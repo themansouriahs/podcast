@@ -124,12 +124,12 @@ public class DownloadingActivity extends PodcastBaseActivity {
 	}
 
 	@Override
-	protected void onDestroy() {
+	public void onDestroy() {
 		super.onDestroy();
 	}
 
 	@Override
-	protected void onResume() {
+	public void onResume() {
 		super.onResume();
 		if (mServiceBinder == null)
 			return;

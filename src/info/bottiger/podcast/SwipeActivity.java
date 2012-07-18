@@ -78,7 +78,14 @@ public class SwipeActivity extends FragmentActivity {
 
         @Override
         public Fragment getItem(int i) {
-            Fragment fragment = new DummySectionFragment();
+            Fragment fragment;
+            if (i == 0) {
+            	fragment = new ChannelFragment();
+            } else if (i == 1) {
+            	fragment = new AllItemFragment();
+            } else {
+            	fragment = new DummySectionFragment();
+            }
             Bundle args = new Bundle();
             args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, i + 1);
             fragment.setArguments(args);
