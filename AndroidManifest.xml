@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="info.xuluan.podcast"  android:versionName="1.1.0"
-	android:versionCode="101">
-      
-	<uses-sdk android:minSdkVersion="3" android:targetSdkVersion="4" />
-      
+    package="info.bottiger.podcast"
+    android:versionCode="101"
+    android:versionName="1.1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="8"
+        android:targetSdkVersion="14" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -13,74 +15,141 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.VIBRATE" />
-    
-    <supports-screens android:largeScreens="true"
-		android:normalScreens="true" android:smallScreens="true"
-		android:anyDensity="true" />
-	
-    <application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="false">
+
+    <supports-screens
+        android:anyDensity="true"
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:smallScreens="true" />
+
+    <application
+        android:debuggable="true"
+        android:icon="@drawable/icon"
+        android:label="@string/app_name" >
         <uses-library android:name="android.test.runner" />
-	
-        <activity android:name=".StartupActivity" android:label="@string/app_name">
+
+        
+        
+        <activity
+            android:name=".SwipeActivity"
+            android:label="@string/title_activity_swipe" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>    
-        <activity android:name=".MainActivity" android:label="@string/app_name">
+        </activity>
+        <activity
+            android:name="info.bottiger.podcast.StartupActivity"
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <!-- <category android:name="android.intent.category.LAUNCHER" />  -->
+
+                <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
             </intent-filter>
-        </activity>    
-        <activity android:name=".AllItemActivity"
-                  android:label="@string/app_name">
         </activity>
-        <activity android:name=".ItemActivity" android:label="@string/app_name">
+        <activity
+            android:name="info.bottiger.podcast.MainActivity"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="info.bottiger.podcast.AllItemActivity"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name="info.bottiger.podcast.ItemActivity"
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.EDIT" />
-                <data android:mimeType="vnd.android.cursor.item/vnd.xuluan.podcast.item" />
+
+                <data android:mimeType="vnd.android.cursor.item/vnd.bottiger.podcast.item" />
 
                 <category android:name="android.intent.category.DEFAULT" />
-           </intent-filter>        
-        
+            </intent-filter>
         </activity>
-        <activity android:name=".PlayerActivity" android:label="@string/app_name">
+        <activity
+            android:name="info.bottiger.podcast.PlayerActivity"
+            android:label="@string/app_name" >
         </activity>
-        
-        <activity android:name=".SearchActivity" android:label="@string/app_name"></activity>
-        
-        <activity android:name=".ChannelActivity" android:label="@string/app_name">
+        <activity
+            android:name="info.bottiger.podcast.SearchActivity"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name="info.bottiger.podcast.ChannelActivity"
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.EDIT" />
-                <data android:mimeType="vnd.android.cursor.item/vnd.xuluan.podcast.subscription" />
+
+                <data android:mimeType="vnd.android.cursor.item/vnd.bottiger.podcast.subscription" />
+
                 <category android:name="android.intent.category.DEFAULT" />
-           </intent-filter>        
+            </intent-filter>
         </activity>
-        
-        <activity android:name=".ChannelDetailsActivity" android:label="@string/app_name">
+        <activity
+            android:name="info.bottiger.podcast.ChannelDetailsActivity"
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-                <data android:mimeType="vnd.android.cursor.item/vnd.xuluan.podcast.subscription" />
+
+                <data android:mimeType="vnd.android.cursor.item/vnd.bottiger.podcast.subscription" />
+
                 <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>        
+            </intent-filter>
         </activity>
-        
-        <activity android:name=".ChannelsActivity" android:label="@string/app_name"></activity>
-        <activity android:name=".AddChannelActivity" android:label="@string/title_channels"></activity>
-        <activity android:name=".BackupChannelsActivity" android:label="@string/title_channels"></activity>
-        <activity android:name=".Pref" android:label="Settings"></activity>		
-        <activity android:name=".HomeActivity" android:label="@string/app_name"></activity>		
-        <activity android:name=".DownloadingActivity" android:label="Downloading"></activity>		
-        <activity android:name=".PlayListActivity" android:label="Playlist"></activity>				
-        <service android:enabled="true" android:name=".service.PodcastService"></service>
-        <service android:enabled="true" android:name=".service.PlayerService"></service>        
-        <provider android:name=".provider.PodcastProvider" android:authorities="info.xuluan.podcast.provider.podcastprovider"></provider>
+        <activity
+            android:name="info.bottiger.podcast.ChannelsActivity"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name="info.bottiger.podcast.AddChannelActivity"
+            android:label="@string/title_channels" >
+        </activity>
+        <activity
+            android:name="info.bottiger.podcast.BackupChannelsActivity"
+            android:label="@string/title_channels" >
+        </activity>
+        <activity
+            android:name="info.bottiger.podcast.Pref"
+            android:label="Settings" >
+        </activity>
+        <activity
+            android:name="info.bottiger.podcast.HomeActivity"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name="info.bottiger.podcast.DownloadingActivity"
+            android:label="Downloading" >
+        </activity>
+        <activity
+            android:name="info.bottiger.podcast.PlayListActivity"
+            android:label="Playlist" >
+        </activity>
+
+        <service
+            android:name="info.bottiger.podcast.service.PodcastService"
+            android:enabled="true" >
+        </service>
+        <service
+            android:name="info.bottiger.podcast.service.PlayerService"
+            android:enabled="true" >
+        </service>
+
+        <provider
+            android:name="info.bottiger.podcast.provider.PodcastProvider"
+            android:authorities="info.bottiger.podcast.provider.podcastprovider" >
+        </provider>
+
     </application>
-	
-    <instrumentation android:name="android.test.InstrumentationTestRunner"
-                     android:targetPackage="info.xuluan.podcast"
-                     android:label="Hapi Podcast test"/>	
-</manifest> 
+
+    <instrumentation
+        android:name="android.test.InstrumentationTestRunner"
+        android:label="Hapi Podcast test"
+        android:targetPackage="info.bottiger.podcast" />
+
+</manifest>
