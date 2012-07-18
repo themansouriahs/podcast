@@ -1,5 +1,8 @@
 package info.bottiger.podcast;
 
+import info.bottiger.podcast.utils.GoogleReader;
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.content.Context;
@@ -45,6 +48,12 @@ public class SwipeActivity extends FragmentActivity {
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+        
+
+        Account[] a = AccountManager.get(getApplicationContext()).getAccountsByType("com.google");
+        GoogleReader agr = new GoogleReader();
+        agr.refreshAuthToken(SwipeActivity.this, a[0]);
+        agr.getSubscriptionsFromReader();
 
     }
 

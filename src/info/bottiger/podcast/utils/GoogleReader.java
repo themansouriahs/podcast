@@ -92,10 +92,8 @@ public class GoogleReader {
 	public static final String COMSUMER_KEY = "13654253758.apps.googleusercontent.com";
 
 	private AccountManagerFuture<Bundle> amf = null;
-
-	public GoogleReader() {
-	}
-
+	private Context context = null;
+	
 	public void oauth() throws Exception {
 		new HTTPRequest().execute();
 	}
@@ -103,6 +101,7 @@ public class GoogleReader {
 	public void refreshAuthToken(final Context context, final Account account) {
 		//final SharedPreferences settings = activity.getSharedPreferences(
 		//		PREF_NAME, 0);
+		this.context = context;
 		final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
 		String accessToken = settings.getString(PREF_TOKEN, "");
 		final AccountManagerCallback<Bundle> cb = new AccountManagerCallback<Bundle>() {
@@ -299,6 +298,7 @@ public class GoogleReader {
 				}
 
 				Subscription podcast = new Subscription(podFeed);
+				podcast.subscribe(GoogleReader.this.context.getContentResolver());
 				//podcast.subscribe(getContentResolver());
 				//contentService.addSubscription(podcast);
 			}
