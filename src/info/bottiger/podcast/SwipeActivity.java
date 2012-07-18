@@ -1,9 +1,11 @@
 package info.bottiger.podcast;
 
+import info.bottiger.podcast.RecentItemFragment.OnEpisodeSelectedListener;
 import info.bottiger.podcast.utils.GoogleReader;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.os.Bundle;
@@ -11,6 +13,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.ListFragment;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
 import android.view.Gravity;
@@ -29,7 +32,7 @@ public class SwipeActivity extends FragmentActivity {
      * keep every loaded fragment in memory. If this becomes too memory intensive, it may be best
      * to switch to a {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
-    SectionsPagerAdapter mSectionsPagerAdapter;
+    SectionsPagerAdapter mSectionsPagerAdapter; // FIXME not static
 
     /**
      * The {@link ViewPager} that will host the section contents.
@@ -62,6 +65,21 @@ public class SwipeActivity extends FragmentActivity {
         getMenuInflater().inflate(R.menu.activity_swipe, menu);
         return true;
     }
+    
+    public static class RecentIgemFragment extends ListFragment {
+        OnEpisodeSelectedListener mListener;
+ 
+        @Override
+        public void onAttach(Activity activity) {
+            super.onAttach(activity);
+            try {
+                mListener = (OnEpisodeSelectedListener) activity;
+                int i = 5;
+            } catch (ClassCastException e) {
+                throw new ClassCastException(activity.toString() + " must implement OnArticleSelectedListener");
+            }
+        }
+    }
 
     
 
@@ -80,9 +98,9 @@ public class SwipeActivity extends FragmentActivity {
         public Fragment getItem(int i) {
             Fragment fragment;
             if (i == 0) {
-            	fragment = new ChannelFragment();
-            } else if (i == 1) {
-            	fragment = new AllItemFragment();
+            	fragment = new SubscriptionsFragment();
+            } else if (i == 2) {
+            	fragment = new RecentItemFragment();
             } else {
             	fragment = new DummySectionFragment();
             }

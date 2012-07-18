@@ -26,7 +26,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 /* Copy of ChannelActivity */
-public class ChannelFragment extends PodcastBaseFragment {
+public class SubscriptionsFragment extends PodcastBaseFragment {
 
 	private static final int MENU_UNSUBSCRIBE = Menu.FIRST + 1;
 	private static final int MENU_AUTO_DOWNLOAD = Menu.FIRST + 2;

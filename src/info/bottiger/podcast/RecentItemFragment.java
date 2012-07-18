@@ -9,6 +9,7 @@ import info.bottiger.podcast.utils.IconCursorAdapter;
 
 import java.util.HashMap;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Service;
 import android.content.ContentUris;
@@ -20,6 +21,9 @@ import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.CursorLoader;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,7 +32,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class AllItemFragment extends PodcastBaseFragment {
+public class RecentItemFragment extends PodcastBaseFragment {
 
 	private static final int MENU_REFRESH = Menu.FIRST + 1;
 	private static final int MENU_SORT = Menu.FIRST + 2;
@@ -68,6 +72,7 @@ public class AllItemFragment extends PodcastBaseFragment {
 	 */
 	
 	private View V;
+	OnEpisodeSelectedListener mListener;
 	
 	static {
 
@@ -268,6 +273,11 @@ public class AllItemFragment extends PodcastBaseFragment {
 		return super.onOptionsItemSelected(item);
 	}
 	*/
+	
+	// Container Activity must implement this interface
+    public interface OnEpisodeSelectedListener {
+        public void onEpisodeSelected(Uri episodeUri);
+    }
 
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
@@ -275,8 +285,13 @@ public class AllItemFragment extends PodcastBaseFragment {
 		Uri uri = ContentUris.withAppendedId(getActivity().getIntent().getData(), id);
 		String action = getActivity().getIntent().getAction();
 		if (Intent.ACTION_PICK.equals(action)
-				|| Intent.ACTION_GET_CONTENT.equals(action)) {
-			//setResult(RESULT_OK, new Intent().setData(uri)); FIXME
+				|| Intent.ACTION_GET_CONTENT.equals(action)
+				|| Intent.ACTION_MAIN.equals(action)) {
+			//getActivity().setResult(Activity.RESULT_OK, new Intent().setData(uri));
+	        // Append the clicked item's row ID with the content provider Uri
+	        Uri noteUri = ContentUris.withAppendedId(ItemColumns.URI, id);
+	        // Send the event and Uri to the host activity
+	        mListener.onEpisodeSelected(noteUri);
 		} else {
 
 
@@ -374,9 +389,9 @@ public class AllItemFragment extends PodcastBaseFragment {
 	public void startInit() {
 
 		// FIXME
-		//mCursor = managedQuery(ItemColumns.URI, PROJECTION, getWhere(), null, getOrder());
+		mCursor = new CursorLoader(getActivity(), ItemColumns.URI, PROJECTION, getWhere(), null, getOrder()).loadInBackground();
 
-		//mAdapter = AllItemFragment.listItemCursorAdapter(this, mCursor);
+		mAdapter = RecentItemFragment.listItemCursorAdapter(this.getActivity(), mCursor);
 		setListAdapter(mAdapter);
 
 		super.startInit();
