@@ -128,7 +128,7 @@ public class AllItemActivity extends PodcastBaseActivity {
 				new IconCursorAdapter.IconFieldHandler(mIconMap),
 				new IconCursorAdapter.IconFieldHandler(mKeepIconMap)
 		};
-		return new IconCursorAdapter(context, R.layout.channel_list_item, cursor,
+		return new IconCursorAdapter(context, R.layout.channel_list_item_old, cursor,
 				new String[] { SubscriptionColumns.TITLE, SubscriptionColumns.COMMENT, SubscriptionColumns.LINK },
 				new int[] { R.id.text1, R.id.icon, R.id.keep_icon },
 				fields);

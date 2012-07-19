@@ -76,6 +76,7 @@ public class PodcastBaseFragment extends ListFragment {
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			mServiceBinder = ((PodcastService.PodcastBinder) service)
 					.getService();
+			mServiceBinder.start_update();
 			//log.debug("onServiceConnected");
 		}
 
@@ -99,8 +100,6 @@ public class PodcastBaseFragment extends ListFragment {
 			e.printStackTrace();
 
 		}
-
-		// stopService(new Intent(this, service.getClass()));
 	}
 
 	@Override
@@ -112,7 +111,7 @@ public class PodcastBaseFragment extends ListFragment {
 			if (mCursor != null)
 				mCursor.close();
 
-			//unbindService(serviceConnection); TODO
+			getActivity().unbindService(serviceConnection);
 
 			startInit();
 
@@ -139,10 +138,10 @@ public class PodcastBaseFragment extends ListFragment {
 
 		log.debug("startInit()");
 
-		//mService = startService(new Intent(this, PodcastService.class));
+		mService = getActivity().startService(new Intent(getActivity(), PodcastService.class));
 
-		//Intent bindIntent = new Intent(this, PodcastService.class);
-		//bindService(bindIntent, serviceConnection, Context.BIND_AUTO_CREATE);
+		Intent bindIntent = new Intent(getActivity(), PodcastService.class);
+		getActivity().bindService(bindIntent, serviceConnection, Context.BIND_AUTO_CREATE);
 		
 		/*
         gestureDetector = new GestureDetector(new MyGestureDetector());

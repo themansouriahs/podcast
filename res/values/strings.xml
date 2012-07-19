@@ -118,6 +118,6 @@
     <string name="title_section1">Subscribed Podcasts</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
-    <string name="title_activity_swipe">SwipeActivity</string>
+    <string name="title_activity_swipe">SoundWaves</string>
 
 </resources>

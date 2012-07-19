@@ -140,7 +140,9 @@ public class IconCursorAdapter extends SimpleCursorAdapter {
 		final int[] from = mFrom2;
 
 		for (int i = 0; i < count; i++) {
-			mFieldHandlers[i].setViewValue(this,cursor,holder[i],from[i]);
+			View v2 = holder[i];
+			FieldHandler fh = mFieldHandlers[i];
+			fh.setViewValue(this,cursor,v2,from[i]);
 		}
 
 	}

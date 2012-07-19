@@ -6,6 +6,7 @@ import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.SubscriptionColumns;
 import info.bottiger.podcast.utils.DialogMenu;
 import info.bottiger.podcast.utils.IconCursorAdapter;
+import info.bottiger.podcast.utils.IconCursorAdapter.TextFieldHandler;
 
 import java.util.HashMap;
 
@@ -47,8 +48,8 @@ public class RecentItemFragment extends PodcastBaseFragment {
 	private static final String[] PROJECTION = new String[] { 
 		 	ItemColumns._ID, // 0
 			ItemColumns.TITLE, // 1
-			ItemColumns.DURATION, 
 			ItemColumns.SUB_TITLE, 
+			ItemColumns.DURATION, 
 			ItemColumns.STATUS,
 			ItemColumns.SUBS_ID,
 			ItemColumns.KEEP
@@ -107,15 +108,15 @@ public class RecentItemFragment extends PodcastBaseFragment {
 	public static IconCursorAdapter listItemCursorAdapter(Context context, Cursor cursor) {
 		IconCursorAdapter.FieldHandler[] fields = {
 				IconCursorAdapter.defaultTextFieldHandler,
-				IconCursorAdapter.defaultTextFieldHandler,
-				IconCursorAdapter.defaultTextFieldHandler,
-				new IconCursorAdapter.IconFieldHandler(mIconMap),
-				new IconCursorAdapter.IconFieldHandler(mKeepIconMap)
+				new TextFieldHandler(),
+				new TextFieldHandler()
+				//new IconCursorAdapter.IconFieldHandler(mIconMap),
+				//new IconCursorAdapter.IconFieldHandler(mKeepIconMap)
 		};
 		return new IconCursorAdapter(context, R.layout.list_item, cursor,
 				new String[] { ItemColumns.TITLE, ItemColumns.SUB_TITLE,
-						ItemColumns.DURATION, ItemColumns.STATUS, ItemColumns.KEEP },
-				new int[] { R.id.text1, R.id.text2, R.id.text3, R.id.icon, R.id.keep_icon },
+						ItemColumns.DURATION },
+				new int[] { R.id.title, R.id.podcast, R.id.duration },
 				fields);
 	}
 
@@ -149,7 +150,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 
 		//super.onCreate(savedInstanceState);
 
-		V = inflater.inflate(R.layout.main, container, false);
+		V = inflater.inflate(R.layout.recent, container, false);
 		//setContentView(R.layout.main);
 		//setTitle(getResources().getString(R.string.title_episodes));
 
@@ -162,6 +163,9 @@ public class RecentItemFragment extends PodcastBaseFragment {
 		//mNextIntent = new Intent(this, DownloadingActivity.class);
 		
 		getPref();
+
+		//mServiceBinder.
+		//mServiceBinder.start_update();
 
 		//TabsHelper.setEpisodeTabClickListeners(this, R.id.episode_bar_all_button);
 
@@ -291,7 +295,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 	        // Append the clicked item's row ID with the content provider Uri
 	        Uri noteUri = ContentUris.withAppendedId(ItemColumns.URI, id);
 	        // Send the event and Uri to the host activity
-	        mListener.onEpisodeSelected(noteUri);
+	        //mListener.onEpisodeSelected(noteUri);
 		} else {
 
 
@@ -398,7 +402,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 
 	}
 	public String getOrder() {
-			String order = ItemColumns.CREATED + " DESC";
+			String order = ItemColumns.DATE + " DESC"; // before: ItemColumns.CREATED
  			if(pref_order==0){
  				 order = ItemColumns.SUBS_ID +"," +order;
  			}else if(pref_order==1){
