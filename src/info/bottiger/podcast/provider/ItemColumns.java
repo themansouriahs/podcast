@@ -59,6 +59,7 @@ public class ItemColumns implements BaseColumns {
 	public static final String RESOURCE = "res";
 
 	public static final String DURATION = "duration";
+	public static final String IMAGE_URL = "image";
 
 	public static final String LENGTH = "length";
 
@@ -79,7 +80,7 @@ public class ItemColumns implements BaseColumns {
 	public static final String[] ALL_COLUMNS = { _ID, SUBS_ID, TITLE, AUTHOR,
 			DATE, LAST_UPDATE, CONTENT, STATUS, URL, RESOURCE, DURATION,
 			LENGTH, OFFSET, PATHNAME, FAIL_COUNT, MEDIA_URI, SUB_TITLE,
-			CREATED, TYPE, KEEP };
+			CREATED, TYPE, KEEP, IMAGE_URL };
 
 	public static final String DEFAULT_SORT_ORDER = CREATED + " DESC";
 
@@ -96,6 +97,7 @@ public class ItemColumns implements BaseColumns {
 		+ URL + " VARCHAR(1024), " 
 		+ RESOURCE + " VARCHAR(1024), " 
 		+ DURATION + " VARCHAR(16), " 
+		+ IMAGE_URL + " VARCHAR(1024), " 
 		+ LENGTH + " INTEGER, " 
 		+ OFFSET + " INTEGER, "
 		+ PATHNAME + " VARCHAR(128), " 
@@ -172,6 +174,11 @@ public class ItemColumns implements BaseColumns {
 		if (values.containsKey(DURATION) == false) {
 			values.put(DURATION, "");
 		}
+		
+		if (values.containsKey(IMAGE_URL) == false) {
+			values.put(IMAGE_URL, "");
+		}
+
 
 		if (values.containsKey(LENGTH) == false) {
 			values.put(LENGTH, 0);

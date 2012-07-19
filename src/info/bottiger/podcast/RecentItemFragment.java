@@ -49,6 +49,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 		 	ItemColumns._ID, // 0
 			ItemColumns.TITLE, // 1
 			ItemColumns.SUB_TITLE, 
+			ItemColumns.IMAGE_URL,
 			ItemColumns.DURATION, 
 			ItemColumns.STATUS,
 			ItemColumns.SUBS_ID,
@@ -114,7 +115,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 				//new IconCursorAdapter.IconFieldHandler(mKeepIconMap)
 		};
 		return new IconCursorAdapter(context, R.layout.list_item, cursor,
-				new String[] { ItemColumns.TITLE, ItemColumns.SUB_TITLE,
+				new String[] { ItemColumns.TITLE, ItemColumns.IMAGE_URL,
 						ItemColumns.DURATION },
 				new int[] { R.id.title, R.id.podcast, R.id.duration },
 				fields);
@@ -372,7 +373,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 	
 				feeditem.status = ItemColumns.ITEM_STATUS_DOWNLOAD_QUEUE;
 				feeditem.update(getActivity().getContentResolver());
-				mServiceBinder.start_download();
+				SwipeActivity.mServiceBinder.start_download();
 				return;
 			}
 			case MENU_ITEM_START_PLAY: {
@@ -388,14 +389,12 @@ public class RecentItemFragment extends PodcastBaseFragment {
         }
         
 
-
-	@Override
 	public void startInit() {
 
 		// FIXME
-		mCursor = new CursorLoader(getActivity(), ItemColumns.URI, PROJECTION, getWhere(), null, getOrder()).loadInBackground();
+		SwipeActivity.mCursor = new CursorLoader(getActivity(), ItemColumns.URI, PROJECTION, getWhere(), null, getOrder()).loadInBackground();
 
-		mAdapter = RecentItemFragment.listItemCursorAdapter(this.getActivity(), mCursor);
+		mAdapter = RecentItemFragment.listItemCursorAdapter(this.getActivity(), SwipeActivity.mCursor);
 		setListAdapter(mAdapter);
 
 		super.startInit();

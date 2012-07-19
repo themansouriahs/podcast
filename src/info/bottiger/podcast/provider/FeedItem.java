@@ -36,8 +36,7 @@ public class FeedItem {
 	public String content;
 	public String resource;
 	public String duration;
-	
-	public byte[] picture;
+	public String image;
 
 	public long id;
 
@@ -185,7 +184,7 @@ public class FeedItem {
 		pathname = null;
 		uri = null;
 		type = null;
-		picture = null;
+		image = null;
 
 		id = -1;
 		offset = -1;
@@ -487,6 +486,7 @@ public class FeedItem {
 		item.length = cursor.getLong(cursor.getColumnIndex(ItemColumns.LENGTH));
 
 		item.url = cursor.getString(cursor.getColumnIndex(ItemColumns.URL));
+		item.image = cursor.getString(cursor.getColumnIndex(ItemColumns.IMAGE_URL));
 		item.title = cursor.getString(cursor.getColumnIndex(ItemColumns.TITLE));
 		item.author = cursor.getString(cursor
 				.getColumnIndex(ItemColumns.AUTHOR));

@@ -261,7 +261,7 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 	
 				feeditem.status = ItemColumns.ITEM_STATUS_DOWNLOAD_QUEUE;
 				feeditem.update(getActivity().getContentResolver());
-				mServiceBinder.start_download();
+				SwipeActivity.mServiceBinder.start_download();
 				return;
 			}
 			case MENU_ITEM_START_PLAY: {
@@ -292,11 +292,11 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 		String where = ItemColumns.SUBS_ID + "=" + mChannel.id + " AND " 
 		+ ItemColumns.STATUS + "<" + ItemColumns.ITEM_STATUS_MAX_PLAYLIST_VIEW;
 */
-		mCursor = new CursorLoader(getActivity(), SubscriptionColumns.URI, PROJECTION, null, null, null).loadInBackground();
+		SwipeActivity.mCursor = new CursorLoader(getActivity(), SubscriptionColumns.URI, PROJECTION, null, null, null).loadInBackground();
 
 		
 		//mAdapter = AllItemActivity.channelListItemCursorAdapter(getActivity().getApplicationContext(), mCursor);
-		mAdapter = AllItemActivity.channelListSubscriptionCursorAdapter(getActivity().getApplicationContext(), mCursor);
+		mAdapter = AllItemActivity.channelListSubscriptionCursorAdapter(getActivity().getApplicationContext(), SwipeActivity.mCursor);
 		/*		
 		 * mAdapter = new IconCursorAdapter(this, R.layout.channel_list_item, mCursor,
 		 *

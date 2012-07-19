@@ -2,18 +2,26 @@ package info.bottiger.podcast;
 
 import info.bottiger.podcast.RecentItemFragment.OnEpisodeSelectedListener;
 import info.bottiger.podcast.provider.ItemColumns;
+import info.bottiger.podcast.provider.PodcastProvider;
+import info.bottiger.podcast.service.PodcastService;
 import info.bottiger.podcast.utils.GoogleReader;
+import info.bottiger.podcast.utils.Log;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.FragmentTransaction;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -31,9 +39,13 @@ import android.widget.TextView;
 
 public class SwipeActivity extends FragmentActivity {
 
-	private static final int MENU_SETTINGS = Menu.FIRST + 1;
-	private static final int MENU_REFRESH = Menu.FIRST + 2;
-
+	
+	protected static PodcastService mServiceBinder = null;
+	protected static Cursor mCursor = null;
+	protected boolean mInit = false;
+	protected final Log log = Log.getLog(getClass());
+	protected static ComponentName mService = null;
+	
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide
 	 * fragments for each of the sections. We use a
@@ -48,11 +60,27 @@ public class SwipeActivity extends FragmentActivity {
 	 * The {@link ViewPager} that will host the section contents.
 	 */
 	ViewPager mViewPager;
+	
+	protected static ServiceConnection serviceConnection = new ServiceConnection() {
+		public void onServiceConnected(ComponentName className, IBinder service) {
+			mServiceBinder = ((PodcastService.PodcastBinder) service)
+					.getService();
+			mServiceBinder.start_update();
+			//log.debug("onServiceConnected");
+		}
+
+		public void onServiceDisconnected(ComponentName className) {
+			mServiceBinder = null;
+			//log.debug("onServiceDisconnected");
+		}
+	};
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_swipe);
+		PodcastProvider pp = new PodcastProvider();
+		
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections
 		// of the app.
@@ -70,6 +98,32 @@ public class SwipeActivity extends FragmentActivity {
 		agr.getSubscriptionsFromReader();
 
 	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		if (mInit) {
+			mInit = false;
+
+			if (mCursor != null)
+				mCursor.close();
+
+			unbindService(serviceConnection);
+
+			//startInit(); FIXME
+
+		}
+
+	}
+	
+	@Override
+	public void onLowMemory() {
+		super.onLowMemory();
+		mInit = true;
+
+		log.debug("onLowMemory()");
+		//finish();
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -80,16 +134,16 @@ public class SwipeActivity extends FragmentActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case MENU_SETTINGS:
+		case R.id.menu_settings:
 			// mServiceBinder.start_update();
 			return true;
-		case MENU_REFRESH:
-			//mServiceBinder.start_update();
+		case R.id.menu_refresh:
+			mServiceBinder.start_update();
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
-
+	/*
 	public static class RecentItemFragment extends ListFragment {
 		OnEpisodeSelectedListener mListener;
 
@@ -105,6 +159,7 @@ public class SwipeActivity extends FragmentActivity {
 			}
 		}
 	}
+	*/
 
 	/**
 	 * A {@link FragmentPagerAdapter} that returns a fragment corresponding to

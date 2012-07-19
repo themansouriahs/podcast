@@ -20,7 +20,7 @@ public class SubscriptionColumns implements BaseColumns {
 
 	public static final String DESCRIPTION = "description";
 	
-	public static final String IMAGE_URL = "image_url";
+	public static final String IMAGE_URL = "image";
 
 	public static final String LAST_UPDATED = "last_updated";
 

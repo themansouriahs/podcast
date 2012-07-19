@@ -29,50 +29,21 @@ public class PodcastBaseFragment extends ListFragment {
 	public static final int COLUMN_INDEX_TITLE = 1;
 	
 
-	protected  static PodcastService mServiceBinder = null;
-	protected final Log log = Log.getLog(getClass());
+	//protected  static PodcastService mServiceBinder = null;
+	//protected final Log log = Log.getLog(getClass());
 
 	protected SimpleCursorAdapter mAdapter;
-	protected Cursor mCursor = null;
+	//protected Cursor mCursor = null;
 
-	protected static ComponentName mService = null;
+	//protected static ComponentName mService = null;
 	
-	protected boolean mInit = false;
+	//protected boolean mInit = false;
 	protected Intent mPrevIntent = null;
 	
 	protected Intent mNextIntent = null;
 	
 	
-	/*
-	protected GestureDetector gestureDetector;
-	protected View.OnTouchListener gestureListener;	
-	
-    class MyGestureDetector extends SimpleOnGestureListener {
-        @Override
-        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-        	//log.debug("onFling");
-            try {
-                if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
-                    return false;
-                // right to left swipe
-                if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                	if(mPrevIntent!=null)
-                		startActivity(mPrevIntent);
-                	finish();
-
-                }  else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                	if(mPrevIntent!=null)
-                		startActivity(mNextIntent);
-                	finish();
-                }
-            } catch (Exception e) {
-                // nothing
-            }
-            return false;
-        }
-    }	
-	*/
-	protected static ServiceConnection serviceConnection = new ServiceConnection() {
+	/*protected static ServiceConnection serviceConnection = new ServiceConnection() {
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			mServiceBinder = ((PodcastService.PodcastBinder) service)
 					.getService();
@@ -84,7 +55,7 @@ public class PodcastBaseFragment extends ListFragment {
 			mServiceBinder = null;
 			//log.debug("onServiceDisconnected");
 		}
-	};
+	};*/
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -102,6 +73,7 @@ public class PodcastBaseFragment extends ListFragment {
 		}
 	}
 
+	/*
 	@Override
 	public void onResume() {
 		super.onResume();
@@ -118,6 +90,7 @@ public class PodcastBaseFragment extends ListFragment {
 		}
 
 	}
+	*/
 
 	@Override
 	public void onPause() {
@@ -125,6 +98,7 @@ public class PodcastBaseFragment extends ListFragment {
 
 	}
 
+	/*
 	@Override
 	public void onLowMemory() {
 		super.onLowMemory();
@@ -133,28 +107,13 @@ public class PodcastBaseFragment extends ListFragment {
 		log.debug("onLowMemory()");
 		//finish();
 	}
-
+	*/
 	public void startInit() {
 
-		log.debug("startInit()");
-
-		mService = getActivity().startService(new Intent(getActivity(), PodcastService.class));
+		SwipeActivity.mService = getActivity().startService(new Intent(getActivity(), PodcastService.class));
 
 		Intent bindIntent = new Intent(getActivity(), PodcastService.class);
-		getActivity().bindService(bindIntent, serviceConnection, Context.BIND_AUTO_CREATE);
-		
-		/*
-        gestureDetector = new GestureDetector(new MyGestureDetector());
-        gestureListener = new View.OnTouchListener() {
-            public boolean onTouch(View v, MotionEvent event) {
-                if (gestureDetector.onTouchEvent(event)) {
-                    return true;
-                }
-                return false;
-            }
-        };
-        */
-        
-        //getListView().setOnTouchListener(gestureListener);	
+		getActivity().bindService(bindIntent, SwipeActivity.serviceConnection, Context.BIND_AUTO_CREATE);
 	}
+	
 }
