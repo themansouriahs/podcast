@@ -107,6 +107,7 @@ public class FeedHandler  {
 		subscription.fail_count = 0;
 		subscription.title = listener.getFeedTitle();
 		subscription.description = listener.getFeedDescription();
+		subscription.imageURL = listener.getFeedImage();
 		subscription.lastItemUpdated = update_date;
 		subscription.update(cr);
 		log.debug("add url: "+subscription.url+"\n add num = "+add_num);

@@ -19,6 +19,7 @@ public class FeedParserListener implements FeedParserListenerInterface {
 
 	private String feedTitle;
 	private String feedDescription;
+	private String feedImage;
 	private String feedLink;
 	private List<FeedItem> items = new ArrayList<FeedItem>();
 	
@@ -41,6 +42,10 @@ public class FeedParserListener implements FeedParserListenerInterface {
 	public String getFeedDescription() {
 		return feedDescription;
 	}
+	
+	public String getFeedImage() {
+		return feedImage;
+	}
 /*
 	public FeedItem[] getFeedItems() {
 		return items.toArray(new FeedItem[items.size()]);
@@ -52,6 +57,10 @@ public class FeedParserListener implements FeedParserListenerInterface {
 
 	public void onFeedDescriptionLoad(String feedDescription) {
 		this.feedDescription = feedDescription;
+	}
+	
+	public void onFeedImageLoad(String feedImage) {
+		this.feedImage = feedImage;
 	}
 
 	public void onFeedTitleLoad(String feedTitle) {

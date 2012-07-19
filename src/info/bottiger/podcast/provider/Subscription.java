@@ -23,6 +23,7 @@ public class Subscription {
 
 	public String url;
 	public String description;
+	public String imageURL;
 	public long lastUpdated;
 	public long lastItemUpdated;
 	public long fail_count;
@@ -122,6 +123,7 @@ public class Subscription {
 		link = null;
 		comment = "";
 		description = null;
+		imageURL = null;
 		lastUpdated = -1;
 		fail_count = -1;
 		lastItemUpdated = -1;
@@ -157,6 +159,7 @@ public class Subscription {
 		cv.put(SubscriptionColumns.LAST_UPDATED, 0L);
 		cv.put(SubscriptionColumns.COMMENT, comment);
 		cv.put(SubscriptionColumns.DESCRIPTION, description);
+		cv.put(SubscriptionColumns.IMAGE_URL, imageURL);
 		Uri uri = context.insert(SubscriptionColumns.URI, cv);
 		if (uri == null) {
 			return ADD_FAIL_UNSUCCESS;

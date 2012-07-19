@@ -31,6 +31,7 @@ public class FeedParserHandler extends DefaultHandler {
 	private static final String NODE_RSS_AUTHOR = "author";
 	private static final String NODE_RSS_CREATOR = "creator";
 	private static final String NODE_RSS_GUID = "guid";
+	private static final String NODE_RSS_IMAGE = "url";
 
 	private static final String NODE_RSS_SUBTITLE = "subtitle";
 	private static final String NODE_RSS_SUMMARY = "summary";
@@ -54,6 +55,7 @@ public class FeedParserHandler extends DefaultHandler {
 	private boolean mFeedTitleLoaded = false;
 	private String mFeedTitle = "";
 	private boolean mFeedDescriptionLoaded = false;
+	private boolean mFeedImageLoaded = false;
 
 	private int mType = TYPE_UNKNOWN;
 	private FeedItem mCurrentItem = null;
@@ -131,6 +133,11 @@ public class FeedParserHandler extends DefaultHandler {
 						if (!mFeedDescriptionLoaded) {
 							mFeedDescriptionLoaded = true;
 							listener.onFeedDescriptionLoad(mCache.toString());
+						}
+					} else if (NODE_RSS_IMAGE.equalsIgnoreCase(localName)) {
+						if (!mFeedImageLoaded) {
+							mFeedImageLoaded = true;
+							listener.onFeedImageLoad(mCache.toString());
 						}
 					}
 				} else if (mType == TYPE_FEED) {

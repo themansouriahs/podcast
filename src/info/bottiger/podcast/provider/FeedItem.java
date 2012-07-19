@@ -36,6 +36,8 @@ public class FeedItem {
 	public String content;
 	public String resource;
 	public String duration;
+	
+	public byte[] picture;
 
 	public long id;
 
@@ -183,6 +185,7 @@ public class FeedItem {
 		pathname = null;
 		uri = null;
 		type = null;
+		picture = null;
 
 		id = -1;
 		offset = -1;

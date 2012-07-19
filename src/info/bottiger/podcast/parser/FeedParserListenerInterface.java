@@ -9,6 +9,8 @@ public interface FeedParserListenerInterface {
 	void onFeedTitleLoad(String feedTitle);
 
 	void onFeedDescriptionLoad(String feedDescription);
+	
+	void onFeedImageLoad(String image);
 
 	void onFeedLinkLoad(String feedLink);
 
