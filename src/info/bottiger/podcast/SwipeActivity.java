@@ -97,9 +97,9 @@ public class SwipeActivity extends FragmentActivity {
         @Override
         public Fragment getItem(int i) {
             Fragment fragment;
-            if (i == 0) {
+            if (i == 1) {
             	fragment = new SubscriptionsFragment();
-            } else if (i == 2) {
+            } else if (i == 0) {
             	fragment = new RecentItemFragment();
             } else {
             	fragment = new DummySectionFragment();
