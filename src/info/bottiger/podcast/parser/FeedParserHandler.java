@@ -72,6 +72,7 @@ public class FeedParserHandler extends DefaultHandler {
 		fetchChars.add(NODE_RSS_AUTHOR);
 		fetchChars.add(NODE_RSS_CREATOR);
 		fetchChars.add(NODE_RSS_PUBDATE);
+		fetchChars.add(NODE_RSS_IMAGE);
 
 		fetchChars.add(NODE_RSS_SUBTITLE);
 		fetchChars.add(NODE_RSS_SUMMARY);
@@ -163,6 +164,8 @@ public class FeedParserHandler extends DefaultHandler {
 						mCurrentItem.title = mCache.toString();
 					else if (NODE_RSS_LINK.equalsIgnoreCase(localName))
 						mCurrentItem.url = mCache.toString();
+					else if (NODE_RSS_IMAGE.equalsIgnoreCase(localName))
+						mCurrentItem.image = mCache.toString();
 					else if (NODE_RSS_AUTHOR.equalsIgnoreCase(localName)
 							|| NODE_RSS_CREATOR.equals(localName))
 						mCurrentItem.author = mCache.toString();
