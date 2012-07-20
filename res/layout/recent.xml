@@ -7,7 +7,7 @@
     <ViewStub
         android:id="@+id/stub_play"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="100dip"
         android:layout_gravity="top"
         android:inflatedId="@+id/player"
         android:layout="@layout/player" />
