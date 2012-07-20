@@ -41,6 +41,7 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 		SubscriptionColumns._ID, // 0
 		SubscriptionColumns.TITLE, // 1
 		SubscriptionColumns.LINK,
+		SubscriptionColumns.IMAGE_URL,
 		SubscriptionColumns.RATING,
 		SubscriptionColumns.LAST_UPDATED,
 		SubscriptionColumns.COMMENT

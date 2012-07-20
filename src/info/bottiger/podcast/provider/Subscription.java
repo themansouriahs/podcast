@@ -182,6 +182,8 @@ public class Subscription {
 				cv.put(SubscriptionColumns.TITLE, title);
 			if (url != null)
 				cv.put(SubscriptionColumns.URL, url);
+			if (imageURL != null)
+				cv.put(SubscriptionColumns.IMAGE_URL, imageURL);
 			if (description != null)
 				cv.put(SubscriptionColumns.DESCRIPTION, description);
 
@@ -218,6 +220,8 @@ public class Subscription {
 				.getColumnIndex(SubscriptionColumns.TITLE));
 		sub.url = cursor.getString(cursor
 				.getColumnIndex(SubscriptionColumns.URL));		
+		sub.imageURL = cursor.getString(cursor
+				.getColumnIndex(SubscriptionColumns.IMAGE_URL));	
 		sub.comment = cursor.getString(cursor
 				.getColumnIndex(SubscriptionColumns.COMMENT));		
 		sub.description = cursor.getString(cursor

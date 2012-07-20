@@ -56,6 +56,7 @@ public class FeedParserHandler extends DefaultHandler {
 	private String mFeedTitle = "";
 	private boolean mFeedDescriptionLoaded = false;
 	private boolean mFeedImageLoaded = false;
+	private String mFeedImageURL = null;
 
 	private int mType = TYPE_UNKNOWN;
 	private FeedItem mCurrentItem = null;
@@ -122,7 +123,7 @@ public class FeedParserHandler extends DefaultHandler {
 		// Feed tag
 		if (mCurrentItem == null) {
 			if (mCache != null) {
-				// Log.d("parser", "<"+localName +"> "+ cache.toString());
+				//log.error("parser<: <"+localName +"> "+ mCache.toString());
 				if (mType == TYPE_RSS) {
 					if (NODE_RSS_TITLE.equalsIgnoreCase(localName)) {
 						if (!mFeedTitleLoaded) {
@@ -138,7 +139,8 @@ public class FeedParserHandler extends DefaultHandler {
 					} else if (NODE_RSS_IMAGE.equalsIgnoreCase(localName)) {
 						if (!mFeedImageLoaded) {
 							mFeedImageLoaded = true;
-							listener.onFeedImageLoad(mCache.toString());
+							mFeedImageURL = mCache.toString();
+							listener.onFeedImageLoad(mFeedImageURL);
 						}
 					}
 				} else if (mType == TYPE_FEED) {
@@ -158,14 +160,16 @@ public class FeedParserHandler extends DefaultHandler {
 		} else {
 			if (mCache != null) {
 				// Log.d("parser item", "<"+localName +"> "+ cache.toString());
-
+				if (mFeedImageLoaded)
+					mCurrentItem.image = mFeedImageURL;
+				
 				if (mType == TYPE_RSS) {
 					if (NODE_RSS_TITLE.equalsIgnoreCase(localName))
 						mCurrentItem.title = mCache.toString();
 					else if (NODE_RSS_LINK.equalsIgnoreCase(localName))
 						mCurrentItem.url = mCache.toString();
-					else if (NODE_RSS_IMAGE.equalsIgnoreCase(localName))
-						mCurrentItem.image = mCache.toString();
+					//else if (NODE_RSS_IMAGE.equalsIgnoreCase(localName))
+					//	mCurrentItem.image = mCache.toString();
 					else if (NODE_RSS_AUTHOR.equalsIgnoreCase(localName)
 							|| NODE_RSS_CREATOR.equals(localName))
 						mCurrentItem.author = mCache.toString();

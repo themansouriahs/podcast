@@ -1,11 +1,14 @@
 package info.bottiger.podcast;
 
 import info.bottiger.podcast.R;
+import info.bottiger.podcast.service.PlayerService;
 import info.bottiger.podcast.service.PodcastService;
 import info.bottiger.podcast.utils.Log;
 
+import android.app.Activity;
 import android.app.ListActivity;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.content.ComponentName;
@@ -29,6 +32,7 @@ public class PodcastBaseFragment extends ListFragment {
 	public static final int COLUMN_INDEX_TITLE = 1;
 	
 
+	protected  static PlayerService mPlayerServiceBinder = null;
 	//protected  static PodcastService mServiceBinder = null;
 	//protected final Log log = Log.getLog(getClass());
 
@@ -41,6 +45,36 @@ public class PodcastBaseFragment extends ListFragment {
 	protected Intent mPrevIntent = null;
 	
 	protected Intent mNextIntent = null;
+	
+	OnEpisodeSelectedListener mListener;
+	
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mListener = (OnEpisodeSelectedListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString() + " must implement OnArticleSelectedListener");
+        }
+    }
+    
+	// Container Activity must implement this interface
+    public interface OnEpisodeSelectedListener {
+        public void onEpisodeSelected(Uri episodeUri);
+    }
+    
+	protected static ServiceConnection serviceConnection = new ServiceConnection() {
+		public void onServiceConnected(ComponentName className, IBinder service) {
+			mPlayerServiceBinder = ((PlayerService.PlayerBinder) service)
+					.getService();
+			//log.debug("onServiceConnected");
+		}
+
+		public void onServiceDisconnected(ComponentName className) {
+			mPlayerServiceBinder = null;
+			//log.debug("onServiceDisconnected");
+		}
+	};	
 	
 	
 	/*protected static ServiceConnection serviceConnection = new ServiceConnection() {

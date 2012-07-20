@@ -30,7 +30,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class RecentItemFragment extends PodcastBaseFragment {
@@ -74,7 +76,6 @@ public class RecentItemFragment extends PodcastBaseFragment {
 	 */
 	
 	private View V;
-	OnEpisodeSelectedListener mListener;
 	
 	static {
 
@@ -110,14 +111,14 @@ public class RecentItemFragment extends PodcastBaseFragment {
 		IconCursorAdapter.FieldHandler[] fields = {
 				IconCursorAdapter.defaultTextFieldHandler,
 				new TextFieldHandler(),
-				new TextFieldHandler()
-				//new IconCursorAdapter.IconFieldHandler(mIconMap),
+				new TextFieldHandler(),
+				new IconCursorAdapter.IconFieldHandler(mIconMap),
 				//new IconCursorAdapter.IconFieldHandler(mKeepIconMap)
 		};
 		return new IconCursorAdapter(context, R.layout.list_item, cursor,
-				new String[] { ItemColumns.TITLE, ItemColumns.IMAGE_URL,
-						ItemColumns.DURATION },
-				new int[] { R.id.title, R.id.podcast, R.id.duration },
+				new String[] { ItemColumns.TITLE, ItemColumns.SUB_TITLE,
+						ItemColumns.DURATION, ItemColumns.IMAGE_URL },
+				new int[] { R.id.title, R.id.podcast, R.id.duration, R.id.list_image },
 				fields);
 	}
 
@@ -278,11 +279,6 @@ public class RecentItemFragment extends PodcastBaseFragment {
 		return super.onOptionsItemSelected(item);
 	}
 	*/
-	
-	// Container Activity must implement this interface
-    public interface OnEpisodeSelectedListener {
-        public void onEpisodeSelected(Uri episodeUri);
-    }
 
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
@@ -297,6 +293,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 	        Uri noteUri = ContentUris.withAppendedId(ItemColumns.URI, id);
 	        // Send the event and Uri to the host activity
 	        //mListener.onEpisodeSelected(noteUri);
+	        this.showPlayingEpisode(id);
 		} else {
 
 
@@ -390,16 +387,38 @@ public class RecentItemFragment extends PodcastBaseFragment {
         
 
 	public void startInit() {
-
-		// FIXME
-		SwipeActivity.mCursor = new CursorLoader(getActivity(), ItemColumns.URI, PROJECTION, getWhere(), null, getOrder()).loadInBackground();
+		showEpisodes(getWhere());
+		super.startInit();
+	}
+	
+	public void showPlayingEpisode(long playingEpisodeID) {
+		//this.getActivity().findViewById(id)
+		ViewStub stub = (ViewStub) getActivity().findViewById(R.id.stub_play);
+	    View inflated = stub.inflate();
+	    
+	    FeedItem episode = FeedItem.getById(getActivity().getContentResolver(), playingEpisodeID);
+	    
+	    TextView t = (TextView)inflated.findViewById(R.id.player_title);
+	    t.setText(episode.title);
+	    
+	    //SwipeActivity.mServiceBinder.
+	    mPlayerServiceBinder.play(playingEpisodeID);
+	    
+		listNonPlayingEpisodes(playingEpisodeID);
+	}
+	
+	public void listNonPlayingEpisodes(long playingEpisodeID) {
+		String excludePLayingEpisode = ItemColumns._ID + "!=" + playingEpisodeID;
+		showEpisodes(excludePLayingEpisode);
+	}
+	
+	public void showEpisodes(String condition) {
+		SwipeActivity.mCursor = new CursorLoader(getActivity(), ItemColumns.URI, PROJECTION, condition, null, getOrder()).loadInBackground();
 
 		mAdapter = RecentItemFragment.listItemCursorAdapter(this.getActivity(), SwipeActivity.mCursor);
 		setListAdapter(mAdapter);
-
-		super.startInit();
-
 	}
+	
 	public String getOrder() {
 			String order = ItemColumns.DATE + " DESC"; // before: ItemColumns.CREATED
  			if(pref_order==0){

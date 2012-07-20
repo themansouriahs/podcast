@@ -12,6 +12,8 @@ import info.bottiger.podcast.R;
 
 import java.util.HashMap;
 
+import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
+
 public class IconCursorAdapter extends SimpleCursorAdapter {
 
 	public static final int ICON_DEFAULT_ID = -1;
@@ -38,6 +40,17 @@ public class IconCursorAdapter extends SimpleCursorAdapter {
 		}
 	}
 	public static class IconFieldHandler implements FieldHandler {
+		public IconFieldHandler(HashMap<Integer,Integer> iconMap) {
+		}
+		public IconFieldHandler() {
+		}
+		public void setViewValue(IconCursorAdapter adapter, Cursor cursor,
+				View v, int fromColumnId) {
+			adapter.setViewImage3((ImageView) v, cursor.getString(fromColumnId));
+		}
+	}
+	/*
+	public static class IconFieldHandler implements FieldHandler {
 		HashMap<Integer, Integer> mIconMap;
 		public IconFieldHandler(HashMap<Integer,Integer> iconMap) {
 			mIconMap = iconMap;
@@ -58,6 +71,7 @@ public class IconCursorAdapter extends SimpleCursorAdapter {
 			adapter.setViewImage2((ImageView) v, icon);
 		}
 	}
+	*/
 	public final static FieldHandler defaultTextFieldHandler = new TextFieldHandler();
 	
 	protected int[] mFrom2;
@@ -131,6 +145,13 @@ public class IconCursorAdapter extends SimpleCursorAdapter {
 	public void setViewImage2(ImageView v, int value) {
 		// Log.w("VIEW", "setViewImage2");
 		v.setImageResource(value);
+	}
+	
+	public void setViewImage3(ImageView v, String imageURL) {
+		// https://github.com/koush/UrlImageViewHelper#readme
+		int cacheTime = 60000 * 60* 24 * 31; // in ms
+		UrlImageViewHelper.loadUrlDrawable(v.getContext(), imageURL);
+		UrlImageViewHelper.setUrlDrawable(v, imageURL, null, cacheTime);
 	}
 
 	@Override

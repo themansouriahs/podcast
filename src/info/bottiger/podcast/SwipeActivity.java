@@ -1,6 +1,6 @@
 package info.bottiger.podcast;
 
-import info.bottiger.podcast.RecentItemFragment.OnEpisodeSelectedListener;
+import info.bottiger.podcast.PodcastBaseFragment.OnEpisodeSelectedListener;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.PodcastProvider;
 import info.bottiger.podcast.service.PodcastService;
@@ -20,6 +20,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
@@ -37,7 +38,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class SwipeActivity extends FragmentActivity {
+public class SwipeActivity extends FragmentActivity implements OnEpisodeSelectedListener {
 
 	
 	protected static PodcastService mServiceBinder = null;
@@ -79,7 +80,6 @@ public class SwipeActivity extends FragmentActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_swipe);
-		PodcastProvider pp = new PodcastProvider();
 		
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections
@@ -97,6 +97,11 @@ public class SwipeActivity extends FragmentActivity {
 		agr.refreshAuthToken(SwipeActivity.this, a[0]);
 		agr.getSubscriptionsFromReader();
 
+	}
+	
+	@Override
+	public void onEpisodeSelected(Uri episodeUri) {
+		// TODO Auto-generated method stub
 	}
 	
 	@Override

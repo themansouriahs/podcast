@@ -6,9 +6,10 @@ import android.os.Environment;
 public class SDCardMgr {
 
 	public static String SDCARD_DIR = "/sdcard"; 
-	public static final String APP_DIR = "/xuluan.podcast";
+	public static final String APP_DIR = "/bottiger.podcast";
 	public static final String DOWNLOAD_DIR = "/download";
 	public static final String EXPORT_DIR = "/export";
+	public static final String CACHE_DIR = "/cache";
 	
 	public static boolean getSDCardStatus()
 	{
@@ -25,23 +26,27 @@ public class SDCardMgr {
 
 	public static String getExportDir()
 	{
-		File sdDir = new File(Environment.getExternalStorageDirectory().getPath());
-		SDCARD_DIR = sdDir.getAbsolutePath();
-		return SDCARD_DIR + APP_DIR + EXPORT_DIR;
+		return getSDCardDir() + APP_DIR + EXPORT_DIR;
 	}	
 
 	public static String getDownloadDir()
 	{
-		File sdDir = new File(Environment.getExternalStorageDirectory().getPath());
-		SDCARD_DIR = sdDir.getAbsolutePath();
-		return SDCARD_DIR + APP_DIR + DOWNLOAD_DIR;
+		return getSDCardDir() + APP_DIR + DOWNLOAD_DIR;
 	}
 	
 	public static String getAppDir()
 	{
+		return getSDCardDir() + APP_DIR;
+	}
+	
+	public static String getCacheDir()
+	{
+		return getSDCardDir() + APP_DIR + CACHE_DIR;
+	}
+	
+	private static String getSDCardDir() {
 		File sdDir = new File(Environment.getExternalStorageDirectory().getPath());
-		SDCARD_DIR = sdDir.getAbsolutePath();
-		return SDCARD_DIR + APP_DIR;
+		return sdDir.getAbsolutePath();
 	}
 
 

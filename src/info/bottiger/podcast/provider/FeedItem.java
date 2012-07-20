@@ -359,6 +359,8 @@ public class FeedItem {
 				cv.put(ItemColumns.SUBS_ID, sub_id);
 			if (url != null)
 				cv.put(ItemColumns.URL, url);
+			if (image != null)
+				cv.put(ItemColumns.IMAGE_URL, image);
 			if (title != null)
 				cv.put(ItemColumns.TITLE, title);
 
