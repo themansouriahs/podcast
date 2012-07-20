@@ -4,6 +4,7 @@ import info.bottiger.podcast.R;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.SubscriptionColumns;
+import info.bottiger.podcast.service.PlayerService;
 import info.bottiger.podcast.utils.DialogMenu;
 import info.bottiger.podcast.utils.IconCursorAdapter;
 import info.bottiger.podcast.utils.IconCursorAdapter.TextFieldHandler;
@@ -146,6 +147,14 @@ public class RecentItemFragment extends PodcastBaseFragment {
 		return icon;
 	}
 	
+	public void onResume() {
+		super.onResume();
+		if (mPlayerServiceBinder != null && mPlayerServiceBinder.isPlaying()) {
+			long current_id = mPlayerServiceBinder.getCurrentItem().id;
+			showPlayingEpisode(current_id);
+		}
+	}
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
@@ -285,15 +294,21 @@ public class RecentItemFragment extends PodcastBaseFragment {
 
 		Uri uri = ContentUris.withAppendedId(getActivity().getIntent().getData(), id);
 		String action = getActivity().getIntent().getAction();
-		if (Intent.ACTION_PICK.equals(action)
+		/*if (Intent.ACTION_PICK.equals(action)
 				|| Intent.ACTION_GET_CONTENT.equals(action)
-				|| Intent.ACTION_MAIN.equals(action)) {
+				|| Intent.ACTION_MAIN.equals(action)) {*/
+		if (id > 0) {
+			
+			
 			//getActivity().setResult(Activity.RESULT_OK, new Intent().setData(uri));
 	        // Append the clicked item's row ID with the content provider Uri
 	        Uri noteUri = ContentUris.withAppendedId(ItemColumns.URI, id);
 	        // Send the event and Uri to the host activity
 	        //mListener.onEpisodeSelected(noteUri);
 	        this.showPlayingEpisode(id);
+		    mPlayerServiceBinder.play(id);
+		    mPlayerServiceBinder.start();
+		    
 		} else {
 
 
@@ -400,10 +415,6 @@ public class RecentItemFragment extends PodcastBaseFragment {
 	    
 	    TextView t = (TextView)inflated.findViewById(R.id.player_title);
 	    t.setText(episode.title);
-	    
-	    //SwipeActivity.mServiceBinder.
-	    mPlayerServiceBinder.play(playingEpisodeID);
-	    
 		listNonPlayingEpisodes(playingEpisodeID);
 	}
 	

@@ -1,46 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/player_title"
+    <include layout="@layout/player" />
+
+    <ListView
+        android:id="@android:id/list"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Episode Title" />
-
-    <SeekBar
-        android:id="@+id/player_seekBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true" />
-
-    <LinearLayout
-        android:id="@+id/linearLayout1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/seekBar1"
-        android:layout_marginTop="85dp" >
-
-        <Button
-            android:id="@+id/button1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Button" />
-
-        <Button
-            android:id="@+id/button2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Button" />
-
-        <Button
-            android:id="@+id/button3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Button" />
-    </LinearLayout>
+        android:layout_height="0dip"
+        android:layout_weight="1" />
 
 </LinearLayout>

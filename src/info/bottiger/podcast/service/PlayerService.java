@@ -328,7 +328,7 @@ public class PlayerService extends Service {
 	}
 
     private void dis_notifyStatus() {
-        mNotificationManager.cancel(R.layout.audio_player);    	
+        mNotificationManager.cancel(R.layout.playing_episode);    	
         //setForeground(false);
     }
     
@@ -349,7 +349,7 @@ public class PlayerService extends Service {
         		null, contentIntent);        
         //setForeground(true);
 
-        mNotificationManager.notify(R.layout.audio_player, notification);
+        mNotificationManager.notify(R.layout.playing_episode, notification);
         
     }	
 	
@@ -378,13 +378,14 @@ public class PlayerService extends Service {
 			return;
 		}
 		
+		/*
 		File file = new File(mItem.pathname);
 		if (file.exists()==false) {
 			Toast.makeText(this, getResources().getString(R.string.audio_no_found), Toast.LENGTH_LONG).show();	
 			return;
 		}		
-
-		mPlayer.setDataSource(mItem.pathname);
+		*/
+		mPlayer.setDataSource(mItem.url);
 		int offset = mItem.offset < 0 ? 0: mItem.offset;
 		mPlayer.seek(offset);
 		start();

@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="top"
         android:inflatedId="@+id/player"
-        android:layout="@layout/playing_episode" />
+        android:layout="@layout/player" />
 
     <ListView
         android:id="@android:id/list"

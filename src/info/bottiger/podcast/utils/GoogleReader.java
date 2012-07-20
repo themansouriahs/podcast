@@ -287,7 +287,7 @@ public class GoogleReader {
 						Element child = (Element) propertyNode;
 						String att = child.getAttribute("name");
 						// String v = n.getTextContent();
-						Log.v(TAG, att);
+						//Log.v(TAG, att);
 
 						if (att.equalsIgnoreCase("id")) {
 							podFeed = child.getTextContent().substring(5); // remove "feed/" from tge beginning

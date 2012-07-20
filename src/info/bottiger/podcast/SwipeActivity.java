@@ -3,6 +3,7 @@ package info.bottiger.podcast;
 import info.bottiger.podcast.PodcastBaseFragment.OnEpisodeSelectedListener;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.PodcastProvider;
+import info.bottiger.podcast.service.PlayerService;
 import info.bottiger.podcast.service.PodcastService;
 import info.bottiger.podcast.utils.GoogleReader;
 import info.bottiger.podcast.utils.Log;
@@ -42,6 +43,7 @@ public class SwipeActivity extends FragmentActivity implements OnEpisodeSelected
 
 	
 	protected static PodcastService mServiceBinder = null;
+	
 	protected static Cursor mCursor = null;
 	protected boolean mInit = false;
 	protected final Log log = Log.getLog(getClass());
@@ -79,6 +81,10 @@ public class SwipeActivity extends FragmentActivity implements OnEpisodeSelected
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		startService(new Intent(this, PodcastService.class));
+		startService(new Intent(this, PlayerService.class));
+		
 		setContentView(R.layout.activity_swipe);
 		
 		// Create the adapter that will return a fragment for each of the three
@@ -184,7 +190,8 @@ public class SwipeActivity extends FragmentActivity implements OnEpisodeSelected
 			} else if (i == 0) {
 				fragment = new RecentItemFragment();
 			} else {
-				fragment = new DummySectionFragment();
+				//fragment = new DummySectionFragment();
+				fragment = new PlayerFragment();
 			}
 			Bundle args = new Bundle();
 			args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, i + 1);

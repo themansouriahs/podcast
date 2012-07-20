@@ -341,6 +341,7 @@ public class PodcastService extends Service {
 
 	@Override
 	public void onCreate() {
+		// Podcast service onCreate()
 		super.onCreate();
 		updateSetting();
 		SDCardMgr.getSDCardStatusAndCreate();

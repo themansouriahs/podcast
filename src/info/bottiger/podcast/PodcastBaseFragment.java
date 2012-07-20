@@ -31,15 +31,13 @@ public class PodcastBaseFragment extends ListFragment {
 	
 	public static final int COLUMN_INDEX_TITLE = 1;
 	
-
-	protected  static PlayerService mPlayerServiceBinder = null;
 	//protected  static PodcastService mServiceBinder = null;
+	protected  static PlayerService mPlayerServiceBinder = null;
+	protected static ComponentName mService = null;
 	//protected final Log log = Log.getLog(getClass());
 
 	protected SimpleCursorAdapter mAdapter;
 	//protected Cursor mCursor = null;
-
-	//protected static ComponentName mService = null;
 	
 	//protected boolean mInit = false;
 	protected Intent mPrevIntent = null;
@@ -47,6 +45,19 @@ public class PodcastBaseFragment extends ListFragment {
 	protected Intent mNextIntent = null;
 	
 	OnEpisodeSelectedListener mListener;
+	
+	protected static ServiceConnection playerServiceConnection = new ServiceConnection() {
+		public void onServiceConnected(ComponentName className, IBinder service) {
+			mPlayerServiceBinder = ((PlayerService.PlayerBinder) service)
+					.getService();
+			//log.debug("onServiceConnected");
+		}
+
+		public void onServiceDisconnected(ComponentName className) {
+			mPlayerServiceBinder = null;
+			//log.debug("onServiceDisconnected");
+		}
+	};	
 	
     @Override
     public void onAttach(Activity activity) {
@@ -62,19 +73,6 @@ public class PodcastBaseFragment extends ListFragment {
     public interface OnEpisodeSelectedListener {
         public void onEpisodeSelected(Uri episodeUri);
     }
-    
-	protected static ServiceConnection serviceConnection = new ServiceConnection() {
-		public void onServiceConnected(ComponentName className, IBinder service) {
-			mPlayerServiceBinder = ((PlayerService.PlayerBinder) service)
-					.getService();
-			//log.debug("onServiceConnected");
-		}
-
-		public void onServiceDisconnected(ComponentName className) {
-			mPlayerServiceBinder = null;
-			//log.debug("onServiceDisconnected");
-		}
-	};	
 	
 	
 	/*protected static ServiceConnection serviceConnection = new ServiceConnection() {
@@ -94,6 +92,10 @@ public class PodcastBaseFragment extends ListFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		mService = getActivity().startService(new Intent(getActivity(), PlayerService.class));
+		Intent bindIntent = new Intent(getActivity(), PlayerService.class);
+		getActivity().bindService(bindIntent, playerServiceConnection, Context.BIND_AUTO_CREATE);
 	}
 
 	@Override

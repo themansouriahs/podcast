@@ -21,9 +21,12 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.SystemClock;
+import android.support.v4.content.CursorLoader;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -44,7 +47,7 @@ import info.bottiger.podcast.utils.Log;
 import info.bottiger.podcast.utils.StrUtils;
 
 
-public class PlayerActivity   extends HapiListActivity
+public class PlayerFragment   extends PodcastBaseFragment
 {
 	protected  static PlayerService mServiceBinder = null;
 	protected final Log log = Log.getLog(getClass());
@@ -93,6 +96,8 @@ public class PlayerActivity   extends HapiListActivity
 	private TextView mCurrentTime;
 	private TextView mTotalTime;	
 	private ProgressBar mProgress;
+	
+	private View V;
 	
 	private static final String[] PROJECTION = new String[] {
 		ItemColumns._ID, // 0
@@ -260,7 +265,7 @@ public class PlayerActivity   extends HapiListActivity
     	FeedItem item;
     	if(mServiceBinder == null){
             mTotalTime.setVisibility(View.INVISIBLE);
-    		setTitle(mTitle);	
+    		getActivity().setTitle(mTitle);	
             mPauseButton.setImageResource(android.R.drawable.ic_media_play);    		
     		return;
 
@@ -268,7 +273,7 @@ public class PlayerActivity   extends HapiListActivity
     	
     	if(mServiceBinder.isInitialized() == false){
             mTotalTime.setVisibility(View.INVISIBLE);
-    		setTitle(mTitle);	
+            getActivity().setTitle(mTitle);	
             mPauseButton.setImageResource(android.R.drawable.ic_media_play);
             return;
     	}
@@ -281,14 +286,14 @@ public class PlayerActivity   extends HapiListActivity
     	
 		mTotalTime.setVisibility(View.VISIBLE);
         mTotalTime.setText(StrUtils.formatTime( mServiceBinder.duration() ));    
-		setTitle(item.title);	
+        getActivity().setTitle(item.title);	
         
     	if(mServiceBinder.isPlaying() == false){    	
             mPauseButton.setImageResource(android.R.drawable.ic_media_play);
     	} else {
             mPauseButton.setImageResource(android.R.drawable.ic_media_pause); 
     	}
-    	item.playingOrPaused(mServiceBinder.isPlaying(), getContentResolver());
+    	item.playingOrPaused(mServiceBinder.isPlaying(), getActivity().getContentResolver());
 
     }    
 
@@ -376,60 +381,67 @@ public class PlayerActivity   extends HapiListActivity
     };    
 
     @Override
-    public void onCreate(Bundle icicle) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle icicle) {
         super.onCreate(icicle);
-		startService(new Intent(this, PlayerService.class));
-        setContentView(R.layout.audio_player);
-		setTitle(getResources().getString(R.string.title_episodes));
-		getListView().setOnCreateContextMenuListener(this);
+        V = inflater.inflate(R.layout.playing_episode, container, false);
         
-        final Intent intent = getIntent();
+        getActivity().startService(new Intent(getActivity(), PlayerService.class));
+        //setContentView(R.layout.audio_player);
+		
+		
+		getActivity().setTitle(getResources().getString(R.string.title_episodes));
+		//getListView().setOnCreateContextMenuListener(this);
+        
+        final Intent intent = getActivity().getIntent();
         mID = intent.getLongExtra("item_id", -1);
-        setIntent(new Intent());
+        getActivity().setIntent(new Intent());
        
-        mPauseButton = (ImageButton) findViewById(R.id.pause);
+        mPauseButton = (ImageButton) V.findViewById(R.id.pause);
         mPauseButton.requestFocus();
         mPauseButton.setOnClickListener(mPauseListener);
 
-        mRwndButton = (ImageButton) findViewById(R.id.rwnd);
+        mRwndButton = (ImageButton) V.findViewById(R.id.rwnd);
         mRwndButton.requestFocus();
         mRwndButton.setOnClickListener(mRwndListener);        
         
-        mFfwdButton = (ImageButton) findViewById(R.id.ffwd);
+        mFfwdButton = (ImageButton) V.findViewById(R.id.ffwd);
         mFfwdButton.requestFocus();
         mFfwdButton.setOnClickListener(mFfwdListener);        
         
-        mPrevButton = (ImageButton) findViewById(R.id.prev);
+        mPrevButton = (ImageButton) V.findViewById(R.id.prev);
         mPrevButton.requestFocus();
         mPrevButton.setOnClickListener(mPrevListener);        
         
-        mNextButton = (ImageButton) findViewById(R.id.next);
+        mNextButton = (ImageButton) V.findViewById(R.id.next);
         mNextButton.requestFocus();
         mNextButton.setOnClickListener(mNextListener);        
         
-        mProgress = (ProgressBar) findViewById(android.R.id.progress);
+        mProgress = (ProgressBar) V.findViewById(android.R.id.progress);
         
         if (mProgress instanceof SeekBar) {
             SeekBar seeker = (SeekBar) mProgress;
             seeker.setOnSeekBarChangeListener(mSeekListener);
         }
         mProgress.setMax(1000);    
-        mTotalTime = (TextView) findViewById(R.id.totaltime); 
-        mCurrentTime = (TextView) findViewById(R.id.currenttime); 
+        mTotalTime = (TextView) V.findViewById(R.id.totaltime); 
+        mCurrentTime = (TextView) V.findViewById(R.id.currenttime); 
         
-		TabsHelper.setEpisodeTabClickListeners(this, R.id.episode_bar_play_button);
+		//TabsHelper.setEpisodeTabClickListeners(this, R.id.episode_bar_play_button);
 
         startInit();
 
         //updateInfo();
+        
+        return V;
    
     }
     
 	public void startInit() {
 
-		mService = startService(new Intent(this, PlayerService.class));
-		Intent bindIntent = new Intent(this, PlayerService.class);
-		bindService(bindIntent, serviceConnection, Context.BIND_AUTO_CREATE);
+		mService = getActivity().startService(new Intent(getActivity(), PlayerService.class));
+		Intent bindIntent = new Intent(getActivity(), PlayerService.class);
+		getActivity().bindService(bindIntent, serviceConnection, Context.BIND_AUTO_CREATE);
 		
 		String where =  ItemColumns.STATUS  + ">" + ItemColumns.ITEM_STATUS_MAX_DOWNLOADING_VIEW 
 		+ " AND " + ItemColumns.STATUS + "<" + ItemColumns.ITEM_STATUS_MAX_PLAYLIST_VIEW
@@ -437,9 +449,9 @@ public class PlayerActivity   extends HapiListActivity
 		
 		String order = ItemColumns.FAIL_COUNT + " ASC";
 
-		mCursor = managedQuery(ItemColumns.URI, PROJECTION, where, null, order);
+		mCursor = new CursorLoader(getActivity(), ItemColumns.URI, PROJECTION, where, null, order).loadInBackground();
 
-		mAdapter = AllItemActivity.channelListItemCursorAdapter(this, mCursor);
+		mAdapter = AllItemActivity.channelListItemCursorAdapter(getActivity(), mCursor);
 /*		mAdapter = new IconCursorAdapter(this, R.layout.channel_list_item, mCursor,
 				new String[] { ItemColumns.TITLE,ItemColumns.STATUS }, new int[] {
 						R.id.text1}, mIconMap);
@@ -449,7 +461,7 @@ public class PlayerActivity   extends HapiListActivity
 	}   
 	
 	@Override
-	protected void onResume() {
+	public void onResume() {
 		super.onResume();
         getPref();
 		
@@ -463,7 +475,7 @@ public class PlayerActivity   extends HapiListActivity
 	}
 
 	@Override
-	protected void onPause() {
+	public void onPause() {
 		super.onPause();
 		mShow = false;
 
@@ -473,14 +485,14 @@ public class PlayerActivity   extends HapiListActivity
 	public void onLowMemory() {
 		super.onLowMemory();
 		log.debug("onLowMemory()");
-		finish();
+		getActivity().finish();
 	}	
 
 	@Override
-	protected void onDestroy() {
+	public void onDestroy() {
 		super.onDestroy();
 		try {
-			unbindService(serviceConnection);
+			getActivity().unbindService(serviceConnection);
 		} catch (Exception e) {
 			e.printStackTrace();
 
@@ -489,6 +501,7 @@ public class PlayerActivity   extends HapiListActivity
 		// stopService(new Intent(this, service.getClass()));
 	}
 	
+	/*
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menu.add(0, MENU_REPEAT, 0,
@@ -505,8 +518,9 @@ public class PlayerActivity   extends HapiListActivity
 				R.drawable.ic_menu_clear_playlist);			
 	
 		return true;
-	}
+	}*/
 	
+	/*
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -571,6 +585,7 @@ public class PlayerActivity   extends HapiListActivity
 
 		return dialog_menu;
 	}		
+	*/
 	
 	class PlayClickListener implements DialogInterface.OnClickListener {
 		public DialogMenu mMenu;
@@ -583,7 +598,7 @@ public class PlayerActivity   extends HapiListActivity
 		
         public void onClick(DialogInterface dialog, int select) 
         {
-    		FeedItem feeditem = FeedItem.getById(getContentResolver(), item_id);
+    		FeedItem feeditem = FeedItem.getById(getActivity().getContentResolver(), item_id);
     		if (feeditem == null)
     			return;   
     		
@@ -597,8 +612,8 @@ public class PlayerActivity   extends HapiListActivity
 		    		FeedItem pre = mServiceBinder.getPrev(feeditem);
 		    		if(pre!=null){
 		    			long ord = pre.failcount;
-		    			pre.addtoPlaylistByOrder(getContentResolver(), feeditem.failcount);
-		    			feeditem.addtoPlaylistByOrder(getContentResolver(), ord);
+		    			pre.addtoPlaylistByOrder(getActivity().getContentResolver(), feeditem.failcount);
+		    			feeditem.addtoPlaylistByOrder(getActivity().getContentResolver(), ord);
 		    		}
 		    	}
 				return ;
@@ -608,8 +623,8 @@ public class PlayerActivity   extends HapiListActivity
 		    		FeedItem next = mServiceBinder.getNext(feeditem);
 		    		if(next!=null){
 		    			long ord = next.failcount;
-		    			next.addtoPlaylistByOrder(getContentResolver(), feeditem.failcount);
-		    			feeditem.addtoPlaylistByOrder(getContentResolver(), ord);
+		    			next.addtoPlaylistByOrder(getActivity().getContentResolver(), feeditem.failcount);
+		    			feeditem.addtoPlaylistByOrder(getActivity().getContentResolver(), ord);
 		    		}
 		    	}
 				return ;
@@ -627,7 +642,7 @@ public class PlayerActivity   extends HapiListActivity
 		    				mServiceBinder.stop();
 		    		}
 		    	}
-				feeditem.removeFromPlaylist(getContentResolver());
+				feeditem.removeFromPlaylist(getActivity().getContentResolver());
 				return ;
 			}			
 		}
@@ -636,14 +651,15 @@ public class PlayerActivity   extends HapiListActivity
 
 	
 	@Override
-	protected void onListItemClick(ListView l, View v, int position, long id) {
+	public void onListItemClick(ListView l, View v, int position, long id) {
 
 		Uri uri = ContentUris.withAppendedId(ItemColumns.URI, id);
-		String action = getIntent().getAction();
+		String action = getActivity().getIntent().getAction();
 		if (Intent.ACTION_PICK.equals(action)
 				|| Intent.ACTION_GET_CONTENT.equals(action)) {
-			setResult(RESULT_OK, new Intent().setData(uri));
+			getActivity().setResult(getActivity().RESULT_OK, new Intent().setData(uri));
 		} else {
+			/*
 			DialogMenu dialog_menu = createDialogMenus(id);
 			if( dialog_menu==null)
 				return;
@@ -652,6 +668,7 @@ public class PlayerActivity   extends HapiListActivity
 			 new AlertDialog.Builder(this)
              .setTitle(dialog_menu.getHeader())
              .setItems(dialog_menu.getItems(), new PlayClickListener(dialog_menu,id)).show();	
+             */
 		}
 
 	}	
@@ -660,9 +677,9 @@ public class PlayerActivity   extends HapiListActivity
     
     private void startPlay() {
     	if(mServiceBinder!=null){
-        	FeedItem item = FeedItem.getById(getContentResolver(), mID);
+        	FeedItem item = FeedItem.getById(getActivity().getContentResolver(), mID);
         	if(item!=null){
-        		item.addtoPlaylist(getContentResolver());
+        		item.addtoPlaylist(getActivity().getContentResolver());
             	play(item);        		
         	}
 
@@ -675,7 +692,7 @@ public class PlayerActivity   extends HapiListActivity
     	final long[] id_arr = new long[100];
     	
 		String where =  null;
-		Cursor cursor = managedQuery(SubscriptionColumns.URI, SubscriptionColumns.ALL_COLUMNS, where, null, null);      	
+		Cursor cursor = new CursorLoader(getActivity(), SubscriptionColumns.URI, SubscriptionColumns.ALL_COLUMNS, where, null, null).loadInBackground();      	
 		int size = 0;
 		if(cursor!=null && cursor.moveToFirst()){
 			do{
@@ -693,7 +710,7 @@ public class PlayerActivity   extends HapiListActivity
         for (int i = 0; i < size; i++) {
         	select_arr[i] = arr[i];
         }
-        
+        /*
 		 new AlertDialog.Builder(this)
          .setTitle("Select Channel")
          .setSingleChoiceItems(select_arr, 0, new DialogInterface.OnClickListener() {
@@ -703,7 +720,8 @@ public class PlayerActivity   extends HapiListActivity
       			dialog.dismiss();
              }
          })
-        .show();    	
+        .show();  
+        */  	
     }
     
     private void loadItem(String channel_condition) {
@@ -723,14 +741,14 @@ public class PlayerActivity   extends HapiListActivity
 
 					String order = ItemColumns.FAIL_COUNT + " ASC";
 
-					cursor = managedQuery(ItemColumns.URI, ItemColumns.ALL_COLUMNS, sel, null, order);  
+					cursor = new CursorLoader(getActivity(), ItemColumns.URI, ItemColumns.ALL_COLUMNS, sel, null, order).loadInBackground();  
 					long ord = Long.valueOf(System.currentTimeMillis());
 
 					if((cursor!=null) && cursor.moveToFirst()){
 						do{
 							FeedItem item = FeedItem.getByCursor(cursor);
 							if(item!=null)
-								item.addtoPlaylistByOrder(getContentResolver(), ord++);
+								item.addtoPlaylistByOrder(getActivity().getContentResolver(), ord++);
 
 						}while (cursor.moveToNext());			
 					}
@@ -766,13 +784,13 @@ public class PlayerActivity   extends HapiListActivity
 				Cursor cursor = null;
 				try {
 
-					cursor = managedQuery(ItemColumns.URI, ItemColumns.ALL_COLUMNS, sel, null, null);  
+					cursor = new CursorLoader(getActivity(), ItemColumns.URI, ItemColumns.ALL_COLUMNS, sel, null, null).loadInBackground();  
 
 					if((cursor!=null) && cursor.moveToFirst()){
 						do{
 							FeedItem item = FeedItem.getByCursor(cursor);
 							if(item!=null)
-								item.addtoPlaylistByOrder(getContentResolver(), 0);
+								item.addtoPlaylistByOrder(getActivity().getContentResolver(), 0);
 
 						}while (cursor.moveToNext());			
 					}    	
@@ -791,7 +809,7 @@ public class PlayerActivity   extends HapiListActivity
     
     
     private void getPref() {
-		SharedPreferences pref = getSharedPreferences(
+		SharedPreferences pref = getActivity().getSharedPreferences(
 				Pref.HAPI_PREFS_FILE_NAME, Service.MODE_PRIVATE);
 		pref_repeat = pref.getLong("pref_repeat",0);
 		pref_fas_fwd_interval = Integer.parseInt(pref.getString("pref_fast_forward_interval","30"));		
