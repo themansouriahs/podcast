@@ -190,8 +190,8 @@ public class SwipeActivity extends FragmentActivity implements OnEpisodeSelected
 			} else if (i == 0) {
 				fragment = new RecentItemFragment();
 			} else {
-				//fragment = new DummySectionFragment();
-				fragment = new PlayerFragment();
+				fragment = new DummySectionFragment();
+				//fragment = new PlayerFragment();
 			}
 			Bundle args = new Bundle();
 			args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, i + 1);

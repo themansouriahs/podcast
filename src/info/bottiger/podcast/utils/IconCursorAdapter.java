@@ -2,15 +2,21 @@ package info.bottiger.podcast.utils;
 
 import android.widget.SimpleCursorAdapter;
 import android.database.Cursor;
+import android.app.Activity;
 import android.content.Context;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import info.bottiger.podcast.R;
+import info.bottiger.podcast.provider.FeedItem;
+import info.bottiger.podcast.provider.ItemColumns;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.TreeSet;
 
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 
@@ -22,6 +28,7 @@ public class IconCursorAdapter extends SimpleCursorAdapter {
 		public void setViewValue(IconCursorAdapter adapter, Cursor cursor,
 				View v, int fromColumnId);
 	}
+	
 	public static class TextFieldHandler implements FieldHandler {
 		public void setViewValue(IconCursorAdapter adapter, Cursor cursor,
 				View v, int fromColumnId) {
@@ -78,6 +85,15 @@ public class IconCursorAdapter extends SimpleCursorAdapter {
 	protected int[] mTo2;
 	protected FieldHandler[] mFieldHandlers;
 
+    private static final int TYPE_COLLAPS = 0;
+    private static final int TYPE_EXPAND = 1;
+	private static final int TYPE_MAX_COUNT = 2;
+	
+	private ArrayList<FeedItem> mData = new ArrayList<FeedItem>();
+    private LayoutInflater mInflater;
+	
+    private TreeSet<Number> mExpandedItemID = new TreeSet<Number>();
+    
 	//Create a set of FieldHandlers for methods calling using the legacy constructor
 	private static FieldHandler[] defaultFieldHandlers(String[] fromColumns,
 			HashMap<Integer,Integer> iconMap) {
@@ -103,6 +119,8 @@ public class IconCursorAdapter extends SimpleCursorAdapter {
 	public IconCursorAdapter(Context context, int layout, Cursor cursor,
 			String[] fromColumns, int[] to, FieldHandler[] fieldHandlers) {
 		super(context, layout, cursor, fromColumns, to);
+		
+		mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 		if (to.length<fromColumns.length){
 			mTo2  = new int[fromColumns.length];
@@ -126,46 +144,83 @@ public class IconCursorAdapter extends SimpleCursorAdapter {
 
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {
-		// Log.w("VIEW", "newView");
-		View v = super.newView(context, cursor, parent);
-		final int[] to = mTo2;
-		final int count = mFieldHandlers.length;
-		final View[] holder = new View[count];
-		// Log.d("ADAPTER", "count = "+count);
+	    ViewHolder viewHolder = new ViewHolder();
+	    View v = null;
+	    
+	    Long cursorID = cursor.getLong(cursor.getColumnIndex("_id"));
+        boolean doExpand = mExpandedItemID.contains(cursorID);
+            if (doExpand) {
+                    v = mInflater.inflate(R.layout.list_item_expanded, null);
+			} else {
+                    v = mInflater.inflate(R.layout.list_item, null);
+            }
+            
+    	    viewHolder.textViewTitle = (TextView)v.findViewById(R.id.title);
+    	    viewHolder.textViewSubTitle = (TextView)v.findViewById(R.id.podcast);
+    	    viewHolder.textViewDuration = (TextView)v.findViewById(R.id.duration);
+    	    viewHolder.imageView = (ImageView)v.findViewById(R.id.list_image);
+            
+            v.setTag(viewHolder);
+            return v;
+	}
 
-		for (int i = 0; i < count; i++) {
-			holder[i] = v.findViewById(to[i]);
-		}
-		v.setTag(holder);
-
-		return v;
+	@Override
+	public void bindView(View view, Context context, Cursor cursor) {
+		ViewHolder holder = (ViewHolder) view.getTag();
+		
+		int titleIndex = cursor.getColumnIndex(ItemColumns.TITLE);
+		int subtitleIndex = cursor.getColumnIndex(ItemColumns.SUB_TITLE);
+		int imageIndex = cursor.getColumnIndex(ItemColumns.IMAGE_URL);
+		
+	    holder.textViewTitle.setText(cursor.getString(titleIndex));
+	    
+	    if (subtitleIndex > 0)
+	    	holder.textViewSubTitle.setText(cursor.getString(subtitleIndex));
+	    
+	    this.setViewImage3(holder.imageView, cursor.getString(imageIndex));
 
 	}
 
-	public void setViewImage2(ImageView v, int value) {
-		// Log.w("VIEW", "setViewImage2");
-		v.setImageResource(value);
+	
+	public void toggleItem(long id) {
+		if (mExpandedItemID.contains(id))
+			mExpandedItemID.remove(id);
+		else
+			mExpandedItemID.add(id);
 	}
 	
-	public void setViewImage3(ImageView v, String imageURL) {
+    @Override
+    public int getViewTypeCount() {
+        return TYPE_MAX_COUNT;
+    }
+    
+    @Override
+    public int getItemViewType(int position) {
+        return mExpandedItemID.contains(itemID(position)) ? TYPE_EXPAND : TYPE_COLLAPS;
+    }
+    
+    public static class ViewHolder {
+    	public ImageView imageView;
+        public TextView textViewTitle;
+        public TextView textViewSubTitle;
+        public TextView textViewDuration;
+    }
+	
+	private void setViewImage3(ImageView v, String imageURL) {
 		// https://github.com/koush/UrlImageViewHelper#readme
 		int cacheTime = 60000 * 60* 24 * 31; // in ms
 		UrlImageViewHelper.loadUrlDrawable(v.getContext(), imageURL);
 		UrlImageViewHelper.setUrlDrawable(v, imageURL, null, cacheTime);
 	}
-
-	@Override
-	public void bindView(View view, Context context, Cursor cursor) {
-		final View[] holder = (View[]) view.getTag();
-		final int count = mFieldHandlers.length;
-		final int[] from = mFrom2;
-
-		for (int i = 0; i < count; i++) {
-			View v2 = holder[i];
-			FieldHandler fh = mFieldHandlers[i];
-			fh.setViewValue(this,cursor,v2,from[i]);
-		}
-
+	
+	
+	private Long itemID(int position) {
+		Object item = getItem(position);
+		if (item instanceof FeedItem) {
+			FeedItem feedItem = (FeedItem) item;
+			return Long.valueOf(feedItem.id);
+		} else
+			return new Long(1); // FIXME
 	}
 
 }

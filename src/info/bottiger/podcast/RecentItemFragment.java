@@ -77,6 +77,8 @@ public class RecentItemFragment extends PodcastBaseFragment {
 	 */
 	
 	private View V;
+	private IconCursorAdapter mAdapter;
+	private Cursor mCursor;
 	
 	static {
 
@@ -305,9 +307,15 @@ public class RecentItemFragment extends PodcastBaseFragment {
 	        Uri noteUri = ContentUris.withAppendedId(ItemColumns.URI, id);
 	        // Send the event and Uri to the host activity
 	        //mListener.onEpisodeSelected(noteUri);
-	        this.showPlayingEpisode(id);
-		    mPlayerServiceBinder.play(id);
-		    mPlayerServiceBinder.start();
+	        
+	        //this.showPlayingEpisode(id);
+	        mAdapter.toggleItem(id);
+	        mCursor.requery();
+	        mAdapter.changeCursor(mCursor);
+	        mAdapter.notifyDataSetChanged();
+	        v.invalidate();
+		    //mPlayerServiceBinder.play(id);
+		    //mPlayerServiceBinder.start();
 		    
 		} else {
 
@@ -424,9 +432,9 @@ public class RecentItemFragment extends PodcastBaseFragment {
 	}
 	
 	public void showEpisodes(String condition) {
-		SwipeActivity.mCursor = new CursorLoader(getActivity(), ItemColumns.URI, PROJECTION, condition, null, getOrder()).loadInBackground();
+		mCursor = new CursorLoader(getActivity(), ItemColumns.URI, PROJECTION, condition, null, getOrder()).loadInBackground();
 
-		mAdapter = RecentItemFragment.listItemCursorAdapter(this.getActivity(), SwipeActivity.mCursor);
+		mAdapter = RecentItemFragment.listItemCursorAdapter(this.getActivity(), mCursor);
 		setListAdapter(mAdapter);
 	}
 	
