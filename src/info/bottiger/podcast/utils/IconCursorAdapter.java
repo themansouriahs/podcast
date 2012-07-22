@@ -141,6 +141,15 @@ public class IconCursorAdapter extends SimpleCursorAdapter {
 			}
 		}
 	}
+	
+	@Override
+	public View getView(int position, View convertView, ViewGroup parent) {
+		if (mExpandedItemID.contains(getItem(position))) {
+			
+		}
+		
+		return null;
+	}
 
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {
@@ -149,11 +158,11 @@ public class IconCursorAdapter extends SimpleCursorAdapter {
 	    
 	    Long cursorID = cursor.getLong(cursor.getColumnIndex("_id"));
         boolean doExpand = mExpandedItemID.contains(cursorID);
-            if (doExpand) {
-                    v = mInflater.inflate(R.layout.list_item_expanded, null);
-			} else {
+            //if (doExpand) {
+            //        v = mInflater.inflate(R.layout.list_item_expanded, null);
+			//} else {
                     v = mInflater.inflate(R.layout.list_item, null);
-            }
+            //}
             
     	    viewHolder.textViewTitle = (TextView)v.findViewById(R.id.title);
     	    viewHolder.textViewSubTitle = (TextView)v.findViewById(R.id.podcast);

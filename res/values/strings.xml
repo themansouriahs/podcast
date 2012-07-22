@@ -120,5 +120,8 @@
     <string name="menu_settings">Settings</string>
     <string name="title_activity_swipe">SoundWaves</string>
     <string name="refresh">Refresh</string>
+    <string name="play">Play</string>
+    <string name="stop">Stop</string>
+    <string name="forward">Jump 10 s</string>
 
 </resources>

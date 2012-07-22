@@ -1,71 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/item"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:padding="3dip" >
- 
-    <!--  ListRow Left sied Thumbnail image -->
-    <LinearLayout android:id="@+id/thumbnail"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="0dip"
-        android:layout_alignParentLeft="true"
-        android:layout_marginRight="7dip">
- 
-        <ImageView
-            android:id="@+id/list_image"
-            android:layout_width="90dip"
-            android:layout_height="90dip"
-            android:src="@drawable/feed_default_icon" />
- 
-    </LinearLayout>
- 
-    <!-- Title Of Podcast-->
+        android:orientation="horizontal"
+        android:padding="3dip" >
 
-    <TextView
-        android:id="@+id/title"
+        <!-- ListRow Left sied Thumbnail image -->
+
+        <LinearLayout
+            android:id="@+id/thumbnail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginRight="7dip"
+            android:padding="0dip" >
+
+            <ImageView
+                android:id="@+id/list_image"
+                android:layout_width="90dip"
+                android:layout_height="90dip"
+                android:src="@drawable/feed_default_icon" />
+        </LinearLayout>
+
+        <!-- Title Of Podcast -->
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/thumbnail"
+            android:layout_toLeftOf="@+id/duration"
+            android:layout_toRightOf="@+id/thumbnail"
+            android:text="Podcast Title"
+            android:textColor="#FFFFFF"
+            android:textSize="15dip"
+            android:typeface="sans" />
+
+        <!-- Podcast Name -->
+
+        <TextView
+            android:id="@+id/podcast"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/title"
+            android:layout_marginTop="1dip"
+            android:layout_toRightOf="@+id/thumbnail"
+            android:text="Podcast Name"
+            android:textColor="#FF00FF"
+            android:textSize="10dip" />
+
+        <!-- Rightend Duration -->
+
+        <TextView
+            android:id="@+id/duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@id/title"
+            android:layout_marginRight="5dip"
+            android:gravity="right"
+            android:text="1:35:45"
+            android:textColor="#FFFFFF"
+            android:textSize="10dip"
+            android:textStyle="bold" />
+
+        <!-- Rightend Arrow -->
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true" />
+    </RelativeLayout>
+    
+
+    <ViewStub
+        android:id="@+id/stub"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/thumbnail"
-        android:layout_toLeftOf="@+id/duration"
-        android:layout_toRightOf="@+id/thumbnail"
-        android:text="Podcast Title"
-        android:textColor="#FFFFFF"
-        android:textSize="15dip"
-        android:typeface="sans" />
- 
-    <!-- Podcast Name -->
-    <TextView
-        android:id="@+id/podcast"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/title"
-        android:textColor="#FF00FF"
-        android:textSize="10dip"
-        android:layout_marginTop="1dip"
-        android:layout_toRightOf="@+id/thumbnail"
-        android:text="Podcast Name" />
- 
-    <!-- Rightend Duration -->
+        android:inflatedId="@+id/stub_player"
+        android:layout="@layout/list_item_expanded" />
 
-    <TextView
-        android:id="@+id/duration"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignTop="@id/title"
-        android:layout_marginRight="5dip"
-        android:gravity="right"
-        android:text="1:35:45"
-        android:textColor="#FFFFFF"
-        android:textSize="10dip"
-        android:textStyle="bold" />
- 
-     <!-- Rightend Arrow -->
-     <ImageView android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"/>
- 
-</RelativeLayout>
+</LinearLayout>
