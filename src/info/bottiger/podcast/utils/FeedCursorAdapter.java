@@ -21,17 +21,17 @@ import java.util.TreeSet;
 
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 
-public class IconCursorAdapter extends SimpleCursorAdapter {
+public class FeedCursorAdapter extends SimpleCursorAdapter {
 
 	public static final int ICON_DEFAULT_ID = -1;
 
 	public interface FieldHandler {
-		public void setViewValue(IconCursorAdapter adapter, Cursor cursor,
+		public void setViewValue(FeedCursorAdapter adapter, Cursor cursor,
 				View v, int fromColumnId);
 	}
 
 	public static class TextFieldHandler implements FieldHandler {
-		public void setViewValue(IconCursorAdapter adapter, Cursor cursor,
+		public void setViewValue(FeedCursorAdapter adapter, Cursor cursor,
 				View v, int fromColumnId) {
 			// Normal text column, just display what's in the database
 			String text = cursor.getString(fromColumnId);
@@ -55,7 +55,7 @@ public class IconCursorAdapter extends SimpleCursorAdapter {
 		public IconFieldHandler() {
 		}
 
-		public void setViewValue(IconCursorAdapter adapter, Cursor cursor,
+		public void setViewValue(FeedCursorAdapter adapter, Cursor cursor,
 				View v, int fromColumnId) {
 			adapter.setViewImage3((ImageView) v, cursor.getString(fromColumnId));
 		}
@@ -105,7 +105,7 @@ public class IconCursorAdapter extends SimpleCursorAdapter {
 	}
 
 	// Legacy constructor
-	public IconCursorAdapter(Context context, int layout, Cursor cursor,
+	public FeedCursorAdapter(Context context, int layout, Cursor cursor,
 			String[] fromColumns, int[] to, HashMap<Integer, Integer> iconMap) {
 		this(context, layout, cursor, fromColumns, to, defaultFieldHandlers(
 				fromColumns, iconMap));
@@ -117,7 +117,7 @@ public class IconCursorAdapter extends SimpleCursorAdapter {
 	// of those objects, but the overhead of defining that value class in Java
 	// is not worth it.
 	// If this were a Scala program, that would be a one-line case class.
-	public IconCursorAdapter(Context context, int layout, Cursor cursor,
+	public FeedCursorAdapter(Context context, int layout, Cursor cursor,
 			String[] fromColumns, int[] to, FieldHandler[] fieldHandlers) {
 		super(context, layout, cursor, fromColumns, to);
 
@@ -197,6 +197,7 @@ public class IconCursorAdapter extends SimpleCursorAdapter {
 		viewHolder.textViewTitle = (TextView) v.findViewById(R.id.title);
 		viewHolder.textViewSubTitle = (TextView) v.findViewById(R.id.podcast);
 		viewHolder.textViewDuration = (TextView) v.findViewById(R.id.duration);
+		viewHolder.textViewFileSize = (TextView) v.findViewById(R.id.filesize);
 		viewHolder.imageView = (ImageView) v.findViewById(R.id.list_image);
 
 		v.setTag(viewHolder);
@@ -207,11 +208,20 @@ public class IconCursorAdapter extends SimpleCursorAdapter {
 	public void bindView(View view, Context context, Cursor cursor) {
 		ViewHolder holder = (ViewHolder) view.getTag();
 
+
 		int titleIndex = cursor.getColumnIndex(ItemColumns.TITLE);
+		String title = cursor.getString(titleIndex);
+		
 		int subtitleIndex = cursor.getColumnIndex(ItemColumns.SUB_TITLE);
 		int imageIndex = cursor.getColumnIndex(ItemColumns.IMAGE_URL);
-
-		String title = cursor.getString(titleIndex);
+		try {
+			int filesizeIndex = cursor.getColumnIndexOrThrow(ItemColumns.STATUS);
+			int filesize = cursor.getInt(filesizeIndex);
+			holder.textViewFileSize.setText("" + filesize);
+		} catch (IllegalArgumentException e) {
+			
+		}
+		
 		holder.textViewTitle.setText(title);
 
 		if (subtitleIndex > 0)
@@ -248,6 +258,7 @@ public class IconCursorAdapter extends SimpleCursorAdapter {
 		public TextView textViewTitle;
 		public TextView textViewSubTitle;
 		public TextView textViewDuration;
+		public TextView textViewFileSize;
 	}
 
 	private void setViewImage3(ImageView v, String imageURL) {

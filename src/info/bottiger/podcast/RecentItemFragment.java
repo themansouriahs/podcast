@@ -8,9 +8,9 @@ import info.bottiger.podcast.service.PlayerService;
 import info.bottiger.podcast.utils.ControlButtons;
 import info.bottiger.podcast.utils.DialogMenu;
 import info.bottiger.podcast.utils.ExpandAnimation;
-import info.bottiger.podcast.utils.IconCursorAdapter;
-import info.bottiger.podcast.utils.IconCursorAdapter.TextFieldHandler;
-import info.bottiger.podcast.utils.IconCursorAdapter.ViewHolder;
+import info.bottiger.podcast.utils.FeedCursorAdapter;
+import info.bottiger.podcast.utils.FeedCursorAdapter.TextFieldHandler;
+import info.bottiger.podcast.utils.FeedCursorAdapter.ViewHolder;
 
 import java.util.HashMap;
 
@@ -59,8 +59,12 @@ public class RecentItemFragment extends PodcastBaseFragment {
 	private static final String[] PROJECTION = new String[] {
 			ItemColumns._ID, // 0
 			ItemColumns.TITLE, // 1
-			ItemColumns.SUB_TITLE, ItemColumns.IMAGE_URL, ItemColumns.DURATION,
-			ItemColumns.STATUS, ItemColumns.SUBS_ID, ItemColumns.KEEP
+			ItemColumns.SUB_TITLE, //
+			ItemColumns.IMAGE_URL, //
+			ItemColumns.DURATION, //
+			ItemColumns.STATUS, // 
+			ItemColumns.SUBS_ID, //
+			ItemColumns.KEEP //
 
 	};
 
@@ -84,7 +88,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 	 */
 
 	private View V;
-	private IconCursorAdapter mAdapter;
+	private FeedCursorAdapter mAdapter;
 	private Cursor mCursor;
 
 	static {
@@ -94,7 +98,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 
 		mKeepIconMap = new HashMap<Integer, Integer>();
 		mKeepIconMap.put(1, R.drawable.keep);
-		mKeepIconMap.put(IconCursorAdapter.ICON_DEFAULT_ID, R.drawable.blank); // anything
+		mKeepIconMap.put(FeedCursorAdapter.ICON_DEFAULT_ID, R.drawable.blank); // anything
 																				// other
 																				// than
 																				// KEEP
@@ -121,32 +125,32 @@ public class RecentItemFragment extends PodcastBaseFragment {
 		// we now show KEEP status with a separate icon, based on separate DB
 		// flag
 
-		iconMap.put(IconCursorAdapter.ICON_DEFAULT_ID,
+		iconMap.put(FeedCursorAdapter.ICON_DEFAULT_ID,
 				R.drawable.status_unknown); // default for unknowns
 	}
 
-	public static IconCursorAdapter listItemCursorAdapter(Context context,
+	public static FeedCursorAdapter listItemCursorAdapter(Context context,
 			Cursor cursor) {
-		IconCursorAdapter.FieldHandler[] fields = {
-				IconCursorAdapter.defaultTextFieldHandler,
+		FeedCursorAdapter.FieldHandler[] fields = {
+				FeedCursorAdapter.defaultTextFieldHandler,
 				new TextFieldHandler(), new TextFieldHandler(),
-				new IconCursorAdapter.IconFieldHandler(mIconMap),
+				new FeedCursorAdapter.IconFieldHandler(mIconMap),
 		// new IconCursorAdapter.IconFieldHandler(mKeepIconMap)
 		};
-		return new IconCursorAdapter(context, R.layout.list_item, cursor,
+		return new FeedCursorAdapter(context, R.layout.list_item, cursor,
 				new String[] { ItemColumns.TITLE, ItemColumns.SUB_TITLE,
 						ItemColumns.DURATION, ItemColumns.IMAGE_URL },
 				new int[] { R.id.title, R.id.podcast, R.id.duration,
 						R.id.list_image }, fields);
 	}
 
-	public static IconCursorAdapter channelListItemCursorAdapter(
+	public static FeedCursorAdapter channelListItemCursorAdapter(
 			Context context, Cursor cursor) {
-		IconCursorAdapter.FieldHandler[] fields = {
-				IconCursorAdapter.defaultTextFieldHandler,
-				new IconCursorAdapter.IconFieldHandler(mIconMap),
-				new IconCursorAdapter.IconFieldHandler(mKeepIconMap) };
-		return new IconCursorAdapter(context, R.layout.channel_list_item,
+		FeedCursorAdapter.FieldHandler[] fields = {
+				FeedCursorAdapter.defaultTextFieldHandler,
+				new FeedCursorAdapter.IconFieldHandler(mIconMap),
+				new FeedCursorAdapter.IconFieldHandler(mKeepIconMap) };
+		return new FeedCursorAdapter(context, R.layout.channel_list_item,
 				cursor, new String[] { ItemColumns.TITLE, ItemColumns.STATUS,
 						ItemColumns.KEEP }, new int[] { R.id.text1, R.id.icon,
 						R.id.keep_icon }, fields);
@@ -155,7 +159,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 	public static int mapToIcon(int status) {
 		Integer iconI = mIconMap.get(status);
 		if (iconI == null)
-			iconI = mIconMap.get(IconCursorAdapter.ICON_DEFAULT_ID); // look for
+			iconI = mIconMap.get(FeedCursorAdapter.ICON_DEFAULT_ID); // look for
 																		// default
 																		// value
 																		// in

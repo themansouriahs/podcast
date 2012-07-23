@@ -5,7 +5,7 @@ import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.SubscriptionColumns;
 import info.bottiger.podcast.utils.DialogMenu;
-import info.bottiger.podcast.utils.IconCursorAdapter;
+import info.bottiger.podcast.utils.FeedCursorAdapter;
 
 import java.util.HashMap;
 
@@ -72,7 +72,7 @@ public class AllItemActivity extends PodcastBaseActivity {
 		
 		mKeepIconMap = new HashMap<Integer, Integer>();
 		mKeepIconMap.put(1, R.drawable.keep);		
-		mKeepIconMap.put(IconCursorAdapter.ICON_DEFAULT_ID, R.drawable.blank);	 //anything other than KEEP	
+		mKeepIconMap.put(FeedCursorAdapter.ICON_DEFAULT_ID, R.drawable.blank);	 //anything other than KEEP	
 
 	}
 	
@@ -92,42 +92,42 @@ public class AllItemActivity extends PodcastBaseActivity {
 		//iconMap.put(ItemColumns.ITEM_STATUS_KEEP, R.drawable.keep);
 			//we now show KEEP status with a separate icon, based on separate DB flag
 		
-		iconMap.put(IconCursorAdapter.ICON_DEFAULT_ID, R.drawable.status_unknown);		//default for unknowns
+		iconMap.put(FeedCursorAdapter.ICON_DEFAULT_ID, R.drawable.status_unknown);		//default for unknowns
 	}
 	
-	public static IconCursorAdapter listItemCursorAdapter(Context context, Cursor cursor) {
-		IconCursorAdapter.FieldHandler[] fields = {
-				IconCursorAdapter.defaultTextFieldHandler,
-				IconCursorAdapter.defaultTextFieldHandler,
-				IconCursorAdapter.defaultTextFieldHandler,
-				new IconCursorAdapter.IconFieldHandler(mIconMap),
-				new IconCursorAdapter.IconFieldHandler(mKeepIconMap)
+	public static FeedCursorAdapter listItemCursorAdapter(Context context, Cursor cursor) {
+		FeedCursorAdapter.FieldHandler[] fields = {
+				FeedCursorAdapter.defaultTextFieldHandler,
+				FeedCursorAdapter.defaultTextFieldHandler,
+				FeedCursorAdapter.defaultTextFieldHandler,
+				new FeedCursorAdapter.IconFieldHandler(mIconMap),
+				new FeedCursorAdapter.IconFieldHandler(mKeepIconMap)
 		};
-		return new IconCursorAdapter(context, R.layout.list_item, cursor,
+		return new FeedCursorAdapter(context, R.layout.list_item, cursor,
 				new String[] { ItemColumns.TITLE, ItemColumns.SUB_TITLE,
 						ItemColumns.DURATION, ItemColumns.STATUS, ItemColumns.KEEP },
 				new int[] { R.id.text1, R.id.text2, R.id.text3, R.id.icon, R.id.keep_icon },
 				fields);
 	}
 
-	public static IconCursorAdapter channelListItemCursorAdapter(Context context, Cursor cursor) {
-		IconCursorAdapter.FieldHandler[] fields = {
-				IconCursorAdapter.defaultTextFieldHandler,
-				new IconCursorAdapter.IconFieldHandler(mIconMap),
-				new IconCursorAdapter.IconFieldHandler(mKeepIconMap)
+	public static FeedCursorAdapter channelListItemCursorAdapter(Context context, Cursor cursor) {
+		FeedCursorAdapter.FieldHandler[] fields = {
+				FeedCursorAdapter.defaultTextFieldHandler,
+				new FeedCursorAdapter.IconFieldHandler(mIconMap),
+				new FeedCursorAdapter.IconFieldHandler(mKeepIconMap)
 		};
-		return new IconCursorAdapter(context, R.layout.channel_list_item, cursor,
+		return new FeedCursorAdapter(context, R.layout.channel_list_item, cursor,
 				new String[] { ItemColumns.TITLE, ItemColumns.STATUS, ItemColumns.KEEP },
 				new int[] { R.id.text1, R.id.icon, R.id.keep_icon },
 				fields);
 	}
 
-	public static IconCursorAdapter channelListSubscriptionCursorAdapter(Context context, Cursor cursor) {
-		IconCursorAdapter.FieldHandler[] fields = {
-				IconCursorAdapter.defaultTextFieldHandler,
-				new IconCursorAdapter.IconFieldHandler()
+	public static FeedCursorAdapter channelListSubscriptionCursorAdapter(Context context, Cursor cursor) {
+		FeedCursorAdapter.FieldHandler[] fields = {
+				FeedCursorAdapter.defaultTextFieldHandler,
+				new FeedCursorAdapter.IconFieldHandler()
 		};
-		return new IconCursorAdapter(context, R.layout.list_item, cursor,
+		return new FeedCursorAdapter(context, R.layout.list_item, cursor,
 				new String[] { SubscriptionColumns.TITLE, SubscriptionColumns.IMAGE_URL },
 				new int[] { R.id.title, R.id.list_image },
 				fields);
@@ -136,7 +136,7 @@ public class AllItemActivity extends PodcastBaseActivity {
 	public static int mapToIcon(int status) {
 		Integer iconI = mIconMap.get(status);
 		if (iconI==null)
-			iconI = mIconMap.get(IconCursorAdapter.ICON_DEFAULT_ID);	//look for default value in map
+			iconI = mIconMap.get(FeedCursorAdapter.ICON_DEFAULT_ID);	//look for default value in map
 		int icon = (iconI!=null)?
 			iconI.intValue():
 			R.drawable.status_unknown;	//Use this icon when not in map and no map default.

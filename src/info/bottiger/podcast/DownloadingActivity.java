@@ -4,7 +4,7 @@ import info.bottiger.podcast.R;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.utils.DialogMenu;
-import info.bottiger.podcast.utils.IconCursorAdapter;
+import info.bottiger.podcast.utils.FeedCursorAdapter;
 import info.bottiger.podcast.utils.StrUtils;
 import android.database.Cursor;
 import android.net.Uri;
@@ -78,8 +78,8 @@ public class DownloadingActivity extends PodcastBaseActivity {
 			ItemColumns.LENGTH, ItemColumns.STATUS, ItemColumns.KEEP };
 
 	private int offset;
-	class OffsetFieldHandler implements IconCursorAdapter.FieldHandler {
-		public void setViewValue(IconCursorAdapter adapter, Cursor cursor,
+	class OffsetFieldHandler implements FeedCursorAdapter.FieldHandler {
+		public void setViewValue(FeedCursorAdapter adapter, Cursor cursor,
 				View v, int fromColumnId) {
 			offset = cursor.getInt(fromColumnId);
 			if (v != null) {
@@ -87,8 +87,8 @@ public class DownloadingActivity extends PodcastBaseActivity {
 			}
 		}
 	}
-	class LengthFieldHandler implements IconCursorAdapter.FieldHandler {
-		public void setViewValue(IconCursorAdapter adapter, Cursor cursor,
+	class LengthFieldHandler implements FeedCursorAdapter.FieldHandler {
+		public void setViewValue(FeedCursorAdapter adapter, Cursor cursor,
 				View v, int fromColumnId) {
 			int length = cursor.getInt(fromColumnId);
 			String str = "0% ( 0 KB / 0 KB )";
@@ -350,14 +350,14 @@ public class DownloadingActivity extends PodcastBaseActivity {
 		String[] fromColNames = { ItemColumns.TITLE, ItemColumns.OFFSET,
 				ItemColumns.LENGTH, ItemColumns.STATUS, ItemColumns.KEEP };
 		int[] toColIds = { R.id.dtext1, R.id.dtext2, R.id.dtext3, R.id.icon, R.id.keep_icon };
-		IconCursorAdapter.FieldHandler[] fieldHandlers = {
-				IconCursorAdapter.defaultTextFieldHandler,
+		FeedCursorAdapter.FieldHandler[] fieldHandlers = {
+				FeedCursorAdapter.defaultTextFieldHandler,
 				new OffsetFieldHandler(),
 				new LengthFieldHandler(),
-				new IconCursorAdapter.IconFieldHandler(mIconMap),
-				new IconCursorAdapter.IconFieldHandler(AllItemActivity.mKeepIconMap)
+				new FeedCursorAdapter.IconFieldHandler(mIconMap),
+				new FeedCursorAdapter.IconFieldHandler(AllItemActivity.mKeepIconMap)
 				};
-		mAdapter = new IconCursorAdapter(this, R.layout.download_item, mCursor,
+		mAdapter = new FeedCursorAdapter(this, R.layout.download_item, mCursor,
 				fromColNames, toColIds, fieldHandlers);
 
 		setListAdapter(mAdapter);

@@ -1,5 +1,7 @@
 package info.bottiger.podcast.service;
 
+import java.util.PriorityQueue;
+
 import info.bottiger.podcast.Pref;
 import info.bottiger.podcast.R;
 import info.bottiger.podcast.fetcher.FeedFetcher;
@@ -50,6 +52,8 @@ public class PodcastService extends Service {
 	public long pref_download_file_expire = 0;
 	public long pref_played_file_expire = 0;
 	public int pref_max_valid_size = 0;
+	
+	private PriorityQueue<FeedItem> mDownloadQueue = new PriorityQueue<FeedItem>();
 	
 
 	private FeedItem mDownloadingItem = null;
@@ -135,9 +139,10 @@ public class PodcastService extends Service {
 			return sub;
 
 	}
-
-	private FeedItem getDownloadItem() {
-
+	
+	private void populateDownloadQueue() {
+		FeedItem item = null;
+		do {
 		String where = ItemColumns.STATUS + ">"
 				+ ItemColumns.ITEM_STATUS_DOWNLOAD_PAUSE + " AND "
 				+ ItemColumns.STATUS + "<"
@@ -145,7 +150,16 @@ public class PodcastService extends Service {
 		
 		String order =ItemColumns.STATUS + " DESC , " + ItemColumns.LAST_UPDATE
 		+ " ASC";
-		return FeedItem.getBySQL(getContentResolver(),where,order);
+		item = FeedItem.getBySQL(getContentResolver(),where,order);	
+		
+		if (item != null) {
+			mDownloadQueue.add(item);
+		}
+		} while (item != null);
+	}
+
+	private FeedItem getDownloadItem() {
+		return mDownloadQueue.poll();
 	}
 
 	
@@ -211,7 +225,8 @@ public class PodcastService extends Service {
 		
 		if(mDownloadLock.locked()==false)
 			return;
-
+		
+		populateDownloadQueue();
 
 		new Thread() {
 			public void run() {
@@ -223,8 +238,6 @@ public class PodcastService extends Service {
 						if (mDownloadingItem == null) {
 							break;
 						}
-
-
 
 						try {
 							mDownloadingItem.startDownload(getContentResolver());
