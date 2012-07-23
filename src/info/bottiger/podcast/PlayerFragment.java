@@ -174,13 +174,6 @@ public class PlayerFragment   extends PodcastBaseFragment
     
     private static final int REFRESH = 1;
     private static final int PLAYITEM = 2;
-
-    private void queueNextRefresh(long delay) {
-            Message msg = mHandler.obtainMessage(REFRESH);
-            mHandler.removeMessages(REFRESH);
-            if(mShow)
-            	mHandler.sendMessageDelayed(msg, delay);
-    }
     
 
     
@@ -190,59 +183,6 @@ public class PlayerFragment   extends PodcastBaseFragment
 		if(mServiceBinder!=null)
 			mServiceBinder.play(item.id);
         updateInfo();		
-    }    
-
-    private long refreshNow() {
-        if(mServiceBinder == null)
-            return 500;
-        if(mID>=0){
-        	startPlay();
-        }
-        if(mServiceBinder.getUpdateStatus()){
-        	updateInfo();
-        	mServiceBinder.setUpdateStatus(false);
-        	
-        }
-        try {
-        	if(mServiceBinder.isInitialized()==false){
-                mCurrentTime.setVisibility(View.INVISIBLE);
-                mTotalTime.setVisibility(View.INVISIBLE);
-                mProgress.setProgress(0);
-                return 500;
-        	}
-        	long pos = mServiceBinder.position();
-        	long duration = mServiceBinder.duration();
-            
-            //mTotalTime.setVisibility(View.VISIBLE);
-            //mTotalTime.setText(formatTime( duration ));
-            
-        	if(mServiceBinder.isPlaying() == false) {
-                mCurrentTime.setVisibility(View.VISIBLE);
-                mCurrentTime.setText(StrUtils.formatTime( pos ));
-
-                mProgress.setProgress((int) (1000 * pos / duration));
-                return 500;
-        	}
-        	
-            long remaining = 1000 - (pos % 1000);
-            if ((pos >= 0) && (duration > 0)) {
-                mCurrentTime.setText(StrUtils.formatTime( pos ));
-                
-                if (mServiceBinder.isInitialized()) {
-                    mCurrentTime.setVisibility(View.VISIBLE);
-                    //mTotalTime.setVisibility(View.VISIBLE);
-                } 
-
-                mProgress.setProgress((int) (1000 * pos / mServiceBinder.duration()));
-            } else {
-                mCurrentTime.setText("--:--");
-                mProgress.setProgress(1000);
-            }
-
-            return remaining;
-        } catch (Exception ex) {
-        }
-        return 500;
     }    
     
     private final Handler mHandler = new Handler() {

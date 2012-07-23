@@ -194,6 +194,8 @@ public class RecentItemFragment extends PodcastBaseFragment {
 		Intent intent = getActivity().getIntent();
 		intent.setData(ItemColumns.URI);
 
+		
+		
 		// FIXME
 		// mPrevIntent = new Intent(this, ChannelsActivity.class);
 		// mNextIntent = new Intent(this, DownloadingActivity.class);
@@ -209,74 +211,6 @@ public class RecentItemFragment extends PodcastBaseFragment {
 		startInit();
 		return V;
 	}
-
-	/*
-	 * @Override public boolean onCreateOptionsMenu(Menu menu) { menu.add(0,
-	 * MENU_REFRESH, 0, getResources().getString(R.string.menu_update)).setIcon(
-	 * android.R.drawable.ic_menu_rotate); menu.add(0, MENU_SORT, 1,
-	 * getResources().getString(R.string.menu_sort)).setIcon(
-	 * android.R.drawable.ic_menu_agenda); menu.add(0, MENU_SELECT, 2,
-	 * getResources().getString(R.string.menu_select)).setIcon(
-	 * android.R.drawable.ic_menu_today); return true; }
-	 * 
-	 * /*
-	 * 
-	 * @Override public boolean onPrepareOptionsMenu(Menu menu) {
-	 * super.onPrepareOptionsMenu(menu); MenuItem item =
-	 * menu.findItem(MENU_DISPLAY); String auto; if(pref_where==0){ auto =
-	 * "Only Undownload"; }else{ auto = "Display All"; } item.setTitle(auto);
-	 * return true; }
-	 */
-
-	/*
-	 * @Override public boolean onOptionsItemSelected(MenuItem item) { switch
-	 * (item.getItemId()) { case MENU_REFRESH: mServiceBinder.start_update();
-	 * return true; case MENU_SORT: new AlertDialog.Builder(this)
-	 * .setTitle("Chose Sort Mode") .setSingleChoiceItems(R.array.sort_select,
-	 * (int) pref_order, new DialogInterface.OnClickListener() { public void
-	 * onClick(DialogInterface dialog, int select) {
-	 * 
-	 * if(mCursor!=null) mCursor.close();
-	 * 
-	 * pref_order = select; SharedPreferences prefsPrivate =
-	 * getSharedPreferences(Pref.HAPI_PREFS_FILE_NAME, Context.MODE_PRIVATE);
-	 * Editor prefsPrivateEditor = prefsPrivate.edit();
-	 * prefsPrivateEditor.putLong("pref_order", pref_order);
-	 * prefsPrivateEditor.commit();
-	 * 
-	 * mCursor = managedQuery(ItemColumns.URI, PROJECTION, getWhere(), null,
-	 * getOrder()); mAdapter.changeCursor(mCursor); //setListAdapter(mAdapter);
-	 * dialog.dismiss();
-	 * 
-	 * } }) .show(); return true; case MENU_SELECT: new
-	 * AlertDialog.Builder(this) .setTitle("Chose Select Mode")
-	 * .setSingleChoiceItems(R.array.select_select, (int) pref_select, new
-	 * DialogInterface.OnClickListener() { public void onClick(DialogInterface
-	 * dialog, int select) {
-	 * 
-	 * if(mCursor!=null) mCursor.close();
-	 * 
-	 * pref_select = select; SharedPreferences prefsPrivate =
-	 * getSharedPreferences(Pref.HAPI_PREFS_FILE_NAME, Context.MODE_PRIVATE);
-	 * Editor prefsPrivateEditor = prefsPrivate.edit();
-	 * prefsPrivateEditor.putLong("pref_select", pref_select);
-	 * prefsPrivateEditor.commit();
-	 * 
-	 * mCursor = managedQuery(ItemColumns.URI, PROJECTION, getWhere(), null,
-	 * getOrder()); mAdapter.changeCursor(mCursor); //setListAdapter(mAdapter);
-	 * dialog.dismiss(); } }) .show(); return true; /* case MENU_DISPLAY:
-	 * if(mCursor!=null) mCursor.close(); pref_where = 1- pref_where;
-	 * 
-	 * SharedPreferences prefsPrivate =
-	 * getSharedPreferences(Pref.HAPI_PREFS_FILE_NAME, Context.MODE_PRIVATE);
-	 * Editor prefsPrivateEditor = prefsPrivate.edit();
-	 * prefsPrivateEditor.putLong("pref_where", pref_where);
-	 * prefsPrivateEditor.commit();
-	 * 
-	 * mCursor = managedQuery(ItemColumns.URI, PROJECTION,getWhere(), null,
-	 * getOrder()); mAdapter.changeCursor(mCursor); return true; / } return
-	 * super.onOptionsItemSelected(item); }
-	 */
 
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
@@ -298,6 +232,8 @@ public class RecentItemFragment extends PodcastBaseFragment {
 				View view = list.getChildAt(i - start);
 				mAdapter.notifyDataSetChanged();
 
+				TextView currentPosition = (TextView) view.findViewById(R.id.current_position);
+				
 				ViewStub stub = (ViewStub) view.findViewById(R.id.stub);
 				if (stub != null) {
 					stub.inflate();
@@ -310,15 +246,17 @@ public class RecentItemFragment extends PodcastBaseFragment {
 					//View controls = view.findViewById(R.id.stub_player);
 					//mCurrentPlayer = controls;
 					
+					
 					ControlButtons.Holder viewHolder = new ControlButtons.Holder();
 					viewHolder.playPauseButton = (ImageButton) view.findViewById(R.id.play_toggle);
 					viewHolder.stopButton = (ImageButton) view.findViewById(R.id.stop);
 					viewHolder.infoButton = (ImageButton) view.findViewById(R.id.info);
 					viewHolder.downloadButton = (ImageButton) view.findViewById(R.id.download);
 					viewHolder.queueButton = (ImageButton) view.findViewById(R.id.queue);
+					viewHolder.currentTime = currentPosition; 
 					viewHolder.seekbar = (SeekBar) view.findViewById(R.id.progress);
-					ControlButtons.setListener(viewHolder, mPlayerServiceBinder, id);
-				} else {
+					ControlButtons.setListener(this, viewHolder, id);
+				} else { 
 					View player = view.findViewById(R.id.stub_player);
 					if (player.getVisibility() == View.VISIBLE) {
 						player.setVisibility(View.GONE);

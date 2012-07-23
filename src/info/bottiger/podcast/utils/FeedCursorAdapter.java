@@ -199,6 +199,7 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 		viewHolder.textViewDuration = (TextView) v.findViewById(R.id.duration);
 		viewHolder.textViewFileSize = (TextView) v.findViewById(R.id.filesize);
 		viewHolder.imageView = (ImageView) v.findViewById(R.id.list_image);
+		viewHolder.textViewCurrentTime = (TextView) v.findViewById(R.id.current_position);
 
 		v.setTag(viewHolder);
 		return v;
@@ -214,6 +215,9 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 		
 		int subtitleIndex = cursor.getColumnIndex(ItemColumns.SUB_TITLE);
 		int imageIndex = cursor.getColumnIndex(ItemColumns.IMAGE_URL);
+		
+		int currentTimeIndex = cursor.getColumnIndex(ItemColumns.DURATION);
+		
 		try {
 			int filesizeIndex = cursor.getColumnIndexOrThrow(ItemColumns.STATUS);
 			int filesize = cursor.getInt(filesizeIndex);
@@ -259,6 +263,7 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 		public TextView textViewSubTitle;
 		public TextView textViewDuration;
 		public TextView textViewFileSize;
+		public TextView textViewCurrentTime;
 	}
 
 	private void setViewImage3(ImageView v, String imageURL) {
