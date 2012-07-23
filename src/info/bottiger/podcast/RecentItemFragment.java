@@ -7,6 +7,7 @@ import info.bottiger.podcast.provider.SubscriptionColumns;
 import info.bottiger.podcast.service.PlayerService;
 import info.bottiger.podcast.utils.ControlButtons;
 import info.bottiger.podcast.utils.DialogMenu;
+import info.bottiger.podcast.utils.ExpandAnimation;
 import info.bottiger.podcast.utils.IconCursorAdapter;
 import info.bottiger.podcast.utils.IconCursorAdapter.TextFieldHandler;
 import info.bottiger.podcast.utils.IconCursorAdapter.ViewHolder;
@@ -34,8 +35,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -271,7 +276,6 @@ public class RecentItemFragment extends PodcastBaseFragment {
 
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
-		// mAdapter.toggleItem(id);
 
 		/*
 		if (!mPlayerServiceBinder.isPlaying()) {
@@ -280,18 +284,21 @@ public class RecentItemFragment extends PodcastBaseFragment {
 		}
 		*/
 		
-
 		ListView list = getListView();
 		int start = list.getFirstVisiblePosition();
 		for (int i = start, j = list.getLastVisiblePosition(); i <= j; i++) {
 			Cursor item = (Cursor) list.getItemAtPosition(i);
 
 			if (id == item.getLong(item.getColumnIndex(ItemColumns._ID))) {
+				mAdapter.toggleItem(item);
 				View view = list.getChildAt(i - start);
+				mAdapter.notifyDataSetChanged();
 
 				ViewStub stub = (ViewStub) view.findViewById(R.id.stub);
 				if (stub != null) {
 					stub.inflate();
+					ExpandAnimation expandAni = new ExpandAnimation(stub, 5000);
+					stub.startAnimation(expandAni);
 					
 					//if (mCurrentPlayer != null)
 					//	mCurrentPlayer.setVisibility(View.GONE);
@@ -299,10 +306,14 @@ public class RecentItemFragment extends PodcastBaseFragment {
 					//View controls = view.findViewById(R.id.stub_player);
 					//mCurrentPlayer = controls;
 					
-					//ControlButtons.Holder viewHolder = new ControlButtons.Holder();
-					//viewHolder.playPauseButton = (Button) controls.findViewById(R.id.play_toggle);
-					//viewHolder.stopButton = (Button) controls.findViewById(R.id.stop);
-					//ControlButtons.setListener(viewHolder, mPlayerServiceBinder, id);
+					ControlButtons.Holder viewHolder = new ControlButtons.Holder();
+					viewHolder.playPauseButton = (ImageButton) view.findViewById(R.id.play_toggle);
+					viewHolder.stopButton = (ImageButton) view.findViewById(R.id.stop);
+					viewHolder.infoButton = (ImageButton) view.findViewById(R.id.info);
+					viewHolder.downloadButton = (ImageButton) view.findViewById(R.id.download);
+					viewHolder.queueButton = (ImageButton) view.findViewById(R.id.queue);
+					viewHolder.seekbar = (SeekBar) view.findViewById(R.id.progress);
+					ControlButtons.setListener(viewHolder, mPlayerServiceBinder, id);
 				} else {
 					View player = view.findViewById(R.id.stub_player);
 					if (player.getVisibility() == View.VISIBLE) {

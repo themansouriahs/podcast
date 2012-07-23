@@ -26,7 +26,7 @@
                 android:id="@+id/list_image"
                 android:layout_width="90dip"
                 android:layout_height="90dip"
-                android:src="@drawable/feed_default_icon" />
+                android:src="@drawable/generic_podcast" />
         </LinearLayout>
 
         <!-- Title Of Podcast -->

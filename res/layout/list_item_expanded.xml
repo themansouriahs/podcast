@@ -1,38 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:descendantFocusability="blocksDescendants"
-    android:orientation="vertical">
+    android:orientation="vertical" >
 
-	
-    <SeekBar android:id="@+id/progress"
+    <SeekBar
+        android:id="@+id/progress"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
-        <Button
+        <ImageButton
+            style="@style/PlayerControlButtons"
             android:id="@+id/play_toggle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/play" />
+            android:src="@drawable/play"
+            android:contentDescription="@string/play" />
 
-        <Button
+        <ImageButton
+            style="@style/PlayerControlButtons"
             android:id="@+id/stop"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/stop" />
+            android:src="@drawable/stop"
+            android:contentDescription="@string/stop" />
 
-        <Button
-            android:id="@+id/forward"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/forward" />
+        <ImageButton
+            style="@style/PlayerControlButtons"
+            android:id="@+id/info"
+            android:src="@drawable/info"
+            android:contentDescription="@string/info" />
 
+        <ImageButton
+            style="@style/PlayerControlButtons"
+            android:id="@+id/download"
+            android:src="@drawable/download"
+            android:contentDescription="@string/download" />
+
+        <ImageButton
+            style="@style/PlayerControlButtons"
+            android:id="@+id/queue"
+            android:src="@drawable/plus"
+            android:contentDescription="@string/queue" />
     </LinearLayout>
- 	
+
 </LinearLayout>

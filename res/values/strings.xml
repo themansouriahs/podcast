@@ -123,5 +123,8 @@
     <string name="play">Play</string>
     <string name="stop">Stop</string>
     <string name="forward">Jump 10 s</string>
+    <string name="info">Info</string>
+    <string name="download">Download</string>
+    <string name="queue">Queue</string>
 
 </resources>
