@@ -5,6 +5,7 @@ import info.bottiger.podcast.ChannelActivity;
 import info.bottiger.podcast.PlayListActivity;
 import info.bottiger.podcast.PlayerActivity;
 import info.bottiger.podcast.PodcastBaseActivity;
+import info.bottiger.podcast.service.PodcastService;
 import info.bottiger.podcast.utils.FileUtils;
 import info.bottiger.podcast.utils.Log;
 import info.bottiger.podcast.utils.SDCardMgr;
@@ -23,7 +24,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.widget.Toast;
 
-public class FeedItem {
+public class FeedItem implements Comparable<FeedItem> {
 	
 	public static final int MAX_DOWNLOAD_FAIL = 5;
 	
@@ -41,6 +42,7 @@ public class FeedItem {
 	public long id;
 
 	public long sub_id;
+	public long filesize;
 
 	public String pathname;
 	public int offset;
@@ -193,6 +195,7 @@ public class FeedItem {
 		length = -1;
 		update = -1;
 		keep = -1;
+		filesize = -1;
 
 		created = -1;
 		sub_title = null;
@@ -307,6 +310,8 @@ public class FeedItem {
 			ContentValues cv = new ContentValues();
 			if (pathname != null)
 				cv.put(ItemColumns.PATHNAME, pathname);
+			if (filesize >= 0)
+				cv.put(ItemColumns.PATHNAME, filesize);
 			if (offset >= 0)
 				cv.put(ItemColumns.OFFSET, offset);
 			if (status >= 0)
@@ -372,6 +377,8 @@ public class FeedItem {
 				cv.put(ItemColumns.CONTENT, content);
 			if (resource != null)
 				cv.put(ItemColumns.RESOURCE, resource);
+			if (filesize >= 0)
+				cv.put(ItemColumns.FILESIZE, filesize);
 			if (duration != null) {
 				// Log.w("ITEM","  duration: " + duration);
 				cv.put(ItemColumns.DURATION, duration);
@@ -495,6 +502,8 @@ public class FeedItem {
 		item.date = cursor.getString(cursor.getColumnIndex(ItemColumns.DATE));
 		item.content = cursor.getString(cursor
 				.getColumnIndex(ItemColumns.CONTENT));
+		item.filesize = cursor.getLong(cursor
+				.getColumnIndex(ItemColumns.FILESIZE));
 		item.duration = cursor.getString(cursor
 				.getColumnIndex(ItemColumns.DURATION));
 		item.uri = cursor.getString(cursor
@@ -581,20 +590,23 @@ public class FeedItem {
 		
 	}
 	
-	public void startDownload(ContentResolver context)
+	public void prepareDownload(ContentResolver context)
 	{
-		if (pathname.equals("")) {
-			pathname = SDCardMgr.getDownloadDir()
-					+ "/podcast_" + id + ".mp3";
+		if (pathname.equals("") || pathname.equals("0")) {
+			//String fileName = new File(pathname)FeedItem getName();
+			String filename = resource.substring(resource.lastIndexOf("/")+1);  
+			
+			//pathname = SDCardMgr.getDownloadDir() + "/podcast_" + id + ".mp3";
+			pathname = SDCardMgr.getDownloadDir() + "/" + this.sub_id + "_" + filename + ".mp3";
 		}
 		status = ItemColumns.ITEM_STATUS_DOWNLOADING_NOW;
 		update(context);
-		
 	}
 
 	public void downloadSuccess()
 	{
 		status = ItemColumns.ITEM_STATUS_NO_PLAY;
+		filesize = new File(pathname).length();
 	}	
 	
 	public void endDownload(ContentResolver context)
@@ -625,5 +637,20 @@ public class FeedItem {
 		emailIntent .putExtra(android.content.Intent.EXTRA_SUBJECT, "please listen..."); 
 		emailIntent .putExtra(android.content.Intent.EXTRA_TEXT, getMailBody()); 
 		act.startActivity(Intent.createChooser(emailIntent, "Send mail..."));
+	}
+	
+	public void setPosition(ContentResolver contentResolver, long pos) {
+		this.offset = (int) pos;
+		update(contentResolver);
+	}
+
+	@Override
+	public int compareTo(FeedItem another) {
+		if (this.update > another.update)
+			return 1;
+		else if (this.update < another.update)
+			return -1;
+		
+		return 0;
 	}
 }

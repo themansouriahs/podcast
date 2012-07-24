@@ -64,6 +64,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 			ItemColumns.DURATION, //
 			ItemColumns.STATUS, // 
 			ItemColumns.SUBS_ID, //
+			ItemColumns.FILESIZE, //
 			ItemColumns.KEEP //
 
 	};
@@ -231,8 +232,9 @@ public class RecentItemFragment extends PodcastBaseFragment {
 				mAdapter.toggleItem(item);
 				View view = list.getChildAt(i - start);
 				mAdapter.notifyDataSetChanged();
-
-				TextView currentPosition = (TextView) view.findViewById(R.id.current_position);
+				
+				ControlButtons.Holder viewHolder = new ControlButtons.Holder();
+				viewHolder.currentTime = (TextView) view.findViewById(R.id.current_position);
 				
 				ViewStub stub = (ViewStub) view.findViewById(R.id.stub);
 				if (stub != null) {
@@ -240,34 +242,25 @@ public class RecentItemFragment extends PodcastBaseFragment {
 					ExpandAnimation expandAni = new ExpandAnimation(stub, 5000);
 					stub.startAnimation(expandAni);
 					
-					//if (mCurrentPlayer != null)
-					//	mCurrentPlayer.setVisibility(View.GONE);
-				
-					//View controls = view.findViewById(R.id.stub_player);
-					//mCurrentPlayer = controls;
-					
-					
-					ControlButtons.Holder viewHolder = new ControlButtons.Holder();
 					viewHolder.playPauseButton = (ImageButton) view.findViewById(R.id.play_toggle);
 					viewHolder.stopButton = (ImageButton) view.findViewById(R.id.stop);
 					viewHolder.infoButton = (ImageButton) view.findViewById(R.id.info);
 					viewHolder.downloadButton = (ImageButton) view.findViewById(R.id.download);
 					viewHolder.queueButton = (ImageButton) view.findViewById(R.id.queue);
-					viewHolder.currentTime = currentPosition; 
+					viewHolder.currentTime = (TextView) view.findViewById(R.id.current_position);
 					viewHolder.seekbar = (SeekBar) view.findViewById(R.id.progress);
+					
 					ControlButtons.setListener(this, viewHolder, id);
 				} else { 
 					View player = view.findViewById(R.id.stub_player);
 					if (player.getVisibility() == View.VISIBLE) {
 						player.setVisibility(View.GONE);
-						//mCurrentPlayer = null;
 					} else {
-						//if (mCurrentPlayer != null)
-						//	mCurrentPlayer.setVisibility(View.GONE);
 						player.setVisibility(View.VISIBLE);
-						//mCurrentPlayer = player;
 					}
 				}
+				
+				updateCurrentPosition();
 			}
 
 		}

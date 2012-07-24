@@ -219,14 +219,22 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 		int currentTimeIndex = cursor.getColumnIndex(ItemColumns.DURATION);
 		
 		try {
-			int filesizeIndex = cursor.getColumnIndexOrThrow(ItemColumns.STATUS);
+			int filesizeIndex = cursor.getColumnIndexOrThrow(ItemColumns.FILESIZE);
 			int filesize = cursor.getInt(filesizeIndex);
-			holder.textViewFileSize.setText("" + filesize);
+			if (filesize > 0)
+				holder.textViewFileSize.setText(filesize/1024/1024 + " MB");
 		} catch (IllegalArgumentException e) {
 			
 		}
 		
 		holder.textViewTitle.setText(title);
+		
+		if (currentTimeIndex > 0) {
+			String duration = cursor.getString(currentTimeIndex);
+			holder.textViewDuration.setText(duration);
+			if (holder.textViewCurrentTime.getText().equals(""))
+				holder.textViewCurrentTime.setText(StrUtils.formatTime( 0 ) + " / " + duration);
+		}
 
 		if (subtitleIndex > 0)
 			holder.textViewSubTitle.setText(cursor.getString(subtitleIndex));

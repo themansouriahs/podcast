@@ -3,7 +3,9 @@ package info.bottiger.podcast.utils;
 import info.bottiger.podcast.PodcastBaseFragment;
 import info.bottiger.podcast.R;
 import info.bottiger.podcast.RecentItemFragment;
+import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.service.PlayerService;
+import info.bottiger.podcast.service.PodcastService;
 import info.bottiger.podcast.utils.ControlButtons.Holder;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -25,6 +27,10 @@ public class ControlButtons {
         public TextView currentTime;
         public SeekBar seekbar;
     }
+    
+    public static void setCurrentTime(final RecentItemFragment fragment, final Holder viewHolder, final long id) {
+    	
+    }
 
     public static void setListener(final RecentItemFragment fragment, final Holder viewHolder, final long id) {
     	
@@ -33,16 +39,16 @@ public class ControlButtons {
     	final ImageButton b = (ImageButton)viewHolder.playPauseButton;
 		b.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+            	fragment.setProgress(viewHolder.seekbar);
+            	fragment.setCurrentTime(viewHolder.currentTime);
                 if (fragment.mPlayerServiceBinder.isPlaying()) {
-                	fragment.mPlayerServiceBinder.pause();
                 	b.setContentDescription("Play");
                 	b.setImageResource(R.drawable.play);
-                	fragment.setProgress(viewHolder.seekbar);
-                	fragment.setCurrentTime(viewHolder.currentTime);
+                	fragment.mPlayerServiceBinder.pause();
                 } else {
-                	fragment.mPlayerServiceBinder.play(id);
                 	b.setImageResource(R.drawable.pause);
                 	b.setContentDescription("Pause");
+                	fragment.mPlayerServiceBinder.play(id);
                 }
             }
         });
@@ -60,6 +66,11 @@ public class ControlButtons {
 		
 		viewHolder.downloadButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+            	FeedItem item = FeedItem.getById(fragment.getActivity().getContentResolver(), id);
+            	//item.startDownload(fragment.getActivity().getContentResolver());
+            	PodcastService.downloadItem(fragment.getActivity().getContentResolver(), item);
+            	viewHolder.downloadButton.setImageResource(R.drawable.trash);
+            	viewHolder.downloadButton.setContentDescription("Trash");
             }
         });
 		

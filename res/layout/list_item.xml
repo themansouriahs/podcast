@@ -95,7 +95,7 @@
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/thumbnail"
             android:layout_toRightOf="@+id/thumbnail"
-            android:text="34:45 / 1:34:56"
+            android:text=""
             android:textColor="#FFFFFF"
             android:textSize="15dip"
             android:typeface="sans" />

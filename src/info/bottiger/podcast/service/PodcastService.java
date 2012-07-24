@@ -17,6 +17,7 @@ import info.bottiger.podcast.utils.SDCardMgr;
 
 
 import android.app.Service;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -40,7 +41,9 @@ public class PodcastService extends Service {
 	private static final long ONE_HOUR = 60L * ONE_MINUTE;
 	private static final long ONE_DAY = 24L * ONE_HOUR;
 
-	private static final long timer_freq = 3 * ONE_MINUTE;
+	//private static final long timer_freq = 3 * ONE_MINUTE;
+	private static final long timer_freq = 1000L;
+	
 
 	private long pref_update = 2 * 60 * ONE_MINUTE;
 
@@ -53,7 +56,7 @@ public class PodcastService extends Service {
 	public long pref_played_file_expire = 0;
 	public int pref_max_valid_size = 0;
 	
-	private PriorityQueue<FeedItem> mDownloadQueue = new PriorityQueue<FeedItem>();
+	private static PriorityQueue<FeedItem> mDownloadQueue = new PriorityQueue<FeedItem>();
 	
 
 	private FeedItem mDownloadingItem = null;
@@ -143,7 +146,7 @@ public class PodcastService extends Service {
 	private void populateDownloadQueue() {
 		FeedItem item = null;
 		do {
-		String where = ItemColumns.STATUS + ">"
+		/*String where = ItemColumns.STATUS + ">"
 				+ ItemColumns.ITEM_STATUS_DOWNLOAD_PAUSE + " AND "
 				+ ItemColumns.STATUS + "<"
 				+ ItemColumns.ITEM_STATUS_MAX_DOWNLOADING_VIEW;
@@ -151,7 +154,7 @@ public class PodcastService extends Service {
 		String order =ItemColumns.STATUS + " DESC , " + ItemColumns.LAST_UPDATE
 		+ " ASC";
 		item = FeedItem.getBySQL(getContentResolver(),where,order);	
-		
+		*/
 		if (item != null) {
 			mDownloadQueue.add(item);
 		}
@@ -240,7 +243,7 @@ public class PodcastService extends Service {
 						}
 
 						try {
-							mDownloadingItem.startDownload(getContentResolver());
+							//mDownloadingItem.startDownload(getContentResolver());
 							FeedFetcher fetcher = new FeedFetcher();
 
 							fetcher.download(mDownloadingItem);
@@ -422,6 +425,11 @@ public class PodcastService extends Service {
 		
 		pref_max_valid_size= Integer.parseInt(pref.getString(
 				"pref_max_new_items", "10"));
+	}
+	
+	public static void downloadItem(ContentResolver context, FeedItem item) {
+		item.prepareDownload(context);
+		mDownloadQueue.add(item);
 	}
 
 }

@@ -378,14 +378,18 @@ public class PlayerService extends Service {
 			return;
 		}
 		
-		/*
+		
 		File file = new File(mItem.pathname);
-		if (file.exists()==false) {
-			Toast.makeText(this, getResources().getString(R.string.audio_no_found), Toast.LENGTH_LONG).show();	
-			return;
-		}		
-		*/
-		mPlayer.setDataSource(mItem.url);
+		String dataSource;
+		if (file.exists()) {
+			dataSource = mItem.pathname;
+			//Toast.makeText(this, getResources().getString(R.string.audio_no_found), Toast.LENGTH_LONG).show();	
+			//return;
+		} else {
+			dataSource = mItem.url;
+		}
+		
+		mPlayer.setDataSource(dataSource);
 		int offset = mItem.offset < 0 ? 0: mItem.offset;
 		mPlayer.seek(offset);
 		start();

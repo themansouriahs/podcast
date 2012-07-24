@@ -32,41 +32,40 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 /* Copy of PodcastBaseActivity */
 public class PodcastBaseFragment extends ListFragment {
 
-    private static final int SWIPE_MIN_DISTANCE = 120;
-    private static final int SWIPE_MAX_OFF_PATH = 250;
+	private static final int SWIPE_MIN_DISTANCE = 120;
+	private static final int SWIPE_MAX_OFF_PATH = 250;
 	private static final int SWIPE_THRESHOLD_VELOCITY = 200;
-	
+
 	public static final int COLUMN_INDEX_TITLE = 1;
-	
-	//protected  static PodcastService mServiceBinder = null;
+
+	// protected static PodcastService mServiceBinder = null;
 	public PlayerService mPlayerServiceBinder = null;
 	protected static ComponentName mService = null;
-	//protected final Log log = Log.getLog(getClass());
+	// protected final Log log = Log.getLog(getClass());
 
 	protected SimpleCursorAdapter mAdapter;
-	//protected Cursor mCursor = null;
-	
-	//protected boolean mInit = false;
+	// protected Cursor mCursor = null;
+
+	// protected boolean mInit = false;
 	protected Intent mPrevIntent = null;
-	
+
 	protected Intent mNextIntent = null;
-	
+
 	OnEpisodeSelectedListener mListener;
-	
+
 	protected final Log log = Log.getLog(getClass());
-	
+
 	private long mLastSeekEventTime;
-    private boolean mFromTouch;
-    
-    private static final int REFRESH = 1;
-    private static final int PLAYITEM = 2;
-    
-    private boolean mShow = true;
-    
-    private TextView mCurrentTime = null;
+	private boolean mFromTouch;
+
+	private static final int REFRESH = 1;
+	private static final int PLAYITEM = 2;
+
+	private boolean mShow = true;
+
+	private TextView mCurrentTime = null;
 	private SeekBar mProgress = null;
 
-	
 	public TextView getCurrentTime() {
 		return mCurrentTime;
 	}
@@ -87,98 +86,100 @@ public class PodcastBaseFragment extends ListFragment {
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			mPlayerServiceBinder = ((PlayerService.PlayerBinder) service)
 					.getService();
-			//log.debug("onServiceConnected");
+			// log.debug("onServiceConnected");
 		}
 
 		public void onServiceDisconnected(ComponentName className) {
 			mPlayerServiceBinder = null;
-			//log.debug("onServiceDisconnected");
+			// log.debug("onServiceDisconnected");
 		}
-	};	
-	
+	};
+
 	public OnSeekBarChangeListener mSeekListener = new OnSeekBarChangeListener() {
-        public void onStartTrackingTouch(SeekBar bar) {
-            mLastSeekEventTime = 0;
-            mFromTouch = true;
-            log.debug("mFromTouch = false; ");
-            
-        }
-        public void onProgressChanged(SeekBar bar, int progress, boolean fromuser) {
-            log.debug("onProgressChanged");
-       	
-            if (!fromuser || (mPlayerServiceBinder == null)) return;
+		public void onStartTrackingTouch(SeekBar bar) {
+			mLastSeekEventTime = 0;
+			mFromTouch = true;
+			log.debug("mFromTouch = false; ");
 
-            long now = SystemClock.elapsedRealtime();
-            if ((now - mLastSeekEventTime) > 250) {
-                mLastSeekEventTime = now;
-                //mPosOverride = mp.duration * progress / 1000;
-                try {
-                	if(mPlayerServiceBinder.isInitialized())
-                		mPlayerServiceBinder.seek(mPlayerServiceBinder.duration() * progress / 1000);
-                } catch (Exception ex) {
-                }
+		}
 
-                if (!mFromTouch) {
-                    refreshNow();
-                    //mPosOverride = -1;
-                }
-            }
-            
-        }
-        
-        public void onStopTrackingTouch(SeekBar bar) {
-            //mPosOverride = -1;
-            mFromTouch = false;
-            log.debug("mFromTouch = false; ");
+		public void onProgressChanged(SeekBar bar, int progress,
+				boolean fromuser) {
+			log.debug("onProgressChanged");
 
-        }
-    };
+			if (!fromuser || (mPlayerServiceBinder == null))
+				return;
 
-	
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (OnEpisodeSelectedListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement OnArticleSelectedListener");
-        }
-    }
-    
+			long now = SystemClock.elapsedRealtime();
+			if ((now - mLastSeekEventTime) > 250) {
+				mLastSeekEventTime = now;
+				// mPosOverride = mp.duration * progress / 1000;
+				try {
+					if (mPlayerServiceBinder.isInitialized())
+						mPlayerServiceBinder.seek(mPlayerServiceBinder
+								.duration() * progress / 1000);
+				} catch (Exception ex) {
+				}
+
+				if (!mFromTouch) {
+					refreshNow();
+					// mPosOverride = -1;
+				}
+			}
+
+		}
+
+		public void onStopTrackingTouch(SeekBar bar) {
+			// mPosOverride = -1;
+			mFromTouch = false;
+			log.debug("mFromTouch = false; ");
+
+		}
+	};
+
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		try {
+			mListener = (OnEpisodeSelectedListener) activity;
+		} catch (ClassCastException e) {
+			throw new ClassCastException(activity.toString()
+					+ " must implement OnArticleSelectedListener");
+		}
+	}
+
 	// Container Activity must implement this interface
-    public interface OnEpisodeSelectedListener {
-        public void onEpisodeSelected(Uri episodeUri);
-    }
-	
-	
-	/*protected static ServiceConnection serviceConnection = new ServiceConnection() {
-		public void onServiceConnected(ComponentName className, IBinder service) {
-			mServiceBinder = ((PodcastService.PodcastBinder) service)
-					.getService();
-			mServiceBinder.start_update();
-			//log.debug("onServiceConnected");
-		}
+	public interface OnEpisodeSelectedListener {
+		public void onEpisodeSelected(Uri episodeUri);
+	}
 
-		public void onServiceDisconnected(ComponentName className) {
-			mServiceBinder = null;
-			//log.debug("onServiceDisconnected");
-		}
-	};*/
+	/*
+	 * protected static ServiceConnection serviceConnection = new
+	 * ServiceConnection() { public void onServiceConnected(ComponentName
+	 * className, IBinder service) { mServiceBinder =
+	 * ((PodcastService.PodcastBinder) service) .getService();
+	 * mServiceBinder.start_update(); //log.debug("onServiceConnected"); }
+	 * 
+	 * public void onServiceDisconnected(ComponentName className) {
+	 * mServiceBinder = null; //log.debug("onServiceDisconnected"); } };
+	 */
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		mService = getActivity().startService(new Intent(getActivity(), PlayerService.class));
+
+		mService = getActivity().startService(
+				new Intent(getActivity(), PlayerService.class));
 		Intent bindIntent = new Intent(getActivity(), PlayerService.class);
-		getActivity().bindService(bindIntent, playerServiceConnection, Context.BIND_AUTO_CREATE);
+		getActivity().bindService(bindIntent, playerServiceConnection,
+				Context.BIND_AUTO_CREATE);
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
 		try {
-			//unbindService(serviceConnection); TODO
+			// unbindService(serviceConnection); TODO
 		} catch (Exception e) {
 			e.printStackTrace();
 
@@ -186,23 +187,19 @@ public class PodcastBaseFragment extends ListFragment {
 	}
 
 	/*
-	@Override
-	public void onResume() {
-		super.onResume();
-		if (mInit) {
-			mInit = false;
-
-			if (mCursor != null)
-				mCursor.close();
-
-			getActivity().unbindService(serviceConnection);
-
-			startInit();
-
-		}
-
-	}
-	*/
+	 * @Override public void onResume() { super.onResume(); if (mInit) { mInit =
+	 * false;
+	 * 
+	 * if (mCursor != null) mCursor.close();
+	 * 
+	 * getActivity().unbindService(serviceConnection);
+	 * 
+	 * startInit();
+	 * 
+	 * }
+	 * 
+	 * }
+	 */
 
 	@Override
 	public void onPause() {
@@ -211,96 +208,110 @@ public class PodcastBaseFragment extends ListFragment {
 	}
 
 	/*
-	@Override
-	public void onLowMemory() {
-		super.onLowMemory();
-		mInit = true;
-
-		log.debug("onLowMemory()");
-		//finish();
-	}
-	*/
+	 * @Override public void onLowMemory() { super.onLowMemory(); mInit = true;
+	 * 
+	 * log.debug("onLowMemory()"); //finish(); }
+	 */
 	public void startInit() {
 
-		SwipeActivity.mService = getActivity().startService(new Intent(getActivity(), PodcastService.class));
+		SwipeActivity.mService = getActivity().startService(
+				new Intent(getActivity(), PodcastService.class));
 
 		Intent bindIntent = new Intent(getActivity(), PodcastService.class);
-		getActivity().bindService(bindIntent, SwipeActivity.serviceConnection, Context.BIND_AUTO_CREATE);
+		getActivity().bindService(bindIntent, SwipeActivity.serviceConnection,
+				Context.BIND_AUTO_CREATE);
 	}
-	
-    private final Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case REFRESH:
-                    long next = refreshNow();
-                    queueNextRefresh(next);
-                    //log.debug("REFRESH: "+next);
-                    break;
 
-                default:
-                    break;
-            }
-        }
-    };  
-    
-    public void queueNextRefresh(long delay) {
-        Message msg = mHandler.obtainMessage(REFRESH);
-        mHandler.removeMessages(REFRESH);
-        if(mShow)
-        	mHandler.sendMessageDelayed(msg, delay);
-}
+	private final Handler mHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			switch (msg.what) {
+			case REFRESH:
+				long next = refreshNow();
+				queueNextRefresh(next);
+				// log.debug("REFRESH: "+next);
+				break;
 
-    protected long refreshNow() {
-    	
-        if(mPlayerServiceBinder == null)
-            return 500;
-        
-        try {
-        	if(mPlayerServiceBinder.isInitialized()==false){
-                //mCurrentTime.setVisibility(View.INVISIBLE);
-                //mTotalTime.setVisibility(View.INVISIBLE);
-                mProgress.setProgress(0);
-                return 500;
-        	}
-        	long pos = mPlayerServiceBinder.position();
-        	long duration = mPlayerServiceBinder.duration();
-            
-        	String timeCounter = StrUtils.formatTime( pos ) + " / " + StrUtils.formatTime( duration );
-            mCurrentTime.setText(timeCounter);
-        	
-            //mTotalTime.setVisibility(View.VISIBLE);
-            //mTotalTime.setText(formatTime( duration ));
-            
-        	if(mPlayerServiceBinder.isPlaying() == false) {
-                //mCurrentTime.setVisibility(View.VISIBLE);
-                //mCurrentTime.setText(StrUtils.formatTime( pos ));
+			default:
+				break;
+			}
+		}
+	};
 
-                mProgress.setProgress((int) (1000 * pos / duration));
-                return 500;
-        	}
-        	
-            long remaining = 1000 - (pos % 1000);
-            if ((pos >= 0) && (duration > 0)) {
-            	//String timeCounter = StrUtils.formatTime( pos ) + " / " + StrUtils.formatTime( duration );
-                //mCurrentTime.setText(timeCounter);
-                
-                if (mPlayerServiceBinder.isInitialized()) {
-                    //mCurrentTime.setVisibility(View.VISIBLE);
-                    //mTotalTime.setVisibility(View.VISIBLE);
-                } 
-                int nextPos = (int) (1000 * pos / mPlayerServiceBinder.duration());
-                mProgress.setProgress(nextPos);
-            } else {
-                //mCurrentTime.setText("--:--");
-                mProgress.setProgress(1000);
-            }
+	public void queueNextRefresh(long delay) {
+		Message msg = mHandler.obtainMessage(REFRESH);
+		mHandler.removeMessages(REFRESH);
+		if (mShow)
+			mHandler.sendMessageDelayed(msg, delay);
+	}
 
-            return remaining;
-        } catch (Exception ex) {
-        }
-        return 500;
-    }    
+	protected long refreshNow() {
 
-	
+		if (mPlayerServiceBinder == null)
+			return 500;
+
+		try {
+			if (mPlayerServiceBinder.isInitialized() == false) {
+				// mCurrentTime.setVisibility(View.INVISIBLE);
+				// mTotalTime.setVisibility(View.INVISIBLE);
+				mProgress.setProgress(0);
+				return 500;
+			}
+
+			long pos = mPlayerServiceBinder.position();
+			long duration = mPlayerServiceBinder.duration();
+
+			updateCurrentPosition();
+			/*
+			 * String timeCounter = StrUtils.formatTime( pos ) + " / " +
+			 * StrUtils.formatTime( duration );
+			 * mCurrentTime.setText(timeCounter);
+			 */
+
+			// mTotalTime.setVisibility(View.VISIBLE);
+			// mTotalTime.setText(formatTime( duration ));
+
+			if (mPlayerServiceBinder.isPlaying() == false) {
+				// mCurrentTime.setVisibility(View.VISIBLE);
+				// mCurrentTime.setText(StrUtils.formatTime( pos ));
+
+				mProgress.setProgress((int) (1000 * pos / duration));
+				return 500;
+			}
+
+			long remaining = 1000 - (pos % 1000);
+			if ((pos >= 0) && (duration > 0)) {
+				// String timeCounter = StrUtils.formatTime( pos ) + " / " +
+				// StrUtils.formatTime( duration );
+				// mCurrentTime.setText(timeCounter);
+
+				if (mPlayerServiceBinder.isInitialized()) {
+					// mCurrentTime.setVisibility(View.VISIBLE);
+					// mTotalTime.setVisibility(View.VISIBLE);
+				}
+				int nextPos = (int) (1000 * pos / mPlayerServiceBinder
+						.duration());
+				mProgress.setProgress(nextPos);
+			} else {
+				// mCurrentTime.setText("--:--");
+				mProgress.setProgress(1000);
+			}
+
+			return remaining;
+		} catch (Exception ex) {
+		}
+		return 500;
+	}
+
+	protected void updateCurrentPosition() {
+		if (mCurrentTime != null) {
+			long pos = mPlayerServiceBinder.position();
+			long duration = mPlayerServiceBinder.duration();
+
+			String timeCounter = StrUtils.formatTime(pos) + " / "
+					+ StrUtils.formatTime(duration);
+			mCurrentTime.setText(timeCounter);
+		}
+	}
+
 }
