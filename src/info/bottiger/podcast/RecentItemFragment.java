@@ -235,6 +235,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 					viewHolder.downloadButton = (ImageButton) view.findViewById(R.id.download);
 					viewHolder.queueButton = (ImageButton) view.findViewById(R.id.queue);
 					viewHolder.currentTime = (TextView) view.findViewById(R.id.current_position);
+					viewHolder.duration = (TextView) view.findViewById(R.id.duration);
 					viewHolder.seekbar = (SeekBar) view.findViewById(R.id.progress);
 					
 					ControlButtons.setListener(this, SwipeActivity.mServiceBinder, viewHolder, id);
@@ -247,7 +248,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 					}
 				}
 				
-				updateCurrentPosition();
+				updateCurrentPosition(FeedItem.getById(getActivity().getContentResolver(), id));
 			}
 
 		}
@@ -362,7 +363,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 	}
 
 	public String getOrder() {
-		String order = ItemColumns.DATE + " DESC"; // before:
+		String order = ItemColumns.DATE + " DESC LIMIT 20"; // before:
 													// ItemColumns.CREATED
 		if (pref_order == 0) {
 			order = ItemColumns.SUBS_ID + "," + order;

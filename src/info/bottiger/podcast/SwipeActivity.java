@@ -103,13 +103,17 @@ public class SwipeActivity extends FragmentActivity implements
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
 
-		Account[] a = AccountManager.get(getApplicationContext())
-				.getAccountsByType("com.google");
-		if (a.length > 0) {
-			GoogleReader agr = new GoogleReader();
-			agr.refreshAuthToken(SwipeActivity.this, a[0]);
-			agr.getSubscriptionsFromReader();
-		}
+		new Thread(new Runnable() {
+			public void run() {
+				Account[] a = AccountManager.get(getApplicationContext())
+						.getAccountsByType("com.google");
+				if (a.length > 0) {
+					GoogleReader agr = new GoogleReader();
+					agr.refreshAuthToken(SwipeActivity.this, a[0]);
+					agr.getSubscriptionsFromReader();
+				}
+			}
+		}).start();
 
 	}
 

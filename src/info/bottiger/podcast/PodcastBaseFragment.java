@@ -1,6 +1,7 @@
 package info.bottiger.podcast;
 
 import info.bottiger.podcast.R;
+import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.service.PlayerService;
 import info.bottiger.podcast.service.PodcastService;
 import info.bottiger.podcast.utils.Log;
@@ -61,6 +62,7 @@ public class PodcastBaseFragment extends ListFragment {
 
 	private TextView mCurrentTime = null;
 	private SeekBar mProgress = null;
+	private TextView mDuration = null;
 
 	public TextView getCurrentTime() {
 		return mCurrentTime;
@@ -78,6 +80,10 @@ public class PodcastBaseFragment extends ListFragment {
 		this.mProgress = mProgress;
 	}
 
+	public void setDuration(TextView mDuration) {
+		this.mDuration = mDuration;
+	}
+	
 	public ServiceConnection playerServiceConnection = new ServiceConnection() {
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			mPlayerServiceBinder = ((PlayerService.PlayerBinder) service)
@@ -257,7 +263,7 @@ public class PodcastBaseFragment extends ListFragment {
 			long pos = mPlayerServiceBinder.position();
 			long duration = mPlayerServiceBinder.duration();
 
-			updateCurrentPosition();
+			updateCurrentPosition(mPlayerServiceBinder.getCurrentItem());
 			/*
 			 * String timeCounter = StrUtils.formatTime( pos ) + " / " +
 			 * StrUtils.formatTime( duration );
@@ -299,13 +305,15 @@ public class PodcastBaseFragment extends ListFragment {
 		return 500;
 	}
 
-	protected void updateCurrentPosition() {
+	protected void updateCurrentPosition(FeedItem item) {
 		if (mCurrentTime != null) {
 			long pos = mPlayerServiceBinder.position();
 			long duration = mPlayerServiceBinder.duration();
 
 			String timeCounter = StrUtils.formatTime(pos);
+			String durationString = StrUtils.formatTime(duration);
 			mCurrentTime.setText(timeCounter);
+			mDuration.setText(durationString);
 		}
 	}
 

@@ -654,4 +654,13 @@ public class FeedItem implements Comparable<FeedItem> {
 		
 		return 0;
 	}
+	
+	public String getURL() {
+		String itemURL = "";
+		if (resource.length() > 1)
+			itemURL = resource;
+		else if (url.length() > 1)
+			itemURL = url;
+		return itemURL;
+	}
 }

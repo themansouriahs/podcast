@@ -36,6 +36,7 @@ public class FeedParserHandler extends DefaultHandler {
 	private static final String NODE_RSS_CREATOR = "creator";
 	private static final String NODE_RSS_GUID = "guid";
 	private static final String NODE_RSS_IMAGE = "url";
+	private static final String NODE_RSS_IMAGE_ALT = "itunes:image";
 
 	private static final String NODE_RSS_SUBTITLE = "subtitle";
 	private static final String NODE_RSS_SUMMARY = "summary";
@@ -144,6 +145,22 @@ public class FeedParserHandler extends DefaultHandler {
 						if (!mFeedImageLoaded) {
 							mFeedImageLoaded = true;
 							mFeedImageURL = mCache.toString();
+							listener.onFeedImageLoad(mFeedImageURL);
+						}
+					} else if (NODE_RSS_IMAGE_ALT.equalsIgnoreCase(localName)) {
+						if (!mFeedImageLoaded) {
+							mFeedImageLoaded = true;
+							mFeedImageURL = mCache.toString();
+							String url = mCache.toString();
+
+							Pattern p = Pattern.compile("^(http|https)://.*",
+									Pattern.CASE_INSENSITIVE);
+							Matcher m = p.matcher(url);
+							if (m.find()) {
+								// log.warn("item match");
+								mFeedImageURL = url;
+							}
+							
 							listener.onFeedImageLoad(mFeedImageURL);
 						}
 					}

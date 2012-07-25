@@ -386,7 +386,7 @@ public class PlayerService extends Service {
 			//Toast.makeText(this, getResources().getString(R.string.audio_no_found), Toast.LENGTH_LONG).show();	
 			//return;
 		} else {
-			dataSource = mItem.url;
+			dataSource = mItem.getURL();
 		}
 		
 		mPlayer.setDataSource(dataSource);

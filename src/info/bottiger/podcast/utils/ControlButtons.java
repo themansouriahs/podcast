@@ -26,6 +26,7 @@ public class ControlButtons {
         public ImageButton downloadButton;
         public ImageButton queueButton;
         public TextView currentTime;
+        public TextView duration;
         public SeekBar seekbar;
     }
     
@@ -37,18 +38,19 @@ public class ControlButtons {
     	
     	fragment.queueNextRefresh(1);
     	
-    	final ImageButton b = (ImageButton)viewHolder.playPauseButton;
-		b.setOnClickListener(new View.OnClickListener() {
+    	final ImageButton playPauseButton = (ImageButton)viewHolder.playPauseButton;
+		playPauseButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
             	fragment.setProgress(viewHolder.seekbar);
             	fragment.setCurrentTime(viewHolder.currentTime);
+            	fragment.setDuration(viewHolder.duration);
                 if (fragment.mPlayerServiceBinder.isPlaying()) {
-                	b.setContentDescription("Play");
-                	b.setImageResource(R.drawable.play);
+                	playPauseButton.setContentDescription("Play");
+                	playPauseButton.setImageResource(R.drawable.play);
                 	fragment.mPlayerServiceBinder.pause();
                 } else {
-                	b.setImageResource(R.drawable.pause);
-                	b.setContentDescription("Pause");
+                	playPauseButton.setImageResource(R.drawable.pause);
+                	playPauseButton.setContentDescription("Pause");
                 	fragment.mPlayerServiceBinder.play(id);
                 }
             }
@@ -56,6 +58,8 @@ public class ControlButtons {
 		
 		viewHolder.stopButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+            	playPauseButton.setContentDescription("Play");
+            	playPauseButton.setImageResource(R.drawable.play);
             	fragment.mPlayerServiceBinder.stop();
             }
         });
@@ -69,7 +73,7 @@ public class ControlButtons {
             public void onClick(View v) {
             	FeedItem item = FeedItem.getById(fragment.getActivity().getContentResolver(), id);
             	//item.startDownload(fragment.getActivity().getContentResolver());
-            	podcastServiceConnection .downloadItem(fragment.getActivity().getContentResolver(), item);
+            	podcastServiceConnection.downloadItem(fragment.getActivity().getContentResolver(), item);
             	viewHolder.downloadButton.setImageResource(R.drawable.trash);
             	viewHolder.downloadButton.setContentDescription("Trash");
             }
