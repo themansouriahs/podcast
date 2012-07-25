@@ -7,6 +7,7 @@ import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.service.PlayerService;
 import info.bottiger.podcast.service.PodcastService;
 import info.bottiger.podcast.utils.ControlButtons.Holder;
+import android.content.ServiceConnection;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.view.View;
@@ -32,7 +33,7 @@ public class ControlButtons {
     	
     }
 
-    public static void setListener(final RecentItemFragment fragment, final Holder viewHolder, final long id) {
+    public static void setListener(final RecentItemFragment fragment, final PodcastService podcastServiceConnection, final Holder viewHolder, final long id) {
     	
     	fragment.queueNextRefresh(1);
     	
@@ -68,7 +69,7 @@ public class ControlButtons {
             public void onClick(View v) {
             	FeedItem item = FeedItem.getById(fragment.getActivity().getContentResolver(), id);
             	//item.startDownload(fragment.getActivity().getContentResolver());
-            	PodcastService.downloadItem(fragment.getActivity().getContentResolver(), item);
+            	podcastServiceConnection .downloadItem(fragment.getActivity().getContentResolver(), item);
             	viewHolder.downloadButton.setImageResource(R.drawable.trash);
             	viewHolder.downloadButton.setContentDescription("Trash");
             }

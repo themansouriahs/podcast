@@ -17,6 +17,7 @@ import info.bottiger.podcast.R;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeSet;
@@ -182,7 +183,8 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 			
 			if (pathIndex > 0) {
 				String itemPathname = item.getString(pathIndex);
-				if (!(itemPathname.equals("") || itemPathname.equals("0"))) {
+				File file = new File(itemPathname);
+				if (file.exists()) {
 					ImageButton downloadButton = (ImageButton) stub.findViewById(R.id.download);
 					downloadButton.setImageResource(R.drawable.trash);
 				}

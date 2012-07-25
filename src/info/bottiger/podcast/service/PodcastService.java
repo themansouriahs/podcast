@@ -42,7 +42,7 @@ public class PodcastService extends Service {
 	private static final long ONE_DAY = 24L * ONE_HOUR;
 
 	//private static final long timer_freq = 3 * ONE_MINUTE;
-	private static final long timer_freq = 1000L;
+	private static final long timer_freq = ONE_HOUR;
 	
 
 	private long pref_update = 2 * 60 * ONE_MINUTE;
@@ -83,15 +83,16 @@ public class PodcastService extends Service {
 				start_update();
 				removeExpires();
 				do_download(false);
-
-				triggerNextTimer(timer_freq);
+				
+				long nextUpdate = (PodcastService.mDownloadQueue.isEmpty()) ? timer_freq : 1;
+				triggerNextTimer(nextUpdate);
 
 				break;
 			}
 		}
 	};
 
-	void triggerNextTimer(long delay) {
+	private void triggerNextTimer(long delay) {
 		Message msg = Message.obtain();
 		msg.what = MSG_TIMER;
 		handler.sendMessageDelayed(msg, delay);
@@ -427,9 +428,10 @@ public class PodcastService extends Service {
 				"pref_max_new_items", "10"));
 	}
 	
-	public static void downloadItem(ContentResolver context, FeedItem item) {
+	public void downloadItem(ContentResolver context, FeedItem item) {
 		item.prepareDownload(context);
 		mDownloadQueue.add(item);
+		triggerNextTimer(1); // DOes this work?
 	}
 
 }

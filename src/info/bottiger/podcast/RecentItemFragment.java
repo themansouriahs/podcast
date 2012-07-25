@@ -237,7 +237,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 					viewHolder.currentTime = (TextView) view.findViewById(R.id.current_position);
 					viewHolder.seekbar = (SeekBar) view.findViewById(R.id.progress);
 					
-					ControlButtons.setListener(this, viewHolder, id);
+					ControlButtons.setListener(this, SwipeActivity.mServiceBinder, viewHolder, id);
 				} else { 
 					View player = view.findViewById(R.id.stub_player);
 					if (player.getVisibility() == View.VISIBLE) {
