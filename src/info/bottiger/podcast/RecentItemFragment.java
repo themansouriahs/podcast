@@ -49,7 +49,8 @@ public class RecentItemFragment extends PodcastBaseFragment {
 			ItemColumns.DURATION, //
 			ItemColumns.STATUS, // 
 			ItemColumns.SUBS_ID, //
-			ItemColumns.FILESIZE, //
+			ItemColumns.FILESIZE,
+			ItemColumns.PATHNAME, //
 			ItemColumns.OFFSET, //
 			ItemColumns.KEEP //
 

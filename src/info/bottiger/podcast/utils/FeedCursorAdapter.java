@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -164,6 +165,8 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 		bindView(v, mContext, item);
 
 		Long itemID = item.getLong(item.getColumnIndex(ItemColumns._ID));
+		
+		int pathIndex = item.getColumnIndex(ItemColumns.PATHNAME);
 		//int itemOffset = item.getInt(item.getColumnIndex(ItemColumns.OFFSET));
 		
 		if (mExpandedItemID.contains(itemID)) {
@@ -176,6 +179,15 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 				//SeekBar sb = (SeekBar) playerView.findViewById(R.id.progress);
 				//sb.setProgress((int) 20);
 			}
+			
+			if (pathIndex > 0) {
+				String itemPathname = item.getString(pathIndex);
+				if (!(itemPathname.equals("") || itemPathname.equals("0"))) {
+					ImageButton downloadButton = (ImageButton) stub.findViewById(R.id.download);
+					downloadButton.setImageResource(R.drawable.trash);
+				}
+			}
+			
 		} else {
 			View playerView = v.findViewById(R.id.stub_player);
 			if (playerView != null) {
