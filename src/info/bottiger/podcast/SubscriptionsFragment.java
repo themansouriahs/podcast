@@ -183,15 +183,8 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 	 */
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
-		//Intent intent = new Intent(getActivity(),FeedFragment.class);
-		//intent.putExtra("subID", id);
-		//startActivity(intent);
-		android.support.v4.app.FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-		FeedFragment bdf = new FeedFragment();
-		ft.replace(R.id.pager, bdf);
-		ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-		ft.addToBackStack(null);
-		ft.commit();
+		Subscription s = Subscription.getById(getActivity().getContentResolver(), id);
+        this.mListener.onItemSelected(s.id);
 	}
 	
 	public DialogMenu createDialogMenus(long id) {

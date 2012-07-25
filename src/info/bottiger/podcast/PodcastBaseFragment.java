@@ -47,7 +47,7 @@ public class PodcastBaseFragment extends ListFragment {
 
 	protected Intent mNextIntent = null;
 
-	OnEpisodeSelectedListener mListener;
+	OnItemSelectedListener mListener;
 
 	protected final Log log = Log.getLog(getClass());
 
@@ -137,7 +137,7 @@ public class PodcastBaseFragment extends ListFragment {
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		try {
-			mListener = (OnEpisodeSelectedListener) activity;
+			mListener = (OnItemSelectedListener) activity;
 		} catch (ClassCastException e) {
 			throw new ClassCastException(activity.toString()
 					+ " must implement OnArticleSelectedListener");
@@ -145,8 +145,8 @@ public class PodcastBaseFragment extends ListFragment {
 	}
 
 	// Container Activity must implement this interface
-	public interface OnEpisodeSelectedListener {
-		public void onEpisodeSelected(Uri episodeUri);
+	public interface OnItemSelectedListener {
+		public void onItemSelected(long id);
 	}
 
 	/*
