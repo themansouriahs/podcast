@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import info.bottiger.podcast.R;
@@ -163,6 +164,8 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 		bindView(v, mContext, item);
 
 		Long itemID = item.getLong(item.getColumnIndex(ItemColumns._ID));
+		//int itemOffset = item.getInt(item.getColumnIndex(ItemColumns.OFFSET));
+		
 		if (mExpandedItemID.contains(itemID)) {
 			ViewStub stub = (ViewStub) v.findViewById(R.id.stub);
 			if (stub != null)
@@ -170,6 +173,8 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 			else {
 				View playerView = v.findViewById(R.id.stub_player);
 				playerView.setVisibility(View.VISIBLE);
+				//SeekBar sb = (SeekBar) playerView.findViewById(R.id.progress);
+				//sb.setProgress((int) 20);
 			}
 		} else {
 			View playerView = v.findViewById(R.id.stub_player);
@@ -196,10 +201,11 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 
 		viewHolder.textViewTitle = (TextView) v.findViewById(R.id.title);
 		viewHolder.textViewSubTitle = (TextView) v.findViewById(R.id.podcast);
-		viewHolder.textViewDuration = (TextView) v.findViewById(R.id.duration);
 		viewHolder.textViewFileSize = (TextView) v.findViewById(R.id.filesize);
 		viewHolder.imageView = (ImageView) v.findViewById(R.id.list_image);
 		viewHolder.textViewCurrentTime = (TextView) v.findViewById(R.id.current_position);
+		viewHolder.textViewDuration = (TextView) v.findViewById(R.id.duration);
+		viewHolder.textViewSlash = (TextView) v.findViewById(R.id.time_slash);
 
 		v.setTag(viewHolder);
 		return v;
@@ -216,7 +222,10 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 		int subtitleIndex = cursor.getColumnIndex(ItemColumns.SUB_TITLE);
 		int imageIndex = cursor.getColumnIndex(ItemColumns.IMAGE_URL);
 		
-		int currentTimeIndex = cursor.getColumnIndex(ItemColumns.DURATION);
+		int durationIndex = cursor.getColumnIndex(ItemColumns.DURATION);
+		int offsetIndex = cursor.getColumnIndex(ItemColumns.OFFSET);
+		
+		int statusIndex = cursor.getColumnIndex(ItemColumns.STATUS);
 		
 		try {
 			int filesizeIndex = cursor.getColumnIndexOrThrow(ItemColumns.FILESIZE);
@@ -229,11 +238,23 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 		
 		holder.textViewTitle.setText(title);
 		
-		if (currentTimeIndex > 0) {
-			String duration = cursor.getString(currentTimeIndex);
+		if (durationIndex > 0) {
+			String duration = cursor.getString(durationIndex);
+			int offset = cursor.getInt(offsetIndex);
+			int status = cursor.getInt(statusIndex);
+			
 			holder.textViewDuration.setText(duration);
-			if (holder.textViewCurrentTime.getText().equals(""))
-				holder.textViewCurrentTime.setText(StrUtils.formatTime( 0 ) + " / " + duration);
+			
+			if (offset > 0 || status == ItemColumns.ITEM_STATUS_PLAYING_NOW ) {
+				
+				if (status != ItemColumns.ITEM_STATUS_PLAYING_NOW)
+					holder.textViewCurrentTime.setText(StrUtils.formatTime( offset ));
+				
+				holder.textViewSlash.setText("/");
+				holder.textViewSlash.setVisibility(View.VISIBLE);
+			} else {
+				holder.textViewSlash.setVisibility(View.GONE);
+			}
 		}
 
 		if (subtitleIndex > 0)
@@ -272,6 +293,7 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 		public TextView textViewDuration;
 		public TextView textViewFileSize;
 		public TextView textViewCurrentTime;
+		public TextView textViewSlash;
 	}
 
 	private void setViewImage3(ImageView v, String imageURL) {

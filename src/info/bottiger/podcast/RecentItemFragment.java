@@ -3,46 +3,31 @@ package info.bottiger.podcast;
 import info.bottiger.podcast.R;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
-import info.bottiger.podcast.provider.SubscriptionColumns;
-import info.bottiger.podcast.service.PlayerService;
 import info.bottiger.podcast.utils.ControlButtons;
 import info.bottiger.podcast.utils.DialogMenu;
 import info.bottiger.podcast.utils.ExpandAnimation;
 import info.bottiger.podcast.utils.FeedCursorAdapter;
 import info.bottiger.podcast.utils.FeedCursorAdapter.TextFieldHandler;
-import info.bottiger.podcast.utils.FeedCursorAdapter.ViewHolder;
 
 import java.util.HashMap;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Service;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.CursorLoader;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class RecentItemFragment extends PodcastBaseFragment {
 
@@ -65,6 +50,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 			ItemColumns.STATUS, // 
 			ItemColumns.SUBS_ID, //
 			ItemColumns.FILESIZE, //
+			ItemColumns.OFFSET, //
 			ItemColumns.KEEP //
 
 	};

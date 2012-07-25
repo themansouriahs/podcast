@@ -36,7 +36,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignTop="@+id/thumbnail"
-            android:layout_toLeftOf="@+id/duration"
             android:layout_toRightOf="@+id/thumbnail"
             android:text="Podcast Title"
             android:textColor="#FFFFFF"
@@ -58,18 +57,6 @@
 
         <!-- Rightend Duration -->
 
-        <TextView
-            android:id="@+id/duration"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_alignTop="@id/title"
-            android:layout_marginRight="5dip"
-            android:gravity="right"
-            android:text="1:35:45"
-            android:textColor="#FFFFFF"
-            android:textSize="13dip"
-            android:textStyle="bold" />
 
         <!-- Rightend Arrow -->
 
@@ -84,18 +71,41 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignRight="@+id/podcast"
-            android:layout_below="@+id/duration"
             android:textColor="#FFFFFF"
             android:textSize="10dip"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/current_position"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/thumbnail"
             android:layout_toRightOf="@+id/thumbnail"
-            android:text=""
+            android:textColor="#FFFFFF"
+            android:textSize="15dip"
+            android:typeface="sans" />
+
+        <TextView
+            android:id="@+id/time_slash"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/current_position"
+            android:layout_alignBottom="@+id/current_position"
+            android:layout_toRightOf="@+id/current_position"
+            android:paddingLeft="5dip"
+            android:paddingRight="5dip"
+            android:textColor="#FFFFFF"
+            android:visibility="gone"
+            android:textSize="15dip"
+            android:typeface="sans" />
+
+        <TextView
+            android:id="@+id/duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/time_slash"
+            android:layout_alignBottom="@+id/time_slash"
+            android:layout_toRightOf="@+id/time_slash"
             android:textColor="#FFFFFF"
             android:textSize="15dip"
             android:typeface="sans" />

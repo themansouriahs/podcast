@@ -1,11 +1,15 @@
 package info.bottiger.podcast.parser;
 
 import info.bottiger.podcast.provider.FeedItem;
+import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.utils.Log;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -234,13 +238,35 @@ public class FeedParserHandler extends DefaultHandler {
 		if (item.content == null)
 			item.content = "(No content)";
 
+		SimpleDateFormat correctRSSFormatter = new SimpleDateFormat(
+				"EEE, dd MMM yyyy HH:mm:ss Z");
+		DateFormat wrongRSSFormatter = new SimpleDateFormat("dd MMM yyyy HH:mm:ss zzz", Locale.ENGLISH);
+		String ff = ItemColumns.DATE_FORMAT;
+		SimpleDateFormat correctSQLFormatter = new SimpleDateFormat(
+				ff);
+		
+		// In case the date is in a wrong format
+		Date date = null;
+		try {
+			date = correctRSSFormatter.parse(item.date);
+		} catch (ParseException e) {
+			try {
+				date = wrongRSSFormatter.parse(item.date);
+			} catch (ParseException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+		
 		if (item.getDate() == 0) {
-			SimpleDateFormat formatter = new SimpleDateFormat(
-					"EEE, dd MMM yyyy HH:mm:ss Z");
-			Date currentTime = new Date();
-			item.date = formatter.format(currentTime);
+			
+			date = new Date();
+			//item.date = correctFormatter.format(date);
 			// log.warn("item.date: " + item.date);
 		}
+		
+		if (date != null)
+			item.date = correctSQLFormatter.format(date);
 
 		return item;
 	}
@@ -327,5 +353,22 @@ public class FeedParserHandler extends DefaultHandler {
 		str = matcher.replaceAll("");		
 	
 		return str;
+	}
+	
+	private Date parseDate(String dateString) {
+		Character fourthLetter = dateString.charAt(4);
+		if (fourthLetter.equals(",")) {
+			dateString = dateString.substring(6);
+		}
+		// Now dateString should have the format 05 May 2012 12:30:00 TimeZone
+		DateFormat formatter = new SimpleDateFormat("dd MMM yyyy HH:mm:ss zzz", Locale.ENGLISH);
+		Date date = null;
+		try {
+			date = formatter.parse(dateString);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return date;
 	}
 }

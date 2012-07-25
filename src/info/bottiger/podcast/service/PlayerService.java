@@ -409,6 +409,7 @@ public class PlayerService extends Service {
 		}
 		
 		if((mItem != null)) {
+			mItem.status = ItemColumns.ITEM_STATUS_PLAY_PAUSE;
 			mItem.updateOffset(getContentResolver(), mPlayer.position());	
 		} else {
     		log.error("playing but no item!!!");

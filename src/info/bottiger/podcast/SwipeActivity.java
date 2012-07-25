@@ -57,7 +57,7 @@ public class SwipeActivity extends FragmentActivity implements OnEpisodeSelected
 	 * intensive, it may be best to switch to a
 	 * {@link android.support.v4.app.FragmentStatePagerAdapter}.
 	 */
-	SectionsPagerAdapter mSectionsPagerAdapter; // FIXME not static
+	protected SectionsPagerAdapter mSectionsPagerAdapter; // FIXME not static
 
 	/**
 	 * The {@link ViewPager} that will host the section contents.

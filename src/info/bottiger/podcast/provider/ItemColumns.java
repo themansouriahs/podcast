@@ -77,6 +77,8 @@ public class ItemColumns implements BaseColumns {
 	public static final String CREATED = "created";
 	public static final String TYPE = "audio_type";
 	public static final String KEEP = "keep";
+	
+	public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
 	public static final String[] ALL_COLUMNS = { _ID, SUBS_ID, TITLE, AUTHOR,
 			DATE, LAST_UPDATE, CONTENT, STATUS, URL, RESOURCE, FILESIZE, DURATION,
@@ -155,7 +157,7 @@ public class ItemColumns implements BaseColumns {
 
 		if (values.containsKey(DATE) == false) {
 			SimpleDateFormat formatter = new SimpleDateFormat(
-					"EEE, dd MMM yyyy HH:mm:ss Z");
+					DATE_FORMAT);
 			Date currentTime = new Date();
 			values.put(DATE, formatter.format(currentTime));
 		}

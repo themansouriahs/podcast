@@ -11,12 +11,15 @@ import java.util.HashMap;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.ContentUris;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.ListFragment;
 import android.support.v4.content.CursorLoader;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -180,25 +183,15 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 	 */
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
-
-		Uri uri = ContentUris.withAppendedId(getActivity().getIntent().getData(), id);
-		String action = getActivity().getIntent().getAction();
-		if (Intent.ACTION_PICK.equals(action)
-				|| Intent.ACTION_GET_CONTENT.equals(action)) {
-			//setResult(RESULT_OK, new Intent().setData(uri)); TODO
-		} else {
-
-
-			DialogMenu dialog_menu = createDialogMenus(id);
-			if( dialog_menu==null)
-				return;
-			
-			/*
-			 new AlertDialog.Builder(this)
-             .setTitle(dialog_menu.getHeader())
-             .setItems(dialog_menu.getItems(), new MainClickListener(dialog_menu,id)).show();		
-			*/
-		}
+		//Intent intent = new Intent(getActivity(),FeedFragment.class);
+		//intent.putExtra("subID", id);
+		//startActivity(intent);
+		android.support.v4.app.FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+		FeedFragment bdf = new FeedFragment();
+		ft.replace(R.id.pager, bdf);
+		ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+		ft.addToBackStack(null);
+		ft.commit();
 	}
 	
 	public DialogMenu createDialogMenus(long id) {
