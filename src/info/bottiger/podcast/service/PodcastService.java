@@ -14,8 +14,6 @@ import info.bottiger.podcast.utils.LockHandler;
 import info.bottiger.podcast.utils.Log;
 import info.bottiger.podcast.utils.SDCardMgr;
 
-
-
 import android.app.Service;
 import android.content.ContentResolver;
 import android.content.Intent;
@@ -41,13 +39,12 @@ public class PodcastService extends Service {
 	private static final long ONE_HOUR = 60L * ONE_MINUTE;
 	private static final long ONE_DAY = 24L * ONE_HOUR;
 
-	//private static final long timer_freq = 3 * ONE_MINUTE;
+	// private static final long timer_freq = 3 * ONE_MINUTE;
 	private static final long timer_freq = ONE_HOUR;
-	
 
 	private long pref_update = 2 * 60 * ONE_MINUTE;
 
-	public int pref_connection_sel = MOBILE_CONNECT|WIFI_CONNECT;
+	public int pref_connection_sel = MOBILE_CONNECT | WIFI_CONNECT;
 
 	public long pref_update_wifi = 0;
 	public long pref_update_mobile = 0;
@@ -55,23 +52,19 @@ public class PodcastService extends Service {
 	public long pref_download_file_expire = 0;
 	public long pref_played_file_expire = 0;
 	public int pref_max_valid_size = 0;
-	
+
 	private static PriorityQueue<FeedItem> mDownloadQueue = new PriorityQueue<FeedItem>();
-	
 
 	private FeedItem mDownloadingItem = null;
 	private static final LockHandler mDownloadLock = new LockHandler();
 
 	private static final LockHandler mUpdateLock = new LockHandler();
 	private static int mConnectStatus = NO_CONNECT;
-	
 
 	public static final String UPDATE_DOWNLOAD_STATUS = PodcastService.class
-			.getName()
-			+ ".UPDATE_DOWNLOAD_STATUS";
+			.getName() + ".UPDATE_DOWNLOAD_STATUS";
 
 	private final Log log = Log.getLog(getClass());
-
 
 	private final Handler handler = new Handler() {
 		@Override
@@ -83,8 +76,9 @@ public class PodcastService extends Service {
 				start_update();
 				removeExpires();
 				do_download(false);
-				
-				long nextUpdate = (PodcastService.mDownloadQueue.isEmpty()) ? timer_freq : 1;
+
+				long nextUpdate = (PodcastService.mDownloadQueue.isEmpty()) ? timer_freq
+						: 1;
 				triggerNextTimer(nextUpdate);
 
 				break;
@@ -97,7 +91,7 @@ public class PodcastService extends Service {
 		msg.what = MSG_TIMER;
 		handler.sendMessageDelayed(msg, delay);
 	}
-	
+
 	private int updateConnectStatus() {
 		log.debug("updateConnectStatus");
 		try {
@@ -131,54 +125,55 @@ public class PodcastService extends Service {
 
 	private Subscription findSubscription() {
 
-			Long now = Long.valueOf(System.currentTimeMillis());
-			log.debug("pref_update = " + pref_update);
+		Long now = Long.valueOf(System.currentTimeMillis());
+		log.debug("pref_update = " + pref_update);
 
-			String where = SubscriptionColumns.LAST_UPDATED + "<"
-					+ (now - pref_update);
-			String order = SubscriptionColumns.LAST_UPDATED + " ASC,"
-			+ SubscriptionColumns.FAIL_COUNT +" ASC";
-			Subscription sub = Subscription.getBySQL(getContentResolver(),where,order);
+		String where = SubscriptionColumns.LAST_UPDATED + "<"
+				+ (now - pref_update);
+		String order = SubscriptionColumns.LAST_UPDATED + " ASC,"
+				+ SubscriptionColumns.FAIL_COUNT + " ASC";
+		Subscription sub = Subscription.getBySQL(getContentResolver(), where,
+				order);
 
-			return sub;
+		return sub;
 
 	}
-	
+
 	private void populateDownloadQueue() {
-		FeedItem item = null;
+		/*FeedItem item = null;
 		do {
-		/*String where = ItemColumns.STATUS + ">"
-				+ ItemColumns.ITEM_STATUS_DOWNLOAD_PAUSE + " AND "
-				+ ItemColumns.STATUS + "<"
-				+ ItemColumns.ITEM_STATUS_MAX_DOWNLOADING_VIEW;
-		
-		String order =ItemColumns.STATUS + " DESC , " + ItemColumns.LAST_UPDATE
-		+ " ASC";
-		item = FeedItem.getBySQL(getContentResolver(),where,order);	
-		*/
-		if (item != null) {
-			mDownloadQueue.add(item);
-		}
-		} while (item != null);
+			String where = ItemColumns.STATUS + ">"
+					+ ItemColumns.ITEM_STATUS_DOWNLOAD_PAUSE + " AND "
+					+ ItemColumns.STATUS + "<"
+					+ ItemColumns.ITEM_STATUS_MAX_DOWNLOADING_VIEW;
+
+			String order = ItemColumns.STATUS + " DESC , "
+					+ ItemColumns.LAST_UPDATE + " ASC";
+			item = FeedItem.getBySQL(getContentResolver(), where, order);
+
+			if (item != null) {
+				mDownloadQueue.add(item);
+				item.status = ItemColumns.ITEM_STATUS_DOWNLOAD_PENDING;
+				item.update(getContentResolver());
+			}
+		} while (item != null);*/
 	}
 
 	private FeedItem getDownloadItem() {
 		return mDownloadQueue.poll();
 	}
 
-	
 	public FeedItem getDownloadingItem() {
 		return mDownloadingItem;
 	}
-	
+
 	public void start_update() {
 		if (updateConnectStatus() == NO_CONNECT)
 			return;
 
 		log.debug("start_update()");
-		if(mUpdateLock.locked()==false)
+		if (mUpdateLock.locked() == false)
 			return;
-
 
 		new Thread() {
 			public void run() {
@@ -186,11 +181,12 @@ public class PodcastService extends Service {
 					int add_num;
 					Subscription sub = findSubscription();
 					while (sub != null) {
-					if (updateConnectStatus() == NO_CONNECT)
+						if (updateConnectStatus() == NO_CONNECT)
 							break;
-						FeedHandler handler = new FeedHandler(getContentResolver(),pref_max_valid_size);
+						FeedHandler handler = new FeedHandler(
+								getContentResolver(), pref_max_valid_size);
 						add_num = handler.update(sub);
-						if((add_num>0)&&(sub.auto_download>0))
+						if ((add_num > 0) && (sub.auto_download > 0))
 							do_download(false);
 
 						sub = findSubscription();
@@ -208,28 +204,31 @@ public class PodcastService extends Service {
 
 	public void start_download() {
 
-		 do_download(true);
-		
+		do_download(true);
+
 	}
-	
-	private void do_download(boolean show){
-		if (SDCardMgr.getSDCardStatusAndCreate()==false){
-			
-			if(show)
-				Toast.makeText(this, getResources().getString(R.string.sdcard_unmout), Toast.LENGTH_LONG).show();
+
+	private void do_download(boolean show) {
+		if (SDCardMgr.getSDCardStatusAndCreate() == false) {
+
+			if (show)
+				Toast.makeText(this,
+						getResources().getString(R.string.sdcard_unmout),
+						Toast.LENGTH_LONG).show();
 			return;
 		}
 
-		
-		if (updateConnectStatus() == NO_CONNECT){
-			if(show)
-				Toast.makeText(this, getResources().getString(R.string.no_connect), Toast.LENGTH_LONG).show();
+		if (updateConnectStatus() == NO_CONNECT) {
+			if (show)
+				Toast.makeText(this,
+						getResources().getString(R.string.no_connect),
+						Toast.LENGTH_LONG).show();
 			return;
 		}
-		
-		if(mDownloadLock.locked()==false)
+
+		if (mDownloadLock.locked() == false)
 			return;
-		
+
 		populateDownloadQueue();
 
 		new Thread() {
@@ -244,7 +243,7 @@ public class PodcastService extends Service {
 						}
 
 						try {
-							//mDownloadingItem.startDownload(getContentResolver());
+							// mDownloadingItem.startDownload(getContentResolver());
 							FeedFetcher fetcher = new FeedFetcher();
 
 							fetcher.download(mDownloadingItem);
@@ -252,10 +251,10 @@ public class PodcastService extends Service {
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
-						
-						log.debug(mDownloadingItem.title + "  " + mDownloadingItem.length + "  "
-								+ mDownloadingItem.offset);
 
+						log.debug(mDownloadingItem.title + "  "
+								+ mDownloadingItem.length + "  "
+								+ mDownloadingItem.offset);
 
 						mDownloadingItem.endDownload(getContentResolver());
 
@@ -274,46 +273,47 @@ public class PodcastService extends Service {
 	}
 
 	private void deleteExpireFile(Cursor cursor) {
-		
-		if(cursor==null)
+
+		if (cursor == null)
 			return;
-		
+
 		if (cursor.moveToFirst()) {
-			do{
+			do {
 				FeedItem item = FeedItem.getByCursor(cursor);
-				if(item!=null){
+				if (item != null) {
 					item.delFile(getContentResolver());
 				}
-			}while (cursor.moveToNext());
+			} while (cursor.moveToNext());
 		}
 		cursor.close();
-		
+
 	}
 
 	private void removeExpires() {
 		long expiredTime = System.currentTimeMillis() - pref_item_expire;
 		try {
-			String where =
-				ItemColumns.CREATED + "<" + expiredTime + " and " +
-				ItemColumns.STATUS + "<" + ItemColumns.ITEM_STATUS_MAX_READING_VIEW + " and " +
-				ItemColumns.KEEP + "=0";
+			String where = ItemColumns.CREATED + "<" + expiredTime + " and "
+					+ ItemColumns.STATUS + "<"
+					+ ItemColumns.ITEM_STATUS_MAX_READING_VIEW + " and "
+					+ ItemColumns.KEEP + "=0";
 
 			getContentResolver().delete(ItemColumns.URI, where, null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		if (SDCardMgr.getSDCardStatus()==false){
+
+		if (SDCardMgr.getSDCardStatus() == false) {
 			return;
 		}
 
 		expiredTime = System.currentTimeMillis() - pref_download_file_expire;
 		try {
-			String where =
-				ItemColumns.LAST_UPDATE + "<" + expiredTime + " and " +
-				ItemColumns.STATUS + ">"  + ItemColumns.ITEM_STATUS_MAX_READING_VIEW + " and " +
-				ItemColumns.STATUS + "<=" + ItemColumns.ITEM_STATUS_PLAY_PAUSE + " and " +
-				ItemColumns.KEEP + "=0";
+			String where = ItemColumns.LAST_UPDATE + "<" + expiredTime
+					+ " and " + ItemColumns.STATUS + ">"
+					+ ItemColumns.ITEM_STATUS_MAX_READING_VIEW + " and "
+					+ ItemColumns.STATUS + "<="
+					+ ItemColumns.ITEM_STATUS_PLAY_PAUSE + " and "
+					+ ItemColumns.KEEP + "=0";
 
 			Cursor cursor = getContentResolver().query(ItemColumns.URI,
 					ItemColumns.ALL_COLUMNS, where, null, null);
@@ -322,14 +322,15 @@ public class PodcastService extends Service {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		expiredTime = System.currentTimeMillis() - pref_played_file_expire;
 		try {
-			String where =
-				ItemColumns.LAST_UPDATE + "<" + expiredTime + " and " +
-				ItemColumns.STATUS + ">" + ItemColumns.ITEM_STATUS_PLAY_PAUSE + " and " +
-				ItemColumns.STATUS + "<" + ItemColumns.ITEM_STATUS_MAX_PLAYLIST_VIEW + " and " +
-				ItemColumns.KEEP + "=0";
+			String where = ItemColumns.LAST_UPDATE + "<" + expiredTime
+					+ " and " + ItemColumns.STATUS + ">"
+					+ ItemColumns.ITEM_STATUS_PLAY_PAUSE + " and "
+					+ ItemColumns.STATUS + "<"
+					+ ItemColumns.ITEM_STATUS_MAX_PLAYLIST_VIEW + " and "
+					+ ItemColumns.KEEP + "=0";
 
 			Cursor cursor = getContentResolver().query(ItemColumns.URI,
 					ItemColumns.ALL_COLUMNS, where, null, null);
@@ -340,8 +341,9 @@ public class PodcastService extends Service {
 		}
 
 		try {
-			String where = ItemColumns.STATUS + "=" + ItemColumns.ITEM_STATUS_DELETE;
-					//DELETE status takes priority over KEEP flag
+			String where = ItemColumns.STATUS + "="
+					+ ItemColumns.ITEM_STATUS_DELETE;
+			// DELETE status takes priority over KEEP flag
 
 			Cursor cursor = getContentResolver().query(ItemColumns.URI,
 					ItemColumns.ALL_COLUMNS, where, null, null);
@@ -350,8 +352,9 @@ public class PodcastService extends Service {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		String where = ItemColumns.STATUS + "=" + ItemColumns.ITEM_STATUS_DELETED;		
+
+		String where = ItemColumns.STATUS + "="
+				+ ItemColumns.ITEM_STATUS_DELETED;
 		getContentResolver().delete(ItemColumns.URI, where, null);
 
 	}
@@ -423,11 +426,11 @@ public class PodcastService extends Service {
 		pref_played_file_expire = Integer.parseInt(pref.getString(
 				"pref_played_file_expire", "24"));
 		pref_played_file_expire *= ONE_HOUR;
-		
-		pref_max_valid_size= Integer.parseInt(pref.getString(
+
+		pref_max_valid_size = Integer.parseInt(pref.getString(
 				"pref_max_new_items", "10"));
 	}
-	
+
 	public void downloadItem(ContentResolver context, FeedItem item) {
 		item.prepareDownload(context);
 		mDownloadQueue.add(item);

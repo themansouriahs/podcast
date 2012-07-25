@@ -1,6 +1,7 @@
 package info.bottiger.podcast.parser;
 
 import info.bottiger.podcast.R;
+import info.bottiger.podcast.SwipeActivity;
 import info.bottiger.podcast.fetcher.FeedFetcher;
 import info.bottiger.podcast.fetcher.Response;
 import info.bottiger.podcast.provider.FeedItem;

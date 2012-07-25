@@ -612,6 +612,8 @@ public class FeedItem implements Comparable<FeedItem> {
 	
 	public void endDownload(ContentResolver context)
 	{
+		if (status == ItemColumns.ITEM_STATUS_DOWNLOAD_PENDING)
+			status = ItemColumns.ITEM_STATUS_NO_PLAY;
 		
 		if (status == ItemColumns.ITEM_STATUS_NO_PLAY) {
 			update = Long.valueOf(System.currentTimeMillis());
