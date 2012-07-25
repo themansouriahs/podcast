@@ -42,16 +42,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class SwipeActivity extends FragmentActivity implements OnItemSelectedListener {
+public class SwipeActivity extends FragmentActivity implements
+		OnItemSelectedListener {
 
-	
 	protected static PodcastService mServiceBinder = null;
-	
+
 	protected static Cursor mCursor = null;
 	protected boolean mInit = false;
 	protected final Log log = Log.getLog(getClass());
 	protected static ComponentName mService = null;
-	
+
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide
 	 * fragments for each of the sections. We use a
@@ -67,32 +67,32 @@ public class SwipeActivity extends FragmentActivity implements OnItemSelectedLis
 	 * The {@link ViewPager} that will host the section contents.
 	 */
 	ViewPager mViewPager;
-	
+
 	private long SubscriptionFeedID = 0;
-	
+
 	protected static ServiceConnection serviceConnection = new ServiceConnection() {
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			mServiceBinder = ((PodcastService.PodcastBinder) service)
 					.getService();
 			mServiceBinder.start_update();
-			//log.debug("onServiceConnected");
+			// log.debug("onServiceConnected");
 		}
 
 		public void onServiceDisconnected(ComponentName className) {
 			mServiceBinder = null;
-			//log.debug("onServiceDisconnected");
+			// log.debug("onServiceDisconnected");
 		}
 	};
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		startService(new Intent(this, PodcastService.class));
 		startService(new Intent(this, PlayerService.class));
-		
+
 		setContentView(R.layout.activity_swipe);
-		
+
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections
 		// of the app.
@@ -105,25 +105,27 @@ public class SwipeActivity extends FragmentActivity implements OnItemSelectedLis
 
 		Account[] a = AccountManager.get(getApplicationContext())
 				.getAccountsByType("com.google");
-		GoogleReader agr = new GoogleReader();
-		agr.refreshAuthToken(SwipeActivity.this, a[0]);
-		agr.getSubscriptionsFromReader();
+		if (a.length > 0) {
+			GoogleReader agr = new GoogleReader();
+			agr.refreshAuthToken(SwipeActivity.this, a[0]);
+			agr.getSubscriptionsFromReader();
+		}
 
 	}
-	
+
 	@Override
 	public void onItemSelected(long id) {
 		SubscriptionFeedID = id;
-		//Object o = mSectionsPagerAdapter.instantiateItem(mViewPager, 1);
-		//mSectionsPagerAdapter.destroyItem(mViewPager, 1, o);
-		//mSectionsPagerAdapter.finishUpdate(mViewPager);
-		//Object o2 = mSectionsPagerAdapter.instantiateItem(mViewPager, 1);
+		// Object o = mSectionsPagerAdapter.instantiateItem(mViewPager, 1);
+		// mSectionsPagerAdapter.destroyItem(mViewPager, 1, o);
+		// mSectionsPagerAdapter.finishUpdate(mViewPager);
+		// Object o2 = mSectionsPagerAdapter.instantiateItem(mViewPager, 1);
 		mSectionsPagerAdapter.notifyDataSetChanged();
-		//mSectionsPagerAdapter.finishUpdate(mViewPager);
-		//mViewPager.invalidate();
-		//mViewPager.setAdapter(mSectionsPagerAdapter);
+		// mSectionsPagerAdapter.finishUpdate(mViewPager);
+		// mViewPager.invalidate();
+		// mViewPager.setAdapter(mSectionsPagerAdapter);
 	}
-	
+
 	@Override
 	public void onResume() {
 		super.onResume();
@@ -135,19 +137,19 @@ public class SwipeActivity extends FragmentActivity implements OnItemSelectedLis
 
 			unbindService(serviceConnection);
 
-			//startInit(); FIXME
+			// startInit(); FIXME
 
 		}
 
 	}
-	
+
 	@Override
 	public void onLowMemory() {
 		super.onLowMemory();
 		mInit = true;
 
 		log.debug("onLowMemory()");
-		//finish();
+		// finish();
 	}
 
 	@Override
@@ -179,10 +181,11 @@ public class SwipeActivity extends FragmentActivity implements OnItemSelectedLis
 		public SectionsPagerAdapter(FragmentManager fm) {
 			super(fm);
 		}
-		
-		// Hack: http://stackoverflow.com/questions/7263291/viewpager-pageradapter-not-updating-the-view/7287121#7287121
+
+		// Hack:
+		// http://stackoverflow.com/questions/7263291/viewpager-pageradapter-not-updating-the-view/7287121#7287121
 		public int getItemPosition(Object object) {
-		    return PagerAdapter.POSITION_NONE;
+			return PagerAdapter.POSITION_NONE;
 		}
 
 		@Override
@@ -194,7 +197,7 @@ public class SwipeActivity extends FragmentActivity implements OnItemSelectedLis
 				fragment = new RecentItemFragment();
 			} else {
 				fragment = new DummySectionFragment();
-				//fragment = new PlayerFragment();
+				// fragment = new PlayerFragment();
 			}
 			Bundle args = new Bundle();
 			args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, i + 1);
@@ -241,20 +244,22 @@ public class SwipeActivity extends FragmentActivity implements OnItemSelectedLis
 			return textView;
 		}
 	}
-	
+
 	/*
 	 * Override BACK button
-	 * @see android.support.v4.app.FragmentActivity#onKeyDown(int, android.view.KeyEvent)
+	 * 
+	 * @see android.support.v4.app.FragmentActivity#onKeyDown(int,
+	 * android.view.KeyEvent)
 	 */
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-	    if (keyCode == KeyEvent.KEYCODE_BACK) {
-	    	onItemSelected(0);
-	        return true;
-	    }
-	    return super.onKeyDown(keyCode, event);
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			onItemSelected(0);
+			return true;
+		}
+		return super.onKeyDown(keyCode, event);
 	}
-	
+
 	private Fragment getSubscriptionFragmentContent() {
 		if (SubscriptionFeedID == 0) {
 			return new SubscriptionsFragment();
@@ -264,9 +269,9 @@ public class SwipeActivity extends FragmentActivity implements OnItemSelectedLis
 			bundle.putInt("ii", 55);
 			bundle.putString("hej", "med dig");
 			FeedFragment.newInstance(SubscriptionFeedID);
-			FeedFragment feed =  new FeedFragment();
-			//feed.setArguments(bundle);
-			//feed.newInstance(SubscriptionFeedID);
+			FeedFragment feed = new FeedFragment();
+			// feed.setArguments(bundle);
+			// feed.newInstance(SubscriptionFeedID);
 			return feed;
 		}
 	}
