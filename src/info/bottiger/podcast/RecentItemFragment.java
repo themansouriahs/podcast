@@ -97,6 +97,30 @@ public class RecentItemFragment extends PodcastBaseFragment {
 	}
 	
 	// Read here: http://developer.android.com/reference/android/app/Fragment.html#Layout
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        // Populate list with our static array of titles.
+        startInit();
+        
+        // Check to see if we have a frame in which to embed the details
+        // fragment directly in the containing UI.
+        //View detailsFrame = getActivity().findViewById(R.id.details);
+        //mDualPane = detailsFrame != null && detailsFrame.getVisibility() == View.VISIBLE;
+
+        if (savedInstanceState != null) {
+            // Restore last state for checked position.
+            mCurCheckPosition = savedInstanceState.getInt("curChoice", 0);
+        }
+
+        if (mDualPane) {
+            // In dual-pane mode, the list view highlights the selected item.
+            getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+            // Make sure our UI is in the correct state.
+            //showDetails(mCurCheckPosition);
+        }
+    }
 	
 	public static void initFullIconMap(HashMap<Integer, Integer> iconMap) {
 		iconMap.put(ItemColumns.ITEM_STATUS_UNREAD, R.drawable.feed_new);
