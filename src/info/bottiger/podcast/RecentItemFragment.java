@@ -78,6 +78,9 @@ public class RecentItemFragment extends PodcastBaseFragment {
 	private View V;
 	private FeedCursorAdapter mAdapter;
 	private Cursor mCursor;
+	
+    boolean mDualPane;
+	private long mCurCheckPosition = -1;
 
 	static {
 
@@ -92,7 +95,9 @@ public class RecentItemFragment extends PodcastBaseFragment {
 																				// KEEP
 
 	}
-
+	
+	// Read here: http://developer.android.com/reference/android/app/Fragment.html#Layout
+	
 	public static void initFullIconMap(HashMap<Integer, Integer> iconMap) {
 		iconMap.put(ItemColumns.ITEM_STATUS_UNREAD, R.drawable.feed_new);
 		iconMap.put(ItemColumns.ITEM_STATUS_READ, R.drawable.feed_viewed);
@@ -209,7 +214,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 			mPlayerServiceBinder.start(); 
 		}
 		*/
-		
+		mCurCheckPosition = id;
 		ListView list = getListView();
 		int start = list.getFirstVisiblePosition();
 		for (int i = start, j = list.getLastVisiblePosition(); i <= j; i++) {
