@@ -4,6 +4,7 @@ import info.bottiger.podcast.R;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.utils.ControlButtons;
+import info.bottiger.podcast.utils.ControlButtons.Holder;
 import info.bottiger.podcast.utils.DialogMenu;
 import info.bottiger.podcast.utils.ExpandAnimation;
 import info.bottiger.podcast.utils.FeedCursorAdapter;
@@ -80,7 +81,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 	private Cursor mCursor;
 	
     boolean mDualPane;
-	private long mCurCheckPosition = -1;
+	private long mCurCheckID = -1;
 
 	static {
 
@@ -100,6 +101,11 @@ public class RecentItemFragment extends PodcastBaseFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        
+        if (savedInstanceState != null) {
+            // Restore last state for checked position.
+            mCurCheckID = savedInstanceState.getLong("curChoice", 0);
+        }
 
         // Populate list with our static array of titles.
         startInit();
@@ -109,17 +115,18 @@ public class RecentItemFragment extends PodcastBaseFragment {
         //View detailsFrame = getActivity().findViewById(R.id.details);
         //mDualPane = detailsFrame != null && detailsFrame.getVisibility() == View.VISIBLE;
 
-        if (savedInstanceState != null) {
-            // Restore last state for checked position.
-            mCurCheckPosition = savedInstanceState.getInt("curChoice", 0);
-        }
-
         if (mDualPane) {
             // In dual-pane mode, the list view highlights the selected item.
             getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
             // Make sure our UI is in the correct state.
             //showDetails(mCurCheckPosition);
         }
+    }
+    
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLong("curChoice", mCurCheckID);
     }
 	
 	public static void initFullIconMap(HashMap<Integer, Integer> iconMap) {
@@ -191,6 +198,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 
 	public void onResume() {
 		super.onResume();
+		ControlButtons.fragment = this;
 		if (mPlayerServiceBinder != null && mPlayerServiceBinder.isPlaying()) {
 			long current_id = mPlayerServiceBinder.getCurrentItem().id;
 			showPlayingEpisode(current_id);
@@ -225,7 +233,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 		// TabsHelper.setEpisodeTabClickListeners(this,
 		// R.id.episode_bar_all_button);
 
-		startInit();
+		//startInit();
 		return V;
 	}
 
@@ -238,46 +246,14 @@ public class RecentItemFragment extends PodcastBaseFragment {
 			mPlayerServiceBinder.start(); 
 		}
 		*/
-		mCurCheckPosition = id;
+		mCurCheckID = id;
 		ListView list = getListView();
 		int start = list.getFirstVisiblePosition();
 		for (int i = start, j = list.getLastVisiblePosition(); i <= j; i++) {
 			Cursor item = (Cursor) list.getItemAtPosition(i);
 
 			if (id == item.getLong(item.getColumnIndex(ItemColumns._ID))) {
-				mAdapter.toggleItem(item);
-				View view = list.getChildAt(i - start);
-				mAdapter.notifyDataSetChanged();
-				
-				ControlButtons.Holder viewHolder = new ControlButtons.Holder();
-				viewHolder.currentTime = (TextView) view.findViewById(R.id.current_position);
-				
-				ViewStub stub = (ViewStub) view.findViewById(R.id.stub);
-				if (stub != null) {
-					stub.inflate();
-					ExpandAnimation expandAni = new ExpandAnimation(stub, 5000);
-					stub.startAnimation(expandAni);
-					
-					viewHolder.playPauseButton = (ImageButton) view.findViewById(R.id.play_toggle);
-					viewHolder.stopButton = (ImageButton) view.findViewById(R.id.stop);
-					viewHolder.infoButton = (ImageButton) view.findViewById(R.id.info);
-					viewHolder.downloadButton = (ImageButton) view.findViewById(R.id.download);
-					viewHolder.queueButton = (ImageButton) view.findViewById(R.id.queue);
-					viewHolder.currentTime = (TextView) view.findViewById(R.id.current_position);
-					viewHolder.duration = (TextView) view.findViewById(R.id.duration);
-					viewHolder.seekbar = (SeekBar) view.findViewById(R.id.progress);
-					
-					ControlButtons.setListener(this, SwipeActivity.mServiceBinder, viewHolder, id);
-				} else { 
-					View player = view.findViewById(R.id.stub_player);
-					if (player.getVisibility() == View.VISIBLE) {
-						player.setVisibility(View.GONE);
-					} else {
-						player.setVisibility(View.VISIBLE);
-					}
-				}
-				
-				updateCurrentPosition(FeedItem.getById(getActivity().getContentResolver(), id));
+				this.togglePlayer(list, item);
 			}
 
 		}
@@ -388,6 +364,13 @@ public class RecentItemFragment extends PodcastBaseFragment {
 
 		mAdapter = RecentItemFragment.listItemCursorAdapter(this.getActivity(),
 				mCursor);
+		
+		if (this.mCurCheckID > 0) {
+			mAdapter.showItem(mCurCheckID);
+			//View view = getViewByID(mCurCheckID);
+			//this.setPlayerListeners(view, mCurCheckID);
+		}
+		
 		setListAdapter(mAdapter);
 	}
 
@@ -429,5 +412,61 @@ public class RecentItemFragment extends PodcastBaseFragment {
 		pref_order = pref.getLong("pref_order", 2);
 		pref_where = pref.getLong("pref_where", 0);
 		pref_select = pref.getLong("pref_select", 0);
+	}
+	
+	private void togglePlayer(ListView list, Cursor item) {
+		int start = list.getFirstVisiblePosition();
+		boolean setListners = false;
+		
+		mAdapter.toggleItem(item);
+		long id = item.getLong(item.getColumnIndex(ItemColumns._ID));
+		int position = item.getPosition();
+		View view = list.getChildAt(position - start);
+		mAdapter.notifyDataSetChanged();
+		
+		ControlButtons.Holder viewHolder = new ControlButtons.Holder();
+		viewHolder.currentTime = (TextView) view.findViewById(R.id.current_position);
+		
+		ViewStub stub = (ViewStub) view.findViewById(R.id.stub);
+		if (stub != null) {
+			stub.inflate();
+			ExpandAnimation expandAni = new ExpandAnimation(stub, 5000);
+			stub.startAnimation(expandAni);
+			
+			setListners = true;
+		} else { 
+			View player = view.findViewById(R.id.stub_player);
+			if (player.getVisibility() == View.VISIBLE) {
+				player.setVisibility(View.GONE);
+				mCurCheckID = -1;
+			} else {
+				player.setVisibility(View.VISIBLE);
+				setListners = true;
+			}
+		}
+		
+		//if (setListners) {
+		//	setPlayerListeners(view, id);
+		//}
+		ControlButtons.setPlayerListeners(view, id);
+		
+		updateCurrentPosition(FeedItem.getById(getActivity().getContentResolver(), id));
+	}
+	
+	private View getViewByID(long id) {
+	
+		ListView list = getListView();
+		int start = list.getFirstVisiblePosition();
+		
+		for (int i = start, j = list.getLastVisiblePosition(); i <= j; i++) {
+			Cursor item = (Cursor) list.getItemAtPosition(i);
+
+			if (id == item.getLong(item.getColumnIndex(ItemColumns._ID))) {
+				View view = list.getChildAt(i);
+				return view;
+			}
+
+		}
+		return null;
 	}
 }

@@ -45,7 +45,7 @@ import android.widget.TextView;
 public class SwipeActivity extends FragmentActivity implements
 		OnItemSelectedListener {
 
-	protected static PodcastService mServiceBinder = null;
+	public static PodcastService mServiceBinder = null;
 
 	protected static Cursor mCursor = null;
 	protected boolean mInit = false;

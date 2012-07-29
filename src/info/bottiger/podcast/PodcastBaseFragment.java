@@ -36,7 +36,7 @@ public class PodcastBaseFragment extends ListFragment {
 	public static final int COLUMN_INDEX_TITLE = 1;
 
 	// protected static PodcastService mServiceBinder = null;
-	public PlayerService mPlayerServiceBinder = null;
+	public static PlayerService mPlayerServiceBinder = null;
 	protected static ComponentName mService = null;
 	// protected final Log log = Log.getLog(getClass());
 

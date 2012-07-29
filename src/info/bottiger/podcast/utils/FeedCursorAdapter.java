@@ -13,7 +13,9 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import info.bottiger.podcast.PodcastBaseFragment;
 import info.bottiger.podcast.R;
+import info.bottiger.podcast.RecentItemFragment;
 import info.bottiger.podcast.SwipeActivity;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
@@ -167,30 +169,40 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 		bindView(v, mContext, item);
 
 		Long itemID = item.getLong(item.getColumnIndex(ItemColumns._ID));
-		
+
 		int pathIndex = item.getColumnIndex(ItemColumns.PATHNAME);
-		//int itemOffset = item.getInt(item.getColumnIndex(ItemColumns.OFFSET));
-		
+		// int itemOffset =
+		// item.getInt(item.getColumnIndex(ItemColumns.OFFSET));
+
 		if (mExpandedItemID.contains(itemID)) {
 			ViewStub stub = (ViewStub) v.findViewById(R.id.stub);
 			if (stub != null)
 				stub.inflate();
-			else {
-				View playerView = v.findViewById(R.id.stub_player);
-				playerView.setVisibility(View.VISIBLE);
-				//SeekBar sb = (SeekBar) playerView.findViewById(R.id.progress);
-				//sb.setProgress((int) 20);
+			// else {
+			View playerView = v.findViewById(R.id.stub_player);
+			playerView.setVisibility(View.VISIBLE);
+			// SeekBar sb = (SeekBar) playerView.findViewById(R.id.progress);
+			// sb.setProgress((int) 20);
+			// }
+
+			ControlButtons.setPlayerListeners(playerView, itemID);
+
+
+			if (itemID == PodcastBaseFragment.mPlayerServiceBinder.getCurrentItem().id) {
+				ImageButton playPauseButton = (ImageButton) stub
+						.findViewById(R.id.play_toggle);
+				playPauseButton.setImageResource(R.drawable.pause);
 			}
 			
 			if (pathIndex > 0) {
 				String itemPathname = item.getString(pathIndex);
 				File file = new File(itemPathname);
 				if (file.exists()) {
-					ImageButton downloadButton = (ImageButton) stub.findViewById(R.id.download);
+					ImageButton downloadButton = (ImageButton) stub
+							.findViewById(R.id.download);
 					downloadButton.setImageResource(R.drawable.trash);
 				}
 			}
-			
 		} else {
 			View playerView = v.findViewById(R.id.stub_player);
 			if (playerView != null) {
@@ -218,7 +230,8 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 		viewHolder.textViewSubTitle = (TextView) v.findViewById(R.id.podcast);
 		viewHolder.textViewFileSize = (TextView) v.findViewById(R.id.filesize);
 		viewHolder.imageView = (ImageView) v.findViewById(R.id.list_image);
-		viewHolder.textViewCurrentTime = (TextView) v.findViewById(R.id.current_position);
+		viewHolder.textViewCurrentTime = (TextView) v
+				.findViewById(R.id.current_position);
 		viewHolder.textViewDuration = (TextView) v.findViewById(R.id.duration);
 		viewHolder.textViewSlash = (TextView) v.findViewById(R.id.time_slash);
 
@@ -230,46 +243,55 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 	public void bindView(View view, Context context, Cursor cursor) {
 		ViewHolder holder = (ViewHolder) view.getTag();
 
-
 		int titleIndex = cursor.getColumnIndex(ItemColumns.TITLE);
 		String title = cursor.getString(titleIndex);
+
+		int idIndex = cursor.getColumnIndex(ItemColumns._ID);
+		long id = cursor.getLong(idIndex);
 		
 		int subtitleIndex = cursor.getColumnIndex(ItemColumns.SUB_TITLE);
 		int imageIndex = cursor.getColumnIndex(ItemColumns.IMAGE_URL);
-		
+
 		int durationIndex = cursor.getColumnIndex(ItemColumns.DURATION);
 		int offsetIndex = cursor.getColumnIndex(ItemColumns.OFFSET);
-		
+
 		int statusIndex = cursor.getColumnIndex(ItemColumns.STATUS);
-		
+
 		try {
-			int filesizeIndex = cursor.getColumnIndexOrThrow(ItemColumns.FILESIZE);
+			int filesizeIndex = cursor
+					.getColumnIndexOrThrow(ItemColumns.FILESIZE);
 			int filesize = cursor.getInt(filesizeIndex);
 			if (filesize > 0)
-				holder.textViewFileSize.setText(filesize/1024/1024 + " MB");
+				holder.textViewFileSize.setText(filesize / 1024 / 1024 + " MB");
 		} catch (IllegalArgumentException e) {
-			
+
 		}
-		
+
 		holder.textViewTitle.setText(title);
-		
+
 		if (durationIndex > 0) {
 			String duration = cursor.getString(durationIndex);
 			int offset = cursor.getInt(offsetIndex);
 			int status = cursor.getInt(statusIndex);
-			
+
 			holder.textViewDuration.setText(duration);
 			
-			if (offset > 0 || status == ItemColumns.ITEM_STATUS_PLAYING_NOW ) {
-				
-				if (status != ItemColumns.ITEM_STATUS_PLAYING_NOW)
-					holder.textViewCurrentTime.setText(StrUtils.formatTime( offset ));
-				
+			// if (offset > 0 || status == ItemColumns.ITEM_STATUS_PLAYING_NOW )
+			// {
+
+			// if (status != ItemColumns.ITEM_STATUS_PLAYING_NOW) {
+			if (offset > 0) {
+				String offsetText = StrUtils.formatTime(offset);
+				holder.textViewCurrentTime.setText(offsetText);
 				holder.textViewSlash.setText("/");
 				holder.textViewSlash.setVisibility(View.VISIBLE);
 			} else {
+				holder.textViewCurrentTime.setText("");
 				holder.textViewSlash.setVisibility(View.GONE);
 			}
+			// } else {
+			// holder.textViewSlash.setVisibility(View.GONE);
+			// }
 		}
 
 		if (subtitleIndex > 0)
@@ -279,14 +301,24 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 
 	}
 
+	public void showItem(Long id) {
+		if (!mExpandedItemID.isEmpty())
+			mExpandedItemID.remove(mExpandedItemID.first()); // HACK: only show
+																// one expanded
+																// at the time
+		mExpandedItemID.add(id);
+	}
+
 	public void toggleItem(Cursor item) {
 		Long itemID = item.getLong(item.getColumnIndex(ItemColumns._ID));
-		if (mExpandedItemID.contains(itemID)) // ItemColumns._ID
-			mExpandedItemID.remove(itemID);
+		toggleItem(itemID);
+	}
+
+	public void toggleItem(Long id) {
+		if (mExpandedItemID.contains(id)) // ItemColumns._ID
+			mExpandedItemID.remove(id);
 		else {
-			if (!mExpandedItemID.isEmpty())
-				mExpandedItemID.remove(mExpandedItemID.first()); // HACK: only show one expanded at the time
-			mExpandedItemID.add(itemID);
+			showItem(id);
 		}
 	}
 
@@ -315,7 +347,8 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 		// https://github.com/koush/UrlImageViewHelper#readme
 		int cacheTime = 60000 * 60 * 24 * 31; // in ms
 		UrlImageViewHelper.loadUrlDrawable(v.getContext(), imageURL);
-		UrlImageViewHelper.setUrlDrawable(v, imageURL, R.drawable.generic_podcast, cacheTime);
+		UrlImageViewHelper.setUrlDrawable(v, imageURL,
+				R.drawable.generic_podcast, cacheTime);
 	}
 
 	private Long itemID(int position) {

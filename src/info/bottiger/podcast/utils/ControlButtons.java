@@ -3,6 +3,7 @@ package info.bottiger.podcast.utils;
 import info.bottiger.podcast.PodcastBaseFragment;
 import info.bottiger.podcast.R;
 import info.bottiger.podcast.RecentItemFragment;
+import info.bottiger.podcast.SwipeActivity;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.service.PlayerService;
 import info.bottiger.podcast.service.PodcastService;
@@ -18,6 +19,8 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
 public class ControlButtons {
+	
+	public static RecentItemFragment fragment = null;
 		
     public static class Holder {
     	public ImageButton playPauseButton;
@@ -30,11 +33,11 @@ public class ControlButtons {
         public SeekBar seekbar;
     }
     
-    public static void setCurrentTime(final RecentItemFragment fragment, final Holder viewHolder, final long id) {
+    public static void setCurrentTime(final Holder viewHolder, final long id) {
     	
     }
 
-    public static void setListener(final RecentItemFragment fragment, final PodcastService podcastServiceConnection, final Holder viewHolder, final long id) {
+    public static void setListener(final PodcastService podcastServiceConnection, final Holder viewHolder, final long id) {
     	
     	fragment.queueNextRefresh(1);
     	
@@ -88,6 +91,27 @@ public class ControlButtons {
         	viewHolder.seekbar.setOnSeekBarChangeListener(fragment.mSeekListener);
         }
         viewHolder.seekbar.setMax(1000); 
+	}
+    
+	public static void setPlayerListeners(View view, long id) {
+		
+		//View view = getChildByID(id);
+
+		ControlButtons.Holder viewHolder = new ControlButtons.Holder();
+		viewHolder.currentTime = (TextView) view.findViewById(R.id.current_position);
+		
+		
+		viewHolder.playPauseButton = (ImageButton) view.findViewById(R.id.play_toggle);
+		viewHolder.stopButton = (ImageButton) view.findViewById(R.id.stop);
+		viewHolder.infoButton = (ImageButton) view.findViewById(R.id.info);
+		viewHolder.downloadButton = (ImageButton) view.findViewById(R.id.download);
+		viewHolder.queueButton = (ImageButton) view.findViewById(R.id.queue);
+		viewHolder.currentTime = (TextView) view.findViewById(R.id.current_position);
+		viewHolder.duration = (TextView) view.findViewById(R.id.duration);
+		viewHolder.seekbar = (SeekBar) view.findViewById(R.id.progress);
+		
+		ControlButtons.setListener(SwipeActivity.mServiceBinder, viewHolder, id);
+	
 	}
 
 }
