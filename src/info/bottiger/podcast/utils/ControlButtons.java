@@ -44,9 +44,9 @@ public class ControlButtons {
     	final ImageButton playPauseButton = (ImageButton)viewHolder.playPauseButton;
 		playPauseButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-            	fragment.setProgress(viewHolder.seekbar);
-            	fragment.setCurrentTime(viewHolder.currentTime);
-            	fragment.setDuration(viewHolder.duration);
+            	if (viewHolder.seekbar != null) fragment.setProgressBar(viewHolder.seekbar);
+            	if (viewHolder.currentTime != null) fragment.setCurrentTime(viewHolder.currentTime);
+            	if (viewHolder.duration != null) fragment.setDuration(viewHolder.duration);
                 if (fragment.mPlayerServiceBinder.isPlaying()) {
                 	playPauseButton.setContentDescription("Play");
                 	playPauseButton.setImageResource(R.drawable.play);

@@ -324,7 +324,8 @@ public class PlayerFragment   extends PodcastBaseFragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle icicle) {
         super.onCreate(icicle);
-        V = inflater.inflate(R.layout.playing_episode, container, false);
+        // R.layout.playing_episode
+        V = inflater.inflate(R.layout.recent, container, false);
         
         getActivity().startService(new Intent(getActivity(), PlayerService.class));
         //setContentView(R.layout.audio_player);

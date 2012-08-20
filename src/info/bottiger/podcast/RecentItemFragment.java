@@ -19,6 +19,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.CursorLoader;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -154,14 +155,14 @@ public class RecentItemFragment extends PodcastBaseFragment {
 	}
 
 	public static FeedCursorAdapter listItemCursorAdapter(Context context,
-			Cursor cursor) {
+			PodcastBaseFragment fragment, Cursor cursor) {
 		FeedCursorAdapter.FieldHandler[] fields = {
 				FeedCursorAdapter.defaultTextFieldHandler,
 				new TextFieldHandler(), new TextFieldHandler(),
 				new FeedCursorAdapter.IconFieldHandler(mIconMap),
 		// new IconCursorAdapter.IconFieldHandler(mKeepIconMap)
 		};
-		return new FeedCursorAdapter(context, R.layout.list_item, cursor,
+		return new FeedCursorAdapter(context, fragment, R.layout.list_item, cursor,
 				new String[] { ItemColumns.TITLE, ItemColumns.SUB_TITLE,
 						ItemColumns.DURATION, ItemColumns.IMAGE_URL },
 				new int[] { R.id.title, R.id.podcast, R.id.duration,
@@ -341,20 +342,21 @@ public class RecentItemFragment extends PodcastBaseFragment {
 
 	public void showPlayingEpisode(long playingEpisodeID) {
 		// this.getActivity().findViewById(id)
-		ViewStub stub = (ViewStub) getActivity().findViewById(R.id.stub_play);
-		View inflated = stub.inflate();
+		//ViewStub stub = (ViewStub) getActivity().findViewById(R.id.stub_play);
+		//View inflated = stub.inflate();
 
 		FeedItem episode = FeedItem.getById(getActivity().getContentResolver(),
 				playingEpisodeID);
 
-		TextView t = (TextView) inflated.findViewById(R.id.player_title);
-		t.setText(episode.title);
+		//TextView t = (TextView) inflated.findViewById(R.id.player_title); FIXME
+		//t.setText(episode.title); FIXME
 		listNonPlayingEpisodes(playingEpisodeID);
 	}
 
 	public void listNonPlayingEpisodes(long playingEpisodeID) {
-		String excludePLayingEpisode = ItemColumns._ID + "!="
-				+ playingEpisodeID;
+		//String excludePLayingEpisode = ItemColumns._ID + "!="
+		//		+ playingEpisodeID;
+		String excludePLayingEpisode = "";
 		showEpisodes(excludePLayingEpisode);
 	}
 
@@ -362,7 +364,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 		mCursor = new CursorLoader(getActivity(), ItemColumns.URI, PROJECTION,
 				condition, null, getOrder()).loadInBackground();
 
-		mAdapter = RecentItemFragment.listItemCursorAdapter(this.getActivity(),
+		mAdapter = RecentItemFragment.listItemCursorAdapter(this.getActivity(), this,
 				mCursor);
 		
 		if (this.mCurCheckID > 0) {
@@ -386,8 +388,9 @@ public class RecentItemFragment extends PodcastBaseFragment {
 	}
 
 	public String getWhere() {
-		String where = ItemColumns.STATUS + "<"
-				+ ItemColumns.ITEM_STATUS_MAX_PLAYLIST_VIEW;
+		String where = "";
+		//where = where + ItemColumns.STATUS + "<"
+		//		+ ItemColumns.ITEM_STATUS_MAX_PLAYLIST_VIEW;
 		switch ((int) pref_select) {
 		case 1: // New only
 			where = ItemColumns.STATUS + "<"
@@ -450,7 +453,8 @@ public class RecentItemFragment extends PodcastBaseFragment {
 		//}
 		ControlButtons.setPlayerListeners(view, id);
 		
-		updateCurrentPosition(FeedItem.getById(getActivity().getContentResolver(), id));
+		//updateCurrentPosition(FeedItem.getById(getActivity().getContentResolver(), id));
+		updateCurrentPosition();
 	}
 	
 	private View getViewByID(long id) {

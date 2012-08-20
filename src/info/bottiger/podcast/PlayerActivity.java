@@ -378,7 +378,8 @@ public class PlayerActivity   extends HapiListActivity
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
 		startService(new Intent(this, PlayerService.class));
-        setContentView(R.layout.audio_player);
+        //setContentView(R.layout.audio_player);
+		setContentView(R.layout.recent);
 		setTitle(getResources().getString(R.string.title_episodes));
 		getListView().setOnCreateContextMenuListener(this);
         

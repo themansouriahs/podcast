@@ -328,7 +328,7 @@ public class PlayerService extends Service {
 	}
 
     private void dis_notifyStatus() {
-        mNotificationManager.cancel(R.layout.playing_episode);    	
+        ////mNotificationManager.cancel(R.layout.playing_episode);    	
         //setForeground(false);
     }
     
@@ -349,7 +349,7 @@ public class PlayerService extends Service {
         		null, contentIntent);        
         //setForeground(true);
 
-        mNotificationManager.notify(R.layout.playing_episode, notification);
+        ////mNotificationManager.notify(R.layout.playing_episode, notification);
         
     }	
 	

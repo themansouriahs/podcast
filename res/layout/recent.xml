@@ -10,7 +10,7 @@
         android:layout_height="100dip"
         android:layout_gravity="top"
         android:inflatedId="@+id/player"
-        android:layout="@layout/player" />
+        android:layout="@layout/player2" />
 
     <ListView
         android:id="@android:id/list"

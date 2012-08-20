@@ -4,6 +4,7 @@ import android.widget.SimpleCursorAdapter;
 import android.database.Cursor;
 import android.app.Activity;
 import android.content.Context;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -95,6 +96,7 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 	private ArrayList<FeedItem> mData = new ArrayList<FeedItem>();
 	private LayoutInflater mInflater;
 	private Context mContext;
+	private PodcastBaseFragment mFragment = null;
 
 	private TreeSet<Number> mExpandedItemID = new TreeSet<Number>();
 
@@ -117,17 +119,24 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 				fromColumns, iconMap));
 	}
 
+	public FeedCursorAdapter(Context context, int layout, Cursor cursor,
+			String[] fromColumns, int[] to, FieldHandler[] fieldHandlers) {
+		this(context, null, layout, cursor,
+				fromColumns, to, fieldHandlers);
+	}
+	
 	// Newer constructor allows custom FieldHandlers.
 	// Would be better to bundle fromColumn/to/fieldHandler for each field and
 	// pass a single array
 	// of those objects, but the overhead of defining that value class in Java
 	// is not worth it.
 	// If this were a Scala program, that would be a one-line case class.
-	public FeedCursorAdapter(Context context, int layout, Cursor cursor,
+	public FeedCursorAdapter(Context context, PodcastBaseFragment fragment, int layout, Cursor cursor,
 			String[] fromColumns, int[] to, FieldHandler[] fieldHandlers) {
 		super(context, layout, cursor, fromColumns, to);
 
 		mContext = context;
+		mFragment = fragment;
 		mInflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -173,8 +182,15 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 		int pathIndex = item.getColumnIndex(ItemColumns.PATHNAME);
 		// int itemOffset =
 		// item.getInt(item.getColumnIndex(ItemColumns.OFFSET));
+		
+		long playingID;
+		try {
+			playingID = PodcastBaseFragment.mPlayerServiceBinder.getCurrentItem().id;
+		} catch (Exception e) {
+			playingID = 0;
+		}
 
-		if (mExpandedItemID.contains(itemID)) {
+		if (mExpandedItemID.contains(itemID) || itemID == playingID) {
 			ViewStub stub = (ViewStub) v.findViewById(R.id.stub);
 			if (stub != null)
 				stub.inflate();
@@ -187,13 +203,26 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 
 			ControlButtons.setPlayerListeners(playerView, itemID);
 
-
-			if (itemID == PodcastBaseFragment.mPlayerServiceBinder.getCurrentItem().id) {
-				ImageButton playPauseButton = (ImageButton) stub
-						.findViewById(R.id.play_toggle);
-				playPauseButton.setImageResource(R.drawable.pause);
+			if (PodcastBaseFragment.mPlayerServiceBinder.isInitialized()) {
+				if (itemID == PodcastBaseFragment.mPlayerServiceBinder
+						.getCurrentItem().id) {
+					if (PodcastBaseFragment.mPlayerServiceBinder.isPlaying()) {
+						ImageButton playPauseButton = (ImageButton) v
+							.findViewById(R.id.play_toggle);
+						playPauseButton.setImageResource(R.drawable.pause);
+						
+						SeekBar sb = (SeekBar) v.findViewById(R.id.progress); 
+						TextView tv = (TextView) v.findViewById(R.id.current_position); 
+						mFragment.setProgressBar(sb);
+						mFragment.setCurrentTime(tv);
+					} else {
+						//ImageButton playPauseButton = (ImageButton) v
+						//		.findViewById(R.id.play_toggle);
+						//playPauseButton.setImageResource(R.drawable.play);
+					}
+				}
 			}
-			
+
 			if (pathIndex > 0) {
 				String itemPathname = item.getString(pathIndex);
 				File file = new File(itemPathname);
@@ -248,7 +277,7 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 
 		int idIndex = cursor.getColumnIndex(ItemColumns._ID);
 		long id = cursor.getLong(idIndex);
-		
+
 		int subtitleIndex = cursor.getColumnIndex(ItemColumns.SUB_TITLE);
 		int imageIndex = cursor.getColumnIndex(ItemColumns.IMAGE_URL);
 
@@ -275,7 +304,7 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 			int status = cursor.getInt(statusIndex);
 
 			holder.textViewDuration.setText(duration);
-			
+
 			// if (offset > 0 || status == ItemColumns.ITEM_STATUS_PLAYING_NOW )
 			// {
 

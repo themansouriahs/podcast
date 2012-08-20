@@ -61,7 +61,7 @@ public class PodcastBaseFragment extends ListFragment {
 	private boolean mShow = true;
 
 	private TextView mCurrentTime = null;
-	private SeekBar mProgress = null;
+	private SeekBar mProgressBar = null;
 	private TextView mDuration = null;
 
 	public TextView getCurrentTime() {
@@ -73,11 +73,11 @@ public class PodcastBaseFragment extends ListFragment {
 	}
 
 	public SeekBar getProgress() {
-		return mProgress;
+		return mProgressBar;
 	}
 
-	public void setProgress(SeekBar mProgress) {
-		this.mProgress = mProgress;
+	public void setProgressBar(SeekBar mProgress) {
+		this.mProgressBar = mProgress;
 	}
 
 	public void setDuration(TextView mDuration) {
@@ -256,14 +256,15 @@ public class PodcastBaseFragment extends ListFragment {
 			if (mPlayerServiceBinder.isInitialized() == false) {
 				// mCurrentTime.setVisibility(View.INVISIBLE);
 				// mTotalTime.setVisibility(View.INVISIBLE);
-				mProgress.setProgress(0);
+				mProgressBar.setProgress(0);
 				return 500;
 			}
 
 			long pos = mPlayerServiceBinder.position();
 			long duration = mPlayerServiceBinder.duration();
 
-			updateCurrentPosition(mPlayerServiceBinder.getCurrentItem());
+			//updateCurrentPosition(mPlayerServiceBinder.getCurrentItem());
+			updateCurrentPosition();
 			/*
 			 * String timeCounter = StrUtils.formatTime( pos ) + " / " +
 			 * StrUtils.formatTime( duration );
@@ -277,15 +278,15 @@ public class PodcastBaseFragment extends ListFragment {
 				// mCurrentTime.setVisibility(View.VISIBLE);
 				// mCurrentTime.setText(StrUtils.formatTime( pos ));
 
-				mProgress.setProgress((int) (1000 * pos / duration));
+				mProgressBar.setProgress((int) (1000 * pos / duration));
 				return 500;
 			}
 
 			long remaining = 1000 - (pos % 1000);
 			if ((pos >= 0) && (duration > 0)) {
-				// String timeCounter = StrUtils.formatTime( pos ) + " / " +
-				// StrUtils.formatTime( duration );
-				// mCurrentTime.setText(timeCounter);
+				String timeCounter = StrUtils.formatTime( pos );
+						//+ " / " + StrUtils.formatTime( duration );
+				mCurrentTime.setText(timeCounter);
 
 				if (mPlayerServiceBinder.isInitialized()) {
 					// mCurrentTime.setVisibility(View.VISIBLE);
@@ -293,10 +294,10 @@ public class PodcastBaseFragment extends ListFragment {
 				}
 				int nextPos = (int) (1000 * pos / mPlayerServiceBinder
 						.duration());
-				mProgress.setProgress(nextPos);
+				mProgressBar.setProgress(nextPos);
 			} else {
 				// mCurrentTime.setText("--:--");
-				mProgress.setProgress(1000);
+				mProgressBar.setProgress(1000);
 			}
 
 			return remaining;
@@ -305,7 +306,7 @@ public class PodcastBaseFragment extends ListFragment {
 		return 500;
 	}
 
-	protected void updateCurrentPosition(FeedItem item) {
+	protected void updateCurrentPosition() {
 		if (mCurrentTime != null) {
 			long pos = mPlayerServiceBinder.position();
 			long duration = mPlayerServiceBinder.duration();
@@ -313,7 +314,7 @@ public class PodcastBaseFragment extends ListFragment {
 			String timeCounter = StrUtils.formatTime(pos);
 			String durationString = StrUtils.formatTime(duration);
 			mCurrentTime.setText(timeCounter);
-			mDuration.setText(durationString);
+			if (mDuration != null) mDuration.setText(durationString);
 		}
 	}
 
