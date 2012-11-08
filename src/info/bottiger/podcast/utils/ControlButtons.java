@@ -29,6 +29,7 @@ public class ControlButtons {
         public ImageButton downloadButton;
         public ImageButton queueButton;
         public TextView currentTime;
+        public TextView timeSlash;
         public TextView duration;
         public SeekBar seekbar;
     }
@@ -42,10 +43,13 @@ public class ControlButtons {
     	fragment.queueNextRefresh(1);
     	
     	final ImageButton playPauseButton = (ImageButton)viewHolder.playPauseButton;
+  
 		playPauseButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
             	if (viewHolder.seekbar != null) fragment.setProgressBar(viewHolder.seekbar);
-            	if (viewHolder.currentTime != null) fragment.setCurrentTime(viewHolder.currentTime);
+            	if (viewHolder.currentTime != null) 
+            		fragment.setCurrentTime(viewHolder.currentTime);
+            	
             	if (viewHolder.duration != null) fragment.setDuration(viewHolder.duration);
                 if (fragment.mPlayerServiceBinder.isPlaying()) {
                 	playPauseButton.setContentDescription("Play");

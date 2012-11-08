@@ -60,6 +60,7 @@ public class ItemColumns implements BaseColumns {
 	public static final String RESOURCE = "res";
 
 	public static final String FILESIZE = "filesize";
+	public static final String CHUNK_FILESIZE = "chunk_filesize";
 	public static final String DURATION = "duration";
 	public static final String IMAGE_URL = "image";
 
@@ -82,7 +83,7 @@ public class ItemColumns implements BaseColumns {
 	public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
 	public static final String[] ALL_COLUMNS = { _ID, SUBS_ID, TITLE, AUTHOR,
-			DATE, LAST_UPDATE, CONTENT, STATUS, URL, RESOURCE, FILESIZE, DURATION,
+			DATE, LAST_UPDATE, CONTENT, STATUS, URL, RESOURCE, FILESIZE,CHUNK_FILESIZE, DURATION,
 			LENGTH, OFFSET, PATHNAME, FAIL_COUNT, MEDIA_URI, SUB_TITLE,
 			CREATED, TYPE, KEEP, IMAGE_URL };
 
@@ -101,6 +102,7 @@ public class ItemColumns implements BaseColumns {
 		+ URL + " VARCHAR(1024), " 
 		+ RESOURCE + " VARCHAR(1024), " 
 		+ FILESIZE + " INTEGER, "
+		+ CHUNK_FILESIZE + " INTEGER, "
 		+ DURATION + " VARCHAR(16), " 
 		+ IMAGE_URL + " VARCHAR(1024), " 
 		+ LENGTH + " INTEGER, " 
@@ -182,6 +184,10 @@ public class ItemColumns implements BaseColumns {
 
 		if (values.containsKey(FILESIZE) == false) {
 			values.put(FILESIZE, "");
+		}
+
+		if (values.containsKey(CHUNK_FILESIZE) == false) {
+			values.put(CHUNK_FILESIZE, "");
 		}
 		
 		if (values.containsKey(IMAGE_URL) == false) {

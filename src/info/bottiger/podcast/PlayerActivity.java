@@ -186,6 +186,10 @@ public class PlayerActivity   extends HapiListActivity
         updateInfo();		
     }    
 
+    /**
+     * Update the player UI
+     * @return
+     */
     private long refreshNow() {
         if(mServiceBinder == null)
             return 500;
@@ -195,8 +199,8 @@ public class PlayerActivity   extends HapiListActivity
         if(mServiceBinder.getUpdateStatus()){
         	updateInfo();
         	mServiceBinder.setUpdateStatus(false);
-        	
         }
+        
         try {
         	if(mServiceBinder.isInitialized()==false){
                 mCurrentTime.setVisibility(View.INVISIBLE);
@@ -207,7 +211,11 @@ public class PlayerActivity   extends HapiListActivity
         	long pos = mServiceBinder.position();
         	long duration = mServiceBinder.duration();
             
-            //mTotalTime.setVisibility(View.VISIBLE);
+        	if (mServiceBinder.getCurrentItem().chunkFilesize > 0) {
+        		mProgress.setSecondaryProgress(50);
+        	}
+            
+        	//mTotalTime.setVisibility(View.VISIBLE);
             //mTotalTime.setText(formatTime( duration ));
             
         	if(mServiceBinder.isPlaying() == false) {

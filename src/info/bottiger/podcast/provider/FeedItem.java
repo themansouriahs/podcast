@@ -44,6 +44,7 @@ public class FeedItem implements Comparable<FeedItem> {
 
 	public long sub_id;
 	public long filesize;
+	public long chunkFilesize;
 
 	public String pathname;
 	public int offset;
@@ -197,6 +198,7 @@ public class FeedItem implements Comparable<FeedItem> {
 		update = -1;
 		keep = -1;
 		filesize = -1;
+		chunkFilesize = -1;
 
 		created = -1;
 		sub_title = null;
@@ -312,7 +314,9 @@ public class FeedItem implements Comparable<FeedItem> {
 			if (pathname != null)
 				cv.put(ItemColumns.PATHNAME, pathname);
 			if (filesize >= 0)
-				cv.put(ItemColumns.PATHNAME, filesize);
+				cv.put(ItemColumns.FILESIZE, filesize);
+			if (chunkFilesize >= 0)
+				cv.put(ItemColumns.CHUNK_FILESIZE, chunkFilesize);
 			if (offset >= 0)
 				cv.put(ItemColumns.OFFSET, offset);
 			if (status >= 0)
@@ -505,6 +509,8 @@ public class FeedItem implements Comparable<FeedItem> {
 				.getColumnIndex(ItemColumns.CONTENT));
 		item.filesize = cursor.getLong(cursor
 				.getColumnIndex(ItemColumns.FILESIZE));
+		item.chunkFilesize = cursor.getLong(cursor
+				.getColumnIndex(ItemColumns.CHUNK_FILESIZE));
 		item.duration = cursor.getString(cursor
 				.getColumnIndex(ItemColumns.DURATION));
 		item.uri = cursor.getString(cursor
@@ -607,7 +613,7 @@ public class FeedItem implements Comparable<FeedItem> {
 	public void downloadSuccess()
 	{
 		status = ItemColumns.ITEM_STATUS_NO_PLAY;
-		filesize = new File(pathname).length();
+		filesize = getCurrentFileSize();
 	}	
 	
 	public void endDownload(ContentResolver context)
@@ -631,6 +637,10 @@ public class FeedItem implements Comparable<FeedItem> {
 
 		update(context);		
 	}	
+	
+	public long getCurrentFileSize() {
+		return new File(pathname).length();
+	}
 
 	public void sendMail(Activity act){
 	

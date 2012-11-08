@@ -4,6 +4,7 @@ import info.bottiger.podcast.R;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.SubscriptionColumns;
+import info.bottiger.podcast.service.PodcastUpdateManager;
 import info.bottiger.podcast.utils.DialogMenu;
 import info.bottiger.podcast.utils.FeedCursorAdapter;
 
@@ -202,7 +203,8 @@ public class AllItemActivity extends PodcastBaseActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case MENU_REFRESH:
-			mServiceBinder.start_update();
+			//mServiceBinder.start_update();
+			PodcastUpdateManager.updateNow(getBaseContext());
 			return true;
 		case MENU_SORT:
 			 new AlertDialog.Builder(this)
@@ -354,7 +356,8 @@ public class AllItemActivity extends PodcastBaseActivity {
 	
 				feeditem.status = ItemColumns.ITEM_STATUS_DOWNLOAD_QUEUE;
 				feeditem.update(getContentResolver());
-				mServiceBinder.start_download();
+				//mServiceBinder.start_download();
+				PodcastUpdateManager.updateNow(getBaseContext());
 				return;
 			}
 			case MENU_ITEM_START_PLAY: {

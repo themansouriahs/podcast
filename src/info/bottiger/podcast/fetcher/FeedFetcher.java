@@ -215,6 +215,8 @@ public class FeedFetcher {
 			}
 
 			int responseCode = httpConnection.getResponseCode();
+			item.filesize = httpConnection.getContentLength();
+			
 			log.debug("Error Code : " + responseCode);
 			if (responseCode >= 500) {
 				item.offset = 0;
@@ -253,6 +255,7 @@ public class FeedFetcher {
 				oSavedFile.write(b, 0, nRead);
 				nStartPos += nRead;
 				item.offset = nStartPos;
+				item.chunkFilesize = nStartPos;
 			}
 			if (nStartPos >= nEndPos)
 				item.downloadSuccess();

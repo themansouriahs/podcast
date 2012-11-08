@@ -262,14 +262,21 @@ public class PodcastBaseFragment extends ListFragment {
 
 			long pos = mPlayerServiceBinder.position();
 			long duration = mPlayerServiceBinder.duration();
+			
+			// update secondary progress bar
+			long chunkSize = mPlayerServiceBinder.getCurrentItem().getCurrentFileSize();
+			long totalFileSize = mPlayerServiceBinder.getCurrentItem().filesize;
+			int fileProgress;
+			fileProgress = (totalFileSize != 0) ? (int) (chunkSize / totalFileSize * mProgressBar.getMax()) : 0;
+			
+			//mProgressBar.setSecondaryProgress(fileProgress);
+			int fileProgress2 = (int) mPlayerServiceBinder.bufferProgress();
+			int fileProgress3 = (int) fileProgress2*mProgressBar.getMax();
+			int fileProgress4 = (int) fileProgress3/100;
+			mProgressBar.setSecondaryProgress(fileProgress4);
 
 			//updateCurrentPosition(mPlayerServiceBinder.getCurrentItem());
 			updateCurrentPosition();
-			/*
-			 * String timeCounter = StrUtils.formatTime( pos ) + " / " +
-			 * StrUtils.formatTime( duration );
-			 * mCurrentTime.setText(timeCounter);
-			 */
 
 			// mTotalTime.setVisibility(View.VISIBLE);
 			// mTotalTime.setText(formatTime( duration ));
@@ -286,6 +293,7 @@ public class PodcastBaseFragment extends ListFragment {
 			if ((pos >= 0) && (duration > 0)) {
 				String timeCounter = StrUtils.formatTime( pos );
 						//+ " / " + StrUtils.formatTime( duration );
+				
 				mCurrentTime.setText(timeCounter);
 
 				if (mPlayerServiceBinder.isInitialized()) {

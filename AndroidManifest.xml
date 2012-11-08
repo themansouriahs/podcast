@@ -142,6 +142,8 @@
             android:name="info.bottiger.podcast.service.PlayerService"
             android:enabled="true" >
         </service>
+        
+        <receiver  android:process=":remote" android:name="PodcastUpdateManager"></receiver>
 
         <provider
             android:name="info.bottiger.podcast.provider.PodcastProvider"

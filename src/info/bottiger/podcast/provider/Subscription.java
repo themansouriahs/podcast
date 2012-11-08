@@ -1,6 +1,9 @@
 package info.bottiger.podcast.provider;
 
 
+import java.util.LinkedList;
+import java.util.List;
+
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -38,6 +41,21 @@ public class Subscription {
 	public static void viewEpisodes(Activity act, long channel_id) {
 		Uri uri = ContentUris.withAppendedId(SubscriptionColumns.URI, channel_id);
 		act.startActivity(new Intent(Intent.ACTION_EDIT, uri));
+	}
+	
+	public static Cursor allAsCursor(ContentResolver context) {
+		return context.query(SubscriptionColumns.URI,
+				SubscriptionColumns.ALL_COLUMNS, null, null, null);
+	}
+	
+	public static LinkedList<Subscription> allAsList(ContentResolver context) {
+		LinkedList<Subscription> subscriptions = new LinkedList<Subscription>();
+		Cursor cursor = allAsCursor(context);
+		
+		while (cursor.moveToNext()) {
+			subscriptions.add(Subscription.getByCursor(cursor));
+		}
+		return subscriptions;
 	}
 
 	public static Subscription getBySQL(ContentResolver context,String where,String order) 

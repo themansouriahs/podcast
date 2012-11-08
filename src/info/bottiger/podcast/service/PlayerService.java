@@ -53,8 +53,8 @@ public class PlayerService extends Service {
     private NotificationManager mNotificationManager;
 	
 
-	FeedItem mItem = null;
-	boolean  mUpdate = false;
+	private FeedItem mItem = null;
+	private boolean  mUpdate = false;
     private boolean mResumeAfterCall = false;
 	
 
@@ -89,6 +89,7 @@ public class PlayerService extends Service {
         private MediaPlayer mMediaPlayer = new MediaPlayer();
         private Handler mHandler;
         private boolean mIsInitialized = false;
+    	int bufferProgress = 0;
 
         public MyPlayer() {
             //mMediaPlayer.setWakeMode(PlayerService.this, PowerManager.PARTIAL_WAKE_LOCK);
@@ -111,6 +112,7 @@ public class PlayerService extends Service {
                 return;
             }
             mMediaPlayer.setOnCompletionListener(listener);
+            mMediaPlayer.setOnBufferingUpdateListener(bufferListener);
             mMediaPlayer.setOnErrorListener(errorListener);
             
             mIsInitialized = true;
@@ -133,6 +135,7 @@ public class PlayerService extends Service {
                 return;
             }
             mMediaPlayer.setOnCompletionListener(listener);
+            mMediaPlayer.setOnBufferingUpdateListener(bufferListener);
             mMediaPlayer.setOnErrorListener(errorListener);
             
             mIsInitialized = true;
@@ -165,6 +168,10 @@ public class PlayerService extends Service {
             mMediaPlayer.pause();
         }
         
+        public int getBufferProgress() {
+        	return this.bufferProgress;
+        }
+        
         public void setHandler(Handler handler) {
             mHandler = handler;
         }
@@ -178,6 +185,13 @@ public class PlayerService extends Service {
             }
         };
 
+        MediaPlayer.OnBufferingUpdateListener  bufferListener = new MediaPlayer.OnBufferingUpdateListener() {
+			@Override
+			public void onBufferingUpdate(MediaPlayer mp, int percent) {
+				MyPlayer.this.bufferProgress = percent;
+			}
+        };
+        
         MediaPlayer.OnPreparedListener preparedlistener = new MediaPlayer.OnPreparedListener() {
             public void onPrepared(MediaPlayer mp) {
                 //notifyChange(ASYNC_OPEN_COMPLETE);
@@ -451,6 +465,11 @@ public class PlayerService extends Service {
 	public long duration() {
 		return mPlayer.duration();
 	}	
+	
+	public int bufferProgress() {
+		int test = mPlayer.bufferProgress;
+		return test;//mPlayer.bufferProgress;
+	}
 	
 	public FeedItem getCurrentItem() {
 		return mItem;

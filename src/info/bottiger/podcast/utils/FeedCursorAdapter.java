@@ -192,14 +192,21 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 
 		if (mExpandedItemID.contains(itemID) || itemID == playingID) {
 			ViewStub stub = (ViewStub) v.findViewById(R.id.stub);
-			if (stub != null)
+			if (stub != null) {
 				stub.inflate();
+			}
 			// else {
 			View playerView = v.findViewById(R.id.stub_player);
 			playerView.setVisibility(View.VISIBLE);
 			// SeekBar sb = (SeekBar) playerView.findViewById(R.id.progress);
 			// sb.setProgress((int) 20);
 			// }
+			
+			TextView timeSlash = (TextView)v.findViewById(R.id.time_slash);
+			timeSlash.setText("/");
+			timeSlash.setVisibility(View.VISIBLE);
+			TextView currentTime = (TextView)v.findViewById(R.id.current_position);
+			currentTime.setText("00:00");
 
 			ControlButtons.setPlayerListeners(playerView, itemID);
 
@@ -223,7 +230,7 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 				}
 			}
 
-			if (pathIndex > 0) {
+			if (pathIndex > 0 && stub != null) {
 				String itemPathname = item.getString(pathIndex);
 				File file = new File(itemPathname);
 				if (file.exists()) {
