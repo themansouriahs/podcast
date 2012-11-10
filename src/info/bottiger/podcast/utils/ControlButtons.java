@@ -8,6 +8,7 @@ import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.service.PlayerService;
 import info.bottiger.podcast.service.PodcastService;
 import info.bottiger.podcast.utils.ControlButtons.Holder;
+import android.content.ContentResolver;
 import android.content.ServiceConnection;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -31,6 +32,7 @@ public class ControlButtons {
         public TextView currentTime;
         public TextView timeSlash;
         public TextView duration;
+        public TextView filesize;
         public SeekBar seekbar;
     }
     
@@ -78,11 +80,21 @@ public class ControlButtons {
 		
 		viewHolder.downloadButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-            	FeedItem item = FeedItem.getById(fragment.getActivity().getContentResolver(), id);
-            	//item.startDownload(fragment.getActivity().getContentResolver());
-            	podcastServiceConnection.downloadItem(fragment.getActivity().getContentResolver(), item);
-            	viewHolder.downloadButton.setImageResource(R.drawable.trash);
-            	viewHolder.downloadButton.setContentDescription("Trash");
+            	ContentResolver resolver = fragment.getActivity().getContentResolver();
+            	FeedItem item = FeedItem.getById(resolver, id);
+            	
+            	if (item.isDownloaded()) {
+            		// Delete file
+            		item.delFile(resolver);
+            		viewHolder.downloadButton.setImageResource(R.drawable.download);
+            		viewHolder.downloadButton.setContentDescription("Download");
+            	} else {
+            		// Download file
+            		podcastServiceConnection.downloadItem(fragment.getActivity().getContentResolver(), item);
+            		new FilesizeUpdater(fragment.getActivity(), item.id, viewHolder.filesize);
+            		viewHolder.downloadButton.setImageResource(R.drawable.trash);
+            		viewHolder.downloadButton.setContentDescription("Trash");
+            	}
             }
         });
 		
@@ -112,6 +124,7 @@ public class ControlButtons {
 		viewHolder.queueButton = (ImageButton) view.findViewById(R.id.queue);
 		viewHolder.currentTime = (TextView) view.findViewById(R.id.current_position);
 		viewHolder.duration = (TextView) view.findViewById(R.id.duration);
+		viewHolder.filesize = (TextView) view.findViewById(R.id.filesize);
 		viewHolder.seekbar = (SeekBar) view.findViewById(R.id.progress);
 		
 		ControlButtons.setListener(SwipeActivity.mServiceBinder, viewHolder, id);

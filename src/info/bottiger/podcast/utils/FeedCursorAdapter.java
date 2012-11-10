@@ -20,6 +20,7 @@ import info.bottiger.podcast.RecentItemFragment;
 import info.bottiger.podcast.SwipeActivity;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
+import info.bottiger.podcast.service.PodcastDownloadManager;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -163,22 +164,26 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 
+		View v;
 		Cursor item = (Cursor) getItem(position);
-
+		
 		if (!item.moveToPosition(position)) {
 			throw new IllegalStateException("couldn't move cursor to position "
 					+ position);
 		}
-		View v;
+		
 		if (convertView == null) {
 			v = newView(mContext, item, parent);
 		} else {
 			v = convertView;
 		}
+		
 		bindView(v, mContext, item);
 
 		Long itemID = item.getLong(item.getColumnIndex(ItemColumns._ID));
 
+		FeedItem feedItem = FeedItem.getById(mContext.getContentResolver(), itemID);
+		
 		int pathIndex = item.getColumnIndex(ItemColumns.PATHNAME);
 		// int itemOffset =
 		// item.getInt(item.getColumnIndex(ItemColumns.OFFSET));
@@ -210,6 +215,11 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 
 			ControlButtons.setPlayerListeners(playerView, itemID);
 
+			if (feedItem.isDownloaded()) {
+				ImageButton downloadButton = (ImageButton) playerView.findViewById(R.id.download);
+				downloadButton.setImageResource(R.drawable.trash);
+			}
+			
 			if (PodcastBaseFragment.mPlayerServiceBinder.isInitialized()) {
 				if (itemID == PodcastBaseFragment.mPlayerServiceBinder
 						.getCurrentItem().id) {
@@ -228,8 +238,11 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 						//playPauseButton.setImageResource(R.drawable.play);
 					}
 				}
+				
+
 			}
 
+			/*
 			if (pathIndex > 0 && stub != null) {
 				String itemPathname = item.getString(pathIndex);
 				File file = new File(itemPathname);
@@ -239,6 +252,8 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 					downloadButton.setImageResource(R.drawable.trash);
 				}
 			}
+			*/
+			
 		} else {
 			View playerView = v.findViewById(R.id.stub_player);
 			if (playerView != null) {
@@ -256,11 +271,8 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 
 		Long cursorID = cursor.getLong(cursor.getColumnIndex("_id"));
 		boolean doExpand = mExpandedItemID.contains(cursorID);
-		// if (doExpand) {
-		// v = mInflater.inflate(R.layout.list_item_expanded, null);
-		// } else {
+
 		v = mInflater.inflate(R.layout.list_item, null);
-		// }
 
 		viewHolder.textViewTitle = (TextView) v.findViewById(R.id.title);
 		viewHolder.textViewSubTitle = (TextView) v.findViewById(R.id.podcast);
@@ -270,6 +282,7 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 				.findViewById(R.id.current_position);
 		viewHolder.textViewDuration = (TextView) v.findViewById(R.id.duration);
 		viewHolder.textViewSlash = (TextView) v.findViewById(R.id.time_slash);
+		viewHolder.textFileSize = (TextView) v.findViewById(R.id.filesize);
 
 		v.setTag(viewHolder);
 		return v;
@@ -292,7 +305,10 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 		int offsetIndex = cursor.getColumnIndex(ItemColumns.OFFSET);
 
 		int statusIndex = cursor.getColumnIndex(ItemColumns.STATUS);
-
+		
+		PodcastDownloadManager.DownloadStatus ds = PodcastDownloadManager.getStatus(FeedItem.getById(context.getContentResolver(), id));
+		writeStatus(id, holder.textViewFileSize, ds);
+		
 		try {
 			int filesizeIndex = cursor
 					.getColumnIndexOrThrow(ItemColumns.FILESIZE);
@@ -325,9 +341,6 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 				holder.textViewCurrentTime.setText("");
 				holder.textViewSlash.setVisibility(View.GONE);
 			}
-			// } else {
-			// holder.textViewSlash.setVisibility(View.GONE);
-			// }
 		}
 
 		if (subtitleIndex > 0)
@@ -377,6 +390,29 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 		public TextView textViewFileSize;
 		public TextView textViewCurrentTime;
 		public TextView textViewSlash;
+		public TextView textFileSize;
+	}
+	
+	private void writeStatus(long id, TextView tv, PodcastDownloadManager.DownloadStatus ds) {
+		String statusText = "";
+		switch (ds) {
+		case PENDING:
+			statusText = "waiting";
+			break;
+		case DOWNLOADING:
+			FilesizeUpdater fsu = new FilesizeUpdater(mContext, id, tv);
+			statusText = "downloading";
+			break;
+		case DONE:
+			statusText = "Done";
+			break;
+		case ERROR:
+			statusText = "Error";
+			break;
+		default:
+			statusText = "";
+		}
+		tv.setText(statusText);
 	}
 
 	private void setViewImage3(ImageView v, String imageURL) {

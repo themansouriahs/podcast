@@ -555,10 +555,10 @@ public class FeedItem implements Comparable<FeedItem> {
 
 	}
 	
-	public void delFile(ContentResolver context){
+	public void delFile(ContentResolver contentResolver){
 		if(status<ItemColumns.ITEM_STATUS_DELETE){
 			status = ItemColumns.ITEM_STATUS_DELETE;
-			update(context);	
+			update(contentResolver);	
 		}
 
 		if (SDCardMgr.getSDCardStatus()) {
@@ -573,7 +573,7 @@ public class FeedItem implements Comparable<FeedItem> {
 				if(deleted){
 					if(status<ItemColumns.ITEM_STATUS_DELETED){
 						status = ItemColumns.ITEM_STATUS_DELETED;
-						update(context);	
+						update(contentResolver);	
 					}						
 				}
 			} catch (Exception e) {
@@ -610,10 +610,11 @@ public class FeedItem implements Comparable<FeedItem> {
 		update(context);
 	}
 
-	public void downloadSuccess()
+	public void downloadSuccess(ContentResolver contentResolver)
 	{
 		status = ItemColumns.ITEM_STATUS_NO_PLAY;
 		filesize = getCurrentFileSize();
+		update(contentResolver);
 	}	
 	
 	public void endDownload(ContentResolver context)
@@ -674,5 +675,14 @@ public class FeedItem implements Comparable<FeedItem> {
 		else if (url.length() > 1)
 			itemURL = url;
 		return itemURL;
+	}
+	
+	public boolean isDownloaded() {
+		long localFilesize = new File(pathname).length();
+		return localFilesize == filesize && localFilesize > 0;
+	}
+	
+	public boolean equals(FeedItem item) {
+		return item.id == this.id;
 	}
 }

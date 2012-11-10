@@ -17,6 +17,7 @@
 package info.bottiger.podcast.tests;
 
 
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.test.mock.MockContentResolver;
 import junit.framework.TestCase;
@@ -86,9 +87,9 @@ public class FeedItemTest extends android.test.ProviderTestCase<PodcastProvider>
         assertTrue((update+10)>item.update);
     }     
 
-    public void testdownloadSuccess() throws Exception {
+    public void testdownloadSuccess(ContentResolver contentResolver) throws Exception {
     	FeedItem item = new FeedItem();
-    	item.downloadSuccess();
+    	item.downloadSuccess(contentResolver);
         assertTrue(item.status==ItemColumns.ITEM_STATUS_NO_PLAY);
     }	
     

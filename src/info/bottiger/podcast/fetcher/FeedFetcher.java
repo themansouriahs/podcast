@@ -13,6 +13,8 @@ import java.net.URL;
 import java.util.Properties;
 import java.util.zip.GZIPInputStream;
 
+import android.content.ContentResolver;
+
 public class FeedFetcher {
 
 	private static final int maxSize = 100 * 1024;
@@ -189,7 +191,7 @@ public class FeedFetcher {
 	
 	
 
-	public int download(FeedItem item) {
+	public int download(FeedItem item, ContentResolver contentResolver) {
 		String pathname = item.pathname;
 
 		int nStartPos = item.offset;
@@ -258,7 +260,7 @@ public class FeedFetcher {
 				item.chunkFilesize = nStartPos;
 			}
 			if (nStartPos >= nEndPos)
-				item.downloadSuccess();
+				item.downloadSuccess(contentResolver);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

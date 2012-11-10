@@ -1,5 +1,6 @@
 package info.bottiger.podcast.service;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 
@@ -11,6 +12,7 @@ import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.provider.SubscriptionColumns;
+import info.bottiger.podcast.utils.DownloadStatus;
 import info.bottiger.podcast.utils.LockHandler;
 import info.bottiger.podcast.utils.Log;
 import info.bottiger.podcast.utils.SDCardMgr;
@@ -42,7 +44,7 @@ public class PodcastDownloadManager {
 	private static PriorityQueue<FeedItem> mDownloadQueue = new PriorityQueue<FeedItem>();
 	private final Log log = Log.getLog(getClass());
 	
-	private FeedItem mDownloadingItem = null;
+	private static FeedItem mDownloadingItem = null;
 	private static final LockHandler mDownloadLock = new LockHandler();
 
 	private static final LockHandler mUpdateLock = new LockHandler();
@@ -54,7 +56,31 @@ public class PodcastDownloadManager {
 	public long pref_download_file_expire = 0;
 	public long pref_played_file_expire = 0;
 	public int pref_max_valid_size = 0;
+	
+	public enum DownloadStatus {
+	    NOTHING, PENDING, DOWNLOADING, DONE, ERROR
+	}
 
+	public static DownloadStatus getStatus(FeedItem item) {
+		if (item == null)
+			return DownloadStatus.NOTHING;
+		
+		if (mDownloadQueue.contains(item))
+			return DownloadStatus.PENDING;
+		
+		if (mDownloadingItem != null)
+			if (item.equals(mDownloadingItem))
+				return DownloadStatus.DOWNLOADING;
+		
+		if (item.isDownloaded()) {
+			return DownloadStatus.DONE;
+		} else if (item.chunkFilesize > 0) {
+			return DownloadStatus.ERROR;
+				// consider deleting it here
+		}
+		
+		return DownloadStatus.NOTHING;
+	}
 	
 
 	public void start_update(final Context context) {
@@ -99,70 +125,7 @@ public class PodcastDownloadManager {
 		
 	}
 
-	 private class UpdateSubscriptions extends AsyncTask<Void, String, Void> {
-		 Context mContext;
-		 
-		 public UpdateSubscriptions(Context context) {
-		        mContext = context;
-		    } 
-		 
-	     protected Void doInBackground(Void... params) {
-				try {					
-					Cursor subscriptionCursor = Subscription.allAsCursor(mContext.getContentResolver());
-					while (subscriptionCursor.moveToNext()) {
-						int add_num;
-						Subscription subscription = Subscription.getByCursor(subscriptionCursor);
-						
-						if (updateConnectStatus(mContext) == NO_CONNECT)
-							break;
-						
-						FeedHandler handler = new FeedHandler(
-								mContext.getContentResolver(), pref_max_valid_size);
-						
-						publishProgress(subscription.title);
-						
-						add_num = handler.update(subscription);
-						if ((add_num > 0) && (subscription.auto_download > 0))
-							do_download(false, mContext);
-
-						subscription = findSubscription(mContext);
-
-					}
-					/*
-					int add_num;
-					Subscription sub = findSubscription(mContext);
-					while (sub != null) {
-						if (updateConnectStatus(mContext) == NO_CONNECT)
-							break;
-						FeedHandler handler = new FeedHandler(
-								mContext.getContentResolver(), pref_max_valid_size);
-						publishProgress(sub.title);
-						/*Toast.makeText(context,
-								"Updating: " + sub.title,
-								Toast.LENGTH_LONG).show();*
-						add_num = handler.update(sub);
-						if ((add_num > 0) && (sub.auto_download > 0))
-							do_download(false, mContext);
-
-						sub = findSubscription(mContext);
-					}
-					*/
-
-				} catch (Exception e) {
-					e.printStackTrace();
-				} finally {
-					mUpdateLock.release();
-				}
-	    	 return null;
-	     }
-
-	     
-	     protected void onProgressUpdate(String... title) {
-	    	 Toast.makeText(mContext, "Updating: " + title[0], Toast.LENGTH_LONG).show();
-	     }
-	 }
-
-
+	 
 	protected void do_download(boolean show, final Context context) {
 		if (SDCardMgr.getSDCardStatusAndCreate() == false) {
 
@@ -186,12 +149,14 @@ public class PodcastDownloadManager {
 
 		populateDownloadQueue();
 
+		new DownloadPodcast(context).execute();
+		/*
 		new Thread() {
 			public void run() {
 				try {
 					while ((updateConnectStatus(context) & pref_connection_sel) > 0) {
 
-						mDownloadingItem = getDownloadItem();
+						mDownloadingItem = getNextItem();
 
 						if (mDownloadingItem == null) {
 							break;
@@ -225,6 +190,7 @@ public class PodcastDownloadManager {
 			}
 
 		}.start();
+		*/
 	}
 
 	private void deleteExpireFile(Context context, Cursor cursor) {
@@ -387,7 +353,7 @@ public class PodcastDownloadManager {
 		return mDownloadingItem;
 	}
 	
-	private FeedItem getDownloadItem() {
+	private FeedItem getNextItem() {
 		return mDownloadQueue.poll();
 	}
 	
@@ -397,5 +363,118 @@ public class PodcastDownloadManager {
 		// should we start downloading now?
 	}
 	
+	private class UpdateSubscriptions extends AsyncTask<Void, String, Void> {
+		 Context mContext;
+		 
+		 public UpdateSubscriptions(Context context) {
+		        mContext = context;
+		    } 
+		 
+	     protected Void doInBackground(Void... params) {
+				try {					
+					Cursor subscriptionCursor = Subscription.allAsCursor(mContext.getContentResolver());
+					while (subscriptionCursor.moveToNext()) {
+						int add_num;
+						Subscription subscription = Subscription.getByCursor(subscriptionCursor);
+						
+						if (updateConnectStatus(mContext) == NO_CONNECT)
+							break;
+						
+						FeedHandler handler = new FeedHandler(
+								mContext.getContentResolver(), pref_max_valid_size);
+						
+						publishProgress(subscription.title);
+						
+						add_num = handler.update(subscription);
+						if ((add_num > 0) && (subscription.auto_download > 0))
+							do_download(false, mContext);
 
+						subscription = findSubscription(mContext);
+
+					}
+					/*
+					int add_num;
+					Subscription sub = findSubscription(mContext);
+					while (sub != null) {
+						if (updateConnectStatus(mContext) == NO_CONNECT)
+							break;
+						FeedHandler handler = new FeedHandler(
+								mContext.getContentResolver(), pref_max_valid_size);
+						publishProgress(sub.title);
+						/*Toast.makeText(context,
+								"Updating: " + sub.title,
+								Toast.LENGTH_LONG).show();*
+						add_num = handler.update(sub);
+						if ((add_num > 0) && (sub.auto_download > 0))
+							do_download(false, mContext);
+
+						sub = findSubscription(mContext);
+					}
+					*/
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				} finally {
+					mUpdateLock.release();
+				}
+	    	 return null;
+	     }
+
+	     
+	     protected void onProgressUpdate(String... title) {
+	    	 Toast.makeText(mContext, "Updating: " + title[0], Toast.LENGTH_LONG).show();
+	     }
+	 }
+	
+	
+	private class DownloadPodcast extends AsyncTask<Void, String, Void> {
+		 Context mContext;
+		 
+		 public DownloadPodcast(Context context) {
+		        mContext = context;
+		    } 
+		 
+	     protected Void doInBackground(Void... params) {
+				try {
+					while ((updateConnectStatus(mContext) & pref_connection_sel) > 0) {
+
+						mDownloadingItem = getNextItem();
+
+						if (mDownloadingItem == null) {
+							break;
+						}
+
+						try {
+							// mDownloadingItem.startDownload(getContentResolver());
+							FeedFetcher fetcher = new FeedFetcher();
+
+							fetcher.download(mDownloadingItem, mContext.getContentResolver());
+
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+
+						log.debug(mDownloadingItem.title + "  "
+								+ mDownloadingItem.length + "  "
+								+ mDownloadingItem.offset);
+
+						mDownloadingItem.endDownload(mContext.getContentResolver());
+
+					}
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				} finally {
+					mDownloadingItem = null;
+					mDownloadLock.release();
+				}
+
+	    	 
+	    	 return null;
+	     }
+	     
+	     protected void onProgressUpdate(String... title) {
+	    	 //Toast.makeText(mContext, "Updating: " + title[0], Toast.LENGTH_LONG).show();
+	     }
+	 }
 }
