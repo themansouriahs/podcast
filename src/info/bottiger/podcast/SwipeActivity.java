@@ -23,6 +23,7 @@ import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Debug;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -51,6 +52,8 @@ public class SwipeActivity extends FragmentActivity implements
 	protected boolean mInit = false;
 	protected final Log log = Log.getLog(getClass());
 	protected static ComponentName mService = null;
+	
+	private boolean debugging = true;
 
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -74,19 +77,21 @@ public class SwipeActivity extends FragmentActivity implements
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			mServiceBinder = ((PodcastService.PodcastBinder) service)
 					.getService();
-			mServiceBinder.start_update();
-			// log.debug("onServiceConnected");
+			//mServiceBinder.start_update();
+			//log.debug("onServiceConnected");
 		}
 
 		public void onServiceDisconnected(ComponentName className) {
 			mServiceBinder = null;
-			// log.debug("onServiceDisconnected");
+			//log.debug("onServiceDisconnected");
 		}
 	};
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		if (debugging) Debug.startMethodTracing("calc");
 
 		startService(new Intent(this, PodcastService.class));
 		startService(new Intent(this, PlayerService.class));
@@ -111,6 +116,10 @@ public class SwipeActivity extends FragmentActivity implements
 			agr.getSubscriptionsFromReader();
 		}
 
+	}
+	
+	protected void onPause() {
+		if (debugging) Debug.stopMethodTracing();
 	}
 
 	@Override

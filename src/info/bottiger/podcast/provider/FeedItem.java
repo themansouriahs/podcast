@@ -8,7 +8,7 @@ import info.bottiger.podcast.PodcastBaseActivity;
 import info.bottiger.podcast.service.PodcastService;
 import info.bottiger.podcast.utils.FileUtils;
 import info.bottiger.podcast.utils.Log;
-import info.bottiger.podcast.utils.SDCardMgr;
+import info.bottiger.podcast.utils.SDCardManager;
 
 import java.io.File;
 import java.text.ParseException;
@@ -431,7 +431,7 @@ public class FeedItem implements Comparable<FeedItem> {
 
 	public void export(Activity act) {
 		String filename = FileUtils.get_export_file_name(this.title, this.id);
-		filename = SDCardMgr.getExportDir()+"/"+filename;
+		filename = SDCardManager.getExportDir()+"/"+filename;
 		log.error(filename);   			
 			 Toast.makeText(act, "Please wait... ", 
 				 Toast.LENGTH_LONG).show();  
@@ -561,7 +561,7 @@ public class FeedItem implements Comparable<FeedItem> {
 			update(contentResolver);	
 		}
 
-		if (SDCardMgr.getSDCardStatus()) {
+		if (SDCardManager.getSDCardStatus()) {
 			try {
 				File file = new File(pathname);
 				
@@ -604,7 +604,7 @@ public class FeedItem implements Comparable<FeedItem> {
 			String filename = resource.substring(resource.lastIndexOf("/")+1);  
 			
 			//pathname = SDCardMgr.getDownloadDir() + "/podcast_" + id + ".mp3";
-			pathname = SDCardMgr.getDownloadDir() + "/" + this.sub_id + "_" + filename + ".mp3";
+			pathname = SDCardManager.getDownloadDir() + "/" + this.sub_id + "_" + filename + ".mp3";
 		}
 		status = ItemColumns.ITEM_STATUS_DOWNLOADING_NOW;
 		update(context);

@@ -1,5 +1,7 @@
 package info.bottiger.podcast.utils;
 
+import java.util.HashMap;
+
 import android.content.Context;
 import android.os.AsyncTask;
 import android.widget.TextView;
@@ -9,24 +11,25 @@ import info.bottiger.podcast.service.PodcastDownloadManager;
 
 public class FilesizeUpdater {
 
-	private FeedItem item;
-	private TextView tv;
+	private static HashMap<Long, TextView> viewTable = new HashMap<Long, TextView>();
 	
-	public FilesizeUpdater(FeedItem item, TextView tv) {
-		this.item = item;
-		this.tv = tv;
-		this.updateTextView();
+	public static void put(Context context, long itemID, TextView tv) {
+		FeedItem item = FeedItem.getById(context.getContentResolver(), itemID);
+		viewTable.put(item.id, tv);
 	}
 	
-
-	public FilesizeUpdater(Context context, long itemID, TextView tv) {
-		this.item = FeedItem.getById(context.getContentResolver(), itemID);
-		this.tv = tv;
-		this.updateTextView();
+	public static void put(FeedItem item, TextView tv) {
+		viewTable.put(item.id, tv);
+	}
+	
+	public static TextView get(FeedItem item) {
+		TextView tv = viewTable.get(item.id);
+		return tv;
 	}
 	
 	private void updateTextView() {
-		new TextViewUpdater(this.item, this.tv).execute();
+		
+		//new TextViewUpdater(this.item, this.tv).execute();
 	}
 	
 
@@ -42,8 +45,10 @@ public class FilesizeUpdater {
 	     protected Void doInBackground(Void... params) {
 	    	 PodcastDownloadManager.DownloadStatus status = PodcastDownloadManager.getStatus(this.mFeedItem);
 	    	 
-	    	 while (status == PodcastDownloadManager.DownloadStatus.DOWNLOADING) {
+	    	 while (status == PodcastDownloadManager.DownloadStatus.DOWNLOADING || 
+	    			status == PodcastDownloadManager.DownloadStatus.PENDING) {
 	    		 Long chunkFileSize = this.mFeedItem.chunkFilesize;
+	    		 
 	    		 try {
 	    			 publishProgress(chunkFileSize.toString());
 	    		 } catch(NullPointerException e) {
@@ -62,7 +67,10 @@ public class FilesizeUpdater {
 	     }
 	     
 	     protected void onProgressUpdate(String... filesize) {
-	    	 this.mTextView.setText(filesize[0] + "MB");
+	    	 if (mFeedItem.isDownloaded())
+	    		 this.mTextView.setText(filesize[0] + "MB");
+	    	 else
+	    		 this.mTextView.setText("waiting");
 	     }
 	 }
 }

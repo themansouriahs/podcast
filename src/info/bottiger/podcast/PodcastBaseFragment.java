@@ -4,6 +4,7 @@ import info.bottiger.podcast.R;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.service.PlayerService;
 import info.bottiger.podcast.service.PodcastService;
+import info.bottiger.podcast.utils.FilesizeUpdater;
 import info.bottiger.podcast.utils.Log;
 import info.bottiger.podcast.utils.StrUtils;
 
@@ -55,8 +56,9 @@ public class PodcastBaseFragment extends ListFragment {
 	private long mLastSeekEventTime;
 	private boolean mFromTouch;
 
-	private static final int REFRESH = 1;
-	private static final int PLAYITEM = 2;
+	public static final int REFRESH = 1;
+	public static final int PLAYITEM = 2;
+	public static final int UPDATE_FILESIZE = 3;
 
 	private boolean mShow = true;
 
@@ -224,16 +226,23 @@ public class PodcastBaseFragment extends ListFragment {
 				Context.BIND_AUTO_CREATE);
 	}
 
-	private final Handler mHandler = new Handler() {
+	public static final Handler mHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
-			case REFRESH:
-				long next = refreshNow();
-				queueNextRefresh(next);
-				// log.debug("REFRESH: "+next);
-				break;
+			//case REFRESH:
+			//	long next = refreshNow();
+			//	queueNextRefresh(next);
+			//	// log.debug("REFRESH: "+next);
+			//	break;
 
+			case UPDATE_FILESIZE:
+				FeedItem item = (FeedItem)msg.obj;
+				TextView tv = FilesizeUpdater.get(item);
+				if (tv != null)
+					tv.setText(Math.round(item.chunkFilesize * 100.0 / 1024 / 1024)/100.0 + " MB");
+				break;
+				
 			default:
 				break;
 			}

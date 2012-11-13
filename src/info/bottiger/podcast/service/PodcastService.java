@@ -12,7 +12,7 @@ import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.provider.SubscriptionColumns;
 import info.bottiger.podcast.utils.LockHandler;
 import info.bottiger.podcast.utils.Log;
-import info.bottiger.podcast.utils.SDCardMgr;
+import info.bottiger.podcast.utils.SDCardManager;
 
 import android.app.Service;
 import android.content.ContentResolver;
@@ -99,7 +99,7 @@ public class PodcastService extends Service {
 		// Podcast service onCreate()
 		super.onCreate();
 		//updateSetting(); //removed - not sure if I should
-		SDCardMgr.getSDCardStatusAndCreate();
+		SDCardManager.getSDCardStatusAndCreate();
 		
 		// old Alarm way
 		//triggerNextTimer(1);
@@ -176,7 +176,7 @@ public class PodcastService extends Service {
 		pref_max_valid_size = Integer.parseInt(pref.getString(
 				"pref_max_new_items", "10"));
 	}
-
+	
 	public void downloadItem(ContentResolver context, FeedItem item) {
 		item.prepareDownload(context);
 		pdm.addItemToQueue(item);

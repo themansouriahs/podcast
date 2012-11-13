@@ -3,7 +3,7 @@ package info.bottiger.podcast.utils;
 import java.io.File;
 import android.os.Environment;
 
-public class SDCardMgr {
+public class SDCardManager {
 
 	public static String SDCARD_DIR = "/sdcard"; 
 	public static final String APP_DIR = "/bottiger.podcast";

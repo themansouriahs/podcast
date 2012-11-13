@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import info.bottiger.podcast.PlayerActivity;
 import info.bottiger.podcast.PodcastBaseFragment;
 import info.bottiger.podcast.R;
 import info.bottiger.podcast.RecentItemFragment;
@@ -210,10 +211,15 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 			TextView timeSlash = (TextView)v.findViewById(R.id.time_slash);
 			timeSlash.setText("/");
 			timeSlash.setVisibility(View.VISIBLE);
+			
 			TextView currentTime = (TextView)v.findViewById(R.id.current_position);
-			currentTime.setText("00:00");
+			currentTime.setText(StrUtils.formatTime(feedItem));
+			
+			SeekBar sb = (SeekBar)playerView.findViewById(R.id.progress);
+			
+			PlayerActivity.setProgressBar(sb, feedItem);
 
-			ControlButtons.setPlayerListeners(playerView, itemID);
+			ControlButtons.setPlayerListeners(v, playerView, itemID);
 
 			if (feedItem.isDownloaded()) {
 				ImageButton downloadButton = (ImageButton) playerView.findViewById(R.id.download);
@@ -228,7 +234,7 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 							.findViewById(R.id.play_toggle);
 						playPauseButton.setImageResource(R.drawable.pause);
 						
-						SeekBar sb = (SeekBar) v.findViewById(R.id.progress); 
+						//SeekBar sb = (SeekBar) v.findViewById(R.id.progress); 
 						TextView tv = (TextView) v.findViewById(R.id.current_position); 
 						mFragment.setProgressBar(sb);
 						mFragment.setCurrentTime(tv);
@@ -303,16 +309,21 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 
 		int durationIndex = cursor.getColumnIndex(ItemColumns.DURATION);
 		int offsetIndex = cursor.getColumnIndex(ItemColumns.OFFSET);
+		int lengthIndex = cursor.getColumnIndex(ItemColumns.LENGTH);
 
 		int statusIndex = cursor.getColumnIndex(ItemColumns.STATUS);
 		
 		PodcastDownloadManager.DownloadStatus ds = PodcastDownloadManager.getStatus(FeedItem.getById(context.getContentResolver(), id));
 		writeStatus(id, holder.textViewFileSize, ds);
 		
+
+		int filesize = 0;
+		
 		try {
 			int filesizeIndex = cursor
 					.getColumnIndexOrThrow(ItemColumns.FILESIZE);
-			int filesize = cursor.getInt(filesizeIndex);
+			filesize = cursor.getInt(filesizeIndex);
+			
 			if (filesize > 0)
 				holder.textViewFileSize.setText(filesize / 1024 / 1024 + " MB");
 		} catch (IllegalArgumentException e) {
@@ -324,7 +335,6 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 		if (durationIndex > 0) {
 			String duration = cursor.getString(durationIndex);
 			int offset = cursor.getInt(offsetIndex);
-			int status = cursor.getInt(statusIndex);
 
 			holder.textViewDuration.setText(duration);
 
@@ -332,8 +342,8 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 			// {
 
 			// if (status != ItemColumns.ITEM_STATUS_PLAYING_NOW) {
-			if (offset > 0) {
-				String offsetText = StrUtils.formatTime(offset);
+			if (offset > 0 && filesize > 0) {
+				String offsetText = StrUtils.formatTime((float)offset/(float)filesize, duration);
 				holder.textViewCurrentTime.setText(offsetText);
 				holder.textViewSlash.setText("/");
 				holder.textViewSlash.setVisibility(View.VISIBLE);
@@ -400,7 +410,7 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 			statusText = "waiting";
 			break;
 		case DOWNLOADING:
-			FilesizeUpdater fsu = new FilesizeUpdater(mContext, id, tv);
+			FilesizeUpdater.put(mContext, id, tv);
 			statusText = "downloading";
 			break;
 		case DONE:

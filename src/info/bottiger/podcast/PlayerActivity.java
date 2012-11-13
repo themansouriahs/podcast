@@ -91,7 +91,7 @@ public class PlayerActivity   extends HapiListActivity
 
 	private TextView mCurrentTime;
 	private TextView mTotalTime;	
-	private ProgressBar mProgress;
+	private SeekBar mProgress;
 	
 	private static final String[] PROJECTION = new String[] {
 		ItemColumns._ID, // 0
@@ -205,47 +205,53 @@ public class PlayerActivity   extends HapiListActivity
         	if(mServiceBinder.isInitialized()==false){
                 mCurrentTime.setVisibility(View.INVISIBLE);
                 mTotalTime.setVisibility(View.INVISIBLE);
-                mProgress.setProgress(0);
                 return 500;
         	}
         	long pos = mServiceBinder.position();
         	long duration = mServiceBinder.duration();
             
-        	if (mServiceBinder.getCurrentItem().chunkFilesize > 0) {
-        		mProgress.setSecondaryProgress(50);
-        	}
-            
-        	//mTotalTime.setVisibility(View.VISIBLE);
-            //mTotalTime.setText(formatTime( duration ));
-            
         	if(mServiceBinder.isPlaying() == false) {
                 mCurrentTime.setVisibility(View.VISIBLE);
                 mCurrentTime.setText(StrUtils.formatTime( pos ));
 
-                mProgress.setProgress((int) (1000 * pos / duration));
                 return 500;
         	}
         	
             long remaining = 1000 - (pos % 1000);
+            
             if ((pos >= 0) && (duration > 0)) {
                 mCurrentTime.setText(StrUtils.formatTime( pos ));
                 
                 if (mServiceBinder.isInitialized()) {
                     mCurrentTime.setVisibility(View.VISIBLE);
-                    //mTotalTime.setVisibility(View.VISIBLE);
                 } 
 
-                mProgress.setProgress((int) (1000 * pos / mServiceBinder.duration()));
-            } else {
-                mCurrentTime.setText("--:--");
-                mProgress.setProgress(1000);
+                //mProgress.setProgress((int) (1000 * pos / mServiceBinder.duration()));
             }
+            
+            setProgressBar(mProgress, mServiceBinder);
 
             return remaining;
         } catch (Exception ex) {
         }
         return 500;
     }    
+    
+    private void setProgressBar(SeekBar progressBar, PlayerService playerService) {
+    	FeedItem item = playerService.getCurrentItem();
+    	long secondary = item.isDownloaded() ? item.length : (item.chunkFilesize / item.filesize);
+    	setProgressBar(progressBar, playerService.duration(), mServiceBinder.position(), secondary);
+    }
+    
+    public static void setProgressBar(SeekBar progressBar, FeedItem item) {
+    	long secondary = item.isDownloaded() ? item.length : (item.chunkFilesize / item.filesize);
+    	setProgressBar(progressBar, item.length, item.offset, secondary);
+    }
+    
+    private static void setProgressBar(SeekBar progressBar, long duration, long progress, long secondary) {
+    	progressBar.setProgress((int) (progressBar.getMax() * progress / duration));
+    	progressBar.setSecondaryProgress((int) (progressBar.getMax() * secondary / duration));
+    }
     
     private final Handler mHandler = new Handler() {
         @Override
@@ -415,7 +421,7 @@ public class PlayerActivity   extends HapiListActivity
         mNextButton.requestFocus();
         mNextButton.setOnClickListener(mNextListener);        
         
-        mProgress = (ProgressBar) findViewById(android.R.id.progress);
+        mProgress = (SeekBar) findViewById(android.R.id.progress);
         
         if (mProgress instanceof SeekBar) {
             SeekBar seeker = (SeekBar) mProgress;

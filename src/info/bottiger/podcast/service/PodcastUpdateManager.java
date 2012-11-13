@@ -9,7 +9,7 @@ import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.provider.SubscriptionColumns;
 import info.bottiger.podcast.utils.LockHandler;
 import info.bottiger.podcast.utils.Log;
-import info.bottiger.podcast.utils.SDCardMgr;
+import info.bottiger.podcast.utils.SDCardManager;
 
 import java.util.PriorityQueue;
 

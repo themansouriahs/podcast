@@ -15,7 +15,7 @@ import info.bottiger.podcast.provider.SubscriptionColumns;
 import info.bottiger.podcast.utils.DownloadStatus;
 import info.bottiger.podcast.utils.LockHandler;
 import info.bottiger.podcast.utils.Log;
-import info.bottiger.podcast.utils.SDCardMgr;
+import info.bottiger.podcast.utils.SDCardManager;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
@@ -127,7 +127,7 @@ public class PodcastDownloadManager {
 
 	 
 	protected void do_download(boolean show, final Context context) {
-		if (SDCardMgr.getSDCardStatusAndCreate() == false) {
+		if (SDCardManager.getSDCardStatusAndCreate() == false) {
 
 			if (show)
 				Toast.makeText(context,
@@ -144,8 +144,11 @@ public class PodcastDownloadManager {
 			return;
 		}
 
-		if (mDownloadLock.locked() == false)
+		if (mDownloadLock.locked() == false) {
+			int i = 5;
+			i = i+6;
 			return;
+		}
 
 		populateDownloadQueue();
 
@@ -223,7 +226,7 @@ public class PodcastDownloadManager {
 			e.printStackTrace();
 		}
 
-		if (SDCardMgr.getSDCardStatus() == false) {
+		if (SDCardManager.getSDCardStatus() == false) {
 			return;
 		}
 
@@ -447,7 +450,6 @@ public class PodcastDownloadManager {
 						try {
 							// mDownloadingItem.startDownload(getContentResolver());
 							FeedFetcher fetcher = new FeedFetcher();
-
 							fetcher.download(mDownloadingItem, mContext.getContentResolver());
 
 						} catch (Exception e) {

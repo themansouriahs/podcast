@@ -1,5 +1,6 @@
 package info.bottiger.podcast.fetcher;
 
+import info.bottiger.podcast.PodcastBaseFragment;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.utils.Log;
@@ -14,6 +15,9 @@ import java.util.Properties;
 import java.util.zip.GZIPInputStream;
 
 import android.content.ContentResolver;
+import android.content.Context;
+import android.os.AsyncTask;
+import android.os.Message;
 
 public class FeedFetcher {
 
@@ -192,7 +196,9 @@ public class FeedFetcher {
 	
 
 	public int download(FeedItem item, ContentResolver contentResolver) {
-		String pathname = item.pathname;
+		new DownloadFile(contentResolver, item).execute();
+		return 0;
+/*		String pathname = item.pathname;
 
 		int nStartPos = item.offset;
 
@@ -286,7 +292,131 @@ public class FeedFetcher {
 		}
 
 		return 0;
-
+*/
 	}
+	
+
+	private class DownloadFile extends AsyncTask<Void, Long, Integer> {
+		 ContentResolver mContentResolver;
+		 FeedItem mFeedItem;
+		 
+		 public DownloadFile(ContentResolver contentResolver, FeedItem feedItem) {
+		        mContentResolver = contentResolver;
+		        mFeedItem = feedItem;
+		    } 
+		 
+	     protected Integer doInBackground(Void... params) {
+	 		String pathname = mFeedItem.pathname;
+
+			int nStartPos = mFeedItem.offset;
+			nStartPos = 0;
+
+			RandomAccessFile oSavedFile = null;
+			InputStream input = null;
+			HttpURLConnection httpConnection = null;
+			try {
+				URL url = new URL(mFeedItem.resource);
+				log.debug("url = " + url);
+				oSavedFile = new RandomAccessFile(pathname, "rw");
+
+				httpConnection = (HttpURLConnection) url.openConnection();
+				httpConnection.setReadTimeout(TIMEOUT);
+				httpConnection.setConnectTimeout(TIMEOUT);
+				httpConnection
+						.setRequestProperty("User-Agent", "Internet Explorer");
+				if (mFeedItem.offset != 0) {
+					String sProperty = "bytes=" + mFeedItem.offset + "-";
+					httpConnection.setRequestProperty("RANGE", sProperty);
+					System.out.println(sProperty);
+					oSavedFile.seek(mFeedItem.offset);
+				}
+
+				int responseCode = httpConnection.getResponseCode();
+				mFeedItem.filesize = httpConnection.getContentLength();
+				
+				log.debug("Error Code : " + responseCode);
+				if (responseCode >= 500) {
+					mFeedItem.offset = 0;
+					throw new IOException("Error Code : " + responseCode);
+				} else if (responseCode >= 400) {
+					throw new IOException("Error Code : " + responseCode);
+				}
+
+				long nEndPos = mFeedItem.length;
+				//if (mFeedItem.offset == 0) {
+				if (true) {
+
+					nEndPos = httpConnection.getContentLength();
+					if (nEndPos < 0) {
+						log.warn("Cannot get content length: " + nEndPos);
+
+						throw new IOException("Cannot get content length: "
+								+ nEndPos);
+					}
+					mFeedItem.length = nEndPos;
+				}
+				log.debug("nEndPos = " + nEndPos);
+
+				input = httpConnection.getInputStream();
+				int buff_size = 1024 * 4;
+				byte[] b = new byte[buff_size];
+				int nRead = 0;
+				long lastUpdate = System.currentTimeMillis();
+
+				while ((nRead = input.read(b, 0, buff_size)) > 0
+						&& nStartPos < nEndPos) {
+	                                if(mFeedItem.offset == 0) {
+	                                    if(!isAudioFile(b, nRead, mFeedItem.type)){
+	                                        log.debug("giving up on non-audio file");
+	                                        break;
+	                                    }
+	                                }
+					oSavedFile.write(b, 0, nRead);
+					nStartPos += nRead;
+					mFeedItem.offset = nStartPos;
+					mFeedItem.chunkFilesize = nStartPos;
+					
+					// Only update progress once a second at most
+					if (lastUpdate + 1000 < System.currentTimeMillis())
+						publishProgress(new Long(nStartPos));
+				}
+				if (nStartPos >= nEndPos)
+					mFeedItem.downloadSuccess(mContentResolver);
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+
+				try {
+					if (httpConnection != null)
+						httpConnection.disconnect();
+				} catch (Exception e) {
+				}
+
+				try {
+					if (input != null)
+						input.close();
+				} catch (Exception e) {
+				}
+
+				try {
+					if (oSavedFile != null)
+						oSavedFile.close();
+				} catch (Exception e) {
+				}
+
+			}
+
+			return 0;
+
+//	    	 return null;
+	     }
+	     
+	     protected void onProgressUpdate(Long... chunkSize) {
+	    	 Message msg = new Message();
+	    	 msg.what = PodcastBaseFragment.UPDATE_FILESIZE;
+	    	 msg.obj = this.mFeedItem;
+	    	 PodcastBaseFragment.mHandler.sendMessage(msg);
+	     }
+	 }
 
 }

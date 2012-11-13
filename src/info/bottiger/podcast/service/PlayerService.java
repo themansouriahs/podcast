@@ -10,7 +10,7 @@ import info.bottiger.podcast.R;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.utils.Log;
-import info.bottiger.podcast.utils.SDCardMgr;
+import info.bottiger.podcast.utils.SDCardManager;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -368,7 +368,7 @@ public class PlayerService extends Service {
     }	
 	
 	public void play(long id) {
-		if(SDCardMgr.getSDCardStatus()==false){
+		if(SDCardManager.getSDCardStatus()==false){
 			Toast.makeText(this, getResources().getString(R.string.sdcard_unmout), Toast.LENGTH_LONG).show();
 			return;
 		}
@@ -388,20 +388,10 @@ public class PlayerService extends Service {
 		}
 		
 		mItem = FeedItem.getById(getContentResolver(), id);
-		if(mItem==null){
-			return;
-		}
 		
+		if(mItem==null) return;
 		
-		File file = new File(mItem.pathname);
-		String dataSource;
-		if (file.exists()) {
-			dataSource = mItem.pathname;
-			//Toast.makeText(this, getResources().getString(R.string.audio_no_found), Toast.LENGTH_LONG).show();	
-			//return;
-		} else {
-			dataSource = mItem.getURL();
-		}
+		String dataSource = mItem.isDownloaded() ? mItem.pathname : mItem.getURL();
 		
 		mPlayer.setDataSource(dataSource);
 		int offset = mItem.offset < 0 ? 0: mItem.offset;

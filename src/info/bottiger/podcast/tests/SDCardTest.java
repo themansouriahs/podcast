@@ -17,20 +17,20 @@
 package info.bottiger.podcast.tests;
 
 import junit.framework.TestCase;
-import info.bottiger.podcast.utils.SDCardMgr;
+import info.bottiger.podcast.utils.SDCardManager;
 
 
 public class SDCardTest extends TestCase {
 
     public void testAppDir() throws Exception {
-        assertTrue(SDCardMgr.getAppDir().equals("/mnt/sdcard/xuluan.podcast"));
+        assertTrue(SDCardManager.getAppDir().equals("/mnt/sdcard/xuluan.podcast"));
     }
 
     public void testDownloadDir() throws Exception {
-        assertTrue(SDCardMgr.getDownloadDir().equals("/mnt/sdcard/xuluan.podcast/download"));
+        assertTrue(SDCardManager.getDownloadDir().equals("/mnt/sdcard/xuluan.podcast/download"));
     }
     
     public void testSDCardStatus() throws Exception {
-        assertTrue(SDCardMgr.getSDCardStatus());
+        assertTrue(SDCardManager.getSDCardStatus());
     }    
 }

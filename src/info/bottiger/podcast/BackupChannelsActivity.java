@@ -6,7 +6,7 @@ import info.bottiger.podcast.parser.OPMLParserHandler;
 import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.provider.SubscriptionColumns;
 import info.bottiger.podcast.utils.Log;
-import info.bottiger.podcast.utils.SDCardMgr;
+import info.bottiger.podcast.utils.SDCardManager;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -92,11 +92,11 @@ public class BackupChannelsActivity extends HapiActivity {
 	
 	private boolean pre_dir_handle()
 	{
-    	if(SDCardMgr.getSDCardStatusAndCreate()==false){
+    	if(SDCardManager.getSDCardStatusAndCreate()==false){
     		return false;
     	}
     	
-		File file = new File(SDCardMgr.getAppDir());
+		File file = new File(SDCardManager.getAppDir());
 		
 		boolean exists = (file.exists());
 		if (exists==false) {
@@ -113,7 +113,7 @@ public class BackupChannelsActivity extends HapiActivity {
     		return;   		
     	}
     	
-        File directory = new File(SDCardMgr.getAppDir());
+        File directory = new File(SDCardManager.getAppDir());
         final File[] filesArray = directory.listFiles(new MyFileFilter());
         
         if(filesArray == null){
@@ -173,7 +173,7 @@ public class BackupChannelsActivity extends HapiActivity {
 			
         }else{
 		 Toast.makeText(BackupChannelsActivity.this, " No OPML file found. \n  Please copy OPML file to the directory:\n"
-				 + SDCardMgr.getAppDir()+"\n", Toast.LENGTH_LONG).show();	
+				 + SDCardManager.getAppDir()+"\n", Toast.LENGTH_LONG).show();	
 		}
     	
     }
@@ -242,7 +242,7 @@ public class BackupChannelsActivity extends HapiActivity {
 
             FileOutputStream fileOutputStream = null;
             try {
-                File writeFile = new File(SDCardMgr.getAppDir(), OPML_FILE);
+                File writeFile = new File(SDCardManager.getAppDir(), OPML_FILE);
                 fileOutputStream = new FileOutputStream(writeFile);
 
                 fileOutputStream.write(xml.getBytes());
@@ -250,7 +250,7 @@ public class BackupChannelsActivity extends HapiActivity {
         		
         		new AlertDialog.Builder(this)
                 .setTitle("Success")
-                .setMessage("Export to : "+ SDCardMgr.getAppDir() + "/" + OPML_FILE)
+                .setMessage("Export to : "+ SDCardManager.getAppDir() + "/" + OPML_FILE)
                 .setPositiveButton(R.string.menu_ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                        }

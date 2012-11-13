@@ -90,8 +90,8 @@ public class ControlButtons {
             		viewHolder.downloadButton.setContentDescription("Download");
             	} else {
             		// Download file
+            		FilesizeUpdater.put(fragment.getActivity(), item.id, viewHolder.filesize);
             		podcastServiceConnection.downloadItem(fragment.getActivity().getContentResolver(), item);
-            		new FilesizeUpdater(fragment.getActivity(), item.id, viewHolder.filesize);
             		viewHolder.downloadButton.setImageResource(R.drawable.trash);
             		viewHolder.downloadButton.setContentDescription("Trash");
             	}
@@ -109,26 +109,40 @@ public class ControlButtons {
         viewHolder.seekbar.setMax(1000); 
 	}
     
-	public static void setPlayerListeners(View view, long id) {
+	public static void setPlayerListeners(View listView, View playerView, long id) {
+
+		ControlButtons.Holder viewHolder = new ControlButtons.Holder();
+		viewHolder.currentTime = (TextView) playerView.findViewById(R.id.current_position);
 		
+		viewHolder.playPauseButton = (ImageButton) playerView.findViewById(R.id.play_toggle);
+		viewHolder.stopButton = (ImageButton) playerView.findViewById(R.id.stop);
+		viewHolder.infoButton = (ImageButton) playerView.findViewById(R.id.info);
+		viewHolder.downloadButton = (ImageButton) playerView.findViewById(R.id.download);
+		viewHolder.queueButton = (ImageButton) playerView.findViewById(R.id.queue);
+		viewHolder.seekbar = (SeekBar) playerView.findViewById(R.id.progress);
+		viewHolder.currentTime = (TextView) listView.findViewById(R.id.current_position);
+		viewHolder.duration = (TextView) listView.findViewById(R.id.duration);
+		viewHolder.filesize = (TextView) listView.findViewById(R.id.filesize);
+		
+		ControlButtons.setListener(SwipeActivity.mServiceBinder, viewHolder, id);
+	}
+	
+	public static void setPlayerListeners(View playerView, long id) {
 		//View view = getChildByID(id);
 
 		ControlButtons.Holder viewHolder = new ControlButtons.Holder();
-		viewHolder.currentTime = (TextView) view.findViewById(R.id.current_position);
+		viewHolder.currentTime = (TextView) playerView.findViewById(R.id.current_position);
 		
 		
-		viewHolder.playPauseButton = (ImageButton) view.findViewById(R.id.play_toggle);
-		viewHolder.stopButton = (ImageButton) view.findViewById(R.id.stop);
-		viewHolder.infoButton = (ImageButton) view.findViewById(R.id.info);
-		viewHolder.downloadButton = (ImageButton) view.findViewById(R.id.download);
-		viewHolder.queueButton = (ImageButton) view.findViewById(R.id.queue);
-		viewHolder.currentTime = (TextView) view.findViewById(R.id.current_position);
-		viewHolder.duration = (TextView) view.findViewById(R.id.duration);
-		viewHolder.filesize = (TextView) view.findViewById(R.id.filesize);
-		viewHolder.seekbar = (SeekBar) view.findViewById(R.id.progress);
+		viewHolder.playPauseButton = (ImageButton) playerView.findViewById(R.id.play_toggle);
+		viewHolder.stopButton = (ImageButton) playerView.findViewById(R.id.stop);
+		viewHolder.infoButton = (ImageButton) playerView.findViewById(R.id.info);
+		viewHolder.downloadButton = (ImageButton) playerView.findViewById(R.id.download);
+		viewHolder.queueButton = (ImageButton) playerView.findViewById(R.id.queue);
+		viewHolder.seekbar = (SeekBar) playerView.findViewById(R.id.progress);
 		
 		ControlButtons.setListener(SwipeActivity.mServiceBinder, viewHolder, id);
-	
+			
 	}
 
 }
