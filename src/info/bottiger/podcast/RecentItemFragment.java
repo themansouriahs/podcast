@@ -241,12 +241,6 @@ public class RecentItemFragment extends PodcastBaseFragment {
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 
-		/*
-		if (!mPlayerServiceBinder.isPlaying()) {
-			mPlayerServiceBinder.play(id); 
-			mPlayerServiceBinder.start(); 
-		}
-		*/
 		mCurCheckID = id;
 		ListView list = getListView();
 		int start = list.getFirstVisiblePosition();
@@ -389,6 +383,10 @@ public class RecentItemFragment extends PodcastBaseFragment {
 
 	public String getWhere() {
 		String where = "";
+		
+		int foo = 56;
+		if (foo == 56)
+			return where;
 		//where = where + ItemColumns.STATUS + "<"
 		//		+ ItemColumns.ITEM_STATUS_MAX_PLAYLIST_VIEW;
 		switch ((int) pref_select) {

@@ -201,12 +201,9 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 			if (stub != null) {
 				stub.inflate();
 			}
-			// else {
+			
 			View playerView = v.findViewById(R.id.stub_player);
 			playerView.setVisibility(View.VISIBLE);
-			// SeekBar sb = (SeekBar) playerView.findViewById(R.id.progress);
-			// sb.setProgress((int) 20);
-			// }
 			
 			TextView timeSlash = (TextView)v.findViewById(R.id.time_slash);
 			timeSlash.setText("/");
@@ -216,6 +213,7 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 			currentTime.setText(StrUtils.formatTime(feedItem));
 			
 			SeekBar sb = (SeekBar)playerView.findViewById(R.id.progress);
+			sb.setMax(1000);
 			
 			PlayerActivity.setProgressBar(sb, feedItem);
 

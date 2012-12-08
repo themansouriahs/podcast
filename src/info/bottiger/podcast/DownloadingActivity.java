@@ -252,12 +252,12 @@ public class DownloadingActivity extends PodcastBaseActivity {
     			}
 
     			try {
-    				File file = new File(feed_item.pathname);
+    				File file = new File(feed_item.getPathname());
 
     				boolean deleted = file.delete();
 
     			} catch (Exception e) {
-    				log.warn("del file failed : " + feed_item.pathname + "  " + e);
+    				log.warn("del file failed : " + feed_item.getPathname() + "  " + e);
 
     			}
 

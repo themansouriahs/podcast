@@ -55,7 +55,7 @@ public class PodcastDownloadManager {
 	public long pref_item_expire = 0;
 	public long pref_download_file_expire = 0;
 	public long pref_played_file_expire = 0;
-	public int pref_max_valid_size = 0;
+	public int pref_max_valid_size = 20;
 	
 	public enum DownloadStatus {
 	    NOTHING, PENDING, DOWNLOADING, DONE, ERROR

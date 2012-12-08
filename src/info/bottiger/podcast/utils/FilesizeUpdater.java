@@ -37,6 +37,8 @@ public class FilesizeUpdater {
 		 TextView mTextView;
 		 FeedItem mFeedItem;
 		 
+		 private long lastUpdate = 0;
+		 
 		 public TextViewUpdater(FeedItem item, TextView tv) {
 			 this.mTextView = tv;
 			 this.mFeedItem = item;
@@ -67,9 +69,13 @@ public class FilesizeUpdater {
 	     }
 	     
 	     protected void onProgressUpdate(String... filesize) {
-	    	 if (mFeedItem.isDownloaded())
-	    		 this.mTextView.setText(filesize[0] + "MB");
-	    	 else
+	    	 if (mFeedItem.isDownloaded()) {
+	    		 long currentTime = System.currentTimeMillis();
+	    		 if (currentTime > lastUpdate + 1000) {
+	    			 this.mTextView.setText(filesize[0] + "MB");
+	    			 lastUpdate = currentTime;
+	    		 }
+	    	 } else
 	    		 this.mTextView.setText("waiting");
 	     }
 	 }

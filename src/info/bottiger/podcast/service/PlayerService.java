@@ -127,6 +127,7 @@ public class PlayerService extends Service {
                 mMediaPlayer.prepare();
             } catch (IOException ex) {
                 // TODO: notify the user why the file couldn't be opened
+            	ex.printStackTrace();
                 mIsInitialized = false;
                 return;
             } catch (IllegalArgumentException ex) {
@@ -391,7 +392,7 @@ public class PlayerService extends Service {
 		
 		if(mItem==null) return;
 		
-		String dataSource = mItem.isDownloaded() ? mItem.pathname : mItem.getURL();
+		String dataSource = mItem.isDownloaded() ? mItem.getPathname() : mItem.getURL();
 		
 		mPlayer.setDataSource(dataSource);
 		int offset = mItem.offset < 0 ? 0: mItem.offset;

@@ -47,16 +47,16 @@ public class FeedItemTest extends android.test.ProviderTestCase<PodcastProvider>
     public void testStartDownload() throws Exception {
     	FeedItem item = new FeedItem();
     	item.id = 1;
-    	item.pathname = "";
+    	//item.pathname = "";
     	item.prepareDownload(context);
         assertTrue(item.status==ItemColumns.ITEM_STATUS_DOWNLOADING_NOW);
-        assertTrue(item.pathname.equals("/mnt/sdcard/xuluan.podcast/download/podcast_1.mp3"));
+        assertTrue(item.getPathname().equals("/mnt/sdcard/xuluan.podcast/download/podcast_1.mp3"));
     }
     
     public void testEndDownload() throws Exception {
     	FeedItem item = new FeedItem();
     	item.id = 1;
-    	item.pathname = "";
+    	//item.pathname = "";
     	item.failcount = 2;
     	item.endDownload(context);
         assertTrue(item.status==ItemColumns.ITEM_STATUS_DOWNLOAD_QUEUE);
@@ -66,7 +66,7 @@ public class FeedItemTest extends android.test.ProviderTestCase<PodcastProvider>
     public void testEndDownloadPause() throws Exception {
     	FeedItem item = new FeedItem();
     	item.id = 1;
-    	item.pathname = "";
+    	//item.pathname = "";
     	item.failcount = 5;
     	item.endDownload(context);
         assertTrue(item.status==ItemColumns.ITEM_STATUS_DOWNLOAD_PAUSE);
@@ -76,7 +76,7 @@ public class FeedItemTest extends android.test.ProviderTestCase<PodcastProvider>
     public void testEndDownloadSuccess() throws Exception {
     	FeedItem item = new FeedItem();
     	item.id = 1;
-    	item.pathname = "";
+    	//item.pathname = "";
     	item.status = ItemColumns.ITEM_STATUS_NO_PLAY;
     	long update = Long.valueOf(System.currentTimeMillis());
     	item.endDownload(context);

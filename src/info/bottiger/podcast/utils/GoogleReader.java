@@ -230,11 +230,6 @@ public class GoogleReader {
 
 			try {
 				document = builder.parse(conn.getInputStream());
-			} catch (SAXException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
 
 			Element rootElement = document.getDocumentElement();
 
@@ -301,6 +296,14 @@ public class GoogleReader {
 				podcast.subscribe(GoogleReader.this.context.getContentResolver());
 				//podcast.subscribe(getContentResolver());
 				//contentService.addSubscription(podcast);
+			
+			}
+			
+			
+			} catch (SAXException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 
 			/*

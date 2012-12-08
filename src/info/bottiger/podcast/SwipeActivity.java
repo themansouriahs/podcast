@@ -1,5 +1,7 @@
 package info.bottiger.podcast;
 
+import com.bugsense.trace.BugSenseHandler;
+
 import info.bottiger.podcast.PodcastBaseFragment.OnItemSelectedListener;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.PodcastProvider;
@@ -91,6 +93,7 @@ public class SwipeActivity extends FragmentActivity implements
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
+		BugSenseHandler.initAndStartSession(SwipeActivity.this, "75981add");
 		if (debugging) Debug.startMethodTracing("calc");
 
 		startService(new Intent(this, PodcastService.class));
@@ -108,6 +111,7 @@ public class SwipeActivity extends FragmentActivity implements
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
 
+		try {
 		Account[] a = AccountManager.get(getApplicationContext())
 				.getAccountsByType("com.google");
 		if (a.length > 0) {
@@ -115,11 +119,20 @@ public class SwipeActivity extends FragmentActivity implements
 			agr.refreshAuthToken(SwipeActivity.this, a[0]);
 			agr.getSubscriptionsFromReader();
 		}
+		} catch(Exception e) {
+			
+		}
 
 	}
 	
 	protected void onPause() {
+		super.onPause();
 		if (debugging) Debug.stopMethodTracing();
+	}
+	
+	protected void onDestroy() {
+		super.onDestroy();
+		BugSenseHandler.closeSession(SwipeActivity.this);
 	}
 
 	@Override

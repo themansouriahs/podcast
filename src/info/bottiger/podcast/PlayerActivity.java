@@ -40,6 +40,7 @@ import info.bottiger.podcast.service.PlayerService;
 import info.bottiger.podcast.service.PodcastService;
 import info.bottiger.podcast.utils.DialogMenu;
 import info.bottiger.podcast.utils.Log;
+import info.bottiger.podcast.utils.PodcastProgressBar;
 import info.bottiger.podcast.utils.StrUtils;
 
 
@@ -91,7 +92,7 @@ public class PlayerActivity   extends HapiListActivity
 
 	private TextView mCurrentTime;
 	private TextView mTotalTime;	
-	private SeekBar mProgress;
+	private PodcastProgressBar mProgress;
 	
 	private static final String[] PROJECTION = new String[] {
 		ItemColumns._ID, // 0
@@ -125,46 +126,7 @@ public class PlayerActivity   extends HapiListActivity
 			//log.debug("onServiceDisconnected");
 		}
 	};	
-    
-    private long mLastSeekEventTime;
-    private boolean mFromTouch;
-    private OnSeekBarChangeListener mSeekListener = new OnSeekBarChangeListener() {
-        public void onStartTrackingTouch(SeekBar bar) {
-            mLastSeekEventTime = 0;
-            mFromTouch = true;
-            log.debug("mFromTouch = false; ");
-            
-        }
-        public void onProgressChanged(SeekBar bar, int progress, boolean fromuser) {
-            log.debug("onProgressChanged");
-       	
-            if (!fromuser || (mServiceBinder == null)) return;
-
-            long now = SystemClock.elapsedRealtime();
-            if ((now - mLastSeekEventTime) > 250) {
-                mLastSeekEventTime = now;
-                //mPosOverride = mp.duration * progress / 1000;
-                try {
-                	if(mServiceBinder.isInitialized())
-                		mServiceBinder.seek(mServiceBinder.duration() * progress / 1000);
-                } catch (Exception ex) {
-                }
-
-                if (!mFromTouch) {
-                    refreshNow();
-                    //mPosOverride = -1;
-                }
-            }
-            
-        }
-        
-        public void onStopTrackingTouch(SeekBar bar) {
-            //mPosOverride = -1;
-            mFromTouch = false;
-            log.debug("mFromTouch = false; ");
-
-        }
-    };  
+      
     
     private static final int REFRESH = 1;
     private static final int PLAYITEM = 2;
@@ -237,20 +199,38 @@ public class PlayerActivity   extends HapiListActivity
         return 500;
     }    
     
-    private void setProgressBar(SeekBar progressBar, PlayerService playerService) {
+    static void setProgressBar(SeekBar progressBar, PlayerService playerService) {
     	FeedItem item = playerService.getCurrentItem();
-    	long secondary = item.isDownloaded() ? item.length : (item.chunkFilesize / item.filesize);
-    	setProgressBar(progressBar, playerService.duration(), mServiceBinder.position(), secondary);
+    	long duration = playerService.duration();
+    	long position = playerService != null ? playerService.position() : 0;
+    	long secondary;
+    	
+    	if (item.isDownloaded())
+    		secondary = item.getCurrentFileSize();
+    	else
+    		secondary = (playerService.bufferProgress() * duration) / 100;
+    	setProgressBar(progressBar, duration, position, secondary);
     }
     
     public static void setProgressBar(SeekBar progressBar, FeedItem item) {
-    	long secondary = item.isDownloaded() ? item.length : (item.chunkFilesize / item.filesize);
-    	setProgressBar(progressBar, item.length, item.offset, secondary);
+    	if (item.getCurrentFileSize() == 0)
+    		return;
+    	long secondary = item.isDownloaded() ? item.getCurrentFileSize() : (item.chunkFilesize / item.filesize);
+    	long duration = item.getDuration();
+    	setProgressBar(progressBar, duration, item.offset, secondary);
     }
     
+    /*
+     * duration, progress, secondary should all be in units of 
+     */
     private static void setProgressBar(SeekBar progressBar, long duration, long progress, long secondary) {
-    	progressBar.setProgress((int) (progressBar.getMax() * progress / duration));
-    	progressBar.setSecondaryProgress((int) (progressBar.getMax() * secondary / duration));
+    	if (duration == 0)
+    		return;
+    	int progressMax = progressBar.getMax();
+    	int primaryProgress = (int) ((progressMax * progress) / duration);
+    	int secondaryProgress = (int) ((progressMax * secondary) / duration);
+    	progressBar.setProgress(primaryProgress);
+    	progressBar.setSecondaryProgress(secondaryProgress);
     }
     
     private final Handler mHandler = new Handler() {
@@ -421,13 +401,10 @@ public class PlayerActivity   extends HapiListActivity
         mNextButton.requestFocus();
         mNextButton.setOnClickListener(mNextListener);        
         
-        mProgress = (SeekBar) findViewById(android.R.id.progress);
+        SeekBar mProgress = (SeekBar) findViewById(R.id.progress);
         
-        if (mProgress instanceof SeekBar) {
-            SeekBar seeker = (SeekBar) mProgress;
-            seeker.setOnSeekBarChangeListener(mSeekListener);
-        }
-        mProgress.setMax(1000);    
+        //mProgress = new PodcastProgressBar(this, mServiceBinder, mCurrentTime);
+
         mTotalTime = (TextView) findViewById(R.id.totaltime); 
         mCurrentTime = (TextView) findViewById(R.id.currenttime); 
         

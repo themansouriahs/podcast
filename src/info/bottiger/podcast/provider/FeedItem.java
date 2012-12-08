@@ -21,6 +21,7 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Handler;
 import android.widget.Toast;
@@ -46,7 +47,7 @@ public class FeedItem implements Comparable<FeedItem> {
 	public long filesize;
 	public long chunkFilesize;
 
-	public String pathname;
+	private String pathname;
 	public int offset;
 	public int status;
 	public long failcount;
@@ -436,7 +437,7 @@ public class FeedItem implements Comparable<FeedItem> {
 			 Toast.makeText(act, "Please wait... ", 
 				 Toast.LENGTH_LONG).show();  
 			 
-		boolean b  = FileUtils.copy_file(this.pathname,filename);
+		boolean b  = FileUtils.copy_file(getPathname(),filename);
 		if(b)
 		 Toast.makeText(act, "Exported audio file to : "+ filename, 
 				 Toast.LENGTH_LONG).show();
@@ -563,10 +564,10 @@ public class FeedItem implements Comparable<FeedItem> {
 
 		if (SDCardManager.getSDCardStatus()) {
 			try {
-				File file = new File(pathname);
+				File file = new File(getPathname());
 				
 				boolean deleted = true;
-				if(file.exists()==true)
+				if(file.exists())
 				{
 					deleted = file.delete();					
 				}
@@ -577,7 +578,7 @@ public class FeedItem implements Comparable<FeedItem> {
 					}						
 				}
 			} catch (Exception e) {
-				log.warn("del file failed : " + pathname + "  " + e);
+				log.warn("del file failed : " + getPathname() + "  " + e);
 
 			}
 		}		
@@ -599,12 +600,12 @@ public class FeedItem implements Comparable<FeedItem> {
 	
 	public void prepareDownload(ContentResolver context)
 	{
-		if (pathname.equals("") || pathname.equals("0")) {
+		if (getPathname().equals("") || getPathname().equals("0")) {
 			//String fileName = new File(pathname)FeedItem getName();
 			String filename = resource.substring(resource.lastIndexOf("/")+1);  
 			
 			//pathname = SDCardMgr.getDownloadDir() + "/podcast_" + id + ".mp3";
-			pathname = SDCardManager.getDownloadDir() + "/" + this.sub_id + "_" + filename + ".mp3";
+			pathname = this.sub_id + "_" + filename + ".mp3";
 		}
 		status = ItemColumns.ITEM_STATUS_DOWNLOADING_NOW;
 		update(context);
@@ -640,7 +641,14 @@ public class FeedItem implements Comparable<FeedItem> {
 	}	
 	
 	public long getCurrentFileSize() {
-		return new File(pathname).length();
+		return new File(getPathname()).length();
+	}
+	
+	public String getPathname() {
+		if (this.pathname.equals(""))
+		return "";
+		else
+			return SDCardManager.getDownloadDir() + "/" + this.pathname;
 	}
 
 	public void sendMail(Activity act){
@@ -678,8 +686,28 @@ public class FeedItem implements Comparable<FeedItem> {
 	}
 	
 	public boolean isDownloaded() {
-		long localFilesize = new File(pathname).length();
-		return localFilesize == filesize && localFilesize > 0;
+		/* refactor when it works */
+		String path = getPathname();
+		File localFile = new File(path);
+		long localFilesize = localFile.length();
+		
+		if (filesize == 0)
+			return localFilesize > 0;
+		else
+			return localFilesize >= filesize && localFilesize > 0;
+	}
+	
+	/*
+	 * @return the duration of the mp3 (or whatever) in milliseconds.
+	 */
+	public long getDuration() {
+		if (isDownloaded()) {
+			MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+			retriever.setDataSource(getPathname());
+			return Long.parseLong(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
+		} else {
+			return this.length;
+		}
 	}
 	
 	public boolean equals(FeedItem item) {

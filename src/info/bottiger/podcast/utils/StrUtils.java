@@ -18,7 +18,10 @@ public class StrUtils {
      * Kind of a hack
      */
     public static String formatTime(FeedItem item) {
-    	float progress = item.offset / item.length;
+    	if (item.getDuration() == 0) 
+    		return "00:00";
+    	long duration = item.getDuration();
+    	float progress = (float)item.offset / (float)duration;
     	return formatTime(progress, item.duration);
     }
     
@@ -33,7 +36,7 @@ public class StrUtils {
             date = sdf.parse(duration);            
             
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
         
         if (date == null) {

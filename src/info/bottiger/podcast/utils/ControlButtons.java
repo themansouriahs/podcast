@@ -21,6 +21,51 @@ import android.widget.TextView;
 
 public class ControlButtons {
 	
+	private static final int MAX_SEEKBAR_VALUE = 1000;
+    private static long mLastSeekEventTime;
+    private static boolean mFromTouch;
+    
+	private static TextView mCurrentTime;
+	
+	private static OnSeekBarChangeListener mSeekListener = new OnSeekBarChangeListener() {
+        public void onStartTrackingTouch(SeekBar bar) {
+            mLastSeekEventTime = 0;
+            mFromTouch = true;
+        }
+        public void onProgressChanged(SeekBar bar, int progress, boolean fromuser) {
+            //log.debug("onProgressChanged");
+       	
+            if (!fromuser || (fragment.mPlayerServiceBinder == null)) return;
+
+            long now = SystemClock.elapsedRealtime();
+            if ((now - mLastSeekEventTime) > 250) {
+                mLastSeekEventTime = now;
+                long timeMs = fragment.mPlayerServiceBinder.duration() * progress / 1000;
+                if (mCurrentTime != null) mCurrentTime.setText(StrUtils.formatTime(timeMs));
+                //mPosOverride = mp.duration * progress / 1000;
+
+                if (!mFromTouch) {
+                    //refreshNow();
+                    //mPosOverride = -1;
+                }
+            }
+            
+        }
+        
+        public void onStopTrackingTouch(SeekBar bar) {
+            //mPosOverride = -1;
+            mFromTouch = false;
+            long timeMs = fragment.mPlayerServiceBinder.duration() * bar.getProgress() / 1000;
+            try {
+            	if(fragment.mPlayerServiceBinder.isInitialized())
+            		fragment.mPlayerServiceBinder.seek(timeMs);
+            } catch (Exception ex) {
+            }
+            //log.debug("mFromTouch = false; ");
+
+        }
+    };
+	
 	public static RecentItemFragment fragment = null;
 		
     public static class Holder {
@@ -42,8 +87,6 @@ public class ControlButtons {
 
     public static void setListener(final PodcastService podcastServiceConnection, final Holder viewHolder, final long id) {
     	
-    	fragment.queueNextRefresh(1);
-    	
     	final ImageButton playPauseButton = (ImageButton)viewHolder.playPauseButton;
   
 		playPauseButton.setOnClickListener(new View.OnClickListener() {
@@ -61,6 +104,7 @@ public class ControlButtons {
                 	playPauseButton.setImageResource(R.drawable.pause);
                 	playPauseButton.setContentDescription("Pause");
                 	fragment.mPlayerServiceBinder.play(id);
+                	fragment.queueNextRefresh(1);
                 }
             }
         });
@@ -103,10 +147,10 @@ public class ControlButtons {
             }
         });
 		
-        if (viewHolder.seekbar instanceof SeekBar) {
-        	viewHolder.seekbar.setOnSeekBarChangeListener(fragment.mSeekListener);
-        }
-        viewHolder.seekbar.setMax(1000); 
+
+    	ControlButtons.mCurrentTime = viewHolder.currentTime;
+        viewHolder.seekbar.setOnSeekBarChangeListener(mSeekListener);
+        viewHolder.seekbar.setMax(MAX_SEEKBAR_VALUE); 
 	}
     
 	public static void setPlayerListeners(View listView, View playerView, long id) {

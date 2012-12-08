@@ -99,7 +99,7 @@ public class FeedFetcher {
 		}
 
 		return response;
-
+		
 	}
 
 
@@ -300,15 +300,18 @@ public class FeedFetcher {
 		 ContentResolver mContentResolver;
 		 FeedItem mFeedItem;
 		 
+		 int nStartPos;
+		 long nEndPos;
+		 
 		 public DownloadFile(ContentResolver contentResolver, FeedItem feedItem) {
 		        mContentResolver = contentResolver;
 		        mFeedItem = feedItem;
 		    } 
 		 
 	     protected Integer doInBackground(Void... params) {
-	 		String pathname = mFeedItem.pathname;
+	 		String pathname = mFeedItem.getPathname();
 
-			int nStartPos = mFeedItem.offset;
+			//nStartPos = mFeedItem.offset;
 			nStartPos = 0;
 
 			RandomAccessFile oSavedFile = null;
@@ -342,7 +345,7 @@ public class FeedFetcher {
 					throw new IOException("Error Code : " + responseCode);
 				}
 
-				long nEndPos = mFeedItem.length;
+				nEndPos = mFeedItem.length;
 				//if (mFeedItem.offset == 0) {
 				if (true) {
 
@@ -377,11 +380,13 @@ public class FeedFetcher {
 					mFeedItem.chunkFilesize = nStartPos;
 					
 					// Only update progress once a second at most
-					if (lastUpdate + 1000 < System.currentTimeMillis())
+					if (lastUpdate + 1000 < System.currentTimeMillis()) {
 						publishProgress(new Long(nStartPos));
+						lastUpdate = System.currentTimeMillis();
+					}
 				}
-				if (nStartPos >= nEndPos)
-					mFeedItem.downloadSuccess(mContentResolver);
+				//if (nStartPos >= nEndPos)
+				//	mFeedItem.downloadSuccess(mContentResolver);
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {
@@ -416,6 +421,12 @@ public class FeedFetcher {
 	    	 msg.what = PodcastBaseFragment.UPDATE_FILESIZE;
 	    	 msg.obj = this.mFeedItem;
 	    	 PodcastBaseFragment.mHandler.sendMessage(msg);
+	     }
+	     
+	     protected void onPostExecute(Long result) {
+	    	 mFeedItem.offset = 0;
+			if (nStartPos >= nEndPos)
+				mFeedItem.downloadSuccess(mContentResolver);
 	     }
 	 }
 

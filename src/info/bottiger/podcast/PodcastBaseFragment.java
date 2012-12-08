@@ -6,6 +6,7 @@ import info.bottiger.podcast.service.PlayerService;
 import info.bottiger.podcast.service.PodcastService;
 import info.bottiger.podcast.utils.FilesizeUpdater;
 import info.bottiger.podcast.utils.Log;
+import info.bottiger.podcast.utils.PodcastProgressBar;
 import info.bottiger.podcast.utils.StrUtils;
 
 import android.app.Activity;
@@ -62,9 +63,9 @@ public class PodcastBaseFragment extends ListFragment {
 
 	private boolean mShow = true;
 
-	private TextView mCurrentTime = null;
-	private SeekBar mProgressBar = null;
-	private TextView mDuration = null;
+	private static TextView mCurrentTime = null;
+	private static SeekBar mProgressBar = null;
+	private static TextView mDuration = null;
 
 	public TextView getCurrentTime() {
 		return mCurrentTime;
@@ -230,11 +231,11 @@ public class PodcastBaseFragment extends ListFragment {
 		@Override
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
-			//case REFRESH:
-			//	long next = refreshNow();
-			//	queueNextRefresh(next);
-			//	// log.debug("REFRESH: "+next);
-			//	break;
+			case REFRESH:
+				long next = refreshUI();
+				queueNextRefresh(next);
+				// log.debug("REFRESH: "+next);
+				break;
 
 			case UPDATE_FILESIZE:
 				FeedItem item = (FeedItem)msg.obj;
@@ -249,13 +250,27 @@ public class PodcastBaseFragment extends ListFragment {
 		}
 	};
 
-	public void queueNextRefresh(long delay) {
+	public static void queueNextRefresh(long delay) {
 		Message msg = mHandler.obtainMessage(REFRESH);
 		mHandler.removeMessages(REFRESH);
-		if (mShow)
+		if (mPlayerServiceBinder.isPlaying()) // FIXME or something is downloading
 			mHandler.sendMessageDelayed(msg, delay);
 	}
 
+	protected static long refreshUI() {
+		long refresh_time = 500;
+		
+		if (mPlayerServiceBinder == null)
+			return refresh_time;
+		
+		if (mPlayerServiceBinder.isPlaying()) {
+			updateCurrentPosition();
+		}
+		
+		return refresh_time;
+
+	}
+	
 	protected long refreshNow() {
 
 		if (mPlayerServiceBinder == null)
@@ -322,8 +337,8 @@ public class PodcastBaseFragment extends ListFragment {
 		}
 		return 500;
 	}
-
-	protected void updateCurrentPosition() {
+	
+	protected static void updateCurrentPosition() {
 		if (mCurrentTime != null) {
 			long pos = mPlayerServiceBinder.position();
 			long duration = mPlayerServiceBinder.duration();
@@ -332,6 +347,7 @@ public class PodcastBaseFragment extends ListFragment {
 			String durationString = StrUtils.formatTime(duration);
 			mCurrentTime.setText(timeCounter);
 			if (mDuration != null) mDuration.setText(durationString);
+			PlayerActivity.setProgressBar(mProgressBar, mPlayerServiceBinder);
 		}
 	}
 
