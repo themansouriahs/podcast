@@ -100,6 +100,7 @@ public class PodcastBaseFragment extends ListFragment {
 		}
 	};
 
+	/*
 	public OnSeekBarChangeListener mSeekListener = new OnSeekBarChangeListener() {
 		public void onStartTrackingTouch(SeekBar bar) {
 			mLastSeekEventTime = 0;
@@ -141,6 +142,7 @@ public class PodcastBaseFragment extends ListFragment {
 
 		}
 	};
+	*/
 
 	@Override
 	public void onAttach(Activity activity) {
@@ -270,7 +272,7 @@ public class PodcastBaseFragment extends ListFragment {
 		return refresh_time;
 
 	}
-	
+	/*
 	protected long refreshNow() {
 
 		if (mPlayerServiceBinder == null)
@@ -337,6 +339,7 @@ public class PodcastBaseFragment extends ListFragment {
 		}
 		return 500;
 	}
+	*/
 	
 	protected static void updateCurrentPosition() {
 		if (mCurrentTime != null) {

@@ -245,18 +245,6 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 				
 
 			}
-
-			/*
-			if (pathIndex > 0 && stub != null) {
-				String itemPathname = item.getString(pathIndex);
-				File file = new File(itemPathname);
-				if (file.exists()) {
-					ImageButton downloadButton = (ImageButton) stub
-							.findViewById(R.id.download);
-					downloadButton.setImageResource(R.drawable.trash);
-				}
-			}
-			*/
 			
 		} else {
 			View playerView = v.findViewById(R.id.stub_player);
@@ -312,6 +300,7 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 		int statusIndex = cursor.getColumnIndex(ItemColumns.STATUS);
 		
 		PodcastDownloadManager.DownloadStatus ds = PodcastDownloadManager.getStatus(FeedItem.getById(context.getContentResolver(), id));
+		FilesizeUpdater.put(mContext, id, holder.textViewFileSize);
 		writeStatus(id, holder.textViewFileSize, ds);
 		
 
@@ -408,7 +397,6 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 			statusText = "waiting";
 			break;
 		case DOWNLOADING:
-			FilesizeUpdater.put(mContext, id, tv);
 			statusText = "downloading";
 			break;
 		case DONE:
