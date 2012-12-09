@@ -23,6 +23,7 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.content.CursorLoader;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -275,22 +276,9 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 
 	@Override
 	public void startInit() {
-/*
-		String where = ItemColumns.SUBS_ID + "=" + mChannel.id + " AND " 
-		+ ItemColumns.STATUS + "<" + ItemColumns.ITEM_STATUS_MAX_PLAYLIST_VIEW;
-*/
 		SwipeActivity.mCursor = new CursorLoader(getActivity(), SubscriptionColumns.URI, PROJECTION, null, null, null).loadInBackground();
-
-		
-		//mAdapter = AllItemActivity.channelListItemCursorAdapter(getActivity().getApplicationContext(), mCursor);
 		mAdapter = AllItemActivity.channelListSubscriptionCursorAdapter(getActivity().getApplicationContext(), SwipeActivity.mCursor);
-		/*		
-		 * mAdapter = new IconCursorAdapter(this, R.layout.channel_list_item, mCursor,
-		 *
-		 * new String[] { ItemColumns.TITLE,ItemColumns.STATUS }, new int[] {
-		 *		R.id.text1}, mIconMap);
-		 */
-		
+	
 		setListAdapter(mAdapter);
 
 		super.startInit();

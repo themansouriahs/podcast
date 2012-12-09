@@ -138,14 +138,7 @@ public class SwipeActivity extends FragmentActivity implements
 	@Override
 	public void onItemSelected(long id) {
 		SubscriptionFeedID = id;
-		// Object o = mSectionsPagerAdapter.instantiateItem(mViewPager, 1);
-		// mSectionsPagerAdapter.destroyItem(mViewPager, 1, o);
-		// mSectionsPagerAdapter.finishUpdate(mViewPager);
-		// Object o2 = mSectionsPagerAdapter.instantiateItem(mViewPager, 1);
 		mSectionsPagerAdapter.notifyDataSetChanged();
-		// mSectionsPagerAdapter.finishUpdate(mViewPager);
-		// mViewPager.invalidate();
-		// mViewPager.setAdapter(mSectionsPagerAdapter);
 	}
 
 	@Override

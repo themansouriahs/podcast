@@ -62,6 +62,8 @@ public class PodcastBaseFragment extends ListFragment {
 	public static final int UPDATE_FILESIZE = 3;
 
 	private boolean mShow = true;
+	
+	protected Cursor mCursor;
 
 	private static TextView mCurrentTime = null;
 	private static SeekBar mProgressBar = null;
@@ -352,6 +354,10 @@ public class PodcastBaseFragment extends ListFragment {
 			if (mDuration != null) mDuration.setText(durationString);
 			PlayerActivity.setProgressBar(mProgressBar, mPlayerServiceBinder);
 		}
+	}
+	
+	protected Cursor getCursor() {
+		return this.mCursor;
 	}
 
 }

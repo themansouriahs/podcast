@@ -3,6 +3,7 @@ package info.bottiger.podcast;
 import info.bottiger.podcast.R;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
+import info.bottiger.podcast.service.PodcastDownloadManager;
 import info.bottiger.podcast.utils.ControlButtons;
 import info.bottiger.podcast.utils.ControlButtons.Holder;
 import info.bottiger.podcast.utils.DialogMenu;
@@ -23,6 +24,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.CursorLoader;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
@@ -79,7 +82,6 @@ public class RecentItemFragment extends PodcastBaseFragment {
 
 	private View V;
 	private FeedCursorAdapter mAdapter;
-	private Cursor mCursor;
 	
     boolean mDualPane;
 	private long mCurCheckID = -1;
@@ -129,6 +131,32 @@ public class RecentItemFragment extends PodcastBaseFragment {
         super.onSaveInstanceState(outState);
         outState.putLong("curChoice", mCurCheckID);
     }
+    
+	@Override
+	public void onCreate (Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setHasOptionsMenu(true);
+	}
+	
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+	    inflater.inflate(R.menu.episode_list, menu);
+	    super.onCreateOptionsMenu(menu, inflater);
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.menu_download_all: {
+			Cursor cursor = createCursor(getWhere());
+			while (cursor.moveToNext()) {
+			    FeedItem feedItem = FeedItem.getByCursor(cursor);
+			    PodcastDownloadManager.addItemToQueue(feedItem);
+			}
+			return true;
+		}
+		}
+		return super.onOptionsItemSelected(item);
+	}
 	
 	public static void initFullIconMap(HashMap<Integer, Integer> iconMap) {
 		iconMap.put(ItemColumns.ITEM_STATUS_UNREAD, R.drawable.feed_new);
@@ -355,8 +383,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 	}
 
 	public void showEpisodes(String condition) {
-		mCursor = new CursorLoader(getActivity(), ItemColumns.URI, PROJECTION,
-				condition, null, getOrder()).loadInBackground();
+		mCursor = createCursor(condition);
 
 		mAdapter = RecentItemFragment.listItemCursorAdapter(this.getActivity(), this,
 				mCursor);
@@ -470,5 +497,10 @@ public class RecentItemFragment extends PodcastBaseFragment {
 
 		}
 		return null;
+	}
+	
+	private Cursor createCursor(String condition) {
+		return new CursorLoader(getActivity(), ItemColumns.URI, PROJECTION,
+				condition, null, getOrder()).loadInBackground();
 	}
 }

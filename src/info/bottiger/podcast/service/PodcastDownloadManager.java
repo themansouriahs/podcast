@@ -360,7 +360,7 @@ public class PodcastDownloadManager {
 		return mDownloadQueue.poll();
 	}
 	
-	protected void addItemToQueue(FeedItem item) {
+	public static void addItemToQueue(FeedItem item) {
 		mDownloadQueue.add(item);
 		
 		// should we start downloading now?

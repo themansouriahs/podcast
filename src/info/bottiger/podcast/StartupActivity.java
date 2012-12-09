@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
-public class StartupActivity extends HapiFragmentActivity {
+public class StartupActivity extends SoundWavesFragmentActivity {
 	
 	private final Log log = Log.getLog(getClass());
 	long delayMillis = 1500;

@@ -16,7 +16,7 @@ import android.widget.Toast;
 import info.bottiger.podcast.R;
 import info.bottiger.podcast.actionbar.ActionBarHelper;
 
-public class HapiFragmentActivity extends SherlockFragmentActivity {
+public class SoundWavesFragmentActivity extends SherlockFragmentActivity {
 	final ActionBarHelper mActionBarHelper = ActionBarHelper.createInstance(this);
 	
     /**

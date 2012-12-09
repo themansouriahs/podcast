@@ -126,5 +126,6 @@
     <string name="info">Info</string>
     <string name="download">Download</string>
     <string name="queue">Queue</string>
+    <string name="menu_download_all">Download All</string>
 
 </resources>
