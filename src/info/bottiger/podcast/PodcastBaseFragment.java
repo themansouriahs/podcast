@@ -272,7 +272,7 @@ public class PodcastBaseFragment extends ListFragment {
 		return refresh_time;
 
 	}
-	/*
+	
 	protected long refreshNow() {
 
 		if (mPlayerServiceBinder == null)
@@ -339,7 +339,7 @@ public class PodcastBaseFragment extends ListFragment {
 		}
 		return 500;
 	}
-	*/
+	
 	
 	protected static void updateCurrentPosition() {
 		if (mCurrentTime != null) {
