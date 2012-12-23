@@ -126,7 +126,7 @@ public class PodcastDownloadManager {
 	}
 
 	 
-	protected void do_download(boolean show, final Context context) {
+	public void do_download(boolean show, final Context context) {
 		if (SDCardManager.getSDCardStatusAndCreate() == false) {
 
 			if (show)

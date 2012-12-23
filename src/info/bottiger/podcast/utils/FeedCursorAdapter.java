@@ -2,8 +2,11 @@ package info.bottiger.podcast.utils;
 
 import android.widget.SimpleCursorAdapter;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.app.Activity;
 import android.content.Context;
+import android.media.MediaMetadataRetriever;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +24,7 @@ import info.bottiger.podcast.RecentItemFragment;
 import info.bottiger.podcast.SwipeActivity;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
+import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.service.PodcastDownloadManager;
 
 import java.io.File;
@@ -29,6 +33,14 @@ import java.util.HashMap;
 import java.util.TreeSet;
 
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
+import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiscCache;
+import com.nostra13.universalimageloader.cache.disc.naming.HashCodeFileNameGenerator;
+import com.nostra13.universalimageloader.cache.memory.impl.UsingFreqLimitedMemoryCache;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
+import com.nostra13.universalimageloader.core.download.URLConnectionImageDownloader;
 
 public class FeedCursorAdapter extends SimpleCursorAdapter {
 
@@ -166,26 +178,26 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 	public View getView(int position, View convertView, ViewGroup parent) {
 
 		View v;
-		Cursor item = (Cursor) getItem(position);
+		Cursor itemCursor = (Cursor) getItem(position);
 		
-		if (!item.moveToPosition(position)) {
+		if (!itemCursor.moveToPosition(position)) {
 			throw new IllegalStateException("couldn't move cursor to position "
 					+ position);
 		}
 		
 		if (convertView == null) {
-			v = newView(mContext, item, parent);
+			v = newView(mContext, itemCursor, parent);
 		} else {
 			v = convertView;
 		}
 		
-		bindView(v, mContext, item);
+		bindView(v, mContext, itemCursor);
 
-		Long itemID = item.getLong(item.getColumnIndex(ItemColumns._ID));
+		Long itemID = itemCursor.getLong(itemCursor.getColumnIndex(ItemColumns._ID));
 
 		FeedItem feedItem = FeedItem.getById(mContext.getContentResolver(), itemID);
 		
-		int pathIndex = item.getColumnIndex(ItemColumns.PATHNAME);
+		int pathIndex = itemCursor.getColumnIndex(ItemColumns.PATHNAME);
 		// int itemOffset =
 		// item.getInt(item.getColumnIndex(ItemColumns.OFFSET));
 		
@@ -297,12 +309,31 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 		int offsetIndex = cursor.getColumnIndex(ItemColumns.OFFSET);
 		int lengthIndex = cursor.getColumnIndex(ItemColumns.LENGTH);
 
+		
+		int filePathIndex = cursor.getColumnIndex(ItemColumns.PATHNAME);
+		String filePath;
+		
+		try {
+			filePath = cursor.getString(filePathIndex);
+		} catch (Exception e) {
+			filePath = "";
+		}
+
+		FeedItem item = null;
+		try {
+			item = FeedItem.getByCursor(cursor);
+		} catch (IllegalStateException e) {
+			//Subscription sub = Subscription.getByCursor(cursor);
+		}
+			
 		int statusIndex = cursor.getColumnIndex(ItemColumns.STATUS);
 		
-		PodcastDownloadManager.DownloadStatus ds = PodcastDownloadManager.getStatus(FeedItem.getById(context.getContentResolver(), id));
-		FilesizeUpdater.put(mContext, id, holder.textViewFileSize);
-		writeStatus(id, holder.textViewFileSize, ds);
-		
+		if (item != null) {
+			// FeedItem.getById(context.getContentResolver(), id)
+			PodcastDownloadManager.DownloadStatus ds = PodcastDownloadManager.getStatus(item);
+			FilesizeUpdater.put(mContext, id, holder.textViewFileSize);
+			writeStatus(id, holder.textViewFileSize, ds);
+		}
 
 		int filesize = 0;
 		
@@ -343,8 +374,39 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 		if (subtitleIndex > 0)
 			holder.textViewSubTitle.setText(cursor.getString(subtitleIndex));
 
-		this.setViewImage3(holder.imageView, cursor.getString(imageIndex));
-
+		/*
+		String fullPath = SDCardManager.pathFromFilename(filePath);
+		if (filePath != null && filePath.length() > 0 && new File(fullPath).exists()) {
+			MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+			mmr.setDataSource(fullPath);
+			byte[] ba = mmr.getEmbeddedPicture();
+			Bitmap cover = BitmapFactory.decodeByteArray(ba, 0, ba.length);
+			holder.imageView.setImageBitmap(cover);
+		} else
+			this.setViewImage3(holder.imageView, cursor.getString(imageIndex));
+		*/
+		File cacheDir = SDCardManager.getCaceDir();
+		DisplayImageOptions options = new DisplayImageOptions.Builder()
+		.showStubImage(R.drawable.channel_big_pic)
+        .cacheInMemory()
+        .cacheOnDisc()
+        .build();
+		ImageLoader imageLoader = ImageLoader.getInstance();
+		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context)
+			.memoryCacheExtraOptions(480, 800) // max width, max height
+			.threadPoolSize(5)
+			.offOutOfMemoryHandling()
+			.memoryCache(new UsingFreqLimitedMemoryCache(2 * 1024 * 1024)) // You can pass your own memory cache implementation
+			.discCache(new UnlimitedDiscCache(cacheDir)) // You can pass your own disc cache implementation
+            .discCacheFileNameGenerator(new HashCodeFileNameGenerator())
+            .imageDownloader(new URLConnectionImageDownloader(5 * 1000, 20 * 1000)) // connectTimeout (5 s), readTimeout (20 s)
+            .tasksProcessingOrder(QueueProcessingType.FIFO)
+            .defaultDisplayImageOptions(options)
+            .build();
+		// Initialize ImageLoader with configuration. Do it once.
+		imageLoader.init(config);
+		// Load and display image asynchronously
+		imageLoader.displayImage(cursor.getString(imageIndex), holder.imageView);
 	}
 
 	public void showItem(Long id) {

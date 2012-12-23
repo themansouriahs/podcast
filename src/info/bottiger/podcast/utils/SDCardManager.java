@@ -43,7 +43,13 @@ public class SDCardManager {
 	
 	public static String getCacheDir()
 	{
-		return getSDCardDir() + APP_DIR + CACHE_DIR;
+		return getSDCardDir().toString();
+	}
+	
+	public static File getCaceDir() {
+		File cacheDir = new File(getSDCardDir() + APP_DIR + CACHE_DIR);
+		if (!cacheDir.exists()) cacheDir.mkdir();
+		return cacheDir;
 	}
 	
 	private static String getSDCardDir() {
@@ -66,6 +72,13 @@ public class SDCardManager {
 			return file.mkdirs();
 		}		
 		return true;
-	}		
+	}	
+	
+	public static String pathFromFilename(String filename) {
+		if (filename.equals(""))
+		return null;
+		else
+			return SDCardManager.getDownloadDir() + "/" + filename;
+	}
 
 }

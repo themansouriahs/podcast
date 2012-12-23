@@ -489,8 +489,10 @@ public class FeedItem implements Comparable<FeedItem> {
 		//assert cursor.moveToFirst();
 		//cursor.moveToFirst();
 		item.id = cursor.getLong(cursor.getColumnIndex(ItemColumns._ID));
-		item.resource = cursor.getString(cursor
-				.getColumnIndex(ItemColumns.RESOURCE));
+		
+		int idx = cursor
+				.getColumnIndex(ItemColumns.RESOURCE);
+		item.resource = cursor.getString(idx);
 		item.pathname = cursor.getString(cursor
 				.getColumnIndex(ItemColumns.PATHNAME));
 		item.offset = cursor.getInt(cursor.getColumnIndex(ItemColumns.OFFSET));
@@ -641,14 +643,14 @@ public class FeedItem implements Comparable<FeedItem> {
 	}	
 	
 	public long getCurrentFileSize() {
-		return new File(getPathname()).length();
+		String filename = getPathname();
+		if (filename != null)
+			return new File(filename).length();
+		return 0;
 	}
 	
 	public String getPathname() {
-		if (this.pathname.equals(""))
-		return "";
-		else
-			return SDCardManager.getDownloadDir() + "/" + this.pathname;
+		return SDCardManager.pathFromFilename(this.pathname);
 	}
 
 	public void sendMail(Activity act){
@@ -688,6 +690,8 @@ public class FeedItem implements Comparable<FeedItem> {
 	public boolean isDownloaded() {
 		/* refactor when it works */
 		String path = getPathname();
+		if (path == null || path == "") return false;
+		
 		File localFile = new File(path);
 		long localFilesize = localFile.length();
 		

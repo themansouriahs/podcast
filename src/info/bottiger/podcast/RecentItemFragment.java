@@ -150,8 +150,11 @@ public class RecentItemFragment extends PodcastBaseFragment {
 			Cursor cursor = createCursor(getWhere());
 			while (cursor.moveToNext()) {
 			    FeedItem feedItem = FeedItem.getByCursor(cursor);
-			    PodcastDownloadManager.addItemToQueue(feedItem);
+			    if (!feedItem.isDownloaded())
+			    	PodcastDownloadManager.addItemToQueue(feedItem);
 			}
+		    PodcastDownloadManager pdm = new PodcastDownloadManager();
+		    pdm.do_download(true, this.getActivity());
 			return true;
 		}
 		}
@@ -500,7 +503,9 @@ public class RecentItemFragment extends PodcastBaseFragment {
 	}
 	
 	private Cursor createCursor(String condition) {
-		return new CursorLoader(getActivity(), ItemColumns.URI, PROJECTION,
+		//return new CursorLoader(getActivity(), ItemColumns.URI, PROJECTION,
+		//		condition, null, getOrder()).loadInBackground();
+		return new CursorLoader(getActivity(), ItemColumns.URI, ItemColumns.ALL_COLUMNS,
 				condition, null, getOrder()).loadInBackground();
 	}
 }
