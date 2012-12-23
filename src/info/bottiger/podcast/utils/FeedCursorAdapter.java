@@ -28,6 +28,8 @@ import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.service.PodcastDownloadManager;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeSet;
@@ -313,6 +315,8 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 		int filePathIndex = cursor.getColumnIndex(ItemColumns.PATHNAME);
 		String filePath;
 		
+		PodcastDownloadManager.DownloadStatus ds = null;
+		
 		try {
 			filePath = cursor.getString(filePathIndex);
 		} catch (Exception e) {
@@ -320,6 +324,7 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 		}
 
 		FeedItem item = null;
+		
 		try {
 			item = FeedItem.getByCursor(cursor);
 		} catch (IllegalStateException e) {
@@ -330,7 +335,7 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 		
 		if (item != null) {
 			// FeedItem.getById(context.getContentResolver(), id)
-			PodcastDownloadManager.DownloadStatus ds = PodcastDownloadManager.getStatus(item);
+			ds = PodcastDownloadManager.getStatus(item);
 			FilesizeUpdater.put(mContext, id, holder.textViewFileSize);
 			writeStatus(id, holder.textViewFileSize, ds);
 		}
@@ -374,18 +379,41 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 		if (subtitleIndex > 0)
 			holder.textViewSubTitle.setText(cursor.getString(subtitleIndex));
 
-		/*
+		
+		/* Calculate the imageOath */
+		String imagePath;
 		String fullPath = SDCardManager.pathFromFilename(filePath);
-		if (filePath != null && filePath.length() > 0 && new File(fullPath).exists()) {
-			MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-			mmr.setDataSource(fullPath);
-			byte[] ba = mmr.getEmbeddedPicture();
-			Bitmap cover = BitmapFactory.decodeByteArray(ba, 0, ba.length);
-			holder.imageView.setImageBitmap(cover);
-		} else
-			this.setViewImage3(holder.imageView, cursor.getString(imageIndex));
-		*/
-		File cacheDir = SDCardManager.getCaceDir();
+		if (filePath != null && filePath.length() > 0 && new File(fullPath).exists() && ds == PodcastDownloadManager.DownloadStatus.DONE) {
+			//holder.imageView.setImageBitmap(cover);
+			FileOutputStream out;
+			String thumbnailPath = thumbnailCacheURL(cursor.getString(idIndex));
+			File thumbnail = new File(thumbnailPath);
+			if (!thumbnail.exists()) {
+			try {
+				MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+				mmr.setDataSource(fullPath);
+				byte[] ba = mmr.getEmbeddedPicture();
+				Bitmap cover = BitmapFactory.decodeByteArray(ba, 0, ba.length);
+				out = new FileOutputStream(thumbnailPath);
+				cover.compress(Bitmap.CompressFormat.PNG, 90, out);
+				imagePath = thumbnailPath;
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				imagePath = cursor.getString(imageIndex);
+			} catch (RuntimeException e) {
+				e.printStackTrace();
+				imagePath = cursor.getString(imageIndex);
+			}
+			} else {
+				imagePath = thumbnailPath;
+			}
+		} else {
+			//this.setViewImage3(holder.imageView, cursor.getString(imageIndex));
+			imagePath = cursor.getString(imageIndex);
+		}
+		
+		File cacheDir = SDCardManager.getCacheDir();
 		DisplayImageOptions options = new DisplayImageOptions.Builder()
 		.showStubImage(R.drawable.channel_big_pic)
         .cacheInMemory()
@@ -488,6 +516,12 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 			return Long.valueOf(feedItem.id);
 		} else
 			return new Long(1); // FIXME
+	}
+	
+	private String thumbnailCacheURL(String StringID) {
+		//Long id = Long.parseLong(StringID);
+		String thumbURL = SDCardManager.getThumbnailCacheDir() + "/" + StringID + ".png";
+		return thumbURL;
 	}
 
 }

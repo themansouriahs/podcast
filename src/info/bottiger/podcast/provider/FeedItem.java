@@ -707,7 +707,12 @@ public class FeedItem implements Comparable<FeedItem> {
 	public long getDuration() {
 		if (isDownloaded()) {
 			MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-			retriever.setDataSource(getPathname());
+			try {
+				retriever.setDataSource(getPathname());
+			} catch(RuntimeException e) {
+				e.printStackTrace();
+				return this.length;
+			}
 			return Long.parseLong(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
 		} else {
 			return this.length;

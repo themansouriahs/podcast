@@ -12,6 +12,8 @@ public class SDCardManager {
 	public static final String DOWNLOAD_DIR = "/download";
 	public static final String EXPORT_DIR = "/export";
 	public static final String CACHE_DIR = "/cache";
+	public static final String THUMBNAIL_CACHE = "/thumbnails";
+	
 	
 	public static boolean getSDCardStatus()
 	{
@@ -41,15 +43,18 @@ public class SDCardManager {
 		return getSDCardDir() + APP_DIR;
 	}
 	
-	public static String getCacheDir()
-	{
-		return getSDCardDir().toString();
+	public static File getCacheDir() {
+		return  returnDir(getSDCardDir() + APP_DIR + CACHE_DIR);
 	}
 	
-	public static File getCaceDir() {
-		File cacheDir = new File(getSDCardDir() + APP_DIR + CACHE_DIR);
-		if (!cacheDir.exists()) cacheDir.mkdir();
-		return cacheDir;
+	public static File getThumbnailCacheDir() {
+		return  returnDir(getSDCardDir() + APP_DIR + CACHE_DIR + THUMBNAIL_CACHE);
+	}
+	
+	private static File returnDir(String path) {
+		File dir = new File(path);
+		if (!dir.exists()) dir.mkdir();
+		return dir;		
 	}
 	
 	private static String getSDCardDir() {
@@ -76,7 +81,7 @@ public class SDCardManager {
 	
 	public static String pathFromFilename(String filename) {
 		if (filename.equals(""))
-		return null;
+			return "";
 		else
 			return SDCardManager.getDownloadDir() + "/" + filename;
 	}
