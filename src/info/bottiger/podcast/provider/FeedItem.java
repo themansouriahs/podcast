@@ -24,6 +24,7 @@ import android.database.Cursor;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Handler;
+import android.support.v4.util.LruCache;
 import android.widget.Toast;
 
 public class FeedItem implements Comparable<FeedItem> {
@@ -31,6 +32,7 @@ public class FeedItem implements Comparable<FeedItem> {
 	public static final int MAX_DOWNLOAD_FAIL = 5;
 	
 	private final Log log = Log.getLog(getClass());
+	private static ItemLruCache cache = null;
 
 	public String url;
 	public String title;
@@ -143,13 +145,24 @@ public class FeedItem implements Comparable<FeedItem> {
 						
 	}
 	
-	public static FeedItem getById(ContentResolver context, long id) {
+	public static FeedItem getById(ContentResolver contentResolver, long id) {
 		Cursor cursor = null;
 		FeedItem item = null;
+		
+		initCache();
+		
+		// Return item directly if cached
+		synchronized (cache) {
+			item = cache.get(id);
+			if (item != null) {
+				return item;
+			}
+		}
+		
 		try {
 			String where = ItemColumns._ID + " = " + id;
 
-			cursor = context.query(ItemColumns.URI, ItemColumns.ALL_COLUMNS,
+			cursor = contentResolver.query(ItemColumns.URI, ItemColumns.ALL_COLUMNS,
 					where, null, null);
 			if (cursor.moveToFirst()) {
 				item = new FeedItem();
@@ -490,6 +503,16 @@ public class FeedItem implements Comparable<FeedItem> {
 		//cursor.moveToFirst();
 		item.id = cursor.getLong(cursor.getColumnIndex(ItemColumns._ID));
 		
+		// Return item directly if cached
+		initCache();
+		synchronized (cache) {
+			FeedItem cacheItem = cache.get(item.id);
+			if (cacheItem != null) {
+				item = cacheItem;
+				return;
+			}
+		}
+		
 		int idx = cursor
 				.getColumnIndex(ItemColumns.RESOURCE);
 		item.resource = cursor.getString(idx);
@@ -528,6 +551,11 @@ public class FeedItem implements Comparable<FeedItem> {
 		item.sub_id = cursor.getLong(cursor.getColumnIndex(ItemColumns.SUBS_ID));
 		item.type = cursor.getString(cursor.getColumnIndex(ItemColumns.TYPE));
 		item.keep = cursor.getInt(cursor.getColumnIndex(ItemColumns.KEEP));
+		
+		// if item was not cached we put it in the cache
+		synchronized (cache) {
+			cache.put(item.id, item);
+		}
 	}
 
 	@Override
@@ -745,5 +773,20 @@ public class FeedItem implements Comparable<FeedItem> {
 		if (id != other.id)
 			return false;
 		return true;
+	}
+	
+	private static void initCache() {
+		if (cache == null) {
+			int memoryClass = 16 * 1024 * 1024; //FIXME use getMemoryClass()
+	    	cache = new ItemLruCache(memoryClass);		
+		}
+	}
+	
+	private static class ItemLruCache extends LruCache<Long, FeedItem> {
+
+	    public ItemLruCache(int maxSize) {
+	        super(maxSize);
+	    }
+
 	}
 }
