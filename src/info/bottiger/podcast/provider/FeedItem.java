@@ -165,8 +165,7 @@ public class FeedItem implements Comparable<FeedItem> {
 			cursor = contentResolver.query(ItemColumns.URI, ItemColumns.ALL_COLUMNS,
 					where, null, null);
 			if (cursor.moveToFirst()) {
-				item = new FeedItem();
-				fetchFromCursor(item, cursor);
+				item = fetchFromCursor(cursor);
 
 				cursor.close();
 			}
@@ -186,8 +185,7 @@ public class FeedItem implements Comparable<FeedItem> {
 	public static FeedItem getByCursor(Cursor cursor) {
 		//if (cursor.moveToFirst() == false)
 		//	return null;
-		FeedItem item = new FeedItem();
-		fetchFromCursor(item, cursor);
+		FeedItem item = fetchFromCursor(cursor);
 		return item;
 	}
 
@@ -322,6 +320,11 @@ public class FeedItem implements Comparable<FeedItem> {
 	
 	public void update(ContentResolver context) {
 		log.debug("item update start");
+		
+		initCache();
+		if (this.id > 0)
+			cache.remove(this.id);
+		
 		try {
 
 			ContentValues cv = new ContentValues();
@@ -498,18 +501,20 @@ public class FeedItem implements Comparable<FeedItem> {
 		return 0L;
 	}
 
-	private static void fetchFromCursor(FeedItem item, Cursor cursor) {
+	private static FeedItem fetchFromCursor(Cursor cursor) {
 		//assert cursor.moveToFirst();
 		//cursor.moveToFirst();
+		FeedItem item = new FeedItem();
+		
 		item.id = cursor.getLong(cursor.getColumnIndex(ItemColumns._ID));
 		
 		// Return item directly if cached
 		initCache();
 		synchronized (cache) {
 			FeedItem cacheItem = cache.get(item.id);
-			if (cacheItem != null) {
+			if (cacheItem != null && cacheItem.title != "") { // FIXME cacheItem.title != ""
 				item = cacheItem;
-				return;
+				return item;
 			}
 		}
 		
@@ -556,6 +561,8 @@ public class FeedItem implements Comparable<FeedItem> {
 		synchronized (cache) {
 			cache.put(item.id, item);
 		}
+		
+		return item;
 	}
 
 	@Override

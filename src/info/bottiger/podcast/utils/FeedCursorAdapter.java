@@ -340,8 +340,9 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 			writeStatus(id, holder.textViewFileSize, ds);
 		}
 
-		int filesize = 0;
 		
+		int filesize = 0;
+		/*
 		try {
 			int filesizeIndex = cursor
 					.getColumnIndexOrThrow(ItemColumns.FILESIZE);
@@ -352,6 +353,7 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 		} catch (IllegalArgumentException e) {
 
 		}
+		*/
 
 		holder.textViewTitle.setText(title);
 
@@ -381,13 +383,14 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 
 		
 		/* Calculate the imageOath */
-		String imagePath;
+		String imageURL;
 		String fullPath = SDCardManager.pathFromFilename(filePath);
 		if (filePath != null && filePath.length() > 0 && new File(fullPath).exists() && ds == PodcastDownloadManager.DownloadStatus.DONE) {
 			//holder.imageView.setImageBitmap(cover);
 			FileOutputStream out;
 			String thumbnailPath = thumbnailCacheURL(cursor.getString(idIndex));
 			File thumbnail = new File(thumbnailPath);
+			String urlPrefix = "file://";
 			if (!thumbnail.exists()) {
 			try {
 				MediaMetadataRetriever mmr = new MediaMetadataRetriever();
@@ -396,21 +399,21 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 				Bitmap cover = BitmapFactory.decodeByteArray(ba, 0, ba.length);
 				out = new FileOutputStream(thumbnailPath);
 				cover.compress(Bitmap.CompressFormat.PNG, 90, out);
-				imagePath = thumbnailPath;
+				imageURL = urlPrefix + thumbnailPath;
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				imagePath = cursor.getString(imageIndex);
+				imageURL = urlPrefix + cursor.getString(imageIndex);
 			} catch (RuntimeException e) {
 				e.printStackTrace();
-				imagePath = cursor.getString(imageIndex);
+				imageURL = cursor.getString(imageIndex);
 			}
 			} else {
-				imagePath = thumbnailPath;
+				imageURL = urlPrefix + thumbnailPath;
 			}
 		} else {
 			//this.setViewImage3(holder.imageView, cursor.getString(imageIndex));
-			imagePath = cursor.getString(imageIndex);
+			imageURL = cursor.getString(imageIndex);
 		}
 		
 		File cacheDir = SDCardManager.getCacheDir();
@@ -434,7 +437,9 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 		// Initialize ImageLoader with configuration. Do it once.
 		imageLoader.init(config);
 		// Load and display image asynchronously
-		imageLoader.displayImage(cursor.getString(imageIndex), holder.imageView);
+		//imageLoader.displayImage(cursor.getString(imageIndex), holder.imageView);
+		if (imageURL != null && !imageURL.equals(""))
+			imageLoader.displayImage(imageURL, holder.imageView);
 	}
 
 	public void showItem(Long id) {
