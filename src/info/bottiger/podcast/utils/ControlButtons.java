@@ -27,27 +27,19 @@ public class ControlButtons {
     
 	private static TextView mCurrentTime;
 	
+	/* Deprecated. 24/12-2012
 	private static OnSeekBarChangeListener mSeekListener = new OnSeekBarChangeListener() {
         public void onStartTrackingTouch(SeekBar bar) {
             mLastSeekEventTime = 0;
-            mFromTouch = true;
         }
         public void onProgressChanged(SeekBar bar, int progress, boolean fromuser) {
-            //log.debug("onProgressChanged");
-       	
-            if (!fromuser || (fragment.mPlayerServiceBinder == null)) return;
+            //if (!fromuser || (PodcastBaseFragment.mPlayerServiceBinder == null)) return;
 
             long now = SystemClock.elapsedRealtime();
             if ((now - mLastSeekEventTime) > 250) {
                 mLastSeekEventTime = now;
-                long timeMs = fragment.mPlayerServiceBinder.duration() * progress / 1000;
-                if (mCurrentTime != null) mCurrentTime.setText(StrUtils.formatTime(timeMs));
-                //mPosOverride = mp.duration * progress / 1000;
-
-                if (!mFromTouch) {
-                    //refreshNow();
-                    //mPosOverride = -1;
-                }
+                long timeMs = (PodcastBaseFragment.mPlayerServiceBinder.duration() * progress) / 1000;
+                //if (mCurrentTime != null) mCurrentTime.setText(StrUtils.formatTime(timeMs));
             }
             
         }
@@ -65,6 +57,7 @@ public class ControlButtons {
 
         }
     };
+    */
 	
 	public static RecentItemFragment fragment = null;
 		
@@ -149,7 +142,9 @@ public class ControlButtons {
 		
 
     	ControlButtons.mCurrentTime = viewHolder.currentTime;
-        viewHolder.seekbar.setOnSeekBarChangeListener(mSeekListener);
+    	OnPlayerSeekBarChangeListener listener = new OnPlayerSeekBarChangeListener(viewHolder.currentTime, viewHolder.duration);
+        //viewHolder.seekbar.setOnSeekBarChangeListener(mSeekListener);
+    	viewHolder.seekbar.setOnSeekBarChangeListener(listener);
         viewHolder.seekbar.setMax(MAX_SEEKBAR_VALUE); 
 	}
     
@@ -187,6 +182,55 @@ public class ControlButtons {
 		
 		ControlButtons.setListener(SwipeActivity.mServiceBinder, viewHolder, id);
 			
+	}
+	
+	
+	private static class OnPlayerSeekBarChangeListener implements OnSeekBarChangeListener {
+
+		TextView currentTimeView;
+		TextView durationView;
+		
+	    public OnPlayerSeekBarChangeListener(TextView tv, TextView dv) {
+	        this.currentTimeView = tv;
+	        this.durationView = dv;
+	    }
+	    
+	    @Override
+	    public void onStartTrackingTouch(SeekBar bar) {
+            mLastSeekEventTime = 0;
+        }
+	    
+	    @Override
+        public void onProgressChanged(SeekBar bar, int progress, boolean fromuser) {
+            //if (!fromuser || (PodcastBaseFragment.mPlayerServiceBinder == null)) return;
+
+            long now = SystemClock.elapsedRealtime();
+            if ((now - mLastSeekEventTime) > 250 && durationView != null) {
+                mLastSeekEventTime = now;
+                
+                float relativeProgress = progress / (float)1000;
+                String duration = durationView.getText().toString();
+                //long timeMs = duration * progress / 1000;
+                //if (mCurrentTime != null) mCurrentTime.setText(StrUtils.formatTime(timeMs));
+                if (currentTimeView != null) currentTimeView.setText(StrUtils.formatTime(relativeProgress, duration));
+            }
+            
+        }
+        
+	    @Override
+        public void onStopTrackingTouch(SeekBar bar) {
+            //mPosOverride = -1;
+            mFromTouch = false;
+            long timeMs = fragment.mPlayerServiceBinder.duration() * bar.getProgress() / 1000;
+            try {
+            	if(fragment.mPlayerServiceBinder.isInitialized())
+            		fragment.mPlayerServiceBinder.seek(timeMs);
+            } catch (Exception ex) {
+            }
+            //log.debug("mFromTouch = false; ");
+
+        }
+
 	}
 
 }

@@ -25,6 +25,7 @@ public class StrUtils {
     	return formatTime(progress, item.duration);
     }
     
+    // 0 < progress < 1
     public static String formatTime(float progress, String duration) {
     	if (duration.length() == 0) 
     		return "";

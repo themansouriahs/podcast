@@ -82,7 +82,7 @@ public class PodcastBaseFragment extends ListFragment {
 	}
 
 	public void setProgressBar(SeekBar mProgress) {
-		this.mProgressBar = mProgress;
+		PodcastBaseFragment.mProgressBar = mProgress;
 	}
 
 	public void setDuration(TextView mDuration) {
