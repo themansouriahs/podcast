@@ -115,8 +115,8 @@ public class SwipeActivity extends FragmentActivity implements
 		Account[] a = AccountManager.get(getApplicationContext())
 				.getAccountsByType("com.google");
 		if (a.length > 0) {
-			GoogleReader agr = new GoogleReader();
-			agr.refreshAuthToken(SwipeActivity.this, a[0]);
+			GoogleReader agr = new GoogleReader(SwipeActivity.this);
+			agr.refreshAuthToken(a[0]);
 			agr.getSubscriptionsFromReader();
 		}
 		} catch(Exception e) {

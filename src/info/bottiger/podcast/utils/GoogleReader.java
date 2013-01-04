@@ -13,6 +13,7 @@ package info.bottiger.podcast.utils;
  * limitations under the License.
  */
 
+import info.bottiger.podcast.R;
 import info.bottiger.podcast.provider.Subscription;
 
 import java.io.BufferedInputStream;
@@ -85,6 +86,7 @@ import android.util.Log;
  */
 public class GoogleReader {
 	private static final String TAG = GoogleReader.class.getName();
+	private final String CLIENT;
 
 	public static final String PREF_NAME = "Random Name";
 	public static final String PREF_TOKEN = "accessToken";
@@ -92,17 +94,36 @@ public class GoogleReader {
 	public static final String COMSUMER_KEY = "13654253758.apps.googleusercontent.com";
 
 	private AccountManagerFuture<Bundle> amf = null;
-	private Context context = null;
+	private Context mContext = null;
+	
+	private String baseURL = "http://www.google.com/reader/api/0/subscription/";
+	private URL getURL;
+	private URL editURL;
+	
+	public enum ReaderAction {
+	    GET, ADD, DELETE 
+	}
+	
+	public GoogleReader(Context context) {
+		this.mContext = context;
+		this.CLIENT = mContext.getString(R.string.http_client_name);
+		
+		try {
+			getURL = new URL(baseURL + "list");
+			editURL = new URL(baseURL + "edit");
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+	}
 	
 	public void oauth() throws Exception {
-		new HTTPRequest().execute();
+		new HTTPRequest(ReaderAction.GET).execute();
 	}
 
-	public void refreshAuthToken(final Context context, final Account account) {
+	public void refreshAuthToken(final Account account) {
 		//final SharedPreferences settings = activity.getSharedPreferences(
 		//		PREF_NAME, 0);
-		this.context = context;
-		final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+		final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
 		String accessToken = settings.getString(PREF_TOKEN, "");
 		final AccountManagerCallback<Bundle> cb = new AccountManagerCallback<Bundle>() {
 			public void run(AccountManagerFuture<Bundle> future) {
@@ -119,7 +140,7 @@ public class GoogleReader {
 						editor.putString(PREF_TOKEN, authToken);
 						editor.commit();
 					} else if (authIntent != null) {
-						context.startActivity(authIntent);
+						mContext.startActivity(authIntent);
 					} else {
 						Log.e(TAG,
 								"AccountManager was unable to obtain an authToken.");
@@ -129,9 +150,9 @@ public class GoogleReader {
 				}
 			}
 		};
-		AccountManager.get(context).invalidateAuthToken("com.google",
+		AccountManager.get(mContext).invalidateAuthToken("com.google",
 				accessToken);
-		this.amf = AccountManager.get(context).getAuthToken(account, SCOPE,
+		this.amf = AccountManager.get(mContext).getAuthToken(account, SCOPE,
 				true, cb, null);
 	}
 
@@ -147,7 +168,7 @@ public class GoogleReader {
 
 	public List<Subscription> getSubscriptionsFromReader() {
 		// http://www.google.com/reader/api/0/stream/contents/user/-/label/Listen%20Subscriptions?client=myApplication
-		new HTTPRequest().execute();
+		new HTTPRequest(ReaderAction.GET).execute(getURL);
 		return null; // FIXME
 	}
 
@@ -158,188 +179,279 @@ public class GoogleReader {
 		}
 		return true;
 	}
-
-	private boolean addSubscriptiontoReader(Subscription subscription) {
-		return false; // FIXME
+	
+	private boolean removeSubscriptionsfromReader(List<Subscription> subscriptions) {
+		for (Subscription s : subscriptions) {
+			if (!this.removeSubscriptionfromReader(s))
+				return false;
+		}
+		return true;
 	}
 
-	private class HTTPRequest extends AsyncTask<Void, Void, String> {
-		private String Content;
-		private String Error = null;
-
-		protected void onPreExecute() {
+	private boolean addSubscriptiontoReader(Subscription subscription) {
+		String feedURL = subscription.url;
+		String ac = "subscribe";
+		String t = subscription.title;
+		String a = "Listen Subscriptions";
+		String T = "";
+		try {
+			T = amf.getResult().getString("authtoken");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		
+		StringBuilder urlString = new StringBuilder(this.baseURL);
+		urlString.append("?");
+		urlString.append("s=");
+		urlString.append(feedURL);
+		urlString.append("ac=");
+		urlString.append(ac);
+		urlString.append("t=");
+		urlString.append(t);
+		urlString.append("a=");
+		urlString.append(a);
+		urlString.append("T=");
+		urlString.append(T);
+		
+		URL url;
+		try {
+			url = new URL(urlString.toString());
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		
+		new HTTPRequest(ReaderAction.ADD).execute();
+		return true; // FIXME
+	}
 
-		protected void onPostExecute(String result) {
-
+	private boolean removeSubscriptionfromReader(Subscription subscription) {
+		String feedURL = subscription.url;
+		String ac = "unsubscribe";
+		String T = "";
+		try {
+			T = amf.getResult().getString("authtoken");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		
+		StringBuilder urlString = new StringBuilder(this.baseURL);
+		urlString.append("?");
+		urlString.append("s=");
+		urlString.append(feedURL);
+		urlString.append("ac=");
+		urlString.append(ac);
+		urlString.append("T=");
+		urlString.append(T);
+		
+		URL url;
+		try {
+			url = new URL(urlString.toString());
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-
-		protected String doInBackground(Void... urls) {
-
-			URL url = null;
-			try {
+		
+		new HTTPRequest(ReaderAction.DELETE).execute();
+		return true; // FIXME
+	}
+	
+	
+	private class HTTPRequest extends AsyncTask<URL, Void, String> {		
+		private URL url;
+		private URLConnection conn;
+		private String authKey;
+		private ReaderAction action;
+		
+		/*
+		  			try {
 				url = new URL(
 						"http://www.google.com/reader/api/0/subscription/list");
-			} catch (MalformedURLException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				authKey = amf.getResult().getString("authtoken");
+			} catch (Exception e1) {
+						e1.printStackTrace();
 			}
-			URLConnection conn = null;
+		 */
+		
+		HTTPRequest(ReaderAction ra) {
+			this.action = ra;
+		}
+		
+		protected void onPreExecute() {
+			try {
+				authKey = amf.getResult().getString("authtoken");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		protected void onPostExecute(String result) {}
 
+		protected String doInBackground(URL... urls) {
+
+			url = urls[0];
+			
 			try {
 				conn = (HttpURLConnection) url.openConnection();
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-
-			String authKey = null;
-			;
-			try {
-				authKey = amf.getResult().getString("authtoken");
-			} catch (OperationCanceledException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (AuthenticatorException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-
+			
 			conn.setRequestProperty("Authorization", "OAuth " + authKey);
-
-			StringBuilder response = new StringBuilder();
-			/*
-			 * try { BufferedReader in = new BufferedReader(isr); String
-			 * inputLine; while ((inputLine = in.readLine()) != null)
-			 * response.append(inputLine); in.close(); } catch (IOException e) {
-			 * Error = e.getMessage(); cancel(true); }
-			 */
-
-			DocumentBuilderFactory builderFactory = DocumentBuilderFactory
-					.newInstance();
-			DocumentBuilder builder = null;
-			Document document = null;
+			InputStream response = null;
 			try {
-				builder = builderFactory.newDocumentBuilder();
-			} catch (ParserConfigurationException e) {
-				e.printStackTrace();
-			}
-
-			try {
-				document = builder.parse(conn.getInputStream());
-
-			Element rootElement = document.getDocumentElement();
-
-			NodeList nodes = rootElement.getChildNodes();
-
-			DOMSource source = new DOMSource(document);
-			StringWriter xmlAsWriter = new StringWriter();
-			StreamResult result = new StreamResult(xmlAsWriter);
-			try {
-				TransformerFactory.newInstance().newTransformer()
-						.transform(source, result);
-			} catch (TransformerConfigurationException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (TransformerException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (TransformerFactoryConfigurationError e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			StringReader xmlReader = new StringReader(xmlAsWriter.toString());
-			InputSource is = new InputSource(xmlReader);
-
-			NodeList xpathNodes = null;
-			XPath xpath = XPathFactory.newInstance().newXPath();
-			// String expression =
-			// "//object/string[@name = \"id\" and ../list/object/string = \"Listen Subscriptions\"]";
-			String expression = "//object[list/object/string = \"Listen Subscriptions\"]";
-			try {
-				xpathNodes = (NodeList) xpath.evaluate(expression, is,
-						XPathConstants.NODESET);
-			} catch (XPathExpressionException e) {
+				response = conn.getInputStream();
+			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
+			String result = null;
+			if (action == ReaderAction.GET) {
+				result = parseGoogleReader(response);
+			} else if (action == ReaderAction.ADD || action == ReaderAction.DELETE) {
+				result = response.toString();
+			}
+			return result;
 
-			for (int i = 0; i < xpathNodes.getLength(); i++) {
-				Node n = xpathNodes.item(i);
+			
 
-				NodeList ns = n.getChildNodes();
+		}
+	}
+	
+	private String parseGoogleReader(InputStream input) {
+		StringBuilder response = new StringBuilder();
+		/*
+		 * try { BufferedReader in = new BufferedReader(isr); String
+		 * inputLine; while ((inputLine = in.readLine()) != null)
+		 * response.append(inputLine); in.close(); } catch (IOException e) {
+		 * Error = e.getMessage(); cancel(true); }
+		 */
 
-				String podName = null;
-				String podFeed = null;
+		DocumentBuilderFactory builderFactory = DocumentBuilderFactory
+				.newInstance();
+		DocumentBuilder builder = null;
+		Document document = null;
+		try {
+			builder = builderFactory.newDocumentBuilder();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		}
 
-				for (int j = 0; j < ns.getLength(); j++) {
-					Node propertyNode = ns.item(j);
+		try {
+			//document = builder.parse(conn.getInputStream());
+			document = builder.parse(input);
 
-					if (propertyNode.getNodeType() == Node.ELEMENT_NODE) {
-						Element child = (Element) propertyNode;
-						String att = child.getAttribute("name");
-						// String v = n.getTextContent();
-						//Log.v(TAG, att);
+		Element rootElement = document.getDocumentElement();
 
-						if (att.equalsIgnoreCase("id")) {
-							podFeed = child.getTextContent().substring(5); // remove "feed/" from tge beginning
-						} else if (att.equalsIgnoreCase("title")) {
-							podName = child.getTextContent();
-						}
+		NodeList nodes = rootElement.getChildNodes();
+
+		DOMSource source = new DOMSource(document);
+		StringWriter xmlAsWriter = new StringWriter();
+		StreamResult result = new StreamResult(xmlAsWriter);
+		try {
+			TransformerFactory.newInstance().newTransformer()
+					.transform(source, result);
+		} catch (TransformerConfigurationException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (TransformerException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (TransformerFactoryConfigurationError e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		StringReader xmlReader = new StringReader(xmlAsWriter.toString());
+		InputSource is = new InputSource(xmlReader);
+
+		NodeList xpathNodes = null;
+		XPath xpath = XPathFactory.newInstance().newXPath();
+		// String expression =
+		// "//object/string[@name = \"id\" and ../list/object/string = \"Listen Subscriptions\"]";
+		String expression = "//object[list/object/string = \"Listen Subscriptions\"]";
+		try {
+			xpathNodes = (NodeList) xpath.evaluate(expression, is,
+					XPathConstants.NODESET);
+		} catch (XPathExpressionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		for (int i = 0; i < xpathNodes.getLength(); i++) {
+			Node n = xpathNodes.item(i);
+
+			NodeList ns = n.getChildNodes();
+
+			String podName = null;
+			String podFeed = null;
+
+			for (int j = 0; j < ns.getLength(); j++) {
+				Node propertyNode = ns.item(j);
+
+				if (propertyNode.getNodeType() == Node.ELEMENT_NODE) {
+					Element child = (Element) propertyNode;
+					String att = child.getAttribute("name");
+					// String v = n.getTextContent();
+					//Log.v(TAG, att);
+
+					if (att.equalsIgnoreCase("id")) {
+						podFeed = child.getTextContent().substring(5); // remove "feed/" from tge beginning
+					} else if (att.equalsIgnoreCase("title")) {
+						podName = child.getTextContent();
 					}
 				}
-
-				Subscription podcast = new Subscription(podFeed);
-				podcast.subscribe(GoogleReader.this.context.getContentResolver());
-				//podcast.subscribe(getContentResolver());
-				//contentService.addSubscription(podcast);
-			
-			}
-			
-			
-			} catch (SAXException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
 			}
 
-			/*
-			 * // loop over "subscription list node" for (int i = 0; i <
-			 * nodes.getLength(); i++) { Node node = nodes.item(i);
-			 * 
-			 * if (node instanceof Element) { Element child = (Element) node;
-			 * 
-			 * NodeList objectNodes = node.getChildNodes();
-			 * 
-			 * // loop over "object" nodes for (int j = 0; j <
-			 * objectNodes.getLength(); j++) { Node object =
-			 * objectNodes.item(j); if (node instanceof Element) { Element el =
-			 * (Element) object;
-			 * 
-			 * // objectPropertiers => string, string, list, // string, number,
-			 * string NodeList objectPropertiers = el.getChildNodes();
-			 * 
-			 * for (int k = 0; k < objectPropertiers.getLength(); k++) { Node
-			 * objectNode = objectPropertiers.item(k); if (objectNode instanceof
-			 * Element) { String attName = ((Element)
-			 * objectNode).getAttribute("name");
-			 * 
-			 * if (attName.equalsIgnoreCase("categories") &&
-			 * objectNode.hasChildNodes()) {
-			 * 
-			 * XPath xpath = XPathFactory.newInstance().newXPath(); String
-			 * expression = "//object[string = \"Listen Subscriptions\"]";
-			 * InputSource inputSource = new InputSource(); NodeSet nodes =
-			 * (NodeSet) xpath.evaluate(expression, inputSource,
-			 * XPathConstants.NODESET);
-			 * 
-			 * } } } } } } }
-			 */
-
-			return response.toString();
+			Subscription podcast = new Subscription(podFeed);
+			podcast.subscribe(GoogleReader.this.mContext.getContentResolver());
+			//podcast.subscribe(getContentResolver());
+			//contentService.addSubscription(podcast);
+		
 		}
+		
+		
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		/*
+		 * // loop over "subscription list node" for (int i = 0; i <
+		 * nodes.getLength(); i++) { Node node = nodes.item(i);
+		 * 
+		 * if (node instanceof Element) { Element child = (Element) node;
+		 * 
+		 * NodeList objectNodes = node.getChildNodes();
+		 * 
+		 * // loop over "object" nodes for (int j = 0; j <
+		 * objectNodes.getLength(); j++) { Node object =
+		 * objectNodes.item(j); if (node instanceof Element) { Element el =
+		 * (Element) object;
+		 * 
+		 * // objectPropertiers => string, string, list, // string, number,
+		 * string NodeList objectPropertiers = el.getChildNodes();
+		 * 
+		 * for (int k = 0; k < objectPropertiers.getLength(); k++) { Node
+		 * objectNode = objectPropertiers.item(k); if (objectNode instanceof
+		 * Element) { String attName = ((Element)
+		 * objectNode).getAttribute("name");
+		 * 
+		 * if (attName.equalsIgnoreCase("categories") &&
+		 * objectNode.hasChildNodes()) {
+		 * 
+		 * XPath xpath = XPathFactory.newInstance().newXPath(); String
+		 * expression = "//object[string = \"Listen Subscriptions\"]";
+		 * InputSource inputSource = new InputSource(); NodeSet nodes =
+		 * (NodeSet) xpath.evaluate(expression, inputSource,
+		 * XPathConstants.NODESET);
+		 * 
+		 * } } } } } } }
+		 */
+
+		return response.toString();		
 	}
 }

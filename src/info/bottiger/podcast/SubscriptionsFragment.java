@@ -26,8 +26,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 /* Copy of ChannelActivity */
 public class SubscriptionsFragment extends PodcastBaseFragment {
@@ -51,28 +54,29 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 		SubscriptionColumns.COMMENT
 	};
 
+	TextView addSubscriptionView = null;;
 	private static HashMap<Integer, Integer> mIconMap;
-	private View V;
+	private View fragmentView;
 	
 	Subscription mChannel = null;
 	long id;
 
 	static {
-
 		mIconMap = new HashMap<Integer, Integer>();
 		AllItemActivity.initFullIconMap(mIconMap);
-/*
-		mIconMap.put(ItemColumns.ITEM_STATUS_UNREAD, R.drawable.new_item);
-		mIconMap.put(ItemColumns.ITEM_STATUS_READ, R.drawable.open_item);
-		mIconMap.put(ItemColumns.ITEM_STATUS_DOWNLOAD_PAUSE, R.drawable.download);
-		mIconMap.put(ItemColumns.ITEM_STATUS_DOWNLOAD_QUEUE, R.drawable.download);
-		mIconMap.put(ItemColumns.ITEM_STATUS_DOWNLOADING_NOW, R.drawable.download);
-		
-		mIconMap.put(ItemColumns.ITEM_STATUS_NO_PLAY, R.drawable.music);
-		mIconMap.put(ItemColumns.ITEM_STATUS_KEEP, R.drawable.music);
-		mIconMap.put(ItemColumns.ITEM_STATUS_PLAYED, R.drawable.music);		
-*/
 	}
+	
+	private OnClickListener clickListener = new OnClickListener() {
+	    @Override
+	    public void onClick(final View v) {
+	        switch(v.getId()) {
+	           case R.id.add_subscription:
+	        	   Toast toast = Toast.makeText(getActivity(), "adding subscription", Toast.LENGTH_SHORT);
+	        	   toast.show();
+	        	   break;
+	        }
+	    }
+	};
 
 	public static boolean channelExists(Activity act, Uri uri) {
 		Cursor cursor = act.getContentResolver().query(uri,
@@ -91,37 +95,19 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-
-		//super.onCreate(savedInstanceState);
-		//setContentView(R.layout.channel);
-		V = inflater.inflate(R.layout.channel, container, false);
+		fragmentView = inflater.inflate(R.layout.channel, container, false);
+		
+		addSubscriptionView = (TextView) fragmentView.findViewById(R.id.add_subscription);
+		addSubscriptionView.setOnClickListener(clickListener);
+		
 		Intent intent = getActivity().getIntent();
 
 		Uri uri = intent.getData();
-		/*
-		Cursor cursor = getActivity().getContentResolver().query(uri,
-				SubscriptionColumns.ALL_COLUMNS, null, null, null);
-		if (!cursor.moveToFirst()) {
-			//return;
-		}
-		
-		mChannel = Subscription.getByCursor(cursor);
-
-		cursor.close();
-		
-		if(mChannel==null){
-			//finish();
-			//return;
-		}
-		//setTitle(mChannel.title);
-		
-		getListView().setOnCreateContextMenuListener(this);
-		*/
 		
 		mPrevIntent = null;
 		mNextIntent = null;
 		startInit();
-		return V;
+		return fragmentView;
 	}
 	/*
 	@Override
@@ -284,4 +270,5 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 		super.startInit();
 
 	}
+	
 }

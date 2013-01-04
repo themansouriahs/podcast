@@ -127,5 +127,7 @@
     <string name="download">Download</string>
     <string name="queue">Queue</string>
     <string name="menu_download_all">Download All</string>
+    <string name="add_subscription">Add Subscription</string>
+    <string name="http_client_name">SoundWaves</string>
 
 </resources>
