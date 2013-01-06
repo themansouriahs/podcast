@@ -16,6 +16,8 @@ package info.bottiger.podcast.utils;
 import info.bottiger.podcast.R;
 import info.bottiger.podcast.provider.Subscription;
 
+import com.loopj.android.http.*;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -29,6 +31,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -45,6 +48,14 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -80,33 +91,78 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 /**
+ * More about google reader API: 
+ *  - http://blog.martindoms.com/2010/01/20/using-the-google-reader-api-part-3/
+ *  - http://www.chrisdadswell.co.uk/grapicalls/
+ *  
+ *  
  * Collection of OAuth 2 utilities to achieve "one-click" approval on Android.
  * 
  * @author Chirag Shah <chirags@google.com>
  */
 public class GoogleReader {
 	private static final String TAG = GoogleReader.class.getName();
-	private final String CLIENT;
+	private static String CLIENT= null;
 
 	public static final String PREF_NAME = "Random Name";
 	public static final String PREF_TOKEN = "accessToken";
 	public static final String SCOPE = "oauth2:http://www.google.com/reader/api"; // Or
 	public static final String COMSUMER_KEY = "13654253758.apps.googleusercontent.com";
-
-	private AccountManagerFuture<Bundle> amf = null;
-	private Context mContext = null;
+	public static final String TOKEN_URL = "http://www.google.com/reader/api/0/token";
 	
-	private String baseURL = "http://www.google.com/reader/api/0/subscription/";
-	private URL getURL;
-	private URL editURL;
+	private static Account mAccount;
+	private static AccountManagerFuture<Bundle> amf = null;
+	private static Context mContext = null;
+	
+	private static String baseURL = "http://www.google.com/reader/api/0/subscription/";
+	private static URL getURL;
+	private static URL editURL;
+	
+	private static Object mTokenLock = new Object();
+	private static String mToken;
 	
 	public enum ReaderAction {
 	    GET, ADD, DELETE 
 	}
 	
-	public GoogleReader(Context context) {
-		this.mContext = context;
-		this.CLIENT = mContext.getString(R.string.http_client_name);
+	private static SharedPreferences mSettings = null;
+	
+	final AccountManagerCallback<Bundle> cb = new AccountManagerCallback<Bundle>() {
+		public void run(AccountManagerFuture<Bundle> future) {
+			try {
+				final Bundle result = future.getResult();
+				final String accountName = result
+						.getString(AccountManager.KEY_ACCOUNT_NAME);
+				final String authToken = result
+						.getString(AccountManager.KEY_AUTHTOKEN);
+				final Intent authIntent = result
+						.getParcelable(AccountManager.KEY_INTENT);
+				if (accountName != null && authToken != null) {
+					final SharedPreferences.Editor editor = mSettings.edit();
+					editor.putString(PREF_TOKEN, authToken);
+					editor.commit();
+				} else if (authIntent != null) {
+					mContext.startActivity(authIntent);
+				} else {
+					Log.e(TAG,
+							"AccountManager was unable to obtain an authToken.");
+				}
+			} catch (Exception e) {
+				Log.e(TAG, "Auth Error", e);
+			}
+		}
+	};
+	
+	public GoogleReader(Context context, Account account) {
+		init(context, account);
+	}
+	
+	public static void init(Context context, Account account) {
+		//readerToken();
+		mContext = context;
+		mAccount = account;
+		CLIENT = mContext.getString(R.string.http_client_name);
+		mSettings = PreferenceManager.getDefaultSharedPreferences(mContext);
 		
 		try {
 			getURL = new URL(baseURL + "list");
@@ -120,161 +176,166 @@ public class GoogleReader {
 		new HTTPRequest(ReaderAction.GET).execute();
 	}
 
-	public void refreshAuthToken(final Account account) {
+	public void refreshAuthToken() {
 		//final SharedPreferences settings = activity.getSharedPreferences(
 		//		PREF_NAME, 0);
-		final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
-		String accessToken = settings.getString(PREF_TOKEN, "");
-		final AccountManagerCallback<Bundle> cb = new AccountManagerCallback<Bundle>() {
-			public void run(AccountManagerFuture<Bundle> future) {
-				try {
-					final Bundle result = future.getResult();
-					final String accountName = result
-							.getString(AccountManager.KEY_ACCOUNT_NAME);
-					final String authToken = result
-							.getString(AccountManager.KEY_AUTHTOKEN);
-					final Intent authIntent = result
-							.getParcelable(AccountManager.KEY_INTENT);
-					if (accountName != null && authToken != null) {
-						final SharedPreferences.Editor editor = settings.edit();
-						editor.putString(PREF_TOKEN, authToken);
-						editor.commit();
-					} else if (authIntent != null) {
-						mContext.startActivity(authIntent);
-					} else {
-						Log.e(TAG,
-								"AccountManager was unable to obtain an authToken.");
-					}
-				} catch (Exception e) {
-					Log.e(TAG, "Auth Error", e);
-				}
-			}
-		};
+		String accessToken = mSettings.getString(PREF_TOKEN, "");
 		AccountManager.get(mContext).invalidateAuthToken("com.google",
 				accessToken);
-		this.amf = AccountManager.get(mContext).getAuthToken(account, SCOPE,
+		this.amf = AccountManager.get(mContext).getAuthToken(mAccount, SCOPE,
 				true, cb, null);
 	}
 
-	public void synchronize() {
-		int i;
-		// get all remote subscriptions and add them to the local database
-		//for (Subscription s : this.getSubscriptionsFromReader())
-			//this.contentService.addSubscription(s);
-
-		// push local subscriptions to reader
-		//this.addSubscriptionstoReader(this.contentService.getSubscriptions());
-	}
-
-	public List<Subscription> getSubscriptionsFromReader() {
+	public static List<Subscription> getSubscriptionsFromReader() {
 		// http://www.google.com/reader/api/0/stream/contents/user/-/label/Listen%20Subscriptions?client=myApplication
 		new HTTPRequest(ReaderAction.GET).execute(getURL);
 		return null; // FIXME
 	}
 
-	private boolean addSubscriptionstoReader(List<Subscription> subscriptions) {
+	public static void addSubscriptionstoReader(Context context, Account account, List<Subscription> subscriptions) {
 		for (Subscription s : subscriptions) {
-			if (!this.addSubscriptiontoReader(s))
-				return false;
+			addSubscriptiontoReader(context, account, s);
 		}
-		return true;
 	}
 	
-	private boolean removeSubscriptionsfromReader(List<Subscription> subscriptions) {
+	public void removeSubscriptionsfromReader(Context context, Account account, List<Subscription> subscriptions) {
 		for (Subscription s : subscriptions) {
-			if (!this.removeSubscriptionfromReader(s))
-				return false;
+			removeSubscriptionfromReader(context, account, s);
 		}
-		return true;
 	}
 
-	private boolean addSubscriptiontoReader(Subscription subscription) {
-		String feedURL = subscription.url;
+	public static void addSubscriptiontoReader(Context context, Account account, Subscription subscription) {
+		init(context, account);
+		String feed = subscription.url;
 		String ac = "subscribe";
 		String t = subscription.title;
 		String a = "Listen Subscriptions";
-		String T = "";
-		try {
-			T = amf.getResult().getString("authtoken");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
 		
-		StringBuilder urlString = new StringBuilder(this.baseURL);
+    	final RequestParams params = new RequestParams();
+    	params.put("quickadd", feed);
+    	params.put("s", "feed/" + feed);
+    	params.put("ac", ac);
+		params.put("t", t);
+		params.put("a", a);
+		
+		AsyncHttpResponseHandler handler = new AsyncHttpResponseHandler() {
+	    	@Override
+	    	public void onSuccess(String response) {
+	        	Log.d("TOKEN ->",response);
+	        	params.put("T", response);
+	        	addSubscriptionHTTPRequest(params);
+	    	}
+		};
+		
+		
+		readerToken(handler);
+	}
+	
+	private static String buildURL(String action) {
+		final StringBuilder urlString = new StringBuilder(baseURL);
+		urlString.append(action);
 		urlString.append("?");
-		urlString.append("s=");
-		urlString.append(feedURL);
-		urlString.append("ac=");
-		urlString.append(ac);
-		urlString.append("t=");
-		urlString.append(t);
-		urlString.append("a=");
-		urlString.append(a);
-		urlString.append("T=");
-		urlString.append(T);
+		urlString.append("client=");
+		urlString.append(CLIENT);
+		return urlString.toString();
+	}
+	
+	private static void addSubscriptionHTTPRequest(final RequestParams params) {
 		
-		URL url;
-		try {
-			url = new URL(urlString.toString());
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		String action = "quickadd";
 		
-		new HTTPRequest(ReaderAction.ADD).execute();
-		return true; // FIXME
+		AsyncHttpClient client = new AsyncHttpClient();
+		Log.d("OAuth auth: ", authHeaderValue());
+		client.addHeader(authHeaderKey(), authHeaderValue());
+		client.post(buildURL(action), params, new AsyncHttpResponseHandler() {
+		    @Override
+		    public void onSuccess(String response) {
+		        Log.d("RESPONSE ->",response);
+		        tagSubscriptionHTTPRequest(params);
+		    }
+		    
+		    @Override
+		     public void onFailure(Throwable e, String response) {
+		         // Response failed :(
+		    	int i;
+		    	i = 5;
+		     }
+		});
+	}
+	
+	private static void tagSubscriptionHTTPRequest(RequestParams params) {
+		
+		String action = "edit";
+		params.put("a", "user/-/label/Listen Subscriptions");
+		params.put("ac", "edit");
+		
+		AsyncHttpClient client = new AsyncHttpClient();
+		Log.d("OAuth auth: ", authHeaderValue());
+		client.addHeader(authHeaderKey(), authHeaderValue());
+		client.post(buildURL(action), params, new AsyncHttpResponseHandler() {
+		    @Override
+		    public void onSuccess(String response) {
+		        Log.d("RESPONSE ->",response);
+		    }
+		    
+		    @Override
+		     public void onFailure(Throwable e, String response) {
+		         // Response failed :(
+		    	int i;
+		    	i = 5;
+		     }
+		});
+	}
+	
+	private static void removeSubscriptionHTTPRequest(RequestParams params) {
+		
+		String action = "edit";
+		params.put("ac", "unsubscribe");
+		
+		AsyncHttpClient client = new AsyncHttpClient();
+		Log.d("OAuth auth: ", authHeaderValue());
+		client.addHeader(authHeaderKey(), authHeaderValue());
+		client.post(buildURL(action), params, new AsyncHttpResponseHandler() {
+		    @Override
+		    public void onSuccess(String response) {
+		        Log.d("RESPONSE ->",response);
+		    }
+		    
+		    @Override
+		     public void onFailure(Throwable e, String response) {
+		         // Response failed :(
+		    	int i;
+		    	i = 5;
+		     }
+		});
 	}
 
-	private boolean removeSubscriptionfromReader(Subscription subscription) {
-		String feedURL = subscription.url;
-		String ac = "unsubscribe";
-		String T = "";
-		try {
-			T = amf.getResult().getString("authtoken");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
+	public void removeSubscriptionfromReader(Context context, Account account, Subscription subscription) {
+		init(context, account);
+		String feed = subscription.url;
+		String t = subscription.title;
 		
-		StringBuilder urlString = new StringBuilder(this.baseURL);
-		urlString.append("?");
-		urlString.append("s=");
-		urlString.append(feedURL);
-		urlString.append("ac=");
-		urlString.append(ac);
-		urlString.append("T=");
-		urlString.append(T);
+    	final RequestParams params = new RequestParams();
+    	params.put("s", "feed/" + feed);
 		
-		URL url;
-		try {
-			url = new URL(urlString.toString());
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		new HTTPRequest(ReaderAction.DELETE).execute();
-		return true; // FIXME
+		AsyncHttpResponseHandler handler = new AsyncHttpResponseHandler() {
+	    	@Override
+	    	public void onSuccess(String response) {
+	        	Log.d("TOKEN ->",response);
+	        	params.put("T", response);
+	        	tagSubscriptionHTTPRequest(params);
+	    	}
+		};
+		readerToken(handler);
 	}
 	
 	
-	private class HTTPRequest extends AsyncTask<URL, Void, String> {		
+	private static class HTTPRequest extends AsyncTask<URL, Void, String> {		
 		private URL url;
 		private URLConnection conn;
 		private String authKey;
 		private ReaderAction action;
-		
-		/*
-		  			try {
-				url = new URL(
-						"http://www.google.com/reader/api/0/subscription/list");
-				authKey = amf.getResult().getString("authtoken");
-			} catch (Exception e1) {
-						e1.printStackTrace();
-			}
-		 */
-		
+
 		HTTPRequest(ReaderAction ra) {
 			this.action = ra;
 		}
@@ -301,27 +362,26 @@ public class GoogleReader {
 			
 			conn.setRequestProperty("Authorization", "OAuth " + authKey);
 			InputStream response = null;
+			String result = null;
 			try {
 				response = conn.getInputStream();
+				if (action == ReaderAction.GET) {
+					result = parseGoogleReader(response);
+				} else if (action == ReaderAction.ADD || action == ReaderAction.DELETE) {
+					result = response.toString();
+				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}
-			
-			String result = null;
-			if (action == ReaderAction.GET) {
-				result = parseGoogleReader(response);
-			} else if (action == ReaderAction.ADD || action == ReaderAction.DELETE) {
-				result = response.toString();
+				
+				//hack http://stackoverflow.com/questions/11810447/httpurlconnection-worked-fine-in-android-2-x-but-not-in-4-1-no-authentication-c
+				//response = conn.get
 			}
 			return result;
-
-			
-
 		}
 	}
 	
-	private String parseGoogleReader(InputStream input) {
+	private static String parseGoogleReader(InputStream input) {
 		StringBuilder response = new StringBuilder();
 		/*
 		 * try { BufferedReader in = new BufferedReader(isr); String
@@ -406,7 +466,7 @@ public class GoogleReader {
 			}
 
 			Subscription podcast = new Subscription(podFeed);
-			podcast.subscribe(GoogleReader.this.mContext.getContentResolver());
+			podcast.subscribe(GoogleReader.mContext.getContentResolver());
 			//podcast.subscribe(getContentResolver());
 			//contentService.addSubscription(podcast);
 		
@@ -453,5 +513,50 @@ public class GoogleReader {
 		 */
 
 		return response.toString();		
+	}
+	
+	private String getAuthToken() {
+		this.amf =  AccountManager.get(mContext).getAuthToken(mAccount, SCOPE,
+				true, cb, null);
+		try {
+			return this.amf.getResult().getString("authtoken");
+		} catch (OperationCanceledException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (AuthenticatorException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	private static void readerToken(AsyncHttpResponseHandler handler) {
+			AsyncHttpClient client = new AsyncHttpClient();
+			client.addHeader(authHeaderKey(), authHeaderValue());
+			client.get(TOKEN_URL, handler);
+	}
+	
+	private static String authHeaderKey() {
+		return "Authorization";
+	}
+	
+	private static String authHeaderValue() {
+		String authKey = null;
+		try {
+			authKey = amf.getResult().getString("authtoken");
+		} catch (OperationCanceledException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (AuthenticatorException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return "OAuth " + authKey;
 	}
 }

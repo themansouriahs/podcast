@@ -49,11 +49,14 @@ public class SwipeActivity extends FragmentActivity implements
 		OnItemSelectedListener {
 
 	public static PodcastService mServiceBinder = null;
-
+	public static GoogleReader gReader = null;
+	
 	protected static Cursor mCursor = null;
 	protected boolean mInit = false;
 	protected final Log log = Log.getLog(getClass());
 	protected static ComponentName mService = null;
+	
+	public static Account mAccount;
 	
 	private boolean debugging = true;
 
@@ -112,13 +115,14 @@ public class SwipeActivity extends FragmentActivity implements
 		mViewPager.setAdapter(mSectionsPagerAdapter);
 
 		try {
-		Account[] a = AccountManager.get(getApplicationContext())
+			Account[] a = AccountManager.get(getApplicationContext())
 				.getAccountsByType("com.google");
-		if (a.length > 0) {
-			GoogleReader agr = new GoogleReader(SwipeActivity.this);
-			agr.refreshAuthToken(a[0]);
-			agr.getSubscriptionsFromReader();
-		}
+			this.mAccount = a[0];
+			gReader = new GoogleReader(SwipeActivity.this, mAccount);
+			if (a.length > 0) {
+				gReader.refreshAuthToken();
+				gReader.getSubscriptionsFromReader();
+			}
 		} catch(Exception e) {
 			
 		}

@@ -6,6 +6,7 @@ import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.provider.SubscriptionColumns;
 import info.bottiger.podcast.utils.DialogMenu;
+import info.bottiger.podcast.utils.GoogleReader;
 
 import java.util.HashMap;
 
@@ -71,6 +72,8 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 	    public void onClick(final View v) {
 	        switch(v.getId()) {
 	           case R.id.add_subscription:
+	        	   Subscription sub = new Subscription("http://feeds.twit.tv/ifive");
+	        	   GoogleReader.addSubscriptiontoReader(getActivity(), SwipeActivity.mAccount, sub);
 	        	   Toast toast = Toast.makeText(getActivity(), "adding subscription", Toast.LENGTH_SHORT);
 	        	   toast.show();
 	        	   break;
