@@ -180,6 +180,9 @@ public class SwipeActivity extends FragmentActivity implements
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+		case R.id.menu_add:
+			mServiceBinder.start_update();
+			return true;
 		case R.id.menu_settings:
 			// mServiceBinder.start_update();
 			return true;
