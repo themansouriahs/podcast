@@ -137,7 +137,7 @@ public class BackupChannelsActivity extends HapiActivity {
                 	 try {
 						fileInputStream = new FileInputStream(filesArray[select]);
 						OPMLParserHandler handler = new OPMLParserHandler();
-						handler.context = getContentResolver();
+						handler.context = getApplicationContext();
 						try {
 							FeedParser.getDefault().parse(
 									fileInputStream, handler);							

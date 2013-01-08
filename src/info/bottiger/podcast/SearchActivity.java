@@ -276,7 +276,7 @@ public class SearchActivity extends PodcastBaseActivity implements TextWatcher {
 						
 						sub.comment = content;
 						
-						int rc = sub.subscribe(getContentResolver());
+						int rc = sub.subscribe(getApplicationContext());
 						
 						if(rc == Subscription.ADD_FAIL_DUP){
 							Toast.makeText(SearchActivity.this,

@@ -19,6 +19,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import android.content.ContentResolver;
+import android.content.Context;
 import android.widget.Toast;
 
 public class OPMLParserHandler extends DefaultHandler {
@@ -32,7 +33,7 @@ public class OPMLParserHandler extends DefaultHandler {
 
 	private final Log log = Log.getLog(getClass());
 	
-	public ContentResolver context;
+	public Context context;
 	
 	public int success_num;
 	public int dup_num;;

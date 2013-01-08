@@ -1,6 +1,9 @@
 package info.bottiger.podcast.provider;
 
 
+import info.bottiger.podcast.SwipeActivity;
+import info.bottiger.podcast.utils.GoogleReader;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -8,6 +11,7 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -153,22 +157,18 @@ public class Subscription {
 	}
 	
 	public Subscription(String url_link) {
-		
 		init();
 		url = url_link;
 		title = url_link;
 		link = url_link;
-
 	}	
 	
-	public int subscribe(ContentResolver context){
+	public int subscribe(Context context){
 		Subscription sub = Subscription.getByUrl(
-				context, url);
+				context.getContentResolver(), url);
 		if (sub != null) {
 			return ADD_FAIL_DUP;
 		}
-
-
 
 		ContentValues cv = new ContentValues();
 		cv.put(SubscriptionColumns.TITLE, title);
@@ -178,11 +178,12 @@ public class Subscription {
 		cv.put(SubscriptionColumns.COMMENT, comment);
 		cv.put(SubscriptionColumns.DESCRIPTION, description);
 		cv.put(SubscriptionColumns.IMAGE_URL, imageURL);
-		Uri uri = context.insert(SubscriptionColumns.URI, cv);
+		Uri uri = context.getContentResolver().insert(SubscriptionColumns.URI, cv);
 		if (uri == null) {
 			return ADD_FAIL_UNSUCCESS;
 		}
 		
+		GoogleReader.addSubscriptiontoReader(context, SwipeActivity.mAccount, sub);
 		return ADD_SUCCESS;
 			
 	}

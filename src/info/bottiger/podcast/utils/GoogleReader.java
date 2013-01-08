@@ -466,7 +466,7 @@ public class GoogleReader {
 			}
 
 			Subscription podcast = new Subscription(podFeed);
-			podcast.subscribe(GoogleReader.mContext.getContentResolver());
+			podcast.subscribe(GoogleReader.mContext);
 			//podcast.subscribe(getContentResolver());
 			//contentService.addSubscription(podcast);
 		

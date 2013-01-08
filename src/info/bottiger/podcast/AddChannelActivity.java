@@ -154,7 +154,7 @@ public class AddChannelActivity extends HapiActivity {
 	private void addFeed(String url, FeedParserListener feed) {
 
 		Subscription sub = new Subscription(url);
-		sub.subscribe(getContentResolver());
+		sub.subscribe(getApplicationContext());
 		feed_handler.updateFeed(sub, feed);
 
 	}

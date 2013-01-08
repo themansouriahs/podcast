@@ -7,6 +7,7 @@ import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.PodcastProvider;
 import info.bottiger.podcast.service.PlayerService;
 import info.bottiger.podcast.service.PodcastService;
+import info.bottiger.podcast.utils.AddPodcastDialog;
 import info.bottiger.podcast.utils.GoogleReader;
 import info.bottiger.podcast.utils.Log;
 import android.accounts.Account;
@@ -181,7 +182,7 @@ public class SwipeActivity extends FragmentActivity implements
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_add:
-			mServiceBinder.start_update();
+			AddPodcastDialog.addPodcast(this);
 			return true;
 		case R.id.menu_settings:
 			// mServiceBinder.start_update();
