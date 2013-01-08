@@ -39,12 +39,13 @@ import info.bottiger.podcast.provider.SubscriptionColumns;
 import info.bottiger.podcast.service.PlayerService;
 import info.bottiger.podcast.service.PodcastService;
 import info.bottiger.podcast.utils.DialogMenu;
+import info.bottiger.podcast.utils.FeedCursorAdapter;
 import info.bottiger.podcast.utils.Log;
 import info.bottiger.podcast.utils.PodcastProgressBar;
 import info.bottiger.podcast.utils.StrUtils;
 
 
-public class PlayerActivity   extends HapiListActivity
+public class PlayerActivity   extends ListActivity
 {
 	protected  static PlayerService mServiceBinder = null;
 	protected final Log log = Log.getLog(getClass());
@@ -105,13 +106,10 @@ public class PlayerActivity   extends HapiListActivity
 	
 	static {
 		mIconMap = new HashMap<Integer, Integer>();
-		AllItemActivity.initFullIconMap(mIconMap);
-/*
-		mIconMap.put(ItemColumns.ITEM_STATUS_NO_PLAY, R.drawable.music);
-		mIconMap.put(ItemColumns.ITEM_STATUS_KEEP, R.drawable.music);
-		mIconMap.put(ItemColumns.ITEM_STATUS_PLAYED, R.drawable.music);		
-*/
+		
 		}	
+	
+	public static HashMap<Integer, Integer> mKeepIconMap;
 	
 
 	protected static ServiceConnection serviceConnection = new ServiceConnection() {
@@ -408,13 +406,25 @@ public class PlayerActivity   extends HapiListActivity
         mTotalTime = (TextView) findViewById(R.id.totaltime); 
         mCurrentTime = (TextView) findViewById(R.id.currenttime); 
         
-		TabsHelper.setEpisodeTabClickListeners(this, R.id.episode_bar_play_button);
+		//TabsHelper.setEpisodeTabClickListeners(this, R.id.episode_bar_play_button);
 
         startInit();
 
         //updateInfo();
    
     }
+    
+	protected static FeedCursorAdapter channelListItemCursorAdapter(Context context, Cursor cursor) {
+		FeedCursorAdapter.FieldHandler[] fields = {
+				FeedCursorAdapter.defaultTextFieldHandler,
+				new FeedCursorAdapter.IconFieldHandler(mIconMap),
+				new FeedCursorAdapter.IconFieldHandler(mKeepIconMap)
+		};
+		return new FeedCursorAdapter(context, R.layout.channel_list_item, cursor,
+				new String[] { ItemColumns.TITLE, ItemColumns.STATUS, ItemColumns.KEEP },
+				new int[] { R.id.text1, R.id.icon, R.id.keep_icon },
+				fields);
+	}
     
 	public void startInit() {
 
@@ -430,7 +440,7 @@ public class PlayerActivity   extends HapiListActivity
 
 		mCursor = managedQuery(ItemColumns.URI, PROJECTION, where, null, order);
 
-		mAdapter = AllItemActivity.channelListItemCursorAdapter(this, mCursor);
+		mAdapter = channelListItemCursorAdapter(this, mCursor);
 /*		mAdapter = new IconCursorAdapter(this, R.layout.channel_list_item, mCursor,
 				new String[] { ItemColumns.TITLE,ItemColumns.STATUS }, new int[] {
 						R.id.text1}, mIconMap);

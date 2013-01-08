@@ -131,6 +131,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
         }
         
         
+        /*
         final PullToRefreshListView pullToRefreshView = (PullToRefreshListView) fragmentView.findViewById(R.id.episode_list);
         
         OnRefreshListener<ListView> pullToRefreshListener = new OnRefreshListener<ListView>() {
@@ -143,6 +144,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
         
         pullToRefreshView.getLoadingLayoutProxy().setRefreshingLabel("opdaterer"	);
         pullToRefreshView.setOnRefreshListener(pullToRefreshListener);
+        */
     }
     
     @Override

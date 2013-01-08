@@ -6,6 +6,7 @@ import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.provider.SubscriptionColumns;
 import info.bottiger.podcast.utils.DialogMenu;
+import info.bottiger.podcast.utils.FeedCursorAdapter;
 import info.bottiger.podcast.utils.GoogleReader;
 
 import java.util.HashMap;
@@ -15,6 +16,7 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.ContentUris;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -64,7 +66,6 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 
 	static {
 		mIconMap = new HashMap<Integer, Integer>();
-		AllItemActivity.initFullIconMap(mIconMap);
 	}
 
 	public static boolean channelExists(Activity act, Uri uri) {
@@ -245,11 +246,22 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
     		}
 		} 
 	}
+	
+	private static FeedCursorAdapter channelListSubscriptionCursorAdapter(Context context, Cursor cursor) {
+		FeedCursorAdapter.FieldHandler[] fields = {
+				FeedCursorAdapter.defaultTextFieldHandler,
+				new FeedCursorAdapter.IconFieldHandler()
+		};
+		return new FeedCursorAdapter(context, R.layout.list_item, cursor,
+				new String[] { SubscriptionColumns.TITLE, SubscriptionColumns.IMAGE_URL },
+				new int[] { R.id.title, R.id.list_image },
+				fields);
+	}
 
 	@Override
 	public void startInit() {
 		SwipeActivity.mCursor = new CursorLoader(getActivity(), SubscriptionColumns.URI, PROJECTION, null, null, null).loadInBackground();
-		mAdapter = AllItemActivity.channelListSubscriptionCursorAdapter(getActivity().getApplicationContext(), SwipeActivity.mCursor);
+		mAdapter = channelListSubscriptionCursorAdapter(getActivity().getApplicationContext(), SwipeActivity.mCursor);
 	
 		setListAdapter(mAdapter);
 

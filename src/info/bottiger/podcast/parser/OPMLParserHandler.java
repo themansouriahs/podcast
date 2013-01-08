@@ -1,7 +1,6 @@
 package info.bottiger.podcast.parser;
 
 import info.bottiger.podcast.R;
-import info.bottiger.podcast.SearchActivity;
 import info.bottiger.podcast.parser.SearchItem;
 import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.utils.Log;

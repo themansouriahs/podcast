@@ -1,10 +1,6 @@
 package info.bottiger.podcast.provider;
 
-import info.bottiger.podcast.AllItemActivity;
-import info.bottiger.podcast.ChannelActivity;
-import info.bottiger.podcast.PlayListActivity;
 import info.bottiger.podcast.PlayerActivity;
-import info.bottiger.podcast.PodcastBaseActivity;
 import info.bottiger.podcast.service.PodcastService;
 import info.bottiger.podcast.utils.FileUtils;
 import info.bottiger.podcast.utils.Log;
@@ -99,11 +95,12 @@ public class FeedItem implements Comparable<FeedItem> {
 		act.startActivity(new Intent(Intent.ACTION_EDIT, uri));   
 	}
 	
+	/*
 	public static void viewChannel(Activity act, long item_id) {
 		FeedItem item = FeedItem.getById(act.getContentResolver(), item_id);
 		item.viewChannel(act);
 	}
-
+	*/
 	public static void play(Activity act, long item_id) {
 		FeedItem feeditem = FeedItem.getById(act.getContentResolver(), item_id);
 		if (feeditem == null)
@@ -419,6 +416,7 @@ public class FeedItem implements Comparable<FeedItem> {
 		}
 	}
 
+	/*
 	public void viewChannel(Activity act) {
 		//Subscription sub = Subscription.getSubbyId(getContentResolver(), item.sub_id);
 		Uri chUri = ContentUris.withAppendedId(SubscriptionColumns.URI, this.sub_id);
@@ -432,7 +430,7 @@ public class FeedItem implements Comparable<FeedItem> {
 			Toast.makeText(act, tstr, Toast.LENGTH_SHORT).show();
 		}
 	}
-
+	*/
 	public void playedBy(Activity act) {
 		Intent intent = new Intent(android.content.Intent.ACTION_VIEW); 
 	    Uri data = Uri.parse("file://"+this.pathname); 

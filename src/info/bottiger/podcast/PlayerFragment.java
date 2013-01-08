@@ -110,7 +110,6 @@ public class PlayerFragment   extends PodcastBaseFragment
 	
 	static {
 		mIconMap = new HashMap<Integer, Integer>();
-		AllItemActivity.initFullIconMap(mIconMap);
 /*
 		mIconMap.put(ItemColumns.ITEM_STATUS_NO_PLAY, R.drawable.music);
 		mIconMap.put(ItemColumns.ITEM_STATUS_KEEP, R.drawable.music);
@@ -392,7 +391,7 @@ public class PlayerFragment   extends PodcastBaseFragment
 
 		mCursor = new CursorLoader(getActivity(), ItemColumns.URI, PROJECTION, where, null, order).loadInBackground();
 
-		mAdapter = AllItemActivity.channelListItemCursorAdapter(getActivity(), mCursor);
+		mAdapter = PlayerActivity.channelListItemCursorAdapter(getActivity(), mCursor);
 /*		mAdapter = new IconCursorAdapter(this, R.layout.channel_list_item, mCursor,
 				new String[] { ItemColumns.TITLE,ItemColumns.STATUS }, new int[] {
 						R.id.text1}, mIconMap);
