@@ -2,6 +2,7 @@ package info.bottiger.podcast;
 
 import info.bottiger.podcast.R;
 import info.bottiger.podcast.provider.FeedItem;
+import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.service.PlayerService;
 import info.bottiger.podcast.service.PodcastService;
 import info.bottiger.podcast.utils.FilesizeUpdater;
@@ -23,10 +24,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.support.v4.app.ListFragment;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.SeekBar;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.Toast;
 
 /* Copy of PodcastBaseActivity */
 public class PodcastBaseFragment extends ListFragment {
@@ -156,6 +166,53 @@ public class PodcastBaseFragment extends ListFragment {
 					+ " must implement OnArticleSelectedListener");
 		}
 	}
+	
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+ 
+        OnItemLongClickListener listener = new OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int position, long id) {
+               return false;
+            }
+
+        };
+ 
+        registerForContextMenu(getListView());
+        getListView().setOnItemLongClickListener(listener);
+ 
+    }
+    
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getActivity().getMenuInflater();
+        inflater.inflate(R.menu.podcast_context, menu);
+    }
+    
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+    	
+        if (!AdapterView.AdapterContextMenuInfo.class.isInstance (item.getMenuInfo ()))
+            return false;
+
+        AdapterView.AdapterContextMenuInfo cmi =
+            (AdapterView.AdapterContextMenuInfo) item.getMenuInfo ();
+
+        Object o = getListView ().getItemAtPosition (cmi.position);
+        Subscription sub = this.getSubscription(o);
+    	
+        AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+        switch (item.getItemId()) {
+            case R.id.unsubscribe:
+            	sub.unsubscribe(getActivity().getApplicationContext());
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
 
 	// Container Activity must implement this interface
 	public interface OnItemSelectedListener {
@@ -358,6 +415,11 @@ public class PodcastBaseFragment extends ListFragment {
 	
 	protected Cursor getCursor() {
 		return this.mCursor;
+	}
+	
+	// HACK, FIX IT
+	Subscription getSubscription(Object o) {
+		return null;
 	}
 
 }

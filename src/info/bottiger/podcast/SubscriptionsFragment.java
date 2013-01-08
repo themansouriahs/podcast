@@ -273,5 +273,11 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 		super.startInit();
 
 	}
+
+	Subscription getSubscription(Object o) {
+		Cursor item = (Cursor)o;
+		Long id = item.getLong(item.getColumnIndex(ItemColumns._ID));
+		return new Subscription().getById(getActivity().getContentResolver(), id);
+	}
 	
 }

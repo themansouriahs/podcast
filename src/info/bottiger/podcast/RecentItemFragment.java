@@ -3,6 +3,7 @@ package info.bottiger.podcast;
 import info.bottiger.podcast.R;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
+import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.service.PodcastDownloadManager;
 import info.bottiger.podcast.utils.ControlButtons;
 import info.bottiger.podcast.utils.ControlButtons.Holder;
@@ -495,7 +496,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 		
 		for (int i = start, j = list.getLastVisiblePosition(); i <= j; i++) {
 			Cursor item = (Cursor) list.getItemAtPosition(i);
-
+			
 			if (id == item.getLong(item.getColumnIndex(ItemColumns._ID))) {
 				View view = list.getChildAt(i);
 				return view;
@@ -510,5 +511,11 @@ public class RecentItemFragment extends PodcastBaseFragment {
 		//		condition, null, getOrder()).loadInBackground();
 		return new CursorLoader(getActivity(), ItemColumns.URI, ItemColumns.ALL_COLUMNS,
 				condition, null, getOrder()).loadInBackground();
+	}
+	
+	Subscription getSubscription(Object o) {
+		Cursor item = (Cursor)o;
+		Long id = item.getLong(item.getColumnIndex(ItemColumns.SUBS_ID));
+		return new Subscription().getById(getActivity().getContentResolver(), id);
 	}
 }

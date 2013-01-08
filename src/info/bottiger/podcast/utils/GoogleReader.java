@@ -310,7 +310,7 @@ public class GoogleReader {
 		});
 	}
 
-	public void removeSubscriptionfromReader(Context context, Account account, Subscription subscription) {
+	public static void removeSubscriptionfromReader(Context context, Account account, Subscription subscription) {
 		init(context, account);
 		String feed = subscription.url;
 		String t = subscription.title;
@@ -323,7 +323,7 @@ public class GoogleReader {
 	    	public void onSuccess(String response) {
 	        	Log.d("TOKEN ->",response);
 	        	params.put("T", response);
-	        	tagSubscriptionHTTPRequest(params);
+	        	removeSubscriptionHTTPRequest(params);
 	    	}
 		};
 		readerToken(handler);
