@@ -66,20 +66,6 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 		mIconMap = new HashMap<Integer, Integer>();
 		AllItemActivity.initFullIconMap(mIconMap);
 	}
-	
-	private OnClickListener clickListener = new OnClickListener() {
-	    @Override
-	    public void onClick(final View v) {
-	        switch(v.getId()) {
-	           case R.id.add_subscription:
-	        	   Subscription sub = new Subscription("http://feeds.twit.tv/ifive");
-	        	   GoogleReader.addSubscriptiontoReader(getActivity(), SwipeActivity.mAccount, sub);
-	        	   Toast toast = Toast.makeText(getActivity(), "adding subscription", Toast.LENGTH_SHORT);
-	        	   toast.show();
-	        	   break;
-	        }
-	    }
-	};
 
 	public static boolean channelExists(Activity act, Uri uri) {
 		Cursor cursor = act.getContentResolver().query(uri,
@@ -99,9 +85,6 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
 		fragmentView = inflater.inflate(R.layout.channel, container, false);
-		
-		addSubscriptionView = (TextView) fragmentView.findViewById(R.id.add_subscription);
-		addSubscriptionView.setOnClickListener(clickListener);
 		
 		Intent intent = getActivity().getIntent();
 

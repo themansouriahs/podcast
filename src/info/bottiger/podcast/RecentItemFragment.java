@@ -14,12 +14,17 @@ import info.bottiger.podcast.utils.FeedCursorAdapter.TextFieldHandler;
 
 import java.util.HashMap;
 
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
+
 import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.CursorLoader;
@@ -81,7 +86,6 @@ public class RecentItemFragment extends PodcastBaseFragment {
 	 * bits set
 	 */
 
-	private View V;
 	private FeedCursorAdapter mAdapter;
 	
     boolean mDualPane;
@@ -125,6 +129,20 @@ public class RecentItemFragment extends PodcastBaseFragment {
             // Make sure our UI is in the correct state.
             //showDetails(mCurCheckPosition);
         }
+        
+        
+        final PullToRefreshListView pullToRefreshView = (PullToRefreshListView) fragmentView.findViewById(R.id.episode_list);
+        
+        OnRefreshListener<ListView> pullToRefreshListener = new OnRefreshListener<ListView>() {
+            
+        	@Override
+            public void onRefresh(PullToRefreshBase<ListView> refreshView) {
+        		SwipeActivity.mServiceBinder.start_update(pullToRefreshView);
+            }
+        };
+        
+        pullToRefreshView.getLoadingLayoutProxy().setRefreshingLabel("opdaterer"	);
+        pullToRefreshView.setOnRefreshListener(pullToRefreshListener);
     }
     
     @Override
@@ -244,7 +262,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 
 		// super.onCreate(savedInstanceState);
 
-		V = inflater.inflate(R.layout.recent, container, false);
+		fragmentView = inflater.inflate(R.layout.recent, container, false);
 		// setContentView(R.layout.main);
 		// setTitle(getResources().getString(R.string.title_episodes));
 
@@ -267,9 +285,9 @@ public class RecentItemFragment extends PodcastBaseFragment {
 		// R.id.episode_bar_all_button);
 
 		//startInit();
-		return V;
+		return fragmentView;
 	}
-
+	
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 

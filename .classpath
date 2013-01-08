@@ -6,5 +6,6 @@
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry kind="src" path="/UrlImageViewHelper"/>
+	<classpathentry kind="src" path="/library-pulltorefresh"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

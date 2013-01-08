@@ -1,5 +1,7 @@
 package info.bottiger.podcast;
 
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
+
 import info.bottiger.podcast.R;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.Subscription;
@@ -46,6 +48,8 @@ public class PodcastBaseFragment extends ListFragment {
 	private static final int SWIPE_THRESHOLD_VELOCITY = 200;
 
 	public static final int COLUMN_INDEX_TITLE = 1;
+	
+	protected View fragmentView;
 
 	// protected static PodcastService mServiceBinder = null;
 	public static PlayerService mPlayerServiceBinder = null;
@@ -78,6 +82,7 @@ public class PodcastBaseFragment extends ListFragment {
 	private static TextView mCurrentTime = null;
 	private static SeekBar mProgressBar = null;
 	private static TextView mDuration = null;
+	
 
 	public TextView getCurrentTime() {
 		return mCurrentTime;

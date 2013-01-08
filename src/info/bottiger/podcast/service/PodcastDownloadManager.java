@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
+
 import info.bottiger.podcast.R;
 import info.bottiger.podcast.SwipeActivity;
 import info.bottiger.podcast.fetcher.FeedFetcher;
@@ -82,8 +84,11 @@ public class PodcastDownloadManager {
 		return DownloadStatus.NOTHING;
 	}
 	
-
 	public void start_update(final Context context) {
+		start_update(context, null);
+	}
+
+	public void start_update(final Context context, final PullToRefreshListView pullToRefreshView) {
 		if (updateConnectStatus(context) == NO_CONNECT)
 			return;
 
@@ -91,38 +96,7 @@ public class PodcastDownloadManager {
 		if (mUpdateLock.locked() == false)
 			return;
 
-		/*
-		new Thread() {
-			public void run() {
-				try {
-					int add_num;
-					Subscription sub = findSubscription(context);
-					while (sub != null) {
-						if (updateConnectStatus(context) == NO_CONNECT)
-							break;
-						FeedHandler handler = new FeedHandler(
-								context.getContentResolver(), pref_max_valid_size);
-						Toast.makeText(context,
-								"Updating: " + sub.title,
-								Toast.LENGTH_LONG).show();
-						add_num = handler.update(sub);
-						if ((add_num > 0) && (sub.auto_download > 0))
-							do_download(false, context);
-
-						sub = findSubscription(context);
-					}
-
-				} catch (Exception e) {
-					e.printStackTrace();
-				} finally {
-					mUpdateLock.release();
-				}
-
-			}
-		}.start();
-		*/
-		new UpdateSubscriptions(context).execute();
-		
+		new UpdateSubscriptions(context, pullToRefreshView).execute();
 	}
 
 	 
@@ -366,14 +340,16 @@ public class PodcastDownloadManager {
 		// should we start downloading now?
 	}
 	
-	private class UpdateSubscriptions extends AsyncTask<Void, String, Void> {
+	private class UpdateSubscriptions extends AsyncTask<Void, String, PullToRefreshListView> {
 		 Context mContext;
+		 PullToRefreshListView mRefreshView;
 		 
-		 public UpdateSubscriptions(Context context) {
+		 public UpdateSubscriptions(Context context, PullToRefreshListView pullToRefreshView) {
 		        mContext = context;
+		        mRefreshView = pullToRefreshView;
 		    } 
 		 
-	     protected Void doInBackground(Void... params) {
+	     protected PullToRefreshListView doInBackground(Void... params) {
 				try {					
 					Cursor subscriptionCursor = Subscription.allAsCursor(mContext.getContentResolver());
 					while (subscriptionCursor.moveToNext()) {
@@ -395,38 +371,27 @@ public class PodcastDownloadManager {
 						subscription = findSubscription(mContext);
 
 					}
-					/*
-					int add_num;
-					Subscription sub = findSubscription(mContext);
-					while (sub != null) {
-						if (updateConnectStatus(mContext) == NO_CONNECT)
-							break;
-						FeedHandler handler = new FeedHandler(
-								mContext.getContentResolver(), pref_max_valid_size);
-						publishProgress(sub.title);
-						/*Toast.makeText(context,
-								"Updating: " + sub.title,
-								Toast.LENGTH_LONG).show();*
-						add_num = handler.update(sub);
-						if ((add_num > 0) && (sub.auto_download > 0))
-							do_download(false, mContext);
-
-						sub = findSubscription(mContext);
-					}
-					*/
-
 				} catch (Exception e) {
 					e.printStackTrace();
 				} finally {
 					mUpdateLock.release();
 				}
-	    	 return null;
+	    	 return mRefreshView;
 	     }
 
 	     
 	     protected void onProgressUpdate(String... title) {
-	    	 Toast.makeText(mContext, "Updating: " + title[0], Toast.LENGTH_LONG).show();
+	    	 //Toast.makeText(mContext, "Updating: " + title[0], Toast.LENGTH_LONG).show();
+	    	 CharSequence pullLabel = "Updateing: " + title[0];
+	    	 mRefreshView.getLoadingLayoutProxy().setRefreshingLabel(pullLabel);
 	     }
+	     
+         @Override
+         protected void onPostExecute(PullToRefreshListView refreshView) {
+             // Call onRefreshComplete when the list has been refreshed.
+             refreshView.onRefreshComplete();
+             super.onPostExecute(refreshView);
+         }
 	 }
 	
 	

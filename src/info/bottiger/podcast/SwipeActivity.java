@@ -1,6 +1,8 @@
 package info.bottiger.podcast;
 
 import com.bugsense.trace.BugSenseHandler;
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 import info.bottiger.podcast.PodcastBaseFragment.OnItemSelectedListener;
 import info.bottiger.podcast.provider.ItemColumns;
@@ -25,6 +27,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Debug;
 import android.os.IBinder;

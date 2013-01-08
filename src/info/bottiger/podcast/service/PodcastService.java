@@ -2,6 +2,8 @@ package info.bottiger.podcast.service;
 
 import java.util.PriorityQueue;
 
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
+
 import info.bottiger.podcast.Pref;
 import info.bottiger.podcast.R;
 import info.bottiger.podcast.fetcher.FeedFetcher;
@@ -145,6 +147,10 @@ public class PodcastService extends Service {
 	
 	public void start_update() {
 		pdm.start_update(getBaseContext());
+	}
+	
+	public void start_update(PullToRefreshListView pullToRefreshView) {
+		pdm.start_update(getBaseContext(), pullToRefreshView);
 	}
 
 	public void updateSetting() {
