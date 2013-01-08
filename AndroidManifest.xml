@@ -15,7 +15,6 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.VIBRATE" />
-    
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
 
@@ -30,16 +29,14 @@
         android:icon="@drawable/soundwaves"
         android:label="@string/app_name" >
         <uses-library android:name="android.test.runner" />
-        
-        <activity android:name="com.handmark.pulltorefresh.library.PullToRefreshListView" />
 
-        
-        
+        <activity android:name="com.handmark.pulltorefresh.library.PullToRefreshListView" />
         <activity
             android:name=".SwipeActivity"
             android:label="@string/title_activity_swipe" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -61,8 +58,43 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="info.bottiger.podcast.AllItemActivity"
+            android:name="info.bottiger.podcast.PodcastSubscriberActivity"
             android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="http" />
+                <data android:host="*" />
+                <data android:pathPattern=".*\\.xml" />
+                <data android:pathPattern=".*\\.rss" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="http" />
+                <data android:host="feeds.feedburner.com" />
+                <data android:host="feedproxy.google.com" />
+                <data android:host="feeds2.feedburner.com" />
+                <data android:host="feedsproxy.google.com" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="http" />
+                <data android:mimeType="text/xml" />
+                <data android:mimeType="application/rss+xml" />
+                <data android:mimeType="application/atom+xml" />
+                <data android:mimeType="application/xml" />
+            </intent-filter>
         </activity>
         <activity
             android:name="info.bottiger.podcast.ItemActivity"
@@ -144,14 +176,16 @@
             android:name="info.bottiger.podcast.service.PlayerService"
             android:enabled="true" >
         </service>
-        
-        <receiver  android:process=":remote" android:name="PodcastUpdateManager"></receiver>
+
+        <receiver
+            android:name="PodcastUpdateManager"
+            android:process=":remote" >
+        </receiver>
 
         <provider
             android:name="info.bottiger.podcast.provider.PodcastProvider"
             android:authorities="info.bottiger.podcast.provider.podcastprovider" >
         </provider>
-
     </application>
 
     <instrumentation
