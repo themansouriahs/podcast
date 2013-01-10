@@ -15,6 +15,7 @@ import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.provider.SubscriptionColumns;
 import info.bottiger.podcast.utils.DownloadStatus;
+import info.bottiger.podcast.utils.GoogleReader;
 import info.bottiger.podcast.utils.LockHandler;
 import info.bottiger.podcast.utils.Log;
 import info.bottiger.podcast.utils.SDCardManager;
@@ -347,6 +348,7 @@ public class PodcastDownloadManager {
 		 public UpdateSubscriptions(Context context, PullToRefreshListView pullToRefreshView) {
 		        mContext = context;
 		        mRefreshView = pullToRefreshView;
+		        GoogleReader.getSubscriptionsFromReader();
 		    } 
 		 
 	     protected PullToRefreshListView doInBackground(Void... params) {
@@ -383,7 +385,8 @@ public class PodcastDownloadManager {
 	     protected void onProgressUpdate(String... title) {
 	    	 //Toast.makeText(mContext, "Updating: " + title[0], Toast.LENGTH_LONG).show();
 	    	 CharSequence pullLabel = "Updateing: " + title[0];
-	    	 mRefreshView.getLoadingLayoutProxy().setLastUpdatedLabel(pullLabel);
+	    	 if (pullLabel != null)
+	    		 mRefreshView.getLoadingLayoutProxy().setLastUpdatedLabel(pullLabel);
 	     }
 	     
          @Override

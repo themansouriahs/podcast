@@ -187,6 +187,7 @@ public class Subscription {
 	public int subscribe(Context context) {
 		Subscription sub = Subscription.getByUrl(context.getContentResolver(),
 				url);
+
 		if (sub != null) {
 			return ADD_FAIL_DUP;
 		}
@@ -204,9 +205,12 @@ public class Subscription {
 		if (uri == null) {
 			return ADD_FAIL_UNSUCCESS;
 		}
+		
+		Subscription sub_test = Subscription.getByUrl(context.getContentResolver(),
+				url);
+		if (sub_test != null)
+			GoogleReader.addSubscriptiontoReader(context, SwipeActivity.mAccount,sub_test);
 
-		GoogleReader.addSubscriptiontoReader(context, SwipeActivity.mAccount,
-				sub);
 		return ADD_SUCCESS;
 
 	}
@@ -274,6 +278,10 @@ public class Subscription {
 				.getColumnIndex(SubscriptionColumns.LAST_ITEM_UPDATED));
 		sub.auto_download = cursor.getLong(cursor
 				.getColumnIndex(SubscriptionColumns.AUTO_DOWNLOAD));
+	}
+	
+	public String toString() {
+		return this.url;
 	}
 
 }
