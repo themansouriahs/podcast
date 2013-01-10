@@ -383,7 +383,7 @@ public class PodcastDownloadManager {
 	     protected void onProgressUpdate(String... title) {
 	    	 //Toast.makeText(mContext, "Updating: " + title[0], Toast.LENGTH_LONG).show();
 	    	 CharSequence pullLabel = "Updateing: " + title[0];
-	    	 mRefreshView.getLoadingLayoutProxy().setRefreshingLabel(pullLabel);
+	    	 mRefreshView.getLoadingLayoutProxy().setLastUpdatedLabel(pullLabel);
 	     }
 	     
          @Override

@@ -71,6 +71,8 @@ public class RecentItemFragment extends PodcastBaseFragment {
 	public static HashMap<Integer, Integer> mKeepIconMap;
 
 	private View mCurrentPlayer = null;
+	private ListView actualListView = null;
+	
 	
 	private long pref_order;
 	private long pref_where;
@@ -130,8 +132,6 @@ public class RecentItemFragment extends PodcastBaseFragment {
             //showDetails(mCurCheckPosition);
         }
         
-        
-        /*
         final PullToRefreshListView pullToRefreshView = (PullToRefreshListView) fragmentView.findViewById(R.id.episode_list);
         
         OnRefreshListener<ListView> pullToRefreshListener = new OnRefreshListener<ListView>() {
@@ -142,9 +142,9 @@ public class RecentItemFragment extends PodcastBaseFragment {
             }
         };
         
-        pullToRefreshView.getLoadingLayoutProxy().setRefreshingLabel("opdaterer"	);
+        actualListView =pullToRefreshView.getRefreshableView();
+        pullToRefreshView.getLoadingLayoutProxy().setRefreshingLabel("Refreshing feeds");
         pullToRefreshView.setOnRefreshListener(pullToRefreshListener);
-        */
     }
     
     @Override
@@ -294,10 +294,11 @@ public class RecentItemFragment extends PodcastBaseFragment {
 	public void onListItemClick(ListView l, View v, int position, long id) {
 
 		mCurCheckID = id;
-		ListView list = getListView();
+		//ListView list = getListView();
+		ListView list = actualListView;
 		int start = list.getFirstVisiblePosition();
 		for (int i = start, j = list.getLastVisiblePosition(); i <= j; i++) {
-			Cursor item = (Cursor) list.getItemAtPosition(i);
+			Cursor item = (Cursor) list.getItemAtPosition(i+1); //FIXME https://github.com/chrisbanes/Android-PullToRefresh/issues/99
 
 			if (id == item.getLong(item.getColumnIndex(ItemColumns._ID))) {
 				this.togglePlayer(list, item);
