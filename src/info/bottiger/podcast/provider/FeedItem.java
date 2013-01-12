@@ -571,7 +571,7 @@ public class FeedItem implements Comparable<FeedItem> {
 
 	@Override
 	public String toString() {
-		return title;
+		return "Feed: " + title;
 	}
 
 	public String getType() {

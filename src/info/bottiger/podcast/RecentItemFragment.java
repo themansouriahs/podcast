@@ -475,13 +475,13 @@ public class RecentItemFragment extends PodcastBaseFragment {
 		long id = item.getLong(item.getColumnIndex(ItemColumns._ID));
 		String duration = item.getString(item.getColumnIndex(ItemColumns.DURATION));
 		int position = item.getPosition();
-		View view = list.getChildAt(position - start);
+		View view = list.getChildAt(position - start +1);
 		mAdapter.notifyDataSetChanged();
 		
 		ControlButtons.Holder viewHolder = new ControlButtons.Holder();
 		viewHolder.currentTime = (TextView) view.findViewById(R.id.current_position);
 		viewHolder.duration = (TextView) view.findViewById(R.id.duration);
-		viewHolder.duration.setText(duration);
+		if (viewHolder.duration != null) viewHolder.duration.setText(duration);
 		
 		ViewStub stub = (ViewStub) view.findViewById(R.id.stub);
 		if (stub != null) {
