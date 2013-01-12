@@ -57,9 +57,9 @@ public class PodcastService extends Service {
 	public long pref_update_wifi = 0;
 	public long pref_update_mobile = 0;
 	public long pref_item_expire = 0;
-	public long pref_download_file_expire = 0;
+	public long pref_download_file_expire = 1000;
 	public long pref_played_file_expire = 0;
-	public int pref_max_valid_size = 0;
+	public int pref_max_valid_size = 1000;
 
 
 	

@@ -87,15 +87,9 @@
     <string name="pref_update_mobile_title">Update interval though 3G</string>
     <string name="pref_item_expire_description">Setup the automatic expiration time of the undownload items</string>
     <string name="pref_item_expire_title">Undownload item expire in</string>
-    <string name="pref_downloaded_expire_description">Setup the automatic expiration time of the downloaded items</string>
-    <string name="pref_downloaded_expire_title">Downloaded file expire in</string>
-    <string name="pref_played_file_expire_description">Setup the automatic expiration time of the downloaded items</string>
-    <string name="pref_played_file_expire_title">Played file expire in</string>
-    <string name="pref_rewind_interval_description">Setup rewind step</string>
-    <string name="pref_rewind_interval_title">Player Rewind Step</string>
-    <string name="pref_fast_forward_interval_description">Setup fast-forward step</string>
-    <string name="pref_fast_forward_interval_title">Player Fast-Forward Step</string>
-    <string name="pref_max_new_items_description">Setup maximum updated new items</string>
+    <string name="pref_downloaded_expire_description">Setup maximum size of downloaded items</string>
+    <string name="pref_downloaded_expire_title">Podcast history size</string>
+    <string name="pref_downloaded_dialog_title">History size</string>
     <string name="pref_max_new_items_title">Maximum Updated New Items</string>
     <string name="dialog_title_loading">Loading</string>
     <string name="dialog_message_loading">Loading channel...</string>
@@ -130,5 +124,9 @@
     <string name="add_subscription">Add Subscription</string>
     <string name="http_client_name">SoundWaves</string>
     <string name="menu_add_podcast">Add Podcast</string>
+    <string name="pref_feedback_title">Send anonymous feedback</string>
+    <string name="pref_feedback_description">Send anonymous data about the app, such as crash reports, to the developer. </string>
+    <string name="pref_cloud_support_title">Enable Cloud Support</string>
+    <string name="pref_cloud_support_description">Cloud support will backup your data to the cloud and synchronize data between your devices</string>
 
 </resources>

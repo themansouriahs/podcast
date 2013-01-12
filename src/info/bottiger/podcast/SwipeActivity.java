@@ -190,7 +190,8 @@ public class SwipeActivity extends FragmentActivity implements
 			AddPodcastDialog.addPodcast(this);
 			return true;
 		case R.id.menu_settings:
-			// mServiceBinder.start_update();
+			Intent i= new Intent(getBaseContext(), Pref.class);
+            startActivity(i);
 			return true;
 		case R.id.menu_refresh:
 			mServiceBinder.start_update();
