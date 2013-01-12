@@ -2,7 +2,6 @@ package info.bottiger.podcast.provider;
 
 import info.bottiger.podcast.SwipeActivity;
 import info.bottiger.podcast.cloud.GoogleReader;
-
 import java.util.LinkedList;
 import java.util.List;
 
@@ -14,12 +13,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.v4.util.LruCache;
 
 public class Subscription {
 
 	public final static int ADD_SUCCESS = 0;
 	public final static int ADD_FAIL_DUP = -1;
 	public final static int ADD_FAIL_UNSUCCESS = -2;
+	
+	private static SubscriptionLruCache cache = null;
 
 	public long id;
 	public String title;
@@ -90,7 +92,7 @@ public class Subscription {
 							+ "=?", new String[] { url }, null);
 			if (cursor.moveToFirst()) {
 				Subscription sub = new Subscription();
-				fetchFromCursor(sub, cursor);
+				sub = fetchFromCursor(sub, cursor);
 				cursor.close();
 				return sub;
 			}
@@ -110,13 +112,23 @@ public class Subscription {
 		// if (cursor.moveToFirst() == false)
 		// return null;
 		Subscription sub = new Subscription();
-		fetchFromCursor(sub, cursor);
+		sub = fetchFromCursor(sub, cursor);
 		return sub;
 	}
 
 	public static Subscription getById(ContentResolver context, long id) {
 		Cursor cursor = null;
 		Subscription sub = null;
+		
+		initCache();
+		
+		// Return item directly if cached
+		synchronized (cache) {
+			sub = cache.get(id);
+			if (sub != null) {
+				return sub;
+			}
+		}
 
 		try {
 			String where = SubscriptionColumns._ID + " = " + id;
@@ -125,7 +137,7 @@ public class Subscription {
 					SubscriptionColumns.ALL_COLUMNS, where, null, null);
 			if (cursor.moveToFirst()) {
 				sub = new Subscription();
-				fetchFromCursor(sub, cursor);
+				sub = fetchFromCursor(sub, cursor);
 				cursor.close();
 			}
 		} catch (Exception e) {
@@ -256,10 +268,21 @@ public class Subscription {
 		}
 	}
 
-	private static void fetchFromCursor(Subscription sub, Cursor cursor) {
+	private static Subscription fetchFromCursor(Subscription sub, Cursor cursor) {
 		// assert cursor.moveToFirst();
 		// cursor.moveToFirst();
 		sub.id = cursor.getLong(cursor.getColumnIndex(SubscriptionColumns._ID));
+		
+		// Return item directly if cached
+		initCache();
+		synchronized (cache) {
+			Subscription cacheSub = cache.get(sub.id);
+			if (cacheSub != null && cacheSub.title != "") { // FIXME cacheItem.title != ""
+				sub = cacheSub;
+				return sub;
+			}
+		}
+		
 		sub.lastUpdated = cursor.getLong(cursor
 				.getColumnIndex(SubscriptionColumns.LAST_UPDATED));
 		sub.title = cursor.getString(cursor
@@ -278,10 +301,32 @@ public class Subscription {
 				.getColumnIndex(SubscriptionColumns.LAST_ITEM_UPDATED));
 		sub.auto_download = cursor.getLong(cursor
 				.getColumnIndex(SubscriptionColumns.AUTO_DOWNLOAD));
+		
+		// if item was not cached we put it in the cache
+		synchronized (cache) {
+			cache.put(sub.id, sub);
+		}
+		
+		return sub;
 	}
 	
 	public String toString() {
-		return this.url;
+		return "Subscription: " + this.url;
+	}
+	
+	private static void initCache() {
+		if (cache == null) {
+			int memoryClass = 16 * 1024 * 1024; //FIXME use getMemoryClass()
+	    	cache = new SubscriptionLruCache(memoryClass);		
+		}
+	}
+	
+	private static class SubscriptionLruCache extends LruCache<Long, Subscription> {
+
+	    public SubscriptionLruCache(int maxSize) {
+	        super(maxSize);
+	    }
+
 	}
 
 }

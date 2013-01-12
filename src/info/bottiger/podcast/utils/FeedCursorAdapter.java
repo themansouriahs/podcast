@@ -385,7 +385,7 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 		/* Calculate the imageOath */
 		String imageURL = null;
 		if (item != null)
-			imageURL = item.getThumbnail();
+			imageURL = item.getThumbnail(context);
 		
 		if (imageURL != null && !imageURL.equals("")) {
 			ImageLoader imageLoader = getImageLoader(context);

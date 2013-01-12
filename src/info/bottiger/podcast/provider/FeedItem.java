@@ -19,6 +19,7 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -761,7 +762,7 @@ public class FeedItem implements Comparable<FeedItem> {
 	/*
 	 * @return The path to the Items icons
 	 */
-	public String getThumbnail() {
+	public String getThumbnail(Context context) {
 
 		/* Calculate the imageOath */
 		String imageURL;
@@ -797,6 +798,12 @@ public class FeedItem implements Comparable<FeedItem> {
 		} else {
 			//this.setViewImage3(holder.imageView, cursor.getString(imageIndex));
 			imageURL = image;
+			
+			if (imageURL.equals("")) {
+				Subscription subscription = Subscription.getById(context.getContentResolver(), sub_id);
+				imageURL = subscription.imageURL;
+				
+			}
 		}
 		
 		return imageURL;
