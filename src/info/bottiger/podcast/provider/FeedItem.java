@@ -1,22 +1,28 @@
 package info.bottiger.podcast.provider;
 
 import info.bottiger.podcast.PlayerActivity;
+import info.bottiger.podcast.service.PodcastDownloadManager;
 import info.bottiger.podcast.service.PodcastService;
 import info.bottiger.podcast.utils.FileUtils;
 import info.bottiger.podcast.utils.Log;
 import info.bottiger.podcast.utils.SDCardManager;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Handler;
@@ -750,6 +756,57 @@ public class FeedItem implements Comparable<FeedItem> {
 		} else {
 			return this.length;
 		}
+	}
+	
+	/*
+	 * @return The path to the Items icons
+	 */
+	public String getThumbnail() {
+
+		/* Calculate the imageOath */
+		String imageURL;
+		String fullPath = SDCardManager.pathFromFilename(pathname);
+		PodcastDownloadManager.DownloadStatus ds = PodcastDownloadManager.getStatus(this);
+		
+		if (pathname != null && pathname.length() > 0 && new File(fullPath).exists() && ds == PodcastDownloadManager.DownloadStatus.DONE) {
+			//holder.imageView.setImageBitmap(cover);
+			FileOutputStream out;
+			String thumbnailPath = thumbnailCacheURL(id);
+			File thumbnail = new File(thumbnailPath);
+			String urlPrefix = "file://";
+			if (!thumbnail.exists()) {
+			try {
+				MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+				mmr.setDataSource(fullPath);
+				byte[] ba = mmr.getEmbeddedPicture();
+				Bitmap cover = BitmapFactory.decodeByteArray(ba, 0, ba.length);
+				out = new FileOutputStream(thumbnailPath);
+				cover.compress(Bitmap.CompressFormat.PNG, 90, out);
+				imageURL = urlPrefix + thumbnailPath;
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				imageURL = urlPrefix + image;
+			} catch (RuntimeException e) {
+				e.printStackTrace();
+				imageURL = image;
+			}
+			} else {
+				imageURL = urlPrefix + thumbnailPath;
+			}
+		} else {
+			//this.setViewImage3(holder.imageView, cursor.getString(imageIndex));
+			imageURL = image;
+		}
+		
+		return imageURL;
+	}
+	
+	@SuppressLint("UseValueOf")
+	private String thumbnailCacheURL(long id) {
+		String StringID = new Long(id).toString();
+		String thumbURL = SDCardManager.getThumbnailCacheDir() + "/" + StringID + ".png";
+		return thumbURL;
 	}
 
 	/* (non-Javadoc)
