@@ -1,4 +1,4 @@
-package info.bottiger.podcast.utils;
+package info.bottiger.podcast.cloud;
 
 /*
  * Copyright 2011 Google Inc.
@@ -100,7 +100,7 @@ import android.util.Log;
  * 
  * @author Chirag Shah <chirags@google.com>
  */
-public class GoogleReader {
+public class GoogleReader extends AbstractCloudProvider {
 	private static final String TAG = GoogleReader.class.getName();
 	private static String CLIENT= null;
 
@@ -172,6 +172,16 @@ public class GoogleReader {
 		}
 	}
 	
+	public boolean auth() {
+		try {
+			oauth();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return true;
+	}
+	
 	public void oauth() throws Exception {
 		new HTTPRequest(ReaderAction.GET).execute();
 	}
@@ -186,25 +196,14 @@ public class GoogleReader {
 				true, cb, null);
 	}
 
-	public static List<Subscription> getSubscriptionsFromReader() {
+	public List<Subscription> getSubscriptionsFromReader() {
 		// http://www.google.com/reader/api/0/stream/contents/user/-/label/Listen%20Subscriptions?client=myApplication
+		this.refreshAuthToken();
 		new HTTPRequest(ReaderAction.GET).execute(getURL);
 		return null; // FIXME
 	}
 
-	public static void addSubscriptionstoReader(Context context, Account account, List<Subscription> subscriptions) {
-		for (Subscription s : subscriptions) {
-			addSubscriptiontoReader(context, account, s);
-		}
-	}
-	
-	public void removeSubscriptionsfromReader(Context context, Account account, List<Subscription> subscriptions) {
-		for (Subscription s : subscriptions) {
-			removeSubscriptionfromReader(context, account, s);
-		}
-	}
-
-	public static void addSubscriptiontoReader(Context context, Account account, Subscription subscription) {
+	public void addSubscriptiontoReader(Context context, Account account, Subscription subscription) {
 		init(context, account);
 		String feed = subscription.url;
 		String ac = "subscribe";
@@ -310,7 +309,7 @@ public class GoogleReader {
 		});
 	}
 
-	public static void removeSubscriptionfromReader(Context context, Account account, Subscription subscription) {
+	public void removeSubscriptionfromReader(Context context, Account account, Subscription subscription) {
 		init(context, account);
 		String feed = subscription.url;
 		String t = subscription.title;

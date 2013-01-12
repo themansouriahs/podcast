@@ -1,13 +1,13 @@
 package info.bottiger.podcast;
 
 import info.bottiger.podcast.R;
+import info.bottiger.podcast.cloud.GoogleReader;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.provider.SubscriptionColumns;
 import info.bottiger.podcast.utils.DialogMenu;
 import info.bottiger.podcast.utils.FeedCursorAdapter;
-import info.bottiger.podcast.utils.GoogleReader;
 
 import java.util.HashMap;
 

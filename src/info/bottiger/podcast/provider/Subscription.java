@@ -1,7 +1,7 @@
 package info.bottiger.podcast.provider;
 
 import info.bottiger.podcast.SwipeActivity;
-import info.bottiger.podcast.utils.GoogleReader;
+import info.bottiger.podcast.cloud.GoogleReader;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -170,7 +170,7 @@ public class Subscription {
 				url);
 
 		// Unsubscribe from Google Reader
-		GoogleReader.removeSubscriptionfromReader(context,
+		SwipeActivity.gReader.removeSubscriptionfromReader(context,
 				SwipeActivity.mAccount, sub);
 
 		// Unsubscribe from local database
@@ -209,7 +209,7 @@ public class Subscription {
 		Subscription sub_test = Subscription.getByUrl(context.getContentResolver(),
 				url);
 		if (sub_test != null)
-			GoogleReader.addSubscriptiontoReader(context, SwipeActivity.mAccount,sub_test);
+			SwipeActivity.gReader.addSubscriptiontoReader(context, SwipeActivity.mAccount,sub_test);
 
 		return ADD_SUCCESS;
 

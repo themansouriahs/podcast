@@ -8,6 +8,7 @@ import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 import info.bottiger.podcast.R;
 import info.bottiger.podcast.SwipeActivity;
+import info.bottiger.podcast.cloud.GoogleReader;
 import info.bottiger.podcast.fetcher.FeedFetcher;
 import info.bottiger.podcast.parser.FeedHandler;
 import info.bottiger.podcast.provider.FeedItem;
@@ -15,7 +16,6 @@ import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.provider.SubscriptionColumns;
 import info.bottiger.podcast.utils.DownloadStatus;
-import info.bottiger.podcast.utils.GoogleReader;
 import info.bottiger.podcast.utils.LockHandler;
 import info.bottiger.podcast.utils.Log;
 import info.bottiger.podcast.utils.SDCardManager;
@@ -348,7 +348,7 @@ public class PodcastDownloadManager {
 		 public UpdateSubscriptions(Context context, PullToRefreshListView pullToRefreshView) {
 		        mContext = context;
 		        mRefreshView = pullToRefreshView;
-		        GoogleReader.getSubscriptionsFromReader();
+		        SwipeActivity.gReader.getSubscriptionsFromReader();
 		    } 
 		 
 	     protected PullToRefreshListView doInBackground(Void... params) {
