@@ -90,16 +90,20 @@ public class PlayerService extends Service {
         private Handler mHandler;
         private boolean mIsInitialized = false;
     	int bufferProgress = 0;
+    	
+    	int startPos = 0;
 
         public MyPlayer() {
             //mMediaPlayer.setWakeMode(PlayerService.this, PowerManager.PARTIAL_WAKE_LOCK);
         }
 
-        public void setDataSourceAsync(String path) {
+        public void setDataSourceAsync(String path, int startPos) {
             try {
                 mMediaPlayer.reset();
                 mMediaPlayer.setDataSource(path);
                 mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                
+                this.startPos = startPos;
                 mMediaPlayer.setOnPreparedListener(preparedlistener);
                 mMediaPlayer.prepareAsync();
             } catch (IOException ex) {
@@ -118,6 +122,7 @@ public class PlayerService extends Service {
             mIsInitialized = true;
         }
         
+        /*
         public void setDataSource(String path) {
             try {
                 mMediaPlayer.reset();
@@ -141,6 +146,7 @@ public class PlayerService extends Service {
             
             mIsInitialized = true;
         }
+        */
         
         public boolean isInitialized() {
             return mIsInitialized;
@@ -196,6 +202,8 @@ public class PlayerService extends Service {
         MediaPlayer.OnPreparedListener preparedlistener = new MediaPlayer.OnPreparedListener() {
             public void onPrepared(MediaPlayer mp) {
                 //notifyChange(ASYNC_OPEN_COMPLETE);
+            	mp.seekTo(startPos);
+            	start();
             }
         };
  
@@ -394,10 +402,11 @@ public class PlayerService extends Service {
 		
 		String dataSource = mItem.isDownloaded() ? mItem.getPathname() : mItem.getURL();
 		
-		mPlayer.setDataSource(dataSource);
 		int offset = mItem.offset < 0 ? 0: mItem.offset;
-		mPlayer.seek(offset);
-		start();
+		mPlayer.setDataSourceAsync(dataSource, offset);
+		
+		//mPlayer.seek(offset);
+		//start();
 		mItem.playing(getContentResolver());
 	}
 

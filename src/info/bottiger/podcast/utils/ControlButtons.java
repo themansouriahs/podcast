@@ -89,15 +89,15 @@ public class ControlButtons {
             		fragment.setCurrentTime(viewHolder.currentTime);
             	
             	if (viewHolder.duration != null) fragment.setDuration(viewHolder.duration);
-                if (fragment.mPlayerServiceBinder.isPlaying()) {
+                if (PodcastBaseFragment.mPlayerServiceBinder.isPlaying()) {
                 	playPauseButton.setContentDescription("Play");
                 	playPauseButton.setImageResource(R.drawable.av_play);
-                	fragment.mPlayerServiceBinder.pause();
+                	PodcastBaseFragment.mPlayerServiceBinder.pause();
                 } else {
                 	playPauseButton.setImageResource(R.drawable.av_pause);
                 	playPauseButton.setContentDescription("Pause");
-                	fragment.mPlayerServiceBinder.play(id);
-                	fragment.queueNextRefresh(1);
+                	PodcastBaseFragment.mPlayerServiceBinder.play(id);
+                	PodcastBaseFragment.queueNextRefresh(1);
                 }
             }
         });
