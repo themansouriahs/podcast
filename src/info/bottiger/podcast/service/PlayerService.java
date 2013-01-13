@@ -351,13 +351,13 @@ public class PlayerService extends Service {
     	
         String tickerText = mItem == null ? "player" : mItem.title;
 
-        Notification notification = new Notification(R.drawable.notify_player, tickerText, 0);
+        Notification notification = new Notification(R.drawable.av_add_to_queue, tickerText, 0);
         notification.flags |= Notification.FLAG_ONGOING_EVENT;
 
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
                 new Intent(this, PlayerActivity.class)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        .putExtra("moodimg", R.drawable.notify_player),
+                        .putExtra("moodimg", R.drawable.av_add_to_queue),
                 PendingIntent.FLAG_UPDATE_CURRENT);   
         
         notification.setLatestEventInfo(this, tickerText,

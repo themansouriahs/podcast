@@ -91,10 +91,10 @@ public class ControlButtons {
             	if (viewHolder.duration != null) fragment.setDuration(viewHolder.duration);
                 if (fragment.mPlayerServiceBinder.isPlaying()) {
                 	playPauseButton.setContentDescription("Play");
-                	playPauseButton.setImageResource(R.drawable.play);
+                	playPauseButton.setImageResource(R.drawable.av_play);
                 	fragment.mPlayerServiceBinder.pause();
                 } else {
-                	playPauseButton.setImageResource(R.drawable.pause);
+                	playPauseButton.setImageResource(R.drawable.av_pause);
                 	playPauseButton.setContentDescription("Pause");
                 	fragment.mPlayerServiceBinder.play(id);
                 	fragment.queueNextRefresh(1);
@@ -105,7 +105,7 @@ public class ControlButtons {
 		viewHolder.stopButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
             	playPauseButton.setContentDescription("Play");
-            	playPauseButton.setImageResource(R.drawable.play);
+            	playPauseButton.setImageResource(R.drawable.av_play);
             	fragment.mPlayerServiceBinder.stop();
             }
         });
@@ -129,7 +129,7 @@ public class ControlButtons {
             		// Download file
             		FilesizeUpdater.put(fragment.getActivity(), item.id, viewHolder.filesize);
             		podcastServiceConnection.downloadItem(fragment.getActivity().getContentResolver(), item);
-            		viewHolder.downloadButton.setImageResource(R.drawable.trash);
+            		viewHolder.downloadButton.setImageResource(R.drawable.ic_action_delete);
             		viewHolder.downloadButton.setContentDescription("Trash");
             	}
             }

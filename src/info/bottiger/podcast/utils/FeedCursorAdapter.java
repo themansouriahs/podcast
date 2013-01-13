@@ -235,7 +235,7 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 
 			if (feedItem.isDownloaded()) {
 				ImageButton downloadButton = (ImageButton) playerView.findViewById(R.id.download);
-				downloadButton.setImageResource(R.drawable.trash);
+				downloadButton.setImageResource(R.drawable.ic_action_delete);
 			}
 			
 			if (PodcastBaseFragment.mPlayerServiceBinder.isInitialized()) {
@@ -244,7 +244,7 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 					if (PodcastBaseFragment.mPlayerServiceBinder.isPlaying()) {
 						ImageButton playPauseButton = (ImageButton) v
 							.findViewById(R.id.play_toggle);
-						playPauseButton.setImageResource(R.drawable.pause);
+						playPauseButton.setImageResource(R.drawable.av_pause);
 						
 						//SeekBar sb = (SeekBar) v.findViewById(R.id.progress); 
 						TextView tv = (TextView) v.findViewById(R.id.current_position); 
@@ -396,7 +396,7 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 	private ImageLoader getImageLoader(Context context) {
 		File cacheDir = SDCardManager.getCacheDir();
 		DisplayImageOptions options = new DisplayImageOptions.Builder()
-		.showStubImage(R.drawable.channel_big_pic)
+		.showStubImage(R.drawable.generic_podcast)
         .cacheInMemory()
         .cacheOnDisc()
         .build();

@@ -422,7 +422,7 @@ public class PlayerActivity   extends ListActivity
 		};
 		return new FeedCursorAdapter(context, R.layout.channel_list_item, cursor,
 				new String[] { ItemColumns.TITLE, ItemColumns.STATUS, ItemColumns.KEEP },
-				new int[] { R.id.text1, R.id.icon, R.id.keep_icon },
+				new int[] { R.id.text1, R.id.icon, R.id.icon },
 				fields);
 	}
     
@@ -490,24 +490,7 @@ public class PlayerActivity   extends ListActivity
 		// stopService(new Intent(this, service.getClass()));
 	}
 	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		menu.add(0, MENU_REPEAT, 0,
-				getResources().getString(R.string.menu_repeat)).setIcon(
-				android.R.drawable.ic_menu_rotate);
-		menu.add(0, MENU_LOAD_ALL, 1,
-				getResources().getString(R.string.menu_load_all)).setIcon(
-				android.R.drawable.ic_menu_agenda);		
-		menu.add(0, MENU_LOAD_BY_CHANNEL, 2,
-				getResources().getString(R.string.menu_load_by_channel)).setIcon(
-				R.drawable.ic_menu_mark);		
-		menu.add(0, MENU_REMOVE_ALL, 3,
-				getResources().getString(R.string.menu_remove_all)).setIcon(
-				R.drawable.ic_menu_clear_playlist);			
-	
-		return true;
-	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {

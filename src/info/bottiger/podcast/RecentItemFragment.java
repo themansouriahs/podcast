@@ -92,20 +92,6 @@ public class RecentItemFragment extends PodcastBaseFragment {
 	
     boolean mDualPane;
 	private long mCurCheckID = -1;
-
-	static {
-
-		mIconMap = new HashMap<Integer, Integer>();
-		initFullIconMap(mIconMap);
-
-		mKeepIconMap = new HashMap<Integer, Integer>();
-		mKeepIconMap.put(1, R.drawable.keep);
-		mKeepIconMap.put(FeedCursorAdapter.ICON_DEFAULT_ID, R.drawable.blank); // anything
-																				// other
-																				// than
-																				// KEEP
-
-	}
 	
 	// Read here: http://developer.android.com/reference/android/app/Fragment.html#Layout
     @Override
@@ -182,29 +168,6 @@ public class RecentItemFragment extends PodcastBaseFragment {
 		return super.onOptionsItemSelected(item);
 	}
 	
-	public static void initFullIconMap(HashMap<Integer, Integer> iconMap) {
-		iconMap.put(ItemColumns.ITEM_STATUS_UNREAD, R.drawable.feed_new);
-		iconMap.put(ItemColumns.ITEM_STATUS_READ, R.drawable.feed_viewed);
-
-		iconMap.put(ItemColumns.ITEM_STATUS_DOWNLOAD_PAUSE,
-				R.drawable.download_pause);
-		iconMap.put(ItemColumns.ITEM_STATUS_DOWNLOAD_QUEUE,
-				R.drawable.download_wait);
-		iconMap.put(ItemColumns.ITEM_STATUS_DOWNLOADING_NOW,
-				R.drawable.downloading);
-
-		iconMap.put(ItemColumns.ITEM_STATUS_NO_PLAY, R.drawable.playable);
-		iconMap.put(ItemColumns.ITEM_STATUS_PLAY_READY, R.drawable.play_ready);
-		iconMap.put(ItemColumns.ITEM_STATUS_PLAYING_NOW, R.drawable.playing);
-		iconMap.put(ItemColumns.ITEM_STATUS_PLAY_PAUSE, R.drawable.play_pause);
-		iconMap.put(ItemColumns.ITEM_STATUS_PLAYED, R.drawable.played);
-		// iconMap.put(ItemColumns.ITEM_STATUS_KEEP, R.drawable.keep);
-		// we now show KEEP status with a separate icon, based on separate DB
-		// flag
-
-		iconMap.put(FeedCursorAdapter.ICON_DEFAULT_ID,
-				R.drawable.status_unknown); // default for unknowns
-	}
 
 	public static FeedCursorAdapter listItemCursorAdapter(Context context,
 			PodcastBaseFragment fragment, Cursor cursor) {
@@ -230,23 +193,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 		return new FeedCursorAdapter(context, R.layout.channel_list_item,
 				cursor, new String[] { ItemColumns.TITLE, ItemColumns.STATUS,
 						ItemColumns.KEEP }, new int[] { R.id.text1, R.id.icon,
-						R.id.keep_icon }, fields);
-	}
-
-	public static int mapToIcon(int status) {
-		Integer iconI = mIconMap.get(status);
-		if (iconI == null)
-			iconI = mIconMap.get(FeedCursorAdapter.ICON_DEFAULT_ID); // look for
-																		// default
-																		// value
-																		// in
-																		// map
-		int icon = (iconI != null) ? iconI.intValue()
-				: R.drawable.status_unknown; // Use this icon when not in map
-												// and no map default.
-		// This allows going back to a previous version after data has been
-		// added in a new version with additional status codes.
-		return icon;
+						R.id.appView }, fields);
 	}
 
 	public void onResume() {

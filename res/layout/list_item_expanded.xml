@@ -18,19 +18,19 @@
         <ImageButton
             style="@style/PlayerControlButtons"
             android:id="@+id/play_toggle"
-            android:src="@drawable/play"
+            android:src="@drawable/av_play"
             android:contentDescription="@string/play" />
 
         <ImageButton
             style="@style/PlayerControlButtons"
             android:id="@+id/stop"
-            android:src="@drawable/stop"
+            android:src="@drawable/av_stop"
             android:contentDescription="@string/stop" />
 
         <ImageButton
             style="@style/PlayerControlButtons"
-            android:id="@+id/info"
-            android:src="@drawable/info"
+            android:id="@+id/info"	
+            android:src="@drawable/collections_view_as_list"
             android:contentDescription="@string/info" />
 
         <ImageButton
@@ -42,7 +42,7 @@
         <ImageButton
             style="@style/PlayerControlButtons"
             android:id="@+id/queue"
-            android:src="@drawable/plus"
+            android:src="@drawable/av_add_to_queue"
             android:contentDescription="@string/queue" />
     </LinearLayout>
 
