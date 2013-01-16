@@ -16,11 +16,13 @@ public class NotificationPlayer {
 	
 	private Context mContext;
 	private FeedItem item;
+
 	private int mId = 7;
 	
-	public NotificationPlayer(Context context) {
+	public NotificationPlayer(Context context, FeedItem item) {
 		super();
 		this.mContext = context;
+		this.item = item;
 	}
 	
 	public void show() {
@@ -28,8 +30,8 @@ public class NotificationPlayer {
 		NotificationCompat.Builder mBuilder =
 		        new NotificationCompat.Builder(mContext)
 		        .setSmallIcon(R.drawable.generic_podcast)
-		        .setContentTitle("My notification")
-		        .setContentText("Hello World!");
+		        .setContentTitle(item.title)
+		        .setContentText(item.sub_title);
 		
 		Intent resultIntent = new Intent(mContext, NotificationReceiver.class);
 		
@@ -55,4 +57,13 @@ public class NotificationPlayer {
 		mNotificationManager.notify(mId, not);
 	}
 
+	public FeedItem getItem() {
+		return item;
+	}
+
+	public void setItem(FeedItem item) {
+		this.item = item;
+	}
+
+	
 }

@@ -92,8 +92,6 @@ public class ControlButtons {
 				} else {
 					playPauseButton.setImageResource(R.drawable.av_pause);
 					playPauseButton.setContentDescription("Pause");
-					PodcastBaseFragment.mPlayerServiceBinder.play(id);
-					fragment.getNotificationPlayer().show();
 					PodcastBaseFragment.queueNextRefresh(1);
 				}
 			}

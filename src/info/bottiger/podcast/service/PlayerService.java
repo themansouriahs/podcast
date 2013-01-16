@@ -6,6 +6,7 @@ import java.io.IOException;
 import info.bottiger.podcast.PlayerActivity;
 import info.bottiger.podcast.SettingsActivity;
 import info.bottiger.podcast.R;
+import info.bottiger.podcast.notification.NotificationPlayer;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.utils.Log;
@@ -50,6 +51,7 @@ public class PlayerService extends Service {
 	
 	MyPlayer mPlayer = null;
     private NotificationManager mNotificationManager;
+    private NotificationPlayer mNotificationPlayer;
 	
 
 	private FeedItem mItem = null;
@@ -359,6 +361,12 @@ public class PlayerService extends Service {
     
     private void notifyStatus() {
     	
+    	if (mNotificationPlayer == null)
+    		mNotificationPlayer = new NotificationPlayer(this, mItem);
+    	
+    	mNotificationPlayer.show(); 
+    	
+    	/*
         String tickerText = mItem == null ? "player" : mItem.title;
 
         Notification notification = new Notification(R.drawable.av_add_to_queue, tickerText, 0);
@@ -371,7 +379,8 @@ public class PlayerService extends Service {
                 PendingIntent.FLAG_UPDATE_CURRENT);   
         
         notification.setLatestEventInfo(this, tickerText,
-        		null, contentIntent);        
+        		null, contentIntent);     
+        		*/   
         //setForeground(true);
 
         ////mNotificationManager.notify(R.layout.playing_episode, notification);

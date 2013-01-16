@@ -43,8 +43,6 @@ public class PodcastBaseFragment extends ListFragment {
 	public static final int COLUMN_INDEX_TITLE = 1;
 	
 	protected View fragmentView;
-	
-	private static NotificationPlayer notificationPlayer;
 
 	// protected static PodcastService mServiceBinder = null;
 	public static PlayerService mPlayerServiceBinder = null;
@@ -378,12 +376,6 @@ public class PodcastBaseFragment extends ListFragment {
 	// HACK, FIX IT
 	Subscription getSubscription(Object o) {
 		return null;
-	}
-	
-	public NotificationPlayer getNotificationPlayer() {
-		if (notificationPlayer == null)
-			notificationPlayer = new NotificationPlayer(this.getActivity());
-		return notificationPlayer;
 	}
 
 }
