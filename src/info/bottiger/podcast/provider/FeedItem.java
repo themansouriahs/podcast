@@ -6,6 +6,7 @@ import info.bottiger.podcast.service.PodcastService;
 import info.bottiger.podcast.utils.FileUtils;
 import info.bottiger.podcast.utils.Log;
 import info.bottiger.podcast.utils.SDCardManager;
+import info.bottiger.podcast.utils.StrUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -755,7 +756,12 @@ public class FeedItem implements Comparable<FeedItem> {
 			}
 			return Long.parseLong(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
 		} else {
-			return this.length;
+			if (this.duration.equals(""))
+				return this.length;
+			else {
+				//String offsetString  = StrUtils.getTimeFromOffset(this.offset, this.length, this.duration);
+				return StrUtils.parseTimeToSeconds(duration);
+			}
 		}
 	}
 	

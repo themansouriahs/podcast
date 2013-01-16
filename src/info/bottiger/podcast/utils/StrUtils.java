@@ -21,14 +21,16 @@ public class StrUtils {
     	if (item.getDuration() == 0) 
     		return "00:00";
     	long duration = item.getDuration();
-    	float progress = (float)item.offset / (float)duration;
+    	float progress = (float)item.offset / ((float)duration);
     	return formatTime(progress, item.duration);
     }
     
-    // 0 < progress < 1
-    public static String formatTime(float progress, String duration) {
+    
+    public static int parseTimeToSeconds(String duration) {
+    	int seconds = 0;
+    	
     	if (duration.length() == 0) 
-    		return "";
+    		return 0;
     	else {
     	Date date = null;
     	SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss");
@@ -49,11 +51,27 @@ public class StrUtils {
 			}
         }
         
-        int seconds = date.getSeconds() + date.getMinutes() * 60 + date.getHours() * 3600;
+        seconds = date.getSeconds() + date.getMinutes() * 60 + date.getHours() * 3600;
+        
+    	}
+    	
+    	return seconds;
+    }
+    
+    // 0 < progress < 1
+    public static String formatTime(float progress, String duration) {
+    	
+    	int seconds = parseTimeToSeconds(duration);
         float secondsPlayed = seconds*progress;
         return formatTime((long)secondsPlayed*1000);
-    	}
 
+    }
+    
+    public static String getTimeFromOffset(int offset, long length, String duration) {
+    	long durationInSeconds = parseTimeToSeconds(duration);
+    	float progress = (float)offset / (float)length;
+    	String currentTime = formatTime((long)(durationInSeconds*progress)*1000);
+    	return currentTime;
     }
     
     public static String formatTime(long ms) {

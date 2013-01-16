@@ -117,50 +117,6 @@ public class PodcastBaseFragment extends ListFragment {
 		}
 	};
 
-	/*
-	public OnSeekBarChangeListener mSeekListener = new OnSeekBarChangeListener() {
-		public void onStartTrackingTouch(SeekBar bar) {
-			mLastSeekEventTime = 0;
-			mFromTouch = true;
-			log.debug("mFromTouch = false; ");
-
-		}
-
-		public void onProgressChanged(SeekBar bar, int progress,
-				boolean fromuser) {
-			log.debug("onProgressChanged");
-
-			if (!fromuser || (mPlayerServiceBinder == null))
-				return;
-
-			long now = SystemClock.elapsedRealtime();
-			if ((now - mLastSeekEventTime) > 250) {
-				mLastSeekEventTime = now;
-				// mPosOverride = mp.duration * progress / 1000;
-				try {
-					if (mPlayerServiceBinder.isInitialized())
-						mPlayerServiceBinder.seek(mPlayerServiceBinder
-								.duration() * progress / 1000);
-				} catch (Exception ex) {
-				}
-
-				if (!mFromTouch) {
-					refreshNow();
-					// mPosOverride = -1;
-				}
-			}
-
-		}
-
-		public void onStopTrackingTouch(SeekBar bar) {
-			// mPosOverride = -1;
-			mFromTouch = false;
-			log.debug("mFromTouch = false; ");
-
-		}
-	};
-	*/
-
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
@@ -319,8 +275,8 @@ public class PodcastBaseFragment extends ListFragment {
 	public static void queueNextRefresh(long delay) {
 		Message msg = mHandler.obtainMessage(REFRESH);
 		mHandler.removeMessages(REFRESH);
-		if (mPlayerServiceBinder.isPlaying()) // FIXME or something is downloading
-			mHandler.sendMessageDelayed(msg, delay);
+		//if (mPlayerServiceBinder.isPlaying()) // FIXME or something is downloading
+		mHandler.sendMessageDelayed(msg, delay);
 	}
 
 	protected static long refreshUI() {
