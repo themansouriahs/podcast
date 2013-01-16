@@ -87,7 +87,8 @@ public class SwipeActivity extends FragmentActivity implements
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		BugSenseHandler.initAndStartSession(SwipeActivity.this, "75981add");
+		//BugSenseHandler.initAndStartSession(SwipeActivity.this, "75981add");
+		BugSenseHandler.initAndStartSession(SwipeActivity.this, ((SoundWaves)this.getApplication()).getBugSenseAPIKey());
 		if (debugging) Debug.startMethodTracing("calc");
 
 		startService(new Intent(this, PodcastService.class));

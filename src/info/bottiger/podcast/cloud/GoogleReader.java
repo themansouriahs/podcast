@@ -14,6 +14,7 @@ package info.bottiger.podcast.cloud;
  */
 
 import info.bottiger.podcast.R;
+import info.bottiger.podcast.SoundWaves;
 import info.bottiger.podcast.provider.Subscription;
 
 import com.loopj.android.http.*;
@@ -54,6 +55,7 @@ import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -76,15 +78,17 @@ public class GoogleReader extends AbstractCloudProvider {
 	private static final String TAG = GoogleReader.class.getName();
 	private static String CLIENT= null;
 
-	public static final String PREF_NAME = "Random Name";
-	public static final String PREF_TOKEN = "accessToken";
-	public static final String SCOPE = "oauth2:http://www.google.com/reader/api"; // Or
-	public static final String COMSUMER_KEY = "13654253758.apps.googleusercontent.com";
-	public static final String TOKEN_URL = "http://www.google.com/reader/api/0/token";
-	
 	private static Account mAccount;
 	private static AccountManagerFuture<Bundle> amf = null;
 	private static Context mContext = null;
+	
+	public static final String PREF_NAME = "Random Name";
+	public static final String PREF_TOKEN = "accessToken";
+	public static final String SCOPE = "oauth2:http://www.google.com/reader/api"; // Or
+	//public static final String COMSUMER_KEY = "13654253758.apps.googleusercontent.com";
+	public static final String COMSUMER_KEY = ((SoundWaves) mContext).getGoogleReaderConsumerKey();;
+	public static final String TOKEN_URL = "http://www.google.com/reader/api/0/token";
+	
 	
 	private static String baseURL = "http://www.google.com/reader/api/0/subscription/";
 	private static URL getURL;
