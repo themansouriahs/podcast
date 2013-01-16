@@ -41,13 +41,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="info.bottiger.podcast.StartupActivity"
-            android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-            </intent-filter>
+            android:name=".NotificationReveiverActivity"
+            android:label="@string/app_name" > <!--  android:parentActivityName=".MainActivity" -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".SwipeActivity" />
         </activity>
         <activity
             android:name="info.bottiger.podcast.MainActivity"
@@ -96,76 +94,13 @@
                 <data android:mimeType="application/xml" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="info.bottiger.podcast.ItemActivity"
-            android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.intent.action.EDIT" />
 
-                <data android:mimeType="vnd.android.cursor.item/vnd.bottiger.podcast.item" />
 
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name="info.bottiger.podcast.PlayerActivity"
-            android:label="@string/app_name" >
-        </activity>
-        <activity
-            android:name="info.bottiger.podcast.SearchActivity"
-            android:label="@string/app_name" >
-        </activity>
-        <activity
-            android:name="info.bottiger.podcast.ChannelActivity"
-            android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.intent.action.EDIT" />
 
-                <data android:mimeType="vnd.android.cursor.item/vnd.bottiger.podcast.subscription" />
 
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
         <activity
-            android:name="info.bottiger.podcast.ChannelDetailsActivity"
-            android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <data android:mimeType="vnd.android.cursor.item/vnd.bottiger.podcast.subscription" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name="info.bottiger.podcast.ChannelsActivity"
-            android:label="@string/app_name" >
-        </activity>
-        <activity
-            android:name="info.bottiger.podcast.AddChannelActivity"
-            android:label="@string/title_channels" >
-        </activity>
-        <activity
-            android:name="info.bottiger.podcast.BackupChannelsActivity"
-            android:label="@string/title_channels" >
-        </activity>
-        <activity
-            android:name="info.bottiger.podcast.Pref"
+            android:name=".SettingsActivity"
             android:label="Settings" >
-        </activity>
-        <activity
-            android:name="info.bottiger.podcast.HomeActivity"
-            android:label="@string/app_name" >
-        </activity>
-        <activity
-            android:name="info.bottiger.podcast.DownloadingActivity"
-            android:label="Downloading" >
-        </activity>
-        <activity
-            android:name="info.bottiger.podcast.PlayListActivity"
-            android:label="Playlist" >
         </activity>
 
         <service
@@ -186,6 +121,7 @@
             android:name="info.bottiger.podcast.provider.PodcastProvider"
             android:authorities="info.bottiger.podcast.provider.podcastprovider" >
         </provider>
+
     </application>
 
     <instrumentation

@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.IOException;
 
 import info.bottiger.podcast.PlayerActivity;
-import info.bottiger.podcast.Pref;
+import info.bottiger.podcast.SettingsActivity;
 import info.bottiger.podcast.R;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
@@ -632,7 +632,7 @@ public class PlayerService extends Service {
 	
     private long getPref() {
 		SharedPreferences pref = getSharedPreferences(
-				Pref.HAPI_PREFS_FILE_NAME, Service.MODE_PRIVATE);
+				SettingsActivity.HAPI_PREFS_FILE_NAME, Service.MODE_PRIVATE);
 		return pref.getLong("pref_repeat",0);
 
 	}

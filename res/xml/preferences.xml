@@ -43,7 +43,14 @@
                 android:title="@string/pref_only_wifi_title"
 				android:defaultValue="false"
                 android:summary="@string/pref_only_wifi_description" />
-				
+
+         <CheckBoxPreference
+                android:key="pref_notification_control"
+                android:title="@string/pref_notification_control"
+				android:defaultValue="true"
+                android:summary="@string/pref_notification_control_description" />
+        
+        				
         <!--  
         <ListPreference
                 android:key="pref_item_expire"

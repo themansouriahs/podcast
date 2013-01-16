@@ -408,7 +408,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 
 	public void getPref() {
 		SharedPreferences pref = getActivity().getSharedPreferences(
-				Pref.HAPI_PREFS_FILE_NAME, Service.MODE_PRIVATE);
+				SettingsActivity.HAPI_PREFS_FILE_NAME, Service.MODE_PRIVATE);
 		pref_order = pref.getLong("pref_order", 2);
 		pref_where = pref.getLong("pref_where", 0);
 		pref_select = pref.getLong("pref_select", 0);

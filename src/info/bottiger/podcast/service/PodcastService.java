@@ -4,7 +4,7 @@ import java.util.PriorityQueue;
 
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
-import info.bottiger.podcast.Pref;
+import info.bottiger.podcast.SettingsActivity;
 import info.bottiger.podcast.R;
 import info.bottiger.podcast.fetcher.FeedFetcher;
 import info.bottiger.podcast.parser.FeedHandler;
@@ -155,7 +155,7 @@ public class PodcastService extends Service {
 
 	public void updateSetting() {
 		SharedPreferences pref = getSharedPreferences(
-				Pref.HAPI_PREFS_FILE_NAME, Service.MODE_PRIVATE);
+				SettingsActivity.HAPI_PREFS_FILE_NAME, Service.MODE_PRIVATE);
 
 		boolean b = pref.getBoolean("pref_download_only_wifi", false);
 		pref_connection_sel = b ? WIFI_CONNECT

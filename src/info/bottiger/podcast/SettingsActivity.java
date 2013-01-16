@@ -28,7 +28,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceActivity;
 
-public class Pref extends PreferenceActivity {
+public class SettingsActivity extends PreferenceActivity {
 
 	public static final String HAPI_PREFS_FILE_NAME = "info.xuluan.podcast_preferences";
 	private PodcastService serviceBinder = null;

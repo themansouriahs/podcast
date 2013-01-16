@@ -7,6 +7,7 @@ import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import info.bottiger.podcast.PodcastBaseFragment.OnItemSelectedListener;
 import info.bottiger.podcast.cloud.CloudProvider;
 import info.bottiger.podcast.cloud.GoogleReader;
+import info.bottiger.podcast.notification.NotificationPlayer;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.PodcastProvider;
 import info.bottiger.podcast.service.PlayerService;
@@ -190,7 +191,7 @@ public class SwipeActivity extends FragmentActivity implements
 			AddPodcastDialog.addPodcast(this);
 			return true;
 		case R.id.menu_settings:
-			Intent i= new Intent(getBaseContext(), Pref.class);
+			Intent i= new Intent(getBaseContext(), SettingsActivity.class);
             startActivity(i);
 			return true;
 		case R.id.menu_refresh:

@@ -750,7 +750,7 @@ public class PlayerFragment   extends PodcastBaseFragment
     
     private void getPref() {
 		SharedPreferences pref = getActivity().getSharedPreferences(
-				Pref.HAPI_PREFS_FILE_NAME, Service.MODE_PRIVATE);
+				SettingsActivity.HAPI_PREFS_FILE_NAME, Service.MODE_PRIVATE);
 		pref_repeat = pref.getLong("pref_repeat",0);
 		pref_fas_fwd_interval = Integer.parseInt(pref.getString("pref_fast_forward_interval","30"));		
 		ffwd_interval = pref_fas_fwd_interval*1000;

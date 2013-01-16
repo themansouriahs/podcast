@@ -4,6 +4,7 @@ import info.bottiger.podcast.PodcastBaseFragment;
 import info.bottiger.podcast.R;
 import info.bottiger.podcast.RecentItemFragment;
 import info.bottiger.podcast.SwipeActivity;
+import info.bottiger.podcast.notification.NotificationPlayer;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.service.PlayerService;
 import info.bottiger.podcast.service.PodcastService;
@@ -97,6 +98,7 @@ public class ControlButtons {
 					playPauseButton.setImageResource(R.drawable.av_pause);
 					playPauseButton.setContentDescription("Pause");
 					PodcastBaseFragment.mPlayerServiceBinder.play(id);
+					fragment.getNotificationPlayer().show();
 					PodcastBaseFragment.queueNextRefresh(1);
 				}
 			}

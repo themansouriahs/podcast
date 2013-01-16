@@ -90,6 +90,8 @@
     <string name="pref_downloaded_expire_description">Setup maximum size of downloaded items</string>
     <string name="pref_downloaded_expire_title">Podcast history size</string>
     <string name="pref_downloaded_dialog_title">History size</string>
+    <string name="pref_notification_control">Notification Controls</string>
+    <string name="pref_notification_control_description">Show small player in notification area</string>
     <string name="pref_max_new_items_title">Maximum Updated New Items</string>
     <string name="dialog_title_loading">Loading</string>
     <string name="dialog_message_loading">Loading channel...</string>
@@ -128,5 +130,6 @@
     <string name="pref_feedback_description">Send anonymous data about the app, such as crash reports, to the developer. </string>
     <string name="pref_cloud_support_title">Enable Cloud Support</string>
     <string name="pref_cloud_support_description">Cloud support will backup your data to the cloud and synchronize data between your devices</string>
+    <string name="title_activity_notification_receiver">NotificationReceiverActivity</string>
 
 </resources>
