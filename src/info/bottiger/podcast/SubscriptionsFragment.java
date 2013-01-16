@@ -1,7 +1,6 @@
 package info.bottiger.podcast;
 
 import info.bottiger.podcast.R;
-import info.bottiger.podcast.cloud.GoogleReader;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.Subscription;
@@ -12,9 +11,6 @@ import info.bottiger.podcast.utils.FeedCursorAdapter;
 import java.util.HashMap;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -22,18 +18,14 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
+import android.provider.BaseColumns;
 import android.support.v4.content.CursorLoader;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 /* Copy of ChannelActivity */
 public class SubscriptionsFragment extends PodcastBaseFragment {
@@ -200,7 +192,8 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 			item_id = id;
 		}
 		
-        public void onClick(DialogInterface dialog, int select) 
+        @Override
+		public void onClick(DialogInterface dialog, int select) 
         {
     		switch (mMenu.getSelect(select)) {
     		case MENU_ITEM_DETAILS: {
@@ -269,10 +262,12 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 
 	}
 
+	@Override
 	Subscription getSubscription(Object o) {
 		Cursor item = (Cursor)o;
-		Long id = item.getLong(item.getColumnIndex(ItemColumns._ID));
-		return new Subscription().getById(getActivity().getContentResolver(), id);
+		Long id = item.getLong(item.getColumnIndex(BaseColumns._ID));
+		new Subscription();
+		return Subscription.getById(getActivity().getContentResolver(), id);
 	}
 	
 }

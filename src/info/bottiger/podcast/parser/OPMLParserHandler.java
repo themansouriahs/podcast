@@ -1,14 +1,8 @@
 package info.bottiger.podcast.parser;
 
-import info.bottiger.podcast.R;
-import info.bottiger.podcast.parser.SearchItem;
 import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.utils.Log;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,9 +11,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import android.content.ContentResolver;
 import android.content.Context;
-import android.widget.Toast;
 
 public class OPMLParserHandler extends DefaultHandler {
 	

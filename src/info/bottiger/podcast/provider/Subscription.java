@@ -1,10 +1,7 @@
 package info.bottiger.podcast.provider;
 
 import info.bottiger.podcast.SwipeActivity;
-import info.bottiger.podcast.cloud.GoogleReader;
 import java.util.LinkedList;
-import java.util.List;
-
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -13,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.provider.BaseColumns;
 import android.support.v4.util.LruCache;
 
 public class Subscription {
@@ -131,7 +129,7 @@ public class Subscription {
 		}
 
 		try {
-			String where = SubscriptionColumns._ID + " = " + id;
+			String where = BaseColumns._ID + " = " + id;
 
 			cursor = context.query(SubscriptionColumns.URI,
 					SubscriptionColumns.ALL_COLUMNS, where, null, null);
@@ -186,7 +184,7 @@ public class Subscription {
 				SwipeActivity.mAccount, sub);
 
 		// Unsubscribe from local database
-		String where = SubscriptionColumns._ID + " = ?";
+		String where = BaseColumns._ID + " = ?";
 		String[] selectionArgs = {new Long(sub.id).toString()};
 		int deletedRows = context.getContentResolver().delete(
 				SubscriptionColumns.URI, where, selectionArgs);
@@ -262,7 +260,7 @@ public class Subscription {
 				cv.put(SubscriptionColumns.AUTO_DOWNLOAD, auto_download);
 
 			return context.update(SubscriptionColumns.URI, cv,
-					SubscriptionColumns._ID + "=" + id, null);
+					BaseColumns._ID + "=" + id, null);
 
 		} finally {
 		}
@@ -271,7 +269,7 @@ public class Subscription {
 	private static Subscription fetchFromCursor(Subscription sub, Cursor cursor) {
 		// assert cursor.moveToFirst();
 		// cursor.moveToFirst();
-		sub.id = cursor.getLong(cursor.getColumnIndex(SubscriptionColumns._ID));
+		sub.id = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
 		
 		// Return item directly if cached
 		initCache();
@@ -310,6 +308,7 @@ public class Subscription {
 		return sub;
 	}
 	
+	@Override
 	public String toString() {
 		return "Subscription: " + this.url;
 	}

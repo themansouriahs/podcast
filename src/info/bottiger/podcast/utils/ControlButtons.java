@@ -4,17 +4,11 @@ import info.bottiger.podcast.PodcastBaseFragment;
 import info.bottiger.podcast.R;
 import info.bottiger.podcast.RecentItemFragment;
 import info.bottiger.podcast.SwipeActivity;
-import info.bottiger.podcast.notification.NotificationPlayer;
 import info.bottiger.podcast.provider.FeedItem;
-import info.bottiger.podcast.service.PlayerService;
 import info.bottiger.podcast.service.PodcastService;
-import info.bottiger.podcast.utils.ControlButtons.Holder;
 import android.content.ContentResolver;
-import android.content.ServiceConnection;
-import android.os.Handler;
 import android.os.SystemClock;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -76,12 +70,13 @@ public class ControlButtons {
 			final PodcastService podcastServiceConnection,
 			final Holder viewHolder, final long id) {
 
-		final ImageButton playPauseButton = (ImageButton) viewHolder.playPauseButton;
+		final ImageButton playPauseButton = viewHolder.playPauseButton;
 		final ContentResolver resolver = fragment.getActivity()
 				.getContentResolver();
 		final FeedItem item = FeedItem.getById(resolver, id);
 
 		playPauseButton.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				if (viewHolder.seekbar != null)
 					fragment.setProgressBar(viewHolder.seekbar);
@@ -105,6 +100,7 @@ public class ControlButtons {
 		});
 
 		viewHolder.stopButton.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				playPauseButton.setContentDescription("Play");
 				playPauseButton.setImageResource(R.drawable.av_play);
@@ -113,12 +109,14 @@ public class ControlButtons {
 		});
 
 		viewHolder.infoButton.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick(View v) {
 			}
 		});
 
 		viewHolder.downloadButton
 				.setOnClickListener(new View.OnClickListener() {
+					@Override
 					public void onClick(View v) {
 
 						if (item.isDownloaded()) {
@@ -143,6 +141,7 @@ public class ControlButtons {
 				});
 
 		viewHolder.queueButton.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick(View v) {
 			}
 		});

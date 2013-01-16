@@ -1,17 +1,11 @@
 package info.bottiger.podcast.utils;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 public class Thumbnail {
 	

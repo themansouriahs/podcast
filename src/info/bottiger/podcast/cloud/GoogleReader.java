@@ -18,20 +18,13 @@ import info.bottiger.podcast.provider.Subscription;
 
 import com.loopj.android.http.*;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -48,19 +41,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-import org.w3c.dom.CharacterData;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -68,20 +48,12 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import oauth.signpost.OAuth;
-import oauth.signpost.OAuthConsumer;
-import oauth.signpost.OAuthProvider;
-import oauth.signpost.basic.DefaultOAuthConsumer;
-import oauth.signpost.basic.DefaultOAuthProvider;
-
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
-import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -128,6 +100,7 @@ public class GoogleReader extends AbstractCloudProvider {
 	private static SharedPreferences mSettings = null;
 	
 	final AccountManagerCallback<Bundle> cb = new AccountManagerCallback<Bundle>() {
+		@Override
 		public void run(AccountManagerFuture<Bundle> future) {
 			try {
 				final Bundle result = future.getResult();
@@ -172,6 +145,7 @@ public class GoogleReader extends AbstractCloudProvider {
 		}
 	}
 	
+	@Override
 	public boolean auth() {
 		try {
 			oauth();
@@ -192,10 +166,11 @@ public class GoogleReader extends AbstractCloudProvider {
 		String accessToken = mSettings.getString(PREF_TOKEN, "");
 		AccountManager.get(mContext).invalidateAuthToken("com.google",
 				accessToken);
-		this.amf = AccountManager.get(mContext).getAuthToken(mAccount, SCOPE,
+		GoogleReader.amf = AccountManager.get(mContext).getAuthToken(mAccount, SCOPE,
 				true, cb, null);
 	}
 
+	@Override
 	public List<Subscription> getSubscriptionsFromReader() {
 		// http://www.google.com/reader/api/0/stream/contents/user/-/label/Listen%20Subscriptions?client=myApplication
 		this.refreshAuthToken();
@@ -203,6 +178,7 @@ public class GoogleReader extends AbstractCloudProvider {
 		return null; // FIXME
 	}
 
+	@Override
 	public void addSubscriptiontoReader(Context context, Account account, Subscription subscription) {
 		init(context, account);
 		String feed = subscription.url;
@@ -309,6 +285,7 @@ public class GoogleReader extends AbstractCloudProvider {
 		});
 	}
 
+	@Override
 	public void removeSubscriptionfromReader(Context context, Account account, Subscription subscription) {
 		init(context, account);
 		String feed = subscription.url;
@@ -339,6 +316,7 @@ public class GoogleReader extends AbstractCloudProvider {
 			this.action = ra;
 		}
 		
+		@Override
 		protected void onPreExecute() {
 			try {
 				authKey = amf.getResult().getString("authtoken");
@@ -346,14 +324,16 @@ public class GoogleReader extends AbstractCloudProvider {
 				e.printStackTrace();
 			}
 		}
+		@Override
 		protected void onPostExecute(String result) {}
 
+		@Override
 		protected String doInBackground(URL... urls) {
 
 			url = urls[0];
 			
 			try {
-				conn = (HttpURLConnection) url.openConnection();
+				conn = url.openConnection();
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -515,10 +495,10 @@ public class GoogleReader extends AbstractCloudProvider {
 	}
 	
 	private String getAuthToken() {
-		this.amf =  AccountManager.get(mContext).getAuthToken(mAccount, SCOPE,
+		GoogleReader.amf =  AccountManager.get(mContext).getAuthToken(mAccount, SCOPE,
 				true, cb, null);
 		try {
-			return this.amf.getResult().getString("authtoken");
+			return GoogleReader.amf.getResult().getString("authtoken");
 		} catch (OperationCanceledException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

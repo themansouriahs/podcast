@@ -4,7 +4,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import info.bottiger.podcast.R;
-import info.bottiger.podcast.SwipeActivity;
 import info.bottiger.podcast.provider.Subscription;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -12,16 +11,12 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ClipboardManager;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 
 public class AddPodcastDialog {
 
@@ -70,6 +65,7 @@ public class AddPodcastDialog {
 
 		alertBuilder.setPositiveButton("Ok",
 				new DialogInterface.OnClickListener() {
+					@Override
 					public void onClick(DialogInterface dialog, int whichButton) {
 
 						try {
@@ -87,6 +83,7 @@ public class AddPodcastDialog {
 		alertBuilder.setNegativeButton("Cancel",
 				new DialogInterface.OnClickListener() {
 
+					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						// TODO Auto-generated method stub
 						return;
@@ -97,7 +94,7 @@ public class AddPodcastDialog {
 		dialog.show();
 
 		if (input.getText().toString().equals("")) {
-			Button b = dialog.getButton(Dialog.BUTTON1);
+			Button b = dialog.getButton(DialogInterface.BUTTON1);
 			b.setEnabled(false);
 			input.setSelection(0);
 		}
@@ -126,9 +123,9 @@ public class AddPodcastDialog {
 				String text = s.toString();
 				try {
 					URL url = new URL(text);
-					dialog.getButton(Dialog.BUTTON1).setEnabled(true);
+					dialog.getButton(DialogInterface.BUTTON1).setEnabled(true);
 				} catch (MalformedURLException e) {
-					dialog.getButton(Dialog.BUTTON1).setEnabled(false);
+					dialog.getButton(DialogInterface.BUTTON1).setEnabled(false);
 				}
 			}
 		};

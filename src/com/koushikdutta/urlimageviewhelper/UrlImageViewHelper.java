@@ -28,7 +28,6 @@ import android.graphics.drawable.Drawable;
 import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.widget.ImageView;
 
 public final class UrlImageViewHelper {
@@ -287,7 +286,8 @@ public final class UrlImageViewHelper {
                 }
             }
 
-            protected void onPostExecute(BitmapDrawable result) {
+            @Override
+			protected void onPostExecute(BitmapDrawable result) {
                 Drawable usableResult = result;
                 if (usableResult == null)
                     usableResult = defaultDrawable;

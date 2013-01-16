@@ -18,12 +18,10 @@ package info.bottiger.podcast;
 
 import info.bottiger.podcast.R;
 import info.bottiger.podcast.service.PodcastService;
-import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceActivity;
@@ -35,11 +33,13 @@ public class SettingsActivity extends PreferenceActivity {
 	ComponentName service = null;
 
 	private ServiceConnection serviceConnection = new ServiceConnection() {
+		@Override
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			serviceBinder = ((PodcastService.PodcastBinder) service)
 					.getService();
 		}
 
+		@Override
 		public void onServiceDisconnected(ComponentName className) {
 			serviceBinder = null;
 		}

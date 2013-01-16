@@ -1,7 +1,5 @@
 package info.bottiger.podcast;
 
-import com.handmark.pulltorefresh.library.PullToRefreshListView;
-
 import info.bottiger.podcast.R;
 import info.bottiger.podcast.notification.NotificationPlayer;
 import info.bottiger.podcast.provider.FeedItem;
@@ -10,18 +8,14 @@ import info.bottiger.podcast.service.PlayerService;
 import info.bottiger.podcast.service.PodcastService;
 import info.bottiger.podcast.utils.FilesizeUpdater;
 import info.bottiger.podcast.utils.Log;
-import info.bottiger.podcast.utils.PodcastProgressBar;
 import info.bottiger.podcast.utils.StrUtils;
 
 import android.app.Activity;
-import android.app.ListActivity;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.os.SystemClock;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -38,8 +32,6 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.SeekBar;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
-import android.widget.SeekBar.OnSeekBarChangeListener;
-import android.widget.Toast;
 
 /* Copy of PodcastBaseActivity */
 public class PodcastBaseFragment extends ListFragment {
@@ -92,7 +84,7 @@ public class PodcastBaseFragment extends ListFragment {
 	}
 
 	public void setCurrentTime(TextView mCurrentTime) {
-		this.mCurrentTime = mCurrentTime;
+		PodcastBaseFragment.mCurrentTime = mCurrentTime;
 	}
 
 	public SeekBar getProgress() {
@@ -104,16 +96,18 @@ public class PodcastBaseFragment extends ListFragment {
 	}
 
 	public void setDuration(TextView mDuration) {
-		this.mDuration = mDuration;
+		PodcastBaseFragment.mDuration = mDuration;
 	}
 	
 	public ServiceConnection playerServiceConnection = new ServiceConnection() {
+		@Override
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			mPlayerServiceBinder = ((PlayerService.PlayerBinder) service)
 					.getService();
 			// log.debug("onServiceConnected");
 		}
 
+		@Override
 		public void onServiceDisconnected(ComponentName className) {
 			mPlayerServiceBinder = null;
 			// log.debug("onServiceDisconnected");
@@ -319,9 +313,9 @@ public class PodcastBaseFragment extends ListFragment {
 			fileProgress = (totalFileSize != 0) ? (int) (chunkSize / totalFileSize * mProgressBar.getMax()) : 0;
 			
 			//mProgressBar.setSecondaryProgress(fileProgress);
-			int fileProgress2 = (int) mPlayerServiceBinder.bufferProgress();
-			int fileProgress3 = (int) fileProgress2*mProgressBar.getMax();
-			int fileProgress4 = (int) fileProgress3/100;
+			int fileProgress2 = mPlayerServiceBinder.bufferProgress();
+			int fileProgress3 = fileProgress2*mProgressBar.getMax();
+			int fileProgress4 = fileProgress3/100;
 			mProgressBar.setSecondaryProgress(fileProgress4);
 
 			//updateCurrentPosition(mPlayerServiceBinder.getCurrentItem());

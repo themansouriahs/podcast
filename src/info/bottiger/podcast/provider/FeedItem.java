@@ -2,7 +2,6 @@ package info.bottiger.podcast.provider;
 
 import info.bottiger.podcast.PlayerActivity;
 import info.bottiger.podcast.service.PodcastDownloadManager;
-import info.bottiger.podcast.service.PodcastService;
 import info.bottiger.podcast.utils.FileUtils;
 import info.bottiger.podcast.utils.Log;
 import info.bottiger.podcast.utils.SDCardManager;
@@ -27,7 +26,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
-import android.os.Handler;
+import android.provider.BaseColumns;
 import android.support.v4.util.LruCache;
 import android.widget.Toast;
 
@@ -165,7 +164,7 @@ public class FeedItem implements Comparable<FeedItem> {
 		}
 		
 		try {
-			String where = ItemColumns._ID + " = " + id;
+			String where = BaseColumns._ID + " = " + id;
 
 			cursor = contentResolver.query(ItemColumns.URI, ItemColumns.ALL_COLUMNS,
 					where, null, null);
@@ -361,7 +360,7 @@ public class FeedItem implements Comparable<FeedItem> {
 			if (keep>=0)
 				cv.put(ItemColumns.KEEP, keep);
 
-			context.update(ItemColumns.URI, cv, ItemColumns._ID + "=" + id,
+			context.update(ItemColumns.URI, cv, BaseColumns._ID + "=" + id,
 					null);
 
 			log.debug("update OK");
@@ -512,7 +511,7 @@ public class FeedItem implements Comparable<FeedItem> {
 		//cursor.moveToFirst();
 		FeedItem item = new FeedItem();
 		
-		item.id = cursor.getLong(cursor.getColumnIndex(ItemColumns._ID));
+		item.id = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
 		
 		// Return item directly if cached
 		initCache();

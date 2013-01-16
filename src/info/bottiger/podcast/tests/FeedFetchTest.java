@@ -17,8 +17,6 @@
 package info.bottiger.podcast.tests;
 
 import android.content.Intent;
-import info.bottiger.podcast.R;
-import info.bottiger.podcast.parser.FeedParserListener;
 import info.bottiger.podcast.service.PodcastService;
 
 

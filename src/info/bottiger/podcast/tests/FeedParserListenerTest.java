@@ -19,7 +19,6 @@ package info.bottiger.podcast.tests;
 import junit.framework.TestCase;
 import info.bottiger.podcast.parser.FeedParserListener;
 import info.bottiger.podcast.provider.FeedItem;
-import info.bottiger.podcast.provider.Subscription;
 
 /**
  * An example of a true unit test that tests the utility class {@link MorseCodeConverter}.

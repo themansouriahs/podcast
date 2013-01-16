@@ -3,8 +3,6 @@ package info.bottiger.podcast;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 
-import android.app.AlertDialog;
-import android.app.ListActivity;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.ContentUris;
@@ -13,7 +11,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,7 +21,6 @@ import android.os.SystemClock;
 import android.support.v4.content.CursorLoader;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -40,9 +36,7 @@ import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.provider.SubscriptionColumns;
 import info.bottiger.podcast.service.PlayerService;
-import info.bottiger.podcast.service.PodcastService;
 import info.bottiger.podcast.utils.DialogMenu;
-import info.bottiger.podcast.utils.FeedCursorAdapter;
 import info.bottiger.podcast.utils.Log;
 import info.bottiger.podcast.utils.StrUtils;
 
@@ -119,12 +113,14 @@ public class PlayerFragment   extends PodcastBaseFragment
 	
 
 	protected static ServiceConnection serviceConnection = new ServiceConnection() {
+		@Override
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			mServiceBinder = ((PlayerService.PlayerBinder) service)
 					.getService();
 			//log.debug("onServiceConnected");
 		}
 
+		@Override
 		public void onServiceDisconnected(ComponentName className) {
 			mServiceBinder = null;
 			//log.debug("onServiceDisconnected");
@@ -134,13 +130,15 @@ public class PlayerFragment   extends PodcastBaseFragment
     private long mLastSeekEventTime;
     private boolean mFromTouch;
     private OnSeekBarChangeListener mSeekListener = new OnSeekBarChangeListener() {
-        public void onStartTrackingTouch(SeekBar bar) {
+        @Override
+		public void onStartTrackingTouch(SeekBar bar) {
             mLastSeekEventTime = 0;
             mFromTouch = true;
             log.debug("mFromTouch = false; ");
             
         }
-        public void onProgressChanged(SeekBar bar, int progress, boolean fromuser) {
+        @Override
+		public void onProgressChanged(SeekBar bar, int progress, boolean fromuser) {
             log.debug("onProgressChanged");
        	
             if (!fromuser || (mServiceBinder == null)) return;
@@ -163,7 +161,8 @@ public class PlayerFragment   extends PodcastBaseFragment
             
         }
         
-        public void onStopTrackingTouch(SeekBar bar) {
+        @Override
+		public void onStopTrackingTouch(SeekBar bar) {
             //mPosOverride = -1;
             mFromTouch = false;
             log.debug("mFromTouch = false; ");
@@ -254,7 +253,8 @@ public class PlayerFragment   extends PodcastBaseFragment
     }
     
     private View.OnClickListener mNextListener = new View.OnClickListener() {
-        public void onClick(View v) {
+        @Override
+		public void onClick(View v) {
             try {
                 if (mServiceBinder != null && mServiceBinder.isInitialized()) {
                 	mServiceBinder.next();
@@ -267,13 +267,15 @@ public class PlayerFragment   extends PodcastBaseFragment
     };   
     
     private View.OnClickListener mPauseListener = new View.OnClickListener() {
-        public void onClick(View v) {
+        @Override
+		public void onClick(View v) {
             doPauseResume();
         }
     };
     
     private View.OnClickListener mPrevListener = new View.OnClickListener() {
-        public void onClick(View v) {
+        @Override
+		public void onClick(View v) {
             try {
                 if (mServiceBinder != null && mServiceBinder.isInitialized()) {
                 	if(mServiceBinder.position()>5000)
@@ -290,7 +292,8 @@ public class PlayerFragment   extends PodcastBaseFragment
     
     
     private View.OnClickListener mRwndListener = new View.OnClickListener() {
-        public void onClick(View v) {
+        @Override
+		public void onClick(View v) {
             try {
                 if (mServiceBinder != null && mServiceBinder.isInitialized()) {
                 	long pos = mServiceBinder.position();
@@ -306,7 +309,8 @@ public class PlayerFragment   extends PodcastBaseFragment
     };    
     
     private View.OnClickListener mFfwdListener = new View.OnClickListener() {
-        public void onClick(View v) {
+        @Override
+		public void onClick(View v) {
             try {
                 if (mServiceBinder != null && mServiceBinder.isInitialized()) {
                 	long pos = mServiceBinder.position();
@@ -377,6 +381,7 @@ public class PlayerFragment   extends PodcastBaseFragment
    
     }
     
+	@Override
 	public void startInit() {
 
 		mService = getActivity().startService(new Intent(getActivity(), PlayerService.class));
@@ -536,7 +541,8 @@ public class PlayerFragment   extends PodcastBaseFragment
 			item_id = id;
 		}
 		
-        public void onClick(DialogInterface dialog, int select) 
+        @Override
+		public void onClick(DialogInterface dialog, int select) 
         {
     		FeedItem feeditem = FeedItem.getById(getActivity().getContentResolver(), item_id);
     		if (feeditem == null)
@@ -675,6 +681,7 @@ public class PlayerFragment   extends PodcastBaseFragment
 		final String sel = where;
 		
 		new Thread() {
+			@Override
 			public void run() {
 				Cursor cursor = null;
 				try {
@@ -720,6 +727,7 @@ public class PlayerFragment   extends PodcastBaseFragment
 
 		
 		new Thread() {
+			@Override
 			public void run() {
 				Cursor cursor = null;
 				try {
@@ -750,7 +758,7 @@ public class PlayerFragment   extends PodcastBaseFragment
     
     private void getPref() {
 		SharedPreferences pref = getActivity().getSharedPreferences(
-				SettingsActivity.HAPI_PREFS_FILE_NAME, Service.MODE_PRIVATE);
+				SettingsActivity.HAPI_PREFS_FILE_NAME, Context.MODE_PRIVATE);
 		pref_repeat = pref.getLong("pref_repeat",0);
 		pref_fas_fwd_interval = Integer.parseInt(pref.getString("pref_fast_forward_interval","30"));		
 		ffwd_interval = pref_fas_fwd_interval*1000;

@@ -1,21 +1,17 @@
 package info.bottiger.podcast.service;
 
-import java.io.File;
-import java.util.LinkedList;
 import java.util.PriorityQueue;
 
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 import info.bottiger.podcast.R;
 import info.bottiger.podcast.SwipeActivity;
-import info.bottiger.podcast.cloud.GoogleReader;
 import info.bottiger.podcast.fetcher.FeedFetcher;
 import info.bottiger.podcast.parser.FeedHandler;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.provider.SubscriptionColumns;
-import info.bottiger.podcast.utils.DownloadStatus;
 import info.bottiger.podcast.utils.LockHandler;
 import info.bottiger.podcast.utils.Log;
 import info.bottiger.podcast.utils.SDCardManager;
@@ -263,7 +259,7 @@ public class PodcastDownloadManager {
 		log.debug("updateConnectStatus");
 		try {
 
-			ConnectivityManager cm = (ConnectivityManager) context.getSystemService(context.CONNECTIVITY_SERVICE);
+			ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 			NetworkInfo info = cm.getActiveNetworkInfo();
 			if (info == null) {
 				mConnectStatus = NO_CONNECT;
@@ -351,7 +347,8 @@ public class PodcastDownloadManager {
 		        SwipeActivity.gReader.getSubscriptionsFromReader();
 		    } 
 		 
-	     protected PullToRefreshListView doInBackground(Void... params) {
+	     @Override
+		protected PullToRefreshListView doInBackground(Void... params) {
 				try {					
 					Cursor subscriptionCursor = Subscription.allAsCursor(mContext.getContentResolver());
 					while (subscriptionCursor.moveToNext()) {
@@ -382,7 +379,8 @@ public class PodcastDownloadManager {
 	     }
 
 	     
-	     protected void onProgressUpdate(String... title) {
+	     @Override
+		protected void onProgressUpdate(String... title) {
 	    	 //Toast.makeText(mContext, "Updating: " + title[0], Toast.LENGTH_LONG).show();
 	    	 CharSequence pullLabel = "Updateing: " + title[0];
 	    	 if (pullLabel != null)
@@ -405,7 +403,8 @@ public class PodcastDownloadManager {
 		        mContext = context;
 		    } 
 		 
-	     protected Void doInBackground(Void... params) {
+	     @Override
+		protected Void doInBackground(Void... params) {
 				try {
 					while ((updateConnectStatus(mContext) & pref_connection_sel) > 0) {
 
@@ -443,7 +442,8 @@ public class PodcastDownloadManager {
 	    	 return null;
 	     }
 	     
-	     protected void onProgressUpdate(String... title) {
+	     @Override
+		protected void onProgressUpdate(String... title) {
 	    	 //Toast.makeText(mContext, "Updating: " + title[0], Toast.LENGTH_LONG).show();
 	     }
 	 }

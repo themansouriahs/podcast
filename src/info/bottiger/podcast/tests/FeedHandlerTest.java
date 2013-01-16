@@ -17,7 +17,6 @@
 package info.bottiger.podcast.tests;
 
 import android.test.mock.MockContentResolver;
-import info.bottiger.podcast.R;
 import info.bottiger.podcast.parser.FeedHandler;
 import info.bottiger.podcast.parser.FeedParserHandler;
 import info.bottiger.podcast.parser.FeedParserListener;

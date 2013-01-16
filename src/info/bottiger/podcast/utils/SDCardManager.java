@@ -2,7 +2,6 @@ package info.bottiger.podcast.utils;
 
 import java.io.File;
 
-import android.content.Context;
 import android.os.Environment;
 
 public class SDCardManager {

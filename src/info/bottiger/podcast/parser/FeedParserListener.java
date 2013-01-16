@@ -55,18 +55,22 @@ public class FeedParserListener implements FeedParserListenerInterface {
 		return items.size();
 	}
 
+	@Override
 	public void onFeedDescriptionLoad(String feedDescription) {
 		this.feedDescription = feedDescription;
 	}
 	
+	@Override
 	public void onFeedImageLoad(String feedImage) {
 		this.feedImage = feedImage;
 	}
 
+	@Override
 	public void onFeedTitleLoad(String feedTitle) {
 		this.feedTitle = feedTitle;
 	}
 
+	@Override
 	public void onFeedLinkLoad(String feedLink) {
 		this.feedLink = feedLink;
 	}
@@ -78,7 +82,8 @@ public class FeedParserListener implements FeedParserListenerInterface {
 		FeedItem[] item_list = items.toArray(new FeedItem[items.size()]);
 		Arrays.sort( item_list,
                 new Comparator<FeedItem>() {
-                    public int compare(FeedItem i1, FeedItem i2) {
+                    @Override
+					public int compare(FeedItem i1, FeedItem i2) {
                         long d1 = i1.getDate();
                         long d2 = i2.getDate();
                         if (d1==d2)
@@ -94,6 +99,7 @@ public class FeedParserListener implements FeedParserListenerInterface {
 	}
 	
 
+	@Override
 	public void onItemLoad(FeedItem item) throws SAXException {
 		items.add(item);
 		if (items.size() >= MAX_SIZE) {

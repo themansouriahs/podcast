@@ -1,35 +1,19 @@
 package info.bottiger.podcast;
 
 import com.bugsense.trace.BugSenseHandler;
-import com.handmark.pulltorefresh.library.PullToRefreshBase;
-import com.handmark.pulltorefresh.library.PullToRefreshListView;
-
 import info.bottiger.podcast.PodcastBaseFragment.OnItemSelectedListener;
 import info.bottiger.podcast.cloud.CloudProvider;
 import info.bottiger.podcast.cloud.GoogleReader;
-import info.bottiger.podcast.notification.NotificationPlayer;
-import info.bottiger.podcast.provider.ItemColumns;
-import info.bottiger.podcast.provider.PodcastProvider;
 import info.bottiger.podcast.service.PlayerService;
 import info.bottiger.podcast.service.PodcastService;
 import info.bottiger.podcast.utils.AddPodcastDialog;
 import info.bottiger.podcast.utils.Log;
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.app.ActionBar;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.FragmentTransaction;
 import android.content.ComponentName;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Debug;
 import android.os.IBinder;
@@ -38,8 +22,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.app.ListFragment;
-import android.support.v4.app.NavUtils;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Gravity;
@@ -86,6 +68,7 @@ public class SwipeActivity extends FragmentActivity implements
 	private long SubscriptionFeedID = 0;
 
 	protected static ServiceConnection serviceConnection = new ServiceConnection() {
+		@Override
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			mServiceBinder = ((PodcastService.PodcastBinder) service)
 					.getService();
@@ -93,6 +76,7 @@ public class SwipeActivity extends FragmentActivity implements
 			//log.debug("onServiceConnected");
 		}
 
+		@Override
 		public void onServiceDisconnected(ComponentName className) {
 			mServiceBinder = null;
 			//log.debug("onServiceDisconnected");
@@ -124,7 +108,7 @@ public class SwipeActivity extends FragmentActivity implements
 		try {
 			Account[] a = AccountManager.get(getApplicationContext())
 				.getAccountsByType("com.google");
-			this.mAccount = a[0];
+			SwipeActivity.mAccount = a[0];
 			gReader = new GoogleReader(SwipeActivity.this, mAccount);
 			if (a.length > 0) {
 				//gReader.refreshAuthToken();
@@ -136,11 +120,13 @@ public class SwipeActivity extends FragmentActivity implements
 
 	}
 	
+	@Override
 	protected void onPause() {
 		super.onPause();
 		if (debugging) Debug.stopMethodTracing();
 	}
 	
+	@Override
 	protected void onDestroy() {
 		super.onDestroy();
 		BugSenseHandler.closeSession(SwipeActivity.this);
@@ -214,6 +200,7 @@ public class SwipeActivity extends FragmentActivity implements
 
 		// Hack:
 		// http://stackoverflow.com/questions/7263291/viewpager-pageradapter-not-updating-the-view/7287121#7287121
+		@Override
 		public int getItemPosition(Object object) {
 			return PagerAdapter.POSITION_NONE;
 		}

@@ -2,12 +2,8 @@ package info.bottiger.podcast.utils;
 
 import android.widget.SimpleCursorAdapter;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.app.Activity;
 import android.content.Context;
-import android.media.MediaMetadataRetriever;
-import android.support.v4.app.Fragment;
+import android.provider.BaseColumns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,16 +16,11 @@ import android.widget.TextView;
 import info.bottiger.podcast.PlayerActivity;
 import info.bottiger.podcast.PodcastBaseFragment;
 import info.bottiger.podcast.R;
-import info.bottiger.podcast.RecentItemFragment;
-import info.bottiger.podcast.SwipeActivity;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
-import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.service.PodcastDownloadManager;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeSet;
@@ -54,6 +45,7 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 	}
 
 	public static class TextFieldHandler implements FieldHandler {
+		@Override
 		public void setViewValue(FeedCursorAdapter adapter, Cursor cursor,
 				View v, int fromColumnId) {
 			// Normal text column, just display what's in the database
@@ -78,6 +70,7 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 		public IconFieldHandler() {
 		}
 
+		@Override
 		public void setViewValue(FeedCursorAdapter adapter, Cursor cursor,
 				View v, int fromColumnId) {
 			adapter.setViewImage3((ImageView) v, cursor.getString(fromColumnId));
@@ -195,7 +188,7 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 		
 		bindView(v, mContext, itemCursor);
 
-		Long itemID = itemCursor.getLong(itemCursor.getColumnIndex(ItemColumns._ID));
+		Long itemID = itemCursor.getLong(itemCursor.getColumnIndex(BaseColumns._ID));
 
 		FeedItem feedItem = FeedItem.getById(mContext.getContentResolver(), itemID);
 		
@@ -301,7 +294,7 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 		int titleIndex = cursor.getColumnIndex(ItemColumns.TITLE);
 		String title = cursor.getString(titleIndex);
 
-		int idIndex = cursor.getColumnIndex(ItemColumns._ID);
+		int idIndex = cursor.getColumnIndex(BaseColumns._ID);
 		long id = cursor.getLong(idIndex);
 
 		int subtitleIndex = cursor.getColumnIndex(ItemColumns.SUB_TITLE);
@@ -427,7 +420,7 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 	}
 
 	public void toggleItem(Cursor item) {
-		Long itemID = item.getLong(item.getColumnIndex(ItemColumns._ID));
+		Long itemID = item.getLong(item.getColumnIndex(BaseColumns._ID));
 		toggleItem(itemID);
 	}
 

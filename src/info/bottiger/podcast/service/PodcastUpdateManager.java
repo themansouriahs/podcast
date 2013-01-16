@@ -1,29 +1,11 @@
 package info.bottiger.podcast.service;
 
-import info.bottiger.podcast.R;
-import info.bottiger.podcast.fetcher.FeedFetcher;
-import info.bottiger.podcast.parser.FeedHandler;
-import info.bottiger.podcast.provider.FeedItem;
-import info.bottiger.podcast.provider.ItemColumns;
-import info.bottiger.podcast.provider.Subscription;
-import info.bottiger.podcast.provider.SubscriptionColumns;
-import info.bottiger.podcast.utils.LockHandler;
-import info.bottiger.podcast.utils.Log;
-import info.bottiger.podcast.utils.SDCardManager;
-
-import java.util.PriorityQueue;
-
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.PowerManager;
-import android.widget.Toast;
 
 public class PodcastUpdateManager extends BroadcastReceiver {
 	

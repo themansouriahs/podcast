@@ -2,7 +2,6 @@ package info.bottiger.podcast.fetcher;
 
 import info.bottiger.podcast.PodcastBaseFragment;
 import info.bottiger.podcast.provider.FeedItem;
-import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.utils.Log;
 
 import java.io.ByteArrayOutputStream;
@@ -15,7 +14,6 @@ import java.util.Properties;
 import java.util.zip.GZIPInputStream;
 
 import android.content.ContentResolver;
-import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Message;
 
@@ -308,7 +306,8 @@ public class FeedFetcher {
 		        mFeedItem = feedItem;
 		    } 
 		 
-	     protected Integer doInBackground(Void... params) {
+	     @Override
+		protected Integer doInBackground(Void... params) {
 	 		String pathname = mFeedItem.getPathname();
 
 			//nStartPos = mFeedItem.offset;
@@ -416,7 +415,8 @@ public class FeedFetcher {
 //	    	 return null;
 	     }
 	     
-	     protected void onProgressUpdate(Long... chunkSize) {
+	     @Override
+		protected void onProgressUpdate(Long... chunkSize) {
 	    	 Message msg = new Message();
 	    	 msg.what = PodcastBaseFragment.UPDATE_FILESIZE;
 	    	 msg.obj = this.mFeedItem;

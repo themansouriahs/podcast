@@ -1,7 +1,6 @@
 package info.bottiger.podcast.service;
 
 
-import java.io.File;
 import java.io.IOException;
 
 import info.bottiger.podcast.PlayerActivity;
@@ -185,7 +184,8 @@ public class PlayerService extends Service {
         
 
         MediaPlayer.OnCompletionListener listener = new MediaPlayer.OnCompletionListener() {
-            public void onCompletion(MediaPlayer mp) {
+            @Override
+			public void onCompletion(MediaPlayer mp) {
 
                 mHandler.sendEmptyMessage(TRACK_ENDED);
 
@@ -200,7 +200,8 @@ public class PlayerService extends Service {
         };
         
         MediaPlayer.OnPreparedListener preparedlistener = new MediaPlayer.OnPreparedListener() {
-            public void onPrepared(MediaPlayer mp) {
+            @Override
+			public void onPrepared(MediaPlayer mp) {
                 //notifyChange(ASYNC_OPEN_COMPLETE);
             	mp.seekTo(startPos);
             	start();
@@ -208,7 +209,8 @@ public class PlayerService extends Service {
         };
  
         MediaPlayer.OnErrorListener errorListener = new MediaPlayer.OnErrorListener() {
-            public boolean onError(MediaPlayer mp, int what, int extra) {
+            @Override
+			public boolean onError(MediaPlayer mp, int what, int extra) {
 	    		log.debug("onError() "+ what + " : " + extra);
 	    		
                 switch (what) {
@@ -632,7 +634,7 @@ public class PlayerService extends Service {
 	
     private long getPref() {
 		SharedPreferences pref = getSharedPreferences(
-				SettingsActivity.HAPI_PREFS_FILE_NAME, Service.MODE_PRIVATE);
+				SettingsActivity.HAPI_PREFS_FILE_NAME, Context.MODE_PRIVATE);
 		return pref.getLong("pref_repeat",0);
 
 	}

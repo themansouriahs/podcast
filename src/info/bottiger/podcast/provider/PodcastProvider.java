@@ -12,6 +12,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.provider.BaseColumns;
 import android.text.TextUtils;
 
 public class PodcastProvider extends ContentProvider {
@@ -85,7 +86,7 @@ public class PodcastProvider extends ContentProvider {
 		case TYPE_SINGLE_SUBSCRIPTION:
 			qb.setTables(SubscriptionColumns.TABLE_NAME);
 			qb.setProjectionMap(sSubProjectionMap);
-			qb.appendWhere(SubscriptionColumns._ID + "="
+			qb.appendWhere(BaseColumns._ID + "="
 					+ uri.getPathSegments().get(1));
 
 			// String s_id = uri.getPathSegments().get(1);
@@ -108,7 +109,7 @@ public class PodcastProvider extends ContentProvider {
 			qb.setTables(ItemColumns.TABLE_NAME);
 			qb.setProjectionMap(sItemProjectionMap);
 			qb
-					.appendWhere(ItemColumns._ID + "="
+					.appendWhere(BaseColumns._ID + "="
 							+ uri.getPathSegments().get(1));
 			// String i_id = uri.getPathSegments().get(1);
 			// c = db.query(ItemColumns.TABLE_NAME, projection, ItemColumns._ID
@@ -182,7 +183,7 @@ public class PodcastProvider extends ContentProvider {
 		case TYPE_SINGLE_SUBSCRIPTION:
 			String s_id = uri.getPathSegments().get(1);
 			count = db.delete(SubscriptionColumns.TABLE_NAME,
-					SubscriptionColumns._ID
+					BaseColumns._ID
 							+ "="
 							+ s_id
 							+ (!TextUtils.isEmpty(where) ? " AND (" + where
@@ -194,7 +195,7 @@ public class PodcastProvider extends ContentProvider {
 		case TYPE_SINGLE_ITEM:
 			String i_id = uri.getPathSegments().get(1);
 			count = db.delete(ItemColumns.TABLE_NAME,
-					ItemColumns._ID
+					BaseColumns._ID
 							+ "="
 							+ i_id
 							+ (!TextUtils.isEmpty(where) ? " AND (" + where

@@ -20,24 +20,20 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.os.SystemClock;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
-import android.widget.SeekBar.OnSeekBarChangeListener;
 import info.bottiger.podcast.R;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.provider.SubscriptionColumns;
 import info.bottiger.podcast.service.PlayerService;
-import info.bottiger.podcast.service.PodcastService;
 import info.bottiger.podcast.utils.DialogMenu;
 import info.bottiger.podcast.utils.FeedCursorAdapter;
 import info.bottiger.podcast.utils.Log;
@@ -113,12 +109,14 @@ public class PlayerActivity   extends ListActivity
 	
 
 	protected static ServiceConnection serviceConnection = new ServiceConnection() {
+		@Override
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			mServiceBinder = ((PlayerService.PlayerBinder) service)
 					.getService();
 			//log.debug("onServiceConnected");
 		}
 
+		@Override
 		public void onServiceDisconnected(ComponentName className) {
 			mServiceBinder = null;
 			//log.debug("onServiceDisconnected");
@@ -301,7 +299,8 @@ public class PlayerActivity   extends ListActivity
     }
     
     private View.OnClickListener mNextListener = new View.OnClickListener() {
-        public void onClick(View v) {
+        @Override
+		public void onClick(View v) {
             try {
                 if (mServiceBinder != null && mServiceBinder.isInitialized()) {
                 	mServiceBinder.next();
@@ -314,13 +313,15 @@ public class PlayerActivity   extends ListActivity
     };   
     
     private View.OnClickListener mPauseListener = new View.OnClickListener() {
-        public void onClick(View v) {
+        @Override
+		public void onClick(View v) {
             doPauseResume();
         }
     };
     
     private View.OnClickListener mPrevListener = new View.OnClickListener() {
-        public void onClick(View v) {
+        @Override
+		public void onClick(View v) {
             try {
                 if (mServiceBinder != null && mServiceBinder.isInitialized()) {
                 	if(mServiceBinder.position()>5000)
@@ -337,7 +338,8 @@ public class PlayerActivity   extends ListActivity
     
     
     private View.OnClickListener mRwndListener = new View.OnClickListener() {
-        public void onClick(View v) {
+        @Override
+		public void onClick(View v) {
             try {
                 if (mServiceBinder != null && mServiceBinder.isInitialized()) {
                 	long pos = mServiceBinder.position();
@@ -353,7 +355,8 @@ public class PlayerActivity   extends ListActivity
     };    
     
     private View.OnClickListener mFfwdListener = new View.OnClickListener() {
-        public void onClick(View v) {
+        @Override
+		public void onClick(View v) {
             try {
                 if (mServiceBinder != null && mServiceBinder.isInitialized()) {
                 	long pos = mServiceBinder.position();
@@ -500,7 +503,8 @@ public class PlayerActivity   extends ListActivity
 			 new AlertDialog.Builder(this)
              .setTitle("Chose Repeat Mode")
              .setSingleChoiceItems(R.array.repeat_select, (int) pref_repeat, new DialogInterface.OnClickListener() {
-                 public void onClick(DialogInterface dialog, int select) {
+                 @Override
+				public void onClick(DialogInterface dialog, int select) {
          			
                 	pref_repeat = select;
          			SharedPreferences prefsPrivate = getSharedPreferences(SettingsActivity.HAPI_PREFS_FILE_NAME, Context.MODE_PRIVATE);
@@ -565,7 +569,8 @@ public class PlayerActivity   extends ListActivity
 			item_id = id;
 		}
 		
-        public void onClick(DialogInterface dialog, int select) 
+        @Override
+		public void onClick(DialogInterface dialog, int select) 
         {
     		FeedItem feeditem = FeedItem.getById(getContentResolver(), item_id);
     		if (feeditem == null)
@@ -681,7 +686,8 @@ public class PlayerActivity   extends ListActivity
 		 new AlertDialog.Builder(this)
          .setTitle("Select Channel")
          .setSingleChoiceItems(select_arr, 0, new DialogInterface.OnClickListener() {
-             public void onClick(DialogInterface dialog, int select) {
+             @Override
+			public void onClick(DialogInterface dialog, int select) {
      			loadItem(" AND " + ItemColumns.SUBS_ID+ "=" + id_arr[select]);
 
       			dialog.dismiss();
@@ -701,6 +707,7 @@ public class PlayerActivity   extends ListActivity
 		final String sel = where;
 		
 		new Thread() {
+			@Override
 			public void run() {
 				Cursor cursor = null;
 				try {
@@ -746,6 +753,7 @@ public class PlayerActivity   extends ListActivity
 
 		
 		new Thread() {
+			@Override
 			public void run() {
 				Cursor cursor = null;
 				try {
@@ -776,7 +784,7 @@ public class PlayerActivity   extends ListActivity
     
     private void getPref() {
 		SharedPreferences pref = getSharedPreferences(
-				SettingsActivity.HAPI_PREFS_FILE_NAME, Service.MODE_PRIVATE);
+				SettingsActivity.HAPI_PREFS_FILE_NAME, Context.MODE_PRIVATE);
 		pref_repeat = pref.getLong("pref_repeat",0);
 		pref_fas_fwd_interval = Integer.parseInt(pref.getString("pref_fast_forward_interval","30"));		
 		ffwd_interval = pref_fas_fwd_interval*1000;

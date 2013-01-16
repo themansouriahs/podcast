@@ -18,13 +18,10 @@ package info.bottiger.podcast.tests;
 
 
 import android.content.ContentResolver;
-import android.content.Intent;
 import android.test.mock.MockContentResolver;
-import junit.framework.TestCase;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.PodcastProvider;
-import info.bottiger.podcast.service.PodcastService;
 
 
 public class FeedItemTest extends android.test.ProviderTestCase<PodcastProvider> {

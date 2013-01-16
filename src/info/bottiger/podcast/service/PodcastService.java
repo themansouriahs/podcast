@@ -1,18 +1,9 @@
 package info.bottiger.podcast.service;
 
-import java.util.PriorityQueue;
-
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 import info.bottiger.podcast.SettingsActivity;
-import info.bottiger.podcast.R;
-import info.bottiger.podcast.fetcher.FeedFetcher;
-import info.bottiger.podcast.parser.FeedHandler;
 import info.bottiger.podcast.provider.FeedItem;
-import info.bottiger.podcast.provider.ItemColumns;
-import info.bottiger.podcast.provider.Subscription;
-import info.bottiger.podcast.provider.SubscriptionColumns;
-import info.bottiger.podcast.utils.LockHandler;
 import info.bottiger.podcast.utils.Log;
 import info.bottiger.podcast.utils.SDCardManager;
 
@@ -21,14 +12,8 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Binder;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
-import android.widget.Toast;
 
 public class PodcastService extends Service {
 	
@@ -111,7 +96,7 @@ public class PodcastService extends Service {
 	//@Override
 	public void onStart(Context context, Intent intent, int startId) {
 		super.onStart(intent, startId);
-		this.updateManager.updateNow(context); // new AlarmManager way
+		PodcastUpdateManager.updateNow(context); // new AlarmManager way
 		log.debug("onStart()");
 	}
 
@@ -155,7 +140,7 @@ public class PodcastService extends Service {
 
 	public void updateSetting() {
 		SharedPreferences pref = getSharedPreferences(
-				SettingsActivity.HAPI_PREFS_FILE_NAME, Service.MODE_PRIVATE);
+				SettingsActivity.HAPI_PREFS_FILE_NAME, Context.MODE_PRIVATE);
 
 		boolean b = pref.getBoolean("pref_download_only_wifi", false);
 		pref_connection_sel = b ? WIFI_CONNECT
@@ -185,7 +170,7 @@ public class PodcastService extends Service {
 	
 	public void downloadItem(ContentResolver context, FeedItem item) {
 		item.prepareDownload(context);
-		pdm.addItemToQueue(item);
+		PodcastDownloadManager.addItemToQueue(item);
 		pdm.do_download(true, getBaseContext());
 	}
 

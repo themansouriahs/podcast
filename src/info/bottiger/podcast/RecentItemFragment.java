@@ -6,7 +6,6 @@ import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.service.PodcastDownloadManager;
 import info.bottiger.podcast.utils.ControlButtons;
-import info.bottiger.podcast.utils.ControlButtons.Holder;
 import info.bottiger.podcast.utils.DialogMenu;
 import info.bottiger.podcast.utils.ExpandAnimation;
 import info.bottiger.podcast.utils.FeedCursorAdapter;
@@ -18,15 +17,13 @@ import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
-import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.provider.BaseColumns;
 import android.support.v4.content.CursorLoader;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -35,9 +32,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
-import android.widget.ImageButton;
+import android.widget.AbsListView;
 import android.widget.ListView;
-import android.widget.SeekBar;
 import android.widget.TextView;
 
 public class RecentItemFragment extends PodcastBaseFragment {
@@ -113,7 +109,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 
         if (mDualPane) {
             // In dual-pane mode, the list view highlights the selected item.
-            getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+            getListView().setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
             // Make sure our UI is in the correct state.
             //showDetails(mCurCheckPosition);
         }
@@ -145,6 +141,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 		setHasOptionsMenu(true);
 	}
 	
+	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 	    inflater.inflate(R.menu.episode_list, menu);
 	    super.onCreateOptionsMenu(menu, inflater);
@@ -196,6 +193,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 						R.id.appView }, fields);
 	}
 
+	@Override
 	public void onResume() {
 		super.onResume();
 		ControlButtons.fragment = this;
@@ -247,7 +245,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 		for (int i = start, j = list.getLastVisiblePosition(); i <= j; i++) {
 			Cursor item = (Cursor) list.getItemAtPosition(i+1); //FIXME https://github.com/chrisbanes/Android-PullToRefresh/issues/99
 
-			if (id == item.getLong(item.getColumnIndex(ItemColumns._ID))) {
+			if (id == item.getLong(item.getColumnIndex(BaseColumns._ID))) {
 				this.togglePlayer(list, item);
 			}
 
@@ -294,6 +292,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 			item_id = id;
 		}
 
+		@Override
 		public void onClick(DialogInterface dialog, int select) {
 			switch (mMenu.getSelect(select)) {
 			case MENU_ITEM_DETAILS: {
@@ -329,6 +328,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 		}
 	}
 
+	@Override
 	public void startInit() {
 		showEpisodes(getWhere());
 		super.startInit();
@@ -408,7 +408,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 
 	public void getPref() {
 		SharedPreferences pref = getActivity().getSharedPreferences(
-				SettingsActivity.HAPI_PREFS_FILE_NAME, Service.MODE_PRIVATE);
+				SettingsActivity.HAPI_PREFS_FILE_NAME, Context.MODE_PRIVATE);
 		pref_order = pref.getLong("pref_order", 2);
 		pref_where = pref.getLong("pref_where", 0);
 		pref_select = pref.getLong("pref_select", 0);
@@ -419,7 +419,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 		boolean setListners = false;
 		
 		mAdapter.toggleItem(item);
-		long id = item.getLong(item.getColumnIndex(ItemColumns._ID));
+		long id = item.getLong(item.getColumnIndex(BaseColumns._ID));
 		String duration = item.getString(item.getColumnIndex(ItemColumns.DURATION));
 		int position = item.getPosition();
 		View view = list.getChildAt(position - start +1);
@@ -465,7 +465,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 		for (int i = start, j = list.getLastVisiblePosition(); i <= j; i++) {
 			Cursor item = (Cursor) list.getItemAtPosition(i);
 			
-			if (id == item.getLong(item.getColumnIndex(ItemColumns._ID))) {
+			if (id == item.getLong(item.getColumnIndex(BaseColumns._ID))) {
 				View view = list.getChildAt(i);
 				return view;
 			}
@@ -481,9 +481,11 @@ public class RecentItemFragment extends PodcastBaseFragment {
 				condition, null, getOrder()).loadInBackground();
 	}
 	
+	@Override
 	Subscription getSubscription(Object o) {
 		Cursor item = (Cursor)o;
 		Long id = item.getLong(item.getColumnIndex(ItemColumns.SUBS_ID));
-		return new Subscription().getById(getActivity().getContentResolver(), id);
+		new Subscription();
+		return Subscription.getById(getActivity().getContentResolver(), id);
 	}
 }

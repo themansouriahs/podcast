@@ -1,7 +1,6 @@
 package info.bottiger.podcast.parser;
 
 import info.bottiger.podcast.R;
-import info.bottiger.podcast.SwipeActivity;
 import info.bottiger.podcast.fetcher.FeedFetcher;
 import info.bottiger.podcast.fetcher.Response;
 import info.bottiger.podcast.provider.FeedItem;
@@ -14,6 +13,7 @@ import java.io.ByteArrayInputStream;
 
 import android.content.ContentResolver;
 import android.database.Cursor;
+import android.provider.BaseColumns;
 
 public class FeedHandler  {
 	private static final int REPEAT_UPDATE_FEED_COUNT = 3;
@@ -128,7 +128,7 @@ public class FeedHandler  {
 				+ ItemColumns.RESOURCE + "= '" + item.resource + "'";
 
 		Cursor cursor = cr.query(ItemColumns.URI,
-				new String[] { ItemColumns._ID }, where, null, null);
+				new String[] { BaseColumns._ID }, where, null, null);
 
 		if (cursor.moveToFirst()) {
 		} else {

@@ -7,8 +7,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import android.text.format.DateFormat;
-
 public class StrUtils {
 
     private static DecimalFormat mTimeDecimalFormat = new DecimalFormat("00");

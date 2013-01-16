@@ -3,11 +3,8 @@ package info.bottiger.podcast.utils;
 import java.util.HashMap;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.widget.TextView;
-import info.bottiger.podcast.fetcher.FeedFetcher;
 import info.bottiger.podcast.provider.FeedItem;
-import info.bottiger.podcast.service.PodcastDownloadManager;
 
 /*
  * Updates the current filesize of a file while being downloaded

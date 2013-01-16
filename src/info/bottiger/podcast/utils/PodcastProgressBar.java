@@ -5,7 +5,6 @@ import info.bottiger.podcast.service.PlayerService;
 import android.content.Context;
 import android.os.SystemClock;
 import android.widget.SeekBar;
-import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
 public class PodcastProgressBar extends SeekBar {
@@ -22,13 +21,15 @@ public class PodcastProgressBar extends SeekBar {
     protected final Log log = Log.getLog(getClass());
 	
 	private OnSeekBarChangeListener mSeekListener = new OnSeekBarChangeListener() {
-        public void onStartTrackingTouch(SeekBar bar) {
+        @Override
+		public void onStartTrackingTouch(SeekBar bar) {
             mLastSeekEventTime = 0;
             mFromTouch = true;
             log.debug("mFromTouch = false; ");
             
         }
-        public void onProgressChanged(SeekBar bar, int progress, boolean fromuser) {
+        @Override
+		public void onProgressChanged(SeekBar bar, int progress, boolean fromuser) {
             log.debug("onProgressChanged");
        	
             if (!fromuser || (mServiceBinder == null)) return;
@@ -52,7 +53,8 @@ public class PodcastProgressBar extends SeekBar {
             
         }
         
-        public void onStopTrackingTouch(SeekBar bar) {
+        @Override
+		public void onStopTrackingTouch(SeekBar bar) {
             //mPosOverride = -1;
             mFromTouch = false;
             log.debug("mFromTouch = false; ");
