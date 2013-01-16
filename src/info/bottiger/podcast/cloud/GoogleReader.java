@@ -86,7 +86,7 @@ public class GoogleReader extends AbstractCloudProvider {
 	public static final String PREF_TOKEN = "accessToken";
 	public static final String SCOPE = "oauth2:http://www.google.com/reader/api"; // Or
 	//public static final String COMSUMER_KEY = "13654253758.apps.googleusercontent.com";
-	public static final String COMSUMER_KEY = ((SoundWaves) mContext).getGoogleReaderConsumerKey();;
+	public static String COMSUMER_KEY = null; 
 	public static final String TOKEN_URL = "http://www.google.com/reader/api/0/token";
 	
 	
@@ -131,6 +131,7 @@ public class GoogleReader extends AbstractCloudProvider {
 	};
 	
 	public GoogleReader(Context context, Account account) {
+		GoogleReader.COMSUMER_KEY = ((SoundWaves) mContext).getGoogleReaderConsumerKey();
 		init(context, account);
 	}
 	
