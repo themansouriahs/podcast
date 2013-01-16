@@ -16,7 +16,8 @@ public class NotificationPlayer {
 	
 	private Context mContext;
 	private FeedItem item;
-
+	
+	private NotificationManager mNotificationManager = null;
 	private int mId = 7;
 	
 	public NotificationPlayer(Context context, FeedItem item) {
@@ -29,9 +30,10 @@ public class NotificationPlayer {
 		
 		NotificationCompat.Builder mBuilder =
 		        new NotificationCompat.Builder(mContext)
-		        .setSmallIcon(R.drawable.generic_podcast)
+		        .setSmallIcon(R.drawable.soundwaves)
 		        .setContentTitle(item.title)
-		        .setContentText(item.sub_title);
+		        .setContentText(item.sub_title)
+		        .setLargeIcon(item.getThumbnailBitmap(mContext));
 		
 		Intent resultIntent = new Intent(mContext, NotificationReceiver.class);
 		
@@ -50,11 +52,15 @@ public class NotificationPlayer {
 		            PendingIntent.FLAG_UPDATE_CURRENT
 		        );
 		mBuilder.setContentIntent(resultPendingIntent);
-		NotificationManager mNotificationManager =
+		mNotificationManager =
 		    (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
 		// mId allows you to update the notification later on.
 		Notification not = mBuilder.build();
 		mNotificationManager.notify(mId, not);
+	}
+	
+	public void hide() {
+		mNotificationManager.cancel(mId);
 	}
 
 	public FeedItem getItem() {

@@ -154,6 +154,7 @@ public class PlayerService extends Service {
         }
 
         public void start() {
+        	notifyStatus();
             mMediaPlayer.start();
         }
 
@@ -163,6 +164,7 @@ public class PlayerService extends Service {
         }
 
         public void release() {
+        	dis_notifyStatus();
             stop();
             mMediaPlayer.release();
             mIsInitialized = false;
@@ -336,7 +338,6 @@ public class PlayerService extends Service {
 	public void onDestroy() {
 		super.onDestroy();
 		if(mPlayer!=null){
-			dis_notifyStatus();
 			mPlayer.release();
 		}
 
@@ -357,6 +358,7 @@ public class PlayerService extends Service {
     private void dis_notifyStatus() {
         ////mNotificationManager.cancel(R.layout.playing_episode);    	
         //setForeground(false);
+    	mNotificationPlayer.hide();
     }
     
     private void notifyStatus() {
@@ -365,26 +367,6 @@ public class PlayerService extends Service {
     		mNotificationPlayer = new NotificationPlayer(this, mItem);
     	
     	mNotificationPlayer.show(); 
-    	
-    	/*
-        String tickerText = mItem == null ? "player" : mItem.title;
-
-        Notification notification = new Notification(R.drawable.av_add_to_queue, tickerText, 0);
-        notification.flags |= Notification.FLAG_ONGOING_EVENT;
-
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, PlayerActivity.class)
-                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        .putExtra("moodimg", R.drawable.av_add_to_queue),
-                PendingIntent.FLAG_UPDATE_CURRENT);   
-        
-        notification.setLatestEventInfo(this, tickerText,
-        		null, contentIntent);     
-        		*/   
-        //setForeground(true);
-
-        ////mNotificationManager.notify(R.layout.playing_episode, notification);
-        
     }	
 	
 	public void play(long id) {
@@ -423,7 +405,6 @@ public class PlayerService extends Service {
 
 	public void start() {
 		if(mPlayer.isPlaying()==false) {
-			notifyStatus();
 			mPlayer.start();
 		}
 	}

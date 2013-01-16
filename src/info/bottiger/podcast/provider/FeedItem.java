@@ -1,6 +1,7 @@
 package info.bottiger.podcast.provider;
 
 import info.bottiger.podcast.PlayerActivity;
+import info.bottiger.podcast.R;
 import info.bottiger.podcast.service.PodcastDownloadManager;
 import info.bottiger.podcast.utils.FileUtils;
 import info.bottiger.podcast.utils.Log;
@@ -775,17 +776,13 @@ public class FeedItem implements Comparable<FeedItem> {
 		PodcastDownloadManager.DownloadStatus ds = PodcastDownloadManager.getStatus(this);
 		
 		if (pathname != null && pathname.length() > 0 && new File(fullPath).exists() && ds == PodcastDownloadManager.DownloadStatus.DONE) {
-			//holder.imageView.setImageBitmap(cover);
 			FileOutputStream out;
 			String thumbnailPath = thumbnailCacheURL(id);
-			File thumbnail = new File(thumbnailPath);
+			File thumbnail = getThumbnailFile();
 			String urlPrefix = "file://";
 			if (!thumbnail.exists()) {
 			try {
-				MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-				mmr.setDataSource(fullPath);
-				byte[] ba = mmr.getEmbeddedPicture();
-				Bitmap cover = BitmapFactory.decodeByteArray(ba, 0, ba.length);
+				Bitmap cover = getThumbnailBitmap(context);
 				out = new FileOutputStream(thumbnailPath);
 				cover.compress(Bitmap.CompressFormat.PNG, 90, out);
 				imageURL = urlPrefix + thumbnailPath;
@@ -812,6 +809,33 @@ public class FeedItem implements Comparable<FeedItem> {
 		}
 		
 		return imageURL;
+	}
+	
+	/*
+	 * Extracts the Bitmap from the MP3/media file
+	 */
+	public Bitmap getThumbnailBitmap(Context context) {
+		File thumbnail = getThumbnailFile();
+		if (thumbnail.exists()) {
+			String fullPath = SDCardManager.pathFromFilename(pathname);
+			MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+			mmr.setDataSource(fullPath);
+			byte[] ba = mmr.getEmbeddedPicture();
+			Bitmap cover = BitmapFactory.decodeByteArray(ba, 0, ba.length);
+			return cover;
+		}
+		
+		Bitmap icon = BitmapFactory.decodeResource(context.getResources(),
+                R.drawable.soundwaves);
+		return icon;
+	}
+	
+	/*
+	 * 
+	 */
+	private File getThumbnailFile() {
+		String thumbnailPath = thumbnailCacheURL(id);
+		return new File(thumbnailPath);
 	}
 	
 	@SuppressLint("UseValueOf")
