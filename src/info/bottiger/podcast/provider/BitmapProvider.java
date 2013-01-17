@@ -53,6 +53,9 @@ public class BitmapProvider {
 		String imageURL = null;
 		Bitmap generatedFile = null;
 		File thumbnail = getThumbnailFile();
+		
+		// make sure mItem is defined
+		if (mItem == null) return null;
 
 		// 1. Attempt: Extract thumbnail from local file.
 		//
