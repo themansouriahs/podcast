@@ -24,3 +24,14 @@ Thanks a ton to xuluan for making this open-source podcaster and helping me
 get started with my own fork.
 
 Arvid Böttiger
+
+Ignore SoundWaves.java
+======================
+
+After you fill in the sensitive information in SoundWaves.java use the following line to avoid commiting it:
+
+    git update-index --assume-unchanged src/info/bottiger/podcast/SoundWaves.java
+
+if you make changes you can start tracking it again with
+
+    git update-index --no-assume-unchanged src/info/bottiger/podcast/SoundWaves.java
