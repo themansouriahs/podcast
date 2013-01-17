@@ -55,7 +55,7 @@ public class BitmapProvider {
 		File thumbnail = getThumbnailFile();
 		
 		// make sure mItem is defined
-		if (mItem == null) return null;
+		if (mItem == null) return defaultIcon().getAbsolutePath();
 
 		// 1. Attempt: Extract thumbnail from local file.
 		//
