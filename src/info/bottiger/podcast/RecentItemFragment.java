@@ -190,7 +190,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 		return new FeedCursorAdapter(context, R.layout.channel_list_item,
 				cursor, new String[] { ItemColumns.TITLE, ItemColumns.STATUS,
 						ItemColumns.KEEP }, new int[] { R.id.text1, R.id.icon,
-						R.id.appView }, fields);
+						R.id.actionbar_compat }, fields);
 	}
 
 	@Override

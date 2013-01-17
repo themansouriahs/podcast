@@ -130,8 +130,13 @@ public class GoogleReader extends AbstractCloudProvider {
 		}
 	};
 	
-	public GoogleReader(Context context, Account account) {
-		GoogleReader.COMSUMER_KEY = ((SoundWaves) mContext).getGoogleReaderConsumerKey();
+	/*
+	 * Initialize the GoogleReader object.
+	 * The API key should be removed from the arguments and extracted from the context if possible
+	 */
+	public GoogleReader(Context context, Account account, String APIKey) {
+		//GoogleReader.COMSUMER_KEY = ((SoundWaves) mContext.getApplicationContext()).getGoogleReaderConsumerKey();
+		GoogleReader.COMSUMER_KEY = APIKey;
 		init(context, account);
 	}
 	

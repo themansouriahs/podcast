@@ -383,14 +383,15 @@ public class PodcastDownloadManager {
 		protected void onProgressUpdate(String... title) {
 	    	 //Toast.makeText(mContext, "Updating: " + title[0], Toast.LENGTH_LONG).show();
 	    	 CharSequence pullLabel = "Updateing: " + title[0];
-	    	 if (pullLabel != null)
+	    	 if (pullLabel != null && mRefreshView != null)
 	    		 mRefreshView.getLoadingLayoutProxy().setLastUpdatedLabel(pullLabel);
 	     }
 	     
          @Override
          protected void onPostExecute(PullToRefreshListView refreshView) {
              // Call onRefreshComplete when the list has been refreshed.
-             refreshView.onRefreshComplete();
+        	 if (mRefreshView != null) 
+        		 refreshView.onRefreshComplete();
              super.onPostExecute(refreshView);
          }
 	 }
