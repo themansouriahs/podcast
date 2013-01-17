@@ -1,21 +1,9 @@
 package info.bottiger.podcast.utils;
 
-import android.widget.SimpleCursorAdapter;
-import android.database.Cursor;
-import android.content.Context;
-import android.provider.BaseColumns;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewStub;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.SeekBar;
-import android.widget.TextView;
-
 import info.bottiger.podcast.PlayerActivity;
 import info.bottiger.podcast.PodcastBaseFragment;
 import info.bottiger.podcast.R;
+import info.bottiger.podcast.provider.BitmapProvider;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.service.PodcastDownloadManager;
@@ -24,6 +12,19 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeSet;
+
+import android.content.Context;
+import android.database.Cursor;
+import android.provider.BaseColumns;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewStub;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.SeekBar;
+import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiscCache;
@@ -375,10 +376,11 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 			holder.textViewSubTitle.setText(cursor.getString(subtitleIndex));
 
 		
-		/* Calculate the imageOath */
+		/* Calculate the imagePath */
 		String imageURL = null;
 		if (item != null)
-			imageURL = item.getThumbnail(context);
+			imageURL = new BitmapProvider(context,item).getThumbnailPath();
+			
 		
 		if (imageURL != null && !imageURL.equals("")) {
 			ImageLoader imageLoader = getImageLoader(context);

@@ -13,7 +13,7 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 import android.support.v4.util.LruCache;
 
-public class Subscription {
+public class Subscription implements WithIcon {
 
 	public final static int ADD_SUCCESS = 0;
 	public final static int ADD_FAIL_DUP = -1;
@@ -326,6 +326,16 @@ public class Subscription {
 	        super(maxSize);
 	    }
 
+	}
+
+	@Override
+	public long getId() {
+		return id;
+	}
+
+	@Override
+	public String getImageURL(Context context) {
+		return imageURL;
 	}
 
 }

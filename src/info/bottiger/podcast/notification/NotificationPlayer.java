@@ -3,12 +3,14 @@ package info.bottiger.podcast.notification;
 import info.bottiger.podcast.NotificationReceiver;
 import info.bottiger.podcast.R;
 import info.bottiger.podcast.SwipeActivity;
+import info.bottiger.podcast.provider.BitmapProvider;
 import info.bottiger.podcast.provider.FeedItem;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
@@ -33,7 +35,7 @@ public class NotificationPlayer {
 		        .setSmallIcon(R.drawable.soundwaves)
 		        .setContentTitle(item.title)
 		        .setContentText(item.sub_title)
-		        .setLargeIcon(item.getThumbnailBitmap(mContext));
+		        .setLargeIcon(new BitmapProvider(mContext, item).createBitmapFromMediaFile());
 		
 		Intent resultIntent = new Intent(mContext, NotificationReceiver.class);
 		
