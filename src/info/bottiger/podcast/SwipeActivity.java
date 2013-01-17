@@ -1,9 +1,12 @@
 package info.bottiger.podcast;
 
+import java.io.IOException;
+
 import com.bugsense.trace.BugSenseHandler;
 import info.bottiger.podcast.PodcastBaseFragment.OnItemSelectedListener;
 import info.bottiger.podcast.cloud.CloudProvider;
 import info.bottiger.podcast.cloud.GoogleReader;
+import info.bottiger.podcast.debug.SqliteCopy;
 import info.bottiger.podcast.service.PlayerService;
 import info.bottiger.podcast.service.PodcastService;
 import info.bottiger.podcast.utils.AddPodcastDialog;
@@ -89,7 +92,16 @@ public class SwipeActivity extends FragmentActivity implements
 		
 		//BugSenseHandler.initAndStartSession(SwipeActivity.this, "75981add");
 		BugSenseHandler.initAndStartSession(SwipeActivity.this, ((SoundWaves)this.getApplication()).getBugSenseAPIKey());
-		if (debugging) Debug.startMethodTracing("calc");
+		if (debugging)  {
+			Debug.startMethodTracing("calc");
+			
+			try {
+				SqliteCopy.backupDatabase();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 
 		startService(new Intent(this, PodcastService.class));
 		startService(new Intent(this, PlayerService.class));
