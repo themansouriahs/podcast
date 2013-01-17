@@ -184,7 +184,7 @@ public class PodcastDownloadManager {
 
 	}
 
-	protected void removeExpires(Context context) {
+	public void removeExpires(Context context) {
 		long expiredTime = System.currentTimeMillis() - pref_item_expire;
 		try {
 			String where = ItemColumns.CREATED + "<" + expiredTime + " and "
