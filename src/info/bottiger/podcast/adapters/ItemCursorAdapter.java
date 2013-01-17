@@ -1,4 +1,4 @@
-package info.bottiger.podcast.utils;
+package info.bottiger.podcast.adapters;
 
 import info.bottiger.podcast.PlayerActivity;
 import info.bottiger.podcast.PodcastBaseFragment;
@@ -6,7 +6,12 @@ import info.bottiger.podcast.R;
 import info.bottiger.podcast.provider.BitmapProvider;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
+import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.service.PodcastDownloadManager;
+import info.bottiger.podcast.utils.ControlButtons;
+import info.bottiger.podcast.utils.FilesizeUpdater;
+import info.bottiger.podcast.utils.SDCardManager;
+import info.bottiger.podcast.utils.StrUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -36,18 +41,18 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.nostra13.universalimageloader.core.download.URLConnectionImageDownloader;
 
-public class FeedCursorAdapter extends SimpleCursorAdapter {
+public class ItemCursorAdapter extends AbstractPodcastAdapter {
 
 	public static final int ICON_DEFAULT_ID = -1;
 
 	public interface FieldHandler {
-		public void setViewValue(FeedCursorAdapter adapter, Cursor cursor,
+		public void setViewValue(ItemCursorAdapter adapter, Cursor cursor,
 				View v, int fromColumnId);
 	}
 
 	public static class TextFieldHandler implements FieldHandler {
 		@Override
-		public void setViewValue(FeedCursorAdapter adapter, Cursor cursor,
+		public void setViewValue(ItemCursorAdapter adapter, Cursor cursor,
 				View v, int fromColumnId) {
 			// Normal text column, just display what's in the database
 			String text = cursor.getString(fromColumnId);
@@ -72,7 +77,7 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 		}
 
 		@Override
-		public void setViewValue(FeedCursorAdapter adapter, Cursor cursor,
+		public void setViewValue(ItemCursorAdapter adapter, Cursor cursor,
 				View v, int fromColumnId) {
 			adapter.setViewImage3((ImageView) v, cursor.getString(fromColumnId));
 		}
@@ -123,13 +128,13 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 	}
 
 	// Legacy constructor
-	public FeedCursorAdapter(Context context, int layout, Cursor cursor,
+	public ItemCursorAdapter(Context context, int layout, Cursor cursor,
 			String[] fromColumns, int[] to, HashMap<Integer, Integer> iconMap) {
 		this(context, layout, cursor, fromColumns, to, defaultFieldHandlers(
 				fromColumns, iconMap));
 	}
 
-	public FeedCursorAdapter(Context context, int layout, Cursor cursor,
+	public ItemCursorAdapter(Context context, int layout, Cursor cursor,
 			String[] fromColumns, int[] to, FieldHandler[] fieldHandlers) {
 		this(context, null, layout, cursor,
 				fromColumns, to, fieldHandlers);
@@ -141,7 +146,7 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 	// of those objects, but the overhead of defining that value class in Java
 	// is not worth it.
 	// If this were a Scala program, that would be a one-line case class.
-	public FeedCursorAdapter(Context context, PodcastBaseFragment fragment, int layout, Cursor cursor,
+	public ItemCursorAdapter(Context context, PodcastBaseFragment fragment, int layout, Cursor cursor,
 			String[] fromColumns, int[] to, FieldHandler[] fieldHandlers) {
 		super(context, layout, cursor, fromColumns, to);
 
@@ -318,11 +323,21 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 		}
 
 		FeedItem item = null;
+		Subscription sub = null;
 		
 		try {
 			item = FeedItem.getByCursor(cursor);
 		} catch (IllegalStateException e) {
-			//Subscription sub = Subscription.getByCursor(cursor);
+		}
+		
+		try {
+			sub = Subscription.getByCursor(cursor);
+		} catch (IllegalStateException e) {
+		}
+		
+		if (sub != null) {
+			int t = 55;
+			t = t * 7;
 		}
 			
 		int statusIndex = cursor.getColumnIndex(ItemColumns.STATUS);
@@ -378,7 +393,7 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 		
 		/* Calculate the imagePath */
 		String imageURL = null;
-		if (item != null)
+		if (item != null || sub != null)
 			imageURL = new BitmapProvider(context,item).getThumbnailPath();
 			
 		
@@ -400,7 +415,7 @@ public class FeedCursorAdapter extends SimpleCursorAdapter {
 			.memoryCacheExtraOptions(480, 800) // max width, max height
 			.threadPoolSize(5)
 			.offOutOfMemoryHandling()
-			.memoryCache(new UsingFreqLimitedMemoryCache(2 * 1024 * 1024)) // You can pass your own memory cache implementation
+			.memoryCache(new UsingFreqLimitedMemoryCache(10 * 1024 * 1024)) // You can pass your own memory cache implementation
 			.discCache(new UnlimitedDiscCache(cacheDir)) // You can pass your own disc cache implementation
             .discCacheFileNameGenerator(new HashCodeFileNameGenerator())
             .imageDownloader(new URLConnectionImageDownloader(5 * 1000, 20 * 1000)) // connectTimeout (5 s), readTimeout (20 s)

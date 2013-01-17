@@ -1,6 +1,8 @@
 package info.bottiger.podcast;
 
 import info.bottiger.podcast.R;
+import info.bottiger.podcast.adapters.ItemCursorAdapter;
+import info.bottiger.podcast.adapters.ItemCursorAdapter.TextFieldHandler;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.Subscription;
@@ -8,8 +10,6 @@ import info.bottiger.podcast.service.PodcastDownloadManager;
 import info.bottiger.podcast.utils.ControlButtons;
 import info.bottiger.podcast.utils.DialogMenu;
 import info.bottiger.podcast.utils.ExpandAnimation;
-import info.bottiger.podcast.utils.FeedCursorAdapter;
-import info.bottiger.podcast.utils.FeedCursorAdapter.TextFieldHandler;
 
 import java.util.HashMap;
 
@@ -84,7 +84,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 	 * bits set
 	 */
 
-	private FeedCursorAdapter mAdapter;
+	private ItemCursorAdapter mAdapter;
 	
     boolean mDualPane;
 	private long mCurCheckID = -1;
@@ -166,28 +166,28 @@ public class RecentItemFragment extends PodcastBaseFragment {
 	}
 	
 
-	public static FeedCursorAdapter listItemCursorAdapter(Context context,
+	public static ItemCursorAdapter listItemCursorAdapter(Context context,
 			PodcastBaseFragment fragment, Cursor cursor) {
-		FeedCursorAdapter.FieldHandler[] fields = {
-				FeedCursorAdapter.defaultTextFieldHandler,
+		ItemCursorAdapter.FieldHandler[] fields = {
+				ItemCursorAdapter.defaultTextFieldHandler,
 				new TextFieldHandler(), new TextFieldHandler(),
-				new FeedCursorAdapter.IconFieldHandler(mIconMap),
+				new ItemCursorAdapter.IconFieldHandler(mIconMap),
 		// new IconCursorAdapter.IconFieldHandler(mKeepIconMap)
 		};
-		return new FeedCursorAdapter(context, fragment, R.layout.list_item, cursor,
+		return new ItemCursorAdapter(context, fragment, R.layout.list_item, cursor,
 				new String[] { ItemColumns.TITLE, ItemColumns.SUB_TITLE,
 						ItemColumns.DURATION, ItemColumns.IMAGE_URL },
 				new int[] { R.id.title, R.id.podcast, R.id.duration,
 						R.id.list_image }, fields);
 	}
 
-	public static FeedCursorAdapter channelListItemCursorAdapter(
+	public static ItemCursorAdapter channelListItemCursorAdapter(
 			Context context, Cursor cursor) {
-		FeedCursorAdapter.FieldHandler[] fields = {
-				FeedCursorAdapter.defaultTextFieldHandler,
-				new FeedCursorAdapter.IconFieldHandler(mIconMap),
-				new FeedCursorAdapter.IconFieldHandler(mKeepIconMap) };
-		return new FeedCursorAdapter(context, R.layout.channel_list_item,
+		ItemCursorAdapter.FieldHandler[] fields = {
+				ItemCursorAdapter.defaultTextFieldHandler,
+				new ItemCursorAdapter.IconFieldHandler(mIconMap),
+				new ItemCursorAdapter.IconFieldHandler(mKeepIconMap) };
+		return new ItemCursorAdapter(context, R.layout.channel_list_item,
 				cursor, new String[] { ItemColumns.TITLE, ItemColumns.STATUS,
 						ItemColumns.KEEP }, new int[] { R.id.text1, R.id.icon,
 						R.id.actionbar_compat }, fields);

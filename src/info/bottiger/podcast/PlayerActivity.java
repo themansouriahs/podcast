@@ -29,13 +29,13 @@ import android.widget.SeekBar;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import info.bottiger.podcast.R;
+import info.bottiger.podcast.adapters.ItemCursorAdapter;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.provider.SubscriptionColumns;
 import info.bottiger.podcast.service.PlayerService;
 import info.bottiger.podcast.utils.DialogMenu;
-import info.bottiger.podcast.utils.FeedCursorAdapter;
 import info.bottiger.podcast.utils.Log;
 import info.bottiger.podcast.utils.PodcastProgressBar;
 import info.bottiger.podcast.utils.StrUtils;
@@ -417,13 +417,13 @@ public class PlayerActivity   extends ListActivity
    
     }
     
-	protected static FeedCursorAdapter channelListItemCursorAdapter(Context context, Cursor cursor) {
-		FeedCursorAdapter.FieldHandler[] fields = {
-				FeedCursorAdapter.defaultTextFieldHandler,
-				new FeedCursorAdapter.IconFieldHandler(mIconMap),
-				new FeedCursorAdapter.IconFieldHandler(mKeepIconMap)
+	protected static ItemCursorAdapter channelListItemCursorAdapter(Context context, Cursor cursor) {
+		ItemCursorAdapter.FieldHandler[] fields = {
+				ItemCursorAdapter.defaultTextFieldHandler,
+				new ItemCursorAdapter.IconFieldHandler(mIconMap),
+				new ItemCursorAdapter.IconFieldHandler(mKeepIconMap)
 		};
-		return new FeedCursorAdapter(context, R.layout.channel_list_item, cursor,
+		return new ItemCursorAdapter(context, R.layout.channel_list_item, cursor,
 				new String[] { ItemColumns.TITLE, ItemColumns.STATUS, ItemColumns.KEEP },
 				new int[] { R.id.text1, R.id.icon, R.id.icon },
 				fields);

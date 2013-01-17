@@ -1,12 +1,12 @@
 package info.bottiger.podcast;
 
 import info.bottiger.podcast.R;
+import info.bottiger.podcast.adapters.ItemCursorAdapter;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.provider.SubscriptionColumns;
 import info.bottiger.podcast.utils.DialogMenu;
-import info.bottiger.podcast.utils.FeedCursorAdapter;
 
 import java.util.HashMap;
 
@@ -240,12 +240,12 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 		} 
 	}
 	
-	private static FeedCursorAdapter channelListSubscriptionCursorAdapter(Context context, Cursor cursor) {
-		FeedCursorAdapter.FieldHandler[] fields = {
-				FeedCursorAdapter.defaultTextFieldHandler,
-				new FeedCursorAdapter.IconFieldHandler()
+	private static ItemCursorAdapter channelListSubscriptionCursorAdapter(Context context, Cursor cursor) {
+		ItemCursorAdapter.FieldHandler[] fields = {
+				ItemCursorAdapter.defaultTextFieldHandler,
+				new ItemCursorAdapter.IconFieldHandler()
 		};
-		return new FeedCursorAdapter(context, R.layout.list_item, cursor,
+		return new ItemCursorAdapter(context, R.layout.list_item, cursor,
 				new String[] { SubscriptionColumns.TITLE, SubscriptionColumns.IMAGE_URL },
 				new int[] { R.id.title, R.id.list_image },
 				fields);
