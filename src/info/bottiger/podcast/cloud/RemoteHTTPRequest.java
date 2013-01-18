@@ -14,7 +14,6 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -58,6 +57,9 @@ public class RemoteHTTPRequest extends AsyncTask<URL, Void, String> {
 
 		url = urls[0];
 		
+		/*
+		 * Request a new authKey. This has to be done async
+		 */
 		try {
 			authKey = GoogleReader.amf.getResult().getString("authtoken");
 		} catch (Exception e) {
@@ -67,7 +69,6 @@ public class RemoteHTTPRequest extends AsyncTask<URL, Void, String> {
 		try {
 			conn = (HttpURLConnection) url.openConnection();
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 
@@ -94,9 +95,7 @@ public class RemoteHTTPRequest extends AsyncTask<URL, Void, String> {
 
 	private static String parseGoogleReader(InputStream input) {
 		StringBuilder response = new StringBuilder();
-		
-		
-		
+
 		/*
 		 * A giant bug in jelly bean forces me convert the input stream to a string and back to an inputstream.
 		 * Maybe it's a speed issue with the parsing - maybe not.
@@ -109,13 +108,11 @@ public class RemoteHTTPRequest extends AsyncTask<URL, Void, String> {
 			read = br.readLine();
 
 			while (read != null) {
-				// System.out.println(read);
 				sb.append(read);
 				read = br.readLine();
 
 			}
 		} catch (IOException e2) {
-			// TODO Auto-generated catch block
 			e2.printStackTrace();
 		}
 
@@ -123,7 +120,6 @@ public class RemoteHTTPRequest extends AsyncTask<URL, Void, String> {
 		try {
 			input = new ByteArrayInputStream(hhh.getBytes("UTF-8"));
 		} catch (UnsupportedEncodingException e2) {
-			// TODO Auto-generated catch block
 			e2.printStackTrace();
 		}  
 		/*
@@ -142,7 +138,6 @@ public class RemoteHTTPRequest extends AsyncTask<URL, Void, String> {
 		}
 
 		try {
-			// document = builder.parse(conn.getInputStream());
 			document = builder.parse(input);
 
 			Element rootElement = document.getDocumentElement();
@@ -156,13 +151,10 @@ public class RemoteHTTPRequest extends AsyncTask<URL, Void, String> {
 				TransformerFactory.newInstance().newTransformer()
 						.transform(source, result);
 			} catch (TransformerConfigurationException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			} catch (TransformerException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			} catch (TransformerFactoryConfigurationError e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			StringReader xmlReader = new StringReader(xmlAsWriter.toString());
@@ -177,7 +169,6 @@ public class RemoteHTTPRequest extends AsyncTask<URL, Void, String> {
 				xpathNodes = (NodeList) xpath.evaluate(expression, is,
 						XPathConstants.NODESET);
 			} catch (XPathExpressionException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -195,8 +186,6 @@ public class RemoteHTTPRequest extends AsyncTask<URL, Void, String> {
 					if (propertyNode.getNodeType() == Node.ELEMENT_NODE) {
 						Element child = (Element) propertyNode;
 						String att = child.getAttribute("name");
-						// String v = n.getTextContent();
-						// Log.v(TAG, att);
 
 						if (att.equalsIgnoreCase("id")) {
 							podFeed = child.getTextContent().substring(5); // remove
@@ -212,8 +201,6 @@ public class RemoteHTTPRequest extends AsyncTask<URL, Void, String> {
 
 				Subscription podcast = new Subscription(podFeed);
 				podcast.subscribe(GoogleReader.mContext);
-				// podcast.subscribe(getContentResolver());
-				// contentService.addSubscription(podcast);
 
 			}
 
@@ -222,38 +209,6 @@ public class RemoteHTTPRequest extends AsyncTask<URL, Void, String> {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		/*
-		 * // loop over "subscription list node" for (int i = 0; i <
-		 * nodes.getLength(); i++) { Node node = nodes.item(i);
-		 * 
-		 * if (node instanceof Element) { Element child = (Element) node;
-		 * 
-		 * NodeList objectNodes = node.getChildNodes();
-		 * 
-		 * // loop over "object" nodes for (int j = 0; j <
-		 * objectNodes.getLength(); j++) { Node object = objectNodes.item(j); if
-		 * (node instanceof Element) { Element el = (Element) object;
-		 * 
-		 * // objectPropertiers => string, string, list, // string, number,
-		 * string NodeList objectPropertiers = el.getChildNodes();
-		 * 
-		 * for (int k = 0; k < objectPropertiers.getLength(); k++) { Node
-		 * objectNode = objectPropertiers.item(k); if (objectNode instanceof
-		 * Element) { String attName = ((Element)
-		 * objectNode).getAttribute("name");
-		 * 
-		 * if (attName.equalsIgnoreCase("categories") &&
-		 * objectNode.hasChildNodes()) {
-		 * 
-		 * XPath xpath = XPathFactory.newInstance().newXPath(); String
-		 * expression = "//object[string = \"Listen Subscriptions\"]";
-		 * InputSource inputSource = new InputSource(); NodeSet nodes =
-		 * (NodeSet) xpath.evaluate(expression, inputSource,
-		 * XPathConstants.NODESET);
-		 * 
-		 * } } } } } } }
-		 */
 
 		return response.toString();
 	}
