@@ -78,14 +78,14 @@ public class ItemColumns implements BaseColumns {
 	public static final String SUB_TITLE = "sub_title";
 	public static final String CREATED = "created";
 	public static final String TYPE = "audio_type";
-	public static final String KEEP = "keep";
+	public static final String LISTENED = "keep";
 	
 	public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
 	public static final String[] ALL_COLUMNS = { _ID, SUBS_ID, TITLE, AUTHOR,
 			DATE, LAST_UPDATE, CONTENT, STATUS, URL, RESOURCE, FILESIZE,CHUNK_FILESIZE, DURATION,
 			LENGTH, OFFSET, PATHNAME, FAIL_COUNT, MEDIA_URI, SUB_TITLE,
-			CREATED, TYPE, KEEP, IMAGE_URL };
+			CREATED, TYPE, LISTENED, IMAGE_URL };
 
 	public static final String DEFAULT_SORT_ORDER = CREATED + " DESC";
 
@@ -113,14 +113,14 @@ public class ItemColumns implements BaseColumns {
 		+ SUB_TITLE + " VARCHAR(128), "
 		+ TYPE + " VARCHAR(64), " 
 		+ CREATED + " INTEGER, "
-		+ KEEP + " INTEGER NOT NULL DEFAULT 0"
+		+ LISTENED + " INTEGER NOT NULL DEFAULT 0"
 		+ ");";
 
 	//To upgrade from database version 12 to version 13
 	public static final String sql_upgrade_table_add_keep_column = "ALTER TABLE "
-			+ TABLE_NAME + " ADD COLUMN " + KEEP + " INTEGER NOT NULL DEFAULT 0;";
+			+ TABLE_NAME + " ADD COLUMN " + LISTENED + " INTEGER NOT NULL DEFAULT 0;";
 	public static final String sql_populate_keep_from_status =
-			"UPDATE " + TABLE_NAME + " SET " + KEEP + " = 1 "
+			"UPDATE " + TABLE_NAME + " SET " + LISTENED + " = 1 "
 			+ " WHERE " + STATUS + "=" + ITEM_STATUS_KEEP;
 	public static final String sql_change_keep_status_to_played =
 			"UPDATE " + TABLE_NAME + " SET " + STATUS + "=" + ITEM_STATUS_PLAYED
@@ -225,8 +225,8 @@ public class ItemColumns implements BaseColumns {
 		if (values.containsKey(TYPE) == false) {
 			values.put(TYPE, "");
 		}
-		if (values.containsKey(KEEP) == false) {
-			values.put(KEEP, 0);
+		if (values.containsKey(LISTENED) == false) {
+			values.put(LISTENED, 0);
 		}
 		return values;
 	}

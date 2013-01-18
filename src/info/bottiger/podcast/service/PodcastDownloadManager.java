@@ -130,8 +130,6 @@ public class PodcastDownloadManager {
 			return;
 		}
 
-		populateDownloadQueue();
-
 		new DownloadPodcast(context).execute();
 	}
 
@@ -158,7 +156,7 @@ public class PodcastDownloadManager {
 			String where = ItemColumns.CREATED + "<" + expiredTime + " and "
 					+ ItemColumns.STATUS + "<"
 					+ ItemColumns.ITEM_STATUS_MAX_READING_VIEW + " and "
-					+ ItemColumns.KEEP + "=0";
+					+ ItemColumns.LISTENED + "=0";
 
 			context.getContentResolver().delete(ItemColumns.URI, where, null);
 		} catch (Exception e) {
@@ -176,7 +174,7 @@ public class PodcastDownloadManager {
 					+ ItemColumns.ITEM_STATUS_MAX_READING_VIEW + " and "
 					+ ItemColumns.STATUS + "<="
 					+ ItemColumns.ITEM_STATUS_PLAY_PAUSE + " and "
-					+ ItemColumns.KEEP + "=0";
+					+ ItemColumns.LISTENED + "=0";
 
 			Cursor cursor = context.getContentResolver().query(ItemColumns.URI,
 					ItemColumns.ALL_COLUMNS, where, null, null);
@@ -193,7 +191,7 @@ public class PodcastDownloadManager {
 					+ ItemColumns.ITEM_STATUS_PLAY_PAUSE + " and "
 					+ ItemColumns.STATUS + "<"
 					+ ItemColumns.ITEM_STATUS_MAX_PLAYLIST_VIEW + " and "
-					+ ItemColumns.KEEP + "=0";
+					+ ItemColumns.LISTENED + "=0";
 
 			Cursor cursor = context.getContentResolver().query(ItemColumns.URI,
 					ItemColumns.ALL_COLUMNS, where, null, null);
@@ -251,38 +249,6 @@ public class PodcastDownloadManager {
 			return mConnectStatus;
 		}
 
-	}
-
-	private Subscription findSubscription(Context context) {
-
-		Long now = Long.valueOf(System.currentTimeMillis());
-		log.debug("pref_update = " + pref_update);
-
-		String where = SubscriptionColumns.LAST_UPDATED + "<"
-				+ (now - pref_update);
-		String order = SubscriptionColumns.LAST_UPDATED + " ASC,"
-				+ SubscriptionColumns.FAIL_COUNT + " ASC";
-		Subscription sub = Subscription.getBySQL(context.getContentResolver(),
-				where, order);
-
-		return sub;
-
-	}
-
-	private void populateDownloadQueue() {
-		/*
-		 * FeedItem item = null; do { String where = ItemColumns.STATUS + ">" +
-		 * ItemColumns.ITEM_STATUS_DOWNLOAD_PAUSE + " AND " + ItemColumns.STATUS
-		 * + "<" + ItemColumns.ITEM_STATUS_MAX_DOWNLOADING_VIEW;
-		 * 
-		 * String order = ItemColumns.STATUS + " DESC , " +
-		 * ItemColumns.LAST_UPDATE + " ASC"; item =
-		 * FeedItem.getBySQL(getContentResolver(), where, order);
-		 * 
-		 * if (item != null) { mDownloadQueue.add(item); item.status =
-		 * ItemColumns.ITEM_STATUS_DOWNLOAD_PENDING;
-		 * item.update(getContentResolver()); } } while (item != null);
-		 */
 	}
 
 	public FeedItem getDownloadingItem() {
@@ -421,6 +387,8 @@ public class PodcastDownloadManager {
 
 		@Override
 		protected Void doInBackground(Void... params) {
+			int gg = 6;
+			gg = gg +6;
 			try {
 				while ((updateConnectStatus(mContext) & pref_connection_sel) > 0) {
 

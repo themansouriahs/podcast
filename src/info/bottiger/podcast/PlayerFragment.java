@@ -99,7 +99,7 @@ public class PlayerFragment   extends PodcastBaseFragment
 		ItemColumns.DURATION,
 		ItemColumns.SUB_TITLE,
 		ItemColumns.STATUS,
-		ItemColumns.KEEP
+		ItemColumns.LISTENED
 	};
 	
 	static {

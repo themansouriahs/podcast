@@ -32,130 +32,178 @@ import android.support.v4.util.LruCache;
 import android.widget.Toast;
 
 public class FeedItem implements Comparable<FeedItem>, WithIcon {
-	
+
 	public static final int MAX_DOWNLOAD_FAIL = 5;
-	
+
 	private final Log log = Log.getLog(getClass());
 	private static ItemLruCache cache = null;
 
-	public String url;
-	public String title;
-	public String author;
-	public String date;
-	public String content;
-	public String resource;
-	public String duration;
-	public String image;
+	/*
+	 * Let's document these retared fields! They are totally impossible to guess
+	 * the meaning of.
+	 */
 
+	/*
+	 * Unique ID
+	 */
 	public long id;
 
+	/*
+	 * URL of the episode:
+	 * http://podcast.dr.dk/P1/p1debat/2013/p1debat_1301171220.mp3
+	 */
+	public String url;
+
+	/*
+	 * Title of the episode
+	 */
+	public String title;
+
+	/*
+	 * Name of Publisher
+	 */
+	public String author;
+
+	/*
+	 * Date Published
+	 */
+	public String date;
+
+	/*
+	 * Episode description in text
+	 */
+	public String content;
+
+	/*
+	 * 
+	 */
+	public String resource;
+
+	/*
+	 * Duration as String hh:mm:ss or mm:ss 02:23:34
+	 */
+	public String duration;
+
+	/*
+	 * URL to relevant episode image
+	 */
+	public String image;
+
+	/*
+	 * Unique ID of the subscription the episode belongs to
+	 */
 	public long sub_id;
+
+	/*
+	 * Total size of the episode in bytes
+	 */
 	public long filesize;
+
+	/*
+	 * Size of the file on disk in bytes
+	 */
 	public long chunkFilesize;
 
+	/*
+	 * Filename of the episode on disk. sn209.mp3
+	 */
 	private String pathname;
+
+	/*
+	 * Last position during playback in ms Should match seekTo(int)
+	 * http://developer
+	 * .android.com/reference/android/media/MediaPlayer.html#seekTo(int)
+	 */
 	public int offset;
+
+	/*
+	 * Deprecated status from before forking
+	 */
+	@Deprecated
 	public int status;
+
+	@Deprecated
 	public long failcount;
-            //failcount is currently used for two purposes:
-            //1. counts the number of times we fail to download, and
-            //   when we exceed a predefined max, we pause the download.
-            //2. when an item is in the player, failcount is used as
-            //   the order of the item in the list.
-	public int keep;	//1 if we should not expire this item
-	
+	// failcount is currently used for two purposes:
+	// 1. counts the number of times we fail to download, and
+	// when we exceed a predefined max, we pause the download.
+	// 2. when an item is in the player, failcount is used as
+	// the order of the item in the list.
+
+	/*
+	 * Have to listened to this episode yet?
+	 */
+	public int listened;
+
+	@Deprecated
 	public long length;
 
+	/*
+	 * The time the record in the database was updated the last time. measured
+	 * in: System.currentTimeMillis()
+	 */
 	public long update;
 
+	/*
+	 * The URI of the podcast episode
+	 */
+	@Deprecated
 	public String uri;
 
+	/*
+	 * Title of the parent subscription
+	 */
 	public String sub_title;
+
+	@Deprecated
 	public long created;
 
+	@Deprecated
 	public String type;
-	
+
+	@Deprecated
 	private long m_date;
 
-	static String[] DATE_FORMATS = { 
-		"EEE, dd MMM yyyy HH:mm:ss Z",
-		"EEE, d MMM yy HH:mm z", 
-		"EEE, d MMM yyyy HH:mm:ss z",
-		"EEE, d MMM yyyy HH:mm z", 
-		"d MMM yy HH:mm z",
-		"d MMM yy HH:mm:ss z", 
-		"d MMM yyyy HH:mm z",
-		"d MMM yyyy HH:mm:ss z", 
-		"yyyy-MM-dd HH:mm", 
-		"yyyy-MM-dd HH:mm:ss", 
-		"EEE,dd MMM yyyy HH:mm:ss Z",};
-	
+	static String[] DATE_FORMATS = { "EEE, dd MMM yyyy HH:mm:ss Z",
+			"EEE, d MMM yy HH:mm z", "EEE, d MMM yyyy HH:mm:ss z",
+			"EEE, d MMM yyyy HH:mm z", "d MMM yy HH:mm z",
+			"d MMM yy HH:mm:ss z", "d MMM yyyy HH:mm z",
+			"d MMM yyyy HH:mm:ss z", "yyyy-MM-dd HH:mm", "yyyy-MM-dd HH:mm:ss",
+			"EEE,dd MMM yyyy HH:mm:ss Z", };
+
 	static String default_format = "EEE, dd MMM yyyy HH:mm:ss Z";
 
 	public static void view(Activity act, long item_id) {
 		Uri uri = ContentUris.withAppendedId(ItemColumns.URI, item_id);
-		FeedItem item = FeedItem.getById(act.getContentResolver(), item_id);
-		if ((item != null)
-				&& (item.status == ItemColumns.ITEM_STATUS_UNREAD)) {
-			item.status = ItemColumns.ITEM_STATUS_READ;
-			item.update(act.getContentResolver());
-		}    			
-		act.startActivity(new Intent(Intent.ACTION_EDIT, uri));   
-	}
-	
-	/*
-	public static void viewChannel(Activity act, long item_id) {
-		FeedItem item = FeedItem.getById(act.getContentResolver(), item_id);
-		item.viewChannel(act);
-	}
-	*/
-	public static void play(Activity act, long item_id) {
-		FeedItem feeditem = FeedItem.getById(act.getContentResolver(), item_id);
-		if (feeditem == null)
-			return;
-		feeditem.play(act);
-	}
-	
-	//True if we found the item and added it to the playlist
-	public static boolean addToPlaylist(Activity act, long item_id) {
-		FeedItem feeditem = FeedItem.getById(act.getContentResolver(), item_id);
-		if (feeditem != null) {
-			feeditem.addtoPlaylist(act.getContentResolver());
-			return true;
-		} else {
-			return false;
-		}
+		act.startActivity(new Intent(Intent.ACTION_EDIT, uri));
 	}
 
-	public static FeedItem getBySQL(ContentResolver context,String where,String order) 
-	{
+	@Deprecated
+	public static FeedItem getBySQL(ContentResolver context, String where,
+			String order) {
 		FeedItem item = null;
 		Cursor cursor = null;
-	
+
 		try {
-			cursor = context.query(
-					ItemColumns.URI,
-					ItemColumns.ALL_COLUMNS,
-					where,
-					null,
-					order);
+			cursor = context.query(ItemColumns.URI, ItemColumns.ALL_COLUMNS,
+					where, null, order);
 			if (cursor.moveToFirst()) {
 				item = FeedItem.getByCursor(cursor);
 			}
-		}finally {
+		} finally {
 			if (cursor != null)
 				cursor.close();
-		}		
+		}
 		return item;
-						
+
 	}
-	
+
 	public static FeedItem getById(ContentResolver contentResolver, long id) {
 		Cursor cursor = null;
 		FeedItem item = null;
-		
+
 		initCache();
-		
+
 		// Return item directly if cached
 		synchronized (cache) {
 			item = cache.get(id);
@@ -163,12 +211,12 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 				return item;
 			}
 		}
-		
+
 		try {
 			String where = BaseColumns._ID + " = " + id;
 
-			cursor = contentResolver.query(ItemColumns.URI, ItemColumns.ALL_COLUMNS,
-					where, null, null);
+			cursor = contentResolver.query(ItemColumns.URI,
+					ItemColumns.ALL_COLUMNS, where, null, null);
 			if (cursor.moveToFirst()) {
 				item = fetchFromCursor(cursor);
 
@@ -188,8 +236,6 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	}
 
 	public static FeedItem getByCursor(Cursor cursor) {
-		//if (cursor.moveToFirst() == false)
-		//	return null;
 		FeedItem item = fetchFromCursor(cursor);
 		return item;
 	}
@@ -213,123 +259,35 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		failcount = -1;
 		length = -1;
 		update = -1;
-		keep = -1;
+		listened = -1;
 		filesize = -1;
 		chunkFilesize = -1;
 
 		created = -1;
 		sub_title = null;
 		sub_id = -1;
-		
+
 		m_date = -1;
 
 	}
-	
-	public void updateOffset(ContentResolver context, long i)
-	{
-		offset = (int)i;
+
+	public void updateOffset(ContentResolver context, long i) {
+		offset = (int) i;
 		update = -1;
 		update(context);
-		
-	}
-	
-	public void playingOrPaused(boolean isPlaying, ContentResolver context)
-	{
-		if (isPlaying)
-			playing(context);
-		else
-			paused(context);				
-	}
-	
-	public void playing(ContentResolver context)
-	{
-		if(status != ItemColumns.ITEM_STATUS_PLAYING_NOW) {
-			status = ItemColumns.ITEM_STATUS_PLAYING_NOW;
-			update = Long.valueOf(System.currentTimeMillis());
-		}else{
-			update = -1;
-		}
-		update(context);		
-	}
-	
-	public void paused(ContentResolver context)
-	{
-		if(status == ItemColumns.ITEM_STATUS_PLAYING_NOW) {
-			status = ItemColumns.ITEM_STATUS_PLAY_PAUSE;
-			update = Long.valueOf(System.currentTimeMillis());
-		}else{
-			update = -1;
-		}
-		update(context);		
-	}
-	
-	public void played(ContentResolver context)
-	{
-		offset = 0;
-		if(status == ItemColumns.ITEM_STATUS_NO_PLAY ||
-           status == ItemColumns.ITEM_STATUS_PLAYING_NOW) {
-			status = ItemColumns.ITEM_STATUS_PLAYED;
-			update = Long.valueOf(System.currentTimeMillis());
-		}else{
-			update = -1;
-		}
-		update(context);		
-	}
-	
-	public void addtoPlaylistByOrder(ContentResolver context, long order)
-	{
-		failcount = order;
-		if(status == ItemColumns.ITEM_STATUS_NO_PLAY) {
-			status = ItemColumns.ITEM_STATUS_PLAY_READY;
-		}
-		update = -1;
-		update(context);
-		
-	}
-	
-	public void addtoPlaylist(ContentResolver context)
-	{
-		addtoPlaylistByOrder(context,Long.valueOf(System.currentTimeMillis()));		
-	}		
 
-	public void removeFromPlaylist(ContentResolver context)
-	{
-		failcount = 0;
-		if(status == ItemColumns.ITEM_STATUS_PLAY_READY) {
-			status = ItemColumns.ITEM_STATUS_NO_PLAY;
-		}
-		update = -1;
-		update(context);		
 	}
 
-	public void markKeep(ContentResolver context) {
-		if (this.keep <= 1) {
-			this.keep = 1;
-			this.update(context);
-		}
-	}
-	public void markUnkeep(ContentResolver context) {
-		if (this.keep > 0) {
-			this.keep = 0;
-			this.update(context);
-		}
-	}
-	public void markNew(ContentResolver context) {
-		if (this.status > ItemColumns.ITEM_STATUS_NO_PLAY &&
-				this.status!=ItemColumns.ITEM_STATUS_PLAYING_NOW) {
-			this.status = ItemColumns.ITEM_STATUS_NO_PLAY;
-			this.failcount = 0;
-			this.updateOffset(context,0);
-		}
-	}
-	
+	/*
+	 * Update the FeedItem in the database
+	 */
 	public void update(ContentResolver context) {
 		log.debug("item update start");
-		
+
 		initCache();
 		if (this.id > 0)
 			cache.remove(this.id);
-		
+
 		try {
 
 			ContentValues cv = new ContentValues();
@@ -341,25 +299,12 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 				cv.put(ItemColumns.CHUNK_FILESIZE, chunkFilesize);
 			if (offset >= 0)
 				cv.put(ItemColumns.OFFSET, offset);
-			if (status >= 0)
-				cv.put(ItemColumns.STATUS, status);
-			if (failcount >= 0)
-				cv.put(ItemColumns.FAIL_COUNT, failcount);
-			
-			if(update >= 0){
+			if (update >= 0) {
 				update = Long.valueOf(System.currentTimeMillis());
 				cv.put(ItemColumns.LAST_UPDATE, update);
 			}
-			if (created >= 0)
-				cv.put(ItemColumns.CREATED, created);
-			if (length >= 0)
-				cv.put(ItemColumns.LENGTH, length);
-			if (uri != null)
-				cv.put(ItemColumns.MEDIA_URI, uri);
-			if (type != null)
-				cv.put(ItemColumns.TYPE, type);
-			if (keep>=0)
-				cv.put(ItemColumns.KEEP, keep);
+			if (listened >= 0)
+				cv.put(ItemColumns.LISTENED, listened);
 
 			context.update(ItemColumns.URI, cv, BaseColumns._ID + "=" + id,
 					null);
@@ -378,14 +323,8 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 				cv.put(ItemColumns.PATHNAME, pathname);
 			if (offset >= 0)
 				cv.put(ItemColumns.OFFSET, offset);
-			if (status >= 0)
-				cv.put(ItemColumns.STATUS, status);
-			if (failcount >= 0)
-				cv.put(ItemColumns.FAIL_COUNT, failcount);
 			if (update >= 0)
 				cv.put(ItemColumns.LAST_UPDATE, update);
-			if (length >= 0)
-				cv.put(ItemColumns.LENGTH, length);
 
 			if (sub_id >= 0)
 				cv.put(ItemColumns.SUBS_ID, sub_id);
@@ -413,10 +352,8 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 			if (sub_title != null) {
 				cv.put(ItemColumns.SUB_TITLE, sub_title);
 			}
-			if (uri != null)
-				cv.put(ItemColumns.MEDIA_URI, uri);
-			if (keep >= 0)
-				cv.put(ItemColumns.KEEP, keep);
+			if (listened >= 0)
+				cv.put(ItemColumns.LISTENED, listened);
 
 			return context.insert(ItemColumns.URI, cv);
 
@@ -424,75 +361,29 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		}
 	}
 
-	/*
-	public void viewChannel(Activity act) {
-		//Subscription sub = Subscription.getSubbyId(getContentResolver(), item.sub_id);
-		Uri chUri = ContentUris.withAppendedId(SubscriptionColumns.URI, this.sub_id);
-		if (ChannelActivity.channelExists(act,chUri))
-			act.startActivity(new Intent(Intent.ACTION_EDIT, chUri));
-		else {
-			String subTitle = this.sub_title;
-			if (subTitle==null || subTitle.equals(""))
-				subTitle = "(no channel title)";
-			String tstr = String.format("Channel not found: '%s'", subTitle);
-			Toast.makeText(act, tstr, Toast.LENGTH_SHORT).show();
-		}
-	}
-	*/
-	public void playedBy(Activity act) {
-		Intent intent = new Intent(android.content.Intent.ACTION_VIEW); 
-	    Uri data = Uri.parse("file://"+this.pathname); 
-		log.error(this.pathname);
-	 
-	    intent.setDataAndType(data,"audio/mp3"); 
-	    try { 
-	         act.startActivity(intent); 
-	    } catch (Exception e) { 
-	         e.printStackTrace();
-	    }
-	}
-
-	public void export(Activity act) {
-		String filename = FileUtils.get_export_file_name(this.title, this.id);
-		filename = SDCardManager.getExportDir()+"/"+filename;
-		log.error(filename);   			
-			 Toast.makeText(act, "Please wait... ", 
-				 Toast.LENGTH_LONG).show();  
-			 
-		boolean b  = FileUtils.copy_file(getPathname(),filename);
-		if(b)
-		 Toast.makeText(act, "Exported audio file to : "+ filename, 
-				 Toast.LENGTH_LONG).show();
-		else
-			 Toast.makeText(act, "Export failed ", 
-				 Toast.LENGTH_LONG).show();    				
-	}
-	
+	@Deprecated
 	public long getDate() {
-		//log.debug(" getDate() start");
-		
-		if(m_date<0){
-			m_date  = parse();
-			//log.debug(" getDate() end " + default_format);
-			
-			
+		// log.debug(" getDate() start");
+
+		if (m_date < 0) {
+			m_date = parse();
+			// log.debug(" getDate() end " + default_format);
+
 		}
-			
+
 		return m_date;
 
 	}
 
+	@Deprecated
 	private long parse() {
 		long l = 0;
-		try{
-			return  new SimpleDateFormat(default_format, Locale.US).parse(date)
-			.getTime();
+		try {
+			return new SimpleDateFormat(default_format, Locale.US).parse(date)
+					.getTime();
 		} catch (ParseException e) {
 			log.debug(" first fail");
 		}
-
-
-		
 
 		for (String format : DATE_FORMATS) {
 			try {
@@ -508,36 +399,30 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	}
 
 	private static FeedItem fetchFromCursor(Cursor cursor) {
-		//assert cursor.moveToFirst();
-		//cursor.moveToFirst();
 		FeedItem item = new FeedItem();
-		
+
 		item.id = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
-		
+
 		// Return item directly if cached
 		initCache();
 		synchronized (cache) {
 			FeedItem cacheItem = cache.get(item.id);
-			if (cacheItem != null && cacheItem.title != "") { // FIXME cacheItem.title != ""
+			if (cacheItem != null && cacheItem.title != "") { // FIXME
+																// cacheItem.title
+																// != ""
 				item = cacheItem;
 				return item;
 			}
 		}
-		
-		int idx = cursor
-				.getColumnIndex(ItemColumns.RESOURCE);
+
+		int idx = cursor.getColumnIndex(ItemColumns.RESOURCE);
 		item.resource = cursor.getString(idx);
 		item.pathname = cursor.getString(cursor
 				.getColumnIndex(ItemColumns.PATHNAME));
 		item.offset = cursor.getInt(cursor.getColumnIndex(ItemColumns.OFFSET));
-		item.status = cursor.getInt(cursor.getColumnIndex(ItemColumns.STATUS));
-		item.failcount = cursor.getLong(cursor
-				.getColumnIndex(ItemColumns.FAIL_COUNT));
-
-		item.length = cursor.getLong(cursor.getColumnIndex(ItemColumns.LENGTH));
-
 		item.url = cursor.getString(cursor.getColumnIndex(ItemColumns.URL));
-		item.image = cursor.getString(cursor.getColumnIndex(ItemColumns.IMAGE_URL));
+		item.image = cursor.getString(cursor
+				.getColumnIndex(ItemColumns.IMAGE_URL));
 		item.title = cursor.getString(cursor.getColumnIndex(ItemColumns.TITLE));
 		item.author = cursor.getString(cursor
 				.getColumnIndex(ItemColumns.AUTHOR));
@@ -550,24 +435,20 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 				.getColumnIndex(ItemColumns.CHUNK_FILESIZE));
 		item.duration = cursor.getString(cursor
 				.getColumnIndex(ItemColumns.DURATION));
-		item.uri = cursor.getString(cursor
-				.getColumnIndex(ItemColumns.MEDIA_URI));
-
-		item.created = cursor.getLong(cursor
-				.getColumnIndex(ItemColumns.CREATED));
 		item.update = cursor.getLong(cursor
-				.getColumnIndex(ItemColumns.LAST_UPDATE));		
+				.getColumnIndex(ItemColumns.LAST_UPDATE));
 		item.sub_title = cursor.getString(cursor
 				.getColumnIndex(ItemColumns.SUB_TITLE));
-		item.sub_id = cursor.getLong(cursor.getColumnIndex(ItemColumns.SUBS_ID));
-		item.type = cursor.getString(cursor.getColumnIndex(ItemColumns.TYPE));
-		item.keep = cursor.getInt(cursor.getColumnIndex(ItemColumns.KEEP));
-		
+		item.sub_id = cursor
+				.getLong(cursor.getColumnIndex(ItemColumns.SUBS_ID));
+		item.listened = cursor.getInt(cursor
+				.getColumnIndex(ItemColumns.LISTENED));
+
 		// if item was not cached we put it in the cache
 		synchronized (cache) {
 			cache.put(item.id, item);
 		}
-		
+
 		return item;
 	}
 
@@ -576,134 +457,56 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		return "Feed: " + title;
 	}
 
-	public String getType() {
-		if (type == null) {
-			return "audio/mpeg";
-		}
-
-		if (!type.equalsIgnoreCase("")) {
-			return type;
-		}
-
-		return "audio/mpeg";
-	}
-	
-	public void play(Activity act){
-		
-		//item.play(ReadActivity.this);
-		Intent intent = new Intent(act, PlayerActivity.class);
-		intent.putExtra("item_id", id);
-		act.startActivity(intent);
-		
-		return;
-
-	}
-	
-	public void delFile(ContentResolver contentResolver){
-		if(status<ItemColumns.ITEM_STATUS_DELETE){
-			status = ItemColumns.ITEM_STATUS_DELETE;
-			update(contentResolver);	
-		}
+	public void delFile(ContentResolver contentResolver) {
 
 		if (SDCardManager.getSDCardStatus()) {
 			try {
 				File file = new File(getPathname());
-				
+
 				boolean deleted = true;
-				if(file.exists())
-				{
-					deleted = file.delete();					
+				if (file.exists()) {
+					deleted = file.delete();
 				}
-				if(deleted){
-					if(status<ItemColumns.ITEM_STATUS_DELETED){
-						status = ItemColumns.ITEM_STATUS_DELETED;
-						update(contentResolver);	
-					}						
+				if (deleted) {
+					update(contentResolver);
 				}
 			} catch (Exception e) {
 				log.warn("del file failed : " + getPathname() + "  " + e);
 
 			}
-		}		
+		}
 
 	}
-	
-	private String getMailBody(){
-		
-		String text;
-		text = "audio title: "+title+" \n";
-		text +="download address: "+resource;
-		
-		text +="\n-------------------------------------------------------------\n";
-		text +="from Hapi Podcast http://market.android.com/search?q=pname:info.xuluan.podcast";
-		
-		return text;
-		
-	}
-	
-	public void prepareDownload(ContentResolver context)
-	{
+
+	public void prepareDownload(ContentResolver context) {
 		if (getPathname().equals("") || getPathname().equals("0")) {
-			//String fileName = new File(pathname)FeedItem getName();
-			String filename = resource.substring(resource.lastIndexOf("/")+1);  
-			
-			//pathname = SDCardMgr.getDownloadDir() + "/podcast_" + id + ".mp3";
+			String filename = resource.substring(resource.lastIndexOf("/") + 1);
 			pathname = this.sub_id + "_" + filename + ".mp3";
 		}
-		status = ItemColumns.ITEM_STATUS_DOWNLOADING_NOW;
 		update(context);
 	}
 
-	public void downloadSuccess(ContentResolver contentResolver)
-	{
-		status = ItemColumns.ITEM_STATUS_NO_PLAY;
+	public void downloadSuccess(ContentResolver contentResolver) {
 		filesize = getCurrentFileSize();
 		update(contentResolver);
-	}	
-	
-	public void endDownload(ContentResolver context)
-	{
-		if (status == ItemColumns.ITEM_STATUS_DOWNLOAD_PENDING)
-			status = ItemColumns.ITEM_STATUS_NO_PLAY;
-		
-		if (status == ItemColumns.ITEM_STATUS_NO_PLAY) {
-			update = Long.valueOf(System.currentTimeMillis());
-			failcount = 0;
-			offset = 0;
+	}
 
-		} else {
-			status = ItemColumns.ITEM_STATUS_DOWNLOAD_QUEUE;
-			failcount++;
-			if (failcount > MAX_DOWNLOAD_FAIL) {
-				status = ItemColumns.ITEM_STATUS_DOWNLOAD_PAUSE;
-				failcount = 0;
-			}
-		}
+	public void endDownload(ContentResolver context) {
+		update = Long.valueOf(System.currentTimeMillis());
+		update(context);
+	}
 
-		update(context);		
-	}	
-	
 	public long getCurrentFileSize() {
 		String filename = getPathname();
 		if (filename != null)
 			return new File(filename).length();
 		return 0;
 	}
-	
+
 	public String getPathname() {
 		return SDCardManager.pathFromFilename(this.pathname);
 	}
 
-	public void sendMail(Activity act){
-	
-		final Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND); 
-		emailIntent .setType("plain/text"); 
-		//emailIntent .putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{"xuluan.android@gmail.com"}); 
-		emailIntent .putExtra(android.content.Intent.EXTRA_SUBJECT, "please listen..."); 
-		emailIntent .putExtra(android.content.Intent.EXTRA_TEXT, getMailBody()); 
-		act.startActivity(Intent.createChooser(emailIntent, "Send mail..."));
-	}
-	
 	public void setPosition(ContentResolver contentResolver, long pos) {
 		this.offset = (int) pos;
 		update(contentResolver);
@@ -715,10 +518,10 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 			return 1;
 		else if (this.update < another.update)
 			return -1;
-		
+
 		return 0;
 	}
-	
+
 	public String getURL() {
 		String itemURL = "";
 		if (resource.length() > 1)
@@ -727,21 +530,22 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 			itemURL = url;
 		return itemURL;
 	}
-	
+
 	public boolean isDownloaded() {
 		/* refactor when it works */
 		String path = getPathname();
-		if (path == null || path == "") return false;
-		
+		if (path == null || path == "")
+			return false;
+
 		File localFile = new File(path);
 		long localFilesize = localFile.length();
-		
+
 		if (filesize == 0)
 			return localFilesize > 0;
 		else
 			return localFilesize >= filesize && localFilesize > 0;
 	}
-	
+
 	/*
 	 * @return the duration of the mp3 (or whatever) in milliseconds.
 	 */
@@ -750,22 +554,27 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 			MediaMetadataRetriever retriever = new MediaMetadataRetriever();
 			try {
 				retriever.setDataSource(getPathname());
-			} catch(RuntimeException e) {
+			} catch (RuntimeException e) {
 				e.printStackTrace();
 				return this.length;
 			}
-			return Long.parseLong(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
+			return Long
+					.parseLong(retriever
+							.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
 		} else {
 			if (this.duration.equals(""))
 				return this.length;
 			else {
-				//String offsetString  = StrUtils.getTimeFromOffset(this.offset, this.length, this.duration);
+				// String offsetString = StrUtils.getTimeFromOffset(this.offset,
+				// this.length, this.duration);
 				return StrUtils.parseTimeToSeconds(duration);
 			}
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
@@ -776,7 +585,9 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		return result;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
@@ -792,19 +603,22 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 			return false;
 		return true;
 	}
-	
+
 	private static void initCache() {
 		if (cache == null) {
-			int memoryClass = 16 * 1024 * 1024; //FIXME use getMemoryClass()
-	    	cache = new ItemLruCache(memoryClass);		
+			int memoryClass = 16 * 1024 * 1024; // FIXME use getMemoryClass()
+			cache = new ItemLruCache(memoryClass);
 		}
 	}
-	
+
+	/*
+	 * Caching class for keeping items in memory
+	 */
 	private static class ItemLruCache extends LruCache<Long, FeedItem> {
 
-	    public ItemLruCache(int maxSize) {
-	        super(maxSize);
-	    }
+		public ItemLruCache(int maxSize) {
+			super(maxSize);
+		}
 
 	}
 
@@ -812,7 +626,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	public String getImageURL(Context context) {
 		String imageURL = null;
 		if (!image.equals("")) {
-			imageURL = image; 
+			imageURL = image;
 		} else {
 			Subscription subscription = Subscription.getById(
 					context.getContentResolver(), sub_id);

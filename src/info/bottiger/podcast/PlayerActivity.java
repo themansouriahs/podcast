@@ -97,7 +97,7 @@ public class PlayerActivity   extends ListActivity
 		ItemColumns.DURATION,
 		ItemColumns.SUB_TITLE,
 		ItemColumns.STATUS,
-		ItemColumns.KEEP
+		ItemColumns.LISTENED
 	};
 	
 	static {
@@ -424,7 +424,7 @@ public class PlayerActivity   extends ListActivity
 				new ItemCursorAdapter.IconFieldHandler(mKeepIconMap)
 		};
 		return new ItemCursorAdapter(context, R.layout.channel_list_item, cursor,
-				new String[] { ItemColumns.TITLE, ItemColumns.STATUS, ItemColumns.KEEP },
+				new String[] { ItemColumns.TITLE, ItemColumns.STATUS, ItemColumns.LISTENED },
 				new int[] { R.id.text1, R.id.icon, R.id.icon },
 				fields);
 	}

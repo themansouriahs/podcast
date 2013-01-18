@@ -352,18 +352,6 @@ public class ItemCursorAdapter extends AbstractPodcastAdapter {
 
 		
 		int filesize = 0;
-		/*
-		try {
-			int filesizeIndex = cursor
-					.getColumnIndexOrThrow(ItemColumns.FILESIZE);
-			filesize = cursor.getInt(filesizeIndex);
-			
-			if (filesize > 0)
-				holder.textViewFileSize.setText(filesize / 1024 / 1024 + " MB");
-		} catch (IllegalArgumentException e) {
-
-		}
-		*/
 
 		holder.textViewTitle.setText(title);
 

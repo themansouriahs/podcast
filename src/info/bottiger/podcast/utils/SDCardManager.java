@@ -79,9 +79,9 @@ public class SDCardManager {
 	}	
 	
 	public static String pathFromFilename(String filename) {
-		if (filename == null || filename.equals(""))
+		if (filename == null || filename.equals("")) {
 			return "";
-		else
+		} else
 			return SDCardManager.getDownloadDir() + "/" + filename;
 	}
 

@@ -59,7 +59,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 			ItemColumns.FILESIZE,
 			ItemColumns.PATHNAME, //
 			ItemColumns.OFFSET, //
-			ItemColumns.KEEP //
+			ItemColumns.LISTENED //
 
 	};
 
@@ -179,7 +179,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 				new ItemCursorAdapter.IconFieldHandler(mKeepIconMap) };
 		return new ItemCursorAdapter(context, R.layout.channel_list_item,
 				cursor, new String[] { ItemColumns.TITLE, ItemColumns.STATUS,
-						ItemColumns.KEEP }, new int[] { R.id.text1, R.id.icon,
+						ItemColumns.LISTENED }, new int[] { R.id.text1, R.id.icon,
 						R.id.actionbar_compat }, fields);
 	}
 
