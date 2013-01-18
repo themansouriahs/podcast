@@ -195,48 +195,6 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
         @Override
 		public void onClick(DialogInterface dialog, int select) 
         {
-    		switch (mMenu.getSelect(select)) {
-    		case MENU_ITEM_DETAILS: {
-    			Uri uri = ContentUris.withAppendedId(ItemColumns.URI, item_id);
-    			FeedItem item = FeedItem.getById(getActivity().getContentResolver(), item_id);
-    			if ((item != null)
-    					&& (item.status == ItemColumns.ITEM_STATUS_UNREAD)) {
-    				item.status = ItemColumns.ITEM_STATUS_READ;
-    				item.update(getActivity().getContentResolver());
-    			}    			
-    			startActivity(new Intent(Intent.ACTION_EDIT, uri));   
-    			return;
-    		}    		
-			case MENU_ITEM_START_DOWNLOAD: {
-	
-				FeedItem feeditem = FeedItem.getById(getActivity().getContentResolver(), item_id);
-				if (feeditem == null)
-					return;
-	
-				feeditem.status = ItemColumns.ITEM_STATUS_DOWNLOAD_QUEUE;
-				feeditem.update(getActivity().getContentResolver());
-				SwipeActivity.mServiceBinder.start_download();
-				return;
-			}
-			case MENU_ITEM_START_PLAY: {
-	
-				FeedItem feeditem = FeedItem.getById(getActivity().getContentResolver(), item_id);
-				if (feeditem == null)
-					return;
-		
-				//feeditem.play(ChannelFragment.this); TODO
-				return;
-			}
-			case MENU_ITEM_ADD_TO_PLAYLIST: {
-				
-				FeedItem feeditem = FeedItem.getById(getActivity().getContentResolver(), item_id);
-				if (feeditem == null)
-					return;
-		
-				feeditem.addtoPlaylist(getActivity().getContentResolver());
-				return;
-			}
-    		}
 		} 
 	}
 	
