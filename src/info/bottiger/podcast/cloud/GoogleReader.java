@@ -65,44 +65,44 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 /**
- * More about google reader API: 
- *  - http://blog.martindoms.com/2010/01/20/using-the-google-reader-api-part-3/
- *  - http://www.chrisdadswell.co.uk/grapicalls/
- *  
- *  
+ * More about google reader API: -
+ * http://blog.martindoms.com/2010/01/20/using-the-google-reader-api-part-3/ -
+ * http://www.chrisdadswell.co.uk/grapicalls/
+ * 
+ * 
  * Collection of OAuth 2 utilities to achieve "one-click" approval on Android.
  * 
  * @author Chirag Shah <chirags@google.com>
  */
 public class GoogleReader extends AbstractCloudProvider {
 	private static final String TAG = GoogleReader.class.getName();
-	private static String CLIENT= null;
+	private static String CLIENT = null;
 
 	private static Account mAccount;
 	static AccountManagerFuture<Bundle> amf = null;
 	static Context mContext = null;
-	
+
 	public static final String PREF_NAME = "Random Name";
 	public static final String PREF_TOKEN = "accessToken";
 	public static final String SCOPE = "oauth2:http://www.google.com/reader/api"; // Or
-	//public static final String COMSUMER_KEY = "13654253758.apps.googleusercontent.com";
-	public static String COMSUMER_KEY = null; 
+	// public static final String COMSUMER_KEY =
+	// "13654253758.apps.googleusercontent.com";
+	public static String COMSUMER_KEY = null;
 	public static final String TOKEN_URL = "http://www.google.com/reader/api/0/token";
-	
-	
+
 	private static String baseURL = "http://www.google.com/reader/api/0/subscription/";
 	private static URL getURL;
 	private static URL editURL;
-	
+
 	private static Object mTokenLock = new Object();
 	private static String mToken;
-	
+
 	public enum ReaderAction {
-	    GET, ADD, DELETE 
+		GET, ADD, DELETE
 	}
-	
+
 	private static SharedPreferences mSettings = null;
-	
+
 	final AccountManagerCallback<Bundle> cb = new AccountManagerCallback<Bundle>() {
 		@Override
 		public void run(AccountManagerFuture<Bundle> future) {
@@ -129,24 +129,25 @@ public class GoogleReader extends AbstractCloudProvider {
 			}
 		}
 	};
-	
+
 	/*
-	 * Initialize the GoogleReader object.
-	 * The API key should be removed from the arguments and extracted from the context if possible
+	 * Initialize the GoogleReader object. The API key should be removed from
+	 * the arguments and extracted from the context if possible
 	 */
 	public GoogleReader(Context context, Account account, String APIKey) {
-		//GoogleReader.COMSUMER_KEY = ((SoundWaves) mContext.getApplicationContext()).getGoogleReaderConsumerKey();
+		// GoogleReader.COMSUMER_KEY = ((SoundWaves)
+		// mContext.getApplicationContext()).getGoogleReaderConsumerKey();
 		GoogleReader.COMSUMER_KEY = APIKey;
 		init(context, account);
 	}
-	
+
 	public static void init(Context context, Account account) {
-		//readerToken();
+		// readerToken();
 		mContext = context;
 		mAccount = account;
 		CLIENT = mContext.getString(R.string.http_client_name);
 		mSettings = PreferenceManager.getDefaultSharedPreferences(mContext);
-		
+
 		try {
 			getURL = new URL(baseURL + "list");
 			editURL = new URL(baseURL + "edit");
@@ -154,7 +155,7 @@ public class GoogleReader extends AbstractCloudProvider {
 			e1.printStackTrace();
 		}
 	}
-	
+
 	@Override
 	public boolean auth() {
 		try {
@@ -165,56 +166,67 @@ public class GoogleReader extends AbstractCloudProvider {
 		}
 		return true;
 	}
-	
+
 	public void oauth() throws Exception {
 		new RemoteHTTPRequest(ReaderAction.GET).execute();
 	}
 
 	public void refreshAuthToken() {
-		//final SharedPreferences settings = activity.getSharedPreferences(
-		//		PREF_NAME, 0);
 		String accessToken = mSettings.getString(PREF_TOKEN, "");
 		AccountManager.get(mContext).invalidateAuthToken("com.google",
 				accessToken);
-		GoogleReader.amf = AccountManager.get(mContext).getAuthToken(mAccount, SCOPE,
-				true, cb, null);
+
+		// Deprecated way
+		// GoogleReader.amf =
+		// AccountManager.get(mContext).getAuthToken(mAccount, SCOPE,
+		// true, cb, null);
+		GoogleReader.amf = AccountManager.get(mContext).getAuthToken(mAccount,
+				SCOPE, null, (Activity) mContext, cb, null);
 	}
 
 	@Override
-	public AsyncTask<URL,Void,String> getSubscriptionsFromReader() {
+	public AsyncTask<URL,Void,Void> getSubscriptionsFromReader() {
 		// http://www.google.com/reader/api/0/stream/contents/user/-/label/Listen%20Subscriptions?client=myApplication
-		this.refreshAuthToken();
-		return new RemoteHTTPRequest(ReaderAction.GET).execute(getURL);
+		return new ReaderHTTPRequest().execute(getURL);
+	}
+
+	private class ReaderHTTPRequest extends AsyncTask<URL, Void, Void> {
+		protected Void doInBackground(URL... urls) {
+			Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+			GoogleReader.this.refreshAuthToken();
+			new RemoteHTTPRequest(ReaderAction.GET).execute(urls[0]);
+			return null;
+		}
 	}
 
 	@Override
-	public void addSubscriptiontoReader(Context context, Account account, Subscription subscription) {
+	public void addSubscriptiontoReader(Context context, Account account,
+			Subscription subscription) {
 		init(context, account);
 		String feed = subscription.url;
 		String ac = "subscribe";
 		String t = subscription.title;
 		String a = "Listen Subscriptions";
-		
-    	final RequestParams params = new RequestParams();
-    	params.put("quickadd", feed);
-    	params.put("s", "feed/" + feed);
-    	params.put("ac", ac);
+
+		final RequestParams params = new RequestParams();
+		params.put("quickadd", feed);
+		params.put("s", "feed/" + feed);
+		params.put("ac", ac);
 		params.put("t", t);
 		params.put("a", a);
-		
+
 		AsyncHttpResponseHandler handler = new AsyncHttpResponseHandler() {
-	    	@Override
-	    	public void onSuccess(String response) {
-	        	Log.d("TOKEN ->",response);
-	        	params.put("T", response);
-	        	addSubscriptionHTTPRequest(params);
-	    	}
+			@Override
+			public void onSuccess(String response) {
+				Log.d("TOKEN ->", response);
+				params.put("T", response);
+				addSubscriptionHTTPRequest(params);
+			}
 		};
-		
-		
+
 		readerToken(handler);
 	}
-	
+
 	private static String buildURL(String action) {
 		final StringBuilder urlString = new StringBuilder(baseURL);
 		urlString.append(action);
@@ -223,126 +235,124 @@ public class GoogleReader extends AbstractCloudProvider {
 		urlString.append(CLIENT);
 		return urlString.toString();
 	}
-	
+
 	private static void addSubscriptionHTTPRequest(final RequestParams params) {
-		
+
 		String action = "quickadd";
-		
+
 		AsyncHttpClient client = new AsyncHttpClient();
 		Log.d("OAuth auth: ", authHeaderValue());
 		client.addHeader(authHeaderKey(), authHeaderValue());
 		client.post(buildURL(action), params, new AsyncHttpResponseHandler() {
-		    @Override
-		    public void onSuccess(String response) {
-		        Log.d("RESPONSE ->",response);
-		        tagSubscriptionHTTPRequest(params);
-		    }
-		    
-		    @Override
-		     public void onFailure(Throwable e, String response) {
-		         // Response failed :(
-		    	int i;
-		    	i = 5;
-		     }
+			@Override
+			public void onSuccess(String response) {
+				Log.d("RESPONSE ->", response);
+				tagSubscriptionHTTPRequest(params);
+			}
+
+			@Override
+			public void onFailure(Throwable e, String response) {
+				// Response failed :(
+				int i;
+				i = 5;
+			}
 		});
 	}
-	
+
 	private static void tagSubscriptionHTTPRequest(RequestParams params) {
-		
+
 		String action = "edit";
 		params.put("a", "user/-/label/Listen Subscriptions");
 		params.put("ac", "edit");
-		
+
 		AsyncHttpClient client = new AsyncHttpClient();
 		Log.d("OAuth auth: ", authHeaderValue());
 		client.addHeader(authHeaderKey(), authHeaderValue());
 		client.post(buildURL(action), params, new AsyncHttpResponseHandler() {
-		    @Override
-		    public void onSuccess(String response) {
-		        Log.d("RESPONSE ->",response);
-		    }
-		    
-		    @Override
-		     public void onFailure(Throwable e, String response) {
-		         // Response failed :(
-		    	int i;
-		    	i = 5;
-		     }
+			@Override
+			public void onSuccess(String response) {
+				Log.d("RESPONSE ->", response);
+			}
+
+			@Override
+			public void onFailure(Throwable e, String response) {
+				// Response failed :(
+				int i;
+				i = 5;
+			}
 		});
 	}
-	
+
 	private static void removeSubscriptionHTTPRequest(RequestParams params) {
-		
+
 		String action = "edit";
 		params.put("ac", "unsubscribe");
-		
+
 		AsyncHttpClient client = new AsyncHttpClient();
 		Log.d("OAuth auth: ", authHeaderValue());
 		client.addHeader(authHeaderKey(), authHeaderValue());
 		client.post(buildURL(action), params, new AsyncHttpResponseHandler() {
-		    @Override
-		    public void onSuccess(String response) {
-		        Log.d("RESPONSE ->",response);
-		    }
-		    
-		    @Override
-		     public void onFailure(Throwable e, String response) {
-		         // Response failed :(
-		    	int i;
-		    	i = 5;
-		     }
+			@Override
+			public void onSuccess(String response) {
+				Log.d("RESPONSE ->", response);
+			}
+
+			@Override
+			public void onFailure(Throwable e, String response) {
+				// Response failed :(
+				int i;
+				i = 5;
+			}
 		});
 	}
 
 	@Override
-	public void removeSubscriptionfromReader(Context context, Account account, Subscription subscription) {
+	public void removeSubscriptionfromReader(Context context, Account account,
+			Subscription subscription) {
 		init(context, account);
 		String feed = subscription.url;
 		String t = subscription.title;
-		
-    	final RequestParams params = new RequestParams();
-    	params.put("s", "feed/" + feed);
-		
+
+		final RequestParams params = new RequestParams();
+		params.put("s", "feed/" + feed);
+
 		AsyncHttpResponseHandler handler = new AsyncHttpResponseHandler() {
-	    	@Override
-	    	public void onSuccess(String response) {
-	        	Log.d("TOKEN ->",response);
-	        	params.put("T", response);
-	        	removeSubscriptionHTTPRequest(params);
-	    	}
+			@Override
+			public void onSuccess(String response) {
+				Log.d("TOKEN ->", response);
+				params.put("T", response);
+				removeSubscriptionHTTPRequest(params);
+			}
 		};
 		readerToken(handler);
 	}
-	
-	
+
+	@Deprecated
 	private String getAuthToken() {
-		GoogleReader.amf =  AccountManager.get(mContext).getAuthToken(mAccount, SCOPE,
-				true, cb, null);
+		GoogleReader.amf = AccountManager.get(mContext).getAuthToken(mAccount,
+				SCOPE, true, cb, null);
 		try {
 			return GoogleReader.amf.getResult().getString("authtoken");
 		} catch (OperationCanceledException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (AuthenticatorException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
 	}
-	
+
 	private static void readerToken(AsyncHttpResponseHandler handler) {
-			AsyncHttpClient client = new AsyncHttpClient();
-			client.addHeader(authHeaderKey(), authHeaderValue());
-			client.get(TOKEN_URL, handler);
+		AsyncHttpClient client = new AsyncHttpClient();
+		client.addHeader(authHeaderKey(), authHeaderValue());
+		client.get(TOKEN_URL, handler);
 	}
-	
+
 	private static String authHeaderKey() {
 		return "Authorization";
 	}
-	
+
 	private static String authHeaderValue() {
 		String authKey = null;
 		try {

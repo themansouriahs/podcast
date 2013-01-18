@@ -36,6 +36,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import android.accounts.AccountManager;
 import android.os.AsyncTask;
 
 public class RemoteHTTPRequest extends AsyncTask<URL, Void, String> {
@@ -54,6 +55,7 @@ public class RemoteHTTPRequest extends AsyncTask<URL, Void, String> {
 
 	@Override
 	protected String doInBackground(URL... urls) {
+		Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
 
 		url = urls[0];
 		

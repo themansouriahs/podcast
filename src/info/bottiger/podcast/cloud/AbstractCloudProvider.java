@@ -27,7 +27,7 @@ public abstract class AbstractCloudProvider implements CloudProvider {
 	abstract public boolean auth();
 
 	@Override
-	abstract public AsyncTask<URL, Void, String> getSubscriptionsFromReader();
+	abstract public AsyncTask<URL, Void, Void> getSubscriptionsFromReader();
 
 
 	@Override

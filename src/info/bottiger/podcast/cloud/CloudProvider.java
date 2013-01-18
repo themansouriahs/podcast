@@ -13,7 +13,7 @@ public interface CloudProvider {
 	
 	public boolean auth();
 	
-	public AsyncTask<URL,Void,String> getSubscriptionsFromReader();
+	public AsyncTask<URL, Void, Void> getSubscriptionsFromReader();
 	
 	public void addSubscriptionstoReader(Context context, Account account, List<Subscription> subscriptions);
 	public void addSubscriptiontoReader(Context context, Account account, Subscription subscription);

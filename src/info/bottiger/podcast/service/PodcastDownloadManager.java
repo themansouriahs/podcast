@@ -303,7 +303,7 @@ public class PodcastDownloadManager {
 	private class UpdateSubscriptions extends AsyncTask<Void, String, PullToRefreshListView> {
 		 Context mContext;
 		 PullToRefreshListView mRefreshView;
-		 AsyncTask<URL, Void, String> subscriptionDownloader;
+		 AsyncTask<URL, Void, Void> subscriptionDownloader;
 		 
 		 public UpdateSubscriptions(Context context, PullToRefreshListView pullToRefreshView) {
 		        mContext = context;

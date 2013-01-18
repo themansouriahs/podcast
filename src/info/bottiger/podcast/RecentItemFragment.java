@@ -73,16 +73,6 @@ public class RecentItemFragment extends PodcastBaseFragment {
 	private long pref_order;
 	private long pref_where;
 	private long pref_select;
-	/*
-	 * private long pref_select_bits; //bitmask of which status values to
-	 * display private static long pref_select_bits_new = 1<<0; //new or viewed
-	 * private static long pref_select_bits_download = 1<<1; //being downloaded
-	 * private static long pref_select_bits_unplayed = 1<<2; //downloaded, not
-	 * in playlist private static long pref_select_bits_inplay = 1<<3; //in
-	 * playlist, play, pause private static long pref_select_bits_done = 1<<4;
-	 * //done being played private static long pref_select_bits_all = -1; //all
-	 * bits set
-	 */
 
 	private ItemCursorAdapter mAdapter;
 	

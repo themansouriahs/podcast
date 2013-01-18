@@ -18,7 +18,7 @@ public class gPodderProvider extends AbstractCloudProvider {
 	}
 
 	@Override
-	public AsyncTask<URL,Void,String> getSubscriptionsFromReader() {
+	public AsyncTask<URL,Void,Void> getSubscriptionsFromReader() {
 		// TODO Auto-generated method stub
 		return null;
 	}
