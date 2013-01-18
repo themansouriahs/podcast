@@ -7,6 +7,7 @@ import info.bottiger.podcast.provider.BitmapProvider;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.Subscription;
+import info.bottiger.podcast.provider.WithIcon;
 import info.bottiger.podcast.service.PodcastDownloadManager;
 import info.bottiger.podcast.utils.ControlButtons;
 import info.bottiger.podcast.utils.FilesizeUpdater;
@@ -393,8 +394,10 @@ public class ItemCursorAdapter extends AbstractPodcastAdapter {
 		
 		/* Calculate the imagePath */
 		String imageURL = null;
-		if (item != null || sub != null)
-			imageURL = new BitmapProvider(context,item).getThumbnailPath();
+		if (item != null || sub != null) {
+			WithIcon iconItem = item != null ? item : sub; 
+			imageURL = new BitmapProvider(context,iconItem).getThumbnailPath();
+		}
 			
 		
 		if (imageURL != null && !imageURL.equals("")) {

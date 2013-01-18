@@ -1,6 +1,10 @@
 package info.bottiger.podcast.service;
 
+import java.net.URL;
 import java.util.PriorityQueue;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
@@ -124,47 +128,6 @@ public class PodcastDownloadManager {
 		populateDownloadQueue();
 
 		new DownloadPodcast(context).execute();
-		/*
-		new Thread() {
-			public void run() {
-				try {
-					while ((updateConnectStatus(context) & pref_connection_sel) > 0) {
-
-						mDownloadingItem = getNextItem();
-
-						if (mDownloadingItem == null) {
-							break;
-						}
-
-						try {
-							// mDownloadingItem.startDownload(getContentResolver());
-							FeedFetcher fetcher = new FeedFetcher();
-
-							fetcher.download(mDownloadingItem);
-
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-
-						log.debug(mDownloadingItem.title + "  "
-								+ mDownloadingItem.length + "  "
-								+ mDownloadingItem.offset);
-
-						mDownloadingItem.endDownload(context.getContentResolver());
-
-					}
-
-				} catch (Exception e) {
-					e.printStackTrace();
-				} finally {
-					mDownloadingItem = null;
-					mDownloadLock.release();
-				}
-
-			}
-
-		}.start();
-		*/
 	}
 
 	private void deleteExpireFile(Context context, Cursor cursor) {
@@ -340,11 +303,12 @@ public class PodcastDownloadManager {
 	private class UpdateSubscriptions extends AsyncTask<Void, String, PullToRefreshListView> {
 		 Context mContext;
 		 PullToRefreshListView mRefreshView;
+		 AsyncTask<URL, Void, String> subscriptionDownloader;
 		 
 		 public UpdateSubscriptions(Context context, PullToRefreshListView pullToRefreshView) {
 		        mContext = context;
 		        mRefreshView = pullToRefreshView;
-		        SwipeActivity.gReader.getSubscriptionsFromReader();
+		        subscriptionDownloader = SwipeActivity.gReader.getSubscriptionsFromReader();
 		    } 
 		 
 	     @Override
@@ -376,6 +340,20 @@ public class PodcastDownloadManager {
 					mUpdateLock.release();
 				}
 	    	 return mRefreshView;
+	     }
+	     
+	     protected void onPreExecute() {
+	    	 try {
+				subscriptionDownloader.get(1, TimeUnit.MINUTES);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+			} catch (TimeoutException e) {
+				e.printStackTrace();
+			}
+	    	 int test = 5;
+	    	 test = test;
 	     }
 
 	     

@@ -2,10 +2,12 @@ package info.bottiger.podcast.cloud;
 
 import info.bottiger.podcast.provider.Subscription;
 
+import java.net.URL;
 import java.util.List;
 
 import android.accounts.Account;
 import android.content.Context;
+import android.os.AsyncTask;
 
 public abstract class AbstractCloudProvider implements CloudProvider {
 	
@@ -25,7 +27,7 @@ public abstract class AbstractCloudProvider implements CloudProvider {
 	abstract public boolean auth();
 
 	@Override
-	abstract public List<Subscription> getSubscriptionsFromReader();
+	abstract public AsyncTask<URL, Void, String> getSubscriptionsFromReader();
 
 
 	@Override

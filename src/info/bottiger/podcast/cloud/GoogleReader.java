@@ -79,8 +79,8 @@ public class GoogleReader extends AbstractCloudProvider {
 	private static String CLIENT= null;
 
 	private static Account mAccount;
-	private static AccountManagerFuture<Bundle> amf = null;
-	private static Context mContext = null;
+	static AccountManagerFuture<Bundle> amf = null;
+	static Context mContext = null;
 	
 	public static final String PREF_NAME = "Random Name";
 	public static final String PREF_TOKEN = "accessToken";
@@ -167,7 +167,7 @@ public class GoogleReader extends AbstractCloudProvider {
 	}
 	
 	public void oauth() throws Exception {
-		new HTTPRequest(ReaderAction.GET).execute();
+		new RemoteHTTPRequest(ReaderAction.GET).execute();
 	}
 
 	public void refreshAuthToken() {
@@ -181,11 +181,10 @@ public class GoogleReader extends AbstractCloudProvider {
 	}
 
 	@Override
-	public List<Subscription> getSubscriptionsFromReader() {
+	public AsyncTask<URL,Void,String> getSubscriptionsFromReader() {
 		// http://www.google.com/reader/api/0/stream/contents/user/-/label/Listen%20Subscriptions?client=myApplication
 		this.refreshAuthToken();
-		new HTTPRequest(ReaderAction.GET).execute(getURL);
-		return null; // FIXME
+		return new RemoteHTTPRequest(ReaderAction.GET).execute(getURL);
 	}
 
 	@Override
@@ -315,194 +314,6 @@ public class GoogleReader extends AbstractCloudProvider {
 		readerToken(handler);
 	}
 	
-	
-	private static class HTTPRequest extends AsyncTask<URL, Void, String> {		
-		private URL url;
-		private URLConnection conn;
-		private String authKey;
-		private ReaderAction action;
-
-		HTTPRequest(ReaderAction ra) {
-			this.action = ra;
-		}
-		
-		@Override
-		protected void onPreExecute() {
-			try {
-				authKey = amf.getResult().getString("authtoken");
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		@Override
-		protected void onPostExecute(String result) {}
-
-		@Override
-		protected String doInBackground(URL... urls) {
-
-			url = urls[0];
-			
-			try {
-				conn = url.openConnection();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			
-			conn.setRequestProperty("Authorization", "OAuth " + authKey);
-			InputStream response = null;
-			String result = null;
-			try {
-				response = conn.getInputStream();
-				if (action == ReaderAction.GET) {
-					result = parseGoogleReader(response);
-				} else if (action == ReaderAction.ADD || action == ReaderAction.DELETE) {
-					result = response.toString();
-				}
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				
-				//hack http://stackoverflow.com/questions/11810447/httpurlconnection-worked-fine-in-android-2-x-but-not-in-4-1-no-authentication-c
-				//response = conn.get
-			}
-			return result;
-		}
-	}
-	
-	private static String parseGoogleReader(InputStream input) {
-		StringBuilder response = new StringBuilder();
-		/*
-		 * try { BufferedReader in = new BufferedReader(isr); String
-		 * inputLine; while ((inputLine = in.readLine()) != null)
-		 * response.append(inputLine); in.close(); } catch (IOException e) {
-		 * Error = e.getMessage(); cancel(true); }
-		 */
-
-		DocumentBuilderFactory builderFactory = DocumentBuilderFactory
-				.newInstance();
-		DocumentBuilder builder = null;
-		Document document = null;
-		try {
-			builder = builderFactory.newDocumentBuilder();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		}
-
-		try {
-			//document = builder.parse(conn.getInputStream());
-			document = builder.parse(input);
-
-		Element rootElement = document.getDocumentElement();
-
-		NodeList nodes = rootElement.getChildNodes();
-
-		DOMSource source = new DOMSource(document);
-		StringWriter xmlAsWriter = new StringWriter();
-		StreamResult result = new StreamResult(xmlAsWriter);
-		try {
-			TransformerFactory.newInstance().newTransformer()
-					.transform(source, result);
-		} catch (TransformerConfigurationException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (TransformerException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (TransformerFactoryConfigurationError e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		StringReader xmlReader = new StringReader(xmlAsWriter.toString());
-		InputSource is = new InputSource(xmlReader);
-
-		NodeList xpathNodes = null;
-		XPath xpath = XPathFactory.newInstance().newXPath();
-		// String expression =
-		// "//object/string[@name = \"id\" and ../list/object/string = \"Listen Subscriptions\"]";
-		String expression = "//object[list/object/string = \"Listen Subscriptions\"]";
-		try {
-			xpathNodes = (NodeList) xpath.evaluate(expression, is,
-					XPathConstants.NODESET);
-		} catch (XPathExpressionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		for (int i = 0; i < xpathNodes.getLength(); i++) {
-			Node n = xpathNodes.item(i);
-
-			NodeList ns = n.getChildNodes();
-
-			String podName = null;
-			String podFeed = null;
-
-			for (int j = 0; j < ns.getLength(); j++) {
-				Node propertyNode = ns.item(j);
-
-				if (propertyNode.getNodeType() == Node.ELEMENT_NODE) {
-					Element child = (Element) propertyNode;
-					String att = child.getAttribute("name");
-					// String v = n.getTextContent();
-					//Log.v(TAG, att);
-
-					if (att.equalsIgnoreCase("id")) {
-						podFeed = child.getTextContent().substring(5); // remove "feed/" from tge beginning
-					} else if (att.equalsIgnoreCase("title")) {
-						podName = child.getTextContent();
-					}
-				}
-			}
-
-			Subscription podcast = new Subscription(podFeed);
-			podcast.subscribe(GoogleReader.mContext);
-			//podcast.subscribe(getContentResolver());
-			//contentService.addSubscription(podcast);
-		
-		}
-		
-		
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		/*
-		 * // loop over "subscription list node" for (int i = 0; i <
-		 * nodes.getLength(); i++) { Node node = nodes.item(i);
-		 * 
-		 * if (node instanceof Element) { Element child = (Element) node;
-		 * 
-		 * NodeList objectNodes = node.getChildNodes();
-		 * 
-		 * // loop over "object" nodes for (int j = 0; j <
-		 * objectNodes.getLength(); j++) { Node object =
-		 * objectNodes.item(j); if (node instanceof Element) { Element el =
-		 * (Element) object;
-		 * 
-		 * // objectPropertiers => string, string, list, // string, number,
-		 * string NodeList objectPropertiers = el.getChildNodes();
-		 * 
-		 * for (int k = 0; k < objectPropertiers.getLength(); k++) { Node
-		 * objectNode = objectPropertiers.item(k); if (objectNode instanceof
-		 * Element) { String attName = ((Element)
-		 * objectNode).getAttribute("name");
-		 * 
-		 * if (attName.equalsIgnoreCase("categories") &&
-		 * objectNode.hasChildNodes()) {
-		 * 
-		 * XPath xpath = XPathFactory.newInstance().newXPath(); String
-		 * expression = "//object[string = \"Listen Subscriptions\"]";
-		 * InputSource inputSource = new InputSource(); NodeSet nodes =
-		 * (NodeSet) xpath.evaluate(expression, inputSource,
-		 * XPathConstants.NODESET);
-		 * 
-		 * } } } } } } }
-		 */
-
-		return response.toString();		
-	}
 	
 	private String getAuthToken() {
 		GoogleReader.amf =  AccountManager.get(mContext).getAuthToken(mAccount, SCOPE,
