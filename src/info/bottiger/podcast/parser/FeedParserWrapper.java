@@ -59,15 +59,15 @@ public class FeedParserWrapper {
 
 	public void parse(Subscription subscription) {
 
-		//try {
-			jsonParser(subscription, mostRecentItem);
-			/*
-			 * If we can't parse the feed with RSSFeed we try with ROME
-			 */
-		/*} catch (Exception e) {
-			e.printStackTrace();
-			romeParser(subscription, mostRecentItem);
-		}*/
+		// try {
+		jsonParser(subscription, mostRecentItem);
+		/*
+		 * If we can't parse the feed with RSSFeed we try with ROME
+		 */
+		/*
+		 * } catch (Exception e) { e.printStackTrace(); romeParser(subscription,
+		 * mostRecentItem); }
+		 */
 
 	}
 
@@ -116,13 +116,13 @@ public class FeedParserWrapper {
 					item.date = dt.format(time);
 				if (duration != null)
 					item.duration = StrUtils
-							.formatLength(duration.intValue() * 1000);
+							.formatTime(duration.intValue() * 1000);
 				if (filesize != null)
 					item.filesize = filesize.intValue();
 				item.image = image;
 				item.url = (String) episode.get("link");
 				item.resource = item.url;
-				
+
 				item.title = (String) episode.get("title");
 				item.author = (String) episode.get("author");
 				item.content = (String) episode.get("description");
@@ -140,6 +140,12 @@ public class FeedParserWrapper {
 		}
 	}
 
+	/**
+	 * Parses a Feed with ROME. This is very robust, but also very slow.
+	 * 
+	 * @param subscription
+	 * @param recentItem
+	 */
 	private void romeParser(Subscription subscription, FeedItem recentItem) {
 
 		XmlReader reader = null;
@@ -184,22 +190,19 @@ public class FeedParserWrapper {
 	}
 
 	/*
-	private FeedItem fromRSSEntry(Item entry) {
-		FeedItem item = new FeedItem();
-
-		SimpleDateFormat dt = new SimpleDateFormat(item.default_format);
-
-		item.author = entry.getAuthor();
-		item.title = entry.getTitle();
-		item.content = (entry.getDescription() != null) ? entry
-				.getDescription().toString() : "";
-		item.date = dt.format(entry.getPubDate());
-		item.resource = entry.getUri();
-		item.url = entry.getLink();
-
-		return item;
-	}
-	*/
+	 * private FeedItem fromRSSEntry(Item entry) { FeedItem item = new
+	 * FeedItem();
+	 * 
+	 * SimpleDateFormat dt = new SimpleDateFormat(item.default_format);
+	 * 
+	 * item.author = entry.getAuthor(); item.title = entry.getTitle();
+	 * item.content = (entry.getDescription() != null) ? entry
+	 * .getDescription().toString() : ""; item.date =
+	 * dt.format(entry.getPubDate()); item.resource = entry.getUri(); item.url =
+	 * entry.getLink();
+	 * 
+	 * return item; }
+	 */
 
 	private FeedItem fromRSSEntry(SyndEntry entry) {
 		FeedItem item = new FeedItem();

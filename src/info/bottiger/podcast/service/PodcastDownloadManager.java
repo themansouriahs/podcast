@@ -12,6 +12,8 @@ import info.bottiger.podcast.utils.LockHandler;
 import info.bottiger.podcast.utils.Log;
 import info.bottiger.podcast.utils.SDCardManager;
 
+import java.io.File;
+import java.net.URI;
 import java.net.URL;
 import java.util.PriorityQueue;
 import java.util.concurrent.ExecutionException;
@@ -159,10 +161,12 @@ public class PodcastDownloadManager {
 		request.setDescription(mDownloadingItem.content);
 		// Set the local destination for the downloaded file to a path within
 		// the application's external files directory
-		String downloadDir = SDCardManager.getDownloadDir();
-		String fileName = mDownloadingItem.getFilename();
-		request.setDestinationInExternalFilesDir(context,
-			downloadDir, fileName);
+		//String downloadDir = SDCardManager.getDownloadDir();
+		//String fileName = mDownloadingItem.getFilename();
+		//request.setDestinationInExternalFilesDir(context,
+		//	downloadDir, fileName);
+		File file = new File(mDownloadingItem.getAbsolutePath());
+		request.setDestinationUri(Uri.fromFile(file));
 		
 		//Enqueue a new download and same the referenceId
 		downloadReference = downloadManager.enqueue(request);

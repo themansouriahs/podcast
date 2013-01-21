@@ -1,5 +1,7 @@
 package info.bottiger.podcast.utils;
 
+import info.bottiger.podcast.provider.Subscription;
+
 import java.io.File;
 
 import android.os.Environment;
@@ -81,8 +83,9 @@ public class SDCardManager {
 	public static String pathFromFilename(String filename) {
 		if (filename == null || filename.equals("")) {
 			return "";
-		} else
+		} else {
 			return SDCardManager.getDownloadDir() + "/" + filename;
+		}
 	}
 
 }
