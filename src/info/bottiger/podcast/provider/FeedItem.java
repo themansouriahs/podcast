@@ -75,8 +75,9 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	public String content;
 
 	/*
-	 * 
+	 * Also an URL 
 	 */
+	@Deprecated
 	public String resource;
 
 	/*
@@ -107,7 +108,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	/*
 	 * Filename of the episode on disk. sn209.mp3
 	 */
-	private String pathname;
+	private String filename;
 
 	/*
 	 * Last position during playback in ms Should match seekTo(int)
@@ -135,7 +136,9 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	 */
 	public int listened;
 
-	@Deprecated
+	/*
+	 * Filesize as reported by the RSS feed
+	 */
 	public long length;
 
 	/*
@@ -171,7 +174,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 			"d MMM yyyy HH:mm:ss z", "yyyy-MM-dd HH:mm", "yyyy-MM-dd HH:mm:ss",
 			"EEE,dd MMM yyyy HH:mm:ss Z", };
 
-	static String default_format = "EEE, dd MMM yyyy HH:mm:ss Z";
+	public static String default_format = "EEE, dd MMM yyyy HH:mm:ss Z";
 
 	public static void view(Activity act, long item_id) {
 		Uri uri = ContentUris.withAppendedId(ItemColumns.URI, item_id);
@@ -239,6 +242,10 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		FeedItem item = fetchFromCursor(cursor);
 		return item;
 	}
+	
+	public static FeedItem getMostRecent(ContentResolver context) {
+		return getBySQL(context, "1==1", "_id DESC");
+	}
 
 	public FeedItem() {
 		url = null;
@@ -248,7 +255,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		content = null;
 		resource = null;
 		duration = null;
-		pathname = null;
+		filename = null;
 		uri = null;
 		type = null;
 		image = null;
@@ -291,10 +298,12 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		try {
 
 			ContentValues cv = new ContentValues();
-			if (pathname != null)
-				cv.put(ItemColumns.PATHNAME, pathname);
+			if (filename != null)
+				cv.put(ItemColumns.PATHNAME, filename);
 			if (filesize >= 0)
 				cv.put(ItemColumns.FILESIZE, filesize);
+			if (chunkFilesize >= 0)
+				cv.put(ItemColumns.LENGTH, length);
 			if (chunkFilesize >= 0)
 				cv.put(ItemColumns.CHUNK_FILESIZE, chunkFilesize);
 			if (offset >= 0)
@@ -319,8 +328,8 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		try {
 
 			ContentValues cv = new ContentValues();
-			if (pathname != null)
-				cv.put(ItemColumns.PATHNAME, pathname);
+			if (filename != null)
+				cv.put(ItemColumns.PATHNAME, filename);
 			if (offset >= 0)
 				cv.put(ItemColumns.OFFSET, offset);
 			if (update >= 0)
@@ -345,6 +354,8 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 				cv.put(ItemColumns.RESOURCE, resource);
 			if (filesize >= 0)
 				cv.put(ItemColumns.FILESIZE, filesize);
+			if (length >= 0)
+				cv.put(ItemColumns.LENGTH, length);
 			if (duration != null) {
 				// Log.w("ITEM","  duration: " + duration);
 				cv.put(ItemColumns.DURATION, duration);
@@ -360,8 +371,17 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		} finally {
 		}
 	}
+	
+	/**
+	 * 
+	 */
+	public boolean newerThan(FeedItem item) {
+		return this.getDate() > item.getDate();
+	}
 
-	@Deprecated
+	/**
+	 *  Return the PublishingDate as default_format = "EEE, dd MMM yyyy HH:mm:ss Z"
+	 */
 	public long getDate() {
 		// log.debug(" getDate() start");
 
@@ -417,7 +437,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 
 		int idx = cursor.getColumnIndex(ItemColumns.RESOURCE);
 		item.resource = cursor.getString(idx);
-		item.pathname = cursor.getString(cursor
+		item.filename = cursor.getString(cursor
 				.getColumnIndex(ItemColumns.PATHNAME));
 		item.offset = cursor.getInt(cursor.getColumnIndex(ItemColumns.OFFSET));
 		item.url = cursor.getString(cursor.getColumnIndex(ItemColumns.URL));
@@ -431,6 +451,8 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 				.getColumnIndex(ItemColumns.CONTENT));
 		item.filesize = cursor.getLong(cursor
 				.getColumnIndex(ItemColumns.FILESIZE));
+		item.length = cursor.getLong(cursor
+				.getColumnIndex(ItemColumns.LENGTH));
 		item.chunkFilesize = cursor.getLong(cursor
 				.getColumnIndex(ItemColumns.CHUNK_FILESIZE));
 		item.duration = cursor.getString(cursor
@@ -461,7 +483,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 
 		if (SDCardManager.getSDCardStatus()) {
 			try {
-				File file = new File(getPathname());
+				File file = new File(getAbsolutePath());
 
 				boolean deleted = true;
 				if (file.exists()) {
@@ -471,7 +493,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 					update(contentResolver);
 				}
 			} catch (Exception e) {
-				log.warn("del file failed : " + getPathname() + "  " + e);
+				log.warn("del file failed : " + getAbsolutePath() + "  " + e);
 
 			}
 		}
@@ -479,9 +501,9 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	}
 
 	public void prepareDownload(ContentResolver context) {
-		if (getPathname().equals("") || getPathname().equals("0")) {
-			String filename = resource.substring(resource.lastIndexOf("/") + 1);
-			pathname = this.sub_id + "_" + filename + ".mp3";
+		if (getAbsolutePath().equals("") || getAbsolutePath().equals("0")) {
+			String filenameFromURL = resource.substring(resource.lastIndexOf("/") + 1);
+			filename = this.sub_id + "_" + filenameFromURL;
 		}
 		update(context);
 	}
@@ -497,14 +519,19 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	}
 
 	public long getCurrentFileSize() {
-		String filename = getPathname();
-		if (filename != null)
-			return new File(filename).length();
+		String file = getAbsolutePath();
+		if (file != null)
+			return new File(file).length();
 		return 0;
 	}
 
-	public String getPathname() {
-		return SDCardManager.pathFromFilename(this.pathname);
+	public String getFilename() {
+		String fileName = url.substring( url.lastIndexOf('/')+1, url.length() );
+		return fileName;
+	}
+
+	public String getAbsolutePath() {
+		return SDCardManager.pathFromFilename(this.filename);
 	}
 
 	public void setPosition(ContentResolver contentResolver, long pos) {
@@ -533,7 +560,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 
 	public boolean isDownloaded() {
 		/* refactor when it works */
-		String path = getPathname();
+		String path = getAbsolutePath();
 		if (path == null || path == "")
 			return false;
 
@@ -553,7 +580,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		if (isDownloaded()) {
 			MediaMetadataRetriever retriever = new MediaMetadataRetriever();
 			try {
-				retriever.setDataSource(getPathname());
+				retriever.setDataSource(getAbsolutePath());
 			} catch (RuntimeException e) {
 				e.printStackTrace();
 				return this.length;

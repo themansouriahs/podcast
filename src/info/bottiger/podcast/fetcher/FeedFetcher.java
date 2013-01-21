@@ -308,7 +308,7 @@ public class FeedFetcher {
 		 
 	     @Override
 		protected Integer doInBackground(Void... params) {
-	 		String pathname = mFeedItem.getPathname();
+	 		String pathname = mFeedItem.getAbsolutePath();
 
 			//nStartPos = mFeedItem.offset;
 			nStartPos = 0;

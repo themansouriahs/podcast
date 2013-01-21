@@ -47,7 +47,7 @@ public class FeedItemTest extends android.test.ProviderTestCase<PodcastProvider>
     	//item.pathname = "";
     	item.prepareDownload(context);
         assertTrue(item.status==ItemColumns.ITEM_STATUS_DOWNLOADING_NOW);
-        assertTrue(item.getPathname().equals("/mnt/sdcard/xuluan.podcast/download/podcast_1.mp3"));
+        assertTrue(item.getAbsolutePath().equals("/mnt/sdcard/xuluan.podcast/download/podcast_1.mp3"));
     }
     
     public void testEndDownload() throws Exception {

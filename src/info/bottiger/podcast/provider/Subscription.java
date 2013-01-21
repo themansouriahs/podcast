@@ -1,7 +1,11 @@
 package info.bottiger.podcast.provider;
 
 import info.bottiger.podcast.SwipeActivity;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.LinkedList;
+
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -326,6 +330,11 @@ public class Subscription implements WithIcon {
 	        super(maxSize);
 	    }
 
+	}
+	
+
+	public URL getURL() throws MalformedURLException {
+		return new URL(url);
 	}
 
 	@Override

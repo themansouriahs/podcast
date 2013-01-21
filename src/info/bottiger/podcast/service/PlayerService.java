@@ -280,7 +280,6 @@ public class PlayerService extends Service {
 				if(mItem != null) {
 					FeedItem next_item = getNext(mItem);
 		            dis_notifyStatus();
-					mItem.played(getContentResolver());
 					mPlayer.stop();
 					mUpdate = true;
 					
@@ -393,14 +392,14 @@ public class PlayerService extends Service {
 		
 		if(mItem==null) return;
 		
-		String dataSource = mItem.isDownloaded() ? mItem.getPathname() : mItem.getURL();
+		String dataSource = mItem.isDownloaded() ? mItem.getAbsolutePath() : mItem.getURL();
 		
 		int offset = mItem.offset < 0 ? 0: mItem.offset;
 		mPlayer.setDataSourceAsync(dataSource, offset);
 		
 		//mPlayer.seek(offset);
 		//start();
-		mItem.playing(getContentResolver());
+		//mItem.playing(getContentResolver());
 	}
 
 	public void start() {
@@ -467,45 +466,8 @@ public class PlayerService extends Service {
 		return mItem;
 	}	
 	
-	public void prev() {
-		FeedItem item = mItem;
-		if (mItem.status==ItemColumns.ITEM_STATUS_PLAYING_NOW)
-			mItem.paused(getContentResolver());
-		
-		item = getPrev(item);
-		if(item==null){
-			item = getFirst();				
-		}
+	
 
-		if(item==null){
-			stop();
-		} else {
-			play(item.id);
-		}
-	
-	}
-	
-	public void next() {
-		FeedItem item = mItem;
-		if (mItem.status==ItemColumns.ITEM_STATUS_PLAYING_NOW)
-			mItem.paused(getContentResolver());
-		
-		item = getNext(item);
-		if(item==null){
-			if(getPref()!=REPEAT_MODE_NO_REPEAT){
-				item = getFirst();				
-			}
-		}
-
-		if(item==null){
-			stop();
-		} else {
-			play(item.id);
-		}
-		
-		
-	}	
-	
 	
 	public boolean getUpdateStatus() {
 		return mUpdate;

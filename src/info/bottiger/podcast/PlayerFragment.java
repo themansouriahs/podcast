@@ -199,6 +199,10 @@ public class PlayerFragment   extends PodcastBaseFragment
         }
     };  
     
+    /*
+     * Update should happen elsewhere
+     */
+    @Deprecated
     private void updateInfo() {
     	FeedItem item;
     	if(mServiceBinder == null){
@@ -231,8 +235,6 @@ public class PlayerFragment   extends PodcastBaseFragment
     	} else {
             mPauseButton.setImageResource(android.R.drawable.ic_media_pause); 
     	}
-    	item.playingOrPaused(mServiceBinder.isPlaying(), getActivity().getContentResolver());
-
     }    
 
     private void doPauseResume() {
@@ -257,7 +259,7 @@ public class PlayerFragment   extends PodcastBaseFragment
 		public void onClick(View v) {
             try {
                 if (mServiceBinder != null && mServiceBinder.isInitialized()) {
-                	mServiceBinder.next();
+                	//mServiceBinder.next();
 
                 }
             } catch (Exception ex) {
@@ -281,7 +283,7 @@ public class PlayerFragment   extends PodcastBaseFragment
                 	if(mServiceBinder.position()>5000)
                 		mServiceBinder.seek( 0 );
                 	else{
-                		mServiceBinder.prev();
+                		//mServiceBinder.prev();
                 	}
                 }
             } catch (Exception ex) {
@@ -553,44 +555,6 @@ public class PlayerFragment   extends PodcastBaseFragment
 				play(feeditem);
 				return ;
 			}
-			case MENU_MOVE_UP: {
-		    	if(mServiceBinder != null){
-		    		FeedItem pre = mServiceBinder.getPrev(feeditem);
-		    		if(pre!=null){
-		    			long ord = pre.failcount;
-		    			pre.addtoPlaylistByOrder(getActivity().getContentResolver(), feeditem.failcount);
-		    			feeditem.addtoPlaylistByOrder(getActivity().getContentResolver(), ord);
-		    		}
-		    	}
-				return ;
-			}	
-			case MENU_MOVE_DOWN: {
-		    	if(mServiceBinder != null){
-		    		FeedItem next = mServiceBinder.getNext(feeditem);
-		    		if(next!=null){
-		    			long ord = next.failcount;
-		    			next.addtoPlaylistByOrder(getActivity().getContentResolver(), feeditem.failcount);
-		    			feeditem.addtoPlaylistByOrder(getActivity().getContentResolver(), ord);
-		    		}
-		    	}
-				return ;
-			}			
-			case MENU_DETAILS: {
-				Uri uri = ContentUris.withAppendedId(ItemColumns.URI, feeditem.id);
-				startActivity(new Intent(Intent.ACTION_EDIT, uri));
-				return ;
-			}
-			case MENU_REMOVE: {
-		    	if(mServiceBinder != null){
-		    		FeedItem curr = mServiceBinder.getCurrentItem();
-		    		if(curr!=null) {
-		    			if(curr.id == feeditem.id)
-		    				mServiceBinder.stop();
-		    		}
-		    	}
-				feeditem.removeFromPlaylist(getActivity().getContentResolver());
-				return ;
-			}			
 		}
       }
 	}
@@ -604,28 +568,17 @@ public class PlayerFragment   extends PodcastBaseFragment
 		if (Intent.ACTION_PICK.equals(action)
 				|| Intent.ACTION_GET_CONTENT.equals(action)) {
 			getActivity().setResult(getActivity().RESULT_OK, new Intent().setData(uri));
-		} else {
-			/*
-			DialogMenu dialog_menu = createDialogMenus(id);
-			if( dialog_menu==null)
-				return;
-			
-			
-			 new AlertDialog.Builder(this)
-             .setTitle(dialog_menu.getHeader())
-             .setItems(dialog_menu.getItems(), new PlayClickListener(dialog_menu,id)).show();	
-             */
 		}
 
 	}	
     
     static DecimalFormat mTimeDecimalFormat = new DecimalFormat("00");
     
+    @Deprecated
     private void startPlay() {
     	if(mServiceBinder!=null){
         	FeedItem item = FeedItem.getById(getActivity().getContentResolver(), mID);
         	if(item!=null){
-        		item.addtoPlaylist(getActivity().getContentResolver());
             	play(item);        		
         	}
 
@@ -633,6 +586,7 @@ public class PlayerFragment   extends PodcastBaseFragment
     	}    	
     }
     
+    @Deprecated
     private void loadChannel() {
     	String[] arr = new String[100];
     	final long[] id_arr = new long[100];
@@ -656,20 +610,9 @@ public class PlayerFragment   extends PodcastBaseFragment
         for (int i = 0; i < size; i++) {
         	select_arr[i] = arr[i];
         }
-        /*
-		 new AlertDialog.Builder(this)
-         .setTitle("Select Channel")
-         .setSingleChoiceItems(select_arr, 0, new DialogInterface.OnClickListener() {
-             public void onClick(DialogInterface dialog, int select) {
-     			loadItem(" AND " + ItemColumns.SUBS_ID+ "=" + id_arr[select]);
-
-      			dialog.dismiss();
-             }
-         })
-        .show();  
-        */  	
     }
     
+    @Deprecated
     private void loadItem(String channel_condition) {
     	
 		String where =  ItemColumns.STATUS  + ">" + ItemColumns.ITEM_STATUS_MAX_DOWNLOADING_VIEW 
@@ -694,9 +637,6 @@ public class PlayerFragment   extends PodcastBaseFragment
 					if((cursor!=null) && cursor.moveToFirst()){
 						do{
 							FeedItem item = FeedItem.getByCursor(cursor);
-							if(item!=null)
-								item.addtoPlaylistByOrder(getActivity().getContentResolver(), ord++);
-
 						}while (cursor.moveToNext());			
 					}
 
@@ -717,6 +657,7 @@ public class PlayerFragment   extends PodcastBaseFragment
 		
     }
     
+    @Deprecated
     private void removeAll() {
     	if(mServiceBinder!=null)
     		mServiceBinder.stop();
@@ -737,9 +678,6 @@ public class PlayerFragment   extends PodcastBaseFragment
 					if((cursor!=null) && cursor.moveToFirst()){
 						do{
 							FeedItem item = FeedItem.getByCursor(cursor);
-							if(item!=null)
-								item.addtoPlaylistByOrder(getActivity().getContentResolver(), 0);
-
 						}while (cursor.moveToNext());			
 					}    	
 
@@ -755,7 +693,7 @@ public class PlayerFragment   extends PodcastBaseFragment
 
     }
     
-    
+    @Deprecated
     private void getPref() {
 		SharedPreferences pref = getActivity().getSharedPreferences(
 				SettingsActivity.HAPI_PREFS_FILE_NAME, Context.MODE_PRIVATE);

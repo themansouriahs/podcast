@@ -3,7 +3,7 @@ package info.bottiger.podcast.service;
 import info.bottiger.podcast.R;
 import info.bottiger.podcast.SwipeActivity;
 import info.bottiger.podcast.fetcher.FeedFetcher;
-import info.bottiger.podcast.parser.FeedHandler;
+import info.bottiger.podcast.parser.FeedParserWrapper;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.Subscription;
@@ -20,11 +20,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import android.app.DownloadManager;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.widget.Toast;
 
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
@@ -66,6 +69,9 @@ public class PodcastDownloadManager {
 	public enum DownloadStatus {
 		NOTHING, PENDING, DOWNLOADING, DONE, ERROR
 	}
+
+	private DownloadManager downloadManager;
+	private long downloadReference;
 
 	public static DownloadStatus getStatus(FeedItem item) {
 		if (item == null)
@@ -127,10 +133,41 @@ public class PodcastDownloadManager {
 		if (mDownloadLock.locked() == false) {
 			int i = 5;
 			i = i + 6;
-			return;
+			//return;
 		}
 
-		new DownloadPodcast(context).execute();
+		// new DownloadPodcast(context).execute();
+		downloadManager = (DownloadManager) context
+				.getSystemService(Context.DOWNLOAD_SERVICE);
+		mDownloadingItem = getNextItem();
+		Uri downloadURI = Uri.parse(mDownloadingItem.url);
+		DownloadManager.Request request = new DownloadManager.Request(
+				downloadURI);
+
+		// Restrict the types of networks over which this download may proceed.
+		request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI
+				| DownloadManager.Request.NETWORK_MOBILE);
+		//request.setAllowedOverMetered(true);
+		
+		// Set whether this download may proceed over a roaming connection.
+		request.setAllowedOverRoaming(false);
+		// Set the title of this download, to be displayed in notifications (if
+		// enabled).
+		request.setTitle(mDownloadingItem.title);
+		// Set a description of this download, to be displayed in notifications
+		// (if enabled)
+		request.setDescription(mDownloadingItem.content);
+		// Set the local destination for the downloaded file to a path within
+		// the application's external files directory
+		String downloadDir = SDCardManager.getDownloadDir();
+		String fileName = mDownloadingItem.getFilename();
+		request.setDestinationInExternalFilesDir(context,
+			downloadDir, fileName);
+		
+		//Enqueue a new download and same the referenceId
+		downloadReference = downloadManager.enqueue(request);
+		   
+
 	}
 
 	private void deleteExpireFile(Context context, Cursor cursor) {
@@ -272,10 +309,12 @@ public class PodcastDownloadManager {
 		AsyncTask<URL, Void, Void> subscriptionDownloader;
 
 		/*
-		 *  AsyncTask may be asynchronous, but not very concurrent.
-		 *  Instead of spawning a bunch of AsyncTasks to refresh our feeds we use a ThreadPool 
-		 *  
-		 *  http://stackoverflow.com/questions/11878563/how-can-i-make-this-code-more-concurrent?rq=1
+		 * AsyncTask may be asynchronous, but not very concurrent. Instead of
+		 * spawning a bunch of AsyncTasks to refresh our feeds we use a
+		 * ThreadPool
+		 * 
+		 * http://stackoverflow.com/questions/11878563/how-can-i-make-this-code-more
+		 * -concurrent?rq=1
 		 */
 		ExecutorService service = Executors.newFixedThreadPool(5);
 
@@ -297,7 +336,8 @@ public class PodcastDownloadManager {
 					Subscription subscription = Subscription
 							.getByCursor(subscriptionCursor);
 
-					GetSubscriptionRunnable run = new GetSubscriptionRunnable(subscription);
+					GetSubscriptionRunnable run = new GetSubscriptionRunnable(
+							subscription);
 					service.execute(run);
 
 				}
@@ -309,14 +349,16 @@ public class PodcastDownloadManager {
 			try {
 				/*
 				 * Call shutdown() before awaitTermination
-				 * http://stackoverflow.com/questions/1250643/how-to-wait-for-all-threads-to-finish-using-executorservice
+				 * http://stackoverflow.com
+				 * /questions/1250643/how-to-wait-for-all
+				 * -threads-to-finish-using-executorservice
 				 */
 				service.shutdown();
 				service.awaitTermination(10, TimeUnit.MINUTES);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			
+
 			return mRefreshView;
 		}
 
@@ -355,8 +397,8 @@ public class PodcastDownloadManager {
 		private class GetSubscriptionRunnable implements Runnable {
 			private final Subscription subscription;
 
-			GetSubscriptionRunnable(final Subscription message) {
-				this.subscription = message;
+			GetSubscriptionRunnable(final Subscription subscription) {
+				this.subscription = subscription;
 			}
 
 			public void run() {
@@ -365,15 +407,19 @@ public class PodcastDownloadManager {
 				if (updateConnectStatus(mContext) == NO_CONNECT)
 					return;
 
-				FeedHandler handler = new FeedHandler(
-						mContext.getContentResolver(), pref_max_valid_size);
-				
+				FeedParserWrapper parser = new FeedParserWrapper(mContext.getContentResolver());
+				parser.parse(subscription);
+				//FeedHandler handler = new FeedHandler(
+				//		mContext.getContentResolver(), pref_max_valid_size);
+
+				/*
 				add_num = handler.update(subscription);
 				if ((add_num > 0) && (subscription.auto_download > 0))
 					do_download(false, mContext);
-
+				*/
 				publishProgress(subscription.title);
-				//message = findSubscription(mContext);
+				
+				// message = findSubscription(mContext);
 			}
 		}
 	}
@@ -387,42 +433,31 @@ public class PodcastDownloadManager {
 
 		@Override
 		protected Void doInBackground(Void... params) {
-			int gg = 6;
-			gg = gg +6;
-			try {
-				while ((updateConnectStatus(mContext) & pref_connection_sel) > 0) {
-
-					mDownloadingItem = getNextItem();
-
-					if (mDownloadingItem == null) {
-						break;
-					}
-
-					try {
-						// mDownloadingItem.startDownload(getContentResolver());
-						FeedFetcher fetcher = new FeedFetcher();
-						fetcher.download(mDownloadingItem,
-								mContext.getContentResolver());
-
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-
-					log.debug(mDownloadingItem.title + "  "
-							+ mDownloadingItem.length + "  "
-							+ mDownloadingItem.offset);
-
-					mDownloadingItem.endDownload(mContext.getContentResolver());
-
-				}
-
-			} catch (Exception e) {
-				e.printStackTrace();
-			} finally {
-				mDownloadingItem = null;
-				mDownloadLock.release();
-			}
-
+			/*
+			 * int gg = 6; gg = gg +6; try { while
+			 * ((updateConnectStatus(mContext) & pref_connection_sel) > 0) {
+			 * 
+			 * mDownloadingItem = getNextItem();
+			 * 
+			 * if (mDownloadingItem == null) { break; }
+			 * 
+			 * try { // mDownloadingItem.startDownload(getContentResolver());
+			 * FeedFetcher fetcher = new FeedFetcher();
+			 * fetcher.download(mDownloadingItem,
+			 * mContext.getContentResolver());
+			 * 
+			 * } catch (Exception e) { e.printStackTrace(); }
+			 * 
+			 * log.debug(mDownloadingItem.title + "  " + mDownloadingItem.length
+			 * + "  " + mDownloadingItem.offset);
+			 * 
+			 * mDownloadingItem.endDownload(mContext.getContentResolver());
+			 * 
+			 * }
+			 * 
+			 * } catch (Exception e) { e.printStackTrace(); } finally {
+			 * mDownloadingItem = null; mDownloadLock.release(); }
+			 */
 			return null;
 		}
 

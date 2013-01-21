@@ -193,12 +193,12 @@ public class BitmapProvider {
 	 */
 	private boolean mediaFileExist(FeedItem feedItem) {
 		String fullPath = SDCardManager
-				.pathFromFilename(feedItem.getPathname());
+				.pathFromFilename(feedItem.getAbsolutePath());
 		PodcastDownloadManager.DownloadStatus ds = PodcastDownloadManager
 				.getStatus(feedItem);
 
-		return feedItem.getPathname() != null
-				&& feedItem.getPathname().length() > 0
+		return feedItem.getAbsolutePath() != null
+				&& feedItem.getAbsolutePath().length() > 0
 				&& new File(fullPath).exists()
 				&& ds == PodcastDownloadManager.DownloadStatus.DONE;
 	}
