@@ -22,6 +22,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import android.annotation.SuppressLint;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.database.Cursor;
@@ -29,7 +30,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Environment;
+import android.view.View;
 import android.widget.Toast;
 
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
@@ -112,6 +115,7 @@ public class PodcastDownloadManager {
 		new UpdateSubscriptions(context, pullToRefreshView).execute();
 	}
 
+	@SuppressLint("NewApi")
 	public void do_download(boolean show, final Context context) {
 		if (SDCardManager.getSDCardStatusAndCreate() == false) {
 
@@ -151,6 +155,9 @@ public class PodcastDownloadManager {
 				| DownloadManager.Request.NETWORK_MOBILE);
 		//request.setAllowedOverMetered(true);
 		
+		
+		if (android.os.Build.VERSION.SDK_INT > 11)
+				request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN);
 		// Set whether this download may proceed over a roaming connection.
 		request.setAllowedOverRoaming(false);
 		// Set the title of this download, to be displayed in notifications (if
