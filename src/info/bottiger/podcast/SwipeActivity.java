@@ -1,8 +1,5 @@
 package info.bottiger.podcast;
 
-import java.io.IOException;
-
-import com.bugsense.trace.BugSenseHandler;
 import info.bottiger.podcast.PodcastBaseFragment.OnItemSelectedListener;
 import info.bottiger.podcast.cloud.CloudProvider;
 import info.bottiger.podcast.cloud.GoogleReader;
@@ -11,6 +8,9 @@ import info.bottiger.podcast.service.PlayerService;
 import info.bottiger.podcast.service.PodcastService;
 import info.bottiger.podcast.utils.AddPodcastDialog;
 import info.bottiger.podcast.utils.Log;
+
+import java.io.IOException;
+
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.ComponentName;
@@ -25,6 +25,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Gravity;
@@ -36,20 +37,24 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class SwipeActivity extends FragmentActivity implements
+import com.bugsense.trace.BugSenseHandler;
+import com.slidingmenu.lib.SlidingMenu;
+import com.slidingmenu.lib.app.SlidingFragmentActivity;
+
+public class SwipeActivity extends SlidingFragmentActivity implements
 		OnItemSelectedListener {
 
 	public static PodcastService mServiceBinder = null;
-	//public static GoogleReader gReader = null;
+	// public static GoogleReader gReader = null;
 	public static CloudProvider gReader = null;
-	
+
 	protected static Cursor mCursor = null;
 	protected boolean mInit = false;
 	protected final Log log = Log.getLog(getClass());
 	protected static ComponentName mService = null;
-	
+
 	public static Account mAccount;
-	
+
 	private boolean debugging = true;
 
 	/**
@@ -63,6 +68,9 @@ public class SwipeActivity extends FragmentActivity implements
 	protected SectionsPagerAdapter mSectionsPagerAdapter; // FIXME not static
 	protected SectionsPagerAdapter mSectionsPagerAdapter2; // FIXME not static
 
+	private FragmentManager mFragmentManager;
+	private FragmentTransaction mFragmentTransition;
+	
 	/**
 	 * The {@link ViewPager} that will host the section contents.
 	 */
@@ -75,26 +83,27 @@ public class SwipeActivity extends FragmentActivity implements
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			mServiceBinder = ((PodcastService.PodcastBinder) service)
 					.getService();
-			//mServiceBinder.start_update();
-			//log.debug("onServiceConnected");
+			// mServiceBinder.start_update();
+			// log.debug("onServiceConnected");
 		}
 
 		@Override
 		public void onServiceDisconnected(ComponentName className) {
 			mServiceBinder = null;
-			//log.debug("onServiceDisconnected");
+			// log.debug("onServiceDisconnected");
 		}
 	};
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		//BugSenseHandler.initAndStartSession(SwipeActivity.this, "75981add");
-		BugSenseHandler.initAndStartSession(SwipeActivity.this, ((SoundWaves)this.getApplication()).getBugSenseAPIKey());
-		if (debugging)  {
+
+		// BugSenseHandler.initAndStartSession(SwipeActivity.this, "75981add");
+		BugSenseHandler.initAndStartSession(SwipeActivity.this,
+				((SoundWaves) this.getApplication()).getBugSenseAPIKey());
+		if (debugging) {
 			Debug.startMethodTracing("calc");
-			
+
 			try {
 				SqliteCopy.backupDatabase();
 			} catch (IOException e) {
@@ -108,37 +117,69 @@ public class SwipeActivity extends FragmentActivity implements
 
 		setContentView(R.layout.activity_swipe);
 
+		// set the Behind View
+		setBehindContentView(R.layout.download);
+
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections
 		// of the app.
-		mSectionsPagerAdapter = new SectionsPagerAdapter(
-				getSupportFragmentManager());
+		mFragmentManager = getSupportFragmentManager();
+		mFragmentTransition = mFragmentManager.beginTransaction();
+		mSectionsPagerAdapter = new SectionsPagerAdapter(mFragmentManager);
 
+		
+		//mFragmentTransition.replace(R.id.download, mSectionsPagerAdapter.getItem(0));
+		//mFragmentTransition.commit();
+		
+		
+		// configure the SlidingMenu
+		SlidingMenu menu = new SlidingMenu(this);
+		menu.setMode(SlidingMenu.LEFT);
+		menu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
+		menu.setAboveOffset(500);
+		menu.setBehindWidth(400);
+		// menu.setShadowWidthRes(R.dimen.);
+		// menu.setShadowDrawable(R.drawable.shadow);
+		// menu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
+		menu.setFadeDegree(0.35f);
+		menu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
+		menu.setMenu(R.layout.download);
+		
+		
+		
 		// Set up the ViewPager with the sections adapter.
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
 
 		try {
 			Account[] a = AccountManager.get(getApplicationContext())
-				.getAccountsByType("com.google");
+					.getAccountsByType("com.google");
 			SwipeActivity.mAccount = a[0];
-			gReader = new GoogleReader(SwipeActivity.this, mAccount, ((SoundWaves)this.getApplication()).getGoogleReaderConsumerKey());
+			gReader = new GoogleReader(SwipeActivity.this, mAccount,
+					((SoundWaves) this.getApplication())
+							.getGoogleReaderConsumerKey());
 			if (a.length > 0) {
-				//gReader.refreshAuthToken();
+				// gReader.refreshAuthToken();
 				gReader.getSubscriptionsFromReader();
 			}
-		} catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 	}
 	
+	
+	protected void onActivityCreated(Bundle savedInstanceState) {
+
+	}
+
 	@Override
 	protected void onPause() {
 		super.onPause();
-		if (debugging) Debug.stopMethodTracing();
+		if (debugging)
+			Debug.stopMethodTracing();
 	}
-	
+
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
@@ -190,8 +231,8 @@ public class SwipeActivity extends FragmentActivity implements
 			AddPodcastDialog.addPodcast(this);
 			return true;
 		case R.id.menu_settings:
-			Intent i= new Intent(getBaseContext(), SettingsActivity.class);
-            startActivity(i);
+			Intent i = new Intent(getBaseContext(), SettingsActivity.class);
+			startActivity(i);
 			return true;
 		case R.id.menu_refresh:
 			mServiceBinder.start_update();
