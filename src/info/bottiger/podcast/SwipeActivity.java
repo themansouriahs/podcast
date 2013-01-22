@@ -117,9 +117,6 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 
 		setContentView(R.layout.activity_swipe);
 
-		// set the Behind View
-		setBehindContentView(R.layout.download);
-
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections
 		// of the app.
@@ -131,19 +128,33 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 		//mFragmentTransition.replace(R.id.download, mSectionsPagerAdapter.getItem(0));
 		//mFragmentTransition.commit();
 		
+		// set the Behind View
+		setBehindContentView(R.layout.download);
 		
+		/*
 		// configure the SlidingMenu
-		SlidingMenu menu = new SlidingMenu(this);
+		SlidingMenu menu = getSlidingMenu(); //new SlidingMenu(this);
 		menu.setMode(SlidingMenu.LEFT);
-		menu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
-		menu.setAboveOffset(500);
-		menu.setBehindWidth(400);
+		menu.setTouchModeAbove(SlidingMenu.LEFT);
+		//menu.setAboveOffset(100);
+		menu.setBehindWidth(200);
+		//menu.setBehindWidth(100);
 		// menu.setShadowWidthRes(R.dimen.);
-		// menu.setShadowDrawable(R.drawable.shadow);
-		// menu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
+		//menu.setShadowDrawable(R.drawable.shadow);
+		menu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
 		menu.setFadeDegree(0.35f);
 		menu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
-		menu.setMenu(R.layout.download);
+		menu.setMenu(R.layout.channel);
+		*/
+		SlidingMenu menu = getSlidingMenu();
+
+	    menu.setMode(SlidingMenu.LEFT);
+	    menu.setShadowWidthRes(R.dimen.shadow_width);
+	    //menu.setShadowDrawable(R.drawable.shadow);
+	    menu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
+	    menu.setFadeDegree(0.35f);
+	    menu.setTouchModeAbove(SlidingMenu.LEFT);
+	    setSlidingActionBarEnabled(true);
 		
 		
 		
