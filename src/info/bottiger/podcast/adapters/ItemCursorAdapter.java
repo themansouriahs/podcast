@@ -426,17 +426,6 @@ public class ItemCursorAdapter extends AbstractPodcastAdapter {
 				: TYPE_COLLAPS;
 	}
 
-	public static class ViewHolder {
-		public ImageView imageView;
-		public TextView textViewTitle;
-		public TextView textViewSubTitle;
-		public TextView textViewDuration;
-		public TextView textViewFileSize;
-		public TextView textViewCurrentTime;
-		public TextView textViewSlash;
-		public TextView textFileSize;
-	}
-
 	private void writeStatus(long id, TextView tv,
 			PodcastDownloadManager.DownloadStatus ds) {
 		String statusText = "";
