@@ -137,18 +137,18 @@ public class ItemCursorAdapter extends AbstractPodcastAdapter {
 
 	public ItemCursorAdapter(Context context, int layout, Cursor cursor,
 			String[] fromColumns, int[] to, FieldHandler[] fieldHandlers) {
-		this(context, null, layout, cursor,
-				fromColumns, to, fieldHandlers);
+		this(context, null, layout, cursor, fromColumns, to, fieldHandlers);
 	}
-	
+
 	// Newer constructor allows custom FieldHandlers.
 	// Would be better to bundle fromColumn/to/fieldHandler for each field and
 	// pass a single array
 	// of those objects, but the overhead of defining that value class in Java
 	// is not worth it.
 	// If this were a Scala program, that would be a one-line case class.
-	public ItemCursorAdapter(Context context, PodcastBaseFragment fragment, int layout, Cursor cursor,
-			String[] fromColumns, int[] to, FieldHandler[] fieldHandlers) {
+	public ItemCursorAdapter(Context context, PodcastBaseFragment fragment,
+			int layout, Cursor cursor, String[] fromColumns, int[] to,
+			FieldHandler[] fieldHandlers) {
 		super(context, layout, cursor, fromColumns, to);
 
 		mContext = context;
@@ -179,243 +179,218 @@ public class ItemCursorAdapter extends AbstractPodcastAdapter {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 
-		View v;
+		View listViewItem;
 		Cursor itemCursor = (Cursor) getItem(position);
-		
+
 		if (!itemCursor.moveToPosition(position)) {
 			throw new IllegalStateException("couldn't move cursor to position "
 					+ position);
 		}
-		
+
 		if (convertView == null) {
-			v = newView(mContext, itemCursor, parent);
+			listViewItem = newView(mContext, itemCursor, parent);
 		} else {
-			v = convertView;
+			listViewItem = convertView;
 		}
-		
-		bindView(v, mContext, itemCursor);
 
-		Long itemID = itemCursor.getLong(itemCursor.getColumnIndex(BaseColumns._ID));
+		bindView(listViewItem, mContext, itemCursor);
 
-		FeedItem feedItem = FeedItem.getById(mContext.getContentResolver(), itemID);
-		
+		Long itemID = itemCursor.getLong(itemCursor
+				.getColumnIndex(BaseColumns._ID));
+
+		FeedItem feedItem = FeedItem.getById(mContext.getContentResolver(),
+				itemID);
+
 		int pathIndex = itemCursor.getColumnIndex(ItemColumns.PATHNAME);
 		// int itemOffset =
 		// item.getInt(item.getColumnIndex(ItemColumns.OFFSET));
-		
+
 		long playingID;
 		try {
-			playingID = PodcastBaseFragment.mPlayerServiceBinder.getCurrentItem().id;
+			playingID = PodcastBaseFragment.mPlayerServiceBinder
+					.getCurrentItem().id;
 		} catch (Exception e) {
 			playingID = 0;
 		}
 
 		if (mExpandedItemID.contains(itemID) || itemID == playingID) {
-			ViewStub stub = (ViewStub) v.findViewById(R.id.stub);
+			ViewStub stub = (ViewStub) listViewItem.findViewById(R.id.stub);
 			if (stub != null) {
 				stub.inflate();
 			}
-			
-			View playerView = v.findViewById(R.id.stub_player);
+
+			View playerView = listViewItem.findViewById(R.id.stub_player);
 			playerView.setVisibility(View.VISIBLE);
-			
-			TextView timeSlash = (TextView)v.findViewById(R.id.time_slash);
+
+			TextView timeSlash = (TextView) listViewItem
+					.findViewById(R.id.time_slash);
 			timeSlash.setText("/");
 			timeSlash.setVisibility(View.VISIBLE);
-			
-			TextView currentTime = (TextView)v.findViewById(R.id.current_position);
+
+			TextView currentTime = (TextView) listViewItem
+					.findViewById(R.id.current_position);
 			currentTime.setText(StrUtils.formatTime(feedItem));
-			
-			SeekBar sb = (SeekBar)playerView.findViewById(R.id.progress);
+
+			SeekBar sb = (SeekBar) playerView.findViewById(R.id.progress);
 			sb.setMax(1000);
-			
+
 			PlayerActivity.setProgressBar(sb, feedItem);
 
-			ControlButtons.setPlayerListeners(v, playerView, itemID);
+			ControlButtons.setPlayerListeners(listViewItem, playerView, itemID);
 
 			if (feedItem.isDownloaded()) {
-				ImageButton downloadButton = (ImageButton) playerView.findViewById(R.id.download);
+				ImageButton downloadButton = (ImageButton) playerView
+						.findViewById(R.id.download);
 				downloadButton.setImageResource(R.drawable.ic_action_delete);
 			}
-			
+
 			if (PodcastBaseFragment.mPlayerServiceBinder.isInitialized()) {
 				if (itemID == PodcastBaseFragment.mPlayerServiceBinder
 						.getCurrentItem().id) {
 					if (PodcastBaseFragment.mPlayerServiceBinder.isPlaying()) {
-						ImageButton playPauseButton = (ImageButton) v
-							.findViewById(R.id.play_toggle);
+						ImageButton playPauseButton = (ImageButton) listViewItem
+								.findViewById(R.id.play_toggle);
 						playPauseButton.setImageResource(R.drawable.av_pause);
-						
-						//SeekBar sb = (SeekBar) v.findViewById(R.id.progress); 
-						TextView tv = (TextView) v.findViewById(R.id.current_position); 
+
+						// SeekBar sb = (SeekBar) v.findViewById(R.id.progress);
+						TextView tv = (TextView) listViewItem
+								.findViewById(R.id.current_position);
 						mFragment.setProgressBar(sb);
 						mFragment.setCurrentTime(tv);
 					} else {
-						//ImageButton playPauseButton = (ImageButton) v
-						//		.findViewById(R.id.play_toggle);
-						//playPauseButton.setImageResource(R.drawable.play);
+						// ImageButton playPauseButton = (ImageButton) v
+						// .findViewById(R.id.play_toggle);
+						// playPauseButton.setImageResource(R.drawable.play);
 					}
 				}
-				
 
 			}
-			
+
 		} else {
-			View playerView = v.findViewById(R.id.stub_player);
+			View playerView = listViewItem.findViewById(R.id.stub_player);
 			if (playerView != null) {
 				playerView.setVisibility(View.GONE);
 			}
 		}
 
-		return v;
+		return listViewItem;
 	}
 
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {
-		ViewHolder viewHolder = new ViewHolder();
-		View v = null;
 
-		Long cursorID = cursor.getLong(cursor.getColumnIndex("_id"));
-		boolean doExpand = mExpandedItemID.contains(cursorID);
+		View view = mInflater.inflate(R.layout.list_item, null);
 
-		v = mInflater.inflate(R.layout.list_item, null);
-
-		viewHolder.textViewTitle = (TextView) v.findViewById(R.id.title);
-		viewHolder.textViewSubTitle = (TextView) v.findViewById(R.id.podcast);
-		viewHolder.textViewFileSize = (TextView) v.findViewById(R.id.filesize);
-		viewHolder.imageView = (ImageView) v.findViewById(R.id.list_image);
-		viewHolder.textViewCurrentTime = (TextView) v
-				.findViewById(R.id.current_position);
-		viewHolder.textViewDuration = (TextView) v.findViewById(R.id.duration);
-		viewHolder.textViewSlash = (TextView) v.findViewById(R.id.time_slash);
-		viewHolder.textFileSize = (TextView) v.findViewById(R.id.filesize);
-
-		v.setTag(viewHolder);
-		return v;
+		view.setTag(R.id.list_image, view.findViewById(R.id.list_image));
+		view.setTag(R.id.title, view.findViewById(R.id.title));
+		view.setTag(R.id.podcast, view.findViewById(R.id.podcast));
+		view.setTag(R.id.duration, view.findViewById(R.id.duration));
+		view.setTag(R.id.current_position,
+				view.findViewById(R.id.current_position));
+		view.setTag(R.id.time_slash, view.findViewById(R.id.time_slash));
+		view.setTag(R.id.filesize, view.findViewById(R.id.filesize));
+		return view;
 	}
 
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
-		ViewHolder holder = (ViewHolder) view.getTag();
-
-		int titleIndex = cursor.getColumnIndex(ItemColumns.TITLE);
-		String title = cursor.getString(titleIndex);
-
-		int idIndex = cursor.getColumnIndex(BaseColumns._ID);
-		long id = cursor.getLong(idIndex);
-
-		int subtitleIndex = cursor.getColumnIndex(ItemColumns.SUB_TITLE);
-		int imageIndex = cursor.getColumnIndex(ItemColumns.IMAGE_URL);
-
-		int durationIndex = cursor.getColumnIndex(ItemColumns.DURATION);
-		int offsetIndex = cursor.getColumnIndex(ItemColumns.OFFSET);
-		int lengthIndex = cursor.getColumnIndex(ItemColumns.LENGTH);
-
-		
-		int filePathIndex = cursor.getColumnIndex(ItemColumns.PATHNAME);
-		String filePath;
-		
-		PodcastDownloadManager.DownloadStatus ds = null;
-		
-		try {
-			filePath = cursor.getString(filePathIndex);
-		} catch (Exception e) {
-			filePath = "";
-		}
 
 		FeedItem item = null;
-		Subscription sub = null;
-		
 		try {
 			item = FeedItem.getByCursor(cursor);
 		} catch (IllegalStateException e) {
 		}
-		
+
+		Subscription sub = null;
 		try {
 			sub = Subscription.getByCursor(cursor);
 		} catch (IllegalStateException e) {
 		}
-		
-		if (sub != null) {
-			int t = 55;
-			t = t * 7;
-		}
-			
-		int statusIndex = cursor.getColumnIndex(ItemColumns.STATUS);
-		
+
+		/*
+		 * http://drasticp.blogspot.dk/2012/04/viewholder-is-dead.html
+		 */
+		ImageView icon = (ImageView) view.getTag(R.id.list_image);
+		TextView mainTitle = (TextView) view.getTag(R.id.title);
+		TextView subTitle = (TextView) view.getTag(R.id.podcast);
+		TextView timeDuration = (TextView) view.getTag(R.id.duration);
+		TextView currentPosition = (TextView) view
+				.getTag(R.id.current_position);
+		TextView slash = (TextView) view.getTag(R.id.time_slash);
+		TextView fileSize = (TextView) view.getTag(R.id.filesize);
+
+		PodcastDownloadManager.DownloadStatus ds;
 		if (item != null) {
 			// FeedItem.getById(context.getContentResolver(), id)
 			ds = PodcastDownloadManager.getStatus(item);
-			FilesizeUpdater.put(mContext, id, holder.textViewFileSize);
-			writeStatus(id, holder.textViewFileSize, ds);
-		}
+			FilesizeUpdater.put(mContext, item.getId(), fileSize);
+			writeStatus(item.getId(), fileSize, ds);
 
-		
-		int filesize = 0;
+			int filesize = 0;
 
-		holder.textViewTitle.setText(title);
+			if (item.title != null)
+				mainTitle.setText(item.title);
 
-		if (durationIndex > 0) {
-			String duration = cursor.getString(durationIndex);
-			int offset = cursor.getInt(offsetIndex);
+			if (item.sub_title != null)
+				subTitle.setText(item.sub_title);
 
-			holder.textViewDuration.setText(duration);
+			if (item.getDuration() > 0) {
 
-			// if (offset > 0 || status == ItemColumns.ITEM_STATUS_PLAYING_NOW )
-			// {
+				timeDuration.setText(item.duration);
 
-			// if (status != ItemColumns.ITEM_STATUS_PLAYING_NOW) {
-			if (offset > 0 && filesize > 0) {
-				String offsetText = StrUtils.formatTime((float)offset/(float)filesize, duration);
-				holder.textViewCurrentTime.setText(offsetText);
-				holder.textViewSlash.setText("/");
-				holder.textViewSlash.setVisibility(View.VISIBLE);
-			} else {
-				holder.textViewCurrentTime.setText("");
-				holder.textViewSlash.setVisibility(View.GONE);
+				if (item.offset > 0 && filesize > 0) {
+					String offsetText = StrUtils.formatTime((float) item.offset
+							/ (float) filesize, item.duration);
+					currentPosition.setText(offsetText);
+					slash.setText("/");
+					slash.setVisibility(View.VISIBLE);
+				} else {
+					currentPosition.setText("");
+					slash.setVisibility(View.GONE);
+				}
 			}
-		}
 
-		if (subtitleIndex > 0)
-			holder.textViewSubTitle.setText(cursor.getString(subtitleIndex));
+			/* Calculate the imagePath */
+			String imageURL = null;
+			if (item != null || sub != null) {
+				WithIcon iconItem = item != null ? item : sub;
+				imageURL = new BitmapProvider(context, iconItem)
+						.getThumbnailPath();
+			}
 
-		
-		/* Calculate the imagePath */
-		String imageURL = null;
-		if (item != null || sub != null) {
-			WithIcon iconItem = item != null ? item : sub; 
-			imageURL = new BitmapProvider(context,iconItem).getThumbnailPath();
-		}
-			
-		
-		if (imageURL != null && !imageURL.equals("")) {
-			ImageLoader imageLoader = getImageLoader(context);
-			imageLoader.displayImage(imageURL, holder.imageView);
+			if (imageURL != null && !imageURL.equals("")) {
+				ImageLoader imageLoader = getImageLoader(context);
+				imageLoader.displayImage(imageURL, icon);
+			}
+
 		}
 	}
-	
+
 	private ImageLoader getImageLoader(Context context) {
 		File cacheDir = SDCardManager.getCacheDir();
 		DisplayImageOptions options = new DisplayImageOptions.Builder()
-		.showStubImage(R.drawable.generic_podcast)
-        .cacheInMemory()
-        .cacheOnDisc()
-        .build();
+				.showStubImage(R.drawable.generic_podcast).cacheInMemory()
+				.cacheOnDisc().build();
 		ImageLoader imageLoader = ImageLoader.getInstance();
-		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context)
-			.memoryCacheExtraOptions(480, 800) // max width, max height
-			.threadPoolSize(5)
-			.offOutOfMemoryHandling()
-			.memoryCache(new UsingFreqLimitedMemoryCache(10 * 1024 * 1024)) // You can pass your own memory cache implementation
-			.discCache(new UnlimitedDiscCache(cacheDir)) // You can pass your own disc cache implementation
-            .discCacheFileNameGenerator(new HashCodeFileNameGenerator())
-            .imageDownloader(new URLConnectionImageDownloader(5 * 1000, 20 * 1000)) // connectTimeout (5 s), readTimeout (20 s)
-            .tasksProcessingOrder(QueueProcessingType.FIFO)
-            .defaultDisplayImageOptions(options)
-            .build();
+		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
+				context)
+				.memoryCacheExtraOptions(480, 800)
+				// max width, max height
+				.threadPoolSize(5)
+				.offOutOfMemoryHandling()
+				.memoryCache(new UsingFreqLimitedMemoryCache(10 * 1024 * 1024))
+				// You can pass your own memory cache implementation
+				.discCache(new UnlimitedDiscCache(cacheDir))
+				// You can pass your own disc cache implementation
+				.discCacheFileNameGenerator(new HashCodeFileNameGenerator())
+				.imageDownloader(
+						new URLConnectionImageDownloader(5 * 1000, 20 * 1000))
+				// connectTimeout (5 s), readTimeout (20 s)
+				.tasksProcessingOrder(QueueProcessingType.FIFO)
+				.defaultDisplayImageOptions(options).build();
 		// Initialize ImageLoader with configuration. Do it once.
 		imageLoader.init(config);
-		
+
 		return imageLoader;
 	}
 
@@ -461,8 +436,9 @@ public class ItemCursorAdapter extends AbstractPodcastAdapter {
 		public TextView textViewSlash;
 		public TextView textFileSize;
 	}
-	
-	private void writeStatus(long id, TextView tv, PodcastDownloadManager.DownloadStatus ds) {
+
+	private void writeStatus(long id, TextView tv,
+			PodcastDownloadManager.DownloadStatus ds) {
 		String statusText = "";
 		switch (ds) {
 		case PENDING:
