@@ -208,21 +208,6 @@ public class PodcastBaseFragment extends ListFragment {
 		}
 	}
 
-	/*
-	 * @Override public void onResume() { super.onResume(); if (mInit) { mInit =
-	 * false;
-	 * 
-	 * if (mCursor != null) mCursor.close();
-	 * 
-	 * getActivity().unbindService(serviceConnection);
-	 * 
-	 * startInit();
-	 * 
-	 * }
-	 * 
-	 * }
-	 */
-
 	@Override
 	public void onPause() {
 		super.onPause();

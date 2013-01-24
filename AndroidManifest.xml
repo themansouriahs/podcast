@@ -116,10 +116,15 @@
             android:name="PodcastUpdateManager"
             android:process=":remote" >
         </receiver>
-        <receiver android:name=".AutoStart" >
+        <receiver android:name=".receiver.AutoStart" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" >
                 </action>
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".receiver.RemoteControlReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </receiver>
 

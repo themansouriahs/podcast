@@ -1,26 +1,26 @@
 package info.bottiger.podcast.service;
 
 
-import java.io.IOException;
-
-import info.bottiger.podcast.PlayerActivity;
-import info.bottiger.podcast.SettingsActivity;
 import info.bottiger.podcast.R;
+import info.bottiger.podcast.SettingsActivity;
 import info.bottiger.podcast.notification.NotificationPlayer;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
+import info.bottiger.podcast.receiver.RemoteControlReceiver;
 import info.bottiger.podcast.utils.Log;
 import info.bottiger.podcast.utils.SDCardManager;
 
-import android.app.Notification;
+import java.io.IOException;
+
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.media.AudioManager;
+import android.media.AudioManager.OnAudioFocusChangeListener;
 import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.Handler;
@@ -30,7 +30,7 @@ import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.widget.Toast;
 
-public class PlayerService extends Service {
+public class PlayerService extends Service implements AudioManager.OnAudioFocusChangeListener {
 
 	private static final int FADEIN = 0;
 	private static final int TRACK_ENDED = 1;
@@ -86,9 +86,45 @@ public class PlayerService extends Service {
         handler.sendEmptyMessageDelayed(FADEIN, 10);
     }
     
+    //AudioManager
+	private AudioManager mAudioManager;
+	private ComponentName mControllerComponentName;
+
+	@Override
+	public void onCreate() {
+		super.onCreate();
+	    mPlayer = new MyPlayer();
+	    mPlayer.setHandler(handler);
+        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        TelephonyManager tmgr = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+        tmgr.listen(mPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
+		
+
+		this.mControllerComponentName = new ComponentName(this, RemoteControlReceiver.class);
+		log.debug("onCreate(): " + mControllerComponentName);
+		this.mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+	}
+	
+	@Override
+    public void onAudioFocusChange(int focusChange) {
+        if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
+            // Pause playback
+        	pause();
+        } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
+            // Resume playback
+        	start();
+        } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+            mAudioManager.unregisterMediaButtonEventReceiver(mControllerComponentName);
+            mAudioManager.abandonAudioFocus(this);
+            // Stop playback
+            stop();
+        }
+    }	
+	
     private class MyPlayer {
         private MediaPlayer mMediaPlayer = new MediaPlayer();
-        private Handler mHandler;
+        
+		private Handler mHandler;
         private boolean mIsInitialized = false;
     	int bufferProgress = 0;
     	
@@ -123,39 +159,24 @@ public class PlayerService extends Service {
             mIsInitialized = true;
         }
         
-        /*
-        public void setDataSource(String path) {
-            try {
-                mMediaPlayer.reset();
-                mMediaPlayer.setOnPreparedListener(null);
-                mMediaPlayer.setDataSource(path);
-                mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                mMediaPlayer.prepare();
-            } catch (IOException ex) {
-                // TODO: notify the user why the file couldn't be opened
-            	ex.printStackTrace();
-                mIsInitialized = false;
-                return;
-            } catch (IllegalArgumentException ex) {
-                // TODO: notify the user why the file couldn't be opened
-                mIsInitialized = false;
-                return;
-            }
-            mMediaPlayer.setOnCompletionListener(listener);
-            mMediaPlayer.setOnBufferingUpdateListener(bufferListener);
-            mMediaPlayer.setOnErrorListener(errorListener);
-            
-            mIsInitialized = true;
-        }
-        */
-        
         public boolean isInitialized() {
             return mIsInitialized;
         }
 
         public void start() {
         	notifyStatus();
-            mMediaPlayer.start();
+        	
+        	// Request audio focus for playback
+        	int result = mAudioManager.requestAudioFocus(PlayerService.this,
+        	                                 // Use the music stream.
+        	                                 AudioManager.STREAM_MUSIC,
+        	                                 // Request permanent focus.
+        	                                 AudioManager.AUDIOFOCUS_GAIN);
+        	   
+        	if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+        	    mAudioManager.registerMediaButtonEventReceiver(mControllerComponentName);
+                mMediaPlayer.start();
+        	}
         }
 
         public void stop() {
@@ -167,17 +188,28 @@ public class PlayerService extends Service {
         	dis_notifyStatus();
             stop();
             mMediaPlayer.release();
+            mAudioManager.unregisterMediaButtonEventReceiver(mControllerComponentName);
             mIsInitialized = false;
         }
 
+        /**
+         * Test of the player is playing something right now
+         * 
+         * @return Is the player playing right now
+         */
         public boolean isPlaying() {
             return mMediaPlayer.isPlaying();
         }
         
+
+    	/**
+    	 * Pause the current playing item
+    	 */
         public void pause() {
             mMediaPlayer.pause();
         }
         
+        @Deprecated
         public int getBufferProgress() {
         	return this.bufferProgress;
         }
@@ -313,17 +345,6 @@ public class PlayerService extends Service {
 			}
 		}
 	};
-
-	@Override
-	public void onCreate() {
-		super.onCreate();
-	    mPlayer = new MyPlayer();
-	    mPlayer.setHandler(handler);
-        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        TelephonyManager tmgr = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-        tmgr.listen(mPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
-		log.debug("onCreate()");
-	}
 	
 
 	@Override
@@ -354,12 +375,19 @@ public class PlayerService extends Service {
 		return binder;
 	}
 
+	/**
+	 * Hide the notification
+	 */
     private void dis_notifyStatus() {
         ////mNotificationManager.cancel(R.layout.playing_episode);    	
         //setForeground(false);
-    	mNotificationPlayer.hide();
+    	if (mNotificationPlayer != null)
+    		mNotificationPlayer.hide();
     }
     
+    /**
+     * Display a notification with the current podcast
+     */
     private void notifyStatus() {
     	
     	if (mNotificationPlayer == null)
@@ -598,6 +626,8 @@ public class PlayerService extends Service {
 		public PlayerService getService() {
 			return PlayerService.this;
 		}
-	}	
+	}
+
+
 	
 }

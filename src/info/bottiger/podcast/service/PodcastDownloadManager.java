@@ -181,6 +181,12 @@ public class PodcastDownloadManager {
 
 	}
 
+	/**
+	 * Write this method
+	 * 
+	 * @param context
+	 * @param cursor
+	 */
 	private void deleteExpireFile(Context context, Cursor cursor) {
 
 		if (cursor == null)
@@ -314,7 +320,7 @@ public class PodcastDownloadManager {
 	}
 
 	private class UpdateSubscriptions extends
-			AsyncTask<Void, String, PullToRefreshListView> {
+			AsyncTask<Void, Subscription, PullToRefreshListView> {
 		Context mContext;
 		PullToRefreshListView mRefreshView;
 		AsyncTask<URL, Void, Void> subscriptionDownloader;
@@ -383,16 +389,21 @@ public class PodcastDownloadManager {
 			} catch (TimeoutException e) {
 				e.printStackTrace();
 			}
-			int test = 5;
-			test = test;
 		}
 
+		/*
+		 * For some reason this prints "Update: null" once in a while
+		 * It never seems to be called with a subscription with the title null
+		 * 
+		 * That why I have all the checks
+		 */
 		@Override
-		protected void onProgressUpdate(String... title) {
-			// Toast.makeText(mContext, "Updating: " + title[0],
-			// Toast.LENGTH_LONG).show();
-			CharSequence pullLabel = "Updated: " + title[0];
-			if (pullLabel != null && mRefreshView != null)
+		protected void onProgressUpdate(Subscription... subscription) {
+			
+			Subscription sub = subscription[0];
+			CharSequence pullLabel = "Updated: " + sub.title;
+			
+			if (pullLabel != null && !pullLabel.equals("null") && !pullLabel.equals("") && mRefreshView != null)
 				mRefreshView.getLoadingLayoutProxy().setLastUpdatedLabel(
 						pullLabel);
 		}
@@ -413,69 +424,17 @@ public class PodcastDownloadManager {
 			}
 
 			public void run() {
-				int add_num;
-
+				
 				if (updateConnectStatus(mContext) == NO_CONNECT)
 					return;
+				
+				if (subscription.title == null || subscription.title.equals("") || subscription.title.equals("null"))
+					subscription.getClass();
 
 				FeedParserWrapper parser = new FeedParserWrapper(mContext.getContentResolver());
 				parser.parse(subscription);
-				//FeedHandler handler = new FeedHandler(
-				//		mContext.getContentResolver(), pref_max_valid_size);
-
-				/*
-				add_num = handler.update(subscription);
-				if ((add_num > 0) && (subscription.auto_download > 0))
-					do_download(false, mContext);
-				*/
-				publishProgress(subscription.title);
-				
-				// message = findSubscription(mContext);
+				publishProgress(subscription);
 			}
-		}
-	}
-
-	private class DownloadPodcast extends AsyncTask<Void, String, Void> {
-		Context mContext;
-
-		public DownloadPodcast(Context context) {
-			mContext = context;
-		}
-
-		@Override
-		protected Void doInBackground(Void... params) {
-			/*
-			 * int gg = 6; gg = gg +6; try { while
-			 * ((updateConnectStatus(mContext) & pref_connection_sel) > 0) {
-			 * 
-			 * mDownloadingItem = getNextItem();
-			 * 
-			 * if (mDownloadingItem == null) { break; }
-			 * 
-			 * try { // mDownloadingItem.startDownload(getContentResolver());
-			 * FeedFetcher fetcher = new FeedFetcher();
-			 * fetcher.download(mDownloadingItem,
-			 * mContext.getContentResolver());
-			 * 
-			 * } catch (Exception e) { e.printStackTrace(); }
-			 * 
-			 * log.debug(mDownloadingItem.title + "  " + mDownloadingItem.length
-			 * + "  " + mDownloadingItem.offset);
-			 * 
-			 * mDownloadingItem.endDownload(mContext.getContentResolver());
-			 * 
-			 * }
-			 * 
-			 * } catch (Exception e) { e.printStackTrace(); } finally {
-			 * mDownloadingItem = null; mDownloadLock.release(); }
-			 */
-			return null;
-		}
-
-		@Override
-		protected void onProgressUpdate(String... title) {
-			// Toast.makeText(mContext, "Updating: " + title[0],
-			// Toast.LENGTH_LONG).show();
 		}
 	}
 }

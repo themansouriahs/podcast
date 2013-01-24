@@ -4,6 +4,7 @@ import info.bottiger.podcast.PodcastBaseFragment.OnItemSelectedListener;
 import info.bottiger.podcast.cloud.CloudProvider;
 import info.bottiger.podcast.cloud.GoogleReader;
 import info.bottiger.podcast.debug.SqliteCopy;
+import info.bottiger.podcast.receiver.RemoteControlReceiver;
 import info.bottiger.podcast.service.PlayerService;
 import info.bottiger.podcast.service.PodcastService;
 import info.bottiger.podcast.utils.AddPodcastDialog;
@@ -14,14 +15,15 @@ import java.io.IOException;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Debug;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -77,6 +79,9 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 	ViewPager mViewPager;
 
 	private long SubscriptionFeedID = 0;
+	
+	private AudioManager mAudioManager;
+    private ComponentName mRemoteControlResponder;
 
 	protected static ServiceConnection serviceConnection = new ServiceConnection() {
 		@Override
@@ -117,6 +122,12 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 
 		setContentView(R.layout.activity_swipe);
 
+        mAudioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        mRemoteControlResponder = new ComponentName(getPackageName(),
+                RemoteControlReceiver.class.getName());
+        //mAudioManager.registerMediaButtonEventReceiver(mRemoteControlResponder);
+		
+		
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections
 		// of the app.
@@ -125,27 +136,11 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 		mSectionsPagerAdapter = new SectionsPagerAdapter(mFragmentManager);
 
 		
-		//mFragmentTransition.replace(R.id.download, mSectionsPagerAdapter.getItem(0));
-		//mFragmentTransition.commit();
 		
 		// set the Behind View
 		setBehindContentView(R.layout.download);
 		
-		/*
-		// configure the SlidingMenu
-		SlidingMenu menu = getSlidingMenu(); //new SlidingMenu(this);
-		menu.setMode(SlidingMenu.LEFT);
-		menu.setTouchModeAbove(SlidingMenu.LEFT);
-		//menu.setAboveOffset(100);
-		menu.setBehindWidth(200);
-		//menu.setBehindWidth(100);
-		// menu.setShadowWidthRes(R.dimen.);
-		//menu.setShadowDrawable(R.drawable.shadow);
-		menu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
-		menu.setFadeDegree(0.35f);
-		menu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
-		menu.setMenu(R.layout.channel);
-		*/
+		
 		SlidingMenu menu = getSlidingMenu();
 
 	    menu.setMode(SlidingMenu.LEFT);
@@ -155,8 +150,6 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 	    menu.setFadeDegree(0.35f);
 	    menu.setTouchModeAbove(SlidingMenu.LEFT);
 	    setSlidingActionBarEnabled(true);
-		
-		
 		
 		// Set up the ViewPager with the sections adapter.
 		mViewPager = (ViewPager) findViewById(R.id.pager);
