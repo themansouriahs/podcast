@@ -44,10 +44,22 @@ public class BitmapProvider {
 				DISK_CACHE_SIZE, mCompressFormat, mCompressQuality);
 	}
 
-	/*
+
+	/**
+	 * 
 	 * @return The path to the Items icons
 	 */
 	public String getThumbnailPath() {
+		return getThumbnailPath(0, 0);
+	}
+	
+	/**
+	 * 
+	 * @param thumbnail width
+	 * @param thumbnail height
+	 * @return thumbnail of the width and height given as input
+	 */
+	public String getThumbnailPath(int width, int height) {
 
 		/* Calculate the imagePath */
 		String imageURL = null;
@@ -67,12 +79,12 @@ public class BitmapProvider {
 
 				// create the thumbnail if it doesn't exist
 				if (!thumbnail.exists()) {
-					generatedFile = bitmapFromFile(thumbnail);
+					generatedFile = bitmapFromFile(thumbnail, width, height);
 				}
 
 				if (thumbnail.exists() || generatedFile != null) {
 					String urlPrefix = "file://";
-					String thumbnailPath = thumbnailCacheURL(mItem);
+					String thumbnailPath = thumbnailCacheURL(mItem, width, height);
 					return imageURL = urlPrefix + thumbnailPath;
 				}
 			}
@@ -94,16 +106,25 @@ public class BitmapProvider {
 		
 	}
 
-	public Bitmap createBitmapFromMediaFile() {
-		return bitmapFromFile(getThumbnailFile());
+	public Bitmap createBitmapFromMediaFile(int width, int height) {
+		if (mItem instanceof FeedItem) {
+			FeedItem feedItem = (FeedItem)mItem;
+			
+			return bitmapFromFile(new File(feedItem.getAbsolutePath()), width, height);
+		}
+		return null;
 	}
 
-	/*
+	/**
 	 * Extracts the Bitmap from the MP3/media file
+	 * 
+	 * @param fd
+	 * @return Bitmap from the file or feed
 	 */
-	public Bitmap createBitmapFromMediaFile(FileDescriptor fd) {
+	public Bitmap createBitmapFromMediaFile(FileDescriptor fd, int height, int width) {
 
-		String cacheKey = thumbnailCacheName(mItem);
+		Bitmap cover = null;
+		String cacheKey = thumbnailCacheName(mItem, height, width);
 
 		// Return if we have the bitmap cached
 		if (mDiskLruImageCache.containsKey(cacheKey))
@@ -116,18 +137,21 @@ public class BitmapProvider {
 
 		// If the image exists, cache and return
 		if (embeddedPicture != null) {
-			Bitmap cover = BitmapFactory.decodeByteArray(embeddedPicture, 0,
+			cover = BitmapFactory.decodeByteArray(embeddedPicture, 0,
 					embeddedPicture.length);
 			mDiskLruImageCache.put(cacheKey, cover);
+			
+			// Resize the bitmap
+			cover = Bitmap.createScaledBitmap(cover, width, height, false);
 
 			try {
-				saveBitmap(cover, getThumbnailFile());
+				saveBitmap(cover, getThumbnailFile(width, height));
+				return cover;
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 				return null;
 			}
-
-			return cover;
+			
 		}
 		// }
 
@@ -135,7 +159,7 @@ public class BitmapProvider {
 		// dummy image
 		// Bitmap icon = BitmapFactory.decodeResource(mContext.getResources(),
 		// R.drawable.soundwaves);
-		return null;
+		return cover;
 	}
 
 	/*
@@ -147,22 +171,26 @@ public class BitmapProvider {
 		bitmap.compress(mCompressFormat, mCompressQuality, out);
 	}
 
-	/*
+	/**
 	 * 
+	 * @return The default size thumbnail
 	 */
 	private File getThumbnailFile() {
-		String thumbnailPath = thumbnailCacheURL(mItem);
+		return getThumbnailFile(0, 0);
+	}
+	private File getThumbnailFile(int width, int height) {
+		String thumbnailPath = thumbnailCacheURL(mItem, width, height);
 		return new File(thumbnailPath);
 	}
 
-	private String thumbnailCacheURL(WithIcon item) {
+	private String thumbnailCacheURL(WithIcon item, int width, int height) {
 		String thumbURL = SDCardManager.getThumbnailCacheDir() + "/"
-				+ thumbnailCacheName(item) + ".png";
+				+ thumbnailCacheName(item, width, height) + ".png";
 		return thumbURL;
 	}
 
 	@SuppressLint("UseValueOf")
-	private String thumbnailCacheName(WithIcon item) {
+	private String thumbnailCacheName(WithIcon item, int height, int width) {
 		String type = null;
 
 		if (item instanceof FeedItem) {
@@ -184,12 +212,15 @@ public class BitmapProvider {
 		}
 
 		String StringID = new Long(item.getId()).toString();
-		return StringID + "_" + type;
+		return StringID + "_x" + width + "_y" + height + "_" + type;
 
 	}
 
-	/*
+	/**
 	 * Test if the media file is on disk.
+	 * 
+	 * @param feedItem
+	 * @return boolean
 	 */
 	private boolean mediaFileExist(FeedItem feedItem) {
 		String fullPath = SDCardManager
@@ -204,13 +235,13 @@ public class BitmapProvider {
 	}
 
 	@SuppressWarnings("resource")
-	private Bitmap bitmapFromFile(File file) {
+	private Bitmap bitmapFromFile(File file, int width, int height) {
 		FileInputStream fis;
 		Bitmap generatedFile = null;
 
 		try {
 			fis = new FileInputStream(file);
-			generatedFile = createBitmapFromMediaFile(fis.getFD());
+			generatedFile = createBitmapFromMediaFile(fis.getFD(), width, height);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

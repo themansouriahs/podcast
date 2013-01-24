@@ -30,12 +30,13 @@ public class NotificationPlayer {
 	
 	public void show() {
 		
+		Bitmap icon = new BitmapProvider(mContext, item).createBitmapFromMediaFile(128, 128);
 		NotificationCompat.Builder mBuilder =
 		        new NotificationCompat.Builder(mContext)
 		        .setSmallIcon(R.drawable.soundwaves)
 		        .setContentTitle(item.title)
 		        .setContentText(item.sub_title)
-		        .setLargeIcon(new BitmapProvider(mContext, item).createBitmapFromMediaFile());
+		        .setLargeIcon(icon);
 		
 		Intent resultIntent = new Intent(mContext, NotificationReceiver.class);
 		
