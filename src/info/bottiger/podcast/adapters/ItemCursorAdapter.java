@@ -80,7 +80,8 @@ public class ItemCursorAdapter extends AbstractPodcastAdapter {
 		@Override
 		public void setViewValue(ItemCursorAdapter adapter, Cursor cursor,
 				View v, int fromColumnId) {
-			adapter.setViewImage3((ImageView) v, cursor.getString(fromColumnId));
+			adapter.setViewImageAsync((ImageView) v,
+					cursor.getString(fromColumnId));
 		}
 	}
 
@@ -426,10 +427,18 @@ public class ItemCursorAdapter extends AbstractPodcastAdapter {
 				: TYPE_COLLAPS;
 	}
 
-	private void writeStatus(long id, TextView tv,
-			PodcastDownloadManager.DownloadStatus ds) {
+	/**
+	 * Writes the currentstatus of the FeedItem with the giving ID to the
+	 * textView argument
+	 * 
+	 * @param itemID
+	 * @param textView
+	 * @param downloadStatus
+	 */
+	private void writeStatus(long itemID, TextView textView,
+			PodcastDownloadManager.DownloadStatus downloadStatus) {
 		String statusText = "";
-		switch (ds) {
+		switch (downloadStatus) {
 		case PENDING:
 			statusText = "waiting";
 			break;
@@ -445,17 +454,29 @@ public class ItemCursorAdapter extends AbstractPodcastAdapter {
 		default:
 			statusText = "";
 		}
-		tv.setText(statusText);
+		textView.setText(statusText);
 	}
 
-	private void setViewImage3(ImageView v, String imageURL) {
-		// https://github.com/koush/UrlImageViewHelper#readme
+	/**
+	 * Sets the listItems icon Async using the UrlImageViewHelper from
+	 * https://github.com/koush/UrlImageViewHelper#readme
+	 * 
+	 * @param imageView
+	 * @param imageURL
+	 */
+	private void setViewImageAsync(ImageView imageView, String imageURL) {
 		int cacheTime = 60000 * 60 * 24 * 31; // in ms
-		UrlImageViewHelper.loadUrlDrawable(v.getContext(), imageURL);
-		UrlImageViewHelper.setUrlDrawable(v, imageURL,
+		UrlImageViewHelper.loadUrlDrawable(imageView.getContext(), imageURL);
+		UrlImageViewHelper.setUrlDrawable(imageView, imageURL,
 				R.drawable.generic_podcast, cacheTime);
 	}
 
+	/**
+	 * Returns the ID of the item at the position
+	 * 
+	 * @param position
+	 * @return ID of the FeedItem
+	 */
 	private Long itemID(int position) {
 		Object item = getItem(position);
 		if (item instanceof FeedItem) {
