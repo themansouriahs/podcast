@@ -6,7 +6,7 @@ import info.bottiger.podcast.SettingsActivity;
 import info.bottiger.podcast.notification.NotificationPlayer;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
-import info.bottiger.podcast.receiver.RemoteControlReceiver;
+import info.bottiger.podcast.receiver.HeadsetReceiver;
 import info.bottiger.podcast.utils.Log;
 import info.bottiger.podcast.utils.SDCardManager;
 
@@ -100,7 +100,7 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
         tmgr.listen(mPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
 		
 
-		this.mControllerComponentName = new ComponentName(this, RemoteControlReceiver.class);
+		this.mControllerComponentName = new ComponentName(this, HeadsetReceiver.class);
 		log.debug("onCreate(): " + mControllerComponentName);
 		this.mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 	}

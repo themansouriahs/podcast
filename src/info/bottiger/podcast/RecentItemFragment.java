@@ -230,7 +230,8 @@ public class RecentItemFragment extends PodcastBaseFragment {
 
 		mCurCheckID = id;
 		//ListView list = getListView();
-		ListView list = actualListView;
+		//ListView list = actualListView;
+		ListView list = l;
 		int start = list.getFirstVisiblePosition();
 		for (int i = start, j = list.getLastVisiblePosition(); i <= j; i++) {
 			Cursor item = (Cursor) list.getItemAtPosition(i+1); //FIXME https://github.com/chrisbanes/Android-PullToRefresh/issues/99

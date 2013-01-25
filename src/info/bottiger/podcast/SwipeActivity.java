@@ -4,7 +4,7 @@ import info.bottiger.podcast.PodcastBaseFragment.OnItemSelectedListener;
 import info.bottiger.podcast.cloud.CloudProvider;
 import info.bottiger.podcast.cloud.GoogleReader;
 import info.bottiger.podcast.debug.SqliteCopy;
-import info.bottiger.podcast.receiver.RemoteControlReceiver;
+import info.bottiger.podcast.receiver.HeadsetReceiver;
 import info.bottiger.podcast.service.PlayerService;
 import info.bottiger.podcast.service.PodcastService;
 import info.bottiger.podcast.utils.AddPodcastDialog;
@@ -17,6 +17,7 @@ import android.accounts.AccountManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.media.AudioManager;
@@ -124,7 +125,11 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 
         mAudioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
         mRemoteControlResponder = new ComponentName(getPackageName(),
-                RemoteControlReceiver.class.getName());
+                HeadsetReceiver.class.getName());
+        
+        IntentFilter receiverFilter = new IntentFilter(Intent.ACTION_HEADSET_PLUG);
+        HeadsetReceiver receiver = new HeadsetReceiver();
+        registerReceiver( receiver, receiverFilter );
         //mAudioManager.registerMediaButtonEventReceiver(mRemoteControlResponder);
 		
 		
