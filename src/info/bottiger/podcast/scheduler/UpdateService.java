@@ -8,7 +8,7 @@ import android.os.IBinder;
 /*
  * Example of how to trigger an automated update
  */
-public class YourService extends Service
+public class UpdateService extends Service
 {
 	PodcastUpdateManager alarm = new PodcastUpdateManager();
     public void onCreate()
@@ -18,7 +18,7 @@ public class YourService extends Service
 
     public void onStart(Context context,Intent intent, int startId)
     {
-        alarm.setUpdate(context);
+        PodcastUpdateManager.setUpdate(context);
     }
 
     @Override

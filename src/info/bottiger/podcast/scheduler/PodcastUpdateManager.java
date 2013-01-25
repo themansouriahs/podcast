@@ -13,6 +13,8 @@ public class PodcastUpdateManager extends BroadcastReceiver {
 	private static final long ONE_MINUTE = 60L * 1000L;
 	private static final long ONE_HOUR = 60L * ONE_MINUTE;
 	private static final long ONE_DAY = 24L * ONE_HOUR;
+	
+	private static final long updateInterval = ONE_HOUR;
 
 	
     @Override
@@ -39,7 +41,7 @@ public class PodcastUpdateManager extends BroadcastReceiver {
         Intent i = new Intent(context, PodcastUpdateManager.class);
         PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
         //am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 1000 * 60 * 10, pi); // Millisec * Second * Minute
-        am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+ONE_HOUR,  pi);
+        am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+updateInterval,  pi);
     }
 
     public static void cancelUpdate(Context context)
