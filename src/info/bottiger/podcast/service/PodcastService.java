@@ -4,7 +4,7 @@ import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 import info.bottiger.podcast.SettingsActivity;
 import info.bottiger.podcast.provider.FeedItem;
-import info.bottiger.podcast.scheduler.PodcastUpdateManager;
+import info.bottiger.podcast.receiver.PodcastUpdateManager;
 import info.bottiger.podcast.utils.Log;
 import info.bottiger.podcast.utils.SDCardManager;
 
