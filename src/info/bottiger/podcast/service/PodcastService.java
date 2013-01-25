@@ -128,7 +128,7 @@ public class PodcastService extends Service {
 	}
 
 	public void start_download() {
-		pdm.do_download(true, getBaseContext());
+		pdm.startDownload(true, getBaseContext());
 	}
 	
 	public void start_update() {
@@ -172,7 +172,7 @@ public class PodcastService extends Service {
 	public void downloadItem(ContentResolver context, FeedItem item) {
 		item.prepareDownload(context);
 		PodcastDownloadManager.addItemToQueue(item);
-		pdm.do_download(true, getBaseContext());
+		pdm.startDownload(true, getBaseContext());
 	}
 
 

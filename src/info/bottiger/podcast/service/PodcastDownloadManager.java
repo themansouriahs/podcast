@@ -2,18 +2,15 @@ package info.bottiger.podcast.service;
 
 import info.bottiger.podcast.R;
 import info.bottiger.podcast.SwipeActivity;
-import info.bottiger.podcast.fetcher.FeedFetcher;
 import info.bottiger.podcast.parser.FeedParserWrapper;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.Subscription;
-import info.bottiger.podcast.provider.SubscriptionColumns;
 import info.bottiger.podcast.utils.LockHandler;
 import info.bottiger.podcast.utils.Log;
 import info.bottiger.podcast.utils.SDCardManager;
 
 import java.io.File;
-import java.net.URI;
 import java.net.URL;
 import java.util.PriorityQueue;
 import java.util.concurrent.ExecutionException;
@@ -25,14 +22,13 @@ import java.util.concurrent.TimeoutException;
 import android.annotation.SuppressLint;
 import android.app.DownloadManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Environment;
-import android.view.View;
+import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
@@ -53,7 +49,7 @@ public class PodcastDownloadManager {
 
 	// private static final long timer_freq = 3 * ONE_MINUTE;
 	private static final long timer_freq = ONE_HOUR;
-	private long pref_update = 2 * 60 * ONE_MINUTE;
+	private static long pref_update = 2 * 60 * ONE_MINUTE;
 
 	private static PriorityQueue<FeedItem> mDownloadQueue = new PriorityQueue<FeedItem>();
 	private final Log log = Log.getLog(getClass());
@@ -64,8 +60,8 @@ public class PodcastDownloadManager {
 	private static final LockHandler mUpdateLock = new LockHandler();
 	private static int mConnectStatus = NO_CONNECT;
 
-	public long pref_update_wifi = 0;
-	public long pref_update_mobile = 0;
+	public static long pref_update_wifi = 0;
+	public static long pref_update_mobile = 0;
 	public long pref_item_expire = 0;
 	public long pref_download_file_expire = 1000;
 	public long pref_played_file_expire = 0;
@@ -75,8 +71,8 @@ public class PodcastDownloadManager {
 		NOTHING, PENDING, DOWNLOADING, DONE, ERROR
 	}
 
-	private DownloadManager downloadManager;
-	private long downloadReference;
+	private static DownloadManager downloadManager;
+	private static long downloadReference;
 
 	public static DownloadStatus getStatus(FeedItem item) {
 		if (item == null)
@@ -115,8 +111,22 @@ public class PodcastDownloadManager {
 		new UpdateSubscriptions(context, pullToRefreshView).execute();
 	}
 
+	/**
+	 * Download all the episodes in the queue
+	 * 
+	 * @param show
+	 * @param context
+	 */
+	public static void startDownload(final Context context) {
+		startDownload(false, context);
+	}
+
 	@SuppressLint("NewApi")
-	public void do_download(boolean show, final Context context) {
+	@Deprecated
+	public static void startDownload(boolean show, final Context context) {
+		SharedPreferences sharedPreferences = PreferenceManager
+				.getDefaultSharedPreferences(context);
+
 		if (SDCardManager.getSDCardStatusAndCreate() == false) {
 
 			if (show)
@@ -136,48 +146,61 @@ public class PodcastDownloadManager {
 			return;
 		}
 
-		if (mDownloadLock.locked() == false) {
-			int i = 5;
-			i = i + 6;
-			//return;
-		}
+		/*
+		 * Deprecated if (mDownloadLock.locked() == false) { int i = 5; i = i +
+		 * 6; //return; }
+		 */
 
 		// new DownloadPodcast(context).execute();
 		downloadManager = (DownloadManager) context
 				.getSystemService(Context.DOWNLOAD_SERVICE);
-		mDownloadingItem = getNextItem();
-		Uri downloadURI = Uri.parse(mDownloadingItem.url);
-		DownloadManager.Request request = new DownloadManager.Request(
-				downloadURI);
+		while (mDownloadQueue.size() > 0) {
+			mDownloadingItem = getNextItem();
+			Uri downloadURI = Uri.parse(mDownloadingItem.url);
+			DownloadManager.Request request = new DownloadManager.Request(
+					downloadURI);
 
-		// Restrict the types of networks over which this download may proceed.
-		request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI
-				| DownloadManager.Request.NETWORK_MOBILE);
-		//request.setAllowedOverMetered(true);
-		
-		
-		if (android.os.Build.VERSION.SDK_INT > 11)
+			// Restrict the types of networks over which this download may
+			// proceed.
+			int networkType = DownloadManager.Request.NETWORK_WIFI;
+
+			// Only Allow mobile network if the user has enabled it
+			if (!sharedPreferences.getBoolean("pref_download_only_wifi", true))
+				networkType = networkType
+						| DownloadManager.Request.NETWORK_MOBILE;
+
+			request.setAllowedNetworkTypes(networkType);
+			// request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI
+			// | DownloadManager.Request.NETWORK_MOBILE);
+
+			// request.setAllowedOverMetered(true);
+
+			if (android.os.Build.VERSION.SDK_INT > 11)
 				request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN);
-		// Set whether this download may proceed over a roaming connection.
-		request.setAllowedOverRoaming(false);
-		// Set the title of this download, to be displayed in notifications (if
-		// enabled).
-		request.setTitle(mDownloadingItem.title);
-		// Set a description of this download, to be displayed in notifications
-		// (if enabled)
-		request.setDescription(mDownloadingItem.content);
-		// Set the local destination for the downloaded file to a path within
-		// the application's external files directory
-		//String downloadDir = SDCardManager.getDownloadDir();
-		//String fileName = mDownloadingItem.getFilename();
-		//request.setDestinationInExternalFilesDir(context,
-		//	downloadDir, fileName);
-		File file = new File(mDownloadingItem.getAbsolutePath());
-		request.setDestinationUri(Uri.fromFile(file));
-		
-		//Enqueue a new download and same the referenceId
-		downloadReference = downloadManager.enqueue(request);
-		   
+
+			// Set whether this download may proceed over a roaming connection.
+			request.setAllowedOverRoaming(false);
+			// Set the title of this download, to be displayed in notifications
+			// (if
+			// enabled).
+			request.setTitle(mDownloadingItem.title);
+			// Set a description of this download, to be displayed in
+			// notifications
+			// (if enabled)
+			request.setDescription(mDownloadingItem.content);
+			// Set the local destination for the downloaded file to a path
+			// within
+			// the application's external files directory
+			// String downloadDir = SDCardManager.getDownloadDir();
+			// String fileName = mDownloadingItem.getFilename();
+			// request.setDestinationInExternalFilesDir(context,
+			// downloadDir, fileName);
+			File file = new File(mDownloadingItem.getAbsolutePath());
+			request.setDestinationUri(Uri.fromFile(file));
+
+			// Enqueue a new download and same the referenceId
+			downloadReference = downloadManager.enqueue(request);
+		}
 
 	}
 
@@ -274,8 +297,8 @@ public class PodcastDownloadManager {
 
 	}
 
-	private int updateConnectStatus(Context context) {
-		log.debug("updateConnectStatus");
+	private static int updateConnectStatus(Context context) {
+		// log.debug("updateConnectStatus");
 		try {
 
 			ConnectivityManager cm = (ConnectivityManager) context
@@ -305,20 +328,28 @@ public class PodcastDownloadManager {
 
 	}
 
-	public FeedItem getDownloadingItem() {
+	public static FeedItem getDownloadingItem() {
 		return mDownloadingItem;
 	}
 
-	private FeedItem getNextItem() {
+	private static FeedItem getNextItem() {
 		return mDownloadQueue.poll();
 	}
 
+	/**
+	 * Add feeditem to the download queue
+	 * 
+	 * @param feedItem
+	 */
 	public static void addItemToQueue(FeedItem item) {
 		mDownloadQueue.add(item);
-
-		// should we start downloading now?
 	}
 
+	/**
+	 * Update the list of subscriptions as well as their content
+	 * 
+	 * @author Arvid Böttiger
+	 */
 	private class UpdateSubscriptions extends
 			AsyncTask<Void, Subscription, PullToRefreshListView> {
 		Context mContext;
@@ -392,18 +423,19 @@ public class PodcastDownloadManager {
 		}
 
 		/*
-		 * For some reason this prints "Update: null" once in a while
-		 * It never seems to be called with a subscription with the title null
+		 * For some reason this prints "Update: null" once in a while It never
+		 * seems to be called with a subscription with the title null
 		 * 
 		 * That why I have all the checks
 		 */
 		@Override
 		protected void onProgressUpdate(Subscription... subscription) {
-			
+
 			Subscription sub = subscription[0];
 			CharSequence pullLabel = "Updated: " + sub.title;
-			
-			if (pullLabel != null && !pullLabel.equals("null") && !pullLabel.equals("") && mRefreshView != null)
+
+			if (pullLabel != null && !pullLabel.equals("null")
+					&& !pullLabel.equals("") && mRefreshView != null)
 				mRefreshView.getLoadingLayoutProxy().setLastUpdatedLabel(
 						pullLabel);
 		}
@@ -416,6 +448,11 @@ public class PodcastDownloadManager {
 			super.onPostExecute(refreshView);
 		}
 
+		/**
+		 * A Runnable class for updating the content of a subscription.
+		 * 
+		 * @author Arvid Böttiger
+		 */
 		private class GetSubscriptionRunnable implements Runnable {
 			private final Subscription subscription;
 
@@ -424,14 +461,15 @@ public class PodcastDownloadManager {
 			}
 
 			public void run() {
-				
+
 				if (updateConnectStatus(mContext) == NO_CONNECT)
 					return;
-				
-				if (subscription.title == null || subscription.title.equals("") || subscription.title.equals("null"))
+
+				if (subscription.title == null || subscription.title.equals("")
+						|| subscription.title.equals("null"))
 					subscription.getClass();
 
-				FeedParserWrapper parser = new FeedParserWrapper(mContext.getContentResolver());
+				FeedParserWrapper parser = new FeedParserWrapper(mContext);
 				parser.parse(subscription);
 				publishProgress(subscription);
 			}

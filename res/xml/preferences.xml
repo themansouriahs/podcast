@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2008 The Android Open Source Project
+<!--
+     Copyright (C) 2008 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -15,10 +16,9 @@
 -->
 
 <!-- This is a primitive example showing the different types of preferences available. -->
-<PreferenceScreen
-        xmlns:android="http://schemas.android.com/apk/res/android">
-                
-       <!--
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <!--
         <ListPreference
                 android:key="pref_update_wifi"
                 android:title="@string/pref_update_wifi_title"
@@ -27,8 +27,8 @@
                 android:entryValues="@array/entryvalues_update"
 				android:defaultValue="60"
                 android:dialogTitle="Update Interval on Wi-Fi" />
-		-->		
-		<!--
+    -->
+    <!--
         <ListPreference
                 android:key="pref_update_mobile"
                 android:title="@string/pref_update_mobile_title"
@@ -37,21 +37,24 @@
                 android:entryValues="@array/entryvalues_update"
 				android:defaultValue="120"
                 android:dialogTitle="Update Interval on Mobile" />	
-        -->
-        <CheckBoxPreference
-                android:key="pref_download_only_wifi"
-                android:title="@string/pref_only_wifi_title"
-				android:defaultValue="false"
-                android:summary="@string/pref_only_wifi_description" />
+    -->
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_download_on_update"
+        android:summary="@string/pref_download_on_update_description"
+        android:title="@string/pref_download_on_update_title" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_download_only_wifi"
+        android:summary="@string/pref_only_wifi_description"
+        android:title="@string/pref_only_wifi_title" />
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_notification_control"
+        android:summary="@string/pref_notification_control_description"
+        android:title="@string/pref_notification_control" />
 
-         <CheckBoxPreference
-                android:key="pref_notification_control"
-                android:title="@string/pref_notification_control"
-				android:defaultValue="true"
-                android:summary="@string/pref_notification_control_description" />
-        
-        				
-        <!--  
+    <!--
         <ListPreference
                 android:key="pref_item_expire"
                 android:title="@string/pref_item_expire_title"
@@ -60,26 +63,25 @@
                 android:entryValues="@array/entryvalues_item_expire"
 				android:defaultValue="5"
                 android:dialogTitle="Item Expire" />	
-       -->
-        <ListPreference
-                android:key="pref_download_file_expire"
-                android:title="@string/pref_downloaded_expire_title"
-                android:summary="@string/pref_downloaded_expire_description"
-                android:entries="@array/entries_download_file_expire"
-                android:entryValues="@array/entryvalues_downlaod_file_expire"
-				android:defaultValue="100"
-                android:dialogTitle="@string/pref_downloaded_dialog_title" />	
-                
-           <CheckBoxPreference
-                android:key="pref_cloud support"
-                android:title="@string/pref_cloud_support_title"
-				android:defaultValue="false"
-                android:summary="@string/pref_cloud_support_description" />
-        
-        <CheckBoxPreference
-                android:key="pref_anonymous_feedback"
-                android:title="@string/pref_feedback_title"
-				android:defaultValue="false"
-                android:summary="@string/pref_feedback_description" />
-    
+    -->
+    <ListPreference
+        android:defaultValue="100"
+        android:dialogTitle="@string/pref_downloaded_dialog_title"
+        android:entries="@array/entries_download_file_expire"
+        android:entryValues="@array/entryvalues_downlaod_file_expire"
+        android:key="pref_download_file_expire"
+        android:summary="@string/pref_downloaded_expire_description"
+        android:title="@string/pref_downloaded_expire_title" />
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_cloud support"
+        android:summary="@string/pref_cloud_support_description"
+        android:title="@string/pref_cloud_support_title" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_anonymous_feedback"
+        android:summary="@string/pref_feedback_description"
+        android:title="@string/pref_feedback_title" />
+
 </PreferenceScreen>

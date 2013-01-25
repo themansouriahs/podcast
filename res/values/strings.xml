@@ -83,7 +83,9 @@
     <string name="pref_only_wifi_title">Download only Wi-Fi</string>
     <string name="pref_update_wifi_description">Set up automatic update interval time though Wi-Fi</string>
     <string name="pref_update_wifi_title">Update interval through Wi-Fi</string>
-    <string name="pref_update_mobile_description">Set up automatic update interval time though 3G/2.5G network</string>
+    <string name="pref_update_wifi_description">Download new episodes automatically when the feeds are refreshed</string>
+    <string name="pref_download_on_update_title">Automatic download</string>
+    <string name="pref_download_on_update_description">Set up automatic update interval time though 3G/2.5G network</string>
     <string name="pref_update_mobile_title">Update interval though 3G</string>
     <string name="pref_item_expire_description">Setup the automatic expiration time of the undownload items</string>
     <string name="pref_item_expire_title">Undownload item expire in</string>

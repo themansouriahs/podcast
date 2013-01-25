@@ -3,12 +3,12 @@ package info.bottiger.podcast.parser;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.Subscription;
+import info.bottiger.podcast.service.PodcastDownloadManager;
 import info.bottiger.podcast.utils.Log;
 import info.bottiger.podcast.utils.StrUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -28,7 +28,10 @@ import org.json.simple.JSONValue;
 import org.xml.sax.SAXException;
 
 import android.content.ContentResolver;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 
 import com.google.code.rome.android.repackaged.com.sun.syndication.feed.synd.SyndEntry;
@@ -46,15 +49,18 @@ import com.google.code.rome.android.repackaged.com.sun.syndication.io.XmlReader;
 public class FeedParserWrapper {
 
 	private final Log log = Log.getLog(getClass());
+	private Context mContext;
 	private ContentResolver cr;
 
+	private SharedPreferences sharedPrefs;
+	
 	private static FeedItem mostRecentItem = null;
-	private String subscriptionTitle = null;
-	private String subscriptionDescription = null;
-	private String subscriptionImage = null;
 
-	public FeedParserWrapper(ContentResolver cr) {
-		this.cr = cr;
+	public FeedParserWrapper(Context context) {
+		this.mContext = context;
+		this.cr = context.getContentResolver();
+		sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+
 	}
 
 	public void parse(Subscription subscription) {
@@ -71,17 +77,25 @@ public class FeedParserWrapper {
 
 	}
 
+	/**
+	 * Fetches a formatted json file from mygpo-feedservice.appspot.com with the
+	 * most recent episodes
+	 * 
+	 * @param subscription
+	 * @param recentItem
+	 */
 	private void jsonParser(Subscription subscription, FeedItem recentItem) {
 
 		String baseURL = "http://mygpo-feedservice.appspot.com/parse?url=";
-		String extraHeader = "Accept: application/json";
+		String extraHeader = "Accept";
+		String extraHeaderValue = "application/json";
 		SimpleDateFormat dt = new SimpleDateFormat(FeedItem.default_format);
 
 		URL url;
 		try {
 			url = new URL(baseURL + subscription.getURL().toString());
 			URLConnection urlConnection = url.openConnection();
-			urlConnection.setRequestProperty("Accept", "application/json");
+			urlConnection.setRequestProperty(extraHeader, extraHeaderValue);
 
 			BufferedReader in = new BufferedReader(new InputStreamReader(
 					urlConnection.getInputStream()));
@@ -91,8 +105,11 @@ public class FeedParserWrapper {
 			JSONObject mainDataObject = (JSONObject) mainArray.get(0);
 
 			String image = "";
+
 			if (mainDataObject.get("logo") != null)
 				image = mainDataObject.get("logo").toString();
+
+			updateSubscription(subscription, mainDataObject, cr);
 
 			JSONArray episodeDataObject = (JSONArray) mainDataObject
 					.get("episodes");
@@ -130,6 +147,8 @@ public class FeedParserWrapper {
 				updateFeed(subscription, item);
 
 			}
+			
+			PodcastDownloadManager.startDownload(mContext);
 
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
@@ -138,6 +157,31 @@ public class FeedParserWrapper {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	private void updateSubscription(Subscription subscription, JSONObject jsonObject, ContentResolver contentResolver) {
+		String subscriptionTitle = "";
+		String subscriptionDescription = "";
+		String image = "";
+
+		if (jsonObject.get("logo") != null)
+			image = jsonObject.get("logo").toString();
+
+		if (jsonObject.get("title") != null)
+			subscriptionTitle = jsonObject.get("title").toString();
+
+		if (jsonObject.get("description") != null)
+			subscriptionDescription = jsonObject.get("description")
+					.toString();
+
+		if (!subscription.title.equals(subscriptionTitle)
+				|| !subscription.description
+						.equals(subscriptionDescription)) {
+			subscription.title = subscriptionTitle;
+			subscription.description = subscriptionDescription;
+			subscription.imageURL = image;
+			subscription.update(cr);
+		}		
 	}
 
 	/**
@@ -156,11 +200,11 @@ public class FeedParserWrapper {
 			SyndFeed feed = new SyndFeedInput().build(reader);
 			// System.out.println("Feed Title: " + feed.getAuthor());
 
-			subscriptionTitle = feed.getTitle();
-			subscriptionDescription = feed.getDescription();
+			//subscriptionTitle = feed.getTitle();
+			//subscriptionDescription = feed.getDescription();
 
 			SyndImage image = feed.getImage();
-			subscriptionImage = (image != null) ? image.getUrl() : "";
+			//subscriptionImage = (image != null) ? image.getUrl() : "";
 
 			for (Iterator i = feed.getEntries().iterator(); i.hasNext();) {
 				SyndEntry entry = (SyndEntry) i.next();
@@ -292,28 +336,35 @@ public class FeedParserWrapper {
 	public int updateFeed(Subscription subscription, FeedItem item) {
 		long update_date = subscription.lastItemUpdated;
 		int add_num = 0;
+		boolean insertSucces = false;
+		boolean autoDownload = sharedPrefs.getBoolean("pref_download_on_update", true);
 
 		// Get most recent Item for comparison
 		if (FeedParserWrapper.mostRecentItem == null)
 			FeedParserWrapper.mostRecentItem = FeedItem.getMostRecent(cr);
 
 		long itemDate = item.getDate();
-		// itemDate >= subscription.lastItemUpdated
+		
 		if (FeedParserWrapper.mostRecentItem == null
 				|| item.newerThan(FeedParserWrapper.mostRecentItem)) {
 
 			if (itemDate > update_date) {
 				update_date = itemDate;
 			}
-			addItem(subscription, item);
+			insertSucces = addItem(subscription, item);
 			add_num++;
+			
+			/*
+			 * Download podcasts
+			 */
+			if (autoDownload && insertSucces) {
+				PodcastDownloadManager.addItemToQueue(item);
+			}
 
 			subscription.fail_count = 0;
-			subscription.title = this.subscriptionTitle;
-			subscription.description = this.subscriptionDescription;
-			subscription.imageURL = this.subscriptionImage;
 			subscription.lastItemUpdated = update_date;
 			subscription.update(cr);
+			
 			log.debug("add url: " + subscription.url + "\n add num = "
 					+ add_num);
 		}
@@ -321,8 +372,9 @@ public class FeedParserWrapper {
 
 	}
 
-	private void addItem(Subscription subscription, FeedItem item) {
+	private boolean addItem(Subscription subscription, FeedItem item) {
 		Long sub_id = subscription.id;
+		boolean insertSucces = false;
 
 		item.sub_id = sub_id;
 
@@ -335,10 +387,13 @@ public class FeedParserWrapper {
 		if (cursor.moveToFirst()) {
 		} else {
 			item.insert(cr);
+			insertSucces = true;
 		}
 
 		if (cursor != null)
 			cursor.close();
+		
+		return insertSucces;
 
 	}
 
