@@ -210,8 +210,7 @@ public class PodcastService extends IntentService {
         @Override
         protected Void doInBackground(Void... params) {
             // do stuff!
-        	int h = 6;
-        	h = 7*h;
+        	PodcastService.this.pdm.start_update(PodcastService.this);
             return null;
         }
         
