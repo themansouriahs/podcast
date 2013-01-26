@@ -54,6 +54,11 @@
         android:summary="@string/pref_notification_control_description"
         android:title="@string/pref_notification_control" />
 
+    <info.bottiger.podcast.utils.TimePreference
+        android:key="update_time"
+        android:title="@string/pref_update_time_title"
+        android:summary="@string/pref_update_time_description" />
+
     <!--
         <ListPreference
                 android:key="pref_item_expire"

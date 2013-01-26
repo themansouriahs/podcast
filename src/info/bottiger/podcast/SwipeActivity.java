@@ -14,16 +14,21 @@ import java.io.IOException;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Debug;
 import android.os.IBinder;
+import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -47,7 +52,9 @@ import com.slidingmenu.lib.app.SlidingFragmentActivity;
 public class SwipeActivity extends SlidingFragmentActivity implements
 		OnItemSelectedListener {
 
-	public static PodcastService mServiceBinder = null;
+	public static PodcastService mPodcastServiceBinder = null;
+	static boolean mBound = false;
+	
 	// public static GoogleReader gReader = null;
 	public static CloudProvider gReader = null;
 
@@ -83,22 +90,26 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 	
 	private AudioManager mAudioManager;
     private ComponentName mRemoteControlResponder;
+    
+    private SharedPreferences prefs;
 
+    /*
 	protected static ServiceConnection serviceConnection = new ServiceConnection() {
 		@Override
 		public void onServiceConnected(ComponentName className, IBinder service) {
-			mServiceBinder = ((PodcastService.PodcastBinder) service)
+			mPodcastServiceBinder = ((PodcastService.PodcastBinder) service)
 					.getService();
-			// mServiceBinder.start_update();
-			// log.debug("onServiceConnected");
+			//mPodcastServiceBinder.start_update();
+			mBound = true;
 		}
 
 		@Override
 		public void onServiceDisconnected(ComponentName className) {
-			mServiceBinder = null;
-			// log.debug("onServiceDisconnected");
+			mPodcastServiceBinder = null;
+			mBound = false;
 		}
 	};
+	*/
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -118,7 +129,7 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 			}
 		}
 
-		startService(new Intent(this, PodcastService.class));
+		//startService(new Intent(this, PodcastService.class));
 		startService(new Intent(this, PlayerService.class));
 
 		setContentView(R.layout.activity_swipe);
@@ -131,6 +142,15 @@ public class SwipeActivity extends SlidingFragmentActivity implements
         HeadsetReceiver receiver = new HeadsetReceiver();
         registerReceiver( receiver, receiverFilter );
         //mAudioManager.registerMediaButtonEventReceiver(mRemoteControlResponder);
+        
+        
+        
+        //Alarm
+        //AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        //Intent intent = new Intent(this,PodcastUpdateReceiver.class); 
+        //PendingIntent pendingIntent = PendingIntent.getBroadcast(SetReminder.this, ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        //alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 1000, pendingIntent);
 		
 		
 		// Create the adapter that will return a fragment for each of the three
@@ -139,6 +159,10 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 		mFragmentManager = getSupportFragmentManager();
 		mFragmentTransition = mFragmentManager.beginTransaction();
 		mSectionsPagerAdapter = new SectionsPagerAdapter(mFragmentManager);
+		
+		
+		
+		//PodcastUpdateManager.setUpdate(this);
 
 		
 		
@@ -210,11 +234,27 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 			if (mCursor != null)
 				mCursor.close();
 
-			unbindService(serviceConnection);
+			//unbindService(serviceConnection);
 
 			// startInit(); FIXME
 
 		}
+		
+		PodcastService.setAlarm(this);
+		/*
+	    prefs = PreferenceManager.getDefaultSharedPreferences(this);
+	    int minutes = prefs.getInt("interval", 1);
+	    AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+	    Intent intent = new Intent(this, PodcastService.class);
+	    PendingIntent pi = PendingIntent.getService(this, 0, intent, 0);
+	    am.cancel(pi);
+	    // by my own convention, minutes <= 0 means notifications are disabled
+	    if (minutes > 0) {
+	        am.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+	            SystemClock.elapsedRealtime() + minutes*60*1000,
+	            minutes*60*1000, pi);
+	    }
+	    */
 
 	}
 
@@ -233,6 +273,9 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 		return true;
 	}
 
+	/**
+	 * Right corner menu options
+	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -244,7 +287,8 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 			startActivity(i);
 			return true;
 		case R.id.menu_refresh:
-			mServiceBinder.start_update();
+			if (mBound)
+				mPodcastServiceBinder.start_update();
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

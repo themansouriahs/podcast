@@ -177,7 +177,7 @@ public class ControlButtons {
 		viewHolder.filesize = (TextView) listView.findViewById(R.id.filesize);
 
 		ControlButtons
-				.setListener(SwipeActivity.mServiceBinder, viewHolder, id);
+				.setListener(SwipeActivity.mPodcastServiceBinder, viewHolder, id);
 	}
 
 	public static void setPlayerListeners(View playerView, long id) {
@@ -200,7 +200,7 @@ public class ControlButtons {
 		viewHolder.seekbar = (SeekBar) playerView.findViewById(R.id.progress);
 
 		ControlButtons
-				.setListener(SwipeActivity.mServiceBinder, viewHolder, id);
+				.setListener(SwipeActivity.mPodcastServiceBinder, viewHolder, id);
 
 	}
 

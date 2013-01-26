@@ -221,12 +221,14 @@ public class PodcastBaseFragment extends ListFragment {
 	 */
 	public void startInit() {
 
+		/*
 		SwipeActivity.mService = getActivity().startService(
 				new Intent(getActivity(), PodcastService.class));
 
 		Intent bindIntent = new Intent(getActivity(), PodcastService.class);
 		getActivity().bindService(bindIntent, SwipeActivity.serviceConnection,
 				Context.BIND_AUTO_CREATE);
+				*/
 	}
 
 	public static final Handler mHandler = new Handler() {

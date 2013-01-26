@@ -1,22 +1,40 @@
 package info.bottiger.podcast.service;
 
-import com.handmark.pulltorefresh.library.PullToRefreshListView;
-
 import info.bottiger.podcast.SettingsActivity;
 import info.bottiger.podcast.provider.FeedItem;
-import info.bottiger.podcast.receiver.PodcastUpdateManager;
+import info.bottiger.podcast.receiver.PodcastUpdateReceiver;
 import info.bottiger.podcast.utils.Log;
-import info.bottiger.podcast.utils.SDCardManager;
-
-import android.app.Service;
+import android.app.AlarmManager;
+import android.app.IntentService;
+import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.os.AsyncTask;
 import android.os.Binder;
+import android.os.Bundle;
 import android.os.IBinder;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
+import android.os.SystemClock;
+import android.preference.PreferenceManager;
 
-public class PodcastService extends Service {
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
+
+public class PodcastService extends IntentService {
+
+	public PodcastService() {
+		super("PodcastService");
+		// TODO Auto-generated constructor stub
+	}
+
+	// from http://it-ride.blogspot.dk/2010/10/android-implementing-notification.html
+	private WakeLock mWakeLock;
+	private final String TAG = "wakelock";
+	
+	public static final int UPDATE_PODCAST = 100;
 	
 	private final Log log = Log.getLog(getClass());
 
@@ -49,63 +67,22 @@ public class PodcastService extends Service {
 
 
 	
-	private PodcastUpdateManager updateManager = new PodcastUpdateManager();
+	private PodcastUpdateReceiver updateManager = new PodcastUpdateReceiver();
 	private PodcastDownloadManager pdm = new PodcastDownloadManager();
-
-	/*
-	private final Handler handler = new Handler() {
-		@Override
-		public void handleMessage(Message msg) {
-			switch (msg.what) {
-			case MSG_TIMER:
-				log.debug("Message: MSG_TIMER.");
-
-				//start_update();
-				//removeExpires();
-				//do_download(false);
-
-				//long nextUpdate = (PodcastService.mDownloadQueue.isEmpty()) ? timer_freq
-				//		: 1;
-				//triggerNextTimer(nextUpdate);
-
-				break;
-			}
-		}
-	};
-
-	private void triggerNextTimer(long delay) {
-		Message msg = Message.obtain();
-		msg.what = MSG_TIMER;
-		handler.sendMessageDelayed(msg, delay);
-	}
-	*/
-
 	
-
+	/*
 	@Override
 	public void onCreate() {
-		// Podcast service onCreate()
 		super.onCreate();
-		//updateSetting(); //removed - not sure if I should
 		SDCardManager.getSDCardStatusAndCreate();
-		
-		// old Alarm way
-		//triggerNextTimer(1);
-
 	}
+	*/
 
 	//@Override
 	public void onStart(Context context, Intent intent, int startId) {
 		super.onStart(intent, startId);
-		PodcastUpdateManager.updateNow(context); // new AlarmManager way
+		PodcastUpdateReceiver.updateNow(context); // new AlarmManager way
 		log.debug("onStart()");
-	}
-
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-
-		log.debug("onDestroy()");
 	}
 
 	@Override
@@ -132,7 +109,7 @@ public class PodcastService extends Service {
 	}
 	
 	public void start_update() {
-		pdm.start_update(getBaseContext());
+		PodcastUpdateReceiver.updateNow(this);
 	}
 	
 	public void start_update(PullToRefreshListView pullToRefreshView) {
@@ -178,6 +155,115 @@ public class PodcastService extends Service {
 
 	public FeedItem getDownloadingItem() {
 		return pdm.getDownloadingItem();
+	}
+
+	
+	public static void setAlarm(Context context) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        int minutes = prefs.getInt("interval", 60);
+        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        Intent i = new Intent(context, PodcastService.class);
+        Bundle bundle = new Bundle();
+        bundle.putString("store", "Activity1");
+        i.putExtra("b", bundle);
+        PendingIntent pi = PendingIntent.getService(context, 0, i, 0);
+        am.cancel(pi);
+        // by my own convention, minutes <= 0 means notifications are disabled
+        if (minutes > 0) {
+            am.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                SystemClock.elapsedRealtime() + minutes*60*1000,
+                minutes*60*1000, pi);
+        }
+	}
+	
+	 /**
+     * This is where we initialize. We call this when onStart/onStartCommand is
+     * called by the system. We won't do anything with the intent here, and you
+     * probably won't, either.
+     */
+    private void handleIntent(Intent intent) {
+        // obtain the wake lock
+        PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+        mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
+        mWakeLock.acquire();
+        
+        // check the global background data setting
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        if (!cm.getBackgroundDataSetting()) {
+            stopSelf();
+            return;
+        }
+        
+        // do the actual work, in a separate thread
+        //Bundle bb = intent.getExtras().getBundle("b");
+        //String s = bb.getString("store");
+        new PollTask().execute();
+    }
+    
+    private class PollTask extends AsyncTask<Void, Void, Void> {
+        /**
+         * This is where YOU do YOUR work. There's nothing for me to write here
+         * you have to fill this in. Make your HTTP request(s) or whatever it is
+         * you have to do to get your updates in here, because this is run in a
+         * separate thread
+         */
+        @Override
+        protected Void doInBackground(Void... params) {
+            // do stuff!
+        	int h = 6;
+        	h = 7*h;
+            return null;
+        }
+        
+        /**
+         * In here you should interpret whatever you fetched in doInBackground
+         * and push any notifications you need to the status bar, using the
+         * NotificationManager. I will not cover this here, go check the docs on
+         * NotificationManager.
+         *
+         * What you HAVE to do is call stopSelf() after you've pushed your
+         * notification(s). This will:
+         * 1) Kill the service so it doesn't waste precious resources
+         * 2) Call onDestroy() which will release the wake lock, so the device
+         *    can go to sleep again and save precious battery.
+         */
+        @Override
+        protected void onPostExecute(Void result) {
+            // handle your data
+        	stopSelf();
+        }
+    }
+    
+    /**
+     * This is called on 2.0+ (API level 5 or higher). Returning
+     * START_NOT_STICKY tells the system to not restart the service if it is
+     * killed because of poor resource (memory/cpu) conditions.
+     */
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+    	handleIntent(intent);
+    	
+        return START_NOT_STICKY;
+    }
+    
+    /**
+     * In onDestroy() we release our wake lock. This ensures that whenever the
+     * Service stops (killed for resources, stopSelf() called, etc.), the wake
+     * lock will be released.
+     */
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mWakeLock.release();
+        log.debug("onDestroy()");
+    }
+
+    /**
+     * Not sure if this is ever called
+     */
+	@Override
+	protected void onHandleIntent(Intent intent) {
+		// TODO Auto-generated method stub
 	}
 
 }

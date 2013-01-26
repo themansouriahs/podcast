@@ -32,6 +32,7 @@ public class SettingsActivity extends PreferenceActivity {
 	private PodcastService serviceBinder = null;
 	ComponentName service = null;
 
+	
 	private ServiceConnection serviceConnection = new ServiceConnection() {
 		@Override
 		public void onServiceConnected(ComponentName className, IBinder service) {

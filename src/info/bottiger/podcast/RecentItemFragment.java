@@ -110,7 +110,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 
 			@Override
 			public void onRefresh(PullToRefreshBase<ListView> refreshView) {
-				SwipeActivity.mServiceBinder.start_update(pullToRefreshView);
+				SwipeActivity.mPodcastServiceBinder.start_update(pullToRefreshView);
 			}
 		};
 
@@ -291,7 +291,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 
 				feeditem.status = ItemColumns.ITEM_STATUS_DOWNLOAD_QUEUE;
 				feeditem.update(getActivity().getContentResolver());
-				SwipeActivity.mServiceBinder.start_download();
+				SwipeActivity.mPodcastServiceBinder.start_download();
 				return;
 			}
 			case MENU_ITEM_START_PLAY: {

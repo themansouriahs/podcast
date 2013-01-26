@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="set">Set</string>
+    <string name="cancel">Cancel</string>
     <string name="app_name">SoundWaves</string>
     <string name="title_play_list">Episodes</string>
     <string name="title_player">Player</string>
@@ -85,7 +87,11 @@
     <string name="pref_update_wifi_title">Update interval through Wi-Fi</string>
     <string name="pref_update_wifi_description">Download new episodes automatically when the feeds are refreshed</string>
     <string name="pref_download_on_update_title">Automatic download</string>
-    <string name="pref_download_on_update_description">Set up automatic update interval time though 3G/2.5G network</string>
+    <string name="pref_download_on_update_description">Set up automatic update interval time</string>
+    
+    <string name="pref_update_time_title">Update at</string>
+    <string name="pref_update_time_description">In addition to periodic updating the feeds can be updated every night/morning at a given time</string>
+    
     <string name="pref_update_mobile_title">Update interval though 3G</string>
     <string name="pref_item_expire_description">Setup the automatic expiration time of the undownload items</string>
     <string name="pref_item_expire_title">Undownload item expire in</string>
