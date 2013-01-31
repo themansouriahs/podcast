@@ -167,7 +167,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 			"d MMM yyyy HH:mm:ss z", "yyyy-MM-dd HH:mm", "yyyy-MM-dd HH:mm:ss",
 			"EEE,dd MMM yyyy HH:mm:ss Z", };
 
-	public static String default_format = "EEE, dd MMM yyyy HH:mm:ss Z";
+	public static String default_format = "yyyy-MM-dd HH:mm:ss Z";
 
 	public static void view(Activity act, long item_id) {
 		Uri uri = ContentUris.withAppendedId(ItemColumns.URI, item_id);
