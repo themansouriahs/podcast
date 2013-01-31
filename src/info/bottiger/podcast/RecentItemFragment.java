@@ -7,6 +7,7 @@ import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.service.PodcastDownloadManager;
+import info.bottiger.podcast.service.PodcastService;
 import info.bottiger.podcast.utils.ControlButtons;
 import info.bottiger.podcast.utils.DialogMenu;
 import info.bottiger.podcast.utils.ExpandAnimation;
@@ -110,7 +111,8 @@ public class RecentItemFragment extends PodcastBaseFragment {
 
 			@Override
 			public void onRefresh(PullToRefreshBase<ListView> refreshView) {
-				SwipeActivity.mPodcastServiceBinder.start_update(pullToRefreshView);
+				//SwipeActivity.mPodcastServiceBinder.start_update(pullToRefreshView);
+				PodcastService.start_update(getActivity(), pullToRefreshView);
 			}
 		};
 

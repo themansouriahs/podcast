@@ -287,8 +287,10 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 			startActivity(i);
 			return true;
 		case R.id.menu_refresh:
-			if (mBound)
+			if (mBound) {
 				mPodcastServiceBinder.start_update();
+				PodcastService.start_update(this);
+			}
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

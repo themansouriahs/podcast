@@ -1,6 +1,6 @@
 package info.bottiger.podcast.utils;
 
-import info.bottiger.podcast.provider.Subscription;
+import info.bottiger.podcast.provider.FeedItem;
 
 import java.io.File;
 
@@ -80,12 +80,16 @@ public class SDCardManager {
 		return true;
 	}	
 	
-	public static String pathFromFilename(String filename) {
-		if (filename == null || filename.equals("")) {
+	public static String pathFromFilename(FeedItem item) {
+		if (item.getFilename() == null || item.getFilename().equals("")) {
 			return "";
 		} else {
-			return SDCardManager.getDownloadDir() + "/" + filename;
+			return pathFromFilename(item.getFilename());
 		}
+	}
+	
+	public static String pathFromFilename(String item) {
+		return SDCardManager.getDownloadDir() + "/" + item;
 	}
 
 }

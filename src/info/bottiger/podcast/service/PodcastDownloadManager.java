@@ -95,16 +95,16 @@ public class PodcastDownloadManager {
 		return DownloadStatus.NOTHING;
 	}
 
-	public void start_update(final Context context) {
+	public static void start_update(final Context context) {
 		start_update(context, null);
 	}
 
-	public void start_update(final Context context,
+	public static void start_update(final Context context,
 			final PullToRefreshListView pullToRefreshView) {
 		if (updateConnectStatus(context) == NO_CONNECT)
 			return;
 
-		log.debug("start_update()");
+		//log.debug("start_update()");
 		if (mUpdateLock.locked() == false)
 			return;
 
@@ -350,7 +350,7 @@ public class PodcastDownloadManager {
 	 * 
 	 * @author Arvid Böttiger
 	 */
-	private class UpdateSubscriptions extends
+	private static class UpdateSubscriptions extends
 			AsyncTask<Void, Subscription, PullToRefreshListView> {
 		Context mContext;
 		PullToRefreshListView mRefreshView;

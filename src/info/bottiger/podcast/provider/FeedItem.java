@@ -1,21 +1,17 @@
 package info.bottiger.podcast.provider;
 
-import info.bottiger.podcast.PlayerActivity;
-import info.bottiger.podcast.R;
-import info.bottiger.podcast.service.PodcastDownloadManager;
-import info.bottiger.podcast.utils.FileUtils;
 import info.bottiger.podcast.utils.Log;
 import info.bottiger.podcast.utils.SDCardManager;
 import info.bottiger.podcast.utils.StrUtils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -23,13 +19,10 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.support.v4.util.LruCache;
-import android.widget.Toast;
 
 public class FeedItem implements Comparable<FeedItem>, WithIcon {
 
@@ -75,7 +68,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	public String content;
 
 	/*
-	 * Also an URL 
+	 * Also an URL
 	 */
 	@Deprecated
 	public String resource;
@@ -242,7 +235,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		FeedItem item = fetchFromCursor(cursor);
 		return item;
 	}
-	
+
 	public static FeedItem getMostRecent(ContentResolver context) {
 		return getBySQL(context, "1==1", "_id DESC");
 	}
@@ -371,7 +364,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		} finally {
 		}
 	}
-	
+
 	/**
 	 * 
 	 */
@@ -380,7 +373,8 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	}
 
 	/**
-	 *  Return the PublishingDate as default_format = "EEE, dd MMM yyyy HH:mm:ss Z"
+	 * Return the PublishingDate as default_format =
+	 * "EEE, dd MMM yyyy HH:mm:ss Z"
 	 */
 	public long getDate() {
 		// log.debug(" getDate() start");
@@ -451,8 +445,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 				.getColumnIndex(ItemColumns.CONTENT));
 		item.filesize = cursor.getLong(cursor
 				.getColumnIndex(ItemColumns.FILESIZE));
-		item.length = cursor.getLong(cursor
-				.getColumnIndex(ItemColumns.LENGTH));
+		item.length = cursor.getLong(cursor.getColumnIndex(ItemColumns.LENGTH));
 		item.chunkFilesize = cursor.getLong(cursor
 				.getColumnIndex(ItemColumns.CHUNK_FILESIZE));
 		item.duration = cursor.getString(cursor
@@ -502,7 +495,8 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 
 	public void prepareDownload(ContentResolver context) {
 		if (getAbsolutePath().equals("") || getAbsolutePath().equals("0")) {
-			String filenameFromURL = resource.substring(resource.lastIndexOf("/") + 1);
+			String filenameFromURL = resource.substring(resource
+					.lastIndexOf("/") + 1);
 			filename = this.sub_id + "_" + filenameFromURL;
 		}
 		update(context);
@@ -526,12 +520,27 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	}
 
 	public String getFilename() {
-		String fileName = url.substring( url.lastIndexOf('/')+1, url.length() );
+		String fileName = url.substring(url.lastIndexOf('/') + 1, url.length());
+		if (filename == null || filename.equals("")) {
+			MessageDigest m;
+			try {
+				m = MessageDigest.getInstance("MD5");
+				m.reset();
+				m.update(this.getURL().getBytes());
+				byte[] digest = m.digest();
+				BigInteger bigInt = new BigInteger(1, digest);
+				String hashtext = bigInt.toString(16);
+				return hashtext;
+			} catch (NoSuchAlgorithmException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		return fileName;
 	}
 
 	public String getAbsolutePath() {
-		return SDCardManager.pathFromFilename(this.filename);
+		return SDCardManager.pathFromFilename(this);
 	}
 
 	public void setPosition(ContentResolver contentResolver, long pos) {

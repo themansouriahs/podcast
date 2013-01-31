@@ -107,11 +107,22 @@ public class PodcastService extends IntentService {
 	public void start_download() {
 		pdm.startDownload(true, getBaseContext());
 	}
+
+	public static void start_update(Context context, PullToRefreshListView pullToRefreshView) {
+		PodcastDownloadManager.start_update(context, pullToRefreshView);
+		//PodcastUpdateReceiver.updateNow(context);
+	}
+
+	public static void start_update(Context context) {
+		PodcastDownloadManager.start_update(context);
+	}
 	
+	@Deprecated
 	public void start_update() {
 		PodcastUpdateReceiver.updateNow(this);
 	}
 	
+	@Deprecated
 	public void start_update(PullToRefreshListView pullToRefreshView) {
 		pdm.start_update(getBaseContext(), pullToRefreshView);
 	}
