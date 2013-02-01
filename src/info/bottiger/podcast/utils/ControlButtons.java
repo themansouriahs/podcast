@@ -5,6 +5,7 @@ import info.bottiger.podcast.R;
 import info.bottiger.podcast.RecentItemFragment;
 import info.bottiger.podcast.SwipeActivity;
 import info.bottiger.podcast.provider.FeedItem;
+import info.bottiger.podcast.service.PodcastDownloadManager;
 import info.bottiger.podcast.service.PodcastService;
 import android.content.ContentResolver;
 import android.os.SystemClock;
@@ -129,8 +130,9 @@ public class ControlButtons {
 							// Download file
 							FilesizeUpdater.put(fragment.getActivity(),
 									item.id, viewHolder.filesize);
-							podcastServiceConnection.downloadItem(fragment
-									.getActivity().getContentResolver(), item);
+							PodcastDownloadManager.addItemAndStartDownload(item, fragment.getActivity());
+							//podcastServiceConnection.downloadItem(fragment
+							//		.getActivity().getContentResolver(), item);
 							viewHolder.downloadButton
 									.setImageResource(R.drawable.ic_action_delete);
 							viewHolder.downloadButton

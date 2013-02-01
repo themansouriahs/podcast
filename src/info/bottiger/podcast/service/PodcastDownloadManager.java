@@ -347,6 +347,17 @@ public class PodcastDownloadManager {
 	public static void addItemToQueue(FeedItem item) {
 		mDownloadQueue.add(item);
 	}
+	
+	/**
+	 * Add feeditem to the download queue and start downloading at once
+	 * 
+	 * @param feedItem
+	 * @param context
+	 */
+	public static void addItemAndStartDownload(FeedItem item, Context context) {
+		mDownloadQueue.add(item);
+		startDownload(context);
+	}
 
 	/**
 	 * Update the list of subscriptions as well as their content
