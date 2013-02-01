@@ -39,23 +39,16 @@ public class PodcastDownloadManager {
 	public static final int WIFI_CONNECT = 2;
 	public static final int MOBILE_CONNECT = 4;
 
-	private static final int MSG_TIMER = 0;
-
 	public int pref_connection_sel = MOBILE_CONNECT | WIFI_CONNECT;
 
 	private static final long ONE_MINUTE = 60L * 1000L;
 	private static final long ONE_HOUR = 60L * ONE_MINUTE;
-	private static final long ONE_DAY = 24L * ONE_HOUR;
 
-	// private static final long timer_freq = 3 * ONE_MINUTE;
-	private static final long timer_freq = ONE_HOUR;
 	private static long pref_update = 2 * 60 * ONE_MINUTE;
 
 	private static PriorityQueue<FeedItem> mDownloadQueue = new PriorityQueue<FeedItem>();
-	private final Log log = Log.getLog(getClass());
 
 	private static FeedItem mDownloadingItem = null;
-	private static final LockHandler mDownloadLock = new LockHandler();
 
 	private static final LockHandler mUpdateLock = new LockHandler();
 	private static int mConnectStatus = NO_CONNECT;
@@ -146,12 +139,6 @@ public class PodcastDownloadManager {
 			return;
 		}
 
-		/*
-		 * Deprecated if (mDownloadLock.locked() == false) { int i = 5; i = i +
-		 * 6; //return; }
-		 */
-
-		// new DownloadPodcast(context).execute();
 		downloadManager = (DownloadManager) context
 				.getSystemService(Context.DOWNLOAD_SERVICE);
 		while (mDownloadQueue.size() > 0) {
