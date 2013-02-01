@@ -146,6 +146,8 @@ public class FeedParserWrapper {
 				item.title = (String) episode.get("title");
 				item.author = (String) episode.get("author");
 				item.content = (String) episode.get("description");
+				
+				
 
 				updateFeed(subscription, item);
 
@@ -302,7 +304,7 @@ public class FeedParserWrapper {
 			}
 		}
 
-		if (item.getDate() == 0) {
+		if (item.getDate().equals("")) {
 
 			date = new Date();
 			// item.date = correctFormatter.format(date);
@@ -346,7 +348,7 @@ public class FeedParserWrapper {
 		if (FeedParserWrapper.mostRecentItem == null)
 			FeedParserWrapper.mostRecentItem = FeedItem.getMostRecent(cr);
 
-		long itemDate = item.getDate();
+		Long itemDate = item.getLongDate();
 		
 		if (FeedParserWrapper.mostRecentItem == null
 				|| item.newerThan(FeedParserWrapper.mostRecentItem)) {

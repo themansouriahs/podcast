@@ -406,25 +406,25 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	}
 
 	/**
+	 * @see http://docs.oracle.com/javase/6/docs/api/java/lang/String.html#compareTo%28java.lang.String%29
 	 * @return True of the current FeedItem is newer than the supplied argument
 	 */
 	public boolean newerThan(FeedItem item) {
-		return this.getDate() > item.getDate();
+		int comparator = this.getDate().compareTo(item.getDate());
+		return comparator > 0;
+	}
+	
+	@Deprecated
+	public long getLongDate() {
+		return m_date;
 	}
 
 	/**
 	 * @return the PublishingDate as default_format = "yyyy-MM-dd HH:mm:ss Z"
 	 */
-	public long getDate() {
+	public String getDate() {
 		// log.debug(" getDate() start");
-
-		if (m_date < 0) {
-			m_date = parse();
-			// log.debug(" getDate() end " + default_format);
-
-		}
-
-		return m_date;
+		return this.date;
 
 	}
 

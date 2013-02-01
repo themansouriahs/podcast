@@ -76,6 +76,7 @@ public class SubscriptionColumns implements BaseColumns {
 			+ TABLE_NAME + "_" + LAST_UPDATED + " ON " + TABLE_NAME + " ("
 			+ LAST_UPDATED + ");";
 
+	/*
 	public static final String sql_insert_default = "INSERT INTO "
 			+ TABLE_NAME
 			+ " ("
@@ -165,6 +166,8 @@ public class SubscriptionColumns implements BaseColumns {
 		+ ","
 		+ LAST_ITEM_UPDATED
 		+ ") VALUES ('http://downloads.bbc.co.uk/podcasts/radio4/r4choice/rss.xml', 'unknown', 'unknown', '', 0, 0, 0);";
+	
+	*/
 	
 	public static ContentValues checkValues(ContentValues values, Uri uri) {
 		if (values.containsKey(URL) == false) {

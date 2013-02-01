@@ -26,9 +26,9 @@ public class PodcastOpenHelper extends SQLiteOpenHelper {
 		db.execSQL(ItemColumns.sql_index_item_res);
 		db.execSQL(ItemColumns.sql_index_item_created);
 
-		db.execSQL(SubscriptionColumns.sql_insert_default);
-		db.execSQL(SubscriptionColumns.sql_insert_default1);
-		db.execSQL(SubscriptionColumns.sql_insert_default2);
+		//db.execSQL(SubscriptionColumns.sql_insert_default);
+		//db.execSQL(SubscriptionColumns.sql_insert_default1);
+		//db.execSQL(SubscriptionColumns.sql_insert_default2);
 		//db.execSQL(SubscriptionColumns.sql_insert_default3);
 		//db.execSQL(SubscriptionColumns.sql_insert_default4);
 
