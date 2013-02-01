@@ -8,6 +8,7 @@ import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.provider.WithIcon;
+import info.bottiger.podcast.service.DownloadStatus;
 import info.bottiger.podcast.service.PodcastDownloadManager;
 import info.bottiger.podcast.utils.ControlButtons;
 import info.bottiger.podcast.utils.FilesizeUpdater;
@@ -320,7 +321,7 @@ public class ItemCursorAdapter extends AbstractPodcastAdapter {
 		TextView slash = (TextView) view.getTag(R.id.time_slash);
 		TextView fileSize = (TextView) view.getTag(R.id.filesize);
 
-		PodcastDownloadManager.DownloadStatus ds;
+		DownloadStatus ds;
 		if (item != null) {
 			// FeedItem.getById(context.getContentResolver(), id)
 			ds = PodcastDownloadManager.getStatus(item);
@@ -436,7 +437,7 @@ public class ItemCursorAdapter extends AbstractPodcastAdapter {
 	 * @param downloadStatus
 	 */
 	private void writeStatus(long itemID, TextView textView,
-			PodcastDownloadManager.DownloadStatus downloadStatus) {
+			DownloadStatus downloadStatus) {
 		String statusText = "";
 		switch (downloadStatus) {
 		case PENDING:

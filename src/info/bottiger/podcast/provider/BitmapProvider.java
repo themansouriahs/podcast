@@ -1,6 +1,7 @@
 package info.bottiger.podcast.provider;
 
 import info.bottiger.podcast.R;
+import info.bottiger.podcast.service.DownloadStatus;
 import info.bottiger.podcast.service.PodcastDownloadManager;
 import info.bottiger.podcast.utils.SDCardManager;
 
@@ -195,7 +196,7 @@ public class BitmapProvider {
 
 		if (item instanceof FeedItem) {
 			FeedItem feedItem = (FeedItem) item;
-			PodcastDownloadManager.DownloadStatus ds = PodcastDownloadManager
+			DownloadStatus ds = PodcastDownloadManager
 					.getStatus(feedItem);
 			switch (ds) {
 			case DONE:
@@ -225,13 +226,13 @@ public class BitmapProvider {
 	private boolean mediaFileExist(FeedItem feedItem) {
 		String fullPath = SDCardManager
 				.pathFromFilename(feedItem);
-		PodcastDownloadManager.DownloadStatus ds = PodcastDownloadManager
+		DownloadStatus ds = PodcastDownloadManager
 				.getStatus(feedItem);
 
 		return feedItem.getAbsolutePath() != null
 				&& feedItem.getAbsolutePath().length() > 0
 				&& new File(fullPath).exists()
-				&& ds == PodcastDownloadManager.DownloadStatus.DONE;
+				&& ds == DownloadStatus.DONE;
 	}
 
 	@SuppressWarnings("resource")
