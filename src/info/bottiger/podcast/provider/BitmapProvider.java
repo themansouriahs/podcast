@@ -118,10 +118,10 @@ public class BitmapProvider {
 	/**
 	 * Extracts the Bitmap from the MP3/media file
 	 * 
-	 * @param fd
+	 * @param mediaFileFD
 	 * @return Bitmap from the file or feed
 	 */
-	public Bitmap createBitmapFromMediaFile(FileDescriptor fd, int height, int width) {
+	public Bitmap createBitmapFromMediaFile(FileDescriptor mediaFileFD, int height, int width) {
 
 		Bitmap cover = null;
 		String cacheKey = thumbnailCacheName(mItem, height, width);
@@ -132,7 +132,7 @@ public class BitmapProvider {
 
 		// if (mediaFileExist()) {
 		MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-		mmr.setDataSource(fd);
+		mmr.setDataSource(mediaFileFD);
 		byte[] embeddedPicture = mmr.getEmbeddedPicture();
 
 		// If the image exists, cache and return

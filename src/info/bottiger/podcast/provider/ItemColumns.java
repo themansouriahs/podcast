@@ -51,6 +51,7 @@ public class ItemColumns implements BaseColumns {
 	public static final String LAST_UPDATE = "last_update";
 
 	public static final String CONTENT = "content";
+	public static final String EPISODE_NUMBER = "episode_number";
 
 	// download
 	public static final String STATUS = "status";
@@ -61,6 +62,7 @@ public class ItemColumns implements BaseColumns {
 
 	public static final String FILESIZE = "filesize";
 	public static final String CHUNK_FILESIZE = "chunk_filesize";
+	public static final String DOWNLOAD_REFERENCE = "download_reference";
 	public static final String DURATION = "duration";
 	public static final String IMAGE_URL = "image";
 
@@ -85,7 +87,7 @@ public class ItemColumns implements BaseColumns {
 	public static final String[] ALL_COLUMNS = { _ID, SUBS_ID, TITLE, AUTHOR,
 			DATE, LAST_UPDATE, CONTENT, STATUS, URL, RESOURCE, FILESIZE,CHUNK_FILESIZE, DURATION,
 			LENGTH, OFFSET, PATHNAME, FAIL_COUNT, MEDIA_URI, SUB_TITLE,
-			CREATED, TYPE, LISTENED, IMAGE_URL };
+			CREATED, TYPE, LISTENED, IMAGE_URL, DOWNLOAD_REFERENCE, EPISODE_NUMBER };
 
 	public static final String DEFAULT_SORT_ORDER = CREATED + " DESC";
 
@@ -103,6 +105,8 @@ public class ItemColumns implements BaseColumns {
 		+ RESOURCE + " VARCHAR(1024), " 
 		+ FILESIZE + " INTEGER, "
 		+ CHUNK_FILESIZE + " INTEGER, "
+		+ DOWNLOAD_REFERENCE + " INTEGER, "
+		+ EPISODE_NUMBER + " INTEGER, "
 		+ DURATION + " VARCHAR(16), " 
 		+ IMAGE_URL + " VARCHAR(1024), " 
 		+ LENGTH + " INTEGER, " 

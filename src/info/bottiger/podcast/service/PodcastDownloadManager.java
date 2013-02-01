@@ -200,6 +200,9 @@ public class PodcastDownloadManager {
 
 			// Enqueue a new download and same the referenceId
 			downloadReference = downloadManager.enqueue(request);
+			
+			mDownloadingItem.setDownloadReferenceID(downloadReference);
+			mDownloadingItem.update(context.getContentResolver());
 		}
 
 	}

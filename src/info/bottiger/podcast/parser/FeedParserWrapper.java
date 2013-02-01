@@ -123,6 +123,7 @@ public class FeedParserWrapper {
 				JSONObject files = (JSONObject) fileData.get(0);
 				item.type = (String) files.get("mimetype");
 				Number filesize = (Number) files.get("filesize");
+				Number episodeNumber = (Number) files.get("number");
 
 				Number released = (Number) episode.get("released");
 				Date time = null;
@@ -136,6 +137,8 @@ public class FeedParserWrapper {
 							.formatTime(duration.intValue() * 1000);
 				if (filesize != null)
 					item.filesize = filesize.intValue();
+				if (episodeNumber != null)
+					item.setEpisodeNumber(episodeNumber.intValue());
 				item.image = image;
 				item.url = (String) episode.get("link");
 				item.resource = item.url;

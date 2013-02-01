@@ -36,81 +36,92 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	 * the meaning of.
 	 */
 
-	/*
+	/**
 	 * Unique ID
 	 */
 	public long id;
 
-	/*
+	/**
 	 * URL of the episode:
 	 * http://podcast.dr.dk/P1/p1debat/2013/p1debat_1301171220.mp3
 	 */
 	public String url;
 
-	/*
+	/**
 	 * Title of the episode
 	 */
 	public String title;
 
-	/*
+	/**
 	 * Name of Publisher
 	 */
 	public String author;
 
-	/*
+	/**
 	 * Date Published
 	 */
 	public String date;
 
-	/*
+	/**
 	 * Episode description in text
 	 */
 	public String content;
 
-	/*
+	/**
 	 * Also an URL
 	 */
 	@Deprecated
 	public String resource;
 
-	/*
+	/**
 	 * Duration as String hh:mm:ss or mm:ss 02:23:34
 	 */
 	public String duration;
 
-	/*
+	/**
 	 * URL to relevant episode image
 	 */
 	public String image;
 
-	/*
+	/**
 	 * Unique ID of the subscription the episode belongs to
 	 */
 	public long sub_id;
 
-	/*
+	/**
 	 * Total size of the episode in bytes
 	 */
 	public long filesize;
 
-	/*
+	/**
 	 * Size of the file on disk in bytes
 	 */
 	public long chunkFilesize;
 
-	/*
+	/**
 	 * Filename of the episode on disk. sn209.mp3
 	 */
 	private String filename;
+	
+	/**
+	 * Episode number.
+	 */
+	private int episodeNumber;
 
-	/*
+	/**
+	 * Download reference ID as returned by
+	 * http://developer.android.com/reference/android/app/DownloadManager.html#enqueue(android.app.DownloadManager.Request)
+	 */
+	private long downloadReferenceID;
+
+	/**
 	 * Last position during playback in ms Should match seekTo(int)
 	 * http://developer
 	 * .android.com/reference/android/media/MediaPlayer.html#seekTo(int)
 	 */
 	public int offset;
 
-	/*
+	/**
 	 * Deprecated status from before forking
 	 */
 	@Deprecated
@@ -124,29 +135,29 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	// 2. when an item is in the player, failcount is used as
 	// the order of the item in the list.
 
-	/*
+	/**
 	 * Have to listened to this episode yet?
 	 */
 	public int listened;
 
-	/*
+	/**
 	 * Filesize as reported by the RSS feed
 	 */
 	public long length;
 
-	/*
+	/**
 	 * The time the record in the database was updated the last time. measured
 	 * in: System.currentTimeMillis()
 	 */
 	public long update;
 
-	/*
+	/**
 	 * The URI of the podcast episode
 	 */
 	@Deprecated
 	public String uri;
 
-	/*
+	/**
 	 * Title of the parent subscription
 	 */
 	public String sub_title;
@@ -183,6 +194,25 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		try {
 			cursor = context.query(ItemColumns.URI, ItemColumns.ALL_COLUMNS,
 					where, null, order);
+			if (cursor.moveToFirst()) {
+				item = FeedItem.getByCursor(cursor);
+			}
+		} finally {
+			if (cursor != null)
+				cursor.close();
+		}
+		return item;
+
+	}
+	
+	public static FeedItem getByDownloadReference(ContentResolver contentResolver, long id) {
+		FeedItem item = null;
+		Cursor cursor = null;
+
+		String where = ItemColumns.DOWNLOAD_REFERENCE + " = " + id;
+		try {
+			cursor = contentResolver.query(ItemColumns.URI, ItemColumns.ALL_COLUMNS,
+					where, null, null);
 			if (cursor.moveToFirst()) {
 				item = FeedItem.getByCursor(cursor);
 			}
@@ -262,6 +292,8 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		listened = -1;
 		filesize = -1;
 		chunkFilesize = -1;
+		downloadReferenceID = -1;
+		episodeNumber = -1;
 
 		created = -1;
 		sub_title = null;
@@ -271,17 +303,17 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 
 	}
 
-	public void updateOffset(ContentResolver context, long i) {
+	public void updateOffset(ContentResolver contentResolver, long i) {
 		offset = (int) i;
 		update = -1;
-		update(context);
+		update(contentResolver);
 
 	}
 
-	/*
+	/**
 	 * Update the FeedItem in the database
 	 */
-	public void update(ContentResolver context) {
+	public void update(ContentResolver contentResolver) {
 		log.debug("item update start");
 
 		initCache();
@@ -295,6 +327,10 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 				cv.put(ItemColumns.PATHNAME, filename);
 			if (filesize >= 0)
 				cv.put(ItemColumns.FILESIZE, filesize);
+			if (downloadReferenceID >= 0)
+				cv.put(ItemColumns.DOWNLOAD_REFERENCE, downloadReferenceID);
+			if (episodeNumber >= 0)
+				cv.put(ItemColumns.EPISODE_NUMBER, episodeNumber);
 			if (chunkFilesize >= 0)
 				cv.put(ItemColumns.LENGTH, length);
 			if (chunkFilesize >= 0)
@@ -308,7 +344,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 			if (listened >= 0)
 				cv.put(ItemColumns.LISTENED, listened);
 
-			context.update(ItemColumns.URI, cv, BaseColumns._ID + "=" + id,
+			contentResolver.update(ItemColumns.URI, cv, BaseColumns._ID + "=" + id,
 					null);
 
 			log.debug("update OK");
@@ -347,6 +383,10 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 				cv.put(ItemColumns.RESOURCE, resource);
 			if (filesize >= 0)
 				cv.put(ItemColumns.FILESIZE, filesize);
+			if (downloadReferenceID >= 0)
+				cv.put(ItemColumns.DOWNLOAD_REFERENCE, downloadReferenceID);
+			if (episodeNumber >= 0)
+				cv.put(ItemColumns.EPISODE_NUMBER, episodeNumber);
 			if (length >= 0)
 				cv.put(ItemColumns.LENGTH, length);
 			if (duration != null) {
@@ -366,15 +406,14 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	}
 
 	/**
-	 * 
+	 * @return True of the current FeedItem is newer than the supplied argument
 	 */
 	public boolean newerThan(FeedItem item) {
 		return this.getDate() > item.getDate();
 	}
 
 	/**
-	 * Return the PublishingDate as default_format =
-	 * "EEE, dd MMM yyyy HH:mm:ss Z"
+	 * @return the PublishingDate as default_format = "yyyy-MM-dd HH:mm:ss Z"
 	 */
 	public long getDate() {
 		// log.debug(" getDate() start");
@@ -448,6 +487,9 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		item.length = cursor.getLong(cursor.getColumnIndex(ItemColumns.LENGTH));
 		item.chunkFilesize = cursor.getLong(cursor
 				.getColumnIndex(ItemColumns.CHUNK_FILESIZE));
+		item.downloadReferenceID = cursor.getLong(cursor
+				.getColumnIndex(ItemColumns.DOWNLOAD_REFERENCE));
+		item.episodeNumber = cursor.getInt(cursor.getColumnIndex(ItemColumns.EPISODE_NUMBER));
 		item.duration = cursor.getString(cursor
 				.getColumnIndex(ItemColumns.DURATION));
 		item.update = cursor.getLong(cursor
@@ -520,7 +562,6 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	}
 
 	public String getFilename() {
-		String fileName = url.substring(url.lastIndexOf('/') + 1, url.length());
 		if (filename == null || filename.equals("")) {
 			MessageDigest m;
 			try {
@@ -536,7 +577,14 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 				e.printStackTrace();
 			}
 		}
-		return fileName;
+		return filename;
+	}
+
+	/**
+	 * @param filename the filename to set
+	 */
+	public void setFilename(String filename) {
+		this.filename = filename;
 	}
 
 	public String getAbsolutePath() {
@@ -582,7 +630,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 			return localFilesize >= filesize && localFilesize > 0;
 	}
 
-	/*
+	/**
 	 * @return the duration of the mp3 (or whatever) in milliseconds.
 	 */
 	public long getDuration() {
@@ -608,9 +656,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
@@ -621,9 +667,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		return result;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
@@ -647,7 +691,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		}
 	}
 
-	/*
+	/**
 	 * Caching class for keeping items in memory
 	 */
 	private static class ItemLruCache extends LruCache<Long, FeedItem> {
@@ -675,5 +719,47 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	@Override
 	public long getId() {
 		return id;
+	}
+
+	/**
+	 * @return the downloadReferenceID
+	 */
+	public long getDownloadReferenceID() {
+		return downloadReferenceID;
+	}
+
+	/**
+	 * @param downloadReferenceID the downloadReferenceID to set
+	 */
+	public void setDownloadReferenceID(long downloadReferenceID) {
+		this.downloadReferenceID = downloadReferenceID;
+	}
+	
+	/**
+	 * @return the episodeNumber
+	 */
+	public int getEpisodeNumber() {
+		return episodeNumber;
+	}
+
+	/**
+	 * @param episodeNumber the episodeNumber to set
+	 */
+	public void setEpisodeNumber(int episodeNumber) {
+		this.episodeNumber = episodeNumber;
+	}
+
+	/**
+	 * @return the title
+	 */
+	public String getTitle() {
+		return title;
+	}
+
+	/**
+	 * @param title the title to set
+	 */
+	public void setTitle(String title) {
+		this.title = title;
 	}
 }
