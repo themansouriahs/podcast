@@ -8,9 +8,9 @@ import android.os.Environment;
 
 public class SDCardManager {
 
-	public static String SDCARD_DIR = "/sdcard"; 
 	public static final String APP_DIR = "/bottiger.podcast";
 	public static final String DOWNLOAD_DIR = "/download";
+	public static final String TMP_DIR = "/tmp";
 	public static final String EXPORT_DIR = "/export";
 	public static final String CACHE_DIR = "/cache";
 	public static final String THUMBNAIL_CACHE = "/thumbnails";
@@ -37,6 +37,11 @@ public class SDCardManager {
 	public static String getDownloadDir()
 	{
 		return getSDCardDir() + APP_DIR + DOWNLOAD_DIR;
+	}
+	
+	public static String getTmpDir()
+	{
+		return getSDCardDir() + APP_DIR + TMP_DIR;
 	}
 	
 	public static String getAppDir()
@@ -88,8 +93,24 @@ public class SDCardManager {
 		}
 	}
 	
+	public static String pathTmpFromFilename(FeedItem item) {
+		if (item.getFilename() == null || item.getFilename().equals("")) {
+			return "";
+		} else {
+			return pathTmpFromFilename(item.getFilename());
+		}
+	}
+	
+	public static String pathTmpFromFilename(String item) {
+		String folder = SDCardManager.getTmpDir();
+		returnDir(folder);
+		return folder + "/" + item;
+	}
+	
 	public static String pathFromFilename(String item) {
-		return SDCardManager.getDownloadDir() + "/" + item;
+		String folder = SDCardManager.getDownloadDir();
+		returnDir(folder);
+		return folder + "/" + item;
 	}
 
 }

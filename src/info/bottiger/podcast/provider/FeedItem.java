@@ -113,6 +113,11 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	 * http://developer.android.com/reference/android/app/DownloadManager.html#enqueue(android.app.DownloadManager.Request)
 	 */
 	private long downloadReferenceID;
+	
+	/**
+	 * Flags for filtering downloaded items
+	 */
+	private boolean isDownloaded;
 
 	/**
 	 * Last position during playback in ms Should match seekTo(int)
@@ -294,6 +299,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		chunkFilesize = -1;
 		downloadReferenceID = -1;
 		episodeNumber = -1;
+		isDownloaded = false;
 
 		created = -1;
 		sub_title = null;
@@ -329,6 +335,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 				cv.put(ItemColumns.FILESIZE, filesize);
 			if (downloadReferenceID >= 0)
 				cv.put(ItemColumns.DOWNLOAD_REFERENCE, downloadReferenceID);
+			cv.put(ItemColumns.DOWNLOAD_REFERENCE, isDownloaded);
 			if (episodeNumber >= 0)
 				cv.put(ItemColumns.EPISODE_NUMBER, episodeNumber);
 			if (chunkFilesize >= 0)
@@ -385,6 +392,8 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 				cv.put(ItemColumns.FILESIZE, filesize);
 			if (downloadReferenceID >= 0)
 				cv.put(ItemColumns.DOWNLOAD_REFERENCE, downloadReferenceID);
+			
+			cv.put(ItemColumns.IS_DOWNLOADED, isDownloaded);
 			if (episodeNumber >= 0)
 				cv.put(ItemColumns.EPISODE_NUMBER, episodeNumber);
 			if (length >= 0)
@@ -489,6 +498,10 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 				.getColumnIndex(ItemColumns.CHUNK_FILESIZE));
 		item.downloadReferenceID = cursor.getLong(cursor
 				.getColumnIndex(ItemColumns.DOWNLOAD_REFERENCE));
+		
+		int intVal = cursor.getInt(cursor.getColumnIndex(ItemColumns.IS_DOWNLOADED));
+		item.isDownloaded = intVal == 1;
+		
 		item.episodeNumber = cursor.getInt(cursor.getColumnIndex(ItemColumns.EPISODE_NUMBER));
 		item.duration = cursor.getString(cursor
 				.getColumnIndex(ItemColumns.DURATION));
@@ -590,6 +603,10 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	public String getAbsolutePath() {
 		return SDCardManager.pathFromFilename(this);
 	}
+	
+	public String getAbsoluteTmpPath() {
+		return SDCardManager.pathTmpFromFilename(this);
+	}
 
 	public void setPosition(ContentResolver contentResolver, long pos) {
 		this.offset = (int) pos;
@@ -629,6 +646,14 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		else
 			return localFilesize >= filesize && localFilesize > 0;
 	}
+	
+	/**
+	 * @param isDownloaded the isDownloaded to set
+	 */
+	public void setDownloaded(boolean isDownloaded) {
+		this.isDownloaded = isDownloaded;
+	}
+
 
 	/**
 	 * @return the duration of the mp3 (or whatever) in milliseconds.

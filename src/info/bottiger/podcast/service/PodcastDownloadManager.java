@@ -195,7 +195,7 @@ public class PodcastDownloadManager {
 			// String fileName = mDownloadingItem.getFilename();
 			// request.setDestinationInExternalFilesDir(context,
 			// downloadDir, fileName);
-			File file = new File(mDownloadingItem.getAbsolutePath());
+			File file = new File(mDownloadingItem.getAbsoluteTmpPath());
 			request.setDestinationUri(Uri.fromFile(file));
 
 			// Enqueue a new download and same the referenceId
@@ -229,6 +229,7 @@ public class PodcastDownloadManager {
 		cursor.close();
 
 	}
+
 
 	public void removeExpires(Context context) {
 		long expiredTime = System.currentTimeMillis() - pref_item_expire;
