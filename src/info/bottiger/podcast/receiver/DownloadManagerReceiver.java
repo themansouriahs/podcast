@@ -1,6 +1,7 @@
 package info.bottiger.podcast.receiver;
 
 import info.bottiger.podcast.provider.FeedItem;
+import info.bottiger.podcast.service.PodcastDownloadManager;
 
 import java.io.File;
 
@@ -39,6 +40,7 @@ public class DownloadManagerReceiver extends BroadcastReceiver {
 				int columnIndex = c
 						.getColumnIndex(DownloadManager.COLUMN_STATUS);
 				if (DownloadManager.STATUS_SUCCESSFUL == c.getInt(columnIndex)) {
+					
 					String currentLocation = c
 							.getString(c
 									.getColumnIndex(DownloadManager.COLUMN_LOCAL_FILENAME));
@@ -64,9 +66,13 @@ public class DownloadManagerReceiver extends BroadcastReceiver {
 						oldFile.renameTo(newFileName);
 
 						item.update(context.getContentResolver());
+						if (PodcastDownloadManager.getmDownloadingIDs().contains(downloadId))
+							PodcastDownloadManager.getmDownloadingIDs().remove(downloadId);
 					}
 				}
 			}
+			
+			PodcastDownloadManager.removeExpiredDownloadedPodcasts(context);
 		}
 	}
 }

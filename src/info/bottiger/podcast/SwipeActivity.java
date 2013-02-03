@@ -6,6 +6,7 @@ import info.bottiger.podcast.cloud.GoogleReader;
 import info.bottiger.podcast.debug.SqliteCopy;
 import info.bottiger.podcast.receiver.HeadsetReceiver;
 import info.bottiger.podcast.service.PlayerService;
+import info.bottiger.podcast.service.PodcastDownloadManager;
 import info.bottiger.podcast.service.PodcastService;
 import info.bottiger.podcast.utils.AddPodcastDialog;
 import info.bottiger.podcast.utils.Log;
@@ -93,27 +94,11 @@ public class SwipeActivity extends SlidingFragmentActivity implements
     
     private SharedPreferences prefs;
 
-    /*
-	protected static ServiceConnection serviceConnection = new ServiceConnection() {
-		@Override
-		public void onServiceConnected(ComponentName className, IBinder service) {
-			mPodcastServiceBinder = ((PodcastService.PodcastBinder) service)
-					.getService();
-			//mPodcastServiceBinder.start_update();
-			mBound = true;
-		}
-
-		@Override
-		public void onServiceDisconnected(ComponentName className) {
-			mPodcastServiceBinder = null;
-			mBound = false;
-		}
-	};
-	*/
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		PodcastDownloadManager.cancelAllDownloads(this);
 
 		// BugSenseHandler.initAndStartSession(SwipeActivity.this, "75981add");
 		BugSenseHandler.initAndStartSession(SwipeActivity.this,

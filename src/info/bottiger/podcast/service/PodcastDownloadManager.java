@@ -7,11 +7,11 @@ import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.utils.LockHandler;
-import info.bottiger.podcast.utils.Log;
 import info.bottiger.podcast.utils.SDCardManager;
 
 import java.io.File;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -21,6 +21,8 @@ import java.util.concurrent.TimeoutException;
 
 import android.annotation.SuppressLint;
 import android.app.DownloadManager;
+import android.app.DownloadManager.Query;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -49,6 +51,7 @@ public class PodcastDownloadManager {
 	private static PriorityQueue<FeedItem> mDownloadQueue = new PriorityQueue<FeedItem>();
 
 	private static FeedItem mDownloadingItem = null;
+	private static HashSet<Long> mDownloadingIDs = new HashSet<Long>();
 
 	private static final LockHandler mUpdateLock = new LockHandler();
 	private static int mConnectStatus = NO_CONNECT;
@@ -93,7 +96,7 @@ public class PodcastDownloadManager {
 		if (updateConnectStatus(context) == NO_CONNECT)
 			return;
 
-		//log.debug("start_update()");
+		// log.debug("start_update()");
 		if (mUpdateLock.locked() == false)
 			return;
 
@@ -183,7 +186,8 @@ public class PodcastDownloadManager {
 
 			// Enqueue a new download and same the referenceId
 			downloadReference = downloadManager.enqueue(request);
-			
+			PodcastDownloadManager.mDownloadingIDs.add(downloadReference);
+
 			mDownloadingItem.setDownloadReferenceID(downloadReference);
 			mDownloadingItem.update(context.getContentResolver());
 		}
@@ -191,97 +195,69 @@ public class PodcastDownloadManager {
 	}
 
 	/**
-	 * Write this method
+	 * Deletes the downloaded file and updates the database record
 	 * 
 	 * @param context
 	 * @param cursor
 	 */
-	private void deleteExpireFile(Context context, Cursor cursor) {
+	private static void deleteExpireFile(Context context, FeedItem item) {
 
-		if (cursor == null)
+		if (item == null)
 			return;
 
-		if (cursor.moveToFirst()) {
-			do {
-				FeedItem item = FeedItem.getByCursor(cursor);
-				if (item != null) {
-					item.delFile(context.getContentResolver());
-				}
-			} while (cursor.moveToNext());
-		}
-		cursor.close();
-
+		ContentResolver contentResolver = context.getContentResolver();
+		item.delFile(contentResolver);
 	}
 
-
-	public void removeExpires(Context context) {
-		long expiredTime = System.currentTimeMillis() - pref_item_expire;
-		try {
-			String where = ItemColumns.CREATED + "<" + expiredTime + " and "
-					+ ItemColumns.STATUS + "<"
-					+ ItemColumns.ITEM_STATUS_MAX_READING_VIEW + " and "
-					+ ItemColumns.LISTENED + "=0";
-
-			context.getContentResolver().delete(ItemColumns.URI, where, null);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	/**
+	 * Iterates through all the downloaded episodes and deletes the ones who
+	 * exceed the download limit
+	 * 
+	 * @param context
+	 * @return
+	 */
+	public static boolean removeExpiredDownloadedPodcasts(Context context) {
 
 		if (SDCardManager.getSDCardStatus() == false) {
-			return;
+			return false;
 		}
 
-		expiredTime = System.currentTimeMillis() - pref_download_file_expire;
+		SharedPreferences sharedPreferences = PreferenceManager
+				.getDefaultSharedPreferences(context);
+
+		long megabytesToKeep = sharedPreferences.getLong(
+				"pref_podcast_collection_size", 1000);
+		long bytesToKeep = megabytesToKeep * 1024 * 1024;
+
 		try {
-			String where = ItemColumns.LAST_UPDATE + "<" + expiredTime
-					+ " and " + ItemColumns.STATUS + ">"
-					+ ItemColumns.ITEM_STATUS_MAX_READING_VIEW + " and "
-					+ ItemColumns.STATUS + "<="
-					+ ItemColumns.ITEM_STATUS_PLAY_PAUSE + " and "
-					+ ItemColumns.LISTENED + "=0";
+			// Fetch all downloaded podcasts
+			String where = ItemColumns.IS_DOWNLOADED + "== 1";
+
+			// sort by nevest first
+			String sortOrder = ItemColumns.LAST_UPDATE + " DESC";
 
 			Cursor cursor = context.getContentResolver().query(ItemColumns.URI,
-					ItemColumns.ALL_COLUMNS, where, null, null);
-			deleteExpireFile(context, cursor);
+					ItemColumns.ALL_COLUMNS, where, null, sortOrder);
+
+			while (cursor.moveToNext()) {
+				// Extract data.
+				FeedItem item = FeedItem.getByCursor(cursor);
+				if (item != null) {
+					bytesToKeep = bytesToKeep - item.filesize;
+
+					// if we have exceeded our limit start deleting old items
+					if (bytesToKeep < 0) {
+						deleteExpireFile(context, item);
+					}
+				}
+			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
+			return false;
 		}
 
-		expiredTime = System.currentTimeMillis() - pref_played_file_expire;
-		try {
-			String where = ItemColumns.LAST_UPDATE + "<" + expiredTime
-					+ " and " + ItemColumns.STATUS + ">"
-					+ ItemColumns.ITEM_STATUS_PLAY_PAUSE + " and "
-					+ ItemColumns.STATUS + "<"
-					+ ItemColumns.ITEM_STATUS_MAX_PLAYLIST_VIEW + " and "
-					+ ItemColumns.LISTENED + "=0";
-
-			Cursor cursor = context.getContentResolver().query(ItemColumns.URI,
-					ItemColumns.ALL_COLUMNS, where, null, null);
-			deleteExpireFile(context, cursor);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		try {
-			String where = ItemColumns.STATUS + "="
-					+ ItemColumns.ITEM_STATUS_DELETE;
-			// DELETE status takes priority over KEEP flag
-
-			Cursor cursor = context.getContentResolver().query(ItemColumns.URI,
-					ItemColumns.ALL_COLUMNS, where, null, null);
-			deleteExpireFile(context, cursor);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		String where = ItemColumns.STATUS + "="
-				+ ItemColumns.ITEM_STATUS_DELETED;
-		context.getContentResolver().delete(ItemColumns.URI, where, null);
-
+		return true;
 	}
 
 	private static int updateConnectStatus(Context context) {
@@ -324,6 +300,13 @@ public class PodcastDownloadManager {
 	}
 
 	/**
+	 * @return the mDownloadingIDs
+	 */
+	public static HashSet<Long> getmDownloadingIDs() {
+		return mDownloadingIDs;
+	}
+
+	/**
 	 * Add feeditem to the download queue
 	 * 
 	 * @param feedItem
@@ -331,7 +314,35 @@ public class PodcastDownloadManager {
 	public static void addItemToQueue(FeedItem item) {
 		mDownloadQueue.add(item);
 	}
-	
+
+	/**
+	 * Cancel all current downloads
+	 */
+	public static void cancelAllDownloads(Context context) {
+		
+		downloadManager = (DownloadManager) context
+				.getSystemService(Context.DOWNLOAD_SERVICE);
+		
+		Query query = new Query();
+		query.setFilterByStatus(DownloadManager.STATUS_RUNNING);
+		// query.setFilterByStatus(DownloadManager.STATUS_PENDING);
+		// query.setFilterByStatus(DownloadManager.STATUS_FAILED);
+		// query.setFilterByStatus(DownloadManager.STATUS_PAUSED);
+		// query.setFilterByStatus(DownloadManager.STATUS_SUCCESSFUL);
+		Cursor cursor = downloadManager.query(query);
+
+		int counter = 0;
+		while (cursor.moveToNext()) {
+			counter++;
+			long downloadID = cursor.getLong(cursor
+					.getColumnIndex(DownloadManager.EXTRA_DOWNLOAD_ID));
+
+			downloadManager.remove(downloadID);
+
+		}
+		counter = counter + 1;
+	}
+
 	/**
 	 * Add feeditem to the download queue and start downloading at once
 	 * 

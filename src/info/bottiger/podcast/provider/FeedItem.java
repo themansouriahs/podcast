@@ -335,7 +335,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 				cv.put(ItemColumns.FILESIZE, filesize);
 			if (downloadReferenceID >= 0)
 				cv.put(ItemColumns.DOWNLOAD_REFERENCE, downloadReferenceID);
-			cv.put(ItemColumns.DOWNLOAD_REFERENCE, isDownloaded);
+			cv.put(ItemColumns.IS_DOWNLOADED, isDownloaded);
 			if (episodeNumber >= 0)
 				cv.put(ItemColumns.EPISODE_NUMBER, episodeNumber);
 			if (chunkFilesize >= 0)
@@ -351,10 +351,10 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 			if (listened >= 0)
 				cv.put(ItemColumns.LISTENED, listened);
 
-			contentResolver.update(ItemColumns.URI, cv, BaseColumns._ID + "=" + id,
+			int numUpdatedRows = contentResolver.update(ItemColumns.URI, cv, BaseColumns._ID + "=" + id,
 					null);
-
-			log.debug("update OK");
+			if (numUpdatedRows == 1)
+				log.debug("update OK");
 		} finally {
 		}
 	}
@@ -527,24 +527,30 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		return "Feed: " + title;
 	}
 
-	public void delFile(ContentResolver contentResolver) {
+	/**
+	 * Deletes the downloaded file and updates the data in the database
+	 * 
+	 * @param contentResolver
+	 * @return True of the file was deleted succesfully
+	 */
+	public boolean delFile(ContentResolver contentResolver) {
 
 		if (SDCardManager.getSDCardStatus()) {
 			try {
 				File file = new File(getAbsolutePath());
 
-				boolean deleted = true;
-				if (file.exists()) {
-					deleted = file.delete();
-				}
-				if (deleted) {
+				if (file.exists() && file.delete()) {
+					setDownloaded(false);
 					update(contentResolver);
+					return true;
 				}
 			} catch (Exception e) {
 				log.warn("del file failed : " + getAbsolutePath() + "  " + e);
 
 			}
 		}
+		
+		return false;
 
 	}
 
