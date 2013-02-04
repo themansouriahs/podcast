@@ -311,7 +311,6 @@ public class RecentItemFragment extends PodcastBaseFragment {
 	@Override
 	public void startInit() {
 		showEpisodes(getWhere());
-		super.startInit();
 	}
 
 	public void showPlayingEpisode(long playingEpisodeID) {

@@ -216,8 +216,6 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 	
 		setListAdapter(mAdapter);
 
-		super.startInit();
-
 	}
 
 	@Override

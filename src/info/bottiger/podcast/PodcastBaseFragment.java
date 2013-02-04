@@ -34,7 +34,7 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 /* Copy of PodcastBaseActivity */
-public class PodcastBaseFragment extends ListFragment {
+public abstract class PodcastBaseFragment extends ListFragment {
 
 	private static final int SWIPE_MIN_DISTANCE = 120;
 	private static final int SWIPE_MAX_OFF_PATH = 250;
@@ -175,17 +175,6 @@ public class PodcastBaseFragment extends ListFragment {
 		public void onItemSelected(long id);
 	}
 
-	/*
-	 * protected static ServiceConnection serviceConnection = new
-	 * ServiceConnection() { public void onServiceConnected(ComponentName
-	 * className, IBinder service) { mServiceBinder =
-	 * ((PodcastService.PodcastBinder) service) .getService();
-	 * mServiceBinder.start_update(); //log.debug("onServiceConnected"); }
-	 * 
-	 * public void onServiceDisconnected(ComponentName className) {
-	 * mServiceBinder = null; //log.debug("onServiceDisconnected"); } };
-	 */
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -214,22 +203,7 @@ public class PodcastBaseFragment extends ListFragment {
 
 	}
 
-	/*
-	 * @Override public void onLowMemory() { super.onLowMemory(); mInit = true;
-	 * 
-	 * log.debug("onLowMemory()"); //finish(); }
-	 */
-	public void startInit() {
-
-		/*
-		SwipeActivity.mService = getActivity().startService(
-				new Intent(getActivity(), PodcastService.class));
-
-		Intent bindIntent = new Intent(getActivity(), PodcastService.class);
-		getActivity().bindService(bindIntent, SwipeActivity.serviceConnection,
-				Context.BIND_AUTO_CREATE);
-				*/
-	}
+	abstract public void startInit();
 
 	public static final Handler mHandler = new Handler() {
 		@Override
