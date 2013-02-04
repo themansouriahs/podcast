@@ -1,4 +1,3 @@
-
 package info.bottiger.podcast.provider;
 
 import info.bottiger.podcast.BuildConfig;
@@ -27,178 +26,189 @@ import com.jakewharton.DiskLruCache;
  */
 public class DiskLruImageCache {
 
-    private DiskLruCache mDiskCache;
-    private CompressFormat mCompressFormat = CompressFormat.PNG;
-    private int mCompressQuality = 70;
-    private static final int APP_VERSION = 1;
-    private static final int VALUE_COUNT = 1;
-    private static final String TAG = "DiskLruImageCache";
+	private DiskLruCache mDiskCache;
+	private CompressFormat mCompressFormat = CompressFormat.PNG;
+	private int mCompressQuality = 70;
+	private static final int APP_VERSION = 1;
+	private static final int VALUE_COUNT = 1;
+	private static final String TAG = "DiskLruImageCache";
 
-    public DiskLruImageCache( Context context,String uniqueName, int diskCacheSize,
-        Bitmap.CompressFormat compressFormat, int quality ) {
-        try {
-                final File diskCacheDir = getDiskCacheDir(context, uniqueName );
-                mDiskCache = DiskLruCache.open( diskCacheDir, APP_VERSION, VALUE_COUNT, diskCacheSize );
-                mCompressFormat = compressFormat;
-                mCompressQuality = quality;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-    }
+	public DiskLruImageCache(Context context, String uniqueName,
+			int diskCacheSize, Bitmap.CompressFormat compressFormat, int quality) {
+		try {
+			final File diskCacheDir = getDiskCacheDir(context, uniqueName);
+			mDiskCache = DiskLruCache.open(diskCacheDir, APP_VERSION,
+					VALUE_COUNT, diskCacheSize);
+			mCompressFormat = compressFormat;
+			mCompressQuality = quality;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
-    private boolean writeBitmapToFile( Bitmap bitmap, DiskLruCache.Editor editor )
-        throws IOException, FileNotFoundException {
-        OutputStream out = null;
-        try {
-            out = new BufferedOutputStream( editor.newOutputStream( 0 ), Utils.IO_BUFFER_SIZE );
-            return bitmap.compress( mCompressFormat, mCompressQuality, out );
-        } finally {
-            if ( out != null ) {
-                out.close();
-            }
-        }
-    }
+	private boolean writeBitmapToFile(Bitmap bitmap, DiskLruCache.Editor editor)
+			throws IOException, FileNotFoundException {
+		OutputStream out = null;
+		try {
+			out = new BufferedOutputStream(editor.newOutputStream(0),
+					Utils.IO_BUFFER_SIZE);
+			return bitmap.compress(mCompressFormat, mCompressQuality, out);
+		} finally {
+			if (out != null) {
+				out.close();
+			}
+		}
+	}
 
-    private File getDiskCacheDir(Context context, String uniqueName) {
+	private File getDiskCacheDir(Context context, String uniqueName) {
 
-    // Check if media is mounted or storage is built-in, if so, try and use external cache dir
-    // otherwise use internal cache dir
-        final String cachePath =
-            Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED ||
-                    !Utils.isExternalStorageRemovable() ?
-                    Utils.getExternalCacheDir(context).getPath() :
-                    context.getCacheDir().getPath();
+		// Check if media is mounted or storage is built-in, if so, try and use
+		// external cache dir
+		// otherwise use internal cache dir
+		String cachePath = null;
+		if (Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED
+				|| !Utils.isExternalStorageRemovable())
+			cachePath = Utils.getExternalCacheDir(context).getPath();
+		else
+			cachePath = context.getCacheDir().getPath();
 
-        return new File(cachePath + File.separator + uniqueName);
-    }
+		return new File(cachePath + File.separator + uniqueName);
+	}
 
-    public void put( String key, Bitmap data ) {
+	public void put(String key, Bitmap data) {
 
-        DiskLruCache.Editor editor = null;
-        try {
-            editor = mDiskCache.edit( key );
-            if ( editor == null ) {
-                return;
-            }
+		DiskLruCache.Editor editor = null;
+		try {
+			editor = mDiskCache.edit(key);
+			if (editor == null) {
+				return;
+			}
 
-            if( writeBitmapToFile( data, editor ) ) {               
-                mDiskCache.flush();
-                editor.commit();
-                if ( BuildConfig.DEBUG ) {
-                   Log.d( "cache_test_DISK_", "image put on disk cache " + key );
-                }
-            } else {
-                editor.abort();
-                if ( BuildConfig.DEBUG ) {
-                    Log.d( "cache_test_DISK_", "ERROR on: image put on disk cache " + key );
-                }
-            }   
-        } catch (IOException e) {
-            if ( BuildConfig.DEBUG ) {
-                Log.d( "cache_test_DISK_", "ERROR on: image put on disk cache " + key );
-            }
-            try {
-                if ( editor != null ) {
-                    editor.abort();
-                }
-            } catch (IOException ignored) {
-            }           
-        }
+			if (writeBitmapToFile(data, editor)) {
+				mDiskCache.flush();
+				editor.commit();
+				if (BuildConfig.DEBUG) {
+					Log.d("cache_test_DISK_", "image put on disk cache " + key);
+				}
+			} else {
+				editor.abort();
+				if (BuildConfig.DEBUG) {
+					Log.d("cache_test_DISK_",
+							"ERROR on: image put on disk cache " + key);
+				}
+			}
+		} catch (IOException e) {
+			if (BuildConfig.DEBUG) {
+				Log.d("cache_test_DISK_", "ERROR on: image put on disk cache "
+						+ key);
+			}
+			try {
+				if (editor != null) {
+					editor.abort();
+				}
+			} catch (IOException ignored) {
+			}
+		}
 
-    }
+	}
 
-    public Bitmap getBitmap( String key ) {
+	public Bitmap getBitmap(String key) {
 
-        Bitmap bitmap = null;
-        DiskLruCache.Snapshot snapshot = null;
-        try {
+		Bitmap bitmap = null;
+		DiskLruCache.Snapshot snapshot = null;
+		try {
 
-            snapshot = mDiskCache.get( key );
-            if ( snapshot == null ) {
-                return null;
-            }
-            final InputStream in = snapshot.getInputStream( 0 );
-            if ( in != null ) {
-                final BufferedInputStream buffIn = 
-                new BufferedInputStream( in, Utils.IO_BUFFER_SIZE );
-                bitmap = BitmapFactory.decodeStream( buffIn );              
-            }   
-        } catch ( IOException e ) {
-            e.printStackTrace();
-        } finally {
-            if ( snapshot != null ) {
-                snapshot.close();
-            }
-        }
+			snapshot = mDiskCache.get(key);
+			if (snapshot == null) {
+				return null;
+			}
+			final InputStream in = snapshot.getInputStream(0);
+			if (in != null) {
+				final BufferedInputStream buffIn = new BufferedInputStream(in,
+						Utils.IO_BUFFER_SIZE);
+				bitmap = BitmapFactory.decodeStream(buffIn);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (snapshot != null) {
+				snapshot.close();
+			}
+		}
 
-        if ( BuildConfig.DEBUG ) {
-            Log.d( "cache_test_DISK_", bitmap == null ? "" : "image read from disk " + key);
-        }
+		if (BuildConfig.DEBUG) {
+			Log.d("cache_test_DISK_", bitmap == null ? ""
+					: "image read from disk " + key);
+		}
 
-        return bitmap;
+		return bitmap;
 
-    }
+	}
 
-    public boolean containsKey( String key ) {
+	public boolean containsKey(String key) {
 
-        boolean contained = false;
-        DiskLruCache.Snapshot snapshot = null;
-        try {
-            snapshot = mDiskCache.get( key );
-            contained = snapshot != null;
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if ( snapshot != null ) {
-                snapshot.close();
-            }
-        }
+		boolean contained = false;
+		DiskLruCache.Snapshot snapshot = null;
+		try {
+			snapshot = mDiskCache.get(key);
+			contained = snapshot != null;
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (snapshot != null) {
+				snapshot.close();
+			}
+		}
 
-        return contained;
+		return contained;
 
-    }
+	}
 
-    public void clearCache() {
-        if ( BuildConfig.DEBUG ) {
-            Log.d( "cache_test_DISK_", "disk cache CLEARED");
-        }
-        try {
-            mDiskCache.delete();
-        } catch ( IOException e ) {
-            e.printStackTrace();
-        }
-    }
+	public void clearCache() {
+		if (BuildConfig.DEBUG) {
+			Log.d("cache_test_DISK_", "disk cache CLEARED");
+		}
+		try {
+			mDiskCache.delete();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
-    public File getCacheFolder() {
-        return mDiskCache.getDirectory();
-    }
-    
-    static class Utils {
-        public static final int IO_BUFFER_SIZE = 8 * 1024;
+	public File getCacheFolder() {
+		return mDiskCache.getDirectory();
+	}
 
-        private Utils() {};
+	static class Utils {
+		public static final int IO_BUFFER_SIZE = 8 * 1024;
 
-        public static boolean isExternalStorageRemovable() {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-                return Environment.isExternalStorageRemovable();
-            }
-            return true;
-        }
+		private Utils() {
+		};
 
-        public static File getExternalCacheDir(Context context) {
-            if (hasExternalCacheDir()) {
-                return context.getExternalCacheDir();
-            }
+		public static boolean isExternalStorageRemovable() {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
+				return Environment.isExternalStorageRemovable();
+			}
+			return true;
+		}
 
-            // Before Froyo we need to construct the external cache dir ourselves
-            final String cacheDir = "/Android/data/" + context.getPackageName() + "/cache/";
-            return new File(Environment.getExternalStorageDirectory().getPath() + cacheDir);
-        }
+		public static File getExternalCacheDir(Context context) {
+			if (hasExternalCacheDir()) {
+				return context.getExternalCacheDir();
+			}
 
-        public static boolean hasExternalCacheDir() {
-            return Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO;
-        }
+			// Before Froyo we need to construct the external cache dir
+			// ourselves
+			final String cacheDir = "/Android/data/" + context.getPackageName()
+					+ "/cache/";
+			return new File(Environment.getExternalStorageDirectory().getPath()
+					+ cacheDir);
+		}
 
-    }
+		public static boolean hasExternalCacheDir() {
+			return Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO;
+		}
+
+	}
 
 }

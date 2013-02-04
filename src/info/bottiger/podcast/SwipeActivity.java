@@ -102,8 +102,8 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 		BugSenseHandler.initAndStartSession(SwipeActivity.this,
 				((SoundWaves) this.getApplication()).getBugSenseAPIKey());
 		if (debugging) {
-			//PodcastDownloadManager.cancelAllDownloads(this);
-			Debug.startMethodTracing("calc");
+			//Tracing is buggy on emulator
+			//Debug.startMethodTracing("calc");
 
 			try {
 				SqliteCopy.backupDatabase();

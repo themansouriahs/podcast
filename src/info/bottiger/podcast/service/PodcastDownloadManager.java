@@ -402,8 +402,13 @@ public class PodcastDownloadManager {
 				PullToRefreshListView pullToRefreshView) {
 			mContext = context;
 			mRefreshView = pullToRefreshView;
-			subscriptionDownloader = SwipeActivity.gReader
-					.getSubscriptionsFromReader();
+			subscriptionDownloader = null;
+
+			// FIXME this only works if there is an google account present
+			if (SwipeActivity.gReader != null) {
+				subscriptionDownloader = SwipeActivity.gReader
+						.getSubscriptionsFromReader();
+			}
 		}
 
 		@Override
@@ -444,7 +449,8 @@ public class PodcastDownloadManager {
 
 		protected void onPreExecute() {
 			try {
-				subscriptionDownloader.get(1, TimeUnit.MINUTES);
+				if (subscriptionDownloader != null)
+					subscriptionDownloader.get(1, TimeUnit.MINUTES);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			} catch (ExecutionException e) {

@@ -222,7 +222,7 @@ public class Subscription implements WithIcon {
 		
 		Subscription sub_test = Subscription.getByUrl(context.getContentResolver(),
 				url);
-		if (sub_test != null)
+		if (sub_test != null && SwipeActivity.gReader != null)
 			SwipeActivity.gReader.addSubscriptiontoReader(context, SwipeActivity.mAccount,sub_test);
 
 		return ADD_SUCCESS;
