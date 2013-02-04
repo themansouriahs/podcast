@@ -2,6 +2,7 @@ package info.bottiger.podcast.receiver;
 
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.service.PodcastDownloadManager;
+import info.bottiger.podcast.utils.SDCardManager;
 
 import java.io.File;
 
@@ -69,6 +70,29 @@ public class DownloadManagerReceiver extends BroadcastReceiver {
 						item.update(context.getContentResolver());
 						if (PodcastDownloadManager.getmDownloadingIDs().contains(downloadId))
 							PodcastDownloadManager.getmDownloadingIDs().remove(downloadId);
+						
+						/*
+						 * If no more files are being downloaded we purge the tmp dir.
+						 * Things might build up here if downloads are aborted for various reasons. 
+						 */
+						if (PodcastDownloadManager.getmDownloadingIDs().size() == 0) {
+							File directory = new File(SDCardManager.getTmpDir());
+
+							// Get all files in directory
+
+							File[] files = directory.listFiles();
+							for (File file : files)
+							{
+							   // Delete each file
+
+							   if (!file.delete())
+							   {
+							       // Failed to delete file
+
+							       System.out.println("Failed to delete "+file);
+							   }
+							} 
+						}
 					}
 				}
 			}
