@@ -192,11 +192,14 @@ public class PlayerActivity extends ListActivity {
 		long position = playerService != null ? playerService.position() : 0;
 		long secondary;
 
-		if (item.isDownloaded())
-			secondary = item.getCurrentFileSize();
-		else
-			secondary = (playerService.bufferProgress() * duration) / 100;
-		setProgressBar(progressBar, duration, position, secondary);
+		// FIXME - just added this check to avoid a crash
+		if (item != null) {
+			if (item.isDownloaded())
+				secondary = item.getCurrentFileSize();
+			else
+				secondary = (playerService.bufferProgress() * duration) / 100;
+			setProgressBar(progressBar, duration, position, secondary);
+		}
 	}
 
 	public static void setProgressBar(SeekBar progressBar, FeedItem item) {
@@ -297,7 +300,7 @@ public class PlayerActivity extends ListActivity {
 		public void onClick(View v) {
 			try {
 				if (mServiceBinder != null && mServiceBinder.isInitialized()) {
-					//mServiceBinder.next();
+					// mServiceBinder.next();
 
 				}
 			} catch (Exception ex) {
@@ -321,7 +324,7 @@ public class PlayerActivity extends ListActivity {
 					if (mServiceBinder.position() > 5000)
 						mServiceBinder.seek(0);
 					else {
-						//mServiceBinder.prev();
+						// mServiceBinder.prev();
 					}
 				}
 			} catch (Exception ex) {

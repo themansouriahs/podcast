@@ -97,13 +97,12 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		//PodcastDownloadManager.cancelAllDownloads(this);
 
 		// BugSenseHandler.initAndStartSession(SwipeActivity.this, "75981add");
 		BugSenseHandler.initAndStartSession(SwipeActivity.this,
 				((SoundWaves) this.getApplication()).getBugSenseAPIKey());
 		if (debugging) {
+			//PodcastDownloadManager.cancelAllDownloads(this);
 			Debug.startMethodTracing("calc");
 
 			try {
@@ -168,12 +167,20 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 		// Set up the ViewPager with the sections adapter.
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
-
+		/*
+	}
+	
+	public void onActivityCreated(Bundle savedInstanceState) {
+		*/
+		if (debugging) {
+				PodcastDownloadManager.cancelAllDownloads(this.getApplicationContext());
+		}
+		
 		try {
 			Account[] a = AccountManager.get(getApplicationContext())
 					.getAccountsByType("com.google");
 			SwipeActivity.mAccount = a[0];
-			gReader = new GoogleReader(SwipeActivity.this, mAccount,
+			gReader = new GoogleReader(this, mAccount,
 					((SoundWaves) this.getApplication())
 							.getGoogleReaderConsumerKey());
 			if (a.length > 0) {
@@ -183,12 +190,6 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-	}
-	
-	
-	protected void onActivityCreated(Bundle savedInstanceState) {
-
 	}
 
 	@Override

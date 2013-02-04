@@ -12,6 +12,7 @@ import info.bottiger.podcast.utils.SDCardManager;
 import java.io.File;
 import java.net.URL;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -225,13 +226,13 @@ public class PodcastDownloadManager {
 		SharedPreferences sharedPreferences = PreferenceManager
 				.getDefaultSharedPreferences(context);
 
-		long megabytesToKeep = sharedPreferences.getLong(
+		long megabytesToKeep = (long) sharedPreferences.getInt(
 				"pref_podcast_collection_size", 1000);
 		long bytesToKeep = megabytesToKeep * 1024 * 1024;
 
 		try {
 			// Fetch all downloaded podcasts
-			String where = ItemColumns.IS_DOWNLOADED + "== 1";
+			String where = ItemColumns.IS_DOWNLOADED + "==1";
 
 			// sort by nevest first
 			String sortOrder = ItemColumns.LAST_UPDATE + " DESC";
@@ -239,7 +240,9 @@ public class PodcastDownloadManager {
 			Cursor cursor = context.getContentResolver().query(ItemColumns.URI,
 					ItemColumns.ALL_COLUMNS, where, null, sortOrder);
 
-			while (cursor.moveToNext()) {
+			LinkedList<String> filesToKeep = new LinkedList<String>();
+			cursor.moveToFirst();
+			while (cursor.isAfterLast() == false) {
 				// Extract data.
 				FeedItem item = FeedItem.getByCursor(cursor);
 				if (item != null) {
@@ -248,6 +251,22 @@ public class PodcastDownloadManager {
 					// if we have exceeded our limit start deleting old items
 					if (bytesToKeep < 0) {
 						deleteExpireFile(context, item);
+					} else {
+						filesToKeep.add(item.getFilename());
+					}
+
+					cursor.moveToNext();
+				}
+
+				// Delete the remaining files which are not indexed in the
+				// database
+				// Duplicated code from DownloadManagerReceiver
+				File directory = new File(SDCardManager.getDownloadDir());
+				File[] files = directory.listFiles();
+				for (File file : files) {
+					if (!filesToKeep.contains(file.getName())) {
+						// Delete each file
+						file.delete();
 					}
 				}
 			}
@@ -319,32 +338,31 @@ public class PodcastDownloadManager {
 	 * Cancel all current downloads
 	 */
 	public static void cancelAllDownloads(Context context) {
-		
+
 		downloadManager = (DownloadManager) context
 				.getSystemService(Context.DOWNLOAD_SERVICE);
-		
+
 		Query query = new Query();
-		query.setFilterByStatus(DownloadManager.STATUS_RUNNING);
-		query.setFilterByStatus(DownloadManager.STATUS_PENDING);
-		query.setFilterByStatus(DownloadManager.STATUS_FAILED);
-		query.setFilterByStatus(DownloadManager.STATUS_PAUSED);
-		query.setFilterByStatus(DownloadManager.STATUS_SUCCESSFUL);
+		query.setFilterByStatus(DownloadManager.STATUS_RUNNING
+				| DownloadManager.STATUS_PENDING
+				| DownloadManager.STATUS_FAILED | DownloadManager.STATUS_PAUSED
+				| DownloadManager.STATUS_SUCCESSFUL);
 		Cursor cursor = downloadManager.query(query);
 
 		int counter = 0;
-		
-		cursor.moveToFirst();
-		do {
-			counter++;
-			int cursorIndex = cursor
-					.getColumnIndex(DownloadManager.COLUMN_ID);
-			Long downloadID = cursor.getLong(cursorIndex);
-			
 
-			downloadManager.remove(downloadID);
+		if (cursor.moveToFirst()) {
+			do {
+				counter++;
+				int cursorIndex = cursor
+						.getColumnIndex(DownloadManager.COLUMN_ID);
+				Long downloadID = cursor.getLong(cursorIndex);
 
-		} while(cursor.moveToNext());
-		
+				downloadManager.remove(downloadID);
+
+			} while (cursor.moveToNext());
+		}
+
 		counter = counter + 1;
 	}
 
