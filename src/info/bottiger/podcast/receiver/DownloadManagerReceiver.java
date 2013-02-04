@@ -57,7 +57,8 @@ public class DownloadManagerReceiver extends BroadcastReceiver {
 						String filename = Integer.toString(item
 								.getEpisodeNumber())
 								+ "_"
-								+ item.title.replace(' ', '_');
+								+ item.title.replace(' ', '_')
+								+ ".mp3";
 						item.setFilename(filename);
 
 						// Rename the file
