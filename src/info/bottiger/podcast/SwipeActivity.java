@@ -98,7 +98,7 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		PodcastDownloadManager.cancelAllDownloads(this);
+		//PodcastDownloadManager.cancelAllDownloads(this);
 
 		// BugSenseHandler.initAndStartSession(SwipeActivity.this, "75981add");
 		BugSenseHandler.initAndStartSession(SwipeActivity.this,

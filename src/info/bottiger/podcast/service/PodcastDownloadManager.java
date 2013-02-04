@@ -333,12 +333,12 @@ public class PodcastDownloadManager {
 
 		int counter = 0;
 		
+		cursor.moveToFirst();
 		do {
 			counter++;
 			int cursorIndex = cursor
 					.getColumnIndex(DownloadManager.COLUMN_ID);
-			String stringDownloadID = cursor.getString(cursorIndex);
-			int downloadID = Integer.parseInt(stringDownloadID);
+			Long downloadID = cursor.getLong(cursorIndex);
 			
 
 			downloadManager.remove(downloadID);
