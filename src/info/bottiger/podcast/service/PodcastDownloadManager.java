@@ -325,21 +325,26 @@ public class PodcastDownloadManager {
 		
 		Query query = new Query();
 		query.setFilterByStatus(DownloadManager.STATUS_RUNNING);
-		// query.setFilterByStatus(DownloadManager.STATUS_PENDING);
-		// query.setFilterByStatus(DownloadManager.STATUS_FAILED);
-		// query.setFilterByStatus(DownloadManager.STATUS_PAUSED);
-		// query.setFilterByStatus(DownloadManager.STATUS_SUCCESSFUL);
+		query.setFilterByStatus(DownloadManager.STATUS_PENDING);
+		query.setFilterByStatus(DownloadManager.STATUS_FAILED);
+		query.setFilterByStatus(DownloadManager.STATUS_PAUSED);
+		query.setFilterByStatus(DownloadManager.STATUS_SUCCESSFUL);
 		Cursor cursor = downloadManager.query(query);
 
 		int counter = 0;
-		while (cursor.moveToNext()) {
+		
+		do {
 			counter++;
-			long downloadID = cursor.getLong(cursor
-					.getColumnIndex(DownloadManager.EXTRA_DOWNLOAD_ID));
+			int cursorIndex = cursor
+					.getColumnIndex(DownloadManager.COLUMN_ID);
+			String stringDownloadID = cursor.getString(cursorIndex);
+			int downloadID = Integer.parseInt(stringDownloadID);
+			
 
 			downloadManager.remove(downloadID);
 
-		}
+		} while(cursor.moveToNext());
+		
 		counter = counter + 1;
 	}
 
