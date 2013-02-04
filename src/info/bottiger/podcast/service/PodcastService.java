@@ -167,23 +167,41 @@ public class PodcastService extends IntentService {
 	public FeedItem getDownloadingItem() {
 		return pdm.getDownloadingItem();
 	}
-
 	
-	public static void setAlarm(Context context) {
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        int minutes = prefs.getInt("interval", 60);
-        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        Intent i = new Intent(context, PodcastService.class);
+	/**
+	 * Creates and intent to be executed when the alarm goes of.
+	 * 
+	 * @param context
+	 * @return The intent to be executed when the alarm fires
+	 */
+	private static PendingIntent getAlarmIntent(Context context) {
+		Intent i = new Intent(context, PodcastService.class);
         Bundle bundle = new Bundle();
         bundle.putString("store", "Activity1");
         i.putExtra("b", bundle);
-        PendingIntent pi = PendingIntent.getService(context, 0, i, 0);
+        return PendingIntent.getService(context, 0, i, 0);	
+	}
+
+	
+	/**
+	 * Schedules a podcast refresh every X minutes. Where X is defined by the user in the settings.
+	 * 
+	 * @param context
+	 */
+	public static void setAlarm(Context context) {
+		// Refresh interval
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        long minutes = prefs.getLong("interval", 60);
+        long milliSeconds = minutes*60*1000;
+        
+        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        PendingIntent pi = getAlarmIntent(context);
         am.cancel(pi);
         // by my own convention, minutes <= 0 means notifications are disabled
-        if (minutes > 0) {
+        if (milliSeconds > 0) {
             am.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                SystemClock.elapsedRealtime() + minutes*60*1000,
-                minutes*60*1000, pi);
+                SystemClock.elapsedRealtime() + milliSeconds,
+                milliSeconds, pi);
         }
 	}
 	
