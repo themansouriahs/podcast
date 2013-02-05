@@ -92,15 +92,25 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 	private AudioManager mAudioManager;
     private ComponentName mRemoteControlResponder;
     
-    private SharedPreferences prefs;
+    private SharedPreferences preferences;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		// BugSenseHandler.initAndStartSession(SwipeActivity.this, "75981add");
+		// Start bugsense in order to catpture exceptions
 		BugSenseHandler.initAndStartSession(SwipeActivity.this,
 				((SoundWaves) this.getApplication()).getBugSenseAPIKey());
+		
+		
+		preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		if (preferences.getBoolean("first_run", true) || true) {
+			preferences.edit().putBoolean("first_run", false).commit();
+			Intent intent = new Intent(this, WelcomeActivity.class);
+			startActivity(intent);
+		}
+		
+		
 		if (debugging) {
 			//Tracing is buggy on emulator
 			//Debug.startMethodTracing("calc");

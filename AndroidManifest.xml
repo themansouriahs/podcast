@@ -52,6 +52,15 @@
                 android:value=".SwipeActivity" />
         </activity>
         <activity
+            android:name=".WelcomeActivity"
+            android:label="test" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".SwipeActivity" />
+        </activity>
+
+        <!-- May or may not be deprecated -->
+        <activity
             android:name="info.bottiger.podcast.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
@@ -122,8 +131,7 @@
                 </action>
             </intent-filter>
         </receiver>
-        <receiver
-            android:name=".receiver.DownloadManagerReceiver">
+        <receiver android:name=".receiver.DownloadManagerReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
             </intent-filter>
