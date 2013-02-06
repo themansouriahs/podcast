@@ -76,7 +76,12 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	/**
 	 * Duration as String hh:mm:ss or mm:ss 02:23:34
 	 */
-	public String duration;
+	public String duration_string;
+	
+	/**
+	 * Duration in milliseconds
+	 */
+	public long duration_ms;
 
 	/**
 	 * URL to relevant episode image
@@ -282,7 +287,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		date = null;
 		content = null;
 		resource = null;
-		duration = null;
+		duration_string = null;
 		filename = null;
 		uri = null;
 		type = null;
@@ -300,6 +305,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		downloadReferenceID = -1;
 		episodeNumber = -1;
 		isDownloaded = false;
+		duration_ms = -1;
 
 		created = -1;
 		sub_title = null;
@@ -340,6 +346,8 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 				cv.put(ItemColumns.EPISODE_NUMBER, episodeNumber);
 			if (chunkFilesize >= 0)
 				cv.put(ItemColumns.LENGTH, length);
+			if (duration_ms >= 0)
+				cv.put(ItemColumns.DURATION_MS, duration_ms);
 			if (chunkFilesize >= 0)
 				cv.put(ItemColumns.CHUNK_FILESIZE, chunkFilesize);
 			if (offset >= 0)
@@ -398,9 +406,12 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 				cv.put(ItemColumns.EPISODE_NUMBER, episodeNumber);
 			if (length >= 0)
 				cv.put(ItemColumns.LENGTH, length);
-			if (duration != null) {
+			if (duration_string != null) {
 				// Log.w("ITEM","  duration: " + duration);
-				cv.put(ItemColumns.DURATION, duration);
+				cv.put(ItemColumns.DURATION, duration_string);
+			}
+			if (duration_ms > 0) {
+				cv.put(ItemColumns.DURATION_MS, duration_ms);
 			}
 			if (sub_title != null) {
 				cv.put(ItemColumns.SUB_TITLE, sub_title);
@@ -503,8 +514,10 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		item.isDownloaded = intVal == 1;
 		
 		item.episodeNumber = cursor.getInt(cursor.getColumnIndex(ItemColumns.EPISODE_NUMBER));
-		item.duration = cursor.getString(cursor
+		item.duration_string = cursor.getString(cursor
 				.getColumnIndex(ItemColumns.DURATION));
+		item.duration_ms = cursor.getLong(cursor
+				.getColumnIndex(ItemColumns.DURATION_MS));
 		item.update = cursor.getLong(cursor
 				.getColumnIndex(ItemColumns.LAST_UPDATE));
 		item.sub_title = cursor.getString(cursor
@@ -540,6 +553,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 				File file = new File(getAbsolutePath());
 
 				if (file.exists() && file.delete()) {
+					downloadReferenceID = -1;
 					setDownloaded(false);
 					update(contentResolver);
 					return true;
@@ -639,7 +653,10 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	}
 
 	public boolean isDownloaded() {
+		
+		return this.isDownloaded;
 		/* refactor when it works */
+		/*
 		String path = getAbsolutePath();
 		if (path == null || path == "")
 			return false;
@@ -651,6 +668,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 			return localFilesize > 0;
 		else
 			return localFilesize >= filesize && localFilesize > 0;
+			*/
 	}
 	
 	/**
@@ -665,6 +683,13 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	 * @return the duration of the mp3 (or whatever) in milliseconds.
 	 */
 	public long getDuration() {
+		if (duration_ms > 0) {
+			if ("".equals(duration_string)) {
+				duration_ms = StrUtils.parseTimeToSeconds(duration_string);
+			}
+			return duration_ms;
+		}
+			
 		if (isDownloaded()) {
 			MediaMetadataRetriever retriever = new MediaMetadataRetriever();
 			try {
@@ -677,12 +702,12 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 					.parseLong(retriever
 							.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
 		} else {
-			if (this.duration.equals(""))
+			if (this.duration_string.equals(""))
 				return this.length;
 			else {
 				// String offsetString = StrUtils.getTimeFromOffset(this.offset,
 				// this.length, this.duration);
-				return StrUtils.parseTimeToSeconds(duration);
+				return StrUtils.parseTimeToSeconds(duration_string);
 			}
 		}
 	}

@@ -151,7 +151,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 					PodcastDownloadManager.addItemToQueue(feedItem);
 			}
 			PodcastDownloadManager pdm = new PodcastDownloadManager();
-			pdm.startDownload(true, this.getActivity());
+			pdm.startDownload( this.getActivity());
 			return true;
 		}
 		}

@@ -74,8 +74,9 @@ public class PodcastDownloadManager {
 		if (mDownloadQueue.contains(item))
 			return DownloadStatus.PENDING;
 
-		if (mDownloadingItem != null)
-			if (item.equals(mDownloadingItem))
+		FeedItem downloadingItem = getDownloadingItem();
+		if (downloadingItem != null)
+			if (item.equals(downloadingItem))
 				return DownloadStatus.DOWNLOADING;
 
 		if (item.isDownloaded()) {
@@ -110,38 +111,24 @@ public class PodcastDownloadManager {
 	 * @param show
 	 * @param context
 	 */
-	public static void startDownload(final Context context) {
-		startDownload(false, context);
-	}
-
 	@SuppressLint("NewApi")
-	@Deprecated
-	public static void startDownload(boolean show, final Context context) {
+	public static void startDownload(final Context context) {
+
 		SharedPreferences sharedPreferences = PreferenceManager
 				.getDefaultSharedPreferences(context);
 
 		if (SDCardManager.getSDCardStatusAndCreate() == false) {
-
-			if (show)
-				Toast.makeText(
-						context,
-						context.getResources()
-								.getString(R.string.sdcard_unmout),
-						Toast.LENGTH_LONG).show();
 			return;
 		}
 
 		if (updateConnectStatus(context) == NO_CONNECT) {
-			if (show)
-				Toast.makeText(context,
-						context.getResources().getString(R.string.no_connect),
-						Toast.LENGTH_LONG).show();
 			return;
 		}
 
 		downloadManager = (DownloadManager) context
 				.getSystemService(Context.DOWNLOAD_SERVICE);
-		while (mDownloadQueue.size() > 0) {
+		
+		if (getDownloadingItem() == null && mDownloadQueue.size() > 0) {
 			mDownloadingItem = getNextItem();
 			Uri downloadURI = Uri.parse(mDownloadingItem.url);
 			DownloadManager.Request request = new DownloadManager.Request(
@@ -211,53 +198,74 @@ public class PodcastDownloadManager {
 	}
 
 	/**
+	 * Removes all the expired downloads async
+	 */
+	public static void removeExpiredDownloadedPodcasts(Context context) {
+		new removeExpiredDownloadedPodcastsTask(context).execute();
+	}
+	
+	/**
 	 * Iterates through all the downloaded episodes and deletes the ones who
 	 * exceed the download limit
+	 * Runs with minimum priority
 	 * 
 	 * @param context
-	 * @return
+	 * @return Void
 	 */
-	public static boolean removeExpiredDownloadedPodcasts(Context context) {
-
-		if (SDCardManager.getSDCardStatus() == false) {
-			return false;
+	private static class removeExpiredDownloadedPodcastsTask extends AsyncTask<Void, Integer, Void> {
+		
+		Context mContext = null;
+		
+		public removeExpiredDownloadedPodcastsTask(Context context) {
+			mContext = context;
 		}
+		
+	    // Do the long-running work in here
+	    protected Void doInBackground(Void... params) {
+	    	Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+	    	
+			if (SDCardManager.getSDCardStatus() == false) {
+				return null;
+			}
 
-		SharedPreferences sharedPreferences = PreferenceManager
-				.getDefaultSharedPreferences(context);
+			SharedPreferences sharedPreferences = PreferenceManager
+					.getDefaultSharedPreferences(mContext);
 
-		long megabytesToKeep = (long) sharedPreferences.getInt(
-				"pref_podcast_collection_size", 1000);
-		long bytesToKeep = megabytesToKeep * 1024 * 1024;
+			String megabytesToKeepAsString = sharedPreferences.getString(
+					"pref_podcast_collection_size", "1000");
+			
+			long megabytesToKeep = Long.parseLong(megabytesToKeepAsString);
+			long bytesToKeep = megabytesToKeep * 1024 * 1024;
 
-		try {
-			// Fetch all downloaded podcasts
-			String where = ItemColumns.IS_DOWNLOADED + "==1";
+			try {
+				// Fetch all downloaded podcasts
+				String where = ItemColumns.IS_DOWNLOADED + "==1";
 
-			// sort by nevest first
-			String sortOrder = ItemColumns.LAST_UPDATE + " DESC";
+				// sort by nevest first
+				String sortOrder = ItemColumns.LAST_UPDATE + " DESC";
 
-			Cursor cursor = context.getContentResolver().query(ItemColumns.URI,
-					ItemColumns.ALL_COLUMNS, where, null, sortOrder);
+				Cursor cursor = mContext.getContentResolver().query(ItemColumns.URI,
+						ItemColumns.ALL_COLUMNS, where, null, sortOrder);
 
-			LinkedList<String> filesToKeep = new LinkedList<String>();
-			cursor.moveToFirst();
-			while (cursor.isAfterLast() == false) {
-				// Extract data.
-				FeedItem item = FeedItem.getByCursor(cursor);
-				if (item != null) {
-					bytesToKeep = bytesToKeep - item.filesize;
+				LinkedList<String> filesToKeep = new LinkedList<String>();
+				cursor.moveToFirst();
+				while (cursor.isAfterLast() == false) {
+					// Extract data.
+					FeedItem item = FeedItem.getByCursor(cursor);
+					if (item != null) {
+						bytesToKeep = bytesToKeep - item.filesize;
 
-					// if we have exceeded our limit start deleting old items
-					if (bytesToKeep < 0) {
-						deleteExpireFile(context, item);
-					} else {
-						filesToKeep.add(item.getFilename());
+						// if we have exceeded our limit start deleting old items
+						if (bytesToKeep < 0) {
+							deleteExpireFile(mContext, item);
+						} else {
+							filesToKeep.add(item.getFilename());
+						}
+
+						cursor.moveToNext();
 					}
-
-					cursor.moveToNext();
 				}
-
+				
 				// Delete the remaining files which are not indexed in the
 				// database
 				// Duplicated code from DownloadManagerReceiver
@@ -269,14 +277,13 @@ public class PodcastDownloadManager {
 						file.delete();
 					}
 				}
+
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
+			return null;
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		return true;
+	    }
 	}
 
 	private static int updateConnectStatus(Context context) {
@@ -312,6 +319,12 @@ public class PodcastDownloadManager {
 
 	public static FeedItem getDownloadingItem() {
 		return mDownloadingItem;
+	}
+	
+	public static void notifyDownloadComplete(FeedItem completedItem) {
+		assert completedItem != null;
+		if (completedItem.equals(mDownloadingItem))
+				mDownloadingItem = null;
 	}
 
 	private static FeedItem getNextItem() {

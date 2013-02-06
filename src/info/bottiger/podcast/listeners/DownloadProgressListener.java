@@ -20,8 +20,8 @@ public class DownloadProgressListener {
 	/**
 	 * How often the UI should refresh
 	 */
-	private static long REFRESH_INTERVAL = TimeUnit.SECONDS.convert(1,
-			TimeUnit.MILLISECONDS);
+	private static long REFRESH_INTERVAL = TimeUnit.MILLISECONDS.convert(1,
+			TimeUnit.SECONDS);
 
 	private static HashMap<TextView, TextViewProgress> mTextViews = new HashMap<TextView, TextViewProgress>();
 	private static TextViewProgress mTextViewProgress;
@@ -42,6 +42,7 @@ public class DownloadProgressListener {
 			case REFRESH:
 				for (TextViewProgress textViewProgress: mTextViews.values())
 					textViewProgress.updateTextViewProgress();
+					refreshUI();
 				break;
 			}
 		}
@@ -66,9 +67,7 @@ public class DownloadProgressListener {
 		// If mTextViews doesn't contain any elements we should start the update
 		// process
 		if (mTextViews.size() == 0) {
-			mHandler.removeMessages(REFRESH);
-			Message msg = mHandler.obtainMessage(REFRESH);
-			mHandler.sendMessageDelayed(msg, REFRESH_INTERVAL);
+			refreshUI();
 		}
 
 		mTextViews.put(textView, mTextViewProgress);
@@ -80,6 +79,9 @@ public class DownloadProgressListener {
 	 * @param textView
 	 */
 	public static boolean unregisterTextView(TextView textView, FeedItem item) {
+		if (textView == null || item == null)
+			return false;
+		
 		mTextViewProgress = new TextViewProgress(textView, item);
 		boolean isRemoved = false;
 		
@@ -95,6 +97,15 @@ public class DownloadProgressListener {
 
 		return isRemoved;
 	}
+	
+	/**
+	 * Refrersh the UI handler
+	 */
+	private static void refreshUI() {
+		mHandler.removeMessages(REFRESH);
+		Message msg = mHandler.obtainMessage(REFRESH);
+		mHandler.sendMessageDelayed(msg, REFRESH_INTERVAL);
+	}
 
 	/**
 	 * Private class containing the relation between a textView and an episode
@@ -109,6 +120,9 @@ public class DownloadProgressListener {
 
 		public TextViewProgress(TextView mTextView, FeedItem item) {
 			super();
+			assert mTextView != null;
+			assert item != null;
+			
 			this.mTextView = mTextView;
 			this.mItem = item;
 		}
@@ -127,8 +141,6 @@ public class DownloadProgressListener {
 		 * Writes the currentstatus of the FeedItem with the giving ID to the
 		 * textView argument
 		 * 
-		 * @param itemID
-		 * @param textView
 		 * @param downloadStatus
 		 */
 		private String getStatus() {
@@ -139,7 +151,7 @@ public class DownloadProgressListener {
 				statusText = "waiting";
 				break;
 			case DOWNLOADING:
-				statusText = getProgress();
+				statusText = "Downloading: " + getProgress();
 				break;
 			case DONE:
 				statusText = "Done";
@@ -159,7 +171,7 @@ public class DownloadProgressListener {
 		 * @return download status in percent
 		 */
 		private String getProgress() {
-			int percent = 0;
+			long percent = 0;
 			
 			//FIXME This is run one time for each textview. It should only be run once with all the reference ID's
 			Query query = new Query();
@@ -171,8 +183,8 @@ public class DownloadProgressListener {
 			    int cursorBytesSoFarIndex = c.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR);
 			    int cursorBytesTotalIndex =  c.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES);
 			    
-			    int bytesSoFar = c.getInt(cursorBytesSoFarIndex);
-			    int bytesTotal = c.getInt(cursorBytesTotalIndex);
+			    long bytesSoFar = (long)c.getInt(cursorBytesSoFarIndex);
+			    long bytesTotal = (long)c.getInt(cursorBytesTotalIndex);
 			    
 			    percent = bytesSoFar*100/bytesTotal;
 			    
