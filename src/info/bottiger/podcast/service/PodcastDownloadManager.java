@@ -264,17 +264,17 @@ public class PodcastDownloadManager {
 
 						cursor.moveToNext();
 					}
-
-					// Delete the remaining files which are not indexed in the
-					// database
-					// Duplicated code from DownloadManagerReceiver
-					File directory = new File(SDCardManager.getDownloadDir());
-					File[] files = directory.listFiles();
-					for (File file : files) {
-						if (!filesToKeep.contains(file.getName())) {
-							// Delete each file
-							file.delete();
-						}
+				}
+				
+				// Delete the remaining files which are not indexed in the
+				// database
+				// Duplicated code from DownloadManagerReceiver
+				File directory = new File(SDCardManager.getDownloadDir());
+				File[] files = directory.listFiles();
+				for (File file : files) {
+					if (!filesToKeep.contains(file.getName())) {
+						// Delete each file
+						file.delete();
 					}
 				}
 
