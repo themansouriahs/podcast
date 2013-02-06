@@ -211,72 +211,90 @@ public class PodcastDownloadManager {
 	}
 
 	/**
+	 * Removes all the expired downloads async
+	 */
+	public static void removeExpiredDownloadedPodcasts(Context context) {
+		new removeExpiredDownloadedPodcastsTask(context).execute();
+	}
+	
+	/**
 	 * Iterates through all the downloaded episodes and deletes the ones who
 	 * exceed the download limit
+	 * Runs with minimum priority
 	 * 
 	 * @param context
-	 * @return
+	 * @return Void
 	 */
-	public static boolean removeExpiredDownloadedPodcasts(Context context) {
-
-		if (SDCardManager.getSDCardStatus() == false) {
-			return false;
+	private static class removeExpiredDownloadedPodcastsTask extends AsyncTask<Void, Integer, Void> {
+		
+		Context mContext = null;
+		
+		public removeExpiredDownloadedPodcastsTask(Context context) {
+			mContext = context;
 		}
-
-		SharedPreferences sharedPreferences = PreferenceManager
-				.getDefaultSharedPreferences(context);
-
-		long megabytesToKeep = (long) sharedPreferences.getInt(
-				"pref_podcast_collection_size", 1000);
-		long bytesToKeep = megabytesToKeep * 1024 * 1024;
-
-		try {
-			// Fetch all downloaded podcasts
-			String where = ItemColumns.IS_DOWNLOADED + "==1";
-
-			// sort by nevest first
-			String sortOrder = ItemColumns.LAST_UPDATE + " DESC";
-
-			Cursor cursor = context.getContentResolver().query(ItemColumns.URI,
-					ItemColumns.ALL_COLUMNS, where, null, sortOrder);
-
-			LinkedList<String> filesToKeep = new LinkedList<String>();
-			cursor.moveToFirst();
-			while (cursor.isAfterLast() == false) {
-				// Extract data.
-				FeedItem item = FeedItem.getByCursor(cursor);
-				if (item != null) {
-					bytesToKeep = bytesToKeep - item.filesize;
-
-					// if we have exceeded our limit start deleting old items
-					if (bytesToKeep < 0) {
-						deleteExpireFile(context, item);
-					} else {
-						filesToKeep.add(item.getFilename());
-					}
-
-					cursor.moveToNext();
-				}
-
-				// Delete the remaining files which are not indexed in the
-				// database
-				// Duplicated code from DownloadManagerReceiver
-				File directory = new File(SDCardManager.getDownloadDir());
-				File[] files = directory.listFiles();
-				for (File file : files) {
-					if (!filesToKeep.contains(file.getName())) {
-						// Delete each file
-						file.delete();
-					}
-				}
+		
+	    // Do the long-running work in here
+	    protected Void doInBackground(Void... params) {
+	    	Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+	    	
+			if (SDCardManager.getSDCardStatus() == false) {
+				return null;
 			}
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
+			SharedPreferences sharedPreferences = PreferenceManager
+					.getDefaultSharedPreferences(mContext);
 
-		return true;
+			long megabytesToKeep = (long) sharedPreferences.getInt(
+					"pref_podcast_collection_size", 1000);
+			long bytesToKeep = megabytesToKeep * 1024 * 1024;
+
+			try {
+				// Fetch all downloaded podcasts
+				String where = ItemColumns.IS_DOWNLOADED + "==1";
+
+				// sort by nevest first
+				String sortOrder = ItemColumns.LAST_UPDATE + " DESC";
+
+				Cursor cursor = mContext.getContentResolver().query(ItemColumns.URI,
+						ItemColumns.ALL_COLUMNS, where, null, sortOrder);
+
+				LinkedList<String> filesToKeep = new LinkedList<String>();
+				cursor.moveToFirst();
+				while (cursor.isAfterLast() == false) {
+					// Extract data.
+					FeedItem item = FeedItem.getByCursor(cursor);
+					if (item != null) {
+						bytesToKeep = bytesToKeep - item.filesize;
+
+						// if we have exceeded our limit start deleting old items
+						if (bytesToKeep < 0) {
+							deleteExpireFile(mContext, item);
+						} else {
+							filesToKeep.add(item.getFilename());
+						}
+
+						cursor.moveToNext();
+					}
+
+					// Delete the remaining files which are not indexed in the
+					// database
+					// Duplicated code from DownloadManagerReceiver
+					File directory = new File(SDCardManager.getDownloadDir());
+					File[] files = directory.listFiles();
+					for (File file : files) {
+						if (!filesToKeep.contains(file.getName())) {
+							// Delete each file
+							file.delete();
+						}
+					}
+				}
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return null;
+
+	    }
 	}
 
 	private static int updateConnectStatus(Context context) {

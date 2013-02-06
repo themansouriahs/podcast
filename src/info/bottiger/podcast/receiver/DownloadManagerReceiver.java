@@ -1,6 +1,8 @@
 package info.bottiger.podcast.receiver;
 
+import info.bottiger.podcast.provider.BitmapProvider;
 import info.bottiger.podcast.provider.FeedItem;
+import info.bottiger.podcast.provider.WithIcon;
 import info.bottiger.podcast.service.PodcastDownloadManager;
 import info.bottiger.podcast.utils.SDCardManager;
 
@@ -61,6 +63,14 @@ public class DownloadManagerReceiver extends BroadcastReceiver {
 								+ item.title.replace(' ', '_')
 								+ ".mp3";
 						item.setFilename(filename);
+						
+						/* Calculate the imagePath */
+						String imageURL = null;
+						if (item != null) {
+							imageURL = new BitmapProvider(context, item)
+									.getThumbnailPath();
+							item.image = imageURL;
+						}
 
 						// Rename the file
 						File oldFile = new File(currentLocation);

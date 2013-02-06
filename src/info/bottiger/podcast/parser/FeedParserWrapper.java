@@ -133,9 +133,12 @@ public class FeedParserWrapper {
 
 					if (time != null)
 						item.date = dt.format(time);
-					if (duration != null)
-						item.duration = StrUtils
-								.formatTime(duration.intValue() * 1000);
+					if (duration != null) {
+						item.duration_ms = duration.intValue() * 1000;
+						item.duration_string = StrUtils
+								.formatTime(item.duration_ms);
+					}
+						
 					if (filesize != null)
 						item.filesize = filesize.intValue();
 					if (episodeNumber != null)

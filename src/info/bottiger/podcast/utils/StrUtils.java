@@ -20,7 +20,7 @@ public class StrUtils {
     		return "00:00";
     	long duration = item.getDuration();
     	float progress = (float)item.offset / ((float)duration);
-    	return formatTime(progress, item.duration);
+    	return formatTime(progress, item.duration_string);
     }
     
     

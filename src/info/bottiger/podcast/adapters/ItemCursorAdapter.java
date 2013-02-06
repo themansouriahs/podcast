@@ -342,11 +342,11 @@ public class ItemCursorAdapter extends AbstractPodcastAdapter {
 
 			if (item.getDuration() > 0) {
 
-				timeDuration.setText(item.duration);
+				timeDuration.setText(item.duration_string);
 
 				if (item.offset > 0 && filesize > 0) {
 					String offsetText = StrUtils.formatTime((float) item.offset
-							/ (float) filesize, item.duration);
+							/ (float) filesize, item.duration_string);
 					currentPosition.setText(offsetText);
 					slash.setText("/");
 					slash.setVisibility(View.VISIBLE);
@@ -356,17 +356,20 @@ public class ItemCursorAdapter extends AbstractPodcastAdapter {
 				}
 			}
 
+			
 			/* Calculate the imagePath */
+			/*
 			String imageURL = null;
 			if (item != null || sub != null) {
 				WithIcon iconItem = item != null ? item : sub;
 				imageURL = new BitmapProvider(context, iconItem)
 						.getThumbnailPath();
 			}
+			*/
 
-			if (imageURL != null && !imageURL.equals("")) {
+			if (item.image != null && !item.image.equals("")) {
 				ImageLoader imageLoader = getImageLoader(context);
-				imageLoader.displayImage(imageURL, icon);
+				imageLoader.displayImage(item.image, icon);
 			}
 
 		}
