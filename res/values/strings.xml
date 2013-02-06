@@ -137,11 +137,9 @@
     <string name="pref_cloud_support_title">Enable Cloud Support</string>
     <string name="pref_cloud_support_description">Cloud support will backup your data to the cloud and synchronize data between your devices</string>
     <string name="title_activity_notification_receiver">NotificationReceiverActivity</string>
-    <string name="welcome_body_1">Thank you for trying out SoundWaves!\n
-        I am truly doing my best in order to create the best possible podcasting app for you.\n
+    <string name="welcome_body_1">Privacy is boring but important!\n
+        Therefore we have disabled some otherwise very useful, like cloud support, features as default.\n
         \n
-However, in order to get the best possible experience I highly recommend you spend 30 seconds answering a few questions in order to configure the most common settings\n
-\n
-If not you can always change everything later in the settings menu.</string>
+        Please spend 15  seconds reviewing what features you would like to use.</string>
 
 </resources>
