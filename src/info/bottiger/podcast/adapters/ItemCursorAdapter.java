@@ -3,6 +3,7 @@ package info.bottiger.podcast.adapters;
 import info.bottiger.podcast.PlayerActivity;
 import info.bottiger.podcast.PodcastBaseFragment;
 import info.bottiger.podcast.R;
+import info.bottiger.podcast.listeners.DownloadProgressListener;
 import info.bottiger.podcast.provider.BitmapProvider;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
@@ -324,9 +325,12 @@ public class ItemCursorAdapter extends AbstractPodcastAdapter {
 		DownloadStatus ds;
 		if (item != null) {
 			// FeedItem.getById(context.getContentResolver(), id)
-			ds = PodcastDownloadManager.getStatus(item);
-			FilesizeUpdater.put(mContext, item.getId(), fileSize);
-			writeStatus(item.getId(), fileSize, ds);
+			
+			
+			//ds = PodcastDownloadManager.getStatus(item);
+			//FilesizeUpdater.put(mContext, item.getId(), fileSize);
+			//writeStatus(item.getId(), fileSize, ds);
+			DownloadProgressListener.registerTextView(context, fileSize, item);
 
 			int filesize = 0;
 
@@ -426,36 +430,6 @@ public class ItemCursorAdapter extends AbstractPodcastAdapter {
 	public int getItemViewType(int position) {
 		return mExpandedItemID.contains(itemID(position)) ? TYPE_EXPAND
 				: TYPE_COLLAPS;
-	}
-
-	/**
-	 * Writes the currentstatus of the FeedItem with the giving ID to the
-	 * textView argument
-	 * 
-	 * @param itemID
-	 * @param textView
-	 * @param downloadStatus
-	 */
-	private void writeStatus(long itemID, TextView textView,
-			DownloadStatus downloadStatus) {
-		String statusText = "";
-		switch (downloadStatus) {
-		case PENDING:
-			statusText = "waiting";
-			break;
-		case DOWNLOADING:
-			statusText = "downloading";
-			break;
-		case DONE:
-			statusText = "Done";
-			break;
-		case ERROR:
-			statusText = "Error";
-			break;
-		default:
-			statusText = "";
-		}
-		textView.setText(statusText);
 	}
 
 	/**
