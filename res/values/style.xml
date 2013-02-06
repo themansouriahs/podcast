@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Text">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">#FFF</item>
+    </style>
+
+    <style name="HeaderText" parent="@style/Text">
+        <item name="android:textSize">32sp</item>
+        <item name="android:padding">10sp</item>
+    </style>
+
+</resources>

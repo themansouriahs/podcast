@@ -88,10 +88,8 @@
     <string name="pref_update_wifi_description">Download new episodes automatically when the feeds are refreshed</string>
     <string name="pref_download_on_update_title">Automatic download</string>
     <string name="pref_download_on_update_description">Set up automatic update interval time</string>
-    
     <string name="pref_update_time_title">Update at</string>
     <string name="pref_update_time_description">In addition to periodic updating the feeds can be updated every night/morning at a given time</string>
-    
     <string name="pref_update_mobile_title">Update interval though 3G</string>
     <string name="pref_item_expire_description">Setup the automatic expiration time of the undownload items</string>
     <string name="pref_item_expire_title">Undownload item expire in</string>
@@ -139,5 +137,11 @@
     <string name="pref_cloud_support_title">Enable Cloud Support</string>
     <string name="pref_cloud_support_description">Cloud support will backup your data to the cloud and synchronize data between your devices</string>
     <string name="title_activity_notification_receiver">NotificationReceiverActivity</string>
+    <string name="welcome_body_1">Thank you for trying out SoundWaves!\n
+        I am truly doing my best in order to create the best possible podcasting app for you.\n
+        \n
+However, in order to get the best possible experience I highly recommend you spend 30 seconds answering a few questions in order to configure the most common settings\n
+\n
+If not you can always change everything later in the settings menu.</string>
 
 </resources>

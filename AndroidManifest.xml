@@ -52,7 +52,7 @@
                 android:value=".SwipeActivity" />
         </activity>
         <activity
-            android:name=".WelcomeActivity"
+            android:name=".ui.welcome.WelcomeActivity"
             android:label="test" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

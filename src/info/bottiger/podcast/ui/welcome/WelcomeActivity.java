@@ -1,6 +1,9 @@
-package info.bottiger.podcast;
+package info.bottiger.podcast.ui.welcome;
 
-import info.bottiger.podcast.adapters.TestFragmentAdapter;
+import info.bottiger.podcast.R;
+import info.bottiger.podcast.R.id;
+import info.bottiger.podcast.R.layout;
+import info.bottiger.podcast.R.menu;
 
 import java.util.Random;
 
@@ -18,7 +21,7 @@ public class WelcomeActivity extends FragmentActivity {
 	
     private static final Random RANDOM = new Random();
 
-    TestFragmentAdapter mAdapter;
+    WelcomeFragmentAdapter mAdapter;
     ViewPager mPager;
     PageIndicator mIndicator;
 
@@ -60,7 +63,7 @@ public class WelcomeActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.simple_circles);
 
-        mAdapter = new TestFragmentAdapter(getSupportFragmentManager());
+        mAdapter = new WelcomeFragmentAdapter(getSupportFragmentManager());
 
         mPager = (ViewPager)findViewById(R.id.pager);
         mPager.setAdapter(mAdapter);

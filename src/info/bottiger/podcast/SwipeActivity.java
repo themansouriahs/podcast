@@ -8,6 +8,7 @@ import info.bottiger.podcast.receiver.HeadsetReceiver;
 import info.bottiger.podcast.service.PlayerService;
 import info.bottiger.podcast.service.PodcastDownloadManager;
 import info.bottiger.podcast.service.PodcastService;
+import info.bottiger.podcast.ui.welcome.WelcomeActivity;
 import info.bottiger.podcast.utils.AddPodcastDialog;
 import info.bottiger.podcast.utils.Log;
 
