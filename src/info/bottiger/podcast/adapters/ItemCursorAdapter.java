@@ -356,17 +356,6 @@ public class ItemCursorAdapter extends AbstractPodcastAdapter {
 				}
 			}
 
-			
-			/* Calculate the imagePath */
-			/*
-			String imageURL = null;
-			if (item != null || sub != null) {
-				WithIcon iconItem = item != null ? item : sub;
-				imageURL = new BitmapProvider(context, iconItem)
-						.getThumbnailPath();
-			}
-			*/
-
 			if (item.image != null && !item.image.equals("")) {
 				ImageLoader imageLoader = getImageLoader(context);
 				imageLoader.displayImage(item.image, icon);

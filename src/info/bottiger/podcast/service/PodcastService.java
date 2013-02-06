@@ -105,7 +105,7 @@ public class PodcastService extends IntentService {
 	}
 
 	public void start_download() {
-		pdm.startDownload(true, getBaseContext());
+		pdm.startDownload(getBaseContext());
 	}
 
 	public static void start_update(Context context, PullToRefreshListView pullToRefreshView) {
@@ -160,7 +160,7 @@ public class PodcastService extends IntentService {
 	public void downloadItem(ContentResolver context, FeedItem item) {
 		item.prepareDownload(context);
 		PodcastDownloadManager.addItemToQueue(item);
-		pdm.startDownload(true, getBaseContext());
+		pdm.startDownload(getBaseContext());
 	}
 
 

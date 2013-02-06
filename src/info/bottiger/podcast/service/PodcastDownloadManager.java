@@ -74,8 +74,9 @@ public class PodcastDownloadManager {
 		if (mDownloadQueue.contains(item))
 			return DownloadStatus.PENDING;
 
-		if (mDownloadingItem != null)
-			if (item.equals(mDownloadingItem))
+		FeedItem downloadingItem = getDownloadingItem();
+		if (downloadingItem != null)
+			if (item.equals(downloadingItem))
 				return DownloadStatus.DOWNLOADING;
 
 		if (item.isDownloaded()) {
@@ -110,38 +111,24 @@ public class PodcastDownloadManager {
 	 * @param show
 	 * @param context
 	 */
-	public static void startDownload(final Context context) {
-		startDownload(false, context);
-	}
-
 	@SuppressLint("NewApi")
-	@Deprecated
-	public static void startDownload(boolean show, final Context context) {
+	public static void startDownload(final Context context) {
+
 		SharedPreferences sharedPreferences = PreferenceManager
 				.getDefaultSharedPreferences(context);
 
 		if (SDCardManager.getSDCardStatusAndCreate() == false) {
-
-			if (show)
-				Toast.makeText(
-						context,
-						context.getResources()
-								.getString(R.string.sdcard_unmout),
-						Toast.LENGTH_LONG).show();
 			return;
 		}
 
 		if (updateConnectStatus(context) == NO_CONNECT) {
-			if (show)
-				Toast.makeText(context,
-						context.getResources().getString(R.string.no_connect),
-						Toast.LENGTH_LONG).show();
 			return;
 		}
 
 		downloadManager = (DownloadManager) context
 				.getSystemService(Context.DOWNLOAD_SERVICE);
-		while (mDownloadQueue.size() > 0) {
+		
+		if (getDownloadingItem() == null && mDownloadQueue.size() > 0) {
 			mDownloadingItem = getNextItem();
 			Uri downloadURI = Uri.parse(mDownloadingItem.url);
 			DownloadManager.Request request = new DownloadManager.Request(
@@ -330,6 +317,12 @@ public class PodcastDownloadManager {
 
 	public static FeedItem getDownloadingItem() {
 		return mDownloadingItem;
+	}
+	
+	public static void notifyDownloadComplete(FeedItem completedItem) {
+		assert completedItem != null;
+		if (completedItem.equals(mDownloadingItem))
+				mDownloadingItem = null;
 	}
 
 	private static FeedItem getNextItem() {

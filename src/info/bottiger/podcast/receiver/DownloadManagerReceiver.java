@@ -42,72 +42,77 @@ public class DownloadManagerReceiver extends BroadcastReceiver {
 			if (c.moveToFirst()) {
 				int columnIndex = c
 						.getColumnIndex(DownloadManager.COLUMN_STATUS);
-				if (DownloadManager.STATUS_SUCCESSFUL == c.getInt(columnIndex)) {
-					
-					String currentLocation = c
-							.getString(c
-									.getColumnIndex(DownloadManager.COLUMN_LOCAL_FILENAME));
 
-					FeedItem item = FeedItem.getByDownloadReference(
-							context.getContentResolver(), downloadId);
+				FeedItem item = FeedItem.getByDownloadReference(
+						context.getContentResolver(), downloadId);
 
-					if (item != null) {
-						item.setDownloaded(true);
-						item.filesize = c
-								.getInt(c
-										.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
-
-						String filename = Integer.toString(item
-								.getEpisodeNumber())
-								+ "_"
-								+ item.title.replace(' ', '_')
-								+ ".mp3";
-						item.setFilename(filename);
-						
-						/* Calculate the imagePath */
-						String imageURL = null;
-						if (item != null) {
-							imageURL = new BitmapProvider(context, item)
-									.getThumbnailPath();
-							item.image = imageURL;
-						}
-
-						// Rename the file
-						File oldFile = new File(currentLocation);
-						File newFileName = new File(item.getAbsolutePath());
-						oldFile.renameTo(newFileName);
-
-						item.update(context.getContentResolver());
-						if (PodcastDownloadManager.getmDownloadingIDs().contains(downloadId))
-							PodcastDownloadManager.getmDownloadingIDs().remove(downloadId);
-						
-						/*
-						 * If no more files are being downloaded we purge the tmp dir.
-						 * Things might build up here if downloads are aborted for various reasons. 
-						 */
-						if (PodcastDownloadManager.getmDownloadingIDs().size() == 0) {
-							File directory = new File(SDCardManager.getTmpDir());
-
-							// Get all files in directory
-
-							File[] files = directory.listFiles();
-							for (File file : files)
-							{
-							   // Delete each file
-
-							   if (!file.delete())
-							   {
-							       // Failed to delete file
-
-							       System.out.println("Failed to delete "+file);
-							   }
-							} 
-						}
+				if (item != null) {
+					if (DownloadManager.STATUS_SUCCESSFUL == c
+							.getInt(columnIndex)) {
+						updateFeedItemIfSuccessful(c, item, downloadId, context);
+					} else {
+						item.setDownloaded(false);
 					}
+					item.update(context.getContentResolver());
+				}
+				
+				// Start next download
+				PodcastDownloadManager.notifyDownloadComplete(item);
+				PodcastDownloadManager.startDownload(context);
+			}
+
+			PodcastDownloadManager.removeExpiredDownloadedPodcasts(context);
+		}
+	}
+
+	private void updateFeedItemIfSuccessful(Cursor c, FeedItem item,
+			long downloadId, Context context) {
+
+		String currentLocation = c.getString(c
+				.getColumnIndex(DownloadManager.COLUMN_LOCAL_FILENAME));
+
+		item.setDownloaded(true);
+		item.filesize = c.getInt(c
+				.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+
+		String filename = Integer.toString(item.getEpisodeNumber()) + "_"
+				+ item.title.replace(' ', '_') + ".mp3";
+		item.setFilename(filename);
+
+		/* Calculate the imagePath */
+		String imageURL = null;
+		if (item != null) {
+			imageURL = new BitmapProvider(context, item).getThumbnailPath();
+			item.image = imageURL;
+		}
+
+		// Rename the file
+		File oldFile = new File(currentLocation);
+		File newFileName = new File(item.getAbsolutePath());
+		oldFile.renameTo(newFileName);
+
+		if (PodcastDownloadManager.getmDownloadingIDs().contains(downloadId))
+			PodcastDownloadManager.getmDownloadingIDs().remove(downloadId);
+
+		/*
+		 * If no more files are being downloaded we purge the tmp dir. Things
+		 * might build up here if downloads are aborted for various reasons.
+		 */
+		if (PodcastDownloadManager.getmDownloadingIDs().size() == 0) {
+			File directory = new File(SDCardManager.getTmpDir());
+
+			// Get all files in directory
+
+			File[] files = directory.listFiles();
+			for (File file : files) {
+				// Delete each file
+
+				if (!file.delete()) {
+					// Failed to delete file
+
+					System.out.println("Failed to delete " + file);
 				}
 			}
-			
-			PodcastDownloadManager.removeExpiredDownloadedPodcasts(context);
 		}
 	}
 }

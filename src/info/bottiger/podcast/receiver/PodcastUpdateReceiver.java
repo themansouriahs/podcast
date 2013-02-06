@@ -33,7 +33,7 @@ public class PodcastUpdateReceiver extends BroadcastReceiver {
         PodcastDownloadManager pdm = new PodcastDownloadManager();
 		pdm.start_update(context);
 		pdm.removeExpiredDownloadedPodcasts(context);
-		pdm.startDownload(false, context);
+		pdm.startDownload(context);
 
         wl.release();
     }

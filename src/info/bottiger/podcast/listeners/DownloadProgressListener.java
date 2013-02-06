@@ -171,7 +171,7 @@ public class DownloadProgressListener {
 		 * @return download status in percent
 		 */
 		private String getProgress() {
-			int percent = 0;
+			long percent = 0;
 			
 			//FIXME This is run one time for each textview. It should only be run once with all the reference ID's
 			Query query = new Query();
@@ -183,8 +183,8 @@ public class DownloadProgressListener {
 			    int cursorBytesSoFarIndex = c.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR);
 			    int cursorBytesTotalIndex =  c.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES);
 			    
-			    int bytesSoFar = c.getInt(cursorBytesSoFarIndex);
-			    int bytesTotal = c.getInt(cursorBytesTotalIndex);
+			    long bytesSoFar = (long)c.getInt(cursorBytesSoFarIndex);
+			    long bytesTotal = (long)c.getInt(cursorBytesTotalIndex);
 			    
 			    percent = bytesSoFar*100/bytesTotal;
 			    
