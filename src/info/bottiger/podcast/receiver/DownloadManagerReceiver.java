@@ -54,11 +54,11 @@ public class DownloadManagerReceiver extends BroadcastReceiver {
 						item.setDownloaded(false);
 					}
 					item.update(context.getContentResolver());
+					
+					// Start next download
+					PodcastDownloadManager.notifyDownloadComplete(item);
+					PodcastDownloadManager.startDownload(context);
 				}
-				
-				// Start next download
-				PodcastDownloadManager.notifyDownloadComplete(item);
-				PodcastDownloadManager.startDownload(context);
 			}
 
 			PodcastDownloadManager.removeExpiredDownloadedPodcasts(context);

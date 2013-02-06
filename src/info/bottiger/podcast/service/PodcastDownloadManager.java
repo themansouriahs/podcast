@@ -231,8 +231,10 @@ public class PodcastDownloadManager {
 			SharedPreferences sharedPreferences = PreferenceManager
 					.getDefaultSharedPreferences(mContext);
 
-			long megabytesToKeep = (long) sharedPreferences.getInt(
-					"pref_podcast_collection_size", 1000);
+			String megabytesToKeepAsString = sharedPreferences.getString(
+					"pref_podcast_collection_size", "1000");
+			
+			long megabytesToKeep = Long.parseLong(megabytesToKeepAsString);
 			long bytesToKeep = megabytesToKeep * 1024 * 1024;
 
 			try {

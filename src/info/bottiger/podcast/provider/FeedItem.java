@@ -553,6 +553,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 				File file = new File(getAbsolutePath());
 
 				if (file.exists() && file.delete()) {
+					downloadReferenceID = -1;
 					setDownloaded(false);
 					update(contentResolver);
 					return true;
