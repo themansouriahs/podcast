@@ -151,7 +151,7 @@ public class DownloadProgressListener {
 				statusText = "waiting";
 				break;
 			case DOWNLOADING:
-				statusText = getProgress();
+				statusText = "Downloading: " + getProgress();
 				break;
 			case DONE:
 				statusText = "Done";
