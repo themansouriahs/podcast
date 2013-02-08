@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeSet;
 
+import android.app.DownloadManager;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.BaseColumns;
@@ -31,18 +32,10 @@ import android.view.ViewStub;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
-import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
-import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiscCache;
-import com.nostra13.universalimageloader.cache.disc.naming.HashCodeFileNameGenerator;
-import com.nostra13.universalimageloader.cache.memory.impl.UsingFreqLimitedMemoryCache;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
-import com.nostra13.universalimageloader.core.download.URLConnectionImageDownloader;
+
 
 public class ItemCursorAdapter extends AbstractPodcastAdapter {
 
@@ -275,9 +268,15 @@ public class ItemCursorAdapter extends AbstractPodcastAdapter {
 			//ds = PodcastDownloadManager.getStatus(item);
 			//FilesizeUpdater.put(mContext, item.getId(), fileSize);
 			//writeStatus(item.getId(), fileSize, ds);
+			
+			
 			DownloadProgressListener.registerTextView(context, fileSize, item);
 
 			int filesize = 0;
+			
+			DownloadManager downloadManager = (DownloadManager) mContext
+					.getSystemService(Context.DOWNLOAD_SERVICE);
+			fileSize.setText(item.getStatus(downloadManager));
 
 			if (item.title != null)
 				mainTitle.setText(item.title);

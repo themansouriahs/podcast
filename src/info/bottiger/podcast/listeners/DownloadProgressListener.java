@@ -133,66 +133,10 @@ public class DownloadProgressListener {
 		 * @return whether the view was updated successfully  
 		 */
 		public boolean updateTextViewProgress() {
-			mTextView.setText(getStatus());
+			mTextView.setText(mItem.getStatus(mDownloadManager));
 			return false;
 		}
 		
-		/**
-		 * Writes the currentstatus of the FeedItem with the giving ID to the
-		 * textView argument
-		 * 
-		 * @param downloadStatus
-		 */
-		private String getStatus() {
-			DownloadStatus downloadStatus = PodcastDownloadManager.getStatus(mItem);
-			String statusText = "";
-			switch (downloadStatus) {
-			case PENDING:
-				statusText = "waiting";
-				break;
-			case DOWNLOADING:
-				statusText = "Downloading: " + getProgress();
-				break;
-			case DONE:
-				statusText = "Done";
-				break;
-			case ERROR:
-				statusText = "Error";
-				break;
-			default:
-				statusText = "";
-			}
-			return statusText;
-		}
-		
-		/**
-		 * Get the current download progress as a String.
-		 * 
-		 * @return download status in percent
-		 */
-		private String getProgress() {
-			long percent = 0;
-			
-			//FIXME This is run one time for each textview. It should only be run once with all the reference ID's
-			Query query = new Query();
-			query.setFilterById(mItem.getDownloadReferenceID());
-			Cursor c = mDownloadManager.query(query);
-			c.moveToFirst();
-			while (c.isAfterLast() == false) 
-			{
-			    int cursorBytesSoFarIndex = c.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR);
-			    int cursorBytesTotalIndex =  c.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES);
-			    
-			    long bytesSoFar = (long)c.getInt(cursorBytesSoFarIndex);
-			    long bytesTotal = (long)c.getInt(cursorBytesTotalIndex);
-			    
-			    percent = bytesSoFar*100/bytesTotal;
-			    
-			    c.moveToNext();
-			}
-			
-			return percent + "%";
-		}
 
 	}
 

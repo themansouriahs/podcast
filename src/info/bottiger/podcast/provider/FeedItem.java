@@ -1,5 +1,7 @@
 package info.bottiger.podcast.provider;
 
+import info.bottiger.podcast.service.DownloadStatus;
+import info.bottiger.podcast.service.PodcastDownloadManager;
 import info.bottiger.podcast.utils.Log;
 import info.bottiger.podcast.utils.SDCardManager;
 import info.bottiger.podcast.utils.StrUtils;
@@ -13,6 +15,8 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 import android.app.Activity;
+import android.app.DownloadManager;
+import android.app.DownloadManager.Query;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -538,6 +542,64 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	@Override
 	public String toString() {
 		return "Feed: " + title;
+	}
+	
+	/**
+	 * Writes the currentstatus of the FeedItem with the giving ID to the
+	 * textView argument
+	 * 
+	 * @param downloadStatus
+	 */
+	public String getStatus(DownloadManager downloadManager) {
+		DownloadStatus downloadStatus = PodcastDownloadManager.getStatus(this);
+		String statusText = "";
+		switch (downloadStatus) {
+		case PENDING:
+			statusText = "waiting";
+			break;
+		case DOWNLOADING:
+			statusText = "Downloading: " + getProgress(downloadManager);
+			break;
+		case DONE:
+			statusText = "Done";
+			break;
+		case ERROR:
+			statusText = "Error";
+			break;
+		default:
+			statusText = "";
+		}
+		return statusText;
+	}
+	
+	/**
+	 * Get the current download progress as a String.
+	 * 
+	 * @return download status in percent
+	 */
+	private String getProgress(DownloadManager downloadManager) {
+		assert downloadManager != null;
+		long percent = 0;
+		
+		//FIXME This is run one time for each textview. It should only be run once with all the reference ID's
+		Query query = new Query();
+		query.setFilterById(getDownloadReferenceID());
+		Cursor c = downloadManager.query(query);
+		c.moveToFirst();
+		while (c.isAfterLast() == false) 
+		{
+		    int cursorBytesSoFarIndex = c.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR);
+		    int cursorBytesTotalIndex =  c.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES);
+		    
+		    long bytesSoFar = (long)c.getInt(cursorBytesSoFarIndex);
+		    long bytesTotal = (long)c.getInt(cursorBytesTotalIndex);
+		    
+		    percent = bytesSoFar*100/bytesTotal;
+		    
+		    c.moveToNext();
+		}
+		
+		return percent + "%";
 	}
 
 	/**
