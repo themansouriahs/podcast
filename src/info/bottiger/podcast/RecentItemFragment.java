@@ -165,7 +165,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 				new ItemCursorAdapter.IconFieldHandler(mIconMap),
 		// new IconCursorAdapter.IconFieldHandler(mKeepIconMap)
 		};
-		return new ItemCursorAdapter(context, fragment, R.layout.list_item,
+		return new ItemCursorAdapter(context, fragment, R.layout.episode_list,
 				cursor, new String[] { ItemColumns.TITLE,
 						ItemColumns.SUB_TITLE, ItemColumns.DURATION,
 						ItemColumns.IMAGE_URL }, new int[] { R.id.title,
@@ -178,7 +178,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 				ItemCursorAdapter.defaultTextFieldHandler,
 				new ItemCursorAdapter.IconFieldHandler(mIconMap),
 				new ItemCursorAdapter.IconFieldHandler(mKeepIconMap) };
-		return new ItemCursorAdapter(context, R.layout.channel_list_item,
+		return new ItemCursorAdapter(context, R.layout.subscription_list,
 				cursor, new String[] { ItemColumns.TITLE, ItemColumns.STATUS,
 						ItemColumns.LISTENED }, new int[] { R.id.text1,
 						R.id.icon, R.id.actionbar_compat }, fields);

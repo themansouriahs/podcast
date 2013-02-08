@@ -1,7 +1,7 @@
 package info.bottiger.podcast;
 
 import info.bottiger.podcast.adapters.AbstractPodcastAdapter;
-import info.bottiger.podcast.adapters.SubscriptionCursorAdapter;
+import info.bottiger.podcast.adapters.SubscriptionListCursorAdapter;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.Subscription;
@@ -141,12 +141,12 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 	}
 
 	
-	private static SubscriptionCursorAdapter listSubscriptionCursorAdapter(Context context, Cursor cursor) {
-		SubscriptionCursorAdapter.FieldHandler[] fields = {
+	private static SubscriptionListCursorAdapter listSubscriptionCursorAdapter(Context context, Cursor cursor) {
+		SubscriptionListCursorAdapter.FieldHandler[] fields = {
 				AbstractPodcastAdapter.defaultTextFieldHandler,
-				new SubscriptionCursorAdapter.IconFieldHandler()
+				new SubscriptionListCursorAdapter.IconFieldHandler()
 		};
-		return new SubscriptionCursorAdapter(context, R.layout.list_item, cursor,
+		return new SubscriptionListCursorAdapter(context, R.layout.episode_list, cursor,
 				new String[] { SubscriptionColumns.TITLE, SubscriptionColumns.IMAGE_URL },
 				new int[] { R.id.title, R.id.list_image },
 				fields);

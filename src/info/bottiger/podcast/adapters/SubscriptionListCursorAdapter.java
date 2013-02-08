@@ -12,20 +12,20 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class SubscriptionCursorAdapter extends AbstractPodcastAdapter {
+public class SubscriptionListCursorAdapter extends AbstractPodcastAdapter {
 
-	public SubscriptionCursorAdapter(Context context, int layout, Cursor c,
+	public SubscriptionListCursorAdapter(Context context, int layout, Cursor c,
 			String[] from, int[] to) {
 		super(context, layout, c, from, to);
 	}
 	
-	public SubscriptionCursorAdapter(
+	public SubscriptionListCursorAdapter(
 			Context context,
 			int listItem,
 			Cursor cursor,
 			String[] strings,
 			int[] is,
-			info.bottiger.podcast.adapters.SubscriptionCursorAdapter.FieldHandler[] fields) {
+			SubscriptionListCursorAdapter.FieldHandler[] fields) {
 		super(context, listItem, cursor, strings, is, fields);
 		
 		mContext = context;
@@ -58,7 +58,7 @@ public class SubscriptionCursorAdapter extends AbstractPodcastAdapter {
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {
 
-		View view = mInflater.inflate(R.layout.list_item, null);
+		View view = mInflater.inflate(R.layout.episode_list, null);
 
 		view.setTag(R.id.list_image, view.findViewById(R.id.list_image));
 		view.setTag(R.id.title, view.findViewById(R.id.title));

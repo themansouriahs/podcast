@@ -31,7 +31,7 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 
-public class ItemCursorAdapter extends AbstractPodcastAdapter {
+public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 
 	public static final int ICON_DEFAULT_ID = -1;
 
@@ -214,7 +214,7 @@ public class ItemCursorAdapter extends AbstractPodcastAdapter {
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {
 
-		View view = mInflater.inflate(R.layout.list_item, null);
+		View view = mInflater.inflate(R.layout.episode_list, null);
 
 		view.setTag(R.id.list_image, view.findViewById(R.id.list_image));
 		view.setTag(R.id.title, view.findViewById(R.id.title));

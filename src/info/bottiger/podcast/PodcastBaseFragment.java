@@ -247,6 +247,7 @@ public abstract class PodcastBaseFragment extends ListFragment {
 
 	}
 	
+	
 	protected long refreshNow() {
 
 		if (mPlayerServiceBinder == null)
@@ -313,7 +314,7 @@ public abstract class PodcastBaseFragment extends ListFragment {
 		}
 		return 500;
 	}
-	
+
 	
 	protected static void updateCurrentPosition() {
 		if (mCurrentTime != null) {

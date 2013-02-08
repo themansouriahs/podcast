@@ -372,12 +372,8 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 		} else {
 			Bundle bundle = new Bundle();
 			bundle.putLong("subID", SubscriptionFeedID);
-			bundle.putInt("ii", 55);
-			bundle.putString("hej", "med dig");
 			FeedFragment.newInstance(SubscriptionFeedID);
 			FeedFragment feed = new FeedFragment();
-			// feed.setArguments(bundle);
-			// feed.newInstance(SubscriptionFeedID);
 			return feed;
 		}
 	}
