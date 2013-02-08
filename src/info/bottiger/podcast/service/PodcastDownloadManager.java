@@ -127,10 +127,10 @@ public class PodcastDownloadManager {
 
 		downloadManager = (DownloadManager) context
 				.getSystemService(Context.DOWNLOAD_SERVICE);
-		
+
 		if (getDownloadingItem() == null && mDownloadQueue.size() > 0) {
-			mDownloadingItem = getNextItem();
-			Uri downloadURI = Uri.parse(mDownloadingItem.url);
+			FeedItem downloadingItem = getNextItem();
+			Uri downloadURI = Uri.parse(downloadingItem.url);
 			DownloadManager.Request request = new DownloadManager.Request(
 					downloadURI);
 
@@ -157,11 +157,11 @@ public class PodcastDownloadManager {
 			// Set the title of this download, to be displayed in notifications
 			// (if
 			// enabled).
-			request.setTitle(mDownloadingItem.title);
+			request.setTitle(downloadingItem.title);
 			// Set a description of this download, to be displayed in
 			// notifications
 			// (if enabled)
-			request.setDescription(mDownloadingItem.content);
+			request.setDescription(downloadingItem.content);
 			// Set the local destination for the downloaded file to a path
 			// within
 			// the application's external files directory
@@ -169,15 +169,16 @@ public class PodcastDownloadManager {
 			// String fileName = mDownloadingItem.getFilename();
 			// request.setDestinationInExternalFilesDir(context,
 			// downloadDir, fileName);
-			File file = new File(mDownloadingItem.getAbsoluteTmpPath());
+			File file = new File(downloadingItem.getAbsoluteTmpPath());
 			request.setDestinationUri(Uri.fromFile(file));
 
 			// Enqueue a new download and same the referenceId
 			downloadReference = downloadManager.enqueue(request);
 			PodcastDownloadManager.mDownloadingIDs.add(downloadReference);
 
-			mDownloadingItem.setDownloadReferenceID(downloadReference);
-			mDownloadingItem.update(context.getContentResolver());
+			downloadingItem.setDownloadReferenceID(downloadReference);
+			downloadingItem.update(context.getContentResolver());
+			mDownloadingItem = downloadingItem;
 		}
 
 	}
@@ -203,27 +204,27 @@ public class PodcastDownloadManager {
 	public static void removeExpiredDownloadedPodcasts(Context context) {
 		new removeExpiredDownloadedPodcastsTask(context).execute();
 	}
-	
+
 	/**
 	 * Iterates through all the downloaded episodes and deletes the ones who
-	 * exceed the download limit
-	 * Runs with minimum priority
+	 * exceed the download limit Runs with minimum priority
 	 * 
 	 * @param context
 	 * @return Void
 	 */
-	private static class removeExpiredDownloadedPodcastsTask extends AsyncTask<Void, Integer, Void> {
-		
+	private static class removeExpiredDownloadedPodcastsTask extends
+			AsyncTask<Void, Integer, Void> {
+
 		Context mContext = null;
-		
+
 		public removeExpiredDownloadedPodcastsTask(Context context) {
 			mContext = context;
 		}
-		
-	    // Do the long-running work in here
-	    protected Void doInBackground(Void... params) {
-	    	Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-	    	
+
+		// Do the long-running work in here
+		protected Void doInBackground(Void... params) {
+			Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+
 			if (SDCardManager.getSDCardStatus() == false) {
 				return null;
 			}
@@ -233,7 +234,7 @@ public class PodcastDownloadManager {
 
 			String megabytesToKeepAsString = sharedPreferences.getString(
 					"pref_podcast_collection_size", "1000");
-			
+
 			long megabytesToKeep = Long.parseLong(megabytesToKeepAsString);
 			long bytesToKeep = megabytesToKeep * 1024 * 1024;
 
@@ -244,8 +245,9 @@ public class PodcastDownloadManager {
 				// sort by nevest first
 				String sortOrder = ItemColumns.LAST_UPDATE + " DESC";
 
-				Cursor cursor = mContext.getContentResolver().query(ItemColumns.URI,
-						ItemColumns.ALL_COLUMNS, where, null, sortOrder);
+				Cursor cursor = mContext.getContentResolver().query(
+						ItemColumns.URI, ItemColumns.ALL_COLUMNS, where, null,
+						sortOrder);
 
 				LinkedList<String> filesToKeep = new LinkedList<String>();
 				cursor.moveToFirst();
@@ -255,7 +257,8 @@ public class PodcastDownloadManager {
 					if (item != null) {
 						bytesToKeep = bytesToKeep - item.filesize;
 
-						// if we have exceeded our limit start deleting old items
+						// if we have exceeded our limit start deleting old
+						// items
 						if (bytesToKeep < 0) {
 							deleteExpireFile(mContext, item);
 						} else {
@@ -265,7 +268,7 @@ public class PodcastDownloadManager {
 						cursor.moveToNext();
 					}
 				}
-				
+
 				// Delete the remaining files which are not indexed in the
 				// database
 				// Duplicated code from DownloadManagerReceiver
@@ -283,7 +286,7 @@ public class PodcastDownloadManager {
 			}
 			return null;
 
-	    }
+		}
 	}
 
 	private static int updateConnectStatus(Context context) {
@@ -318,13 +321,28 @@ public class PodcastDownloadManager {
 	}
 
 	public static FeedItem getDownloadingItem() {
-		return mDownloadingItem;
+		if (mDownloadingItem == null)
+			return null;
+
+		long downloadReference = mDownloadingItem.getDownloadReferenceID();
+		Query query = new Query();
+		query.setFilterById(downloadReference);
+		Cursor c = downloadManager.query(query);
+		if (c.moveToFirst()) {
+			int columnIndex = c.getColumnIndex(DownloadManager.COLUMN_STATUS);
+			int status = c.getInt(columnIndex);
+			
+			if (status == DownloadManager.STATUS_RUNNING)
+				return mDownloadingItem;
+		}
+
+		return null;
 	}
-	
+
 	public static void notifyDownloadComplete(FeedItem completedItem) {
 		assert completedItem != null;
 		if (completedItem.equals(mDownloadingItem))
-				mDownloadingItem = null;
+			mDownloadingItem = null;
 	}
 
 	private static FeedItem getNextItem() {

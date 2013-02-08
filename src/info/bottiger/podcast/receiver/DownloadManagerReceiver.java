@@ -56,7 +56,11 @@ public class DownloadManagerReceiver extends BroadcastReceiver {
 					item.update(context.getContentResolver());
 					
 					// Start next download
+					
+					// Reset downloadingItem 
 					PodcastDownloadManager.notifyDownloadComplete(item);
+					
+					// start downloading a new item
 					PodcastDownloadManager.startDownload(context);
 				}
 			}
@@ -64,7 +68,15 @@ public class DownloadManagerReceiver extends BroadcastReceiver {
 			PodcastDownloadManager.removeExpiredDownloadedPodcasts(context);
 		}
 	}
-
+	
+	/**
+	 * Update the FeedItem in teh SQLite database
+	 * 
+	 * @param c
+	 * @param item
+	 * @param downloadId
+	 * @param context
+	 */
 	private void updateFeedItemIfSuccessful(Cursor c, FeedItem item,
 			long downloadId, Context context) {
 
