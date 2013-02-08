@@ -1,7 +1,7 @@
 package info.bottiger.podcast;
 
-import info.bottiger.podcast.R;
 import info.bottiger.podcast.adapters.ItemCursorAdapter;
+import info.bottiger.podcast.adapters.SubscriptionCursorAdapter;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.Subscription;
@@ -10,8 +10,9 @@ import info.bottiger.podcast.utils.DialogMenu;
 
 import java.util.HashMap;
 
+import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
+
 import android.app.Activity;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -24,6 +25,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -88,65 +90,8 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 		startInit();
 		return fragmentView;
 	}
-	/*
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		menu.add(0, MENU_UNSUBSCRIBE, 0,
-				getResources().getString(R.string.unsubscribe)).setIcon(
-				android.R.drawable.ic_menu_close_clear_cancel);
-		
 
-		
-		menu.add(0, MENU_AUTO_DOWNLOAD, 0,"Auto Download").setIcon(
-				android.R.drawable.ic_menu_set_as);
-		
 	
-		return true;
-	}
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
-        MenuItem item = menu.findItem(MENU_AUTO_DOWNLOAD);
-		String auto;
-		if(mChannel.auto_download==0){
-			auto = getResources().getString(R.string.menu_auto_download);
-		}else{
-			auto = getResources().getString(R.string.menu_manual_download);
-		}        
-        item.setTitle(auto);
-        return true;
-    }
-    
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case MENU_UNSUBSCRIBE:
-		
-		new AlertDialog.Builder(ChannelFragment.this)
-                .setTitle(R.string.unsubscribe_channel)
-                .setPositiveButton(R.string.menu_ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-							mChannel.delete(getContentResolver());	
-							finish();
-							dialog.dismiss();
-                    }
-                })
-                .setNegativeButton(R.string.menu_cancel, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                    }
-                })
-                .show();
-			return true;
-		case MENU_AUTO_DOWNLOAD:
-			mChannel.auto_download = 1-mChannel.auto_download;
-			mChannel.update(getContentResolver());	
-			return true;			
-
-		}
-		return super.onOptionsItemSelected(item);
-	}
-	 */
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		Subscription s = Subscription.getById(getActivity().getContentResolver(), id);
@@ -197,13 +142,14 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
         {
 		} 
 	}
+
 	
-	private static ItemCursorAdapter channelListSubscriptionCursorAdapter(Context context, Cursor cursor) {
-		ItemCursorAdapter.FieldHandler[] fields = {
-				ItemCursorAdapter.defaultTextFieldHandler,
-				new ItemCursorAdapter.IconFieldHandler()
+	private static SubscriptionCursorAdapter listSubscriptionCursorAdapter(Context context, Cursor cursor) {
+		SubscriptionCursorAdapter.FieldHandler[] fields = {
+				SubscriptionCursorAdapter.defaultTextFieldHandler,
+				new SubscriptionCursorAdapter.IconFieldHandler()
 		};
-		return new ItemCursorAdapter(context, R.layout.list_item, cursor,
+		return new SubscriptionCursorAdapter(context, R.layout.list_item, cursor,
 				new String[] { SubscriptionColumns.TITLE, SubscriptionColumns.IMAGE_URL },
 				new int[] { R.id.title, R.id.list_image },
 				fields);
@@ -211,8 +157,8 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 
 	@Override
 	public void startInit() {
-		SwipeActivity.mCursor = new CursorLoader(getActivity(), SubscriptionColumns.URI, PROJECTION, null, null, null).loadInBackground();
-		mAdapter = channelListSubscriptionCursorAdapter(getActivity().getApplicationContext(), SwipeActivity.mCursor);
+		mCursor = new CursorLoader(getActivity(), SubscriptionColumns.URI, PROJECTION, null, null, null).loadInBackground();
+		mAdapter = listSubscriptionCursorAdapter(getActivity().getApplicationContext(), mCursor);
 	
 		setListAdapter(mAdapter);
 

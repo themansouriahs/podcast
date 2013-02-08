@@ -2,7 +2,6 @@ package info.bottiger.podcast;
 
 import info.bottiger.podcast.R;
 import info.bottiger.podcast.adapters.ItemCursorAdapter;
-import info.bottiger.podcast.adapters.ItemCursorAdapter.TextFieldHandler;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.Subscription;
@@ -162,7 +161,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 			PodcastBaseFragment fragment, Cursor cursor) {
 		ItemCursorAdapter.FieldHandler[] fields = {
 				ItemCursorAdapter.defaultTextFieldHandler,
-				new TextFieldHandler(), new TextFieldHandler(),
+				new ItemCursorAdapter.TextFieldHandler(), new ItemCursorAdapter.TextFieldHandler(),
 				new ItemCursorAdapter.IconFieldHandler(mIconMap),
 		// new IconCursorAdapter.IconFieldHandler(mKeepIconMap)
 		};

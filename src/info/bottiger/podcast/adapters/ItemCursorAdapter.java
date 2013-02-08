@@ -48,61 +48,8 @@ public class ItemCursorAdapter extends AbstractPodcastAdapter {
 
 	public static final int ICON_DEFAULT_ID = -1;
 
-	public interface FieldHandler {
-		public void setViewValue(ItemCursorAdapter adapter, Cursor cursor,
-				View v, int fromColumnId);
-	}
 
-	public static class TextFieldHandler implements FieldHandler {
-		@Override
-		public void setViewValue(ItemCursorAdapter adapter, Cursor cursor,
-				View v, int fromColumnId) {
-			// Normal text column, just display what's in the database
-			String text = cursor.getString(fromColumnId);
-
-			if (text == null) {
-				text = "";
-			}
-
-			if (v instanceof TextView) {
-				adapter.setViewText((TextView) v, text);
-			} else if (v instanceof ImageView) {
-				adapter.setViewImage((ImageView) v, text);
-			}
-		}
-	}
-
-	public static class IconFieldHandler implements FieldHandler {
-		public IconFieldHandler(HashMap<Integer, Integer> iconMap) {
-		}
-
-		public IconFieldHandler() {
-		}
-
-		@Override
-		public void setViewValue(ItemCursorAdapter adapter, Cursor cursor,
-				View v, int fromColumnId) {
-			adapter.setViewImageAsync((ImageView) v,
-					cursor.getString(fromColumnId));
-		}
-	}
-
-	/*
-	 * public static class IconFieldHandler implements FieldHandler {
-	 * HashMap<Integer, Integer> mIconMap; public
-	 * IconFieldHandler(HashMap<Integer,Integer> iconMap) { mIconMap = iconMap;
-	 * } public void setViewValue(IconCursorAdapter adapter, Cursor cursor, View
-	 * v, int fromColumnId) { //The status column gets displayed as our icon int
-	 * status = cursor.getInt(fromColumnId);
-	 * 
-	 * Integer iconI = mIconMap.get(status); if (iconI==null) iconI =
-	 * mIconMap.get(ICON_DEFAULT_ID); //look for default value in map int icon =
-	 * (iconI!=null)? iconI.intValue(): R.drawable.status_unknown; //Use this
-	 * icon when not in map and no map default. //This allows going back to a
-	 * previous version after data has been //added in a new version with
-	 * additional status codes. adapter.setViewImage2((ImageView) v, icon); } }
-	 */
-	public final static FieldHandler defaultTextFieldHandler = new TextFieldHandler();
+	public final static FieldHandler defaultTextFieldHandler = new FieldHandler.TextFieldHandler();
 
 	protected int[] mFrom2;
 	protected int[] mTo2;
@@ -113,8 +60,6 @@ public class ItemCursorAdapter extends AbstractPodcastAdapter {
 	private static final int TYPE_MAX_COUNT = 2;
 
 	private ArrayList<FeedItem> mData = new ArrayList<FeedItem>();
-	private LayoutInflater mInflater;
-	private Context mContext;
 	private PodcastBaseFragment mFragment = null;
 
 	private TreeSet<Number> mExpandedItemID = new TreeSet<Number>();
@@ -127,7 +72,7 @@ public class ItemCursorAdapter extends AbstractPodcastAdapter {
 		for (int i = 0; i < handlers.length - 1; i++) {
 			handlers[i] = defaultTextFieldHandler;
 		}
-		handlers[fromColumns.length - 1] = new IconFieldHandler(iconMap);
+		handlers[fromColumns.length - 1] = new FieldHandler.IconFieldHandler(iconMap);
 		return handlers;
 	}
 
@@ -364,34 +309,6 @@ public class ItemCursorAdapter extends AbstractPodcastAdapter {
 		}
 	}
 
-	private ImageLoader getImageLoader(Context context) {
-		File cacheDir = SDCardManager.getCacheDir();
-		DisplayImageOptions options = new DisplayImageOptions.Builder()
-				.showStubImage(R.drawable.generic_podcast).cacheInMemory()
-				.cacheOnDisc().build();
-		ImageLoader imageLoader = ImageLoader.getInstance();
-		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
-				context)
-				.memoryCacheExtraOptions(480, 800)
-				// max width, max height
-				.threadPoolSize(5)
-				.offOutOfMemoryHandling()
-				.memoryCache(new UsingFreqLimitedMemoryCache(10 * 1024 * 1024))
-				// You can pass your own memory cache implementation
-				.discCache(new UnlimitedDiscCache(cacheDir))
-				// You can pass your own disc cache implementation
-				.discCacheFileNameGenerator(new HashCodeFileNameGenerator())
-				.imageDownloader(
-						new URLConnectionImageDownloader(5 * 1000, 20 * 1000))
-				// connectTimeout (5 s), readTimeout (20 s)
-				.tasksProcessingOrder(QueueProcessingType.FIFO)
-				.defaultDisplayImageOptions(options).build();
-		// Initialize ImageLoader with configuration. Do it once.
-		imageLoader.init(config);
-
-		return imageLoader;
-	}
-
 	public void showItem(Long id) {
 		if (!mExpandedItemID.isEmpty())
 			mExpandedItemID.remove(mExpandedItemID.first()); // HACK: only show
@@ -424,19 +341,6 @@ public class ItemCursorAdapter extends AbstractPodcastAdapter {
 				: TYPE_COLLAPS;
 	}
 
-	/**
-	 * Sets the listItems icon Async using the UrlImageViewHelper from
-	 * https://github.com/koush/UrlImageViewHelper#readme
-	 * 
-	 * @param imageView
-	 * @param imageURL
-	 */
-	private void setViewImageAsync(ImageView imageView, String imageURL) {
-		int cacheTime = 60000 * 60 * 24 * 31; // in ms
-		UrlImageViewHelper.loadUrlDrawable(imageView.getContext(), imageURL);
-		UrlImageViewHelper.setUrlDrawable(imageView, imageURL,
-				R.drawable.generic_podcast, cacheTime);
-	}
 
 	/**
 	 * Returns the ID of the item at the position

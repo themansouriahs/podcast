@@ -320,6 +320,11 @@ public class PodcastDownloadManager {
 
 	}
 
+	/**
+	 * Return the FeedItem currently being downloaded
+	 * 
+	 * @return The downloading FeedItem
+	 */
 	public static FeedItem getDownloadingItem() {
 		if (mDownloadingItem == null)
 			return null;
