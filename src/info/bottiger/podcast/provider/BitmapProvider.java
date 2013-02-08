@@ -11,8 +11,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;

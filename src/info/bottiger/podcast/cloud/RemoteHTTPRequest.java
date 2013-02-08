@@ -36,7 +36,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import android.accounts.AccountManager;
 import android.os.AsyncTask;
 
 public class RemoteHTTPRequest extends AsyncTask<URL, Void, String> {

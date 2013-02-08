@@ -14,41 +14,12 @@ package info.bottiger.podcast.cloud;
  */
 
 import info.bottiger.podcast.R;
-import info.bottiger.podcast.SoundWaves;
 import info.bottiger.podcast.provider.Subscription;
 
 import com.loopj.android.http.*;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
-import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
@@ -191,6 +162,7 @@ public class GoogleReader extends AbstractCloudProvider {
 	}
 
 	private class ReaderHTTPRequest extends AsyncTask<URL, Void, Void> {
+		@Override
 		protected Void doInBackground(URL... urls) {
 			Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
 			GoogleReader.this.refreshAuthToken();

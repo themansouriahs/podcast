@@ -1,31 +1,15 @@
 package info.bottiger.podcast.adapters;
 
-import info.bottiger.podcast.PlayerActivity;
-import info.bottiger.podcast.PodcastBaseFragment;
 import info.bottiger.podcast.R;
-import info.bottiger.podcast.listeners.DownloadProgressListener;
-import info.bottiger.podcast.provider.FeedItem;
-import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.Subscription;
-import info.bottiger.podcast.service.DownloadStatus;
-import info.bottiger.podcast.utils.ControlButtons;
-import info.bottiger.podcast.utils.StrUtils;
-
-import java.util.HashMap;
-
-import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.provider.BaseColumns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewStub;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.SeekBar;
 import android.widget.TextView;
 
 public class SubscriptionCursorAdapter extends AbstractPodcastAdapter {

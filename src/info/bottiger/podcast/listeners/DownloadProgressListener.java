@@ -1,16 +1,11 @@
 package info.bottiger.podcast.listeners;
 
 import info.bottiger.podcast.provider.FeedItem;
-import info.bottiger.podcast.service.DownloadStatus;
-import info.bottiger.podcast.service.PodcastDownloadManager;
-
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import android.app.DownloadManager;
-import android.app.DownloadManager.Query;
 import android.content.Context;
-import android.database.Cursor;
 import android.os.Handler;
 import android.os.Message;
 import android.widget.TextView;

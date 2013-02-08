@@ -105,7 +105,7 @@ public class PodcastService extends IntentService {
 	}
 
 	public void start_download() {
-		pdm.startDownload(getBaseContext());
+		PodcastDownloadManager.startDownload(getBaseContext());
 	}
 
 	public static void start_update(Context context, PullToRefreshListView pullToRefreshView) {
@@ -124,7 +124,7 @@ public class PodcastService extends IntentService {
 	
 	@Deprecated
 	public void start_update(PullToRefreshListView pullToRefreshView) {
-		pdm.start_update(getBaseContext(), pullToRefreshView);
+		PodcastDownloadManager.start_update(getBaseContext(), pullToRefreshView);
 	}
 
 	public void updateSetting() {
@@ -160,12 +160,12 @@ public class PodcastService extends IntentService {
 	public void downloadItem(ContentResolver context, FeedItem item) {
 		item.prepareDownload(context);
 		PodcastDownloadManager.addItemToQueue(item);
-		pdm.startDownload(getBaseContext());
+		PodcastDownloadManager.startDownload(getBaseContext());
 	}
 
 
 	public FeedItem getDownloadingItem() {
-		return pdm.getDownloadingItem();
+		return PodcastDownloadManager.getDownloadingItem();
 	}
 	
 	/**
@@ -239,7 +239,7 @@ public class PodcastService extends IntentService {
         @Override
         protected Void doInBackground(Void... params) {
             // do stuff!
-        	PodcastService.this.pdm.start_update(PodcastService.this);
+        	PodcastDownloadManager.start_update(PodcastService.this);
             return null;
         }
         

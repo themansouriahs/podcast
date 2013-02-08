@@ -3,7 +3,6 @@ package info.bottiger.podcast;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 
-import android.app.Service;
 import android.content.ComponentName;
 import android.content.ContentUris;
 import android.content.Context;

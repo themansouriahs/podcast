@@ -5,7 +5,6 @@ import java.util.HashMap;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
-import android.app.Service;
 import android.content.ComponentName;
 import android.content.ContentUris;
 import android.content.Context;

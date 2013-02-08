@@ -591,8 +591,8 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		    int cursorBytesSoFarIndex = c.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR);
 		    int cursorBytesTotalIndex =  c.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES);
 		    
-		    long bytesSoFar = (long)c.getInt(cursorBytesSoFarIndex);
-		    long bytesTotal = (long)c.getInt(cursorBytesTotalIndex);
+		    long bytesSoFar = c.getInt(cursorBytesSoFarIndex);
+		    long bytesTotal = c.getInt(cursorBytesTotalIndex);
 		    
 		    percent = bytesSoFar*100/bytesTotal;
 		    

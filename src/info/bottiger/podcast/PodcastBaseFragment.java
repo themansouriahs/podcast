@@ -1,11 +1,9 @@
 package info.bottiger.podcast;
 
 import info.bottiger.podcast.R;
-import info.bottiger.podcast.notification.NotificationPlayer;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.service.PlayerService;
-import info.bottiger.podcast.service.PodcastService;
 import info.bottiger.podcast.utils.FilesizeUpdater;
 import info.bottiger.podcast.utils.Log;
 import info.bottiger.podcast.utils.StrUtils;

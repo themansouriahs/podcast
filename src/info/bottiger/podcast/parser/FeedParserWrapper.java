@@ -267,7 +267,7 @@ public class FeedParserWrapper {
 	private FeedItem fromRSSEntry(SyndEntry entry) {
 		FeedItem item = new FeedItem();
 
-		SimpleDateFormat dt = new SimpleDateFormat(item.default_format);
+		SimpleDateFormat dt = new SimpleDateFormat(FeedItem.default_format);
 
 		item.author = entry.getAuthor();
 		item.title = entry.getTitle();

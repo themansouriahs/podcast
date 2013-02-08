@@ -2,7 +2,6 @@ package info.bottiger.podcast.receiver;
 
 import info.bottiger.podcast.provider.BitmapProvider;
 import info.bottiger.podcast.provider.FeedItem;
-import info.bottiger.podcast.provider.WithIcon;
 import info.bottiger.podcast.service.PodcastDownloadManager;
 import info.bottiger.podcast.utils.SDCardManager;
 

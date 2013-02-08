@@ -1,7 +1,6 @@
 package info.bottiger.podcast.adapters;
 
 import info.bottiger.podcast.R;
-import info.bottiger.podcast.adapters.PodcastAdapterInterface.FieldHandler;
 import info.bottiger.podcast.utils.SDCardManager;
 
 import java.io.File;
@@ -91,6 +90,7 @@ public abstract class AbstractPodcastAdapter extends SimpleCursorAdapter impleme
 				R.drawable.generic_podcast, cacheTime);
 	}
 	
+	@Override
 	public ImageLoader getImageLoader(Context context) {
 		File cacheDir = SDCardManager.getCacheDir();
 		DisplayImageOptions options = new DisplayImageOptions.Builder()

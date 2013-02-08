@@ -1,6 +1,5 @@
 package info.bottiger.podcast.service;
 
-import info.bottiger.podcast.R;
 import info.bottiger.podcast.SwipeActivity;
 import info.bottiger.podcast.parser.FeedParserWrapper;
 import info.bottiger.podcast.provider.FeedItem;
@@ -32,8 +31,6 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
-import android.widget.Toast;
-
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 public class PodcastDownloadManager {
@@ -222,6 +219,7 @@ public class PodcastDownloadManager {
 		}
 
 		// Do the long-running work in here
+		@Override
 		protected Void doInBackground(Void... params) {
 			Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
 
@@ -483,6 +481,7 @@ public class PodcastDownloadManager {
 			return mRefreshView;
 		}
 
+		@Override
 		protected void onPreExecute() {
 			try {
 				if (subscriptionDownloader != null)
@@ -534,6 +533,7 @@ public class PodcastDownloadManager {
 				this.subscription = subscription;
 			}
 
+			@Override
 			public void run() {
 
 				if (updateConnectStatus(mContext) == NO_CONNECT)

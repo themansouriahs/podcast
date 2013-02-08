@@ -9,7 +9,6 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.ClipboardManager;
 import android.content.DialogInterface;
 import android.text.Editable;

@@ -3,8 +3,6 @@ package info.bottiger.podcast.cloud;
 import info.bottiger.podcast.provider.Subscription;
 
 import java.net.URL;
-import java.util.List;
-
 import android.accounts.Account;
 import android.content.Context;
 import android.os.AsyncTask;

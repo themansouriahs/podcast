@@ -1,6 +1,6 @@
 package info.bottiger.podcast;
 
-import info.bottiger.podcast.adapters.ItemCursorAdapter;
+import info.bottiger.podcast.adapters.AbstractPodcastAdapter;
 import info.bottiger.podcast.adapters.SubscriptionCursorAdapter;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
@@ -9,8 +9,6 @@ import info.bottiger.podcast.provider.SubscriptionColumns;
 import info.bottiger.podcast.utils.DialogMenu;
 
 import java.util.HashMap;
-
-import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 
 import android.app.Activity;
 import android.content.Context;
@@ -25,7 +23,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -146,7 +143,7 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 	
 	private static SubscriptionCursorAdapter listSubscriptionCursorAdapter(Context context, Cursor cursor) {
 		SubscriptionCursorAdapter.FieldHandler[] fields = {
-				SubscriptionCursorAdapter.defaultTextFieldHandler,
+				AbstractPodcastAdapter.defaultTextFieldHandler,
 				new SubscriptionCursorAdapter.IconFieldHandler()
 		};
 		return new SubscriptionCursorAdapter(context, R.layout.list_item, cursor,
