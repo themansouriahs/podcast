@@ -27,13 +27,9 @@ public class PodcastUpdateReceiver extends BroadcastReceiver {
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "");
         wl.acquire();
 
-        // Put here YOUR code.
-        //Toast.makeText(context, "Alarm !!!!!!!!!!", Toast.LENGTH_LONG).show(); // For example
-        
-        PodcastDownloadManager pdm = new PodcastDownloadManager();
-		pdm.start_update(context);
-		pdm.removeExpiredDownloadedPodcasts(context);
-		pdm.startDownload(context);
+		PodcastDownloadManager.start_update(context);
+		PodcastDownloadManager.removeExpiredDownloadedPodcasts(context);
+		PodcastDownloadManager.startDownload(context);
 
         wl.release();
     }
