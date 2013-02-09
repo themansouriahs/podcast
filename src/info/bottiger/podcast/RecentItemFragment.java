@@ -36,17 +36,7 @@ import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class RecentItemFragment extends PodcastBaseFragment {
-
-	private static final int MENU_REFRESH = Menu.FIRST + 1;
-	private static final int MENU_SORT = Menu.FIRST + 2;
-	private static final int MENU_SELECT = Menu.FIRST + 3;
-
-	private static final int MENU_ITEM_VIEW_CHANNEL = Menu.FIRST + 8;
-	private static final int MENU_ITEM_DETAILS = Menu.FIRST + 9;
-	private static final int MENU_ITEM_START_DOWNLOAD = Menu.FIRST + 10;
-	private static final int MENU_ITEM_START_PLAY = Menu.FIRST + 11;
-	private static final int MENU_ITEM_ADD_TO_PLAYLIST = Menu.FIRST + 12;
+public class RecentItemFragment extends AbstractEpisodeFragment {
 
 	private static final String[] PROJECTION = new String[] { ItemColumns._ID, // 0
 			ItemColumns.TITLE, // 1
@@ -61,20 +51,15 @@ public class RecentItemFragment extends PodcastBaseFragment {
 
 	};
 
-	private static HashMap<Integer, Integer> mIconMap;
 	public static HashMap<Integer, Integer> mKeepIconMap;
 
 	private View mCurrentPlayer = null;
-	private ListView actualListView = null;
-
-	private long pref_order;
-	private long pref_where;
-	private long pref_select;
 
 	private ItemCursorAdapter mAdapter;
 
-	boolean mDualPane;
+
 	private long mCurCheckID = -1;
+	boolean mDualPane;
 
 	// Read here:
 	// http://developer.android.com/reference/android/app/Fragment.html#Layout
@@ -90,12 +75,6 @@ public class RecentItemFragment extends PodcastBaseFragment {
 		// Populate list with our static array of titles.
 		startInit();
 
-		// Check to see if we have a frame in which to embed the details
-		// fragment directly in the containing UI.
-		// View detailsFrame = getActivity().findViewById(R.id.details);
-		// mDualPane = detailsFrame != null && detailsFrame.getVisibility() ==
-		// View.VISIBLE;
-
 		if (mDualPane) {
 			// In dual-pane mode, the list view highlights the selected item.
 			getListView().setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
@@ -110,7 +89,7 @@ public class RecentItemFragment extends PodcastBaseFragment {
 
 			@Override
 			public void onRefresh(PullToRefreshBase<ListView> refreshView) {
-				//SwipeActivity.mPodcastServiceBinder.start_update(pullToRefreshView);
+				// SwipeActivity.mPodcastServiceBinder.start_update(pullToRefreshView);
 				PodcastService.start_update(getActivity(), pullToRefreshView);
 			}
 		};
@@ -127,61 +106,18 @@ public class RecentItemFragment extends PodcastBaseFragment {
 		outState.putLong("curChoice", mCurCheckID);
 	}
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setHasOptionsMenu(true);
-	}
-
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		inflater.inflate(R.menu.episode_list, menu);
-		super.onCreateOptionsMenu(menu, inflater);
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.menu_download_all: {
-			Cursor cursor = createCursor(getWhere());
-			while (cursor.moveToNext()) {
-				FeedItem feedItem = FeedItem.getByCursor(cursor);
-				if (!feedItem.isDownloaded())
-					PodcastDownloadManager.addItemToQueue(feedItem);
-			}
-			PodcastDownloadManager pdm = new PodcastDownloadManager();
-			PodcastDownloadManager.startDownload( this.getActivity());
-			return true;
-		}
-		}
-		return super.onOptionsItemSelected(item);
-	}
-
 	public static ItemCursorAdapter listItemCursorAdapter(Context context,
 			PodcastBaseFragment fragment, Cursor cursor) {
 		ItemCursorAdapter.FieldHandler[] fields = {
 				ItemCursorAdapter.defaultTextFieldHandler,
-				new ItemCursorAdapter.TextFieldHandler(), new ItemCursorAdapter.TextFieldHandler(),
-				new ItemCursorAdapter.IconFieldHandler(mIconMap),
-		// new IconCursorAdapter.IconFieldHandler(mKeepIconMap)
-		};
+				new ItemCursorAdapter.TextFieldHandler(),
+				new ItemCursorAdapter.TextFieldHandler(),
+				new ItemCursorAdapter.IconFieldHandler(mIconMap), };
 		return new ItemCursorAdapter(context, fragment, R.layout.episode_list,
 				cursor, new String[] { ItemColumns.TITLE,
 						ItemColumns.SUB_TITLE, ItemColumns.DURATION,
 						ItemColumns.IMAGE_URL }, new int[] { R.id.title,
 						R.id.podcast, R.id.duration, R.id.list_image }, fields);
-	}
-
-	public static ItemCursorAdapter channelListItemCursorAdapter(
-			Context context, Cursor cursor) {
-		ItemCursorAdapter.FieldHandler[] fields = {
-				ItemCursorAdapter.defaultTextFieldHandler,
-				new ItemCursorAdapter.IconFieldHandler(mIconMap),
-				new ItemCursorAdapter.IconFieldHandler(mKeepIconMap) };
-		return new ItemCursorAdapter(context, R.layout.subscription_list,
-				cursor, new String[] { ItemColumns.TITLE, ItemColumns.STATUS,
-						ItemColumns.LISTENED }, new int[] { R.id.text1,
-						R.id.icon, R.id.actionbar_compat }, fields);
 	}
 
 	@Override
@@ -197,119 +133,20 @@ public class RecentItemFragment extends PodcastBaseFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-
-		// super.onCreate(savedInstanceState);
-
 		fragmentView = inflater.inflate(R.layout.recent, container, false);
-		// setContentView(R.layout.main);
-		// setTitle(getResources().getString(R.string.title_episodes));
-
-		// getListView().setOnCreateContextMenuListener(this);
 		Intent intent = getActivity().getIntent();
 		intent.setData(ItemColumns.URI);
 
-		// FIXME
-		// mPrevIntent = new Intent(this, ChannelsActivity.class);
-		// mNextIntent = new Intent(this, DownloadingActivity.class);
-
 		getPref();
-
-		// mServiceBinder.
-		// mServiceBinder.start_update();
-
-		// TabsHelper.setEpisodeTabClickListeners(this,
-		// R.id.episode_bar_all_button);
-
-		// startInit();
 		return fragmentView;
 	}
 
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		Cursor item = (Cursor) l.getItemAtPosition(position); // FIXME
-															// https://github.com/chrisbanes/Android-PullToRefresh/issues/99
+																// https://github.com/chrisbanes/Android-PullToRefresh/issues/99
 		this.togglePlayer(l, item);
 
-	}
-
-	public DialogMenu createDialogMenus(long id) {
-
-		FeedItem feed_item = FeedItem.getById(getActivity()
-				.getContentResolver(), id);
-		if (feed_item == null) {
-			return null;
-		}
-
-		DialogMenu dialog_menu = new DialogMenu();
-
-		dialog_menu.setHeader(feed_item.title);
-
-		dialog_menu.addMenu(MENU_ITEM_DETAILS,
-				getResources().getString(R.string.menu_details));
-		dialog_menu.addMenu(MENU_ITEM_VIEW_CHANNEL,
-				getResources().getString(R.string.menu_view_channel));
-
-		if (feed_item.status < ItemColumns.ITEM_STATUS_MAX_READING_VIEW) {
-			dialog_menu.addMenu(MENU_ITEM_START_DOWNLOAD, getResources()
-					.getString(R.string.menu_download));
-		} else if (feed_item.status > ItemColumns.ITEM_STATUS_MAX_DOWNLOADING_VIEW) {
-			dialog_menu.addMenu(MENU_ITEM_START_PLAY,
-					getResources().getString(R.string.menu_play));
-			dialog_menu.addMenu(MENU_ITEM_ADD_TO_PLAYLIST, getResources()
-					.getString(R.string.menu_add_to_playlist));
-		}
-
-		return dialog_menu;
-	}
-
-	class MainClickListener implements DialogInterface.OnClickListener {
-		public DialogMenu mMenu;
-		public long item_id;
-
-		public MainClickListener(DialogMenu menu, long id) {
-			mMenu = menu;
-			item_id = id;
-		}
-
-		@Override
-		public void onClick(DialogInterface dialog, int select) {
-			switch (mMenu.getSelect(select)) {
-			case MENU_ITEM_DETAILS: {
-				// FeedItem.view(AllItemFragment.this, item_id); FIXME
-				return;
-			}
-			case MENU_ITEM_VIEW_CHANNEL: {
-				// FeedItem.viewChannel(AllItemFragment.this, item_id); FIXME
-				return;
-			}
-
-			case MENU_ITEM_START_DOWNLOAD: {
-
-				FeedItem feeditem = FeedItem.getById(getActivity()
-						.getContentResolver(), item_id);
-				if (feeditem == null)
-					return;
-
-				feeditem.status = ItemColumns.ITEM_STATUS_DOWNLOAD_QUEUE;
-				feeditem.update(getActivity().getContentResolver());
-				SwipeActivity.mPodcastServiceBinder.start_download();
-				return;
-			}
-			case MENU_ITEM_START_PLAY: {
-				// FeedItem.play(AllItemFragment.this, item_id); FIXME
-				return;
-			}
-			case MENU_ITEM_ADD_TO_PLAYLIST: {
-				// FeedItem.addToPlaylist(AllItemFragment.this, item_id); FIXME
-				return;
-			}
-			}
-		}
-	}
-
-	@Override
-	public void startInit() {
-		showEpisodes(getWhere());
 	}
 
 	public void showPlayingEpisode(long playingEpisodeID) {
@@ -347,51 +184,6 @@ public class RecentItemFragment extends PodcastBaseFragment {
 		}
 
 		setListAdapter(mAdapter);
-	}
-
-	public String getOrder() {
-		String order = ItemColumns.DATE + " DESC LIMIT 20"; // before:
-		// ItemColumns.CREATED
-		if (pref_order == 0) {
-			order = ItemColumns.SUBS_ID + "," + order;
-		} else if (pref_order == 1) {
-			order = ItemColumns.STATUS + "," + order;
-		}
-		return order;
-	}
-
-	public String getWhere() {
-		String where = "";
-
-		int foo = 56;
-		if (foo == 56)
-			return where;
-		// where = where + ItemColumns.STATUS + "<"
-		// + ItemColumns.ITEM_STATUS_MAX_PLAYLIST_VIEW;
-		switch ((int) pref_select) {
-		case 1: // New only
-			where = ItemColumns.STATUS + "<"
-					+ ItemColumns.ITEM_STATUS_MAX_READING_VIEW;
-			break;
-		case 2: // Unplayed only
-			where = ItemColumns.STATUS + "=" + ItemColumns.ITEM_STATUS_NO_PLAY;
-			break;
-		case 3: // Playable only
-			where = "(" + where + ") AND (" + ItemColumns.STATUS + ">"
-					+ ItemColumns.ITEM_STATUS_MAX_DOWNLOADING_VIEW + ")";
-			break;
-		default: // case 0 = All, no change to initial where clause
-			; // treat any unknown values as "All"
-		}
-		return where;
-	}
-
-	public void getPref() {
-		SharedPreferences pref = getActivity().getSharedPreferences(
-				SettingsActivity.HAPI_PREFS_FILE_NAME, Context.MODE_PRIVATE);
-		pref_order = pref.getLong("pref_order", 2);
-		pref_where = pref.getLong("pref_where", 0);
-		pref_select = pref.getLong("pref_select", 0);
 	}
 
 	private void togglePlayer(ListView list, Cursor item) {
@@ -458,13 +250,6 @@ public class RecentItemFragment extends PodcastBaseFragment {
 		return null;
 	}
 
-	private Cursor createCursor(String condition) {
-		// return new CursorLoader(getActivity(), ItemColumns.URI, PROJECTION,
-		// condition, null, getOrder()).loadInBackground();
-		return new CursorLoader(getActivity(), ItemColumns.URI,
-				ItemColumns.ALL_COLUMNS, condition, null, getOrder())
-				.loadInBackground();
-	}
 
 	@Override
 	Subscription getSubscription(Object o) {
