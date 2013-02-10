@@ -55,7 +55,7 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 
 	protected static Cursor mCursor = null;
 	protected boolean mInit = false;
-	protected final Log log = Log.getLog(getClass());
+	protected final Log log = Log.getDebugLog(getClass(), 0);
 	protected static ComponentName mService = null;
 
 	public static Account mAccount;
@@ -135,6 +135,10 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 		// primary sections
 		// of the app.
 		mFragmentManager = getSupportFragmentManager();
+		
+		if (debugging)
+			mFragmentManager.enableDebugLogging(true);
+		
 		mFragmentTransition = mFragmentManager.beginTransaction();
 		mSectionsPagerAdapter = new SectionsPagerAdapter(mFragmentManager);
 		
@@ -297,6 +301,7 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 		@Override
 		public Fragment getItem(int i) {
 			Fragment fragment;
+			log.debug("inside: getItem(" + i + ")");
 			if (i == 1) {
 				fragment = getSubscriptionFragmentContent();
 			} else if (i == 0) {
@@ -368,6 +373,7 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 
 	private Fragment getSubscriptionFragmentContent() {
 		if (SubscriptionFeedID == 0) {
+			log.debug("inside: getSubscriptionFragmentContent()");
 			return new SubscriptionsFragment();
 		} else {
 			Bundle bundle = new Bundle();

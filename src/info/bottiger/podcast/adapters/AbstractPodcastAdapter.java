@@ -1,10 +1,22 @@
 package info.bottiger.podcast.adapters;
 
 import info.bottiger.podcast.R;
+import info.bottiger.podcast.utils.Log;
 import info.bottiger.podcast.utils.SDCardManager;
 
 import java.io.File;
 import java.util.HashMap;
+
+import android.content.Context;
+import android.database.Cursor;
+import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
+import android.support.v4.widget.SimpleCursorAdapter;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiscCache;
@@ -16,16 +28,10 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.nostra13.universalimageloader.core.download.URLConnectionImageDownloader;
 
-import android.content.Context;
-import android.database.Cursor;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.SimpleCursorAdapter;
-import android.widget.TextView;
-
 public abstract class AbstractPodcastAdapter extends SimpleCursorAdapter implements PodcastAdapterInterface {
 
+	protected final Log log = Log.getDebugLog(getClass(), 0);
+	
 	public AbstractPodcastAdapter(Context context, int layout, Cursor c,
 			String[] from, int[] to) {
 		super(context, layout, c, from, to);
@@ -118,5 +124,4 @@ public abstract class AbstractPodcastAdapter extends SimpleCursorAdapter impleme
 
 		return imageLoader;
 	}
-
 }

@@ -1,45 +1,52 @@
 package info.bottiger.podcast;
 
-import info.bottiger.podcast.R;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.service.PlayerService;
 import info.bottiger.podcast.utils.FilesizeUpdater;
 import info.bottiger.podcast.utils.Log;
 import info.bottiger.podcast.utils.StrUtils;
-
 import android.app.Activity;
-import android.database.Cursor;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.Message;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
 import android.support.v4.app.ListFragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.ListView;
 import android.widget.SeekBar;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 /* Copy of PodcastBaseActivity */
-public abstract class PodcastBaseFragment extends ListFragment {
+public abstract class PodcastBaseFragment extends ListFragment implements
+		LoaderManager.LoaderCallbacks<Cursor> {
 
 	private static final int SWIPE_MIN_DISTANCE = 120;
 	private static final int SWIPE_MAX_OFF_PATH = 250;
 	private static final int SWIPE_THRESHOLD_VELOCITY = 200;
 
 	public static final int COLUMN_INDEX_TITLE = 1;
-	
+
 	protected View fragmentView;
 
 	// protected static PodcastService mServiceBinder = null;
@@ -57,7 +64,7 @@ public abstract class PodcastBaseFragment extends ListFragment {
 
 	OnItemSelectedListener mListener;
 
-	protected final Log log = Log.getLog(getClass());
+	protected final Log log = Log.getDebugLog(getClass(), 0);
 
 	private long mLastSeekEventTime;
 	private boolean mFromTouch;
@@ -67,13 +74,12 @@ public abstract class PodcastBaseFragment extends ListFragment {
 	public static final int UPDATE_FILESIZE = 3;
 
 	private boolean mShow = true;
-	
+
 	protected Cursor mCursor;
 
 	private static TextView mCurrentTime = null;
 	private static SeekBar mProgressBar = null;
 	private static TextView mDuration = null;
-	
 
 	public TextView getCurrentTime() {
 		return mCurrentTime;
@@ -94,7 +100,7 @@ public abstract class PodcastBaseFragment extends ListFragment {
 	public void setDuration(TextView mDuration) {
 		PodcastBaseFragment.mDuration = mDuration;
 	}
-	
+
 	public ServiceConnection playerServiceConnection = new ServiceConnection() {
 		@Override
 		public void onServiceConnected(ComponentName className, IBinder service) {
@@ -120,53 +126,56 @@ public abstract class PodcastBaseFragment extends ListFragment {
 					+ " must implement OnArticleSelectedListener");
 		}
 	}
-	
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
- 
-        OnItemLongClickListener listener = new OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int position, long id) {
-               return false;
-            }
 
-        };
- 
-        registerForContextMenu(getListView());
-        getListView().setOnItemLongClickListener(listener);
- 
-    }
-    
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v,
-                                    ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        MenuInflater inflater = getActivity().getMenuInflater();
-        inflater.inflate(R.menu.podcast_context, menu);
-    }
-    
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-    	
-        if (!AdapterView.AdapterContextMenuInfo.class.isInstance (item.getMenuInfo ()))
-            return false;
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
 
-        AdapterView.AdapterContextMenuInfo cmi =
-            (AdapterView.AdapterContextMenuInfo) item.getMenuInfo ();
+		OnItemLongClickListener listener = new OnItemLongClickListener() {
+			@Override
+			public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
+					int position, long id) {
+				return false;
+			}
 
-        Object o = getListView ().getItemAtPosition (cmi.position);
-        Subscription sub = this.getSubscription(o);
-    	
-        AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-        switch (item.getItemId()) {
-            case R.id.unsubscribe:
-            	sub.unsubscribe(getActivity().getApplicationContext());
-                return true;
-            default:
-                return super.onContextItemSelected(item);
-        }
-    }
+		};
+
+		registerForContextMenu(getListView());
+		getListView().setOnItemLongClickListener(listener);
+
+	}
+
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v,
+			ContextMenuInfo menuInfo) {
+		super.onCreateContextMenu(menu, v, menuInfo);
+		MenuInflater inflater = getActivity().getMenuInflater();
+		inflater.inflate(R.menu.podcast_context, menu);
+	}
+
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+
+		if (!AdapterView.AdapterContextMenuInfo.class.isInstance(item
+				.getMenuInfo()))
+			return false;
+
+		AdapterView.AdapterContextMenuInfo cmi = (AdapterView.AdapterContextMenuInfo) item
+				.getMenuInfo();
+
+		Object o = getListView().getItemAtPosition(cmi.position);
+		Subscription sub = this.getSubscription(o);
+
+		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
+				.getMenuInfo();
+		switch (item.getItemId()) {
+		case R.id.unsubscribe:
+			sub.unsubscribe(getActivity().getApplicationContext());
+			return true;
+		default:
+			return super.onContextItemSelected(item);
+		}
+	}
 
 	// Container Activity must implement this interface
 	public interface OnItemSelectedListener {
@@ -201,7 +210,20 @@ public abstract class PodcastBaseFragment extends ListFragment {
 
 	}
 
-	abstract public void startInit();
+	public void startInit(int id, Uri columns, String[] projection, String condition, String order) {
+		assert condition != null;
+		assert order != null;
+		assert projection != null;
+		
+		setListAdapter(mAdapter);
+
+		// Prepare the loader. Either re-connect with an existing one,
+		// or start a new one.
+		Bundle mBundle = new Bundle();
+		mBundle.putParcelable("uri", columns);
+		mBundle.putStringArray("projection", projection);
+		getLoaderManager().initLoader(id, mBundle, this);
+	}
 
 	public static final Handler mHandler = new Handler() {
 		@Override
@@ -214,12 +236,14 @@ public abstract class PodcastBaseFragment extends ListFragment {
 				break;
 
 			case UPDATE_FILESIZE:
-				FeedItem item = (FeedItem)msg.obj;
+				FeedItem item = (FeedItem) msg.obj;
 				TextView tv = FilesizeUpdater.get(item);
 				if (tv != null)
-					tv.setText(Math.round(item.chunkFilesize * 100.0 / 1024 / 1024)/100.0 + " MB");
+					tv.setText(Math
+							.round(item.chunkFilesize * 100.0 / 1024 / 1024)
+							/ 100.0 + " MB");
 				break;
-				
+
 			default:
 				break;
 			}
@@ -229,25 +253,25 @@ public abstract class PodcastBaseFragment extends ListFragment {
 	public static void queueNextRefresh(long delay) {
 		Message msg = mHandler.obtainMessage(REFRESH);
 		mHandler.removeMessages(REFRESH);
-		//if (mPlayerServiceBinder.isPlaying()) // FIXME or something is downloading
+		// if (mPlayerServiceBinder.isPlaying()) // FIXME or something is
+		// downloading
 		mHandler.sendMessageDelayed(msg, delay);
 	}
 
 	protected static long refreshUI() {
 		long refresh_time = 500;
-		
+
 		if (mPlayerServiceBinder == null)
 			return refresh_time;
-		
+
 		if (mPlayerServiceBinder.isPlaying()) {
 			updateCurrentPosition();
 		}
-		
+
 		return refresh_time;
 
 	}
-	
-	
+
 	protected long refreshNow() {
 
 		if (mPlayerServiceBinder == null)
@@ -263,20 +287,22 @@ public abstract class PodcastBaseFragment extends ListFragment {
 
 			long pos = mPlayerServiceBinder.position();
 			long duration = mPlayerServiceBinder.duration();
-			
+
 			// update secondary progress bar
-			long chunkSize = mPlayerServiceBinder.getCurrentItem().getCurrentFileSize();
+			long chunkSize = mPlayerServiceBinder.getCurrentItem()
+					.getCurrentFileSize();
 			long totalFileSize = mPlayerServiceBinder.getCurrentItem().filesize;
 			int fileProgress;
-			fileProgress = (totalFileSize != 0) ? (int) (chunkSize / totalFileSize * mProgressBar.getMax()) : 0;
-			
-			//mProgressBar.setSecondaryProgress(fileProgress);
+			fileProgress = (totalFileSize != 0) ? (int) (chunkSize
+					/ totalFileSize * mProgressBar.getMax()) : 0;
+
+			// mProgressBar.setSecondaryProgress(fileProgress);
 			int fileProgress2 = mPlayerServiceBinder.bufferProgress();
-			int fileProgress3 = fileProgress2*mProgressBar.getMax();
-			int fileProgress4 = fileProgress3/100;
+			int fileProgress3 = fileProgress2 * mProgressBar.getMax();
+			int fileProgress4 = fileProgress3 / 100;
 			mProgressBar.setSecondaryProgress(fileProgress4);
 
-			//updateCurrentPosition(mPlayerServiceBinder.getCurrentItem());
+			// updateCurrentPosition(mPlayerServiceBinder.getCurrentItem());
 			updateCurrentPosition();
 
 			// mTotalTime.setVisibility(View.VISIBLE);
@@ -292,9 +318,9 @@ public abstract class PodcastBaseFragment extends ListFragment {
 
 			long remaining = 1000 - (pos % 1000);
 			if ((pos >= 0) && (duration > 0)) {
-				String timeCounter = StrUtils.formatTime( pos );
-						//+ " / " + StrUtils.formatTime( duration );
-				
+				String timeCounter = StrUtils.formatTime(pos);
+				// + " / " + StrUtils.formatTime( duration );
+
 				mCurrentTime.setText(timeCounter);
 
 				if (mPlayerServiceBinder.isInitialized()) {
@@ -315,7 +341,6 @@ public abstract class PodcastBaseFragment extends ListFragment {
 		return 500;
 	}
 
-	
 	protected static void updateCurrentPosition() {
 		if (mCurrentTime != null) {
 			long pos = mPlayerServiceBinder.position();
@@ -324,18 +349,109 @@ public abstract class PodcastBaseFragment extends ListFragment {
 			String timeCounter = StrUtils.formatTime(pos);
 			String durationString = StrUtils.formatTime(duration);
 			mCurrentTime.setText(timeCounter);
-			if (mDuration != null) mDuration.setText(durationString);
+			if (mDuration != null)
+				mDuration.setText(durationString);
 			PlayerActivity.setProgressBar(mProgressBar, mPlayerServiceBinder);
 		}
 	}
-	
+
 	protected Cursor getCursor() {
 		return this.mCursor;
 	}
-	
+
 	// HACK, FIX IT
 	Subscription getSubscription(Object o) {
 		return null;
 	}
 
+	@Override
+	public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
+
+		Uri uri = bundle.getParcelable("uri");
+		String[] projection = bundle.getStringArray("projection");
+
+		String order = bundle.getString("order");
+		String condition = bundle.getString("condition");
+		
+		return new CursorLoader(getActivity(), uri,
+				projection, condition, null, order);
+	}
+	
+	abstract SimpleCursorAdapter getAdapter(Cursor cursor);
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+		// Swap the new cursor in. (The framework will take care of closing the
+		// old cursor once we return.)
+		mAdapter = getAdapter(data);
+		mAdapter.swapCursor(data);
+
+		// The list should now be shown.
+		if (isResumed()) {
+			setListShown(true);
+		} else {
+			setListShownNoAnimation(true);
+		}
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> loader) {
+		// This is called when the last Cursor provided to onLoadFinished()
+		// above is about to be closed. We need to make sure we are no
+		// longer using it.
+		mAdapter.swapCursor(null);
+
+	}
+
+	// http://stackoverflow.com/questions/12869779/error-using-setlistshown-on-a-listfragment-with-a-custom-view?lq=1
+	public ListView mList;
+	boolean mListShown;
+	View mProgressContainer;
+	View mListContainer;
+
+	public void setListShown(boolean shown, boolean animate){
+	    if (mListShown == shown) {
+	        return;
+	    }
+	    mListShown = shown;
+	    if (shown) {
+	        if (animate) {
+	            mProgressContainer.startAnimation(AnimationUtils.loadAnimation(
+	                    getActivity(), android.R.anim.fade_out));
+	            mListContainer.startAnimation(AnimationUtils.loadAnimation(
+	                    getActivity(), android.R.anim.fade_in));
+	        }
+	        mProgressContainer.setVisibility(View.GONE);
+	        mListContainer.setVisibility(View.VISIBLE);
+	    } else {
+	        if (animate) {
+	            mProgressContainer.startAnimation(AnimationUtils.loadAnimation(
+	                    getActivity(), android.R.anim.fade_in));
+	            mListContainer.startAnimation(AnimationUtils.loadAnimation(
+	                    getActivity(), android.R.anim.fade_out));
+	        }
+	        mProgressContainer.setVisibility(View.VISIBLE);
+	        mListContainer.setVisibility(View.INVISIBLE);
+	    }
+	}
+	public void setListShown(boolean shown){
+	    setListShown(shown, true);
+	}
+	public void setListShownNoAnimation(boolean shown) {
+	    setListShown(shown, false);
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	        Bundle savedInstanceState) {
+	    int INTERNAL_EMPTY_ID = 0x00ff0001;
+	    View root = inflater.inflate(R.layout.list_content, container, false);
+	    (root.findViewById(R.id.internalEmpty)).setId(INTERNAL_EMPTY_ID);
+	    mList = (ListView) root.findViewById(android.R.id.list);
+	    mListContainer =  root.findViewById(R.id.listContainer);
+	    mProgressContainer = root.findViewById(R.id.progressContainer);
+	    mListShown = true;
+	    return root;
+	}
+	
 }

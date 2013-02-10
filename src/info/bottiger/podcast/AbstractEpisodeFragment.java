@@ -2,6 +2,7 @@ package info.bottiger.podcast;
 
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
+import info.bottiger.podcast.provider.SubscriptionColumns;
 import info.bottiger.podcast.service.PodcastDownloadManager;
 import info.bottiger.podcast.utils.ControlButtons;
 
@@ -38,6 +39,8 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 		setHasOptionsMenu(true);
 	}
 	
+    //abstract public void onActivityCreated(Bundle savedInstanceState);
+	
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.episode_list, menu);
@@ -71,6 +74,7 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 		return where;
 	}
 	
+	/*
 	@Override
 	public void startInit() {
 		showEpisodes(getWhere());
@@ -84,6 +88,7 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 
 		setListAdapter(mAdapter);
 	}
+	*/
 	
 	public void getPref() {
 		SharedPreferences pref = getActivity().getSharedPreferences(

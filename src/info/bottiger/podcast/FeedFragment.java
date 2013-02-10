@@ -7,11 +7,14 @@ import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
 import info.bottiger.podcast.adapters.CompactListCursorAdapter;
 import info.bottiger.podcast.adapters.ItemCursorAdapter;
 import info.bottiger.podcast.provider.ItemColumns;
+import info.bottiger.podcast.provider.SubscriptionColumns;
 import info.bottiger.podcast.service.PodcastService;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,6 +55,11 @@ public class FeedFragment extends AbstractEpisodeFragment {
 		return fragmentView;
 	}
 	
+	public SimpleCursorAdapter getAdapter(Cursor cursor) {
+		return FeedFragment.listItemCursorAdapter(this.getActivity(),
+				this, cursor);
+	}
+	
 	// Read here:
 	// http://developer.android.com/reference/android/app/Fragment.html#Layout
 	@Override
@@ -63,7 +71,10 @@ public class FeedFragment extends AbstractEpisodeFragment {
 
 
 		// Populate list with our static array of titles.
-		startInit();
+		//startInit();
+		mAdapter = FeedFragment.listItemCursorAdapter(this.getActivity(),
+				this, mCursor);
+		startInit(1, ItemColumns.URI, ItemColumns.ALL_COLUMNS, getWhere(), getOrder());
 
 		/*
 		final PullToRefreshListView pullToRefreshView = (PullToRefreshListView) fragmentView
@@ -104,6 +115,7 @@ public class FeedFragment extends AbstractEpisodeFragment {
 		return where;
 	}
 
+	/*
 	@Override
 	public void startInit() {
 		showEpisodes(getWhere());
@@ -117,4 +129,5 @@ public class FeedFragment extends AbstractEpisodeFragment {
 
 		setListAdapter(mAdapter);
 	}
+	*/
 }

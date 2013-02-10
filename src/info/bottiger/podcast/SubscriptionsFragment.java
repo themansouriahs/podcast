@@ -8,6 +8,7 @@ import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.provider.SubscriptionColumns;
 import info.bottiger.podcast.utils.DialogMenu;
 
+import java.net.URI;
 import java.util.HashMap;
 
 import android.app.Activity;
@@ -18,7 +19,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.BaseColumns;
-import android.support.v4.content.CursorLoader;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -76,7 +77,9 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-		fragmentView = inflater.inflate(R.layout.channel, container, false);
+		
+		log.debug("inside: onCreateView()");
+		fragmentView = inflater.inflate(R.layout.subscriptions, container, false);
 		
 		Intent intent = getActivity().getIntent();
 
@@ -84,9 +87,21 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 		
 		mPrevIntent = null;
 		mNextIntent = null;
-		startInit();
+		
 		return fragmentView;
 	}
+	
+	public SimpleCursorAdapter getAdapter(Cursor cursor) {
+		return listSubscriptionCursorAdapter(getActivity(), cursor);
+	}
+	
+    @Override 
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+		mAdapter = listSubscriptionCursorAdapter(getActivity(), mCursor);
+		startInit(0, SubscriptionColumns.URI, PROJECTION, "", "");
+    }
 
 	
 	@Override
@@ -146,20 +161,27 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 				AbstractPodcastAdapter.defaultTextFieldHandler,
 				new SubscriptionListCursorAdapter.IconFieldHandler()
 		};
-		return new SubscriptionListCursorAdapter(context, R.layout.episode_list, cursor,
+		return new SubscriptionListCursorAdapter(context, R.layout.subscriptions_list, cursor,
 				new String[] { SubscriptionColumns.TITLE, SubscriptionColumns.IMAGE_URL },
 				new int[] { R.id.title, R.id.list_image },
 				fields);
 	}
 
+	/*
+	 * Please delete
 	@Override
-	public void startInit() {
-		mCursor = new CursorLoader(getActivity(), SubscriptionColumns.URI, PROJECTION, null, null, null).loadInBackground();
-		mAdapter = listSubscriptionCursorAdapter(getActivity().getApplicationContext(), mCursor);
-	
+	public void startInit(int id, URI columns, String[] projection) {
+		mAdapter = listSubscriptionCursorAdapter(getActivity(), mCursor);
 		setListAdapter(mAdapter);
-
+		
+		// Prepare the loader.  Either re-connect with an existing one,
+        // or start a new one.
+		Bundle mBundle = new Bundle();
+		mBundle.putParcelable("uri", SubscriptionColumns.URI);
+		mBundle.putStringArray("projection", PROJECTION);
+		getLoaderManager().initLoader(0, mBundle, this);
 	}
+	*/
 
 	@Override
 	Subscription getSubscription(Object o) {

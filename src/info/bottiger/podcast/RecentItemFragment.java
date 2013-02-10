@@ -5,6 +5,7 @@ import info.bottiger.podcast.adapters.ItemCursorAdapter;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.Subscription;
+import info.bottiger.podcast.provider.SubscriptionColumns;
 import info.bottiger.podcast.service.PodcastDownloadManager;
 import info.bottiger.podcast.service.PodcastService;
 import info.bottiger.podcast.utils.ControlButtons;
@@ -25,6 +26,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.content.CursorLoader;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -61,6 +63,12 @@ public class RecentItemFragment extends AbstractEpisodeFragment {
 	private long mCurCheckID = -1;
 	boolean mDualPane;
 
+	
+	public SimpleCursorAdapter getAdapter(Cursor cursor) {
+		return RecentItemFragment.listItemCursorAdapter(this.getActivity(),
+				this, cursor);
+	}
+	
 	// Read here:
 	// http://developer.android.com/reference/android/app/Fragment.html#Layout
 	@Override
@@ -73,7 +81,10 @@ public class RecentItemFragment extends AbstractEpisodeFragment {
 		}
 
 		// Populate list with our static array of titles.
-		startInit();
+		//startInit();
+		mAdapter = RecentItemFragment.listItemCursorAdapter(this.getActivity(),
+				this, mCursor);
+		startInit(1, ItemColumns.URI, ItemColumns.ALL_COLUMNS, getWhere(), getOrder());
 
 		if (mDualPane) {
 			// In dual-pane mode, the list view highlights the selected item.
