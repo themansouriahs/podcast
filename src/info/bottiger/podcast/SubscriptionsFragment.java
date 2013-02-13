@@ -8,7 +8,6 @@ import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.provider.SubscriptionColumns;
 import info.bottiger.podcast.utils.DialogMenu;
 
-import java.net.URI;
 import java.util.HashMap;
 
 import android.app.Activity;
@@ -19,13 +18,15 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.BaseColumns;
-import android.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
+
+import com.actionbarsherlock.view.Menu;
+
 
 /* Copy of ChannelActivity */
 public class SubscriptionsFragment extends PodcastBaseFragment {

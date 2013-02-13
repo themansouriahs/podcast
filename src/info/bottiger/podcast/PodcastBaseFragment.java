@@ -7,13 +7,9 @@ import info.bottiger.podcast.utils.FilesizeUpdater;
 import info.bottiger.podcast.utils.Log;
 import info.bottiger.podcast.utils.StrUtils;
 import android.app.Activity;
-import android.app.ListFragment;
-import android.app.LoaderManager;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.Loader;
 import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.net.Uri;
@@ -21,10 +17,15 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.support.v4.app.ListFragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.animation.AnimationUtils;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,16 +35,11 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 import android.widget.SeekBar;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 /* Copy of PodcastBaseActivity */
 public abstract class PodcastBaseFragment extends ListFragment implements
 		LoaderManager.LoaderCallbacks<Cursor> {
-
-	private static final int SWIPE_MIN_DISTANCE = 120;
-	private static final int SWIPE_MAX_OFF_PATH = 250;
-	private static final int SWIPE_THRESHOLD_VELOCITY = 200;
 
 	public static final int COLUMN_INDEX_TITLE = 1;
 
@@ -190,17 +186,18 @@ public abstract class PodcastBaseFragment extends ListFragment implements
 		super.onActivityCreated(savedInstanceState);
 
 		OnItemLongClickListener listener = new OnItemLongClickListener() {
-			@Override
+			
 			public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
 					int position, long id) {
 				return false;
 			}
+			
 
 		};
 
 		registerForContextMenu(getListView());
 		//((TextView)getListView().getEmptyView()).setText( "the empty message" );
-		getListView().setOnItemLongClickListener(listener);
+		getListView().setOnItemLongClickListener((android.widget.AdapterView.OnItemLongClickListener) listener);
 
 	}
 
@@ -209,10 +206,9 @@ public abstract class PodcastBaseFragment extends ListFragment implements
 			ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
 		MenuInflater inflater = getActivity().getMenuInflater();
-		inflater.inflate(R.menu.podcast_context, menu);
+		inflater.inflate(R.menu.podcast_context, (Menu) menu);
 	}
 
-	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 
 		if (!AdapterView.AdapterContextMenuInfo.class.isInstance(item
@@ -232,7 +228,7 @@ public abstract class PodcastBaseFragment extends ListFragment implements
 			sub.unsubscribe(getActivity().getApplicationContext());
 			return true;
 		default:
-			return super.onContextItemSelected(item);
+			return super.onContextItemSelected((android.view.MenuItem) item);
 		}
 	}
 

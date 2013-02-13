@@ -1,37 +1,21 @@
 package info.bottiger.podcast.adapters;
 
-import info.bottiger.podcast.PlayerActivity;
 import info.bottiger.podcast.PodcastBaseFragment;
 import info.bottiger.podcast.R;
-import info.bottiger.podcast.adapters.PodcastAdapterInterface.FieldHandler;
-import info.bottiger.podcast.listeners.DownloadProgressListener;
 import info.bottiger.podcast.provider.FeedItem;
-import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.Subscription;
-import info.bottiger.podcast.service.DownloadStatus;
-import info.bottiger.podcast.utils.ControlButtons;
-import info.bottiger.podcast.utils.StrUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeSet;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
-
-import android.app.DownloadManager;
 import android.content.Context;
 import android.database.Cursor;
-import android.os.Bundle;
-import android.provider.BaseColumns;
-import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewStub;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.SeekBar;
 import android.widget.TextView;
+
 
 public class CompactListCursorAdapter extends AbstractEpisodeCursorAdapter {
 

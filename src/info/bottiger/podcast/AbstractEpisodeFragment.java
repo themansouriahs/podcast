@@ -2,24 +2,16 @@ package info.bottiger.podcast;
 
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
-import info.bottiger.podcast.provider.SubscriptionColumns;
 import info.bottiger.podcast.service.PodcastDownloadManager;
-import info.bottiger.podcast.utils.ControlButtons;
 
 import java.util.HashMap;
 
 import android.content.Context;
-import android.content.CursorLoader;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
+import android.support.v4.content.CursorLoader;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ListView;
 
 public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
@@ -41,11 +33,12 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 	
     //abstract public void onActivityCreated(Bundle savedInstanceState);
 	
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		inflater.inflate(R.menu.episode_list, menu);
+	/*
+	public void onCreateOptionsMenu(Menu menu) {
+		getSupportMenuInflater().inflate(R.menu.episode_list, menu);
 		super.onCreateOptionsMenu(menu, inflater);
 	}
+	*/
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
