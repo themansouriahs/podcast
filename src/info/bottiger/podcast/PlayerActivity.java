@@ -19,7 +19,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.support.v4.widget.SimpleCursorAdapter;
+import android.widget.SimpleCursorAdapter;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,6 +38,7 @@ import info.bottiger.podcast.utils.DialogMenu;
 import info.bottiger.podcast.utils.Log;
 import info.bottiger.podcast.utils.PodcastProgressBar;
 import info.bottiger.podcast.utils.StrUtils;
+
 
 public class PlayerActivity extends ListActivity {
 	protected static PlayerService mServiceBinder = null;

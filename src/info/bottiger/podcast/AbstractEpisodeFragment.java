@@ -9,11 +9,11 @@ import info.bottiger.podcast.utils.ControlButtons;
 import java.util.HashMap;
 
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.content.CursorLoader;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -70,7 +70,7 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 	}
 
 	public String getWhere() {
-		String where = "";
+		String where = "1";
 		return where;
 	}
 	

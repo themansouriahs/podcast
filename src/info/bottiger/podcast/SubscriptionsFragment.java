@@ -19,7 +19,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.BaseColumns;
-import android.support.v4.widget.SimpleCursorAdapter;
+import android.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -52,6 +52,7 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 	TextView addSubscriptionView = null;;
 	private static HashMap<Integer, Integer> mIconMap;
 	private View fragmentView;
+	private int mListItem;
 	
 	Subscription mChannel = null;
 	long id;
@@ -77,11 +78,27 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
+		super.onCreateView(inflater, container, savedInstanceState);
 		
 		log.debug("inside: onCreateView()");
-		fragmentView = inflater.inflate(R.layout.subscriptions, container, false);
+		super.onCreateView(inflater, container, savedInstanceState);
 		
+		int INTERNAL_EMPTY_ID = 0x00ff0001;
+		
+		mListItem = R.layout.subscriptions_list;
+		int listContainer = R.layout.list_content;
+		
+		fragmentView = inflater.inflate(listContainer, container, false);
+		
+	    (fragmentView.findViewById(R.id.internalEmpty)).setId(INTERNAL_EMPTY_ID);
+	    
+	    mList = (ListView) fragmentView.findViewById(mListItem);
+				
 		Intent intent = getActivity().getIntent();
+		intent.setData(ItemColumns.URI);
+	    mListContainer =  fragmentView.findViewById(R.id.listContainer);
+	    mProgressContainer = fragmentView.findViewById(R.id.progressContainer);
+	    mListShown = true;
 
 		Uri uri = intent.getData();
 		
@@ -92,16 +109,26 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 	}
 	
 	public SimpleCursorAdapter getAdapter(Cursor cursor) {
-		return listSubscriptionCursorAdapter(getActivity(), cursor);
+		return listSubscriptionCursorAdapter(getActivity(), cursor, mListItem);
 	}
 	
     @Override 
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-		mAdapter = listSubscriptionCursorAdapter(getActivity(), mCursor);
-		startInit(0, SubscriptionColumns.URI, PROJECTION, "", "");
+		mAdapter = listSubscriptionCursorAdapter(getActivity(), mCursor, mListItem);
+		startInit(0, SubscriptionColumns.URI, PROJECTION, getWhere(), getOrder());
     }
+    
+	public String getWhere() {
+		String where = "1";
+		return where;
+	}
+	
+	public String getOrder() {
+		String order = "title DESC";
+		return order;
+	}
 
 	
 	@Override
@@ -156,12 +183,12 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 	}
 
 	
-	private static SubscriptionListCursorAdapter listSubscriptionCursorAdapter(Context context, Cursor cursor) {
+	private static SubscriptionListCursorAdapter listSubscriptionCursorAdapter(Context context, Cursor cursor, int listitem) {
 		SubscriptionListCursorAdapter.FieldHandler[] fields = {
 				AbstractPodcastAdapter.defaultTextFieldHandler,
 				new SubscriptionListCursorAdapter.IconFieldHandler()
 		};
-		return new SubscriptionListCursorAdapter(context, R.layout.subscriptions_list, cursor,
+		return new SubscriptionListCursorAdapter(context, listitem, cursor,
 				new String[] { SubscriptionColumns.TITLE, SubscriptionColumns.IMAGE_URL },
 				new int[] { R.id.title, R.id.list_image },
 				fields);

@@ -7,9 +7,13 @@ import info.bottiger.podcast.utils.FilesizeUpdater;
 import info.bottiger.podcast.utils.Log;
 import info.bottiger.podcast.utils.StrUtils;
 import android.app.Activity;
+import android.app.ListFragment;
+import android.app.LoaderManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
 import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.net.Uri;
@@ -17,24 +21,20 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.support.v4.app.ListFragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.animation.AnimationUtils;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 import android.widget.SeekBar;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 /* Copy of PodcastBaseActivity */
@@ -80,6 +80,64 @@ public abstract class PodcastBaseFragment extends ListFragment implements
 	private static TextView mCurrentTime = null;
 	private static SeekBar mProgressBar = null;
 	private static TextView mDuration = null;
+	
+	
+	/////////////////////////
+	
+	public ListView mList;
+	boolean mListShown;
+	View mProgressContainer;
+	View mListContainer;
+	/*
+	public void setListShown(boolean shown, boolean animate){
+		int v = mListContainer.getVisibility();
+		if (mListShown == shown) {
+	        return;
+	    }
+	    
+	    mListShown = shown;
+	    if (shown) {
+	        if (animate) {
+	            mProgressContainer.startAnimation(AnimationUtils.loadAnimation(
+	                    getActivity(), android.R.anim.fade_out));
+	            mListContainer.startAnimation(AnimationUtils.loadAnimation(
+	                    getActivity(), android.R.anim.fade_in));
+	        }
+	        mProgressContainer.setVisibility(View.GONE);
+	        mListContainer.setVisibility(View.VISIBLE);
+	    } else {
+	        if (animate) {
+	            mProgressContainer.startAnimation(AnimationUtils.loadAnimation(
+	                    getActivity(), android.R.anim.fade_in));
+	            mListContainer.startAnimation(AnimationUtils.loadAnimation(
+	                    getActivity(), android.R.anim.fade_out));
+	        }
+	        mProgressContainer.setVisibility(View.VISIBLE);
+	        mListContainer.setVisibility(View.INVISIBLE);
+	    }
+	}
+	public void setListShown(boolean shown){
+	    setListShown(shown, true);
+	}
+	public void setListShownNoAnimation(boolean shown) {
+	    setListShown(shown, false);
+	}
+	*/
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	        Bundle savedInstanceState) {
+	    int INTERNAL_EMPTY_ID = 0x00ff0001;
+	    View root = inflater.inflate(R.layout.list_content, container, false);
+	    (root.findViewById(R.id.internalEmpty)).setId(INTERNAL_EMPTY_ID);
+	    mList = (ListView) root.findViewById(android.R.id.list);
+	    mListContainer =  root.findViewById(R.id.listContainer);
+	    mProgressContainer = root.findViewById(R.id.progressContainer);
+	    mListShown = true;
+	    return root;
+	}
+	/////////////////////////
+	
 
 	public TextView getCurrentTime() {
 		return mCurrentTime;
@@ -141,6 +199,7 @@ public abstract class PodcastBaseFragment extends ListFragment implements
 		};
 
 		registerForContextMenu(getListView());
+		//((TextView)getListView().getEmptyView()).setText( "the empty message" );
 		getListView().setOnItemLongClickListener(listener);
 
 	}
@@ -191,6 +250,8 @@ public abstract class PodcastBaseFragment extends ListFragment implements
 		Intent bindIntent = new Intent(getActivity(), PlayerService.class);
 		getActivity().bindService(bindIntent, playerServiceConnection,
 				Context.BIND_AUTO_CREATE);
+		
+		
 	}
 
 	@Override
@@ -222,6 +283,8 @@ public abstract class PodcastBaseFragment extends ListFragment implements
 		Bundle mBundle = new Bundle();
 		mBundle.putParcelable("uri", columns);
 		mBundle.putStringArray("projection", projection);
+		mBundle.putString("where", condition);
+		mBundle.putString("order", order);
 		getLoaderManager().initLoader(id, mBundle, this);
 	}
 
@@ -371,20 +434,24 @@ public abstract class PodcastBaseFragment extends ListFragment implements
 		String[] projection = bundle.getStringArray("projection");
 
 		String order = bundle.getString("order");
-		String condition = bundle.getString("condition");
+		String condition = bundle.getString("where");
 		
 		return new CursorLoader(getActivity(), uri,
 				projection, condition, null, order);
 	}
 	
 	abstract SimpleCursorAdapter getAdapter(Cursor cursor);
+	
+	abstract String getWhere();
+	abstract String getOrder();
 
 	@Override
-	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
 		// Swap the new cursor in. (The framework will take care of closing the
+		
 		// old cursor once we return.)
-		mAdapter = getAdapter(data);
-		mAdapter.swapCursor(data);
+		mAdapter.swapCursor(cursor);
+		/*
 
 		// The list should now be shown.
 		if (isResumed()) {
@@ -392,6 +459,8 @@ public abstract class PodcastBaseFragment extends ListFragment implements
 		} else {
 			setListShownNoAnimation(true);
 		}
+		
+		*/
 	}
 
 	@Override
@@ -403,55 +472,7 @@ public abstract class PodcastBaseFragment extends ListFragment implements
 
 	}
 
+	/*
 	// http://stackoverflow.com/questions/12869779/error-using-setlistshown-on-a-listfragment-with-a-custom-view?lq=1
-	public ListView mList;
-	boolean mListShown;
-	View mProgressContainer;
-	View mListContainer;
-
-	public void setListShown(boolean shown, boolean animate){
-	    if (mListShown == shown) {
-	        return;
-	    }
-	    mListShown = shown;
-	    if (shown) {
-	        if (animate) {
-	            mProgressContainer.startAnimation(AnimationUtils.loadAnimation(
-	                    getActivity(), android.R.anim.fade_out));
-	            mListContainer.startAnimation(AnimationUtils.loadAnimation(
-	                    getActivity(), android.R.anim.fade_in));
-	        }
-	        mProgressContainer.setVisibility(View.GONE);
-	        mListContainer.setVisibility(View.VISIBLE);
-	    } else {
-	        if (animate) {
-	            mProgressContainer.startAnimation(AnimationUtils.loadAnimation(
-	                    getActivity(), android.R.anim.fade_in));
-	            mListContainer.startAnimation(AnimationUtils.loadAnimation(
-	                    getActivity(), android.R.anim.fade_out));
-	        }
-	        mProgressContainer.setVisibility(View.VISIBLE);
-	        mListContainer.setVisibility(View.INVISIBLE);
-	    }
-	}
-	public void setListShown(boolean shown){
-	    setListShown(shown, true);
-	}
-	public void setListShownNoAnimation(boolean shown) {
-	    setListShown(shown, false);
-	}
-
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-	        Bundle savedInstanceState) {
-	    int INTERNAL_EMPTY_ID = 0x00ff0001;
-	    View root = inflater.inflate(R.layout.list_content, container, false);
-	    (root.findViewById(R.id.internalEmpty)).setId(INTERNAL_EMPTY_ID);
-	    mList = (ListView) root.findViewById(android.R.id.list);
-	    mListContainer =  root.findViewById(R.id.listContainer);
-	    mProgressContainer = root.findViewById(R.id.progressContainer);
-	    mListShown = true;
-	    return root;
-	}
-	
+	*/
 }

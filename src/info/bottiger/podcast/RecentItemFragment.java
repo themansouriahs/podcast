@@ -25,8 +25,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.BaseColumns;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.widget.SimpleCursorAdapter;
+import android.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -57,7 +56,7 @@ public class RecentItemFragment extends AbstractEpisodeFragment {
 
 	private View mCurrentPlayer = null;
 
-	private ItemCursorAdapter mAdapter;
+	//private ItemCursorAdapter mAdapter;
 
 
 	private long mCurCheckID = -1;
@@ -66,8 +65,13 @@ public class RecentItemFragment extends AbstractEpisodeFragment {
 	
 	public SimpleCursorAdapter getAdapter(Cursor cursor) {
 		return RecentItemFragment.listItemCursorAdapter(this.getActivity(),
-				this, cursor);
+				this, cursor, mListItemView);
 	}
+
+	
+	int mListItemView;
+	int mListView;
+
 	
 	// Read here:
 	// http://developer.android.com/reference/android/app/Fragment.html#Layout
@@ -83,7 +87,7 @@ public class RecentItemFragment extends AbstractEpisodeFragment {
 		// Populate list with our static array of titles.
 		//startInit();
 		mAdapter = RecentItemFragment.listItemCursorAdapter(this.getActivity(),
-				this, mCursor);
+				this, mCursor, mListItemView);
 		startInit(1, ItemColumns.URI, ItemColumns.ALL_COLUMNS, getWhere(), getOrder());
 
 		if (mDualPane) {
@@ -93,8 +97,10 @@ public class RecentItemFragment extends AbstractEpisodeFragment {
 			// showDetails(mCurCheckPosition);
 		}
 
+		
+		/*
 		final PullToRefreshListView pullToRefreshView = (PullToRefreshListView) fragmentView
-				.findViewById(R.id.episode_list);
+				.findViewById(mListView);
 
 		OnRefreshListener<ListView> pullToRefreshListener = new OnRefreshListener<ListView>() {
 
@@ -105,10 +111,13 @@ public class RecentItemFragment extends AbstractEpisodeFragment {
 			}
 		};
 
+		
 		actualListView = pullToRefreshView.getRefreshableView();
 		pullToRefreshView.getLoadingLayoutProxy().setRefreshingLabel(
 				"Refreshing feeds");
 		pullToRefreshView.setOnRefreshListener(pullToRefreshListener);
+		*/
+		
 	}
 
 	@Override
@@ -118,13 +127,13 @@ public class RecentItemFragment extends AbstractEpisodeFragment {
 	}
 
 	public static ItemCursorAdapter listItemCursorAdapter(Context context,
-			PodcastBaseFragment fragment, Cursor cursor) {
+			PodcastBaseFragment fragment, Cursor cursor, int listItemView) {
 		ItemCursorAdapter.FieldHandler[] fields = {
 				ItemCursorAdapter.defaultTextFieldHandler,
 				new ItemCursorAdapter.TextFieldHandler(),
 				new ItemCursorAdapter.TextFieldHandler(),
 				new ItemCursorAdapter.IconFieldHandler(mIconMap), };
-		return new ItemCursorAdapter(context, fragment, R.layout.episode_list,
+		return new ItemCursorAdapter(context, fragment, listItemView,
 				cursor, new String[] { ItemColumns.TITLE,
 						ItemColumns.SUB_TITLE, ItemColumns.DURATION,
 						ItemColumns.IMAGE_URL }, new int[] { R.id.title,
@@ -144,9 +153,25 @@ public class RecentItemFragment extends AbstractEpisodeFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		fragmentView = inflater.inflate(R.layout.recent, container, false);
+		super.onCreateView(inflater, container, savedInstanceState);
+		
+		int INTERNAL_EMPTY_ID = 0x00ff0001;
+		
+		mListView = R.layout.recent;
+		mListItemView = R.layout.episode_list;
+		
+	
+		fragmentView = inflater.inflate(mListView, container, false);
+		
+	    (fragmentView.findViewById(R.id.internalEmpty)).setId(INTERNAL_EMPTY_ID);
+	    mList = (ListView) fragmentView.findViewById(mListItemView);
+		
+		
 		Intent intent = getActivity().getIntent();
 		intent.setData(ItemColumns.URI);
+	    mListContainer =  fragmentView.findViewById(R.id.listContainer);
+	    mProgressContainer = fragmentView.findViewById(R.id.progressContainer);
+	    mListShown = true;
 
 		getPref();
 		return fragmentView;
@@ -186,12 +211,10 @@ public class RecentItemFragment extends AbstractEpisodeFragment {
 		mCursor = createCursor(condition);
 
 		mAdapter = RecentItemFragment.listItemCursorAdapter(this.getActivity(),
-				this, mCursor);
+				this, mCursor, mListItemView);
 
 		if (this.mCurCheckID > 0) {
-			mAdapter.showItem(mCurCheckID);
-			// View view = getViewByID(mCurCheckID);
-			// this.setPlayerListeners(view, mCurCheckID);
+			((ItemCursorAdapter)mAdapter).showItem(mCurCheckID);
 		}
 
 		setListAdapter(mAdapter);
@@ -201,7 +224,7 @@ public class RecentItemFragment extends AbstractEpisodeFragment {
 		int start = list.getFirstVisiblePosition();
 		boolean setListners = false;
 
-		mAdapter.toggleItem(item);
+		((ItemCursorAdapter)mAdapter).toggleItem(item);
 		long id = item.getLong(item.getColumnIndex(BaseColumns._ID));
 		String duration = item.getString(item
 				.getColumnIndex(ItemColumns.DURATION));
