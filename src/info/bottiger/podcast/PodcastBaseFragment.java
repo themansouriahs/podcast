@@ -1,24 +1,26 @@
 package info.bottiger.podcast;
 
-import info.bottiger.podcast.R;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.service.PlayerService;
 import info.bottiger.podcast.utils.FilesizeUpdater;
 import info.bottiger.podcast.utils.Log;
 import info.bottiger.podcast.utils.StrUtils;
-
 import android.app.Activity;
+import android.app.ListFragment;
+import android.app.LoaderManager;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.CursorLoader;
+import android.content.Intent;
+import android.content.Loader;
+import android.content.ServiceConnection;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.support.v4.app.ListFragment;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.MenuInflater;
@@ -32,7 +34,7 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 /* Copy of PodcastBaseActivity */
-public abstract class PodcastBaseFragment extends ListFragment {
+public abstract class PodcastBaseFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
 	private static final int SWIPE_MIN_DISTANCE = 120;
 	private static final int SWIPE_MAX_OFF_PATH = 250;
@@ -337,5 +339,61 @@ public abstract class PodcastBaseFragment extends ListFragment {
 	Subscription getSubscription(Object o) {
 		return null;
 	}
+	
+	public void startInit(int id, Uri columns, String[] projection, String condition, String order) {
+		assert condition != null;
+		assert order != null;
+		assert projection != null;
+
+		setListAdapter(mAdapter);
+
+		// Prepare the loader. Either re-connect with an existing one,
+		// or start a new one.
+		Bundle mBundle = new Bundle();
+		mBundle.putParcelable("uri", columns);
+		mBundle.putStringArray("projection", projection);
+		// FIXME
+		getLoaderManager().initLoader(id, mBundle, this);
+	}
+	
+	@Override
+	public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
+
+		Uri uri = bundle.getParcelable("uri");
+		String[] projection = bundle.getStringArray("projection");
+
+		String order = bundle.getString("order");
+		String condition = bundle.getString("condition");
+
+		return new CursorLoader(getActivity(), uri,
+				projection, condition, null, order);
+	}
+
+	abstract SimpleCursorAdapter getAdapter(Cursor cursor);
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+		// Swap the new cursor in. (The framework will take care of closing the
+		// old cursor once we return.)
+		mAdapter = getAdapter(data);
+		mAdapter.swapCursor(data);
+
+		// The list should now be shown.
+		if (isResumed()) {
+			setListShown(true);
+		} else {
+			setListShownNoAnimation(true);
+		}
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> loader) {
+		// This is called when the last Cursor provided to onLoadFinished()
+		// above is about to be closed. We need to make sure we are no
+		// longer using it.
+		mAdapter.swapCursor(null);
+
+	}
+
 
 }

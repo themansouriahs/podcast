@@ -702,6 +702,12 @@ public class PlayerFragment   extends PodcastBaseFragment
 		pref_rwnd_interval = Integer.parseInt(pref.getString("pref_rewind_interval","7"));		
 		rwnd_interval = pref_rwnd_interval*1000;
 
+	}
+
+	@Override
+	SimpleCursorAdapter getAdapter(Cursor cursor) {
+		// TODO Auto-generated method stub
+		return null;
 	}    
 
 }

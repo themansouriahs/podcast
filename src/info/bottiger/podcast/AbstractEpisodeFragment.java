@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 
 public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 	
@@ -31,6 +32,7 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 	
 
 	protected ListView actualListView = null;
+	
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {

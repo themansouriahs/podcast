@@ -34,6 +34,7 @@ import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.AbsListView;
 import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 public class RecentItemFragment extends AbstractEpisodeFragment {
@@ -73,7 +74,10 @@ public class RecentItemFragment extends AbstractEpisodeFragment {
 		}
 
 		// Populate list with our static array of titles.
-		startInit();
+		mAdapter = listItemCursorAdapter(this.getActivity(),
+				this, mCursor);
+		startInit(1, ItemColumns.URI, ItemColumns.ALL_COLUMNS, getWhere(), getOrder());
+		//startInit();
 
 		if (mDualPane) {
 			// In dual-pane mode, the list view highlights the selected item.
@@ -118,6 +122,11 @@ public class RecentItemFragment extends AbstractEpisodeFragment {
 						ItemColumns.SUB_TITLE, ItemColumns.DURATION,
 						ItemColumns.IMAGE_URL }, new int[] { R.id.title,
 						R.id.podcast, R.id.duration, R.id.list_image }, fields);
+	}
+	
+	public SimpleCursorAdapter getAdapter(Cursor cursor) {
+		return listItemCursorAdapter(this.getActivity(),
+				this, cursor);
 	}
 
 	@Override

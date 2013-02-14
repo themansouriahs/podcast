@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 
 public class FeedFragment extends AbstractEpisodeFragment {
 
@@ -36,6 +37,11 @@ public class FeedFragment extends AbstractEpisodeFragment {
 						ItemColumns.SUB_TITLE, ItemColumns.DURATION,
 						ItemColumns.IMAGE_URL }, new int[] { R.id.title,
 						R.id.podcast, R.id.duration, R.id.list_image }, fields);
+	}
+	
+	public SimpleCursorAdapter getAdapter(Cursor cursor) {
+		return listItemCursorAdapter(this.getActivity(),
+				this, cursor);
 	}
 	
 	@Override
@@ -63,7 +69,11 @@ public class FeedFragment extends AbstractEpisodeFragment {
 
 
 		// Populate list with our static array of titles.
-		startInit();
+		
+		mAdapter = FeedFragment.listItemCursorAdapter(this.getActivity(),
+				this, mCursor);
+		startInit(1, ItemColumns.URI, ItemColumns.ALL_COLUMNS, getWhere(), getOrder());
+		//startInit();
 
 		/*
 		final PullToRefreshListView pullToRefreshView = (PullToRefreshListView) fragmentView

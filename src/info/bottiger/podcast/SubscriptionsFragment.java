@@ -24,6 +24,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 /* Copy of ChannelActivity */
@@ -87,6 +88,14 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 		startInit();
 		return fragmentView;
 	}
+	
+    @Override 
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+		mAdapter = listSubscriptionCursorAdapter(getActivity(), mCursor);
+		startInit(0, SubscriptionColumns.URI, PROJECTION, "", "");
+    }
 
 	
 	@Override
@@ -150,6 +159,10 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 				new String[] { SubscriptionColumns.TITLE, SubscriptionColumns.IMAGE_URL },
 				new int[] { R.id.title, R.id.list_image },
 				fields);
+	}
+	
+	public SimpleCursorAdapter getAdapter(Cursor cursor) {
+		return listSubscriptionCursorAdapter(this.getActivity(), cursor);
 	}
 
 	@Override
