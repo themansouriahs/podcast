@@ -1,24 +1,16 @@
 package info.bottiger.podcast;
 
-import com.handmark.pulltorefresh.library.PullToRefreshBase;
-import com.handmark.pulltorefresh.library.PullToRefreshListView;
-import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
-
 import info.bottiger.podcast.adapters.CompactListCursorAdapter;
 import info.bottiger.podcast.adapters.ItemCursorAdapter;
 import info.bottiger.podcast.provider.ItemColumns;
-import info.bottiger.podcast.service.PodcastService;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
-
 public class FeedFragment extends AbstractEpisodeFragment {
 
 	// FIXME should not be static
@@ -40,6 +32,9 @@ public class FeedFragment extends AbstractEpisodeFragment {
 	}
 	
 	public SimpleCursorAdapter getAdapter(Cursor cursor) {
+		if (mAdapter != null)
+			return mAdapter;
+		
 		return listItemCursorAdapter(this.getActivity(),
 				this, cursor);
 	}
@@ -47,6 +42,7 @@ public class FeedFragment extends AbstractEpisodeFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+		super.onCreateView(inflater, container, savedInstanceState);
 		
 		header = (ViewGroup) inflater.inflate(R.layout.podcast_header, null);
 		

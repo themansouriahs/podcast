@@ -12,19 +12,19 @@ import java.util.HashMap;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.BaseColumns;
-import android.support.v4.content.CursorLoader;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 /* Copy of ChannelActivity */
@@ -77,7 +77,10 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-		fragmentView = inflater.inflate(R.layout.channel, container, false);
+		super.onCreateView(inflater, container, savedInstanceState);
+		
+		fragmentView = inflater.inflate(R.layout.channel_new, container, false);
+		
 		
 		Intent intent = getActivity().getIntent();
 
@@ -95,6 +98,9 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 
 		mAdapter = listSubscriptionCursorAdapter(getActivity(), mCursor);
 		startInit(0, SubscriptionColumns.URI, PROJECTION, "", "");
+		
+
+		setEmptyText("Your emptyText message");
     }
 
 	
@@ -162,6 +168,9 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 	}
 	
 	public SimpleCursorAdapter getAdapter(Cursor cursor) {
+		if (mAdapter != null)
+			return mAdapter;
+		
 		return listSubscriptionCursorAdapter(this.getActivity(), cursor);
 	}
 

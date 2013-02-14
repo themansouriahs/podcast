@@ -1,5 +1,14 @@
 package info.bottiger.podcast;
 
+import info.bottiger.podcast.provider.FeedItem;
+import info.bottiger.podcast.provider.ItemColumns;
+import info.bottiger.podcast.provider.Subscription;
+import info.bottiger.podcast.provider.SubscriptionColumns;
+import info.bottiger.podcast.service.PlayerService;
+import info.bottiger.podcast.utils.DialogMenu;
+import info.bottiger.podcast.utils.Log;
+import info.bottiger.podcast.utils.StrUtils;
+
 import java.text.DecimalFormat;
 import java.util.HashMap;
 
@@ -18,6 +27,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.SystemClock;
 import android.support.v4.content.CursorLoader;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -26,18 +36,8 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
-import android.widget.SimpleCursorAdapter;
-import android.widget.TextView;
 import android.widget.SeekBar.OnSeekBarChangeListener;
-import info.bottiger.podcast.R;
-import info.bottiger.podcast.provider.FeedItem;
-import info.bottiger.podcast.provider.ItemColumns;
-import info.bottiger.podcast.provider.Subscription;
-import info.bottiger.podcast.provider.SubscriptionColumns;
-import info.bottiger.podcast.service.PlayerService;
-import info.bottiger.podcast.utils.DialogMenu;
-import info.bottiger.podcast.utils.Log;
-import info.bottiger.podcast.utils.StrUtils;
+import android.widget.TextView;
 
 
 public class PlayerFragment   extends PodcastBaseFragment
@@ -397,7 +397,7 @@ public class PlayerFragment   extends PodcastBaseFragment
 
 		mCursor = new CursorLoader(getActivity(), ItemColumns.URI, PROJECTION, where, null, order).loadInBackground();
 
-		mAdapter = PlayerActivity.channelListItemCursorAdapter(getActivity(), mCursor);
+		//mAdapter = PlayerActivity.channelListItemCursorAdapter(getActivity(), mCursor);
 /*		mAdapter = new IconCursorAdapter(this, R.layout.channel_list_item, mCursor,
 				new String[] { ItemColumns.TITLE,ItemColumns.STATUS }, new int[] {
 						R.id.text1}, mIconMap);

@@ -1,41 +1,33 @@
 package info.bottiger.podcast;
 
-import info.bottiger.podcast.R;
+
 import info.bottiger.podcast.adapters.ItemCursorAdapter;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.Subscription;
-import info.bottiger.podcast.service.PodcastDownloadManager;
 import info.bottiger.podcast.service.PodcastService;
 import info.bottiger.podcast.utils.ControlButtons;
-import info.bottiger.podcast.utils.DialogMenu;
 import info.bottiger.podcast.utils.ExpandAnimation;
 
 import java.util.HashMap;
 
-import com.handmark.pulltorefresh.library.PullToRefreshBase;
-import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
-import com.handmark.pulltorefresh.library.PullToRefreshListView;
-
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.BaseColumns;
-import android.support.v4.content.CursorLoader;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.AbsListView;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
+
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 public class RecentItemFragment extends AbstractEpisodeFragment {
 
@@ -56,7 +48,7 @@ public class RecentItemFragment extends AbstractEpisodeFragment {
 
 	private View mCurrentPlayer = null;
 
-	private ItemCursorAdapter mAdapter;
+	private int layoutID;
 
 
 	private long mCurCheckID = -1;
@@ -78,6 +70,9 @@ public class RecentItemFragment extends AbstractEpisodeFragment {
 				this, mCursor);
 		startInit(1, ItemColumns.URI, ItemColumns.ALL_COLUMNS, getWhere(), getOrder());
 		//startInit();
+		
+
+		setEmptyText("Your emptyText message");
 
 		if (mDualPane) {
 			// In dual-pane mode, the list view highlights the selected item.
@@ -98,10 +93,12 @@ public class RecentItemFragment extends AbstractEpisodeFragment {
 			}
 		};
 
+		/*
 		actualListView = pullToRefreshView.getRefreshableView();
 		pullToRefreshView.getLoadingLayoutProxy().setRefreshingLabel(
 				"Refreshing feeds");
 		pullToRefreshView.setOnRefreshListener(pullToRefreshListener);
+		*/
 	}
 
 	@Override
@@ -125,6 +122,9 @@ public class RecentItemFragment extends AbstractEpisodeFragment {
 	}
 	
 	public SimpleCursorAdapter getAdapter(Cursor cursor) {
+		if (mAdapter != null)
+			return mAdapter;
+		
 		return listItemCursorAdapter(this.getActivity(),
 				this, cursor);
 	}
@@ -142,10 +142,14 @@ public class RecentItemFragment extends AbstractEpisodeFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		fragmentView = inflater.inflate(R.layout.recent, container, false);
+		super.onCreateView(inflater, container, savedInstanceState);
+		
+		layoutID = R.layout.recent_new;
+		fragmentView = inflater.inflate(layoutID, container, false);
 		Intent intent = getActivity().getIntent();
 		intent.setData(ItemColumns.URI);
-
+		
+		
 		getPref();
 		return fragmentView;
 	}
@@ -187,7 +191,7 @@ public class RecentItemFragment extends AbstractEpisodeFragment {
 				this, mCursor);
 
 		if (this.mCurCheckID > 0) {
-			mAdapter.showItem(mCurCheckID);
+			((ItemCursorAdapter) mAdapter).showItem(mCurCheckID);
 			// View view = getViewByID(mCurCheckID);
 			// this.setPlayerListeners(view, mCurCheckID);
 		}
@@ -199,7 +203,7 @@ public class RecentItemFragment extends AbstractEpisodeFragment {
 		int start = list.getFirstVisiblePosition();
 		boolean setListners = false;
 
-		mAdapter.toggleItem(item);
+		((ItemCursorAdapter) mAdapter).toggleItem(item);
 		long id = item.getLong(item.getColumnIndex(BaseColumns._ID));
 		String duration = item.getString(item
 				.getColumnIndex(ItemColumns.DURATION));

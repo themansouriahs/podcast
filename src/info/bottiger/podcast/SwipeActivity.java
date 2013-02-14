@@ -49,13 +49,13 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 
 	public static PodcastService mPodcastServiceBinder = null;
 	static boolean mBound = false;
-	
+
 	// public static GoogleReader gReader = null;
 	public static CloudProvider gReader = null;
 
 	protected static Cursor mCursor = null;
 	protected boolean mInit = false;
-	protected final Log log = Log.getLog(getClass());
+	protected final Log log = Log.getDebugLog(getClass(), 0);
 	protected static ComponentName mService = null;
 
 	public static Account mAccount;
@@ -75,29 +75,28 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 
 	private FragmentManager mFragmentManager;
 	private FragmentTransaction mFragmentTransition;
-	
+
 	/**
 	 * The {@link ViewPager} that will host the section contents.
 	 */
 	ViewPager mViewPager;
 
 	private long SubscriptionFeedID = 0;
-	
+
 	private AudioManager mAudioManager;
-    private ComponentName mRemoteControlResponder;
-    
-    private SharedPreferences prefs;
+	private ComponentName mRemoteControlResponder;
+
+	private SharedPreferences prefs;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		// BugSenseHandler.initAndStartSession(SwipeActivity.this, "75981add");
 		BugSenseHandler.initAndStartSession(SwipeActivity.this,
 				((SoundWaves) this.getApplication()).getBugSenseAPIKey());
 		if (debugging) {
-			//Tracing is buggy on emulator
-			//Debug.startMethodTracing("calc");
+			// Tracing is buggy on emulator
+			// Debug.startMethodTracing("calc");
 
 			try {
 				SqliteCopy.backupDatabase();
@@ -107,69 +106,79 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 			}
 		}
 
-		//startService(new Intent(this, PodcastService.class));
+		// startService(new Intent(this, PodcastService.class));
 		startService(new Intent(this, PlayerService.class));
 
 		setContentView(R.layout.activity_swipe);
 
-        mAudioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
-        mRemoteControlResponder = new ComponentName(getPackageName(),
-                HeadsetReceiver.class.getName());
-        
-        IntentFilter receiverFilter = new IntentFilter(Intent.ACTION_HEADSET_PLUG);
-        HeadsetReceiver receiver = new HeadsetReceiver();
-        registerReceiver( receiver, receiverFilter );
-        //mAudioManager.registerMediaButtonEventReceiver(mRemoteControlResponder);
-        
-        
-        
-        //Alarm
-        //AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        //Intent intent = new Intent(this,PodcastUpdateReceiver.class); 
-        //PendingIntent pendingIntent = PendingIntent.getBroadcast(SetReminder.this, ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+		mRemoteControlResponder = new ComponentName(getPackageName(),
+				HeadsetReceiver.class.getName());
 
-        //alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 1000, pendingIntent);
-		
-		
+		IntentFilter receiverFilter = new IntentFilter(
+				Intent.ACTION_HEADSET_PLUG);
+		HeadsetReceiver receiver = new HeadsetReceiver();
+		registerReceiver(receiver, receiverFilter);
+		// mAudioManager.registerMediaButtonEventReceiver(mRemoteControlResponder);
+
+		// Alarm
+		// AlarmManager alarmManager = (AlarmManager)
+		// getSystemService(Context.ALARM_SERVICE);
+		// Intent intent = new Intent(this,PodcastUpdateReceiver.class);
+		// PendingIntent pendingIntent =
+		// PendingIntent.getBroadcast(SetReminder.this, ID, intent,
+		// PendingIntent.FLAG_UPDATE_CURRENT);
+
+		// alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()
+		// + 1000, pendingIntent);
+
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections
 		// of the app.
-		mFragmentManager = getSupportFragmentManager();
+		mFragmentManager = getSupportFragmentManager(); // getSupportFragmentManager();
+
+		if (debugging)
+			mFragmentManager.enableDebugLogging(true);
+
 		mFragmentTransition = mFragmentManager.beginTransaction();
 		mSectionsPagerAdapter = new SectionsPagerAdapter(mFragmentManager);
-		
-		
-		
-		//PodcastUpdateManager.setUpdate(this);
 
-		
-		
+		ViewPager pager = (ViewPager) findViewById(R.id.pager);
+		pager.setAdapter(mSectionsPagerAdapter);
+
+		/*
+		TabPageIndicator indicator = (TabPageIndicator) findViewById(R.id.info);
+		indicator.setViewPager(pager);
+		*/
+
+		// PodcastUpdateManager.setUpdate(this);
+
 		// set the Behind View
 		setBehindContentView(R.layout.download);
-		
-		
+
 		SlidingMenu menu = getSlidingMenu();
 
-	    menu.setMode(SlidingMenu.LEFT);
-	    menu.setShadowWidthRes(R.dimen.shadow_width);
-	    //menu.setShadowDrawable(R.drawable.shadow);
-	    menu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
-	    menu.setFadeDegree(0.35f);
-	    menu.setTouchModeAbove(SlidingMenu.LEFT);
-	    setSlidingActionBarEnabled(true);
-		
+		menu.setMode(SlidingMenu.LEFT);
+		menu.setShadowWidthRes(R.dimen.shadow_width);
+		// menu.setShadowDrawable(R.drawable.shadow);
+		menu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
+		menu.setFadeDegree(0.35f);
+		menu.setTouchModeAbove(SlidingMenu.LEFT);
+		setSlidingActionBarEnabled(true);
+
 		// Set up the ViewPager with the sections adapter.
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
 		/*
-	}
-	
-	public void onActivityCreated(Bundle savedInstanceState) {
-		*/
+		 * }
+		 * 
+		 * public void onActivityCreated(Bundle savedInstanceState) {
+		 */
 		if (debugging) {
-				PodcastDownloadManager.cancelAllDownloads(this.getApplicationContext());
+			PodcastDownloadManager.cancelAllDownloads(this
+					.getApplicationContext());
 		}
-		
+
 		try {
 			Account[] a = AccountManager.get(getApplicationContext())
 					.getAccountsByType("com.google");
@@ -214,27 +223,25 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 			if (mCursor != null)
 				mCursor.close();
 
-			//unbindService(serviceConnection);
+			// unbindService(serviceConnection);
 
 			// startInit(); FIXME
 
 		}
-		
+
 		PodcastService.setAlarm(this);
 		/*
-	    prefs = PreferenceManager.getDefaultSharedPreferences(this);
-	    int minutes = prefs.getInt("interval", 1);
-	    AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
-	    Intent intent = new Intent(this, PodcastService.class);
-	    PendingIntent pi = PendingIntent.getService(this, 0, intent, 0);
-	    am.cancel(pi);
-	    // by my own convention, minutes <= 0 means notifications are disabled
-	    if (minutes > 0) {
-	        am.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-	            SystemClock.elapsedRealtime() + minutes*60*1000,
-	            minutes*60*1000, pi);
-	    }
-	    */
+		 * prefs = PreferenceManager.getDefaultSharedPreferences(this); int
+		 * minutes = prefs.getInt("interval", 1); AlarmManager am =
+		 * (AlarmManager) getSystemService(ALARM_SERVICE); Intent intent = new
+		 * Intent(this, PodcastService.class); PendingIntent pi =
+		 * PendingIntent.getService(this, 0, intent, 0); am.cancel(pi); // by my
+		 * own convention, minutes <= 0 means notifications are disabled if
+		 * (minutes > 0) {
+		 * am.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+		 * SystemClock.elapsedRealtime() + minutes*60*1000, minutes*60*1000,
+		 * pi); }
+		 */
 
 	}
 
@@ -297,6 +304,7 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 		@Override
 		public Fragment getItem(int i) {
 			Fragment fragment;
+			log.debug("inside: getItem(" + i + ")");
 			if (i == 1) {
 				fragment = getSubscriptionFragmentContent();
 			} else if (i == 0) {
@@ -368,6 +376,7 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 
 	private Fragment getSubscriptionFragmentContent() {
 		if (SubscriptionFeedID == 0) {
+			log.debug("inside: getSubscriptionFragmentContent()");
 			return new SubscriptionsFragment();
 		} else {
 			Bundle bundle = new Bundle();

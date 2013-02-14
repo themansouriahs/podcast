@@ -3,24 +3,18 @@ package info.bottiger.podcast;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.service.PodcastDownloadManager;
-import info.bottiger.podcast.utils.ControlButtons;
 
 import java.util.HashMap;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.content.CursorLoader;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 
 public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 	
@@ -69,7 +63,7 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 	}
 
 	public String getWhere() {
-		String where = "";
+		String where = "1";
 		return where;
 	}
 	
