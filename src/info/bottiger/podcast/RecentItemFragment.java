@@ -92,12 +92,12 @@ public class RecentItemFragment extends AbstractEpisodeFragment {
 			}
 		};
 
-		/*
+		
 		actualListView = pullToRefreshView.getRefreshableView();
 		pullToRefreshView.getLoadingLayoutProxy().setRefreshingLabel(
 				"Refreshing feeds");
 		pullToRefreshView.setOnRefreshListener(pullToRefreshListener);
-		*/
+		
 	}
 
 	@Override

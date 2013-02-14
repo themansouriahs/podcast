@@ -148,6 +148,7 @@ public class CompactListCursorAdapter extends AbstractEpisodeCursorAdapter {
 		try {
 			item = FeedItem.getByCursor(cursor);
 		} catch (IllegalStateException e) {
+			e.printStackTrace();
 		}
 
 		Subscription sub = null;
