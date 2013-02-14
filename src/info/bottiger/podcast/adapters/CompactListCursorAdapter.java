@@ -35,7 +35,6 @@ public class CompactListCursorAdapter extends AbstractEpisodeCursorAdapter {
 
 	public static final int ICON_DEFAULT_ID = -1;
 
-
 	public final static FieldHandler defaultTextFieldHandler = new FieldHandler.TextFieldHandler();
 
 	protected int[] mFrom2;
@@ -135,10 +134,10 @@ public class CompactListCursorAdapter extends AbstractEpisodeCursorAdapter {
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {
 
-		View view = mInflater.inflate(R.layout.episode_list_compact, null);
+		View listView = mInflater.inflate(R.layout.episode_list_compact, null);
 
-		view.setTag(R.id.title, view.findViewById(R.id.title));
-		return view;
+		listView.setTag(R.id.title, listView.findViewById(R.id.title));
+		return listView;
 	}
 
 	@Override

@@ -14,7 +14,19 @@
   limitations under the License.
   -->
 
+
+<!-- http://stackoverflow.com/questions/12338244/making-resources-theme-dependent -->
 <resources>
+    
+    <attr name="play_icon" format="reference"/>
+    <attr name="pause_icon" format="reference"/>
+    <attr name="stop_icon" format="reference"/>
+    <attr name="download_icon" format="reference"/>
+    <attr name="delete_icon" format="reference"/>
+    <attr name="backspace_icon" format="reference"/>
+    <attr name="queue_icon" format="reference"/>
+    <attr name="info_icon" format="reference"/>
+    <attr name="new_icon" format="reference"/>
 
     <declare-styleable name="AppTheme">
         <attr name="actionbarCompatTitleStyle" format="reference" />

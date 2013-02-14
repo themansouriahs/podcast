@@ -3,7 +3,8 @@ package info.bottiger.podcast;
 import info.bottiger.podcast.adapters.CompactListCursorAdapter;
 import info.bottiger.podcast.adapters.ItemCursorAdapter;
 import info.bottiger.podcast.provider.ItemColumns;
-import info.bottiger.podcast.service.PodcastService;
+import info.bottiger.podcast.provider.Subscription;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -12,11 +13,10 @@ import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
+import android.widget.ImageView;
+import android.widget.TextView;
 
-import com.handmark.pulltorefresh.library.PullToRefreshBase;
-import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
-import com.handmark.pulltorefresh.library.PullToRefreshListView;
+import com.nostra13.universalimageloader.core.ImageLoader;
 public class FeedFragment extends AbstractEpisodeFragment {
 
 	// FIXME should not be static
@@ -51,6 +51,11 @@ public class FeedFragment extends AbstractEpisodeFragment {
 		super.onCreateView(inflater, container, savedInstanceState);
 		
 		header = (ViewGroup) inflater.inflate(R.layout.podcast_header, null);
+		Subscription subscription = getSubscription(getActivity().getContentResolver());
+		
+		if (subscription != null)
+			setHeader(header, subscription);
+
 		
 		//fragmentView = inflater.inflate(R.layout.subscription_list, container, false);
 		fragmentView = inflater.inflate(R.layout.recent_new, container, false);
@@ -59,6 +64,19 @@ public class FeedFragment extends AbstractEpisodeFragment {
 
 		getPref();
 		return fragmentView;
+	}
+	
+	private void setHeader(ViewGroup header, Subscription subscription) {
+		
+		TextView title = (TextView) header.findViewById(R.id.title);
+		ImageView icon = (ImageView) header.findViewById(R.id.podcast_cover);
+		
+		title.setText(subscription.title);
+		ImageLoader imageLoader = ((CompactListCursorAdapter)getAdapter(mCursor)).getImageLoader(getActivity());
+ 
+		if (subscription.imageURL != null && !subscription.imageURL.equals("")) {
+			imageLoader.displayImage(subscription.imageURL, icon);
+		}		
 	}
 	
 	// Read here:
@@ -71,12 +89,9 @@ public class FeedFragment extends AbstractEpisodeFragment {
 		if (header != null)  this.getListView().addHeaderView(header);
 
 
-		// Populate list with our static array of titles.
-		
 		mAdapter = FeedFragment.listItemCursorAdapter(this.getActivity(),
 				this, mCursor);
 		startInit(1, ItemColumns.URI, ItemColumns.ALL_COLUMNS, getWhere(), getOrder());
-		//startInit();
 
 		/*
 		final PullToRefreshListView pullToRefreshView = (PullToRefreshListView) fragmentView
@@ -117,13 +132,6 @@ public class FeedFragment extends AbstractEpisodeFragment {
 		return where;
 	}
 
-	/*
-	@Override
-	public void startInit() {
-		showEpisodes(getWhere());
-	}
-	*/
-	
 	public void showEpisodes(String condition) {
 		mCursor = createCursor(condition);
 
@@ -131,5 +139,9 @@ public class FeedFragment extends AbstractEpisodeFragment {
 				this, mCursor);
 
 		setListAdapter(mAdapter);
+	}
+	
+	private Subscription getSubscription(ContentResolver contentResolver) {
+		return Subscription.getById(contentResolver, subId);
 	}
 }

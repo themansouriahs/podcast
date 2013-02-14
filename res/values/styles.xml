@@ -1,14 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-        <style name="EpisodeHeaderFont" parent="@android:style/TextAppearance.Medium">
+    <style name="SoundWavesTheme" parent="android:Theme.Holo">
+        <item name="play_icon">@drawable/av_play</item>
+        <item name="pause_icon">@drawable/av_pause</item>
+        <item name="stop_icon">@drawable/av_stop</item>
+        <item name="download_icon">@drawable/av_download</item>
+        <item name="delete_icon">@drawable/ic_action_delete</item>
+        <item name="backspace_icon">@drawable/content_backspace</item>
+        <item name="queue_icon">@drawable/av_add_to_queue</item>
+        <item name="info_icon">@drawable/collections_view_as_list</item>
+        <item name="new_icon">@drawable/content_new</item>
+    </style>
+
+    <style name="SoundWavesTheme.Light" parent="android:Theme.Holo.Light.DarkActionBar">
+        <item name="play_icon">@drawable/av_play_dark</item>
+        <item name="pause_icon">@drawable/av_pause_dark</item>
+        <item name="stop_icon">@drawable/av_stop_dark</item>
+        <item name="download_icon">@drawable/av_download_dark</item>
+        <item name="delete_icon">@drawable/content_discard_dark</item>
+        <item name="backspace_icon">@drawable/content_backspace_dark</item>
+        <item name="queue_icon">@drawable/av_add_to_queue_dark</item>
+        <item name="info_icon">@drawable/collections_view_as_list_dark</item>
+        <item name="new_icon">@drawable/content_new_dark</item>
+    </style>
+
+    <style name="EpisodeHeaderFont" parent="@android:style/TextAppearance.Medium">
         <item name="android:layout_width">fill_parent</item>
         <item name="android:layout_height">wrap_content</item>
     </style>
-    
+
+    <style name="EpisodeMinorFont" parent="@style/EpisodeHeaderFont">
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="PodcastImage">
+        <item name="android:layout_width">115dip</item>
+        <item name="android:layout_height">115dip</item>
+        <item name="android:src">@drawable/generic_podcast</item>
+    </style>
+
     <style name="SubscriptionHeaderFont" parent="@android:style/TextAppearance.Large">
         <item name="android:layout_width">fill_parent</item>
         <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="CompactListItem" parent="@android:style/TextAppearance.Small">
+        <item name="android:padding">5dip</item>
+    </style>
+
+    <style name="PlayerControlButtons">
+        <item name="android:layout_width">42dip</item>
+        <item name="android:layout_height">42dip</item>
+        <item name="android:layout_marginLeft">10dip</item>
+        <item name="android:layout_marginRight">10dip</item>
     </style>
 
 </resources>

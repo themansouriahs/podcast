@@ -10,6 +10,7 @@ import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.service.DownloadStatus;
 import info.bottiger.podcast.utils.ControlButtons;
 import info.bottiger.podcast.utils.StrUtils;
+import info.bottiger.podcast.utils.ThemeHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -122,6 +123,8 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 					+ position);
 		}
 
+		ThemeHelper themeHelper = new ThemeHelper(mContext);
+
 		if (convertView == null) {
 			listViewItem = newView(mContext, itemCursor, parent);
 		} else {
@@ -176,7 +179,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 			if (feedItem.isDownloaded()) {
 				ImageButton downloadButton = (ImageButton) playerView
 						.findViewById(R.id.download);
-				downloadButton.setImageResource(R.drawable.ic_action_delete);
+				downloadButton.setImageResource(themeHelper.getAttr(R.attr.delete_icon));
 			}
 
 			if (PodcastBaseFragment.mPlayerServiceBinder.isInitialized()) {
@@ -185,7 +188,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 					if (PodcastBaseFragment.mPlayerServiceBinder.isPlaying()) {
 						ImageButton playPauseButton = (ImageButton) listViewItem
 								.findViewById(R.id.play_toggle);
-						playPauseButton.setImageResource(R.drawable.av_pause);
+						playPauseButton.setImageResource(themeHelper.getAttr(R.attr.pause_icon));
 
 						// SeekBar sb = (SeekBar) v.findViewById(R.id.progress);
 						TextView tv = (TextView) listViewItem

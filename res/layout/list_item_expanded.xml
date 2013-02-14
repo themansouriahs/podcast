@@ -16,33 +16,33 @@
         android:padding="@dimen/padding_large" >
 
         <ImageButton
-            style="@style/PlayerControlButtons"
             android:id="@+id/play_toggle"
-            android:src="@drawable/av_play"
-            android:contentDescription="@string/play" />
+            style="@style/PlayerControlButtons"
+            android:contentDescription="@string/play"
+            android:src="?attr/play_icon" />
 
         <ImageButton
             style="@style/PlayerControlButtons"
             android:id="@+id/stop"
-            android:src="@drawable/av_stop"
+            android:src="?attr/stop_icon"
             android:contentDescription="@string/stop" />
 
         <ImageButton
             style="@style/PlayerControlButtons"
             android:id="@+id/info"	
-            android:src="@drawable/collections_view_as_list"
+            android:src="?attr/info_icon"
             android:contentDescription="@string/info" />
 
         <ImageButton
             style="@style/PlayerControlButtons"
             android:id="@+id/download"
-            android:src="@drawable/download"
+            android:src="?attr/download_icon"
             android:contentDescription="@string/download" />
 
         <ImageButton
             style="@style/PlayerControlButtons"
             android:id="@+id/queue"
-            android:src="@drawable/av_add_to_queue"
+            android:src="?attr/queue_icon"
             android:contentDescription="@string/queue" />
     </LinearLayout>
 

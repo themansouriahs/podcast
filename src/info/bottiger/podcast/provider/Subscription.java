@@ -346,7 +346,12 @@ public class Subscription implements WithIcon {
 	}
 
 	@Override
+	@Deprecated
 	public String getImageURL(Context context) {
+		return getImageURL();
+	}
+	
+	public String getImageURL() {
 		return imageURL;
 	}
 

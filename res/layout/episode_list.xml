@@ -9,8 +9,7 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="3dip" >
+        android:orientation="horizontal">
 
         <!-- ListRow Left sied Thumbnail image -->
 
@@ -24,9 +23,7 @@
 
             <ImageView
                 android:id="@+id/list_image"
-                android:layout_width="90dip"
-                android:layout_height="90dip"
-                android:src="@drawable/generic_podcast" />
+                style="@style/PodcastImage" />
         </LinearLayout>
 
         <!-- Title Of Podcast -->
@@ -69,7 +66,7 @@
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/thumbnail"
             android:layout_toRightOf="@+id/thumbnail"
-            android:textSize="15dip"/>
+            style="@style/EpisodeMinorFont" />
 
         <TextView
             android:id="@+id/time_slash"
@@ -81,7 +78,7 @@
             android:paddingLeft="5dip"
             android:paddingRight="5dip"
             android:visibility="gone"
-            android:textSize="15dip" />
+            style="@style/EpisodeMinorFont"/>
 
         <TextView
             android:id="@+id/duration"
@@ -90,7 +87,7 @@
             android:layout_alignBaseline="@+id/time_slash"
             android:layout_alignBottom="@+id/time_slash"
             android:layout_toRightOf="@+id/time_slash"
-            android:textSize="15dip"/>
+            style="@style/EpisodeMinorFont" />
 
          <TextView
              android:id="@+id/filesize"
