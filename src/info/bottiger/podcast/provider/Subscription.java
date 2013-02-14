@@ -285,12 +285,15 @@ public class Subscription implements WithIcon {
 			}
 		}
 		
-		sub.lastUpdated = cursor.getLong(cursor
-				.getColumnIndex(SubscriptionColumns.LAST_UPDATED));
+		int lastUpdatedIndex = cursor
+				.getColumnIndex(SubscriptionColumns.LAST_UPDATED);
+		int urlIndex = cursor
+				.getColumnIndex(SubscriptionColumns.URL);
+		
+		sub.lastUpdated = cursor.getLong(lastUpdatedIndex);
 		sub.title = cursor.getString(cursor
 				.getColumnIndex(SubscriptionColumns.TITLE));
-		sub.url = cursor.getString(cursor
-				.getColumnIndex(SubscriptionColumns.URL));
+		sub.url = cursor.getString(urlIndex);
 		sub.imageURL = cursor.getString(cursor
 				.getColumnIndex(SubscriptionColumns.IMAGE_URL));
 		sub.comment = cursor.getString(cursor

@@ -66,8 +66,7 @@ public class RecentItemFragment extends AbstractEpisodeFragment {
 		}
 
 		// Populate list with our static array of titles.
-		mAdapter = listItemCursorAdapter(this.getActivity(),
-				this, mCursor);
+		mAdapter = this.getAdapter(mCursor); // listItemCursorAdapter(this.getActivity(),this, mCursor);
 		startInit(1, ItemColumns.URI, ItemColumns.ALL_COLUMNS, getWhere(), getOrder());
 		//startInit();
 		

@@ -210,7 +210,9 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 
 	}
 
+	/*
 	abstract public void startInit();
+	*/
 
 	public static final Handler mHandler = new Handler() {
 		@Override

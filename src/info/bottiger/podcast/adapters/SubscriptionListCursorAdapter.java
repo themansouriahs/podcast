@@ -74,6 +74,7 @@ public class SubscriptionListCursorAdapter extends AbstractPodcastAdapter {
 		try {
 			sub = Subscription.getByCursor(cursor);
 		} catch (IllegalStateException e) {
+			e.printStackTrace();
 		}
 
 		/*

@@ -43,6 +43,11 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 		SubscriptionColumns._ID, // 0
 		SubscriptionColumns.TITLE, // 1
 		SubscriptionColumns.LINK,
+		SubscriptionColumns.URL,
+		SubscriptionColumns.DESCRIPTION,
+		SubscriptionColumns.FAIL_COUNT,
+		SubscriptionColumns.LAST_ITEM_UPDATED,
+		SubscriptionColumns.AUTO_DOWNLOAD,
 		SubscriptionColumns.IMAGE_URL,
 		SubscriptionColumns.RATING,
 		SubscriptionColumns.LAST_UPDATED,
@@ -97,7 +102,7 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
         super.onActivityCreated(savedInstanceState);
 
 		mAdapter = listSubscriptionCursorAdapter(getActivity(), mCursor);
-		startInit(0, SubscriptionColumns.URI, PROJECTION, "", "");
+		startInit(0, SubscriptionColumns.URI, PROJECTION, "1", SubscriptionColumns.TITLE + " ASC");
 		
 
 		setEmptyText("Your emptyText message");
@@ -174,7 +179,6 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 		return listSubscriptionCursorAdapter(this.getActivity(), cursor);
 	}
 
-	@Override
 	public void startInit() {
 		mCursor = new CursorLoader(getActivity(), SubscriptionColumns.URI, PROJECTION, null, null, null).loadInBackground();
 		mAdapter = listSubscriptionCursorAdapter(getActivity().getApplicationContext(), mCursor);

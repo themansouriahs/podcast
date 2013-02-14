@@ -374,7 +374,7 @@ public class PlayerFragment   extends PodcastBaseFragment
         
 		//TabsHelper.setEpisodeTabClickListeners(this, R.id.episode_bar_play_button);
 
-        startInit();
+        //startInit();
 
         //updateInfo();
         
@@ -382,6 +382,7 @@ public class PlayerFragment   extends PodcastBaseFragment
    
     }
     
+    /*
 	@Override
 	public void startInit() {
 
@@ -401,11 +402,11 @@ public class PlayerFragment   extends PodcastBaseFragment
 /*		mAdapter = new IconCursorAdapter(this, R.layout.channel_list_item, mCursor,
 				new String[] { ItemColumns.TITLE,ItemColumns.STATUS }, new int[] {
 						R.id.text1}, mIconMap);
-*/
+
 		setListAdapter(mAdapter);
 
 	}   
-	
+*/	
 	@Override
 	public void onResume() {
 		super.onResume();

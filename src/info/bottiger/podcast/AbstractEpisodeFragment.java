@@ -67,11 +67,14 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 		return where;
 	}
 	
+	/*
 	@Override
 	public void startInit() {
 		showEpisodes(getWhere());
 	}
+	*/
 	
+	/*
 	public void showEpisodes(String condition) {
 		mCursor = createCursor(condition);
 
@@ -80,6 +83,7 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 
 		setListAdapter(mAdapter);
 	}
+	*/
 	
 	public void getPref() {
 		SharedPreferences pref = getActivity().getSharedPreferences(
@@ -96,6 +100,7 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 				ItemColumns.ALL_COLUMNS, condition, null, getOrder())
 				.loadInBackground();
 	}
+	
 	
 	public String getOrder() {
 		String order = ItemColumns.DATE + " DESC LIMIT 20"; // before:

@@ -110,10 +110,12 @@ public class FeedFragment extends AbstractEpisodeFragment {
 		return where;
 	}
 
+	/*
 	@Override
 	public void startInit() {
 		showEpisodes(getWhere());
 	}
+	*/
 	
 	public void showEpisodes(String condition) {
 		mCursor = createCursor(condition);
