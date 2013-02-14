@@ -27,12 +27,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
-/* Copy of ChannelActivity */
 public class SubscriptionsFragment extends PodcastBaseFragment {
-
-	private static final int MENU_UNSUBSCRIBE = Menu.FIRST + 1;
-	private static final int MENU_AUTO_DOWNLOAD = Menu.FIRST + 2;
-
 	
 	private static final int MENU_ITEM_DETAILS = Menu.FIRST + 9;
 	private static final int MENU_ITEM_START_DOWNLOAD = Menu.FIRST + 10;
@@ -166,7 +161,7 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 				AbstractPodcastAdapter.defaultTextFieldHandler,
 				new SubscriptionListCursorAdapter.IconFieldHandler()
 		};
-		return new SubscriptionListCursorAdapter(context, R.layout.episode_list, cursor,
+		return new SubscriptionListCursorAdapter(context, R.layout.subscription_list_item, cursor,
 				new String[] { SubscriptionColumns.TITLE, SubscriptionColumns.IMAGE_URL },
 				new int[] { R.id.title, R.id.list_image },
 				fields);

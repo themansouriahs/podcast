@@ -37,20 +37,11 @@
             android:layout_height="wrap_content"
             android:layout_alignTop="@+id/thumbnail"
             android:layout_toRightOf="@+id/thumbnail"
-            android:text="Podcast Title"
-            style="@style/EpisodeHeaderFont" />
+            android:text="Podcast Name"
+            android:textSize="15dip"
+            android:typeface="sans" />
 
         <!-- Podcast Name -->
-
-        <TextView
-            android:id="@+id/podcast"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/title"
-            android:layout_marginTop="1dip"
-            android:layout_toRightOf="@+id/thumbnail"
-            android:text="Podcast Name"
-            android:textSize="10dip" />
 
         <!-- Rightend Duration -->
 
@@ -69,7 +60,13 @@
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/thumbnail"
             android:layout_toRightOf="@+id/thumbnail"
-            android:textSize="15dip"/>
+            style="@style/SubscriptionHeaderFont"/>
+        <!-- 
+        
+            android:textColor="#FFFFFF"
+            android:textSize="15dip"
+            android:typeface="sans"  
+            -->
 
         <TextView
             android:id="@+id/time_slash"
@@ -80,8 +77,10 @@
             android:layout_toRightOf="@+id/current_position"
             android:paddingLeft="5dip"
             android:paddingRight="5dip"
+            android:textColor="#FFFFFF"
             android:visibility="gone"
-            android:textSize="15dip" />
+            android:textSize="15dip"
+            android:typeface="sans" />
 
         <TextView
             android:id="@+id/duration"
@@ -90,18 +89,9 @@
             android:layout_alignBaseline="@+id/time_slash"
             android:layout_alignBottom="@+id/time_slash"
             android:layout_toRightOf="@+id/time_slash"
-            android:textSize="15dip"/>
-
-         <TextView
-             android:id="@+id/filesize"
-             android:layout_width="match_parent"
-             android:layout_height="wrap_content"
-             android:layout_alignBottom="@+id/duration"
-             android:layout_toRightOf="@+id/duration"
-             android:gravity="bottom|right"
-             android:text="0"
-             android:textSize="10dip"
-             android:textStyle="bold" />
+            android:textColor="#FFFFFF"
+            android:textSize="15dip"
+            android:typeface="sans" />
         
     </RelativeLayout>
 

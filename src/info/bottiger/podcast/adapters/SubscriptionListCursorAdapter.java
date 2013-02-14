@@ -59,7 +59,7 @@ public class SubscriptionListCursorAdapter extends AbstractPodcastAdapter {
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {
 
-		View view = mInflater.inflate(R.layout.episode_list, null);
+		View view = mInflater.inflate(R.layout.subscription_list_item, null);
 
 		view.setTag(R.id.list_image, view.findViewById(R.id.list_image));
 		view.setTag(R.id.title, view.findViewById(R.id.title));

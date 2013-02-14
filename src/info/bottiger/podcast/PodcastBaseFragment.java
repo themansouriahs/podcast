@@ -41,10 +41,6 @@ import android.widget.TextView;
 /* Copy of PodcastBaseActivity */
 public abstract class PodcastBaseFragment extends FixedListFragment {
 
-	private static final int SWIPE_MIN_DISTANCE = 120;
-	private static final int SWIPE_MAX_OFF_PATH = 250;
-	private static final int SWIPE_THRESHOLD_VELOCITY = 200;
-
 	public static final int COLUMN_INDEX_TITLE = 1;
 
 	protected View fragmentView;
