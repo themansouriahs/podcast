@@ -3,28 +3,56 @@ package info.bottiger.podcast.listeners;
 import info.bottiger.podcast.R;
 import info.bottiger.podcast.utils.ThemeHelper;
 
-import java.util.LinkedList;
+import java.util.HashMap;
 
+import android.app.Activity;
 import android.content.Context;
 import android.widget.ImageView;
 
 public class PlayerStatusListener {
 
-	private static LinkedList<ImageView> mImageViews = new LinkedList<ImageView>();
-
+	private static HashMap<ImageView, ImageViewButton> mImageViews = new HashMap<ImageView, ImageViewButton>();
+	private static Activity mActivity;
+	
 	public enum STATUS {
 		PLAYING, PAUSED, STOPPED
+	}
+	
+	/**
+	 * Set the activity to update the action bar in
+	 * 
+	 * @param activity
+	 */
+	public static void setActivity(Activity activity) {
+		mActivity = activity;
 	}
 
 	/**
 	 * Register a ImageView to be updated on status changes
 	 * 
 	 * @param ImageView
+	 * @param Play button resource
+	 * @param Pause button resource
 	 */
-	public static void registerImageView(Context context, ImageView imageView) {
+	public static void registerImageView(ImageView imageView, int playResource,
+			int pauseResource) {
 		assert imageView != null;
 
-		mImageViews.add(imageView);
+		ImageViewButton imageViewButton = new ImageViewButton(imageView, playResource, pauseResource);
+		mImageViews.put(imageView, imageViewButton);
+	}
+	
+	/**
+	 * Register a ImageView to be updated on status changes
+	 * 
+	 * @param ImageView
+	 * @param Context
+	 */
+	public static void registerImageView(ImageView imageView, Context context) {
+		assert imageView != null;
+
+		ImageViewButton imageViewButton = new ImageViewButton(imageView, context);
+		mImageViews.put(imageView, imageViewButton);
 	}
 
 	/**
@@ -37,8 +65,8 @@ public class PlayerStatusListener {
 
 		boolean isRemoved = false;
 
-		if (mImageViews.contains(imageView))
-			isRemoved = mImageViews.remove(imageView);
+		if (mImageViews.containsKey(imageView))
+			isRemoved = mImageViews.remove(imageView) != null;
 
 		return isRemoved;
 	}
@@ -46,22 +74,56 @@ public class PlayerStatusListener {
 	/**
 	 * Update the icons so they match the current status of the player
 	 */
-	public static void updateImages(Context context, STATUS status) {
-		ThemeHelper themeHelper = new ThemeHelper(context);
+	public static void updateStatus(STATUS status) {
 		
-		int iconResource = 0;
-		switch (status) {
-		case PLAYING:
-			iconResource = themeHelper.getAttr(R.attr.pause_icon);
-			break;
-		case PAUSED:;
-		case STOPPED:
-			iconResource = themeHelper.getAttr(R.attr.play_icon);
-			break;
+		// Update UI buttons
+		for (ImageViewButton imageView : mImageViews.values()) {
+			imageView.updateIcon(status);
 		}
 		
-		for (ImageView imageView : mImageViews) {
-			imageView.setImageResource(iconResource);
+		// Update action bar
+		if (mActivity != null) {
+			mActivity.invalidateOptionsMenu();
+		}
+		
+		// Update notification
+	}
+	
+	/**
+	 * Private class for holding the ImageView and the corresponding icons
+	 */
+	private static class ImageViewButton {
+		
+		private ImageView mImageView;
+		private int playResource;
+		private int pauseResource;
+		
+		public ImageViewButton(ImageView mImageView, int playResource,
+				int pauseResource) {
+			super();
+			this.mImageView = mImageView;
+			this.playResource = playResource;
+			this.pauseResource = pauseResource;
+		}
+		
+		public ImageViewButton(ImageView mImageView, Context context) {
+			super();
+			ThemeHelper themeHelper = new ThemeHelper(context);
+			this.mImageView = mImageView;
+			this.playResource = themeHelper.getAttr(R.attr.play_icon);
+			this.pauseResource = themeHelper.getAttr(R.attr.pause_icon);
+		}
+		
+		public void updateIcon(STATUS status) {
+			switch (status) {
+			case PLAYING:
+				mImageView.setImageResource(playResource);
+				break;
+			case PAUSED:;
+			case STOPPED:
+				mImageView.setImageResource(pauseResource);
+				break;
+			}
 		}
 	}
 

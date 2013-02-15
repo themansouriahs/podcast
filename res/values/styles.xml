@@ -4,6 +4,8 @@
     <style name="SoundWavesTheme" parent="android:Theme.Holo">
         <item name="play_icon">@drawable/av_play</item>
         <item name="pause_icon">@drawable/av_pause</item>
+        <item name="play_invert_icon">@drawable/av_play_dark</item>
+        <item name="pause_invert_icon">@drawable/av_pause_dark</item>
         <item name="stop_icon">@drawable/av_stop</item>
         <item name="download_icon">@drawable/av_download</item>
         <item name="delete_icon">@drawable/ic_action_delete</item>
@@ -16,6 +18,8 @@
     <style name="SoundWavesTheme.Light" parent="android:Theme.Holo.Light.DarkActionBar">
         <item name="play_icon">@drawable/av_play_dark</item>
         <item name="pause_icon">@drawable/av_pause_dark</item>
+        <item name="play_invert_icon">@drawable/av_play</item>
+        <item name="pause_invert_icon">@drawable/av_pause</item>
         <item name="stop_icon">@drawable/av_stop_dark</item>
         <item name="download_icon">@drawable/av_download_dark</item>
         <item name="delete_icon">@drawable/content_discard_dark</item>

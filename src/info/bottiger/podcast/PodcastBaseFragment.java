@@ -1,5 +1,6 @@
 package info.bottiger.podcast;
 
+import info.bottiger.podcast.listeners.PlayerStatusListener;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.service.PlayerService;
@@ -102,6 +103,7 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			mPlayerServiceBinder = ((PlayerService.PlayerBinder) service)
 					.getService();
+			PlayerStatusListener.setActivity(getActivity());
 			// log.debug("onServiceConnected");
 		}
 

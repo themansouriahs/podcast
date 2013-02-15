@@ -10,6 +10,7 @@ import info.bottiger.podcast.service.PodcastDownloadManager;
 import info.bottiger.podcast.service.PodcastService;
 import info.bottiger.podcast.utils.AddPodcastDialog;
 import info.bottiger.podcast.utils.Log;
+import info.bottiger.podcast.utils.ThemeHelper;
 
 import java.io.IOException;
 
@@ -257,9 +258,25 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 		// finish();
 	}
 
+	/**
+	 * Creates the actionbar from the XML menu file.
+	 * In addition it makes sure the play/pause icon is correct
+	 */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.activity_swipe, menu);
+		
+		// The player can only be playing if the PlayerService has been bound
+		if (PodcastBaseFragment.mPlayerServiceBinder != null) {
+			
+			ThemeHelper themeHelper = new ThemeHelper(this);
+			MenuItem menuItem = menu.findItem(R.id.menu_control);
+			if (PodcastBaseFragment.mPlayerServiceBinder.isPlaying()) {
+				menuItem.setIcon(themeHelper.getAttr(R.attr.pause_invert_icon));
+			} else {
+				menuItem.setIcon(themeHelper.getAttr(R.attr.play_invert_icon));
+			}
+		}
 		return true;
 	}
 

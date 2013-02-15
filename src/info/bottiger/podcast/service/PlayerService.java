@@ -2,6 +2,7 @@ package info.bottiger.podcast.service;
 
 import info.bottiger.podcast.R;
 import info.bottiger.podcast.SettingsActivity;
+import info.bottiger.podcast.listeners.PlayerStatusListener;
 import info.bottiger.podcast.notification.NotificationPlayer;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
@@ -189,6 +190,7 @@ public class PlayerService extends Service implements
 						.registerMediaButtonEventReceiver(mControllerComponentName);
 				mMediaPlayer.start();
 				startForeground(mNotificationPlayer.getNotificationId(), notification);
+				PlayerStatusListener.updateStatus(PlayerStatusListener.STATUS.PLAYING);
 			}
 		}
 
@@ -196,6 +198,7 @@ public class PlayerService extends Service implements
 			mMediaPlayer.reset();
 			mIsInitialized = false;
 			stopForeground(true);
+			PlayerStatusListener.updateStatus(PlayerStatusListener.STATUS.STOPPED);
 		}
 
 		public void release() {
@@ -221,6 +224,7 @@ public class PlayerService extends Service implements
 		 */
 		public void pause() {
 			mMediaPlayer.pause();
+			PlayerStatusListener.updateStatus(PlayerStatusListener.STATUS.PAUSED);
 		}
 
 		@Deprecated
