@@ -11,6 +11,7 @@ import info.bottiger.podcast.utils.SDCardManager;
 
 import java.io.IOException;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.ComponentName;
@@ -59,7 +60,7 @@ public class PlayerService extends Service implements
 	MyPlayer mPlayer = null;
 	private NotificationManager mNotificationManager;
 	private NotificationPlayer mNotificationPlayer;
-
+	
 	private FeedItem mItem = null;
 	private boolean mUpdate = false;
 	private boolean mResumeAfterCall = false;
@@ -174,7 +175,7 @@ public class PlayerService extends Service implements
 		}
 
 		public void start() {
-			notifyStatus();
+			Notification notification = notifyStatus();
 
 			// Request audio focus for playback
 			int result = mAudioManager.requestAudioFocus(PlayerService.this,
@@ -187,12 +188,14 @@ public class PlayerService extends Service implements
 				mAudioManager
 						.registerMediaButtonEventReceiver(mControllerComponentName);
 				mMediaPlayer.start();
+				startForeground(mNotificationPlayer.getNotificationId(), notification);
 			}
 		}
 
 		public void stop() {
 			mMediaPlayer.reset();
 			mIsInitialized = false;
+			stopForeground(true);
 		}
 
 		public void release() {
@@ -395,12 +398,12 @@ public class PlayerService extends Service implements
 	/**
 	 * Display a notification with the current podcast
 	 */
-	private void notifyStatus() {
+	private Notification notifyStatus() {
 
 		if (mNotificationPlayer == null)
 			mNotificationPlayer = new NotificationPlayer(this, mItem);
 
-		mNotificationPlayer.show();
+		return mNotificationPlayer.show();
 	}
 
 	public void play(long id) {

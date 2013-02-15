@@ -28,7 +28,7 @@ public class NotificationPlayer {
 		this.item = item;
 	}
 	
-	public void show() {
+	public Notification show() {
 		
 		Bitmap icon = new BitmapProvider(mContext, item).createBitmapFromMediaFile(128, 128);
 		NotificationCompat.Builder mBuilder =
@@ -60,6 +60,7 @@ public class NotificationPlayer {
 		// mId allows you to update the notification later on.
 		Notification not = mBuilder.build();
 		mNotificationManager.notify(mId, not);
+		return not;
 	}
 	
 	public void hide() {
@@ -72,6 +73,10 @@ public class NotificationPlayer {
 
 	public void setItem(FeedItem item) {
 		this.item = item;
+	}
+	
+	public int getNotificationId() {
+		return mId;
 	}
 
 	
