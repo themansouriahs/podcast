@@ -210,10 +210,10 @@ public class PlayerActivity extends ListActivity {
 		setProgressBar(progressBar, duration, item.offset, secondary);
 	}
 
-	/*
-	 * duration, progress, secondary should all be in units of
+	/**
+	 * duration, progress, secondary should all be in units of ms
 	 */
-	private static void setProgressBar(SeekBar progressBar, long duration,
+	public static void setProgressBar(SeekBar progressBar, long duration,
 			long progress, long secondary) {
 		if (duration == 0)
 			return;

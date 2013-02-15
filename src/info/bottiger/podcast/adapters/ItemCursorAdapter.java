@@ -117,13 +117,12 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 
 		View listViewItem;
 		Cursor itemCursor = (Cursor) getItem(position);
-
+		ThemeHelper themeHelper = new ThemeHelper(mContext);
+		
 		if (!itemCursor.moveToPosition(position)) {
 			throw new IllegalStateException("couldn't move cursor to position "
 					+ position);
 		}
-
-		ThemeHelper themeHelper = new ThemeHelper(mContext);
 
 		if (convertView == null) {
 			listViewItem = newView(mContext, itemCursor, parent);
@@ -133,25 +132,17 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 
 		bindView(listViewItem, mContext, itemCursor);
 
+		// Get the current FeedItem
 		Long itemID = itemCursor.getLong(itemCursor
 				.getColumnIndex(BaseColumns._ID));
-
 		FeedItem feedItem = FeedItem.getById(mContext.getContentResolver(),
 				itemID);
 
-		int pathIndex = itemCursor.getColumnIndex(ItemColumns.PATHNAME);
-		// int itemOffset =
-		// item.getInt(item.getColumnIndex(ItemColumns.OFFSET));
 
-		long playingID;
-		try {
-			playingID = PodcastBaseFragment.mPlayerServiceBinder
-					.getCurrentItem().id;
-		} catch (Exception e) {
-			playingID = 0;
-		}
+		boolean isCurrentPlayingItem = feedItem.equals(PodcastBaseFragment.mPlayerServiceBinder
+					.getCurrentItem());
 
-		if (mExpandedItemID.contains(itemID) || itemID == playingID) {
+		if (mExpandedItemID.contains(itemID) || isCurrentPlayingItem) {
 			ViewStub stub = (ViewStub) listViewItem.findViewById(R.id.stub);
 			if (stub != null) {
 				stub.inflate();
@@ -167,15 +158,32 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 
 			TextView currentTime = (TextView) listViewItem
 					.findViewById(R.id.current_position);
-			currentTime.setText(StrUtils.formatTime(feedItem));
+			
+			
+			long playerPosition = 0;
+			long playerDuration = 0;
+			
+			if (isCurrentPlayingItem) {
+				playerPosition = PodcastBaseFragment.mPlayerServiceBinder.position();
+				playerDuration = PodcastBaseFragment.mPlayerServiceBinder.duration();
+			} else {
+				playerPosition = feedItem.offset;
+				playerDuration = feedItem.getDuration();
+			}
+			
+			currentTime.setText(StrUtils.formatTime(playerPosition));
 
 			SeekBar sb = (SeekBar) playerView.findViewById(R.id.progress);
-			sb.setMax(1000);
+			sb.setMax(ControlButtons.MAX_SEEKBAR_VALUE);
 
-			PlayerActivity.setProgressBar(sb, feedItem);
+			//PlayerActivity.setProgressBar(sb, feedItem);
+			long secondary = feedItem.isDownloaded() ? feedItem.getCurrentFileSize()
+					: (feedItem.chunkFilesize / feedItem.filesize);
+			PlayerActivity.setProgressBar(sb, playerDuration, playerPosition, secondary);
+
 
 			ControlButtons.setPlayerListeners(listViewItem, playerView, itemID);
-
+			
 			if (feedItem.isDownloaded()) {
 				ImageButton downloadButton = (ImageButton) playerView
 						.findViewById(R.id.download);
@@ -189,16 +197,6 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 						ImageButton playPauseButton = (ImageButton) listViewItem
 								.findViewById(R.id.play_toggle);
 						playPauseButton.setImageResource(themeHelper.getAttr(R.attr.pause_icon));
-
-						// SeekBar sb = (SeekBar) v.findViewById(R.id.progress);
-						TextView tv = (TextView) listViewItem
-								.findViewById(R.id.current_position);
-						mFragment.setProgressBar(sb);
-						mFragment.setCurrentTime(tv);
-					} else {
-						// ImageButton playPauseButton = (ImageButton) v
-						// .findViewById(R.id.play_toggle);
-						// playPauseButton.setImageResource(R.drawable.play);
 					}
 				}
 
@@ -259,14 +257,6 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 
 		DownloadStatus ds;
 		if (item != null) {
-			// FeedItem.getById(context.getContentResolver(), id)
-			
-			
-			//ds = PodcastDownloadManager.getStatus(item);
-			//FilesizeUpdater.put(mContext, item.getId(), fileSize);
-			//writeStatus(item.getId(), fileSize, ds);
-			
-			
 			DownloadProgressListener.registerTextView(context, fileSize, item);
 
 			int filesize = 0;

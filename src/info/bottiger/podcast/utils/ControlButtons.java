@@ -17,7 +17,7 @@ import android.widget.TextView;
 
 public class ControlButtons {
 
-	private static final int MAX_SEEKBAR_VALUE = 1000;
+	public static final int MAX_SEEKBAR_VALUE = 1000;
 	private static long mLastSeekEventTime;
 	private static boolean mFromTouch;
 
@@ -64,10 +64,12 @@ public class ControlButtons {
 					fragment.setDuration(viewHolder.duration);
 				if (PodcastBaseFragment.mPlayerServiceBinder.isPlaying()) {
 					playPauseButton.setContentDescription("Play");
-					playPauseButton.setImageResource(themeHelper.getAttr(R.attr.play_icon));
+					playPauseButton.setImageResource(themeHelper
+							.getAttr(R.attr.play_icon));
 					PodcastBaseFragment.mPlayerServiceBinder.pause();
 				} else {
-					playPauseButton.setImageResource(themeHelper.getAttr(R.attr.pause_icon));
+					playPauseButton.setImageResource(themeHelper
+							.getAttr(R.attr.pause_icon));
 					playPauseButton.setContentDescription("Pause");
 					PodcastBaseFragment.mPlayerServiceBinder.play(id);
 					PodcastBaseFragment.queueNextRefresh(1);
@@ -79,7 +81,8 @@ public class ControlButtons {
 			@Override
 			public void onClick(View v) {
 				playPauseButton.setContentDescription("Play");
-				playPauseButton.setImageResource(themeHelper.getAttr(R.attr.play_icon));
+				playPauseButton.setImageResource(themeHelper
+						.getAttr(R.attr.play_icon));
 				PodcastBaseFragment.mPlayerServiceBinder.stop();
 			}
 		});
@@ -99,18 +102,21 @@ public class ControlButtons {
 							// Delete file
 							item.delFile(resolver);
 							viewHolder.downloadButton
-									.setImageResource(themeHelper.getAttr(R.attr.download_icon));
+									.setImageResource(themeHelper
+											.getAttr(R.attr.download_icon));
 							viewHolder.downloadButton
 									.setContentDescription("Download");
 						} else {
 							// Download file
 							FilesizeUpdater.put(fragment.getActivity(),
 									item.id, viewHolder.filesize);
-							PodcastDownloadManager.addItemAndStartDownload(item, fragment.getActivity());
-							//podcastServiceConnection.downloadItem(fragment
-							//		.getActivity().getContentResolver(), item);
+							PodcastDownloadManager.addItemAndStartDownload(
+									item, fragment.getActivity());
+							// podcastServiceConnection.downloadItem(fragment
+							// .getActivity().getContentResolver(), item);
 							viewHolder.downloadButton
-									.setImageResource(themeHelper.getAttr(R.attr.delete_icon));
+									.setImageResource(themeHelper
+											.getAttr(R.attr.delete_icon));
 							viewHolder.downloadButton
 									.setContentDescription("Trash");
 						}
@@ -125,7 +131,7 @@ public class ControlButtons {
 
 		ControlButtons.mCurrentTime = viewHolder.currentTime;
 		OnPlayerSeekBarChangeListener listener = new OnPlayerSeekBarChangeListener(
-				item, viewHolder.currentTime, viewHolder.duration);
+				item, resolver, viewHolder.currentTime, viewHolder.duration);
 		// viewHolder.seekbar.setOnSeekBarChangeListener(mSeekListener);
 		viewHolder.seekbar.setOnSeekBarChangeListener(listener);
 		viewHolder.seekbar.setMax(MAX_SEEKBAR_VALUE);
@@ -154,8 +160,8 @@ public class ControlButtons {
 		viewHolder.duration = (TextView) listView.findViewById(R.id.duration);
 		viewHolder.filesize = (TextView) listView.findViewById(R.id.filesize);
 
-		ControlButtons
-				.setListener(SwipeActivity.mPodcastServiceBinder, viewHolder, id);
+		ControlButtons.setListener(SwipeActivity.mPodcastServiceBinder,
+				viewHolder, id);
 	}
 
 	public static void setPlayerListeners(View playerView, long id) {
@@ -177,20 +183,22 @@ public class ControlButtons {
 				.findViewById(R.id.queue);
 		viewHolder.seekbar = (SeekBar) playerView.findViewById(R.id.progress);
 
-		ControlButtons
-				.setListener(SwipeActivity.mPodcastServiceBinder, viewHolder, id);
+		ControlButtons.setListener(SwipeActivity.mPodcastServiceBinder,
+				viewHolder, id);
 
 	}
 
 	private static class OnPlayerSeekBarChangeListener implements
 			OnSeekBarChangeListener {
 
+		ContentResolver contentResolver;
 		TextView currentTimeView;
 		TextView durationView;
 		FeedItem item;
 
-		public OnPlayerSeekBarChangeListener(FeedItem item, TextView tv,
-				TextView dv) {
+		public OnPlayerSeekBarChangeListener(FeedItem item,
+				ContentResolver contentResolver, TextView tv, TextView dv) {
+			this.contentResolver = contentResolver;
 			this.item = item;
 			this.currentTimeView = tv;
 			this.durationView = dv;
@@ -211,7 +219,7 @@ public class ControlButtons {
 			if ((now - mLastSeekEventTime) > 250 && durationView != null) {
 				mLastSeekEventTime = now;
 
-				float relativeProgress = progress / (float) 1000;
+				float relativeProgress = progress / (float) MAX_SEEKBAR_VALUE;
 				String duration = durationView.getText().toString();
 				// long timeMs = duration * progress / 1000;
 				// if (mCurrentTime != null)
@@ -227,8 +235,10 @@ public class ControlButtons {
 		public void onStopTrackingTouch(SeekBar bar) {
 			// mPosOverride = -1;
 			mFromTouch = false;
-			long timeMs = PodcastBaseFragment.mPlayerServiceBinder.duration()
-					* bar.getProgress() / 1000;
+			long timeMs = item.getDuration() * bar.getProgress()
+					/ MAX_SEEKBAR_VALUE;
+			item.offset = (int) timeMs;
+			item.update(contentResolver);
 			try {
 				if (PodcastBaseFragment.mPlayerServiceBinder.isInitialized()
 						&& PodcastBaseFragment.mPlayerServiceBinder
