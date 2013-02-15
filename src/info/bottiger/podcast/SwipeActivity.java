@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.os.Bundle;
@@ -105,6 +106,8 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 				e.printStackTrace();
 			}
 		}
+		
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
 		// startService(new Intent(this, PodcastService.class));
 		startService(new Intent(this, PlayerService.class));
