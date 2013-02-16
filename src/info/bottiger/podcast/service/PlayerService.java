@@ -174,6 +174,13 @@ public class PlayerService extends Service implements
 		public boolean isInitialized() {
 			return mIsInitialized;
 		}
+		
+		public void toggle() {
+			if (mMediaPlayer.isPlaying())
+				pause();
+			else
+				start();
+		}
 
 		public void start() {
 			Notification notification = notifyStatus();
@@ -446,6 +453,14 @@ public class PlayerService extends Service implements
 		// mPlayer.seek(offset);
 		// start();
 		// mItem.playing(getContentResolver());
+	}
+	
+	public void toggle() {
+		if (mPlayer.isPlaying() == false && mItem != null) {
+			mPlayer.start();
+		} else {
+			mPlayer.pause();
+		}
 	}
 
 	public void start() {

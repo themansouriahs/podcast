@@ -133,7 +133,7 @@ public class FeedFragment extends AbstractEpisodeFragment {
 	}
 
 	public void showEpisodes(String condition) {
-		mCursor = createCursor(condition);
+		mCursor = createCursor(condition, getOrder());
 
 		mAdapter = FeedFragment.listItemCursorAdapter(this.getActivity(),
 				this, mCursor);

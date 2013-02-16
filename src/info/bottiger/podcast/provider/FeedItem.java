@@ -697,12 +697,15 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 
 	@Override
 	public int compareTo(FeedItem another) {
+		return another.date.compareTo(date);
+		/*
 		if (this.update > another.update)
 			return 1;
 		else if (this.update < another.update)
 			return -1;
 
 		return 0;
+		*/
 	}
 
 	public String getURL() {
@@ -714,23 +717,12 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		return itemURL;
 	}
 
+	/**
+	 * 
+	 * @return wether the item is downloaded to the phone
+	 */
 	public boolean isDownloaded() {
-		
 		return this.isDownloaded;
-		/* refactor when it works */
-		/*
-		String path = getAbsolutePath();
-		if (path == null || path == "")
-			return false;
-
-		File localFile = new File(path);
-		long localFilesize = localFile.length();
-
-		if (filesize == 0)
-			return localFilesize > 0;
-		else
-			return localFilesize >= filesize && localFilesize > 0;
-			*/
 	}
 	
 	/**

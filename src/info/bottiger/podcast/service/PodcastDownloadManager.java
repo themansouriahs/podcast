@@ -109,7 +109,7 @@ public class PodcastDownloadManager {
 	 * @param context
 	 */
 	@SuppressLint("NewApi")
-	public static void startDownload(final Context context) {
+	public static synchronized void startDownload(final Context context) {
 
 		SharedPreferences sharedPreferences = PreferenceManager
 				.getDefaultSharedPreferences(context);

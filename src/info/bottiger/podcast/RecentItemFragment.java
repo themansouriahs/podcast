@@ -184,7 +184,7 @@ public class RecentItemFragment extends AbstractEpisodeFragment {
 	}
 
 	public void showEpisodes(String condition) {
-		mCursor = createCursor(condition);
+		mCursor = createCursor(condition, getOrder());
 
 		mAdapter = RecentItemFragment.listItemCursorAdapter(this.getActivity(),
 				this, mCursor);

@@ -286,6 +286,11 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+		case R.id.menu_control:
+			if (PodcastBaseFragment.mPlayerServiceBinder != null) {
+				PodcastBaseFragment.mPlayerServiceBinder.toggle();
+			}
+			return true;
 		case R.id.menu_add:
 			AddPodcastDialog.addPodcast(this);
 			return true;
@@ -295,8 +300,8 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 			return true;
 		case R.id.menu_refresh:
 			if (mBound) {
-				mPodcastServiceBinder.start_update();
-				PodcastService.start_update(this);
+				//mPodcastServiceBinder.start_update();
+				PodcastDownloadManager.start_update(this);
 			}
 			return true;
 		}

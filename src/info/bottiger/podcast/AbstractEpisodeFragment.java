@@ -44,14 +44,17 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_download_all: {
-			Cursor cursor = createCursor(getWhere());
-			while (cursor.moveToNext()) {
+			Cursor cursor = createCursor(getWhere(), getOrder());
+			cursor.moveToFirst();
+			while (cursor.isAfterLast() == false) {
 				FeedItem feedItem = FeedItem.getByCursor(cursor);
 				if (!feedItem.isDownloaded())
 					PodcastDownloadManager.addItemToQueue(feedItem);
-				PodcastDownloadManager.startDownload(this.getActivity());
-				return true;
+				
+				cursor.moveToNext();
 			}
+			PodcastDownloadManager.startDownload(getActivity());
+			return true;
 		}
 		}
 		return super.onOptionsItemSelected(item);
@@ -67,24 +70,6 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 		return where;
 	}
 	
-	/*
-	@Override
-	public void startInit() {
-		showEpisodes(getWhere());
-	}
-	*/
-	
-	/*
-	public void showEpisodes(String condition) {
-		mCursor = createCursor(condition);
-
-		mAdapter = RecentItemFragment.listItemCursorAdapter(this.getActivity(),
-				this, mCursor);
-
-		setListAdapter(mAdapter);
-	}
-	*/
-	
 	public void getPref() {
 		SharedPreferences pref = getActivity().getSharedPreferences(
 				SettingsActivity.HAPI_PREFS_FILE_NAME, Context.MODE_PRIVATE);
@@ -93,23 +78,23 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 		pref_select = pref.getLong("pref_select", 0);
 	}
 	
-	protected Cursor createCursor(String condition) {
+	@Deprecated
+	protected Cursor createCursor(String condition, String order) {
 		// return new CursorLoader(getActivity(), ItemColumns.URI, PROJECTION,
 		// condition, null, getOrder()).loadInBackground();
 		return new CursorLoader(getActivity(), ItemColumns.URI,
-				ItemColumns.ALL_COLUMNS, condition, null, getOrder())
+				ItemColumns.ALL_COLUMNS, condition, null, order)
 				.loadInBackground();
 	}
 	
-	
 	public String getOrder() {
-		String order = ItemColumns.DATE + " DESC LIMIT 20"; // before:
-		// ItemColumns.CREATED
-		if (pref_order == 0) {
-			order = ItemColumns.SUBS_ID + "," + order;
-		} else if (pref_order == 1) {
-			order = ItemColumns.STATUS + "," + order;
-		}
+		return getOrder("DESC");
+	}
+	
+	public String getOrder(String inputOrder) {
+		assert inputOrder != null;
+		
+		String order = ItemColumns.DATE + " " + inputOrder + " LIMIT 20"; // before:
 		return order;
 	}
 
