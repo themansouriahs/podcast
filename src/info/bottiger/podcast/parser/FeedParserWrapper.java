@@ -31,6 +31,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 
@@ -368,13 +369,13 @@ public class FeedParserWrapper {
 			if (itemDate > update_date) {
 				update_date = itemDate;
 			}
-			insertSucces = addItem(subscription, item);
+			item = addItem(subscription, item);
 			add_num++;
 
 			/*
 			 * Download podcasts
 			 */
-			if (autoDownload && insertSucces) {
+			if (autoDownload && item != null) {
 				PodcastDownloadManager.addItemToQueue(item);
 			}
 
@@ -389,7 +390,7 @@ public class FeedParserWrapper {
 
 	}
 
-	private boolean addItem(Subscription subscription, FeedItem item) {
+	private synchronized FeedItem addItem(Subscription subscription, FeedItem item) {
 		Long sub_id = subscription.id;
 		boolean insertSucces = false;
 
@@ -403,14 +404,18 @@ public class FeedParserWrapper {
 
 		if (cursor.moveToFirst()) {
 		} else {
-			item.insert(cr);
+			Uri insertedUri = item.insert(cr);
+			item = FeedItem.getMostRecent(cr);
 			insertSucces = true;
 		}
 
 		if (cursor != null)
 			cursor.close();
 
-		return insertSucces;
+		if (insertSucces)
+			return item;
+		
+		return null;
 
 	}
 

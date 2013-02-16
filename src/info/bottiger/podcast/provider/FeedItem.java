@@ -371,7 +371,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		}
 	}
 
-	public Uri insert(ContentResolver context) {
+	public Uri insert(ContentResolver contentResolver) {
 		log.debug("item insert start");
 		try {
 
@@ -423,7 +423,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 			if (listened >= 0)
 				cv.put(ItemColumns.LISTENED, listened);
 
-			return context.insert(ItemColumns.URI, cv);
+			return contentResolver.insert(ItemColumns.URI, cv);
 
 		} finally {
 		}
