@@ -2,7 +2,7 @@ package info.bottiger.podcast.notification;
 
 import info.bottiger.podcast.NotificationReceiver;
 import info.bottiger.podcast.R;
-import info.bottiger.podcast.SwipeActivity;
+import info.bottiger.podcast.MainActivity;
 import info.bottiger.podcast.provider.BitmapProvider;
 import info.bottiger.podcast.provider.FeedItem;
 import android.app.Notification;
@@ -46,7 +46,7 @@ public class NotificationPlayer {
 		// your application to the Home screen.
 		TaskStackBuilder stackBuilder = TaskStackBuilder.create(mContext);
 		// Adds the back stack for the Intent (but not the Intent itself)
-		stackBuilder.addParentStack(SwipeActivity.class);
+		stackBuilder.addParentStack(MainActivity.class);
 		// Adds the Intent that starts the Activity to the top of the stack
 		stackBuilder.addNextIntent(resultIntent);
 		PendingIntent resultPendingIntent =

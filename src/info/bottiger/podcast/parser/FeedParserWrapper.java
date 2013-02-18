@@ -103,66 +103,68 @@ public class FeedParserWrapper {
 
 			Object rootObject = JSONValue.parse(in);
 			JSONArray mainArray = (JSONArray) rootObject;
-			JSONObject mainDataObject = (JSONObject) mainArray.get(0);
+			if (mainArray != null) {
+				JSONObject mainDataObject = (JSONObject) mainArray.get(0);
 
-			String image = "";
+				String image = "";
 
-			if (mainDataObject.get("logo") != null)
-				image = mainDataObject.get("logo").toString();
+				if (mainDataObject.get("logo") != null)
+					image = mainDataObject.get("logo").toString();
 
-			updateSubscription(subscription, mainDataObject, cr);
+				updateSubscription(subscription, mainDataObject, cr);
 
-			JSONArray episodeDataObject = (JSONArray) mainDataObject
-					.get("episodes");
-			for (int i = 0; i < episodeDataObject.size(); i++) {
-				FeedItem item = new FeedItem();
+				JSONArray episodeDataObject = (JSONArray) mainDataObject
+						.get("episodes");
+				for (int i = 0; i < episodeDataObject.size(); i++) {
+					FeedItem item = new FeedItem();
 
-				JSONObject episode = (JSONObject) episodeDataObject.get(i);
-				Number duration = (Number) episode.get("duration");
+					JSONObject episode = (JSONObject) episodeDataObject.get(i);
+					Number duration = (Number) episode.get("duration");
 
-				JSONArray fileData = (JSONArray) episode.get("files");
-				if (fileData.size() > 0) {
-					
-					JSONObject files = (JSONObject) fileData.get(0);
-					
-					String episodeURL = "";
-					JSONArray urlsData = (JSONArray) files.get("urls");
-					if (urlsData.size() > 0) {
-						episodeURL = (String) urlsData.get(0);
-					} else {
-						episodeURL = (String) episode.get("link");
+					JSONArray fileData = (JSONArray) episode.get("files");
+					if (fileData.size() > 0) {
+
+						JSONObject files = (JSONObject) fileData.get(0);
+
+						String episodeURL = "";
+						JSONArray urlsData = (JSONArray) files.get("urls");
+						if (urlsData.size() > 0) {
+							episodeURL = (String) urlsData.get(0);
+						} else {
+							episodeURL = (String) episode.get("link");
+						}
+
+						item.type = (String) files.get("mimetype");
+						Number filesize = (Number) files.get("filesize");
+						Number episodeNumber = (Number) files.get("number");
+
+						Number released = (Number) episode.get("released");
+						Date time = null;
+						if (released != null)
+							time = new Date(released.longValue() * 1000);
+
+						if (time != null)
+							item.date = dt.format(time);
+						if (duration != null) {
+							item.duration_ms = duration.intValue() * 1000;
+							item.duration_string = StrUtils
+									.formatTime(item.duration_ms);
+						}
+
+						if (filesize != null)
+							item.filesize = filesize.intValue();
+						if (episodeNumber != null)
+							item.setEpisodeNumber(episodeNumber.intValue());
+						item.image = image;
+						item.url = episodeURL;
+						item.resource = item.url;
+
+						item.title = (String) episode.get("title");
+						item.author = (String) episode.get("author");
+						item.content = (String) episode.get("description");
+
+						updateFeed(subscription, item);
 					}
-					
-					item.type = (String) files.get("mimetype");
-					Number filesize = (Number) files.get("filesize");
-					Number episodeNumber = (Number) files.get("number");
-
-					Number released = (Number) episode.get("released");
-					Date time = null;
-					if (released != null)
-						time = new Date(released.longValue() * 1000);
-
-					if (time != null)
-						item.date = dt.format(time);
-					if (duration != null) {
-						item.duration_ms = duration.intValue() * 1000;
-						item.duration_string = StrUtils
-								.formatTime(item.duration_ms);
-					}
-						
-					if (filesize != null)
-						item.filesize = filesize.intValue();
-					if (episodeNumber != null)
-						item.setEpisodeNumber(episodeNumber.intValue());
-					item.image = image;
-					item.url = episodeURL;
-					item.resource = item.url;
-
-					item.title = (String) episode.get("title");
-					item.author = (String) episode.get("author");
-					item.content = (String) episode.get("description");
-
-					updateFeed(subscription, item);
 				}
 			}
 
@@ -390,7 +392,8 @@ public class FeedParserWrapper {
 
 	}
 
-	private synchronized FeedItem addItem(Subscription subscription, FeedItem item) {
+	private synchronized FeedItem addItem(Subscription subscription,
+			FeedItem item) {
 		Long sub_id = subscription.id;
 		boolean insertSucces = false;
 
@@ -414,7 +417,7 @@ public class FeedParserWrapper {
 
 		if (insertSucces)
 			return item;
-		
+
 		return null;
 
 	}

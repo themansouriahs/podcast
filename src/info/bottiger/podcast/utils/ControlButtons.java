@@ -3,7 +3,7 @@ package info.bottiger.podcast.utils;
 import info.bottiger.podcast.PodcastBaseFragment;
 import info.bottiger.podcast.R;
 import info.bottiger.podcast.RecentItemFragment;
-import info.bottiger.podcast.SwipeActivity;
+import info.bottiger.podcast.MainActivity;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.service.PodcastDownloadManager;
 import info.bottiger.podcast.service.PodcastService;
@@ -72,7 +72,7 @@ public class ControlButtons {
 							.getAttr(R.attr.pause_icon));
 					playPauseButton.setContentDescription("Pause");
 					PodcastBaseFragment.mPlayerServiceBinder.play(id);
-					PodcastBaseFragment.queueNextRefresh(1);
+					PodcastBaseFragment.queueNextRefresh();
 				}
 			}
 		});
@@ -160,7 +160,7 @@ public class ControlButtons {
 		viewHolder.duration = (TextView) listView.findViewById(R.id.duration);
 		viewHolder.filesize = (TextView) listView.findViewById(R.id.filesize);
 
-		ControlButtons.setListener(SwipeActivity.mPodcastServiceBinder,
+		ControlButtons.setListener(MainActivity.mPodcastServiceBinder,
 				viewHolder, id);
 	}
 
@@ -183,7 +183,7 @@ public class ControlButtons {
 				.findViewById(R.id.queue);
 		viewHolder.seekbar = (SeekBar) playerView.findViewById(R.id.progress);
 
-		ControlButtons.setListener(SwipeActivity.mPodcastServiceBinder,
+		ControlButtons.setListener(MainActivity.mPodcastServiceBinder,
 				viewHolder, id);
 
 	}

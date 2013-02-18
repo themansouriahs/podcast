@@ -731,6 +731,20 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	public void setDownloaded(boolean isDownloaded) {
 		this.isDownloaded = isDownloaded;
 	}
+	
+	/**
+	 * Mark the episode as listened
+	 */
+	public void markAsListened() {
+		markAsListened(1);
+	}
+	
+	/**
+	 * @params 1 for listened. 0 for unlistened. -1 for undefined
+	 */
+	public void markAsListened(int hasBeenListened) {
+		this.listened = hasBeenListened;
+	}
 
 
 	/**

@@ -137,10 +137,12 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 				.getColumnIndex(BaseColumns._ID));
 		FeedItem feedItem = FeedItem.getById(mContext.getContentResolver(),
 				itemID);
-
-
-		boolean isCurrentPlayingItem = feedItem.equals(PodcastBaseFragment.mPlayerServiceBinder
-					.getCurrentItem());
+		
+		
+		boolean isCurrentPlayingItem = false;
+		if (PodcastBaseFragment.mPlayerServiceBinder != null) {
+			isCurrentPlayingItem = feedItem.equals(PodcastBaseFragment.mPlayerServiceBinder.getCurrentItem());
+		}
 
 		if (mExpandedItemID.contains(itemID) || isCurrentPlayingItem) {
 			ViewStub stub = (ViewStub) listViewItem.findViewById(R.id.stub);
@@ -194,6 +196,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 				if (itemID == PodcastBaseFragment.mPlayerServiceBinder
 						.getCurrentItem().id) {
 					if (PodcastBaseFragment.mPlayerServiceBinder.isPlaying()) {
+						PodcastBaseFragment.setCurrentTime(currentTime);
 						ImageButton playPauseButton = (ImageButton) listViewItem
 								.findViewById(R.id.play_toggle);
 						playPauseButton.setImageResource(themeHelper.getAttr(R.attr.pause_icon));

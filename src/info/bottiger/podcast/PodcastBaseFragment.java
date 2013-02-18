@@ -82,7 +82,7 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 		return mCurrentTime;
 	}
 
-	public void setCurrentTime(TextView mCurrentTime) {
+	public static void setCurrentTime(TextView mCurrentTime) {
 		PodcastBaseFragment.mCurrentTime = mCurrentTime;
 	}
 
@@ -218,31 +218,27 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 			switch (msg.what) {
 			case REFRESH:
 				long next = refreshUI();
-				queueNextRefresh(next);
+				queueNextRefresh();
 				// log.debug("REFRESH: "+next);
-				break;
-
-			case UPDATE_FILESIZE:
-				FeedItem item = (FeedItem) msg.obj;
-				TextView tv = FilesizeUpdater.get(item);
-				if (tv != null)
-					tv.setText(Math
-							.round(item.chunkFilesize * 100.0 / 1024 / 1024)
-							/ 100.0 + " MB");
-				break;
-
-			default:
 				break;
 			}
 		}
 	};
 
-	public static void queueNextRefresh(long delay) {
+	public static void queueNextRefresh() {
+		long delay = 3;
 		Message msg = mHandler.obtainMessage(REFRESH);
 		mHandler.removeMessages(REFRESH);
 		// if (mPlayerServiceBinder.isPlaying()) // FIXME or something is
 		// downloading
 		mHandler.sendMessageDelayed(msg, delay);
+	}
+	
+	@Override
+	public void onResume()
+	{
+	    super.onResume();
+	    queueNextRefresh();
 	}
 
 	protected static long refreshUI() {

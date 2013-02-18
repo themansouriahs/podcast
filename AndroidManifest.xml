@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="info.bottiger.podcast"
-    android:versionCode="1"
+    android:versionCode="2"
     android:versionName="0.1" >
 
     <uses-sdk
@@ -37,7 +37,7 @@
 
         <activity android:name="com.handmark.pulltorefresh.library.PullToRefreshListView" />
         <activity
-            android:name=".SwipeActivity"
+            android:name="info.bottiger.podcast.MainActivity"
             android:label="@string/title_activity_swipe" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

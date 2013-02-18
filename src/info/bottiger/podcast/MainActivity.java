@@ -45,8 +45,10 @@ import android.widget.TextView;
 import com.bugsense.trace.BugSenseHandler;
 import com.slidingmenu.lib.SlidingMenu;
 import com.slidingmenu.lib.app.SlidingFragmentActivity;
+import com.zubhium.ZubhiumSDK;
+import com.zubhium.ZubhiumSDK.CrashReportingMode;
 
-public class SwipeActivity extends SlidingFragmentActivity implements
+public class MainActivity extends SlidingFragmentActivity implements
 		OnItemSelectedListener {
 
 	public static PodcastService mPodcastServiceBinder = null;
@@ -94,8 +96,12 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		BugSenseHandler.initAndStartSession(SwipeActivity.this,
+		BugSenseHandler.initAndStartSession(MainActivity.this,
 				((SoundWaves) this.getApplication()).getBugSenseAPIKey());
+
+		ZubhiumSDK sdk = ZubhiumSDK.getZubhiumSDKInstance(getApplicationContext(), ((SoundWaves) this.getApplication()).zubhiumAPIKey);
+		sdk.setCrashReportingMode(CrashReportingMode.SILENT);
+		
 		if (debugging) {
 			// Tracing is buggy on emulator
 			// Debug.startMethodTracing("calc");
@@ -186,7 +192,7 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 		try {
 			Account[] a = AccountManager.get(getApplicationContext())
 					.getAccountsByType("com.google");
-			SwipeActivity.mAccount = a[0];
+			MainActivity.mAccount = a[0];
 			gReader = new GoogleReader(this, mAccount,
 					((SoundWaves) this.getApplication())
 							.getGoogleReaderConsumerKey());
@@ -209,7 +215,7 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		BugSenseHandler.closeSession(SwipeActivity.this);
+		BugSenseHandler.closeSession(MainActivity.this);
 	}
 
 	@Override
@@ -267,15 +273,19 @@ public class SwipeActivity extends SlidingFragmentActivity implements
 		getMenuInflater().inflate(R.menu.activity_swipe, menu);
 		
 		// The player can only be playing if the PlayerService has been bound
+		MenuItem menuItem = menu.findItem(R.id.menu_control);
 		if (PodcastBaseFragment.mPlayerServiceBinder != null) {
 			
 			ThemeHelper themeHelper = new ThemeHelper(this);
-			MenuItem menuItem = menu.findItem(R.id.menu_control);
 			if (PodcastBaseFragment.mPlayerServiceBinder.isPlaying()) {
 				menuItem.setIcon(themeHelper.getAttr(R.attr.pause_invert_icon));
-			} else {
+			} else if (PodcastBaseFragment.mPlayerServiceBinder.isOnPause()) {
 				menuItem.setIcon(themeHelper.getAttr(R.attr.play_invert_icon));
+			} else { 
+				menuItem.setVisible(false);
 			}
+		} else {
+			menuItem.setVisible(false);
 		}
 		return true;
 	}

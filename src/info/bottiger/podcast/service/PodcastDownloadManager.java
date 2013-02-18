@@ -1,6 +1,6 @@
 package info.bottiger.podcast.service;
 
-import info.bottiger.podcast.SwipeActivity;
+import info.bottiger.podcast.MainActivity;
 import info.bottiger.podcast.parser.FeedParserWrapper;
 import info.bottiger.podcast.provider.FeedItem;
 import info.bottiger.podcast.provider.ItemColumns;
@@ -439,8 +439,8 @@ public class PodcastDownloadManager {
 			subscriptionDownloader = null;
 
 			// FIXME this only works if there is an google account present
-			if (SwipeActivity.gReader != null) {
-				subscriptionDownloader = SwipeActivity.gReader
+			if (MainActivity.gReader != null) {
+				subscriptionDownloader = MainActivity.gReader
 						.getSubscriptionsFromReader();
 			}
 		}

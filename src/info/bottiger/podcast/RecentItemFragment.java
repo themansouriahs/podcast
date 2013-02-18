@@ -71,7 +71,7 @@ public class RecentItemFragment extends AbstractEpisodeFragment {
 		//startInit();
 		
 
-		setEmptyText("Your emptyText message");
+		setEmptyText("No podcasts :( You should add some feeds and refresh the list");
 
 		if (mDualPane) {
 			// In dual-pane mode, the list view highlights the selected item.

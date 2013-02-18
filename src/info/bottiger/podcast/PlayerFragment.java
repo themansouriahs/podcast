@@ -188,7 +188,7 @@ public class PlayerFragment   extends PodcastBaseFragment
             switch (msg.what) {
                 case REFRESH:
                     long next = refreshNow();
-                    queueNextRefresh(next);
+                    //queueNextRefresh(next);
                     //log.debug("REFRESH: "+next);
                     break;
 
@@ -416,7 +416,7 @@ public class PlayerFragment   extends PodcastBaseFragment
         if(mID>=0) {
         	startPlay();
         }
-        queueNextRefresh(1);
+        //queueNextRefresh(1);
         updateInfo();
 
 	}

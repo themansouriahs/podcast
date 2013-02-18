@@ -246,7 +246,10 @@ public class PlayerService extends Service implements
 		MediaPlayer.OnCompletionListener listener = new MediaPlayer.OnCompletionListener() {
 			@Override
 			public void onCompletion(MediaPlayer mp) {
-
+				FeedItem item = PlayerService.this.mItem;
+				item.markAsListened();
+				item.update(getContentResolver());
+				
 				mHandler.sendEmptyMessage(TRACK_ENDED);
 
 			}
@@ -501,6 +504,18 @@ public class PlayerService extends Service implements
 	public boolean isPlaying() {
 		return mPlayer.isPlaying();
 	}
+	
+	/**
+	 * Test of the player is on pause right now
+	 * 
+	 * @return True if the player is on pause right now
+	 */
+	public boolean isOnPause() {
+		if (isPlaying() || getCurrentItem() == null)
+			return false;
+		
+		return true;
+	}
 
 	public long seek(long offset) {
 		offset = offset < 0 ? 0 : offset;
@@ -522,6 +537,11 @@ public class PlayerService extends Service implements
 		return test;// mPlayer.bufferProgress;
 	}
 
+	public void setCurrentItem(FeedItem item) {
+		stop();
+		mItem = item;
+	}
+	
 	public FeedItem getCurrentItem() {
 		return mItem;
 	}

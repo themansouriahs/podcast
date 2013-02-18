@@ -1,6 +1,6 @@
 package info.bottiger.podcast.provider;
 
-import info.bottiger.podcast.SwipeActivity;
+import info.bottiger.podcast.MainActivity;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -184,8 +184,8 @@ public class Subscription implements WithIcon {
 				url);
 
 		// Unsubscribe from Google Reader
-		SwipeActivity.gReader.removeSubscriptionfromReader(context,
-				SwipeActivity.mAccount, sub);
+		MainActivity.gReader.removeSubscriptionfromReader(context,
+				MainActivity.mAccount, sub);
 
 		// Unsubscribe from local database
 		String where = BaseColumns._ID + " = ?";
@@ -222,8 +222,8 @@ public class Subscription implements WithIcon {
 		
 		Subscription sub_test = Subscription.getByUrl(context.getContentResolver(),
 				url);
-		if (sub_test != null && SwipeActivity.gReader != null)
-			SwipeActivity.gReader.addSubscriptiontoReader(context, SwipeActivity.mAccount,sub_test);
+		if (sub_test != null && MainActivity.gReader != null)
+			MainActivity.gReader.addSubscriptiontoReader(context, MainActivity.mAccount,sub_test);
 
 		return ADD_SUCCESS;
 
