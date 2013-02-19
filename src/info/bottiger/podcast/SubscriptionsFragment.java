@@ -182,14 +182,4 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 
 	}
 	
-	/*
-	@Override
-	Subscription getSubscription(Object o) {
-		Cursor item = (Cursor)o;
-		Long id = item.getLong(item.getColumnIndex(BaseColumns._ID));
-		new Subscription();
-		return Subscription.getById(getActivity().getContentResolver(), id);
-	}
-	*/
-	
 }
