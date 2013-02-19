@@ -365,8 +365,8 @@ public class FeedParserWrapper {
 
 		Long itemDate = item.getLongDate();
 
-		if (FeedParserWrapper.mostRecentItem == null
-				|| item.newerThan(FeedParserWrapper.mostRecentItem)) {
+		FeedItem localItemWithSameURL = FeedItem.getByURL(cr, item.url);
+		if (localItemWithSameURL == null) {
 
 			if (itemDate > update_date) {
 				update_date = itemDate;

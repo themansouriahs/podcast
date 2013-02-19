@@ -219,6 +219,25 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 
 	}
 	
+	public static FeedItem getByURL(ContentResolver contentResolver, String Url) {
+		FeedItem item = null;
+		Cursor cursor = null;
+
+		String where = ItemColumns.URL + " = ?";
+		try {
+			cursor = contentResolver.query(ItemColumns.URI, ItemColumns.ALL_COLUMNS,
+					where,  new String[] {Url}, null);
+			if (cursor.moveToFirst()) {
+				item = FeedItem.getByCursor(cursor);
+			}
+		} finally {
+			if (cursor != null)
+				cursor.close();
+		}
+		return item;
+
+	}
+	
 	public static FeedItem getByDownloadReference(ContentResolver contentResolver, long id) {
 		FeedItem item = null;
 		Cursor cursor = null;

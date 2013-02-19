@@ -4,6 +4,7 @@ import info.bottiger.podcast.adapters.CompactListCursorAdapter;
 import info.bottiger.podcast.adapters.ItemCursorAdapter;
 import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.Subscription;
+import info.bottiger.podcast.service.PodcastService;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -14,13 +15,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 public class FeedFragment extends AbstractEpisodeFragment {
 
 	// FIXME should not be static
 	private static long subId = 14;
+	private static Subscription mSubscription = null;
+	
 	private ViewGroup header;
 	
 	public static CompactListCursorAdapter listItemCursorAdapter(Context context,
@@ -92,25 +99,9 @@ public class FeedFragment extends AbstractEpisodeFragment {
 		mAdapter = FeedFragment.listItemCursorAdapter(this.getActivity(),
 				this, mCursor);
 		startInit(1, ItemColumns.URI, ItemColumns.ALL_COLUMNS, getWhere(), getOrder());
-
-		/*
-		final PullToRefreshListView pullToRefreshView = (PullToRefreshListView) fragmentView
-				.findViewById(R.id.episode_list_compact);
-
-		OnRefreshListener<ListView> pullToRefreshListener = new OnRefreshListener<ListView>() {
-
-			@Override
-			public void onRefresh(PullToRefreshBase<ListView> refreshView) {
-				// SwipeActivity.mPodcastServiceBinder.start_update(pullToRefreshView);
-				PodcastService.start_update(getActivity(), pullToRefreshView);
-			}
-		};
-
-		actualListView = pullToRefreshView.getRefreshableView();
-		pullToRefreshView.getLoadingLayoutProxy().setRefreshingLabel(
-				"Refreshing feeds");
-		pullToRefreshView.setOnRefreshListener(pullToRefreshListener);
-		*/
+		
+		Subscription sub = getSubscription(getActivity().getContentResolver());
+		enablePullToRefresh(sub);
 	}
 	
 	public static FeedFragment newInstance(long subID) {
@@ -142,6 +133,7 @@ public class FeedFragment extends AbstractEpisodeFragment {
 	}
 	
 	private Subscription getSubscription(ContentResolver contentResolver) {
-		return Subscription.getById(contentResolver, subId);
+		mSubscription = mSubscription == null ? Subscription.getById(contentResolver, subId) : mSubscription;
+		return mSubscription;
 	}
 }

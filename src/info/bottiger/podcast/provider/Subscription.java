@@ -51,7 +51,7 @@ public class Subscription implements WithIcon {
 				channel_id);
 		act.startActivity(new Intent(Intent.ACTION_EDIT, uri));
 	}
-
+	
 	public static Cursor allAsCursor(ContentResolver context) {
 		return context.query(SubscriptionColumns.URI,
 				SubscriptionColumns.ALL_COLUMNS, null, null, null);

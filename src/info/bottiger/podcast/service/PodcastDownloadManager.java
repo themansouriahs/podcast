@@ -87,11 +87,17 @@ public class PodcastDownloadManager {
 	}
 
 	public static void start_update(final Context context) {
-		start_update(context, null);
+		start_update(context, null, null);
 	}
 
 	public static void start_update(final Context context,
 			final PullToRefreshListView pullToRefreshView) {
+		start_update(context, pullToRefreshView, null);
+	}
+
+	public static void start_update(final Context context,
+			final PullToRefreshListView pullToRefreshView,
+			Subscription subscription) {
 		if (updateConnectStatus(context) == NO_CONNECT)
 			return;
 
@@ -99,7 +105,8 @@ public class PodcastDownloadManager {
 		if (mUpdateLock.locked() == false)
 			return;
 
-		new UpdateSubscriptions(context, pullToRefreshView).execute();
+		new UpdateSubscriptions(context, pullToRefreshView, subscription)
+				.execute();
 	}
 
 	/**
@@ -334,7 +341,7 @@ public class PodcastDownloadManager {
 		if (c.moveToFirst()) {
 			int columnIndex = c.getColumnIndex(DownloadManager.COLUMN_STATUS);
 			int status = c.getInt(columnIndex);
-			
+
 			if (status == DownloadManager.STATUS_RUNNING)
 				return mDownloadingItem;
 		}
@@ -418,9 +425,10 @@ public class PodcastDownloadManager {
 	 */
 	private static class UpdateSubscriptions extends
 			AsyncTask<Void, Subscription, PullToRefreshListView> {
-		Context mContext;
-		PullToRefreshListView mRefreshView;
-		AsyncTask<URL, Void, Void> subscriptionDownloader;
+		private Context mContext;
+		private Subscription mSubscription;
+		private PullToRefreshListView mRefreshView;
+		private AsyncTask<URL, Void, Void> subscriptionDownloader;
 
 		/*
 		 * AsyncTask may be asynchronous, but not very concurrent. Instead of
@@ -433,12 +441,13 @@ public class PodcastDownloadManager {
 		ExecutorService service = Executors.newFixedThreadPool(5);
 
 		public UpdateSubscriptions(Context context,
-				PullToRefreshListView pullToRefreshView) {
+				PullToRefreshListView pullToRefreshView,
+				Subscription subscription) {
 			mContext = context;
+			mSubscription = subscription;
 			mRefreshView = pullToRefreshView;
 			subscriptionDownloader = null;
 
-			// FIXME this only works if there is an google account present
 			if (MainActivity.gReader != null) {
 				subscriptionDownloader = MainActivity.gReader
 						.getSubscriptionsFromReader();
@@ -447,18 +456,26 @@ public class PodcastDownloadManager {
 
 		@Override
 		protected PullToRefreshListView doInBackground(Void... params) {
+			Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
 			try {
-				Cursor subscriptionCursor = Subscription.allAsCursor(mContext
-						.getContentResolver());
-				while (subscriptionCursor.moveToNext()) {
 
-					Subscription subscription = Subscription
-							.getByCursor(subscriptionCursor);
-
+				if (mSubscription != null) {
 					GetSubscriptionRunnable run = new GetSubscriptionRunnable(
-							subscription);
+							mSubscription);
 					service.execute(run);
+				} else {
+					Cursor subscriptionCursor = Subscription
+							.allAsCursor(mContext.getContentResolver());
 
+					while (subscriptionCursor.moveToNext()) {
+
+						Subscription subscription = Subscription
+								.getByCursor(subscriptionCursor);
+
+						GetSubscriptionRunnable run = new GetSubscriptionRunnable(
+								subscription);
+						service.execute(run);
+					}
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -544,8 +561,8 @@ public class PodcastDownloadManager {
 					subscription.getClass();
 
 				FeedParserWrapper parser = new FeedParserWrapper(mContext);
-				parser.parse(subscription);
 				publishProgress(subscription);
+				parser.parse(subscription);
 			}
 		}
 	}

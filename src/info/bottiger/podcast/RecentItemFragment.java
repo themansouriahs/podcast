@@ -80,23 +80,7 @@ public class RecentItemFragment extends AbstractEpisodeFragment {
 			// showDetails(mCurCheckPosition);
 		}
 
-		final PullToRefreshListView pullToRefreshView = (PullToRefreshListView) fragmentView
-				.findViewById(R.id.episode_list);
-
-		OnRefreshListener<ListView> pullToRefreshListener = new OnRefreshListener<ListView>() {
-
-			@Override
-			public void onRefresh(PullToRefreshBase<ListView> refreshView) {
-				// SwipeActivity.mPodcastServiceBinder.start_update(pullToRefreshView);
-				PodcastService.start_update(getActivity(), pullToRefreshView);
-			}
-		};
-
-		
-		actualListView = pullToRefreshView.getRefreshableView();
-		pullToRefreshView.getLoadingLayoutProxy().setRefreshingLabel(
-				"Refreshing feeds");
-		pullToRefreshView.setOnRefreshListener(pullToRefreshListener);
+		enablePullToRefresh();
 		
 	}
 
