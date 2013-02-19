@@ -207,12 +207,12 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		String strID = String.valueOf(subscription.getId());
 		return context.query(ItemColumns.URI, ItemColumns.ALL_COLUMNS,
 				ItemColumns.SUBS_ID + "=? AND " + ItemColumns.DATE + ">?",
-				new String[] {strID, oldestDate}, null);
+				new String[] { strID, oldestDate }, null);
 	}
 
-	public static HashMap<String,FeedItem> allAsList(ContentResolver context,
+	public static HashMap<String, FeedItem> allAsList(ContentResolver context,
 			Subscription subscription, String oldestDate) {
-		HashMap<String,FeedItem> item = new HashMap<String,FeedItem>();
+		HashMap<String, FeedItem> item = new HashMap<String, FeedItem>();
 		Cursor cursor = allAsCursor(context, subscription, oldestDate);
 
 		while (cursor.moveToNext()) {
@@ -473,7 +473,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	}
 
 	/**
-	 * @see http
+	 * @see http 
 	 *      ://docs.oracle.com/javase/6/docs/api/java/lang/String.html#compareTo
 	 *      %28java.lang.String%29
 	 * @return True of the current FeedItem is newer than the supplied argument
@@ -772,7 +772,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	public boolean isDownloaded() {
 		return this.isDownloaded;
 	}
-	
+
 	/**
 	 * @return true of the podcast has been listened too
 	 */
@@ -821,9 +821,12 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 				e.printStackTrace();
 				return this.length;
 			}
-			return Long
-					.parseLong(retriever
-							.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
+			String mediaID = retriever
+					.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+			if (mediaID != null)
+				return Long.parseLong(mediaID);
+			else
+				return 0;
 		} else {
 			if (this.duration_string.equals(""))
 				return this.length;

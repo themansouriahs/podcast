@@ -40,10 +40,6 @@ public class ControlButtons {
 		public SeekBar seekbar;
 	}
 
-	public static void setCurrentTime(final Holder viewHolder, final long id) {
-
-	}
-
 	public static void setListener(
 			final PodcastService podcastServiceConnection,
 			final Holder viewHolder, final long id) {

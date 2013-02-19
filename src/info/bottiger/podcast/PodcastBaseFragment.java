@@ -342,7 +342,9 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 			mCurrentTime.setText(timeCounter);
 			if (mDuration != null)
 				mDuration.setText(durationString);
-			PlayerActivity.setProgressBar(mProgressBar, mPlayerServiceBinder);
+			
+			if (mProgressBar != null)
+				PlayerActivity.setProgressBar(mProgressBar, mPlayerServiceBinder);
 		}
 	}
 

@@ -5,9 +5,11 @@ import info.bottiger.podcast.PodcastBaseFragment;
 import info.bottiger.podcast.R;
 import info.bottiger.podcast.listeners.DownloadProgressListener;
 import info.bottiger.podcast.provider.FeedItem;
+import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.service.DownloadStatus;
 import info.bottiger.podcast.utils.ControlButtons;
+import info.bottiger.podcast.utils.ExpandAnimation;
 import info.bottiger.podcast.utils.StrUtils;
 import info.bottiger.podcast.utils.ThemeHelper;
 
@@ -27,16 +29,15 @@ import android.view.ViewStub;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 
-
 public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 
 	public static final int ICON_DEFAULT_ID = -1;
-
 
 	public final static FieldHandler defaultTextFieldHandler = new FieldHandler.TextFieldHandler();
 
@@ -61,7 +62,8 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 		for (int i = 0; i < handlers.length - 1; i++) {
 			handlers[i] = defaultTextFieldHandler;
 		}
-		handlers[fromColumns.length - 1] = new FieldHandler.IconFieldHandler(iconMap);
+		handlers[fromColumns.length - 1] = new FieldHandler.IconFieldHandler(
+				iconMap);
 		return handlers;
 	}
 
@@ -119,7 +121,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 		View listViewItem;
 		Cursor itemCursor = (Cursor) getItem(position);
 		ThemeHelper themeHelper = new ThemeHelper(mContext);
-		
+
 		if (!itemCursor.moveToPosition(position)) {
 			throw new IllegalStateException("couldn't move cursor to position "
 					+ position);
@@ -138,11 +140,12 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 				.getColumnIndex(BaseColumns._ID));
 		FeedItem feedItem = FeedItem.getById(mContext.getContentResolver(),
 				itemID);
-		
-		
+
 		boolean isCurrentPlayingItem = false;
 		if (PodcastBaseFragment.mPlayerServiceBinder != null) {
-			isCurrentPlayingItem = feedItem.equals(PodcastBaseFragment.mPlayerServiceBinder.getCurrentItem());
+			isCurrentPlayingItem = feedItem
+					.equals(PodcastBaseFragment.mPlayerServiceBinder
+							.getCurrentItem());
 		}
 
 		if (mExpandedItemID.contains(itemID) || isCurrentPlayingItem) {
@@ -161,41 +164,45 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 
 			TextView currentTime = (TextView) listViewItem
 					.findViewById(R.id.current_position);
-			//View podcastImageOverlay = (View) listViewItem
-			//		.findViewById(R.id.overlay);
-			
+			// View podcastImageOverlay = (View) listViewItem
+			// .findViewById(R.id.overlay);
+
 			long playerPosition = 0;
 			long playerDuration = 0;
-			
+
 			if (isCurrentPlayingItem) {
-				playerPosition = PodcastBaseFragment.mPlayerServiceBinder.position();
-				playerDuration = PodcastBaseFragment.mPlayerServiceBinder.duration();
+				playerPosition = PodcastBaseFragment.mPlayerServiceBinder
+						.position();
+				playerDuration = PodcastBaseFragment.mPlayerServiceBinder
+						.duration();
 			} else {
 				playerPosition = feedItem.offset;
 				playerDuration = feedItem.getDuration();
 			}
-			
+
 			currentTime.setText(StrUtils.formatTime(playerPosition));
 
 			SeekBar sb = (SeekBar) playerView.findViewById(R.id.progress);
 			sb.setMax(ControlButtons.MAX_SEEKBAR_VALUE);
 
-			//PlayerActivity.setProgressBar(sb, feedItem);
-			long secondary = feedItem.isDownloaded() ? feedItem.getCurrentFileSize()
+			// PlayerActivity.setProgressBar(sb, feedItem);
+			long secondary = feedItem.isDownloaded() ? feedItem
+					.getCurrentFileSize()
 					: (feedItem.chunkFilesize / feedItem.filesize);
-			PlayerActivity.setProgressBar(sb, playerDuration, playerPosition, secondary);
-
+			PlayerActivity.setProgressBar(sb, playerDuration, playerPosition,
+					secondary);
 
 			ControlButtons.setPlayerListeners(listViewItem, playerView, itemID);
-			
+
 			if (feedItem.isDownloaded()) {
 				ImageButton downloadButton = (ImageButton) playerView
 						.findViewById(R.id.download);
-				downloadButton.setImageResource(themeHelper.getAttr(R.attr.delete_icon));
+				downloadButton.setImageResource(themeHelper
+						.getAttr(R.attr.delete_icon));
 			}
-			
+
 			if (feedItem.isMarkedAsListened()) {
-				//setOverlay(podcastImageOverlay, true);
+				// setOverlay(podcastImageOverlay, true);
 			}
 
 			if (PodcastBaseFragment.mPlayerServiceBinder.isInitialized()) {
@@ -205,7 +212,8 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 						PodcastBaseFragment.setCurrentTime(currentTime);
 						ImageButton playPauseButton = (ImageButton) listViewItem
 								.findViewById(R.id.play_toggle);
-						playPauseButton.setImageResource(themeHelper.getAttr(R.attr.pause_icon));
+						playPauseButton.setImageResource(themeHelper
+								.getAttr(R.attr.pause_icon));
 					}
 				}
 
@@ -227,7 +235,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 		View view = mInflater.inflate(R.layout.episode_list, null);
 
 		view.setTag(R.id.list_image, view.findViewById(R.id.list_image));
-		//view.setTag(R.id.overlay, view.findViewById(R.id.overlay));
+		// view.setTag(R.id.overlay, view.findViewById(R.id.overlay));
 		view.setTag(R.id.title, view.findViewById(R.id.title));
 		view.setTag(R.id.podcast, view.findViewById(R.id.podcast));
 		view.setTag(R.id.duration, view.findViewById(R.id.duration));
@@ -241,69 +249,81 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
 
-		FeedItem item = null;
 		try {
-			item = FeedItem.getByCursor(cursor);
-		} catch (IllegalStateException e) {
-		}
+			final FeedItem item = FeedItem.getByCursor(cursor);
 
-		Subscription sub = null;
-		try {
-			sub = Subscription.getByCursor(cursor);
-		} catch (IllegalStateException e) {
-		}
+			Subscription sub = null;
+			try {
+				sub = Subscription.getByCursor(cursor);
+			} catch (IllegalStateException e) {
+			}
 
-		/*
-		 * http://drasticp.blogspot.dk/2012/04/viewholder-is-dead.html
-		 */
-		ImageView icon = (ImageView) view.getTag(R.id.list_image);
-		//View overlay = (View) view.getTag(R.id.overlay);
-		TextView mainTitle = (TextView) view.getTag(R.id.title);
-		TextView subTitle = (TextView) view.getTag(R.id.podcast);
-		TextView timeDuration = (TextView) view.getTag(R.id.duration);
-		TextView currentPosition = (TextView) view
-				.getTag(R.id.current_position);
-		TextView slash = (TextView) view.getTag(R.id.time_slash);
-		TextView fileSize = (TextView) view.getTag(R.id.filesize);
+			/*
+			 * http://drasticp.blogspot.dk/2012/04/viewholder-is-dead.html
+			 */
+			ImageView icon = (ImageView) view.getTag(R.id.list_image);
+			// View overlay = (View) view.getTag(R.id.overlay);
+			TextView mainTitle = (TextView) view.getTag(R.id.title);
+			TextView subTitle = (TextView) view.getTag(R.id.podcast);
+			TextView timeDuration = (TextView) view.getTag(R.id.duration);
+			TextView currentPosition = (TextView) view
+					.getTag(R.id.current_position);
+			TextView slash = (TextView) view.getTag(R.id.time_slash);
+			TextView fileSize = (TextView) view.getTag(R.id.filesize);
 
-		DownloadStatus ds;
-		if (item != null) {
-			DownloadProgressListener.registerTextView(context, fileSize, item);
+			DownloadStatus ds;
+			if (item != null) {
+				DownloadProgressListener.registerTextView(context, fileSize,
+						item);
+				
+				icon.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						PodcastBaseFragment.mPlayerServiceBinder.toggle(item
+								.getId());// .play();
+					}
+				});
+				
 
-			int filesize = 0;
-			
-			DownloadManager downloadManager = (DownloadManager) mContext
-					.getSystemService(Context.DOWNLOAD_SERVICE);
-			fileSize.setText(item.getStatus(downloadManager));
+				int filesize = 0;
 
-			if (item.title != null)
-				mainTitle.setText(item.title);
+				DownloadManager downloadManager = (DownloadManager) mContext
+						.getSystemService(Context.DOWNLOAD_SERVICE);
+				fileSize.setText(item.getStatus(downloadManager));
 
-			if (item.sub_title != null)
-				subTitle.setText(item.sub_title);
+				if (item.title != null)
+					mainTitle.setText(item.title);
 
-			if (item.getDuration() > 0) {
+				if (item.sub_title != null)
+					subTitle.setText(item.sub_title);
 
-				timeDuration.setText(item.duration_string);
+				if (item.getDuration() > 0) {
 
-				if (item.offset > 0 && filesize > 0) {
-					String offsetText = StrUtils.formatTime((float) item.offset
-							/ (float) filesize, item.duration_string);
-					currentPosition.setText(offsetText);
-					slash.setText("/");
-					slash.setVisibility(View.VISIBLE);
-				} else {
-					currentPosition.setText("");
-					slash.setVisibility(View.GONE);
+					timeDuration.setText(item.duration_string);
+
+					if (item.offset > 0 && filesize > 0) {
+						String offsetText = StrUtils.formatTime(
+								(float) item.offset / (float) filesize,
+								item.duration_string);
+						currentPosition.setText(offsetText);
+						slash.setText("/");
+						slash.setVisibility(View.VISIBLE);
+					} else {
+						currentPosition.setText("");
+						slash.setVisibility(View.GONE);
+					}
 				}
+
+				if (item.image != null && !item.image.equals("")) {
+					ImageLoader imageLoader = getImageLoader(context);
+					imageLoader.displayImage(item.image, icon);
+				}
+
 			}
 
-			if (item.image != null && !item.image.equals("")) {
-				ImageLoader imageLoader = getImageLoader(context);
-				imageLoader.displayImage(item.image, icon);
-			}
-
+		} catch (IllegalStateException e) {
 		}
+
 	}
 
 	public void showItem(Long id) {
@@ -337,18 +357,18 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 		return mExpandedItemID.contains(itemID(position)) ? TYPE_EXPAND
 				: TYPE_COLLAPS;
 	}
-	
-	
+
 	private void setOverlay(View overlay, boolean isOn) {
 		int opacity = isOn ? 150 : 0; // from 0 to 255
-		overlay.setBackgroundColor(opacity * 0x1000000); // black with a variable alpha
-		FrameLayout.LayoutParams params =
-		    new FrameLayout.LayoutParams(FrameLayout.LayoutParams.FILL_PARENT, FrameLayout.LayoutParams.FILL_PARENT);
+		overlay.setBackgroundColor(opacity * 0x1000000); // black with a
+															// variable alpha
+		FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+				FrameLayout.LayoutParams.FILL_PARENT,
+				FrameLayout.LayoutParams.FILL_PARENT);
 		params.gravity = Gravity.BOTTOM;
 		overlay.setLayoutParams(params);
-		//overlay.invalidate(); // update the view
+		// overlay.invalidate(); // update the view
 	}
-
 
 	/**
 	 * Returns the ID of the item at the position

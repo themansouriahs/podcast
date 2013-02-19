@@ -1,6 +1,7 @@
 package info.bottiger.podcast;
 
 import info.bottiger.podcast.PodcastBaseFragment.OnItemSelectedListener;
+import info.bottiger.podcast.autoupdateapk.AutoUpdateApk;
 import info.bottiger.podcast.cloud.CloudProvider;
 import info.bottiger.podcast.cloud.GoogleReader;
 import info.bottiger.podcast.debug.SqliteCopy;
@@ -46,8 +47,6 @@ import android.widget.TextView;
 import com.bugsense.trace.BugSenseHandler;
 import com.slidingmenu.lib.SlidingMenu;
 import com.slidingmenu.lib.app.SlidingFragmentActivity;
-import com.zubhium.ZubhiumSDK;
-import com.zubhium.ZubhiumSDK.CrashReportingMode;
 
 public class MainActivity extends SlidingFragmentActivity implements
 		OnItemSelectedListener {
@@ -92,6 +91,8 @@ public class MainActivity extends SlidingFragmentActivity implements
 	private ComponentName mRemoteControlResponder;
 
 	private SharedPreferences prefs;
+	
+	private AutoUpdateApk aua;  
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -100,8 +101,8 @@ public class MainActivity extends SlidingFragmentActivity implements
 		BugSenseHandler.initAndStartSession(MainActivity.this,
 				((SoundWaves) this.getApplication()).getBugSenseAPIKey());
 
-		ZubhiumSDK sdk = ZubhiumSDK.getZubhiumSDKInstance(getApplicationContext(), ((SoundWaves) this.getApplication()).zubhiumAPIKey);
-		sdk.setCrashReportingMode(CrashReportingMode.SILENT);
+		
+		aua = new AutoUpdateApk(getApplicationContext());  
 		
 		if (debugging) {
 			// Tracing is buggy on emulator

@@ -421,12 +421,6 @@ public class PlayerService extends Service implements
 	}
 
 	public void play(long id) {
-		if (SDCardManager.getSDCardStatus() == false) {
-			Toast.makeText(this,
-					getResources().getString(R.string.sdcard_unmout),
-					Toast.LENGTH_LONG).show();
-			return;
-		}
 
 		if (mItem != null) {
 			if ((mItem.id == id) && mPlayer.isInitialized()) {
@@ -452,12 +446,17 @@ public class PlayerService extends Service implements
 
 		int offset = mItem.offset < 0 ? 0 : mItem.offset;
 		mPlayer.setDataSourceAsync(dataSource, offset);
-
-		// mPlayer.seek(offset);
-		// start();
-		// mItem.playing(getContentResolver());
 	}
 	
+	public void toggle(long id) {
+		if (mPlayer.isPlaying() == false && mItem != null) {
+			play(id);
+		} else {
+			mPlayer.pause();
+		}
+	}
+	
+	@Deprecated
 	public void toggle() {
 		if (mPlayer.isPlaying() == false && mItem != null) {
 			mPlayer.start();

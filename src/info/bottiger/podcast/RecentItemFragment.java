@@ -139,8 +139,8 @@ public class RecentItemFragment extends AbstractEpisodeFragment {
 
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
-		Cursor item = (Cursor) l.getItemAtPosition(position); // FIXME
-																// https://github.com/chrisbanes/Android-PullToRefresh/issues/99
+		Cursor item = (Cursor) l.getItemAtPosition(position); // https://github.com/chrisbanes/Android-PullToRefresh/issues/99
+		
 		this.togglePlayer(l, item);
 
 	}
