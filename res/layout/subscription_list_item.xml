@@ -21,9 +21,10 @@
             android:layout_marginRight="7dip"
             android:padding="0dip" >
 
-            <ImageView
-                android:id="@+id/list_image"
-				style="@style/PodcastImage"  />
+                                         <ImageView
+                    android:id="@+id/list_image"
+                    style="@style/PodcastImage" />
+
         </LinearLayout>
 
         <!-- Title Of Podcast -->

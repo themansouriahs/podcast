@@ -222,7 +222,7 @@ public class RecentItemFragment extends AbstractEpisodeFragment {
 		// if (setListners) {
 		// setPlayerListeners(view, id);
 		// }
-		ControlButtons.setPlayerListeners(view, id);
+		ControlButtons.setPlayerListeners(list, view, id);
 
 		// updateCurrentPosition(FeedItem.getById(getActivity().getContentResolver(),
 		// id));

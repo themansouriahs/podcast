@@ -5,7 +5,6 @@ import info.bottiger.podcast.PodcastBaseFragment;
 import info.bottiger.podcast.R;
 import info.bottiger.podcast.listeners.DownloadProgressListener;
 import info.bottiger.podcast.provider.FeedItem;
-import info.bottiger.podcast.provider.ItemColumns;
 import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.service.DownloadStatus;
 import info.bottiger.podcast.utils.ControlButtons;
@@ -20,10 +19,12 @@ import android.app.DownloadManager;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.BaseColumns;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -160,7 +161,8 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 
 			TextView currentTime = (TextView) listViewItem
 					.findViewById(R.id.current_position);
-			
+			//View podcastImageOverlay = (View) listViewItem
+			//		.findViewById(R.id.overlay);
 			
 			long playerPosition = 0;
 			long playerDuration = 0;
@@ -190,6 +192,10 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 				ImageButton downloadButton = (ImageButton) playerView
 						.findViewById(R.id.download);
 				downloadButton.setImageResource(themeHelper.getAttr(R.attr.delete_icon));
+			}
+			
+			if (feedItem.isMarkedAsListened()) {
+				//setOverlay(podcastImageOverlay, true);
 			}
 
 			if (PodcastBaseFragment.mPlayerServiceBinder.isInitialized()) {
@@ -221,6 +227,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 		View view = mInflater.inflate(R.layout.episode_list, null);
 
 		view.setTag(R.id.list_image, view.findViewById(R.id.list_image));
+		//view.setTag(R.id.overlay, view.findViewById(R.id.overlay));
 		view.setTag(R.id.title, view.findViewById(R.id.title));
 		view.setTag(R.id.podcast, view.findViewById(R.id.podcast));
 		view.setTag(R.id.duration, view.findViewById(R.id.duration));
@@ -250,6 +257,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 		 * http://drasticp.blogspot.dk/2012/04/viewholder-is-dead.html
 		 */
 		ImageView icon = (ImageView) view.getTag(R.id.list_image);
+		//View overlay = (View) view.getTag(R.id.overlay);
 		TextView mainTitle = (TextView) view.getTag(R.id.title);
 		TextView subTitle = (TextView) view.getTag(R.id.podcast);
 		TextView timeDuration = (TextView) view.getTag(R.id.duration);
@@ -328,6 +336,17 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 	public int getItemViewType(int position) {
 		return mExpandedItemID.contains(itemID(position)) ? TYPE_EXPAND
 				: TYPE_COLLAPS;
+	}
+	
+	
+	private void setOverlay(View overlay, boolean isOn) {
+		int opacity = isOn ? 150 : 0; // from 0 to 255
+		overlay.setBackgroundColor(opacity * 0x1000000); // black with a variable alpha
+		FrameLayout.LayoutParams params =
+		    new FrameLayout.LayoutParams(FrameLayout.LayoutParams.FILL_PARENT, FrameLayout.LayoutParams.FILL_PARENT);
+		params.gravity = Gravity.BOTTOM;
+		overlay.setLayoutParams(params);
+		//overlay.invalidate(); // update the view
 	}
 
 

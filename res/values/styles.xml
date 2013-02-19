@@ -38,10 +38,18 @@
         <item name="android:textSize">15sp</item>
     </style>
 
-    <style name="PodcastImage">
+    <style name="PodcastImageSIze">
         <item name="android:layout_width">115dip</item>
         <item name="android:layout_height">115dip</item>
+        <item name="android:layout_margin">0dip</item>
+        <item name="android:padding">0dip</item>
+    </style>
+
+    <style name="PodcastImage" parent="@style/PodcastImageSIze">
         <item name="android:src">@drawable/generic_podcast</item>
+        <!-- <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">fill_parent</item> -->
+        <item name="android:scaleType">fitStart</item>
     </style>
 
     <style name="SubscriptionHeaderFont" parent="@android:style/TextAppearance.Large">

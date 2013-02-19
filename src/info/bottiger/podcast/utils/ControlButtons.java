@@ -11,6 +11,7 @@ import android.content.ContentResolver;
 import android.os.SystemClock;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
@@ -31,6 +32,7 @@ public class ControlButtons {
 		public ImageButton infoButton;
 		public ImageButton downloadButton;
 		public ImageButton queueButton;
+		public ImageView image;
 		public TextView currentTime;
 		public TextView timeSlash;
 		public TextView duration;
@@ -47,33 +49,23 @@ public class ControlButtons {
 			final Holder viewHolder, final long id) {
 
 		final ImageButton playPauseButton = viewHolder.playPauseButton;
+		final ImageView playImage = viewHolder.image;
 		final ContentResolver resolver = fragment.getActivity()
 				.getContentResolver();
 		final FeedItem item = FeedItem.getById(resolver, id);
 		final ThemeHelper themeHelper = new ThemeHelper(fragment.getActivity());
-
+		
 		playPauseButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (viewHolder.seekbar != null)
-					fragment.setProgressBar(viewHolder.seekbar);
-				if (viewHolder.currentTime != null)
-					fragment.setCurrentTime(viewHolder.currentTime);
-
-				if (viewHolder.duration != null)
-					fragment.setDuration(viewHolder.duration);
-				if (PodcastBaseFragment.mPlayerServiceBinder.isPlaying()) {
-					playPauseButton.setContentDescription("Play");
-					playPauseButton.setImageResource(themeHelper
-							.getAttr(R.attr.play_icon));
-					PodcastBaseFragment.mPlayerServiceBinder.pause();
-				} else {
-					playPauseButton.setImageResource(themeHelper
-							.getAttr(R.attr.pause_icon));
-					playPauseButton.setContentDescription("Pause");
-					PodcastBaseFragment.mPlayerServiceBinder.play(id);
-					PodcastBaseFragment.queueNextRefresh();
-				}
+				playPause(id, viewHolder, themeHelper, playPauseButton);
+			}
+		});
+		
+		playImage.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				playPause(id, viewHolder, themeHelper, playPauseButton);
 			}
 		});
 
@@ -159,6 +151,7 @@ public class ControlButtons {
 				.findViewById(R.id.current_position);
 		viewHolder.duration = (TextView) listView.findViewById(R.id.duration);
 		viewHolder.filesize = (TextView) listView.findViewById(R.id.filesize);
+		viewHolder.image = (ImageView) listView.findViewById(R.id.list_image);
 
 		ControlButtons.setListener(MainActivity.mPodcastServiceBinder,
 				viewHolder, id);
@@ -250,6 +243,28 @@ public class ControlButtons {
 
 		}
 
+	}
+	
+	private static void playPause(long id, Holder viewHolder, ThemeHelper themeHelper, ImageButton playPauseButton) {
+		if (viewHolder.seekbar != null)
+			fragment.setProgressBar(viewHolder.seekbar);
+		if (viewHolder.currentTime != null)
+			fragment.setCurrentTime(viewHolder.currentTime);
+
+		if (viewHolder.duration != null)
+			fragment.setDuration(viewHolder.duration);
+		if (PodcastBaseFragment.mPlayerServiceBinder.isPlaying()) {
+			playPauseButton.setContentDescription("Play");
+			playPauseButton.setImageResource(themeHelper
+					.getAttr(R.attr.play_icon));
+			PodcastBaseFragment.mPlayerServiceBinder.pause();
+		} else {
+			playPauseButton.setImageResource(themeHelper
+					.getAttr(R.attr.pause_icon));
+			playPauseButton.setContentDescription("Pause");
+			PodcastBaseFragment.mPlayerServiceBinder.play(id);
+			PodcastBaseFragment.queueNextRefresh();
+		}
 	}
 
 }

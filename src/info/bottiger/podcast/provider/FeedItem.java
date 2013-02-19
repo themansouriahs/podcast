@@ -772,6 +772,13 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	public boolean isDownloaded() {
 		return this.isDownloaded;
 	}
+	
+	/**
+	 * @return true of the podcast has been listened too
+	 */
+	public boolean isMarkedAsListened() {
+		return this.listened == 1;
+	}
 
 	/**
 	 * @param isDownloaded

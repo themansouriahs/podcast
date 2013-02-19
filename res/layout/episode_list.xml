@@ -9,7 +9,7 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal" >
 
         <!-- ListRow Left sied Thumbnail image -->
 
@@ -21,21 +21,41 @@
             android:layout_marginRight="7dip"
             android:padding="0dip" >
 
-            <ImageView
-                android:id="@+id/list_image"
-                style="@style/PodcastImage" />
+            
+                            <ImageView
+                    android:id="@+id/list_image"
+                    style="@style/PodcastImage" />
+            
+            <!-- 
+            <FrameLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                style="@style/PodcastImageSIze" >
+                
+                <View
+                    android:id="@+id/overlay"
+                    style="@style/PodcastImageSIze" />
+ 
+                
+                <ImageButton
+                    android:id="@+id/play_toggle"
+                    style="@style/PodcastImageSIze"
+                    android:contentDescription="@string/play"
+                    android:src="?attr/play_invert_icon" />
+                     
+            </FrameLayout>
+             -->
         </LinearLayout>
 
         <!-- Title Of Podcast -->
 
         <TextView
             android:id="@+id/title"
+            style="@style/EpisodeHeaderFont"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignTop="@+id/thumbnail"
             android:layout_toRightOf="@+id/thumbnail"
-            android:text="Podcast Title"
-            style="@style/EpisodeHeaderFont" />
+            android:text="Podcast Title" />
 
         <!-- Podcast Name -->
 
@@ -62,14 +82,15 @@
 
         <TextView
             android:id="@+id/current_position"
+            style="@style/EpisodeMinorFont"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/thumbnail"
-            android:layout_toRightOf="@+id/thumbnail"
-            style="@style/EpisodeMinorFont" />
+            android:layout_toRightOf="@+id/thumbnail" />
 
         <TextView
             android:id="@+id/time_slash"
+            style="@style/EpisodeMinorFont"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@+id/current_position"
@@ -77,29 +98,27 @@
             android:layout_toRightOf="@+id/current_position"
             android:paddingLeft="5dip"
             android:paddingRight="5dip"
-            android:visibility="gone"
-            style="@style/EpisodeMinorFont"/>
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/duration"
+            style="@style/EpisodeMinorFont"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@+id/time_slash"
             android:layout_alignBottom="@+id/time_slash"
-            android:layout_toRightOf="@+id/time_slash"
-            style="@style/EpisodeMinorFont" />
+            android:layout_toRightOf="@+id/time_slash" />
 
-         <TextView
-             android:id="@+id/filesize"
-             android:layout_width="match_parent"
-             android:layout_height="wrap_content"
-             android:layout_alignBottom="@+id/duration"
-             android:layout_toRightOf="@+id/duration"
-             android:gravity="bottom|right"
-             android:text="0"
-             android:textSize="10dip"
-             android:textStyle="bold" />
-        
+        <TextView
+            android:id="@+id/filesize"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/duration"
+            android:layout_toRightOf="@+id/duration"
+            android:gravity="bottom|right"
+            android:text="0"
+            android:textSize="10dip"
+            android:textStyle="bold" />
     </RelativeLayout>
 
     <ViewStub
