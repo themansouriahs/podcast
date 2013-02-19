@@ -245,13 +245,4 @@ public class RecentItemFragment extends AbstractEpisodeFragment {
 		}
 		return null;
 	}
-
-
-	@Override
-	Subscription getSubscription(Object o) {
-		Cursor item = (Cursor) o;
-		Long id = item.getLong(item.getColumnIndex(ItemColumns.SUBS_ID));
-		new Subscription();
-		return Subscription.getById(getActivity().getContentResolver(), id);
-	}
 }

@@ -16,8 +16,12 @@ import java.net.URLConnection;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -92,6 +96,8 @@ public class FeedParserWrapper {
 		String extraHeaderValue = "application/json";
 		SimpleDateFormat dt = new SimpleDateFormat(FeedItem.default_format);
 
+		ArrayList<FeedItem> rssEpisodes = new ArrayList<FeedItem>();
+
 		URL url;
 		try {
 			url = new URL(baseURL + subscription.getURL().toString());
@@ -163,10 +169,12 @@ public class FeedParserWrapper {
 						item.author = (String) episode.get("author");
 						item.content = (String) episode.get("description");
 
-						updateFeed(subscription, item);
+						rssEpisodes.add(item);
 					}
 				}
 			}
+
+			updateFeed(subscription, rssEpisodes);
 
 			PodcastDownloadManager.startDownload(mContext);
 
@@ -230,7 +238,7 @@ public class FeedParserWrapper {
 				FeedItem currentItem = fromRSSEntry(entry);
 
 				if (currentItem != null) {
-					updateFeed(subscription, currentItem);
+					// updateFeed(subscription, currentItem);
 				}
 
 				// System.out.println(entry.getTitle());
@@ -352,42 +360,50 @@ public class FeedParserWrapper {
 		return str;
 	}
 
-	public int updateFeed(Subscription subscription, FeedItem item) {
+	public int updateFeed(Subscription subscription, ArrayList<FeedItem> items) {
 		long update_date = subscription.lastItemUpdated;
 		int add_num = 0;
 		boolean insertSucces = false;
 		boolean autoDownload = sharedPrefs.getBoolean(
 				"pref_download_on_update", true);
 
-		// Get most recent Item for comparison
-		if (FeedParserWrapper.mostRecentItem == null)
-			FeedParserWrapper.mostRecentItem = FeedItem.getMostRecent(cr);
+		// Sort the items to find the oldest
+		Collections.sort(items);
+		FeedItem oldestItem = items.get(items.size() - 1);
 
-		Long itemDate = item.getLongDate();
+		HashMap<String, FeedItem> databaseItems = FeedItem.allAsList(cr,
+				subscription, oldestItem.getDate());
 
-		FeedItem localItemWithSameURL = FeedItem.getByURL(cr, item.url);
-		if (localItemWithSameURL == null) {
+		// we iterate over all the input items
+		for (FeedItem item : items) {
 
-			if (itemDate > update_date) {
-				update_date = itemDate;
+			// and if the item is not included in the database already we add it
+			if (!databaseItems.containsKey(item.getURL())) {
+
+				Long itemDate = item.getLongDate();
+
+				if (itemDate > update_date) {
+					update_date = itemDate;
+				}
+				item = addItem(subscription, item);
+				add_num++;
+
+				/*
+				 * Download podcasts
+				 */
+				if (autoDownload && item != null) {
+					PodcastDownloadManager.addItemToQueue(item);
+				}
+
+				subscription.fail_count = 0;
+				subscription.lastItemUpdated = update_date;
+				subscription.update(cr);
+
+				log.debug("add url: " + subscription.url + "\n add num = "
+						+ add_num);
 			}
-			item = addItem(subscription, item);
-			add_num++;
-
-			/*
-			 * Download podcasts
-			 */
-			if (autoDownload && item != null) {
-				PodcastDownloadManager.addItemToQueue(item);
-			}
-
-			subscription.fail_count = 0;
-			subscription.lastItemUpdated = update_date;
-			subscription.update(cr);
-
-			log.debug("add url: " + subscription.url + "\n add num = "
-					+ add_num);
 		}
+
 		return add_num;
 
 	}

@@ -58,7 +58,7 @@ public class FeedFragment extends AbstractEpisodeFragment {
 		super.onCreateView(inflater, container, savedInstanceState);
 		
 		header = (ViewGroup) inflater.inflate(R.layout.podcast_header, null);
-		Subscription subscription = getSubscription(getActivity().getContentResolver());
+		Subscription subscription = mSubscription;
 		
 		if (subscription != null)
 			setHeader(header, subscription);
@@ -99,19 +99,13 @@ public class FeedFragment extends AbstractEpisodeFragment {
 		mAdapter = FeedFragment.listItemCursorAdapter(this.getActivity(),
 				this, mCursor);
 		startInit(1, ItemColumns.URI, ItemColumns.ALL_COLUMNS, getWhere(), getOrder());
-		
-		Subscription sub = getSubscription(getActivity().getContentResolver());
-		enablePullToRefresh(sub);
+
+		enablePullToRefresh(mSubscription);
 	}
 	
-	public static FeedFragment newInstance(long subID) {
+	public static FeedFragment newInstance(Subscription subscription) {
 	    FeedFragment fragment = new FeedFragment();
-
-	    Bundle args = new Bundle();
-	    args.putLong("subID", subID);
-	    fragment.setArguments(args);
-	    
-	    FeedFragment.subId = subID;
+	    FeedFragment.mSubscription = subscription;
 
 	    return fragment;
 	}
@@ -119,7 +113,7 @@ public class FeedFragment extends AbstractEpisodeFragment {
 
 	@Override
 	public String getWhere() {		
-		String where = ItemColumns.SUBS_ID + "=" + subId;
+		String where = ItemColumns.SUBS_ID + "=" + mSubscription.getId();
 		return where;
 	}
 
@@ -130,10 +124,5 @@ public class FeedFragment extends AbstractEpisodeFragment {
 				this, mCursor);
 
 		setListAdapter(mAdapter);
-	}
-	
-	private Subscription getSubscription(ContentResolver contentResolver) {
-		mSubscription = mSubscription == null ? Subscription.getById(contentResolver, subId) : mSubscription;
-		return mSubscription;
 	}
 }

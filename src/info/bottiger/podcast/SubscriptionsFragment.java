@@ -100,14 +100,14 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 		startInit(0, SubscriptionColumns.URI, PROJECTION, "1", SubscriptionColumns.TITLE + " ASC");
 		
 
-		setEmptyText("Your emptyText message");
+		setEmptyText("You are not subscribed to any podcasts");
     }
 
 	
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		Subscription s = Subscription.getById(getActivity().getContentResolver(), id);
-        this.mListener.onItemSelected(s.id);
+        this.mListener.onItemSelected(s.getId());
 	}
 	
 	public DialogMenu createDialogMenus(long id) {
@@ -181,7 +181,8 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 		setListAdapter(mAdapter);
 
 	}
-
+	
+	/*
 	@Override
 	Subscription getSubscription(Object o) {
 		Cursor item = (Cursor)o;
@@ -189,5 +190,6 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 		new Subscription();
 		return Subscription.getById(getActivity().getContentResolver(), id);
 	}
+	*/
 	
 }

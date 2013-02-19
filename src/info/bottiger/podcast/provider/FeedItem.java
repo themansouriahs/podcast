@@ -12,6 +12,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.Locale;
 
 import android.app.Activity;
@@ -81,7 +82,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	 * Duration as String hh:mm:ss or mm:ss 02:23:34
 	 */
 	public String duration_string;
-	
+
 	/**
 	 * Duration in milliseconds
 	 */
@@ -111,7 +112,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	 * Filename of the episode on disk. sn209.mp3
 	 */
 	private String filename;
-	
+
 	/**
 	 * Episode number.
 	 */
@@ -119,10 +120,12 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 
 	/**
 	 * Download reference ID as returned by
-	 * http://developer.android.com/reference/android/app/DownloadManager.html#enqueue(android.app.DownloadManager.Request)
+	 * http://developer.android.com/reference
+	 * /android/app/DownloadManager.html#enqueue
+	 * (android.app.DownloadManager.Request)
 	 */
 	private long downloadReferenceID;
-	
+
 	/**
 	 * Flags for filtering downloaded items
 	 */
@@ -199,6 +202,26 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		act.startActivity(new Intent(Intent.ACTION_EDIT, uri));
 	}
 
+	public static Cursor allAsCursor(ContentResolver context,
+			Subscription subscription, String oldestDate) {
+		String strID = String.valueOf(subscription.getId());
+		return context.query(ItemColumns.URI, ItemColumns.ALL_COLUMNS,
+				ItemColumns.SUBS_ID + "=? AND " + ItemColumns.DATE + ">?",
+				new String[] {strID, oldestDate}, null);
+	}
+
+	public static HashMap<String,FeedItem> allAsList(ContentResolver context,
+			Subscription subscription, String oldestDate) {
+		HashMap<String,FeedItem> item = new HashMap<String,FeedItem>();
+		Cursor cursor = allAsCursor(context, subscription, oldestDate);
+
+		while (cursor.moveToNext()) {
+			FeedItem currentItem = FeedItem.getByCursor(cursor);
+			item.put(currentItem.url, currentItem);
+		}
+		return item;
+	}
+
 	@Deprecated
 	public static FeedItem getBySQL(ContentResolver context, String where,
 			String order) {
@@ -218,15 +241,15 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		return item;
 
 	}
-	
+
 	public static FeedItem getByURL(ContentResolver contentResolver, String Url) {
 		FeedItem item = null;
 		Cursor cursor = null;
 
 		String where = ItemColumns.URL + " = ?";
 		try {
-			cursor = contentResolver.query(ItemColumns.URI, ItemColumns.ALL_COLUMNS,
-					where,  new String[] {Url}, null);
+			cursor = contentResolver.query(ItemColumns.URI,
+					ItemColumns.ALL_COLUMNS, where, new String[] { Url }, null);
 			if (cursor.moveToFirst()) {
 				item = FeedItem.getByCursor(cursor);
 			}
@@ -237,15 +260,16 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		return item;
 
 	}
-	
-	public static FeedItem getByDownloadReference(ContentResolver contentResolver, long id) {
+
+	public static FeedItem getByDownloadReference(
+			ContentResolver contentResolver, long id) {
 		FeedItem item = null;
 		Cursor cursor = null;
 
 		String where = ItemColumns.DOWNLOAD_REFERENCE + " = " + id;
 		try {
-			cursor = contentResolver.query(ItemColumns.URI, ItemColumns.ALL_COLUMNS,
-					where, null, null);
+			cursor = contentResolver.query(ItemColumns.URI,
+					ItemColumns.ALL_COLUMNS, where, null, null);
 			if (cursor.moveToFirst()) {
 				item = FeedItem.getByCursor(cursor);
 			}
@@ -382,8 +406,8 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 			if (listened >= 0)
 				cv.put(ItemColumns.LISTENED, listened);
 
-			int numUpdatedRows = contentResolver.update(ItemColumns.URI, cv, BaseColumns._ID + "=" + id,
-					null);
+			int numUpdatedRows = contentResolver.update(ItemColumns.URI, cv,
+					BaseColumns._ID + "=" + id, null);
 			if (numUpdatedRows == 1)
 				log.debug("update OK");
 		} finally {
@@ -423,7 +447,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 				cv.put(ItemColumns.FILESIZE, filesize);
 			if (downloadReferenceID >= 0)
 				cv.put(ItemColumns.DOWNLOAD_REFERENCE, downloadReferenceID);
-			
+
 			cv.put(ItemColumns.IS_DOWNLOADED, isDownloaded);
 			if (episodeNumber >= 0)
 				cv.put(ItemColumns.EPISODE_NUMBER, episodeNumber);
@@ -449,14 +473,16 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	}
 
 	/**
-	 * @see http://docs.oracle.com/javase/6/docs/api/java/lang/String.html#compareTo%28java.lang.String%29
+	 * @see http
+	 *      ://docs.oracle.com/javase/6/docs/api/java/lang/String.html#compareTo
+	 *      %28java.lang.String%29
 	 * @return True of the current FeedItem is newer than the supplied argument
 	 */
 	public boolean newerThan(FeedItem item) {
 		int comparator = this.getDate().compareTo(item.getDate());
 		return comparator > 0;
 	}
-	
+
 	@Deprecated
 	public long getLongDate() {
 		return m_date;
@@ -532,11 +558,13 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 				.getColumnIndex(ItemColumns.CHUNK_FILESIZE));
 		item.downloadReferenceID = cursor.getLong(cursor
 				.getColumnIndex(ItemColumns.DOWNLOAD_REFERENCE));
-		
-		int intVal = cursor.getInt(cursor.getColumnIndex(ItemColumns.IS_DOWNLOADED));
+
+		int intVal = cursor.getInt(cursor
+				.getColumnIndex(ItemColumns.IS_DOWNLOADED));
 		item.isDownloaded = intVal == 1;
-		
-		item.episodeNumber = cursor.getInt(cursor.getColumnIndex(ItemColumns.EPISODE_NUMBER));
+
+		item.episodeNumber = cursor.getInt(cursor
+				.getColumnIndex(ItemColumns.EPISODE_NUMBER));
 		item.duration_string = cursor.getString(cursor
 				.getColumnIndex(ItemColumns.DURATION));
 		item.duration_ms = cursor.getLong(cursor
@@ -562,7 +590,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	public String toString() {
 		return "Feed: " + title;
 	}
-	
+
 	/**
 	 * Writes the currentstatus of the FeedItem with the giving ID to the
 	 * textView argument
@@ -590,7 +618,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		}
 		return statusText;
 	}
-	
+
 	/**
 	 * Get the current download progress as a String.
 	 * 
@@ -599,25 +627,27 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	private String getProgress(DownloadManager downloadManager) {
 		assert downloadManager != null;
 		long percent = 0;
-		
-		//FIXME This is run one time for each textview. It should only be run once with all the reference ID's
+
+		// FIXME This is run one time for each textview. It should only be run
+		// once with all the reference ID's
 		Query query = new Query();
 		query.setFilterById(getDownloadReferenceID());
 		Cursor c = downloadManager.query(query);
 		c.moveToFirst();
-		while (c.isAfterLast() == false) 
-		{
-		    int cursorBytesSoFarIndex = c.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR);
-		    int cursorBytesTotalIndex =  c.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES);
-		    
-		    long bytesSoFar = c.getInt(cursorBytesSoFarIndex);
-		    long bytesTotal = c.getInt(cursorBytesTotalIndex);
-		    
-		    percent = bytesSoFar*100/bytesTotal;
-		    
-		    c.moveToNext();
+		while (c.isAfterLast() == false) {
+			int cursorBytesSoFarIndex = c
+					.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR);
+			int cursorBytesTotalIndex = c
+					.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES);
+
+			long bytesSoFar = c.getInt(cursorBytesSoFarIndex);
+			long bytesTotal = c.getInt(cursorBytesTotalIndex);
+
+			percent = bytesSoFar * 100 / bytesTotal;
+
+			c.moveToNext();
 		}
-		
+
 		return percent + "%";
 	}
 
@@ -644,7 +674,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 
 			}
 		}
-		
+
 		return false;
 
 	}
@@ -695,7 +725,8 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	}
 
 	/**
-	 * @param filename the filename to set
+	 * @param filename
+	 *            the filename to set
 	 */
 	public void setFilename(String filename) {
 		this.filename = filename;
@@ -704,7 +735,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	public String getAbsolutePath() {
 		return SDCardManager.pathFromFilename(this);
 	}
-	
+
 	public String getAbsoluteTmpPath() {
 		return SDCardManager.pathTmpFromFilename(this);
 	}
@@ -718,13 +749,11 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	public int compareTo(FeedItem another) {
 		return another.date.compareTo(date);
 		/*
-		if (this.update > another.update)
-			return 1;
-		else if (this.update < another.update)
-			return -1;
-
-		return 0;
-		*/
+		 * if (this.update > another.update) return 1; else if (this.update <
+		 * another.update) return -1;
+		 * 
+		 * return 0;
+		 */
 	}
 
 	public String getURL() {
@@ -743,28 +772,28 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	public boolean isDownloaded() {
 		return this.isDownloaded;
 	}
-	
+
 	/**
-	 * @param isDownloaded the isDownloaded to set
+	 * @param isDownloaded
+	 *            the isDownloaded to set
 	 */
 	public void setDownloaded(boolean isDownloaded) {
 		this.isDownloaded = isDownloaded;
 	}
-	
+
 	/**
 	 * Mark the episode as listened
 	 */
 	public void markAsListened() {
 		markAsListened(1);
 	}
-	
+
 	/**
 	 * @params 1 for listened. 0 for unlistened. -1 for undefined
 	 */
 	public void markAsListened(int hasBeenListened) {
 		this.listened = hasBeenListened;
 	}
-
 
 	/**
 	 * @return the duration of the mp3 (or whatever) in milliseconds.
@@ -776,7 +805,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 			}
 			return duration_ms;
 		}
-			
+
 		if (isDownloaded()) {
 			MediaMetadataRetriever retriever = new MediaMetadataRetriever();
 			try {
@@ -872,12 +901,13 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	}
 
 	/**
-	 * @param downloadReferenceID the downloadReferenceID to set
+	 * @param downloadReferenceID
+	 *            the downloadReferenceID to set
 	 */
 	public void setDownloadReferenceID(long downloadReferenceID) {
 		this.downloadReferenceID = downloadReferenceID;
 	}
-	
+
 	/**
 	 * @return the episodeNumber
 	 */
@@ -886,7 +916,8 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	}
 
 	/**
-	 * @param episodeNumber the episodeNumber to set
+	 * @param episodeNumber
+	 *            the episodeNumber to set
 	 */
 	public void setEpisodeNumber(int episodeNumber) {
 		this.episodeNumber = episodeNumber;
@@ -900,7 +931,8 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	}
 
 	/**
-	 * @param title the title to set
+	 * @param title
+	 *            the title to set
 	 */
 	public void setTitle(String title) {
 		this.title = title;

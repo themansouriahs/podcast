@@ -4,6 +4,7 @@ import info.bottiger.podcast.PodcastBaseFragment.OnItemSelectedListener;
 import info.bottiger.podcast.cloud.CloudProvider;
 import info.bottiger.podcast.cloud.GoogleReader;
 import info.bottiger.podcast.debug.SqliteCopy;
+import info.bottiger.podcast.provider.Subscription;
 import info.bottiger.podcast.receiver.HeadsetReceiver;
 import info.bottiger.podcast.service.PlayerService;
 import info.bottiger.podcast.service.PodcastDownloadManager;
@@ -414,11 +415,8 @@ public class MainActivity extends SlidingFragmentActivity implements
 			log.debug("inside: getSubscriptionFragmentContent()");
 			return new SubscriptionsFragment();
 		} else {
-			Bundle bundle = new Bundle();
-			bundle.putLong("subID", SubscriptionFeedID);
-			FeedFragment.newInstance(SubscriptionFeedID);
-			FeedFragment feed = new FeedFragment();
-			return feed;
+			Subscription sub = Subscription.getById(getContentResolver(), SubscriptionFeedID);
+			return FeedFragment.newInstance(sub);
 		}
 	}
 }

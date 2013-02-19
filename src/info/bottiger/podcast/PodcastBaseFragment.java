@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.provider.BaseColumns;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
@@ -173,6 +174,13 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 		default:
 			return super.onContextItemSelected(item);
 		}
+	}
+	
+	Subscription getSubscription(Object o) {
+		Cursor item = (Cursor)o;
+		Long id = item.getLong(item.getColumnIndex(BaseColumns._ID));
+		new Subscription();
+		return Subscription.getById(getActivity().getContentResolver(), id);
 	}
 
 	// Container Activity must implement this interface
@@ -340,11 +348,6 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 
 	protected Cursor getCursor() {
 		return this.mCursor;
-	}
-
-	// HACK, FIX IT
-	Subscription getSubscription(Object o) {
-		return null;
 	}
 
 	public void startInit(int id, Uri columns, String[] projection,
