@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="info.bottiger.podcast"
+    package="org.bottiger.podcast"
     android:versionCode="4"
     android:versionName="0.2" >
 
@@ -37,7 +37,7 @@
 
         <activity android:name="com.handmark.pulltorefresh.library.PullToRefreshListView" />
         <activity
-            android:name="info.bottiger.podcast.MainActivity"
+            android:name="org.bottiger.podcast.MainActivity"
             android:label="@string/title_activity_swipe" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -53,7 +53,7 @@
                 android:value=".SwipeActivity" />
         </activity>
         <activity
-            android:name="info.bottiger.podcast.PodcastSubscriberActivity"
+            android:name="org.bottiger.podcast.PodcastSubscriberActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -97,11 +97,11 @@
         </activity>
 
         <service
-            android:name="info.bottiger.podcast.service.PodcastService"
+            android:name="org.bottiger.podcast.service.PodcastService"
             android:enabled="true" >
         </service>
         <service
-            android:name="info.bottiger.podcast.service.PlayerService"
+            android:name="org.bottiger.podcast.service.PlayerService"
             android:enabled="true" >
         </service>
 
@@ -120,21 +120,21 @@
                 <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
             </intent-filter>
         </receiver>
-        <receiver android:name="info.bottiger.podcast.receiver.HeadsetReceiver" >
+        <receiver android:name="org.bottiger.podcast.receiver.HeadsetReceiver" >
             <intent-filter android:priority="1000000000000000">
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </receiver>
 
         <provider
-            android:name="info.bottiger.podcast.provider.PodcastProvider"
-            android:authorities="info.bottiger.podcast.provider.podcastprovider" >
+            android:name="org.bottiger.podcast.provider.PodcastProvider"
+            android:authorities="org.bottiger.podcast.provider.podcastprovider" >
         </provider>
     </application>
 
     <instrumentation
         android:name="android.test.InstrumentationTestRunner"
         android:label="Hapi Podcast test"
-        android:targetPackage="info.bottiger.podcast" />
+        android:targetPackage="org.bottiger.podcast" />
 
 </manifest>
