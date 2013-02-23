@@ -710,6 +710,12 @@ public class PlayerFragment   extends PodcastBaseFragment
 	SimpleCursorAdapter getAdapter(Cursor cursor) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public int getItemLayout() {
+		// TODO Auto-generated method stub
+		return 0;
 	}    
 
 }

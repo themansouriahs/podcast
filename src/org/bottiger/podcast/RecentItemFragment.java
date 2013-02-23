@@ -28,7 +28,7 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class RecentItemFragment extends AbstractEpisodeFragment {
+public class RecentItemFragment extends PlaylistDSLVFragment {
 
 	private static final String[] PROJECTION = new String[] { ItemColumns._ID, // 0
 			ItemColumns.TITLE, // 1
@@ -52,6 +52,18 @@ public class RecentItemFragment extends AbstractEpisodeFragment {
 
 	private long mCurCheckID = -1;
 	boolean mDualPane;
+	
+	
+    public static RecentItemFragment newInstance(int headers, int footers) {
+    	RecentItemFragment f = new RecentItemFragment();
+
+        Bundle args = new Bundle();
+        args.putInt("headers", headers);
+        args.putInt("footers", footers);
+        f.setArguments(args);
+
+        return f;
+    }
 
 	// Read here:
 	// http://developer.android.com/reference/android/app/Fragment.html#Layout
@@ -66,11 +78,9 @@ public class RecentItemFragment extends AbstractEpisodeFragment {
 
 		// Populate list with our static array of titles.
 		mAdapter = this.getAdapter(mCursor); // listItemCursorAdapter(this.getActivity(),this, mCursor);
-		startInit(1, ItemColumns.URI, ItemColumns.ALL_COLUMNS, getWhere(), getOrder());
-		//startInit();
-		
+		startInit(1, ItemColumns.URI, ItemColumns.ALL_COLUMNS, getWhere(), getOrder());		
 
-		setEmptyText("No podcasts :( You should add some feeds and refresh the list");
+		//setEmptyText("No podcasts :( You should add some feeds and refresh the list");
 
 		if (mDualPane) {
 			// In dual-pane mode, the list view highlights the selected item.
@@ -79,7 +89,8 @@ public class RecentItemFragment extends AbstractEpisodeFragment {
 			// showDetails(mCurCheckPosition);
 		}
 
-		enablePullToRefresh();
+		// FIXME
+		//enablePullToRefresh();
 		
 	}
 
@@ -121,6 +132,7 @@ public class RecentItemFragment extends AbstractEpisodeFragment {
 		}
 	}
 
+	/*
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -135,6 +147,7 @@ public class RecentItemFragment extends AbstractEpisodeFragment {
 		getPref();
 		return fragmentView;
 	}
+	*/
 
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
@@ -243,5 +256,12 @@ public class RecentItemFragment extends AbstractEpisodeFragment {
 
 		}
 		return null;
+	}
+
+	@Override
+	public void setListAdapter() {
+		// TODO Auto-generated method stub
+		setListAdapter(getAdapter(getCursor()));
+		
 	}
 }

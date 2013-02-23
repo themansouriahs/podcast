@@ -18,26 +18,27 @@
 -->
 <resources>
 
-  <item type="id" name="text1" />
-  <item type="id" name="text2" />
-  <item type="id" name="text3" />
-  <item type="id" name="icon" />
-  
-    <item type="id" name="actionbar_compat" />
-    <item type="id" name="actionbar_compat_title" />
-    <item type="id" name="actionbar_compat_item_refresh_progress" />
-    <item type="id" name="actionbar_compat_item_refresh" />
-    <item type="id" name="add_channel" />
-    <item type="id" name="menu_refresh" />
-    <item type="id" name="search_channels" />
-    <item type="id" name="list_channels" />
-      
+    <item name="text1" type="id"/>
+    <item name="text2" type="id"/>
+    <item name="text3" type="id"/>
+    <item name="icon" type="id"/>
+    <item name="actionbar_compat" type="id"/>
+    <item name="actionbar_compat_title" type="id"/>
+    <item name="actionbar_compat_item_refresh_progress" type="id"/>
+    <item name="actionbar_compat_item_refresh" type="id"/>
+    <item name="add_channel" type="id"/>
+    <item name="menu_refresh" type="id"/>
+    <item name="search_channels" type="id"/>
+    <item name="list_channels" type="id"/>
+    <item name="drag_handle" type="id"/>
+    <item name="click_remove" type="id"/>
+
     <drawable name="solid_red">#f00</drawable>
     <drawable name="solid_blue">#0000ff</drawable>
-    <drawable name="solid_green">#f0f0</drawable>  
-    <drawable name="black">#000</drawable>  
-    <drawable name="white">#fff</drawable>  
-    
+    <drawable name="solid_green">#f0f0</drawable>
+    <drawable name="black">#000</drawable>
+    <drawable name="white">#fff</drawable>
     <drawable name="lighter_gray">#ddd</drawable>
-    <drawable name="darker_gray">#555</drawable>	
+    <drawable name="darker_gray">#555</drawable>
+
 </resources>

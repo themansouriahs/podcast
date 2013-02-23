@@ -30,6 +30,7 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Debug;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -49,7 +50,8 @@ import com.bugsense.trace.BugSenseHandler;
 import com.slidingmenu.lib.SlidingMenu;
 import com.slidingmenu.lib.app.SlidingFragmentActivity;
 
-public class MainActivity extends SlidingFragmentActivity implements
+// Sliding
+public class MainActivity extends FragmentActivity implements
 		OnItemSelectedListener {
 
 	public static PodcastService mPodcastServiceBinder = null;
@@ -132,22 +134,8 @@ public class MainActivity extends SlidingFragmentActivity implements
 				Intent.ACTION_HEADSET_PLUG);
 		HeadsetReceiver receiver = new HeadsetReceiver();
 		registerReceiver(receiver, receiverFilter);
-		// mAudioManager.registerMediaButtonEventReceiver(mRemoteControlResponder);
-
-		// Alarm
-		// AlarmManager alarmManager = (AlarmManager)
-		// getSystemService(Context.ALARM_SERVICE);
-		// Intent intent = new Intent(this,PodcastUpdateReceiver.class);
-		// PendingIntent pendingIntent =
-		// PendingIntent.getBroadcast(SetReminder.this, ID, intent,
-		// PendingIntent.FLAG_UPDATE_CURRENT);
-
-		// alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()
-		// + 1000, pendingIntent);
-
-		// Create the adapter that will return a fragment for each of the three
-		// primary sections
-		// of the app.
+		
+		
 		mFragmentManager = getSupportFragmentManager(); // getSupportFragmentManager();
 
 		if (debugging)
@@ -166,6 +154,8 @@ public class MainActivity extends SlidingFragmentActivity implements
 
 		// PodcastUpdateManager.setUpdate(this);
 
+		//FIXME
+		/*
 		// set the Behind View
 		setBehindContentView(R.layout.download);
 
@@ -178,6 +168,8 @@ public class MainActivity extends SlidingFragmentActivity implements
 		menu.setFadeDegree(0.35f);
 		menu.setTouchModeAbove(SlidingMenu.LEFT);
 		setSlidingActionBarEnabled(true);
+		*/
+
 
 		// Set up the ViewPager with the sections adapter.
 		mViewPager = (ViewPager) findViewById(R.id.pager);
@@ -348,7 +340,8 @@ public class MainActivity extends SlidingFragmentActivity implements
 			} else if (i == 0) {
 				fragment = new RecentItemFragment();
 			} else {
-				fragment = new DummySectionFragment();
+				fragment = new DSLVFragmentBGHandle();
+				//fragment = new DummySectionFragment();
 				// fragment = new PlayerFragment();
 			}
 			Bundle args = new Bundle();
@@ -359,7 +352,7 @@ public class MainActivity extends SlidingFragmentActivity implements
 
 		@Override
 		public int getCount() {
-			return 2;
+			return 3;
 		}
 
 		@Override

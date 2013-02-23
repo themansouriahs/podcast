@@ -73,6 +73,8 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 	private static SeekBar mProgressBar = null;
 	private static TextView mDuration = null;
 
+	protected abstract int getItemLayout();
+	
 	public TextView getCurrentTime() {
 		return mCurrentTime;
 	}
@@ -391,7 +393,7 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 
 			// The list should now be shown.
 			if (isResumed()) {
-				setListShown(true);
+				//setListShown(true); FIXME
 			} else {
 				setListShownNoAnimation(true);
 			}

@@ -120,4 +120,9 @@ public class FeedFragment extends AbstractEpisodeFragment {
 
 		setListAdapter(mAdapter);
 	}
+
+	@Override
+	public int getItemLayout() {
+		return R.layout.episode_list_compact;
+	}
 }

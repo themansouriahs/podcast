@@ -181,5 +181,11 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 		setListAdapter(mAdapter);
 
 	}
+
+	@Override
+	public int getItemLayout() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 	
 }
