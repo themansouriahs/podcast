@@ -37,13 +37,13 @@ public class SubscriptionColumns implements BaseColumns {
 	public static final String SERVER_ID = "server_id";
 	public static final String SYNC = "sync";	
 	public static final String AUTO_DOWNLOAD = "auto_download";	
-	public static final String PLAYLIST_ID = "playlist_id";		
+	public static final String PLAYLIST_POSITION = "playlist_id";		
 	
 
 	public static final String[] ALL_COLUMNS = { _ID, URL, LINK, TITLE,
 			DESCRIPTION, LAST_UPDATED, LAST_ITEM_UPDATED, FAIL_COUNT, STATUS,
 			COMMENT, RATING, USERNAME, PASSWORD, SERVER_ID, SYNC, AUTO_DOWNLOAD,
-			PLAYLIST_ID, IMAGE_URL};
+			PLAYLIST_POSITION, IMAGE_URL};
 
 	public static final String DEFAULT_SORT_ORDER = _ID + " ASC";
 	public static final String sql_create_table = "CREATE TABLE " 
@@ -64,7 +64,7 @@ public class SubscriptionColumns implements BaseColumns {
 		+ SERVER_ID + " INTEGER , " 
 		+ SYNC + " INTEGER , " 		
 		+ AUTO_DOWNLOAD + " INTEGER , "
-		+ PLAYLIST_ID + " INTEGER , " 	
+		+ PLAYLIST_POSITION + " INTEGER , " 	
 		+ IMAGE_URL + " VARCHAR(1024) " 		
 		
 		+ ");";
@@ -206,8 +206,8 @@ public class SubscriptionColumns implements BaseColumns {
 		if (values.containsKey(AUTO_DOWNLOAD) == false) {
 			values.put(AUTO_DOWNLOAD, 0);
 		}		
-		if (values.containsKey(PLAYLIST_ID) == false) {
-			values.put(PLAYLIST_ID, -1);
+		if (values.containsKey(PLAYLIST_POSITION) == false) {
+			values.put(PLAYLIST_POSITION, -1);
 		}			
 		return values;
 	}

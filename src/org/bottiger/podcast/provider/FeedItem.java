@@ -159,6 +159,11 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	public int listened;
 
 	/**
+	 * Priority in the playlist
+	 */
+	public int priority;
+	
+	/**
 	 * Filesize as reported by the RSS feed
 	 */
 	public long length;
@@ -348,6 +353,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		length = -1;
 		update = -1;
 		listened = -1;
+		priority = 0;
 		filesize = -1;
 		chunkFilesize = -1;
 		downloadReferenceID = -1;
@@ -406,7 +412,9 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 			}
 			if (listened >= 0)
 				cv.put(ItemColumns.LISTENED, listened);
-
+			if (priority >= 0)
+				cv.put(ItemColumns.PRIORITY, priority);
+			
 			int numUpdatedRows = contentResolver.update(ItemColumns.URI, cv,
 					BaseColumns._ID + "=" + id, null);
 			if (numUpdatedRows == 1)
@@ -467,6 +475,9 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 			if (listened >= 0)
 				cv.put(ItemColumns.LISTENED, listened);
 
+			if (priority >= 0)
+				cv.put(ItemColumns.PRIORITY, priority);
+			
 			return contentResolver.insert(ItemColumns.URI, cv);
 
 		} finally {
@@ -578,6 +589,8 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 				.getLong(cursor.getColumnIndex(ItemColumns.SUBS_ID));
 		item.listened = cursor.getInt(cursor
 				.getColumnIndex(ItemColumns.LISTENED));
+		item.priority = cursor.getInt(cursor
+				.getColumnIndex(ItemColumns.PRIORITY));
 
 		// if item was not cached we put it in the cache
 		synchronized (cache) {

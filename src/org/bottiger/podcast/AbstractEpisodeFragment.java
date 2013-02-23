@@ -98,7 +98,8 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 	public String getOrder(String inputOrder) {
 		assert inputOrder != null;
 
-		String order = ItemColumns.DATE + " " + inputOrder + " LIMIT 20"; // before:
+		String prioritiesFirst = "case " + ItemColumns.PRIORITY + " when 0 then 2 else 1 end, " + ItemColumns.PRIORITY + ", ";
+		String order = prioritiesFirst + ItemColumns.DATE + " " + inputOrder + " LIMIT 20"; // before:
 		return order;
 	}
 	

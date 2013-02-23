@@ -158,7 +158,7 @@ public class DSLVFragment extends ListFragment {
             addFooter(getActivity(), mDslv);
         }
 
-        setListAdapter();
+        //setListAdapter();
     }
 
 

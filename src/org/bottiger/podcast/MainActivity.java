@@ -304,10 +304,7 @@ public class MainActivity extends FragmentActivity implements
 			startActivity(i);
 			return true;
 		case R.id.menu_refresh:
-			if (mBound) {
-				//mPodcastServiceBinder.start_update();
 				PodcastDownloadManager.start_update(this);
-			}
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
@@ -352,7 +349,7 @@ public class MainActivity extends FragmentActivity implements
 
 		@Override
 		public int getCount() {
-			return 3;
+			return 1;
 		}
 
 		@Override

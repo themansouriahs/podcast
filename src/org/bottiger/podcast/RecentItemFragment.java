@@ -114,12 +114,19 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 						R.id.podcast, R.id.duration, R.id.list_image }, fields);
 	}
 	
+	public void setAdapter(SimpleCursorAdapter adapter) {
+		mAdapter = adapter;
+	}
+	
 	public SimpleCursorAdapter getAdapter(Cursor cursor) {
 		if (mAdapter != null)
 			return mAdapter;
 		
-		return listItemCursorAdapter(this.getActivity(),
-				this, cursor);
+		SimpleCursorAdapter adapter = listItemCursorAdapter(this.getActivity(),this, cursor);
+		setAdapter(adapter);
+		return adapter;
+		//return listItemCursorAdapter(this.getActivity(),
+		//		this, cursor);
 	}
 
 	@Override
@@ -261,7 +268,8 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 	@Override
 	public void setListAdapter() {
 		// TODO Auto-generated method stub
-		setListAdapter(getAdapter(getCursor()));
+		SimpleCursorAdapter sca = getAdapter(getCursor()); 
+		setListAdapter(sca);
 		
 	}
 }

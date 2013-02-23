@@ -119,6 +119,16 @@
             android:text="0"
             android:textSize="10dip"
             android:textStyle="bold" />
+
+        <ImageView
+            android:id="@id/drag_handle"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/item_height"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_weight="0"
+            android:background="@drawable/drag" />
+
     </RelativeLayout>
 
     <ViewStub

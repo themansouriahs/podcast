@@ -82,14 +82,16 @@ public class ItemColumns implements BaseColumns {
 	public static final String SUB_TITLE = "sub_title";
 	public static final String CREATED = "created";
 	public static final String TYPE = "audio_type";
+	
 	public static final String LISTENED = "keep";
+	public static final String PRIORITY = "priority";
 	
 	public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
 	public static final String[] ALL_COLUMNS = { _ID, SUBS_ID, TITLE, AUTHOR,
 			DATE, LAST_UPDATE, CONTENT, STATUS, URL, RESOURCE, FILESIZE,CHUNK_FILESIZE, DURATION,
 			LENGTH, OFFSET, PATHNAME, FAIL_COUNT, MEDIA_URI, SUB_TITLE,
-			CREATED, TYPE, LISTENED, IMAGE_URL, DOWNLOAD_REFERENCE, EPISODE_NUMBER, IS_DOWNLOADED, DURATION_MS };
+			CREATED, TYPE, LISTENED, IMAGE_URL, DOWNLOAD_REFERENCE, EPISODE_NUMBER, IS_DOWNLOADED, DURATION_MS, PRIORITY };
 
 	public static final String DEFAULT_SORT_ORDER = CREATED + " DESC";
 
@@ -121,7 +123,8 @@ public class ItemColumns implements BaseColumns {
 		+ SUB_TITLE + " VARCHAR(128), "
 		+ TYPE + " VARCHAR(64), " 
 		+ CREATED + " INTEGER, "
-		+ LISTENED + " INTEGER NOT NULL DEFAULT 0"
+		+ LISTENED + " INTEGER NOT NULL DEFAULT 0, "
+		+ PRIORITY + " INTEGER NOT NULL DEFAULT 0"
 		+ ");";
 
 	//To upgrade from database version 12 to version 13
@@ -235,6 +238,10 @@ public class ItemColumns implements BaseColumns {
 		}
 		if (values.containsKey(LISTENED) == false) {
 			values.put(LISTENED, 0);
+		}
+		
+		if (values.containsKey(PRIORITY) == false) {
+			values.put(PRIORITY, 0);
 		}
 		return values;
 	}

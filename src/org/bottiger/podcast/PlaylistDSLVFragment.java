@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.mobeta.android.dslv.DragSortListView;
 import com.mobeta.android.dslv.DragSortController;
 import org.bottiger.podcast.adapters.ItemCursorAdapter;
+import org.bottiger.podcast.provider.FeedItem;
 
 public abstract class PlaylistDSLVFragment extends AbstractEpisodeFragment {
 
@@ -26,27 +27,19 @@ public abstract class PlaylistDSLVFragment extends AbstractEpisodeFragment {
                 @Override
                 public void drop(int from, int to) {
                     if (from != to) {
-                    	/*
+                    	
                         Cursor item = (Cursor)((ItemCursorAdapter) mAdapter).getItem(from);
-                        mAdapter.
-                        mAdapter.remove(item);
-                        mAdapter.insert(item, to);
-                        */
+                        FeedItem feedItem = FeedItem.getByCursor(item);
+                        feedItem.priority = 1;
+                        feedItem.update(PlaylistDSLVFragment.this.getActivity().getContentResolver());
+                        mAdapter.notifyDataSetChanged();
+                        //mAdapter.
+                        //mAdapter.remove(item);
+                        //mAdapter.insert(item, to);
+                        
                     }
                 }
             };
-
-    private DragSortListView.RemoveListener onRemove = 
-            new DragSortListView.RemoveListener() {
-                @Override
-                public void remove(int which) {
-                	/*
-                    adapter.remove(adapter.getItem(which));
-                    */
-                }
-            };
-            
-            
 
     /*
          private DragSortListView.DropListener onDrop =
@@ -128,7 +121,7 @@ public abstract class PlaylistDSLVFragment extends AbstractEpisodeFragment {
         //   dragStartMode = onDown
         //   removeMode = flingRight
         DragSortController controller = new DragSortController(dslv);
-        //controller.setDragHandleId(R.id.drag_handle);
+        controller.setDragHandleId(R.id.drag_handle);
         //controller.setClickRemoveId(R.id.click_remove);
         controller.setRemoveEnabled(removeEnabled);
         controller.setSortEnabled(sortEnabled);
@@ -162,7 +155,7 @@ public abstract class PlaylistDSLVFragment extends AbstractEpisodeFragment {
         mDslv = (DragSortListView) getListView(); 
 
         mDslv.setDropListener(onDrop);
-        mDslv.setRemoveListener(onRemove);
+        //mDslv.setRemoveListener(onRemove);
 
         Bundle args = getArguments();
         int headers = 0;
@@ -179,7 +172,7 @@ public abstract class PlaylistDSLVFragment extends AbstractEpisodeFragment {
             addFooter(getActivity(), mDslv);
         }
 
-        setListAdapter();
+        //setListAdapter();
     }
 
 
