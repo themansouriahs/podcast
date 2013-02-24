@@ -7,4 +7,5 @@
     <color name="grayEnd">#ffffff</color>
     <color name="black">#000000</color>
     <color name="bg_handle_pressed">#a0a0a0</color>
+    <color name="playlist_background">#E6E6DC</color>
 </resources>

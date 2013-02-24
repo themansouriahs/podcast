@@ -188,9 +188,13 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 			sb.setMax(ControlButtons.MAX_SEEKBAR_VALUE);
 
 			// PlayerActivity.setProgressBar(sb, feedItem);
-			long secondary = feedItem.isDownloaded() ? feedItem
+			long secondary = 0;
+			if (feedItem.filesize != 0) {
+				secondary = feedItem.isDownloaded() ? feedItem
 					.getCurrentFileSize()
 					: (feedItem.chunkFilesize / feedItem.filesize);
+			}
+			
 			PlayerActivity.setProgressBar(sb, playerDuration, playerPosition,
 					secondary);
 
@@ -292,9 +296,18 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 				DownloadManager downloadManager = (DownloadManager) mContext
 						.getSystemService(Context.DOWNLOAD_SERVICE);
 				fileSize.setText(item.getStatus(downloadManager));
-
-				if (item.title != null)
-					mainTitle.setText(item.title);
+				
+				//item.setPriority(null, mContext);
+				
+				if (item.title != null) {
+					String title = item.title;
+					int priority = item.getPriority();
+					if (priority > 0) {
+						//title = title + "#" + priority;
+						view.setBackgroundColor(mContext.getResources().getColor(R.color.playlist_background));
+					}
+					mainTitle.setText(title);
+				}
 
 				if (item.sub_title != null)
 					subTitle.setText(item.sub_title);

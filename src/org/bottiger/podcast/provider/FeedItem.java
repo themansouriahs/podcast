@@ -1,6 +1,5 @@
 package org.bottiger.podcast.provider;
 
-
 import java.io.File;
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -25,6 +24,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.provider.BaseColumns;
@@ -162,7 +162,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	 * Priority in the playlist
 	 */
 	public int priority;
-	
+
 	/**
 	 * Filesize as reported by the RSS feed
 	 */
@@ -353,7 +353,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		length = -1;
 		update = -1;
 		listened = -1;
-		priority = 0;
+		priority = -1;
 		filesize = -1;
 		chunkFilesize = -1;
 		downloadReferenceID = -1;
@@ -414,7 +414,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 				cv.put(ItemColumns.LISTENED, listened);
 			if (priority >= 0)
 				cv.put(ItemColumns.PRIORITY, priority);
-			
+
 			int numUpdatedRows = contentResolver.update(ItemColumns.URI, cv,
 					BaseColumns._ID + "=" + id, null);
 			if (numUpdatedRows == 1)
@@ -477,7 +477,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 
 			if (priority >= 0)
 				cv.put(ItemColumns.PRIORITY, priority);
-			
+
 			return contentResolver.insert(ItemColumns.URI, cv);
 
 		} finally {
@@ -915,6 +915,43 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	@Override
 	public long getId() {
 		return id;
+	}
+
+	/**
+	 * 
+	 */
+	public void setPriority(FeedItem precedingItem, Context context) {
+		priority = precedingItem == null ? 1 : precedingItem.getPriority() + 1;
+		update(context.getContentResolver());
+		increateHigherPriorities(precedingItem, context);
+	}
+
+	/**
+	 * Increase the priority of all items in the playlist after the current item
+	 * 
+	 * @param precedingItem
+	 * @param minPriority
+	 * @param context
+	 */
+	private void increateHigherPriorities(FeedItem precedingItem,
+			Context context) {
+		PodcastOpenHelper helper = new PodcastOpenHelper(context);
+		SQLiteDatabase db = helper.getWritableDatabase();
+		String action = "UPDATE " + ItemColumns.TABLE_NAME + " SET ";
+		String value = ItemColumns.PRIORITY + "=" + ItemColumns.PRIORITY
+				+ "+1 ";
+		String where = "WHERE " + ItemColumns.PRIORITY + ">=" + this.priority
+				+ " AND " + ItemColumns.PRIORITY + "<> 0 AND "
+				+ ItemColumns._ID + "<> " + this.id;
+		String sql = action + value + where;
+		db.execSQL(sql);
+	}
+
+	/**
+	 * 
+	 */
+	public int getPriority() {
+		return this.priority;
 	}
 
 	/**

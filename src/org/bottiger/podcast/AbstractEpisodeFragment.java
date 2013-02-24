@@ -5,12 +5,14 @@ import java.util.HashMap;
 
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
+import org.bottiger.podcast.provider.PodcastOpenHelper;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.PodcastDownloadManager;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.content.CursorLoader;
 import android.view.Menu;
@@ -59,6 +61,12 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 			}
 			PodcastDownloadManager.startDownload(getActivity());
 			return true;
+		}
+		case R.id.menu_clear_playlist: {
+			resetPlaylist(getActivity());
+			startInit(10, ItemColumns.URI, ItemColumns.ALL_COLUMNS, getWhere(), getOrder());
+			//mAdapter.changeCursor(getCursor());
+			//mAdapter.notifyDataSetChanged();
 		}
 		}
 		return super.onOptionsItemSelected(item);
@@ -124,6 +132,15 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 		pullToRefreshView.getLoadingLayoutProxy().setRefreshingLabel(
 				"Refreshing feeds");
 		pullToRefreshView.setOnRefreshListener(pullToRefreshListener);
+	}
+	
+	protected static void resetPlaylist(Context context) {
+		PodcastOpenHelper helper = new PodcastOpenHelper(context);
+		SQLiteDatabase db = helper.getWritableDatabase();
+		String action = "UPDATE " + ItemColumns.TABLE_NAME + " SET ";
+		String value = ItemColumns.PRIORITY + "=0";
+		String sql = action + value;
+		db.execSQL(sql);
 	}
 
 }

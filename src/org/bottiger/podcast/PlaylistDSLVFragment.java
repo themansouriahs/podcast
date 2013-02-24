@@ -1,21 +1,20 @@
 package org.bottiger.podcast;
 
-import java.util.Arrays;
 import java.util.ArrayList;
 
-import android.support.v4.app.ListFragment;
-import android.app.Activity;
-import android.database.Cursor;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.LayoutInflater;
-import android.os.Bundle;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
-import com.mobeta.android.dslv.DragSortListView;
-import com.mobeta.android.dslv.DragSortController;
 import org.bottiger.podcast.adapters.ItemCursorAdapter;
 import org.bottiger.podcast.provider.FeedItem;
+
+import android.app.Activity;
+import android.content.Context;
+import android.database.Cursor;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import com.mobeta.android.dslv.DragSortController;
+import com.mobeta.android.dslv.DragSortListView;
 
 public abstract class PlaylistDSLVFragment extends AbstractEpisodeFragment {
 
@@ -27,15 +26,19 @@ public abstract class PlaylistDSLVFragment extends AbstractEpisodeFragment {
                 @Override
                 public void drop(int from, int to) {
                     if (from != to) {
+                    	FeedItem precedingItem = null;
+                    	if (to > 0) {
+                    		Cursor precedingItemCursor = (Cursor)((ItemCursorAdapter) mAdapter).getItem(to-1);
+                    		precedingItem = FeedItem.getByCursor(precedingItemCursor);
+                    	}
                     	
                         Cursor item = (Cursor)((ItemCursorAdapter) mAdapter).getItem(from);
                         FeedItem feedItem = FeedItem.getByCursor(item);
-                        feedItem.priority = 1;
-                        feedItem.update(PlaylistDSLVFragment.this.getActivity().getContentResolver());
-                        mAdapter.notifyDataSetChanged();
-                        //mAdapter.
-                        //mAdapter.remove(item);
-                        //mAdapter.insert(item, to);
+                        
+                        Context c = PlaylistDSLVFragment.this.getActivity();
+                        feedItem.setPriority(precedingItem, c);
+                        //feedItem.update();
+                        //mAdapter.notifyDataSetChanged();
                         
                     }
                 }

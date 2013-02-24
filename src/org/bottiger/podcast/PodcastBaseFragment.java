@@ -354,7 +354,8 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 		assert order != null;
 		assert projection != null;
 
-		setListAdapter(mAdapter);
+		if (id != 10)
+			setListAdapter(mAdapter);
 
 		// Prepare the loader. Either re-connect with an existing one,
 		// or start a new one.
@@ -389,7 +390,7 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 			// the
 			// old cursor once we return.)
 			mAdapter = getAdapter(data);
-			mAdapter.swapCursor(data);
+			mAdapter.changeCursor(data);
 
 			// The list should now be shown.
 			if (isResumed()) {
