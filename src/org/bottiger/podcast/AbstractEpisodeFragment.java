@@ -64,6 +64,7 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 		}
 		case R.id.menu_clear_playlist: {
 			resetPlaylist(getActivity());
+			FeedItem.clearCache();
 			startInit(10, ItemColumns.URI, ItemColumns.ALL_COLUMNS, getWhere(), getOrder());
 			//mAdapter.changeCursor(getCursor());
 			//mAdapter.notifyDataSetChanged();
@@ -135,11 +136,13 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 	}
 	
 	protected static void resetPlaylist(Context context) {
+		// Update the database
 		PodcastOpenHelper helper = new PodcastOpenHelper(context);
 		SQLiteDatabase db = helper.getWritableDatabase();
 		String action = "UPDATE " + ItemColumns.TABLE_NAME + " SET ";
-		String value = ItemColumns.PRIORITY + "=0";
-		String sql = action + value;
+		String value = ItemColumns.PRIORITY + "=0 ";
+		String where = "WHERE " + ItemColumns.PRIORITY + "<> 0";
+		String sql = action + value + where;
 		db.execSQL(sql);
 	}
 

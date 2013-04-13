@@ -879,6 +879,15 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 			return false;
 		return true;
 	}
+	
+	/**
+	 * Clear the cache
+	 */
+	public static void clearCache() {
+		if (cache != null) {
+			cache.evictAll();
+		}
+	}
 
 	private static void initCache() {
 		if (cache == null) {

@@ -307,7 +307,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 					String title = item.title;
 					int priority = item.getPriority();
 					if (priority > 0) {
-						title = priority + " # " + title;
+						//title = priority + " # " + title;
 						view.setBackgroundColor(mContext.getResources().getColor(R.color.playlist_background));
 					} else {
 						view.setBackgroundColor(mContext.getResources().getColor(R.color.default_background));

@@ -127,7 +127,7 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_weight="0"
-            android:background="@drawable/drag" />
+            android:background="@drawable/drag_new" />
 
     </RelativeLayout>
 
