@@ -1,10 +1,11 @@
 package org.bottiger.podcast.notification;
 
 import org.bottiger.podcast.MainActivity;
-import org.bottiger.podcast.NotificationReceiver;
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.listeners.PlayerStatusListener;
 import org.bottiger.podcast.provider.BitmapProvider;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.receiver.NotificationReceiver;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -14,6 +15,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.widget.RemoteViews;
 
 public class NotificationPlayer {
 	
@@ -40,6 +42,28 @@ public class NotificationPlayer {
 		        .setLargeIcon(icon);
 		
 		Intent resultIntent = new Intent(mContext, NotificationReceiver.class);
+		
+		// Sets a custom content view for the notification, including an image button.
+        RemoteViews layout = new RemoteViews(mContext.getPackageName(), R.layout.notification);
+        layout.setTextViewText(R.id.notification_title, item.title);
+        layout.setTextViewText(R.id.notification_content, item.sub_title);
+        layout.setImageViewBitmap(R.id.icon, icon);
+        
+     // Prepare intent which is triggered if the
+        // notification is selected
+        Intent toggleIntent = new Intent(NotificationReceiver.toggleAction);
+        Intent nextIntent = new Intent(NotificationReceiver.nextAction);
+        
+        PendingIntent pendingToggleIntent = PendingIntent.getBroadcast(mContext, 0, toggleIntent, 0);
+        PendingIntent pendingNextIntent = PendingIntent.getBroadcast(mContext, 0, nextIntent, 0);
+        
+        layout.setOnClickPendingIntent(R.id.play_pause_button,pendingToggleIntent);
+        layout.setOnClickPendingIntent(R.id.next_button,pendingNextIntent);
+        
+        //PlayerStatusListener.registerImageView(, mContext);
+        
+        mBuilder.setContent(layout);
+		
 		
 		// The stack builder object will contain an artificial back stack for the
 		// started Activity.

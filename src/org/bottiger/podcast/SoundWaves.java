@@ -4,6 +4,9 @@ import android.app.Application;
 
 public class SoundWaves extends Application {
 	
+	// package name
+	public static final String packageName = "org.bottiger.soundwaves"; 
+	
 	// Bugsense API Key.
 	// https://www.bugsense.com/dashboard/project/
 	public final String bugSenseAPIKey = "11b0ee02";

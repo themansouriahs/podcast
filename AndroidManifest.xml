@@ -109,6 +109,14 @@
             android:name="PodcastUpdateManager"
             android:process=":remote" >
         </receiver>
+         <receiver android:name="org.bottiger.podcast.receiver.NotificationReceiver" >
+             <intent-filter>
+                <action android:name="org.bottiger.soundwaves.TOGGLE" >
+                </action>
+                <action android:name="org.bottiger.soundwaves.NEXT" >
+                    </action>
+            </intent-filter>
+        </receiver>
         <receiver android:name=".receiver.AutoStart" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" >
