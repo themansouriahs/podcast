@@ -1,6 +1,8 @@
 package org.bottiger.podcast;
 
+import org.bottiger.podcast.adapters.ItemCursorAdapter;
 import org.bottiger.podcast.listeners.PlayerStatusListener;
+import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.Log;
@@ -12,6 +14,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
+import android.database.CursorWrapper;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,6 +26,7 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.util.SparseIntArray;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.MenuInflater;
@@ -31,8 +35,12 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.CursorAdapter;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
+import com.mobeta.android.dslv.DragSortListView;
+import com.mobeta.android.dslv.SimpleDragSortCursorAdapter;
 
 /* Copy of PodcastBaseActivity */
 public abstract class PodcastBaseFragment extends FixedListFragment {
@@ -46,7 +54,7 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 	protected static ComponentName mService = null;
 	// protected final Log log = Log.getLog(getClass());
 
-	protected SimpleCursorAdapter mAdapter;
+	protected SimpleDragSortCursorAdapter mAdapter;
 	// protected Cursor mCursor = null;
 
 	// protected boolean mInit = false;
@@ -368,7 +376,7 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 		getLoaderManager().initLoader(id, mBundle, loaderCallback);
 	}
 
-	abstract SimpleCursorAdapter getAdapter(Cursor cursor);
+	abstract SimpleDragSortCursorAdapter getAdapter(Cursor cursor);
 
 	private LoaderManager.LoaderCallbacks<Cursor> loaderCallback = new LoaderCallbacks<Cursor>() {
 		@Override
@@ -386,11 +394,21 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 
 		@Override
 		public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+			
+			// https://github.com/bauerca/drag-sort-listview/issues/20
+			final ReorderCursor wrapped_cursor = new ReorderCursor(data);
+			
+			mAdapter = getAdapter(wrapped_cursor);
+			mAdapter.changeCursor(wrapped_cursor);
+			
+            //((CursorAdapter) getListView().getAdapter()).swapCursor(wrapped_cursor);
+            ((DragSortListView) getListView()).setDropListener(wrapped_cursor);
+			
 			// Swap the new cursor in. (The framework will take care of closing
 			// the
 			// old cursor once we return.)
-			mAdapter = getAdapter(data);
-			mAdapter.changeCursor(data);
+			//mAdapter = getAdapter(data);
+			//mAdapter.changeCursor(data);
 
 			// The list should now be shown.
 			if (isResumed()) {
@@ -406,7 +424,81 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 			// above is about to be closed. We need to make sure we are no
 			// longer using it.
 			mAdapter.swapCursor(null);
+			
+			// https://github.com/bauerca/drag-sort-listview/issues/20
+			//((CursorAdapter) getListView().getAdapter()).swap(null);
 
 		}
 	};
+	
+	class ReorderCursor extends CursorWrapper implements DragSortListView.DropListener {
+
+	    ReorderCursor(Cursor cursor) {
+	        super(cursor);
+	        _remapping = new SparseIntArray();
+	    }
+
+	    @Override
+	     public void drop(final int from, final int to) {	
+	    	
+	        // Update remapping
+	        final int remapped_from = getRemappedPosition(from);
+	        if (from > to)
+	            for (int position = from; position > to; position--)
+	                _remapping.put(position, getRemappedPosition(position - 1));
+	        else // shift up
+	            for (int position = from; position < to; position++)
+	                _remapping.put(position, getRemappedPosition(position + 1)); 
+	        _remapping.put(to, remapped_from);
+             
+	        /*
+	         // Update remapping
+	         _remapping.put(to, from);
+	         if (from > to)
+	            for (int position = from; position > to; position--)
+	                _remapping.put(position, position - 1);
+	         else // shift up
+	            for (int position = from; position < to; position++)
+	                _remapping.put(position, position + 1);
+				*/
+	         //mAdapter.notifyDataSetChanged();
+	         
+	         
+			new Thread(new Runnable() {
+				public void run() {
+					
+	        
+	        		if (from != to) {
+						FeedItem precedingItem = null;
+						if (to > 0) {
+							Cursor precedingItemCursor = (Cursor) mAdapter
+									.getItem(to - 1);
+							precedingItem = FeedItem
+									.getByCursor(precedingItemCursor);
+						}
+
+						Cursor item = (Cursor) mAdapter.getItem(to);
+						FeedItem feedItem = FeedItem.getByCursor(item);
+
+						Context c = PodcastBaseFragment.this.getActivity();
+						feedItem.setPriority(precedingItem, c);
+					}		
+				}
+			}).start();
+					
+			mAdapter.notifyDataSetChanged();
+			
+	     }
+
+	    @Override
+	    public boolean moveToPosition(int position) {
+	    	return super.moveToPosition(getRemappedPosition(position));
+	    }
+
+	    private int getRemappedPosition(int position) {
+	        return _remapping.get(position, position);
+	    }
+
+	    private final SparseIntArray _remapping;
+	}
 }

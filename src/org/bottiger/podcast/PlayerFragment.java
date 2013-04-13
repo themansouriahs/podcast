@@ -40,6 +40,8 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
+import com.mobeta.android.dslv.SimpleDragSortCursorAdapter;
+
 
 public class PlayerFragment   extends PodcastBaseFragment
 {
@@ -707,7 +709,7 @@ public class PlayerFragment   extends PodcastBaseFragment
 	}
 
 	@Override
-	SimpleCursorAdapter getAdapter(Cursor cursor) {
+	SimpleDragSortCursorAdapter getAdapter(Cursor cursor) {
 		// TODO Auto-generated method stub
 		return null;
 	}

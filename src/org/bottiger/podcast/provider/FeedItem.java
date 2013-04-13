@@ -922,8 +922,8 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	 */
 	public void setPriority(FeedItem precedingItem, Context context) {
 		priority = precedingItem == null ? 1 : precedingItem.getPriority() + 1;
-		update(context.getContentResolver());
 		increateHigherPriorities(precedingItem, context);
+		//update(context.getContentResolver());
 	}
 
 	/**
@@ -944,7 +944,22 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 				+ " AND " + ItemColumns.PRIORITY + "<> 0 AND "
 				+ ItemColumns._ID + "<> " + this.id;
 		String sql = action + value + where;
-		db.execSQL(sql);
+		
+		
+		String actionCurrent = "UPDATE " + ItemColumns.TABLE_NAME + " SET ";
+		String valueCurrent = ItemColumns.PRIORITY + "=" + this.priority;
+		String whereCurrent = " WHERE " + ItemColumns._ID + ">=" + this.id;
+		String sqlCurrent = actionCurrent + valueCurrent + whereCurrent;
+		
+		
+		db.beginTransaction();
+		try {
+			db.execSQL(sql);
+			db.execSQL(sqlCurrent); 
+		    db.setTransactionSuccessful();
+		} finally {
+		    db.endTransaction();
+		}
 	}
 
 	/**

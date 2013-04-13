@@ -11,22 +11,17 @@ import org.bottiger.podcast.utils.ControlButtons;
 import org.bottiger.podcast.utils.ExpandAnimation;
 
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.widget.SimpleCursorAdapter;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewStub;
-import android.view.animation.Animation;
-import android.view.animation.Transformation;
-import android.view.animation.Animation.AnimationListener;
 import android.widget.AbsListView;
-import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.mobeta.android.dslv.SimpleDragSortCursorAdapter;
 
 public class RecentItemFragment extends PlaylistDSLVFragment {
 
@@ -114,15 +109,15 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 						R.id.podcast, R.id.duration, R.id.list_image }, fields);
 	}
 	
-	public void setAdapter(SimpleCursorAdapter adapter) {
+	public void setAdapter(SimpleDragSortCursorAdapter adapter) {
 		mAdapter = adapter;
 	}
 	
-	public SimpleCursorAdapter getAdapter(Cursor cursor) {
+	public SimpleDragSortCursorAdapter getAdapter(Cursor cursor) {
 		if (mAdapter != null)
 			return mAdapter;
 		
-		SimpleCursorAdapter adapter = listItemCursorAdapter(this.getActivity(),this, cursor);
+		SimpleDragSortCursorAdapter adapter = listItemCursorAdapter(this.getActivity(),this, cursor);
 		setAdapter(adapter);
 		return adapter;
 		//return listItemCursorAdapter(this.getActivity(),
@@ -268,7 +263,7 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 	@Override
 	public void setListAdapter() {
 		// TODO Auto-generated method stub
-		SimpleCursorAdapter sca = getAdapter(getCursor()); 
+		SimpleDragSortCursorAdapter sca = getAdapter(getCursor()); 
 		setListAdapter(sca);
 		
 	}

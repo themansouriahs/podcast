@@ -9,13 +9,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.mobeta.android.dslv.SimpleDragSortCursorAdapter;
 import com.nostra13.universalimageloader.core.ImageLoader;
 public class FeedFragment extends AbstractEpisodeFragment {
 
@@ -39,7 +39,7 @@ public class FeedFragment extends AbstractEpisodeFragment {
 						R.id.podcast, R.id.duration, R.id.list_image }, fields);
 	}
 	
-	public SimpleCursorAdapter getAdapter(Cursor cursor) {
+	public SimpleDragSortCursorAdapter getAdapter(Cursor cursor) {
 		if (mAdapter != null)
 			return mAdapter;
 		

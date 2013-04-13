@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.bottiger.podcast.adapters.ItemCursorAdapter;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.utils.Playlist;
 
 import android.app.Activity;
 import android.content.Context;
@@ -12,6 +13,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 
 import com.mobeta.android.dslv.DragSortController;
 import com.mobeta.android.dslv.DragSortListView;
@@ -26,20 +28,46 @@ public abstract class PlaylistDSLVFragment extends AbstractEpisodeFragment {
                 @Override
                 public void drop(int from, int to) {
                     if (from != to) {
+                    	// Playlist.setFrom(from);
+                    	// Playlist.setTo(to);
+                    	ItemCursorAdapter adapter = ((ItemCursorAdapter) mAdapter);
+                    	
+                        //Cursor item = (Cursor) adapter.getItem(from);
+                        //adapter.remove(item);
+                        //adapter.insert(item, to);
+                    	
+                    	//ListView listView = PlaylistDSLVFragment.this.getListView();
+                    	//adapter.bindView(listView.getChildAt(from), getActivity(), (Cursor)adapter.getItem(to));
+                    	//adapter.bindView(listView.getChildAt(to), getActivity(), (Cursor)adapter.getItem(from));
+                    	/*
+                    	int count=0;
+                    	for(int i = 0; i  <= listView.getLastVisiblePosition(); i++)
+                    	{
+                    		if(listView.getChildAt(i)!= null)
+                    	    {
+                    			if (i < from) {
+                    				if (i == to) {
+                    					
+                    				}
+                    			}
+                    			
+                    			if (i > from) {
+                    			}
+                    	    }
+                    	}
+                    	*/
+                    	
                     	FeedItem precedingItem = null;
                     	if (to > 0) {
-                    		Cursor precedingItemCursor = (Cursor)((ItemCursorAdapter) mAdapter).getItem(to-1);
+                    		Cursor precedingItemCursor = (Cursor)adapter.getItem(to-1);
                     		precedingItem = FeedItem.getByCursor(precedingItemCursor);
                     	}
                     	
-                        Cursor item = (Cursor)((ItemCursorAdapter) mAdapter).getItem(from);
+                        Cursor item = (Cursor)adapter.getItem(from);
                         FeedItem feedItem = FeedItem.getByCursor(item);
                         
                         Context c = PlaylistDSLVFragment.this.getActivity();
                         feedItem.setPriority(precedingItem, c);
-                        //feedItem.update();
-                        //mAdapter.notifyDataSetChanged();
-                        
                     }
                 }
             };
@@ -155,7 +183,7 @@ public abstract class PlaylistDSLVFragment extends AbstractEpisodeFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mDslv = (DragSortListView) getListView(); 
+        //mDslv = (DragSortListView) getListView(); 
 
         mDslv.setDropListener(onDrop);
         //mDslv.setRemoveListener(onRemove);

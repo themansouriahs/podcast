@@ -19,13 +19,14 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.mobeta.android.dslv.SimpleDragSortCursorAdapter;
 
 public class SubscriptionsFragment extends PodcastBaseFragment {
 	
@@ -167,7 +168,7 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 				fields);
 	}
 	
-	public SimpleCursorAdapter getAdapter(Cursor cursor) {
+	public SimpleDragSortCursorAdapter getAdapter(Cursor cursor) {
 		if (mAdapter != null)
 			return mAdapter;
 		

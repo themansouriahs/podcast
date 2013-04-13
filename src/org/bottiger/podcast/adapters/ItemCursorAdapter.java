@@ -13,6 +13,7 @@ import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.DownloadStatus;
 import org.bottiger.podcast.utils.ControlButtons;
+import org.bottiger.podcast.utils.Playlist;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.ThemeHelper;
 
@@ -121,6 +122,9 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 	public View getView(int position, View convertView, ViewGroup parent) {
 
 		View listViewItem;
+		
+		int itemId = Playlist.getItemAt(position);
+		
 		Cursor itemCursor = (Cursor) getItem(position);
 		ThemeHelper themeHelper = new ThemeHelper(mContext);
 
@@ -303,8 +307,10 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 					String title = item.title;
 					int priority = item.getPriority();
 					if (priority > 0) {
-						//title = title + "#" + priority;
+						title = priority + " # " + title;
 						view.setBackgroundColor(mContext.getResources().getColor(R.color.playlist_background));
+					} else {
+						view.setBackgroundColor(mContext.getResources().getColor(R.color.default_background));
 					}
 					mainTitle.setText(title);
 				}

@@ -10,7 +10,7 @@ public class PodcastOpenHelper extends SQLiteOpenHelper {
 
 	private final Log log = Log.getLog(getClass());
 
-	private final static int DBVERSION = 13;
+	private final static int DBVERSION = 14;
 	
 	public PodcastOpenHelper(Context context) {
 		super(context, "podcast.db", null, DBVERSION);
@@ -37,6 +37,11 @@ public class PodcastOpenHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		if (oldVersion==13 && newVersion==14) {
+			log.debug("Upgrading database from version 13 to 14");
+			db.execSQL("CREATE INDEX idx_date ON " + ItemColumns.TABLE_NAME + " (" + ItemColumns.DATE + ")");
+			db.execSQL("CREATE INDEX idx_priority ON " + ItemColumns.TABLE_NAME + " (" + ItemColumns.PRIORITY + ")");
+		}
 		if (oldVersion==12 && newVersion==13) {
 			log.debug("Upgrading database from version 12 to 13");
 			//Add the KEEP column to the items table,
