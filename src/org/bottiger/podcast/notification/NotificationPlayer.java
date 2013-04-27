@@ -31,7 +31,34 @@ public class NotificationPlayer {
 		this.item = item;
 	}
 	
-	public Notification show() {
+	public Notification show() { 
+		return show(true);
+	}
+	
+	public Notification show(Boolean isPlaying) {
+		// mId allows you to update the notification later on.
+		Notification not = buildNotification(isPlaying).build();
+		mNotificationManager.notify(mId, not);
+		return not;
+	}
+	
+	public void hide() {
+		mNotificationManager.cancel(mId);
+	}
+
+	public FeedItem getItem() {
+		return item;
+	}
+
+	public void setItem(FeedItem item) {
+		this.item = item;
+	}
+	
+	public int getNotificationId() {
+		return mId;
+	}
+	
+	private NotificationCompat.Builder buildNotification(Boolean isPlaying) {
 		
 		Bitmap icon = new BitmapProvider(mContext, item).createBitmapFromMediaFile(128, 128);
 		NotificationCompat.Builder mBuilder =
@@ -61,6 +88,10 @@ public class NotificationPlayer {
         layout.setOnClickPendingIntent(R.id.next_button,pendingNextIntent);
         
         //PlayerStatusListener.registerImageView(, mContext);
+        int srcId = R.drawable.av_play;
+        if (isPlaying) srcId = R.drawable.av_pause;
+        
+        layout.setImageViewResource(R.id.play_pause_button, srcId);
         
         mBuilder.setContent(layout);
 		
@@ -82,26 +113,8 @@ public class NotificationPlayer {
 		mBuilder.setContentIntent(resultPendingIntent);
 		mNotificationManager =
 		    (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-		// mId allows you to update the notification later on.
-		Notification not = mBuilder.build();
-		mNotificationManager.notify(mId, not);
-		return not;
-	}
-	
-	public void hide() {
-		mNotificationManager.cancel(mId);
-	}
-
-	public FeedItem getItem() {
-		return item;
-	}
-
-	public void setItem(FeedItem item) {
-		this.item = item;
-	}
-	
-	public int getNotificationId() {
-		return mId;
+		
+		return mBuilder;
 	}
 
 	
