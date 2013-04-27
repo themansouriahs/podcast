@@ -14,6 +14,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.CursorWrapper;
 import android.net.Uri;
@@ -21,6 +22,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
@@ -50,6 +52,8 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 	public static final int COLUMN_INDEX_TITLE = 1;
 
 	protected View fragmentView;
+	
+	protected SharedPreferences sharedPreferences;
 
 	// protected static PodcastService mServiceBinder = null;
 	public static PlayerService mPlayerServiceBinder = null;
@@ -203,6 +207,9 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 		Intent bindIntent = new Intent(getActivity(), PlayerService.class);
 		getActivity().bindService(bindIntent, playerServiceConnection,
 				Context.BIND_AUTO_CREATE);
+		
+		sharedPreferences = PreferenceManager
+				.getDefaultSharedPreferences(getActivity());
 	}
 
 	@Override
@@ -419,12 +426,6 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 				((DragSortListView) currentListView).setDropListener(wrapped_cursor);
 			}
 			
-			// Swap the new cursor in. (The framework will take care of closing
-			// the
-			// old cursor once we return.)
-			//mAdapter = getAdapter(data);
-			//mAdapter.changeCursor(data);
-
 			// The list should now be shown.
 			if (isResumed()) {
 				//setListShown(true); //FIXME

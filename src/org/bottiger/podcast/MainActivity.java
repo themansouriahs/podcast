@@ -15,6 +15,7 @@ import org.bottiger.podcast.service.PodcastDownloadManager;
 import org.bottiger.podcast.service.PodcastService;
 import org.bottiger.podcast.utils.AddPodcastDialog;
 import org.bottiger.podcast.utils.Log;
+import org.bottiger.podcast.utils.SlidingMenuBuilder;
 import org.bottiger.podcast.utils.ThemeHelper;
 
 import android.accounts.Account;
@@ -29,6 +30,7 @@ import android.database.Cursor;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Debug;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -66,7 +68,7 @@ public class MainActivity extends FragmentActivity implements
 	protected boolean mInit = false;
 	protected final Log log = Log.getDebugLog(getClass(), 0);
 	protected static ComponentName mService = null;
-
+	
 	public static Account mAccount;
 
 	private boolean debugging = true;
@@ -137,7 +139,6 @@ public class MainActivity extends FragmentActivity implements
 		HeadsetReceiver receiver = new HeadsetReceiver();
 		registerReceiver(receiver, receiverFilter);
 		
-		
 		mFragmentManager = getSupportFragmentManager(); // getSupportFragmentManager();
 
 		if (debugging)
@@ -162,16 +163,7 @@ public class MainActivity extends FragmentActivity implements
 		//setBehindContentView(R.layout.download);
 
 		//SlidingMenu menu = getSlidingMenu();
-		SlidingMenu menu = new SlidingMenu(this);
-
-		menu.setMode(SlidingMenu.LEFT);
-		menu.setShadowWidthRes(R.dimen.shadow_width);
-		// menu.setShadowDrawable(R.drawable.shadow);
-		menu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
-		menu.setFadeDegree(0.35f);
-		menu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
-		menu.setTouchModeAbove(SlidingMenu.LEFT);
-		menu.setMenu(R.layout.download);
+		SlidingMenuBuilder.build(this, mSectionsPagerAdapter);
 		//setSlidingActionBarEnabled(true);
 		
 

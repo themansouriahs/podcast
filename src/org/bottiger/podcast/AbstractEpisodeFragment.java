@@ -8,6 +8,7 @@ import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.PodcastOpenHelper;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.PodcastDownloadManager;
+import org.bottiger.podcast.utils.SlidingMenuBuilder;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -82,7 +83,8 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 
 	public String getWhere() {
 		//String where = "1";
-		String where = ItemColumns.LISTENED + "==1";
+		Boolean showListened = sharedPreferences.getBoolean(SlidingMenuBuilder.showListenedKey, SlidingMenuBuilder.showListenedVal);
+		String where = (showListened) ? "1" : ItemColumns.LISTENED + "== 0";
 		return where;
 	}
 
