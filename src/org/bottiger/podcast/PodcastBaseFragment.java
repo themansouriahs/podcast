@@ -37,6 +37,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.CursorAdapter;
+import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -413,7 +414,10 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 			mAdapter.changeCursor(wrapped_cursor);
 			
             //((CursorAdapter) getListView().getAdapter()).swapCursor(wrapped_cursor);
-            ((DragSortListView) getListView()).setDropListener(wrapped_cursor);
+			ListView currentListView = getListView();
+			if (currentListView instanceof DragSortListView) {
+				((DragSortListView) currentListView).setDropListener(wrapped_cursor);
+			}
 			
 			// Swap the new cursor in. (The framework will take care of closing
 			// the
