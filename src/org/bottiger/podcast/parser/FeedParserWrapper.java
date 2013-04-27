@@ -120,7 +120,10 @@ public class FeedParserWrapper {
 
 				JSONArray episodeDataObject = (JSONArray) mainDataObject
 						.get("episodes");
-				for (int i = 0; i < episodeDataObject.size(); i++) {
+				
+				if (episodeDataObject != null) {
+					int numOfEpisodes = episodeDataObject.size();
+				for (int i = 0; i < numOfEpisodes; i++) {
 					FeedItem item = new FeedItem();
 
 					JSONObject episode = (JSONObject) episodeDataObject.get(i);
@@ -170,6 +173,7 @@ public class FeedParserWrapper {
 
 						rssEpisodes.add(item);
 					}
+				}
 				}
 			}
 
@@ -366,6 +370,8 @@ public class FeedParserWrapper {
 		boolean autoDownload = sharedPrefs.getBoolean(
 				"pref_download_on_update", true);
 
+		if (!items.isEmpty()) {
+		
 		// Sort the items to find the oldest
 		Collections.sort(items);
 		FeedItem oldestItem = items.get(items.size() - 1);
@@ -404,7 +410,8 @@ public class FeedParserWrapper {
 		}
 
 		return add_num;
-
+		}
+	return 0;
 	}
 
 	private synchronized FeedItem addItem(Subscription subscription,

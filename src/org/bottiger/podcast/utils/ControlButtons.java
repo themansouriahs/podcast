@@ -261,6 +261,7 @@ public class ControlButtons {
 			playPauseButton.setContentDescription("Pause");
 			PodcastBaseFragment.mPlayerServiceBinder.play(id);
 			PodcastBaseFragment.queueNextRefresh();
+			fragment.refreshView();
 		}
 	}
 

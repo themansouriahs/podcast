@@ -934,6 +934,10 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		increateHigherPriorities(precedingItem, context);
 		//update(context.getContentResolver());
 	}
+	
+	public void setTopPriority(Context context) {
+		setPriority(null, context);
+	}
 
 	/**
 	 * Increase the priority of all items in the playlist after the current item
@@ -957,7 +961,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		
 		String actionCurrent = "UPDATE " + ItemColumns.TABLE_NAME + " SET ";
 		String valueCurrent = ItemColumns.PRIORITY + "=" + this.priority;
-		String whereCurrent = " WHERE " + ItemColumns._ID + ">=" + this.id;
+		String whereCurrent = " WHERE " + ItemColumns._ID + "==" + this.id;
 		String sqlCurrent = actionCurrent + valueCurrent + whereCurrent;
 		
 		

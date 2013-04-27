@@ -718,6 +718,18 @@ public class PlayerFragment   extends PodcastBaseFragment
 	public int getItemLayout() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	@Override
+	String getWhere() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	String getOrder() {
+		// TODO Auto-generated method stub
+		return null;
 	}    
 
 }

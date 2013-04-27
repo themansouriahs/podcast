@@ -439,6 +439,9 @@ public class PlayerService extends Service implements
 		if (mItem == null)
 			return;
 
+		mItem.setPriority(null, getApplication());
+		mItem.update(getContentResolver());
+		
 		String dataSource = mItem.isDownloaded() ? mItem.getAbsolutePath()
 				: mItem.getURL();
 

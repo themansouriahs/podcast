@@ -3,6 +3,7 @@ package org.bottiger.podcast;
 import org.bottiger.podcast.adapters.ItemCursorAdapter;
 import org.bottiger.podcast.listeners.PlayerStatusListener;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.Log;
@@ -372,9 +373,19 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 		mBundle.putStringArray("projection", projection);
 		mBundle.putString("order", order);
 		mBundle.putString("condition", condition);
+		
 		// FIXME
-		getLoaderManager().initLoader(id, mBundle, loaderCallback);
+		getLoaderManager().restartLoader(id, mBundle, loaderCallback);
+		//getLoaderManager().initLoader(id, mBundle, loaderCallback);
 	}
+	
+	public void refreshView() {
+		FeedItem.clearCache();
+		startInit(10, ItemColumns.URI, ItemColumns.ALL_COLUMNS, getWhere(), getOrder());
+	}
+	
+	abstract String getWhere();
+	abstract String getOrder();
 
 	abstract SimpleDragSortCursorAdapter getAdapter(Cursor cursor);
 
@@ -393,10 +404,10 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 		}
 
 		@Override
-		public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+		public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
 			
 			// https://github.com/bauerca/drag-sort-listview/issues/20
-			final ReorderCursor wrapped_cursor = new ReorderCursor(data);
+			final ReorderCursor wrapped_cursor = new ReorderCursor(cursor);
 			
 			mAdapter = getAdapter(wrapped_cursor);
 			mAdapter.changeCursor(wrapped_cursor);

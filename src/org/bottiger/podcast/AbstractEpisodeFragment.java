@@ -64,8 +64,10 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 		}
 		case R.id.menu_clear_playlist: {
 			resetPlaylist(getActivity());
-			FeedItem.clearCache();
-			startInit(10, ItemColumns.URI, ItemColumns.ALL_COLUMNS, getWhere(), getOrder());
+			refreshView();
+			//FeedItem.clearCache();
+			//startInit(10, ItemColumns.URI, ItemColumns.ALL_COLUMNS, getWhere(), getOrder());
+			
 			//mAdapter.changeCursor(getCursor());
 			//mAdapter.notifyDataSetChanged();
 		}
@@ -79,7 +81,8 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 	}
 
 	public String getWhere() {
-		String where = "1";
+		//String where = "1";
+		String where = ItemColumns.LISTENED + "==1";
 		return where;
 	}
 
@@ -107,8 +110,12 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 	public String getOrder(String inputOrder) {
 		assert inputOrder != null;
 
-		String prioritiesFirst = "case " + ItemColumns.PRIORITY + " when 0 then 2 else 1 end, " + ItemColumns.PRIORITY + ", ";
-		String order = prioritiesFirst + ItemColumns.DATE + " " + inputOrder + " LIMIT 20"; // before:
+		String playingFirst = "";
+		if (mPlayerServiceBinder != null && mPlayerServiceBinder.getCurrentItem() != null) {
+			playingFirst = "case " + ItemColumns._ID + " when " + mPlayerServiceBinder.getCurrentItem().getId() + " then 1 else 2 end, ";
+		}
+		String prioritiesSecond = "case " + ItemColumns.PRIORITY + " when 0 then 2 else 1 end, " + ItemColumns.PRIORITY + ", ";
+		String order = playingFirst + prioritiesSecond + ItemColumns.DATE + " " + inputOrder + " LIMIT 20"; // before:
 		return order;
 	}
 	
