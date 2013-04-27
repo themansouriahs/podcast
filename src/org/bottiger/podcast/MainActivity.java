@@ -44,10 +44,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.TextView;
 
 import com.bugsense.trace.BugSenseHandler;
 import com.slidingmenu.lib.SlidingMenu;
+import com.slidingmenu.lib.app.SlidingActivityBase;
 import com.slidingmenu.lib.app.SlidingFragmentActivity;
 
 // Sliding
@@ -155,20 +157,23 @@ public class MainActivity extends FragmentActivity implements
 		// PodcastUpdateManager.setUpdate(this);
 
 		//FIXME
-		/*
+		
 		// set the Behind View
-		setBehindContentView(R.layout.download);
+		//setBehindContentView(R.layout.download);
 
-		SlidingMenu menu = getSlidingMenu();
+		//SlidingMenu menu = getSlidingMenu();
+		SlidingMenu menu = new SlidingMenu(this);
 
 		menu.setMode(SlidingMenu.LEFT);
 		menu.setShadowWidthRes(R.dimen.shadow_width);
 		// menu.setShadowDrawable(R.drawable.shadow);
 		menu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
 		menu.setFadeDegree(0.35f);
+		menu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
 		menu.setTouchModeAbove(SlidingMenu.LEFT);
-		setSlidingActionBarEnabled(true);
-		*/
+		menu.setMenu(R.layout.download);
+		//setSlidingActionBarEnabled(true);
+		
 
 
 		// Set up the ViewPager with the sections adapter.
