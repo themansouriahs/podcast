@@ -3,7 +3,11 @@ package org.bottiger.podcast.listeners;
 
 import java.util.HashMap;
 
+import org.bottiger.podcast.PodcastBaseFragment;
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.notification.NotificationPlayer;
+import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ThemeHelper;
 
 import android.app.Activity;
@@ -88,6 +92,14 @@ public class PlayerStatusListener {
 		}
 		
 		// Update notification
+		PlayerService ps = PodcastBaseFragment.mPlayerServiceBinder;
+		if (ps != null) {
+			FeedItem currentItem = ps.getCurrentItem();
+			if (currentItem != null) {
+				NotificationPlayer np = new NotificationPlayer(mActivity, null);
+				np.show(status == STATUS.PLAYING);
+			}
+		}
 	}
 	
 	/**
