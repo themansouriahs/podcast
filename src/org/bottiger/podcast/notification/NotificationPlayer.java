@@ -23,7 +23,7 @@ public class NotificationPlayer {
 	private FeedItem item;
 	
 	private NotificationManager mNotificationManager = null;
-	private int mId = 7;
+	private int mId = 4260;
 	
 	public NotificationPlayer(Context context, FeedItem item) {
 		super();
@@ -105,12 +105,14 @@ public class NotificationPlayer {
 		stackBuilder.addParentStack(MainActivity.class);
 		// Adds the Intent that starts the Activity to the top of the stack
 		stackBuilder.addNextIntent(resultIntent);
+		
 		PendingIntent resultPendingIntent =
 		        stackBuilder.getPendingIntent(
 		            0,
 		            PendingIntent.FLAG_UPDATE_CURRENT
 		        );
 		mBuilder.setContentIntent(resultPendingIntent);
+		
 		mNotificationManager =
 		    (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
 		
