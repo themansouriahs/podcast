@@ -20,8 +20,8 @@ public class Playlist {
 	public Playlist(Context context) {
 	}
 	
-	public static boolean updatePosition(FeedItem item, int position) {
-		QueueItem queueItem = new QueueItem(item.getId(), position);
+	public static boolean updatePosition(FeedItem item) {
+		QueueItem queueItem = new QueueItem(item);
 		if (playlist.contains(queueItem)) 
 			playlist.remove(queueItem);
 		playlist.add(queueItem);
@@ -90,25 +90,36 @@ public class Playlist {
 	private static class QueueItem implements Comparable<QueueItem> {
 		
 		private Integer episodeId;
-		private Integer playlistPosition;
+		private Integer priority;
+		private String date;
 		
-		public QueueItem(long episodeId, int playlistPosition) {
+		public QueueItem(FeedItem item) {
 			super();
-			this.episodeId = Integer.valueOf((int)episodeId);
-			this.playlistPosition = Integer.valueOf(playlistPosition);
+			this.episodeId = Integer.valueOf((int)item.getId());
+			this.priority = Integer.valueOf(item.getPriority());
+			this.date = item.getDate();
 		}
 		
 		public Integer getId() {
 			return episodeId;
 		}
 		
-		public Integer getPosition() {
-			return playlistPosition;
+		public Integer getPriority() {
+			return priority;
+		}
+		
+		public String getDate() {
+			return date;
 		}
 
 		@Override	
 		public int compareTo(QueueItem otherItem) {
-			return playlistPosition.compareTo(otherItem.getPosition());
+			// If either is greater than zero return the largest
+			if (priority > 0 || otherItem.getPriority() > 0)
+				return priority.compareTo(otherItem.getPriority());
+			
+			// Otherwize the must be sorted by date.
+			return date.compareTo(otherItem.date);
 		}
 		
 		@Override
