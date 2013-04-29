@@ -97,6 +97,7 @@ public class PlayerStatusListener {
 			FeedItem currentItem = ps.getCurrentItem();
 			if (currentItem != null) {
 				NotificationPlayer np = new NotificationPlayer(mActivity, null);
+				np.setItem(currentItem);
 				np.show(status == STATUS.PLAYING);
 			}
 		}

@@ -10,6 +10,7 @@ import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.utils.Log;
+import org.bottiger.podcast.utils.Playlist;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -106,7 +107,7 @@ public class PlayerService extends Service implements
 		mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 		TelephonyManager tmgr = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
 		tmgr.listen(mPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
-
+		
 		this.mControllerComponentName = new ComponentName(this,
 				HeadsetReceiver.class);
 		log.debug("onCreate(): " + mControllerComponentName);
@@ -336,26 +337,30 @@ public class PlayerService extends Service implements
 				long repeat_mode = getPref();
 
 				if (mItem != null) {
-					FeedItem next_item = getNext(mItem);
+					mItem.trackEnded(getContentResolver());
+					
+					long nextItemId = getNextId();
 					dis_notifyStatus();
 					mPlayer.stop();
 					mUpdate = true;
+					
+					play(nextItemId);
 
 					if (repeat_mode == REPEAT_MODE_REPEAT_ONE) {
 						long id = mItem.id;
 						mItem = null;
 						play(id);
 					} else if (repeat_mode == REPEAT_MODE_REPEAT) {
-						if (next_item == null) {
-							next_item = getFirst();
+						if (nextItemId == -1) {
+							//nextItemId = getFirst();
 						}
 
-						if (next_item != null)
-							play(next_item.id);
+						if (nextItemId > -1)
+							play(nextItemId);
 
 					} else if (repeat_mode == REPEAT_MODE_NO_REPEAT) {
-						if (next_item != null)
-							play(next_item.id);
+						if (nextItemId > -1)
+							play(nextItemId);
 
 					}
 
@@ -577,47 +582,8 @@ public class PlayerService extends Service implements
 		return null;
 	}
 
-	public FeedItem getNext(FeedItem item) {
-		FeedItem next_item = null;
-		Cursor cursor = null;
-
-		if (item == null) {
-			FeedItem.getByCursor(cursor);
-			return null;
-		}
-
-		try {
-
-			cursor = getContentResolver().query(ItemColumns.URI,
-					ItemColumns.ALL_COLUMNS, WHERE, null, ORDER);
-			if (cursor == null) {
-				return null;
-			}
-			cursor.moveToFirst();
-
-			do {
-
-				next_item = FeedItem.getByCursor(cursor);
-
-				if ((next_item != null) && (item.id == next_item.id)) {
-					if (cursor.moveToNext()) {
-						next_item = FeedItem.getByCursor(cursor);
-						return next_item;
-					}
-
-				}
-
-			} while (cursor.moveToNext());
-
-		} catch (Exception e) {
-
-		} finally {
-			if (cursor != null)
-				cursor.close();
-		}
-
-		return null;
-
+	public long getNextId() {
+		return (long)Playlist.nextId();
 	}
 
 	public FeedItem getPrev(FeedItem item) {

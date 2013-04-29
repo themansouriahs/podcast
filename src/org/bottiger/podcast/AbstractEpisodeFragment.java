@@ -7,7 +7,9 @@ import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.PodcastOpenHelper;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.service.PodcastDownloadManager;
+import org.bottiger.podcast.utils.Playlist;
 import org.bottiger.podcast.utils.SlidingMenuBuilder;
 
 import android.content.Context;
@@ -15,6 +17,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.content.CursorLoader;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -81,13 +84,6 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 		super.onResume();
 	}
 
-	public String getWhere() {
-		//String where = "1";
-		Boolean showListened = sharedPreferences.getBoolean(SlidingMenuBuilder.showListenedKey, SlidingMenuBuilder.showListenedVal);
-		String where = (showListened) ? "1" : ItemColumns.LISTENED + "== 0";
-		return where;
-	}
-
 	public void getPref() {
 		SharedPreferences pref = getActivity().getSharedPreferences(
 				SettingsActivity.HAPI_PREFS_FILE_NAME, Context.MODE_PRIVATE);
@@ -104,21 +100,48 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 				ItemColumns.ALL_COLUMNS, condition, null, order)
 				.loadInBackground();
 	}
-
+	
+	public String getWhere() {
+		Boolean showListened = sharedPreferences.getBoolean(SlidingMenuBuilder.showListenedKey,
+				SlidingMenuBuilder.showListenedVal);
+		String where = (showListened) ? "1" : ItemColumns.LISTENED + "== 0";
+		return where;
+	}
+	
 	public String getOrder() {
-		return getOrder("DESC");
+		return getOrder("DESC", 20);
+	}
+
+	public String getOrder(String inputOrder, Integer amount) {
+		assert inputOrder != null;
+
+		PlayerService playerService = PodcastBaseFragment.mPlayerServiceBinder;
+
+		String playingFirst = "";
+		if (playerService != null && playerService.getCurrentItem() != null) {
+			playingFirst = "case " + ItemColumns._ID + " when "
+					+ playerService.getCurrentItem().getId()
+					+ " then 1 else 2 end, ";
+		}
+		String prioritiesSecond = "case " + ItemColumns.PRIORITY
+				+ " when 0 then 2 else 1 end, " + ItemColumns.PRIORITY + ", ";
+		String order = playingFirst + prioritiesSecond + ItemColumns.DATE + " "
+				+ inputOrder + " LIMIT " + amount; // before:
+		return order;
 	}
 
 	public String getOrder(String inputOrder) {
-		assert inputOrder != null;
-
-		String playingFirst = "";
-		if (mPlayerServiceBinder != null && mPlayerServiceBinder.getCurrentItem() != null) {
-			playingFirst = "case " + ItemColumns._ID + " when " + mPlayerServiceBinder.getCurrentItem().getId() + " then 1 else 2 end, ";
-		}
-		String prioritiesSecond = "case " + ItemColumns.PRIORITY + " when 0 then 2 else 1 end, " + ItemColumns.PRIORITY + ", ";
-		String order = playingFirst + prioritiesSecond + ItemColumns.DATE + " " + inputOrder + " LIMIT 20"; // before:
-		return order;
+//		assert inputOrder != null;
+//
+//		String playingFirst = "";
+//		if (mPlayerServiceBinder != null && mPlayerServiceBinder.getCurrentItem() != null) {
+//			playingFirst = "case " + ItemColumns._ID + " when " + mPlayerServiceBinder.getCurrentItem().getId() + " then 1 else 2 end, ";
+//		}
+//		String prioritiesSecond = "case " + ItemColumns.PRIORITY + " when 0 then 2 else 1 end, " + ItemColumns.PRIORITY + ", ";
+//		String order = playingFirst + prioritiesSecond + ItemColumns.DATE + " " + inputOrder + " LIMIT 20"; // before:
+//		return order;
+		int amount = sharedPreferences.getInt(SlidingMenuBuilder.episodesToShowKey, 20);
+		return getOrder(inputOrder, amount);
 	}
 	
 	protected void enablePullToRefresh() {

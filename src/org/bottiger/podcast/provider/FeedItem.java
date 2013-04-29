@@ -12,6 +12,7 @@ import java.util.Locale;
 import org.bottiger.podcast.service.DownloadStatus;
 import org.bottiger.podcast.service.PodcastDownloadManager;
 import org.bottiger.podcast.utils.Log;
+import org.bottiger.podcast.utils.Playlist;
 import org.bottiger.podcast.utils.SDCardManager;
 import org.bottiger.podcast.utils.StrUtils;
 
@@ -927,7 +928,8 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	}
 
 	/**
-	 * 
+	 * Put the current FeedItem after the argument in the playlist. 
+	 * If the given FeedItem is null the current FeedItem becomes the first item in the playlist
 	 */
 	public void setPriority(FeedItem precedingItem, Context context) {
 		priority = precedingItem == null ? 1 : precedingItem.getPriority() + 1;
@@ -937,6 +939,12 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	
 	public void setTopPriority(Context context) {
 		setPriority(null, context);
+	}
+	
+	public void trackEnded(ContentResolver contentResolver) {
+		priority = 0;
+		listened = 1;
+		update(contentResolver);
 	}
 
 	/**

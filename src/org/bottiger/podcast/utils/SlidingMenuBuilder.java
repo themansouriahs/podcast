@@ -19,6 +19,8 @@ import com.slidingmenu.lib.SlidingMenu;
 
 public class SlidingMenuBuilder {
 	
+	final public static String episodesToShowKey = "num_of_episodes";
+	
 	final public static String showListenedKey = "show_listened";
 	final public static Boolean showListenedVal = false;
 	

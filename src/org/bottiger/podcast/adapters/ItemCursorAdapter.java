@@ -123,8 +123,6 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 
 		View listViewItem;
 		
-		int itemId = Playlist.getItemAt(position);
-		
 		Cursor itemCursor = (Cursor) getItem(position);
 		ThemeHelper themeHelper = new ThemeHelper(mContext);
 
@@ -146,6 +144,9 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 				.getColumnIndex(BaseColumns._ID));
 		FeedItem feedItem = FeedItem.getById(mContext.getContentResolver(),
 				itemID);
+		
+		// Update the playlsit to reflect the position of the item
+		//Playlist.updatePosition(feedItem, position);
 
 		boolean isCurrentPlayingItem = false;
 		if (PodcastBaseFragment.mPlayerServiceBinder != null) {

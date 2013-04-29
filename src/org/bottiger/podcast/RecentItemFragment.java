@@ -40,11 +40,6 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 
 	public static HashMap<Integer, Integer> mKeepIconMap;
 
-	private View mCurrentPlayer = null;
-
-	private int layoutID;
-
-
 	private long mCurCheckID = -1;
 	boolean mDualPane;
 	

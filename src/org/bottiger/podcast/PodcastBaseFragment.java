@@ -466,24 +466,11 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 	            for (int position = from; position < to; position++)
 	                _remapping.put(position, getRemappedPosition(position + 1)); 
 	        _remapping.put(to, remapped_from);
-             
-	        /*
-	         // Update remapping
-	         _remapping.put(to, from);
-	         if (from > to)
-	            for (int position = from; position > to; position--)
-	                _remapping.put(position, position - 1);
-	         else // shift up
-	            for (int position = from; position < to; position++)
-	                _remapping.put(position, position + 1);
-				*/
-	         //mAdapter.notifyDataSetChanged();
 	         
 	         
 			new Thread(new Runnable() {
 				public void run() {
-					
-	        
+						        
 	        		if (from != to) {
 						FeedItem precedingItem = null;
 						if (to > 0) {
