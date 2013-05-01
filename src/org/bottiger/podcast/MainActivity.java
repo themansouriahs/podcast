@@ -109,19 +109,21 @@ public class MainActivity extends FragmentActivity implements
 				((SoundWaves) this.getApplication()).getBugSenseAPIKey());
 
 		
-		aua = new AutoUpdateApk(getApplicationContext());  
-		
 		if (debugging) {
 			// Tracing is buggy on emulator
-			// Debug.startMethodTracing("calc");
+			Debug.startMethodTracing("calc");
 
+			if (false) {
 			try {
 				SqliteCopy.backupDatabase();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			}
 		}
+		
+		aua = new AutoUpdateApk(getApplicationContext());  
 		
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
