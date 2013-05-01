@@ -943,7 +943,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	
 	public void trackEnded(ContentResolver contentResolver) {
 		priority = 0;
-		listened = 1;
+		markAsListened();
 		update(contentResolver);
 	}
 

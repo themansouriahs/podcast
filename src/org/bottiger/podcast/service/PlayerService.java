@@ -26,6 +26,7 @@ import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 
@@ -245,9 +246,9 @@ public class PlayerService extends Service implements
 		MediaPlayer.OnCompletionListener listener = new MediaPlayer.OnCompletionListener() {
 			@Override
 			public void onCompletion(MediaPlayer mp) {
-				FeedItem item = PlayerService.this.mItem;
-				item.markAsListened();
-				item.update(getContentResolver());
+				//FeedItem item = PlayerService.this.mItem;
+				//item.markAsListened();
+				//item.update(getContentResolver());
 				
 				mHandler.sendEmptyMessage(TRACK_ENDED);
 
@@ -337,15 +338,19 @@ public class PlayerService extends Service implements
 				long repeat_mode = getPref();
 
 				if (mItem != null) {
-					mItem.trackEnded(getContentResolver());
 					
 					long nextItemId = getNextId();
-					dis_notifyStatus();
-					mPlayer.stop();
-					mUpdate = true;
 					
-					play(nextItemId);
+					if (nextItemId == -1) {
+						dis_notifyStatus();
+						mPlayer.stop();
+					} else {
+						playNext(nextItemId);
+					}
+					mUpdate = true;
 
+					
+					// deprecated - I think
 					if (repeat_mode == REPEAT_MODE_REPEAT_ONE) {
 						long id = mItem.id;
 						mItem = null;
@@ -421,6 +426,16 @@ public class PlayerService extends Service implements
 			mNotificationPlayer = new NotificationPlayer(this, mItem);
 
 		return mNotificationPlayer.show();
+	}
+	
+	public void playNext(long nextId) {
+		//assert playlistAdapter != null;
+		
+		//Cursor firstItem = (Cursor) playlistAdapter.getItem(0);
+		//playlistAdapter.notifyDataSetChanged();
+		if (mItem != null)
+			mItem.trackEnded(getContentResolver());
+		play(nextId);
 	}
 
 	public void play(long id) {

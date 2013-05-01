@@ -146,7 +146,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 				itemID);
 		
 		// Update the playlsit to reflect the position of the item
-		Playlist.updatePosition(feedItem);
+		Playlist.updatePosition(feedItem, position);
 
 		boolean isCurrentPlayingItem = false;
 		if (PodcastBaseFragment.mPlayerServiceBinder != null) {
