@@ -1,6 +1,5 @@
 package org.bottiger.podcast;
 
-import org.bottiger.podcast.adapters.ItemCursorAdapter;
 import org.bottiger.podcast.listeners.PlayerStatusListener;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
@@ -28,7 +27,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.widget.SimpleCursorAdapter;
+import android.support.v4.widget.CursorAdapter;
 import android.util.SparseIntArray;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -38,13 +37,11 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.mobeta.android.dslv.DragSortListView;
-import com.mobeta.android.dslv.SimpleDragSortCursorAdapter;
 
 /* Copy of PodcastBaseActivity */
 public abstract class PodcastBaseFragment extends FixedListFragment {
@@ -60,7 +57,7 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 	protected static ComponentName mService = null;
 	// protected final Log log = Log.getLog(getClass());
 
-	protected SimpleDragSortCursorAdapter mAdapter;
+	protected CursorAdapter mAdapter;
 	// protected Cursor mCursor = null;
 
 	// protected boolean mInit = false;
@@ -395,7 +392,7 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 	abstract String getWhere();
 	abstract String getOrder();
 
-	abstract SimpleDragSortCursorAdapter getAdapter(Cursor cursor);
+	abstract CursorAdapter getAdapter(Cursor cursor);
 
 	private LoaderManager.LoaderCallbacks<Cursor> loaderCallback = new LoaderCallbacks<Cursor>() {
 		@Override
@@ -421,7 +418,7 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 			mAdapter.changeCursor(wrapped_cursor);
 			
             //((CursorAdapter) getListView().getAdapter()).swapCursor(wrapped_cursor);
-			ListView currentListView = getListView();
+			View currentListView = getView();
 			if (currentListView instanceof DragSortListView) {
 				((DragSortListView) currentListView).setDropListener(wrapped_cursor);
 			}

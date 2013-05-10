@@ -9,6 +9,7 @@ import org.bottiger.podcast.utils.SDCardManager;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -24,21 +25,16 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 
-public abstract class AbstractPodcastAdapter extends SimpleDragSortCursorAdapter implements PodcastAdapterInterface {
+public abstract class AbstractGridPodcastAdapter extends CursorAdapter implements PodcastAdapterInterface {
 
-	public AbstractPodcastAdapter(Context context, int layout, Cursor c,
-			String[] from, int[] to) {
-		super(context, layout, c, from, to);
-	}
-
-	public AbstractPodcastAdapter(Context context, int listItem, Cursor cursor,
-			String[] strings, int[] is, FieldHandler[] fields) {
-		super(context, listItem, cursor, strings, is);
-	}	
-	
 	protected LayoutInflater mInflater;
 	protected Context mContext;
 	
+    @Deprecated
+    public AbstractGridPodcastAdapter(Context context, int layout, Cursor c) {
+        super(context, c);
+        mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    }
 	
 	public final static FieldHandler defaultTextFieldHandler = new FieldHandler.TextFieldHandler();
 	
@@ -71,7 +67,7 @@ public abstract class AbstractPodcastAdapter extends SimpleDragSortCursorAdapter
 		@Override
 		public void setViewValue(PodcastAdapterInterface adapter, Cursor cursor,
 				View v, int fromColumnId) {
-			((AbstractPodcastAdapter) adapter).setViewImageAsync((ImageView) v,
+			((AbstractGridPodcastAdapter) adapter).setViewImageAsync((ImageView) v,
 					cursor.getString(fromColumnId));
 		}
 	}

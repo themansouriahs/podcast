@@ -14,14 +14,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.BaseColumns;
-import android.support.v4.widget.SimpleCursorAdapter;
+import android.support.v4.widget.CursorAdapter;
 import android.view.View;
 import android.view.ViewStub;
 import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import com.mobeta.android.dslv.SimpleDragSortCursorAdapter;
 
 public class RecentItemFragment extends PlaylistDSLVFragment {
 
@@ -90,7 +88,7 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 		outState.putLong("curChoice", mCurCheckID);
 	}
 
-	public static ItemCursorAdapter listItemCursorAdapter(Context context,
+	public static CursorAdapter listItemCursorAdapter(Context context,
 			PodcastBaseFragment fragment, Cursor cursor) {
 		ItemCursorAdapter.FieldHandler[] fields = {
 				ItemCursorAdapter.defaultTextFieldHandler,
@@ -104,15 +102,15 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 						R.id.podcast, R.id.duration, R.id.list_image }, fields);
 	}
 	
-	public void setAdapter(SimpleDragSortCursorAdapter adapter) {
+	public void setAdapter(CursorAdapter adapter) {
 		mAdapter = adapter;
 	}
 	
-	public SimpleDragSortCursorAdapter getAdapter(Cursor cursor) {
+	public CursorAdapter getAdapter(Cursor cursor) {
 		if (mAdapter != null)
 			return mAdapter;
 		
-		SimpleDragSortCursorAdapter adapter = listItemCursorAdapter(this.getActivity(),this, cursor);
+		CursorAdapter adapter = listItemCursorAdapter(this.getActivity(),this, cursor);
 		setAdapter(adapter);
 		return adapter;
 		//return listItemCursorAdapter(this.getActivity(),
@@ -258,7 +256,7 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 	@Override
 	public void setListAdapter() {
 		// TODO Auto-generated method stub
-		SimpleDragSortCursorAdapter sca = getAdapter(getCursor()); 
+		CursorAdapter sca = getAdapter(getCursor()); 
 		setListAdapter(sca);
 		
 	}

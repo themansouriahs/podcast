@@ -4,12 +4,14 @@ package org.bottiger.podcast;
 import java.util.HashMap;
 
 import org.bottiger.podcast.adapters.AbstractPodcastAdapter;
+import org.bottiger.podcast.adapters.SubscriptionGridCursorAdapter;
 import org.bottiger.podcast.adapters.SubscriptionListCursorAdapter;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionColumns;
 import org.bottiger.podcast.utils.DialogMenu;
+import org.bottiger.podcast.utils.FragmentUtils;
 
 import android.app.Activity;
 import android.content.Context;
@@ -19,16 +21,19 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.GridView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.mobeta.android.dslv.SimpleDragSortCursorAdapter;
-
-public class SubscriptionsFragment extends PodcastBaseFragment {
+public class SubscriptionsFragment extends Fragment {
 	
 	private static final int MENU_ITEM_DETAILS = Menu.FIRST + 9;
 	private static final int MENU_ITEM_START_DOWNLOAD = Menu.FIRST + 10;
@@ -49,14 +54,21 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 		SubscriptionColumns.LAST_UPDATED,
 		SubscriptionColumns.COMMENT
 	};
+	
+	private static enum LayoutType { LIST, GRID };
+	
+	private FragmentUtils mFragmentUtils;
 
 	TextView addSubscriptionView = null;;
 	private static HashMap<Integer, Integer> mIconMap;
 	private View fragmentView;
 	
+	private GridView mGridView;
+	
 	Subscription mChannel = null;
 	long id;
-
+	private LayoutType displayLayout = LayoutType.GRID;
+	
 	static {
 		mIconMap = new HashMap<Integer, Integer>();
 	}
@@ -80,15 +92,41 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
             Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
 		
-		fragmentView = inflater.inflate(R.layout.channel_new, container, false);
+		fragmentView = inflater.inflate(getLayoutType(), container, false);
+	
+		mFragmentUtils = new FragmentUtils(getActivity(), fragmentView, this);
+		mGridView = (GridView) fragmentView.findViewById(R.id.gridview);
 		
+		mGridView.setOnItemClickListener(new OnItemClickListener() {
+	        
+			@Override
+			public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+	            //Toast.makeText(SubscriptionsFragment.this.getActivity(), "" + position, Toast.LENGTH_SHORT).show();
+	            Activity activity = SubscriptionsFragment.this.getActivity();
+	            if (activity instanceof MainActivity) {
+	            	Cursor cursor = (Cursor) SubscriptionsFragment.this.getAdapter().getItem(position);
+	            	
+	        		Subscription sub = null;
+	        		try {
+	        			sub = Subscription.getByCursor(cursor);
+	        		} catch (IllegalStateException e) {
+	        			e.printStackTrace();
+	        		}
+	            	
+	        		if (sub != null) {
+	        			((MainActivity) activity).onItemSelected(sub.getId());
+	        		}
+	            }
+	        }
+
+	    });
+
+	
 		
 		Intent intent = getActivity().getIntent();
 
 		Uri uri = intent.getData();
 		
-		mPrevIntent = null;
-		mNextIntent = null;
 		startInit();
 		return fragmentView;
 	}
@@ -97,19 +135,16 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-		mAdapter = listSubscriptionCursorAdapter(getActivity(), mCursor);
-		startInit(0, SubscriptionColumns.URI, PROJECTION, "1", SubscriptionColumns.TITLE + " ASC");
-		
-
-		setEmptyText("You are not subscribed to any podcasts");
+        mFragmentUtils.setAdapter(getSubscriptionCursorAdapter(getActivity(), mFragmentUtils.getCursor()));		
+        mFragmentUtils.startInit(0, SubscriptionColumns.URI, PROJECTION, "1", SubscriptionColumns.TITLE + " ASC");
     }
 
 	
-	@Override
-	public void onListItemClick(ListView l, View v, int position, long id) {
-		Subscription s = Subscription.getById(getActivity().getContentResolver(), id);
-        this.mListener.onItemSelected(s.getId());
-	}
+//	@Override
+//	public void onListItemClick(ListView l, View v, int position, long id) {
+//		Subscription s = Subscription.getById(getActivity().getContentResolver(), id);
+//        this.mListener.onItemSelected(s.getId());
+//	}
 	
 	public DialogMenu createDialogMenus(long id) {
 
@@ -168,37 +203,66 @@ public class SubscriptionsFragment extends PodcastBaseFragment {
 				fields);
 	}
 	
-	public SimpleDragSortCursorAdapter getAdapter(Cursor cursor) {
-		if (mAdapter != null)
-			return mAdapter;
+	private static SubscriptionGridCursorAdapter gridSubscriptionCursorAdapter(Context context, Cursor cursor) {
+		SubscriptionGridCursorAdapter.FieldHandler[] fields = {
+				AbstractPodcastAdapter.defaultTextFieldHandler,
+				new SubscriptionGridCursorAdapter.IconFieldHandler()
+		};
+		return new SubscriptionGridCursorAdapter(context, R.layout.subscription_grid_item, cursor,
+				new String[] { SubscriptionColumns.TITLE, SubscriptionColumns.IMAGE_URL },
+				new int[] { R.id.title, R.id.list_image },
+				fields);
+	}
+	
+	public CursorAdapter getAdapter(Cursor cursor) {
+		CursorAdapter adapter = mFragmentUtils.getAdapter();
+		if (adapter != null)
+			return adapter;
 		
-		return listSubscriptionCursorAdapter(this.getActivity(), cursor);
+		return getSubscriptionCursorAdapter(this.getActivity(), cursor);
 	}
 
 	public void startInit() {
-		mCursor = new CursorLoader(getActivity(), SubscriptionColumns.URI, PROJECTION, null, null, null).loadInBackground();
-		mAdapter = listSubscriptionCursorAdapter(getActivity().getApplicationContext(), mCursor);
+		Cursor cursor = new CursorLoader(getActivity(), SubscriptionColumns.URI, PROJECTION, null, null, null).loadInBackground();
+		CursorAdapter cursorAdapter = getSubscriptionCursorAdapter(getActivity().getApplicationContext(), cursor);
 	
-		setListAdapter(mAdapter);
-
+		mFragmentUtils.setCursor(cursor);
+		mFragmentUtils.setAdapter(cursorAdapter);
+			
+		mGridView.setAdapter(cursorAdapter);
+		//setListAdapter(cursorAdapter);
 	}
 
-	@Override
 	public int getItemLayout() {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
-	@Override
 	String getWhere() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	String getOrder() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	private int getLayoutType() {
+		return (displayLayout == LayoutType.GRID) ? R.layout.subscription_list : R.layout.channel_new;
+	}
+	
+	public CursorAdapter getAdapter() {
+		Cursor cursor = new CursorLoader(getActivity(), SubscriptionColumns.URI, PROJECTION, null, null, null).loadInBackground();
+		return getSubscriptionCursorAdapter(getActivity(), cursor);
+	}
+	
+	// Should this be public?
+	public CursorAdapter getSubscriptionCursorAdapter(Context context, Cursor cursor) {
+		if ((displayLayout == LayoutType.GRID)) 
+			return gridSubscriptionCursorAdapter(context, cursor);
+		else
+			return listSubscriptionCursorAdapter(context, cursor);
 	}
 	
 }
