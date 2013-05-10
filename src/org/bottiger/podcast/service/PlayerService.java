@@ -85,7 +85,8 @@ public class PlayerService extends Service implements
 			} else if (state == TelephonyManager.CALL_STATE_IDLE) {
 				if (mResumeAfterCall) {
 
-					startAndFadeIn();
+					// never fade in before I have stopped it from doing so when it shouldn't
+					//startAndFadeIn();
 					mResumeAfterCall = false;
 				}
 			}
