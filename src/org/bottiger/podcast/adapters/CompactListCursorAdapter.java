@@ -1,6 +1,5 @@
 package org.bottiger.podcast.adapters;
 
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeSet;
@@ -9,12 +8,15 @@ import org.bottiger.podcast.PodcastBaseFragment;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.utils.ControlButtons;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 public class CompactListCursorAdapter extends AbstractEpisodeCursorAdapter {
@@ -44,7 +46,8 @@ public class CompactListCursorAdapter extends AbstractEpisodeCursorAdapter {
 		for (int i = 0; i < handlers.length - 1; i++) {
 			handlers[i] = defaultTextFieldHandler;
 		}
-		handlers[fromColumns.length - 1] = new FieldHandler.IconFieldHandler(iconMap);
+		handlers[fromColumns.length - 1] = new FieldHandler.IconFieldHandler(
+				iconMap);
 		return handlers;
 	}
 
@@ -66,9 +69,9 @@ public class CompactListCursorAdapter extends AbstractEpisodeCursorAdapter {
 	// of those objects, but the overhead of defining that value class in Java
 	// is not worth it.
 	// If this were a Scala program, that would be a one-line case class.
-	public CompactListCursorAdapter(Context context, PodcastBaseFragment fragment,
-			int layout, Cursor cursor, String[] fromColumns, int[] to,
-			FieldHandler[] fieldHandlers) {
+	public CompactListCursorAdapter(Context context,
+			PodcastBaseFragment fragment, int layout, Cursor cursor,
+			String[] fromColumns, int[] to, FieldHandler[] fieldHandlers) {
 		super(context, layout, cursor, fromColumns, to);
 
 		mContext = context;
@@ -123,6 +126,7 @@ public class CompactListCursorAdapter extends AbstractEpisodeCursorAdapter {
 		View listView = mInflater.inflate(R.layout.episode_list_compact, null);
 
 		listView.setTag(R.id.title, listView.findViewById(R.id.title));
+		listView.setTag(R.id.play_episode, listView.findViewById(R.id.play_episode));
 		return listView;
 	}
 
@@ -147,6 +151,22 @@ public class CompactListCursorAdapter extends AbstractEpisodeCursorAdapter {
 		 */
 		TextView mainTitle = (TextView) view.getTag(R.id.title);
 		mainTitle.setText(item.title);
+		
+		final ImageButton playToggleButton = (ImageButton) view.getTag(R.id.play_episode);
+
+		if (PodcastBaseFragment.mPlayerServiceBinder != null) {
+			PlayerService ps = PodcastBaseFragment.mPlayerServiceBinder;
+			if (ps.isPlaying() && item.getId() == ps.getCurrentItem().getId()) {
+				playToggleButton.setBackgroundResource(R.drawable.av_pause_dark);
+			}
+		}
+		
+		final FeedItem item2 = item;
+		playToggleButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+            	ControlButtons.playPauseToggle(item2.getId(), playToggleButton);
+            }
+		});
 	}
 
 	@Override
@@ -159,7 +179,6 @@ public class CompactListCursorAdapter extends AbstractEpisodeCursorAdapter {
 		return mExpandedItemID.contains(itemID(position)) ? TYPE_EXPAND
 				: TYPE_COLLAPS;
 	}
-
 
 	/**
 	 * Returns the ID of the item at the position
@@ -175,7 +194,5 @@ public class CompactListCursorAdapter extends AbstractEpisodeCursorAdapter {
 		} else
 			return new Long(1); // FIXME
 	}
-
-
 
 }

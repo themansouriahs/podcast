@@ -14,6 +14,7 @@ import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.service.PodcastDownloadManager;
 import org.bottiger.podcast.service.PodcastService;
 import org.bottiger.podcast.utils.AddPodcastDialog;
+import org.bottiger.podcast.utils.ControlButtons;
 import org.bottiger.podcast.utils.Log;
 import org.bottiger.podcast.utils.SlidingMenuBuilder;
 import org.bottiger.podcast.utils.ThemeHelper;
@@ -140,6 +141,8 @@ public class MainActivity extends FragmentActivity implements
 				Intent.ACTION_HEADSET_PLUG);
 		HeadsetReceiver receiver = new HeadsetReceiver();
 		registerReceiver(receiver, receiverFilter);
+		
+		ControlButtons.setThemeHelper(getApplicationContext());
 		
 		mFragmentManager = getSupportFragmentManager(); // getSupportFragmentManager();
 

@@ -5,10 +5,12 @@ import org.bottiger.podcast.PodcastBaseFragment;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.RecentItemFragment;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.service.PodcastDownloadManager;
 import org.bottiger.podcast.service.PodcastService;
 
 import android.content.ContentResolver;
+import android.content.Context;
 import android.os.SystemClock;
 import android.view.View;
 import android.widget.ImageButton;
@@ -24,6 +26,8 @@ public class ControlButtons {
 	private static boolean mFromTouch;
 
 	private static TextView mCurrentTime;
+	
+	private static ThemeHelper themeHelper;
 
 	public static RecentItemFragment fragment = null;
 
@@ -39,6 +43,10 @@ public class ControlButtons {
 		public TextView duration;
 		public TextView filesize;
 		public SeekBar seekbar;
+	}
+	
+	public static void setThemeHelper(Context context) {
+		themeHelper = new ThemeHelper(context);
 	}
 
 	public static void setListener(
@@ -70,7 +78,7 @@ public class ControlButtons {
 			@Override
 			public void onClick(View v) {
 				playPauseButton.setContentDescription("Play");
-				playPauseButton.setImageResource(themeHelper
+				playPauseButton.setBackgroundResource(themeHelper
 						.getAttr(R.attr.play_icon));
 				PodcastBaseFragment.mPlayerServiceBinder.stop();
 			}
@@ -91,7 +99,7 @@ public class ControlButtons {
 							// Delete file
 							item.delFile(resolver);
 							viewHolder.downloadButton
-									.setImageResource(themeHelper
+									.setBackgroundResource(themeHelper
 											.getAttr(R.attr.download_icon));
 							viewHolder.downloadButton
 									.setContentDescription("Download");
@@ -104,7 +112,7 @@ public class ControlButtons {
 							// podcastServiceConnection.downloadItem(fragment
 							// .getActivity().getContentResolver(), item);
 							viewHolder.downloadButton
-									.setImageResource(themeHelper
+									.setBackgroundResource(themeHelper
 											.getAttr(R.attr.delete_icon));
 							viewHolder.downloadButton
 									.setContentDescription("Trash");
@@ -242,6 +250,28 @@ public class ControlButtons {
 
 	}
 	
+	public static void playPauseToggle(long id, ImageButton button) {
+		assert themeHelper != null;
+		PlayerService ps = PodcastBaseFragment.mPlayerServiceBinder;
+		if (ps != null) {
+			if (ps.isPlaying()) {
+				button.setContentDescription("Play");
+				button.setBackgroundResource(themeHelper
+						.getAttr(R.attr.play_icon));
+				ps.pause();
+			} else {
+				button.setBackgroundResource(themeHelper
+						.getAttr(R.attr.pause_icon));
+				button.setContentDescription("Pause");
+				ps.play(id);
+				PodcastBaseFragment.queueNextRefresh();
+				
+				if (fragment != null)
+					fragment.refreshView();
+			}			
+		}
+	}
+	
 	private static void playPause(long id, Holder viewHolder, ThemeHelper themeHelper, ImageButton playPauseButton) {
 		if (viewHolder.seekbar != null)
 			fragment.setProgressBar(viewHolder.seekbar);
@@ -250,6 +280,9 @@ public class ControlButtons {
 
 		if (viewHolder.duration != null)
 			fragment.setDuration(viewHolder.duration);
+		
+		playPauseToggle(id, playPauseButton);
+		/*
 		if (PodcastBaseFragment.mPlayerServiceBinder.isPlaying()) {
 			playPauseButton.setContentDescription("Play");
 			playPauseButton.setImageResource(themeHelper
@@ -263,6 +296,7 @@ public class ControlButtons {
 			PodcastBaseFragment.queueNextRefresh();
 			fragment.refreshView();
 		}
+		*/
 	}
 
 }

@@ -12,7 +12,7 @@
 
         <ImageView
             android:id="@+id/podcast_cover"
-            style="@style/PodcastImage" />
+            style="@style/FeedListImage" />
 
         <LinearLayout
             android:layout_width="fill_parent"
