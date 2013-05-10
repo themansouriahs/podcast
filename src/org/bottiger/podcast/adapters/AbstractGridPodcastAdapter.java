@@ -95,11 +95,11 @@ public abstract class AbstractGridPodcastAdapter extends CursorAdapter implement
 		ImageLoader imageLoader = ImageLoader.getInstance();
 		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
 				context.getApplicationContext())
-				.memoryCacheExtraOptions(480, 800)
+				.memoryCacheExtraOptions(800, 800)
 				// max width, max height
 				.threadPoolSize(5)
 				//.offOutOfMemoryHandling()
-				.memoryCache(new UsingFreqLimitedMemoryCache(10 * 1024 * 1024))
+				.memoryCache(new UsingFreqLimitedMemoryCache(50 * 1024 * 1024))
 				// You can pass your own memory cache implementation
 				.discCache(new UnlimitedDiscCache(cacheDir))
 				// You can pass your own disc cache implementation
