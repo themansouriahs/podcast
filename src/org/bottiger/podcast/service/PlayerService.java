@@ -144,6 +144,9 @@ public class PlayerService extends Service implements
 
 		private Handler mHandler;
 		private boolean mIsInitialized = false;
+		
+		private boolean isPreparingMedia = false;
+		
 		int bufferProgress = 0;
 
 		int startPos = 0;
@@ -160,6 +163,8 @@ public class PlayerService extends Service implements
 				mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 
 				this.startPos = startPos;
+				this.isPreparingMedia = true;
+				
 				mMediaPlayer.setOnPreparedListener(preparedlistener);
 				mMediaPlayer.prepareAsync();
 			} catch (IOException ex) {
@@ -257,11 +262,12 @@ public class PlayerService extends Service implements
 		MediaPlayer.OnCompletionListener listener = new MediaPlayer.OnCompletionListener() {
 			@Override
 			public void onCompletion(MediaPlayer mp) {
-				// FeedItem item = PlayerService.this.mItem;
+				FeedItem item = PlayerService.this.mItem;
 				// item.markAsListened();
 				// item.update(getContentResolver());
-
-				mHandler.sendEmptyMessage(TRACK_ENDED);
+				
+				if (!isPreparingMedia)
+					mHandler.sendEmptyMessage(TRACK_ENDED);
 
 			}
 		};
@@ -279,6 +285,7 @@ public class PlayerService extends Service implements
 				// notifyChange(ASYNC_OPEN_COMPLETE);
 				mp.seekTo(startPos);
 				start();
+				isPreparingMedia = false;
 				PlayerService.setNextTrack(NextTrack.NEXT_IN_PLAYLIST);
 			}
 		};

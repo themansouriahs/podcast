@@ -1,11 +1,11 @@
 package org.bottiger.podcast.adapters;
 
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeSet;
 
 import org.bottiger.podcast.PlayerActivity;
+import org.bottiger.podcast.PlaylistDSLVFragment;
 import org.bottiger.podcast.PodcastBaseFragment;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.DownloadProgressListener;
@@ -43,6 +43,9 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 	public static final int ICON_DEFAULT_ID = -1;
 
 	public final static FieldHandler defaultTextFieldHandler = new FieldHandler.TextFieldHandler();
+
+	private Integer mFrom;
+	private Integer mTo;
 
 	protected int[] mFrom2;
 	protected int[] mTo2;
@@ -118,11 +121,32 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 		}
 	}
 
+	private boolean mFirstMove = true;
+	
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 
 		View listViewItem;
+
+		/*
+		if (mFrom != null && mFirstMove) {
+			boolean atTo = position == mTo;
+			boolean atFrom = position == mFrom;
+			
+			if (atFrom)
+				position = mTo;
+			else if (atTo)
+				position = mFrom;
+			
+			if ((mFrom > mTo && atFrom) || (mTo > mFrom && atTo)) {
+				mFrom = null;
+				mTo = null;
+				mFirstMove = false;
+			}
+		}
+		*/
 		
+
 		Cursor itemCursor = (Cursor) getItem(position);
 		ThemeHelper themeHelper = new ThemeHelper(mContext);
 
@@ -144,7 +168,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 				.getColumnIndex(BaseColumns._ID));
 		FeedItem feedItem = FeedItem.getById(mContext.getContentResolver(),
 				itemID);
-		
+
 		// Update the playlsit to reflect the position of the item
 		Playlist.updatePosition(feedItem, position);
 
@@ -196,10 +220,10 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 			long secondary = 0;
 			if (feedItem.filesize != 0) {
 				secondary = feedItem.isDownloaded() ? feedItem
-					.getCurrentFileSize()
-					: (feedItem.chunkFilesize / feedItem.filesize);
+						.getCurrentFileSize()
+						: (feedItem.chunkFilesize / feedItem.filesize);
 			}
-			
+
 			PlayerActivity.setProgressBar(sb, playerDuration, playerPosition,
 					secondary);
 
@@ -286,7 +310,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 			if (item != null) {
 				DownloadProgressListener.registerTextView(context, fileSize,
 						item);
-				
+
 				icon.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
@@ -294,24 +318,25 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 								.getId());// .play();
 					}
 				});
-				
 
 				int filesize = 0;
 
 				DownloadManager downloadManager = (DownloadManager) mContext
 						.getSystemService(Context.DOWNLOAD_SERVICE);
 				fileSize.setText(item.getStatus(downloadManager));
-				
-				//item.setPriority(null, mContext);
-				
+
+				// item.setPriority(null, mContext);
+
 				if (item.title != null) {
 					String title = item.title;
 					int priority = item.getPriority();
 					if (priority > 0) {
 						title = priority + " # " + title;
-						view.setBackgroundColor(mContext.getResources().getColor(R.color.playlist_background));
+						view.setBackgroundColor(mContext.getResources()
+								.getColor(R.color.playlist_background));
 					} else {
-						view.setBackgroundColor(mContext.getResources().getColor(R.color.default_background));
+						view.setBackgroundColor(mContext.getResources()
+								.getColor(R.color.default_background));
 					}
 					mainTitle.setText(title);
 				}
@@ -406,5 +431,30 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 		} else
 			return new Long(1); // FIXME
 	}
+
+	/*
+	public void drop(int from, int to) {
+		if (from != to) {
+			mFrom = new Integer(from);
+			mTo = new Integer(to);
+			// Playlist.setFrom(from);
+			// Playlist.setTo(to);
+			ItemCursorAdapter adapter = ((ItemCursorAdapter) this);
+
+			FeedItem precedingItem = null;
+			if (to > 0) {
+				Cursor precedingItemCursor = (Cursor) adapter.getItem(to - 1);
+				precedingItem = FeedItem.getByCursor(precedingItemCursor);
+			}
+
+			Cursor item = (Cursor) adapter.getItem(from);
+			FeedItem feedItem = FeedItem.getByCursor(item);
+
+			feedItem.setPriority(precedingItem, mContext);
+			FeedItem.clearCache(); // this should nit be there - I think
+			notifyDataSetChanged();
+		}
+	}
+	*/
 
 }
