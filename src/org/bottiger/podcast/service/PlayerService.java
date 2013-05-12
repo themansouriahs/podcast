@@ -1,6 +1,5 @@
 package org.bottiger.podcast.service;
 
-
 import java.io.IOException;
 
 import org.bottiger.podcast.SettingsActivity;
@@ -39,6 +38,12 @@ import android.telephony.TelephonyManager;
 public class PlayerService extends Service implements
 		AudioManager.OnAudioFocusChangeListener {
 
+	private static enum NextTrack {
+		NONE, NEW_TRACK, NEXT_IN_PLAYLIST
+	}
+
+	private static NextTrack nextTrack = NextTrack.NEXT_IN_PLAYLIST;
+
 	private static final int FADEIN = 0;
 	private static final int TRACK_ENDED = 1;
 	private static final int SERVER_DIED = 2;
@@ -61,7 +66,7 @@ public class PlayerService extends Service implements
 	MyPlayer mPlayer = null;
 	private NotificationManager mNotificationManager;
 	private NotificationPlayer mNotificationPlayer;
-	
+
 	private FeedItem mItem = null;
 	private boolean mUpdate = false;
 	private boolean mResumeAfterCall = false;
@@ -85,8 +90,9 @@ public class PlayerService extends Service implements
 			} else if (state == TelephonyManager.CALL_STATE_IDLE) {
 				if (mResumeAfterCall) {
 
-					// never fade in before I have stopped it from doing so when it shouldn't
-					//startAndFadeIn();
+					// never fade in before I have stopped it from doing so when
+					// it shouldn't
+					// startAndFadeIn();
 					mResumeAfterCall = false;
 				}
 			}
@@ -109,7 +115,7 @@ public class PlayerService extends Service implements
 		mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 		TelephonyManager tmgr = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
 		tmgr.listen(mPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
-		
+
 		this.mControllerComponentName = new ComponentName(this,
 				HeadsetReceiver.class);
 		log.debug("onCreate(): " + mControllerComponentName);
@@ -175,7 +181,7 @@ public class PlayerService extends Service implements
 		public boolean isInitialized() {
 			return mIsInitialized;
 		}
-		
+
 		public void toggle() {
 			if (mMediaPlayer.isPlaying())
 				pause();
@@ -197,8 +203,10 @@ public class PlayerService extends Service implements
 				mAudioManager
 						.registerMediaButtonEventReceiver(mControllerComponentName);
 				mMediaPlayer.start();
-				startForeground(mNotificationPlayer.getNotificationId(), notification);
-				PlayerStatusListener.updateStatus(PlayerStatusListener.STATUS.PLAYING);
+				startForeground(mNotificationPlayer.getNotificationId(),
+						notification);
+				PlayerStatusListener
+						.updateStatus(PlayerStatusListener.STATUS.PLAYING);
 			}
 		}
 
@@ -206,7 +214,8 @@ public class PlayerService extends Service implements
 			mMediaPlayer.reset();
 			mIsInitialized = false;
 			stopForeground(true);
-			PlayerStatusListener.updateStatus(PlayerStatusListener.STATUS.STOPPED);
+			PlayerStatusListener
+					.updateStatus(PlayerStatusListener.STATUS.STOPPED);
 		}
 
 		public void release() {
@@ -232,7 +241,8 @@ public class PlayerService extends Service implements
 		 */
 		public void pause() {
 			mMediaPlayer.pause();
-			PlayerStatusListener.updateStatus(PlayerStatusListener.STATUS.PAUSED);
+			PlayerStatusListener
+					.updateStatus(PlayerStatusListener.STATUS.PAUSED);
 		}
 
 		@Deprecated
@@ -247,10 +257,10 @@ public class PlayerService extends Service implements
 		MediaPlayer.OnCompletionListener listener = new MediaPlayer.OnCompletionListener() {
 			@Override
 			public void onCompletion(MediaPlayer mp) {
-				//FeedItem item = PlayerService.this.mItem;
-				//item.markAsListened();
-				//item.update(getContentResolver());
-				
+				// FeedItem item = PlayerService.this.mItem;
+				// item.markAsListened();
+				// item.update(getContentResolver());
+
 				mHandler.sendEmptyMessage(TRACK_ENDED);
 
 			}
@@ -269,6 +279,7 @@ public class PlayerService extends Service implements
 				// notifyChange(ASYNC_OPEN_COMPLETE);
 				mp.seekTo(startPos);
 				start();
+				PlayerService.setNextTrack(NextTrack.NEXT_IN_PLAYLIST);
 			}
 		};
 
@@ -339,26 +350,28 @@ public class PlayerService extends Service implements
 				long repeat_mode = getPref();
 
 				if (mItem != null) {
-					
-					long nextItemId = getNextId();
-					
-					if (nextItemId == -1) {
-						dis_notifyStatus();
-						mPlayer.stop();
-					} else {
-						playNext(nextItemId);
-					}
-					mUpdate = true;
 
-					
+					if (getNextTrack() == NextTrack.NEXT_IN_PLAYLIST) {
+						long nextItemId = getNextId();
+
+						if (nextItemId == -1) {
+							dis_notifyStatus();
+							mPlayer.stop();
+						} else {
+							playNext(nextItemId);
+						}
+						mUpdate = true;
+					}
+
 					// deprecated - I think
+					/*
 					if (repeat_mode == REPEAT_MODE_REPEAT_ONE) {
 						long id = mItem.id;
 						mItem = null;
 						play(id);
 					} else if (repeat_mode == REPEAT_MODE_REPEAT) {
 						if (nextItemId == -1) {
-							//nextItemId = getFirst();
+							// nextItemId = getFirst();
 						}
 
 						if (nextItemId > -1)
@@ -369,6 +382,7 @@ public class PlayerService extends Service implements
 							play(nextItemId);
 
 					}
+					*/
 
 				}
 
@@ -428,18 +442,22 @@ public class PlayerService extends Service implements
 
 		return mNotificationPlayer.show();
 	}
-	
+
 	public void playNext(long nextId) {
-		//assert playlistAdapter != null;
-		
-		//Cursor firstItem = (Cursor) playlistAdapter.getItem(0);
-		//playlistAdapter.notifyDataSetChanged();
+		// assert playlistAdapter != null;
+
+		// Cursor firstItem = (Cursor) playlistAdapter.getItem(0);
+		// playlistAdapter.notifyDataSetChanged();
 		if (mItem != null)
 			mItem.trackEnded(getContentResolver());
 		play(nextId);
 	}
 
 	public void play(long id) {
+
+		// Pause the current episode in order to save the current state
+		if (mPlayer.isPlaying())
+			mPlayer.pause();
 
 		if (mItem != null) {
 			if ((mItem.id == id) && mPlayer.isInitialized()) {
@@ -462,14 +480,14 @@ public class PlayerService extends Service implements
 
 		mItem.setPriority(null, getApplication());
 		mItem.update(getContentResolver());
-		
+
 		String dataSource = mItem.isDownloaded() ? mItem.getAbsolutePath()
 				: mItem.getURL();
 
 		int offset = mItem.offset < 0 ? 0 : mItem.offset;
 		mPlayer.setDataSourceAsync(dataSource, offset);
 	}
-	
+
 	public void toggle(long id) {
 		if (mPlayer.isPlaying() == false && mItem != null) {
 			play(id);
@@ -477,7 +495,7 @@ public class PlayerService extends Service implements
 			mPlayer.pause();
 		}
 	}
-	
+
 	@Deprecated
 	public void toggle() {
 		if (mPlayer.isPlaying() == false && mItem != null) {
@@ -525,7 +543,7 @@ public class PlayerService extends Service implements
 	public boolean isPlaying() {
 		return mPlayer.isPlaying();
 	}
-	
+
 	/**
 	 * Test of the player is on pause right now
 	 * 
@@ -534,7 +552,7 @@ public class PlayerService extends Service implements
 	public boolean isOnPause() {
 		if (isPlaying() || getCurrentItem() == null)
 			return false;
-		
+
 		return true;
 	}
 
@@ -562,7 +580,7 @@ public class PlayerService extends Service implements
 		stop();
 		mItem = item;
 	}
-	
+
 	public FeedItem getCurrentItem() {
 		return mItem;
 	}
@@ -599,7 +617,25 @@ public class PlayerService extends Service implements
 	}
 
 	public long getNextId() {
-		return (long)Playlist.nextId();
+		return (long) Playlist.nextId();
+	}
+
+	/**
+	 * Returns whether the next episode to be played should come from the
+	 * playlist, or somewhere else
+	 * 
+	 * @return The type of episode to be played next
+	 */
+	public static NextTrack getNextTrack() {
+		return nextTrack;
+	}
+
+	/**
+	 * 
+	 * @param nextTrack
+	 */
+	public static void setNextTrack(NextTrack nextTrack) {
+		PlayerService.nextTrack = nextTrack;
 	}
 
 	public FeedItem getPrev(FeedItem item) {

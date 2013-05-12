@@ -208,7 +208,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 			if (feedItem.isDownloaded()) {
 				ImageButton downloadButton = (ImageButton) playerView
 						.findViewById(R.id.download);
-				downloadButton.setImageResource(themeHelper
+				downloadButton.setBackgroundResource(themeHelper
 						.getAttr(R.attr.delete_icon));
 			}
 
@@ -223,7 +223,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 						PodcastBaseFragment.setCurrentTime(currentTime);
 						ImageButton playPauseButton = (ImageButton) listViewItem
 								.findViewById(R.id.play_toggle);
-						playPauseButton.setImageResource(themeHelper
+						playPauseButton.setBackgroundResource(themeHelper
 								.getAttr(R.attr.pause_icon));
 					}
 				}
