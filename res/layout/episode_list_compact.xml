@@ -15,13 +15,15 @@
 
         <TextView
             android:id="@+id/title"
+            style="@style/CompactListItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
             android:layout_alignTop="@+id/thumbnail"
+            android:layout_centerVertical="true"
+            android:singleLine="true"
+            android:layout_toLeftOf="@+id/play_episode"
             android:layout_toRightOf="@+id/thumbnail"
-            android:text="Podcast Title" 
-            style="@style/CompactListItem" />
+            android:text="Podcast Title" />
 
         <ImageButton
             android:id="@+id/play_episode"

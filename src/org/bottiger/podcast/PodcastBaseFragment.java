@@ -51,7 +51,7 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 	public static final int COLUMN_INDEX_TITLE = 1;
 
 	protected View fragmentView;
-	
+
 	protected SharedPreferences sharedPreferences;
 
 	// protected static PodcastService mServiceBinder = null;
@@ -87,7 +87,7 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 	private static TextView mDuration = null;
 
 	protected abstract int getItemLayout();
-	
+
 	public TextView getCurrentTime() {
 		return mCurrentTime;
 	}
@@ -184,9 +184,9 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 			return super.onContextItemSelected(item);
 		}
 	}
-	
+
 	Subscription getSubscription(Object o) {
-		Cursor item = (Cursor)o;
+		Cursor item = (Cursor) o;
 		Long id = item.getLong(item.getColumnIndex(BaseColumns._ID));
 		new Subscription();
 		return Subscription.getById(getActivity().getContentResolver(), id);
@@ -200,13 +200,13 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		mService = getActivity().startService(
 				new Intent(getActivity(), PlayerService.class));
 		Intent bindIntent = new Intent(getActivity(), PlayerService.class);
 		getActivity().bindService(bindIntent, playerServiceConnection,
 				Context.BIND_AUTO_CREATE);
-		
+
 		sharedPreferences = PreferenceManager
 				.getDefaultSharedPreferences(getActivity());
 	}
@@ -229,8 +229,8 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 	}
 
 	/*
-	abstract public void startInit();
-	*/
+	 * abstract public void startInit();
+	 */
 
 	public static final Handler mHandler = new Handler() {
 		@Override
@@ -253,12 +253,11 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 		// downloading
 		mHandler.sendMessageDelayed(msg, delay);
 	}
-	
+
 	@Override
-	public void onResume()
-	{
-	    super.onResume();
-	    queueNextRefresh();
+	public void onResume() {
+		super.onResume();
+		queueNextRefresh();
 	}
 
 	protected static long refreshUI() {
@@ -354,9 +353,10 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 			mCurrentTime.setText(timeCounter);
 			if (mDuration != null)
 				mDuration.setText(durationString);
-			
+
 			if (mProgressBar != null)
-				PlayerActivity.setProgressBar(mProgressBar, mPlayerServiceBinder);
+				PlayerActivity.setProgressBar(mProgressBar,
+						mPlayerServiceBinder);
 		}
 	}
 
@@ -380,18 +380,20 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 		mBundle.putStringArray("projection", projection);
 		mBundle.putString("order", order);
 		mBundle.putString("condition", condition);
-		
+
 		// FIXME
 		getLoaderManager().restartLoader(id, mBundle, loaderCallback);
-		//getLoaderManager().initLoader(id, mBundle, loaderCallback);
+		// getLoaderManager().initLoader(id, mBundle, loaderCallback);
 	}
-	
+
 	public void refreshView() {
 		FeedItem.clearCache();
-		startInit(10, ItemColumns.URI, ItemColumns.ALL_COLUMNS, getWhere(), getOrder());
+		startInit(10, ItemColumns.URI, ItemColumns.ALL_COLUMNS, getWhere(),
+				getOrder());
 	}
-	
+
 	abstract String getWhere();
+
 	abstract String getOrder();
 
 	public abstract CursorAdapter getAdapter(Cursor cursor);
@@ -412,24 +414,31 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 
 		@Override
 		public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-			
+
 			// https://github.com/bauerca/drag-sort-listview/issues/20
-			final ReorderCursor wrapped_cursor = new ReorderCursor(cursor, PodcastBaseFragment.this);
-			
+			final ReorderCursor wrapped_cursor = new ReorderCursor(cursor,
+					PodcastBaseFragment.this);
+
 			mAdapter = getAdapter(wrapped_cursor);
 			mAdapter.changeCursor(wrapped_cursor);
-			
-            //((CursorAdapter) getListView().getAdapter()).swapCursor(wrapped_cursor);
+
+			// ((CursorAdapter)
+			// getListView().getAdapter()).swapCursor(wrapped_cursor);
 			View fragmentView = getView();
-			DragSortListView mDslv = (DragSortListView) fragmentView.findViewById(android.R.id.list);
-			//if (fragmentView instanceof ListView) {//DragSortListView) { // DragSortListView
-			if (mDslv != null) {
-				mDslv.setDropListener(wrapped_cursor);
+
+			View currentView = fragmentView.findViewById(android.R.id.list);
+			if (currentView instanceof DragSortListView) {
+				DragSortListView mDslv = (DragSortListView) currentView;
+				// if (fragmentView instanceof ListView) {//DragSortListView) {
+				// // DragSortListView
+				if (mDslv != null) {
+					mDslv.setDropListener(wrapped_cursor);
+				}
 			}
-			
+
 			// The list should now be shown.
 			if (isResumed()) {
-				//setListShown(true); //FIXME
+				// setListShown(true); //FIXME
 			} else {
 				setListShownNoAnimation(true);
 			}
@@ -441,9 +450,9 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 			// above is about to be closed. We need to make sure we are no
 			// longer using it.
 			mAdapter.swapCursor(null);
-			
+
 			// https://github.com/bauerca/drag-sort-listview/issues/20
-			//((CursorAdapter) getListView().getAdapter()).swap(null);
+			// ((CursorAdapter) getListView().getAdapter()).swap(null);
 
 		}
 	};
