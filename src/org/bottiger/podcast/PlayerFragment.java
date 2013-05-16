@@ -709,7 +709,7 @@ public class PlayerFragment   extends PodcastBaseFragment
 	}
 
 	@Override
-	SimpleDragSortCursorAdapter getAdapter(Cursor cursor) {
+	public SimpleDragSortCursorAdapter getAdapter(Cursor cursor) {
 		// TODO Auto-generated method stub
 		return null;
 	}

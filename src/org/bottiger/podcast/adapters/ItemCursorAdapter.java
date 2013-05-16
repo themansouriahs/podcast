@@ -10,6 +10,7 @@ import org.bottiger.podcast.PodcastBaseFragment;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.DownloadProgressListener;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.DownloadStatus;
 import org.bottiger.podcast.utils.ControlButtons;
@@ -148,12 +149,26 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 		
 
 		Cursor itemCursor = (Cursor) getItem(position);
+		Cursor itemCursor2 = (Cursor) getItem(position+1);
+		Cursor itemCursor3 = (Cursor) getItem(position+1);
+		
+		//ReorderCursor rCursor = new ReorderCursor(itemCursor);
+		String itemTitle2 = itemCursor2.getString(itemCursor2
+				.getColumnIndex(ItemColumns.TITLE));
+		
 		ThemeHelper themeHelper = new ThemeHelper(mContext);
 
 		if (!itemCursor.moveToPosition(position)) {
 			throw new IllegalStateException("couldn't move cursor to position "
 					+ position);
 		}
+		
+		String itemTitle = itemCursor.getString(itemCursor
+				.getColumnIndex(ItemColumns.TITLE));
+		
+		long itemID = itemCursor.getLong(itemCursor
+				.getColumnIndex(ItemColumns._ID));
+		
 
 		if (convertView == null) {
 			listViewItem = newView(mContext, itemCursor, parent);
@@ -164,10 +179,11 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 		bindView(listViewItem, mContext, itemCursor);
 
 		// Get the current FeedItem
-		Long itemID = itemCursor.getLong(itemCursor
-				.getColumnIndex(BaseColumns._ID));
-		FeedItem feedItem = FeedItem.getById(mContext.getContentResolver(),
-				itemID);
+		//Long itemID = itemCursor.getLong(itemCursor
+		//		.getColumnIndex(BaseColumns._ID));
+		//FeedItem feedItem = FeedItem.getById(mContext.getContentResolver(),
+		//		itemID);
+		FeedItem feedItem = FeedItem.getByCursor(itemCursor);
 
 		// Update the playlsit to reflect the position of the item
 		Playlist.updatePosition(feedItem, position);
@@ -179,7 +195,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 							.getCurrentItem());
 		}
 
-		if (mExpandedItemID.contains(itemID) || isCurrentPlayingItem) {
+		if (mExpandedItemID.contains(feedItem.getId()) || isCurrentPlayingItem) {
 			ViewStub stub = (ViewStub) listViewItem.findViewById(R.id.stub);
 			if (stub != null) {
 				stub.inflate();
@@ -227,7 +243,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 			PlayerActivity.setProgressBar(sb, playerDuration, playerPosition,
 					secondary);
 
-			ControlButtons.setPlayerListeners(listViewItem, playerView, itemID);
+			ControlButtons.setPlayerListeners(listViewItem, playerView, feedItem.getId());
 
 			if (feedItem.isDownloaded()) {
 				ImageButton downloadButton = (ImageButton) playerView
@@ -241,7 +257,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 			}
 
 			if (PodcastBaseFragment.mPlayerServiceBinder.isInitialized()) {
-				if (itemID == PodcastBaseFragment.mPlayerServiceBinder
+				if (feedItem.getId() == PodcastBaseFragment.mPlayerServiceBinder
 						.getCurrentItem().id) {
 					if (PodcastBaseFragment.mPlayerServiceBinder.isPlaying()) {
 						PodcastBaseFragment.setCurrentTime(currentTime);

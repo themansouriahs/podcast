@@ -3,6 +3,7 @@ package org.bottiger.podcast;
 import java.util.ArrayList;
 
 import org.bottiger.podcast.adapters.ItemCursorAdapter;
+import org.bottiger.podcast.adapters.ReorderCursor;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.utils.Playlist;
 
@@ -22,6 +23,8 @@ public abstract class PlaylistDSLVFragment extends AbstractEpisodeFragment {
 
     private String[] array;
     private ArrayList<String> list;
+    
+    //private DragSortListView.DropListener onDrop2 = new ReorderCursor(mCursor, PlaylistDSLVFragment.this); 
 
     private DragSortListView.DropListener onDrop =
             new DragSortListView.DropListener() {
@@ -178,6 +181,13 @@ public abstract class PlaylistDSLVFragment extends AbstractEpisodeFragment {
 
         return mDslv;
     }
+    
+    @Override
+    public void onResume() {
+    	super.onResume();
+    	//mDslv.setDropListener(onDrop2);
+    	//mDslv.setDropListener((DragSortListView.DropListener)mCursor);
+    }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -185,7 +195,7 @@ public abstract class PlaylistDSLVFragment extends AbstractEpisodeFragment {
 
         //mDslv = (DragSortListView) getListView(); 
 
-        mDslv.setDropListener(onDrop);
+        //mDslv.setDropListener(onDrop);
         //mDslv.setRemoveListener(onRemove);
 
         Bundle args = getArguments();
@@ -203,7 +213,7 @@ public abstract class PlaylistDSLVFragment extends AbstractEpisodeFragment {
             addFooter(getActivity(), mDslv);
         }
 
-        //setListAdapter();
+        //setListAdapter(mAdapter);
     }
 
 

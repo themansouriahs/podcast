@@ -1,5 +1,7 @@
 package org.bottiger.podcast;
 
+import org.bottiger.podcast.adapters.ItemCursorAdapter;
+import org.bottiger.podcast.adapters.ReorderCursor;
 import org.bottiger.podcast.listeners.PlayerStatusListener;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
@@ -392,7 +394,7 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 	abstract String getWhere();
 	abstract String getOrder();
 
-	abstract CursorAdapter getAdapter(Cursor cursor);
+	public abstract CursorAdapter getAdapter(Cursor cursor);
 
 	private LoaderManager.LoaderCallbacks<Cursor> loaderCallback = new LoaderCallbacks<Cursor>() {
 		@Override
@@ -412,15 +414,17 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 		public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
 			
 			// https://github.com/bauerca/drag-sort-listview/issues/20
-			final ReorderCursor wrapped_cursor = new ReorderCursor(cursor);
+			final ReorderCursor wrapped_cursor = new ReorderCursor(cursor, PodcastBaseFragment.this);
 			
 			mAdapter = getAdapter(wrapped_cursor);
 			mAdapter.changeCursor(wrapped_cursor);
 			
             //((CursorAdapter) getListView().getAdapter()).swapCursor(wrapped_cursor);
-			View currentListView = getView();
-			if (currentListView instanceof DragSortListView) {
-				((DragSortListView) currentListView).setDropListener(wrapped_cursor);
+			View fragmentView = getView();
+			DragSortListView mDslv = (DragSortListView) fragmentView.findViewById(android.R.id.list);
+			//if (fragmentView instanceof ListView) {//DragSortListView) { // DragSortListView
+			if (mDslv != null) {
+				mDslv.setDropListener(wrapped_cursor);
 			}
 			
 			// The list should now be shown.
@@ -443,62 +447,4 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 
 		}
 	};
-	
-	class ReorderCursor extends CursorWrapper implements DragSortListView.DropListener {
-
-	    ReorderCursor(Cursor cursor) {
-	        super(cursor);
-	        _remapping = new SparseIntArray();
-	    }
-
-	    @Override
-	     public void drop(final int from, final int to) {	
-	    	
-	        // Update remapping
-	        final int remapped_from = getRemappedPosition(from);
-	        if (from > to)
-	            for (int position = from; position > to; position--)
-	                _remapping.put(position, getRemappedPosition(position - 1));
-	        else // shift up
-	            for (int position = from; position < to; position++)
-	                _remapping.put(position, getRemappedPosition(position + 1)); 
-	        _remapping.put(to, remapped_from);
-	         
-	         
-			new Thread(new Runnable() {
-				public void run() {
-						        
-	        		if (from != to) {
-						FeedItem precedingItem = null;
-						if (to > 0) {
-							Cursor precedingItemCursor = (Cursor) mAdapter
-									.getItem(to - 1);
-							precedingItem = FeedItem
-									.getByCursor(precedingItemCursor);
-						}
-
-						Cursor item = (Cursor) mAdapter.getItem(to);
-						FeedItem feedItem = FeedItem.getByCursor(item);
-
-						Context c = PodcastBaseFragment.this.getActivity();
-						feedItem.setPriority(precedingItem, c);
-					}		
-				}
-			}).start();
-					
-			mAdapter.notifyDataSetChanged();
-			
-	     }
-
-	    @Override
-	    public boolean moveToPosition(int position) {
-	    	return super.moveToPosition(getRemappedPosition(position));
-	    }
-
-	    private int getRemappedPosition(int position) {
-	        return _remapping.get(position, position);
-	    }
-
-	    private final SparseIntArray _remapping;
-	}
 }
