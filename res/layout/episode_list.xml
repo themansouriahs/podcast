@@ -98,26 +98,26 @@
         </RelativeLayout>
 
         <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:paddingBottom="16dp"
-            android:paddingTop="16dp" >
+            android:id="@id/drag_handle"
+            android:layout_width="25dp"
+            android:layout_height="match_parent" 
+            android:paddingTop="30dp"
+            android:paddingBottom="30dp">
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="7dp"
                 android:layout_height="fill_parent"
-                android:layout_weight="1"
                 android:background="@drawable/drag_handle"
                 android:orientation="vertical"
                 android:tileMode="repeat" >
-
+				<!--
                 <ImageView
                     android:id="@id/drag_handle"
-                    android:layout_width="40dp"
+                    android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
                     android:layout_alignParentRight="true"
                     android:background="@drawable/drag_handle" />
+                    -->
             </LinearLayout>
 
         </FrameLayout>
