@@ -30,7 +30,7 @@
         android:paddingBottom="15dp"
         android:layout_gravity="bottom"
         android:textColor="@android:color/white"
-        android:background="#55000000"
+        android:background="#AA000000"
         />
 </FrameLayout>
 <!-- 
