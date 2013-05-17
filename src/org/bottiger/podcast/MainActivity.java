@@ -219,6 +219,7 @@ public class MainActivity extends FragmentActivity implements
 	public void onItemSelected(long id) {
 		SubscriptionFeedID = id;
 		mSectionsPagerAdapter.notifyDataSetChanged();
+		mViewPager.setCurrentItem(2);
 	}
 
 	@Override
@@ -338,6 +339,8 @@ public class MainActivity extends FragmentActivity implements
 				fragment = getSubscriptionFragmentContent();
 			} else if (i == 0) {
 				fragment = new RecentItemFragment();
+			} else if (i == 2) {
+				fragment = getFeedFragmentContent();
 			} else {
 				fragment = new DSLVFragmentBGHandle();
 				//fragment = new DummySectionFragment();
@@ -351,7 +354,7 @@ public class MainActivity extends FragmentActivity implements
 
 		@Override
 		public int getCount() {
-			return 2;
+			return (SubscriptionFeedID == 0) ? 2 : 3;
 		}
 
 		@Override
@@ -405,12 +408,12 @@ public class MainActivity extends FragmentActivity implements
 	}
 
 	private Fragment getSubscriptionFragmentContent() {
-		if (SubscriptionFeedID == 0) {
-			log.debug("inside: getSubscriptionFragmentContent()");
-			return new SubscriptionsFragment();
-		} else {
-			Subscription sub = Subscription.getById(getContentResolver(), SubscriptionFeedID);
-			return FeedFragment.newInstance(sub);
-		}
+		log.debug("inside: getSubscriptionFragmentContent()");
+		return new SubscriptionsFragment();
+	}
+	
+	private Fragment getFeedFragmentContent() {
+		Subscription sub = Subscription.getById(getContentResolver(), SubscriptionFeedID);
+		return FeedFragment.newInstance(sub);
 	}
 }
