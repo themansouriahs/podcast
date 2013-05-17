@@ -129,46 +129,14 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 
 		View listViewItem;
 
-		/*
-		if (mFrom != null && mFirstMove) {
-			boolean atTo = position == mTo;
-			boolean atFrom = position == mFrom;
-			
-			if (atFrom)
-				position = mTo;
-			else if (atTo)
-				position = mFrom;
-			
-			if ((mFrom > mTo && atFrom) || (mTo > mFrom && atTo)) {
-				mFrom = null;
-				mTo = null;
-				mFirstMove = false;
-			}
-		}
-		*/
-		
-
 		Cursor itemCursor = (Cursor) getItem(position);
-		Cursor itemCursor2 = (Cursor) getItem(position+1);
-		Cursor itemCursor3 = (Cursor) getItem(position+1);
-		
-		//ReorderCursor rCursor = new ReorderCursor(itemCursor);
-		String itemTitle2 = itemCursor2.getString(itemCursor2
-				.getColumnIndex(ItemColumns.TITLE));
 		
 		ThemeHelper themeHelper = new ThemeHelper(mContext);
 
 		if (!itemCursor.moveToPosition(position)) {
 			throw new IllegalStateException("couldn't move cursor to position "
 					+ position);
-		}
-		
-		String itemTitle = itemCursor.getString(itemCursor
-				.getColumnIndex(ItemColumns.TITLE));
-		
-		long itemID = itemCursor.getLong(itemCursor
-				.getColumnIndex(ItemColumns._ID));
-		
+		}		
 
 		if (convertView == null) {
 			listViewItem = newView(mContext, itemCursor, parent);
