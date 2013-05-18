@@ -8,8 +8,10 @@ import org.bottiger.podcast.autoupdateapk.AutoUpdateApk;
 import org.bottiger.podcast.cloud.CloudProvider;
 import org.bottiger.podcast.cloud.GoogleReader;
 import org.bottiger.podcast.debug.SqliteCopy;
+import org.bottiger.podcast.listeners.PlayerStatusListener;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
+import org.bottiger.podcast.service.HTTPDService;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.service.PodcastDownloadManager;
 import org.bottiger.podcast.service.PodcastService;
@@ -25,13 +27,14 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Debug;
-import android.preference.PreferenceManager;
+import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -47,19 +50,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.TextView;
 
 import com.bugsense.trace.BugSenseHandler;
-import com.slidingmenu.lib.SlidingMenu;
-import com.slidingmenu.lib.app.SlidingActivityBase;
-import com.slidingmenu.lib.app.SlidingFragmentActivity;
 
 // Sliding
 public class MainActivity extends FragmentActivity implements
 		OnItemSelectedListener {
 
 	public static PodcastService mPodcastServiceBinder = null;
+	public static HTTPDService mHTTPDServiceBinder = null;
+	
 	static boolean mBound = false;
 
 	// public static GoogleReader gReader = null;
@@ -101,11 +102,28 @@ public class MainActivity extends FragmentActivity implements
 	private SharedPreferences prefs;
 	
 	private AutoUpdateApk aua;  
+	
+	public static ServiceConnection mHTTPDServiceConnection = new ServiceConnection() {
+		@Override
+		public void onServiceConnected(ComponentName className, IBinder service) {
+			mHTTPDServiceBinder = ((HTTPDService.HTTPDBinder) service)
+					.getService();
+			String out = mHTTPDServiceBinder.getTest();
+			android.util.Log.d("nanoHTTPD", out);
+		}
 
+		@Override
+		public void onServiceDisconnected(ComponentName className) {
+			mHTTPDServiceBinder = null;
+		}
+	};
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		android.util.Log.d("nanoHTTPD", "first");
+		
 		BugSenseHandler.initAndStartSession(MainActivity.this,
 				((SoundWaves) this.getApplication()).getBugSenseAPIKey());
 
@@ -128,8 +146,13 @@ public class MainActivity extends FragmentActivity implements
 		
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-		// startService(new Intent(this, PodcastService.class));
+		// Start Application services
 		startService(new Intent(this, PlayerService.class));
+		startService(new Intent(this, HTTPDService.class));
+		
+		Intent bindIntent = new Intent(this, HTTPDService.class);
+		bindService(bindIntent, mHTTPDServiceConnection,
+				Context.BIND_AUTO_CREATE);
 
 		setContentView(R.layout.activity_swipe);
 
@@ -416,4 +439,5 @@ public class MainActivity extends FragmentActivity implements
 		Subscription sub = Subscription.getById(getContentResolver(), SubscriptionFeedID);
 		return FeedFragment.newInstance(sub);
 	}
+
 }
