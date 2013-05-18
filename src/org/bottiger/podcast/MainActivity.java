@@ -1,7 +1,13 @@
 package org.bottiger.podcast;
 
-
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import org.bottiger.podcast.PodcastBaseFragment.OnItemSelectedListener;
 import org.bottiger.podcast.autoupdateapk.AutoUpdateApk;
@@ -60,7 +66,7 @@ public class MainActivity extends FragmentActivity implements
 
 	public static PodcastService mPodcastServiceBinder = null;
 	public static HTTPDService mHTTPDServiceBinder = null;
-	
+
 	static boolean mBound = false;
 
 	// public static GoogleReader gReader = null;
@@ -70,7 +76,7 @@ public class MainActivity extends FragmentActivity implements
 	protected boolean mInit = false;
 	protected final Log log = Log.getDebugLog(getClass(), 0);
 	protected static ComponentName mService = null;
-	
+
 	public static Account mAccount;
 
 	private boolean debugging = false;
@@ -100,16 +106,65 @@ public class MainActivity extends FragmentActivity implements
 	private ComponentName mRemoteControlResponder;
 
 	private SharedPreferences prefs;
-	
-	private AutoUpdateApk aua;  
-	
+
+	private AutoUpdateApk aua;
+
 	public static ServiceConnection mHTTPDServiceConnection = new ServiceConnection() {
 		@Override
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			mHTTPDServiceBinder = ((HTTPDService.HTTPDBinder) service)
 					.getService();
-			String out = mHTTPDServiceBinder.getTest();
-			android.util.Log.d("nanoHTTPD", out);
+			// String out = mHTTPDServiceBinder.getTest();
+			// android.util.Log.d("nanoHTTPD", out);
+
+			new Thread(new Runnable() {
+				public void run() {
+					URL url = null;
+					HttpURLConnection connection = null;
+					try {
+						url = new URL("http://127.0.0.1:8080/test");
+						connection = (HttpURLConnection) url.openConnection();
+					} catch (MalformedURLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+					InputStream in = null;
+					try {
+						// Read the response.
+						in = connection.getInputStream();
+						// byte[] response = readFully(in);
+						// return new String(response, "UTF-8");
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					InputStream bin = new BufferedInputStream(in);
+
+					BufferedReader r = new BufferedReader(
+							new InputStreamReader(bin));
+
+					StringBuilder total = new StringBuilder();
+					String line;
+					try {
+						while ((line = r.readLine()) != null) {
+							total.append(line);
+						}
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+					String res = total.toString();
+					res = res + "sdfd";
+					res = res + "123";
+
+				}
+			}).start();
+
 		}
 
 		@Override
@@ -117,39 +172,38 @@ public class MainActivity extends FragmentActivity implements
 			mHTTPDServiceBinder = null;
 		}
 	};
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		android.util.Log.d("nanoHTTPD", "first");
-		
+
 		BugSenseHandler.initAndStartSession(MainActivity.this,
 				((SoundWaves) this.getApplication()).getBugSenseAPIKey());
 
-		
 		if (debugging) {
 			// Tracing is buggy on emulator
 			Debug.startMethodTracing("calc");
 
 			if (false) {
-			try {
-				SqliteCopy.backupDatabase();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+				try {
+					SqliteCopy.backupDatabase();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
-		
-		aua = new AutoUpdateApk(getApplicationContext());  
-		
+
+		aua = new AutoUpdateApk(getApplicationContext());
+
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
 		// Start Application services
 		startService(new Intent(this, PlayerService.class));
 		startService(new Intent(this, HTTPDService.class));
-		
+
 		Intent bindIntent = new Intent(this, HTTPDService.class);
 		bindService(bindIntent, mHTTPDServiceConnection,
 				Context.BIND_AUTO_CREATE);
@@ -164,9 +218,9 @@ public class MainActivity extends FragmentActivity implements
 				Intent.ACTION_HEADSET_PLUG);
 		HeadsetReceiver receiver = new HeadsetReceiver();
 		registerReceiver(receiver, receiverFilter);
-		
+
 		ControlButtons.setThemeHelper(getApplicationContext());
-		
+
 		mFragmentManager = getSupportFragmentManager(); // getSupportFragmentManager();
 
 		if (debugging)
@@ -179,22 +233,20 @@ public class MainActivity extends FragmentActivity implements
 		pager.setAdapter(mSectionsPagerAdapter);
 
 		/*
-		TabPageIndicator indicator = (TabPageIndicator) findViewById(R.id.info);
-		indicator.setViewPager(pager);
-		*/
+		 * TabPageIndicator indicator = (TabPageIndicator)
+		 * findViewById(R.id.info); indicator.setViewPager(pager);
+		 */
 
 		// PodcastUpdateManager.setUpdate(this);
 
-		//FIXME
-		
+		// FIXME
+
 		// set the Behind View
-		//setBehindContentView(R.layout.download);
+		// setBehindContentView(R.layout.download);
 
-		//SlidingMenu menu = getSlidingMenu();
+		// SlidingMenu menu = getSlidingMenu();
 		SlidingMenuBuilder.build(this, mSectionsPagerAdapter);
-		//setSlidingActionBarEnabled(true);
-		
-
+		// setSlidingActionBarEnabled(true);
 
 		// Set up the ViewPager with the sections adapter.
 		mViewPager = (ViewPager) findViewById(R.id.pager);
@@ -286,23 +338,23 @@ public class MainActivity extends FragmentActivity implements
 	}
 
 	/**
-	 * Creates the actionbar from the XML menu file.
-	 * In addition it makes sure the play/pause icon is correct
+	 * Creates the actionbar from the XML menu file. In addition it makes sure
+	 * the play/pause icon is correct
 	 */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.activity_swipe, menu);
-		
+
 		// The player can only be playing if the PlayerService has been bound
 		MenuItem menuItem = menu.findItem(R.id.menu_control);
 		if (PodcastBaseFragment.mPlayerServiceBinder != null) {
-			
+
 			ThemeHelper themeHelper = new ThemeHelper(this);
 			if (PodcastBaseFragment.mPlayerServiceBinder.isPlaying()) {
 				menuItem.setIcon(themeHelper.getAttr(R.attr.pause_invert_icon));
 			} else if (PodcastBaseFragment.mPlayerServiceBinder.isOnPause()) {
 				menuItem.setIcon(themeHelper.getAttr(R.attr.play_invert_icon));
-			} else { 
+			} else {
 				menuItem.setVisible(false);
 			}
 		} else {
@@ -330,7 +382,7 @@ public class MainActivity extends FragmentActivity implements
 			startActivity(i);
 			return true;
 		case R.id.menu_refresh:
-				PodcastDownloadManager.start_update(this);
+			PodcastDownloadManager.start_update(this);
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
@@ -366,7 +418,7 @@ public class MainActivity extends FragmentActivity implements
 				fragment = getFeedFragmentContent();
 			} else {
 				fragment = new DSLVFragmentBGHandle();
-				//fragment = new DummySectionFragment();
+				// fragment = new DummySectionFragment();
 				// fragment = new PlayerFragment();
 			}
 			Bundle args = new Bundle();
@@ -434,9 +486,10 @@ public class MainActivity extends FragmentActivity implements
 		log.debug("inside: getSubscriptionFragmentContent()");
 		return new SubscriptionsFragment();
 	}
-	
+
 	private Fragment getFeedFragmentContent() {
-		Subscription sub = Subscription.getById(getContentResolver(), SubscriptionFeedID);
+		Subscription sub = Subscription.getById(getContentResolver(),
+				SubscriptionFeedID);
 		return FeedFragment.newInstance(sub);
 	}
 
