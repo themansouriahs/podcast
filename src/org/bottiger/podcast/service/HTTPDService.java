@@ -26,7 +26,7 @@ public class HTTPDService extends Service {
 
 	@Override
 	public void onCreate() {
-		mServer = new HelloServer();
+		mServer = new HelloServer(getContentResolver(), 8080);
 		mServer.run();
 	}
 

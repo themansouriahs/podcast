@@ -2,9 +2,7 @@ package fi.iki.elonen;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -14,25 +12,33 @@ import java.net.URL;
 import java.util.Map;
 
 import org.apache.commons.io.input.TeeInputStream;
-import org.bottiger.podcast.utils.SDCardManager;
+import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.utils.StreamDownloader;
 
+import android.content.ContentResolver;
 import fi.iki.elonen.NanoHTTPD.Response.Status;
 
 /**
  * An example of subclassing NanoHTTPD to make a custom HTTP server.
  */
 public class HelloServer extends NanoHTTPD {
-    public HelloServer() {
-        super(8080);
+	
+	private ContentResolver mContentResovler;
+	
+    public HelloServer(ContentResolver contentResolver, int port) {
+        super(port);
+        this.mContentResovler = contentResolver;
     }
 
     @Override
     public Response serve(String uri, Method method, Map<String, String> header, Map<String, String> parms, Map<String, String> files) {
     	//OkHttpClient client = new OkHttpClient();
+    	FeedItem item = FeedItem.getById(mContentResovler, Long.parseLong(parms.get("id")));
+    	
     	URL url = null;
     	HttpURLConnection connection = null;
     	try {
-			url = new URL(uri);
+			url = new URL(item.getURL());
 			connection = (HttpURLConnection) url.openConnection();
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
@@ -74,11 +80,11 @@ public class HelloServer extends NanoHTTPD {
 		res = res + "123";
 		*/
         
-    	File f = new File(SDCardManager.getTmpDir() + "/testfile");
+    	StreamDownloader sd = new StreamDownloader(item);
     	//InputStream newIS2 = new TeeInputStream(newIS2, null);
     	InputStream newIS = null;
 		try {
-			newIS = new TeeInputStream(bin, new FileOutputStream(f));
+			newIS = new TeeInputStream(bin, sd.getFileOutputStream());
 		} catch (FileNotFoundException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
