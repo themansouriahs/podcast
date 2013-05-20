@@ -5,10 +5,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 
@@ -54,7 +57,14 @@ public class DriveUtils {
 		          credential.setSelectedAccountName(accountName);
 		          service = getDriveService(credential);
 		          //startCameraIntent();
-		          updateDatabase();
+		          //updateDatabase();
+		          Account account = credential.getSelectedAccount();
+					Bundle bundle = new Bundle();
+					bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+					bundle.putBoolean(ContentResolver.SYNC_EXTRAS_FORCE, true);
+					bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+					ContentResolver.requestSync(account, "org.bottiger.podcast.provider.podcastprovider",
+							bundle);
 		        }
 		      }
 		      break;

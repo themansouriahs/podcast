@@ -20,7 +20,6 @@ import org.bottiger.podcast.service.HTTPDService;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.service.PodcastDownloadManager;
 import org.bottiger.podcast.service.PodcastService;
-import org.bottiger.podcast.utils.AddPodcastDialog;
 import org.bottiger.podcast.utils.ControlButtons;
 import org.bottiger.podcast.utils.DriveUtils;
 import org.bottiger.podcast.utils.Log;
@@ -30,6 +29,7 @@ import org.bottiger.podcast.utils.ThemeHelper;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -112,7 +112,7 @@ public class MainActivity extends FragmentActivity implements
 	private AutoUpdateApk aua;
 
 	private DriveUtils mDriveUtils;
-	
+
 	public static ServiceConnection mHTTPDServiceConnection = new ServiceConnection() {
 		@Override
 		public void onServiceConnected(ComponentName className, IBinder service) {
@@ -281,12 +281,12 @@ public class MainActivity extends FragmentActivity implements
 			e.printStackTrace();
 		}
 	}
-	
-	  @Override
-	  protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
-		  mDriveUtils.activityResult(requestCode, resultCode, data);
-	  }
 
+	@Override
+	protected void onActivityResult(final int requestCode,
+			final int resultCode, final Intent data) {
+		mDriveUtils.activityResult(requestCode, resultCode, data);
+	}
 
 	@Override
 	protected void onPause() {
@@ -386,9 +386,22 @@ public class MainActivity extends FragmentActivity implements
 			}
 			return true;
 		case R.id.menu_add:
+			// Sync with google drive
+/*			GoogleAccountCredential credential = GoogleAccountCredential
+					.usingOAuth2(this, DriveScopes.DRIVE);
+
+			Account account = credential.getSelectedAccount();
+			if (account == null) {
+				final int REQUEST_ACCOUNT_PICKER = 1;
+				startActivityForResult(credential.newChooseAccountIntent(),
+						REQUEST_ACCOUNT_PICKER);
+				account = credential.getSelectedAccount();
+			}*/
+			// DriveSyncer mSyncer = new DriveSyncer(getApplicationContext());
+
 			mDriveUtils = new DriveUtils(this);
 			mDriveUtils.driveAccount();
-			//AddPodcastDialog.addPodcast(this);
+			// AddPodcastDialog.addPodcast(this);
 			return true;
 		case R.id.menu_settings:
 			Intent i = new Intent(getBaseContext(), SettingsActivity.class);

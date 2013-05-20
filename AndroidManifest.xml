@@ -20,6 +20,9 @@
     <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" >
     </uses-permission>
+    <uses-permission android:name="android.permission.READ_SYNC_STATS" />
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
 
     <supports-screens
         android:anyDensity="true"
@@ -110,7 +113,7 @@
         </service>
         <service
             android:name="org.bottiger.podcast.cloud.drive.DriveSyncService"
-            android:exported="false" >
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
             </intent-filter>
@@ -119,17 +122,17 @@
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/syncadapter" />
         </service>
-        
+
         <receiver
             android:name="PodcastUpdateManager"
             android:process=":remote" >
         </receiver>
-         <receiver android:name="org.bottiger.podcast.receiver.NotificationReceiver" >
-             <intent-filter>
+        <receiver android:name="org.bottiger.podcast.receiver.NotificationReceiver" >
+            <intent-filter>
                 <action android:name="org.bottiger.soundwaves.TOGGLE" >
                 </action>
                 <action android:name="org.bottiger.soundwaves.NEXT" >
-                    </action>
+                </action>
             </intent-filter>
         </receiver>
         <receiver android:name=".receiver.AutoStart" >
@@ -144,7 +147,7 @@
             </intent-filter>
         </receiver>
         <receiver android:name="org.bottiger.podcast.receiver.HeadsetReceiver" >
-            <intent-filter android:priority="1000000000000000">
+            <intent-filter android:priority="1000000000000000" >
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </receiver>
