@@ -235,6 +235,7 @@ public class MainActivity extends FragmentActivity implements
 
 		ViewPager pager = (ViewPager) findViewById(R.id.pager);
 		pager.setAdapter(mSectionsPagerAdapter);
+		pager.setOffscreenPageLimit(3);
 
 		/*
 		 * TabPageIndicator indicator = (TabPageIndicator)
