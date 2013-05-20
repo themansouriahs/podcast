@@ -14,7 +14,6 @@ import org.bottiger.podcast.autoupdateapk.AutoUpdateApk;
 import org.bottiger.podcast.cloud.CloudProvider;
 import org.bottiger.podcast.cloud.GoogleReader;
 import org.bottiger.podcast.debug.SqliteCopy;
-import org.bottiger.podcast.listeners.PlayerStatusListener;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.service.HTTPDService;
@@ -23,6 +22,7 @@ import org.bottiger.podcast.service.PodcastDownloadManager;
 import org.bottiger.podcast.service.PodcastService;
 import org.bottiger.podcast.utils.AddPodcastDialog;
 import org.bottiger.podcast.utils.ControlButtons;
+import org.bottiger.podcast.utils.DriveUtils;
 import org.bottiger.podcast.utils.Log;
 import org.bottiger.podcast.utils.SlidingMenuBuilder;
 import org.bottiger.podcast.utils.ThemeHelper;
@@ -59,6 +59,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.bugsense.trace.BugSenseHandler;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.services.drive.DriveScopes;
 
 // Sliding
 public class MainActivity extends FragmentActivity implements
@@ -109,6 +111,8 @@ public class MainActivity extends FragmentActivity implements
 
 	private AutoUpdateApk aua;
 
+	private DriveUtils mDriveUtils;
+	
 	public static ServiceConnection mHTTPDServiceConnection = new ServiceConnection() {
 		@Override
 		public void onServiceConnected(ComponentName className, IBinder service) {
@@ -276,6 +280,12 @@ public class MainActivity extends FragmentActivity implements
 			e.printStackTrace();
 		}
 	}
+	
+	  @Override
+	  protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+		  mDriveUtils.activityResult(requestCode, resultCode, data);
+	  }
+
 
 	@Override
 	protected void onPause() {
@@ -375,7 +385,9 @@ public class MainActivity extends FragmentActivity implements
 			}
 			return true;
 		case R.id.menu_add:
-			AddPodcastDialog.addPodcast(this);
+			mDriveUtils = new DriveUtils(this);
+			mDriveUtils.driveAccount();
+			//AddPodcastDialog.addPodcast(this);
 			return true;
 		case R.id.menu_settings:
 			Intent i = new Intent(getBaseContext(), SettingsActivity.class);

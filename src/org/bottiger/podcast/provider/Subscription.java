@@ -15,6 +15,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.SystemClock;
 import android.provider.BaseColumns;
 import android.support.v4.util.LruCache;
 
@@ -34,6 +35,7 @@ public class Subscription implements WithIcon {
 	public String url;
 	public String description;
 	public String imageURL;
+	public String sync_id;
 	public long lastUpdated;
 	public long lastItemUpdated;
 	public long fail_count;
@@ -167,6 +169,7 @@ public class Subscription implements WithIcon {
 		fail_count = -1;
 		lastItemUpdated = -1;
 		auto_download = -1;
+		sync_id = null;
 	}
 
 	public Subscription() {
@@ -215,6 +218,7 @@ public class Subscription implements WithIcon {
 		cv.put(SubscriptionColumns.COMMENT, comment);
 		cv.put(SubscriptionColumns.DESCRIPTION, description);
 		cv.put(SubscriptionColumns.IMAGE_URL, imageURL);
+		cv.put(SubscriptionColumns.SYNC, sync_id);
 		Uri uri = context.getContentResolver().insert(SubscriptionColumns.URI,
 				cv);
 		if (uri == null) {
@@ -263,6 +267,9 @@ public class Subscription implements WithIcon {
 
 			if (auto_download >= 0)
 				cv.put(SubscriptionColumns.AUTO_DOWNLOAD, auto_download);
+			
+			if (sync_id != null)
+				cv.put(SubscriptionColumns.SYNC, sync_id);
 
 			return context.update(SubscriptionColumns.URI, cv,
 					BaseColumns._ID + "=" + id, null);
@@ -307,6 +314,8 @@ public class Subscription implements WithIcon {
 				.getColumnIndex(SubscriptionColumns.LAST_ITEM_UPDATED));
 		sub.auto_download = cursor.getLong(cursor
 				.getColumnIndex(SubscriptionColumns.AUTO_DOWNLOAD));
+		sub.sync_id = cursor.getString(cursor
+				.getColumnIndex(SubscriptionColumns.SYNC));
 		
 		// if item was not cached we put it in the cache
 		synchronized (cache) {
@@ -354,6 +363,14 @@ public class Subscription implements WithIcon {
 	
 	public String getImageURL() {
 		return imageURL;
+	}
+	
+	/**
+	 * Run whenever the subscription has been updated to google drive
+	 */
+	public void synced(ContentResolver contentResolver, String fileID) {
+		sync_id = fileID;
+		update(contentResolver);
 	}
 
 }

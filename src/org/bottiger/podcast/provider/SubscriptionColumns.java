@@ -10,7 +10,7 @@ public class SubscriptionColumns implements BaseColumns {
 	public static final Uri URI = Uri.parse("content://"
 			+ PodcastProvider.AUTHORITY + "/subscriptions");
 
-	public static final String TABLE_NAME = "subs";
+	public static final String TABLE_NAME = "subscriptions";
 
 	public static final String URL = "url";
 
@@ -44,6 +44,14 @@ public class SubscriptionColumns implements BaseColumns {
 			DESCRIPTION, LAST_UPDATED, LAST_ITEM_UPDATED, FAIL_COUNT, STATUS,
 			COMMENT, RATING, USERNAME, PASSWORD, SERVER_ID, SYNC, AUTO_DOWNLOAD,
 			PLAYLIST_POSITION, IMAGE_URL};
+	
+	  /** The index of the projection columns */
+	  public static final int COLUMN_INDEX_ID = 0;
+	  public static final int COLUMN_INDEX_URL = 1;
+	  public static final int COLUMN_INDEX_LINK = 2;
+	  public static final int COLUMN_INDEX_TITLE = 3;
+	  public static final int COLUMN_INDEX_DESCIPTION = 4;
+	  public static final int COLUMN_INDEX_LAST_UPDATED = 5;
 
 	public static final String DEFAULT_SORT_ORDER = _ID + " ASC";
 	public static final String sql_create_table = "CREATE TABLE " 
@@ -66,7 +74,6 @@ public class SubscriptionColumns implements BaseColumns {
 		+ AUTO_DOWNLOAD + " INTEGER , "
 		+ PLAYLIST_POSITION + " INTEGER , " 	
 		+ IMAGE_URL + " VARCHAR(1024) " 		
-		
 		+ ");";
 
 	public static final String sql_index_subs_url = "CREATE UNIQUE INDEX IDX_"
@@ -75,99 +82,6 @@ public class SubscriptionColumns implements BaseColumns {
 	public static final String sql_index_last_update = "CREATE INDEX IDX_"
 			+ TABLE_NAME + "_" + LAST_UPDATED + " ON " + TABLE_NAME + " ("
 			+ LAST_UPDATED + ");";
-
-	/*
-	public static final String sql_insert_default = "INSERT INTO "
-			+ TABLE_NAME
-			+ " ("
-			+ URL
-			+ ","
-			+ TITLE
-			+ ","
-			+ DESCRIPTION
-			+ ","
-			+ LINK
-			+ ","
-			+ LAST_UPDATED
-			+ ","
-			+ FAIL_COUNT
-			+ ","
-			+ LAST_ITEM_UPDATED
-			+ ") VALUES ('http://www.cbcradio3.com/podcast/', 'unknown', 'unknown', '', 0, 0, 0);";
-	
-
-	public static final String sql_insert_default1 = "INSERT INTO "
-			+ TABLE_NAME
-			+ " ("
-			+ URL
-			+ ","
-			+ TITLE
-			+ ","
-			+ DESCRIPTION
-			+ ","
-			+ LINK
-			+ ","
-			+ LAST_UPDATED
-			+ ","
-			+ FAIL_COUNT
-			+ ","
-			+ LAST_ITEM_UPDATED
-			+ ") VALUES ('http://www.blogtalkradio.com/rss/category/finance/mostviewed.rss', 'unknown', 'unknown', '', 0, 0, 0);";
-
-	public static final String sql_insert_default2 = "INSERT INTO "
-			+ TABLE_NAME
-			+ " ("
-			+ URL
-			+ ","
-			+ TITLE
-			+ ","
-			+ DESCRIPTION
-			+ ","
-			+ LINK
-			+ ","
-			+ LAST_UPDATED
-			+ ","
-			+ FAIL_COUNT
-			+ ","
-			+ LAST_ITEM_UPDATED
-			+ ") VALUES ('http://www.npr.org/rss/podcast.php?id=13', 'unknown', 'unknown', '', 0, 0, 0);";
-	public static final String sql_insert_default3 = "INSERT INTO "
-			+ TABLE_NAME
-			+ " ("
-			+ URL
-			+ ","
-			+ TITLE
-			+ ","
-			+ DESCRIPTION
-			+ ","
-			+ LINK
-			+ ","
-			+ LAST_UPDATED
-			+ ","
-			+ FAIL_COUNT
-			+ ","
-			+ LAST_ITEM_UPDATED
-			+ ") VALUES ('http://podcasts.engadget.com/rss.xml', 'unknown', 'unknown', '', 0, 0, 0);";
-
-	public static final String sql_insert_default4 = "INSERT INTO "
-		+ TABLE_NAME
-		+ " ("
-		+ URL
-		+ ","
-		+ TITLE
-		+ ","
-		+ DESCRIPTION
-		+ ","
-		+ LINK
-		+ ","
-		+ LAST_UPDATED
-		+ ","
-		+ FAIL_COUNT
-		+ ","
-		+ LAST_ITEM_UPDATED
-		+ ") VALUES ('http://downloads.bbc.co.uk/podcasts/radio4/r4choice/rss.xml', 'unknown', 'unknown', '', 0, 0, 0);";
-	
-	*/
 	
 	public static ContentValues checkValues(ContentValues values, Uri uri) {
 		if (values.containsKey(URL) == false) {

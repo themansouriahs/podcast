@@ -33,6 +33,8 @@ public class HelloServer extends NanoHTTPD {
     @Override
     public Response serve(String uri, Method method, Map<String, String> header, Map<String, String> parms, Map<String, String> files) {
     	//OkHttpClient client = new OkHttpClient();
+    	String sid = parms.get("id");
+    	if (sid != null) {
     	FeedItem item = FeedItem.getById(mContentResovler, Long.parseLong(parms.get("id")));
     	
     	URL url = null;
@@ -107,6 +109,9 @@ public class HelloServer extends NanoHTTPD {
 
         return new NanoHTTPD.Response(msg);
         */
+    	}
+    	
+    	return null;
     }
 
     public void run() {
