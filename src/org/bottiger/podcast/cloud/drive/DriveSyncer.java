@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bottiger.podcast.provider.PodcastProvider;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionColumns;
 
@@ -17,7 +18,6 @@ import android.accounts.Account;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ContentProviderClient;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -29,6 +29,7 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.google.android.gms.auth.UserRecoverableAuthException;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.http.ByteArrayContent;
@@ -73,6 +74,8 @@ public class DriveSyncer {
 	private Account mAccount;
 	private Drive mService;
 	private long mLargestChangeId;
+
+	private int REQUEST_AUTHORIZATION = 1;
 
 	/**
 	 * Instantiate a new DriveSyncer.
@@ -419,14 +422,19 @@ public class DriveSyncer {
 				// notification that will trigger the
 				// intent to fix the issue.
 				if (e instanceof UserRecoverableAuthException) {
+					int res = GooglePlayServicesUtil.isGooglePlayServicesAvailable(mContext);
+					
 					UserRecoverableAuthException exception = (UserRecoverableAuthException) e;
 					NotificationManager notificationManager = (NotificationManager) mContext
 							.getSystemService(Context.NOTIFICATION_SERVICE);
 					Intent authorizationIntent = exception.getIntent();
+					
+					// .startActivityForResult(authorizationIntent, REQUEST_AUTHORIZATION);
+					
 					authorizationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 							.addFlags(Intent.FLAG_FROM_BACKGROUND);
 					PendingIntent pendingIntent = PendingIntent.getActivity(
-							mContext, 0, authorizationIntent, 0);
+							mContext, REQUEST_AUTHORIZATION , authorizationIntent, 0);
 
 					NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(
 							mContext)
@@ -437,6 +445,7 @@ public class DriveSyncer {
 							.setContentIntent(pendingIntent)
 							.setAutoCancel(true);
 					notificationManager.notify(0, notificationBuilder.build());
+					
 				} else {
 					e.printStackTrace();
 				}
@@ -611,18 +620,18 @@ public class DriveSyncer {
 	}
 
 	private static Uri getSubscriptionsUri(String accountName) {
-		return Uri.parse("content://com.google.provider.NotePad/" + accountName
-				+ "/notes/");
+		return SubscriptionColumns.URI;
 	}
 
+	/*
 	private static Uri getSubscriptionUri(String accountName) {
-		return Uri.parse("content://com.google.provider.NotePad/" + accountName
-				+ "/notes/");
+		return Uri.parse("content://" + PodcastProvider.AUTHORITY + "/" + accountName
+				+ "/subscriptions/");
 	}
+	*/
 
-	private static Uri getItemUri(String accountName, String noteId) {
-		return Uri.parse("content://com.google.provider.NotePad/" + accountName
-				+ "/notes/" + noteId);
+	private static Uri getItemUri(String accountName, String fileId) {
+		return Uri.parse(SubscriptionColumns.URI + "/" + fileId);
 	}
 
 }
