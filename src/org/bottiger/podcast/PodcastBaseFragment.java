@@ -440,7 +440,7 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 			if (isResumed()) {
 				// setListShown(true); //FIXME
 			} else {
-				setListShownNoAnimation(true);
+				//setListShownNoAnimation(true); //FIXME as well
 			}
 		}
 

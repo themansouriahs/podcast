@@ -2,6 +2,7 @@ package org.bottiger.podcast.provider;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.net.MalformedURLException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
@@ -15,6 +16,7 @@ import org.bottiger.podcast.utils.Log;
 import org.bottiger.podcast.utils.Playlist;
 import org.bottiger.podcast.utils.SDCardManager;
 import org.bottiger.podcast.utils.StrUtils;
+import org.json.simple.JSONObject;
 
 import android.app.Activity;
 import android.app.DownloadManager;
@@ -47,6 +49,11 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	 * Unique ID
 	 */
 	public long id;
+
+	/**
+	 * Unique ID of the file on the remote server
+	 */
+	public String remote_id;
 
 	/**
 	 * URL of the episode:
@@ -173,7 +180,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	 * The time the record in the database was updated the last time. measured
 	 * in: System.currentTimeMillis()
 	 */
-	public long update;
+	public long lastUpdate;
 
 	/**
 	 * The URI of the podcast episode
@@ -346,13 +353,14 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		uri = null;
 		type = null;
 		image = null;
+		remote_id = null;
 
 		id = -1;
 		offset = -1;
 		status = -1;
 		failcount = -1;
 		length = -1;
-		update = -1;
+		lastUpdate = -1;
 		listened = -1;
 		priority = -1;
 		filesize = -1;
@@ -372,7 +380,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 
 	public void updateOffset(ContentResolver contentResolver, long i) {
 		offset = (int) i;
-		update = -1;
+		lastUpdate = -1;
 		update(contentResolver);
 
 	}
@@ -392,6 +400,8 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 			ContentValues cv = new ContentValues();
 			if (filename != null)
 				cv.put(ItemColumns.PATHNAME, filename);
+			if (remote_id != null)
+				cv.put(ItemColumns.REMOTE_ID, remote_id);
 			if (filesize >= 0)
 				cv.put(ItemColumns.FILESIZE, filesize);
 			if (downloadReferenceID >= 0)
@@ -407,9 +417,9 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 				cv.put(ItemColumns.CHUNK_FILESIZE, chunkFilesize);
 			if (offset >= 0)
 				cv.put(ItemColumns.OFFSET, offset);
-			if (update >= 0) {
-				update = Long.valueOf(System.currentTimeMillis());
-				cv.put(ItemColumns.LAST_UPDATE, update);
+			if (lastUpdate >= 0) {
+				lastUpdate = Long.valueOf(System.currentTimeMillis());
+				cv.put(ItemColumns.LAST_UPDATE, lastUpdate);
 			}
 			if (listened >= 0)
 				cv.put(ItemColumns.LISTENED, listened);
@@ -431,10 +441,12 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 			ContentValues cv = new ContentValues();
 			if (filename != null)
 				cv.put(ItemColumns.PATHNAME, filename);
+			if (remote_id != null)
+				cv.put(ItemColumns.REMOTE_ID, remote_id);
 			if (offset >= 0)
 				cv.put(ItemColumns.OFFSET, offset);
-			if (update >= 0)
-				cv.put(ItemColumns.LAST_UPDATE, update);
+			if (lastUpdate >= 0)
+				cv.put(ItemColumns.LAST_UPDATE, lastUpdate);
 
 			if (sub_id >= 0)
 				cv.put(ItemColumns.SUBS_ID, sub_id);
@@ -554,6 +566,8 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		item.resource = cursor.getString(idx);
 		item.filename = cursor.getString(cursor
 				.getColumnIndex(ItemColumns.PATHNAME));
+		item.remote_id = cursor.getString(cursor
+				.getColumnIndex(ItemColumns.REMOTE_ID));
 		item.offset = cursor.getInt(cursor.getColumnIndex(ItemColumns.OFFSET));
 		item.url = cursor.getString(cursor.getColumnIndex(ItemColumns.URL));
 		item.image = cursor.getString(cursor
@@ -582,7 +596,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 				.getColumnIndex(ItemColumns.DURATION));
 		item.duration_ms = cursor.getLong(cursor
 				.getColumnIndex(ItemColumns.DURATION_MS));
-		item.update = cursor.getLong(cursor
+		item.lastUpdate = cursor.getLong(cursor
 				.getColumnIndex(ItemColumns.LAST_UPDATE));
 		item.sub_title = cursor.getString(cursor
 				.getColumnIndex(ItemColumns.SUB_TITLE));
@@ -709,7 +723,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	}
 
 	public void endDownload(ContentResolver context) {
-		update = Long.valueOf(System.currentTimeMillis());
+		lastUpdate = Long.valueOf(System.currentTimeMillis());
 		update(context);
 	}
 
@@ -880,7 +894,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 			return false;
 		return true;
 	}
-	
+
 	/**
 	 * Clear the cache
 	 */
@@ -928,19 +942,20 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	}
 
 	/**
-	 * Put the current FeedItem after the argument in the playlist. 
-	 * If the given FeedItem is null the current FeedItem becomes the first item in the playlist
+	 * Put the current FeedItem after the argument in the playlist. If the given
+	 * FeedItem is null the current FeedItem becomes the first item in the
+	 * playlist
 	 */
 	public void setPriority(FeedItem precedingItem, Context context) {
 		priority = precedingItem == null ? 1 : precedingItem.getPriority() + 1;
 		increateHigherPriorities(precedingItem, context);
-		//update(context.getContentResolver());
+		// update(context.getContentResolver());
 	}
-	
+
 	public void setTopPriority(Context context) {
 		setPriority(null, context);
 	}
-	
+
 	public void trackEnded(ContentResolver contentResolver) {
 		priority = 0;
 		markAsListened();
@@ -965,21 +980,19 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 				+ " AND " + ItemColumns.PRIORITY + "<> 0 AND "
 				+ ItemColumns._ID + "<> " + this.id;
 		String sql = action + value + where;
-		
-		
+
 		String actionCurrent = "UPDATE " + ItemColumns.TABLE_NAME + " SET ";
 		String valueCurrent = ItemColumns.PRIORITY + "=" + this.priority;
 		String whereCurrent = " WHERE " + ItemColumns._ID + "==" + this.id;
 		String sqlCurrent = actionCurrent + valueCurrent + whereCurrent;
-		
-		
+
 		db.beginTransaction();
 		try {
 			db.execSQL(sql);
-			db.execSQL(sqlCurrent); 
-		    db.setTransactionSuccessful();
+			db.execSQL(sqlCurrent);
+			db.setTransactionSuccessful();
 		} finally {
-		    db.endTransaction();
+			db.endTransaction();
 		}
 	}
 
@@ -1033,5 +1046,61 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	 */
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	@Override
+	public long lastModificationDate() {
+		return this.lastUpdate;
+	}
+
+	@Override
+	public String getDriveId() {
+		return this.remote_id.equals("") ? null : this.remote_id;
+	}
+
+	@Override
+	public String toJSON() {
+		JSONObject json = new JSONObject();
+		// strings
+		json.put("url", getURL().toString());
+		json.put("remote_id", remote_id);
+		json.put("title", title);
+		json.put("author", author);
+		json.put("date", date);
+		json.put("content", content);
+		json.put("resource", resource);
+		json.put("duration_string", duration_string);
+		json.put("image", image);
+		json.put("filename", filename);
+		json.put("uri", uri);
+		json.put("subtitle", sub_title);
+
+		// long/int
+		json.put("duration_ms", duration_ms);
+		json.put("sub_id", sub_id);
+		json.put("filesize", filesize);
+		json.put("episodeNumber", episodeNumber);
+		json.put("offset", offset);
+		json.put("status", status);
+		json.put("listened", listened);
+		json.put("priority", priority);
+		json.put("length", length);
+		json.put("lastUpdate", lastUpdate);
+
+		return json.toJSONString();
+	}
+
+	@Override
+	public void fromJSON(String json) {
+		// TODO Auto-generated method stub
+
+	}
+	
+	/**
+	 * Run whenever the subscription has been updated to google drive
+	 */
+	public void synced(ContentResolver contentResolver, String fileID) {
+		remote_id = fileID;
+		update(contentResolver);
 	}
 }

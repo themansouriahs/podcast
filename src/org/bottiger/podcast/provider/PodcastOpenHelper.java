@@ -10,7 +10,7 @@ public class PodcastOpenHelper extends SQLiteOpenHelper {
 
 	private final Log log = Log.getLog(getClass());
 
-	private final static int DBVERSION = 15;
+	private final static int DBVERSION = 16;
 
 	public PodcastOpenHelper(Context context) {
 		super(context, "podcast.db", null, DBVERSION);
@@ -37,91 +37,101 @@ public class PodcastOpenHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		if (oldVersion==14 && newVersion==15) {
+		if (oldVersion == 15 && newVersion == 16) {
+			// Add new column
+			String new_item_column = "ALTER TABLE " + ItemColumns.TABLE_NAME
+					+ " ADD COLUMN " + ItemColumns.REMOTE_ID + " VARCHAR(128);";
+			
+			log.debug("Upgrading database from version 15 to 16");
+			db.execSQL(new_item_column);
+		}
+		if (oldVersion == 14 && newVersion == 15) {
 			// http://stackoverflow.com/questions/8442147/how-to-delete-or-add-column-in-sqlite
-			
+
 			String new_name = SubscriptionColumns.TABLE_NAME + "_new";
-			
-			//Create new table
+
+			// Create new table
 			// http://stackoverflow.com/questions/2361921/select-into-statement-in-sqlite
-			String sql_create_table = "CREATE TABLE " 
-					+ new_name + " (" 
- 					+ SubscriptionColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " 
-					+ SubscriptionColumns.URL + " VARCHAR(1024), " 
-					+ SubscriptionColumns.LINK + " VARCHAR(256), " 
-					+ SubscriptionColumns.TITLE	+ " VARCHAR(128), " 
+			String sql_create_table = "CREATE TABLE " + new_name + " ("
+					+ SubscriptionColumns._ID
+					+ " INTEGER PRIMARY KEY AUTOINCREMENT, "
+					+ SubscriptionColumns.URL + " VARCHAR(1024), "
+					+ SubscriptionColumns.LINK + " VARCHAR(256), "
+					+ SubscriptionColumns.TITLE + " VARCHAR(128), "
 					+ SubscriptionColumns.DESCRIPTION + " TEXT, "
-					+ SubscriptionColumns.LAST_UPDATED + " INTEGER, " 
+					+ SubscriptionColumns.LAST_UPDATED + " INTEGER, "
 					+ SubscriptionColumns.LAST_ITEM_UPDATED + " INTEGER, "
-					+ SubscriptionColumns.FAIL_COUNT + " INTEGER, " 
-					+ SubscriptionColumns.STATUS + " INTEGER, " 
-					+ SubscriptionColumns.COMMENT + " TEXT, " 
-					+ SubscriptionColumns.RATING + " INTEGER, "  
-					+ SubscriptionColumns.SERVER_ID + " INTEGER, " 
-					+ SubscriptionColumns.SYNC + " VARCHAR(128), " 		
+					+ SubscriptionColumns.FAIL_COUNT + " INTEGER, "
+					+ SubscriptionColumns.STATUS + " INTEGER, "
+					+ SubscriptionColumns.COMMENT + " TEXT, "
+					+ SubscriptionColumns.RATING + " INTEGER, "
+					+ SubscriptionColumns.SERVER_ID + " INTEGER, "
+					+ SubscriptionColumns.SYNC + " VARCHAR(128), "
 					+ SubscriptionColumns.AUTO_DOWNLOAD + " INTEGER , "
-					+ SubscriptionColumns.PLAYLIST_POSITION + " INTEGER , " 	
-					+ SubscriptionColumns.IMAGE_URL + " VARCHAR(1024) "
-					+ ");";
-			
+					+ SubscriptionColumns.PLAYLIST_POSITION + " INTEGER , "
+					+ SubscriptionColumns.IMAGE_URL + " VARCHAR(1024) " + ");";
+
 			// http://www.sqlite.org/faq.html#q11
 			// INSERT INTO t1_backup SELECT a,b FROM t1;
 			String insert_into = "INSERT INTO " + new_name + " SELECT "
-					+ SubscriptionColumns._ID + ", " 
-					+ SubscriptionColumns.URL + ", " 
-					+ SubscriptionColumns.LINK + ", " 
-					+ SubscriptionColumns.TITLE	+ ", " 
+					+ SubscriptionColumns._ID + ", " + SubscriptionColumns.URL
+					+ ", " + SubscriptionColumns.LINK + ", "
+					+ SubscriptionColumns.TITLE + ", "
 					+ SubscriptionColumns.DESCRIPTION + ", "
-					+ SubscriptionColumns.LAST_UPDATED + ", " 
+					+ SubscriptionColumns.LAST_UPDATED + ", "
 					+ SubscriptionColumns.LAST_ITEM_UPDATED + ", "
-					+ SubscriptionColumns.FAIL_COUNT + ", " 
-					+ SubscriptionColumns.STATUS + ", " 
-					+ SubscriptionColumns.COMMENT + ", " 
-					+ SubscriptionColumns.RATING + ", " 
-					+ SubscriptionColumns.SERVER_ID + ", "
-					+ "\"\", "
+					+ SubscriptionColumns.FAIL_COUNT + ", "
+					+ SubscriptionColumns.STATUS + ", "
+					+ SubscriptionColumns.COMMENT + ", "
+					+ SubscriptionColumns.RATING + ", "
+					+ SubscriptionColumns.SERVER_ID + ", " + "\"\", "
 					+ SubscriptionColumns.AUTO_DOWNLOAD + ", "
-					+ SubscriptionColumns.PLAYLIST_POSITION + ", " 	
-					+ SubscriptionColumns.IMAGE_URL
-					+ " FROM subs;";
-			
-			//Add new column
-			String new_column = "ALTER TABLE " + SubscriptionColumns.TABLE_NAME + "_new ADD " + SubscriptionColumns.SYNC + " VARCHAR(128)";
-			
+					+ SubscriptionColumns.PLAYLIST_POSITION + ", "
+					+ SubscriptionColumns.IMAGE_URL + " FROM subs;";
+
+			// Add new column
+			String new_column = "ALTER TABLE " + SubscriptionColumns.TABLE_NAME
+					+ "_new ADD " + SubscriptionColumns.SYNC + " VARCHAR(128)";
+
 			// Drop old table
 			// http://stackoverflow.com/questions/3675032/drop-existing-table-in-sqlite-when-if-exists-operator-is-not-supported
 			String drop_old_table = "DROP TABLE IF EXISTS subs;";
-			
+
 			// rename new table
 			// http://stackoverflow.com/questions/426495/how-do-you-rename-a-table-in-sqlite-3-0
-			String rename_new_table = "ALTER TABLE " + new_name + " RENAME TO " + SubscriptionColumns.TABLE_NAME + ";";
-			
+			String rename_new_table = "ALTER TABLE " + new_name + " RENAME TO "
+					+ SubscriptionColumns.TABLE_NAME + ";";
+
 			log.debug("Upgrading database from version 14 to 15");
-			//db.execSQL("BEGIN TRANSACTION;");
+			// db.execSQL("BEGIN TRANSACTION;");
 			db.execSQL(sql_create_table);
 			db.execSQL(insert_into);
 			db.execSQL(drop_old_table);
 			db.execSQL(rename_new_table);
-			//db.execSQL("COMMIT;");
+			// db.execSQL("COMMIT;");
 		}
-		if (oldVersion==13 && newVersion==14) {
+		if (oldVersion == 13 && newVersion == 14) {
 			log.debug("Upgrading database from version 13 to 14");
-			db.execSQL("CREATE INDEX idx_date ON " + ItemColumns.TABLE_NAME + " (" + ItemColumns.DATE + ")");
-			db.execSQL("CREATE INDEX idx_priority ON " + ItemColumns.TABLE_NAME + " (" + ItemColumns.PRIORITY + ")");
+			db.execSQL("CREATE INDEX idx_date ON " + ItemColumns.TABLE_NAME
+					+ " (" + ItemColumns.DATE + ")");
+			db.execSQL("CREATE INDEX idx_priority ON " + ItemColumns.TABLE_NAME
+					+ " (" + ItemColumns.PRIORITY + ")");
 		}
-		if (oldVersion==12 && newVersion==13) {
+		if (oldVersion == 12 && newVersion == 13) {
 			log.debug("Upgrading database from version 12 to 13");
-			//Add the KEEP column to the items table,
-			//use that rather than the old KEEP status
-			log.debug("executing sql: "+ItemColumns.sql_upgrade_table_add_keep_column);
+			// Add the KEEP column to the items table,
+			// use that rather than the old KEEP status
+			log.debug("executing sql: "
+					+ ItemColumns.sql_upgrade_table_add_keep_column);
 			db.execSQL(ItemColumns.sql_upgrade_table_add_keep_column);
-			log.debug("executing sql: "+ItemColumns.sql_populate_keep_from_status);
+			log.debug("executing sql: "
+					+ ItemColumns.sql_populate_keep_from_status);
 			db.execSQL(ItemColumns.sql_populate_keep_from_status);
-			log.debug("executing sql: "+ItemColumns.sql_change_keep_status_to_played);
+			log.debug("executing sql: "
+					+ ItemColumns.sql_change_keep_status_to_played);
 			db.execSQL(ItemColumns.sql_change_keep_status_to_played);
 			log.debug("Done upgrading database");
-		}
-		else if (oldVersion != newVersion) {
+		} else if (oldVersion != newVersion) {
 			// drop db
 			db.execSQL("DROP TABLE " + ItemColumns.TABLE_NAME);
 			db.execSQL("DROP TABLE " + SubscriptionColumns.TABLE_NAME);

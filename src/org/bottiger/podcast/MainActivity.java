@@ -14,6 +14,7 @@ import org.bottiger.podcast.autoupdateapk.AutoUpdateApk;
 import org.bottiger.podcast.cloud.CloudProvider;
 import org.bottiger.podcast.cloud.GoogleReader;
 import org.bottiger.podcast.debug.SqliteCopy;
+import org.bottiger.podcast.provider.PodcastProvider;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.service.HTTPDService;
@@ -28,6 +29,9 @@ import org.bottiger.podcast.utils.ThemeHelper;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.app.Activity;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -41,12 +45,14 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Debug;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Gravity;
@@ -59,12 +65,24 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.bugsense.trace.BugSenseHandler;
+import com.google.android.gms.auth.GoogleAuthException;
+import com.google.android.gms.auth.UserRecoverableAuthException;
+import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 
 // Sliding
 public class MainActivity extends FragmentActivity implements
 		OnItemSelectedListener {
+
+	private static final String ACCOUNT_KEY = "account";
+
+	private Drive mDriveService = null;
+	private final int REQUEST_AUTHORIZATION = 1;
+	private final int REQUEST_ACCOUNT_PICKER = 0;
+	private static GoogleAccountCredential mCredential;
 
 	public static PodcastService mPodcastServiceBinder = null;
 	public static HTTPDService mHTTPDServiceBinder = null;
@@ -81,7 +99,7 @@ public class MainActivity extends FragmentActivity implements
 
 	public static Account mAccount;
 
-	private boolean debugging = false;
+	private boolean debugging = true;
 
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -181,8 +199,6 @@ public class MainActivity extends FragmentActivity implements
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		android.util.Log.d("nanoHTTPD", "first");
-
 		BugSenseHandler.initAndStartSession(MainActivity.this,
 				((SoundWaves) this.getApplication()).getBugSenseAPIKey());
 
@@ -190,7 +206,7 @@ public class MainActivity extends FragmentActivity implements
 			// Tracing is buggy on emulator
 			Debug.startMethodTracing("calc");
 
-			if (false) {
+			if (true) {
 				try {
 					SqliteCopy.backupDatabase();
 				} catch (IOException e) {
@@ -199,6 +215,26 @@ public class MainActivity extends FragmentActivity implements
 				}
 			}
 		}
+
+		mCredential = GoogleAccountCredential.usingOAuth2(this,
+				DriveScopes.DRIVE);
+		prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		if (!prefs.contains(ACCOUNT_KEY))
+			startActivityForResult(mCredential.newChooseAccountIntent(),
+					REQUEST_ACCOUNT_PICKER);
+		else
+			mCredential
+					.setSelectedAccountName(prefs.getString(ACCOUNT_KEY, ""));
+		try {
+			mCredential.getToken();
+		} catch (Exception e) {
+			if (e instanceof UserRecoverableAuthException) {
+				e.printStackTrace();
+				startActivityForResult(mCredential.newChooseAccountIntent(),
+						REQUEST_AUTHORIZATION);
+			}
+		}
+		mDriveService = getDriveService(mCredential);
 
 		aua = new AutoUpdateApk(getApplicationContext());
 
@@ -282,10 +318,52 @@ public class MainActivity extends FragmentActivity implements
 		}
 	}
 
+	/*
+	 * @Override protected void onActivityResult(final int requestCode, final
+	 * int resultCode, final Intent data) {
+	 * mDriveUtils.activityResult(requestCode, resultCode, data); }
+	 */
+
+	public static GoogleAccountCredential getCredentials() {
+		return mCredential;
+	}
+
 	@Override
 	protected void onActivityResult(final int requestCode,
 			final int resultCode, final Intent data) {
-		mDriveUtils.activityResult(requestCode, resultCode, data);
+		switch (requestCode) {
+		case REQUEST_ACCOUNT_PICKER:
+			if (resultCode == RESULT_OK && data != null
+					&& data.getExtras() != null) {
+				String accountName = data
+						.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+				if (accountName != null) {
+					prefs.edit().putString(ACCOUNT_KEY, accountName).commit();
+					mCredential.setSelectedAccountName(accountName);
+					mDriveService = getDriveService(mCredential);
+					// startCameraIntent();
+					// updateDatabase();
+					Account account = mCredential.getSelectedAccount();
+					Bundle bundle = new Bundle();
+					bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED,
+							true);
+					bundle.putBoolean(ContentResolver.SYNC_EXTRAS_FORCE, true);
+					bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+					ContentResolver.requestSync(account,
+							"org.bottiger.podcast.provider.podcastprovider",
+							bundle);
+				}
+			}
+			break;
+		case REQUEST_AUTHORIZATION:
+			if (resultCode == Activity.RESULT_OK) {
+				// saveFileToDrive();
+			} else {
+				startActivityForResult(mCredential.newChooseAccountIntent(),
+						REQUEST_ACCOUNT_PICKER);
+			}
+			break;
+		}
 	}
 
 	@Override
@@ -387,20 +465,31 @@ public class MainActivity extends FragmentActivity implements
 			return true;
 		case R.id.menu_add:
 			// Sync with google drive
-/*			GoogleAccountCredential credential = GoogleAccountCredential
-					.usingOAuth2(this, DriveScopes.DRIVE);
-
-			Account account = credential.getSelectedAccount();
-			if (account == null) {
-				final int REQUEST_ACCOUNT_PICKER = 1;
-				startActivityForResult(credential.newChooseAccountIntent(),
-						REQUEST_ACCOUNT_PICKER);
-				account = credential.getSelectedAccount();
-			}*/
+			/*
+			 * GoogleAccountCredential credential = GoogleAccountCredential
+			 * .usingOAuth2(this, DriveScopes.DRIVE);
+			 * 
+			 * Account account = credential.getSelectedAccount(); if (account ==
+			 * null) { final int REQUEST_ACCOUNT_PICKER = 1;
+			 * startActivityForResult(credential.newChooseAccountIntent(),
+			 * REQUEST_ACCOUNT_PICKER); account =
+			 * credential.getSelectedAccount(); }
+			 */
 			// DriveSyncer mSyncer = new DriveSyncer(getApplicationContext());
 
 			mDriveUtils = new DriveUtils(this);
-			mDriveUtils.driveAccount();
+
+			Account account = mCredential.getSelectedAccount();
+			Bundle bundle = new Bundle();
+			bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+			bundle.putBoolean(ContentResolver.SYNC_EXTRAS_FORCE, true);
+			bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+			String auth = PodcastProvider.AUTHORITY;
+			auth = "org.bottiger.podcast.provider.PodcastProvider";
+			// ContentResolver.requestSync(account,
+			// "org.bottiger.podcast.provider.podcastprovider", bundle);
+			ContentResolver.requestSync(account, auth, bundle);
+			// mDriveUtils.driveAccount();
 			// AddPodcastDialog.addPodcast(this);
 			return true;
 		case R.id.menu_settings:
@@ -518,5 +607,55 @@ public class MainActivity extends FragmentActivity implements
 				SubscriptionFeedID);
 		return FeedFragment.newInstance(sub);
 	}
+
+	private Drive getDriveService(GoogleAccountCredential credential) {
+		return new Drive.Builder(AndroidHttp.newCompatibleTransport(),
+				new GsonFactory(), credential).build();
+	}
+
+	/**
+	 * Retrieve a authorized service object to send requests to the Google Drive
+	 * API. On failure to retrieve an access token, a notification is sent to
+	 * the user requesting that authorization be granted for the
+	 * {@code https://www.googleapis.com/auth/drive.file} scope.
+	 * 
+	 * @return An authorized service object.
+	 */
+	/*
+	 * private Drive getDriveService(GoogleAccountCredential credential) { if
+	 * (mDriveService == null) { try { /* GoogleAccountCredential credential =
+	 * GoogleAccountCredential .usingOAuth2(getApplicationContext(),
+	 * DriveScopes.DRIVE_FILE);
+	 * 
+	 * credential.setSelectedAccountName(mAccount.name); // Trying to get a
+	 * token right away to see if we are authorized credential.getToken();
+	 * mDriveService = new Drive.Builder( AndroidHttp.newCompatibleTransport(),
+	 * new GsonFactory(), credential).build(); } catch (Exception e) { //
+	 * Log.e(TAG, "Failed to get token"); // If the Exception is User
+	 * Recoverable, we display a // notification that will trigger the // intent
+	 * to fix the issue. if (e instanceof UserRecoverableAuthException) {
+	 * 
+	 * UserRecoverableAuthException exception = (UserRecoverableAuthException)
+	 * e; NotificationManager notificationManager = (NotificationManager)
+	 * getApplicationContext() .getSystemService(Context.NOTIFICATION_SERVICE);
+	 * Intent authorizationIntent = exception.getIntent();
+	 * 
+	 * startActivityForResult(authorizationIntent, REQUEST_AUTHORIZATION);
+	 * 
+	 * authorizationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+	 * .addFlags(Intent.FLAG_FROM_BACKGROUND); PendingIntent pendingIntent =
+	 * PendingIntent.getActivity( getApplicationContext(),
+	 * REQUEST_AUTHORIZATION, authorizationIntent, 0);
+	 * 
+	 * NotificationCompat.Builder notificationBuilder = new
+	 * NotificationCompat.Builder( getApplicationContext())
+	 * .setSmallIcon(android.R.drawable.ic_dialog_alert)
+	 * .setTicker("Permission requested")
+	 * .setContentTitle("Permission requested") .setContentText("for account " +
+	 * mAccount.name) .setContentIntent(pendingIntent) .setAutoCancel(true);
+	 * notificationManager.notify(0, notificationBuilder.build());
+	 * 
+	 * } else { e.printStackTrace(); } } } return mDriveService; }
+	 */
 
 }

@@ -18,8 +18,8 @@ import android.text.TextUtils;
 
 public class PodcastProvider extends ContentProvider {
 
-	public static final String AUTHORITY = PodcastProvider.class.getName()
-			.toLowerCase();
+	public static final String AUTHORITY = PodcastProvider.class.getName();
+			//.toLowerCase();
 
 	private static final int TYPE_ALL_SUBSCRIPTIONS = 0;
 	private static final int TYPE_SINGLE_SUBSCRIPTION = 1;

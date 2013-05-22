@@ -27,6 +27,8 @@ import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 
 public abstract class AbstractGridPodcastAdapter extends CursorAdapter implements PodcastAdapterInterface {
 
+	private ImageLoader mImageLoader = null;
+	
 	protected LayoutInflater mInflater;
 	protected Context mContext;
 	
@@ -88,18 +90,21 @@ public abstract class AbstractGridPodcastAdapter extends CursorAdapter implement
 	
 	@Override
 	public ImageLoader getImageLoader(Context context) {
+		if (mImageLoader != null)
+			return mImageLoader;
+		
 		File cacheDir = SDCardManager.getCacheDir();
 		DisplayImageOptions options = new DisplayImageOptions.Builder()
 				.showStubImage(R.drawable.generic_podcast).cacheInMemory()
 				.cacheOnDisc().build();
-		ImageLoader imageLoader = ImageLoader.getInstance();
+		mImageLoader = ImageLoader.getInstance();
 		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
 				context.getApplicationContext())
 				.memoryCacheExtraOptions(800, 800)
 				// max width, max height
 				.threadPoolSize(5)
 				//.offOutOfMemoryHandling()
-				.memoryCache(new UsingFreqLimitedMemoryCache(50 * 1024 * 1024))
+				.memoryCache(new UsingFreqLimitedMemoryCache(5 * 1024 * 1024))
 				// You can pass your own memory cache implementation
 				.discCache(new UnlimitedDiscCache(cacheDir))
 				// You can pass your own disc cache implementation
@@ -110,9 +115,9 @@ public abstract class AbstractGridPodcastAdapter extends CursorAdapter implement
 				.tasksProcessingOrder(QueueProcessingType.FIFO)
 				.defaultDisplayImageOptions(options).build();
 		// Initialize ImageLoader with configuration. Do it once.
-		imageLoader.init(config);
+		mImageLoader.init(config);
 
-		return imageLoader;
+		return mImageLoader;
 	}
 
 }

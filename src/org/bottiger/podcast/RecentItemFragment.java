@@ -23,19 +23,6 @@ import android.widget.TextView;
 
 public class RecentItemFragment extends PlaylistDSLVFragment {
 
-	private static final String[] PROJECTION = new String[] { ItemColumns._ID, // 0
-			ItemColumns.TITLE, // 1
-			ItemColumns.SUB_TITLE, //
-			ItemColumns.IMAGE_URL, //
-			ItemColumns.DURATION, //
-			ItemColumns.STATUS, //
-			ItemColumns.SUBS_ID, //
-			ItemColumns.FILESIZE, ItemColumns.PATHNAME, //
-			ItemColumns.OFFSET, //
-			ItemColumns.LISTENED //
-
-	};
-
 	public static HashMap<Integer, Integer> mKeepIconMap;
 
 	private long mCurCheckID = -1;

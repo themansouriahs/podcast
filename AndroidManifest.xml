@@ -51,7 +51,7 @@
             
             <meta-data
                 android:name="com.google.android.apps.drive.APP_ID"
-                android:value="id=13654253758-tbropa3ahjd02i3nhabn1gs9uir4fd9p.apps.googleusercontent.com" />
+                android:value="API_KEY" />
             
         </activity>
         <activity
@@ -160,7 +160,7 @@
 
         <provider
             android:name="org.bottiger.podcast.provider.PodcastProvider"
-            android:authorities="org.bottiger.podcast.provider.podcastprovider" >
+            android:authorities="org.bottiger.podcast.provider.PodcastProvider" >
         </provider>
     </application>
 

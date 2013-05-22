@@ -38,6 +38,7 @@ public abstract class AbstractPodcastAdapter extends SimpleDragSortCursorAdapter
 	
 	protected LayoutInflater mInflater;
 	protected Context mContext;
+	private ImageLoader mImageLoader = null;
 	
 	
 	public final static FieldHandler defaultTextFieldHandler = new FieldHandler.TextFieldHandler();
@@ -92,11 +93,14 @@ public abstract class AbstractPodcastAdapter extends SimpleDragSortCursorAdapter
 	
 	@Override
 	public ImageLoader getImageLoader(Context context) {
+		if (mImageLoader != null)
+			return mImageLoader;
+		
 		File cacheDir = SDCardManager.getCacheDir();
 		DisplayImageOptions options = new DisplayImageOptions.Builder()
 				.showStubImage(R.drawable.generic_podcast).cacheInMemory()
 				.cacheOnDisc().build();
-		ImageLoader imageLoader = ImageLoader.getInstance();
+		ImageLoader mImageLoader = ImageLoader.getInstance();
 		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
 				context.getApplicationContext())
 				.memoryCacheExtraOptions(480, 800)
@@ -114,9 +118,9 @@ public abstract class AbstractPodcastAdapter extends SimpleDragSortCursorAdapter
 				.tasksProcessingOrder(QueueProcessingType.FIFO)
 				.defaultDisplayImageOptions(options).build();
 		// Initialize ImageLoader with configuration. Do it once.
-		imageLoader.init(config);
+		mImageLoader.init(config);
 
-		return imageLoader;
+		return mImageLoader;
 	}
 
 }

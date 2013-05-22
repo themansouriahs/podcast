@@ -43,6 +43,8 @@ public class ItemColumns implements BaseColumns {
 	public static final String SUBS_ID = "subs_id";
 
 	public static final String TITLE = "title";
+	
+	public static final String REMOTE_ID = "remote_id";
 
 	public static final String AUTHOR = "author";
 
@@ -91,13 +93,14 @@ public class ItemColumns implements BaseColumns {
 	public static final String[] ALL_COLUMNS = { _ID, SUBS_ID, TITLE, AUTHOR,
 			DATE, LAST_UPDATE, CONTENT, STATUS, URL, RESOURCE, FILESIZE,CHUNK_FILESIZE, DURATION,
 			LENGTH, OFFSET, PATHNAME, FAIL_COUNT, MEDIA_URI, SUB_TITLE,
-			CREATED, TYPE, LISTENED, IMAGE_URL, DOWNLOAD_REFERENCE, EPISODE_NUMBER, IS_DOWNLOADED, DURATION_MS, PRIORITY };
+			CREATED, TYPE, LISTENED, IMAGE_URL, DOWNLOAD_REFERENCE, EPISODE_NUMBER, IS_DOWNLOADED, DURATION_MS, PRIORITY, REMOTE_ID };
 
 	public static final String DEFAULT_SORT_ORDER = CREATED + " DESC";
 
 	public static final String sql_create_table = "CREATE TABLE " 
 		+ TABLE_NAME + " (" 
-		+ _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " 
+		+ _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+		+ REMOTE_ID + " VARCHAR(128), "
 		+ SUBS_ID + " INTEGER, " 
 		+ TITLE + " VARCHAR(128), " 
 		+ AUTHOR + " VARCHAR(128), " 
@@ -159,6 +162,10 @@ public class ItemColumns implements BaseColumns {
 			values.put(TITLE, "unknow");
 		}
 
+		if (values.containsKey(REMOTE_ID) == false) {
+			values.put(REMOTE_ID, "");
+		}
+		
 		if (values.containsKey(AUTHOR) == false) {
 			values.put(AUTHOR, "");
 		}

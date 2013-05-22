@@ -39,22 +39,7 @@ public class SubscriptionsFragment extends Fragment {
 	private static final int MENU_ITEM_START_DOWNLOAD = Menu.FIRST + 10;
 	private static final int MENU_ITEM_START_PLAY = Menu.FIRST + 11;
 	private static final int MENU_ITEM_ADD_TO_PLAYLIST = Menu.FIRST + 12;
-	
-	private static final String[] PROJECTION = new String[] {
-		SubscriptionColumns._ID, // 0
-		SubscriptionColumns.TITLE, // 1
-		SubscriptionColumns.LINK,
-		SubscriptionColumns.URL,
-		SubscriptionColumns.DESCRIPTION,
-		SubscriptionColumns.FAIL_COUNT,
-		SubscriptionColumns.LAST_ITEM_UPDATED,
-		SubscriptionColumns.AUTO_DOWNLOAD,
-		SubscriptionColumns.IMAGE_URL,
-		SubscriptionColumns.RATING,
-		SubscriptionColumns.LAST_UPDATED,
-		SubscriptionColumns.COMMENT
-	};
-	
+		
 	private static enum LayoutType { LIST, GRID };
 	
 	private FragmentUtils mFragmentUtils;
@@ -136,7 +121,7 @@ public class SubscriptionsFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         mFragmentUtils.setAdapter(getSubscriptionCursorAdapter(getActivity(), mFragmentUtils.getCursor()));		
-        mFragmentUtils.startInit(0, SubscriptionColumns.URI, PROJECTION, "1", SubscriptionColumns.TITLE + " ASC");
+        mFragmentUtils.startInit(0, SubscriptionColumns.URI, SubscriptionColumns.ALL_COLUMNS, "1", SubscriptionColumns.TITLE + " ASC");
     }
 
 	
@@ -223,7 +208,7 @@ public class SubscriptionsFragment extends Fragment {
 	}
 
 	public void startInit() {
-		Cursor cursor = new CursorLoader(getActivity(), SubscriptionColumns.URI, PROJECTION, null, null, null).loadInBackground();
+		Cursor cursor = new CursorLoader(getActivity(), SubscriptionColumns.URI, SubscriptionColumns.ALL_COLUMNS, null, null, null).loadInBackground();
 		CursorAdapter cursorAdapter = getSubscriptionCursorAdapter(getActivity().getApplicationContext(), cursor);
 	
 		mFragmentUtils.setCursor(cursor);
@@ -253,7 +238,7 @@ public class SubscriptionsFragment extends Fragment {
 	}
 	
 	public CursorAdapter getAdapter() {
-		Cursor cursor = new CursorLoader(getActivity(), SubscriptionColumns.URI, PROJECTION, null, null, null).loadInBackground();
+		Cursor cursor = new CursorLoader(getActivity(), SubscriptionColumns.URI, SubscriptionColumns.ALL_COLUMNS, null, null, null).loadInBackground();
 		return getSubscriptionCursorAdapter(getActivity(), cursor);
 	}
 	

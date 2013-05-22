@@ -70,10 +70,10 @@ public class SubscriptionColumns implements BaseColumns {
 		+ USERNAME	+ " VARCHAR(32) , " 
 		+ PASSWORD + " VARCHAR(32) , " 
 		+ SERVER_ID + " INTEGER , " 
-		+ SYNC + " INTEGER , " 		
+		+ SYNC + " VARCHAR(128), " 		
 		+ AUTO_DOWNLOAD + " INTEGER , "
 		+ PLAYLIST_POSITION + " INTEGER , " 	
-		+ IMAGE_URL + " VARCHAR(1024) " 		
+		+ IMAGE_URL + " VARCHAR(1024) "
 		+ ");";
 
 	public static final String sql_index_subs_url = "CREATE UNIQUE INDEX IDX_"

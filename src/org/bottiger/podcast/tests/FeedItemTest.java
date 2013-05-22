@@ -81,8 +81,8 @@ public class FeedItemTest extends android.test.ProviderTestCase<PodcastProvider>
         assertTrue(item.status==ItemColumns.ITEM_STATUS_NO_PLAY);
         assertTrue(item.failcount==0);
         assertTrue(item.offset==0);
-        assertTrue(update<=item.update);
-        assertTrue((update+10)>item.update);
+        assertTrue(update<=item.lastUpdate);
+        assertTrue((update+10)>item.lastUpdate);
     }     
 
     public void testdownloadSuccess(ContentResolver contentResolver) throws Exception {

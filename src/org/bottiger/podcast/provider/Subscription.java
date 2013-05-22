@@ -1,11 +1,13 @@
 package org.bottiger.podcast.provider;
 
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedList;
 
 import org.bottiger.podcast.MainActivity;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 import android.app.Activity;
 import android.content.ContentResolver;
@@ -15,7 +17,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.SystemClock;
 import android.provider.BaseColumns;
 import android.support.v4.util.LruCache;
 
@@ -24,7 +25,10 @@ public class Subscription implements WithIcon {
 	public final static int ADD_SUCCESS = 0;
 	public final static int ADD_FAIL_DUP = -1;
 	public final static int ADD_FAIL_UNSUCCESS = -2;
-	
+
+	public final static int STATUS_SUBSCRIBED = 1;
+	public final static int STATUS_UNSUBSCRIBED = 2;
+
 	private static SubscriptionLruCache cache = null;
 
 	public long id;
@@ -36,6 +40,7 @@ public class Subscription implements WithIcon {
 	public String description;
 	public String imageURL;
 	public String sync_id;
+	public String status;
 	public long lastUpdated;
 	public long lastItemUpdated;
 	public long fail_count;
@@ -54,7 +59,7 @@ public class Subscription implements WithIcon {
 				channel_id);
 		act.startActivity(new Intent(Intent.ACTION_EDIT, uri));
 	}
-	
+
 	public static Cursor allAsCursor(ContentResolver context) {
 		return context.query(SubscriptionColumns.URI,
 				SubscriptionColumns.ALL_COLUMNS, null, null, null);
@@ -124,9 +129,9 @@ public class Subscription implements WithIcon {
 	public static Subscription getById(ContentResolver context, long id) {
 		Cursor cursor = null;
 		Subscription sub = null;
-		
+
 		initCache();
-		
+
 		// Return item directly if cached
 		synchronized (cache) {
 			sub = cache.get(id);
@@ -170,6 +175,7 @@ public class Subscription implements WithIcon {
 		lastItemUpdated = -1;
 		auto_download = -1;
 		sync_id = null;
+		status = null;
 	}
 
 	public Subscription() {
@@ -193,7 +199,7 @@ public class Subscription implements WithIcon {
 
 		// Unsubscribe from local database
 		String where = BaseColumns._ID + " = ?";
-		String[] selectionArgs = {new Long(sub.id).toString()};
+		String[] selectionArgs = { new Long(sub.id).toString() };
 		int deletedRows = context.getContentResolver().delete(
 				SubscriptionColumns.URI, where, selectionArgs);
 		if (deletedRows == 1)
@@ -219,16 +225,18 @@ public class Subscription implements WithIcon {
 		cv.put(SubscriptionColumns.DESCRIPTION, description);
 		cv.put(SubscriptionColumns.IMAGE_URL, imageURL);
 		cv.put(SubscriptionColumns.SYNC, sync_id);
+		cv.put(SubscriptionColumns.STATUS, status);
 		Uri uri = context.getContentResolver().insert(SubscriptionColumns.URI,
 				cv);
 		if (uri == null) {
 			return ADD_FAIL_UNSUCCESS;
 		}
-		
-		Subscription sub_test = Subscription.getByUrl(context.getContentResolver(),
-				url);
+
+		Subscription sub_test = Subscription.getByUrl(
+				context.getContentResolver(), url);
 		if (sub_test != null && MainActivity.gReader != null)
-			MainActivity.gReader.addSubscriptiontoReader(context, MainActivity.mAccount,sub_test);
+			MainActivity.gReader.addSubscriptiontoReader(context,
+					MainActivity.mAccount, sub_test);
 
 		return ADD_SUCCESS;
 
@@ -239,7 +247,7 @@ public class Subscription implements WithIcon {
 		context.delete(uri, null, null);
 	}
 
-	public int update(ContentResolver context) {
+	public void update(ContentResolver context) {
 		try {
 
 			ContentValues cv = new ContentValues();
@@ -267,37 +275,43 @@ public class Subscription implements WithIcon {
 
 			if (auto_download >= 0)
 				cv.put(SubscriptionColumns.AUTO_DOWNLOAD, auto_download);
-			
+
 			if (sync_id != null)
 				cv.put(SubscriptionColumns.SYNC, sync_id);
 
-			return context.update(SubscriptionColumns.URI, cv,
-					BaseColumns._ID + "=" + id, null);
+			if (status != null)
+				cv.put(SubscriptionColumns.STATUS, status);
+
+			context.update(SubscriptionColumns.URI, cv, BaseColumns._ID + "="
+					+ id, null);
 
 		} finally {
 		}
+
+		return;
 	}
 
 	private static Subscription fetchFromCursor(Subscription sub, Cursor cursor) {
 		// assert cursor.moveToFirst();
 		// cursor.moveToFirst();
 		sub.id = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
-		
+
 		// Return item directly if cached
 		initCache();
 		synchronized (cache) {
 			Subscription cacheSub = cache.get(sub.id);
-			if (cacheSub != null && cacheSub.title != "") { // FIXME cacheItem.title != ""
+			if (cacheSub != null && cacheSub.title != "") { // FIXME
+															// cacheItem.title
+															// != ""
 				sub = cacheSub;
 				return sub;
 			}
 		}
-		
+
 		int lastUpdatedIndex = cursor
 				.getColumnIndex(SubscriptionColumns.LAST_UPDATED);
-		int urlIndex = cursor
-				.getColumnIndex(SubscriptionColumns.URL);
-		
+		int urlIndex = cursor.getColumnIndex(SubscriptionColumns.URL);
+
 		sub.lastUpdated = cursor.getLong(lastUpdatedIndex);
 		sub.title = cursor.getString(cursor
 				.getColumnIndex(SubscriptionColumns.TITLE));
@@ -316,35 +330,35 @@ public class Subscription implements WithIcon {
 				.getColumnIndex(SubscriptionColumns.AUTO_DOWNLOAD));
 		sub.sync_id = cursor.getString(cursor
 				.getColumnIndex(SubscriptionColumns.SYNC));
-		
+
 		// if item was not cached we put it in the cache
 		synchronized (cache) {
 			cache.put(sub.id, sub);
 		}
-		
+
 		return sub;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "Subscription: " + this.url;
 	}
-	
+
 	private static void initCache() {
 		if (cache == null) {
-			int memoryClass = 16 * 1024 * 1024; //FIXME use getMemoryClass()
-	    	cache = new SubscriptionLruCache(memoryClass);		
+			int memoryClass = 16 * 1024 * 1024; // FIXME use getMemoryClass()
+			cache = new SubscriptionLruCache(memoryClass);
 		}
 	}
-	
-	private static class SubscriptionLruCache extends LruCache<Long, Subscription> {
 
-	    public SubscriptionLruCache(int maxSize) {
-	        super(maxSize);
-	    }
+	private static class SubscriptionLruCache extends
+			LruCache<Long, Subscription> {
+
+		public SubscriptionLruCache(int maxSize) {
+			super(maxSize);
+		}
 
 	}
-	
 
 	public URL getURL() throws MalformedURLException {
 		return new URL(url);
@@ -360,17 +374,75 @@ public class Subscription implements WithIcon {
 	public String getImageURL(Context context) {
 		return getImageURL();
 	}
-	
+
 	public String getImageURL() {
 		return imageURL;
 	}
-	
+
 	/**
 	 * Run whenever the subscription has been updated to google drive
 	 */
 	public void synced(ContentResolver contentResolver, String fileID) {
 		sync_id = fileID;
 		update(contentResolver);
+	}
+
+	@Override
+	public long lastModificationDate() {
+		return lastItemUpdated;
+	}
+
+	public int getStatus() {
+		if (status == "ubsubscribed")
+			return STATUS_UNSUBSCRIBED;
+
+		return STATUS_SUBSCRIBED;
+	}
+
+	@Override
+	public String getDriveId() {
+		return sync_id;
+	}
+
+	@Override
+	public String getTitle() {
+		return title;
+	}
+
+	@Override
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public void setURL(String url) {
+		this.url = url;
+	}
+
+	@Override
+	public String toJSON() {
+		JSONObject json = new JSONObject();
+		try {
+			json.put("url", getURL().toString());
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return json.toJSONString();
+	}
+
+	@Override
+	public void fromJSON(String json) {
+		if (json != null) {
+			String url = null;
+			Object rootObject = JSONValue.parse(json);
+			JSONObject mainObject = (JSONObject) rootObject;
+			if (mainObject != null) {
+				url = mainObject.get("url").toString();
+			}
+			if (url != null)
+				this.url = url;
+		}
 	}
 
 }
