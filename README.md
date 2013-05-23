@@ -25,6 +25,18 @@ get started with my own fork.
 
 Arvid Böttiger
 
+BETA Testing
+============
+
+While there are still some critical bugs in the code it has become usable for everyday use - if you are fine with random crashes once in a while.
+In order to get the current beat-version Google requires you to join this community on Google+
+
+    https://plus.google.com/communities/112499725575016472220
+
+Then you can join the beta program on the play store from here:
+
+    https://play.google.com/apps/testing/org.bottiger.podcast
+
 Ignore SoundWaves.java
 ======================
 
