@@ -118,27 +118,33 @@ public class DriveSyncer {
 		} else {
 			// Files changed since last time we synced
 			Map<String, File> files = getChangedFiles(mLargestChangeId);
+			
 			Uri subscriptionUri = getSubscriptionsUri(mAccount.name);
 			Uri itemUri = getItemsUri(mAccount.name);
 
 			try {
+				/*
+				 * Merge Subscriptions with Google Drive
+				 */
 				Cursor subscriptionCursor = mProvider.query(subscriptionUri,
 						SUBSCRIPTION_PROJECTION, null, null, null);
-				Cursor itemCursor = mProvider.query(itemUri, ITEM_PROJECTION,
-						null, null, null);
-
 				Log.d(TAG,
 						"Got local subscriptions: "
 								+ subscriptionCursor.getCount());
-				Log.d(TAG, "Got local episodes: " + itemCursor.getCount());
-
 				for (boolean more = subscriptionCursor.moveToFirst(); more; more = subscriptionCursor
 						.moveToNext()) {
 					Subscription subscription = Subscription
 							.getByCursor(subscriptionCursor);
 					mergeCursor(subscription, files);
 				}
+				
 
+				/*
+				 * Merge FeedItems with Google Drive
+				 */
+				Cursor itemCursor = mProvider.query(itemUri, ITEM_PROJECTION,
+						null, null, null);
+				Log.d(TAG, "Got local episodes: " + itemCursor.getCount());
 				for (boolean more = itemCursor.moveToFirst(); more; more = itemCursor
 						.moveToNext()) {
 					FeedItem item = FeedItem.getByCursor(itemCursor);
@@ -165,10 +171,7 @@ public class DriveSyncer {
 
 	private void mergeCursor(WithIcon item, Map<String, File> files)
 			throws IOException {
-		// Merge.
-
 		String fileId = item.getDriveId();
-		// Uri localFileUri = getItemUri(mAccount.name, fileId);
 
 		Log.d(TAG, "Processing local file with drive ID: " + fileId);
 		if (files.containsKey(fileId)) {
@@ -196,8 +199,6 @@ public class DriveSyncer {
 		}
 
 		item.update(mContext.getContentResolver());
-		// mContext.getContentResolver().notifyChange(localFileUri,
-		// null, false);
 	}
 
 	/**
@@ -334,23 +335,6 @@ public class DriveSyncer {
 					newSubscription.synced(mContext.getContentResolver(),
 							driveFile.getId());
 				}
-				/*
-				 * ContentValues values = new ContentValues();
-				 * values.put(NotePad.Notes.COLUMN_NAME_ACCOUNT, mAccount.name);
-				 * values.put(NotePad.Notes.COLUMN_NAME_FILE_ID,
-				 * driveFile.getId());
-				 * values.put(NotePad.Notes.COLUMN_NAME_TITLE,
-				 * driveFile.getTitle());
-				 * values.put(NotePad.Notes.COLUMN_NAME_NOTE,
-				 * getFileContent(driveFile));
-				 * values.put(NotePad.Notes.COLUMN_NAME_CREATE_DATE, driveFile
-				 * .getCreatedDate().getValue());
-				 * values.put(NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE,
-				 * driveFile.getModifiedDate().getValue());
-				 * 
-				 * try { mProvider.insert(uri, values); } catch (RemoteException
-				 * e) { e.printStackTrace(); }
-				 */
 			}
 		}
 
@@ -608,10 +592,6 @@ public class DriveSyncer {
 		}
 
 		long localFileModificationDate = localFile.lastModificationDate();
-		/*
-		 * long localFileModificationDate = localFile
-		 * .getLong(COLUMN_INDEX_MODIFICATION_DATE);
-		 */
 
 		Log.d(TAG, "Modification dates: " + localFileModificationDate + " - "
 				+ driveFile.getModifiedDate().getValue());

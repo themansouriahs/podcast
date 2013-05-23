@@ -38,7 +38,7 @@ public abstract class AbstractPodcastAdapter extends SimpleDragSortCursorAdapter
 	
 	protected LayoutInflater mInflater;
 	protected Context mContext;
-	private ImageLoader mImageLoader = null;
+	private static ImageLoader mImageLoader = null;
 	
 	
 	public final static FieldHandler defaultTextFieldHandler = new FieldHandler.TextFieldHandler();
@@ -100,7 +100,7 @@ public abstract class AbstractPodcastAdapter extends SimpleDragSortCursorAdapter
 		DisplayImageOptions options = new DisplayImageOptions.Builder()
 				.showStubImage(R.drawable.generic_podcast).cacheInMemory()
 				.cacheOnDisc().build();
-		ImageLoader mImageLoader = ImageLoader.getInstance();
+		mImageLoader = ImageLoader.getInstance();
 		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
 				context.getApplicationContext())
 				.memoryCacheExtraOptions(480, 800)
