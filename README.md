@@ -25,6 +25,12 @@ get started with my own fork.
 
 Arvid Böttiger
 
+Screenshots
+===========
+
+![Playlist with current item](misc/screenshots/Screenshot_2013-05-23-09-52-49.png "Playlist")
+![Subscriptions](misc/screenshots/Screenshot_2013-05-23-09-53-18.png "Subscriptions")
+
 BETA Testing
 ============
 
