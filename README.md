@@ -28,8 +28,8 @@ Arvid Böttiger
 Screenshots
 ===========
 
-![Playlist with current item](misc/screenshots/Screenshot_2013-05-23-09-52-49.png "Playlist")
-![Subscriptions](misc/screenshots/Screenshot_2013-05-23-09-53-18.png "Subscriptions")
+![Playlist with current item](misc/screenshots/49.png "Playlist")
+![Subscriptions](misc/screenshots/18.png "Subscriptions")
 
 BETA Testing
 ============
