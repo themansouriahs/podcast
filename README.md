@@ -29,6 +29,7 @@ Screenshots
 ===========
 
 ![Playlist with current item](misc/screenshots/49.png "Playlist")
+ 
 ![Subscriptions](misc/screenshots/18.png "Subscriptions")
 
 BETA Testing
