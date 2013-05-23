@@ -391,6 +391,10 @@ public class Subscription implements WithIcon {
 	public long lastModificationDate() {
 		return lastItemUpdated;
 	}
+	
+	public long getLastUpdate() {
+		return this.lastUpdated;
+	}
 
 	public int getStatus() {
 		if (status == "ubsubscribed")
@@ -423,6 +427,8 @@ public class Subscription implements WithIcon {
 		JSONObject json = new JSONObject();
 		try {
 			json.put("url", getURL().toString());
+			json.put("last_update", getLastUpdate());
+			json.put("title", getTitle());
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -432,16 +438,36 @@ public class Subscription implements WithIcon {
 	}
 
 	@Override
-	public void fromJSON(String json) {
+	public void fromJSON(ContentResolver contentResolver, String json) {
+		Subscription subscription = null;
+		boolean updateItem = false;
 		if (json != null) {
 			String url = null;
+			String title = null;
+			Number lastUpdate = -1;
+			
 			Object rootObject = JSONValue.parse(json);
 			JSONObject mainObject = (JSONObject) rootObject;
 			if (mainObject != null) {
 				url = mainObject.get("url").toString();
+				title = mainObject.get("title").toString();
+				lastUpdate = (Number) mainObject.get("last_update");
 			}
-			if (url != null)
-				this.url = url;
+			
+			subscription = Subscription.getByUrl(contentResolver, url);
+			if (subscription == null) {
+				subscription = new Subscription();
+				updateItem = true;
+			} else {
+				updateItem = subscription.getLastUpdate() < lastUpdate.longValue();
+			}
+			
+			if (url != null) this.url = url;
+			if (title != null) this.title = title;
+			if (lastUpdate.longValue() > -1) subscription.lastUpdated = lastUpdate.longValue();
+			
+			if (updateItem)
+				subscription.update(contentResolver);
 		}
 	}
 

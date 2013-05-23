@@ -19,7 +19,7 @@ public interface WithIcon {
 	
 	public abstract String toJSON();
 	
-	public abstract void fromJSON(String json);
+	public abstract void fromJSON(ContentResolver contentResolver, String json);
 	
 	public abstract void update(ContentResolver contentResolver);
 
