@@ -35,14 +35,14 @@ public class SubscriptionColumns implements BaseColumns {
 	public static final String USERNAME = "user";
 	public static final String PASSWORD = "pwd";
 	public static final String SERVER_ID = "server_id";
-	public static final String SYNC = "sync";	
+	public static final String REMOTE_ID = "sync";	
 	public static final String AUTO_DOWNLOAD = "auto_download";	
 	public static final String PLAYLIST_POSITION = "playlist_id";		
 	
 
 	public static final String[] ALL_COLUMNS = { _ID, URL, LINK, TITLE,
 			DESCRIPTION, LAST_UPDATED, LAST_ITEM_UPDATED, FAIL_COUNT, STATUS,
-			COMMENT, RATING, USERNAME, PASSWORD, SERVER_ID, SYNC, AUTO_DOWNLOAD,
+			COMMENT, RATING, USERNAME, PASSWORD, SERVER_ID, REMOTE_ID, AUTO_DOWNLOAD,
 			PLAYLIST_POSITION, IMAGE_URL};
 	
 	  /** The index of the projection columns */
@@ -70,7 +70,7 @@ public class SubscriptionColumns implements BaseColumns {
 		+ USERNAME	+ " VARCHAR(32) , " 
 		+ PASSWORD + " VARCHAR(32) , " 
 		+ SERVER_ID + " INTEGER , " 
-		+ SYNC + " VARCHAR(128), " 		
+		+ REMOTE_ID + " VARCHAR(128), " 		
 		+ AUTO_DOWNLOAD + " INTEGER , "
 		+ PLAYLIST_POSITION + " INTEGER , " 	
 		+ IMAGE_URL + " VARCHAR(1024) "

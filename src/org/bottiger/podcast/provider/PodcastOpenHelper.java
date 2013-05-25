@@ -66,7 +66,7 @@ public class PodcastOpenHelper extends SQLiteOpenHelper {
 					+ SubscriptionColumns.COMMENT + " TEXT, "
 					+ SubscriptionColumns.RATING + " INTEGER, "
 					+ SubscriptionColumns.SERVER_ID + " INTEGER, "
-					+ SubscriptionColumns.SYNC + " VARCHAR(128), "
+					+ SubscriptionColumns.REMOTE_ID + " VARCHAR(128), "
 					+ SubscriptionColumns.AUTO_DOWNLOAD + " INTEGER , "
 					+ SubscriptionColumns.PLAYLIST_POSITION + " INTEGER , "
 					+ SubscriptionColumns.IMAGE_URL + " VARCHAR(1024) " + ");";
@@ -91,7 +91,7 @@ public class PodcastOpenHelper extends SQLiteOpenHelper {
 
 			// Add new column
 			String new_column = "ALTER TABLE " + SubscriptionColumns.TABLE_NAME
-					+ "_new ADD " + SubscriptionColumns.SYNC + " VARCHAR(128)";
+					+ "_new ADD " + SubscriptionColumns.REMOTE_ID + " VARCHAR(128)";
 
 			// Drop old table
 			// http://stackoverflow.com/questions/3675032/drop-existing-table-in-sqlite-when-if-exists-operator-is-not-supported

@@ -416,29 +416,4 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 			return new Long(1); // FIXME
 	}
 
-	/*
-	public void drop(int from, int to) {
-		if (from != to) {
-			mFrom = new Integer(from);
-			mTo = new Integer(to);
-			// Playlist.setFrom(from);
-			// Playlist.setTo(to);
-			ItemCursorAdapter adapter = ((ItemCursorAdapter) this);
-
-			FeedItem precedingItem = null;
-			if (to > 0) {
-				Cursor precedingItemCursor = (Cursor) adapter.getItem(to - 1);
-				precedingItem = FeedItem.getByCursor(precedingItemCursor);
-			}
-
-			Cursor item = (Cursor) adapter.getItem(from);
-			FeedItem feedItem = FeedItem.getByCursor(item);
-
-			feedItem.setPriority(precedingItem, mContext);
-			FeedItem.clearCache(); // this should nit be there - I think
-			notifyDataSetChanged();
-		}
-	}
-	*/
-
 }

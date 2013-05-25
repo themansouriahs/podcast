@@ -6,6 +6,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -20,24 +21,29 @@ import org.json.simple.JSONValue;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.app.DownloadManager.Query;
+import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
+import android.os.RemoteException;
 import android.provider.BaseColumns;
 import android.support.v4.util.LruCache;
 
-public class FeedItem implements Comparable<FeedItem>, WithIcon {
+public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 
 	public static final int MAX_DOWNLOAD_FAIL = 5;
 
 	private final Log log = Log.getLog(getClass());
 	private static ItemLruCache cache = null;
+
+	private BulkUpdater mBulkUpdater = null;
 
 	/*
 	 * Let's document these retared fields! They are totally impossible to guess
@@ -385,52 +391,67 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	}
 
 	/**
-	 * Update the FeedItem in the database
+	 * Batch update
 	 */
-	public void update(ContentResolver contentResolver) {
+	public ContentProviderOperation update(ContentResolver contentResolver,
+			boolean batchUpdate) {
+
 		log.debug("item update start");
+
+		ContentProviderOperation contentUpdate = null;
 
 		initCache();
 		if (this.id > 0)
 			cache.remove(this.id);
 
-		try {
+		ContentValues cv = new ContentValues();
 
-			ContentValues cv = new ContentValues();
-			if (filename != null)
-				cv.put(ItemColumns.PATHNAME, filename);
-			if (remote_id != null)
-				cv.put(ItemColumns.REMOTE_ID, remote_id);
-			if (filesize >= 0)
-				cv.put(ItemColumns.FILESIZE, filesize);
-			if (downloadReferenceID >= 0)
-				cv.put(ItemColumns.DOWNLOAD_REFERENCE, downloadReferenceID);
-			cv.put(ItemColumns.IS_DOWNLOADED, isDownloaded);
-			if (episodeNumber >= 0)
-				cv.put(ItemColumns.EPISODE_NUMBER, episodeNumber);
-			if (chunkFilesize >= 0)
-				cv.put(ItemColumns.LENGTH, length);
-			if (duration_ms >= 0)
-				cv.put(ItemColumns.DURATION_MS, duration_ms);
-			if (chunkFilesize >= 0)
-				cv.put(ItemColumns.CHUNK_FILESIZE, chunkFilesize);
-			if (offset >= 0)
-				cv.put(ItemColumns.OFFSET, offset);
-			if (lastUpdate >= 0) {
-				lastUpdate = Long.valueOf(System.currentTimeMillis());
-				cv.put(ItemColumns.LAST_UPDATE, lastUpdate);
-			}
-			if (listened >= 0)
-				cv.put(ItemColumns.LISTENED, listened);
-			if (priority >= 0)
-				cv.put(ItemColumns.PRIORITY, priority);
+		if (filename != null)
+			cv.put(ItemColumns.PATHNAME, filename);
+		cv.put(ItemColumns.REMOTE_ID, remote_id);
+		if (filesize >= 0)
+			cv.put(ItemColumns.FILESIZE, filesize);
+		if (downloadReferenceID >= 0)
+			cv.put(ItemColumns.DOWNLOAD_REFERENCE, downloadReferenceID);
+		cv.put(ItemColumns.IS_DOWNLOADED, isDownloaded);
+		if (episodeNumber >= 0)
+			cv.put(ItemColumns.EPISODE_NUMBER, episodeNumber);
+		if (chunkFilesize >= 0)
+			cv.put(ItemColumns.LENGTH, length);
+		if (duration_ms >= 0)
+			cv.put(ItemColumns.DURATION_MS, duration_ms);
+		if (chunkFilesize >= 0)
+			cv.put(ItemColumns.CHUNK_FILESIZE, chunkFilesize);
+		if (offset >= 0)
+			cv.put(ItemColumns.OFFSET, offset);
+		if (lastUpdate >= 0) {
+			lastUpdate = Long.valueOf(System.currentTimeMillis());
+			cv.put(ItemColumns.LAST_UPDATE, lastUpdate);
+		}
+		if (listened >= 0)
+			cv.put(ItemColumns.LISTENED, listened);
+		if (priority >= 0)
+			cv.put(ItemColumns.PRIORITY, priority);
 
+		if (batchUpdate) {
+			contentUpdate = ContentProviderOperation.newUpdate(ItemColumns.URI)
+					.withValues(cv)
+					.withSelection(BaseColumns._ID + "=" + id, null)
+					.withYieldAllowed(true).build();
+		} else {
 			int numUpdatedRows = contentResolver.update(ItemColumns.URI, cv,
 					BaseColumns._ID + "=" + id, null);
 			if (numUpdatedRows == 1)
 				log.debug("update OK");
-		} finally {
 		}
+		return contentUpdate;
+	}
+
+	/**
+	 * Update the FeedItem in the database
+	 */
+	public void update(ContentResolver contentResolver) {
+		update(contentResolver, false);
 	}
 
 	public Uri insert(ContentResolver contentResolver) {
@@ -1046,9 +1067,10 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 	public void setTitle(String title) {
 		this.title = title;
 	}
-	
+
 	/**
 	 * Get the time this item was last updated
+	 * 
 	 * @return
 	 */
 	public long getLastUpdate() {
@@ -1097,8 +1119,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 		return json.toJSONString();
 	}
 
-	@Override
-	public void fromJSON(ContentResolver contentResolver, String json) {
+	public static FeedItem fromJSON(ContentResolver contentResolver, String json) {
 		FeedItem item = null;
 		boolean updateItem = false;
 		if (json != null) {
@@ -1112,7 +1133,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 			String image = null;
 			String filename = null;
 			String subtitle = null;
-			
+
 			Number duration_ms = -1;
 			Number sub_id = -1;
 			Number filesize = -1;
@@ -1123,12 +1144,16 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 			Number priority = -1;
 			Number length = -1;
 			Number lastUpdate = -1;
-			
+
 			Object rootObject = JSONValue.parse(json);
 			JSONObject mainObject = (JSONObject) rootObject;
 			if (mainObject != null) {
 				url = mainObject.get("url").toString();
-				remote_id = mainObject.get("remote_id").toString();
+				
+				Object remoteIdObject = mainObject.get("remote_id");
+				if (remoteIdObject != null)
+					remote_id = mainObject.get("remote_id").toString();
+					
 				title = mainObject.get("title").toString();
 				author = mainObject.get("author").toString();
 				date = mainObject.get("date").toString();
@@ -1137,7 +1162,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 				image = mainObject.get("image").toString();
 				filename = mainObject.get("filename").toString();
 				subtitle = mainObject.get("subtitle").toString();
-				
+
 				duration_ms = (Number) mainObject.get("duration_ms");
 				sub_id = (Number) mainObject.get("sub_id");
 				filesize = (Number) mainObject.get("filesize");
@@ -1148,7 +1173,7 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 				priority = (Number) mainObject.get("priority");
 				length = (Number) mainObject.get("length");
 				lastUpdate = (Number) mainObject.get("lastUpdate");
-				
+
 				item = FeedItem.getByURL(contentResolver, url);
 				if (item == null) {
 					item = new FeedItem();
@@ -1157,39 +1182,62 @@ public class FeedItem implements Comparable<FeedItem>, WithIcon {
 					updateItem = item.getLastUpdate() < lastUpdate.longValue();
 				}
 			}
-			
-			if (url != null) item.url = url;
-			if (remote_id != null) item.remote_id = title;
-			if (title != null) item.title = title;
-			if (author != null) item.author = author;
-			if (date != null) item.date = date;
-			if (content != null) item.content = content;
-			if (duration_string != null) item.duration_string = duration_string;
-			if (image != null) item.image = image;
-			if (filename != null) item.filename = filename;
-			if (subtitle != null) item.sub_title = subtitle;
-			
-			if (duration_ms.longValue() > -1) item.duration_ms = duration_ms.longValue();
-			if (sub_id.longValue() > -1) item.sub_id = sub_id.longValue();
-			if (filesize.longValue() > -1) item.filesize = filesize.longValue();
-			if (episodeNumber.longValue() > -1) item.episodeNumber = episodeNumber.intValue();
-			if (offset.longValue() > -1) item.offset = offset.intValue();
-			if (status.longValue() > -1) item.status = status.intValue();
-			if (listened.longValue() > -1) item.listened = listened.intValue();
-			if (priority.longValue() > -1) item.priority = priority.intValue();
-			if (length.longValue() > -1) item.length = length.longValue();
-			if (lastUpdate.longValue() > -1) item.lastUpdate = lastUpdate.longValue();
-			
+
+			if (url != null)
+				item.url = url;
+			if (remote_id != null)
+				item.remote_id = title;
+			if (title != null)
+				item.title = title;
+			if (author != null)
+				item.author = author;
+			if (date != null)
+				item.date = date;
+			if (content != null)
+				item.content = content;
+			if (duration_string != null)
+				item.duration_string = duration_string;
+			if (image != null)
+				item.image = image;
+			if (filename != null)
+				item.filename = filename;
+			if (subtitle != null)
+				item.sub_title = subtitle;
+
+			if (duration_ms.longValue() > -1)
+				item.duration_ms = duration_ms.longValue();
+			if (sub_id.longValue() > -1)
+				item.sub_id = sub_id.longValue();
+			if (filesize.longValue() > -1)
+				item.filesize = filesize.longValue();
+			if (episodeNumber.longValue() > -1)
+				item.episodeNumber = episodeNumber.intValue();
+			if (offset.longValue() > -1)
+				item.offset = offset.intValue();
+			if (status.longValue() > -1)
+				item.status = status.intValue();
+			if (listened.longValue() > -1)
+				item.listened = listened.intValue();
+			if (priority.longValue() > -1)
+				item.priority = priority.intValue();
+			if (length.longValue() > -1)
+				item.length = length.longValue();
+			if (lastUpdate.longValue() > -1)
+				item.lastUpdate = lastUpdate.longValue();
+
 			if (updateItem)
 				item.update(contentResolver);
+
 		}
+
+		return item;
 	}
-	
+
 	/**
 	 * Run whenever the subscription has been updated to google drive
 	 */
-	public void synced(ContentResolver contentResolver, String fileID) {
+	public void setDriveId(String fileID) {
 		remote_id = fileID;
-		update(contentResolver);
+		// update(contentResolver);
 	}
 }

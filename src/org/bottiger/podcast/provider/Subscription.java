@@ -5,11 +5,13 @@ import java.net.URL;
 import java.util.LinkedList;
 
 import org.bottiger.podcast.MainActivity;
+import org.bottiger.podcast.utils.Log;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import android.app.Activity;
+import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -20,7 +22,9 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 import android.support.v4.util.LruCache;
 
-public class Subscription implements WithIcon {
+public class Subscription extends AbstractItem {
+
+	private final Log log = Log.getLog(getClass());
 
 	public final static int ADD_SUCCESS = 0;
 	public final static int ADD_FAIL_DUP = -1;
@@ -224,7 +228,7 @@ public class Subscription implements WithIcon {
 		cv.put(SubscriptionColumns.COMMENT, comment);
 		cv.put(SubscriptionColumns.DESCRIPTION, description);
 		cv.put(SubscriptionColumns.IMAGE_URL, imageURL);
-		cv.put(SubscriptionColumns.SYNC, sync_id);
+		cv.put(SubscriptionColumns.REMOTE_ID, sync_id);
 		cv.put(SubscriptionColumns.STATUS, status);
 		Uri uri = context.getContentResolver().insert(SubscriptionColumns.URI,
 				cv);
@@ -247,48 +251,57 @@ public class Subscription implements WithIcon {
 		context.delete(uri, null, null);
 	}
 
-	public void update(ContentResolver context) {
-		try {
+	/**
+	 * Batch update
+	 */
+	public ContentProviderOperation update(ContentResolver contentResolver,
+			boolean batchUpdate) {
 
-			ContentValues cv = new ContentValues();
-			if (title != null)
-				cv.put(SubscriptionColumns.TITLE, title);
-			if (url != null)
-				cv.put(SubscriptionColumns.URL, url);
-			if (imageURL != null)
-				cv.put(SubscriptionColumns.IMAGE_URL, imageURL);
-			if (description != null)
-				cv.put(SubscriptionColumns.DESCRIPTION, description);
+		ContentProviderOperation contentUpdate = null;
+		ContentValues cv = new ContentValues();
 
-			if (fail_count <= 0) {
-				lastUpdated = Long.valueOf(System.currentTimeMillis());
-			} else {
-				lastUpdated = 0;
-			}
-			cv.put(SubscriptionColumns.LAST_UPDATED, lastUpdated);
+		if (title != null)
+			cv.put(SubscriptionColumns.TITLE, title);
+		if (url != null)
+			cv.put(SubscriptionColumns.URL, url);
+		if (imageURL != null)
+			cv.put(SubscriptionColumns.IMAGE_URL, imageURL);
+		if (description != null)
+			cv.put(SubscriptionColumns.DESCRIPTION, description);
 
-			if (fail_count >= 0)
-				cv.put(SubscriptionColumns.FAIL_COUNT, fail_count);
+		if (fail_count <= 0) {
+			lastUpdated = Long.valueOf(System.currentTimeMillis());
+		} else {
+			lastUpdated = 0;
+		}
+		cv.put(SubscriptionColumns.LAST_UPDATED, lastUpdated);
 
-			if (lastItemUpdated >= 0)
-				cv.put(SubscriptionColumns.LAST_ITEM_UPDATED, lastItemUpdated);
+		if (fail_count >= 0)
+			cv.put(SubscriptionColumns.FAIL_COUNT, fail_count);
 
-			if (auto_download >= 0)
-				cv.put(SubscriptionColumns.AUTO_DOWNLOAD, auto_download);
+		if (lastItemUpdated >= 0)
+			cv.put(SubscriptionColumns.LAST_ITEM_UPDATED, lastItemUpdated);
 
-			if (sync_id != null)
-				cv.put(SubscriptionColumns.SYNC, sync_id);
+		if (auto_download >= 0)
+			cv.put(SubscriptionColumns.AUTO_DOWNLOAD, auto_download);
 
-			if (status != null)
-				cv.put(SubscriptionColumns.STATUS, status);
+		cv.put(SubscriptionColumns.REMOTE_ID, sync_id);
 
-			context.update(SubscriptionColumns.URI, cv, BaseColumns._ID + "="
-					+ id, null);
+		if (status != null)
+			cv.put(SubscriptionColumns.STATUS, status);
 
-		} finally {
+		if (batchUpdate) {
+			contentUpdate = ContentProviderOperation
+					.newUpdate(SubscriptionColumns.URI).withValues(cv)
+					.withSelection(BaseColumns._ID + "=" + id, null)
+					.withYieldAllowed(true).build();
+		} else {
+			contentResolver.update(SubscriptionColumns.URI, cv, BaseColumns._ID
+					+ "=" + id, null);
+			log.debug("update OK");
 		}
 
-		return;
+		return contentUpdate;
 	}
 
 	private static Subscription fetchFromCursor(Subscription sub, Cursor cursor) {
@@ -329,7 +342,7 @@ public class Subscription implements WithIcon {
 		sub.auto_download = cursor.getLong(cursor
 				.getColumnIndex(SubscriptionColumns.AUTO_DOWNLOAD));
 		sub.sync_id = cursor.getString(cursor
-				.getColumnIndex(SubscriptionColumns.SYNC));
+				.getColumnIndex(SubscriptionColumns.REMOTE_ID));
 
 		// if item was not cached we put it in the cache
 		synchronized (cache) {
@@ -382,16 +395,16 @@ public class Subscription implements WithIcon {
 	/**
 	 * Run whenever the subscription has been updated to google drive
 	 */
-	public void synced(ContentResolver contentResolver, String fileID) {
+	public void setDriveId(String fileID) {
 		sync_id = fileID;
-		update(contentResolver);
+		// update(contentResolver);
 	}
 
 	@Override
 	public long lastModificationDate() {
 		return lastItemUpdated;
 	}
-	
+
 	public long getLastUpdate() {
 		return this.lastUpdated;
 	}
@@ -437,38 +450,51 @@ public class Subscription implements WithIcon {
 		return json.toJSONString();
 	}
 
-	@Override
-	public void fromJSON(ContentResolver contentResolver, String json) {
+	public static Subscription fromJSON(ContentResolver contentResolver,
+			String json) {
 		Subscription subscription = null;
 		boolean updateItem = false;
 		if (json != null) {
 			String url = null;
 			String title = null;
+			String remote_id = null;
 			Number lastUpdate = -1;
-			
+
 			Object rootObject = JSONValue.parse(json);
 			JSONObject mainObject = (JSONObject) rootObject;
 			if (mainObject != null) {
 				url = mainObject.get("url").toString();
-				title = mainObject.get("title").toString();
-				lastUpdate = (Number) mainObject.get("last_update");
+				if (mainObject.get("title") != null)
+					title = mainObject.get("title").toString();
+				if (mainObject.get("last_update") != null)
+					lastUpdate = (Number) mainObject.get("last_update");
+				if (mainObject.get("remote_id") != null)
+					remote_id = mainObject.get("remote_id").toString();
 			}
-			
+
 			subscription = Subscription.getByUrl(contentResolver, url);
 			if (subscription == null) {
 				subscription = new Subscription();
 				updateItem = true;
 			} else {
-				updateItem = subscription.getLastUpdate() < lastUpdate.longValue();
+				updateItem = subscription.getLastUpdate() < lastUpdate
+						.longValue();
 			}
-			
-			if (url != null) this.url = url;
-			if (title != null) this.title = title;
-			if (lastUpdate.longValue() > -1) subscription.lastUpdated = lastUpdate.longValue();
-			
+
+			if (url != null)
+				subscription.url = url;
+			if (title != null)
+				subscription.title = title;
+			if (remote_id != null)
+				subscription.sync_id = remote_id;
+			if (lastUpdate.longValue() > -1)
+				subscription.lastUpdated = lastUpdate.longValue();
+
 			if (updateItem)
 				subscription.update(contentResolver);
 		}
+
+		return subscription;
 	}
 
 }

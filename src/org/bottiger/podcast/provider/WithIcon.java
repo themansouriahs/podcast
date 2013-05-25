@@ -1,5 +1,6 @@
 package org.bottiger.podcast.provider;
 
+import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.Context;
 
@@ -11,6 +12,8 @@ public interface WithIcon {
 	
 	public abstract String getDriveId();
 	
+	public abstract void setDriveId(String id);
+	
 	public abstract long lastModificationDate();
 	
 	public abstract String getTitle();
@@ -19,8 +22,10 @@ public interface WithIcon {
 	
 	public abstract String toJSON();
 	
-	public abstract void fromJSON(ContentResolver contentResolver, String json);
+	public abstract WithIcon createFromJSON(ContentResolver contentResolver, String json);
 	
 	public abstract void update(ContentResolver contentResolver);
+	
+	public abstract ContentProviderOperation update(ContentResolver contentResolver, boolean batchUpdate);
 
 }

@@ -217,7 +217,7 @@ public class MainActivity extends FragmentActivity implements
 		}
 
 		mCredential = GoogleAccountCredential.usingOAuth2(this,
-				DriveScopes.DRIVE);
+				"https://www.googleapis.com/auth/drive.appdata"); //DriveScopes.DRIVE);
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		if (!prefs.contains(ACCOUNT_KEY))
 			startActivityForResult(mCredential.newChooseAccountIntent(),
@@ -225,16 +225,23 @@ public class MainActivity extends FragmentActivity implements
 		else
 			mCredential
 					.setSelectedAccountName(prefs.getString(ACCOUNT_KEY, ""));
-		try {
-			mCredential.getToken();
-		} catch (Exception e) {
-			if (e instanceof UserRecoverableAuthException) {
-				e.printStackTrace();
-				startActivityForResult(mCredential.newChooseAccountIntent(),
-						REQUEST_AUTHORIZATION);
+		
+		new Thread(new Runnable() {
+			public void run() {
+				try {
+					mCredential.getToken();
+				} catch (Exception e) {
+					e.printStackTrace();
+					if (e instanceof UserRecoverableAuthException) {
+						startActivityForResult(
+								((UserRecoverableAuthException) e).getIntent(),
+								REQUEST_AUTHORIZATION);
+					}
+				}
+
+				mDriveService = getDriveService(mCredential);
 			}
-		}
-		mDriveService = getDriveService(mCredential);
+		}).start();
 
 		aua = new AutoUpdateApk(getApplicationContext());
 
