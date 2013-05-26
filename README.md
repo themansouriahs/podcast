@@ -33,7 +33,11 @@ Screenshots
 BETA Testing
 ============
 
-While there are still some critical bugs in the code it has become usable for everyday use - if you are fine with random crashes once in a while.
+Thank you for showing interest in the beta version!
+
+While SoundWaves still are in a very early state with serveral critical known bugs it has become usable for everyday use - if you are fine with random crashes once in a while and a laggy user interface.
+However, the fundamental backend is shaping up and by running it you will help finding new bugs I can fix before I release it.
+
 In order to get the current beat-version Google requires you to join this community on Google+
 
     https://plus.google.com/communities/112499725575016472220
