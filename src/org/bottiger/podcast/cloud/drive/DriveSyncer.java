@@ -4,13 +4,15 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.bottiger.podcast.MainActivity;
@@ -25,7 +27,6 @@ import android.accounts.Account;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ContentProviderClient;
-import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -53,6 +54,8 @@ import com.google.api.services.drive.model.ChangeList;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import com.google.api.services.drive.model.ParentReference;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 /**
  * From
@@ -66,6 +69,9 @@ import com.google.api.services.drive.model.ParentReference;
  */
 public class DriveSyncer {
 
+	/** For debugging set parent = root. Othervise = appdata */
+	private static final String parent = "appdata";
+
 	/** For logging and debugging purposes */
 	private static final String TAG = "DriveSyncerAdapter";
 
@@ -78,16 +84,18 @@ public class DriveSyncer {
 
 	/** text/plain MIME type. */
 	private static final String TEXT_PLAIN = "text/plain";
-	private static final String FOLDER = "application/vnd.google-apps.folder";
 
 	/** */
-	private static final String SUBSCRIPTION_PREFIX = "subscription";
-	private static final String FEEDITEM_PREFIX = "episode";
+	private static final String SUBSCRIPTIONS_FILENAME = "subscription";
+	private static final String PLAYLIST_FILENAME = "playlist";
+	private static final String EPISODES_PREFIX = "feed_episodes";
 
-	private static File subscriptionFolder = null;
-	private static File episodeFolder = null;
+	private List<WithIcon> subscriptions = new LinkedList<WithIcon>();
 
 	BulkUpdater mUpdater = new BulkUpdater();
+	private Map<String, File> files;
+
+	private Gson gson = new Gson();
 
 	private Context mContext;
 	private ContentProviderClient mProvider;
@@ -130,7 +138,8 @@ public class DriveSyncer {
 			performFullSync();
 		} else {
 			// Files changed since last time we synced
-			Map<String, File> files = getChangedFiles(mLargestChangeId);
+			// Map<String, File> files = getChangedFiles(mLargestChangeId);
+			files = getAllFiles();
 
 			Uri subscriptionUri = getSubscriptionsUri(mAccount.name);
 			Uri itemUri = getItemsUri(mAccount.name);
@@ -141,17 +150,15 @@ public class DriveSyncer {
 				/*
 				 * Merge Subscriptions with Google Drive
 				 */
-				Cursor subscriptionCursor = mProvider.query(subscriptionUri,
-						SUBSCRIPTION_PROJECTION, SubscriptionColumns.REMOTE_ID
-								+ " IS NOT NULL", null, null);
-				Log.d(TAG,
-						"Got local subscriptions: "
-								+ subscriptionCursor.getCount());
-				for (boolean more = subscriptionCursor.moveToFirst(); more; more = subscriptionCursor
-						.moveToNext()) {
-					Subscription subscription = Subscription
-							.getByCursor(subscriptionCursor);
-					mergeCursor(subscription, files);
+				if (files.containsKey(SUBSCRIPTIONS_FILENAME)) {
+					File file = files.get(SUBSCRIPTIONS_FILENAME);
+					List<WithIcon> subscriptions = getSubscriptions();
+					mergeFiles(subscriptions, file);
+					files.remove(SUBSCRIPTIONS_FILENAME);
+				}
+
+				if (files.containsKey(PLAYLIST_FILENAME)) {
+					files.remove(PLAYLIST_FILENAME);
 				}
 
 				// mUpdater.commit(contentResolver);
@@ -159,17 +166,34 @@ public class DriveSyncer {
 				/*
 				 * Merge FeedItems with Google Drive
 				 */
-				Cursor itemCursor = mProvider.query(itemUri, ITEM_PROJECTION,
-						ItemColumns.REMOTE_ID + " IS NOT NULL", null, null);
-				Log.d(TAG, "Got local episodes: " + itemCursor.getCount());
-				int counter = 0;
-				for (boolean more = itemCursor.moveToFirst(); more; more = itemCursor
-						.moveToNext()) {
-					counter++;
-					FeedItem item = FeedItem.getByCursor(itemCursor);
-					Log.d(TAG, "merged episode: " + counter + " of "
-							+ itemCursor.getCount());
-					mergeCursor(item, files);
+				for (String fileKey : files.keySet()) {
+					if (fileKey.startsWith(EPISODES_PREFIX)) {
+						File file = files.get(fileKey);
+
+						Cursor subscriptionCursor = mProvider.query(
+								subscriptionUri,
+								SUBSCRIPTION_PROJECTION,
+								SubscriptionColumns.REMOTE_ID + "==\""
+										+ file.getId() + "\"", null, null);
+
+						Log.d(TAG,
+								"Got local episodes: "
+										+ subscriptionCursor.getCount());
+						List<WithIcon> episodes = new LinkedList<WithIcon>();
+						int counter = 0;
+						for (boolean more = subscriptionCursor.moveToFirst(); more; more = subscriptionCursor
+								.moveToNext()) {
+							counter++;
+							Subscription subscription = Subscription
+									.getByCursor(subscriptionCursor);
+							Log.d(TAG, "merged episode: " + counter + " of "
+									+ subscriptionCursor.getCount());
+							episodes.addAll(subscription
+									.getFeedItems(contentResolver));
+						}
+						mergeFiles(episodes, file);
+						files.remove(fileKey);
+					}
 				}
 
 				mUpdater.commit(contentResolver);
@@ -178,8 +202,6 @@ public class DriveSyncer {
 				// the local database.
 				insertNewDriveFiles(files.values());
 				storeLargestChangeId(mLargestChangeId + 1);
-			} catch (IOException e) {
-				e.printStackTrace();
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			}
@@ -187,51 +209,11 @@ public class DriveSyncer {
 		}
 
 		// Insert new local files.
+		files = getAllFiles();
 		insertNewLocalFiles();
+		cleanup(100);
 
 		Log.d(TAG, "Done performing sync for " + mAccount.name);
-	}
-
-	private void mergeCursor(WithIcon item, Map<String, File> files)
-			throws IOException {
-		String fileId = item.getDriveId();
-		ContentProviderOperation contentProviderOperation = null;
-
-		Log.d(TAG, "Processing local file with drive ID: " + fileId);
-		ContentResolver contentResolver = mContext.getContentResolver();
-		if (files.containsKey(fileId)) {
-			File driveFile = files.get(fileId);
-			if (driveFile != null) {
-				// Merge the files.
-				mergeFiles(item, driveFile);
-				contentProviderOperation = item.update(contentResolver, true);
-			} else {
-				Log.d(TAG, " > Deleting local file: " + fileId);
-				// The file does not exist in Drive anymore, delete
-				// it.
-			}
-			files.remove(fileId);
-		} else {
-			// The file has not been updated on Drive, eventually
-			// update the Drive file.
-
-			item.setDriveId(null);
-			contentProviderOperation = item.update(contentResolver, true);
-
-			// FIXME This doesn't work. We cannot assume files have been changed
-			// locally
-			// without being noticed about it. It will take to long to iterate
-			// them all.
-			/*
-			 * if (fileId != "" && fileId != null) { File driveFile =
-			 * mService.files().get(fileId).execute(); DateTime dt =
-			 * driveFile.getModifiedDate(); if (dt != null) mergeFiles(item,
-			 * driveFile); }
-			 */
-		}
-
-		if (contentProviderOperation != null)
-			mUpdater.addOperation(contentProviderOperation);
 	}
 
 	/**
@@ -259,33 +241,43 @@ public class DriveSyncer {
 	 */
 	private void insertNewLocalFiles() {
 		Uri uri = getSubscriptionsUri(mAccount.name);
-		Uri itemUri = getItemsUri(mAccount.name);
 		try {
-			Cursor subscriptionCursor = mProvider.query(uri,
-					SUBSCRIPTION_PROJECTION, SubscriptionColumns.REMOTE_ID
-							+ " IS NULL", null, null);
-			Cursor itemCursor = mProvider.query(itemUri, ITEM_PROJECTION,
-					ItemColumns.REMOTE_ID + " IS NULL", null, null);
 
 			ContentResolver contenResolver = mContext.getContentResolver();
 
-			Log.d(TAG, "Inserting new local subscriptions: "
-					+ subscriptionCursor.getCount());
-			if (subscriptionCursor.moveToFirst()) {
-				do {
-					Subscription subscription = Subscription
-							.getByCursor(subscriptionCursor);
+			//Subscription List
+			if (!files.containsKey(SUBSCRIPTIONS_FILENAME)) {
+				insertSubscriptios();
+			}
+			
+			// FeedItems
+			Cursor subscriptionCursor = mProvider.query(uri,
+					SUBSCRIPTION_PROJECTION, null, null, null);
+			Log.d(TAG,
+					"Got local subscriptions: " + subscriptionCursor.getCount());
+
+			for (boolean more = subscriptionCursor.moveToFirst(); more; more = subscriptionCursor
+					.moveToNext()) {
+				Subscription subscription = Subscription
+						.getByCursor(subscriptionCursor);
+
+				String key = remoteFilename(subscription);
+				if (!files.containsKey(key)) {
+					List<FeedItem> episodes = subscription
+							.getFeedItems(contenResolver);
 
 					File newFile = new File();
+					File insertedFile = null;
 					newFile.setTitle(remoteFilename(subscription));
 					newFile.setMimeType(TEXT_PLAIN);
-					//String subscriptionID = getSubscriptionFolder().getId(); 
-					//newFile.setParents(Arrays.asList(new ParentReference()
-							//.setId(subscriptionID)));
-					newFile.setParents(Arrays.asList(new ParentReference().setId("appdata")));
+					newFile.setParents(Arrays.asList(new ParentReference()
+							.setId(parent)));
+
+					Gson gson = new Gson();
+					String content = gson.toJson(episodes);
+
+					Log.d(TAG, "Inserting new local episodes: ");
 					try {
-						File insertedFile = null;
-						String content = subscription.toJSON();
 						if (content != null && content.length() > 0) {
 
 							insertedFile = mService
@@ -305,72 +297,78 @@ public class DriveSyncer {
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
-				} while (subscriptionCursor.moveToNext());
+
+					files.remove(key);
+
+				}
 			}
-
-			// FeedItems
-			
-			Log.d(TAG, "Inserting new local episodes: " + itemCursor.getCount());
-			if (itemCursor.moveToFirst()) {
-				do {
-					FeedItem item = FeedItem.getByCursor(itemCursor);
-
-					File newFile = new File();
-					newFile.setTitle(remoteFilename(item));
-					newFile.setMimeType(TEXT_PLAIN);
-					newFile.setParents(Arrays.asList(new ParentReference().setId("appdata")));
-					try {
-						File insertedFile = null;
-						String content = item.toJSON();
-						if (content != null && content.length() > 0) {
-
-							insertedFile = mService
-									.files()
-									.insert(newFile,
-											ByteArrayContent.fromString(
-													TEXT_PLAIN, content))
-									.execute();
-						} else {
-							insertedFile = mService.files().insert(newFile)
-									.execute();
-						}
-						// Update the local file to add the file ID.
-						item.setDriveId(insertedFile.getId());
-						mUpdater.addOperation(item.update(contenResolver, true));
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				} while (itemCursor.moveToNext());
-			}
-		
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
 
 		mUpdater.commit(mContext.getContentResolver());
+	}
 
-		// Since all files have been moved into a folder we delete all in root
+	/**
+	 * Insert the SUBSCRIPTIONS_FILENAME containing all the subscriptions
+	 */
+	private void insertSubscriptios() {
+		Uri uri = getSubscriptionsUri(mAccount.name);
+		
 		/*
+		Cursor subscriptionCursor = null;
 		try {
-			Files.List request = mService.files().list();
-
-			do {
-				FileList files = request.execute();
-
-				for (File file : files.getItems()) {
-					if (TEXT_PLAIN.equals(file.getMimeType())) {
-						mService.files().delete(file.getId()).execute();
-					}
-				}
-				request.setPageToken(files.getNextPageToken());
-			} while (request.getPageToken() != null
-					&& request.getPageToken().length() > 0);
-
-		} catch (IOException e) {
+			subscriptionCursor = mProvider.query(uri, SUBSCRIPTION_PROJECTION,
+					null, null, null);
+		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+
+		Log.d(TAG,
+				"Inserting new local subscriptions: "
+						+ subscriptionCursor.getCount());
 		*/
+		Gson gson = new Gson();
+		File insertedFile = null;
+		File newFile = new File();
+		newFile.setTitle(SUBSCRIPTIONS_FILENAME);
+		newFile.setMimeType(TEXT_PLAIN);
+
+		newFile.setParents(Arrays.asList(new ParentReference().setId(parent)));
+
+		/*
+		subscriptions.clear();
+		if (subscriptionCursor.moveToFirst()) {
+			Subscription subscription = Subscription
+					.getByCursor(subscriptionCursor);
+			subscriptions.add(subscription);
+		}
+		while (subscriptionCursor.moveToNext())
+			;
+		*/
+		List<WithIcon> subscriptions = getSubscriptions();
+
+		if (subscriptions.size() > 0) {
+			String content = gson.toJson(subscriptions);
+			try {
+				if (content != null && content.length() > 0) {
+
+					insertedFile = mService
+							.files()
+							.insert(newFile,
+									ByteArrayContent.fromString(TEXT_PLAIN,
+											content)).execute();
+
+				} else {
+					insertedFile = mService.files().insert(newFile).execute();
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 
 	}
 
@@ -385,25 +383,35 @@ public class DriveSyncer {
 
 		Log.d(TAG, "Inserting new Drive files: " + driveFiles.size());
 
+		ContentResolver contentResolver = mContext.getContentResolver();
+
 		for (File driveFile : driveFiles) {
 			if (driveFile != null) {
 
-				String title = driveFile.getTitle();
-				ContentResolver contentResolver = mContext.getContentResolver();
+				if (driveFile.getTitle().equals(SUBSCRIPTIONS_FILENAME)) {
+					Type collectionType = new TypeToken<Collection<Subscription>>() {
+					}.getType();
+					String fileContent = this.getFileContent(driveFile);
+					Collection<Subscription> subscriptions = gson.fromJson(
+							fileContent, collectionType);
 
-				WithIcon newItem = null;
-				if (isEpisode(title)) {
-					newItem = FeedItem.fromJSON(contentResolver,
-							getFileContent(driveFile));
-				} else if (isSubscription(title)) {
-					newItem = Subscription.fromJSON(contentResolver,
-							getFileContent(driveFile));
-					((Subscription) newItem).subscribe(mContext);
+					for (Subscription subscription : subscriptions) {
+						subscription.update(contentResolver);
+					}
+				} else if (driveFile.getTitle().equals(PLAYLIST_FILENAME)) {
+
+				} else if (driveFile.getTitle().startsWith(EPISODES_PREFIX)) {
+					Type collectionType = new TypeToken<Collection<FeedItem>>() {
+					}.getType();
+					String fileContent = this.getFileContent(driveFile);
+					Collection<FeedItem> items = gson.fromJson(fileContent,
+							collectionType);
+
+					for (FeedItem item : items) {
+						item.update(contentResolver);
+					}
 				}
-				if (newItem != null) {
-					newItem.setDriveId(driveFile.getId());
-					newItem.update(contentResolver);
-				}
+
 			}
 		}
 
@@ -484,7 +492,8 @@ public class DriveSyncer {
 						result.put(change.getFileId(), null);
 					} else if (TEXT_PLAIN
 							.equals(change.getFile().getMimeType())) {
-						result.put(change.getFileId(), change.getFile());
+						result.put(change.getFile().getTitle(),
+								change.getFile());
 					}
 				}
 
@@ -504,6 +513,71 @@ public class DriveSyncer {
 	}
 
 	/**
+	 * Retrieve a collection of all files created by the app {@code changeId}.
+	 * 
+	 * @param changeId
+	 *            Change ID to retrieve changed files from.
+	 * @return Map of changed files key'ed by their file ID.
+	 */
+	private Map<String, File> getAllFiles() {
+		Map<String, File> result = new HashMap<String, File>();
+
+		try {
+			Files.List request = mService
+					.files()
+					.list()
+					.setQ("title contains '" + EPISODES_PREFIX
+							+ "' and 'appdata' in parents");
+			do {
+				FileList files = request.execute();
+
+				for (File file : files.getItems()) {
+					Log.d(TAG, "found: " + file.getTitle());
+					// mService.files().delete(file.getId());
+					result.put(file.getTitle(), file);
+				}
+				request.setPageToken(files.getNextPageToken());
+			} while (request.getPageToken() != null
+					&& request.getPageToken().length() > 0);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		Log.d(TAG, "Got Drive files: " + result.size() + " - "
+				+ mLargestChangeId);
+		return result;
+	}
+
+	/**
+	 * Cleans up the appdata by removing old files.
+	 */
+	private void cleanup(int filesToDelete) {
+		try {
+			Files.List request = mService
+					.files()
+					.list()
+					.setQ("not title contains '" + EPISODES_PREFIX
+							+ "' and not title contains '" + PLAYLIST_FILENAME
+							+ "' and not title contains '"
+							+ SUBSCRIPTIONS_FILENAME
+							+ "' and 'appdata' in parents");
+			do {
+				FileList files = request.execute();
+
+				for (File file : files.getItems()) {
+					Log.d(TAG, "delete: " + file.getTitle());
+					mService.files().delete(file.getId());
+					filesToDelete--;
+				}
+				request.setPageToken(files.getNextPageToken());
+			} while (request.getPageToken() != null
+					&& request.getPageToken().length() > 0 && filesToDelete > 0);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
 	 * Retrieve a authorized service object to send requests to the Google Drive
 	 * API. On failure to retrieve an access token, a notification is sent to
 	 * the user requesting that authorization be granted for the
@@ -519,7 +593,10 @@ public class DriveSyncer {
 				GoogleAccountCredential credential = null;
 				if (mainCredentials == null) {
 					credential = GoogleAccountCredential.usingOAuth2(mContext,
-							"https://www.googleapis.com/auth/drive.appdata"); //DriveScopes.DRIVE_FILE);
+							"https://www.googleapis.com/auth/drive.appdata"); // DriveScopes.DRIVE_FILE);
+					// credential =
+					// GoogleAccountCredential.usingOAuth2(mContext,
+					// DriveScopes.DRIVE_FILE);
 					credential.setSelectedAccountName(mAccount.name);
 				} else {
 					credential = mainCredentials;
@@ -653,58 +730,52 @@ public class DriveSyncer {
 	 * @param driveFile
 	 *            Google Drive file.
 	 */
-	private void mergeFiles(WithIcon localFile, File driveFile) {
-		Subscription subscription = null;
-		if (localFile instanceof Subscription) {
-			subscription = new Subscription();
-		}
+	private void mergeFiles(List<WithIcon> localFile, File driveFile) {
 
-		long localFileModificationDate = localFile.lastModificationDate();
+		Gson gson = new Gson();
+		long localFileModificationDate = 0;
+		for (WithIcon item : localFile)
+			localFileModificationDate = (item.lastModificationDate() > localFileModificationDate) ? item
+					.lastModificationDate() : localFileModificationDate;
 
 		Log.d(TAG, "Modification dates: " + localFileModificationDate + " - "
 				+ driveFile.getModifiedDate().getValue());
 		if (localFileModificationDate > driveFile.getModifiedDate().getValue()) {
 			try {
-				if (subscription != null
-						&& subscription.getStatus() == Subscription.STATUS_UNSUBSCRIBED) {
-					Log.d(TAG, " > Deleting Drive file.");
-					mService.files().delete(driveFile.getId()).execute();
-					// mProvider.delete(localFileUri, null, null);
+				// String localNote =
+				// localFile.getString(COLUMN_INDEX_NOTE);
+				File updatedFile = null;
+
+				// Update drive file.
+				Log.d(TAG, " > Updating Drive file.");
+
+				String driveTitle = remoteFilename(localFile);
+				driveFile.setTitle(driveTitle);
+
+				// String driveContent = getContent(localFile);
+				String driveContent = gson.toJson(localFile);
+				// String driveContent = localFile.toJSON();
+
+				if (md5(driveContent) != driveFile.getMd5Checksum()) {
+					// Update both content and metadata.
+					ByteArrayContent content = ByteArrayContent.fromString(
+							TEXT_PLAIN, driveContent);
+					updatedFile = mService.files()
+							.update(driveFile.getId(), driveFile, content)
+							.execute();
 				} else {
-					// String localNote =
-					// localFile.getString(COLUMN_INDEX_NOTE);
-					File updatedFile = null;
-
-					// Update drive file.
-					Log.d(TAG, " > Updating Drive file.");
-
-					String driveTitle = remoteFilename(localFile);
-					driveFile.setTitle(driveTitle);
-
-					// String driveContent = getContent(localFile);
-					String driveContent = localFile.toJSON();
-
-					if (md5(driveContent) != driveFile.getMd5Checksum()) {
-						// Update both content and metadata.
-						ByteArrayContent content = ByteArrayContent.fromString(
-								TEXT_PLAIN, driveContent);
-						updatedFile = mService.files()
-								.update(driveFile.getId(), driveFile, content)
-								.execute();
-					} else {
-						// Only update the metadata.
-						updatedFile = mService.files()
-								.update(driveFile.getId(), driveFile).execute();
-					}
-
-					localFile.update(mContext.getContentResolver());
-					/*
-					 * ContentValues values = new ContentValues();
-					 * values.put(NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE,
-					 * updatedFile.getModifiedDate().getValue());
-					 * mProvider.update(localFileUri, values, null, null);
-					 */
+					// Only update the metadata.
+					updatedFile = mService.files()
+							.update(driveFile.getId(), driveFile).execute();
 				}
+
+				// localFile.update(mContext.getContentResolver());
+				/*
+				 * ContentValues values = new ContentValues();
+				 * values.put(NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE,
+				 * updatedFile.getModifiedDate().getValue());
+				 * mProvider.update(localFileUri, values, null, null);
+				 */
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -712,8 +783,19 @@ public class DriveSyncer {
 				.getValue()) {
 			// Update local file.
 			Log.d(TAG, " > Updating local file.");
-			localFile.createFromJSON(mContext.getContentResolver(),
-					getFileContent(driveFile));
+
+			// Type collectionType = new
+			// TypeToken<List<Subscription>>(){}.getType();
+			Collection<Subscription> subscriptions = gson.fromJson(
+					getFileContent(driveFile),
+					new TypeToken<List<Subscription>>() {
+					}.getType());
+
+			for (Subscription subscription : subscriptions)
+				subscription.update(mContext.getContentResolver());
+
+			// localFile.createFromJSON(mContext.getContentResolver(),
+			// getFileContent(driveFile));
 
 			/*
 			 * ContentValues values = new ContentValues();
@@ -748,6 +830,31 @@ public class DriveSyncer {
 			content.append(item.getURL());
 		}
 		return content.toString();
+	}
+	
+	private List<WithIcon> getSubscriptions() {
+
+		Cursor subscriptionCursor = null;
+		try {
+			subscriptionCursor = mProvider.query(
+					getSubscriptionsUri(mAccount.name), SUBSCRIPTION_PROJECTION, null,
+					null, null);
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Log.d(TAG,
+				"Got local subscriptions: "
+						+ subscriptionCursor.getCount());
+
+		for (boolean more = subscriptionCursor.moveToFirst(); more; more = subscriptionCursor
+				.moveToNext()) {
+			Subscription subscription = Subscription
+					.getByCursor(subscriptionCursor);
+			subscriptions.add(subscription);
+		}
+		
+		return subscriptions;
 	}
 
 	private String md5(String s) {
@@ -798,16 +905,24 @@ public class DriveSyncer {
 		return Uri.parse(SubscriptionColumns.URI + "/" + fileId);
 	}
 
-	private String remoteFilename(WithIcon item) {
-		String driveTitle = (item instanceof Subscription) ? SUBSCRIPTION_PREFIX
+	private String remoteFilename(Subscription subscription) {
+		return EPISODES_PREFIX + "_" + subscription.getId() + "_"
+				+ subscription.getTitle();
+	}
+
+	private String remoteFilename(List<WithIcon> items) {
+		String driveTitle = (items.get(0).getClass().equals(Subscription.class)) ? SUBSCRIPTIONS_FILENAME
 				+ "_"
-				: FEEDITEM_PREFIX + "_";
-		driveTitle = driveTitle + item.getTitle();
+				: EPISODES_PREFIX + "_";
+
+		if (driveTitle.startsWith(EPISODES_PREFIX)) {
+			driveTitle = driveTitle + ((FeedItem) items.get(0)).sub_id;
+		}
 		return driveTitle;
 	}
 
 	private boolean isEpisode(String title) {
-		return title.startsWith(FEEDITEM_PREFIX);
+		return title.startsWith(EPISODES_PREFIX);
 	}
 
 	private boolean isSubscription(String title) {
@@ -815,66 +930,47 @@ public class DriveSyncer {
 	}
 
 	/*
-	private File getEpisodeFolder() {
-		return getFolder(FEEDITEM_PREFIX.toUpperCase());
-	}
-
-	private File getSubscriptionFolder() {
-		return getFolder(SUBSCRIPTION_PREFIX.toUpperCase());
-	}
-
-	private File getFolder(String title) {
-		String mineType = "application/vnd.google-apps.folder";
-
-		File folder = (title == SUBSCRIPTION_PREFIX.toUpperCase()) ? subscriptionFolder
-				: episodeFolder;
-
-		// If the folder is cached just return is
-		if (folder != null)
-			return folder;
-
-		// If the folder is created in Drive cache it and return it from there
-		try {
-			Files.List request = mService.files().list().setQ("mimeType='" + mineType + "' and title='" + title + "'");
-
-			FileList files = request.execute();
-
-			for (File file : files.getItems()) {
-				if (title.equals(file.getTitle())) {
-					folder = file;
-					
-					cacheFolder(title, folder);
-					return folder;
-				}
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		// Create folder if the don't exist
-		File newFolder = new File();
-		newFolder.setTitle(title);
-		newFolder.setMimeType(mineType);
-		//newFolder.setParents(Arrays.asList(new ParentReference().setId("appdata"));
-
-		try {
-			folder = mService.files().insert(newFolder).execute();
-			cacheFolder(title, folder);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		return folder;
-	}
-	
-	private void cacheFolder(String title, File file) {
-		if (title.equals(SUBSCRIPTION_PREFIX.toUpperCase()))
-			subscriptionFolder = file;
-		else
-			episodeFolder = file;
-	}
-	*/
+	 * private File getEpisodeFolder() { return
+	 * getFolder(FEEDITEM_PREFIX.toUpperCase()); }
+	 * 
+	 * private File getSubscriptionFolder() { return
+	 * getFolder(SUBSCRIPTION_PREFIX.toUpperCase()); }
+	 * 
+	 * private File getFolder(String title) { String mineType =
+	 * "application/vnd.google-apps.folder";
+	 * 
+	 * File folder = (title == SUBSCRIPTION_PREFIX.toUpperCase()) ?
+	 * subscriptionFolder : episodeFolder;
+	 * 
+	 * // If the folder is cached just return is if (folder != null) return
+	 * folder;
+	 * 
+	 * // If the folder is created in Drive cache it and return it from there
+	 * try { Files.List request = mService.files().list().setQ("mimeType='" +
+	 * mineType + "' and title='" + title + "'");
+	 * 
+	 * FileList files = request.execute();
+	 * 
+	 * for (File file : files.getItems()) { if (title.equals(file.getTitle())) {
+	 * folder = file;
+	 * 
+	 * cacheFolder(title, folder); return folder; } } } catch (IOException e) {
+	 * // TODO Auto-generated catch block e.printStackTrace(); }
+	 * 
+	 * // Create folder if the don't exist File newFolder = new File();
+	 * newFolder.setTitle(title); newFolder.setMimeType(mineType);
+	 * //newFolder.setParents(Arrays.asList(new
+	 * ParentReference().setId("appdata"));
+	 * 
+	 * try { folder = mService.files().insert(newFolder).execute();
+	 * cacheFolder(title, folder); } catch (IOException e) { // TODO
+	 * Auto-generated catch block e.printStackTrace(); }
+	 * 
+	 * return folder; }
+	 * 
+	 * private void cacheFolder(String title, File file) { if
+	 * (title.equals(SUBSCRIPTION_PREFIX.toUpperCase())) subscriptionFolder =
+	 * file; else episodeFolder = file; }
+	 */
 
 }

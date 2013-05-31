@@ -30,8 +30,6 @@ import org.bottiger.podcast.utils.ThemeHelper;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -52,7 +50,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Gravity;
@@ -65,7 +62,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.bugsense.trace.BugSenseHandler;
-import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
@@ -218,6 +214,8 @@ public class MainActivity extends FragmentActivity implements
 
 		mCredential = GoogleAccountCredential.usingOAuth2(this,
 				"https://www.googleapis.com/auth/drive.appdata"); //DriveScopes.DRIVE);
+		//mCredential = GoogleAccountCredential.usingOAuth2(this,
+		//		DriveScopes.DRIVE_FILE); //DriveScopes.DRIVE);
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		if (!prefs.contains(ACCOUNT_KEY))
 			startActivityForResult(mCredential.newChooseAccountIntent(),
