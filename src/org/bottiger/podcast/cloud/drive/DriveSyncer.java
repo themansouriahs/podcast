@@ -192,7 +192,7 @@ public class DriveSyncer {
 									.getFeedItems(contentResolver));
 						}
 						mergeFiles(episodes, file);
-						files.remove(fileKey);
+						//files.remove(fileKey);
 					}
 				}
 
@@ -527,6 +527,9 @@ public class DriveSyncer {
 					.files()
 					.list()
 					.setQ("title contains '" + EPISODES_PREFIX
+							+ "' and title contains '" + PLAYLIST_FILENAME
+							+ "' and title contains '"
+							+ SUBSCRIPTIONS_FILENAME
 							+ "' and 'appdata' in parents");
 			do {
 				FileList files = request.execute();
