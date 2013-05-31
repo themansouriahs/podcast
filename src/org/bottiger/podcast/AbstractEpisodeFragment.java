@@ -112,7 +112,7 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 		return getOrder("DESC", 20);
 	}
 
-	public String getOrder(String inputOrder, Integer amount) {
+	public static String getOrder(String inputOrder, Integer amount) {
 		assert inputOrder != null;
 
 		PlayerService playerService = PodcastBaseFragment.mPlayerServiceBinder;

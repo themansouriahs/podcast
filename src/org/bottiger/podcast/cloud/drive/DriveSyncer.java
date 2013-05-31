@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bottiger.podcast.MainActivity;
+import org.bottiger.podcast.RecentItemFragment;
 import org.bottiger.podcast.provider.BulkUpdater;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
@@ -148,12 +149,40 @@ public class DriveSyncer {
 
 			try {
 				/*
+				 * Merge playlist
+				 */
+				/*
+				 * Merge FeedItems with Google Drive
+				 */
+				if (files.containsKey(PLAYLIST_FILENAME)) {
+					File file = files.get(PLAYLIST_FILENAME);
+
+					Cursor itemCursor = mProvider.query(
+							itemUri,
+							ITEM_PROJECTION,
+							ItemColumns.LISTENED + "== 0", null, RecentItemFragment.getOrder("DESC", 20));
+
+					List<WithIcon> playlist = new LinkedList<WithIcon>();
+					int counter = 0;
+					for (boolean more = itemCursor.moveToFirst(); more; more = itemCursor
+							.moveToNext()) {
+						counter++;
+						FeedItem item = FeedItem
+								.getByCursor(itemCursor);
+						
+						playlist.add(item);
+					}
+					mergeFiles(playlist, file, PLAYLIST_FILENAME);
+					// files.remove(fileKey);
+				}
+
+				/*
 				 * Merge Subscriptions with Google Drive
 				 */
 				if (files.containsKey(SUBSCRIPTIONS_FILENAME)) {
 					File file = files.get(SUBSCRIPTIONS_FILENAME);
 					List<WithIcon> subscriptions = getSubscriptions();
-					mergeFiles(subscriptions, file);
+					mergeFiles(subscriptions, file, SUBSCRIPTIONS_FILENAME);
 					files.remove(SUBSCRIPTIONS_FILENAME);
 				}
 
@@ -191,8 +220,8 @@ public class DriveSyncer {
 							episodes.addAll(subscription
 									.getFeedItems(contentResolver));
 						}
-						mergeFiles(episodes, file);
-						//files.remove(fileKey);
+						mergeFiles(episodes, file, remoteFilename(episodes));
+						// files.remove(fileKey);
 					}
 				}
 
@@ -245,11 +274,11 @@ public class DriveSyncer {
 
 			ContentResolver contenResolver = mContext.getContentResolver();
 
-			//Subscription List
+			// Subscription List
 			if (!files.containsKey(SUBSCRIPTIONS_FILENAME)) {
 				insertSubscriptios();
 			}
-			
+
 			// FeedItems
 			Cursor subscriptionCursor = mProvider.query(uri,
 					SUBSCRIPTION_PROJECTION, null, null, null);
@@ -314,22 +343,17 @@ public class DriveSyncer {
 	 */
 	private void insertSubscriptios() {
 		Uri uri = getSubscriptionsUri(mAccount.name);
-		
-		/*
-		Cursor subscriptionCursor = null;
-		try {
-			subscriptionCursor = mProvider.query(uri, SUBSCRIPTION_PROJECTION,
-					null, null, null);
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
 
-		Log.d(TAG,
-				"Inserting new local subscriptions: "
-						+ subscriptionCursor.getCount());
-		*/
+		/*
+		 * Cursor subscriptionCursor = null; try { subscriptionCursor =
+		 * mProvider.query(uri, SUBSCRIPTION_PROJECTION, null, null, null); }
+		 * catch (RemoteException e) { // TODO Auto-generated catch block
+		 * e.printStackTrace(); }
+		 * 
+		 * 
+		 * Log.d(TAG, "Inserting new local subscriptions: " +
+		 * subscriptionCursor.getCount());
+		 */
 		Gson gson = new Gson();
 		File insertedFile = null;
 		File newFile = new File();
@@ -339,15 +363,11 @@ public class DriveSyncer {
 		newFile.setParents(Arrays.asList(new ParentReference().setId(parent)));
 
 		/*
-		subscriptions.clear();
-		if (subscriptionCursor.moveToFirst()) {
-			Subscription subscription = Subscription
-					.getByCursor(subscriptionCursor);
-			subscriptions.add(subscription);
-		}
-		while (subscriptionCursor.moveToNext())
-			;
-		*/
+		 * subscriptions.clear(); if (subscriptionCursor.moveToFirst()) {
+		 * Subscription subscription = Subscription
+		 * .getByCursor(subscriptionCursor); subscriptions.add(subscription); }
+		 * while (subscriptionCursor.moveToNext()) ;
+		 */
 		List<WithIcon> subscriptions = getSubscriptions();
 
 		if (subscriptions.size() > 0) {
@@ -528,8 +548,7 @@ public class DriveSyncer {
 					.list()
 					.setQ("title contains '" + EPISODES_PREFIX
 							+ "' and title contains '" + PLAYLIST_FILENAME
-							+ "' and title contains '"
-							+ SUBSCRIPTIONS_FILENAME
+							+ "' and title contains '" + SUBSCRIPTIONS_FILENAME
 							+ "' and 'appdata' in parents");
 			do {
 				FileList files = request.execute();
@@ -733,7 +752,7 @@ public class DriveSyncer {
 	 * @param driveFile
 	 *            Google Drive file.
 	 */
-	private void mergeFiles(List<WithIcon> localFile, File driveFile) {
+	private void mergeFiles(List<WithIcon> localFile, File driveFile, String title) {
 
 		Gson gson = new Gson();
 		long localFileModificationDate = 0;
@@ -752,7 +771,8 @@ public class DriveSyncer {
 				// Update drive file.
 				Log.d(TAG, " > Updating Drive file.");
 
-				String driveTitle = remoteFilename(localFile);
+				//String driveTitle = remoteFilename(localFile);
+				String driveTitle = title;
 				driveFile.setTitle(driveTitle);
 
 				// String driveContent = getContent(localFile);
@@ -834,21 +854,19 @@ public class DriveSyncer {
 		}
 		return content.toString();
 	}
-	
+
 	private List<WithIcon> getSubscriptions() {
 
 		Cursor subscriptionCursor = null;
 		try {
 			subscriptionCursor = mProvider.query(
-					getSubscriptionsUri(mAccount.name), SUBSCRIPTION_PROJECTION, null,
-					null, null);
+					getSubscriptionsUri(mAccount.name),
+					SUBSCRIPTION_PROJECTION, null, null, null);
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		Log.d(TAG,
-				"Got local subscriptions: "
-						+ subscriptionCursor.getCount());
+		Log.d(TAG, "Got local subscriptions: " + subscriptionCursor.getCount());
 
 		for (boolean more = subscriptionCursor.moveToFirst(); more; more = subscriptionCursor
 				.moveToNext()) {
@@ -856,7 +874,7 @@ public class DriveSyncer {
 					.getByCursor(subscriptionCursor);
 			subscriptions.add(subscription);
 		}
-		
+
 		return subscriptions;
 	}
 
