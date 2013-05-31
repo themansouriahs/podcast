@@ -241,8 +241,6 @@ public class MainActivity extends FragmentActivity implements
 			}
 		}).start();
 
-		aua = new AutoUpdateApk(getApplicationContext());
-
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
 		// Start Application services
