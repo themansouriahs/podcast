@@ -8,9 +8,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 
 import org.bottiger.podcast.PodcastBaseFragment.OnItemSelectedListener;
-import org.bottiger.podcast.autoupdateapk.AutoUpdateApk;
 import org.bottiger.podcast.cloud.CloudProvider;
 import org.bottiger.podcast.cloud.GoogleReader;
 import org.bottiger.podcast.debug.SqliteCopy;
@@ -24,6 +24,7 @@ import org.bottiger.podcast.service.PodcastService;
 import org.bottiger.podcast.utils.ControlButtons;
 import org.bottiger.podcast.utils.DriveUtils;
 import org.bottiger.podcast.utils.Log;
+import org.bottiger.podcast.utils.SDCardManager;
 import org.bottiger.podcast.utils.SlidingMenuBuilder;
 import org.bottiger.podcast.utils.ThemeHelper;
 
@@ -65,9 +66,12 @@ import com.bugsense.trace.BugSenseHandler;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.http.FileContent;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
+import com.google.api.services.drive.model.File;
+import com.google.api.services.drive.model.ParentReference;
 
 // Sliding
 public class MainActivity extends FragmentActivity implements
@@ -122,8 +126,6 @@ public class MainActivity extends FragmentActivity implements
 	private ComponentName mRemoteControlResponder;
 
 	private SharedPreferences prefs;
-
-	private AutoUpdateApk aua;
 
 	private DriveUtils mDriveUtils;
 
@@ -213,7 +215,7 @@ public class MainActivity extends FragmentActivity implements
 		}
 
 		mCredential = GoogleAccountCredential.usingOAuth2(this,
-				"https://www.googleapis.com/auth/drive.appdata"); //DriveScopes.DRIVE);
+				"https://www.googleapis.com/auth/drive.file"); //"https://www.googleapis.com/auth/drive.appdata"); //DriveScopes.DRIVE);
 		//mCredential = GoogleAccountCredential.usingOAuth2(this,
 		//		DriveScopes.DRIVE_FILE); //DriveScopes.DRIVE);
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);

@@ -10,8 +10,6 @@ import android.os.RemoteException;
 public class BulkUpdater {
 	
 	private ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
-	private ArrayList<ContentProviderOperation> subscriptionOps = new ArrayList<ContentProviderOperation>();
-	private ArrayList<ContentProviderOperation> episodeOps = new ArrayList<ContentProviderOperation>();
 	
 	/**
 	 * Add a operation to execute
@@ -19,12 +17,6 @@ public class BulkUpdater {
 	 */
 	public void addOperation(ContentProviderOperation op) {
 		ops.add(op);
-		/*
-		if (op.getUri().equals(ItemColumns.URI))
-			episodeOps.add(op);
-		else if (op.getUri().equals(SubscriptionColumns.URI))
-			subscriptionOps.add(op);
-		 */
 	}
 	
 	/**
@@ -33,20 +25,12 @@ public class BulkUpdater {
 	public void commit(ContentResolver contentResolver) {
 		try {
 			contentResolver.applyBatch(PodcastProvider.AUTHORITY, ops);
-			/*
-			contentResolver.applyBatch(PodcastProvider.AUTHORITY, subscriptionOps);
-			contentResolver.applyBatch(PodcastProvider.AUTHORITY, episodeOps);
-			*/
 		} catch (RemoteException e) {
 			// do s.th.
 		} catch (OperationApplicationException e) {
 			// do s.th.
 		}
 		ops.clear();
-		/*
-		subscriptionOps.clear();
-		episodeOps.clear();
-		*/
 	}
 
 }

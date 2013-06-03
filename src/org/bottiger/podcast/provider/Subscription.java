@@ -303,15 +303,21 @@ public class Subscription extends AbstractItem {
 		if (status != null)
 			cv.put(SubscriptionColumns.STATUS, status);
 
+		// BaseColumns._ID + "=" + id
+		String condition = SubscriptionColumns.URL + "='" + url + "'";
 		if (batchUpdate) {
 			contentUpdate = ContentProviderOperation
 					.newUpdate(SubscriptionColumns.URI).withValues(cv)
-					.withSelection(BaseColumns._ID + "=" + id, null)
+					.withSelection(condition, null)
 					.withYieldAllowed(true).build();
 		} else {
-			contentResolver.update(SubscriptionColumns.URI, cv, BaseColumns._ID
-					+ "=" + id, null);
-			log.debug("update OK");
+			int numUpdatedRows = contentResolver.update(SubscriptionColumns.URI, cv, condition, null);
+			if (numUpdatedRows == 1)
+				log.debug("update OK");
+			else {
+				log.debug("update NOT OK. Insert instead");
+				contentResolver.insert(SubscriptionColumns.URI, cv);
+			}
 		}
 
 		return contentUpdate;
@@ -415,7 +421,7 @@ public class Subscription extends AbstractItem {
 
 	@Override
 	public long lastModificationDate() {
-		return lastItemUpdated;
+		return lastUpdated;
 	}
 
 	public long getLastUpdate() {

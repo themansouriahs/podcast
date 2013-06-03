@@ -406,8 +406,17 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 
 		ContentValues cv = new ContentValues();
 
+		if (title != null)
+			cv.put(ItemColumns.TITLE, title);
 		if (filename != null)
 			cv.put(ItemColumns.PATHNAME, filename);
+		if (sub_id > 0)
+			cv.put(ItemColumns.SUBS_ID, sub_id);
+			
+		if (url != null) {
+			cv.put(ItemColumns.URL, url);
+			cv.put(ItemColumns.RESOURCE, url);
+		}
 		cv.put(ItemColumns.REMOTE_ID, remote_id);
 		if (filesize >= 0)
 			cv.put(ItemColumns.FILESIZE, filesize);
@@ -424,25 +433,30 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 			cv.put(ItemColumns.CHUNK_FILESIZE, chunkFilesize);
 		if (offset >= 0)
 			cv.put(ItemColumns.OFFSET, offset);
-		if (lastUpdate >= 0) {
-			lastUpdate = Long.valueOf(System.currentTimeMillis());
-			cv.put(ItemColumns.LAST_UPDATE, lastUpdate);
-		}
+
+		lastUpdate = Long.valueOf(System.currentTimeMillis());
+		cv.put(ItemColumns.LAST_UPDATE, lastUpdate);
+
 		if (listened >= 0)
 			cv.put(ItemColumns.LISTENED, listened);
 		if (priority >= 0)
 			cv.put(ItemColumns.PRIORITY, priority);
 
+		// BaseColumns._ID + "=" + id
+		String condition = ItemColumns.URL + "='" + url + "'";
 		if (batchUpdate) {
 			contentUpdate = ContentProviderOperation.newUpdate(ItemColumns.URI)
-					.withValues(cv)
-					.withSelection(BaseColumns._ID + "=" + id, null)
+					.withValues(cv).withSelection(condition, null)
 					.withYieldAllowed(true).build();
 		} else {
 			int numUpdatedRows = contentResolver.update(ItemColumns.URI, cv,
-					BaseColumns._ID + "=" + id, null);
+					condition, null);
 			if (numUpdatedRows == 1)
 				log.debug("update OK");
+			else {
+				log.debug("update NOT OK. Insert instead");
+				contentResolver.insert(ItemColumns.URI, cv);
+			}
 		}
 		return contentUpdate;
 	}
@@ -1149,11 +1163,11 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 			JSONObject mainObject = (JSONObject) rootObject;
 			if (mainObject != null) {
 				url = mainObject.get("url").toString();
-				
+
 				Object remoteIdObject = mainObject.get("remote_id");
 				if (remoteIdObject != null)
 					remote_id = mainObject.get("remote_id").toString();
-					
+
 				title = mainObject.get("title").toString();
 				author = mainObject.get("author").toString();
 				date = mainObject.get("date").toString();
