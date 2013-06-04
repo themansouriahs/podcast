@@ -62,6 +62,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
 import com.bugsense.trace.BugSenseHandler;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.api.client.extensions.android.http.AndroidHttp;
@@ -88,6 +90,9 @@ public class MainActivity extends FragmentActivity implements
 	public static HTTPDService mHTTPDServiceBinder = null;
 
 	static boolean mBound = false;
+	
+	/** Painless networking with Volley */
+	private RequestQueue mRequestQueue;
 
 	// public static GoogleReader gReader = null;
 	public static CloudProvider gReader = null;
@@ -244,6 +249,8 @@ public class MainActivity extends FragmentActivity implements
 		}).start();
 
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		
+		mRequestQueue = Volley.newRequestQueue(this);
 
 		// Start Application services
 		startService(new Intent(this, PlayerService.class));

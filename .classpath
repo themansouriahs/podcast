@@ -11,5 +11,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/library-dragdrop"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry kind="con" path="com.google.gdt.eclipse.managedapis.MANAGED_API_CONTAINER/drive-v2r75lv1.14.2-beta"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Volley"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

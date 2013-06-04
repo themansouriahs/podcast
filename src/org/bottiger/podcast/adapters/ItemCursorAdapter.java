@@ -1,5 +1,6 @@
 package org.bottiger.podcast.adapters;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeSet;
@@ -8,6 +9,7 @@ import org.bottiger.podcast.PlayerActivity;
 import org.bottiger.podcast.PlaylistDSLVFragment;
 import org.bottiger.podcast.PodcastBaseFragment;
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.images.ImageCacheManager;
 import org.bottiger.podcast.listeners.DownloadProgressListener;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
@@ -21,6 +23,7 @@ import org.bottiger.podcast.utils.ThemeHelper;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.provider.BaseColumns;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -37,6 +40,7 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.android.volley.toolbox.NetworkImageView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
@@ -44,9 +48,6 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 	public static final int ICON_DEFAULT_ID = -1;
 
 	public final static FieldHandler defaultTextFieldHandler = new FieldHandler.TextFieldHandler();
-
-	private Integer mFrom;
-	private Integer mTo;
 
 	protected int[] mFrom2;
 	protected int[] mTo2;
@@ -121,8 +122,6 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 			}
 		}
 	}
-
-	private boolean mFirstMove = true;
 	
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
@@ -281,6 +280,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 			 * http://drasticp.blogspot.dk/2012/04/viewholder-is-dead.html
 			 */
 			ImageView icon = (ImageView) view.getTag(R.id.list_image);
+			//NetworkImageView icon = (NetworkImageView) view.getTag(R.id.list_image);
 			// View overlay = (View) view.getTag(R.id.overlay);
 			TextView mainTitle = (TextView) view.getTag(R.id.title);
 			TextView subTitle = (TextView) view.getTag(R.id.podcast);
@@ -346,8 +346,13 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 				}
 
 				if (item.image != null && !item.image.equals("")) {
+					
 					ImageLoader imageLoader = getImageLoader(context);
 					imageLoader.displayImage(item.image, icon);
+					
+					//icon.setImageURI(Uri.parse(item.image));
+					//com.android.volley.toolbox.ImageLoader imageLoader = ImageCacheManager.getInstance().getImageLoader();
+					//icon.setImageUrl(item.image, imageLoader);
 				}
 
 			}

@@ -4,13 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical" >
-    
+
     <LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal" >
-    
-            <!-- android:layout_height="@dimen/item_height" -->
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <!-- android:layout_height="@dimen/item_height" -->
 
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -29,6 +29,11 @@
                 <ImageView
                     android:id="@+id/list_image"
                     style="@style/PodcastImage" />
+				 <!--
+                <com.android.volley.toolbox.NetworkImageView
+                    android:id="@+id/list_image"
+                      style="@style/PodcastImage" />-->
+                
             </LinearLayout>
 
             <TextView
@@ -100,9 +105,9 @@
         <FrameLayout
             android:id="@id/drag_handle"
             android:layout_width="25dp"
-            android:layout_height="match_parent" 
-            android:paddingTop="30dp"
-            android:paddingBottom="30dp">
+            android:layout_height="match_parent"
+            android:paddingBottom="30dp"
+            android:paddingTop="30dp" >
 
             <LinearLayout
                 android:layout_width="7dp"
@@ -110,18 +115,17 @@
                 android:background="@drawable/drag_handle"
                 android:orientation="vertical"
                 android:tileMode="repeat" >
-				<!--
+
+                <!--
                 <ImageView
                     android:id="@id/drag_handle"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
                     android:layout_alignParentRight="true"
                     android:background="@drawable/drag_handle" />
-                    -->
+                -->
             </LinearLayout>
-
         </FrameLayout>
-    
     </LinearLayout>
 
     <ViewStub
