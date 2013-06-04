@@ -26,6 +26,6 @@ public interface WithIcon {
 	
 	public abstract void update(ContentResolver contentResolver);
 	
-	public abstract ContentProviderOperation update(ContentResolver contentResolver, boolean batchUpdate);
+	public abstract ContentProviderOperation update(ContentResolver contentResolver, boolean batchUpdate, boolean silent);
 
 }

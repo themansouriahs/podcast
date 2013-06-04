@@ -268,7 +268,7 @@ public class Subscription extends AbstractItem {
 	 * Batch update
 	 */
 	public ContentProviderOperation update(ContentResolver contentResolver,
-			boolean batchUpdate) {
+			boolean batchUpdate, boolean silent) {
 
 		ContentProviderOperation contentUpdate = null;
 		ContentValues cv = new ContentValues();
@@ -282,7 +282,7 @@ public class Subscription extends AbstractItem {
 		if (description != null)
 			cv.put(SubscriptionColumns.DESCRIPTION, description);
 
-		if (fail_count <= 0) {
+		if (fail_count <= 0 && !silent) {
 			lastUpdated = Long.valueOf(System.currentTimeMillis());
 		} else {
 			lastUpdated = 0;

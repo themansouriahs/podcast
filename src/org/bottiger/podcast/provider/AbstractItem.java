@@ -18,7 +18,7 @@ public abstract class AbstractItem implements WithIcon {
 	 * Update the Item in the database
 	 */
 	public void update(ContentResolver contentResolver) {
-		update(contentResolver, false);
+		update(contentResolver, false, false);
 	}
 
 }

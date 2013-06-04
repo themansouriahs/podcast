@@ -394,7 +394,7 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 	 * Batch update
 	 */
 	public ContentProviderOperation update(ContentResolver contentResolver,
-			boolean batchUpdate) {
+			boolean batchUpdate, boolean silent) {
 
 		log.debug("item update start");
 
@@ -412,7 +412,7 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 			cv.put(ItemColumns.PATHNAME, filename);
 		if (sub_id > 0)
 			cv.put(ItemColumns.SUBS_ID, sub_id);
-			
+
 		if (url != null) {
 			cv.put(ItemColumns.URL, url);
 			cv.put(ItemColumns.RESOURCE, url);
@@ -434,8 +434,11 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 		if (offset >= 0)
 			cv.put(ItemColumns.OFFSET, offset);
 
-		lastUpdate = Long.valueOf(System.currentTimeMillis());
-		cv.put(ItemColumns.LAST_UPDATE, lastUpdate);
+		if (!silent) {
+			lastUpdate = Long.valueOf(System.currentTimeMillis());
+		}
+		if (lastUpdate > 0)
+			cv.put(ItemColumns.LAST_UPDATE, lastUpdate);
 
 		if (listened >= 0)
 			cv.put(ItemColumns.LISTENED, listened);
@@ -460,12 +463,19 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 		}
 		return contentUpdate;
 	}
+	
+	/**
+	 * Update the FeedItem in the database
+	 */
+	public void silentUpdate(ContentResolver contentResolver) {
+		update(contentResolver, false, true);
+	}
 
 	/**
 	 * Update the FeedItem in the database
 	 */
 	public void update(ContentResolver contentResolver) {
-		update(contentResolver, false);
+		update(contentResolver, false, false);
 	}
 
 	public Uri insert(ContentResolver contentResolver) {
