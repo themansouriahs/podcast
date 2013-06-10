@@ -62,6 +62,18 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 
 	private TreeSet<Number> mExpandedItemID = new TreeSet<Number>();
 
+	private static DownloadManager mDownloadManager = null;
+	
+	static class ViewHolder {
+		ImageView icon;
+		TextView mainTitle;
+		TextView subTitle;
+		TextView timeDuration;
+		TextView currentPosition;
+		TextView slash;
+		TextView fileSize;
+	}
+
 	// Create a set of FieldHandlers for methods calling using the legacy
 	// constructor
 	private static FieldHandler[] defaultFieldHandlers(String[] fromColumns,
@@ -122,145 +134,147 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 			}
 		}
 	}
+
 	
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 
 		View listViewItem;
+		ViewHolder holder;
 
 		Cursor itemCursor = (Cursor) getItem(position);
-		
+
 		ThemeHelper themeHelper = new ThemeHelper(mContext);
 
 		if (!itemCursor.moveToPosition(position)) {
 			throw new IllegalStateException("couldn't move cursor to position "
 					+ position);
-		}		
+		}
 
 		if (convertView == null) {
 			listViewItem = newView(mContext, itemCursor, parent);
 		} else {
+			holder = (ViewHolder) convertView.getTag();
 			listViewItem = convertView;
 		}
 
 		bindView(listViewItem, mContext, itemCursor);
 
-		// Get the current FeedItem
-		//Long itemID = itemCursor.getLong(itemCursor
-		//		.getColumnIndex(BaseColumns._ID));
-		//FeedItem feedItem = FeedItem.getById(mContext.getContentResolver(),
-		//		itemID);
-		FeedItem feedItem = FeedItem.getByCursor(itemCursor);
-
-		// Update the playlsit to reflect the position of the item
-		Playlist.updatePosition(feedItem, position);
-
-		boolean isCurrentPlayingItem = false;
-		if (PodcastBaseFragment.mPlayerServiceBinder != null) {
-			isCurrentPlayingItem = feedItem
-					.equals(PodcastBaseFragment.mPlayerServiceBinder
-							.getCurrentItem());
-		}
-
-		if (mExpandedItemID.contains(feedItem.getId()) || isCurrentPlayingItem) {
-			ViewStub stub = (ViewStub) listViewItem.findViewById(R.id.stub);
-			if (stub != null) {
-				stub.inflate();
-			}
-
-			View playerView = listViewItem.findViewById(R.id.stub_player);
-			playerView.setVisibility(View.VISIBLE);
-
-			TextView timeSlash = (TextView) listViewItem
-					.findViewById(R.id.time_slash);
-			timeSlash.setText("/");
-			timeSlash.setVisibility(View.VISIBLE);
-
-			TextView currentTime = (TextView) listViewItem
-					.findViewById(R.id.current_position);
-			// View podcastImageOverlay = (View) listViewItem
-			// .findViewById(R.id.overlay);
-
-			long playerPosition = 0;
-			long playerDuration = 0;
-
-			if (isCurrentPlayingItem) {
-				playerPosition = PodcastBaseFragment.mPlayerServiceBinder
-						.position();
-				playerDuration = PodcastBaseFragment.mPlayerServiceBinder
-						.duration();
-			} else {
-				playerPosition = feedItem.offset;
-				playerDuration = feedItem.getDuration();
-			}
-
-			currentTime.setText(StrUtils.formatTime(playerPosition));
-
-			SeekBar sb = (SeekBar) playerView.findViewById(R.id.progress);
-			sb.setMax(ControlButtons.MAX_SEEKBAR_VALUE);
-
-			// PlayerActivity.setProgressBar(sb, feedItem);
-			long secondary = 0;
-			if (feedItem.filesize != 0) {
-				secondary = feedItem.isDownloaded() ? feedItem
-						.getCurrentFileSize()
-						: (feedItem.chunkFilesize / feedItem.filesize);
-			}
-
-			PlayerActivity.setProgressBar(sb, playerDuration, playerPosition,
-					secondary);
-
-			ControlButtons.setPlayerListeners(listViewItem, playerView, feedItem.getId());
-
-			if (feedItem.isDownloaded()) {
-				ImageButton downloadButton = (ImageButton) playerView
-						.findViewById(R.id.download);
-				downloadButton.setBackgroundResource(themeHelper
-						.getAttr(R.attr.delete_icon));
-			}
-
-			if (feedItem.isMarkedAsListened()) {
-				// setOverlay(podcastImageOverlay, true);
-			}
-
-			if (PodcastBaseFragment.mPlayerServiceBinder.isInitialized()) {
-				if (feedItem.getId() == PodcastBaseFragment.mPlayerServiceBinder
-						.getCurrentItem().id) {
-					if (PodcastBaseFragment.mPlayerServiceBinder.isPlaying()) {
-						PodcastBaseFragment.setCurrentTime(currentTime);
-						ImageButton playPauseButton = (ImageButton) listViewItem
-								.findViewById(R.id.play_toggle);
-						playPauseButton.setBackgroundResource(themeHelper
-								.getAttr(R.attr.pause_icon));
-					}
-				}
-
-			}
-
-		} else {
-			View playerView = listViewItem.findViewById(R.id.stub_player);
-			if (playerView != null) {
-				playerView.setVisibility(View.GONE);
-			}
-		}
+		/*
+		 * 
+		 * 
+		 * // Get the current FeedItem //Long itemID =
+		 * itemCursor.getLong(itemCursor // .getColumnIndex(BaseColumns._ID));
+		 * //FeedItem feedItem = FeedItem.getById(mContext.getContentResolver(),
+		 * // itemID); FeedItem feedItem = FeedItem.getByCursor(itemCursor);
+		 * 
+		 * 
+		 * // Update the playlsit to reflect the position of the item
+		 * Playlist.updatePosition(feedItem, position);
+		 * 
+		 * boolean isCurrentPlayingItem = false; if
+		 * (PodcastBaseFragment.mPlayerServiceBinder != null) {
+		 * isCurrentPlayingItem = feedItem
+		 * .equals(PodcastBaseFragment.mPlayerServiceBinder .getCurrentItem());
+		 * }
+		 * 
+		 * if (mExpandedItemID.contains(feedItem.getId()) ||
+		 * isCurrentPlayingItem) { ViewStub stub = (ViewStub)
+		 * listViewItem.findViewById(R.id.stub); if (stub != null) {
+		 * stub.inflate(); }
+		 * 
+		 * View playerView = listViewItem.findViewById(R.id.stub_player);
+		 * playerView.setVisibility(View.VISIBLE);
+		 * 
+		 * TextView timeSlash = (TextView) listViewItem
+		 * .findViewById(R.id.time_slash); timeSlash.setText("/");
+		 * timeSlash.setVisibility(View.VISIBLE);
+		 * 
+		 * TextView currentTime = (TextView) listViewItem
+		 * .findViewById(R.id.current_position); // View podcastImageOverlay =
+		 * (View) listViewItem // .findViewById(R.id.overlay);
+		 * 
+		 * long playerPosition = 0; long playerDuration = 0;
+		 * 
+		 * if (isCurrentPlayingItem) { playerPosition =
+		 * PodcastBaseFragment.mPlayerServiceBinder .position(); playerDuration
+		 * = PodcastBaseFragment.mPlayerServiceBinder .duration(); } else {
+		 * playerPosition = feedItem.offset; playerDuration =
+		 * feedItem.getDuration(); }
+		 * 
+		 * currentTime.setText(StrUtils.formatTime(playerPosition));
+		 * 
+		 * SeekBar sb = (SeekBar) playerView.findViewById(R.id.progress);
+		 * sb.setMax(ControlButtons.MAX_SEEKBAR_VALUE);
+		 * 
+		 * // PlayerActivity.setProgressBar(sb, feedItem); long secondary = 0;
+		 * if (feedItem.filesize != 0) { secondary = feedItem.isDownloaded() ?
+		 * feedItem .getCurrentFileSize() : (feedItem.chunkFilesize /
+		 * feedItem.filesize); }
+		 * 
+		 * PlayerActivity.setProgressBar(sb, playerDuration, playerPosition,
+		 * secondary);
+		 * 
+		 * ControlButtons.setPlayerListeners(listViewItem, playerView,
+		 * feedItem.getId());
+		 * 
+		 * if (feedItem.isDownloaded()) { ImageButton downloadButton =
+		 * (ImageButton) playerView .findViewById(R.id.download);
+		 * downloadButton.setBackgroundResource(themeHelper
+		 * .getAttr(R.attr.delete_icon)); }
+		 * 
+		 * if (feedItem.isMarkedAsListened()) { //
+		 * setOverlay(podcastImageOverlay, true); }
+		 * 
+		 * if (PodcastBaseFragment.mPlayerServiceBinder.isInitialized()) { if
+		 * (feedItem.getId() == PodcastBaseFragment.mPlayerServiceBinder
+		 * .getCurrentItem().id) { if
+		 * (PodcastBaseFragment.mPlayerServiceBinder.isPlaying()) {
+		 * PodcastBaseFragment.setCurrentTime(currentTime); ImageButton
+		 * playPauseButton = (ImageButton) listViewItem
+		 * .findViewById(R.id.play_toggle);
+		 * playPauseButton.setBackgroundResource(themeHelper
+		 * .getAttr(R.attr.pause_icon)); } }
+		 * 
+		 * }
+		 * 
+		 * } else { View playerView =
+		 * listViewItem.findViewById(R.id.stub_player); if (playerView != null)
+		 * { playerView.setVisibility(View.GONE); } }
+		 */
 
 		return listViewItem;
 	}
+
 
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {
 
 		View view = mInflater.inflate(R.layout.episode_list, null);
 
-		view.setTag(R.id.list_image, view.findViewById(R.id.list_image));
-		// view.setTag(R.id.overlay, view.findViewById(R.id.overlay));
-		view.setTag(R.id.title, view.findViewById(R.id.title));
-		view.setTag(R.id.podcast, view.findViewById(R.id.podcast));
-		view.setTag(R.id.duration, view.findViewById(R.id.duration));
-		view.setTag(R.id.current_position,
-				view.findViewById(R.id.current_position));
-		view.setTag(R.id.time_slash, view.findViewById(R.id.time_slash));
-		view.setTag(R.id.filesize, view.findViewById(R.id.filesize));
+		ViewHolder holder = new ViewHolder();
+		holder.icon = (ImageView) view.findViewById(R.id.list_image);
+		// NetworkImageView icon = (NetworkImageView)
+		// view.getTag(R.id.list_image);
+		holder.mainTitle = (TextView) view.findViewById(R.id.title);
+		holder.subTitle = (TextView) view.findViewById(R.id.podcast);
+		holder.timeDuration = (TextView) view.findViewById(R.id.duration);
+		holder.currentPosition = (TextView) view.getTag(R.id.current_position);
+		holder.slash = (TextView) view.findViewById(R.id.time_slash);
+		holder.fileSize = (TextView) view.findViewById(R.id.filesize);
+		view.setTag(holder);
+
+		/*
+		 * view.setTag(R.id.list_image, view.findViewById(R.id.list_image)); //
+		 * view.setTag(R.id.overlay, view.findViewById(R.id.overlay));
+		 * view.setTag(R.id.title, view.findViewById(R.id.title));
+		 * view.setTag(R.id.podcast, view.findViewById(R.id.podcast));
+		 * view.setTag(R.id.duration, view.findViewById(R.id.duration));
+		 * view.setTag(R.id.current_position,
+		 * view.findViewById(R.id.current_position));
+		 * view.setTag(R.id.time_slash, view.findViewById(R.id.time_slash));
+		 * view.setTag(R.id.filesize, view.findViewById(R.id.filesize));
+		 */
 		return view;
 	}
 
@@ -270,47 +284,44 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 		try {
 			final FeedItem item = FeedItem.getByCursor(cursor);
 
-			Subscription sub = null;
-			try {
-				sub = Subscription.getByCursor(cursor);
-			} catch (IllegalStateException e) {
-			}
-
 			/*
-			 * http://drasticp.blogspot.dk/2012/04/viewholder-is-dead.html
+			 * Subscription sub = null; try { sub =
+			 * Subscription.getByCursor(cursor); } catch (IllegalStateException
+			 * e) { }
 			 */
-			ImageView icon = (ImageView) view.getTag(R.id.list_image);
-			//NetworkImageView icon = (NetworkImageView) view.getTag(R.id.list_image);
-			// View overlay = (View) view.getTag(R.id.overlay);
-			TextView mainTitle = (TextView) view.getTag(R.id.title);
-			TextView subTitle = (TextView) view.getTag(R.id.podcast);
-			TextView timeDuration = (TextView) view.getTag(R.id.duration);
-			TextView currentPosition = (TextView) view
-					.getTag(R.id.current_position);
-			TextView slash = (TextView) view.getTag(R.id.time_slash);
-			TextView fileSize = (TextView) view.getTag(R.id.filesize);
 
+			ViewHolder holder = (ViewHolder) view.getTag();
+
+			
 			DownloadStatus ds;
 			if (item != null) {
-				DownloadProgressListener.registerTextView(context, fileSize,
-						item);
+				
+				DownloadProgressListener.registerTextView(context,
+						holder.fileSize, item);
 
-				icon.setOnClickListener(new View.OnClickListener() {
+				holder.icon.setOnClickListener(new View.OnClickListener() {
+
 					@Override
 					public void onClick(View v) {
 						PodcastBaseFragment.mPlayerServiceBinder.toggle(item
 								.getId());// .play();
 					}
 				});
+				
 
 				int filesize = 0;
 
-				DownloadManager downloadManager = (DownloadManager) mContext
-						.getSystemService(Context.DOWNLOAD_SERVICE);
-				fileSize.setText(item.getStatus(downloadManager));
+				if (mDownloadManager == null) {
+					mDownloadManager = (DownloadManager) mContext
+								.getSystemService(Context.DOWNLOAD_SERVICE);
+				}
+				
+				holder.fileSize.setText(item.getStatus(mDownloadManager));
+				
 
 				// item.setPriority(null, mContext);
 
+				
 				if (item.title != null) {
 					String title = item.title;
 					int priority = item.getPriority();
@@ -322,39 +333,46 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 						view.setBackgroundColor(mContext.getResources()
 								.getColor(R.color.default_background));
 					}
-					mainTitle.setText(title);
+					holder.mainTitle.setText(title);
 				}
+				
 
+				
 				if (item.sub_title != null)
-					subTitle.setText(item.sub_title);
+					holder.subTitle.setText(item.sub_title);
 
 				if (item.getDuration() > 0) {
 
-					timeDuration.setText(item.duration_string);
+					holder.timeDuration.setText(item.duration_string);
 
 					if (item.offset > 0 && filesize > 0) {
 						String offsetText = StrUtils.formatTime(
 								(float) item.offset / (float) filesize,
 								item.duration_string);
-						currentPosition.setText(offsetText);
-						slash.setText("/");
-						slash.setVisibility(View.VISIBLE);
+						holder.currentPosition.setText(offsetText);
+						holder.slash.setText("/");
+						holder.slash.setVisibility(View.VISIBLE);
 					} else {
-						currentPosition.setText("");
-						slash.setVisibility(View.GONE);
+						if (holder.currentPosition != null) {
+							holder.currentPosition.setText("");
+							holder.slash.setVisibility(View.GONE);
+						}
 					}
 				}
 
+				
 				if (item.image != null && !item.image.equals("")) {
-					
-					ImageLoader imageLoader = getImageLoader(context);
-					imageLoader.displayImage(item.image, icon);
-					
-					//icon.setImageURI(Uri.parse(item.image));
-					//com.android.volley.toolbox.ImageLoader imageLoader = ImageCacheManager.getInstance().getImageLoader();
-					//icon.setImageUrl(item.image, imageLoader);
-				}
 
+					ImageLoader imageLoader = getImageLoader(context);
+					imageLoader.displayImage(item.image, holder.icon);
+
+					// icon.setImageURI(Uri.parse(item.image));
+					// com.android.volley.toolbox.ImageLoader imageLoader =
+					ImageCacheManager.getInstance().getImageLoader();
+					// icon.setImageUrl(item.image, imageLoader); }
+
+				}
+				
 			}
 
 		} catch (IllegalStateException e) {
