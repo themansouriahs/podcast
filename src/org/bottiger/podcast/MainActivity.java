@@ -14,6 +14,9 @@ import org.bottiger.podcast.PodcastBaseFragment.OnItemSelectedListener;
 import org.bottiger.podcast.cloud.CloudProvider;
 import org.bottiger.podcast.cloud.GoogleReader;
 import org.bottiger.podcast.debug.SqliteCopy;
+import org.bottiger.podcast.images.ImageCacheManager;
+import org.bottiger.podcast.images.ImageCacheManager.CacheType;
+import org.bottiger.podcast.images.RequestManager;
 import org.bottiger.podcast.provider.PodcastProvider;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
@@ -40,6 +43,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
+import android.graphics.Bitmap.CompressFormat;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Debug;
@@ -90,9 +94,6 @@ public class MainActivity extends FragmentActivity implements
 	public static HTTPDService mHTTPDServiceBinder = null;
 
 	static boolean mBound = false;
-	
-	/** Painless networking with Volley */
-	private RequestQueue mRequestQueue;
 
 	// public static GoogleReader gReader = null;
 	public static CloudProvider gReader = null;
@@ -133,6 +134,13 @@ public class MainActivity extends FragmentActivity implements
 	private SharedPreferences prefs;
 
 	private DriveUtils mDriveUtils;
+	
+	/** Painless networking with Volley */
+	private static int DISK_IMAGECACHE_SIZE = 1024 * 1024 * 10;
+	private static CompressFormat DISK_IMAGECACHE_COMPRESS_FORMAT = CompressFormat.PNG;
+	private static int DISK_IMAGECACHE_QUALITY = 100; // PNG is lossless so
+														// quality is ignored
+														// but must be provided
 
 	public static ServiceConnection mHTTPDServiceConnection = new ServiceConnection() {
 		@Override
@@ -250,7 +258,14 @@ public class MainActivity extends FragmentActivity implements
 
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		
-		mRequestQueue = Volley.newRequestQueue(this);
+		/** Painless networking with Volley */
+		RequestManager.init(this);
+		ImageCacheManager.getInstance().init(this,
+				this.getPackageCodePath()
+				, DISK_IMAGECACHE_SIZE
+				, DISK_IMAGECACHE_COMPRESS_FORMAT
+				, DISK_IMAGECACHE_QUALITY
+				, CacheType.MEMORY);
 
 		// Start Application services
 		startService(new Intent(this, PlayerService.class));

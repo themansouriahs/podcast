@@ -26,13 +26,15 @@
                 android:layout_marginRight="7dip"
                 android:padding="0dip" >
 
+                <!-- 
                 <ImageView
                     android:id="@+id/list_image"
                     style="@style/PodcastImage" />
-				 <!--
+                     -->
+				
                 <com.android.volley.toolbox.NetworkImageView
                     android:id="@+id/list_image"
-                      style="@style/PodcastImage" />-->
+                      style="@style/PodcastImage" />
                 
             </LinearLayout>
 

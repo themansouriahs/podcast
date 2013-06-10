@@ -63,9 +63,9 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 	private TreeSet<Number> mExpandedItemID = new TreeSet<Number>();
 
 	private static DownloadManager mDownloadManager = null;
-	
+
 	static class ViewHolder {
-		ImageView icon;
+		NetworkImageView icon;
 		TextView mainTitle;
 		TextView subTitle;
 		TextView timeDuration;
@@ -135,7 +135,6 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 		}
 	}
 
-	
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 
@@ -246,14 +245,13 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 		return listViewItem;
 	}
 
-
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {
 
 		View view = mInflater.inflate(R.layout.episode_list, null);
 
 		ViewHolder holder = new ViewHolder();
-		holder.icon = (ImageView) view.findViewById(R.id.list_image);
+		holder.icon = (NetworkImageView) view.findViewById(R.id.list_image);
 		// NetworkImageView icon = (NetworkImageView)
 		// view.getTag(R.id.list_image);
 		holder.mainTitle = (TextView) view.findViewById(R.id.title);
@@ -284,18 +282,11 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 		try {
 			final FeedItem item = FeedItem.getByCursor(cursor);
 
-			/*
-			 * Subscription sub = null; try { sub =
-			 * Subscription.getByCursor(cursor); } catch (IllegalStateException
-			 * e) { }
-			 */
-
 			ViewHolder holder = (ViewHolder) view.getTag();
 
-			
 			DownloadStatus ds;
 			if (item != null) {
-				
+
 				DownloadProgressListener.registerTextView(context,
 						holder.fileSize, item);
 
@@ -307,21 +298,18 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 								.getId());// .play();
 					}
 				});
-				
 
 				int filesize = 0;
 
 				if (mDownloadManager == null) {
 					mDownloadManager = (DownloadManager) mContext
-								.getSystemService(Context.DOWNLOAD_SERVICE);
+							.getSystemService(Context.DOWNLOAD_SERVICE);
 				}
-				
+
 				holder.fileSize.setText(item.getStatus(mDownloadManager));
-				
 
 				// item.setPriority(null, mContext);
 
-				
 				if (item.title != null) {
 					String title = item.title;
 					int priority = item.getPriority();
@@ -335,9 +323,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 					}
 					holder.mainTitle.setText(title);
 				}
-				
 
-				
 				if (item.sub_title != null)
 					holder.subTitle.setText(item.sub_title);
 
@@ -360,19 +346,18 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 					}
 				}
 
-				
 				if (item.image != null && !item.image.equals("")) {
 
-					ImageLoader imageLoader = getImageLoader(context);
-					imageLoader.displayImage(item.image, holder.icon);
+					// ImageLoader imageLoader = getImageLoader(context);
+					// imageLoader.displayImage(item.image, holder.icon);
 
 					// icon.setImageURI(Uri.parse(item.image));
-					// com.android.volley.toolbox.ImageLoader imageLoader =
-					ImageCacheManager.getInstance().getImageLoader();
-					// icon.setImageUrl(item.image, imageLoader); }
+					com.android.volley.toolbox.ImageLoader imageLoader = ImageCacheManager
+							.getInstance().getImageLoader();
+					holder.icon.setImageUrl(item.image, imageLoader);
 
 				}
-				
+
 			}
 
 		} catch (IllegalStateException e) {
