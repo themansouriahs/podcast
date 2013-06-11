@@ -2,6 +2,7 @@ package org.bottiger.podcast.adapters;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.adapters.PodcastAdapterInterface.FieldHandler;
+import org.bottiger.podcast.images.ImageCacheManager;
 import org.bottiger.podcast.provider.Subscription;
 
 import android.content.Context;
@@ -15,10 +16,16 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.volley.toolbox.NetworkImageView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 
 public class SubscriptionGridCursorAdapter extends AbstractGridPodcastAdapter {
+	
+	static class SubscriptionViewHolder {
+		NetworkImageView image;
+		TextView title;
+	}
 
 	
     public SubscriptionGridCursorAdapter(Context context, int layout, Cursor c) {
@@ -70,42 +77,24 @@ public class SubscriptionGridCursorAdapter extends AbstractGridPodcastAdapter {
             v.setImageURI(Uri.parse(value));
         }
     }
-    
-	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
-
-		View gridViewItem;
-		Cursor subscriptionCursor = (Cursor) getItem(position);
-
-		if (!subscriptionCursor.moveToPosition(position)) {
-			throw new IllegalStateException("couldn't move cursor to position "
-					+ position);
-		}
-
-		if (convertView == null) {
-			gridViewItem = newView(mContext, subscriptionCursor, parent);
-		} else {
-			gridViewItem = convertView;
-		}
-
-		bindView(gridViewItem, mContext, subscriptionCursor);
-
-		return gridViewItem;
-	}
 	
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {
 
 		View view = mInflater.inflate(R.layout.subscription_grid_item, null);
+		
+		SubscriptionViewHolder holder = new SubscriptionViewHolder();
+		holder.image = (NetworkImageView) view.findViewById(R.id.grid_image);
+		holder.title = (TextView) view.findViewById(R.id.grid_title);
+		view.setTag(holder);
 
-		view.setTag(R.id.grid_image, view.findViewById(R.id.grid_image));
-		view.setTag(R.id.grid_title, view.findViewById(R.id.grid_title));
-		view.setTag(R.id.podcast, view.findViewById(R.id.podcast));
 		return view;
 	}
 	
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
+		
+		SubscriptionViewHolder holder = (SubscriptionViewHolder)view.getTag();
 
 		Subscription sub = null;
 		try {
@@ -113,24 +102,21 @@ public class SubscriptionGridCursorAdapter extends AbstractGridPodcastAdapter {
 		} catch (IllegalStateException e) {
 			e.printStackTrace();
 		}
-
-		/*
-		 * http://drasticp.blogspot.dk/2012/04/viewholder-is-dead.html
-		 */
-		ImageView icon = (ImageView) view.getTag(R.id.grid_image);
-		TextView gridTitle = (TextView) view.getTag(R.id.grid_title);
-		//TextView subTitle = (TextView) view.getTag(R.id.podcast);
 		
 		if (sub != null) {
 
 
 			if (sub.title != null)
-				gridTitle.setText(sub.title);
+				holder.title.setText(sub.title);
 
 
 			if (sub.imageURL != null && !sub.imageURL.equals("")) {
-				ImageLoader imageLoader = getImageLoader(context);
-				imageLoader.displayImage(sub.imageURL, icon);
+				//ImageLoader imageLoader = getImageLoader(context);
+				//imageLoader.displayImage(sub.imageURL, holder.image);
+				
+				com.android.volley.toolbox.ImageLoader imageLoader = ImageCacheManager
+						.getInstance().getImageLoader();
+				holder.image.setImageUrl(sub.imageURL, imageLoader);
 			}
 
 		}

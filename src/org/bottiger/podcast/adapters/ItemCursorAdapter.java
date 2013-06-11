@@ -262,17 +262,6 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 		holder.fileSize = (TextView) view.findViewById(R.id.filesize);
 		view.setTag(holder);
 
-		/*
-		 * view.setTag(R.id.list_image, view.findViewById(R.id.list_image)); //
-		 * view.setTag(R.id.overlay, view.findViewById(R.id.overlay));
-		 * view.setTag(R.id.title, view.findViewById(R.id.title));
-		 * view.setTag(R.id.podcast, view.findViewById(R.id.podcast));
-		 * view.setTag(R.id.duration, view.findViewById(R.id.duration));
-		 * view.setTag(R.id.current_position,
-		 * view.findViewById(R.id.current_position));
-		 * view.setTag(R.id.time_slash, view.findViewById(R.id.time_slash));
-		 * view.setTag(R.id.filesize, view.findViewById(R.id.filesize));
-		 */
 		return view;
 	}
 
