@@ -185,9 +185,20 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 		String duration = item.getString(item
 				.getColumnIndex(ItemColumns.DURATION));
 		int position = item.getPosition();
-		View view = list.getChildAt(position - start + 1);
+		
+		View view1 = list.getChildAt(0);
+		View view2 = list.getChildAt(1);
+		View view3 = list.getChildAt(2);
+		
+		int newStart = (start > 0) ? start+1 : start;
+		
+		View view = list.getChildAt(position - start);
 		mAdapter.notifyDataSetChanged();
 
+		TextView title = (TextView) view
+				.findViewById(R.id.title);
+		CharSequence title2 = title.getText();
+		
 		ControlButtons.Holder viewHolder = new ControlButtons.Holder();
 		viewHolder.currentTime = (TextView) view
 				.findViewById(R.id.current_position);

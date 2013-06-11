@@ -64,7 +64,13 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 
 	private static DownloadManager mDownloadManager = null;
 
-	static class ViewHolder {
+	private static PlayerViewHolder currentEpisodePlayerViewHolder = null;
+	private static PlayerViewHolder secondaryEpisodePlayerViewHolder = null;
+
+	private FeedItem mCurrentFeedItem = null;
+
+	/** ViewHolder for holding a basiv listitem */
+	static class EpisodeViewHolder {
 		NetworkImageView icon;
 		TextView mainTitle;
 		TextView subTitle;
@@ -72,6 +78,22 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 		TextView currentPosition;
 		TextView slash;
 		TextView fileSize;
+		ViewStub stub;
+		View playerView;
+	}
+
+	/** ViewHolder for holding the expanded player */
+	static class PlayerViewHolder {
+		ViewStub stub;
+		View playerView;
+		TextView timeSlash;
+		SeekBar progress;
+		TextView currentPosition;
+		ImageButton playPauseButton;
+		ImageButton stopButton;
+		ImageButton downloadButton;
+		ImageButton infoButton;
+		ImageButton queueButton;
 	}
 
 	// Create a set of FieldHandlers for methods calling using the legacy
@@ -139,11 +161,9 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 	public View getView(int position, View convertView, ViewGroup parent) {
 
 		View listViewItem;
-		ViewHolder holder;
+		EpisodeViewHolder holder;
 
 		Cursor itemCursor = (Cursor) getItem(position);
-
-		ThemeHelper themeHelper = new ThemeHelper(mContext);
 
 		if (!itemCursor.moveToPosition(position)) {
 			throw new IllegalStateException("couldn't move cursor to position "
@@ -153,94 +173,16 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 		if (convertView == null) {
 			listViewItem = newView(mContext, itemCursor, parent);
 		} else {
-			holder = (ViewHolder) convertView.getTag();
 			listViewItem = convertView;
 		}
 
+		mCurrentFeedItem = FeedItem.getByCursor(itemCursor);
+
 		bindView(listViewItem, mContext, itemCursor);
 
-		/*
-		 * 
-		 * 
-		 * // Get the current FeedItem //Long itemID =
-		 * itemCursor.getLong(itemCursor // .getColumnIndex(BaseColumns._ID));
-		 * //FeedItem feedItem = FeedItem.getById(mContext.getContentResolver(),
-		 * // itemID); FeedItem feedItem = FeedItem.getByCursor(itemCursor);
-		 * 
-		 * 
-		 * // Update the playlsit to reflect the position of the item
-		 * Playlist.updatePosition(feedItem, position);
-		 * 
-		 * boolean isCurrentPlayingItem = false; if
-		 * (PodcastBaseFragment.mPlayerServiceBinder != null) {
-		 * isCurrentPlayingItem = feedItem
-		 * .equals(PodcastBaseFragment.mPlayerServiceBinder .getCurrentItem());
-		 * }
-		 * 
-		 * if (mExpandedItemID.contains(feedItem.getId()) ||
-		 * isCurrentPlayingItem) { ViewStub stub = (ViewStub)
-		 * listViewItem.findViewById(R.id.stub); if (stub != null) {
-		 * stub.inflate(); }
-		 * 
-		 * View playerView = listViewItem.findViewById(R.id.stub_player);
-		 * playerView.setVisibility(View.VISIBLE);
-		 * 
-		 * TextView timeSlash = (TextView) listViewItem
-		 * .findViewById(R.id.time_slash); timeSlash.setText("/");
-		 * timeSlash.setVisibility(View.VISIBLE);
-		 * 
-		 * TextView currentTime = (TextView) listViewItem
-		 * .findViewById(R.id.current_position); // View podcastImageOverlay =
-		 * (View) listViewItem // .findViewById(R.id.overlay);
-		 * 
-		 * long playerPosition = 0; long playerDuration = 0;
-		 * 
-		 * if (isCurrentPlayingItem) { playerPosition =
-		 * PodcastBaseFragment.mPlayerServiceBinder .position(); playerDuration
-		 * = PodcastBaseFragment.mPlayerServiceBinder .duration(); } else {
-		 * playerPosition = feedItem.offset; playerDuration =
-		 * feedItem.getDuration(); }
-		 * 
-		 * currentTime.setText(StrUtils.formatTime(playerPosition));
-		 * 
-		 * SeekBar sb = (SeekBar) playerView.findViewById(R.id.progress);
-		 * sb.setMax(ControlButtons.MAX_SEEKBAR_VALUE);
-		 * 
-		 * // PlayerActivity.setProgressBar(sb, feedItem); long secondary = 0;
-		 * if (feedItem.filesize != 0) { secondary = feedItem.isDownloaded() ?
-		 * feedItem .getCurrentFileSize() : (feedItem.chunkFilesize /
-		 * feedItem.filesize); }
-		 * 
-		 * PlayerActivity.setProgressBar(sb, playerDuration, playerPosition,
-		 * secondary);
-		 * 
-		 * ControlButtons.setPlayerListeners(listViewItem, playerView,
-		 * feedItem.getId());
-		 * 
-		 * if (feedItem.isDownloaded()) { ImageButton downloadButton =
-		 * (ImageButton) playerView .findViewById(R.id.download);
-		 * downloadButton.setBackgroundResource(themeHelper
-		 * .getAttr(R.attr.delete_icon)); }
-		 * 
-		 * if (feedItem.isMarkedAsListened()) { //
-		 * setOverlay(podcastImageOverlay, true); }
-		 * 
-		 * if (PodcastBaseFragment.mPlayerServiceBinder.isInitialized()) { if
-		 * (feedItem.getId() == PodcastBaseFragment.mPlayerServiceBinder
-		 * .getCurrentItem().id) { if
-		 * (PodcastBaseFragment.mPlayerServiceBinder.isPlaying()) {
-		 * PodcastBaseFragment.setCurrentTime(currentTime); ImageButton
-		 * playPauseButton = (ImageButton) listViewItem
-		 * .findViewById(R.id.play_toggle);
-		 * playPauseButton.setBackgroundResource(themeHelper
-		 * .getAttr(R.attr.pause_icon)); } }
-		 * 
-		 * }
-		 * 
-		 * } else { View playerView =
-		 * listViewItem.findViewById(R.id.stub_player); if (playerView != null)
-		 * { playerView.setVisibility(View.GONE); } }
-		 */
+		getPlayerViewHolder(position, listViewItem, itemCursor, convertView,
+				parent);
+		// bindExandedPlayer(itemCursor, listViewItem, position);
 
 		return listViewItem;
 	}
@@ -250,7 +192,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 
 		View view = mInflater.inflate(R.layout.episode_list, null);
 
-		ViewHolder holder = new ViewHolder();
+		EpisodeViewHolder holder = new EpisodeViewHolder();
 		holder.icon = (NetworkImageView) view.findViewById(R.id.list_image);
 		// NetworkImageView icon = (NetworkImageView)
 		// view.getTag(R.id.list_image);
@@ -260,6 +202,8 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 		holder.currentPosition = (TextView) view.getTag(R.id.current_position);
 		holder.slash = (TextView) view.findViewById(R.id.time_slash);
 		holder.fileSize = (TextView) view.findViewById(R.id.filesize);
+		holder.stub = (ViewStub) view.findViewById(R.id.stub);
+		holder.playerView = (View) view.findViewById(R.id.stub_player);
 		view.setTag(holder);
 
 		return view;
@@ -269,9 +213,9 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 	public void bindView(View view, Context context, Cursor cursor) {
 
 		try {
-			final FeedItem item = FeedItem.getByCursor(cursor);
+			final FeedItem item = mCurrentFeedItem;
 
-			ViewHolder holder = (ViewHolder) view.getTag();
+			EpisodeViewHolder holder = (EpisodeViewHolder) view.getTag();
 
 			DownloadStatus ds;
 			if (item != null) {
@@ -340,7 +284,6 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 					// ImageLoader imageLoader = getImageLoader(context);
 					// imageLoader.displayImage(item.image, holder.icon);
 
-					// icon.setImageURI(Uri.parse(item.image));
 					com.android.volley.toolbox.ImageLoader imageLoader = ImageCacheManager
 							.getInstance().getImageLoader();
 					holder.icon.setImageUrl(item.image, imageLoader);
@@ -350,6 +293,153 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 			}
 
 		} catch (IllegalStateException e) {
+		}
+
+	}
+
+	public View getPlayerViewHolder(int position, View listViewItem,
+			Cursor itemCursor, View convertView, ViewGroup parent) {
+
+		ViewStub stub = (ViewStub) listViewItem.findViewById(R.id.stub);
+		View playerView1 = listViewItem.findViewById(R.id.stub_player);
+		//playerView1.setVisibility(View.VISIBLE);
+
+		View viewHolder = null;
+
+		EpisodeViewHolder episodeHolder = (EpisodeViewHolder) listViewItem
+				.getTag();
+		//View playerView = episodeHolder.playerView;
+		View playerView = listViewItem.findViewById(R.id.stub_player);
+
+		// Update the playlsit to reflect the position of the item
+		// Playlist.updatePosition(mCurrentFeedItem, position); FIXME
+		boolean firstItem = position == 0;
+
+		if (firstItem || mExpandedItemID.contains(mCurrentFeedItem.getId())) {
+
+			PlayerViewHolder holder = firstItem ? currentEpisodePlayerViewHolder
+					: secondaryEpisodePlayerViewHolder;
+
+			if (holder == null) {
+				playerView = newPlayerView(mContext, listViewItem, parent,
+						holder);
+				holder = (PlayerViewHolder) playerView.getTag();
+				episodeHolder.playerView = playerView;
+			} 
+
+			if (firstItem)
+				currentEpisodePlayerViewHolder = holder;
+			else
+				secondaryEpisodePlayerViewHolder = holder;
+
+			bindExandedPlayer(mCurrentFeedItem, playerView, holder, position);
+		} else {
+			if (playerView != null) {
+				playerView.setVisibility(View.GONE);
+			}
+		}
+
+		return viewHolder;
+	}
+
+	public View newPlayerView(Context context, View view, View parent,
+			PlayerViewHolder viewHolder) {
+
+		ViewStub stub = (ViewStub) view.findViewById(R.id.stub);
+		if (stub != null) {
+			stub.inflate();
+		}
+
+		if (viewHolder == null)
+			viewHolder = new PlayerViewHolder();
+
+		View playerView = view.findViewById(R.id.stub_player);
+
+		viewHolder.stub = stub;
+		// viewHolder.playerView = (TextView)
+		// view.findViewById(R.id.stub_player);
+		viewHolder.timeSlash = (TextView) view.findViewById(R.id.time_slash);
+		viewHolder.currentPosition = (TextView) view
+				.findViewById(R.id.current_position);
+		viewHolder.progress = (SeekBar) view.findViewById(R.id.progress);
+		viewHolder.playPauseButton = (ImageButton) view
+				.findViewById(R.id.play_pause_button);
+		viewHolder.stopButton = (ImageButton) view.findViewById(R.id.stop);
+		viewHolder.downloadButton = (ImageButton) view
+				.findViewById(R.id.download);
+		viewHolder.infoButton = (ImageButton) view.findViewById(R.id.info);
+		viewHolder.queueButton = (ImageButton) view.findViewById(R.id.queue);
+
+		playerView.setTag(viewHolder);
+
+		return playerView;
+	}
+
+	/**
+	 * Expands the StubView and creates the expandable player. This is done for
+	 * the current playing episode and at most one other episode which the user
+	 * is interacting with
+	 * 
+	 * @param feedItem
+	 * @param playerView
+	 * @param holder
+	 * @param position
+	 */
+	public void bindExandedPlayer(FeedItem feedItem, View playerView,
+			PlayerViewHolder holder, int position) {
+
+		ThemeHelper themeHelper = new ThemeHelper(mContext);
+
+		playerView.setVisibility(View.VISIBLE);
+		holder.timeSlash.setText("/");
+		holder.timeSlash.setVisibility(View.VISIBLE);
+
+		long playerPosition = 0;
+		long playerDuration = 0;
+
+		if (position == 0
+				&& PodcastBaseFragment.mPlayerServiceBinder.isPlaying()) {
+			playerPosition = PodcastBaseFragment.mPlayerServiceBinder
+					.position();
+			playerDuration = PodcastBaseFragment.mPlayerServiceBinder
+					.duration();
+		} else {
+			playerPosition = feedItem.offset;
+			playerDuration = feedItem.getDuration();
+		}
+
+		holder.currentPosition.setText(StrUtils.formatTime(playerPosition));
+
+		holder.progress.setMax(ControlButtons.MAX_SEEKBAR_VALUE);
+
+		// PlayerActivity.setProgressBar(sb, feedItem);
+		long secondary = 0;
+		if (feedItem.filesize != 0) {
+			secondary = feedItem.isDownloaded() ? feedItem.getCurrentFileSize()
+					: (feedItem.chunkFilesize / feedItem.filesize);
+		}
+
+		PlayerActivity.setProgressBar(holder.progress, playerDuration,
+				playerPosition, secondary);
+
+		// ControlButtons.setPlayerListeners(playerView, playerView,
+		// feedItem.getId());
+
+		if (feedItem.isDownloaded()) {
+			holder.downloadButton.setBackgroundResource(themeHelper
+					.getAttr(R.attr.delete_icon));
+		}
+
+		if (PodcastBaseFragment.mPlayerServiceBinder.isInitialized()) {
+			if (feedItem.getId() == PodcastBaseFragment.mPlayerServiceBinder
+					.getCurrentItem().id) {
+				if (PodcastBaseFragment.mPlayerServiceBinder.isPlaying()) {
+					PodcastBaseFragment.setCurrentTime(holder.currentPosition);
+					holder.playPauseButton.setBackgroundResource(themeHelper
+							.getAttr(R.attr.pause_icon));
+				}
+			}
+
 		}
 
 	}
