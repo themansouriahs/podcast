@@ -10,6 +10,9 @@ import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.Log;
 import org.bottiger.podcast.utils.StrUtils;
 
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
+import uk.co.senab.actionbarpulltorefresh.library.delegate.AbsListViewDelegate;
+
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -19,6 +22,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.CursorWrapper;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -46,13 +50,16 @@ import android.widget.TextView;
 import com.mobeta.android.dslv.DragSortListView;
 
 /* Copy of PodcastBaseActivity */
-public abstract class PodcastBaseFragment extends FixedListFragment {
+public abstract class PodcastBaseFragment extends FixedListFragment implements PullToRefreshAttacher.OnRefreshListener {
 
 	public static final int COLUMN_INDEX_TITLE = 1;
 
 	protected View fragmentView;
 
 	protected SharedPreferences sharedPreferences;
+	
+	/** ActionBar pull to refresh */
+	private PullToRefreshAttacher mPullToRefreshAttacher;
 
 	// protected static PodcastService mServiceBinder = null;
 	public static PlayerService mPlayerServiceBinder = null;
@@ -150,8 +157,68 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 
 		registerForContextMenu(getListView());
 		getListView().setOnItemLongClickListener(listener);
+		
+		/** ActionBar Pull to Refresh */
+        // As we're modifying some of the options, create an instance of
+        // PullToRefreshAttacher.Options
+        PullToRefreshAttacher.Options ptrOptions = new PullToRefreshAttacher.Options();
+        // Here we make the refresh scroll distance to 75% of the GridView height
+        ptrOptions.refreshScrollDistance = 0.75f;
+        
+        /**
+         * As GridView is an AbsListView derived class, we create a new AbsListViewDelegate
+         * instance. You do NOT need to do this if you're using a supported scrollable Views. It is
+         * merely in this sample to show you how to set a custom delegate.
+         */
+        ptrOptions.delegate = new AbsListViewDelegate();
+
+        // Here we customise the animations which are used when showing/hiding the header view
+        //ptrOptions.headerInAnimation = R.anim.slide_in_top;
+        //ptrOptions.headerOutAnimation = R.anim.slide_out_top;
+
+        // Here we define a custom header layout which will be inflated and used
+        //ptrOptions.headerLayout = R.layout.actionbar_pulltorefresh_customised_header;
+
+        // Here we define a custom header transformer which will alter the header based on the
+        // current pull-to-refresh state
+        //ptrOptions.headerTransformer = new CustomisedHeaderTransformer();
+
+        // Here we create a PullToRefreshAttacher manually with the Options instance created above.
+        mPullToRefreshAttacher = new PullToRefreshAttacher(getActivity(), getPullView());
+
+        // Set Listener to know when a refresh should be started
+        mPullToRefreshAttacher.setRefreshListener(this);
 
 	}
+	
+	  
+    @Override
+    public void onRefreshStarted(View view) {
+        /**
+         * Simulate Refresh with 4 seconds sleep
+         */
+        new AsyncTask<Void, Void, Void>() {
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    Thread.sleep(4000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void result) {
+                super.onPostExecute(result);
+
+                // Notify PullToRefreshAttacher that the refresh has finished
+                mPullToRefreshAttacher.setRefreshComplete();
+            }
+        }.execute();
+    }
+
 
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v,
@@ -210,6 +277,8 @@ public abstract class PodcastBaseFragment extends FixedListFragment {
 		sharedPreferences = PreferenceManager
 				.getDefaultSharedPreferences(getActivity());
 	}
+	
+	abstract View getPullView();
 
 	@Override
 	public void onDestroy() {

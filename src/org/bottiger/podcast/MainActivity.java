@@ -31,6 +31,9 @@ import org.bottiger.podcast.utils.SDCardManager;
 import org.bottiger.podcast.utils.SlidingMenuBuilder;
 import org.bottiger.podcast.utils.ThemeHelper;
 
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
+import uk.co.senab.actionbarpulltorefresh.library.delegate.AbsListViewDelegate;
+
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
@@ -45,6 +48,7 @@ import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap.CompressFormat;
 import android.media.AudioManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Debug;
 import android.os.IBinder;
@@ -684,5 +688,5 @@ public class MainActivity extends FragmentActivity implements
 	 * 
 	 * } else { e.printStackTrace(); } } } return mDriveService; }
 	 */
-
+  
 }

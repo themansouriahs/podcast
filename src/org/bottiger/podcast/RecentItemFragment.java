@@ -247,4 +247,9 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 		setListAdapter(sca);
 		
 	}
+
+	@Override
+	View getPullView() {
+		return getListView();
+	}
 }

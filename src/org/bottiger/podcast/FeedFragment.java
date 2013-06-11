@@ -125,4 +125,15 @@ public class FeedFragment extends AbstractEpisodeFragment {
 	public int getItemLayout() {
 		return R.layout.episode_list_compact;
 	}
+
+	@Override
+	public void onRefreshStarted(View view) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	View getPullView() {
+		return getListView();
+	}
 }

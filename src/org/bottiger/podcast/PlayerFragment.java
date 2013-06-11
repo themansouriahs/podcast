@@ -731,5 +731,16 @@ public class PlayerFragment   extends PodcastBaseFragment
 		// TODO Auto-generated method stub
 		return null;
 	}    
+	
+	@Override
+	View getPullView() {
+		return null;
+	}
+
+	@Override
+	public void onRefreshStarted(View view) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }
