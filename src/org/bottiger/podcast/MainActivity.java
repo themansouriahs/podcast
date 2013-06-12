@@ -8,16 +8,13 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
 
 import org.bottiger.podcast.PodcastBaseFragment.OnItemSelectedListener;
 import org.bottiger.podcast.cloud.CloudProvider;
 import org.bottiger.podcast.cloud.GoogleReader;
-import org.bottiger.podcast.debug.SqliteCopy;
 import org.bottiger.podcast.images.ImageCacheManager;
 import org.bottiger.podcast.images.ImageCacheManager.CacheType;
 import org.bottiger.podcast.images.RequestManager;
-import org.bottiger.podcast.provider.PodcastProvider;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.service.HTTPDService;
@@ -28,15 +25,13 @@ import org.bottiger.podcast.utils.AddPodcastDialog;
 import org.bottiger.podcast.utils.ControlButtons;
 import org.bottiger.podcast.utils.DriveUtils;
 import org.bottiger.podcast.utils.Log;
-import org.bottiger.podcast.utils.SDCardManager;
 import org.bottiger.podcast.utils.ThemeHelper;
-
-import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
-import uk.co.senab.actionbarpulltorefresh.library.delegate.AbsListViewDelegate;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -48,7 +43,6 @@ import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap.CompressFormat;
 import android.media.AudioManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Debug;
 import android.os.IBinder;
@@ -68,30 +62,22 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
 import com.bugsense.trace.BugSenseHandler;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.google.api.client.http.FileContent;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
-import com.google.api.services.drive.DriveScopes;
-import com.google.api.services.drive.model.File;
-import com.google.api.services.drive.model.ParentReference;
 
 // Sliding
 public class MainActivity extends FragmentActivity implements
 		OnItemSelectedListener {
 
 	private static final String ACCOUNT_KEY = "account";
-	
+
 	public static final boolean SHOW_DRAWER = false;
 	public static final boolean SHOW_PULL_TO_REFRESH = false;
 
@@ -218,6 +204,8 @@ public class MainActivity extends FragmentActivity implements
 
 	private String[] mPlanetTitles;
 	private LinearLayout mDrawerList;
+	
+	private HeadsetReceiver receiver;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -277,12 +265,16 @@ public class MainActivity extends FragmentActivity implements
 				DISK_IMAGECACHE_QUALITY, CacheType.MEMORY);
 
 		// Start Application services
-		startService(new Intent(this, PlayerService.class));
-		startService(new Intent(this, HTTPDService.class));
+		if (isMyServiceRunning(PlayerService.class.getName()))
+			startService(new Intent(this, PlayerService.class));
 
-		Intent bindIntent = new Intent(this, HTTPDService.class);
-		bindService(bindIntent, mHTTPDServiceConnection,
-				Context.BIND_AUTO_CREATE);
+		if (isMyServiceRunning(HTTPDService.class.getName())) {
+			startService(new Intent(this, HTTPDService.class));
+
+			Intent bindIntent = new Intent(this, HTTPDService.class);
+			bindService(bindIntent, mHTTPDServiceConnection,
+					Context.BIND_AUTO_CREATE);
+		}
 
 		setContentView(R.layout.activity_swipe);
 
@@ -292,7 +284,7 @@ public class MainActivity extends FragmentActivity implements
 
 		IntentFilter receiverFilter = new IntentFilter(
 				Intent.ACTION_HEADSET_PLUG);
-		HeadsetReceiver receiver = new HeadsetReceiver();
+		receiver = new HeadsetReceiver();
 		registerReceiver(receiver, receiverFilter);
 
 		ControlButtons.setThemeHelper(getApplicationContext());
@@ -359,6 +351,24 @@ public class MainActivity extends FragmentActivity implements
 		}
 	}
 
+	/**
+	 * Test if a service is running
+	 * 
+	 * @param serviceName
+	 *            MyService.class.getName()
+	 * @return
+	 */
+	private boolean isMyServiceRunning(String serviceName) {
+		ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+		for (RunningServiceInfo service : manager
+				.getRunningServices(Integer.MAX_VALUE)) {
+			if (serviceName.equals(service.service.getClassName())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public static GoogleAccountCredential getCredentials() {
 		return mCredential;
 	}
@@ -410,6 +420,7 @@ public class MainActivity extends FragmentActivity implements
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		unregisterReceiver(receiver);
 		BugSenseHandler.closeSession(MainActivity.this);
 	}
 
@@ -534,7 +545,8 @@ public class MainActivity extends FragmentActivity implements
 			if (i == 1) {
 				fragment = getSubscriptionFragmentContent();
 			} else if (i == 0) {
-				fragment = new RecentItemFragment(); // new DummySectionFragment();
+				fragment = new RecentItemFragment(); // new
+														// DummySectionFragment();
 			} else if (i == 2) {
 				fragment = getFeedFragmentContent();
 			} else {
