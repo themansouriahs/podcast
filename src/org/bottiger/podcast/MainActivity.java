@@ -91,6 +91,9 @@ public class MainActivity extends FragmentActivity implements
 		OnItemSelectedListener {
 
 	private static final String ACCOUNT_KEY = "account";
+	
+	public static final boolean SHOW_DRAWER = false;
+	public static final boolean SHOW_PULL_TO_REFRESH = false;
 
 	private Drive mDriveService = null;
 	private final int REQUEST_AUTHORIZATION = 1;
@@ -314,8 +317,7 @@ public class MainActivity extends FragmentActivity implements
 		// PodcastUpdateManager.setUpdate(this);
 
 		// set the Behind View
-		boolean showDrawer = false;
-		if (showDrawer) {
+		if (SHOW_DRAWER) {
 			mPlanetTitles = getResources().getStringArray(
 					R.array.entries_item_expire);
 			mDrawerList = (LinearLayout) findViewById(R.id.left_drawer);

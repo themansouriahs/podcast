@@ -53,14 +53,15 @@ import android.widget.TextView;
 import com.mobeta.android.dslv.DragSortListView;
 
 /* Copy of PodcastBaseActivity */
-public abstract class PodcastBaseFragment extends FixedListFragment implements PullToRefreshAttacher.OnRefreshListener {
+public abstract class PodcastBaseFragment extends FixedListFragment implements
+		PullToRefreshAttacher.OnRefreshListener {
 
 	public static final int COLUMN_INDEX_TITLE = 1;
 
 	protected View fragmentView;
 
 	protected SharedPreferences sharedPreferences;
-	
+
 	/** ActionBar pull to refresh */
 	private PullToRefreshAttacher mPullToRefreshAttacher;
 
@@ -160,68 +161,76 @@ public abstract class PodcastBaseFragment extends FixedListFragment implements P
 
 		registerForContextMenu(getListView());
 		getListView().setOnItemLongClickListener(listener);
-		
+
 		/** ActionBar Pull to Refresh */
-        // As we're modifying some of the options, create an instance of
-        // PullToRefreshAttacher.Options
-        PullToRefreshAttacher.Options ptrOptions = new PullToRefreshAttacher.Options();
-        // Here we make the refresh scroll distance to 75% of the GridView height
-        ptrOptions.refreshScrollDistance = 0.75f;
-        
-        /**
-         * As GridView is an AbsListView derived class, we create a new AbsListViewDelegate
-         * instance. You do NOT need to do this if you're using a supported scrollable Views. It is
-         * merely in this sample to show you how to set a custom delegate.
-         */
-        ptrOptions.delegate = new AbsListViewDelegate();
+		if (MainActivity.SHOW_PULL_TO_REFRESH) {
+			// As we're modifying some of the options, create an instance of
+			// PullToRefreshAttacher.Options
+			PullToRefreshAttacher.Options ptrOptions = new PullToRefreshAttacher.Options();
+			// Here we make the refresh scroll distance to 75% of the GridView
+			// height
+			ptrOptions.refreshScrollDistance = 0.75f;
 
-        // Here we customise the animations which are used when showing/hiding the header view
-        //ptrOptions.headerInAnimation = R.anim.slide_in_top;
-        //ptrOptions.headerOutAnimation = R.anim.slide_out_top;
+			/**
+			 * As GridView is an AbsListView derived class, we create a new
+			 * AbsListViewDelegate instance. You do NOT need to do this if
+			 * you're using a supported scrollable Views. It is merely in this
+			 * sample to show you how to set a custom delegate.
+			 */
+			ptrOptions.delegate = new AbsListViewDelegate();
 
-        // Here we define a custom header layout which will be inflated and used
-        //ptrOptions.headerLayout = R.layout.actionbar_pulltorefresh_customised_header;
+			// Here we customise the animations which are used when
+			// showing/hiding the header view
+			// ptrOptions.headerInAnimation = R.anim.slide_in_top;
+			// ptrOptions.headerOutAnimation = R.anim.slide_out_top;
 
-        // Here we define a custom header transformer which will alter the header based on the
-        // current pull-to-refresh state
-        //ptrOptions.headerTransformer = new CustomisedHeaderTransformer();
+			// Here we define a custom header layout which will be inflated and
+			// used
+			// ptrOptions.headerLayout =
+			// R.layout.actionbar_pulltorefresh_customised_header;
 
-        // Here we create a PullToRefreshAttacher manually with the Options instance created above.
-        mPullToRefreshAttacher = new PullToRefreshAttacher(getActivity(), getPullView());
+			// Here we define a custom header transformer which will alter the
+			// header based on the
+			// current pull-to-refresh state
+			// ptrOptions.headerTransformer = new CustomisedHeaderTransformer();
 
-        // Set Listener to know when a refresh should be started
-        mPullToRefreshAttacher.setRefreshListener(this);
+			// Here we create a PullToRefreshAttacher manually with the Options
+			// instance created above.
+			mPullToRefreshAttacher = new PullToRefreshAttacher(getActivity(),
+					getPullView());
+
+			// Set Listener to know when a refresh should be started
+			mPullToRefreshAttacher.setRefreshListener(this);
+		}
 
 	}
-	
-	  
-    @Override
-    public void onRefreshStarted(View view) {
-        /**
-         * Simulate Refresh with 4 seconds sleep
-         */
-        new AsyncTask<Void, Void, Void>() {
 
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    Thread.sleep(4000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                return null;
-            }
+	@Override
+	public void onRefreshStarted(View view) {
+		/**
+		 * Simulate Refresh with 4 seconds sleep
+		 */
+		new AsyncTask<Void, Void, Void>() {
 
-            @Override
-            protected void onPostExecute(Void result) {
-                super.onPostExecute(result);
+			@Override
+			protected Void doInBackground(Void... params) {
+				try {
+					Thread.sleep(4000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				return null;
+			}
 
-                // Notify PullToRefreshAttacher that the refresh has finished
-                mPullToRefreshAttacher.setRefreshComplete();
-            }
-        }.execute();
-    }
+			@Override
+			protected void onPostExecute(Void result) {
+				super.onPostExecute(result);
 
+				// Notify PullToRefreshAttacher that the refresh has finished
+				mPullToRefreshAttacher.setRefreshComplete();
+			}
+		}.execute();
+	}
 
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v,
@@ -280,7 +289,7 @@ public abstract class PodcastBaseFragment extends FixedListFragment implements P
 		sharedPreferences = PreferenceManager
 				.getDefaultSharedPreferences(getActivity());
 	}
-	
+
 	abstract View getPullView();
 
 	@Override
@@ -512,7 +521,7 @@ public abstract class PodcastBaseFragment extends FixedListFragment implements P
 			if (isResumed()) {
 				// setListShown(true); //FIXME
 			} else {
-				//setListShownNoAnimation(true); //FIXME as well
+				// setListShownNoAnimation(true); //FIXME as well
 			}
 		}
 
