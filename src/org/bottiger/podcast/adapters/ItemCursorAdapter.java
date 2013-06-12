@@ -300,15 +300,8 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 	public View getPlayerViewHolder(int position, View listViewItem,
 			Cursor itemCursor, View convertView, ViewGroup parent) {
 
-		ViewStub stub = (ViewStub) listViewItem.findViewById(R.id.stub);
-		View playerView1 = listViewItem.findViewById(R.id.stub_player);
-		//playerView1.setVisibility(View.VISIBLE);
-
 		View viewHolder = null;
 
-		EpisodeViewHolder episodeHolder = (EpisodeViewHolder) listViewItem
-				.getTag();
-		//View playerView = episodeHolder.playerView;
 		View playerView = listViewItem.findViewById(R.id.stub_player);
 
 		// Update the playlsit to reflect the position of the item
@@ -320,10 +313,13 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 			PlayerViewHolder holder = firstItem ? currentEpisodePlayerViewHolder
 					: secondaryEpisodePlayerViewHolder;
 
-			if (holder == null) {
+			if (holder == null || holder.playerView == null) {
 				playerView = newPlayerView(mContext, listViewItem, parent,
 						holder);
 				holder = (PlayerViewHolder) playerView.getTag();
+				
+				EpisodeViewHolder episodeHolder = (EpisodeViewHolder) listViewItem
+						.getTag();
 				episodeHolder.playerView = playerView;
 			} 
 
@@ -331,6 +327,12 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 				currentEpisodePlayerViewHolder = holder;
 			else
 				secondaryEpisodePlayerViewHolder = holder;
+			
+			if (playerView == null) {
+				int hej = 5;
+				hej = hej + 5;
+			}
+				
 
 			bindExandedPlayer(mCurrentFeedItem, playerView, holder, position);
 		} else {
@@ -422,8 +424,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 		PlayerActivity.setProgressBar(holder.progress, playerDuration,
 				playerPosition, secondary);
 
-		// ControlButtons.setPlayerListeners(playerView, playerView,
-		// feedItem.getId());
+		ControlButtons.setPlayerListeners(playerView, playerView, feedItem.getId());
 
 		if (feedItem.isDownloaded()) {
 			holder.downloadButton.setBackgroundResource(themeHelper
