@@ -13,6 +13,8 @@
         <item name="queue_icon">@drawable/av_add_to_queue</item>
         <item name="info_icon">@drawable/collections_view_as_list</item>
         <item name="new_icon">@drawable/content_new</item>
+        <item name="sync_icon">@drawable/refresh</item>
+        <item name="sync_invert_icon">@drawable/refresh</item>
     </style>
 
     <style name="SoundWavesTheme.Light" parent="android:Theme.Holo.Light.DarkActionBar">
@@ -27,6 +29,8 @@
         <item name="queue_icon">@drawable/av_add_to_queue_dark</item>
         <item name="info_icon">@drawable/collections_view_as_list_dark</item>
         <item name="new_icon">@drawable/content_new_dark</item>
+        <item name="sync_icon">@drawable/refresh</item>
+        <item name="sync_invert_icon">@drawable/refresh</item>
     </style>
 
     <style name="EpisodeHeaderFont" parent="@android:style/TextAppearance.Medium">

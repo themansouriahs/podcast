@@ -15,6 +15,7 @@ import org.bottiger.podcast.cloud.GoogleReader;
 import org.bottiger.podcast.images.ImageCacheManager;
 import org.bottiger.podcast.images.ImageCacheManager.CacheType;
 import org.bottiger.podcast.images.RequestManager;
+import org.bottiger.podcast.provider.PodcastProvider;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.service.HTTPDService;
@@ -204,7 +205,7 @@ public class MainActivity extends FragmentActivity implements
 
 	private String[] mPlanetTitles;
 	private LinearLayout mDrawerList;
-	
+
 	private HeadsetReceiver receiver;
 
 	@Override
@@ -461,12 +462,12 @@ public class MainActivity extends FragmentActivity implements
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.activity_swipe, menu);
+		ThemeHelper themeHelper = new ThemeHelper(this);
 
 		// The player can only be playing if the PlayerService has been bound
 		MenuItem menuItem = menu.findItem(R.id.menu_control);
 		if (PodcastBaseFragment.mPlayerServiceBinder != null) {
 
-			ThemeHelper themeHelper = new ThemeHelper(this);
 			if (PodcastBaseFragment.mPlayerServiceBinder.isPlaying()) {
 				menuItem.setIcon(themeHelper.getAttr(R.attr.pause_invert_icon));
 			} else if (PodcastBaseFragment.mPlayerServiceBinder.isOnPause()) {
@@ -477,6 +478,9 @@ public class MainActivity extends FragmentActivity implements
 		} else {
 			menuItem.setVisible(false);
 		}
+
+		MenuItem menuItemSync = menu.findItem(R.id.menu_sync);
+		menuItemSync.setIcon(themeHelper.getAttr(R.attr.sync_icon));
 		return true;
 	}
 
@@ -492,22 +496,23 @@ public class MainActivity extends FragmentActivity implements
 			}
 			return true;
 		case R.id.menu_add:
-			/*
-			 * // Google Drive Sync mDriveUtils = new DriveUtils(this);
-			 * 
-			 * Account account = mCredential.getSelectedAccount(); Bundle bundle
-			 * = new Bundle();
-			 * bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-			 * bundle.putBoolean(ContentResolver.SYNC_EXTRAS_FORCE, true);
-			 * bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-			 * String auth = PodcastProvider.AUTHORITY; auth =
-			 * "org.bottiger.podcast.provider.PodcastProvider"; //
-			 * ContentResolver.requestSync(account, //
-			 * "org.bottiger.podcast.provider.podcastprovider", bundle);
-			 * ContentResolver.requestSync(account, auth, bundle);
-			 */
 			// mDriveUtils.driveAccount();
 			AddPodcastDialog.addPodcast(this);
+			return true;
+		case R.id.menu_sync:
+
+			// Google Drive Sync mDriveUtils = new DriveUtils(this);
+			Account account = mCredential.getSelectedAccount();
+			Bundle bundle = new Bundle();
+			bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+			bundle.putBoolean(ContentResolver.SYNC_EXTRAS_FORCE, true);
+			bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+			String auth = PodcastProvider.AUTHORITY;
+			auth = "org.bottiger.podcast.provider.PodcastProvider"; //
+			ContentResolver.requestSync(account,
+					"org.bottiger.podcast.provider.podcastprovider", bundle);
+			ContentResolver.requestSync(account, auth, bundle);
+
 			return true;
 		case R.id.menu_settings:
 			Intent i = new Intent(getBaseContext(), SettingsActivity.class);

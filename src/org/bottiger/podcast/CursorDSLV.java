@@ -32,7 +32,7 @@ public class CursorDSLV extends FragmentActivity {
 
         // build a cursor from the String array
         MatrixCursor cursor = new MatrixCursor(new String[] {"_id", "name"});
-        String[] artistNames = getResources().getStringArray(R.array.jazz_artist_names);
+        String[] artistNames = getResources().getStringArray(R.array.entries_update);
         for (int i = 0; i < artistNames.length; i++) {
             cursor.newRow()
                     .add(i)

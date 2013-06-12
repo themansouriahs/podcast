@@ -28,7 +28,7 @@ public class DSLVFragmentBGHandle extends DSLVFragment {
 
     @Override
     public void setListAdapter() {
-        String[] array = getResources().getStringArray(R.array.jazz_artist_names);
+        String[] array = getResources().getStringArray(R.array.entries_update);
         ArrayList<String> list = new ArrayList<String>(Arrays.asList(array));
         adapter = new MyAdapter(list);
         setListAdapter(adapter);
