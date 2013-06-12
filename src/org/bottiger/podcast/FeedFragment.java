@@ -1,5 +1,8 @@
 package org.bottiger.podcast;
 
+import org.bottiger.podcast.R;
+import org.bottiger.podcast.R.id;
+import org.bottiger.podcast.R.layout;
 import org.bottiger.podcast.adapters.CompactListCursorAdapter;
 import org.bottiger.podcast.adapters.ItemCursorAdapter;
 import org.bottiger.podcast.provider.ItemColumns;

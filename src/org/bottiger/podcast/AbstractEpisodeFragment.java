@@ -3,6 +3,9 @@ package org.bottiger.podcast;
 
 import java.util.HashMap;
 
+import org.bottiger.podcast.R;
+import org.bottiger.podcast.R.id;
+import org.bottiger.podcast.R.menu;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.PodcastOpenHelper;

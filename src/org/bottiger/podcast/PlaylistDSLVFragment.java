@@ -2,6 +2,9 @@ package org.bottiger.podcast;
 
 import java.util.ArrayList;
 
+import org.bottiger.podcast.R;
+import org.bottiger.podcast.R.id;
+import org.bottiger.podcast.R.layout;
 import org.bottiger.podcast.adapters.ItemCursorAdapter;
 import org.bottiger.podcast.adapters.ReorderCursor;
 import org.bottiger.podcast.provider.FeedItem;

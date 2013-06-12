@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="gen"/>
-	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="/UrlImageViewHelper"/>
 	<classpathentry kind="src" path="/library-pulltorefresh"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/library-slidingmenu"/>
@@ -12,5 +10,9 @@
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry kind="con" path="com.google.gdt.eclipse.managedapis.MANAGED_API_CONTAINER/drive-v2r75lv1.14.2-beta"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Volley"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="gen"/>
+	<classpathentry kind="lib" path="/home/bottiger/dev/android-sdk-linux_x86/extras/google/google_play_services/libproject/google-play-services_lib/bin/google-play-services_lib.jar"/>
+	<classpathentry kind="src" path="/library-actionbarpulltorefresh"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

@@ -213,14 +213,13 @@ public class MainActivity extends FragmentActivity implements
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		if (debugging)
-			ViewServer.get(this).addWindow(this);
+			
 
 		BugSenseHandler.initAndStartSession(MainActivity.this,
 				((SoundWaves) this.getApplication()).getBugSenseAPIKey());
 
 		if (debugging) {
+			ViewServer.get(this).addWindow(this);
 			// Tracing is buggy on emulator
 			//Debug.startMethodTracing("calc");
 

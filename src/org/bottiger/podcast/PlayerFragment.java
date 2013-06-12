@@ -4,6 +4,10 @@ package org.bottiger.podcast;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 
+import org.bottiger.podcast.R;
+import org.bottiger.podcast.R.id;
+import org.bottiger.podcast.R.layout;
+import org.bottiger.podcast.R.string;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.Subscription;

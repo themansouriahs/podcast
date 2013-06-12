@@ -9,6 +9,7 @@ import org.bottiger.podcast.PlayerActivity;
 import org.bottiger.podcast.PlaylistDSLVFragment;
 import org.bottiger.podcast.PodcastBaseFragment;
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.adapters.viewholders.InlinePlayer;
 import org.bottiger.podcast.images.ImageCacheManager;
 import org.bottiger.podcast.listeners.DownloadProgressListener;
 import org.bottiger.podcast.provider.FeedItem;
@@ -64,9 +65,6 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 
 	private static DownloadManager mDownloadManager = null;
 
-	private static PlayerViewHolder currentEpisodePlayerViewHolder = null;
-	private static PlayerViewHolder secondaryEpisodePlayerViewHolder = null;
-
 	private FeedItem mCurrentFeedItem = null;
 
 	/** ViewHolder for holding a basiv listitem */
@@ -80,20 +78,6 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 		TextView fileSize;
 		ViewStub stub;
 		View playerView;
-	}
-
-	/** ViewHolder for holding the expanded player */
-	static class PlayerViewHolder {
-		ViewStub stub;
-		View playerView;
-		TextView timeSlash;
-		SeekBar progress;
-		TextView currentPosition;
-		ImageButton playPauseButton;
-		ImageButton stopButton;
-		ImageButton downloadButton;
-		ImageButton infoButton;
-		ImageButton queueButton;
 	}
 
 	// Create a set of FieldHandlers for methods calling using the legacy
@@ -310,13 +294,13 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 
 		if (firstItem || mExpandedItemID.contains(mCurrentFeedItem.getId())) {
 
-			PlayerViewHolder holder = firstItem ? currentEpisodePlayerViewHolder
-					: secondaryEpisodePlayerViewHolder;
+			InlinePlayer holder = firstItem ? InlinePlayer.getCurrentEpisodePlayerViewHolder()
+					: InlinePlayer.getSecondaryEpisodePlayerViewHolder();
 
 			if (holder == null || holder.playerView == null) {
 				playerView = newPlayerView(mContext, listViewItem, parent,
 						holder);
-				holder = (PlayerViewHolder) playerView.getTag();
+				holder = (InlinePlayer) playerView.getTag();
 				
 				EpisodeViewHolder episodeHolder = (EpisodeViewHolder) listViewItem
 						.getTag();
@@ -324,15 +308,9 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 			} 
 
 			if (firstItem)
-				currentEpisodePlayerViewHolder = holder;
+				InlinePlayer.setCurrentEpisodePlayerViewHolder(holder);
 			else
-				secondaryEpisodePlayerViewHolder = holder;
-			
-			if (playerView == null) {
-				int hej = 5;
-				hej = hej + 5;
-			}
-				
+				InlinePlayer.setSecondaryEpisodePlayerViewHolder(holder);
 
 			bindExandedPlayer(mCurrentFeedItem, playerView, holder, position);
 		} else {
@@ -345,32 +323,37 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 	}
 
 	public View newPlayerView(Context context, View view, View parent,
-			PlayerViewHolder viewHolder) {
+			InlinePlayer viewHolder) {
 
 		ViewStub stub = (ViewStub) view.findViewById(R.id.stub);
 		if (stub != null) {
 			stub.inflate();
 		}
 
-		if (viewHolder == null)
-			viewHolder = new PlayerViewHolder();
-
 		View playerView = view.findViewById(R.id.stub_player);
 
+		viewHolder = InlinePlayer.getViewHolder(view, viewHolder);
 		viewHolder.stub = stub;
+		
 		// viewHolder.playerView = (TextView)
 		// view.findViewById(R.id.stub_player);
+		/*
 		viewHolder.timeSlash = (TextView) view.findViewById(R.id.time_slash);
-		viewHolder.currentPosition = (TextView) view
+		viewHolder.currentTime = (TextView) view
 				.findViewById(R.id.current_position);
-		viewHolder.progress = (SeekBar) view.findViewById(R.id.progress);
+		viewHolder.seekbar = (SeekBar) view.findViewById(R.id.progress);
 		viewHolder.playPauseButton = (ImageButton) view
-				.findViewById(R.id.play_pause_button);
+				.findViewById(R.id.play_toggle);
 		viewHolder.stopButton = (ImageButton) view.findViewById(R.id.stop);
 		viewHolder.downloadButton = (ImageButton) view
 				.findViewById(R.id.download);
 		viewHolder.infoButton = (ImageButton) view.findViewById(R.id.info);
+		
+		// listview
 		viewHolder.queueButton = (ImageButton) view.findViewById(R.id.queue);
+		viewHolder.duration = (TextView) view.findViewById(R.id.duration);
+		viewHolder.filesize = (TextView) view.findViewById(R.id.filesize);
+		*/
 
 		playerView.setTag(viewHolder);
 
@@ -388,7 +371,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 	 * @param position
 	 */
 	public void bindExandedPlayer(FeedItem feedItem, View playerView,
-			PlayerViewHolder holder, int position) {
+			InlinePlayer holder, int position) {
 
 		ThemeHelper themeHelper = new ThemeHelper(mContext);
 
@@ -410,9 +393,9 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 			playerDuration = feedItem.getDuration();
 		}
 
-		holder.currentPosition.setText(StrUtils.formatTime(playerPosition));
+		holder.currentTime.setText(StrUtils.formatTime(playerPosition));
 
-		holder.progress.setMax(ControlButtons.MAX_SEEKBAR_VALUE);
+		holder.seekbar.setMax(ControlButtons.MAX_SEEKBAR_VALUE);
 
 		// PlayerActivity.setProgressBar(sb, feedItem);
 		long secondary = 0;
@@ -421,10 +404,10 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 					: (feedItem.chunkFilesize / feedItem.filesize);
 		}
 
-		PlayerActivity.setProgressBar(holder.progress, playerDuration,
+		PlayerActivity.setProgressBar(holder.seekbar, playerDuration,
 				playerPosition, secondary);
 
-		ControlButtons.setPlayerListeners(playerView, playerView, feedItem.getId());
+		ControlButtons.setPlayerListeners(holder, feedItem.getId());
 
 		if (feedItem.isDownloaded()) {
 			holder.downloadButton.setBackgroundResource(themeHelper
@@ -435,7 +418,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 			if (feedItem.getId() == PodcastBaseFragment.mPlayerServiceBinder
 					.getCurrentItem().id) {
 				if (PodcastBaseFragment.mPlayerServiceBinder.isPlaying()) {
-					PodcastBaseFragment.setCurrentTime(holder.currentPosition);
+					PodcastBaseFragment.setCurrentTime(holder.currentTime);
 					holder.playPauseButton.setBackgroundResource(themeHelper
 							.getAttr(R.attr.pause_icon));
 				}

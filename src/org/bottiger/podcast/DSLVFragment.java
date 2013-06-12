@@ -3,6 +3,9 @@ package org.bottiger.podcast;
 import java.util.Arrays;
 import java.util.ArrayList;
 
+import org.bottiger.podcast.R;
+import org.bottiger.podcast.R.layout;
+
 import android.support.v4.app.ListFragment;
 import android.app.Activity;
 import android.view.View;

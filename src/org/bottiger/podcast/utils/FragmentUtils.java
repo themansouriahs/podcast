@@ -1,7 +1,7 @@
 package org.bottiger.podcast.utils;
 
-import org.bottiger.podcast.PodcastBaseFragment.OnItemSelectedListener;
 import org.bottiger.podcast.SubscriptionsFragment;
+import org.bottiger.podcast.PodcastBaseFragment.OnItemSelectedListener;
 import org.bottiger.podcast.provider.FeedItem;
 
 import android.app.Activity;

@@ -4,6 +4,8 @@ import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.PodcastBaseFragment;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.RecentItemFragment;
+import org.bottiger.podcast.adapters.ItemCursorAdapter;
+import org.bottiger.podcast.adapters.viewholders.InlinePlayer;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.service.PodcastDownloadManager;
@@ -11,6 +13,7 @@ import org.bottiger.podcast.service.PodcastService;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.os.Debug;
 import android.os.SystemClock;
 import android.view.View;
 import android.widget.ImageButton;
@@ -51,10 +54,10 @@ public class ControlButtons {
 
 	public static void setListener(
 			final PodcastService podcastServiceConnection,
-			final Holder viewHolder, final long id) {
+			final InlinePlayer viewHolder, final long id) {
 
 		final ImageButton playPauseButton = viewHolder.playPauseButton;
-		final ImageView playImage = viewHolder.image;
+		//final ImageView playImage = viewHolder.image; FIXME
 		final ContentResolver resolver = fragment.getActivity()
 				.getContentResolver();
 		final FeedItem item = FeedItem.getById(resolver, id);
@@ -63,16 +66,25 @@ public class ControlButtons {
 		playPauseButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				//Debug.startMethodTracing("playpause");
+				long start = System.nanoTime();
 				playPause(id, viewHolder, themeHelper, playPauseButton);
+				long end = System.nanoTime();
+				long diff = end-start;
+				long diff2 = diff*2;
+				diff2 = diff2 - diff;
+				//Debug.stopMethodTracing();
 			}
 		});
 		
+		/*
 		playImage.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				playPause(id, viewHolder, themeHelper, playPauseButton);
 			}
 		});
+		*/
 
 		viewHolder.stopButton.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -133,11 +145,17 @@ public class ControlButtons {
 		viewHolder.seekbar.setOnSeekBarChangeListener(listener);
 		viewHolder.seekbar.setMax(MAX_SEEKBAR_VALUE);
 	}
+	
+	public static void setPlayerListeners(InlinePlayer holder, long id) {
+		ControlButtons.setListener(MainActivity.mPodcastServiceBinder,
+				holder, id);
+	}
 
+	@Deprecated
 	public static void setPlayerListeners(View listView, View playerView,
 			long id) {
 
-		ControlButtons.Holder viewHolder = new ControlButtons.Holder();
+		InlinePlayer viewHolder = new InlinePlayer();
 		viewHolder.currentTime = (TextView) playerView
 				.findViewById(R.id.current_position);
 
@@ -156,35 +174,12 @@ public class ControlButtons {
 				.findViewById(R.id.current_position);
 		viewHolder.duration = (TextView) listView.findViewById(R.id.duration);
 		viewHolder.filesize = (TextView) listView.findViewById(R.id.filesize);
-		viewHolder.image = (ImageView) listView.findViewById(R.id.list_image);
+		//viewHolder.image = (ImageView) listView.findViewById(R.id.list_image);
 
 		ControlButtons.setListener(MainActivity.mPodcastServiceBinder,
 				viewHolder, id);
 	}
-
-	public static void setPlayerListeners(View playerView, long id) {
-		// View view = getChildByID(id);
-
-		ControlButtons.Holder viewHolder = new ControlButtons.Holder();
-		viewHolder.currentTime = (TextView) playerView
-				.findViewById(R.id.current_position);
-
-		viewHolder.playPauseButton = (ImageButton) playerView
-				.findViewById(R.id.play_toggle);
-		viewHolder.stopButton = (ImageButton) playerView
-				.findViewById(R.id.stop);
-		viewHolder.infoButton = (ImageButton) playerView
-				.findViewById(R.id.info);
-		viewHolder.downloadButton = (ImageButton) playerView
-				.findViewById(R.id.download);
-		viewHolder.queueButton = (ImageButton) playerView
-				.findViewById(R.id.queue);
-		viewHolder.seekbar = (SeekBar) playerView.findViewById(R.id.progress);
-
-		ControlButtons.setListener(MainActivity.mPodcastServiceBinder,
-				viewHolder, id);
-
-	}
+	
 
 	private static class OnPlayerSeekBarChangeListener implements
 			OnSeekBarChangeListener {
@@ -272,9 +267,10 @@ public class ControlButtons {
 		}
 	}
 	
-	private static void playPause(long id, Holder viewHolder, ThemeHelper themeHelper, ImageButton playPauseButton) {
+	private static void playPause(long id, InlinePlayer viewHolder, ThemeHelper themeHelper, ImageButton playPauseButton) {
 		if (viewHolder.seekbar != null)
 			fragment.setProgressBar(viewHolder.seekbar);
+		
 		if (viewHolder.currentTime != null)
 			fragment.setCurrentTime(viewHolder.currentTime);
 
@@ -282,21 +278,6 @@ public class ControlButtons {
 			fragment.setDuration(viewHolder.duration);
 		
 		playPauseToggle(id, playPauseButton);
-		/*
-		if (PodcastBaseFragment.mPlayerServiceBinder.isPlaying()) {
-			playPauseButton.setContentDescription("Play");
-			playPauseButton.setImageResource(themeHelper
-					.getAttr(R.attr.play_icon));
-			PodcastBaseFragment.mPlayerServiceBinder.pause();
-		} else {
-			playPauseButton.setImageResource(themeHelper
-					.getAttr(R.attr.pause_icon));
-			playPauseButton.setContentDescription("Pause");
-			PodcastBaseFragment.mPlayerServiceBinder.play(id);
-			PodcastBaseFragment.queueNextRefresh();
-			fragment.refreshView();
-		}
-		*/
 	}
 
 }

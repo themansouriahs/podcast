@@ -1,5 +1,8 @@
 package org.bottiger.podcast;
 
+import org.bottiger.podcast.R;
+import org.bottiger.podcast.R.id;
+
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;

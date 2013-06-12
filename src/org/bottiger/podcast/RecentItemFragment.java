@@ -4,7 +4,11 @@ package org.bottiger.podcast;
 
 import java.util.HashMap;
 
+import org.bottiger.podcast.R;
+import org.bottiger.podcast.R.id;
+import org.bottiger.podcast.R.layout;
 import org.bottiger.podcast.adapters.ItemCursorAdapter;
+import org.bottiger.podcast.adapters.viewholders.InlinePlayer;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.utils.ControlButtons;
@@ -176,6 +180,12 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 		setListAdapter(mAdapter);
 	}
 
+	/**
+	 * Toggles the inline player for an episode when cliked on
+	 * 
+	 * @param list
+	 * @param item
+	 */
 	private void togglePlayer(ListView list, Cursor item) {
 		int start = list.getFirstVisiblePosition();
 		boolean setListners = false;
@@ -186,23 +196,15 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 				.getColumnIndex(ItemColumns.DURATION));
 		int position = item.getPosition();
 		
-		View view1 = list.getChildAt(0);
-		View view2 = list.getChildAt(1);
-		View view3 = list.getChildAt(2);
-		
-		int newStart = (start > 0) ? start+1 : start;
-		
 		View view = list.getChildAt(position - start);
-		mAdapter.notifyDataSetChanged();
-
-		TextView title = (TextView) view
-				.findViewById(R.id.title);
-		CharSequence title2 = title.getText();
+		//mAdapter.notifyDataSetChanged();
 		
-		ControlButtons.Holder viewHolder = new ControlButtons.Holder();
-		viewHolder.currentTime = (TextView) view
-				.findViewById(R.id.current_position);
-		viewHolder.duration = (TextView) view.findViewById(R.id.duration);
+		InlinePlayer viewHolder = InlinePlayer.getCurrentEpisodePlayerViewHolder();
+				
+		// Is this even possible to be true?
+		if (viewHolder == null)
+			viewHolder = InlinePlayer.getViewHolder(view);
+		
 		if (viewHolder.duration != null)
 			viewHolder.duration.setText(duration);
 
@@ -224,13 +226,8 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 			}
 		}
 
-		// if (setListners) {
-		// setPlayerListeners(view, id);
-		// }
-		ControlButtons.setPlayerListeners(list, view, id);
-
-		// updateCurrentPosition(FeedItem.getById(getActivity().getContentResolver(),
-		// id));
+		//ControlButtons.setPlayerListeners(list, view, id);
+		ControlButtons.setPlayerListeners(viewHolder, id);
 		updateCurrentPosition();
 	}
 
