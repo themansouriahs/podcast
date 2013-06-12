@@ -29,7 +29,6 @@ import org.bottiger.podcast.utils.ControlButtons;
 import org.bottiger.podcast.utils.DriveUtils;
 import org.bottiger.podcast.utils.Log;
 import org.bottiger.podcast.utils.SDCardManager;
-import org.bottiger.podcast.utils.SlidingMenuBuilder;
 import org.bottiger.podcast.utils.ThemeHelper;
 
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
@@ -69,6 +68,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.android.volley.RequestQueue;
@@ -110,7 +112,7 @@ public class MainActivity extends FragmentActivity implements
 
 	public static Account mAccount;
 
-	private boolean debugging = true;
+	private boolean debugging = false;
 
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -139,7 +141,7 @@ public class MainActivity extends FragmentActivity implements
 	private SharedPreferences prefs;
 
 	private DriveUtils mDriveUtils;
-	
+
 	/** Painless networking with Volley */
 	private static int DISK_IMAGECACHE_SIZE = 1024 * 1024 * 10;
 	private static CompressFormat DISK_IMAGECACHE_COMPRESS_FORMAT = CompressFormat.PNG;
@@ -211,10 +213,12 @@ public class MainActivity extends FragmentActivity implements
 		}
 	};
 
+	private String[] mPlanetTitles;
+	private LinearLayout mDrawerList;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-			
 
 		BugSenseHandler.initAndStartSession(MainActivity.this,
 				((SoundWaves) this.getApplication()).getBugSenseAPIKey());
@@ -222,25 +226,20 @@ public class MainActivity extends FragmentActivity implements
 		if (debugging) {
 			ViewServer.get(this).addWindow(this);
 			// Tracing is buggy on emulator
-			//Debug.startMethodTracing("calc");
+			// Debug.startMethodTracing("calc");
 
 			/*
-			if (true) {
-				try {
-					SqliteCopy.backupDatabase();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			*/
+			 * if (true) { try { SqliteCopy.backupDatabase(); } catch
+			 * (IOException e) { // TODO Auto-generated catch block
+			 * e.printStackTrace(); } }
+			 */
 		}
 
-		
 		mCredential = GoogleAccountCredential.usingOAuth2(this,
-				"https://www.googleapis.com/auth/drive.file"); //"https://www.googleapis.com/auth/drive.appdata"); //DriveScopes.DRIVE);
-		//mCredential = GoogleAccountCredential.usingOAuth2(this,
-		//		DriveScopes.DRIVE_FILE); //DriveScopes.DRIVE);
+				"https://www.googleapis.com/auth/drive.file"); // "https://www.googleapis.com/auth/drive.appdata");
+																// //DriveScopes.DRIVE);
+		// mCredential = GoogleAccountCredential.usingOAuth2(this,
+		// DriveScopes.DRIVE_FILE); //DriveScopes.DRIVE);
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		if (!prefs.contains(ACCOUNT_KEY))
 			startActivityForResult(mCredential.newChooseAccountIntent(),
@@ -248,7 +247,7 @@ public class MainActivity extends FragmentActivity implements
 		else
 			mCredential
 					.setSelectedAccountName(prefs.getString(ACCOUNT_KEY, ""));
-		
+
 		new Thread(new Runnable() {
 			public void run() {
 				try {
@@ -265,18 +264,14 @@ public class MainActivity extends FragmentActivity implements
 				mDriveService = getDriveService(mCredential);
 			}
 		}).start();
-		
 
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-		
+
 		/** Painless networking with Volley */
 		RequestManager.init(this);
-		ImageCacheManager.getInstance().init(this,
-				this.getPackageCodePath()
-				, DISK_IMAGECACHE_SIZE
-				, DISK_IMAGECACHE_COMPRESS_FORMAT
-				, DISK_IMAGECACHE_QUALITY
-				, CacheType.MEMORY);
+		ImageCacheManager.getInstance().init(this, this.getPackageCodePath(),
+				DISK_IMAGECACHE_SIZE, DISK_IMAGECACHE_COMPRESS_FORMAT,
+				DISK_IMAGECACHE_QUALITY, CacheType.MEMORY);
 
 		// Start Application services
 		startService(new Intent(this, PlayerService.class));
@@ -318,14 +313,20 @@ public class MainActivity extends FragmentActivity implements
 
 		// PodcastUpdateManager.setUpdate(this);
 
-		// FIXME
-
 		// set the Behind View
-		// setBehindContentView(R.layout.download);
+		boolean showDrawer = false;
+		if (showDrawer) {
+			mPlanetTitles = getResources().getStringArray(
+					R.array.entries_item_expire);
+			mDrawerList = (LinearLayout) findViewById(R.id.left_drawer);
 
-		// SlidingMenu menu = getSlidingMenu();
-		SlidingMenuBuilder.build(this, mSectionsPagerAdapter);
-		// setSlidingActionBarEnabled(true);
+			// Set the adapter for the list view
+			// mDrawerList.setAdapter(new ArrayAdapter<String>(this,
+			// R.layout.list_item_test, mPlanetTitles));
+			// Set the list's click listener
+			// mDrawerList.setOnItemClickListener(new
+			// DrawerItemClickListener());
+		}
 
 		// Set up the ViewPager with the sections adapter.
 		mViewPager = (ViewPager) findViewById(R.id.pager);
@@ -356,12 +357,6 @@ public class MainActivity extends FragmentActivity implements
 		}
 	}
 
-	/*
-	 * @Override protected void onActivityResult(final int requestCode, final
-	 * int resultCode, final Intent data) {
-	 * mDriveUtils.activityResult(requestCode, resultCode, data); }
-	 */
-
 	public static GoogleAccountCredential getCredentials() {
 		return mCredential;
 	}
@@ -385,7 +380,6 @@ public class MainActivity extends FragmentActivity implements
 					Bundle bundle = new Bundle();
 					bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED,
 							true);
-					bundle.putBoolean(ContentResolver.SYNC_EXTRAS_FORCE, true);
 					bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
 					ContentResolver.requestSync(account,
 							"org.bottiger.podcast.provider.podcastprovider",
@@ -432,26 +426,9 @@ public class MainActivity extends FragmentActivity implements
 
 			if (mCursor != null)
 				mCursor.close();
-
-			// unbindService(serviceConnection);
-
-			// startInit(); FIXME
-
 		}
 
 		PodcastService.setAlarm(this);
-		/*
-		 * prefs = PreferenceManager.getDefaultSharedPreferences(this); int
-		 * minutes = prefs.getInt("interval", 1); AlarmManager am =
-		 * (AlarmManager) getSystemService(ALARM_SERVICE); Intent intent = new
-		 * Intent(this, PodcastService.class); PendingIntent pi =
-		 * PendingIntent.getService(this, 0, intent, 0); am.cancel(pi); // by my
-		 * own convention, minutes <= 0 means notifications are disabled if
-		 * (minutes > 0) {
-		 * am.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-		 * SystemClock.elapsedRealtime() + minutes*60*1000, minutes*60*1000,
-		 * pi); }
-		 */
 
 	}
 
@@ -503,20 +480,19 @@ public class MainActivity extends FragmentActivity implements
 			return true;
 		case R.id.menu_add:
 			/*
-			// Google Drive Sync
-			mDriveUtils = new DriveUtils(this);
-
-			Account account = mCredential.getSelectedAccount();
-			Bundle bundle = new Bundle();
-			bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-			bundle.putBoolean(ContentResolver.SYNC_EXTRAS_FORCE, true);
-			bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-			String auth = PodcastProvider.AUTHORITY;
-			auth = "org.bottiger.podcast.provider.PodcastProvider";
-			// ContentResolver.requestSync(account,
-			// "org.bottiger.podcast.provider.podcastprovider", bundle);
-			ContentResolver.requestSync(account, auth, bundle);
-			*/
+			 * // Google Drive Sync mDriveUtils = new DriveUtils(this);
+			 * 
+			 * Account account = mCredential.getSelectedAccount(); Bundle bundle
+			 * = new Bundle();
+			 * bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+			 * bundle.putBoolean(ContentResolver.SYNC_EXTRAS_FORCE, true);
+			 * bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+			 * String auth = PodcastProvider.AUTHORITY; auth =
+			 * "org.bottiger.podcast.provider.PodcastProvider"; //
+			 * ContentResolver.requestSync(account, //
+			 * "org.bottiger.podcast.provider.podcastprovider", bundle);
+			 * ContentResolver.requestSync(account, auth, bundle);
+			 */
 			// mDriveUtils.driveAccount();
 			AddPodcastDialog.addPodcast(this);
 			return true;
@@ -556,7 +532,7 @@ public class MainActivity extends FragmentActivity implements
 			if (i == 1) {
 				fragment = getSubscriptionFragmentContent();
 			} else if (i == 0) {
-				fragment = new DummySectionFragment();//new RecentItemFragment();
+				fragment = new RecentItemFragment(); // new DummySectionFragment();
 			} else if (i == 2) {
 				fragment = getFeedFragmentContent();
 			} else {
@@ -685,5 +661,5 @@ public class MainActivity extends FragmentActivity implements
 	 * 
 	 * } else { e.printStackTrace(); } } } return mDriveService; }
 	 */
-  
+
 }

@@ -24,6 +24,8 @@ import org.bottiger.podcast.utils.ThemeHelper;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.view.Gravity;
@@ -45,6 +47,8 @@ import com.android.volley.toolbox.NetworkImageView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
+	
+	private static final boolean COLOR_BACKGROUND = false;
 
 	public static final int ICON_DEFAULT_ID = -1;
 
@@ -230,14 +234,14 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 				if (item.title != null) {
 					String title = item.title;
 					int priority = item.getPriority();
+
 					if (priority > 0) {
 						title = priority + " # " + title;
-						view.setBackgroundColor(mContext.getResources()
-								.getColor(R.color.playlist_background));
-					} else {
-						view.setBackgroundColor(mContext.getResources()
-								.getColor(R.color.default_background));
-					}
+					} 
+					
+					if (COLOR_BACKGROUND)
+						colorBackground(view, priority);
+					
 					holder.mainTitle.setText(title);
 				}
 
@@ -294,18 +298,19 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 
 		if (firstItem || mExpandedItemID.contains(mCurrentFeedItem.getId())) {
 
-			InlinePlayer holder = firstItem ? InlinePlayer.getCurrentEpisodePlayerViewHolder()
-					: InlinePlayer.getSecondaryEpisodePlayerViewHolder();
+			InlinePlayer holder = firstItem ? InlinePlayer
+					.getCurrentEpisodePlayerViewHolder() : InlinePlayer
+					.getSecondaryEpisodePlayerViewHolder();
 
 			if (holder == null || holder.playerView == null) {
 				playerView = newPlayerView(mContext, listViewItem, parent,
 						holder);
 				holder = (InlinePlayer) playerView.getTag();
-				
+
 				EpisodeViewHolder episodeHolder = (EpisodeViewHolder) listViewItem
 						.getTag();
 				episodeHolder.playerView = playerView;
-			} 
+			}
 
 			if (firstItem)
 				InlinePlayer.setCurrentEpisodePlayerViewHolder(holder);
@@ -334,26 +339,25 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 
 		viewHolder = InlinePlayer.getViewHolder(view, viewHolder);
 		viewHolder.stub = stub;
-		
+
 		// viewHolder.playerView = (TextView)
 		// view.findViewById(R.id.stub_player);
 		/*
-		viewHolder.timeSlash = (TextView) view.findViewById(R.id.time_slash);
-		viewHolder.currentTime = (TextView) view
-				.findViewById(R.id.current_position);
-		viewHolder.seekbar = (SeekBar) view.findViewById(R.id.progress);
-		viewHolder.playPauseButton = (ImageButton) view
-				.findViewById(R.id.play_toggle);
-		viewHolder.stopButton = (ImageButton) view.findViewById(R.id.stop);
-		viewHolder.downloadButton = (ImageButton) view
-				.findViewById(R.id.download);
-		viewHolder.infoButton = (ImageButton) view.findViewById(R.id.info);
-		
-		// listview
-		viewHolder.queueButton = (ImageButton) view.findViewById(R.id.queue);
-		viewHolder.duration = (TextView) view.findViewById(R.id.duration);
-		viewHolder.filesize = (TextView) view.findViewById(R.id.filesize);
-		*/
+		 * viewHolder.timeSlash = (TextView) view.findViewById(R.id.time_slash);
+		 * viewHolder.currentTime = (TextView) view
+		 * .findViewById(R.id.current_position); viewHolder.seekbar = (SeekBar)
+		 * view.findViewById(R.id.progress); viewHolder.playPauseButton =
+		 * (ImageButton) view .findViewById(R.id.play_toggle);
+		 * viewHolder.stopButton = (ImageButton) view.findViewById(R.id.stop);
+		 * viewHolder.downloadButton = (ImageButton) view
+		 * .findViewById(R.id.download); viewHolder.infoButton = (ImageButton)
+		 * view.findViewById(R.id.info);
+		 * 
+		 * // listview viewHolder.queueButton = (ImageButton)
+		 * view.findViewById(R.id.queue); viewHolder.duration = (TextView)
+		 * view.findViewById(R.id.duration); viewHolder.filesize = (TextView)
+		 * view.findViewById(R.id.filesize);
+		 */
 
 		playerView.setTag(viewHolder);
 
@@ -485,6 +489,30 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 			return Long.valueOf(feedItem.id);
 		} else
 			return new Long(1); // FIXME
+	}
+	
+	/**
+	 * Color the background of the playlist.
+	 * This has performance issues.
+	 */
+	private void colorBackground(View view, int priority) {
+		// Only draw the background if it is wrong.
+		int defaultColor = mContext.getResources().getColor(
+				R.color.default_background);
+		int playlistColor = mContext.getResources().getColor(
+				R.color.playlist_background);
+		
+		Drawable background = view.getBackground();
+		int currentColor = (background != null) ? ((ColorDrawable)background).getColor() : defaultColor;
+		int newColor = -1;
+		
+		if (priority > 0) {
+			newColor = playlistColor;
+		} else {
+			newColor = defaultColor;
+		}
+		if (currentColor != newColor)
+			view.setBackgroundColor(newColor);
 	}
 
 }

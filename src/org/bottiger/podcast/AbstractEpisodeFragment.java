@@ -13,7 +13,6 @@ import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.service.PodcastDownloadManager;
 import org.bottiger.podcast.utils.Playlist;
-import org.bottiger.podcast.utils.SlidingMenuBuilder;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -40,6 +39,12 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 	protected long pref_select;
 
 	protected ListView actualListView = null;
+	
+	String showListenedKey = "sowListened";
+	Boolean showListenedVal = true;
+	
+	String episodesToShowKey = "episodesToShow";
+	int episodesToShowVal = 20;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -105,8 +110,8 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 	}
 	
 	public String getWhere() {
-		Boolean showListened = sharedPreferences.getBoolean(SlidingMenuBuilder.showListenedKey,
-				SlidingMenuBuilder.showListenedVal);
+		Boolean showListened = sharedPreferences.getBoolean(showListenedKey,
+				showListenedVal);
 		String where = (showListened) ? "1" : ItemColumns.LISTENED + "== 0";
 		return where;
 	}
@@ -143,7 +148,7 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 //		String prioritiesSecond = "case " + ItemColumns.PRIORITY + " when 0 then 2 else 1 end, " + ItemColumns.PRIORITY + ", ";
 //		String order = playingFirst + prioritiesSecond + ItemColumns.DATE + " " + inputOrder + " LIMIT 20"; // before:
 //		return order;
-		int amount = sharedPreferences.getInt(SlidingMenuBuilder.episodesToShowKey, 20);
+		int amount = sharedPreferences.getInt(episodesToShowKey, episodesToShowVal);
 		return getOrder(inputOrder, amount);
 	}
 	

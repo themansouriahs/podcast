@@ -1,7 +1,5 @@
 package org.bottiger.podcast;
 
-
-
 import java.util.HashMap;
 
 import org.bottiger.podcast.R;
@@ -57,9 +55,7 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 
 		// Populate list with our static array of titles.
 		mAdapter = this.getAdapter(mCursor); // listItemCursorAdapter(this.getActivity(),this, mCursor);
-		startInit(1, ItemColumns.URI, ItemColumns.ALL_COLUMNS, getWhere(), getOrder());		
-
-		//setEmptyText("No podcasts :( You should add some feeds and refresh the list");
+		startInit(1, ItemColumns.URI, ItemColumns.ALL_COLUMNS, getWhere(), getOrder());
 
 		if (mDualPane) {
 			// In dual-pane mode, the list view highlights the selected item.
@@ -67,9 +63,6 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 			// Make sure our UI is in the correct state.
 			// showDetails(mCurCheckPosition);
 		}
-
-		// FIXME
-		//enablePullToRefresh();
 		
 	}
 
@@ -104,8 +97,6 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 		CursorAdapter adapter = listItemCursorAdapter(this.getActivity(),this, cursor);
 		setAdapter(adapter);
 		return adapter;
-		//return listItemCursorAdapter(this.getActivity(),
-		//		this, cursor);
 	}
 
 	@Override
@@ -117,23 +108,6 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 			showPlayingEpisode(current_id);
 		}
 	}
-
-	/*
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		super.onCreateView(inflater, container, savedInstanceState);
-		
-		layoutID = R.layout.recent_new;
-		fragmentView = inflater.inflate(layoutID, container, false);
-		Intent intent = getActivity().getIntent();
-		intent.setData(ItemColumns.URI);
-		
-		
-		getPref();
-		return fragmentView;
-	}
-	*/
 
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {

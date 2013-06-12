@@ -38,31 +38,6 @@ public abstract class PlaylistDSLVFragment extends AbstractEpisodeFragment {
                     	// Playlist.setTo(to);
                     	ItemCursorAdapter adapter = ((ItemCursorAdapter) mAdapter);
                     	
-                        //Cursor item = (Cursor) adapter.getItem(from);
-                        //adapter.remove(item);
-                        //adapter.insert(item, to);
-                    	
-                    	//ListView listView = PlaylistDSLVFragment.this.getListView();
-                    	//adapter.bindView(listView.getChildAt(from), getActivity(), (Cursor)adapter.getItem(to));
-                    	//adapter.bindView(listView.getChildAt(to), getActivity(), (Cursor)adapter.getItem(from));
-                    	/*
-                    	int count=0;
-                    	for(int i = 0; i  <= listView.getLastVisiblePosition(); i++)
-                    	{
-                    		if(listView.getChildAt(i)!= null)
-                    	    {
-                    			if (i < from) {
-                    				if (i == to) {
-                    					
-                    				}
-                    			}
-                    			
-                    			if (i > from) {
-                    			}
-                    	    }
-                    	}
-                    	*/
-                    	
                     	FeedItem precedingItem = null;
                     	if (to > 0) {
                     		Cursor precedingItemCursor = (Cursor)adapter.getItem(to-1);
