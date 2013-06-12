@@ -24,6 +24,7 @@ import org.bottiger.podcast.service.HTTPDService;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.service.PodcastDownloadManager;
 import org.bottiger.podcast.service.PodcastService;
+import org.bottiger.podcast.utils.AddPodcastDialog;
 import org.bottiger.podcast.utils.ControlButtons;
 import org.bottiger.podcast.utils.DriveUtils;
 import org.bottiger.podcast.utils.Log;
@@ -501,19 +502,8 @@ public class MainActivity extends FragmentActivity implements
 			}
 			return true;
 		case R.id.menu_add:
-			// Sync with google drive
 			/*
-			 * GoogleAccountCredential credential = GoogleAccountCredential
-			 * .usingOAuth2(this, DriveScopes.DRIVE);
-			 * 
-			 * Account account = credential.getSelectedAccount(); if (account ==
-			 * null) { final int REQUEST_ACCOUNT_PICKER = 1;
-			 * startActivityForResult(credential.newChooseAccountIntent(),
-			 * REQUEST_ACCOUNT_PICKER); account =
-			 * credential.getSelectedAccount(); }
-			 */
-			// DriveSyncer mSyncer = new DriveSyncer(getApplicationContext());
-
+			// Google Drive Sync
 			mDriveUtils = new DriveUtils(this);
 
 			Account account = mCredential.getSelectedAccount();
@@ -526,8 +516,9 @@ public class MainActivity extends FragmentActivity implements
 			// ContentResolver.requestSync(account,
 			// "org.bottiger.podcast.provider.podcastprovider", bundle);
 			ContentResolver.requestSync(account, auth, bundle);
+			*/
 			// mDriveUtils.driveAccount();
-			// AddPodcastDialog.addPodcast(this);
+			AddPodcastDialog.addPodcast(this);
 			return true;
 		case R.id.menu_settings:
 			Intent i = new Intent(getBaseContext(), SettingsActivity.class);
@@ -565,7 +556,7 @@ public class MainActivity extends FragmentActivity implements
 			if (i == 1) {
 				fragment = getSubscriptionFragmentContent();
 			} else if (i == 0) {
-				fragment = new RecentItemFragment();
+				fragment = new DummySectionFragment();//new RecentItemFragment();
 			} else if (i == 2) {
 				fragment = getFeedFragmentContent();
 			} else {
