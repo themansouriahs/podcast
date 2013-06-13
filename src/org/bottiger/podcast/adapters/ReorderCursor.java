@@ -22,6 +22,9 @@ public class ReorderCursor extends CursorWrapper implements DragSortListView.Dro
         _remapping = new SparseIntArray();
     }
 
+    /**
+     * This is the one being used as of 13 June 2013
+     */
     @Override
     public void drop(final int from, final int to) {	
         // Update remapping

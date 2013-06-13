@@ -1015,19 +1015,22 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 	 */
 	private void increateHigherPriorities(FeedItem precedingItem,
 			Context context) {
+		String currentTime = String.valueOf(System.currentTimeMillis());
+		String updateLastUpdate = ", " + ItemColumns.LAST_UPDATE + "=" + currentTime + " ";
+		
 		PodcastOpenHelper helper = new PodcastOpenHelper(context);
 		SQLiteDatabase db = helper.getWritableDatabase();
 		String action = "UPDATE " + ItemColumns.TABLE_NAME + " SET ";
 		String value = ItemColumns.PRIORITY + "=" + ItemColumns.PRIORITY
-				+ "+1 ";
+				+ "+1" + updateLastUpdate;
 		String where = "WHERE " + ItemColumns.PRIORITY + ">=" + this.priority
 				+ " AND " + ItemColumns.PRIORITY + "<> 0 AND "
 				+ ItemColumns._ID + "<> " + this.id;
 		String sql = action + value + where;
 
 		String actionCurrent = "UPDATE " + ItemColumns.TABLE_NAME + " SET ";
-		String valueCurrent = ItemColumns.PRIORITY + "=" + this.priority;
-		String whereCurrent = " WHERE " + ItemColumns._ID + "==" + this.id;
+		String valueCurrent = ItemColumns.PRIORITY + "=" + this.priority + updateLastUpdate;
+		String whereCurrent = "WHERE " + ItemColumns._ID + "==" + this.id;
 		String sqlCurrent = actionCurrent + valueCurrent + whereCurrent;
 
 		db.beginTransaction();
