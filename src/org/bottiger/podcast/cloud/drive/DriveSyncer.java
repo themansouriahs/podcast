@@ -76,7 +76,7 @@ import android.provider.Settings.Secure;
 public class DriveSyncer {
 
 	/** For debugging set parent = root. Othervise = appdata */
-	private static final String parent = "root";
+	private static final String parent = "appdata";
 	private static int MAX_RESULTS = 1000;
 
 	private static final String SEPARATOR = "|";
