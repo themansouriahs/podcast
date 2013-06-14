@@ -13,7 +13,6 @@ package org.bottiger.podcast.cloud;
  * limitations under the License.
  */
 
-
 import java.io.IOException;
 import java.net.URL;
 
@@ -155,12 +154,13 @@ public class GoogleReader extends AbstractCloudProvider {
 		// GoogleReader.amf =
 		// AccountManager.get(mContext).getAuthToken(mAccount, SCOPE,
 		// true, cb, null);
-		GoogleReader.amf = AccountManager.get(mContext).getAuthToken(mAccount,
-				SCOPE, null, (Activity) mContext, cb, null);
+		if (mContext instanceof Activity)
+			GoogleReader.amf = AccountManager.get(mContext).getAuthToken(
+					mAccount, SCOPE, null, (Activity) mContext, cb, null);
 	}
 
 	@Override
-	public AsyncTask<URL,Void,Void> getSubscriptionsFromReader() {
+	public AsyncTask<URL, Void, Void> getSubscriptionsFromReader() {
 		// http://www.google.com/reader/api/0/stream/contents/user/-/label/Listen%20Subscriptions?client=myApplication
 		return new ReaderHTTPRequest().execute(getURL);
 	}
