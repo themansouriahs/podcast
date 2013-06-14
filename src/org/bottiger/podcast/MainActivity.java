@@ -336,21 +336,9 @@ public class MainActivity extends FragmentActivity implements
 					.getApplicationContext());
 		}
 
-		try {
-			Account[] a = AccountManager.get(getApplicationContext())
-					.getAccountsByType("com.google");
-			MainActivity.mAccount = a[0];
-			gReader = new GoogleReader(this, mAccount,
-					((SoundWaves) this.getApplication())
-							.getGoogleReaderConsumerKey());
-			if (a.length > 0) {
-				// gReader.refreshAuthToken();
-				gReader.getSubscriptionsFromReader();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		startGoogleReader();
 	}
+	
 
 	/**
 	 * Test if a service is running
@@ -635,50 +623,21 @@ public class MainActivity extends FragmentActivity implements
 		return new Drive.Builder(AndroidHttp.newCompatibleTransport(),
 				new GsonFactory(), credential).build();
 	}
-
-	/**
-	 * Retrieve a authorized service object to send requests to the Google Drive
-	 * API. On failure to retrieve an access token, a notification is sent to
-	 * the user requesting that authorization be granted for the
-	 * {@code https://www.googleapis.com/auth/drive.file} scope.
-	 * 
-	 * @return An authorized service object.
-	 */
-	/*
-	 * private Drive getDriveService(GoogleAccountCredential credential) { if
-	 * (mDriveService == null) { try { /* GoogleAccountCredential credential =
-	 * GoogleAccountCredential .usingOAuth2(getApplicationContext(),
-	 * DriveScopes.DRIVE_FILE);
-	 * 
-	 * credential.setSelectedAccountName(mAccount.name); // Trying to get a
-	 * token right away to see if we are authorized credential.getToken();
-	 * mDriveService = new Drive.Builder( AndroidHttp.newCompatibleTransport(),
-	 * new GsonFactory(), credential).build(); } catch (Exception e) { //
-	 * Log.e(TAG, "Failed to get token"); // If the Exception is User
-	 * Recoverable, we display a // notification that will trigger the // intent
-	 * to fix the issue. if (e instanceof UserRecoverableAuthException) {
-	 * 
-	 * UserRecoverableAuthException exception = (UserRecoverableAuthException)
-	 * e; NotificationManager notificationManager = (NotificationManager)
-	 * getApplicationContext() .getSystemService(Context.NOTIFICATION_SERVICE);
-	 * Intent authorizationIntent = exception.getIntent();
-	 * 
-	 * startActivityForResult(authorizationIntent, REQUEST_AUTHORIZATION);
-	 * 
-	 * authorizationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-	 * .addFlags(Intent.FLAG_FROM_BACKGROUND); PendingIntent pendingIntent =
-	 * PendingIntent.getActivity( getApplicationContext(),
-	 * REQUEST_AUTHORIZATION, authorizationIntent, 0);
-	 * 
-	 * NotificationCompat.Builder notificationBuilder = new
-	 * NotificationCompat.Builder( getApplicationContext())
-	 * .setSmallIcon(android.R.drawable.ic_dialog_alert)
-	 * .setTicker("Permission requested")
-	 * .setContentTitle("Permission requested") .setContentText("for account " +
-	 * mAccount.name) .setContentIntent(pendingIntent) .setAutoCancel(true);
-	 * notificationManager.notify(0, notificationBuilder.build());
-	 * 
-	 * } else { e.printStackTrace(); } } } return mDriveService; }
-	 */
-
+	
+	private void startGoogleReader() {
+		try {
+			Account[] a = AccountManager.get(getApplicationContext())
+					.getAccountsByType("com.google");
+			MainActivity.mAccount = a[0];
+			gReader = new GoogleReader(this, mAccount,
+					((SoundWaves) this.getApplication())
+							.getGoogleReaderConsumerKey());
+			if (a.length > 0) {
+				// gReader.refreshAuthToken();
+				gReader.getSubscriptionsFromReader();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }
