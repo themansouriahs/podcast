@@ -17,22 +17,26 @@
 package org.bottiger.podcast;
 
 import org.bottiger.podcast.service.PodcastService;
+import org.bottiger.podcast.utils.ThemeHelper;
 
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
 
-public class SettingsActivity extends PreferenceActivity {
+public class SettingsActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+
+	public static final String DARK_THEME_KEY = "pref_dark_theme";
 
 	public static final String HAPI_PREFS_FILE_NAME = "org.bottiger.podcast_preferences";
 	private PodcastService serviceBinder = null;
 	ComponentName service = null;
 
-	
 	private ServiceConnection serviceConnection = new ServiceConnection() {
 		@Override
 		public void onServiceConnected(ComponentName className, IBinder service) {
@@ -48,7 +52,11 @@ public class SettingsActivity extends PreferenceActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-
+		// This is bizar, but works:
+		// http://stackoverflow.com/questions/11751498/how-to-change-preferenceactivity-theme
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		setTheme(ThemeHelper.getTheme(prefs));
 		super.onCreate(savedInstanceState);
 
 		// Load the preferences from an XML resource
@@ -58,11 +66,23 @@ public class SettingsActivity extends PreferenceActivity {
 
 		Intent bindIntent = new Intent(this, PodcastService.class);
 		bindService(bindIntent, serviceConnection, Context.BIND_AUTO_CREATE);
+
+	}
+
+	@Override
+	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
+			String key) {
+		if (key.equals(DARK_THEME_KEY)) {
+			recreate();
+		}
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
+	    // Set up a listener whenever a key changes
+	    getPreferenceScreen().getSharedPreferences()
+	            .registerOnSharedPreferenceChangeListener(this);
 
 	}
 
@@ -70,8 +90,12 @@ public class SettingsActivity extends PreferenceActivity {
 	protected void onPause() {
 
 		super.onPause();
-		if(serviceBinder!=null)
+		if (serviceBinder != null)
 			serviceBinder.updateSetting();
+		
+	    // Unregister the listener whenever a key changes
+	    getPreferenceScreen().getSharedPreferences()
+	            .unregisterOnSharedPreferenceChangeListener(this);
 	}
 
 	@Override

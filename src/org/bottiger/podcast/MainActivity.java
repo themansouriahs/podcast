@@ -130,6 +130,8 @@ public class MainActivity extends FragmentActivity implements
 
 	private SharedPreferences prefs;
 
+	private int currentTheme;
+
 	private DriveUtils mDriveUtils;
 
 	/** Painless networking with Volley */
@@ -229,7 +231,7 @@ public class MainActivity extends FragmentActivity implements
 
 		mCredential = GoogleAccountCredential.usingOAuth2(this,
 				"https://www.googleapis.com/auth/drive.appdata"); // "https://www.googleapis.com/auth/drive.appdata");
-																// //DriveScopes.DRIVE);
+																	// //DriveScopes.DRIVE);
 		// mCredential = GoogleAccountCredential.usingOAuth2(this,
 		// DriveScopes.DRIVE_FILE); //DriveScopes.DRIVE);
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -276,6 +278,9 @@ public class MainActivity extends FragmentActivity implements
 			bindService(bindIntent, mHTTPDServiceConnection,
 					Context.BIND_AUTO_CREATE);
 		}
+
+		currentTheme = ThemeHelper.getTheme(prefs);
+		setTheme(currentTheme);
 
 		setContentView(R.layout.activity_swipe);
 
@@ -338,7 +343,15 @@ public class MainActivity extends FragmentActivity implements
 
 		startGoogleReader();
 	}
-	
+
+	/**
+	 * Set the current theme based on the preference
+	 */
+	private void refreshTheme() {
+		if (currentTheme != ThemeHelper.getTheme(prefs)) {
+			recreate();
+		}
+	}
 
 	/**
 	 * Test if a service is running
@@ -423,6 +436,7 @@ public class MainActivity extends FragmentActivity implements
 	@Override
 	public void onResume() {
 		super.onResume();
+		refreshTheme();
 		if (mInit) {
 			mInit = false;
 
@@ -623,7 +637,7 @@ public class MainActivity extends FragmentActivity implements
 		return new Drive.Builder(AndroidHttp.newCompatibleTransport(),
 				new GsonFactory(), credential).build();
 	}
-	
+
 	private void startGoogleReader() {
 		try {
 			Account[] a = AccountManager.get(getApplicationContext())
