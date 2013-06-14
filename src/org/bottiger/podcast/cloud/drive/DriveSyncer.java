@@ -151,6 +151,7 @@ public class DriveSyncer {
 	 * Perform a synchronization for the current account.
 	 */
 	public void performSync() {
+		cleanup(100000);
 		if (mService == null) {
 			return;
 		}
@@ -205,7 +206,7 @@ public class DriveSyncer {
 		insertNewLocalFiles();
 
 		// Cleanup legacy files
-		cleanup(100);
+		//cleanup(100);
 
 		Log.d(TAG, "Done performing sync for " + mAccount.name);
 	}
@@ -249,6 +250,8 @@ public class DriveSyncer {
 				String description = createFileDescription(
 						mostRecentItem(playlist), PLAYLIST_FILENAME);
 				newFile.setDescription(description);
+				newFile.setParents(Arrays.asList(new ParentReference()
+				.setId(parent)));
 
 				mergeFiles(playlist, newFile, PLAYLIST_FILENAME,
 						DataType.EPISODE);
@@ -587,7 +590,7 @@ public class DriveSyncer {
 								key = titles[i];
 							}
 							result.put(key, file);
-						} catch (ArrayIndexOutOfBoundsException e) {
+						} catch (Exception e) {
 							Log.d(TAG, "invalid and unparsable description: "
 									+ file.getTitle() + ". Description: "
 									+ file.getDescription());
@@ -611,7 +614,7 @@ public class DriveSyncer {
 	 */
 	private void cleanup(int filesToDelete) {
 
-		for (int k = 1; k < 1; k++) {
+		for (int k = 0; k < 10; k++) {
 
 			int counter = 0;
 			try {
@@ -624,7 +627,7 @@ public class DriveSyncer {
 								+ SUBSCRIPTIONS_FILENAME
 								+ "' and not title contains '"
 								+ PLAYLIST_FILENAME
-								+ "' and 'appdata' in parents");
+								+ "' and 'root' in parents");
 
 				do {
 					FileList files = request.execute();

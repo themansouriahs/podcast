@@ -228,7 +228,7 @@ public class MainActivity extends FragmentActivity implements
 		}
 
 		mCredential = GoogleAccountCredential.usingOAuth2(this,
-				"https://www.googleapis.com/auth/drive.file"); // "https://www.googleapis.com/auth/drive.appdata");
+				"https://www.googleapis.com/auth/drive.appdata"); // "https://www.googleapis.com/auth/drive.appdata");
 																// //DriveScopes.DRIVE);
 		// mCredential = GoogleAccountCredential.usingOAuth2(this,
 		// DriveScopes.DRIVE_FILE); //DriveScopes.DRIVE);
