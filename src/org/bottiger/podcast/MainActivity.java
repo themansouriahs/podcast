@@ -41,6 +41,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap.CompressFormat;
 import android.media.AudioManager;
@@ -48,6 +49,7 @@ import android.os.Bundle;
 import android.os.Debug;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -56,6 +58,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -210,6 +213,14 @@ public class MainActivity extends FragmentActivity implements
 
 	private HeadsetReceiver receiver;
 
+	/** Navigation Drawer */
+    private DrawerLayout mDrawerLayout;
+    private ActionBarDrawerToggle mDrawerToggle;
+    private CharSequence mDrawerTitle;
+    private CharSequence mTitle;
+
+
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -316,16 +327,58 @@ public class MainActivity extends FragmentActivity implements
 
 		// set the Behind View
 		if (SHOW_DRAWER) {
+			mTitle = mDrawerTitle = getTitle();
+	        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+	        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
+	                R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
+
+	            /** Called when a drawer has settled in a completely closed state. */
+	            public void onDrawerClosed(View view) {
+	                getActionBar().setTitle(mTitle);
+	                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+	            }
+
+	            /** Called when a drawer has settled in a completely open state. */
+	            public void onDrawerOpened(View drawerView) {
+	                getActionBar().setTitle(mDrawerTitle);
+	                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+	            }
+	        };
+
+	        // Set the drawer toggle as the DrawerListener
+	        mDrawerLayout.setDrawerListener(mDrawerToggle);
+
+			
 			mPlanetTitles = getResources().getStringArray(
 					R.array.entries_item_expire);
 			mDrawerList = (LinearLayout) findViewById(R.id.left_drawer);
+			
+	        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+	        mDrawerToggle = new ActionBarDrawerToggle(
+	                this,                  /* host Activity */
+	                mDrawerLayout,         /* DrawerLayout object */
+	                R.drawable.ic_drawer,  /* nav drawer icon to replace 'Up' caret */
+	                R.string.drawer_open,  /* "open drawer" description */
+	                R.string.drawer_close  /* "close drawer" description */
+	                ) {
 
-			// Set the adapter for the list view
-			// mDrawerList.setAdapter(new ArrayAdapter<String>(this,
-			// R.layout.list_item_test, mPlanetTitles));
-			// Set the list's click listener
-			// mDrawerList.setOnItemClickListener(new
-			// DrawerItemClickListener());
+	            /** Called when a drawer has settled in a completely closed state. */
+	            public void onDrawerClosed(View view) {
+	                getActionBar().setTitle(mTitle);
+	            }
+
+	            /** Called when a drawer has settled in a completely open state. */
+	            public void onDrawerOpened(View drawerView) {
+	                getActionBar().setTitle(mDrawerTitle);
+	            }
+	        };
+
+	        // Set the drawer toggle as the DrawerListener
+	        mDrawerLayout.setDrawerListener(mDrawerToggle);
+
+	        getActionBar().setDisplayHomeAsUpEnabled(true);
+	        getActionBar().setHomeButtonEnabled(true);
+
 		}
 
 		// Set up the ViewPager with the sections adapter.
@@ -654,4 +707,6 @@ public class MainActivity extends FragmentActivity implements
 			e.printStackTrace();
 		}
 	}
+
+
 }

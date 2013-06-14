@@ -145,5 +145,8 @@
     <string name="pref_cloud_support_title">Enable Cloud Support</string>
     <string name="pref_cloud_support_description">Cloud support will backup your data to the cloud and synchronize data between your devices</string>
     <string name="title_activity_notification_receiver">NotificationReceiverActivity</string>
+    
+        <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
 
 </resources>
