@@ -145,7 +145,7 @@ public class GoogleReader extends AbstractCloudProvider {
 		new RemoteHTTPRequest(ReaderAction.GET).execute();
 	}
 
-	public void refreshAuthToken() {
+	public boolean refreshAuthToken() {
 		String accessToken = mSettings.getString(PREF_TOKEN, "");
 		AccountManager.get(mContext).invalidateAuthToken("com.google",
 				accessToken);
@@ -154,9 +154,13 @@ public class GoogleReader extends AbstractCloudProvider {
 		// GoogleReader.amf =
 		// AccountManager.get(mContext).getAuthToken(mAccount, SCOPE,
 		// true, cb, null);
-		if (mContext instanceof Activity)
+		if (mContext instanceof Activity) {
 			GoogleReader.amf = AccountManager.get(mContext).getAuthToken(
 					mAccount, SCOPE, null, (Activity) mContext, cb, null);
+			return true;
+		}
+
+		return false;
 	}
 
 	@Override
@@ -169,8 +173,9 @@ public class GoogleReader extends AbstractCloudProvider {
 		@Override
 		protected Void doInBackground(URL... urls) {
 			Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-			GoogleReader.this.refreshAuthToken();
-			new RemoteHTTPRequest(ReaderAction.GET).execute(urls[0]);
+			if (GoogleReader.this.refreshAuthToken()) {
+				new RemoteHTTPRequest(ReaderAction.GET).execute(urls[0]);
+			}
 			return null;
 		}
 	}
