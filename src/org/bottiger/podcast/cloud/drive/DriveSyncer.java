@@ -53,6 +53,7 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.Drive.Changes;
 import com.google.api.services.drive.Drive.Files;
+import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.Change;
 import com.google.api.services.drive.model.ChangeList;
 import com.google.api.services.drive.model.File;
@@ -77,7 +78,7 @@ public class DriveSyncer {
 
 	/** For debugging set parent = root. Othervise = appdata */
 	private static final String parent = "appdata";
-	private static int MAX_RESULTS = 1000;
+	private static int MAX_RESULTS = 10;
 
 	private static final String SEPARATOR = "|";
 	private static final String TIMESTAMP_KEY = "timestamp";
@@ -146,12 +147,40 @@ public class DriveSyncer {
 		itemUri = getItemsUri(mAccount.name);
 
 	}
+	
+	public static String getScope() {
+		return parent.equals("appdata") ? "https://www.googleapis.com/auth/drive.appdata" : DriveScopes.DRIVE;
+	}
 
 	/**
 	 * Perform a synchronization for the current account.
+	 * 
+	 * The strategy is:
+	 * 
+	 * if not sync before:
+	 * 
+	 * if synced before:
+	 * 
+	 * 1) Update the Playlist - most critical item The most recent wins
+	 * 
+	 * 2) Update the subscription list. The most recent wins
+	 * 
+	 * 3) Update episodes. For each subscription the most recent list of
+	 * episodes wins.
+	 * 
+	 * 4) If Drive contains more files which have not been changed we insert
+	 * them locally
+	 * 
+	 * 5) Now, if the Playlist does not exist on the remote server we create it
+	 * 
+	 * 6) If the subscription list does not exist on the remote server we create
+	 * it
+	 * 
+	 * 7) If any of the subscriptions does not contain a ID for a remote file we
+	 * upload the file list and add a remote_id to the subscription
+	 * 
 	 */
 	public void performSync() {
-		cleanup(100000);
 		if (mService == null) {
 			return;
 		}
@@ -168,6 +197,8 @@ public class DriveSyncer {
 			ContentResolver contentResolver = mContext.getContentResolver();
 
 			/*
+			 * Step 1
+			 * 
 			 * Merge playlist if it exists
 			 */
 			if (files.containsKey(PLAYLIST_FILENAME)) {
@@ -178,6 +209,8 @@ public class DriveSyncer {
 			}
 
 			/*
+			 * Step 2
+			 * 
 			 * Merge Subscriptions with Google Drive (if the file exists)
 			 */
 			if (files.containsKey(SUBSCRIPTIONS_FILENAME)) {
@@ -202,11 +235,11 @@ public class DriveSyncer {
 		}
 
 		// Insert new local files.
-		files = getAllFiles();
+		files = getKeyFiles();
 		insertNewLocalFiles();
 
 		// Cleanup legacy files
-		//cleanup(100);
+		// cleanup(100);
 
 		Log.d(TAG, "Done performing sync for " + mAccount.name);
 	}
@@ -240,7 +273,7 @@ public class DriveSyncer {
 
 			ContentResolver contenResolver = mContext.getContentResolver();
 
-			// Playlist
+			// Insert the current Playlist if the file does not exist
 			if (!files.containsKey(PLAYLIST_FILENAME)) {
 				File newFile = newFile = new File();
 
@@ -251,19 +284,22 @@ public class DriveSyncer {
 						mostRecentItem(playlist), PLAYLIST_FILENAME);
 				newFile.setDescription(description);
 				newFile.setParents(Arrays.asList(new ParentReference()
-				.setId(parent)));
+						.setId(parent)));
 
 				mergeFiles(playlist, newFile, PLAYLIST_FILENAME,
 						DataType.EPISODE);
 			}
 
+			// Insert the current list of subscriptions if the file does not
+			// exist
 			if (!files.containsKey(SUBSCRIPTIONS_FILENAME)) {
 				insertSubscriptions();
 			}
 
-			// FeedItems
+			// Insert the feedItems which does not have a DriveID
 			Cursor subscriptionCursor = mProvider.query(uri,
-					SUBSCRIPTION_PROJECTION, null, null, null);
+					SUBSCRIPTION_PROJECTION, SubscriptionColumns.SERVER_ID
+							+ " IS NULL", null, null);
 			Log.d(TAG,
 					"Got local subscriptions: " + subscriptionCursor.getCount());
 
@@ -273,49 +309,48 @@ public class DriveSyncer {
 						.getByCursor(subscriptionCursor);
 				String key = subscriptionKey(subscription);
 				String filename = remoteFilename(subscription);
-				if (!files.containsKey(key)) {
-					List<FeedItem> episodes = subscription
-							.getFeedItems(contenResolver);
+				// if (!files.containsKey(key)) {
+				List<FeedItem> episodes = subscription
+						.getFeedItems(contenResolver);
 
-					long mostRecent = mostRecentFeedItem(episodes);
+				long mostRecent = mostRecentFeedItem(episodes);
 
-					File newFile = new File();
-					File insertedFile = null;
-					newFile.setTitle(filename);
-					newFile.setMimeType(TEXT_PLAIN);
-					String description = createFileDescription(mostRecent, key);
-					newFile.setDescription(description);
-					newFile.setParents(Arrays.asList(new ParentReference()
-							.setId(parent)));
+				File newFile = new File();
+				File insertedFile = null;
+				newFile.setTitle(filename);
+				newFile.setMimeType(TEXT_PLAIN);
+				String description = createFileDescription(mostRecent, key);
+				newFile.setDescription(description);
+				newFile.setParents(Arrays.asList(new ParentReference()
+						.setId(parent)));
 
-					Gson gson = new Gson();
-					String content = gson.toJson(episodes);
+				Gson gson = new Gson();
+				String content = gson.toJson(episodes);
 
-					Log.d(TAG, "Inserting new local episodes: " + filename);
-					try {
-						if (content != null && content.length() > 0) {
+				Log.d(TAG, "Inserting new local episodes: " + filename);
+				try {
+					if (content != null && content.length() > 0) {
 
-							insertedFile = mService
-									.files()
-									.insert(newFile,
-											ByteArrayContent.fromString(
-													TEXT_PLAIN, content))
-									.execute();
-						} else {
-							insertedFile = mService.files().insert(newFile)
-									.execute();
-						}
-						// Update the local file to add the file ID.
-						subscription.setDriveId(insertedFile.getId());
-						mUpdater.addOperation(subscription.update(
-								contenResolver, true, true));
-					} catch (IOException e) {
-						e.printStackTrace();
+						insertedFile = mService
+								.files()
+								.insert(newFile,
+										ByteArrayContent.fromString(TEXT_PLAIN,
+												content)).execute();
+					} else {
+						insertedFile = mService.files().insert(newFile)
+								.execute();
 					}
-
-					files.remove(filename);
-
+					// Update the local file to add the file ID.
+					subscription.setDriveId(insertedFile.getId());
+					mUpdater.addOperation(subscription.update(contenResolver,
+							true, true));
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
+
+				// files.remove(filename);
+
+				// }
 			}
 		} catch (RemoteException e) {
 			e.printStackTrace();
@@ -610,6 +645,65 @@ public class DriveSyncer {
 	}
 
 	/**
+	 * Retrieve a collection of all files created by the app {@code changeId}.
+	 * 
+	 * @param changeId
+	 *            Change ID to retrieve changed files from.
+	 * @return Map of changed files key'ed by their file ID.
+	 */
+	private Map<String, File> getKeyFiles() {
+		Map<String, File> result = new HashMap<String, File>();
+		String[] titles = { PLAYLIST_FILENAME, SUBSCRIPTIONS_FILENAME };
+
+		for (int i = 0; i < titles.length; i++) {
+			try {
+				Files.List request = mService
+						.files()
+						.list()
+						.setMaxResults(MAX_RESULTS)
+						.setQ("title contains '" + titles[i] + "' and '"
+								+ parent + "' in parents");
+				do {
+					FileList files = request.execute();
+
+					String content = null;
+					for (File file : files.getItems()) {
+						Log.d(TAG, "found: " + file.getTitle());
+						// mService.files().delete(file.getId());
+						try {
+							String key = null;
+							if (titles[i].equals(EPISODES_PREFIX)) {
+								key = getDescriptionID(file);
+							} else {
+								key = titles[i];
+							}
+							result.put(key, file);
+							
+							if (false) {
+								Log.d(TAG, "Delete: " + file.getTitle());
+								mService.files().delete(file.getId()).execute();
+							}
+							
+						} catch (Exception e) {
+							Log.d(TAG, "invalid and unparsable description: "
+									+ file.getTitle() + ". Description: "
+									+ file.getDescription());
+						}
+					}
+					request.setPageToken(files.getNextPageToken());
+				} while (request.getPageToken() != null
+						&& request.getPageToken().length() > 0);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		Log.d(TAG, "Got Drive files: " + result.size() + " - "
+				+ mLargestChangeId);
+		return result;
+	}
+
+	/**
 	 * Cleans up the appdata by removing old files.
 	 */
 	private void cleanup(int filesToDelete) {
@@ -626,8 +720,7 @@ public class DriveSyncer {
 								+ "' and not title contains '"
 								+ SUBSCRIPTIONS_FILENAME
 								+ "' and not title contains '"
-								+ PLAYLIST_FILENAME
-								+ "' and 'root' in parents");
+								+ PLAYLIST_FILENAME + "' and 'root' in parents");
 
 				do {
 					FileList files = request.execute();

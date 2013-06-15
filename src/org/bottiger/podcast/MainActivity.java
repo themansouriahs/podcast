@@ -12,6 +12,7 @@ import java.net.URL;
 import org.bottiger.podcast.PodcastBaseFragment.OnItemSelectedListener;
 import org.bottiger.podcast.cloud.CloudProvider;
 import org.bottiger.podcast.cloud.GoogleReader;
+import org.bottiger.podcast.cloud.drive.DriveSyncer;
 import org.bottiger.podcast.debug.SqliteCopy;
 import org.bottiger.podcast.images.ImageCacheManager;
 import org.bottiger.podcast.images.ImageCacheManager.CacheType;
@@ -42,7 +43,6 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap.CompressFormat;
 import android.media.AudioManager;
@@ -69,6 +69,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bugsense.trace.BugSenseHandler;
 import com.google.android.gms.auth.UserRecoverableAuthException;
@@ -247,7 +248,7 @@ public class MainActivity extends FragmentActivity implements
 		if (prefs.getBoolean(SettingsActivity.CLOUD_SUPPORT, true)) {
 
 			mCredential = GoogleAccountCredential.usingOAuth2(this,
-					"https://www.googleapis.com/auth/drive.appdata"); // "https://www.googleapis.com/auth/drive.appdata");
+					DriveSyncer.getScope()); // "https://www.googleapis.com/auth/drive.appdata");
 																		// //DriveScopes.DRIVE);
 			// mCredential = GoogleAccountCredential.usingOAuth2(this,
 			// DriveScopes.DRIVE_FILE); //DriveScopes.DRIVE);
@@ -572,6 +573,7 @@ public class MainActivity extends FragmentActivity implements
 			return true;
 		case R.id.menu_sync:
 
+			if (prefs.getBoolean(SettingsActivity.CLOUD_SUPPORT, true)) {
 			// Google Drive Sync mDriveUtils = new DriveUtils(this);
 			Account account = mCredential.getSelectedAccount();
 			Bundle bundle = new Bundle();
@@ -583,6 +585,13 @@ public class MainActivity extends FragmentActivity implements
 			ContentResolver.requestSync(account,
 					"org.bottiger.podcast.provider.podcastprovider", bundle);
 			ContentResolver.requestSync(account, auth, bundle);
+			} else {
+				CharSequence text = "Please enabled cloud support in the settings menu before attempting to sync";
+				int duration = Toast.LENGTH_LONG;
+
+				Toast toast = Toast.makeText(this, text, duration);
+				toast.show();
+			}
 
 			return true;
 		case R.id.menu_settings:
