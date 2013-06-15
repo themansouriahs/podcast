@@ -240,7 +240,7 @@ public class Subscription extends AbstractItem {
 		cv.put(SubscriptionColumns.DESCRIPTION, description);
 		cv.put(SubscriptionColumns.IMAGE_URL, imageURL);
 		cv.put(SubscriptionColumns.REMOTE_ID, sync_id);
-		cv.put(SubscriptionColumns.STATUS, status);
+		cv.put(SubscriptionColumns.STATUS, STATUS_SUBSCRIBED);
 		Uri uri = context.getContentResolver().insert(SubscriptionColumns.URI,
 				cv);
 		if (uri == null) {
