@@ -9,8 +9,6 @@
     <facet type="android-gradle" name="Android-Gradle">
       <configuration>
         <option name="GRADLE_PROJECT_PATH" value=":" />
-        <option name="PROJECT_ABSOLUTE_PATH" value="$MODULE_DIR$" />
-        <option name="GRADLE_HOME_DIR_PATH" value="$MODULE_DIR$/../gradle-1.6" />
       </configuration>
     </facet>
   </component>
@@ -61,7 +59,7 @@
       <excludeFolder url="file://$MODULE_DIR$/build/symbols" />
       <excludeFolder url="file://$MODULE_DIR$/build/tmp" />
     </content>
-    <orderEntry type="jdk" jdkName="Android 4.2.2" jdkType="Android SDK" />
+    <orderEntry type="jdk" jdkName="Android 4.0 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="json-simple-1.1.1" level="project" />
     <orderEntry type="library" name="signpost-core-1.2.1.2" level="project" />
@@ -90,6 +88,8 @@
     <orderEntry type="library" name="PullToRefreshListFragment.aar" level="project" />
     <orderEntry type="library" name="library.aar" level="project" />
     <orderEntry type="library" name="google-play-services_lib.aar" level="project" />
+    <orderEntry type="library" name="android-support-v4" level="project" />
+    <orderEntry type="library" name="gson-2.1" level="project" />
   </component>
 </module>
 

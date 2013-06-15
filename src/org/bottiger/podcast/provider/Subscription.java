@@ -33,6 +33,8 @@ public class Subscription extends AbstractItem {
 
 	public final static int STATUS_SUBSCRIBED = 1;
 	public final static int STATUS_UNSUBSCRIBED = 2;
+	
+	public final static String UNSUBSCRIBED = "unsubscribed";
 
 	private static SubscriptionLruCache cache = null;
 
@@ -45,7 +47,7 @@ public class Subscription extends AbstractItem {
 	public String description;
 	public String imageURL;
 	public String sync_id;
-	public String status;
+	public long status;
 	public long lastUpdated;
 	public long lastItemUpdated;
 	public long fail_count;
@@ -180,7 +182,7 @@ public class Subscription extends AbstractItem {
 		lastItemUpdated = -1;
 		auto_download = -1;
 		sync_id = null;
-		status = null;
+		status = -1;
 	}
 
 	public Subscription() {
@@ -194,7 +196,7 @@ public class Subscription extends AbstractItem {
 		link = url_link;
 	}
 
-	public boolean unsubscribe(Context context) {
+	public void unsubscribe(Context context) {
 
 		// Unsubscribe from Google Reader
 		try {
@@ -205,16 +207,9 @@ public class Subscription extends AbstractItem {
 		}
 
 		// Unsubscribe from local database
-		ContentValues cv = new ContentValues();
-		cv.put(SubscriptionColumns.STATUS, STATUS_UNSUBSCRIBED);
-		String where = BaseColumns._ID + " = ?";
-		String[] selectionArgs = { String.valueOf(id) };
-		int deletedRows = context.getContentResolver().update(
-				SubscriptionColumns.URI, cv, where, selectionArgs);
-		if (deletedRows == 1) {
-			return deleteEpisodes(context);
-		} else
-			return false;
+		this.status = STATUS_UNSUBSCRIBED;
+		update(context.getContentResolver());
+		deleteEpisodes(context);
 	}
 	
 	private boolean deleteEpisodes(Context context) {
@@ -315,8 +310,10 @@ public class Subscription extends AbstractItem {
 
 		cv.put(SubscriptionColumns.REMOTE_ID, sync_id);
 
-		if (status != null)
+		if (status >= 0)
 			cv.put(SubscriptionColumns.STATUS, status);
+		
+		//cv.put(SubscriptionColumns.COMMENT, "valuehejeh");
 
 		// BaseColumns._ID + "=" + id
 		String condition = SubscriptionColumns.URL + "='" + url + "'";
@@ -445,7 +442,7 @@ public class Subscription extends AbstractItem {
 	}
 
 	public int getStatus() {
-		if (status == "ubsubscribed")
+		if (status == STATUS_UNSUBSCRIBED)
 			return STATUS_UNSUBSCRIBED;
 
 		return STATUS_SUBSCRIBED;

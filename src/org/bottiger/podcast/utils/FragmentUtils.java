@@ -47,9 +47,6 @@ public class FragmentUtils {
 		assert order != null;
 		assert projection != null;
 
-		//if (id != 10)
-		//	setListAdapter(mAdapter);
-
 		// Prepare the loader. Either re-connect with an existing one,
 		// or start a new one.
 		Bundle mBundle = new Bundle();
@@ -60,17 +57,19 @@ public class FragmentUtils {
 		
 		// FIXME
 		mFragment.getLoaderManager().restartLoader(id, mBundle, loaderCallback);
-		//getLoaderManager().initLoader(id, mBundle, loaderCallback);
+		// //getLoaderManager().initLoader(id, mBundle, loaderCallback);
 	}
 	
 	/*
 	 * This is a huge hack. FIXME
 	 */
 	public CursorAdapter getAdapter(Cursor cursor) {
+		/*
 		if (mFragment instanceof SubscriptionsFragment) {
 			SubscriptionsFragment sf = (SubscriptionsFragment) mFragment;
 			mAdapter = sf.getAdapter();
 		}
+		*/
 		return mAdapter;
 	}
 	
