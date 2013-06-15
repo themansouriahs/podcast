@@ -14,6 +14,7 @@
   limitations under the License.
 -->
 
+
 <!-- http://stackoverflow.com/questions/12338244/making-resources-theme-dependent -->
 <resources>
 
@@ -28,14 +29,17 @@
     <attr name="queue_icon" format="reference" />
     <attr name="info_icon" format="reference" />
     <attr name="new_icon" format="reference" />
-     <attr name="sync_icon" format="reference" />
+    <attr name="sync_icon" format="reference" />
     <attr name="sync_invert_icon" format="reference" />
+    
+    <attr name="customBackground" format="reference" />
 
     <declare-styleable name="AppTheme">
         <attr name="actionbarCompatTitleStyle" format="reference" />
         <attr name="actionbarCompatItemStyle" format="reference" />
         <attr name="actionbarCompatItemHomeStyle" format="reference" />
         <attr name="actionbarCompatProgressIndicatorStyle" format="reference" />
+        <attr name="solidBackgroundStyle" format="reference" />
     </declare-styleable>
     <declare-styleable name="BezelImageView">
         <attr name="maskDrawable" format="reference" />

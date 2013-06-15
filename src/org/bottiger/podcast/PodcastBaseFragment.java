@@ -96,6 +96,8 @@ public abstract class PodcastBaseFragment extends FixedListFragment implements
 	private static TextView mCurrentTime = null;
 	private static SeekBar mProgressBar = null;
 	private static TextView mDuration = null;
+	
+	private int contextMenuViewID;
 
 	protected abstract int getItemLayout();
 
@@ -238,6 +240,7 @@ public abstract class PodcastBaseFragment extends FixedListFragment implements
 		super.onCreateContextMenu(menu, v, menuInfo);
 		MenuInflater inflater = getActivity().getMenuInflater();
 		inflater.inflate(R.menu.podcast_context, menu);
+		//contextMenuViewID = v. .getId(); //this is where I get the id of my clicked button
 	}
 
 	@Override
@@ -249,15 +252,23 @@ public abstract class PodcastBaseFragment extends FixedListFragment implements
 
 		AdapterView.AdapterContextMenuInfo cmi = (AdapterView.AdapterContextMenuInfo) item
 				.getMenuInfo();
-
+		
+		Cursor cursor = mAdapter.getCursor();
+		Cursor cursor2 = getCursor();
+		mCursor.moveToPosition(cmi.position);
+		Subscription sub2 = Subscription.getByCursor(cursor);
+		
+		
+		
 		Object o = getListView().getItemAtPosition(cmi.position);
 		Subscription sub = this.getSubscription(o);
+		//Subscription sub2 = this.getSubscription(contextMenuViewID);
 
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
 				.getMenuInfo();
 		switch (item.getItemId()) {
 		case R.id.unsubscribe:
-			sub.unsubscribe(getActivity().getApplicationContext());
+			sub.unsubscribe(getActivity());
 			return true;
 		default:
 			return super.onContextItemSelected(item);

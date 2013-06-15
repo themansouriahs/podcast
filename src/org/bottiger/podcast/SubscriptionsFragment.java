@@ -124,16 +124,10 @@ public class SubscriptionsFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mFragmentUtils.setAdapter(getSubscriptionCursorAdapter(getActivity(), mFragmentUtils.getCursor()));		
-        mFragmentUtils.startInit(0, SubscriptionColumns.URI, SubscriptionColumns.ALL_COLUMNS, "1", SubscriptionColumns.TITLE + " ASC");
+        mFragmentUtils.setAdapter(getSubscriptionCursorAdapter(getActivity(), mFragmentUtils.getCursor()));
+        String condition = SubscriptionColumns.STATUS + "<>'" + Subscription.UNSUBSCRIBED + "'";
+        mFragmentUtils.startInit(0, SubscriptionColumns.URI, SubscriptionColumns.ALL_COLUMNS, condition, SubscriptionColumns.TITLE + " ASC");
     }
-
-	
-//	@Override
-//	public void onListItemClick(ListView l, View v, int position, long id) {
-//		Subscription s = Subscription.getById(getActivity().getContentResolver(), id);
-//        this.mListener.onItemSelected(s.getId());
-//	}
 	
 	public DialogMenu createDialogMenus(long id) {
 

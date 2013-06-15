@@ -214,12 +214,10 @@ public class MainActivity extends FragmentActivity implements
 	private HeadsetReceiver receiver;
 
 	/** Navigation Drawer */
-    private DrawerLayout mDrawerLayout;
-    private ActionBarDrawerToggle mDrawerToggle;
-    private CharSequence mDrawerTitle;
-    private CharSequence mTitle;
-
-
+	private DrawerLayout mDrawerLayout;
+	private ActionBarDrawerToggle mDrawerToggle;
+	private CharSequence mDrawerTitle;
+	private CharSequence mTitle;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -227,6 +225,8 @@ public class MainActivity extends FragmentActivity implements
 
 		BugSenseHandler.initAndStartSession(MainActivity.this,
 				((SoundWaves) this.getApplication()).getBugSenseAPIKey());
+
+		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
 		if (debugging) {
 			ViewServer.get(this).addWindow(this);
@@ -240,35 +240,38 @@ public class MainActivity extends FragmentActivity implements
 			 */
 		}
 
-		mCredential = GoogleAccountCredential.usingOAuth2(this,
-				"https://www.googleapis.com/auth/drive.appdata"); // "https://www.googleapis.com/auth/drive.appdata");
-																	// //DriveScopes.DRIVE);
-		// mCredential = GoogleAccountCredential.usingOAuth2(this,
-		// DriveScopes.DRIVE_FILE); //DriveScopes.DRIVE);
-		prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		if (!prefs.contains(ACCOUNT_KEY))
-			startActivityForResult(mCredential.newChooseAccountIntent(),
-					REQUEST_ACCOUNT_PICKER);
-		else
-			mCredential
-					.setSelectedAccountName(prefs.getString(ACCOUNT_KEY, ""));
+		if (prefs.getBoolean(SettingsActivity.CLOUD_SUPPORT, true)) {
 
-		new Thread(new Runnable() {
-			public void run() {
-				try {
-					mCredential.getToken();
-				} catch (Exception e) {
-					e.printStackTrace();
-					if (e instanceof UserRecoverableAuthException) {
-						startActivityForResult(
-								((UserRecoverableAuthException) e).getIntent(),
-								REQUEST_AUTHORIZATION);
+			mCredential = GoogleAccountCredential.usingOAuth2(this,
+					"https://www.googleapis.com/auth/drive.appdata"); // "https://www.googleapis.com/auth/drive.appdata");
+																		// //DriveScopes.DRIVE);
+			// mCredential = GoogleAccountCredential.usingOAuth2(this,
+			// DriveScopes.DRIVE_FILE); //DriveScopes.DRIVE);
+			if (!prefs.contains(ACCOUNT_KEY))
+				startActivityForResult(mCredential.newChooseAccountIntent(),
+						REQUEST_ACCOUNT_PICKER);
+			else
+				mCredential.setSelectedAccountName(prefs.getString(ACCOUNT_KEY,
+						""));
+
+			new Thread(new Runnable() {
+				public void run() {
+					try {
+						mCredential.getToken();
+					} catch (Exception e) {
+						e.printStackTrace();
+						if (e instanceof UserRecoverableAuthException) {
+							startActivityForResult(
+									((UserRecoverableAuthException) e)
+											.getIntent(), REQUEST_AUTHORIZATION);
+						}
 					}
-				}
 
-				mDriveService = getDriveService(mCredential);
-			}
-		}).start();
+					mDriveService = getDriveService(mCredential);
+				}
+			}).start();
+
+		}
 
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
@@ -328,56 +331,63 @@ public class MainActivity extends FragmentActivity implements
 		// set the Behind View
 		if (SHOW_DRAWER) {
 			mTitle = mDrawerTitle = getTitle();
-	        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-	        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-	                R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
+			mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+			mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
+					R.drawable.ic_drawer, R.string.drawer_open,
+					R.string.drawer_close) {
 
-	            /** Called when a drawer has settled in a completely closed state. */
-	            public void onDrawerClosed(View view) {
-	                getActionBar().setTitle(mTitle);
-	                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-	            }
+				/**
+				 * Called when a drawer has settled in a completely closed
+				 * state.
+				 */
+				public void onDrawerClosed(View view) {
+					getActionBar().setTitle(mTitle);
+					invalidateOptionsMenu(); // creates call to
+												// onPrepareOptionsMenu()
+				}
 
-	            /** Called when a drawer has settled in a completely open state. */
-	            public void onDrawerOpened(View drawerView) {
-	                getActionBar().setTitle(mDrawerTitle);
-	                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-	            }
-	        };
+				/** Called when a drawer has settled in a completely open state. */
+				public void onDrawerOpened(View drawerView) {
+					getActionBar().setTitle(mDrawerTitle);
+					invalidateOptionsMenu(); // creates call to
+												// onPrepareOptionsMenu()
+				}
+			};
 
-	        // Set the drawer toggle as the DrawerListener
-	        mDrawerLayout.setDrawerListener(mDrawerToggle);
+			// Set the drawer toggle as the DrawerListener
+			mDrawerLayout.setDrawerListener(mDrawerToggle);
 
-			
 			mPlanetTitles = getResources().getStringArray(
 					R.array.entries_item_expire);
 			mDrawerList = (LinearLayout) findViewById(R.id.left_drawer);
-			
-	        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-	        mDrawerToggle = new ActionBarDrawerToggle(
-	                this,                  /* host Activity */
-	                mDrawerLayout,         /* DrawerLayout object */
-	                R.drawable.ic_drawer,  /* nav drawer icon to replace 'Up' caret */
-	                R.string.drawer_open,  /* "open drawer" description */
-	                R.string.drawer_close  /* "close drawer" description */
-	                ) {
 
-	            /** Called when a drawer has settled in a completely closed state. */
-	            public void onDrawerClosed(View view) {
-	                getActionBar().setTitle(mTitle);
-	            }
+			mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+			mDrawerToggle = new ActionBarDrawerToggle(this, /* host Activity */
+			mDrawerLayout, /* DrawerLayout object */
+			R.drawable.ic_drawer, /* nav drawer icon to replace 'Up' caret */
+			R.string.drawer_open, /* "open drawer" description */
+			R.string.drawer_close /* "close drawer" description */
+			) {
 
-	            /** Called when a drawer has settled in a completely open state. */
-	            public void onDrawerOpened(View drawerView) {
-	                getActionBar().setTitle(mDrawerTitle);
-	            }
-	        };
+				/**
+				 * Called when a drawer has settled in a completely closed
+				 * state.
+				 */
+				public void onDrawerClosed(View view) {
+					getActionBar().setTitle(mTitle);
+				}
 
-	        // Set the drawer toggle as the DrawerListener
-	        mDrawerLayout.setDrawerListener(mDrawerToggle);
+				/** Called when a drawer has settled in a completely open state. */
+				public void onDrawerOpened(View drawerView) {
+					getActionBar().setTitle(mDrawerTitle);
+				}
+			};
 
-	        getActionBar().setDisplayHomeAsUpEnabled(true);
-	        getActionBar().setHomeButtonEnabled(true);
+			// Set the drawer toggle as the DrawerListener
+			mDrawerLayout.setDrawerListener(mDrawerToggle);
+
+			getActionBar().setDisplayHomeAsUpEnabled(true);
+			getActionBar().setHomeButtonEnabled(true);
 
 		}
 
@@ -394,7 +404,9 @@ public class MainActivity extends FragmentActivity implements
 					.getApplicationContext());
 		}
 
-		startGoogleReader();
+		if (prefs.getBoolean(SettingsActivity.CLOUD_SUPPORT, true)) {
+			startGoogleReader();
+		}
 	}
 
 	/**
@@ -707,6 +719,5 @@ public class MainActivity extends FragmentActivity implements
 			e.printStackTrace();
 		}
 	}
-
 
 }

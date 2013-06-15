@@ -32,6 +32,7 @@ import android.preference.PreferenceManager;
 public class SettingsActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
 	public static final String DARK_THEME_KEY = "pref_dark_theme";
+	public static final String CLOUD_SUPPORT = "pref_cloud support";
 
 	public static final String HAPI_PREFS_FILE_NAME = "org.bottiger.podcast_preferences";
 	private PodcastService serviceBinder = null;

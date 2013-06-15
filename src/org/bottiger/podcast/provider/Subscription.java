@@ -33,6 +33,8 @@ public class Subscription extends AbstractItem {
 
 	public final static int STATUS_SUBSCRIBED = 1;
 	public final static int STATUS_UNSUBSCRIBED = 2;
+	
+	public final static String UNSUBSCRIBED = "unsubscribed";
 
 	private static SubscriptionLruCache cache = null;
 
@@ -195,21 +197,36 @@ public class Subscription extends AbstractItem {
 	}
 
 	public boolean unsubscribe(Context context) {
-		Subscription sub = Subscription.getByUrl(context.getContentResolver(),
-				url);
 
 		// Unsubscribe from Google Reader
+		try {
 		MainActivity.gReader.removeSubscriptionfromReader(context,
-				MainActivity.mAccount, sub);
+				MainActivity.mAccount, this);
+		} catch (Exception e) {
+			
+		}
 
 		// Unsubscribe from local database
+		ContentValues cv = new ContentValues();
+		cv.put(SubscriptionColumns.STATUS, UNSUBSCRIBED);
 		String where = BaseColumns._ID + " = ?";
-		String[] selectionArgs = { new Long(sub.id).toString() };
+		String[] selectionArgs = { String.valueOf(id) };
+		int deletedRows = context.getContentResolver().update(
+				SubscriptionColumns.URI, cv, where, selectionArgs);
+		if (deletedRows == 1) {
+			return deleteEpisodes(context);
+		} else
+			return false;
+	}
+	
+	private boolean deleteEpisodes(Context context) {
+		String where = ItemColumns.SUBS_ID + " = ?";
+		String[] selectionArgs = { String.valueOf(id) };
 		int deletedRows = context.getContentResolver().delete(
 				SubscriptionColumns.URI, where, selectionArgs);
-		if (deletedRows == 1)
+		if (deletedRows > 1) {
 			return true;
-		else
+		} else
 			return false;
 	}
 
