@@ -33,8 +33,6 @@ public class Subscription extends AbstractItem {
 
 	public final static int STATUS_SUBSCRIBED = 1;
 	public final static int STATUS_UNSUBSCRIBED = 2;
-	
-	public final static String UNSUBSCRIBED = "unsubscribed";
 
 	private static SubscriptionLruCache cache = null;
 
@@ -208,7 +206,7 @@ public class Subscription extends AbstractItem {
 
 		// Unsubscribe from local database
 		ContentValues cv = new ContentValues();
-		cv.put(SubscriptionColumns.STATUS, UNSUBSCRIBED);
+		cv.put(SubscriptionColumns.STATUS, STATUS_UNSUBSCRIBED);
 		String where = BaseColumns._ID + " = ?";
 		String[] selectionArgs = { String.valueOf(id) };
 		int deletedRows = context.getContentResolver().update(
@@ -223,7 +221,7 @@ public class Subscription extends AbstractItem {
 		String where = ItemColumns.SUBS_ID + " = ?";
 		String[] selectionArgs = { String.valueOf(id) };
 		int deletedRows = context.getContentResolver().delete(
-				SubscriptionColumns.URI, where, selectionArgs);
+				ItemColumns.URI, where, selectionArgs);
 		if (deletedRows > 1) {
 			return true;
 		} else
@@ -361,7 +359,8 @@ public class Subscription extends AbstractItem {
 				.getColumnIndex(SubscriptionColumns.LAST_UPDATED);
 		int urlIndex = cursor.getColumnIndex(SubscriptionColumns.URL);
 
-		sub.lastUpdated = cursor.getLong(lastUpdatedIndex);
+		String lastUpdatedString = cursor.getString(lastUpdatedIndex);
+		sub.lastUpdated = Long.parseLong(lastUpdatedString);
 		sub.title = cursor.getString(cursor
 				.getColumnIndex(SubscriptionColumns.TITLE));
 		sub.url = cursor.getString(urlIndex);

@@ -234,47 +234,6 @@ public abstract class PodcastBaseFragment extends FixedListFragment implements
 		}.execute();
 	}
 
-	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v,
-			ContextMenuInfo menuInfo) {
-		super.onCreateContextMenu(menu, v, menuInfo);
-		MenuInflater inflater = getActivity().getMenuInflater();
-		inflater.inflate(R.menu.podcast_context, menu);
-		//contextMenuViewID = v. .getId(); //this is where I get the id of my clicked button
-	}
-
-	@Override
-	public boolean onContextItemSelected(MenuItem item) {
-
-		if (!AdapterView.AdapterContextMenuInfo.class.isInstance(item
-				.getMenuInfo()))
-			return false;
-
-		AdapterView.AdapterContextMenuInfo cmi = (AdapterView.AdapterContextMenuInfo) item
-				.getMenuInfo();
-		
-		Cursor cursor = mAdapter.getCursor();
-		Cursor cursor2 = getCursor();
-		mCursor.moveToPosition(cmi.position);
-		Subscription sub2 = Subscription.getByCursor(cursor);
-		
-		
-		
-		Object o = getListView().getItemAtPosition(cmi.position);
-		Subscription sub = this.getSubscription(o);
-		//Subscription sub2 = this.getSubscription(contextMenuViewID);
-
-		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
-				.getMenuInfo();
-		switch (item.getItemId()) {
-		case R.id.unsubscribe:
-			sub.unsubscribe(getActivity());
-			return true;
-		default:
-			return super.onContextItemSelected(item);
-		}
-	}
-
 	Subscription getSubscription(Object o) {
 		Cursor item = (Cursor) o;
 		Long id = item.getLong(item.getColumnIndex(BaseColumns._ID));

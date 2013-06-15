@@ -9,6 +9,7 @@ import org.bottiger.podcast.adapters.ItemCursorAdapter;
 import org.bottiger.podcast.adapters.viewholders.InlinePlayer;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
+import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.ControlButtons;
 import org.bottiger.podcast.utils.ExpandAnimation;
 
@@ -17,11 +18,17 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.widget.CursorAdapter;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewStub;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 
 public class RecentItemFragment extends PlaylistDSLVFragment {
 
@@ -115,6 +122,41 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 		
 		this.togglePlayer(l, item);
 
+	}
+	
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v,
+			ContextMenuInfo menuInfo) {
+		super.onCreateContextMenu(menu, v, menuInfo);
+		MenuInflater inflater = getActivity().getMenuInflater();
+		inflater.inflate(R.menu.podcast_context, menu);
+		//contextMenuViewID = v. .getId(); //this is where I get the id of my clicked button
+	}
+
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+
+		if (!AdapterView.AdapterContextMenuInfo.class.isInstance(item
+				.getMenuInfo()))
+			return false;
+
+		AdapterView.AdapterContextMenuInfo cmi = (AdapterView.AdapterContextMenuInfo) item
+				.getMenuInfo();
+		
+		Cursor cursor = mAdapter.getCursor();
+		cursor.moveToPosition(cmi.position);
+		FeedItem episode = FeedItem.getByCursor(cursor);
+		Subscription subscription = Subscription.getById(getActivity().getContentResolver(), episode.sub_id);
+
+		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
+				.getMenuInfo();
+		switch (item.getItemId()) {
+		case R.id.unsubscribe:
+			subscription.unsubscribe(getActivity());
+			return true;
+		default:
+			return super.onContextItemSelected(item);
+		}
 	}
 
 	public void showPlayingEpisode(long playingEpisodeID) {

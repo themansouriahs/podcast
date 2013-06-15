@@ -12,6 +12,7 @@ import java.net.URL;
 import org.bottiger.podcast.PodcastBaseFragment.OnItemSelectedListener;
 import org.bottiger.podcast.cloud.CloudProvider;
 import org.bottiger.podcast.cloud.GoogleReader;
+import org.bottiger.podcast.debug.SqliteCopy;
 import org.bottiger.podcast.images.ImageCacheManager;
 import org.bottiger.podcast.images.ImageCacheManager.CacheType;
 import org.bottiger.podcast.images.RequestManager;
@@ -233,11 +234,14 @@ public class MainActivity extends FragmentActivity implements
 			// Tracing is buggy on emulator
 			// Debug.startMethodTracing("calc");
 
-			/*
-			 * if (true) { try { SqliteCopy.backupDatabase(); } catch
-			 * (IOException e) { // TODO Auto-generated catch block
-			 * e.printStackTrace(); } }
-			 */
+			if (true) {
+				try {
+					SqliteCopy.backupDatabase();
+				} catch (IOException e) { // TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
 		}
 
 		if (prefs.getBoolean(SettingsActivity.CLOUD_SUPPORT, true)) {

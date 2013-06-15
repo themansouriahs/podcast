@@ -125,7 +125,7 @@ public class SubscriptionsFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         mFragmentUtils.setAdapter(getSubscriptionCursorAdapter(getActivity(), mFragmentUtils.getCursor()));
-        String condition = SubscriptionColumns.STATUS + "<>'" + Subscription.UNSUBSCRIBED + "'";
+        String condition = SubscriptionColumns.STATUS + "<>" + Subscription.STATUS_UNSUBSCRIBED ;
         mFragmentUtils.startInit(0, SubscriptionColumns.URI, SubscriptionColumns.ALL_COLUMNS, condition, SubscriptionColumns.TITLE + " ASC");
     }
 	
