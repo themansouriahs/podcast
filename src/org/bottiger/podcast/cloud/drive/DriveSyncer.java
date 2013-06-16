@@ -112,7 +112,7 @@ public class DriveSyncer {
 
 	private List<WithIcon> subscriptions = new LinkedList<WithIcon>();
 
-	BulkUpdater mUpdater = new BulkUpdater();
+	private BulkUpdater mUpdater = new BulkUpdater();
 	private Map<String, File> files;
 
 	private Gson gson = new Gson();

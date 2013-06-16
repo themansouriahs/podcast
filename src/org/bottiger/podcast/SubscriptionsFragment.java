@@ -96,8 +96,8 @@ public class SubscriptionsFragment extends Fragment {
 				// position, Toast.LENGTH_SHORT).show();
 				Activity activity = SubscriptionsFragment.this.getActivity();
 				if (activity instanceof MainActivity) {
-					Cursor cursor = (Cursor) SubscriptionsFragment.this
-							.getAdapter().getItem(position);
+					
+					Cursor cursor = (Cursor) mGridView.getAdapter().getItem(position);
 
 					Subscription sub = null;
 					try {

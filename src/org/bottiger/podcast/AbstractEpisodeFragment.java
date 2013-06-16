@@ -1,25 +1,20 @@
 package org.bottiger.podcast;
 
-
 import java.util.HashMap;
 
-import org.bottiger.podcast.R;
-import org.bottiger.podcast.R.id;
-import org.bottiger.podcast.R.menu;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.PodcastOpenHelper;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.service.PodcastDownloadManager;
-import org.bottiger.podcast.utils.Playlist;
+import org.bottiger.podcast.utils.OPMLImportExport;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.content.CursorLoader;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -39,10 +34,10 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 	protected long pref_select;
 
 	protected ListView actualListView = null;
-	
+
 	String showListenedKey = "sowListened";
 	Boolean showListenedVal = true;
-	
+
 	String episodesToShowKey = "episodesToShow";
 	int episodesToShowVal = 20;
 
@@ -77,11 +72,11 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 		case R.id.menu_clear_playlist: {
 			resetPlaylist(getActivity());
 			refreshView();
-			//FeedItem.clearCache();
-			//startInit(10, ItemColumns.URI, ItemColumns.ALL_COLUMNS, getWhere(), getOrder());
-			
-			//mAdapter.changeCursor(getCursor());
-			//mAdapter.notifyDataSetChanged();
+		}
+		case R.id.menu_import: {
+			OPMLImportExport importExport = new OPMLImportExport(getActivity());
+			importExport.importSubscriptions();
+			refreshView();
 		}
 		}
 		return super.onOptionsItemSelected(item);
@@ -108,14 +103,14 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 				ItemColumns.ALL_COLUMNS, condition, null, order)
 				.loadInBackground();
 	}
-	
+
 	public String getWhere() {
 		Boolean showListened = sharedPreferences.getBoolean(showListenedKey,
 				showListenedVal);
 		String where = (showListened) ? "1" : ItemColumns.LISTENED + "== 0";
 		return where;
 	}
-	
+
 	public String getOrder() {
 		return getOrder("DESC", 20);
 	}
@@ -139,23 +134,29 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 	}
 
 	public String getOrder(String inputOrder) {
-//		assert inputOrder != null;
-//
-//		String playingFirst = "";
-//		if (mPlayerServiceBinder != null && mPlayerServiceBinder.getCurrentItem() != null) {
-//			playingFirst = "case " + ItemColumns._ID + " when " + mPlayerServiceBinder.getCurrentItem().getId() + " then 1 else 2 end, ";
-//		}
-//		String prioritiesSecond = "case " + ItemColumns.PRIORITY + " when 0 then 2 else 1 end, " + ItemColumns.PRIORITY + ", ";
-//		String order = playingFirst + prioritiesSecond + ItemColumns.DATE + " " + inputOrder + " LIMIT 20"; // before:
-//		return order;
-		int amount = sharedPreferences.getInt(episodesToShowKey, episodesToShowVal);
+		// assert inputOrder != null;
+		//
+		// String playingFirst = "";
+		// if (mPlayerServiceBinder != null &&
+		// mPlayerServiceBinder.getCurrentItem() != null) {
+		// playingFirst = "case " + ItemColumns._ID + " when " +
+		// mPlayerServiceBinder.getCurrentItem().getId() +
+		// " then 1 else 2 end, ";
+		// }
+		// String prioritiesSecond = "case " + ItemColumns.PRIORITY +
+		// " when 0 then 2 else 1 end, " + ItemColumns.PRIORITY + ", ";
+		// String order = playingFirst + prioritiesSecond + ItemColumns.DATE +
+		// " " + inputOrder + " LIMIT 20"; // before:
+		// return order;
+		int amount = sharedPreferences.getInt(episodesToShowKey,
+				episodesToShowVal);
 		return getOrder(inputOrder, amount);
 	}
-	
+
 	protected void enablePullToRefresh() {
 		enablePullToRefresh(null);
 	}
-	
+
 	protected void enablePullToRefresh(final Subscription subscription) {
 
 		final PullToRefreshListView pullToRefreshView = (PullToRefreshListView) fragmentView
@@ -165,7 +166,8 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 
 			@Override
 			public void onRefresh(PullToRefreshBase<ListView> refreshView) {
-				PodcastDownloadManager.start_update(getActivity(), pullToRefreshView, subscription);
+				PodcastDownloadManager.start_update(getActivity(),
+						pullToRefreshView, subscription);
 			}
 		};
 
@@ -174,7 +176,7 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 				"Refreshing feeds");
 		pullToRefreshView.setOnRefreshListener(pullToRefreshListener);
 	}
-	
+
 	protected static void resetPlaylist(Context context) {
 		// Update the database
 		PodcastOpenHelper helper = new PodcastOpenHelper(context);

@@ -1,4 +1,9 @@
-   <android.support.v4.widget.DrawerLayout>
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+>
+
     <android.support.v4.view.ViewPager
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
@@ -25,14 +30,16 @@
 
     <!-- The navigation drawer -->
 
-        <!-- style="?android:attr/solidBackground" -->
+
+    <!-- style="?android:attr/solidBackground" -->
+
     <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        android:background="?attr/customBackground"
         android:id="@+id/left_drawer"
         android:layout_width="240dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
+        android:background="?attr/customBackground"
         android:orientation="vertical"
         android:padding="10dp" >
 
@@ -72,4 +79,3 @@
     </LinearLayout>
 
 </android.support.v4.widget.DrawerLayout>
-

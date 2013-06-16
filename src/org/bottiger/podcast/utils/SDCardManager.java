@@ -64,7 +64,7 @@ public class SDCardManager {
 		return dir;		
 	}
 	
-	private static String getSDCardDir() {
+	public static String getSDCardDir() {
 		File sdDir = new File(Environment.getExternalStorageDirectory().getPath());
 		return sdDir.getAbsolutePath();
 	}

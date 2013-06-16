@@ -42,11 +42,12 @@ public class OpmlReader {
 					Log.d(TAG, "Reached beginning of document");
 				break;
 			case XmlPullParser.START_TAG:
-				if (xpp.getName().equals(OpmlSymbols.OPML)) {
+				String elementName = xpp.getName();
+				if (elementName.equals(OpmlSymbols.OPML)) {
 					isInOpml = true;
 					if (MainActivity.debugging)
 						Log.d(TAG, "Reached beginning of OPML tree.");
-				} else if (isInOpml && xpp.getName().equals(OpmlSymbols.OUTLINE)) {
+				} else if (isInOpml && elementName.equals(OpmlSymbols.OUTLINE)) {
 					if (MainActivity.debugging)
 						Log.d(TAG, "Found new Opml element");
 					OpmlElement element = new OpmlElement();
@@ -59,7 +60,11 @@ public class OpmlReader {
 						Log.i(TAG, "Title not found, using text");
 						element.setText(xpp.getAttributeValue(null, OpmlSymbols.TEXT));			
 					}
-					element.setXmlUrl(xpp.getAttributeValue(null, OpmlSymbols.XMLURL));
+					String xmlUrl = xpp.getAttributeValue(null, OpmlSymbols.XMLURL);
+					if (xmlUrl != null)
+						element.setXmlUrl(xmlUrl);
+					else
+						element.setXmlUrl(xpp.getAttributeValue(null, OpmlSymbols.URL));
 					element.setHtmlUrl(xpp.getAttributeValue(null, OpmlSymbols.HTMLURL));
 					element.setType(xpp.getAttributeValue(null, OpmlSymbols.TYPE));
 					if (element.getXmlUrl() != null) {

@@ -52,28 +52,6 @@ public abstract class PlaylistDSLVFragment extends AbstractEpisodeFragment {
                     }
                 }
             };
-
-    /*
-         private DragSortListView.DropListener onDrop =
-            new DragSortListView.DropListener() {
-                @Override
-                public void drop(int from, int to) {
-                    if (from != to) {
-                        String item = adapter.getItem(from);
-                        adapter.remove(item);
-                        adapter.insert(item, to);
-                    }
-                }
-            };
-
-    private DragSortListView.RemoveListener onRemove = 
-            new DragSortListView.RemoveListener() {
-                @Override
-                public void remove(int which) {
-                    adapter.remove(adapter.getItem(which));
-                }
-            };
-     */
             
     protected int getLayout() {
         // this DSLV xml declaration does not call for the use

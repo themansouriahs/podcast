@@ -106,17 +106,22 @@ public class SubscriptionGridCursorAdapter extends AbstractGridPodcastAdapter {
 		if (sub != null) {
 
 
-			if (sub.title != null)
+			if (sub.title != null && !sub.title.equals(""))
 				holder.title.setText(sub.title);
+			else
+				holder.title.setText(R.string.subscription_no_title);
 
 
-			if (sub.imageURL != null && !sub.imageURL.equals("")) {
+			String imageURL = sub.imageURL;
+			if (imageURL != null && !imageURL.equals("")) {
 				//ImageLoader imageLoader = getImageLoader(context);
 				//imageLoader.displayImage(sub.imageURL, holder.image);
 				
 				com.android.volley.toolbox.ImageLoader imageLoader = ImageCacheManager
 						.getInstance().getImageLoader();
 				holder.image.setImageUrl(sub.imageURL, imageLoader);
+			} else {
+				holder.image.setImageResource(R.drawable.generic_podcast);
 			}
 
 		}

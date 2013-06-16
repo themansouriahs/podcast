@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="subscription_no_title">(No title)</string>
     <string name="set">Set</string>
     <string name="cancel">Cancel</string>
     <string name="app_name">SoundWaves</string>
@@ -134,6 +135,7 @@
     <string name="queue">Queue</string>
     <string name="menu_download_all">Download All</string>
     <string name="menu_clear_playlist">Clear Playlist</string>
+    <string name="menu_import">Import OPML</string>
     <string name="add_subscription">Add Subscription</string>
     <string name="http_client_name">SoundWaves</string>
     <string name="menu_add_podcast">Add Podcast</string>
