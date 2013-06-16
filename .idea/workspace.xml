@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="15a06d5c-99df-4883-acbe-a96a9733465f" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/local.properties" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bottiger/podcast/cloud/drive/DriveSyncer.java" afterPath="$PROJECT_DIR$/src/org/bottiger/podcast/cloud/drive/DriveSyncer.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bottiger/podcast/MainActivity.java" afterPath="$PROJECT_DIR$/src/org/bottiger/podcast/MainActivity.java" />
     </list>
     <ignored path="HapiPodcastJ.iws" />
     <ignored path=".idea/workspace.xml" />
