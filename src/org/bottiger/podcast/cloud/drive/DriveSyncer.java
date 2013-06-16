@@ -300,10 +300,10 @@ public class DriveSyncer {
 
 			// Insert the feedItems which does not have a DriveID
 			Cursor subscriptionCursor = mProvider.query(uri,
-					SUBSCRIPTION_PROJECTION, SubscriptionColumns.SERVER_ID
+					SUBSCRIPTION_PROJECTION, SubscriptionColumns.REMOTE_ID
 							+ " IS NULL", null, null);
 			Log.d(TAG,
-					"Got local subscriptions: " + subscriptionCursor.getCount());
+					"Got local subscriptions without a remote sync_id: " + subscriptionCursor.getCount());
 
 			for (boolean more = subscriptionCursor.moveToFirst(); more; more = subscriptionCursor
 					.moveToNext()) {
@@ -676,7 +676,7 @@ public class DriveSyncer {
 
 				String content = null;
 				for (File file : files.getItems()) {
-					Log.d(TAG, "found: " + file.getTitle() + " description: "
+					Log.d(TAG, "File Without a sync_id: found: " + file.getTitle() + " description: "
 							+ file.getDescription());
 					// mService.files().delete(file.getId());
 					try {
@@ -931,7 +931,7 @@ public class DriveSyncer {
 				}
 
 				Log.d(TAG,
-						"Got local episodes: " + subscriptionCursor.getCount());
+						"Got local subscriptions: " + subscriptionCursor.getCount());
 
 				List<WithIcon> episodes = new LinkedList<WithIcon>();
 				int counter = 0;
