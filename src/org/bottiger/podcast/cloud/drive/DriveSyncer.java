@@ -713,6 +713,7 @@ public class DriveSyncer {
 		String[] titles = { PLAYLIST_FILENAME, SUBSCRIPTIONS_FILENAME };
 
 		for (int i = 0; i < titles.length; i++) {
+			int filesFound = 0;
 			try {
 				Files.List request = mService
 						.files()
@@ -735,8 +736,9 @@ public class DriveSyncer {
 								key = titles[i];
 							}
 							result.put(key, file);
+							filesFound++;
 
-							if (false) {
+							if (filesFound > 1) {
 								Log.d(TAG, "Delete: " + file.getTitle());
 								mService.files().delete(file.getId()).execute();
 							}
@@ -901,7 +903,6 @@ public class DriveSyncer {
 		List<WithIcon> subscriptions = getSubscriptions();
 		mergeFiles(subscriptions, file, SUBSCRIPTIONS_FILENAME,
 				DataType.SUBSCRIPTION);
-		files.remove(SUBSCRIPTIONS_FILENAME);
 	}
 
 	/**
