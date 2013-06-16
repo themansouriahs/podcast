@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Version 0.15
+------------
+
+* Device Syncing supports podcasts with non ascii characters
+
 Version 0.14
 ------------
 

@@ -1207,7 +1207,7 @@ public class DriveSyncer {
 
 	private String remoteFilename(Subscription subscription) {
 		return EPISODES_PREFIX + "_" + subscription.getId() + "_"
-				+ subscription.getTitle();
+				+ subscription.getTitle().replaceAll("[^\\x00-\\x7F]", "");
 	}
 
 	private String remoteFilename(List<WithIcon> items,
