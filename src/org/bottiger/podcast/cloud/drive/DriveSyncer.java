@@ -198,27 +198,6 @@ public class DriveSyncer {
 			ContentResolver contentResolver = mContext.getContentResolver();
 
 			/*
-			 * Step 1
-			 * 
-			 * Merge playlist if it exists
-			 */
-			if (files.containsKey(PLAYLIST_FILENAME)) {
-				List<WithIcon> playlist = getPlaylist();
-				File file = files.get(PLAYLIST_FILENAME);
-
-				mergeFiles(playlist, file, PLAYLIST_FILENAME, DataType.EPISODE);
-			}
-
-			/*
-			 * Step 2
-			 * 
-			 * Merge Subscriptions with Google Drive (if the file exists)
-			 */
-			if (files.containsKey(SUBSCRIPTIONS_FILENAME)) {
-				mergeSubscriptions(files);
-			}
-
-			/*
 			 * Merge FeedItems with Google Drive
 			 */
 			mergeEpisodes(files);
@@ -237,6 +216,28 @@ public class DriveSyncer {
 
 		// Insert new local files.
 		files = getKeyFiles();
+		
+		/*
+		 * Step 1
+		 * 
+		 * Merge playlist if it exists
+		 */
+		if (files.containsKey(PLAYLIST_FILENAME)) {
+			List<WithIcon> playlist = getPlaylist();
+			File file = files.get(PLAYLIST_FILENAME);
+
+			mergeFiles(playlist, file, PLAYLIST_FILENAME, DataType.EPISODE);
+		}
+
+		/*
+		 * Step 2
+		 * 
+		 * Merge Subscriptions with Google Drive (if the file exists)
+		 */
+		if (files.containsKey(SUBSCRIPTIONS_FILENAME)) {
+			mergeSubscriptions(files);
+		}
+		
 		insertNewLocalFiles();
 
 		// Cleanup legacy files
