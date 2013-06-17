@@ -840,10 +840,18 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 
 	/**
 	 * 
-	 * @return wether the item is downloaded to the phone
+	 * @return whether the item is downloaded to the phone
 	 */
 	public boolean isDownloaded() {
-		return this.isDownloaded;
+		if (!this.isDownloaded)
+			return this.isDownloaded;
+		
+		File f = new File(getAbsolutePath());
+		if (f.exists())
+			return true;
+		
+		isDownloaded = false;
+		return isDownloaded;
 	}
 
 	/**
@@ -889,7 +897,8 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 		if (isDownloaded()) {
 			MediaMetadataRetriever retriever = new MediaMetadataRetriever();
 			try {
-				retriever.setDataSource(getAbsolutePath());
+				String path = getAbsolutePath();
+				retriever.setDataSource(path);
 			} catch (RuntimeException e) {
 				e.printStackTrace();
 				return this.length;
