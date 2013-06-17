@@ -277,7 +277,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 					holder.icon.setImageUrl(item.image, imageLoader);
 
 				} else {
-					holder.icon.setImageResource(R.drawable.generic_podcast);
+					holder.icon.setImageResource(R.drawable.generic_podcast);	
 				}
 
 			}
