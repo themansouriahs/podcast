@@ -11,9 +11,10 @@ public class PodcastOpenHelper extends SQLiteOpenHelper {
 	private final Log log = Log.getLog(getClass());
 
 	private final static int DBVERSION = 16;
+	private final static String DBNAME = "podcast.db";
 
 	public PodcastOpenHelper(Context context) {
-		super(context, "podcast.db", null, DBVERSION);
+		super(context, DBNAME, null, DBVERSION);
 	}
 
 	@Override
@@ -37,11 +38,19 @@ public class PodcastOpenHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		/*
+		if (oldVersion == 16 && newVersion == 17) {
+			// Delete duplicates
+			String sql_delete_duplicates = "DELETE n1 FROM "
+					+ ItemColumns.TABLE_NAME + " n1, " + ItemColumns.TABLE_NAME
+					+ " n2 WHERE n1.id > n2.id AND n1.url = n2.url";
+		}
+		*/
 		if (oldVersion == 15 && newVersion == 16) {
 			// Add new column
 			String new_item_column = "ALTER TABLE " + ItemColumns.TABLE_NAME
 					+ " ADD COLUMN " + ItemColumns.REMOTE_ID + " VARCHAR(128);";
-			
+
 			log.debug("Upgrading database from version 15 to 16");
 			db.execSQL(new_item_column);
 		}
@@ -91,7 +100,8 @@ public class PodcastOpenHelper extends SQLiteOpenHelper {
 
 			// Add new column
 			String new_column = "ALTER TABLE " + SubscriptionColumns.TABLE_NAME
-					+ "_new ADD " + SubscriptionColumns.REMOTE_ID + " VARCHAR(128)";
+					+ "_new ADD " + SubscriptionColumns.REMOTE_ID
+					+ " VARCHAR(128)";
 
 			// Drop old table
 			// http://stackoverflow.com/questions/3675032/drop-existing-table-in-sqlite-when-if-exists-operator-is-not-supported
