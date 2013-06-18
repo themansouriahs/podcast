@@ -223,10 +223,7 @@ public class DriveSyncer {
 		 * Merge playlist if it exists
 		 */
 		if (files.containsKey(PLAYLIST_FILENAME)) {
-			List<WithIcon> playlist = getPlaylist();
-			File file = files.get(PLAYLIST_FILENAME);
-
-			mergeFiles(playlist, file, PLAYLIST_FILENAME, DataType.EPISODE);
+			mergePlaylist();
 		}
 
 		/*
@@ -884,6 +881,10 @@ public class DriveSyncer {
 		if (textFiles.containsKey(SUBSCRIPTIONS_FILENAME)) {
 			mergeSubscriptions(textFiles);
 		}
+		
+		if (textFiles.containsKey(PLAYLIST_FILENAME)) {
+			mergePlaylist();
+		}
 
 		/*
 		 * Merge FeedItems with Google Drive
@@ -893,6 +894,16 @@ public class DriveSyncer {
 		mUpdater.commit(contentResolver);
 
 		// insertNewDriveFiles(textFiles.values());
+	}
+	
+	/**
+	 * Merge the playlist
+	 */
+	private void mergePlaylist() {
+		List<WithIcon> playlist = getPlaylist();
+		File file = files.get(PLAYLIST_FILENAME);
+
+		mergeFiles(playlist, file, PLAYLIST_FILENAME, DataType.EPISODE);
 	}
 
 	/**

@@ -72,6 +72,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bugsense.trace.BugSenseHandler;
+import com.google.android.gms.common.AccountPicker;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
@@ -107,7 +108,7 @@ public class MainActivity extends FragmentActivity implements
 
 	public static Account mAccount;
 
-	public static final boolean debugging = false;
+	public static final boolean debugging = true;
 
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -126,7 +127,7 @@ public class MainActivity extends FragmentActivity implements
 	/**
 	 * The {@link ViewPager} that will host the section contents.
 	 */
-	ViewPager mViewPager;
+	private ViewPager mViewPager;
 
 	private long SubscriptionFeedID = 0;
 
@@ -227,6 +228,13 @@ public class MainActivity extends FragmentActivity implements
 
 		BugSenseHandler.initAndStartSession(MainActivity.this,
 				((SoundWaves) this.getApplication()).getBugSenseAPIKey());
+		
+		setContentView(R.layout.activity_swipe);
+
+		mViewPager = (ViewPager) findViewById(R.id.pager);
+		//View pager2 = (ViewPager) findViewById(R.id.drawer_layout);
+		mViewPager.setAdapter(mSectionsPagerAdapter);
+		mViewPager.setOffscreenPageLimit(3);
 
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -301,8 +309,6 @@ public class MainActivity extends FragmentActivity implements
 		currentTheme = ThemeHelper.getTheme(prefs);
 		setTheme(currentTheme);
 
-		setContentView(R.layout.activity_swipe);
-
 		mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 		mRemoteControlResponder = new ComponentName(getPackageName(),
 				HeadsetReceiver.class.getName());
@@ -321,10 +327,6 @@ public class MainActivity extends FragmentActivity implements
 
 		mFragmentTransition = mFragmentManager.beginTransaction();
 		mSectionsPagerAdapter = new SectionsPagerAdapter(mFragmentManager);
-
-		ViewPager pager = (ViewPager) findViewById(R.id.pager);
-		pager.setAdapter(mSectionsPagerAdapter);
-		pager.setOffscreenPageLimit(3);
 
 		/*
 		 * TabPageIndicator indicator = (TabPageIndicator)
@@ -397,7 +399,6 @@ public class MainActivity extends FragmentActivity implements
 		}
 
 		// Set up the ViewPager with the sections adapter.
-		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
 		/*
 		 * }

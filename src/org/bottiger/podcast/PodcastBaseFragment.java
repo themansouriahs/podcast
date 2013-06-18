@@ -13,9 +13,8 @@ import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.Log;
 import org.bottiger.podcast.utils.StrUtils;
 
-import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
-import uk.co.senab.actionbarpulltorefresh.library.delegate.AbsListViewDelegate;
-
+import uk.co.senab.actionbarpulltorefresh.library.*;
+import uk.co.senab.actionbarpulltorefresh.library.viewdelegates.AbsListViewDelegate;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -179,7 +178,7 @@ public abstract class PodcastBaseFragment extends FixedListFragment implements
 			 * you're using a supported scrollable Views. It is merely in this
 			 * sample to show you how to set a custom delegate.
 			 */
-			ptrOptions.delegate = new AbsListViewDelegate();
+			//ptrOptions.delegate = new AbsListViewDelegate();
 
 			// Here we customise the animations which are used when
 			// showing/hiding the header view
@@ -198,11 +197,12 @@ public abstract class PodcastBaseFragment extends FixedListFragment implements
 
 			// Here we create a PullToRefreshAttacher manually with the Options
 			// instance created above.
-			mPullToRefreshAttacher = new PullToRefreshAttacher(getActivity(),
-					getPullView());
+			//mPullToRefreshAttacher = new PullToRefreshAttacher(getActivity(),
+			//		getPullView());
+			mPullToRefreshAttacher = new PullToRefreshAttacher(getActivity());
 
 			// Set Listener to know when a refresh should be started
-			mPullToRefreshAttacher.setRefreshListener(this);
+			mPullToRefreshAttacher.setRefreshing(true);
 		}
 
 	}
