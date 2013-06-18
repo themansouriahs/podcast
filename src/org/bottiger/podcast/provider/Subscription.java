@@ -423,6 +423,10 @@ public class Subscription extends AbstractItem {
 	public String getImageURL() {
 		return imageURL;
 	}
+	
+	public String getUrl() {
+		return url;
+	}
 
 	/**
 	 * Run whenever the subscription has been updated to google drive
