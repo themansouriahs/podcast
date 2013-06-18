@@ -1,6 +1,5 @@
 package org.bottiger.podcast.service;
 
-
 import java.io.File;
 import java.net.URL;
 import java.util.HashSet;
@@ -13,12 +12,15 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.bottiger.podcast.MainActivity;
+import org.bottiger.podcast.images.RequestManager;
 import org.bottiger.podcast.parser.FeedParserWrapper;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.LockHandler;
+import org.bottiger.podcast.utils.Log;
 import org.bottiger.podcast.utils.SDCardManager;
+import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.app.DownloadManager;
@@ -33,6 +35,11 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 public class PodcastDownloadManager {
@@ -107,8 +114,49 @@ public class PodcastDownloadManager {
 		if (mUpdateLock.locked() == false)
 			return;
 
-		new UpdateSubscriptions(context, pullToRefreshView, subscription)
-				.execute();
+		/*
+		 * Replaced by Volley new UpdateSubscriptions(context,
+		 * pullToRefreshView, subscription) .execute();
+		 */
+
+		// FIXME
+		// Perhaps we should do this in the background in the future
+		RequestQueue requestQueue = RequestManager.getRequestQueue();
+		final FeedParserWrapper feedParser = new FeedParserWrapper(context);
+
+		Cursor subscriptionCursor = Subscription.allAsCursor(context
+				.getContentResolver());
+
+		while (subscriptionCursor.moveToNext()) {
+
+			Subscription sub = Subscription.getByCursor(subscriptionCursor);
+
+			// Create a json request intended to fetching json data
+			JsonObjectRequest jr = new JsonObjectRequest(Request.Method.GET,
+					sub.getUrl(), null, createGetSuccessListener(feedParser,
+							sub), createGetFailureListener());
+
+			// Add the request to Volley
+			requestQueue.add(jr);
+		}
+	}
+
+	private static Response.Listener<JSONObject> createGetSuccessListener(final FeedParserWrapper feedParser, final Subscription subscription) {
+		return new Response.Listener<JSONObject>() {
+			@Override
+			public void onResponse(JSONObject response) {
+				//feedParser.feedParser(response, subscription);
+			}
+		};
+	}
+
+	private static Response.ErrorListener createGetFailureListener() {
+		return new Response.ErrorListener() {
+			@Override
+			public void onErrorResponse(VolleyError error) {
+				// Handle error
+			}
+		};
 	}
 
 	/**

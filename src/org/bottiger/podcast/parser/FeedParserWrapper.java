@@ -1,6 +1,5 @@
 package org.bottiger.podcast.parser;
 
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -55,6 +54,7 @@ public class FeedParserWrapper {
 	private final Log log = Log.getLog(getClass());
 	private Context mContext;
 	private ContentResolver cr;
+	private SimpleDateFormat dt = new SimpleDateFormat(FeedItem.default_format);
 
 	private SharedPreferences sharedPrefs;
 
@@ -64,13 +64,12 @@ public class FeedParserWrapper {
 		this.mContext = context;
 		this.cr = context.getContentResolver();
 		sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-
 	}
 
 	public void parse(Subscription subscription) {
 
 		// try {
-		jsonParser(subscription, mostRecentItem);
+		jsonFetcherAndParser(subscription, mostRecentItem);
 		/*
 		 * If we can't parse the feed with RSSFeed we try with ROME
 		 */
@@ -88,12 +87,12 @@ public class FeedParserWrapper {
 	 * @param subscription
 	 * @param recentItem
 	 */
-	private void jsonParser(Subscription subscription, FeedItem recentItem) {
+	private void jsonFetcherAndParser(Subscription subscription,
+			FeedItem recentItem) {
 
 		String baseURL = "http://feeds.gpodder.net/parse?url=";
 		String extraHeader = "Accept";
 		String extraHeaderValue = "application/json";
-		SimpleDateFormat dt = new SimpleDateFormat(FeedItem.default_format);
 
 		ArrayList<FeedItem> rssEpisodes = new ArrayList<FeedItem>();
 
@@ -120,60 +119,61 @@ public class FeedParserWrapper {
 
 				JSONArray episodeDataObject = (JSONArray) mainDataObject
 						.get("episodes");
-				
+
 				if (episodeDataObject != null) {
 					int numOfEpisodes = episodeDataObject.size();
-				for (int i = 0; i < numOfEpisodes; i++) {
-					FeedItem item = new FeedItem();
+					for (int i = 0; i < numOfEpisodes; i++) {
+						FeedItem item = new FeedItem();
 
-					JSONObject episode = (JSONObject) episodeDataObject.get(i);
-					Number duration = (Number) episode.get("duration");
+						JSONObject episode = (JSONObject) episodeDataObject
+								.get(i);
+						Number duration = (Number) episode.get("duration");
 
-					JSONArray fileData = (JSONArray) episode.get("files");
-					if (fileData.size() > 0) {
+						JSONArray fileData = (JSONArray) episode.get("files");
+						if (fileData.size() > 0) {
 
-						JSONObject files = (JSONObject) fileData.get(0);
+							JSONObject files = (JSONObject) fileData.get(0);
 
-						String episodeURL = "";
-						JSONArray urlsData = (JSONArray) files.get("urls");
-						if (urlsData.size() > 0) {
-							episodeURL = (String) urlsData.get(0);
-						} else {
-							episodeURL = (String) episode.get("link");
+							String episodeURL = "";
+							JSONArray urlsData = (JSONArray) files.get("urls");
+							if (urlsData.size() > 0) {
+								episodeURL = (String) urlsData.get(0);
+							} else {
+								episodeURL = (String) episode.get("link");
+							}
+
+							item.type = (String) files.get("mimetype");
+							Number filesize = (Number) files.get("filesize");
+							Number episodeNumber = (Number) files.get("number");
+
+							Number released = (Number) episode.get("released");
+							Date time = null;
+							if (released != null)
+								time = new Date(released.longValue() * 1000);
+
+							if (time != null)
+								item.date = dt.format(time);
+							if (duration != null) {
+								item.duration_ms = duration.intValue() * 1000;
+								item.duration_string = StrUtils
+										.formatTime(item.duration_ms);
+							}
+
+							if (filesize != null)
+								item.filesize = filesize.intValue();
+							if (episodeNumber != null)
+								item.setEpisodeNumber(episodeNumber.intValue());
+							item.image = image;
+							item.url = episodeURL;
+							item.resource = item.url;
+
+							item.title = (String) episode.get("title");
+							item.author = (String) episode.get("author");
+							item.content = (String) episode.get("description");
+
+							rssEpisodes.add(item);
 						}
-
-						item.type = (String) files.get("mimetype");
-						Number filesize = (Number) files.get("filesize");
-						Number episodeNumber = (Number) files.get("number");
-
-						Number released = (Number) episode.get("released");
-						Date time = null;
-						if (released != null)
-							time = new Date(released.longValue() * 1000);
-
-						if (time != null)
-							item.date = dt.format(time);
-						if (duration != null) {
-							item.duration_ms = duration.intValue() * 1000;
-							item.duration_string = StrUtils
-									.formatTime(item.duration_ms);
-						}
-
-						if (filesize != null)
-							item.filesize = filesize.intValue();
-						if (episodeNumber != null)
-							item.setEpisodeNumber(episodeNumber.intValue());
-						item.image = image;
-						item.url = episodeURL;
-						item.resource = item.url;
-
-						item.title = (String) episode.get("title");
-						item.author = (String) episode.get("author");
-						item.content = (String) episode.get("description");
-
-						rssEpisodes.add(item);
 					}
-				}
 				}
 			}
 
@@ -188,6 +188,99 @@ public class FeedParserWrapper {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * Parses a json Object an updates the feed
+	 * 
+	 * @param jsonArray
+	 * @param subscription
+	 */
+	public void feedParser(JSONObject jsonObject, Subscription subscription) {
+		ArrayList<FeedItem> episodes = jsonParser(jsonObject, subscription);
+		updateFeed(subscription, episodes);
+		PodcastDownloadManager.startDownload(mContext);
+	}
+
+	/**
+	 * 
+	 * @param jsonArray
+	 * @param subscription
+	 * @return
+	 */
+	private ArrayList<FeedItem> jsonParser(JSONObject jsonObject, Subscription subscription) {
+		ArrayList<FeedItem> jsonEpisodes = new ArrayList<FeedItem>();
+		JSONArray mainArray = (JSONArray) jsonObject.get("hej");
+		
+		if (mainArray != null) {
+			JSONObject mainDataObject = (JSONObject) mainArray.get(0);
+
+			String image = "";
+
+			if (mainDataObject.get("logo") != null)
+				image = mainDataObject.get("logo").toString();
+
+			updateSubscription(subscription, mainDataObject, cr);
+
+			JSONArray episodeDataObject = (JSONArray) mainDataObject
+					.get("episodes");
+			
+			if (episodeDataObject != null) {
+				int numOfEpisodes = episodeDataObject.size();
+			for (int i = 0; i < numOfEpisodes; i++) {
+				FeedItem item = new FeedItem();
+
+				JSONObject episode = (JSONObject) episodeDataObject.get(i);
+				Number duration = (Number) episode.get("duration");
+
+				JSONArray fileData = (JSONArray) episode.get("files");
+				if (fileData.size() > 0) {
+
+					JSONObject files = (JSONObject) fileData.get(0);
+
+					String episodeURL = "";
+					JSONArray urlsData = (JSONArray) files.get("urls");
+					if (urlsData.size() > 0) {
+						episodeURL = (String) urlsData.get(0);
+					} else {
+						episodeURL = (String) episode.get("link");
+					}
+
+					item.type = (String) files.get("mimetype");
+					Number filesize = (Number) files.get("filesize");
+					Number episodeNumber = (Number) files.get("number");
+
+					Number released = (Number) episode.get("released");
+					Date time = null;
+					if (released != null)
+						time = new Date(released.longValue() * 1000);
+
+					if (time != null)
+						item.date = dt.format(time);
+					if (duration != null) {
+						item.duration_ms = duration.intValue() * 1000;
+						item.duration_string = StrUtils
+								.formatTime(item.duration_ms);
+					}
+
+					if (filesize != null)
+						item.filesize = filesize.intValue();
+					if (episodeNumber != null)
+						item.setEpisodeNumber(episodeNumber.intValue());
+					item.image = image;
+					item.url = episodeURL;
+					item.resource = item.url;
+
+					item.title = (String) episode.get("title");
+					item.author = (String) episode.get("author");
+					item.content = (String) episode.get("description");
+
+					jsonEpisodes.add(item);
+				}
+			}
+		}
+		}
+		return jsonEpisodes;
 	}
 
 	private void updateSubscription(Subscription subscription,
@@ -371,47 +464,48 @@ public class FeedParserWrapper {
 				"pref_download_on_update", true);
 
 		if (!items.isEmpty()) {
-		
-		// Sort the items to find the oldest
-		Collections.sort(items);
-		FeedItem oldestItem = items.get(items.size() - 1);
 
-		HashMap<String, FeedItem> databaseItems = FeedItem.allAsList(cr,
-				subscription, oldestItem.getDate());
+			// Sort the items to find the oldest
+			Collections.sort(items);
+			FeedItem oldestItem = items.get(items.size() - 1);
 
-		// we iterate over all the input items
-		for (FeedItem item : items) {
+			HashMap<String, FeedItem> databaseItems = FeedItem.allAsList(cr,
+					subscription, oldestItem.getDate());
 
-			// and if the item is not included in the database already we add it
-			if (!databaseItems.containsKey(item.getURL())) {
+			// we iterate over all the input items
+			for (FeedItem item : items) {
 
-				Long itemDate = item.getLongDate();
+				// and if the item is not included in the database already we
+				// add it
+				if (!databaseItems.containsKey(item.getURL())) {
 
-				if (itemDate > update_date) {
-					update_date = itemDate;
+					Long itemDate = item.getLongDate();
+
+					if (itemDate > update_date) {
+						update_date = itemDate;
+					}
+					item = addItem(subscription, item);
+					add_num++;
+
+					/*
+					 * Download podcasts
+					 */
+					if (autoDownload && item != null) {
+						PodcastDownloadManager.addItemToQueue(item);
+					}
+
+					subscription.fail_count = 0;
+					subscription.lastItemUpdated = update_date;
+					subscription.update(cr);
+
+					log.debug("add url: " + subscription.url + "\n add num = "
+							+ add_num);
 				}
-				item = addItem(subscription, item);
-				add_num++;
-
-				/*
-				 * Download podcasts
-				 */
-				if (autoDownload && item != null) {
-					PodcastDownloadManager.addItemToQueue(item);
-				}
-
-				subscription.fail_count = 0;
-				subscription.lastItemUpdated = update_date;
-				subscription.update(cr);
-
-				log.debug("add url: " + subscription.url + "\n add num = "
-						+ add_num);
 			}
-		}
 
-		return add_num;
+			return add_num;
 		}
-	return 0;
+		return 0;
 	}
 
 	private synchronized FeedItem addItem(Subscription subscription,
