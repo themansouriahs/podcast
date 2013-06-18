@@ -681,7 +681,7 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 			statusText = "Downloading: " + getProgress(downloadManager);
 			break;
 		case DONE:
-			statusText = "Done";
+			statusText = "Downloaded";
 			break;
 		case ERROR:
 			statusText = "Error";
@@ -734,12 +734,11 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 
 		if (SDCardManager.getSDCardStatus()) {
 			try {
+				downloadReferenceID = -1;
+				setDownloaded(false);
+				update(contentResolver);
 				File file = new File(getAbsolutePath());
-
 				if (file.exists() && file.delete()) {
-					downloadReferenceID = -1;
-					setDownloaded(false);
-					update(contentResolver);
 					return true;
 				}
 			} catch (Exception e) {
@@ -802,7 +801,8 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 	 *            the filename to set
 	 */
 	public void setFilename(String filename) {
-		this.filename = filename;
+		// Remove non ascii characters
+		this.filename = filename.replaceAll("[^\\x00-\\x7F]", "");
 	}
 
 	public String getAbsolutePath() {

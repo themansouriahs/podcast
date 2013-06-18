@@ -1,6 +1,5 @@
 package org.bottiger.podcast.provider;
 
-
 import java.util.HashMap;
 
 import org.bottiger.podcast.utils.Log;
@@ -19,7 +18,7 @@ import android.text.TextUtils;
 public class PodcastProvider extends ContentProvider {
 
 	public static final String AUTHORITY = PodcastProvider.class.getName();
-			//.toLowerCase();
+	// .toLowerCase();
 
 	private static final int TYPE_ALL_SUBSCRIPTIONS = 0;
 	private static final int TYPE_SINGLE_SUBSCRIPTION = 1;
@@ -87,8 +86,7 @@ public class PodcastProvider extends ContentProvider {
 		case TYPE_SINGLE_SUBSCRIPTION:
 			qb.setTables(SubscriptionColumns.TABLE_NAME);
 			qb.setProjectionMap(sSubProjectionMap);
-			qb.appendWhere(BaseColumns._ID + "="
-					+ uri.getPathSegments().get(1));
+			qb.appendWhere(BaseColumns._ID + "=" + uri.getPathSegments().get(1));
 
 			// String s_id = uri.getPathSegments().get(1);
 			// c = db.query(SubscriptionColumns.TABLE_NAME, projection,
@@ -109,9 +107,7 @@ public class PodcastProvider extends ContentProvider {
 		case TYPE_SINGLE_ITEM:
 			qb.setTables(ItemColumns.TABLE_NAME);
 			qb.setProjectionMap(sItemProjectionMap);
-			qb
-					.appendWhere(BaseColumns._ID + "="
-							+ uri.getPathSegments().get(1));
+			qb.appendWhere(BaseColumns._ID + "=" + uri.getPathSegments().get(1));
 			// String i_id = uri.getPathSegments().get(1);
 			// c = db.query(ItemColumns.TABLE_NAME, projection, ItemColumns._ID
 			// + "=" + i_id, null, null, null, null);
@@ -156,14 +152,26 @@ public class PodcastProvider extends ContentProvider {
 		case TYPE_ALL_ITEMS:
 
 			try {
-				values = ItemColumns.checkValues(initialValues, uri);
-				id = db.insertOrThrow(ItemColumns.TABLE_NAME,
-						ItemColumns.RESOURCE, values);
-				if (id > 0) {
-					newUri = ContentUris.withAppendedId(ItemColumns.URI, id);
-					getContext().getContentResolver()
-							.notifyChange(newUri, null);
-					return newUri;
+				/**
+				 * FIXME Hardcode UNIQUE URL
+				 */
+				String url = initialValues.getAsString(ItemColumns.URL);
+				FeedItem testItem = FeedItem.getByURL(getContext()
+						.getContentResolver(), url);
+				if (testItem != null) {
+					throw new Exception("Duplicate URL for FeedItem");
+				} else {
+
+					values = ItemColumns.checkValues(initialValues, uri);
+					id = db.insertOrThrow(ItemColumns.TABLE_NAME,
+							ItemColumns.RESOURCE, values);
+					if (id > 0) {
+						newUri = ContentUris
+								.withAppendedId(ItemColumns.URI, id);
+						getContext().getContentResolver().notifyChange(newUri,
+								null);
+						return newUri;
+					}
 				}
 			} catch (Exception e) {
 				log.warn("Failed to insert item into", e);
