@@ -19,7 +19,7 @@ public class PodcastProgressBar extends SeekBar {
     private long mLastSeekEventTime;
     private boolean mFromTouch;
     
-    protected final Log log = Log.getLog(getClass());
+    protected final PodcastLog log = PodcastLog.getLog(getClass());
 	
 	private OnSeekBarChangeListener mSeekListener = new OnSeekBarChangeListener() {
         @Override

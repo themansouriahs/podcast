@@ -8,7 +8,7 @@ import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
-import org.bottiger.podcast.utils.Log;
+import org.bottiger.podcast.utils.PodcastLog;
 import org.bottiger.podcast.utils.Playlist;
 
 import android.app.Notification;
@@ -61,7 +61,7 @@ public class PlayerService extends Service implements
 
 	private static final String ORDER = ItemColumns.FAIL_COUNT + " ASC";
 
-	private final Log log = Log.getLog(getClass());
+	private final PodcastLog log = PodcastLog.getLog(getClass());
 
 	MyPlayer mPlayer = null;
 	private NotificationManager mNotificationManager;

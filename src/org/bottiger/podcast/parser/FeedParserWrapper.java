@@ -24,7 +24,7 @@ import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.gpodder.GPodderSubscriptionWrapper;
 import org.bottiger.podcast.service.PodcastDownloadManager;
-import org.bottiger.podcast.utils.Log;
+import org.bottiger.podcast.utils.PodcastLog;
 import org.bottiger.podcast.utils.StrUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -39,6 +39,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
+import android.util.Log;
 
 import com.google.code.rome.android.repackaged.com.sun.syndication.feed.synd.SyndEntry;
 import com.google.code.rome.android.repackaged.com.sun.syndication.feed.synd.SyndFeed;
@@ -55,7 +56,7 @@ import com.google.gson.Gson;
  */
 public class FeedParserWrapper {
 
-	private final Log log = Log.getLog(getClass());
+	private final PodcastLog log = PodcastLog.getLog(getClass());
 	private Context mContext;
 	private ContentResolver cr;
 	private SimpleDateFormat dt = new SimpleDateFormat(FeedItem.default_format);
@@ -201,7 +202,10 @@ public class FeedParserWrapper {
 	 * @param subscription
 	 */
 	public void feedParser(org.json.JSONArray jsonArray) {
+		long start = System.currentTimeMillis();
 		GPodderSubscriptionWrapper subscriptionWrapper = jsonParser(jsonArray);
+		long end = System.currentTimeMillis();
+		Log.d("Parser Profiler", "gson time: " + (end-start));
 		if (subscriptionWrapper != null) { // FIXME this should not be null
 			Subscription subscription = subscriptionWrapper.getSubscription(cr);
 			ArrayList<FeedItem> episodes = subscriptionWrapper.getEpisodes(cr); // Optimize?

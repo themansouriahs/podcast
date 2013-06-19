@@ -39,7 +39,7 @@ public class FragmentUtils {
 	private OnItemSelectedListener mListener;
 	private Cursor mCursor;
 
-	protected final Log log = Log.getLog(getClass());
+	protected final PodcastLog log = PodcastLog.getLog(getClass());
 	
 	public void startInit(int id, Uri columns, String[] projection,
 			String condition, String order) {

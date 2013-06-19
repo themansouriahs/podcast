@@ -12,7 +12,7 @@ import java.util.zip.GZIPInputStream;
 
 import org.bottiger.podcast.PodcastBaseFragment;
 import org.bottiger.podcast.provider.FeedItem;
-import org.bottiger.podcast.utils.Log;
+import org.bottiger.podcast.utils.PodcastLog;
 
 import android.content.ContentResolver;
 import android.os.AsyncTask;
@@ -24,7 +24,7 @@ public class FeedFetcher {
 	private static final int TIMEOUT = 10 * 1000;
 	private boolean canceled = false;
 	private String mAgent;
-	protected final Log log = Log.getLog(getClass());
+	protected final PodcastLog log = PodcastLog.getLog(getClass());
 
     private static final int[] mp3Sig = { 0x49, 0x44, 0x33};
     

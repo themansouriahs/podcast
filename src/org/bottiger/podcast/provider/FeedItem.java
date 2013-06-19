@@ -12,7 +12,7 @@ import java.util.Locale;
 
 import org.bottiger.podcast.service.DownloadStatus;
 import org.bottiger.podcast.service.PodcastDownloadManager;
-import org.bottiger.podcast.utils.Log;
+import org.bottiger.podcast.utils.PodcastLog;
 import org.bottiger.podcast.utils.SDCardManager;
 import org.bottiger.podcast.utils.StrUtils;
 import org.json.simple.JSONObject;
@@ -40,7 +40,7 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 
 	public static final int MAX_DOWNLOAD_FAIL = 5;
 
-	private final Log log = Log.getLog(getClass());
+	private final PodcastLog log = PodcastLog.getLog(getClass());
 	private static ItemLruCache cache = null;
 
 	private BulkUpdater mBulkUpdater = null;

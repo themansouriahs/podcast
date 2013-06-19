@@ -1,6 +1,6 @@
 package org.bottiger.podcast.provider;
 
-import org.bottiger.podcast.utils.Log;
+import org.bottiger.podcast.utils.PodcastLog;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class PodcastOpenHelper extends SQLiteOpenHelper {
 
-	private final Log log = Log.getLog(getClass());
+	private final PodcastLog log = PodcastLog.getLog(getClass());
 
 	private final static int DBVERSION = 16;
 	private final static String DBNAME = "podcast.db";

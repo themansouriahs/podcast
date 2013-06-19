@@ -234,6 +234,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 				if (item.title != null) {
 					String title = item.title;
 					int priority = item.getPriority();
+					long lastUpdate = item.getLastUpdate();
 
 					if (priority > 0) {
 						title = priority + " # " + title;

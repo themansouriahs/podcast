@@ -3,7 +3,7 @@ package org.bottiger.podcast.service;
 import org.bottiger.podcast.SettingsActivity;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.receiver.PodcastUpdateReceiver;
-import org.bottiger.podcast.utils.Log;
+import org.bottiger.podcast.utils.PodcastLog;
 
 import android.app.AlarmManager;
 import android.app.IntentService;
@@ -37,7 +37,7 @@ public class PodcastService extends IntentService {
 	
 	public static final int UPDATE_PODCAST = 100;
 	
-	private final Log log = Log.getLog(getClass());
+	private final PodcastLog log = PodcastLog.getLog(getClass());
 
 	public static final String UPDATE_DOWNLOAD_STATUS = PodcastService.class
 			.getName() + ".UPDATE_DOWNLOAD_STATUS";

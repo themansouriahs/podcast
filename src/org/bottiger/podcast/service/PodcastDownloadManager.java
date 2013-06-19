@@ -33,6 +33,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.RequestQueue;
@@ -191,7 +192,10 @@ public class PodcastDownloadManager {
 		}
 	     protected Void doInBackground(JSONArray... response) {
 				Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+				long start = System.currentTimeMillis();
 				feedParser.feedParser(response[0]);
+				long end = System.currentTimeMillis();
+				Log.d("Parser Profiler", "total time: " + (end-start));
 				return null;
 	     }
 	}

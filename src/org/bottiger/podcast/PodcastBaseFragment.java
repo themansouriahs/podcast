@@ -10,7 +10,7 @@ import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.PlayerService;
-import org.bottiger.podcast.utils.Log;
+import org.bottiger.podcast.utils.PodcastLog;
 import org.bottiger.podcast.utils.StrUtils;
 
 import uk.co.senab.actionbarpulltorefresh.library.*;
@@ -79,7 +79,7 @@ public abstract class PodcastBaseFragment extends FixedListFragment implements
 
 	OnItemSelectedListener mListener;
 
-	protected final Log log = Log.getLog(getClass());
+	protected final PodcastLog log = PodcastLog.getLog(getClass());
 
 	private long mLastSeekEventTime;
 	private boolean mFromTouch;

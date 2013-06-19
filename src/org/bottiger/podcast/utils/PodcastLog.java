@@ -1,6 +1,6 @@
 package org.bottiger.podcast.utils;
 
-public class Log {
+public class PodcastLog {
 
 	public final static int  VERBOSE = 0;
 	
@@ -16,17 +16,17 @@ public class Log {
 	private int  level;
 	private static final String TAG = "PODCAST";
 	
-	public static Log getDebugLog(Class<?> clazz, int l) {
-		Log log = new Log(clazz);
+	public static PodcastLog getDebugLog(Class<?> clazz, int l) {
+		PodcastLog log = new PodcastLog(clazz);
 		log.level = l;
 		return log;
 	}	
 
-	public static Log getLog(Class<?> clazz) {
-		return new Log(clazz);
+	public static PodcastLog getLog(Class<?> clazz) {
+		return new PodcastLog(clazz);
 	}
 
-	public Log(Class<?> clazz) {
+	public PodcastLog(Class<?> clazz) {
 		this.clazz = "[" + clazz.getSimpleName() + "] ";
 		level = DEFAULT_LEVEL;
 	}

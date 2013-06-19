@@ -14,7 +14,7 @@ import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionColumns;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.DialogMenu;
-import org.bottiger.podcast.utils.Log;
+import org.bottiger.podcast.utils.PodcastLog;
 import org.bottiger.podcast.utils.StrUtils;
 
 import android.content.ComponentName;
@@ -50,7 +50,7 @@ import com.mobeta.android.dslv.SimpleDragSortCursorAdapter;
 public class PlayerFragment   extends PodcastBaseFragment
 {
 	protected  static PlayerService mServiceBinder = null;
-	protected final Log log = Log.getLog(getClass());
+	protected final PodcastLog log = PodcastLog.getLog(getClass());
 	protected static ComponentName mService = null;
 	
 	private static final int MENU_OPEN_AUDIO = Menu.FIRST + 1;

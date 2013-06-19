@@ -27,7 +27,7 @@ import org.bottiger.podcast.service.PodcastService;
 import org.bottiger.podcast.utils.AddPodcastDialog;
 import org.bottiger.podcast.utils.ControlButtons;
 import org.bottiger.podcast.utils.DriveUtils;
-import org.bottiger.podcast.utils.Log;
+import org.bottiger.podcast.utils.PodcastLog;
 import org.bottiger.podcast.utils.ThemeHelper;
 
 import android.accounts.Account;
@@ -103,7 +103,7 @@ public class MainActivity extends FragmentActivity implements
 
 	protected static Cursor mCursor = null;
 	protected boolean mInit = false;
-	protected final Log log = Log.getDebugLog(getClass(), 0);
+	protected final PodcastLog log = PodcastLog.getDebugLog(getClass(), 0);
 	protected static ComponentName mService = null;
 
 	public static Account mAccount;
@@ -155,53 +155,7 @@ public class MainActivity extends FragmentActivity implements
 			// String out = mHTTPDServiceBinder.getTest();
 			// android.util.Log.d("nanoHTTPD", out);
 
-			new Thread(new Runnable() {
-				public void run() {
-					URL url = null;
-					HttpURLConnection connection = null;
-					try {
-						url = new URL("http://127.0.0.1:8080/test");
-						connection = (HttpURLConnection) url.openConnection();
-					} catch (MalformedURLException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-					InputStream in = null;
-					try {
-						// Read the response.
-						in = connection.getInputStream();
-						// byte[] response = readFully(in);
-						// return new String(response, "UTF-8");
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					InputStream bin = new BufferedInputStream(in);
-
-					BufferedReader r = new BufferedReader(
-							new InputStreamReader(bin));
-
-					StringBuilder total = new StringBuilder();
-					String line;
-					try {
-						while ((line = r.readLine()) != null) {
-							total.append(line);
-						}
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-					String res = total.toString();
-					res = res + "sdfd";
-					res = res + "123";
-
-				}
-			}).start();
+			// init webserver
 
 		}
 

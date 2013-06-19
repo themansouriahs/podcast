@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.bottiger.podcast.MainActivity;
-import org.bottiger.podcast.utils.Log;
+import org.bottiger.podcast.utils.PodcastLog;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -25,7 +25,7 @@ import android.support.v4.util.LruCache;
 
 public class Subscription extends AbstractItem {
 
-	private final Log log = Log.getLog(getClass());
+	private final PodcastLog log = PodcastLog.getLog(getClass());
 
 	public final static int ADD_SUCCESS = 0;
 	public final static int ADD_FAIL_DUP = -1;

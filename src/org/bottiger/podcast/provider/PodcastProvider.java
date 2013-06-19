@@ -2,7 +2,7 @@ package org.bottiger.podcast.provider;
 
 import java.util.HashMap;
 
-import org.bottiger.podcast.utils.Log;
+import org.bottiger.podcast.utils.PodcastLog;
 
 import android.content.ContentProvider;
 import android.content.ContentUris;
@@ -25,7 +25,7 @@ public class PodcastProvider extends ContentProvider {
 	private static final int TYPE_ALL_ITEMS = 2;
 	private static final int TYPE_SINGLE_ITEM = 3;
 
-	private final Log log = Log.getLog(getClass());
+	private final PodcastLog log = PodcastLog.getLog(getClass());
 
 	private PodcastOpenHelper mHelper = null;
 

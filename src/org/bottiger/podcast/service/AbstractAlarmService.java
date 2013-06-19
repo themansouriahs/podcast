@@ -1,6 +1,6 @@
 package org.bottiger.podcast.service;
 
-import org.bottiger.podcast.utils.Log;
+import org.bottiger.podcast.utils.PodcastLog;
 
 import android.app.AlarmManager;
 import android.app.IntentService;
@@ -24,7 +24,7 @@ public abstract class AbstractAlarmService extends IntentService {
 	private final String BASETAG = "wakelock";
 	private final String TAG;
 	
-	private final Log log = Log.getLog(getClass());
+	private final PodcastLog log = PodcastLog.getLog(getClass());
 	
 	/**
 	 * Do the actual work when the alarm fires
