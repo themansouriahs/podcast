@@ -159,13 +159,17 @@ public class PodcastDownloadManager {
 	static class MyResponseListener implements Listener<JSONArray> {
 
 		final FeedParserWrapper feedParser;
+		final VolleyResultParser volleyResultParser;
 
 		public MyResponseListener(FeedParserWrapper feedParser) {
 			this.feedParser = feedParser;
+			this.volleyResultParser = new VolleyResultParser(feedParser);
 		}
 
 		@Override
 		public void onResponse(JSONArray response) {
+			volleyResultParser.execute(response);
+			/*
 			final JSONArray finalResponse = response;
 			new Thread(new Runnable() {
 				public void run() {
@@ -173,9 +177,25 @@ public class PodcastDownloadManager {
 					feedParser.feedParser(finalResponse);
 				}
 			}).start();
+			*/
 		}
 
 	}
+	
+	private static class VolleyResultParser extends AsyncTask<JSONArray, Void, Void> {
+		
+		FeedParserWrapper feedParser = null;
+
+		public VolleyResultParser(FeedParserWrapper feedParser) {
+			this.feedParser = feedParser;
+		}
+	     protected Void doInBackground(JSONArray... response) {
+				Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+				feedParser.feedParser(response[0]);
+				return null;
+	     }
+	}
+
 
 	private static Response.Listener<JSONArray> createGetSuccessListener(
 			final FeedParserWrapper feedParser, final Subscription subscription) {

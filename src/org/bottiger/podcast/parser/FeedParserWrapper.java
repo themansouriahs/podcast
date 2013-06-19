@@ -426,11 +426,11 @@ public class FeedParserWrapper {
 			Collections.sort(items);
 			FeedItem oldestItem = items.get(items.size() - 1);
 
-			/*
+			
 			HashMap<String, FeedItem> databaseItems = FeedItem.allAsList(cr,
 					subscription, oldestItem.getDate());
-					*/
-			HashMap<String, FeedItem> databaseItems = FeedItem.allAsList(cr, subscription, null);
+			
+			//HashMap<String, FeedItem> databaseItems = FeedItem.allAsList(cr, subscription, null);
 			
 			BulkUpdater bulkUpdater = new BulkUpdater();
 
@@ -440,7 +440,7 @@ public class FeedParserWrapper {
 				// and if the item is not included in the database already we
 				// add it
 				String url = item.getURL();
-				if (!databaseItems.containsKey(url)) {
+				if (databaseItems != null && !databaseItems.containsKey(url)) {
 
 					Long itemDate = item.getLongDate();
 
@@ -489,7 +489,7 @@ public class FeedParserWrapper {
 				new String[] { BaseColumns._ID }, where, null, null);
 
 		if (cursor.moveToFirst()) {
-			item.update(cr);
+			updater.addOperation(item.update(cr, true, true));
 			log.debug("Updating episode: " + item.title + "(" + item.image + ")");
 		} else {
 			Uri insertedUri = item.insert(cr);

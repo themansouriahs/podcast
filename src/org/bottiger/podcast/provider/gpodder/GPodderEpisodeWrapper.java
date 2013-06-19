@@ -44,34 +44,48 @@ public class GPodderEpisodeWrapper {
 
 		SimpleDateFormat dt = new SimpleDateFormat(FeedItem.default_format);
 
-		FeedItem episode = FeedItem.getByURL(contentResolver, link);
-		if (episode == null) {
-			episode = new FeedItem();
-		}
-
-		Date time = new Date(released * 1000);
-
-		episode.setTitle(title);
-		episode.sub_title = subtitle;
-		episode.content = content;
-		episode.date = dt.format(time);
-		episode.setEpisodeNumber(number);
-		episode.author = author;
-		
-		episode.duration_ms = duration * 1000;
-		episode.duration_string = StrUtils.formatTime(episode.duration_ms);
-		
-		episode.sub_id = subscription.getId();
-		episode.image = subscription.getImageURL();
+		String url = null;
+		JSONFile file = null;
 
 		if (files.size() > 0) {
-			JSONFile file = files.iterator().next();
-			episode.filesize = file.filesize;
-			episode.url = file.urls.iterator().next();
+			file = files.iterator().next();
+			url = file.urls.iterator().next();
 		}
-		
-		episode.resource = episode.url;
 
-		return episode;
+		if (url != null) {
+
+			FeedItem episode = FeedItem.getByURL(contentResolver, url);
+			if (episode == null) {
+				episode = new FeedItem();
+			}
+
+			Date time = new Date((long)released*1000);
+
+			episode.setTitle(title);
+			episode.sub_title = subtitle;
+			episode.content = content;
+			episode.date = dt.format(time);
+			episode.setEpisodeNumber(number);
+			episode.author = author;
+
+			episode.duration_ms = duration * 1000;
+			episode.duration_string = StrUtils.formatTime(episode.duration_ms);
+
+			episode.sub_id = subscription.getId();
+			episode.image = subscription.getImageURL();
+
+			if (files.size() > 0) {
+				episode.filesize = file.filesize;
+				episode.url = file.urls.iterator().next();
+			}
+
+			episode.resource = episode.url;
+
+			return episode;
+		} else {
+			int j = 6;
+			j = j + 6;
+			return null;
+		}
 	}
 }

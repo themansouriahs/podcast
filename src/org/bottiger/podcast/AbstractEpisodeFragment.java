@@ -112,7 +112,7 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 	}
 
 	public String getOrder() {
-		return getOrder("DESC", 20);
+		return getOrder("DESC", 100);
 	}
 
 	public static String getOrder(String inputOrder, Integer amount) {
