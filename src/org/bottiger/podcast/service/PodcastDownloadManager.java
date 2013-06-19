@@ -18,9 +18,8 @@ import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.LockHandler;
-import org.bottiger.podcast.utils.Log;
 import org.bottiger.podcast.utils.SDCardManager;
-import org.json.JSONObject;
+import org.json.JSONArray;
 
 import android.annotation.SuppressLint;
 import android.app.DownloadManager;
@@ -35,11 +34,12 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 
-import com.android.volley.Request;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 public class PodcastDownloadManager {
@@ -110,14 +110,17 @@ public class PodcastDownloadManager {
 		if (updateConnectStatus(context) == NO_CONNECT)
 			return;
 
-		// log.debug("start_update()");
-		if (mUpdateLock.locked() == false)
-			return;
+		/*
+		 * // log.debug("start_update()"); if (mUpdateLock.locked() == false)
+		 * return;
+		 */
 
 		/*
 		 * Replaced by Volley new UpdateSubscriptions(context,
 		 * pullToRefreshView, subscription) .execute();
 		 */
+		if (pullToRefreshView != null)
+			pullToRefreshView.onRefreshComplete();
 
 		// FIXME
 		// Perhaps we should do this in the background in the future
@@ -131,21 +134,55 @@ public class PodcastDownloadManager {
 
 			Subscription sub = Subscription.getByCursor(subscriptionCursor);
 
-			// Create a json request intended to fetching json data
-			JsonObjectRequest jr = new JsonObjectRequest(Request.Method.GET,
-					sub.getUrl(), null, createGetSuccessListener(feedParser,
-							sub), createGetFailureListener());
+			if (subscription == null || sub.equals(subscription)) {
 
-			// Add the request to Volley
-			requestQueue.add(jr);
+				// Create a json request intended to fetching json data
+				JsonArrayRequest jr = new JsonArrayRequest(
+						"http://feeds.gpodder.net/parse?url=" + sub.getUrl(),
+						new MyResponseListener(feedParser),
+						createGetFailureListener());
+
+				int MY_SOCKET_TIMEOUT_MS = 300000;
+				DefaultRetryPolicy retryPolicy = new DefaultRetryPolicy(
+						MY_SOCKET_TIMEOUT_MS,
+						DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+						DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+				jr.setRetryPolicy(retryPolicy);
+
+				// Add the request to Volley
+				requestQueue.add(jr);
+			}
 		}
+		requestQueue.start();
 	}
 
-	private static Response.Listener<JSONObject> createGetSuccessListener(final FeedParserWrapper feedParser, final Subscription subscription) {
-		return new Response.Listener<JSONObject>() {
+	static class MyResponseListener implements Listener<JSONArray> {
+
+		final FeedParserWrapper feedParser;
+
+		public MyResponseListener(FeedParserWrapper feedParser) {
+			this.feedParser = feedParser;
+		}
+
+		@Override
+		public void onResponse(JSONArray response) {
+			final JSONArray finalResponse = response;
+			new Thread(new Runnable() {
+				public void run() {
+					Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+					feedParser.feedParser(finalResponse);
+				}
+			}).start();
+		}
+
+	}
+
+	private static Response.Listener<JSONArray> createGetSuccessListener(
+			final FeedParserWrapper feedParser, final Subscription subscription) {
+		return new Response.Listener<JSONArray>() {
 			@Override
-			public void onResponse(JSONObject response) {
-				//feedParser.feedParser(response, subscription);
+			public void onResponse(JSONArray response) {
+				feedParser.feedParser(response);
 			}
 		};
 	}
@@ -155,6 +192,9 @@ public class PodcastDownloadManager {
 			@Override
 			public void onErrorResponse(VolleyError error) {
 				// Handle error
+				error.printStackTrace();
+				int i = 5;
+				i = i + i;
 			}
 		};
 	}

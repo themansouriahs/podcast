@@ -224,9 +224,14 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 	public static Cursor allAsCursor(ContentResolver context,
 			Subscription subscription, String oldestDate) {
 		String strID = String.valueOf(subscription.getId());
+		if (oldestDate != null) {
 		return context.query(ItemColumns.URI, ItemColumns.ALL_COLUMNS,
 				ItemColumns.SUBS_ID + "=? AND " + ItemColumns.DATE + ">?",
 				new String[] { strID, oldestDate }, null);
+		}
+		return context.query(ItemColumns.URI, ItemColumns.ALL_COLUMNS,
+				ItemColumns.SUBS_ID + "=?",
+				new String[] { strID}, null);		
 	}
 
 	public static HashMap<String, FeedItem> allAsList(ContentResolver context,
@@ -417,7 +422,8 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 			cv.put(ItemColumns.URL, url);
 			cv.put(ItemColumns.RESOURCE, url);
 		}
-		cv.put(ItemColumns.REMOTE_ID, remote_id);
+		if (remote_id != null)
+			cv.put(ItemColumns.REMOTE_ID, remote_id);
 		if (filesize >= 0)
 			cv.put(ItemColumns.FILESIZE, filesize);
 		if (downloadReferenceID >= 0)
@@ -444,6 +450,9 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 			cv.put(ItemColumns.LISTENED, listened);
 		if (priority >= 0)
 			cv.put(ItemColumns.PRIORITY, priority);
+		
+		if (image != null)
+			cv.put(ItemColumns.IMAGE_URL, image);
 
 		// BaseColumns._ID + "=" + id
 		String condition = ItemColumns.URL + "='" + url + "'";
@@ -831,10 +840,10 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 
 	public String getURL() {
 		String itemURL = "";
-		if (resource.length() > 1)
-			itemURL = resource;
-		else if (url.length() > 1)
+		if (url != null && url.length() > 1)
 			itemURL = url;
+		else if (resource != null && resource.length() > 1)
+			itemURL = resource;
 		return itemURL;
 	}
 

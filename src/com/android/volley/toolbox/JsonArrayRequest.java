@@ -45,8 +45,10 @@ public class JsonArrayRequest extends JsonRequest<JSONArray> {
     @Override
     protected Response<JSONArray> parseNetworkResponse(NetworkResponse response) {
         try {
+        	byte[] data = response.data;
+        	String charset = HttpHeaderParser.parseCharset(response.headers);
             String jsonString =
-                new String(response.data, HttpHeaderParser.parseCharset(response.headers));
+                new String(data, charset);
             return Response.success(new JSONArray(jsonString),
                     HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException e) {

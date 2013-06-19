@@ -40,6 +40,8 @@ public class Subscription extends AbstractItem {
 
 	public long id;
 	public String title;
+	
+	@Deprecated
 	public String link;
 	public String comment;
 

@@ -266,7 +266,8 @@ public abstract class PodcastBaseFragment extends FixedListFragment implements
 	public void onDestroy() {
 		super.onDestroy();
 		try {
-			// unbindService(serviceConnection); TODO
+			//unbindService(playerServiceConnection);
+			getActivity().unbindService(playerServiceConnection);
 		} catch (Exception e) {
 			e.printStackTrace();
 

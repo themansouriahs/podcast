@@ -18,9 +18,11 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.bottiger.podcast.provider.BulkUpdater;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.provider.gpodder.GPodderSubscriptionWrapper;
 import org.bottiger.podcast.service.PodcastDownloadManager;
 import org.bottiger.podcast.utils.Log;
 import org.bottiger.podcast.utils.StrUtils;
@@ -29,6 +31,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.xml.sax.SAXException;
 
+import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -43,6 +46,7 @@ import com.google.code.rome.android.repackaged.com.sun.syndication.feed.synd.Syn
 import com.google.code.rome.android.repackaged.com.sun.syndication.io.FeedException;
 import com.google.code.rome.android.repackaged.com.sun.syndication.io.SyndFeedInput;
 import com.google.code.rome.android.repackaged.com.sun.syndication.io.XmlReader;
+import com.google.gson.Gson;
 
 /**
  * 
@@ -189,17 +193,22 @@ public class FeedParserWrapper {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Parses a json Object an updates the feed
 	 * 
 	 * @param jsonArray
 	 * @param subscription
 	 */
-	public void feedParser(JSONObject jsonObject, Subscription subscription) {
-		ArrayList<FeedItem> episodes = jsonParser(jsonObject, subscription);
-		updateFeed(subscription, episodes);
-		PodcastDownloadManager.startDownload(mContext);
+	public void feedParser(org.json.JSONArray jsonArray) {
+		GPodderSubscriptionWrapper subscriptionWrapper = jsonParser(jsonArray);
+		if (subscriptionWrapper != null) { // FIXME this should not be null
+			Subscription subscription = subscriptionWrapper.getSubscription(cr);
+			ArrayList<FeedItem> episodes = subscriptionWrapper.getEpisodes(cr); // Optimize?
+																				// FIXME
+			updateFeed(subscription, episodes);
+			PodcastDownloadManager.startDownload(mContext);
+		}
 	}
 
 	/**
@@ -208,79 +217,27 @@ public class FeedParserWrapper {
 	 * @param subscription
 	 * @return
 	 */
-	private ArrayList<FeedItem> jsonParser(JSONObject jsonObject, Subscription subscription) {
-		ArrayList<FeedItem> jsonEpisodes = new ArrayList<FeedItem>();
-		JSONArray mainArray = (JSONArray) jsonObject.get("hej");
-		
-		if (mainArray != null) {
-			JSONObject mainDataObject = (JSONObject) mainArray.get(0);
+	private GPodderSubscriptionWrapper jsonParser(org.json.JSONArray jsonArray) {
 
-			String image = "";
+		Gson gson = new Gson();
+		GPodderSubscriptionWrapper subscriptionWrapper = null;
 
-			if (mainDataObject.get("logo") != null)
-				image = mainDataObject.get("logo").toString();
+		GPodderSubscriptionWrapper[] subscriptionWrappers = gson.fromJson(
+				jsonArray.toString(), GPodderSubscriptionWrapper[].class);
 
-			updateSubscription(subscription, mainDataObject, cr);
-
-			JSONArray episodeDataObject = (JSONArray) mainDataObject
-					.get("episodes");
-			
-			if (episodeDataObject != null) {
-				int numOfEpisodes = episodeDataObject.size();
-			for (int i = 0; i < numOfEpisodes; i++) {
-				FeedItem item = new FeedItem();
-
-				JSONObject episode = (JSONObject) episodeDataObject.get(i);
-				Number duration = (Number) episode.get("duration");
-
-				JSONArray fileData = (JSONArray) episode.get("files");
-				if (fileData.size() > 0) {
-
-					JSONObject files = (JSONObject) fileData.get(0);
-
-					String episodeURL = "";
-					JSONArray urlsData = (JSONArray) files.get("urls");
-					if (urlsData.size() > 0) {
-						episodeURL = (String) urlsData.get(0);
-					} else {
-						episodeURL = (String) episode.get("link");
-					}
-
-					item.type = (String) files.get("mimetype");
-					Number filesize = (Number) files.get("filesize");
-					Number episodeNumber = (Number) files.get("number");
-
-					Number released = (Number) episode.get("released");
-					Date time = null;
-					if (released != null)
-						time = new Date(released.longValue() * 1000);
-
-					if (time != null)
-						item.date = dt.format(time);
-					if (duration != null) {
-						item.duration_ms = duration.intValue() * 1000;
-						item.duration_string = StrUtils
-								.formatTime(item.duration_ms);
-					}
-
-					if (filesize != null)
-						item.filesize = filesize.intValue();
-					if (episodeNumber != null)
-						item.setEpisodeNumber(episodeNumber.intValue());
-					item.image = image;
-					item.url = episodeURL;
-					item.resource = item.url;
-
-					item.title = (String) episode.get("title");
-					item.author = (String) episode.get("author");
-					item.content = (String) episode.get("description");
-
-					jsonEpisodes.add(item);
-				}
-			}
+		if (subscriptionWrappers.length > 1) {
+			int i = subscriptionWrappers.length;
+			i = 6 + i;
 		}
+
+		if (subscriptionWrappers.length > 0) {
+			subscriptionWrapper = subscriptionWrappers[0];
+
+			Subscription subscription = subscriptionWrapper.getSubscription(cr);
+			subscription.update(cr);
 		}
-		return jsonEpisodes;
+
+		return subscriptionWrapper;
 	}
 
 	private void updateSubscription(Subscription subscription,
@@ -469,22 +426,27 @@ public class FeedParserWrapper {
 			Collections.sort(items);
 			FeedItem oldestItem = items.get(items.size() - 1);
 
+			/*
 			HashMap<String, FeedItem> databaseItems = FeedItem.allAsList(cr,
 					subscription, oldestItem.getDate());
+					*/
+			HashMap<String, FeedItem> databaseItems = FeedItem.allAsList(cr, subscription, null);
+			
+			BulkUpdater bulkUpdater = new BulkUpdater();
 
 			// we iterate over all the input items
 			for (FeedItem item : items) {
 
 				// and if the item is not included in the database already we
 				// add it
-				if (!databaseItems.containsKey(item.getURL())) {
+				String url = item.getURL();
+				if (!databaseItems.containsKey(url)) {
 
 					Long itemDate = item.getLongDate();
 
 					if (itemDate > update_date) {
 						update_date = itemDate;
 					}
-					item = addItem(subscription, item);
 					add_num++;
 
 					/*
@@ -496,20 +458,25 @@ public class FeedParserWrapper {
 
 					subscription.fail_count = 0;
 					subscription.lastItemUpdated = update_date;
-					subscription.update(cr);
+					ContentProviderOperation cpo = subscription.update(cr,
+							true, true);
+					bulkUpdater.addOperation(cpo);
 
 					log.debug("add url: " + subscription.url + "\n add num = "
 							+ add_num);
 				}
+				
+				item = addItem(subscription, item, bulkUpdater);
 			}
 
+			bulkUpdater.commit(cr);
 			return add_num;
 		}
 		return 0;
 	}
 
 	private synchronized FeedItem addItem(Subscription subscription,
-			FeedItem item) {
+			FeedItem item, BulkUpdater updater) {
 		Long sub_id = subscription.id;
 		boolean insertSucces = false;
 
@@ -522,10 +489,13 @@ public class FeedParserWrapper {
 				new String[] { BaseColumns._ID }, where, null, null);
 
 		if (cursor.moveToFirst()) {
+			item.update(cr);
+			log.debug("Updating episode: " + item.title + "(" + item.image + ")");
 		} else {
 			Uri insertedUri = item.insert(cr);
 			item = FeedItem.getMostRecent(cr);
 			insertSucces = true;
+			log.debug("Inserting new episode: " + item.title);
 		}
 
 		if (cursor != null)
