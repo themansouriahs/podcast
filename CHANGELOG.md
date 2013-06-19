@@ -6,6 +6,7 @@ Version 0.15
 
 * Device Syncing supports podcasts with non ascii characters
 * Better control over if an episode has been downloaded or not
+* Better podcast-refresh. (May still be quite a resource hog)
 
 Version 0.14
 ------------
