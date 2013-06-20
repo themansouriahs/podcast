@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Version 0.16
+------------
+
+* Much faster feed updates
+
 Version 0.15
 ------------
 

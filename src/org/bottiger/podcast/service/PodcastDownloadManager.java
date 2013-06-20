@@ -13,7 +13,7 @@ import java.util.concurrent.TimeoutException;
 
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.images.RequestManager;
-import org.bottiger.podcast.parser.FeedParserWrapper;
+import org.bottiger.podcast.parser.JSONFeedParserWrapper;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.Subscription;
@@ -126,7 +126,7 @@ public class PodcastDownloadManager {
 		// FIXME
 		// Perhaps we should do this in the background in the future
 		RequestQueue requestQueue = RequestManager.getRequestQueue();
-		final FeedParserWrapper feedParser = new FeedParserWrapper(context);
+		final JSONFeedParserWrapper feedParser = new JSONFeedParserWrapper(context);
 
 		Cursor subscriptionCursor = Subscription.allAsCursor(context
 				.getContentResolver());
@@ -159,10 +159,10 @@ public class PodcastDownloadManager {
 
 	static class MyResponseListener implements Listener<JSONArray> {
 
-		final FeedParserWrapper feedParser;
+		final JSONFeedParserWrapper feedParser;
 		final VolleyResultParser volleyResultParser;
 
-		public MyResponseListener(FeedParserWrapper feedParser) {
+		public MyResponseListener(JSONFeedParserWrapper feedParser) {
 			this.feedParser = feedParser;
 			this.volleyResultParser = new VolleyResultParser(feedParser);
 		}
@@ -185,9 +185,9 @@ public class PodcastDownloadManager {
 	
 	private static class VolleyResultParser extends AsyncTask<JSONArray, Void, Void> {
 		
-		FeedParserWrapper feedParser = null;
+		JSONFeedParserWrapper feedParser = null;
 
-		public VolleyResultParser(FeedParserWrapper feedParser) {
+		public VolleyResultParser(JSONFeedParserWrapper feedParser) {
 			this.feedParser = feedParser;
 		}
 	     protected Void doInBackground(JSONArray... response) {
@@ -202,7 +202,7 @@ public class PodcastDownloadManager {
 
 
 	private static Response.Listener<JSONArray> createGetSuccessListener(
-			final FeedParserWrapper feedParser, final Subscription subscription) {
+			final JSONFeedParserWrapper feedParser, final Subscription subscription) {
 		return new Response.Listener<JSONArray>() {
 			@Override
 			public void onResponse(JSONArray response) {
@@ -674,9 +674,9 @@ public class PodcastDownloadManager {
 						|| subscription.title.equals("null"))
 					subscription.getClass();
 
-				FeedParserWrapper parser = new FeedParserWrapper(mContext);
+				JSONFeedParserWrapper parser = new JSONFeedParserWrapper(mContext);
 				publishProgress(subscription);
-				parser.parse(subscription);
+				//parser.parse(subscription);
 			}
 		}
 	}

@@ -243,6 +243,7 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 			FeedItem currentItem = FeedItem.getByCursor(cursor);
 			item.put(currentItem.url, currentItem);
 		}
+		cursor.close();
 		return item;
 	}
 

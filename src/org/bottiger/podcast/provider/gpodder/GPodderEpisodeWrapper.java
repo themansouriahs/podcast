@@ -51,6 +51,9 @@ public class GPodderEpisodeWrapper {
 			file = files.iterator().next();
 			url = file.urls.iterator().next();
 		}
+		
+		if (url == null)
+			url = link;
 
 		if (url != null) {
 
@@ -74,9 +77,11 @@ public class GPodderEpisodeWrapper {
 			episode.sub_id = subscription.getId();
 			episode.image = subscription.getImageURL();
 
+			episode.url = url;
+			
 			if (files.size() > 0) {
 				episode.filesize = file.filesize;
-				episode.url = file.urls.iterator().next();
+				
 			}
 
 			episode.resource = episode.url;
