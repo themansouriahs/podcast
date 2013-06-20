@@ -1,13 +1,10 @@
 package org.bottiger.podcast.parser;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 
 import org.bottiger.podcast.provider.BulkUpdater;
 import org.bottiger.podcast.provider.FeedItem;
@@ -20,12 +17,11 @@ import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
+import com.google.gson.JsonParseException;
 
 /**
  * 
@@ -58,6 +54,15 @@ public class JSONFeedParserWrapper {
 		GPodderSubscriptionWrapper subscriptionWrapper = jsonParser(jsonArray);
 		long end = System.currentTimeMillis();
 		Log.d("Parser Profiler", "gson time: " + (end - start));
+
+		/*
+		 * Wait untill Jackson 2.2.1 is released start =
+		 * System.currentTimeMillis(); GPodderSubscriptionWrapper[]
+		 * subscriptionWrapper2 = jacson(jsonArray.toString()); end =
+		 * System.currentTimeMillis();
+		 */
+		Log.d("Parser Profiler", "jackson time: " + (end - start));
+
 		if (subscriptionWrapper != null) { // FIXME this should not be null
 			start = System.currentTimeMillis();
 			Subscription subscription = subscriptionWrapper.getSubscription(cr);
@@ -73,6 +78,19 @@ public class JSONFeedParserWrapper {
 			PodcastDownloadManager.startDownload(mContext);
 		}
 	}
+
+	/*
+	 * private GPodderSubscriptionWrapper[] jacson(String json) { ObjectMapper
+	 * mapper = new ObjectMapper(); GPodderSubscriptionWrapper[] item = null;
+	 * try { item = mapper.readValue(json, GPodderSubscriptionWrapper[].class);
+	 * } catch (JsonParseException e) { // TODO Auto-generated catch block
+	 * e.printStackTrace(); } catch (JsonMappingException e) { // TODO
+	 * Auto-generated catch block e.printStackTrace(); } catch (IOException e) {
+	 * // TODO Auto-generated catch block e.printStackTrace(); } if (item !=
+	 * null) { int party = 1; party = 2 + party; }
+	 * 
+	 * return item; }
+	 */
 
 	/**
 	 * 
@@ -103,7 +121,8 @@ public class JSONFeedParserWrapper {
 		return subscriptionWrapper;
 	}
 
-	public int updateFeed(Subscription subscription, ArrayList<FeedItem> items, boolean updateExisting) {
+	public int updateFeed(Subscription subscription, ArrayList<FeedItem> items,
+			boolean updateExisting) {
 		long update_date = subscription.lastItemUpdated;
 		int add_num = 0;
 		boolean insertSucces = false;
@@ -112,17 +131,20 @@ public class JSONFeedParserWrapper {
 
 		if (!items.isEmpty()) {
 
+			FeedItem oldestItem = null;
+			HashMap<String, FeedItem> databaseItems = null;
+
 			// Sort the items to find the oldest
 			try {
-			Collections.sort(items);
+				Collections.sort(items);
+
+				oldestItem = items.get(items.size() - 1);
+
+				databaseItems = FeedItem.allAsList(cr, subscription,
+						oldestItem.getDate());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			FeedItem oldestItem = items.get(items.size() - 1);
-
-			HashMap<String, FeedItem> databaseItems = FeedItem.allAsList(cr,
-					subscription, oldestItem.getDate());
-
 			// HashMap<String, FeedItem> databaseItems = FeedItem.allAsList(cr,
 			// subscription, null);
 
@@ -142,7 +164,8 @@ public class JSONFeedParserWrapper {
 						update_date = itemDate;
 					}
 					item.insert(cr);
-					Log.d("Feed Updater","Inserting new episode: " + item.title);
+					Log.d("Feed Updater", "Inserting new episode: "
+							+ item.title);
 
 					add_num++;
 
@@ -159,13 +182,13 @@ public class JSONFeedParserWrapper {
 							true, true);
 					bulkUpdater.addOperation(cpo);
 
-					Log.d("Feed Updater","add url: " + subscription.url + "\n add num = "
-							+ add_num);
+					Log.d("Feed Updater", "add url: " + subscription.url
+							+ "\n add num = " + add_num);
 				} else {
 					if (updateExisting) {
-					bulkUpdater.addOperation(item.update(cr, true, true));
-					Log.d("Feed Updater","Updating episode: " + item.title + "("
-							+ item.image + ")");
+						bulkUpdater.addOperation(item.update(cr, true, true));
+						Log.d("Feed Updater", "Updating episode: " + item.title
+								+ "(" + item.image + ")");
 					}
 				}
 

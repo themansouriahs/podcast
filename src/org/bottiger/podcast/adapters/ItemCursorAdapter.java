@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeSet;
 
+import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.PlayerActivity;
 import org.bottiger.podcast.PlaylistDSLVFragment;
 import org.bottiger.podcast.PodcastBaseFragment;
@@ -236,8 +237,14 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 					int priority = item.getPriority();
 					long lastUpdate = item.getLastUpdate();
 
+					long preTitle;
+					if (MainActivity.debugging)
+						preTitle = lastUpdate;
+					else
+						preTitle = priority;
+					
 					if (priority > 0) {
-						title = priority + " # " + title;
+						title = preTitle + " # " + title;
 					} 
 					
 					if (COLOR_BACKGROUND)

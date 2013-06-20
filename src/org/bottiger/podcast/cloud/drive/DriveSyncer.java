@@ -1026,7 +1026,7 @@ public class DriveSyncer {
 				|| driveFile.getId() == null;
 		updateFileOnDevice = localFileModificationDate < driveFileModificationTime;
 
-		Log.d(TAG, "Modification dates. Local: " + localFileModificationDate
+		Log.d(TAG, "Modification dates for: " + driveFile.getDescription() + ". Local: " + localFileModificationDate
 				+ " - Remote: " + driveFileModificationTime);
 		if (updateFileOnDrive) {
 
@@ -1038,7 +1038,7 @@ public class DriveSyncer {
 		} else if (updateFileOnDevice) {
 
 			// Update local file.
-			Log.d(TAG, " > Updating local file.");
+			Log.d(TAG, " > Updating local file: " + driveFile.getDescription());
 
 			if (type.equals(DataType.SUBSCRIPTION)) {
 				// Type collectionType = new
@@ -1076,7 +1076,7 @@ public class DriveSyncer {
 		try {
 
 			// Update drive file.
-			Log.d(TAG, " > Updating Drive file.");
+			Log.d(TAG, " > Updating Drive file: " + driveFile.getDescription());
 
 			// String driveTitle = remoteFilename(localFile);
 			String driveTitle = title;
