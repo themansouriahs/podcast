@@ -23,10 +23,11 @@ import fi.iki.elonen.NanoHTTPD.Method;
 public class HTTPDService extends Service {
 
 	private HelloServer mServer = null;
+	private static final int port = 8080;
 
 	@Override
 	public void onCreate() {
-		mServer = new HelloServer(getContentResolver(), 8080);
+		mServer = new HelloServer(getContentResolver(), port);
 		mServer.run();
 	}
 

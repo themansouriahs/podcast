@@ -181,8 +181,11 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 		// Update the database
 		PodcastOpenHelper helper = new PodcastOpenHelper(context);
 		SQLiteDatabase db = helper.getWritableDatabase();
+		String currentTime = String.valueOf(System.currentTimeMillis());
+		String updateLastUpdate = ", " + ItemColumns.LAST_UPDATE + "=" + currentTime + " ";
+		
 		String action = "UPDATE " + ItemColumns.TABLE_NAME + " SET ";
-		String value = ItemColumns.PRIORITY + "=0 ";
+		String value = ItemColumns.PRIORITY + "=0" + updateLastUpdate;
 		String where = "WHERE " + ItemColumns.PRIORITY + "<> 0";
 		String sql = action + value + where;
 		db.execSQL(sql);
