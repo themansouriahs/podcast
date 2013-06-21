@@ -50,6 +50,7 @@ public class DownloadManagerReceiver extends BroadcastReceiver {
 					if (DownloadManager.STATUS_SUCCESSFUL == c
 							.getInt(columnIndex)) {
 						updateFeedItemIfSuccessful(c, item, downloadId, context);
+						item.setDownloaded(true);
 					} else {
 						item.setDownloaded(false);
 					}

@@ -126,7 +126,8 @@ public class PodcastDownloadManager {
 		// FIXME
 		// Perhaps we should do this in the background in the future
 		RequestQueue requestQueue = RequestManager.getRequestQueue();
-		final JSONFeedParserWrapper feedParser = new JSONFeedParserWrapper(context);
+		final JSONFeedParserWrapper feedParser = new JSONFeedParserWrapper(
+				context);
 
 		Cursor subscriptionCursor = Subscription.allAsCursor(context
 				.getContentResolver());
@@ -171,38 +172,37 @@ public class PodcastDownloadManager {
 		public void onResponse(JSONArray response) {
 			volleyResultParser.execute(response);
 			/*
-			final JSONArray finalResponse = response;
-			new Thread(new Runnable() {
-				public void run() {
-					Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-					feedParser.feedParser(finalResponse);
-				}
-			}).start();
-			*/
+			 * final JSONArray finalResponse = response; new Thread(new
+			 * Runnable() { public void run() {
+			 * Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+			 * feedParser.feedParser(finalResponse); } }).start();
+			 */
 		}
 
 	}
-	
-	private static class VolleyResultParser extends AsyncTask<JSONArray, Void, Void> {
-		
+
+	private static class VolleyResultParser extends
+			AsyncTask<JSONArray, Void, Void> {
+
 		JSONFeedParserWrapper feedParser = null;
 
 		public VolleyResultParser(JSONFeedParserWrapper feedParser) {
 			this.feedParser = feedParser;
 		}
-	     protected Void doInBackground(JSONArray... response) {
-				Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-				long start = System.currentTimeMillis();
-				feedParser.feedParser(response[0]);
-				long end = System.currentTimeMillis();
-				Log.d("Parser Profiler", "total time: " + (end-start));
-				return null;
-	     }
+
+		protected Void doInBackground(JSONArray... response) {
+			Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+			long start = System.currentTimeMillis();
+			feedParser.feedParser(response[0]);
+			long end = System.currentTimeMillis();
+			Log.d("Parser Profiler", "total time: " + (end - start));
+			return null;
+		}
 	}
 
-
 	private static Response.Listener<JSONArray> createGetSuccessListener(
-			final JSONFeedParserWrapper feedParser, final Subscription subscription) {
+			final JSONFeedParserWrapper feedParser,
+			final Subscription subscription) {
 		return new Response.Listener<JSONArray>() {
 			@Override
 			public void onResponse(JSONArray response) {
@@ -362,7 +362,7 @@ public class PodcastDownloadManager {
 				String where = ItemColumns.IS_DOWNLOADED + "==1";
 
 				// sort by nevest first
-				String sortOrder = ItemColumns.LAST_UPDATE + " DESC";
+				String sortOrder = ItemColumns.LAST_UPDATE + " ASC";
 
 				Cursor cursor = mContext.getContentResolver().query(
 						ItemColumns.URI, ItemColumns.ALL_COLUMNS, where, null,
@@ -371,19 +371,29 @@ public class PodcastDownloadManager {
 				LinkedList<String> filesToKeep = new LinkedList<String>();
 				cursor.moveToFirst();
 				while (cursor.isAfterLast() == false) {
+					boolean deleteFile = true;
 					// Extract data.
 					FeedItem item = FeedItem.getByCursor(cursor);
 					if (item != null) {
-						bytesToKeep = bytesToKeep - item.filesize;
+						File file = new File(item.getAbsolutePath());
 
-						// if we have exceeded our limit start deleting old
-						// items
-						if (bytesToKeep < 0) {
-							deleteExpireFile(mContext, item);
-						} else {
-							filesToKeep.add(item.getFilename());
+						if (file.exists()) {
+							bytesToKeep = bytesToKeep - item.filesize;
+
+							// if we have exceeded our limit start deleting old
+							// items
+							if (bytesToKeep < 0) {
+								deleteExpireFile(mContext, item);
+							} else {
+								deleteFile = false;
+								filesToKeep.add(item.getFilename());
+							}
 						}
 
+						if (deleteFile) {
+							item.setDownloaded(false);
+							item.update(mContext.getContentResolver());
+						}
 						cursor.moveToNext();
 					}
 				}
@@ -674,9 +684,10 @@ public class PodcastDownloadManager {
 						|| subscription.title.equals("null"))
 					subscription.getClass();
 
-				JSONFeedParserWrapper parser = new JSONFeedParserWrapper(mContext);
+				JSONFeedParserWrapper parser = new JSONFeedParserWrapper(
+						mContext);
 				publishProgress(subscription);
-				//parser.parse(subscription);
+				// parser.parse(subscription);
 			}
 		}
 	}

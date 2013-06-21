@@ -327,7 +327,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 			else
 				InlinePlayer.setSecondaryEpisodePlayerViewHolder(holder);
 
-			bindExandedPlayer(mCurrentFeedItem, playerView, holder, position);
+			bindExandedPlayer(mContext, mCurrentFeedItem, playerView, holder, position);
 		} else {
 			if (playerView != null) {
 				playerView.setVisibility(View.GONE);
@@ -384,10 +384,10 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 	 * @param holder
 	 * @param position
 	 */
-	public void bindExandedPlayer(FeedItem feedItem, View playerView,
+	public static void bindExandedPlayer(Context context, FeedItem feedItem, View playerView,
 			InlinePlayer holder, int position) {
 
-		ThemeHelper themeHelper = new ThemeHelper(mContext);
+		ThemeHelper themeHelper = new ThemeHelper(context);
 
 		playerView.setVisibility(View.VISIBLE);
 		holder.timeSlash.setText("/");

@@ -2,9 +2,6 @@ package org.bottiger.podcast;
 
 import java.util.HashMap;
 
-import org.bottiger.podcast.R;
-import org.bottiger.podcast.R.id;
-import org.bottiger.podcast.R.layout;
 import org.bottiger.podcast.adapters.ItemCursorAdapter;
 import org.bottiger.podcast.adapters.viewholders.InlinePlayer;
 import org.bottiger.podcast.provider.FeedItem;
@@ -13,22 +10,22 @@ import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.ControlButtons;
 import org.bottiger.podcast.utils.ExpandAnimation;
 
+import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.widget.CursorAdapter;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewStub;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.ListView;
 
 public class RecentItemFragment extends PlaylistDSLVFragment {
 
@@ -243,6 +240,8 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 		}
 
 		//ControlButtons.setPlayerListeners(list, view, id);
+		//Activity activity = getActivity();
+		//ItemCursorAdapter.bindExandedPlayer(activity, FeedItem.getById(activity.getContentResolver(), id), player, viewHolder, position);
 		ControlButtons.setPlayerListeners(viewHolder, id);
 		updateCurrentPosition();
 	}

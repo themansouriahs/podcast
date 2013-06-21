@@ -143,7 +143,7 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 	/**
 	 * Flags for filtering downloaded items
 	 */
-	private boolean isDownloaded;
+	private Boolean isDownloaded;
 
 	/**
 	 * Last position during playback in ms Should match seekTo(int)
@@ -378,7 +378,7 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 		chunkFilesize = -1;
 		downloadReferenceID = -1;
 		episodeNumber = -1;
-		isDownloaded = false;
+		isDownloaded = null;
 		duration_ms = -1;
 
 		created = -1;
@@ -429,7 +429,6 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 			cv.put(ItemColumns.FILESIZE, filesize);
 		if (downloadReferenceID >= 0)
 			cv.put(ItemColumns.DOWNLOAD_REFERENCE, downloadReferenceID);
-		cv.put(ItemColumns.IS_DOWNLOADED, isDownloaded);
 		if (episodeNumber >= 0)
 			cv.put(ItemColumns.EPISODE_NUMBER, episodeNumber);
 		if (chunkFilesize >= 0)
@@ -455,6 +454,9 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 		if (image != null)
 			cv.put(ItemColumns.IMAGE_URL, image);
 
+		if (isDownloaded != null)
+			cv.put(ItemColumns.IS_DOWNLOADED, isDownloaded);
+		
 		// BaseColumns._ID + "=" + id
 		String condition = ItemColumns.URL + "='" + url + "'";
 		if (batchUpdate) {
@@ -524,7 +526,9 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 			if (downloadReferenceID >= 0)
 				cv.put(ItemColumns.DOWNLOAD_REFERENCE, downloadReferenceID);
 
-			cv.put(ItemColumns.IS_DOWNLOADED, isDownloaded);
+			if (isDownloaded != null)
+				cv.put(ItemColumns.IS_DOWNLOADED, isDownloaded);
+			
 			if (episodeNumber >= 0)
 				cv.put(ItemColumns.EPISODE_NUMBER, episodeNumber);
 			if (length >= 0)
