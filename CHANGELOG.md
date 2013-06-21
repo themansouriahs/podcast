@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Version 0.17
+------------
+
+* Fixed some listeners for control buttons. Now they actually work again
+* The player only deletes the correct files when they expire
+
 Version 0.16
 ------------
 

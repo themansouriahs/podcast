@@ -108,7 +108,7 @@ public class MainActivity extends FragmentActivity implements
 
 	public static Account mAccount;
 
-	public static final boolean debugging = true;
+	public static final boolean debugging = false;
 
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide
