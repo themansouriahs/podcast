@@ -33,18 +33,17 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 
 	private long mCurCheckID = -1;
 	boolean mDualPane;
-	
-	
-    public static RecentItemFragment newInstance(int headers, int footers) {
-    	RecentItemFragment f = new RecentItemFragment();
 
-        Bundle args = new Bundle();
-        args.putInt("headers", headers);
-        args.putInt("footers", footers);
-        f.setArguments(args);
+	public static RecentItemFragment newInstance(int headers, int footers) {
+		RecentItemFragment f = new RecentItemFragment();
 
-        return f;
-    }
+		Bundle args = new Bundle();
+		args.putInt("headers", headers);
+		args.putInt("footers", footers);
+		f.setArguments(args);
+
+		return f;
+	}
 
 	// Read here:
 	// http://developer.android.com/reference/android/app/Fragment.html#Layout
@@ -58,8 +57,10 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 		}
 
 		// Populate list with our static array of titles.
-		mAdapter = this.getAdapter(mCursor); // listItemCursorAdapter(this.getActivity(),this, mCursor);
-		startInit(1, ItemColumns.URI, ItemColumns.ALL_COLUMNS, getWhere(), getOrder());
+		mAdapter = this.getAdapter(mCursor); // listItemCursorAdapter(this.getActivity(),this,
+												// mCursor);
+		startInit(1, ItemColumns.URI, ItemColumns.ALL_COLUMNS, getWhere(),
+				getOrder());
 
 		if (mDualPane) {
 			// In dual-pane mode, the list view highlights the selected item.
@@ -67,7 +68,7 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 			// Make sure our UI is in the correct state.
 			// showDetails(mCurCheckPosition);
 		}
-		
+
 	}
 
 	@Override
@@ -89,16 +90,17 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 						ItemColumns.IMAGE_URL }, new int[] { R.id.title,
 						R.id.podcast, R.id.duration, R.id.list_image }, fields);
 	}
-	
+
 	public void setAdapter(CursorAdapter adapter) {
 		mAdapter = adapter;
 	}
-	
+
 	public CursorAdapter getAdapter(Cursor cursor) {
 		if (mAdapter != null)
 			return mAdapter;
-		
-		CursorAdapter adapter = listItemCursorAdapter(this.getActivity(),this, cursor);
+
+		CursorAdapter adapter = listItemCursorAdapter(this.getActivity(), this,
+				cursor);
 		setAdapter(adapter);
 		return adapter;
 	}
@@ -116,18 +118,19 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		Cursor item = (Cursor) l.getItemAtPosition(position); // https://github.com/chrisbanes/Android-PullToRefresh/issues/99
-		
+
 		this.togglePlayer(l, item);
 
 	}
-	
+
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v,
 			ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
 		MenuInflater inflater = getActivity().getMenuInflater();
 		inflater.inflate(R.menu.podcast_context, menu);
-		//contextMenuViewID = v. .getId(); //this is where I get the id of my clicked button
+		// contextMenuViewID = v. .getId(); //this is where I get the id of my
+		// clicked button
 	}
 
 	@Override
@@ -139,11 +142,12 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 
 		AdapterView.AdapterContextMenuInfo cmi = (AdapterView.AdapterContextMenuInfo) item
 				.getMenuInfo();
-		
+
 		Cursor cursor = mAdapter.getCursor();
 		cursor.moveToPosition(cmi.position);
 		FeedItem episode = FeedItem.getByCursor(cursor);
-		Subscription subscription = Subscription.getById(getActivity().getContentResolver(), episode.sub_id);
+		Subscription subscription = Subscription.getById(getActivity()
+				.getContentResolver(), episode.sub_id);
 
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
 				.getMenuInfo();
@@ -208,18 +212,13 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 		String duration = item.getString(item
 				.getColumnIndex(ItemColumns.DURATION));
 		int position = item.getPosition();
-		
+
 		View view = list.getChildAt(position - start);
-		//mAdapter.notifyDataSetChanged();
-		
-		InlinePlayer viewHolder = InlinePlayer.getCurrentEpisodePlayerViewHolder();
-				
-		// Is this even possible to be true?
-		if (viewHolder == null)
-			viewHolder = InlinePlayer.getViewHolder(view);
-		
-		if (viewHolder.duration != null)
-			viewHolder.duration.setText(duration);
+		// mAdapter.notifyDataSetChanged();
+
+		InlinePlayer viewHolder = (position == 0) ? InlinePlayer
+				.getCurrentEpisodePlayerViewHolder() : InlinePlayer
+				.getSecondaryEpisodePlayerViewHolder();
 
 		ViewStub stub = (ViewStub) view.findViewById(R.id.stub);
 		if (stub != null) {
@@ -239,9 +238,18 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 			}
 		}
 
-		//ControlButtons.setPlayerListeners(list, view, id);
-		//Activity activity = getActivity();
-		//ItemCursorAdapter.bindExandedPlayer(activity, FeedItem.getById(activity.getContentResolver(), id), player, viewHolder, position);
+		// Is this even possible to be true?
+		if (viewHolder == null)
+			viewHolder = InlinePlayer.getViewHolder(view);
+
+		if (viewHolder.duration != null)
+			viewHolder.duration.setText(duration);
+
+		// ControlButtons.setPlayerListeners(list, view, id);
+		// Activity activity = getActivity();
+		// ItemCursorAdapter.bindExandedPlayer(activity,
+		// FeedItem.getById(activity.getContentResolver(), id), player,
+		// viewHolder, position);
 		ControlButtons.setPlayerListeners(viewHolder, id);
 		updateCurrentPosition();
 	}
@@ -266,9 +274,9 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 	@Override
 	public void setListAdapter() {
 		// TODO Auto-generated method stub
-		CursorAdapter sca = getAdapter(getCursor()); 
+		CursorAdapter sca = getAdapter(getCursor());
 		setListAdapter(sca);
-		
+
 	}
 
 	@Override
