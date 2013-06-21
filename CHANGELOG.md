@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Version 0.18
+------------
+
+* Increased default podcast history to 1 GB
+
 Version 0.17
 ------------
 
