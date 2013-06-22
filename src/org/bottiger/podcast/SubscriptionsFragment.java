@@ -132,8 +132,10 @@ public class SubscriptionsFragment extends Fragment {
 		// String condition = SubscriptionColumns.STATUS + "<>" +
 		// Subscription.STATUS_UNSUBSCRIBED ;
 		String condition = "1==1";
+		String order = getOrder();
+		String where = getWhere();
 		mFragmentUtils.startInit(0, SubscriptionColumns.URI,
-				SubscriptionColumns.ALL_COLUMNS, getWhere(), getOrder());
+				SubscriptionColumns.ALL_COLUMNS, where, order);
 		mGridView.setAdapter(ca);
 	}
 
@@ -240,7 +242,7 @@ public class SubscriptionsFragment extends Fragment {
 	}
 
 	String getOrder() {
-		return SubscriptionColumns.TITLE + " ASC";
+		return PodcastBaseFragment.orderByFirst(SubscriptionColumns.TITLE + "<> ''") + ", " + SubscriptionColumns.TITLE + " ASC";
 	}
 
 	private int getLayoutType() {

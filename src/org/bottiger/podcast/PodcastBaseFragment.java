@@ -447,6 +447,11 @@ public abstract class PodcastBaseFragment extends FixedListFragment implements
 	abstract String getWhere();
 
 	abstract String getOrder();
+	
+	protected static String orderByFirst(String condition) {
+		String priorityOrder = "case when " + condition + " then 1 else 2 end";
+		return priorityOrder;
+	}
 
 	public abstract CursorAdapter getAdapter(Cursor cursor);
 
