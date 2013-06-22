@@ -5,6 +5,8 @@ Version 0.18
 ------------
 
 * Increased default podcast history to 1 GB
+* Added non working search button :)
+* It is not possible to queue episodes.
 
 Version 0.17
 ------------
