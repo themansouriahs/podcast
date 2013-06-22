@@ -59,6 +59,7 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 		// Populate list with our static array of titles.
 		mAdapter = this.getAdapter(mCursor); // listItemCursorAdapter(this.getActivity(),this,
 												// mCursor);
+		
 		startInit(1, ItemColumns.URI, ItemColumns.ALL_COLUMNS, getWhere(),
 				getOrder());
 
@@ -108,6 +109,15 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 	@Override
 	public void onResume() {
 		super.onResume();
+		
+		/* We put it here instead of in onActivityCreated because we only want to call
+			it once: http://stackoverflow.com/questions/11293441/android-loadercallbacks-onloadfinished-called-twice
+			
+			However, now it called every time the app is resumed.
+		
+		startInit(1, ItemColumns.URI, ItemColumns.ALL_COLUMNS, getWhere(),
+				getOrder());
+		*/
 		ControlButtons.fragment = this;
 		if (mPlayerServiceBinder != null && mPlayerServiceBinder.isPlaying()) {
 			long current_id = mPlayerServiceBinder.getCurrentItem().id;
