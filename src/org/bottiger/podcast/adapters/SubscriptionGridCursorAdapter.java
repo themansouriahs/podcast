@@ -1,8 +1,10 @@
 package org.bottiger.podcast.adapters;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.adapters.ItemCursorAdapter.EpisodeViewHolder;
 import org.bottiger.podcast.adapters.PodcastAdapterInterface.FieldHandler;
 import org.bottiger.podcast.images.ImageCacheManager;
+import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.Subscription;
 
 import android.content.Context;
@@ -104,22 +106,23 @@ public class SubscriptionGridCursorAdapter extends AbstractGridPodcastAdapter {
 		}
 		
 		if (sub != null) {
+			
+			String title = sub.title;
+			String logo = sub.imageURL;
 
 
-			if (sub.title != null && !sub.title.equals(""))
-				holder.title.setText(sub.title);
+			if (title != null && !title.equals(""))
+				holder.title.setText(title);
 			else
 				holder.title.setText(R.string.subscription_no_title);
 
-
-			String imageURL = sub.imageURL;
-			if (imageURL != null && !imageURL.equals("")) {
+			if (logo != null && !logo.equals("")) {
 				//ImageLoader imageLoader = getImageLoader(context);
 				//imageLoader.displayImage(sub.imageURL, holder.image);
 				
 				com.android.volley.toolbox.ImageLoader imageLoader = ImageCacheManager
 						.getInstance().getImageLoader();
-				holder.image.setImageUrl(sub.imageURL, imageLoader);
+				holder.image.setImageUrl(logo, imageLoader);
 			} else {
 				holder.image.setImageResource(R.drawable.generic_podcast);
 			}

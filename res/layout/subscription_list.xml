@@ -1,10 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout 
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    >
-    <!-- 
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/searchTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:text="Searching using gPodder.net"
+        android:textStyle="bold"
+        android:visibility="visible" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <!--
 <org.bottiger.podcast.views.SquareGridViewGroup xmlns:android="http://schemas.android.com/apk/res/android" 
     android:id="@+id/gridview"
     android:layout_width="fill_parent" 
@@ -15,19 +28,20 @@
     android:horizontalSpacing="1dp"
     android:stretchMode="columnWidth"
     android:gravity="start"
-/> -->
-     <GridView
-        android:id="@+id/gridview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:verticalSpacing="0dp"
-        android:horizontalSpacing="0dp"
-        android:stretchMode="columnWidth"
-        android:numColumns="2" 
-        />
-</FrameLayout>
+/>
+        -->
 
-<!--
+        <GridView
+            android:id="@+id/gridview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:horizontalSpacing="0dp"
+            android:numColumns="2"
+            android:stretchMode="columnWidth"
+            android:verticalSpacing="0dp" />
+    </FrameLayout>
+
+    <!--
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -50,4 +64,6 @@
     </LinearLayout>
 
 </RelativeLayout>
--->
+    -->
+
+</LinearLayout>

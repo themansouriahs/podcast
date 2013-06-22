@@ -1,6 +1,12 @@
 package org.bottiger.podcast;
 
+import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import org.bottiger.podcast.adapters.AbstractPodcastAdapter;
 import org.bottiger.podcast.adapters.SubscriptionGridCursorAdapter;
@@ -11,7 +17,6 @@ import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionColumns;
 import org.bottiger.podcast.utils.DialogMenu;
 import org.bottiger.podcast.utils.FragmentUtils;
-import org.bottiger.podcast.utils.ThemeHelper;
 
 import android.app.Activity;
 import android.content.Context;
@@ -19,7 +24,9 @@ import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.CursorAdapter;
@@ -33,6 +40,10 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.dragontek.mygpoclient.pub.PublicClient;
+import com.dragontek.mygpoclient.simple.IPodcast;
 
 public class SubscriptionsFragment extends Fragment {
 
@@ -44,6 +55,10 @@ public class SubscriptionsFragment extends Fragment {
 	private static enum LayoutType {
 		LIST, GRID
 	};
+	
+	private static enum ContentType {
+		LOCAL, REMOTE
+	};
 
 	private FragmentUtils mFragmentUtils;
 
@@ -52,20 +67,23 @@ public class SubscriptionsFragment extends Fragment {
 	private View fragmentView;
 
 	private GridView mGridView;
+	private TextView searchStatus;
 
 	Subscription mChannel = null;
 	long id;
+	
 	private LayoutType displayLayout = LayoutType.GRID;
+	private ContentType contentType = ContentType.LOCAL;
 
 	static {
 		mIconMap = new HashMap<Integer, Integer>();
 	}
-	
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setHasOptionsMenu(true);
+	}
 
 	public static boolean channelExists(Activity act, Uri uri) {
 		Cursor cursor = act.getContentResolver().query(uri,
@@ -90,6 +108,7 @@ public class SubscriptionsFragment extends Fragment {
 
 		mFragmentUtils = new FragmentUtils(getActivity(), fragmentView, this);
 		mGridView = (GridView) fragmentView.findViewById(R.id.gridview);
+		searchStatus = (TextView) fragmentView.findViewById(R.id.searchTextView);
 
 		mGridView.setOnItemClickListener(new OnItemClickListener() {
 
@@ -100,8 +119,9 @@ public class SubscriptionsFragment extends Fragment {
 				// position, Toast.LENGTH_SHORT).show();
 				Activity activity = SubscriptionsFragment.this.getActivity();
 				if (activity instanceof MainActivity) {
-					
-					Cursor cursor = (Cursor) mGridView.getAdapter().getItem(position);
+
+					Cursor cursor = (Cursor) mGridView.getAdapter().getItem(
+							position);
 
 					Subscription sub = null;
 					try {
@@ -111,7 +131,13 @@ public class SubscriptionsFragment extends Fragment {
 					}
 
 					if (sub != null) {
-						((MainActivity) activity).onItemSelected(sub.getId());
+						if (contentType.equals(ContentType.LOCAL))
+							((MainActivity) activity).onItemSelected(sub.getId());
+						else {
+							sub.subscribe(getActivity());
+							String text = "Subscribing to: " + sub.getTitle();
+							Toast.makeText(getActivity(), text, Toast.LENGTH_SHORT).show();
+						}
 					}
 				}
 			}
@@ -135,20 +161,18 @@ public class SubscriptionsFragment extends Fragment {
 		mFragmentUtils.setAdapter(ca);
 		// String condition = SubscriptionColumns.STATUS + "<>" +
 		// Subscription.STATUS_UNSUBSCRIBED ;
-		String condition = "1==1";
-		String order = getOrder();
-		String where = getWhere();
-		mFragmentUtils.startInit(0, SubscriptionColumns.URI,
-				SubscriptionColumns.ALL_COLUMNS, where, order);
+		fetchLocalCursor();
 		mGridView.setAdapter(ca);
 	}
-	
+
 	@Override
 	public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.subscription_actionbar, menu);
 		SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
 		
 	    searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+	    	
+	    	private QueryGpodder asyncTask = null;
 
 	        @Override
 	        public boolean onQueryTextSubmit(String query) {
@@ -160,13 +184,31 @@ public class SubscriptionsFragment extends Fragment {
 	        @Override
 	        public boolean onQueryTextChange(String newText) {
 	            // search goes here !!
-	            // listAdapter.getFilter().filter(query);
+	        	if (newText != null && !newText.equals("")) {
+	        		mFragmentUtils.getAdapter().changeCursor(newMatrixCursor());
+	        		if (asyncTask != null && asyncTask.getStatus() != AsyncTask.Status.FINISHED)
+	        			asyncTask.cancel(true);
+	        		
+	        		asyncTask = new QueryGpodder();
+	        		asyncTask.execute(newText);
+	        	} else
+	        		fetchLocalCursor();
+	        	
 	            return false;
 	        }
 
 	    });
 		
 		super.onCreateOptionsMenu(menu, inflater);
+	}
+	
+	private void fetchLocalCursor() {
+		String order = getOrder();
+		String where = getWhere();
+		mFragmentUtils.startInit(0, SubscriptionColumns.URI,
+				SubscriptionColumns.ALL_COLUMNS, where, order);
+		contentType = ContentType.LOCAL;
+		setSearchStatusVisible(false);
 	}
 
 	public void startInit() {
@@ -272,7 +314,9 @@ public class SubscriptionsFragment extends Fragment {
 	}
 
 	String getOrder() {
-		return PodcastBaseFragment.orderByFirst(SubscriptionColumns.TITLE + "<> ''") + ", " + SubscriptionColumns.TITLE + " ASC";
+		return PodcastBaseFragment.orderByFirst(SubscriptionColumns.TITLE
+				+ "<> ''")
+				+ ", " + SubscriptionColumns.TITLE + " ASC";
 	}
 
 	private int getLayoutType() {
@@ -294,6 +338,103 @@ public class SubscriptionsFragment extends Fragment {
 			return gridSubscriptionCursorAdapter(context, cursor);
 		else
 			return listSubscriptionCursorAdapter(context, cursor);
+	}
+	
+	private void setSearchStatusVisible(boolean isVisible) {
+		if (isVisible) {
+			searchStatus.setVisibility(View.VISIBLE);
+		} else {
+			searchStatus.setVisibility(View.GONE);
+		}
+	}
+
+	private Cursor cursorFromSearchResults(List<IPodcast> podcasts) {
+
+		MatrixCursor matrixCursor = newMatrixCursor();
+
+		int idIdx = matrixCursor.getColumnIndex(SubscriptionColumns._ID);
+		int titleIdx = matrixCursor.getColumnIndex(SubscriptionColumns.TITLE);
+		int logoIdx = matrixCursor.getColumnIndex(SubscriptionColumns.IMAGE_URL);
+		int urlIdx = matrixCursor.getColumnIndex(SubscriptionColumns.URL);
+		
+		int autoDownloadIdx = matrixCursor.getColumnIndex(SubscriptionColumns.AUTO_DOWNLOAD);
+		int itemUpdatedIdx = matrixCursor.getColumnIndex(SubscriptionColumns.LAST_ITEM_UPDATED);
+		int updatedIdx = matrixCursor.getColumnIndex(SubscriptionColumns.LAST_UPDATED);
+		int failIdx = matrixCursor.getColumnIndex(SubscriptionColumns.FAIL_COUNT);
+		
+		int nItems = SubscriptionColumns.ALL_COLUMNS.length;
+		for (IPodcast podcast : podcasts) {
+			ArrayList<Object> values = new ArrayList<Object>((Collections.nCopies(nItems, null)));
+			String url = podcast.getUrl();
+			
+			// Since we cace by ID we need a unique ID for remote podcasts as well.
+			// We do this by calculating the long value of sha1(url)
+			values.set(idIdx, StringtoLong(url));
+			values.set(titleIdx, podcast.getTitle());
+			values.set(logoIdx, podcast.getLogoUrl());
+			values.set(urlIdx, podcast.getUrl());
+			
+			values.set(autoDownloadIdx, (long)-1);
+			values.set(itemUpdatedIdx, (long)-1);
+			values.set(updatedIdx, (long)-1);
+			values.set(failIdx, (long)-1);
+			//values.add(statusIdx, Subscription.STATUS_UNSUBSCRIBED);
+
+			matrixCursor.addRow(values);
+		}
+
+		mFragmentUtils.setCursor(matrixCursor);
+		mFragmentUtils.getAdapter().changeCursor(matrixCursor);
+		contentType = ContentType.REMOTE;
+		return matrixCursor;
+	}
+	
+	private MatrixCursor newMatrixCursor() {
+		return new MatrixCursor(SubscriptionColumns.ALL_COLUMNS);
+	}
+	
+	private long StringtoLong(String s) {
+
+		MessageDigest mDigest = null;
+		try {
+			mDigest = MessageDigest.getInstance("SHA1");
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		byte[] hashValBytes = mDigest.digest(s.getBytes());
+
+		long hashValLong = 0;
+
+		//create a long value from the byte array
+		for( int i = 0; i < 8; i++ ) {
+		    hashValLong |= ((long)(hashValBytes[i]) & 0x0FF)<<(8*i);
+		}
+		
+		return hashValLong;
+	}
+	
+	private class QueryGpodder extends AsyncTask<String, Void, List<IPodcast>> {
+		
+		public QueryGpodder() {
+			setSearchStatusVisible(true);
+		}
+		
+		protected List<IPodcast> doInBackground(String... string) {
+			PublicClient gpodderClient = new PublicClient();
+			List<IPodcast> podcasts = null;
+			try {
+				podcasts = gpodderClient.searchPodcast(string[0]);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			return podcasts;
+		}
+
+		protected void onPostExecute(List<IPodcast> podcasts) {
+			SubscriptionsFragment.this.cursorFromSearchResults(podcasts);
+		}
 	}
 
 }

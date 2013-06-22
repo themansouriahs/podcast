@@ -1,12 +1,18 @@
 Changelog
 =========
 
+Version 0.19
+------------
+
+* Possibility to search and subscribe to new podcasts using gPodder.net
+
 Version 0.18
 ------------
 
 * Increased default podcast history to 1 GB
 * Added non working search button :)
-* It is not possible to queue episodes.
+* It is now possible to queue episodes.
+* Subscriptions are sorted after name
 
 Version 0.17
 ------------

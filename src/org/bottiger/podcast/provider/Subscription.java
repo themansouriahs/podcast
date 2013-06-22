@@ -33,14 +33,14 @@ public class Subscription extends AbstractItem {
 
 	public final static int STATUS_SUBSCRIBED = 1;
 	public final static int STATUS_UNSUBSCRIBED = 2;
-	
+
 	public final static String UNSUBSCRIBED = "unsubscribed";
 
 	private static SubscriptionLruCache cache = null;
 
 	public long id;
 	public String title;
-	
+
 	@Deprecated
 	public String link;
 	public String comment;
@@ -202,10 +202,10 @@ public class Subscription extends AbstractItem {
 
 		// Unsubscribe from Google Reader
 		try {
-		MainActivity.gReader.removeSubscriptionfromReader(context,
-				MainActivity.mAccount, this);
+			MainActivity.gReader.removeSubscriptionfromReader(context,
+					MainActivity.mAccount, this);
 		} catch (Exception e) {
-			
+
 		}
 
 		// Unsubscribe from local database
@@ -213,12 +213,12 @@ public class Subscription extends AbstractItem {
 		update(context.getContentResolver());
 		deleteEpisodes(context);
 	}
-	
+
 	private boolean deleteEpisodes(Context context) {
 		String where = ItemColumns.SUBS_ID + " = ?";
 		String[] selectionArgs = { String.valueOf(id) };
-		int deletedRows = context.getContentResolver().delete(
-				ItemColumns.URI, where, selectionArgs);
+		int deletedRows = context.getContentResolver().delete(ItemColumns.URI,
+				where, selectionArgs);
 		if (deletedRows > 1) {
 			return true;
 		} else
@@ -263,16 +263,17 @@ public class Subscription extends AbstractItem {
 		Uri uri = ContentUris.withAppendedId(SubscriptionColumns.URI, id);
 		context.delete(uri, null, null);
 	}
-	
+
 	public LinkedList<FeedItem> getFeedItems(ContentResolver contentResolver) {
 		LinkedList<FeedItem> episodes = new LinkedList<FeedItem>();
-		Cursor itemCursor = contentResolver.query(ItemColumns.URI, ItemColumns.ALL_COLUMNS,
-				ItemColumns.SUBS_ID + "==" + this.id, null, null);
+		Cursor itemCursor = contentResolver.query(ItemColumns.URI,
+				ItemColumns.ALL_COLUMNS, ItemColumns.SUBS_ID + "==" + this.id,
+				null, null);
 		for (boolean more = itemCursor.moveToFirst(); more; more = itemCursor
 				.moveToNext()) {
 			episodes.add(FeedItem.getByCursor(itemCursor));
 		}
-		
+
 		return episodes;
 	}
 
@@ -314,18 +315,19 @@ public class Subscription extends AbstractItem {
 
 		if (status >= 0)
 			cv.put(SubscriptionColumns.STATUS, status);
-		
-		//cv.put(SubscriptionColumns.COMMENT, "valuehejeh");
+
+		// cv.put(SubscriptionColumns.COMMENT, "valuehejeh");
 
 		// BaseColumns._ID + "=" + id
 		String condition = SubscriptionColumns.URL + "='" + url + "'";
 		if (batchUpdate) {
 			contentUpdate = ContentProviderOperation
 					.newUpdate(SubscriptionColumns.URI).withValues(cv)
-					.withSelection(condition, null)
-					.withYieldAllowed(true).build();
+					.withSelection(condition, null).withYieldAllowed(true)
+					.build();
 		} else {
-			int numUpdatedRows = contentResolver.update(SubscriptionColumns.URI, cv, condition, null);
+			int numUpdatedRows = contentResolver.update(
+					SubscriptionColumns.URI, cv, condition, null);
 			if (numUpdatedRows == 1)
 				log.debug("update OK");
 			else {
@@ -360,8 +362,8 @@ public class Subscription extends AbstractItem {
 
 		String lastUpdatedString = cursor.getString(lastUpdatedIndex);
 		sub.lastUpdated = Long.parseLong(lastUpdatedString);
-		sub.title = cursor.getString(cursor
-				.getColumnIndex(SubscriptionColumns.TITLE));
+
+		sub.title = cursor.getString(cursor.getColumnIndex(SubscriptionColumns.TITLE));
 		sub.url = cursor.getString(urlIndex);
 		sub.imageURL = cursor.getString(cursor
 				.getColumnIndex(SubscriptionColumns.IMAGE_URL));
@@ -369,14 +371,15 @@ public class Subscription extends AbstractItem {
 				.getColumnIndex(SubscriptionColumns.COMMENT));
 		sub.description = cursor.getString(cursor
 				.getColumnIndex(SubscriptionColumns.DESCRIPTION));
-		sub.fail_count = cursor.getLong(cursor
-				.getColumnIndex(SubscriptionColumns.FAIL_COUNT));
-		sub.lastItemUpdated = cursor.getLong(cursor
-				.getColumnIndex(SubscriptionColumns.LAST_ITEM_UPDATED));
-		sub.auto_download = cursor.getLong(cursor
-				.getColumnIndex(SubscriptionColumns.AUTO_DOWNLOAD));
 		sub.sync_id = cursor.getString(cursor
 				.getColumnIndex(SubscriptionColumns.REMOTE_ID));
+
+		sub.auto_download = cursor.getLong(cursor
+				.getColumnIndex(SubscriptionColumns.AUTO_DOWNLOAD));
+		sub.lastItemUpdated = cursor.getLong(cursor
+				.getColumnIndex(SubscriptionColumns.LAST_ITEM_UPDATED));
+		sub.fail_count = cursor.getLong(cursor
+				.getColumnIndex(SubscriptionColumns.FAIL_COUNT));
 
 		// if item was not cached we put it in the cache
 		synchronized (cache) {
@@ -425,7 +428,7 @@ public class Subscription extends AbstractItem {
 	public String getImageURL() {
 		return imageURL;
 	}
-	
+
 	public String getUrl() {
 		return url;
 	}
