@@ -7,6 +7,7 @@ import java.util.HashMap;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.utils.SDCardManager;
 
+import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.view.LayoutInflater;
@@ -38,6 +39,7 @@ public abstract class AbstractPodcastAdapter extends SimpleDragSortCursorAdapter
 	
 	protected LayoutInflater mInflater;
 	protected Context mContext;
+	protected Activity mActivity;
 	private static ImageLoader mImageLoader = null;
 	
 	

@@ -9,6 +9,7 @@ import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.PodcastService;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -35,14 +36,14 @@ public class FeedFragment extends AbstractEpisodeFragment {
 		mSubscription = subscription;
 	}
 	
-	public static CursorAdapter listItemCursorAdapter(Context context,
+	public static CursorAdapter listItemCursorAdapter(Activity activity,
 			PodcastBaseFragment fragment, Cursor cursor) {
 		CompactListCursorAdapter.FieldHandler[] fields = {
 				CompactListCursorAdapter.defaultTextFieldHandler,
 				new CompactListCursorAdapter.TextFieldHandler(), new ItemCursorAdapter.TextFieldHandler(),
 				new CompactListCursorAdapter.IconFieldHandler(mIconMap),
 		};
-		return new CompactListCursorAdapter(context, R.layout.episode_list_compact,
+		return new CompactListCursorAdapter(activity, R.layout.episode_list_compact,
 				cursor, new String[] { ItemColumns.TITLE,
 						ItemColumns.SUB_TITLE, ItemColumns.DURATION,
 						ItemColumns.IMAGE_URL }, new int[] { R.id.title,

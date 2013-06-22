@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeSet;
 
+import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.PodcastBaseFragment;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.provider.FeedItem;
@@ -11,6 +12,7 @@ import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ControlButtons;
 
+import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
@@ -53,15 +55,15 @@ public class CompactListCursorAdapter extends AbstractEpisodeCursorAdapter {
 	}
 
 	// Legacy constructor
-	public CompactListCursorAdapter(Context context, int layout, Cursor cursor,
+	public CompactListCursorAdapter(Activity activity, int layout, Cursor cursor,
 			String[] fromColumns, int[] to, HashMap<Integer, Integer> iconMap) {
-		this(context, layout, cursor, fromColumns, to, defaultFieldHandlers(
+		this(activity, layout, cursor, fromColumns, to, defaultFieldHandlers(
 				fromColumns, iconMap));
 	}
 
-	public CompactListCursorAdapter(Context context, int layout, Cursor cursor,
+	public CompactListCursorAdapter(Activity activity, int layout, Cursor cursor,
 			String[] fromColumns, int[] to, FieldHandler[] fieldHandlers) {
-		this(context, null, layout, cursor, fromColumns, to, fieldHandlers);
+		this(activity, null, layout, cursor, fromColumns, to, fieldHandlers);
 	}
 
 	// Newer constructor allows custom FieldHandlers.
@@ -70,14 +72,15 @@ public class CompactListCursorAdapter extends AbstractEpisodeCursorAdapter {
 	// of those objects, but the overhead of defining that value class in Java
 	// is not worth it.
 	// If this were a Scala program, that would be a one-line case class.
-	public CompactListCursorAdapter(Context context,
+	public CompactListCursorAdapter(Activity activity,
 			PodcastBaseFragment fragment, int layout, Cursor cursor,
 			String[] fromColumns, int[] to, FieldHandler[] fieldHandlers) {
-		super(context, layout, cursor, fromColumns, to);
+		super(activity, layout, cursor, fromColumns, to);
 
-		mContext = context;
+		mActivity = activity;
+		mContext = activity;
 		mFragment = fragment;
-		mInflater = (LayoutInflater) context
+		mInflater = (LayoutInflater) activity
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 		if (to.length < fromColumns.length) {
@@ -148,9 +151,6 @@ public class CompactListCursorAdapter extends AbstractEpisodeCursorAdapter {
 		} catch (IllegalStateException e) {
 		}
 
-		/*
-		 * http://drasticp.blogspot.dk/2012/04/viewholder-is-dead.html
-		 */
 		TextView mainTitle = (TextView) view.getTag(R.id.title);
 		mainTitle.setText(item.title);
 		
@@ -166,6 +166,7 @@ public class CompactListCursorAdapter extends AbstractEpisodeCursorAdapter {
 		
 		final FeedItem item2 = item;
 		final Context context2 = context;
+		final Activity activity2 = mActivity;
 		
 		final CursorAdapter adapter = this;
 		
@@ -178,7 +179,7 @@ public class CompactListCursorAdapter extends AbstractEpisodeCursorAdapter {
 		queueButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
             	item2.queue(context2);
-            	adapter.notifyDataSetChanged();
+            	((MainActivity) activity2).onRefreshPlaylist();
             }
 		});
 	}

@@ -1,14 +1,8 @@
 package org.bottiger.podcast;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 
+import org.bottiger.podcast.AbstractEpisodeFragment.OnPlaylistRefreshListener;
 import org.bottiger.podcast.PodcastBaseFragment.OnItemSelectedListener;
 import org.bottiger.podcast.cloud.CloudProvider;
 import org.bottiger.podcast.cloud.GoogleReader;
@@ -59,9 +53,9 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.DrawerLayout;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -72,7 +66,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bugsense.trace.BugSenseHandler;
-import com.google.android.gms.common.AccountPicker;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
@@ -81,7 +74,7 @@ import com.google.api.services.drive.Drive;
 
 // Sliding
 public class MainActivity extends FragmentActivity implements
-		OnItemSelectedListener {
+		OnItemSelectedListener, OnPlaylistRefreshListener {
 
 	private static final String ACCOUNT_KEY = "account";
 
@@ -459,6 +452,17 @@ public class MainActivity extends FragmentActivity implements
 		mSectionsPagerAdapter.notifyDataSetChanged();
 		mViewPager.setCurrentItem(2);
 	}
+	
+	@Override
+	public void onRefreshPlaylist() {
+		mSectionsPagerAdapter.refreshData(SectionsPagerAdapter.PLAYLIST);
+		/*
+		RecentItemFragment fragment = (RecentItemFragment)mSectionsPagerAdapter.getItem(SectionsPagerAdapter.PLAYLIST);
+		CursorAdapter adapter = fragment.getAdapter();
+		if (adapter != null)
+			adapter.notifyDataSetChanged();
+			*/
+	}
 
 	@Override
 	public void onResume() {
@@ -571,6 +575,14 @@ public class MainActivity extends FragmentActivity implements
 	 */
 	public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
 		// http://stackoverflow.com/questions/10396321/remove-fragment-page-from-viewpager-in-android/10399127#10399127
+		
+		public static final int PLAYLIST = 0;
+		public static final int SUBSRIPTION = 1;
+		public static final int FEED = 2;
+		
+		private static final int MAX_FRAGMENTS = 3;
+		
+		private Fragment[] mFragments = new Fragment[MAX_FRAGMENTS];
 
 		public SectionsPagerAdapter(FragmentManager fm) {
 			super(fm);
@@ -587,18 +599,19 @@ public class MainActivity extends FragmentActivity implements
 		public Fragment getItem(int i) {
 			Fragment fragment;
 			log.debug("inside: getItem(" + i + ")");
-			if (i == 1) {
+			if (i == SUBSRIPTION) {
 				fragment = getSubscriptionFragmentContent();
-			} else if (i == 0) {
+			} else if (i == PLAYLIST) {
 				fragment = new RecentItemFragment(); // new
 														// DummySectionFragment();
-			} else if (i == 2) {
+			} else if (i == FEED) {
 				fragment = getFeedFragmentContent();
 			} else {
 				fragment = new DSLVFragmentBGHandle();
 				// fragment = new DummySectionFragment();
 				// fragment = new PlayerFragment();
 			}
+			mFragments[i] = fragment;
 			Bundle args = new Bundle();
 			args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, i + 1);
 			fragment.setArguments(args);
@@ -607,20 +620,35 @@ public class MainActivity extends FragmentActivity implements
 
 		@Override
 		public int getCount() {
-			return (SubscriptionFeedID == 0) ? 2 : 3;
+			return (SubscriptionFeedID == 0) ? MAX_FRAGMENTS-1 : MAX_FRAGMENTS;
 		}
 
 		@Override
 		public CharSequence getPageTitle(int position) {
 			switch (position) {
-			case 0:
+			case PLAYLIST:
 				return getString(R.string.title_section3).toUpperCase();
-			case 1:
+			case SUBSRIPTION:
 				return getString(R.string.title_section1).toUpperCase();
-			case 2:
+			case FEED:
 				return getString(R.string.title_section2).toUpperCase();
 			}
 			return null;
+		}
+		
+		public void refreshData(int position) {
+			Fragment fragment = mFragments[position];
+			switch (position) {
+			case PLAYLIST:
+				RecentItemFragment recentFragment = (RecentItemFragment) fragment;
+				recentFragment.refreshView();
+			case SUBSRIPTION:
+				//return getString(R.string.title_section1).toUpperCase();
+				return;
+			case FEED:
+				//return getString(R.string.title_section2).toUpperCase();
+				return;
+			}
 		}
 	}
 

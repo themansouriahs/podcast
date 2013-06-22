@@ -10,6 +10,7 @@ import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.service.PodcastDownloadManager;
 import org.bottiger.podcast.utils.OPMLImportExport;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -26,6 +27,8 @@ import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
+	
+	protected OnPlaylistRefreshListener mActivityCallback;
 
 	protected static HashMap<Integer, Integer> mIconMap;
 
@@ -38,8 +41,29 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 	String showListenedKey = "sowListened";
 	Boolean showListenedVal = true;
 
-	String episodesToShowKey = "episodesToShow";
-	int episodesToShowVal = 20;
+	protected static final String episodesToShowKey = "episodesToShow";
+	protected static final int episodesToShowVal = 20;
+	
+    // Container Activity must implement this interface
+	// http://developer.android.com/training/basics/fragments/communicating.html
+    public interface OnPlaylistRefreshListener {
+        public void onRefreshPlaylist();
+    }
+    
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        
+        // This makes sure that the container activity has implemented
+        // the callback interface. If not, it throws an exception
+        try {
+        	mActivityCallback = (OnPlaylistRefreshListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnHeadlineSelectedListener");
+        }
+    }
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
