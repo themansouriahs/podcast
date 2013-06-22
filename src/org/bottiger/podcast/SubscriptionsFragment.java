@@ -2,10 +2,6 @@ package org.bottiger.podcast;
 
 import java.util.HashMap;
 
-import org.bottiger.podcast.R;
-import org.bottiger.podcast.R.id;
-import org.bottiger.podcast.R.layout;
-import org.bottiger.podcast.R.string;
 import org.bottiger.podcast.adapters.AbstractPodcastAdapter;
 import org.bottiger.podcast.adapters.SubscriptionGridCursorAdapter;
 import org.bottiger.podcast.adapters.SubscriptionListCursorAdapter;
@@ -30,14 +26,13 @@ import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
+import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class SubscriptionsFragment extends Fragment {
 
@@ -149,13 +144,29 @@ public class SubscriptionsFragment extends Fragment {
 	}
 	
 	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+	public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.subscription_actionbar, menu);
-	    super.onCreateOptionsMenu(menu, inflater);
-	    
-		ThemeHelper themeHelper = new ThemeHelper(getActivity());
-		MenuItem menuItemSearch = menu.findItem(R.id.menu_search);
-		menuItemSearch.setIcon(themeHelper.getAttr(R.attr.search_icon));
+		SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
+		
+	    searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+	        @Override
+	        public boolean onQueryTextSubmit(String query) {
+	            // collapse the view ?
+	            menu.findItem(R.id.menu_search).collapseActionView();
+	            return false;
+	        }
+
+	        @Override
+	        public boolean onQueryTextChange(String newText) {
+	            // search goes here !!
+	            // listAdapter.getFilter().filter(query);
+	            return false;
+	        }
+
+	    });
+		
+		super.onCreateOptionsMenu(menu, inflater);
 	}
 
 	public void startInit() {

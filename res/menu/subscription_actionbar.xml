@@ -2,9 +2,10 @@
 
     <item
         android:id="@+id/menu_search"
+        android:actionViewClass="android.widget.SearchView"
         android:icon="?attr/search_icon"
         android:orderInCategory="4"
-        android:showAsAction="always"
+        android:showAsAction="always|collapseActionView"
         android:title="@string/menu_search"/>
 
 </menu>
