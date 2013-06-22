@@ -6,8 +6,8 @@
     android:orientation="vertical" >
 
     <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
         android:orientation="horizontal"
         android:padding="5dip" >
 
@@ -27,19 +27,24 @@
         
         <ImageButton
             android:id="@+id/play_episode"
+            android:layout_width="37dp"
+            android:layout_height="match_parent"
             android:layout_alignParentRight="true"
             android:layout_alignTop="@+id/title"
-            android:layout_height="40dp"
-			android:layout_width="40dp"
-            android:background="@drawable/av_play_dark" />
+            android:background="@drawable/button_flash"
+            android:scaleType="fitStart"
+            android:src="@drawable/av_play_dark" />
 
         <ImageButton
             android:id="@+id/queue_episode"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_marginRight="5dp"
+            android:layout_width="37dp"
+            android:layout_height="match_parent"
+            android:scaleType="fitStart"
             android:layout_alignTop="@+id/play_episode"
             android:layout_toLeftOf="@+id/play_episode"
-            android:background="@drawable/av_add_to_queue_dark" />
+            android:src="@drawable/av_add_to_queue_dark"
+            android:background="@drawable/button_flash" />
         
     </RelativeLayout>
 

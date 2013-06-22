@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Version 0.20
+------------
+
+* Added visual effects to some buttons when pressed
+
 Version 0.19
 ------------
 
