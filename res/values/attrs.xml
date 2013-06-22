@@ -31,7 +31,8 @@
     <attr name="new_icon" format="reference" />
     <attr name="sync_icon" format="reference" />
     <attr name="sync_invert_icon" format="reference" />
-    
+    <attr name="search_icon" format="reference" />
+    <attr name="search_invert_icon" format="reference" />
     <attr name="customBackground" format="reference" />
 
     <declare-styleable name="AppTheme">

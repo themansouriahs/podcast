@@ -140,6 +140,7 @@
     <string name="http_client_name">SoundWaves</string>
     <string name="menu_add_podcast">Add Podcast</string>
      <string name="menu_sync">Sync</string>
+     <string name="menu_search">Search</string>
     <string name="menu_play">Play</string>
     <string name="menu_pause">Pause</string>
     <string name="pref_feedback_title">Send anonymous feedback</string>

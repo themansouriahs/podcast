@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/menu_search"
+        android:icon="?attr/search_icon"
+        android:orderInCategory="4"
+        android:showAsAction="always"
+        android:title="@string/menu_search"/>
+
+</menu>

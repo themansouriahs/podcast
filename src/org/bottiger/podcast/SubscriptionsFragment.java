@@ -15,6 +15,7 @@ import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionColumns;
 import org.bottiger.podcast.utils.DialogMenu;
 import org.bottiger.podcast.utils.FragmentUtils;
+import org.bottiger.podcast.utils.ThemeHelper;
 
 import android.app.Activity;
 import android.content.Context;
@@ -28,6 +29,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -62,6 +65,12 @@ public class SubscriptionsFragment extends Fragment {
 	static {
 		mIconMap = new HashMap<Integer, Integer>();
 	}
+	
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
 
 	public static boolean channelExists(Activity act, Uri uri) {
 		Cursor cursor = act.getContentResolver().query(uri,
@@ -137,6 +146,16 @@ public class SubscriptionsFragment extends Fragment {
 		mFragmentUtils.startInit(0, SubscriptionColumns.URI,
 				SubscriptionColumns.ALL_COLUMNS, where, order);
 		mGridView.setAdapter(ca);
+	}
+	
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		inflater.inflate(R.menu.subscription_actionbar, menu);
+	    super.onCreateOptionsMenu(menu, inflater);
+	    
+		ThemeHelper themeHelper = new ThemeHelper(getActivity());
+		MenuItem menuItemSearch = menu.findItem(R.id.menu_search);
+		menuItemSearch.setIcon(themeHelper.getAttr(R.attr.search_icon));
 	}
 
 	public void startInit() {

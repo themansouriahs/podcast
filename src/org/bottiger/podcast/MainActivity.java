@@ -511,10 +511,9 @@ public class MainActivity extends FragmentActivity implements
 		} else {
 			menuItem.setVisible(false);
 		}
-
-		MenuItem menuItemSync = menu.findItem(R.id.menu_sync);
-		menuItemSync.setIcon(themeHelper.getAttr(R.attr.sync_icon));
+		
 		return true;
+
 	}
 
 	/**
@@ -531,32 +530,6 @@ public class MainActivity extends FragmentActivity implements
 		case R.id.menu_add:
 			// mDriveUtils.driveAccount();
 			AddPodcastDialog.addPodcast(this);
-			return true;
-		case R.id.menu_sync:
-
-			if (prefs.getBoolean(SettingsActivity.CLOUD_SUPPORT, true)) {
-				// Google Drive Sync mDriveUtils = new DriveUtils(this);
-				Account account = mCredential.getSelectedAccount();
-				Bundle bundle = new Bundle();
-				bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-				bundle.putBoolean(ContentResolver.SYNC_EXTRAS_FORCE, true);
-				bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-				String auth = PodcastProvider.AUTHORITY;
-				auth = "org.bottiger.podcast.provider.PodcastProvider"; //
-				ContentResolver
-						.requestSync(
-								account,
-								"org.bottiger.podcast.provider.podcastprovider",
-								bundle);
-				ContentResolver.requestSync(account, auth, bundle);
-			} else {
-				CharSequence text = "Please enabled cloud support in the settings menu before attempting to sync";
-				int duration = Toast.LENGTH_LONG;
-
-				Toast toast = Toast.makeText(this, text, duration);
-				toast.show();
-			}
-
 			return true;
 		case R.id.menu_settings:
 			Intent i = new Intent(getBaseContext(), SettingsActivity.class);

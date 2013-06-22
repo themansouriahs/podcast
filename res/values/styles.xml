@@ -17,7 +17,9 @@
         <item name="info_icon">@drawable/collections_view_as_list</item>
         <item name="new_icon">@drawable/content_new</item>
         <item name="sync_icon">@drawable/refresh</item>
-        <item name="sync_invert_icon">@drawable/refresh</item>
+        <item name="sync_invert_icon">@drawable/action_search</item>
+        <item name="search_icon">@drawable/action_search</item>
+        <item name="search_invert_icon">@drawable/action_search</item>
         <item name="customBackground">@color/pitch_black</item>
     </style>
 
@@ -35,6 +37,8 @@
         <item name="new_icon">@drawable/content_new_dark</item>
         <item name="sync_icon">@drawable/refresh</item>
         <item name="sync_invert_icon">@drawable/refresh</item>
+        <item name="search_invert_icon">@drawable/action_search</item>
+        <item name="search_icon">@drawable/action_search</item>
         <item name="customBackground">@color/white_opaque</item>
     </style>
 
