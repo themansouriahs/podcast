@@ -20,11 +20,11 @@
             android:layout_height="wrap_content"
             android:layout_alignTop="@+id/thumbnail"
             android:layout_centerVertical="true"
-            android:singleLine="true"
-            android:layout_toLeftOf="@+id/play_episode"
+            android:layout_toLeftOf="@+id/queue_episode"
             android:layout_toRightOf="@+id/thumbnail"
+            android:singleLine="true"
             android:text="Podcast Title" />
-
+        
         <ImageButton
             android:id="@+id/play_episode"
             android:layout_alignParentRight="true"
@@ -32,6 +32,14 @@
             android:layout_height="40dp"
 			android:layout_width="40dp"
             android:background="@drawable/av_play_dark" />
+
+        <ImageButton
+            android:id="@+id/queue_episode"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignTop="@+id/play_episode"
+            android:layout_toLeftOf="@+id/play_episode"
+            android:background="@drawable/av_add_to_queue_dark" />
         
     </RelativeLayout>
 

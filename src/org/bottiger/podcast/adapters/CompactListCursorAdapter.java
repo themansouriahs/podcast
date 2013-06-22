@@ -13,6 +13,7 @@ import org.bottiger.podcast.utils.ControlButtons;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -127,6 +128,7 @@ public class CompactListCursorAdapter extends AbstractEpisodeCursorAdapter {
 
 		listView.setTag(R.id.title, listView.findViewById(R.id.title));
 		listView.setTag(R.id.play_episode, listView.findViewById(R.id.play_episode));
+		listView.setTag(R.id.queue_episode, listView.findViewById(R.id.queue_episode));
 		return listView;
 	}
 
@@ -153,6 +155,7 @@ public class CompactListCursorAdapter extends AbstractEpisodeCursorAdapter {
 		mainTitle.setText(item.title);
 		
 		final ImageButton playToggleButton = (ImageButton) view.getTag(R.id.play_episode);
+		final ImageButton queueButton = (ImageButton) view.getTag(R.id.queue_episode);
 
 		if (PodcastBaseFragment.mPlayerServiceBinder != null) {
 			PlayerService ps = PodcastBaseFragment.mPlayerServiceBinder;
@@ -162,9 +165,20 @@ public class CompactListCursorAdapter extends AbstractEpisodeCursorAdapter {
 		}
 		
 		final FeedItem item2 = item;
+		final Context context2 = context;
+		
+		final CursorAdapter adapter = this;
+		
 		playToggleButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
             	ControlButtons.playPauseToggle(item2.getId(), playToggleButton);
+            }
+		});
+		
+		queueButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+            	item2.queue(context2);
+            	adapter.notifyDataSetChanged();
             }
 		});
 	}

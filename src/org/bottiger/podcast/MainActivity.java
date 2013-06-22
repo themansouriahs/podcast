@@ -124,6 +124,8 @@ public class MainActivity extends FragmentActivity implements
 	private FragmentManager mFragmentManager;
 	private FragmentTransaction mFragmentTransition;
 
+	private FeedFragment mFeedFragment = null;
+
 	/**
 	 * The {@link ViewPager} that will host the section contents.
 	 */
@@ -182,11 +184,11 @@ public class MainActivity extends FragmentActivity implements
 
 		BugSenseHandler.initAndStartSession(MainActivity.this,
 				((SoundWaves) this.getApplication()).getBugSenseAPIKey());
-		
+
 		setContentView(R.layout.activity_swipe);
 
 		mViewPager = (ViewPager) findViewById(R.id.pager);
-		//View pager2 = (ViewPager) findViewById(R.id.drawer_layout);
+		// View pager2 = (ViewPager) findViewById(R.id.drawer_layout);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
 		mViewPager.setOffscreenPageLimit(3);
 
@@ -211,7 +213,7 @@ public class MainActivity extends FragmentActivity implements
 
 			mCredential = GoogleAccountCredential.usingOAuth2(this,
 					DriveSyncer.getScope()); // "https://www.googleapis.com/auth/drive.appdata");
-																		// //DriveScopes.DRIVE);
+												// //DriveScopes.DRIVE);
 			// mCredential = GoogleAccountCredential.usingOAuth2(this,
 			// DriveScopes.DRIVE_FILE); //DriveScopes.DRIVE);
 			if (!prefs.contains(ACCOUNT_KEY))
@@ -529,17 +531,20 @@ public class MainActivity extends FragmentActivity implements
 		case R.id.menu_sync:
 
 			if (prefs.getBoolean(SettingsActivity.CLOUD_SUPPORT, true)) {
-			// Google Drive Sync mDriveUtils = new DriveUtils(this);
-			Account account = mCredential.getSelectedAccount();
-			Bundle bundle = new Bundle();
-			bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-			bundle.putBoolean(ContentResolver.SYNC_EXTRAS_FORCE, true);
-			bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-			String auth = PodcastProvider.AUTHORITY;
-			auth = "org.bottiger.podcast.provider.PodcastProvider"; //
-			ContentResolver.requestSync(account,
-					"org.bottiger.podcast.provider.podcastprovider", bundle);
-			ContentResolver.requestSync(account, auth, bundle);
+				// Google Drive Sync mDriveUtils = new DriveUtils(this);
+				Account account = mCredential.getSelectedAccount();
+				Bundle bundle = new Bundle();
+				bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+				bundle.putBoolean(ContentResolver.SYNC_EXTRAS_FORCE, true);
+				bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+				String auth = PodcastProvider.AUTHORITY;
+				auth = "org.bottiger.podcast.provider.PodcastProvider"; //
+				ContentResolver
+						.requestSync(
+								account,
+								"org.bottiger.podcast.provider.podcastprovider",
+								bundle);
+				ContentResolver.requestSync(account, auth, bundle);
 			} else {
 				CharSequence text = "Please enabled cloud support in the settings menu before attempting to sync";
 				int duration = Toast.LENGTH_LONG;
@@ -646,6 +651,7 @@ public class MainActivity extends FragmentActivity implements
 	 * @see android.support.v4.app.FragmentActivity#onKeyDown(int,
 	 * android.view.KeyEvent)
 	 */
+	/*
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
@@ -654,6 +660,7 @@ public class MainActivity extends FragmentActivity implements
 		}
 		return super.onKeyDown(keyCode, event);
 	}
+	*/
 
 	private Fragment getSubscriptionFragmentContent() {
 		log.debug("inside: getSubscriptionFragmentContent()");
@@ -661,9 +668,10 @@ public class MainActivity extends FragmentActivity implements
 	}
 
 	private Fragment getFeedFragmentContent() {
-		Subscription sub = Subscription.getById(getContentResolver(),
-				SubscriptionFeedID);
-		return FeedFragment.newInstance(sub);
+		Subscription subscription = Subscription.getById(getContentResolver(), SubscriptionFeedID);
+		mFeedFragment = FeedFragment.newInstance(subscription);
+
+		return mFeedFragment;
 	}
 
 	private Drive getDriveService(GoogleAccountCredential credential) {

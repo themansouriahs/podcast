@@ -7,6 +7,7 @@ import org.bottiger.podcast.adapters.CompactListCursorAdapter;
 import org.bottiger.podcast.adapters.ItemCursorAdapter;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.service.PodcastService;
 
 import android.content.Context;
 import android.content.Intent;
@@ -22,11 +23,17 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 public class FeedFragment extends AbstractEpisodeFragment {
 
-	// FIXME should not be static
-	private static long subId = 14;
-	private static Subscription mSubscription = null;
+	public static final String subscriptionIDKey = "subscription_id";
+	private static final long defaultSubscriptionID = 1;
+	
+	private long subId = 14;
+	private Subscription mSubscription = null;
 	
 	private ViewGroup header;
+	
+	private void setSubscription(Subscription subscription) {
+		mSubscription = subscription;
+	}
 	
 	public static CursorAdapter listItemCursorAdapter(Context context,
 			PodcastBaseFragment fragment, Cursor cursor) {
@@ -96,16 +103,30 @@ public class FeedFragment extends AbstractEpisodeFragment {
 
 		mAdapter = FeedFragment.listItemCursorAdapter(this.getActivity(),
 				this, mCursor);
-		startInit(1, ItemColumns.URI, ItemColumns.ALL_COLUMNS, getWhere(), getOrder());
+		String where = getWhere();
+		String order = getOrder();
+		startInit(1, ItemColumns.URI, ItemColumns.ALL_COLUMNS, where, order);
 
 		enablePullToRefresh(mSubscription);
 	}
 	
+	public String getOrder() {
+		return ItemColumns.DATE + " DESC";
+	}
+	
 	public static FeedFragment newInstance(Subscription subscription) {
 	    FeedFragment fragment = new FeedFragment();
-	    FeedFragment.mSubscription = subscription;
+	    fragment.mSubscription = subscription;
 
 	    return fragment;
+	}
+	
+	public void refreshCursor() {
+		startInit(1, ItemColumns.URI, ItemColumns.ALL_COLUMNS, getWhere(), getOrder());
+	}
+	
+	public CursorAdapter getAdapter() {
+		return mAdapter;
 	}
 
 
@@ -127,12 +148,6 @@ public class FeedFragment extends AbstractEpisodeFragment {
 	@Override
 	public int getItemLayout() {
 		return R.layout.episode_list_compact;
-	}
-
-	@Override
-	public void onRefreshStarted(View view) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override

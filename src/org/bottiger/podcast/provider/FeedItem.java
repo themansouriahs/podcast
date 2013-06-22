@@ -225,13 +225,12 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 			Subscription subscription, String oldestDate) {
 		String strID = String.valueOf(subscription.getId());
 		if (oldestDate != null) {
-		return context.query(ItemColumns.URI, ItemColumns.ALL_COLUMNS,
-				ItemColumns.SUBS_ID + "=? AND " + ItemColumns.DATE + ">?",
-				new String[] { strID, oldestDate }, null);
+			return context.query(ItemColumns.URI, ItemColumns.ALL_COLUMNS,
+					ItemColumns.SUBS_ID + "=? AND " + ItemColumns.DATE + ">?",
+					new String[] { strID, oldestDate }, null);
 		}
 		return context.query(ItemColumns.URI, ItemColumns.ALL_COLUMNS,
-				ItemColumns.SUBS_ID + "=?",
-				new String[] { strID}, null);		
+				ItemColumns.SUBS_ID + "=?", new String[] { strID }, null);
 	}
 
 	public static HashMap<String, FeedItem> allAsList(ContentResolver context,
@@ -450,13 +449,13 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 			cv.put(ItemColumns.LISTENED, listened);
 		if (priority >= 0)
 			cv.put(ItemColumns.PRIORITY, priority);
-		
+
 		if (image != null)
 			cv.put(ItemColumns.IMAGE_URL, image);
 
 		if (isDownloaded != null)
 			cv.put(ItemColumns.IS_DOWNLOADED, isDownloaded);
-		
+
 		// BaseColumns._ID + "=" + id
 		String condition = ItemColumns.URL + "='" + url + "'";
 		if (batchUpdate) {
@@ -475,7 +474,7 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 		}
 		return contentUpdate;
 	}
-	
+
 	/**
 	 * Update the FeedItem in the database
 	 */
@@ -528,7 +527,7 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 
 			if (isDownloaded != null)
 				cv.put(ItemColumns.IS_DOWNLOADED, isDownloaded);
-			
+
 			if (episodeNumber >= 0)
 				cv.put(ItemColumns.EPISODE_NUMBER, episodeNumber);
 			if (length >= 0)
@@ -859,11 +858,11 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 	public boolean isDownloaded() {
 		if (!this.isDownloaded)
 			return this.isDownloaded;
-		
+
 		File f = new File(getAbsolutePath());
 		if (f.exists())
 			return true;
-		
+
 		isDownloaded = false;
 		return isDownloaded;
 	}
@@ -1039,20 +1038,22 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 	private void increateHigherPriorities(FeedItem precedingItem,
 			Context context) {
 		String currentTime = String.valueOf(System.currentTimeMillis());
-		String updateLastUpdate = ", " + ItemColumns.LAST_UPDATE + "=" + currentTime + " ";
-		
+		String updateLastUpdate = ", " + ItemColumns.LAST_UPDATE + "="
+				+ currentTime + " ";
+
 		PodcastOpenHelper helper = new PodcastOpenHelper(context);
 		SQLiteDatabase db = helper.getWritableDatabase();
 		String action = "UPDATE " + ItemColumns.TABLE_NAME + " SET ";
-		String value = ItemColumns.PRIORITY + "=" + ItemColumns.PRIORITY
-				+ "+1" + updateLastUpdate;
+		String value = ItemColumns.PRIORITY + "=" + ItemColumns.PRIORITY + "+1"
+				+ updateLastUpdate;
 		String where = "WHERE " + ItemColumns.PRIORITY + ">=" + this.priority
 				+ " AND " + ItemColumns.PRIORITY + "<> 0 AND "
 				+ ItemColumns._ID + "<> " + this.id;
 		String sql = action + value + where;
 
 		String actionCurrent = "UPDATE " + ItemColumns.TABLE_NAME + " SET ";
-		String valueCurrent = ItemColumns.PRIORITY + "=" + this.priority + updateLastUpdate;
+		String valueCurrent = ItemColumns.PRIORITY + "=" + this.priority
+				+ updateLastUpdate;
 		String whereCurrent = "WHERE " + ItemColumns._ID + "==" + this.id;
 		String sqlCurrent = actionCurrent + valueCurrent + whereCurrent;
 
@@ -1289,5 +1290,17 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 	public void setDriveId(String fileID) {
 		remote_id = fileID;
 		// update(contentResolver);
+	}
+
+	public void queue(Context context) {
+
+		String sqlQueue = "update " + ItemColumns.TABLE_NAME + " set "
+				+ ItemColumns.PRIORITY + " = (select max("
+				+ ItemColumns.PRIORITY + ") from " + ItemColumns.TABLE_NAME
+				+ ")+1 where " + ItemColumns._ID + " =" + this.id;
+
+		PodcastOpenHelper helper = new PodcastOpenHelper(context);
+		SQLiteDatabase db = helper.getWritableDatabase();
+		db.execSQL(sqlQueue);
 	}
 }
