@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 import org.bottiger.podcast.parser.opml.OpmlElement;
 import org.bottiger.podcast.parser.opml.OpmlReader;
-import org.bottiger.podcast.provider.BulkUpdater;
+import org.bottiger.podcast.provider.DatabaseHelper;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.Subscription;
 import org.xmlpull.v1.XmlPullParserException;
@@ -30,7 +30,7 @@ public class OPMLImportExport {
 
 	private Context mContext;
 	private ContentResolver contentResolver;
-	private BulkUpdater mUpdater = new BulkUpdater();
+	private DatabaseHelper mUpdater = new DatabaseHelper();
 
 	public OPMLImportExport(Context context) {
 		this.mContext = context;

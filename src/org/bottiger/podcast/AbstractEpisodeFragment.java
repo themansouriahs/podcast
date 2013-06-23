@@ -2,6 +2,7 @@ package org.bottiger.podcast;
 
 import java.util.HashMap;
 
+import org.bottiger.podcast.provider.DatabaseHelper;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.PodcastOpenHelper;
@@ -22,6 +23,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.CursorLoader;
+import android.support.v4.widget.CursorAdapter;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -33,7 +35,7 @@ import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
-	
+
 	protected OnPlaylistRefreshListener mActivityCallback;
 
 	protected static HashMap<Integer, Integer> mIconMap;
@@ -43,7 +45,7 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 	protected long pref_select;
 
 	protected ListView actualListView = null;
-	
+
 	private SharedPreferences prefs;
 
 	String showListenedKey = "sowListened";
@@ -51,27 +53,26 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 
 	protected static final String episodesToShowKey = "episodesToShow";
 	protected static final int episodesToShowVal = 20;
-	
-    // Container Activity must implement this interface
-	// http://developer.android.com/training/basics/fragments/communicating.html
-    public interface OnPlaylistRefreshListener {
-        public void onRefreshPlaylist();
-    }
-    
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        
-        // This makes sure that the container activity has implemented
-        // the callback interface. If not, it throws an exception
-        try {
-        	mActivityCallback = (OnPlaylistRefreshListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnHeadlineSelectedListener");
-        }
-    }
 
+	// Container Activity must implement this interface
+	// http://developer.android.com/training/basics/fragments/communicating.html
+	public interface OnPlaylistRefreshListener {
+		public void onRefreshPlaylist();
+	}
+
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+
+		// This makes sure that the container activity has implemented
+		// the callback interface. If not, it throws an exception
+		try {
+			mActivityCallback = (OnPlaylistRefreshListener) activity;
+		} catch (ClassCastException e) {
+			throw new ClassCastException(activity.toString()
+					+ " must implement OnHeadlineSelectedListener");
+		}
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -84,7 +85,7 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.episode_list, menu);
 		super.onCreateOptionsMenu(menu, inflater);
-		
+
 		ThemeHelper themeHelper = new ThemeHelper(getActivity());
 		MenuItem menuItemSync = menu.findItem(R.id.menu_sync);
 		menuItemSync.setIcon(themeHelper.getAttr(R.attr.sync_icon));
@@ -112,8 +113,9 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 		}
 		case R.id.menu_sync:
 			if (prefs.getBoolean(SettingsActivity.CLOUD_SUPPORT, true)) {
-				//Account account = mCredential.getSelectedAccount();
-				Account account = MainActivity.getCredentials().getSelectedAccount();
+				// Account account = mCredential.getSelectedAccount();
+				Account account = MainActivity.getCredentials()
+						.getSelectedAccount();
 				Bundle bundle = new Bundle();
 				bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
 				bundle.putBoolean(ContentResolver.SYNC_EXTRAS_FORCE, true);
@@ -239,18 +241,27 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 		pullToRefreshView.setOnRefreshListener(pullToRefreshListener);
 	}
 
-	protected static void resetPlaylist(Context context) {
+	protected void resetPlaylist(Context context) {
 		// Update the database
-		PodcastOpenHelper helper = new PodcastOpenHelper(context);
-		SQLiteDatabase db = helper.getWritableDatabase();
 		String currentTime = String.valueOf(System.currentTimeMillis());
-		String updateLastUpdate = ", " + ItemColumns.LAST_UPDATE + "=" + currentTime + " ";
-		
+		String updateLastUpdate = ", " + ItemColumns.LAST_UPDATE + "="
+				+ currentTime + " ";
+
+		// We remove the playlist position for all items in the playlist.
 		String action = "UPDATE " + ItemColumns.TABLE_NAME + " SET ";
 		String value = ItemColumns.PRIORITY + "=0" + updateLastUpdate;
 		String where = "WHERE " + ItemColumns.PRIORITY + "<> 0";
-		String sql = action + value + where;
-		db.execSQL(sql);
+
+		// Also update the timestamp of the top item in order to indicate to the
+		// drivesyncer
+		// Our data is up tp date.
+		String where2 = " OR " + ItemColumns._ID + "==(select " + ItemColumns._ID + " from " + ItemColumns.TABLE_NAME
+				+ " order by " + ItemColumns.DATE + " desc limit 1)";
+
+		String sql = action + value + where + where2;
+
+		DatabaseHelper dbHelper = new DatabaseHelper();
+		dbHelper.executeSQL(context, sql, mAdapter);
 	}
 
 }

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-import org.bottiger.podcast.provider.BulkUpdater;
+import org.bottiger.podcast.provider.DatabaseHelper;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.gpodder.GPodderSubscriptionWrapper;
@@ -148,7 +148,7 @@ public class JSONFeedParserWrapper {
 			// HashMap<String, FeedItem> databaseItems = FeedItem.allAsList(cr,
 			// subscription, null);
 
-			BulkUpdater bulkUpdater = new BulkUpdater();
+			DatabaseHelper bulkUpdater = new DatabaseHelper();
 
 			// we iterate over all the input items
 			for (FeedItem item : items) {

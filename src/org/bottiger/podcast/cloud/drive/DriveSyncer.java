@@ -21,7 +21,7 @@ import java.util.zip.Deflater;
 
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.RecentItemFragment;
-import org.bottiger.podcast.provider.BulkUpdater;
+import org.bottiger.podcast.provider.DatabaseHelper;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.Subscription;
@@ -112,7 +112,7 @@ public class DriveSyncer {
 
 	private List<WithIcon> subscriptions = new LinkedList<WithIcon>();
 
-	private BulkUpdater mUpdater = new BulkUpdater();
+	private DatabaseHelper mUpdater = new DatabaseHelper();
 	private Map<String, File> files;
 
 	private Gson gson = new Gson();
@@ -193,6 +193,7 @@ public class DriveSyncer {
 
 			// The the files which have changed since the apps changeID
 			files = getChangedFiles(mLargestChangeId);
+			Log.d(TAG, files.size() + " Files have changed on the remote destination");
 
 			// Fetch the ContentResolver
 			ContentResolver contentResolver = mContext.getContentResolver();

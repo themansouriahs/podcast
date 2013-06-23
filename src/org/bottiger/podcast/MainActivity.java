@@ -101,7 +101,7 @@ public class MainActivity extends FragmentActivity implements
 
 	public static Account mAccount;
 
-	public static final boolean debugging = false;
+	public static final boolean debugging = true;
 
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -179,6 +179,14 @@ public class MainActivity extends FragmentActivity implements
 				((SoundWaves) this.getApplication()).getBugSenseAPIKey());
 
 		setContentView(R.layout.activity_swipe);
+		
+		mFragmentManager = getSupportFragmentManager(); // getSupportFragmentManager();
+
+		if (debugging)
+			mFragmentManager.enableDebugLogging(true);
+
+		mFragmentTransition = mFragmentManager.beginTransaction();
+		mSectionsPagerAdapter = new SectionsPagerAdapter(mFragmentManager);
 
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		// View pager2 = (ViewPager) findViewById(R.id.drawer_layout);
@@ -268,14 +276,6 @@ public class MainActivity extends FragmentActivity implements
 		registerReceiver(receiver, receiverFilter);
 
 		ControlButtons.setThemeHelper(getApplicationContext());
-
-		mFragmentManager = getSupportFragmentManager(); // getSupportFragmentManager();
-
-		if (debugging)
-			mFragmentManager.enableDebugLogging(true);
-
-		mFragmentTransition = mFragmentManager.beginTransaction();
-		mSectionsPagerAdapter = new SectionsPagerAdapter(mFragmentManager);
 
 		/*
 		 * TabPageIndicator indicator = (TabPageIndicator)

@@ -43,7 +43,7 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 	private final PodcastLog log = PodcastLog.getLog(getClass());
 	private static ItemLruCache cache = null;
 
-	private BulkUpdater mBulkUpdater = null;
+	private DatabaseHelper mBulkUpdater = null;
 
 	/*
 	 * Let's document these retared fields! They are totally impossible to guess
@@ -1299,8 +1299,7 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 				+ ItemColumns.PRIORITY + ") from " + ItemColumns.TABLE_NAME
 				+ ")+1 where " + ItemColumns._ID + " =" + this.id;
 
-		PodcastOpenHelper helper = new PodcastOpenHelper(context);
-		SQLiteDatabase db = helper.getWritableDatabase();
-		db.execSQL(sqlQueue);
+		DatabaseHelper dbHelper = new DatabaseHelper();
+		dbHelper.executeSQL(context, sqlQueue);
 	}
 }

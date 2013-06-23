@@ -5,6 +5,9 @@ Version 0.20
 ------------
 
 * Added visual effects to some buttons when pressed
+* Performance enhancments when doing operarions in the backend
+* Fixed a bug where the cross device syncing would overwrite the playlist with an old version
+* Various stability bugs
 
 Version 0.19
 ------------

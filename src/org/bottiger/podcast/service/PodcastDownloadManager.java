@@ -462,7 +462,7 @@ public class PodcastDownloadManager {
 		Query query = new Query();
 		query.setFilterById(downloadReference);
 		Cursor c = downloadManager.query(query);
-		if (c.moveToFirst()) {
+		if (c != null && c.moveToFirst()) {
 			int columnIndex = c.getColumnIndex(DownloadManager.COLUMN_STATUS);
 			int status = c.getInt(columnIndex);
 
