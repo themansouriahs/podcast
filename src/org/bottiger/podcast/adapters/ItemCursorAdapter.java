@@ -243,7 +243,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 					else
 						preTitle = String.valueOf(priority);
 					
-					if (priority > 0) {
+					if (priority > 0 || MainActivity.debugging) {
 						title = preTitle + " # " + title;
 					} 
 					
