@@ -1,7 +1,15 @@
 package org.bottiger.podcast;
 
+import org.acra.ACRA;
+import org.acra.annotation.ReportsCrashes;
+
 import android.app.Application;
-import android.graphics.Bitmap.CompressFormat;
+
+// Acra debugging
+@ReportsCrashes(
+	      formKey = "", // This is required for backward compatibility but not used
+	      formUri = "http://www.backendofyourchoice.com/reportpath"
+	  )
 
 public class SoundWaves extends Application {
 
@@ -10,17 +18,25 @@ public class SoundWaves extends Application {
 
 	// Bugsense API Key.
 	// https://www.bugsense.com/dashboard/project/
-	public final String bugSenseAPIKey = "11b0ee02";
+	public final String bugSenseAPIKey = "";
 
 	// zubhium API Key.
-	public final String zubhiumAPIKey = "2168f55feb0b29864c927eae05b78c";
+	public final String zubhiumAPIKey = "";
 
 	// Google API Key: https://code.google.com/apis/console/
 	// Get fingerprint like this:
 	// keytool -exportcert -alias androiddebugkey -keystore
 	// .android/debug.keystore -list -v
-	public final String googleReaderConsumerKey = "13654253758-cc5plpi2m80d9g9utkp6jm1t9pebi7r4.apps.googleusercontent.com";
+	public final String googleReaderConsumerKey = "";
 
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        // The following line triggers the initialization of ACRA
+        ACRA.init(this);
+    }
+	
 	public String getZubhiumAPIKey() {
 		return this.zubhiumAPIKey;
 	}

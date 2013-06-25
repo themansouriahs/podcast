@@ -51,10 +51,10 @@ Ignore SoundWaves.java
 
 After you fill in the sensitive information in SoundWaves.java use the following line to avoid commiting it:
 
-    git update-index --assume-unchanged src/info/bottiger/podcast/SoundWaves.java
+    git update-index --assume-unchanged src/org/bottiger/podcast/SoundWaves.java
     git update-index --assume-unchanged AndroidManifest.xml
 
 if you make changes you can start tracking it again with
 
-    git update-index --no-assume-unchanged src/info/bottiger/podcast/SoundWaves.java
+    git update-index --no-assume-unchanged src/org/bottiger/podcast/SoundWaves.java
     git update-index --no-assume-unchanged AndroidManifest.xml
