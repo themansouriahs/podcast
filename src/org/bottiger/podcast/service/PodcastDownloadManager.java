@@ -362,7 +362,7 @@ public class PodcastDownloadManager {
 				String where = ItemColumns.IS_DOWNLOADED + "==1";
 
 				// sort by nevest first
-				String sortOrder = ItemColumns.LAST_UPDATE + " ASC";
+				String sortOrder = ItemColumns.LAST_UPDATE + " DESC";
 
 				Cursor cursor = mContext.getContentResolver().query(
 						ItemColumns.URI, ItemColumns.ALL_COLUMNS, where, null,
