@@ -11,6 +11,7 @@ import org.bottiger.podcast.debug.SqliteCopy;
 import org.bottiger.podcast.images.ImageCacheManager;
 import org.bottiger.podcast.images.ImageCacheManager.CacheType;
 import org.bottiger.podcast.images.RequestManager;
+import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.PodcastProvider;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
@@ -175,8 +176,10 @@ public class MainActivity extends FragmentActivity implements
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		/*
 		BugSenseHandler.initAndStartSession(MainActivity.this,
 				((SoundWaves) this.getApplication()).getBugSenseAPIKey());
+				*/
 
 		setContentView(R.layout.activity_swipe);
 		
