@@ -168,6 +168,8 @@ public class JSONFeedParserWrapper {
 		Subscription subscription = subscriptionWrapper.getSubscription(cr,
 				cachedSubscriptionObject);
 		Collection<GPodderEpisodeWrapper> episodes = subscriptionWrapper.episodes;
+
+		Log.d("Feed Updater/Profiler", "updateFeed(): " + subscription.url);
 		
 		long update_date = subscription.lastItemUpdated;
 		int add_num = 0;
