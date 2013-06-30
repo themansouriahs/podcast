@@ -2,13 +2,18 @@ package org.bottiger.podcast.parser;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import org.bottiger.podcast.provider.DatabaseHelper;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.provider.gpodder.GPodderEpisodeWrapper;
+import org.bottiger.podcast.provider.gpodder.GPodderEpisodeWrapper.JSONFile;
 import org.bottiger.podcast.provider.gpodder.GPodderSubscriptionWrapper;
 import org.bottiger.podcast.service.PodcastDownloadManager;
 import org.bottiger.podcast.utils.PodcastLog;
@@ -93,6 +98,7 @@ public class JSONFeedParserWrapper {
 			start = System.currentTimeMillis();
 			Subscription subscription;
 			ArrayList<FeedItem> episodes;
+			/*
 			synchronized (cacheLock) {
 				subscription = subscriptionWrapper.getSubscription(cr,
 						cachedSubscriptionObject);
@@ -105,9 +111,9 @@ public class JSONFeedParserWrapper {
 			Log.d("Parser Profiler", "object creation time: " + timeDiff
 					+ " for " + arraySize + " objects. "
 					+ ((double) timeDiff / (double) arraySize) + " pr object");
-
+			*/
 			start = System.currentTimeMillis();
-			updateFeed(subscription, episodes, false);
+			updateFeed(subscriptionWrapper, false);
 			end = System.currentTimeMillis();
 			Log.d("Parser Profiler", "updateFeed time: " + (end - start));
 			PodcastDownloadManager.startDownload(mContext);
@@ -157,17 +163,23 @@ public class JSONFeedParserWrapper {
 		return subscriptionWrapper;
 	}
 
-	public int updateFeed(Subscription subscription, ArrayList<FeedItem> items,
+	public int updateFeed(GPodderSubscriptionWrapper subscriptionWrapper,
 			boolean updateExisting) {
+		Subscription subscription = subscriptionWrapper.getSubscription(cr,
+				cachedSubscriptionObject);
+		Collection<GPodderEpisodeWrapper> episodes = subscriptionWrapper.episodes;
+		
 		long update_date = subscription.lastItemUpdated;
 		int add_num = 0;
 		boolean insertSucces = false;
 		boolean autoDownload = sharedPrefs.getBoolean(
 				"pref_download_on_update", true);
+		SimpleDateFormat dt = new SimpleDateFormat(FeedItem.default_format);
+		
 		
 		SQLiteStatement sqlStatment = DatabaseHelper.prepareFeedUpdateQuery(mContext, UPDATE_COLUMNS);
 
-		if (items != null && !items.isEmpty()) {
+		if (episodes != null && !episodes.isEmpty()) {
 
 			FeedItem oldestItem = null;
 			HashMap<String, FeedItem> databaseItems = null;
@@ -176,23 +188,23 @@ public class JSONFeedParserWrapper {
 			// Sort the items to find the oldest
 			try {
 				// FIXME why are there null's in here?
-				items.removeAll(Collections.singleton(null));
+				episodes.removeAll(Collections.singleton(null));
 
-				Collections.sort(items);
+				Iterator<GPodderEpisodeWrapper> episodeItr = episodes.iterator();
+				int oldestRelease = 0;
+				GPodderEpisodeWrapper oldestEpisode = null;
+				
+				while (episodeItr.hasNext()) {
+					GPodderEpisodeWrapper episode = episodeItr.next();
+					if (oldestRelease < episode.released || oldestEpisode == null) {
+						oldestEpisode = episode;
+					}
+				}
 
-				oldestItem = items.get(items.size() - 1);
-
-				oldestDate = oldestItem.getDate();
-				// databaseItems = FeedItem.allAsList(cr, subscription,
-				// oldestDate);
+				Date time = new Date((long) oldestEpisode.released * 1000);
+				oldestDate = dt.format(time);
 			} catch (Exception e) {
 				e.printStackTrace();
-				for (FeedItem item : items) {
-					String title = item == null ? "null" : item.title;
-					if (title == null)
-						title = "item.title is null";
-					Log.d("Feed Updater", "Item title: " + title);
-				}
 			}
 			databaseItems = FeedItem.allAsList(cr, subscription, oldestDate);
 			// HashMap<String, FeedItem> databaseItems = FeedItem.allAsList(cr,
@@ -201,13 +213,36 @@ public class JSONFeedParserWrapper {
 			DatabaseHelper bulkUpdater = new DatabaseHelper();
 
 			// we iterate over all the input items
-			for (FeedItem item : items) {
+			for (GPodderEpisodeWrapper episode : episodes) {
 
 				// and if the item is not included in the database already we
 				// add it
-				String url = item.getURL();
+				String url = null;
+				
+				Iterator<JSONFile> itr = episode.files.iterator();
+				while (itr.hasNext()) {
+					JSONFile file = itr.next();
+					if (file.urls != null) {
+						Iterator<String> itrURL = file.urls.iterator();
+						while (itrURL.hasNext()) {
+							String urlCandidate = itrURL.next();
+							if (urlCandidate != null) {
+								url = urlCandidate;
+								break;
+							}
+						}
+					}
+				}
+				
+				if (url == null) {
+					int j = 5;
+					j = j +5;
+				}
+				
 				if (databaseItems != null && !databaseItems.containsKey(url)) {
 
+					FeedItem item = FeedItem.getByURL(cr, url);
+					
 					Long itemDate = item.getLongDate();
 
 					if (itemDate > update_date) {
@@ -248,6 +283,7 @@ public class JSONFeedParserWrapper {
 							+ "\n add num = " + add_num);
 				} else {
 					if (updateExisting) {
+						FeedItem item = FeedItem.getByURL(cr, url);
 						if (USE_COMPILED_STATMENTS) {
 							DatabaseHelper.executeStatment(sqlStatment, columnValues(item), item.url);
 						} else {
