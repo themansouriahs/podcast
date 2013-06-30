@@ -235,11 +235,15 @@ public class JSONFeedParserWrapper {
 				}
 				
 				if (url == null) {
+					url = episode.link;
+				}
+				
+				if (url == null) {
 					int j = 5;
 					j = j +5;
 				}
 				
-				if (databaseItems != null && !databaseItems.containsKey(url)) {
+				if (url != null && databaseItems != null && !databaseItems.containsKey(url)) {
 
 					FeedItem item = FeedItem.getByURL(cr, url);
 					
