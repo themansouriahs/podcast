@@ -12,8 +12,10 @@ import org.bottiger.podcast.images.ImageCacheManager;
 import org.bottiger.podcast.images.ImageCacheManager.CacheType;
 import org.bottiger.podcast.images.RequestManager;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.PodcastOpenHelper;
 import org.bottiger.podcast.provider.PodcastProvider;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.provider.gpodder.GPodderEpisodeWrapper;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.service.HTTPDService;
 import org.bottiger.podcast.service.PlayerService;
@@ -180,6 +182,10 @@ public class MainActivity extends FragmentActivity implements
 		BugSenseHandler.initAndStartSession(MainActivity.this,
 				((SoundWaves) this.getApplication()).getBugSenseAPIKey());
 				*/
+		//3132
+		//PodcastOpenHelper helper = new PodcastOpenHelper(this);
+		//helper.getWritableDatabase().execSQL("delete from item where _id >= 3132");
+		
 
 		setContentView(R.layout.activity_swipe);
 		

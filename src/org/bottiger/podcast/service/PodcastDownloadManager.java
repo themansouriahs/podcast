@@ -1,6 +1,7 @@
 package org.bottiger.podcast.service;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -131,12 +132,22 @@ public class PodcastDownloadManager {
 
 		Cursor subscriptionCursor = Subscription.allAsCursor(context
 				.getContentResolver());
+		
+		MyResponseListener responseListener = new MyResponseListener(feedParser);
 
 		while (subscriptionCursor.moveToNext()) {
 
 			Subscription sub = Subscription.getByCursor(subscriptionCursor);
 
 			if (subscription == null || sub.equals(subscription)) {
+
+				/*
+				 * URL url; try { url = new
+				 * URL("http://feeds.gpodder.net/parse?url=" + sub.getUrl());
+				 * new JacksonURLParser(feedParser).execute(url); } catch
+				 * (MalformedURLException e) { // TODO Auto-generated catch
+				 * block e.printStackTrace(); }
+				 */
 
 				// Create a json request intended to fetching json data
 				JsonArrayRequest jr = new JsonArrayRequest(
@@ -151,12 +162,29 @@ public class PodcastDownloadManager {
 						DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
 				jr.setRetryPolicy(retryPolicy);
 
-				// Add the request to Volley
+				// Add the request to Volley 
 				requestQueue.add(jr);
+
 			}
 		}
 		requestQueue.start();
 	}
+
+	/*
+	 * private static class JacksonURLParser extends AsyncTask<URL, Void, Void>
+	 * {
+	 * 
+	 * JSONFeedParserWrapper feedParser = null;
+	 * 
+	 * public JacksonURLParser(JSONFeedParserWrapper feedParser) {
+	 * this.feedParser = feedParser; }
+	 * 
+	 * protected Void doInBackground(URL... urls) { URL url = urls[0];
+	 * Thread.currentThread().setPriority(Thread.MIN_PRIORITY); long start =
+	 * System.currentTimeMillis(); feedParser.feedParser(url); long end =
+	 * System.currentTimeMillis(); Log.d("Parser Profiler", "total time: " +
+	 * (end - start)); return null; } }
+	 */
 
 	static class MyResponseListener implements Listener<JSONArray> {
 
@@ -171,12 +199,6 @@ public class PodcastDownloadManager {
 		@Override
 		public void onResponse(JSONArray response) {
 			volleyResultParser.execute(response);
-			/*
-			 * final JSONArray finalResponse = response; new Thread(new
-			 * Runnable() { public void run() {
-			 * Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-			 * feedParser.feedParser(finalResponse); } }).start();
-			 */
 		}
 
 	}
@@ -204,6 +226,7 @@ public class PodcastDownloadManager {
 			final JSONFeedParserWrapper feedParser,
 			final Subscription subscription) {
 		return new Response.Listener<JSONArray>() {
+
 			@Override
 			public void onResponse(JSONArray response) {
 				feedParser.feedParser(response);
@@ -213,9 +236,9 @@ public class PodcastDownloadManager {
 
 	private static Response.ErrorListener createGetFailureListener() {
 		return new Response.ErrorListener() {
+
 			@Override
-			public void onErrorResponse(VolleyError error) {
-				// Handle error
+			public void onErrorResponse(VolleyError error) { // Handle error
 				error.printStackTrace();
 				int i = 5;
 				i = i + i;

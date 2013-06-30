@@ -2,6 +2,8 @@ package org.bottiger.podcast.provider;
 
 import java.util.ArrayList;
 
+import com.google.common.collect.ObjectArrays;
+
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -116,6 +118,61 @@ public class DatabaseHelper {
 
 		// }
 		// }).start();
+	}
+
+	public static void executeStatment(SQLiteStatement statment,
+			Object[] columnValues, String whereURL) {
+		// String[] allArgs = ObjectArrays.concat(columnValues, new
+		// String[]{whereURL}, String.class);
+		int i = 1;
+		for (Object value : columnValues) {
+			if (value instanceof String) {
+				String stringValue = (String)value;
+				statment.bindString(i, stringValue);
+			} else {
+				Number numValue = (Number)value;
+				Long longValue = (long)0;
+				if (numValue != null) {
+					longValue = numValue.longValue();
+				}
+				statment.bindLong(i, longValue);
+			}
+			i++;
+
+		}
+
+		// statment.bindAllArgsAsStrings(allArgs);
+		statment.execute();
+		statment.clearBindings();
+	}
+
+	public static SQLiteStatement prepareFeedUpdateQuery(Context context,
+			String[] columnNames) {
+		PodcastOpenHelper helper = new PodcastOpenHelper(context);
+		SQLiteDatabase database = helper.getWritableDatabase();
+		SQLiteStatement statment = buildFeedUpdateQuery(database, columnNames);
+		return statment;
+	}
+
+	public static SQLiteStatement buildFeedUpdateQuery(SQLiteDatabase database,
+			String[] columnNames) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("update " + ItemColumns.TABLE_NAME + " set ");
+		
+		int i = 0;
+		int arrayLength = columnNames.length;
+		for (String name : columnNames) {
+			i++;
+			builder.append(name + "=?");
+			if (i != arrayLength)
+				builder.append(", ");
+		}
+		builder.append(" where url=?");
+
+		String sql = builder.toString();
+		SQLiteStatement stmt = database.compileStatement(sql);
+
+		return stmt;
 	}
 
 }

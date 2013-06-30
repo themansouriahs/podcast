@@ -1,6 +1,5 @@
 package org.bottiger.podcast.parser;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,6 +7,7 @@ import java.util.HashMap;
 
 import org.bottiger.podcast.provider.DatabaseHelper;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.gpodder.GPodderSubscriptionWrapper;
 import org.bottiger.podcast.service.PodcastDownloadManager;
@@ -17,11 +17,12 @@ import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteStatement;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonParseException;
 
 /**
  * 
@@ -30,12 +31,26 @@ import com.google.gson.JsonParseException;
  */
 public class JSONFeedParserWrapper {
 
+	private final boolean USE_GSON = true;
+	private final boolean USE_COMPILED_STATMENTS = true;
+
 	private final PodcastLog log = PodcastLog.getLog(getClass());
 	private Context mContext;
 	private ContentResolver cr;
 	private SimpleDateFormat dt = new SimpleDateFormat(FeedItem.default_format);
 
 	private SharedPreferences sharedPrefs;
+
+	/** Cached objecs used for Object creation */
+	static final Object cacheLock = new Object();
+	Subscription cachedSubscriptionObject = new Subscription();
+	ArrayList<FeedItem> cachedEpisodeObjects = new ArrayList<FeedItem>();
+
+	public static final String[] UPDATE_COLUMNS = { ItemColumns.TITLE,
+			ItemColumns.AUTHOR, ItemColumns.DATE, ItemColumns.CONTENT,
+			ItemColumns.FILESIZE, ItemColumns.DURATION, ItemColumns.LENGTH,
+			ItemColumns.SUB_TITLE, ItemColumns.EPISODE_NUMBER,
+			ItemColumns.DURATION_MS };
 
 	public JSONFeedParserWrapper(Context context) {
 		this.mContext = context;
@@ -50,26 +65,46 @@ public class JSONFeedParserWrapper {
 	 * @param subscription
 	 */
 	public void feedParser(org.json.JSONArray jsonArray) {
-		long start = System.currentTimeMillis();
-		GPodderSubscriptionWrapper subscriptionWrapper = jsonParser(jsonArray);
-		long end = System.currentTimeMillis();
-		Log.d("Parser Profiler", "gson time: " + (end - start));
+		// public void feedParser(URL url) {
 
-		/*
-		 * Wait untill Jackson 2.2.1 is released start =
-		 * System.currentTimeMillis(); GPodderSubscriptionWrapper[]
-		 * subscriptionWrapper2 = jacson(jsonArray.toString()); end =
-		 * System.currentTimeMillis();
-		 */
-		Log.d("Parser Profiler", "jackson time: " + (end - start));
+		GPodderSubscriptionWrapper subscriptionWrapper = null;
+		long start = 0;
+		long end = 0;
+
+		if (USE_GSON) {
+
+			start = System.currentTimeMillis();
+			subscriptionWrapper = jsonParser(jsonArray);
+			end = System.currentTimeMillis();
+			Log.d("Parser Profiler", "gson time: " + (end - start));
+
+		} else {
+			GpodderJacksonParser jacksonParser = new GpodderJacksonParser();
+			start = System.currentTimeMillis();
+
+			// StringReader sr = new StringReader(jsonArray.toString());
+			subscriptionWrapper = jacksonParser.streamParser(jsonArray
+					.toString());
+			end = System.currentTimeMillis();
+			Log.d("Parser Profiler", "jackson time: " + (end - start));
+		}
 
 		if (subscriptionWrapper != null) { // FIXME this should not be null
 			start = System.currentTimeMillis();
-			Subscription subscription = subscriptionWrapper.getSubscription(cr);
-			ArrayList<FeedItem> episodes = subscriptionWrapper.getEpisodes(cr); // Optimize?
-																				// FIXME
+			Subscription subscription;
+			ArrayList<FeedItem> episodes;
+			synchronized (cacheLock) {
+				subscription = subscriptionWrapper.getSubscription(cr,
+						cachedSubscriptionObject);
+				episodes = subscriptionWrapper.getEpisodes(cr, subscription,
+						cachedEpisodeObjects);
+			}
 			end = System.currentTimeMillis();
-			Log.d("Parser Profiler", "object creation time: " + (end - start));
+			long timeDiff = (end - start);
+			long arraySize = episodes.size();
+			Log.d("Parser Profiler", "object creation time: " + timeDiff
+					+ " for " + arraySize + " objects. "
+					+ ((double) timeDiff / (double) arraySize) + " pr object");
 
 			start = System.currentTimeMillis();
 			updateFeed(subscription, episodes, false);
@@ -114,7 +149,8 @@ public class JSONFeedParserWrapper {
 		if (subscriptionWrappers.length > 0) {
 			subscriptionWrapper = subscriptionWrappers[0];
 
-			Subscription subscription = subscriptionWrapper.getSubscription(cr);
+			Subscription subscription = subscriptionWrapper.getSubscription(cr,
+					cachedSubscriptionObject);
 			subscription.update(cr);
 		}
 
@@ -128,23 +164,37 @@ public class JSONFeedParserWrapper {
 		boolean insertSucces = false;
 		boolean autoDownload = sharedPrefs.getBoolean(
 				"pref_download_on_update", true);
+		
+		SQLiteStatement sqlStatment = DatabaseHelper.prepareFeedUpdateQuery(mContext, UPDATE_COLUMNS);
 
-		if (!items.isEmpty()) {
+		if (items != null && !items.isEmpty()) {
 
 			FeedItem oldestItem = null;
 			HashMap<String, FeedItem> databaseItems = null;
 
+			String oldestDate = null;
 			// Sort the items to find the oldest
 			try {
+				// FIXME why are there null's in here?
+				items.removeAll(Collections.singleton(null));
+
 				Collections.sort(items);
 
 				oldestItem = items.get(items.size() - 1);
 
-				databaseItems = FeedItem.allAsList(cr, subscription,
-						oldestItem.getDate());
+				oldestDate = oldestItem.getDate();
+				// databaseItems = FeedItem.allAsList(cr, subscription,
+				// oldestDate);
 			} catch (Exception e) {
 				e.printStackTrace();
+				for (FeedItem item : items) {
+					String title = item == null ? "null" : item.title;
+					if (title == null)
+						title = "item.title is null";
+					Log.d("Feed Updater", "Item title: " + title);
+				}
 			}
+			databaseItems = FeedItem.allAsList(cr, subscription, oldestDate);
 			// HashMap<String, FeedItem> databaseItems = FeedItem.allAsList(cr,
 			// subscription, null);
 
@@ -163,11 +213,23 @@ public class JSONFeedParserWrapper {
 					if (itemDate > update_date) {
 						update_date = itemDate;
 					}
-					item.insert(cr);
-					Log.d("Feed Updater", "Inserting new episode: "
-							+ item.title);
+					Uri insertedItem = item.insert(cr);
 
-					add_num++;
+					if (insertedItem != null) {
+						Log.d("Feed Updater", "Inserting new episode: "
+								+ item.title);
+
+						add_num++;
+					} else if (updateExisting) {
+						
+						if (USE_COMPILED_STATMENTS) {
+							DatabaseHelper.executeStatment(sqlStatment, columnValues(item), item.url);
+						} else {
+							bulkUpdater.addOperation(item.update(cr, true, true));
+						}
+						//bulkUpdater.addOperation(item.update(cr, true, true));
+						
+					}
 
 					/*
 					 * Download podcasts
@@ -186,7 +248,11 @@ public class JSONFeedParserWrapper {
 							+ "\n add num = " + add_num);
 				} else {
 					if (updateExisting) {
-						bulkUpdater.addOperation(item.update(cr, true, true));
+						if (USE_COMPILED_STATMENTS) {
+							DatabaseHelper.executeStatment(sqlStatment, columnValues(item), item.url);
+						} else {
+							bulkUpdater.addOperation(item.update(cr, true, true));
+						}
 						Log.d("Feed Updater", "Updating episode: " + item.title
 								+ "(" + item.image + ")");
 					}
@@ -202,6 +268,28 @@ public class JSONFeedParserWrapper {
 			return add_num;
 		}
 		return 0;
+	}
+	
+	/*
+	 * 	public static final String[] UPDATE_COLUMNS = { ItemColumns.TITLE,
+			ItemColumns.AUTHOR, ItemColumns.DATE, ItemColumns.CONTENT,
+			ItemColumns.FILESIZE, ItemColumns.DURATION, ItemColumns.LENGTH,
+			ItemColumns.SUB_TITLE, ItemColumns.EPISODE_NUMBER,
+			ItemColumns.DURATION_MS };
+	 */
+	private Object[] columnValues(FeedItem item) {
+		Object[] values = new Object[UPDATE_COLUMNS.length];
+		values[0] = item.title;
+		values[1] = item.author;
+		values[2] = item.date;
+		values[3] = item.content;
+		values[4] = item.filesize;
+		values[5] = item.duration_string;
+		values[6] = item.length;
+		values[7] = item.sub_title;
+		values[8] = item.episodeNumber;
+		values[9] = item.duration_ms;
+		return values;
 	}
 
 }

@@ -2,7 +2,7 @@ package org.bottiger.podcast.provider.gpodder;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
+import java.util.Iterator;
 
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.Subscription;
@@ -11,31 +11,40 @@ import android.content.ContentResolver;
 
 public class GPodderSubscriptionWrapper {
 
-	private String title;
-	private String link;
-	private String description;
-	private String subtitle;
-	private String author;
-	private String language;
-	private Collection<String> urls;
-	private String new_location;
-	private String logo;
-	private String logo_data; // works
-	private Collection<String> content_types;
-	private String hub;
-	// private String errors;
-	// private String warnings;
-	private String http_last_modified;
-	private String http_etag;
-	private String license;
-	private Collection<GPodderEpisodeWrapper> episodes;
+	public String title;
+	public String link;
+	public String description;
+	public String subtitle;
+	public String author;
+	public String language;
+	public Collection<String> urls;
+	public String new_location;
+	public String logo;
+	public String logo_data; // works
+	public Collection<String> content_types;
+	public String hub;
+	// public String errors;
+	// public String warnings;
+	public String http_last_modified;
+	public String http_etag;
+	public String license;
+	public Collection<GPodderEpisodeWrapper> episodes;
 
-	public Subscription getSubscription(ContentResolver contentResolver) {
+	public Subscription getSubscription(ContentResolver contentResolver,
+			Subscription cachedSubscriptionObject) {
 
 		String url = urls.iterator().next();
-		Subscription subscription = Subscription.getByUrl(contentResolver, url);
+
+		Subscription subscription;
+
+		subscription = Subscription.getByUrl(contentResolver, url);
 		if (subscription == null) {
-			subscription = new Subscription();
+			if (cachedSubscriptionObject != null)
+				cachedSubscriptionObject.reset();
+			else
+				cachedSubscriptionObject = new Subscription();
+			
+			subscription = cachedSubscriptionObject;
 		}
 
 		subscription.title = title;
@@ -46,15 +55,44 @@ public class GPodderSubscriptionWrapper {
 		return subscription;
 	}
 
-	public ArrayList<FeedItem> getEpisodes(ContentResolver contentResolver) {
+	public ArrayList<FeedItem> getEpisodes(ContentResolver contentResolver,
+			Subscription subscription, ArrayList<FeedItem> cachedEpisodeObjects) {
+
 		ArrayList<FeedItem> items = new ArrayList<FeedItem>();
 		if (episodes != null) {
-			for (GPodderEpisodeWrapper episode : episodes) {
-				items.add(episode.toFeedItem(contentResolver,
-						getSubscription(contentResolver)));
+			// for (GPodderEpisodeWrapper episode : episodes) {
+			
+			// Create an iterator in order to iterate over the wrapped episodes
+			Iterator<GPodderEpisodeWrapper> wrapperIterator = episodes.iterator();
+			Iterator<FeedItem> cacheIterator = cachedEpisodeObjects.iterator();
+			
+			// Calculate the amount of times the loop should run
+			int largestLoop = episodes.size() > cachedEpisodeObjects.size() ? episodes
+					.size() : cachedEpisodeObjects.size();
+					
+			// populate "items" with new objects.
+			for (int i = 0; i < episodes.size(); i++) {
+				
+				// Get a wrapped episode from the iterator if it exists
+				GPodderEpisodeWrapper episode = getNextFromIterator(wrapperIterator);
+				FeedItem cachedEpisode = getNextFromIterator(cacheIterator);
+				
+				if (cachedEpisode == null) {
+					cachedEpisode = new FeedItem();
+					cachedEpisodeObjects.add(cachedEpisode);
+				}
+				
+				if (episode != null)
+					items.add(episode.toFeedItem(contentResolver, subscription, cachedEpisode));
 			}
 		}
 		return items;
+	}
+	
+	private <T> T getNextFromIterator(Iterator<T> iterator) {
+		if (iterator.hasNext())
+			return iterator.next();
+		return null;
 	}
 
 }

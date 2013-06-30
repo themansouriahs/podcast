@@ -275,7 +275,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 					}
 				}
 
-				if (item.image != null && !item.image.equals("")) {
+				if (false && (item.image != null && !item.image.equals(""))) {
 
 					// ImageLoader imageLoader = getImageLoader(context);
 					// imageLoader.displayImage(item.image, holder.icon);

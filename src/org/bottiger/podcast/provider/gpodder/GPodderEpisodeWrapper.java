@@ -3,6 +3,7 @@ package org.bottiger.podcast.provider.gpodder;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.Subscription;
@@ -12,26 +13,26 @@ import android.content.ContentResolver;
 
 public class GPodderEpisodeWrapper {
 
-	private String guid;
-	private String title;
-	private String subtitle;
-	private String short_title;
-	private String content;
-	private int number;
-	private int released;
-	private String description;
-	private String link;
-	private String author;
-	private int duration;
-	private String language;
-	private String license;
-	private Collection<String> content_types;
-	private Collection<JSONFile> files;
+	public String guid;
+	public String title;
+	public String subtitle;
+	public String short_title;
+	public String content;
+	public int number;
+	public int released;
+	public String description;
+	public String link;
+	public String author;
+	public int duration;
+	public String language;
+	public String license;
+	public Collection<String> content_types;
+	public Collection<JSONFile> files;
 
 	public static class JSONFile {
-		private int filesize;
-		private String minetype;
-		private Collection<String> urls;
+		public int filesize;
+		public String minetype;
+		public Collection<String> urls;
 	}
 
 	/*
@@ -40,29 +41,38 @@ public class GPodderEpisodeWrapper {
 	 */
 
 	public FeedItem toFeedItem(ContentResolver contentResolver,
-			Subscription subscription) {
+			Subscription subscription, FeedItem cachedFeedItem) {
 
 		SimpleDateFormat dt = new SimpleDateFormat(FeedItem.default_format);
 
 		String url = null;
 		JSONFile file = null;
 
-		if (files.size() > 0) {
-			file = files.iterator().next();
-			url = file.urls.iterator().next();
+		Iterator<JSONFile> fileIterator = files.iterator();
+		while (fileIterator.hasNext()) {
+			file = fileIterator.next();
+			Collection<String> urlCollection = file.urls;
+			if (urlCollection != null) {
+				Iterator<String> urls = urlCollection.iterator();
+				while (urls.hasNext()) {
+					String urlCandidate = urls.next();
+					if (urlCandidate != null && !urlCandidate.equals("")) {
+						url = urlCandidate;
+					}
+				}
+
+			}
 		}
-		
-		if (url == null)
-			url = link;
 
 		if (url != null) {
 
 			FeedItem episode = FeedItem.getByURL(contentResolver, url);
 			if (episode == null) {
-				episode = new FeedItem();
+				cachedFeedItem.reset();
+				episode = cachedFeedItem;
 			}
 
-			Date time = new Date((long)released*1000);
+			Date time = new Date((long) released * 1000);
 
 			episode.setTitle(title);
 			episode.sub_title = subtitle;
@@ -78,10 +88,10 @@ public class GPodderEpisodeWrapper {
 			episode.image = subscription.getImageURL();
 
 			episode.url = url;
-			
+
 			if (files.size() > 0) {
 				episode.filesize = file.filesize;
-				
+
 			}
 
 			episode.resource = episode.url;

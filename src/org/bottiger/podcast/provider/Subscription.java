@@ -171,7 +171,7 @@ public class Subscription extends AbstractItem {
 
 	}
 
-	private void init() {
+	public void reset() {
 		id = -1;
 		title = null;
 		url = null;
@@ -188,11 +188,11 @@ public class Subscription extends AbstractItem {
 	}
 
 	public Subscription() {
-		init();
+		reset();
 	}
 
 	public Subscription(String url_link) {
-		init();
+		reset();
 		url = url_link;
 		title = url_link;
 		link = url_link;

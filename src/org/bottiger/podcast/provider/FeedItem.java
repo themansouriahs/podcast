@@ -130,7 +130,7 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 	/**
 	 * Episode number.
 	 */
-	private int episodeNumber;
+	public int episodeNumber;
 
 	/**
 	 * Download reference ID as returned by
@@ -265,8 +265,12 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 		return item;
 
 	}
-
+	
 	public static FeedItem getByURL(ContentResolver contentResolver, String Url) {
+		return getByURL(contentResolver, Url, null);
+	}
+
+	public static FeedItem getByURL(ContentResolver contentResolver, String Url, FeedItem cachedFeedItem) {
 		FeedItem item = null;
 		Cursor cursor = null;
 
@@ -275,7 +279,7 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 			cursor = contentResolver.query(ItemColumns.URI,
 					ItemColumns.ALL_COLUMNS, where, new String[] { Url }, null);
 			if (cursor.moveToFirst()) {
-				item = FeedItem.getByCursor(cursor);
+				item = FeedItem.getByCursor(cursor, cachedFeedItem);
 			}
 		} finally {
 			if (cursor != null)
@@ -341,17 +345,26 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 
 		return item;
 	}
-
+	
 	public static FeedItem getByCursor(Cursor cursor) {
-		FeedItem item = fetchFromCursor(cursor);
+		FeedItem item = fetchFromCursor(cursor, null);
+		return item;
+	}
+
+	public static FeedItem getByCursor(Cursor cursor, FeedItem cachedFeedItem) {
+		FeedItem item = fetchFromCursor(cursor, cachedFeedItem);
 		return item;
 	}
 
 	public static FeedItem getMostRecent(ContentResolver context) {
 		return getBySQL(context, "1==1", "_id DESC");
 	}
-
+	
 	public FeedItem() {
+		reset();
+	}
+
+	public void reset() {
 		url = null;
 		title = null;
 		author = null;
@@ -458,9 +471,10 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 
 		// BaseColumns._ID + "=" + id
 		String condition = ItemColumns.URL + "='" + url + "'";
+		//String condition = ItemColumns.URL + "='?' AND "+ ItemColumns.URL + "='?'"; // BUG! http://code.google.com/p/android/issues/detail?id=56062
 		if (batchUpdate) {
 			contentUpdate = ContentProviderOperation.newUpdate(ItemColumns.URI)
-					.withValues(cv).withSelection(condition, null)
+					.withValues(cv).withSelection(condition, null) //new String[]{url})
 					.withYieldAllowed(true).build();
 		} else {
 			int numUpdatedRows = contentResolver.update(ItemColumns.URI, cv,
@@ -601,9 +615,19 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 		log.warn("cannot parser date: " + date);
 		return 0L;
 	}
-
+	
 	private static FeedItem fetchFromCursor(Cursor cursor) {
-		FeedItem item = new FeedItem();
+		return fetchFromCursor(cursor, null);
+	}
+
+	private static FeedItem fetchFromCursor(Cursor cursor, FeedItem cachedFeedItem) {
+		
+		FeedItem item; 
+		if (cachedFeedItem != null) {
+			cachedFeedItem.reset();
+			item = cachedFeedItem;
+		} else
+			item = new FeedItem();
 
 		item.id = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
 
