@@ -126,6 +126,7 @@ public class PodcastDownloadManager {
 
 		// FIXME
 		// Perhaps we should do this in the background in the future
+		RequestManager.initIfNeeded(context);
 		RequestQueue requestQueue = RequestManager.getRequestQueue();
 		final JSONFeedParserWrapper feedParser = new JSONFeedParserWrapper(
 				context);

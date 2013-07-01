@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Version 0.20.1
+--------------
+
+* Background crash fix
+
 Version 0.20
 ------------
 
@@ -9,6 +14,7 @@ Version 0.20
 * Performance enhancments when doing operarions in the backend
 * Fixed a bug where the cross device syncing would overwrite the playlist with an old version
 * Various stability bugs
+* Performance upgrade when refreshing podcast. However, this still needs some work.
 
 Version 0.19
 ------------

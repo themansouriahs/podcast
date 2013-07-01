@@ -32,6 +32,14 @@ public class RequestManager {
 	public static void init(Context context) {
 		mRequestQueue = Volley.newRequestQueue(context);
 	}
+	
+	/**
+	 * @param application context 
+	 */
+	public static void initIfNeeded(Context context) {
+		if (!isInit())
+			init(context);
+	}
 
 	/**
 	 * @return
@@ -40,10 +48,17 @@ public class RequestManager {
 	 * 		IllegalStatException if init has not yet been called
 	 */
 	public static RequestQueue getRequestQueue() {
-	    if (mRequestQueue != null) {
+	    if (isInit()) {
 	        return mRequestQueue;
 	    } else {
 	        throw new IllegalStateException("Not initialized");
 	    }
+	}
+	
+	/**
+	 * @return if the requestQueue has been initialized
+	 */
+	public static boolean isInit() {
+		return mRequestQueue != null;
 	}
 }
