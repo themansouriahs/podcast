@@ -46,7 +46,12 @@ Then you can join the beta program on the play store from here:
 
     https://play.google.com/apps/testing/org.bottiger.podcast
 
-Ignore SoundWaves.java
+Help out
+========
+
+I can always need an extra hand. Doesn't matter if you can code, create graphics or just come with feedback. Please wirte me an e-mail at bottiger@gmail.com if you are interested in helping out.
+
+Before Commiting
 ======================
 
 After you fill in the sensitive information in SoundWaves.java use the following line to avoid commiting it:
