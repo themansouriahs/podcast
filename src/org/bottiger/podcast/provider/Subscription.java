@@ -25,6 +25,10 @@ import android.support.v4.util.LruCache;
 
 public class Subscription extends AbstractItem {
 
+	public static final String TYPE_RSS2 = "rss";
+	public static final String TYPE_RSS091 = "rss";
+	public static final String TYPE_ATOM1 = "atom";
+
 	private final PodcastLog log = PodcastLog.getLog(getClass());
 
 	public final static int ADD_SUCCESS = 0;
@@ -363,7 +367,8 @@ public class Subscription extends AbstractItem {
 		String lastUpdatedString = cursor.getString(lastUpdatedIndex);
 		sub.lastUpdated = Long.parseLong(lastUpdatedString);
 
-		sub.title = cursor.getString(cursor.getColumnIndex(SubscriptionColumns.TITLE));
+		sub.title = cursor.getString(cursor
+				.getColumnIndex(SubscriptionColumns.TITLE));
 		sub.url = cursor.getString(urlIndex);
 		sub.imageURL = cursor.getString(cursor
 				.getColumnIndex(SubscriptionColumns.IMAGE_URL));
@@ -410,8 +415,13 @@ public class Subscription extends AbstractItem {
 
 	}
 
-	public URL getURL() throws MalformedURLException {
-		return new URL(url);
+	public URL getURL() {
+		try {
+			return new URL(url);
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	@Override
@@ -479,14 +489,9 @@ public class Subscription extends AbstractItem {
 	@Override
 	public String toJSON() {
 		JSONObject json = new JSONObject();
-		try {
-			json.put("url", getURL().toString());
-			json.put("last_update", getLastUpdate());
-			json.put("title", getTitle());
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		json.put("url", getURL().toString());
+		json.put("last_update", getLastUpdate());
+		json.put("title", getTitle());
 
 		return json.toJSONString();
 	}
@@ -538,4 +543,12 @@ public class Subscription extends AbstractItem {
 		return subscription;
 	}
 
+	public void setType(String typeRss2) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void setDescription(String content) {
+		this.description = content;
+	}
 }

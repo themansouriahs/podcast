@@ -133,7 +133,7 @@ public class PodcastDownloadManager {
 
 		Cursor subscriptionCursor = Subscription.allAsCursor(context
 				.getContentResolver());
-		
+
 		MyResponseListener responseListener = new MyResponseListener(feedParser);
 
 		while (subscriptionCursor.moveToNext()) {
@@ -163,7 +163,7 @@ public class PodcastDownloadManager {
 						DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
 				jr.setRetryPolicy(retryPolicy);
 
-				// Add the request to Volley 
+				// Add the request to Volley
 				requestQueue.add(jr);
 
 			}
@@ -240,9 +240,13 @@ public class PodcastDownloadManager {
 
 			@Override
 			public void onErrorResponse(VolleyError error) { // Handle error
-				error.printStackTrace();
-				int i = 5;
-				i = i + i;
+				if (error instanceof com.android.volley.ServerError) {
+
+				} else {
+					error.printStackTrace();
+					int i = 5;
+					i = i + i;
+				}
 			}
 		};
 	}

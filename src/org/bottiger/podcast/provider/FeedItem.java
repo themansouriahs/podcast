@@ -7,6 +7,7 @@ import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -265,12 +266,13 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 		return item;
 
 	}
-	
+
 	public static FeedItem getByURL(ContentResolver contentResolver, String Url) {
 		return getByURL(contentResolver, Url, null);
 	}
 
-	public static FeedItem getByURL(ContentResolver contentResolver, String Url, FeedItem cachedFeedItem) {
+	public static FeedItem getByURL(ContentResolver contentResolver,
+			String Url, FeedItem cachedFeedItem) {
 		FeedItem item = null;
 		Cursor cursor = null;
 
@@ -345,7 +347,7 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 
 		return item;
 	}
-	
+
 	public static FeedItem getByCursor(Cursor cursor) {
 		FeedItem item = fetchFromCursor(cursor, null);
 		return item;
@@ -359,7 +361,7 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 	public static FeedItem getMostRecent(ContentResolver context) {
 		return getBySQL(context, "1==1", "_id DESC");
 	}
-	
+
 	public FeedItem() {
 		reset();
 	}
@@ -471,10 +473,13 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 
 		// BaseColumns._ID + "=" + id
 		String condition = ItemColumns.URL + "='" + url + "'";
-		//String condition = ItemColumns.URL + "='?' AND "+ ItemColumns.URL + "='?'"; // BUG! http://code.google.com/p/android/issues/detail?id=56062
+		// String condition = ItemColumns.URL + "='?' AND "+ ItemColumns.URL +
+		// "='?'"; // BUG!
+		// http://code.google.com/p/android/issues/detail?id=56062
 		if (batchUpdate) {
 			contentUpdate = ContentProviderOperation.newUpdate(ItemColumns.URI)
-					.withValues(cv).withSelection(condition, null) //new String[]{url})
+					.withValues(cv).withSelection(condition, null) // new
+																	// String[]{url})
 					.withYieldAllowed(true).build();
 		} else {
 			int numUpdatedRows = contentResolver.update(ItemColumns.URI, cv,
@@ -615,14 +620,15 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 		log.warn("cannot parser date: " + date);
 		return 0L;
 	}
-	
+
 	private static FeedItem fetchFromCursor(Cursor cursor) {
 		return fetchFromCursor(cursor, null);
 	}
 
-	private static FeedItem fetchFromCursor(Cursor cursor, FeedItem cachedFeedItem) {
-		
-		FeedItem item; 
+	private static FeedItem fetchFromCursor(Cursor cursor,
+			FeedItem cachedFeedItem) {
+
+		FeedItem item;
 		if (cachedFeedItem != null) {
 			cachedFeedItem.reset();
 			item = cachedFeedItem;
@@ -1142,6 +1148,14 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 	public void setTitle(String title) {
 		this.title = title;
 	}
+	
+	public String getAuthor() {
+		return author;
+	}
+
+	public void setAuthor(String author) {
+		this.author = author;
+	}
 
 	/**
 	 * Get the time this item was last updated
@@ -1325,5 +1339,26 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 
 		DatabaseHelper dbHelper = new DatabaseHelper();
 		dbHelper.executeSQL(context, sqlQueue);
+	}
+
+	public void setFeed(Subscription feed) {
+		this.sub_id = feed.getId();
+	}
+
+	public Object getMedia() {
+		return null;
+	}
+
+	public void setPubDate(Date parseRFC822Date) {
+		SimpleDateFormat format = new SimpleDateFormat(default_format);
+		this.date = format.format(parseRFC822Date);
+	}
+
+	public void setDescription(String content2) {
+		this.content = content2;
+	}
+
+	public void setLink(String href) {
+		this.url = href;
 	}
 }
