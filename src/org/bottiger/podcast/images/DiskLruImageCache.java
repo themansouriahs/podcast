@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.bottiger.podcast.BuildConfig;
+import org.bottiger.podcast.utils.Crypto;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -65,6 +66,8 @@ public class DiskLruImageCache implements ImageCache  {
 
     @Override
     public void putBitmap( String key, Bitmap data ) {
+    	
+    	key = Crypto.md5(key);
 
         DiskLruCache.Editor editor = null;
         try {
@@ -101,6 +104,8 @@ public class DiskLruImageCache implements ImageCache  {
 
     @Override
     public Bitmap getBitmap( String key ) {
+    	
+    	key = Crypto.md5(key);
 
         Bitmap bitmap = null;
         DiskLruCache.Snapshot snapshot = null;
@@ -133,6 +138,8 @@ public class DiskLruImageCache implements ImageCache  {
     }
 
     public boolean containsKey( String key ) {
+    	
+    	key = Crypto.md5(key);
 
         boolean contained = false;
         DiskLruCache.Snapshot snapshot = null;

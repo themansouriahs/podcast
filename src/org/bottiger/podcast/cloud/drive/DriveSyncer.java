@@ -26,6 +26,7 @@ import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionColumns;
 import org.bottiger.podcast.provider.WithIcon;
+import org.bottiger.podcast.utils.Crypto;
 
 import android.accounts.Account;
 import android.app.NotificationManager;
@@ -1086,7 +1087,7 @@ public class DriveSyncer {
 			String driveContent = gson.toJson(localFiles);
 			// String driveContent = localFile.toJSON();
 
-			if (md5(driveContent) != driveFile.getMd5Checksum()) {
+			if (Crypto.md5(driveContent) != driveFile.getMd5Checksum()) {
 				// Update both content and metadata.
 				ByteArrayContent content = ByteArrayContent.fromString(
 						TEXT_PLAIN, driveContent);
@@ -1169,26 +1170,6 @@ public class DriveSyncer {
 			playlist.add(item);
 		}
 		return playlist;
-	}
-
-	private String md5(String s) {
-		try {
-			// Create MD5 Hash
-			MessageDigest digest = java.security.MessageDigest
-					.getInstance("MD5");
-			digest.update(s.getBytes());
-			byte messageDigest[] = digest.digest();
-
-			// Create Hex String
-			StringBuffer hexString = new StringBuffer();
-			for (int i = 0; i < messageDigest.length; i++)
-				hexString.append(Integer.toHexString(0xFF & messageDigest[i]));
-			return hexString.toString();
-
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
-		return "";
 	}
 
 	/**

@@ -75,8 +75,10 @@ public class ImageCacheManager{
 			break;
 		case MEMORY:
 			mImageCache = new BitmapLruImageCache(cacheSize);
+			break;
 		case HYBRID:
-			mImageCache = SoundWaves.getImageCache();
+			mImageCache = new HybridBitmapLruCache(context, uniqueName, cacheSize, cacheSize*100, compressFormat, quality);
+			break;
 		default:
 			mImageCache = new BitmapLruImageCache(cacheSize);
 			break;
