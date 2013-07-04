@@ -59,6 +59,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.DrawerLayout;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -179,16 +180,15 @@ public class MainActivity extends FragmentActivity implements
 		super.onCreate(savedInstanceState);
 
 		/*
-		BugSenseHandler.initAndStartSession(MainActivity.this,
-				((SoundWaves) this.getApplication()).getBugSenseAPIKey());
-				*/
-		//3132
-		//PodcastOpenHelper helper = new PodcastOpenHelper(this);
-		//helper.getWritableDatabase().execSQL("delete from item where _id >= 3132");
-		
+		 * BugSenseHandler.initAndStartSession(MainActivity.this, ((SoundWaves)
+		 * this.getApplication()).getBugSenseAPIKey());
+		 */
+		// 3132
+		// PodcastOpenHelper helper = new PodcastOpenHelper(this);
+		// helper.getWritableDatabase().execSQL("delete from item where _id >= 3132");
 
 		setContentView(R.layout.activity_swipe);
-		
+
 		mFragmentManager = getSupportFragmentManager(); // getSupportFragmentManager();
 
 		if (debugging)
@@ -461,16 +461,17 @@ public class MainActivity extends FragmentActivity implements
 		mSectionsPagerAdapter.notifyDataSetChanged();
 		mViewPager.setCurrentItem(2);
 	}
-	
+
 	@Override
 	public void onRefreshPlaylist() {
 		mSectionsPagerAdapter.refreshData(SectionsPagerAdapter.PLAYLIST);
 		/*
-		RecentItemFragment fragment = (RecentItemFragment)mSectionsPagerAdapter.getItem(SectionsPagerAdapter.PLAYLIST);
-		CursorAdapter adapter = fragment.getAdapter();
-		if (adapter != null)
-			adapter.notifyDataSetChanged();
-			*/
+		 * RecentItemFragment fragment =
+		 * (RecentItemFragment)mSectionsPagerAdapter
+		 * .getItem(SectionsPagerAdapter.PLAYLIST); CursorAdapter adapter =
+		 * fragment.getAdapter(); if (adapter != null)
+		 * adapter.notifyDataSetChanged();
+		 */
 	}
 
 	@Override
@@ -520,7 +521,7 @@ public class MainActivity extends FragmentActivity implements
 		} else {
 			menuItem.setVisible(false);
 		}
-		
+
 		return true;
 
 	}
@@ -551,19 +552,31 @@ public class MainActivity extends FragmentActivity implements
 		return super.onOptionsItemSelected(item);
 	}
 
+	/*
+	 * Override BACK button
+	 */
+	@Override
+	public void onBackPressed() {
+		if (mViewPager.getCurrentItem() == SectionsPagerAdapter.FEED) {
+			mViewPager.setCurrentItem(SectionsPagerAdapter.SUBSRIPTION, true);
+		} else {
+			super.onBackPressed(); // This will pop the Activity from the stack.
+		}
+	}
+
 	/**
 	 * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
 	 * one of the primary sections of the app.
 	 */
 	public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
 		// http://stackoverflow.com/questions/10396321/remove-fragment-page-from-viewpager-in-android/10399127#10399127
-		
+
 		public static final int PLAYLIST = 0;
 		public static final int SUBSRIPTION = 1;
 		public static final int FEED = 2;
-		
+
 		private static final int MAX_FRAGMENTS = 3;
-		
+
 		private Fragment[] mFragments = new Fragment[MAX_FRAGMENTS];
 
 		public SectionsPagerAdapter(FragmentManager fm) {
@@ -602,7 +615,8 @@ public class MainActivity extends FragmentActivity implements
 
 		@Override
 		public int getCount() {
-			return (SubscriptionFeedID == 0) ? MAX_FRAGMENTS-1 : MAX_FRAGMENTS;
+			return (SubscriptionFeedID == 0) ? MAX_FRAGMENTS - 1
+					: MAX_FRAGMENTS;
 		}
 
 		@Override
@@ -617,7 +631,7 @@ public class MainActivity extends FragmentActivity implements
 			}
 			return null;
 		}
-		
+
 		public void refreshData(int position) {
 			Fragment fragment = mFragments[position];
 			switch (position) {
@@ -625,10 +639,10 @@ public class MainActivity extends FragmentActivity implements
 				RecentItemFragment recentFragment = (RecentItemFragment) fragment;
 				recentFragment.refreshView();
 			case SUBSRIPTION:
-				//return getString(R.string.title_section1).toUpperCase();
+				// return getString(R.string.title_section1).toUpperCase();
 				return;
 			case FEED:
-				//return getString(R.string.title_section2).toUpperCase();
+				// return getString(R.string.title_section2).toUpperCase();
 				return;
 			}
 		}
@@ -655,30 +669,14 @@ public class MainActivity extends FragmentActivity implements
 		}
 	}
 
-	/*
-	 * Override BACK button
-	 * 
-	 * @see android.support.v4.app.FragmentActivity#onKeyDown(int,
-	 * android.view.KeyEvent)
-	 */
-	/*
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if (keyCode == KeyEvent.KEYCODE_BACK) {
-			onItemSelected(0);
-			return true;
-		}
-		return super.onKeyDown(keyCode, event);
-	}
-	*/
-
 	private Fragment getSubscriptionFragmentContent() {
 		log.debug("inside: getSubscriptionFragmentContent()");
 		return new SubscriptionsFragment();
 	}
 
 	private Fragment getFeedFragmentContent() {
-		Subscription subscription = Subscription.getById(getContentResolver(), SubscriptionFeedID);
+		Subscription subscription = Subscription.getById(getContentResolver(),
+				SubscriptionFeedID);
 		mFeedFragment = FeedFragment.newInstance(subscription);
 
 		return mFeedFragment;
