@@ -453,6 +453,8 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 			cv.put(ItemColumns.CONTENT, content);
 		if (filename != null)
 			cv.put(ItemColumns.PATHNAME, filename);
+		if (date != null)
+			cv.put(ItemColumns.DATE, date);
 		if (sub_id > 0)
 			cv.put(ItemColumns.SUBS_ID, sub_id);
 
