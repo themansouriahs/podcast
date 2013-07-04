@@ -1,51 +1,39 @@
 package org.bottiger.podcast.adapters;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeSet;
 
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.PlayerActivity;
-import org.bottiger.podcast.PlaylistDSLVFragment;
 import org.bottiger.podcast.PodcastBaseFragment;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.adapters.viewholders.InlinePlayer;
 import org.bottiger.podcast.images.ImageCacheManager;
 import org.bottiger.podcast.listeners.DownloadProgressListener;
 import org.bottiger.podcast.provider.FeedItem;
-import org.bottiger.podcast.provider.ItemColumns;
-import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.DownloadStatus;
 import org.bottiger.podcast.utils.ControlButtons;
-import org.bottiger.podcast.utils.Playlist;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.ThemeHelper;
+import org.jsoup.Jsoup;
 
 import android.app.DownloadManager;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.provider.BaseColumns;
+import android.text.Html;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
-import android.view.animation.Animation;
-import android.view.animation.Animation.AnimationListener;
-import android.view.animation.Transformation;
-import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.NetworkImageView;
-import com.nostra13.universalimageloader.core.ImageLoader;
 
 public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 	
@@ -253,8 +241,11 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 					holder.mainTitle.setText(title);
 				}
 
-				if (item.sub_title != null)
-					holder.subTitle.setText(item.content);
+				if (item.sub_title != null) {
+					// Html.fromHtml(item.content).toString()
+					String plainText = Jsoup.parse(item.content).text();
+					holder.subTitle.setText(plainText);
+				}
 
 				if (item.getDuration() > 0) {
 

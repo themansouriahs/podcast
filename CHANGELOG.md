@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Version 0.21
+------------
+
+* Huge performance improvment when refreshing feeds
+
 Version 0.20.1
 --------------
 
