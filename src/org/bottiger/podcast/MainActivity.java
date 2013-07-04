@@ -259,7 +259,7 @@ public class MainActivity extends FragmentActivity implements
 		RequestManager.init(this);
 		ImageCacheManager.getInstance().init(this, this.getPackageCodePath(),
 				DISK_IMAGECACHE_SIZE, DISK_IMAGECACHE_COMPRESS_FORMAT,
-				DISK_IMAGECACHE_QUALITY, CacheType.MEMORY);
+				DISK_IMAGECACHE_QUALITY, CacheType.HYBRID);
 
 		// Start Application services
 		if (isMyServiceRunning(PlayerService.class.getName()))

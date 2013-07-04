@@ -10,6 +10,8 @@ import java.io.OutputStream;
 
 import org.bottiger.podcast.BuildConfig;
 
+import com.jakewharton.disklrucache.DiskLruCache;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
@@ -17,8 +19,6 @@ import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
-
-import com.jakewharton.DiskLruCache;
 
 /*
  * Taken from

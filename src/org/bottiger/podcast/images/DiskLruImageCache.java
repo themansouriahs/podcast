@@ -17,7 +17,7 @@ import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import com.android.volley.toolbox.ImageLoader.ImageCache;
-import com.jakewharton.DiskLruCache;
+import com.jakewharton.disklrucache.DiskLruCache;
 
 /**
  * Implementation of DiskLruCache by Jake Wharton

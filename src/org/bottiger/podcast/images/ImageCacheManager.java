@@ -1,5 +1,8 @@
 package org.bottiger.podcast.images;
 
+import org.bottiger.podcast.SoundWaves;
+
+import uk.co.senab.bitmapcache.BitmapLruCache;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
@@ -26,7 +29,7 @@ public class ImageCacheManager{
 	 */
 	public enum CacheType {
 		DISK
-		, MEMORY
+		, MEMORY, HYBRID
 	}
 	
 	private static ImageCacheManager mInstance;
@@ -72,6 +75,8 @@ public class ImageCacheManager{
 			break;
 		case MEMORY:
 			mImageCache = new BitmapLruImageCache(cacheSize);
+		case HYBRID:
+			mImageCache = SoundWaves.getImageCache();
 		default:
 			mImageCache = new BitmapLruImageCache(cacheSize);
 			break;
