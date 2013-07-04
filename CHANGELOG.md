@@ -5,6 +5,9 @@ Version 0.21
 ------------
 
 * Huge performance improvment when refreshing feeds
+* Back button is back
+* You can  now unsubscribe from a podcast at the subscription fragment
+* Disabled Google Reader support
 
 Version 0.20.1
 --------------

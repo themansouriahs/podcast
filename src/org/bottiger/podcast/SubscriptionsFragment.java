@@ -30,12 +30,16 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.CursorAdapter;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 import android.widget.SearchView;
@@ -109,6 +113,9 @@ public class SubscriptionsFragment extends Fragment {
 		mFragmentUtils = new FragmentUtils(getActivity(), fragmentView, this);
 		mGridView = (GridView) fragmentView.findViewById(R.id.gridview);
 		searchStatus = (TextView) fragmentView.findViewById(R.id.searchTextView);
+		
+		registerForContextMenu(mGridView);
+		mGridView.setOnCreateContextMenuListener(this);
 
 		mGridView.setOnItemClickListener(new OnItemClickListener() {
 
@@ -202,6 +209,49 @@ public class SubscriptionsFragment extends Fragment {
 		super.onCreateOptionsMenu(menu, inflater);
 	}
 	
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v,
+			ContextMenuInfo menuInfo) {
+		super.onCreateContextMenu(menu, v, menuInfo);
+		MenuInflater inflater = getActivity().getMenuInflater();
+		inflater.inflate(R.menu.subscription_context, menu);
+		RecentItemFragment.setContextMenu(RecentItemFragment.SUBSCRIPTION_CONTEXT_MENU, this);
+	}
+	
+	/**
+	 * FIXME this should be moved somewhere else
+	 * 
+	 * @param menuItem
+	 * @return
+	 */
+	public boolean subscriptionContextMenu(MenuItem menuItem) {
+
+		if (!AdapterView.AdapterContextMenuInfo.class.isInstance(menuItem
+				.getMenuInfo()))
+			return false;
+
+		AdapterView.AdapterContextMenuInfo cmi = (AdapterView.AdapterContextMenuInfo) menuItem
+				.getMenuInfo();
+
+		Cursor cursor = getAdapter().getCursor();
+		int pos = cmi.position;
+		cursor.moveToPosition(pos);
+		Subscription subscription = Subscription.getByCursor(cursor);
+
+		AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuItem
+				.getMenuInfo();
+		switch (menuItem.getItemId()) {
+		case R.id.unsubscribe:
+			subscription.unsubscribe(getActivity());
+			CursorAdapter adapter = getAdapter();
+			if (adapter != null)
+				getAdapter().notifyDataSetChanged();
+			return true;
+		default:
+			return super.onContextItemSelected(menuItem);
+		}
+	}
+	
 	private void fetchLocalCursor() {
 		String order = getOrder();
 		String where = getWhere();
@@ -222,48 +272,6 @@ public class SubscriptionsFragment extends Fragment {
 		mFragmentUtils.setAdapter(cursorAdapter);
 
 		mGridView.setAdapter(cursorAdapter);
-	}
-
-	public DialogMenu createDialogMenus(long id) {
-
-		FeedItem feed_item = FeedItem.getById(getActivity()
-				.getContentResolver(), id);
-		if (feed_item == null) {
-			return null;
-		}
-
-		DialogMenu dialog_menu = new DialogMenu();
-
-		dialog_menu.setHeader(feed_item.title);
-
-		dialog_menu.addMenu(MENU_ITEM_DETAILS,
-				getResources().getString(R.string.menu_details));
-
-		if (feed_item.status < ItemColumns.ITEM_STATUS_MAX_READING_VIEW) {
-			dialog_menu.addMenu(MENU_ITEM_START_DOWNLOAD, getResources()
-					.getString(R.string.menu_download));
-		} else if (feed_item.status > ItemColumns.ITEM_STATUS_MAX_DOWNLOADING_VIEW) {
-			dialog_menu.addMenu(MENU_ITEM_START_PLAY,
-					getResources().getString(R.string.menu_play));
-			dialog_menu.addMenu(MENU_ITEM_ADD_TO_PLAYLIST, getResources()
-					.getString(R.string.menu_add_to_playlist));
-		}
-
-		return dialog_menu;
-	}
-
-	class MainClickListener implements DialogInterface.OnClickListener {
-		public DialogMenu mMenu;
-		public long item_id;
-
-		public MainClickListener(DialogMenu menu, long id) {
-			mMenu = menu;
-			item_id = id;
-		}
-
-		@Override
-		public void onClick(DialogInterface dialog, int select) {
-		}
 	}
 
 	private static SubscriptionListCursorAdapter listSubscriptionCursorAdapter(
@@ -325,9 +333,10 @@ public class SubscriptionsFragment extends Fragment {
 	}
 
 	public CursorAdapter getAdapter() {
+		// FIXME deprecated
 		Cursor cursor = new CursorLoader(getActivity(),
-				SubscriptionColumns.URI, SubscriptionColumns.ALL_COLUMNS, null,
-				null, null).loadInBackground();
+				SubscriptionColumns.URI, SubscriptionColumns.ALL_COLUMNS, getWhere(),
+				null, getOrder()).loadInBackground();
 		return getSubscriptionCursorAdapter(getActivity(), cursor);
 	}
 

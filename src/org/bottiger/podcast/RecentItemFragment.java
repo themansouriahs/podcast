@@ -10,11 +10,11 @@ import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.ControlButtons;
 import org.bottiger.podcast.utils.ExpandAnimation;
 
-import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.BaseColumns;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.CursorAdapter;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -24,10 +24,15 @@ import android.view.View;
 import android.view.ViewStub;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
 
 public class RecentItemFragment extends PlaylistDSLVFragment {
+
+	private static int CONTEXT_MENU = 0;
+	private static Fragment CONTEXT_FRAGMENT = null;
+	
+	public final static int PLAYLIST_CONTEXT_MENU = 0;
+	public final static int SUBSCRIPTION_CONTEXT_MENU = 1;
 
 	public static HashMap<Integer, Integer> mKeepIconMap;
 
@@ -134,6 +139,7 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 		super.onCreateContextMenu(menu, v, menuInfo);
 		MenuInflater inflater = getActivity().getMenuInflater();
 		inflater.inflate(R.menu.podcast_context, menu);
+		RecentItemFragment.setContextMenu(PLAYLIST_CONTEXT_MENU, this);
 		// contextMenuViewID = v. .getId(); //this is where I get the id of my
 		// clicked button
 	}
@@ -144,18 +150,28 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 		if (!AdapterView.AdapterContextMenuInfo.class.isInstance(item
 				.getMenuInfo()))
 			return false;
+		
+		if (CONTEXT_MENU == PLAYLIST_CONTEXT_MENU) {
+			return playlistContextMenu(item);
+		} else if (CONTEXT_MENU == SUBSCRIPTION_CONTEXT_MENU) {
+			if (CONTEXT_FRAGMENT != null)
+			return ((SubscriptionsFragment)CONTEXT_FRAGMENT).subscriptionContextMenu(item);
+		}
+		
+		return false;
 
+
+	}
+
+	public boolean playlistContextMenu(MenuItem item) {
 		AdapterView.AdapterContextMenuInfo cmi = (AdapterView.AdapterContextMenuInfo) item
 				.getMenuInfo();
-
 		Cursor cursor = mAdapter.getCursor();
 		cursor.moveToPosition(cmi.position);
 		FeedItem episode = FeedItem.getByCursor(cursor);
 		Subscription subscription = Subscription.getById(getActivity()
 				.getContentResolver(), episode.sub_id);
 
-		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
-				.getMenuInfo();
 		switch (item.getItemId()) {
 		case R.id.unsubscribe:
 			subscription.unsubscribe(getActivity());
@@ -286,5 +302,14 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 	@Override
 	View getPullView() {
 		return getListView();
+	}
+
+	public static void setContextMenu(int menu, Fragment fragment) {
+		CONTEXT_MENU = menu;
+		CONTEXT_FRAGMENT = fragment;
+	}
+	
+	public static int getContextMenu() {
+		return CONTEXT_MENU;
 	}
 }

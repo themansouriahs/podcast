@@ -84,6 +84,7 @@ public class MainActivity extends FragmentActivity implements
 
 	public static final boolean SHOW_DRAWER = false;
 	public static final boolean SHOW_PULL_TO_REFRESH = false;
+	public static final boolean READER_SUPPORT = false;
 
 	private Drive mDriveService = null;
 	private final int REQUEST_AUTHORIZATION = 1;
@@ -184,8 +185,8 @@ public class MainActivity extends FragmentActivity implements
 		 * this.getApplication()).getBugSenseAPIKey());
 		 */
 		// 3132
-		// PodcastOpenHelper helper = new PodcastOpenHelper(this);
-		// helper.getWritableDatabase().execSQL("delete from item where _id >= 3132");
+		//PodcastOpenHelper helper = new PodcastOpenHelper(this);
+		//helper.getWritableDatabase().execSQL("update subscriptions set status = " + Subscription.STATUS_SUBSCRIBED);
 
 		setContentView(R.layout.activity_swipe);
 
@@ -368,7 +369,7 @@ public class MainActivity extends FragmentActivity implements
 					.getApplicationContext());
 		}
 
-		if (prefs.getBoolean(SettingsActivity.CLOUD_SUPPORT, true)) {
+		if (READER_SUPPORT && prefs.getBoolean(SettingsActivity.CLOUD_SUPPORT, true)) {
 			startGoogleReader();
 		}
 	}
