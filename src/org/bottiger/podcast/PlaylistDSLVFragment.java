@@ -23,35 +23,6 @@ import com.mobeta.android.dslv.DragSortController;
 import com.mobeta.android.dslv.DragSortListView;
 
 public abstract class PlaylistDSLVFragment extends AbstractEpisodeFragment {
-
-    private String[] array;
-    private ArrayList<String> list;
-    
-    //private DragSortListView.DropListener onDrop2 = new ReorderCursor(mCursor, PlaylistDSLVFragment.this); 
-
-    private DragSortListView.DropListener onDrop =
-            new DragSortListView.DropListener() {
-                @Override
-                public void drop(int from, int to) {
-                    if (from != to) {
-                    	// Playlist.setFrom(from);
-                    	// Playlist.setTo(to);
-                    	ItemCursorAdapter adapter = ((ItemCursorAdapter) mAdapter);
-                    	
-                    	FeedItem precedingItem = null;
-                    	if (to > 0) {
-                    		Cursor precedingItemCursor = (Cursor)adapter.getItem(to-1);
-                    		precedingItem = FeedItem.getByCursor(precedingItemCursor);
-                    	}
-                    	
-                        Cursor item = (Cursor)adapter.getItem(from);
-                        FeedItem feedItem = FeedItem.getByCursor(item);
-                        
-                        Context c = PlaylistDSLVFragment.this.getActivity();
-                        feedItem.setPriority(precedingItem, c);
-                    }
-                }
-            };
             
     protected int getLayout() {
         // this DSLV xml declaration does not call for the use
@@ -91,28 +62,15 @@ public abstract class PlaylistDSLVFragment extends AbstractEpisodeFragment {
      * Called from DSLVFragment.onActivityCreated(). Override to
      * set a different adapter.
      */
-    public abstract void setListAdapter(); // {
-    	//setListAdapter(mAdapter);
-    	/*
-        array = getResources().getStringArray(R.array.jazz_artist_names);
-        list = new ArrayList<String>(Arrays.asList(array));
-
-        adapter = new ArrayAdapter<String>(getActivity(), getItemLayout(), R.id.text, list);
-        setListAdapter(adapter);
-        */
-    //}
+    public abstract void setListAdapter();
 
     /**
      * Called in onCreateView. Override this to provide a custom
      * DragSortController.
      */
     public DragSortController buildController(DragSortListView dslv) {
-        // defaults are
-        //   dragStartMode = onDown
-        //   removeMode = flingRight
         DragSortController controller = new DragSortController(dslv);
         controller.setDragHandleId(R.id.drag_handle);
-        //controller.setClickRemoveId(R.id.click_remove);
         controller.setRemoveEnabled(removeEnabled);
         controller.setSortEnabled(sortEnabled);
         controller.setDragInitMode(dragStartMode);
@@ -141,18 +99,11 @@ public abstract class PlaylistDSLVFragment extends AbstractEpisodeFragment {
     @Override
     public void onResume() {
     	super.onResume();
-    	//mDslv.setDropListener(onDrop2);
-    	//mDslv.setDropListener((DragSortListView.DropListener)mCursor);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        //mDslv = (DragSortListView) getListView(); 
-
-        //mDslv.setDropListener(onDrop);
-        //mDslv.setRemoveListener(onRemove);
 
         Bundle args = getArguments();
         int headers = 0;

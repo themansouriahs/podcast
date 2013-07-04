@@ -614,8 +614,7 @@ public class MainActivity extends FragmentActivity implements
 			} else if (i == FEED) {
 				fragment = getFeedFragmentContent();
 			} else {
-				fragment = new DSLVFragmentBGHandle();
-				// fragment = new DummySectionFragment();
+				fragment = new DummySectionFragment();
 				// fragment = new PlayerFragment();
 			}
 			mFragments[i] = fragment;
