@@ -280,8 +280,11 @@ public class MainActivity extends FragmentActivity implements
 		mRemoteControlResponder = new ComponentName(getPackageName(),
 				HeadsetReceiver.class.getName());
 
+		/*
 		IntentFilter receiverFilter = new IntentFilter(
-				Intent.ACTION_HEADSET_PLUG);
+				Intent.ACTION_HEADSET_PLUG); */
+		IntentFilter receiverFilter = new IntentFilter(
+				AudioManager.ACTION_AUDIO_BECOMING_NOISY);
 		receiver = new HeadsetReceiver();
 		registerReceiver(receiver, receiverFilter);
 

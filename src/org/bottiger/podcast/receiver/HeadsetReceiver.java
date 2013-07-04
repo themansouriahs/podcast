@@ -9,6 +9,7 @@ import org.bottiger.podcast.service.PlayerService;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.view.KeyEvent;
 
 public class HeadsetReceiver extends BroadcastReceiver {
@@ -18,7 +19,8 @@ public class HeadsetReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		if (Intent.ACTION_HEADSET_PLUG.equals(intent.getAction())) {
+		// if (Intent.ACTION_HEADSET_PLUG.equals(intent.getAction())) {
+		if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
 			mPlayerServiceBinder = PodcastBaseFragment.mPlayerServiceBinder;
 			if (mPlayerServiceBinder != null) {
 				if (mPlayerServiceBinder.isPlaying())

@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Version 0.22
+------------
+
+* Better detection of headset getting unplugged
+
 Version 0.21
 ------------
 
