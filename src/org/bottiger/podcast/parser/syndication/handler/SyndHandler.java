@@ -1,6 +1,7 @@
 package org.bottiger.podcast.parser.syndication.handler;
 
 import org.bottiger.podcast.MainActivity;
+import org.bottiger.podcast.parser.FeedUpdater;
 import org.bottiger.podcast.parser.syndication.namespace.NSContent;
 import org.bottiger.podcast.parser.syndication.namespace.NSITunes;
 import org.bottiger.podcast.parser.syndication.namespace.NSMedia;
@@ -14,15 +15,18 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import android.content.ContentResolver;
 import android.util.Log;
 
 /** Superclass for all SAX Handlers which process Syndication formats */
 public class SyndHandler extends DefaultHandler {
+	private ContentResolver contentResolver;
 	private static final String TAG = "SyndHandler";
 	private static final String DEFAULT_PREFIX = "";
 	protected HandlerState state;
 
-	public SyndHandler(Subscription feed, TypeGetter.Type type) {
+	public SyndHandler(ContentResolver contentResolver, Subscription feed, TypeGetter.Type type) {
+		this.contentResolver = contentResolver;
 		state = new HandlerState(feed);
 		if (type == TypeGetter.Type.RSS20 || type == TypeGetter.Type.RSS091) {
 			state.defaultNamespaces.push(new NSRSS20());
@@ -124,6 +128,8 @@ public class SyndHandler extends DefaultHandler {
 	public void endDocument() throws SAXException {
 		super.endDocument();
 		//state.getFeed().setItems(state.getItems());
+		FeedUpdater updater = new FeedUpdater(contentResolver);
+		updater.updateDatabase(state.getFeed(), state.getItems());
 	}
 
 	public HandlerState getState() {

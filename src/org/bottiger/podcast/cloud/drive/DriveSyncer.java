@@ -6,13 +6,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
-import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -1117,12 +1116,9 @@ public class DriveSyncer {
 		if (localFile instanceof Subscription) {
 			Subscription subscription = (Subscription) localFile;
 			// content.append(subscription.getTitle());
-			try {
-				content.append(subscription.getURL().toString());
-			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			URL url = subscription.getURL();
+			if (url != null)
+				content.append(url.toString());
 		} else if (localFile instanceof Subscription) {
 			FeedItem item = (FeedItem) localFile;
 			content.append(item.getTitle());

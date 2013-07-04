@@ -1,13 +1,16 @@
 package org.bottiger.podcast.parser.syndication.handler;
 
-import java.io.File;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.PushbackInputStream;
 import java.io.Reader;
 
+import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.io.input.XmlStreamReader;
 import org.bottiger.podcast.MainActivity;
-import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.Subscription;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -26,14 +29,14 @@ public class TypeGetter {
 	private static final String ATOM_ROOT = "feed";
 	private static final String RSS_ROOT = "rss";
 
-	public Type getType(Subscription feed) throws UnsupportedFeedtypeException {
+	public Type getType(Subscription feed, String feedContent) throws UnsupportedFeedtypeException {
 		XmlPullParserFactory factory;
-		if (feed.url != null) {
+		if (feed.getUrl() != null) {
 			try {
 				factory = XmlPullParserFactory.newInstance();
 				factory.setNamespaceAware(true);
 				XmlPullParser xpp = factory.newPullParser();
-				xpp.setInput(createReader(feed));
+				xpp.setInput(createReader(feed, feedContent));
 				int eventType = xpp.getEventType();
 
 				while (eventType != XmlPullParser.END_DOCUMENT) {
@@ -84,11 +87,15 @@ public class TypeGetter {
 		throw new UnsupportedFeedtypeException(Type.INVALID);
 	}
 
-	private Reader createReader(Subscription feed) {
+	private Reader createReader(Subscription feed, String feedContent) {
 		Reader reader;
 		try {
 			//reader = new XmlStreamReader(new File(feed.getFile_url()));
-			reader = new XmlStreamReader(new File(feed.url));
+			
+			// http://stackoverflow.com/questions/4897876/reading-utf-8-bom-marker
+			InputStream stream = new ByteArrayInputStream(feedContent.getBytes("UTF-8"));
+			BOMInputStream bomIn = new BOMInputStream(stream);
+			reader = new XmlStreamReader(bomIn);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			return null;
@@ -98,4 +105,17 @@ public class TypeGetter {
 		}
 		return reader;
 	}
+	
+	/**
+	 * http://stackoverflow.com/questions/9736999/how-to-remove-bom-from-an-xml-file-in-java
+	 */
+	private static InputStream checkForUtf8BOMAndDiscardIfAny(InputStream inputStream) throws IOException {
+	    PushbackInputStream pushbackInputStream = new PushbackInputStream(new BufferedInputStream(inputStream), 3);
+	    byte[] bom = new byte[3];
+	    if (pushbackInputStream.read(bom) != -1) {
+	        if (!(bom[0] == (byte) 0xEF && bom[1] == (byte) 0xBB && bom[2] == (byte) 0xBF)) {
+	            pushbackInputStream.unread(bom);
+	        }
+	    }
+	    return pushbackInputStream; }
 }

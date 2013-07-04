@@ -202,7 +202,6 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 	@Deprecated
 	public long created;
 
-	@Deprecated
 	public String type;
 
 	@Deprecated
@@ -266,28 +265,50 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 		return item;
 
 	}
-
-	public static FeedItem getByURL(ContentResolver contentResolver, String Url) {
-		return getByURL(contentResolver, Url, null);
+	
+	public static FeedItem[] getByURL(ContentResolver contentResolver, String[] urls) {
+		return getByURL(contentResolver, urls, null);
 	}
 
-	public static FeedItem getByURL(ContentResolver contentResolver,
-			String Url, FeedItem cachedFeedItem) {
-		FeedItem item = null;
+	public static FeedItem getByURL(ContentResolver contentResolver, String url) {
+		return getByURL(contentResolver, new String[]{url}, null)[0];
+	}
+
+	public static FeedItem[] getByURL(ContentResolver contentResolver,
+			String[] urls, FeedItem cachedFeedItem) {
+		FeedItem[] items = new FeedItem[urls.length];
 		Cursor cursor = null;
 
-		String where = ItemColumns.URL + " = ?";
+		/*
+		 * Build a query with the correct amount of ?,?,?
+		 */
+		StringBuilder queryBuilder = new StringBuilder();
+		queryBuilder.append(ItemColumns.URL + " IN (");
+		for (int i = 1; i <= urls.length; i++) {
+			queryBuilder.append("?");
+			if (i != urls.length)
+				queryBuilder.append(", ");
+		}
+		queryBuilder.append(")");
+		String where = queryBuilder.toString();
+		//String where = ItemColumns.URL + " = ?";
+		
 		try {
 			cursor = contentResolver.query(ItemColumns.URI,
-					ItemColumns.ALL_COLUMNS, where, new String[] { Url }, null);
-			if (cursor.moveToFirst()) {
-				item = FeedItem.getByCursor(cursor, cachedFeedItem);
+					ItemColumns.ALL_COLUMNS, where, urls, null);
+
+			int j = 0;
+			cursor.moveToFirst();
+			while (cursor.moveToNext()) {
+				items[j] = FeedItem.getByCursor(cursor, cachedFeedItem);
+				j++;
 			}
+			cursor.close();
 		} finally {
 			if (cursor != null)
 				cursor.close();
 		}
-		return item;
+		return items;
 
 	}
 
@@ -428,6 +449,8 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 
 		if (title != null)
 			cv.put(ItemColumns.TITLE, title);
+		if (content != null)
+			cv.put(ItemColumns.CONTENT, content);
 		if (filename != null)
 			cv.put(ItemColumns.PATHNAME, filename);
 		if (sub_id > 0)
@@ -871,6 +894,10 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 		 * return 0;
 		 */
 	}
+	
+	public void setURL(String url) {
+		this.url = url;
+	}
 
 	public String getURL() {
 		String itemURL = "";
@@ -879,6 +906,22 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 		else if (resource != null && resource.length() > 1)
 			itemURL = resource;
 		return itemURL;
+	}
+
+	public long getFilesize() {
+		return filesize;
+	}
+
+	public void setFilesize(long filesize) {
+		this.filesize = filesize;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 
 	/**

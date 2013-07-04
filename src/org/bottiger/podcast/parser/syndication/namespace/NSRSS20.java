@@ -47,7 +47,8 @@ public class NSRSS20 extends Namespace {
 		} else if (localName.equals(ENCLOSURE)) {
 			String type = attributes.getValue(ENC_TYPE);
 			String url = attributes.getValue(ENC_URL);
-			/*
+			
+			
 			if (state.getCurrentItem().getMedia() == null
 					&& (SyndTypeUtils.enclosureTypeValid(type) || ((type = SyndTypeUtils
 							.getValidMimeTypeFromUrl(url)) != null))) {
@@ -59,10 +60,16 @@ public class NSRSS20 extends Namespace {
 					if (MainActivity.debugging)
 						Log.d(TAG, "Length attribute could not be parsed.");
 				}
-				state.getCurrentItem().setMedia(
-						new FeedMedia(state.getCurrentItem(), url, size, type));
+				
+				//state.getCurrentItem().setMedia(
+				//		new FeedMedia(state.getCurrentItem(), url, size, type));
+				FeedItem item = state.getCurrentItem();
+				item.setURL(url);
+				item.setFilesize(size);
+				item.setType(type);
 			}
-			*/
+			
+			
 
 		} else if (localName.equals(IMAGE)) {
 			if (state.getTagstack().size() >= 1) {
@@ -107,7 +114,7 @@ public class NSRSS20 extends Namespace {
 			} else if (top.equals(LINK)) {
 				if (second.equals(CHANNEL)) {
 					// FIXME
-					//state.getFeed().setLink(content);
+					state.getFeed().setLink(content);
 				} else if (second.equals(ITEM)) {
 					//state.getCurrentItem().setLink(content);
 					state.getCurrentItem().url = content;
@@ -117,7 +124,7 @@ public class NSRSS20 extends Namespace {
 						SyndDateUtils.parseRFC822Date(content));
 			} else if (top.equals(URL) && second.equals(IMAGE) && third != null && third.equals(CHANNEL)) {
 				//state.getFeed().getImage().setDownload_url(content);
-				state.getCurrentItem().image = content;
+				state.getFeed().imageURL = content;
 			} else if (localName.equals(DESCR)) {
 				if (second.equals(CHANNEL)) {
 					state.getFeed().setDescription(content);

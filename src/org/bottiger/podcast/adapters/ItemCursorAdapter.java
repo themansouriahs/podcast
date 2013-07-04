@@ -254,7 +254,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 				}
 
 				if (item.sub_title != null)
-					holder.subTitle.setText(item.sub_title);
+					holder.subTitle.setText(item.content);
 
 				if (item.getDuration() > 0) {
 

@@ -1,6 +1,7 @@
 package org.bottiger.podcast.service;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashSet;
@@ -12,15 +13,20 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.images.RequestManager;
 import org.bottiger.podcast.parser.JSONFeedParserWrapper;
+import org.bottiger.podcast.parser.syndication.handler.FeedHandler;
+import org.bottiger.podcast.parser.syndication.handler.UnsupportedFeedtypeException;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.LockHandler;
 import org.bottiger.podcast.utils.SDCardManager;
 import org.json.JSONArray;
+import org.xml.sax.SAXException;
 
 import android.annotation.SuppressLint;
 import android.app.DownloadManager;
@@ -42,6 +48,7 @@ import com.android.volley.Response;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 public class PodcastDownloadManager {
@@ -151,10 +158,12 @@ public class PodcastDownloadManager {
 				 */
 
 				// Create a json request intended to fetching json data
-				JsonArrayRequest jr = new JsonArrayRequest(
-						"http://feeds.gpodder.net/parse?url=" + sub.getUrl(),
-						new MyResponseListener(feedParser),
-						createGetFailureListener());
+				/*
+				 * JsonArrayRequest jr = new JsonArrayRequest(
+				 * "http://feeds.gpodder.net/parse?url=" + sub.getUrl(), new
+				 * MyResponseListener(feedParser), createGetFailureListener());
+				 */
+				StringRequest jr = new StringRequest(sub.getUrl(), new MyStringResponseListener(context.getContentResolver(), sub), createGetFailureListener());
 
 				int MY_SOCKET_TIMEOUT_MS = 300000;
 				DefaultRetryPolicy retryPolicy = new DefaultRetryPolicy(
@@ -200,6 +209,41 @@ public class PodcastDownloadManager {
 		@Override
 		public void onResponse(JSONArray response) {
 			volleyResultParser.execute(response);
+		}
+
+	}
+	
+	static class MyStringResponseListener implements Listener<String> {
+
+		static FeedHandler feedHandler = new FeedHandler();
+		Subscription subscription;
+		ContentResolver contentResolver;
+		final JSONFeedParserWrapper feedParser = null;
+		final VolleyResultParser volleyResultParser = null;
+
+		public MyStringResponseListener(ContentResolver contentResolver, Subscription subscription) {
+			this.subscription = subscription;
+			this.contentResolver = contentResolver;
+		}
+
+		@Override
+		public void onResponse(String response) {
+			//volleyResultParser.execute(response);
+			try {
+				feedHandler.parseFeed(contentResolver, subscription, response.replace("ï»¿", ""));
+			} catch (SAXException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ParserConfigurationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (UnsupportedFeedtypeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
 	}

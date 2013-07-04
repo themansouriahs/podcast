@@ -45,7 +45,9 @@ public class Subscription extends AbstractItem {
 	public long id;
 	public String title;
 
-	@Deprecated
+	/**
+	 * Link to a website or similar
+	 */
 	public String link;
 	public String comment;
 
@@ -173,6 +175,14 @@ public class Subscription extends AbstractItem {
 
 		return sub;
 
+	}
+
+	public String getLink() {
+		return link;
+	}
+
+	public void setLink(String link) {
+		this.link = link;
 	}
 
 	public void reset() {
