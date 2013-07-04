@@ -741,10 +741,4 @@ public class PlayerFragment   extends PodcastBaseFragment
 		return null;
 	}
 
-	@Override
-	public void onRefreshStarted(View view) {
-		// TODO Auto-generated method stub
-		
-	}
-
 }

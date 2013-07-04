@@ -10,17 +10,23 @@ import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.ControlButtons;
 import org.bottiger.podcast.utils.ExpandAnimation;
 
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
+
 import android.content.Context;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.CursorAdapter;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
@@ -30,7 +36,7 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 
 	private static int CONTEXT_MENU = 0;
 	private static Fragment CONTEXT_FRAGMENT = null;
-	
+
 	public final static int PLAYLIST_CONTEXT_MENU = 0;
 	public final static int SUBSCRIPTION_CONTEXT_MENU = 1;
 
@@ -123,6 +129,21 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 			long current_id = mPlayerServiceBinder.getCurrentItem().id;
 			showPlayingEpisode(current_id);
 		}
+
+		if (MainActivity.SHOW_PULL_TO_REFRESH) {
+			// Delegate OnTouch calls to both libraries that want to receive
+			// them
+			getListView().setOnTouchListener(new View.OnTouchListener() {
+				@Override
+				public boolean onTouch(View view, MotionEvent motionEvent) {
+					if (!mController.onTouch(view, motionEvent)) {
+					// Only allow pull to refresh if not swiping list item
+					getPullToRefreshAttacher().onTouch(view, motionEvent);
+					}
+					return false;
+				}
+			});
+		}
 	}
 
 	@Override
@@ -150,16 +171,16 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 		if (!AdapterView.AdapterContextMenuInfo.class.isInstance(item
 				.getMenuInfo()))
 			return false;
-		
+
 		if (CONTEXT_MENU == PLAYLIST_CONTEXT_MENU) {
 			return playlistContextMenu(item);
 		} else if (CONTEXT_MENU == SUBSCRIPTION_CONTEXT_MENU) {
 			if (CONTEXT_FRAGMENT != null)
-			return ((SubscriptionsFragment)CONTEXT_FRAGMENT).subscriptionContextMenu(item);
+				return ((SubscriptionsFragment) CONTEXT_FRAGMENT)
+						.subscriptionContextMenu(item);
 		}
-		
-		return false;
 
+		return false;
 
 	}
 
@@ -308,7 +329,7 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 		CONTEXT_MENU = menu;
 		CONTEXT_FRAGMENT = fragment;
 	}
-	
+
 	public static int getContextMenu() {
 		return CONTEXT_MENU;
 	}

@@ -39,9 +39,12 @@ import android.support.v4.widget.CursorAdapter;
 import android.util.SparseIntArray;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemLongClickListener;
@@ -60,9 +63,6 @@ public abstract class PodcastBaseFragment extends FixedListFragment implements
 	protected View fragmentView;
 
 	protected SharedPreferences sharedPreferences;
-
-	/** ActionBar pull to refresh */
-	private PullToRefreshAttacher mPullToRefreshAttacher;
 
 	// protected static PodcastService mServiceBinder = null;
 	public static PlayerService mPlayerServiceBinder = null;
@@ -95,7 +95,7 @@ public abstract class PodcastBaseFragment extends FixedListFragment implements
 	private static TextView mCurrentTime = null;
 	private static SeekBar mProgressBar = null;
 	private static TextView mDuration = null;
-	
+
 	private int contextMenuViewID;
 
 	protected abstract int getItemLayout();
@@ -163,75 +163,6 @@ public abstract class PodcastBaseFragment extends FixedListFragment implements
 		registerForContextMenu(getListView());
 		getListView().setOnItemLongClickListener(listener);
 
-		/** ActionBar Pull to Refresh */
-		if (MainActivity.SHOW_PULL_TO_REFRESH) {
-			// As we're modifying some of the options, create an instance of
-			// PullToRefreshAttacher.Options
-			PullToRefreshAttacher.Options ptrOptions = new PullToRefreshAttacher.Options();
-			// Here we make the refresh scroll distance to 75% of the GridView
-			// height
-			ptrOptions.refreshScrollDistance = 0.75f;
-
-			/**
-			 * As GridView is an AbsListView derived class, we create a new
-			 * AbsListViewDelegate instance. You do NOT need to do this if
-			 * you're using a supported scrollable Views. It is merely in this
-			 * sample to show you how to set a custom delegate.
-			 */
-			//ptrOptions.delegate = new AbsListViewDelegate();
-
-			// Here we customise the animations which are used when
-			// showing/hiding the header view
-			// ptrOptions.headerInAnimation = R.anim.slide_in_top;
-			// ptrOptions.headerOutAnimation = R.anim.slide_out_top;
-
-			// Here we define a custom header layout which will be inflated and
-			// used
-			// ptrOptions.headerLayout =
-			// R.layout.actionbar_pulltorefresh_customised_header;
-
-			// Here we define a custom header transformer which will alter the
-			// header based on the
-			// current pull-to-refresh state
-			// ptrOptions.headerTransformer = new CustomisedHeaderTransformer();
-
-			// Here we create a PullToRefreshAttacher manually with the Options
-			// instance created above.
-			//mPullToRefreshAttacher = new PullToRefreshAttacher(getActivity(),
-			//		getPullView());
-			mPullToRefreshAttacher = new PullToRefreshAttacher(getActivity());
-
-			// Set Listener to know when a refresh should be started
-			mPullToRefreshAttacher.setRefreshing(true);
-		}
-
-	}
-
-	@Override
-	public void onRefreshStarted(View view) {
-		/**
-		 * Simulate Refresh with 4 seconds sleep
-		 */
-		new AsyncTask<Void, Void, Void>() {
-
-			@Override
-			protected Void doInBackground(Void... params) {
-				try {
-					Thread.sleep(4000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				return null;
-			}
-
-			@Override
-			protected void onPostExecute(Void result) {
-				super.onPostExecute(result);
-
-				// Notify PullToRefreshAttacher that the refresh has finished
-				mPullToRefreshAttacher.setRefreshComplete();
-			}
-		}.execute();
 	}
 
 	Subscription getSubscription(Object o) {
@@ -266,7 +197,7 @@ public abstract class PodcastBaseFragment extends FixedListFragment implements
 	public void onDestroy() {
 		super.onDestroy();
 		try {
-			//unbindService(playerServiceConnection);
+			// unbindService(playerServiceConnection);
 			getActivity().unbindService(playerServiceConnection);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -310,6 +241,77 @@ public abstract class PodcastBaseFragment extends FixedListFragment implements
 	public void onResume() {
 		super.onResume();
 		queueNextRefresh();
+
+		/** ActionBar Pull to Refresh */
+		if (MainActivity.SHOW_PULL_TO_REFRESH) {
+			// As we're modifying some of the options, create an instance of
+			// PullToRefreshAttacher.Options
+			PullToRefreshAttacher.Options ptrOptions = new PullToRefreshAttacher.Options();
+			// Here we make the refresh scroll distance to 75% of the GridView
+			// height
+			ptrOptions.refreshScrollDistance = 0.75f;
+
+			/**
+			 * As GridView is an AbsListView derived class, we create a new
+			 * AbsListViewDelegate instance. You do NOT need to do this if
+			 * you're using a supported scrollable Views. It is merely in this
+			 * sample to show you how to set a custom delegate.
+			 */
+			// ptrOptions.delegate = new AbsListViewDelegate();
+
+			// Here we customise the animations which are used when
+			// showing/hiding the header view
+			// ptrOptions.headerInAnimation = R.anim.slide_in_top;
+			// ptrOptions.headerOutAnimation = R.anim.slide_out_top;
+
+			// Here we define a custom header layout which will be inflated and
+			// used
+			// ptrOptions.headerLayout =
+			// R.layout.actionbar_pulltorefresh_customised_header;
+
+			// Here we define a custom header transformer which will alter the
+			// header based on the
+			// current pull-to-refresh state
+			// ptrOptions.headerTransformer = new CustomisedHeaderTransformer();
+
+			// Here we create a PullToRefreshAttacher manually with the Options
+			// instance created above.
+			// mPullToRefreshAttacher = new PullToRefreshAttacher(getActivity(),
+			// getPullView());
+			// mPullToRefreshAttacher = new
+			// PullToRefreshAttacher(getActivity());
+
+			// Set Listener to know when a refresh should be started
+			// mPullToRefreshAttacher.setRefreshing(true);
+			getPullToRefreshAttacher().setRefreshableView(getListView(), this);
+		}
+	}
+
+	@Override
+	public void onRefreshStarted(View view) {
+		/**
+		 * Simulate Refresh with 4 seconds sleep
+		 */
+		new AsyncTask<Void, Void, Void>() {
+
+			@Override
+			protected Void doInBackground(Void... params) {
+				try {
+					Thread.sleep(4000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				return null;
+			}
+
+			@Override
+			protected void onPostExecute(Void result) {
+				super.onPostExecute(result);
+
+				// Notify PullToRefreshAttacher that the refresh has finished
+				getPullToRefreshAttacher().setRefreshComplete();
+			}
+		}.execute();
 	}
 
 	protected static long refreshUI() {
@@ -447,10 +449,14 @@ public abstract class PodcastBaseFragment extends FixedListFragment implements
 	abstract String getWhere();
 
 	abstract String getOrder();
-	
+
 	protected static String orderByFirst(String condition) {
 		String priorityOrder = "case when " + condition + " then 1 else 2 end";
 		return priorityOrder;
+	}
+
+	public PullToRefreshAttacher getPullToRefreshAttacher() {
+		return ((MainActivity) getActivity()).getPullToRefreshAttacher();
 	}
 
 	public abstract CursorAdapter getAdapter(Cursor cursor);

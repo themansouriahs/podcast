@@ -75,7 +75,7 @@ public abstract class PlaylistDSLVFragment extends AbstractEpisodeFragment {
     }
 
     protected DragSortListView mDslv;
-    private DragSortController mController;
+    protected DragSortController mController;
 
     public int dragStartMode = DragSortController.ON_DOWN;
     public boolean removeEnabled = false;

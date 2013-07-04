@@ -27,6 +27,8 @@ import org.bottiger.podcast.utils.DriveUtils;
 import org.bottiger.podcast.utils.PodcastLog;
 import org.bottiger.podcast.utils.ThemeHelper;
 
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
+
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
@@ -83,7 +85,7 @@ public class MainActivity extends FragmentActivity implements
 	private static final String ACCOUNT_KEY = "account";
 
 	public static final boolean SHOW_DRAWER = false;
-	public static final boolean SHOW_PULL_TO_REFRESH = false;
+	public static final boolean SHOW_PULL_TO_REFRESH = true;
 	public static final boolean READER_SUPPORT = false;
 
 	private Drive mDriveService = null;
@@ -123,6 +125,9 @@ public class MainActivity extends FragmentActivity implements
 	private FragmentTransaction mFragmentTransition;
 
 	private FeedFragment mFeedFragment = null;
+	
+	/** ActionBar pull to refresh */
+	private PullToRefreshAttacher mPullToRefreshAttacher;
 
 	/**
 	 * The {@link ViewPager} that will host the section contents.
@@ -279,6 +284,9 @@ public class MainActivity extends FragmentActivity implements
 		mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 		mRemoteControlResponder = new ComponentName(getPackageName(),
 				HeadsetReceiver.class.getName());
+		
+		/** ActionBar pull to refresh */
+		pullToRefreshAttacher();
 
 		/*
 		IntentFilter receiverFilter = new IntentFilter(
@@ -706,6 +714,16 @@ public class MainActivity extends FragmentActivity implements
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private void pullToRefreshAttacher() {
+		if (SHOW_PULL_TO_REFRESH) {
+			mPullToRefreshAttacher = new PullToRefreshAttacher(this);
+		}
+	}
+	
+	public PullToRefreshAttacher getPullToRefreshAttacher() {
+		return mPullToRefreshAttacher;
 	}
 
 }
