@@ -28,7 +28,6 @@ public class PodcastService extends IntentService {
 
 	public PodcastService() {
 		super("PodcastService");
-		// TODO Auto-generated constructor stub
 	}
 
 	// from http://it-ride.blogspot.dk/2010/10/android-implementing-notification.html
@@ -45,8 +44,6 @@ public class PodcastService extends IntentService {
 	public static final int NO_CONNECT = 1;
 	public static final int WIFI_CONNECT = 2;
 	public static final int MOBILE_CONNECT = 4;
-
-	private static final int MSG_TIMER = 0;
 
 	public int pref_connection_sel = MOBILE_CONNECT | WIFI_CONNECT;
 	
@@ -70,14 +67,6 @@ public class PodcastService extends IntentService {
 	
 	private PodcastUpdateReceiver updateManager = new PodcastUpdateReceiver();
 	private PodcastDownloadManager pdm = new PodcastDownloadManager();
-	
-	/*
-	@Override
-	public void onCreate() {
-		super.onCreate();
-		SDCardManager.getSDCardStatusAndCreate();
-	}
-	*/
 
 	//@Override
 	public void onStart(Context context, Intent intent, int startId) {
