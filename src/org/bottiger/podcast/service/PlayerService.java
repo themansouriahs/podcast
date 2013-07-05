@@ -25,7 +25,6 @@ import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 
@@ -49,10 +48,6 @@ public class PlayerService extends Service implements
 	private static final int SERVER_DIED = 2;
 	public static final int PlayerService_STATUS = 1;
 
-	private static final long REPEAT_MODE_NO_REPEAT = 0;
-	private static final long REPEAT_MODE_REPEAT = 1;
-	private static final long REPEAT_MODE_REPEAT_ONE = 2;
-
 	private static final String WHERE = ItemColumns.STATUS + ">"
 			+ ItemColumns.ITEM_STATUS_MAX_DOWNLOADING_VIEW + " AND "
 			+ ItemColumns.STATUS + "<"
@@ -67,10 +62,18 @@ public class PlayerService extends Service implements
 	private NotificationManager mNotificationManager;
 	private NotificationPlayer mNotificationPlayer;
 
+	// AudioManager
+	private AudioManager mAudioManager;
+	private ComponentName mControllerComponentName;
+
 	private FeedItem mItem = null;
 	private boolean mUpdate = false;
-	private boolean mResumeAfterCall = false;
+	private boolean mResumePlayback = false;
 
+	/**
+	 * Phone state listener. Will pause the playback when the phone is ringing
+	 * and continue it afterwards
+	 */
 	private PhoneStateListener mPhoneStateListener = new PhoneStateListener() {
 		@Override
 		public void onCallStateChanged(int state, String incomingNumber) {
@@ -79,21 +82,19 @@ public class PlayerService extends Service implements
 				int ringvolume = audioManager
 						.getStreamVolume(AudioManager.STREAM_RING);
 				if (ringvolume > 0) {
-					mResumeAfterCall = (isPlaying() || mResumeAfterCall)
+					mResumePlayback = (isPlaying() || mResumePlayback)
 							&& (mItem != null);
 					pause();
 				}
 			} else if (state == TelephonyManager.CALL_STATE_OFFHOOK) {
-				mResumeAfterCall = (isPlaying() || mResumeAfterCall)
+				mResumePlayback = (isPlaying() || mResumePlayback)
 						&& (mItem != null);
 				pause();
 			} else if (state == TelephonyManager.CALL_STATE_IDLE) {
-				if (mResumeAfterCall) {
+				if (mResumePlayback) {
 
-					// never fade in before I have stopped it from doing so when
-					// it shouldn't
-					// startAndFadeIn();
-					mResumeAfterCall = false;
+					startAndFadeIn();
+					mResumePlayback = false;
 				}
 			}
 		}
@@ -102,10 +103,6 @@ public class PlayerService extends Service implements
 	private void startAndFadeIn() {
 		handler.sendEmptyMessageDelayed(FADEIN, 10);
 	}
-
-	// AudioManager
-	private AudioManager mAudioManager;
-	private ComponentName mControllerComponentName;
 
 	@Override
 	public void onCreate() {
@@ -127,9 +124,13 @@ public class PlayerService extends Service implements
 		if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
 			// Pause playback
 			pause();
+			mResumePlayback = true;
 		} else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
 			// Resume playback
-			start();
+			if (mResumePlayback) {
+				start();
+				mResumePlayback = false;
+			}
 		} else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
 			mAudioManager
 					.unregisterMediaButtonEventReceiver(mControllerComponentName);
@@ -144,9 +145,9 @@ public class PlayerService extends Service implements
 
 		private Handler mHandler;
 		private boolean mIsInitialized = false;
-		
+
 		private boolean isPreparingMedia = false;
-		
+
 		int bufferProgress = 0;
 
 		int startPos = 0;
@@ -164,7 +165,7 @@ public class PlayerService extends Service implements
 
 				this.startPos = startPos;
 				this.isPreparingMedia = true;
-				
+
 				mMediaPlayer.setOnPreparedListener(preparedlistener);
 				mMediaPlayer.prepareAsync();
 			} catch (IOException ex) {
@@ -265,7 +266,7 @@ public class PlayerService extends Service implements
 				FeedItem item = PlayerService.this.mItem;
 				// item.markAsListened();
 				// item.update(getContentResolver());
-				
+
 				if (!isPreparingMedia)
 					mHandler.sendEmptyMessage(TRACK_ENDED);
 
@@ -372,24 +373,18 @@ public class PlayerService extends Service implements
 
 					// deprecated - I think
 					/*
-					if (repeat_mode == REPEAT_MODE_REPEAT_ONE) {
-						long id = mItem.id;
-						mItem = null;
-						play(id);
-					} else if (repeat_mode == REPEAT_MODE_REPEAT) {
-						if (nextItemId == -1) {
-							// nextItemId = getFirst();
-						}
-
-						if (nextItemId > -1)
-							play(nextItemId);
-
-					} else if (repeat_mode == REPEAT_MODE_NO_REPEAT) {
-						if (nextItemId > -1)
-							play(nextItemId);
-
-					}
-					*/
+					 * if (repeat_mode == REPEAT_MODE_REPEAT_ONE) { long id =
+					 * mItem.id; mItem = null; play(id); } else if (repeat_mode
+					 * == REPEAT_MODE_REPEAT) { if (nextItemId == -1) { //
+					 * nextItemId = getFirst(); }
+					 * 
+					 * if (nextItemId > -1) play(nextItemId);
+					 * 
+					 * } else if (repeat_mode == REPEAT_MODE_NO_REPEAT) { if
+					 * (nextItemId > -1) play(nextItemId);
+					 * 
+					 * }
+					 */
 
 				}
 
