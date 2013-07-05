@@ -1,0 +1,103 @@
+package org.bottiger.podcast.playlist;
+
+import java.util.LinkedList;
+
+import org.bottiger.podcast.PodcastBaseFragment;
+import org.bottiger.podcast.provider.DatabaseHelper;
+import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.ItemColumns;
+import org.bottiger.podcast.service.PlayerService;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.preference.PreferenceManager;
+import android.support.v4.widget.CursorAdapter;
+
+public class Playlist {
+	
+	private Context context;
+	
+	private SharedPreferences sharedPreferences;
+	
+	private String showListenedKey = "showListened";
+	private Boolean showListenedVal = true;
+	
+	private LinkedList<FeedItem> mPlaylist;
+	
+	public Playlist(Context context) {
+		this.context = context;
+		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+	}
+	
+	public Cursor getPlaylistCursor() {
+		return null;
+	}
+	
+	public LinkedList<FeedItem> getPlaylist() {
+		return mPlaylist;
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param inputOrder
+	 * @param Amount of episodes
+	 * @return A SQL formatted string of the order
+	 */
+	public String getOrder(String inputOrder, Integer amount) {
+		assert inputOrder != null;
+
+		PlayerService playerService = PodcastBaseFragment.mPlayerServiceBinder;
+
+		String playingFirst = "";
+		if (playerService != null && playerService.getCurrentItem() != null) {
+			playingFirst = "case " + ItemColumns._ID + " when "
+					+ playerService.getCurrentItem().getId()
+					+ " then 1 else 2 end, ";
+		}
+		String prioritiesSecond = "case " + ItemColumns.PRIORITY
+				+ " when 0 then 2 else 1 end, " + ItemColumns.PRIORITY + ", ";
+		String order = playingFirst + prioritiesSecond + ItemColumns.DATE + " "
+				+ inputOrder + " LIMIT " + amount; // before:
+		return order;
+	}
+	
+	/**
+	 * 
+	 * @return A SQL formatted string of the where clause 
+	 */
+	public String getWhere() {
+		Boolean showListened = sharedPreferences.getBoolean(showListenedKey,
+				showListenedVal);
+		String where = (showListened) ? "1" : ItemColumns.LISTENED + "== 0";
+		return where;
+	}
+	
+	/**
+	 * 
+	 */
+	public void resetPlaylist(CursorAdapter adapter) {
+		// Update the database
+		String currentTime = String.valueOf(System.currentTimeMillis());
+		String updateLastUpdate = ", " + ItemColumns.LAST_UPDATE + "="
+				+ currentTime + " ";
+
+		// We remove the playlist position for all items in the playlist.
+		String action = "UPDATE " + ItemColumns.TABLE_NAME + " SET ";
+		String value = ItemColumns.PRIORITY + "=0" + updateLastUpdate;
+		String where = "WHERE " + ItemColumns.PRIORITY + "<> 0";
+
+		// Also update the timestamp of the top item in order to indicate to the
+		// drivesyncer
+		// Our data is up tp date.
+		String where2 = " OR " + ItemColumns._ID + "==(select " + ItemColumns._ID + " from " + ItemColumns.TABLE_NAME
+				+ " order by " + ItemColumns.DATE + " desc limit 1)";
+
+		String sql = action + value + where + where2;
+
+		DatabaseHelper dbHelper = new DatabaseHelper();
+		dbHelper.executeSQL(context, sql, adapter);
+	}
+
+}

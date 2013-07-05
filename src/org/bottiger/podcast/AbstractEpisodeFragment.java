@@ -168,6 +168,7 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 				.loadInBackground();
 	}
 
+	@Deprecated
 	public String getWhere() {
 		Boolean showListened = sharedPreferences.getBoolean(showListenedKey,
 				showListenedVal);
@@ -175,10 +176,12 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 		return where;
 	}
 
+	@Deprecated
 	public String getOrder() {
 		return getOrder("DESC", 100);
 	}
 
+	@Deprecated
 	public static String getOrder(String inputOrder, Integer amount) {
 		assert inputOrder != null;
 
@@ -197,6 +200,7 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 		return order;
 	}
 
+	@Deprecated
 	public String getOrder(String inputOrder) {
 		// assert inputOrder != null;
 		//
@@ -241,6 +245,7 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 		pullToRefreshView.setOnRefreshListener(pullToRefreshListener);
 	}
 
+	@Deprecated
 	protected void resetPlaylist(Context context) {
 		// Update the database
 		String currentTime = String.valueOf(System.currentTimeMillis());
