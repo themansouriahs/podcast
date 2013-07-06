@@ -4,29 +4,25 @@ import java.util.HashMap;
 
 import org.bottiger.podcast.adapters.ItemCursorAdapter;
 import org.bottiger.podcast.adapters.viewholders.InlinePlayer;
+import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.ControlButtons;
 import org.bottiger.podcast.utils.ExpandAnimation;
 
-import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
-
 import android.content.Context;
 import android.database.Cursor;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.CursorAdapter;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
@@ -41,6 +37,8 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 	public final static int SUBSCRIPTION_CONTEXT_MENU = 1;
 
 	public static HashMap<Integer, Integer> mKeepIconMap;
+	
+	private Playlist mPlaylist;
 
 	private long mCurCheckID = -1;
 	boolean mDualPane;
@@ -61,6 +59,8 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		
+		mPlaylist = new Playlist(getActivity());
 
 		if (savedInstanceState != null) {
 			// Restore last state for checked position.

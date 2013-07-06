@@ -6,7 +6,7 @@ import org.bottiger.podcast.R;
 import org.bottiger.podcast.R.id;
 import org.bottiger.podcast.R.layout;
 import org.bottiger.podcast.adapters.ItemCursorAdapter;
-import org.bottiger.podcast.adapters.ReorderCursor;
+import org.bottiger.podcast.playlist.ReorderCursor;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.utils.Playlist;
 

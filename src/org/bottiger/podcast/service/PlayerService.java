@@ -5,11 +5,11 @@ import java.io.IOException;
 import org.bottiger.podcast.SettingsActivity;
 import org.bottiger.podcast.listeners.PlayerStatusListener;
 import org.bottiger.podcast.notification.NotificationPlayer;
+import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.utils.PodcastLog;
-import org.bottiger.podcast.utils.Playlist;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -37,11 +37,14 @@ import android.telephony.TelephonyManager;
 public class PlayerService extends Service implements
 		AudioManager.OnAudioFocusChangeListener {
 
+	/** Which action to perform when a track ends */
 	private static enum NextTrack {
 		NONE, NEW_TRACK, NEXT_IN_PLAYLIST
 	}
 
 	private static NextTrack nextTrack = NextTrack.NEXT_IN_PLAYLIST;
+	
+	private Playlist mPlaylist = new Playlist(this);
 
 	private static final int FADEIN = 0;
 	private static final int TRACK_ENDED = 1;
@@ -618,8 +621,14 @@ public class PlayerService extends Service implements
 		return null;
 	}
 
+	/**
+	 * @return The ID of the next episode in the playlist
+	 */
 	public long getNextId() {
-		return (long) Playlist.nextId();
+		FeedItem next = mPlaylist.nextEpisode();
+		if (next != null)
+			return next.getId();
+		return -1;
 	}
 
 	/**

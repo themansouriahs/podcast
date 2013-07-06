@@ -1,4 +1,4 @@
-package org.bottiger.podcast.adapters;
+package org.bottiger.podcast.playlist;
 
 import org.bottiger.podcast.PodcastBaseFragment;
 import org.bottiger.podcast.provider.FeedItem;
@@ -6,26 +6,36 @@ import org.bottiger.podcast.provider.FeedItem;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.CursorWrapper;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.CursorAdapter;
 import android.util.SparseIntArray;
 
 import com.mobeta.android.dslv.DragSortListView;
 
-public class ReorderCursor extends CursorWrapper implements DragSortListView.DropListener {
-//class ReorderCursor extends CursorWrapper {
+public class ReorderCursor extends CursorWrapper implements
+		DragSortListView.DropListener {
+	// class ReorderCursor extends CursorWrapper {
 
-	PodcastBaseFragment mFragment = null;
-	
-    public ReorderCursor(Cursor cursor, PodcastBaseFragment fragment) {
-        super(cursor);
-        mFragment = fragment;
-        _remapping = new SparseIntArray();
-    }
+	PodcastBaseFragment mBaseFragment = null;
+	CursorAdapter mAdapter = null;
 
-    /**
-     * This is the one being used as of 13 June 2013
-     */
-    @Override
+	@Deprecated
+	public ReorderCursor(Cursor cursor, PodcastBaseFragment fragment) {
+		super(cursor);
+		mBaseFragment = fragment;
+		_remapping = new SparseIntArray();
+	}
+
+	public ReorderCursor(CursorAdapter adapter, Cursor cursor) {
+		super(cursor);
+		mAdapter = adapter;
+		_remapping = new SparseIntArray();
+	}
+
+	/**
+	 * This is the one being used as of 13 June 2013
+	 */
+	@Override
     public void drop(final int from, final int to) {	
         // Update remapping
     	
@@ -40,9 +50,9 @@ public class ReorderCursor extends CursorWrapper implements DragSortListView.Dro
         
         FeedItem.clearCache();
          
-         
-        final CursorAdapter mAdapter = mFragment.getAdapter(this);
-        final Context c = mFragment.getActivity();
+        
+        final CursorAdapter adapter = (mAdapter != null) ?	mAdapter : mBaseFragment.getAdapter(this);
+        final Context c = mBaseFragment.getActivity();
 		new Thread(new Runnable() {
 			public void run() {
 		
@@ -50,13 +60,13 @@ public class ReorderCursor extends CursorWrapper implements DragSortListView.Dro
         		if (from != to) {
 					FeedItem precedingItem = null;
 					if (to > 0) {
-						Cursor precedingItemCursor = (Cursor) mAdapter
+						Cursor precedingItemCursor = (Cursor) adapter
 								.getItem(to - 1);
 						precedingItem = FeedItem
 								.getByCursor(precedingItemCursor);
 					}
 
-					Cursor item = (Cursor) mAdapter.getItem(to);
+					Cursor item = (Cursor) adapter.getItem(to);
 					FeedItem feedItem = FeedItem.getByCursor(item);
 
 					feedItem.setPriority(precedingItem, c);
@@ -64,21 +74,20 @@ public class ReorderCursor extends CursorWrapper implements DragSortListView.Dro
 			}
 		}).start();
 		
-		mAdapter.notifyDataSetChanged();
+		adapter.notifyDataSetChanged();
 		
      }
 
-    
-    @Override
-    public boolean moveToPosition(int position) {
-    	int newPos = getRemappedPosition(position);
-    	return super.moveToPosition(newPos);
-    }
+	@Override
+	public boolean moveToPosition(int position) {
+		int newPos = getRemappedPosition(position);
+		return super.moveToPosition(newPos);
+	}
 
-    private int getRemappedPosition(int position) {
-        return _remapping.get(position, position);
-    }
+	private int getRemappedPosition(int position) {
+		return _remapping.get(position, position);
+	}
 
-    private final SparseIntArray _remapping;
-    
+	private final SparseIntArray _remapping;
+
 }

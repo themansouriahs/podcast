@@ -14,6 +14,7 @@ import android.support.v4.content.Loader;
 
 public class Playlist {
 
+	/*
 	private final static int playlistSize = 10;
 	private final static int playlistTreshold = 5;
 
@@ -38,7 +39,7 @@ public class Playlist {
 	 * 
 	 * @param item
 	 *            the Item to be removed
-	 */
+	 
 	public static void removeEpisode(FeedItem item) {
 		QueueItem queueItem = new QueueItem(item, 0);
 		if (playlist.contains(queueItem))
@@ -75,7 +76,7 @@ public class Playlist {
 
 	/**
 	 * @return the next item to be played
-	 */
+	 
 	public FeedItem getNext() {
 		// String where = getWhere();
 		// if (playerService != null) {
@@ -132,7 +133,7 @@ public class Playlist {
 
 	/**
 	 * Private class for holding the an episodeID and a position in the playlist
-	 */
+	 
 	private static class QueueItem implements Comparable<QueueItem> {
 
 		private Integer episodeId;
@@ -167,14 +168,14 @@ public class Playlist {
 		@Override
 		public int compareTo(QueueItem otherItem) {
 			return position.compareTo(otherItem.getPosition());
-			/*
+			
 			// If either is greater than zero return the largest
-			if (priority > 0 || otherItem.getPriority() > 0)
-				return priority.compareTo(otherItem.getPriority());
+			//if (priority > 0 || otherItem.getPriority() > 0)
+			//	return priority.compareTo(otherItem.getPriority());
 
 			// Otherwize the must be sorted by date.
-			return date.compareTo(otherItem.date);
-			*/
+			//return date.compareTo(otherItem.date);
+			
 		}
 
 		@Override
@@ -203,4 +204,5 @@ public class Playlist {
 			return true;
 		}
 	}
+	*/
 }

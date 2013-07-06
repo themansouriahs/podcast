@@ -15,38 +15,61 @@ import android.preference.PreferenceManager;
 import android.support.v4.widget.CursorAdapter;
 
 public class Playlist {
-	
+
 	private Context context;
-	
+
 	private SharedPreferences sharedPreferences;
-	
+
 	private String showListenedKey = "showListened";
 	private Boolean showListenedVal = true;
-	
+
+	private String inputOrderKey = "inputOrder";
+	private String defaultOrder = "DESC";
+
+	private String amountKey = "amountOfEpisodes";
+	private int amountValue = 20;
+
 	private LinkedList<FeedItem> mPlaylist;
-	
+
 	public Playlist(Context context) {
 		this.context = context;
-		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+		sharedPreferences = PreferenceManager
+				.getDefaultSharedPreferences(context);
 	}
-	
-	public Cursor getPlaylistCursor() {
-		return null;
+
+	public void getPlaylistCursor(CursorAdapter adapter) {
 	}
-	
+
+	/**
+	 * @return The playlist as a list of episodes
+	 */
 	public LinkedList<FeedItem> getPlaylist() {
 		return mPlaylist;
 	}
-	
+
+	/**
+	 * @return The next item in the playlist
+	 */
+	public FeedItem nextEpisode() {
+		if (mPlaylist.size() > 1)
+			return mPlaylist.get(1);
+		return null;
+	}
+
 	/**
 	 * 
 	 * 
 	 * @param inputOrder
-	 * @param Amount of episodes
+	 * @param Amount
+	 *            of episodes
 	 * @return A SQL formatted string of the order
 	 */
-	public String getOrder(String inputOrder, Integer amount) {
-		assert inputOrder != null;
+	public String getOrder() {
+
+		String inputOrder = sharedPreferences.getString(inputOrderKey,
+				defaultOrder);
+		int amount = sharedPreferences.getInt(amountKey,
+				amountValue);
 
 		PlayerService playerService = PodcastBaseFragment.mPlayerServiceBinder;
 
@@ -62,10 +85,10 @@ public class Playlist {
 				+ inputOrder + " LIMIT " + amount; // before:
 		return order;
 	}
-	
+
 	/**
 	 * 
-	 * @return A SQL formatted string of the where clause 
+	 * @return A SQL formatted string of the where clause
 	 */
 	public String getWhere() {
 		Boolean showListened = sharedPreferences.getBoolean(showListenedKey,
@@ -73,7 +96,7 @@ public class Playlist {
 		String where = (showListened) ? "1" : ItemColumns.LISTENED + "== 0";
 		return where;
 	}
-	
+
 	/**
 	 * 
 	 */
@@ -91,7 +114,8 @@ public class Playlist {
 		// Also update the timestamp of the top item in order to indicate to the
 		// drivesyncer
 		// Our data is up tp date.
-		String where2 = " OR " + ItemColumns._ID + "==(select " + ItemColumns._ID + " from " + ItemColumns.TABLE_NAME
+		String where2 = " OR " + ItemColumns._ID + "==(select "
+				+ ItemColumns._ID + " from " + ItemColumns.TABLE_NAME
 				+ " order by " + ItemColumns.DATE + " desc limit 1)";
 
 		String sql = action + value + where + where2;
