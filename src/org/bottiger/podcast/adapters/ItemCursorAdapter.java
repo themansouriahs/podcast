@@ -41,12 +41,6 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 
 	public static final int ICON_DEFAULT_ID = -1;
 
-	public final static FieldHandler defaultTextFieldHandler = new FieldHandler.TextFieldHandler();
-
-	protected int[] mFrom2;
-	protected int[] mTo2;
-	protected FieldHandler[] mFieldHandlers;
-
 	private static final int TYPE_COLLAPS = 0;
 	private static final int TYPE_EXPAND = 1;
 	private static final int TYPE_MAX_COUNT = 2;
@@ -139,7 +133,6 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 
 		getPlayerViewHolder(position, listViewItem, itemCursor, convertView,
 				parent);
-		// bindExandedPlayer(itemCursor, listViewItem, position);
 
 		return listViewItem;
 	}
@@ -151,8 +144,6 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 
 		EpisodeViewHolder holder = new EpisodeViewHolder();
 		holder.icon = (NetworkImageView) view.findViewById(R.id.list_image);
-		// NetworkImageView icon = (NetworkImageView)
-		// view.getTag(R.id.list_image);
 		holder.mainTitle = (TextView) view.findViewById(R.id.title);
 		holder.subTitle = (TextView) view.findViewById(R.id.podcast);
 		holder.timeDuration = (TextView) view.findViewById(R.id.duration);
