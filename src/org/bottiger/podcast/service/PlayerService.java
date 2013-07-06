@@ -44,7 +44,7 @@ public class PlayerService extends Service implements
 
 	private static NextTrack nextTrack = NextTrack.NEXT_IN_PLAYLIST;
 	
-	private Playlist mPlaylist = new Playlist(this);
+	private Playlist mPlaylist;
 
 	private static final int FADEIN = 0;
 	private static final int TRACK_ENDED = 1;
@@ -110,6 +110,9 @@ public class PlayerService extends Service implements
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		
+		mPlaylist = new Playlist(this);
+		
 		mPlayer = new MyPlayer();
 		mPlayer.setHandler(handler);
 		mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);

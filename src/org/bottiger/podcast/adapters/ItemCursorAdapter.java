@@ -95,7 +95,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 
 	public ItemCursorAdapter(Context context, int layout, Cursor cursor,
 			String[] fromColumns, int[] to, FieldHandler[] fieldHandlers) {
-		this(context, null, layout, cursor, fromColumns, to, fieldHandlers);
+		this(context, null, layout, cursor, fromColumns, to);
 	}
 
 	// Newer constructor allows custom FieldHandlers.
@@ -105,33 +105,13 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 	// is not worth it.
 	// If this were a Scala program, that would be a one-line case class.
 	public ItemCursorAdapter(Context context, PodcastBaseFragment fragment,
-			int layout, Cursor cursor, String[] fromColumns, int[] to,
-			FieldHandler[] fieldHandlers) {
+			int layout, Cursor cursor, String[] fromColumns, int[] to) {
 		super(context, layout, cursor, fromColumns, to);
 
 		mContext = context;
 		mFragment = fragment;
 		mInflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-		if (to.length < fromColumns.length) {
-			mTo2 = new int[fromColumns.length];
-			for (int i = 0; i < to.length; i++)
-				mTo2[i] = to[i];
-			mTo2[fromColumns.length - 1] = R.id.icon;
-		} else
-			mTo2 = to;
-		mFieldHandlers = fieldHandlers;
-		if (cursor != null) {
-			int i;
-			int count = fromColumns.length;
-			if (mFrom2 == null || mFrom2.length != count) {
-				mFrom2 = new int[count];
-			}
-			for (i = 0; i < count; i++) {
-				mFrom2[i] = cursor.getColumnIndexOrThrow(fromColumns[i]);
-			}
-		}
 	}
 
 	@Override

@@ -29,10 +29,6 @@ public class GenericCursorLoader {
 		assert order != null;
 		assert projection != null;
 
-		/*
-		if (id != 10)
-			setListAdapter(mAdapter);
-			*/
 
 		// Prepare the loader. Either re-connect with an existing one,
 		// or start a new one.
@@ -42,9 +38,7 @@ public class GenericCursorLoader {
 		mBundle.putString("order", order);
 		mBundle.putString("condition", condition);
 
-		// FIXME
 		mFragment.getLoaderManager().restartLoader(id, mBundle, loaderCallback);
-		// getLoaderManager().initLoader(id, mBundle, loaderCallback);
 	}
 
 	private LoaderManager.LoaderCallbacks<Cursor> loaderCallback = new LoaderCallbacks<Cursor>() {
@@ -86,11 +80,6 @@ public class GenericCursorLoader {
 				}
 			}
 
-			// The list should now be shown.
-			/*
-			 * if (isResumed()) { // setListShown(true); //FIXME } else { //
-			 * setListShownNoAnimation(true); //FIXME as well }
-			 */
 		}
 
 		@Override

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import org.bottiger.podcast.adapters.ItemCursorAdapter;
 import org.bottiger.podcast.adapters.viewholders.InlinePlayer;
 import org.bottiger.podcast.playlist.Playlist;
+import org.bottiger.podcast.playlist.PlaylistCursorLoader;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.Subscription;
@@ -37,10 +38,13 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 	public final static int SUBSCRIPTION_CONTEXT_MENU = 1;
 
 	public static HashMap<Integer, Integer> mKeepIconMap;
-	
+
 	private Playlist mPlaylist;
 
-	private long mCurCheckID = -1;
+	/** ID of the current expanded episode */
+	private long mExpandedEpisodeId = -1;
+	private String mExpandedEpisodeKey = "currentExpanded";
+	
 	boolean mDualPane;
 
 	public static RecentItemFragment newInstance(int headers, int footers) {
@@ -59,48 +63,22 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		
+
 		mPlaylist = new Playlist(getActivity());
+		mAdapter = this.getAdapter(mCursor);
+		new PlaylistCursorLoader(mPlaylist, this, mAdapter);
+		setListAdapter(mAdapter);
 
 		if (savedInstanceState != null) {
 			// Restore last state for checked position.
-			mCurCheckID = savedInstanceState.getLong("curChoice", 0);
+			mExpandedEpisodeId = savedInstanceState.getLong(mExpandedEpisodeKey, mExpandedEpisodeId);
 		}
-
-		// Populate list with our static array of titles.
-		mAdapter = this.getAdapter(mCursor); // listItemCursorAdapter(this.getActivity(),this,
-												// mCursor);
-
-		startInit(1, ItemColumns.URI, ItemColumns.ALL_COLUMNS, getWhere(),
-				getOrder());
-
-		if (mDualPane) {
-			// In dual-pane mode, the list view highlights the selected item.
-			getListView().setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
-			// Make sure our UI is in the correct state.
-			// showDetails(mCurCheckPosition);
-		}
-
 	}
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putLong("curChoice", mCurCheckID);
-	}
-
-	public static CursorAdapter listItemCursorAdapter(Context context,
-			PodcastBaseFragment fragment, Cursor cursor) {
-		ItemCursorAdapter.FieldHandler[] fields = {
-				ItemCursorAdapter.defaultTextFieldHandler,
-				new ItemCursorAdapter.TextFieldHandler(),
-				new ItemCursorAdapter.TextFieldHandler(),
-				new ItemCursorAdapter.IconFieldHandler(mIconMap), };
-		return new ItemCursorAdapter(context, fragment, R.layout.episode_list,
-				cursor, new String[] { ItemColumns.TITLE,
-						ItemColumns.SUB_TITLE, ItemColumns.DURATION,
-						ItemColumns.IMAGE_URL }, new int[] { R.id.title,
-						R.id.podcast, R.id.duration, R.id.list_image }, fields);
+		outState.putLong(mExpandedEpisodeKey, mExpandedEpisodeId);
 	}
 
 	public void setAdapter(CursorAdapter adapter) {
@@ -115,20 +93,24 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 		if (mAdapter != null)
 			return mAdapter;
 
-		CursorAdapter adapter = listItemCursorAdapter(this.getActivity(), this,
-				cursor);
+		CursorAdapter adapter = createAdapter(this.getActivity(), this, cursor);
 		setAdapter(adapter);
 		return adapter;
+	}
+
+	public static CursorAdapter createAdapter(Context context,
+			PodcastBaseFragment fragment, Cursor cursor) {
+		return new ItemCursorAdapter(context, fragment, R.layout.episode_list,
+				cursor, new String[] { ItemColumns.TITLE,
+						ItemColumns.SUB_TITLE, ItemColumns.DURATION,
+						ItemColumns.IMAGE_URL }, new int[] { R.id.title,
+						R.id.podcast, R.id.duration, R.id.list_image });
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
 		ControlButtons.fragment = this;
-		if (mPlayerServiceBinder != null && mPlayerServiceBinder.isPlaying()) {
-			long current_id = mPlayerServiceBinder.getCurrentItem().id;
-			showPlayingEpisode(current_id);
-		}
 
 		if (MainActivity.SHOW_PULL_TO_REFRESH) {
 			// Delegate OnTouch calls to both libraries that want to receive
@@ -137,8 +119,8 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 				@Override
 				public boolean onTouch(View view, MotionEvent motionEvent) {
 					if (!mController.onTouch(view, motionEvent)) {
-					// Only allow pull to refresh if not swiping list item
-					getPullToRefreshAttacher().onTouch(view, motionEvent);
+						// Only allow pull to refresh if not swiping list item
+						getPullToRefreshAttacher().onTouch(view, motionEvent);
 					}
 					return false;
 				}
@@ -161,8 +143,6 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 		MenuInflater inflater = getActivity().getMenuInflater();
 		inflater.inflate(R.menu.podcast_context, menu);
 		RecentItemFragment.setContextMenu(PLAYLIST_CONTEXT_MENU, this);
-		// contextMenuViewID = v. .getId(); //this is where I get the id of my
-		// clicked button
 	}
 
 	@Override
@@ -202,45 +182,8 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 		}
 	}
 
-	public void showPlayingEpisode(long playingEpisodeID) {
-		// this.getActivity().findViewById(id)
-		// ViewStub stub = (ViewStub)
-		// getActivity().findViewById(R.id.stub_play);
-		// View inflated = stub.inflate();
-
-		FeedItem episode = FeedItem.getById(getActivity().getContentResolver(),
-				playingEpisodeID);
-
-		// TextView t = (TextView) inflated.findViewById(R.id.player_title);
-		// FIXME
-		// t.setText(episode.title); FIXME
-		listNonPlayingEpisodes(playingEpisodeID);
-	}
-
-	public void listNonPlayingEpisodes(long playingEpisodeID) {
-		// String excludePLayingEpisode = ItemColumns._ID + "!="
-		// + playingEpisodeID;
-		String excludePLayingEpisode = "";
-		showEpisodes(excludePLayingEpisode);
-	}
-
-	public void showEpisodes(String condition) {
-		mCursor = createCursor(condition, getOrder());
-
-		mAdapter = RecentItemFragment.listItemCursorAdapter(this.getActivity(),
-				this, mCursor);
-
-		if (this.mCurCheckID > 0) {
-			((ItemCursorAdapter) mAdapter).showItem(mCurCheckID);
-			// View view = getViewByID(mCurCheckID);
-			// this.setPlayerListeners(view, mCurCheckID);
-		}
-
-		setListAdapter(mAdapter);
-	}
-
 	/**
-	 * Toggles the inline player for an episode when cliked on
+	 * Toggles the inline player for an episode when clicked on
 	 * 
 	 * @param list
 	 * @param item
@@ -273,7 +216,7 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 			View player = view.findViewById(R.id.stub_player);
 			if (player.getVisibility() == View.VISIBLE) {
 				player.setVisibility(View.GONE);
-				mCurCheckID = -1;
+				mExpandedEpisodeId = -1;
 			} else {
 				player.setVisibility(View.VISIBLE);
 				setListners = true;
@@ -287,30 +230,8 @@ public class RecentItemFragment extends PlaylistDSLVFragment {
 		if (viewHolder.duration != null)
 			viewHolder.duration.setText(duration);
 
-		// ControlButtons.setPlayerListeners(list, view, id);
-		// Activity activity = getActivity();
-		// ItemCursorAdapter.bindExandedPlayer(activity,
-		// FeedItem.getById(activity.getContentResolver(), id), player,
-		// viewHolder, position);
 		ControlButtons.setPlayerListeners(viewHolder, id);
 		updateCurrentPosition();
-	}
-
-	private View getViewByID(long id) {
-
-		ListView list = getListView();
-		int start = list.getFirstVisiblePosition();
-
-		for (int i = start, j = list.getLastVisiblePosition(); i <= j; i++) {
-			Cursor item = (Cursor) list.getItemAtPosition(i);
-
-			if (id == item.getLong(item.getColumnIndex(BaseColumns._ID))) {
-				View view = list.getChildAt(i);
-				return view;
-			}
-
-		}
-		return null;
 	}
 
 	@Override

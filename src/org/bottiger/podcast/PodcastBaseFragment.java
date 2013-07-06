@@ -90,7 +90,7 @@ public abstract class PodcastBaseFragment extends FixedListFragment implements
 
 	private boolean mShow = true;
 
-	protected Cursor mCursor;
+	protected Cursor mCursor = null;
 
 	private static TextView mCurrentTime = null;
 	private static SeekBar mProgressBar = null;
@@ -418,6 +418,7 @@ public abstract class PodcastBaseFragment extends FixedListFragment implements
 		return this.mCursor;
 	}
 
+	@Deprecated
 	public void startInit(int id, Uri columns, String[] projection,
 			String condition, String order) {
 		assert condition != null;
@@ -461,6 +462,7 @@ public abstract class PodcastBaseFragment extends FixedListFragment implements
 
 	public abstract CursorAdapter getAdapter(Cursor cursor);
 
+	@Deprecated
 	private LoaderManager.LoaderCallbacks<Cursor> loaderCallback = new LoaderCallbacks<Cursor>() {
 		@Override
 		public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
