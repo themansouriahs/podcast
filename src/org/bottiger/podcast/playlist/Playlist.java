@@ -1,6 +1,6 @@
 package org.bottiger.podcast.playlist;
 
-import java.util.LinkedList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.bottiger.podcast.PodcastBaseFragment;
 import org.bottiger.podcast.provider.DatabaseHelper;
@@ -10,29 +10,26 @@ import org.bottiger.podcast.service.PlayerService;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.CursorAdapter;
 
 public class Playlist {
 
-	private Context context;
+	private Context mContext;
 
+	private static CopyOnWriteArrayList<FeedItem> mPlaylist;
 	private SharedPreferences sharedPreferences;
 
+	// Shared setting key/values
 	private String showListenedKey = "showListened";
 	private Boolean showListenedVal = true;
-
 	private String inputOrderKey = "inputOrder";
 	private String defaultOrder = "DESC";
-
 	private String amountKey = "amountOfEpisodes";
 	private int amountValue = 20;
 
-	private static LinkedList<FeedItem> mPlaylist;
-
 	public Playlist(Context context) {
-		this.context = context;
+		this.mContext = context;
 		sharedPreferences = PreferenceManager
 				.getDefaultSharedPreferences(context);
 	}
@@ -43,8 +40,26 @@ public class Playlist {
 	/**
 	 * @return The playlist as a list of episodes
 	 */
-	public LinkedList<FeedItem> getPlaylist() {
+	public CopyOnWriteArrayList<FeedItem> getPlaylist() {
 		return mPlaylist;
+	}
+	
+	/**
+	 * 
+	 * @param position in the playlist (0-indexed)
+	 * @return The episode at the given position
+	 */
+	public FeedItem getItem(int position) {
+			return mPlaylist.get(position);
+	}
+	
+	/**
+	 * 
+	 * @param position
+	 * @param item
+	 */
+	public void setItem(int position, FeedItem item) {
+		mPlaylist.set(position, item);
 	}
 
 	/**
@@ -121,7 +136,7 @@ public class Playlist {
 		String sql = action + value + where + where2;
 
 		DatabaseHelper dbHelper = new DatabaseHelper();
-		dbHelper.executeSQL(context, sql, adapter);
+		dbHelper.executeSQL(mContext, sql, adapter);
 	}
 
 }

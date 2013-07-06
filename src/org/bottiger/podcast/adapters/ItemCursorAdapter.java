@@ -11,6 +11,7 @@ import org.bottiger.podcast.R;
 import org.bottiger.podcast.adapters.viewholders.InlinePlayer;
 import org.bottiger.podcast.images.ImageCacheManager;
 import org.bottiger.podcast.listeners.DownloadProgressListener;
+import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.service.DownloadStatus;
 import org.bottiger.podcast.utils.ControlButtons;
@@ -24,7 +25,6 @@ import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.provider.BaseColumns;
-import android.text.Html;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,6 +47,8 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 
 	private ArrayList<FeedItem> mData = new ArrayList<FeedItem>();
 	private PodcastBaseFragment mFragment = null;
+	
+	private Playlist mPlaylist;
 
 	private TreeSet<Number> mExpandedItemID = new TreeSet<Number>();
 
@@ -106,6 +108,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 		mFragment = fragment;
 		mInflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		mPlaylist = new Playlist(context);
 	}
 
 	@Override
@@ -128,6 +131,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 		}
 
 		mCurrentFeedItem = FeedItem.getByCursor(itemCursor);
+		mPlaylist.setItem(position, mCurrentFeedItem);
 
 		bindView(listViewItem, mContext, itemCursor);
 
