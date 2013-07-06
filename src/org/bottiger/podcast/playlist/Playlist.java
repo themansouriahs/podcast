@@ -29,7 +29,7 @@ public class Playlist {
 	private String amountKey = "amountOfEpisodes";
 	private int amountValue = 20;
 
-	private LinkedList<FeedItem> mPlaylist;
+	private static LinkedList<FeedItem> mPlaylist;
 
 	public Playlist(Context context) {
 		this.context = context;

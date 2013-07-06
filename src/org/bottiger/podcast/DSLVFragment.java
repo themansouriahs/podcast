@@ -22,7 +22,7 @@ import android.widget.ListView;
 import com.mobeta.android.dslv.DragSortController;
 import com.mobeta.android.dslv.DragSortListView;
 
-public abstract class PlaylistDSLVFragment extends AbstractEpisodeFragment {
+public abstract class DSLVFragment extends AbstractEpisodeFragment {
             
     protected int getLayout() {
         // this DSLV xml declaration does not call for the use

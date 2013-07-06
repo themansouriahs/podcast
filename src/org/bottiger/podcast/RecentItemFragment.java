@@ -29,7 +29,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-public class RecentItemFragment extends PlaylistDSLVFragment {
+public class RecentItemFragment extends DSLVFragment {
 
 	private static int CONTEXT_MENU = 0;
 	private static Fragment CONTEXT_FRAGMENT = null;
