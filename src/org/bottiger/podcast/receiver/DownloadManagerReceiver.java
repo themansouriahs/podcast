@@ -61,7 +61,6 @@ public class DownloadManagerReceiver extends BroadcastReceiver {
 					// Reset downloadingItem 
 					PodcastDownloadManager.notifyDownloadComplete(item);
 					
-					// start downloading a new item
 					PodcastDownloadManager.startDownload(context);
 				}
 			}

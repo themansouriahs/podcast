@@ -47,8 +47,6 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 
 	private ArrayList<FeedItem> mData = new ArrayList<FeedItem>();
 	private PodcastBaseFragment mFragment = null;
-	
-	private Playlist mPlaylist;
 
 	private TreeSet<Number> mExpandedItemID = new TreeSet<Number>();
 
@@ -108,7 +106,6 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 		mFragment = fragment;
 		mInflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		mPlaylist = new Playlist(context);
 	}
 
 	@Override
@@ -131,7 +128,6 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 		}
 
 		mCurrentFeedItem = FeedItem.getByCursor(itemCursor);
-		mPlaylist.setItem(position, mCurrentFeedItem);
 
 		bindView(listViewItem, mContext, itemCursor);
 

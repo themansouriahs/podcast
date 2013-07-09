@@ -2,7 +2,6 @@ package org.bottiger.podcast.service;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -12,6 +11,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -20,9 +20,11 @@ import org.bottiger.podcast.images.RequestManager;
 import org.bottiger.podcast.parser.JSONFeedParserWrapper;
 import org.bottiger.podcast.parser.syndication.handler.FeedHandler;
 import org.bottiger.podcast.parser.syndication.handler.UnsupportedFeedtypeException;
+import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.receiver.DownloadManagerReceiver;
 import org.bottiger.podcast.utils.LockHandler;
 import org.bottiger.podcast.utils.SDCardManager;
 import org.json.JSONArray;
@@ -47,11 +49,14 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 public class PodcastDownloadManager {
+	
+	// Running processes
+	private static AtomicInteger processCounts = new AtomicInteger(0);
+	private static Context mContext = null;
 
 	public static final int NO_CONNECT = 1;
 	public static final int WIFI_CONNECT = 2;
@@ -103,6 +108,15 @@ public class PodcastDownloadManager {
 
 		return DownloadStatus.NOTHING;
 	}
+	
+	public static void queueNewItems(Context context, int numOfItems) {
+		Playlist playlist = new Playlist(context);
+		for (int i = 0; i < numOfItems; i++) {
+			FeedItem item = playlist.getItem(i);
+			if (item != null)
+				PodcastDownloadManager.addItemToQueue(item);
+		}
+	}
 
 	public static void start_update(final Context context) {
 		start_update(context, null, null);
@@ -118,6 +132,8 @@ public class PodcastDownloadManager {
 			Subscription subscription) {
 		if (updateConnectStatus(context) == NO_CONNECT)
 			return;
+		
+		mContext = context;
 
 		/*
 		 * // log.debug("start_update()"); if (mUpdateLock.locked() == false)
@@ -141,7 +157,7 @@ public class PodcastDownloadManager {
 		Cursor subscriptionCursor = Subscription.allAsCursor(context
 				.getContentResolver());
 
-		MyResponseListener responseListener = new MyResponseListener(feedParser);
+		//MyResponseListener responseListener = new MyResponseListener(feedParser);
 
 		while (subscriptionCursor.moveToNext()) {
 
@@ -174,43 +190,11 @@ public class PodcastDownloadManager {
 
 				// Add the request to Volley
 				requestQueue.add(jr);
+				processCounts.incrementAndGet();
 
 			}
 		}
 		requestQueue.start();
-	}
-
-	/*
-	 * private static class JacksonURLParser extends AsyncTask<URL, Void, Void>
-	 * {
-	 * 
-	 * JSONFeedParserWrapper feedParser = null;
-	 * 
-	 * public JacksonURLParser(JSONFeedParserWrapper feedParser) {
-	 * this.feedParser = feedParser; }
-	 * 
-	 * protected Void doInBackground(URL... urls) { URL url = urls[0];
-	 * Thread.currentThread().setPriority(Thread.MIN_PRIORITY); long start =
-	 * System.currentTimeMillis(); feedParser.feedParser(url); long end =
-	 * System.currentTimeMillis(); Log.d("Parser Profiler", "total time: " +
-	 * (end - start)); return null; } }
-	 */
-
-	static class MyResponseListener implements Listener<JSONArray> {
-
-		final JSONFeedParserWrapper feedParser;
-		final VolleyResultParser volleyResultParser;
-
-		public MyResponseListener(JSONFeedParserWrapper feedParser) {
-			this.feedParser = feedParser;
-			this.volleyResultParser = new VolleyResultParser(feedParser);
-		}
-
-		@Override
-		public void onResponse(JSONArray response) {
-			volleyResultParser.execute(response);
-		}
-
 	}
 	
 	static class MyStringResponseListener implements Listener<String> {
@@ -219,7 +203,6 @@ public class PodcastDownloadManager {
 		Subscription subscription;
 		ContentResolver contentResolver;
 		final JSONFeedParserWrapper feedParser = null;
-		final VolleyResultParser volleyResultParser = null;
 
 		public MyStringResponseListener(ContentResolver contentResolver, Subscription subscription) {
 			this.subscription = subscription;
@@ -244,39 +227,9 @@ public class PodcastDownloadManager {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			decrementProcessCount();
 		}
 
-	}
-
-	private static class VolleyResultParser extends
-			AsyncTask<JSONArray, Void, Void> {
-
-		JSONFeedParserWrapper feedParser = null;
-
-		public VolleyResultParser(JSONFeedParserWrapper feedParser) {
-			this.feedParser = feedParser;
-		}
-
-		protected Void doInBackground(JSONArray... response) {
-			Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-			long start = System.currentTimeMillis();
-			feedParser.feedParser(response[0]);
-			long end = System.currentTimeMillis();
-			Log.d("Parser Profiler", "total time: " + (end - start));
-			return null;
-		}
-	}
-
-	private static Response.Listener<JSONArray> createGetSuccessListener(
-			final JSONFeedParserWrapper feedParser,
-			final Subscription subscription) {
-		return new Response.Listener<JSONArray>() {
-
-			@Override
-			public void onResponse(JSONArray response) {
-				feedParser.feedParser(response);
-			}
-		};
 	}
 
 	private static Response.ErrorListener createGetFailureListener() {
@@ -284,6 +237,7 @@ public class PodcastDownloadManager {
 
 			@Override
 			public void onErrorResponse(VolleyError error) { // Handle error
+				decrementProcessCount();
 				if (error instanceof com.android.volley.ServerError) {
 
 				} else {
@@ -293,6 +247,14 @@ public class PodcastDownloadManager {
 				}
 			}
 		};
+	}
+	
+	private static void decrementProcessCount() {
+		PodcastDownloadManager.processCounts.decrementAndGet();
+		if (PodcastDownloadManager.processCounts.get() == 0) {
+			if (mContext != null)
+				PodcastDownloadManager.startDownload(mContext);
+		}
 	}
 
 	/**
@@ -317,6 +279,14 @@ public class PodcastDownloadManager {
 
 		downloadManager = (DownloadManager) context
 				.getSystemService(Context.DOWNLOAD_SERVICE);
+		
+		Playlist playlist = new Playlist(context);
+		int max = 5;
+		for (int i = 0; i < max; i++) {
+			FeedItem item = playlist.getItem(i);
+			if (item != null && !item.isDownloaded())
+				mDownloadQueue.add(item);
+		}
 
 		if (getDownloadingItem() == null && mDownloadQueue.size() > 0) {
 			FeedItem downloadingItem = getNextItem();

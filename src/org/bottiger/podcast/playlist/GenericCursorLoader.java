@@ -13,10 +13,12 @@ import android.view.View;
 
 import com.mobeta.android.dslv.DragSortListView;
 
-public class GenericCursorLoader {
+public abstract class GenericCursorLoader {
 
 	final CursorAdapter mAdapter;
 	final Fragment mFragment;
+	
+	public abstract void cursorPostProsessing(ReorderCursor cursoer);
 
 	public GenericCursorLoader(Fragment fragment, CursorAdapter adapter) {
 		this.mFragment = fragment;
@@ -62,7 +64,7 @@ public class GenericCursorLoader {
 			// https://github.com/bauerca/drag-sort-listview/issues/20
 			// final ReorderCursor wrapped_cursor = new ReorderCursor(cursor,
 			// PodcastBaseFragment.this);
-			final ReorderCursor wrapped_cursor = new ReorderCursor(mAdapter,
+			final ReorderCursor wrapped_cursor = new ReorderCursor(mFragment.getActivity(), mAdapter,
 					cursor);
 
 			// mAdapter = getAdapter(wrapped_cursor);
@@ -79,6 +81,9 @@ public class GenericCursorLoader {
 					mDslv.setDropListener(wrapped_cursor);
 				}
 			}
+			
+			// Update playlist
+			cursorPostProsessing(wrapped_cursor);
 
 		}
 

@@ -6,18 +6,23 @@ import org.bottiger.podcast.PodcastBaseFragment;
 import org.bottiger.podcast.provider.DatabaseHelper;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
+import org.bottiger.podcast.provider.PodcastOpenHelper;
 import org.bottiger.podcast.service.PlayerService;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.CursorAdapter;
 
 public class Playlist {
+	
+	private int MAX_SIZE = 20;
 
 	private Context mContext;
 
-	private static CopyOnWriteArrayList<FeedItem> mPlaylist;
+	private static CopyOnWriteArrayList<FeedItem> mPlaylist =  new CopyOnWriteArrayList<FeedItem>();
 	private SharedPreferences sharedPreferences;
 
 	// Shared setting key/values
@@ -28,6 +33,11 @@ public class Playlist {
 	private String amountKey = "amountOfEpisodes";
 	private int amountValue = 20;
 
+	public Playlist(Context context, int length) {
+		this(context);
+		this.populatePlaylist(length);
+	}
+	
 	public Playlist(Context context) {
 		this.mContext = context;
 		sharedPreferences = PreferenceManager
@@ -59,7 +69,23 @@ public class Playlist {
 	 * @param item
 	 */
 	public void setItem(int position, FeedItem item) {
-		mPlaylist.set(position, item);
+		int size = mPlaylist.size(); 
+		if (size > position)
+			mPlaylist.set(position, item);
+		else if (size == position){
+			mPlaylist.add(item);
+		}
+	}
+	
+	/**
+	 * 
+	 * @param cursor
+	 */
+	public void setItem(Cursor cursor) {
+		int position = cursor.getPosition();
+		if (position < MAX_SIZE) {
+			setItem(position, FeedItem.getByCursor(cursor));
+		}
 	}
 
 	/**
@@ -137,6 +163,26 @@ public class Playlist {
 
 		DatabaseHelper dbHelper = new DatabaseHelper();
 		dbHelper.executeSQL(mContext, sql, adapter);
+	}
+	
+	/**
+	 * Populates the playlist up to a certain length
+	 * 
+	 * @param length of the playlist
+	 */
+	private void populatePlaylist(int length) {
+		if (mPlaylist.size() >= length)
+			return;
+		
+		PodcastOpenHelper helper = new PodcastOpenHelper(mContext);
+		SQLiteDatabase database = helper.getWritableDatabase();
+		Cursor cursor = database.query(ItemColumns.TABLE_NAME, ItemColumns.ALL_COLUMNS, getWhere(), null, null, null, getOrder());
+		
+		mPlaylist.clear();
+		cursor.moveToPosition(-1);
+		while (cursor.moveToNext()) {
+			setItem(cursor);
+		}
 	}
 
 }

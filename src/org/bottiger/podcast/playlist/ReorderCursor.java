@@ -15,6 +15,8 @@ public class ReorderCursor extends CursorWrapper implements
 		DragSortListView.DropListener {
 
 	private PodcastBaseFragment mBaseFragment = null;
+	
+	private Context mContext = null;
 	private CursorAdapter mAdapter = null;
 
 	private final SparseIntArray _remapping;
@@ -26,8 +28,9 @@ public class ReorderCursor extends CursorWrapper implements
 		_remapping = new SparseIntArray();
 	}
 
-	public ReorderCursor(CursorAdapter adapter, Cursor cursor) {
+	public ReorderCursor(Context context, CursorAdapter adapter, Cursor cursor) {
 		super(cursor);
+		mContext = context;
 		mAdapter = adapter;
 		_remapping = new SparseIntArray();
 	}
@@ -53,7 +56,7 @@ public class ReorderCursor extends CursorWrapper implements
 
 		final CursorAdapter adapter = (mAdapter != null) ? mAdapter
 				: mBaseFragment.getAdapter(this);
-		final Context c = mBaseFragment.getActivity();
+		final Context c = mContext;
 		
 		asyncDatabaseUpdate(c, adapter, from , to);
 
