@@ -1047,7 +1047,7 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 
 	private static void initCache() {
 		if (cache == null) {
-			int memoryClass = 16 * 1024 * 1024; // FIXME use getMemoryClass()
+			int memoryClass = 5 * 1024 * 1024; // FIXME use getMemoryClass()
 			cache = new ItemLruCache(memoryClass);
 		}
 	}
