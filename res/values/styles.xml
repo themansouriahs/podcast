@@ -80,13 +80,21 @@
     </style>
 
     <style name="PlayerControlButtons">
-        <item name="android:layout_width">42dip</item>
-        <item name="android:layout_height">42dip</item>
+        <item name="android:scaleType">fitStart</item>
+        <item name="android:layout_width">37dp</item>
+        <item name="android:layout_height">37dp</item>
+        <item name="android:layout_margin">10dip</item>
+        <item name="android:background">@drawable/button_flash</item>
+        <!-- 
+        <item name="android:scaleType">fitStart</item>
+        <item name="android:layout_width">37dip</item>
+        <item name="android:layout_height">37dip</item>
         <item name="android:layout_margin">10dip</item>
         <item name="android:paddingTop">20dip</item>
         <item name="android:paddingBottom">20dip</item>
         <item name="android:paddingLeft">20dip</item>
         <item name="android:paddingRight">20dip</item>
+         -->
     </style>
 
 </resources>

@@ -76,21 +76,14 @@ public class ControlButtons {
 				//Debug.stopMethodTracing();
 			}
 		});
-		
-		/*
-		playImage.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				playPause(id, viewHolder, themeHelper, playPauseButton);
-			}
-		});
-		*/
 
 		viewHolder.stopButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				playPauseButton.setContentDescription("Play");
-				playPauseButton.setBackgroundResource(themeHelper
+				/*playPauseButton.setBackgroundResource(themeHelper
+						.getAttr(R.attr.play_icon));*/
+				playPauseButton.setImageResource(themeHelper
 						.getAttr(R.attr.play_icon));
 				PodcastBaseFragment.mPlayerServiceBinder.stop();
 			}
@@ -110,8 +103,14 @@ public class ControlButtons {
 						if (item.isDownloaded()) {
 							// Delete file
 							item.delFile(resolver);
+							/*
 							viewHolder.downloadButton
 									.setBackgroundResource(themeHelper
+											.getAttr(R.attr.download_icon));
+											*/
+
+							viewHolder.downloadButton
+									.setImageResource(themeHelper
 											.getAttr(R.attr.download_icon));
 							viewHolder.downloadButton
 									.setContentDescription("Download");
@@ -123,9 +122,12 @@ public class ControlButtons {
 									item, fragment.getActivity());
 							// podcastServiceConnection.downloadItem(fragment
 							// .getActivity().getContentResolver(), item);
-							viewHolder.downloadButton
+							/*viewHolder.downloadButton
 									.setBackgroundResource(themeHelper
-											.getAttr(R.attr.delete_icon));
+											.getAttr(R.attr.delete_icon));*/
+							viewHolder.downloadButton
+							.setImageResource(themeHelper
+									.getAttr(R.attr.delete_icon));
 							viewHolder.downloadButton
 									.setContentDescription("Trash");
 						}
@@ -251,11 +253,15 @@ public class ControlButtons {
 		if (ps != null) {
 			if (ps.isPlaying()) {
 				button.setContentDescription("Play");
-				button.setBackgroundResource(themeHelper
+				/*button.setBackgroundResource(themeHelper
+						.getAttr(R.attr.play_icon));*/
+				button.setImageResource(themeHelper
 						.getAttr(R.attr.play_icon));
 				ps.pause();
 			} else {
-				button.setBackgroundResource(themeHelper
+				/*button.setBackgroundResource(themeHelper
+						.getAttr(R.attr.pause_icon));*/
+				button.setImageResource(themeHelper
 						.getAttr(R.attr.pause_icon));
 				button.setContentDescription("Pause");
 				ps.play(id);

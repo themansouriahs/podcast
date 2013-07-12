@@ -19,30 +19,30 @@
             android:id="@+id/play_toggle"
             style="@style/PlayerControlButtons"
             android:contentDescription="@string/play"
-            android:background="?attr/play_icon" />
+            android:src="?attr/play_icon" />
 
         <ImageButton
             style="@style/PlayerControlButtons"
             android:id="@+id/stop"
-            android:background="?attr/stop_icon"
+            android:src="?attr/stop_icon"
             android:contentDescription="@string/stop" />
 
         <ImageButton
             style="@style/PlayerControlButtons"
             android:id="@+id/info"	
-            android:background="?attr/info_icon"
+            android:src="?attr/info_icon"
             android:contentDescription="@string/info" />
 
         <ImageButton
             style="@style/PlayerControlButtons"
             android:id="@+id/download"
-            android:background="?attr/download_icon"
+            android:src="?attr/download_icon"
             android:contentDescription="@string/download" />
 
         <ImageButton
             style="@style/PlayerControlButtons"
             android:id="@+id/queue"
-            android:background="?attr/queue_icon"
+            android:src="?attr/queue_icon"
             android:contentDescription="@string/queue" />
     </LinearLayout>
 

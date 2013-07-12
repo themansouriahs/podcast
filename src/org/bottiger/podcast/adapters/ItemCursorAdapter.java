@@ -312,25 +312,6 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 		viewHolder = InlinePlayer.getViewHolder(view, viewHolder);
 		viewHolder.stub = stub;
 
-		// viewHolder.playerView = (TextView)
-		// view.findViewById(R.id.stub_player);
-		/*
-		 * viewHolder.timeSlash = (TextView) view.findViewById(R.id.time_slash);
-		 * viewHolder.currentTime = (TextView) view
-		 * .findViewById(R.id.current_position); viewHolder.seekbar = (SeekBar)
-		 * view.findViewById(R.id.progress); viewHolder.playPauseButton =
-		 * (ImageButton) view .findViewById(R.id.play_toggle);
-		 * viewHolder.stopButton = (ImageButton) view.findViewById(R.id.stop);
-		 * viewHolder.downloadButton = (ImageButton) view
-		 * .findViewById(R.id.download); viewHolder.infoButton = (ImageButton)
-		 * view.findViewById(R.id.info);
-		 * 
-		 * // listview viewHolder.queueButton = (ImageButton)
-		 * view.findViewById(R.id.queue); viewHolder.duration = (TextView)
-		 * view.findViewById(R.id.duration); viewHolder.filesize = (TextView)
-		 * view.findViewById(R.id.filesize);
-		 */
-
 		playerView.setTag(viewHolder);
 
 		return playerView;
@@ -386,20 +367,27 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 		ControlButtons.setPlayerListeners(holder, feedItem.getId());
 
 		if (feedItem.isDownloaded()) {
-			holder.downloadButton.setBackgroundResource(themeHelper
+			holder.downloadButton.setImageResource(themeHelper
 					.getAttr(R.attr.delete_icon));
 		}
 
+		boolean isPlaying = false;
 		if (PodcastBaseFragment.mPlayerServiceBinder.isInitialized()) {
 			if (feedItem.getId() == PodcastBaseFragment.mPlayerServiceBinder
 					.getCurrentItem().id) {
 				if (PodcastBaseFragment.mPlayerServiceBinder.isPlaying()) {
+					isPlaying = true;
 					PodcastBaseFragment.setCurrentTime(holder.currentTime);
-					holder.playPauseButton.setBackgroundResource(themeHelper
+					holder.playPauseButton.setImageResource(themeHelper
 							.getAttr(R.attr.pause_icon));
 				}
 			}
 
+		}
+		
+		if (!isPlaying) {
+			holder.playPauseButton.setImageResource(themeHelper
+					.getAttr(R.attr.play_icon));
 		}
 
 	}

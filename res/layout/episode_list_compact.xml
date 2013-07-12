@@ -32,7 +32,7 @@
             android:layout_alignParentRight="true"
             android:layout_alignTop="@+id/title"
             android:background="@drawable/button_flash"
-            android:scaleType="fitStart"
+    		 android:scaleType="fitStart"
             android:src="@drawable/av_play_dark" />
 
         <ImageButton
