@@ -5,6 +5,7 @@
     <color name="pitch_black">#FF000000</color>
 
     <style name="SoundWavesTheme" parent="android:Theme.Holo">
+        <item name="playpause_icon">@drawable/playpause</item>
         <item name="play_icon">@drawable/av_play</item>
         <item name="pause_icon">@drawable/av_pause</item>
         <item name="play_invert_icon">@drawable/av_play_dark</item>
@@ -24,6 +25,7 @@
     </style>
 
     <style name="SoundWavesTheme.Light" parent="android:Theme.Holo.Light.DarkActionBar">
+        <item name="playpause_icon">@drawable/playpause_dark</item>
         <item name="play_icon">@drawable/av_play_dark</item>
         <item name="pause_icon">@drawable/av_pause_dark</item>
         <item name="play_invert_icon">@drawable/av_play</item>
@@ -95,6 +97,12 @@
         <item name="android:paddingLeft">20dip</item>
         <item name="android:paddingRight">20dip</item>
          -->
+    </style>
+    
+    <style  name="PlayerPlayPauseToggle"  parent="@style/PlayerControlButtons">
+        <item name="android:textOn"></item>
+        <item name="android:textOff"></item>
+        <item name="android:background">?attr/playpause_icon</item>
     </style>
 
 </resources>

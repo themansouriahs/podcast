@@ -379,17 +379,12 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 				if (PodcastBaseFragment.mPlayerServiceBinder.isPlaying()) {
 					isPlaying = true;
 					PodcastBaseFragment.setCurrentTime(holder.currentTime);
-					holder.playPauseButton.setImageResource(themeHelper
-							.getAttr(R.attr.pause_icon));
 				}
 			}
 
 		}
 		
-		if (!isPlaying) {
-			holder.playPauseButton.setImageResource(themeHelper
-					.getAttr(R.attr.play_icon));
-		}
+		holder.playPauseButton.setChecked(isPlaying);
 
 	}
 

@@ -18,6 +18,7 @@
 <!-- http://stackoverflow.com/questions/12338244/making-resources-theme-dependent -->
 <resources>
 
+    <attr name="playpause_icon" format="reference" />
     <attr name="play_icon" format="reference" />
     <attr name="pause_icon" format="reference" />
     <attr name="play_invert_icon" format="reference" />

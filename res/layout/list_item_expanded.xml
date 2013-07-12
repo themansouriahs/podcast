@@ -15,11 +15,19 @@
         android:layout_height="wrap_content"
         android:padding="@dimen/padding_large" >
 
+         
+        <!-- 
         <ImageButton
             android:id="@+id/play_toggle"
             style="@style/PlayerControlButtons"
             android:contentDescription="@string/play"
             android:src="?attr/play_icon" />
+             -->
+             
+        <ToggleButton
+            android:id="@+id/play_toggle"
+            android:contentDescription="@string/play"
+            style="@style/PlayerPlayPauseToggle" />
 
         <ImageButton
             style="@style/PlayerControlButtons"

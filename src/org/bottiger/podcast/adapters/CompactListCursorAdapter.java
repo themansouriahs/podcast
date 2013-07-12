@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 public class CompactListCursorAdapter extends AbstractEpisodeCursorAdapter {
 
@@ -154,7 +155,7 @@ public class CompactListCursorAdapter extends AbstractEpisodeCursorAdapter {
 		TextView mainTitle = (TextView) view.getTag(R.id.title);
 		mainTitle.setText(item.title);
 		
-		final ImageButton playToggleButton = (ImageButton) view.getTag(R.id.play_episode);
+		final ToggleButton playToggleButton = (ToggleButton) view.getTag(R.id.play_episode);
 		final ImageButton queueButton = (ImageButton) view.getTag(R.id.queue_episode);
 
 		if (PodcastBaseFragment.mPlayerServiceBinder != null) {

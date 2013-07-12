@@ -7,6 +7,7 @@ import android.view.ViewStub;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 /** ViewHolder for holding the expanded player */
 public class InlinePlayer {
@@ -17,7 +18,7 @@ public class InlinePlayer {
 	public TextView currentTime;
 	public TextView duration;
 	public TextView filesize;
-	public ImageButton playPauseButton;
+	public ToggleButton playPauseButton;
 	public ImageButton stopButton;
 	public ImageButton downloadButton;
 	public ImageButton infoButton;
@@ -40,7 +41,7 @@ public class InlinePlayer {
 		viewHolder.currentTime = (TextView) view
 				.findViewById(R.id.current_position);
 		viewHolder.seekbar = (SeekBar) view.findViewById(R.id.progress);
-		viewHolder.playPauseButton = (ImageButton) view
+		viewHolder.playPauseButton = (ToggleButton) view
 				.findViewById(R.id.play_toggle);
 		viewHolder.stopButton = (ImageButton) view.findViewById(R.id.stop);
 		viewHolder.downloadButton = (ImageButton) view
