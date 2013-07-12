@@ -211,36 +211,9 @@ public abstract class PodcastBaseFragment extends FixedListFragment implements
 
 	}
 
-	/*
-	 * abstract public void startInit();
-	 */
-
-	public static final Handler mHandler = new Handler() {
-		@Override
-		public void handleMessage(Message msg) {
-			switch (msg.what) {
-			case REFRESH:
-				long next = refreshUI();
-				queueNextRefresh();
-				// log.debug("REFRESH: "+next);
-				break;
-			}
-		}
-	};
-
-	public static void queueNextRefresh() {
-		long delay = 3;
-		Message msg = mHandler.obtainMessage(REFRESH);
-		mHandler.removeMessages(REFRESH);
-		// if (mPlayerServiceBinder.isPlaying()) // FIXME or something is
-		// downloading
-		mHandler.sendMessageDelayed(msg, delay);
-	}
-
 	@Override
 	public void onResume() {
 		super.onResume();
-		queueNextRefresh();
 
 		/** ActionBar Pull to Refresh */
 		if (MainActivity.SHOW_PULL_TO_REFRESH) {
@@ -314,20 +287,6 @@ public abstract class PodcastBaseFragment extends FixedListFragment implements
 		}.execute();
 	}
 
-	protected static long refreshUI() {
-		long refresh_time = 500;
-
-		if (mPlayerServiceBinder == null)
-			return refresh_time;
-
-		if (mPlayerServiceBinder.isPlaying()) {
-			updateCurrentPosition();
-		}
-
-		return refresh_time;
-
-	}
-
 	protected long refreshNow() {
 
 		if (mPlayerServiceBinder == null)
@@ -359,7 +318,7 @@ public abstract class PodcastBaseFragment extends FixedListFragment implements
 			mProgressBar.setSecondaryProgress(fileProgress4);
 
 			// updateCurrentPosition(mPlayerServiceBinder.getCurrentItem());
-			updateCurrentPosition();
+			//updateCurrentPosition(); FIXME
 
 			// mTotalTime.setVisibility(View.VISIBLE);
 			// mTotalTime.setText(formatTime( duration ));
@@ -395,23 +354,6 @@ public abstract class PodcastBaseFragment extends FixedListFragment implements
 		} catch (Exception ex) {
 		}
 		return 500;
-	}
-
-	protected static void updateCurrentPosition() {
-		if (mCurrentTime != null) {
-			long pos = mPlayerServiceBinder.position();
-			long duration = mPlayerServiceBinder.duration();
-
-			String timeCounter = StrUtils.formatTime(pos);
-			String durationString = StrUtils.formatTime(duration);
-			mCurrentTime.setText(timeCounter);
-			if (mDuration != null)
-				mDuration.setText(durationString);
-
-			if (mProgressBar != null)
-				PlayerActivity.setProgressBar(mProgressBar,
-						mPlayerServiceBinder);
-		}
 	}
 
 	protected Cursor getCursor() {

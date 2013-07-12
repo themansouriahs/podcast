@@ -8,6 +8,7 @@ import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.PlayerActivity;
 import org.bottiger.podcast.PodcastBaseFragment;
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.RecentItemFragment;
 import org.bottiger.podcast.adapters.viewholders.InlinePlayer;
 import org.bottiger.podcast.images.ImageCacheManager;
 import org.bottiger.podcast.listeners.DownloadProgressListener;
@@ -120,14 +121,14 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 			throw new IllegalStateException("couldn't move cursor to position "
 					+ position);
 		}
+		
+		mCurrentFeedItem = FeedItem.getByCursor(itemCursor);
 
 		if (convertView == null) {
 			listViewItem = newView(mContext, itemCursor, parent);
 		} else {
 			listViewItem = convertView;
 		}
-
-		mCurrentFeedItem = FeedItem.getByCursor(itemCursor);
 
 		bindView(listViewItem, mContext, itemCursor);
 
@@ -361,7 +362,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 					: (feedItem.chunkFilesize / feedItem.filesize);
 		}
 
-		PlayerActivity.setProgressBar(holder.seekbar, playerDuration,
+		RecentItemFragment.setProgressBar(holder.seekbar, playerDuration,
 				playerPosition, secondary);
 
 		ControlButtons.setPlayerListeners(holder, feedItem.getId());
@@ -418,9 +419,11 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 		return TYPE_MAX_COUNT;
 	}
 
+	// http://stackoverflow.com/questions/5300962/getviewtypecount-and-getitemviewtype-methods-of-arrayadapter
 	@Override
 	public int getItemViewType(int position) {
-		return mExpandedItemID.contains(itemID(position)) ? TYPE_EXPAND
+		boolean isExpanded = position == 0 || mExpandedItemID.contains(itemID(position)); 
+		return isExpanded ? TYPE_EXPAND
 				: TYPE_COLLAPS;
 	}
 

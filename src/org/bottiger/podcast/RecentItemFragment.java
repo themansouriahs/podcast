@@ -9,12 +9,16 @@ import org.bottiger.podcast.playlist.PlaylistCursorLoader;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ControlButtons;
 import org.bottiger.podcast.utils.ExpandAnimation;
+import org.bottiger.podcast.utils.StrUtils;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.BaseColumns;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.CursorAdapter;
@@ -25,12 +29,15 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewStub;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 public class RecentItemFragment extends DSLVFragment {
 
+	private static boolean updateProgressbar = true;
+	
 	private static int CONTEXT_MENU = 0;
 	private static Fragment CONTEXT_FRAGMENT = null;
 
@@ -110,6 +117,9 @@ public class RecentItemFragment extends DSLVFragment {
 	@Override
 	public void onResume() {
 		super.onResume();
+		
+		queueNextRefresh();
+		
 		ControlButtons.fragment = this;
 
 		if (MainActivity.SHOW_PULL_TO_REFRESH) {
@@ -231,7 +241,7 @@ public class RecentItemFragment extends DSLVFragment {
 			viewHolder.duration.setText(duration);
 
 		ControlButtons.setPlayerListeners(viewHolder, id);
-		updateCurrentPosition();
+		updatePlayingView();
 	}
 
 	@Override
@@ -253,5 +263,114 @@ public class RecentItemFragment extends DSLVFragment {
 
 	public static int getContextMenu() {
 		return CONTEXT_MENU;
+	}
+	
+	public static boolean isUpdateProgressbar() {
+		return updateProgressbar;
+	}
+
+	public static void setUpdateProgressbar(boolean updateProgressbar) {
+		RecentItemFragment.updateProgressbar = updateProgressbar;
+	}
+
+	/**
+	 * Handler for updating the UI
+	 */
+	/*
+	 * abstract public void startInit();
+	 */
+	public static final Handler mHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			switch (msg.what) {
+			case REFRESH:
+				long next = refreshUI();
+				queueNextRefresh();
+				break;
+			}
+		}
+	};
+
+	public static void queueNextRefresh() {
+		long delay = 3;
+		Message msg = mHandler.obtainMessage(REFRESH);
+		mHandler.removeMessages(REFRESH);
+		mHandler.sendMessageDelayed(msg, delay);
+	}
+	
+	protected static long refreshUI() {
+		long refresh_time = 500;
+
+		if (mPlayerServiceBinder == null)
+			return refresh_time;
+
+		if (mPlayerServiceBinder.isPlaying()) {
+			updatePlayingView();
+		}
+
+		return refresh_time;
+	}
+	
+	protected static void updatePlayingView() {
+		InlinePlayer player = InlinePlayer
+		.getCurrentEpisodePlayerViewHolder();
+		
+		
+		//TextView firstVisibleCurrentTime = getListView()
+		
+		if (player.currentTime != null) {
+			long pos = mPlayerServiceBinder.position();
+			long duration = mPlayerServiceBinder.duration();
+			
+			String timeCounter = StrUtils.formatTime(pos);
+			String durationString = StrUtils.formatTime(duration);
+			player.currentTime.setText(timeCounter);
+			if (player.duration != null)
+				player.duration.setText(durationString);
+
+			if (RecentItemFragment.isUpdateProgressbar() && player.seekbar != null)
+				setProgressBar(player.seekbar,
+						mPlayerServiceBinder);
+		}
+	}
+	
+	private static void setProgressBar(SeekBar progressBar, PlayerService playerService) {
+		FeedItem item = playerService.getCurrentItem();
+		long duration = playerService.duration();
+		long position = playerService != null ? playerService.position() : 0;
+		long secondary;
+
+		// FIXME - just added this check to avoid a crash
+		if (item != null) {
+			if (item.isDownloaded())
+				secondary = item.getCurrentFileSize();
+			else
+				secondary = (playerService.bufferProgress() * duration) / 100;
+			setProgressBar(progressBar, duration, position, secondary);
+		}
+	}
+
+	@Deprecated
+	private static void setProgressBar(SeekBar progressBar, FeedItem item) {
+		if (item.getCurrentFileSize() == 0)
+			return;
+		long secondary = item.isDownloaded() ? item.getCurrentFileSize()
+				: (item.chunkFilesize / item.filesize);
+		long duration = item.getDuration();
+		setProgressBar(progressBar, duration, item.offset, secondary);
+	}
+
+	/**
+	 * duration, progress, secondary should all be in units of ms
+	 */
+	public static void setProgressBar(SeekBar progressBar, long duration,
+			long progress, long secondary) {
+		if (duration == 0)
+			return;
+		int progressMax = progressBar.getMax();
+		int primaryProgress = (int) ((progressMax * progress) / duration);
+		int secondaryProgress = (int) ((progressMax * secondary) / duration);
+		progressBar.setProgress(primaryProgress);
+		progressBar.setSecondaryProgress(secondaryProgress);
 	}
 }

@@ -178,51 +178,12 @@ public class PlayerActivity extends ListActivity {
 				// mServiceBinder.duration()));
 			}
 
-			setProgressBar(mProgress, mServiceBinder);
+			//setProgressBar(mProgress, mServiceBinder);
 
 			return remaining;
 		} catch (Exception ex) {
 		}
 		return 500;
-	}
-
-	static void setProgressBar(SeekBar progressBar, PlayerService playerService) {
-		FeedItem item = playerService.getCurrentItem();
-		long duration = playerService.duration();
-		long position = playerService != null ? playerService.position() : 0;
-		long secondary;
-
-		// FIXME - just added this check to avoid a crash
-		if (item != null) {
-			if (item.isDownloaded())
-				secondary = item.getCurrentFileSize();
-			else
-				secondary = (playerService.bufferProgress() * duration) / 100;
-			setProgressBar(progressBar, duration, position, secondary);
-		}
-	}
-
-	public static void setProgressBar(SeekBar progressBar, FeedItem item) {
-		if (item.getCurrentFileSize() == 0)
-			return;
-		long secondary = item.isDownloaded() ? item.getCurrentFileSize()
-				: (item.chunkFilesize / item.filesize);
-		long duration = item.getDuration();
-		setProgressBar(progressBar, duration, item.offset, secondary);
-	}
-
-	/**
-	 * duration, progress, secondary should all be in units of ms
-	 */
-	public static void setProgressBar(SeekBar progressBar, long duration,
-			long progress, long secondary) {
-		if (duration == 0)
-			return;
-		int progressMax = progressBar.getMax();
-		int primaryProgress = (int) ((progressMax * progress) / duration);
-		int secondaryProgress = (int) ((progressMax * secondary) / duration);
-		progressBar.setProgress(primaryProgress);
-		progressBar.setSecondaryProgress(secondaryProgress);
 	}
 
 	private final Handler mHandler = new Handler() {

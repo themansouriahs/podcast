@@ -202,6 +202,7 @@ public class ControlButtons {
 		@Override
 		public void onStartTrackingTouch(SeekBar bar) {
 			mLastSeekEventTime = 0;
+			RecentItemFragment.setUpdateProgressbar(false);
 		}
 
 		@Override
@@ -242,6 +243,8 @@ public class ControlButtons {
 			} catch (Exception ex) {
 			}
 			// log.debug("mFromTouch = false; ");
+			
+			RecentItemFragment.setUpdateProgressbar(true);
 
 		}
 
@@ -253,19 +256,15 @@ public class ControlButtons {
 		if (ps != null) {
 			if (ps.isPlaying()) {
 				button.setContentDescription("Play");
-				/*button.setBackgroundResource(themeHelper
-						.getAttr(R.attr.play_icon));*/
 				button.setImageResource(themeHelper
 						.getAttr(R.attr.play_icon));
 				ps.pause();
 			} else {
-				/*button.setBackgroundResource(themeHelper
-						.getAttr(R.attr.pause_icon));*/
 				button.setImageResource(themeHelper
 						.getAttr(R.attr.pause_icon));
 				button.setContentDescription("Pause");
 				ps.play(id);
-				PodcastBaseFragment.queueNextRefresh();
+				RecentItemFragment.queueNextRefresh();
 				
 				if (fragment != null)
 					fragment.refreshView();

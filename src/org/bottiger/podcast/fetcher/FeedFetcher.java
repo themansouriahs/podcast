@@ -11,6 +11,7 @@ import java.util.Properties;
 import java.util.zip.GZIPInputStream;
 
 import org.bottiger.podcast.PodcastBaseFragment;
+import org.bottiger.podcast.RecentItemFragment;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.utils.PodcastLog;
 
@@ -421,7 +422,7 @@ public class FeedFetcher {
 	    	 Message msg = new Message();
 	    	 msg.what = PodcastBaseFragment.UPDATE_FILESIZE;
 	    	 msg.obj = this.mFeedItem;
-	    	 PodcastBaseFragment.mHandler.sendMessage(msg);
+	    	 RecentItemFragment.mHandler.sendMessage(msg);
 	     }
 	     
 	     protected void onPostExecute(Long result) {
