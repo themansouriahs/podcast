@@ -486,14 +486,20 @@ public class PlayerService extends Service implements
 		if (mItem == null)
 			return;
 
-		mItem.setPriority(null, getApplication());
-		mItem.update(getContentResolver());
-
 		String dataSource = mItem.isDownloaded() ? mItem.getAbsolutePath()
 				: mItem.getURL();
 
 		int offset = mItem.offset < 0 ? 0 : mItem.offset;
 		mPlayer.setDataSourceAsync(dataSource, offset);
+		
+	    new Thread(new Runnable() {
+	        public void run() {
+	        	if (mItem.priority != 1)
+	        		mItem.setPriority(null, getApplication());
+	    		mItem.update(getContentResolver());
+	        }
+	    }).start();
+	    
 	}
 
 	public void toggle(long id) {
@@ -525,7 +531,6 @@ public class PlayerService extends Service implements
 		}
 
 		if ((mItem != null)) {
-			mItem.status = ItemColumns.ITEM_STATUS_PLAY_PAUSE;
 			mItem.updateOffset(getContentResolver(), mPlayer.position());
 		} else {
 			log.error("playing but no item!!!");

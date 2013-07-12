@@ -66,14 +66,14 @@ public class ControlButtons {
 		playPauseButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				//Debug.startMethodTracing("playpause");
+				Debug.startMethodTracing("playpause");
 				long start = System.nanoTime();
 				playPause(id, viewHolder, themeHelper, playPauseButton);
 				long end = System.nanoTime();
 				long diff = end-start;
 				long diff2 = diff*2;
+				Debug.stopMethodTracing();
 				diff2 = diff2 - diff;
-				//Debug.stopMethodTracing();
 			}
 		});
 

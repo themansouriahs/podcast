@@ -6,6 +6,8 @@ Version 0.22
 
 * Better detection of headset getting unplugged
 * Basic autodownload of most recent episodes works again
+* Less misplaced UI updates. (wrong timestamps etc.)
+* More responsive UI
 
 Version 0.21
 ------------
