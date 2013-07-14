@@ -290,7 +290,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 			else
 				InlinePlayer.setSecondaryEpisodePlayerViewHolder(holder);
 
-			bindExandedPlayer(mContext, mCurrentFeedItem, playerView, holder, position);
+			bindExandedPlayer(mContext, mFragment, mCurrentFeedItem, playerView, holder, position);
 		} else {
 			if (playerView != null) {
 				playerView.setVisibility(View.GONE);
@@ -328,7 +328,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 	 * @param holder
 	 * @param position
 	 */
-	public static void bindExandedPlayer(Context context, FeedItem feedItem, View playerView,
+	public static void bindExandedPlayer(Context context, PodcastBaseFragment fragment, FeedItem feedItem, View playerView,
 			InlinePlayer holder, int position) {
 
 		ThemeHelper themeHelper = new ThemeHelper(context);
@@ -365,7 +365,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 		RecentItemFragment.setProgressBar(holder.seekbar, playerDuration,
 				playerPosition, secondary);
 
-		ControlButtons.setPlayerListeners(holder, feedItem.getId());
+		ControlButtons.setPlayerListeners(holder, fragment, feedItem.getId());
 
 		if (feedItem.isDownloaded()) {
 			holder.downloadButton.setImageResource(themeHelper

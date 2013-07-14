@@ -5,6 +5,7 @@ import org.bottiger.podcast.PodcastBaseFragment;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.RecentItemFragment;
 import org.bottiger.podcast.adapters.viewholders.InlinePlayer;
+import org.bottiger.podcast.playlist.ReorderCursor;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.service.PodcastDownloadManager;
@@ -54,7 +55,7 @@ public class ControlButtons {
 
 	public static void setListener(
 			final PodcastService podcastServiceConnection,
-			final InlinePlayer viewHolder, final long id) {
+			final InlinePlayer viewHolder, final PodcastBaseFragment fragment, final long id) {
 
 		final ToggleButton playPauseButton = viewHolder.playPauseButton;
 		//final ImageView playImage = viewHolder.image; FIXME
@@ -68,7 +69,7 @@ public class ControlButtons {
 			public void onClick(View v) {
 				Debug.startMethodTracing("playpause");
 				long start = System.nanoTime();
-				playPause(id, viewHolder, themeHelper, playPauseButton);
+				playPause(id, fragment, viewHolder, themeHelper, playPauseButton);
 				long end = System.nanoTime();
 				long diff = end-start;
 				long diff2 = diff*2;
@@ -145,9 +146,9 @@ public class ControlButtons {
 		viewHolder.seekbar.setMax(MAX_SEEKBAR_VALUE);
 	}
 	
-	public static void setPlayerListeners(InlinePlayer holder, long id) {
+	public static void setPlayerListeners(InlinePlayer holder, PodcastBaseFragment fragment, long id) {
 		ControlButtons.setListener(MainActivity.mPodcastServiceBinder,
-				holder, id);
+				holder, fragment, id);
 	}
 
 	@Deprecated
@@ -176,7 +177,7 @@ public class ControlButtons {
 		//viewHolder.image = (ImageView) listView.findViewById(R.id.list_image);
 
 		ControlButtons.setListener(MainActivity.mPodcastServiceBinder,
-				viewHolder, id);
+				viewHolder, fragment, id);
 	}
 	
 
@@ -247,7 +248,7 @@ public class ControlButtons {
 
 	}
 	
-	public static void playPauseToggle(long id, ToggleButton button) {
+	public static void playPauseToggle(long id, PodcastBaseFragment fragment, ToggleButton button) {
 		assert themeHelper != null;
 		PlayerService ps = PodcastBaseFragment.mPlayerServiceBinder;
 		boolean isPlaying = false;
@@ -266,7 +267,7 @@ public class ControlButtons {
 		button.setChecked(isPlaying);
 	}
 	
-	private static void playPause(long id, InlinePlayer viewHolder, ThemeHelper themeHelper, ToggleButton playPauseButton) {
+	private static void playPause(long id, PodcastBaseFragment fragment, InlinePlayer viewHolder, ThemeHelper themeHelper, ToggleButton playPauseButton) {
 		if (viewHolder.seekbar != null)
 			fragment.setProgressBar(viewHolder.seekbar);
 		
@@ -276,7 +277,7 @@ public class ControlButtons {
 		if (viewHolder.duration != null)
 			fragment.setDuration(viewHolder.duration);
 		
-		playPauseToggle(id, playPauseButton);
+		playPauseToggle(id, fragment, playPauseButton);
 	}
 
 }

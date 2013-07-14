@@ -240,7 +240,7 @@ public class RecentItemFragment extends DSLVFragment {
 		if (viewHolder.duration != null)
 			viewHolder.duration.setText(duration);
 
-		ControlButtons.setPlayerListeners(viewHolder, id);
+		ControlButtons.setPlayerListeners(viewHolder, this, id);
 		updatePlayingView();
 	}
 

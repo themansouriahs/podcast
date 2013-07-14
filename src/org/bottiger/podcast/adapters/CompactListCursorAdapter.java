@@ -173,7 +173,7 @@ public class CompactListCursorAdapter extends AbstractEpisodeCursorAdapter {
 		
 		playToggleButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-            	ControlButtons.playPauseToggle(item2.getId(), playToggleButton);
+            	ControlButtons.playPauseToggle(item2.getId(), null, playToggleButton); //FIXME
             }
 		});
 		
