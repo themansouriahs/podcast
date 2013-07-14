@@ -1,6 +1,7 @@
 package org.bottiger.podcast.images;
 
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.utils.SDCardManager;
 
 import uk.co.senab.bitmapcache.BitmapLruCache;
 import android.content.Context;
@@ -8,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.os.AsyncTask;
 
+import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.ImageLoader.ImageCache;
 import com.android.volley.toolbox.ImageLoader.ImageListener;
@@ -71,7 +73,9 @@ public class ImageCacheManager{
 	public void init(Context context, String uniqueName, int cacheSize, CompressFormat compressFormat, int quality, CacheType type){
 		switch (type) {
 		case DISK:
-			mImageCache= new DiskLruImageCache(context, uniqueName, cacheSize, compressFormat, quality);
+			mImageCache = new DiskLruImageCache(context, uniqueName, cacheSize, compressFormat, quality);
+			//mImageCache= new DiskLruImageCache(context, uniqueName, cacheSize, compressFormat, quality);
+			//mImageCache = new DiskBasedCache("/tmp/");
 			break;
 		case MEMORY:
 			mImageCache = new BitmapLruImageCache(cacheSize);

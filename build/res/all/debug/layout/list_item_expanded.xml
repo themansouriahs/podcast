@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:descendantFocusability="blocksDescendants"
+    android:orientation="vertical" >
+
+    <SeekBar
+        android:id="@+id/progress"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/padding_large" >
+
+        <ImageButton
+            android:id="@+id/play_toggle"
+            style="@style/PlayerControlButtons"
+            android:contentDescription="@string/play"
+            android:background="?attr/play_icon" />
+
+        <ImageButton
+            style="@style/PlayerControlButtons"
+            android:id="@+id/stop"
+            android:background="?attr/stop_icon"
+            android:contentDescription="@string/stop" />
+
+        <ImageButton
+            style="@style/PlayerControlButtons"
+            android:id="@+id/info"	
+            android:background="?attr/info_icon"
+            android:contentDescription="@string/info" />
+
+        <ImageButton
+            style="@style/PlayerControlButtons"
+            android:id="@+id/download"
+            android:background="?attr/download_icon"
+            android:contentDescription="@string/download" />
+
+        <ImageButton
+            style="@style/PlayerControlButtons"
+            android:id="@+id/queue"
+            android:background="?attr/queue_icon"
+            android:contentDescription="@string/queue" />
+    </LinearLayout>
+
+</LinearLayout>

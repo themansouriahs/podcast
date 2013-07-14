@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <!-- android:layout_height="@dimen/item_height" -->
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:orientation="horizontal" >
+
+            <LinearLayout
+                android:id="@+id/thumbnail"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:layout_alignParentLeft="true"
+                android:layout_marginRight="7dip"
+                android:padding="0dip" >
+				
+                <com.android.volley.toolbox.NetworkImageView
+                    android:id="@+id/list_image"
+                      style="@style/PodcastImage" />
+                
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/title"
+                style="@style/EpisodeHeaderFont"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/thumbnail"
+                android:layout_toRightOf="@+id/thumbnail"
+                android:text="Podcast Title" />
+
+            <TextView
+                android:id="@+id/podcast"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/title"
+                android:layout_marginTop="1dip"
+                android:layout_toRightOf="@+id/thumbnail"
+                android:text="Podcast Name"
+                android:textSize="10dip" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true" />
+
+            <TextView
+                android:id="@+id/current_position"
+                style="@style/EpisodeMinorFont"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/thumbnail"
+                android:layout_toRightOf="@+id/thumbnail" />
+
+            <TextView
+                android:id="@+id/time_slash"
+                style="@style/EpisodeMinorFont"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/current_position"
+                android:layout_alignBottom="@+id/current_position"
+                android:layout_toRightOf="@+id/current_position"
+                android:paddingLeft="5dip"
+                android:paddingRight="5dip"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/duration"
+                style="@style/EpisodeMinorFont"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/time_slash"
+                android:layout_alignBottom="@+id/time_slash"
+                android:layout_toRightOf="@+id/time_slash" />
+
+            <TextView
+                android:id="@+id/filesize"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/duration"
+                android:layout_toRightOf="@+id/duration"
+                android:gravity="bottom|right"
+                android:text="0"
+                android:textSize="10dip"
+                android:textStyle="bold" />
+        </RelativeLayout>
+
+        <FrameLayout
+            android:id="@id/drag_handle"
+            android:layout_width="25dp"
+            android:layout_height="match_parent"
+            android:paddingBottom="30dp"
+            android:paddingTop="30dp" >
+
+            <LinearLayout
+                android:layout_width="7dp"
+                android:layout_height="fill_parent"
+                android:background="@drawable/drag_handle"
+                android:orientation="vertical"
+                android:tileMode="repeat" >
+
+                <!--
+                <ImageView
+                    android:id="@id/drag_handle"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_alignParentRight="true"
+                    android:background="@drawable/drag_handle" />
+                -->
+            </LinearLayout>
+        </FrameLayout>
+    </LinearLayout>
+
+    <ViewStub
+        android:id="@+id/stub"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inflatedId="@+id/stub_player"
+        android:layout="@layout/list_item_expanded" />
+
+</LinearLayout>

@@ -1,0 +1,1680 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger>
+
+    <dataSet config="main" >
+        <source path="/home/bottiger/dev/HapiPodcastJ/res" >
+            <file
+                name="av_add_to_queue"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable/av_add_to_queue.png"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="av_add_to_queue_dark"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable/av_add_to_queue_dark.png"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="av_download"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable/av_download.png"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="av_download_dark"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable/av_download_dark.png"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="av_next"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable/av_next.png"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="av_next_dark"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable/av_next_dark.png"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="av_pause"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable/av_pause.png"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="av_pause_dark"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable/av_pause_dark.png"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="av_play"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable/av_play.png"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="av_play_dark"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable/av_play_dark.png"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="av_stop"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable/av_stop.png"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="av_stop_dark"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable/av_stop_dark.png"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="bg_handle"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable/bg_handle.xml"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="blank"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable/blank.png"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="collections_view_as_list"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable/collections_view_as_list.png"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="collections_view_as_list_dark"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable/collections_view_as_list_dark.png"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="content_backspace"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable/content_backspace.png"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="content_backspace_dark"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable/content_backspace_dark.png"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="content_discard_dark"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable/content_discard_dark.png"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="content_new"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable/content_new.png"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="content_new_dark"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable/content_new_dark.png"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="delete_x"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable/delete_x.png"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="download"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable/download.png"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="drag"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable/drag.9.png"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="drag2_new"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable/drag2_new.xcf"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="drag_handle"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable/drag_handle.xml"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="drag_new"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable/drag_new.png"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="generic_podcast"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable/generic_podcast.png"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="ic_action_delete"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable/ic_action_delete.png"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="ic_home"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable/ic_home.png"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="info"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable/info.png"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="soundwaves"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable/soundwaves.png"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="refresh"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable/refresh.png"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="refresh_dark"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable/refresh_dark.png"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="actionbar_compat"
+                path="/home/bottiger/dev/HapiPodcastJ/res/layout/actionbar_compat.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="actionbar_pulltorefresh_customised_header"
+                path="/home/bottiger/dev/HapiPodcastJ/res/layout/actionbar_pulltorefresh_customised_header.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="add_a_channel"
+                path="/home/bottiger/dev/HapiPodcastJ/res/layout/add_a_channel.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="add_podcast_dialog"
+                path="/home/bottiger/dev/HapiPodcastJ/res/layout/add_podcast_dialog.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="audio_player"
+                path="/home/bottiger/dev/HapiPodcastJ/res/layout/audio_player.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="backup_channels"
+                path="/home/bottiger/dev/HapiPodcastJ/res/layout/backup_channels.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="channel"
+                path="/home/bottiger/dev/HapiPodcastJ/res/layout/channel.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="channel_details"
+                path="/home/bottiger/dev/HapiPodcastJ/res/layout/channel_details.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="channel_new"
+                path="/home/bottiger/dev/HapiPodcastJ/res/layout/channel_new.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="cursor_main"
+                path="/home/bottiger/dev/HapiPodcastJ/res/layout/cursor_main.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="cursordragdrop"
+                path="/home/bottiger/dev/HapiPodcastJ/res/layout/cursordragdrop.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="dragdrop"
+                path="/home/bottiger/dev/HapiPodcastJ/res/layout/dragdrop.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="dslv_fragment_main"
+                path="/home/bottiger/dev/HapiPodcastJ/res/layout/dslv_fragment_main.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="episode_list"
+                path="/home/bottiger/dev/HapiPodcastJ/res/layout/episode_list.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="episode_list_compact"
+                path="/home/bottiger/dev/HapiPodcastJ/res/layout/episode_list_compact.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="list_item_bg_handle"
+                path="/home/bottiger/dev/HapiPodcastJ/res/layout/list_item_bg_handle.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="list_item_click_remove"
+                path="/home/bottiger/dev/HapiPodcastJ/res/layout/list_item_click_remove.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="list_item_expanded"
+                path="/home/bottiger/dev/HapiPodcastJ/res/layout/list_item_expanded.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="main"
+                path="/home/bottiger/dev/HapiPodcastJ/res/layout/main.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="notification"
+                path="/home/bottiger/dev/HapiPodcastJ/res/layout/notification.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="player2"
+                path="/home/bottiger/dev/HapiPodcastJ/res/layout/player2.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="podcast_header"
+                path="/home/bottiger/dev/HapiPodcastJ/res/layout/podcast_header.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="recent"
+                path="/home/bottiger/dev/HapiPodcastJ/res/layout/recent.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="recent_new"
+                path="/home/bottiger/dev/HapiPodcastJ/res/layout/recent_new.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="select"
+                path="/home/bottiger/dev/HapiPodcastJ/res/layout/select.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="startup"
+                path="/home/bottiger/dev/HapiPodcastJ/res/layout/startup.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="subs"
+                path="/home/bottiger/dev/HapiPodcastJ/res/layout/subs.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="subscription_grid_item"
+                path="/home/bottiger/dev/HapiPodcastJ/res/layout/subscription_grid_item.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="subscription_list"
+                path="/home/bottiger/dev/HapiPodcastJ/res/layout/subscription_list.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="subscription_list_header"
+                path="/home/bottiger/dev/HapiPodcastJ/res/layout/subscription_list_header.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="tmp_dslv_fragment_main"
+                path="/home/bottiger/dev/HapiPodcastJ/res/layout/tmp_dslv_fragment_main.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="slidemenu_filter"
+                path="/home/bottiger/dev/HapiPodcastJ/res/layout/slidemenu_filter.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="subscription_list_item"
+                path="/home/bottiger/dev/HapiPodcastJ/res/layout/subscription_list_item.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="activity_swipe_drawer"
+                path="/home/bottiger/dev/HapiPodcastJ/res/layout/activity_swipe_drawer.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="activity_swipe"
+                path="/home/bottiger/dev/HapiPodcastJ/res/layout/activity_swipe.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="activity_notification_receiver"
+                path="/home/bottiger/dev/HapiPodcastJ/res/menu/activity_notification_receiver.xml"
+                qualifiers=""
+                type="menu" />
+            <file
+                name="add_a_channel"
+                path="/home/bottiger/dev/HapiPodcastJ/res/menu/add_a_channel.xml"
+                qualifiers=""
+                type="menu" />
+            <file
+                name="backup_channels"
+                path="/home/bottiger/dev/HapiPodcastJ/res/menu/backup_channels.xml"
+                qualifiers=""
+                type="menu" />
+            <file
+                name="channel_details_activity"
+                path="/home/bottiger/dev/HapiPodcastJ/res/menu/channel_details_activity.xml"
+                qualifiers=""
+                type="menu" />
+            <file
+                name="channels_activity"
+                path="/home/bottiger/dev/HapiPodcastJ/res/menu/channels_activity.xml"
+                qualifiers=""
+                type="menu" />
+            <file
+                name="episode_list"
+                path="/home/bottiger/dev/HapiPodcastJ/res/menu/episode_list.xml"
+                qualifiers=""
+                type="menu" />
+            <file
+                name="item_activity"
+                path="/home/bottiger/dev/HapiPodcastJ/res/menu/item_activity.xml"
+                qualifiers=""
+                type="menu" />
+            <file
+                name="podcast_context"
+                path="/home/bottiger/dev/HapiPodcastJ/res/menu/podcast_context.xml"
+                qualifiers=""
+                type="menu" />
+            <file
+                name="search_activity"
+                path="/home/bottiger/dev/HapiPodcastJ/res/menu/search_activity.xml"
+                qualifiers=""
+                type="menu" />
+            <file
+                name="activity_swipe"
+                path="/home/bottiger/dev/HapiPodcastJ/res/menu/activity_swipe.xml"
+                qualifiers=""
+                type="menu" />
+            <file
+                path="/home/bottiger/dev/HapiPodcastJ/res/values/colors.xml"
+                qualifiers="" >
+                <color name="playlist_background" >#E6E6DC
+                </color>
+                <color name="grayStart" >#adadad
+                </color>
+                <color name="blue" >#33b5e5
+                </color>
+                <color name="default_background" >#FFFFFF
+                </color>
+                <color name="black" >#000000
+                </color>
+                <color name="red" >#ff4444
+                </color>
+                <color name="grayEnd" >#ffffff
+                </color>
+                <color name="darkblue" >#0099cc
+                </color>
+                <color name="bg_handle_pressed" >#a0a0a0
+                </color>
+            </file>
+            <file
+                path="/home/bottiger/dev/HapiPodcastJ/res/values/dimens.xml"
+                qualifiers="" >
+                <dimen name="shadow_width" >15dp
+                </dimen>
+                <dimen name="padding_medium" >8dp
+                </dimen>
+                <dimen name="actionbar_compat_button_width" >24dp
+                </dimen>
+                <dimen name="slidingmenu_offset" >120dp
+                </dimen>
+                <dimen name="section_div_height" >20dp
+                </dimen>
+
+                <integer name="num_cols" >
+1
+                </integer>
+
+                <dimen name="padding_small" >8dp
+                </dimen>
+                <dimen name="actionbar_compat_button_home_width" >36dp
+                </dimen>
+                <dimen name="actionbar_compat_height" >48dp
+                </dimen>
+                <dimen name="list_padding" >10dp
+                </dimen>
+                <dimen name="item_height" >67dp
+                </dimen>
+                <dimen name="padding_large" >16dp
+                </dimen>
+            </file>
+            <file
+                path="/home/bottiger/dev/HapiPodcastJ/res/values/ids.xml"
+                qualifiers="" >
+                <item
+                    name="actionbar_compat_item_refresh_progress"
+                    type="id"/>
+
+                <drawable name="solid_blue" >
+#0000ff
+                </drawable>
+                <drawable name="solid_red" >
+#f00
+                </drawable>
+
+                <item
+                    name="search_channels"
+                    type="id"/>
+                <item
+                    name="text2"
+                    type="id"/>
+                <item
+                    name="text1"
+                    type="id"/>
+
+                <drawable name="solid_green" >
+#f0f0
+                </drawable>
+
+                <item
+                    name="drag_handle"
+                    type="id"/>
+                <item
+                    name="text3"
+                    type="id"/>
+                <item
+                    name="click_remove"
+                    type="id"/>
+                <item
+                    name="add_channel"
+                    type="id"/>
+                <item
+                    name="menu_refresh"
+                    type="id"/>
+                <item
+                    name="actionbar_compat"
+                    type="id"/>
+
+                <drawable name="darker_gray" >
+#555
+                </drawable>
+                <drawable name="black" >
+#000
+                </drawable>
+
+                <item
+                    name="actionbar_compat_title"
+                    type="id"/>
+                <item
+                    name="actionbar_compat_item_refresh"
+                    type="id"/>
+
+                <drawable name="lighter_gray" >
+#ddd
+                </drawable>
+
+                <item
+                    name="icon"
+                    type="id"/>
+
+                <drawable name="white" >
+#fff
+                </drawable>
+
+                <item
+                    name="list_channels"
+                    type="id"/>
+            </file>
+            <file
+                path="/home/bottiger/dev/HapiPodcastJ/res/values/arrays.xml"
+                qualifiers="" >
+                <string-array name="sort_select" >
+                    <item>
+Sort by Channel
+                    </item>
+                    <item>
+Sort by Status
+                    </item>
+                    <item>
+Sort by Date
+                    </item>
+                </string-array>
+                <string-array name="entries_pref_fast_forward_interval" >
+                    <item>
+5 seconds
+                    </item>
+                    <item>
+10 seconds
+                    </item>
+                    <item>
+15 seconds
+                    </item>
+                    <item>
+20 seconds
+                    </item>
+                    <item>
+30 seconds
+                    </item>
+                </string-array>
+                <string-array name="backup_select" >
+                    <item>
+Import from OPML
+                    </item>
+                    <item>
+Export to OPML
+                    </item>
+                </string-array>
+                <string-array name="entryvalues_update" >
+                    <item>
+30
+                    </item>
+                    <item>
+60
+                    </item>
+                    <item>
+120
+                    </item>
+                    <item>
+240
+                    </item>
+                    <item>
+360
+                    </item>
+                    <item>
+600
+                    </item>
+                    <item>
+1440
+                    </item>
+                </string-array>
+                <string-array name="entries_pref_rewind_interval" >
+                    <item>
+3 seconds
+                    </item>
+                    <item>
+5 seconds
+                    </item>
+                    <item>
+7 seconds
+                    </item>
+                    <item>
+10 seconds
+                    </item>
+                    <item>
+15 seconds
+                    </item>
+                    <item>
+20 seconds
+                    </item>
+                    <item>
+30 seconds
+                    </item>
+                </string-array>
+                <string-array name="repeat_select" >
+                    <item>
+No Repeat
+                    </item>
+                    <item>
+Repeat All
+                    </item>
+                    <item>
+Repeat One
+                    </item>
+                </string-array>
+                <string-array name="entryvalues_spinner_number_of_episodes" >
+                    <item>
+10
+                    </item>
+                    <item>
+20
+                    </item>
+                    <item>
+30
+                    </item>
+                    <item>
+40
+                    </item>
+                    <item>
+50
+                    </item>
+                    <item>
+100
+                    </item>
+                </string-array>
+                <string-array name="select_select" >
+                    <item>
+All
+                    </item>
+                    <item>
+New only
+                    </item>
+                    <item>
+Unplayed only
+                    </item>
+                    <item>
+Playable only
+                    </item>
+                </string-array>
+                <string-array name="entries_item_expire" >
+                    <item>
+1 day
+                    </item>
+                    <item>
+3 days
+                    </item>
+                    <item>
+5 days
+                    </item>
+                    <item>
+1 week
+                    </item>
+                    <item>
+2 weeks
+                    </item>
+                    <item>
+1 month
+                    </item>
+                </string-array>
+                <string-array name="entryvalues_downlaod_file_expire" >
+                    <item>
+100
+                    </item>
+                    <item>
+1000
+                    </item>
+                    <item>
+2000
+                    </item>
+                    <item>
+3000
+                    </item>
+                    <item>
+5000
+                    </item>
+                    <item>
+-1
+                    </item>
+                </string-array>
+                <string-array name="entryvalues_pref_rewind_interval" >
+                    <item>
+3
+                    </item>
+                    <item>
+5
+                    </item>
+                    <item>
+7
+                    </item>
+                    <item>
+10
+                    </item>
+                    <item>
+15
+                    </item>
+                    <item>
+20
+                    </item>
+                    <item>
+30
+                    </item>
+                </string-array>
+                <string-array name="entryvalues_pref_fast_forward_interval" >
+                    <item>
+5
+                    </item>
+                    <item>
+10
+                    </item>
+                    <item>
+15
+                    </item>
+                    <item>
+20
+                    </item>
+                    <item>
+30
+                    </item>
+                </string-array>
+                <string-array name="entries_pref_max_new_items" >
+                    <item>
+5
+                    </item>
+                    <item>
+10
+                    </item>
+                    <item>
+20
+                    </item>
+                    <item>
+30
+                    </item>
+                    <item>
+50
+                    </item>
+                </string-array>
+                <string-array name="entryvalues_item_expire" >
+                    <item>
+1
+                    </item>
+                    <item>
+3
+                    </item>
+                    <item>
+5
+                    </item>
+                    <item>
+7
+                    </item>
+                    <item>
+14
+                    </item>
+                    <item>
+30
+                    </item>
+                </string-array>
+                <string-array name="entries_download_file_expire" >
+                    <item>
+100 MB
+                    </item>
+                    <item>
+1 GB
+                    </item>
+                    <item>
+2 GB
+                    </item>
+                    <item>
+3 GB
+                    </item>
+                    <item>
+5 GB
+                    </item>
+                    <item>
+Unlimited
+                    </item>
+                </string-array>
+                <string-array name="entries_update" >
+                    <item>
+30 minutes
+                    </item>
+                    <item>
+1 hour
+                    </item>
+                    <item>
+2 hours
+                    </item>
+                    <item>
+4 hours
+                    </item>
+                    <item>
+6 hours
+                    </item>
+                    <item>
+10 hours
+                    </item>
+                    <item>
+1 day
+                    </item>
+                </string-array>
+                <string-array name="entryvalues_pref_max_new_items" >
+                    <item>
+5
+                    </item>
+                    <item>
+10
+                    </item>
+                    <item>
+20
+                    </item>
+                    <item>
+30
+                    </item>
+                    <item>
+50
+                    </item>
+                </string-array>
+            </file>
+            <file
+                path="/home/bottiger/dev/HapiPodcastJ/res/values/attrs.xml"
+                qualifiers="" >
+                <attr
+                    name="sync_invert_icon"
+                    format="reference" />
+
+                <declare-styleable name="BezelImageView" >
+                    <attr
+                        name="maskDrawable"
+                        format="reference" />
+                    <attr
+                        name="borderDrawable"
+                        format="reference" />
+                </declare-styleable>
+
+                <attr
+                    name="pause_icon"
+                    format="reference" />
+                <attr
+                    name="pause_invert_icon"
+                    format="reference" />
+                <attr
+                    name="queue_icon"
+                    format="reference" />
+                <attr
+                    name="stop_icon"
+                    format="reference" />
+
+                <declare-styleable name="AppTheme" >
+                    <attr
+                        name="actionbarCompatTitleStyle"
+                        format="reference" />
+                    <attr
+                        name="actionbarCompatItemStyle"
+                        format="reference" />
+                    <attr
+                        name="actionbarCompatItemHomeStyle"
+                        format="reference" />
+                    <attr
+                        name="actionbarCompatProgressIndicatorStyle"
+                        format="reference" />
+                    <attr
+                        name="solidBackgroundStyle"
+                        format="reference" />
+                </declare-styleable>
+
+                <attr
+                    name="play_icon"
+                    format="reference" />
+                <attr
+                    name="new_icon"
+                    format="reference" />
+                <attr
+                    name="delete_icon"
+                    format="reference" />
+                <attr
+                    name="play_invert_icon"
+                    format="reference" />
+                <attr
+                    name="info_icon"
+                    format="reference" />
+                <attr
+                    name="customBackground"
+                    format="reference" />
+                <attr
+                    name="sync_icon"
+                    format="reference" />
+                <attr
+                    name="backspace_icon"
+                    format="reference" />
+                <attr
+                    name="download_icon"
+                    format="reference" />
+            </file>
+            <file
+                path="/home/bottiger/dev/HapiPodcastJ/res/values/strings.xml"
+                qualifiers="" >
+                <string name="no_new_items" >No new items found
+                </string>
+                <string name="manual_download_hint" >Auto Download disabled.
+                </string>
+                <string name="pref_download_on_update_description" >Set up automatic update interval time
+                </string>
+                <string name="pref_downloaded_expire_title" >Podcast history size
+                </string>
+                <string name="menu_delete" >Delete
+                </string>
+                <string name="pref_update_wifi_description" >Download new episodes automatically when the feeds are refreshed
+                </string>
+                <string name="auto_download" >Auto Download
+                </string>
+                <string name="menu_search_channels" >Search Channels
+                </string>
+                <string name="menu_play" >Play
+                </string>
+                <string name="menu_sort" >Sort Mode
+                </string>
+                <string name="episode_bar_button_download" >Download
+                </string>
+                <string name="menu_auto_download" >Auto Download
+                </string>
+                <string name="toast_added_to_playlist" >Added to playlist
+                </string>
+                <string name="pref_feedback_title" >Send anonymous feedback
+                </string>
+                <string name="pref_max_new_items_title" >Maximum Updated New Items
+                </string>
+                <string name="title_search_channel" >Search Channel
+                </string>
+                <string name="menu_manual_download" >Manual Download
+                </string>
+                <string name="menu_back" >Back
+                </string>
+                <string name="title_backup" >Backup Channels
+                </string>
+                <string name="menu_update" >Update
+                </string>
+                <string name="add_subscription" >Add Subscription
+                </string>
+                <string name="title_activity_notification_receiver" >NotificationReceiverActivity
+                </string>
+                <string name="menu_add_podcast" >Add Podcast
+                </string>
+                <string name="drawer_open" >Open
+                </string>
+                <string name="pref_notification_control_description" >Show small player in notification area
+                </string>
+                <string name="menu_played_by" >Played by
+                </string>
+                <string name="menu_repeat" >Repeat Mode
+                </string>
+                <string name="menu_unsubscribe" >Unsubscribe
+                </string>
+                <string name="pref_dark_theme" >Enable Dark Theme for higher contrast
+                </string>
+                <string name="dialog_title_loading" >Loading
+                </string>
+                <string name="no_data_found" >no data found
+                </string>
+                <string name="pref_update_wifi_title" >Update interval through Wi-Fi
+                </string>
+                <string name="episode_bar_button_all" >All
+                </string>
+                <string name="audio_no_found" >Audio File not found.
+                </string>
+                <string name="pref_cloud_support_title" >Enable Cloud Support
+                </string>
+                <string name="pref_downloaded_dialog_title" >History size
+                </string>
+                <string name="menu_list_channels" >List Channels
+                </string>
+                <string name="info" >Info
+                </string>
+                <string name="title_pref" >Settings
+                </string>
+                <string name="pref_item_expire_title" >Undownload item expire in
+                </string>
+                <string name="cancel" >Cancel
+                </string>
+                <string name="pref_item_expire_description" >Setup the automatic expiration time of the undownload items
+                </string>
+                <string name="menu_download_all" >Download All
+                </string>
+                <string name="already_subscribed" >The channel has been subscribed.
+                </string>
+                <string name="title_download_list" >Downloading List
+                </string>
+                <string name="pref_update_time_title" >Update at
+                </string>
+                <string name="menu_ok" >OK
+                </string>
+                <string name="title_activity_swipe" >SoundWaves
+                </string>
+                <string name="menu_cancel" >Cancel
+                </string>
+                <string name="hello_world" >Hello world!
+                </string>
+                <string name="title_read_list" >All Items
+                </string>
+                <string name="title_player" >Player
+                </string>
+                <string name="unsubscribe" >Unsubscribe
+                </string>
+                <string name="dialog_title_del_sub" >Delete Channel
+                </string>
+                <string name="menu_load_by_channel" >Load by Channel
+                </string>
+                <string name="menu_sync" >Sync
+                </string>
+                <string name="off" >Off
+                </string>
+                <string name="download" >Download
+                </string>
+                <string name="menu_resume" >Resume
+                </string>
+                <string name="dialog_title_add_sub" >Add Channel
+                </string>
+                <string name="menu_unkeep" >Unkeep
+                </string>
+                <string name="feed_format_error" >Feed format error or cannot identify format.
+                </string>
+                <string name="more_channel" >More Channels... 
+                </string>
+                <string name="app_name" >SoundWaves
+                </string>
+                <string name="dialog_message_add_sub" >Add channel from URL:
+                </string>
+                <string name="pref_only_wifi_description" >Download file only when Wi-Fi connected
+                </string>
+                <string name="title_section1" >Subscriptions
+                </string>
+                <string name="menu_clear_playlist" >Clear Playlist
+                </string>
+                <string name="title_section3" >Playlist
+                </string>
+                <string name="title_section2" >Feed
+                </string>
+                <string name="menu_keep" >Keep
+                </string>
+                <string name="download_hint" >Placed in the download queue.
+                </string>
+                <string name="channel_bar_button_manage" >Manage
+                </string>
+                <string name="channel_bar_button_add" >Add
+                </string>
+                <string name="pref_dark_theme_title" >Dark Theme
+                </string>
+                <string name="pref_update_mobile_title" >Update interval though 3G
+                </string>
+                <string name="dialog_message_loading" >Loading channel...
+                </string>
+                <string name="menu_details" >Details
+                </string>
+                <string name="menu_move_up" >Move Up
+                </string>
+                <string name="menu_mark_new" >Reset to Unplayed
+                </string>
+                <string name="pref_download_on_update_title" >Automatic download
+                </string>
+                <string name="menu_share" >Share
+                </string>
+                <string name="menu_export_audio_file" >Export audio file
+                </string>
+                <string name="last_item_date" >Last Item Time
+                </string>
+                <string name="menu_clear" >Clear
+                </string>
+                <string name="menu_display" >Display
+                </string>
+                <string name="menu_load_all" >Load All
+                </string>
+                <string name="menu_settings" >Settings
+                </string>
+                <string name="list_message_empty_item" >No Data Found
+                </string>
+                <string name="button_opml_import" >Import from OPML
+                </string>
+                <string name="stop" >Stop
+                </string>
+                <string name="pref_only_wifi_title" >Download only Wi-Fi
+                </string>
+                <string name="drawer_close" >Close
+                </string>
+                <string name="menu_view_channel" >View Channel
+                </string>
+                <string name="play" >Play
+                </string>
+                <string name="subscribe" >Subscribe
+                </string>
+                <string name="menu_manual_update" >Manual Update
+                </string>
+                <string name="title_play_list" >Episodes
+                </string>
+                <string name="subscription_no_title" >(No title)
+                </string>
+                <string name="refresh" >Refresh
+                </string>
+                <string name="menu_download" >Download
+                </string>
+                <string name="channel_title" >Channel Info
+                </string>
+                <string name="menu_import" >Import OPML
+                </string>
+                <string name="menu_episodes" >Episodes
+                </string>
+                <string name="pref_feedback_description" >Send anonymous data about the app, such as crash reports, to the developer. 
+                </string>
+                <string name="queue" >Queue
+                </string>
+                <string name="list_message_empty_subs" >No channel, please add one...
+                </string>
+                <string name="http_client_name" >SoundWaves
+                </string>
+                <string name="channel_bar_button_search" >Search
+                </string>
+                <string name="pref_downloaded_expire_description" >Setup maximum size of downloaded items
+                </string>
+                <string name="menu_add_to_playlist" >Add To Playlist
+                </string>
+                <string name="menu_remove" >Remove
+                </string>
+                <string name="no_connect" >Network not found.
+                </string>
+                <string name="pref_cloud_support_description" >Cloud support will backup your data to the cloud and synchronize data between your devices
+                </string>
+                <string name="sdcard_unmout" >SDCard not found.
+                </string>
+                <string name="menu_view" >View
+                </string>
+                <string name="update_date" >Last Update Time
+                </string>
+                <string name="on" >On
+                </string>
+                <string name="forward" >Jump 10 s
+                </string>
+                <string name="button_opml_export" >Export to OPML
+                </string>
+                <string name="menu_move_down" >Move Down
+                </string>
+                <string name="set" >Set
+                </string>
+                <string name="channel_bar_button_backup" >Backup
+                </string>
+                <string name="dialog_message_malformed_url" >URL is invalid, please retry!
+                </string>
+                <string name="menu_select" >Select Mode
+                </string>
+                <string name="pref_notification_control" >Notification Controls
+                </string>
+                <string name="auto_download_hint" >The new items in the channel will be automatically downloaded.
+                </string>
+                <string name="pref_update_time_description" >In addition to periodic updating the feeds can be updated every night/morning at a given time
+                </string>
+                <string name="network_fail" >network fail
+                </string>
+                <string name="menu_refresh" >Refresh
+                </string>
+                <string name="success" >success
+                </string>
+                <string name="menu_pause" >Pause
+                </string>
+                <string name="menu_remove_all" >Remove All
+                </string>
+                <string name="menu_add" >Add
+                </string>
+                <string name="title_subs" >Channels
+                </string>
+                <string name="episode_bar_button_manage" >Manage
+                </string>
+                <string name="menu_backup_channels" >Backup Channels
+                </string>
+                <string name="title_episodes" >Episodes
+                </string>
+                <string name="title_channels" >Channels
+                </string>
+                <string name="fail" >fail
+                </string>
+                <string name="dialog_message_url_exist" >URL exist, please retry!
+                </string>
+                <string name="unsubscribe_channel" >Do you want to unsubscribe the channel?
+                </string>
+                <string name="episode_bar_button_play" >Play
+                </string>
+            </file>
+            <file
+                path="/home/bottiger/dev/HapiPodcastJ/res/values/styles.xml"
+                qualifiers="" >
+
+                <style
+                    name="PodcastImage"
+                    parent="@style/PodcastImageSIze" >
+                    <item name="android:src">
+@drawable/generic_podcast
+                    </item>
+                    <item name="android:scaleType">
+fitStart
+                    </item>
+                </style>
+
+                <color name="white_opaque" >#FFFFFFFF
+                </color>
+
+                <style
+                    name="EpisodeMinorFont"
+                    parent="@style/EpisodeHeaderFont" >
+                    <item name="android:textSize">
+15sp
+                    </item>
+                </style>
+
+                <style
+                    name="SubscriptionHeaderFont"
+                    parent="@android:style/TextAppearance.Large" >
+                    <item name="android:layout_width">
+fill_parent
+                    </item>
+                    <item name="android:layout_height">
+wrap_content
+                    </item>
+                </style>
+
+                <style name="PlayerControlButtons" >
+                    <item name="android:layout_width">
+42dip
+                    </item>
+                    <item name="android:layout_height">
+42dip
+                    </item>
+                    <item name="android:layout_margin">
+10dip
+                    </item>
+                    <item name="android:paddingTop">
+20dip
+                    </item>
+                    <item name="android:paddingBottom">
+20dip
+                    </item>
+                    <item name="android:paddingLeft">
+20dip
+                    </item>
+                    <item name="android:paddingRight">
+20dip
+                    </item>
+                </style>
+
+                <style
+                    name="SoundWavesTheme.Light"
+                    parent="android:Theme.Holo.Light.DarkActionBar" >
+                    <item name="play_icon">
+@drawable/av_play_dark
+                    </item>
+                    <item name="pause_icon">
+@drawable/av_pause_dark
+                    </item>
+                    <item name="play_invert_icon">
+@drawable/av_play
+                    </item>
+                    <item name="pause_invert_icon">
+@drawable/av_pause
+                    </item>
+                    <item name="stop_icon">
+@drawable/av_stop_dark
+                    </item>
+                    <item name="download_icon">
+@drawable/av_download_dark
+                    </item>
+                    <item name="delete_icon">
+@drawable/content_discard_dark
+                    </item>
+                    <item name="backspace_icon">
+@drawable/content_backspace_dark
+                    </item>
+                    <item name="queue_icon">
+@drawable/av_add_to_queue_dark
+                    </item>
+                    <item name="info_icon">
+@drawable/collections_view_as_list_dark
+                    </item>
+                    <item name="new_icon">
+@drawable/content_new_dark
+                    </item>
+                    <item name="sync_icon">
+@drawable/refresh
+                    </item>
+                    <item name="sync_invert_icon">
+@drawable/refresh
+                    </item>
+                    <item name="customBackground">
+@color/white_opaque
+                    </item>
+                </style>
+
+                <style
+                    name="SoundWavesTheme"
+                    parent="android:Theme.Holo" >
+                    <item name="play_icon">
+@drawable/av_play
+                    </item>
+                    <item name="pause_icon">
+@drawable/av_pause
+                    </item>
+                    <item name="play_invert_icon">
+@drawable/av_play_dark
+                    </item>
+                    <item name="pause_invert_icon">
+@drawable/av_pause_dark
+                    </item>
+                    <item name="stop_icon">
+@drawable/av_stop
+                    </item>
+                    <item name="download_icon">
+@drawable/av_download
+                    </item>
+                    <item name="delete_icon">
+@drawable/ic_action_delete
+                    </item>
+                    <item name="backspace_icon">
+@drawable/content_backspace
+                    </item>
+                    <item name="queue_icon">
+@drawable/av_add_to_queue
+                    </item>
+                    <item name="info_icon">
+@drawable/collections_view_as_list
+                    </item>
+                    <item name="new_icon">
+@drawable/content_new
+                    </item>
+                    <item name="sync_icon">
+@drawable/refresh
+                    </item>
+                    <item name="sync_invert_icon">
+@drawable/refresh
+                    </item>
+                    <item name="customBackground">
+@color/pitch_black
+                    </item>
+                </style>
+
+                <style
+                    name="FeedListImage"
+                    parent="@style/PodcastImageSIze" >
+                    <item name="android:layout_width">
+160dip
+                    </item>
+                    <item name="android:layout_height">
+160dip
+                    </item>
+                    <item name="android:src">
+@drawable/generic_podcast
+                    </item>
+                    <item name="android:scaleType">
+fitStart
+                    </item>
+                </style>
+
+                <color name="pitch_black" >#FF000000
+                </color>
+
+                <style
+                    name="EpisodeHeaderFont"
+                    parent="@android:style/TextAppearance.Medium" >
+                    <item name="android:layout_width">
+fill_parent
+                    </item>
+                    <item name="android:layout_height">
+wrap_content
+                    </item>
+                </style>
+
+                <style name="PodcastImageSIze" >
+                    <item name="android:layout_width">
+130dip
+                    </item>
+                    <item name="android:layout_height">
+130dip
+                    </item>
+                    <item name="android:layout_margin">
+0dip
+                    </item>
+                    <item name="android:padding">
+0dip
+                    </item>
+                </style>
+
+                <style
+                    name="CompactListItem"
+                    parent="@android:style/TextAppearance.Small" >
+                    <item name="android:padding">
+5dip
+                    </item>
+                </style>
+            </file>
+            <file
+                name="mimetypes"
+                path="/home/bottiger/dev/HapiPodcastJ/res/xml/mimetypes.xml"
+                qualifiers=""
+                type="xml" />
+            <file
+                name="syncadapter"
+                path="/home/bottiger/dev/HapiPodcastJ/res/xml/syncadapter.xml"
+                qualifiers=""
+                type="xml" />
+            <file
+                name="preferences"
+                path="/home/bottiger/dev/HapiPodcastJ/res/xml/preferences.xml"
+                qualifiers=""
+                type="xml" />
+            <file
+                path="/home/bottiger/dev/HapiPodcastJ/res/values-large/dimens.xml"
+                qualifiers="large" >
+                <dimen name="padding_small" >8dp
+                </dimen>
+                <dimen name="padding_medium" >16dp
+                </dimen>
+                <dimen name="padding_large" >16dp
+                </dimen>
+            </file>
+            <file
+                name="av_add_to_queue"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-hdpi/av_add_to_queue.png"
+                qualifiers="hdpi"
+                type="drawable" />
+            <file
+                name="av_download"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-hdpi/av_download.png"
+                qualifiers="hdpi"
+                type="drawable" />
+            <file
+                name="av_pause"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-hdpi/av_pause.png"
+                qualifiers="hdpi"
+                type="drawable" />
+            <file
+                name="av_play"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-hdpi/av_play.png"
+                qualifiers="hdpi"
+                type="drawable" />
+            <file
+                name="av_stop"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-hdpi/av_stop.png"
+                qualifiers="hdpi"
+                type="drawable" />
+            <file
+                name="collections_view_as_list"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-hdpi/collections_view_as_list.png"
+                qualifiers="hdpi"
+                type="drawable" />
+            <file
+                name="content_backspace"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-hdpi/content_backspace.png"
+                qualifiers="hdpi"
+                type="drawable" />
+            <file
+                name="content_new"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-hdpi/content_new.png"
+                qualifiers="hdpi"
+                type="drawable" />
+            <file
+                name="ic_action_delete"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-hdpi/ic_action_delete.png"
+                qualifiers="hdpi"
+                type="drawable" />
+            <file
+                name="ic_action_search"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-hdpi/ic_action_search.png"
+                qualifiers="hdpi"
+                type="drawable" />
+            <file
+                name="icon"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-hdpi/icon.png"
+                qualifiers="hdpi"
+                type="drawable" />
+            <file
+                name="drawer_shadow"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-hdpi/drawer_shadow.9.png"
+                qualifiers="hdpi"
+                type="drawable" />
+            <file
+                name="ic_drawer"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-hdpi/ic_drawer.png"
+                qualifiers="hdpi"
+                type="drawable" />
+            <file
+                name="refresh"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-hdpi/refresh.png"
+                qualifiers="hdpi"
+                type="drawable" />
+            <file
+                name="refresh_dark"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-hdpi/refresh_dark.png"
+                qualifiers="hdpi"
+                type="drawable" />
+            <file
+                name="av_add_to_queue"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-xhdpi/av_add_to_queue.png"
+                qualifiers="xhdpi"
+                type="drawable" />
+            <file
+                name="av_download"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-xhdpi/av_download.png"
+                qualifiers="xhdpi"
+                type="drawable" />
+            <file
+                name="av_next"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-xhdpi/av_next.png"
+                qualifiers="xhdpi"
+                type="drawable" />
+            <file
+                name="av_next_dark"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-xhdpi/av_next_dark.png"
+                qualifiers="xhdpi"
+                type="drawable" />
+            <file
+                name="av_pause"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-xhdpi/av_pause.png"
+                qualifiers="xhdpi"
+                type="drawable" />
+            <file
+                name="av_play"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-xhdpi/av_play.png"
+                qualifiers="xhdpi"
+                type="drawable" />
+            <file
+                name="av_stop"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-xhdpi/av_stop.png"
+                qualifiers="xhdpi"
+                type="drawable" />
+            <file
+                name="collections_view_as_list"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-xhdpi/collections_view_as_list.png"
+                qualifiers="xhdpi"
+                type="drawable" />
+            <file
+                name="content_backspace"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-xhdpi/content_backspace.png"
+                qualifiers="xhdpi"
+                type="drawable" />
+            <file
+                name="content_new"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-xhdpi/content_new.png"
+                qualifiers="xhdpi"
+                type="drawable" />
+            <file
+                name="ic_action_delete"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-xhdpi/ic_action_delete.png"
+                qualifiers="xhdpi"
+                type="drawable" />
+            <file
+                name="ic_action_search"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-xhdpi/ic_action_search.png"
+                qualifiers="xhdpi"
+                type="drawable" />
+            <file
+                name="drawer_shadow"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-xhdpi/drawer_shadow.9.png"
+                qualifiers="xhdpi"
+                type="drawable" />
+            <file
+                name="ic_drawer"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-xhdpi/ic_drawer.png"
+                qualifiers="xhdpi"
+                type="drawable" />
+            <file
+                name="refresh"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-xhdpi/refresh.png"
+                qualifiers="xhdpi"
+                type="drawable" />
+            <file
+                name="refresh_dark"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-xhdpi/refresh_dark.png"
+                qualifiers="xhdpi"
+                type="drawable" />
+            <file
+                name="av_add_to_queue"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-mdpi/av_add_to_queue.png"
+                qualifiers="mdpi"
+                type="drawable" />
+            <file
+                name="av_download"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-mdpi/av_download.png"
+                qualifiers="mdpi"
+                type="drawable" />
+            <file
+                name="av_pause"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-mdpi/av_pause.png"
+                qualifiers="mdpi"
+                type="drawable" />
+            <file
+                name="av_play"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-mdpi/av_play.png"
+                qualifiers="mdpi"
+                type="drawable" />
+            <file
+                name="av_stop"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-mdpi/av_stop.png"
+                qualifiers="mdpi"
+                type="drawable" />
+            <file
+                name="collections_view_as_list"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-mdpi/collections_view_as_list.png"
+                qualifiers="mdpi"
+                type="drawable" />
+            <file
+                name="content_backspace"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-mdpi/content_backspace.png"
+                qualifiers="mdpi"
+                type="drawable" />
+            <file
+                name="content_new"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-mdpi/content_new.png"
+                qualifiers="mdpi"
+                type="drawable" />
+            <file
+                name="ic_action_delete"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-mdpi/ic_action_delete.png"
+                qualifiers="mdpi"
+                type="drawable" />
+            <file
+                name="ic_action_search"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-mdpi/ic_action_search.png"
+                qualifiers="mdpi"
+                type="drawable" />
+            <file
+                name="drawer_shadow"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-mdpi/drawer_shadow.9.png"
+                qualifiers="mdpi"
+                type="drawable" />
+            <file
+                name="ic_drawer"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-mdpi/ic_drawer.png"
+                qualifiers="mdpi"
+                type="drawable" />
+            <file
+                name="refresh"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-mdpi/refresh.png"
+                qualifiers="mdpi"
+                type="drawable" />
+            <file
+                name="refresh_dark"
+                path="/home/bottiger/dev/HapiPodcastJ/res/drawable-mdpi/refresh_dark.png"
+                qualifiers="mdpi"
+                type="drawable" />
+            <file
+                name="slide_in_top"
+                path="/home/bottiger/dev/HapiPodcastJ/res/anim/slide_in_top.xml"
+                qualifiers=""
+                type="anim" />
+            <file
+                name="slide_out_top"
+                path="/home/bottiger/dev/HapiPodcastJ/res/anim/slide_out_top.xml"
+                qualifiers=""
+                type="anim" />
+        </source>
+        <source path="/home/bottiger/dev/HapiPodcastJ/build/res/rs/debug" />
+    </dataSet>
+    <dataSet config="debug" >
+        <source path="/home/bottiger/dev/HapiPodcastJ/src/debug/res" />
+    </dataSet>
+
+</merger>

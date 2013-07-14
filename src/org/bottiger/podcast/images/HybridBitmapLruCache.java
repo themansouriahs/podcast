@@ -14,12 +14,14 @@ import com.android.volley.toolbox.ImageLoader.ImageCache;
 
 public class HybridBitmapLruCache implements ImageCache {
 
+	private int DISK_CACHE_SIZE = 30*1024*1024;
+	
 	private BitmapLruImageCache mMemoryCache;
 	private DiskLruImageCache mDiskCache;
 	
 	public HybridBitmapLruCache(Context context, String uniqueName, int memoryCacheSzie, int distCacheSize, CompressFormat compressFormat, int quality) {
 		mMemoryCache = new BitmapLruImageCache(memoryCacheSzie);
-		mDiskCache = new DiskLruImageCache(context, uniqueName, distCacheSize, compressFormat, quality);
+		mDiskCache = new DiskLruImageCache(context, uniqueName, DISK_CACHE_SIZE, compressFormat, quality);
 	}
 
 	@Override

@@ -35,9 +35,11 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.NetworkImageView;
+import com.squareup.picasso.Picasso;
 
 public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
-	
+
+	private static final boolean USE_PICASSO = false;
 	private static final boolean COLOR_BACKGROUND = false;
 
 	public static final int ICON_DEFAULT_ID = -1;
@@ -121,7 +123,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 			throw new IllegalStateException("couldn't move cursor to position "
 					+ position);
 		}
-		
+
 		mCurrentFeedItem = FeedItem.getByCursor(itemCursor);
 
 		if (convertView == null) {
@@ -202,14 +204,14 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 						preTitle = "p:" + priority + " t:" + lastUpdate;
 					else
 						preTitle = String.valueOf(priority);
-					
+
 					if (priority > 0 || MainActivity.debugging) {
 						title = preTitle + " # " + title;
-					} 
-					
+					}
+
 					if (COLOR_BACKGROUND)
 						colorBackground(view, priority);
-					
+
 					holder.mainTitle.setText(title);
 				}
 
@@ -243,12 +245,19 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 					// ImageLoader imageLoader = getImageLoader(context);
 					// imageLoader.displayImage(item.image, holder.icon);
 
-					com.android.volley.toolbox.ImageLoader imageLoader = ImageCacheManager
-							.getInstance().getImageLoader();
-					holder.icon.setImageUrl(item.image, imageLoader);
+					if (USE_PICASSO) {
+						String i = item.image;
+						Picasso.with(mContext).load(i)
+								.placeholder(R.drawable.generic_podcast)
+								.into(holder.icon);
+					} else {
+						com.android.volley.toolbox.ImageLoader imageLoader = ImageCacheManager
+								.getInstance().getImageLoader();
+						holder.icon.setImageUrl(item.image, imageLoader);
+					}
 
 				} else {
-					holder.icon.setImageResource(R.drawable.generic_podcast);	
+					holder.icon.setImageResource(R.drawable.generic_podcast);
 				}
 
 			}
@@ -290,7 +299,8 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 			else
 				InlinePlayer.setSecondaryEpisodePlayerViewHolder(holder);
 
-			bindExandedPlayer(mContext, mFragment, mCurrentFeedItem, playerView, holder, position);
+			bindExandedPlayer(mContext, mFragment, mCurrentFeedItem,
+					playerView, holder, position);
 		} else {
 			if (playerView != null) {
 				playerView.setVisibility(View.GONE);
@@ -328,7 +338,8 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 	 * @param holder
 	 * @param position
 	 */
-	public static void bindExandedPlayer(Context context, PodcastBaseFragment fragment, FeedItem feedItem, View playerView,
+	public static void bindExandedPlayer(Context context,
+			PodcastBaseFragment fragment, FeedItem feedItem, View playerView,
 			InlinePlayer holder, int position) {
 
 		ThemeHelper themeHelper = new ThemeHelper(context);
@@ -383,7 +394,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 			}
 
 		}
-		
+
 		holder.playPauseButton.setChecked(isPlaying);
 
 	}
@@ -417,9 +428,9 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 	// http://stackoverflow.com/questions/5300962/getviewtypecount-and-getitemviewtype-methods-of-arrayadapter
 	@Override
 	public int getItemViewType(int position) {
-		boolean isExpanded = position == 0 || mExpandedItemID.contains(itemID(position)); 
-		return isExpanded ? TYPE_EXPAND
-				: TYPE_COLLAPS;
+		boolean isExpanded = position == 0
+				|| mExpandedItemID.contains(itemID(position));
+		return isExpanded ? TYPE_EXPAND : TYPE_COLLAPS;
 	}
 
 	private void setOverlay(View overlay, boolean isOn) {
@@ -448,10 +459,9 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 		} else
 			return new Long(1); // FIXME
 	}
-	
+
 	/**
-	 * Color the background of the playlist.
-	 * This has performance issues.
+	 * Color the background of the playlist. This has performance issues.
 	 */
 	private void colorBackground(View view, int priority) {
 		// Only draw the background if it is wrong.
@@ -459,11 +469,12 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 				R.color.default_background);
 		int playlistColor = mContext.getResources().getColor(
 				R.color.playlist_background);
-		
+
 		Drawable background = view.getBackground();
-		int currentColor = (background != null) ? ((ColorDrawable)background).getColor() : defaultColor;
+		int currentColor = (background != null) ? ((ColorDrawable) background)
+				.getColor() : defaultColor;
 		int newColor = -1;
-		
+
 		if (priority > 0) {
 			newColor = playlistColor;
 		} else {
