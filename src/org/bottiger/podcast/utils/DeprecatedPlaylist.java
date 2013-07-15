@@ -12,7 +12,8 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
-public class Playlist {
+@Deprecated
+public class DeprecatedPlaylist {
 
 	/*
 	private final static int playlistSize = 10;

@@ -90,7 +90,7 @@ public abstract class PodcastBaseFragment extends FixedListFragment implements
 
 	private boolean mShow = true;
 
-	protected Cursor mCursor = null;
+	protected ReorderCursor mCursor = null;
 
 	private static TextView mCurrentTime = null;
 	private static SeekBar mProgressBar = null;
@@ -356,7 +356,7 @@ public abstract class PodcastBaseFragment extends FixedListFragment implements
 		return 500;
 	}
 
-	protected Cursor getCursor() {
+	public ReorderCursor getCursor() {
 		return this.mCursor;
 	}
 

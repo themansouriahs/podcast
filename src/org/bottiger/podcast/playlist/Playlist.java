@@ -65,6 +65,15 @@ public class Playlist {
 	
 	/**
 	 * 
+	 * @param episode
+	 * @return The position of the episode
+	 */
+	public int getPosition(FeedItem episode) {
+		return mPlaylist.indexOf(episode, 0);
+	}
+	
+	/**
+	 * 
 	 * @param position
 	 * @param item
 	 */

@@ -8,7 +8,7 @@ import org.bottiger.podcast.R.layout;
 import org.bottiger.podcast.adapters.ItemCursorAdapter;
 import org.bottiger.podcast.playlist.ReorderCursor;
 import org.bottiger.podcast.provider.FeedItem;
-import org.bottiger.podcast.utils.Playlist;
+import org.bottiger.podcast.utils.DeprecatedPlaylist;
 
 import android.app.Activity;
 import android.content.Context;

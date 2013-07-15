@@ -5,7 +5,6 @@ import java.util.HashMap;
 import org.bottiger.podcast.provider.DatabaseHelper;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
-import org.bottiger.podcast.provider.PodcastOpenHelper;
 import org.bottiger.podcast.provider.PodcastProvider;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.PlayerService;
@@ -19,9 +18,9 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.widget.CursorAdapter;
 import android.view.Menu;
@@ -151,6 +150,25 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 		super.onResume();
 	}
 
+	public CursorAdapter getAdapter() {
+		return mAdapter;
+	}
+
+	public CursorAdapter getAdapter(Cursor cursor) {
+		if (mAdapter != null)
+			return mAdapter;
+
+		CursorAdapter adapter = createAdapter(this.getActivity(), cursor);
+		setAdapter(adapter);
+		return adapter;
+	}
+
+	public abstract CursorAdapter createAdapter(Activity activity, Cursor cursor);
+
+	public void setAdapter(CursorAdapter adapter) {
+		mAdapter = adapter;
+	}
+
 	public void getPref() {
 		SharedPreferences pref = getActivity().getSharedPreferences(
 				SettingsActivity.HAPI_PREFS_FILE_NAME, Context.MODE_PRIVATE);
@@ -260,7 +278,8 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 		// Also update the timestamp of the top item in order to indicate to the
 		// drivesyncer
 		// Our data is up tp date.
-		String where2 = " OR " + ItemColumns._ID + "==(select " + ItemColumns._ID + " from " + ItemColumns.TABLE_NAME
+		String where2 = " OR " + ItemColumns._ID + "==(select "
+				+ ItemColumns._ID + " from " + ItemColumns.TABLE_NAME
 				+ " order by " + ItemColumns.DATE + " desc limit 1)";
 
 		String sql = action + value + where + where2;

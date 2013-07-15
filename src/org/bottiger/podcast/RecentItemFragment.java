@@ -14,6 +14,7 @@ import org.bottiger.podcast.utils.ControlButtons;
 import org.bottiger.podcast.utils.ExpandAnimation;
 import org.bottiger.podcast.utils.StrUtils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -92,22 +93,9 @@ public class RecentItemFragment extends DSLVFragment {
 		mAdapter = adapter;
 	}
 
-	public CursorAdapter getAdapter() {
-		return mAdapter;
-	}
-
-	public CursorAdapter getAdapter(Cursor cursor) {
-		if (mAdapter != null)
-			return mAdapter;
-
-		CursorAdapter adapter = createAdapter(this.getActivity(), this, cursor);
-		setAdapter(adapter);
-		return adapter;
-	}
-
-	public static CursorAdapter createAdapter(Context context,
-			PodcastBaseFragment fragment, Cursor cursor) {
-		return new ItemCursorAdapter(context, fragment, R.layout.episode_list,
+	@Override
+	public CursorAdapter createAdapter(Activity activity, Cursor cursor) {
+		return new ItemCursorAdapter(activity, this, R.layout.episode_list,
 				cursor, new String[] { ItemColumns.TITLE,
 						ItemColumns.SUB_TITLE, ItemColumns.DURATION,
 						ItemColumns.IMAGE_URL }, new int[] { R.id.title,
@@ -240,7 +228,7 @@ public class RecentItemFragment extends DSLVFragment {
 		if (viewHolder.duration != null)
 			viewHolder.duration.setText(duration);
 
-		ControlButtons.setPlayerListeners(viewHolder, this, id);
+		ControlButtons.setPlayerListeners(viewHolder, this, FeedItem.getByCursor(item));
 		updatePlayingView();
 	}
 
@@ -373,4 +361,5 @@ public class RecentItemFragment extends DSLVFragment {
 		progressBar.setProgress(primaryProgress);
 		progressBar.setSecondaryProgress(secondaryProgress);
 	}
+
 }

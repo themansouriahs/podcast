@@ -238,10 +238,6 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 				}
 
 				if ((item.image != null && !item.image.equals(""))) {
-
-					// ImageLoader imageLoader = getImageLoader(context);
-					// imageLoader.displayImage(item.image, holder.icon);
-
 					if (ApplicationConfiguration.USE_PICASSO) {
 						String i = item.image;
 						Picasso.with(mContext).load(i)
@@ -373,7 +369,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 		RecentItemFragment.setProgressBar(holder.seekbar, playerDuration,
 				playerPosition, secondary);
 
-		ControlButtons.setPlayerListeners(holder, fragment, feedItem.getId());
+		ControlButtons.setPlayerListeners(holder, fragment, feedItem);
 
 		if (feedItem.isDownloaded()) {
 			holder.downloadButton.setImageResource(themeHelper

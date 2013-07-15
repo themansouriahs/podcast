@@ -5,6 +5,7 @@ import org.bottiger.podcast.PodcastBaseFragment;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.RecentItemFragment;
 import org.bottiger.podcast.adapters.viewholders.InlinePlayer;
+import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.playlist.ReorderCursor;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.service.PlayerService;
@@ -15,6 +16,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.os.Debug;
 import android.os.SystemClock;
+import android.support.v4.widget.CursorAdapter;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -55,13 +57,12 @@ public class ControlButtons {
 
 	public static void setListener(
 			final PodcastService podcastServiceConnection,
-			final InlinePlayer viewHolder, final PodcastBaseFragment fragment, final long id) {
+			final InlinePlayer viewHolder, final PodcastBaseFragment fragment, final FeedItem item) {
 
 		final ToggleButton playPauseButton = viewHolder.playPauseButton;
 		//final ImageView playImage = viewHolder.image; FIXME
 		final ContentResolver resolver = fragment.getActivity()
 				.getContentResolver();
-		final FeedItem item = FeedItem.getById(resolver, id);
 		final ThemeHelper themeHelper = new ThemeHelper(fragment.getActivity());
 		
 		playPauseButton.setOnClickListener(new View.OnClickListener() {
@@ -69,7 +70,7 @@ public class ControlButtons {
 			public void onClick(View v) {
 				Debug.startMethodTracing("playpause");
 				long start = System.nanoTime();
-				playPause(id, fragment, viewHolder, themeHelper, playPauseButton);
+				playPause(item, fragment, viewHolder, themeHelper, playPauseButton);
 				long end = System.nanoTime();
 				long diff = end-start;
 				long diff2 = diff*2;
@@ -146,14 +147,14 @@ public class ControlButtons {
 		viewHolder.seekbar.setMax(MAX_SEEKBAR_VALUE);
 	}
 	
-	public static void setPlayerListeners(InlinePlayer holder, PodcastBaseFragment fragment, long id) {
+	public static void setPlayerListeners(InlinePlayer holder, PodcastBaseFragment fragment, FeedItem episode) {
 		ControlButtons.setListener(MainActivity.mPodcastServiceBinder,
-				holder, fragment, id);
+				holder, fragment, episode);
 	}
 
 	@Deprecated
 	public static void setPlayerListeners(View listView, View playerView,
-			long id) {
+			FeedItem item) {
 
 		InlinePlayer viewHolder = new InlinePlayer();
 		viewHolder.currentTime = (TextView) playerView
@@ -177,7 +178,7 @@ public class ControlButtons {
 		//viewHolder.image = (ImageView) listView.findViewById(R.id.list_image);
 
 		ControlButtons.setListener(MainActivity.mPodcastServiceBinder,
-				viewHolder, fragment, id);
+				viewHolder, fragment, item);
 	}
 	
 
@@ -248,7 +249,7 @@ public class ControlButtons {
 
 	}
 	
-	public static void playPauseToggle(long id, PodcastBaseFragment fragment, ToggleButton button) {
+	public static void playPauseToggle(FeedItem episode, PodcastBaseFragment fragment, ToggleButton button) {
 		assert themeHelper != null;
 		PlayerService ps = PodcastBaseFragment.mPlayerServiceBinder;
 		boolean isPlaying = false;
@@ -257,17 +258,22 @@ public class ControlButtons {
 				ps.pause();
 			} else {
 				isPlaying = true;
-				ps.play(id);
+				ps.play(episode.id);
 				RecentItemFragment.queueNextRefresh();
 				
-				if (fragment != null)
-					fragment.refreshView();
+				if (fragment != null) {
+					//fragment.refreshView();
+					Playlist playlist = new Playlist(fragment.getActivity());
+					int episodePos = playlist.getPosition(episode);
+					ReorderCursor cursor = fragment.getCursor(); 
+					cursor.drop(episodePos, 0);
+				}
 			}			
 		}
 		button.setChecked(isPlaying);
 	}
 	
-	private static void playPause(long id, PodcastBaseFragment fragment, InlinePlayer viewHolder, ThemeHelper themeHelper, ToggleButton playPauseButton) {
+	private static void playPause(FeedItem episode, PodcastBaseFragment fragment, InlinePlayer viewHolder, ThemeHelper themeHelper, ToggleButton playPauseButton) {
 		if (viewHolder.seekbar != null)
 			fragment.setProgressBar(viewHolder.seekbar);
 		
@@ -277,7 +283,7 @@ public class ControlButtons {
 		if (viewHolder.duration != null)
 			fragment.setDuration(viewHolder.duration);
 		
-		playPauseToggle(id, fragment, playPauseButton);
+		playPauseToggle(episode, fragment, playPauseButton);
 	}
 
 }
