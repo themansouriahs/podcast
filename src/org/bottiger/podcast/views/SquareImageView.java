@@ -1,12 +1,10 @@
 package org.bottiger.podcast.views;
 
-import com.android.volley.toolbox.NetworkImageView;
-
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
-public class SquareImageView extends NetworkImageView {
+public class SquareImageView extends ImageView {
     public SquareImageView(Context context) {
         super(context);
     }

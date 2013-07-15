@@ -1,31 +1,27 @@
 package org.bottiger.podcast.adapters;
 
+import org.bottiger.podcast.ApplicationConfiguration;
 import org.bottiger.podcast.R;
-import org.bottiger.podcast.adapters.ItemCursorAdapter.EpisodeViewHolder;
-import org.bottiger.podcast.adapters.PodcastAdapterInterface.FieldHandler;
 import org.bottiger.podcast.images.ImageCacheManager;
-import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.views.SquareImageView;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.NetworkImageView;
-import com.nostra13.universalimageloader.core.ImageLoader;
+import com.squareup.picasso.Picasso;
 
 
 public class SubscriptionGridCursorAdapter extends AbstractGridPodcastAdapter {
 	
 	static class SubscriptionViewHolder {
-		NetworkImageView image;
+		SquareImageView image;
 		TextView title;
 	}
 
@@ -86,7 +82,7 @@ public class SubscriptionGridCursorAdapter extends AbstractGridPodcastAdapter {
 		View view = mInflater.inflate(R.layout.subscription_grid_item, null);
 		
 		SubscriptionViewHolder holder = new SubscriptionViewHolder();
-		holder.image = (NetworkImageView) view.findViewById(R.id.grid_image);
+		holder.image = (SquareImageView) view.findViewById(R.id.grid_image);
 		holder.title = (TextView) view.findViewById(R.id.grid_title);
 		view.setTag(holder);
 
@@ -120,9 +116,17 @@ public class SubscriptionGridCursorAdapter extends AbstractGridPodcastAdapter {
 				//ImageLoader imageLoader = getImageLoader(context);
 				//imageLoader.displayImage(sub.imageURL, holder.image);
 				
+				if (ApplicationConfiguration.USE_PICASSO) {
+					Picasso.with(mContext).load(logo)
+							.placeholder(R.drawable.generic_podcast)
+							.into(holder.image);
+				} else {
+					/*
 				com.android.volley.toolbox.ImageLoader imageLoader = ImageCacheManager
 						.getInstance().getImageLoader();
-				holder.image.setImageUrl(logo, imageLoader);
+				((NetworkImageView)holder.image).setImageUrl(logo, imageLoader);
+				*/
+				}
 			} else {
 				holder.image.setImageResource(R.drawable.generic_podcast);
 			}

@@ -25,11 +25,16 @@
                 android:layout_alignParentLeft="true"
                 android:layout_marginRight="7dip"
                 android:padding="0dip" >
-				
+
+                <!--
                 <com.android.volley.toolbox.NetworkImageView
                     android:id="@+id/list_image"
                       style="@style/PodcastImage" />
-                
+                -->
+
+                <ImageView
+                    android:id="@+id/list_image"
+                    style="@style/PodcastImage" />
             </LinearLayout>
 
             <TextView
@@ -49,9 +54,9 @@
                 android:layout_below="@id/title"
                 android:layout_marginTop="1dip"
                 android:layout_toRightOf="@+id/thumbnail"
+                android:ellipsize="end"
                 android:text="Podcast Name"
-                android:textSize="10dip"
-                android:ellipsize="end" />
+                android:textSize="10dip" />
 
             <ImageView
                 android:layout_width="wrap_content"

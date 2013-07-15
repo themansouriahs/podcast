@@ -4,15 +4,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeSet;
 
+import org.bottiger.podcast.ApplicationConfiguration;
 import org.bottiger.podcast.MainActivity;
-import org.bottiger.podcast.PlayerActivity;
 import org.bottiger.podcast.PodcastBaseFragment;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.RecentItemFragment;
 import org.bottiger.podcast.adapters.viewholders.InlinePlayer;
 import org.bottiger.podcast.images.ImageCacheManager;
 import org.bottiger.podcast.listeners.DownloadProgressListener;
-import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.service.DownloadStatus;
 import org.bottiger.podcast.utils.ControlButtons;
@@ -32,15 +31,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.NetworkImageView;
 import com.squareup.picasso.Picasso;
 
 public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
-
-	private static final boolean USE_PICASSO = false;
-	private static final boolean COLOR_BACKGROUND = false;
 
 	public static final int ICON_DEFAULT_ID = -1;
 
@@ -59,7 +56,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 
 	/** ViewHolder for holding a basiv listitem */
 	static class EpisodeViewHolder {
-		NetworkImageView icon;
+		ImageView icon;
 		TextView mainTitle;
 		TextView subTitle;
 		TextView timeDuration;
@@ -146,7 +143,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 		View view = mInflater.inflate(R.layout.episode_list, null);
 
 		EpisodeViewHolder holder = new EpisodeViewHolder();
-		holder.icon = (NetworkImageView) view.findViewById(R.id.list_image);
+		holder.icon = (ImageView) view.findViewById(R.id.list_image);
 		holder.mainTitle = (TextView) view.findViewById(R.id.title);
 		holder.subTitle = (TextView) view.findViewById(R.id.podcast);
 		holder.timeDuration = (TextView) view.findViewById(R.id.duration);
@@ -209,7 +206,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 						title = preTitle + " # " + title;
 					}
 
-					if (COLOR_BACKGROUND)
+					if (ApplicationConfiguration.COLOR_BACKGROUND)
 						colorBackground(view, priority);
 
 					holder.mainTitle.setText(title);
@@ -245,7 +242,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 					// ImageLoader imageLoader = getImageLoader(context);
 					// imageLoader.displayImage(item.image, holder.icon);
 
-					if (USE_PICASSO) {
+					if (ApplicationConfiguration.USE_PICASSO) {
 						String i = item.image;
 						Picasso.with(mContext).load(i)
 								.placeholder(R.drawable.generic_podcast)
@@ -253,7 +250,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 					} else {
 						com.android.volley.toolbox.ImageLoader imageLoader = ImageCacheManager
 								.getInstance().getImageLoader();
-						holder.icon.setImageUrl(item.image, imageLoader);
+						((NetworkImageView)holder.icon).setImageUrl(item.image, imageLoader);
 					}
 
 				} else {

@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Version 0.23
+------------
+
+* Faster image loading
+
 Version 0.22
 ------------
 
