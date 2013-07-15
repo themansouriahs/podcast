@@ -245,7 +245,7 @@ public class PodcastDownloadManager {
 				.getSystemService(Context.DOWNLOAD_SERVICE);
 		
 		Playlist playlist = new Playlist(context);
-		int max = 5;
+		int max = playlist.size() > 5 ? 5 : playlist.size();
 		for (int i = 0; i < max; i++) {
 			FeedItem item = playlist.getItem(i);
 			if (item != null && !item.isDownloaded())

@@ -19,7 +19,7 @@ import android.util.SparseIntArray;
 
 public class Playlist {
 	
-	private int MAX_SIZE = 20;
+	private static int MAX_SIZE = 20;
 
 	private Context mContext;
 	
@@ -37,14 +37,14 @@ public class Playlist {
 	private int amountValue = 20;
 
 	public Playlist(Context context, int length) {
-		this(context);
+		this.mContext = context;
 		this.populatePlaylist(length);
+		sharedPreferences = PreferenceManager
+				.getDefaultSharedPreferences(context);
 	}
 	
 	public Playlist(Context context) {
-		this.mContext = context;
-		sharedPreferences = PreferenceManager
-				.getDefaultSharedPreferences(context);
+		this(context, MAX_SIZE);
 	}
 
 	public void getPlaylistCursor(CursorAdapter adapter) {
@@ -55,6 +55,14 @@ public class Playlist {
 	 */
 	public CopyOnWriteArrayList<FeedItem> getPlaylist() {
 		return mPlaylist;
+	}
+	
+	/**
+	 * 
+	 * @return the size of the playlist
+	 */
+	public int size() {
+		return mPlaylist.size();
 	}
 	
 	/**
