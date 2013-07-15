@@ -252,8 +252,7 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 
 			@Override
 			public void onRefresh(PullToRefreshBase<ListView> refreshView) {
-				PodcastDownloadManager.start_update(getActivity(),
-						pullToRefreshView, subscription);
+				PodcastDownloadManager.start_update(getActivity(), subscription);
 			}
 		};
 

@@ -119,45 +119,23 @@ public class PodcastDownloadManager {
 	}
 
 	public static void start_update(final Context context) {
-		start_update(context, null, null);
+		start_update(context, null);
 	}
 
 	public static void start_update(final Context context,
-			final PullToRefreshListView pullToRefreshView) {
-		start_update(context, pullToRefreshView, null);
-	}
-
-	public static void start_update(final Context context,
-			final PullToRefreshListView pullToRefreshView,
 			Subscription subscription) {
 		if (updateConnectStatus(context) == NO_CONNECT)
 			return;
 		
 		mContext = context;
 
-		/*
-		 * // log.debug("start_update()"); if (mUpdateLock.locked() == false)
-		 * return;
-		 */
-
-		/*
-		 * Replaced by Volley new UpdateSubscriptions(context,
-		 * pullToRefreshView, subscription) .execute();
-		 */
-		if (pullToRefreshView != null)
-			pullToRefreshView.onRefreshComplete();
-
 		// FIXME
 		// Perhaps we should do this in the background in the future
 		RequestManager.initIfNeeded(context);
 		RequestQueue requestQueue = RequestManager.getRequestQueue();
-		final JSONFeedParserWrapper feedParser = new JSONFeedParserWrapper(
-				context);
 
 		Cursor subscriptionCursor = Subscription.allAsCursor(context
 				.getContentResolver());
-
-		//MyResponseListener responseListener = new MyResponseListener(feedParser);
 
 		while (subscriptionCursor.moveToNext()) {
 
@@ -165,20 +143,6 @@ public class PodcastDownloadManager {
 
 			if (subscription == null || sub.equals(subscription)) {
 
-				/*
-				 * URL url; try { url = new
-				 * URL("http://feeds.gpodder.net/parse?url=" + sub.getUrl());
-				 * new JacksonURLParser(feedParser).execute(url); } catch
-				 * (MalformedURLException e) { // TODO Auto-generated catch
-				 * block e.printStackTrace(); }
-				 */
-
-				// Create a json request intended to fetching json data
-				/*
-				 * JsonArrayRequest jr = new JsonArrayRequest(
-				 * "http://feeds.gpodder.net/parse?url=" + sub.getUrl(), new
-				 * MyResponseListener(feedParser), createGetFailureListener());
-				 */
 				StringRequest jr = new StringRequest(sub.getUrl(), new MyStringResponseListener(context.getContentResolver(), sub), createGetFailureListener());
 
 				int MY_SOCKET_TIMEOUT_MS = 300000;

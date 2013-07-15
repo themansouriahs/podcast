@@ -98,27 +98,6 @@ public class PodcastService extends IntentService {
 		PodcastDownloadManager.startDownload(getBaseContext());
 	}
 
-	@Deprecated
-	public static void start_update(Context context, PullToRefreshListView pullToRefreshView) {
-		PodcastDownloadManager.start_update(context, pullToRefreshView);
-		//PodcastUpdateReceiver.updateNow(context);
-	}
-
-	@Deprecated
-	public static void start_update(Context context) {
-		PodcastDownloadManager.start_update(context);
-	}
-	
-	@Deprecated
-	public void start_update() {
-		PodcastUpdateReceiver.updateNow(this);
-	}
-	
-	@Deprecated
-	public void start_update(PullToRefreshListView pullToRefreshView) {
-		PodcastDownloadManager.start_update(getBaseContext(), pullToRefreshView);
-	}
-
 	public void updateSetting() {
 		SharedPreferences pref = getSharedPreferences(
 				SettingsActivity.HAPI_PREFS_FILE_NAME, Context.MODE_PRIVATE);
