@@ -491,7 +491,7 @@ public class MainActivity extends FragmentActivity implements
 				mCursor.close();
 		}
 
-		PodcastService.setAlarm(this);
+		PodcastService.setupAlarm(this);
 
 	}
 

@@ -112,11 +112,11 @@ public class PodcastService extends IntentService {
 	public static PendingIntent getAlarmIntent(Context context) {
 		Intent i = new Intent(context, PodcastService.class);
 
-		/* Not used at the moment
-		Bundle bundle = new Bundle();
-		bundle.putLong("intervalMinutes", alarmInterval(intervalMinutes));
-		i.putExtra("schedule", bundle);
-		*/
+		/*
+		 * Not used at the moment Bundle bundle = new Bundle();
+		 * bundle.putLong("intervalMinutes", alarmInterval(intervalMinutes));
+		 * i.putExtra("schedule", bundle);
+		 */
 
 		return PendingIntent.getService(context, 0, i, 0);
 	}
@@ -151,7 +151,8 @@ public class PodcastService extends IntentService {
 		// by my own convention, minutes <= 0 means notifications are disabled
 		if (nextAlarmMinutes > 0) {
 			am.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-					nextAlarm(nextAlarmMinutes), alarmInterval(intervalMinutes), pi);
+					nextAlarm(nextAlarmMinutes),
+					alarmInterval(intervalMinutes), pi);
 		}
 	}
 
@@ -161,6 +162,36 @@ public class PodcastService extends IntentService {
 
 	public static long alarmInterval(long minutes) {
 		return Long.valueOf(minutes * 60 * 1000); // minutes to milliseconds
+	}
+
+	public void updateSetting() {
+		SharedPreferences pref = getSharedPreferences(
+				SettingsActivity.HAPI_PREFS_FILE_NAME, Context.MODE_PRIVATE);
+
+		boolean b = pref.getBoolean("pref_download_only_wifi", false);
+		pref_connection_sel = b ? WIFI_CONNECT
+				: (WIFI_CONNECT | MOBILE_CONNECT);
+
+		pref_update_wifi = Integer.parseInt(pref.getString("pref_update_wifi",
+				"60"));
+		pref_update_wifi *= ONE_MINUTE;
+
+		pref_update_mobile = Integer.parseInt(pref.getString(
+				"pref_update_mobile", "120"));
+		pref_update_mobile *= ONE_MINUTE;
+
+		pref_item_expire = Integer.parseInt(pref.getString("pref_item_expire",
+				"7"));
+		pref_item_expire *= ONE_DAY;
+		pref_download_file_expire = Integer.parseInt(pref.getString(
+				"pref_download_file_expire", "7"));
+		pref_download_file_expire *= ONE_DAY;
+		pref_played_file_expire = Integer.parseInt(pref.getString(
+				"pref_played_file_expire", "24"));
+		pref_played_file_expire *= ONE_HOUR;
+
+		pref_max_valid_size = Integer.parseInt(pref.getString(
+				"pref_max_new_items", "10"));
 	}
 
 	/**
