@@ -211,19 +211,19 @@ public class MainActivity extends FragmentActivity implements
 
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-		if (debugging) {
-			ViewServer.get(this).addWindow(this);
+		if (ApplicationConfiguration.TRACE_STARTUP) {
+			//ViewServer.get(this).addWindow(this);
 			// Tracing is buggy on emulator
-			// Debug.startMethodTracing("calc");
+			Debug.startMethodTracing("calc");
 
-			if (true) {
-				try {
-					SqliteCopy.backupDatabase();
-				} catch (IOException e) { // TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+		}
+		
+		if (ApplicationConfiguration.COPY_DATABASE) {
+			try {
+				SqliteCopy.backupDatabase();
+			} catch (IOException e) { // TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-
 		}
 
 		if (prefs.getBoolean(SettingsActivity.CLOUD_SUPPORT, true)) {
@@ -457,7 +457,7 @@ public class MainActivity extends FragmentActivity implements
 	@Override
 	protected void onPause() {
 		super.onPause();
-		if (debugging)
+		if (ApplicationConfiguration.TRACE_STARTUP)
 			Debug.stopMethodTracing();
 	}
 

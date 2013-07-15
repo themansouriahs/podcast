@@ -212,9 +212,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 					holder.mainTitle.setText(title);
 				}
 
-				if (item.sub_title != null) {
-					// Html.fromHtml(item.content).toString()
-					
+				if (item.sub_title != null) {	
 					holder.subTitle.setText(item.content);
 					//String plainText = Jsoup.parse(item.content).text();
 					//holder.subTitle.setText(plainText);
