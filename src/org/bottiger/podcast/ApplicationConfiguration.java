@@ -10,7 +10,7 @@ public class ApplicationConfiguration {
 	/** Copy the database to the SD card */
 	public static final boolean COPY_DATABASE = false; 
 	
-	public static final boolean USE_ACRA = false;
+	public static final boolean USE_ACRA = true;
 	
 	public static final boolean USE_PICASSO = true;
 	public static final boolean COLOR_BACKGROUND = false;

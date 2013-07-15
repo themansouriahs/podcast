@@ -10,6 +10,7 @@ import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.service.PodcastDownloadManager;
 import org.bottiger.podcast.utils.PodcastLog;
 import org.bottiger.podcast.utils.StrUtils;
 
@@ -270,6 +271,7 @@ public abstract class PodcastBaseFragment extends FixedListFragment implements
 			@Override
 			protected Void doInBackground(Void... params) {
 				try {
+					PodcastDownloadManager.start_update(getActivity());
 					Thread.sleep(4000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
