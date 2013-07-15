@@ -478,13 +478,6 @@ public class MainActivity extends FragmentActivity implements
 	@Override
 	public void onRefreshPlaylist() {
 		mSectionsPagerAdapter.refreshData(SectionsPagerAdapter.PLAYLIST);
-		/*
-		 * RecentItemFragment fragment =
-		 * (RecentItemFragment)mSectionsPagerAdapter
-		 * .getItem(SectionsPagerAdapter.PLAYLIST); CursorAdapter adapter =
-		 * fragment.getAdapter(); if (adapter != null)
-		 * adapter.notifyDataSetChanged();
-		 */
 	}
 
 	@Override

@@ -37,10 +37,10 @@ public class Playlist {
 	private int amountValue = 20;
 
 	public Playlist(Context context, int length) {
-		this.mContext = context;
-		this.populatePlaylist(length);
 		sharedPreferences = PreferenceManager
 				.getDefaultSharedPreferences(context);
+		this.mContext = context;
+		this.populatePlaylist(length);
 	}
 	
 	public Playlist(Context context) {

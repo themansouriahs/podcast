@@ -22,7 +22,7 @@ public class AutoStart extends BroadcastReceiver
             // Thankfully, Android will supply a valid Context as the first parameter
             
         	
-        	PodcastService.setAlarm(context);
+        	PodcastService.setupAlarm(context);
         }
     }
 }

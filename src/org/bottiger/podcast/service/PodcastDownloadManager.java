@@ -233,6 +233,7 @@ public class PodcastDownloadManager {
 		SharedPreferences sharedPreferences = PreferenceManager
 				.getDefaultSharedPreferences(context);
 
+		// Make sure we have access to external storage
 		if (SDCardManager.getSDCardStatusAndCreate() == false) {
 			return;
 		}
@@ -245,6 +246,7 @@ public class PodcastDownloadManager {
 				.getSystemService(Context.DOWNLOAD_SERVICE);
 		
 		Playlist playlist = new Playlist(context);
+		
 		int max = playlist.size() > 5 ? 5 : playlist.size();
 		for (int i = 0; i < max; i++) {
 			FeedItem item = playlist.getItem(i);

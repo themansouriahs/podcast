@@ -1,7 +1,12 @@
 Changelog
 =========
 
-Version 0.23
+Version 0.26
+------------
+
+* Less frequent refresh when not plugged in
+
+Version 0.24
 ------------
 
 * Faster image loading
