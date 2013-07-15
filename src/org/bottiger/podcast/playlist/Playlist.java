@@ -15,12 +15,15 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.CursorAdapter;
+import android.util.SparseIntArray;
 
 public class Playlist {
 	
 	private int MAX_SIZE = 20;
 
 	private Context mContext;
+	
+	private static SparseIntArray reorder = new SparseIntArray();
 
 	private static CopyOnWriteArrayList<FeedItem> mPlaylist =  new CopyOnWriteArrayList<FeedItem>();
 	private SharedPreferences sharedPreferences;
@@ -104,6 +107,37 @@ public class Playlist {
 		if (mPlaylist.size() > 1)
 			return mPlaylist.get(1);
 		return null;
+	}
+	
+	/**
+	 * 
+	 * @param from, old position in the playlist
+	 * @param to, the new position in the playlist
+	 */
+	public void move(int to, int from) {
+		if (from > to)
+			for (int position = from; position > to; position--)
+				reorder.put(position, position - 1);
+		else
+			// shift up
+			for (int position = from; position < to; position++)
+				reorder.put(position, position + 1);
+		reorder.put(to, from);
+	}
+	
+	/**
+	 * 
+	 * @return The mapping of the new positions
+	 */
+	public SparseIntArray getReordering() {
+		return reorder;
+	}
+	
+	/**
+	 * Reser the order of the playlsit
+	 */
+	public void resetOrder() {
+		reorder.clear();
 	}
 
 	/**

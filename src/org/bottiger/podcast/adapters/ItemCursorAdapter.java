@@ -122,7 +122,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter {
 		}
 
 		mCurrentFeedItem = FeedItem.getByCursor(itemCursor);
-
+		String tttitle = mCurrentFeedItem.getTitle();
 		if (convertView == null) {
 			listViewItem = newView(mContext, itemCursor, parent);
 		} else {

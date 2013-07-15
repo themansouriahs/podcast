@@ -402,6 +402,7 @@ public abstract class PodcastBaseFragment extends FixedListFragment implements
 		return ((MainActivity) getActivity()).getPullToRefreshAttacher();
 	}
 
+	public abstract CursorAdapter getAdapter();
 	public abstract CursorAdapter getAdapter(Cursor cursor);
 
 	@Deprecated

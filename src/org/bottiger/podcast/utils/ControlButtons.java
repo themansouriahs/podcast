@@ -32,7 +32,7 @@ public class ControlButtons {
 	private static boolean mFromTouch;
 
 	private static TextView mCurrentTime;
-	
+
 	private static ThemeHelper themeHelper;
 
 	public static RecentItemFragment fragment = null;
@@ -50,30 +50,32 @@ public class ControlButtons {
 		public TextView filesize;
 		public SeekBar seekbar;
 	}
-	
+
 	public static void setThemeHelper(Context context) {
 		themeHelper = new ThemeHelper(context);
 	}
 
 	public static void setListener(
 			final PodcastService podcastServiceConnection,
-			final InlinePlayer viewHolder, final PodcastBaseFragment fragment, final FeedItem item) {
+			final InlinePlayer viewHolder, final PodcastBaseFragment fragment,
+			final FeedItem item) {
 
 		final ToggleButton playPauseButton = viewHolder.playPauseButton;
-		//final ImageView playImage = viewHolder.image; FIXME
+		// final ImageView playImage = viewHolder.image; FIXME
 		final ContentResolver resolver = fragment.getActivity()
 				.getContentResolver();
 		final ThemeHelper themeHelper = new ThemeHelper(fragment.getActivity());
-		
+
 		playPauseButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				Debug.startMethodTracing("playpause");
 				long start = System.nanoTime();
-				playPause(item, fragment, viewHolder, themeHelper, playPauseButton);
+				playPause(item, fragment, viewHolder, themeHelper,
+						playPauseButton);
 				long end = System.nanoTime();
-				long diff = end-start;
-				long diff2 = diff*2;
+				long diff = end - start;
+				long diff2 = diff * 2;
 				Debug.stopMethodTracing();
 				diff2 = diff2 - diff;
 			}
@@ -103,10 +105,10 @@ public class ControlButtons {
 							// Delete file
 							item.delFile(resolver);
 							/*
-							viewHolder.downloadButton
-									.setBackgroundResource(themeHelper
-											.getAttr(R.attr.download_icon));
-											*/
+							 * viewHolder.downloadButton
+							 * .setBackgroundResource(themeHelper
+							 * .getAttr(R.attr.download_icon));
+							 */
 
 							viewHolder.downloadButton
 									.setImageResource(themeHelper
@@ -121,12 +123,14 @@ public class ControlButtons {
 									item, fragment.getActivity());
 							// podcastServiceConnection.downloadItem(fragment
 							// .getActivity().getContentResolver(), item);
-							/*viewHolder.downloadButton
-									.setBackgroundResource(themeHelper
-											.getAttr(R.attr.delete_icon));*/
+							/*
+							 * viewHolder.downloadButton
+							 * .setBackgroundResource(themeHelper
+							 * .getAttr(R.attr.delete_icon));
+							 */
 							viewHolder.downloadButton
-							.setImageResource(themeHelper
-									.getAttr(R.attr.delete_icon));
+									.setImageResource(themeHelper
+											.getAttr(R.attr.delete_icon));
 							viewHolder.downloadButton
 									.setContentDescription("Trash");
 						}
@@ -146,10 +150,11 @@ public class ControlButtons {
 		viewHolder.seekbar.setOnSeekBarChangeListener(listener);
 		viewHolder.seekbar.setMax(MAX_SEEKBAR_VALUE);
 	}
-	
-	public static void setPlayerListeners(InlinePlayer holder, PodcastBaseFragment fragment, FeedItem episode) {
-		ControlButtons.setListener(MainActivity.mPodcastServiceBinder,
-				holder, fragment, episode);
+
+	public static void setPlayerListeners(InlinePlayer holder,
+			PodcastBaseFragment fragment, FeedItem episode) {
+		ControlButtons.setListener(MainActivity.mPodcastServiceBinder, holder,
+				fragment, episode);
 	}
 
 	@Deprecated
@@ -175,12 +180,12 @@ public class ControlButtons {
 				.findViewById(R.id.current_position);
 		viewHolder.duration = (TextView) listView.findViewById(R.id.duration);
 		viewHolder.filesize = (TextView) listView.findViewById(R.id.filesize);
-		//viewHolder.image = (ImageView) listView.findViewById(R.id.list_image);
+		// viewHolder.image = (ImageView)
+		// listView.findViewById(R.id.list_image);
 
 		ControlButtons.setListener(MainActivity.mPodcastServiceBinder,
 				viewHolder, fragment, item);
 	}
-	
 
 	private static class OnPlayerSeekBarChangeListener implements
 			OnSeekBarChangeListener {
@@ -242,14 +247,15 @@ public class ControlButtons {
 			} catch (Exception ex) {
 			}
 			// log.debug("mFromTouch = false; ");
-			
+
 			RecentItemFragment.setUpdateProgressbar(true);
 
 		}
 
 	}
-	
-	public static void playPauseToggle(FeedItem episode, PodcastBaseFragment fragment, ToggleButton button) {
+
+	public static void playPauseToggle(FeedItem episode,
+			PodcastBaseFragment fragment, ToggleButton button) {
 		assert themeHelper != null;
 		PlayerService ps = PodcastBaseFragment.mPlayerServiceBinder;
 		boolean isPlaying = false;
@@ -260,29 +266,49 @@ public class ControlButtons {
 				isPlaying = true;
 				ps.play(episode.id);
 				RecentItemFragment.queueNextRefresh();
-				
+
 				if (fragment != null) {
-					//fragment.refreshView();
+					// fragment.refreshView();
 					Playlist playlist = new Playlist(fragment.getActivity());
 					int episodePos = playlist.getPosition(episode);
-					ReorderCursor cursor = fragment.getCursor(); 
-					cursor.drop(episodePos, 0);
+					if (episodePos > 0) {
+						playlist.move(episodePos, 0);
+						//playlist.move(0, episodePos);
+						
+						CursorAdapter adapter = fragment.getAdapter(); 
+						ReorderCursor cursor = (ReorderCursor) adapter.getCursor();
+						
+						ReorderCursor newCursor = new ReorderCursor(fragment.getActivity(), adapter,
+								cursor, playlist.getReordering());
+						
+						
+						cursor.reorderCursor(episodePos, 0);
+						//adapter.notifyDataSetChanged();
+						//cursor.drop(episodePos, 0);
+						
+						
+						//adapter.swapCursor(newCursor);
+							
+						fragment.getListView().setSelection(0);
+					}
 				}
-			}			
+			}
 		}
 		button.setChecked(isPlaying);
 	}
-	
-	private static void playPause(FeedItem episode, PodcastBaseFragment fragment, InlinePlayer viewHolder, ThemeHelper themeHelper, ToggleButton playPauseButton) {
+
+	private static void playPause(FeedItem episode,
+			PodcastBaseFragment fragment, InlinePlayer viewHolder,
+			ThemeHelper themeHelper, ToggleButton playPauseButton) {
 		if (viewHolder.seekbar != null)
 			fragment.setProgressBar(viewHolder.seekbar);
-		
+
 		if (viewHolder.currentTime != null)
 			fragment.setCurrentTime(viewHolder.currentTime);
 
 		if (viewHolder.duration != null)
 			fragment.setDuration(viewHolder.duration);
-		
+
 		playPauseToggle(episode, fragment, playPauseButton);
 	}
 

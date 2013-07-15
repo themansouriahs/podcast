@@ -19,6 +19,11 @@ public abstract class GenericCursorLoader {
 	final Fragment mFragment;
 	
 	public abstract void cursorPostProsessing(ReorderCursor cursoer);
+	
+	public ReorderCursor getReorderCursor(Cursor cursor) {
+		return new ReorderCursor(mFragment.getActivity(), mAdapter,
+				cursor);
+	}
 
 	public GenericCursorLoader(Fragment fragment, CursorAdapter adapter) {
 		this.mFragment = fragment;
@@ -64,8 +69,7 @@ public abstract class GenericCursorLoader {
 			// https://github.com/bauerca/drag-sort-listview/issues/20
 			// final ReorderCursor wrapped_cursor = new ReorderCursor(cursor,
 			// PodcastBaseFragment.this);
-			final ReorderCursor wrapped_cursor = new ReorderCursor(mFragment.getActivity(), mAdapter,
-					cursor);
+			final ReorderCursor wrapped_cursor = getReorderCursor(cursor);
 
 			// mAdapter = getAdapter(wrapped_cursor);
 			mAdapter.changeCursor(wrapped_cursor);

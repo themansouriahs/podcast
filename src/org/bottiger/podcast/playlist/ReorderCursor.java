@@ -34,6 +34,13 @@ public class ReorderCursor extends CursorWrapper implements
 		mAdapter = adapter;
 		_remapping = new SparseIntArray();
 	}
+	
+	public ReorderCursor(Context context, CursorAdapter adapter, Cursor cursor, SparseIntArray order) {
+		super(cursor);
+		mContext = context;
+		mAdapter = adapter;
+		_remapping = order;
+	}
 
 	/**
 	 * This is the one being used as of 13 June 2013
@@ -42,23 +49,18 @@ public class ReorderCursor extends CursorWrapper implements
 	public void drop(final int from, final int to) {
 		// Update remapping
 
-		final int remapped_from = getRemappedPosition(from);
-		if (from > to)
-			for (int position = from; position > to; position--)
-				_remapping.put(position, getRemappedPosition(position - 1));
-		else
-			// shift up
-			for (int position = from; position < to; position++)
-				_remapping.put(position, getRemappedPosition(position + 1));
-		_remapping.put(to, remapped_from);
+		reorderCursor(from, to);
 
+		/*
 		FeedItem.clearCache();
 
+		
+		final Context c = mContext;
+		*/
 		final CursorAdapter adapter = (mAdapter != null) ? mAdapter
 				: mBaseFragment.getAdapter(this);
-		final Context c = mContext;
 		
-		asyncDatabaseUpdate(c, adapter, from , to);
+		//asyncDatabaseUpdate(c, adapter, from , to);
 
 		adapter.notifyDataSetChanged();
 
@@ -69,10 +71,23 @@ public class ReorderCursor extends CursorWrapper implements
 		int newPos = getRemappedPosition(position);
 		return super.moveToPosition(newPos);
 	}
+	
+	public void reorderCursor(final int from, final int to) {
+		final int remapped_from = getRemappedPosition(from);
+		if (from > to)
+			for (int position = from; position > to; position--)
+				_remapping.put(position, getRemappedPosition(position - 1));
+		else
+			// shift up
+			for (int position = from; position < to; position++)
+				_remapping.put(position, getRemappedPosition(position + 1));
+		_remapping.put(to, remapped_from);
+	}
 
 	private int getRemappedPosition(int position) {
 		return _remapping.get(position, position);
 	}
+	
 
 	private void asyncDatabaseUpdate(final Context context,
 			final CursorAdapter adapter, final int from, final int to) {
