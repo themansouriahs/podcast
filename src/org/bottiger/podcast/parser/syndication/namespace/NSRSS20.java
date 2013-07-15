@@ -5,6 +5,7 @@ import org.bottiger.podcast.parser.syndication.handler.HandlerState;
 import org.bottiger.podcast.parser.syndication.util.SyndDateUtils;
 import org.bottiger.podcast.parser.syndication.util.SyndTypeUtils;
 import org.bottiger.podcast.provider.FeedItem;
+import org.jsoup.Jsoup;
 import org.xml.sax.Attributes;
 
 import android.util.Log;
@@ -129,7 +130,8 @@ public class NSRSS20 extends Namespace {
 				if (second.equals(CHANNEL)) {
 					state.getFeed().setDescription(content);
 				} else if (second.equals(ITEM)) {
-					state.getCurrentItem().setDescription(content);
+					String description = Jsoup.parse(content).text(); // FIXME make sure this is correct
+					state.getCurrentItem().setDescription(description);
 				}
 
 			} else if (localName.equals(LANGUAGE)) {

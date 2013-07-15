@@ -5,6 +5,7 @@ Version 0.23
 ------------
 
 * Faster image loading
+* Somewhat more smooth playlist ordering
 
 Version 0.22
 ------------
