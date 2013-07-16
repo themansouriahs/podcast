@@ -16,6 +16,11 @@
 
 <resources>
     
+     <string-array name="drawer_menu">
+        <item>Downloading items</item>
+        <item>Something else</item>
+    </string-array>
+    
     <string-array name="entries_update">
         <item>30 minutes</item>
         <item>1 hour</item>

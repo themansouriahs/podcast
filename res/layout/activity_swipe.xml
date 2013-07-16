@@ -37,6 +37,9 @@
 
     <!-- style="?android:attr/solidBackground" -->
 
+<include layout="@layout/drawer_left" />
+
+<!-- 
     <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/left_drawer"
@@ -81,5 +84,5 @@
             android:layout_height="wrap_content"
             android:text="Switch" />
     </LinearLayout>
-
+ -->
 </android.support.v4.widget.DrawerLayout>

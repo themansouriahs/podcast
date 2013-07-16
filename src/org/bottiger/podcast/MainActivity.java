@@ -79,12 +79,11 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 
 // Sliding
-public class MainActivity extends FragmentActivity implements
+public class MainActivity extends DrawerActivity implements
 		OnItemSelectedListener, OnPlaylistRefreshListener {
 
 	private static final String ACCOUNT_KEY = "account";
 
-	public static final boolean SHOW_DRAWER = false;
 	public static final boolean SHOW_PULL_TO_REFRESH = true;
 	public static final boolean READER_SUPPORT = false;
 
@@ -171,16 +170,7 @@ public class MainActivity extends FragmentActivity implements
 		}
 	};
 
-	private String[] mPlanetTitles;
-	private LinearLayout mDrawerList;
-
 	private HeadsetReceiver receiver;
-
-	/** Navigation Drawer */
-	private DrawerLayout mDrawerLayout;
-	private ActionBarDrawerToggle mDrawerToggle;
-	private CharSequence mDrawerTitle;
-	private CharSequence mTitle;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -194,8 +184,6 @@ public class MainActivity extends FragmentActivity implements
 		//PodcastOpenHelper helper = new PodcastOpenHelper(this);
 		//helper.getWritableDatabase().execSQL("update subscriptions set status = " + Subscription.STATUS_SUBSCRIBED);
 
-		setContentView(R.layout.activity_swipe);
-
 		mFragmentManager = getSupportFragmentManager(); // getSupportFragmentManager();
 
 		if (debugging)
@@ -205,7 +193,6 @@ public class MainActivity extends FragmentActivity implements
 		mSectionsPagerAdapter = new SectionsPagerAdapter(mFragmentManager);
 
 		mViewPager = (ViewPager) findViewById(R.id.pager);
-		// View pager2 = (ViewPager) findViewById(R.id.drawer_layout);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
 		mViewPager.setOffscreenPageLimit(3);
 
@@ -305,69 +292,6 @@ public class MainActivity extends FragmentActivity implements
 		 */
 
 		// PodcastUpdateManager.setUpdate(this);
-
-		// set the Behind View
-		if (SHOW_DRAWER) {
-			mTitle = mDrawerTitle = getTitle();
-			mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-			mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-					R.drawable.ic_drawer, R.string.drawer_open,
-					R.string.drawer_close) {
-
-				/**
-				 * Called when a drawer has settled in a completely closed
-				 * state.
-				 */
-				public void onDrawerClosed(View view) {
-					getActionBar().setTitle(mTitle);
-					invalidateOptionsMenu(); // creates call to
-												// onPrepareOptionsMenu()
-				}
-
-				/** Called when a drawer has settled in a completely open state. */
-				public void onDrawerOpened(View drawerView) {
-					getActionBar().setTitle(mDrawerTitle);
-					invalidateOptionsMenu(); // creates call to
-												// onPrepareOptionsMenu()
-				}
-			};
-
-			// Set the drawer toggle as the DrawerListener
-			mDrawerLayout.setDrawerListener(mDrawerToggle);
-
-			mPlanetTitles = getResources().getStringArray(
-					R.array.entries_item_expire);
-			mDrawerList = (LinearLayout) findViewById(R.id.left_drawer);
-
-			mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-			mDrawerToggle = new ActionBarDrawerToggle(this, /* host Activity */
-			mDrawerLayout, /* DrawerLayout object */
-			R.drawable.ic_drawer, /* nav drawer icon to replace 'Up' caret */
-			R.string.drawer_open, /* "open drawer" description */
-			R.string.drawer_close /* "close drawer" description */
-			) {
-
-				/**
-				 * Called when a drawer has settled in a completely closed
-				 * state.
-				 */
-				public void onDrawerClosed(View view) {
-					getActionBar().setTitle(mTitle);
-				}
-
-				/** Called when a drawer has settled in a completely open state. */
-				public void onDrawerOpened(View drawerView) {
-					getActionBar().setTitle(mDrawerTitle);
-				}
-			};
-
-			// Set the drawer toggle as the DrawerListener
-			mDrawerLayout.setDrawerListener(mDrawerToggle);
-
-			getActionBar().setDisplayHomeAsUpEnabled(true);
-			getActionBar().setHomeButtonEnabled(true);
-
-		}
 
 		// Set up the ViewPager with the sections adapter.
 		mViewPager.setAdapter(mSectionsPagerAdapter);
