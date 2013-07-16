@@ -7,6 +7,7 @@ import org.bottiger.podcast.adapters.DrawerAdapter;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -19,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
@@ -57,13 +59,16 @@ import android.widget.ListView;
  */
 public abstract class DrawerActivity extends FragmentActivity {
 	private DrawerLayout mDrawerLayout;
-	private ListView mDrawerList;
+	private ExpandableListView mDrawerList;
 	private LinearLayout mDrawerContainer;
 	private ActionBarDrawerToggle mDrawerToggle;
 
 	private CharSequence mDrawerTitle;
 	private CharSequence mTitle;
 	private String[] mListItems;
+	
+	private ArrayList<String> parentItems = new ArrayList<String>();
+	private ArrayList<Object> childItems = new ArrayList<Object>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -74,10 +79,20 @@ public abstract class DrawerActivity extends FragmentActivity {
 		mListItems = getResources().getStringArray(R.array.drawer_menu);
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerContainer = (LinearLayout) findViewById(R.id.drawer_container);
-		mDrawerList = (ListView) findViewById(R.id.drawer_list_view);
+		mDrawerList = (ExpandableListView) findViewById(R.id.drawer_list_view);
 		
-		ArrayAdapter arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, mListItems);
-		mDrawerList.setAdapter(arrayAdapter);
+		mDrawerList.setDividerHeight(2);
+		mDrawerList.setGroupIndicator(null);
+		mDrawerList.setClickable(true);
+		
+		setGroupParents();
+		setChildData();
+		
+		DrawerAdapter adapter = new DrawerAdapter(parentItems, childItems);
+		adapter.setInflater((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE), this);
+		
+		//ArrayAdapter arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, mListItems);
+		mDrawerList.setAdapter(adapter);
 		mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 		
 		// enable ActionBar app icon to behave as action to toggle nav drawer
@@ -246,6 +261,47 @@ public abstract class DrawerActivity extends FragmentActivity {
 			*/
 			return null;
 		}
+	}
+	
+	public void setGroupParents() {
+		parentItems.add("Android");
+		parentItems.add("Core Java");
+		parentItems.add("Desktop Java");
+		parentItems.add("Enterprise Java");
+	}
+
+	public void setChildData() {
+
+		// Android
+		ArrayList<String> child = new ArrayList<String>();
+		child.add("Core");
+		child.add("Games");
+		childItems.add(child);
+
+		// Core Java
+		child = new ArrayList<String>();
+		child.add("Apache");
+		child.add("Applet");
+		child.add("AspectJ");
+		child.add("Beans");
+		child.add("Crypto");
+		childItems.add(child);
+
+		// Desktop Java
+		child = new ArrayList<String>();
+		child.add("Accessibility");
+		child.add("AWT");
+		child.add("ImageIO");
+		child.add("Print");
+		childItems.add(child);
+
+		// Enterprise Java
+		child = new ArrayList<String>();
+		child.add("EJB3");
+		child.add("GWT");
+		child.add("Hibernate");
+		child.add("JSP");
+		childItems.add(child);
 	}
 	
 	
