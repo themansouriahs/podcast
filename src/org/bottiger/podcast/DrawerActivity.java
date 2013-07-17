@@ -124,9 +124,11 @@ public abstract class DrawerActivity extends FragmentActivity {
 		};
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
 
+		/*
 		if (savedInstanceState == null) {
 			selectItem(0);
 		}
+		*/
 	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
