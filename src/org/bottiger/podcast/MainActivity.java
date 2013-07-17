@@ -79,7 +79,7 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 
 // Sliding
-public class MainActivity extends DrawerActivity implements
+public class MainActivity extends FragmentContainerActivity implements
 		OnItemSelectedListener, OnPlaylistRefreshListener {
 
 	private static final String ACCOUNT_KEY = "account";
