@@ -6,8 +6,4 @@
     android:layout_marginLeft="5dp"
     android:gravity="center_vertical"
     android:padding="10dp"
-    android:textColor="#000000"
-    android:textSize="15sp"
-    android:textStyle="bold" 
-    android:background="#CCFF99"
     />

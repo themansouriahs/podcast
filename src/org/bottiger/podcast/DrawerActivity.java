@@ -1,6 +1,7 @@
 package org.bottiger.podcast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 
 import org.bottiger.podcast.adapters.DrawerAdapter;
@@ -85,7 +86,8 @@ public abstract class DrawerActivity extends FragmentActivity {
 		mDrawerList.setGroupIndicator(null);
 		mDrawerList.setClickable(true);
 		
-		setGroupParents();
+		parentItems = new ArrayList<String>(Arrays.asList(mListItems));
+		//setGroupParents();
 		setChildData();
 		
 		DrawerAdapter adapter = new DrawerAdapter(parentItems, childItems);
