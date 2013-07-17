@@ -24,6 +24,7 @@ import org.bottiger.podcast.parser.syndication.handler.UnsupportedFeedtypeExcept
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
+import org.bottiger.podcast.provider.QueueEpisode;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.receiver.DownloadManagerReceiver;
 import org.bottiger.podcast.utils.LockHandler;
@@ -70,7 +71,7 @@ public class PodcastDownloadManager {
 
 	private static long pref_update = 2 * 60 * ONE_MINUTE;
 
-	private static PriorityQueue<FeedItem> mDownloadQueue = new PriorityQueue<FeedItem>();
+	private static PriorityQueue<QueueEpisode> mDownloadQueue = new PriorityQueue<QueueEpisode>();
 
 	private static FeedItem mDownloadingItem = null;
 	private static HashSet<Long> mDownloadingIDs = new HashSet<Long>();
@@ -257,11 +258,12 @@ public class PodcastDownloadManager {
 		for (int i = 0; i < max; i++) {
 			FeedItem item = playlist.getItem(i);
 			if (item != null && !item.isDownloaded())
-				mDownloadQueue.add(item);
+				mDownloadQueue.add(new QueueEpisode(item));
 		}
 
 		if (getDownloadingItem() == null && mDownloadQueue.size() > 0) {
-			FeedItem downloadingItem = getNextItem();
+			QueueEpisode nextInQueue = getNextItem();
+			FeedItem downloadingItem = FeedItem.getById(context.getContentResolver(), nextInQueue.getId());
 			Uri downloadURI = Uri.parse(downloadingItem.url);
 			DownloadManager.Request request = new DownloadManager.Request(
 					downloadURI);
@@ -493,7 +495,7 @@ public class PodcastDownloadManager {
 			mDownloadingItem = null;
 	}
 
-	private static FeedItem getNextItem() {
+	private static QueueEpisode getNextItem() {
 		return mDownloadQueue.poll();
 	}
 
@@ -510,7 +512,20 @@ public class PodcastDownloadManager {
 	 * @param feedItem
 	 */
 	public static void addItemToQueue(FeedItem item) {
-		mDownloadQueue.add(item);
+		mDownloadQueue.add(new QueueEpisode(item));
+	}
+	
+	/**
+	 * Replace item in the queue
+	 */
+	public static void replace(QueueEpisode episode) {
+		if (mDownloadQueue.remove(episode)) {
+			mDownloadQueue.add(episode);
+		}
+	}
+	
+	public static PriorityQueue<QueueEpisode> getQueue() {
+		return mDownloadQueue;
 	}
 
 	/**
@@ -552,7 +567,7 @@ public class PodcastDownloadManager {
 	 * @param context
 	 */
 	public static void addItemAndStartDownload(FeedItem item, Context context) {
-		mDownloadQueue.add(item);
+		mDownloadQueue.add(new QueueEpisode(item));
 		startDownload(context);
 	}
 

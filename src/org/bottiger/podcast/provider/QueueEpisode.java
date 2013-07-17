@@ -8,15 +8,25 @@ import java.util.Comparator;
  * @author Arvid Böttiger
  *
  */
-public class QueueEpisode implements Comparator<QueueEpisode> {
+public class QueueEpisode implements Comparable {
 
 	private String title;
 	private long episodeID;
 	private Integer queuePriority;
 
-	QueueEpisode(FeedItem episode) {
+	public QueueEpisode(FeedItem episode) {
 		title = episode.getTitle();
 		episodeID = episode.getId();
+		
+		int priority = episode.getPriority();
+		if (priority > 0)
+			queuePriority = priority;
+		else
+			queuePriority = (int) episodeID; 
+	}
+	
+	public long getId() {
+		return episodeID;
 	}
 	
 	public String getTitle() {
@@ -32,14 +42,41 @@ public class QueueEpisode implements Comparator<QueueEpisode> {
 	}
 
 	@Override
-	public int compare(QueueEpisode lhs, QueueEpisode rhs) {
-		if (lhs.getPriority() < rhs.getPriority())
-			return -1;
+	public int compareTo(Object other) {
+		Integer otherPriority = ((QueueEpisode)other).getPriority();
+	    if(this.getPriority() == otherPriority)
+	        return 0;
+	    else if (this.getPriority() < otherPriority)
+	        return 1;
+	    else 
+	        return -1;
+	}
+	
+	@Override
+	public String toString() {
+		return "QueueEpisode (" + String.valueOf(this.getPriority()) + "): " + this.getTitle();
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (episodeID ^ (episodeID >>> 32));
+		return result;
+	}
 
-		if (lhs.getPriority() > rhs.getPriority())
-			return 1;
-
-		return 0;
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		QueueEpisode other = (QueueEpisode) obj;
+		if (episodeID != other.episodeID)
+			return false;
+		return true;
 	}
 
 }
