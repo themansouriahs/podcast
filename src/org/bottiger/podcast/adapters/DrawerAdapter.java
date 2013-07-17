@@ -2,9 +2,9 @@ package org.bottiger.podcast.adapters;
 
 import java.util.ArrayList;
 
+import org.bottiger.podcast.DrawerActivity;
 import org.bottiger.podcast.R;
 
-import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -16,7 +16,7 @@ import android.widget.Toast;
 
 public class DrawerAdapter extends BaseExpandableListAdapter {
 
-	private Activity activity;
+	private DrawerActivity activity;
 	private ArrayList<Object> childtems;
 	private LayoutInflater inflater;
 	private ArrayList<String> parentItems, child;
@@ -26,7 +26,7 @@ public class DrawerAdapter extends BaseExpandableListAdapter {
 		this.childtems = childern;
 	}
 
-	public void setInflater(LayoutInflater inflater, Activity activity) {
+	public void setInflater(LayoutInflater inflater, DrawerActivity activity) {
 		this.inflater = inflater;
 		this.activity = activity;
 	}
@@ -58,7 +58,7 @@ public class DrawerAdapter extends BaseExpandableListAdapter {
 	}
 
 	@Override
-	public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
+	public View getGroupView(final int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
 
 		if (convertView == null) {
 			convertView = inflater.inflate(R.layout.drawer_row, null);
@@ -66,6 +66,16 @@ public class DrawerAdapter extends BaseExpandableListAdapter {
 
 		((CheckedTextView) convertView).setText(parentItems.get(groupPosition));
 		((CheckedTextView) convertView).setChecked(isExpanded);
+		
+		if (getChildrenCount(groupPosition) == 0) {
+			convertView.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View view) {
+					activity.selectItem(groupPosition);
+				}
+			});			
+		}
 
 		return convertView;
 	}
@@ -83,7 +93,10 @@ public class DrawerAdapter extends BaseExpandableListAdapter {
 
 	@Override
 	public int getChildrenCount(int groupPosition) {
-		return ((ArrayList<String>) childtems.get(groupPosition)).size();
+		if (childtems.size() > groupPosition)
+			return ((ArrayList<String>) childtems.get(groupPosition)).size();
+		else
+			return 0;
 	}
 
 	@Override

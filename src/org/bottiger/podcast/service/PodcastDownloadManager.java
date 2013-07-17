@@ -3,6 +3,7 @@ package org.bottiger.podcast.service;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
@@ -53,7 +54,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 public class PodcastDownloadManager {
-	
+
 	// Running processes
 	private static AtomicInteger processCounts = new AtomicInteger(0);
 	private static Context mContext = null;
@@ -108,7 +109,7 @@ public class PodcastDownloadManager {
 
 		return DownloadStatus.NOTHING;
 	}
-	
+
 	public static void queueNewItems(Context context, int numOfItems) {
 		Playlist playlist = new Playlist(context);
 		for (int i = 0; i < numOfItems; i++) {
@@ -126,7 +127,7 @@ public class PodcastDownloadManager {
 			Subscription subscription) {
 		if (updateConnectStatus(context) == NO_CONNECT)
 			return;
-		
+
 		mContext = context;
 
 		// FIXME
@@ -143,7 +144,10 @@ public class PodcastDownloadManager {
 
 			if (subscription == null || sub.equals(subscription)) {
 
-				StringRequest jr = new StringRequest(sub.getUrl(), new MyStringResponseListener(context.getContentResolver(), sub), createGetFailureListener());
+				StringRequest jr = new StringRequest(sub.getUrl(),
+						new MyStringResponseListener(context
+								.getContentResolver(), sub),
+						createGetFailureListener());
 
 				int MY_SOCKET_TIMEOUT_MS = 300000;
 				DefaultRetryPolicy retryPolicy = new DefaultRetryPolicy(
@@ -160,7 +164,7 @@ public class PodcastDownloadManager {
 		}
 		requestQueue.start();
 	}
-	
+
 	static class MyStringResponseListener implements Listener<String> {
 
 		static FeedHandler feedHandler = new FeedHandler();
@@ -168,16 +172,18 @@ public class PodcastDownloadManager {
 		ContentResolver contentResolver;
 		final JSONFeedParserWrapper feedParser = null;
 
-		public MyStringResponseListener(ContentResolver contentResolver, Subscription subscription) {
+		public MyStringResponseListener(ContentResolver contentResolver,
+				Subscription subscription) {
 			this.subscription = subscription;
 			this.contentResolver = contentResolver;
 		}
 
 		@Override
 		public void onResponse(String response) {
-			//volleyResultParser.execute(response);
+			// volleyResultParser.execute(response);
 			try {
-				feedHandler.parseFeed(contentResolver, subscription, response.replace("ï»¿", ""));
+				feedHandler.parseFeed(contentResolver, subscription,
+						response.replace("ï»¿", ""));
 			} catch (SAXException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -212,7 +218,7 @@ public class PodcastDownloadManager {
 			}
 		};
 	}
-	
+
 	private static void decrementProcessCount() {
 		PodcastDownloadManager.processCounts.decrementAndGet();
 		if (PodcastDownloadManager.processCounts.get() == 0) {
@@ -244,9 +250,9 @@ public class PodcastDownloadManager {
 
 		downloadManager = (DownloadManager) context
 				.getSystemService(Context.DOWNLOAD_SERVICE);
-		
+
 		Playlist playlist = new Playlist(context);
-		
+
 		int max = playlist.size() > 5 ? 5 : playlist.size();
 		for (int i = 0; i < max; i++) {
 			FeedItem item = playlist.getItem(i);

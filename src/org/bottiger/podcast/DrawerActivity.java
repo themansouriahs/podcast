@@ -59,14 +59,14 @@ import android.widget.ListView;
  * </p>
  */
 public abstract class DrawerActivity extends FragmentActivity {
-	private DrawerLayout mDrawerLayout;
-	private ExpandableListView mDrawerList;
-	private LinearLayout mDrawerContainer;
-	private ActionBarDrawerToggle mDrawerToggle;
-
+	protected DrawerLayout mDrawerLayout;
+	protected ExpandableListView mDrawerList;
+	protected LinearLayout mDrawerContainer;
+	protected ActionBarDrawerToggle mDrawerToggle;
+	protected String[] mListItems;
+	
 	private CharSequence mDrawerTitle;
 	private CharSequence mTitle;
-	private String[] mListItems;
 	
 	private ArrayList<String> parentItems = new ArrayList<String>();
 	private ArrayList<Object> childItems = new ArrayList<Object>();
@@ -190,6 +190,8 @@ public abstract class DrawerActivity extends FragmentActivity {
 		}
 	}
 
+	public abstract void selectItem(int position);
+	/*
 	private void selectItem(int position) {
 		// update the main content by replacing fragments
 		Fragment fragment = new PlanetFragment();
@@ -199,16 +201,17 @@ public abstract class DrawerActivity extends FragmentActivity {
 
 		FragmentManager fragmentManager = getFragmentManager();
 		
-		/*
-		fragmentManager.beginTransaction()
-				.replace(R.id.content_frame, fragment).commit();
-			*/	
+		
+		//fragmentManager.beginTransaction()
+		//		.replace(R.id.content_frame, fragment).commit();
+				
 
 		// update selected item and title, then close the drawer
 		mDrawerList.setItemChecked(position, true);
 		setTitle(mListItems[position]);
 		mDrawerLayout.closeDrawer(mDrawerContainer);
 	}
+	*/
 
 	@Override
 	public void setTitle(CharSequence title) {
@@ -282,6 +285,7 @@ public abstract class DrawerActivity extends FragmentActivity {
 		child.add("Games");
 		childItems.add(child);
 
+		/*
 		// Core Java
 		child = new ArrayList<String>();
 		child.add("Apache");
@@ -306,6 +310,7 @@ public abstract class DrawerActivity extends FragmentActivity {
 		child.add("Hibernate");
 		child.add("JSP");
 		childItems.add(child);
+		*/
 	}
 	
 	

@@ -1,10 +1,10 @@
 package org.bottiger.podcast;
 
-
 import org.bottiger.podcast.PodcastBaseFragment.OnItemSelectedListener;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.PodcastLog;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -18,15 +18,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
+import android.widget.EditText;
 import android.widget.TextView;
 
-public class FragmentContainerActivity extends DrawerActivity implements OnItemSelectedListener {
-	
+public class FragmentContainerActivity extends DrawerActivity implements
+		OnItemSelectedListener {
+
 	@Deprecated
 	public static final boolean debugging = ApplicationConfiguration.DEBUGGING;
-	
+
 	protected final PodcastLog log = PodcastLog.getDebugLog(getClass(), 0);
-	
+
 	/**
 	 * The {@link ViewPager} that will host the section contents.
 	 */
@@ -47,48 +49,63 @@ public class FragmentContainerActivity extends DrawerActivity implements OnItemS
 
 	private FragmentManager mFragmentManager;
 	private FragmentTransaction mFragmentTransition;
+	
+	private ViewStub mViewStub;
 
 	private FeedFragment mFeedFragment = null;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		/*
-		 * BugSenseHandler.initAndStartSession(MainActivity.this, ((SoundWaves)
-		 * this.getApplication()).getBugSenseAPIKey());
-		 */
-		// 3132
-		// PodcastOpenHelper helper = new PodcastOpenHelper(this);
-		// helper.getWritableDatabase().execSQL("update subscriptions set status = "
-		// + Subscription.STATUS_SUBSCRIBED);
-
+		
 		mFragmentManager = getSupportFragmentManager(); // getSupportFragmentManager();
 
-		if (debugging)
+		if (ApplicationConfiguration.DEBUGGING)
 			mFragmentManager.enableDebugLogging(true);
 
 		mFragmentTransition = mFragmentManager.beginTransaction();
-		mSectionsPagerAdapter = new SectionsPagerAdapter(mFragmentManager);
-		
-		ViewStub stub = (ViewStub) findViewById(R.id.app_content);
-	    View inflated = stub.inflate();
-		
-		mViewPager = (ViewPager) inflated; // (ViewPager) inflated.findViewById(R.id.pager);
-		mViewPager.setAdapter(mSectionsPagerAdapter);
-		mViewPager.setOffscreenPageLimit(3);
-		// Set up the ViewPager with the sections adapter.
-		mViewPager.setAdapter(mSectionsPagerAdapter);
 
+		mViewStub = (ViewStub) findViewById(R.id.app_content);
+
+		
+		createViewPager();
 	}
 	
+	public void selectItem(int position) {
+		//createDownloadFragment();
+		
+		
+		//mContainerFragmentVi	ew.setLayoutResource(R.layout.download_fragment);
+		// update selected item and title, then close the drawer
+		mDrawerList.setItemChecked(position, true);
+		setTitle(mListItems[position]);
+		mDrawerLayout.closeDrawer(mDrawerContainer);
+		
+	    Intent intent = new Intent(this, DownloadActivity.class);
+	    startActivity(intent);
+	}
+	
+	private void createDownloadFragment() {
+		DownloadFragment fragment = new DownloadFragment();
+		mFragmentManager.beginTransaction().replace(R.id.app_content, fragment).commit();
+	}
+	
+	private void createViewPager() {
+		View inflated = mViewStub.inflate();
+		mSectionsPagerAdapter = new SectionsPagerAdapter(mFragmentManager);
+		mViewPager = (ViewPager) inflated.findViewById(R.id.pager);
+		mViewPager.setAdapter(mSectionsPagerAdapter);
+		mViewPager.setOffscreenPageLimit(3);
+		mViewPager.setAdapter(mSectionsPagerAdapter);
+	}
+
 	@Override
 	public void onItemSelected(long id) {
 		SubscriptionFeedID = id;
 		mSectionsPagerAdapter.notifyDataSetChanged();
 		mViewPager.setCurrentItem(2);
 	}
-	
+
 	/*
 	 * Override BACK button
 	 */

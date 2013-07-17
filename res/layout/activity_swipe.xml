@@ -5,19 +5,20 @@
 >
 
      <ViewStub android:id="@+id/app_content"
-               android:inflatedId="@+id/subTree"
+               android:inflatedId="@+id/pager"
                android:layout="@layout/view_pager_main"
                android:layout_width="match_parent"
                android:layout_height="match_parent" />
+
 
     <!-- The navigation drawer -->
 
 
     <!-- style="?android:attr/solidBackground" -->
 
-<include layout="@layout/drawer_left" />
+    <include layout="@layout/drawer_left" />
 
-<!-- 
+    <!--
     <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/left_drawer"
@@ -62,5 +63,6 @@
             android:layout_height="wrap_content"
             android:text="Switch" />
     </LinearLayout>
- -->
+    -->
+
 </android.support.v4.widget.DrawerLayout>
