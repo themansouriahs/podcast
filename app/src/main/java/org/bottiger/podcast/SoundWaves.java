@@ -3,6 +3,8 @@ package org.bottiger.podcast;
 import android.app.Application;
 import android.content.Context;
 
+import org.acra.ACRA;
+import org.acra.annotation.ReportsCrashes;
 import org.bottiger.soundwaves.Soundwaves;
 
 // Acra debugging
@@ -12,6 +14,17 @@ import org.bottiger.soundwaves.Soundwaves;
 	      formUri = "http://www.backendofyourchoice.com/reportpath"
 	  )
 */
+//Acra debugging
+@ReportsCrashes(formKey = "", // This is required for backward compatibility but
+        // not used
+        formUri = "https://acra.bottiger.org/acra-soundwaves/_design/acra-storage/_update/report",
+        formUriBasicAuthLogin = "soundwaves", // optional
+        formUriBasicAuthPassword = "", // optional
+        disableSSLCertValidation = true,
+        httpMethod = org.acra.sender.HttpSender.Method.POST,
+        reportType = org.acra.sender.HttpSender.Type.JSON,
+        socketTimeout = 10000)
+
 public class SoundWaves extends Application {
 
     private static Context context;
@@ -37,7 +50,7 @@ public class SoundWaves extends Application {
         super.onCreate();
 
         // The following line triggers the initialization of ACRA
-        //ACRA.init(this);
+        ACRA.init(this);
 
         context = getApplicationContext();
     }
