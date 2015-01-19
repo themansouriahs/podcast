@@ -4,7 +4,9 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.transition.ChangeBounds;
 import android.transition.ChangeTransform;
@@ -110,6 +112,7 @@ public class TopPlayer extends RelativeLayout {
         init(context);
     }
 
+    @TargetApi(21)
     public TopPlayer(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         init(context);
@@ -128,7 +131,9 @@ public class TopPlayer extends RelativeLayout {
 
         mTransitionManager = new TransitionManager();
 
-        setClipToOutline(true);
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            setClipToOutline(true);
+        }
     }
 
 

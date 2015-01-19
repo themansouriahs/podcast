@@ -277,7 +277,10 @@ public class PlaylistFragment extends GeastureFragment implements
         Palette palette = PaletteCache.get(item.image);
         if (palette != null) {
             mPlayPauseButton.onPaletteFound(palette);
-
+            mBackButton.onPaletteFound(palette);
+            mDownloadButton.onPaletteFound(palette);
+            mQueueButton.onPaletteFound(palette);
+            mFavoriteButton.onPaletteFound(palette);
         }
 
         BackgroundTransformation mImageTransformation = null;

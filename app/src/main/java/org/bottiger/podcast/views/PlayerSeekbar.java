@@ -1,6 +1,7 @@
 package org.bottiger.podcast.views;
 
 import android.animation.ObjectAnimator;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -161,6 +162,7 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
         init(context);
     }
 
+    @TargetApi(21)
     public PlayerSeekbar(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         init(context);

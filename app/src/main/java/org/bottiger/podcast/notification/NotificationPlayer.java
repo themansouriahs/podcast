@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.media.session.MediaController;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
@@ -65,6 +66,10 @@ public class NotificationPlayer {
 	}
 	
 	public Notification show(Boolean isPlaying) {
+        if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            return null;
+        }
+
 		// mId allows you to update the notification later on.
 
         mNotification = buildNotification(isPlaying, mPlayerService, mArtwork).build();

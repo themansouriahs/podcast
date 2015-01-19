@@ -1,5 +1,7 @@
 package org.bottiger.podcast.service;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -12,6 +14,7 @@ import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.utils.PodcastLog;
 
+import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.Service;
@@ -26,6 +29,7 @@ import android.media.session.MediaController;
 import android.media.session.MediaSession;
 import android.media.session.MediaSessionManager;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -122,7 +126,7 @@ public class PlayerService extends Service implements
 		}
 	};
 
-    // This doesn't work in L preview 2
+    @TargetApi(21)
     public MediaSession.Token getToken() {
         /*
         ComponentName componentName = new ComponentName(getPackageName(), NotificationListener.class.getName());
@@ -154,18 +158,21 @@ public class PlayerService extends Service implements
 		log.debug("onCreate(): " + mControllerComponentName);
 		this.mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
-        // from https://github.com/googlesamples/android-MediaBrowserService/blob/master/Application/src/main/java/com/example/android/mediabrowserservice/MusicService.java
-        // Start a new MediaSession
-        mMediaSession = new MediaSession(this, "MusicService");
-        //setSessionToken(mMediaSession.getSessionToken());
-        //mMediaSession.setCallback(new MediaSessionCallback());
-        mMediaSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS |
-                MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
 
-        mController = new MediaController(getApplicationContext(), getToken()); // .fromToken( mSession.getSessionToken() );
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // from https://github.com/googlesamples/android-MediaBrowserService/blob/master/Application/src/main/java/com/example/android/mediabrowserservice/MusicService.java
+            // Start a new MediaSession
+            mMediaSession = new MediaSession(this, "MusicService");
+            //setSessionToken(mMediaSession.getSessionToken());
+            //mMediaSession.setCallback(new MediaSessionCallback());
+            mMediaSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS |
+                    MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
 
+            mController = new MediaController(getApplicationContext(), getToken()); // .fromToken( mSession.getSessionToken() );
+        }
 	}
 
+    @TargetApi(21)
     private void handleIntent( Intent intent ) {
         if( intent == null || intent.getAction() == null )
             return;
