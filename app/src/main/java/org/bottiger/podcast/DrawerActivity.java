@@ -124,11 +124,6 @@ public abstract class DrawerActivity extends ToolbarActivity {
 		mListItems = getResources().getStringArray(R.array.drawer_menu);
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerContainer = (LinearLayout) findViewById(R.id.drawer_container);
-		mDrawerList = (ExpandableListView) findViewById(R.id.drawer_list_view);
-
-		mDrawerList.setDividerHeight(2);
-		mDrawerList.setGroupIndicator(null);
-		mDrawerList.setClickable(true);
 
 		parentItems = new ArrayList<String>(Arrays.asList(mListItems));
 		// setGroupParents();
@@ -139,13 +134,6 @@ public abstract class DrawerActivity extends ToolbarActivity {
 				(LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE),
 				this);
 
-		// ArrayAdapter arrayAdapter = new ArrayAdapter(this,
-		// android.R.layout.simple_list_item_1, mListItems);
-		mDrawerList.setAdapter(adapter);
-		mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
-		
-		// Expand the first item (Playlist Filters) by default
-		mDrawerList.expandGroup(0);
 
         // enable ActionBar app icon to behave as action to toggle nav drawer
         //getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -222,7 +210,6 @@ public abstract class DrawerActivity extends ToolbarActivity {
 	}
 
 	public void selectItem(int position) {
-		mDrawerList.setItemChecked(position, true);
 		setTitle(mListItems[position]);
 		mDrawerLayout.closeDrawer(mDrawerContainer);
 
