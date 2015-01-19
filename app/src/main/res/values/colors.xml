@@ -5,6 +5,11 @@
     <color name="colorPrimaryDark">#DD330000</color>
     <color name="colorAccent">#ff3d00</color>
 
+    <color name="colorBgPrimary">#adadad</color>
+    <color name="colorBgSecondary">#797979</color>
+    <color name="colorBgPrimaryDark">#DD330000</color>
+    <color name="colorBgAccent">#ff3d00</color>
+
     <color name="translucent_actionbar_background">@color/colorPrimary</color>
 
     <color name="blue">#33b5e5</color>
