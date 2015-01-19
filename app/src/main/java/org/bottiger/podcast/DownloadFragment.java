@@ -9,11 +9,4 @@ public class DownloadFragment extends GeastureFragment {
     public void onRefresh() {
 
     }
-
-
-    @Override
-	View getPullView() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }

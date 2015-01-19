@@ -38,21 +38,10 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 
 	protected OnPlaylistRefreshListener mActivityCallback;
 
-	protected static HashMap<Integer, Integer> mIconMap;
-
-	protected long pref_order;
-	protected long pref_where;
-	protected long pref_select;
-
-	protected ListView actualListView = null;
-
 	private SharedPreferences prefs;
 
-	String showListenedKey = "sowListened";
+	String showListenedKey = "showListened";
 	Boolean showListenedVal = true;
-
-	protected static final String episodesToShowKey = "episodesToShow";
-	protected static final int episodesToShowVal = 20;
 
 	// Container Activity must implement this interface
 	// http://developer.android.com/training/basics/fragments/communicating.html
@@ -84,11 +73,6 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.episode_list, menu);
-
-
-        //Animation rotation = AnimationUtils.loadAnimation(getActivity(), R.anim.slide_in_top);
-        //rotation.setRepeatCount(Animation.INFINITE);
-        //.startAnimation(rotation);
 
 		super.onCreateOptionsMenu(menu, inflater);
 

@@ -64,7 +64,6 @@ public class PlaylistFragment extends GeastureFragment implements
     private GestureDetector.OnGestureListener mListener;
 
     private static final int DEFAULT_IMAGE_SIZE = 1080;
-    private int maxRecyclerViewOffset = -1;
 
     private static int CONTEXT_MENU = 0;
 	private static Fragment CONTEXT_FRAGMENT = null;
@@ -213,6 +212,7 @@ public class PlaylistFragment extends GeastureFragment implements
         // specify an adapter (see also next example)
         mAdapter = new ItemCursorAdapter(mActivity, this, mOverlay, mPlaylist, mCursor, mDownloadProgressObservable);
         mRecyclerView.setAdapter(mAdapter);
+
         RecentItemsRecyclerListener l = new RecentItemsRecyclerListener(mAdapter);
         mRecyclerView.setRecyclerListener(l);
 
@@ -233,8 +233,8 @@ public class PlaylistFragment extends GeastureFragment implements
 
     @Override
     public void onAttach(Activity activity) {
-        super.onAttach(activity);
         mActivity = activity;
+        super.onAttach(activity);
     }
 
     public void bindHeader(final FeedItem item) {
@@ -245,7 +245,6 @@ public class PlaylistFragment extends GeastureFragment implements
                 mHasPhoto = true;
                 recomputePhotoAndScrollingMetrics();
                 int h =mPhotoContainer.getHeight();
-                maxRecyclerViewOffset = h;
                 mPhotoContainer.getLayoutParams().height = (h); // +actionBarSize
                 mPhotoContainer.requestLayout();
                 mRecyclerView.scrollToPosition(0);
@@ -327,8 +326,6 @@ public class PlaylistFragment extends GeastureFragment implements
             lp.height = mPhotoHeightPixels;
             mPhotoContainer.setLayoutParams(lp);
         }
-
-        //onScrolled(0, 0); // trigger scroll handling
     }
 
 	@Override
@@ -377,15 +374,6 @@ public class PlaylistFragment extends GeastureFragment implements
 		AdapterView.AdapterContextMenuInfo cmi = (AdapterView.AdapterContextMenuInfo) item
 				.getMenuInfo();
         return true;
-	}
-
-    private int getMaxPlayerSize() {
-        return DEFAULT_IMAGE_SIZE;
-    }
-
-	@Override
-	View getPullView() {
-		return getListView();
 	}
 
 	public static void setContextMenu(int menu, Fragment fragment) {

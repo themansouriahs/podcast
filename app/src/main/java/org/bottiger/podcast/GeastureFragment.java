@@ -51,7 +51,6 @@ public abstract class GeastureFragment extends AbstractEpisodeFragment implement
 
         mOverlay = fragmentView.findViewById(id.overlay_container);
         mOverlay = mOverlay.findViewById(id.playlist_overlay_layout);
-        //mOverlay = fragmentView.findViewById(id.playlist_overlay_layout);
         mOverlay.setVisibility(View.INVISIBLE);
 
         mSwipeRefreshView = view;
@@ -67,7 +66,6 @@ public abstract class GeastureFragment extends AbstractEpisodeFragment implement
 
 
         mRecyclerView = (FixedRecyclerView) fragmentView.findViewById(id.my_recycler_view);
-        //mRecyclerView.setItemAnimator(new SlideInOutBottomItemAnimator(mRecyclerView)); // doesn't really use this at the moment
 
         return mSwipeRefreshView;
     }
@@ -84,24 +82,6 @@ public abstract class GeastureFragment extends AbstractEpisodeFragment implement
             if (parentViewGroup != null) {
                 parentViewGroup.removeAllViews();
             }
-        }
-    }
-    
-    //@Override
-    public void onResume() {
-    	super.onResume();
-    }
-
-    //@Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        Bundle args = getArguments();
-        int headers = 0;
-        int footers = 0;
-        if (args != null) {
-            headers = args.getInt("headers", 0);
-            footers = args.getInt("footers", 0);
         }
     }
 }

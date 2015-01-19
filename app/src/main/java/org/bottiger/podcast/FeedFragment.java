@@ -200,16 +200,6 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
 	}
 
     @Override
-    protected int getItemLayout() {
-        return R.layout.episode_list;
-    }
-
-    @Override
-	View getPullView() {
-		return null;//getListView();
-	}
-
-    @Override
     public void onPaletteFound(Palette argChangedPalette) {
         setColors(argChangedPalette);
     }
@@ -234,8 +224,6 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
         if (mBackgroundTransformation == null) {
             mBackgroundTransformation = new BackgroundTransformation(mActivity, mContainer.getHeight());
         }
-
-        //mItemBackground.setImageResource(0);
 
         if (mSubscription != null) {
 
