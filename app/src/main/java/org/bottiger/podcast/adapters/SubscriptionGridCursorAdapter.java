@@ -83,6 +83,9 @@ public class SubscriptionGridCursorAdapter extends AbstractGridPodcastAdapter {
 			}
 
 		}
+
+        if (mObersever != null)
+            mObersever.listPopulated(cursor);
 	}
 
     public interface OnPopulateSubscriptionList {
