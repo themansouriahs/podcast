@@ -5,6 +5,7 @@ import java.util.TreeSet;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.bottiger.podcast.ApplicationConfiguration;
+import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.PodcastBaseFragment;
 import org.bottiger.podcast.R;
 
@@ -31,12 +32,14 @@ import android.animation.ValueAnimator;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationSet;
@@ -119,15 +122,38 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
         final FeedItem item = mPlaylist.getItem(position+PLAYLIST_OFFSET);
         boolean isPlaying = false;
 
+        /*
         playlistViewHolder2.mItemBackground.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 playlistViewHolder2.onClick(playlistViewHolder2.mLayout, playlistViewHolder2);
             }
+        });*/
+
+        playlistViewHolder2.mItemBackground.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN){
+                    Rect viewRect = new Rect();
+                    playlistViewHolder2.mPlayPauseButton.getHitRect(viewRect);
+                    if (viewRect.contains((int)event.getX(), (int)event.getY())) {
+                        playlistViewHolder2.mPlayPauseButton.onClick(null);
+                    } else {
+                        playlistViewHolder2.onClick(playlistViewHolder2.mLayout, playlistViewHolder2);
+                    }
+                    /*
+                    mMainTitle.setText("Touch coordinates : " +
+                            String.valueOf(event.getX()) + "x" + String.valueOf(event.getY()));*/
+                }
+                return true;
+            }
         });
 
 
         PaletteObservable.registerListener(playlistViewHolder2.mPlayPauseButton);
+
+        //((MainActivity)mContext).setOnTouchOutsideViewListener(playlistViewHolder2.mLayout, playlistViewHolder2.mPlayPauseButton);
+        //((MainActivity)mContext).setOnTouchOutsideViewListener((View) playlistViewHolder2.mPlayPauseButton);
 
         playlistViewHolder2.playerLinearLayout.setVisibility(View.GONE);
 
