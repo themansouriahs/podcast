@@ -198,13 +198,13 @@ public class Playlist {
 
 		String playingFirst = "";
 		if (playerService != null && playerService.getCurrentItem() != null) {
-			playingFirst = "case " + ItemColumns._ID + " when "
+			playingFirst = "case " + ItemColumns.TABLE_NAME + "." + ItemColumns._ID + " when "
 					+ playerService.getCurrentItem().getId()
 					+ " then 1 else 2 end, ";
 		}
-		String prioritiesSecond = "case " + ItemColumns.PRIORITY
-				+ " when 0 then 2 else 1 end, " + ItemColumns.PRIORITY + ", ";
-		String order = playingFirst + prioritiesSecond + ItemColumns.DATE + " "
+		String prioritiesSecond = "case " + ItemColumns.TABLE_NAME + "." + ItemColumns.PRIORITY
+				+ " when 0 then 2 else 1 end, " + ItemColumns.TABLE_NAME + "." + ItemColumns.PRIORITY + ", ";
+		String order = playingFirst + prioritiesSecond + ItemColumns.TABLE_NAME + "." + ItemColumns.DATE + " "
 				+ inputOrder + " LIMIT " + amount; // before:
 		return order;
 	}
