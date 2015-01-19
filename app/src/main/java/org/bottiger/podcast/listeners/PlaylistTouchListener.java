@@ -116,6 +116,7 @@ public class PlaylistTouchListener extends GestureDetector.SimpleOnGestureListen
         // distanceY < 0 => scroll down
 
         if (mTopPlayer.isMinimumSize() && distanceY > 0) {
+            mTopPlayer.bringToFront();
             mSwipeRefreshView.mDownGeastureInProgress = false;
             mSwipeRefreshView.setCurrentScrollState(SwipeRefreshExpandableLayout.ScrollState.MINIMAIL_PLAYER_AND_SCROLLED_LIST);
             return false;
@@ -164,13 +165,14 @@ public class PlaylistTouchListener extends GestureDetector.SimpleOnGestureListen
             usingLargeLayout = true;
         }
 
-        boolean isMinimumSize = mTopPlayer.isMinimumSize();
+        boolean isMinimumSize = mTopPlayer.isMinimumSize((int)newVisibleHeight);
 
         mSwipeRefreshView.setCanScrollRecyclerView(isMinimumSize);
         mRecyclerView.setCanScrollRecyclerView(isMinimumSize);
 
         if (isMinimumSize) {
             Log.d("TopPlayerIOut", "To the top!");
+            mTopPlayer.bringToFront();
             //mRecyclerView.scrollToPosition(0);
         }
 
