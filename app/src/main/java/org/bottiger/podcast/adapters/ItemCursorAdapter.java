@@ -57,7 +57,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
     private static final int PLAYLIST_OFFSET = 1;
 
     public static int mCollapsedHeight = -1;
-    private static int mExpandedHeight = 890;
+    private static int mExpandedHeight = -1; //890;
 
     private View mOverlay;
 
@@ -114,7 +114,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, final int position) {
-        Log.d("transformation", "pos: " + position);
+        Log.d("PlaylistViewHolderExpanderHelper", "pos: " + position);
         final PlaylistViewHolder playlistViewHolder2 = (PlaylistViewHolder)viewHolder;
         final FeedItem item = mPlaylist.getItem(position+PLAYLIST_OFFSET);
         boolean isPlaying = false;
@@ -131,7 +131,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
 
         playlistViewHolder2.playerLinearLayout.setVisibility(View.GONE);
 
-        int type = getItemViewType(position+PLAYLIST_OFFSET);
+        int type = getItemViewType(position);
         //type = TYPE_FIRST;
         boolean doExpand = type == TYPE_EXPAND; //  || position < 5
 
@@ -154,6 +154,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
                     }
                 }
             }
+
 
             if (doExpand) {
                 mExpanderHelper.expand(playlistViewHolder2, false, false);
@@ -406,9 +407,9 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
 
 	public void showItem(Long id) {
 		if (!mExpandedItemID.isEmpty())
-			mExpandedItemID.remove(mExpandedItemID.first()); // HACK: only show
-																// one expanded
-																// at the time
+			mExpandedItemID.remove(mExpandedItemID.first()); // only show
+														     // one expanded
+															 // at the time
 		mExpandedItemID.add(id);
 	}
 
@@ -425,11 +426,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
     // http://stackoverflow.com/questions/5300962/getviewtypecount-and-getitemviewtype-methods-of-arrayadapter
 	@Override
 	public int getItemViewType(int position) {
-        boolean isFirst = position == 0;
-        if (isFirst) {
-            return TYPE_FIRST;
-        }
-        Long id = itemID(position);
+        Long id = itemID(position+PLAYLIST_OFFSET); // The recyclervies does not start with item 1 in the playlist
 		boolean isExpanded = mExpandedItemID.contains(id);
 		return isExpanded ? TYPE_EXPAND : TYPE_COLLAPS;
 	}

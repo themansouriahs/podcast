@@ -41,9 +41,6 @@ public class PlayerLinearLayout extends LinearLayout {
         this.getLayoutParams().height = argHeight;
     }
 
-
-    public SeekBar mSeekbar = null;
-
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         String tag = "PlayerLinearLayout intercept";
@@ -52,18 +49,5 @@ public class PlayerLinearLayout extends LinearLayout {
         Log.d(tag, "------------");
         return false; //super.onInterceptTouchEvent(ev);
     }
-
-
-    /*
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        String tag = "PlayerLinearLayout touchevent";
-        Log.d(tag, "------------");
-        Log.d(tag, event.toString());
-        Log.d(tag, "------------");
-        //return super.onTouchEvent(event);
-        return true;
-    }
-    */
 
 }

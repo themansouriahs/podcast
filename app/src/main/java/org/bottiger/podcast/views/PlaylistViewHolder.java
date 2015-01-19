@@ -115,10 +115,13 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder { //  implements
 
         boolean doAnimate = true;
 
-        int newType = viewHolder.mAdapter.toggleItem(viewHolder.episode.getId());
+        //int newType = viewHolder.mAdapter.toggleItem(viewHolder.episode.getId());
+        int newType = type == ItemCursorAdapter.TYPE_EXPAND ? ItemCursorAdapter.TYPE_COLLAPS : ItemCursorAdapter.TYPE_EXPAND;
 
 
         PlaylistViewHolderExpanderHelper helper = viewHolder.mAdapter.getExpanderHelper();
+
+        helper.newAnimator();
         if (newType == ItemCursorAdapter.TYPE_EXPAND) {
             if (helper.expandedView != null) {
                 helper.collapse(helper.expandedView, doAnimate);
@@ -129,6 +132,8 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder { //  implements
             helper.collapse(viewHolder, doAnimate);
             viewHolder.setExpanded(false);
         }
+        helper.playAnimator();
+
         }
 
     public boolean isExpanded() {
