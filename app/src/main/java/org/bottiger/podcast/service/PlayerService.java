@@ -38,6 +38,8 @@ import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
+import javax.annotation.Nullable;
+
 /**
  * The service which handles the audio extended_player. This is responsible for playing
  * including controlling the playback. Play, pause, stop etc.
@@ -85,8 +87,8 @@ public class PlayerService extends Service implements
 
 
 	private NotificationManager mNotificationManager;
-	private NotificationPlayer mNotificationPlayer;
-    private MediaSessionManager mMediaSessionManager;
+    @Nullable private NotificationPlayer mNotificationPlayer;
+    @Nullable private MediaSessionManager mMediaSessionManager;
 
 	// AudioManager
 	private AudioManager mAudioManager;
@@ -148,8 +150,12 @@ public class PlayerService extends Service implements
 		
 		mPlayer = new MyPlayer();
 		mPlayer.setHandler(handler);
-        mMediaSessionManager = (MediaSessionManager) getSystemService(MEDIA_SESSION_SERVICE);
-		mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mMediaSessionManager = (MediaSessionManager) getSystemService(MEDIA_SESSION_SERVICE);
+            mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        }
+
 		TelephonyManager tmgr = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
 		tmgr.listen(mPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
 

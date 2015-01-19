@@ -61,6 +61,8 @@ public class PlaylistFragment extends GeastureFragment implements
 		OnSharedPreferenceChangeListener, Playlist.PlaylistChangeListener, DownloadCompleteCallback
          { // , SwipeRefreshLayout.OnRefreshListener // RecyclerView.OnScrollListener
 
+    private GestureDetector.OnGestureListener mListener;
+
     private static final int DEFAULT_IMAGE_SIZE = 1080;
     private int maxRecyclerViewOffset = -1;
 
@@ -328,19 +330,6 @@ public class PlaylistFragment extends GeastureFragment implements
 
         //onScrolled(0, 0); // trigger scroll handling
     }
-
-    public int playerHeight = getMaxPlayerSize();
-
-
-             /*
-    private GestureDetector.OnGestureListener mListener = new GestureDetector.SimpleOnGestureListener() {
-
-
-    };*/
-    private GestureDetector.OnGestureListener mListener;
-
-
-
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {

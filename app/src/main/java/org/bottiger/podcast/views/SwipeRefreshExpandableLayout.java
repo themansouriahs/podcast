@@ -145,7 +145,7 @@ public class SwipeRefreshExpandableLayout extends FeedRefreshLayout implements T
                 break;
         }
 
-        delegateToTopPlayer(event);
+        //delegateToTopPlayer(event);
 
         boolean TouchFromSuper = super.onTouchEvent(event);
 
@@ -169,11 +169,14 @@ public class SwipeRefreshExpandableLayout extends FeedRefreshLayout implements T
         //Log.d("Skipping motion", "setting event" + event.hashCode());
         mLastEvent = event.hashCode();
 
+        delegateToTopPlayer(event);
+
         switch (event.getAction())
         {
             case MotionEvent.ACTION_MOVE:
                 mDownGeastureInProgress = true;
-                return true;
+                //return true;
+                break;
         }
 
         /*

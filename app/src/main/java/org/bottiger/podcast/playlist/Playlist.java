@@ -6,6 +6,7 @@ import java.util.LinkedList;
 
 import org.bottiger.podcast.ApplicationConfiguration;
 import org.bottiger.podcast.PodcastBaseFragment;
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.provider.DatabaseHelper;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
@@ -13,6 +14,7 @@ import org.bottiger.podcast.provider.PodcastOpenHelper;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionColumns;
 import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.soundwaves.Soundwaves;
 
 import android.app.Activity;
 import android.content.Context;
@@ -358,12 +360,22 @@ public class Playlist {
         }
     }
 
-    public void notifyPlaylistRangeChanged(int argFrom, int argTo) {
+    public void notifyPlaylistRangeChanged(final int argFrom, final int argTo) {
         for (PlaylistChangeListener listener : mPlaylistChangeListeners) {
             if (listener == null) {
                 throw new IllegalStateException("Listener can ot be null");
             }
-            listener.notifyPlaylistRangeChanged(argFrom, argTo);
+            //listener.notifyPlaylistRangeChanged(argFrom, argTo);
+
+            final PlaylistChangeListener finalListener = listener;
+            if (mContext instanceof Activity) {
+                ((Activity)mContext).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        finalListener.notifyPlaylistRangeChanged(argFrom, argTo);
+                    }
+                });
+            }
         }
     }
 }

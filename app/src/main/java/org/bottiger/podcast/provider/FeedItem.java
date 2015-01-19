@@ -987,7 +987,7 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 	 */
 	public boolean isDownloaded() {
         try {
-            if (!this.isDownloaded)
+            if (this.isDownloaded!=null)
                 return this.isDownloaded;
         } catch (NullPointerException e) {
             e.printStackTrace();
