@@ -211,6 +211,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
                 }
 
 
+                /*
                 if (item.title != null) {
                     String title = item.title;
                     int priority = item.getPriority();
@@ -234,6 +235,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
 
                     playlistViewHolder2.mMainTitle.setText(title);
                 }
+                */
 
                 if (item.sub_title != null) {
 

@@ -1,11 +1,13 @@
 package org.bottiger.podcast.listeners;
 
+import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.widget.ImageView;
 
+import org.bottiger.podcast.adapters.decoration.DragSortRecycler;
 import org.bottiger.podcast.views.ExpandableLayoutManager;
 import org.bottiger.podcast.views.FixedRecyclerView;
 import org.bottiger.podcast.views.SwipeRefreshExpandableLayout;
@@ -14,7 +16,7 @@ import org.bottiger.podcast.views.TopPlayer;
 /**
  * Created by apl on 13-01-2015.
  */
-public class PlaylistTouchListener extends GestureDetector.SimpleOnGestureListener {
+public class PlaylistTouchListener extends GestureDetector.SimpleOnGestureListener implements DragSortRecycler.OnDragStateChangedListener {
 
     private SwipeRefreshExpandableLayout mSwipeRefreshView;
     private TopPlayer mTopPlayer;
@@ -50,6 +52,9 @@ public class PlaylistTouchListener extends GestureDetector.SimpleOnGestureListen
         if (e1==null || e2==null || mRecyclerView.getChildAt(0) == null) {
             return false;
         }
+
+        if (isDradding)
+            return false;
 
         Log.d("GeatureDetector", "onScroll: e1y -> " + e1.getY() + " e2y -> " + e2.getY() + " dy -> " + distanceY);
         mSwipeRefreshView.getOverScroller().startScroll((int)e2.getX(),
@@ -188,5 +193,17 @@ public class PlaylistTouchListener extends GestureDetector.SimpleOnGestureListen
 
         Log.d("TopPlayerInputkmRecyclerView", "mRecyclerView translation ->" + mRecyclerView.getTranslationY());
         return true;
+    }
+
+    private boolean isDradding = false;
+
+    @Override
+    public void onDragStart() {
+        isDradding = true;
+    }
+
+    @Override
+    public void onDragStop() {
+        isDradding = false;
     }
 }

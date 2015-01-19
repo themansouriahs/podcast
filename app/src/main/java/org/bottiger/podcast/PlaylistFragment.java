@@ -1,6 +1,8 @@
 package org.bottiger.podcast;
 
 import org.bottiger.podcast.adapters.ItemCursorAdapter;
+import org.bottiger.podcast.adapters.decoration.DragSortRecycler;
+import org.bottiger.podcast.adapters.decoration.InitialHeaderAdapter;
 import org.bottiger.podcast.images.PicassoWrapper;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.listeners.PaletteListener;
@@ -29,6 +31,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
@@ -55,13 +58,15 @@ import android.widget.RelativeLayout;
 import android.widget.Scroller;
 import android.widget.TextView;
 
+import com.eowise.recyclerview.stickyheaders.StickyHeadersBuilder;
+import com.eowise.recyclerview.stickyheaders.StickyHeadersItemDecoration;
 import com.squareup.picasso.Callback;
 
 public class PlaylistFragment extends GeastureFragment implements
 		OnSharedPreferenceChangeListener, Playlist.PlaylistChangeListener, DownloadCompleteCallback
          { // , SwipeRefreshLayout.OnRefreshListener // RecyclerView.OnScrollListener
 
-    private GestureDetector.OnGestureListener mListener;
+    private PlaylistTouchListener mListener;
 
     private static final int DEFAULT_IMAGE_SIZE = 1080;
 
@@ -211,6 +216,8 @@ public class PlaylistFragment extends GeastureFragment implements
 
         // specify an adapter (see also next example)
         mAdapter = new ItemCursorAdapter(mActivity, this, mOverlay, mPlaylist, mCursor, mDownloadProgressObservable);
+        mAdapter.setHasStableIds(true);
+
         mRecyclerView.setAdapter(mAdapter);
 
         RecentItemsRecyclerListener l = new RecentItemsRecyclerListener(mAdapter);
@@ -229,6 +236,40 @@ public class PlaylistFragment extends GeastureFragment implements
 
         mSwipeRefreshView.setGestureListener(mListener);
         mSwipeRefreshView.fragment = this;
+
+        //////
+        DragSortRecycler dragSortRecycler = new DragSortRecycler();
+        dragSortRecycler.setViewHandleId(R.id.drag_handle); //View you wish to use as the handle
+
+        dragSortRecycler.setOnDragStateChangedListener(mListener);
+        /*
+        dragSortRecycler.setOnItemMovedListener(new DragSortRecycler.OnItemMovedListener() {
+            @Override
+            public void onItemMoved(int from, int to) {
+                Log.d("ytfy", "onItemMoved " + from + " to " + to);
+            }
+        });*/
+
+        Resources resources = getResources();
+        int resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
+        dragSortRecycler.setNavigationHeight(resources.getDimensionPixelSize(resourceId));
+
+        mRecyclerView.addItemDecoration(dragSortRecycler);
+        mRecyclerView.addOnItemTouchListener(dragSortRecycler);
+        mRecyclerView.setOnScrollListener(dragSortRecycler.getScrollListener());
+        //////
+
+
+        // Build item decoration and add it to the RecyclerView
+        StickyHeadersItemDecoration decoration = new StickyHeadersBuilder()
+                .setAdapter(mAdapter)
+                .setRecyclerView(mRecyclerView)
+                .setStickyHeadersAdapter(
+                        new InitialHeaderAdapter(null), // Class that implements StickyHeadersAdapter
+                        true)     // Decoration position relative to a item
+                .build();
+
+        mRecyclerView.addItemDecoration(decoration);
     }
 
     @Override

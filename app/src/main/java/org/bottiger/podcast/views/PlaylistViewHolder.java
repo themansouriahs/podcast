@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.eowise.recyclerview.stickyheaders.StickyHeadersAdapter;
 import com.squareup.picasso.Callback;
 
 import org.bottiger.podcast.R;
@@ -75,7 +76,7 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder { //  implements
         mForward = (PlayerButtonView) view.findViewById(R.id.fast_forward);
         mBackward = (PlayerButtonView) view.findViewById(R.id.rewind);
         mItemBackground = (ImageView) view.findViewById(R.id.item_background);
-        mMainTitle = (TextView) view.findViewById(R.id.title);
+        //mMainTitle = (TextView) view.findViewById(R.id.title);
         mSubTitle = (TextView) view.findViewById(R.id.podcast);
         mTimeDuration = (TextView) view.findViewById(R.id.duration);
         mCurrentPosition = (TextView) view.getTag(R.id.current_position);

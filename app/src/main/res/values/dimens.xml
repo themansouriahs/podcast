@@ -51,6 +51,6 @@
 
     <dimen name="playpause_button_size_normal">50dp</dimen>
     <dimen name="playpause_button_size">100dp</dimen>
-    <dimen name="player_buttons_padding_left">74dp</dimen> <!-- around 2*playpause_button_size -->
+    <dimen name="player_buttons_padding_left">70dp</dimen> <!-- around 2*playpause_button_size -->
     
 </resources>
