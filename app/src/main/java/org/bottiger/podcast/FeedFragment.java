@@ -76,7 +76,7 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
 
         @Override
         public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-            //setBackgroundDrawable(new BitmapDrawable(bitmap));
+
             BitmapDrawable ob = new BitmapDrawable(mContainerBackground.getResources(),bitmap);
             mContainerBackground.setBackground(ob);
             String image = mSubscription.getImageURL();

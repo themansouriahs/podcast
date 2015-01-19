@@ -45,12 +45,19 @@ public class PaletteObservable {
             return;
         }
 
-        for (PaletteListener item : mListeners.keySet()) {
+        try {
 
-            if (item.getPaletteUrl().equals(argUrl)) {
+            for (PaletteListener item : mListeners.keySet()) {
 
-                item.onPaletteFound(argPalette);
+                if (item.getPaletteUrl().equals(argUrl)) {
+
+                    item.onPaletteFound(argPalette);
+                }
             }
+
+        } catch (NullPointerException npe) {
+
+            return; // FIXME
         }
     }
 }
