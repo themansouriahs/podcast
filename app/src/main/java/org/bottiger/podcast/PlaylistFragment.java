@@ -237,11 +237,25 @@ public class PlaylistFragment extends GeastureFragment implements
         mSwipeRefreshView.setGestureListener(mListener);
         mSwipeRefreshView.fragment = this;
 
+        // Build item decoration and add it to the RecyclerView
+        InitialHeaderAdapter initialHeaderAdapter = new InitialHeaderAdapter(mPlaylist);
+        StickyHeadersItemDecoration decoration = new StickyHeadersBuilder()
+                .setAdapter(mAdapter)
+                .setRecyclerView(mRecyclerView)
+                .setStickyHeadersAdapter(
+                        initialHeaderAdapter, // Class that implements StickyHeadersAdapter
+                        true)     // Decoration position relative to a item
+                .build();
+
+        mRecyclerView.addItemDecoration(decoration);
+
         //////
         DragSortRecycler dragSortRecycler = new DragSortRecycler();
         dragSortRecycler.setViewHandleId(R.id.drag_handle); //View you wish to use as the handle
 
         dragSortRecycler.setOnDragStateChangedListener(mListener);
+        dragSortRecycler.setOnDragStateChangedListener(initialHeaderAdapter);
+        dragSortRecycler.setOnDragStateChangedListener(mPlaylist);
 
         dragSortRecycler.setNavigationHeight(UIUtils.NavigationBarHeight(mActivity));
 
@@ -249,18 +263,6 @@ public class PlaylistFragment extends GeastureFragment implements
         mRecyclerView.addOnItemTouchListener(dragSortRecycler);
         mRecyclerView.setOnScrollListener(dragSortRecycler.getScrollListener());
         //////
-
-
-        // Build item decoration and add it to the RecyclerView
-        StickyHeadersItemDecoration decoration = new StickyHeadersBuilder()
-                .setAdapter(mAdapter)
-                .setRecyclerView(mRecyclerView)
-                .setStickyHeadersAdapter(
-                        new InitialHeaderAdapter(mPlaylist), // Class that implements StickyHeadersAdapter
-                        true)     // Decoration position relative to a item
-                .build();
-
-        mRecyclerView.addItemDecoration(decoration);
     }
 
     @Override

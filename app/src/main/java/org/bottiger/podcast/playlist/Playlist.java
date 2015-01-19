@@ -7,6 +7,8 @@ import java.util.LinkedList;
 import org.bottiger.podcast.ApplicationConfiguration;
 import org.bottiger.podcast.PodcastBaseFragment;
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.adapters.ItemCursorAdapter;
+import org.bottiger.podcast.adapters.decoration.DragSortRecycler;
 import org.bottiger.podcast.provider.DatabaseHelper;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
@@ -25,7 +27,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.CursorAdapter;
 
-public class Playlist {
+public class Playlist implements DragSortRecycler.OnDragStateChangedListener {
 
 	private static int MAX_SIZE = 20;
     private static Playlist activePlaylist = null;
@@ -173,9 +175,19 @@ public class Playlist {
 	public void move(int from, int to) {
         populatePlaylistIfEmpty();
 
-        FeedItem fromItem = mPlaylist.get(from);
-        mPlaylist.remove(from);
-        mPlaylist.add(to,fromItem);
+        FeedItem fromItem = mPlaylist.get(from+ItemCursorAdapter.PLAYLIST_OFFSET);
+        mPlaylist.remove(from+ItemCursorAdapter.PLAYLIST_OFFSET);
+        mPlaylist.add(to+ItemCursorAdapter.PLAYLIST_OFFSET,fromItem);
+
+        int min = from;
+        int max = to;
+
+        if (to < from) {
+            min = to;
+            max = from;
+        }
+
+        notifyPlaylistRangeChanged(min, max);
 
         FeedItem precedingItem = to == 0 ? null : mPlaylist.get(to-1);
         FeedItem movedItem = mPlaylist.get(from);
@@ -339,6 +351,18 @@ public class Playlist {
         } else {
             throw new IllegalStateException("New playlist is the same");
         }
+    }
+
+    private int dragStart = -1;
+    @Override
+    public void onDragStart(int position) {
+        dragStart = position;
+    }
+
+    @Override
+    public void onDragStop(int position) {
+        move(dragStart, position);
+        dragStart = -1;
     }
 
     public interface PlaylistChangeListener {

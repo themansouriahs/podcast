@@ -18,8 +18,11 @@ import java.util.List;
 /**
  * Created by apl on 19-01-2015.
  */
-public class InitialHeaderAdapter implements StickyHeadersAdapter<InitialHeaderAdapter.ViewHolder> {
+public class InitialHeaderAdapter implements StickyHeadersAdapter<InitialHeaderAdapter.ViewHolder>, DragSortRecycler.OnDragStateChangedListener {
+
     private Playlist mPlaylist;
+    private int mCurrentlyDragging = -1;
+
     public InitialHeaderAdapter(Playlist argPlaylist) {
         this.mPlaylist = argPlaylist;
     }
@@ -36,6 +39,11 @@ public class InitialHeaderAdapter implements StickyHeadersAdapter<InitialHeaderA
         //headerViewHolder.letter.setText("Bob");
 
         FeedItem item = mPlaylist.getItem(position);
+
+        headerViewHolder.letter.setVisibility(View.VISIBLE);
+        if (position == mCurrentlyDragging) {
+            headerViewHolder.letter.setVisibility(View.INVISIBLE);
+        }
 
         if (item.title != null) {
             String title = item.title;
@@ -66,6 +74,16 @@ public class InitialHeaderAdapter implements StickyHeadersAdapter<InitialHeaderA
     @Override
     public long getHeaderId(int position) {
         return position; //items.get(position).charAt(0);
+    }
+
+    @Override
+    public void onDragStart(int position) {
+        mCurrentlyDragging = position;
+    }
+
+    @Override
+    public void onDragStop(int position) {
+        mCurrentlyDragging = -1;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

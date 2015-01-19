@@ -34,6 +34,8 @@ import android.view.View;
 import android.support.annotation.Nullable;
 
 import java.lang.reflect.Modifier;
+import java.util.HashSet;
+import java.util.WeakHashMap;
 
 
 public class DragSortRecycler extends RecyclerView.ItemDecoration implements RecyclerView.OnItemTouchListener {
@@ -70,8 +72,8 @@ public class DragSortRecycler extends RecyclerView.ItemDecoration implements Rec
     OnItemMovedListener moveInterface;
 
     private boolean isDragging;
-    @Nullable
-    OnDragStateChangedListener dragStateChangedListener;
+
+    private WeakHashMap<OnDragStateChangedListener, Boolean> dragStateChangedListener = new WeakHashMap<>();
 
 
 
@@ -81,8 +83,8 @@ public class DragSortRecycler extends RecyclerView.ItemDecoration implements Rec
     }
 
     public interface OnDragStateChangedListener {
-        public void onDragStart();
-        public void onDragStop();
+        public void onDragStart(int position);
+        public void onDragStop(int position);
     }
 
     private void debugLog(String log)
@@ -279,6 +281,7 @@ public class DragSortRecycler extends RecyclerView.ItemDecoration implements Rec
                 return false;
 
             boolean dragging = false;
+            int itemPosition = rv.getChildPosition(itemView);
 
             if ((dragHandleWidth > 0 ) && (e.getX() < dragHandleWidth))
             {
@@ -328,7 +331,7 @@ public class DragSortRecycler extends RecyclerView.ItemDecoration implements Rec
             {
                 debugLog("Started Drag");
 
-                setIsDragging(true);
+                setIsDragging(true, itemPosition);
 
                 floatingItem = createFloatingBitmap(itemView);
 
@@ -348,18 +351,19 @@ public class DragSortRecycler extends RecyclerView.ItemDecoration implements Rec
     @Override
     public void onTouchEvent(RecyclerView rv, MotionEvent e) {
         debugLog("onTouchEvent");
+        int newPos = -1;
 
         if ((e.getAction() == MotionEvent.ACTION_UP) ||
                 (e.getAction() == MotionEvent.ACTION_CANCEL))
         {
             if ((e.getAction() == MotionEvent.ACTION_UP) && selectedDragItemPos != -1)
             {
-                int newPos = getNewPostion(rv);
+                newPos = getNewPostion(rv);
                 if (moveInterface != null)
                     moveInterface.onItemMoved(selectedDragItemPos, newPos);
             }
 
-            setIsDragging(false);
+            setIsDragging(false, newPos);
             selectedDragItemPos = -1;
             floatingItem = null;
             rv.invalidateItemDecorations();
@@ -401,21 +405,21 @@ public class DragSortRecycler extends RecyclerView.ItemDecoration implements Rec
         rv.invalidateItemDecorations();// Redraw
     }
 
-    private void setIsDragging(final boolean dragging) {
+    private void setIsDragging(final boolean dragging, final int argPosition) {
         if(dragging != isDragging) {
             isDragging = dragging;
-            if(dragStateChangedListener != null) {
+            for (OnDragStateChangedListener listener : dragStateChangedListener.keySet()) {
                 if (isDragging) {
-                    dragStateChangedListener.onDragStart();
+                    listener.onDragStart(argPosition);
                 } else {
-                    dragStateChangedListener.onDragStop();
+                    listener.onDragStop(argPosition);
                 }
             }
         }
     }
 
     public void setOnDragStateChangedListener(final OnDragStateChangedListener dragStateChangedListener) {
-        this.dragStateChangedListener = dragStateChangedListener;
+        this.dragStateChangedListener.put(dragStateChangedListener, true);
     }
 
 

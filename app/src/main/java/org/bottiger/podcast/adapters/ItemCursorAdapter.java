@@ -58,7 +58,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
 	public static final int TYPE_COLLAPS = 2;
 	private static final int TYPE_MAX_COUNT = 3;
 
-    private static final int PLAYLIST_OFFSET = 1;
+    public static final int PLAYLIST_OFFSET = 1;
 
     public static int mCollapsedHeight = -1;
     private static int mExpandedHeight = -1; //890;
@@ -209,33 +209,6 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
                     mDownloadManager = (DownloadManager) mContext
                             .getSystemService(Context.DOWNLOAD_SERVICE);
                 }
-
-
-                /*
-                if (item.title != null) {
-                    String title = item.title;
-                    int priority = item.getPriority();
-                    long lastUpdate = item.getLastUpdate();
-
-                    String preTitle = "";
-
-                    if (item.isListened() && ApplicationConfiguration.DEBUGGING) {
-                        preTitle = "L";
-                    }
-
-
-                    if (ApplicationConfiguration.DEBUGGING)
-                        preTitle = preTitle+ "p:" + priority + " t:" + lastUpdate;
-                    else
-                        preTitle = preTitle + String.valueOf(priority);
-
-                    if (priority > 0 || ApplicationConfiguration.DEBUGGING) {
-                        title = preTitle + " # " + title;
-                    }
-
-                    playlistViewHolder2.mMainTitle.setText(title);
-                }
-                */
 
                 if (item.sub_title != null) {
 

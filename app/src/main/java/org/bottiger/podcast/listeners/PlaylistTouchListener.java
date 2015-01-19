@@ -214,12 +214,12 @@ public class PlaylistTouchListener extends GestureDetector.SimpleOnGestureListen
     private boolean isDradding = false;
 
     @Override
-    public void onDragStart() {
+    public void onDragStart(int position) {
         isDradding = true;
     }
 
     @Override
-    public void onDragStop() {
+    public void onDragStop(int position) {
         isDradding = false;
     }
 }
