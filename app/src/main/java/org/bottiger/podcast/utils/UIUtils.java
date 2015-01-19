@@ -326,6 +326,19 @@ public class UIUtils {
         return dp;
     }
 
+    public static int NavigationBarHeight(Context context) {
+        Resources resources = context.getResources();
+        int orientation = resources.getConfiguration().orientation;
+
+        int id = resources.getIdentifier(
+                orientation == Configuration.ORIENTATION_PORTRAIT ? "navigation_bar_height" : "navigation_bar_height_landscape",
+                "dimen", "android");
+        if (id > 0) {
+            return resources.getDimensionPixelSize(id);
+        }
+        return 0;
+    }
+
 
 }
 

@@ -242,17 +242,8 @@ public class PlaylistFragment extends GeastureFragment implements
         dragSortRecycler.setViewHandleId(R.id.drag_handle); //View you wish to use as the handle
 
         dragSortRecycler.setOnDragStateChangedListener(mListener);
-        /*
-        dragSortRecycler.setOnItemMovedListener(new DragSortRecycler.OnItemMovedListener() {
-            @Override
-            public void onItemMoved(int from, int to) {
-                Log.d("ytfy", "onItemMoved " + from + " to " + to);
-            }
-        });*/
 
-        Resources resources = getResources();
-        int resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
-        dragSortRecycler.setNavigationHeight(resources.getDimensionPixelSize(resourceId));
+        dragSortRecycler.setNavigationHeight(UIUtils.NavigationBarHeight(mActivity));
 
         mRecyclerView.addItemDecoration(dragSortRecycler);
         mRecyclerView.addOnItemTouchListener(dragSortRecycler);
