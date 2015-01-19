@@ -17,6 +17,7 @@ import org.bottiger.podcast.adapters.ItemCursorAdapter;
 import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.utils.PaletteCache;
+import org.bottiger.podcast.views.utils.PlaylistViewHolderExpanderHelper;
 
 import java.util.HashMap;
 
@@ -111,23 +112,21 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder { //  implements
         int listPost = viewHolder.getPosition();
         int type = viewHolder.mAdapter.getItemViewType(listPost);
 
-        /*
-        if (type == ItemCursorAdapter.TYPE_FIRST) {
-            return;
-        }*/
 
         boolean doAnimate = true;
 
         int newType = viewHolder.mAdapter.toggleItem(viewHolder.episode.getId());
 
+
+        PlaylistViewHolderExpanderHelper helper = viewHolder.mAdapter.getExpanderHelper();
         if (newType == ItemCursorAdapter.TYPE_EXPAND) {
-            if (ItemCursorAdapter.expandedView != null) {
-                viewHolder.mAdapter.collapse(ItemCursorAdapter.expandedView, doAnimate);
+            if (helper.expandedView != null) {
+                helper.collapse(helper.expandedView, doAnimate);
             }
-            viewHolder.mAdapter.expand(viewHolder, doAnimate, true);
+            helper.expand(viewHolder, doAnimate, true);
             viewHolder.setExpanded(true);
         } else {
-            viewHolder.mAdapter.collapse(viewHolder, doAnimate);
+            helper.collapse(viewHolder, doAnimate);
             viewHolder.setExpanded(false);
         }
         }
