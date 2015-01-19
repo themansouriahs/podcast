@@ -157,7 +157,7 @@ public class PlaylistViewHolderExpanderHelper {
 
         caclButtonOffset(player);
         int c = viewHolder.mPlayPauseButton.getBottom()-viewHolder.mPlayPauseButton.getTop();
-        offset = imageStartHeight-c;
+        offset = imageStartHeight-c+player.getPaddingTop()/2;
 
 
         /*

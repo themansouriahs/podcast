@@ -7,13 +7,13 @@
     android:layout_gravity="bottom"
     android:layout_alignParentBottom="true"
     android:descendantFocusability="afterDescendants"
+    android:padding="@dimen/padding_medium"
     android:orientation="vertical">
     <!--     android:layout_below="@+id/main_player_container" -->
 
     <FrameLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:padding="@dimen/padding_medium">
+        android:layout_height="wrap_content">
 
         <!-- Colors the background-->
         <LinearLayout

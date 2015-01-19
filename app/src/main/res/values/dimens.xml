@@ -20,7 +20,7 @@
     <dimen name="header_bar_height">76dp</dimen>
 
     <dimen name="top_player_size_minimum">175dp</dimen>
-    <dimen name="top_player_size_medium">215dp</dimen>
+    <dimen name="top_player_size_medium">250dp</dimen>
     <dimen name="top_player_size_maximum">300dp</dimen>
 
     <dimen name="overlay_side_margin">40dp</dimen>
