@@ -152,5 +152,7 @@
     <string name="pref_stream_proxy">This may require some extra time buffering</string>
     <string name="episode_title">Episode title</string>
     <string name="episode_description">Episode description</string>
+    <string name="pref_continuously_playing">Continuously playing</string>
+    <string name="pref_continuously_playing_description">When an episode end, start the next one automatically</string>
 
 </resources>

@@ -54,10 +54,18 @@
         android:summary="@string/pref_notification_control_description"
         android:title="@string/pref_notification_control" />
 
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_continuously_playing"
+        android:summary="@string/pref_continuously_playing_description"
+        android:title="@string/pref_continuously_playing" />
+
+    <!--
     <org.bottiger.podcast.utils.TimePreference
         android:key="update_time"
         android:title="@string/pref_update_time_title"
         android:summary="@string/pref_update_time_description" />
+        -->
 
     <!--
         <ListPreference

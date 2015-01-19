@@ -435,7 +435,7 @@ public class PlayerService extends Service implements
 				}
 				break;
 			case TRACK_ENDED:
-				long repeat_mode = getPref();
+				boolean repeat_mode = getPref();
 
 				if (mItem != null) {
 
@@ -445,27 +445,11 @@ public class PlayerService extends Service implements
 						if (nextItemId == -1) {
 							dis_notifyStatus();
 							mPlayer.stop();
-						} else {
+						} else if (repeat_mode) {
 							playNext(nextItemId);
 						}
 						mUpdate = true;
 					}
-
-					// deprecated - I think
-					/*
-					 * if (repeat_mode == REPEAT_MODE_REPEAT_ONE) { long id =
-					 * mItem.id; mItem = null; play(id); } else if (repeat_mode
-					 * == REPEAT_MODE_REPEAT) { if (nextItemId == -1) { //
-					 * nextItemId = getFirst(); }
-					 * 
-					 * if (nextItemId > -1) play(nextItemId);
-					 * 
-					 * } else if (repeat_mode == REPEAT_MODE_NO_REPEAT) { if
-					 * (nextItemId > -1) play(nextItemId);
-					 * 
-					 * }
-					 */
-
 				}
 
 				break;
@@ -790,12 +774,12 @@ public class PlayerService extends Service implements
 		return null;
 	}
 
-	private long getPref() {
-		SharedPreferences pref = getSharedPreferences(
-				SettingsActivity.HAPI_PREFS_FILE_NAME, Context.MODE_PRIVATE);
-		return pref.getLong("pref_repeat", 0);
+	private boolean getPref() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
+        return prefs.getBoolean("pref_continuously_playing", false);
 
-	}
+
+    }
 
 	private final IBinder binder = new PlayerBinder();
 
