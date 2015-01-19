@@ -130,7 +130,7 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
 
     public void setImage(int argImage) {
         s_Icon = BitmapFactory.decodeResource(getResources(), argImage);
-        //this.setImage(s_Icon.);
+
         this.setImageBitmap(s_Icon);
         this.invalidate();
     }

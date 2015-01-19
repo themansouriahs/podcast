@@ -80,10 +80,11 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
             long timeMs = mEpisode.getDuration() * seekBar.getProgress()
                     / RANGE_MAX;
 
-            if (mEpisode == PodcastBaseFragment.mPlayerServiceBinder.getCurrentItem()) {
+            if (mEpisode.equals(PodcastBaseFragment.mPlayerServiceBinder.getCurrentItem())) {
                 PodcastBaseFragment.mPlayerServiceBinder.seek(timeMs);
             }
 
+            FixedRecyclerView.mSeekbarSeeking = false;
             invalidate();
         }
 
@@ -91,6 +92,8 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
         public void onStartTrackingTouch(SeekBar seekBar) {
             Log.d("PlayerSeekbar state", "onStartTrackingTouch");
             validateState();
+
+            FixedRecyclerView.mSeekbarSeeking = true;
 
             Log.d("mPaintSeekInfo", "onStartTracking mPaintSeekInfo => " + mPaintSeekInfo);
             mIsTouching = true;
@@ -190,6 +193,10 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
     public void setEpisode(FeedItem argEpisode) {
         mEpisode = argEpisode;
         mDurationMs = argEpisode.getDuration();
+
+        if (mEpisode.offset > 0) {
+            setProgress(mEpisode.offset);
+        }
     }
 
     public void setOverlay(View argLayout) {

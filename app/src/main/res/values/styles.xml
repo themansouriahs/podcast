@@ -109,8 +109,10 @@
     </style>
 
     <style name="PodcastImageSIze">
-        <item name="android:layout_width">50dip</item>
-        <item name="android:layout_height">50dip</item>
+        <item name="android:layout_width">@dimen/playpause_button_size_normal</item>
+        <item name="android:layout_height">@dimen/playpause_button_size_normal</item>
+        <item name="android:width">@dimen/playpause_button_size_normal</item>
+        <item name="android:height">@dimen/playpause_button_size_normal</item>
         <item name="android:padding">0dip</item>
     </style>
 

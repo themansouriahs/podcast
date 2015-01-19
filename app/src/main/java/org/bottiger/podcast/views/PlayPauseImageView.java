@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
+import android.support.annotation.NonNull;
 import android.support.v7.graphics.Palette;
 import android.util.AttributeSet;
 import android.view.View;
@@ -167,20 +168,6 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
         }
     }
 
-    /*
-    @Override
-    public void onPaletteFound(TINT argTint, int argColor) {
-        boolean updateView = false;
-        if (argTint == TINT.VIBRANT_LIGHT) {
-            setColor(argColor);
-            updateView = true;
-        }
-
-        if (updateView) {
-            invalidate();
-        }
-    }*/
-
     @Override
     public void onPaletteFound(Palette argChangedPalette) {
         setColor(PlayerButtonView.ButtonColor(argChangedPalette));
@@ -190,5 +177,26 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
     @Override
     public String getPaletteUrl() {
         return FeedItem.getById(getContext().getContentResolver(), mEpisodeId).getImageURL(getContext()); // FIXME
+    }
+
+    private static int smallSize = -1;
+    private static int largeSize = -1;
+
+    public static int getSmallSize(@NonNull Context argContext) {
+        if (smallSize > 0)
+            return smallSize;
+
+        smallSize = argContext.getResources().getDimensionPixelSize(R.dimen.playpause_button_size_normal);
+
+        return smallSize;
+    }
+
+    public static int getLargeSize(@NonNull Context argContext) {
+        if (largeSize > 0)
+            return largeSize;
+
+        largeSize = argContext.getResources().getDimensionPixelSize(R.dimen.playpause_button_size);
+
+        return largeSize;
     }
 }

@@ -18,11 +18,13 @@ import org.bottiger.podcast.utils.BackgroundTransformation;
 import org.bottiger.podcast.utils.PaletteCache;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.ThemeHelper;
+import org.bottiger.podcast.views.PlayPauseImageView;
 import org.bottiger.podcast.views.PlayerLinearLayout;
 import org.bottiger.podcast.views.PlaylistViewHolder;
 import org.bottiger.podcast.views.RelativeLayoutWithBackground;
 
 import android.animation.Animator;
+import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.DownloadManager;
@@ -36,6 +38,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationSet;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -309,6 +313,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
         holder.downloadButton.setEpisode(feedItem);
 
 
+
         mDownloadProgressObservable.registerObserver(holder.downloadButton);
 
         PaletteObservable.registerListener(holder.mPlayPauseButton);
@@ -446,8 +451,15 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
             viewHolder.mLayout.getLayoutParams().height = mExpandedHeight;//imageStartHeight-initialHeight;
             viewHolder.mItemBackground.getLayoutParams().height = mExpandedHeight;
 
+            /*
             viewHolder.mForward.setVisibility(View.VISIBLE);
             viewHolder.mBackward.setVisibility(View.VISIBLE);
+            */
+
+            viewHolder.mPlayPauseButton.getLayoutParams().height = PlayPauseImageView.getLargeSize(mContext);
+            viewHolder.mPlayPauseButton.getLayoutParams().width = PlayPauseImageView.getLargeSize(mContext);
+            viewHolder.mPlayPauseButton.setTranslationY(200);
+            Log.d("mExpandedHeight", "expand " + viewHolder.episode.getTitle() + " no animation");
 
             player.setVisibility(View.VISIBLE);
             player.measure(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -469,8 +481,14 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
             viewHolder.mBackward.setVisibility(View.INVISIBLE);
             viewHolder.mForward.setVisibility(View.INVISIBLE);
 
+            viewHolder.mPlayPauseButton.getLayoutParams().height = PlayPauseImageView.getSmallSize(mContext);
+            viewHolder.mPlayPauseButton.getLayoutParams().width = PlayPauseImageView.getSmallSize(mContext);
+
             player.setVisibility(View.GONE);
             viewHolder.mLayout.getLayoutParams().height = mCollapsedHeight;//imageStartHeight-initialHeight;
+
+            viewHolder.mPlayPauseButton.requestLayout();
+
         }
     }
 
@@ -490,15 +508,18 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
         player.requestLayout();
         player.setVisibility(View.VISIBLE);
 
+
+        /*
         viewHolder.mForward.setAlpha(0f);
         viewHolder.mBackward.setAlpha(0f);
         viewHolder.mForward.setVisibility(View.VISIBLE);
         viewHolder.mBackward.setVisibility(View.VISIBLE);
+        */
+
+
 
         final int targtetHeight = initialPlayerMeasuredHeight + imageStartHeight; // + initialMeasuredHeight; //player.getMeasuredHeight();
-        //extended_player.getLayoutParams().height = 0;
 
-        //layoutWithBackground.getLayoutParams().height = mExpandedHeight;
         layoutBackground.getLayoutParams().height = viewHolder.mMainContainer.getMeasuredHeight();
 
         final ItemCursorAdapter adapter = this;
@@ -519,8 +540,13 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
             public int getHeight() {return mHeight; }
         }
         final Incrementer inc = new Incrementer();
+        final Incrementer buttonInc = new Incrementer();
+        final Incrementer buttonTrans = new Incrementer();
 
         ObjectAnimator animator;
+        ObjectAnimator buttonAnimator;
+        ObjectAnimator buttonTransAnimator = ObjectAnimator.ofInt(buttonTrans, "height", 0, 200);
+
         if (minHeight > 0) {
             Log.d("mExpandedHeight", "expand goal => " + maxHeight);
             animator = ObjectAnimator.ofInt(inc, "height", minHeight, maxHeight); // targtetHeight
@@ -530,9 +556,34 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
             maxHeight = initialMeasuredHeight;
         }
         animator.setDuration(duration);
+        buttonTransAnimator.setDuration(duration);
+
 
         final RecyclerView.LayoutParams paramsT1 = (RecyclerView.LayoutParams)viewHolder.mLayout.getLayoutParams();
         final RelativeLayout.LayoutParams paramsT2 = (RelativeLayout.LayoutParams)viewHolder.mItemBackground.getLayoutParams();
+        final ViewGroup.LayoutParams paramsButton = viewHolder.mPlayPauseButton.getLayoutParams();
+
+        int smallButton = mContext.getResources().getDimensionPixelSize(R.dimen.playpause_button_size_normal);
+        int largeButton = mContext.getResources().getDimensionPixelSize(R.dimen.playpause_button_size);
+        //ValueAnimator wAnimator = ObjectAnimator.ofInt(viewHolder.mPlayPauseButton, "layout_width", smallButton, largeButton);
+        //ValueAnimator hAnimator = ObjectAnimator.ofInt(viewHolder.mPlayPauseButton, "layout_height", smallButton, largeButton);
+        buttonAnimator = ObjectAnimator.ofInt(buttonInc, "height", smallButton, largeButton);
+        buttonAnimator.setDuration(duration);
+
+        buttonAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                int height = buttonInc.getHeight();
+                paramsButton.height = height;
+                paramsButton.width = height;
+                //paramsButton.height = height/2;
+                //paramsButton.width = height/2;
+
+                Log.d("mExpandedHeight", "expand " + viewHolder.episode.getTitle() + " current height => " + height);
+                viewHolder.mPlayPauseButton.setLayoutParams(paramsButton);
+                viewHolder.mPlayPauseButton.setTranslationY(buttonTrans.getHeight());
+            }
+        });
 
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -540,16 +591,21 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
                 int height = inc.getHeight();
                 paramsT1.height = height;
                 paramsT2.height = height;
+                //paramsButton.height = height/2;
+                //paramsButton.width = height/2;
 
                 Log.d("mExpandedHeight", "current height => " + height);
+                //viewHolder.mPlayPauseButton.setLayoutParams(paramsButton);
+
                 viewHolder.mLayout.setLayoutParams(paramsT1);
                 viewHolder.mItemBackground.setLayoutParams(paramsT2);
-       }
+            }
         });
 
         animator.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animator) {
+                viewHolder.mPlayPauseButton.bringToFront();
             }
 
             @Override
@@ -568,7 +624,11 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
             }
         });
 
-        animator.start();
+        //animator.start();
+
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.playTogether(animator, buttonAnimator, buttonTransAnimator);
+        animatorSet.start();
 
         expandedView = viewHolder;
         expandedLayout = layoutWithBackground;
@@ -578,17 +638,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
     private static int minHeight = -1;
     private static int maxHeight = -1;
 
-    private static float dpFromPx(Context context, float px)
-    {
-        return px / context.getResources().getDisplayMetrics().density;
-    }
-
-    private static float pxFromDp(Context context, float dp)
-    {
-        return dp * context.getResources().getDisplayMetrics().density;
-    }
-
-    private static void collapse(final PlaylistViewHolder viewHolder) {
+    private void collapse(final PlaylistViewHolder viewHolder) {
         final PlayerLinearLayout player = viewHolder.playerLinearLayout;
         final RelativeLayoutWithBackground layoutWithBackground = viewHolder.mLayout;
         final RelativeLayout mainContainer = viewHolder.mMainContainer;
@@ -609,14 +659,43 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
             public int getHeight() {return mHeight; }
         }
         final Incrementer inc = new Incrementer();
+        final Incrementer buttonInc = new Incrementer();
+        final Incrementer buttonTransInc = new Incrementer();
 
         //ObjectAnimator animator = ObjectAnimator.ofInt(inc, "height", initialHeight, targerHeight);
+
+        ObjectAnimator buttonAnimator;
         ObjectAnimator animator = ObjectAnimator.ofInt(inc, "height", maxHeight, minHeight);
+        ObjectAnimator buttonTrans = ObjectAnimator.ofInt(buttonTransInc, "height", 200, 0);
         animator.setDuration(duration);
+        buttonTrans.setDuration(duration);
 
         final RecyclerView.LayoutParams paramsT1 = (RecyclerView.LayoutParams)viewHolder.mLayout.getLayoutParams();
         final RelativeLayout.LayoutParams paramsT2 = (RelativeLayout.LayoutParams)viewHolder.mItemBackground.getLayoutParams();
 
+        final ViewGroup.LayoutParams paramsButton = viewHolder.mPlayPauseButton.getLayoutParams();
+
+        int smallButton = mContext.getResources().getDimensionPixelSize(R.dimen.playpause_button_size_normal);
+        int largeButton = mContext.getResources().getDimensionPixelSize(R.dimen.playpause_button_size);
+        //ValueAnimator wAnimator = ObjectAnimator.ofInt(viewHolder.mPlayPauseButton, "layout_width", smallButton, largeButton);
+        //ValueAnimator hAnimator = ObjectAnimator.ofInt(viewHolder.mPlayPauseButton, "layout_height", smallButton, largeButton);
+        buttonAnimator = ObjectAnimator.ofInt(buttonInc, "height", largeButton,smallButton);
+        buttonAnimator.setDuration(duration);
+
+        buttonAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                int height = buttonInc.getHeight();
+                paramsButton.height = height;
+                paramsButton.width = height;
+                //paramsButton.height = height/2;
+                //paramsButton.width = height/2;
+
+                Log.d("mExpandedHeight", "collapse" + viewHolder.episode.getTitle() + " current height => " + height);
+                viewHolder.mPlayPauseButton.setLayoutParams(paramsButton);
+                viewHolder.mPlayPauseButton.setTranslationY(buttonTransInc.getHeight());
+            }
+        });
 
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -643,7 +722,10 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
             @Override
             public void onAnimationRepeat(Animator animator) {}
         });
-        animator.start();
+        //animator.start();
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.playTogether(animator, buttonAnimator, buttonTrans);
+        animatorSet.start();
 
         expandedView = null;
         expandedLayout = null;

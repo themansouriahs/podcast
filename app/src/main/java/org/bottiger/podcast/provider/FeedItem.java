@@ -935,6 +935,7 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 		return SDCardManager.pathTmpFromFilename(this);
 	}
 
+    // in ms
 	public void setPosition(ContentResolver contentResolver, long pos) {
 		this.offset = (int) pos;
 		update(contentResolver);

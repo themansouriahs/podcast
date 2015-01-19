@@ -13,7 +13,6 @@ import android.view.MotionEvent;
  */
 public class FixedRecyclerView extends RecyclerView {
 
-    private boolean mScrollable = false;
     private boolean mCanScrollRecyclerView = false;
 
     private boolean mRequestDisallowInterceptTouchEvent = false;
@@ -41,10 +40,15 @@ public class FixedRecyclerView extends RecyclerView {
             return;
     }
 
+    public static boolean mSeekbarSeeking = false;
 
     // http://stackoverflow.com/questions/25178329/recyclerview-and-swiperefreshlayout
     @Override
     public boolean canScrollVertically(int direction) {
+
+        if (mSeekbarSeeking)
+            return false;
+
         // check if scrolling up
         if (direction < 1) {
             boolean original = super.canScrollVertically(direction);
@@ -57,14 +61,10 @@ public class FixedRecyclerView extends RecyclerView {
         return canScroll;
     }
 
-    public void disableScrolling(boolean isDisabled) {
-        mScrollable = !isDisabled;
-    }
-
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
         Log.d("FixedRecyclerView touch", "event" + ev.toString());
-        mCanScrollRecyclerView = canScrollVertically(DOWN);
+        //mCanScrollRecyclerView = canScrollVertically(DOWN);
         return super.onTouchEvent(ev);
         //return false;
     }

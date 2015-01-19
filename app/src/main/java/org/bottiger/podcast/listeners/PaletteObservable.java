@@ -23,7 +23,12 @@ public class PaletteObservable {
 
     public static boolean unregisterListener(PaletteListener listener) {
         try {
-            return mListeners.remove(listener);
+            synchronized (mListeners) {
+                if (!mListeners.containsKey(listener))
+                    return false;
+
+                return mListeners.remove(listener);
+            }
         } catch (Exception e) {
             //Log.d(e.printStackTrace();)
             e.printStackTrace(); // FIXME: This should not happen
