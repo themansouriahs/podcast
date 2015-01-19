@@ -216,14 +216,17 @@ public class Playlist {
 	public String getWhere() {
 		Boolean showListened = sharedPreferences.getBoolean(showListenedKey,
 				showListenedVal);
-		String where = (showListened) ? "1" : ItemColumns.LISTENED + "== 0";
-        where += " AND ";
-        where += ItemColumns.SUBS_ID + " IN (SELECT " + SubscriptionColumns._ID + " FROM "  +
-                SubscriptionColumns.TABLE_NAME + " WHERE " + SubscriptionColumns.STATUS + "<>"
-                + Subscription.STATUS_UNSUBSCRIBED + ")";
+		String where = (showListened) ? "1==1" : ItemColumns.LISTENED + "== 0";
+        where += " AND (";
+        where += ItemColumns.TABLE_NAME + "." + ItemColumns.SUBS_ID + " IN (SELECT " + SubscriptionColumns.TABLE_NAME + "." + SubscriptionColumns._ID + " FROM "  +
+                SubscriptionColumns.TABLE_NAME + " WHERE " + SubscriptionColumns.TABLE_NAME + "." + SubscriptionColumns.STATUS + "<>"
+                + Subscription.STATUS_UNSUBSCRIBED + " OR " + SubscriptionColumns.TABLE_NAME + "." + SubscriptionColumns.STATUS + " IS NULL)";
+        //where += ItemColumns.TABLE_NAME + "." + ItemColumns.SUBS_ID + " IN (4)";
+        where += " )";
 
 
 		return where;
+        //return "1==1";
 	}
 
 	/**
