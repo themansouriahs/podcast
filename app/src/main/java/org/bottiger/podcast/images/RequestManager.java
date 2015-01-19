@@ -30,7 +30,7 @@ public class RequestManager {
 	 * 			application context
 	 */
 	public static void init(Context context) {
-		mRequestQueue = Volley.newRequestQueue(context);
+		mRequestQueue = Volley.newRequestQueue(context, 0); // zero cache
 	}
 	
 	/**
