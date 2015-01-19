@@ -33,7 +33,6 @@ public class FeedUpdater {
 		}
 		
 		FeedItem[] localItems = FeedItem.getByURL(contentResolver, urls, null);
-        Playlist playlist = Playlist.getActivePlaylist();
 		
 		HashMap<String,FeedItem> itemDict = new HashMap<String,FeedItem>();
 		for (FeedItem item : localItems) {
@@ -56,8 +55,11 @@ public class FeedUpdater {
                     item.image = subscription.getImageURL();
                 }
 
-                if (playlist != null) {
+                try {
+                    Playlist playlist = Playlist.getActivePlaylist();
                     playlist.notifyAbout(item);
+                } catch (IllegalStateException ise) {
+                    // its okay. We are running in a background job.
                 }
 
 				//item.update(contentResolver);
