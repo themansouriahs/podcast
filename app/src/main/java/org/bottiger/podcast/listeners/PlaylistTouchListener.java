@@ -47,7 +47,7 @@ public class PlaylistTouchListener extends GestureDetector.SimpleOnGestureListen
 
     @Override
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-        if (e1==null || e2==null) {
+        if (e1==null || e2==null || mRecyclerView.getChildAt(0) == null) {
             return false;
         }
 
