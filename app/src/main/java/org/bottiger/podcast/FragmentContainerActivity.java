@@ -7,6 +7,8 @@ import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.PodcastLog;
 import org.bottiger.podcast.views.MyCustomViewPager;
 
+import android.annotation.TargetApi;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -72,7 +74,6 @@ public class FragmentContainerActivity extends DrawerActivity implements
 		mFragmentTransaction = mFragmentManager.beginTransaction();
 
 		mViewStub = (ViewStub) findViewById(R.id.app_content);
-        TransitionInflater inflater = TransitionInflater.from(this);
 
         mPlaylist = new Playlist(this,30);
         mPlaylist.populatePlaylistIfEmpty();
@@ -90,12 +91,12 @@ public class FragmentContainerActivity extends DrawerActivity implements
 		mFragmentManager.beginTransaction().replace(R.id.app_content, fragment).commit();
 	}
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     private void createScenes(ViewGroup viewGroup) {
-        //LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        //View subscriptionView = inflater.inflate(R.layout.feed_view, viewGroup, false);
-
-        mSceneSubscriptions = Scene.getSceneForLayout(viewGroup, R.layout.subscription_list, this);
-        mSceneFeed = Scene.getSceneForLayout(viewGroup, R.layout.transition_test, this);
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            mSceneSubscriptions = Scene.getSceneForLayout(viewGroup, R.layout.subscription_list, this);
+            mSceneFeed = Scene.getSceneForLayout(viewGroup, R.layout.transition_test, this);
+        }
     }
 	
 	private void createViewPager() {
