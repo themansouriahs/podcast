@@ -4,7 +4,7 @@
     <color name="white_opaque">#FFFFFFFF</color>
     <color name="pitch_black">#FF000000</color>
 
-    <style name="SoundWavesTheme" parent="android:Theme.Material">
+    <style name="SoundWavesTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="playpause_icon">@drawable/playpause</item>
         <item name="play_icon">@drawable/av_play</item>
         <item name="pause_icon">@drawable/av_pause</item>
@@ -27,9 +27,12 @@
         <item name="customBackground">@color/pitch_black</item>
         <!--<item name="seekbar_handle">@drawable/seekbar_handle2.9</item>-->
         <item name="android:actionBarStyle">@style/TranslucentActionBar</item>
+
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
     </style>
 
-    <style name="SoundWavesTheme.Light" parent="android:Theme.Material.Light">
+    <style name="SoundWavesTheme.Light" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="playpause_icon">@drawable/playpause_dark</item>
         <item name="play_icon">@drawable/av_play_dark</item>
         <item name="pause_icon">@drawable/av_pause_dark</item>
@@ -62,7 +65,8 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:statusBarColor">@color/colorPrimaryDark</item>
 
-
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
         <!--<item name="android:windowActionBarOverlay">true</item>-->
     </style>
 

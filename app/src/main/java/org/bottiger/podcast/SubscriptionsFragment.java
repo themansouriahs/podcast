@@ -172,7 +172,8 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
 	public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.subscription_actionbar, menu);
 		SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
-		
+
+        /*
 	    searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 	    	
 	    	private QueryGpodder asyncTask = null;
@@ -199,7 +200,7 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
 	            return false;
 	        }
 
-	    });
+	    });*/
 		
 		super.onCreateOptionsMenu(menu, inflater);
 	}

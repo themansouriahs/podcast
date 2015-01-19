@@ -23,20 +23,4 @@ public class MyCustomViewPager extends ViewPager {
     protected boolean canScroll(View v, boolean checkV, int dx, int x, int y) {
         return false;
     }
-
-    /*
-    @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
-        String tag = "MyCustomViewPager intercept";
-        Log.d(tag, "------------");
-        Log.d(tag, ev.toString());
-        Log.d(tag, "------------");
-        return super.onInterceptTouchEvent(ev);
-    }*/
-
-    /*
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        return false;
-    }*/
 }

@@ -6,6 +6,7 @@ import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.PodcastLog;
 import org.bottiger.podcast.views.MyCustomViewPager;
+import org.bottiger.podcast.views.ToolbarActivity;
 
 import android.annotation.TargetApi;
 import android.os.Build;

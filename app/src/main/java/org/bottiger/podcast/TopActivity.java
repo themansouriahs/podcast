@@ -5,21 +5,22 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.transition.Explode;
 import android.transition.Slide;
 import android.transition.Transition;
 import android.view.Window;
 
-public class TopActivity extends FragmentActivity {
+public class TopActivity extends ActionBarActivity {
 	
 	private static SharedPreferences prefs;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-
         getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
+
+        super.onCreate(savedInstanceState);
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Transition transition = new Slide();
