@@ -6,6 +6,7 @@ import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
+import org.bottiger.podcast.listeners.PlaylistTouchListener;
 import org.bottiger.podcast.listeners.RecentItemsRecyclerListener;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.playlist.PlaylistCursorLoader;
@@ -182,9 +183,6 @@ public class PlaylistFragment extends GeastureFragment implements
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view,savedInstanceState);
 
-        mSwipeRefreshView.setGestureListener(mListener);
-        mSwipeRefreshView.fragment = this;
-
         mPhotoContainer =   (TopPlayer) mSwipeRefreshView.findViewById(R.id.session_photo_container);
         mPhoto =            (ImageView) mSwipeRefreshView.findViewById(R.id.session_photo);
 
@@ -221,6 +219,14 @@ public class PlaylistFragment extends GeastureFragment implements
         if (!mPlaylist.isEmpty()) {
             bindHeader(mPlaylist.first());
         }
+
+        mListener = new PlaylistTouchListener(mSwipeRefreshView,
+                mPhotoContainer,
+                mRecyclerView,
+                mPhoto);
+
+        mSwipeRefreshView.setGestureListener(mListener);
+        mSwipeRefreshView.fragment = this;
     }
 
     @Override
@@ -325,148 +331,15 @@ public class PlaylistFragment extends GeastureFragment implements
 
     public int playerHeight = getMaxPlayerSize();
 
-    public static boolean usingLargeLayout = true;
+
+             /*
     private GestureDetector.OnGestureListener mListener = new GestureDetector.SimpleOnGestureListener() {
 
-        @Override
-        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            Log.d("GeatureDetector", "onScroll: e1y -> " + e1.getY() + " e2y -> " + e2.getY() + " dy -> " + distanceY);
-            mSwipeRefreshView.getOverScroller().startScroll((int)e2.getX(),
-                                                            (int)e2.getY(),
-                                                            (int)distanceX,
-                                                            (int)distanceY);
 
-            boolean minimalPlayer = mSwipeRefreshView.getCurrentScrollState() == SwipeRefreshExpandableLayout.ScrollState.MINIMAIL_PLAYER
-                    || mSwipeRefreshView.getCurrentScrollState() == SwipeRefreshExpandableLayout.ScrollState.MINIMAIL_PLAYER_AND_SCROLLED_LIST;
-            Log.d("GeatureDetector", "minimalplayer: -> " + minimalPlayer);
-
-            // distanceY > 0 => scroll up
-            // distanceY < 0 => scroll down
-            int containerHeight = mPhotoContainer.getHeight();
-            float containerTranslationY = mPhotoContainer.getTranslationY();
-            //float currentHeight = !mPhotoContainer.isMinimumSize() ? containerHeight+containerTranslationY-distanceY : mPhotoContainer.getHeight()-distanceY;
-            float currentHeight = containerHeight+containerTranslationY-distanceY;
-
-            Log.d("GeatureDetector", "currentHeight: -> " + currentHeight + " getTop: " + mRecyclerView.getChildAt(0).getTop() + " mPhotoContainer.isMinimumSize(): " + mPhotoContainer.isMinimumSize((int)currentHeight));
-
-            boolean newHeightSmallerThanMinimum = mPhotoContainer.isMinimumSize((int)currentHeight);
-            if (minimalPlayer) {
-                if (distanceY > 0 && newHeightSmallerThanMinimum ||
-                    distanceY < 0 && mRecyclerView.getChildAt(0).getTop() != 0) {
-
-                    ExpandableLayoutManager elm = ((ExpandableLayoutManager) mRecyclerView.getLayoutManager());
-                    elm.SetCanScrollVertically(true);
+    };*/
+    private GestureDetector.OnGestureListener mListener;
 
 
-                    Log.d("GeatureDetector", "onScroll recyclerview: -> " + distanceY);
-                    mRecyclerView.scrollBy(0, (int) distanceY);
-                    //mRecyclerView.scrollToPosition(6);
-
-                    return true;
-                }
-            }
-
-            return scrollLayout(distanceY);
-        }
-
-        // http://stackoverflow.com/questions/4951142/smooth-scrolling-in-android
-        @Override
-        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            Log.d("GeatureDetector", "Fling : e1y -> " + e1.getY() + " e2y -> " + e2.getY() + " vy -> " + velocityY);
-            //mSwipeRefreshView.getOverScroller().
-            mSwipeRefreshView.getOverScroller().fling((int)e1.getX(), (int)e1.getY(),
-                    (int)velocityX, (int)velocityY, 0, (int)10000, 0, (int)10000);
-
-            return true;
-        }
-    };
-
-    public boolean scrollLayout( float distanceY) {
-        Log.d("GeatureDetector", "scrollLayout: distanceY -> " + distanceY);
-
-        ExpandableLayoutManager elm = ((ExpandableLayoutManager) mRecyclerView.getLayoutManager());
-        if (mPhotoContainer.isMinimumSize()) {
-            elm.SetCanScrollVertically(true);
-        } else {
-            elm.SetCanScrollVertically(false);
-        }
-
-        mSwipeRefreshView.mDownGeastureInProgress = true;
-        // distanceY > 0 => scroll up
-        // distanceY < 0 => scroll down
-
-        if (mPhotoContainer.isMinimumSize() && distanceY > 0) {
-            mSwipeRefreshView.mDownGeastureInProgress = false;
-            mSwipeRefreshView.setCurrentScrollState(SwipeRefreshExpandableLayout.ScrollState.MINIMAIL_PLAYER_AND_SCROLLED_LIST);
-            return false;
-        }
-
-        int containerHeight = mPhotoContainer.getHeight();
-        float containerTranslationY = mPhotoContainer.getTranslationY();
-        //float currentHeight = !mPhotoContainer.isMinimumSize() ? containerHeight+containerTranslationY-distanceY : mPhotoContainer.getHeight()-distanceY;
-        float currentHeight = containerHeight+containerTranslationY-distanceY;
-
-        Log.d("setTranslationXYZ", "h -> " + containerHeight + " t -> " + containerTranslationY + " dy -> " + distanceY + " curH -> " + currentHeight);
-
-
-
-        float newShrinkAmount = mPhotoContainer.getTranslationY()-distanceY;
-        Log.d("setTranslationXYZ", "newShrinkAmount: " +  newShrinkAmount + " trans: " + mPhotoContainer.getTranslationY() + " distY: " + distanceY);
-
-        float newVisibleHeight = mRecyclerView.getTranslationY();
-
-        // Prevent the user from scrolling too far down. (i.e. more down than the maximum size player)
-        if (mPhotoContainer.isMaximumSize() && currentHeight >= 0 && newShrinkAmount > 0) {
-            mPhoto.setTranslationY(0);
-            mRecyclerView.setTranslationY(mPhotoContainer.getHeight());
-            mSwipeRefreshView.setCurrentScrollState(SwipeRefreshExpandableLayout.ScrollState.FULL_PLAYER);
-            //mPhotoContainer.setPlayerHeight(mPhotoContainer.get, newOffset);
-            return false;
-        }
-
-        if ( (!mPhotoContainer.isMinimumSize() && distanceY > 0) || (!mPhotoContainer.isMaximumSize() && distanceY < 0) ) {
-            newVisibleHeight = mPhotoContainer.setPlayerHeight(currentHeight, newShrinkAmount);
-            Log.d("photoOffsejjjt", "newShrinkAmount (in) -> "  + newShrinkAmount + " newVisibleHeight (out) -> " + newVisibleHeight);
-        }
-
-        if (mPhotoContainer.isMinimumSize()) {
-            if (usingLargeLayout) {
-                Log.d("PlaylistHeight", "TopPlayer is minimum");
-                mSwipeRefreshView.setCurrentScrollState(SwipeRefreshExpandableLayout.ScrollState.MINIMAIL_PLAYER);
-                mPhotoContainer.bringToFront();
-                usingLargeLayout = false;
-            }
-        } else {
-            if (!usingLargeLayout) {
-                mRecyclerView.bringToFront();
-                mSwipeRefreshView.setCurrentScrollState(SwipeRefreshExpandableLayout.ScrollState.PARTIAL_PLAYER);
-            }
-            usingLargeLayout = true;
-        }
-
-        boolean isMinimumSize = mPhotoContainer.isMinimumSize();
-
-        mSwipeRefreshView.setCanScrollRecyclerView(isMinimumSize);
-        mRecyclerView.setCanScrollRecyclerView(isMinimumSize);
-
-        if (isMinimumSize) {
-            Log.d("TopPlayerIOut", "To the top!");
-            //mRecyclerView.scrollToPosition(0);
-        }
-
-        int[] location = new int[2];
-        mRecyclerView.getChildAt(0).getLocationOnScreen(location);
-
-        int[] location2 = new int[2];
-        mRecyclerView.getLocationOnScreen(location2);
-
-        Log.d("TopPlayerIOut", "Translation =>" + newVisibleHeight + " mRecyclerView.child.Top => " + location[0] + " & " + location[1]);
-        Log.d("TopPlayerIOut", "diffx =>" + (location[0]-location2[0]) + " diffy => " + (location[1]-location2[1]));
-        mRecyclerView.setTranslationY(newVisibleHeight);
-
-        Log.d("TopPlayerInputkmRecyclerView", "mRecyclerView translation ->" + mRecyclerView.getTranslationY());
-        return true;
-    }
 
 
 	@Override

@@ -126,7 +126,7 @@ public class SwipeRefreshExpandableLayout extends FeedRefreshLayout implements T
                 mCurrentScrollState = ScrollState.MINIMAIL_PLAYER_AND_SCROLLED_LIST;
             } else {
                 Log.d("ScrollType", "TopPlayer, dy => " + diff);
-                fragment.scrollLayout(diff);
+                //fragment.scrollLayout(diff);
             }
             lastScrollPos = currentScrollPos;
         }
@@ -136,7 +136,7 @@ public class SwipeRefreshExpandableLayout extends FeedRefreshLayout implements T
     public boolean onTouchEvent(MotionEvent event) {
         mLastEvent = -1;
 
-        //Log.d("SwipeRefreshExpandableLayout touch", "event" + event.toString());
+        Log.d("SwipeRefreshExpandableLayout touch", "event" + event.toString());
         switch (event.getAction())
         {
             case MotionEvent.ACTION_CANCEL:
@@ -169,6 +169,13 @@ public class SwipeRefreshExpandableLayout extends FeedRefreshLayout implements T
         //Log.d("Skipping motion", "setting event" + event.hashCode());
         mLastEvent = event.hashCode();
 
+        switch (event.getAction())
+        {
+            case MotionEvent.ACTION_MOVE:
+                mDownGeastureInProgress = true;
+                return true;
+        }
+
         /*
         if (mRecycerView != null && mRecycerView.canScrollVertically(FixedRecyclerView.DOWN)) {
             Log.d("SwipeRefreshExpandableLayout touch", "intercept (recycler can scroll) =>" + false);
@@ -199,7 +206,7 @@ public class SwipeRefreshExpandableLayout extends FeedRefreshLayout implements T
 
         Log.d("SwipeRefreshExpandableLayout touch", "intercept =>" + mDownGeastureInProgress);
         //return mDownGeastureInProgress;
-        return true;
+        return false;
     }
 
     public boolean getCanScrollRecyclerView() {

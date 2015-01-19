@@ -290,6 +290,10 @@ public class TopPlayer extends RelativeLayout {
         return mPlayerLayout == PlayerLayout.LARGE;
     }
 
+    public int getVisibleHeight() {
+        return (int) (getHeight()+getTranslationY());
+    }
+
     private boolean validateState() {
         if (sizeSmall < 0 || sizeMedium < 0 || sizeLarge < 0) {
             Log.d("TopPlayer", "Layout sizes needs to be defined");
