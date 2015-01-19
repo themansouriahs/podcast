@@ -164,9 +164,6 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
 
         PaletteObservable.registerListener(playlistViewHolder2.mPlayPauseButton);
 
-        //((MainActivity)mContext).setOnTouchOutsideViewListener(playlistViewHolder2.mLayout, playlistViewHolder2.mPlayPauseButton);
-        //((MainActivity)mContext).setOnTouchOutsideViewListener((View) playlistViewHolder2.mPlayPauseButton);
-
         playlistViewHolder2.playerLinearLayout.setVisibility(View.GONE);
 
         int type = getItemViewType(position);

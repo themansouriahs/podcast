@@ -133,7 +133,7 @@ public class SwipeRefreshExpandableLayout extends FeedRefreshLayout implements T
                 break;
         }
 
-        //delegateToTopPlayer(event);
+        delegateToTopPlayer(event);
 
         boolean TouchFromSuper = super.onTouchEvent(event);
 
