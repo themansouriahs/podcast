@@ -1,16 +1,36 @@
-<android.support.v4.widget.DrawerLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/outer_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/my_awesome_toolbar"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_alignParentTop="true"
+        android:minHeight="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        </android.support.v7.widget.Toolbar>
 
      <ViewStub android:id="@+id/app_content"
                android:inflatedId="@+id/pager"
                android:layout="@layout/view_pager_main"
                android:layout_width="match_parent"
-               android:layout_height="match_parent" />
+               android:layout_height="match_parent"
+               android:layout_below="@id/my_awesome_toolbar"
+         />
+
+    </RelativeLayout>
+
 
     <include layout="@layout/drawer_left" />
-
 
 </android.support.v4.widget.DrawerLayout>

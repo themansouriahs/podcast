@@ -19,6 +19,7 @@ import android.database.ContentObservable;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.database.MatrixCursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -26,6 +27,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.CursorAdapter;
+import android.support.v7.widget.SearchView;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -39,7 +41,6 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 import android.widget.RelativeLayout;
-import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -171,9 +172,8 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
 	@Override
 	public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.subscription_actionbar, menu);
-		SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
 
-        /*
+        SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
 	    searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 	    	
 	    	private QueryGpodder asyncTask = null;
@@ -200,7 +200,7 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
 	            return false;
 	        }
 
-	    });*/
+	    });
 		
 		super.onCreateOptionsMenu(menu, inflater);
 	}

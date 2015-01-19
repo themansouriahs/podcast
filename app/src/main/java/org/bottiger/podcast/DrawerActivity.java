@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 
 import org.bottiger.podcast.adapters.DrawerAdapter;
+import org.bottiger.podcast.views.ToolbarActivity;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
@@ -18,12 +19,9 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.transition.Slide;
-import android.transition.Transition;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -73,7 +71,7 @@ import com.android.volley.toolbox.ImageLoader;
  * overlay on top of the current content.
  * </p>
  */
-public abstract class DrawerActivity extends TopActivity {
+public abstract class DrawerActivity extends ToolbarActivity {
 
 	protected DrawerLayout mDrawerLayout;
 	protected ExpandableListView mDrawerList;
@@ -120,7 +118,7 @@ public abstract class DrawerActivity extends TopActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		setContentView(R.layout.activity_swipe);
+
 
 		mTitle = mDrawerTitle = getTitle();
 		mListItems = getResources().getStringArray(R.array.drawer_menu);
@@ -149,27 +147,26 @@ public abstract class DrawerActivity extends TopActivity {
 		// Expand the first item (Playlist Filters) by default
 		mDrawerList.expandGroup(0);
 
-
         // enable ActionBar app icon to behave as action to toggle nav drawer
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setHomeButtonEnabled(true);
+        //getActionBar().setDisplayHomeAsUpEnabled(true);
+        //getActionBar().setHomeButtonEnabled(true);
 
         // ActionBarDrawerToggle ties together the the proper interactions
         // between the sliding drawer and the action bar app icon
         mDrawerToggle = new ActionBarDrawerToggle(this, /* host Activity */
                 mDrawerLayout, /* DrawerLayout object */
-                R.drawable.ic_drawer, /* nav drawer image to replace 'Up' caret */
+                mToolbar, //R.drawable.ic_drawer, /* nav drawer image to replace 'Up' caret */
                 R.string.drawer_open, /* "open drawer" description for accessibility */
                 R.string.drawer_close /* "close drawer" description for accessibility */
         ) {
             public void onDrawerClosed(View view) {
-                getActionBar().setTitle(mTitle);
+                //getActionBar().setTitle(mTitle);
                 invalidateOptionsMenu(); // creates call to
                 // onPrepareOptionsMenu()
             }
 
             public void onDrawerOpened(View drawerView) {
-                getActionBar().setTitle(mDrawerTitle);
+                //getActionBar().setTitle(mDrawerTitle);
                 invalidateOptionsMenu(); // creates call to
                 // onPrepareOptionsMenu()
             }
@@ -259,7 +256,7 @@ public abstract class DrawerActivity extends TopActivity {
 	@Override
 	public void setTitle(CharSequence title) {
 		mTitle = title;
-		getActionBar().setTitle(mTitle);
+		//getActionBar().setTitle(mTitle);
 	}
 
 	/**
