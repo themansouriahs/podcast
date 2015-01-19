@@ -271,6 +271,10 @@ public class TopPlayer extends RelativeLayout {
         return sizeSmall == getHeight()+getTranslationY();
     }
 
+    public int getMinimumSize() {
+        return sizeSmall;
+    }
+
     public boolean isMaximumSize() {
         Log.d("MaximumSize", "Trans: " + getTranslationY());
         return mPlayerLayout == PlayerLayout.LARGE && getTranslationY() >= 0; // FIXME: refine

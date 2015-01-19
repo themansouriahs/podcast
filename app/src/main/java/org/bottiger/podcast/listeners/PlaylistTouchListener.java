@@ -103,6 +103,22 @@ public class PlaylistTouchListener extends GestureDetector.SimpleOnGestureListen
         mSwipeRefreshView.getOverScroller().fling((int)e1.getX(), (int)e1.getY(),
                 (int)velocityX, (int)velocityY, 0, (int)10000, 0, (int)10000);
 
+        /*
+        float minSize = mTopPlayer.getMinimumSize();
+        float trans = minSize-mTopPlayer.getHeight();
+
+        float newVisibleHeight = mTopPlayer.setPlayerHeight(minSize, trans);
+        mRecyclerView.setTranslationY(newVisibleHeight);
+        mRecyclerView.bringToFront();
+        */
+
+        /*
+        ExpandableLayoutManager elm = ((ExpandableLayoutManager) mRecyclerView.getLayoutManager());
+
+        elm.SetCanScrollVertically(true);
+
+        return mRecyclerView.fling((int)velocityX, (int)velocityY);
+        */
         return true;
     }
 
