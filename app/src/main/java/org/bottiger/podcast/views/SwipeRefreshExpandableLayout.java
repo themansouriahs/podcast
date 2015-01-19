@@ -35,9 +35,6 @@ public class SwipeRefreshExpandableLayout extends FeedRefreshLayout implements T
 
     public PlaylistFragment fragment = null;
 
-    private int mLastEvent = -1;
-
-    public boolean mIsScrolling = false;
     public boolean mDownGeastureInProgress = false;
     private boolean mCanScrollRecyclerView = false;
 
@@ -85,19 +82,11 @@ public class SwipeRefreshExpandableLayout extends FeedRefreshLayout implements T
     }
 
     public View mTarget;
-    private static View itemView = null;
 
 
     //@Override
     public boolean canChildScrollUp() {
         return true;
-        /*
-        if (itemView == null) {
-            RecyclerView.ViewHolder holder = ((RecyclerView) mTarget).findViewHolderForPosition(0); //. .itemView.getTop() >= 0;
-            itemView = holder.itemView;
-        }
-
-        return itemView.getTop() < 0;*/
     }
 
     private void delegateToTopPlayer(MotionEvent event) {
@@ -134,7 +123,6 @@ public class SwipeRefreshExpandableLayout extends FeedRefreshLayout implements T
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        mLastEvent = -1;
 
         Log.d("SwipeRefreshExpandableLayout touch", "event" + event.toString());
         switch (event.getAction())
@@ -165,9 +153,6 @@ public class SwipeRefreshExpandableLayout extends FeedRefreshLayout implements T
     }
 
     public boolean onInterceptTouchEvent(MotionEvent event) {
-
-        //Log.d("Skipping motion", "setting event" + event.hashCode());
-        mLastEvent = event.hashCode();
 
         delegateToTopPlayer(event);
 
@@ -218,21 +203,6 @@ public class SwipeRefreshExpandableLayout extends FeedRefreshLayout implements T
 
     public void setCanScrollRecyclerView(boolean mCanScrollRecyclerView) {
         this.mCanScrollRecyclerView = mCanScrollRecyclerView;
-    }
-
-    private boolean RecyclerViewAtTopAndGeasureDown(MotionEvent event) {
-
-        //return mDownGeastureInProgress && mCanScrollRecyclerView;
-
-        switch (event.getAction())
-        {
-            case MotionEvent.ACTION_MOVE:
-                mCanScrollRecyclerView = mRecycerView.getCanScrollRecyclerView();
-                return mCanScrollRecyclerView;
-        }
-
-        //mRecycerView.setCanScrollRecyclerView(false);
-        return false;
     }
 
     @Override

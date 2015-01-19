@@ -18,6 +18,7 @@ import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Transformation;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
@@ -33,28 +34,9 @@ public class TopPlayer extends RelativeLayout {
     private enum PlayerLayout { SMALL, MEDIUM, LARGE }
     private PlayerLayout mPlayerLayout = PlayerLayout.LARGE;
 
-    private boolean SEEKBAR_FULL_WIDTH = true;
     private int mPlayPauseLargeSize = -1;
 
     private Context mContext;
-
-    private ViewGroup.LayoutParams mSeekbarParams;
-    private ViewGroup.LayoutParams mPlayPauseParams;
-
-    private Scene mLargePlayer;
-    private Scene mMediumPlayer;
-    private Scene mButtons;
-
-    private AnimatorSet mAnimationSet;
-    private ValueAnimator mScaleButtonSize;
-    private ValueAnimator mScaleSeekbarSize;
-    private ValueAnimator mTranslateButtonSize;
-
-    private TransitionManager mTransitionManager;
-    private Transition mChangeBoundsLargeToMedium;
-    private TimeInterpolator mInterpolator = new DecelerateInterpolator();
-    private long mAnimationStartTime = -1;
-    private long mAnimationDuration = 100;
 
     public static int sizeSmall                 =   -1;
     public static int sizeMedium                =   -1;
@@ -72,14 +54,7 @@ public class TopPlayer extends RelativeLayout {
     private int mTextFadeDistancePx;
     private int mTextInfoFadeDistancePx;
 
-    private static int sPlayPauseMarginSmall    =   300;
-    private static int sPlayPauseMarginLarge    =   660;
-
-    private PlayerLayout mCurrentLayout = PlayerLayout.LARGE;
     private boolean mCanScrollUp = true;
-
-    private int mSeekbarLeft = -1;
-    private int mSeekbarOffset = -1;
 
     private PlayerLinearLayout mPlayerControlsLinearLayout;
 
@@ -104,8 +79,6 @@ public class TopPlayer extends RelativeLayout {
         public int SeekBarLeftMargin;
         public int PlayPauseSize;
         public int PlayPauseBottomMargin;
-        public int LayoutRule;
-        public int LayoutVerb;
     }
 
     public TopPlayer(Context context) {
@@ -132,8 +105,6 @@ public class TopPlayer extends RelativeLayout {
     private void init(@NonNull Context argContext) {
         mContext = argContext;
 
-        mAnimationSet = new AnimatorSet();
-
         sizeSmall = mContext.getResources().getDimensionPixelSize(R.dimen.top_player_size_minimum);
         sizeMedium = mContext.getResources().getDimensionPixelSize(R.dimen.top_player_size_medium);
         sizeLarge = mContext.getResources().getDimensionPixelSize(R.dimen.top_player_max_offset);
@@ -145,8 +116,6 @@ public class TopPlayer extends RelativeLayout {
         mTextInfoFadeDistancePx   = (int)UIUtils.convertDpToPixel(mTextInfoFadeDistance, mContext);
 
         sizeActionbar = mContext.getResources().getDimensionPixelSize(R.dimen.action_bar_height);
-
-        mTransitionManager = new TransitionManager();
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             setClipToOutline(true);
@@ -172,12 +141,6 @@ public class TopPlayer extends RelativeLayout {
         mPlayerButtons = (LinearLayout) findViewById(R.id.player_buttons);
 
         mPlayPauseLargeSize = mPlayPauseButton.getLayoutParams().height;
-        mSeekbarParams = mSeekbar.getLayoutParams();
-        mPlayPauseParams = mPlayPauseButton.getLayoutParams();
-
-        mLargePlayer = Scene.getSceneForLayout(mPlayerControlsLinearLayout, R.layout.extended_player, mContext);
-        mMediumPlayer = Scene.getSceneForLayout(mPlayerControlsLinearLayout, R.layout.extended_player_medium, mContext);
-        mButtons = Scene.getSceneForLayout(mPlayerButtons, R.layout.extended_player_buttons, mContext);
 
         mLargeLayout.SeekBarLeftMargin = 0;
         mLargeLayout.PlayPauseSize = mPlayPauseLargeSize;
@@ -208,7 +171,9 @@ public class TopPlayer extends RelativeLayout {
 
         Log.d("TopPlayerInput", "(canScrollUp: " + mCanScrollUp + ")maxScreenHeight -> " + maxScreenHeight + "ScreenOffset -> " + argOffset);
 
-        mPhoto.setTranslationY(-(argOffset/2));
+        //mPhoto.setTranslationY(-(argOffset/2));
+        translatePhotoY(mPhoto, argOffset);
+
         mEpisodeText.setTranslationY(-argOffset);
         mEpisodeInfo.setTranslationY(-argOffset);
 
@@ -216,7 +181,7 @@ public class TopPlayer extends RelativeLayout {
         if (argScreenHeight <= sizeMedium) {
 
             if (mPlayerButtonsHeight < 0) {
-                mPlayerButtonsHeight = mPlayerButtons.getHeight()-50;
+                mPlayerButtonsHeight = mPlayerButtons.getHeight()-(int)UIUtils.convertPixelsToDp(50, mContext);
 
                 mSmallLayout.SeekBarLeftMargin = mPlayPauseButton.getLeft() + mSeekbar.getHeight();
                 mSmallLayout.PlayPauseSize = mSeekbar.getHeight();
@@ -230,7 +195,7 @@ public class TopPlayer extends RelativeLayout {
 
         String size = "large";
 
-        transY = minMaxScreenHeight-sizeLarge; //argOffset;
+        transY = minMaxScreenHeight-sizeLarge;
         Log.d("setTranslationXYZ", "minMaxScreenHeight: " +  minMaxScreenHeight);
 
         setTranslationY(transY);
@@ -282,14 +247,6 @@ public class TopPlayer extends RelativeLayout {
         return VisibilityFraction;
     }
 
-    public boolean isSmall() {
-        return mPlayerLayout == PlayerLayout.SMALL;
-    }
-
-    public boolean isLarge() {
-        return mPlayerLayout == PlayerLayout.LARGE;
-    }
-
     public int getVisibleHeight() {
         return (int) (getHeight()+getTranslationY());
     }
@@ -316,75 +273,12 @@ public class TopPlayer extends RelativeLayout {
         return mPlayerLayout == PlayerLayout.LARGE && getTranslationY() >= 0; // FIXME: refine
     }
 
-    private void transformLayout(@NonNull SeekBar argSeekbar, PlayerLayout argTargetLayout) {
-
-        if (mPlayerLayout == argTargetLayout) {
-            return;
-        }
-
-        Log.d("LayoutTransform", "From: " + mPlayerLayout + " to: " + argTargetLayout);
-
-        final PlayerLayoutParameter startValue, endValues;
-
-        if (argTargetLayout == PlayerLayout.SMALL) {
-            mPlayerLayout = PlayerLayout.SMALL;
-            startValue = mLargeLayout;
-            endValues = mSmallLayout;
+    private void translatePhotoY(@NonNull View argImageView , float amount) {
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            argImageView.setTranslationY(-(amount/2));
         } else {
-            mPlayerLayout = PlayerLayout.LARGE;
-            startValue = mSmallLayout;
-            endValues = mLargeLayout;
+            //argImageView.setTranslationY(-amount);
         }
-
-        int height = argSeekbar.getHeight(); // min value
-
-        final RelativeLayout.LayoutParams playPauseParams = (RelativeLayout.LayoutParams) mPlayPauseButton.getLayoutParams();
-        final FrameLayout.LayoutParams seekbarParams = (FrameLayout.LayoutParams) mSeekbar.getLayoutParams();
-
-        playPauseParams.width = endValues.PlayPauseSize;
-        playPauseParams.height = endValues.PlayPauseSize;
-
-        if (mPlayerLayout == PlayerLayout.SMALL) {
-            playPauseParams.topMargin = 660;
-        } else {
-            playPauseParams.topMargin = 300;
-        }
-
-        seekbarParams.leftMargin = endValues.SeekBarLeftMargin;
-
-        Log.d("Interp", "gogog");
-        Animation a = new Animation() {
-
-            @Override
-            protected void applyTransformation(float interpolatedTime, Transformation t) {
-                playPauseParams.width = (int)((endValues.PlayPauseSize-startValue.PlayPauseSize) * interpolatedTime) + startValue.PlayPauseSize;
-                playPauseParams.height = (int)((endValues.PlayPauseSize-startValue.PlayPauseSize) * interpolatedTime) + startValue.PlayPauseSize;
-
-                int ifinal = -1;
-                int newTopMargin = -1;
-                if (mPlayerLayout == PlayerLayout.SMALL) {
-                    ifinal = sPlayPauseMarginLarge;
-                    newTopMargin = (int)((sPlayPauseMarginLarge-sPlayPauseMarginSmall) * interpolatedTime) + sPlayPauseMarginSmall;
-                } else {
-                    ifinal = sPlayPauseMarginSmall;
-                    newTopMargin = (int)(sPlayPauseMarginLarge + (sPlayPauseMarginSmall-sPlayPauseMarginLarge) * interpolatedTime - (1-interpolatedTime)*0.5*playPauseParams.height);
-                    //newTopMargin = sPlayPauseMarginLarge;
-                }
-
-                playPauseParams.topMargin = newTopMargin;
-
-                seekbarParams.leftMargin = (int)(endValues.SeekBarLeftMargin * interpolatedTime);
-
-                Log.d("InterpSize", "w ->" + playPauseParams.width);
-                Log.d("Interp", "i ->" + interpolatedTime + " margin -> " + playPauseParams.topMargin + "(final)" + ifinal + " cal:" + newTopMargin);
-                mPlayPauseButton.setLayoutParams(playPauseParams);
-                mSeekbar.setLayoutParams(seekbarParams);
-                //requestLayout();
-            }
-        };
-
-        a.setDuration(100);
-        startAnimation(a);
     }
 
 }

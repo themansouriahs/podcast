@@ -90,16 +90,6 @@ public class FixedRecyclerView extends RecyclerView {
         }
 
         return getCanScrollRecyclerView();
-        //return false;
-
-        //return true;
-        //return !scrolledToTop();
-        //return true
-        //return super.onInterceptTouchEvent(ev);
-    }
-
-    public boolean scrolledToTop() {
-        return !canScrollVertically(DOWN);
     }
 
     public boolean getCanScrollRecyclerView() {
@@ -109,24 +99,4 @@ public class FixedRecyclerView extends RecyclerView {
     public void setCanScrollRecyclerView(boolean mCanScrollRecyclerView) {
         this.mCanScrollRecyclerView = mCanScrollRecyclerView;
     }
-
-    /*
-    @Override
-    public boolean onTouchEvent(MotionEvent ev) {
-        if (mScrollable)
-            return super.onTouchEvent(ev);
-
-        return false;
-    }
-
-    @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
-        // Don't do anything with intercepted touch events if
-        // we are not scrollable
-        if (!mScrollable)
-            return false;
-
-        return super.onInterceptTouchEvent(ev);
-    }
-    */
 }
