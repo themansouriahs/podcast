@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<org.bottiger.podcast.views.PlayerLinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:SoundwavesNS="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/player_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:descendantFocusability="blocksDescendants"
+    android:orientation="vertical" >
+
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Colors the background -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="@dimen/padding_medium"
+            android:alpha="0.4"
+            android:background="@color/black">
+        </LinearLayout>
+
+        <org.bottiger.podcast.views.PlayerSeekbar
+            android:id="@+id/player_progress"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" />
+
+        <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="20dp"
+        android:padding="@dimen/padding_small">
+
+
+            <org.bottiger.podcast.views.PlayerButtonView
+            android:id="@+id/previous"
+            android:padding="0dip"
+            android:elevation="8dp"
+            SoundwavesNS:image="?attr/previous_icon"
+            style="@style/PlayerButton" />
+
+        <org.bottiger.podcast.views.DownloadButtonView
+            android:id="@+id/download"
+            android:padding="0dip"
+            android:elevation="8dp"
+            style="@style/PlayerButton" />
+
+        <org.bottiger.podcast.views.PlayerButtonView
+            android:id="@+id/queue"
+            android:padding="0dip"
+            android:elevation="8dp"
+            SoundwavesNS:image="?attr/queue_icon"
+            style="@style/PlayerButton" />
+
+            <org.bottiger.podcast.views.PlayerButtonView
+                android:id="@+id/bookmark"
+                android:padding="0dip"
+                android:elevation="8dp"
+                SoundwavesNS:image="?attr/new_icon"
+                style="@style/PlayerButton" />
+
+    </LinearLayout>
+    </FrameLayout>
+
+</org.bottiger.podcast.views.PlayerLinearLayout>

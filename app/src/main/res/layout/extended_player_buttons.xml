@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:SoundwavesNS="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/player_buttons"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="50dp"
+    android:padding="@dimen/padding_small">
+
+
+    <!-- SoundwavesNS:image="?attr/previous_icon" -->
+    <org.bottiger.podcast.views.PlayerButtonView
+        android:id="@+id/previous"
+        android:padding="0dip"
+        android:elevation="8dp"
+        android:src="?attr/previous_icon"
+        style="@style/PlayerButton" />
+
+    <org.bottiger.podcast.views.DownloadButtonView
+        android:id="@+id/download"
+        android:padding="0dip"
+        android:elevation="8dp"
+        style="@style/PlayerButton" />
+
+    <org.bottiger.podcast.views.PlayerButtonView
+        android:id="@+id/queue"
+        android:padding="0dip"
+        android:elevation="8dp"
+        android:src="?attr/queue_icon"
+        style="@style/PlayerButton" />
+
+    <org.bottiger.podcast.views.PlayerButtonView
+        android:id="@+id/bookmark"
+        android:padding="0dip"
+        android:elevation="8dp"
+        android:src="?attr/new_icon"
+        style="@style/PlayerButton" />
+
+</LinearLayout>

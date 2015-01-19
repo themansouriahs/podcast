@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/playlist_overlay_frame"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal">
+
+    <RelativeLayout
+        android:id="@+id/playlist_overlay_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/overlay_side_margin"
+        android:layout_marginRight="@dimen/overlay_side_margin"
+        android:background="@drawable/border_frame">
+
+        <TextView
+            android:id="@+id/seekbar_time_current"
+            style="@style/SeekbarOverlayText"
+            android:layout_centerHorizontal="true"
+            android:textSize="32dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"/>
+
+        <TextView
+            android:id="@+id/seekbar_time_backwards"
+            style="@style/SeekbarOverlayText"
+            android:layout_alignParentLeft="true"
+            android:layout_toRightOf="@id/seekbar_time_current"/>
+
+        <TextView
+            android:id="@+id/seekbar_time_forward"
+            style="@style/SeekbarOverlayText"
+            android:layout_alignParentRight="true"
+            android:layout_toLeftOf="@id/seekbar_time_current"/>
+
+    </RelativeLayout>
+
+</FrameLayout>

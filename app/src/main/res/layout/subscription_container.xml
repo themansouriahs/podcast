@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/subscription_fragment_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/subscription_empty"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:padding="10dp"
+        android:layout_marginTop="@dimen/header_bar_height"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp">
+
+        <TextView
+            android:id="@+id/subscription_empty_arrow"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:layout_marginRight="15dp"
+            android:textSize="60dp"
+            android:text="↑"/>
+
+        <TextView
+            android:id="@+id/subscription_empty_text"
+            android:layout_below="@+id/subscription_empty_arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"
+            android:text="Add new podcasts by using the search function or paste in the URL manually"/>
+
+        <org.bottiger.podcast.views.SquareImageView
+            android:id="@+id/subscription_empty_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/subscription_empty_text"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/find_subscription"/>
+
+    </RelativeLayout>
+
+</FrameLayout>

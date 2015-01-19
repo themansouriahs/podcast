@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<org.bottiger.podcast.views.PlayerLinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/expanded_controls"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:layout_alignParentBottom="true"
+    android:descendantFocusability="afterDescendants"
+    android:orientation="vertical">
+    <!--     android:layout_below="@+id/main_player_container" -->
+
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Colors the background-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="@dimen/padding_medium"
+            android:alpha="0.4"
+            android:background="@color/black">
+        </LinearLayout>
+
+        <org.bottiger.podcast.views.PlayerSeekbar
+            android:id="@+id/player_progress"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:layout_marginTop="10dp"
+            />
+
+        <include layout="@layout/extended_player_buttons" />
+
+    </FrameLayout>
+
+</org.bottiger.podcast.views.PlayerLinearLayout>
