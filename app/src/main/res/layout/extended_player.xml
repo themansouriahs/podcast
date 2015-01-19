@@ -34,9 +34,9 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="right"
-            android:paddingBottom="10dp"
-            android:paddingTop="10dp"
-            android:layout_marginTop="70dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="80dp"
+            style="@style/tallerBarStyle"
             />
 
     </FrameLayout>

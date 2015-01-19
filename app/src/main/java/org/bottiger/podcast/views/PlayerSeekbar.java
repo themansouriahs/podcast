@@ -350,14 +350,15 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
 
     @Override
     public void onPaletteFound(Palette argChangedPalette) {
-        Palette.Swatch swatch = argChangedPalette.getLightVibrantSwatch();
+        Palette.Swatch swatch = argChangedPalette.getVibrantSwatch();
         if (swatch==null)
             return;
 
-        int color = swatch.getTitleTextColor();
+        int color = swatch.getRgb();// .getTitleTextColor();
         ColorDrawable dc = new ColorDrawable(color);
-        dc.setAlpha(200);
-        setProgressDrawable(dc);
+        dc.setAlpha(100);
+        //setProgressDrawable(dc);
+        //setBackgroundColor(color);
         invalidate();
     }
 

@@ -24,6 +24,7 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.utils.UIUtils;
 
 /**
@@ -141,6 +142,8 @@ public class TopPlayer extends RelativeLayout {
         mPlayerButtons = (LinearLayout) findViewById(R.id.player_buttons);
 
         mPlayPauseLargeSize = mPlayPauseButton.getLayoutParams().height;
+
+        PaletteObservable.registerListener((PlayerSeekbar)mSeekbar);
 
         mLargeLayout.SeekBarLeftMargin = 0;
         mLargeLayout.PlayPauseSize = mPlayPauseLargeSize;

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@android:id/background">
-        <!--<nine-patch
+        <nine-patch
             xmlns:android="http://schemas.android.com/apk/res/android"
-            android:src="@color/pitch_black"
+            android:src="@drawable/drag"
             android:dither="true"
-            android:alpha="0.5"
-            /> -->
+            />
+            <!--
         <shape xmlns:android="http://schemas.android.com/apk/res/android" >
 
             <gradient
@@ -24,7 +24,7 @@
                 android:width="10dp"
                 android:color="#70555555" />
 
-        </shape>
+        </shape>-->
     </item>
     <item android:id="@android:id/secondaryProgress">
         <shape xmlns:android="http://schemas.android.com/apk/res/android" >
@@ -45,19 +45,6 @@
                 android:color="#70555555" />
 
         </shape>
-        <!--
-        <clip>
-            <shape>
-                <gradient
-                    android:startColor="#80028ac8"
-                    android:centerColor="#80127fb1"
-                    android:centerY="0.75"
-                    android:endColor="#a004638f"
-                    android:angle="270"
-                    />
-            </shape>
-        </clip>
-    -->
     </item>
     <item
         android:id="@android:id/progress"
