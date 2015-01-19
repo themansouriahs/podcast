@@ -96,7 +96,6 @@ public class FragmentContainerActivity extends DrawerActivity implements
     private void createScenes(ViewGroup viewGroup) {
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             mSceneSubscriptions = Scene.getSceneForLayout(viewGroup, R.layout.subscription_list, this);
-            mSceneFeed = Scene.getSceneForLayout(viewGroup, R.layout.transition_test, this);
         }
     }
 	

@@ -282,10 +282,6 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
             return R.layout.subscription_list;
         }
 
-        if ((argDisplayLayout == LayoutType.LIST)) {
-            return R.layout.channel_new;
-        }
-
         if ((argDisplayLayout == LayoutType.FEED)) {
             return R.layout.feed_view;
         }
