@@ -37,6 +37,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -102,7 +103,8 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-        View view = mInflater.inflate(R.layout.episode_list, viewGroup, false);
+        View view = null;
+        view = mInflater.inflate(R.layout.episode_list, viewGroup, false);
         PlaylistViewHolder holder = null;
 
         holder = new PlaylistViewHolder(view);
@@ -404,6 +406,10 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
 
         if (holder.episode == null) {
             return;
+        } else {
+            if (!TextUtils.isEmpty(holder.episode.image)) {
+                mBitmapCache.remove(holder.episode.image);
+            }
         }
 
         //PlayerStatusObservable.unregisterListener(holder.seekbar);
