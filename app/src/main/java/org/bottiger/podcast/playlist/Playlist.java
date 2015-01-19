@@ -219,7 +219,7 @@ public class Playlist {
 		String where = (showListened) ? "1" : ItemColumns.LISTENED + "== 0";
         where += " AND ";
         where += ItemColumns.SUBS_ID + " IN (SELECT " + SubscriptionColumns._ID + " FROM "  +
-                SubscriptionColumns.TABLE_NAME + " WHERE + " + SubscriptionColumns.STATUS + "<>"
+                SubscriptionColumns.TABLE_NAME + " WHERE " + SubscriptionColumns.STATUS + "<>"
                 + Subscription.STATUS_UNSUBSCRIBED + ")";
 
 

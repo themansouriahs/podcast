@@ -143,8 +143,15 @@ public class PodcastProvider extends ContentProvider {
 			throw new IllegalArgumentException("Unknown URI " + uri);
 		}
 		SQLiteDatabase db = mHelper.getReadableDatabase();
-		Cursor c = qb.query(db, projection, selection, selectionArgs, null,
-				null, orderBy);
+        Cursor c = null;
+        try {
+
+
+            c = qb.query(db, projection, selection, selectionArgs, null,
+                    null, orderBy);
+        } catch (Exception e) {
+            throw e;
+        }
 
 		c.setNotificationUri(getContext().getContentResolver(), uri);
 		return c;
