@@ -62,8 +62,8 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
     private TextView mTitleView;
     private FeedViewAdapter mAdapter;
     private FeedCursorLoader mCursorLoader;
-    private static RelativeLayoutWithBackground mContainer;
-    private static ImageView mContainerBackground;
+    private RelativeLayoutWithBackground mContainer;
+    private ImageView mContainerBackground;
 
     private static BackgroundTransformation mBackgroundTransformation;
 
@@ -89,6 +89,9 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
 
         @Override
         public void onPrepareLoad(Drawable placeHolderDrawable) {
+            if (isAdded()) {
+                mContainerBackground.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+            }
             return;
         }
     };
