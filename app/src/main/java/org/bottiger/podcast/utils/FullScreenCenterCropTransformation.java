@@ -7,11 +7,15 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Transformation;
+
+import org.acra.ACRA;
+import org.acra.log.ACRALog;
 
 /**
  * Created by apl on 09-11-2014.
@@ -86,7 +90,14 @@ public class FullScreenCenterCropTransformation implements Transformation {
             cropStartY = pixelsToCrop / topVersusBottomCrop;
         }
 
-        Bitmap croppedBitmap = Bitmap.createBitmap(scaledBitmap, cropStartY, 0, (int) m_viewWidth, m_viewHeight);
+        Bitmap croppedBitmap = null;
+        try {
+            croppedBitmap = Bitmap.createBitmap(scaledBitmap, cropStartY, 0, (int) m_viewWidth, m_viewHeight);
+        } catch (IllegalArgumentException iae) {
+            ACRA.getErrorReporter().handleSilentException(iae);
+            Log.e("BitmapCreationError", "cropStartY: " + cropStartY + " w: " + m_viewWidth + " h: " + m_viewHeight);
+            return scaledBitmap;
+        }
         scaledBitmap.recycle();
 
         // Consider converting the images to RGB_565 to save memory
