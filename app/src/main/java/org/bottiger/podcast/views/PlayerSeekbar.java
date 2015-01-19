@@ -183,9 +183,13 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
 
         mSideMargin = argContext.getResources().getDimensionPixelSize(R.dimen.action_bar_height);
 
+        int seekbarHeight = argContext.getResources().getDimensionPixelSize(R.dimen.seekbar_thumb_size);
+        int seebarWidth = seekbarHeight / 3 *2;
+
         Drawable thumb = getResources().getDrawable(R.drawable.seekbar_handle);
         Bitmap bitmap = ((BitmapDrawable) thumb).getBitmap();
-        thumb = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, 60, 90, true));
+        thumb = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, seebarWidth, seekbarHeight, true));
+        //thumb = new BitmapDrawable(getResources(), Bitmap.createBitmap(bitmap));
 
         setThumb(thumb);
     }
