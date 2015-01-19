@@ -9,8 +9,8 @@ android {
         applicationId "org.bottiger.podcast"
         minSdkVersion 16
         targetSdkVersion 21
-        versionCode 51
-        versionName "0.37"
+        versionCode 53
+        versionName "0.39"
         //useJack = true
     }
     buildTypes {
