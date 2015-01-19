@@ -150,5 +150,7 @@
     <string name="drawer_close">Close</string>
     <string name="pref_stream_proxy_title">Download while streaming</string>
     <string name="pref_stream_proxy">This may require some extra time buffering</string>
+    <string name="episode_title">Episode title</string>
+    <string name="episode_description">Episode description</string>
 
 </resources>

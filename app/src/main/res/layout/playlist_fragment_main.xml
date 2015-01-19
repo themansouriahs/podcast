@@ -77,40 +77,50 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop" />
-            <!--
-            <com.melnykov.fab.FloatingActionButton
-                android:id="@+id/fab"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_above="@id/expanded_controls"
-                android:layout_margin="16dp"
-                android:src="@drawable/ic_action_delete"
-                android:elevation="10dp"
-                fab:fab_shadow="true"
-                fab:fab_colorNormal="@color/colorAccent"
-                fab:fab_colorPressed="@color/colorPrimary"
-                fab:fab_colorRipple="@color/blue" />
-                -->
 
+            <TextView
+                android:id="@+id/episode_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:text="@string/episode_title"
+                android:singleLine="true"
+                android:background="@color/blackWithAlpha"
+                android:textColor="@color/white_opaque"
+                android:textSize="30dp"
+                android:padding="5dp"
+                android:layout_marginTop="@dimen/header_bar_height"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"/>
+
+            <TextView
+                android:id="@+id/episode_info"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/episode_title"
+                android:layout_above="@id/expanded_controls"
+                android:text="@string/episode_description"
+                android:background="@color/blackWithAlpha"
+                android:padding="5dp"
+                android:textColor="@color/white_opaque"
+                android:textSize="20dp"
+                android:visibility="gone"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"/>
             <!--
-            <com.melnykov.fab.FloatingActionButton
-                android:id="@+id/play_pause_button"
-                android:layout_width="90dp"
-                android:layout_height="90dp"
-                android:layout_margin="16dp"
-                android:src="@drawable/av_play"
-                android:elevation="10dp"
-                fab:fab_shadow="true"
-                fab:fab_colorNormal="@color/colorAccent"
-                fab:fab_colorPressed="@color/colorPrimary"
-                fab:fab_colorRipple="@color/blue" />-->
+
+                android:alpha="0.3"
+            android:layout_above="@id/expanded_controls"
+                android:layout_marginBottom="100dp"
+
+                -->
 
             <org.bottiger.podcast.views.PlayPauseImageView
                 style="@style/PodcastImage"
                 android:id="@+id/play_pause_button"
                 android:layout_width="90dp"
                 android:layout_height="90dp"
-                android:layout_marginTop="80dp"
+                android:layout_marginTop="240dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginBottom="10dp"
                 android:paddingRight="14dip"

@@ -7,7 +7,9 @@ import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.FrameLayout;
 
 import org.bottiger.podcast.R;
 
@@ -31,7 +33,6 @@ public class FeedRefreshLayout extends SwipeRefreshLayout {
     private void init(Context argContext) {
         float offset = argContext.getResources().getDimension(R.dimen.header_bar_height);
         setProgressViewOffset (false, 0, (int)(offset*1.2));
-        //mOriginalOffsetTop += offset;
     }
 
     public void setRecyclerView(RecyclerView recyclerView) {

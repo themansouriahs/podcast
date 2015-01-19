@@ -68,6 +68,10 @@ public class SwipeRefreshExpandableLayout extends FeedRefreshLayout implements T
         mTopPlayer = (TopPlayer) findViewById(R.id.session_photo_container);
     }
 
+    public ScrollState getCurrentScrollState() {
+        return mCurrentScrollState;
+    }
+
     public void setCurrentScrollState(ScrollState argScrollState) {
         mCurrentScrollState = argScrollState;
     }
@@ -97,7 +101,7 @@ public class SwipeRefreshExpandableLayout extends FeedRefreshLayout implements T
     }
 
     private void delegateToTopPlayer(MotionEvent event) {
-        if (mRecycerView != null && (mRecycerView.scrolledToTop() || (mCurrentScrollState != ScrollState.MINIMAIL_PLAYER_AND_SCROLLED_LIST))) {
+        if (mRecycerView != null) { // && (mRecycerView.scrolledToTop() || (mCurrentScrollState != ScrollState.MINIMAIL_PLAYER_AND_SCROLLED_LIST))) {
             Log.d("Delegate touch event", "event -> " + event.toString());
             mDetector.onTouchEvent(event);
         }
@@ -129,13 +133,16 @@ public class SwipeRefreshExpandableLayout extends FeedRefreshLayout implements T
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
+        delegateToTopPlayer(event);
         //Log.d("Skipping motion", "mLastEvent" + mLastEvent);
+        /*
         if (mLastEvent != event.hashCode()) {
             delegateToTopPlayer(event);
-            //Log.d("Skipping motion", "hurra" + event.hashCode());
+            Log.d("Skipping motion", "hurra" + event.hashCode());
         } else
-            //Log.d("Skipping motion", "event" + event.hashCode());
+            Log.d("Skipping motion", "event" + event.hashCode());
 
+*/
         mLastEvent = -1;
 
         //Log.d("SwipeRefreshExpandableLayout touch", "event" + event.toString());
@@ -150,11 +157,11 @@ public class SwipeRefreshExpandableLayout extends FeedRefreshLayout implements T
         boolean TouchFromSuper = super.onTouchEvent(event);
 
         if (mDownGeastureInProgress) {
-            Log.d("SwipeRefreshExpandableLayout touch", "return" + true);
+            Log.d("SwipeRefreshExpandableLayout touch", "(mDownGeastureInProgress) return: " + true);
             return true;
         }
 
-        Log.d("SwipeRefreshExpandableLayout touch", "return" + TouchFromSuper);
+        Log.d("SwipeRefreshExpandableLayout touch", "return: " + TouchFromSuper);
         return TouchFromSuper;
     }
     @Override
@@ -168,6 +175,7 @@ public class SwipeRefreshExpandableLayout extends FeedRefreshLayout implements T
         //Log.d("Skipping motion", "setting event" + event.hashCode());
         mLastEvent = event.hashCode();
 
+        /*
         if (mRecycerView != null && mRecycerView.canScrollVertically(FixedRecyclerView.DOWN)) {
             Log.d("SwipeRefreshExpandableLayout touch", "intercept (recycler can scroll) =>" + false);
             return false;
@@ -176,9 +184,10 @@ public class SwipeRefreshExpandableLayout extends FeedRefreshLayout implements T
         if (mRecycerView == null) {
             Log.d("SwipeRefreshExpandableLayout touch", "intercept (recycler null) =>" + false);
             return false;
-        }
+        }*/
 
         delegateToTopPlayer(event);
+
 
         if (mCurrentScrollState == ScrollState.MINIMAIL_PLAYER_AND_SCROLLED_LIST) {
             //return true;

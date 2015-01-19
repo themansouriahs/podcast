@@ -1,15 +1,12 @@
 package org.bottiger.podcast.views;
 
 import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
-import android.transition.ChangeBounds;
-import android.transition.ChangeTransform;
 import android.transition.Scene;
 import android.transition.Transition;
 import android.transition.TransitionManager;
@@ -26,8 +23,7 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 
 import org.bottiger.podcast.R;
-import org.bottiger.podcast.listeners.PaletteListener;
-import org.bottiger.podcast.listeners.PaletteObservable;
+import org.bottiger.podcast.utils.UIUtils;
 
 /**
  * Created by apl on 30-09-2014.
@@ -60,13 +56,24 @@ public class TopPlayer extends RelativeLayout {
     private long mAnimationStartTime = -1;
     private long mAnimationDuration = 100;
 
-    public static int sizeSmall   = -1;
-    public static int sizeMedium  = 1000;
-    public static int sizeLarge   = -1;
-    public static int sizeActionbar   = -1;
+    public static int sizeSmall                 =   -1;
+    public static int sizeMedium                =   -1;
+    public static int sizeLarge                 =   -1;
+    public static int sizeActionbar             =   -1;
 
-    private static int sPlayPauseMarginSmall = 300;
-    private static int sPlayPauseMarginLarge = 660;
+    private boolean mSeekbarVisible             =   true;
+    private int mSeekbarDeadzone                =   20; // dp
+    private int mSeekbarFadeDistance            =   20; // dp
+    private int mTextInfoFadeDistance           =   100; // dp
+    private int mTextFadeDistance               =   20; // dp
+
+    private int mSeekbarDeadzonePx;
+    private int mSeekbarFadeDistancePx;
+    private int mTextFadeDistancePx;
+    private int mTextInfoFadeDistancePx;
+
+    private static int sPlayPauseMarginSmall    =   300;
+    private static int sPlayPauseMarginLarge    =   660;
 
     private PlayerLayout mCurrentLayout = PlayerLayout.LARGE;
     private boolean mCanScrollUp = true;
@@ -79,8 +86,12 @@ public class TopPlayer extends RelativeLayout {
     private LinearLayout mPlayerButtons;
     private int mPlayerButtonsHeight = -1;
 
+    private View mEpisodeText;
+    private View mEpisodeInfo;
+    private View mPhoto;
     private View mPlayPauseButton;
     private View mSeekbar;
+
     private View mBackButton;
     private View mDownloadButton;
     private View mQueueButton;
@@ -124,8 +135,14 @@ public class TopPlayer extends RelativeLayout {
         mAnimationSet = new AnimatorSet();
 
         sizeSmall = mContext.getResources().getDimensionPixelSize(R.dimen.top_player_size_minimum);
+        sizeMedium = mContext.getResources().getDimensionPixelSize(R.dimen.top_player_size_medium);
         sizeLarge = mContext.getResources().getDimensionPixelSize(R.dimen.top_player_max_offset);
         //sizeLarge = 1080; // 1080
+
+        mSeekbarDeadzonePx        = (int)UIUtils.convertDpToPixel(mSeekbarDeadzone, mContext);
+        mSeekbarFadeDistancePx    = (int)UIUtils.convertDpToPixel(mSeekbarFadeDistance, mContext);
+        mTextFadeDistancePx       = (int)UIUtils.convertDpToPixel(mTextFadeDistance, mContext);
+        mTextInfoFadeDistancePx   = (int)UIUtils.convertDpToPixel(mTextInfoFadeDistance, mContext);
 
         sizeActionbar = mContext.getResources().getDimensionPixelSize(R.dimen.action_bar_height);
 
@@ -141,7 +158,11 @@ public class TopPlayer extends RelativeLayout {
     protected void onFinishInflate () {
         mPlayerControlsLinearLayout = (PlayerLinearLayout)findViewById(R.id.expanded_controls);
 
+        mPhoto = findViewById(R.id.session_photo);
+
         mPlayPauseButton = findViewById(R.id.play_pause_button);
+        mEpisodeText = findViewById(R.id.episode_title);
+        mEpisodeInfo = findViewById(R.id.episode_info);
         mSeekbar = findViewById(R.id.player_progress);
         mBackButton = findViewById(R.id.previous);
         mDownloadButton = findViewById(R.id.download);
@@ -182,12 +203,18 @@ public class TopPlayer extends RelativeLayout {
 
         float transY;
         float minMaxScreenHeight = maxScreenHeight;
+        minMaxScreenHeight = minMaxScreenHeight < sizeSmall ? sizeSmall : minMaxScreenHeight;
         mCanScrollUp = maxScreenHeight > sizeSmall;
 
         Log.d("TopPlayerInput", "(canScrollUp: " + mCanScrollUp + ")maxScreenHeight -> " + maxScreenHeight + "ScreenOffset -> " + argOffset);
 
+        mPhoto.setTranslationY(-(argOffset/2));
+        mEpisodeText.setTranslationY(-argOffset);
+        mEpisodeInfo.setTranslationY(-argOffset);
+
         int offset = -1;
         if (argScreenHeight <= sizeMedium) {
+
             if (mPlayerButtonsHeight < 0) {
                 mPlayerButtonsHeight = mPlayerButtons.getHeight()-50;
 
@@ -201,49 +228,59 @@ public class TopPlayer extends RelativeLayout {
             mPlayPauseButton.setTranslationY(buttonOffset);
         }
 
-        /*
-        if (!mCanScrollUp) {
-
-
-            getLayoutParams().height = sizeSmall;
-
-            mPlayPauseButton.setTranslationY(-sizeSmall+sizeActionbar/2);
-            //return sizeSmall;
-        } else {
-            getLayoutParams().height = sizeLarge;
-        }*/
-
         String size = "large";
-        if (maxScreenHeight >= sizeSmall) {
-            getLayoutParams().height = sizeLarge;
 
-            transY = minMaxScreenHeight-sizeLarge; //argOffset;
-            Log.d("setTranslationXYZ", "minMaxScreenHeight: " +  minMaxScreenHeight);
+        transY = minMaxScreenHeight-sizeLarge; //argOffset;
+        Log.d("setTranslationXYZ", "minMaxScreenHeight: " +  minMaxScreenHeight);
 
-            setTranslationY(transY);
-        } else {
-            size = "small";
-            getLayoutParams().height = sizeSmall;
+        setTranslationY(transY);
 
-            mPlayPauseButton.setTranslationY(-sizeSmall+sizeActionbar/2);
+        // Set seekbar visibility
+        setSeekbarVisibility(argScreenHeight);
 
-            transY = -(getHeight()-sizeSmall);
-            setTranslationY(transY);
-            minMaxScreenHeight = sizeSmall;
-        }
+        // Set TextBox visibility
+        setTextVisibility(argScreenHeight);
+        setTextInfoVisibility(argScreenHeight);
 
         Log.d("setTranslationXYZ", size + ": " +  getLayoutParams().height + " trans: " + transY);
-
-        if (offset > 0) { // offset == mPlayerButtonsHeight &&
-            transformLayout((SeekBar) mSeekbar, (PlayPauseImageView) mPlayPauseButton, PlayerLayout.SMALL);
-        } else {
-            transformLayout((SeekBar) mSeekbar, (PlayPauseImageView) mPlayPauseButton, PlayerLayout.LARGE);
-        }
 
         Log.d("TopPlayerInputk", "layoutparams =>" + getLayoutParams().height + "Translation =>" + transY + " minMaxHeight =>" + minMaxScreenHeight);
         return minMaxScreenHeight; // return newVisibleHeight
     }
 
+    public float setTextVisibility(float argTopPlayerHeight) {
+        return setGenericVisibility(mEpisodeText, sizeMedium, mTextFadeDistancePx, argTopPlayerHeight);
+    }
+
+    public float setTextInfoVisibility(float argTopPlayerHeight) {
+        return setGenericVisibility(mEpisodeInfo, sizeLarge, mTextInfoFadeDistancePx, argTopPlayerHeight);
+    }
+
+    public float setSeekbarVisibility(float argTopPlayerHeight) {
+        return setGenericVisibility(mSeekbar, sizeMedium, mSeekbarFadeDistancePx, argTopPlayerHeight);
+    }
+
+    public float setGenericVisibility(@NonNull View argView, int argVisibleHeight, int argFadeDistance, float argTopPlayerHeight) {
+        Log.d("Top", "setGenericVisibility: h: " + argTopPlayerHeight);
+
+        int VisibleHeightPx = argVisibleHeight;
+        int InvisibleHeightPx = argVisibleHeight-argFadeDistance;
+
+        if (argTopPlayerHeight > VisibleHeightPx)
+            return 1f;
+
+        if (argTopPlayerHeight < InvisibleHeightPx || argTopPlayerHeight == sizeSmall)
+            return 0f;
+
+        float thressholdDiff = VisibleHeightPx - InvisibleHeightPx;
+        float DistanceFromVisible = argTopPlayerHeight-InvisibleHeightPx;
+
+        float VisibilityFraction = DistanceFromVisible / thressholdDiff;
+
+        argView.setAlpha(VisibilityFraction);
+
+        return VisibilityFraction;
+    }
 
     public boolean isSmall() {
         return mPlayerLayout == PlayerLayout.SMALL;
@@ -261,6 +298,10 @@ public class TopPlayer extends RelativeLayout {
         return true;
     }
 
+    public boolean isMinimumSize(int argHeight) {
+        return sizeSmall >= argHeight;
+    }
+
     public boolean isMinimumSize() {
         //return !mCanScrollUp;
         return sizeSmall == getHeight()+getTranslationY();
@@ -271,7 +312,7 @@ public class TopPlayer extends RelativeLayout {
         return mPlayerLayout == PlayerLayout.LARGE && getTranslationY() >= 0; // FIXME: refine
     }
 
-    private void transformLayout(@NonNull SeekBar argSeekbar, @NonNull PlayPauseImageView argPlayPause, PlayerLayout argTargetLayout) {
+    private void transformLayout(@NonNull SeekBar argSeekbar, PlayerLayout argTargetLayout) {
 
         if (mPlayerLayout == argTargetLayout) {
             return;
@@ -307,12 +348,6 @@ public class TopPlayer extends RelativeLayout {
 
         seekbarParams.leftMargin = endValues.SeekBarLeftMargin;
 
-        /*
-        mTransitionManager.beginDelayedTransition(this);
-
-        mPlayPauseButton.setLayoutParams(playPauseParams);
-        mSeekbar.setLayoutParams(seekbarParams);
-        */
         Log.d("Interp", "gogog");
         Animation a = new Animation() {
 
@@ -344,9 +379,7 @@ public class TopPlayer extends RelativeLayout {
             }
         };
 
-        //ObjectAnimator anim = ObjectAnimator.ofFloat(mSeekbar, "alpha", 0f, 1f);
         a.setDuration(100);
-        //a.start();
         startAnimation(a);
     }
 

@@ -49,9 +49,12 @@ public class FixedRecyclerView extends RecyclerView {
         if (direction < 1) {
             boolean original = super.canScrollVertically(direction);
             mCanScrollRecyclerView = !original && getChildAt(0) != null && getChildAt(0).getTop() < 0 || original;
+            Log.d("FixedRecyclerView", "(mCanScrollRecyclerView) canscroll: " + mCanScrollRecyclerView);
             return mCanScrollRecyclerView;
         }
-        return super.canScrollVertically(direction);
+        boolean canScroll = super.canScrollVertically(direction);
+        Log.d("FixedRecyclerView", "(super) canscroll: " + canScroll);
+        return canScroll;
     }
 
     public void disableScrolling(boolean isDisabled) {
@@ -77,7 +80,7 @@ public class FixedRecyclerView extends RecyclerView {
         if (mRequestDisallowInterceptTouchEvent)
             return false;
 
-        Log.d("RecyclerIntercept", "Intercept -> " + getCanScrollRecyclerView());
+        Log.d("FixedRecyclerView", "Intercept -> " + getCanScrollRecyclerView());
 
 
         switch (ev.getAction()) {

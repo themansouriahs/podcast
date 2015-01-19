@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:android="http://schemas.android.com/apk/res/android">
+<resources xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
 
     <color name="white_opaque">#FFFFFFFF</color>
     <color name="pitch_black">#FF000000</color>
@@ -124,9 +124,9 @@
     <!-- <style name="PlayerButton" parent="@style/PodcastImageSIze">-->
     <!-- <item name="android:scaleType">fitStart</item> -->
     <style name="PlayerButton" parent="@style/PodcastImageSIze">
-        <item name="android:layout_width">30dip</item>
-        <item name="android:layout_height">65dip</item>
-        <item name="android:layout_margin">15dip</item>
+        <item name="android:layout_width">50dip</item>
+        <item name="android:layout_height">50dip</item>
+        <item name="android:layout_margin">0dip</item>
         <item name="android:layout_weight">1</item>
     </style>
 
@@ -160,8 +160,8 @@
 
     <style name="PlayerControlButtons">
         <item name="android:scaleType">fitStart</item>
-        <item name="android:layout_width">37dp</item>
-        <item name="android:layout_height">37dp</item>
+        <item name="android:layout_width">@dimen/playpause_button_size</item>
+        <item name="android:layout_height">@dimen/playpause_button_size</item>
         <item name="android:layout_margin">10dip</item>
         <item name="android:background">@drawable/button_flash</item>
         <!-- 

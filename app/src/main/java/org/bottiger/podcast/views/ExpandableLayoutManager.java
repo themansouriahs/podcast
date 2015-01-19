@@ -56,7 +56,7 @@ public class ExpandableLayoutManager extends LinearLayoutManager {
     @Override
     public boolean canScrollVertically() {
         boolean canScroll = super.canScrollVertically();
-        //Log.d("ExpandableLayoutManager", "canScrollV => "+ mcanScrollVertically);
+        Log.d("ExpandableLayoutManager", "canScrollV => "+ mcanScrollVertically);
         return mcanScrollVertically;
     }
 

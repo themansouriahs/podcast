@@ -13,6 +13,8 @@ import android.support.v7.graphics.Palette;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.SparseIntArray;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import org.bottiger.podcast.R;
@@ -27,7 +29,8 @@ import org.bottiger.podcast.provider.FeedItem;
 /**
  * TODO: document your custom view class.
  */
-public class PlayerButtonView extends com.melnykov.fab.FloatingActionButton implements PlayerStatusObserver, PaletteListener, DownloadObserver {
+//public class PlayerButtonView extends com.melnykov.fab.FloatingActionButton implements PlayerStatusObserver, PaletteListener, DownloadObserver {
+public class PlayerButtonView extends ImageButton implements PlayerStatusObserver, PaletteListener, DownloadObserver {
 
     public final static int STATE_DEFAULT = 0;
     public final static int STATE_DOWNLOAD = 1;
@@ -223,26 +226,6 @@ public class PlayerButtonView extends com.melnykov.fab.FloatingActionButton impl
         this.invalidate();
     }
 
-    /*
-        @Override
-    public void onPaletteFound(TINT argTint, int argColor) {
-        boolean updateView = false;
-        if (argTint == TINT.VIBRANT_LIGHT) {
-            baseColorPaint.setColor(argColor);
-            updateView = true;
-        }
-
-        if (argTint == TINT.VIBRANT) {
-            foregroundColorPaint.setColor(argColor);
-            updateView = true;
-        }
-
-        if (updateView) {
-            invalidate();
-        }
-    }
-     */
-
     @Override
     public void onPaletteFound(Palette argChangedPalette) {
         Palette.Swatch swatch = argChangedPalette.getVibrantSwatch();
@@ -251,7 +234,8 @@ public class PlayerButtonView extends com.melnykov.fab.FloatingActionButton impl
         baseColorPaint.setColor(c); // -1761607680
         //foregroundColorPaint.setColor(swatch.getBodyTextColor());
         foregroundColorPaint.setColor(c);
-        super.setColorNormal(PlayerButtonView.ButtonColor(argChangedPalette));
+        //super.setColorNormal(PlayerButtonView.ButtonColor(argChangedPalette));
+        setBackgroundColor(PlayerButtonView.ButtonColor(argChangedPalette));
         invalidate();
     }
 

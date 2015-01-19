@@ -19,7 +19,8 @@
     <dimen name="navigation_bar_height">24dp</dimen>
     <dimen name="header_bar_height">76dp</dimen>
 
-    <dimen name="top_player_size_minimum">150dp</dimen>
+    <dimen name="top_player_size_minimum">175dp</dimen>
+    <dimen name="top_player_size_medium">215dp</dimen>
     <dimen name="top_player_size_maximum">300dp</dimen>
 
     <dimen name="overlay_side_margin">40dp</dimen>
@@ -43,5 +44,8 @@
     <!-- Action Bar auto-hide-on-scroll behavior parameters -->
     <dimen name="action_bar_auto_hide_min_y">152dp</dimen>
     <dimen name="action_bar_auto_hide_sensivity">48dp</dimen>
+
+    <dimen name="playpause_button_size">20dp</dimen>
+    <dimen name="player_buttons_padding_left">74dp</dimen> <!-- around 2*playpause_button_size -->
     
 </resources>
