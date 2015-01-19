@@ -169,29 +169,17 @@ public class TopPlayer extends RelativeLayout {
             return -1;
         }
 
+        Log.d("setTranslationXYZ", "argScreenHeight: " +  argScreenHeight);
+
         float maxScreenHeight = argScreenHeight > sizeLarge ? sizeLarge : argScreenHeight;
 
-        Log.d("TopPlayer", "maxScreenHeight -> " + maxScreenHeight + "ScreenOffset -> " + argOffset);
+        Log.d("setTranslationXYZ", "maxScreenHeight: " +  maxScreenHeight);
+
+        float transY;
+        float minMaxScreenHeight = maxScreenHeight;
         mCanScrollUp = maxScreenHeight > sizeSmall;
 
-        boolean didExpand = false;
-        boolean didCollapse = false;
-
-        if (!mCanScrollUp) {
-            if (getHeight() > sizeSmall)
-                didCollapse = true;
-
-
-            getLayoutParams().height = sizeSmall;
-
-            mPlayPauseButton.setTranslationY(-sizeSmall+sizeActionbar/2);
-            return sizeSmall;
-        } else {
-            if (getHeight() == sizeSmall)
-                didExpand = true;
-
-            getLayoutParams().height = sizeLarge;
-        }
+        Log.d("TopPlayerInput", "(canScrollUp: " + mCanScrollUp + ")maxScreenHeight -> " + maxScreenHeight + "ScreenOffset -> " + argOffset);
 
         int offset = -1;
         if (argScreenHeight <= sizeMedium) {
@@ -208,18 +196,38 @@ public class TopPlayer extends RelativeLayout {
             mPlayPauseButton.setTranslationY(buttonOffset);
         }
 
-        float transY;
-        float minMaxScreenHeight = maxScreenHeight;
+        /*
+        if (!mCanScrollUp) {
 
+
+            getLayoutParams().height = sizeSmall;
+
+            mPlayPauseButton.setTranslationY(-sizeSmall+sizeActionbar/2);
+            //return sizeSmall;
+        } else {
+            getLayoutParams().height = sizeLarge;
+        }*/
+
+        String size = "large";
         if (maxScreenHeight >= sizeSmall) {
+            getLayoutParams().height = sizeLarge;
+
             transY = minMaxScreenHeight-sizeLarge; //argOffset;
+            Log.d("setTranslationXYZ", "minMaxScreenHeight: " +  minMaxScreenHeight);
 
             setTranslationY(transY);
         } else {
+            size = "small";
+            getLayoutParams().height = sizeSmall;
+
+            mPlayPauseButton.setTranslationY(-sizeSmall+sizeActionbar/2);
+
             transY = -(getHeight()-sizeSmall);
             setTranslationY(transY);
             minMaxScreenHeight = sizeSmall;
         }
+
+        Log.d("setTranslationXYZ", size + ": " +  getLayoutParams().height + " trans: " + transY);
 
         if (offset > 0) { // offset == mPlayerButtonsHeight &&
             transformLayout((SeekBar) mSeekbar, (PlayPauseImageView) mPlayPauseButton, PlayerLayout.SMALL);
@@ -227,8 +235,8 @@ public class TopPlayer extends RelativeLayout {
             transformLayout((SeekBar) mSeekbar, (PlayPauseImageView) mPlayPauseButton, PlayerLayout.LARGE);
         }
 
-        Log.d("TopPlayerTranslation", "Translation =>" + transY + " minMaxHeight =>" + minMaxScreenHeight);
-        return minMaxScreenHeight;
+        Log.d("TopPlayerInputk", "layoutparams =>" + getLayoutParams().height + "Translation =>" + transY + " minMaxHeight =>" + minMaxScreenHeight);
+        return minMaxScreenHeight; // return newVisibleHeight
     }
 
 
@@ -249,7 +257,8 @@ public class TopPlayer extends RelativeLayout {
     }
 
     public boolean isMinimumSize() {
-        return !mCanScrollUp;
+        //return !mCanScrollUp;
+        return sizeSmall == getHeight()+getTranslationY();
     }
 
     public boolean isMaximumSize() {
@@ -262,6 +271,8 @@ public class TopPlayer extends RelativeLayout {
         if (mPlayerLayout == argTargetLayout) {
             return;
         }
+
+        Log.d("LayoutTransform", "From: " + mPlayerLayout + " to: " + argTargetLayout);
 
         final PlayerLayoutParameter startValue, endValues;
 

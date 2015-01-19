@@ -9,4 +9,6 @@ import android.service.notification.NotificationListenerService;
  * Created by apl on 09-11-2014.
  */
 public class NotificationListener extends NotificationListenerService {
+    public NotificationListener() {
+    }
 }

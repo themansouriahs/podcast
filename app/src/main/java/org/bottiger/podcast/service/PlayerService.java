@@ -32,6 +32,7 @@ import android.os.Message;
 import android.preference.PreferenceManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 
 /**
  * The service which handles the audio extended_player. This is responsible for playing
@@ -41,6 +42,14 @@ import android.telephony.TelephonyManager;
  */
 public class PlayerService extends Service implements
 		AudioManager.OnAudioFocusChangeListener {
+
+    public static final String ACTION_PLAY = "action_play";
+    public static final String ACTION_PAUSE = "action_pause";
+    public static final String ACTION_REWIND = "action_rewind";
+    public static final String ACTION_FAST_FORWARD = "action_fast_foward";
+    public static final String ACTION_NEXT = "action_next";
+    public static final String ACTION_PREVIOUS = "action_previous";
+    public static final String ACTION_STOP = "action_stop";
 
 	/** Which action to perform when a track ends */
 	private static enum NextTrack {
@@ -66,7 +75,11 @@ public class PlayerService extends Service implements
 
 	private final PodcastLog log = PodcastLog.getLog(getClass());
 
-	MyPlayer mPlayer = null;
+    private MediaSession mMediaSession;
+	private MyPlayer mPlayer = null;
+    private MediaController mController;
+
+
 	private NotificationManager mNotificationManager;
 	private NotificationPlayer mNotificationPlayer;
     private MediaSessionManager mMediaSessionManager;
@@ -111,9 +124,11 @@ public class PlayerService extends Service implements
 
     // This doesn't work in L preview 2
     public MediaSession.Token getToken() {
+        /*
         ComponentName componentName = new ComponentName(getPackageName(), NotificationListener.class.getName());
         List<MediaController> list =  mMediaSessionManager.getActiveSessions(componentName);
-        return list.get(0).getSessionToken();
+        return list.get(0).getSessionToken();*/
+        return mMediaSession.getSessionToken();
     }
 
 	private void startAndFadeIn() {
@@ -138,7 +153,43 @@ public class PlayerService extends Service implements
 				HeadsetReceiver.class);
 		log.debug("onCreate(): " + mControllerComponentName);
 		this.mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+
+        // from https://github.com/googlesamples/android-MediaBrowserService/blob/master/Application/src/main/java/com/example/android/mediabrowserservice/MusicService.java
+        // Start a new MediaSession
+        mMediaSession = new MediaSession(this, "MusicService");
+        //setSessionToken(mMediaSession.getSessionToken());
+        //mMediaSession.setCallback(new MediaSessionCallback());
+        mMediaSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS |
+                MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
+
+        mController = new MediaController(getApplicationContext(), getToken()); // .fromToken( mSession.getSessionToken() );
+
 	}
+
+    private void handleIntent( Intent intent ) {
+        if( intent == null || intent.getAction() == null )
+            return;
+
+        String action = intent.getAction();
+
+        if( action.equalsIgnoreCase( ACTION_PLAY ) ) {
+            //mController.getTransportControls().play();
+            start();
+        } else if( action.equalsIgnoreCase( ACTION_PAUSE ) ) {
+            //mController.getTransportControls().pause();
+            pause();
+        } else if( action.equalsIgnoreCase( ACTION_FAST_FORWARD ) ) {
+            mController.getTransportControls().fastForward();
+        } else if( action.equalsIgnoreCase( ACTION_REWIND ) ) {
+            mController.getTransportControls().rewind();
+        } else if( action.equalsIgnoreCase( ACTION_PREVIOUS ) ) {
+            mController.getTransportControls().skipToPrevious();
+        } else if( action.equalsIgnoreCase( ACTION_NEXT ) ) {
+            mController.getTransportControls().skipToNext();
+        } else if( action.equalsIgnoreCase( ACTION_STOP ) ) {
+            mController.getTransportControls().stop();
+        }
+    }
 
 	@Override
 	public void onAudioFocusChange(int focusChange) {
@@ -217,7 +268,7 @@ public class PlayerService extends Service implements
 		}
 
 		public void start() {
-			Notification notification = notifyStatus();
+			notifyStatus();
 
 			// Request audio focus for playback
 			int result = mAudioManager.requestAudioFocus(PlayerService.this,
@@ -230,8 +281,7 @@ public class PlayerService extends Service implements
 				mAudioManager
 						.registerMediaButtonEventReceiver(mControllerComponentName);
 				mMediaPlayer.start();
-				startForeground(mNotificationPlayer.getNotificationId(),
-						notification);
+
 				PlayerStatusObservable
 						.updateStatus(PlayerStatusObservable.STATUS.PLAYING);
 			}
@@ -424,6 +474,12 @@ public class PlayerService extends Service implements
 		log.debug("onStart()");
 	}
 
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        handleIntent( intent );
+        return super.onStartCommand(intent, flags, startId);
+    }
+
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
@@ -463,8 +519,9 @@ public class PlayerService extends Service implements
 		if (mNotificationPlayer == null)
 			mNotificationPlayer = new NotificationPlayer(this, mItem);
 
-		return mNotificationPlayer.show(this);
-	}
+        mNotificationPlayer.setPlayerService(this);
+		return mNotificationPlayer.show();
+    }
 
 	public void playNext(long nextId) {
 		// assert playlistAdapter != null;

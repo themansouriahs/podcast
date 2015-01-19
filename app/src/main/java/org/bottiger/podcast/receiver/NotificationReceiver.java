@@ -38,7 +38,8 @@ public class NotificationReceiver extends  BroadcastReceiver {
 			}
 			
 			np = new NotificationPlayer(context, mPlayerServiceBinder.getCurrentItem());
-			np.show(isPlaying, mPlayerServiceBinder);
+            np.setPlayerService(mPlayerServiceBinder);
+			np.show(isPlaying);
 		}
 		
 		if (action.equals(nextAction)) {

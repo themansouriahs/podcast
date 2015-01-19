@@ -339,6 +339,14 @@ public class PlaylistFragment extends GeastureFragment implements
 
     public boolean scrollLayout( float distanceY) {
         Log.d("GeatureDetector", "scrollLayout: distanceY -> " + distanceY);
+
+        ExpandableLayoutManager elm = ((ExpandableLayoutManager) mRecyclerView.getLayoutManager());
+        if (mPhotoContainer.isMinimumSize()) {
+            elm.SetCanScrollVertically(true);
+        } else {
+            elm.SetCanScrollVertically(false);
+        }
+
         mSwipeRefreshView.mDownGeastureInProgress = true;
         // distanceY > 0 => scroll up
         // distanceY < 0 => scroll down
@@ -351,13 +359,15 @@ public class PlaylistFragment extends GeastureFragment implements
 
         int containerHeight = mPhotoContainer.getHeight();
         float containerTranslationY = mPhotoContainer.getTranslationY();
-        float currentHeight = !mPhotoContainer.isMinimumSize() ? containerHeight+containerTranslationY-distanceY : mPhotoContainer.getHeight()-distanceY;
+        //float currentHeight = !mPhotoContainer.isMinimumSize() ? containerHeight+containerTranslationY-distanceY : mPhotoContainer.getHeight()-distanceY;
+        float currentHeight = containerHeight+containerTranslationY-distanceY;
 
-        Log.d("TopPlayerInput", "h -> " + containerHeight + " t -> " + containerTranslationY + " dy -> " + distanceY + " curH -> " + currentHeight);
+        Log.d("setTranslationXYZ", "h -> " + containerHeight + " t -> " + containerTranslationY + " dy -> " + distanceY + " curH -> " + currentHeight);
 
 
 
         float newShrinkAmount = mPhotoContainer.getTranslationY()-distanceY;
+        Log.d("setTranslationXYZ", "newShrinkAmount: " +  newShrinkAmount + " trans: " + mPhotoContainer.getTranslationY() + " distY: " + distanceY);
 
         float newVisibleHeight = -1;
 
@@ -372,18 +382,23 @@ public class PlaylistFragment extends GeastureFragment implements
 
         if ( (!mPhotoContainer.isMinimumSize() && distanceY > 0) || (!mPhotoContainer.isMaximumSize() && distanceY < 0) ) {
             newVisibleHeight = mPhotoContainer.setPlayerHeight(currentHeight, newShrinkAmount);
-            //mPhotoContainer.setTranslationY(newOffset);
-            float photoOffset = -newShrinkAmount / 2; // < 0 ? 0 : -newOffset / 2;
-            Log.d("photoOffset", "photoOffset -> " + photoOffset);
-            float photoOffset2 = photoOffset < 0 ? 0 : photoOffset;
-            Log.d("photoOffset", "photoOffset2 -> " + photoOffset2);
-            mPhoto.setTranslationY(photoOffset2); //mPhoto.getTranslationY()+distanceY/2);
+            Log.d("photoOffset", "newVisibleHeight -> " + newVisibleHeight);
+
+            if (newShrinkAmount == 111120) {
+                //mPhotoContainer.setTranslationY(newOffset);
+                float photoOffset = -newShrinkAmount / 2; // < 0 ? 0 : -newOffset / 2;
+                Log.d("photoOffset", "photoOffset -> " + photoOffset);
+                float photoOffset2 = photoOffset < 0 ? 0 : photoOffset;
+                Log.d("photoOffset", "photoOffset2 -> " + photoOffset2);
+                mPhoto.setTranslationY(photoOffset2); //mPhoto.getTranslationY()+distanceY/2);
+            }
             //mPlayPauseButton.setTranslationY(-photoOffset2);
         }
 
         if (mPhotoContainer.isMinimumSize()) {
             if (usingLargeLayout) {
-                mPhotoContainer.setTranslationY(0);
+                Log.d("photoOffset", "mPhotoContainer.setTranslationY(0)");
+                //mPhotoContainer.setTranslationY(0);
                 mPhoto.setTranslationY(0);
                 mSwipeRefreshView.setCurrentScrollState(SwipeRefreshExpandableLayout.ScrollState.MINIMAIL_PLAYER);
                 mPhotoContainer.bringToFront();
@@ -397,14 +412,16 @@ public class PlaylistFragment extends GeastureFragment implements
             usingLargeLayout = true;
         }
 
-        mSwipeRefreshView.setCanScrollRecyclerView(mPhotoContainer.isMinimumSize());
-        mRecyclerView.setCanScrollRecyclerView(mPhotoContainer.isMinimumSize());
+        boolean isMinimumSize = mPhotoContainer.isMinimumSize();
+
+        mSwipeRefreshView.setCanScrollRecyclerView(isMinimumSize);
+        mRecyclerView.setCanScrollRecyclerView(isMinimumSize);
 
         if (newVisibleHeight < 0)
             newVisibleHeight = mPhotoContainer.getHeight();
 
 
-        if (mPhotoContainer.isMinimumSize()) {
+        if (isMinimumSize) {
             Log.d("TopPlayerIOut", "To the top!");
             //mRecyclerView.scrollToPosition(0);
         }
@@ -419,14 +436,7 @@ public class PlaylistFragment extends GeastureFragment implements
         Log.d("TopPlayerIOut", "diffx =>" + (location[0]-location2[0]) + " diffy => " + (location[1]-location2[1]));
         mRecyclerView.setTranslationY(newVisibleHeight);
 
-        ExpandableLayoutManager elm = ((ExpandableLayoutManager) mRecyclerView.getLayoutManager());
-        if (mPhotoContainer.isMinimumSize()) {
-            elm.SetCanScrollVertically(true);
-        } else {
-            elm.SetCanScrollVertically(false);
-        }
-
-        Log.d("Top", "top ->" + mPlayPauseButton.getTranslationY());
+        Log.d("TopPlayerInputk", "mPhotoContainer translation ->" + mPhotoContainer.getTranslationY());
         return true;
     }
 

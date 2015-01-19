@@ -41,7 +41,8 @@ public class FixedRecyclerView extends RecyclerView {
             return;
     }
 
-    /*
+
+    // http://stackoverflow.com/questions/25178329/recyclerview-and-swiperefreshlayout
     @Override
     public boolean canScrollVertically(int direction) {
         // check if scrolling up
@@ -51,15 +52,11 @@ public class FixedRecyclerView extends RecyclerView {
             return mCanScrollRecyclerView;
         }
         return super.canScrollVertically(direction);
-
-    }*/
+    }
 
     public void disableScrolling(boolean isDisabled) {
         mScrollable = !isDisabled;
     }
-
-
-
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {

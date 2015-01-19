@@ -2,18 +2,19 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 21
-    buildToolsVersion "21.1.1"
+    buildToolsVersion "21.1.2"
 
     defaultConfig {
         applicationId "org.bottiger.podcast"
         minSdkVersion 21
         targetSdkVersion 21
-        versionCode 41
-        versionName "0.27"
+        versionCode 42
+        versionName "0.28"
+        //useJack = true
     }
     buildTypes {
         release {
-            runProguard false
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

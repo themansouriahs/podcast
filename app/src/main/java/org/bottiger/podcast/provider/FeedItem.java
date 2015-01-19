@@ -1,7 +1,11 @@
 package org.bottiger.podcast.provider;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
@@ -31,14 +35,20 @@ import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.RemoteException;
 import android.provider.BaseColumns;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.util.LruCache;
 import android.util.Log;
 
 import com.google.api.client.util.DateTime;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 
@@ -974,10 +984,18 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 	 * @return whether the item is downloaded to the phone
 	 */
 	public boolean isDownloaded() {
-		if (!this.isDownloaded)
-			return this.isDownloaded;
+        try {
+            if (!this.isDownloaded)
+                return this.isDownloaded;
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
 
 		File f = new File(getAbsolutePath());
+
+        if (f == null)
+            return false;
+
 		if (f.exists())
 			return true;
 
@@ -1121,6 +1139,11 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 		}
 
 	}
+
+    @Nullable
+    public void getArtworAsync(@NonNull Context context, @NonNull Target argTarget) {
+        Picasso.with(context).load(getImageURL(context)).into(argTarget);
+    }
 
 	@Override
 	public String getImageURL(Context context) {

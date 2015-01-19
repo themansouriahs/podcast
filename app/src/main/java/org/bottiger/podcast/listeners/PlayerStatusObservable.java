@@ -144,7 +144,8 @@ public class PlayerStatusObservable {
 
 				NotificationPlayer np = new NotificationPlayer(mActivity, null);
 				np.setItem(currentItem);
-				np.show(status == STATUS.PLAYING, ps);
+                np.setPlayerService(ps);
+				np.show(status == STATUS.PLAYING);
 			}
 		}
 	}

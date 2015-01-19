@@ -328,6 +328,7 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
                 invalidate();
                 break;
 
+            default:
             case MotionEvent.ACTION_CANCEL:
                 onSeekBarChangeListener.onProgressChanged(this, getProgress(), true);
                 requestParentTouchRecursive(getParent(), false);

@@ -111,9 +111,10 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder { //  implements
         int listPost = viewHolder.getPosition();
         int type = viewHolder.mAdapter.getItemViewType(listPost);
 
+        /*
         if (type == ItemCursorAdapter.TYPE_FIRST) {
             return;
-        }
+        }*/
 
         boolean doAnimate = true;
 

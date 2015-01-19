@@ -261,7 +261,9 @@ public class FragmentContainerActivity extends DrawerActivity implements
             SubscriptionFeedID = id;
             return getFeedFragmentContent();
         }*/
-		return new ViewPagerSubscriptionFragment(this);
+        ViewPagerSubscriptionFragment viewPagerSubscriptionFragment = new ViewPagerSubscriptionFragment();
+        viewPagerSubscriptionFragment.setOnItemSelectedListener(this);
+        return viewPagerSubscriptionFragment;
 	}
 
 	private Fragment getFeedFragmentContent() {

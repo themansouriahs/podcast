@@ -28,7 +28,7 @@ public class ViewPagerSubscriptionFragment extends Fragment implements PodcastBa
         this.subid = subid;
     }
 
-    public ViewPagerSubscriptionFragment(PodcastBaseFragment.OnItemSelectedListener argOnItemSelectedListener) {
+    public void setOnItemSelectedListener(PodcastBaseFragment.OnItemSelectedListener argOnItemSelectedListener) {
         mOnItemSelectedListener = argOnItemSelectedListener;
     }
 

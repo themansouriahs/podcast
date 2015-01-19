@@ -121,6 +121,8 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
+        mFeedSwipeRefreshView.setRecyclerView(mRecyclerView);
+
         mContainer = (RelativeLayoutWithBackground)fragmentView.findViewById(R.id.container);
 
         mContainerBackground = (ImageView) fragmentView.findViewById(R.id.background_container);

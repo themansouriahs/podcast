@@ -35,6 +35,8 @@ public class SwipeRefreshExpandableLayout extends FeedRefreshLayout implements T
 
     public PlaylistFragment fragment = null;
 
+    private int mLastEvent = -1;
+
     public boolean mIsScrolling = false;
     public boolean mDownGeastureInProgress = false;
     private boolean mCanScrollRecyclerView = false;
@@ -126,9 +128,17 @@ public class SwipeRefreshExpandableLayout extends FeedRefreshLayout implements T
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        delegateToTopPlayer(event);
 
-        Log.d("SwipeRefreshExpandableLayout touch", "event" + event.toString());
+        //Log.d("Skipping motion", "mLastEvent" + mLastEvent);
+        if (mLastEvent != event.hashCode()) {
+            delegateToTopPlayer(event);
+            //Log.d("Skipping motion", "hurra" + event.hashCode());
+        } else
+            //Log.d("Skipping motion", "event" + event.hashCode());
+
+        mLastEvent = -1;
+
+        //Log.d("SwipeRefreshExpandableLayout touch", "event" + event.toString());
         switch (event.getAction())
         {
             case MotionEvent.ACTION_CANCEL:
@@ -154,7 +164,10 @@ public class SwipeRefreshExpandableLayout extends FeedRefreshLayout implements T
     }
 
     public boolean onInterceptTouchEvent(MotionEvent event) {
-        //if (mRequestDisallowInterceptTouchEvent)
+
+        //Log.d("Skipping motion", "setting event" + event.hashCode());
+        mLastEvent = event.hashCode();
+
         if (mRecycerView != null && mRecycerView.canScrollVertically(FixedRecyclerView.DOWN)) {
             Log.d("SwipeRefreshExpandableLayout touch", "intercept (recycler can scroll) =>" + false);
             return false;
@@ -173,6 +186,9 @@ public class SwipeRefreshExpandableLayout extends FeedRefreshLayout implements T
             Log.d("SwipeRefreshExpandableLayout touch", "intercept (can scroll recycler) =>" + false);
             return false;
         }
+
+        if (mRequestDisallowInterceptTouchEvent)
+            return false;
 
         if (mCurrentScrollState != ScrollState.MINIMAIL_PLAYER) {
             mRecycerView.setCanScrollRecyclerView(false);

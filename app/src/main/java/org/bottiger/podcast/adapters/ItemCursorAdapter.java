@@ -133,9 +133,10 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
             playlistViewHolder2.mAdapter = this;
 
             // The first item should never be recycled
+            /*
             if (position == 0 && !playlistViewHolder2.isRecyclable()) {
                 playlistViewHolder2.setIsRecyclable(false);
-            }
+            }*/
 
             if (PodcastBaseFragment.mPlayerServiceBinder != null && PodcastBaseFragment.mPlayerServiceBinder.isInitialized()) {
                 if (item.getId() == PodcastBaseFragment.mPlayerServiceBinder
