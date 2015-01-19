@@ -265,7 +265,7 @@ public class PlaylistFragment extends GeastureFragment implements
                 .setAdapter(mAdapter)
                 .setRecyclerView(mRecyclerView)
                 .setStickyHeadersAdapter(
-                        new InitialHeaderAdapter(null), // Class that implements StickyHeadersAdapter
+                        new InitialHeaderAdapter(mPlaylist), // Class that implements StickyHeadersAdapter
                         true)     // Decoration position relative to a item
                 .build();
 

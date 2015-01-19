@@ -8,7 +8,10 @@ import android.widget.TextView;
 
 import com.eowise.recyclerview.stickyheaders.StickyHeadersAdapter;
 
+import org.bottiger.podcast.ApplicationConfiguration;
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.playlist.Playlist;
+import org.bottiger.podcast.provider.FeedItem;
 
 import java.util.List;
 
@@ -16,9 +19,9 @@ import java.util.List;
  * Created by apl on 19-01-2015.
  */
 public class InitialHeaderAdapter implements StickyHeadersAdapter<InitialHeaderAdapter.ViewHolder> {
-    private List<String> items;
-    public InitialHeaderAdapter(List<String> items) {
-        this.items = items;
+    private Playlist mPlaylist;
+    public InitialHeaderAdapter(Playlist argPlaylist) {
+        this.mPlaylist = argPlaylist;
     }
 
     @Override
@@ -30,7 +33,34 @@ public class InitialHeaderAdapter implements StickyHeadersAdapter<InitialHeaderA
     @Override
     public void onBindViewHolder(ViewHolder headerViewHolder, int position) {
         //headerViewHolder.letter.setText(items.get(position).subSequence(0, 1));
-        headerViewHolder.letter.setText("Bob");
+        //headerViewHolder.letter.setText("Bob");
+
+        FeedItem item = mPlaylist.getItem(position);
+
+        if (item.title != null) {
+            String title = item.title;
+            int priority = item.getPriority();
+            long lastUpdate = item.getLastUpdate();
+
+            String preTitle = "";
+
+            if (item.isListened() && ApplicationConfiguration.DEBUGGING) {
+                preTitle = "L";
+            }
+
+
+            if (ApplicationConfiguration.DEBUGGING)
+                preTitle = preTitle+ "p:" + priority + " t:" + lastUpdate;
+            else
+                preTitle = preTitle + String.valueOf(priority);
+
+            if (priority > 0 || ApplicationConfiguration.DEBUGGING) {
+                title = preTitle + " # " + title;
+            }
+
+            headerViewHolder.letter.setText(title);
+            //playlistViewHolder2.mMainTitle.setText(title);
+        }
     }
 
     @Override
