@@ -199,13 +199,14 @@ public class MainActivity extends FragmentContainerActivity implements
 		if (!isMyServiceRunning(PlayerService.class.getName()))
 			startService(new Intent(this, PlayerService.class));
 
+        /*
 		if (!isMyServiceRunning(HTTPDService.class.getName())) {
 			startService(new Intent(this, HTTPDService.class));
 
 			Intent bindIntent = new Intent(this, HTTPDService.class);
 			bindService(bindIntent, mHTTPDServiceConnection,
 					Context.BIND_AUTO_CREATE);
-		}
+		}*/
 
 		currentTheme = ThemeHelper.getTheme(prefs);
 		setTheme(currentTheme);

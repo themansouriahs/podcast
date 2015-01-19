@@ -42,38 +42,38 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="edaf6acd-b678-4386-9b24-e145d4661174" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/android_rome_feed_reader_1_0_0_r3.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/android_async_http_1_4_2.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/signpost_core_1_2_1_2.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/jackson_core_2_1_3.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/json_simple_1_1_1.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/commons_io_2_4.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/jsr305_1_3_9.xml" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/gradle.xml" afterPath="$PROJECT_DIR$/.idea/gradle.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/views/SwipeRefreshExpandableLayout.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/views/SwipeRefreshExpandableLayout.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/views/ExpandableLayoutManager.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/views/ExpandableLayoutManager.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/ViewPagerSubscriptionFragment.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/ViewPagerSubscriptionFragment.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/service/NotificationListener.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/service/NotificationListener.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/views/FeedRefreshLayout.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/views/FeedRefreshLayout.java" />
+      <change type="DELETED" beforePath="C:\Users\apl\Dropbox\github\SoundWaves\.idea\libraries\jsr305_1_3_9.xml" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\apl\Dropbox\github\SoundWaves\.idea\libraries\commons_io_2_4.xml" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\apl\Dropbox\github\SoundWaves\.idea\libraries\json_simple_1_1_1.xml" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\apl\Dropbox\github\SoundWaves\.idea\libraries\android_rome_feed_reader_1_0_0_r3.xml" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\apl\Dropbox\github\SoundWaves\.idea\libraries\android_async_http_1_4_2.xml" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\apl\Dropbox\github\SoundWaves\.idea\libraries\signpost_core_1_2_1_2.xml" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\apl\Dropbox\github\SoundWaves\.idea\libraries\jackson_core_2_1_3.xml" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/adapters/ItemCursorAdapter.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/adapters/ItemCursorAdapter.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/res/layout/feed_view_list_episode.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/feed_view_list_episode.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/views/TopPlayer.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/views/TopPlayer.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/service/PlayerService.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/service/PlayerService.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/views/FeedRecyclerView.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/views/FeedRecyclerView.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/FragmentContainerActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/FragmentContainerActivity.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/service/NotificationListener.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/service/NotificationListener.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/provider/FeedItem.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/provider/FeedItem.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/views/TopPlayer.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/views/TopPlayer.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/views/PlayerSeekbar.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/views/PlayerSeekbar.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/views/ExpandableLayoutManager.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/views/ExpandableLayoutManager.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/FeedFragment.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/FeedFragment.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/build.gradle" afterPath="$PROJECT_DIR$/app/build.gradle" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/receiver/NotificationReceiver.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/receiver/NotificationReceiver.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/views/SwipeRefreshExpandableLayout.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/views/SwipeRefreshExpandableLayout.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/views/FeedRefreshLayout.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/views/FeedRefreshLayout.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/FragmentContainerActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/FragmentContainerActivity.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build.gradle" afterPath="$PROJECT_DIR$/build.gradle" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/notification/NotificationPlayer.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/notification/NotificationPlayer.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/receiver/NotificationReceiver.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/receiver/NotificationReceiver.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/gradle.xml" afterPath="$PROJECT_DIR$/.idea/gradle.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/listeners/PlayerStatusObservable.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/listeners/PlayerStatusObservable.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/views/PlaylistViewHolder.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/views/PlaylistViewHolder.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/views/PlayerSeekbar.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/views/PlayerSeekbar.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build.gradle" afterPath="$PROJECT_DIR$/build.gradle" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/PlaylistFragment.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/PlaylistFragment.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/FeedFragment.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/FeedFragment.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/provider/FeedItem.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/provider/FeedItem.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/ViewPagerSubscriptionFragment.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/ViewPagerSubscriptionFragment.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/views/FixedRecyclerView.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/views/FixedRecyclerView.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/service/PlayerService.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/service/PlayerService.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/adapters/ItemCursorAdapter.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/adapters/ItemCursorAdapter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/PlaylistFragment.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/PlaylistFragment.java" />
     </list>
     <ignored path="SoundWaves.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -136,51 +136,70 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="SwipeRefreshExpandableLayout.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/views/SwipeRefreshExpandableLayout.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="2244" max-vertical-offset="4182">
-              <caret line="132" column="0" selection-start-line="132" selection-start-column="0" selection-end-line="132" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="PodcastDownloadManager.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/service/PodcastDownloadManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-9.428572" vertical-offset="2150" max-vertical-offset="13787">
-              <caret line="200" column="44" selection-start-line="200" selection-start-column="31" selection-end-line="200" selection-end-column="44" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="3031" max-vertical-offset="13787">
+              <caret line="244" column="0" selection-start-line="244" selection-start-column="0" selection-end-line="244" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="StringRequest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/android/volley/toolbox/StringRequest.java">
+      <file leaf-file-name="build.gradle" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/build.gradle">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="969">
-              <caret line="16" column="20" selection-start-line="16" selection-start-column="20" selection-end-line="16" selection-end-column="26" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1258">
+              <caret line="11" column="23" selection-start-line="11" selection-start-column="23" selection-end-line="11" selection-end-column="23" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="BasicNetwork.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/android/volley/toolbox/BasicNetwork.java">
+      <file leaf-file-name="NotificationListener.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/service/NotificationListener.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.5264188" vertical-offset="2179" max-vertical-offset="3604">
-              <caret line="187" column="20" selection-start-line="187" selection-start-column="20" selection-end-line="187" selection-end-column="20" />
+            <state vertical-scroll-proportion="0.6594828" vertical-offset="0" max-vertical-offset="464">
+              <caret line="22" column="40" selection-start-line="22" selection-start-column="40" selection-end-line="22" selection-end-column="40" />
+              <folding>
+                <element signature="e#484#485#0" expanded="true" />
+                <element signature="e#531#532#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="feed_view_list_episode.xml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/feed_view_list_episode.xml">
+          <provider editor-type-id="android-designer">
+            <state />
+          </provider>
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-19.518518" vertical-offset="85" max-vertical-offset="1037">
+              <caret line="36" column="27" selection-start-line="36" selection-start-column="27" selection-end-line="36" selection-end-column="27" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="FeedHandler.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/parser/syndication/handler/FeedHandler.java">
+      <file leaf-file-name="feed_view.xml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/feed_view.xml">
+          <provider editor-type-id="android-designer">
+            <state />
+          </provider>
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="149" max-vertical-offset="561">
-              <caret line="21" column="24" selection-start-line="21" selection-start-column="24" selection-end-line="21" selection-end-column="24" />
+            <state vertical-scroll-proportion="-13.111111" vertical-offset="700" max-vertical-offset="1258">
+              <caret line="62" column="16" selection-start-line="62" selection-start-column="16" selection-end-line="62" selection-end-column="16" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="colors.xml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/res/values/colors.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="442">
+              <caret line="15" column="36" selection-start-line="15" selection-start-column="36" selection-end-line="15" selection-end-column="36" />
               <folding />
             </state>
           </provider>
@@ -189,48 +208,97 @@
       <file leaf-file-name="FeedUpdater.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/parser/FeedUpdater.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="454" max-vertical-offset="1241">
+            <state vertical-scroll-proportion="0.0" vertical-offset="460" max-vertical-offset="1241">
               <caret line="50" column="0" selection-start-line="50" selection-start-column="0" selection-end-line="50" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="AbstractEpisodeFragment.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/AbstractEpisodeFragment.java">
+      <file leaf-file-name="DownloadManagerReceiver.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/receiver/DownloadManagerReceiver.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="2142" max-vertical-offset="4114">
-              <caret line="126" column="0" selection-start-line="126" selection-start-column="0" selection-end-line="126" selection-end-column="0" />
+            <state vertical-scroll-proportion="-7.178571" vertical-offset="1261" max-vertical-offset="2312">
+              <caret line="103" column="0" selection-start-line="103" selection-start-column="0" selection-end-line="104" selection-end-column="83" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="NotificationPlayer.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/notification/NotificationPlayer.java">
+      <file leaf-file-name="FeedItem.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/provider/FeedItem.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1462" max-vertical-offset="3910">
-              <caret line="86" column="51" selection-start-line="86" selection-start-column="51" selection-end-line="86" selection-end-column="51" />
-              <folding />
+            <state vertical-scroll-proportion="-4.5" vertical-offset="14545" max-vertical-offset="24395">
+              <caret line="923" column="16" selection-start-line="923" selection-start-column="16" selection-end-line="923" selection-end-column="28" />
+              <folding>
+                <element signature="e#23929#23930#0" expanded="true" />
+                <element signature="e#23979#23980#0" expanded="true" />
+                <element signature="e#24018#24019#0" expanded="true" />
+                <element signature="e#24071#24072#0" expanded="true" />
+                <element signature="e#24467#24468#0" expanded="true" />
+                <element signature="e#24488#24489#0" expanded="true" />
+                <element signature="e#24723#24724#0" expanded="true" />
+                <element signature="e#24745#24746#0" expanded="true" />
+                <element signature="e#24788#24789#0" expanded="true" />
+                <element signature="e#24819#24820#0" expanded="true" />
+                <element signature="e#24847#24848#0" expanded="true" />
+                <element signature="e#24865#24866#0" expanded="true" />
+                <element signature="e#24902#24903#0" expanded="true" />
+                <element signature="e#24925#24926#0" expanded="true" />
+                <element signature="e#25489#25490#0" expanded="true" />
+                <element signature="e#25521#25522#0" expanded="true" />
+                <element signature="e#25646#25647#0" expanded="true" />
+                <element signature="e#25685#25686#0" expanded="true" />
+                <element signature="e#25761#25762#0" expanded="true" />
+                <element signature="e#25785#25786#0" expanded="true" />
+                <element signature="e#25868#25869#0" expanded="true" />
+                <element signature="e#25900#25901#0" expanded="true" />
+                <element signature="e#26025#26026#0" expanded="true" />
+                <element signature="e#26063#26064#0" expanded="true" />
+                <element signature="e#28822#28823#0" expanded="true" />
+                <element signature="e#28838#28839#0" expanded="true" />
+                <element signature="e#29300#29301#0" expanded="true" />
+                <element signature="e#29333#29334#0" expanded="true" />
+                <element signature="e#30844#30845#0" expanded="true" />
+                <element signature="e#30871#30872#0" expanded="true" />
+                <element signature="e#30958#30959#0" expanded="true" />
+                <element signature="e#30991#30992#0" expanded="true" />
+                <element signature="e#31270#31271#0" expanded="true" />
+                <element signature="e#31297#31298#0" expanded="true" />
+                <element signature="e#31424#31425#0" expanded="true" />
+                <element signature="e#31465#31466#0" expanded="true" />
+                <element signature="e#31526#31527#0" expanded="true" />
+                <element signature="e#31572#31573#0" expanded="true" />
+                <element signature="e#31670#31671#0" expanded="true" />
+                <element signature="e#31695#31696#0" expanded="true" />
+                <element signature="e#31726#31727#0" expanded="true" />
+                <element signature="e#31746#31747#0" expanded="true" />
+                <element signature="e#31787#31788#0" expanded="true" />
+                <element signature="e#31814#31815#0" expanded="true" />
+                <element signature="e#31917#31918#0" expanded="true" />
+                <element signature="e#31946#31947#0" expanded="true" />
+                <element signature="e#31996#31997#0" expanded="true" />
+                <element signature="e#32025#32026#0" expanded="true" />
+                <element signature="e#32067#32068#0" expanded="true" />
+                <element signature="e#32130#32131#0" expanded="true" />
+                <element signature="e#37103#37104#0" expanded="true" />
+                <element signature="e#37136#37137#0" expanded="true" />
+                <element signature="e#37165#37166#0" expanded="true" />
+                <element signature="e#37183#37184#0" expanded="true" />
+                <element signature="e#37395#37396#0" expanded="true" />
+                <element signature="e#37425#37426#0" expanded="true" />
+                <element signature="e#37462#37463#0" expanded="true" />
+                <element signature="e#37484#37485#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="NotificationReceiver.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/receiver/NotificationReceiver.java">
+      <file leaf-file-name="OkHttpDownloader.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/service/Downloader/OkHttpDownloader.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="680" max-vertical-offset="952">
-              <caret line="40" column="52" selection-start-line="40" selection-start-column="52" selection-end-line="40" selection-end-column="52" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="PlayerService.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/service/PlayerService.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="8857" max-vertical-offset="13685">
-              <caret line="521" column="49" selection-start-line="521" selection-start-column="49" selection-end-line="521" selection-end-column="49" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="906" max-vertical-offset="1938">
+              <caret line="81" column="13" selection-start-line="81" selection-start-column="13" selection-end-line="81" selection-end-column="13" />
               <folding />
             </state>
           </provider>
@@ -1093,7 +1161,7 @@
     </option>
     <option name="modificationStamps">
       <map>
-        <entry key="$PROJECT_DIR$" value="4243111006972" />
+        <entry key="$PROJECT_DIR$" value="4243205600200" />
       </map>
     </option>
     <option name="projectBuildClasspath">
@@ -1257,11 +1325,6 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/utils/PalletteCache.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/listeners/PaletteListener.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/views/PlayPauseImageView.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/views/PlayerButtonView.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/adapters/FeedViewAdapter.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/AbstractEpisodeFragment.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/utils/PaletteCache.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/listeners/PaletteObservable.java" />
@@ -1276,12 +1339,10 @@
         <option value="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/DrawerActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/values-v21/styles.xml" />
         <option value="$PROJECT_DIR$/app/src/main/res/values/styles.xml" />
-        <option value="$PROJECT_DIR$/app/src/main/res/values/colors.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/utils/FragmentUtils.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/SubscriptionsFragment.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/subscription_container.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/adapters/SubscriptionGridCursorAdapter.java" />
-        <option value="$PROJECT_DIR$/app/src/main/res/layout/feed_view.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/service/DownloadComplete.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/service/PodcastDownloadManager.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/values/dimens.xml" />
@@ -1297,17 +1358,24 @@
         <option value="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/views/FeedRefreshLayout.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/views/FixedRecyclerView.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/views/FeedRecyclerView.java" />
-        <option value="$PROJECT_DIR$/app/build.gradle" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/ViewPagerSubscriptionFragment.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/FragmentContainerActivity.java" />
-        <option value="$PROJECT_DIR$/app/src/main/res/layout/feed_view_list_episode.xml" />
-        <option value="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/service/NotificationListener.java" />
         <option value="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" />
-        <option value="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/provider/FeedItem.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/listeners/PlayerStatusObservable.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/receiver/NotificationReceiver.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/service/PlayerService.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/notification/NotificationPlayer.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/MainActivity.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/playlist/Playlist.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/SoundWaves.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/org/bottiger/soundwaves/Soundwaves.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/provider/FeedItem.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/service/Downloader/OkHttpDownloader.java" />
+        <option value="$PROJECT_DIR$/app/src/main/res/layout/feed_view_list_episode.xml" />
+        <option value="$PROJECT_DIR$/app/src/main/res/layout/feed_view.xml" />
+        <option value="$PROJECT_DIR$/app/src/main/res/values/colors.xml" />
+        <option value="$PROJECT_DIR$/app/build.gradle" />
+        <option value="$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/service/NotificationListener.java" />
       </list>
     </option>
   </component>
@@ -1381,7 +1449,7 @@
         </expanded-state>
         <selected-state>
           <State>
-            <id>AndroidLintWrongViewCast</id>
+            <id>AndroidLintOverrideAbstract</id>
           </State>
         </selected-state>
       </profile-state>
@@ -1413,8 +1481,7 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="AndroidView" />
-      <pane id="Scope" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -2341,7 +2408,8 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
+      <pane id="AndroidView" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -2609,30 +2677,30 @@
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32962447" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.19794345" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32823366" sideWeight="0.5" order="14" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2503477" sideWeight="0.49807197" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.23504868" sideWeight="0.7859897" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2503477" sideWeight="0.5012854" order="8" side_tool="true" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.27816412" sideWeight="0.49807197" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24756606" sideWeight="0.83161956" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.31571627" sideWeight="0.2377892" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="true" content_ui="tabs" />
       <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39499304" sideWeight="0.7622108" order="12" side_tool="false" content_ui="tabs" />
-      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3908206" sideWeight="0.8528278" order="13" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.31571627" sideWeight="0.7622108" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.31293464" sideWeight="0.8528278" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32962447" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.283419" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.30269924" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32127956" sideWeight="0.49678662" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Memory Monitor" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="15" side_tool="true" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.19794345" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
     </layout>
@@ -2776,7 +2844,7 @@
         </line-breakpoint>
         <line-breakpoint type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/service/Downloader/OkHttpDownloader.java</url>
-          <line>71</line>
+          <line>77</line>
           <properties />
           <option name="timeStamp" value="679" />
         </line-breakpoint>
@@ -2794,7 +2862,7 @@
         </line-breakpoint>
         <line-breakpoint type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/MainActivity.java</url>
-          <line>322</line>
+          <line>323</line>
           <properties />
           <option name="timeStamp" value="800" />
         </line-breakpoint>
@@ -3086,24 +3154,6 @@
           <option name="timeStamp" value="1196" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/parser/FeedUpdater.java</url>
-          <line>50</line>
-          <properties />
-          <option name="timeStamp" value="1209" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/service/PodcastDownloadManager.java</url>
-          <line>171</line>
-          <properties />
-          <option name="timeStamp" value="1214" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/service/PodcastDownloadManager.java</url>
-          <line>244</line>
-          <properties />
-          <option name="timeStamp" value="1215" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/service/PodcastDownloadManager.java</url>
           <line>201</line>
           <properties />
@@ -3114,6 +3164,24 @@
           <line>193</line>
           <properties />
           <option name="timeStamp" value="1217" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/receiver/DownloadManagerReceiver.java</url>
+          <line>116</line>
+          <properties />
+          <option name="timeStamp" value="1218" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/receiver/DownloadManagerReceiver.java</url>
+          <line>114</line>
+          <properties />
+          <option name="timeStamp" value="1219" />
+        </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/service/Downloader/OkHttpDownloader.java</url>
+          <line>82</line>
+          <properties />
+          <option name="timeStamp" value="1228" />
         </line-breakpoint>
         <line-breakpoint type="java-method">
           <url>file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/views/PlayerSeekbar.java</url>
@@ -3132,68 +3200,10 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="1218" />
+      <option name="time" value="1230" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/provider/Subscription.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="9231">
-          <caret line="25" column="46" selection-start-line="25" selection-start-column="34" selection-end-line="25" selection-end-column="46" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/provider/AbstractItem.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="476">
-          <caret line="4" column="54" selection-start-line="4" selection-start-column="46" selection-end-line="4" selection-end-column="54" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/service/DownloadCompleteCallback.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="272">
-          <caret line="5" column="41" selection-start-line="5" selection-start-column="17" selection-end-line="5" selection-end-column="41" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/parser/syndication/namespace/NSRSS20.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.25035766" vertical-offset="454" max-vertical-offset="2567">
-          <caret line="45" column="0" selection-start-line="45" selection-start-column="0" selection-end-line="45" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://C:/sdk/sources/android-21/android/support/v4/widget/SwipeRefreshLayout.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="3.076159" vertical-offset="692" max-vertical-offset="15062">
-          <caret line="180" column="0" selection-start-line="180" selection-start-column="0" selection-end-line="180" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/provider/WithIcon.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.11258278" vertical-offset="0" max-vertical-offset="604">
-          <caret line="6" column="17" selection-start-line="6" selection-start-column="17" selection-end-line="6" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://C:/sdk/sources/android-21/android/view/ViewGroup.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="33663" max-vertical-offset="121618">
-          <caret line="2058" column="0" selection-start-line="2058" selection-start-column="0" selection-end-line="2058" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/playlist/Playlist.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="4542" max-vertical-offset="5695">
-          <caret line="317" column="0" selection-start-line="317" selection-start-column="0" selection-end-line="317" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/res/values/dimens.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="105" max-vertical-offset="884">
@@ -3226,14 +3236,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/adapters/ItemCursorAdapter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.33189654" vertical-offset="5728" max-vertical-offset="10421">
-          <caret line="393" column="16" selection-start-line="393" selection-start-column="16" selection-end-line="393" selection-end-column="16" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/views/PlaylistViewHolder.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="1632" max-vertical-offset="2142">
@@ -3259,13 +3261,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="557">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/listeners/DownloadProgressObservable.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1972" max-vertical-offset="3332">
-          <caret line="151" column="0" selection-start-line="151" selection-start-column="0" selection-end-line="151" selection-end-column="0" />
         </state>
       </provider>
     </entry>
@@ -3375,13 +3370,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/build.gradle">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1241">
-          <caret line="8" column="24" selection-start-line="8" selection-start-column="24" selection-end-line="8" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/subscription_container.xml">
       <provider editor-type-id="android-designer">
         <state />
@@ -3389,7 +3377,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="136" max-vertical-offset="833">
           <caret line="8" column="44" selection-start-line="8" selection-start-column="44" selection-end-line="8" selection-end-column="44" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -3397,12 +3384,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="204" max-vertical-offset="1513">
           <caret line="30" column="15" selection-start-line="30" selection-start-column="15" selection-end-line="30" selection-end-column="15" />
-          <folding>
-            <element signature="e#3059#3060#0" expanded="false" />
-            <element signature="e#3101#3102#0" expanded="false" />
-            <element signature="e#3143#3144#0" expanded="false" />
-            <element signature="e#3185#3186#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -3410,14 +3391,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="3857" max-vertical-offset="4352">
           <caret line="265" column="44" selection-start-line="265" selection-start-column="44" selection-end-line="265" selection-end-column="44" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/service/NotificationListener.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="289">
-          <caret line="10" column="33" selection-start-line="10" selection-start-column="13" selection-end-line="10" selection-end-column="33" />
         </state>
       </provider>
     </entry>
@@ -3436,41 +3409,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/feed_view_list_episode.xml">
-      <provider editor-type-id="android-designer">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.3250478" vertical-offset="0" max-vertical-offset="986">
-          <caret line="10" column="31" selection-start-line="10" selection-start-column="31" selection-end-line="10" selection-end-column="31" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/feed_view.xml">
-      <provider editor-type-id="android-designer">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="51" max-vertical-offset="1224">
-          <caret line="3" column="40" selection-start-line="3" selection-start-column="40" selection-end-line="3" selection-end-column="40" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/provider/FeedItem.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="17837" max-vertical-offset="23409">
-          <caret line="1144" column="54" selection-start-line="1144" selection-start-column="54" selection-end-line="1144" selection-end-column="54" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/listeners/PlayerStatusObservable.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="1854" max-vertical-offset="2278">
           <caret line="146" column="40" selection-start-line="146" selection-start-column="40" selection-end-line="146" selection-end-column="40" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -3478,15 +3420,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="154" max-vertical-offset="765">
           <caret line="40" column="52" selection-start-line="40" selection-start-column="52" selection-end-line="40" selection-end-column="52" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/service/PlayerService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="7631" max-vertical-offset="12206">
-          <caret line="521" column="49" selection-start-line="521" selection-start-column="49" selection-end-line="521" selection-end-column="49" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -3518,13 +3451,179 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="149" max-vertical-offset="561">
           <caret line="21" column="24" selection-start-line="21" selection-start-column="24" selection-end-line="21" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/MainActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="2142" max-vertical-offset="5797">
+          <caret line="208" column="11" selection-start-line="208" selection-start-column="11" selection-end-line="208" selection-end-column="11" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/service/PlayerService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="2368" max-vertical-offset="13685">
+          <caret line="141" column="14" selection-start-line="141" selection-start-column="14" selection-end-line="141" selection-end-column="14" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/adapters/ItemCursorAdapter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="11220" max-vertical-offset="11424">
+          <caret line="660" column="42" selection-start-line="660" selection-start-column="16" selection-end-line="660" selection-end-column="42" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/playlist/Playlist.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1020" max-vertical-offset="6375">
+          <caret line="60" column="5" selection-start-line="60" selection-start-column="5" selection-end-line="60" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/listeners/DownloadFileObserver.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1309" max-vertical-offset="2448">
+          <caret line="98" column="50" selection-start-line="98" selection-start-column="40" selection-end-line="98" selection-end-column="50" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/listeners/DownloadProgressObservable.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1864" max-vertical-offset="3332">
+          <caret line="199" column="16" selection-start-line="199" selection-start-column="16" selection-end-line="199" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/service/Downloader/IDownloadEngine.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.58128077" vertical-offset="19" max-vertical-offset="425">
+          <caret line="21" column="13" selection-start-line="21" selection-start-column="13" selection-end-line="21" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/soundwaves/Soundwaves.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="663">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/SoundWaves.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1020">
+          <caret line="0" column="8" selection-start-line="0" selection-start-column="8" selection-end-line="0" selection-end-column="28" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1170#1171#0" expanded="true" />
+            <element signature="e#1200#1201#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/utils/SDCardManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1035" max-vertical-offset="1785">
+          <caret line="92" column="52" selection-start-line="92" selection-start-column="41" selection-end-line="92" selection-end-column="52" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/provider/FeedItem.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-4.5" vertical-offset="14545" max-vertical-offset="24395">
+          <caret line="923" column="16" selection-start-line="923" selection-start-column="16" selection-end-line="923" selection-end-column="28" />
+          <folding>
+            <element signature="e#23929#23930#0" expanded="true" />
+            <element signature="e#23979#23980#0" expanded="true" />
+            <element signature="e#24018#24019#0" expanded="true" />
+            <element signature="e#24071#24072#0" expanded="true" />
+            <element signature="e#24467#24468#0" expanded="true" />
+            <element signature="e#24488#24489#0" expanded="true" />
+            <element signature="e#24723#24724#0" expanded="true" />
+            <element signature="e#24745#24746#0" expanded="true" />
+            <element signature="e#24788#24789#0" expanded="true" />
+            <element signature="e#24819#24820#0" expanded="true" />
+            <element signature="e#24847#24848#0" expanded="true" />
+            <element signature="e#24865#24866#0" expanded="true" />
+            <element signature="e#24902#24903#0" expanded="true" />
+            <element signature="e#24925#24926#0" expanded="true" />
+            <element signature="e#25489#25490#0" expanded="true" />
+            <element signature="e#25521#25522#0" expanded="true" />
+            <element signature="e#25646#25647#0" expanded="true" />
+            <element signature="e#25685#25686#0" expanded="true" />
+            <element signature="e#25761#25762#0" expanded="true" />
+            <element signature="e#25785#25786#0" expanded="true" />
+            <element signature="e#25868#25869#0" expanded="true" />
+            <element signature="e#25900#25901#0" expanded="true" />
+            <element signature="e#26025#26026#0" expanded="true" />
+            <element signature="e#26063#26064#0" expanded="true" />
+            <element signature="e#28822#28823#0" expanded="true" />
+            <element signature="e#28838#28839#0" expanded="true" />
+            <element signature="e#29300#29301#0" expanded="true" />
+            <element signature="e#29333#29334#0" expanded="true" />
+            <element signature="e#30844#30845#0" expanded="true" />
+            <element signature="e#30871#30872#0" expanded="true" />
+            <element signature="e#30958#30959#0" expanded="true" />
+            <element signature="e#30991#30992#0" expanded="true" />
+            <element signature="e#31270#31271#0" expanded="true" />
+            <element signature="e#31297#31298#0" expanded="true" />
+            <element signature="e#31424#31425#0" expanded="true" />
+            <element signature="e#31465#31466#0" expanded="true" />
+            <element signature="e#31526#31527#0" expanded="true" />
+            <element signature="e#31572#31573#0" expanded="true" />
+            <element signature="e#31670#31671#0" expanded="true" />
+            <element signature="e#31695#31696#0" expanded="true" />
+            <element signature="e#31726#31727#0" expanded="true" />
+            <element signature="e#31746#31747#0" expanded="true" />
+            <element signature="e#31787#31788#0" expanded="true" />
+            <element signature="e#31814#31815#0" expanded="true" />
+            <element signature="e#31917#31918#0" expanded="true" />
+            <element signature="e#31946#31947#0" expanded="true" />
+            <element signature="e#31996#31997#0" expanded="true" />
+            <element signature="e#32025#32026#0" expanded="true" />
+            <element signature="e#32067#32068#0" expanded="true" />
+            <element signature="e#32130#32131#0" expanded="true" />
+            <element signature="e#37103#37104#0" expanded="true" />
+            <element signature="e#37136#37137#0" expanded="true" />
+            <element signature="e#37165#37166#0" expanded="true" />
+            <element signature="e#37183#37184#0" expanded="true" />
+            <element signature="e#37395#37396#0" expanded="true" />
+            <element signature="e#37425#37426#0" expanded="true" />
+            <element signature="e#37462#37463#0" expanded="true" />
+            <element signature="e#37484#37485#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/receiver/DownloadManagerReceiver.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-7.178571" vertical-offset="1261" max-vertical-offset="2312">
+          <caret line="103" column="0" selection-start-line="103" selection-start-column="0" selection-end-line="104" selection-end-column="83" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/service/Downloader/OkHttpDownloader.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="906" max-vertical-offset="1938">
+          <caret line="81" column="13" selection-start-line="81" selection-start-column="13" selection-end-line="81" selection-end-column="13" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/parser/FeedUpdater.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="454" max-vertical-offset="1241">
+        <state vertical-scroll-proportion="0.0" vertical-offset="460" max-vertical-offset="1241">
           <caret line="50" column="0" selection-start-line="50" selection-start-column="0" selection-end-line="50" selection-end-column="0" />
           <folding />
         </state>
@@ -3532,25 +3631,58 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/service/PodcastDownloadManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-9.428572" vertical-offset="2150" max-vertical-offset="13787">
-          <caret line="200" column="44" selection-start-line="200" selection-start-column="31" selection-end-line="200" selection-end-column="44" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="3031" max-vertical-offset="13787">
+          <caret line="244" column="0" selection-start-line="244" selection-start-column="0" selection-end-line="244" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/android/volley/toolbox/StringRequest.java">
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/feed_view_list_episode.xml">
+      <provider editor-type-id="android-designer">
+        <state />
+      </provider>
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="969">
-          <caret line="16" column="20" selection-start-line="16" selection-start-column="20" selection-end-line="16" selection-end-column="26" />
+        <state vertical-scroll-proportion="-19.518518" vertical-offset="85" max-vertical-offset="1037">
+          <caret line="36" column="27" selection-start-line="36" selection-start-column="27" selection-end-line="36" selection-end-column="27" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/android/volley/toolbox/BasicNetwork.java">
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/feed_view.xml">
+      <provider editor-type-id="android-designer">
+        <state />
+      </provider>
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.5264188" vertical-offset="2179" max-vertical-offset="3604">
-          <caret line="187" column="20" selection-start-line="187" selection-start-column="20" selection-end-line="187" selection-end-column="20" />
+        <state vertical-scroll-proportion="-13.111111" vertical-offset="700" max-vertical-offset="1258">
+          <caret line="62" column="16" selection-start-line="62" selection-start-column="16" selection-end-line="62" selection-end-column="16" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/values/colors.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="442">
+          <caret line="15" column="36" selection-start-line="15" selection-start-column="36" selection-end-line="15" selection-end-column="36" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/build.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1258">
+          <caret line="11" column="23" selection-start-line="11" selection-start-column="23" selection-end-line="11" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/bottiger/podcast/service/NotificationListener.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.6594828" vertical-offset="0" max-vertical-offset="464">
+          <caret line="22" column="40" selection-start-line="22" selection-start-column="40" selection-end-line="22" selection-end-column="40" />
+          <folding>
+            <element signature="e#484#485#0" expanded="true" />
+            <element signature="e#531#532#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

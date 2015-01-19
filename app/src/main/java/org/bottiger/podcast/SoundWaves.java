@@ -1,6 +1,9 @@
 package org.bottiger.podcast;
 
 import android.app.Application;
+import android.content.Context;
+
+import org.bottiger.soundwaves.Soundwaves;
 
 // Acra debugging
 /*
@@ -10,6 +13,8 @@ import android.app.Application;
 	  )
 */
 public class SoundWaves extends Application {
+
+    private static Context context;
 
 	// package name
 	public static final String packageName = "org.bottiger.soundwaves";
@@ -33,6 +38,12 @@ public class SoundWaves extends Application {
 
         // The following line triggers the initialization of ACRA
         //ACRA.init(this);
+
+        context = getApplicationContext();
+    }
+
+    public static Context getAppContext() {
+        return context;
     }
 	
 	public String getZubhiumAPIKey() {

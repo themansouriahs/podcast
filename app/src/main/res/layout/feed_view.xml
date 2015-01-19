@@ -57,8 +57,10 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_above="@+id/text"
-        android:alpha="1"
+        android:background="@color/blackWithAlpha"
         />
+            <!-- android:alpha="0.6"
+                android:alpha="1" -->
 
         </RelativeLayout>
 

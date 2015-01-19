@@ -1,5 +1,6 @@
 package org.bottiger.podcast.service.Downloader;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -16,8 +17,10 @@ import java.util.HashSet;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.OkUrlFactory;
 
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.service.PodcastDownloadManager;
+import org.bottiger.soundwaves.Soundwaves;
 
 /**
  * Created by apl on 17-09-2014.
@@ -54,6 +57,9 @@ public class OkHttpDownloader extends DownloadEngineBase {
         Thread downloadingThread = new Thread() {
             public void run() {
                 try {
+                    String filename =  Integer.toString(mEpisode.getEpisodeNumber()) + mEpisode.title.replace(' ', '_'); //Integer.toString(item.getEpisodeNumber()) + "_"
+                    mEpisode.setFilename(filename + ".mp3"); // .replaceAll("[^a-zA-Z0-9_-]", "") +
+
                     double contentLength = mConnection.getContentLength();
                     InputStream inputStream = mConnection.getInputStream();
                     FileOutputStream outputStream = new FileOutputStream(mEpisode.getAbsoluteTmpPath());
@@ -71,6 +77,10 @@ public class OkHttpDownloader extends DownloadEngineBase {
 
                     File tmpFIle = new File(mEpisode.getAbsoluteTmpPath());
                     File finalFIle = new File(mEpisode.getAbsolutePath());
+
+                    Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                    intent.setData(Uri.fromFile(finalFIle));
+                    SoundWaves.getAppContext().sendBroadcast(intent);
 
                     PodcastDownloadManager.mDownloadingItem = null;
 

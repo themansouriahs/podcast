@@ -14,6 +14,7 @@ import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionColumns;
 import org.bottiger.podcast.service.PlayerService;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -135,14 +136,15 @@ public class Playlist {
         for (FeedItem episode : mPlaylist) {
             isAfter = argEpisode.getDateTime().after(episode.getDateTime());
             if (isAfter) {
-                int size = mPlaylist.size();
+                final int size = mPlaylist.size();
 
                 if (size == MAX_SIZE) {
                     mPlaylist.remove(mPlaylist.size() - 1);
                 }
 
                 mPlaylist.add(counter, argEpisode);
-                notifyPlaylistRangeChanged(counter, size-1);
+
+                notifyPlaylistRangeChanged(counter, size - 1);
                 return;
             }
             counter++;

@@ -6,10 +6,10 @@ android {
 
     defaultConfig {
         applicationId "org.bottiger.podcast"
-        minSdkVersion 21
+        minSdkVersion 19
         targetSdkVersion 21
-        versionCode 42
-        versionName "0.28"
+        versionCode 43
+        versionName "0.29"
         //useJack = true
     }
     buildTypes {
@@ -42,6 +42,7 @@ dependencies {
 
     //compile 'com.squareup.okhttp:okhttp:2+'
     //compile 'com.squareup.okhttp:okhttp-urlconnection:2+'
+    compile 'com.mcxiaoke.volley:library:1.0.+'
 
     compile 'com.squareup.picasso:picasso:2+'
     compile 'com.google.apis:google-api-services-drive:+' exclude module: 'httpclient'
