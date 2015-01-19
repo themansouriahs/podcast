@@ -7,10 +7,10 @@ android {
 
     defaultConfig {
         applicationId "org.bottiger.podcast"
-        minSdkVersion 19
+        minSdkVersion 16
         targetSdkVersion 21
-        versionCode 45
-        versionName "0.31"
+        versionCode 47
+        versionName "0.33"
         //useJack = true
     }
     buildTypes {
