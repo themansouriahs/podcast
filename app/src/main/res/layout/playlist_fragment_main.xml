@@ -18,76 +18,7 @@
         android:elevation="0dp"
         android:clipToPadding="false">
 
-        <!-- Background photo -->
-        <org.bottiger.podcast.views.TopPlayer
-            android:visibility="visible"
-            android:elevation="4dip"
-            android:id="@+id/session_photo_container"
-            android:layout_alignParentTop="true"
-            android:animateLayoutChanges="true"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/top_player_size_maximum"
-            android:foreground="@drawable/photo_banner_scrim">
-
-            <ImageView
-                android:id="@+id/session_photo"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop" />
-
-            <TextView
-                android:id="@+id/episode_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:text="@string/episode_title"
-                android:singleLine="true"
-                android:background="@color/blackWithAlpha"
-                android:textColor="@color/white_opaque"
-                android:textSize="30dp"
-                android:padding="5dp"
-                android:layout_marginLeft="30dp"
-                android:layout_marginRight="30dp"/>
-
-            <TextView
-                android:id="@+id/episode_info"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_below="@id/episode_title"
-                android:layout_above="@id/expanded_controls"
-                android:text="@string/episode_description"
-                android:background="@color/blackWithAlpha"
-                android:padding="5dp"
-                android:textColor="@color/white_opaque"
-                android:textSize="20dp"
-                android:visibility="gone"
-                android:layout_marginLeft="30dp"
-                android:layout_marginRight="30dp"/>
-
-            <org.bottiger.podcast.views.PlayPauseImageView
-                style="@style/PodcastImage"
-                android:id="@+id/play_pause_button"
-                android:layout_width="90dp"
-                android:layout_height="90dp"
-                android:layout_alignParentBottom="true"
-                android:layout_marginLeft="20dp"
-                android:layout_marginBottom="60dp"
-                android:paddingRight="14dip"
-                android:padding="0dip"
-                android:translationZ="20dp"
-                android:elevation="8dp"/>
-            <!-- android:layout_marginTop="205dp" -->
-                <!-- android:layout_above="@id/expanded_controls"-->
-
-            <include layout="@layout/extended_player" />
-
-            <View
-                android:layout_alignParentBottom="true"
-                android:layout_width="fill_parent"
-                android:layout_height="1dp"
-                android:background="#FF000000" />
-
-        </org.bottiger.podcast.views.TopPlayer >
+        <include layout="@layout/top_player" />
 
         <org.bottiger.podcast.views.FixedRecyclerView
             android:id="@+id/my_recycler_view"
