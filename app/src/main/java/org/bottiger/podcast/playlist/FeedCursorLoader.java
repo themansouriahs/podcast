@@ -24,7 +24,11 @@ public class FeedCursorLoader extends GenericCursorLoader {
         super(fragment, adapter, argCursor);
         this.subscription = subscription;
         this.mAdapter = adapter;
-        requery();
+        //requery();
+    }
+
+    public void setSubscription(Subscription argSubscription) {
+        subscription = argSubscription;
     }
 
     public void requery() {

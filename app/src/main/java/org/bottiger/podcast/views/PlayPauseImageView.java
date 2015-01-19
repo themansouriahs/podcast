@@ -98,7 +98,6 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
 
         int centerX = contentWidth/2;
         int centerY = contentHeight/2;
-        //canvas.drawText("Hello World in custom view", 100, 100, paint);
 
         // Draw the background circle
         canvas.drawCircle(centerX,centerY,centerX-5,paint);
@@ -106,10 +105,7 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
         // Draw the play/pause icon
         Bitmap icon = mStatus == PlayerStatusObservable.STATUS.PLAYING ?  s_pauseIcon : s_playIcon;
 
-        BitmapDrawable drawable = new BitmapDrawable(getResources(), icon);
-        //ColorStateList csl = new ColorStateList();
-
-        //drawable.setTint(csl, new AvoidXfermode.Mode());
+        //BitmapDrawable drawable = new BitmapDrawable(getResources(), icon);
 
         int bitmapx = centerX-icon.getWidth()/2;
         int bitmapy = centerY-icon.getHeight()/2;

@@ -115,14 +115,19 @@ public class FragmentContainerActivity extends DrawerActivity implements
             mViewPager.setCurrentItem(1);
 	}
 
+    private boolean first = true;
 	@Override
 	public void onItemSelected(long id) {
         SubscriptionFeedID = id;
+
+
+
+        if (first) {
+            mSectionsPagerAdapter.notifyDataSetChanged();
+            first = false;
+        }
+
         mSectionsPagerAdapter.setSubID(id);
-
-
-        //mFragmentManager.beginTransaction().replace(R.id.subscription_fragment_container, mSectionsPagerAdapter.getItem(SectionsPagerAdapter.FEED)).commit();
-		mSectionsPagerAdapter.notifyDataSetChanged();
         mViewPager.setCurrentItem(2);
 	}
 
@@ -245,24 +250,33 @@ public class FragmentContainerActivity extends DrawerActivity implements
                 vpsf.fillContainerWithSubscriptions();
 				return;
 			case FEED:
-				// return getString(R.string.title_section2).toUpperCase();
+                Subscription subscription;
+                if (subid > 0) {
+                    subscription = Subscription.getById(getContentResolver(), subid);
+                } else {
+                    subscription = Subscription.getFirst(getContentResolver());
+                }
+                ((FeedFragment)fragment).bindNewSubscrption(subscription, true);
 				return;
 			}
 		}
 
         public void setSubID(long subID) {
+            long oldId = subid;
             this.subid = subID;
 
+            if (oldId == -1) {
+                notifyDataSetChanged();
+                refreshData(FEED);
+            } else {
+                refreshData(FEED);
+            }
         }
     }
 
 	private Fragment getSubscriptionFragmentContent(long id) {
 		log.debug("inside: getSubscriptionFragmentContent()");
-        /*
-        if (id > 0) {
-            SubscriptionFeedID = id;
-            return getFeedFragmentContent();
-        }*/
+
         ViewPagerSubscriptionFragment viewPagerSubscriptionFragment = new ViewPagerSubscriptionFragment();
         viewPagerSubscriptionFragment.setOnItemSelectedListener(this);
         return viewPagerSubscriptionFragment;
@@ -276,7 +290,10 @@ public class FragmentContainerActivity extends DrawerActivity implements
             subscription = Subscription.getFirst(getContentResolver());
         }
 
-        mFeedFragment = FeedFragment.newInstance(subscription);
+        if (mFeedFragment == null)
+            mFeedFragment = FeedFragment.newInstance(subscription);
+        else
+            mFeedFragment.bindNewSubscrption(subscription, false);
 		return mFeedFragment;
 	}
 }

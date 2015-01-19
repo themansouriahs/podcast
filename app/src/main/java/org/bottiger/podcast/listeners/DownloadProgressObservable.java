@@ -38,7 +38,7 @@ public class DownloadProgressObservable {
 	private static long REFRESH_INTERVAL = 50; // 16 ms => 60 fps
 	//TimeUnit.MILLISECONDS.convert(1,TimeUnit.SECONDS);
 
-	private static HashMap<Long, List<DownloadObserver>> mObservers = new HashMap<Long, List<DownloadObserver>>();
+	private static WeakHashMap<Long, List<DownloadObserver>> mObservers = new WeakHashMap<Long, List<DownloadObserver>>();
 	private static DownloadManager mDownloadManager = null;
     private static HashMap<Long, IDownloadEngine> mPodcastDownloadManager = null;
 
@@ -212,7 +212,7 @@ public class DownloadProgressObservable {
 		sHandler.sendMessage(msg);
 	}
 
-    public static HashMap<Long,List<DownloadObserver>> getObservers() {
+    public static WeakHashMap<Long,List<DownloadObserver>> getObservers() {
         return mObservers;
     }
 

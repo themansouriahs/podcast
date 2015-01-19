@@ -25,6 +25,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -54,8 +55,6 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
     private View fragmentView;
 
     private Activity mActivity;
-
-    //private ImageView mItemBackground;
 
     protected FeedRefreshLayout mFeedSwipeRefreshView;
 
@@ -101,6 +100,7 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
     public void onAttach (Activity activity) {
         mActivity = activity;
         super.onAttach(activity);
+        //requeryLoader(mSubscription);
     }
 
 	@Override
@@ -170,8 +170,9 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
         mCursorLoader = new FeedCursorLoader(this, (FeedViewAdapter)mAdapter, mCursor, mSubscription);
     }
 
-    public void requeryLoader()
+    public void requeryLoader(@NonNull Subscription subscription)
     {
+        mCursorLoader.setSubscription(subscription);
         mCursorLoader.requery();
     }
 
@@ -179,35 +180,10 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mAdapter = new FeedViewAdapter(this.getActivity(), this, mCursor);
+        mAdapter = new FeedViewAdapter(mActivity, this, mCursor);
         mRecyclerView.setAdapter(mAdapter);
 
-        if (mBackgroundTransformation == null) {
-            mBackgroundTransformation = new BackgroundTransformation(getActivity(), mContainer.getHeight());
-        }
-
-        //mItemBackground.setImageResource(0);
-
-        if (mSubscription != null) {
-
-            mTitleView.setText(mSubscription.getTitle());
-
-            String image = mSubscription.getImageURL();
-            if (image != null && image != "") {
-                /*
-                mImageTransformation = BackgroundTransformation.getmImageTransformation(getActivity(), mImageTransformation, mItemBackground);
-                PicassoWrapper.load(getActivity(), image, mItemBackground, mImageTransformation, picassoCallback);
-                */
-                //PicassoWrapper.simpleLoad(getActivity(), image, mContainer);
-                PicassoWrapper.simpleLoad(getActivity(), image, mTarget);
-
-                mPalette = PaletteCache.get(image);
-            }
-        }
-
-        if (mPalette != null)
-            setColors(mPalette);
-
+        //bindNewSubscrption(mSubscription, false);
     }
 
 	public static FeedFragment newInstance(Subscription subscription) {
@@ -250,5 +226,34 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
             mTitleView.setBackgroundColor(muted.getBodyTextColor());
 
         mAdapter.setPalette(argChangedPalette);
+    }
+
+    public void bindNewSubscrption(Subscription subscription, boolean argRequery) {
+        mSubscription = subscription;
+
+        if (mBackgroundTransformation == null) {
+            mBackgroundTransformation = new BackgroundTransformation(mActivity, mContainer.getHeight());
+        }
+
+        //mItemBackground.setImageResource(0);
+
+        if (mSubscription != null) {
+
+            mTitleView.setText(mSubscription.getTitle());
+
+            String image = mSubscription.getImageURL();
+            if (image != null && image != "") {
+                PicassoWrapper.simpleLoad(mActivity, image, mTarget);
+
+                mPalette = PaletteCache.get(image);
+            }
+        }
+
+        if (mPalette != null)
+            setColors(mPalette);
+
+        if (argRequery) {
+            requeryLoader(mSubscription);
+        }
     }
 }

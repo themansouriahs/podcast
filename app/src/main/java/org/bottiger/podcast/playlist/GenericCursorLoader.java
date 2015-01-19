@@ -65,7 +65,7 @@ public abstract class GenericCursorLoader {
 
             CursorLoader loader = new CursorLoader(mFragment.getActivity(), uri, projection,
 					condition, null, order);
-            loader.setUpdateThrottle(2000);
+            //loader.setUpdateThrottle(2000);
 
             return loader;
 		}
