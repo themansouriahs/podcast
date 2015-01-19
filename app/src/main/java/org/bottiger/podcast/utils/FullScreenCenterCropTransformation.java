@@ -94,8 +94,15 @@ public class FullScreenCenterCropTransformation implements Transformation {
         try {
             croppedBitmap = Bitmap.createBitmap(scaledBitmap, cropStartY, 0, (int) m_viewWidth, m_viewHeight);
         } catch (IllegalArgumentException iae) {
-            ACRA.getErrorReporter().handleSilentException(iae);
             Log.e("BitmapCreationError", "cropStartY: " + cropStartY + " w: " + m_viewWidth + " h: " + m_viewHeight);
+            String keyValue = "cropStartY:" + Integer.toString(cropStartY) + " " +
+                    "m_viewWidth:" + Double.toString(m_viewWidth) + " " +
+                    "m_viewHeight:" + Double.toString(m_viewHeight) + " " +
+                    "sourceWidth:" + Double.toString(sourceWidth) + " " +
+                    "sourceHeight:" + Double.toString(sourceHeight) + " ";
+            ACRA.getErrorReporter()
+                    .putCustomData("TransformationBug", keyValue);
+            ACRA.getErrorReporter().handleException(iae);
             return scaledBitmap;
         }
         scaledBitmap.recycle();
