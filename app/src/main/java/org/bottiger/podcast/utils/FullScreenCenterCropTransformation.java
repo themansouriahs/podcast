@@ -22,7 +22,7 @@ import org.acra.log.ACRALog;
  */
 public class FullScreenCenterCropTransformation implements Transformation {
 
-    final int topVersusBottomCrop = 1; // 8 means that for each 1 pixel we crop from the top we crop 7 pixels from the bottom.
+    final int topVersusBottomCrop = 2; // 8 means that for each 1 pixel we crop from the top we crop 7 pixels from the bottom.
 
     private double m_viewWidth = -1;
     private int m_viewHeight;
@@ -86,7 +86,8 @@ public class FullScreenCenterCropTransformation implements Transformation {
         int cropStartY = 0;
 
         if (m_viewWidth < imageHeight) {
-            int pixelsToCrop = (int)(sourceWidth - m_viewWidth);
+            //int pixelsToCrop = (int)(sourceWidth - m_viewWidth);
+            int pixelsToCrop = (int)(imageHeight - m_viewWidth);
             cropStartY = pixelsToCrop / topVersusBottomCrop;
         }
 
