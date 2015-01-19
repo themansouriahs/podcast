@@ -115,20 +115,15 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
     }
 
 
+    private MotionEvent fingerDown = null;
+    private float fingerdownx = -1;
+    private float fingerdowny = -1;
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, final int position) {
         Log.d("PlaylistViewHolderExpanderHelper", "pos: " + position);
         final PlaylistViewHolder playlistViewHolder2 = (PlaylistViewHolder)viewHolder;
         final FeedItem item = mPlaylist.getItem(position+PLAYLIST_OFFSET);
         boolean isPlaying = false;
-
-        /*
-        playlistViewHolder2.mItemBackground.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                playlistViewHolder2.onClick(playlistViewHolder2.mLayout, playlistViewHolder2);
-            }
-        });*/
 
         playlistViewHolder2.mItemBackground.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -139,12 +134,29 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
                     if (viewRect.contains((int)event.getX(), (int)event.getY())) {
                         playlistViewHolder2.mPlayPauseButton.onClick(null);
                     } else {
-                        playlistViewHolder2.onClick(playlistViewHolder2.mLayout, playlistViewHolder2);
+                        fingerDown = event;
+                        fingerdownx = event.getRawX();
+                        fingerdowny = event.getRawY();
+
                     }
-                    /*
-                    mMainTitle.setText("Touch coordinates : " +
-                            String.valueOf(event.getX()) + "x" + String.valueOf(event.getY()));*/
                 }
+
+                if (event.getAction() == MotionEvent.ACTION_UP){
+                    if (fingerDown != null) {
+                        float thresshold = 10;
+                        float diffx = Math.abs(fingerdownx-event.getRawX());
+                        float diffy = Math.abs(fingerdowny-event.getRawY());
+                        if (diffx < thresshold && diffy < thresshold) {
+                           playlistViewHolder2.onClick(playlistViewHolder2.mLayout, playlistViewHolder2);
+                            fingerDown=null;
+                        }
+                    }
+                }
+
+                if (event.getAction() == MotionEvent.ACTION_CANCEL || event.getAction() == MotionEvent.ACTION_HOVER_EXIT){
+                    fingerDown=null;
+                }
+
                 return true;
             }
         });
