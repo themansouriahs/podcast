@@ -130,10 +130,6 @@ public class PlayerService extends Service implements
 
     @TargetApi(21)
     public MediaSession.Token getToken() {
-        /*
-        ComponentName componentName = new ComponentName(getPackageName(), NotificationListener.class.getName());
-        List<MediaController> list =  mMediaSessionManager.getActiveSessions(componentName);
-        return list.get(0).getSessionToken();*/
         return mMediaSession.getSessionToken();
     }
 

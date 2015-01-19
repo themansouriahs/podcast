@@ -1,21 +1,22 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
         <item
         android:id="@+id/menu_control"
         android:icon="?attr/play_invert_icon"
-        android:orderInCategory="2"
-        android:showAsAction="always"
+        android:orderInCategory="1"
+        app:showAsAction="always"
         android:title="@string/menu_play"/>
     <item
         android:id="@+id/menu_add"
         android:icon="@drawable/content_new"
         android:orderInCategory="10"
-        android:showAsAction="always"
+        app:showAsAction="never"
         android:title="@string/menu_add_podcast"/>
     <item
         android:id="@+id/menu_settings"
         android:orderInCategory="100"
-        android:showAsAction="never"
+        app:showAsAction="never"
         android:title="@string/menu_settings">
     </item>
     <item

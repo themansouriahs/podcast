@@ -366,10 +366,10 @@ public class MainActivity extends FragmentContainerActivity implements
 			} else if (PodcastBaseFragment.mPlayerServiceBinder.isOnPause()) {
 				menuItem.setIcon(themeHelper.getAttr(R.attr.play_invert_icon));
 			} else {
-				menuItem.setVisible(false);
+				//menuItem.setVisible(false);
 			}
 		} else {
-			menuItem.setVisible(false);
+			//menuItem.setVisible(false);
 		}
 
 		return true;
