@@ -1,5 +1,6 @@
 package org.bottiger.podcast.views;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.ViewGroup;
@@ -23,9 +24,12 @@ public class ToolbarActivity extends TopActivity {
 
         mToolbar = (Toolbar) findViewById(R.id.my_awesome_toolbar);
 
-        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) mToolbar.getLayoutParams();
-        params.topMargin = getStatusBarHeight();
-        mToolbar.setLayoutParams(params);
+        // if we can use windowTranslucentNavigation=true
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) mToolbar.getLayoutParams();
+            params.topMargin = getStatusBarHeight();
+            mToolbar.setLayoutParams(params);
+        }
 
         //Title and subtitle
         mToolbar.setTitle(getResources().getString(R.string.app_name));

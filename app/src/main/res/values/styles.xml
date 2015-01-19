@@ -55,15 +55,15 @@
         <item name="customBackground">@color/white_opaque</item>
         <!--<item name="seekbar_handle">@drawable/seekbar_handle</item>-->
 
-        <item name="android:windowTranslucentNavigation">true</item> <!-- actionbar and  bottom navigation -->
-        <!--<<tem name="android:windowTranslucentStatus">true</item>--> <!-- top statusbar -->
-
         <item name="android:actionBarStyle">@style/TransparentActionBar</item>
 
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorSecondary</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:statusBarColor">@color/colorPrimaryDark</item>
+
+        <item name="android:windowTranslucentNavigation" tools:targetApi="19">true</item> <!-- actionbar and  bottom navigation -->
+        <!--<<tem name="android:windowTranslucentStatus">true</item>--> <!-- top statusbar -->
+        <item name="android:statusBarColor" tools:targetApi="21">@color/colorPrimaryDark</item>
 
         <item name="android:windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
