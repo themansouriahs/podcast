@@ -1,12 +1,8 @@
 package org.bottiger.podcast.service;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.List;
-
-import org.bottiger.podcast.SettingsActivity;
-import org.bottiger.podcast.listeners.PlayerStatusObservable;
+import org.bottiger.podcast.Player.PlayerHandler;
+import org.bottiger.podcast.Player.PlayerPhoneListener;
+import org.bottiger.podcast.Player.SoundWavesPlayer;
 import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
@@ -24,7 +20,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.media.session.MediaController;
 import android.media.session.MediaSession;
 import android.media.session.MediaSessionManager;
@@ -36,7 +31,6 @@ import android.os.Message;
 import android.preference.PreferenceManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 
 import javax.annotation.Nullable;
 
@@ -57,8 +51,10 @@ public class PlayerService extends Service implements
     public static final String ACTION_PREVIOUS = "action_previous";
     public static final String ACTION_STOP = "action_stop";
 
+    private static PlayerHandler sPlayerHandler;
+
 	/** Which action to perform when a track ends */
-	private static enum NextTrack {
+	public static enum NextTrack {
 		NONE, NEW_TRACK, NEXT_IN_PLAYLIST
 	}
 
@@ -66,9 +62,6 @@ public class PlayerService extends Service implements
 	
 	private Playlist mPlaylist;
 
-	private static final int FADEIN = 0;
-	private static final int TRACK_ENDED = 1;
-	private static final int SERVER_DIED = 2;
 	public static final int PlayerService_STATUS = 1;
 
 	private static final String WHERE = ItemColumns.STATUS + ">"
@@ -82,7 +75,7 @@ public class PlayerService extends Service implements
 	private final PodcastLog log = PodcastLog.getLog(getClass());
 
     private MediaSession mMediaSession;
-	private MyPlayer mPlayer = null;
+	private SoundWavesPlayer mPlayer = null;
     private MediaController mController;
 
 
@@ -96,46 +89,26 @@ public class PlayerService extends Service implements
 
 	private FeedItem mItem = null;
 	private boolean mUpdate = false;
-	private boolean mResumePlayback = false;
+    private boolean mResumePlayback = false;
 
 	/**
 	 * Phone state listener. Will pause the playback when the phone is ringing
 	 * and continue it afterwards
 	 */
-	private PhoneStateListener mPhoneStateListener = new PhoneStateListener() {
-		@Override
-		public void onCallStateChanged(int state, String incomingNumber) {
-			if (state == TelephonyManager.CALL_STATE_RINGING) {
-				AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-				int ringvolume = audioManager
-						.getStreamVolume(AudioManager.STREAM_RING);
-				if (ringvolume > 0) {
-					mResumePlayback = (isPlaying() || mResumePlayback)
-							&& (mItem != null);
-					pause();
-				}
-			} else if (state == TelephonyManager.CALL_STATE_OFFHOOK) {
-				mResumePlayback = (isPlaying() || mResumePlayback)
-						&& (mItem != null);
-				pause();
-			} else if (state == TelephonyManager.CALL_STATE_IDLE) {
-				if (mResumePlayback) {
-
-					startAndFadeIn();
-					mResumePlayback = false;
-				}
-			}
-		}
-	};
+	private PhoneStateListener mPhoneStateListener = new PlayerPhoneListener(this);
 
     @TargetApi(21)
     public MediaSession.Token getToken() {
         return mMediaSession.getSessionToken();
     }
 
-	private void startAndFadeIn() {
-		handler.sendEmptyMessageDelayed(FADEIN, 10);
+	public void startAndFadeIn() {
+        PlayerHandler.handler.sendEmptyMessageDelayed(PlayerHandler.FADEIN, 10);
 	}
+
+    public SoundWavesPlayer getPlayer() {
+        return mPlayer;
+    }
 
 	@Override
 	public void onCreate() {
@@ -143,9 +116,11 @@ public class PlayerService extends Service implements
 
 		mPlaylist = new Playlist(this);
 		mPlaylist.populatePlaylistIfEmpty();
+
+        sPlayerHandler = new PlayerHandler(this);
 		
-		mPlayer = new MyPlayer();
-		mPlayer.setHandler(handler);
+		mPlayer = new SoundWavesPlayer(this);
+		mPlayer.setHandler(PlayerHandler.handler);
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             mMediaSessionManager = (MediaSessionManager) getSystemService(MEDIA_SESSION_SERVICE);
@@ -221,246 +196,6 @@ public class PlayerService extends Service implements
 		}
 	}
 
-	private class MyPlayer {
-		private MediaPlayer mMediaPlayer = new MediaPlayer();
-
-		private Handler mHandler;
-		private boolean mIsInitialized = false;
-
-		private boolean isPreparingMedia = false;
-
-		int bufferProgress = 0;
-
-		int startPos = 0;
-
-		public MyPlayer() {
-			// mMediaPlayer.setWakeMode(PlayerService.this,
-			// PowerManager.PARTIAL_WAKE_LOCK);
-		}
-
-		public void setDataSourceAsync(String path, int startPos) {
-			try {
-				mMediaPlayer.reset();
-				mMediaPlayer.setDataSource(path);
-				mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-
-				this.startPos = startPos;
-				this.isPreparingMedia = true;
-
-				mMediaPlayer.setOnPreparedListener(preparedlistener);
-				mMediaPlayer.prepareAsync();
-			} catch (IOException ex) {
-				// TODO: notify the user why the file couldn't be opened
-				mIsInitialized = false;
-				return;
-			} catch (IllegalArgumentException ex) {
-				// TODO: notify the user why the file couldn't be opened
-				mIsInitialized = false;
-				return;
-			}
-			mMediaPlayer.setOnCompletionListener(listener);
-			mMediaPlayer.setOnBufferingUpdateListener(bufferListener);
-			mMediaPlayer.setOnErrorListener(errorListener);
-
-			mIsInitialized = true;
-		}
-
-		public boolean isInitialized() {
-			return mIsInitialized;
-		}
-
-		public void toggle() {
-			if (mMediaPlayer.isPlaying())
-				pause();
-			else
-				start();
-		}
-
-		public void start() {
-			notifyStatus();
-
-			// Request audio focus for playback
-			int result = mAudioManager.requestAudioFocus(PlayerService.this,
-			// Use the music stream.
-					AudioManager.STREAM_MUSIC,
-					// Request permanent focus.
-					AudioManager.AUDIOFOCUS_GAIN);
-
-			if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-				mAudioManager
-						.registerMediaButtonEventReceiver(mControllerComponentName);
-				mMediaPlayer.start();
-
-				PlayerStatusObservable
-						.updateStatus(PlayerStatusObservable.STATUS.PLAYING);
-			}
-		}
-
-		public void stop() {
-			mMediaPlayer.reset();
-			mIsInitialized = false;
-			stopForeground(true);
-			PlayerStatusObservable
-					.updateStatus(PlayerStatusObservable.STATUS.STOPPED);
-		}
-
-		public void release() {
-			dis_notifyStatus();
-			stop();
-			mMediaPlayer.release();
-			mAudioManager
-					.unregisterMediaButtonEventReceiver(mControllerComponentName);
-			mIsInitialized = false;
-		}
-
-		/**
-		 * Test of the extended_player is playing something right now
-		 * 
-		 * @return Is the extended_player playing right now
-		 */
-		public boolean isPlaying() {
-			return mMediaPlayer.isPlaying();
-		}
-
-		/**
-		 * Pause the current playing item
-		 */
-		public void pause() {
-			mMediaPlayer.pause();
-			PlayerStatusObservable
-					.updateStatus(PlayerStatusObservable.STATUS.PAUSED);
-		}
-
-		@Deprecated
-		public int getBufferProgress() {
-			return this.bufferProgress;
-		}
-
-		public void setHandler(Handler handler) {
-			mHandler = handler;
-		}
-
-		MediaPlayer.OnCompletionListener listener = new MediaPlayer.OnCompletionListener() {
-			@Override
-			public void onCompletion(MediaPlayer mp) {
-				FeedItem item = PlayerService.this.mItem;
-				// item.markAsListened();
-				// item.update(getContentResolver());
-
-				if (!isPreparingMedia)
-					mHandler.sendEmptyMessage(TRACK_ENDED);
-
-			}
-		};
-
-		MediaPlayer.OnBufferingUpdateListener bufferListener = new MediaPlayer.OnBufferingUpdateListener() {
-			@Override
-			public void onBufferingUpdate(MediaPlayer mp, int percent) {
-				MyPlayer.this.bufferProgress = percent;
-			}
-		};
-
-		MediaPlayer.OnPreparedListener preparedlistener = new MediaPlayer.OnPreparedListener() {
-			@Override
-			public void onPrepared(MediaPlayer mp) {
-				// notifyChange(ASYNC_OPEN_COMPLETE);
-				mp.seekTo(startPos);
-				start();
-				isPreparingMedia = false;
-				PlayerService.setNextTrack(NextTrack.NEXT_IN_PLAYLIST);
-			}
-		};
-
-		MediaPlayer.OnErrorListener errorListener = new MediaPlayer.OnErrorListener() {
-			@Override
-			public boolean onError(MediaPlayer mp, int what, int extra) {
-				log.debug("onError() " + what + " : " + extra);
-
-				switch (what) {
-				case MediaPlayer.MEDIA_ERROR_SERVER_DIED:
-
-					dis_notifyStatus();
-					mIsInitialized = false;
-					mMediaPlayer.release();
-
-					mMediaPlayer = new MediaPlayer();
-					mHandler.sendMessageDelayed(
-							mHandler.obtainMessage(SERVER_DIED), 2000);
-					return true;
-				default:
-					break;
-				}
-				return false;
-			}
-		};
-
-		public long duration() {
-			return mMediaPlayer.getDuration();
-		}
-
-		public long position() {
-			return mMediaPlayer.getCurrentPosition();
-		}
-
-		public long seek(long whereto) {
-			mMediaPlayer.seekTo((int) whereto);
-			return whereto;
-		}
-
-		public void setVolume(float vol) {
-			mMediaPlayer.setVolume(vol, vol);
-		}
-	}
-
-	private final Handler handler = new Handler() {
-		float mCurrentVolume = 1.0f;
-
-		@Override
-		public void handleMessage(Message msg) {
-			switch (msg.what) {
-			case FADEIN:
-				if (!isPlaying()) {
-					mCurrentVolume = 0f;
-					mPlayer.setVolume(mCurrentVolume);
-					start();
-					handler.sendEmptyMessageDelayed(FADEIN, 10);
-				} else {
-					mCurrentVolume += 0.01f;
-					if (mCurrentVolume < 1.0f) {
-						handler.sendEmptyMessageDelayed(FADEIN, 10);
-					} else {
-						mCurrentVolume = 1.0f;
-					}
-					mPlayer.setVolume(mCurrentVolume);
-				}
-				break;
-			case TRACK_ENDED:
-				boolean repeat_mode = getPref();
-
-				if (mItem != null) {
-
-					if (getNextTrack() == NextTrack.NEXT_IN_PLAYLIST) {
-						long nextItemId = getNextId();
-
-						if (nextItemId == -1) {
-							dis_notifyStatus();
-							mPlayer.stop();
-						} else if (repeat_mode) {
-							playNext(nextItemId);
-						}
-						mUpdate = true;
-					}
-				}
-
-				break;
-
-			case SERVER_DIED:
-				break;
-
-			}
-		}
-	};
-
 	@Override
 	public void onStart(Intent intent, int startId) {
 		super.onStart(intent, startId);
@@ -497,7 +232,7 @@ public class PlayerService extends Service implements
 	/**
 	 * Hide the notification
 	 */
-	private void dis_notifyStatus() {
+    public void dis_notifyStatus() {
 		// //mNotificationManager.cancel(R.layout.playing_episode);
 		// setForeground(false);
 		if (mNotificationPlayer != null)
@@ -507,7 +242,7 @@ public class PlayerService extends Service implements
 	/**
 	 * Display a notification with the current podcast
 	 */
-	private Notification notifyStatus() {
+    public Notification notifyStatus() {
 
 		if (mNotificationPlayer == null)
 			mNotificationPlayer = new NotificationPlayer(this, mItem);
@@ -663,7 +398,7 @@ public class PlayerService extends Service implements
 	}
 
 	public int bufferProgress() {
-		int test = mPlayer.bufferProgress;
+		int test = mPlayer.getBufferProgress();
 		return test;// mPlayer.bufferProgress;
 	}
 
@@ -774,7 +509,7 @@ public class PlayerService extends Service implements
 		return null;
 	}
 
-	private boolean getPref() {
+	public boolean getPref() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
         return prefs.getBoolean("pref_continuously_playing", false);
 
