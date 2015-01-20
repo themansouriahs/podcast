@@ -100,9 +100,12 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 		case R.id.menu_clear_playlist: {
 			resetPlaylist(getActivity());
 
-            getPlaylist().resetPlaylist(mCursorAdapter);
+            Playlist playlist = getPlaylist();
+
+            playlist.resetPlaylist(mCursorAdapter);
             //Playlist.resetOrder();
-            getPlaylist().populatePlaylist(getPlaylist().size());
+            int size = playlist.defaultSize();
+            playlist.populatePlaylist(size, true);
             mAdapter.notifyDataSetChanged();
             break;
 			//refreshView();

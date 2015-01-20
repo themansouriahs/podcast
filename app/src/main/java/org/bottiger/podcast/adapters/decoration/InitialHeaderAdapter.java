@@ -36,7 +36,7 @@ public class InitialHeaderAdapter implements StickyHeadersAdapter<InitialHeaderA
 
     @Override
     public void onBindViewHolder(ViewHolder headerViewHolder, int position) {
-        
+
         FeedItem item = mPlaylist.getItem(position+ ItemCursorAdapter.PLAYLIST_OFFSET);
 
         headerViewHolder.letter.setVisibility(View.VISIBLE);

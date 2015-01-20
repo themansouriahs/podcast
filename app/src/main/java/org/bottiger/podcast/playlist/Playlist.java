@@ -34,7 +34,7 @@ public class Playlist implements DragSortRecycler.OnDragStateChangedListener {
 
 	private Context mContext;
 
-	private ArrayList<FeedItem> mPlaylist = new ArrayList<FeedItem>();
+	private static ArrayList<FeedItem> mPlaylist = new ArrayList<FeedItem>();
 	private SharedPreferences sharedPreferences;
 
 	// Shared setting key/values
@@ -82,6 +82,10 @@ public class Playlist implements DragSortRecycler.OnDragStateChangedListener {
 	public int size() {
 		return mPlaylist.size();
 	}
+
+    public int defaultSize() {
+        return amountValue;
+    }
 
 	/**
 	 * 
@@ -285,8 +289,12 @@ public class Playlist implements DragSortRecycler.OnDragStateChangedListener {
 	 * @param length
 	 *            of the playlist
 	 */
-	public void populatePlaylist(int length) {
-		if (mPlaylist.size() >= length) {
+    public void populatePlaylist(int length) {
+        populatePlaylist(length, false);
+    }
+
+	public void populatePlaylist(int length, boolean force) {
+		if (mPlaylist.size() >= length && !force) {
             return;
         }
 
