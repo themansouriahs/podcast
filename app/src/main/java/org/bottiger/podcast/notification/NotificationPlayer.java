@@ -6,6 +6,7 @@ import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.receiver.NotificationReceiver;
 import org.bottiger.podcast.service.PlayerService;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -112,13 +113,15 @@ public class NotificationPlayer {
 		return mId;
 	}
 
+    @TargetApi(20)
     private Notification.Action generateAction( int icon, String title, String intentAction ) {
         Intent intent = new Intent( mContext.getApplicationContext(), PlayerService.class );
         intent.setAction( intentAction );
         PendingIntent pendingIntent = PendingIntent.getService(mContext.getApplicationContext(), 1, intent, 0);
         return new Notification.Action.Builder( icon, title, pendingIntent ).build();
     }
-	
+
+    @TargetApi(21)
 	private Notification.Builder buildNotification(@NonNull Boolean isPlaying, @NonNull PlayerService argPlayerService, @Nullable Bitmap icon) {
 
         mNotificationManager =
