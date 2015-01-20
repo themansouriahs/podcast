@@ -250,6 +250,8 @@ public class PlaylistViewHolderExpanderHelper {
 
     private void collapse(final PlaylistViewHolder viewHolder) {
 
+        viewHolder.setIsRecyclable(false);
+
         final RelativeLayoutWithBackground layoutWithBackground = viewHolder.mLayout;
 
         final int initialHeight = layoutWithBackground.getHeight();
@@ -290,6 +292,7 @@ public class PlaylistViewHolderExpanderHelper {
             public void onAnimationEnd(Animator animator) {
                 Log.d("PlaylistViewHolderExpanderHelper", "END animator" + viewHolder.episode.getTitle() + " new Height:" + viewHolder.mLayout.getLayoutParams().height);
                 viewHolder.mAdapter.toggleItem(viewHolder.episode.getId());
+                viewHolder.setIsRecyclable(true);
                 //mAdapter.notifyDataSetChanged(); // BUGFIX
             }
 
@@ -301,11 +304,6 @@ public class PlaylistViewHolderExpanderHelper {
             public void onAnimationRepeat(Animator animator) {
             }
         });
-
-        /*
-        mAnimatorSet = new AnimatorSet();
-        mAnimatorSet.playTogether(animator, buttonAnimator, buttonTrans);
-        mAnimatorSet.start();*/
 
         mAnimatorCollection.add(animator);
         mAnimatorCollection.add(buttonAnimator);
@@ -330,7 +328,7 @@ public class PlaylistViewHolderExpanderHelper {
                 paramsButton.height = height;
                 paramsButton.width = height;
 
-                Log.d("PlaylistViewHolderExpanderHelper", "button animator" + viewHolder.episode.getTitle() + " current height => " + height);
+                //Log.d("PlaylistViewHolderExpanderHelper", "button animator" + viewHolder.episode.getTitle() + " current height => " + height);
                 viewHolder.mPlayPauseButton.setLayoutParams(paramsButton);
                 viewHolder.mPlayPauseButton.setTranslationY(buttonTransInc.getInterp());
             }
@@ -345,7 +343,7 @@ public class PlaylistViewHolderExpanderHelper {
         return new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                Log.d("PlaylistViewHolderExpanderHelper", "height animator" + viewHolder.episode.getTitle() + " new Height:" + inc.getInterp());
+                //Log.d("PlaylistViewHolderExpanderHelper", "height animator" + viewHolder.episode.getTitle() + " new Height:" + inc.getInterp());
                 paramsRecyclerView.height = inc.getInterp();
                 paramsBackground.height = inc.getInterp();
 

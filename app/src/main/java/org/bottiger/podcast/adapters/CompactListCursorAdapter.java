@@ -10,7 +10,6 @@ import org.bottiger.podcast.R;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.PlayerService;
-import org.bottiger.podcast.utils.ControlButtons;
 
 import android.app.Activity;
 import android.content.Context;
@@ -109,12 +108,6 @@ public class CompactListCursorAdapter extends AbstractEpisodeCursorAdapter {
 		final Context context2 = context;
 		final Activity activity2 = mActivity;
 
-		playToggleButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-            	ControlButtons.playPauseToggle(item2, null, playToggleButton); //FIXME
-            }
-		});
-		
 		queueButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
             	item2.queue(context2);

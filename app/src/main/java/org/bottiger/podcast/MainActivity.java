@@ -13,8 +13,6 @@ import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.service.PodcastDownloadManager;
 import org.bottiger.podcast.service.PodcastService;
 import org.bottiger.podcast.utils.AddPodcastDialog;
-import org.bottiger.podcast.utils.ControlButtons;
-import org.bottiger.podcast.utils.DriveUtils;
 import org.bottiger.podcast.utils.ThemeHelper;
 
 
@@ -223,7 +221,6 @@ public class MainActivity extends FragmentContainerActivity implements
 		receiver = new HeadsetReceiver();
 		registerReceiver(receiver, receiverFilter);
 
-		ControlButtons.setThemeHelper(getApplicationContext());
 
 
 		/*

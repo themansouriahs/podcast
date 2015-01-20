@@ -9,6 +9,7 @@ import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.PodcastBaseFragment;
 import org.bottiger.podcast.R;
 
+import org.bottiger.podcast.adapters.viewholders.ExpandableViewHoldersUtil;
 import org.bottiger.podcast.images.PicassoWrapper;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.listeners.PaletteObservable;
@@ -62,6 +63,8 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
 
     public static int mCollapsedHeight = -1;
     private static int mExpandedHeight = -1; //890;
+
+    ExpandableViewHoldersUtil.KeepOneH<PlaylistViewHolder> keepOne = new ExpandableViewHoldersUtil.KeepOneH<PlaylistViewHolder>();
 
     private View mOverlay;
 
@@ -122,10 +125,12 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
     private float fingerdowny = -1;
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, final int position) {
-        Log.d("PlaylistViewHolderExpanderHelper", "pos: " + position);
         final PlaylistViewHolder playlistViewHolder2 = (PlaylistViewHolder)viewHolder;
         final FeedItem item = mPlaylist.getItem(position+PLAYLIST_OFFSET);
         boolean isPlaying = false;
+        keepOne.bind(playlistViewHolder2, position);
+
+        Log.d("PlaylistViewHolderExpanderHelper", "pos: " + position + " episode: " + item.getTitle());
 
         playlistViewHolder2.mItemBackground.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -149,7 +154,8 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
                         float diffx = Math.abs(fingerdownx-event.getRawX());
                         float diffy = Math.abs(fingerdowny-event.getRawY());
                         if (diffx < thresshold && diffy < thresshold) {
-                           playlistViewHolder2.onClick(playlistViewHolder2.mLayout, playlistViewHolder2);
+                           //playlistViewHolder2.onClick(playlistViewHolder2.mLayout, playlistViewHolder2);
+                           keepOne.toggle(playlistViewHolder2);
                             fingerDown=null;
                         }
                     }
@@ -168,7 +174,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
 
         playlistViewHolder2.playerLinearLayout.setVisibility(View.GONE);
 
-        int type = getItemViewType(position);
+        int type = getTrueItemViewType(position);
         //type = TYPE_FIRST;
         boolean doExpand = type == TYPE_EXPAND; //  || position < 5
 
@@ -445,7 +451,14 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
         Long id = itemID(position+PLAYLIST_OFFSET); // The recyclervies does not start with item 1 in the playlist
 		boolean isExpanded = mExpandedItemID.contains(id);
 		return isExpanded ? TYPE_EXPAND : TYPE_COLLAPS;
+        //return TYPE_COLLAPS;
 	}
+
+    public int getTrueItemViewType(int position) {
+        Long id = itemID(position+PLAYLIST_OFFSET); // The recyclervies does not start with item 1 in the playlist
+        boolean isExpanded = mExpandedItemID.contains(id);
+        return isExpanded ? TYPE_EXPAND : TYPE_COLLAPS;
+    }
 
 	/**
 	 * Returns the ID of the item at the position

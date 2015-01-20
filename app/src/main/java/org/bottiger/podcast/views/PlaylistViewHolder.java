@@ -15,6 +15,7 @@ import com.squareup.picasso.Callback;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.adapters.ItemCursorAdapter;
+import org.bottiger.podcast.adapters.viewholders.ExpandableViewHoldersUtil;
 import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.utils.PaletteCache;
@@ -27,7 +28,7 @@ import java.util.HashMap;
  */
 // Provide a reference to the type of views that you are using
 // (custom viewholder)
-public class PlaylistViewHolder extends RecyclerView.ViewHolder { //  implements View.OnClickListener
+public class PlaylistViewHolder extends RecyclerView.ViewHolder implements ExpandableViewHoldersUtil.Expandable { //  implements View.OnClickListener
 
     public FeedItem episode = null;
     public ItemCursorAdapter mAdapter = null;
@@ -111,7 +112,7 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder { //  implements
         }
 
         int listPost = viewHolder.getPosition();
-        int type = viewHolder.mAdapter.getItemViewType(listPost);
+        int type = viewHolder.mAdapter.getTrueItemViewType(listPost);
 
 
         boolean doAnimate = true;
@@ -142,4 +143,9 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder { //  implements
     }
 
     public void setExpanded(boolean isExpanded) {mIsExpanded = isExpanded;}
+
+    @Override
+    public View getExpandView() {
+        return playerLinearLayout;
+    }
 }

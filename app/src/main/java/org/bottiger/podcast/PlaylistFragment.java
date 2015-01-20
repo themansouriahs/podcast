@@ -16,7 +16,6 @@ import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.service.DownloadCompleteCallback;
 import org.bottiger.podcast.service.PodcastDownloadManager;
 import org.bottiger.podcast.utils.BackgroundTransformation;
-import org.bottiger.podcast.utils.ControlButtons;
 import org.bottiger.podcast.utils.PaletteCache;
 import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.views.DownloadButtonView;
@@ -371,8 +370,6 @@ public class PlaylistFragment extends GeastureFragment implements
 	@Override
 	public void onResume() {
 		super.onResume();
-
-		ControlButtons.fragment = this;
 	}
 
 
