@@ -10,8 +10,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <include layout="@layout/playlist_empty" />
+
     <RelativeLayout
         android:id="@+id/playlist_container"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipChildren="false"

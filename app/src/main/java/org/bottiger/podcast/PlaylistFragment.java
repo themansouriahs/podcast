@@ -37,6 +37,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
@@ -77,6 +78,9 @@ public class PlaylistFragment extends GeastureFragment implements
 
     private boolean mHasPhoto = false;
     private static final float PHOTO_ASPECT_RATIO = 1.7777777f;
+
+    private View mPlaylistContainer;
+    private View mEmptyPlaylistContainer;
 
     private TopPlayer mPhotoContainer;
     private ImageView mPhoto;
@@ -191,6 +195,9 @@ public class PlaylistFragment extends GeastureFragment implements
         mPhotoContainer =   (TopPlayer) mSwipeRefreshView.findViewById(R.id.session_photo_container);
         mPhoto =            (ImageView) mSwipeRefreshView.findViewById(R.id.session_photo);
 
+        mPlaylistContainer = mSwipeRefreshView.findViewById(R.id.playlist_container);
+        mEmptyPlaylistContainer = mSwipeRefreshView.findViewById(R.id.playlist_empty);
+
         mEpisodeTitle         =    (TextView) mSwipeRefreshView.findViewById(R.id.episode_title);
         mEpisodeInfo         =    (TextView) mSwipeRefreshView.findViewById(R.id.episode_info);
 
@@ -211,6 +218,7 @@ public class PlaylistFragment extends GeastureFragment implements
         if (mPlaylist == null) {
             mPlaylist = new Playlist(mActivity);
             mPlaylist.populatePlaylistIfEmpty();
+            setPlaylistViewState(mPlaylist);
         }
 
         // specify an adapter (see also next example)
@@ -361,6 +369,16 @@ public class PlaylistFragment extends GeastureFragment implements
         }
     }
 
+    private void setPlaylistViewState(@NonNull Playlist argPlaylist) {
+        if (argPlaylist.isEmpty()) {
+            mPlaylistContainer.setVisibility(View.GONE);
+            mEmptyPlaylistContainer.setVisibility(View.VISIBLE);
+        } else {
+            mPlaylistContainer.setVisibility(View.VISIBLE);
+            mEmptyPlaylistContainer.setVisibility(View.GONE);
+        }
+    }
+
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
@@ -430,6 +448,8 @@ public class PlaylistFragment extends GeastureFragment implements
                  if (!mPlaylist.isEmpty()) {
                      bindHeader(mPlaylist.first());
                  }
+
+                 setPlaylistViewState(mPlaylist);
              }
 
              @Override
@@ -446,6 +466,8 @@ public class PlaylistFragment extends GeastureFragment implements
                          @Override
                          public void run() {
                              bindHeader(mPlaylist.first());
+
+                             setPlaylistViewState(mPlaylist);
                          }
                      });
                  }
