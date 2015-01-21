@@ -89,7 +89,7 @@ public class NotificationPlayer {
 
     public void refresh() {
         PlayerService ps = mPlayerService;
-        if (ps != null) {
+        if (ps != null && (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {
             mNotification = buildNotification(ps.isPlaying(), mPlayerService, mArtwork).build();
             mNotificationManager.notify(mId, mNotification);
         }
@@ -121,13 +121,76 @@ public class NotificationPlayer {
         return new Notification.Action.Builder( icon, title, pendingIntent ).build();
     }
 
-    @TargetApi(21)
+
 	private Notification.Builder buildNotification(@NonNull Boolean isPlaying, @NonNull PlayerService argPlayerService, @Nullable Bitmap icon) {
+        return mediaStyleNotification(isPlaying, argPlayerService, icon);
+	}
+
+    private NotificationCompat.Builder customStyleNotification(@NonNull Boolean isPlaying, @NonNull PlayerService argPlayerService, @Nullable Bitmap icon) {
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(mContext)
+                        .setSmallIcon(R.drawable.soundwaves)
+                        .setContentTitle(item.title)
+                        .setContentText(item.sub_title)
+                        .setLargeIcon(icon);
+
+        Intent resultIntent = new Intent(mContext, NotificationReceiver.class);
+
+        // Sets a custom content view for the notification, including an image button.
+        RemoteViews layout = new RemoteViews(mContext.getPackageName(), R.layout.notification);
+        layout.setTextViewText(R.id.notification_title, item.title);
+        layout.setTextViewText(R.id.notification_content, item.sub_title);
+        layout.setImageViewBitmap(R.id.icon, icon);
+
+        // Prepare intent which is triggered if the
+        // notification is selected
+        Intent toggleIntent = new Intent(NotificationReceiver.toggleAction);
+        Intent nextIntent = new Intent(NotificationReceiver.nextAction);
+
+        PendingIntent pendingToggleIntent = PendingIntent.getBroadcast(mContext, 0, toggleIntent, 0);
+        PendingIntent pendingNextIntent = PendingIntent.getBroadcast(mContext, 0, nextIntent, 0);
+
+        layout.setOnClickPendingIntent(R.id.play_pause_button,pendingToggleIntent);
+        layout.setOnClickPendingIntent(R.id.next_button,pendingNextIntent);
+
+        //PlayerStatusListener.registerImageView(, mContext);
+        int srcId = R.drawable.av_play;
+        if (isPlaying) srcId = R.drawable.av_pause;
+
+        layout.setImageViewResource(R.id.play_pause_button, srcId);
+
+        mBuilder.setContent(layout);
+
+
+        // The stack builder object will contain an artificial back stack for the
+        // started Activity.
+        // This ensures that navigating backward from the Activity leads out of
+        // your application to the Home screen.
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(mContext);
+        // Adds the back stack for the Intent (but not the Intent itself)
+        stackBuilder.addParentStack(MainActivity.class);
+        // Adds the Intent that starts the Activity to the top of the stack
+        stackBuilder.addNextIntent(resultIntent);
+
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(
+                        0,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+        mBuilder.setContentIntent(resultPendingIntent);
 
         mNotificationManager =
                 (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
 
-		//Bitmap icon = new BitmapProvider(mContext, item).createBitmapFromMediaFile(128, 128);
+        return mBuilder;
+    }
+
+    @TargetApi(21)
+    private Notification.Builder mediaStyleNotification(@NonNull Boolean isPlaying, @NonNull PlayerService argPlayerService, @Nullable Bitmap icon) {
+        mNotificationManager =
+                (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        //Bitmap icon = new BitmapProvider(mContext, item).createBitmapFromMediaFile(128, 128);
 
         Notification.MediaStyle mediaStyle = new Notification.MediaStyle().setMediaSession(argPlayerService.getToken());
         mediaStyle.setShowActionsInCompactView(0);
@@ -137,7 +200,7 @@ public class NotificationPlayer {
                 .setLargeIcon(icon)     // setMediaSession(token, true)
                 .setContentTitle(item.title)     // these three lines are optional
                 .setContentText(item.sub_title)   // if you use
-                //.setMediaSession(PlayerService.SESSION_ID, true) // , true)
+                        //.setMediaSession(PlayerService.SESSION_ID, true) // , true)
                 .setStyle(mediaStyle);
 
 
@@ -164,69 +227,7 @@ public class NotificationPlayer {
         mBuilder.setContentIntent(resultPendingIntent);
 
         return mBuilder;
-
-/*
-        NotificationCompat.Builder mBuilder =
-		        new NotificationCompat.Builder(mContext)
-		        .setSmallIcon(R.drawable.soundwaves)
-		        .setContentTitle(item.title)
-		        .setContentText(item.sub_title)
-		        .setLargeIcon(icon);
-
-
-
-
-		Intent resultIntent = new Intent(mContext, NotificationReceiver.class);
-		
-		// Sets a custom content view for the notification, including an image button.
-        RemoteViews layout = new RemoteViews(mContext.getPackageName(), R.layout.notification);
-        layout.setTextViewText(R.id.notification_title, item.title);
-        layout.setTextViewText(R.id.notification_content, item.sub_title);
-        layout.setImageViewBitmap(R.id.icon, icon);
-        
-     // Prepare intent which is triggered if the
-        // notification is selected
-        Intent toggleIntent = new Intent(NotificationReceiver.toggleAction);
-        Intent nextIntent = new Intent(NotificationReceiver.nextAction);
-        
-        PendingIntent pendingToggleIntent = PendingIntent.getBroadcast(mContext, 0, toggleIntent, 0);
-        PendingIntent pendingNextIntent = PendingIntent.getBroadcast(mContext, 0, nextIntent, 0);
-        
-        layout.setOnClickPendingIntent(R.id.play_pause_button,pendingToggleIntent);
-        layout.setOnClickPendingIntent(R.id.next_button,pendingNextIntent);
-        
-        //PlayerStatusListener.registerImageView(, mContext);
-        int srcId = R.drawable.av_play;
-        if (isPlaying) srcId = R.drawable.av_pause;
-        
-        layout.setImageViewResource(R.id.play_pause_button, srcId);
-        
-        mBuilder.setContent(layout);
-		
-		
-		// The stack builder object will contain an artificial back stack for the
-		// started Activity.
-		// This ensures that navigating backward from the Activity leads out of
-		// your application to the Home screen.
-		TaskStackBuilder stackBuilder = TaskStackBuilder.create(mContext);
-		// Adds the back stack for the Intent (but not the Intent itself)
-		stackBuilder.addParentStack(MainActivity.class);
-		// Adds the Intent that starts the Activity to the top of the stack
-		stackBuilder.addNextIntent(resultIntent);
-		
-		PendingIntent resultPendingIntent =
-		        stackBuilder.getPendingIntent(
-		            0,
-		            PendingIntent.FLAG_UPDATE_CURRENT
-		        );
-		mBuilder.setContentIntent(resultPendingIntent);
-		
-		mNotificationManager =
-		    (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-		
-		return mBuilder;
-		*/
-	}
+    }
 
 	
 }
