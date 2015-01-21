@@ -52,11 +52,9 @@ import com.squareup.picasso.Callback;
 
 public class PlaylistFragment extends GeastureFragment implements
 		OnSharedPreferenceChangeListener, Playlist.PlaylistChangeListener, DownloadCompleteCallback
-         { // , SwipeRefreshLayout.OnRefreshListener // RecyclerView.OnScrollListener
+         {
 
     private PlaylistTouchListener mListener;
-
-    private static final int DEFAULT_IMAGE_SIZE = 1080;
 
     private static int CONTEXT_MENU = 0;
 	private static Fragment CONTEXT_FRAGMENT = null;
@@ -85,10 +83,6 @@ public class PlaylistFragment extends GeastureFragment implements
 
     private int mHeaderTopClearance;
     private int mPhotoHeightPixels;
-    private int mHeaderHeightPixels;
-    private int mAddScheduleButtonHeightPixels;
-
-    private int mHeaderStartSize = -1;
 
 	private SharedPreferences.OnSharedPreferenceChangeListener spChanged;
 
@@ -124,7 +118,7 @@ public class PlaylistFragment extends GeastureFragment implements
         mDownloadProgressObservable = PodcastDownloadManager.getDownloadProgressObservable(mActivity);
 
 		mPlaylist = getPlaylist();
-        mPlaylist.registerPlaylistChangeListener(this);
+
 		playlistCursor = new PlaylistCursorLoader(mPlaylist, this, (ItemCursorAdapter)mAdapter, mCursor);
 
 
@@ -149,18 +143,6 @@ public class PlaylistFragment extends GeastureFragment implements
 		}
 
 	}
-
-    @Override
-    public void onStart () {
-        super.onStart();
-
-        // Does this even work?
-        for (FeedItem item : mPlaylist.getPlaylist()) {
-            if (!TextUtils.isEmpty(item.image)) {
-                PicassoWrapper.fetch(mActivity, item.image, null);
-            }
-        }
-    }
 
     @Override
     public void onRefresh() {
@@ -341,7 +323,6 @@ public class PlaylistFragment extends GeastureFragment implements
     private void recomputePhotoAndScrollingMetrics() {
         final int actionBarSize = UIUtils.calculateActionBarSize(mActivity);
         mHeaderTopClearance = actionBarSize - mPhotoContainer.getPaddingTop();
-        mHeaderHeightPixels = mPhotoContainer.getHeight();
 
         mPhotoHeightPixels = mHeaderTopClearance;
         if (mHasPhoto) {
@@ -377,6 +358,26 @@ public class PlaylistFragment extends GeastureFragment implements
 	public void onResume() {
 		super.onResume();
 	}
+
+    @Override
+    public void onStart () {
+        super.onStart();
+        mPlaylist.registerPlaylistChangeListener(this);
+        playlistCursor.requery();
+
+        // Does this even work?
+        for (FeedItem item : mPlaylist.getPlaylist()) {
+            if (!TextUtils.isEmpty(item.image)) {
+                PicassoWrapper.fetch(mActivity, item.image, null);
+            }
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mPlaylist.unregisterPlaylistChangeListener(this);
+    }
 
 
 	@Override
@@ -432,12 +433,21 @@ public class PlaylistFragment extends GeastureFragment implements
                  if (mPlaylist != activePlaylist)
                      mPlaylist = activePlaylist;
 
-                 mPlaylist.populatePlaylistIfEmpty();
-                 if (!mPlaylist.isEmpty()) {
-                     bindHeader(mPlaylist.first());
-                 }
+                 mActivity.runOnUiThread(new Runnable() {
 
-                 setPlaylistViewState(mPlaylist);
+                     @Override
+                     public void run() {
+                         mPlaylist.populatePlaylistIfEmpty();
+
+                         setPlaylistViewState(mPlaylist);
+
+                         if (!mPlaylist.isEmpty()) {
+                             bindHeader(mPlaylist.first());
+                             playlistCursor.requery();
+                         }
+
+                     }
+                 });
              }
 
              @Override
