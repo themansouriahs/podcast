@@ -7,6 +7,8 @@ import java.util.Locale;
 
 import android.util.Log;
 
+import org.acra.ACRA;
+
 /** Parses several date formats. */
 public class SyndDateUtils {
 	private static final String TAG = "DateUtils";
@@ -108,6 +110,10 @@ public class SyndDateUtils {
 			}
 
 		}
+
+        if (result == null) {
+            ACRA.getErrorReporter().putCustomData("Could not parse date using 'parseRFC3339Date': ", date);
+        }
 
 		return result;
 

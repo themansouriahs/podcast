@@ -1,20 +1,16 @@
 package org.bottiger.podcast.provider;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigInteger;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 
+import org.acra.ACRA;
 import org.bottiger.podcast.service.DownloadStatus;
 import org.bottiger.podcast.service.PodcastDownloadManager;
 import org.bottiger.podcast.utils.PodcastLog;
@@ -32,21 +28,16 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
-import android.os.RemoteException;
 import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.LruCache;
 import android.util.Log;
 
-import com.google.api.client.util.DateTime;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -1478,9 +1469,14 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 		return null;
 	}
 
+    private static SimpleDateFormat sFormat = new SimpleDateFormat(default_format, Locale.US);
 	public void setPubDate(Date parseRFC822Date) {
-		SimpleDateFormat format = new SimpleDateFormat(default_format);
-		this.date = format.format(parseRFC822Date);
+        try {
+            this.date = sFormat.format(parseRFC822Date);
+        } catch (NullPointerException npe) {
+            Log.e("Date parsing error:" , "Could not parse: " + parseRFC822Date.toString());
+            this.date = sFormat.format(new Date());
+        }
 	}
 
 	public void setDescription(String content2) {
