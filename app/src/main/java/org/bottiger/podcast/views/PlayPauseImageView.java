@@ -18,6 +18,7 @@ import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.DownloadObserver;
 import org.bottiger.podcast.listeners.EpisodeStatus;
 import org.bottiger.podcast.listeners.PaletteListener;
+import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObserver;
 import org.bottiger.podcast.playlist.Playlist;
@@ -76,8 +77,14 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
         PlayerStatusObservable.registerListener(this);
     }
 
-    public void setmEpisodeId(long argId) {
+    public synchronized void setEpisodeId(long argId) {
         this.mEpisodeId = argId;
+        PaletteObservable.registerListener(this);
+    }
+
+    public synchronized void unsetEpisodeId() {
+        this.mEpisodeId = -1;
+        PaletteObservable.unregisterListener(this);
     }
 
     public void setStatus(PlayerStatusObservable.STATUS argStatus) {

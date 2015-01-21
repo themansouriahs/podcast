@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.TreeSet;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.bottiger.podcast.ApplicationConfiguration;
-import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.PodcastBaseFragment;
 import org.bottiger.podcast.R;
 
@@ -20,16 +18,9 @@ import org.bottiger.podcast.utils.BackgroundTransformation;
 import org.bottiger.podcast.utils.PaletteCache;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.ThemeHelper;
-import org.bottiger.podcast.views.PlayPauseImageView;
-import org.bottiger.podcast.views.PlayerLinearLayout;
 import org.bottiger.podcast.views.PlaylistViewHolder;
-import org.bottiger.podcast.views.RelativeLayoutWithBackground;
 import org.bottiger.podcast.views.utils.PlaylistViewHolderExpanderHelper;
 
-import android.animation.Animator;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.database.Cursor;
@@ -44,11 +35,6 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationSet;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
 import com.squareup.picasso.Callback;
 
@@ -207,7 +193,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
 
             if (item != null) {
 
-                playlistViewHolder2.mPlayPauseButton.setmEpisodeId(item.getId());
+                playlistViewHolder2.mPlayPauseButton.setEpisodeId(item.getId());
                 playlistViewHolder2.mPlayPauseButton.setStatus(isPlaying ? PlayerStatusObservable.STATUS.PLAYING : PlayerStatusObservable.STATUS.PAUSED);
                 mDownloadProgressObservable.registerObserver(playlistViewHolder2.mPlayPauseButton);
 
@@ -328,7 +314,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
         holder.seekbar.setOverlay(mOverlay);
 
         long id = feedItem.getId();
-        holder.mPlayPauseButton.setmEpisodeId(id);
+        holder.mPlayPauseButton.setEpisodeId(id);
         holder.downloadButton.setEpisodeId(id);
         holder.queueButton.setEpisodeId(id);
         holder.bookmarkButton.setEpisodeId(id);
@@ -339,12 +325,14 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
 
         mDownloadProgressObservable.registerObserver(holder.downloadButton);
 
+        /* handled by the button view
         PaletteObservable.registerListener(holder.mPlayPauseButton);
         PaletteObservable.registerListener(holder.downloadButton);
         PaletteObservable.registerListener(holder.queueButton);
         PaletteObservable.registerListener(holder.bookmarkButton);
         PaletteObservable.registerListener(holder.previousButton);
         PaletteObservable.registerListener(holder.seekbar);
+        */
 
         // PlayerActivity.setProgressBar(sb, feedItem);
         long secondary = 0;
@@ -398,12 +386,20 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
         mDownloadProgressObservable.unregisterObserver(holder.mPlayPauseButton);
 
 
+        holder.mPlayPauseButton.unsetEpisodeId();
+        holder.previousButton.unsetEpisodeId();
+        holder.downloadButton.unsetEpisodeId();
+        holder.queueButton.unsetEpisodeId();
+        holder.bookmarkButton.unsetEpisodeId();
+        /*
         PaletteObservable.unregisterListener(holder.mPlayPauseButton);
         PaletteObservable.unregisterListener(holder.previousButton);
         PaletteObservable.unregisterListener(holder.downloadButton);
         PaletteObservable.unregisterListener(holder.queueButton);
         PaletteObservable.unregisterListener(holder.bookmarkButton);
+        */
         PaletteObservable.unregisterListener(holder.seekbar);
+
     }
 
     /**

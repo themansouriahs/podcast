@@ -114,8 +114,14 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
         mStateIcons.put(PlayerButtonView.STATE_DEFAULT, defaultIcon);
     }
 
-    public void setEpisodeId(long argId) {
+    public synchronized void setEpisodeId(long argId) {
         this.episodeId = argId;
+        PaletteObservable.registerListener(this);
+    }
+
+    public synchronized void unsetEpisodeId() {
+        this.episodeId = -1;
+        PaletteObservable.unregisterListener(this);
     }
 
     public void setStatus(PlayerStatusObservable.STATUS argStatus) {

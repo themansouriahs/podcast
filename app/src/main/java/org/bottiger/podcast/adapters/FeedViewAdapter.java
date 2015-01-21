@@ -3,18 +3,13 @@ package org.bottiger.podcast.adapters;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
-import android.text.SpannableString;
-import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Callback;
@@ -22,7 +17,6 @@ import com.squareup.picasso.Callback;
 import org.bottiger.podcast.PodcastBaseFragment;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
-import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.views.DownloadButtonView;
@@ -95,7 +89,7 @@ public class FeedViewAdapter extends AbstractEpisodeCursorAdapter<FeedViewAdapte
             episodeViewHolder.mDownloadButton.onPaletteFound(mPalette);
         }
 
-        episodeViewHolder.mPlayPauseButton.setmEpisodeId(item.getId());
+        episodeViewHolder.mPlayPauseButton.setEpisodeId(item.getId());
         episodeViewHolder.mPlayPauseButton.setStatus(isPlaying ? PlayerStatusObservable.STATUS.PLAYING : PlayerStatusObservable.STATUS.PAUSED);
 
 
