@@ -42,6 +42,7 @@ public class FeedUpdater {
 		
 		subscription.update(contentResolver);
 
+        Playlist playlist = null;
         LinkedList<ContentValues> cvs = new LinkedList<ContentValues>();
         HashMap<String, Integer> duplicateTest = new HashMap<String, Integer>();
 
@@ -56,7 +57,7 @@ public class FeedUpdater {
                 }
 
                 try {
-                    Playlist playlist = Playlist.getActivePlaylist();
+                    playlist = Playlist.getActivePlaylist();
                     playlist.notifyAbout(item);
                 } catch (IllegalStateException ise) {
                     // its okay. We are running in a background job.
@@ -74,6 +75,9 @@ public class FeedUpdater {
 
         try {
             contentResolver.bulkInsert(ItemColumns.URI, contentValuesArray);
+            if (playlist != null) {
+                playlist.notifyPlaylistChanged();
+            }
         } catch (SQLiteConstraintException e) {
             FeedItem[] localItems2 = FeedItem.getByURL(contentResolver, urls, null);
             return;
