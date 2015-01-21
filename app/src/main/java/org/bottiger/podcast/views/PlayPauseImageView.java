@@ -36,8 +36,10 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
     private static Bitmap s_pauseIcon;
 
     private Paint paint;
+    private static Paint paintBorder;
 
-    private int mPaintColor = Color.GREEN; // TODO: use a default from R.color...
+    private int mPaintColor = Color.WHITE; // TODO: use a default from R.color...
+    private int mPaintBorderColor = Color.BLACK;
 
     public PlayPauseImageView(Context context) {
         super(context);
@@ -59,7 +61,12 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
         paint.setColor(mPaintColor);
         paint.setTextSize(12.0F);
         paint.setStyle(Paint.Style.FILL_AND_STROKE); // Paint.Style.STROKE
-        paint.setStrokeWidth(10F);
+        paint.setStrokeWidth(1F);
+
+        paintBorder = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paintBorder.setColor(mPaintBorderColor);
+        paintBorder.setStyle(Paint.Style.STROKE); // Paint.Style.STROKE
+        paintBorder.setStrokeWidth(2F);
 
         setOnClickListener(this);
         if (s_playIcon == null || s_pauseIcon == null) {
@@ -101,6 +108,7 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
 
         // Draw the background circle
         canvas.drawCircle(centerX,centerY,centerX-5,paint);
+        //canvas.drawCircle(centerX,centerY,centerX-5,paintBorder);
 
         // Draw the play/pause icon
         Bitmap icon = mStatus == PlayerStatusObservable.STATUS.PLAYING ?  s_pauseIcon : s_playIcon;
