@@ -61,11 +61,13 @@ public class NotificationPlayer {
 		this.mContext = context;
 		this.item = item;
 	}
-	
+
+    @Nullable
 	public Notification show() {
 		return show(true);
 	}
-	
+
+    @Nullable
 	public Notification show(Boolean isPlaying) {
         if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             return null;
@@ -74,6 +76,10 @@ public class NotificationPlayer {
 		// mId allows you to update the notification later on.
 
         mNotification = buildNotification(isPlaying, mPlayerService, mArtwork).build();
+
+        if (mNotification == null)
+            return null;
+
 		//mNotificationManager.notify(mId, not);
         if (mContext instanceof PlayerService)
             ((PlayerService)mContext).startForeground(this.getNotificationId(), mNotification);
@@ -126,7 +132,13 @@ public class NotificationPlayer {
         return mediaStyleNotification(isPlaying, argPlayerService, icon);
 	}
 
+    @Nullable
     private NotificationCompat.Builder customStyleNotification(@NonNull Boolean isPlaying, @NonNull PlayerService argPlayerService, @Nullable Bitmap icon) {
+
+        if (item == null) {
+            return null;
+        }
+
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(mContext)
                         .setSmallIcon(R.drawable.soundwaves)
@@ -185,8 +197,14 @@ public class NotificationPlayer {
         return mBuilder;
     }
 
+    @Nullable
     @TargetApi(21)
     private Notification.Builder mediaStyleNotification(@NonNull Boolean isPlaying, @NonNull PlayerService argPlayerService, @Nullable Bitmap icon) {
+
+        if (item == null) {
+            return null;
+        }
+
         mNotificationManager =
                 (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
 
