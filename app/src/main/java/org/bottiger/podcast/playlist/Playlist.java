@@ -403,14 +403,14 @@ public class Playlist implements DragSortRecycler.OnDragStateChangedListener {
             //listener.notifyPlaylistRangeChanged(argFrom, argTo);
 
             final PlaylistChangeListener finalListener = listener;
-            if (mContext instanceof Activity) {
-                ((Activity)mContext).runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
+            //if (mContext instanceof Activity) {
+            //    ((Activity)mContext).runOnUiThread(new Runnable() {
+            //        @Override
+            //        public void run() {
                         finalListener.notifyPlaylistRangeChanged(argFrom, argTo);
-                    }
-                });
-            }
+            //        }
+            //    });
+            //}
         }
     }
 }

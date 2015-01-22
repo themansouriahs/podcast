@@ -21,6 +21,7 @@ import org.bottiger.podcast.utils.ThemeHelper;
 import org.bottiger.podcast.views.PlaylistViewHolder;
 import org.bottiger.podcast.views.utils.PlaylistViewHolderExpanderHelper;
 
+import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.database.Cursor;
@@ -471,13 +472,24 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
 
     @Override
     public void notifyPlaylistChanged() {
-        this.notifyDataSetChanged();
+        ((Activity)mOverlay.getContext()).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ItemCursorAdapter.this.notifyDataSetChanged();
+            }
+        });
     }
 
     @Override
     public void notifyPlaylistRangeChanged(int from, int to) {
         int min = Math.min(from, to);
         int count = 1 + Math.max(from, to) - min;
-        this.notifyItemRangeChanged(min, count);
+        try {
+            this.notifyItemRangeChanged(min, count);
+        } catch (IndexOutOfBoundsException iob) {
+            count = 5;
+            min = count;
+            return;
+        }
     }
 }
