@@ -248,6 +248,33 @@ public class PlaylistFragment extends GeastureFragment implements
         super.onAttach(activity);
     }
 
+    @Override
+    public void onPause() {
+        PaletteObservable.unregisterListener(mPlayPauseButton);
+        PaletteObservable.unregisterListener(mBackButton);
+        PaletteObservable.unregisterListener(mDownloadButton);
+        PaletteObservable.unregisterListener(mQueueButton);
+        PaletteObservable.unregisterListener(mFavoriteButton);
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        if (mPlaylist != null) {
+            FeedItem item = mPlaylist.getItem(0);
+
+            if (item != null) {
+                mPlayPauseButton.setEpisodeId(item.getId());
+                mBackButton.setEpisodeId(item.getId());
+                mDownloadButton.setEpisodeId(item.getId());
+                mQueueButton.setEpisodeId(item.getId());
+                mFavoriteButton.setEpisodeId(item.getId());
+            }
+        }
+        super.onResume();
+    }
+
+
     public void bindHeader(final FeedItem item) {
         Callback cb = new Callback() {
 
@@ -296,11 +323,13 @@ public class PlaylistFragment extends GeastureFragment implements
 
         PlayerStatusObservable.registerListener(mPlayerSeekbar);
 
+        /*
         PaletteObservable.registerListener(mPlayPauseButton);
         PaletteObservable.registerListener(mBackButton);
         PaletteObservable.registerListener(mDownloadButton);
         PaletteObservable.registerListener(mQueueButton);
         PaletteObservable.registerListener(mFavoriteButton);
+        */
 
         Palette palette = PaletteCache.get(item.image);
         if (palette != null) {
@@ -352,11 +381,6 @@ public class PlaylistFragment extends GeastureFragment implements
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		outState.putLong(mExpandedEpisodeKey, mExpandedEpisodeId);
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
 	}
 
     @Override

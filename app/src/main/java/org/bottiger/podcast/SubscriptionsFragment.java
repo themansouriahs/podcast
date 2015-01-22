@@ -318,7 +318,11 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
 
 	private Cursor cursorFromSearchResults(List<IPodcast> podcasts) {
 
-		MatrixCursor matrixCursor = newMatrixCursor();
+        MatrixCursor matrixCursor = newMatrixCursor();
+
+        if (podcasts == null || podcasts.isEmpty())
+            return matrixCursor;
+
 
 		int idIdx = matrixCursor.getColumnIndex(SubscriptionColumns._ID);
 		int titleIdx = matrixCursor.getColumnIndex(SubscriptionColumns.TITLE);

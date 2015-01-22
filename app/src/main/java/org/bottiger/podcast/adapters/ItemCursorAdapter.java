@@ -482,13 +482,21 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
 
     @Override
     public void notifyPlaylistRangeChanged(int from, int to) {
-        int min = Math.min(from, to);
-        int count = 1 + Math.max(from, to) - min;
+        final int tmpmin = Math.min(from, to);
+        final int min = tmpmin > this.getItemCount() ? this.getItemCount() : tmpmin;
+
+        final int tmpcount = 1 + Math.max(from, to) - min;
+        final int count = tmpcount > this.getItemCount() ? this.getItemCount() : tmpcount;
         try {
-            this.notifyItemRangeChanged(min, count);
+            ((Activity)mOverlay.getContext()).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ItemCursorAdapter.this.notifyItemRangeChanged(min, count);
+                }
+            });
         } catch (IndexOutOfBoundsException iob) {
-            count = 5;
-            min = count;
+            int count2 = 5;
+            int min2 = count;
             return;
         }
     }

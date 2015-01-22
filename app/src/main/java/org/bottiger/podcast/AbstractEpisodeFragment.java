@@ -105,8 +105,10 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
             playlist.resetPlaylist(mCursorAdapter);
             //Playlist.resetOrder();
             int size = playlist.defaultSize();
-            playlist.populatePlaylist(size, true);
-            mAdapter.notifyDataSetChanged();
+            if (!playlist.isEmpty()) {
+                playlist.populatePlaylist(size, true);
+                mAdapter.notifyDataSetChanged();
+            }
             break;
 			//refreshView();
 		}

@@ -94,6 +94,9 @@ public class Playlist implements DragSortRecycler.OnDragStateChangedListener {
 	 * @return The episode at the given position
 	 */
 	public FeedItem getItem(int position) {
+        if (position >= mPlaylist.size())
+            return null;
+
 		return mPlaylist.get(position);
 	}
 

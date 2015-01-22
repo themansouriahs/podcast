@@ -89,6 +89,11 @@ public class DownloadProgressObservable {
                             }
 
                             FeedItem item = observers.get(0).getEpisode();
+
+                            if (item == null) {
+                                continue;
+                            }
+
                             DownloadStatus status = PodcastDownloadManager.getStatus(item);
                             IDownloadEngine download = mPodcastDownloadManager.get(item.getId());
 
@@ -104,6 +109,7 @@ public class DownloadProgressObservable {
                                     }
                                     break;
                                 case PENDING:
+                                    break;
                                 case DONE:
                                 case NOTHING:
                                 case ERROR:

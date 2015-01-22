@@ -116,6 +116,7 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
 
     public synchronized void setEpisodeId(long argId) {
         this.episodeId = argId;
+        ensureEpisode();
         PaletteObservable.registerListener(this);
     }
 
@@ -204,9 +205,7 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
 
     @Override
     public FeedItem getEpisode() {
-        if (episodeId < 0) {
-            throw new IllegalStateException("Episode ID must be set before calling getEpisode");
-        }
+        ensureEpisode();
 
         Log.d("Optimize", "Please optimize PlayButtonView.getEpisode");
         return FeedItem.getById(this.getContext().getContentResolver(), episodeId);
@@ -267,5 +266,11 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
             return Color.RED;
 
         return color.getRgb();
+    }
+
+    private void ensureEpisode() {
+        if (episodeId < 0) {
+            throw new IllegalStateException("Episode ID must be set before calling getEpisode");
+        }
     }
 }

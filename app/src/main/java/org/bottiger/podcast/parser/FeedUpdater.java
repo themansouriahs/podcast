@@ -58,7 +58,7 @@ public class FeedUpdater {
 
                 try {
                     playlist = Playlist.getActivePlaylist();
-                    playlist.notifyAbout(item);
+                    //playlist.notifyAbout(item);
                 } catch (IllegalStateException ise) {
                     // its okay. We are running in a background job.
                 }

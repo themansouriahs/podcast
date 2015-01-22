@@ -1,27 +1,34 @@
 package org.bottiger.podcast.listeners;
 
-import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.graphics.Palette;
-import android.util.Log;
 
-import org.bottiger.podcast.R;
-
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.WeakHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by apl on 05-08-2014.
  */
 public class PaletteObservable {
 
-    private static WeakHashMap<PaletteListener, Boolean> mListeners = new WeakHashMap<PaletteListener, Boolean>();
+    private static final ReentrantLock sLock = new ReentrantLock();
+    private static HashMap<PaletteListener, Boolean> mListeners = new HashMap<PaletteListener, Boolean>();
 
     public static void registerListener(PaletteListener listener) {
-        mListeners.put(listener, true);
+        sLock.lock();
+        try {
+            if (mListeners.containsKey(listener))
+                return;
+
+            mListeners.put(listener, true);
+        } finally {
+            sLock.unlock();
+        }
     }
 
     public static boolean unregisterListener(PaletteListener listener) {
+        sLock.lock();
         try {
             synchronized (mListeners) {
                 if (!mListeners.containsKey(listener))
@@ -33,11 +40,18 @@ public class PaletteObservable {
             //Log.d(e.printStackTrace();)
             e.printStackTrace(); // FIXME: This should not happen
             return false;
+        } finally {
+            sLock.unlock();
         }
     }
 
     public static void clear() {
-        mListeners.clear();
+        sLock.lock();
+        try {
+            mListeners.clear();
+        } finally {
+            sLock.unlock();
+        }
     }
 
     public static void updatePalette(@NonNull String argUrl, @NonNull Palette argPalette) {
@@ -45,12 +59,12 @@ public class PaletteObservable {
             return;
         }
 
+        sLock.lock();
         try {
 
             for (PaletteListener item : mListeners.keySet()) {
 
                 if (item.getPaletteUrl().equals(argUrl)) {
-
                     item.onPaletteFound(argPalette);
                 }
             }
@@ -58,6 +72,8 @@ public class PaletteObservable {
         } catch (NullPointerException npe) {
 
             return; // FIXME
+        } finally {
+            sLock.unlock();
         }
     }
 }
