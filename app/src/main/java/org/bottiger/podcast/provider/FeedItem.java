@@ -1095,7 +1095,7 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
         }
         boolean isInstanceof = obj instanceof FeedItem;
 		if (!isInstanceof) {
-            return true;
+            return false;
         }
 
         FeedItem other = (FeedItem) obj;

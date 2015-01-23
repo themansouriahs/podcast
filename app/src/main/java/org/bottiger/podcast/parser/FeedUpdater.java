@@ -76,7 +76,7 @@ public class FeedUpdater {
         try {
             contentResolver.bulkInsert(ItemColumns.URI, contentValuesArray);
             if (playlist != null) {
-                playlist.notifyPlaylistChanged();
+                playlist.notifyDatabaseChanged();
             }
         } catch (SQLiteConstraintException e) {
             FeedItem[] localItems2 = FeedItem.getByURL(contentResolver, urls, null);

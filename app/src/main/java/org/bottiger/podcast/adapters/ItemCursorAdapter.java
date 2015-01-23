@@ -363,7 +363,11 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
 
     @Override
     public int getItemCount() {
-        return mCursor == null ? 0 : mCursor.getCount()-PLAYLIST_OFFSET;
+        int cursorCount = mCursor == null ? 0 : mCursor.getCount();
+        int playlistCount = mPlaylist == null ? 0 : mPlaylist.size();
+        int minCount = Math.min(cursorCount, playlistCount);
+
+        return minCount-PLAYLIST_OFFSET;
     }
 
     @Override
@@ -464,7 +468,12 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
 	 * @return ID of the FeedItem
 	 */
 	private Long itemID(int position) {
-        Long id = mPlaylist.getItem(position).getId(); //Long.valueOf(((ReorderCursor) mCursor).getInt(mCursor.getColumnIndex(BaseColumns._ID)));
+        FeedItem episode = mPlaylist.getItem(position);
+
+        if (episode == null)
+            return -1L;
+
+        Long id = episode.getId(); //Long.valueOf(((ReorderCursor) mCursor).getInt(mCursor.getColumnIndex(BaseColumns._ID)));
         return id;
 	}
 

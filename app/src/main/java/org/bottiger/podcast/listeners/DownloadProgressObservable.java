@@ -101,6 +101,7 @@ public class DownloadProgressObservable {
 
                             switch (status) {
                                 case DOWNLOADING:
+                                    Log.d("Refresh UI:", "Downloading: "+ item.title);
                                     if (download == null) {
                                         progress = item.getProgress(mDownloadManager);
                                     } else {
@@ -109,10 +110,12 @@ public class DownloadProgressObservable {
                                     }
                                     break;
                                 case PENDING:
+                                    Log.d("Refresh UI:", "Pending: "+ item.title);
                                     break;
                                 case DONE:
                                 case NOTHING:
                                 case ERROR:
+                                    Log.d("Refresh UI:", "End: "+ item.title);
                                     progress = 100;
                                     //mUpdateIDs.remove(episodeId);
                                     iterator.remove();

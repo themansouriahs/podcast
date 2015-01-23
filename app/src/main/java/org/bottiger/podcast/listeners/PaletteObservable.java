@@ -18,9 +18,6 @@ public class PaletteObservable {
     public static void registerListener(PaletteListener listener) {
         sLock.lock();
         try {
-            if (mListeners.containsKey(listener))
-                return;
-
             mListeners.put(listener, true);
         } finally {
             sLock.unlock();

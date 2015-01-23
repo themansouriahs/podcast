@@ -182,9 +182,9 @@ public class Playlist implements DragSortRecycler.OnDragStateChangedListener {
 	public void move(int from, int to) {
         populatePlaylistIfEmpty();
 
-        FeedItem fromItem = mPlaylist.get(from+ItemCursorAdapter.PLAYLIST_OFFSET);
-        mPlaylist.remove(from+ItemCursorAdapter.PLAYLIST_OFFSET);
-        mPlaylist.add(to+ItemCursorAdapter.PLAYLIST_OFFSET,fromItem);
+        FeedItem fromItem = mPlaylist.get(from);
+        mPlaylist.remove(from);
+        mPlaylist.add(to,fromItem);
 
         int min = from;
         int max = to;
@@ -194,7 +194,7 @@ public class Playlist implements DragSortRecycler.OnDragStateChangedListener {
             max = from;
         }
 
-        notifyPlaylistRangeChanged(min, max);
+        notifyPlaylistRangeChanged(min-1, max-1);
 
         FeedItem precedingItem = to == 0 ? null : mPlaylist.get(to-1);
         FeedItem movedItem = mPlaylist.get(from);
@@ -367,12 +367,12 @@ public class Playlist implements DragSortRecycler.OnDragStateChangedListener {
     private int dragStart = -1;
     @Override
     public void onDragStart(int position) {
-        dragStart = position;
+        dragStart = position+ItemCursorAdapter.PLAYLIST_OFFSET;
     }
 
     @Override
     public void onDragStop(int position) {
-        move(dragStart, position);
+        move(dragStart, position+ItemCursorAdapter.PLAYLIST_OFFSET);
         dragStart = -1;
     }
 
@@ -387,6 +387,11 @@ public class Playlist implements DragSortRecycler.OnDragStateChangedListener {
 
     public void unregisterPlaylistChangeListener(@NonNull PlaylistChangeListener argChangeListener) {
         mPlaylistChangeListeners.remove(argChangeListener);
+    }
+
+    public void notifyDatabaseChanged() {
+        populatePlaylist(amountValue, true);
+        notifyPlaylistChanged();
     }
 
     public void notifyPlaylistChanged() {
