@@ -7,6 +7,7 @@ import org.bottiger.podcast.images.PicassoWrapper;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
+import org.bottiger.podcast.listeners.PlaylistScrollListener;
 import org.bottiger.podcast.listeners.PlaylistTouchListener;
 import org.bottiger.podcast.listeners.RecentItemsRecyclerListener;
 import org.bottiger.podcast.playlist.Playlist;
@@ -49,6 +50,8 @@ import android.widget.TextView;
 import com.eowise.recyclerview.stickyheaders.StickyHeadersBuilder;
 import com.eowise.recyclerview.stickyheaders.StickyHeadersItemDecoration;
 import com.squareup.picasso.Callback;
+
+import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 
 public class PlaylistFragment extends GeastureFragment implements
 		OnSharedPreferenceChangeListener, Playlist.PlaylistChangeListener, DownloadCompleteCallback
@@ -240,6 +243,9 @@ public class PlaylistFragment extends GeastureFragment implements
         mRecyclerView.addOnItemTouchListener(dragSortRecycler);
         mRecyclerView.setOnScrollListener(dragSortRecycler.getScrollListener());
         //////
+
+        mRecyclerView.setOnScrollListener(new PlaylistScrollListener());
+        mRecyclerView.setItemAnimator(new SlideInLeftAnimator());
     }
 
     @Override

@@ -33,12 +33,14 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.support.annotation.Nullable;
 
+import org.bottiger.podcast.listeners.PlaylistScrollListener;
+
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.WeakHashMap;
 
 
-public class DragSortRecycler extends RecyclerView.ItemDecoration implements RecyclerView.OnItemTouchListener {
+public class DragSortRecycler extends RecyclerView.ItemDecoration implements RecyclerView.OnItemTouchListener, PlaylistScrollListener.PostScrollListener {
 
     final String TAG = "DragSortRecycler";
 
@@ -74,7 +76,6 @@ public class DragSortRecycler extends RecyclerView.ItemDecoration implements Rec
     private boolean isDragging;
 
     private WeakHashMap<OnDragStateChangedListener, Boolean> dragStateChangedListener = new WeakHashMap<>();
-
 
 
     public interface OnItemMovedListener
@@ -434,6 +435,13 @@ public class DragSortRecycler extends RecyclerView.ItemDecoration implements Rec
         }
     }
 
+    RecyclerView.OnScrollListener scrollListener = new PlaylistScrollListener(this);
+
+    @Override
+    public void hasScrolledY(int dy) {
+        fingerAnchorY -= dy;
+    }
+    /*
     RecyclerView.OnScrollListener scrollListener = new RecyclerView.OnScrollListener() {
         @Override
         public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -443,10 +451,10 @@ public class DragSortRecycler extends RecyclerView.ItemDecoration implements Rec
         @Override
         public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
             super.onScrolled(recyclerView, dx, dy);
-            debugLog("Scrolled: " + dx + " " + dy);
             fingerAnchorY -= dy;
         }
     };
+    */
     
     /**
      *
