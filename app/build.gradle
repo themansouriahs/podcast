@@ -9,8 +9,8 @@ android {
         applicationId "org.bottiger.podcast"
         minSdkVersion 16
         targetSdkVersion 21
-        versionCode 56
-        versionName "0.42"
+        versionCode 57
+        versionName "0.43"
         //useJack = true
     }
     buildTypes {
@@ -79,4 +79,5 @@ dependencies {
     compile 'ch.acra:acra:4.5.0'
 
     compile 'com.eowise:recyclerview-stickyheaders:0.5.1@aar'
+    compile 'jp.wasabeef:recyclerview-animators:1.0.3'
 }
