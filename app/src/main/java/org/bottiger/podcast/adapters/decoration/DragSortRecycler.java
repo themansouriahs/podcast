@@ -83,20 +83,10 @@ public class DragSortRecycler extends RecyclerView.ItemDecoration implements Rec
         public void onItemMoved(int from, int to);
     }
 
-    public interface OnDragStateChangedListener {
-        public void onDragStart(int position);
-        public void onDragStop(int position);
-    }
-
     private void debugLog(String log)
     {
         if (DEBUG)
             Log.d(TAG, log);
-    }
-
-    public RecyclerView.OnScrollListener getScrollListener()
-    {
-        return scrollListener;
     }
 
     /*
@@ -435,26 +425,10 @@ public class DragSortRecycler extends RecyclerView.ItemDecoration implements Rec
         }
     }
 
-    RecyclerView.OnScrollListener scrollListener = new PlaylistScrollListener(this);
-
     @Override
     public void hasScrolledY(int dy) {
         fingerAnchorY -= dy;
     }
-    /*
-    RecyclerView.OnScrollListener scrollListener = new RecyclerView.OnScrollListener() {
-        @Override
-        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-            super.onScrollStateChanged(recyclerView, newState);
-        }
-
-        @Override
-        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-            super.onScrolled(recyclerView, dx, dy);
-            fingerAnchorY -= dy;
-        }
-    };
-    */
     
     /**
      *

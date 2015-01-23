@@ -8,6 +8,7 @@ import android.view.MotionEvent;
 import android.widget.ImageView;
 
 import org.bottiger.podcast.adapters.decoration.DragSortRecycler;
+import org.bottiger.podcast.adapters.decoration.OnDragStateChangedListener;
 import org.bottiger.podcast.views.ExpandableLayoutManager;
 import org.bottiger.podcast.views.FixedRecyclerView;
 import org.bottiger.podcast.views.SwipeRefreshExpandableLayout;
@@ -16,7 +17,7 @@ import org.bottiger.podcast.views.TopPlayer;
 /**
  * Created by apl on 13-01-2015.
  */
-public class PlaylistTouchListener extends GestureDetector.SimpleOnGestureListener implements DragSortRecycler.OnDragStateChangedListener {
+public class PlaylistTouchListener extends GestureDetector.SimpleOnGestureListener implements OnDragStateChangedListener {
 
     private SwipeRefreshExpandableLayout mSwipeRefreshView;
     private TopPlayer mTopPlayer;

@@ -71,7 +71,7 @@ public class PlaylistFragment extends GeastureFragment implements
     private View mPlaylistContainer;
     private View mEmptyPlaylistContainer;
 
-    private TopPlayer mPhotoContainer;
+    private TopPlayer mTopPlayer;
     private ImageView mPhoto;
 
     private TextView mEpisodeTitle;
@@ -165,7 +165,7 @@ public class PlaylistFragment extends GeastureFragment implements
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view,savedInstanceState);
 
-        mPhotoContainer =   (TopPlayer) mSwipeRefreshView.findViewById(R.id.session_photo_container);
+        mTopPlayer =   (TopPlayer) mSwipeRefreshView.findViewById(R.id.session_photo_container);
         mPhoto =            (ImageView) mSwipeRefreshView.findViewById(R.id.session_photo);
 
         mPlaylistContainer = mSwipeRefreshView.findViewById(R.id.playlist_container);
@@ -203,14 +203,14 @@ public class PlaylistFragment extends GeastureFragment implements
         RecentItemsRecyclerListener l = new RecentItemsRecyclerListener(mAdapter);
         mRecyclerView.setRecyclerListener(l);
 
-        mPhotoContainer.bringToFront();
+        mTopPlayer.bringToFront();
 
         if (!mPlaylist.isEmpty()) {
             bindHeader(mPlaylist.first());
         }
 
         mListener = new PlaylistTouchListener(mSwipeRefreshView,
-                mPhotoContainer,
+                mTopPlayer,
                 mRecyclerView,
                 mPhoto);
 
@@ -241,10 +241,12 @@ public class PlaylistFragment extends GeastureFragment implements
 
         mRecyclerView.addItemDecoration(dragSortRecycler);
         mRecyclerView.addOnItemTouchListener(dragSortRecycler);
-        mRecyclerView.setOnScrollListener(dragSortRecycler.getScrollListener());
+        //mRecyclerView.setOnScrollListener(dragSortRecycler.getScrollListener());
         //////
 
-        mRecyclerView.setOnScrollListener(new PlaylistScrollListener());
+        PlaylistScrollListener playlistScrollListener = new PlaylistScrollListener(dragSortRecycler, mSwipeRefreshView, mTopPlayer, mRecyclerView, mPhoto);
+
+        mRecyclerView.setOnScrollListener(playlistScrollListener);
         mRecyclerView.setItemAnimator(new SlideInLeftAnimator());
     }
 
@@ -288,9 +290,9 @@ public class PlaylistFragment extends GeastureFragment implements
             public void onSuccess() {
                 mHasPhoto = true;
                 recomputePhotoAndScrollingMetrics();
-                int h =mPhotoContainer.getHeight();
-                mPhotoContainer.getLayoutParams().height = (h); // +actionBarSize
-                mPhotoContainer.requestLayout();
+                int h = mTopPlayer.getHeight();
+                mTopPlayer.getLayoutParams().height = (h); // +actionBarSize
+                mTopPlayer.requestLayout();
                 mRecyclerView.scrollToPosition(0);
                 Log.d("RecyclerPadding", "padding: " + h);
 
@@ -350,14 +352,14 @@ public class PlaylistFragment extends GeastureFragment implements
         int height = TopPlayer.sizeLarge;//1080;//(int)(mPhoto.getHeight()*5.6);
         trans = BackgroundTransformation.getmImageTransformation(mActivity, mImageTransformation, height);
         PicassoWrapper.load(mActivity, item.image, mPhoto, trans, cb);
-        mPhotoContainer.getLayoutParams().height = (height); // +actionBarSize
-        mPhotoContainer.requestLayout();
+        mTopPlayer.getLayoutParams().height = (height); // +actionBarSize
+        mTopPlayer.requestLayout();
     }
     com.squareup.picasso.Transformation trans = null;
 
     private void recomputePhotoAndScrollingMetrics() {
         final int actionBarSize = UIUtils.calculateActionBarSize(mActivity);
-        mHeaderTopClearance = actionBarSize - mPhotoContainer.getPaddingTop();
+        mHeaderTopClearance = actionBarSize - mTopPlayer.getPaddingTop();
 
         mPhotoHeightPixels = mHeaderTopClearance;
         if (mHasPhoto) {
@@ -366,10 +368,10 @@ public class PlaylistFragment extends GeastureFragment implements
         }
 
         ViewGroup.LayoutParams lp;
-        lp = mPhotoContainer.getLayoutParams();
+        lp = mTopPlayer.getLayoutParams();
         if (lp.height != mPhotoHeightPixels) {
             lp.height = mPhotoHeightPixels;
-            mPhotoContainer.setLayoutParams(lp);
+            mTopPlayer.setLayoutParams(lp);
         }
     }
 
