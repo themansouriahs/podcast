@@ -14,7 +14,7 @@ import org.bottiger.podcast.provider.Subscription;
 /**
  * Created by apl on 22-09-2014.
  */
-public class ViewPagerSubscriptionFragment extends Fragment implements PodcastBaseFragment.OnItemSelectedListener {
+public class ViewPagerSubscriptionFragment extends Fragment { //implements PodcastBaseFragment.OnItemSelectedListener {
 
     private FragmentManager mFragmentManager;
 
@@ -49,7 +49,7 @@ public class ViewPagerSubscriptionFragment extends Fragment implements PodcastBa
         mContainerView = (FrameLayout)inflater.inflate(R.layout.subscription_container, container, false);
 
         mSubscriptionFragment = new SubscriptionsFragment();
-        mSubscriptionFragment.mCLickListener = this;
+        //mSubscriptionFragment.mCLickListener = this;
         mFragmentManager.beginTransaction().replace(R.id.subscription_fragment_container, mSubscriptionFragment).commit();
 
         return mContainerView;
@@ -78,7 +78,7 @@ public class ViewPagerSubscriptionFragment extends Fragment implements PodcastBa
                 .replace(R.id.subscription_fragment_container, mFeedFragment).commit();
     }
 
-    @Override
+    //@Override
     public void onItemSelected(long id) {
         //fillContainerWithFeed(id);
         mOnItemSelectedListener.onItemSelected(id);
