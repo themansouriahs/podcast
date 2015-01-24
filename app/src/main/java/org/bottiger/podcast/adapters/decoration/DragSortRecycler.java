@@ -33,14 +33,12 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.support.annotation.Nullable;
 
-import org.bottiger.podcast.listeners.PlaylistScrollListener;
-
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.WeakHashMap;
 
 
-public class DragSortRecycler extends RecyclerView.ItemDecoration implements RecyclerView.OnItemTouchListener, PlaylistScrollListener.PostScrollListener {
+public class DragSortRecycler extends RecyclerView.ItemDecoration implements RecyclerView.OnItemTouchListener, PostScrollListener {
 
     final String TAG = "DragSortRecycler";
 

@@ -9,6 +9,7 @@ import org.bottiger.podcast.PodcastBaseFragment;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.adapters.ItemCursorAdapter;
 import org.bottiger.podcast.adapters.decoration.DragSortRecycler;
+import org.bottiger.podcast.adapters.decoration.OnDragStateChangedListener;
 import org.bottiger.podcast.provider.DatabaseHelper;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
@@ -27,7 +28,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.CursorAdapter;
 
-public class Playlist implements DragSortRecycler.OnDragStateChangedListener {
+public class Playlist implements OnDragStateChangedListener {
 
 	private static int MAX_SIZE = 20;
     private static Playlist activePlaylist = null;
