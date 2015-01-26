@@ -38,8 +38,6 @@ public class TopPlayer extends RelativeLayout {
     private enum PlayerLayout { SMALL, MEDIUM, LARGE }
     private PlayerLayout mPlayerLayout = PlayerLayout.LARGE;
 
-    private GestureDetector mDetector;
-
     private int mPlayPauseLargeSize = -1;
 
     private Context mContext;
@@ -131,13 +129,11 @@ public class TopPlayer extends RelativeLayout {
 
     public void setRecyclerView(@NonNull FixedRecyclerView argRecyclerView) {
         mRecyclerView = argRecyclerView;
-        mDetector = new GestureDetector(mContext, new MyGestureListener(mRecyclerView));
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        mDetector.onTouchEvent(event);
-        return true;
+        return mRecyclerView.onTouchEvent(event);
     }
 
     @Override

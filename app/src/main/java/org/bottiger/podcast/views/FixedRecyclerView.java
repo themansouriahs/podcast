@@ -51,11 +51,12 @@ public class FixedRecyclerView extends RecyclerView {
         }
     }
 
+
     @Override
     public boolean fling(int velocityX, int velocityY) {
         LayoutManager lm = getLayoutManager();
         mLastY = 0;
-        mScroller.fling(0, 0, velocityX, velocityY, 0, 0, -2000 ,4000);
+        mScroller.fling(0, 0, velocityX, velocityY, 0, 0, -10000 ,10000);
         return true;
     }
 
@@ -71,6 +72,8 @@ public class FixedRecyclerView extends RecyclerView {
     @Override
     public boolean canScrollVertically(int direction) {
 
+        return true;
+        /*
         if (mSeekbarSeeking)
             return false;
 
@@ -84,6 +87,7 @@ public class FixedRecyclerView extends RecyclerView {
         boolean canScroll = super.canScrollVertically(direction);
         Log.d("FixedRecyclerView", "(super) canscroll: " + canScroll);
         return canScroll;
+        */
     }
 
     @Override
