@@ -12,21 +12,18 @@
     <org.bottiger.podcast.views.PlayerButtonView
         android:id="@+id/previous"
         android:padding="0dip"
-        android:elevation="8dp"
         android:src="?attr/previous_icon"
         style="@style/RightPlaylistButton" />
 
     <org.bottiger.podcast.views.DownloadButtonView
         android:id="@+id/download"
         android:padding="0dip"
-        android:elevation="8dp"
         android:layout_toLeftOf="@id/previous"
         style="@style/PlaylistButton" />
 
     <org.bottiger.podcast.views.PlayerButtonView
         android:id="@+id/queue"
         android:padding="0dip"
-        android:elevation="8dp"
         android:src="?attr/queue_icon"
         android:layout_toLeftOf="@id/download"
         style="@style/PlaylistButton" />
@@ -34,7 +31,6 @@
     <org.bottiger.podcast.views.PlayerButtonView
         android:id="@+id/bookmark"
         android:padding="0dip"
-        android:elevation="8dp"
         android:layout_toLeftOf="@id/queue"
         android:src="?attr/new_icon"
         style="@style/PlaylistButton" />

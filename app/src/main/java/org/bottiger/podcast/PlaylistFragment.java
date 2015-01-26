@@ -8,6 +8,7 @@ import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.listeners.RecentItemsRecyclerListener;
+import org.bottiger.podcast.listeners.RecyclerItemTouchListener;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.playlist.PlaylistCursorLoader;
 import org.bottiger.podcast.provider.FeedItem;
@@ -220,6 +221,11 @@ public class PlaylistFragment extends GeastureFragment implements
                 .build();
 
         mRecyclerView.addItemDecoration(decoration);
+
+        //////
+
+        mRecyclerView.addOnItemTouchListener(new RecyclerItemTouchListener());
+
 
         //////
         DragSortRecycler dragSortRecycler = new DragSortRecycler();

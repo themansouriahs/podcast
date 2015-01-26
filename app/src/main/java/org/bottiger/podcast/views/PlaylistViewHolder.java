@@ -28,7 +28,7 @@ import java.util.HashMap;
  */
 // Provide a reference to the type of views that you are using
 // (custom viewholder)
-public class PlaylistViewHolder extends RecyclerView.ViewHolder implements ExpandableViewHoldersUtil.Expandable { //  implements View.OnClickListener
+public class PlaylistViewHolder extends RecyclerView.ViewHolder implements ExpandableViewHoldersUtil.Expandable, View.OnClickListener { //
 
     public FeedItem episode = null;
     public ItemCursorAdapter mAdapter = null;
@@ -147,5 +147,10 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
     @Override
     public View getExpandView() {
         return playerLinearLayout;
+    }
+
+    @Override
+    public void onClick(View v) {
+        return;
     }
 }

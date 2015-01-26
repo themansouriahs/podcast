@@ -51,7 +51,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
     public static int mCollapsedHeight = -1;
     private static int mExpandedHeight = -1; //890;
 
-    ExpandableViewHoldersUtil.KeepOneH<PlaylistViewHolder> keepOne = new ExpandableViewHoldersUtil.KeepOneH<PlaylistViewHolder>();
+    public static ExpandableViewHoldersUtil.KeepOneH<PlaylistViewHolder> keepOne = new ExpandableViewHoldersUtil.KeepOneH<PlaylistViewHolder>();
 
     private View mOverlay;
 
@@ -117,9 +117,16 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
         boolean isPlaying = false;
         keepOne.bind(playlistViewHolder2, position);
 
-        Log.d("PlaylistViewHolderExpanderHelper", "pos: " + position + " episode: " + item.getTitle());
+        Log.d("ExpanderHelper", "pos: " + position + " episode: " + item.getTitle());
 
-        /*
+        playlistViewHolder2.mItemBackground.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                keepOne.toggle(playlistViewHolder2);
+            }
+        });
+
+
         playlistViewHolder2.mItemBackground.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -155,7 +162,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
 
                 return true;
             }
-        });*/
+        });
 
 
         PaletteObservable.registerListener(playlistViewHolder2.mPlayPauseButton);

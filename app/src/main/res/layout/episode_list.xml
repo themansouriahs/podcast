@@ -134,7 +134,7 @@
 
     <include layout="@layout/extended_player"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="140dp"
         android:layout_below="@+id/main_player_container"/>
 
 </org.bottiger.podcast.views.RelativeLayoutWithBackground>

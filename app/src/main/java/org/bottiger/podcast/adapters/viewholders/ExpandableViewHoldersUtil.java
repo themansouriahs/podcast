@@ -38,7 +38,6 @@ public class ExpandableViewHoldersUtil {
                     final ObjectAnimator alphaAnimator = ObjectAnimator.ofFloat(expandView, View.ALPHA, 1);
                     alphaAnimator.addListener(new ViewHolderAnimator.ViewHolderAnimatorListener(holder));
                     alphaAnimator.start();
-                    holder.mPlayPauseButton.bringToFront();
                 }
             });
 

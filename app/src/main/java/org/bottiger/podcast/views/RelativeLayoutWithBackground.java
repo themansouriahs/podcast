@@ -1,5 +1,6 @@
 package org.bottiger.podcast.views;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -8,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -34,6 +36,7 @@ public class RelativeLayoutWithBackground extends RelativeLayout implements Targ
         super(context, attrs, defStyleAttr);
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public RelativeLayoutWithBackground(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
@@ -58,13 +61,14 @@ public class RelativeLayoutWithBackground extends RelativeLayout implements Targ
         return;
     }
 
+    /*
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        return false;
+        return true;
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         return false;
-    }
+    }*/
 }

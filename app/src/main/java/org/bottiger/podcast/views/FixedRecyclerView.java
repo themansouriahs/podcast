@@ -44,7 +44,7 @@ public class FixedRecyclerView extends RecyclerView {
         super.onDraw(canvas);
 
         if (mScroller.computeScrollOffset()) {
-            Log.d("FixedRecyclerView", "(fling) Y: " + mScroller.getCurrY());
+            Log.d("FixedRecyclerView", "(ondraw) Y: " + mScroller.getCurrY());
             scrollBy(0, mScroller.getCurrY()- mLastY);
             mLastY = mScroller.getCurrY();
             postInvalidateDelayed(16);
@@ -90,12 +90,14 @@ public class FixedRecyclerView extends RecyclerView {
         */
     }
 
+
+    private boolean mouseDown;
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
-        Log.d("FixedRecyclerView touch", "event" + ev.toString());
-        //mCanScrollRecyclerView = canScrollVertically(DOWN);
+        if (ev.getAction() == MotionEvent.ACTION_DOWN)
+            mScroller.abortAnimation();
+
         return super.onTouchEvent(ev);
-        //return false;
     }
 
     @Override

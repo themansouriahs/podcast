@@ -117,7 +117,6 @@ public class ExpandableLayoutManager extends LinearLayoutManager {
         // distanceY < 0 => scroll down
 
         if (mTopPlayer.isMinimumSize() && distanceY > 0) {
-            mTopPlayer.bringToFront();
             mTopPlayer.ensureMinimalLayout();
             mSwipeRefreshView.mDownGeastureInProgress = false;
             mSwipeRefreshView.setCurrentScrollState(SwipeRefreshExpandableLayout.ScrollState.MINIMAIL_PLAYER_AND_SCROLLED_LIST);
@@ -157,12 +156,10 @@ public class ExpandableLayoutManager extends LinearLayoutManager {
             if (usingLargeLayout) {
                 Log.d("PlaylistHeight", "TopPlayer is minimum");
                 mSwipeRefreshView.setCurrentScrollState(SwipeRefreshExpandableLayout.ScrollState.MINIMAIL_PLAYER);
-                mTopPlayer.bringToFront();
                 usingLargeLayout = false;
             }
         } else {
             if (!usingLargeLayout) {
-                //mRecyclerView.bringToFront();
                 mSwipeRefreshView.setCurrentScrollState(SwipeRefreshExpandableLayout.ScrollState.PARTIAL_PLAYER);
             }
             usingLargeLayout = true;
@@ -174,7 +171,6 @@ public class ExpandableLayoutManager extends LinearLayoutManager {
 
         if (isMinimumSize) {
             Log.d("TopPlayerIOut", "To the top!");
-            mTopPlayer.bringToFront();
             //mRecyclerView.scrollToPosition(0);
         }
 
