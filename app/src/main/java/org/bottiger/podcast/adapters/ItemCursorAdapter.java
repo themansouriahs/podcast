@@ -119,6 +119,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
 
         Log.d("PlaylistViewHolderExpanderHelper", "pos: " + position + " episode: " + item.getTitle());
 
+        /*
         playlistViewHolder2.mItemBackground.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -154,7 +155,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
 
                 return true;
             }
-        });
+        });*/
 
 
         PaletteObservable.registerListener(playlistViewHolder2.mPlayPauseButton);
@@ -303,7 +304,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
                         .duration();
             } else {
                 playerPosition = feedItem.offset;
-                playerDuration = feedItem.getDuration();
+                playerDuration = 0;//feedItem.getDuration();
             }
         }
 

@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * Created by apl on 19-01-2015.
  */
-public class InitialHeaderAdapter implements StickyHeadersAdapter<InitialHeaderAdapter.ViewHolder>, DragSortRecycler.OnDragStateChangedListener {
+public class InitialHeaderAdapter implements StickyHeadersAdapter<InitialHeaderAdapter.ViewHolder>, OnDragStateChangedListener {
 
     private Playlist mPlaylist;
     private int mCurrentlyDragging = -1;

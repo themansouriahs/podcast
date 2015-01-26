@@ -196,7 +196,7 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
 
     public void setEpisode(FeedItem argEpisode) {
         mEpisode = argEpisode;
-        mDurationMs = argEpisode.getDuration();
+        //mDurationMs = argEpisode.getDuration();
 
         if (mEpisode.offset > 0) {
             setProgress(mEpisode.offset);

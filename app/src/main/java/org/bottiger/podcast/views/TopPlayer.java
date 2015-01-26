@@ -7,11 +7,14 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
 import android.transition.Scene;
 import android.transition.Transition;
 import android.transition.TransitionManager;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -38,6 +41,7 @@ public class TopPlayer extends RelativeLayout {
     private int mPlayPauseLargeSize = -1;
 
     private Context mContext;
+    private FixedRecyclerView mRecyclerView;
 
     public static int sizeSmall                 =   -1;
     public static int sizeMedium                =   -1;
@@ -123,6 +127,14 @@ public class TopPlayer extends RelativeLayout {
         }
     }
 
+    public void setRecyclerView(@NonNull FixedRecyclerView argRecyclerView) {
+        mRecyclerView = argRecyclerView;
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        return mRecyclerView.onTouchEvent(event);
+    }
 
     @Override
     protected void onFinishInflate () {
@@ -287,5 +299,31 @@ public class TopPlayer extends RelativeLayout {
             //argImageView.setTranslationY(-amount);
         }
     }
+
+    class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
+        private static final String DEBUG_TAG = "Gestures";
+
+        private FixedRecyclerView mRecyclerView;
+
+        public MyGestureListener(FixedRecyclerView argRecyclerView) {
+            mRecyclerView = argRecyclerView;
+        }
+
+        @Override
+        public  boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            Log.d(DEBUG_TAG,"onDown: " + e1.toString());
+            mRecyclerView.scrollBy((int)distanceX*0, (int)distanceY);
+            return true;
+        }
+
+        @Override
+        public boolean onFling(MotionEvent event1, MotionEvent event2,
+                               float velocityX, float velocityY) {
+            Log.d(DEBUG_TAG, "onFling: " + event1.toString()+event2.toString());
+            mRecyclerView.fling((int)velocityX*0, (int)-velocityY);
+            return true;
+        }
+    }
+
 
 }

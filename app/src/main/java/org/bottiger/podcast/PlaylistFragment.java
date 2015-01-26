@@ -7,7 +7,6 @@ import org.bottiger.podcast.images.PicassoWrapper;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
-import org.bottiger.podcast.listeners.PlaylistTouchListener;
 import org.bottiger.podcast.listeners.RecentItemsRecyclerListener;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.playlist.PlaylistCursorLoader;
@@ -50,11 +49,11 @@ import com.eowise.recyclerview.stickyheaders.StickyHeadersBuilder;
 import com.eowise.recyclerview.stickyheaders.StickyHeadersItemDecoration;
 import com.squareup.picasso.Callback;
 
+import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
+
 public class PlaylistFragment extends GeastureFragment implements
 		OnSharedPreferenceChangeListener, Playlist.PlaylistChangeListener, DownloadCompleteCallback
          {
-
-    private PlaylistTouchListener mListener;
 
     private static int CONTEXT_MENU = 0;
 	private static Fragment CONTEXT_FRAGMENT = null;
@@ -68,7 +67,7 @@ public class PlaylistFragment extends GeastureFragment implements
     private View mPlaylistContainer;
     private View mEmptyPlaylistContainer;
 
-    private TopPlayer mPhotoContainer;
+    private TopPlayer mTopPlayer;
     private ImageView mPhoto;
 
     private TextView mEpisodeTitle;
@@ -162,7 +161,7 @@ public class PlaylistFragment extends GeastureFragment implements
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view,savedInstanceState);
 
-        mPhotoContainer =   (TopPlayer) mSwipeRefreshView.findViewById(R.id.session_photo_container);
+        mTopPlayer =   (TopPlayer) mSwipeRefreshView.findViewById(R.id.session_photo_container);
         mPhoto =            (ImageView) mSwipeRefreshView.findViewById(R.id.session_photo);
 
         mPlaylistContainer = mSwipeRefreshView.findViewById(R.id.playlist_container);
@@ -180,10 +179,12 @@ public class PlaylistFragment extends GeastureFragment implements
         mFavoriteButton = (PlayerButtonView)mSwipeRefreshView.findViewById(R.id.bookmark);
 
         // use a linear layout manager
-        mLayoutManager = new ExpandableLayoutManager(mActivity);
+        mLayoutManager = new ExpandableLayoutManager(mActivity, mSwipeRefreshView, mTopPlayer, mRecyclerView, mPhoto);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         //mRecyclerView.setOnScrollListener(this);
+
+        mTopPlayer.setRecyclerView(mRecyclerView);
 
         if (mPlaylist == null) {
             mPlaylist = new Playlist(mActivity);
@@ -200,18 +201,12 @@ public class PlaylistFragment extends GeastureFragment implements
         RecentItemsRecyclerListener l = new RecentItemsRecyclerListener(mAdapter);
         mRecyclerView.setRecyclerListener(l);
 
-        mPhotoContainer.bringToFront();
+        mTopPlayer.bringToFront();
 
         if (!mPlaylist.isEmpty()) {
             bindHeader(mPlaylist.first());
         }
 
-        mListener = new PlaylistTouchListener(mSwipeRefreshView,
-                mPhotoContainer,
-                mRecyclerView,
-                mPhoto);
-
-        mSwipeRefreshView.setGestureListener(mListener);
         mSwipeRefreshView.fragment = this;
 
         // Build item decoration and add it to the RecyclerView
@@ -230,7 +225,6 @@ public class PlaylistFragment extends GeastureFragment implements
         DragSortRecycler dragSortRecycler = new DragSortRecycler();
         dragSortRecycler.setViewHandleId(R.id.drag_handle); //View you wish to use as the handle
 
-        dragSortRecycler.setOnDragStateChangedListener(mListener);
         dragSortRecycler.setOnDragStateChangedListener(initialHeaderAdapter);
         dragSortRecycler.setOnDragStateChangedListener(mPlaylist);
 
@@ -238,8 +232,10 @@ public class PlaylistFragment extends GeastureFragment implements
 
         mRecyclerView.addItemDecoration(dragSortRecycler);
         mRecyclerView.addOnItemTouchListener(dragSortRecycler);
-        mRecyclerView.setOnScrollListener(dragSortRecycler.getScrollListener());
+        //mRecyclerView.setOnScrollListener(dragSortRecycler.getScrollListener());
         //////
+
+        mRecyclerView.setItemAnimator(new SlideInLeftAnimator());
     }
 
     @Override
@@ -282,9 +278,9 @@ public class PlaylistFragment extends GeastureFragment implements
             public void onSuccess() {
                 mHasPhoto = true;
                 recomputePhotoAndScrollingMetrics();
-                int h =mPhotoContainer.getHeight();
-                mPhotoContainer.getLayoutParams().height = (h); // +actionBarSize
-                mPhotoContainer.requestLayout();
+                int h = mTopPlayer.getHeight();
+                mTopPlayer.getLayoutParams().height = (h); // +actionBarSize
+                mTopPlayer.requestLayout();
                 mRecyclerView.scrollToPosition(0);
                 Log.d("RecyclerPadding", "padding: " + h);
 
@@ -344,14 +340,14 @@ public class PlaylistFragment extends GeastureFragment implements
         int height = TopPlayer.sizeLarge;//1080;//(int)(mPhoto.getHeight()*5.6);
         trans = BackgroundTransformation.getmImageTransformation(mActivity, mImageTransformation, height);
         PicassoWrapper.load(mActivity, item.image, mPhoto, trans, cb);
-        mPhotoContainer.getLayoutParams().height = (height); // +actionBarSize
-        mPhotoContainer.requestLayout();
+        mTopPlayer.getLayoutParams().height = (height); // +actionBarSize
+        mTopPlayer.requestLayout();
     }
     com.squareup.picasso.Transformation trans = null;
 
     private void recomputePhotoAndScrollingMetrics() {
         final int actionBarSize = UIUtils.calculateActionBarSize(mActivity);
-        mHeaderTopClearance = actionBarSize - mPhotoContainer.getPaddingTop();
+        mHeaderTopClearance = actionBarSize - mTopPlayer.getPaddingTop();
 
         mPhotoHeightPixels = mHeaderTopClearance;
         if (mHasPhoto) {
@@ -360,10 +356,10 @@ public class PlaylistFragment extends GeastureFragment implements
         }
 
         ViewGroup.LayoutParams lp;
-        lp = mPhotoContainer.getLayoutParams();
+        lp = mTopPlayer.getLayoutParams();
         if (lp.height != mPhotoHeightPixels) {
             lp.height = mPhotoHeightPixels;
-            mPhotoContainer.setLayoutParams(lp);
+            mTopPlayer.setLayoutParams(lp);
         }
     }
 

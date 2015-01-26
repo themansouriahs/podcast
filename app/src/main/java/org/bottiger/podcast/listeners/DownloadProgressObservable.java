@@ -181,6 +181,10 @@ public class DownloadProgressObservable {
 	 */
 	public boolean unregisterObserver(@NonNull DownloadObserver argObserver) {
         FeedItem observerFeedItem = argObserver.getEpisode();
+
+        if (observerFeedItem == null)
+            return false;
+
         Long episodeId = observerFeedItem.getId();
 
         if (!mObservers.containsKey(episodeId)) {
