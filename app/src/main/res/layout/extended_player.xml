@@ -9,23 +9,6 @@
     android:descendantFocusability="afterDescendants"
     android:padding="@dimen/padding_medium"
     android:orientation="vertical">
-    <!--     android:layout_below="@+id/main_player_container" -->
-
-    <FrameLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
-
-        <!-- Colors the background-->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="@dimen/padding_medium">
-            <!--
-            android:alpha="0.4"
-            android:background="@color/black"
-            -->
-
-        </LinearLayout>
 
         <include layout="@layout/extended_player_buttons" />
 
@@ -33,12 +16,10 @@
             android:id="@+id/player_progress"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="right"
+            android:layout_alignParentBottom="true"
             android:layout_marginBottom="10dp"
-            android:layout_marginTop="80dp"
             style="@style/tallerBarStyle"
             />
-
-    </FrameLayout>
+    <!-- android:layout_marginTop="80dp"-->
 
 </org.bottiger.podcast.views.PlayerLinearLayout>

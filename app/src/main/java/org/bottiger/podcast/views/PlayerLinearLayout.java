@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 
 import org.bottiger.podcast.R;
@@ -19,7 +20,7 @@ import org.bottiger.podcast.R;
 /**
  * TODO: document your custom view class.
  */
-public class PlayerLinearLayout extends LinearLayout {
+public class PlayerLinearLayout extends RelativeLayout {
 
     public PlayerLinearLayout(Context context) {
         super(context);

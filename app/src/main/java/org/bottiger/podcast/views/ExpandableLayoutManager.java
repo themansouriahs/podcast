@@ -96,6 +96,7 @@ public class ExpandableLayoutManager extends LinearLayoutManager {
                 Log.d("GeatureDetector", "onScroll recyclerview: -> " + dy);
 
                 hasSCrolled = true;
+                mTopPlayer.ensureMinimalLayout();
                 amount = super.scrollVerticallyBy(dy, recycler, state);
             }
         }
@@ -117,6 +118,7 @@ public class ExpandableLayoutManager extends LinearLayoutManager {
 
         if (mTopPlayer.isMinimumSize() && distanceY > 0) {
             mTopPlayer.bringToFront();
+            mTopPlayer.ensureMinimalLayout();
             mSwipeRefreshView.mDownGeastureInProgress = false;
             mSwipeRefreshView.setCurrentScrollState(SwipeRefreshExpandableLayout.ScrollState.MINIMAIL_PLAYER_AND_SCROLLED_LIST);
             return false;
@@ -138,6 +140,7 @@ public class ExpandableLayoutManager extends LinearLayoutManager {
 
         // Prevent the user from scrolling too far down. (i.e. more down than the maximum size player)
         if (mTopPlayer.isMaximumSize() && currentHeight >= 0 && newShrinkAmount > 0) {
+            mTopPlayer.ensureMaximumLayout();
             mPhoto.setTranslationY(0);
             mRecyclerView.setTranslationY(mTopPlayer.getHeight());
             mSwipeRefreshView.setCurrentScrollState(SwipeRefreshExpandableLayout.ScrollState.FULL_PLAYER);

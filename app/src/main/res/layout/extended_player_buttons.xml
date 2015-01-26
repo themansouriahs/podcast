@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<merge
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:SoundwavesNS="http://schemas.android.com/apk/res-auto"
     android:id="@+id/player_buttons"
@@ -8,37 +8,35 @@
     android:layout_marginTop="0dp"
     android:layout_marginRight="@dimen/player_buttons_padding_left"
     >
-    <!--
-    android:padding="@dimen/padding_small"
-    -->
 
-
-    <!-- SoundwavesNS:image="?attr/previous_icon" -->
     <org.bottiger.podcast.views.PlayerButtonView
         android:id="@+id/previous"
         android:padding="0dip"
         android:elevation="8dp"
         android:src="?attr/previous_icon"
-        style="@style/PlayerButton" />
+        style="@style/RightPlaylistButton" />
 
     <org.bottiger.podcast.views.DownloadButtonView
         android:id="@+id/download"
         android:padding="0dip"
         android:elevation="8dp"
-        style="@style/PlayerButton" />
+        android:layout_toLeftOf="@id/previous"
+        style="@style/PlaylistButton" />
 
     <org.bottiger.podcast.views.PlayerButtonView
         android:id="@+id/queue"
         android:padding="0dip"
         android:elevation="8dp"
         android:src="?attr/queue_icon"
-        style="@style/PlayerButton" />
+        android:layout_toLeftOf="@id/download"
+        style="@style/PlaylistButton" />
 
     <org.bottiger.podcast.views.PlayerButtonView
         android:id="@+id/bookmark"
         android:padding="0dip"
         android:elevation="8dp"
+        android:layout_toLeftOf="@id/queue"
         android:src="?attr/new_icon"
-        style="@style/PlayerButton" />
+        style="@style/PlaylistButton" />
 
-</LinearLayout>
+</merge>

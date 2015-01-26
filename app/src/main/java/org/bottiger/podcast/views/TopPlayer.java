@@ -63,7 +63,7 @@ public class TopPlayer extends RelativeLayout {
 
     private PlayerLinearLayout mPlayerControlsLinearLayout;
 
-    private LinearLayout mPlayerButtons;
+    private RelativeLayout mPlayerButtons;
     private int mPlayerButtonsHeight = -1;
 
     private View mEpisodeText;
@@ -151,7 +151,7 @@ public class TopPlayer extends RelativeLayout {
         mQueueButton = findViewById(R.id.queue);
         mFavoriteButton = findViewById(R.id.bookmark);
 
-        mPlayerButtons = (LinearLayout) findViewById(R.id.player_buttons);
+        mPlayerButtons = (RelativeLayout) findViewById(R.id.player_buttons);
 
         mPlayPauseLargeSize = mPlayPauseButton.getLayoutParams().height;
 
@@ -167,8 +167,65 @@ public class TopPlayer extends RelativeLayout {
         super.onSizeChanged(w, h, oldw, oldh);
     }
 
+    private boolean minimalEnsured = false;
+    public void ensureMinimalLayout() {
+        if (minimalEnsured)
+            return;
+
+        Log.d("TopPlayer", "ensure minimum");
+        int argScreenHeight = sizeSmall;
+        int trans = sizeSmall-sizeLarge;
+        //setPlayerHeight(sizeSmall, sizeSmall-sizeLarge);
+        setTranslationY(trans);
+
+        // Set seekbar visibility
+        setSeekbarVisibility(argScreenHeight);
+
+        // Set TextBox visibility
+        setTextVisibility(argScreenHeight);
+        setTextInfoVisibility(argScreenHeight);
+
+        translatePhotoY(mPhoto, trans);
+
+        mPlayerControlsLinearLayout.setTranslationY(sizeMedium-sizeSmall);
+        mPlayPauseButton.setTranslationY(sizeMedium-sizeSmall);
+
+        minimalEnsured = true;
+    }
+
+    private boolean maximumEnsured = false;
+    public void ensureMaximumLayout() {
+        if (maximumEnsured)
+            return;
+
+        Log.d("TopPlayer", "ensure maximum");
+        int argScreenHeight = sizeLarge;
+        int trans = 0;
+        //setPlayerHeight(sizeSmall, sizeSmall-sizeLarge);
+        setTranslationY(trans);
+
+        // Set seekbar visibility
+        setSeekbarVisibility(argScreenHeight);
+
+        // Set TextBox visibility
+        setTextVisibility(argScreenHeight);
+        setTextInfoVisibility(argScreenHeight);
+
+        translatePhotoY(mPhoto, trans);
+        mEpisodeText.setTranslationY(-trans);
+        mEpisodeInfo.setTranslationY(-trans);
+
+        mPlayerControlsLinearLayout.setTranslationY(0);
+        mPlayPauseButton.setTranslationY(0);
+
+        maximumEnsured = true;
+    }
+
     // returns actual visible height
     public float setPlayerHeight(float argScreenHeight, float argOffset) {
+        minimalEnsured = false;
+        maximumEnsured = false;
+
         if (!validateState()) {
             return -1;
         }
@@ -195,17 +252,19 @@ public class TopPlayer extends RelativeLayout {
         int offset = -1;
         if (argScreenHeight <= sizeMedium) {
 
+            /*
             if (mPlayerButtonsHeight < 0) {
                 mPlayerButtonsHeight = mPlayerButtons.getHeight()-(int)UIUtils.convertPixelsToDp(50, mContext);
 
                 mSmallLayout.SeekBarLeftMargin = mPlayPauseButton.getLeft() + mSeekbar.getHeight();
                 mSmallLayout.PlayPauseSize = mSeekbar.getHeight();
                 mSmallLayout.PlayPauseBottomMargin = 0;
-            }
+            }*/
+            Log.d("TopPlayer", "under medium size");
             offset = sizeMedium - (int)maxScreenHeight;
-            int buttonOffset = offset > mPlayerButtonsHeight ? mPlayerButtonsHeight : offset;
-            mPlayerControlsLinearLayout.setTranslationY(buttonOffset);
-            mPlayPauseButton.setTranslationY(buttonOffset);
+            //int buttonOffset = offset > mPlayerButtonsHeight ? mPlayerButtonsHeight : offset;
+            mPlayerControlsLinearLayout.setTranslationY(offset);
+            mPlayPauseButton.setTranslationY(offset);
         }
 
         String size = "large";
@@ -246,16 +305,18 @@ public class TopPlayer extends RelativeLayout {
         int VisibleHeightPx = argVisibleHeight;
         int InvisibleHeightPx = argVisibleHeight-argFadeDistance;
 
-        if (argTopPlayerHeight > VisibleHeightPx)
-            return 1f;
+        float VisibilityFraction = 1;
 
-        if (argTopPlayerHeight < InvisibleHeightPx || argTopPlayerHeight == sizeSmall)
-            return 0f;
+        if (argTopPlayerHeight > VisibleHeightPx) {
+            VisibilityFraction = 1f;
+        } else if (argTopPlayerHeight < InvisibleHeightPx || argTopPlayerHeight == sizeSmall) {
+            VisibilityFraction = 0f;
+        } else {
+            float thressholdDiff = VisibleHeightPx - InvisibleHeightPx;
+            float DistanceFromVisible = argTopPlayerHeight - InvisibleHeightPx;
 
-        float thressholdDiff = VisibleHeightPx - InvisibleHeightPx;
-        float DistanceFromVisible = argTopPlayerHeight-InvisibleHeightPx;
-
-        float VisibilityFraction = DistanceFromVisible / thressholdDiff;
+            VisibilityFraction = DistanceFromVisible / thressholdDiff;
+        }
 
         argView.setAlpha(VisibilityFraction);
 

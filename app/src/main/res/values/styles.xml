@@ -132,8 +132,20 @@
     <style name="PlayerButton" parent="@style/PodcastImageSIze">
         <item name="android:layout_width">50dip</item>
         <item name="android:layout_height">50dip</item>
-        <item name="android:layout_margin">0dip</item>
         <item name="android:layout_weight">1</item>
+    </style>
+
+    <style name="PlaylistButton" parent="@style/PlayerButton">
+        <item name="android:layout_above">@id/player_progress</item>
+        <item name="android:layout_marginBottom">32dp</item>
+        <item name="android:layout_marginTop">60dp</item>
+        <item name="android:padding">5dp</item>
+    </style>
+
+    <style name="RightPlaylistButton" parent="@style/PlaylistButton">
+        <item name="android:layout_alignParentRight">true</item>
+        <item name="android:layout_marginRight">90dp</item>
+        <!--<item name="android:paddingRight">80dp</item>-->
     </style>
 
     <style name="ForwardRewindButton" parent="@style/PodcastImage">
