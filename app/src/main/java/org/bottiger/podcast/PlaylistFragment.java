@@ -312,6 +312,15 @@ public class PlaylistFragment extends GeastureFragment implements
         mPlayPauseButton.setStatus(PlayerStatusObservable.STATUS.PAUSED); // FIXME: This should not be static
         mDownloadProgressObservable.registerObserver(mPlayPauseButton);
 
+        mBackButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (PodcastBaseFragment.mPlayerServiceBinder != null) {
+                    PodcastBaseFragment.mPlayerServiceBinder.getPlayer().rewind(item);
+                }
+            }
+        });
+
         mPlayerSeekbar.setEpisode(item);
         mPlayerSeekbar.setOverlay(mOverlay);
 

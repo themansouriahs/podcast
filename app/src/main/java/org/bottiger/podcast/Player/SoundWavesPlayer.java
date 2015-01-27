@@ -127,6 +127,18 @@ public class SoundWavesPlayer {
         return mMediaPlayer.isPlaying();
     }
 
+
+    public void rewind(FeedItem argItem) {
+        if (mPlayerService == null)
+            return;
+
+        argItem.setPosition(mPlayerService.getContentResolver(), 0);
+
+        if (argItem.equals(mPlayerService.getCurrentItem())) {
+            mPlayerService.seek(0);
+        }
+    }
+
     /**
      * Pause the current playing item
      */

@@ -322,7 +322,7 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
         holder.seekbar.setEpisode(feedItem);
         holder.seekbar.setOverlay(mOverlay);
 
-        long id = feedItem.getId();
+        final long id = feedItem.getId();
         holder.mPlayPauseButton.setEpisodeId(id);
         holder.downloadButton.setEpisodeId(id);
         holder.favoriteButton.setEpisodeId(id);
@@ -330,6 +330,14 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
         holder.downloadButton.setEpisode(feedItem);
 
 
+        holder.previousButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (PodcastBaseFragment.mPlayerServiceBinder != null) {
+                    PodcastBaseFragment.mPlayerServiceBinder.getPlayer().rewind(feedItem);
+                }
+            }
+        });
 
         mDownloadProgressObservable.registerObserver(holder.downloadButton);
 
@@ -339,7 +347,6 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
             secondary = feedItem.isDownloaded() ? feedItem.getCurrentFileSize()
                     : (feedItem.chunkFilesize / feedItem.filesize);
         }
-
 
         //RecentItemFragment.setProgressBar(holder.seekbar, playerDuration,
         //        playerPosition, secondary);
