@@ -55,10 +55,10 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
     public TextView currentTime;
     public TextView duration;
     public TextView filesize;
+
+    public PlayerButtonView favoriteButton;
     public PlayerButtonView previousButton;
     public DownloadButtonView downloadButton;
-    public PlayerButtonView bookmarkButton;
-    public PlayerButtonView queueButton;
 
     public Callback mPicassoCallback;
 
@@ -91,12 +91,10 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
                 .findViewById(R.id.current_position);
         seekbar = (PlayerSeekbar) view.findViewById(R.id.player_progress);
 
-        queueButton = (PlayerButtonView) view.findViewById(R.id.queue);
+        favoriteButton = (PlayerButtonView) view.findViewById(R.id.favorite);
         previousButton = (PlayerButtonView) view.findViewById(R.id.previous);
         downloadButton = (DownloadButtonView) view
                 .findViewById(R.id.download);
-        bookmarkButton = (PlayerButtonView) view.findViewById(R.id.bookmark);
-        queueButton = (PlayerButtonView) view.findViewById(R.id.queue);
         duration = (TextView) view.findViewById(R.id.duration);
         filesize = (TextView) view.findViewById(R.id.filesize);
     }

@@ -23,6 +23,7 @@
     <attr name="pause_icon" format="reference" />
     <attr name="fast_forward_icon" format="reference" />
     <attr name="rewind_icon" format="reference" />
+    <attr name="favorite_outline" format="reference" />
     <attr name="previous_icon" format="reference" />
     <attr name="play_invert_icon" format="reference" />
     <attr name="pause_invert_icon" format="reference" />

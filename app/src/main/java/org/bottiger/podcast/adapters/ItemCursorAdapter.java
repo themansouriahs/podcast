@@ -325,23 +325,13 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
         long id = feedItem.getId();
         holder.mPlayPauseButton.setEpisodeId(id);
         holder.downloadButton.setEpisodeId(id);
-        holder.queueButton.setEpisodeId(id);
-        holder.bookmarkButton.setEpisodeId(id);
+        holder.favoriteButton.setEpisodeId(id);
         holder.previousButton.setEpisodeId(id);
         holder.downloadButton.setEpisode(feedItem);
 
 
 
         mDownloadProgressObservable.registerObserver(holder.downloadButton);
-
-        /* handled by the button view
-        PaletteObservable.registerListener(holder.mPlayPauseButton);
-        PaletteObservable.registerListener(holder.downloadButton);
-        PaletteObservable.registerListener(holder.queueButton);
-        PaletteObservable.registerListener(holder.bookmarkButton);
-        PaletteObservable.registerListener(holder.previousButton);
-        PaletteObservable.registerListener(holder.seekbar);
-        */
 
         // PlayerActivity.setProgressBar(sb, feedItem);
         long secondary = 0;
@@ -400,17 +390,10 @@ public class ItemCursorAdapter extends AbstractEpisodeCursorAdapter<PlaylistView
 
 
         holder.mPlayPauseButton.unsetEpisodeId();
+        holder.favoriteButton.unsetEpisodeId();
         holder.previousButton.unsetEpisodeId();
         holder.downloadButton.unsetEpisodeId();
-        holder.queueButton.unsetEpisodeId();
-        holder.bookmarkButton.unsetEpisodeId();
-        /*
-        PaletteObservable.unregisterListener(holder.mPlayPauseButton);
-        PaletteObservable.unregisterListener(holder.previousButton);
-        PaletteObservable.unregisterListener(holder.downloadButton);
-        PaletteObservable.unregisterListener(holder.queueButton);
-        PaletteObservable.unregisterListener(holder.bookmarkButton);
-        */
+
         PaletteObservable.unregisterListener(holder.seekbar);
 
     }

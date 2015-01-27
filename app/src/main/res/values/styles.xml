@@ -25,6 +25,7 @@
         <item name="search_icon">@drawable/action_search</item>
         <item name="search_invert_icon">@drawable/action_search</item>
         <item name="customBackground">@color/pitch_black</item>
+        <item name="favorite_outline">@drawable/ic_favorite_outline_white</item>
         <!--<item name="seekbar_handle">@drawable/seekbar_handle2.9</item>-->
         <item name="android:actionBarStyle">@style/TranslucentActionBar</item>
 
@@ -53,6 +54,7 @@
         <item name="search_invert_icon">@drawable/action_search</item>
         <item name="search_icon">@drawable/action_search</item>
         <item name="customBackground">@color/white_opaque</item>
+        <item name="favorite_outline">@drawable/ic_favorite_outline_white</item>
         <!--<item name="seekbar_handle">@drawable/seekbar_handle</item>-->
 
         <item name="android:actionBarStyle">@style/TransparentActionBar</item>
@@ -137,6 +139,7 @@
 
     <style name="PlaylistButton" parent="@style/PlayerButton">
         <item name="android:layout_above">@id/player_progress</item>
+        <item name="android:layout_width">70dip</item>
         <item name="android:layout_marginBottom">32dp</item>
         <item name="android:layout_marginTop">60dp</item>
         <item name="android:padding">5dp</item>
@@ -145,7 +148,6 @@
     <style name="RightPlaylistButton" parent="@style/PlaylistButton">
         <item name="android:layout_alignParentRight">true</item>
         <item name="android:layout_marginRight">90dp</item>
-        <!--<item name="android:paddingRight">80dp</item>-->
     </style>
 
     <style name="ForwardRewindButton" parent="@style/PodcastImage">

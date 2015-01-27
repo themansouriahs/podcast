@@ -78,7 +78,6 @@ public class PlaylistFragment extends GeastureFragment implements
     private DownloadButtonView mPlayerDownloadButton;
     private PlayerButtonView mBackButton;
     private PlayerButtonView mDownloadButton;
-    private PlayerButtonView mQueueButton;
     private PlayerButtonView mFavoriteButton;
 
     private int mHeaderTopClearance;
@@ -176,8 +175,7 @@ public class PlaylistFragment extends GeastureFragment implements
         mPlayerDownloadButton   =    (DownloadButtonView) mSwipeRefreshView.findViewById(R.id.download);
         mBackButton = (PlayerButtonView)mSwipeRefreshView.findViewById(R.id.previous);
         mDownloadButton = (PlayerButtonView)mSwipeRefreshView.findViewById(R.id.download);
-        mQueueButton = (PlayerButtonView)mSwipeRefreshView.findViewById(R.id.queue);
-        mFavoriteButton = (PlayerButtonView)mSwipeRefreshView.findViewById(R.id.bookmark);
+        mFavoriteButton = (PlayerButtonView)mSwipeRefreshView.findViewById(R.id.favorite);
 
         // use a linear layout manager
         mLayoutManager = new ExpandableLayoutManager(mActivity, mSwipeRefreshView, mTopPlayer, mRecyclerView, mPhoto);
@@ -256,7 +254,6 @@ public class PlaylistFragment extends GeastureFragment implements
         PaletteObservable.unregisterListener(mPlayPauseButton);
         PaletteObservable.unregisterListener(mBackButton);
         PaletteObservable.unregisterListener(mDownloadButton);
-        PaletteObservable.unregisterListener(mQueueButton);
         PaletteObservable.unregisterListener(mFavoriteButton);
         super.onPause();
     }
@@ -270,7 +267,6 @@ public class PlaylistFragment extends GeastureFragment implements
                 mPlayPauseButton.setEpisodeId(item.getId());
                 mBackButton.setEpisodeId(item.getId());
                 mDownloadButton.setEpisodeId(item.getId());
-                mQueueButton.setEpisodeId(item.getId());
                 mFavoriteButton.setEpisodeId(item.getId());
             }
         }
@@ -311,7 +307,6 @@ public class PlaylistFragment extends GeastureFragment implements
         mPlayPauseButton.setEpisodeId(item.getId());
         mBackButton.setEpisodeId(item.getId());
         mDownloadButton.setEpisodeId(item.getId());
-        mQueueButton.setEpisodeId(item.getId());
         mFavoriteButton.setEpisodeId(item.getId());
 
         mPlayPauseButton.setStatus(PlayerStatusObservable.STATUS.PAUSED); // FIXME: This should not be static
@@ -326,20 +321,12 @@ public class PlaylistFragment extends GeastureFragment implements
 
         PlayerStatusObservable.registerListener(mPlayerSeekbar);
 
-        /*
-        PaletteObservable.registerListener(mPlayPauseButton);
-        PaletteObservable.registerListener(mBackButton);
-        PaletteObservable.registerListener(mDownloadButton);
-        PaletteObservable.registerListener(mQueueButton);
-        PaletteObservable.registerListener(mFavoriteButton);
-        */
 
         Palette palette = PaletteCache.get(item.image);
         if (palette != null) {
             mPlayPauseButton.onPaletteFound(palette);
             mBackButton.onPaletteFound(palette);
             mDownloadButton.onPaletteFound(palette);
-            mQueueButton.onPaletteFound(palette);
             mFavoriteButton.onPaletteFound(palette);
         }
 
