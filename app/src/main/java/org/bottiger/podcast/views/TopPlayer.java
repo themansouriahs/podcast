@@ -131,8 +131,12 @@ public class TopPlayer extends RelativeLayout {
         mRecyclerView = argRecyclerView;
     }
 
+    public int maxTrans() {
+        return sizeSmall-sizeLarge;
+    }
+
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
+         public boolean onTouchEvent(MotionEvent event) {
         return mRecyclerView.onTouchEvent(event);
     }
 
@@ -346,6 +350,10 @@ public class TopPlayer extends RelativeLayout {
 
     public int getMinimumSize() {
         return sizeSmall;
+    }
+
+    public int getMaximumSize() {
+        return sizeLarge;
     }
 
     public boolean isMaximumSize() {

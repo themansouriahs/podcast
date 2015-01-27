@@ -39,6 +39,7 @@ public class FixedRecyclerView extends RecyclerView {
         init(context);
     }
 
+/*
     @Override
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -58,7 +59,25 @@ public class FixedRecyclerView extends RecyclerView {
         mLastY = 0;
         mScroller.fling(0, 0, velocityX, velocityY, 0, 0, -10000 ,10000);
         return true;
+    }*/
+
+    @Override
+    public boolean fling(int velocityX, int velocityY) {
+        /*
+        Log.d("FixedRecyclerView", "(fling velocity)  " + velocityY);
+        if (Math.abs(velocityY) > 2000) {
+            ExpandableLayoutManager lm = (ExpandableLayoutManager) getLayoutManager();
+            if (velocityY > 0) {
+                lm.getTopPlayer().ensureMinimalLayout();
+                setTranslationY(lm.getTopPlayer().getMinimumSize());
+            } else {
+                lm.getTopPlayer().ensureMaximumLayout();
+                setTranslationY(lm.getTopPlayer().getMaximumSize());
+            }
+        }*/
+        return super.fling(velocityX, velocityY);
     }
+
 
     protected void init(Context context) {
         mScroller = ScrollerCompat.create(context);
@@ -91,12 +110,37 @@ public class FixedRecyclerView extends RecyclerView {
     }
 
 
-    private boolean mouseDown;
+    private MotionEvent mouseDown;
+    private float transStart = -1;
+
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
-        if (ev.getAction() == MotionEvent.ACTION_DOWN)
-            mScroller.abortAnimation();
+        Log.d("FixedRecyclerView", "(MotionEvent1)  " + ev.toString());
 
+        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+            mouseDown = ev;
+            transStart = ev.getRawY();
+            //transStart = getTranslationY();
+            mScroller.abortAnimation();
+        }
+
+        if (ev.getAction() == MotionEvent.ACTION_UP ||ev.getAction() == MotionEvent.ACTION_CANCEL) {
+            transStart = -1;
+        }
+
+        if (transStart != -1) {
+            float diffY = getTranslationY()-transStart;
+            Log.d("FixedRecyclerView", "(diffy)  " + diffY);
+
+            float x = ev.getX();
+            float y = ev.getY();
+
+            ev.setLocation(x, y+diffY);
+        } else {
+            transStart = getTranslationY(); //ev.getRawY();
+        }
+
+        Log.d("FixedRecyclerView", "(MotionEvent2)  " + ev.toString());
         return super.onTouchEvent(ev);
     }
 

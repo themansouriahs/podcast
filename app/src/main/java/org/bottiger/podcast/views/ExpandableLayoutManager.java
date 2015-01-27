@@ -37,6 +37,10 @@ public class ExpandableLayoutManager extends LinearLayoutManager {
         mPhoto = argImageView;
     }
 
+    public TopPlayer getTopPlayer() {
+        return mTopPlayer;
+    }
+
     @Override
     public void measureChild(View child, int widthUsed, int heightUsed) {
         super.measureChild(child, widthUsed, heightUsed);
