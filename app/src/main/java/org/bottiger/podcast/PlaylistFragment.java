@@ -233,6 +233,7 @@ public class PlaylistFragment extends GeastureFragment implements
 
         dragSortRecycler.setOnDragStateChangedListener(initialHeaderAdapter);
         dragSortRecycler.setOnDragStateChangedListener(mPlaylist);
+        dragSortRecycler.setOnDragStateChangedListener(mRecyclerView);
 
         dragSortRecycler.setNavigationHeight(UIUtils.NavigationBarHeight(mActivity));
 

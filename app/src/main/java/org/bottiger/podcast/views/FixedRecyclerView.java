@@ -8,12 +8,14 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 
+import org.bottiger.podcast.adapters.decoration.OnDragStateChangedListener;
+
 /**
  * Created by apl on 22-08-2014.
  *
  * http://stackoverflow.com/questions/25178329/recyclerview-and-swiperefreshlayout
  */
-public class FixedRecyclerView extends RecyclerView {
+public class FixedRecyclerView extends RecyclerView implements OnDragStateChangedListener{
 
     private boolean mCanScrollRecyclerView = false;
 
@@ -117,35 +119,51 @@ public class FixedRecyclerView extends RecyclerView {
     public boolean onTouchEvent(MotionEvent ev) {
         Log.d("FixedRecyclerView", "(MotionEvent1)  " + ev.toString());
 
-        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
-            mouseDown = ev;
-            transStart = ev.getRawY();
-            //transStart = getTranslationY();
-            mScroller.abortAnimation();
+        if (!isDragging) {
+
+            if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+                mouseDown = ev;
+                transStart = ev.getRawY();
+                //transStart = getTranslationY();
+                mScroller.abortAnimation();
+            }
+
+            if (ev.getAction() == MotionEvent.ACTION_UP || ev.getAction() == MotionEvent.ACTION_CANCEL) {
+                transStart = -1;
+            }
+
+            if (transStart != -1) {
+                float diffY = getTranslationY() - transStart;
+                Log.d("FixedRecyclerView", "(diffy)  " + diffY);
+
+                float x = ev.getX();
+                float y = ev.getY();
+
+                ev.setLocation(x, y + diffY);
+            } else {
+                transStart = getTranslationY(); //ev.getRawY();
+            }
+
+            Log.d("FixedRecyclerView", "(MotionEvent2)  " + ev.toString());
         }
 
-        if (ev.getAction() == MotionEvent.ACTION_UP ||ev.getAction() == MotionEvent.ACTION_CANCEL) {
-            transStart = -1;
-        }
-
-        if (transStart != -1) {
-            float diffY = getTranslationY()-transStart;
-            Log.d("FixedRecyclerView", "(diffy)  " + diffY);
-
-            float x = ev.getX();
-            float y = ev.getY();
-
-            ev.setLocation(x, y+diffY);
-        } else {
-            transStart = getTranslationY(); //ev.getRawY();
-        }
-
-        Log.d("FixedRecyclerView", "(MotionEvent2)  " + ev.toString());
         return super.onTouchEvent(ev);
     }
 
     @Override
     public void requestDisallowInterceptTouchEvent(boolean argDisallow) {
         super.requestDisallowInterceptTouchEvent(argDisallow);
+    }
+
+
+    private boolean isDragging = false;
+    @Override
+    public void onDragStart(int position) {
+        isDragging = true;
+    }
+
+    @Override
+    public void onDragStop(int position) {
+        isDragging = false;
     }
 }
