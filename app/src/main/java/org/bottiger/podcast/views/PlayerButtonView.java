@@ -85,10 +85,10 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
         baseColorPaint.setStrokeWidth(10F);
         baseColorPaint.setAntiAlias(true);
 
-        foregroundColorPaint = new Paint(Paint.LINEAR_TEXT_FLAG);
+        foregroundColorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         foregroundColorPaint.setColor(mForegroundColor);
         foregroundColorPaint.setTextSize(12.0F);
-        foregroundColorPaint.setStyle(Paint.Style.FILL_AND_STROKE); // Paint.Style.STROKE
+        foregroundColorPaint.setStyle(Paint.Style.STROKE); // Paint.Style.FILL_AND_STROKE
         foregroundColorPaint.setStrokeWidth(10F);
         foregroundColorPaint.setAntiAlias(true);
 
