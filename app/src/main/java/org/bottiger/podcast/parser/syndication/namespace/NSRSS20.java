@@ -8,6 +8,7 @@ import org.bottiger.podcast.provider.FeedItem;
 import org.jsoup.Jsoup;
 import org.xml.sax.Attributes;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 /**
@@ -120,7 +121,9 @@ public class NSRSS20 extends Namespace {
 					state.getFeed().setLink(content);
 				} else if (second.equals(ITEM)) {
 					//state.getCurrentItem().setLink(content);
-					state.getCurrentItem().url = content;
+                    if (TextUtils.isEmpty(state.getCurrentItem().url)) {
+                        state.getCurrentItem().url = content;
+                    }
 				}
 			} else if (top.equals(PUBDATE) && second.equals(ITEM)) {
 				state.getCurrentItem().setPubDate(
