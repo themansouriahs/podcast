@@ -67,22 +67,29 @@ public class NotificationPlayer {
 		return show(true);
 	}
 
+    @TargetApi(16)
     @Nullable
 	public Notification show(Boolean isPlaying) {
-        if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+        if (android.os.Build.VERSION.SDK_INT < 16) {
             return null;
         }
 
 		// mId allows you to update the notification later on.
 
-        mNotification = buildNotification(isPlaying, mPlayerService, mArtwork).build();
+        Notification.Builder builder = buildNotification(isPlaying, mPlayerService, mArtwork);
+
+        if (builder == null)
+            return null;
+
+        mNotification = builder.build();
 
         if (mNotification == null)
             return null;
 
 		//mNotificationManager.notify(mId, not);
-        if (mContext instanceof PlayerService)
-            ((PlayerService)mContext).startForeground(this.getNotificationId(), mNotification);
+        if (mContext instanceof PlayerService) {
+            //((PlayerService) mContext).startForeground(this.getNotificationId(), mNotification);
+        }
 
         mNotificationManager.notify(mId, mNotification);
 
@@ -93,9 +100,10 @@ public class NotificationPlayer {
         mPlayerService = argPlayerService;
     }
 
+    @TargetApi(16)
     public void refresh() {
         PlayerService ps = mPlayerService;
-        if (ps != null && (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {
+        if (ps != null && (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)) {
             mNotification = buildNotification(ps.isPlaying(), mPlayerService, mArtwork).build();
             mNotificationManager.notify(mId, mNotification);
         }
