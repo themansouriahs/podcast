@@ -12,17 +12,19 @@ import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.service.PlayerService;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
  * Created by apl on 20-01-2015.
  */
-public class SoundWavesPlayer {
-    private MediaPlayer mMediaPlayer = new MediaPlayer();
+public class SoundWavesPlayer extends MediaPlayer {
+    //private MediaPlayer mMediaPlayer = new MediaPlayer();
 
     private PlayerService mPlayerService;
     private Handler mHandler;
     private boolean mIsInitialized = false;
+    private boolean mIsStreaming = false;
 
     // AudioManager
     private AudioManager mAudioManager;
@@ -45,15 +47,19 @@ public class SoundWavesPlayer {
 
     public void setDataSourceAsync(String path, int startPos) {
         try {
-            mMediaPlayer.reset();
-            mMediaPlayer.setDataSource(path);
-            mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+
+            File f = new File(path);
+            mIsStreaming = !f.exists();
+
+            reset();
+            setDataSource(path);
+            setAudioStreamType(AudioManager.STREAM_MUSIC);
 
             this.startPos = startPos;
             this.isPreparingMedia = true;
 
-            mMediaPlayer.setOnPreparedListener(preparedlistener);
-            mMediaPlayer.prepareAsync();
+            setOnPreparedListener(preparedlistener);
+            prepareAsync();
         } catch (IOException ex) {
             // TODO: notify the user why the file couldn't be opened
             mIsInitialized = false;
@@ -63,19 +69,21 @@ public class SoundWavesPlayer {
             mIsInitialized = false;
             return;
         }
-        mMediaPlayer.setOnCompletionListener(listener);
-        mMediaPlayer.setOnBufferingUpdateListener(bufferListener);
-        mMediaPlayer.setOnErrorListener(errorListener);
+        setOnCompletionListener(listener);
+        setOnBufferingUpdateListener(bufferListener);
+        setOnErrorListener(errorListener);
 
         mIsInitialized = true;
     }
+
+    public boolean isSteaming() { return  mIsStreaming; }
 
     public boolean isInitialized() {
         return mIsInitialized;
     }
 
     public void toggle() {
-        if (mMediaPlayer.isPlaying())
+        if (isPlaying())
             pause();
         else
             start();
@@ -94,7 +102,7 @@ public class SoundWavesPlayer {
         if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             mAudioManager
                     .registerMediaButtonEventReceiver(mControllerComponentName);
-            mMediaPlayer.start();
+            start();
 
             PlayerStatusObservable
                     .updateStatus(PlayerStatusObservable.STATUS.PLAYING);
@@ -102,7 +110,7 @@ public class SoundWavesPlayer {
     }
 
     public void stop() {
-        mMediaPlayer.reset();
+        reset();
         mIsInitialized = false;
         mPlayerService.stopForeground(true);
         PlayerStatusObservable
@@ -112,21 +120,11 @@ public class SoundWavesPlayer {
     public void release() {
         mPlayerService.dis_notifyStatus();
         stop();
-        mMediaPlayer.release();
+        release();
         mAudioManager
                 .unregisterMediaButtonEventReceiver(mControllerComponentName);
         mIsInitialized = false;
     }
-
-    /**
-     * Test of the extended_player is playing something right now
-     *
-     * @return Is the extended_player playing right now
-     */
-    public boolean isPlaying() {
-        return mMediaPlayer.isPlaying();
-    }
-
 
     public void rewind(FeedItem argItem) {
         if (mPlayerService == null)
@@ -143,7 +141,7 @@ public class SoundWavesPlayer {
      * Pause the current playing item
      */
     public void pause() {
-        mMediaPlayer.pause();
+        super.pause();
         PlayerStatusObservable
                 .updateStatus(PlayerStatusObservable.STATUS.PAUSED);
     }
@@ -196,9 +194,8 @@ public class SoundWavesPlayer {
 
                     mPlayerService.dis_notifyStatus();
                     mIsInitialized = false;
-                    mMediaPlayer.release();
+                    release();
 
-                    mMediaPlayer = new MediaPlayer();
                     mHandler.sendMessageDelayed(
                             mHandler.obtainMessage(PlayerHandler.SERVER_DIED), 2000);
                     return true;
@@ -210,19 +207,19 @@ public class SoundWavesPlayer {
     };
 
     public long duration() {
-        return mMediaPlayer.getDuration();
+        return getDuration();
     }
 
     public long position() {
-        return mMediaPlayer.getCurrentPosition();
+        return getCurrentPosition();
     }
 
     public long seek(long whereto) {
-        mMediaPlayer.seekTo((int) whereto);
+        seekTo((int) whereto);
         return whereto;
     }
 
     public void setVolume(float vol) {
-        mMediaPlayer.setVolume(vol, vol);
+        setVolume(vol, vol);
     }
 }

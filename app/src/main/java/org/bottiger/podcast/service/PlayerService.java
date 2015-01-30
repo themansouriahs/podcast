@@ -23,11 +23,15 @@ import android.media.AudioManager;
 import android.media.session.MediaController;
 import android.media.session.MediaSession;
 import android.media.session.MediaSessionManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
@@ -91,6 +95,9 @@ public class PlayerService extends Service implements
 	private boolean mUpdate = false;
     private boolean mResumePlayback = false;
 
+    private final String LOCK_NAME = "SoundWavesWifiLock";
+    WifiManager.WifiLock wifiLock;
+
 	/**
 	 * Phone state listener. Will pause the playback when the phone is ringing
 	 * and continue it afterwards
@@ -113,6 +120,9 @@ public class PlayerService extends Service implements
 	@Override
 	public void onCreate() {
 		super.onCreate();
+
+        wifiLock = ((WifiManager) getSystemService(Context.WIFI_SERVICE))
+                .createWifiLock(WifiManager.WIFI_MODE_FULL, LOCK_NAME);
 
 		mPlaylist = new Playlist(this);
 		mPlaylist.populatePlaylistIfEmpty();
@@ -326,14 +336,15 @@ public class PlayerService extends Service implements
 	@Deprecated
 	public void toggle() {
 		if (mPlayer.isPlaying() == false && mItem != null) {
-			mPlayer.start();
+			start();
 		} else {
-			mPlayer.pause();
+			pause();
 		}
 	}
 
 	public void start() {
 		if (mPlayer.isPlaying() == false) {
+            takeWakelock(mPlayer.isSteaming());
 			mPlayer.start();
 		}
 	}
@@ -351,6 +362,7 @@ public class PlayerService extends Service implements
 		}
 		dis_notifyStatus();
 
+        releaseWakelock();
 		mPlayer.pause();
 	}
 
@@ -461,6 +473,32 @@ public class PlayerService extends Service implements
 	public static NextTrack getNextTrack() {
 		return nextTrack;
 	}
+
+    /**
+     * Set wakelocks
+     */
+    public void takeWakelock(boolean isSteaming) {
+        ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+
+        startForeground(NotificationPlayer.getNotificationId(), mNotificationPlayer.getNotification());
+        mPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
+
+        if (isSteaming && mWifi.isConnected()) {
+            wifiLock.acquire();
+        }
+    }
+
+    /**
+     * Remove wakelocks
+     */
+    public void releaseWakelock() {
+        stopForeground(true);
+        mPlayer.release();
+
+        if (wifiLock.isHeld())
+            wifiLock.release();
+    }
 
 	/**
 	 * 

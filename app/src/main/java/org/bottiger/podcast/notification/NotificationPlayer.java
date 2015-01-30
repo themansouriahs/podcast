@@ -54,13 +54,18 @@ public class NotificationPlayer {
     };
 	
 	private NotificationManager mNotificationManager = null;
-	private int mId = 4260;
+	private static int mId = 4260;
 	
 	public NotificationPlayer(Context context, FeedItem item) {
 		super();
 		this.mContext = context;
 		this.item = item;
 	}
+
+    @Nullable
+    public Notification getNotification() {
+        return mNotification;
+    }
 
     @Nullable
 	public Notification show() {
@@ -88,7 +93,7 @@ public class NotificationPlayer {
 
 		//mNotificationManager.notify(mId, not);
         if (mContext instanceof PlayerService) {
-            //((PlayerService) mContext).startForeground(this.getNotificationId(), mNotification);
+            ((PlayerService) mContext).startForeground(getNotificationId(), mNotification);
         }
 
         mNotificationManager.notify(mId, mNotification);
@@ -123,7 +128,7 @@ public class NotificationPlayer {
         item.getArtworAsync(mContext, loadtarget);
 	}
 	
-	public int getNotificationId() {
+	public static int getNotificationId() {
 		return mId;
 	}
 
