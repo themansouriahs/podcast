@@ -18,8 +18,36 @@
         android:background="?attr/colorPrimary"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-        </android.support.v7.widget.Toolbar>
+    </android.support.v7.widget.Toolbar>
 
+     <!-- The Main layout -->
+        <org.bottiger.podcast.views.MyCustomViewPager
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/app_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/my_awesome_toolbar" >
+
+            <FrameLayout
+                android:id="@+id/pager_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+            </FrameLayout>
+
+            <android.support.v4.view.PagerTitleStrip
+                android:id="@+id/pager_title_strip"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:background="?attr/colorAccent"
+                android:paddingBottom="4dp"
+                android:paddingTop="4dp"
+                android:textColor="#fff" />
+
+        </org.bottiger.podcast.views.MyCustomViewPager>
+
+
+     <!--
      <ViewStub android:id="@+id/app_content"
                android:inflatedId="@+id/pager"
                android:layout="@layout/view_pager_main"
@@ -28,9 +56,11 @@
                android:layout_below="@id/my_awesome_toolbar"
          />
 
+         -->
+
     </RelativeLayout>
 
-
+    <!-- The Drawer -->
     <include layout="@layout/drawer_left" />
 
 </android.support.v4.widget.DrawerLayout>

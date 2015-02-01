@@ -9,6 +9,8 @@
         android:elevation="4dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/playlist_margin"
+        android:layout_marginRight="@dimen/playlist_margin"
         android:padding="4dp"
         android:singleLine="true"
         android:textColor="@color/white_opaque"

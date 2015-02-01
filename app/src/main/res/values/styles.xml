@@ -61,7 +61,7 @@
 
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorSecondary</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorAccent">@color/colorSecondary</item>
 
         <item name="android:windowTranslucentNavigation" tools:targetApi="19">true</item> <!-- actionbar and  bottom navigation -->
         <!--<<tem name="android:windowTranslucentStatus">true</item>--> <!-- top statusbar -->

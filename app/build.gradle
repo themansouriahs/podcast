@@ -9,10 +9,23 @@ android {
         applicationId "org.bottiger.podcast"
         minSdkVersion 16
         targetSdkVersion 21
-        versionCode 57
-        versionName "0.43"
+        versionCode 61
+        versionName "0.47"
         //useJack = true
     }
+
+    productFlavors {
+        free {
+        }
+
+        google {
+        }
+
+        amazon {
+            minSdkVersion 15
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -80,4 +93,5 @@ dependencies {
 
     compile 'com.eowise:recyclerview-stickyheaders:0.5.1@aar'
     compile 'jp.wasabeef:recyclerview-animators:1.0.3'
+    compile 'com.github.traex.rippleeffect:library:1+'
 }

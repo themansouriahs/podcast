@@ -55,8 +55,7 @@ public class FragmentContainerActivity extends DrawerActivity implements
 
     private Scene mSceneSubscriptions;
     private Scene mSceneFeed;
-	
-	private ViewStub mViewStub;
+
     private MyCustomViewPager mInflatedViewStub;
 
 	private FeedFragment mFeedFragment = null;
@@ -74,7 +73,7 @@ public class FragmentContainerActivity extends DrawerActivity implements
 
 		mFragmentTransaction = mFragmentManager.beginTransaction();
 
-		mViewStub = (ViewStub) findViewById(R.id.app_content);
+		mInflatedViewStub = (MyCustomViewPager) findViewById(R.id.app_content);
 
         mPlaylist = new Playlist(this,30);
         mPlaylist.populatePlaylistIfEmpty();
@@ -100,10 +99,10 @@ public class FragmentContainerActivity extends DrawerActivity implements
     }
 	
 	private void createViewPager() {
-		mInflatedViewStub = (MyCustomViewPager) mViewStub.inflate();
+		//mInflatedViewStub = (MyCustomViewPager) mViewStub.inflate();
 
 		mSectionsPagerAdapter = new SectionsPagerAdapter(mFragmentManager);
-		mViewPager = (ViewPager) mInflatedViewStub.findViewById(R.id.pager);
+		mViewPager = mInflatedViewStub;
 		mViewPager.setAdapter(mSectionsPagerAdapter);
 		mViewPager.setOffscreenPageLimit(2); // 3
 		mViewPager.setAdapter(mSectionsPagerAdapter);
@@ -165,6 +164,12 @@ public class FragmentContainerActivity extends DrawerActivity implements
 		public SectionsPagerAdapter(FragmentManager fm) {
 			super(fm);
 		}
+
+        @Override
+        public void setPrimaryItem(ViewGroup container, int position, Object object) {
+            makeToolbarTransparent(position == FEED);
+            super.setPrimaryItem(container, position, object);
+        }
 
 		// Hack:
 		// http://stackoverflow.com/questions/7263291/viewpager-pageradapter-not-updating-the-view/7287121#7287121
@@ -293,6 +298,8 @@ public class FragmentContainerActivity extends DrawerActivity implements
             mFeedFragment = FeedFragment.newInstance(subscription);
         else
             mFeedFragment.bindNewSubscrption(subscription, false);
+
+        makeToolbarTransparent(true);
 		return mFeedFragment;
 	}
 }

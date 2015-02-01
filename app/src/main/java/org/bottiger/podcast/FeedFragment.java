@@ -14,13 +14,9 @@ import org.bottiger.podcast.utils.FragmentUtils;
 import org.bottiger.podcast.utils.PaletteCache;
 import org.bottiger.podcast.views.FeedRecyclerView;
 import org.bottiger.podcast.views.FeedRefreshLayout;
-import org.bottiger.podcast.views.FixedRecyclerView;
-import org.bottiger.podcast.views.LinearWithBackground;
 import org.bottiger.podcast.views.RelativeLayoutWithBackground;
-import org.bottiger.podcast.views.SwipeRefreshExpandableLayout;
 
 import android.app.Activity;
-import android.app.DownloadManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -28,17 +24,13 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.dragontek.mygpoclient.feeds.Feed;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -62,7 +54,7 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
     private TextView mTitleView;
     private FeedViewAdapter mAdapter;
     private FeedCursorLoader mCursorLoader;
-    private RelativeLayoutWithBackground mContainer;
+    private RelativeLayoutWithBackground mTopContainer;
     private ImageView mContainerBackground;
 
     private static BackgroundTransformation mBackgroundTransformation;
@@ -126,7 +118,7 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
 
         mFeedSwipeRefreshView.setRecyclerView(mRecyclerView);
 
-        mContainer = (RelativeLayoutWithBackground)fragmentView.findViewById(R.id.container);
+        mTopContainer = (RelativeLayoutWithBackground)fragmentView.findViewById(R.id.top_container);
 
         mContainerBackground = (ImageView) fragmentView.findViewById(R.id.background_container);
 
@@ -215,6 +207,7 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
     private void setColors(Palette argChangedPalette) {
 
         Palette.Swatch muted = argChangedPalette.getMutedSwatch();
+
         if (muted != null)
             mTitleView.setBackgroundColor(muted.getBodyTextColor());
 
@@ -225,7 +218,7 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
         mSubscription = subscription;
 
         if (mBackgroundTransformation == null) {
-            mBackgroundTransformation = new BackgroundTransformation(mActivity, mContainer.getHeight());
+            mBackgroundTransformation = new BackgroundTransformation(mActivity, mContainerBackground.getLayoutParams().height);
         }
 
         if (mSubscription != null) {
@@ -234,7 +227,18 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
 
             String image = mSubscription.getImageURL();
             if (image != null && image != "") {
-                PicassoWrapper.simpleLoad(mActivity, image, mTarget);
+                //PicassoWrapper.simpleLoad(mActivity, image, mTarget);
+                PicassoWrapper.load(mActivity, image, mContainerBackground, mBackgroundTransformation, new Callback() {
+                    @Override
+                    public void onSuccess() {
+
+                    }
+
+                    @Override
+                    public void onError() {
+
+                    }
+                });
 
                 mPalette = PaletteCache.get(image);
             }
