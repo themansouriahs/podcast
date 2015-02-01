@@ -102,7 +102,7 @@ public class SoundWavesPlayer extends MediaPlayer {
         if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             mAudioManager
                     .registerMediaButtonEventReceiver(mControllerComponentName);
-            start();
+            super.start();
 
             PlayerStatusObservable
                     .updateStatus(PlayerStatusObservable.STATUS.PLAYING);
@@ -110,7 +110,7 @@ public class SoundWavesPlayer extends MediaPlayer {
     }
 
     public void stop() {
-        reset();
+        super.reset();
         mIsInitialized = false;
         mPlayerService.stopForeground(true);
         PlayerStatusObservable
@@ -119,8 +119,8 @@ public class SoundWavesPlayer extends MediaPlayer {
 
     public void release() {
         mPlayerService.dis_notifyStatus();
-        stop();
-        release();
+        super.stop();
+        super.release();
         mAudioManager
                 .unregisterMediaButtonEventReceiver(mControllerComponentName);
         mIsInitialized = false;
