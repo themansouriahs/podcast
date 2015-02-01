@@ -6,6 +6,7 @@ import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.PodcastLog;
 import org.bottiger.podcast.views.MyCustomViewPager;
+import org.bottiger.podcast.views.SlidingTab.SlidingTabLayout;
 import org.bottiger.podcast.views.ToolbarActivity;
 
 import android.annotation.TargetApi;
@@ -20,8 +21,12 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.transition.Scene;
 import android.transition.TransitionInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class FragmentContainerActivity extends DrawerActivity implements
@@ -47,11 +52,13 @@ public class FragmentContainerActivity extends DrawerActivity implements
 	 * intensive, it may be best to switch to a
 	 * {@link android.support.v4.app.FragmentStatePagerAdapter}.
 	 */
-	protected SectionsPagerAdapter mSectionsPagerAdapter; // FIXME not static
-	protected SectionsPagerAdapter mSectionsPagerAdapter2; // FIXME not static
+	protected SectionsPagerAdapter mSectionsPagerAdapter;
 
 	private FragmentManager mFragmentManager;
 	private FragmentTransaction mFragmentTransaction;
+
+    private SlidingTabLayout mSlidingTabLayout;
+    private List<SamplePagerItem> mTabs = new ArrayList<SamplePagerItem>();
 
     private Scene mSceneSubscriptions;
     private Scene mSceneFeed;
@@ -107,6 +114,35 @@ public class FragmentContainerActivity extends DrawerActivity implements
 		mViewPager.setOffscreenPageLimit(2); // 3
 		mViewPager.setAdapter(mSectionsPagerAdapter);
 
+
+
+        // BEGIN_INCLUDE (setup_slidingtablayout)
+        // Give the SlidingTabLayout the ViewPager, this must be done AFTER the ViewPager has had
+        // it's PagerAdapter set.
+        mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
+        mSlidingTabLayout.setViewPager(mViewPager);
+
+        // BEGIN_INCLUDE (tab_colorizer)
+        // Set a TabColorizer to customize the indicator and divider colors. Here we just retrieve
+        // the tab at the position, and return it's set color
+        mSlidingTabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
+
+            @Override
+            public int getIndicatorColor(int position) {
+                //return getResources().getColor(R.color.colorSecondary);
+                return getResources().getColor(R.color.white_opaque);
+                //return mTabs.get(position).getIndicatorColor();
+            }
+
+            @Override
+            public int getDividerColor(int position) {
+                return getResources().getColor(R.color.colorSecondary);
+                //return mTabs.get(position).getDividerColor();
+            }
+
+        });
+
+
         mViewPager.setPageTransformer(true, new DepthPageTransformer());
 
         if (mPlaylist.isEmpty())
@@ -141,7 +177,6 @@ public class FragmentContainerActivity extends DrawerActivity implements
 			super.onBackPressed(); // This will pop the Activity from the stack.
 		//}
 	}
-
 
     /**
 	 * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
@@ -302,4 +337,49 @@ public class FragmentContainerActivity extends DrawerActivity implements
         makeToolbarTransparent(true);
 		return mFeedFragment;
 	}
+
+    /**
+     * This class represents a tab to be displayed by {@link ViewPager} and it's associated
+     * {@link SlidingTabLayout}.
+     */
+    static class SamplePagerItem {
+        private final CharSequence mTitle;
+        private final int mIndicatorColor;
+        private final int mDividerColor;
+
+        SamplePagerItem(CharSequence title, int indicatorColor, int dividerColor) {
+            mTitle = title;
+            mIndicatorColor = indicatorColor;
+            mDividerColor = dividerColor;
+        }
+
+        /**
+         * @return A new {@link Fragment} to be displayed by a {@link ViewPager}
+         */
+        Fragment createFragment() {
+            return null;//return ContentFragment.newInstance(mTitle, mIndicatorColor, mDividerColor);
+        }
+
+        /**
+         * @return the title which represents this tab. In this sample this is used directly by
+         * {@link android.support.v4.view.PagerAdapter#getPageTitle(int)}
+         */
+        CharSequence getTitle() {
+            return mTitle;
+        }
+
+        /**
+         * @return the color to be used for indicator on the {@link SlidingTabLayout}
+         */
+        int getIndicatorColor() {
+            return mIndicatorColor;
+        }
+
+        /**
+         * @return the color to be used for right divider on the {@link SlidingTabLayout}
+         */
+        int getDividerColor() {
+            return mDividerColor;
+        }
+    }
 }

@@ -20,13 +20,21 @@
 
     </android.support.v7.widget.Toolbar>
 
+    <!-- Sliding Tabs -->
+    <org.bottiger.podcast.views.SlidingTab.SlidingTabLayout
+            android:id="@+id/sliding_tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorAccent"
+            android:layout_below="@id/my_awesome_toolbar"/>
+
      <!-- The Main layout -->
         <org.bottiger.podcast.views.MyCustomViewPager
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/app_content"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/my_awesome_toolbar" >
+            android:layout_below="@id/sliding_tabs">
 
             <FrameLayout
                 android:id="@+id/pager_content"
@@ -34,6 +42,7 @@
                 android:layout_height="match_parent" >
             </FrameLayout>
 
+            <!--
             <android.support.v4.view.PagerTitleStrip
                 android:id="@+id/pager_title_strip"
                 android:layout_width="match_parent"
@@ -43,6 +52,7 @@
                 android:paddingBottom="4dp"
                 android:paddingTop="4dp"
                 android:textColor="#fff" />
+                -->
 
         </org.bottiger.podcast.views.MyCustomViewPager>
 

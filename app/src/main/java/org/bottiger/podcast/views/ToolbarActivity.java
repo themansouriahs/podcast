@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.PagerTitleStrip;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,7 +39,6 @@ public class ToolbarActivity extends TopActivity {
         setContentView(R.layout.activity_swipe);
 
         mToolbar = (Toolbar) findViewById(R.id.my_awesome_toolbar);
-        mPagerTitleStrip = (PagerTitleStrip) findViewById(R.id.pager_title_strip);
         mAppContent = findViewById(R.id.app_content);
 
         // if we can use windowTranslucentNavigation=true
@@ -69,7 +69,7 @@ public class ToolbarActivity extends TopActivity {
 
         if (mToolBackground == null) {
             mToolBackground = mToolbar.getBackground();
-            mPagerTitleStripBackground = mPagerTitleStrip.getBackground();
+            //mPagerTitleStripBackground = mPagerTitleStrip.getBackground();
 
 
 
@@ -84,13 +84,11 @@ public class ToolbarActivity extends TopActivity {
 
         if (!argIsTransparent) {
             mToolbar.setBackgroundColor(mToolBackgroundColor);
-            mPagerTitleStrip.setBackgroundColor(mPagerTitleStripBackgroundColor);
+            //mPagerTitleStrip.setBackgroundColor(mPagerTitleStripBackgroundColor);
         } else {
             int alpha  = 0;
             mToolbar.getBackground().setAlpha(alpha);
-            mPagerTitleStrip.getBackground().setAlpha(alpha);
-            //mToolbar.setBackgroundColor(mPagerTitleStripBackgroundColor);
-            //mPagerTitleStrip.setBackgroundColor(mToolBackgroundColor);
+            //mPagerTitleStrip.getBackground().setAlpha(alpha);
         }
 
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mAppContent.getLayoutParams();
@@ -98,9 +96,9 @@ public class ToolbarActivity extends TopActivity {
         if (argIsTransparent) {
             params.removeRule(RelativeLayout.BELOW);
             mToolbar.bringToFront();
-            mPagerTitleStrip.bringToFront();
+            //mPagerTitleStrip.bringToFront();
         } else
-            params.addRule(RelativeLayout.BELOW, R.id.my_awesome_toolbar);
+            params.addRule(RelativeLayout.BELOW, R.id.sliding_tabs);
     }
 
     private int getStatusBarHeight() {
