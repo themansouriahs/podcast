@@ -66,9 +66,22 @@ public class PicassoWrapper {
         return new Picasso.Builder(argContext).memoryCache(cache).build();
     }
 
+    public static void load(Context context, String image, Target argTarget, Transformation transformation)
+    {
+        load(context, image, argTarget, transformation, false);
+    }
+
     public static void load(Context context, String image, ImageView imageView, Transformation transformation, Callback argCallback)
     {
         load(context, image, imageView, transformation, argCallback, false);
+    }
+
+    public static void load(Context context, String image, Target argTarget, Transformation transformation, boolean skipCache)
+    {
+        Picasso picasso = PicassoWrapper.init(context, skipCache);
+
+        picasso.load(image).transform(transformation)
+                    .into(argTarget);
     }
 
     public static void load(Context context, String image, ImageView imageView, Transformation transformation, Callback argCallback, boolean skipCache)

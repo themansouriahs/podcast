@@ -22,7 +22,7 @@ import org.bottiger.podcast.TopActivity;
  */
 public class ToolbarActivity extends TopActivity {
 
-    private PagerTitleStrip mPagerTitleStrip;
+    private View mPagerTitleStrip;
     private View mAppContent;
 
     private Drawable mToolBackground = null;
@@ -39,6 +39,8 @@ public class ToolbarActivity extends TopActivity {
         setContentView(R.layout.activity_swipe);
 
         mToolbar = (Toolbar) findViewById(R.id.my_awesome_toolbar);
+        mPagerTitleStrip = (View) findViewById(R.id.sliding_tabs);
+
         mAppContent = findViewById(R.id.app_content);
 
         // if we can use windowTranslucentNavigation=true
@@ -69,7 +71,7 @@ public class ToolbarActivity extends TopActivity {
 
         if (mToolBackground == null) {
             mToolBackground = mToolbar.getBackground();
-            //mPagerTitleStripBackground = mPagerTitleStrip.getBackground();
+            mPagerTitleStripBackground = mPagerTitleStrip.getBackground();
 
 
 
@@ -84,13 +86,14 @@ public class ToolbarActivity extends TopActivity {
 
         if (!argIsTransparent) {
             mToolbar.setBackgroundColor(mToolBackgroundColor);
-            //mPagerTitleStrip.setBackgroundColor(mPagerTitleStripBackgroundColor);
+            mPagerTitleStrip.setBackgroundColor(mPagerTitleStripBackgroundColor);
         } else {
             int alpha  = 0;
             mToolbar.getBackground().setAlpha(alpha);
-            //mPagerTitleStrip.getBackground().setAlpha(alpha);
+            mPagerTitleStrip.getBackground().setAlpha(alpha);
         }
 
+        /*
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mAppContent.getLayoutParams();
 
         if (argIsTransparent) {
@@ -99,6 +102,7 @@ public class ToolbarActivity extends TopActivity {
             //mPagerTitleStrip.bringToFront();
         } else
             params.addRule(RelativeLayout.BELOW, R.id.sliding_tabs);
+        */
     }
 
     private int getStatusBarHeight() {

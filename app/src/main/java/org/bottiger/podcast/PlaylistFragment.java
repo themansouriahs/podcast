@@ -200,7 +200,9 @@ public class PlaylistFragment extends GeastureFragment implements
         RecentItemsRecyclerListener l = new RecentItemsRecyclerListener(mAdapter);
         mRecyclerView.setRecyclerListener(l);
 
-        mTopPlayer.bringToFront();
+
+        // deprecated??
+        //mTopPlayer.bringToFront();
 
         if (!mPlaylist.isEmpty()) {
             bindHeader(mPlaylist.first());

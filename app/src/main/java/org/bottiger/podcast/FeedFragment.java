@@ -16,10 +16,12 @@ import org.bottiger.podcast.views.FeedRecyclerView;
 import org.bottiger.podcast.views.FeedRefreshLayout;
 import org.bottiger.podcast.views.RelativeLayoutWithBackground;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.graphics.Palette;
@@ -66,10 +68,14 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
     private final Target mTarget = new Target() {
 
         @Override
+        @TargetApi(16)
         public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+            if (Build.VERSION.SDK_INT < 16)
+                return;
 
             BitmapDrawable ob = new BitmapDrawable(mContainerBackground.getResources(),bitmap);
-            mContainerBackground.setBackground(ob);
+            //mContainerBackground.setBackground(ob);
+            mContainerBackground.setImageDrawable(ob);
             String image = mSubscription.getImageURL();
             PaletteCache.generate(image, bitmap);
         }
@@ -228,17 +234,7 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
             String image = mSubscription.getImageURL();
             if (image != null && image != "") {
                 //PicassoWrapper.simpleLoad(mActivity, image, mTarget);
-                PicassoWrapper.load(mActivity, image, mContainerBackground, mBackgroundTransformation, new Callback() {
-                    @Override
-                    public void onSuccess() {
-
-                    }
-
-                    @Override
-                    public void onError() {
-
-                    }
-                });
+                PicassoWrapper.load(mActivity, image, mTarget, mBackgroundTransformation);
 
                 mPalette = PaletteCache.get(image);
             }

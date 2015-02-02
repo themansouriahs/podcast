@@ -13,20 +13,55 @@
         <ImageView
             android:id="@+id/background_container"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="230dp"
             android:scaleType="centerCrop">
         </ImageView>
+
+        <View
+            android:id="@+id/background_gradient"
+            android:background="@drawable/header_gradient"
+            android:layout_width="match_parent"
+            android:layout_height="130dp">
+        </View>
 
         <TextView
                 android:id="@+id/feed_title"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/black"
-                android:padding="10dp"
+                android:padding="5dp"
                 android:textColor="@color/white_opaque"
                 android:singleLine="true"
+                android:layout_marginTop="120dp"
                 android:textSize="32dp"/>
             <!-- android:textStyle="bold" -->
+
+        <LinearLayout
+            android:layout_below="@id/feed_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <Switch
+            android:layout_alignParentRight="true"
+            android:textSize="11sp"
+            android:background="@color/white_opaque"
+            android:hapticFeedbackEnabled="true"
+            android:layout_margin="3dp"
+            android:layout_width="0dp"
+            android:layout_weight=".5"
+            android:layout_height="wrap_content"
+            android:text="Download all" />
+
+        <Switch
+            android:layout_alignParentLeft="true"
+            android:textSize="11sp"
+            android:background="@color/white_opaque"
+            android:hapticFeedbackEnabled="true"
+            android:layout_margin="3dp"
+            android:layout_width="0dp"
+            android:layout_weight=".5"
+            android:layout_height="wrap_content"
+            android:text="Exclude from playlist" />
+        </LinearLayout>
 
     <org.bottiger.podcast.views.FeedRecyclerView
         android:id="@+id/feed_recycler_view"
