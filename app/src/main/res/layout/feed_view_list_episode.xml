@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:fab="http://schemas.android.com/apk/res-auto"
-    xmlns:SoundwavesNS="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_margin="5dp"
     >
     <!--
     android:paddingTop="5dp"
@@ -13,7 +12,6 @@
 
     <org.bottiger.podcast.views.PlayPauseImageView
         android:id="@+id/play_pause_button"
-        android:elevation="8dp"
         android:layout_centerVertical="true"
         style="@style/FeedViewPlayPauseButton" />
 
@@ -21,36 +19,31 @@
         android:id="@+id/download_button"
         android:layout_centerVertical="true"
         android:visibility="visible"
-        android:layout_toRightOf="@+id/play_pause_button"
-        android:elevation="8dp"
+        android:layout_alignParentRight="true"
         android:layout_marginLeft="5dp"
         style="@style/FeedViewPlayPauseButton" />
 
+    <!--
     <FrameLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
         android:layout_centerVertical="true"
-        >
-        <!--
-        android:background="@color/black"
-        android:alpha="0.6"
-        -->
+        >-->
 
 
     <TextView
         android:id="@+id/title"
-        android:textColor="@color/white_opaque"
-        style="@style/AudioFileInfoOverlayText"
+        android:textColor="@color/black"
+        android:textSize="16sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:singleLine="true"
         android:text="Podcast Title"
-        android:layout_marginLeft="130dp"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/download_button" />
-        <!-- android:paddingTop="14dp" -->
-
-    </FrameLayout>
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@+id/download_button"
+        android:layout_toRightOf="@+id/play_pause_button"/>
+    <!--
+        style="@style/AudioFileInfoOverlayText" -->
 
 </RelativeLayout>

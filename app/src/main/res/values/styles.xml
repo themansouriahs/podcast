@@ -163,8 +163,8 @@
     </style>
 
     <style name="FeedViewPlayPauseButton">
-        <item name="android:layout_width">60dip</item>
-        <item name="android:layout_height">60dip</item>
+        <item name="android:layout_width">50dip</item>
+        <item name="android:layout_height">50dip</item>
         <item name="android:layout_margin">5dip</item>
         <item name="android:scaleType">fitStart</item>
     </style>
