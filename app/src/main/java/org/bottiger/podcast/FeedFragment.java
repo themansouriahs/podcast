@@ -169,6 +169,7 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
         super.onActivityCreated(savedInstanceState);
 
         mCursorLoader = new FeedCursorLoader(this, (FeedViewAdapter)mAdapter, mCursor, mSubscription);
+        mCursorLoader.requery();
     }
 
     public void requeryLoader(@NonNull Subscription subscription)
@@ -185,6 +186,25 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
         mRecyclerView.setAdapter(mAdapter);
 
         //bindNewSubscrption(mSubscription, false);
+        if (mBackgroundTransformation == null) {
+            mBackgroundTransformation = new BackgroundTransformation(mActivity, mContainerBackground.getLayoutParams().height);
+        }
+
+        if (mSubscription != null) {
+
+            mTitleView.setText(mSubscription.getTitle());
+
+            String image = mSubscription.getImageURL();
+            if (image != null && image != "") {
+                //PicassoWrapper.simpleLoad(mActivity, image, mTarget);
+                PicassoWrapper.load(mActivity, image, mTarget, mBackgroundTransformation);
+
+                mPalette = PaletteCache.get(image);
+            }
+        }
+
+        if (mPalette != null)
+            setColors(mPalette);
     }
 
 	public static FeedFragment newInstance(Subscription subscription) {
@@ -222,26 +242,6 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
 
     public void bindNewSubscrption(Subscription subscription, boolean argRequery) {
         mSubscription = subscription;
-
-        if (mBackgroundTransformation == null) {
-            mBackgroundTransformation = new BackgroundTransformation(mActivity, mContainerBackground.getLayoutParams().height);
-        }
-
-        if (mSubscription != null) {
-
-            mTitleView.setText(mSubscription.getTitle());
-
-            String image = mSubscription.getImageURL();
-            if (image != null && image != "") {
-                //PicassoWrapper.simpleLoad(mActivity, image, mTarget);
-                PicassoWrapper.load(mActivity, image, mTarget, mBackgroundTransformation);
-
-                mPalette = PaletteCache.get(image);
-            }
-        }
-
-        if (mPalette != null)
-            setColors(mPalette);
 
         if (argRequery) {
             requeryLoader(mSubscription);

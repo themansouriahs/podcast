@@ -1,5 +1,8 @@
 package org.bottiger.podcast.views;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
 import android.content.res.TypedArray;
 import android.graphics.Color;
@@ -21,6 +24,8 @@ import org.bottiger.podcast.TopActivity;
  * Created by apl on 17-01-2015.
  */
 public class ToolbarActivity extends TopActivity {
+
+    private boolean mIsTransparant = false;
 
     private View mPagerTitleStrip;
     private View mAppContent;
@@ -64,7 +69,7 @@ public class ToolbarActivity extends TopActivity {
      * @param argIsTransparent
      */
     @TargetApi(17)
-    protected void makeToolbarTransparent(boolean argIsTransparent) {
+    public void makeToolbarTransparent(boolean argIsTransparent) {
         // If the user API level is less that 17 we just keep the toolbar
         if (Build.VERSION.SDK_INT < 17)
             return;
@@ -82,16 +87,49 @@ public class ToolbarActivity extends TopActivity {
             mToolBackgroundColor = array.getColor(0, 0xFF00FF);
             mPagerTitleStripBackgroundColor = array.getColor(1, 0xFF00FF);
             array.recycle();
-        }
 
-        if (!argIsTransparent) {
             mToolbar.setBackgroundColor(mToolBackgroundColor);
             mPagerTitleStrip.setBackgroundColor(mPagerTitleStripBackgroundColor);
-        } else {
-            int alpha  = 0;
-            mToolbar.getBackground().setAlpha(alpha);
-            mPagerTitleStrip.getBackground().setAlpha(alpha);
         }
+
+        if (mIsTransparant == argIsTransparent)
+            return;
+
+        mIsTransparant = argIsTransparent;
+
+        int minAlpha = argIsTransparent ? 255 : 0;
+        int maxAlpha = argIsTransparent ? 0 : 255;
+
+        ObjectAnimator anim = ObjectAnimator.ofFloat(mToolbar.getBackground(), "alpha", minAlpha, maxAlpha);
+        ObjectAnimator anim2 = ObjectAnimator.ofFloat(mPagerTitleStrip.getBackground(), "alpha", minAlpha, maxAlpha);
+        anim.setDuration(getResources().getInteger(android.R.integer.config_mediumAnimTime));
+        anim2.setDuration(getResources().getInteger(android.R.integer.config_mediumAnimTime));
+
+        ValueAnimator colorAnimation = ValueAnimator.ofInt(minAlpha, maxAlpha);
+        colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
+            @Override
+            public void onAnimationUpdate(ValueAnimator animator) {
+                //textView.setBackgroundColor((Integer)animator.getAnimatedValue());
+                mToolbar.getBackground().setAlpha((Integer)animator.getAnimatedValue());
+                mPagerTitleStrip.getBackground().setAlpha((Integer)animator.getAnimatedValue());
+            }
+
+        });
+        colorAnimation.setDuration(getResources().getInteger(android.R.integer.config_mediumAnimTime));
+        colorAnimation.start();
+        //anim.start();
+        // @android:integer/config_mediumAnimTime
+
+        /*
+        AnimatorSet set = new AnimatorSet();
+        set.playTogether(anim, anim2);
+        set.start();
+        */
+
+
+        //mToolbar.getBackground().setAlpha(alpha);
+        //mPagerTitleStrip.getBackground().setAlpha(alpha);
 
         /*
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mAppContent.getLayoutParams();

@@ -49,6 +49,10 @@ import com.dragontek.mygpoclient.simple.IPodcast;
 
 public class SubscriptionsFragment extends Fragment implements SubscriptionGridCursorAdapter.OnPopulateSubscriptionList {
 
+    public SubscriptionsFragment() {
+        super();
+    }
+
     @Override
     public void listPopulated(Cursor cursor) {
         setSubscriptionBackground(cursor);

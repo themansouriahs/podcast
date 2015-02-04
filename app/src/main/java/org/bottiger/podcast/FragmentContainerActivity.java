@@ -21,11 +21,13 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.transition.Scene;
 import android.transition.TransitionInflater;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 
@@ -106,15 +108,11 @@ public class FragmentContainerActivity extends DrawerActivity implements
     }
 	
 	private void createViewPager() {
-		//mInflatedViewStub = (MyCustomViewPager) mViewStub.inflate();
-
-		mSectionsPagerAdapter = new SectionsPagerAdapter(mFragmentManager);
 		mViewPager = mInflatedViewStub;
+        mSectionsPagerAdapter = new SectionsPagerAdapter(mFragmentManager, mViewPager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
-		mViewPager.setOffscreenPageLimit(2); // 3
+		mViewPager.setOffscreenPageLimit(1);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
-
-
 
         // BEGIN_INCLUDE (setup_slidingtablayout)
         // Give the SlidingTabLayout the ViewPager, this must be done AFTER the ViewPager has had
@@ -153,16 +151,17 @@ public class FragmentContainerActivity extends DrawerActivity implements
 	@Override
 	public void onItemSelected(long id) {
         SubscriptionFeedID = id;
-
-
-
-        if (first) {
-            mSectionsPagerAdapter.notifyDataSetChanged();
-            first = false;
-        }
-
         mSectionsPagerAdapter.setSubID(id);
-        mViewPager.setCurrentItem(2);
+
+        Fragment f = FeedFragment.newInstance(Subscription.getById(getContentResolver(), id));
+        //mFragmentManager.beginTransaction().add(R.id.app_content, f).commit();
+        //mFragmentManager.beginTransaction().replace(R.id.app_content, f).commit();
+        mSectionsPagerAdapter.replace(1, f);
+        //mSectionsPagerAdapter.notifyDataSetChanged();
+
+        //mFragmentManager.executePendingTransactions();
+
+        //mSectionsPagerAdapter.setSubID(id);
 	}
 
 	/*
@@ -170,12 +169,10 @@ public class FragmentContainerActivity extends DrawerActivity implements
 	 */
 	@Override
 	public void onBackPressed() {
-		//if (mViewPager.getCurrentItem() == SectionsPagerAdapter.SUBSCRIPTION) {
-			////mViewPager.setCurrentItem(SectionsPagerAdapter.SUBSCRIPTION, true); // defect
-            //mSectionsPagerAdapter.resetPlatlistFragment();
-		//} else {
-			super.onBackPressed(); // This will pop the Activity from the stack.
-		//}
+        boolean isHandled = mSectionsPagerAdapter.back();
+
+        if (!isHandled)
+            super.onBackPressed(); // This will pop the Activity from the stack.
 	}
 
     /**
@@ -189,81 +186,167 @@ public class FragmentContainerActivity extends DrawerActivity implements
 		public static final int SUBSCRIPTION = 1;
 		public static final int FEED = 2;
 
-		private static final int MAX_FRAGMENTS = 3;
+		private static final int MAX_FRAGMENTS = 2;
 
         public long subid = -1;
 
-		private Fragment[] mFragments = new Fragment[MAX_FRAGMENTS];
+        private ViewPager mContainer;
+
+		private ArrayList<Fragment> mFragments = new ArrayList<>();
         private ViewGroup mViewGroup;
 
-		public SectionsPagerAdapter(FragmentManager fm) {
+        /**
+         * List of page fragments to return to in onBack();
+         */
+        private List<Fragment> mBackFragments;
+
+		public SectionsPagerAdapter(FragmentManager fm, ViewPager container) {
 			super(fm);
+            mContainer = container;
 		}
+
+        /**
+         * Replaces the view pager fragment at specified position.
+         */
+        public void replace(int position, Fragment fragment) {
+            // Get currently active fragment.
+            Fragment old_fragment = mFragments.get(position);
+            if (old_fragment == null) {
+                return;
+            }
+
+            Log.d("Frag.GetI", "replace - start");
+            // Replace the fragment using transaction and in underlaying array list.
+            // NOTE .addToBackStack(null) doesn't work
+            this.startUpdate(mContainer);
+            //mFragmentManager.beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+            //        .remove(old_fragment).add(mContainer.getId(), fragment)
+            //        .commit();
+            mFragmentManager.beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                    .replace(mContainer.getId(), fragment)
+                    .commit();
+
+            mFragments.add(position, fragment);
+            nnew = fragment;
+            Log.d("Frag.GetI", "replace - end");
+            this.notifyDataSetChanged();
+            this.finishUpdate(mContainer);
+        }
+        Fragment nnew = null;
+
+        /**
+         * Replaces the fragment at specified position and stores the current fragment to back stack
+         * so it can be restored by #back().
+         */
+        public void start(int position, Fragment fragment) {
+            // Remember current fragment.
+            mBackFragments.set(position, mFragments.get(position));
+
+            // Replace the displayed fragment.
+            this.replace(position, fragment);
+        }
+
+        /**
+         * Replaces the current fragment by fragment stored in back stack. Does nothing and returns
+         * false if no fragment is back-stacked.
+         */
+        public boolean back() {
+            int position = mContainer.getCurrentItem();
+            Fragment fragment = mFragments.get(position);
+            if (fragment == null) {
+                // Nothing to go back.
+                return false;
+            }
+
+            if (fragment instanceof BackButtonListener) {
+                BackButtonListener bbl = ((BackButtonListener)fragment);
+                boolean canGoBack = bbl.canGoBack();
+                if (canGoBack) {
+                    bbl.back();
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        // Get rid of this
+        private boolean showingFeed() {
+            int position = mContainer.getCurrentItem();
+
+            if (mFragments.size() == 0)
+                return false;
+
+            Fragment fragment = mFragments.get(position);
+            if (fragment == null) {
+                // Nothing to go back.
+                return false;
+            }
+
+            if (fragment instanceof BackButtonListener) {
+                BackButtonListener bbl = ((BackButtonListener)fragment);
+                boolean canGoBack = bbl.canGoBack();
+                if (canGoBack) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
         @Override
         public void setPrimaryItem(ViewGroup container, int position, Object object) {
-            makeToolbarTransparent(position == FEED);
             super.setPrimaryItem(container, position, object);
         }
 
 		// Hack:
 		// http://stackoverflow.com/questions/7263291/viewpager-pageradapter-not-updating-the-view/7287121#7287121
 		@Override
-		public int getItemPosition(Object object) {
+		public int getItemPosition(Object item /* a Fragment */) {
+            if (item instanceof PlaylistFragment)
+                return PagerAdapter.POSITION_UNCHANGED;
+
 			return PagerAdapter.POSITION_NONE;
 		}
 
 		@Override
-		public Fragment getItem(int i) {
+		public Fragment getItem(int position) {
 
-            Fragment fragment = null;
-            log.debug("inside: getItem(" + i + ")");
+            Fragment fragment = null; //mFragments[position];
+            String fs = fragment == null ? "none" : fragment.getTag();
+            Log.d("Frag.GetI", "inside: getItem(" + position + "). fragment: " + fs);
 
-            // No episodes - only show the playlist
-            if (getCount() == 1) {
-                if (i == 0)
-                    fragment = getSubscriptionFragmentContent(subid);
-            } else {
-                if (i == SUBSCRIPTION) {
-                    fragment = getSubscriptionFragmentContent(subid);
-                } else if (i == PLAYLIST) {
-                    fragment = new PlaylistFragment();
-                } else if (i == FEED) {
-                    fragment = getFeedFragmentContent();
-                }
+
+            if (position == SUBSCRIPTION) {
+                fragment = new ViewPagerSubscriptionFragment();
+                        /*
+                        if (nnew != null) {
+                            fragment = getFeedFragmentContent();
+                        } else {
+                            fragment = getSubscriptionFragmentContent(subid);
+                        }*/
+            } else if (position == PLAYLIST) {
+                fragment = new PlaylistFragment();
             }
 
-			mFragments[i] = fragment;
+            mFragments.add(position, fragment);
 			Bundle args = new Bundle();
 			fragment.setArguments(args);
 			return fragment;
 		}
 
-        public void resetPlatlistFragment() {
-            refreshData(SUBSCRIPTION);
-        }
+
 
         @Override
-        public void finishUpdate(ViewGroup container) {
-            super.finishUpdate(container);
+        public void startUpdate(ViewGroup container) {
+            makeToolbarTransparent(showingFeed());
+            super.startUpdate(container);
         }
 
 		@Override
 		public int getCount() {
-            int fragmentsCount = MAX_FRAGMENTS;
-
-            if (SubscriptionFeedID <= 0)
-                fragmentsCount--;
-
-            if (!showPlaylist())
-                fragmentsCount--;
-
-            return fragmentsCount;
+            return MAX_FRAGMENTS;
 		}
-
-        private boolean showPlaylist() {
-            return true;
-        }
 
 		@Override
 		public CharSequence getPageTitle(int position) {
@@ -279,25 +362,6 @@ public class FragmentContainerActivity extends DrawerActivity implements
 		}
 
 		public void refreshData(int position) {
-			Fragment fragment = mFragments[position];
-			switch (position) {
-			case PLAYLIST:
-				PlaylistFragment recentFragment = (PlaylistFragment) fragment;
-				recentFragment.refreshView();
-			case SUBSCRIPTION:
-				ViewPagerSubscriptionFragment vpsf = (ViewPagerSubscriptionFragment) fragment;
-                vpsf.fillContainerWithSubscriptions();
-				return;
-			case FEED:
-                Subscription subscription;
-                if (subid > 0) {
-                    subscription = Subscription.getById(getContentResolver(), subid);
-                } else {
-                    subscription = Subscription.getFirst(getContentResolver());
-                }
-                ((FeedFragment)fragment).bindNewSubscrption(subscription, true);
-				return;
-			}
 		}
 
         public void setSubID(long subID) {
@@ -305,7 +369,7 @@ public class FragmentContainerActivity extends DrawerActivity implements
             this.subid = subID;
 
             if (oldId == -1) {
-                notifyDataSetChanged();
+                //notifyDataSetChanged();
                 refreshData(FEED);
             } else {
                 refreshData(FEED);
