@@ -72,10 +72,12 @@ public class ViewPagerSubscriptionFragment extends Fragment implements BackButto
         }
     }
 
+    private FeedFragment mFeedFragment = null;
+
     public void fillContainerWithSubscriptions() {
         displayingFeed = false;
         mFragmentManager.beginTransaction()
-                .setCustomAnimations(fragmentInAnimation(), fragmentOutAnimation())
+                .setCustomAnimations(R.anim.slide_out_left, R.anim.slide_out_left)
                 .replace(R.id.subscription_fragment_container, mSubscriptionFragment).commit();
     }
 
@@ -83,13 +85,18 @@ public class ViewPagerSubscriptionFragment extends Fragment implements BackButto
         displayingFeed = true;
         Subscription subscription = Subscription.getById(getActivity().getContentResolver(),
                 SubscriptionFeedID);
-        FeedFragment mFeedFragment = FeedFragment.newInstance(subscription);
+        mFeedFragment = FeedFragment.newInstance(subscription);
+        mFeedFragment.bindNewSubscrption(subscription, false);
+        /*
         mFragmentManager.beginTransaction()
                 .setCustomAnimations(fragmentInAnimation(), fragmentOutAnimation())
                 .replace(R.id.subscription_fragment_container, mFeedFragment)
                 .addToBackStack("OpenFeed")
                 .commit();
-        mFeedFragment.bindNewSubscrption(subscription, false);
+                */
+        FragmentTransaction ft = mFragmentManager.beginTransaction();
+        ft.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
+        ft.add(R.id.subscription_fragment_container, mFeedFragment).commit();
         ((ToolbarActivity)mActivity).makeToolbarTransparent(true);
     }
 
@@ -100,11 +107,11 @@ public class ViewPagerSubscriptionFragment extends Fragment implements BackButto
     }
 
     private int fragmentInAnimation() {
-        return R.anim.abc_fade_in; //.slide_in_top;
+        return R.anim.slide_in_right; //.slide_in_top;
     }
 
     private int fragmentOutAnimation() {
-        return R.anim.abc_fade_out; //.slide_in_top;
+        return R.anim.slide_out_right; //abc_fade_out .slide_in_top;
     }
 
     @Override
