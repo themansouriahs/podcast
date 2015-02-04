@@ -192,7 +192,7 @@ public class FragmentContainerActivity extends DrawerActivity implements
 
         private ViewPager mContainer;
 
-		private ArrayList<Fragment> mFragments = new ArrayList<>();
+		private Fragment[] mFragments = new Fragment[MAX_FRAGMENTS];
         private ViewGroup mViewGroup;
 
         /**
@@ -210,7 +210,7 @@ public class FragmentContainerActivity extends DrawerActivity implements
          */
         public void replace(int position, Fragment fragment) {
             // Get currently active fragment.
-            Fragment old_fragment = mFragments.get(position);
+            Fragment old_fragment = mFragments[position];
             if (old_fragment == null) {
                 return;
             }
@@ -226,7 +226,7 @@ public class FragmentContainerActivity extends DrawerActivity implements
                     .replace(mContainer.getId(), fragment)
                     .commit();
 
-            mFragments.add(position, fragment);
+            mFragments[position] = fragment;
             nnew = fragment;
             Log.d("Frag.GetI", "replace - end");
             this.notifyDataSetChanged();
@@ -240,7 +240,7 @@ public class FragmentContainerActivity extends DrawerActivity implements
          */
         public void start(int position, Fragment fragment) {
             // Remember current fragment.
-            mBackFragments.set(position, mFragments.get(position));
+            mBackFragments.set(position, mFragments[position]);
 
             // Replace the displayed fragment.
             this.replace(position, fragment);
@@ -252,7 +252,7 @@ public class FragmentContainerActivity extends DrawerActivity implements
          */
         public boolean back() {
             int position = mContainer.getCurrentItem();
-            Fragment fragment = mFragments.get(position);
+            Fragment fragment = mFragments[position];
             if (fragment == null) {
                 // Nothing to go back.
                 return false;
@@ -274,10 +274,7 @@ public class FragmentContainerActivity extends DrawerActivity implements
         private boolean showingFeed() {
             int position = mContainer.getCurrentItem();
 
-            if (mFragments.size() == 0)
-                return false;
-
-            Fragment fragment = mFragments.get(position);
+            Fragment fragment = mFragments[position];
             if (fragment == null) {
                 // Nothing to go back.
                 return false;
@@ -329,7 +326,7 @@ public class FragmentContainerActivity extends DrawerActivity implements
                 fragment = new PlaylistFragment();
             }
 
-            mFragments.add(position, fragment);
+            mFragments[position] = fragment;
 			Bundle args = new Bundle();
 			fragment.setArguments(args);
 			return fragment;
