@@ -27,6 +27,7 @@ import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObserver;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.utils.UIUtils;
 
 import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
@@ -94,6 +95,10 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
             validateState();
 
             FixedRecyclerView.mSeekbarSeeking = true;
+
+            if (mDurationMs < 0) {
+                mDurationMs = mEpisode.getDuration();
+            }
 
             Log.d("mPaintSeekInfo", "onStartTracking mPaintSeekInfo => " + mPaintSeekInfo);
             mIsTouching = true;
@@ -181,7 +186,9 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
         PlayerStatusObservable.registerListener(this);
         mStatus = PlayerStatusObservable.getStatus();
 
-        mSideMargin = argContext.getResources().getDimensionPixelSize(R.dimen.action_bar_height);
+        // FIXME
+        mSideMargin = (int)UIUtils.convertDpToPixel(40, getContext());
+        //argContext.getResources().getDimensionPixelSize(R.dimen.action_bar_height);
 
         int seekbarHeight = argContext.getResources().getDimensionPixelSize(R.dimen.seekbar_thumb_size);
         int seebarWidth = seekbarHeight / 3 *2;
@@ -196,7 +203,6 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
 
     public void setEpisode(FeedItem argEpisode) {
         mEpisode = argEpisode;
-        //mDurationMs = argEpisode.getDuration();
 
         if (mEpisode.offset > 0) {
             setProgress(mEpisode.offset);
@@ -245,7 +251,7 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
             mForwards.setText(mForwardText);
 
             this.getLocationOnScreen(loc);
-            int offset = loc[1] - this.getHeight()*2;
+            int offset = loc[1] - (int)UIUtils.convertDpToPixel(200, getContext()); //FIXME this.getHeight()*4;
             int translationY = (int)((View)this.getParent()).getTranslationY();
             Log.d("PlayerSeekbar", "trans => " + translationY);
             Log.d("PlayerSeekbar", "loc0 => " + loc[0] + " loc0 => " +loc[1]);
