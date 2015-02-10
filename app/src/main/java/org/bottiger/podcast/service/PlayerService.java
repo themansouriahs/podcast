@@ -362,8 +362,8 @@ public class PlayerService extends Service implements
 		}
 		dis_notifyStatus();
 
-        releaseWakelock();
 		mPlayer.pause();
+        releaseWakelock();
 	}
 
 	public void stop() {
@@ -494,7 +494,7 @@ public class PlayerService extends Service implements
      */
     public void releaseWakelock() {
         stopForeground(true);
-        mPlayer.release();
+        //mPlayer.release();
 
         if (wifiLock.isHeld())
             wifiLock.release();
