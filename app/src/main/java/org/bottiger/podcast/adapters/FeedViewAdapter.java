@@ -19,6 +19,7 @@ import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.utils.PaletteCache;
 import org.bottiger.podcast.views.DownloadButtonView;
 import org.bottiger.podcast.views.PlayPauseImageView;
 
@@ -75,7 +76,21 @@ public class FeedViewAdapter extends AbstractEpisodeCursorAdapter<FeedViewAdapte
 
         Palette.Swatch swatch = null;//mPalette.getVibrantSwatch(); // .getDarkMutedColor(R.color.colorPrimaryDark);
         int c = swatch != null ? swatch.getBodyTextColor() : R.color.white_opaque;
-        //episodeViewHolder.mText.setTextColor(c); //swatch.getRgb());
+
+        episodeViewHolder.mPlayPauseButton.setEpisodeId(item.getId());
+        episodeViewHolder.mPlayPauseButton.setStatus(isPlaying ? PlayerStatusObservable.STATUS.PLAYING : PlayerStatusObservable.STATUS.PAUSED);
+
+
+        episodeViewHolder.mDownloadButton.setEpisode(item);
+        mDownloadProgressObservable.registerObserver(episodeViewHolder.mDownloadButton);
+
+        //PaletteObservable.registerListener(episodeViewHolder.mPlayPauseButton);
+        //PaletteObservable.registerListener(episodeViewHolder.mDownloadButton);
+
+
+        Palette palette = PaletteCache.get(episodeViewHolder.mPlayPauseButton);
+        if (palette != null)
+            mPalette = palette;
 
         if (mPalette != null) {
             /*
@@ -88,17 +103,6 @@ public class FeedViewAdapter extends AbstractEpisodeCursorAdapter<FeedViewAdapte
             episodeViewHolder.mPlayPauseButton.onPaletteFound(mPalette);
             episodeViewHolder.mDownloadButton.onPaletteFound(mPalette);
         }
-
-        episodeViewHolder.mPlayPauseButton.setEpisodeId(item.getId());
-        episodeViewHolder.mPlayPauseButton.setStatus(isPlaying ? PlayerStatusObservable.STATUS.PLAYING : PlayerStatusObservable.STATUS.PAUSED);
-
-
-        episodeViewHolder.mDownloadButton.setEpisode(item);
-        mDownloadProgressObservable.registerObserver(episodeViewHolder.mDownloadButton);
-
-        //PaletteObservable.registerListener(episodeViewHolder.mPlayPauseButton);
-        //PaletteObservable.registerListener(episodeViewHolder.mDownloadButton);
-
     }
 
     @Override

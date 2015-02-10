@@ -22,4 +22,6 @@
     <color name="bg_handle_pressed">#a0a0a0</color>
     <color name="default_background">#FFFFFF</color>
     <color name="playlist_background">#E6E6DC</color>
+
+    <color name="transparent">#00000000</color>
 </resources>

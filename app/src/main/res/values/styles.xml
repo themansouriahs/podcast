@@ -14,7 +14,7 @@
         <item name="rewind_icon">@drawable/ic_action_rewind</item>
         <item name="previous_icon">@drawable/ic_action_previous</item>
         <item name="stop_icon">@drawable/av_stop</item>
-        <item name="download_icon">@drawable/av_download</item>
+        <item name="download_icon">@drawable/ic_get_app_white</item>
         <item name="delete_icon">@drawable/ic_action_delete</item>
         <item name="backspace_icon">@drawable/content_backspace</item>
         <item name="queue_icon">@drawable/av_add_to_queue</item>
@@ -43,7 +43,7 @@
         <item name="rewind_icon">@drawable/ic_action_rewind</item>
         <item name="previous_icon">@drawable/ic_action_previous</item>
         <item name="stop_icon">@drawable/av_stop_dark</item>
-        <item name="download_icon">@drawable/av_download</item>
+        <item name="download_icon">@drawable/ic_get_app_white</item>
         <item name="delete_icon">@drawable/content_discard_dark</item>
         <item name="backspace_icon">@drawable/content_backspace_dark</item>
         <item name="queue_icon">@drawable/av_add_to_queue</item>
@@ -167,6 +167,11 @@
         <item name="android:layout_height">50dip</item>
         <item name="android:layout_margin">5dip</item>
         <item name="android:scaleType">fitStart</item>
+    </style>
+
+    <style name="SmallFeedViewPlayPauseButton"  parent="@style/FeedViewPlayPauseButton">
+        <item name="android:layout_width">35dip</item>
+        <item name="android:layout_height">35dip</item>
     </style>
 
     <style name="SubscriptionHeaderFont" parent="@android:style/TextAppearance.Large">

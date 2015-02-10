@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.v7.graphics.Palette;
 
+import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PaletteObservable;
 
 import java.util.HashMap;
@@ -17,6 +18,10 @@ public class PaletteCache {
 
     private static final int PALETTE_SIZE = 24; /* 24 is default size. You can decrease this value to speed up palette generation */
     public static final HashMap<String,Palette> mPaletteCache = new HashMap<String, Palette>();
+
+    public static Palette get(@NonNull PaletteListener argPaletteListener) {
+        return get(argPaletteListener.getPaletteUrl());
+    }
 
     public static Palette get(@NonNull String argUrl) {
         return mPaletteCache.get(argUrl);

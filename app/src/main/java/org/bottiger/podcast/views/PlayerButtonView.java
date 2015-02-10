@@ -25,6 +25,7 @@ import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObserver;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.utils.PaletteCache;
 
 /**
  * TODO: document your custom view class.
@@ -118,6 +119,12 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
         this.episodeId = argId;
         ensureEpisode();
         PaletteObservable.registerListener(this);
+
+        /*
+        Palette palette = PaletteCache.get(this);
+        if (palette != null) {
+            onPaletteFound(palette);
+        }*/
     }
 
     public synchronized void unsetEpisodeId() {
@@ -166,6 +173,8 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
     @Override
     protected void onDraw(Canvas canvas) {
         long startTime = System.currentTimeMillis();
+        super.onDraw(canvas);
+
         float halfW = getWidth()*RECTANGLE_SCALING;
 
         int left = (int)0;
@@ -177,7 +186,7 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
         //canvas.drawArc(buttonRectangle, -90, 360, true, baseColorPaint);
 
         if(mProgress!=0) {
-            canvas.drawArc(buttonRectangle, -90, Math.round(360 * mProgress / 100F), true, foregroundColorPaint);
+            canvas.drawArc(buttonRectangle, -90, Math.round(360 * mProgress / 100F), false, foregroundColorPaint);
         }
 
         buttonRectangleBitmap = buttonRectangle;
@@ -192,15 +201,7 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
         }
 
         //canvas.drawBitmap(s_Icon, null, buttonRectangle, baseColorPaint);
-
-        long endTime = System.currentTimeMillis();
-        long drawTime = endTime-startTime;
-        String redundantString = mLastProgress == mProgress ? "(Progress unchanged) " : "(Progress diff: " + (mProgress-mLastProgress) + ") ";
-        //Log.d("PlayButtonView", "onDraw: " + drawTime + " ms " + redundantString);
-
         mLastProgress = mProgress;
-
-        super.onDraw(canvas);
     }
 
     @Override
@@ -240,7 +241,7 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
         //foregroundColorPaint.setColor(swatch.getBodyTextColor());
         foregroundColorPaint.setColor(c);
         //super.setColorNormal(PlayerButtonView.ButtonColor(argChangedPalette));
-        setBackgroundColor(PlayerButtonView.ButtonColor(argChangedPalette));
+        setBackgroundColor(ButtonColor(argChangedPalette));
         invalidate();
     }
 
@@ -259,13 +260,17 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
         mDownloadCompletedCallback = argCallback;
     }
 
-    public static int ButtonColor(@NonNull Palette argPalette) {
+    public static int StaticButtonColor(@NonNull Palette argPalette) {
         Palette.Swatch color = argPalette.getVibrantSwatch();
 
         if (color==null)
             return Color.RED;
 
         return color.getRgb();
+    }
+
+    public int ButtonColor(@NonNull Palette argPalette) {
+        return StaticButtonColor(argPalette);
     }
 
     private void ensureEpisode() {

@@ -181,7 +181,7 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
 
     @Override
     public void onPaletteFound(Palette argChangedPalette) {
-        setColor(PlayerButtonView.ButtonColor(argChangedPalette));
+        setColor(PlayerButtonView.StaticButtonColor(argChangedPalette));
         invalidate();
     }
 
