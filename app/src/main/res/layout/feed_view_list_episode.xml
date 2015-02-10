@@ -13,6 +13,7 @@
     <org.bottiger.podcast.views.PlayPauseImageView
         android:id="@+id/play_pause_button"
         android:layout_centerVertical="true"
+        android:layout_marginRight="5dp"
         style="@style/FeedViewPlayPauseButton" />
 
     <org.bottiger.podcast.views.DownloadButtonView

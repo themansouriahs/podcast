@@ -84,22 +84,11 @@ public class FeedViewAdapter extends AbstractEpisodeCursorAdapter<FeedViewAdapte
         episodeViewHolder.mDownloadButton.setEpisode(item);
         mDownloadProgressObservable.registerObserver(episodeViewHolder.mDownloadButton);
 
-        //PaletteObservable.registerListener(episodeViewHolder.mPlayPauseButton);
-        //PaletteObservable.registerListener(episodeViewHolder.mDownloadButton);
-
-
         Palette palette = PaletteCache.get(episodeViewHolder.mPlayPauseButton);
         if (palette != null)
             mPalette = palette;
 
         if (mPalette != null) {
-            /*
-            episodeViewHolder.mText.setTextColor(R.color.white_opaque);
-
-            SpannableString content = new SpannableString(episodeViewHolder.mText.getText());
-            content.setSpan(new StyleSpan(Typeface.BOLD), 0, content.length(), 0);
-
-            episodeViewHolder.mText.setText(content);*/
             episodeViewHolder.mPlayPauseButton.onPaletteFound(mPalette);
             episodeViewHolder.mDownloadButton.onPaletteFound(mPalette);
         }

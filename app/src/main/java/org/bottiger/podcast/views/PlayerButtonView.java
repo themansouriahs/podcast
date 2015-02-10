@@ -209,7 +209,11 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
         ensureEpisode();
 
         Log.d("Optimize", "Please optimize PlayButtonView.getEpisode");
-        return FeedItem.getById(this.getContext().getContentResolver(), episodeId);
+        FeedItem item = FeedItem.getById(this.getContext().getContentResolver(), episodeId);
+        if (item == null)
+            throw new IllegalStateException("Episode must not be null");
+
+        return item;
     }
 
     @Override
@@ -235,11 +239,13 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
     @Override
     public void onPaletteFound(Palette argChangedPalette) {
         Palette.Swatch swatch = argChangedPalette.getVibrantSwatch();
+        Palette.Swatch swatchDark = argChangedPalette.getDarkVibrantSwatch();
 
+        int cd = swatchDark.getRgb();
         int c = swatch.getBodyTextColor();
-        baseColorPaint.setColor(c); // -1761607680
+        baseColorPaint.setColor(cd); // -1761607680
         //foregroundColorPaint.setColor(swatch.getBodyTextColor());
-        foregroundColorPaint.setColor(c);
+        foregroundColorPaint.setColor(cd);
         //super.setColorNormal(PlayerButtonView.ButtonColor(argChangedPalette));
         setBackgroundColor(ButtonColor(argChangedPalette));
         invalidate();
