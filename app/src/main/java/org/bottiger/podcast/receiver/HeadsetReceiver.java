@@ -32,15 +32,20 @@ public class HeadsetReceiver extends BroadcastReceiver {
         }
 
         if (Intent.ACTION_MEDIA_BUTTON.equals(intent.getAction())) {
-            KeyEvent event = (KeyEvent) intent
-                    .getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+            KeyEvent event = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
 
             if (event == null)
                 return;
 
+            if (event.getAction() != KeyEvent.ACTION_DOWN)
+                return;
+
             Log.d("HeadsetReceiver", "Action: " + intent.getAction().toString() + " KeyCode: " + event.getKeyCode());
-            if (KeyEvent.KEYCODE_HEADSETHOOK == event.getKeyCode()) {
-                if (KeyEvent.ACTION_DOWN == event.getAction()) {
+
+            switch (event.getKeyCode()) {
+                case KeyEvent.KEYCODE_HEADSETHOOK:
+                case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
+                    //context.startService(new Intent(MusicService.ACTION_TOGGLE_PLAYBACK));
                     if (mPlayerServiceBinder.isPlaying()) {
                         Log.d("HeadsetReceiver", "ACTION_DOWN => Pause Player");
                         mPlayerServiceBinder.pause();
@@ -48,7 +53,28 @@ public class HeadsetReceiver extends BroadcastReceiver {
                         Log.d("HeadsetReceiver", "ACTION_DOWN => Start Player");
                         mPlayerServiceBinder.start();
                     }
-                }
+                    break;
+                case KeyEvent.KEYCODE_MEDIA_PLAY:
+                    //context.startService(new Intent(MusicService.ACTION_PLAY));
+                    mPlayerServiceBinder.start();
+                    break;
+                case KeyEvent.KEYCODE_MEDIA_PAUSE:
+                    //context.startService(new Intent(MusicService.ACTION_PAUSE));
+                    mPlayerServiceBinder.pause();
+                    break;
+                case KeyEvent.KEYCODE_MEDIA_STOP:
+                    //context.startService(new Intent(MusicService.ACTION_STOP));
+                    mPlayerServiceBinder.stop();
+                    break;
+                case KeyEvent.KEYCODE_MEDIA_NEXT:
+                    //context.startService(new Intent(MusicService.ACTION_SKIP));
+                    mPlayerServiceBinder.play(mPlayerServiceBinder.getNextId());
+                    break;
+                case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
+                    // TODO: ensure that doing this in rapid succession actually plays the
+                    // previous song
+                    //context.startService(new Intent(MusicService.ACTION_REWIND));
+                    break;
             }
         }
     }

@@ -75,7 +75,7 @@ public class NotificationPlayer {
     @TargetApi(16)
     @Nullable
 	public Notification show(Boolean isPlaying) {
-        if (android.os.Build.VERSION.SDK_INT < 16) {
+        if (android.os.Build.VERSION.SDK_INT < 21) {
             return null;
         }
 
@@ -109,7 +109,12 @@ public class NotificationPlayer {
     public void refresh() {
         PlayerService ps = mPlayerService;
         if (ps != null && (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)) {
-            mNotification = buildNotification(ps.isPlaying(), mPlayerService, mArtwork).build();
+            Notification.Builder notificationBuilder = buildNotification(ps.isPlaying(), mPlayerService, mArtwork);
+
+            if (notificationBuilder == null)
+                return;
+
+            mNotification = notificationBuilder.build();
             mNotificationManager.notify(mId, mNotification);
         }
     }
@@ -141,7 +146,12 @@ public class NotificationPlayer {
     }
 
 
+    @TargetApi(21)
 	private Notification.Builder buildNotification(@NonNull Boolean isPlaying, @NonNull PlayerService argPlayerService, @Nullable Bitmap icon) {
+        if (android.os.Build.VERSION.SDK_INT < 21) {
+            return null;
+        }
+
         return mediaStyleNotification(isPlaying, argPlayerService, icon);
 	}
 

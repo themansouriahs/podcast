@@ -2,6 +2,7 @@ package org.bottiger.podcast.service;
 
 import org.bottiger.podcast.Player.PlayerHandler;
 import org.bottiger.podcast.Player.PlayerPhoneListener;
+import org.bottiger.podcast.Player.RemoteController;
 import org.bottiger.podcast.Player.SoundWavesPlayer;
 import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.playlist.Playlist;
@@ -82,6 +83,7 @@ public class PlayerService extends Service implements
 	private SoundWavesPlayer mPlayer = null;
     private MediaController mController;
 
+    private RemoteController controller = null;
 
 	private NotificationManager mNotificationManager;
     @Nullable private NotificationPlayer mNotificationPlayer;
@@ -128,6 +130,9 @@ public class PlayerService extends Service implements
 		mPlaylist.populatePlaylistIfEmpty();
 
         sPlayerHandler = new PlayerHandler(this);
+
+        if(controller == null)
+            controller = new RemoteController();
 		
 		mPlayer = new SoundWavesPlayer(this);
 		mPlayer.setHandler(PlayerHandler.handler);
@@ -215,6 +220,10 @@ public class PlayerService extends Service implements
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         handleIntent( intent );
+
+        controller.register(this);
+        controller.updateMetaData(getCurrentItem());
+
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -295,6 +304,9 @@ public class PlayerService extends Service implements
 
 		if (mItem == null)
 			return;
+
+        controller.updateMetaData(mItem);
+        controller.updateState(true);
 
 		String dataSource = mItem.isDownloaded() ? mItem.getAbsolutePath()
 				: mItem.getURL();
