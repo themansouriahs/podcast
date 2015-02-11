@@ -17,17 +17,18 @@ import com.squareup.picasso.Target;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
+import org.bottiger.podcast.service.PlayerService;
 
 /**
  * Created by apl on 11-02-2015.
  */
 public class RemoteController {
     private LegacyRemoteControlClient remoteControlClient;
-    private Context mContext;
+    private PlayerService mContext;
     private Bitmap dummyAlbumArt;
 
 
-    public void register(Context context)
+    public void register(PlayerService context)
     {
         mContext = context;
 
@@ -94,6 +95,8 @@ public class RemoteController {
     {
         if (remoteControlClient != null && episode != null)
         {
+            int state = mContext.isPlaying() ? remoteControlClient.PLAYSTATE_PLAYING : remoteControlClient.PLAYSTATE_PAUSED;
+            remoteControlClient.setPlaybackState(state);
             Target target = new Target() {
                 @Override
                 public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {

@@ -224,7 +224,8 @@ public class PlayerService extends Service implements
         controller.register(this);
         controller.updateMetaData(getCurrentItem());
 
-        return super.onStartCommand(intent, flags, startId);
+        //return super.onStartCommand(intent, flags, startId);
+        return START_STICKY;
     }
 
 	@Override
@@ -490,10 +491,17 @@ public class PlayerService extends Service implements
      * Set wakelocks
      */
     public void takeWakelock(boolean isSteaming) {
+        if (wifiLock.isHeld())
+            return;
+
         ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
-        startForeground(NotificationPlayer.getNotificationId(), mNotificationPlayer.getNotification());
+        Notification notification = mNotificationPlayer.getNotification();
+        if (notification != null) {
+            startForeground(NotificationPlayer.getNotificationId(), notification);
+        }
+
         mPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
 
         if (isSteaming && mWifi.isConnected()) {
