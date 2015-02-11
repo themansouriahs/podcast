@@ -28,7 +28,7 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            //minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -36,6 +36,7 @@ android {
     // http://stackoverflow.com/questions/22851103/android-studio-gradle-error-multiple-dex-files-define
     dexOptions {
         preDexLibraries = false
+        javaMaxHeapSize "4g"
     }
 
     compileOptions {
@@ -76,8 +77,6 @@ dependencies {
 
     compile 'com.melnykov:floatingactionbutton:1+' // floating action button
 
-    compile 'com.google.android.gms:play-services:4.2.42'
-
     compile 'com.android.support:recyclerview-v7:+'
     compile 'com.android.support:palette-v7:+'
 
@@ -86,4 +85,9 @@ dependencies {
     compile 'com.eowise:recyclerview-stickyheaders:0.5.1@aar'
     compile 'jp.wasabeef:recyclerview-animators:1.0.3'
     compile 'com.github.traex.rippleeffect:library:1+'
+
+    // Free version
+
+    // Play Store
+    googleCompile 'com.google.android.gms:play-services-base:6+' // analytics
 }
