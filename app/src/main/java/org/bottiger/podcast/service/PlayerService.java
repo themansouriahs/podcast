@@ -1,8 +1,10 @@
 package org.bottiger.podcast.service;
 
+import org.bottiger.podcast.Player.LegacyRemoteController;
+import org.bottiger.podcast.Player.MetaDataControllerWrapper;
 import org.bottiger.podcast.Player.PlayerHandler;
 import org.bottiger.podcast.Player.PlayerPhoneListener;
-import org.bottiger.podcast.Player.RemoteController;
+import org.bottiger.podcast.Player.PlayerStateManager;
 import org.bottiger.podcast.Player.SoundWavesPlayer;
 import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.playlist.Playlist;
@@ -22,7 +24,6 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.session.MediaController;
-import android.media.session.MediaSession;
 import android.media.session.MediaSessionManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -77,11 +78,12 @@ public class PlayerService extends Service implements
 
 	private final PodcastLog log = PodcastLog.getLog(getClass());
 
-    private MediaSession mMediaSession;
 	private SoundWavesPlayer mPlayer = null;
     private MediaController mController;
 
-    private RemoteController mRemoteController = null;
+    private MetaDataControllerWrapper mMetaDataControllerWrapper;
+    private PlayerStateManager mPlayerStateManager;
+    private LegacyRemoteController mLegacyRemoteController;
 
 	private NotificationManager mNotificationManager;
     @Nullable private NotificationPlayer mNotificationPlayer;
@@ -105,8 +107,8 @@ public class PlayerService extends Service implements
 	private PhoneStateListener mPhoneStateListener = new PlayerPhoneListener(this);
 
     @TargetApi(21)
-    public MediaSession.Token getToken() {
-        return mMediaSession.getSessionToken();
+    public PlayerStateManager getPlayerStateManager() {
+        return mPlayerStateManager;
     }
 
 	public void startAndFadeIn() {
@@ -128,9 +130,6 @@ public class PlayerService extends Service implements
 		mPlaylist.populatePlaylistIfEmpty();
 
         sPlayerHandler = new PlayerHandler(this);
-
-        if(mRemoteController == null)
-            mRemoteController = new RemoteController();
 		
 		mPlayer = new SoundWavesPlayer(this);
 		mPlayer.setHandler(PlayerHandler.handler);
@@ -152,13 +151,13 @@ public class PlayerService extends Service implements
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             // from https://github.com/googlesamples/android-MediaBrowserService/blob/master/Application/src/main/java/com/example/android/mediabrowserservice/MusicService.java
             // Start a new MediaSession
-            mMediaSession = new MediaSession(this, "MusicService");
-            //setSessionToken(mMediaSession.getSessionToken());
-            //mMediaSession.setCallback(new MediaSessionCallback());
-            mMediaSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS |
-                    MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
+            mPlayerStateManager = new PlayerStateManager(this);
+            mController = new MediaController(getApplicationContext(), mPlayerStateManager.getToken()); // .fromToken( mSession.getSessionToken() );
 
-            mController = new MediaController(getApplicationContext(), getToken()); // .fromToken( mSession.getSessionToken() );
+            mMetaDataControllerWrapper = new MetaDataControllerWrapper(mPlayerStateManager);
+        } else {
+            mLegacyRemoteController = new LegacyRemoteController();
+            mMetaDataControllerWrapper = new MetaDataControllerWrapper(mLegacyRemoteController);
         }
 	}
 
@@ -219,7 +218,7 @@ public class PlayerService extends Service implements
     public int onStartCommand(Intent intent, int flags, int startId) {
         handleIntent( intent );
 
-        mRemoteController.register(this);
+        mMetaDataControllerWrapper.register(this);
 
         //return super.onStartCommand(intent, flags, startId);
         return START_STICKY;
@@ -353,7 +352,7 @@ public class PlayerService extends Service implements
 		if (mPlayer.isPlaying() == false) {
             takeWakelock(mPlayer.isSteaming());
 			mPlayer.start();
-            mRemoteController.updateMetaData();
+            mMetaDataControllerWrapper.updateState(getCurrentItem(), true);
 		}
 	}
 
@@ -371,7 +370,7 @@ public class PlayerService extends Service implements
 		dis_notifyStatus();
 
 		mPlayer.pause();
-        mRemoteController.updateMetaData();
+        mMetaDataControllerWrapper.updateState(mItem, false);
         releaseWakelock();
 	}
 

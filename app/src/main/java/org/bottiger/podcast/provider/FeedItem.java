@@ -1122,7 +1122,11 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 		}
 	}
 
-	/**
+    public Subscription getSubscription(@NonNull Context argContext) {
+        return Subscription.getById(argContext.getContentResolver(), sub_id);
+    }
+
+    /**
 	 * Caching class for keeping items in memory
 	 */
 	private static class ItemLruCache extends LruCache<Long, FeedItem> {

@@ -22,7 +22,7 @@ import org.bottiger.podcast.service.PlayerService;
 /**
  * Created by apl on 11-02-2015.
  */
-public class RemoteController {
+public class LegacyRemoteController {
     private LegacyRemoteControlClient remoteControlClient;
     private PlayerService mContext;
     private Bitmap mCurrentAlbumArt;

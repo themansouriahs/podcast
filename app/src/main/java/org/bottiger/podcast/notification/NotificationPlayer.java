@@ -1,6 +1,7 @@
 package org.bottiger.podcast.notification;
 
 import org.bottiger.podcast.MainActivity;
+import org.bottiger.podcast.Player.PlayerStateManager;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.receiver.NotificationReceiver;
@@ -16,6 +17,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.media.session.MediaController;
+import android.media.session.MediaSession;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -233,8 +235,10 @@ public class NotificationPlayer {
 
         //Bitmap icon = new BitmapProvider(mContext, item).createBitmapFromMediaFile(128, 128);
 
-        Notification.MediaStyle mediaStyle = new Notification.MediaStyle().setMediaSession(argPlayerService.getToken());
-        mediaStyle.setShowActionsInCompactView(0);
+        PlayerStateManager playerStateManager = argPlayerService.getPlayerStateManager();
+        Notification.MediaStyle mediaStyle = new Notification.MediaStyle()
+                .setMediaSession(playerStateManager.getToken())
+                .setShowActionsInCompactView(0);
 
         Notification.Builder mBuilder = new Notification.Builder(mContext)
                 .setSmallIcon(R.drawable.soundwaves) //.setSmallIcon(R.drawable.soundwaves)
@@ -243,6 +247,10 @@ public class NotificationPlayer {
                 .setContentText(item.sub_title)   // if you use
                         //.setMediaSession(PlayerService.SESSION_ID, true) // , true)
                 .setStyle(mediaStyle);
+
+        mBuilder.setOngoing(true);
+        mBuilder.setShowWhen(false);
+        mBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
 
 
         mBuilder.addAction(generateAction(android.R.drawable.ic_media_pause, "Pause", PlayerService.ACTION_PAUSE));
@@ -265,6 +273,7 @@ public class NotificationPlayer {
                         0,
                         PendingIntent.FLAG_UPDATE_CURRENT
                 );
+
         mBuilder.setContentIntent(resultPendingIntent);
 
         return mBuilder;
