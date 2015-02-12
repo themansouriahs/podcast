@@ -1,5 +1,6 @@
 package org.bottiger.podcast.views;
 
+import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
@@ -12,6 +13,7 @@ import android.os.Bundle;
 import android.support.v4.view.PagerTitleStrip;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
@@ -35,6 +37,8 @@ public class ToolbarActivity extends TopActivity {
 
     private int mToolBackgroundColor = -1;
     private int mPagerTitleStripBackgroundColor = -1;
+
+    ValueAnimator mColorAnimation;
 
     protected Toolbar mToolbar;
 
@@ -70,15 +74,10 @@ public class ToolbarActivity extends TopActivity {
      */
     @TargetApi(17)
     public void makeToolbarTransparent(boolean argIsTransparent) {
-        // If the user API level is less that 17 we just keep the toolbar
-        if (Build.VERSION.SDK_INT < 17)
-            return;
 
         if (mToolBackground == null) {
             mToolBackground = mToolbar.getBackground();
             mPagerTitleStripBackground = mPagerTitleStrip.getBackground();
-
-
 
             TypedArray array = getTheme().obtainStyledAttributes(new int[] {
                     android.R.attr.colorPrimary,
@@ -88,9 +87,13 @@ public class ToolbarActivity extends TopActivity {
             mPagerTitleStripBackgroundColor = array.getColor(1, 0xFF00FF);
             array.recycle();
 
-            mToolbar.setBackgroundColor(mToolBackgroundColor);
-            mPagerTitleStrip.setBackgroundColor(mPagerTitleStripBackgroundColor);
+            //mToolbar.setBackgroundColor(mToolBackgroundColor);
+            //mPagerTitleStrip.setBackgroundColor(mPagerTitleStripBackgroundColor);
         }
+
+        // If the user API level is less that 17 we just keep the toolbar
+        if (Build.VERSION.SDK_INT < 17)
+            return;
 
         if (mIsTransparant == argIsTransparent)
             return;
@@ -105,42 +108,23 @@ public class ToolbarActivity extends TopActivity {
         anim.setDuration(getResources().getInteger(android.R.integer.config_mediumAnimTime));
         anim2.setDuration(getResources().getInteger(android.R.integer.config_mediumAnimTime));
 
-        ValueAnimator colorAnimation = ValueAnimator.ofInt(minAlpha, maxAlpha);
-        colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+        mColorAnimation = ValueAnimator.ofInt(minAlpha, maxAlpha);
+        mColorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 
             @Override
             public void onAnimationUpdate(ValueAnimator animator) {
                 //textView.setBackgroundColor((Integer)animator.getAnimatedValue());
-                mToolbar.getBackground().setAlpha((Integer)animator.getAnimatedValue());
-                mPagerTitleStrip.getBackground().setAlpha((Integer)animator.getAnimatedValue());
+                Integer alphaValue = (Integer)animator.getAnimatedValue();
+
+                mToolbar.getBackground().mutate().setAlpha(alphaValue);
+                mPagerTitleStrip.getBackground().mutate().setAlpha(alphaValue);
+
+                Log.d("AlphaAnimator", "alpha: " + alphaValue + " bgAlpha: " + mPagerTitleStrip.getBackground().getOpacity());
             }
 
         });
-        colorAnimation.setDuration(getResources().getInteger(android.R.integer.config_mediumAnimTime));
-        colorAnimation.start();
-        //anim.start();
-        // @android:integer/config_mediumAnimTime
-
-        /*
-        AnimatorSet set = new AnimatorSet();
-        set.playTogether(anim, anim2);
-        set.start();
-        */
-
-
-        //mToolbar.getBackground().setAlpha(alpha);
-        //mPagerTitleStrip.getBackground().setAlpha(alpha);
-
-        /*
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mAppContent.getLayoutParams();
-
-        if (argIsTransparent) {
-            params.removeRule(RelativeLayout.BELOW);
-            mToolbar.bringToFront();
-            //mPagerTitleStrip.bringToFront();
-        } else
-            params.addRule(RelativeLayout.BELOW, R.id.sliding_tabs);
-        */
+        mColorAnimation.setDuration(getResources().getInteger(android.R.integer.config_mediumAnimTime));
+        mColorAnimation.start();
     }
 
     private int getStatusBarHeight() {
