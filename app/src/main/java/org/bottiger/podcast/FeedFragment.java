@@ -44,6 +44,8 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
 	public static final String subscriptionIDKey = "subscription_id";
 	private static final long defaultSubscriptionID = 1;
 
+    private boolean mExpandedLayout = false;
+
     private static BackgroundTransformation mImageTransformation;
 
 	private Subscription mSubscription = null;
@@ -188,7 +190,14 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
         mAdapter = new FeedViewAdapter(mActivity, this, mCursor);
         mRecyclerView.setAdapter(mAdapter);
 
-        //bindNewSubscrption(mSubscription, false);
+        mFloatingButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mExpandedLayout = !mExpandedLayout;
+                mAdapter.setExpanded(mExpandedLayout);
+            }
+        });
+
         if (mBackgroundTransformation == null) {
             mBackgroundTransformation = new BackgroundTransformation(mActivity, mContainerBackground.getLayoutParams().height);
         }

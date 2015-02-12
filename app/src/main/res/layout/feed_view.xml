@@ -87,7 +87,6 @@
 
     <org.bottiger.podcast.views.FeedRecyclerView
         android:id="@+id/feed_recycler_view"
-        android:paddingTop="20dp"
         android:scrollbars="vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

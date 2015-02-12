@@ -47,6 +47,18 @@
         android:layout_centerVertical="true"
         android:layout_toLeftOf="@+id/download_button"
         android:layout_toRightOf="@+id/play_pause_button"/>
+
+    <TextView
+        android:id="@+id/episode_description"
+        android:visibility="gone"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Podcast Description"
+        android:layout_below="@id/title"
+        android:layout_toLeftOf="@+id/download_button"
+        android:layout_toRightOf="@+id/play_pause_button"/>
     <!--
         style="@style/AudioFileInfoOverlayText" -->
 

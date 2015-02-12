@@ -3,6 +3,7 @@ package org.bottiger.podcast.adapters;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.graphics.Palette;
@@ -10,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Callback;
@@ -31,6 +33,7 @@ public class FeedViewAdapter extends AbstractEpisodeCursorAdapter<FeedViewAdapte
     private Fragment mFragment;
     private DownloadProgressObservable mDownloadProgressObservable;
     private Palette mPalette;
+    private boolean mIsExpanded = false;
 
     public FeedViewAdapter(Context context, Fragment fragment, Cursor dataset) {
         super(dataset);
@@ -73,6 +76,12 @@ public class FeedViewAdapter extends AbstractEpisodeCursorAdapter<FeedViewAdapte
         }
 
         episodeViewHolder.mText.setText(item.getTitle());
+        episodeViewHolder.mDescription.setText(item.content);
+
+        if (mIsExpanded != episodeViewHolder.IsExpanded) {
+            episodeViewHolder.IsExpanded = mIsExpanded;
+            episodeViewHolder.modifyLayout();
+        }
 
         Palette.Swatch swatch = null;//mPalette.getVibrantSwatch(); // .getDarkMutedColor(R.color.colorPrimaryDark);
         int c = swatch != null ? swatch.getBodyTextColor() : R.color.white_opaque;
@@ -108,12 +117,19 @@ public class FeedViewAdapter extends AbstractEpisodeCursorAdapter<FeedViewAdapte
         return mCursor == null ? 0 : mCursor.getCount();
     }
 
+    public void setExpanded(boolean expanded) {
+        this.mIsExpanded = expanded;
+        notifyDataSetChanged();
+    }
 
     public class EpisodeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         public TextView mText;
+        public TextView mDescription;
         public PlayPauseImageView mPlayPauseButton;
         public DownloadButtonView mDownloadButton;
+
+        public boolean IsExpanded = false;
 
         public Callback mPicassoCallback;
 
@@ -123,6 +139,7 @@ public class FeedViewAdapter extends AbstractEpisodeCursorAdapter<FeedViewAdapte
             view.setOnClickListener(this);
 
             mText = (TextView) view.findViewById(R.id.title);
+            mDescription = (TextView) view.findViewById(R.id.episode_description);
             mPlayPauseButton = (PlayPauseImageView) view.findViewById(R.id.play_pause_button);
             mDownloadButton = (DownloadButtonView) view.findViewById(R.id.download_button);
         }
@@ -130,6 +147,25 @@ public class FeedViewAdapter extends AbstractEpisodeCursorAdapter<FeedViewAdapte
 
         @Override
         public void onClick(View view) {
+        }
+
+        public void modifyLayout() {
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mText.getLayoutParams();
+
+            if (IsExpanded) {
+                if (Build.VERSION.SDK_INT >= 17) {
+                    params.removeRule(RelativeLayout.CENTER_VERTICAL);
+                } else {
+                    params.addRule(RelativeLayout.CENTER_VERTICAL, 0);
+                }
+            } else {
+                params.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
+            }
+
+            mText.setLayoutParams(params);
+
+            int visibility = IsExpanded ? View.VISIBLE : View.GONE;
+            mDescription.setVisibility(visibility);
         }
     }
 

@@ -39,10 +39,8 @@ public class FloatingActionButton extends com.melnykov.fab.FloatingActionButton 
         int colorPressed = argChangedPalette.getLightMutedSwatch().getRgb();
         int colorRipple = argChangedPalette.getLightVibrantSwatch().getRgb();
 
-        //setBackgroundColor(color);
         super.setColorNormal(color);
         super.setColorPressed(colorPressed);
-        //super.setColorFilter(colorPressed);
         super.setColorRipple(colorRipple);
 
         invalidate();
