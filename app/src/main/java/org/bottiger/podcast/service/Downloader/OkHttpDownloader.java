@@ -20,7 +20,6 @@ import com.squareup.okhttp.OkUrlFactory;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.service.PodcastDownloadManager;
-import org.bottiger.soundwaves.Soundwaves;
 
 /**
  * Created by apl on 17-09-2014.

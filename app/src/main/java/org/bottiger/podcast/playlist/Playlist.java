@@ -17,7 +17,6 @@ import org.bottiger.podcast.provider.PodcastOpenHelper;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionColumns;
 import org.bottiger.podcast.service.PlayerService;
-import org.bottiger.soundwaves.Soundwaves;
 
 import android.app.Activity;
 import android.content.Context;
