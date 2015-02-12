@@ -9,8 +9,8 @@ android {
         applicationId "org.bottiger.podcast"
         minSdkVersion 16
         targetSdkVersion 21
-        versionCode 68     // even - release. Odd - development
-        versionName "0.54" // even - release. Odd - development
+        versionCode 69     // even - release. Odd - development
+        versionName "0.55" // even - release. Odd - development
         //useJack = true
     }
 
@@ -35,7 +35,7 @@ android {
 
     // http://stackoverflow.com/questions/22851103/android-studio-gradle-error-multiple-dex-files-define
     dexOptions {
-        preDexLibraries = false
+        //preDexLibraries = false
         javaMaxHeapSize "4g"
     }
 

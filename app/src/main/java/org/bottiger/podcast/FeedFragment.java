@@ -58,6 +58,7 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
     private FeedCursorLoader mCursorLoader;
     private RelativeLayoutWithBackground mTopContainer;
     private ImageView mContainerBackground;
+    private View mFloatingButton;
 
     private static BackgroundTransformation mBackgroundTransformation;
 
@@ -111,6 +112,7 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
 
 		fragmentView = inflater.inflate(R.layout.feed_view, container, false);
 
+        mFloatingButton = fragmentView.findViewById(R.id.feedview_fap_button);
         mRecyclerView = (FeedRecyclerView) fragmentView.findViewById(R.id.feed_recycler_view);
         mTitleView = (TextView) fragmentView.findViewById(R.id.feed_title);
         //mItemBackground = (ImageView) fragmentView.findViewById(R.id.item_background);

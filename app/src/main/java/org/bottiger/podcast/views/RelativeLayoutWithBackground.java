@@ -60,15 +60,4 @@ public class RelativeLayoutWithBackground extends RelativeLayout implements Targ
     public void onPrepareLoad(Drawable placeHolderDrawable) {
         return;
     }
-
-    /*
-    @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
-        return true;
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        return false;
-    }*/
 }
