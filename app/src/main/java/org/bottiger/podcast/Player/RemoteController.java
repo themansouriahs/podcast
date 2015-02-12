@@ -2,7 +2,6 @@ package org.bottiger.podcast.Player;
 
 import android.app.PendingIntent;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -64,7 +63,7 @@ public class RemoteController {
     /**
      * Update the state of the remote control.
      */
-    public void updateState(boolean isPlaying)
+    public void updatePlayingState(boolean isPlaying)
     {
         if(remoteControlClient != null)
         {
@@ -91,24 +90,25 @@ public class RemoteController {
         }
     }
 
-    public void updateMetaData(final FeedItem episode)
+    public void updateMetaData()
     {
+        final FeedItem episode = mContext.getCurrentItem();
+        
         if (remoteControlClient != null && episode != null)
         {
-            int state = mContext.isPlaying() ? remoteControlClient.PLAYSTATE_PLAYING : remoteControlClient.PLAYSTATE_PAUSED;
-            remoteControlClient.setPlaybackState(state);
+            //int state = mContext.isPlaying() ? remoteControlClient.PLAYSTATE_PLAYING : remoteControlClient.PLAYSTATE_PAUSED;
+            //remoteControlClient.setPlaybackState(state);
+            updatePlayingState(mContext.isPlaying());
+
+            RemoteControlClient.MetadataEditor editor = remoteControlClient.editMetadata(true);
+            updateSimpleMetaData(editor, episode);
+
             Target target = new Target() {
                 @Override
                 public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                     RemoteControlClient.MetadataEditor editor = remoteControlClient.editMetadata(true);
-                    //editor.putBitmap(android.media.RemoteController.MetadataEditor.BITMAP_KEY_ARTWORK, dummyAlbumArt);
                     editor.putBitmap(android.media.RemoteController.MetadataEditor.BITMAP_KEY_ARTWORK, bitmap);
-                    editor.putLong(MediaMetadataRetriever.METADATA_KEY_DURATION, (long)1000);
-                    editor.putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, episode.getAuthor());
-                    editor.putString(MediaMetadataRetriever.METADATA_KEY_TITLE, episode.getTitle());
-                    editor.apply();
-
-                    updateState(true);
+                    updateSimpleMetaData(editor, episode);
                 }
 
                 @Override
@@ -124,6 +124,13 @@ public class RemoteController {
 
             episode.getArtworAsync(mContext, target);
         }
+    }
+
+    private void updateSimpleMetaData(RemoteControlClient.MetadataEditor editor, FeedItem episode) {
+        editor.putLong(MediaMetadataRetriever.METADATA_KEY_DURATION, (long)1000);
+        editor.putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, episode.getAuthor());
+        editor.putString(MediaMetadataRetriever.METADATA_KEY_TITLE, episode.getTitle());
+        editor.apply();
     }
 
     /**

@@ -29,9 +29,7 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.telephony.PhoneStateListener;
@@ -83,7 +81,7 @@ public class PlayerService extends Service implements
 	private SoundWavesPlayer mPlayer = null;
     private MediaController mController;
 
-    private RemoteController controller = null;
+    private RemoteController mRemoteController = null;
 
 	private NotificationManager mNotificationManager;
     @Nullable private NotificationPlayer mNotificationPlayer;
@@ -131,8 +129,8 @@ public class PlayerService extends Service implements
 
         sPlayerHandler = new PlayerHandler(this);
 
-        if(controller == null)
-            controller = new RemoteController();
+        if(mRemoteController == null)
+            mRemoteController = new RemoteController();
 		
 		mPlayer = new SoundWavesPlayer(this);
 		mPlayer.setHandler(PlayerHandler.handler);
@@ -221,8 +219,7 @@ public class PlayerService extends Service implements
     public int onStartCommand(Intent intent, int flags, int startId) {
         handleIntent( intent );
 
-        controller.register(this);
-        controller.updateMetaData(getCurrentItem());
+        mRemoteController.register(this);
 
         //return super.onStartCommand(intent, flags, startId);
         return START_STICKY;
@@ -306,9 +303,6 @@ public class PlayerService extends Service implements
 		if (mItem == null)
 			return;
 
-        controller.updateMetaData(mItem);
-        controller.updateState(true);
-
 		String dataSource = mItem.isDownloaded() ? mItem.getAbsolutePath()
 				: mItem.getURL();
 
@@ -359,6 +353,7 @@ public class PlayerService extends Service implements
 		if (mPlayer.isPlaying() == false) {
             takeWakelock(mPlayer.isSteaming());
 			mPlayer.start();
+            mRemoteController.updateMetaData();
 		}
 	}
 
@@ -376,6 +371,7 @@ public class PlayerService extends Service implements
 		dis_notifyStatus();
 
 		mPlayer.pause();
+        mRemoteController.updateMetaData();
         releaseWakelock();
 	}
 
