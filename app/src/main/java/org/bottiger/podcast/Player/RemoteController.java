@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
 import android.media.RemoteControlClient;
+import android.util.Log;
 
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -24,7 +25,7 @@ import org.bottiger.podcast.service.PlayerService;
 public class RemoteController {
     private LegacyRemoteControlClient remoteControlClient;
     private PlayerService mContext;
-    private Bitmap dummyAlbumArt;
+    private Bitmap mCurrentAlbumArt;
 
 
     public void register(PlayerService context)
@@ -35,7 +36,7 @@ public class RemoteController {
         {
             System.out.println("Trying to register it.");
 
-            dummyAlbumArt = BitmapFactory.decodeResource(context.getResources(), R.drawable.generic_podcast);
+            mCurrentAlbumArt = BitmapFactory.decodeResource(context.getResources(), R.drawable.generic_podcast);
 
             AudioManager audioManager = (AudioManager) context.getSystemService(context.AUDIO_SERVICE);
 
@@ -93,9 +94,10 @@ public class RemoteController {
     public void updateMetaData()
     {
         final FeedItem episode = mContext.getCurrentItem();
-        
+
         if (remoteControlClient != null && episode != null)
         {
+            Log.d("RemoteController", "Updating remote control");
             //int state = mContext.isPlaying() ? remoteControlClient.PLAYSTATE_PLAYING : remoteControlClient.PLAYSTATE_PAUSED;
             //remoteControlClient.setPlaybackState(state);
             updatePlayingState(mContext.isPlaying());
@@ -106,6 +108,8 @@ public class RemoteController {
             Target target = new Target() {
                 @Override
                 public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                    Log.d("RemoteController", "Updating remote control (with background)");
+                    mCurrentAlbumArt = bitmap;
                     RemoteControlClient.MetadataEditor editor = remoteControlClient.editMetadata(true);
                     editor.putBitmap(android.media.RemoteController.MetadataEditor.BITMAP_KEY_ARTWORK, bitmap);
                     updateSimpleMetaData(editor, episode);
@@ -113,6 +117,7 @@ public class RemoteController {
 
                 @Override
                 public void onBitmapFailed(Drawable errorDrawable) {
+                    Log.d("RemoteController", "BACKGROUND failed to load");
                     return;
                 }
 
@@ -130,6 +135,11 @@ public class RemoteController {
         editor.putLong(MediaMetadataRetriever.METADATA_KEY_DURATION, (long)1000);
         editor.putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, episode.getAuthor());
         editor.putString(MediaMetadataRetriever.METADATA_KEY_TITLE, episode.getTitle());
+
+        if (mCurrentAlbumArt != null) {
+            editor.putBitmap(android.media.RemoteController.MetadataEditor.BITMAP_KEY_ARTWORK, mCurrentAlbumArt);
+        }
+
         editor.apply();
     }
 

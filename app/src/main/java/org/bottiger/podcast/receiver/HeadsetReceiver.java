@@ -21,9 +21,14 @@ public class HeadsetReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d("HeadsetReceiver", "Action: " + intent.getAction().toString() + "");
+        mPlayerServiceBinder = PodcastBaseFragment.mPlayerServiceBinder;
+
+        if (mPlayerServiceBinder == null) {
+            Log.e("HeadsetReciever", "Warning, PlayerService is null");
+            throw new IllegalStateException("PlayerService is null");
+        }
 
         if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
-            mPlayerServiceBinder = PodcastBaseFragment.mPlayerServiceBinder;
             if (mPlayerServiceBinder != null) {
                 if (mPlayerServiceBinder.isPlaying())
                     Log.d("HeadsetReceiver", "ACTION_AUDIO_BECOMING_NOISY => Pause Player");
