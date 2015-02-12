@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="5dp"
+    android:animateLayoutChanges="true"
     >
     <!--
     android:paddingTop="5dp"
@@ -12,13 +13,11 @@
 
     <org.bottiger.podcast.views.PlayPauseImageView
         android:id="@+id/play_pause_button"
-        android:layout_centerVertical="true"
         android:layout_marginRight="5dp"
         style="@style/FeedViewPlayPauseButton" />
 
     <org.bottiger.podcast.views.DownloadButtonView
         android:id="@+id/download_button"
-        android:layout_centerVertical="true"
         android:background="@color/transparent"
         android:visibility="visible"
         android:layout_alignParentRight="true"
@@ -26,6 +25,7 @@
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         style="@style/SmallFeedViewPlayPauseButton" />
+    <!-- android:layout_centerVertical="true" -->
 
     <!--
     <FrameLayout
