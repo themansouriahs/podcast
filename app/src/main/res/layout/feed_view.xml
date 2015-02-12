@@ -96,7 +96,7 @@
         />
         <!--         android:background="@color/blackWithAlpha" -->
 
-        <com.melnykov.fab.FloatingActionButton
+        <org.bottiger.podcast.views.FloatingActionButton
             android:id="@+id/feedview_fap_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

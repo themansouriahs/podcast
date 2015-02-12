@@ -14,6 +14,7 @@ import org.bottiger.podcast.utils.FragmentUtils;
 import org.bottiger.podcast.utils.PaletteCache;
 import org.bottiger.podcast.views.FeedRecyclerView;
 import org.bottiger.podcast.views.FeedRefreshLayout;
+import org.bottiger.podcast.views.FloatingActionButton;
 import org.bottiger.podcast.views.RelativeLayoutWithBackground;
 
 import android.annotation.TargetApi;
@@ -58,7 +59,7 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
     private FeedCursorLoader mCursorLoader;
     private RelativeLayoutWithBackground mTopContainer;
     private ImageView mContainerBackground;
-    private View mFloatingButton;
+    private FloatingActionButton mFloatingButton;
 
     private static BackgroundTransformation mBackgroundTransformation;
 
@@ -112,7 +113,7 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
 
 		fragmentView = inflater.inflate(R.layout.feed_view, container, false);
 
-        mFloatingButton = fragmentView.findViewById(R.id.feedview_fap_button);
+        mFloatingButton = (FloatingActionButton) fragmentView.findViewById(R.id.feedview_fap_button);
         mRecyclerView = (FeedRecyclerView) fragmentView.findViewById(R.id.feed_recycler_view);
         mTitleView = (TextView) fragmentView.findViewById(R.id.feed_title);
         //mItemBackground = (ImageView) fragmentView.findViewById(R.id.item_background);
@@ -239,11 +240,15 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
         if (muted != null)
             mTitleView.setBackgroundColor(muted.getBodyTextColor());
 
+        mFloatingButton.onPaletteFound(argChangedPalette);
         mAdapter.setPalette(argChangedPalette);
     }
 
     public void bindNewSubscrption(Subscription subscription, boolean argRequery) {
         mSubscription = subscription;
+
+        if (mFloatingButton != null)
+            mFloatingButton.setPaletteUrl(mSubscription.getImageURL());
 
         if (argRequery) {
             requeryLoader(mSubscription);
