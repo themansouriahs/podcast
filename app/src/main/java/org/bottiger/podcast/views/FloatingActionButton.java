@@ -35,9 +35,12 @@ public class FloatingActionButton extends com.melnykov.fab.FloatingActionButton 
 
     @Override
     public void onPaletteFound(Palette argChangedPalette) {
+
+        Palette.Swatch s = argChangedPalette.getVibrantSwatch();
         int color = PlayerButtonView.StaticButtonColor(argChangedPalette);
         int colorPressed = argChangedPalette.getLightMutedSwatch().getRgb();
-        int colorRipple = argChangedPalette.getLightVibrantSwatch().getRgb();
+        //int colorRipple = argChangedPalette.getLightVibrantSwatch().getRgb();
+        int colorRipple = s == null ? color : s.getRgb();
 
         super.setColorNormal(color);
         super.setColorPressed(colorPressed);
