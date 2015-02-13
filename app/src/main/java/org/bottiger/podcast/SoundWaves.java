@@ -8,7 +8,6 @@ import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
 import org.bottiger.podcast.flavors.Analytics;
-import org.bottiger.soundwaves.Soundwaves;
 
 // Acra debugging
 /*
