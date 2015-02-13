@@ -154,5 +154,11 @@
     <string name="episode_description">Episode description</string>
     <string name="pref_continuously_playing">Continuously playing</string>
     <string name="pref_continuously_playing_description">When an episode end, start the next one automatically</string>
+    <string name="preferences_category_help">Help</string>
+    <string name="preferences_category_ui">User Interface</string>
+    <string name="preferences_category_player">Player</string>
+    <string name="preferences_category_network">Network</string>
+    <string name="preferences_category_cloud">Cloud Support</string>
+    <string name="preferences_category_advanced">Advanced</string>
 
 </resources>

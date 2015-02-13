@@ -72,6 +72,11 @@
         <!--<item name="android:windowActionBarOverlay">true</item>-->
     </style>
 
+    <style name="SoundWaves.PreferenceActivity.Light" parent="SoundWavesTheme.Light">
+        <item name="android:windowTranslucentNavigation" tools:targetApi="19">false</item> <!-- actionbar and  bottom navigation -->
+        <item name="android:windowTranslucentStatus" tools:targetApi="19">false</item> <!-- top statusbar -->
+    </style>
+
 
     <style name="FrameworkRoot.ActionBar" parent="android:Widget.Holo.ActionBar" />
     <style name="FrameworkRoot.ActionBar.TitleText" parent="android:TextAppearance.Holo.Widget.ActionBar.Title" />

@@ -57,7 +57,9 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
 		// http://stackoverflow.com/questions/11751498/how-to-change-preferenceactivity-theme
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(this);
-		setTheme(ThemeHelper.getTheme(prefs));
+		//setTheme(ThemeHelper.getTheme(prefs));
+        setTheme(R.style.SoundWaves_PreferenceActivity_Light);
+
 		super.onCreate(savedInstanceState);
 
 		// Load the preferences from an XML resource
