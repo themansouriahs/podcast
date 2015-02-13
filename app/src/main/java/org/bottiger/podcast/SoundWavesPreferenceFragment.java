@@ -16,16 +16,7 @@ public class SoundWavesPreferenceFragment extends PreferenceFragment {
     public void onCreate(final Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        //addPreferencesFromResource(R.xml.settings);
-
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.preferences);
-
-        /*
-        service = startService(new Intent(this, PodcastService.class));
-
-        Intent bindIntent = new Intent(this, PodcastService.class);
-        bindService(bindIntent, serviceConnection, Context.BIND_AUTO_CREATE);
-        */
     }
 }

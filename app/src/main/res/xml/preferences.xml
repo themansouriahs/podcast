@@ -18,16 +18,25 @@
 <!-- This is a primitive example showing the different types of preferences available. -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
-
     <PreferenceScreen
+        android:key="help"
         android:title="@string/preferences_category_help"
         android:icon="@drawable/ic_help_black">
+
+        <org.bottiger.podcast.ToolbarPreference
+            android:key="help"
+            android:title="@string/preferences_category_help" />
 
     </PreferenceScreen>
 
     <PreferenceScreen
+        android:key="ui"
         android:title="@string/preferences_category_ui"
         android:icon="@drawable/ic_settings_black">
+
+        <org.bottiger.podcast.ToolbarPreference
+            android:key="ui"
+            android:title="@string/preferences_category_ui" />
 
         <CheckBoxPreference
             android:defaultValue="false"
@@ -38,8 +47,13 @@
     </PreferenceScreen>
 
     <PreferenceScreen
+        android:key="player"
         android:title="@string/preferences_category_player"
         android:icon="@drawable/ic_volume_up_black">
+
+        <org.bottiger.podcast.ToolbarPreference
+            android:key="player"
+            android:title="@string/preferences_category_player" />
 
         <CheckBoxPreference
             android:defaultValue="true"
@@ -56,8 +70,13 @@
     </PreferenceScreen>
 
     <PreferenceScreen
+        android:key="network"
         android:title="@string/preferences_category_network"
         android:icon="@drawable/ic_signal_wifi_3_bar_black">
+
+        <org.bottiger.podcast.ToolbarPreference
+            android:key="network"
+            android:title="@string/preferences_category_network" />
 
         <CheckBoxPreference
             android:defaultValue="true"
@@ -89,8 +108,13 @@
     </PreferenceScreen>
 
     <PreferenceScreen
+        android:key="cloud"
         android:title="@string/preferences_category_cloud"
         android:icon="@drawable/ic_cloud_queue_black">
+
+        <org.bottiger.podcast.ToolbarPreference
+            android:key="cloud"
+            android:title="@string/preferences_category_cloud" />
 
         <CheckBoxPreference
             android:defaultValue="true"
@@ -101,8 +125,13 @@
     </PreferenceScreen>
 
     <PreferenceScreen
+        android:key="advanced"
         android:title="@string/preferences_category_advanced"
         android:icon="@drawable/ic_adb_black">
+
+        <org.bottiger.podcast.ToolbarPreference
+            android:key="advanced"
+            android:title="@string/preferences_category_advanced" />
 
         <CheckBoxPreference
             android:defaultValue="true"
@@ -111,23 +140,5 @@
             android:title="@string/pref_feedback_title" />
 
     </PreferenceScreen>
-
-    <!--
-      <org.bottiger.podcast.utils.TimePreference
-          android:key="update_time"
-          android:title="@string/pref_update_time_title"
-          android:summary="@string/pref_update_time_description" />
-          -->
-
-    <!--
-          <ListPreference
-                  android:key="pref_item_expire"
-                  android:title="@string/pref_item_expire_title"
-                  android:summary="@string/pref_item_expire_description"
-                  android:entries="@array/entries_item_expire"
-                  android:entryValues="@array/entryvalues_item_expire"
-                  android:defaultValue="5"
-                  android:dialogTitle="Item Expire" />
-      -->
 
 </PreferenceScreen>
