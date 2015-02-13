@@ -7,7 +7,6 @@ import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.PodcastLog;
 import org.bottiger.podcast.views.MyCustomViewPager;
 import org.bottiger.podcast.views.SlidingTab.SlidingTabLayout;
-import org.bottiger.podcast.views.ToolbarActivity;
 
 import android.annotation.TargetApi;
 import android.os.Build;
@@ -20,14 +19,10 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.transition.Scene;
-import android.transition.TransitionInflater;
 import android.util.Log;
-import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewStub;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 

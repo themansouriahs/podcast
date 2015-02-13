@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import org.bottiger.podcast.provider.Subscription;
-import org.bottiger.podcast.views.ToolbarActivity;
 
 /**
  * Created by apl on 22-09-2014.
