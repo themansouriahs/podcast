@@ -81,7 +81,7 @@ public class ViewPagerSubscriptionFragment extends Fragment implements BackButto
 
     public void fillContainerWithSubscriptions() {
         mFragmentManager.beginTransaction()
-                .setCustomAnimations(R.anim.slide_out_left, R.anim.slide_out_left)
+                .setCustomAnimations(R.anim.slide_out_bottom, R.anim.slide_out_bottom)
                 .replace(R.id.subscription_fragment_container, mSubscriptionFragment).commit();
     }
 
@@ -98,7 +98,7 @@ public class ViewPagerSubscriptionFragment extends Fragment implements BackButto
                 .commit();
                 */
         FragmentTransaction ft = mFragmentManager.beginTransaction();
-        ft.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
+        ft.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_bottom);
         ft.add(R.id.subscription_fragment_container, mFeedFragment).commit();
         ((ToolbarActivity)mActivity).makeToolbarTransparent(true);
     }
