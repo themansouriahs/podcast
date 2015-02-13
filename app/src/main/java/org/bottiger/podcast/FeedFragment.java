@@ -41,12 +41,7 @@ import com.squareup.picasso.Target;
 
 public class FeedFragment extends AbstractEpisodeFragment implements PaletteListener {
 
-	public static final String subscriptionIDKey = "subscription_id";
-	private static final long defaultSubscriptionID = 1;
-
     private boolean mExpandedLayout = false;
-
-    private static BackgroundTransformation mImageTransformation;
 
 	private Subscription mSubscription = null;
     private View fragmentView;
@@ -65,8 +60,6 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
 
     private Palette mPalette = null;
 
-    private FragmentUtils mFragmentUtils;
-
     private final Target mTarget = new Target() {
 
         @Override
@@ -76,7 +69,6 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
                 return;
 
             BitmapDrawable ob = new BitmapDrawable(mContainerBackground.getResources(),bitmap);
-            //mContainerBackground.setBackground(ob);
             mContainerBackground.setImageDrawable(ob);
             String image = mSubscription.getImageURL();
             PaletteCache.generate(image, bitmap);
@@ -96,14 +88,9 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
         }
     };
 
-	private void setSubscription(Subscription subscription) {
-        mSubscription = subscription;
-	}
-
     public void onAttach (Activity activity) {
         mActivity = activity;
         super.onAttach(activity);
-        //requeryLoader(mSubscription);
     }
 
 	@Override
@@ -116,7 +103,6 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
         mFloatingButton = (FloatingActionButton) fragmentView.findViewById(R.id.feedview_fap_button);
         mRecyclerView = (FeedRecyclerView) fragmentView.findViewById(R.id.feed_recycler_view);
         mTitleView = (TextView) fragmentView.findViewById(R.id.feed_title);
-        //mItemBackground = (ImageView) fragmentView.findViewById(R.id.item_background);
 
         mTopContainer = (RelativeLayoutWithBackground)fragmentView.findViewById(R.id.top_container);
 
@@ -125,8 +111,6 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
-
-        mFragmentUtils = new FragmentUtils(getActivity(), fragmentView, this);
 
 		return fragmentView;
 	}
@@ -149,7 +133,7 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mCursorLoader = new FeedCursorLoader(this, (FeedViewAdapter)mAdapter, mCursor, mSubscription);
+        mCursorLoader = new FeedCursorLoader(this, mAdapter, mCursor, mSubscription);
         mCursorLoader.requery();
     }
 
@@ -184,7 +168,6 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
 
             String image = mSubscription.getImageURL();
             if (image != null && image != "") {
-                //PicassoWrapper.simpleLoad(mActivity, image, mTarget);
                 PicassoWrapper.load(mActivity, image, mTarget, mBackgroundTransformation);
 
                 mPalette = PaletteCache.get(image);
