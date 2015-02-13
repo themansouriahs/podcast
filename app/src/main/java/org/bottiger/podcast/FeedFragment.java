@@ -39,7 +39,7 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 
-public class FeedFragment extends AbstractEpisodeFragment implements PaletteListener, FeedRefreshLayout.OnRefreshListener, DownloadCompleteCallback {
+public class FeedFragment extends AbstractEpisodeFragment implements PaletteListener {
 
 	public static final String subscriptionIDKey = "subscription_id";
 	private static final long defaultSubscriptionID = 1;
@@ -52,8 +52,6 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
     private View fragmentView;
 
     private Activity mActivity;
-
-    protected FeedRefreshLayout mFeedSwipeRefreshView;
 
     private FeedRecyclerView mRecyclerView;
     private TextView mTitleView;
@@ -120,15 +118,6 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
         mTitleView = (TextView) fragmentView.findViewById(R.id.feed_title);
         //mItemBackground = (ImageView) fragmentView.findViewById(R.id.item_background);
 
-        mFeedSwipeRefreshView = (FeedRefreshLayout) fragmentView.findViewById(R.id.feed_refresh_layout);
-        mFeedSwipeRefreshView.setOnRefreshListener(this);
-        mFeedSwipeRefreshView.setColorScheme(android.R.color.holo_blue_bright,
-                android.R.color.holo_green_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
-
-        mFeedSwipeRefreshView.setRecyclerView(mRecyclerView);
-
         mTopContainer = (RelativeLayoutWithBackground)fragmentView.findViewById(R.id.top_container);
 
         mContainerBackground = (ImageView) fragmentView.findViewById(R.id.background_container);
@@ -152,19 +141,6 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
     public void onPause() {
         super.onPause();
         PaletteObservable.unregisterListener(this);
-    }
-
-    @Override
-    public void onRefresh() {
-        Log.d("FeedRefresh", "starting");
-        mFeedSwipeRefreshView.setRefreshing(true);
-        PodcastDownloadManager.start_update(mActivity, mSubscription, this);
-    }
-
-    @Override
-    public void complete(boolean succes) {
-        Log.d("FeedRefresh", "ending");
-        mFeedSwipeRefreshView.setRefreshing(false);
     }
 
 	// Read here:
