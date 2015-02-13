@@ -45,7 +45,7 @@ public class ToolbarActivity extends TopActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_swipe);
+        setContentView(getLayout());
 
         mToolbar = (Toolbar) findViewById(R.id.my_awesome_toolbar);
         mPagerTitleStrip = (View) findViewById(R.id.sliding_tabs);
@@ -127,12 +127,16 @@ public class ToolbarActivity extends TopActivity {
         mColorAnimation.start();
     }
 
-    private int getStatusBarHeight() {
+    protected int getStatusBarHeight() {
         int result = 0;
         int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
         if (resourceId > 0) {
             result = getResources().getDimensionPixelSize(resourceId);
         }
         return result;
+    }
+
+    protected int getLayout() {
+        return R.layout.activity_swipe;
     }
 }

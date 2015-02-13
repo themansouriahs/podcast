@@ -21,7 +21,7 @@ import org.bottiger.podcast.flavors.Analytics;
         // not used
         formUri = "https://acra.bottiger.org/acra-soundwaves/_design/acra-storage/_update/report",
         formUriBasicAuthLogin = "soundwaves", // optional
-        formUriBasicAuthPassword = "", // optional
+        formUriBasicAuthPassword = "qAizvWWLZuUtKclMnQTNoExZevGayn", // optional
         disableSSLCertValidation = true,
         mode = ReportingInteractionMode.SILENT,
         forceCloseDialogAfterToast=true,
@@ -37,7 +37,7 @@ public class SoundWaves extends Application {
 	public static final String packageName = "org.bottiger.soundwaves";
 
     // Google Analytics
-    public static final String ANALYTICS_ID = "";
+    public static final String ANALYTICS_ID = "UA-59611883-1";
 
 	// Bugsense API Key.
 	// https://www.bugsense.com/dashboard/project/

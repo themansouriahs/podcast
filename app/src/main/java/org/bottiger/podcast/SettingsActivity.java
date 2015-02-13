@@ -17,7 +17,6 @@
 package org.bottiger.podcast;
 
 import org.bottiger.podcast.service.PodcastService;
-import org.bottiger.podcast.utils.ThemeHelper;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -26,33 +25,18 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 
-public class SettingsActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class SettingsActivity extends ToolbarActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
 	public static final String DARK_THEME_KEY = "pref_dark_theme";
 	public static final String CLOUD_SUPPORT = "pref_cloud support";
 
 	public static final String HAPI_PREFS_FILE_NAME = "org.bottiger.podcast_preferences";
-	private PodcastService serviceBinder = null;
-	ComponentName service = null;
-
-	private ServiceConnection serviceConnection = new ServiceConnection() {
-		@Override
-		public void onServiceConnected(ComponentName className, IBinder service) {
-			serviceBinder = ((PodcastService.PodcastBinder) service)
-					.getService();
-		}
-
-		@Override
-		public void onServiceDisconnected(ComponentName className) {
-			serviceBinder = null;
-		}
-	};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+
 		// This is bizar, but works:
 		// http://stackoverflow.com/questions/11751498/how-to-change-preferenceactivity-theme
 		SharedPreferences prefs = PreferenceManager
@@ -60,17 +44,22 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
 		//setTheme(ThemeHelper.getTheme(prefs));
         setTheme(R.style.SoundWaves_PreferenceActivity_Light);
 
-		super.onCreate(savedInstanceState);
+        //setContentView();
 
-		// Load the preferences from an XML resource
-		addPreferencesFromResource(R.xml.preferences);
+        super.onCreate(savedInstanceState);
 
-		service = startService(new Intent(this, PodcastService.class));
-
-		Intent bindIntent = new Intent(this, PodcastService.class);
-		bindService(bindIntent, serviceConnection, Context.BIND_AUTO_CREATE);
-
+        getFragmentManager().beginTransaction().replace(R.id.content_frame, new SoundWavesPreferenceFragment()).commit();
 	}
+
+    @Override
+    protected int getLayout() {
+        return R.layout.preference_activity;
+    }
+
+    @Override
+    protected int getStatusBarHeight() {
+        return 0;
+    }
 
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
@@ -78,34 +67,6 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
 		if (key.equals(DARK_THEME_KEY)) {
 			recreate();
 		}
-	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-	    // Set up a listener whenever a key changes
-	    getPreferenceScreen().getSharedPreferences()
-	            .registerOnSharedPreferenceChangeListener(this);
-
-	}
-
-	@Override
-	protected void onPause() {
-
-		super.onPause();
-		if (serviceBinder != null)
-			serviceBinder.updateSetting();
-		
-	    // Unregister the listener whenever a key changes
-	    getPreferenceScreen().getSharedPreferences()
-	            .unregisterOnSharedPreferenceChangeListener(this);
-	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		unbindService(serviceConnection);
-		// stopService(new Intent(this, service.getClass()));
 	}
 
 }
