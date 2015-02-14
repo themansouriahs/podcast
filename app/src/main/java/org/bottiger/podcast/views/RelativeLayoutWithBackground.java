@@ -21,9 +21,6 @@ import com.squareup.picasso.Target;
 
 public class RelativeLayoutWithBackground extends RelativeLayout implements Target {
 
-    private OnSizeChangedListener mSizeChangedListener;
-    private int mExpandedHeight = -1;
-
     public RelativeLayoutWithBackground(Context context) {
         super(context);
     }
@@ -43,7 +40,6 @@ public class RelativeLayoutWithBackground extends RelativeLayout implements Targ
 
     @Override
     public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-        //setBackgroundDrawable(new BitmapDrawable(bitmap));
         BitmapDrawable background;
         background = new BitmapDrawable(getContext().getResources(), bitmap);
         background.setAlpha(50);
@@ -52,7 +48,6 @@ public class RelativeLayoutWithBackground extends RelativeLayout implements Targ
 
     @Override
     public void onBitmapFailed(Drawable argDrawable) {
-        //setBackgroundResource(argDrawable);
         return;
     }
 

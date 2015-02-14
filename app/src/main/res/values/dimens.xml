@@ -59,5 +59,14 @@
     <dimen name="playpause_button_size_normal">50dp</dimen>
     <dimen name="playpause_button_size">100dp</dimen>
     <dimen name="player_buttons_padding_left">70dp</dimen> <!-- around 2*playpause_button_size -->
+
+    <!-- Initial height of transparent space above QuickContacts -->
+    <dimen name="quickcontact_starting_empty_height">150dp</dimen>
+    <!-- Initial size of QuickContact's title size -->
+    <dimen name="quickcontact_maximum_title_size">36dp</dimen>
+    <!-- When QC is uncollapsed, the title has this much margin on its left, right and bottom -->
+    <dimen name="quickcontact_title_initial_margin">16dp</dimen>
+
+    <dimen name="quick_contact_toolbar_elevation">16dp</dimen>
     
 </resources>

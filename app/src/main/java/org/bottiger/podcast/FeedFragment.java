@@ -25,10 +25,13 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -100,6 +103,7 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
 
 		fragmentView = inflater.inflate(R.layout.feed_view, container, false);
 
+        mTopContainer = (RelativeLayoutWithBackground) fragmentView.findViewById(R.id.top_container);
         mFloatingButton = (FloatingActionButton) fragmentView.findViewById(R.id.feedview_fap_button);
         mRecyclerView = (FeedRecyclerView) fragmentView.findViewById(R.id.feed_recycler_view);
         mTitleView = (TextView) fragmentView.findViewById(R.id.feed_title);
@@ -222,4 +226,5 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
             requeryLoader(mSubscription);
         }
     }
+
 }
