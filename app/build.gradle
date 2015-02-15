@@ -7,10 +7,10 @@ android {
 
     defaultConfig {
         applicationId "org.bottiger.podcast"
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 21
-        versionCode 72     // even - release. Odd - development
-        versionName "0.58" // even - release. Odd - development
+        versionCode 73     // even - release. Odd - development
+        versionName "0.59" // even - release. Odd - development
         //useJack = true
     }
 

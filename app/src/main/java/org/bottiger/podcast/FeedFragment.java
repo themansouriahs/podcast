@@ -15,6 +15,7 @@ import org.bottiger.podcast.utils.PaletteCache;
 import org.bottiger.podcast.views.FeedRecyclerView;
 import org.bottiger.podcast.views.FeedRefreshLayout;
 import org.bottiger.podcast.views.FloatingActionButton;
+import org.bottiger.podcast.views.MultiShrink.MultiShrinkScroller;
 import org.bottiger.podcast.views.RelativeLayoutWithBackground;
 
 import android.annotation.TargetApi;
@@ -55,7 +56,7 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
     private TextView mTitleView;
     private FeedViewAdapter mAdapter;
     private FeedCursorLoader mCursorLoader;
-    private RelativeLayoutWithBackground mTopContainer;
+    private MultiShrinkScroller mTopContainer;
     private ImageView mContainerBackground;
     private FloatingActionButton mFloatingButton;
 
@@ -95,7 +96,6 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
         mActivity = activity;
         super.onAttach(activity);
     }
-
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -103,12 +103,14 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
 
 		fragmentView = inflater.inflate(R.layout.feed_view, container, false);
 
-        mTopContainer = (RelativeLayoutWithBackground) fragmentView.findViewById(R.id.top_container);
+        mTopContainer = (MultiShrinkScroller) fragmentView.findViewById(R.id.top_container);
         mFloatingButton = (FloatingActionButton) fragmentView.findViewById(R.id.feedview_fap_button);
-        mRecyclerView = (FeedRecyclerView) fragmentView.findViewById(R.id.feed_recycler_view);
+        //mRecyclerView = (FeedRecyclerView) fragmentView.findViewById(R.id.feed_recycler_view);
         mTitleView = (TextView) fragmentView.findViewById(R.id.feed_title);
 
-        mTopContainer = (RelativeLayoutWithBackground)fragmentView.findViewById(R.id.top_container);
+        // mScroller needs to perform asynchronous measurements after initalize(), therefore
+        // we can't mark this as GONE.
+        mTopContainer.setVisibility(View.INVISIBLE);
 
         mContainerBackground = (ImageView) fragmentView.findViewById(R.id.background_container);
 

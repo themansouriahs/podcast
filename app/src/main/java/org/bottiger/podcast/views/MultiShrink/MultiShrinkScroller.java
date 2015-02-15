@@ -17,6 +17,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Trace;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.Display;
@@ -264,13 +265,13 @@ public class MultiShrinkScroller extends FrameLayout {
      * This method must be called inside the Activity's OnCreate.
      */
     public void initialize(MultiShrinkScrollerListener listener, boolean isOpenContactSquare) {
-        mScrollView = (ScrollView) findViewById(R.id.content_scroller);
-        mScrollViewChild = findViewById(R.id.card_container);
+        mScrollView = (ScrollView) findViewById(R.id.feed_scrollview);
+        mScrollViewChild = findViewById(R.id.feed_scrollviewChild);
         mToolbar = findViewById(R.id.toolbar_parent);
         mPhotoViewContainer = findViewById(R.id.toolbar_parent);
-        mTransparentView = findViewById(R.id.transparent_view);
-        mLargeTextView = (TextView) findViewById(R.id.large_title);
-        mInvisiblePlaceholderTextView = (TextView) findViewById(R.id.placeholder_textview);
+        mTransparentView = findViewById(R.id.transparent_view); // background_gradient
+        mLargeTextView = (TextView) findViewById(R.id.feed_title);
+        mInvisiblePlaceholderTextView = (TextView) findViewById(R.id.feed_title);
         mStartColumn = findViewById(R.id.empty_start_column);
         // Touching the empty space should close the card
         if (mStartColumn != null) {
@@ -290,11 +291,11 @@ public class MultiShrinkScroller extends FrameLayout {
         mListener = listener;
         mIsOpenContactSquare = isOpenContactSquare;
 
-        mPhotoView = (ImageView) findViewById(R.id.photo);
+        mPhotoView = (QuickFeedImage) findViewById(R.id.photo);
 
         mTitleGradientView = findViewById(R.id.title_gradient);
         mTitleGradientView.setBackground(mTitleGradientDrawable);
-        mActionBarGradientView = findViewById(R.id.action_bar_gradient);
+        mActionBarGradientView = findViewById(R.id.action_bar_gradient); // R.id.action_bar_gradient
         mActionBarGradientView.setBackground(mActionBarGradientDrawable);
 
         mPhotoTouchInterceptOverlay = findViewById(R.id.photo_touch_intercept_overlay);

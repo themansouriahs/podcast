@@ -2,7 +2,9 @@ package org.bottiger.podcast;
 
 import android.animation.ValueAnimator;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -106,8 +108,13 @@ public class ViewPagerSubscriptionFragment extends Fragment implements BackButto
     @Override
     public void onItemSelected(long id) {
         setState(State.FEED);
-        fillContainerWithFeed(id);
-        //mOnItemSelectedListener.onItemSelected(id);
+
+
+        Intent intent = new Intent(getActivity(), FeedActivity.class);
+        startActivity(intent);
+
+
+        //fillContainerWithFeed(id);
     }
 
     private int fragmentInAnimation() {

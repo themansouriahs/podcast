@@ -75,6 +75,9 @@ public class ToolbarActivity extends TopActivity {
     @TargetApi(17)
     public void makeToolbarTransparent(boolean argIsTransparent) {
 
+        if (argIsTransparent)
+            return;
+
         if (mToolBackground == null) {
             mToolBackground = mToolbar.getBackground();
             mPagerTitleStripBackground = mPagerTitleStrip.getBackground();

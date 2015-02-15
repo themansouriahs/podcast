@@ -77,6 +77,14 @@
         <item name="android:windowTranslucentStatus" tools:targetApi="19">false</item> <!-- top statusbar -->
     </style>
 
+    <style name="Theme.Transparent" parent="Theme.AppCompat">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <!--<item name="android:windowIsFloating">true</item>-->
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
 
     <style name="FrameworkRoot.ActionBar" parent="android:Widget.Holo.ActionBar" />
     <style name="FrameworkRoot.ActionBar.TitleText" parent="android:TextAppearance.Holo.Widget.ActionBar.Title" />
