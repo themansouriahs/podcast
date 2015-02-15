@@ -30,15 +30,13 @@ import org.bottiger.podcast.views.PlayPauseImageView;
  */
 public class FeedViewAdapter extends AbstractEpisodeCursorAdapter<FeedViewAdapter.EpisodeViewHolder> {
 
-    private Fragment mFragment;
     private DownloadProgressObservable mDownloadProgressObservable;
     private Palette mPalette;
     private boolean mIsExpanded = false;
 
-    public FeedViewAdapter(Context context, Fragment fragment, Cursor dataset) {
+    public FeedViewAdapter(Context context, Cursor dataset) {
         super(dataset);
         mContext = context;
-        mFragment = fragment;
 
         mInflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);

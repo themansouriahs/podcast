@@ -1,5 +1,6 @@
 package org.bottiger.podcast.playlist;
 
+import android.app.Activity;
 import android.support.v4.app.Fragment;
 
 import android.database.Cursor;
@@ -22,6 +23,13 @@ public class FeedCursorLoader extends GenericCursorLoader {
 
     public FeedCursorLoader(Fragment fragment, FeedViewAdapter adapter, Cursor argCursor, Subscription subscription) {
         super(fragment, adapter, argCursor);
+        this.subscription = subscription;
+        this.mAdapter = adapter;
+        //requery();
+    }
+
+    public FeedCursorLoader(Activity activity, FeedViewAdapter adapter, Cursor argCursor, Subscription subscription) {
+        super(activity, adapter, argCursor);
         this.subscription = subscription;
         this.mAdapter = adapter;
         //requery();

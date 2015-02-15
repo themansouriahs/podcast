@@ -153,7 +153,7 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mAdapter = new FeedViewAdapter(mActivity, this, mCursor);
+        //mAdapter = new FeedViewAdapter(mActivity, this, mCursor);
         mRecyclerView.setAdapter(mAdapter);
 
         mFloatingButton.setOnClickListener(new View.OnClickListener() {

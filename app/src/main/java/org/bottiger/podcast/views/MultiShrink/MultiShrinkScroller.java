@@ -96,7 +96,7 @@ public class MultiShrinkScroller extends FrameLayout {
     private ScrollView mScrollView;
     private View mScrollViewChild;
     private View mToolbar;
-    private QuickFeedImage mPhotoView; // QuickContactImageView
+    private QuickFeedImage mPhotoView;
     private View mPhotoViewContainer;
     private View mTransparentView;
     private MultiShrinkScrollerListener mListener;

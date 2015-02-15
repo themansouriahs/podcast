@@ -13,6 +13,8 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Trace;
 import android.support.v7.graphics.Palette;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toolbar;
@@ -21,11 +23,15 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
+import org.bottiger.podcast.adapters.FeedViewAdapter;
 import org.bottiger.podcast.images.PicassoWrapper;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PaletteObservable;
+import org.bottiger.podcast.playlist.FeedCursorLoader;
+import org.bottiger.podcast.playlist.ReorderCursor;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.PaletteCache;
+import org.bottiger.podcast.views.FeedRecyclerView;
 import org.bottiger.podcast.views.MultiShrink.MultiShrinkScroller;
 import org.bottiger.podcast.views.MultiShrink.QuickFeedImage;
 import org.bottiger.podcast.views.MultiShrink.SchedulingUtils;
@@ -69,8 +75,11 @@ public class FeedActivity extends Activity implements PaletteListener {
     private boolean mHasAlreadyBeenOpened;
 
     private QuickFeedImage mPhotoView;
-
+    private RecyclerView mRecyclerView;
     private MultiShrinkScroller mScroller;
+    private FeedViewAdapter mAdapter;
+    private FeedCursorLoader mCursorLoader;
+    protected ReorderCursor mCursor = null;
 
     /**
      *  This scrim's opacity is controlled in two different ways. 1) Before the initial entrance
@@ -198,6 +207,17 @@ public class FeedActivity extends Activity implements PaletteListener {
         mWindowScrim.setAlpha(0);
         getWindow().setBackgroundDrawable(mWindowScrim);
 
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        mRecyclerView = (FeedRecyclerView) findViewById(R.id.feed_recycler_view);
+        mRecyclerView.setLayoutManager(layoutManager);
+        mRecyclerView.setHasFixedSize(true);
+
+        mAdapter = new FeedViewAdapter(this, mCursor);
+        mRecyclerView.setAdapter(mAdapter);
+
+        mCursorLoader = new FeedCursorLoader(this, mAdapter, mCursor, mSubscription);
+        mCursorLoader.requery();
         /*
         mContactCard = (ExpandingEntryCardView) findViewById(R.id.communication_card);
         mNoContactDetailsCard = (ExpandingEntryCardView) findViewById(R.id.no_contact_data_card);
