@@ -104,15 +104,15 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
 		fragmentView = inflater.inflate(R.layout.feed_view, container, false);
 
         mTopContainer = (MultiShrinkScroller) fragmentView.findViewById(R.id.top_container);
-        mFloatingButton = (FloatingActionButton) fragmentView.findViewById(R.id.feedview_fap_button);
+        //mFloatingButton = (FloatingActionButton) fragmentView.findViewById(R.id.feedview_fap_button);
         //mRecyclerView = (FeedRecyclerView) fragmentView.findViewById(R.id.feed_recycler_view);
-        mTitleView = (TextView) fragmentView.findViewById(R.id.feed_title);
+        mTitleView = (TextView) fragmentView.findViewById(R.id.feedview_title);
 
         // mScroller needs to perform asynchronous measurements after initalize(), therefore
         // we can't mark this as GONE.
         mTopContainer.setVisibility(View.INVISIBLE);
 
-        mContainerBackground = (ImageView) fragmentView.findViewById(R.id.background_container);
+        mContainerBackground = (ImageView) fragmentView.findViewById(R.id.photo);
 
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);

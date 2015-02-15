@@ -96,8 +96,10 @@ public class PicassoWrapper {
         int height = size.y;
 
         //picasso.load(image).resize(width,width).centerCrop().config(Bitmap.Config.RGB_565)
-
-        if (argCallback != null) {
+        if (transformation == null) {
+            picasso.load(image).into(imageView, argCallback); // .fit().centerCrop()
+        }
+        else if (argCallback != null) {
             picasso.load(image).transform(transformation)
                     .into(imageView, argCallback); // .fit().centerCrop()
         } else {
@@ -106,7 +108,7 @@ public class PicassoWrapper {
         }
     }
 
-    public static void simpleLoad(Context mContext, String logo, SquareImageView image) {
+    public static void simpleLoad(Context mContext, String logo, ImageView image) {
         Picasso picasso = PicassoWrapper.init(mContext, false);
         picasso.load(logo).fit().centerCrop().into(image);
     }

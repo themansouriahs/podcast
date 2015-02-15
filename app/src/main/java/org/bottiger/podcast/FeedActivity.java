@@ -4,26 +4,40 @@ import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Trace;
+import android.support.v7.graphics.Palette;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toolbar;
 
-import org.bottiger.podcast.views.MultiShrink.ExpandingEntryCardView;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
+
+import org.bottiger.podcast.images.PicassoWrapper;
+import org.bottiger.podcast.listeners.PaletteListener;
+import org.bottiger.podcast.listeners.PaletteObservable;
+import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.utils.PaletteCache;
 import org.bottiger.podcast.views.MultiShrink.MultiShrinkScroller;
+import org.bottiger.podcast.views.MultiShrink.QuickFeedImage;
 import org.bottiger.podcast.views.MultiShrink.SchedulingUtils;
 
 /**
  * Created by apl on 14-02-2015.
  */
-public class FeedActivity extends Activity {
+public class FeedActivity extends Activity implements PaletteListener {
 
     public static final int MODE_FULLY_EXPANDED = 4;
 
-    private static final String TAG = "QuickContact";
+    private static final String TAG = "FeedView";
 
     private static final String KEY_THEME_COLOR = "theme_color";
 
@@ -51,8 +65,10 @@ public class FeedActivity extends Activity {
             "com.android.contacts.quickcontact.QuickContactActivity";
 
     private int mStatusBarColor;
-    private int mExtraMode;
+    private int mExtraMode = MODE_FULLY_EXPANDED;
     private boolean mHasAlreadyBeenOpened;
+
+    private QuickFeedImage mPhotoView;
 
     private MultiShrinkScroller mScroller;
 
@@ -67,6 +83,9 @@ public class FeedActivity extends Activity {
     //private MaterialColorMapUtils mMaterialColorMapUtils;
     private boolean mIsExitAnimationInProgress;
     private boolean mHasComputedThemeColor;
+
+    public static final String SUBSCRIPTION_ID_KEY = "episodeID";
+    private Subscription mSubscription = null;
 
     final MultiShrinkScroller.MultiShrinkScrollerListener mMultiShrinkScrollerListener
             = new MultiShrinkScroller.MultiShrinkScrollerListener() {
@@ -103,15 +122,40 @@ public class FeedActivity extends Activity {
         }
     };
 
+    Target target = new Target() {
+        @Override
+        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+            BitmapDrawable bd = new BitmapDrawable(getResources(), bitmap);
+            //mPhotoView.setImageDrawable(bd);
+            mPhotoView.setImageBitmap(bitmap);
+        }
+
+        @Override
+        public void onBitmapFailed(Drawable errorDrawable) {
+            return;
+        }
+
+        @Override
+        public void onPrepareLoad(Drawable placeHolderDrawable) {
+            return;
+        }
+    };
+
     @Override
     @TargetApi(21)
     protected void onCreate(Bundle savedInstanceState) {
-        //Trace.beginSection("onCreate()");
+        Trace.beginSection("onCreate()");
+        mSubscription = null;
+
         super.onCreate(savedInstanceState);
 
         getWindow().setStatusBarColor(Color.TRANSPARENT);
 
-        //processIntent(getIntent());
+        processIntent(getIntent());
+
+        if (mSubscription == null) {
+            throw new IllegalStateException("Episode can not be null");
+        }
 
         // Show QuickContact in front of soft input
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM,
@@ -121,7 +165,38 @@ public class FeedActivity extends Activity {
 
         //mMaterialColorMapUtils = new MaterialColorMapUtils(getResources());
 
+
+        mPhotoView = (QuickFeedImage) findViewById(R.id.photo);
         mScroller = (MultiShrinkScroller) findViewById(R.id.multiscroller);
+
+
+        String url = mSubscription.getImageURL();
+        //PicassoWrapper.simpleLoad(this, url ,target);
+        Picasso.with(this).load(url).into(target);
+
+        final View transparentView = findViewById(R.id.transparent_view);
+        if (mScroller != null) {
+            transparentView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mScroller.scrollOffBottom();
+                }
+            });
+        }
+
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setActionBar(toolbar);
+        getActionBar().setTitle(null);
+
+        // Put a TextView with a known resource id into the ActionBar. This allows us to easily
+        // find the correct TextView location & size later.
+        //toolbar.addView(getLayoutInflater().inflate(R.layout.quickcontact_title_placeholder, null)); // FIXME
+
+        mHasAlreadyBeenOpened = savedInstanceState != null;
+        mIsEntranceAnimationFinished = mHasAlreadyBeenOpened;
+        mWindowScrim = new ColorDrawable(SCRIM_COLOR);
+        mWindowScrim.setAlpha(0);
+        getWindow().setBackgroundDrawable(mWindowScrim);
 
         /*
         mContactCard = (ExpandingEntryCardView) findViewById(R.id.communication_card);
@@ -141,35 +216,18 @@ public class FeedActivity extends Activity {
         mAboutCard.setOnClickListener(mEntryClickHandler);
         mAboutCard.setOnCreateContextMenuListener(mEntryContextMenuListener);
 
-        mPhotoView = (QuickContactImageView) findViewById(R.id.photo);
-        final View transparentView = findViewById(R.id.transparent_view);
-        if (mScroller != null) {
-            transparentView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mScroller.scrollOffBottom();
-                }
-            });
-        }*/
-
         // Allow a shadow to be shown under the toolbar.
         //ViewUtil.addRectangularOutlineProvider(findViewById(R.id.toolbar_parent), getResources());
 
         /*
-        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setActionBar(toolbar);
-        getActionBar().setTitle(null);
-        // Put a TextView with a known resource id into the ActionBar. This allows us to easily
-        // find the correct TextView location & size later.
-        toolbar.addView(getLayoutInflater().inflate(R.layout.quickcontact_title_placeholder, null));
 
-        mHasAlreadyBeenOpened = savedInstanceState != null;
-        mIsEntranceAnimationFinished = mHasAlreadyBeenOpened;
-        mWindowScrim = new ColorDrawable(SCRIM_COLOR);
-        mWindowScrim.setAlpha(0);
-        getWindow().setBackgroundDrawable(mWindowScrim);
         */
         mScroller.initialize(mMultiShrinkScrollerListener, mExtraMode == MODE_FULLY_EXPANDED);
+
+        PaletteObservable.registerListener(this);
+        Palette palette = PaletteCache.get(mSubscription.getImageURL());
+        onPaletteFound(palette);
+
         // mScroller needs to perform asynchronous measurements after initalize(), therefore
         // we can't mark this as GONE.
         //mScroller.setVisibility(View.INVISIBLE);
@@ -232,7 +290,13 @@ public class FeedActivity extends Activity {
                     });
         }
 
-        //Trace.endSection();
+        Trace.endSection();
+    }
+
+    private void processIntent(Intent argIntent) {
+        Bundle b = getIntent().getExtras();
+        long value = b.getLong(SUBSCRIPTION_ID_KEY);
+        mSubscription = Subscription.getById(getContentResolver(), value);
     }
 
     @TargetApi(21)
@@ -253,5 +317,17 @@ public class FeedActivity extends Activity {
         animation.setDuration(ANIMATION_STATUS_BAR_COLOR_CHANGE_DURATION);
         animation.setEvaluator(new ArgbEvaluator());
         animation.start();
+    }
+
+    @Override
+    public void onPaletteFound(Palette argChangedPalette) {
+        if (argChangedPalette != null && argChangedPalette.getVibrantSwatch() != null) {
+            mScroller.setHeaderTintColor(argChangedPalette.getVibrantSwatch().getRgb());
+        }
+    }
+
+    @Override
+    public String getPaletteUrl() {
+        return mSubscription.getImageURL();
     }
 }

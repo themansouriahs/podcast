@@ -1,19 +1,14 @@
 package org.bottiger.podcast;
 
-import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 
 import org.bottiger.podcast.provider.Subscription;
@@ -111,6 +106,11 @@ public class ViewPagerSubscriptionFragment extends Fragment implements BackButto
 
 
         Intent intent = new Intent(getActivity(), FeedActivity.class);
+
+        Bundle b = new Bundle();
+        b.putLong(FeedActivity.SUBSCRIPTION_ID_KEY, id); //Your id
+        intent.putExtras(b); //Put your id to your next Intent
+
         startActivity(intent);
 
 

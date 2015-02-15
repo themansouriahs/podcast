@@ -96,7 +96,7 @@ public class MultiShrinkScroller extends FrameLayout {
     private ScrollView mScrollView;
     private View mScrollViewChild;
     private View mToolbar;
-    private ImageView mPhotoView; // QuickContactImageView
+    private QuickFeedImage mPhotoView; // QuickContactImageView
     private View mPhotoViewContainer;
     private View mTransparentView;
     private MultiShrinkScrollerListener mListener;
@@ -265,13 +265,13 @@ public class MultiShrinkScroller extends FrameLayout {
      * This method must be called inside the Activity's OnCreate.
      */
     public void initialize(MultiShrinkScrollerListener listener, boolean isOpenContactSquare) {
-        mScrollView = (ScrollView) findViewById(R.id.feed_scrollview);
+        mScrollView = (ScrollView) findViewById(R.id.content_scroller);
         mScrollViewChild = findViewById(R.id.feed_scrollviewChild);
         mToolbar = findViewById(R.id.toolbar_parent);
         mPhotoViewContainer = findViewById(R.id.toolbar_parent);
         mTransparentView = findViewById(R.id.transparent_view); // background_gradient
-        mLargeTextView = (TextView) findViewById(R.id.feed_title);
-        mInvisiblePlaceholderTextView = (TextView) findViewById(R.id.feed_title);
+        mLargeTextView = (TextView) findViewById(R.id.feedview_title);
+        mInvisiblePlaceholderTextView = (TextView) findViewById(R.id.feedview_title);
         mStartColumn = findViewById(R.id.empty_start_column);
         // Touching the empty space should close the card
         if (mStartColumn != null) {
@@ -893,7 +893,7 @@ public class MultiShrinkScroller extends FrameLayout {
      * allow the the ScrollView to scroll unless there is new content off of the edge of ScrollView.
      */
     private int getFullyCompressedHeaderHeight() {
-        return Math.min(Math.max(mToolbar.getLayoutParams().height - getOverflowingChildViewSize(),
+        return Math.min(Math.min(mToolbar.getLayoutParams().height - getOverflowingChildViewSize(), // FIXME min max, not min min
                 mMinimumHeaderHeight), getMaximumScrollableHeaderHeight());
     }
 
@@ -1114,7 +1114,7 @@ public class MultiShrinkScroller extends FrameLayout {
         mPhotoView.setColorFilter(new ColorMatrixColorFilter(mColorMatrix));
         // Tell the photo view what tint we are trying to achieve. Depending on the type of
         // drawable used, the photo view may or may not use this tint.
-        //mPhotoView.setTint(mHeaderTintColor); FIXME
+        mPhotoView.setTint(mHeaderTintColor); //FIXME
 
         final int gradientAlpha = (int) (255 * linearBeforeMiddle);
         mTitleGradientDrawable.setAlpha(gradientAlpha);
@@ -1290,6 +1290,6 @@ public class MultiShrinkScroller extends FrameLayout {
     }
 
     public boolean isBasedOffLetterTile(@NonNull View argView) {
-        return argView instanceof ImageView;
+        return false; //return argView instanceof ImageView;
     }
 }

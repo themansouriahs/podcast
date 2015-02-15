@@ -43,6 +43,7 @@ public class QuickFeedImage extends ImageView {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
+
     public void setTint(int color) {
         if (mBitmapDrawable == null || mBitmapDrawable.getBitmap() == null
                 || mBitmapDrawable.getBitmap().hasAlpha()) {
@@ -66,10 +67,18 @@ public class QuickFeedImage extends ImageView {
     public void setImageDrawable(Drawable drawable) {
         // There is no way to avoid all this casting. Blending modes aren't equally
         // supported for all drawable types.
-        final BitmapDrawable bitmapDrawable;
+        BitmapDrawable bitmapDrawable;
+
+        bitmapDrawable = (BitmapDrawable) drawable;
+
+        if (bitmapDrawable == null) {
+            bitmapDrawable = (BitmapDrawable) getResources().getDrawable(
+                    R.drawable.generic_podcast);
+        }
+        /*
         if (drawable == null || drawable instanceof BitmapDrawable) {
             bitmapDrawable = (BitmapDrawable) drawable;
-        } else if (drawable instanceof DrawableContainer) {
+        } else if (drawable instanceof Drawable) {
             if (!mIsBusiness) {
                 bitmapDrawable = (BitmapDrawable) getResources().getDrawable(
                         R.drawable.generic_podcast);
@@ -79,13 +88,14 @@ public class QuickFeedImage extends ImageView {
             }
         } else {
             throw new IllegalArgumentException("Does not support this type of drawable");
-        }
+        }*/
 
         mOriginalDrawable = drawable;
         mBitmapDrawable = bitmapDrawable;
         setTint(mTintColor);
         super.setImageDrawable(bitmapDrawable);
     }
+
 
     @Override
     public Drawable getDrawable() {
