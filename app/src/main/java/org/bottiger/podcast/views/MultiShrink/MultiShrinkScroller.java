@@ -40,6 +40,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.views.FeedRecyclerView;
 
 /**
  * A custom {@link ViewGroup} that operates similarly to a {@link ScrollView}, except with multiple
@@ -93,7 +94,7 @@ public class MultiShrinkScroller extends FrameLayout {
     private boolean mIsBeingDragged = false;
     private boolean mReceivedDown = false;
 
-    private ScrollView mScrollView;
+    private FeedRecyclerView mScrollView;
     private View mScrollViewChild;
     private View mToolbar;
     private QuickFeedImage mPhotoView;
@@ -265,7 +266,7 @@ public class MultiShrinkScroller extends FrameLayout {
      * This method must be called inside the Activity's OnCreate.
      */
     public void initialize(MultiShrinkScrollerListener listener, boolean isOpenContactSquare) {
-        mScrollView = (ScrollView) findViewById(R.id.content_scroller);
+        mScrollView = (FeedRecyclerView) findViewById(R.id.feed_recycler_view);
         mScrollViewChild = findViewById(R.id.feed_scrollviewChild);
         mToolbar = findViewById(R.id.toolbar_parent);
         mPhotoViewContainer = findViewById(R.id.toolbar_parent);
