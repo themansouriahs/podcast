@@ -14,7 +14,8 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <org.bottiger.podcast.views.MultiShrink.QuickFeedImage
         android:id="@+id/photo"
@@ -48,10 +49,22 @@
     <!-- Need to set a non null background on Toolbar in order for MenuItem ripples to be drawn on
          this view, instead of another. This will *not* cause an additional draw since the
          background is transparent.-->
-    <Toolbar
+    <!--<Toolbar
         android:layout_width="match_parent"
         android:layout_height="?android:attr/actionBarSize"
         android:background="#00000000"
-        android:id="@+id/toolbar"/>
+        android:id="@+id/toolbar"/>-->
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/feed_view_toolbar"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_alignParentTop="true"
+        android:minHeight="?attr/actionBarSize">
+
+    </android.support.v7.widget.Toolbar>
+
+    <!--
+        android:background="?attr/colorPrimary"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"-->
 
 </merge>

@@ -12,12 +12,15 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Trace;
+import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Toolbar;
 
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
@@ -39,7 +42,7 @@ import org.bottiger.podcast.views.MultiShrink.SchedulingUtils;
 /**
  * Created by apl on 14-02-2015.
  */
-public class FeedActivity extends Activity implements PaletteListener {
+public class FeedActivity extends ActionBarActivity implements PaletteListener {
 
     public static final int MODE_FULLY_EXPANDED = 4;
 
@@ -193,9 +196,15 @@ public class FeedActivity extends Activity implements PaletteListener {
             });
         }
 
-        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setActionBar(toolbar);
-        getActionBar().setTitle(null);
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.feed_view_toolbar);
+        //setActionBar(toolbar);
+        //getActionBar().setTitle(null);
+
+        toolbar.setTitle(null);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+
 
         // Put a TextView with a known resource id into the ActionBar. This allows us to easily
         // find the correct TextView location & size later.
@@ -317,6 +326,18 @@ public class FeedActivity extends Activity implements PaletteListener {
         Bundle b = getIntent().getExtras();
         long value = b.getLong(SUBSCRIPTION_ID_KEY);
         mSubscription = Subscription.getById(getContentResolver(), value);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                //NavUtils.navigateUpFromSameTask(this);
+                mScroller.scrollOffBottom();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @TargetApi(21)
