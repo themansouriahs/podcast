@@ -25,6 +25,9 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.ListPreference;
+import android.preference.Preference;
+import android.preference.PreferenceGroup;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.view.View;
@@ -32,6 +35,8 @@ import android.view.View;
 public class SettingsActivity extends ToolbarActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
 	public static final String DARK_THEME_KEY = "pref_dark_theme";
+	public static final String KEY_FAST_FORWARD = "pref_player_forward_amount";
+	public static final String KEY_REWIND = "pref_player_backward_amount";
 	public static final String CLOUD_SUPPORT = "pref_cloud support";
 
 	public static final String HAPI_PREFS_FILE_NAME = "org.bottiger.podcast_preferences";
@@ -59,6 +64,20 @@ public class SettingsActivity extends ToolbarActivity implements SharedPreferenc
             }
         });
 	}
+	
+	@Override
+    protected void onResume() {
+        super.onResume();
+        // Set up a listener whenever a key changes
+        getPreferences().registerOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Unregister the listener whenever a key changes
+        getPreferences().unregisterOnSharedPreferenceChangeListener(this);
+    }
 
     @Override
     protected int getLayout() {
@@ -75,6 +94,7 @@ public class SettingsActivity extends ToolbarActivity implements SharedPreferenc
 			String key) {
 		if (key.equals(DARK_THEME_KEY)) {
 			recreate();
+			return;
 		}
 	}
 
