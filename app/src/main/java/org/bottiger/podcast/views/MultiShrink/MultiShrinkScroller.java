@@ -19,6 +19,7 @@ import android.os.Trace;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
@@ -33,7 +34,6 @@ import android.view.animation.Interpolator;
 import android.view.animation.PathInterpolator;
 import android.widget.EdgeEffect;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Scroller;
 import android.widget.ScrollView;
@@ -94,7 +94,7 @@ public class MultiShrinkScroller extends FrameLayout {
     private boolean mIsBeingDragged = false;
     private boolean mReceivedDown = false;
 
-    private FeedRecyclerView mScrollView;
+    private FeedRecyclerView mRecyclerView;
     private View mScrollViewChild;
     private View mToolbar;
     private QuickFeedImage mPhotoView;
@@ -262,11 +262,16 @@ public class MultiShrinkScroller extends FrameLayout {
         attributeArray.recycle();
     }
 
+    private int getTrackedYScroll() {
+        return overallYScrol;
+    }
+
+    private int overallYScrol = 0;
     /**
      * This method must be called inside the Activity's OnCreate.
      */
     public void initialize(MultiShrinkScrollerListener listener, boolean isOpenContactSquare) {
-        mScrollView = (FeedRecyclerView) findViewById(R.id.feed_recycler_view);
+        mRecyclerView = (FeedRecyclerView) findViewById(R.id.feed_recycler_view);
         mScrollViewChild = findViewById(R.id.feed_scrollviewChild);
         mToolbar = findViewById(R.id.toolbar_parent);
         mPhotoViewContainer = findViewById(R.id.toolbar_parent);
@@ -298,6 +303,18 @@ public class MultiShrinkScroller extends FrameLayout {
         mTitleGradientView.setBackground(mTitleGradientDrawable);
         mActionBarGradientView = findViewById(R.id.action_bar_gradient); // R.id.action_bar_gradient
         mActionBarGradientView.setBackground(mActionBarGradientDrawable);
+
+        mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                overallYScrol = overallYScrol + dy;
+
+                Log.i("check", "overall->" + overallYScrol);
+
+            }
+        });
 
         mPhotoTouchInterceptOverlay = findViewById(R.id.photo_touch_intercept_overlay);
         if (!mIsTwoPanel) {
@@ -501,8 +518,8 @@ public class MultiShrinkScroller extends FrameLayout {
             animator.setDuration(ExpandingEntryCardView.DURATION_EXPAND_ANIMATION_CHANGE_BOUNDS);
             animator.start();
             // Scroll nested scroll view to its top
-            if (mScrollView.getScrollY() != 0) {
-                ObjectAnimator.ofInt(mScrollView, "scrollY", -mScrollView.getScrollY()).start();
+            if (mRecyclerView.getScrollY() != 0) {
+                ObjectAnimator.ofInt(mRecyclerView, "scrollY", -mRecyclerView.getScrollY()).start();
             }
         }
     }
@@ -731,7 +748,7 @@ public class MultiShrinkScroller extends FrameLayout {
     public int getScroll() {
         return mTransparentStartHeight - getTransparentViewHeight()
                 + getMaximumScrollableHeaderHeight() - getToolbarHeight()
-                + mScrollView.getScrollY();
+                + getTrackedYScroll();
     }
 
     private int getMaximumScrollableHeaderHeight() {
@@ -752,7 +769,7 @@ public class MultiShrinkScroller extends FrameLayout {
     private int getScroll_ignoreOversizedHeaderForSnapping() {
         return mTransparentStartHeight - getTransparentViewHeight()
                 + Math.max(getMaximumScrollableHeaderHeight() - getToolbarHeight(), 0)
-                + mScrollView.getScrollY();
+                + getTrackedYScroll();
     }
 
     /**
@@ -776,7 +793,9 @@ public class MultiShrinkScroller extends FrameLayout {
         if (mScroller.computeScrollOffset()) {
             // Examine the fling results in order to activate EdgeEffect when we fling to the end.
             final int oldScroll = getScroll();
-            scrollTo(0, mScroller.getCurrY());
+            final int newScroll = mScroller.getCurrY();
+            scrollTo(0, newScroll);
+            Log.d("newScroll", newScroll + "");
             final int delta = mScroller.getCurrY() - oldScroll;
             final int distanceFromMaxScrolling = getMaximumScrollUpwards() - getScroll();
             if (delta > distanceFromMaxScrolling && distanceFromMaxScrolling > 0) {
@@ -787,9 +806,10 @@ public class MultiShrinkScroller extends FrameLayout {
                 // Keep on drawing until the animation has finished.
                 postInvalidateOnAnimation();
             }
+            /*
             if (mScroller.getCurrY() >= getMaximumScrollUpwards()) {
                 mScroller.abortAnimation();
-            }
+            }*/
         }
     }
 
@@ -812,7 +832,7 @@ public class MultiShrinkScroller extends FrameLayout {
             canvas.rotate(180, width, 0);
             if (mIsTwoPanel) {
                 // Only show the EdgeEffect on the bottom of the ScrollView.
-                mEdgeGlowBottom.setSize(mScrollView.getWidth(), height);
+                mEdgeGlowBottom.setSize(mRecyclerView.getWidth(), height);
                 if (isLayoutRtl()) {
                     canvas.translate(mPhotoViewContainer.getWidth(), 0);
                 }
@@ -886,7 +906,7 @@ public class MultiShrinkScroller extends FrameLayout {
             mToolbar.setLayoutParams(toolbarLayoutParams);
             delta -= originalValue - toolbarLayoutParams.height;
         }
-        mScrollView.scrollBy(0, delta);
+        mRecyclerView.scrollBy(0, delta);
     }
 
     /**
@@ -907,10 +927,11 @@ public class MultiShrinkScroller extends FrameLayout {
     }
 
     private void scrollDown(int delta) {
-        if (mScrollView.getScrollY() > 0) {
-            final int originalValue = mScrollView.getScrollY();
-            mScrollView.scrollBy(0, delta);
-            delta -= mScrollView.getScrollY() - originalValue;
+        if (getTrackedYScroll() > 0) {
+            final int originalValue = getTrackedYScroll();
+            mRecyclerView.scrollBy(0, delta);
+            //delta -= mRecyclerView.getScrollY() - originalValue;
+            delta -= getTrackedYScroll() - originalValue;
         }
         final ViewGroup.LayoutParams toolbarLayoutParams = mToolbar.getLayoutParams();
         if (toolbarLayoutParams.height < getMaximumScrollableHeaderHeight()) {
@@ -1253,10 +1274,10 @@ public class MultiShrinkScroller extends FrameLayout {
      */
     public void prepareForShrinkingScrollChild(int heightDelta) {
         // The Transition framework may suppress layout on the scene root and its children. If
-        // mScrollView has its layout suppressed, user scrolling interactions will not display
-        // correctly. By turning suppress off for mScrollView, mScrollView properly adjusts its
+        // mRecyclerView has its layout suppressed, user scrolling interactions will not display
+        // correctly. By turning suppress off for mRecyclerView, mRecyclerView properly adjusts its
         // graphics as the user scrolls during the transition.
-        //mScrollView.suppressLayout(false); // FIXME
+        //mRecyclerView.suppressLayout(false); // FIXME
 
         final int newEmptyScrollViewSpace = -getOverflowingChildViewSize() + heightDelta;
         if (newEmptyScrollViewSpace > 0 && !mIsTwoPanel) {
@@ -1269,10 +1290,10 @@ public class MultiShrinkScroller extends FrameLayout {
 
     public void prepareForExpandingScrollChild() {
         // The Transition framework may suppress layout on the scene root and its children. If
-        // mScrollView has its layout suppressed, user scrolling interactions will not display
-        // correctly. By turning suppress off for mScrollView, mScrollView properly adjusts its
+        // mRecyclerView has its layout suppressed, user scrolling interactions will not display
+        // correctly. By turning suppress off for mRecyclerView, mRecyclerView properly adjusts its
         // graphics as the user scrolls during the transition.
-        //mScrollView.suppressLayout(false); // FIXME
+        //mRecyclerView.suppressLayout(false); // FIXME
     }
 
     private boolean isLayoutRtl() {
