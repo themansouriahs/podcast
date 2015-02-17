@@ -6,6 +6,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
@@ -15,6 +16,7 @@ import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
 import android.os.Trace;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -165,14 +167,14 @@ public class MultiShrinkScroller extends FrameLayout {
             0, 0, 0, 1, 0
     };
 
-    private final PathInterpolator mTextSizePathInterpolator
-            = new PathInterpolator(0.16f, 0.4f, 0.2f, 1);
+    private final PathInterpolatorCompat mTextSizePathInterpolator
+            = new PathInterpolatorCompat(0.16f, 0.4f, 0.2f, 1);
     /**
      * Interpolator that starts and ends with nearly straight segments. At x=0 it has a y of
      * approximately 0.25. We only want the contact photo 25% faded when half collapsed.
      */
-    private final PathInterpolator mWhiteBlendingPathInterpolator
-            = new PathInterpolator(1.0f, 0.4f, 0.9f, 0.8f);
+    private final PathInterpolatorCompat mWhiteBlendingPathInterpolator
+            = new PathInterpolatorCompat(1.0f, 0.4f, 0.9f, 0.8f);
 
     private final int[] mGradientColors = new int[] {0,0xAA000000};
     private final int[] mTitleGradientColors = new int[] {0,0xEE000000};
@@ -486,7 +488,9 @@ public class MultiShrinkScroller extends FrameLayout {
                     if (delta > distanceFromMaxScrolling) {
                         // The ScrollView is being pulled upwards while there is no more
                         // content offscreen, and the view port is already fully expanded.
-                        mEdgeGlowBottom.onPull(delta / getHeight(), 1 - event.getX() / getWidth());
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            mEdgeGlowBottom.onPull(delta / getHeight(), 1 - event.getX() / getWidth());
+                        }
                     }
 
                     if (!mEdgeGlowBottom.isFinished()) {
@@ -509,9 +513,12 @@ public class MultiShrinkScroller extends FrameLayout {
     public void setHeaderTintColor(int color) {
         mHeaderTintColor = color;
         updatePhotoTintAndDropShadow();
-        // We want to use the same amount of alpha on the new tint color as the previous tint color.
-        final int edgeEffectAlpha = Color.alpha(mEdgeGlowBottom.getColor());
-        mEdgeGlowBottom.setColor((color & 0xffffff) | Color.argb(edgeEffectAlpha, 0, 0, 0));
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // We want to use the same amount of alpha on the new tint color as the previous tint color.
+            final int edgeEffectAlpha = Color.alpha(mEdgeGlowBottom.getColor());
+            mEdgeGlowBottom.setColor((color & 0xffffff) | Color.argb(edgeEffectAlpha, 0, 0, 0));
+        }
     }
 
     /**
@@ -1043,7 +1050,12 @@ public class MultiShrinkScroller extends FrameLayout {
      * Interpolate the title's margin size. When {@param x}=1, use the maximum title margins.
      * When {@param x}=0, use the margin values taken from {@link #mInvisiblePlaceholderTextView}.
      */
+    @TargetApi(17)
     private void setInterpolatedTitleMargins(float x) {
+        if (Build.VERSION.SDK_INT < 17) {
+            return;
+        }
+
         final FrameLayout.LayoutParams titleLayoutParams
                 = (FrameLayout.LayoutParams) mLargeTextView.getLayoutParams();
         final LinearLayout.LayoutParams toolbarLayoutParams
@@ -1079,10 +1091,12 @@ public class MultiShrinkScroller extends FrameLayout {
     }
 
     private void updatePhotoTintAndDropShadow() {
-        // Let's keep an eye on how long this method takes to complete. Right now, it takes ~0.2ms
-        // on a Nexus 5. If it starts to get much slower, there are a number of easy optimizations
-        // available.
-        Trace.beginSection("updatePhotoTintAndDropShadow");
+        if (Build.VERSION.SDK_INT >= 18) {
+            // Let's keep an eye on how long this method takes to complete. Right now, it takes ~0.2ms
+            // on a Nexus 5. If it starts to get much slower, there are a number of easy optimizations
+            // available.
+            Trace.beginSection("updatePhotoTintAndDropShadow");
+        }
 
         if (mIsTwoPanel && !isBasedOffLetterTile(mPhotoView)) {
             // When in two panel mode, UX considers photo tinting unnecessary for non letter
@@ -1096,10 +1110,12 @@ public class MultiShrinkScroller extends FrameLayout {
         // params can be updated before the height change is reflected inside the View#getHeight().
         final int toolbarHeight = getToolbarHeight();
 
-        if (toolbarHeight <= mMinimumHeaderHeight && !mIsTwoPanel) {
-            mPhotoViewContainer.setElevation(mToolbarElevation);
-        } else {
-            mPhotoViewContainer.setElevation(0);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (toolbarHeight <= mMinimumHeaderHeight && !mIsTwoPanel) {
+                mPhotoViewContainer.setElevation(mToolbarElevation);
+            } else {
+                mPhotoViewContainer.setElevation(0);
+            }
         }
 
         // Reuse an existing mColorFilter (to avoid GC pauses) to change the photo's tint.
@@ -1158,7 +1174,9 @@ public class MultiShrinkScroller extends FrameLayout {
         mTitleGradientDrawable.setAlpha(gradientAlpha);
         mActionBarGradientDrawable.setAlpha(gradientAlpha);
 
-        Trace.endSection();
+        if (Build.VERSION.SDK_INT >= 18) {
+            Trace.endSection();
+        }
     }
 
     private float calculateHeightRatio(int height) {
@@ -1313,7 +1331,11 @@ public class MultiShrinkScroller extends FrameLayout {
     }
 
     private boolean isLayoutRtl() {
-        return (getLayoutDirection() == LAYOUT_DIRECTION_RTL);
+        if (Build.VERSION.SDK_INT >= 17) {
+            return (getLayoutDirection() == LAYOUT_DIRECTION_RTL);
+        }
+
+        return true;
     }
 
     private Rect getBoundsOnScreen(View view) {

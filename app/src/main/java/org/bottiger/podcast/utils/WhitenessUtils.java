@@ -2,6 +2,7 @@ package org.bottiger.podcast.utils;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Trace;
 
 /**
@@ -37,7 +38,9 @@ public class WhitenessUtils {
      * of the image is white.
      */
     public static boolean isBitmapWhiteAtTopOrBottom(Bitmap largeBitmap) {
-        Trace.beginSection("isBitmapWhiteAtTopOrBottom");
+        if (Build.VERSION.SDK_INT >= 18) {
+            Trace.beginSection("isBitmapWhiteAtTopOrBottom");
+        }
         try {
             final Bitmap smallBitmap = scaleBitmapDown(largeBitmap);
 
@@ -79,7 +82,9 @@ public class WhitenessUtils {
 
             return whiteCount / (float) totalPixels > PROPORTION_WHITE_CUTOFF;
         } finally {
-            Trace.endSection();
+            if (Build.VERSION.SDK_INT >= 18) {
+                Trace.endSection();
+            }
         }
     }
 

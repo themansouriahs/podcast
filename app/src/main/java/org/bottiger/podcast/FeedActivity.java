@@ -10,6 +10,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Trace;
 import android.support.v7.app.ActionBarActivity;
@@ -157,14 +158,17 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
     };
 
     @Override
-    @TargetApi(21)
     protected void onCreate(Bundle savedInstanceState) {
-        Trace.beginSection("onCreate()");
+        if (Build.VERSION.SDK_INT >= 18) {
+            Trace.beginSection("onCreate()");
+        }
         mSubscription = null;
 
         super.onCreate(savedInstanceState);
 
-        getWindow().setStatusBarColor(Color.TRANSPARENT);
+        if (Build.VERSION.SDK_INT >= 21) {
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
+        }
 
         processIntent(getIntent());
 
@@ -333,7 +337,9 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
                     });
         }
 
-        Trace.endSection();
+        if (Build.VERSION.SDK_INT >= 18) {
+            Trace.endSection();
+        }
     }
 
     private void processIntent(Intent argIntent) {
