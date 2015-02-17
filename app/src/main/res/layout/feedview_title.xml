@@ -28,6 +28,7 @@
     android:textSize="@dimen/quickcontact_maximum_title_size"
     android:textAlignment="viewStart"
     android:ellipsize="end"
+    android:singleLine="true"
     android:importantForAccessibility="no"
     android:id="@+id/feedview_title"/>
 

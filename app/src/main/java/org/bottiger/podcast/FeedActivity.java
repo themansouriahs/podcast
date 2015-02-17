@@ -3,16 +3,15 @@ package org.bottiger.podcast;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Trace;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
@@ -22,19 +21,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 
-import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import org.bottiger.podcast.adapters.FeedViewAdapter;
-import org.bottiger.podcast.images.PicassoWrapper;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.playlist.FeedCursorLoader;
 import org.bottiger.podcast.playlist.ReorderCursor;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.PaletteCache;
+import org.bottiger.podcast.utils.WhitenessUtils;
 import org.bottiger.podcast.views.FeedRecyclerView;
+import org.bottiger.podcast.views.FloatingActionButton;
 import org.bottiger.podcast.views.MultiShrink.MultiShrinkScroller;
 import org.bottiger.podcast.views.MultiShrink.QuickFeedImage;
 import org.bottiger.podcast.views.MultiShrink.SchedulingUtils;
@@ -77,9 +76,12 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
     private int mExtraMode = MODE_FULLY_EXPANDED;
     private boolean mHasAlreadyBeenOpened;
 
+    private boolean mExpandedLayout = false;
+
     private QuickFeedImage mPhotoView;
     private RecyclerView mRecyclerView;
-    private MultiShrinkScroller mScroller;
+    private MultiShrinkScroller mMultiShrinkScroller;
+    private FloatingActionButton mFloatingButton;
     private FeedViewAdapter mAdapter;
     private FeedCursorLoader mCursorLoader;
     protected ReorderCursor mCursor = null;
@@ -140,6 +142,7 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
             BitmapDrawable bd = new BitmapDrawable(getResources(), bitmap);
             //mPhotoView.setImageDrawable(bd);
             mPhotoView.setImageBitmap(bitmap);
+            analyzeWhitenessOfPhotoAsynchronously();
         }
 
         @Override
@@ -179,7 +182,17 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
 
 
         mPhotoView = (QuickFeedImage) findViewById(R.id.photo);
-        mScroller = (MultiShrinkScroller) findViewById(R.id.multiscroller);
+        mMultiShrinkScroller = (MultiShrinkScroller) findViewById(R.id.multiscroller);
+        mFloatingButton = (FloatingActionButton) findViewById(R.id.feedview_fap_button);
+
+
+        mFloatingButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mExpandedLayout = !mExpandedLayout;
+                mAdapter.setExpanded(mExpandedLayout);
+            }
+        });
 
 
         String url = mSubscription.getImageURL();
@@ -187,11 +200,11 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
         Picasso.with(this).load(url).into(target);
 
         final View transparentView = findViewById(R.id.transparent_view);
-        if (mScroller != null) {
+        if (mMultiShrinkScroller != null) {
             transparentView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mScroller.scrollOffBottom();
+                    mMultiShrinkScroller.scrollOffBottom();
                 }
             });
         }
@@ -251,15 +264,16 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
         /*
 
         */
-        mScroller.initialize(mMultiShrinkScrollerListener, mExtraMode == MODE_FULLY_EXPANDED);
+        mMultiShrinkScroller.initialize(mMultiShrinkScrollerListener, mExtraMode == MODE_FULLY_EXPANDED);
+        mMultiShrinkScroller.setTitle(mSubscription.getTitle());
 
         PaletteObservable.registerListener(this);
         Palette palette = PaletteCache.get(mSubscription.getImageURL());
         onPaletteFound(palette);
 
-        // mScroller needs to perform asynchronous measurements after initalize(), therefore
+        // mMultiShrinkScroller needs to perform asynchronous measurements after initalize(), therefore
         // we can't mark this as GONE.
-        //mScroller.setVisibility(View.INVISIBLE);
+        //mMultiShrinkScroller.setVisibility(View.INVISIBLE);
 
         /*
         setHeaderNameText(R.string.missing_name);
@@ -274,7 +288,7 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
         }
         mSelectAccountFragmentListener.setQuickContactActivity(this);
         */
-        SchedulingUtils.doOnPreDraw(mScroller, /* drawNextFrame = */ true,
+        SchedulingUtils.doOnPreDraw(mMultiShrinkScroller, /* drawNextFrame = */ true,
                 new Runnable() {
                     @Override
                     public void run() {
@@ -282,7 +296,7 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
                             // The initial scrim opacity must match the scrim opacity that would be
                             // achieved by scrolling to the starting position.
                             final float alphaRatio = mExtraMode == MODE_FULLY_EXPANDED ?
-                                    1 : mScroller.getStartingTransparentHeightRatio();
+                                    1 : mMultiShrinkScroller.getStartingTransparentHeightRatio();
                             final int duration = getResources().getInteger(
                                     android.R.integer.config_shortAnimTime);
                             final int desiredAlpha = (int) (0xFF * alphaRatio);
@@ -296,15 +310,15 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
 
         if (savedInstanceState != null) {
             final int color = savedInstanceState.getInt(KEY_THEME_COLOR, 0);
-            SchedulingUtils.doOnPreDraw(mScroller, /* drawNextFrame = */ false,
+            SchedulingUtils.doOnPreDraw(mMultiShrinkScroller, /* drawNextFrame = */ false,
                     new Runnable() {
                         @Override
                         public void run() {
                             // Need to wait for the pre draw before setting the initial scroll
                             // value. Prior to pre draw all scroll values are invalid.
                             if (mHasAlreadyBeenOpened) {
-                                mScroller.setVisibility(View.VISIBLE);
-                                mScroller.setScroll(mScroller.getScrollNeededToBeFullScreen());
+                                mMultiShrinkScroller.setVisibility(View.VISIBLE);
+                                mMultiShrinkScroller.setScroll(mMultiShrinkScroller.getScrollNeededToBeFullScreen());
                             }
                             // Need to wait for pre draw for setting the theme color. Setting the
                             // header tint before the MultiShrinkScroller has been measured will
@@ -334,7 +348,7 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
             // Respond to the action bar's Up/Home button
             case android.R.id.home:
                 //NavUtils.navigateUpFromSameTask(this);
-                mScroller.scrollOffBottom();
+                mMultiShrinkScroller.scrollOffBottom();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -342,12 +356,12 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
 
     @TargetApi(21)
     private void updateStatusBarColor() {
-        if (mScroller == null) {
+        if (mMultiShrinkScroller == null) {
             return;
         }
         final int desiredStatusBarColor;
         // Only use a custom status bar color if QuickContacts touches the top of the viewport.
-        if (mScroller.getScrollNeededToBeFullScreen() <= 0) {
+        if (mMultiShrinkScroller.getScrollNeededToBeFullScreen() <= 0) {
             desiredStatusBarColor = mStatusBarColor;
         } else {
             desiredStatusBarColor = Color.TRANSPARENT;
@@ -363,12 +377,38 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
     @Override
     public void onPaletteFound(Palette argChangedPalette) {
         if (argChangedPalette != null && argChangedPalette.getVibrantSwatch() != null) {
-            mScroller.setHeaderTintColor(argChangedPalette.getVibrantSwatch().getRgb());
+            mMultiShrinkScroller.setHeaderTintColor(argChangedPalette.getVibrantSwatch().getRgb());
+            mFloatingButton.onPaletteFound(argChangedPalette);
         }
     }
 
     @Override
     public String getPaletteUrl() {
         return mSubscription.getImageURL();
+    }
+
+    /**
+     * Examine how many white pixels are in the bitmap in order to determine whether or not
+     * we need gradient overlays on top of the image.
+     */
+    private void analyzeWhitenessOfPhotoAsynchronously() {
+        final Drawable imageViewDrawable = mPhotoView.getDrawable();
+        new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                if (imageViewDrawable instanceof BitmapDrawable) {
+                    final Bitmap bitmap = ((BitmapDrawable) imageViewDrawable).getBitmap();
+                    return WhitenessUtils.isBitmapWhiteAtTopOrBottom(bitmap);
+                }
+                //return !(imageViewDrawable instanceof LetterTileDrawable);
+                return false;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean isWhite) {
+                super.onPostExecute(isWhite);
+                mMultiShrinkScroller.setUseGradient(isWhite);
+            }
+        }.execute();
     }
 }

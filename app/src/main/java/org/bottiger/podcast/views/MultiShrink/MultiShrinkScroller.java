@@ -35,12 +35,14 @@ import android.view.animation.PathInterpolator;
 import android.widget.EdgeEffect;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Scroller;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.views.FeedRecyclerView;
+import org.bottiger.podcast.views.FloatingActionButton;
 
 /**
  * A custom {@link ViewGroup} that operates similarly to a {@link ScrollView}, except with multiple
@@ -103,6 +105,7 @@ public class MultiShrinkScroller extends FrameLayout {
     private MultiShrinkScrollerListener mListener;
     private TextView mLargeTextView;
     private View mPhotoTouchInterceptOverlay;
+    private FloatingActionButton mFloatingActionButton;
     /** Contains desired location/size of the title, once the header is fully compressed */
     private TextView mInvisiblePlaceholderTextView;
     private View mTitleGradientView;
@@ -172,8 +175,9 @@ public class MultiShrinkScroller extends FrameLayout {
             = new PathInterpolator(1.0f, 0.4f, 0.9f, 0.8f);
 
     private final int[] mGradientColors = new int[] {0,0xAA000000};
+    private final int[] mTitleGradientColors = new int[] {0,0xEE000000};
     private GradientDrawable mTitleGradientDrawable = new GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM, mGradientColors);
+            GradientDrawable.Orientation.TOP_BOTTOM, mTitleGradientColors);
     private GradientDrawable mActionBarGradientDrawable = new GradientDrawable(
             GradientDrawable.Orientation.BOTTOM_TOP, mGradientColors);
 
@@ -279,6 +283,7 @@ public class MultiShrinkScroller extends FrameLayout {
         mLargeTextView = (TextView) findViewById(R.id.feedview_title);
         mInvisiblePlaceholderTextView = (TextView) findViewById(R.id.feedview_title);
         mStartColumn = findViewById(R.id.empty_start_column);
+        mFloatingActionButton = (FloatingActionButton)findViewById(R.id.feedview_fap_button);
         // Touching the empty space should close the card
         if (mStartColumn != null) {
             mStartColumn.setOnClickListener(new OnClickListener() {
@@ -301,7 +306,7 @@ public class MultiShrinkScroller extends FrameLayout {
 
         mTitleGradientView = findViewById(R.id.title_gradient);
         mTitleGradientView.setBackground(mTitleGradientDrawable);
-        mActionBarGradientView = findViewById(R.id.action_bar_gradient); // R.id.action_bar_gradient
+        mActionBarGradientView = findViewById(R.id.action_bar_gradient);
         mActionBarGradientView.setBackground(mActionBarGradientDrawable);
 
         mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -383,17 +388,18 @@ public class MultiShrinkScroller extends FrameLayout {
 
     private void configureGradientViewHeights() {
         final float GRADIENT_SIZE_COEFFICIENT = 1.25f;
-        final FrameLayout.LayoutParams actionBarGradientLayoutParams
-                = (FrameLayout.LayoutParams) mActionBarGradientView.getLayoutParams();
+        final float GRADIENT_SIZE_COEFFICIENT_TITLE = 3.25f;
+        final RelativeLayout.LayoutParams actionBarGradientLayoutParams
+                = (RelativeLayout.LayoutParams) mActionBarGradientView.getLayoutParams();
         actionBarGradientLayoutParams.height
                 = (int) (mActionBarSize * GRADIENT_SIZE_COEFFICIENT);
         mActionBarGradientView.setLayoutParams(actionBarGradientLayoutParams);
-        final FrameLayout.LayoutParams titleGradientLayoutParams
-                = (FrameLayout.LayoutParams) mTitleGradientView.getLayoutParams();
+        final RelativeLayout.LayoutParams titleGradientLayoutParams
+                = (RelativeLayout.LayoutParams) mTitleGradientView.getLayoutParams();
         final FrameLayout.LayoutParams largeTextLayoutParms
                 = (FrameLayout.LayoutParams) mLargeTextView.getLayoutParams();
         titleGradientLayoutParams.height = (int) ((mLargeTextView.getHeight()
-                + largeTextLayoutParms.bottomMargin) * GRADIENT_SIZE_COEFFICIENT);
+                + largeTextLayoutParms.bottomMargin) * GRADIENT_SIZE_COEFFICIENT_TITLE);
         mTitleGradientView.setLayoutParams(titleGradientLayoutParams);
     }
 
@@ -1060,6 +1066,15 @@ public class MultiShrinkScroller extends FrameLayout {
                 - mMaximumHeaderTextSize;
         titleLayoutParams.bottomMargin = 0;
         mLargeTextView.setLayoutParams(titleLayoutParams);
+
+        final FrameLayout.LayoutParams actionButtonLaoutParams = (LayoutParams) mFloatingActionButton.getLayoutParams();
+
+        actionButtonLaoutParams.topMargin = getTransparentViewHeight() + toolbarLayoutParams.height - mMaximumHeaderTextSize;
+                //+ toolbarLayoutParams.height - pretendBottomMargin
+                //- mMaximumHeaderTextSize;
+        actionButtonLaoutParams.topMargin += mFloatingActionButton.getHeight()/3; //actionButtonLaoutParams.height;
+        actionButtonLaoutParams.gravity = Gravity.RIGHT;
+        mFloatingActionButton.setLayoutParams(actionButtonLaoutParams);
     }
 
     private void updatePhotoTintAndDropShadow() {

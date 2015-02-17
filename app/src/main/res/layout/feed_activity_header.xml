@@ -34,26 +34,22 @@
 
     <!-- Overlays/gradients that can be used to make white text/buttons visible -->
     <View
-        android:id="@+id/title_gradient"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:layout_gravity="bottom" />
-    <View
         android:id="@+id/action_bar_gradient"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone"
         android:layout_gravity="top" />
+    <View
+        android:id="@+id/title_gradient"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_gravity="bottom"
+        android:layout_alignParentBottom="true"/>
 
     <!-- Need to set a non null background on Toolbar in order for MenuItem ripples to be drawn on
          this view, instead of another. This will *not* cause an additional draw since the
          background is transparent.-->
-    <!--<Toolbar
-        android:layout_width="match_parent"
-        android:layout_height="?android:attr/actionBarSize"
-        android:background="#00000000"
-        android:id="@+id/toolbar"/>-->
     <android.support.v7.widget.Toolbar
         android:id="@+id/feed_view_toolbar"
         android:layout_height="wrap_content"
@@ -62,9 +58,5 @@
         android:minHeight="?attr/actionBarSize">
 
     </android.support.v7.widget.Toolbar>
-
-    <!--
-        android:background="?attr/colorPrimary"
-        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"-->
 
 </merge>
