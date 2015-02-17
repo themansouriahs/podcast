@@ -154,11 +154,19 @@
     <string name="episode_description">Episode description</string>
     <string name="pref_continuously_playing">Continuously playing</string>
     <string name="pref_continuously_playing_description">When an episode end, start the next one automatically</string>
-    <string name="preferences_category_help">Help</string>
+    <string name="preferences_category_help">Help out</string>
     <string name="preferences_category_ui">User Interface</string>
     <string name="preferences_category_player">Player</string>
     <string name="preferences_category_network">Network</string>
     <string name="preferences_category_cloud">Cloud Support</string>
     <string name="preferences_category_advanced">Advanced</string>
+    <string name="pref_player_forward_amount_dialog_title">How much should the fast forward button go forward</string>
+    <string name="pref_player_backward_amount_dialog_title">How much should the rewind button go back</string>
+    <string name="pref_player_forward_amount_title">Fast forward</string>
+    <string name="pref_player_backward_amount_title">Rewind</string>
+    <string name="pref_player_forwards_amount_summary">Fast forward %s at the time</string>
+    <string name="pref_player_backwards_amount_summary">Rewind %s at the time</string>
+    <string name="pref_playback_category_title">Playback</string>
+    <string name="pref_notification_category_title">Notification</string>
 
 </resources>
