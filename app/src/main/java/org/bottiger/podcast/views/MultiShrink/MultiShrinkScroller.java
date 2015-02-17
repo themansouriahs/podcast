@@ -1065,6 +1065,7 @@ public class MultiShrinkScroller extends FrameLayout {
                 + toolbarLayoutParams.height - pretendBottomMargin
                 - mMaximumHeaderTextSize;
         titleLayoutParams.bottomMargin = 0;
+
         mLargeTextView.setLayoutParams(titleLayoutParams);
 
         final FrameLayout.LayoutParams actionButtonLaoutParams = (LayoutParams) mFloatingActionButton.getLayoutParams();
