@@ -360,7 +360,6 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
         return super.onOptionsItemSelected(item);
     }
 
-    @TargetApi(21)
     private void updateStatusBarColor() {
         if (mMultiShrinkScroller == null) {
             return;
@@ -372,12 +371,15 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
         } else {
             desiredStatusBarColor = Color.TRANSPARENT;
         }
+
         // Animate to the new color.
-        final ObjectAnimator animation = ObjectAnimator.ofInt(getWindow(), "statusBarColor",
-                getWindow().getStatusBarColor(), desiredStatusBarColor);
-        animation.setDuration(ANIMATION_STATUS_BAR_COLOR_CHANGE_DURATION);
-        animation.setEvaluator(new ArgbEvaluator());
-        animation.start();
+        if (Build.VERSION.SDK_INT >= 21) {
+            final ObjectAnimator animation = ObjectAnimator.ofInt(getWindow(), "statusBarColor",
+                    getWindow().getStatusBarColor(), desiredStatusBarColor);
+            animation.setDuration(ANIMATION_STATUS_BAR_COLOR_CHANGE_DURATION);
+            animation.setEvaluator(new ArgbEvaluator());
+            animation.start();
+        }
     }
 
     @Override

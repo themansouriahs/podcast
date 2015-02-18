@@ -19,6 +19,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Trace;
 import android.support.annotation.NonNull;
+import android.support.v4.view.MarginLayoutParamsCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -42,6 +43,7 @@ import android.widget.Scroller;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.views.FeedRecyclerView;
 import org.bottiger.podcast.views.FloatingActionButton;
@@ -1064,8 +1066,14 @@ public class MultiShrinkScroller extends FrameLayout {
         // Need to add more to margin start if there is a start column
         int startColumnWidth = mStartColumn == null ? 0 : mStartColumn.getWidth();
 
-        titleLayoutParams.setMarginStart((int) (mCollapsedTitleStartMargin * (1 - x)
-                + mMaximumTitleMargin * x) + startColumnWidth);
+        int marginStart = (int) (mCollapsedTitleStartMargin * (1 - x)
+                + mMaximumTitleMargin * x) + startColumnWidth;
+
+        if (Build.VERSION.SDK_INT >= 17) {
+            titleLayoutParams.setMarginStart(marginStart);
+        } else {
+            MarginLayoutParamsCompat.setMarginStart(titleLayoutParams, marginStart);
+        }
         // How offset the title should be from the bottom of the toolbar
         final int pretendBottomMargin =  (int) (mCollapsedTitleBottomMargin * (1 - x)
                 + mMaximumTitleMargin * x) ;
