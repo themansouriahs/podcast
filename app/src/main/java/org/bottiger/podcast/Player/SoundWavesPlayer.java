@@ -2,9 +2,11 @@ package org.bottiger.podcast.Player;
 
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -33,6 +35,8 @@ public class SoundWavesPlayer extends MediaPlayer {
 
     private boolean isPreparingMedia = false;
 
+    private SharedPreferences sharedpreferences;
+
     int bufferProgress = 0;
 
     int startPos = 0;
@@ -44,6 +48,7 @@ public class SoundWavesPlayer extends MediaPlayer {
         this.mAudioManager = (AudioManager) mPlayerService.getSystemService(Context.AUDIO_SERVICE);
         // mMediaPlayer.setWakeMode(PlayerService.this,
         // PowerManager.PARTIAL_WAKE_LOCK);
+        sharedpreferences = PreferenceManager.getDefaultSharedPreferences(mPlayerService.getApplicationContext());
     }
 
     public void setDataSourceAsync(String path, int startPos) {
@@ -136,6 +141,20 @@ public class SoundWavesPlayer extends MediaPlayer {
         if (argItem.equals(mPlayerService.getCurrentItem())) {
             mPlayerService.seek(0);
         }
+    }
+
+    public void fastForward(FeedItem argItem) {
+        if (mPlayerService == null)
+            return;
+
+        int fastForwardAmount = sharedpreferences.getInt("pref_player_forward_amount", 60);
+        long seekTo = mPlayerService.position() + fastForwardAmount*1000; // to ms
+
+        if (argItem.equals(mPlayerService.getCurrentItem())) {
+            mPlayerService.seek(seekTo);
+        }
+
+        argItem.setPosition(mPlayerService.getContentResolver(), seekTo);
     }
 
     /**

@@ -11,6 +11,7 @@
     <org.bottiger.podcast.views.DownloadButtonView
         android:id="@+id/download"
         android:padding="0dip"
+        android:src="@drawable/ic_fast_forward_white"
         style="@style/RightTopPlayerButton" />
 
     <org.bottiger.podcast.views.PlayerButtonView
@@ -23,7 +24,7 @@
     <org.bottiger.podcast.views.PlayerButtonView
         android:id="@+id/previous"
         android:padding="0dip"
-        android:src="?attr/previous_icon"
+        android:src="?attr/ic_rewind"
         android:layout_toLeftOf="@id/favorite"
         style="@style/TopPlayerButton" />
 

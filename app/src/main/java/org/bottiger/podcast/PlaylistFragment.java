@@ -76,6 +76,7 @@ public class PlaylistFragment extends GeastureFragment implements
     private PlayPauseImageView mPlayPauseButton;
     private PlayerSeekbar mPlayerSeekbar;
     private DownloadButtonView mPlayerDownloadButton;
+    private PlayerButtonView mForwardButton;
     private PlayerButtonView mBackButton;
     private PlayerButtonView mDownloadButton;
     private PlayerButtonView mFavoriteButton;
@@ -174,6 +175,7 @@ public class PlaylistFragment extends GeastureFragment implements
         mPlayerSeekbar          =    (PlayerSeekbar) mSwipeRefreshView.findViewById(R.id.player_progress);
         mPlayerDownloadButton   =    (DownloadButtonView) mSwipeRefreshView.findViewById(R.id.download);
         mBackButton = (PlayerButtonView)mSwipeRefreshView.findViewById(R.id.previous);
+        mForwardButton = (PlayerButtonView)mSwipeRefreshView.findViewById(R.id.fast_forward_button);
         mDownloadButton = (PlayerButtonView)mSwipeRefreshView.findViewById(R.id.download);
         mFavoriteButton = (PlayerButtonView)mSwipeRefreshView.findViewById(R.id.favorite);
 
@@ -255,6 +257,7 @@ public class PlaylistFragment extends GeastureFragment implements
     public void onPause() {
         PaletteObservable.unregisterListener(mPlayPauseButton);
         PaletteObservable.unregisterListener(mBackButton);
+        PaletteObservable.unregisterListener(mForwardButton);
         PaletteObservable.unregisterListener(mDownloadButton);
         PaletteObservable.unregisterListener(mFavoriteButton);
         super.onPause();
@@ -268,6 +271,7 @@ public class PlaylistFragment extends GeastureFragment implements
             if (item != null) {
                 mPlayPauseButton.setEpisodeId(item.getId());
                 mBackButton.setEpisodeId(item.getId());
+                mForwardButton.setEpisodeId(item.getId());
                 mDownloadButton.setEpisodeId(item.getId());
                 mFavoriteButton.setEpisodeId(item.getId());
             }
@@ -308,6 +312,7 @@ public class PlaylistFragment extends GeastureFragment implements
 
         mPlayPauseButton.setEpisodeId(item.getId());
         mBackButton.setEpisodeId(item.getId());
+        mForwardButton.setEpisodeId(item.getId());
         mDownloadButton.setEpisodeId(item.getId());
         mFavoriteButton.setEpisodeId(item.getId());
 
@@ -319,6 +324,15 @@ public class PlaylistFragment extends GeastureFragment implements
             public void onClick(View v) {
                 if (PodcastBaseFragment.mPlayerServiceBinder != null) {
                     PodcastBaseFragment.mPlayerServiceBinder.getPlayer().rewind(item);
+                }
+            }
+        });
+
+        mForwardButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (PodcastBaseFragment.mPlayerServiceBinder != null) {
+                    PodcastBaseFragment.mPlayerServiceBinder.getPlayer().fastForward(item);
                 }
             }
         });
@@ -337,6 +351,7 @@ public class PlaylistFragment extends GeastureFragment implements
         if (palette != null) {
             mPlayPauseButton.onPaletteFound(palette);
             mBackButton.onPaletteFound(palette);
+            mForwardButton.onPaletteFound(palette);
             mDownloadButton.onPaletteFound(palette);
             mFavoriteButton.onPaletteFound(palette);
         }

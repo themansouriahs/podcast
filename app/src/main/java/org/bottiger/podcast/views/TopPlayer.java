@@ -1,28 +1,14 @@
 package org.bottiger.podcast.views;
 
-import android.animation.AnimatorSet;
-import android.animation.TimeInterpolator;
-import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
-import android.transition.Scene;
-import android.transition.Transition;
-import android.transition.TransitionManager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.DecelerateInterpolator;
-import android.view.animation.Transformation;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 
@@ -70,8 +56,11 @@ public class TopPlayer extends RelativeLayout {
     private View mEpisodeInfo;
     private View mPhoto;
     private View mPlayPauseButton;
-    private View mSeekbar;
+    private View mSeekbarContainer;
 
+    private PlayerSeekbar mSeekbar;
+
+    private View mForwardButton;
     private View mBackButton;
     private View mDownloadButton;
     private View mQueueButton;
@@ -149,17 +138,19 @@ public class TopPlayer extends RelativeLayout {
         mPlayPauseButton = findViewById(R.id.play_pause_button);
         mEpisodeText = findViewById(R.id.episode_title);
         mEpisodeInfo = findViewById(R.id.episode_info);
-        mSeekbar = findViewById(R.id.player_progress);
+        mSeekbarContainer = findViewById(R.id.player_progress);
+        mForwardButton = findViewById(R.id.fast_forward_button);
         mBackButton = findViewById(R.id.previous);
         mDownloadButton = findViewById(R.id.download);
         mQueueButton = findViewById(R.id.queue);
         mFavoriteButton = findViewById(R.id.bookmark);
 
+        mSeekbar = (PlayerSeekbar) findViewById(R.id.player_progress);
         mPlayerButtons = (RelativeLayout) findViewById(R.id.player_buttons);
 
         mPlayPauseLargeSize = mPlayPauseButton.getLayoutParams().height;
 
-        PaletteObservable.registerListener((PlayerSeekbar)mSeekbar);
+        PaletteObservable.registerListener(mSeekbar);
 
         mLargeLayout.SeekBarLeftMargin = 0;
         mLargeLayout.PlayPauseSize = mPlayPauseLargeSize;
@@ -196,6 +187,7 @@ public class TopPlayer extends RelativeLayout {
 
         mPlayerControlsLinearLayout.setTranslationY(-trans);
         mPlayPauseButton.setTranslationY(-trans);
+        mForwardButton.setTranslationY(-trans);
 
         minimalEnsured = true;
     }
@@ -224,6 +216,7 @@ public class TopPlayer extends RelativeLayout {
 
         mPlayerControlsLinearLayout.setTranslationY(0);
         mPlayPauseButton.setTranslationY(0);
+        mForwardButton.setTranslationY(0);
 
         maximumEnsured = true;
     }
@@ -258,17 +251,8 @@ public class TopPlayer extends RelativeLayout {
 
         mPlayerControlsLinearLayout.setTranslationY(-argOffset);
         mPlayPauseButton.setTranslationY(-argOffset);
-        mSeekbar.setTranslationY(-argOffset);
-
-        /*
-        int offset = -1;
-        if (argScreenHeight <= sizeMedium) {
-            Log.d("TopPlayer", "under medium size");
-            offset = sizeMedium - (int)maxScreenHeight;
-            //int buttonOffset = offset > mPlayerButtonsHeight ? mPlayerButtonsHeight : offset;
-            mPlayerControlsLinearLayout.setTranslationY(offset);
-            mPlayPauseButton.setTranslationY(offset);
-        }*/
+        mSeekbarContainer.setTranslationY(-argOffset);
+        mForwardButton.setTranslationY(-argOffset);
 
         String size = "large";
 
@@ -299,7 +283,7 @@ public class TopPlayer extends RelativeLayout {
     }
 
     public float setSeekbarVisibility(float argTopPlayerHeight) {
-        return setGenericVisibility(mSeekbar, sizeMedium, mSeekbarFadeDistancePx, argTopPlayerHeight);
+        return setGenericVisibility(mSeekbarContainer, sizeMedium, mSeekbarFadeDistancePx, argTopPlayerHeight);
     }
 
     public float setGenericVisibility(@NonNull View argView, int argVisibleHeight, int argFadeDistance, float argTopPlayerHeight) {
