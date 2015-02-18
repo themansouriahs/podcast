@@ -93,9 +93,9 @@ public class OkHttpDownloader extends DownloadEngineBase {
 
                 } catch (IOException e) {
                     onFailure(e);
+                } finally {
+                    mConnection.disconnect();
                 }
-
-                mConnection.disconnect();
             }
         };
         downloadingThread.start();
