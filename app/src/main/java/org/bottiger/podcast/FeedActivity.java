@@ -217,7 +217,7 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
         //setActionBar(toolbar);
         //getActionBar().setTitle(null);
 
-        toolbar.setTitle("");
+        toolbar.setTitle(mSubscription.getTitle());
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);

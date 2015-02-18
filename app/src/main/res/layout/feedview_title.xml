@@ -29,6 +29,7 @@
     android:textAlignment="viewStart"
     android:ellipsize="end"
     android:singleLine="true"
+    android:visibility="gone"
     android:importantForAccessibility="no"
     android:id="@+id/feedview_title"/>
 
