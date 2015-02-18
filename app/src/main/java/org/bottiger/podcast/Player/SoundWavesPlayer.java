@@ -147,8 +147,8 @@ public class SoundWavesPlayer extends MediaPlayer {
         if (mPlayerService == null)
             return;
 
-        int fastForwardAmount = sharedpreferences.getInt("pref_player_forward_amount", 60);
-        long seekTo = mPlayerService.position() + fastForwardAmount*1000; // to ms
+        String fastForwardAmount = sharedpreferences.getString("pref_player_forward_amount", "60");
+        long seekTo = mPlayerService.position() + Integer.parseInt(fastForwardAmount)*1000; // to ms
 
         if (argItem.equals(mPlayerService.getCurrentItem())) {
             mPlayerService.seek(seekTo);
