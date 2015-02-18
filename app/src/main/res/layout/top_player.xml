@@ -28,6 +28,7 @@
         android:textColor="@color/white_opaque"
         android:textSize="30dp"
         android:padding="5dp"
+        android:visibility="gone"
         android:layout_marginLeft="30dp"
         android:layout_marginRight="30dp"/>
 
@@ -52,17 +53,46 @@
         android:layout_width="90dp"
         android:layout_height="90dp"
         android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
+        android:layout_marginTop="5dp"
         android:layout_marginRight="20dp"
         android:layout_marginBottom="60dp"
         android:paddingLeft="14dip"
         android:padding="0dip"
         android:translationZ="20dp"
         android:elevation="8dp"/>
+
+    <org.bottiger.podcast.views.PlayerLinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/expanded_controls"
+        android:layout_marginTop="5dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:descendantFocusability="afterDescendants"
+        android:paddingTop="@dimen/padding_medium"
+        android:paddingLeft="@dimen/padding_medium"
+        android:orientation="vertical">
+
+        <include layout="@layout/top_player_buttons" />
+
+    </org.bottiger.podcast.views.PlayerLinearLayout>
+
+    <org.bottiger.podcast.views.PlayerSeekbar
+        android:id="@+id/player_progress"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/expanded_controls"
+        android:layout_marginBottom="10dp"
+        style="@style/tallerBarStyle"
+        />
+
     <!-- android:layout_marginTop="205dp" -->
     <!-- android:layout_above="@id/expanded_controls"-->
 
+    <!--
     <include layout="@layout/extended_player" />
+    -->
 
     <View
         android:layout_alignParentBottom="true"

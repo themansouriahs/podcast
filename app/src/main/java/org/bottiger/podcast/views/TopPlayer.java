@@ -191,8 +191,11 @@ public class TopPlayer extends RelativeLayout {
 
         translatePhotoY(mPhoto, trans);
 
-        mPlayerControlsLinearLayout.setTranslationY(sizeMedium-sizeSmall);
-        mPlayPauseButton.setTranslationY(sizeMedium-sizeSmall);
+        //mPlayerControlsLinearLayout.setTranslationY(sizeMedium-sizeSmall);
+        //mPlayPauseButton.setTranslationY(sizeMedium-sizeSmall);
+
+        mPlayerControlsLinearLayout.setTranslationY(-trans);
+        mPlayPauseButton.setTranslationY(-trans);
 
         minimalEnsured = true;
     }
@@ -253,23 +256,19 @@ public class TopPlayer extends RelativeLayout {
         mEpisodeText.setTranslationY(-argOffset);
         mEpisodeInfo.setTranslationY(-argOffset);
 
+        mPlayerControlsLinearLayout.setTranslationY(-argOffset);
+        mPlayPauseButton.setTranslationY(-argOffset);
+        mSeekbar.setTranslationY(-argOffset);
+
+        /*
         int offset = -1;
         if (argScreenHeight <= sizeMedium) {
-
-            /*
-            if (mPlayerButtonsHeight < 0) {
-                mPlayerButtonsHeight = mPlayerButtons.getHeight()-(int)UIUtils.convertPixelsToDp(50, mContext);
-
-                mSmallLayout.SeekBarLeftMargin = mPlayPauseButton.getLeft() + mSeekbar.getHeight();
-                mSmallLayout.PlayPauseSize = mSeekbar.getHeight();
-                mSmallLayout.PlayPauseBottomMargin = 0;
-            }*/
             Log.d("TopPlayer", "under medium size");
             offset = sizeMedium - (int)maxScreenHeight;
             //int buttonOffset = offset > mPlayerButtonsHeight ? mPlayerButtonsHeight : offset;
             mPlayerControlsLinearLayout.setTranslationY(offset);
             mPlayPauseButton.setTranslationY(offset);
-        }
+        }*/
 
         String size = "large";
 

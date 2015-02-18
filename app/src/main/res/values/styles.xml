@@ -163,6 +163,19 @@
         <item name="android:layout_marginRight">90dp</item>
     </style>
 
+    <style name="TopPlayerButton" parent="@style/PlaylistButton">
+        <item name="android:layout_above">@id/player_progress</item>
+        <item name="android:layout_width">70dip</item>
+        <item name="android:layout_marginBottom">32dp</item>
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:padding">5dp</item>
+    </style>
+
+    <style name="RightTopPlayerButton" parent="@style/TopPlayerButton">
+        <item name="android:layout_alignParentRight">true</item>
+        <item name="android:layout_marginRight">90dp</item>
+    </style>
+
     <style name="ForwardRewindButton" parent="@style/PodcastImage">
         <item name="android:layout_width">40dip</item>
         <item name="android:layout_weight">1</item>
