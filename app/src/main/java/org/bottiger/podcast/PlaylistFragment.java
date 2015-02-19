@@ -425,7 +425,7 @@ public class PlaylistFragment extends GeastureFragment implements
 			ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
 		MenuInflater inflater = mActivity.getMenuInflater();
-		inflater.inflate(R.menu.podcast_context, menu);
+		//inflater.inflate(R.menu.podcast_context, menu);
 		PlaylistFragment.setContextMenu(PLAYLIST_CONTEXT_MENU, this);
 	}
 

@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.bottiger.podcast.adapters.DrawerAdapter;
 import org.bottiger.podcast.adapters.PlaylistContentSpinnerAdapter;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.Subscription;
@@ -161,12 +160,6 @@ public abstract class DrawerActivity extends ToolbarActivity {
         parentItems = new ArrayList<String>(Arrays.asList(mListItems));
 		// setGroupParents();
 		setChildData();
-
-		DrawerAdapter adapter = new DrawerAdapter(parentItems, childItems);
-		adapter.setInflater(
-				(LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE),
-				this);
-
 
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapterSortOrder = ArrayAdapter.createFromResource(this,
