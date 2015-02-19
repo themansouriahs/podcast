@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
+import org.bottiger.podcast.flavors.AmazonAnalytics;
 import org.bottiger.podcast.flavors.Analytics;
 
 // Acra debugging
@@ -60,11 +61,13 @@ public class SoundWaves extends Application {
         if (!BuildConfig.DEBUG)
             ACRA.init(this);
 
-        if (BuildConfig.FLAVOR.toString() == "google") {
+        if (BuildConfig.FLAVOR.equals("google")) {
             Analytics analytics = new Analytics(this);
             analytics.startTracking();
+        } else if (BuildConfig.FLAVOR.equals("amazon")) {
+            AmazonAnalytics analytics = new AmazonAnalytics(this);
+            analytics.startTracking();
         }
-
         context = getApplicationContext();
     }
 

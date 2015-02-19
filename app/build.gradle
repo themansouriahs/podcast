@@ -91,6 +91,7 @@ dependencies {
 
     // Amazon version
     amazonCompile 'com.google.android.gms:play-services-base:6+' // analytics
+    amazonCompile fileTree(dir: 'src/amazon/libs', include: ['*.jar'])
 
     // Play Store
     googleCompile 'com.google.android.gms:play-services-base:6+' // analytics
