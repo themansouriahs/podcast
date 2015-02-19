@@ -309,9 +309,12 @@ public class MultiShrinkScroller extends FrameLayout {
         mPhotoView = (QuickFeedImage) findViewById(R.id.photo);
 
         mTitleGradientView = findViewById(R.id.title_gradient);
-        mTitleGradientView.setBackground(mTitleGradientDrawable);
         mActionBarGradientView = findViewById(R.id.action_bar_gradient);
-        mActionBarGradientView.setBackground(mActionBarGradientDrawable);
+
+        if (Build.VERSION.SDK_INT >= 16) {
+            mTitleGradientView.setBackground(mTitleGradientDrawable);
+            mActionBarGradientView.setBackground(mActionBarGradientDrawable);
+        }
 
         mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -495,8 +498,10 @@ public class MultiShrinkScroller extends FrameLayout {
                         }
                     }
 
-                    if (!mEdgeGlowBottom.isFinished()) {
-                        postInvalidateOnAnimation();
+                    if (Build.VERSION.SDK_INT >= 16) {
+                        if (!mEdgeGlowBottom.isFinished()) {
+                            postInvalidateOnAnimation();
+                        }
                     }
 
                 }
@@ -817,9 +822,11 @@ public class MultiShrinkScroller extends FrameLayout {
                 mEdgeGlowBottom.onAbsorb((int) mScroller.getCurrVelocity());
             }
 
-            if (!awakenScrollBars()) {
-                // Keep on drawing until the animation has finished.
-                postInvalidateOnAnimation();
+            if (Build.VERSION.SDK_INT >= 16) {
+                if (!awakenScrollBars()) {
+                    // Keep on drawing until the animation has finished.
+                    postInvalidateOnAnimation();
+                }
             }
             /*
             if (mScroller.getCurrY() >= getMaximumScrollUpwards()) {
@@ -854,8 +861,10 @@ public class MultiShrinkScroller extends FrameLayout {
             } else {
                 mEdgeGlowBottom.setSize(width, height);
             }
-            if (mEdgeGlowBottom.draw(canvas)) {
-                postInvalidateOnAnimation();
+            if (Build.VERSION.SDK_INT >= 16) {
+                if (mEdgeGlowBottom.draw(canvas)) {
+                    postInvalidateOnAnimation();
+                }
             }
             canvas.restoreToCount(restoreCount);
         }

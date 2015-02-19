@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.DrawableContainer;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
@@ -51,7 +52,9 @@ public class QuickFeedImage extends ImageView {
                 || mBitmapDrawable.getBitmap().hasAlpha()) {
             setBackgroundColor(color);
         } else {
-            setBackground(null);
+            if (Build.VERSION.SDK_INT >= 16) {
+                setBackground(null);
+            }
         }
         mTintColor = color;
         postInvalidate();
