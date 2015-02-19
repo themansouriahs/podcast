@@ -86,7 +86,20 @@ public class PlaylistContentSpinner extends MultiSpinner {
                 android.R.layout.simple_spinner_item,
                 new String[]{spinnerText});
         setAdapter(mAdapter);
-        listener.onItemsSelected(selected);
+
+        if (selected[0]) {
+            listener.onItemsSelected(new Long[0]);
+        }
+
+        LinkedList<Long> ids = new LinkedList<>();
+        for (int i = 0; i < selected.length-1; i++) {
+            Subscription sub = mSubscriptions.get(i);
+
+            if (selected[i])
+                ids.add(sub.getId());
+
+        }
+        listener.onItemsSelected(ids.toArray(new Long[ids.size()]));
     }
 
     public void setSubscriptions(List<Subscription> items, String allText,

@@ -32,18 +32,23 @@ public class Playlist implements OnDragStateChangedListener {
 	private static int MAX_SIZE = 20;
     private static Playlist activePlaylist = null;
 
+    public enum SORT_CRITERIA { DATE, POPULARITY};
+
 	private Context mContext;
 
+    private HashSet<Long> mSubscriptions = new HashSet<>();
 	private static ArrayList<FeedItem> mPlaylist = new ArrayList<FeedItem>();
 	private SharedPreferences sharedPreferences;
 
 	// Shared setting key/values
 	private String showListenedKey = ApplicationConfiguration.showListenedKey;
-	private Boolean showListenedVal = true;
+	private boolean showListenedVal = true;
 	private String inputOrderKey = "inputOrder";
 	private String defaultOrder = "DESC";
 	private String amountKey = "amountOfEpisodes";
 	private int amountValue = 20;
+
+    private SORT_CRITERIA mSortOrder = SORT_CRITERIA.DATE;
 
 	// http://stackoverflow.com/questions/1036754/difference-between-wait-and-sleep
 	private static Boolean lock = true;
@@ -269,7 +274,26 @@ public class Playlist implements OnDragStateChangedListener {
 				+ ItemColumns._ID + " from " + ItemColumns.TABLE_NAME
 				+ " order by " + ItemColumns.DATE + " desc limit 1)";
 
-		String sql = action + value + where + where2;
+        // Limit the playlist to a fixed number of subscriptions
+        String where3 = "";
+
+        synchronized (mSubscriptions) {
+            if (!mSubscriptions.isEmpty()) {
+                where3 += " " + ItemColumns.SUBS_ID + " IN (";
+            }
+
+            for (Long id : mSubscriptions) {
+                where3 += id + ",";
+            }
+
+            where3 = where3.substring(0,where3.length()-1); // FIXME: ugly
+
+            if (!mSubscriptions.isEmpty()) {
+                where3 += ")";
+            }
+        }
+
+		String sql = action + value + where + where2 + where3;
 
 		DatabaseHelper dbHelper = new DatabaseHelper();
 		dbHelper.executeSQL(mContext, sql, adapter);
@@ -420,5 +444,32 @@ public class Playlist implements OnDragStateChangedListener {
             //    });
             //}
         }
+    }
+
+    public void setSortOrder(SORT_CRITERIA argSortOrder) {
+        boolean isChanged = mSortOrder != argSortOrder;
+        mSortOrder = argSortOrder;
+
+        if (isChanged)
+            notifyDatabaseChanged();
+    }
+
+    public void setShowListened(boolean argShowListened) {
+        boolean isChanged = showListenedVal != argShowListened;
+        showListenedVal = argShowListened;
+
+        if (isChanged)
+            notifyDatabaseChanged();
+    }
+
+    public void addSubscriptionID(Long argID) {
+        if (mSubscriptions.contains(argID))
+            return;
+
+        mSubscriptions.add(argID);
+    }
+
+    public void clearSubscriptionID() {
+        mSubscriptions.clear();
     }
 }

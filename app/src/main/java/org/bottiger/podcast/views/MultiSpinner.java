@@ -70,7 +70,7 @@ public class MultiSpinner extends Spinner implements OnMultiChoiceClickListener,
                 android.R.layout.simple_spinner_item,
                 new String[]{spinnerText});
         setAdapter(adapter);
-        listener.onItemsSelected(selected);
+        //listener.onItemsSelected(selected);
     }
 
     @Override
@@ -109,6 +109,6 @@ public class MultiSpinner extends Spinner implements OnMultiChoiceClickListener,
     }
 
     public interface MultiSpinnerListener {
-        public void onItemsSelected(boolean[] selected);
+        public void onItemsSelected(Long[] selected);
     }
 }
