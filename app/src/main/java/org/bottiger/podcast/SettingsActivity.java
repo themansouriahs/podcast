@@ -47,7 +47,7 @@ public class SettingsActivity extends ToolbarActivity implements SharedPreferenc
 		// This is bizar, but works:
 		// http://stackoverflow.com/questions/11751498/how-to-change-preferenceactivity-theme
 		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(this);
+				.getDefaultSharedPreferences(this.getApplicationContext());
 		//setTheme(ThemeHelper.getTheme(prefs));
         setTheme(R.style.SoundWaves_PreferenceActivity_Light);
 

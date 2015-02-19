@@ -168,5 +168,7 @@
     <string name="pref_player_backwards_amount_summary">Rewind %s at the time</string>
     <string name="pref_playback_category_title">Playback</string>
     <string name="pref_notification_category_title">Notification</string>
+    <string name="preferences_category_about">About</string>
+    <string name="pref_current_version_title">Version</string>
 
 </resources>
