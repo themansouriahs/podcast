@@ -177,4 +177,9 @@
         <item>30</item>
         <item>60</item>
     </string-array>
+
+    <string-array name="playlist_sort_order">
+        <item>Sort by: Date</item>
+        <item>Sort by: Popularity</item>
+    </string-array>
 </resources>
