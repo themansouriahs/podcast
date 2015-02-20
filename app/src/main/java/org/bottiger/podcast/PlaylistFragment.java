@@ -38,6 +38,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -276,6 +277,7 @@ public class PlaylistFragment extends GeastureFragment implements
                 mFavoriteButton.setEpisodeId(item.getId());
             }
         }
+
         super.onResume();
     }
 
@@ -428,6 +430,13 @@ public class PlaylistFragment extends GeastureFragment implements
 		//inflater.inflate(R.menu.podcast_context, menu);
 		PlaylistFragment.setContextMenu(PLAYLIST_CONTEXT_MENU, this);
 	}
+
+    @Override
+    public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.playlist_actionbar, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+        return;
+    }
 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {

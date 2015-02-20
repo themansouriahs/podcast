@@ -318,7 +318,7 @@ public class MainActivity extends FragmentContainerActivity implements
 
 	@Override
 	public void onRefreshPlaylist() {
-		mSectionsPagerAdapter.refreshData(SectionsPagerAdapter.PLAYLIST);
+		//mSectionsPagerAdapter.refreshData(SectionsPagerAdapter.PLAYLIST);
 	}
 
 	@Override
@@ -355,6 +355,7 @@ public class MainActivity extends FragmentContainerActivity implements
 		ThemeHelper themeHelper = new ThemeHelper(this);
 
 		// The extended_player can only be playing if the PlayerService has been bound
+        /*
 		MenuItem menuItem = menu.findItem(R.id.menu_control);
 		if (PodcastBaseFragment.mPlayerServiceBinder != null) {
 
@@ -367,9 +368,9 @@ public class MainActivity extends FragmentContainerActivity implements
 			}
 		} else {
 			//menuItem.setVisible(false);
-		}
+		}*/
 
-		return true;
+		return super.onCreateOptionsMenu(menu);
 
 	}
 
@@ -379,11 +380,12 @@ public class MainActivity extends FragmentContainerActivity implements
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+            /*
 		case R.id.menu_control:
 			if (PodcastBaseFragment.mPlayerServiceBinder != null) {
 				PodcastBaseFragment.mPlayerServiceBinder.toggle();
 			}
-			return true;
+			return true;*/
 		case R.id.menu_add:
 			// mDriveUtils.driveAccount();
 			AddPodcastDialog.addPodcast(this);

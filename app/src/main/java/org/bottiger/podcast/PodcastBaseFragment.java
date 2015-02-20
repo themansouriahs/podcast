@@ -42,8 +42,6 @@ public abstract class PodcastBaseFragment extends Fragment {
 
 	protected CursorAdapter mCursorAdapter;
 
-	OnItemSelectedListener mListener;
-
 	protected final PodcastLog log = PodcastLog.getLog(getClass());
 
     private Playlist mPlaylist;
@@ -89,17 +87,6 @@ public abstract class PodcastBaseFragment extends Fragment {
 			// log.debug("onServiceDisconnected");
 		}
 	};
-
-	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		try {
-			mListener = (OnItemSelectedListener) activity;
-		} catch (ClassCastException e) {
-			throw new ClassCastException(activity.toString()
-					+ " must implement OnArticleSelectedListener");
-		}
-	}
 
     public RecyclerView getListView() {
         return currentView;

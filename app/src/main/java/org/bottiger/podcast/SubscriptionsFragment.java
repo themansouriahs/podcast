@@ -39,6 +39,7 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -46,6 +47,8 @@ import android.widget.Toast;
 
 import com.dragontek.mygpoclient.pub.PublicClient;
 import com.dragontek.mygpoclient.simple.IPodcast;
+
+import static android.support.v4.app.ActivityCompat.invalidateOptionsMenu;
 
 public class SubscriptionsFragment extends Fragment implements SubscriptionGridCursorAdapter.OnPopulateSubscriptionList {
 
@@ -79,7 +82,8 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
 
     private RelativeLayout mEmptySubscrptionList;
 
-    private Context mContext;
+    private Activity mContext;
+    private FrameLayout mContainerView;
 
 	long id;
 	
@@ -89,7 +93,6 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setHasOptionsMenu(true);
         mContext = getActivity();
 	}
 
@@ -98,9 +101,14 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
 			Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
 
-		fragmentView = inflater.inflate(getLayoutType(mDisplayLayout), container, false);
+        setHasOptionsMenu(true);
 
-        mEmptySubscrptionList = (RelativeLayout) container.findViewById(R.id.subscription_empty);
+        mContainerView = (FrameLayout)inflater.inflate(R.layout.subscription_container, container, false);
+        FrameLayout fragmentContainer = (FrameLayout)mContainerView.findViewById(R.id.subscription_fragment_container);
+
+		fragmentView = inflater.inflate(getLayoutType(), fragmentContainer, true);
+
+        mEmptySubscrptionList = (RelativeLayout) mContainerView.findViewById(R.id.subscription_empty);
         mEmptySubscrptionList.setVisibility(View.GONE);
 
 		mFragmentUtils = new FragmentUtils(getActivity(), fragmentView, this);
@@ -133,7 +141,8 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
 						if (mContentType.equals(ContentType.LOCAL))
 
                             if (mCLickListener == null) {
-                                ((MainActivity) activity).onItemSelected(sub.getId());
+                                //((MainActivity) activity).onItemSelected(sub.getId());
+                                FeedActivity.start(getActivity(), sub.getId());
                             } else {
                                 mCLickListener.onItemSelected(sub.getId());
                             }
@@ -148,7 +157,7 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
 
 		});
 
-		return fragmentView;
+		return mContainerView;
 	}
 
 	@Override
@@ -175,7 +184,9 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
 
 	@Override
 	public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
+
 		inflater.inflate(R.menu.subscription_actionbar, menu);
+
 
         SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
 	    searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -205,8 +216,10 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
 	        }
 
 	    });
+
 		
 		super.onCreateOptionsMenu(menu, inflater);
+        return;
 	}
 	
 	@Override
@@ -281,16 +294,8 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
 				+ ", " + SubscriptionColumns.TITLE + " ASC";
 	}
 
-	private int getLayoutType(LayoutType argDisplayLayout) {
-		if ((argDisplayLayout == LayoutType.GRID)) {
-            return R.layout.subscription_list;
-        }
-
-        if ((argDisplayLayout == LayoutType.FEED)) {
-            return R.layout.feed_view;
-        }
-
-        throw new IllegalStateException("Unexpected layout");
+	private int getLayoutType() {
+		return R.layout.subscription_list;
 	}
 
 	public CursorAdapter getAdapter() {

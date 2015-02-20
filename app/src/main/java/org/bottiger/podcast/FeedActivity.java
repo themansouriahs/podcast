@@ -3,6 +3,7 @@ package org.bottiger.podcast;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -13,6 +14,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Trace;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
@@ -156,6 +158,17 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
             return;
         }
     };
+
+
+    public static void start(@NonNull Activity argActivity, long argId) {
+        Intent intent = new Intent(argActivity, FeedActivity.class);
+
+        Bundle b = new Bundle();
+        b.putLong(FeedActivity.SUBSCRIPTION_ID_KEY, argId);
+        intent.putExtras(b);
+
+        argActivity.startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

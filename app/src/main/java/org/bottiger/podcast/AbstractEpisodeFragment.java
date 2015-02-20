@@ -70,6 +70,7 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 		prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 	}
 
+
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.episode_list, menu);
