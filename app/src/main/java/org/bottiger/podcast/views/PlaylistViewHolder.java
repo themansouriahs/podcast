@@ -1,27 +1,18 @@
 package org.bottiger.podcast.views;
 
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
-import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.eowise.recyclerview.stickyheaders.StickyHeadersAdapter;
 import com.squareup.picasso.Callback;
 
 import org.bottiger.podcast.R;
-import org.bottiger.podcast.adapters.ItemCursorAdapter;
+import org.bottiger.podcast.adapters.PlaylistAdapter;
 import org.bottiger.podcast.adapters.viewholders.ExpandableViewHoldersUtil;
-import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.provider.FeedItem;
-import org.bottiger.podcast.utils.PaletteCache;
 import org.bottiger.podcast.views.utils.PlaylistViewHolderExpanderHelper;
-
-import java.util.HashMap;
 
 /**
  * Created by apl on 30-07-2014.
@@ -31,7 +22,7 @@ import java.util.HashMap;
 public class PlaylistViewHolder extends RecyclerView.ViewHolder implements ExpandableViewHoldersUtil.Expandable, View.OnClickListener { //
 
     public FeedItem episode = null;
-    public ItemCursorAdapter mAdapter = null;
+    public PlaylistAdapter mAdapter = null;
 
     public RelativeLayoutWithBackground mLayout;
     public RelativeLayout mMainContainer;
@@ -116,13 +107,13 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
         boolean doAnimate = true;
 
         //int newType = viewHolder.mAdapter.toggleItem(viewHolder.episode.getId());
-        int newType = type == ItemCursorAdapter.TYPE_EXPAND ? ItemCursorAdapter.TYPE_COLLAPS : ItemCursorAdapter.TYPE_EXPAND;
+        int newType = type == PlaylistAdapter.TYPE_EXPAND ? PlaylistAdapter.TYPE_COLLAPS : PlaylistAdapter.TYPE_EXPAND;
 
 
         PlaylistViewHolderExpanderHelper helper = viewHolder.mAdapter.getExpanderHelper();
 
         helper.newAnimator();
-        if (newType == ItemCursorAdapter.TYPE_EXPAND) {
+        if (newType == PlaylistAdapter.TYPE_EXPAND) {
             if (helper.expandedView != null) {
                 helper.collapse(helper.expandedView, doAnimate);
             }

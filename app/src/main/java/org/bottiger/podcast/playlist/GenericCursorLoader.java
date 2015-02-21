@@ -10,10 +10,12 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Adapter;
 
 import org.bottiger.podcast.adapters.AbstractPodcastAdapter;
+import org.bottiger.podcast.adapters.FeedViewAdapter;
 import org.bottiger.podcast.service.PodcastDownloadManager;
 
 public abstract class GenericCursorLoader {
@@ -21,12 +23,12 @@ public abstract class GenericCursorLoader {
     final LoaderManager mSupportLoaderManager;
     final android.app.LoaderManager mLoaderManager;
     final Activity mActivity;
-    final AbstractPodcastAdapter mAdapter;
+    final FeedViewAdapter mAdapter;
 	
 	public void cursorPostProsessing(Cursor cursoer)
     {};
 
-	public GenericCursorLoader(Fragment fragment, AbstractPodcastAdapter adapter, Cursor cursor) {
+	public GenericCursorLoader(Fragment fragment, FeedViewAdapter adapter, Cursor cursor) {
 
         this.mLoaderManager = null;
         this.mSupportLoaderManager = fragment.getLoaderManager();
@@ -34,7 +36,7 @@ public abstract class GenericCursorLoader {
         this.mAdapter = adapter;
 	}
 
-    public GenericCursorLoader(Activity activity, AbstractPodcastAdapter adapter, Cursor cursor) {
+    public GenericCursorLoader(Activity activity, FeedViewAdapter adapter, Cursor cursor) {
 
         this.mLoaderManager = activity.getLoaderManager();
         this.mSupportLoaderManager = null;
@@ -94,7 +96,6 @@ public abstract class GenericCursorLoader {
 			// PodcastBaseFragment.this);
 			final Cursor wrapped_cursor = cursor; // getReorderCursor(cursor);
 
-			// mAdapter = getAdapter(wrapped_cursor);
 			mAdapter.setDataset(wrapped_cursor); //.changeCursor(wrapped_cursor);
             mAdapter.notifyDataSetChanged();
 
@@ -138,7 +139,6 @@ public abstract class GenericCursorLoader {
             // PodcastBaseFragment.this);
             final Cursor wrapped_cursor = data; // getReorderCursor(cursor);
 
-            // mAdapter = getAdapter(wrapped_cursor);
             mAdapter.setDataset(wrapped_cursor); //.changeCursor(wrapped_cursor);
             mAdapter.notifyDataSetChanged();
 

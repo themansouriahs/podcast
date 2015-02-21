@@ -2,6 +2,8 @@ package org.bottiger.podcast;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import org.acra.ACRA;
@@ -39,18 +41,9 @@ public class SoundWaves extends Application {
     // Google Analytics
     public static final String ANALYTICS_ID = "UA-59611883-1";
 
-	// Bugsense API Key.
-	// https://www.bugsense.com/dashboard/project/
-	public final String bugSenseAPIKey = "";
+    // Global constants
+    private Boolean mFirstRun = null;
 
-	// zubhium API Key.
-	public final String zubhiumAPIKey = "";
-
-	// Google API Key: https://code.google.com/apis/console/
-	// Get fingerprint like this:
-	// keytool -exportcert -alias androiddebugkey -keystore
-	// .android/debug.keystore -list -v
-	public final String googleReaderConsumerKey = "";
 
     @Override
     public void onCreate() {
@@ -66,21 +59,31 @@ public class SoundWaves extends Application {
         }
 
         context = getApplicationContext();
+
+        firstRun(context);
     }
 
     public static Context getAppContext() {
         return context;
     }
-	
-	public String getZubhiumAPIKey() {
-		return this.zubhiumAPIKey;
-	}
 
-	public String getBugSenseAPIKey() {
-		return this.bugSenseAPIKey;
-	}
+    private void firstRun(@NonNull Context argContext) {
+        SharedPreferences sharedPref = argContext.getSharedPreferences(packageName, Context.MODE_PRIVATE);
+        String key = getString(R.string.preference_first_run_key);
+        boolean firstRun = sharedPref.getBoolean(key, true);
+        if (firstRun) {
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putBoolean(key, false);
+            editor.commit();
+        }
+        mFirstRun = firstRun;
+    }
 
-	public String getGoogleReaderConsumerKey() {
-		return this.googleReaderConsumerKey;
-	}
+    public boolean IsFirstRun() {
+        if (mFirstRun == null) {
+            throw new IllegalStateException("First run can not be null!");
+        }
+
+        return mFirstRun.booleanValue();
+    }
 }

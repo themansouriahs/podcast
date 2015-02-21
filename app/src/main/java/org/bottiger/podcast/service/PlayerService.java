@@ -64,7 +64,7 @@ public class PlayerService extends Service implements
 
 	private static NextTrack nextTrack = NextTrack.NEXT_IN_PLAYLIST;
 	
-	private Playlist mPlaylist;
+	private static Playlist sPlaylist = new Playlist();;
 
 	public static final int PlayerService_STATUS = 1;
 
@@ -126,8 +126,8 @@ public class PlayerService extends Service implements
         wifiLock = ((WifiManager) getSystemService(Context.WIFI_SERVICE))
                 .createWifiLock(WifiManager.WIFI_MODE_FULL, LOCK_NAME);
 
-		mPlaylist = new Playlist(this);
-		mPlaylist.populatePlaylistIfEmpty();
+        sPlaylist.setContext(this);
+		sPlaylist.populatePlaylistIfEmpty();
 
         sPlayerHandler = new PlayerHandler(this);
 		
@@ -466,7 +466,7 @@ public class PlayerService extends Service implements
 	 * @return The ID of the next episode in the playlist
 	 */
 	public long getNextId() {
-		FeedItem next = mPlaylist.nextEpisode();
+		FeedItem next = sPlaylist.nextEpisode();
 		if (next != null)
 			return next.getId();
 		return -1;
@@ -576,5 +576,17 @@ public class PlayerService extends Service implements
 			return PlayerService.this;
 		}
 	}
+
+    public static synchronized Playlist getPlaylist() {
+        return getPlaylist(null);
+    }
+
+    public static synchronized Playlist getPlaylist(@Nullable Playlist.PlaylistChangeListener argListener) {
+        if (argListener != null) {
+            sPlaylist.registerPlaylistChangeListener(argListener);
+        }
+
+        return sPlaylist;
+    }
 
 }

@@ -111,7 +111,7 @@ public abstract class PodcastBaseFragment extends Fragment {
 		sharedPreferences = PreferenceManager
 				.getDefaultSharedPreferences(getActivity());
 
-        mPlaylist = new Playlist(getActivity(), 30, true);
+        mPlaylist = getPlaylist();
 	}
 
 	@Override
@@ -146,8 +146,9 @@ public abstract class PodcastBaseFragment extends Fragment {
 		FeedItem.clearCache();
 	}
 
+    @Deprecated
     public Playlist getPlaylist() {
-        return mPlaylist;
+        return PlayerService.getPlaylist(null);
     }
 
 	abstract String getWhere();
@@ -158,4 +159,11 @@ public abstract class PodcastBaseFragment extends Fragment {
 		String priorityOrder = "case when " + condition + " then 1 else 2 end";
 		return priorityOrder;
 	}
+
+    public static PlayerService getPlayerService() {
+        if (mPlayerServiceBinder == null) {
+            throw new IllegalStateException("What should we do here?");
+        }
+        return mPlayerServiceBinder;
+    }
 }

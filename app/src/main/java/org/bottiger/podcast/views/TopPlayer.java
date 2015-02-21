@@ -101,7 +101,7 @@ public class TopPlayer extends RelativeLayout {
 
         sizeSmall = mContext.getResources().getDimensionPixelSize(R.dimen.top_player_size_minimum);
         sizeMedium = mContext.getResources().getDimensionPixelSize(R.dimen.top_player_size_medium);
-        sizeLarge = mContext.getResources().getDimensionPixelSize(R.dimen.top_player_max_offset);
+        sizeLarge = mContext.getResources().getDimensionPixelSize(R.dimen.top_player_size_maximum);
         //sizeLarge = 1080; // 1080
 
         mSeekbarDeadzonePx        = (int)UIUtils.convertDpToPixel(mSeekbarDeadzone, mContext);

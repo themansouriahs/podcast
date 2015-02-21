@@ -8,6 +8,7 @@ import java.util.List;
 import org.bottiger.podcast.adapters.PlaylistContentSpinnerAdapter;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.views.MultiSpinner;
 import org.bottiger.podcast.views.PlaylistContentSpinner;
 
@@ -134,15 +135,7 @@ public abstract class DrawerActivity extends ToolbarActivity {
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerContainer = (LinearLayout) findViewById(R.id.drawer_container);
 
-        Playlist playlist;
-        try {
-            playlist = Playlist.getActivePlaylist();
-        } catch (IllegalStateException ise) {
-            playlist = new Playlist(this.getApplicationContext());
-            playlist.populatePlaylistIfEmpty();
-            //Playlist.setActivePlaylist(playlist);
-        }
-        final Playlist activePlaylist = playlist;
+        final Playlist playlist = PlayerService.getPlaylist();
 
         mPlaylistContentSpinner = (PlaylistContentSpinner) findViewById(R.id.drawer_playlist_source);
         mPlaylistOrderSpinner = (Spinner) findViewById(R.id.drawer_playlist_sort_order);
@@ -153,8 +146,7 @@ public abstract class DrawerActivity extends ToolbarActivity {
         for (Subscription s : list) {
             slist.add(s.getTitle());
         }
-        MultiSpinnerListener multiSpinnerListener = new MultiSpinnerListener(activePlaylist);
-        //mPlaylistContentSpinner.setItems(slist, "Hey there", multiSpinnerListener);
+        MultiSpinnerListener multiSpinnerListener = new MultiSpinnerListener(playlist);
         mPlaylistContentSpinner.setSubscriptions(list, "Hey there", multiSpinnerListener);
 
         parentItems = new ArrayList<String>(Arrays.asList(mListItems));
@@ -172,9 +164,9 @@ public abstract class DrawerActivity extends ToolbarActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (position == 0) {
-                    activePlaylist.setSortOrder(Playlist.SORT_CRITERIA.DATE); // Date
+                    playlist.setSortOrder(Playlist.SORT_CRITERIA.DATE); // Date
                 } else {
-                    activePlaylist.setSortOrder(Playlist.SORT_CRITERIA.POPULARITY); // populatory
+                    playlist.setSortOrder(Playlist.SORT_CRITERIA.POPULARITY); // populatory
                 }
             }
 
@@ -187,7 +179,7 @@ public abstract class DrawerActivity extends ToolbarActivity {
         mPlaylistShowListened.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                activePlaylist.setShowListened(isChecked);
+                playlist.setShowListened(isChecked);
             }
         });
 

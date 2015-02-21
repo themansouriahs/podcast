@@ -57,7 +57,6 @@ public class FragmentContainerActivity extends DrawerActivity  {
     private Scene mSceneFeed;
 
     private MyCustomViewPager mInflatedViewStub;
-    private Playlist mPlaylist;
 
     @Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -71,9 +70,6 @@ public class FragmentContainerActivity extends DrawerActivity  {
 		mFragmentTransaction = mFragmentManager.beginTransaction();
 
 		mInflatedViewStub = (MyCustomViewPager) findViewById(R.id.app_content);
-
-        mPlaylist = new Playlist(this,30);
-        mPlaylist.populatePlaylistIfEmpty();
 
 		// ViewPager setup
         mViewPager = mInflatedViewStub;
@@ -112,7 +108,7 @@ public class FragmentContainerActivity extends DrawerActivity  {
 
         mViewPager.setPageTransformer(true, new DepthPageTransformer());
 
-        if (mPlaylist.isEmpty())
+        if (((SoundWaves)getApplication()).IsFirstRun())
             mViewPager.setCurrentItem(1);
 
 

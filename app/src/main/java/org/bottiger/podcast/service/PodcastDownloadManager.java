@@ -127,18 +127,6 @@ public class PodcastDownloadManager extends Observable {
 		return DownloadStatus.NOTHING;
 	}
 
-	public static void queueNewItems(Context context, int numOfItems) {
-		Playlist playlist = new Playlist(context);
-		playlist.populatePlaylistIfEmpty();
-		
-		for (int i = 0; i < numOfItems; i++) {
-			FeedItem item = playlist.getItem(i);
-			if (item != null) {
-                PodcastDownloadManager.addItemToQueue(item);
-            }
-		}
-	}
-
 	public static void start_update(final Context context) {
 		start_update(context, null, null);
 	}
@@ -330,7 +318,8 @@ public class PodcastDownloadManager extends Observable {
 		downloadManager = (DownloadManager) context
 				.getSystemService(Context.DOWNLOAD_SERVICE);
 
-		Playlist playlist = new Playlist(context);
+		Playlist playlist = PlayerService.getPlaylist();
+        playlist.populatePlaylistIfEmpty();
 
 		int max = playlist.size() > 5 ? 5 : playlist.size();
 		for (int i = 0; i < max; i++) {
