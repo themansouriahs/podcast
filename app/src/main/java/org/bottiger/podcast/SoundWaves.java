@@ -4,12 +4,13 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
 
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
-import org.bottiger.podcast.flavors.Analytics;
+import org.bottiger.podcast.flavors.Analytics.AnalyticsFactory;
+import org.bottiger.podcast.flavors.Analytics.IAnalytics;
+import org.bottiger.podcast.flavors.Analytics.PlayAnalytics;
 
 // Acra debugging
 /*
@@ -44,6 +45,8 @@ public class SoundWaves extends Application {
     // Global constants
     private Boolean mFirstRun = null;
 
+    public static IAnalytics sAnalytics;
+
 
     @Override
     public void onCreate() {
@@ -53,10 +56,8 @@ public class SoundWaves extends Application {
         if (!BuildConfig.DEBUG)
             ACRA.init(this);
 
-        if (BuildConfig.FLAVOR.toString() == "google") {
-            Analytics analytics = new Analytics(this);
-            analytics.startTracking();
-        }
+        sAnalytics = AnalyticsFactory.getAnalytics(this);
+        sAnalytics.startTracking();
 
         context = getApplicationContext();
 
