@@ -168,6 +168,7 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
         intent.putExtras(b);
 
         argActivity.startActivity(intent);
+        argActivity.overridePendingTransition(R.anim.slide_in_bottom, R.anim.slide_out_bottom);
     }
 
     @Override
