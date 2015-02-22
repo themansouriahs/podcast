@@ -6,7 +6,7 @@
     android:layout_gravity="left"
     android:background="#D0D0D0"
     android:groupIndicator="@null"
-    android:layout_marginTop="111dp">
+    android:layout_marginTop="80dp"> <!-- 111 -->
 
     <TextView
         android:id="@+id/drawer_playlist_filter"
@@ -18,9 +18,9 @@
         android:paddingRight="20dp"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
-        android:background="@color/colorPrimary"
+        android:background="@drawable/drawer_left_title_box"
         android:textAppearance="?android:attr/textAppearanceLargeInverse"/>
-
+<!-- android:background="@color/colorPrimary" -->
 
     <org.bottiger.podcast.views.PlaylistContentSpinner
         android:id="@+id/drawer_playlist_source"
