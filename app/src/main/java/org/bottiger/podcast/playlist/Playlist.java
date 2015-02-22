@@ -236,15 +236,41 @@ public class Playlist implements OnDragStateChangedListener {
 	 * @return A SQL formatted string of the where clause
 	 */
 	public String getWhere() {
+
+        // show/hide listened episodes
 		Boolean showListened = sharedPreferences.getBoolean(showListenedKey,
 				showListenedVal);
 		String where = (showListened) ? "1==1" : ItemColumns.LISTENED + "== 0";
+
+
+        // only find episodes from suscriptions which are not "unsubscribed"
         where += " AND (";
         where += ItemColumns.TABLE_NAME + "." + ItemColumns.SUBS_ID + " IN (SELECT " + SubscriptionColumns.TABLE_NAME + "." + SubscriptionColumns._ID + " FROM "  +
                 SubscriptionColumns.TABLE_NAME + " WHERE " + SubscriptionColumns.TABLE_NAME + "." + SubscriptionColumns.STATUS + "<>"
                 + Subscription.STATUS_UNSUBSCRIBED + " OR " + SubscriptionColumns.TABLE_NAME + "." + SubscriptionColumns.STATUS + " IS NULL)";
         //where += ItemColumns.TABLE_NAME + "." + ItemColumns.SUBS_ID + " IN (4)";
         where += " )";
+
+        // Limit the playlist to a fixed number of subscriptions
+        String where3 = "";
+
+        synchronized (mSubscriptions) {
+            if (!mSubscriptions.isEmpty()) {
+
+                where3 += " AND " + ItemColumns.SUBS_ID + " IN (";
+
+
+                for (Long id : mSubscriptions) {
+                    where3 += id + ",";
+                }
+
+                where3 = where3.substring(0, where3.length() - 1); // FIXME: ugly
+                where3 += ")";
+
+                where += where3;
+            }
+
+        }
 
 
 		return where;
@@ -272,26 +298,7 @@ public class Playlist implements OnDragStateChangedListener {
 				+ ItemColumns._ID + " from " + ItemColumns.TABLE_NAME
 				+ " order by " + ItemColumns.DATE + " desc limit 1)";
 
-        // Limit the playlist to a fixed number of subscriptions
-        String where3 = "";
-
-        synchronized (mSubscriptions) {
-            if (!mSubscriptions.isEmpty()) {
-                where3 += " " + ItemColumns.SUBS_ID + " IN (";
-            }
-
-            for (Long id : mSubscriptions) {
-                where3 += id + ",";
-            }
-
-            where3 = where3.substring(0,where3.length()-1); // FIXME: ugly
-
-            if (!mSubscriptions.isEmpty()) {
-                where3 += ")";
-            }
-        }
-
-		String sql = action + value + where + where2 + where3;
+		String sql = action + value + where + where2;
 
 		DatabaseHelper dbHelper = new DatabaseHelper();
 		dbHelper.executeSQL(mContext, sql, adapter);
@@ -461,8 +468,10 @@ public class Playlist implements OnDragStateChangedListener {
         boolean isChanged = showListenedVal != argShowListened;
         showListenedVal = argShowListened;
 
-        if (isChanged)
+        if (isChanged) {
+            sharedPreferences.edit().putBoolean(showListenedKey, argShowListened).commit();
             notifyDatabaseChanged();
+        }
     }
 
     public void addSubscriptionID(Long argID) {

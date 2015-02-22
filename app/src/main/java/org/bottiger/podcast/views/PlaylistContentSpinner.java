@@ -92,8 +92,8 @@ public class PlaylistContentSpinner extends MultiSpinner {
         }
 
         LinkedList<Long> ids = new LinkedList<>();
-        for (int i = 0; i < selected.length-1; i++) {
-            Subscription sub = mSubscriptions.get(i);
+        for (int i = 1; i < selected.length; i++) {
+            Subscription sub = mSubscriptions.get(i-1);
 
             if (selected[i])
                 ids.add(sub.getId());
