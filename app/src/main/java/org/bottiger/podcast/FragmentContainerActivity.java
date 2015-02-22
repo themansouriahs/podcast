@@ -18,6 +18,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
 import android.transition.Scene;
 import android.util.Log;
 import android.view.ViewGroup;
@@ -26,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class FragmentContainerActivity extends DrawerActivity  {
+public class FragmentContainerActivity extends DrawerActivity {
 
 	@Deprecated
 	public static final boolean debugging = ApplicationConfiguration.DEBUGGING;
@@ -84,6 +85,13 @@ public class FragmentContainerActivity extends DrawerActivity  {
         // it's PagerAdapter set.
         mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
         mSlidingTabLayout.setViewPager(mViewPager);
+        mSlidingTabLayout.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                int lockMode = position == 0 ? DrawerLayout.LOCK_MODE_UNLOCKED : DrawerLayout.LOCK_MODE_LOCKED_CLOSED;
+                mDrawerLayout.setDrawerLockMode(lockMode);
+            }
+        });
 
         // BEGIN_INCLUDE (tab_colorizer)
         // Set a TabColorizer to customize the indicator and divider colors. Here we just retrieve
