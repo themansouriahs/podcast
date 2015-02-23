@@ -5,7 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.MotionEvent;
 import android.view.View;
 
-import org.bottiger.podcast.adapters.ItemCursorAdapter;
+import org.bottiger.podcast.adapters.PlaylistAdapter;
 import org.bottiger.podcast.views.PlaylistViewHolder;
 
 /**
@@ -66,7 +66,7 @@ public class RecyclerItemTouchListener implements RecyclerView.OnItemTouchListen
         if (viewRect.contains((int)e.getX(), (int)e.getY())) {
             playlistViewHolder2.mPlayPauseButton.onClick(null);
         } else {
-            ItemCursorAdapter.keepOne.toggle(playlistViewHolder2);
+            PlaylistAdapter.keepOne.toggle(playlistViewHolder2);
         }
 
     }

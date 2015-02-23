@@ -1,6 +1,6 @@
 package org.bottiger.podcast;
 
-import org.bottiger.podcast.adapters.ItemCursorAdapter;
+import org.bottiger.podcast.adapters.PlaylistAdapter;
 import org.bottiger.podcast.adapters.decoration.DragSortRecycler;
 import org.bottiger.podcast.adapters.decoration.InitialHeaderAdapter;
 import org.bottiger.podcast.images.PicassoWrapper;
@@ -13,6 +13,7 @@ import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.playlist.PlaylistCursorLoader;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.service.DownloadCompleteCallback;
+import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.service.PodcastDownloadManager;
 import org.bottiger.podcast.utils.BackgroundTransformation;
 import org.bottiger.podcast.utils.PaletteCache;
@@ -38,6 +39,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -92,15 +94,15 @@ public class PlaylistFragment extends GeastureFragment implements
 
     DownloadProgressObservable mDownloadProgressObservable = null;
 
-    private PlaylistCursorLoader playlistCursor;
-
     private Playlist mPlaylist;
     private Activity mActivity;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         mDownloadProgressObservable = new DownloadProgressObservable(mActivity);
+        mPlaylist = PlayerService.getPlaylist(this);
+
+        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -116,22 +118,6 @@ public class PlaylistFragment extends GeastureFragment implements
 		super.onActivityCreated(savedInstanceState);
 
         mDownloadProgressObservable = PodcastDownloadManager.getDownloadProgressObservable(mActivity);
-
-		mPlaylist = getPlaylist();
-
-		playlistCursor = new PlaylistCursorLoader(mPlaylist, this, (ItemCursorAdapter)mAdapter, mCursor);
-
-
-		spChanged = new SharedPreferences.OnSharedPreferenceChangeListener() {
-
-			@Override
-			public void onSharedPreferenceChanged(
-					SharedPreferences sharedPreferences, String key) {
-				if (key.equals(ApplicationConfiguration.showListenedKey)) {
-					playlistCursor.requery();
-				}
-			}
-		};
 
 		TopActivity.getPreferences().registerOnSharedPreferenceChangeListener(
 				spChanged);
@@ -179,6 +165,8 @@ public class PlaylistFragment extends GeastureFragment implements
         mDownloadButton = (PlayerButtonView)mSwipeRefreshView.findViewById(R.id.download);
         mFavoriteButton = (PlayerButtonView)mSwipeRefreshView.findViewById(R.id.favorite);
 
+        setPlaylistViewState(mPlaylist);
+
         // use a linear layout manager
         mLayoutManager = new ExpandableLayoutManager(mActivity, mSwipeRefreshView, mTopPlayer, mRecyclerView, mPhoto);
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -187,24 +175,14 @@ public class PlaylistFragment extends GeastureFragment implements
 
         mTopPlayer.setRecyclerView(mRecyclerView);
 
-        if (mPlaylist == null) {
-            mPlaylist = new Playlist(mActivity);
-            mPlaylist.populatePlaylistIfEmpty();
-            setPlaylistViewState(mPlaylist);
-        }
-
         // specify an adapter (see also next example)
-        mAdapter = new ItemCursorAdapter(mActivity, this, mOverlay, mPlaylist, mCursor, mDownloadProgressObservable);
+        mAdapter = new PlaylistAdapter(mActivity, this, mOverlay, mDownloadProgressObservable);
         mAdapter.setHasStableIds(true);
 
         mRecyclerView.setAdapter(mAdapter);
 
         RecentItemsRecyclerListener l = new RecentItemsRecyclerListener(mAdapter);
         mRecyclerView.setRecyclerListener(l);
-
-
-        // deprecated??
-        //mTopPlayer.bringToFront();
 
         if (!mPlaylist.isEmpty()) {
             bindHeader(mPlaylist.first());
@@ -276,6 +254,7 @@ public class PlaylistFragment extends GeastureFragment implements
                 mFavoriteButton.setEpisodeId(item.getId());
             }
         }
+
         super.onResume();
     }
 
@@ -403,7 +382,6 @@ public class PlaylistFragment extends GeastureFragment implements
     public void onStart () {
         super.onStart();
         mPlaylist.registerPlaylistChangeListener(this);
-        playlistCursor.requery();
 
         // Does this even work?
         for (FeedItem item : mPlaylist.getPlaylist()) {
@@ -425,9 +403,16 @@ public class PlaylistFragment extends GeastureFragment implements
 			ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
 		MenuInflater inflater = mActivity.getMenuInflater();
-		inflater.inflate(R.menu.podcast_context, menu);
+		//inflater.inflate(R.menu.podcast_context, menu);
 		PlaylistFragment.setContextMenu(PLAYLIST_CONTEXT_MENU, this);
 	}
+
+    @Override
+    public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.playlist_actionbar, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+        return;
+    }
 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
@@ -467,47 +452,36 @@ public class PlaylistFragment extends GeastureFragment implements
 		}
 	}
 
-             @Override
-             public void notifyPlaylistChanged() {
-                 Playlist activePlaylist = Playlist.getActivePlaylist();
-                 if (mPlaylist != activePlaylist)
-                     mPlaylist = activePlaylist;
+    @Override
+    public void notifyPlaylistChanged() {
+        mActivity.runOnUiThread(new Runnable() {
 
-                 mActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mPlaylist.populatePlaylistIfEmpty();
 
-                     @Override
-                     public void run() {
-                         mPlaylist.populatePlaylistIfEmpty();
+                setPlaylistViewState(mPlaylist);
 
-                         setPlaylistViewState(mPlaylist);
+                if (!mPlaylist.isEmpty()) {
+                    bindHeader(mPlaylist.first());
+                }
 
-                         if (!mPlaylist.isEmpty()) {
-                             bindHeader(mPlaylist.first());
-                             playlistCursor.requery();
-                         }
+            }
+        });
+    }
 
-                     }
-                 });
-             }
+    @Override
+    public void notifyPlaylistRangeChanged(int from, int to) {
+        if (!mPlaylist.isEmpty()) {
 
-             @Override
-             public void notifyPlaylistRangeChanged(int from, int to) {
+            mActivity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    bindHeader(mPlaylist.first());
 
-                 Playlist activePlaylist = Playlist.getActivePlaylist();
-                 if (mPlaylist != activePlaylist)
-                     mPlaylist = activePlaylist;
-
-                 mPlaylist.populatePlaylistIfEmpty();
-                 if (!mPlaylist.isEmpty()) {
-
-                     mActivity.runOnUiThread(new Runnable() {
-                         @Override
-                         public void run() {
-                             bindHeader(mPlaylist.first());
-
-                             setPlaylistViewState(mPlaylist);
-                         }
-                     });
-                 }
-             }
-         }
+                    setPlaylistViewState(mPlaylist);
+                }
+            });
+        }
+    }
+}

@@ -4,11 +4,8 @@ import android.app.Activity;
 import android.support.v4.app.Fragment;
 
 import android.database.Cursor;
-import android.support.v7.widget.RecyclerView;
 
-import org.bottiger.podcast.adapters.AbstractPodcastAdapter;
 import org.bottiger.podcast.adapters.FeedViewAdapter;
-import org.bottiger.podcast.adapters.ItemCursorAdapter;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.Subscription;
 

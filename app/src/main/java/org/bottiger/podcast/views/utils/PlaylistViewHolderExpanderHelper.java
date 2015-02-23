@@ -15,16 +15,13 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import org.bottiger.podcast.R;
-import org.bottiger.podcast.adapters.ItemCursorAdapter;
+import org.bottiger.podcast.adapters.PlaylistAdapter;
 import org.bottiger.podcast.views.PlayPauseImageView;
 import org.bottiger.podcast.views.PlayerLinearLayout;
 import org.bottiger.podcast.views.PlaylistViewHolder;
 import org.bottiger.podcast.views.RelativeLayoutWithBackground;
 
-import java.util.Collection;
 import java.util.LinkedList;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * Created by apl on 14-01-2015.
@@ -32,7 +29,7 @@ import java.util.TreeSet;
 public class PlaylistViewHolderExpanderHelper {
 
     private Context mContext;
-    private ItemCursorAdapter mAdapter;
+    private PlaylistAdapter mAdapter;
     private int mExpandedHeight;
 
     private AnimatorSet mAnimatorSet = new AnimatorSet();
@@ -50,7 +47,7 @@ public class PlaylistViewHolderExpanderHelper {
     public static PlaylistViewHolder expandedView = null;
     public static RelativeLayoutWithBackground expandedLayout = null;
 
-    public PlaylistViewHolderExpanderHelper(@NonNull Context argContext, @NonNull ItemCursorAdapter argAdapter, int argExpandedHeight) {
+    public PlaylistViewHolderExpanderHelper(@NonNull Context argContext, @NonNull PlaylistAdapter argAdapter, int argExpandedHeight) {
         mContext = argContext;
         mAdapter = argAdapter;
         mExpandedHeight = argExpandedHeight;
@@ -122,8 +119,8 @@ public class PlaylistViewHolderExpanderHelper {
             viewHolder.mPlayPauseButton.setTranslationY(0);
 
             //player.setVisibility(View.GONE);
-            viewHolder.mLayout.getLayoutParams().height = ItemCursorAdapter.mCollapsedHeight;//imageStartHeight-initialHeight;
-            viewHolder.mItemBackground.getLayoutParams().height = ItemCursorAdapter.mCollapsedHeight;
+            viewHolder.mLayout.getLayoutParams().height = PlaylistAdapter.mCollapsedHeight;//imageStartHeight-initialHeight;
+            viewHolder.mItemBackground.getLayoutParams().height = PlaylistAdapter.mCollapsedHeight;
 
             viewHolder.mPlayPauseButton.requestLayout();
 

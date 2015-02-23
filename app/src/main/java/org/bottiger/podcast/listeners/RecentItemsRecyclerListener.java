@@ -4,8 +4,6 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
-import org.bottiger.podcast.adapters.ItemCursorAdapter;
-
 /**
  * Created by apl on 15-09-2014.
  */

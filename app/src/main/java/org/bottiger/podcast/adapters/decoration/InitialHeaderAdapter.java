@@ -10,11 +10,9 @@ import com.eowise.recyclerview.stickyheaders.StickyHeadersAdapter;
 
 import org.bottiger.podcast.ApplicationConfiguration;
 import org.bottiger.podcast.R;
-import org.bottiger.podcast.adapters.ItemCursorAdapter;
+import org.bottiger.podcast.adapters.PlaylistAdapter;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
-
-import java.util.List;
 
 /**
  * Created by apl on 19-01-2015.
@@ -37,7 +35,7 @@ public class InitialHeaderAdapter implements StickyHeadersAdapter<InitialHeaderA
     @Override
     public void onBindViewHolder(ViewHolder headerViewHolder, int position) {
 
-        FeedItem item = mPlaylist.getItem(position+ ItemCursorAdapter.PLAYLIST_OFFSET);
+        FeedItem item = mPlaylist.getItem(position+ PlaylistAdapter.PLAYLIST_OFFSET);
 
         headerViewHolder.letter.setVisibility(View.VISIBLE);
         if (position == mCurrentlyDragging) {

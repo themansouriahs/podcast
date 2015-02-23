@@ -32,12 +32,13 @@
 
     <dimen name="top_player_size_minimum">100dp</dimen>
     <dimen name="top_player_size_medium">150dp</dimen>
-    <dimen name="top_player_size_maximum">220dp</dimen>
+    <dimen name="top_player_size_maximum">280dp</dimen>
 
     <dimen name="overlay_side_margin">40dp</dimen>
 
     <!-- top_player_size_maximum + action_bar_height -->
-    <dimen name="top_player_max_offset">376dp</dimen>
+    <!-- <dimen name="top_player_max_offset">376dp</dimen> -->
+    <dimen name="top_player_max_offset">280dp</dimen>
 
     <dimen name="item_height">130dp</dimen>
     <dimen name="section_div_height">20dp</dimen>

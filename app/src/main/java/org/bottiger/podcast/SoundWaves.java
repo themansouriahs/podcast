@@ -2,13 +2,14 @@ package org.bottiger.podcast;
 
 import android.app.Application;
 import android.content.Context;
-import android.text.TextUtils;
+import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
 
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
-import org.bottiger.podcast.flavors.AmazonAnalytics;
-import org.bottiger.podcast.flavors.Analytics;
+import org.bottiger.podcast.flavors.Analytics.AnalyticsFactory;
+import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 
 // Acra debugging
 /*
@@ -22,7 +23,7 @@ import org.bottiger.podcast.flavors.Analytics;
         // not used
         formUri = "https://acra.bottiger.org/acra-soundwaves/_design/acra-storage/_update/report",
         formUriBasicAuthLogin = "soundwaves", // optional
-        formUriBasicAuthPassword = "qAizvWWLZuUtKclMnQTNoExZevGayn", // optional
+        formUriBasicAuthPassword = "", // optional
         disableSSLCertValidation = true,
         mode = ReportingInteractionMode.SILENT,
         forceCloseDialogAfterToast=true,
@@ -38,20 +39,13 @@ public class SoundWaves extends Application {
 	public static final String packageName = "org.bottiger.soundwaves";
 
     // Google Analytics
-    public static final String ANALYTICS_ID = "UA-59611883-1";
+    public static final String ANALYTICS_ID = "";
 
-	// Bugsense API Key.
-	// https://www.bugsense.com/dashboard/project/
-	public final String bugSenseAPIKey = "";
+    // Global constants
+    private Boolean mFirstRun = null;
 
-	// zubhium API Key.
-	public final String zubhiumAPIKey = "";
+    public static IAnalytics sAnalytics;
 
-	// Google API Key: https://code.google.com/apis/console/
-	// Get fingerprint like this:
-	// keytool -exportcert -alias androiddebugkey -keystore
-	// .android/debug.keystore -list -v
-	public final String googleReaderConsumerKey = "";
 
     @Override
     public void onCreate() {
@@ -61,29 +55,35 @@ public class SoundWaves extends Application {
         if (!BuildConfig.DEBUG)
             ACRA.init(this);
 
-        if (BuildConfig.FLAVOR.equals("google")) {
-            Analytics analytics = new Analytics(this);
-            analytics.startTracking();
-        } else if (BuildConfig.FLAVOR.equals("amazon")) {
-            AmazonAnalytics analytics = new AmazonAnalytics(this);
-            analytics.startTracking();
-        }
+        sAnalytics = AnalyticsFactory.getAnalytics(this);
+        sAnalytics.startTracking();
+
         context = getApplicationContext();
+
+        firstRun(context);
     }
 
     public static Context getAppContext() {
         return context;
     }
-	
-	public String getZubhiumAPIKey() {
-		return this.zubhiumAPIKey;
-	}
 
-	public String getBugSenseAPIKey() {
-		return this.bugSenseAPIKey;
-	}
+    private void firstRun(@NonNull Context argContext) {
+        SharedPreferences sharedPref = argContext.getSharedPreferences(packageName, Context.MODE_PRIVATE);
+        String key = getString(R.string.preference_first_run_key);
+        boolean firstRun = sharedPref.getBoolean(key, true);
+        if (firstRun) {
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putBoolean(key, false);
+            editor.commit();
+        }
+        mFirstRun = firstRun;
+    }
 
-	public String getGoogleReaderConsumerKey() {
-		return this.googleReaderConsumerKey;
-	}
+    public boolean IsFirstRun() {
+        if (mFirstRun == null) {
+            throw new IllegalStateException("First run can not be null!");
+        }
+
+        return mFirstRun.booleanValue();
+    }
 }

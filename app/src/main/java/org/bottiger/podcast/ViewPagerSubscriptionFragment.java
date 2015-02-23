@@ -117,14 +117,6 @@ public class ViewPagerSubscriptionFragment extends Fragment implements BackButto
         //fillContainerWithFeed(id);
     }
 
-    private int fragmentInAnimation() {
-        return R.anim.slide_in_right;
-    }
-
-    private int fragmentOutAnimation() {
-        return R.anim.slide_out_right;
-    }
-
     private void setState(State argState) {
         if (mCurrentState == argState) {
             return;

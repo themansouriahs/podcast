@@ -42,7 +42,6 @@ public class FeedViewAdapter extends AbstractEpisodeCursorAdapter<FeedViewAdapte
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         mDownloadProgressObservable = new DownloadProgressObservable(mContext);
-        //PodcastDownloadManager.addDownloadProgressObservable(mDownloadProgressObservable);
         setDataset(dataset);
     }
 

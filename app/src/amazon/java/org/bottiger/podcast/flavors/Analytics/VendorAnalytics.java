@@ -1,4 +1,4 @@
-package org.bottiger.podcast.flavors;
+package org.bottiger.podcast.flavors.Analytics;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -15,12 +15,12 @@ import com.amazonaws.regions.Regions;
  *
  * Only used on the Amazon app store
  */
-public class AmazonAnalytics {
+public class VendorAnalytics implements IAnalytics{
 
     private static MobileAnalyticsManager analytics;
     private Context mContext;
 
-    public AmazonAnalytics(@NonNull Context argContext) {
+    public VendorAnalytics(@NonNull Context argContext) {
         mContext = argContext;
     }
 
@@ -50,6 +50,16 @@ public class AmazonAnalytics {
         } catch(InitializationException ex) {
             Log.e(this.getClass().getName(), "Failed to initialize Amazon Mobile Analytics", ex);
         }
+    }
+
+    @Override
+    public void stopTracking() {
+        return;
+    }
+
+    @Override
+    public void trackEvent(EVENT_TYPE argEvent) {
+        return;
     }
 
 }

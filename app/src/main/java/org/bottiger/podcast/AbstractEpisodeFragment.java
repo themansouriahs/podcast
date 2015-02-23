@@ -70,15 +70,12 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 		prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 	}
 
+
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.episode_list, menu);
 
 		super.onCreateOptionsMenu(menu, inflater);
-
-		ThemeHelper themeHelper = new ThemeHelper(getActivity());
-		MenuItem menuItemSync = menu.findItem(R.id.menu_sync);
-		menuItemSync.setIcon(themeHelper.getAttr(R.attr.sync_icon));
 	}
 
 	@Override
@@ -112,36 +109,6 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
             break;
 			//refreshView();
 		}
-		case R.id.menu_sync:
-            PodcastDownloadManager.start_update(getActivity());
-            break;
-                    /*
-			if (prefs.getBoolean(SettingsActivity.CLOUD_SUPPORT, true)) {
-				// Account account = mCredential.getSelectedAccount();
-				Account account = MainActivity.getCredentials()
-						.getSelectedAccount();
-				Bundle bundle = new Bundle();
-				bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-				bundle.putBoolean(ContentResolver.SYNC_EXTRAS_FORCE, true);
-				bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-				String auth = PodcastProvider.AUTHORITY;
-				auth = "org.bottiger.podcast.provider.PodcastProvider"; //
-				ContentResolver
-						.requestSync(
-								account,
-								"org.bottiger.podcast.provider.podcastprovider",
-								bundle);
-				ContentResolver.requestSync(account, auth, bundle);
-			} else {
-				CharSequence text = "Please enabled cloud support in the settings menu before attempting to sync";
-				int duration = Toast.LENGTH_LONG;
-
-				Toast toast = Toast.makeText(getActivity(), text, duration);
-				toast.show();
-			}
-
-			return true;
-			*/
 		case R.id.menu_import: {
 			OPMLImportExport importExport = new OPMLImportExport(getActivity());
 			importExport.importSubscriptions();

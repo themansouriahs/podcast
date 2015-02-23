@@ -59,23 +59,23 @@
             android:title="@string/pref_playback_category_title"
             android:key="pref_playback_category">
 
-        <ListPreference
-			android:key="pref_player_forward_amount"
-            android:defaultValue="30"
-            android:dialogTitle="@string/pref_player_forward_amount_dialog_title"
-            android:entries="@array/pref_player_seek_entries"
-            android:entryValues="@array/pref_player_seek_entries_values"
-            android:title="@string/pref_player_forward_amount_title"
-            android:summary="@string/pref_player_forwards_amount_summary" />
+            <ListPreference
+                android:key="pref_player_forward_amount"
+                android:defaultValue="30"
+                android:dialogTitle="@string/pref_player_forward_amount_dialog_title"
+                android:entries="@array/pref_player_seek_entries"
+                android:entryValues="@array/pref_player_seek_entries_values"
+                android:title="@string/pref_player_forward_amount_title"
+                android:summary="@string/pref_player_forwards_amount_summary" />
 
-		<ListPreference
-			android:key="pref_player_backward_amount"
-            android:defaultValue="10"
-            android:dialogTitle="@string/pref_player_backward_amount_dialog_title"
-            android:entries="@array/pref_player_seek_entries"
-            android:entryValues="@array/pref_player_seek_entries_values"
-            android:title="@string/pref_player_backward_amount_title"
-            android:summary="@string/pref_player_backwards_amount_summary" />
+            <ListPreference
+                android:key="pref_player_backward_amount"
+                android:defaultValue="10"
+                android:dialogTitle="@string/pref_player_backward_amount_dialog_title"
+                android:entries="@array/pref_player_seek_entries"
+                android:entryValues="@array/pref_player_seek_entries_values"
+                android:title="@string/pref_player_backward_amount_title"
+                android:summary="@string/pref_player_backwards_amount_summary" />
 
             <CheckBoxPreference
                 android:defaultValue="false"
@@ -88,12 +88,12 @@
         <PreferenceCategory
             android:title="@string/pref_notification_category_title"
             android:key="pref_notification_category">
-			
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="pref_notification_control"
-            android:summary="@string/pref_notification_control_description"
-            android:title="@string/pref_notification_control" />
+
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="pref_notification_control"
+                android:summary="@string/pref_notification_control_description"
+                android:title="@string/pref_notification_control" />
 
         </PreferenceCategory>
 
@@ -168,6 +168,22 @@
             android:key="pref_anonymous_feedback"
             android:summary="@string/pref_feedback_description"
             android:title="@string/pref_feedback_title" />
+
+    </PreferenceScreen>
+
+    <PreferenceScreen
+        android:key="about"
+        android:title="@string/preferences_category_about"
+        android:icon="@drawable/ic_info_outline_black">
+
+        <org.bottiger.podcast.ToolbarPreference
+            android:key="about"
+            android:title="@string/preferences_category_about" />
+
+        <Preference
+            android:defaultValue="true"
+            android:key="pref_current_version"
+            android:title="@string/pref_current_version_title" />
 
     </PreferenceScreen>
 

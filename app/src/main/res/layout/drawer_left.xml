@@ -2,23 +2,50 @@
     android:id="@+id/drawer_container"
     android:layout_width="240dp"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:layout_gravity="left"
-    android:background="@color/colorBgPrimary"
+    android:background="#D0D0D0"
     android:groupIndicator="@null"
-    android:paddingTop="100dp">
+    android:layout_marginTop="80dp"> <!-- 111 -->
 
     <TextView
-        android:id="@+id/slidebar_show_listened_title"
-        android:layout_width="wrap_content"
+        android:id="@+id/drawer_playlist_filter"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="10dp"
-        android:text="Show listened"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:gravity="right"
+        android:textAlignment="gravity"
+        android:text="Playlist Filters"
+        android:paddingRight="20dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:background="@drawable/drawer_left_title_box"
+        android:textAppearance="?android:attr/textAppearanceLargeInverse"/>
+
+    <org.bottiger.podcast.views.PlaylistContentSpinner
+        android:id="@+id/drawer_playlist_source"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:layout_marginRight="10dp"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:spinnerMode="dialog" />
+
+    <Spinner
+        android:id="@+id/drawer_playlist_sort_order"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:layout_marginRight="10dp"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:spinnerMode="dialog" />
 
     <Switch
         android:id="@+id/slidebar_show_listened"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="20dp" />
+        android:textSize="15sp"
+        android:text="Show Listened"
+        android:padding="20dp"
+        android:layout_marginLeft="10dp" />
 
 </LinearLayout>
