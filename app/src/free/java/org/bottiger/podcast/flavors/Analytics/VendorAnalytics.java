@@ -1,9 +1,15 @@
 package org.bottiger.podcast.flavors.Analytics;
 
+import android.content.Context;
+
 /**
  * Created by apl on 21-02-2015.
  */
-public class DummyAnalytics implements IAnalytics {
+public class VendorAnalytics implements IAnalytics {
+    public VendorAnalytics(Context argContext) {
+
+    }
+
     @Override
     public void startTracking() {
         return;

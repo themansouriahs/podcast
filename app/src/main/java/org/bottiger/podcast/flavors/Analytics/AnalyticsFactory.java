@@ -11,13 +11,6 @@ import org.bottiger.podcast.BuildConfig;
 public class AnalyticsFactory {
 
     public static IAnalytics getAnalytics(@NonNull Context argContext) {
-
-        String flavor = BuildConfig.FLAVOR;
-
-        if (flavor == "google" || flavor == "amazon") {
-            return new VendorAnalytics(argContext);
-        }
-
-        return new DummyAnalytics();
+        return new VendorAnalytics(argContext);
     }
 }
