@@ -28,7 +28,10 @@ public class Playlist implements OnDragStateChangedListener {
 	private static int MAX_SIZE = 20;
     private static Playlist activePlaylist = null;
 
-    public enum SORT_CRITERIA { DATE, POPULARITY};
+    private static final String mSortNew = "DESC";
+    private static final String mSortOld = "ASC";
+
+    public enum SORT { DATE_NEW, DATE_OLD };
 
 	private Context mContext;
 
@@ -40,11 +43,12 @@ public class Playlist implements OnDragStateChangedListener {
 	private String showListenedKey = ApplicationConfiguration.showListenedKey;
 	private boolean showListenedVal = true;
 	private String inputOrderKey = "inputOrder";
-	private String defaultOrder = "DESC";
+	private String defaultOrder = mSortNew;
 	private String amountKey = "amountOfEpisodes";
 	private int amountValue = 20;
 
-    private SORT_CRITERIA mSortOrder = SORT_CRITERIA.DATE;
+    private SORT mSortOrder = SORT.DATE_NEW;
+
 
 	// http://stackoverflow.com/questions/1036754/difference-between-wait-and-sleep
 	private static Boolean lock = true;
@@ -456,12 +460,15 @@ public class Playlist implements OnDragStateChangedListener {
         }
     }
 
-    public void setSortOrder(SORT_CRITERIA argSortOrder) {
+    public void setSortOrder(SORT argSortOrder) {
         boolean isChanged = mSortOrder != argSortOrder;
         mSortOrder = argSortOrder;
 
-        if (isChanged)
+        if (isChanged) {
+            String order = mSortOrder == SORT.DATE_NEW ? mSortNew : mSortOld;
+            sharedPreferences.edit().putString(inputOrderKey, order).commit();
             notifyDatabaseChanged();
+        }
     }
 
     public void setShowListened(boolean argShowListened) {

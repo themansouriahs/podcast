@@ -16,7 +16,6 @@ import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.TypeEvaluator;
 import android.app.Fragment;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -164,9 +163,9 @@ public abstract class DrawerActivity extends ToolbarActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (position == 0) {
-                    playlist.setSortOrder(Playlist.SORT_CRITERIA.DATE); // Date
+                    playlist.setSortOrder(Playlist.SORT.DATE_NEW); // new first
                 } else {
-                    playlist.setSortOrder(Playlist.SORT_CRITERIA.POPULARITY); // populatory
+                    playlist.setSortOrder(Playlist.SORT.DATE_OLD); // old first
                 }
             }
 

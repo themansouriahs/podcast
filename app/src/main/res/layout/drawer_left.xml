@@ -20,7 +20,6 @@
         android:paddingBottom="10dp"
         android:background="@drawable/drawer_left_title_box"
         android:textAppearance="?android:attr/textAppearanceLargeInverse"/>
-<!-- android:background="@color/colorPrimary" -->
 
     <org.bottiger.podcast.views.PlaylistContentSpinner
         android:id="@+id/drawer_playlist_source"
