@@ -12,6 +12,7 @@ import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ThemeHelper;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
@@ -112,10 +113,27 @@ public class PlayerStatusObservable {
         FeedItem currentItem = argPlayerService.getCurrentItem();
         if (currentItem != null) {
 
+            updateEpisodeOffset(argPlayerService.getContentResolver(),
+                                argPlayerService.getCurrentItem(),
+                                argPlayerService.getPlayer().getCurrentPosition());
+
             for (PlayerStatusObserver listener : mListeners.keySet()) {
                 if (listener.getEpisode() == argPlayerService.getCurrentItem())
                     listener.setProgressMs(argPlayerService.position());
             }
+        }
+    }
+
+    private static long lastUpdate = System.currentTimeMillis();
+    public static void updateEpisodeOffset(@NonNull ContentResolver argContentResolver,
+                                           @NonNull FeedItem argEpisode,
+                                           int argOffset) {
+        long now = System.currentTimeMillis();
+
+        // more than a second ago
+        if (now - lastUpdate > 1000) {
+            argEpisode.setPosition(argContentResolver, argOffset);
+            lastUpdate = now;
         }
     }
 

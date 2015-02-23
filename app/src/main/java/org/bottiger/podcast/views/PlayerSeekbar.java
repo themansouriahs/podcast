@@ -205,7 +205,8 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
         mEpisode = argEpisode;
 
         if (mEpisode.offset > 0) {
-            setProgress(mEpisode.offset);
+            float progress = (float)mEpisode.offset / mEpisode.duration_ms;
+            setProgress((int)(progress*RANGE_MAX));
         }
     }
 
