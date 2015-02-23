@@ -22,6 +22,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.CursorAdapter;
+import android.util.Log;
 
 public class Playlist implements OnDragStateChangedListener {
 
@@ -332,6 +333,11 @@ public class Playlist implements OnDragStateChangedListener {
 	public void populatePlaylist(int length, boolean force) {
 		if (mInternalPlaylist.size() >= length && !force) {
             return;
+        }
+
+        if (mContext == null) {
+            Log.e("PlaylistState", "Context can not be null!");
+            throw new IllegalStateException("Context can not be null");
         }
 
 		PodcastOpenHelper helper = new PodcastOpenHelper(mContext);

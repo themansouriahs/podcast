@@ -319,6 +319,7 @@ public class PodcastDownloadManager extends Observable {
 				.getSystemService(Context.DOWNLOAD_SERVICE);
 
 		Playlist playlist = PlayerService.getPlaylist();
+        playlist.setContext(mContext);
         playlist.populatePlaylistIfEmpty();
 
 		int max = playlist.size() > 5 ? 5 : playlist.size();
