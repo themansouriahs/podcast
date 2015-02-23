@@ -4,6 +4,7 @@ Changelog
 Version 0.68
 -------------
 * Added a Changelog :)
+* Fixed the position of the empty subscription screen
 
 Version 0.66
 -------------
