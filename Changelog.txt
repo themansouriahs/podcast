@@ -4,6 +4,7 @@ Changelog
 Version 0.68
 -------------
 * Added a Changelog :)
+* Better looking navigation drawer
 
 Version 0.66
 -------------

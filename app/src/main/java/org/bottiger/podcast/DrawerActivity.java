@@ -19,6 +19,7 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
@@ -34,10 +35,12 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.ExpandableListView;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.TableLayout;
 
 import com.android.volley.toolbox.ImageLoader;
 
@@ -78,7 +81,8 @@ public abstract class DrawerActivity extends ToolbarActivity {
 
 	protected DrawerLayout mDrawerLayout;
 	protected ExpandableListView mDrawerList;
-	protected LinearLayout mDrawerContainer;
+	protected FrameLayout mDrawerContainer;
+    protected TableLayout mDrawerTable;
 
     protected Switch mPlaylistShowListened;
     protected Spinner mPlaylistOrderSpinner;
@@ -132,7 +136,15 @@ public abstract class DrawerActivity extends ToolbarActivity {
 		mTitle = mDrawerTitle = getTitle();
 		mListItems = getResources().getStringArray(R.array.drawer_menu);
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-		mDrawerContainer = (LinearLayout) findViewById(R.id.drawer_container);
+		mDrawerContainer = (FrameLayout) findViewById(R.id.drawer_container);
+        mDrawerTable = (TableLayout) findViewById(R.id.drawer_table);
+
+        // if we can use windowTranslucentNavigation=true
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            FrameLayout.MarginLayoutParams params = (FrameLayout.MarginLayoutParams) mDrawerTable.getLayoutParams();
+            params.topMargin = getStatusBarHeight();
+            mDrawerTable.setLayoutParams(params);
+        }
 
         final Playlist playlist = PlayerService.getPlaylist();
 
@@ -231,7 +243,7 @@ public abstract class DrawerActivity extends ToolbarActivity {
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		// If the nav drawer is open, hide action items related to the content
 		// view
-		boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerContainer);
+	    boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerContainer);
 		/*
 		 * menu.findItem(R.id.action_websearch).setVisible(!drawerOpen);
 		 */

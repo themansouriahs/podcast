@@ -1,25 +1,51 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/drawer_container"
     android:layout_width="240dp"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:layout_gravity="left"
-    android:background="#D0D0D0"
-    android:groupIndicator="@null"
-    android:layout_marginTop="80dp"> <!-- 111 -->
+    android:background="@color/white_opaque">
+
+<TableLayout
+    android:id="@+id/drawer_table"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="16dp"
+    android:paddingRight="5dp">
+
+
+    <!-- Playlist Header -->
+    <TableRow
+        android:id="@+id/drawer_playlist_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dip" >
+
+        <ImageView
+            android:id="@+id/drawer_playlist_icon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/ic_settings_black"
+            />
 
     <TextView
         android:id="@+id/drawer_playlist_filter"
+        android:layout_width="190dp"
+        android:layout_height="match_parent"
+        android:gravity="left|center"
+        android:text="Playlist Filters"
+        android:paddingLeft="15dp"
+        android:textSize="14sp"
+        android:textColor="@color/black"/>
+
+    </TableRow>
+
+    <!-- Playlist Header -->
+    <TableRow
+        android:id="@+id/drawer_playlist_subscription_filter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="right"
-        android:textAlignment="gravity"
-        android:text="Playlist Filters"
-        android:paddingRight="20dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:background="@drawable/drawer_left_title_box"
-        android:textAppearance="?android:attr/textAppearanceLargeInverse"/>
+        android:padding="5dip" >
 
     <org.bottiger.podcast.views.PlaylistContentSpinner
         android:id="@+id/drawer_playlist_source"
@@ -27,25 +53,49 @@
         android:layout_height="wrap_content"
         android:padding="20dp"
         android:layout_marginRight="10dp"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:spinnerMode="dialog" />
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:spinnerMode="dialog"
+        android:layout_span="2"/>
 
-    <Spinner
+    </TableRow>
+
+    <!-- Playlist Sort Order -->
+    <TableRow
+        android:id="@+id/drawer_playlist_subscription_sorting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dip" >
+
+        <Spinner
         android:id="@+id/drawer_playlist_sort_order"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="20dp"
         android:layout_marginRight="10dp"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:spinnerMode="dialog" />
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:spinnerMode="dialog"
+        android:layout_span="2"/>
 
-    <Switch
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/drawer_playlist_subscription_show_listened"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dip" >
+
+        <Switch
         android:id="@+id/slidebar_show_listened"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="15sp"
+        android:textSize="14sp"
         android:text="Show Listened"
         android:padding="20dp"
-        android:layout_marginLeft="10dp" />
+        android:layout_marginLeft="10dp"
+        android:layout_span="2"/>
 
-</LinearLayout>
+    </TableRow>
+
+</TableLayout>
+
+</FrameLayout>
