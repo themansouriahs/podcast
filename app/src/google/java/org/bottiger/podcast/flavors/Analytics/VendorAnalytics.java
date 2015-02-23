@@ -16,11 +16,11 @@ import java.util.HashMap;
  *
  * Only used on the Google Play Store
  */
-public class PlayAnalytics implements IAnalytics {
+public class VendorAnalytics implements IAnalytics {
 
     private Context mContext;
 
-    public PlayAnalytics(@NonNull Context argContext) {
+    public VendorAnalytics(@NonNull Context argContext) {
         mContext = argContext;
     }
 
