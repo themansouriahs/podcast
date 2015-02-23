@@ -49,6 +49,16 @@ public class VendorAnalytics implements IAnalytics {
         return;
     }
 
+    @Override
+    public void activityPause() {
+        return;
+    }
+
+    @Override
+    public void activityResume() {
+        return;
+    }
+
     public void trackEvent(EVENT_TYPE argEvent) {
         // Build and send an Event.
         getTracker(TrackerName.APP_TRACKER).send(new HitBuilders.EventBuilder()

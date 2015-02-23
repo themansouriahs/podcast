@@ -1,5 +1,6 @@
 package org.bottiger.podcast.flavors.Analytics;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -10,12 +11,14 @@ import com.amazonaws.mobileconnectors.amazonmobileanalytics.InitializationExcept
 import com.amazonaws.mobileconnectors.amazonmobileanalytics.MobileAnalyticsManager;
 import com.amazonaws.regions.Regions;
 
+import org.bottiger.podcast.SoundWaves;
+
 /**
  * Created by apl on 19-02-2015.
  *
  * Only used on the Amazon app store
  */
-public class VendorAnalytics implements IAnalytics{
+public class VendorAnalytics implements IAnalytics {
 
     private static MobileAnalyticsManager analytics;
     private Context mContext;
@@ -30,10 +33,10 @@ public class VendorAnalytics implements IAnalytics{
         // Replace AWS_ACCOUNT_ID, COGNITO_IDENTITY_POOL, UNAUTHENTICATED_ROLE and AUTHENTICATED_ROLE with the applicable values.
         CognitoCachingCredentialsProvider cognitoProvider = new CognitoCachingCredentialsProvider(
                 mContext.getApplicationContext(),
-                "",
-                "", /* Identity Pool ID */
-                "",
-                "",
+                SoundWaves.AMAZON_AMAZON_AWS_ACCOUNT,
+                SoundWaves.AMAZON_COGNITO_IDENTITY_POOL, /* Identity Pool ID */
+                SoundWaves.AMAZON_UNAUTHENTICATED_ARN,
+                SoundWaves.AMAZON_AUTHENTICATED_ARN,
                 Regions.US_EAST_1
         );
 
@@ -42,7 +45,7 @@ public class VendorAnalytics implements IAnalytics{
             options.withAllowsWANDelivery(true);
             analytics = MobileAnalyticsManager.getOrCreateInstance(
                     mContext.getApplicationContext(),
-                    "yourAppId",
+                    SoundWaves.AMAZON_APP_ID, //Mobile Analytics App ID
                     Regions.US_EAST_1,
                     cognitoProvider,
                     options
@@ -55,6 +58,21 @@ public class VendorAnalytics implements IAnalytics{
     @Override
     public void stopTracking() {
         return;
+    }
+
+    @Override
+    public void activityPause() {
+        if(analytics != null) {
+            analytics.getSessionClient().pauseSession();
+            analytics.getEventClient().submitEvents();
+        }
+    }
+
+    @Override
+    public void activityResume() {
+        if(analytics != null) {
+            analytics.getSessionClient().resumeSession();
+        }
     }
 
     @Override

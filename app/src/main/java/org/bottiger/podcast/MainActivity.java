@@ -63,7 +63,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.json.gson.GsonFactory;
@@ -166,6 +165,9 @@ public class MainActivity extends FragmentContainerActivity implements
 				mCredential.setSelectedAccountName(prefs.getString(ACCOUNT_KEY,
 						""));
 
+            /*
+            GOogle flavor
+
 			new Thread(new Runnable() {
 				public void run() {
 					try {
@@ -182,6 +184,7 @@ public class MainActivity extends FragmentContainerActivity implements
 					mDriveService = getDriveService(mCredential);
 				}
 			}); //.start();
+			*/
 
 		}
 

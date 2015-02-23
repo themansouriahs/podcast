@@ -87,10 +87,8 @@ dependencies {
     compile 'com.github.traex.rippleeffect:library:1+'
 
     // Free version
-    freeCompile 'com.google.android.gms:play-services-base:6+' // analytics
 
     // Amazon version
-    amazonCompile 'com.google.android.gms:play-services-base:6+' // analytics
     amazonCompile fileTree(dir: 'src/amazon/libs', include: ['*.jar'])
 
     // Play Store

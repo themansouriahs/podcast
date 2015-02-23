@@ -33,8 +33,20 @@ public class TopActivity extends ActionBarActivity {
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
 	}
-	
-	public static SharedPreferences getPreferences() {
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        SoundWaves.sAnalytics.activityPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SoundWaves.sAnalytics.activityResume();
+    }
+
+    public static SharedPreferences getPreferences() {
 		return prefs;
 	}
 

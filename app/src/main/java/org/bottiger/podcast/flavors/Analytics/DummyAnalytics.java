@@ -15,6 +15,16 @@ public class DummyAnalytics implements IAnalytics {
     }
 
     @Override
+    public void activityPause() {
+        return;
+    }
+
+    @Override
+    public void activityResume() {
+        return;
+    }
+
+    @Override
     public void trackEvent(EVENT_TYPE argEvent) {
         return;
     }

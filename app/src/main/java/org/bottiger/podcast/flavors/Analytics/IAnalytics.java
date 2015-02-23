@@ -10,5 +10,8 @@ public interface IAnalytics {
     public void startTracking();
     public void stopTracking();
 
+    public void activityPause();
+    public void activityResume();
+
     public void trackEvent(EVENT_TYPE argEvent);
 }

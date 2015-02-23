@@ -41,6 +41,13 @@ public class SoundWaves extends Application {
     // Google Analytics
     public static final String ANALYTICS_ID = "";
 
+    // Amazon Analytics
+    public static final String AMAZON_APP_ID                = "";
+    public static final String AMAZON_AMAZON_AWS_ACCOUNT    = "";
+    public static final String AMAZON_COGNITO_IDENTITY_POOL = "";
+    public static final String AMAZON_UNAUTHENTICATED_ARN   = "";
+    public static final String AMAZON_AUTHENTICATED_ARN     = "";
+
     // Global constants
     private Boolean mFirstRun = null;
 

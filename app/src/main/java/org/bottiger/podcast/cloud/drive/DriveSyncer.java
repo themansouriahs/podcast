@@ -42,8 +42,8 @@ import android.provider.Settings.Secure;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.google.android.gms.auth.UserRecoverableAuthException;
-import com.google.android.gms.common.api.GoogleApiClient;
+//import com.google.android.gms.auth.UserRecoverableAuthException;
+//import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.http.AbstractInputStreamContent;
@@ -799,7 +799,7 @@ public class DriveSyncer {
 	}
 
 
-    private GoogleApiClient mGoogleApiClient;
+    //private GoogleApiClient mGoogleApiClient;
 	/**
 	 * Retrieve a authorized service object to send requests to the Google Drive
 	 * API. On failure to retrieve an access token, a notification is sent to
@@ -809,6 +809,7 @@ public class DriveSyncer {
 	 * @return An authorized service object.
 	 */
 	private Drive getDriveService() {
+        /*
 		if (mService == null) {
 			try {
 				GoogleAccountCredential mainCredentials = MainActivity
@@ -862,7 +863,8 @@ public class DriveSyncer {
 				}
 			}
 		}
-		return mService;
+		return mService;*/
+                return null;
 	}
 
 	/**
