@@ -1,0 +1,10 @@
+Changelog
+==========
+
+Version 0.68
+-------------
+* Added a Changelog :)
+
+Version 0.66
+-------------
+* Fixed Crash
