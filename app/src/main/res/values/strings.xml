@@ -175,5 +175,6 @@
     <string name="playlist_filter_some">Selected episodes</string>
     <string name="playlist_filter_prefix">Show:</string>
     <string name="preference_first_run_key">firstrun</string>
+    <string name="menu_feedback">Feedback</string>
 
 </resources>

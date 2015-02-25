@@ -9,9 +9,7 @@
 <TableLayout
     android:id="@+id/drawer_table"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingLeft="16dp"
-    android:paddingRight="5dp">
+    android:layout_height="match_parent">
 
 
     <!-- Playlist Header -->
@@ -19,13 +17,18 @@
         android:id="@+id/drawer_playlist_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="5dip" >
+        android:paddingLeft="16dp"
+        android:paddingRight="5dp"
+        android:paddingTop="5dip"
+        android:paddingBottom="5dip"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="10dp">
 
         <ImageView
             android:id="@+id/drawer_playlist_icon"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:src="@drawable/ic_settings_black"
+            android:src="@drawable/ic_my_library_music_grey"
             />
 
     <TextView
@@ -45,17 +48,24 @@
         android:id="@+id/drawer_playlist_subscription_filter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="5dip" >
+        android:paddingLeft="16dp"
+        android:paddingRight="5dp"
+        android:paddingTop="5dip"
+        android:paddingBottom="5dip">
 
     <org.bottiger.podcast.views.PlaylistContentSpinner
         android:id="@+id/drawer_playlist_source"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="20dp"
         android:layout_marginRight="10dp"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:spinnerMode="dialog"
         android:layout_span="2"/>
+        <!--
+
+        android:padding="20dp"
+        android:layout_marginRight="10dp"
+        -->
 
     </TableRow>
 
@@ -64,13 +74,15 @@
         android:id="@+id/drawer_playlist_subscription_sorting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="5dip" >
+        android:paddingLeft="16dp"
+        android:paddingRight="5dp"
+        android:paddingTop="5dip"
+        android:paddingBottom="5dip">
 
         <Spinner
         android:id="@+id/drawer_playlist_sort_order"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="20dp"
         android:layout_marginRight="10dp"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:spinnerMode="dialog"
@@ -82,19 +94,99 @@
         android:id="@+id/drawer_playlist_subscription_show_listened"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="5dip" >
+        android:paddingLeft="16dp"
+        android:paddingRight="5dp"
+        android:paddingTop="5dip"
+        android:paddingBottom="5dip">
 
         <Switch
         android:id="@+id/slidebar_show_listened"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="14sp"
+        android:padding="10dp"
         android:text="Show Listened"
-        android:padding="20dp"
-        android:layout_marginLeft="10dp"
         android:layout_span="2"/>
 
     </TableRow>
+
+    <!-- Playlist Header -->
+    <TableRow
+        android:id="@+id/drawer_playback_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="16dp"
+        android:paddingRight="5dp"
+        android:paddingTop="5dip"
+        android:paddingBottom="5dip"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="10dp">
+
+        <ImageView
+            android:id="@+id/drawer_playback_icon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/ic_volume_up_grey"
+            />
+
+        <TextView
+            android:id="@+id/drawer_playback_filter"
+            android:layout_width="190dp"
+            android:layout_height="match_parent"
+            android:gravity="left|center"
+            android:text="Player settings"
+            android:paddingLeft="15dp"
+            android:textSize="14sp"
+            android:textColor="@color/black"/>
+
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/drawer_playlist_continues"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="16dp"
+        android:paddingRight="5dp"
+        android:paddingTop="5dip"
+        android:paddingBottom="5dip">
+
+        <Switch
+            android:id="@+id/slidebar_show_continues"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:padding="10dp"
+            android:text="Auto start next"
+            android:layout_span="2"/>
+
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/drawer_settings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/drawer_items"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_span="2">
+
+            <!--
+            <include layout="@layout/drawer_separator" />
+
+            <include layout="@layout/drawer_item" />
+
+            <include layout="@layout/drawer_separator" />
+            -->
+
+            <!-- FeedBack button -->
+
+        </LinearLayout>
+
+    </TableRow>
+
 
 </TableLayout>
 

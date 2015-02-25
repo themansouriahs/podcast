@@ -14,6 +14,7 @@ import org.bottiger.podcast.service.PodcastDownloadManager;
 import org.bottiger.podcast.service.PodcastService;
 import org.bottiger.podcast.utils.AddPodcastDialog;
 import org.bottiger.podcast.utils.ThemeHelper;
+import org.bottiger.podcast.utils.TransitionUtils;
 
 
 import android.accounts.Account;
@@ -394,8 +395,7 @@ public class MainActivity extends FragmentContainerActivity implements
 			AddPodcastDialog.addPodcast(this);
 			return true;
 		case R.id.menu_settings:
-			Intent i = new Intent(getBaseContext(), SettingsActivity.class);
-			startActivity(i);
+            TransitionUtils.openSettings(getBaseContext());
 			return true;
 		case R.id.menu_refresh:
 			PodcastDownloadManager.start_update(this);

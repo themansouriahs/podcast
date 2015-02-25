@@ -9,6 +9,7 @@ import org.bottiger.podcast.adapters.PlaylistContentSpinnerAdapter;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.utils.navdrawer.NavigationDrawerMenuGenerator;
 import org.bottiger.podcast.views.MultiSpinner;
 import org.bottiger.podcast.views.PlaylistContentSpinner;
 
@@ -193,6 +194,10 @@ public abstract class DrawerActivity extends ToolbarActivity {
                 playlist.setShowListened(isChecked);
             }
         });
+
+        LinearLayout layout = (LinearLayout) findViewById(R.id.drawer_items);
+        NavigationDrawerMenuGenerator navigationDrawerMenuGenerator = new NavigationDrawerMenuGenerator(this);
+        navigationDrawerMenuGenerator.generate(layout);
 
 
         // enable ActionBar app icon to behave as action to toggle nav drawer
