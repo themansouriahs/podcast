@@ -14,23 +14,22 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
 
     <org.bottiger.podcast.views.MultiShrink.QuickFeedImage
         android:id="@+id/photo"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/generic_podcast"
         android:clickable="false"
         android:scaleType="centerCrop" />
 
     <View
         android:id="@+id/photo_touch_intercept_overlay"
+        android:background="@drawable/item_background_material_dark"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
     <!--
-        android:background="@drawable/item_background_material_dark" -->
+         -->
 
     <!-- Overlays/gradients that can be used to make white text/buttons visible -->
     <View
