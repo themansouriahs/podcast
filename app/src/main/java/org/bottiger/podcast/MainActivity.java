@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import org.bottiger.podcast.AbstractEpisodeFragment.OnPlaylistRefreshListener;
 import org.bottiger.podcast.cloud.CloudProvider;
-import org.bottiger.podcast.cloud.GoogleReader;
 import org.bottiger.podcast.cloud.drive.DriveSyncer;
 import org.bottiger.podcast.debug.SqliteCopy;
 import org.bottiger.podcast.receiver.HeadsetReceiver;

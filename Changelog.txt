@@ -1,6 +1,10 @@
 Changelog
 ==========
 
+version 0.70
+------------
+* Dependency cleanup
+
 Version 0.68
 -------------
 * Added a Changelog :)
