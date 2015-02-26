@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 
-import org.acra.ACRA;
 import org.bottiger.podcast.service.DownloadStatus;
 import org.bottiger.podcast.service.PodcastDownloadManager;
 import org.bottiger.podcast.utils.PodcastLog;

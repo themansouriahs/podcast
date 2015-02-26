@@ -7,7 +7,8 @@ import java.util.Locale;
 
 import android.util.Log;
 
-import org.acra.ACRA;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+
 
 /** Parses several date formats. */
 public class SyndDateUtils {
@@ -112,7 +113,7 @@ public class SyndDateUtils {
 		}
 
         if (result == null) {
-            ACRA.getErrorReporter().putCustomData("Could not parse date using 'parseRFC3339Date': ", date);
+            VendorCrashReporter.report("Could not parse date using 'parseRFC3339Date': ", date);
         }
 
 		return result;

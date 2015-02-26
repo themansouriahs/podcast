@@ -10,6 +10,7 @@ import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
 import org.bottiger.podcast.flavors.Analytics.AnalyticsFactory;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
+import org.bottiger.podcast.flavors.CrashReporter.CrashReporterFactory;
 
 // Acra debugging
 /*
@@ -22,7 +23,7 @@ import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 @ReportsCrashes(formKey = "", // This is required for backward compatibility but
         // not used
         formUri = "https://acra.bottiger.org/acra-soundwaves/_design/acra-storage/_update/report",
-        formUriBasicAuthLogin = "soundwaves", // optional
+        formUriBasicAuthLogin = "soundwaves2", // optional
         formUriBasicAuthPassword = "", // optional
         disableSSLCertValidation = true,
         mode = ReportingInteractionMode.SILENT,
@@ -59,8 +60,9 @@ public class SoundWaves extends Application {
         super.onCreate();
 
         // The following line triggers the initialization of ACRA
-        if (!BuildConfig.DEBUG)
-            ACRA.init(this);
+        if (!BuildConfig.DEBUG) {
+            CrashReporterFactory.startReporter(this);
+        }
 
         sAnalytics = AnalyticsFactory.getAnalytics(this);
         sAnalytics.startTracking();
