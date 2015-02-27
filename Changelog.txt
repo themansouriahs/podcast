@@ -4,6 +4,8 @@ Changelog
 version 0.70
 ------------
 * Dependency cleanup
+* Added "Refresh" menu item to the Feed view
+*
 
 Version 0.68
 -------------

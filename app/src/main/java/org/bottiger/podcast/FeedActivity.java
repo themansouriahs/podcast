@@ -20,6 +20,7 @@ import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -30,10 +31,14 @@ import com.squareup.picasso.Target;
 import org.bottiger.podcast.adapters.FeedViewAdapter;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PaletteObservable;
+import org.bottiger.podcast.parser.FeedUpdater;
 import org.bottiger.podcast.playlist.FeedCursorLoader;
 import org.bottiger.podcast.playlist.ReorderCursor;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.service.DownloadCompleteCallback;
+import org.bottiger.podcast.service.PodcastDownloadManager;
 import org.bottiger.podcast.utils.PaletteCache;
+import org.bottiger.podcast.utils.ThemeHelper;
 import org.bottiger.podcast.utils.WhitenessUtils;
 import org.bottiger.podcast.views.FeedRecyclerView;
 import org.bottiger.podcast.views.FloatingActionButton;
@@ -363,12 +368,27 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.feedview, menu);
+        return super.onCreateOptionsMenu(menu);
+
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case android.R.id.home:
                 //NavUtils.navigateUpFromSameTask(this);
                 mMultiShrinkScroller.scrollOffBottom();
+                return true;
+            case R.id.menu_refresh_feed:
+                PodcastDownloadManager.start_update(this, mSubscription, new DownloadCompleteCallback() {
+                    @Override
+                    public void complete(boolean succes) {
+                        return;
+                    }
+                });
                 return true;
         }
         return super.onOptionsItemSelected(item);
