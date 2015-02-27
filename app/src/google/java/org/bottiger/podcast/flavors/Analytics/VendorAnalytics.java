@@ -7,6 +7,7 @@ import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
+import org.bottiger.podcast.ApplicationConfiguration;
 import org.bottiger.podcast.SoundWaves;
 
 import java.util.HashMap;
@@ -76,7 +77,7 @@ public class VendorAnalytics implements IAnalytics {
         if (!mTrackers.containsKey(trackerId)) {
 
             com.google.android.gms.analytics.GoogleAnalytics analytics = com.google.android.gms.analytics.GoogleAnalytics.getInstance(mContext);
-            Tracker t = analytics.newTracker(SoundWaves.ANALYTICS_ID);
+            Tracker t = analytics.newTracker(ApplicationConfiguration.ANALYTICS_ID);
             mTrackers.put(trackerId, t);
 
         }

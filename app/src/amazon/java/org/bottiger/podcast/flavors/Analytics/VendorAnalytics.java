@@ -11,6 +11,7 @@ import com.amazonaws.mobileconnectors.amazonmobileanalytics.InitializationExcept
 import com.amazonaws.mobileconnectors.amazonmobileanalytics.MobileAnalyticsManager;
 import com.amazonaws.regions.Regions;
 
+import org.bottiger.podcast.ApplicationConfiguration;
 import org.bottiger.podcast.SoundWaves;
 
 /**
@@ -33,10 +34,10 @@ public class VendorAnalytics implements IAnalytics {
         // Replace AWS_ACCOUNT_ID, COGNITO_IDENTITY_POOL, UNAUTHENTICATED_ROLE and AUTHENTICATED_ROLE with the applicable values.
         CognitoCachingCredentialsProvider cognitoProvider = new CognitoCachingCredentialsProvider(
                 mContext.getApplicationContext(),
-                SoundWaves.AMAZON_AMAZON_AWS_ACCOUNT,
-                SoundWaves.AMAZON_COGNITO_IDENTITY_POOL, /* Identity Pool ID */
-                SoundWaves.AMAZON_UNAUTHENTICATED_ARN,
-                SoundWaves.AMAZON_AUTHENTICATED_ARN,
+                ApplicationConfiguration.AMAZON_AMAZON_AWS_ACCOUNT,
+                ApplicationConfiguration.AMAZON_COGNITO_IDENTITY_POOL, /* Identity Pool ID */
+                ApplicationConfiguration.AMAZON_UNAUTHENTICATED_ARN,
+                ApplicationConfiguration.AMAZON_AUTHENTICATED_ARN,
                 Regions.US_EAST_1
         );
 
@@ -45,7 +46,7 @@ public class VendorAnalytics implements IAnalytics {
             options.withAllowsWANDelivery(true);
             analytics = MobileAnalyticsManager.getOrCreateInstance(
                     mContext.getApplicationContext(),
-                    SoundWaves.AMAZON_APP_ID, //Mobile Analytics App ID
+                    ApplicationConfiguration.AMAZON_APP_ID, //Mobile Analytics App ID
                     Regions.US_EAST_1,
                     cognitoProvider,
                     options

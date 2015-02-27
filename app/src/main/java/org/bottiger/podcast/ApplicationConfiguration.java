@@ -15,4 +15,21 @@ public class ApplicationConfiguration {
 	
 	public static final String showListenedKey = "show_listened";
 
+    public static final String formUriBasicAuthLogin = "";
+    public static final String formUriBasicAuthPassword = "";
+
+    // package name
+    public static final String packageName = "org.bottiger.soundwaves";
+
+    // Google Analytics
+    public static final String ANALYTICS_ID = "";
+
+    // Amazon Analytics
+    public static final String AMAZON_APP_ID                = "";
+    public static final String AMAZON_AMAZON_AWS_ACCOUNT    = "";
+    public static final String AMAZON_COGNITO_IDENTITY_POOL = "";
+    public static final String AMAZON_UNAUTHENTICATED_ARN   = "";
+    public static final String AMAZON_AUTHENTICATED_ARN     = "";
+
+
 }

@@ -4,6 +4,9 @@ import android.app.Application;
 import android.support.annotation.NonNull;
 
 import org.acra.ACRA;
+import org.acra.ACRAConfiguration;
+import org.acra.ACRAConfigurationException;
+import org.acra.ReportingInteractionMode;
 
 /**
  * Created by apl on 26-02-2015.
@@ -13,7 +16,14 @@ import org.acra.ACRA;
 public class VendorCrashReporter {
 
     public static void init(@NonNull Application argApplication) {
-        ACRA.init(argApplication);
+        ACRAConfiguration config = ACRA.getConfig();
+        try {
+            config.setMode(ReportingInteractionMode.SILENT);
+        } catch (ACRAConfigurationException e) {
+            e.printStackTrace();
+        } finally {
+            ACRA.init(argApplication, config);
+        }
     }
 
     public static void report(@NonNull String argKey, @NonNull String argValue) {

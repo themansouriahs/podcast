@@ -7,6 +7,9 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import org.acra.ACRA;
+import org.acra.ACRAConfiguration;
+import org.acra.ACRAConfigurationException;
+import org.acra.ReportingInteractionMode;
 import org.bottiger.podcast.SoundWaves;
 
 /**
@@ -17,7 +20,14 @@ import org.bottiger.podcast.SoundWaves;
 public class VendorCrashReporter {
 
     public static void init(@NonNull Application argApplication) {
-        ACRA.init(argApplication);
+        ACRAConfiguration config = ACRA.getConfig();
+        try {
+            config.setMode(ReportingInteractionMode.SILENT);
+        } catch (ACRAConfigurationException e) {
+            e.printStackTrace();
+        } finally {
+            ACRA.init(argApplication, config);
+        }
     }
 	
 	public static void report(@NonNull String argKey, @NonNull String argValue) {

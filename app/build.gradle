@@ -68,7 +68,10 @@ dependencies {
     compile 'com.squareup.okhttp:okhttp-urlconnection:2.2+'
     compile 'com.squareup.picasso:picasso:2+'
 
-    compile 'com.googlecode.json-simple:json-simple:1.1.1'
+    compile ('com.googlecode.json-simple:json-simple:1.1.1') {
+        exclude module: 'junit'
+    }
+
     compile 'com.google.apis:google-api-services-drive:+'
     compile 'com.google.api-client:google-api-client-android:+'
     compile 'com.google.http-client:google-http-client-gson:+'
@@ -92,13 +95,13 @@ dependencies {
     compile 'jp.wasabeef:recyclerview-animators:1.0.3'
     compile 'com.github.traex.rippleeffect:library:1+'
 
+    compile 'ch.acra:acra:4.6.+'
+
     // Free version
 
     // Amazon version
     amazonCompile fileTree(dir: 'src/amazon/libs', include: ['*.jar'])
-    amazonCompile 'ch.acra:acra:4.5.0'
 
     // Play Store
     googleCompile 'com.google.android.gms:play-services-base:6+' // analytics
-    googleCompile 'ch.acra:acra:4.5.0'
 }

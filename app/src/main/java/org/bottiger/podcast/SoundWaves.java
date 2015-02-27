@@ -12,21 +12,14 @@ import org.bottiger.podcast.flavors.Analytics.AnalyticsFactory;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.CrashReporterFactory;
 
-// Acra debugging
-/*
-@ReportsCrashes(
-	      formKey = "", // This is required for backward compatibility but not used
-	      formUri = "http://www.backendofyourchoice.com/reportpath"
-	  )
-*/
 //Acra debugging
-@ReportsCrashes(formKey = "", // This is required for backward compatibility but
+@ReportsCrashes(
         // not used
         formUri = "https://acra.bottiger.org/acra-soundwaves/_design/acra-storage/_update/report",
-        formUriBasicAuthLogin = "soundwaves2", // optional
-        formUriBasicAuthPassword = "", // optional
+        formUriBasicAuthLogin = ApplicationConfiguration.formUriBasicAuthLogin, // optional
+        formUriBasicAuthPassword = ApplicationConfiguration.formUriBasicAuthPassword, // optional
         disableSSLCertValidation = true,
-        mode = ReportingInteractionMode.SILENT,
+        mode = ReportingInteractionMode.DIALOG,
         forceCloseDialogAfterToast=true,
         httpMethod = org.acra.sender.HttpSender.Method.POST,
         reportType = org.acra.sender.HttpSender.Type.JSON,
@@ -35,20 +28,6 @@ import org.bottiger.podcast.flavors.CrashReporter.CrashReporterFactory;
 public class SoundWaves extends Application {
 
     private static Context context;
-
-	// package name
-	public static final String packageName = "org.bottiger.soundwaves";
-
-    // Google Analytics
-    public static final String ANALYTICS_ID = "";
-
-    // Amazon Analytics
-    public static final String AMAZON_APP_ID                = "";
-    public static final String AMAZON_AMAZON_AWS_ACCOUNT    = "";
-    public static final String AMAZON_COGNITO_IDENTITY_POOL = "";
-    public static final String AMAZON_UNAUTHENTICATED_ARN   = "";
-    public static final String AMAZON_AUTHENTICATED_ARN     = "";
-
     // Global constants
     private Boolean mFirstRun = null;
 
@@ -77,7 +56,7 @@ public class SoundWaves extends Application {
     }
 
     private void firstRun(@NonNull Context argContext) {
-        SharedPreferences sharedPref = argContext.getSharedPreferences(packageName, Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = argContext.getSharedPreferences(ApplicationConfiguration.packageName, Context.MODE_PRIVATE);
         String key = getString(R.string.preference_first_run_key);
         boolean firstRun = sharedPref.getBoolean(key, true);
         if (firstRun) {
