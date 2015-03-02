@@ -323,11 +323,15 @@ public class PlaylistFragment extends GeastureFragment implements
 
         mDownloadProgressObservable.registerObserver(mPlayerDownloadButton);
 
+        mTopPlayer.setEpisodeId(item);
+        PaletteObservable.registerListener(mTopPlayer);
+
         PlayerStatusObservable.registerListener(mPlayerSeekbar);
 
 
         Palette palette = PaletteCache.get(item.image);
         if (palette != null) {
+            mTopPlayer.onPaletteFound(palette);
             mPlayPauseButton.onPaletteFound(palette);
             mBackButton.onPaletteFound(palette);
             mForwardButton.onPaletteFound(palette);

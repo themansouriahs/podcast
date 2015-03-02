@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.v7.graphics.Palette;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -13,13 +14,20 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PaletteObservable;
+import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.utils.PaletteCache;
 import org.bottiger.podcast.utils.UIUtils;
+
+import static org.bottiger.podcast.views.PlayerButtonView.StaticButtonColor;
 
 /**
  * Created by apl on 30-09-2014.
  */
-public class TopPlayer extends RelativeLayout {
+public class TopPlayer extends RelativeLayout implements PaletteListener {
+
+    private FeedItem mEpisodeId;
 
     private enum PlayerLayout { SMALL, MEDIUM, LARGE }
     private PlayerLayout mPlayerLayout = PlayerLayout.LARGE;
@@ -33,6 +41,9 @@ public class TopPlayer extends RelativeLayout {
     public static int sizeMedium                =   -1;
     public static int sizeLarge                 =   -1;
     public static int sizeActionbar             =   -1;
+
+    public static int sizeStartShrink           =   -1;
+    public static int sizeShrinkBuffer           =   -1;
 
     private boolean mSeekbarVisible             =   true;
     private int mSeekbarDeadzone                =   20; // dp
@@ -55,7 +66,7 @@ public class TopPlayer extends RelativeLayout {
     private View mEpisodeText;
     private View mEpisodeInfo;
     private View mPhoto;
-    private View mPlayPauseButton;
+    private PlayPauseImageView mPlayPauseButton;
     private View mSeekbarContainer;
 
     private PlayerSeekbar mSeekbar;
@@ -102,6 +113,10 @@ public class TopPlayer extends RelativeLayout {
         sizeSmall = mContext.getResources().getDimensionPixelSize(R.dimen.top_player_size_minimum);
         sizeMedium = mContext.getResources().getDimensionPixelSize(R.dimen.top_player_size_medium);
         sizeLarge = mContext.getResources().getDimensionPixelSize(R.dimen.top_player_size_maximum);
+
+        sizeShrinkBuffer = (int)UIUtils.convertDpToPixel(20, mContext);
+
+        sizeStartShrink = sizeSmall+sizeShrinkBuffer;
         //sizeLarge = 1080; // 1080
 
         mSeekbarDeadzonePx        = (int)UIUtils.convertDpToPixel(mSeekbarDeadzone, mContext);
@@ -135,7 +150,7 @@ public class TopPlayer extends RelativeLayout {
 
         mPhoto = findViewById(R.id.session_photo);
 
-        mPlayPauseButton = findViewById(R.id.play_pause_button);
+        mPlayPauseButton = (PlayPauseImageView) findViewById(R.id.play_pause_button);
         mEpisodeText = findViewById(R.id.episode_title);
         mEpisodeInfo = findViewById(R.id.episode_info);
         mSeekbarContainer = findViewById(R.id.player_progress);
@@ -182,9 +197,11 @@ public class TopPlayer extends RelativeLayout {
 
         translatePhotoY(mPhoto, trans);
 
+        /*
         mPlayerControlsLinearLayout.setTranslationY(-trans);
         mPlayPauseButton.setTranslationY(-trans);
         mForwardButton.setTranslationY(-trans);
+        */
 
         minimalEnsured = true;
     }
@@ -246,19 +263,22 @@ public class TopPlayer extends RelativeLayout {
         mEpisodeText.setTranslationY(-argOffset);
         mEpisodeInfo.setTranslationY(-argOffset);
 
-        Log.d("TopPlayerInput", "transYControl: minMax->" + minMaxScreenHeight + " sizeM-> " + sizeMedium + " -arg-> " + -argOffset);
-        float transYControl = -argOffset > sizeMedium ? -argOffset : sizeMedium;
+        //float transYControl = -argOffset < sizeStartShrink ? -argOffset : sizeStartShrink;
+        float transYControl = -1;
 
+        if (minMaxScreenHeight > sizeStartShrink) {
+            transYControl = -argOffset;
+        } else {
+            transYControl = sizeLarge-sizeStartShrink;
+        }
+
+        Log.d("TopPlayerInput", "transYControl: minMax->" + minMaxScreenHeight + " trans-> " + transYControl + " -arg-> " + -argOffset);
+
+        setBackgroundVisibility(argScreenHeight);
         mPlayerControlsLinearLayout.setTranslationY(transYControl);
         mPlayPauseButton.setTranslationY(transYControl);
         mSeekbarContainer.setTranslationY(transYControl);
         mForwardButton.setTranslationY(transYControl);
-        /*
-        mPlayerControlsLinearLayout.setTranslationY(-argOffset);
-        mPlayPauseButton.setTranslationY(-argOffset);
-        mSeekbarContainer.setTranslationY(-argOffset);
-        mForwardButton.setTranslationY(-argOffset);
-        */
 
         String size = "large";
 
@@ -290,6 +310,10 @@ public class TopPlayer extends RelativeLayout {
 
     public float setSeekbarVisibility(float argTopPlayerHeight) {
         return setGenericVisibility(mSeekbarContainer, sizeMedium, mSeekbarFadeDistancePx, argTopPlayerHeight);
+    }
+
+    public float setBackgroundVisibility(float argTopPlayerHeight) {
+        return setGenericVisibility(mPhoto, sizeStartShrink, sizeShrinkBuffer, argTopPlayerHeight);
     }
 
     public float setGenericVisibility(@NonNull View argView, int argVisibleHeight, int argFadeDistance, float argTopPlayerHeight) {
@@ -356,6 +380,22 @@ public class TopPlayer extends RelativeLayout {
         } else {
             //argImageView.setTranslationY(-amount);
         }
+    }
+
+    public synchronized void setEpisodeId(FeedItem argEpisode) {
+        this.mEpisodeId = argEpisode;
+        PaletteObservable.registerListener(this);
+    }
+
+    @Override
+    public void onPaletteFound(Palette argChangedPalette) {
+        setBackgroundColor(StaticButtonColor(argChangedPalette));
+        invalidate();
+    }
+
+    @Override
+    public String getPaletteUrl() {
+        return mPlayPauseButton.getPaletteUrl();
     }
 
     class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
