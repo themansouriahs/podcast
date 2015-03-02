@@ -96,6 +96,7 @@ dependencies {
     compile 'com.github.traex.rippleeffect:library:1+'
 
     compile 'ch.acra:acra:4.6.+'
+    compile 'com.github.anrwatchdog:anrwatchdog:1.+'
 
     // Free version
 

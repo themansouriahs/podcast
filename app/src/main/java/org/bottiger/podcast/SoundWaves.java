@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 
+import com.github.anrwatchdog.ANRWatchDog;
+
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
@@ -38,9 +40,14 @@ public class SoundWaves extends Application {
     public void onCreate() {
         super.onCreate();
 
+        if (!BuildConfig.DEBUG) {
+            new ANRWatchDog(2000 /*timeout*/).start();
+        }
+
         // The following line triggers the initialization of ACRA
         if (!BuildConfig.DEBUG) {
             CrashReporterFactory.startReporter(this);
+            new ANRWatchDog(2000 /*timeout*/).start();
         }
 
         sAnalytics = AnalyticsFactory.getAnalytics(this);

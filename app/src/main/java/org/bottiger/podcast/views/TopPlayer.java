@@ -182,9 +182,6 @@ public class TopPlayer extends RelativeLayout {
 
         translatePhotoY(mPhoto, trans);
 
-        //mPlayerControlsLinearLayout.setTranslationY(sizeMedium-sizeSmall);
-        //mPlayPauseButton.setTranslationY(sizeMedium-sizeSmall);
-
         mPlayerControlsLinearLayout.setTranslationY(-trans);
         mPlayPauseButton.setTranslationY(-trans);
         mForwardButton.setTranslationY(-trans);
@@ -249,10 +246,19 @@ public class TopPlayer extends RelativeLayout {
         mEpisodeText.setTranslationY(-argOffset);
         mEpisodeInfo.setTranslationY(-argOffset);
 
+        Log.d("TopPlayerInput", "transYControl: minMax->" + minMaxScreenHeight + " sizeM-> " + sizeMedium + " -arg-> " + -argOffset);
+        float transYControl = -argOffset > sizeMedium ? -argOffset : sizeMedium;
+
+        mPlayerControlsLinearLayout.setTranslationY(transYControl);
+        mPlayPauseButton.setTranslationY(transYControl);
+        mSeekbarContainer.setTranslationY(transYControl);
+        mForwardButton.setTranslationY(transYControl);
+        /*
         mPlayerControlsLinearLayout.setTranslationY(-argOffset);
         mPlayPauseButton.setTranslationY(-argOffset);
         mSeekbarContainer.setTranslationY(-argOffset);
         mForwardButton.setTranslationY(-argOffset);
+        */
 
         String size = "large";
 
