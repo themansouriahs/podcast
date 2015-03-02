@@ -109,7 +109,6 @@ public class ExpandableLayoutManager extends LinearLayoutManager {
             scrollLayout(dy);
         }
 
-
         return amount;
     }
 
@@ -192,6 +191,10 @@ public class ExpandableLayoutManager extends LinearLayoutManager {
 
         //mRecyclerView.invalidate();
         return true;
+    }
+
+    public boolean minimalPlayer() {
+        return mTopPlayer.isMinimumSize();
     }
 
 }

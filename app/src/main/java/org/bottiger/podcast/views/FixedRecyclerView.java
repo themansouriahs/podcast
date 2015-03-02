@@ -2,6 +2,7 @@ package org.bottiger.podcast.views;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.os.Debug;
 import android.support.v4.widget.ScrollerCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
@@ -41,28 +42,62 @@ public class FixedRecyclerView extends RecyclerView implements OnDragStateChange
         init(context);
     }
 
-/*
+    private double lastTime = 1;
     @Override
     public void onDraw(Canvas canvas) {
+
         super.onDraw(canvas);
 
+
+        ExpandableLayoutManager lm = (ExpandableLayoutManager)getLayoutManager();
         if (mScroller.computeScrollOffset()) {
             Log.d("FixedRecyclerView", "(ondraw) Y: " + mScroller.getCurrY());
+
+            if (lm.minimalPlayer()) {
+                mScroller.abortAnimation();
+                double dist = mScroller.getCurrY()- mLastY;
+                double time = System.currentTimeMillis() - lastTime;
+                double vel = (dist / time) / 1000.0;
+                super.fling(0, (int)vel);
+                return;
+            }
+
             scrollBy(0, mScroller.getCurrY()- mLastY);
+            //smoothScrollBy(0, mScroller.getCurrY()- mLastY);
+            lastTime = System.currentTimeMillis();
             mLastY = mScroller.getCurrY();
-            postInvalidateDelayed(16);
+            //postInvalidateDelayed(30);
         }
+
     }
+
+    /*
+    @Override
+    public boolean fling(int velocityX, int velocityY) {
+        Log.d("FixedRecyclerView", "(fling velocity)  " + velocityY);
+        return super.fling(velocityX, velocityY);
+    }*/
 
 
     @Override
     public boolean fling(int velocityX, int velocityY) {
-        LayoutManager lm = getLayoutManager();
+        Log.d("FixedRecyclerView", "(fling velocity)  " + velocityY);
+
+        ExpandableLayoutManager lm = (ExpandableLayoutManager)getLayoutManager();
+        if (lm.minimalPlayer()) {
+            return super.fling(velocityX, velocityY);
+        }
+
         mLastY = 0;
         mScroller.fling(0, 0, velocityX, velocityY, 0, 0, -10000 ,10000);
         return true;
-    }*/
 
+        //mScroller.fling(0, 0, velocityX, velocityY, 0, 0, -10000 ,10000);
+        //smoothScrollBy(0, mScroller.getFinalY());
+        //return true;
+    }
+
+    /*
     @Override
     public boolean fling(int velocityX, int velocityY) {
         /*
@@ -76,9 +111,10 @@ public class FixedRecyclerView extends RecyclerView implements OnDragStateChange
                 lm.getTopPlayer().ensureMaximumLayout();
                 setTranslationY(lm.getTopPlayer().getMaximumSize());
             }
-        }*/
+        }
         return super.fling(velocityX, velocityY);
     }
+    */
 
 
     protected void init(Context context) {

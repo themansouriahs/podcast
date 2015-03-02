@@ -89,6 +89,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
     @Override
     public PlaylistViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+        Log.v("PlaylistAdapter", "onCreateViewHolder");
         View view = null;
         view = mInflater.inflate(R.layout.episode_list, viewGroup, false);
         PlaylistViewHolder holder = null;
@@ -107,6 +108,8 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
     private float fingerdowny = -1;
     @Override
     public void onBindViewHolder(PlaylistViewHolder viewHolder, final int position) {
+        Log.v("PlaylistAdapter", "onBindViewHolder");
+
         final PlaylistViewHolder playlistViewHolder2 = (PlaylistViewHolder)viewHolder;
         final FeedItem item = mPlaylist.getItem(position+PLAYLIST_OFFSET);
         boolean isPlaying = false;
@@ -287,6 +290,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
      */
     public void bindExandedPlayer(final Context context, final FeedItem feedItem,
                                   final PlaylistViewHolder holder, int position) {
+        Log.v("PlaylistAdapter", "bindExandedPlayer");
 
         ThemeHelper themeHelper = new ThemeHelper(context);
 
@@ -363,6 +367,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
     @Override
     public int getItemCount() {
+        Log.v("PlaylistAdapter", "getItemCount");
         //int cursorCount = mCursor == null ? 0 : mCursor.getCount();
         int playlistCount = mPlaylist == null ? 0 : mPlaylist.size();
         //int minCount = Math.min(cursorCount, playlistCount);
@@ -373,6 +378,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
     @Override
     public void onViewRecycled(PlaylistViewHolder viewHolder) {
+        Log.v("PlaylistAdapter", "onViewRecycled");
 
         if (viewHolder == null)
             return;
@@ -410,11 +416,13 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
      */
     @Override
     public void registerAdapterDataObserver (RecyclerView.AdapterDataObserver observer) {
+        Log.v("PlaylistAdapter", "registerAdapterDataObserver");
         super.registerAdapterDataObserver(observer);
     }
 
     @Override
     public void unregisterAdapterDataObserver (RecyclerView.AdapterDataObserver observer) {
+        Log.v("PlaylistAdapter", "unregisterAdapterDataObserver");
         super.unregisterAdapterDataObserver(observer);
     }
 
@@ -423,6 +431,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
     }
 
 	public void showItem(Long id) {
+        Log.v("PlaylistAdapter", "showItem");
 		if (!mExpandedItemID.isEmpty())
 			mExpandedItemID.remove(mExpandedItemID.first()); // only show
 														     // one expanded
@@ -431,6 +440,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 	}
 
 	public int toggleItem(Long id) {
+        Log.v("PlaylistAdapter", "toggleItem");
 		if (mExpandedItemID.contains(id)) {
             mExpandedItemID.remove(id);
             return TYPE_COLLAPS;
@@ -443,13 +453,16 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
     // http://stackoverflow.com/questions/5300962/getviewtypecount-and-getitemviewtype-methods-of-arrayadapter
 	@Override
 	public int getItemViewType(int position) {
+        Log.v("PlaylistAdapter", "getItemViewType");
+
         Long id = itemID(position+PLAYLIST_OFFSET); // The recyclervies does not start with item 1 in the playlist
 		boolean isExpanded = mExpandedItemID.contains(id);
+
 		return isExpanded ? TYPE_EXPAND : TYPE_COLLAPS;
-        //return TYPE_COLLAPS;
 	}
 
     public int getTrueItemViewType(int position) {
+        Log.v("PlaylistAdapter", "getTrueItemViewType");
         Long id = itemID(position+PLAYLIST_OFFSET); // The recyclervies does not start with item 1 in the playlist
         boolean isExpanded = mExpandedItemID.contains(id);
         return isExpanded ? TYPE_EXPAND : TYPE_COLLAPS;
@@ -462,6 +475,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 	 * @return ID of the FeedItem
 	 */
 	private Long itemID(int position) {
+        Log.v("PlaylistAdapter", "itemID");
         FeedItem episode = mPlaylist.getItem(position);
 
         if (episode == null)
