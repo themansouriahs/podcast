@@ -1,11 +1,15 @@
 Changelog
 ==========
 
+version 0.72
+------------
+* Fixed crash when opening the settings 
+* Experimenting with a new playlist UI
+
 version 0.70
 ------------
 * Dependency cleanup
 * Added "Refresh" menu item to the Feed view
-*
 
 Version 0.68
 -------------
