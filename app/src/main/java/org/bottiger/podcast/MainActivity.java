@@ -394,7 +394,7 @@ public class MainActivity extends FragmentContainerActivity implements
 			AddPodcastDialog.addPodcast(this);
 			return true;
 		case R.id.menu_settings:
-            TransitionUtils.openSettings(getBaseContext());
+            TransitionUtils.openSettings(this);
 			return true;
 		case R.id.menu_refresh:
 			PodcastDownloadManager.start_update(this);
