@@ -13,6 +13,9 @@
 
         <include layout="@layout/playlist_empty" />
 
+        <include layout="@layout/playlist_scroller" />
+
+        <!--
     <RelativeLayout
         android:id="@+id/playlist_container"
         android:visibility="gone"
@@ -36,7 +39,7 @@
 
 
     </RelativeLayout>
-
+    -->
         <include
             android:id="@+id/playlist_overlay"
             android:animateLayoutChanges="true"

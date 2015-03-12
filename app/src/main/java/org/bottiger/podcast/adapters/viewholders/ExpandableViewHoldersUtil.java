@@ -45,9 +45,7 @@ public class ExpandableViewHoldersUtil {
             aList.add(animator);
             aList.add(animator2);
             aSet.playTogether(aList);
-            //aSet.playTogether(animator, animator2);
             aSet.start();
-            //animator.start();
         }
         else {
             expandView.setVisibility(View.VISIBLE);
@@ -105,7 +103,7 @@ public class ExpandableViewHoldersUtil {
     }
 
     public static class KeepOneH<VH extends PlaylistViewHolder & Expandable> {
-        private int _opened = -1;
+        public int _opened = -1; //private
 
         public void bind(VH holder, int pos) {
             if (pos == _opened)

@@ -24,6 +24,7 @@ import org.bottiger.podcast.views.PlayPauseImageView;
 import org.bottiger.podcast.views.PlayerButtonView;
 import org.bottiger.podcast.views.PlayerSeekbar;
 import org.bottiger.podcast.views.TopPlayer;
+import org.bottiger.podcast.views.playlist.MultiShrinkScroller;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -35,6 +36,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.graphics.Palette;
+import android.support.v7.widget.LinearLayoutManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -69,6 +71,8 @@ public class PlaylistFragment extends GeastureFragment implements
 
     private View mPlaylistContainer;
     private View mEmptyPlaylistContainer;
+
+    private MultiShrinkScroller mMultiShrinkScroller;
 
     private TopPlayer mTopPlayer;
     private ImageView mPhoto;
@@ -143,10 +147,14 @@ public class PlaylistFragment extends GeastureFragment implements
         mSwipeRefreshView.setRefreshing(false);
     }
 
+
+
     @SuppressLint("WrongViewCast")
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view,savedInstanceState);
+
+        mMultiShrinkScroller = (MultiShrinkScroller) mSwipeRefreshView.findViewById(R.id.playlist_container);
 
         mTopPlayer =   (TopPlayer) mSwipeRefreshView.findViewById(R.id.session_photo_container);
         mPhoto =            (ImageView) mSwipeRefreshView.findViewById(R.id.session_photo);
@@ -167,8 +175,41 @@ public class PlaylistFragment extends GeastureFragment implements
 
         setPlaylistViewState(mPlaylist);
 
+        mMultiShrinkScroller.initialize(new MultiShrinkScroller.MultiShrinkScrollerListener() {
+            @Override
+            public void onScrolledOffBottom() {
+
+            }
+
+            @Override
+            public void onStartScrollOffBottom() {
+
+            }
+
+            @Override
+            public void onTransparentViewHeightChange(float ratio) {
+
+            }
+
+            @Override
+            public void onEntranceAnimationDone() {
+
+            }
+
+            @Override
+            public void onEnterFullscreen() {
+
+            }
+
+            @Override
+            public void onExitFullscreen() {
+
+            }
+        }, true);
+
         // use a linear layout manager
-        mLayoutManager = new ExpandableLayoutManager(mActivity, mSwipeRefreshView, mTopPlayer, mRecyclerView, mPhoto);
+        //mLayoutManager = new ExpandableLayoutManager(mActivity, mSwipeRefreshView, mTopPlayer, mRecyclerView, mPhoto);
+        mLayoutManager = new LinearLayoutManager(mActivity);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         //mRecyclerView.setOnScrollListener(this);
@@ -343,8 +384,8 @@ public class PlaylistFragment extends GeastureFragment implements
         int height = TopPlayer.sizeLarge;//1080;//(int)(mPhoto.getHeight()*5.6);
         trans = BackgroundTransformation.getmImageTransformation(mActivity, mImageTransformation, height);
         PicassoWrapper.load(mActivity, item.image, mPhoto, trans, cb);
-        mTopPlayer.getLayoutParams().height = (height); // +actionBarSize
-        mTopPlayer.requestLayout();
+        //mTopPlayer.getLayoutParams().height = (height); // +actionBarSize
+        //mTopPlayer.requestLayout();
     }
     com.squareup.picasso.Transformation trans = null;
 

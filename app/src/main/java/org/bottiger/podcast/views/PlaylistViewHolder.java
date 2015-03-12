@@ -101,7 +101,7 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
         }
 
         int listPost = viewHolder.getPosition();
-        int type = viewHolder.mAdapter.getTrueItemViewType(listPost);
+        int type = viewHolder.mAdapter.getItemViewType(listPost);
 
 
         boolean doAnimate = true;

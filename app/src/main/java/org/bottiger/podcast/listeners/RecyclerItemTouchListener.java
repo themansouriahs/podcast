@@ -66,7 +66,9 @@ public class RecyclerItemTouchListener implements RecyclerView.OnItemTouchListen
         if (viewRect.contains((int)e.getX(), (int)e.getY())) {
             playlistViewHolder2.mPlayPauseButton.onClick(null);
         } else {
-            PlaylistAdapter.keepOne.toggle(playlistViewHolder2);
+            //PlaylistAdapter.keepOne.toggle(playlistViewHolder2);
+            int pos = rv.getChildPosition(childView);
+            PlaylistAdapter.toggle(playlistViewHolder2, pos);
         }
 
     }
