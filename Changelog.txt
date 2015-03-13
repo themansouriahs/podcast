@@ -5,6 +5,7 @@ version 0.72
 ------------
 * Fixed crash when opening the settings 
 * Experimenting with a new playlist UI
+* Fixed crash on startup on 4.1.2
 
 version 0.70
 ------------

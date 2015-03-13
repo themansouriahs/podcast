@@ -11,6 +11,7 @@ import android.transition.Explode;
 import android.transition.Slide;
 import android.transition.Transition;
 import android.view.Window;
+import android.view.WindowManager;
 
 public class TopActivity extends ActionBarActivity {
 	
@@ -21,6 +22,11 @@ public class TopActivity extends ActionBarActivity {
         getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
 
         super.onCreate(savedInstanceState);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+        }
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Transition transition = new Slide();
