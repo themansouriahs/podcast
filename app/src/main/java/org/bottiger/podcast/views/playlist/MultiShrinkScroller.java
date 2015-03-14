@@ -37,6 +37,7 @@ import android.widget.TextView;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.views.FixedRecyclerView;
 import org.bottiger.podcast.views.FloatingActionButton;
+import org.bottiger.podcast.views.TopPlayer;
 
 /**
  * A custom {@link android.view.ViewGroup} that operates similarly to a {@link android.widget.ScrollView}, except with multiple
@@ -596,10 +597,16 @@ public class MultiShrinkScroller extends FrameLayout {
      */
     //@NeededForReflection
     public void setHeaderHeight(int height) {
+        /*
         final ViewGroup.LayoutParams toolbarLayoutParams
                 = mTopViewContainer.getLayoutParams();
         toolbarLayoutParams.height = height;
         mTopViewContainer.setLayoutParams(toolbarLayoutParams);
+        */
+
+        TopPlayer topPlayer = (TopPlayer)mTopViewContainer;
+        topPlayer.setPlayerHeight(height);
+
         //updatePhotoTintAndDropShadow();
         //updateHeaderTextSizeAndMargin();
     }
@@ -768,21 +775,23 @@ public class MultiShrinkScroller extends FrameLayout {
     }
 
     private void scrollUp(int delta) {
-        if (getTransparentViewHeight() != 0) {
-            final int originalValue = getTransparentViewHeight();
-            setTransparentViewHeight(getTransparentViewHeight() - delta);
-            setTransparentViewHeight(Math.max(0, getTransparentViewHeight()));
-            delta -= originalValue - getTransparentViewHeight();
-        }
-        final ViewGroup.LayoutParams topViewLayoutParams
-                = mTopViewContainer.getLayoutParams();
-        if (topViewLayoutParams.height > getFullyCompressedHeaderHeight()) {
-            final int originalValue = topViewLayoutParams.height;
-            topViewLayoutParams.height -= delta;
-            topViewLayoutParams.height = Math.max(topViewLayoutParams.height,
-                    getFullyCompressedHeaderHeight());
-            mTopViewContainer.setLayoutParams(topViewLayoutParams);
-            delta -= originalValue - topViewLayoutParams.height;
+
+        TopPlayer topPlayer = (TopPlayer)mTopViewContainer;
+
+        if (topPlayer.getPlayerHeight() > getFullyCompressedHeaderHeight()) {
+            //final int originalValue = topViewLayoutParams.height;
+            //topViewLayoutParams.height -= delta;
+            //topViewLayoutParams.height = Math.max(topViewLayoutParams.height,
+            //        getFullyCompressedHeaderHeight());
+            //mTopViewContainer.setLayoutParams(topViewLayoutParams);
+            // delta -= originalValue - topViewLayoutParams.height;
+
+            final float originalValue = topPlayer.getPlayerHeight();
+            float newValue = originalValue - delta;
+            newValue = Math.max(newValue, getFullyCompressedHeaderHeight());
+            topPlayer.setPlayerHeight(newValue);
+
+            delta -= originalValue - topPlayer.getPlayerHeight();
         }
         mRecyclerView.scrollBy(0, delta);
     }
@@ -792,8 +801,9 @@ public class MultiShrinkScroller extends FrameLayout {
      * allow the the ScrollView to scroll unless there is new content off of the edge of ScrollView.
      */
     private int getFullyCompressedHeaderHeight() {
-        return Math.min(Math.min(mTopViewContainer.getLayoutParams().height - getOverflowingChildViewSize(), // FIXME min max, not min min
-                mMinimumHeaderHeight), getMaximumScrollableHeaderHeight());
+        TopPlayer topPlayer = (TopPlayer)mTopViewContainer;
+        return Math.min(Math.min((int)topPlayer.getPlayerHeight() - getOverflowingChildViewSize(), // FIXME min max, not min min
+                topPlayer.getMinimumSize()), getMaximumScrollableHeaderHeight());
     }
 
     /**
@@ -811,16 +821,18 @@ public class MultiShrinkScroller extends FrameLayout {
             //delta -= mRecyclerView.getScrollY() - originalValue;
             delta -= getTrackedYScroll() - originalValue;
         }
-        final ViewGroup.LayoutParams toolbarLayoutParams = mTopViewContainer.getLayoutParams();
-        if (toolbarLayoutParams.height < getMaximumScrollableHeaderHeight()) {
-            final int originalValue = toolbarLayoutParams.height;
-            toolbarLayoutParams.height -= delta;
-            toolbarLayoutParams.height = Math.min(toolbarLayoutParams.height,
+
+        TopPlayer topPlayer = (TopPlayer)mTopViewContainer;
+
+
+        if (topPlayer.getPlayerHeight() < getMaximumScrollableHeaderHeight()) {
+            final float originalValue = topPlayer.getPlayerHeight();
+            float newHeight = originalValue - delta;
+            newHeight = Math.min(newHeight,
                     getMaximumScrollableHeaderHeight());
-            mTopViewContainer.setLayoutParams(toolbarLayoutParams);
-            delta -= originalValue - toolbarLayoutParams.height;
+            topPlayer.setPlayerHeight(newHeight);
+            delta -= originalValue - topPlayer.getPlayerHeight();
         }
-        setTransparentViewHeight(getTransparentViewHeight() - delta);
 
         if (getScrollUntilOffBottom() <= 0) {
             post(new Runnable() {
