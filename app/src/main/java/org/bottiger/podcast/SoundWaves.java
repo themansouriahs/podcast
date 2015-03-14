@@ -26,7 +26,6 @@ import org.bottiger.podcast.flavors.CrashReporter.CrashReporterFactory;
         httpMethod = org.acra.sender.HttpSender.Method.POST,
         reportType = org.acra.sender.HttpSender.Type.JSON,
         socketTimeout = 10000)
-
 public class SoundWaves extends Application {
 
     private static Context context;
@@ -40,14 +39,13 @@ public class SoundWaves extends Application {
     public void onCreate() {
         super.onCreate();
 
-        if (!BuildConfig.DEBUG) {
-            new ANRWatchDog(2000 /*timeout*/).start();
-        }
-
         // The following line triggers the initialization of ACRA
         if (!BuildConfig.DEBUG) {
+            // ACRA - crash reporter
             CrashReporterFactory.startReporter(this);
-            new ANRWatchDog(2000 /*timeout*/).start();
+
+            // ANR
+            new ANRWatchDog(10000 /*timeout*/).start();
         }
 
         sAnalytics = AnalyticsFactory.getAnalytics(this);

@@ -20,7 +20,7 @@ import org.bottiger.podcast.SoundWaves;
 public class VendorCrashReporter {
 
     public static void init(@NonNull Application argApplication) {
-        ACRAConfiguration config = ACRA.getConfig();
+        ACRAConfiguration config = ACRA.getNewDefaultConfig(argApplication);
         try {
             config.setMode(ReportingInteractionMode.SILENT);
         } catch (ACRAConfigurationException e) {

@@ -1,6 +1,10 @@
 Changelog
 ==========
 
+version 0.74
+------------
+* Added crash e-mail crash reporter for the free flavor
+
 version 0.72
 ------------
 * Fixed crash when opening the settings 

@@ -177,5 +177,6 @@
     <string name="preference_first_run_key">firstrun</string>
     <string name="menu_feedback">Feedback</string>
     <string name="menu_refresh_feed">Refresh</string>
+    <string name="crash_toast">Crash :( Please help by sending a crash report</string>
 
 </resources>
