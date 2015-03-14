@@ -14,7 +14,6 @@ import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
-import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.BackgroundTransformation;
 import org.bottiger.podcast.utils.PaletteCache;
 import org.bottiger.podcast.utils.StrUtils;
@@ -25,7 +24,6 @@ import org.bottiger.podcast.views.utils.PlaylistViewHolderExpanderHelper;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
-import android.database.Cursor;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -108,7 +106,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
     private float fingerdowny = -1;
     @Override
     public void onBindViewHolder(PlaylistViewHolder viewHolder, final int position) {
-        Log.v("PlaylistAdapter", "onBindViewHolder");
+        Log.v("PlaylistAdapter", "onBindViewHolder(pos: " + position + ")");
 
         final PlaylistViewHolder playlistViewHolder2 = (PlaylistViewHolder)viewHolder;
         final FeedItem item = mPlaylist.getItem(position+PLAYLIST_OFFSET);
@@ -148,6 +146,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
                         float diffy = Math.abs(fingerdowny-event.getRawY());
                         if (diffx < thresshold && diffy < thresshold) {
                            //playlistViewHolder2.onClick(playlistViewHolder2.mLayout, playlistViewHolder2);
+                           toggleItem(item.getId());
                            keepOne.toggle(playlistViewHolder2);
                             fingerDown=null;
                         }
@@ -165,11 +164,12 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
         PaletteObservable.registerListener(playlistViewHolder2.mPlayPauseButton);
 
-        playlistViewHolder2.playerLinearLayout.setVisibility(View.GONE);
+        //playlistViewHolder2.playerLinearLayout.setVisibility(View.GONE);
 
-        int type = getTrueItemViewType(position);
+        int type = getItemViewType(position);
         //type = TYPE_FIRST;
         boolean doExpand = type == TYPE_EXPAND; //  || position < 5
+        //boolean doExpand = keepOne._opened > 0 && keepOne._opened == position;
 
         try {
 
@@ -189,13 +189,6 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
                         isPlaying = true;
                     }
                 }
-            }
-
-
-            if (doExpand) {
-                mExpanderHelper.expand(playlistViewHolder2, false, false);
-            } else if (type == TYPE_COLLAPS) {
-                mExpanderHelper.collapse(playlistViewHolder2, false);
             }
 
             if (item != null) {
@@ -430,7 +423,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         return mExpanderHelper;
     }
 
-	public void showItem(Long id) {
+	public static void showItem(Long id) {
         Log.v("PlaylistAdapter", "showItem");
 		if (!mExpandedItemID.isEmpty())
 			mExpandedItemID.remove(mExpandedItemID.first()); // only show
@@ -439,7 +432,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 		mExpandedItemID.add(id);
 	}
 
-	public int toggleItem(Long id) {
+	public static int toggleItem(Long id) {
         Log.v("PlaylistAdapter", "toggleItem");
 		if (mExpandedItemID.contains(id)) {
             mExpandedItemID.remove(id);
@@ -452,21 +445,14 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
     // http://stackoverflow.com/questions/5300962/getviewtypecount-and-getitemviewtype-methods-of-arrayadapter
 	@Override
-	public int getItemViewType(int position) {
-        Log.v("PlaylistAdapter", "getItemViewType");
+    public int getItemViewType(int position) {
 
         Long id = itemID(position+PLAYLIST_OFFSET); // The recyclervies does not start with item 1 in the playlist
 		boolean isExpanded = mExpandedItemID.contains(id);
 
+        Log.v("PlaylistAdapter", "getItemViewType: " + isExpanded);
 		return isExpanded ? TYPE_EXPAND : TYPE_COLLAPS;
 	}
-
-    public int getTrueItemViewType(int position) {
-        Log.v("PlaylistAdapter", "getTrueItemViewType");
-        Long id = itemID(position+PLAYLIST_OFFSET); // The recyclervies does not start with item 1 in the playlist
-        boolean isExpanded = mExpandedItemID.contains(id);
-        return isExpanded ? TYPE_EXPAND : TYPE_COLLAPS;
-    }
 
 	/**
 	 * Returns the ID of the item at the position
@@ -474,9 +460,10 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 	 * @param position
 	 * @return ID of the FeedItem
 	 */
-	private Long itemID(int position) {
+	private static Long itemID(int position) {
         Log.v("PlaylistAdapter", "itemID");
-        FeedItem episode = mPlaylist.getItem(position);
+        Playlist playlist = Playlist.getActivePlaylist();
+        FeedItem episode = playlist.getItem(position);
 
         if (episode == null)
             return -1L;
@@ -484,4 +471,15 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         Long id = episode.getId(); //Long.valueOf(((ReorderCursor) mCursor).getInt(mCursor.getColumnIndex(BaseColumns._ID)));
         return id;
 	}
+
+    @Override
+    public long getItemId (int position) {
+        return itemID(position);
+    }
+
+    public static void toggle(PlaylistViewHolder pvh, int pos) {
+        Long id = itemID(pos+PLAYLIST_OFFSET);
+        //toggleItem(id);
+        keepOne.toggle(pvh);
+    }
 }

@@ -112,6 +112,7 @@ public class ExpandableLayoutManager extends LinearLayoutManager {
         return amount;
     }
 
+    @Deprecated
     public boolean scrollLayout( float distanceY) {
         Log.d("GeatureDetector", "scrollLayout: distanceY -> " + distanceY);
 
@@ -151,7 +152,7 @@ public class ExpandableLayoutManager extends LinearLayoutManager {
         }
 
         if ( (!mTopPlayer.isMinimumSize() && distanceY > 0) || (!mTopPlayer.isMaximumSize() && distanceY < 0) ) {
-            newVisibleHeight = mTopPlayer.setPlayerHeight(currentHeight, newShrinkAmount);
+            newVisibleHeight = 0; //mTopPlayer.setPlayerHeight(currentHeight, newShrinkAmount);
             Log.d("photoOffsejjjt", "newShrinkAmount (in) -> "  + newShrinkAmount + " newVisibleHeight (out) -> " + newVisibleHeight);
         }
 

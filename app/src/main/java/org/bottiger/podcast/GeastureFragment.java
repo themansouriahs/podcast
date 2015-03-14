@@ -31,13 +31,6 @@ public abstract class GeastureFragment extends AbstractEpisodeFragment implement
     protected int getLayout() {
         return R.layout.playlist_fragment_main;
     }
-    
-    /**
-     * Return list item layout resource passed to the ArrayAdapter.
-     */
-    protected int getItemLayout() {
-        return R.layout.episode_list;
-    }
 
     /** Called when the activity is first created. */
     @Override

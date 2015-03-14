@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 
@@ -50,6 +51,8 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
     private int mSeekbarFadeDistance            =   20; // dp
     private int mTextInfoFadeDistance           =   100; // dp
     private int mTextFadeDistance               =   20; // dp
+
+    private float screenHeight;
 
     private int mSeekbarDeadzonePx;
     private int mSeekbarFadeDistancePx;
@@ -114,7 +117,9 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
         sizeMedium = mContext.getResources().getDimensionPixelSize(R.dimen.top_player_size_medium);
         sizeLarge = mContext.getResources().getDimensionPixelSize(R.dimen.top_player_size_maximum);
 
-        sizeShrinkBuffer = (int)UIUtils.convertDpToPixel(20, mContext);
+        screenHeight = sizeLarge;
+
+        sizeShrinkBuffer = (int)UIUtils.convertDpToPixel(100, mContext);
 
         sizeStartShrink = sizeSmall+sizeShrinkBuffer;
         //sizeLarge = 1080; // 1080
@@ -235,12 +240,41 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
         maximumEnsured = true;
     }
 
+    public float getPlayerHeight() {
+        return screenHeight;
+    }
+
     // returns actual visible height
-    public float setPlayerHeight(float argScreenHeight, float argOffset) {
+    public float setPlayerHeight(float argScreenHeight) {
         minimalEnsured = false;
         maximumEnsured = false;
 
         if (!validateState()) {
+            return -1;
+        }
+
+        Log.v("TopPlayer", "setPlayerHeight: " +  argScreenHeight);
+
+        screenHeight = argScreenHeight;
+        float argOffset = argScreenHeight-sizeLarge;
+
+        float transYControl = argOffset/2;
+
+        setBackgroundVisibility(screenHeight);
+        /*
+        mPlayerControlsLinearLayout.setTranslationY(transYControl);
+        mPlayPauseButton.setTranslationY(transYControl);
+        mSeekbarContainer.setTranslationY(transYControl);
+        mForwardButton.setTranslationY(transYControl);
+        */
+
+        //setTranslationY(transYControl);
+        ViewGroup.LayoutParams lp = getLayoutParams();
+        lp.height = (int)screenHeight;
+        setLayoutParams(lp);
+
+
+        if (System.currentTimeMillis() > 0) {
             return -1;
         }
 
@@ -264,7 +298,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
         mEpisodeInfo.setTranslationY(-argOffset);
 
         //float transYControl = -argOffset < sizeStartShrink ? -argOffset : sizeStartShrink;
-        float transYControl = -1;
+        transYControl = -1;
 
         if (minMaxScreenHeight > sizeStartShrink) {
             transYControl = -argOffset;
@@ -274,7 +308,6 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
 
         Log.d("TopPlayerInput", "transYControl: minMax->" + minMaxScreenHeight + " trans-> " + transYControl + " -arg-> " + -argOffset);
 
-        setBackgroundVisibility(argScreenHeight);
         mPlayerControlsLinearLayout.setTranslationY(transYControl);
         mPlayPauseButton.setTranslationY(transYControl);
         mSeekbarContainer.setTranslationY(transYControl);
