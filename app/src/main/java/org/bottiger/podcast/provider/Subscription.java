@@ -19,6 +19,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.support.v4.util.LruCache;
@@ -60,6 +61,10 @@ public class Subscription extends AbstractItem {
 	public long lastItemUpdated;
 	public long fail_count;
 	public long auto_download;
+
+    private int mPrimaryColor;
+    private int mPrimaryTintColor;
+    private int mSecondaryColor;
 
 	public static void view(Activity act, long channel_id) {
 		Uri uri = ContentUris.withAppendedId(SubscriptionColumns.URI,
@@ -225,6 +230,9 @@ public class Subscription extends AbstractItem {
 		auto_download = -1;
 		sync_id = null;
 		status = -1;
+        mPrimaryColor = -1;
+        mPrimaryTintColor = -1;
+        mSecondaryColor = -1;
 	}
 
 	public Subscription() {
@@ -291,9 +299,6 @@ public class Subscription extends AbstractItem {
 
 		Subscription sub_test = Subscription.getByUrl(
 				context.getContentResolver(), url);
-		if (sub_test != null && MainActivity.gReader != null)
-			MainActivity.gReader.addSubscriptiontoReader(context,
-					MainActivity.mAccount, sub_test);
 
 		return ADD_SUCCESS;
 
@@ -355,6 +360,15 @@ public class Subscription extends AbstractItem {
 
 		if (status >= 0)
 			cv.put(SubscriptionColumns.STATUS, status);
+
+        if (mPrimaryColor >= 0)
+            cv.put(SubscriptionColumns.PRIMARY_COLOR, mPrimaryColor);
+
+        if (mPrimaryTintColor >= 0)
+            cv.put(SubscriptionColumns.PRIMARY_TINT_COLOR, mPrimaryTintColor);
+
+        if (mSecondaryColor >= 0)
+            cv.put(SubscriptionColumns.SECONDARY_COLOR, mSecondaryColor);
 
 		// cv.put(SubscriptionColumns.COMMENT, "valuehejeh");
 
@@ -422,6 +436,13 @@ public class Subscription extends AbstractItem {
 		sub.fail_count = cursor.getLong(cursor
 				.getColumnIndex(SubscriptionColumns.FAIL_COUNT));
 
+        sub.mPrimaryColor = cursor.getInt(cursor
+                .getColumnIndex(SubscriptionColumns.PRIMARY_COLOR));
+        sub.mPrimaryTintColor = cursor.getInt(cursor
+                .getColumnIndex(SubscriptionColumns.PRIMARY_TINT_COLOR));
+        sub.mSecondaryColor = cursor.getInt(cursor
+                .getColumnIndex(SubscriptionColumns.SECONDARY_COLOR));
+
 		// if item was not cached we put it in the cache
 		synchronized (cache) {
 			cache.put(sub.id, sub);
@@ -429,6 +450,30 @@ public class Subscription extends AbstractItem {
 
 		return sub;
 	}
+
+    public void setPrimaryColor(int argColor) {
+        mPrimaryColor = argColor;
+    }
+
+    public void setPrimaryTintColor(int argColor) {
+        mPrimaryTintColor = argColor;
+    }
+
+    public void setSecondaryColor(int argColor) {
+        mSecondaryColor = argColor;
+    }
+
+    public int getPrimaryColor() {
+        return mPrimaryColor;
+    }
+
+    public int getPrimaryTintColor() {
+        return mPrimaryTintColor;
+    }
+
+    public int getSecondaryColor() {
+        return mSecondaryColor;
+    }
 
 	@Override
 	public String toString() {

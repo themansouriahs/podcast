@@ -38,12 +38,15 @@ public class SubscriptionColumns implements BaseColumns {
 	public static final String REMOTE_ID = "sync";	
 	public static final String AUTO_DOWNLOAD = "auto_download";	
 	public static final String PLAYLIST_POSITION = "playlist_id";		
-	
+
+    public static final String PRIMARY_COLOR = "primary_color";
+    public static final String PRIMARY_TINT_COLOR = "primary_tint_color";
+    public static final String SECONDARY_COLOR = "secondary_color";
 
 	public static final String[] ALL_COLUMNS = { _ID, URL, LINK, TITLE,
 			DESCRIPTION, LAST_UPDATED, LAST_ITEM_UPDATED, FAIL_COUNT, STATUS,
 			COMMENT, RATING, USERNAME, PASSWORD, SERVER_ID, REMOTE_ID, AUTO_DOWNLOAD,
-			PLAYLIST_POSITION, IMAGE_URL};
+			PLAYLIST_POSITION, IMAGE_URL, PRIMARY_COLOR, PRIMARY_TINT_COLOR, SECONDARY_COLOR};
 	
 	  /** The index of the projection columns */
 	  public static final int COLUMN_INDEX_ID = 0;
@@ -122,7 +125,18 @@ public class SubscriptionColumns implements BaseColumns {
 		}		
 		if (values.containsKey(PLAYLIST_POSITION) == false) {
 			values.put(PLAYLIST_POSITION, -1);
-		}			
+		}
+
+        if (values.containsKey(PRIMARY_COLOR) == false) {
+            values.put(PRIMARY_COLOR, -1);
+        }
+        if (values.containsKey(PRIMARY_TINT_COLOR) == false) {
+            values.put(PRIMARY_TINT_COLOR, -1);
+        }
+        if (values.containsKey(SECONDARY_COLOR) == false) {
+            values.put(SECONDARY_COLOR, -1);
+        }
+
 		return values;
 	}
 }

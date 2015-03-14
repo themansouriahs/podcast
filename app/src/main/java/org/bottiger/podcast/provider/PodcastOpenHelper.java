@@ -10,7 +10,7 @@ public class PodcastOpenHelper extends SQLiteOpenHelper {
 
 	private final PodcastLog log = PodcastLog.getLog(getClass());
 
-	private final static int DBVERSION = 16;
+	private final static int DBVERSION = 17;
 	private final static String DBNAME = "podcast.db";
 
 	public PodcastOpenHelper(Context context) {
@@ -36,16 +36,28 @@ public class PodcastOpenHelper extends SQLiteOpenHelper {
 
 	}
 
+    @Override
+    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
+    }
+
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		/*
-		if (oldVersion == 16 && newVersion == 17) {
-			// Delete duplicates
-			String sql_delete_duplicates = "DELETE n1 FROM "
-					+ ItemColumns.TABLE_NAME + " n1, " + ItemColumns.TABLE_NAME
-					+ " n2 WHERE n1.id > n2.id AND n1.url = n2.url";
-		}
-		*/
+
+        if (oldVersion == 16 && newVersion == 17) {
+            // Add new column
+            String new_item_column1 = "ALTER TABLE " + SubscriptionColumns.TABLE_NAME
+                    + " ADD COLUMN " + SubscriptionColumns.PRIMARY_COLOR + " INTEGER DEFAULT 0;";
+            String new_item_column2 = "ALTER TABLE " + SubscriptionColumns.TABLE_NAME
+                    + " ADD COLUMN " + SubscriptionColumns.PRIMARY_TINT_COLOR + " INTEGER DEFAULT 0;";
+            String new_item_column3 = "ALTER TABLE " + SubscriptionColumns.TABLE_NAME
+                    + " ADD COLUMN " + SubscriptionColumns.SECONDARY_COLOR + " INTEGER DEFAULT 0;";
+
+            log.debug("Upgrading database from version 16 to 17");
+            db.execSQL(new_item_column1);
+            db.execSQL(new_item_column2);
+            db.execSQL(new_item_column3);
+        }
 		if (oldVersion == 15 && newVersion == 16) {
 			// Add new column
 			String new_item_column = "ALTER TABLE " + ItemColumns.TABLE_NAME
@@ -141,11 +153,14 @@ public class PodcastOpenHelper extends SQLiteOpenHelper {
 					+ ItemColumns.sql_change_keep_status_to_played);
 			db.execSQL(ItemColumns.sql_change_keep_status_to_played);
 			log.debug("Done upgrading database");
-		} else if (oldVersion != newVersion) {
+		}
+
+        /*
+        else if (oldVersion != newVersion) {
 			// drop db
 			db.execSQL("DROP TABLE " + ItemColumns.TABLE_NAME);
 			db.execSQL("DROP TABLE " + SubscriptionColumns.TABLE_NAME);
 			onCreate(db);
-		}
+		}*/
 	}
 }
