@@ -382,7 +382,7 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
     @Override
     public void onPaletteFound(Palette argChangedPalette) {
         ColorExtractor extractor = new ColorExtractor(this, argChangedPalette);
-        mMultiShrinkScroller.setHeaderTintColor(extractor.getPrimaryTint());
+        mMultiShrinkScroller.setHeaderTintColor(extractor.getPrimary());
         mFloatingButton.onPaletteFound(argChangedPalette);
     }
 

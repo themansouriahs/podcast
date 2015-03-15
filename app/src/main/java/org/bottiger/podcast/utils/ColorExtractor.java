@@ -52,19 +52,23 @@ public class ColorExtractor {
     }
 
     private void loadPrimaryColor(@Nullable Palette argPalette) {
-        mPrimary = getColor(argPalette.getVibrantSwatch(), R.color.colorPrimary);
+        Palette.Swatch swatch = argPalette != null ? argPalette.getDarkVibrantSwatch() : null;
+        mPrimary = getColor(swatch, R.color.colorPrimary);
     }
 
     private void loadPrimaryTintColor(@Nullable Palette argPalette) {
-        mPrimaryTint = getColor(argPalette.getDarkVibrantSwatch(), R.color.colorPrimaryDark);
+        Palette.Swatch swatch = argPalette != null ? argPalette.getLightVibrantSwatch() : null;
+        mPrimaryTint = getColor(swatch, R.color.colorPrimaryDark);
     }
 
     private void loadSecondaryColor(@Nullable Palette argPalette) {
-        mSecondary = getColor(argPalette.getMutedSwatch(), R.color.colorSecondary);
+        Palette.Swatch swatch = argPalette != null ? argPalette.getMutedSwatch() : null;
+        mSecondary = getColor(swatch, R.color.colorSecondary);
     }
 
     private void loadSecondaryTintColor(@Nullable Palette argPalette) {
-        mSecondary = getColor(argPalette.getLightMutedSwatch(), R.color.colorAccent);
+        Palette.Swatch swatch = argPalette != null ? argPalette.getLightMutedSwatch() : null;
+        mSecondary = getColor(swatch, R.color.colorAccent);
     }
 
     private int getColor(@Nullable Palette.Swatch argSwatch, int defaultColorResource) {
