@@ -5,11 +5,11 @@
     <color name="pitch_black">#FF000000</color>
 
     <style name="SoundWavesTheme" parent="Theme.AppCompat.NoActionBar">
-        <item name="playpause_icon">@drawable/playpause</item>
-        <item name="play_icon">@drawable/av_play</item>
-        <item name="pause_icon">@drawable/av_pause</item>
-        <item name="play_invert_icon">@drawable/av_play_dark</item>
-        <item name="pause_invert_icon">@drawable/av_pause_dark</item>
+        <item name="playpause_icon">@drawable/ic_play_arrow_white</item>
+        <item name="play_icon">@drawable/ic_play_arrow_white</item>
+        <item name="pause_icon">@drawable/ic_pause_white</item>
+        <item name="play_invert_icon">@drawable/ic_play_arrow_black</item>
+        <item name="pause_invert_icon">@drawable/ic_pause_black</item>
         <item name="fast_forward_icon">@drawable/ic_action_fast_forward</item>
         <item name="rewind_icon">@drawable/ic_action_rewind</item>
         <item name="previous_icon">@drawable/ic_action_previous</item>
@@ -36,11 +36,11 @@
     </style>
 
     <style name="SoundWavesTheme.Light" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="playpause_icon">@drawable/playpause_dark</item>
-        <item name="play_icon">@drawable/av_play_dark</item>
-        <item name="pause_icon">@drawable/av_pause_dark</item>
-        <item name="play_invert_icon">@drawable/av_play</item>
-        <item name="pause_invert_icon">@drawable/av_pause</item>
+        <item name="playpause_icon">@drawable/ic_play_arrow_white</item>
+        <item name="play_icon">@drawable/ic_play_arrow_white</item>
+        <item name="pause_icon">@drawable/ic_pause_white</item>
+        <item name="play_invert_icon">@drawable/ic_play_arrow_black</item>
+        <item name="pause_invert_icon">@drawable/ic_pause_black</item>
         <item name="fast_forward_icon">@drawable/ic_action_fast_forward</item>
         <item name="rewind_icon">@drawable/ic_action_rewind</item>
         <item name="previous_icon">@drawable/ic_action_previous</item>

@@ -83,7 +83,7 @@ public class NotificationPlayer {
 
 		// mId allows you to update the notification later on.
 
-        Notification.Builder builder = buildNotification(isPlaying, mPlayerService, mArtwork);
+        NotificationCompat.Builder builder = buildNotification(isPlaying, mPlayerService, mArtwork);
 
         if (builder == null)
             return null;
@@ -111,7 +111,7 @@ public class NotificationPlayer {
     public void refresh() {
         PlayerService ps = mPlayerService;
         if (ps != null && (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)) {
-            Notification.Builder notificationBuilder = buildNotification(ps.isPlaying(), mPlayerService, mArtwork);
+            NotificationCompat.Builder notificationBuilder = buildNotification(ps.isPlaying(), mPlayerService, mArtwork);
 
             if (notificationBuilder == null)
                 return;
@@ -148,13 +148,15 @@ public class NotificationPlayer {
     }
 
 
-    @TargetApi(21)
-	private Notification.Builder buildNotification(@NonNull Boolean isPlaying, @NonNull PlayerService argPlayerService, @Nullable Bitmap icon) {
+	private NotificationCompat.Builder buildNotification(@NonNull Boolean isPlaying, @NonNull PlayerService argPlayerService, @Nullable Bitmap icon) {
+        return customStyleNotification(isPlaying, argPlayerService, icon);
+        /*
         if (android.os.Build.VERSION.SDK_INT < 21) {
             return null;
         }
 
         return mediaStyleNotification(isPlaying, argPlayerService, icon);
+        */
 	}
 
     @Nullable
@@ -166,7 +168,7 @@ public class NotificationPlayer {
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(mContext)
-                        .setSmallIcon(R.drawable.soundwaves)
+                        .setSmallIcon(R.drawable.icon)
                         .setContentTitle(item.title)
                         .setContentText(item.sub_title)
                         .setLargeIcon(icon);
@@ -188,11 +190,12 @@ public class NotificationPlayer {
         PendingIntent pendingNextIntent = PendingIntent.getBroadcast(mContext, 0, nextIntent, 0);
 
         layout.setOnClickPendingIntent(R.id.play_pause_button,pendingToggleIntent);
-        layout.setOnClickPendingIntent(R.id.next_button,pendingNextIntent);
+        //layout.setOnClickPendingIntent(R.id.next_button,pendingNextIntent);
 
         //PlayerStatusListener.registerImageView(, mContext);
-        int srcId = R.drawable.av_play;
-        if (isPlaying) srcId = R.drawable.av_pause;
+
+        int srcId = R.drawable.ic_play_arrow_black;
+        if (isPlaying) srcId = R.drawable.ic_pause_black;
 
         layout.setImageViewResource(R.id.play_pause_button, srcId);
 
