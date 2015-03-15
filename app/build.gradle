@@ -9,25 +9,32 @@ android {
         applicationId "org.bottiger.podcast"
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode 89     // even - release. Odd - development
+        versionCode 91     // even - release. Odd - development
         versionName "0.75" // even - release. Odd - development
         //useJack = true
     }
 
     productFlavors {
+
+        dev {
+            buildConfigField "boolean", "DEV_MODE", "true"
+        }
+
         free {
+            buildConfigField "boolean", "DEV_MODE", "false"
         }
 
         google {
+            buildConfigField "boolean", "DEV_MODE", "false"
         }
 
         amazon {
+            buildConfigField "boolean", "DEV_MODE", "false"
         }
     }
 
     buildTypes {
         release {
-            //minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -46,7 +53,6 @@ android {
 
 repositories {
     mavenCentral()
-    //maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
 }
 
 idea {
