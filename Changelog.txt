@@ -6,6 +6,7 @@ version 0.74
 * Added crash e-mail crash reporter for the free flavor
 * Updated Playlist UI
 * Tweaked subscription UI
+* Tweaked UI colors
 
 version 0.72
 ------------
