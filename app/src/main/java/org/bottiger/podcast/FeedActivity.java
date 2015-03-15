@@ -198,6 +198,10 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
             throw new IllegalStateException("Episode can not be null");
         }
 
+        if (mSubscription.IsDirty()) {
+            mSubscription.update(this.getContentResolver());
+        }
+
         // Show QuickContact in front of soft input
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM,
                 WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
@@ -378,13 +382,6 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
     @Override
     public void onPaletteFound(Palette argChangedPalette) {
         ColorExtractor extractor = new ColorExtractor(this, argChangedPalette);
-        /*
-        if (argChangedPalette != null && argChangedPalette.getVibrantSwatch() != null) {
-            //mMultiShrinkScroller.setHeaderTintColor(argChangedPalette.getVibrantSwatch().getRgb());
-            mMultiShrinkScroller.setHeaderTintColor(argChangedPalette.getLightMutedColor(Color.RED));
-            mFloatingButton.onPaletteFound(argChangedPalette);
-        }
-        */
         mMultiShrinkScroller.setHeaderTintColor(extractor.getPrimaryTint());
         mFloatingButton.onPaletteFound(argChangedPalette);
     }

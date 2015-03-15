@@ -49,6 +49,8 @@ public class Subscription extends AbstractItem implements PaletteListener {
 
 	private static SubscriptionLruCache cache = null;
 
+    private boolean mIsDirty = false;
+
 	public long id;
 	public String title;
 
@@ -496,9 +498,21 @@ public class Subscription extends AbstractItem implements PaletteListener {
     @Override
     public void onPaletteFound(@Nullable Palette argChangedPalette) {
         ColorExtractor extractor = new ColorExtractor(argChangedPalette);
-        mPrimaryColor = extractor.getPrimary();
-        mPrimaryTintColor = extractor.getPrimaryTint();
-        mSecondaryColor = extractor.getSecondary();
+        int newPrimaryColor = extractor.getPrimary();
+        int newPrimaryTintColor = extractor.getPrimaryTint();
+        int newSecondaryColor = extractor.getSecondary();
+
+        if (newPrimaryColor != mPrimaryColor || newPrimaryTintColor != mPrimaryTintColor ||newSecondaryColor != mSecondaryColor) {
+            mIsDirty = true;
+        }
+
+        mPrimaryColor     = newPrimaryColor;
+        mPrimaryTintColor = newPrimaryTintColor;
+        mSecondaryColor   = newSecondaryColor;
+    }
+
+    public boolean IsDirty() {
+        return mIsDirty;
     }
 
     @Override
