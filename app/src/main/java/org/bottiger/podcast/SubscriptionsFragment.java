@@ -15,16 +15,11 @@ import org.bottiger.podcast.utils.FragmentUtils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.CursorLoader;
-import android.database.ContentObservable;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.database.MatrixCursor;
-import android.graphics.Color;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.widget.SearchView;
@@ -47,8 +42,6 @@ import android.widget.Toast;
 
 import com.dragontek.mygpoclient.pub.PublicClient;
 import com.dragontek.mygpoclient.simple.IPodcast;
-
-import static android.support.v4.app.ActivityCompat.invalidateOptionsMenu;
 
 public class SubscriptionsFragment extends Fragment implements SubscriptionGridCursorAdapter.OnPopulateSubscriptionList {
 
@@ -82,7 +75,7 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
 
     private RelativeLayout mEmptySubscrptionList;
 
-    private Activity mContext;
+    private Activity mActivity;
     private FrameLayout mContainerView;
 
 	long id;
@@ -93,7 +86,7 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-        mContext = getActivity();
+        mActivity = getActivity();
 	}
 
 	@Override
