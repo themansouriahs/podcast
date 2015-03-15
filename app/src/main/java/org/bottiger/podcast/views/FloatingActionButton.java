@@ -8,6 +8,7 @@ import android.util.AttributeSet;
 
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PaletteObservable;
+import org.bottiger.podcast.utils.ColorExtractor;
 
 /**
  * Created by apl on 12-02-2015.
@@ -15,17 +16,21 @@ import org.bottiger.podcast.listeners.PaletteObservable;
 public class FloatingActionButton extends com.melnykov.fab.FloatingActionButton implements PaletteListener {
 
     private String mURL;
+    private Context mContext;
 
     public FloatingActionButton(Context context) {
         super(context);
+        mContext = context;
     }
 
     public FloatingActionButton(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mContext = context;
     }
 
     public FloatingActionButton(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        mContext = context;
     }
 
     public void setPaletteUrl(String argURL) {
@@ -36,6 +41,7 @@ public class FloatingActionButton extends com.melnykov.fab.FloatingActionButton 
     @Override
     public void onPaletteFound(Palette argChangedPalette) {
 
+        /*
         Palette.Swatch s = argChangedPalette.getVibrantSwatch();
         int color = PlayerButtonView.StaticButtonColor(argChangedPalette);
         int colorPressed = argChangedPalette.getLightMutedSwatch().getRgb();
@@ -45,6 +51,11 @@ public class FloatingActionButton extends com.melnykov.fab.FloatingActionButton 
         super.setColorNormal(color);
         super.setColorPressed(colorPressed);
         super.setColorRipple(colorRipple);
+        */
+        ColorExtractor extractor = new ColorExtractor(mContext, argChangedPalette);
+        super.setColorNormal(extractor.getPrimary());
+        super.setColorPressed(extractor.getSecondary());
+        super.setColorRipple(extractor.getPrimaryTint());
 
         invalidate();
     }

@@ -32,6 +32,7 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
 
     private PlayerStatusObservable.STATUS mStatus = PlayerStatusObservable.STATUS.STOPPED;
     private long mEpisodeId = -1;
+    private Context mContext;
 
     private static Bitmap s_playIcon;
     private static Bitmap s_pauseIcon;
@@ -44,20 +45,22 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
 
     public PlayPauseImageView(Context context) {
         super(context);
-        init();
+        init(context);
     }
 
     public PlayPauseImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
+        init(context);
     }
 
     public PlayPauseImageView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        init();
+        init(context);
     }
 
-    private void init() {
+    private void init(Context argContext) {
+        mContext = argContext;
+
         paint = new Paint(Paint.LINEAR_TEXT_FLAG);
         paint.setColor(mPaintColor);
         paint.setTextSize(12.0F);
@@ -181,7 +184,7 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
 
     @Override
     public void onPaletteFound(Palette argChangedPalette) {
-        setColor(PlayerButtonView.StaticButtonColor(argChangedPalette));
+        setColor(PlayerButtonView.StaticButtonColor(mContext, argChangedPalette));
         invalidate();
     }
 

@@ -422,7 +422,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
 
     @Override
     public void onPaletteFound(Palette argChangedPalette) {
-        setBackgroundColor(StaticButtonColor(argChangedPalette));
+        setBackgroundColor(StaticButtonColor(mContext, argChangedPalette));
         invalidate();
     }
 

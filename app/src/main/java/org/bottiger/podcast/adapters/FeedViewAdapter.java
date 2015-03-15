@@ -21,6 +21,7 @@ import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.PaletteCache;
 import org.bottiger.podcast.views.DownloadButtonView;
 import org.bottiger.podcast.views.PlayPauseImageView;
@@ -29,6 +30,8 @@ import org.bottiger.podcast.views.PlayPauseImageView;
  * Created by apl on 02-09-2014.
  */
 public class FeedViewAdapter extends AbstractEpisodeCursorAdapter<FeedViewAdapter.EpisodeViewHolder> {
+
+    private Subscription mSubscription;
 
     private DownloadProgressObservable mDownloadProgressObservable;
     private Palette mPalette;
@@ -62,6 +65,10 @@ public class FeedViewAdapter extends AbstractEpisodeCursorAdapter<FeedViewAdapte
         final FeedItem item = FeedItem.getByCursor(mCursor);
         final EpisodeViewHolder episodeViewHolder = (EpisodeViewHolder) viewHolder;
 
+        if (mSubscription == null) {
+            mSubscription = item.getSubscription(mContext);
+        }
+
         boolean isPlaying = false;
         if (PodcastBaseFragment.mPlayerServiceBinder != null && PodcastBaseFragment.mPlayerServiceBinder.isInitialized()) {
             if (item.getId() == PodcastBaseFragment.mPlayerServiceBinder
@@ -90,7 +97,7 @@ public class FeedViewAdapter extends AbstractEpisodeCursorAdapter<FeedViewAdapte
         episodeViewHolder.mDownloadButton.setEpisode(item);
         mDownloadProgressObservable.registerObserver(episodeViewHolder.mDownloadButton);
 
-        Palette palette = PaletteCache.get(episodeViewHolder.mPlayPauseButton);
+        Palette palette = PaletteCache.get(mSubscription);
         if (palette != null)
             mPalette = palette;
 

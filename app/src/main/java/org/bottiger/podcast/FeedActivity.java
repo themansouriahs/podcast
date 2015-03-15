@@ -37,6 +37,7 @@ import org.bottiger.podcast.playlist.ReorderCursor;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.DownloadCompleteCallback;
 import org.bottiger.podcast.service.PodcastDownloadManager;
+import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.PaletteCache;
 import org.bottiger.podcast.utils.ThemeHelper;
 import org.bottiger.podcast.utils.WhitenessUtils;
@@ -93,6 +94,7 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
     private FeedViewAdapter mAdapter;
     private FeedCursorLoader mCursorLoader;
     protected ReorderCursor mCursor = null;
+    private String mUrl;
 
     /**
      *  This scrim's opacity is controlled in two different ways. 1) Before the initial entrance
@@ -148,9 +150,10 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
         @Override
         public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
             BitmapDrawable bd = new BitmapDrawable(getResources(), bitmap);
-            //mPhotoView.setImageDrawable(bd);
             mPhotoView.setImageBitmap(bitmap);
             analyzeWhitenessOfPhotoAsynchronously();
+
+            PaletteCache.generate(mUrl, bd.getBitmap());
         }
 
         @Override
@@ -218,9 +221,8 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
         });
 
 
-        String url = mSubscription.getImageURL();
-        //PicassoWrapper.simpleLoad(this, url ,target);
-        Picasso.with(this).load(url).into(target);
+        mUrl = mSubscription.getImageURL();
+        Picasso.with(this).load(mUrl).into(target);
 
         final View transparentView = findViewById(R.id.transparent_view);
         if (mMultiShrinkScroller != null) {
@@ -233,18 +235,11 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
         }
 
         final Toolbar toolbar = (Toolbar) findViewById(R.id.feed_view_toolbar);
-        //setActionBar(toolbar);
-        //getActionBar().setTitle(null);
 
         toolbar.setTitle(mSubscription.getTitle());
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
-
-
-        // Put a TextView with a known resource id into the ActionBar. This allows us to easily
-        // find the correct TextView location & size later.
-        //toolbar.addView(getLayoutInflater().inflate(R.layout.quickcontact_title_placeholder, null)); // FIXME
 
         mHasAlreadyBeenOpened = savedInstanceState != null;
         mIsEntranceAnimationFinished = mHasAlreadyBeenOpened;
@@ -263,30 +258,7 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
 
         mCursorLoader = new FeedCursorLoader(this, mAdapter, mCursor, mSubscription);
         mCursorLoader.requery();
-        /*
-        mContactCard = (ExpandingEntryCardView) findViewById(R.id.communication_card);
-        mNoContactDetailsCard = (ExpandingEntryCardView) findViewById(R.id.no_contact_data_card);
-        mRecentCard = (ExpandingEntryCardView) findViewById(R.id.recent_card);
-        mAboutCard = (ExpandingEntryCardView) findViewById(R.id.about_card);
 
-        mNoContactDetailsCard.setOnClickListener(mEntryClickHandler);
-        mContactCard.setOnClickListener(mEntryClickHandler);
-        mContactCard.setExpandButtonText(
-                getResources().getString(R.string.expanding_entry_card_view_see_all));
-        mContactCard.setOnCreateContextMenuListener(mEntryContextMenuListener);
-
-        mRecentCard.setOnClickListener(mEntryClickHandler);
-        mRecentCard.setTitle(getResources().getString(R.string.recent_card_title));
-
-        mAboutCard.setOnClickListener(mEntryClickHandler);
-        mAboutCard.setOnCreateContextMenuListener(mEntryContextMenuListener);
-
-        // Allow a shadow to be shown under the toolbar.
-        //ViewUtil.addRectangularOutlineProvider(findViewById(R.id.toolbar_parent), getResources());
-
-        /*
-
-        */
         mMultiShrinkScroller.initialize(mMultiShrinkScrollerListener, mExtraMode == MODE_FULLY_EXPANDED);
         mMultiShrinkScroller.setTitle(mSubscription.getTitle());
 
@@ -298,19 +270,6 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
         // we can't mark this as GONE.
         //mMultiShrinkScroller.setVisibility(View.INVISIBLE);
 
-        /*
-        setHeaderNameText(R.string.missing_name);
-
-        mSelectAccountFragmentListener= (SelectAccountDialogFragmentListener) getFragmentManager()
-                .findFragmentByTag(FRAGMENT_TAG_SELECT_ACCOUNT);
-        if (mSelectAccountFragmentListener == null) {
-            mSelectAccountFragmentListener = new SelectAccountDialogFragmentListener();
-            getFragmentManager().beginTransaction().add(0, mSelectAccountFragmentListener,
-                    FRAGMENT_TAG_SELECT_ACCOUNT).commit();
-            mSelectAccountFragmentListener.setRetainInstance(true);
-        }
-        mSelectAccountFragmentListener.setQuickContactActivity(this);
-        */
         SchedulingUtils.doOnPreDraw(mMultiShrinkScroller, /* drawNextFrame = */ true,
                 new Runnable() {
                     @Override
@@ -418,10 +377,16 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
 
     @Override
     public void onPaletteFound(Palette argChangedPalette) {
+        ColorExtractor extractor = new ColorExtractor(this, argChangedPalette);
+        /*
         if (argChangedPalette != null && argChangedPalette.getVibrantSwatch() != null) {
-            mMultiShrinkScroller.setHeaderTintColor(argChangedPalette.getVibrantSwatch().getRgb());
+            //mMultiShrinkScroller.setHeaderTintColor(argChangedPalette.getVibrantSwatch().getRgb());
+            mMultiShrinkScroller.setHeaderTintColor(argChangedPalette.getLightMutedColor(Color.RED));
             mFloatingButton.onPaletteFound(argChangedPalette);
         }
+        */
+        mMultiShrinkScroller.setHeaderTintColor(extractor.getPrimaryTint());
+        mFloatingButton.onPaletteFound(argChangedPalette);
     }
 
     @Override

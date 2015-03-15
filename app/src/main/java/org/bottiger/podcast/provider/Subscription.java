@@ -6,6 +6,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.bottiger.podcast.MainActivity;
+import org.bottiger.podcast.listeners.PaletteListener;
+import org.bottiger.podcast.listeners.PaletteObservable;
+import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.PodcastLog;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -23,8 +26,11 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.support.v4.util.LruCache;
+import android.support.v7.graphics.Palette;
 
-public class Subscription extends AbstractItem {
+import javax.annotation.Nullable;
+
+public class Subscription extends AbstractItem implements PaletteListener {
 
 	public static final String TYPE_RSS2 = "rss";
 	public static final String TYPE_RSS091 = "rss";
@@ -487,7 +493,20 @@ public class Subscription extends AbstractItem {
 		}
 	}
 
-	private static class SubscriptionLruCache extends
+    @Override
+    public void onPaletteFound(@Nullable Palette argChangedPalette) {
+        ColorExtractor extractor = new ColorExtractor(argChangedPalette);
+        mPrimaryColor = extractor.getPrimary();
+        mPrimaryTintColor = extractor.getPrimaryTint();
+        mSecondaryColor = extractor.getSecondary();
+    }
+
+    @Override
+    public String getPaletteUrl() {
+        return getImageURL();
+    }
+
+    private static class SubscriptionLruCache extends
 			LruCache<Long, Subscription> {
 
 		public SubscriptionLruCache(int maxSize) {
