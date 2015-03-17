@@ -427,13 +427,6 @@ public class PlaylistFragment extends GeastureFragment implements
     public void onStart () {
         super.onStart();
         mPlaylist.registerPlaylistChangeListener(this);
-
-        // Does this even work?
-        for (FeedItem item : mPlaylist.getPlaylist()) {
-            if (!TextUtils.isEmpty(item.image)) {
-                PicassoWrapper.fetch(mActivity, item.image, null);
-            }
-        }
     }
 
     @Override
