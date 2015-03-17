@@ -8,14 +8,18 @@ import android.telephony.TelephonyManager;
 
 import org.bottiger.podcast.service.PlayerService;
 
+import java.util.Date;
+
 /**
  * Created by apl on 20-01-2015.
  */
 public class PlayerPhoneListener extends PhoneStateListener {
 
+    private static final int RESTART_THRESHOLD_SECONDS = 5*60; // 5 min
+
     private PlayerService mPlayerService;
 
-    private boolean mResumePlayback = false;
+    private Date mStoppedAt = null;
 
     public PlayerPhoneListener(@NonNull PlayerService argPlayerService) {
         mPlayerService = argPlayerService;
@@ -27,21 +31,35 @@ public class PlayerPhoneListener extends PhoneStateListener {
             AudioManager audioManager = (AudioManager) mPlayerService.getSystemService(Context.AUDIO_SERVICE);
             int ringvolume = audioManager
                     .getStreamVolume(AudioManager.STREAM_RING);
-            if (ringvolume > 0) {
-                mResumePlayback = (mPlayerService.isPlaying() || mResumePlayback)
-                        && (mPlayerService.getCurrentItem() != null);
-                mPlayerService.pause();
+            if (ringvolume > 0 && mPlayerService.isPlaying()) {
+                pausePlayer();
             }
         } else if (state == TelephonyManager.CALL_STATE_OFFHOOK) {
-            mResumePlayback = (mPlayerService.isPlaying() || mResumePlayback)
-                    && (mPlayerService.getCurrentItem() != null);
-            mPlayerService.pause();
+            pausePlayer();
         } else if (state == TelephonyManager.CALL_STATE_IDLE) {
-            if (mResumePlayback) {
-
-                mPlayerService.startAndFadeIn();
-                mResumePlayback = false;
-            }
+            resumePlayer();
         }
+    }
+
+    private void pausePlayer() {
+        if (mPlayerService.isPlaying()) {
+            mStoppedAt = new Date();
+            mPlayerService.pause();
+        }
+    }
+
+    private void resumePlayer() {
+        if (mStoppedAt == null)
+            return;
+
+        mStoppedAt = null;
+
+        Date now = new Date();
+
+        long msDiff = now.getTime()-mStoppedAt.getTime();
+        if (msDiff < RESTART_THRESHOLD_SECONDS*1000) {
+            mPlayerService.startAndFadeIn();
+        }
+
     }
 }
