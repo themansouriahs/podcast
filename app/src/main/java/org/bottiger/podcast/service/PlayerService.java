@@ -190,9 +190,11 @@ public class PlayerService extends Service implements
 	@Override
 	public void onAudioFocusChange(int focusChange) {
 		if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
-			// Pause playback
-			pause();
-			mResumePlayback = true;
+            if (isPlaying()) {
+                // Pause playback
+                pause();
+                mResumePlayback = true;
+            }
 		} else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
 			// Resume playback
 			if (mResumePlayback) {
