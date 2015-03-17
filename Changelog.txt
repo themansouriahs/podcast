@@ -5,6 +5,8 @@ version 0.78
 ------------
 * More robust notification
 * More robust 'resume playback logic'
+* Updated dependencies
+* Leaner cache
 
 version 0.76
 ------------
