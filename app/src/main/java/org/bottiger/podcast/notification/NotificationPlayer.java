@@ -23,6 +23,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.squareup.picasso.Picasso;
@@ -58,10 +59,11 @@ public class NotificationPlayer {
 	private NotificationManager mNotificationManager = null;
 	private static int mId = 4260;
 	
-	public NotificationPlayer(Context context, FeedItem item) {
+	public NotificationPlayer(@NonNull Context context, @NonNull FeedItem item) {
 		super();
 		this.mContext = context;
 		this.item = item;
+        item.getArtworAsync(mContext, loadtarget);
 	}
 
     @Nullable
@@ -74,15 +76,10 @@ public class NotificationPlayer {
 		return show(true);
 	}
 
-    @TargetApi(16)
     @Nullable
 	public Notification show(Boolean isPlaying) {
-        if (android.os.Build.VERSION.SDK_INT < 21) {
-            return null;
-        }
 
 		// mId allows you to update the notification later on.
-
         NotificationCompat.Builder builder = buildNotification(isPlaying, mPlayerService, mArtwork);
 
         if (builder == null)
@@ -107,10 +104,9 @@ public class NotificationPlayer {
         mPlayerService = argPlayerService;
     }
 
-    @TargetApi(16)
     public void refresh() {
         PlayerService ps = mPlayerService;
-        if (ps != null && (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)) {
+        if (ps != null) {
             NotificationCompat.Builder notificationBuilder = buildNotification(ps.isPlaying(), mPlayerService, mArtwork);
 
             if (notificationBuilder == null)
@@ -150,13 +146,6 @@ public class NotificationPlayer {
 
 	private NotificationCompat.Builder buildNotification(@NonNull Boolean isPlaying, @NonNull PlayerService argPlayerService, @Nullable Bitmap icon) {
         return customStyleNotification(isPlaying, argPlayerService, icon);
-        /*
-        if (android.os.Build.VERSION.SDK_INT < 21) {
-            return null;
-        }
-
-        return mediaStyleNotification(isPlaying, argPlayerService, icon);
-        */
 	}
 
     @Nullable
@@ -166,12 +155,17 @@ public class NotificationPlayer {
             return null;
         }
 
+        String bitmapstring = icon == null ? "null" : "present";
+        Log.d("NotificationPlayer", "Build notification, icon => " + bitmapstring);
+
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(mContext)
                         .setSmallIcon(R.drawable.icon)
                         .setContentTitle(item.title)
                         .setContentText(item.sub_title)
                         .setLargeIcon(icon);
+
+        mBuilder.setOnlyAlertOnce(true);
 
         Intent resultIntent = new Intent(mContext, NotificationReceiver.class);
 

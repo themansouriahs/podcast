@@ -492,9 +492,11 @@ public class PlayerService extends Service implements
         ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
-        Notification notification = mNotificationPlayer.getNotification();
-        if (notification != null) {
-            startForeground(NotificationPlayer.getNotificationId(), notification);
+        if (mNotificationPlayer != null) {
+            Notification notification = mNotificationPlayer.getNotification();
+            if (notification != null) {
+                startForeground(NotificationPlayer.getNotificationId(), notification);
+            }
         }
 
         mPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);

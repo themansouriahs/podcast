@@ -96,7 +96,7 @@ public class SoundWavesPlayer extends MediaPlayer {
     }
 
     public void start() {
-        mPlayerService.notifyStatus();
+        //mPlayerService.notifyStatus();
 
         // Request audio focus for playback
         int result = mAudioManager.requestAudioFocus(mPlayerService,

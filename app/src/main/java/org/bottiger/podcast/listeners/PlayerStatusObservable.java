@@ -137,6 +137,8 @@ public class PlayerStatusObservable {
         }
     }
 
+    static NotificationPlayer np;
+
 	/**
 	 * Update the icons so they match the current status of the extended_player
 	 */
@@ -160,9 +162,11 @@ public class PlayerStatusObservable {
 
                 startProgressUpdate();
 
-				NotificationPlayer np = new NotificationPlayer(mActivity, null);
-				np.setItem(currentItem);
+                if (np == null)
+				    np = new NotificationPlayer(mActivity, currentItem);
+
                 np.setPlayerService(ps);
+				np.setItem(currentItem);
 				np.show(status == STATUS.PLAYING);
 			}
 		}

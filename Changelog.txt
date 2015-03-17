@@ -1,6 +1,14 @@
 Changelog
 ==========
 
+version 0.78
+------------
+* More robust notification
+
+version 0.76
+------------
+* Fixed crash
+
 version 0.74
 ------------
 * Added crash e-mail crash reporter for the free flavor
