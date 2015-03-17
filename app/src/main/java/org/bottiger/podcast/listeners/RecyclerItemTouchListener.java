@@ -56,6 +56,7 @@ public class RecyclerItemTouchListener implements RecyclerView.OnItemTouchListen
     // keepOne.toggle(playlistViewHolder2);
 
     public void onCLick(RecyclerView rv, MotionEvent e) {
+
         View childView = rv.findChildViewUnder(e.getX(), e.getY());
         RecyclerView.ViewHolder viewHolder = rv.getChildViewHolder(childView);
         final PlaylistViewHolder playlistViewHolder2 = (PlaylistViewHolder)viewHolder;

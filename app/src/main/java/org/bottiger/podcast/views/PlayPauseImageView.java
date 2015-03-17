@@ -6,13 +6,18 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.graphics.Palette;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
+import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.PodcastBaseFragment;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.DownloadObserver;
@@ -23,6 +28,7 @@ import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObserver;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.utils.ColorExtractor;
 
 /**
  * TODO: document your custom view class.
@@ -30,9 +36,20 @@ import org.bottiger.podcast.provider.FeedItem;
 // imageview
 public class PlayPauseImageView extends ImageView implements PlayerStatusObserver, PaletteListener, DownloadObserver, View.OnClickListener {
 
+    private static final boolean DRAW_PROGRESS          = true;
+    private static final boolean DRAW_PROGRESS_MARKER   = true;
+
+    private static final int START_ANGLE = -90;
+    private static final int DRAW_OFFSET = 5;
+
     private PlayerStatusObservable.STATUS mStatus = PlayerStatusObservable.STATUS.STOPPED;
+
+    private FeedItem mEpisode;
     private long mEpisodeId = -1;
+
     private Context mContext;
+
+    private int mProgressPercent = 0;
 
     private static Bitmap s_playIcon;
     private static Bitmap s_pauseIcon;
@@ -40,8 +57,8 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
     private Paint paint;
     private static Paint paintBorder;
 
-    private int mPaintColor = Color.WHITE; // TODO: use a default from R.color...
-    private int mPaintBorderColor = Color.BLACK;
+    private int mPaintColor = Color.BLACK; // TODO: use a default from R.color...
+    private int mPaintBorderColor = Color.WHITE;
 
     public PlayPauseImageView(Context context) {
         super(context);
@@ -69,8 +86,8 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
 
         paintBorder = new Paint(Paint.ANTI_ALIAS_FLAG);
         paintBorder.setColor(mPaintBorderColor);
-        paintBorder.setStyle(Paint.Style.STROKE); // Paint.Style.STROKE
-        paintBorder.setStrokeWidth(2F);
+        paintBorder.setStyle(Paint.Style.STROKE);
+        paintBorder.setStrokeWidth(5F);
 
         setOnClickListener(this);
         if (s_playIcon == null || s_pauseIcon == null) {
@@ -82,9 +99,22 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
         PlayerStatusObservable.registerListener(this);
     }
 
+    @Override
+    public FeedItem getEpisode() {
+        if (mEpisode == null || mEpisode.getId() != mEpisodeId)
+            mEpisode = FeedItem.getById(this.getContext().getContentResolver(), mEpisodeId);
+
+        return mEpisode;
+    }
+
     public synchronized void setEpisodeId(long argId) {
         this.mEpisodeId = argId;
         PaletteObservable.registerListener(this);
+
+        if (getEpisode().offset > 0) {
+            setProgressMs(getEpisode().offset);
+            invalidate();
+        }
     }
 
     public synchronized void unsetEpisodeId() {
@@ -97,51 +127,60 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
         this.invalidate();
     }
 
-    public void setColor(int argColor) {
-        //mPaintColor = argColor;
+    public void setColor(int argColor, int argOuterColor) {
         paint.setColor(argColor);
+        paintBorder.setColor(argOuterColor);
         this.invalidate();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
 
-
-        int paddingLeft = getPaddingLeft();
-        int paddingTop = getPaddingTop();
-        int paddingRight = getPaddingRight();
-        int paddingBottom = getPaddingBottom();
-
-        int contentWidth = getWidth(); //  - paddingLeft - paddingRight
-        int contentHeight = getHeight(); //  - paddingTop - paddingBottom
+        int contentWidth = getWidth();
+        int contentHeight = getHeight();
 
         int centerX = contentWidth/2;
         int centerY = contentHeight/2;
 
         // Draw the background circle
-        canvas.drawCircle(centerX,centerY,centerX-5,paint);
-        //canvas.drawCircle(centerX,centerY,centerX-5,paintBorder);
+        float radius = centerX-DRAW_OFFSET;
+        canvas.drawCircle(centerX,centerY,radius,paint);
+
+        if (DRAW_PROGRESS) {
+            RectF bounds = new RectF(DRAW_OFFSET, DRAW_OFFSET, contentWidth - DRAW_OFFSET, contentHeight - DRAW_OFFSET);
+            canvas.drawArc(bounds, START_ANGLE, getProgressAngle(mProgressPercent), false, paintBorder);
+        }
 
         // Draw the play/pause icon
         Bitmap icon = mStatus == PlayerStatusObservable.STATUS.PLAYING ?  s_pauseIcon : s_playIcon;
 
-        //BitmapDrawable drawable = new BitmapDrawable(getResources(), icon);
-
         int bitmapx = centerX-icon.getWidth()/2;
         int bitmapy = centerY-icon.getHeight()/2;
         canvas.drawBitmap(icon, bitmapx, bitmapy, paint);
-
-        //super.onDraw(canvas);
-    }
-
-    @Override
-    public FeedItem getEpisode() {
-        return FeedItem.getById(this.getContext().getContentResolver(), mEpisodeId);
     }
 
     @Override
     public void setProgressMs(long progressMs) {
 
+        // copy from seekbar
+
+        if (progressMs < 0) {
+            throw new IllegalStateException("Progress must be positive");
+        }
+        float progress = 0;
+        float duration = getEpisode().getDuration();
+
+        if (duration <= 0) {
+            Log.d("Warning", "Seekbar state may be invalid");
+            return;
+        }
+
+        try {
+            progress = progressMs / duration * 100;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        setProgressPercent((int) progress);
     }
 
     @Override
@@ -159,7 +198,8 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
 
     @Override
     public void setProgressPercent(int argProgress) {
-
+        mProgressPercent = argProgress;
+        invalidate();
     }
 
     @Override
@@ -186,8 +226,8 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
 
     @Override
     public void onPaletteFound(Palette argChangedPalette) {
-        setColor(PlayerButtonView.StaticButtonColor(mContext, argChangedPalette));
-        invalidate();
+        ColorExtractor extractor = new ColorExtractor(mContext, argChangedPalette);
+        setColor(extractor.getPrimary(), extractor.getSecondary());
     }
 
     @Override
@@ -214,5 +254,9 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
         largeSize = argContext.getResources().getDimensionPixelSize(R.dimen.playpause_button_size);
 
         return largeSize;
+    }
+
+    private float getProgressAngle(int argProgress) {
+        return argProgress*3.6F;
     }
 }

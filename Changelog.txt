@@ -7,6 +7,7 @@ version 0.78
 * More robust 'resume playback logic'
 * Updated dependencies
 * Leaner cache
+* Added progress information to the play/pause button
 
 version 0.76
 ------------
