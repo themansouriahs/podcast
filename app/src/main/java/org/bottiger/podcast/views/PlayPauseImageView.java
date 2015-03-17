@@ -74,8 +74,10 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
 
         setOnClickListener(this);
         if (s_playIcon == null || s_pauseIcon == null) {
-            s_playIcon = BitmapFactory.decodeResource(getResources(), R.drawable.av_play);
-            s_pauseIcon = BitmapFactory.decodeResource(getResources(), R.drawable.av_pause);
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inScaled = false;
+            s_playIcon = BitmapFactory.decodeResource(getResources(), R.drawable.av_play, options);
+            s_pauseIcon = BitmapFactory.decodeResource(getResources(), R.drawable.av_pause, options);
         }
         PlayerStatusObservable.registerListener(this);
     }
