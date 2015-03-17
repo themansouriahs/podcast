@@ -76,7 +76,10 @@ public class SubscriptionColumns implements BaseColumns {
 		+ REMOTE_ID + " VARCHAR(128), " 		
 		+ AUTO_DOWNLOAD + " INTEGER , "
 		+ PLAYLIST_POSITION + " INTEGER , " 	
-		+ IMAGE_URL + " VARCHAR(1024) "
+		+ IMAGE_URL + " VARCHAR(1024), "
+        + PRIMARY_COLOR + " INTEGER DEFAULT 0 , "
+        + PRIMARY_TINT_COLOR + " INTEGER DEFAULT 0 , "
+        + SECONDARY_COLOR + " INTEGER DEFAULT 0 "
 		+ ");";
 
 	public static final String sql_index_subs_url = "CREATE UNIQUE INDEX IDX_"
