@@ -20,14 +20,14 @@ public class NSITunes extends Namespace{
 	public SyndElement handleElementStart(String localName, HandlerState state,
 			Attributes attributes) {
 
-		if (localName.equals(IMAGE) ) { // && state.getFeed().getImage() == null) {
+		if (localName.equals(IMAGE) ) { // && state.getSubscription().getImage() == null) {
 
-            state.getFeed().imageURL = attributes.getValue(IMAGE_HREF);
+            state.getSubscription().imageURL = attributes.getValue(IMAGE_HREF);
             /*
 			FeedImage image = new FeedImage();
 			image.setTitle(IMAGE_TITLE);
 			image.setDownload_url(attributes.getValue(IMAGE_HREF));
-			state.getFeed().setImage(image);
+			state.getSubscription().setImage(image);
 			*/
 		}
 		
@@ -38,7 +38,7 @@ public class NSITunes extends Namespace{
 	public void handleElementEnd(String localName, HandlerState state) {
 		if (localName.equals(AUTHOR)) {
 			// FIXME
-			//state.getFeed().setAuthor(state.getContentBuf().toString());
+			//state.getSubscription().setAuthor(state.getContentBuf().toString());
 		}
 		
 	}

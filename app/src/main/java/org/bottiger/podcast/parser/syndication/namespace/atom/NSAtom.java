@@ -5,7 +5,6 @@ import org.bottiger.podcast.parser.syndication.namespace.NSRSS20;
 import org.bottiger.podcast.parser.syndication.namespace.Namespace;
 import org.bottiger.podcast.parser.syndication.namespace.SyndElement;
 import org.bottiger.podcast.parser.syndication.util.SyndDateUtils;
-import org.bottiger.podcast.parser.syndication.util.SyndTypeUtils;
 import org.bottiger.podcast.provider.FeedItem;
 import org.xml.sax.Attributes;
 
@@ -60,7 +59,7 @@ public class NSAtom extends Namespace {
 		if (localName.equals(ENTRY)) {
 			state.setCurrentItem(new FeedItem());
 			state.getItems().add(state.getCurrentItem());
-			state.getCurrentItem().setFeed(state.getFeed());
+			state.getCurrentItem().setFeed(state.getSubscription());
 		} else if (localName.matches(isText)) {
 			String type = attributes.getValue(TEXT_TYPE);
 			return new AtomText(localName, this, type);
@@ -98,13 +97,13 @@ public class NSAtom extends Namespace {
 					 * feed-object has no link yet b) type of link is
 					 * LINK_TYPE_HTML or LINK_TYPE_XHTML
 					 */
-					if ((type == null && state.getFeed().getURL() == null)
+					if ((type == null && state.getSubscription().getURL() == null)
 							|| (type != null && (type.equals(LINK_TYPE_HTML) || type.equals(LINK_TYPE_XHTML)))) {
-						state.getFeed().setURL(href);
+						state.getSubscription().setURL(href);
 					}
 				} else if (rel.equals(LINK_REL_PAYMENT)) {
 					// FIXME
-					// state.getFeed().setPaymentLink(href);
+					// state.getSubscription().setPaymentLink(href);
 				}
 			}
 		}
@@ -138,7 +137,7 @@ public class NSAtom extends Namespace {
 			if (top.equals(ID)) {
 				if (second.equals(FEED)) {
 					// FIXME
-					// state.getFeed().setFeedIdentifier(content);
+					// state.getSubscription().setFeedIdentifier(content);
 				} else if (second.equals(ENTRY)) {
 					// FIXME
 					// state.getCurrentItem().setItemIdentifier(content);
@@ -146,14 +145,14 @@ public class NSAtom extends Namespace {
 			} else if (top.equals(TITLE)) {
 
 				if (second.equals(FEED)) {
-					state.getFeed().setTitle(textElement.getProcessedContent());
+					state.getSubscription().setTitle(textElement.getProcessedContent());
 				} else if (second.equals(ENTRY)) {
 					state.getCurrentItem().setTitle(
 							textElement.getProcessedContent());
 				}
 			} else if (top.equals(SUBTITLE)) {
 				if (second.equals(FEED)) {
-					state.getFeed().setDescription(
+					state.getSubscription().setDescription(
 							textElement.getProcessedContent());
 				}
 			} else if (top.equals(CONTENT)) {
@@ -173,8 +172,8 @@ public class NSAtom extends Namespace {
 							SyndDateUtils.parseRFC3339Date(content));
 				}
 			} else if (top.equals(IMAGE)) {
-				//state.getFeed().setImage(new FeedImage(content, null));
-				state.getFeed().imageURL = content;
+				//state.getSubscription().setImage(new FeedImage(content, null));
+				state.getSubscription().imageURL = content;
 			}
 
 		}

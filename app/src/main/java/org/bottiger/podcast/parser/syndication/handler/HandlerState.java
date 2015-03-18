@@ -34,7 +34,7 @@ public class HandlerState {
 		defaultNamespaces = new Stack<Namespace>();
 	}
 
-	public Subscription getFeed() {
+	public Subscription getSubscription() {
 		return feed;
 	}
 

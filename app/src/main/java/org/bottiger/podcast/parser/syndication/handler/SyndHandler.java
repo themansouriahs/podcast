@@ -127,10 +127,10 @@ public class SyndHandler extends DefaultHandler {
 	@Override
 	public void endDocument() throws SAXException {
 		super.endDocument();
-		//state.getFeed().setItems(state.getItems());
+		//state.getSubscription().setItems(state.getItems());
 		FeedUpdater updater = new FeedUpdater(contentResolver);
 
-		updater.updateDatabase(state.getFeed(), state.getItems());
+		updater.updateDatabase(state.getSubscription(), state.getItems());
 	}
 
 	public HandlerState getState() {
