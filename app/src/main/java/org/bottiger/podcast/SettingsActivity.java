@@ -48,10 +48,7 @@ public class SettingsActivity extends ToolbarActivity implements SharedPreferenc
 		// http://stackoverflow.com/questions/11751498/how-to-change-preferenceactivity-theme
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(this.getApplicationContext());
-		//setTheme(ThemeHelper.getTheme(prefs));
         setTheme(R.style.SoundWaves_PreferenceActivity_Light);
-
-        //setContentView();
 
         super.onCreate(savedInstanceState);
 
@@ -97,5 +94,10 @@ public class SettingsActivity extends ToolbarActivity implements SharedPreferenc
 			return;
 		}
 	}
+
+    @Override
+    protected boolean transparentStatusBar() {
+        return false;
+    }
 
 }

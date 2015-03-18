@@ -23,7 +23,7 @@ public class TopActivity extends ActionBarActivity {
 
         super.onCreate(savedInstanceState);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        if (transparentStatusBar() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
         }
@@ -55,5 +55,12 @@ public class TopActivity extends ActionBarActivity {
     public static SharedPreferences getPreferences() {
 		return prefs;
 	}
+
+    /**
+     * Override this if the status and navigation bar should remain opaque
+     */
+    protected boolean transparentStatusBar() {
+        return true;
+    }
 
 }
