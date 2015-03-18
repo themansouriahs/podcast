@@ -346,12 +346,20 @@ public class Playlist implements OnDragStateChangedListener {
 				ItemColumns.ALL_COLUMNS, getWhere(), null, null, null,
 				getOrder());
 
+        int previousSize = mInternalPlaylist.size();
+
 		mInternalPlaylist.clear();
 		cursor.moveToPosition(-1);
 
         while (cursor.moveToNext()) {
 			setItem(cursor);
 		}
+
+        int newSize = mInternalPlaylist.size();
+
+        // prevent infinite loop because "populateIfEmpty" will be called again and again
+        if (previousSize == 0 && newSize == 0)
+            return;
 
         notifyPlaylistChanged();
 	}
