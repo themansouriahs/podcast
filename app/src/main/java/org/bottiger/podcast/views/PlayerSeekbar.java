@@ -83,6 +83,10 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
 
             if (mEpisode.equals(PodcastBaseFragment.mPlayerServiceBinder.getCurrentItem())) {
                 PodcastBaseFragment.mPlayerServiceBinder.seek(timeMs);
+            } else {
+                mEpisode.updateOffset(PodcastBaseFragment.mPlayerServiceBinder.getContentResolver(), timeMs);
+                PlayerStatusObservable.updateProgress(PodcastBaseFragment.mPlayerServiceBinder, mEpisode);
+                setProgressMs(timeMs);
             }
 
             FixedRecyclerView.mSeekbarSeeking = false;
@@ -261,14 +265,11 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
             if (mOverlay != null) {
                 mOverlay.setLayoutParams(params);
                 mOverlay.setVisibility(VISIBLE);
-                //mOverlay.bringToFront();
             }
         } else {
             Log.d("PlayerSeekbar", "Remove seekinfo");
             if (mOverlay != null) {
                 mOverlay.setVisibility(GONE);
-                //mOverlay.setVisibility(VISIBLE);
-                //mOverlay.bringToFront();
             }
         }
     }
@@ -280,8 +281,11 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
         }
 
         if (progressMs < 0) {
-            throw new IllegalStateException("Progress must be positive");
+            Throwable ise = new IllegalStateException("Progress must be positive");
+            Log.e("PlayerSeekbar", "Progress must be positive ( " + progressMs + " )", ise);
+            return;
         }
+
         float progress = 0;
         float duration = mEpisode.getDuration();
 

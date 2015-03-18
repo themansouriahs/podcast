@@ -55,7 +55,7 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
     private static Bitmap s_pauseIcon;
 
     private Paint paint;
-    private static Paint paintBorder;
+    private Paint paintBorder;
 
     private int mPaintColor = Color.BLACK; // TODO: use a default from R.color...
     private int mPaintBorderColor = Color.WHITE;
@@ -147,7 +147,8 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
         canvas.drawCircle(centerX,centerY,radius,paint);
 
         if (DRAW_PROGRESS) {
-            RectF bounds = new RectF(DRAW_OFFSET, DRAW_OFFSET, contentWidth - DRAW_OFFSET, contentHeight - DRAW_OFFSET);
+            int diff2 = (int) (centerY-radius);
+            RectF bounds = new RectF(DRAW_OFFSET, diff2, contentWidth - DRAW_OFFSET, contentWidth - DRAW_OFFSET + diff2); // DRAW_OFFSET-diff
             canvas.drawArc(bounds, START_ANGLE, getProgressAngle(mProgressPercent), false, paintBorder);
         }
 

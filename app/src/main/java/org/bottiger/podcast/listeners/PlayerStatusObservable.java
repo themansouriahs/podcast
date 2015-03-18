@@ -112,14 +112,19 @@ public class PlayerStatusObservable {
     public static void updateProgress(@NonNull PlayerService argPlayerService) {
         FeedItem currentItem = argPlayerService.getCurrentItem();
         if (currentItem != null) {
-
             updateEpisodeOffset(argPlayerService.getContentResolver(),
-                                argPlayerService.getCurrentItem(),
-                                argPlayerService.getPlayer().getCurrentPosition());
+                    currentItem,
+                    argPlayerService.getPlayer().getCurrentPosition());
 
-            for (PlayerStatusObserver listener : mListeners.keySet()) {
-                if (listener.getEpisode() == argPlayerService.getCurrentItem())
-                    listener.setProgressMs(argPlayerService.position());
+            updateProgress(argPlayerService, currentItem);
+        }
+    }
+
+    public static void updateProgress(@NonNull PlayerService argPlayerService, @NonNull FeedItem argEpisode) {
+        for (PlayerStatusObserver listener : mListeners.keySet()) {
+            if (listener.getEpisode() == argEpisode) {
+                //listener.setProgressMs(argPlayerService.position());
+                listener.setProgressMs(argEpisode.offset);
             }
         }
     }
