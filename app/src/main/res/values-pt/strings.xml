@@ -7,7 +7,7 @@
     <string name="app_name">SoundWaves</string>
     <string name="title_play_list">Episódios</string>
     <string name="title_player">Reprodutor</string>
-    <string name="title_download_list">Transferindo lista</string>
+    <string name="title_download_list">Lista de transferências</string>
     <string name="title_read_list">Todos os itens</string>
     <string name="title_channels">Canais</string>
     <string name="title_episodes">Episódios</string>
@@ -31,7 +31,7 @@
     <string name="menu_move_down">Mover abaixo</string>
     <string name="menu_mark_new">Marcar como novo</string>
     <string name="menu_play">Reproduzir</string>
-    <string name="menu_played_by">Reproduzido por</string>
+    <string name="menu_played_by">Reproduzido durante</string>
     <string name="menu_add_to_playlist">Adicionar à lista de reprodução</string>
     <string name="menu_export_audio_file">Exportar ficheiro áudio</string>
     <string name="menu_backup_channels">Backup de canais</string>
@@ -177,5 +177,6 @@
     <string name="preference_first_run_key">firstrun</string>
     <string name="menu_feedback">Comentários</string>
     <string name="menu_refresh_feed">Recarregar</string>
+    <string name="crash_toast">Erro (ajude-nos a corrigir o problema enviando um relatório de erros)</string>
 
 </resources>
