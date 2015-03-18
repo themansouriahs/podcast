@@ -1,5 +1,7 @@
 package org.bottiger.podcast.parser.syndication.handler;
 
+import android.support.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Stack;
@@ -26,7 +28,7 @@ public class HandlerState {
 	/** Buffer for saving characters. */
 	protected StringBuffer contentBuf;
 
-	public HandlerState(Subscription feed) {
+	public HandlerState(@NonNull Subscription feed) {
 		this.feed = feed;
 		items = new ArrayList<FeedItem>();
 		tagstack = new Stack<SyndElement>();
