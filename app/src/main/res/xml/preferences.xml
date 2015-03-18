@@ -27,6 +27,18 @@
             android:key="help"
             android:title="@string/preferences_category_help" />
 
+        <PreferenceCategory
+            android:title="@string/pref_help_category_title"
+            android:key="pref_help_category">
+
+            <Preference
+                android:key="pref_help_static_field"
+                android:selectable="false"
+                android:persistent="false"
+                android:summary="@string/pref_help_static_field_description"/>
+
+        </PreferenceCategory>
+
     </PreferenceScreen>
 
     <PreferenceScreen
