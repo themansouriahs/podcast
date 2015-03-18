@@ -8,6 +8,7 @@ version 0.78
 * Updated dependencies
 * Leaner cache
 * Added progress information to the play/pause button
+* Various crashes
 
 version 0.76
 ------------
