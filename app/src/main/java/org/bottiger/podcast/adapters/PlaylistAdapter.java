@@ -115,6 +115,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
         Log.d("ExpanderHelper", "pos: " + position + " episode: " + item.getTitle());
 
+        /*
         playlistViewHolder2.mItemBackground.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -160,6 +161,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
                 return true;
             }
         });
+        */
 
 
         PaletteObservable.registerListener(playlistViewHolder2.mPlayPauseButton);

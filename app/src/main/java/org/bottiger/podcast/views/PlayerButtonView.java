@@ -14,6 +14,7 @@ import android.support.v7.graphics.Palette;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.SparseIntArray;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -33,7 +34,7 @@ import org.bottiger.podcast.utils.PaletteCache;
  * TODO: document your custom view class.
  */
 //public class PlayerButtonView extends com.melnykov.fab.FloatingActionButton implements PlayerStatusObserver, PaletteListener, DownloadObserver {
-public class PlayerButtonView extends ImageButton implements PlayerStatusObserver, PaletteListener, DownloadObserver {
+public class PlayerButtonView extends ImageButton implements PlayerStatusObserver, PaletteListener, DownloadObserver, View.OnClickListener {
 
     public final static int STATE_DEFAULT = 0;
     public final static int STATE_DOWNLOAD = 1;
@@ -256,6 +257,11 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
     @Override
     public String getPaletteUrl() {
         return getEpisode().getImageURL(getContext()); // FIXME
+    }
+
+    @Override
+    public void onClick(View v) {
+        return;
     }
 
     public interface DownloadStatus {

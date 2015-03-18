@@ -17,6 +17,8 @@ public class RecyclerItemTouchListener implements RecyclerView.OnItemTouchListen
     private float fingerdownx = -1;
     private float fingerdowny = -1;
 
+    Rect viewRect = new Rect();
+
     private boolean mouseDown = false;
 
     @Override
@@ -55,14 +57,33 @@ public class RecyclerItemTouchListener implements RecyclerView.OnItemTouchListen
 
     // keepOne.toggle(playlistViewHolder2);
 
-    public void onCLick(RecyclerView rv, MotionEvent e) {
+    public void onCLick(RecyclerView rv, MotionEvent event) {
 
-        View childView = rv.findChildViewUnder(e.getX(), e.getY());
+        View childView = rv.findChildViewUnder(event.getX(), event.getY());
         RecyclerView.ViewHolder viewHolder = rv.getChildViewHolder(childView);
-        final PlaylistViewHolder playlistViewHolder2 = (PlaylistViewHolder)viewHolder;
+        final PlaylistViewHolder holder = (PlaylistViewHolder)viewHolder;
 
-        Rect viewRect = new Rect();
+        int topHeight = holder.mMainContainer.getHeight();
 
+        if (mouseDown(holder.mPlayPauseButton, holder.mPlayPauseButton, event, topHeight))
+            return;
+
+        if (mouseDown(holder.downloadButton, holder.downloadButton, event, topHeight))
+            return;
+
+        if (mouseDown(holder.previousButton, holder.previousButton, event, topHeight))
+            return;
+
+        if (mouseDown(holder.favoriteButton, holder.favoriteButton, event, topHeight))
+            return;
+
+        if (mouseDown(holder.mForward, holder.mForward, event, topHeight))
+            return;
+
+        int pos = rv.getChildPosition(childView);
+        PlaylistAdapter.toggle(holder, pos);
+
+        /*
         playlistViewHolder2.mPlayPauseButton.getHitRect(viewRect);
         if (viewRect.contains((int)e.getX(), (int)e.getY())) {
             playlistViewHolder2.mPlayPauseButton.onClick(null);
@@ -70,7 +91,7 @@ public class RecyclerItemTouchListener implements RecyclerView.OnItemTouchListen
             //PlaylistAdapter.keepOne.toggle(playlistViewHolder2);
             int pos = rv.getChildPosition(childView);
             PlaylistAdapter.toggle(playlistViewHolder2, pos);
-        }
+        }*/
 
     }
 
@@ -78,5 +99,25 @@ public class RecyclerItemTouchListener implements RecyclerView.OnItemTouchListen
     public void onTouchEvent(RecyclerView rv, MotionEvent e) {
         View childView = rv.findChildViewUnder(e.getX(), e.getY());
         childView.callOnClick();
+    }
+
+    /**
+     * @return true of view was hit
+     */
+    private boolean mouseDown(View argView, View.OnClickListener argClick, MotionEvent event, int topHeight) {
+        argView.getGlobalVisibleRect(viewRect);
+        if (viewRect.contains((int)event.getRawX(), (int)event.getRawY())) {
+            argClick.onClick(null);
+            resetTouchState();
+            return true;
+        }
+
+        return false;
+    }
+
+    private void resetTouchState() {
+        fingerDown = null;
+        fingerdownx = -1;
+        fingerdowny = -1;
     }
 }
