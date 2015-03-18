@@ -2,6 +2,16 @@
 
 SoundWaves is a free, libre and open source app for fetching and listening to podcasts.
 
+# Help out
+
+If you feel like helping out we are more than happy to accept any kind of help. There are a lot of programming - and non programming - tasks which needs to be done .  
+
+## Translations
+If you want to help translate SoundWaves into your language please head over to:
+https://www.transifex.com/projects/p/soundwaves/
+
+Unfortunately a (free) account is required.
+
 # Privacy
 
 SoundWaves takes privacy very seriously, and I try to do whatever I can do always behave in the users best interest.
