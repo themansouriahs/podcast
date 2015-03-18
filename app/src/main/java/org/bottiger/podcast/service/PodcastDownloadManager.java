@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.bottiger.podcast.MainActivity;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.images.RequestManager;
 import org.bottiger.podcast.listeners.DownloadFileObserver;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
@@ -185,7 +186,13 @@ public class PodcastDownloadManager extends Observable {
 		requestQueue.start();
 	}
 
-    private static void addSubscriptionToQueue(Subscription argSubscription, RequestQueue requestQueue, DownloadCompleteCallback argCallback) {
+    private static void addSubscriptionToQueue(@NonNull Subscription argSubscription, RequestQueue requestQueue, DownloadCompleteCallback argCallback) {
+
+        if (argSubscription == null) {
+            VendorCrashReporter.report("addSubscriptionToQueue", "subscription=null");
+            return;
+        }
+
         StringRequest jr = new StringRequest(argSubscription.getUrl(),
                 new MyStringResponseListener(mContext
                         .getContentResolver(), argCallback, argSubscription),
@@ -212,7 +219,7 @@ public class PodcastDownloadManager extends Observable {
         DownloadCompleteCallback callback;
 
 		public MyStringResponseListener(ContentResolver contentResolver,
-                                        DownloadCompleteCallback argCallback, Subscription subscription) {
+                                        DownloadCompleteCallback argCallback, @NonNull Subscription subscription) {
 			this.subscription = subscription;
 			this.contentResolver = contentResolver;
             this.callback = argCallback;
