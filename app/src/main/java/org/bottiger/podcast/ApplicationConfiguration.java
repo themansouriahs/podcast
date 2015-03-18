@@ -22,7 +22,7 @@ public class ApplicationConfiguration {
     public static final String packageName = "org.bottiger.soundwaves";
 
     // FOSS flavor
-    public static final String ACRA_MAIL = "";
+    public static final String ACRA_MAIL = "soundwavesbugs@gmail.com";
 
     // Google Analytics
     public static final String ANALYTICS_ID = "";
