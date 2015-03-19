@@ -1,6 +1,11 @@
 Changelog
 ==========
 
+version 0.80
+------------
+* A few crashes
+* Fixed a few UI issues on lolipop
+
 version 0.78
 ------------
 * More robust notification

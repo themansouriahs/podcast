@@ -700,6 +700,7 @@ public class MultiShrinkScroller extends FrameLayout {
     public void draw(Canvas canvas) {
         super.draw(canvas);
 
+        /*
         if (!mEdgeGlowBottom.isFinished()) {
             final int restoreCount = canvas.save();
             final int width = getWidth() - getPaddingLeft() - getPaddingRight();
@@ -729,6 +730,7 @@ public class MultiShrinkScroller extends FrameLayout {
             }
             canvas.restoreToCount(restoreCount);
         }
+        */
     }
 
     private float getCurrentVelocity() {
