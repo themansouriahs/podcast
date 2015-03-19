@@ -45,7 +45,7 @@ public class SoundWaves extends Application {
             CrashReporterFactory.startReporter(this);
 
             // ANR
-            new ANRWatchDog(10000 /*timeout*/).start();
+            //new ANRWatchDog(10000 /*timeout*/).start();
         }
 
         sAnalytics = AnalyticsFactory.getAnalytics(this);
