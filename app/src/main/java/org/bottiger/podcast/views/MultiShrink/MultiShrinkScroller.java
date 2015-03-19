@@ -839,7 +839,7 @@ public class MultiShrinkScroller extends FrameLayout {
     public void draw(Canvas canvas) {
         super.draw(canvas);
 
-        if (!mEdgeGlowBottom.isFinished()) {
+        if (!mEdgeGlowBottom.isFinished() && !mRecyclerView.canScrollVertically(1)) { // UP = 1
             final int restoreCount = canvas.save();
             final int width = getWidth() - getPaddingLeft() - getPaddingRight();
             final int height = getHeight();
@@ -848,8 +848,9 @@ public class MultiShrinkScroller extends FrameLayout {
             // of the Window if we start to scroll upwards while EdgeEffect is visible). This
             // does not need to consider the case where this MultiShrinkScroller doesn't fill
             // the Window, since the nested ScrollView should be set to fillViewport.
-            canvas.translate(-width + getPaddingLeft(),
-                    height + getMaximumScrollUpwards() - getScroll());
+            float transx = -width + getPaddingLeft();
+            float transy = height;// + getMaximumScrollUpwards() - getScroll();
+            canvas.translate(transx, transy);
 
             canvas.rotate(180, width, 0);
             if (mIsTwoPanel) {

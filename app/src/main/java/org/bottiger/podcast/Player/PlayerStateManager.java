@@ -82,6 +82,8 @@ public class PlayerStateManager {
     }
 
     public void updateState(@NonNull FeedItem argEpisode, boolean updateAlbumArt) {
+        String albumNull = mAlbumArt == null ? "Null" : "Not null";
+        Log.d("PlayerStateManager", "updateState: updateAlbumState: " + updateAlbumArt + " album: " + albumNull);
         MediaMetadata.Builder mMetaBuilder = new MediaMetadata.Builder();
 
         populateFastMediaMetadata(mMetaBuilder, argEpisode);
@@ -94,13 +96,6 @@ public class PlayerStateManager {
             mMetaBuilder.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, mAlbumArt);
             mMetaBuilder.putBitmap(MediaMetadata.METADATA_KEY_ART, mAlbumArt);
             mMetaBuilder.putBitmap(MediaMetadata.METADATA_KEY_DISPLAY_ICON, mAlbumArt);
-
-            /*
-            Bitmap albumArt = BitmapFactory.decodeResource(mPlaserService.getResources(), R.drawable.generic_podcast);
-            mMetaBuilder.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, albumArt);
-            mMetaBuilder.putBitmap(MediaMetadata.METADATA_KEY_ART, albumArt);
-            mMetaBuilder.putBitmap(MediaMetadata.METADATA_KEY_DISPLAY_ICON, albumArt);
-            */
         }
 
         PlaybackState.Builder stateBuilder = getPlaybackState();
