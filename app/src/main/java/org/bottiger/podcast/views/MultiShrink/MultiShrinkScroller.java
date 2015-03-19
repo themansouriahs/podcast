@@ -1159,10 +1159,17 @@ public class MultiShrinkScroller extends FrameLayout {
         final float EXPONENT_ALMOST_ONE = 1.1f;
         final float semiLinearBeforeMiddle = (float) Math.pow(linearBeforeMiddle,
                 EXPONENT_ALMOST_ONE);
+        final float alpha;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            alpha = 1 - mWhiteBlendingPathInterpolator.getInterpolation(1 - ratio);
+        } else {
+            alpha = ratio;
+        }
         mColorMatrix.reset();
         mColorMatrix.setSaturation(semiLinearBeforeMiddle);
         mColorMatrix.postConcat(alphaMatrix(
-                1 - mWhiteBlendingPathInterpolator.getInterpolation(1 - ratio), Color.WHITE));
+                alpha, Color.WHITE));
 
         final float colorAlpha;
         if (isBasedOffLetterTile(mPhotoView)) {
@@ -1186,7 +1193,7 @@ public class MultiShrinkScroller extends FrameLayout {
         mPhotoView.setColorFilter(new ColorMatrixColorFilter(mColorMatrix));
         // Tell the photo view what tint we are trying to achieve. Depending on the type of
         // drawable used, the photo view may or may not use this tint.
-        mPhotoView.setTint(mHeaderTintColor); //FIXME
+        mPhotoView.setTint(mHeaderTintColor); //FIXME}
 
         final int gradientAlpha = (int) (255 * linearBeforeMiddle);
         mTitleGradientDrawable.setAlpha(gradientAlpha);
