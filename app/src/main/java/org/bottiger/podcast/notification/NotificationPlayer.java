@@ -160,7 +160,7 @@ public class NotificationPlayer {
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(mContext)
-                        .setSmallIcon(R.drawable.icon)
+                        .setSmallIcon(R.drawable.ic_stat_notify)
                         .setContentTitle(item.title)
                         .setContentText(item.sub_title)
                         .setLargeIcon(icon);
