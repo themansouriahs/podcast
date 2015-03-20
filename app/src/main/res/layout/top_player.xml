@@ -70,7 +70,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginBottom="0dp"
             android:padding="0dip"
-            android:elevation="5dp"
+            android:elevation="@dimen/player_elevation"
             android:src="?attr/ic_forward"
             android:layout_alignParentRight="true"/>
 
@@ -84,7 +84,7 @@
             android:layout_marginBottom="0dp"
             android:paddingLeft="14dip"
             android:padding="0dip"
-            android:elevation="5dp"/>
+            android:elevation="@dimen/player_elevation" />
 
     </org.bottiger.podcast.views.PlayerLinearLayout>
 

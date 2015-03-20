@@ -12,7 +12,7 @@
         android:id="@+id/download"
         android:padding="0dip"
         android:src="@drawable/ic_fast_forward_white"
-        android:elevation="5dp"
+        android:elevation="@dimen/player_elevation"
         style="@style/RightTopPlayerButton" />
 
     <org.bottiger.podcast.views.PlayerButtonView
@@ -20,7 +20,7 @@
         android:padding="0dip"
         android:src="?attr/favorite_outline"
         android:layout_toLeftOf="@id/download"
-        android:elevation="5dp"
+        android:elevation="@dimen/player_elevation"
         style="@style/TopPlayerButton" />
 
     <org.bottiger.podcast.views.PlayerButtonView
@@ -28,7 +28,7 @@
         android:padding="0dip"
         android:src="?attr/ic_rewind"
         android:layout_toLeftOf="@id/favorite"
-        android:elevation="5dp"
+        android:elevation="@dimen/player_elevation"
         style="@style/TopPlayerButton" />
 
 </merge>

@@ -33,6 +33,7 @@ public class ExpandableViewHoldersUtil {
 
             final List<Animator> aList =LayoutAnimator.ofButton(holder.mPlayPauseButton, offset, mSmallButtonSize, mLargeButtonSize, true);
 
+            /*
             animator.addListener(new AnimatorListenerAdapter() {
                 @Override public void onAnimationEnd(Animator animation) {
                     final ObjectAnimator alphaAnimator = ObjectAnimator.ofFloat(expandView, View.ALPHA, 1);
@@ -40,10 +41,15 @@ public class ExpandableViewHoldersUtil {
                     alphaAnimator.start();
                 }
             });
+            */
+            final ObjectAnimator alphaAnimator = ObjectAnimator.ofFloat(expandView, View.ALPHA, 1);
+            alphaAnimator.addListener(new ViewHolderAnimator.ViewHolderAnimatorListener(holder));
+            alphaAnimator.start();
 
             AnimatorSet aSet = new AnimatorSet();
             aList.add(animator);
             aList.add(animator2);
+            aList.add(alphaAnimator);
             aSet.playTogether(aList);
             aSet.start();
         }
