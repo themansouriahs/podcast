@@ -23,7 +23,6 @@ import org.bottiger.podcast.views.PlaylistViewHolder;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
-import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
@@ -32,7 +31,6 @@ import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -41,7 +39,7 @@ import com.squareup.picasso.Callback;
 public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> {
 
     public static final int TYPE_EXPAND = 1;
-	public static final int TYPE_COLLAPS = 2;
+	public static final int TYPE_COLLAPSE = 2;
 
     public static final int PLAYLIST_OFFSET = 1;
 
@@ -89,7 +87,6 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         Log.v("PlaylistAdapter", "onBindViewHolder(pos: " + position + ")");
 
         final FeedItem item = mPlaylist.getItem(position+PLAYLIST_OFFSET);
-        boolean isPlaying = false;
         keepOne.bind(viewHolder, position);
 
         Log.d("ExpanderHelper", "pos: " + position + " episode: " + item.getTitle());
@@ -104,19 +101,10 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
             viewHolder.episode = item;
             viewHolder.mAdapter = this;
 
-            if (PodcastBaseFragment.mPlayerServiceBinder != null && PodcastBaseFragment.mPlayerServiceBinder.isInitialized()) {
-                if (item.getId() == PodcastBaseFragment.mPlayerServiceBinder
-                        .getCurrentItem().id) {
-                    if (PodcastBaseFragment.mPlayerServiceBinder.isPlaying()) {
-                        isPlaying = true;
-                    }
-                }
-            }
-
             if (item != null) {
 
                 viewHolder.mPlayPauseButton.setEpisodeId(item.getId());
-                viewHolder.mPlayPauseButton.setStatus(isPlaying ? PlayerStatusObservable.STATUS.PLAYING : PlayerStatusObservable.STATUS.PAUSED);
+                viewHolder.mPlayPauseButton.setStatus(PlayerStatusObservable.STATUS.PAUSED);
                 mDownloadProgressObservable.registerObserver(viewHolder.mPlayPauseButton);
 
                 if (mDownloadManager == null) {
@@ -354,7 +342,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         Log.v("PlaylistAdapter", "toggleItem");
 		if (mExpandedItemID.contains(id)) {
             mExpandedItemID.remove(id);
-            return TYPE_COLLAPS;
+            return TYPE_COLLAPSE;
         } else {
 			showItem(id);
             return TYPE_EXPAND;
@@ -369,7 +357,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 		boolean isExpanded = mExpandedItemID.contains(id);
 
         Log.v("PlaylistAdapter", "getItemViewType: " + isExpanded);
-		return isExpanded ? TYPE_EXPAND : TYPE_COLLAPS;
+		return isExpanded ? TYPE_EXPAND : TYPE_COLLAPSE;
 	}
 
 	/**

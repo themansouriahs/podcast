@@ -88,7 +88,15 @@ public class RecyclerItemTouchListener implements RecyclerView.OnItemTouchListen
      * @return true of view was hit
      */
     private boolean mouseDown(View argView, View.OnClickListener argClick, MotionEvent event, int topHeight) {
-        argView.getGlobalVisibleRect(viewRect);
+        //argView.getGlobalVisibleRect(viewRect);
+
+        int[] locations = new int[2];
+        argView.getLocationOnScreen(locations);
+        int x = locations[0];
+        int y = locations[1];
+
+        viewRect = new Rect(x,y, x+argView.getWidth(),y+argView.getHeight());
+
         if (viewRect.contains((int)event.getRawX(), (int)event.getRawY())) {
             argClick.onClick(null);
             resetTouchState();
