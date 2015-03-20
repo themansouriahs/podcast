@@ -12,7 +12,6 @@ import org.bottiger.podcast.R;
 import org.bottiger.podcast.adapters.PlaylistAdapter;
 import org.bottiger.podcast.adapters.viewholders.ExpandableViewHoldersUtil;
 import org.bottiger.podcast.provider.FeedItem;
-import org.bottiger.podcast.views.utils.PlaylistViewHolderExpanderHelper;
 
 /**
  * Created by apl on 30-07-2014.
@@ -89,49 +88,6 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
         duration = (TextView) view.findViewById(R.id.duration);
         filesize = (TextView) view.findViewById(R.id.filesize);
     }
-
-
-    public static void onClick(View view, PlaylistViewHolder viewHolder) {
-        if (viewHolder.episode == null) {
-            return;
-        }
-
-        if (viewHolder.mAdapter == null) {
-            return;
-        }
-
-        int listPost = viewHolder.getPosition();
-        int type = viewHolder.mAdapter.getItemViewType(listPost);
-
-
-        boolean doAnimate = true;
-
-        //int newType = viewHolder.mAdapter.toggleItem(viewHolder.episode.getId());
-        int newType = type == PlaylistAdapter.TYPE_EXPAND ? PlaylistAdapter.TYPE_COLLAPS : PlaylistAdapter.TYPE_EXPAND;
-
-
-        PlaylistViewHolderExpanderHelper helper = viewHolder.mAdapter.getExpanderHelper();
-
-        helper.newAnimator();
-        if (newType == PlaylistAdapter.TYPE_EXPAND) {
-            if (helper.expandedView != null) {
-                helper.collapse(helper.expandedView, doAnimate);
-            }
-            helper.expand(viewHolder, doAnimate, true);
-            viewHolder.setExpanded(true);
-        } else {
-            helper.collapse(viewHolder, doAnimate);
-            viewHolder.setExpanded(false);
-        }
-        helper.playAnimator();
-
-        }
-
-    public boolean isExpanded() {
-        return mIsExpanded;
-    }
-
-    public void setExpanded(boolean isExpanded) {mIsExpanded = isExpanded;}
 
     @Override
     public View getExpandView() {

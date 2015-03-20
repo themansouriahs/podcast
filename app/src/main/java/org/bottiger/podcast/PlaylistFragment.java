@@ -217,7 +217,7 @@ public class PlaylistFragment extends GeastureFragment implements
         mTopPlayer.setRecyclerView(mRecyclerView);
 
         // specify an adapter (see also next example)
-        mAdapter = new PlaylistAdapter(mActivity, this, mOverlay, mDownloadProgressObservable);
+        mAdapter = new PlaylistAdapter(mActivity, mOverlay, mDownloadProgressObservable);
         mAdapter.setHasStableIds(true);
 
         mRecyclerView.setAdapter(mAdapter);

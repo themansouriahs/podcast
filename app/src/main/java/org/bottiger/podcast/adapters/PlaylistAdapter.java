@@ -19,7 +19,6 @@ import org.bottiger.podcast.utils.PaletteCache;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.ThemeHelper;
 import org.bottiger.podcast.views.PlaylistViewHolder;
-import org.bottiger.podcast.views.utils.PlaylistViewHolderExpanderHelper;
 
 import android.app.Activity;
 import android.app.DownloadManager;
@@ -41,29 +40,21 @@ import com.squareup.picasso.Callback;
 
 public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> {
 
-    public static final int TYPE_FIRST = 0;
     public static final int TYPE_EXPAND = 1;
 	public static final int TYPE_COLLAPS = 2;
-	private static final int TYPE_MAX_COUNT = 3;
 
     public static final int PLAYLIST_OFFSET = 1;
-
-    public static int mCollapsedHeight = -1;
-    private static int mExpandedHeight = -1; //890;
 
     public static ExpandableViewHoldersUtil.KeepOneH<PlaylistViewHolder> keepOne = new ExpandableViewHoldersUtil.KeepOneH<PlaylistViewHolder>();
 
     private View mOverlay;
 
-	private PodcastBaseFragment mFragment = null;
     private DownloadProgressObservable mDownloadProgressObservable = null;
 
 	public static TreeSet<Number> mExpandedItemID = new TreeSet<Number>();
 
 
 	private static DownloadManager mDownloadManager = null;
-
-    private PlaylistViewHolderExpanderHelper mExpanderHelper;
 
     private final ReentrantLock mLock = new ReentrantLock();
 
@@ -73,116 +64,45 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
     private BackgroundTransformation mImageTransformation;
 
-    public PlaylistAdapter(@NonNull Activity argActivity, PodcastBaseFragment fragment, View argOverlay, DownloadProgressObservable argDownloadProgressObservable) {
+    public PlaylistAdapter(@NonNull Activity argActivity, View argOverlay, DownloadProgressObservable argDownloadProgressObservable) {
         super(argActivity);
-        mFragment = fragment;
         mOverlay = argOverlay;
         mInflater = (LayoutInflater) mActivity
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mDownloadProgressObservable = argDownloadProgressObservable;
 
-        mExpanderHelper = new PlaylistViewHolderExpanderHelper(mActivity, this, mExpandedHeight);
         notifyDataSetChanged();
     }
 
     @Override
     public PlaylistViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         Log.v("PlaylistAdapter", "onCreateViewHolder");
-        View view = null;
-        view = mInflater.inflate(R.layout.episode_list, viewGroup, false);
-        PlaylistViewHolder holder = null;
 
-        holder = new PlaylistViewHolder(view);
-
-        if (mCollapsedHeight < 0) {
-            mCollapsedHeight = holder.mLayout.getLayoutParams().height;
-        }
+        View view = mInflater.inflate(R.layout.episode_list, viewGroup, false);
+        PlaylistViewHolder holder = new PlaylistViewHolder(view);
 
         return holder;
     }
 
-    private MotionEvent fingerDown = null;
-    private float fingerdownx = -1;
-    private float fingerdowny = -1;
     @Override
-    public void onBindViewHolder(PlaylistViewHolder viewHolder, final int position) {
+    public void onBindViewHolder(final PlaylistViewHolder viewHolder, final int position) {
         Log.v("PlaylistAdapter", "onBindViewHolder(pos: " + position + ")");
 
-        final PlaylistViewHolder playlistViewHolder2 = (PlaylistViewHolder)viewHolder;
         final FeedItem item = mPlaylist.getItem(position+PLAYLIST_OFFSET);
         boolean isPlaying = false;
-        keepOne.bind(playlistViewHolder2, position);
+        keepOne.bind(viewHolder, position);
 
         Log.d("ExpanderHelper", "pos: " + position + " episode: " + item.getTitle());
 
-        /*
-        playlistViewHolder2.mItemBackground.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                keepOne.toggle(playlistViewHolder2);
-            }
-        });
-
-
-        playlistViewHolder2.mItemBackground.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN){
-                    Rect viewRect = new Rect();
-                    playlistViewHolder2.mPlayPauseButton.getHitRect(viewRect);
-                    if (viewRect.contains((int)event.getX(), (int)event.getY())) {
-                        playlistViewHolder2.mPlayPauseButton.onClick(null);
-                    } else {
-                        fingerDown = event;
-                        fingerdownx = event.getRawX();
-                        fingerdowny = event.getRawY();
-
-                    }
-                }
-
-                if (event.getAction() == MotionEvent.ACTION_UP){
-                    if (fingerDown != null) {
-                        float thresshold = 10;
-                        float diffx = Math.abs(fingerdownx-event.getRawX());
-                        float diffy = Math.abs(fingerdowny-event.getRawY());
-                        if (diffx < thresshold && diffy < thresshold) {
-                           //playlistViewHolder2.onClick(playlistViewHolder2.mLayout, playlistViewHolder2);
-                           toggleItem(item.getId());
-                           keepOne.toggle(playlistViewHolder2);
-                            fingerDown=null;
-                        }
-                    }
-                }
-
-                if (event.getAction() == MotionEvent.ACTION_CANCEL || event.getAction() == MotionEvent.ACTION_HOVER_EXIT){
-                    fingerDown=null;
-                }
-
-                return true;
-            }
-        });
-        */
-
-
-        PaletteObservable.registerListener(playlistViewHolder2.mPlayPauseButton);
-
-        //playlistViewHolder2.playerLinearLayout.setVisibility(View.GONE);
+        PaletteObservable.registerListener(viewHolder.mPlayPauseButton);
 
         int type = getItemViewType(position);
-        //type = TYPE_FIRST;
         boolean doExpand = type == TYPE_EXPAND; //  || position < 5
-        //boolean doExpand = keepOne._opened > 0 && keepOne._opened == position;
 
         try {
 
-            playlistViewHolder2.episode = item;
-            playlistViewHolder2.mAdapter = this;
-
-            // The first item should never be recycled
-            /*
-            if (position == 0 && !playlistViewHolder2.isRecyclable()) {
-                playlistViewHolder2.setIsRecyclable(false);
-            }*/
+            viewHolder.episode = item;
+            viewHolder.mAdapter = this;
 
             if (PodcastBaseFragment.mPlayerServiceBinder != null && PodcastBaseFragment.mPlayerServiceBinder.isInitialized()) {
                 if (item.getId() == PodcastBaseFragment.mPlayerServiceBinder
@@ -195,9 +115,9 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
             if (item != null) {
 
-                playlistViewHolder2.mPlayPauseButton.setEpisodeId(item.getId());
-                playlistViewHolder2.mPlayPauseButton.setStatus(isPlaying ? PlayerStatusObservable.STATUS.PLAYING : PlayerStatusObservable.STATUS.PAUSED);
-                mDownloadProgressObservable.registerObserver(playlistViewHolder2.mPlayPauseButton);
+                viewHolder.mPlayPauseButton.setEpisodeId(item.getId());
+                viewHolder.mPlayPauseButton.setStatus(isPlaying ? PlayerStatusObservable.STATUS.PLAYING : PlayerStatusObservable.STATUS.PAUSED);
+                mDownloadProgressObservable.registerObserver(viewHolder.mPlayPauseButton);
 
                 if (mDownloadManager == null) {
                     mDownloadManager = (DownloadManager) mActivity
@@ -208,17 +128,17 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
                     int stringLength = 150;
                     String displayString = item.content.length() < stringLength ? item.content : item.content.substring(0, stringLength);
-                    playlistViewHolder2.mSubTitle.setText(displayString);
+                    viewHolder.mSubTitle.setText(displayString);
                 }
 
-                playlistViewHolder2.mPicassoCallback = new Callback() {
+                viewHolder.mPicassoCallback = new Callback() {
 
                     @Override
                     public void onSuccess() {
                         String url = item.image;
                         mLock.lock();
                         try {
-                            Drawable d = playlistViewHolder2.mItemBackground.getDrawable();
+                            Drawable d = viewHolder.mItemBackground.getDrawable();
                             mBitmapCache.put(url, d);
 
                             Palette palette = PaletteCache.get(url);
@@ -242,15 +162,15 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
                         //PicassoWrapper.load(mContext, ii, playlistViewHolder2.mPlayPauseButton);
 
                     if (mBitmapCache.containsKey(ii)) {
-                        playlistViewHolder2.mItemBackground.setImageDrawable(mBitmapCache.get(ii));
+                        viewHolder.mItemBackground.setImageDrawable(mBitmapCache.get(ii));
                     } else {
 
-                        playlistViewHolder2.mItemBackground.setImageResource(0);
+                        viewHolder.mItemBackground.setImageResource(0);
 
                         int h = 1080;
                         //com.squareup.picasso.Transformation trans = BackgroundTransformation.getmImageTransformation(mContext, mImageTransformation, playlistViewHolder2.mItemBackground);
                         com.squareup.picasso.Transformation trans = BackgroundTransformation.getmImageTransformation(mActivity, mImageTransformation, h);
-                        PicassoWrapper.load(mActivity, ii, playlistViewHolder2.mItemBackground, trans, playlistViewHolder2.mPicassoCallback); // playlistViewHolder2.mItemBackground
+                        PicassoWrapper.load(mActivity, ii, viewHolder.mItemBackground, trans, viewHolder.mPicassoCallback); // playlistViewHolder2.mItemBackground
                     }
 
                 }
@@ -260,7 +180,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         } catch (IllegalStateException e) {
         }
 
-        bindExandedPlayer(mActivity, item, playlistViewHolder2, position);
+        bindExandedPlayer(mActivity, item, viewHolder, position);
 
         Palette palette = PaletteCache.get(item.image);
         if (palette != null) {
@@ -268,7 +188,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         }
 
         if (!doExpand) {
-            View v = playlistViewHolder2.playerLinearLayout;
+            View v = viewHolder.playerLinearLayout;
             if (v != null) {
                 v.setVisibility(View.GONE);
             }
@@ -419,10 +339,6 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
     public void unregisterAdapterDataObserver (RecyclerView.AdapterDataObserver observer) {
         Log.v("PlaylistAdapter", "unregisterAdapterDataObserver");
         super.unregisterAdapterDataObserver(observer);
-    }
-
-    public PlaylistViewHolderExpanderHelper getExpanderHelper() {
-        return mExpanderHelper;
     }
 
 	public static void showItem(Long id) {
