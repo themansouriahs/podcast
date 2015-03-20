@@ -1,4 +1,4 @@
-package org.bottiger.soundwaves;
+package org.bottiger.podcast;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

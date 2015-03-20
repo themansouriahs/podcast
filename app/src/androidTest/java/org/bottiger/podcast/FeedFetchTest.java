@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.bottiger.podcast.tests;
+package org.bottiger.podcast;
 
 import org.bottiger.podcast.service.PodcastService;
 
@@ -26,19 +26,19 @@ public class FeedFetchTest extends android.test.ServiceTestCase<PodcastService> 
 	PodcastService PodcastServiceInstance;
     public FeedFetchTest() {
 		super(PodcastService.class);
-		// TODO Auto-generated constructor stub
 	}
     
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+        /*
         Intent startIntent = new Intent();
         startIntent.setClass(getContext(), PodcastService.class);
         startService(startIntent); 
         while(PodcastServiceInstance==null){
         	PodcastServiceInstance = getService();
         }
-
+        */
     }
  /*
     

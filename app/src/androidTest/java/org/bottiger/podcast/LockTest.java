@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.bottiger.podcast.tests;
+package org.bottiger.podcast;
 
 
 import junit.framework.TestCase;

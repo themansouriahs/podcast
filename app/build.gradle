@@ -102,6 +102,10 @@ dependencies {
     compile 'ch.acra:acra:4.6.+'
     compile 'com.github.anrwatchdog:anrwatchdog:1.+'
 
+    // For testing only
+    testCompile 'junit:junit:4.12'
+    testCompile "org.mockito:mockito-core:1.9.5"
+
     // Free version
 
     // Amazon version
