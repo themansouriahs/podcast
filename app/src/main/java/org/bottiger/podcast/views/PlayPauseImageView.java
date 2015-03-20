@@ -1,10 +1,12 @@
 package org.bottiger.podcast.views;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Outline;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -15,6 +17,8 @@ import android.support.v7.graphics.Palette;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewOutlineProvider;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import org.bottiger.podcast.BuildConfig;
@@ -34,7 +38,10 @@ import org.bottiger.podcast.utils.ColorExtractor;
  * TODO: document your custom view class.
  */
 // imageview
-public class PlayPauseImageView extends ImageView implements PlayerStatusObserver, PaletteListener, DownloadObserver, View.OnClickListener {
+public class PlayPauseImageView extends ImageView implements PlayerStatusObserver,
+                                                             PaletteListener,
+                                                             DownloadObserver,
+                                                             View.OnClickListener {
 
     private static final boolean DRAW_PROGRESS          = true;
     private static final boolean DRAW_PROGRESS_MARKER   = true;
@@ -48,6 +55,9 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
     private long mEpisodeId = -1;
 
     private Context mContext;
+
+    private RectF bounds;
+    private Rect boundsRound = new Rect();
 
     private int mProgressPercent = 0;
 
@@ -146,9 +156,16 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
         float radius = centerX-DRAW_OFFSET;
         canvas.drawCircle(centerX,centerY,radius,paint);
 
+        int diff2 = (int) (centerY-radius);
+        boolean updateOutline = bounds == null;
+
+        bounds = new RectF(DRAW_OFFSET, diff2, contentWidth - DRAW_OFFSET, contentWidth - DRAW_OFFSET + diff2); // DRAW_OFFSET-diff
+
+        if (updateOutline) {
+            onSizeChanged(0,0,0,0);
+        }
+
         if (DRAW_PROGRESS) {
-            int diff2 = (int) (centerY-radius);
-            RectF bounds = new RectF(DRAW_OFFSET, diff2, contentWidth - DRAW_OFFSET, contentWidth - DRAW_OFFSET + diff2); // DRAW_OFFSET-diff
             canvas.drawArc(bounds, START_ANGLE, getProgressAngle(mProgressPercent), false, paintBorder);
         }
 
@@ -259,5 +276,35 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
 
     private float getProgressAngle(int argProgress) {
         return argProgress*3.6F;
+    }
+
+
+    //
+    // http://stackoverflow.com/questions/27497987/android-elevation-is-not-showing-a-shadow-under-a-customview
+    //
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            setOutlineProvider(new CustomOutline(bounds));
+        }
+    }
+
+    @TargetApi(21)
+    private class CustomOutline extends ViewOutlineProvider {
+
+        RectF bounds = null;
+
+        CustomOutline(RectF argRectF) {
+            bounds = argRectF;
+        }
+
+        @Override
+        public void getOutline(View view, Outline outline) {
+            if (bounds != null) {
+                bounds.round(boundsRound);
+                outline.setOval(boundsRound);
+            }
+        }
     }
 }
