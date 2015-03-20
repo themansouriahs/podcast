@@ -65,11 +65,11 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
         mLayout = (RelativeLayoutWithBackground) view.findViewById(R.id.item);
         mMainContainer = (RelativeLayout) view.findViewById(R.id.main_player_container);
         mPlayPauseButton = (PlayPauseImageView) view.findViewById(R.id.list_image);
-        mForward = (PlayerButtonView) view.findViewById(R.id.fast_forward);
-        mBackward = (PlayerButtonView) view.findViewById(R.id.rewind);
+        //mForward = (PlayerButtonView) view.findViewById(R.id.fast_forward);
+        //mBackward = (PlayerButtonView) view.findViewById(R.id.rewind);
         mItemBackground = (ImageView) view.findViewById(R.id.item_background);
         //mMainTitle = (TextView) view.findViewById(R.id.title);
-        mSubTitle = (TextView) view.findViewById(R.id.podcast);
+        //mSubTitle = (TextView) view.findViewById(R.id.podcast);
         mTimeDuration = (TextView) view.findViewById(R.id.duration);
         mCurrentPosition = (TextView) view.getTag(R.id.current_position);
         mSlash = (TextView) view.findViewById(R.id.time_slash);

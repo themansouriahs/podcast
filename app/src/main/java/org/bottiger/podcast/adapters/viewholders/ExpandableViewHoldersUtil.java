@@ -51,6 +51,27 @@ public class ExpandableViewHoldersUtil {
             aList.add(animator2);
             aList.add(alphaAnimator);
             aSet.playTogether(aList);
+            aSet.addListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    holder.mMainContainer.bringToFront();
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animation) {
+
+                }
+            });
             aSet.start();
         }
         else {

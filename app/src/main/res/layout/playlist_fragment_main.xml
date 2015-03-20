@@ -15,31 +15,6 @@
 
         <include layout="@layout/playlist_scroller" />
 
-        <!--
-    <RelativeLayout
-        android:id="@+id/playlist_container"
-        android:visibility="gone"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipChildren="false"
-        android:elevation="0dp"
-        android:clipToPadding="false">
-
-        <include layout="@layout/top_player" />
-
-        <org.bottiger.podcast.views.FixedRecyclerView
-            android:id="@+id/my_recycler_view"
-            android:scrollbars="vertical"
-            android:translationY="@dimen/top_player_max_offset"
-            android:layout_alignParentTop="true"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:overScrollMode="never"
-            />
-
-
-    </RelativeLayout>
-    -->
         <include
             android:id="@+id/playlist_overlay"
             android:animateLayoutChanges="true"
