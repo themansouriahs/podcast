@@ -30,7 +30,7 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
     public PlayerButtonView mForward;
     public PlayerButtonView mBackward;
 
-    public ImageView mItemBackground;
+    public ImageViewTinted mItemBackground;
     public TextView mMainTitle;
     public TextView mSubTitle;
     public TextView mTimeDuration;
@@ -52,10 +52,6 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
 
     public Callback mPicassoCallback;
 
-    private boolean mIsExpanded;
-    private int mCollapsedHeight;
-    private int mExpandedHeight;
-
     // ImageView iv, TextView tv1, TextView tv2, TextView tv3, TextView tv4, TextView tv5, TextView tv6, ViewStub vs, View pv
     public PlaylistViewHolder(View view) {
         super(view);
@@ -66,7 +62,7 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
         mPlayPauseButton = (PlayPauseImageView) view.findViewById(R.id.list_image);
         //mForward = (PlayerButtonView) view.findViewById(R.id.fast_forward);
         //mBackward = (PlayerButtonView) view.findViewById(R.id.rewind);
-        mItemBackground = (ImageView) view.findViewById(R.id.item_background);
+        mItemBackground = (ImageViewTinted) view.findViewById(R.id.item_background);
         //mMainTitle = (TextView) view.findViewById(R.id.title);
         //mSubTitle = (TextView) view.findViewById(R.id.podcast);
         mTimeDuration = (TextView) view.findViewById(R.id.duration);

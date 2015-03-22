@@ -23,6 +23,9 @@ import org.bottiger.podcast.views.PlaylistViewHolder;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
@@ -35,6 +38,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> {
 
@@ -107,6 +112,8 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
                 viewHolder.mPlayPauseButton.setStatus(PlayerStatusObservable.STATUS.PAUSED);
                 mDownloadProgressObservable.registerObserver(viewHolder.mPlayPauseButton);
 
+                viewHolder.mItemBackground.setPaletteKey(item.getImageURL(mActivity));
+
                 if (mDownloadManager == null) {
                     mDownloadManager = (DownloadManager) mActivity
                             .getSystemService(Context.DOWNLOAD_SERVICE);
@@ -156,9 +163,11 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
                         viewHolder.mItemBackground.setImageResource(0);
 
                         int h = 1080;
-                        //com.squareup.picasso.Transformation trans = BackgroundTransformation.getmImageTransformation(mContext, mImageTransformation, playlistViewHolder2.mItemBackground);
                         com.squareup.picasso.Transformation trans = BackgroundTransformation.getmImageTransformation(mActivity, mImageTransformation, h);
                         PicassoWrapper.load(mActivity, ii, viewHolder.mItemBackground, trans, viewHolder.mPicassoCallback); // playlistViewHolder2.mItemBackground
+                        //PicassoWrapper.load(mActivity, ii, target, trans);
+                        int color = item.getSubscription(mActivity).getPrimaryColor();
+                        viewHolder.mItemBackground.setColorFilter(Color.RED, PorterDuff.Mode.LIGHTEN);
                     }
 
                 }

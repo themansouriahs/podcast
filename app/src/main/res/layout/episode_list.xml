@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <org.bottiger.podcast.views.RelativeLayoutWithBackground
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:SoundwavesNS="http://schemas.android.com/apk/res-auto"
     android:id="@+id/item"
     android:layout_margin="@dimen/playlist_margin"
     android:layout_width="match_parent"
@@ -11,7 +10,7 @@
     android:clipChildren="false"
     android:orientation="horizontal">
 
-    <ImageView
+    <org.bottiger.podcast.views.ImageViewTinted
         android:id="@+id/item_background"
         android:layout_width="fill_parent"
         android:layout_height="150dp"
