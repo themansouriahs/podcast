@@ -65,6 +65,7 @@ public class InitialHeaderAdapter implements StickyHeadersAdapter<InitialHeaderA
 
             headerViewHolder.letter.setText(title);
             //playlistViewHolder2.mMainTitle.setText(title);
+            headerViewHolder.letter.setVisibility(View.GONE);
         }
     }
 
