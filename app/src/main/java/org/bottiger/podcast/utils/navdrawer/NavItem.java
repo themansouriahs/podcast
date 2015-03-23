@@ -40,6 +40,8 @@ public class NavItem {
         TextView textView   = (TextView)argView.findViewById(R.id.drawer_item_title);
 
         imageView.setImageResource(mIcon);
+
+        textView.setTextColor(argView.getResources().getColor(R.color.drawer_text));
         textView.setText(mText);
 
         argView.setOnClickListener(new View.OnClickListener() {

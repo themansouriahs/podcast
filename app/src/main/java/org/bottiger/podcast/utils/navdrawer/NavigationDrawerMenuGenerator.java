@@ -23,14 +23,14 @@ public class NavigationDrawerMenuGenerator {
         mActivity = argContext;
 
         mItems.add(new NavItem());
-        mItems.add(new NavItem(R.string.menu_settings, R.drawable.ic_settings_grey, new INavOnClick() {
+        mItems.add(new NavItem(R.string.menu_settings, R.drawable.ic_settings_white, new INavOnClick() {
             @Override
             public void onClick() {
                 TransitionUtils.openSettings(mActivity);
             }
         }));
         mItems.add(new NavItem());
-        mItems.add(new NavItem(R.string.menu_feedback, R.drawable.ic_messenger_grey, new INavOnClick() {
+        mItems.add(new NavItem(R.string.menu_feedback, R.drawable.ic_messenger_white, new INavOnClick() {
             @Override
             public void onClick() {
                 return;
