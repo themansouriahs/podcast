@@ -10,6 +10,13 @@
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
         />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/footer_gradient" />
+
     <TextView
         android:id="@+id/grid_title"
         android:layout_width="match_parent"
@@ -23,6 +30,7 @@
         android:paddingBottom="10dp"
         android:layout_gravity="bottom"
         android:textColor="@android:color/white"
-        android:background="#AA000000"
         />
+    <!-- android:background="#AA000000" -->
+
 </FrameLayout>
