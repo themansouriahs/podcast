@@ -4,6 +4,7 @@ Changelog
 version 0.80
 ------------
 * A few crashes
+* new playlist UI
 * Fixed a few UI issues on lolipop
 
 version 0.78
