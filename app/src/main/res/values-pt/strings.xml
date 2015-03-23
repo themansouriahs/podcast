@@ -179,6 +179,6 @@
     <string name="menu_refresh_feed">Recarregar</string>
     <string name="crash_toast">Erro (ajude-nos a corrigir o problema enviando um relatório de erros)</string>
     <string name="pref_help_category_title">Ajudar no desenvolvimento de SoundWaves</string>
-    <string name="pref_help_static_field_description">Se você quiser ajudar, existem imensas coisas que pode fazer. Pode ajudar na programação ou algo completamente diferente. Pode ajudar na tradução, na criação de ícones e imagens, um sítio web e muito mais. Aceda à nossa página do github ou envie uma mensagem para: bottiger@gmail.com</string>
+    <string name="pref_help_static_field_description">Se você quiser ajudar, existem imensas coisas que pode fazer. Pode ajudar na programação ou algo completamente diferente. Pode ajudar na tradução, na criação de ícones e imagens, um sítio web e muito mais. Aceda à nossa página do github (https://github.com/bottiger/SoundWaves) ou envie uma mensagem para: bottiger@gmail.com</string>
 
 </resources>
