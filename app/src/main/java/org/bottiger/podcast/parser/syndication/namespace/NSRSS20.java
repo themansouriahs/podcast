@@ -130,7 +130,7 @@ public class NSRSS20 extends Namespace {
 						SyndDateUtils.parseRFC822Date(content));
 			} else if (top.equals(URL) && second.equals(IMAGE) && third != null && third.equals(CHANNEL)) {
 
-				if (!state.getSubscription().imageURL.isEmpty()) {
+				if (!TextUtils.isEmpty(state.getSubscription().imageURL)) {
                     state.getSubscription().imageURL = content;
                 }
 

@@ -244,7 +244,7 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
         if (argChangedPalette != null) {
             setBackgroundColor(ButtonColor(argChangedPalette));
         }
-        
+
         invalidate();
     }
 
