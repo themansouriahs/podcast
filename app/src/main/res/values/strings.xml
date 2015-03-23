@@ -179,7 +179,7 @@
     <string name="menu_refresh_feed">Refresh</string>
     <string name="crash_toast">Crash :( Please help by sending a crash report</string>
     <string name="pref_help_category_title">Help building SoundWaves</string>
-    <string name="pref_help_static_field_description">If you would like to help out there is plenty of things to do. It could be programming and it could be something completley different. I need help with translation, user experience, icons and graphics, a website and so forth. Head over to the project page on github or send me an email: bottiger@gmail.com</string>
+    <string name="pref_help_static_field_description">If you would like to help out there is plenty of things to do. It could be programming and it could be something completley different. I need help with translation, user experience, icons and graphics, a website and so forth. Head over to the project page on github (https://github.com/bottiger/SoundWaves) or send me an email: bottiger@gmail.com</string>
 	
     <string tools:ignore="MissingTranslation" name="test_string">Test string, please ignore</string>
 
