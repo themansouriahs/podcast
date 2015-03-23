@@ -5,7 +5,12 @@ package org.bottiger.podcast.flavors.Analytics;
  */
 public interface IAnalytics {
 
-    public enum EVENT_TYPE { PLAY, PAUSE };
+    public enum EVENT_TYPE { PLAY,
+                             PAUSE,
+                             PLAY_FROM_PLAYLIST,
+                             PLAY_FROM_FEEDVIEW,
+                             SUBSCRIBE_TO_FEED
+    };
 
     public void startTracking();
     public void stopTracking();

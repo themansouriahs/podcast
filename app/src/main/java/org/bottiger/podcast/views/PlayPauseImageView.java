@@ -13,6 +13,7 @@ import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.graphics.Palette;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -24,6 +25,8 @@ import android.widget.ImageView;
 import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.PodcastBaseFragment;
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.listeners.DownloadObserver;
 import org.bottiger.podcast.listeners.EpisodeStatus;
 import org.bottiger.podcast.listeners.PaletteListener;
@@ -45,6 +48,9 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
 
     private static final boolean DRAW_PROGRESS          = true;
     private static final boolean DRAW_PROGRESS_MARKER   = true;
+
+    public enum LOCATION { PLAYLIST, FEEDVIEW, OTHER };
+    private LOCATION mLocation = LOCATION.OTHER;
 
     private static final int START_ANGLE = -90;
     private static final int DRAW_OFFSET = 5;
@@ -117,7 +123,8 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
         return mEpisode;
     }
 
-    public synchronized void setEpisodeId(long argId) {
+    public synchronized void setEpisodeId(long argId, LOCATION argLocation) {
+        this.mLocation = argLocation;
         this.mEpisodeId = argId;
         PaletteObservable.registerListener(this);
 
@@ -221,6 +228,11 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
 
     @Override
     public void onClick(View view) {
+
+        IAnalytics.EVENT_TYPE type = getEventType();
+        if (type != null) {
+            SoundWaves.sAnalytics.trackEvent(type);
+        }
         boolean isPlaying = PodcastBaseFragment.mPlayerServiceBinder.toggle(mEpisodeId);
 
         setStatus(isPlaying ? PlayerStatusObservable.STATUS.PLAYING : PlayerStatusObservable.STATUS.STOPPED);
@@ -275,6 +287,19 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
 
     private float getProgressAngle(int argProgress) {
         return argProgress*3.6F;
+    }
+
+    @Nullable
+    private IAnalytics.EVENT_TYPE getEventType() {
+        if (mLocation == LOCATION.PLAYLIST) {
+            return IAnalytics.EVENT_TYPE.PLAY_FROM_PLAYLIST;
+        }
+
+        if (mLocation == LOCATION.FEEDVIEW) {
+            return IAnalytics.EVENT_TYPE.PLAY_FROM_FEEDVIEW;
+        }
+
+        return null;
     }
 
 

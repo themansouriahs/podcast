@@ -90,7 +90,7 @@ public class FeedViewAdapter extends AbstractEpisodeCursorAdapter<FeedViewAdapte
         Palette.Swatch swatch = null;//mPalette.getVibrantSwatch(); // .getDarkMutedColor(R.color.colorPrimaryDark);
         int c = swatch != null ? swatch.getBodyTextColor() : R.color.white_opaque;
 
-        episodeViewHolder.mPlayPauseButton.setEpisodeId(item.getId());
+        episodeViewHolder.mPlayPauseButton.setEpisodeId(item.getId(), PlayPauseImageView.LOCATION.FEEDVIEW);
         episodeViewHolder.mPlayPauseButton.setStatus(isPlaying ? PlayerStatusObservable.STATUS.PLAYING : PlayerStatusObservable.STATUS.PAUSED);
 
 

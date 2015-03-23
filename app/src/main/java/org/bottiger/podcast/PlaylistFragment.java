@@ -288,7 +288,7 @@ public class PlaylistFragment extends GeastureFragment implements
             FeedItem item = mPlaylist.getItem(0);
 
             if (item != null) {
-                mPlayPauseButton.setEpisodeId(item.getId());
+                mPlayPauseButton.setEpisodeId(item.getId(), PlayPauseImageView.LOCATION.PLAYLIST);
                 mBackButton.setEpisodeId(item.getId());
                 mForwardButton.setEpisodeId(item.getId());
                 mDownloadButton.setEpisodeId(item.getId());
@@ -328,7 +328,7 @@ public class PlaylistFragment extends GeastureFragment implements
         mEpisodeTitle.setText(item.getTitle());
         mEpisodeInfo.setText("");
 
-        mPlayPauseButton.setEpisodeId(item.getId());
+        mPlayPauseButton.setEpisodeId(item.getId(), PlayPauseImageView.LOCATION.PLAYLIST);
         mBackButton.setEpisodeId(item.getId());
         mForwardButton.setEpisodeId(item.getId());
         mDownloadButton.setEpisodeId(item.getId());

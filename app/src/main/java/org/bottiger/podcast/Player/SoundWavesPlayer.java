@@ -10,6 +10,9 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.flavors.Analytics.IAnalytics;
+import org.bottiger.podcast.flavors.Analytics.VendorAnalytics;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
@@ -112,6 +115,7 @@ public class SoundWavesPlayer extends MediaPlayer {
 
             PlayerStatusObservable
                     .updateStatus(PlayerStatusObservable.STATUS.PLAYING);
+            SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.PLAY);
         }
     }
 
@@ -164,6 +168,7 @@ public class SoundWavesPlayer extends MediaPlayer {
         super.pause();
         PlayerStatusObservable
                 .updateStatus(PlayerStatusObservable.STATUS.PAUSED);
+        SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.PAUSE);
     }
 
     @Deprecated

@@ -6,6 +6,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.bottiger.podcast.MainActivity;
+import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.flavors.Analytics.IAnalytics;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.utils.ColorExtractor;
@@ -302,12 +305,14 @@ public class Subscription extends AbstractItem implements PaletteListener {
 		Uri uri = context.getContentResolver().insert(SubscriptionColumns.URI,
 				cv);
 		if (uri == null) {
+            VendorCrashReporter.report("SubscriptionFailed", "" + url);
 			return ADD_FAIL_UNSUCCESS;
 		}
 
 		Subscription sub_test = Subscription.getByUrl(
 				context.getContentResolver(), url);
 
+        SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.SUBSCRIBE_TO_FEED);
 		return ADD_SUCCESS;
 
 	}

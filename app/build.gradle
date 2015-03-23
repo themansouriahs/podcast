@@ -18,18 +18,22 @@ android {
 
         dev {
             buildConfigField "boolean", "DEV_MODE", "true"
+            buildConfigField "boolean", "PRIVATE_MODE", "false"
         }
 
         free {
             buildConfigField "boolean", "DEV_MODE", "false"
+            buildConfigField "boolean", "PRIVATE_MODE", "true"
         }
 
         google {
             buildConfigField "boolean", "DEV_MODE", "false"
+            buildConfigField "boolean", "PRIVATE_MODE", "false"
         }
 
         amazon {
             buildConfigField "boolean", "DEV_MODE", "false"
+            buildConfigField "boolean", "PRIVATE_MODE", "false"
         }
     }
 

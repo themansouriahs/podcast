@@ -2,6 +2,7 @@ package org.bottiger.podcast.flavors.Analytics;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
@@ -17,11 +18,16 @@ import java.util.HashMap;
  *
  * Only used on the Google Play Store
  */
-public class VendorAnalytics implements IAnalytics {
+public class VendorAnalytics extends AbstractAnalytics implements IAnalytics {
+
+    private static final String CATEGORY_PLAYBACK = "Playback";
+    private static final String CATEGORY_BEHAVIOR = "Behavior";
+    private static final String CATEGORY_USAGE    = "Usage";
 
     private Context mContext;
 
     public VendorAnalytics(@NonNull Context argContext) {
+        super(argContext);
         mContext = argContext;
     }
 
@@ -61,11 +67,16 @@ public class VendorAnalytics implements IAnalytics {
     }
 
     public void trackEvent(EVENT_TYPE argEvent) {
+        if (!doShare())
+            return;
+
+        EventData eventData = getEventData(argEvent);
+
         // Build and send an Event.
         getTracker(TrackerName.APP_TRACKER).send(new HitBuilders.EventBuilder()
-                .setCategory("Category")
-                .setAction("Action")
-                .setLabel("LabelID")
+                .setCategory(eventData.Category)
+                .setAction(eventData.Action)
+                .setLabel(eventData.LabelID)
                 .build());
     }
 
@@ -82,5 +93,61 @@ public class VendorAnalytics implements IAnalytics {
 
         }
         return mTrackers.get(trackerId);
+    }
+
+    @NonNull
+    private EventData getEventData(EVENT_TYPE argType) {
+        EventData eventData = null;
+
+        if (argType == EVENT_TYPE.PLAY) {
+            eventData = new EventData();
+            eventData.Category = CATEGORY_PLAYBACK;
+            eventData.Action = "Play";
+            eventData.LabelID = "Play";
+        }
+
+        if (argType == EVENT_TYPE.PAUSE) {
+            eventData = new EventData();
+            eventData.Category = CATEGORY_PLAYBACK;
+            eventData.Action = "Pause";
+            eventData.LabelID = "Pause";
+        }
+
+        if (argType == EVENT_TYPE.PLAY_FROM_PLAYLIST) {
+            eventData = new EventData();
+            eventData.Category = CATEGORY_BEHAVIOR;
+            eventData.Action = "Play from playlist";
+            eventData.LabelID = "Playlist";
+        }
+
+        if (argType == EVENT_TYPE.PLAY_FROM_FEEDVIEW) {
+            eventData = new EventData();
+            eventData.Category = CATEGORY_BEHAVIOR;
+            eventData.Action = "Play from feedview";
+            eventData.LabelID = "FeedView";
+        }
+
+        if (argType == EVENT_TYPE.SUBSCRIBE_TO_FEED) {
+            eventData = new EventData();
+            eventData.Category = CATEGORY_USAGE;
+            eventData.Action = "Subscribe to feed";
+            eventData.LabelID = "Subscribe";
+        }
+
+        if (eventData != null)
+            return eventData;
+
+        eventData = new EventData();
+        eventData.Category = "Unknown";
+        eventData.Action = "Unknown";
+        eventData.LabelID = "Unknown";
+
+        return eventData;
+    }
+
+    private class EventData {
+        public String Category;
+        public String Action;
+        public String LabelID;
     }
 }

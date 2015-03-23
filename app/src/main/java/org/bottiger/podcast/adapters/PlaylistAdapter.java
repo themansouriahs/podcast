@@ -18,6 +18,7 @@ import org.bottiger.podcast.utils.BackgroundTransformation;
 import org.bottiger.podcast.utils.PaletteCache;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.ThemeHelper;
+import org.bottiger.podcast.views.PlayPauseImageView;
 import org.bottiger.podcast.views.PlaylistViewHolder;
 
 import android.app.Activity;
@@ -119,7 +120,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
                     viewHolder.mActionBarGradientView.setBackground(mActionBarGradientDrawable);
                 }
 
-                viewHolder.mPlayPauseButton.setEpisodeId(item.getId());
+                viewHolder.mPlayPauseButton.setEpisodeId(item.getId(), PlayPauseImageView.LOCATION.PLAYLIST);
                 viewHolder.mPlayPauseButton.setStatus(PlayerStatusObservable.STATUS.PAUSED);
                 mDownloadProgressObservable.registerObserver(viewHolder.mPlayPauseButton);
 
@@ -245,7 +246,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         holder.seekbar.setOverlay(mOverlay);
 
         final long id = feedItem.getId();
-        holder.mPlayPauseButton.setEpisodeId(id);
+        holder.mPlayPauseButton.setEpisodeId(id, PlayPauseImageView.LOCATION.PLAYLIST);
         holder.downloadButton.setEpisodeId(id);
         holder.favoriteButton.setEpisodeId(id);
         holder.previousButton.setEpisodeId(id);
