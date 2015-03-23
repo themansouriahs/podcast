@@ -35,6 +35,7 @@ import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.LruCache;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.squareup.picasso.Picasso;
@@ -1263,6 +1264,30 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 	public String getTitle() {
         return title != null ? title : "";
 	}
+
+    /**
+     * @return the title of the episode. Most feeds format the title in the feed as: 'FeedTittle: EpisodeTitle'. This method returns the episodetitle
+     */
+    public String getShortTitle() {
+        String separator = ":";
+        String longTitle = getTitle();
+        if (TextUtils.isEmpty(longTitle))
+            return longTitle;
+
+        int index = longTitle.indexOf(separator);
+
+        if (index < 0)
+            return longTitle;
+
+        String sub = longTitle.substring(index+1, longTitle.length());
+
+        String shortTitle = sub.trim();
+
+        if (TextUtils.isEmpty(shortTitle))
+            return longTitle;
+
+        return shortTitle;
+    }
 
 	/**
 	 * @param title

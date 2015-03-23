@@ -114,7 +114,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
             if (item != null) {
 
-                viewHolder.mMainTitle.setText(item.getTitle());
+                viewHolder.mMainTitle.setText(item.getShortTitle());
                 if (Build.VERSION.SDK_INT >= 16) {
                     viewHolder.mActionBarGradientView.setBackground(mActionBarGradientDrawable);
                 }
