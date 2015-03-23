@@ -105,13 +105,13 @@
     <string name="pref_max_new_items_title">Máximo de novos itens atualizados</string>
     <string name="dialog_title_loading">Carregamento</string>
     <string name="dialog_message_loading">Carregando canal...</string>
-    <string name="dialog_title_add_sub">Adicionar canal</string>
-    <string name="dialog_message_add_sub">Adicionar canal de um URL:</string>
-    <string name="dialog_message_malformed_url">URL inválido. Tente novamente!</string>
-    <string name="dialog_message_url_exist">URL existente. Tente novamente!</string>
+    <string name="dialog_title_add_sub">Adicionar podcast</string>
+    <string name="dialog_message_add_sub">Por favor digite um URL:</string>
+    <string name="dialog_message_malformed_url">O URL é inválido. Tente novamente!</string>
+    <string name="dialog_message_url_exist">O URL já existe. Tente novamente!</string>
     <string name="dialog_title_del_sub">Eliminar canal</string>
-    <string name="list_message_empty_item">Sem dados</string>
-    <string name="list_message_empty_subs">Não existem canais. Adicionar...</string>
+    <string name="list_message_empty_item">Não existem dados</string>
+    <string name="list_message_empty_subs">Não existem canais. Adicione um...</string>
     <string name="fail">Falha</string>
     <string name="success">Sucesso</string>
     <string name="network_fail">Falha de rede</string>
@@ -180,5 +180,15 @@
     <string name="crash_toast">Erro (ajude-nos a corrigir o problema enviando um relatório de erros)</string>
     <string name="pref_help_category_title">Ajudar no desenvolvimento de SoundWaves</string>
     <string name="pref_help_static_field_description">Se você quiser ajudar, existem imensas coisas que pode fazer. Pode ajudar na programação ou algo completamente diferente. Pode ajudar na tradução, na criação de ícones e imagens, um sítio web e muito mais. Aceda à nossa página do github (https://github.com/bottiger/SoundWaves) ou envie uma mensagem para: bottiger@gmail.com</string>
+    <string tools:ignore="MissingTranslation" name="test_string">Test string, please ignore</string>
+    <string name="podcast_title_unknown">Sem título :(</string>
+    <string name="playlist_empty">Lista de reprodução vazia</string>
+    <string name="subscription_instruction">Adicione novos podcasts através da função de pesquisa ou introduza manualmente o URL</string>
+    <string name="filter_show_listened">Mostrar reproduzidos</string>
+    <string name="auto_start_next">Iniciar seguinte automaticamente</string>
+    <plurals name="subscriptions_imported">
+        <item quantity="one">%d subscrição importada.</item>
+        <item quantity="other">%d subscrições importadas.</item>
+    </plurals> 
 
 </resources>
