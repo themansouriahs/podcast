@@ -121,10 +121,9 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
         this.mEpisodeId = argId;
         PaletteObservable.registerListener(this);
 
-        if (getEpisode().offset > 0) {
-            setProgressMs(getEpisode().offset);
-            invalidate();
-        }
+        long offset = getEpisode().offset > 0 ? getEpisode().offset : 0;
+        setProgressMs(offset);
+        invalidate();
     }
 
     public synchronized void unsetEpisodeId() {
