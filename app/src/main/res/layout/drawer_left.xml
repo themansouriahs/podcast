@@ -105,7 +105,7 @@
         android:layout_height="wrap_content"
         android:textSize="14sp"
         android:padding="10dp"
-        android:text="Show Listened"
+        android:text="@string/filter_show_listened"
         android:layout_span="2"/>
 
     </TableRow>
@@ -156,7 +156,7 @@
             android:layout_height="wrap_content"
             android:textSize="14sp"
             android:padding="10dp"
-            android:text="Auto start next"
+            android:text="@string/auto_start_next"
             android:layout_span="2"/>
 
     </TableRow>

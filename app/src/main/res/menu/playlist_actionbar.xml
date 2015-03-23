@@ -1,10 +1,4 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:appcompat="http://schemas.android.com/apk/res-auto">
 
-        <item
-            android:id="@+id/menu_download_all"
-            android:orderInCategory="1"
-            android:title="@string/menu_download_all">
-        </item>
-
 </menu>

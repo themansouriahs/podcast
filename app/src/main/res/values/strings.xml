@@ -105,8 +105,8 @@
     <string name="pref_max_new_items_title">Maximum Updated New Items</string>
     <string name="dialog_title_loading">Loading</string>
     <string name="dialog_message_loading">Loading channel...</string>
-    <string name="dialog_title_add_sub">Add Channel</string>
-    <string name="dialog_message_add_sub">Add channel from URL:</string>
+    <string name="dialog_title_add_sub">Add Podcast</string>
+    <string name="dialog_message_add_sub">Please enter an URL:</string>
     <string name="dialog_message_malformed_url">URL is invalid, please retry!</string>
     <string name="dialog_message_url_exist">URL exist, please retry!</string>
     <string name="dialog_title_del_sub">Delete Channel</string>
@@ -182,5 +182,14 @@
     <string name="pref_help_static_field_description">If you would like to help out there is plenty of things to do. It could be programming and it could be something completley different. I need help with translation, user experience, icons and graphics, a website and so forth. Head over to the project page on github or send me an email: bottiger@gmail.com</string>
 	
     <string tools:ignore="MissingTranslation" name="test_string">Test string, please ignore</string>
+    <string name="playlist_empty">Playlist is empty</string>
+    <string name="subscription_instruction">Add new podcasts by using the search function or paste in the URL manually</string>
+    <string name="filter_show_listened">Show listened</string>
+    <string name="auto_start_next">Auto start next</string>
+    <plurals name="subscriptions_imported">
+        <item quantity="one">%d subscription was imported.</item>
+        <item quantity="other">%d subscriptions was imported.</item>
+    </plurals>
+
 
 </resources>

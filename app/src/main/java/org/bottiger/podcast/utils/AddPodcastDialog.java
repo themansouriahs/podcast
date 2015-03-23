@@ -32,7 +32,7 @@ public class AddPodcastDialog {
 				R.layout.add_podcast_dialog, null);
 		alertBuilder.setView(alertView);
 
-		alertBuilder.setTitle("Add podcast");
+        alertBuilder.setTitle(R.string.dialog_title_add_sub);
 
 		// Set an EditText view to get user input
 		// final EditText input = new EditText(this);
@@ -64,7 +64,7 @@ public class AddPodcastDialog {
 
 		alertBuilder.setView(input);
 
-		alertBuilder.setPositiveButton("Ok",
+		alertBuilder.setPositiveButton(android.R.string.ok,
 				new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int whichButton) {
@@ -81,7 +81,7 @@ public class AddPodcastDialog {
 					}
 				});
 
-		alertBuilder.setNegativeButton("Cancel",
+		alertBuilder.setNegativeButton(android.R.string.cancel,
 				new DialogInterface.OnClickListener() {
 
 					@Override
