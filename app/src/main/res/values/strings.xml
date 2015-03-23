@@ -184,12 +184,12 @@
     <string tools:ignore="MissingTranslation" name="test_string">Test string, please ignore</string>
     <string name="podcast_title_unknown">No title :(</string>
     <string name="playlist_empty">Playlist is empty</string>
-    <string name="subscription_instruction">Add new podcasts by using the search function or paste in the URL manually</string>
+    <string name="subscription_instruction">Add new podcasts by using the search function or enter the URL manually</string>
     <string name="filter_show_listened">Show listened</string>
     <string name="auto_start_next">Auto start next</string>
     <plurals name="subscriptions_imported">
         <item quantity="one">%d subscription was imported.</item>
-        <item quantity="other">%d subscriptions was imported.</item>
+        <item quantity="other">%d subscriptions were imported.</item>
     </plurals>  
 
 </resources>
