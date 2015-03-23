@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.bottiger.podcast.R;
 import org.bottiger.podcast.parser.opml.OpmlElement;
 import org.bottiger.podcast.parser.opml.OpmlReader;
 import org.bottiger.podcast.provider.DatabaseHelper;
@@ -16,6 +17,7 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.res.Resources;
 import android.widget.Toast;
 
 public class OPMLImportExport {
@@ -26,7 +28,7 @@ public class OPMLImportExport {
 	private static CharSequence opmlNotFound = "OPML not found. Please name the file "
 			+ filename
 			+ " and place it at the root folder on the storage (SD Card)";
-	private static String nSubscriptionsImported = " subscriptions was imported";
+	private static String nSubscriptionsImported;
 
 	private Context mContext;
 	private ContentResolver contentResolver;
@@ -59,7 +61,9 @@ public class OPMLImportExport {
 		}
 
 		if (numImported > 0) {
-			toastMsg(numImported + nSubscriptionsImported);
+            Resources res = mContext.getResources();
+            String formattedString = res.getQuantityString(R.plurals.subscriptions_imported, numImported);
+            toastMsg(formattedString);
 		}
 
 		return numImported;

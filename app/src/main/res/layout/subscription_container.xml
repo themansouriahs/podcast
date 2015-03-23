@@ -28,7 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="20dp"
-            android:text="Add new podcasts by using the search function or paste in the URL manually"/>
+            android:text="@string/subscription_instruction"/>
 
         <org.bottiger.podcast.views.SquareImageView
             android:id="@+id/subscription_empty_icon"

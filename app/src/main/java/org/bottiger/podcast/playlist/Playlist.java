@@ -392,14 +392,14 @@ public class Playlist implements OnDragStateChangedListener {
 
     public FeedItem first() {
         if (mInternalPlaylist.size() <= 0) {
-            throw new IllegalStateException("Playlist is empty");
+            throw new IllegalStateException("Playlist is empty"); // NoI18N
         }
         return mInternalPlaylist.get(0);
     }
 
     public static Playlist getActivePlaylist() {
         if (activePlaylist == null) {
-            throw new IllegalStateException("No Active Playlist");
+            throw new IllegalStateException("No Active Playlist"); // NoI18N
         }
         return activePlaylist;
     }
