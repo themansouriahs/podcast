@@ -20,6 +20,10 @@ import junit.framework.TestCase;
 
 import org.bottiger.podcast.provider.Subscription;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * An example of a true unit test that tests the utility class {@link MorseCodeConverter}.
  * Since this test doesn't need a {@link android.content.Context}, or any other
@@ -29,6 +33,11 @@ import org.bottiger.podcast.provider.Subscription;
  * all tests and individual tests in this application.
  */
 public class SubsTest extends TestCase {
+
+    /**
+     * Problematic feeds from the crashlogs:
+     */
+    private List<String> mProblematicFeeds = Arrays.asList("http://downloads.bbc.co.uk/podcasts/worldservice/wbnews/rss.xml");
 
     public void testSubsNew() throws Exception {
     	
