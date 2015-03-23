@@ -4,6 +4,7 @@ import org.bottiger.podcast.ApplicationConfiguration;
 import org.bottiger.podcast.PodcastBaseFragment;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.service.PlayerService;
 
@@ -28,6 +29,14 @@ public class NotificationReceiver extends  BroadcastReceiver {
 		
 		String action = intent.getAction();
 		layout = new RemoteViews(context.getPackageName(), R.layout.notification);
+
+        // FIXME we should start the service and not just return.
+        // FIXME The user probably wants to start playing when the service isn't running
+        if (mPlayerServiceBinder == null) {
+            VendorCrashReporter.report("PlayerService", "IS NULL");
+            return;
+        }
+
 		
 		if (action.equals(toggleAction)) {
 			Boolean isPlaying = false;
