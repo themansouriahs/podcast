@@ -354,7 +354,12 @@ public class PlayerService extends Service implements
 		if (mPlayer.isPlaying() == false) {
             takeWakelock(mPlayer.isSteaming());
 			mPlayer.start();
-            mMetaDataControllerWrapper.updateState(getCurrentItem(), true);
+
+            // FIXME maybe we should not do this before we are sure getCUrrentItem() will return something.
+            FeedItem item = getCurrentItem();
+            if (item != null) {
+                mMetaDataControllerWrapper.updateState(item, true);
+            }
 		}
 	}
 
