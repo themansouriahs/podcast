@@ -30,6 +30,8 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
     public PlayerButtonView mForward;
     public PlayerButtonView mBackward;
 
+    public View mActionBarGradientView;
+
     public ImageViewTinted mItemBackground;
     public TextView mMainTitle;
     public TextView mSubTitle;
@@ -63,12 +65,14 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
         //mForward = (PlayerButtonView) view.findViewById(R.id.fast_forward);
         //mBackward = (PlayerButtonView) view.findViewById(R.id.rewind);
         mItemBackground = (ImageViewTinted) view.findViewById(R.id.item_background);
-        //mMainTitle = (TextView) view.findViewById(R.id.title);
+        mMainTitle = (TextView) view.findViewById(R.id.podcast_title);
         //mSubTitle = (TextView) view.findViewById(R.id.podcast);
         mTimeDuration = (TextView) view.findViewById(R.id.duration);
         mCurrentPosition = (TextView) view.getTag(R.id.current_position);
         mSlash = (TextView) view.findViewById(R.id.time_slash);
         mFileSize = (TextView) view.findViewById(R.id.filesize);
+
+        mActionBarGradientView = view.findViewById(R.id.episode_top_gradient);
 
         // Expanded layout
         playerLinearLayout = (PlayerLinearLayout) view.findViewById(R.id.expanded_controls);

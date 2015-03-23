@@ -47,7 +47,8 @@ public class ImageViewTinted extends ImageView implements PaletteListener {
     public void onPaletteFound(Palette argChangedPalette) {
         ColorExtractor extractor = new ColorExtractor(argChangedPalette);
         //setColorFilter(extractor.getSecondary(), PorterDuff.Mode.LIGHTEN   );
-        setColorFilter(Color.DKGRAY, PorterDuff.Mode.SCREEN);
+        //setColorFilter(Color.DKGRAY, PorterDuff.Mode.SCREEN);
+        //setColorFilter(Color.DKGRAY, PorterDuff.Mode.DST);
         invalidate();
     }
 
