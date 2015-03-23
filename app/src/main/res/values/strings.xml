@@ -182,5 +182,6 @@
     <string name="pref_help_static_field_description">If you would like to help out there is plenty of things to do. It could be programming and it could be something completley different. I need help with translation, user experience, icons and graphics, a website and so forth. Head over to the project page on github or send me an email: bottiger@gmail.com</string>
 	
     <string tools:ignore="MissingTranslation" name="test_string">Test string, please ignore</string>
+    <string name="podcast_title_unknown">No title :(</string>
 
 </resources>

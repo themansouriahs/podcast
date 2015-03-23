@@ -33,7 +33,7 @@
             android:id="@+id/podcast_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Podcast title long long long"
+            android:text="@string/podcast_title_unknown"
             android:singleLine="true"
             android:textSize="26sp"
             android:layout_toRightOf="@+id/drag_handle"
