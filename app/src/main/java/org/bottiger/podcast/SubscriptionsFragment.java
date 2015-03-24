@@ -15,11 +15,15 @@ import org.bottiger.podcast.utils.FragmentUtils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.CursorLoader;
+import android.content.SharedPreferences;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.ListPreference;
+import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.widget.SearchView;
@@ -83,10 +87,14 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
 	private LayoutType mDisplayLayout = LayoutType.GRID;
 	private ContentType mContentType = ContentType.LOCAL;
 
+    private SharedPreferences shareprefs;
+    private static final String PREF_SUBSCRIPTION_COLUMNS = "pref_subscriptions_columns";
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
         mActivity = getActivity();
+        shareprefs = PreferenceManager.getDefaultSharedPreferences(mActivity.getApplicationContext());
 	}
 
 	@Override
@@ -109,6 +117,8 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
 		searchStatus = (TextView) fragmentView.findViewById(R.id.searchTextView);
 
 		registerForContextMenu(mGridView);
+
+        mGridView.setNumColumns(numberOfColumns(mActivity));
 		mGridView.setOnCreateContextMenuListener(this);
 
 		mGridView.setOnItemClickListener(new OnItemClickListener() {
@@ -152,6 +162,15 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
 
 		return mContainerView;
 	}
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mGridView.getNumColumns() != numberOfColumns(mActivity)) {
+            mGridView.setNumColumns(numberOfColumns(mActivity));
+            mGridView.invalidate();
+        }
+    }
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
@@ -411,5 +430,11 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
 			SubscriptionsFragment.this.cursorFromSearchResults(podcasts);
 		}
 	}
+
+
+    private int numberOfColumns(@NonNull Activity argActivity) {
+        String number = shareprefs.getString(PREF_SUBSCRIPTION_COLUMNS, "2");
+        return Integer.parseInt(number);
+    }
 
 }

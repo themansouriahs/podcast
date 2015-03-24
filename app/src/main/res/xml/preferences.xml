@@ -50,11 +50,32 @@
             android:key="ui"
             android:title="@string/preferences_category_ui" />
 
+        <PreferenceCategory
+            android:title="@string/pref_subscriptions_category_title"
+            android:key="pref_subscriptions_category">
+
+            <ListPreference
+                android:key="pref_subscriptions_columns"
+                android:defaultValue="2"
+                android:dialogTitle="@string/pref_subscriptions_columns_dialog_title"
+                android:entries="@array/pref_subscriptions_columns_entries"
+                android:entryValues="@array/pref_subscriptions_columns_entries_values"
+                android:title="@string/pref_subscriptions_columns_title"
+                android:summary="@string/pref_subscriptions_columns_summary" />
+
+        </PreferenceCategory>
+
+        <PreferenceCategory
+            android:title="@string/pref_interface_other_category_title"
+            android:key="@string/pref_interface_other_category_key">
+
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="pref_dark_theme"
             android:summary="@string/pref_dark_theme"
             android:title="@string/pref_dark_theme_title" />
+
+        </PreferenceCategory>
 
     </PreferenceScreen>
 

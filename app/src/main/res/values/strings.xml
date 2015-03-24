@@ -192,6 +192,11 @@
     <string name="opml_not_found">"OPML not found. Please name the file %1$s and place it at the root folder on the storage (SD Card)"</string>
     <string name="gpodder_searching">Searching using gPodder.net</string>
     <string name="subscription_subscribing_to">"Subscribing to: "</string>
+    <string name="pref_subscriptions_category_title">Subscriptions</string>
+    <string name="pref_subscriptions_columns_dialog_title">Number of columns used for displaying your subscriptions</string>
+    <string name="pref_subscriptions_columns_title">Subscription columns</string>
+    <string name="pref_subscriptions_columns_summary">Number of columns for displaying subscriptions</string>
+    <string name="pref_interface_other_category_title">Other</string>
     <plurals name="subscriptions_imported">
         <item quantity="one">%d subscription was imported.</item>
         <item quantity="other">%d subscriptions were imported.</item>
