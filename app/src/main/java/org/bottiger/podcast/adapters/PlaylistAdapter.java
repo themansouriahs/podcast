@@ -426,12 +426,15 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
     private void bindDuration(@NonNull PlaylistViewHolder argHolder, @NonNull FeedItem argFeedItem) {
 
         int visibility = View.INVISIBLE;
+        String strDuration = "";
+
         long duration = argFeedItem.getDuration();
         if (duration > 0) {
-            argHolder.mTimeDuration.setText(StrUtils.formatTime(duration));
+            strDuration = StrUtils.formatTime(duration);
             visibility = View.VISIBLE;
         }
 
+        argHolder.mTimeDuration.setText(strDuration);
         argHolder.mTimeDurationIcon.setVisibility(visibility);
     }
 }
