@@ -134,6 +134,20 @@ public class VendorAnalytics extends AbstractAnalytics implements IAnalytics {
             eventData.LabelID = "Subscribe";
         }
 
+        if (argType == EVENT_TYPE.OPML_IMPORT) {
+            eventData = new EventData();
+            eventData.Category = CATEGORY_USAGE;
+            eventData.Action = "OPML import";
+            eventData.LabelID = "OPML";
+        }
+
+        if (argType == EVENT_TYPE.OPML_EXPORT) {
+            eventData = new EventData();
+            eventData.Category = CATEGORY_USAGE;
+            eventData.Action = "OPML export";
+            eventData.LabelID = "OPML";
+        }
+
         if (eventData != null)
             return eventData;
 

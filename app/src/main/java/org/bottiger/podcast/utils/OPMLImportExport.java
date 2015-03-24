@@ -11,6 +11,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.flavors.Analytics.IAnalytics;
+import org.bottiger.podcast.flavors.Analytics.VendorAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.parser.opml.OpmlElement;
 import org.bottiger.podcast.parser.opml.OpmlReader;
@@ -79,6 +82,7 @@ public class OPMLImportExport {
             Resources res = mContext.getResources();
             String formattedString = res.getQuantityString(R.plurals.subscriptions_imported, numImported, numImported);
             toastMsg(formattedString);
+            SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.OPML_IMPORT);
 		}
 
 		return numImported;
@@ -162,6 +166,7 @@ public class OPMLImportExport {
             return;
         }
 
+        SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.OPML_EXPORT);
         toastMsg(opmlSuccesfullyExported);
     }
 }

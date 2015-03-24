@@ -9,7 +9,9 @@ public interface IAnalytics {
                              PAUSE,
                              PLAY_FROM_PLAYLIST,
                              PLAY_FROM_FEEDVIEW,
-                             SUBSCRIBE_TO_FEED
+                             SUBSCRIBE_TO_FEED,
+                             OPML_IMPORT,
+                             OPML_EXPORT
     };
 
     public void startTracking();
