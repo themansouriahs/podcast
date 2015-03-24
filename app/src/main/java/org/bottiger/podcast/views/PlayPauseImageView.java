@@ -73,7 +73,7 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
     private Paint paint;
     private Paint paintBorder;
 
-    private int mPaintColor = Color.BLACK; // TODO: use a default from R.color...
+    private int mPaintColor = getResources().getColor(R.color.colorPrimaryDark);
     private int mPaintBorderColor = Color.WHITE;
 
     public PlayPauseImageView(Context context) {

@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -145,7 +144,7 @@ public class FeedViewAdapter extends AbstractEpisodeCursorAdapter<FeedViewAdapte
             mText = (TextView) view.findViewById(R.id.title);
             mDescription = (TextView) view.findViewById(R.id.episode_description);
             mPlayPauseButton = (PlayPauseImageView) view.findViewById(R.id.play_pause_button);
-            mDownloadButton = (DownloadButtonView) view.findViewById(R.id.download_button);
+            mDownloadButton = (DownloadButtonView) view.findViewById(R.id.feedview_download_button);
         }
 
 

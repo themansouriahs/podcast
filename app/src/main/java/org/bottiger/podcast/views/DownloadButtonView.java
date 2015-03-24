@@ -49,17 +49,19 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
         setOnClickListener(this);
 
         // Detect of we have defined a background color for the view
-        if (attrs != null) {
-            int[] attrsArray = new int[]{
-                    android.R.attr.background, // 0
-            };
-            TypedArray ta = mContext.obtainStyledAttributes(attrs, attrsArray);
-            mStaticBackground = ta.getDrawable(0);
-            ta.recycle();
+        if (getId() == R.id.feedview_download_button) {
+            if (attrs != null) {
+                int[] attrsArray = new int[]{
+                        android.R.attr.background, // 0
+                };
+                TypedArray ta = mContext.obtainStyledAttributes(attrs, attrsArray);
+                mStaticBackground = ta.getDrawable(0);
+                ta.recycle();
 
-            if (mStaticBackground != null) {
-                download_icon = R.drawable.ic_get_app_grey;
-                delete_icon = R.drawable.ic_delete_grey;
+                if (mStaticBackground != getResources().getDrawable(R.color.colorPrimaryDark)) {
+                    download_icon = R.drawable.ic_get_app_grey;
+                    delete_icon = R.drawable.ic_delete_grey;
+                }
             }
         }
 

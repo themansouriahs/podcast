@@ -61,8 +61,8 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
 
     private PaletteObservable mCurrentListener;
 
-    private int mForegroundColor = Color.CYAN;
-    private int mBackgroundColor = Color.RED;
+    private int mForegroundColor = getResources().getColor(R.color.colorPrimaryDark);
+    private int mBackgroundColor = getResources().getColor(R.color.colorPrimaryDark);
 
     public PlayerButtonView(Context context) {
         super(context);
@@ -82,7 +82,7 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
     private void init(Context context, AttributeSet attrs) {
 
         baseColorPaint = new Paint(Paint.LINEAR_TEXT_FLAG);
-        //baseColorPaint.setColor(mBackgroundColor);
+        baseColorPaint.setColor(mBackgroundColor);
         baseColorPaint.setColor(-1761607680);
         baseColorPaint.setTextSize(12.0F);
         baseColorPaint.setStyle(Paint.Style.FILL_AND_STROKE); // Paint.Style.STROKE
