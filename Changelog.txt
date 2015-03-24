@@ -1,6 +1,17 @@
 Changelog
 ==========
 
+version 0.82
+------------
+* A few crashes
+* Added some new information to the playlist
+* Fixed/Enhanced the OPML import/export.
+* Tinted the status bar
+* Added preference to show 3 columns with subscriptions
+* Fixed some localization issues
+* Added Analytics to the Google Play edition. Opt out is possible
+* Started styling the navigation drawer
+
 version 0.80
 ------------
 * A few crashes
