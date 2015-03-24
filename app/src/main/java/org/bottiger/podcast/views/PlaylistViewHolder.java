@@ -36,6 +36,7 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
     public TextView mMainTitle;
     public TextView mSubTitle;
     public TextView mTimeDuration;
+    public ImageView mTimeDurationIcon;
     public TextView mCurrentPosition;
     public TextView mSlash;
     public TextView mFileSize;
@@ -67,7 +68,8 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
         mItemBackground = (ImageViewTinted) view.findViewById(R.id.item_background);
         mMainTitle = (TextView) view.findViewById(R.id.podcast_title);
         mSubTitle = (TextView) view.findViewById(R.id.podcast_title_extra);
-        mTimeDuration = (TextView) view.findViewById(R.id.duration);
+        mTimeDuration = (TextView) view.findViewById(R.id.podcast_duration);
+        mTimeDurationIcon = (ImageView) view.findViewById(R.id.podcast_duration_ic);
         mCurrentPosition = (TextView) view.getTag(R.id.current_position);
         mSlash = (TextView) view.findViewById(R.id.time_slash);
         mFileSize = (TextView) view.findViewById(R.id.filesize);

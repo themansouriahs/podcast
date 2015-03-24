@@ -56,6 +56,30 @@
             android:layout_marginRight="60dp"
             />
 
+        <ImageView
+            android:id="@+id/podcast_duration_ic"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:scaleType="fitXY"
+            android:adjustViewBounds="true"
+            android:src="@drawable/ic_access_time_white"
+            android:layout_below="@+id/podcast_title_extra"
+            android:layout_toRightOf="@+id/drag_handle"
+            android:layout_marginLeft="20dp" />
+
+        <TextView
+            android:id="@+id/podcast_duration"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:textSize="15sp"
+            android:layout_below="@+id/podcast_title_extra"
+            android:layout_toRightOf="@+id/podcast_duration_ic"
+            android:textColor="@color/white_opaque"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="60dp"
+            />
+
     <org.bottiger.podcast.views.PlayPauseImageView
          style="@style/PodcastImage"
          android:id="@+id/list_image"

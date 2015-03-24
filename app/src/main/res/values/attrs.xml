@@ -42,6 +42,7 @@
     <attr name="search_invert_icon" format="reference" />
     <attr name="customBackground" format="reference" />
     <attr name="seekbar_handle" format="reference" />
+    <attr name="time_icon" format="reference" />
 
     <declare-styleable name="BezelImageView">
         <attr name="maskDrawable" format="reference" />

@@ -118,6 +118,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
                 viewHolder.mMainTitle.setText(item.getShortTitle());
                 viewHolder.mSubTitle.setText(getSubTitle(mActivity, item));
+                bindDuration(viewHolder, item);
 
                 if (Build.VERSION.SDK_INT >= 16) {
                     viewHolder.mActionBarGradientView.setBackground(mActionBarGradientDrawable);
@@ -415,17 +416,27 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
     private String getSubTitle(@NonNull Context argContext, @NonNull FeedItem argFeedItem) {
         mStringBuilder = new StringBuilder();
+        boolean needSeparator = false;
 
         String date = argFeedItem.getDate(argContext);
 
         if (!TextUtils.isEmpty(date)) {
             mStringBuilder.append(date);
-            //builder.append(", ");
+            needSeparator = true;
         }
 
-        //String duration = argFeedItem.getDuration();
-        //builder.append(argFeedItem.getCurrentFileSize());
-
         return mStringBuilder.toString();
+    }
+
+    private void bindDuration(@NonNull PlaylistViewHolder argHolder, @NonNull FeedItem argFeedItem) {
+
+        int visibility = View.INVISIBLE;
+        long duration = argFeedItem.getDuration();
+        if (duration > 0) {
+            argHolder.mTimeDuration.setText(StrUtils.formatTime(duration));
+            visibility = View.VISIBLE;
+        }
+
+        argHolder.mTimeDurationIcon.setVisibility(visibility);
     }
 }

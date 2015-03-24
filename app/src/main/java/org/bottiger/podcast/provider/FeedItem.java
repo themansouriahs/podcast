@@ -1051,9 +1051,12 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 	}
 
 	/**
-	 * @return the duration of the mp3 (or whatever) in milliseconds.
+     * The duration of the mp3 (or whatever) in milliseconds.
+	 * @return the duration in ms. -1 if unknown
 	 */
 	public long getDuration() {
+        return duration_ms;
+        /*
 		if (duration_ms > 0) {
 			if ("".equals(duration_string)) {
 				duration_ms = StrUtils.parseTimeToSeconds(duration_string);
@@ -1087,6 +1090,7 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 				return StrUtils.parseTimeToSeconds(duration_string);
 			}
 		}
+		*/
 	}
 
 	/**

@@ -28,6 +28,7 @@
         <item name="search_invert_icon">@drawable/action_search</item>
         <item name="customBackground">@color/pitch_black</item>
         <item name="favorite_outline">@drawable/ic_favorite_outline_white</item>
+        <item name="time_icon">@drawable/ic_access_time_white</item>
         <!--<item name="seekbar_handle">@drawable/seekbar_handle2.9</item>-->
         <item name="android:actionBarStyle">@style/TranslucentActionBar</item>
 
@@ -59,6 +60,7 @@
         <item name="search_icon">@drawable/action_search</item>
         <item name="customBackground">@color/white_opaque</item>
         <item name="favorite_outline">@drawable/ic_favorite_outline_white</item>
+        <item name="time_icon">@drawable/ic_access_time_white</item>
         <!--<item name="seekbar_handle">@drawable/seekbar_handle</item>-->
 
         <item name="android:actionBarStyle">@style/TransparentActionBar</item>
