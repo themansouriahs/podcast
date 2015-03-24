@@ -42,7 +42,7 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
     public TextView mFileSize;
 
     // expnded extended_player
-    public PlayerLinearLayout playerLinearLayout;
+    public PlayerRelativeLayout playerRelativeLayout;
     public TextView timeSlash;
     public PlayerSeekbar seekbar;
     public TextView currentTime;
@@ -77,7 +77,7 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
         mActionBarGradientView = view.findViewById(R.id.episode_top_gradient);
 
         // Expanded layout
-        playerLinearLayout = (PlayerLinearLayout) view.findViewById(R.id.expanded_controls);
+        playerRelativeLayout = (PlayerRelativeLayout) view.findViewById(R.id.expanded_controls);
         timeSlash = (TextView) view.findViewById(R.id.time_slash);
         currentTime = (TextView) view
                 .findViewById(R.id.current_position);
@@ -93,7 +93,7 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
 
     @Override
     public View getExpandView() {
-        return playerLinearLayout;
+        return playerRelativeLayout;
     }
 
     @Override

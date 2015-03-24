@@ -122,7 +122,7 @@ public class PlayerStatusObservable {
 
     public static void updateProgress(@NonNull PlayerService argPlayerService, @NonNull FeedItem argEpisode) {
         for (PlayerStatusObserver listener : mListeners.keySet()) {
-            if (listener.getEpisode() == argEpisode) {
+            if (argEpisode.equals(listener.getEpisode())) {
                 //listener.setProgressMs(argPlayerService.position());
                 listener.setProgressMs(argEpisode.offset);
             }

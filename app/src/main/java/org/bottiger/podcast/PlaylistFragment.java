@@ -17,12 +17,14 @@ import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.service.PodcastDownloadManager;
 import org.bottiger.podcast.utils.BackgroundTransformation;
 import org.bottiger.podcast.utils.PaletteCache;
+import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.views.DownloadButtonView;
 import org.bottiger.podcast.views.ExpandableLayoutManager;
 import org.bottiger.podcast.views.PlayPauseImageView;
 import org.bottiger.podcast.views.PlayerButtonView;
 import org.bottiger.podcast.views.PlayerSeekbar;
+import org.bottiger.podcast.views.TextViewObserver;
 import org.bottiger.podcast.views.TopPlayer;
 import org.bottiger.podcast.views.playlist.MultiShrinkScroller;
 
@@ -79,6 +81,8 @@ public class PlaylistFragment extends GeastureFragment implements
 
     private TextView mEpisodeTitle;
     private TextView mEpisodeInfo;
+    private TextViewObserver mCurrentTime;
+    private TextView mTotalTime;
     private PlayPauseImageView mPlayPauseButton;
     private PlayerSeekbar mPlayerSeekbar;
     private DownloadButtonView mPlayerDownloadButton;
@@ -164,6 +168,9 @@ public class PlaylistFragment extends GeastureFragment implements
 
         mEpisodeTitle         =    (TextView) mSwipeRefreshView.findViewById(R.id.episode_title);
         mEpisodeInfo         =    (TextView) mSwipeRefreshView.findViewById(R.id.episode_info);
+
+        mCurrentTime       =    (TextViewObserver) mSwipeRefreshView.findViewById(R.id.current_time);
+        mTotalTime         =    (TextView) mSwipeRefreshView.findViewById(R.id.total_time);
 
         mPlayPauseButton         =    (PlayPauseImageView) mSwipeRefreshView.findViewById(R.id.play_pause_button);
         mPlayerSeekbar          =    (PlayerSeekbar) mSwipeRefreshView.findViewById(R.id.player_progress);
@@ -328,6 +335,21 @@ public class PlaylistFragment extends GeastureFragment implements
         mEpisodeTitle.setText(item.getTitle());
         mEpisodeInfo.setText("");
 
+        long duration = item.getDuration();
+        if (duration > 0) {
+            mTotalTime.setText(StrUtils.formatTime(duration));
+        } else {
+            mTotalTime.setText("");
+        }
+
+        long offset = item.offset;
+        if (offset > 0) {
+            mCurrentTime.setText(StrUtils.formatTime(offset));
+        } else {
+            mCurrentTime.setText("");
+        }
+        mCurrentTime.setEpisode(item);
+
         mPlayPauseButton.setEpisodeId(item.getId(), PlayPauseImageView.LOCATION.PLAYLIST);
         mBackButton.setEpisodeId(item.getId());
         mForwardButton.setEpisodeId(item.getId());
@@ -366,6 +388,7 @@ public class PlaylistFragment extends GeastureFragment implements
         PaletteObservable.registerListener(mTopPlayer);
 
         PlayerStatusObservable.registerListener(mPlayerSeekbar);
+        PlayerStatusObservable.registerListener(mCurrentTime);
 
 
         Palette palette = PaletteCache.get(item.image);

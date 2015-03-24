@@ -20,17 +20,17 @@ import org.bottiger.podcast.R;
 /**
  * TODO: document your custom view class.
  */
-public class PlayerLinearLayout extends RelativeLayout {
+public class PlayerRelativeLayout extends RelativeLayout {
 
-    public PlayerLinearLayout(Context context) {
+    public PlayerRelativeLayout(Context context) {
         super(context);
     }
 
-    public PlayerLinearLayout(Context context, AttributeSet attrs) {
+    public PlayerRelativeLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public PlayerLinearLayout(Context context, AttributeSet attrs, int defStyle) {
+    public PlayerRelativeLayout(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 

@@ -24,9 +24,6 @@ import org.bottiger.podcast.views.PlaylistViewHolder;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -41,8 +38,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.squareup.picasso.Callback;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> {
 
@@ -201,7 +196,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         }
 
         if (!doExpand) {
-            View v = viewHolder.playerLinearLayout;
+            View v = viewHolder.playerRelativeLayout;
             if (v != null) {
                 v.setVisibility(View.GONE);
             }
@@ -222,7 +217,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
         ThemeHelper themeHelper = new ThemeHelper(context);
 
-        holder.playerLinearLayout.setVisibility(View.VISIBLE);
+        holder.playerRelativeLayout.setVisibility(View.VISIBLE);
         holder.timeSlash.setText("/");
         holder.timeSlash.setVisibility(View.VISIBLE);
 

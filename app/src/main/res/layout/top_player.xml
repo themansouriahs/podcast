@@ -17,6 +17,13 @@
         android:layout_height="match_parent"
         android:scaleType="centerCrop" />
 
+    <View
+        android:id="@+id/top_gradient"
+        android:background="@drawable/header_gradient"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_gravity="top" />
+
     <TextView
         android:id="@+id/episode_title"
         android:layout_width="match_parent"
@@ -47,7 +54,7 @@
         android:layout_marginLeft="30dp"
         android:layout_marginRight="30dp"/>
 
-    <org.bottiger.podcast.views.PlayerLinearLayout
+    <org.bottiger.podcast.views.PlayerRelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/expanded_controls"
         android:layout_width="match_parent"
@@ -86,7 +93,26 @@
             android:padding="0dip"
             android:elevation="@dimen/player_elevation" />
 
-    </org.bottiger.podcast.views.PlayerLinearLayout>
+        <org.bottiger.podcast.views.TextViewObserver
+            android:id="@+id/current_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/previous"
+            android:padding="5dp"
+            android:textColor="@color/white_opaque"
+            />
+
+        <TextView
+            android:id="@+id/total_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/fast_forward_button"
+            android:padding="5dp"
+            android:textColor="@color/white_opaque"
+            />
+
+    </org.bottiger.podcast.views.PlayerRelativeLayout>
 
     <org.bottiger.podcast.views.PlayerSeekbar
         android:id="@+id/player_progress"

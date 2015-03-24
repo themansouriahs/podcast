@@ -8,7 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import org.bottiger.podcast.views.PlayPauseImageView;
-import org.bottiger.podcast.views.PlayerLinearLayout;
+import org.bottiger.podcast.views.PlayerRelativeLayout;
 import org.bottiger.podcast.views.PlaylistViewHolder;
 
 import java.util.List;
@@ -120,7 +120,7 @@ public class ExpandableViewHoldersUtil {
     private static void calcOffset(PlaylistViewHolder viewHolder, int baseHeight) {
         if (offset > 0)
             return;
-        final PlayerLinearLayout player = viewHolder.playerLinearLayout;
+        final PlayerRelativeLayout player = viewHolder.playerRelativeLayout;
         int c = viewHolder.mPlayPauseButton.getBottom()-viewHolder.mPlayPauseButton.getTop();
         offset = baseHeight-c;
     }

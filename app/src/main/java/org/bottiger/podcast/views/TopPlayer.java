@@ -12,13 +12,11 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
-import android.widget.SeekBar;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.provider.FeedItem;
-import org.bottiger.podcast.utils.PaletteCache;
 import org.bottiger.podcast.utils.UIUtils;
 
 import static org.bottiger.podcast.views.PlayerButtonView.StaticButtonColor;
@@ -61,7 +59,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
 
     private boolean mCanScrollUp = true;
 
-    private PlayerLinearLayout mPlayerControlsLinearLayout;
+    private PlayerRelativeLayout mPlayerControlsLinearLayout;
 
     private RelativeLayout mPlayerButtons;
     private int mPlayerButtonsHeight = -1;
@@ -151,7 +149,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
 
     @Override
     protected void onFinishInflate () {
-        mPlayerControlsLinearLayout = (PlayerLinearLayout)findViewById(R.id.expanded_controls);
+        mPlayerControlsLinearLayout = (PlayerRelativeLayout)findViewById(R.id.expanded_controls);
 
         mPhoto = findViewById(R.id.session_photo);
 

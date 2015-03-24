@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<org.bottiger.podcast.views.PlayerLinearLayout
+<org.bottiger.podcast.views.PlayerRelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:SoundwavesNS="http://schemas.android.com/apk/res-auto"
     android:id="@+id/player_container"
@@ -63,4 +63,4 @@
     </LinearLayout>
     </FrameLayout>
 
-</org.bottiger.podcast.views.PlayerLinearLayout>
+</org.bottiger.podcast.views.PlayerRelativeLayout>
