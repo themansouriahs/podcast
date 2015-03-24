@@ -23,6 +23,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.ListPreference;
@@ -31,6 +32,7 @@ import android.preference.PreferenceGroup;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.view.View;
+import android.view.WindowManager;
 
 public class SettingsActivity extends ToolbarActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -81,11 +83,6 @@ public class SettingsActivity extends ToolbarActivity implements SharedPreferenc
         return R.layout.preference_activity;
     }
 
-    @Override
-    protected int getStatusBarHeight() {
-        return 0;
-    }
-
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
 			String key) {
@@ -96,7 +93,7 @@ public class SettingsActivity extends ToolbarActivity implements SharedPreferenc
 	}
 
     @Override
-    protected boolean transparentStatusBar() {
+    protected boolean transparentNavigationBar() {
         return false;
     }
 

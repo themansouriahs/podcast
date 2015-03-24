@@ -2,14 +2,14 @@
 <org.bottiger.podcast.views.SwipeRefreshExpandableLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/my_frame"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <FrameLayout
         android:id="@+id/overlay_container"
-        android:paddingTop="@dimen/header_bar_height"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+        <!-- android:paddingTop="@dimen/header_bar_height" -->
 
         <include layout="@layout/playlist_empty" />
 

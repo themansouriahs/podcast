@@ -39,6 +39,7 @@ import android.widget.ExpandableListView;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TableLayout;
@@ -81,6 +82,7 @@ import com.android.volley.toolbox.ImageLoader;
 public abstract class DrawerActivity extends ToolbarActivity {
 
 	protected DrawerLayout mDrawerLayout;
+    protected RelativeLayout mDrawerMainContent;
 	protected ExpandableListView mDrawerList;
 	protected FrameLayout mDrawerContainer;
     protected TableLayout mDrawerTable;
@@ -132,18 +134,22 @@ public abstract class DrawerActivity extends ToolbarActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-
-
 		mTitle = mDrawerTitle = getTitle();
 		mListItems = getResources().getStringArray(R.array.drawer_menu);
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerMainContent = (RelativeLayout) findViewById(R.id.outer_container);
 		mDrawerContainer = (FrameLayout) findViewById(R.id.drawer_container);
         mDrawerTable = (TableLayout) findViewById(R.id.drawer_table);
 
         // if we can use windowTranslucentNavigation=true
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             FrameLayout.MarginLayoutParams params = (FrameLayout.MarginLayoutParams) mDrawerTable.getLayoutParams();
-            params.topMargin = getStatusBarHeight();
+            params.topMargin = getStatusBarHeight(getResources());
+
+            RelativeLayout.MarginLayoutParams params2 = (RelativeLayout.MarginLayoutParams) mDrawerMainContent.getLayoutParams();
+            params2.topMargin = getStatusBarHeight(getResources());
+
+            mDrawerMainContent.setLayoutParams(params2);
             mDrawerTable.setLayoutParams(params);
         }
 

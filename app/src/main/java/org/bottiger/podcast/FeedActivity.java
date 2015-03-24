@@ -24,6 +24,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -40,6 +41,7 @@ import org.bottiger.podcast.service.PodcastDownloadManager;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.PaletteCache;
 import org.bottiger.podcast.utils.ThemeHelper;
+import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.utils.WhitenessUtils;
 import org.bottiger.podcast.views.FeedRecyclerView;
 import org.bottiger.podcast.views.FloatingActionButton;
@@ -215,6 +217,13 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
         mMultiShrinkScroller = (MultiShrinkScroller) findViewById(R.id.multiscroller);
         mFloatingButton = (FloatingActionButton) findViewById(R.id.feedview_fap_button);
 
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            FrameLayout.MarginLayoutParams params = (FrameLayout.MarginLayoutParams) mMultiShrinkScroller.getLayoutParams();
+            params.topMargin = ToolbarActivity.getStatusBarHeight(getResources());
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+            mMultiShrinkScroller.setLayoutParams(params);
+        }
+
 
         mFloatingButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -384,6 +393,8 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
         ColorExtractor extractor = new ColorExtractor(this, argChangedPalette);
         mMultiShrinkScroller.setHeaderTintColor(extractor.getPrimary());
         mFloatingButton.onPaletteFound(argChangedPalette);
+        UIUtils.tintStatusBar(extractor.getPrimary(), this);
+        mStatusBarColor = extractor.getPrimary();
     }
 
     @Override

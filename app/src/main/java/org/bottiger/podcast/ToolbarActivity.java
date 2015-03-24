@@ -5,6 +5,7 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -53,11 +54,12 @@ public class ToolbarActivity extends TopActivity {
         mAppContent = findViewById(R.id.app_content);
 
         // if we can use windowTranslucentNavigation=true
+        /*
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) mToolbar.getLayoutParams();
             params.topMargin = getStatusBarHeight();
             mToolbar.setLayoutParams(params);
-        }
+        }*/
 
         //Title and subtitle
         mToolbar.setTitle(getResources().getString(R.string.app_name));
@@ -130,11 +132,11 @@ public class ToolbarActivity extends TopActivity {
         mColorAnimation.start();
     }
 
-    protected int getStatusBarHeight() {
+    protected static int getStatusBarHeight(Resources res) {
         int result = 0;
-        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        int resourceId = res.getIdentifier("status_bar_height", "dimen", "android");
         if (resourceId > 0) {
-            result = getResources().getDimensionPixelSize(resourceId);
+            result = res.getDimensionPixelSize(resourceId);
         }
         return result;
     }

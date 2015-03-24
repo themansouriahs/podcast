@@ -1,13 +1,10 @@
 package org.bottiger.podcast;
 
-import android.annotation.TargetApi;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.Toolbar;
-import android.transition.Explode;
 import android.transition.Slide;
 import android.transition.Transition;
 import android.view.Window;
@@ -23,8 +20,13 @@ public class TopActivity extends ActionBarActivity {
 
         super.onCreate(savedInstanceState);
 
-        if (transparentStatusBar() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        boolean transparentStatus = transparentNavigationBar();
+        /*
+        if (transparentStatus && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        }*/
+
+        if (transparentStatus && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
         }
 
@@ -57,9 +59,9 @@ public class TopActivity extends ActionBarActivity {
 	}
 
     /**
-     * Override this if the status and navigation bar should remain opaque
+     * Override this if the navigation bar should remain opaque
      */
-    protected boolean transparentStatusBar() {
+    protected boolean transparentNavigationBar() {
         return true;
     }
 

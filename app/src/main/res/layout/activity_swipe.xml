@@ -9,10 +9,21 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <include layout="@layout/toolbar_actionbar" />
+
+        <!-- Sliding Tabs -->
+        <org.bottiger.podcast.views.SlidingTab.SlidingTabLayout
+            android:id="@+id/sliding_tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorAccent"
+            android:layout_below="@+id/my_awesome_toolbar"/>
+
      <!-- The Main layout -->
         <org.bottiger.podcast.views.MyCustomViewPager
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/app_content"
+            android:layout_below="@+id/sliding_tabs"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             >
@@ -24,28 +35,6 @@
             </FrameLayout>
 
         </org.bottiger.podcast.views.MyCustomViewPager>
-
-        <!--
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/my_awesome_toolbar"
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:layout_alignParentTop="true"
-            android:minHeight="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-
-        </android.support.v7.widget.Toolbar>
-        -->
-        <include layout="@layout/toolbar_actionbar" />
-
-        <!-- Sliding Tabs -->
-        <org.bottiger.podcast.views.SlidingTab.SlidingTabLayout
-            android:id="@+id/sliding_tabs"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?attr/colorAccent"
-            android:layout_below="@+id/my_awesome_toolbar"/>
 
     </RelativeLayout>
 

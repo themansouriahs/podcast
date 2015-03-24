@@ -42,6 +42,8 @@ import android.text.method.LinkMovementMethod;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -337,6 +339,14 @@ public class UIUtils {
             return resources.getDimensionPixelSize(id);
         }
         return 0;
+    }
+
+    public static void tintStatusBar(int argColor, Activity argActivity) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            Window window = argActivity.getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(argColor);
+        }
     }
 
 
