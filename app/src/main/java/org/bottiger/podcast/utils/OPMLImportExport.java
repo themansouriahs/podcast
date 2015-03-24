@@ -4,14 +4,17 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.parser.opml.OpmlElement;
 import org.bottiger.podcast.parser.opml.OpmlReader;
+import org.bottiger.podcast.parser.opml.OpmlWriter;
 import org.bottiger.podcast.provider.DatabaseHelper;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.Subscription;
@@ -25,9 +28,16 @@ import android.widget.Toast;
 public class OPMLImportExport {
 
 	public static final String filename = "podcasts.opml";
+    public static final String filenameOut = "podcasts_export.opml";
+
 	public static final File file = new File(SDCardManager.getSDCardDir() + "/"
 			+ filename);
+    public static final File fileOut = new File(SDCardManager.getExportDir() + "/"
+            + filenameOut);
 	private static CharSequence opmlNotFound;
+    private static CharSequence opmlFailedToExport;
+    private static CharSequence opmlSuccesfullyExported;
+
 	private static String nSubscriptionsImported;
 
 	private Context mContext;
@@ -40,6 +50,8 @@ public class OPMLImportExport {
 
         Resources res = mContext.getResources();
         opmlNotFound = String.format(res.getString(R.string.opml_not_found), filename);
+        opmlFailedToExport = res.getString(R.string.opml_export_failed);
+        opmlSuccesfullyExported = String.format(res.getString(R.string.opml_export_succes), fileOut);
 	}
 
 	public int importSubscriptions() {
@@ -121,4 +133,35 @@ public class OPMLImportExport {
 		int duration = Toast.LENGTH_LONG;
 		Toast.makeText(mContext, msg, duration).show();
 	}
+
+    public void exportSubscriptions() {
+        FileWriter fileWriter = null;
+
+        try {
+            if (!fileOut.exists()) {
+                fileOut.createNewFile();
+            }
+
+            fileWriter = new FileWriter(fileOut);
+        } catch (IOException e) {
+            VendorCrashReporter.handleException(e);
+        }
+
+        if (fileWriter == null) {
+            toastMsg(opmlFailedToExport);
+            return;
+        }
+
+        OpmlWriter opmlWriter = new OpmlWriter();
+        List<Subscription> subscriptionList = Subscription.allAsList(contentResolver);
+
+        try {
+            opmlWriter.writeDocument(subscriptionList, fileWriter);
+        } catch (IOException e) {
+            toastMsg(opmlFailedToExport);
+            return;
+        }
+
+        toastMsg(opmlSuccesfullyExported);
+    }
 }

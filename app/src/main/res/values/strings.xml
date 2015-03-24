@@ -200,6 +200,8 @@
     <string name="opml_radio_import">Import OPML file</string>
     <string name="opml_radio_export">Export subscriptions to OPML</string>
     <string name="opml_import_instructions">To import an OPML file, first copy it to: %1$s</string>
+    <string name="opml_export_failed">Sorry. The export failed due to an unknown error :( Maybe you are running out of storage?</string>
+    <string name="opml_export_succes">Your subscriptions were succesfully exported to: %1$s</string>
     <plurals name="subscriptions_imported">
         <item quantity="one">%d subscription was imported.</item>
         <item quantity="other">%d subscriptions were imported.</item>

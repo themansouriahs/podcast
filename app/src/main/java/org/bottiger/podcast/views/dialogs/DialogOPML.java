@@ -65,7 +65,7 @@ public class DialogOPML {
                 }
 
                 if (mAction == ACTION.EXPORT) {
-                    //importExport.e
+                    importExport.exportSubscriptions();
                 }
             }
         });
