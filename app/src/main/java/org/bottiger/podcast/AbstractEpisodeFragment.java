@@ -12,9 +12,11 @@ import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.service.PodcastDownloadManager;
 import org.bottiger.podcast.utils.OPMLImportExport;
 import org.bottiger.podcast.utils.ThemeHelper;
+import org.bottiger.podcast.views.dialogs.DialogOPML;
 
 import android.accounts.Account;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -108,11 +110,6 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
             }
             break;
 			//refreshView();
-		}
-		case R.id.menu_import: {
-			OPMLImportExport importExport = new OPMLImportExport(getActivity());
-			importExport.importSubscriptions();
-			refreshView();
 		}
 		}
 		return super.onOptionsItemSelected(item);

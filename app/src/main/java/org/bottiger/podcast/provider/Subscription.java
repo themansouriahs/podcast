@@ -11,6 +11,8 @@ import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PaletteObservable;
+import org.bottiger.podcast.service.DownloadCompleteCallback;
+import org.bottiger.podcast.service.PodcastDownloadManager;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.PodcastLog;
 import org.json.simple.JSONArray;
@@ -28,6 +30,7 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.provider.BaseColumns;
+import android.support.annotation.NonNull;
 import android.support.v4.util.LruCache;
 import android.support.v7.graphics.Palette;
 
@@ -334,6 +337,16 @@ public class Subscription extends AbstractItem implements PaletteListener {
 
 		return episodes;
 	}
+
+    // FIXME
+    public void refresh(@NonNull Context argContext) {
+        PodcastDownloadManager.start_update(argContext, this, new DownloadCompleteCallback() {
+            @Override
+            public void complete(boolean succes) {
+                return;
+            }
+        });
+    }
 
 	/**
 	 * Batch update

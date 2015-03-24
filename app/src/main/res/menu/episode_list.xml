@@ -11,10 +11,5 @@
         android:orderInCategory="300"
         android:title="@string/menu_download_all">
     </item>
-    <item
-        android:id="@+id/menu_import"
-        android:orderInCategory="400"
-        android:title="@string/menu_import">
-    </item>
 
 </menu>

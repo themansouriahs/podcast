@@ -8,11 +8,16 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bottiger.podcast.adapters.SubscriptionGridCursorAdapter;
+import org.bottiger.podcast.playlist.Playlist;
+import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionColumns;
+import org.bottiger.podcast.service.PodcastDownloadManager;
 import org.bottiger.podcast.utils.FragmentUtils;
+import org.bottiger.podcast.views.dialogs.DialogOPML;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.SharedPreferences;
@@ -233,6 +238,18 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
 		super.onCreateOptionsMenu(menu, inflater);
         return;
 	}
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_import: {
+                DialogOPML dialogOPML = new DialogOPML();
+                Dialog dialog = dialogOPML.onCreateDialog(getActivity());
+                dialog.show();
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
 	
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v,

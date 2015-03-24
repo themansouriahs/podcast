@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.parser.opml.OpmlElement;
@@ -22,8 +24,8 @@ import android.widget.Toast;
 
 public class OPMLImportExport {
 
-	private static String filename = "podcasts.opml";
-	private static File file = new File(SDCardManager.getSDCardDir() + "/"
+	public static final String filename = "podcasts.opml";
+	public static final File file = new File(SDCardManager.getSDCardDir() + "/"
 			+ filename);
 	private static CharSequence opmlNotFound;
 	private static String nSubscriptionsImported;
@@ -72,6 +74,8 @@ public class OPMLImportExport {
 
 	private int importElements(ArrayList<OpmlElement> elements) {
 		int numImported = 0;
+        List<Subscription> importedSubscriptions = new LinkedList<>();
+
 		Subscription subscription;
 
 		for (OpmlElement element : elements) {
@@ -98,11 +102,17 @@ public class OPMLImportExport {
 				mUpdater.addOperation(subscription.update(contentResolver,
 						true, true));
 				numImported++;
+                importedSubscriptions.add(subscription);
 			}
 		}
 
-		if (numImported > 0)
-			mUpdater.commit(contentResolver);
+		if (numImported > 0) {
+            mUpdater.commit(contentResolver);
+
+            for (Subscription insertedSubscription : importedSubscriptions) {
+                insertedSubscription.refresh(mContext);
+            }
+        }
 
 		return numImported;
 	}

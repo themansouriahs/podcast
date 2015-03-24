@@ -134,7 +134,7 @@
     <string name="queue">Queue</string>
     <string name="menu_download_all">Download All</string>
     <string name="menu_clear_playlist">Clear Playlist</string>
-    <string name="menu_import">Import OPML</string>
+    <string name="menu_import">Import/Export OPML</string>
     <string name="add_subscription">Add Subscription</string>
     <string name="http_client_name">SoundWaves</string>
     <string name="menu_add_podcast">Add Podcast</string>
@@ -197,6 +197,9 @@
     <string name="pref_subscriptions_columns_title">Subscription columns</string>
     <string name="pref_subscriptions_columns_summary">Number of columns for displaying subscriptions</string>
     <string name="pref_interface_other_category_title">Other</string>
+    <string name="opml_radio_import">Import OPML file</string>
+    <string name="opml_radio_export">Export subscriptions to OPML</string>
+    <string name="opml_import_instructions">To import an OPML file, first copy it to: %1$s</string>
     <plurals name="subscriptions_imported">
         <item quantity="one">%d subscription was imported.</item>
         <item quantity="other">%d subscriptions were imported.</item>

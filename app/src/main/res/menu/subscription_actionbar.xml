@@ -8,4 +8,11 @@
         appcompat:actionViewClass="android.support.v7.widget.SearchView"
         appcompat:showAsAction="always"/>
 
+    <item
+        android:id="@+id/menu_import"
+        android:orderInCategory="400"
+        android:title="@string/menu_import"
+        appcompat:showAsAction="never" >
+    </item>
+
 </menu>
