@@ -141,7 +141,7 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
                             }
 						else {
 							sub.subscribe(getActivity());
-							String text = "Subscribing to: " + sub.getTitle();
+							String text = mActivity.getString(R.string.subscription_subscribing_to) + sub.getTitle();
 							Toast.makeText(getActivity(), text, Toast.LENGTH_SHORT).show();
 						}
 					}
@@ -183,32 +183,32 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
 
         SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
 	    searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-	    	
-	    	private QueryGpodder asyncTask = null;
 
-	        @Override
-	        public boolean onQueryTextSubmit(String query) {
-	            menu.findItem(R.id.menu_search).collapseActionView();
-	            return false;
-	        }
+            private QueryGpodder asyncTask = null;
 
-	        @Override
-	        public boolean onQueryTextChange(String newText) {
-	            // search goes here !!
-	        	if (newText != null && !newText.equals("")) {
-	        		mFragmentUtils.getAdapter().changeCursor(newMatrixCursor());
-	        		if (asyncTask != null && asyncTask.getStatus() != AsyncTask.Status.FINISHED)
-	        			asyncTask.cancel(true);
-	        		
-	        		asyncTask = new QueryGpodder();
-	        		asyncTask.execute(newText);
-	        	} else
-	        		fetchLocalCursor();
-	        	
-	            return false;
-	        }
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                menu.findItem(R.id.menu_search).collapseActionView();
+                return false;
+            }
 
-	    });
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                // search goes here !!
+                if (newText != null && !newText.equals("")) {
+                    mFragmentUtils.getAdapter().changeCursor(newMatrixCursor());
+                    if (asyncTask != null && asyncTask.getStatus() != AsyncTask.Status.FINISHED)
+                        asyncTask.cancel(true);
+
+                    asyncTask = new QueryGpodder();
+                    asyncTask.execute(newText);
+                } else
+                    fetchLocalCursor();
+
+                return false;
+            }
+
+        });
 
 		
 		super.onCreateOptionsMenu(menu, inflater);

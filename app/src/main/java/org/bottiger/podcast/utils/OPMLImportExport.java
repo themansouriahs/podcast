@@ -25,9 +25,7 @@ public class OPMLImportExport {
 	private static String filename = "podcasts.opml";
 	private static File file = new File(SDCardManager.getSDCardDir() + "/"
 			+ filename);
-	private static CharSequence opmlNotFound = "OPML not found. Please name the file "
-			+ filename
-			+ " and place it at the root folder on the storage (SD Card)";
+	private static CharSequence opmlNotFound;
 	private static String nSubscriptionsImported;
 
 	private Context mContext;
@@ -37,6 +35,9 @@ public class OPMLImportExport {
 	public OPMLImportExport(Context context) {
 		this.mContext = context;
 		this.contentResolver = context.getContentResolver();
+
+        Resources res = mContext.getResources();
+        opmlNotFound = String.format(res.getString(R.string.opml_not_found), filename);
 	}
 
 	public int importSubscriptions() {
@@ -62,7 +63,7 @@ public class OPMLImportExport {
 
 		if (numImported > 0) {
             Resources res = mContext.getResources();
-            String formattedString = res.getQuantityString(R.plurals.subscriptions_imported, numImported);
+            String formattedString = res.getQuantityString(R.plurals.subscriptions_imported, numImported, numImported);
             toastMsg(formattedString);
 		}
 
