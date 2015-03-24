@@ -63,6 +63,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 	private static DownloadManager mDownloadManager = null;
 
     private final ReentrantLock mLock = new ReentrantLock();
+    StringBuilder mStringBuilder = new StringBuilder();
 
 
     // memory leak!!!!
@@ -90,7 +91,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         return holder;
     }
 
-    private final int[] mGradientColors = new int[] {0,0xAA000000};
+    private final int[] mGradientColors = new int[] {0,0xDD000000};
     private GradientDrawable mActionBarGradientDrawable = new GradientDrawable(
             GradientDrawable.Orientation.BOTTOM_TOP, mGradientColors);
 
@@ -116,6 +117,8 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
             if (item != null) {
 
                 viewHolder.mMainTitle.setText(item.getShortTitle());
+                viewHolder.mSubTitle.setText(getSubTitle(mActivity, item));
+
                 if (Build.VERSION.SDK_INT >= 16) {
                     viewHolder.mActionBarGradientView.setBackground(mActionBarGradientDrawable);
                 }
@@ -408,5 +411,21 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         Long id = itemID(pos+PLAYLIST_OFFSET);
         //toggleItem(id);
         keepOne.toggle(pvh);
+    }
+
+    private String getSubTitle(@NonNull Context argContext, @NonNull FeedItem argFeedItem) {
+        mStringBuilder = new StringBuilder();
+
+        String date = argFeedItem.getDate(argContext);
+
+        if (!TextUtils.isEmpty(date)) {
+            mStringBuilder.append(date);
+            //builder.append(", ");
+        }
+
+        //String duration = argFeedItem.getDuration();
+        //builder.append(argFeedItem.getCurrentFileSize());
+
+        return mStringBuilder.toString();
     }
 }

@@ -36,6 +36,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.LruCache;
 import android.text.TextUtils;
+import android.text.format.DateFormat;
 import android.util.Log;
 
 import com.squareup.picasso.Picasso;
@@ -634,6 +635,23 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 		// log.debug(" getDate() start");
 		return this.date;
 	}
+
+    /**
+     *   i.e "yyyy-MM-dd hh:mm:ss"
+     */
+    public String getDate(@NonNull Context argContext) {
+        java.text.DateFormat dateFormat = DateFormat.getMediumDateFormat(argContext);
+
+        long time;
+
+        try {
+            time = getDateTime().getTime();
+        } catch (NullPointerException npe) {
+            return "";
+        }
+
+        return dateFormat.format(time);
+    }
 
     private Date mDate = null;
     public static SimpleDateFormat sdf = new SimpleDateFormat(default_format, Locale.US);

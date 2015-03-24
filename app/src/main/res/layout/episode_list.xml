@@ -25,6 +25,7 @@
 
         <View
             android:id="@+id/episode_top_gradient"
+            android:background="@drawable/header_gradient"
             android:layout_width="match_parent"
             android:layout_height="150dp"
             android:layout_gravity="top" />
@@ -35,13 +36,25 @@
             android:layout_height="wrap_content"
             android:text="@string/podcast_title_unknown"
             android:singleLine="true"
-            android:textSize="26sp"
+            android:textSize="22sp"
             android:layout_toRightOf="@+id/drag_handle"
             android:textColor="@color/white_opaque"
             android:paddingLeft="20dp"
             android:paddingRight="50dp"
-            android:paddingTop="30dp"/>
-        <!-- android:layout_toLeftOf="@+id/list_image"-->
+            android:paddingTop="20dp"/>
+
+        <TextView
+            android:id="@+id/podcast_title_extra"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:textSize="15sp"
+            android:layout_below="@+id/podcast_title"
+            android:layout_toRightOf="@+id/drag_handle"
+            android:textColor="@color/white_opaque"
+            android:paddingLeft="20dp"
+            android:layout_marginRight="60dp"
+            />
 
     <org.bottiger.podcast.views.PlayPauseImageView
          style="@style/PodcastImage"
