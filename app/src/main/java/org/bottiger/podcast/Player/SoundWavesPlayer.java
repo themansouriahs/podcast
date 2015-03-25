@@ -8,11 +8,9 @@ import android.media.MediaPlayer;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
-import org.bottiger.podcast.flavors.Analytics.VendorAnalytics;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
@@ -25,7 +23,9 @@ import java.io.IOException;
  * Created by apl on 20-01-2015.
  */
 public class SoundWavesPlayer extends MediaPlayer {
-    //private MediaPlayer mMediaPlayer = new MediaPlayer();
+
+    private static final float MARK_AS_LISTENED_RATIO_THRESHOLD = 0.9f;
+    private static final float MARK_AS_LISTENED_MINUTES_LEFT_THRESHOLD = 5f;
 
     private PlayerService mPlayerService;
     private Handler mHandler;
@@ -162,6 +162,7 @@ public class SoundWavesPlayer extends MediaPlayer {
      */
     public void pause() {
         super.pause();
+        MarkAsListenedIfNeeded();
         PlayerStatusObservable
                 .updateStatus(PlayerStatusObservable.STATUS.PAUSED);
         SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.PAUSE);
@@ -242,5 +243,34 @@ public class SoundWavesPlayer extends MediaPlayer {
 
     public void setVolume(float vol) {
         setVolume(vol, vol);
+    }
+
+    private void MarkAsListenedIfNeeded() {
+        if (mPlayerService == null)
+            return;
+
+        FeedItem episode = mPlayerService.getCurrentItem();
+        float playerPosition = (float) getCurrentPosition();
+
+        if (episode == null)
+            return;
+
+        long episodeDuration = episode.getDuration();
+
+        if (episodeDuration < 0 || playerPosition < 0)
+            return;
+
+        float progressPercent = playerPosition / episodeDuration;
+        double msLeft = episodeDuration - playerPosition;
+        double minLeft = msLeft / 1000 / 60;
+
+        boolean ratioThreshold   = progressPercent >= MARK_AS_LISTENED_RATIO_THRESHOLD;
+        boolean minutesThreshold = minLeft < MARK_AS_LISTENED_MINUTES_LEFT_THRESHOLD;
+
+        if (ratioThreshold || minutesThreshold) {
+            episode.markAsListened();
+        }
+
+        episode.update(mPlayerService.getContentResolver());
     }
 }
