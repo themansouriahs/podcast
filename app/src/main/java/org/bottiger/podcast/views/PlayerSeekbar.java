@@ -187,7 +187,6 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
 
         setMax(RANGE_MAX);
         setOnSeekBarChangeListener(onSeekBarChangeListener);
-        PlayerStatusObservable.registerListener(this);
         mStatus = PlayerStatusObservable.getStatus();
 
         // FIXME
@@ -206,9 +205,14 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
     }
 
     public void setEpisode(FeedItem argEpisode) {
-        mEpisode = argEpisode;
+        if (mEpisode != null) {
+            PlayerStatusObservable.unregisterListener(this);
+        }
 
-        if (mEpisode.offset > 0) {
+        mEpisode = argEpisode;
+        PlayerStatusObservable.registerListener(this);
+
+        if (mEpisode.offset > 0 && mEpisode.getDuration() > 0) {
             float progress = (float)mEpisode.offset / mEpisode.duration_ms;
             setProgress((int)(progress*RANGE_MAX));
         }
