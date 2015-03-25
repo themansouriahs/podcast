@@ -80,7 +80,7 @@ public class DownloadProgressObservable {
                             Long episodeId = iterator.next();
                             List<DownloadObserver> observers = mObservers.get(episodeId);
 
-                            if (observers == null) {
+                            if (observers == null || observers.isEmpty()) {
                                 continue;
                             }
 
