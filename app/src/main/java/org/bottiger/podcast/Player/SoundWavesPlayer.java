@@ -49,8 +49,6 @@ public class SoundWavesPlayer extends MediaPlayer {
         this.mControllerComponentName = new ComponentName(mPlayerService,
                 HeadsetReceiver.class);
         this.mAudioManager = (AudioManager) mPlayerService.getSystemService(Context.AUDIO_SERVICE);
-        // mMediaPlayer.setWakeMode(PlayerService.this,
-        // PowerManager.PARTIAL_WAKE_LOCK);
         sharedpreferences = PreferenceManager.getDefaultSharedPreferences(mPlayerService.getApplicationContext());
     }
 
@@ -99,8 +97,6 @@ public class SoundWavesPlayer extends MediaPlayer {
     }
 
     public void start() {
-        //mPlayerService.notifyStatus();
-
         // Request audio focus for playback
         int result = mAudioManager.requestAudioFocus(mPlayerService,
                 // Use the music stream.
@@ -203,8 +199,8 @@ public class SoundWavesPlayer extends MediaPlayer {
     MediaPlayer.OnPreparedListener preparedlistener = new MediaPlayer.OnPreparedListener() {
         @Override
         public void onPrepared(MediaPlayer mp) {
-            // notifyChange(ASYNC_OPEN_COMPLETE);
             mp.seekTo(startPos);
+            mPlayerService.getCurrentItem().setDuration(mp.getDuration(), false);
             start();
             isPreparingMedia = false;
             PlayerService.setNextTrack(PlayerService.NextTrack.NEXT_IN_PLAYLIST);

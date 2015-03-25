@@ -8,6 +8,7 @@ import android.util.AttributeSet;
 import android.widget.TextView;
 
 import org.bottiger.podcast.listeners.EpisodeStatus;
+import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObserver;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.utils.StrUtils;
@@ -17,7 +18,7 @@ import org.bottiger.podcast.utils.StrUtils;
  */
 public class TextViewObserver extends TextView implements PlayerStatusObserver {
 
-    private FeedItem mEpisode = null;
+    protected FeedItem mEpisode = null;
 
     public TextViewObserver(Context context) {
         super(context);
@@ -37,7 +38,11 @@ public class TextViewObserver extends TextView implements PlayerStatusObserver {
     }
 
     public void setEpisode(@NonNull FeedItem argEpisode) {
+        if (mEpisode != null) {
+            PlayerStatusObservable.unregisterListener(this);
+        }
         mEpisode = argEpisode;
+        PlayerStatusObservable.registerListener(this);
     }
 
     @Override

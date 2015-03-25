@@ -82,7 +82,7 @@ public class PlaylistFragment extends GeastureFragment implements
     private TextView mEpisodeTitle;
     private TextView mEpisodeInfo;
     private TextViewObserver mCurrentTime;
-    private TextView mTotalTime;
+    private TextViewObserver mTotalTime;
     private PlayPauseImageView mPlayPauseButton;
     private PlayerSeekbar mPlayerSeekbar;
     private DownloadButtonView mPlayerDownloadButton;
@@ -170,7 +170,7 @@ public class PlaylistFragment extends GeastureFragment implements
         mEpisodeInfo         =    (TextView) mSwipeRefreshView.findViewById(R.id.episode_info);
 
         mCurrentTime       =    (TextViewObserver) mSwipeRefreshView.findViewById(R.id.current_time);
-        mTotalTime         =    (TextView) mSwipeRefreshView.findViewById(R.id.total_time);
+        mTotalTime         =    (TextViewObserver) mSwipeRefreshView.findViewById(R.id.total_time);
 
         mPlayPauseButton         =    (PlayPauseImageView) mSwipeRefreshView.findViewById(R.id.play_pause_button);
         mPlayerSeekbar          =    (PlayerSeekbar) mSwipeRefreshView.findViewById(R.id.player_progress);
@@ -349,6 +349,7 @@ public class PlaylistFragment extends GeastureFragment implements
             mCurrentTime.setText("");
         }
         mCurrentTime.setEpisode(item);
+        mTotalTime.setEpisode(item);
 
         mPlayPauseButton.setEpisodeId(item.getId(), PlayPauseImageView.LOCATION.PLAYLIST);
         mBackButton.setEpisodeId(item.getId());
@@ -388,7 +389,6 @@ public class PlaylistFragment extends GeastureFragment implements
         PaletteObservable.registerListener(mTopPlayer);
 
         PlayerStatusObservable.registerListener(mPlayerSeekbar);
-        PlayerStatusObservable.registerListener(mCurrentTime);
 
 
         Palette palette = PaletteCache.get(item.image);

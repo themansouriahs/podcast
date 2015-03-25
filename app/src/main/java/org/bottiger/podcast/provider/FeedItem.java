@@ -1093,6 +1093,15 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 		*/
 	}
 
+    public void setDuration(long argDurationMs, boolean argOverride) {
+        if (!argOverride) {
+            if (duration_ms > 0)
+                return;
+        }
+
+        this.duration_ms = argDurationMs;
+    }
+
 	/**
 	 * @see java.lang.Object#hashCode()
 	 */

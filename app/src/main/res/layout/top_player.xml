@@ -102,7 +102,7 @@
             android:textColor="@color/white_opaque"
             />
 
-        <TextView
+        <org.bottiger.podcast.views.TextViewTotalTime
             android:id="@+id/total_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
