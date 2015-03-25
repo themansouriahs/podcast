@@ -11,6 +11,9 @@ version 0.82
 * Fixed some localization issues
 * Added Analytics to the Google Play edition. Opt out is possible
 * Started styling the navigation drawer
+* Better streaming support. Seeking in a stream is not possible.
+* Episode duration is now much more reliable
+* "Show listened" in the playlist filters now works.
 
 version 0.80
 ------------

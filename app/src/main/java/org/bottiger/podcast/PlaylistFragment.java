@@ -312,6 +312,7 @@ public class PlaylistFragment extends GeastureFragment implements
 
             @Override
             public void onSuccess() {
+                /*
                 mHasPhoto = true;
                 recomputePhotoAndScrollingMetrics();
                 int h = mTopPlayer.getHeight();
@@ -319,7 +320,7 @@ public class PlaylistFragment extends GeastureFragment implements
                 mTopPlayer.requestLayout();
                 mRecyclerView.scrollToPosition(0);
                 Log.d("RecyclerPadding", "padding: " + h);
-
+                */
                 Bitmap bitmap = ((BitmapDrawable)mPhoto.getDrawable()).getBitmap();
                 if (bitmap != null) {
                     PaletteCache.generate(item.image, bitmap);
