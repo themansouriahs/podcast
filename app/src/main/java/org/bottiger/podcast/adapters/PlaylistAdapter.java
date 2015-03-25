@@ -121,7 +121,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
                 viewHolder.mPlayPauseButton.setEpisodeId(item.getId(), PlayPauseImageView.LOCATION.PLAYLIST);
                 viewHolder.mPlayPauseButton.setStatus(PlayerStatusObservable.STATUS.PAUSED);
-                mDownloadProgressObservable.registerObserver(viewHolder.mPlayPauseButton);
+                mDownloadProgressObservable.registerObserver(viewHolder.downloadButton);
 
                 viewHolder.mItemBackground.setPaletteKey(item.getImageURL(mActivity));
 
@@ -306,7 +306,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         if (viewHolder == null)
             return;
 
-        PlaylistViewHolder holder = (PlaylistViewHolder) viewHolder;
+        PlaylistViewHolder holder = viewHolder;
 
         if (holder.episode == null) {
             return;
@@ -316,9 +316,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
             }
         }
 
-        //PlayerStatusObservable.unregisterListener(holder.seekbar);
-
-        mDownloadProgressObservable.unregisterObserver(holder.mPlayPauseButton);
+        mDownloadProgressObservable.unregisterObserver(holder.downloadButton);
 
 
         holder.mPlayPauseButton.unsetEpisodeId();

@@ -235,11 +235,12 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
 
     @Override
     public void onPaletteFound(Palette argChangedPalette) {
-        Palette.Swatch swatchDark = argChangedPalette.getDarkVibrantSwatch();
+        ColorExtractor extractor = new ColorExtractor(argChangedPalette);
+        //Palette.Swatch swatchDark = argChangedPalette.getDarkVibrantSwatch();
 
-        int cd = swatchDark.getRgb();
-        baseColorPaint.setColor(cd); // -1761607680
-        foregroundColorPaint.setColor(cd);
+        //int cd = swatchDark.getRgb();
+        baseColorPaint.setColor(extractor.getPrimary()); // -1761607680
+        foregroundColorPaint.setColor(extractor.getSecondaryTint());
 
         if (argChangedPalette != null) {
             setBackgroundColor(ButtonColor(argChangedPalette));

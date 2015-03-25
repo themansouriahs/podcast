@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -29,7 +30,7 @@ public class DownloadProgressObservable {
 	private static long REFRESH_INTERVAL = 50; // 16 ms => 60 fps
 	//TimeUnit.MILLISECONDS.convert(1,TimeUnit.SECONDS);
 
-	private static WeakHashMap<Long, List<DownloadObserver>> mObservers = new WeakHashMap<Long, List<DownloadObserver>>();
+	private static HashMap<Long, List<DownloadObserver>> mObservers = new HashMap<Long, List<DownloadObserver>>();
 	private static DownloadManager mDownloadManager = null;
     private static HashMap<Long, IDownloadEngine> mPodcastDownloadManager = null;
 
@@ -106,7 +107,7 @@ public class DownloadProgressObservable {
                                     break;
                             }
 
-                            if (progress >= 0) {
+                            if (progress >= 0 && observers != null) {
                                 for (DownloadObserver observer : observers) {
                                     observer.setProgressPercent(progress);
                                 }
@@ -207,7 +208,7 @@ public class DownloadProgressObservable {
 		sHandler.sendMessage(msg);
 	}
 
-    public static WeakHashMap<Long,List<DownloadObserver>> getObservers() {
+    public static Map<Long,List<DownloadObserver>> getObservers() {
         return mObservers;
     }
 
