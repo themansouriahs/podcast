@@ -7,11 +7,11 @@
 
     <color name="colorBgPrimary">#adadad</color>
     <color name="colorBgSecondary">#797979</color>
-    <color name="colorBgPrimaryDark">#DD330000</color>
+    <color name="colorBgPrimaryDark">#FF490600</color>
     <color name="colorBgAccent">#ff3d00</color>
 
     <!-- Application Drawer -->
-    <color name="drawer_background">@color/colorPrimary</color>
+    <color name="drawer_background">@color/colorBgPrimaryDark</color>
     <color name="drawer_text">@color/white_opaque</color>
 
     <color name="translucent_actionbar_background">@color/colorPrimary</color>
