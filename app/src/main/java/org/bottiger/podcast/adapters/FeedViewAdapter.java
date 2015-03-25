@@ -110,9 +110,6 @@ public class FeedViewAdapter extends AbstractEpisodeCursorAdapter<FeedViewAdapte
     public void onViewRecycled(RecyclerView.ViewHolder viewHolder) {
         final EpisodeViewHolder episodeViewHolder = (EpisodeViewHolder) viewHolder;
         mDownloadProgressObservable.unregisterObserver(episodeViewHolder.mDownloadButton);
-
-        //PaletteObservable.unregisterListener(episodeViewHolder.mPlayPauseButton);
-        //PaletteObservable.unregisterListener(episodeViewHolder.mDownloadButton);
     }
 
     @Override

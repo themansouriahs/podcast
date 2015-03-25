@@ -416,7 +416,7 @@ public class PodcastDownloadManager extends Observable {
             downloadEngine.startDownload();
             mDownloadingEpisodes.put(new Long(downloadingItem.getId()), downloadEngine);
 
-            getDownloadProgressObservable(mContext).addEpisode(downloadingItem.getId());
+            getDownloadProgressObservable(mContext).addEpisode(downloadingItem);
         }
 
 	}

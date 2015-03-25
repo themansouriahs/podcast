@@ -108,6 +108,7 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
         mEpisode = argItem;
         setEpisodeId(mEpisode.getId());
         setState(mEpisode.isDownloaded() ? PlayerButtonView.STATE_DELETE : PlayerButtonView.STATE_DEFAULT);
+        setProgressPercent(0);
     }
 
     @Override
