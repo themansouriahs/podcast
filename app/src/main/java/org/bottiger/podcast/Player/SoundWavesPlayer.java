@@ -1,14 +1,17 @@
 package org.bottiger.podcast.Player;
 
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
+import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
@@ -27,6 +30,8 @@ public class SoundWavesPlayer extends MediaPlayer {
     private static final float MARK_AS_LISTENED_RATIO_THRESHOLD = 0.9f;
     private static final float MARK_AS_LISTENED_MINUTES_LEFT_THRESHOLD = 5f;
 
+    private static final boolean DELETE_WHEN_FINISHED_DEFAULT = false;
+
     private PlayerService mPlayerService;
     private Handler mHandler;
     private boolean mIsInitialized = false;
@@ -38,7 +43,8 @@ public class SoundWavesPlayer extends MediaPlayer {
 
     private boolean isPreparingMedia = false;
 
-    private SharedPreferences sharedpreferences;
+    @NonNull
+    private SharedPreferences mSharedpreferences;
 
     int bufferProgress = 0;
 
@@ -49,7 +55,7 @@ public class SoundWavesPlayer extends MediaPlayer {
         this.mControllerComponentName = new ComponentName(mPlayerService,
                 HeadsetReceiver.class);
         this.mAudioManager = (AudioManager) mPlayerService.getSystemService(Context.AUDIO_SERVICE);
-        sharedpreferences = PreferenceManager.getDefaultSharedPreferences(mPlayerService.getApplicationContext());
+        mSharedpreferences = PreferenceManager.getDefaultSharedPreferences(mPlayerService.getApplicationContext());
     }
 
     public void setDataSourceAsync(String path, int startPos) {
@@ -147,7 +153,7 @@ public class SoundWavesPlayer extends MediaPlayer {
         if (mPlayerService == null)
             return;
 
-        String fastForwardAmount = sharedpreferences.getString("pref_player_forward_amount", "60");
+        String fastForwardAmount = mSharedpreferences.getString("pref_player_forward_amount", "60");
         long seekTo = mPlayerService.position() + Integer.parseInt(fastForwardAmount)*1000; // to ms
 
         if (argItem.equals(mPlayerService.getCurrentItem())) {
@@ -181,8 +187,23 @@ public class SoundWavesPlayer extends MediaPlayer {
         @Override
         public void onCompletion(MediaPlayer mp) {
             FeedItem item = mPlayerService.getCurrentItem();
-            // item.markAsListened();
-            // item.update(getContentResolver());
+
+            if (item != null) {
+                item.markAsListened();
+
+               if (mPlayerService != null) {
+                    Resources resources = mPlayerService.getResources();
+                    ContentResolver resolver = mPlayerService.getContentResolver();
+                    boolean doDelete = mSharedpreferences.getBoolean(resources.getString(R.string.pref_delete_when_finished_key), DELETE_WHEN_FINISHED_DEFAULT);
+
+                    if (doDelete) {
+                        item.delFile(resolver);
+
+                    }
+
+                   item.update(resolver);
+                }
+            }
 
             if (!isPreparingMedia)
                 mHandler.sendEmptyMessage(PlayerHandler.TRACK_ENDED);

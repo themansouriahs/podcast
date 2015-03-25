@@ -7,13 +7,14 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.WeakHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.service.DownloadStatus;
 import org.bottiger.podcast.service.Downloader.IDownloadEngine;
 import org.bottiger.podcast.service.PodcastDownloadManager;
+import org.bottiger.podcast.views.DownloadButtonView;
+import org.bottiger.podcast.views.PlayerButtonView;
 
 import android.app.DownloadManager;
 import android.content.Context;
@@ -39,6 +40,7 @@ public class DownloadProgressObservable {
 	 */
 	private static final int REFRESH_UI = 1;
     private static final int ADD_ID = 2;
+    private static final int DELETED = 3;
 
     public DownloadProgressObservable(Context context) {
         mDownloadManager = (DownloadManager) context
@@ -126,6 +128,19 @@ public class DownloadProgressObservable {
                         refreshUI();
                         break;
                     }
+                    case DELETED: {
+                        FeedItem episode = (FeedItem) msg.obj;
+                        List<DownloadObserver> observers = mObservers.get(episode.getId());
+                        if (observers != null) {
+                            for (DownloadObserver observer : observers) {
+                                if (observer instanceof DownloadButtonView) {
+                                    DownloadButtonView dbv = (DownloadButtonView) observer;
+                                    dbv.setState(PlayerButtonView.STATE_DEFAULT);
+                                }
+                            }
+                        }
+                        break;
+                    }
                 }
             } finally {
                 lock.unlock();
@@ -195,6 +210,12 @@ public class DownloadProgressObservable {
 
     public void addEpisode(@NonNull FeedItem argEpisode) {
         Message msg = sHandler.obtainMessage(ADD_ID);
+        msg.obj = argEpisode;
+        sHandler.sendMessage(msg);
+    }
+
+    public static void deleteEpisode(@NonNull FeedItem argEpisode) {
+        Message msg = sHandler.obtainMessage(DELETED);
         msg.obj = argEpisode;
         sHandler.sendMessage(msg);
     }

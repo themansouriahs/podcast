@@ -157,7 +157,7 @@
     <string name="preferences_category_help">Help out</string>
     <string name="preferences_category_ui">User Interface</string>
     <string name="preferences_category_player">Player</string>
-    <string name="preferences_category_network">Network</string>
+    <string name="preferences_category_network">Network &amp; Storage</string>
     <string name="preferences_category_cloud">Cloud Support</string>
     <string name="preferences_category_advanced">Advanced</string>
     <string name="pref_player_forward_amount_dialog_title">How much should the fast forward button go forward</string>
@@ -202,7 +202,12 @@
     <string name="opml_import_instructions">To import an OPML file, first copy it to: %1$s</string>
     <string name="opml_export_failed">Sorry. The export failed due to an unknown error :( Maybe you are running out of storage?</string>
     <string name="opml_export_succes">Your subscriptions were succesfully exported to: %1$s</string>
-  
+    <string name="pref_network_category_network_title">Network</string>
+    <string name="pref_network_category_storage_title">Storage</string>
+    <string name="pref_network_category_storage_experimental">Experimental</string>
+    <string name="pref_delete_when_finished_title">Delete after playback</string>
+    <string name="pref_delete_when_finished_description">Automaticlly delete the episode when it\'s finished</string>
+
     <plurals name="subscriptions_imported">
         <item quantity="one">%d subscription was imported.</item>
         <item quantity="other">%d subscriptions were imported.</item>

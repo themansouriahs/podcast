@@ -141,6 +141,10 @@
             android:key="network"
             android:title="@string/preferences_category_network" />
 
+        <PreferenceCategory
+            android:title="@string/pref_network_category_network_title"
+            android:key="pref_network_category_network">
+
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="pref_download_on_update"
@@ -153,6 +157,18 @@
             android:summary="@string/pref_only_wifi_description"
             android:title="@string/pref_only_wifi_title" />
 
+        </PreferenceCategory>
+
+        <PreferenceCategory
+            android:title="@string/pref_network_category_storage_title"
+            android:key="pref_network_category_storage">
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/pref_delete_when_finished_key"
+            android:summary="@string/pref_delete_when_finished_description"
+            android:title="@string/pref_delete_when_finished_title" />
+
         <ListPreference
             android:defaultValue="1000"
             android:dialogTitle="@string/pref_downloaded_dialog_title"
@@ -162,11 +178,19 @@
             android:summary="@string/pref_downloaded_expire_description"
             android:title="@string/pref_downloaded_expire_title" />
 
+        </PreferenceCategory>
+
+        <PreferenceCategory
+            android:title="@string/pref_network_category_storage_experimental"
+            android:key="pref_network_category_experimental">
+
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="pref_stream_proxy"
             android:summary="@string/pref_stream_proxy"
             android:title="@string/pref_stream_proxy_title" />
+
+        </PreferenceCategory>
 
     </PreferenceScreen>
 

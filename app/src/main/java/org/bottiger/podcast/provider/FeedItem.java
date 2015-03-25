@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 
+import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.service.DownloadStatus;
 import org.bottiger.podcast.service.PodcastDownloadManager;
 import org.bottiger.podcast.utils.PodcastLog;
@@ -870,6 +871,7 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 				update(contentResolver);
 				File file = new File(getAbsolutePath());
 				if (file.exists() && file.delete()) {
+                    DownloadProgressObservable.deleteEpisode(this);
 					return true;
 				}
 			} catch (Exception e) {
