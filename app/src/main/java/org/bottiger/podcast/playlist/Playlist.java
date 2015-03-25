@@ -26,6 +26,8 @@ import android.util.Log;
 
 public class Playlist implements OnDragStateChangedListener {
 
+    public static final boolean SHOW_LISTENED_DEFAULT = true;
+
 	private static int MAX_SIZE = 20;
     private static Playlist activePlaylist = null;
 
@@ -41,8 +43,8 @@ public class Playlist implements OnDragStateChangedListener {
 	private SharedPreferences sharedPreferences;
 
 	// Shared setting key/values
-	private String showListenedKey = ApplicationConfiguration.showListenedKey;
-	private boolean showListenedVal = true;
+	private final String showListenedKey = ApplicationConfiguration.showListenedKey;
+	private boolean showListenedVal = SHOW_LISTENED_DEFAULT;
 	private String inputOrderKey = "inputOrder";
 	private String defaultOrder = mSortNew;
 	private String amountKey = "amountOfEpisodes";
@@ -74,6 +76,8 @@ public class Playlist implements OnDragStateChangedListener {
         sharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(argContext);
         this.mContext = argContext;
+
+        showListenedVal = sharedPreferences.getBoolean(showListenedKey, showListenedVal);
     }
 
 	/**

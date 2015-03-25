@@ -18,10 +18,12 @@ import android.animation.ObjectAnimator;
 import android.animation.TypeEvaluator;
 import android.app.Fragment;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -81,7 +83,9 @@ import com.android.volley.toolbox.ImageLoader;
  */
 public abstract class DrawerActivity extends ToolbarActivity {
 
-	protected DrawerLayout mDrawerLayout;
+    protected SharedPreferences mSharedPreferences;
+
+    protected DrawerLayout mDrawerLayout;
     protected RelativeLayout mDrawerMainContent;
 	protected ExpandableListView mDrawerList;
 	protected FrameLayout mDrawerContainer;
@@ -133,6 +137,8 @@ public abstract class DrawerActivity extends ToolbarActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
 		mTitle = mDrawerTitle = getTitle();
 		mListItems = getResources().getStringArray(R.array.drawer_menu);
@@ -200,6 +206,10 @@ public abstract class DrawerActivity extends ToolbarActivity {
                 playlist.setShowListened(isChecked);
             }
         });
+        boolean doSHowListened = mSharedPreferences.getBoolean(ApplicationConfiguration.showListenedKey, Playlist.SHOW_LISTENED_DEFAULT);
+        if (doSHowListened != mPlaylistShowListened.isChecked()) {
+            mPlaylistShowListened.setChecked(doSHowListened);
+        }
 
         LinearLayout layout = (LinearLayout) findViewById(R.id.drawer_items);
         NavigationDrawerMenuGenerator navigationDrawerMenuGenerator = new NavigationDrawerMenuGenerator(this);
