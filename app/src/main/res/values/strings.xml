@@ -146,7 +146,7 @@
     <string name="pref_cloud_support_description">Cloud support will backup your data to the cloud and synchronize data between your devices</string>
     <string name="title_activity_notification_receiver">NotificationReceiverActivity</string>
     
-        <string name="drawer_open">Open</string>
+    <string name="drawer_open">Open</string>
     <string name="drawer_close">Close</string>
     <string name="pref_stream_proxy_title">Download while streaming</string>
     <string name="pref_stream_proxy">This may require some extra time buffering</string>
@@ -202,6 +202,7 @@
     <string name="opml_import_instructions">To import an OPML file, first copy it to: %1$s</string>
     <string name="opml_export_failed">Sorry. The export failed due to an unknown error :( Maybe you are running out of storage?</string>
     <string name="opml_export_succes">Your subscriptions were succesfully exported to: %1$s</string>
+  
     <plurals name="subscriptions_imported">
         <item quantity="one">%d subscription was imported.</item>
         <item quantity="other">%d subscriptions were imported.</item>
