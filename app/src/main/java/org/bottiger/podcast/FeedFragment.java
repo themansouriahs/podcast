@@ -5,6 +5,7 @@ import org.bottiger.podcast.images.PicassoWrapper;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.playlist.FeedCursorLoader;
+import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.DownloadCompleteCallback;
@@ -228,5 +229,4 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
             requeryLoader(mSubscription);
         }
     }
-
 }

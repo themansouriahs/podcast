@@ -405,8 +405,6 @@ public class PlaylistFragment extends GeastureFragment implements
         int height = TopPlayer.sizeLarge;//1080;//(int)(mPhoto.getHeight()*5.6);
         trans = BackgroundTransformation.getmImageTransformation(mActivity, mImageTransformation, height);
         PicassoWrapper.load(mActivity, item.image, mPhoto, trans, cb);
-        //mTopPlayer.getLayoutParams().height = (height); // +actionBarSize
-        //mTopPlayer.requestLayout();
     }
     com.squareup.picasso.Transformation trans = null;
 
