@@ -178,12 +178,12 @@
         <item>60</item>
     </string-array>
 
-    <string-array name="pref_subscriptions_columns_entries" translatable="false">
+    <string-array name="pref_subscriptions_columns_entries">
         <item>2 columns</item>
         <item>3 columns</item>
     </string-array>
 
-    <string-array name="pref_subscriptions_columns_entries_values" translatable="false">
+    <string-array name="pref_subscriptions_columns_entries_values">
         <item>2</item>
         <item>3</item>
     </string-array>
