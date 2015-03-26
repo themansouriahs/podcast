@@ -13,6 +13,7 @@ import org.acra.annotation.ReportsCrashes;
 import org.bottiger.podcast.flavors.Analytics.AnalyticsFactory;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.CrashReporterFactory;
+import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
 
 //Acra debugging
 @ReportsCrashes(
@@ -33,6 +34,7 @@ public class SoundWaves extends Application {
     private Boolean mFirstRun = null;
 
     public static IAnalytics sAnalytics;
+    public static SubscriptionRefreshManager sSubscriptionRefreshManager;
 
 
     @Override
@@ -52,6 +54,8 @@ public class SoundWaves extends Application {
         sAnalytics.startTracking();
 
         context = getApplicationContext();
+
+        sSubscriptionRefreshManager = new SubscriptionRefreshManager(context);
 
         firstRun(context);
     }

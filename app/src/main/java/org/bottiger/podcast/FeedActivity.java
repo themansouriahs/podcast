@@ -352,7 +352,7 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
                 mMultiShrinkScroller.scrollOffBottom();
                 return true;
             case R.id.menu_refresh_feed:
-                SubscriptionRefreshManager.start_update(this, mSubscription, new IDownloadCompleteCallback() {
+                SoundWaves.sSubscriptionRefreshManager.refresh(mSubscription, new IDownloadCompleteCallback() {
                     @Override
                     public void complete(boolean succes) {
                         return;

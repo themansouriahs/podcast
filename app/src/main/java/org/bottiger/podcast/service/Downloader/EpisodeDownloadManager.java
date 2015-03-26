@@ -141,24 +141,7 @@ public class EpisodeDownloadManager extends Observable {
 		return DownloadStatus.NOTHING;
 	}
 
-    static Response.ErrorListener createGetFailureListener() {
-		return new Response.ErrorListener() {
-
-			@Override
-			public void onErrorResponse(VolleyError error) { // Handle error
-				decrementProcessCount();
-				if (error instanceof com.android.volley.ServerError) {
-
-				} else {
-					error.printStackTrace();
-					int i = 5;
-					i = i + i;
-				}
-			}
-		};
-	}
-
-	static void decrementProcessCount() {
+    static void decrementProcessCount() {
 		EpisodeDownloadManager.processCounts.decrementAndGet();
 		if (EpisodeDownloadManager.processCounts.get() == 0) {
             isDownloading = false;

@@ -5,15 +5,17 @@ import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.images.RequestManager;
-import org.bottiger.podcast.parser.JSONFeedParserWrapper;
 import org.bottiger.podcast.parser.syndication.handler.FeedHandler;
 import org.bottiger.podcast.parser.syndication.handler.UnsupportedFeedtypeException;
 import org.bottiger.podcast.provider.Subscription;
@@ -29,105 +31,95 @@ import javax.xml.parsers.ParserConfigurationException;
  */
 public class SubscriptionRefreshManager {
 
-    private static Context mContext;
+    private static final int MY_SOCKET_TIMEOUT_MS = 300000; // 300 s
+    private static final String ACRA_KEY = "SubscriptionRefreshManager";
+
+    private DefaultRetryPolicy mRetryPolicy = new DefaultRetryPolicy(
+                                                            MY_SOCKET_TIMEOUT_MS,
+                                                            DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                                                            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+
+    private Context mContext;
+    private RequestQueue mRequestQueue;
 
     public SubscriptionRefreshManager(@NonNull Context argContext) {
         mContext = argContext;
+        RequestManager.initIfNeeded(mContext);
+        mRequestQueue = RequestManager.getRequestQueue();
     }
 
-    public static void start_update(final Context context) {
-        start_update(context, null, null);
+    Response.ErrorListener getFailureListener() {
+		return new Response.ErrorListener() {
+
+			@Override
+			public void onErrorResponse(VolleyError error) { // Handle error
+				if (error instanceof com.android.volley.ServerError) {
+
+				} else {
+					error.printStackTrace();
+					int i = 5;
+					i = i + i;
+				}
+			}
+		};
+	}
+
+    public void refreshALl() {
+        refresh(null, null);
     }
 
-    public static void start_update(final Context context,
-                                    Subscription subscription, IDownloadCompleteCallback argCallback) {
+    public void refresh(Subscription subscription, IDownloadCompleteCallback argCallback) {
 
-        if (EpisodeDownloadManager.updateConnectStatus(context) == EpisodeDownloadManager.NO_CONNECT)
+        if (EpisodeDownloadManager.updateConnectStatus(mContext) == EpisodeDownloadManager.NO_CONNECT)
             return;
 
         EpisodeDownloadManager.isDownloading = true;
 
-        mContext = context;
-
-        // FIXME
-        // Perhaps we should do this in the background in the future
-        RequestManager.initIfNeeded(context);
-        RequestQueue requestQueue = RequestManager.getRequestQueue();
-
-        Cursor subscriptionCursor;
-
-        if (subscription == null) {
-            subscriptionCursor = Subscription.allAsCursor(context
-                    .getContentResolver());
-
-            while (subscriptionCursor.moveToNext()) {
-
-                Subscription sub = Subscription.getByCursor(subscriptionCursor);
-
-                if (subscription == null || sub.equals(subscription)) {
-
-                    addSubscriptionToQueue(sub, requestQueue, argCallback);
-    /*
-    StringRequest jr = new StringRequest(sub.getUrl(),
-    new MyStringResponseListener(context
-    .getContentResolver(), argCallback, sub),
-    createGetFailureListener());
-
-    int MY_SOCKET_TIMEOUT_MS = 300000;
-    DefaultRetryPolicy retryPolicy = new DefaultRetryPolicy(
-    MY_SOCKET_TIMEOUT_MS,
-    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-    jr.setRetryPolicy(retryPolicy);
-
-    // Add the request to Volley
-    requestQueue.add(jr);
-    processCounts.incrementAndGet();
-    */
-
-                }
-            }
+        if (subscription != null) {
+            addSubscriptionToQueue(subscription, mRequestQueue, argCallback);
         } else {
-            addSubscriptionToQueue(subscription, requestQueue, argCallback);
+            populateQueue(mContext, argCallback);
         }
 
-        requestQueue.start();
+        mRequestQueue.start();
     }
 
-    private static void addSubscriptionToQueue(@NonNull Subscription argSubscription, RequestQueue requestQueue, IDownloadCompleteCallback argCallback) {
+    private void addSubscriptionToQueue(@NonNull Subscription argSubscription, RequestQueue requestQueue, IDownloadCompleteCallback argCallback) {
 
         if (argSubscription == null) {
-            VendorCrashReporter.report("addSubscriptionToQueue", "subscription=null");
+            VendorCrashReporter.report(ACRA_KEY, "subscription=null");
             return;
         }
 
-        StringRequest jr = new StringRequest(argSubscription.getUrl(),
-                new MyStringResponseListener(mContext
-                        .getContentResolver(), argCallback, argSubscription),
-                EpisodeDownloadManager.createGetFailureListener());
+        String subscriptionUrl = argSubscription.getUrl();
 
-        int MY_SOCKET_TIMEOUT_MS = 300000;
-        DefaultRetryPolicy retryPolicy = new DefaultRetryPolicy(
-                MY_SOCKET_TIMEOUT_MS,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        jr.setRetryPolicy(retryPolicy);
+        if (TextUtils.isEmpty(subscriptionUrl)) {
+            VendorCrashReporter.report(ACRA_KEY, "subscription.url=empty");
+            return;
+        }
+
+        StringResponseListener responseListener = new StringResponseListener(mContext
+                .getContentResolver(), argCallback, argSubscription);
+
+        StringRequest request = new StringRequest(subscriptionUrl,
+                responseListener,
+                getFailureListener());
+
+        request.setRetryPolicy(mRetryPolicy);
 
         // Add the request to Volley
-        requestQueue.add(jr);
-        EpisodeDownloadManager.processCounts.incrementAndGet();
+        requestQueue.add(request);
     }
 
-    static class MyStringResponseListener implements Response.Listener<String> {
+    private class StringResponseListener implements Response.Listener<String> {
 
-		static FeedHandler feedHandler = new FeedHandler();
+		FeedHandler feedHandler = new FeedHandler();
 		Subscription subscription;
 		ContentResolver contentResolver;
-		final JSONFeedParserWrapper feedParser = null;
         IDownloadCompleteCallback callback;
 
-		public MyStringResponseListener(ContentResolver contentResolver,
-                                        IDownloadCompleteCallback argCallback, @NonNull Subscription subscription) {
+		public StringResponseListener(ContentResolver contentResolver,
+                                      IDownloadCompleteCallback argCallback, @NonNull Subscription subscription) {
 			this.subscription = subscription;
 			this.contentResolver = contentResolver;
             this.callback = argCallback;
@@ -135,32 +127,28 @@ public class SubscriptionRefreshManager {
 
 		@Override
 		public void onResponse(String response) {
-			// volleyResultParser.execute(response);
-
             new ParseFeedTask().execute(response);
-			//decrementProcessCount();
 		}
 
         private class ParseFeedTask extends AsyncTask<String, Void, Void> {
             protected Void doInBackground(String... responses) {
 
-                Subscription sub = null;
                 String response = responses[0];
 
                 try {
-                    sub = feedHandler.parseFeed(contentResolver, subscription,
+                    feedHandler.parseFeed(contentResolver, subscription,
                             response.replace("ï»¿", "")); // Byte Order Mark
                 } catch (SAXException e) {
-                    // TODO Auto-generated catch block
+                    VendorCrashReporter.handleException(e);
                     e.printStackTrace();
                 } catch (IOException e) {
-                    // TODO Auto-generated catch block
+                    VendorCrashReporter.handleException(e);
                     e.printStackTrace();
                 } catch (ParserConfigurationException e) {
-                    // TODO Auto-generated catch block
+                    VendorCrashReporter.handleException(e);
                     e.printStackTrace();
                 } catch (UnsupportedFeedtypeException e) {
-                    // TODO Auto-generated catch block
+                    VendorCrashReporter.handleException(e);
                     e.printStackTrace();
                 }
 
@@ -168,7 +156,6 @@ public class SubscriptionRefreshManager {
             }
 
             protected void onPostExecute(Void result) {
-                EpisodeDownloadManager.decrementProcessCount();
                 if (callback != null) {
                     callback.complete(true);
                 }
@@ -176,6 +163,24 @@ public class SubscriptionRefreshManager {
         }
 
 
+    }
+
+    private int populateQueue(@NonNull Context argContext, @Nullable IDownloadCompleteCallback argCallback) {
+        Cursor subscriptionCursor;
+        int subscriptionsAdded = 0;
+
+        subscriptionCursor = Subscription.allAsCursor(argContext
+                .getContentResolver());
+
+        while (subscriptionCursor.moveToNext()) {
+
+            Subscription sub = Subscription.getByCursor(subscriptionCursor);
+
+            addSubscriptionToQueue(sub, mRequestQueue, argCallback);
+            subscriptionsAdded++;
+        }
+
+        return subscriptionsAdded;
     }
 }
 

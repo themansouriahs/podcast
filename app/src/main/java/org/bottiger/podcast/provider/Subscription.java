@@ -334,12 +334,11 @@ public class Subscription extends AbstractItem implements PaletteListener {
 		return episodes;
 	}
 
-    // FIXME
-    public void refresh(@NonNull Context argContext) {
-        SubscriptionRefreshManager.start_update(argContext, this, new IDownloadCompleteCallback() {
+    public void refresh(@NonNull final Context argContext) {
+        SoundWaves.sSubscriptionRefreshManager.refresh(this, new IDownloadCompleteCallback() {
             @Override
             public void complete(boolean succes) {
-                return;
+                update(argContext.getContentResolver());
             }
         });
     }

@@ -29,7 +29,8 @@ public class PodcastUpdateReceiver extends BroadcastReceiver {
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "");
         wl.acquire();
 
-		SubscriptionRefreshManager.start_update(context);
+		SubscriptionRefreshManager subscriptionRefreshManager = new SubscriptionRefreshManager(context);
+        subscriptionRefreshManager.refreshALl();
 		EpisodeDownloadManager.removeExpiredDownloadedPodcasts(context);
 		EpisodeDownloadManager.startDownload(context);
 

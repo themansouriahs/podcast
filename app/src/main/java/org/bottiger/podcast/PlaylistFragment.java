@@ -140,7 +140,7 @@ public class PlaylistFragment extends GeastureFragment implements
     public void onRefresh() {
         Log.d("PlaylistRefresh", "starting");
         mSwipeRefreshView.setRefreshing(true);
-        SubscriptionRefreshManager.start_update(mActivity, null, this);
+        SoundWaves.sSubscriptionRefreshManager.refresh(null, this);
     }
 
     @Override
