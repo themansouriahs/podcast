@@ -35,7 +35,7 @@ import org.bottiger.podcast.playlist.FeedCursorLoader;
 import org.bottiger.podcast.playlist.ReorderCursor;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.DownloadCompleteCallback;
-import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
+import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.PaletteCache;
 import org.bottiger.podcast.utils.UIUtils;
@@ -352,7 +352,7 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
                 mMultiShrinkScroller.scrollOffBottom();
                 return true;
             case R.id.menu_refresh_feed:
-                EpisodeDownloadManager.start_update(this, mSubscription, new DownloadCompleteCallback() {
+                SubscriptionRefreshManager.start_update(this, mSubscription, new DownloadCompleteCallback() {
                     @Override
                     public void complete(boolean succes) {
                         return;

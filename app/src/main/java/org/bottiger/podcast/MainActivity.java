@@ -8,6 +8,7 @@ import org.bottiger.podcast.cloud.drive.DriveSyncer;
 import org.bottiger.podcast.debug.SqliteCopy;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
+import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
 import org.bottiger.podcast.service.HTTPDService;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.service.PodcastService;
@@ -372,7 +373,7 @@ public class MainActivity extends FragmentContainerActivity implements
             TransitionUtils.openSettings(this);
 			return true;
 		case R.id.menu_refresh:
-			EpisodeDownloadManager.start_update(this);
+			SubscriptionRefreshManager.start_update(this);
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

@@ -13,6 +13,7 @@ import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.service.DownloadCompleteCallback;
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
+import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.BackgroundTransformation;
 import org.bottiger.podcast.utils.PaletteCache;
@@ -139,7 +140,7 @@ public class PlaylistFragment extends GeastureFragment implements
     public void onRefresh() {
         Log.d("PlaylistRefresh", "starting");
         mSwipeRefreshView.setRefreshing(true);
-        EpisodeDownloadManager.start_update(mActivity, null, this);
+        SubscriptionRefreshManager.start_update(mActivity, null, this);
     }
 
     @Override

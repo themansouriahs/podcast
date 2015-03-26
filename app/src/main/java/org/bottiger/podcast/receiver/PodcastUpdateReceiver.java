@@ -1,6 +1,7 @@
 package org.bottiger.podcast.receiver;
 
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
+import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -28,7 +29,7 @@ public class PodcastUpdateReceiver extends BroadcastReceiver {
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "");
         wl.acquire();
 
-		EpisodeDownloadManager.start_update(context);
+		SubscriptionRefreshManager.start_update(context);
 		EpisodeDownloadManager.removeExpiredDownloadedPodcasts(context);
 		EpisodeDownloadManager.startDownload(context);
 

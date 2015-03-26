@@ -68,7 +68,7 @@ public class EpisodeDownloadManager extends Observable {
     public enum RESULT { OK, NO_STORAGE, OUT_OF_STORAGE, NO_CONNECTION }
 
 	// Running processes
-	private static AtomicInteger processCounts = new AtomicInteger(0);
+	static AtomicInteger processCounts = new AtomicInteger(0);
 	private static Context mContext = null;
 
 	public static final int NO_CONNECT = 1;
@@ -132,89 +132,7 @@ public class EpisodeDownloadManager extends Observable {
 		return DownloadStatus.NOTHING;
 	}
 
-	public static void start_update(final Context context) {
-		start_update(context, null, null);
-	}
-
-	public static void start_update(final Context context,
-			Subscription subscription, DownloadCompleteCallback argCallback) {
-		if (updateConnectStatus(context) == NO_CONNECT)
-			return;
-
-        isDownloading = true;
-
-		mContext = context;
-
-		// FIXME
-		// Perhaps we should do this in the background in the future
-		RequestManager.initIfNeeded(context);
-		RequestQueue requestQueue = RequestManager.getRequestQueue();
-
-		Cursor subscriptionCursor;
-
-        if (subscription == null) {
-            subscriptionCursor = Subscription.allAsCursor(context
-                    .getContentResolver());
-
-            while (subscriptionCursor.moveToNext()) {
-
-                Subscription sub = Subscription.getByCursor(subscriptionCursor);
-
-                if (subscription == null || sub.equals(subscription)) {
-
-                    addSubscriptionToQueue(sub, requestQueue, argCallback);
-                    /*
-                    StringRequest jr = new StringRequest(sub.getUrl(),
-                            new MyStringResponseListener(context
-                                    .getContentResolver(), argCallback, sub),
-                            createGetFailureListener());
-
-                    int MY_SOCKET_TIMEOUT_MS = 300000;
-                    DefaultRetryPolicy retryPolicy = new DefaultRetryPolicy(
-                            MY_SOCKET_TIMEOUT_MS,
-                            DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-                    jr.setRetryPolicy(retryPolicy);
-
-                    // Add the request to Volley
-                    requestQueue.add(jr);
-                    processCounts.incrementAndGet();
-                    */
-
-                }
-            }
-        } else {
-            addSubscriptionToQueue(subscription, requestQueue, argCallback);
-        }
-
-		requestQueue.start();
-	}
-
-    private static void addSubscriptionToQueue(@NonNull Subscription argSubscription, RequestQueue requestQueue, DownloadCompleteCallback argCallback) {
-
-        if (argSubscription == null) {
-            VendorCrashReporter.report("addSubscriptionToQueue", "subscription=null");
-            return;
-        }
-
-        StringRequest jr = new StringRequest(argSubscription.getUrl(),
-                new MyStringResponseListener(mContext
-                        .getContentResolver(), argCallback, argSubscription),
-                createGetFailureListener());
-
-        int MY_SOCKET_TIMEOUT_MS = 300000;
-        DefaultRetryPolicy retryPolicy = new DefaultRetryPolicy(
-                MY_SOCKET_TIMEOUT_MS,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        jr.setRetryPolicy(retryPolicy);
-
-        // Add the request to Volley
-        requestQueue.add(jr);
-        processCounts.incrementAndGet();
-    }
-
-	static class MyStringResponseListener implements Listener<String> {
+    static class MyStringResponseListener implements Listener<String> {
 
 		static FeedHandler feedHandler = new FeedHandler();
 		Subscription subscription;
@@ -274,7 +192,7 @@ public class EpisodeDownloadManager extends Observable {
 
     }
 
-	private static Response.ErrorListener createGetFailureListener() {
+	static Response.ErrorListener createGetFailureListener() {
 		return new Response.ErrorListener() {
 
 			@Override
@@ -565,7 +483,7 @@ public class EpisodeDownloadManager extends Observable {
 		}
 	}
 
-	private static int updateConnectStatus(Context context) {
+	protected static int updateConnectStatus(Context context) {
 		// log.debug("updateConnectStatus");
 		try {
 

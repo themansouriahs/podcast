@@ -4,6 +4,7 @@ import org.bottiger.podcast.SettingsActivity;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.receiver.PodcastUpdateReceiver;
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
+import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
 import org.bottiger.podcast.utils.PodcastLog;
 
 import android.app.AlarmManager;
@@ -226,7 +227,7 @@ public class PodcastService extends IntentService {
 		@Override
 		protected Void doInBackground(Void... params) {
 			// do stuff!
-			EpisodeDownloadManager.start_update(PodcastService.this);
+			SubscriptionRefreshManager.start_update(PodcastService.this);
 			return null;
 		}
 
