@@ -4,28 +4,20 @@ import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.playlist.ReorderCursor;
 import org.bottiger.podcast.provider.FeedItem;
-import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.PlayerService;
-import org.bottiger.podcast.service.PodcastDownloadManager;
 import org.bottiger.podcast.utils.PodcastLog;
-import org.bottiger.podcast.utils.StrUtils;
 
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.provider.BaseColumns;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
 

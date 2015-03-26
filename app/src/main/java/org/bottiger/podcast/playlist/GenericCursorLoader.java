@@ -9,14 +9,8 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.widget.CursorAdapter;
-import android.support.v7.widget.RecyclerView;
-import android.view.View;
-import android.widget.Adapter;
 
-import org.bottiger.podcast.adapters.AbstractPodcastAdapter;
 import org.bottiger.podcast.adapters.FeedViewAdapter;
-import org.bottiger.podcast.service.PodcastDownloadManager;
 
 public abstract class GenericCursorLoader {
 

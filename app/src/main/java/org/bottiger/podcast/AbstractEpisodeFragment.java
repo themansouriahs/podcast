@@ -1,40 +1,22 @@
 package org.bottiger.podcast;
 
-import java.util.HashMap;
-
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.DatabaseHelper;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
-import org.bottiger.podcast.provider.PodcastProvider;
-import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
 import org.bottiger.podcast.service.PlayerService;
-import org.bottiger.podcast.service.PodcastDownloadManager;
-import org.bottiger.podcast.utils.OPMLImportExport;
-import org.bottiger.podcast.utils.ThemeHelper;
-import org.bottiger.podcast.views.dialogs.DialogOPML;
 
-import android.accounts.Account;
 import android.app.Activity;
-import android.app.Dialog;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.CursorLoader;
-import android.support.v4.widget.CursorAdapter;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.ListView;
-import android.widget.Toast;
 
 public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 
@@ -89,11 +71,11 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 			while (cursor.isAfterLast() == false) {
 				FeedItem feedItem = FeedItem.getByCursor(cursor);
 				if (!feedItem.isDownloaded())
-					PodcastDownloadManager.addItemToQueue(feedItem);
+					EpisodeDownloadManager.addItemToQueue(feedItem);
 
 				cursor.moveToNext();
 			}
-			PodcastDownloadManager.startDownload(getActivity());
+			EpisodeDownloadManager.startDownload(getActivity());
 			return true;
 		}
 		case R.id.menu_clear_playlist: {

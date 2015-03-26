@@ -10,17 +10,15 @@ import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.listeners.RecentItemsRecyclerListener;
 import org.bottiger.podcast.listeners.RecyclerItemTouchListener;
 import org.bottiger.podcast.playlist.Playlist;
-import org.bottiger.podcast.playlist.PlaylistCursorLoader;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.service.DownloadCompleteCallback;
+import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
 import org.bottiger.podcast.service.PlayerService;
-import org.bottiger.podcast.service.PodcastDownloadManager;
 import org.bottiger.podcast.utils.BackgroundTransformation;
 import org.bottiger.podcast.utils.PaletteCache;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.views.DownloadButtonView;
-import org.bottiger.podcast.views.ExpandableLayoutManager;
 import org.bottiger.podcast.views.PlayPauseImageView;
 import org.bottiger.podcast.views.PlayerButtonView;
 import org.bottiger.podcast.views.PlayerSeekbar;
@@ -39,7 +37,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -115,7 +112,7 @@ public class PlaylistFragment extends GeastureFragment implements
 
     @Override
     public void onDestroyView() {
-        PodcastDownloadManager.resetDownloadProgressObservable();
+        EpisodeDownloadManager.resetDownloadProgressObservable();
         super.onDestroyView();
     }
 
@@ -125,7 +122,7 @@ public class PlaylistFragment extends GeastureFragment implements
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
-        mDownloadProgressObservable = PodcastDownloadManager.getDownloadProgressObservable(mActivity);
+        mDownloadProgressObservable = EpisodeDownloadManager.getDownloadProgressObservable(mActivity);
 
 		TopActivity.getPreferences().registerOnSharedPreferenceChangeListener(
 				spChanged);
@@ -142,7 +139,7 @@ public class PlaylistFragment extends GeastureFragment implements
     public void onRefresh() {
         Log.d("PlaylistRefresh", "starting");
         mSwipeRefreshView.setRefreshing(true);
-        PodcastDownloadManager.start_update(mActivity, null, this);
+        EpisodeDownloadManager.start_update(mActivity, null, this);
     }
 
     @Override
@@ -312,15 +309,6 @@ public class PlaylistFragment extends GeastureFragment implements
 
             @Override
             public void onSuccess() {
-                /*
-                mHasPhoto = true;
-                recomputePhotoAndScrollingMetrics();
-                int h = mTopPlayer.getHeight();
-                mTopPlayer.getLayoutParams().height = (h); // +actionBarSize
-                mTopPlayer.requestLayout();
-                mRecyclerView.scrollToPosition(0);
-                Log.d("RecyclerPadding", "padding: " + h);
-                */
                 Bitmap bitmap = ((BitmapDrawable)mPhoto.getDrawable()).getBitmap();
                 if (bitmap != null) {
                     PaletteCache.generate(item.image, bitmap);
@@ -359,7 +347,7 @@ public class PlaylistFragment extends GeastureFragment implements
         mFavoriteButton.setEpisodeId(item.getId());
 
         mPlayPauseButton.setStatus(PlayerStatusObservable.STATUS.PAUSED); // FIXME: This should not be static
-        mDownloadProgressObservable.registerObserver(mPlayPauseButton);
+        mDownloadProgressObservable.registerObserver(mDownloadButton);
 
         mBackButton.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -8,11 +8,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bottiger.podcast.adapters.SubscriptionGridCursorAdapter;
-import org.bottiger.podcast.playlist.Playlist;
-import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionColumns;
-import org.bottiger.podcast.service.PodcastDownloadManager;
 import org.bottiger.podcast.utils.FragmentUtils;
 import org.bottiger.podcast.views.dialogs.DialogOPML;
 
@@ -26,7 +23,6 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.ListPreference;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;

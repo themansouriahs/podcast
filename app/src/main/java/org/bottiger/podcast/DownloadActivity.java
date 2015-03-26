@@ -5,17 +5,13 @@ import java.util.Arrays;
 import java.util.PriorityQueue;
 
 import org.bottiger.podcast.adapters.QueueAdapter;
-import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.QueueEpisode;
-import org.bottiger.podcast.service.PodcastDownloadManager;
+import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
 
 import android.app.ListActivity;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
-import android.transition.Slide;
-import android.transition.Transition;
 import android.view.MenuItem;
-import android.view.Window;
 
 public class DownloadActivity extends ListActivity {
 
@@ -33,7 +29,7 @@ public class DownloadActivity extends ListActivity {
 		setContentView(R.layout.activity_download);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
-		testQueue = PodcastDownloadManager.getQueue();
+		testQueue = EpisodeDownloadManager.getQueue();
 
 		// array = Arrays.sort(testQueue.toArray());
 		QueueEpisode[] array = new QueueEpisode[testQueue.size()];

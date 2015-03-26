@@ -8,13 +8,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.graphics.Palette;
 import android.util.AttributeSet;
-import android.util.TypedValue;
 import android.view.View;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.provider.FeedItem;
-import org.bottiger.podcast.service.PodcastDownloadManager;
-import org.bottiger.podcast.utils.ThemeHelper;
+import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
 
 /**
  * Created by apl on 02-09-2014.
@@ -119,7 +117,7 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
         }
 
         if (getState() == PlayerButtonView.STATE_DEFAULT) {
-            PodcastDownloadManager.addItemAndStartDownload(mEpisode, mContext.getApplicationContext());
+            EpisodeDownloadManager.addItemAndStartDownload(mEpisode, mContext.getApplicationContext());
         } else if (getState() == PlayerButtonView.STATE_DELETE) {
             mEpisode.delFile(mContext.getContentResolver());
             setState(PlayerButtonView.STATE_DEFAULT);

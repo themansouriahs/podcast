@@ -11,8 +11,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.service.DownloadStatus;
-import org.bottiger.podcast.service.Downloader.IDownloadEngine;
-import org.bottiger.podcast.service.PodcastDownloadManager;
+import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
+import org.bottiger.podcast.service.Downloader.engines.IDownloadEngine;
 import org.bottiger.podcast.views.DownloadButtonView;
 import org.bottiger.podcast.views.PlayerButtonView;
 
@@ -45,7 +45,7 @@ public class DownloadProgressObservable {
     public DownloadProgressObservable(Context context) {
         mDownloadManager = (DownloadManager) context
                 .getSystemService(Context.DOWNLOAD_SERVICE);
-        mPodcastDownloadManager = PodcastDownloadManager.mDownloadingEpisodes;
+        mPodcastDownloadManager = EpisodeDownloadManager.mDownloadingEpisodes;
     }
 
 	/**
@@ -79,7 +79,7 @@ public class DownloadProgressObservable {
 
                             List<DownloadObserver> observers = mObservers.get(episode.getId());
 
-                            DownloadStatus status = PodcastDownloadManager.getStatus(episode);
+                            DownloadStatus status = EpisodeDownloadManager.getStatus(episode);
                             IDownloadEngine download = mPodcastDownloadManager.get(episode.getId());
 
                             int progress = -1;

@@ -2,14 +2,9 @@ package org.bottiger.podcast.receiver;
 
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.List;
 
-import org.bottiger.podcast.listeners.DownloadFileObserver;
-import org.bottiger.podcast.listeners.DownloadObserver;
-import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.provider.FeedItem;
-import org.bottiger.podcast.service.PodcastDownloadManager;
+import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
 import org.bottiger.podcast.utils.SDCardManager;
 
 import android.app.DownloadManager;
@@ -73,13 +68,13 @@ public class DownloadManagerReceiver extends BroadcastReceiver {
 					// Start next download
 					
 					// Reset downloadingItem 
-					PodcastDownloadManager.notifyDownloadComplete(item);
+					EpisodeDownloadManager.notifyDownloadComplete(item);
 					
-					PodcastDownloadManager.startDownload(context);
+					EpisodeDownloadManager.startDownload(context);
 				}
 			}
 
-			PodcastDownloadManager.removeExpiredDownloadedPodcasts(context);
+			EpisodeDownloadManager.removeExpiredDownloadedPodcasts(context);
 		}
 	}
 	
@@ -120,14 +115,14 @@ public class DownloadManagerReceiver extends BroadcastReceiver {
         intent.setData(Uri.fromFile(newFileName));
         context.sendBroadcast(intent);
 
-		if (PodcastDownloadManager.getmDownloadingIDs().contains(downloadId))
-			PodcastDownloadManager.getmDownloadingIDs().remove(downloadId);
+		if (EpisodeDownloadManager.getmDownloadingIDs().contains(downloadId))
+			EpisodeDownloadManager.getmDownloadingIDs().remove(downloadId);
 
 		/*
 		 * If no more files are being downloaded we purge the tmp dir. Things
 		 * might build up here if downloads are aborted for various reasons.
 		 */
-		if (PodcastDownloadManager.getmDownloadingIDs().size() == 0) {
+		if (EpisodeDownloadManager.getmDownloadingIDs().size() == 0) {
 			File directory = new File(SDCardManager.getTmpDir());
 
 			// Get all files in directory

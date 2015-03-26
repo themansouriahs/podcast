@@ -2,7 +2,6 @@ package org.bottiger.podcast;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -32,15 +31,13 @@ import com.squareup.picasso.Target;
 import org.bottiger.podcast.adapters.FeedViewAdapter;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PaletteObservable;
-import org.bottiger.podcast.parser.FeedUpdater;
 import org.bottiger.podcast.playlist.FeedCursorLoader;
 import org.bottiger.podcast.playlist.ReorderCursor;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.DownloadCompleteCallback;
-import org.bottiger.podcast.service.PodcastDownloadManager;
+import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.PaletteCache;
-import org.bottiger.podcast.utils.ThemeHelper;
 import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.utils.WhitenessUtils;
 import org.bottiger.podcast.views.FeedRecyclerView;
@@ -355,7 +352,7 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
                 mMultiShrinkScroller.scrollOffBottom();
                 return true;
             case R.id.menu_refresh_feed:
-                PodcastDownloadManager.start_update(this, mSubscription, new DownloadCompleteCallback() {
+                EpisodeDownloadManager.start_update(this, mSubscription, new DownloadCompleteCallback() {
                     @Override
                     public void complete(boolean succes) {
                         return;

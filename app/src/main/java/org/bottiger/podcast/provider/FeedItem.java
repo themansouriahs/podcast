@@ -12,10 +12,9 @@ import java.util.Locale;
 
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.service.DownloadStatus;
-import org.bottiger.podcast.service.PodcastDownloadManager;
+import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
 import org.bottiger.podcast.utils.PodcastLog;
 import org.bottiger.podcast.utils.SDCardManager;
-import org.bottiger.podcast.utils.StrUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
@@ -30,7 +29,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
@@ -784,7 +782,7 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 	 * @param downloadStatus
 	 */
 	public String getStatus(DownloadManager downloadManager) {
-		DownloadStatus downloadStatus = PodcastDownloadManager.getStatus(this);
+		DownloadStatus downloadStatus = EpisodeDownloadManager.getStatus(this);
 		String statusText = "";
 		switch (downloadStatus) {
 		case PENDING:

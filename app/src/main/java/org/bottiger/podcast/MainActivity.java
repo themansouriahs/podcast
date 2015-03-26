@@ -7,9 +7,9 @@ import org.bottiger.podcast.cloud.CloudProvider;
 import org.bottiger.podcast.cloud.drive.DriveSyncer;
 import org.bottiger.podcast.debug.SqliteCopy;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
+import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
 import org.bottiger.podcast.service.HTTPDService;
 import org.bottiger.podcast.service.PlayerService;
-import org.bottiger.podcast.service.PodcastDownloadManager;
 import org.bottiger.podcast.service.PodcastService;
 import org.bottiger.podcast.views.dialogs.AddPodcastDialog;
 import org.bottiger.podcast.utils.ThemeHelper;
@@ -207,8 +207,8 @@ public class MainActivity extends FragmentContainerActivity implements
 		 * public void onActivityCreated(Bundle savedInstanceState) {
 		 */
 		if (debugging) {
-			PodcastDownloadManager.cancelAllDownloads(this
-					.getApplicationContext());
+			EpisodeDownloadManager.cancelAllDownloads(this
+                    .getApplicationContext());
 		}
 	}
 
@@ -372,7 +372,7 @@ public class MainActivity extends FragmentContainerActivity implements
             TransitionUtils.openSettings(this);
 			return true;
 		case R.id.menu_refresh:
-			PodcastDownloadManager.start_update(this);
+			EpisodeDownloadManager.start_update(this);
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

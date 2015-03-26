@@ -3,6 +3,8 @@ package org.bottiger.podcast.service;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
 
+import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
+
 /**
  * Created by apl on 09-11-2014.
  */
@@ -10,9 +12,9 @@ public class PodcastUpdateJobService extends JobService {
     @Override
     public boolean onStartJob(JobParameters params) {
 
-        PodcastDownloadManager.start_update(this);
-        PodcastDownloadManager.removeExpiredDownloadedPodcasts(this);
-        PodcastDownloadManager.startDownload(this);
+        EpisodeDownloadManager.start_update(this);
+        EpisodeDownloadManager.removeExpiredDownloadedPodcasts(this);
+        EpisodeDownloadManager.startDownload(this);
         return false;
     }
 
