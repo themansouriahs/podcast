@@ -9,6 +9,12 @@
         appcompat:showAsAction="always"/>
 
     <item
+        android:id="@+id/menu_refresh_all_subscriptions"
+        android:orderInCategory="2"
+        android:title="@string/menu_refresh_feed_all">
+    </item>
+
+    <item
         android:id="@+id/menu_import"
         android:orderInCategory="400"
         android:title="@string/menu_import"

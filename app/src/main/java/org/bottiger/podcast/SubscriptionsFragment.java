@@ -243,6 +243,9 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
                 Dialog dialog = dialogOPML.onCreateDialog(getActivity());
                 dialog.show();
             }
+            case R.id.menu_refresh_all_subscriptions: {
+                SoundWaves.sSubscriptionRefreshManager.refreshALl();
+            }
         }
         return super.onOptionsItemSelected(item);
     }
