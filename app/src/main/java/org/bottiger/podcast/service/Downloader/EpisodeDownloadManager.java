@@ -43,11 +43,14 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 
 public class EpisodeDownloadManager extends Observable {
+
+    public static final String DEBUG_KEY = "EpisodeDownload";
 
     public static boolean isDownloading = false;
 
@@ -61,28 +64,18 @@ public class EpisodeDownloadManager extends Observable {
 	public static final int WIFI_CONNECT = 2;
 	public static final int MOBILE_CONNECT = 4;
 
-	private static final long ONE_MINUTE = 60L * 1000L;
-	private static final long ONE_HOUR = 60L * ONE_MINUTE;
 
-	private static long pref_update = 2 * 60 * ONE_MINUTE;
-
-    private static HashMap<Long, DownloadFileObserver> mFileObserver = new HashMap<Long, DownloadFileObserver>();
-
+    private static HashMap<Long, DownloadFileObserver> mFileObserver = new HashMap<>();
 	private static PriorityQueue<QueueEpisode> mDownloadQueue = new PriorityQueue<>();
 
 	public static FeedItem mDownloadingItem = null;
-	private static HashSet<Long> mDownloadingIDs = new HashSet<Long>();
-    public static HashMap<Long, IDownloadEngine> mDownloadingEpisodes = new HashMap<Long, IDownloadEngine>();
+	private static HashSet<Long> mDownloadingIDs = new HashSet<>();
+    public static HashMap<Long, IDownloadEngine> mDownloadingEpisodes = new HashMap<>();
 
-	private static final LockHandler mUpdateLock = new LockHandler();
 	private static int mConnectStatus = NO_CONNECT;
 
 	public static long pref_update_wifi = 0;
 	public static long pref_update_mobile = 0;
-	public long pref_item_expire = 0;
-	public long pref_download_file_expire = 1000;
-	public long pref_played_file_expire = 0;
-	public int pref_max_valid_size = 20;
 
 	private static DownloadManager downloadManager;
 
@@ -116,6 +109,8 @@ public class EpisodeDownloadManager extends Observable {
      * @return
      */
 	public static DownloadStatus getStatus(FeedItem item) {
+        Log.d(DEBUG_KEY, "getStatus(): " + item);
+
 		if (item == null) {
             return DownloadStatus.NOTHING;
         }
@@ -166,8 +161,7 @@ public class EpisodeDownloadManager extends Observable {
 
 	/**
 	 * Download all the episodes in the queue
-	 * 
-	 * @param show
+	 *
 	 * @param argContext
 	 */
 	public static synchronized RESULT startDownload(@NonNull final Context argContext) {
@@ -405,11 +399,9 @@ public class EpisodeDownloadManager extends Observable {
 
 			if (info.isConnected() && (info.getType() == 1)) {
 				mConnectStatus = WIFI_CONNECT;
-				pref_update = pref_update_wifi;
 				return mConnectStatus;
 			} else {
 				mConnectStatus = MOBILE_CONNECT;
-				pref_update = pref_update_mobile;
 
 				return mConnectStatus;
 			}
@@ -470,8 +462,6 @@ public class EpisodeDownloadManager extends Observable {
 
 	/**
 	 * Add feeditem to the download queue
-	 * 
-	 * @param feedItem
 	 */
 	public static void addItemToQueue(FeedItem item) {
 		QueueEpisode queueItem = new QueueEpisode(item);
@@ -559,159 +549,4 @@ public class EpisodeDownloadManager extends Observable {
     public static void resetDownloadProgressObservable() {
         mDownloadProgressObservable = null;
     }
-
-	/**
-	 * Update the list of subscriptions as well as their content
-	 * 
-	 * @author Arvid Böttiger
-	 */
-	private static class UpdateSubscriptions extends
-			AsyncTask<Void, Subscription, Void> {
-		private Context mContext;
-		private Subscription mSubscription;
-		//private PullToRefreshListView mRefreshView;
-		private AsyncTask<URL, Void, Void> subscriptionDownloader;
-
-		/*
-		 * AsyncTask may be asynchronous, but not very concurrent. Instead of
-		 * spawning a bunch of AsyncTasks to refresh our feeds we use a
-		 * ThreadPool
-		 * 
-		 * http://stackoverflow.com/questions/11878563/how-can-i-make-this-code-more
-		 * -concurrent?rq=1
-		 */
-		ExecutorService service = Executors.newFixedThreadPool(5);
-
-		public UpdateSubscriptions(Context context,
-				Void pullToRefreshView,
-				Subscription subscription) {
-			mContext = context;
-			mSubscription = subscription;
-			//mRefreshView = pullToRefreshView;
-			subscriptionDownloader = null;
-
-			if (MainActivity.gReader != null) {
-				subscriptionDownloader = MainActivity.gReader
-						.getSubscriptionsFromReader();
-			}
-		}
-
-		@Override
-		protected Void doInBackground(Void... params) {
-			Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-			try {
-
-				if (mSubscription != null) {
-					GetSubscriptionRunnable run = new GetSubscriptionRunnable(
-							mSubscription);
-					service.execute(run);
-				} else {
-					Cursor subscriptionCursor = Subscription
-							.allAsCursor(mContext.getContentResolver());
-
-					while (subscriptionCursor.moveToNext()) {
-
-						Subscription subscription = Subscription
-								.getByCursor(subscriptionCursor);
-
-						GetSubscriptionRunnable run = new GetSubscriptionRunnable(
-								subscription);
-						service.execute(run);
-					}
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			} finally {
-				mUpdateLock.release();
-			}
-			try {
-				/*
-				 * Call shutdown() before awaitTermination
-				 * http://stackoverflow.com
-				 * /questions/1250643/how-to-wait-for-all
-				 * -threads-to-finish-using-executorservice
-				 */
-				service.shutdown();
-				service.awaitTermination(10, TimeUnit.MINUTES);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-
-			//return mRefreshView;
-            return null;
-		}
-
-		@Override
-		protected void onPreExecute() {
-			try {
-				if (subscriptionDownloader != null)
-					subscriptionDownloader.get(1, TimeUnit.MINUTES);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				e.printStackTrace();
-			} catch (TimeoutException e) {
-				e.printStackTrace();
-			}
-		}
-
-		/*
-		 * For some reason this prints "Update: null" once in a while It never
-		 * seems to be called with a subscription with the title null
-		 * 
-		 * That why I have all the checks
-		 */
-		@Override
-		protected void onProgressUpdate(Subscription... subscription) {
-
-			Subscription sub = subscription[0];
-			CharSequence pullLabel = "Updated: " + sub.title;
-
-            /*
-			if (pullLabel != null && !pullLabel.equals("null")
-					&& !pullLabel.equals("") && mRefreshView != null)
-				mRefreshView.getLoadingLayoutProxy().setLastUpdatedLabel(
-						pullLabel);
-						*/
-		}
-
-        /*
-		@Override
-		protected void onPostExecute(PullToRefreshListView refreshView) {
-			// Call onRefreshComplete when the list has been refreshed.
-			if (mRefreshView != null)
-				refreshView.onRefreshComplete();
-			super.onPostExecute(refreshView);
-		}
-		*/
-
-		/**
-		 * A Runnable class for updating the content of a subscription.
-		 * 
-		 * @author Arvid Böttiger
-		 */
-		private class GetSubscriptionRunnable implements Runnable {
-			private final Subscription subscription;
-
-			GetSubscriptionRunnable(final Subscription subscription) {
-				this.subscription = subscription;
-			}
-
-			@Override
-			public void run() {
-
-				if (updateConnectStatus(mContext) == NO_CONNECT)
-					return;
-
-				if (subscription.title == null || subscription.title.equals("")
-						|| subscription.title.equals("null"))
-					subscription.getClass();
-
-				JSONFeedParserWrapper parser = new JSONFeedParserWrapper(
-						mContext);
-				publishProgress(subscription);
-				// parser.parse(subscription);
-			}
-		}
-	}
 }

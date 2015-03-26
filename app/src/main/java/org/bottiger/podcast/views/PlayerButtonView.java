@@ -240,7 +240,7 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
 
         //int cd = swatchDark.getRgb();
         baseColorPaint.setColor(extractor.getPrimary()); // -1761607680
-        foregroundColorPaint.setColor(extractor.getSecondaryTint());
+        foregroundColorPaint.setColor(extractor.getSecondary());
 
         if (argChangedPalette != null) {
             setBackgroundColor(ButtonColor(argChangedPalette));
