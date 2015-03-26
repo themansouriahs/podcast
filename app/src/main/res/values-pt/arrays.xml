@@ -17,7 +17,7 @@
 <resources>
     
      <string-array name="drawer_menu">
-         <item>Filtros da lista de reprodução</item>
+        <item>Filtros da lista de reprodução</item>
         <item>Transferindo itens</item>
     </string-array>
     
@@ -176,6 +176,16 @@
         <item>20</item>
         <item>30</item>
         <item>60</item>
+    </string-array>
+
+    <string-array name="pref_subscriptions_columns_entries">
+        <item>2 colunas</item>
+        <item>3 colunas</item>
+    </string-array>
+
+    <string-array name="pref_subscriptions_columns_entries_values">
+        <item>2</item>
+        <item>3</item>
     </string-array>
 
     <string-array name="playlist_sort_order">

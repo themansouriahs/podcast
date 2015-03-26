@@ -17,7 +17,7 @@
 <resources>
     
      <string-array name="drawer_menu">
-         <item>Playlist Filters</item>
+        <item>Playlist Filters</item>
         <item>Downloading items</item>
     </string-array>
     
