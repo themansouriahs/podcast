@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -43,6 +44,13 @@ public class SubscriptionRefreshManager {
 
     private Context mContext;
     private RequestQueue mRequestQueue;
+
+    private RequestQueue.RequestFinishedListener<StringRequest> mFinishedListener = new RequestQueue.RequestFinishedListener<StringRequest>() {
+        @Override
+        public void onRequestFinished(Request<StringRequest> request) {
+            return;
+        }
+    };
 
     public SubscriptionRefreshManager(@NonNull Context argContext) {
         mContext = argContext;
@@ -88,6 +96,8 @@ public class SubscriptionRefreshManager {
         } else {
             populateQueue(mContext, argCallback);
         }
+
+        mRequestQueue.addRequestFinishedListener(mFinishedListener);
 
         Log.d(DEBUG_KEY, "starting refresh using Volley");
         mRequestQueue.start();
