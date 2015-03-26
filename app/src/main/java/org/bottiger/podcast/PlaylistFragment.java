@@ -11,7 +11,7 @@ import org.bottiger.podcast.listeners.RecentItemsRecyclerListener;
 import org.bottiger.podcast.listeners.RecyclerItemTouchListener;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
-import org.bottiger.podcast.service.DownloadCompleteCallback;
+import org.bottiger.podcast.service.IDownloadCompleteCallback;
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
 import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
 import org.bottiger.podcast.service.PlayerService;
@@ -57,7 +57,7 @@ import com.squareup.picasso.Callback;
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 
 public class PlaylistFragment extends GeastureFragment implements
-		OnSharedPreferenceChangeListener, Playlist.PlaylistChangeListener, DownloadCompleteCallback
+		OnSharedPreferenceChangeListener, Playlist.PlaylistChangeListener, IDownloadCompleteCallback
          {
 
     private static int CONTEXT_MENU = 0;

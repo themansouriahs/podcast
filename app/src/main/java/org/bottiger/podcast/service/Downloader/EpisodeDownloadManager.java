@@ -1,7 +1,6 @@
 package org.bottiger.podcast.service.Downloader;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,31 +14,22 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.bottiger.podcast.MainActivity;
-import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.images.RequestManager;
 import org.bottiger.podcast.listeners.DownloadFileObserver;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.parser.JSONFeedParserWrapper;
-import org.bottiger.podcast.parser.syndication.handler.FeedHandler;
-import org.bottiger.podcast.parser.syndication.handler.UnsupportedFeedtypeException;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.QueueEpisode;
 import org.bottiger.podcast.provider.Subscription;
-import org.bottiger.podcast.service.DownloadCompleteCallback;
 import org.bottiger.podcast.service.DownloadStatus;
 import org.bottiger.podcast.service.Downloader.engines.IDownloadEngine;
 import org.bottiger.podcast.service.Downloader.engines.OkHttpDownloader;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.LockHandler;
 import org.bottiger.podcast.utils.SDCardManager;
-import org.xml.sax.SAXException;
 
-import android.annotation.SuppressLint;
 import android.app.DownloadManager;
 import android.app.DownloadManager.Query;
 import android.content.ContentResolver;
@@ -54,12 +44,8 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
-import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 
 public class EpisodeDownloadManager extends Observable {
 
@@ -82,7 +68,7 @@ public class EpisodeDownloadManager extends Observable {
 
     private static HashMap<Long, DownloadFileObserver> mFileObserver = new HashMap<Long, DownloadFileObserver>();
 
-	private static PriorityQueue<QueueEpisode> mDownloadQueue = new PriorityQueue<QueueEpisode>();
+	private static PriorityQueue<QueueEpisode> mDownloadQueue = new PriorityQueue<>();
 
 	public static FeedItem mDownloadingItem = null;
 	private static HashSet<Long> mDownloadingIDs = new HashSet<Long>();
@@ -99,7 +85,30 @@ public class EpisodeDownloadManager extends Observable {
 	public int pref_max_valid_size = 20;
 
 	private static DownloadManager downloadManager;
-	private static long downloadReference;
+
+    private static IDownloadEngine.Callback mDownloadCompleteCallback = new IDownloadEngine.Callback() {
+        @Override
+        public void downloadCompleted(long argID) {
+            FeedItem item = mDownloadingEpisodes.get(argID).getEpisode();
+            item.setDownloaded(true);
+            item.update(mContext.getContentResolver());
+
+            Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+            intent.setData(Uri.fromFile(new File(item.getAbsolutePath())));
+            mContext.sendBroadcast(intent);
+
+            removeDownloadingEpisode(argID);
+            removeExpiredDownloadedPodcasts(mContext);
+
+            startDownload(mContext);
+        }
+
+        @Override
+        public void downloadInterrupted(long argID) {
+            removeDownloadingEpisode(argID);
+            startDownload(mContext);
+        }
+    };
 
     /**
      * Returns the status of the given FeedItem
@@ -132,67 +141,7 @@ public class EpisodeDownloadManager extends Observable {
 		return DownloadStatus.NOTHING;
 	}
 
-    static class MyStringResponseListener implements Listener<String> {
-
-		static FeedHandler feedHandler = new FeedHandler();
-		Subscription subscription;
-		ContentResolver contentResolver;
-		final JSONFeedParserWrapper feedParser = null;
-        DownloadCompleteCallback callback;
-
-		public MyStringResponseListener(ContentResolver contentResolver,
-                                        DownloadCompleteCallback argCallback, @NonNull Subscription subscription) {
-			this.subscription = subscription;
-			this.contentResolver = contentResolver;
-            this.callback = argCallback;
-		}
-
-		@Override
-		public void onResponse(String response) {
-			// volleyResultParser.execute(response);
-
-            new ParseFeedTask().execute(response);
-			//decrementProcessCount();
-		}
-
-        private class ParseFeedTask extends AsyncTask<String, Void, Void> {
-            protected Void doInBackground(String... responses) {
-
-                Subscription sub = null;
-                String response = responses[0];
-
-                try {
-                    sub = feedHandler.parseFeed(contentResolver, subscription,
-                            response.replace("ï»¿", "")); // Byte Order Mark
-                } catch (SAXException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (ParserConfigurationException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (UnsupportedFeedtypeException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-
-                return null;
-            }
-
-            protected void onPostExecute(Void result) {
-                decrementProcessCount();
-                if (callback != null) {
-                    callback.complete(true);
-                }
-            }
-        }
-
-
-    }
-
-	static Response.ErrorListener createGetFailureListener() {
+    static Response.ErrorListener createGetFailureListener() {
 		return new Response.ErrorListener() {
 
 			@Override
@@ -209,7 +158,7 @@ public class EpisodeDownloadManager extends Observable {
 		};
 	}
 
-	private static void decrementProcessCount() {
+	static void decrementProcessCount() {
 		EpisodeDownloadManager.processCounts.decrementAndGet();
 		if (EpisodeDownloadManager.processCounts.get() == 0) {
             isDownloading = false;
@@ -219,13 +168,25 @@ public class EpisodeDownloadManager extends Observable {
 		}
 	}
 
+    public void fetchPLaylist() {
+        Playlist playlist = PlayerService.getPlaylist();
+        playlist.setContext(mContext);
+        playlist.populatePlaylistIfEmpty();
+
+        int max = playlist.size() > 5 ? 5 : playlist.size();
+        for (int i = 0; i < max; i++) {
+            FeedItem item = playlist.getItem(i);
+            if (item != null && !item.isDownloaded())
+                mDownloadQueue.add(new QueueEpisode(item));
+        }
+    }
+
 	/**
 	 * Download all the episodes in the queue
 	 * 
 	 * @param show
 	 * @param argContext
 	 */
-	@SuppressLint("NewApi")
 	public static synchronized RESULT startDownload(@NonNull final Context argContext) {
 
         if (mContext == null) {
@@ -246,18 +207,6 @@ public class EpisodeDownloadManager extends Observable {
 
 		downloadManager = (DownloadManager) argContext
 				.getSystemService(Context.DOWNLOAD_SERVICE);
-
-        /*
-		Playlist playlist = PlayerService.getPlaylist();
-        playlist.setContext(mContext);
-        playlist.populatePlaylistIfEmpty();
-
-		int max = playlist.size() > 5 ? 5 : playlist.size();
-		for (int i = 0; i < max; i++) {
-			FeedItem item = playlist.getItem(i);
-			if (item != null && !item.isDownloaded())
-				mDownloadQueue.add(new QueueEpisode(item));
-		}*/
 
 		if (getDownloadingItem() == null && mDownloadQueue.size() > 0) {
 			QueueEpisode nextInQueue = getNextItem();
@@ -316,29 +265,7 @@ public class EpisodeDownloadManager extends Observable {
 			mDownloadingItem = downloadingItem;
 			*/
             IDownloadEngine downloadEngine = newEngine(downloadingItem);
-            downloadEngine.addCallback(new IDownloadEngine.Callback() {
-                @Override
-                public void downloadCompleted(long argID) {
-                    FeedItem item = mDownloadingEpisodes.get(argID).getEpisode();
-                    item.setDownloaded(true);
-                    item.update(mContext.getContentResolver());
-
-                    Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                    intent.setData(Uri.fromFile(new File(item.getAbsolutePath())));
-                    argContext.sendBroadcast(intent);
-
-                    removeDownloadingEpisode(argID);
-
-                    if (mDownloadQueue.size() > 0) {
-                        startDownload(argContext);
-                    }
-                }
-
-                @Override
-                public void downloadInterrupted(long argID) {
-                    removeDownloadingEpisode(argID);
-                }
-            });
+            downloadEngine.addCallback(mDownloadCompleteCallback);
 
             downloadEngine.startDownload();
             mDownloadingEpisodes.put(new Long(downloadingItem.getId()), downloadEngine);
@@ -370,7 +297,6 @@ public class EpisodeDownloadManager extends Observable {
 	 * Deletes the downloaded file and updates the database record
 	 * 
 	 * @param context
-	 * @param cursor
 	 */
 	private static void deleteExpireFile(Context context, FeedItem item) {
 
@@ -391,8 +317,7 @@ public class EpisodeDownloadManager extends Observable {
 	/**
 	 * Iterates through all the downloaded episodes and deletes the ones who
 	 * exceed the download limit Runs with minimum priority
-	 * 
-	 * @param context
+	 *
 	 * @return Void
 	 */
 	private static class removeExpiredDownloadedPodcastsTask extends

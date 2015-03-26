@@ -9,7 +9,7 @@ import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PaletteListener;
-import org.bottiger.podcast.service.DownloadCompleteCallback;
+import org.bottiger.podcast.service.IDownloadCompleteCallback;
 import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.PodcastLog;
@@ -336,7 +336,7 @@ public class Subscription extends AbstractItem implements PaletteListener {
 
     // FIXME
     public void refresh(@NonNull Context argContext) {
-        SubscriptionRefreshManager.start_update(argContext, this, new DownloadCompleteCallback() {
+        SubscriptionRefreshManager.start_update(argContext, this, new IDownloadCompleteCallback() {
             @Override
             public void complete(boolean succes) {
                 return;
