@@ -11,6 +11,7 @@ import org.bottiger.podcast.parser.syndication.namespace.Namespace;
 import org.bottiger.podcast.parser.syndication.namespace.SyndElement;
 import org.bottiger.podcast.parser.syndication.namespace.atom.NSAtom;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -127,10 +128,13 @@ public class SyndHandler extends DefaultHandler {
 	@Override
 	public void endDocument() throws SAXException {
 		super.endDocument();
-		//state.getSubscription().setItems(state.getItems());
+		Subscription subscription = state.getSubscription();
+
+        Log.d(SubscriptionRefreshManager.DEBUG_KEY, "Done Parsing: " + subscription);
 		FeedUpdater updater = new FeedUpdater(contentResolver);
 
-		updater.updateDatabase(state.getSubscription(), state.getItems());
+		updater.updateDatabase(subscription, state.getItems());
+        Log.d(SubscriptionRefreshManager.DEBUG_KEY, "Done updating database for: " + subscription);
 	}
 
 	public HandlerState getState() {

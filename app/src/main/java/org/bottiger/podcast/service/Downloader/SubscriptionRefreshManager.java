@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.RequestQueue;
@@ -33,6 +34,7 @@ public class SubscriptionRefreshManager {
 
     private static final int MY_SOCKET_TIMEOUT_MS = 300000; // 300 s
     private static final String ACRA_KEY = "SubscriptionRefreshManager";
+    public static final String DEBUG_KEY = "SubscriptionRefresh";
 
     private DefaultRetryPolicy mRetryPolicy = new DefaultRetryPolicy(
                                                             MY_SOCKET_TIMEOUT_MS,
@@ -53,7 +55,8 @@ public class SubscriptionRefreshManager {
 
 			@Override
 			public void onErrorResponse(VolleyError error) { // Handle error
-				if (error instanceof com.android.volley.ServerError) {
+                Log.e(DEBUG_KEY, "Volley error: " + error.toString());
+                if (error instanceof com.android.volley.ServerError) {
 
 				} else {
 					error.printStackTrace();
@@ -65,13 +68,18 @@ public class SubscriptionRefreshManager {
 	}
 
     public void refreshALl() {
+        Log.d(DEBUG_KEY, "refreshALl()");
         refresh(null, null);
     }
 
     public void refresh(Subscription subscription, IDownloadCompleteCallback argCallback) {
+        Log.d(DEBUG_KEY, "refresh subscription: " + subscription + " (null => all)");
 
-        if (EpisodeDownloadManager.updateConnectStatus(mContext) == EpisodeDownloadManager.NO_CONNECT)
+
+        if (EpisodeDownloadManager.updateConnectStatus(mContext) == EpisodeDownloadManager.NO_CONNECT) {
+            Log.d(DEBUG_KEY, "refresh aborted, no network");
             return;
+        }
 
         EpisodeDownloadManager.isDownloading = true;
 
@@ -81,10 +89,12 @@ public class SubscriptionRefreshManager {
             populateQueue(mContext, argCallback);
         }
 
+        Log.d(DEBUG_KEY, "starting refresh using Volley");
         mRequestQueue.start();
     }
 
     private void addSubscriptionToQueue(@NonNull Subscription argSubscription, RequestQueue requestQueue, IDownloadCompleteCallback argCallback) {
+        Log.d(DEBUG_KEY, "Adding to queue: " + argSubscription);
 
         if (argSubscription == null) {
             VendorCrashReporter.report(ACRA_KEY, "subscription=null");
@@ -109,6 +119,7 @@ public class SubscriptionRefreshManager {
 
         // Add the request to Volley
         requestQueue.add(request);
+        Log.d(DEBUG_KEY, "Added to queue successfully: " + argSubscription);
     }
 
     private class StringResponseListener implements Response.Listener<String> {
@@ -127,6 +138,7 @@ public class SubscriptionRefreshManager {
 
 		@Override
 		public void onResponse(String response) {
+            Log.d(DEBUG_KEY, "Volley response from: " + subscription);
             new ParseFeedTask().execute(response);
 		}
 
@@ -136,18 +148,23 @@ public class SubscriptionRefreshManager {
                 String response = responses[0];
 
                 try {
+                    Log.d(DEBUG_KEY, "Parsing: " + subscription);
                     feedHandler.parseFeed(contentResolver, subscription,
                             response.replace("ï»¿", "")); // Byte Order Mark
                 } catch (SAXException e) {
+                    Log.d(DEBUG_KEY, "Parsing EXCEPTION: " + subscription);
                     VendorCrashReporter.handleException(e);
                     e.printStackTrace();
                 } catch (IOException e) {
+                    Log.d(DEBUG_KEY, "Parsing EXCEPTION: " + subscription);
                     VendorCrashReporter.handleException(e);
                     e.printStackTrace();
                 } catch (ParserConfigurationException e) {
+                    Log.d(DEBUG_KEY, "Parsing EXCEPTION: " + subscription);
                     VendorCrashReporter.handleException(e);
                     e.printStackTrace();
                 } catch (UnsupportedFeedtypeException e) {
+                    Log.d(DEBUG_KEY, "Parsing EXCEPTION: " + subscription);
                     VendorCrashReporter.handleException(e);
                     e.printStackTrace();
                 }
@@ -157,6 +174,7 @@ public class SubscriptionRefreshManager {
 
             protected void onPostExecute(Void result) {
                 if (callback != null) {
+                    Log.d(DEBUG_KEY, "Parsing callback for: " + subscription);
                     callback.complete(true);
                 }
             }
@@ -166,6 +184,8 @@ public class SubscriptionRefreshManager {
     }
 
     private int populateQueue(@NonNull Context argContext, @Nullable IDownloadCompleteCallback argCallback) {
+        Log.d(DEBUG_KEY, "populateQueue");
+
         Cursor subscriptionCursor;
         int subscriptionsAdded = 0;
 
@@ -180,6 +200,7 @@ public class SubscriptionRefreshManager {
             subscriptionsAdded++;
         }
 
+        Log.d(DEBUG_KEY, "populateQueue added: " + subscriptionsAdded);
         return subscriptionsAdded;
     }
 }
