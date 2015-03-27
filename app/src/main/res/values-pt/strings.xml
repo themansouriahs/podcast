@@ -47,7 +47,7 @@
     <string name="menu_back">Recuar</string>
     <string name="menu_ok">OK</string>
     <string name="menu_cancel">Cancelar</string>
-    <string name="menu_refresh">Recarregar</string>
+    <string name="menu_refresh">Atualizar</string>
     <string name="menu_clear">Limpar</string>
     <string name="menu_update">Atualizar</string>
     <string name="menu_manual_update">Atualização manual</string>
@@ -125,7 +125,7 @@
     <string name="hello_world">Olá mundo!</string>
     <string name="menu_settings">Definições</string>
     <string name="title_activity_swipe">SoundWaves</string>
-    <string name="refresh">Recarregar</string>
+    <string name="refresh">Atualizar</string>
     <string name="play">Reproduzir</string>
     <string name="stop">Parar</string>
     <string name="forward">Avançar 10 seg.</string>
@@ -176,7 +176,8 @@
     <string name="playlist_filter_prefix">Mostrar:</string>
     <string name="preference_first_run_key">firstrun</string>
     <string name="menu_feedback">Comentários</string>
-    <string name="menu_refresh_feed">Recarregar</string>
+    <string name="menu_refresh_feed">Atualizar</string>
+    <string name="menu_refresh_feed_all">Atualizar todas</string>
     <string name="crash_toast">Erro (ajude-nos a corrigir o problema enviando um relatório de erros)</string>
     <string name="pref_help_category_title">Ajudar no desenvolvimento de SoundWaves</string>
     <string name="pref_help_static_field_description">Se você quiser ajudar, existem imensas coisas que pode fazer. Pode ajudar na programação ou algo completamente diferente. Pode ajudar na tradução, na criação de ícones e imagens, um sítio web e muito mais. Aceda à nossa página do github (https://github.com/bottiger/SoundWaves) ou envie uma mensagem para: bottiger@gmail.com</string>
