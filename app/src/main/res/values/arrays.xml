@@ -18,7 +18,7 @@
     
      <string-array name="drawer_menu">
         <item>Playlist Filters</item>
-        <item>Downloading items</item>
+        <item>Downloading Items</item>
     </string-array>
     
     <string-array name="entries_update">
