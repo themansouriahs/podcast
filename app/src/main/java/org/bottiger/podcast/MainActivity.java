@@ -200,17 +200,6 @@ public class MainActivity extends FragmentContainerActivity implements
 		receiver = new HeadsetReceiver();
 		registerReceiver(receiver, receiverFilter);
 
-
-
-		/*
-		 * }
-		 * 
-		 * public void onActivityCreated(Bundle savedInstanceState) {
-		 */
-		if (debugging) {
-			EpisodeDownloadManager.cancelAllDownloads(this
-                    .getApplicationContext());
-		}
 	}
 
 	/**

@@ -71,7 +71,7 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 			while (cursor.isAfterLast() == false) {
 				FeedItem feedItem = FeedItem.getByCursor(cursor);
 				if (!feedItem.isDownloaded())
-					EpisodeDownloadManager.addItemToQueue(feedItem);
+					EpisodeDownloadManager.addItemToQueue(feedItem, EpisodeDownloadManager.QUEUE_POSITION.ANYWHERE);
 
 				cursor.moveToNext();
 			}

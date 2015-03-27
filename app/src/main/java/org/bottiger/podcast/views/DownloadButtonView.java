@@ -117,7 +117,7 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
         }
 
         if (getState() == PlayerButtonView.STATE_DEFAULT) {
-            EpisodeDownloadManager.addItemAndStartDownload(mEpisode, mContext.getApplicationContext());
+            EpisodeDownloadManager.addItemAndStartDownload(mEpisode, EpisodeDownloadManager.QUEUE_POSITION.FIRST, mContext.getApplicationContext());
         } else if (getState() == PlayerButtonView.STATE_DELETE) {
             mEpisode.delFile(mContext.getContentResolver());
             setState(PlayerButtonView.STATE_DEFAULT);

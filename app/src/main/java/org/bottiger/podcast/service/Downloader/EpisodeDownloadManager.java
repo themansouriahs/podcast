@@ -55,6 +55,7 @@ public class EpisodeDownloadManager extends Observable {
     public static boolean isDownloading = false;
 
     public enum RESULT { OK, NO_STORAGE, OUT_OF_STORAGE, NO_CONNECTION }
+    public enum QUEUE_POSITION { FIRST, LAST, ANYWHERE}
 
 	// Running processes
 	static AtomicInteger processCounts = new AtomicInteger(0);
@@ -64,18 +65,13 @@ public class EpisodeDownloadManager extends Observable {
 	public static final int WIFI_CONNECT = 2;
 	public static final int MOBILE_CONNECT = 4;
 
-
-    private static HashMap<Long, DownloadFileObserver> mFileObserver = new HashMap<>();
-	private static PriorityQueue<QueueEpisode> mDownloadQueue = new PriorityQueue<>();
+    private static LinkedList<QueueEpisode> mDownloadQueue = new LinkedList<>();
 
 	public static FeedItem mDownloadingItem = null;
 	private static HashSet<Long> mDownloadingIDs = new HashSet<>();
     public static HashMap<Long, IDownloadEngine> mDownloadingEpisodes = new HashMap<>();
 
 	private static int mConnectStatus = NO_CONNECT;
-
-	public static long pref_update_wifi = 0;
-	public static long pref_update_mobile = 0;
 
 	private static DownloadManager downloadManager;
 
@@ -136,16 +132,6 @@ public class EpisodeDownloadManager extends Observable {
 		return DownloadStatus.NOTHING;
 	}
 
-    static void decrementProcessCount() {
-		EpisodeDownloadManager.processCounts.decrementAndGet();
-		if (EpisodeDownloadManager.processCounts.get() == 0) {
-            isDownloading = false;
-			if (mContext != null) {
-                EpisodeDownloadManager.startDownload(mContext);
-            }
-		}
-	}
-
     public void fetchPLaylist() {
         Playlist playlist = PlayerService.getPlaylist();
         playlist.setContext(mContext);
@@ -154,8 +140,9 @@ public class EpisodeDownloadManager extends Observable {
         int max = playlist.size() > 5 ? 5 : playlist.size();
         for (int i = 0; i < max; i++) {
             FeedItem item = playlist.getItem(i);
-            if (item != null && !item.isDownloaded())
-                mDownloadQueue.add(new QueueEpisode(item));
+            if (item != null && !item.isDownloaded()) {
+                addItemToQueue(item, QUEUE_POSITION.LAST);
+            }
         }
     }
 
@@ -186,7 +173,7 @@ public class EpisodeDownloadManager extends Observable {
 				.getSystemService(Context.DOWNLOAD_SERVICE);
 
 		if (getDownloadingItem() == null && mDownloadQueue.size() > 0) {
-			QueueEpisode nextInQueue = getNextItem();
+			QueueEpisode nextInQueue = mDownloadQueue.pollFirst(); //getNextItem();
 			FeedItem downloadingItem = FeedItem.getById(argContext.getContentResolver(), nextInQueue.getId());
 
             /*
@@ -264,10 +251,6 @@ public class EpisodeDownloadManager extends Observable {
 
     public static IDownloadEngine newEngine(@NonNull FeedItem argEpisode) {
         return new OkHttpDownloader(argEpisode);
-    }
-
-    public static HashMap<Long, DownloadFileObserver> getFileObservers() {
-        return mFileObserver;
     }
 
 	/**
@@ -449,10 +432,6 @@ public class EpisodeDownloadManager extends Observable {
 			mDownloadingItem = null;
 	}
 
-	private static QueueEpisode getNextItem() {
-		return mDownloadQueue.poll();
-	}
-
 	/**
 	 * @return the mDownloadingIDs
 	 */
@@ -463,55 +442,25 @@ public class EpisodeDownloadManager extends Observable {
 	/**
 	 * Add feeditem to the download queue
 	 */
-	public static void addItemToQueue(FeedItem item) {
-		QueueEpisode queueItem = new QueueEpisode(item);
-		if (!mDownloadQueue.contains(queueItem))
-			mDownloadQueue.add(queueItem);
-	}
-	
-	/**
-	 * Replace item in the queue
-	 */
-	public static void replace(QueueEpisode episode) {
-		if (mDownloadQueue.remove(episode)) {
-			mDownloadQueue.add(episode);
-		}
-	}
-	
-	public static PriorityQueue<QueueEpisode> getQueue() {
-		return mDownloadQueue;
-	}
+	public static synchronized void addItemToQueue(FeedItem argEpisode, QUEUE_POSITION argPosition) {
+		QueueEpisode queueItem = new QueueEpisode(argEpisode);
 
-	/**
-	 * Cancel all current downloads
-	 */
-	public static void cancelAllDownloads(Context context) {
+        if (argPosition == QUEUE_POSITION.ANYWHERE) {
+            if (!mDownloadQueue.contains(queueItem))
+                mDownloadQueue.add(queueItem);
 
-		downloadManager = (DownloadManager) context
-				.getSystemService(Context.DOWNLOAD_SERVICE);
+            return;
+        }
 
-		Query query = new Query();
-		query.setFilterByStatus(DownloadManager.STATUS_RUNNING
-				| DownloadManager.STATUS_PENDING
-				| DownloadManager.STATUS_FAILED | DownloadManager.STATUS_PAUSED
-				| DownloadManager.STATUS_SUCCESSFUL);
-		Cursor cursor = downloadManager.query(query);
+        if (mDownloadQueue.contains(queueItem)) {
+            mDownloadQueue.remove(queueItem);
+        }
 
-		int counter = 0;
-
-		if (cursor.moveToFirst()) {
-			do {
-				counter++;
-				int cursorIndex = cursor
-						.getColumnIndex(DownloadManager.COLUMN_ID);
-				Long downloadID = cursor.getLong(cursorIndex);
-
-				downloadManager.remove(downloadID);
-
-			} while (cursor.moveToNext());
-		}
-
-		counter = counter + 1;
+        if (argPosition == QUEUE_POSITION.FIRST) {
+            mDownloadQueue.addFirst(queueItem);
+        } else if (argPosition == QUEUE_POSITION.LAST) {
+            mDownloadQueue.addLast(queueItem);
+        }
 	}
 
 	/**
@@ -520,8 +469,8 @@ public class EpisodeDownloadManager extends Observable {
 	 * @param feedItem
 	 * @param context
 	 */
-	public static void addItemAndStartDownload(FeedItem item, Context context) {
-		mDownloadQueue.add(new QueueEpisode(item));
+	public static void addItemAndStartDownload(@NonNull FeedItem item, @NonNull QUEUE_POSITION argPosition, @NonNull Context context) {
+        addItemToQueue(item, argPosition);
 		startDownload(context);
 	}
 
@@ -534,17 +483,7 @@ public class EpisodeDownloadManager extends Observable {
         }
         return mDownloadProgressObservable;
     }
-    /**
-     *
-     * @param argDownloadProgressObservable
-     */
-    public static void addDownloadProgressObservable(DownloadProgressObservable argDownloadProgressObservable) {
-        if (mDownloadProgressObservable != null) {
-            throw new IllegalStateException("mDownloadProgressObservable must be null");
-        }
 
-        mDownloadProgressObservable = argDownloadProgressObservable;
-    }
 
     public static void resetDownloadProgressObservable() {
         mDownloadProgressObservable = null;

@@ -29,7 +29,7 @@ public class DownloadActivity extends ListActivity {
 		setContentView(R.layout.activity_download);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
-		testQueue = EpisodeDownloadManager.getQueue();
+		//testQueue = EpisodeDownloadManager.getQueue();
 
 		// array = Arrays.sort(testQueue.toArray());
 		QueueEpisode[] array = new QueueEpisode[testQueue.size()];

@@ -94,7 +94,7 @@ public class PodcastService extends IntentService {
 
 	public void downloadItem(ContentResolver context, FeedItem item) {
 		item.prepareDownload(context);
-		EpisodeDownloadManager.addItemToQueue(item);
+		EpisodeDownloadManager.addItemToQueue(item, EpisodeDownloadManager.QUEUE_POSITION.LAST);
 		EpisodeDownloadManager.startDownload(getBaseContext());
 	}
 
