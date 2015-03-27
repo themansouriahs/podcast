@@ -27,6 +27,7 @@ import android.util.Log;
 public class Playlist implements OnDragStateChangedListener {
 
     public static final boolean SHOW_LISTENED_DEFAULT = true;
+    public static final boolean PLAY_NEXT_DEFAULT     = false;
 
 	private static int MAX_SIZE = 20;
     private static Playlist activePlaylist = null;

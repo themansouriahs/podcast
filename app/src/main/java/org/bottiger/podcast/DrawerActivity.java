@@ -92,6 +92,7 @@ public abstract class DrawerActivity extends ToolbarActivity {
     protected TableLayout mDrawerTable;
 
     protected Switch mPlaylistShowListened;
+    protected Switch mAutoPlayNext;
     protected Spinner mPlaylistOrderSpinner;
     protected PlaylistContentSpinner mPlaylistContentSpinner;
     protected PlaylistContentSpinnerAdapter mPlaylistContentSpinnerAdapter;
@@ -164,6 +165,7 @@ public abstract class DrawerActivity extends ToolbarActivity {
         mPlaylistContentSpinner = (PlaylistContentSpinner) findViewById(R.id.drawer_playlist_source);
         mPlaylistOrderSpinner = (Spinner) findViewById(R.id.drawer_playlist_sort_order);
         mPlaylistShowListened = (Switch) findViewById(R.id.slidebar_show_listened);
+        mAutoPlayNext = (Switch) findViewById(R.id.slidebar_show_continues);
 
         List<Subscription> list = Subscription.allAsList(getContentResolver());
         LinkedList<String> slist = new LinkedList<>();
@@ -200,16 +202,19 @@ public abstract class DrawerActivity extends ToolbarActivity {
             }
         });
 
+        // Show listened
         mPlaylistShowListened.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 playlist.setShowListened(isChecked);
             }
         });
-        boolean doSHowListened = mSharedPreferences.getBoolean(ApplicationConfiguration.showListenedKey, Playlist.SHOW_LISTENED_DEFAULT);
-        if (doSHowListened != mPlaylistShowListened.isChecked()) {
-            mPlaylistShowListened.setChecked(doSHowListened);
+        boolean doShowListened = mSharedPreferences.getBoolean(ApplicationConfiguration.showListenedKey, Playlist.SHOW_LISTENED_DEFAULT);
+        if (doShowListened != mPlaylistShowListened.isChecked()) {
+            mPlaylistShowListened.setChecked(doShowListened);
         }
+
+        initAutoPlayNextSwitch();
 
         LinearLayout layout = (LinearLayout) findViewById(R.id.drawer_items);
         NavigationDrawerMenuGenerator navigationDrawerMenuGenerator = new NavigationDrawerMenuGenerator(this);
@@ -347,6 +352,11 @@ public abstract class DrawerActivity extends ToolbarActivity {
 		// Pass any configuration change to the drawer toggls
 		mDrawerToggle.onConfigurationChanged(newConfig);
 	}
+    @Override
+    public void onResume() {
+        initAutoPlayNextSwitch();
+        super.onResume();
+    }
 
 	/**
 	 * Fragment that appears in the "content_frame", shows a planet
@@ -530,6 +540,31 @@ public abstract class DrawerActivity extends ToolbarActivity {
             mSwipeRefreshLayout.setProgressBarTop(0);
         }
         */
+    }
+
+    private void initAutoPlayNextSwitch() {
+        // Auto play next
+        final String playNextKey = getResources().getString(R.string.pref_continuously_playing_key);
+
+        mAutoPlayNext.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mSharedPreferences.edit().putBoolean(playNextKey, isChecked).commit();
+            }
+        });
+        mSharedPreferences.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                if (key == playNextKey) {
+                    mAutoPlayNext.setChecked(sharedPreferences.getBoolean(playNextKey, Playlist.PLAY_NEXT_DEFAULT));
+                }
+            }
+        });
+
+        boolean doPlayNext = mSharedPreferences.getBoolean(playNextKey, Playlist.PLAY_NEXT_DEFAULT);
+        if (doPlayNext != mAutoPlayNext.isChecked()) {
+            mAutoPlayNext.setChecked(doPlayNext);
+        }
     }
 
     class MultiSpinnerListener implements MultiSpinner.MultiSpinnerListener {
