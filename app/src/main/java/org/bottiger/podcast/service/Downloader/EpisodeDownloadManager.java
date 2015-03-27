@@ -1,33 +1,22 @@
 package org.bottiger.podcast.service.Downloader;
 
 import java.io.File;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Observable;
-import java.util.PriorityQueue;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.bottiger.podcast.MainActivity;
-import org.bottiger.podcast.listeners.DownloadFileObserver;
+import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
-import org.bottiger.podcast.parser.JSONFeedParserWrapper;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.QueueEpisode;
-import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.DownloadStatus;
 import org.bottiger.podcast.service.Downloader.engines.IDownloadEngine;
 import org.bottiger.podcast.service.Downloader.engines.OkHttpDownloader;
 import org.bottiger.podcast.service.PlayerService;
-import org.bottiger.podcast.utils.LockHandler;
 import org.bottiger.podcast.utils.SDCardManager;
 
 import android.app.DownloadManager;
@@ -36,6 +25,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -45,33 +35,26 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-
 public class EpisodeDownloadManager extends Observable {
 
     public static final String DEBUG_KEY = "EpisodeDownload";
+    private static final boolean DOWNLOAD_WIFI_ONLY = false;
 
     public static boolean isDownloading = false;
 
     public enum RESULT { OK, NO_STORAGE, OUT_OF_STORAGE, NO_CONNECTION }
     public enum QUEUE_POSITION { FIRST, LAST, ANYWHERE}
+    public enum NETWORK_STATE { OK, RESTRICTED, DISCONNECTED }
 
-	// Running processes
-	static AtomicInteger processCounts = new AtomicInteger(0);
+    private static SharedPreferences sSharedPreferences;
+
 	private static Context mContext = null;
-
-	public static final int NO_CONNECT = 1;
-	public static final int WIFI_CONNECT = 2;
-	public static final int MOBILE_CONNECT = 4;
 
     private static LinkedList<QueueEpisode> mDownloadQueue = new LinkedList<>();
 
 	public static FeedItem mDownloadingItem = null;
 	private static HashSet<Long> mDownloadingIDs = new HashSet<>();
     public static HashMap<Long, IDownloadEngine> mDownloadingEpisodes = new HashMap<>();
-
-	private static int mConnectStatus = NO_CONNECT;
 
 	private static DownloadManager downloadManager;
 
@@ -157,15 +140,17 @@ public class EpisodeDownloadManager extends Observable {
             mContext = argContext;
         }
 
-		SharedPreferences sharedPreferences = PreferenceManager
-				.getDefaultSharedPreferences(argContext);
+        if (sSharedPreferences == null) {
+            sSharedPreferences = PreferenceManager
+                    .getDefaultSharedPreferences(argContext);
+        }
 
 		// Make sure we have access to external storage
 		if (SDCardManager.getSDCardStatusAndCreate() == false) {
 			return RESULT.NO_STORAGE;
 		}
 
-		if (updateConnectStatus(argContext) == NO_CONNECT) {
+		if (updateConnectStatus(argContext) != NETWORK_STATE.OK) {
 			return RESULT.NO_CONNECTION;
 		}
 
@@ -187,7 +172,7 @@ public class EpisodeDownloadManager extends Observable {
 			int networkType = DownloadManager.Request.NETWORK_WIFI;
 
 			// Only Allow mobile network if the user has enabled it
-			if (!sharedPreferences.getBoolean("pref_download_only_wifi", true))
+			if (!sSharedPreferences.getBoolean("pref_download_only_wifi", true))
 				networkType = networkType
 						| DownloadManager.Request.NETWORK_MOBILE;
 
@@ -368,33 +353,48 @@ public class EpisodeDownloadManager extends Observable {
 		}
 	}
 
-	protected static int updateConnectStatus(Context context) {
-		// log.debug("updateConnectStatus");
-		try {
+	protected static NETWORK_STATE updateConnectStatus(@NonNull Context argContext) {
+		Log.d(DEBUG_KEY, "updateConnectStatus");
 
-			ConnectivityManager cm = (ConnectivityManager) context
-					.getSystemService(Context.CONNECTIVITY_SERVICE);
-			NetworkInfo info = cm.getActiveNetworkInfo();
-			if (info == null) {
-				mConnectStatus = NO_CONNECT;
-				return mConnectStatus;
-			}
+        ConnectivityManager cm = (ConnectivityManager) argContext
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
 
-			if (info.isConnected() && (info.getType() == 1)) {
-				mConnectStatus = WIFI_CONNECT;
-				return mConnectStatus;
-			} else {
-				mConnectStatus = MOBILE_CONNECT;
+        if (cm == null) {
+            return NETWORK_STATE.DISCONNECTED;
+        }
 
-				return mConnectStatus;
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			mConnectStatus = NO_CONNECT;
+        NetworkInfo info = cm.getActiveNetworkInfo();
 
-			return mConnectStatus;
-		}
+        if (info == null) {
+            return NETWORK_STATE.DISCONNECTED;
+        }
 
+        if (!info.isConnected()) {
+            return NETWORK_STATE.DISCONNECTED;
+        }
+
+        int networkType = info.getType();
+
+        switch (networkType) {
+            case ConnectivityManager.TYPE_ETHERNET:
+            case ConnectivityManager.TYPE_WIFI:
+            case ConnectivityManager.TYPE_WIMAX:
+            case ConnectivityManager.TYPE_VPN:
+                return NETWORK_STATE.OK;
+            case ConnectivityManager.TYPE_MOBILE:
+            case ConnectivityManager.TYPE_MOBILE_DUN:
+            case ConnectivityManager.TYPE_MOBILE_HIPRI:
+            case ConnectivityManager.TYPE_MOBILE_MMS:
+            {
+                Resources resources = argContext.getResources();
+                String only_wifi_key = resources.getString(R.string.pref_download_only_wifi_key);
+                boolean wifiOnly = sSharedPreferences.getBoolean(only_wifi_key, DOWNLOAD_WIFI_ONLY);
+
+                return wifiOnly ? NETWORK_STATE.RESTRICTED : NETWORK_STATE.OK;
+            }
+        }
+
+        return NETWORK_STATE.OK;
 	}
 
 	/**
@@ -465,8 +465,7 @@ public class EpisodeDownloadManager extends Observable {
 
 	/**
 	 * Add feeditem to the download queue and start downloading at once
-	 * 
-	 * @param feedItem
+	 *
 	 * @param context
 	 */
 	public static void addItemAndStartDownload(@NonNull FeedItem item, @NonNull QUEUE_POSITION argPosition, @NonNull Context context) {

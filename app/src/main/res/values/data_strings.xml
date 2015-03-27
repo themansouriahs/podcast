@@ -2,4 +2,5 @@
 <resources>
     <string name="pref_interface_other_category_key" translatable="false">pref_interface_other_category</string>
     <string name="pref_delete_when_finished_key" translatable="false">pref_delete_when_finished</string>
+    <string name="pref_download_only_wifi_key" translatable="false">pref_download_only_wifi</string>
 </resources>

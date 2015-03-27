@@ -84,7 +84,7 @@ public class SubscriptionRefreshManager {
         Log.d(DEBUG_KEY, "refresh subscription: " + subscription + " (null => all)");
 
 
-        if (EpisodeDownloadManager.updateConnectStatus(mContext) == EpisodeDownloadManager.NO_CONNECT) {
+        if (EpisodeDownloadManager.updateConnectStatus(mContext) != EpisodeDownloadManager.NETWORK_STATE.OK) {
             Log.d(DEBUG_KEY, "refresh aborted, no network");
             return;
         }
