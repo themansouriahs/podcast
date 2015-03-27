@@ -234,6 +234,9 @@ public class PlaylistFragment extends GeastureFragment implements
         // The context is set by the PlayerService
         // I need to make sure that playerservice has been started at this point,
         // or more realisticly that the header is fixed when the context is ready
+        mPlaylist.setContext(getActivity());
+        mPlaylist.populatePlaylistIfEmpty();
+
         if (!mPlaylist.isEmpty()) {
             bindHeader(mPlaylist.first());
         }

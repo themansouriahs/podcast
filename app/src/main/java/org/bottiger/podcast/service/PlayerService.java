@@ -64,7 +64,7 @@ public class PlayerService extends Service implements
 
 	private static NextTrack nextTrack = NextTrack.NEXT_IN_PLAYLIST;
 	
-	private static Playlist sPlaylist = new Playlist();;
+	private static Playlist sPlaylist = new Playlist();
 
 	public static final int PlayerService_STATUS = 1;
 

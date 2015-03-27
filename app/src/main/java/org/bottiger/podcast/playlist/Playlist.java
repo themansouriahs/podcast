@@ -74,11 +74,13 @@ public class Playlist implements OnDragStateChangedListener {
 	}
 
     public void setContext(@NonNull Context argContext) {
-        sharedPreferences = PreferenceManager
-                .getDefaultSharedPreferences(argContext);
-        this.mContext = argContext;
 
-        showListenedVal = sharedPreferences.getBoolean(showListenedKey, showListenedVal);
+        if (mContext == null) {
+            sharedPreferences = PreferenceManager
+                    .getDefaultSharedPreferences(argContext);
+            showListenedVal = sharedPreferences.getBoolean(showListenedKey, showListenedVal);
+        }
+        this.mContext = argContext;
     }
 
 	/**
