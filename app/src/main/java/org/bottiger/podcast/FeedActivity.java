@@ -35,16 +35,15 @@ import org.bottiger.podcast.playlist.FeedCursorLoader;
 import org.bottiger.podcast.playlist.ReorderCursor;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
-import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.PaletteCache;
 import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.utils.WhitenessUtils;
 import org.bottiger.podcast.views.FeedRecyclerView;
 import org.bottiger.podcast.views.FloatingActionButton;
-import org.bottiger.podcast.views.MultiShrink.MultiShrinkScroller;
-import org.bottiger.podcast.views.MultiShrink.QuickFeedImage;
-import org.bottiger.podcast.views.MultiShrink.SchedulingUtils;
+import org.bottiger.podcast.views.MultiShrink.feed.MultiShrinkScroller;
+import org.bottiger.podcast.views.MultiShrink.feed.QuickFeedImage;
+import org.bottiger.podcast.views.MultiShrink.feed.SchedulingUtils;
 
 /**
  * Created by apl on 14-02-2015.

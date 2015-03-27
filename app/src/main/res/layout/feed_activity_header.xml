@@ -16,7 +16,7 @@
 -->
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <org.bottiger.podcast.views.MultiShrink.QuickFeedImage
+    <org.bottiger.podcast.views.MultiShrink.feed.QuickFeedImage
         android:id="@+id/photo"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

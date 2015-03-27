@@ -1,4 +1,4 @@
-package org.bottiger.podcast.views.playlist;
+package org.bottiger.podcast.views.MultiShrink.feed;
 
 import android.content.Context;
 import android.os.Parcelable;
@@ -7,7 +7,7 @@ import android.view.MotionEvent;
 import android.widget.ScrollView;
 
 /**
- * A {@link android.widget.ScrollView} that doesn't respond or intercept touch events.
+ * A {@link ScrollView} that doesn't respond or intercept touch events.
  *
  * This is used in combination with {@link com.android.contacts.widget.MultiShrinkScroller} so
  * that MultiShrinkScroller can handle all scrolling & saving.

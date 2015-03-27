@@ -13,7 +13,6 @@ import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
-import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.BackgroundTransformation;
 import org.bottiger.podcast.utils.PaletteCache;
@@ -25,7 +24,7 @@ import org.bottiger.podcast.views.PlayerButtonView;
 import org.bottiger.podcast.views.PlayerSeekbar;
 import org.bottiger.podcast.views.TextViewObserver;
 import org.bottiger.podcast.views.TopPlayer;
-import org.bottiger.podcast.views.playlist.MultiShrinkScroller;
+import org.bottiger.podcast.views.MultiShrink.playlist.MultiShrinkScroller;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -230,6 +229,11 @@ public class PlaylistFragment extends GeastureFragment implements
         RecentItemsRecyclerListener l = new RecentItemsRecyclerListener(mAdapter);
         mRecyclerView.setRecyclerListener(l);
 
+        // The bug where the player doesn't show up happens because the playlist is empty.
+        // The playlist is empty if the context is null
+        // The context is set by the PlayerService
+        // I need to make sure that playerservice has been started at this point,
+        // or more realisticly that the header is fixed when the context is ready
         if (!mPlaylist.isEmpty()) {
             bindHeader(mPlaylist.first());
         }

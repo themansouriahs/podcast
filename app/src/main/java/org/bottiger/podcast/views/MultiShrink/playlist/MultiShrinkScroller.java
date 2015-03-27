@@ -1,4 +1,4 @@
-package org.bottiger.podcast.views.playlist;
+package org.bottiger.podcast.views.MultiShrink.playlist;
 
 import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
@@ -37,6 +37,7 @@ import android.widget.TextView;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.views.FixedRecyclerView;
 import org.bottiger.podcast.views.FloatingActionButton;
+import org.bottiger.podcast.views.MultiShrink.MultiShrinkScroller.AbstractMultiShrinkScroller;
 import org.bottiger.podcast.views.TopPlayer;
 
 /**
@@ -59,7 +60,7 @@ import org.bottiger.podcast.views.TopPlayer;
  * order to track velocity, modify EdgeEffect color & perform specific animations such as the ones
  * inside snapToBottom(). As a result this ViewGroup has non-standard talkback and keyboard support.
  */
-public class MultiShrinkScroller extends FrameLayout {
+public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
 
     /**
      * 1000 pixels per millisecond. Ie, 1 pixel per second.
@@ -86,7 +87,6 @@ public class MultiShrinkScroller extends FrameLayout {
      */
     private static final float MAXIMUM_FLING_VELOCITY = 3000;
 
-    private float[] mLastEventPosition = { 0, 0 };
     private VelocityTracker mVelocityTracker;
     private boolean mIsBeingDragged = false;
     private boolean mReceivedDown = false;
@@ -129,7 +129,6 @@ public class MultiShrinkScroller extends FrameLayout {
 
     private final Scroller mScroller;
     private final EdgeEffect mEdgeGlowBottom;
-    private final int mTouchSlop;
     private final int mMaximumVelocity;
     private final int mMinimumVelocity;
     private final int mTransparentStartHeight;
@@ -233,7 +232,6 @@ public class MultiShrinkScroller extends FrameLayout {
 
         mEdgeGlowBottom = new EdgeEffect(context);
         mScroller = new Scroller(context, sInterpolator);
-        mTouchSlop = configuration.getScaledTouchSlop();
         mMinimumVelocity = configuration.getScaledMinimumFlingVelocity();
         mMaximumVelocity = (int)TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP, MAXIMUM_FLING_VELOCITY,
@@ -897,14 +895,6 @@ public class MultiShrinkScroller extends FrameLayout {
     private void updateLastEventPosition(MotionEvent event) {
         mLastEventPosition[0] = event.getX();
         mLastEventPosition[1] = event.getY();
-    }
-
-    private boolean motionShouldStartDrag(MotionEvent event) {
-        final float deltaX = event.getX() - mLastEventPosition[0];
-        final float deltaY = event.getY() - mLastEventPosition[1];
-        final boolean draggedX = (deltaX > mTouchSlop || deltaX < -mTouchSlop);
-        final boolean draggedY = (deltaY > mTouchSlop || deltaY < -mTouchSlop);
-        return draggedY && !draggedX;
     }
 
     private float updatePositionAndComputeDelta(MotionEvent event) {

@@ -11,7 +11,7 @@ import org.bottiger.podcast.utils.BackgroundTransformation;
 import org.bottiger.podcast.utils.PaletteCache;
 import org.bottiger.podcast.views.FeedRecyclerView;
 import org.bottiger.podcast.views.FloatingActionButton;
-import org.bottiger.podcast.views.MultiShrink.MultiShrinkScroller;
+import org.bottiger.podcast.views.MultiShrink.feed.MultiShrinkScroller;
 
 import android.annotation.TargetApi;
 import android.app.Activity;

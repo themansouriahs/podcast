@@ -1,4 +1,4 @@
-package org.bottiger.podcast.views.playlist;
+package org.bottiger.podcast.views.MultiShrink.feed;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -12,10 +12,10 @@ import android.widget.ImageView;
 import org.bottiger.podcast.R;
 
 /**
- * An {@link android.widget.ImageView} designed to display QuickContact's contact photo. When requested to draw
+ * An {@link ImageView} designed to display QuickContact's contact photo. When requested to draw
  * {@link LetterTileDrawable}'s, this class instead draws a different default avatar drawable.
  *
- * In addition to supporting {@link android.widget.ImageView#setColorFilter} this also supports a {@link #setTint}
+ * In addition to supporting {@link ImageView#setColorFilter} this also supports a {@link #setTint}
  * method.
  *
  * This entire class can be deleted once use of LetterTileDrawable is no longer used

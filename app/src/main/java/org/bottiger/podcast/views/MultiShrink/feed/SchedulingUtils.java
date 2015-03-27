@@ -1,4 +1,4 @@
-package org.bottiger.podcast.views.playlist;
+package org.bottiger.podcast.views.MultiShrink.feed;
 
 /**
  * Created by apl on 14-02-2015.

@@ -1,4 +1,4 @@
-package org.bottiger.podcast.views.playlist;
+package org.bottiger.podcast.views.MultiShrink.feed;
 
 import android.annotation.TargetApi;
 import android.os.Build;

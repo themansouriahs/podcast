@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<org.bottiger.podcast.views.playlist.MultiShrinkScroller
+<org.bottiger.podcast.views.MultiShrink.playlist.MultiShrinkScroller
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/playlist_container"
     android:fillViewport="true"
@@ -22,4 +22,4 @@
 
     </LinearLayout>
 
-</org.bottiger.podcast.views.playlist.MultiShrinkScroller>
+</org.bottiger.podcast.views.MultiShrink.playlist.MultiShrinkScroller>
