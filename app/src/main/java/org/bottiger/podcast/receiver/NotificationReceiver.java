@@ -37,6 +37,11 @@ public class NotificationReceiver extends  BroadcastReceiver {
             return;
         }
 
+        if (action.equals(nextAction)) {
+            mPlayerServiceBinder.playNext();
+            return;
+        }
+
 		
 		if (action.equals(toggleAction)) {
 			Boolean isPlaying = false;
@@ -51,9 +56,6 @@ public class NotificationReceiver extends  BroadcastReceiver {
             np.setPlayerService(mPlayerServiceBinder);
 			np.show(isPlaying);
 		}
-		
-		if (action.equals(nextAction)) {
-		} 
 		
 	}
 	

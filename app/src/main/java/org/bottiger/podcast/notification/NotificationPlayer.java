@@ -184,7 +184,7 @@ public class NotificationPlayer {
         PendingIntent pendingNextIntent = PendingIntent.getBroadcast(mContext, 0, nextIntent, 0);
 
         layout.setOnClickPendingIntent(R.id.play_pause_button,pendingToggleIntent);
-        //layout.setOnClickPendingIntent(R.id.next_button,pendingNextIntent);
+        layout.setOnClickPendingIntent(R.id.next_button,pendingNextIntent);
 
         //PlayerStatusListener.registerImageView(, mContext);
 

@@ -55,7 +55,7 @@ public class PlayerHandler {
                                 mPlayerService.dis_notifyStatus();
                                 mPlayerService.getPlayer().stop();
                             } else if (repeat_mode) {
-                                mPlayerService.playNext(nextItemId);
+                                mPlayerService.playNext();
                             }
                             mPlayerService.setUpdateStatus(true);
                         }

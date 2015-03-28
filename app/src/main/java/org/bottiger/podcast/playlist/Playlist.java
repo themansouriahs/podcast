@@ -115,6 +115,10 @@ public class Playlist implements OnDragStateChangedListener {
 		return mInternalPlaylist.get(position);
 	}
 
+    public FeedItem getNext() {
+        return getItem(1);
+    }
+
 	/**
 	 * 
 	 * @param episode

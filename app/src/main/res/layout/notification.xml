@@ -17,9 +17,9 @@
     <TextView
             android:id="@+id/notification_title"
             android:layout_toRightOf="@id/icon"
+            android:layout_toLeftOf="@id/play_pause_button"
             android:layout_marginTop="7dp"
             android:layout_marginLeft="7dp"
-            android:layout_marginRight="53dp"
             android:text="Title"
             style="Custom Notification Title"
             android:layout_width="wrap_content"
@@ -28,14 +28,17 @@
             android:textSize="16sp"
             android:textColor="@color/black"
              />
+    <!--
+    android:layout_marginRight="53dp"
+    -->
 
     <TextView
             android:id="@+id/notification_content"
             android:layout_below="@id/notification_title"
             android:layout_toRightOf="@id/icon"
+            android:layout_toLeftOf="@id/play_pause_button"
             android:layout_marginTop="7dp"
             android:layout_marginLeft="7dp"
-            android:layout_marginRight="53dp"
             android:text="Content"
             style="Custom Notification Text"
             android:layout_width="wrap_content"
@@ -45,14 +48,23 @@
             android:textColor="@color/grayStart"/>
 
     <ImageView
-        android:id="@+id/play_pause_button"
+        android:id="@+id/next_button"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:adjustViewBounds="true"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:src="@drawable/ic_play_arrow_black"
-        android:layout_marginRight="20dp" />
+        android:src="@drawable/ic_fast_forward_black"
+        android:layout_marginRight="10dp" />
 
-    
+    <ImageView
+        android:id="@+id/play_pause_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:adjustViewBounds="true"
+        android:layout_toLeftOf="@id/next_button"
+        android:layout_centerVertical="true"
+        android:src="@drawable/ic_play_arrow_black"
+        android:layout_marginRight="5dp" />
+
 </RelativeLayout>

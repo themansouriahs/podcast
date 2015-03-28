@@ -269,14 +269,25 @@ public class PlayerService extends Service implements
 		return mNotificationPlayer.show();
     }
 
-	public void playNext(long nextId) {
+	public void playNext() {
 		// assert playlistAdapter != null;
 
 		// Cursor firstItem = (Cursor) playlistAdapter.getItem(0);
 		// playlistAdapter.notifyDataSetChanged();
-		if (mItem != null)
-			mItem.trackEnded(getContentResolver());
-		play(nextId);
+        FeedItem item = getCurrentItem();
+        FeedItem nextItem = sPlaylist.getNext();
+
+		if (item != null) {
+            item.trackEnded(getContentResolver());
+        }
+
+        if (nextItem == null) {
+            stop();
+            return;
+        }
+
+		play(nextItem.getId());
+        sPlaylist.notifyPlaylistChanged();
 	}
 
 	public void play(long id) {
