@@ -25,11 +25,15 @@ import org.bottiger.podcast.views.PlayerSeekbar;
 import org.bottiger.podcast.views.TextViewObserver;
 import org.bottiger.podcast.views.TopPlayer;
 import org.bottiger.podcast.views.MultiShrink.playlist.MultiShrinkScroller;
+import org.bottiger.podcast.views.dialogs.DialogBulkDownload;
+import org.bottiger.podcast.views.dialogs.DialogOPML;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
@@ -452,40 +456,53 @@ public class PlaylistFragment extends GeastureFragment implements
     }
 
 
-	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v,
-			ContextMenuInfo menuInfo) {
-		super.onCreateContextMenu(menu, v, menuInfo);
-		MenuInflater inflater = mActivity.getMenuInflater();
-		//inflater.inflate(R.menu.podcast_context, menu);
-		PlaylistFragment.setContextMenu(PLAYLIST_CONTEXT_MENU, this);
-	}
+     @Override
+     public void onCreateContextMenu(ContextMenu menu, View v,
+                                     ContextMenuInfo menuInfo) {
+         super.onCreateContextMenu(menu, v, menuInfo);
+         MenuInflater inflater = mActivity.getMenuInflater();
+         //inflater.inflate(R.menu.podcast_context, menu);
+         PlaylistFragment.setContextMenu(PLAYLIST_CONTEXT_MENU, this);
+     }
 
-    @Override
-    public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.playlist_actionbar, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-        return;
-    }
+     @Override
+     public boolean onContextItemSelected(MenuItem item) {
 
-	@Override
-	public boolean onContextItemSelected(MenuItem item) {
+         if (!AdapterView.AdapterContextMenuInfo.class.isInstance(item
+                 .getMenuInfo()))
+             return false;
 
-		if (!AdapterView.AdapterContextMenuInfo.class.isInstance(item
-				.getMenuInfo()))
-			return false;
+         if (CONTEXT_MENU == PLAYLIST_CONTEXT_MENU) {
+             return playlistContextMenu(item);
+         } else if (CONTEXT_MENU == SUBSCRIPTION_CONTEXT_MENU) {
+             if (CONTEXT_FRAGMENT != null)
+                 return ((SubscriptionsFragment) CONTEXT_FRAGMENT)
+                         .subscriptionContextMenu(item);
+         }
 
-		if (CONTEXT_MENU == PLAYLIST_CONTEXT_MENU) {
-			return playlistContextMenu(item);
-		} else if (CONTEXT_MENU == SUBSCRIPTION_CONTEXT_MENU) {
-			if (CONTEXT_FRAGMENT != null)
-				return ((SubscriptionsFragment) CONTEXT_FRAGMENT)
-						.subscriptionContextMenu(item);
-		}
+         return false;
 
-		return false;
+     }
 
-	}
+     @Override
+     public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
+         inflater.inflate(R.menu.playlist_actionbar, menu);
+         super.onCreateOptionsMenu(menu, inflater);
+         return;
+     }
+
+     @Override
+     public boolean onOptionsItemSelected(MenuItem item) {
+         switch (item.getItemId()) {
+             case R.id.menu_bulk_download: {
+                 DialogBulkDownload dialogBulkDownload = new DialogBulkDownload();
+                 Dialog dialog = dialogBulkDownload.onCreateDialog(getActivity(), mPlaylist);
+                 dialog.show();
+                 return true;
+             }
+         }
+         return super.onOptionsItemSelected(item);
+     }
 
 	public boolean playlistContextMenu(MenuItem item) {
 		AdapterView.AdapterContextMenuInfo cmi = (AdapterView.AdapterContextMenuInfo) item

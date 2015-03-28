@@ -29,7 +29,7 @@ public class DialogAddPodcast {
 		AlertDialog.Builder alertBuilder = new AlertDialog.Builder(activity);
 
 		View alertView = activity.getLayoutInflater().inflate(
-				R.layout.add_podcast_dialog, null);
+				R.layout.dialog_add_podcast, null);
 		alertBuilder.setView(alertView);
 
         alertBuilder.setTitle(R.string.dialog_title_add_sub);

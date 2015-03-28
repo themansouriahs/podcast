@@ -65,7 +65,7 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.menu_download_all: {
+		case R.id.menu_bulk_download: {
 			Cursor cursor = createCursor(getWhere(), getOrder());
 			cursor.moveToFirst();
 			while (cursor.isAfterLast() == false) {

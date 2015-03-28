@@ -286,11 +286,7 @@ public class EpisodeDownloadManager extends Observable {
 			SharedPreferences sharedPreferences = PreferenceManager
 					.getDefaultSharedPreferences(mContext);
 
-			String megabytesToKeepAsString = sharedPreferences.getString(
-					"pref_podcast_collection_size", "1000");
-
-			long megabytesToKeep = Long.parseLong(megabytesToKeepAsString);
-			long bytesToKeep = megabytesToKeep * 1024 * 1024;
+            long bytesToKeep = bytesToKeep(sharedPreferences);
 
 			try {
 				// Fetch all downloaded podcasts
@@ -491,5 +487,15 @@ public class EpisodeDownloadManager extends Observable {
 
     public static void resetDownloadProgressObservable() {
         mDownloadProgressObservable = null;
+    }
+
+    public static long bytesToKeep(@NonNull SharedPreferences argSharedPreference) {
+        String megabytesToKeepAsString = argSharedPreference.getString(
+                "pref_podcast_collection_size", "1000");
+
+        long megabytesToKeep = Long.parseLong(megabytesToKeepAsString);
+        long bytesToKeep = megabytesToKeep * 1024 * 1024;
+
+        return bytesToKeep;
     }
 }

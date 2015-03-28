@@ -29,7 +29,7 @@ public class Playlist implements OnDragStateChangedListener {
     public static final boolean SHOW_LISTENED_DEFAULT = true;
     public static final boolean PLAY_NEXT_DEFAULT     = false;
 
-	private static int MAX_SIZE = 20;
+	private static int MAX_SIZE = 100;
     private static Playlist activePlaylist = null;
 
     private static final String mSortNew = "DESC";

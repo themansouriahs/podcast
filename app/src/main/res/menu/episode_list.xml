@@ -7,7 +7,7 @@
         android:title="@string/menu_clear_playlist">
     </item>
     <item
-        android:id="@+id/menu_download_all"
+        android:id="@+id/menu_bulk_download"
         android:orderInCategory="300"
         android:title="@string/menu_download_all">
     </item>

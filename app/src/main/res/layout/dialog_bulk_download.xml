@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:padding="10dp"
+    android:layout_gravity="center_horizontal">
+
+    <TextView
+        android:id="@+id/dialog_bulk_download_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:padding="10dp"
+        android:text="@string/bulk_download_instructions"
+        />
+
+    <RadioGroup
+        android:id="@+id/radio_bulk_download_action"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:orientation="vertical">
+
+    <RadioButton
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:text="@string/bulk_download_day"
+        android:id="@+id/radio_day" />
+
+    <RadioButton
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:text="@string/bulk_download_week"
+        android:id="@+id/radio_week" />
+
+    <RadioButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="@string/bulk_download_month"
+            android:id="@+id/radio_month" />
+
+    </RadioGroup>
+
+</LinearLayout>
