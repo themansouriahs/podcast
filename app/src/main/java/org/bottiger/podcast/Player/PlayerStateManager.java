@@ -29,6 +29,7 @@ import org.bottiger.podcast.service.PlayerService;
 @TargetApi(21)
 public class PlayerStateManager {
 
+    private static final String DEBUG_KEY = "PlayerStateManager";
     private static final String SESSION_TAG = "SWMediaSession";
 
     private FeedItem mEpisode;
@@ -40,7 +41,7 @@ public class PlayerStateManager {
     private Target target = new Target() {
         @Override
         public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-            Log.d("RemoteController", "Updating remote control (with background)");
+            Log.d(DEBUG_KEY, "Updating remote control (with background)");
             mAlbumArt = bitmap;
             //updateSimpleMetaData(editor, episode);
             updateState(mEpisode, false);
@@ -48,7 +49,7 @@ public class PlayerStateManager {
 
         @Override
         public void onBitmapFailed(Drawable errorDrawable) {
-            Log.d("RemoteController", "BACKGROUND failed to load");
+            Log.d(DEBUG_KEY, "BACKGROUND failed to load");
             return;
         }
 
@@ -59,6 +60,8 @@ public class PlayerStateManager {
     };
 
     public PlayerStateManager(@NonNull PlayerService argService) {
+        Log.d(DEBUG_KEY, "Constructor");
+
         if (Build.VERSION.SDK_INT < 21) {
             throw new IllegalStateException("This should never have been called using this SDK level");
         }
@@ -83,16 +86,18 @@ public class PlayerStateManager {
 
     public void updateState(@NonNull FeedItem argEpisode, boolean updateAlbumArt) {
         String albumNull = mAlbumArt == null ? "Null" : "Not null";
-        Log.d("PlayerStateManager", "updateState: updateAlbumState: " + updateAlbumArt + " album: " + albumNull);
+        Log.d(DEBUG_KEY, "updateState: updateAlbumState: " + updateAlbumArt + " album: " + albumNull);
         MediaMetadata.Builder mMetaBuilder = new MediaMetadata.Builder();
 
         populateFastMediaMetadata(mMetaBuilder, argEpisode);
 
         if (updateAlbumArt || mAlbumArt == null) {
+            Log.d(DEBUG_KEY, "Updating album art");
             mEpisode = argEpisode;
             argEpisode.getArtworAsync(mPlaserService, target);
+            return;
         } else {
-            
+            Log.d(DEBUG_KEY, "Found album art");
             mMetaBuilder.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, mAlbumArt);
             mMetaBuilder.putBitmap(MediaMetadata.METADATA_KEY_ART, mAlbumArt);
             mMetaBuilder.putBitmap(MediaMetadata.METADATA_KEY_DISPLAY_ICON, mAlbumArt);
@@ -121,7 +126,15 @@ public class PlayerStateManager {
 
         stateBuilder.setActiveQueueItemId(MediaSession.QueueItem.UNKNOWN_ID);
 
-        long actions = PlaybackState.ACTION_PLAY_PAUSE | PlaybackState.ACTION_STOP | PlaybackState.ACTION_SKIP_TO_NEXT | PlaybackState.ACTION_SKIP_TO_PREVIOUS;
+        long actions = PlaybackState.ACTION_PLAY_PAUSE |
+                        PlaybackState.ACTION_REWIND |
+                        PlaybackState.ACTION_PLAY |
+                        PlaybackState.ACTION_PAUSE |
+                        PlaybackState.ACTION_STOP |
+                        PlaybackState.ACTION_FAST_FORWARD |
+                        PlaybackState.ACTION_SEEK_TO |
+                        PlaybackState.ACTION_SKIP_TO_NEXT |
+                        PlaybackState.ACTION_SKIP_TO_PREVIOUS;
 
         stateBuilder.setActions(actions);
         stateBuilder.setState(PlaybackState.STATE_PLAYING, 0, 1.0f);

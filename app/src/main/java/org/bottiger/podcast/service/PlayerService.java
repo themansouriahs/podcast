@@ -315,6 +315,11 @@ public class PlayerService extends Service implements
             dataSource = HTTPDService.proxyURL(mItem.id);
 
 		mPlayer.setDataSourceAsync(dataSource, offset);
+
+        FeedItem item = getCurrentItem();
+        if (item != null) {
+            mMetaDataControllerWrapper.updateState(item, false);
+        }
 		
 	    new Thread(new Runnable() {
 	        public void run() {
@@ -354,12 +359,6 @@ public class PlayerService extends Service implements
 		if (mPlayer.isPlaying() == false) {
             takeWakelock(mPlayer.isSteaming());
 			mPlayer.start();
-
-            // FIXME maybe we should not do this before we are sure getCUrrentItem() will return something.
-            FeedItem item = getCurrentItem();
-            if (item != null) {
-                mMetaDataControllerWrapper.updateState(item, true);
-            }
 		}
 	}
 

@@ -42,7 +42,7 @@ public class FeedHandler {
             File file = new File(subscription.url);
             InputStream stream = new ByteArrayInputStream(feedContent.getBytes());
 
-            Reader inputStreamReader = new XmlStreamReader(stream);
+            Reader inputStreamReader = new XmlStreamReader(stream, false, "UTF-8");
             InputSource inputSource = new InputSource(inputStreamReader);
 
             saxParser.parse(inputSource, handler);
