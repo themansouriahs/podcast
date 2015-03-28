@@ -1,5 +1,19 @@
 Changelog
 ==========
+version 0.84
+------------
+* Bulk download of the playlist
+* Much more robust download queue
+* Skip to next button the in notification controls
+* Better album art on the lockscreen in lolipop
+* Fixed crashes
+* Fixed issue where the top episode in the playlist was missing
+* Fixed a scrolling issue in the playlist
+* More consistent string format
+* Robust 'download folder' size limits
+* Robust 'download only using wifi'
+* Refresh all subscriptions option
+* Delete when listened option
 
 version 0.82
 ------------
