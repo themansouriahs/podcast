@@ -54,7 +54,7 @@
         android:adjustViewBounds="true"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:src="@drawable/ic_fast_forward_black"
+        android:src="@drawable/ic_skip_next_black"
         android:layout_marginRight="10dp" />
 
     <ImageView
