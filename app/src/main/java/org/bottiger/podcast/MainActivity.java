@@ -7,12 +7,10 @@ import org.bottiger.podcast.cloud.CloudProvider;
 import org.bottiger.podcast.cloud.drive.DriveSyncer;
 import org.bottiger.podcast.debug.SqliteCopy;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
-import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
-import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
 import org.bottiger.podcast.service.HTTPDService;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.service.PodcastService;
-import org.bottiger.podcast.views.dialogs.AddPodcastDialog;
+import org.bottiger.podcast.views.dialogs.DialogAddPodcast;
 import org.bottiger.podcast.utils.ThemeHelper;
 import org.bottiger.podcast.utils.TransitionUtils;
 
@@ -356,7 +354,7 @@ public class MainActivity extends FragmentContainerActivity implements
 			return true;*/
 		case R.id.menu_add:
 			// mDriveUtils.driveAccount();
-			AddPodcastDialog.addPodcast(this);
+			DialogAddPodcast.addPodcast(this);
 			return true;
 		case R.id.menu_settings:
             TransitionUtils.openSettings(this);
