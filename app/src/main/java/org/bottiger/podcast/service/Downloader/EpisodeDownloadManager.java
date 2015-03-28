@@ -356,6 +356,11 @@ public class EpisodeDownloadManager extends Observable {
 	protected static NETWORK_STATE updateConnectStatus(@NonNull Context argContext) {
 		Log.d(DEBUG_KEY, "updateConnectStatus");
 
+        if (sSharedPreferences == null) {
+            sSharedPreferences = PreferenceManager
+                    .getDefaultSharedPreferences(argContext);
+        }
+
         ConnectivityManager cm = (ConnectivityManager) argContext
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
 
