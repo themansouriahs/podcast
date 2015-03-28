@@ -115,7 +115,7 @@ public class DialogBulkDownload {
             boolean doDownload = validDate(mAction, date);
 
             if (doDownload) {
-                EpisodeDownloadManager.addItemToQueue(episode, EpisodeDownloadManager.QUEUE_POSITION.FIRST);
+                EpisodeDownloadManager.addItemToQueue(episode, EpisodeDownloadManager.QUEUE_POSITION.LAST);
             }
         }
 
