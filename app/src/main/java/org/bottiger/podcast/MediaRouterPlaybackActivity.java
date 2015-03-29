@@ -14,6 +14,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.android.gms.cast.CastMediaControlIntent;
+
 import org.bottiger.podcast.flavors.MediaCast.VendorMediaCast;
 
 /**
@@ -63,7 +65,8 @@ public class MediaRouterPlaybackActivity extends ToolbarActivity {
                 // These are the framework-supported intents
                 .addControlCategory(MediaControlIntent.CATEGORY_LIVE_AUDIO)
                 .addControlCategory(MediaControlIntent.CATEGORY_LIVE_VIDEO)
-                //.addControlCategory(MediaControlIntent.CATEGORY_REMOTE_PLAYBACK)
+                .addControlCategory(MediaControlIntent.CATEGORY_REMOTE_PLAYBACK)
+                //.addControlCategory(CastMediaControlIntent.DEFAULT_MEDIA_RECEIVER_APPLICATION_ID)
                 .build();
     }
 

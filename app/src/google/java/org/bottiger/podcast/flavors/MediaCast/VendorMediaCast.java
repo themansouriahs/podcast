@@ -2,6 +2,7 @@ package org.bottiger.podcast.flavors.MediaCast;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.media.MediaRouter;
 import android.util.Log;
 
@@ -31,8 +32,8 @@ public class VendorMediaCast {
     private Context mContext;
     private GoogleApiClient mApiClient;
     //private Cast.Listener mCastClientListener;
-    private ConnectionCallbacks mConnectionCallbacks;
-    private ConnectionFailedListener mConnectionFailedListener;
+    private ConnectionCallbacks mConnectionCallbacks = new ConnectionCallbacks();
+    private ConnectionFailedListener mConnectionFailedListener = new ConnectionFailedListener();
     private boolean mWaitingForReconnect = false;
     private boolean mApplicationStarted;
 
@@ -102,6 +103,10 @@ public class VendorMediaCast {
                     }
                 });
 
+        connect();
+    }
+
+    public void launch() {
         try {
             Cast.CastApi.setMessageReceivedCallbacks(mApiClient,
                     mRemoteMediaPlayer.getNamespace(), mRemoteMediaPlayer);
@@ -119,10 +124,33 @@ public class VendorMediaCast {
                                 }
                             }
                         });
+
     }
 
-    public void launch() {
-
+    public void loadMedia(@NonNull String argTitle, @NonNull String argUrl, @NonNull String argContentType) {
+        MediaMetadata mediaMetadata = new MediaMetadata(MediaMetadata.MEDIA_TYPE_MOVIE);
+        mediaMetadata.putString(MediaMetadata.KEY_TITLE, argTitle);
+        MediaInfo mediaInfo = new MediaInfo.Builder(
+                argUrl)
+                .setContentType(argContentType) // "video/mp4"
+                .setStreamType(MediaInfo.STREAM_TYPE_BUFFERED)
+                .setMetadata(mediaMetadata)
+                .build();
+        try {
+            mRemoteMediaPlayer.load(mApiClient, mediaInfo, true)
+                    .setResultCallback(new ResultCallback<RemoteMediaPlayer.MediaChannelResult>() {
+                        @Override
+                        public void onResult(RemoteMediaPlayer.MediaChannelResult result) {
+                            if (result.getStatus().isSuccess()) {
+                                Log.d(TAG, "Media loaded successfully");
+                            }
+                        }
+                    });
+        } catch (IllegalStateException e) {
+            Log.e(TAG, "Problem occurred with media during loading", e);
+        } catch (Exception e) {
+            Log.e(TAG, "Problem opening media during loading", e);
+        }
     }
 
     public void connect() {
@@ -140,6 +168,7 @@ public class VendorMediaCast {
                 //reconnectChannels();
             } else {
                 try {
+                    /*
                     Cast.CastApi.launchApplication(mApiClient, APPLICATION_ID, false)
                             .setResultCallback(
                                     new ResultCallback<Cast.ApplicationConnectionResult>() {
@@ -158,6 +187,7 @@ public class VendorMediaCast {
                                             }
                                         }
                                     });
+                                    */
 
                 } catch (Exception e) {
                     Log.e(TAG, "Failed to launch application", e);
