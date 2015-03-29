@@ -208,7 +208,7 @@
     <string name="pref_network_category_storage_experimental">Experimental</string>
     <string name="pref_delete_when_finished_title">Delete After Playback</string>
     <string name="pref_delete_when_finished_description">Episodes are automatically deleted after being played</string>
-    <string name="bulk_download_instructions">Download all episodes in the playlist form the</string>
+    <string name="bulk_download_instructions">Download all episodes in the playlist for the</string>
     <string name="bulk_download_day">Last Day</string>
     <string name="bulk_download_week">Last Week</string>
     <string name="bulk_download_month">Last Month</string>
