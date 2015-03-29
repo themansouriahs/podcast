@@ -81,7 +81,7 @@ import com.android.volley.toolbox.ImageLoader;
  * overlay on top of the current content.
  * </p>
  */
-public abstract class DrawerActivity extends ToolbarActivity {
+public abstract class DrawerActivity extends MediaRouterPlaybackActivity {
 
     protected SharedPreferences mSharedPreferences;
 

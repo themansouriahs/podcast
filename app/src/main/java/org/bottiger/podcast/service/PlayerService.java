@@ -1,11 +1,13 @@
 package org.bottiger.podcast.service;
 
+import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.Player.LegacyRemoteController;
 import org.bottiger.podcast.Player.MetaDataControllerWrapper;
 import org.bottiger.podcast.Player.PlayerHandler;
 import org.bottiger.podcast.Player.PlayerPhoneListener;
 import org.bottiger.podcast.Player.PlayerStateManager;
 import org.bottiger.podcast.Player.SoundWavesPlayer;
+import org.bottiger.podcast.flavors.MediaCast.VendorMediaCast;
 import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
@@ -33,8 +35,12 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
+import android.support.v7.media.MediaControlIntent;
+import android.support.v7.media.MediaRouteSelector;
+import android.support.v7.media.MediaRouter;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 
 import javax.annotation.Nullable;
 
@@ -46,6 +52,8 @@ import javax.annotation.Nullable;
  */
 public class PlayerService extends Service implements
 		AudioManager.OnAudioFocusChangeListener {
+
+    private static final String TAG = "PlayerService";
 
     public static final String ACTION_PLAY = "action_play";
     public static final String ACTION_PAUSE = "action_pause";
@@ -85,7 +93,37 @@ public class PlayerService extends Service implements
     private PlayerStateManager mPlayerStateManager;
     private LegacyRemoteController mLegacyRemoteController;
 
-	private NotificationManager mNotificationManager;
+    // Google Cast
+    private MediaRouter mMediaRouter;
+    private MediaRouteSelector mSelector;
+    private VendorMediaCast mMediaCast;
+    private final MediaRouter.Callback mMediaRouterCallback =
+            new MediaRouter.Callback() {
+
+                @Override
+                public void onRouteSelected(MediaRouter router, MediaRouter.RouteInfo route) {
+                    Log.d(TAG, "onRouteSelected: route=" + route);
+
+                    mMediaCast = new VendorMediaCast(PlayerService.this, router, route);
+                }
+
+                @Override
+                public void onRouteUnselected(MediaRouter router, MediaRouter.RouteInfo route) {
+                    Log.d(TAG, "onRouteUnselected: route=" + route);
+
+                    mMediaCast = null;
+
+                }
+
+                @Override
+                public void onRoutePresentationDisplayChanged(
+                        MediaRouter router, MediaRouter.RouteInfo route) {
+                    Log.d(TAG, "onRoutePresentationDisplayChanged: route=" + route);
+                }
+            };
+
+
+    private NotificationManager mNotificationManager;
     @Nullable private NotificationPlayer mNotificationPlayer;
     @Nullable private MediaSessionManager mMediaSessionManager;
 
@@ -159,10 +197,24 @@ public class PlayerService extends Service implements
             mLegacyRemoteController = new LegacyRemoteController();
             mMetaDataControllerWrapper = new MetaDataControllerWrapper(mLegacyRemoteController);
         }
-	}
 
-    @TargetApi(21)
+        // Get the media router service.
+        mMediaRouter = MediaRouter.getInstance(this);
+        // Create a route selector for the type of routes your app supports.
+        mSelector = new MediaRouteSelector.Builder()
+                // These are the framework-supported intents
+                .addControlCategory(MediaControlIntent.CATEGORY_LIVE_AUDIO)
+                .addControlCategory(MediaControlIntent.CATEGORY_LIVE_VIDEO)
+                .addControlCategory(MediaControlIntent.CATEGORY_REMOTE_PLAYBACK)
+                .build();
+
+    }
+
     private void handleIntent( Intent intent ) {
+
+        mMediaRouter.addCallback(mSelector, mMediaRouterCallback,
+                MediaRouter.CALLBACK_FLAG_REQUEST_DISCOVERY);
+
         if( intent == null || intent.getAction() == null )
             return;
 
@@ -174,16 +226,20 @@ public class PlayerService extends Service implements
         } else if( action.equalsIgnoreCase( ACTION_PAUSE ) ) {
             //mController.getTransportControls().pause();
             pause();
-        } else if( action.equalsIgnoreCase( ACTION_FAST_FORWARD ) ) {
-            mController.getTransportControls().fastForward();
-        } else if( action.equalsIgnoreCase( ACTION_REWIND ) ) {
-            mController.getTransportControls().rewind();
-        } else if( action.equalsIgnoreCase( ACTION_PREVIOUS ) ) {
-            mController.getTransportControls().skipToPrevious();
-        } else if( action.equalsIgnoreCase( ACTION_NEXT ) ) {
-            mController.getTransportControls().skipToNext();
-        } else if( action.equalsIgnoreCase( ACTION_STOP ) ) {
-            mController.getTransportControls().stop();
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (action.equalsIgnoreCase(ACTION_FAST_FORWARD)) {
+                mController.getTransportControls().fastForward();
+            } else if (action.equalsIgnoreCase(ACTION_REWIND)) {
+                mController.getTransportControls().rewind();
+            } else if (action.equalsIgnoreCase(ACTION_PREVIOUS)) {
+                mController.getTransportControls().skipToPrevious();
+            } else if (action.equalsIgnoreCase(ACTION_NEXT)) {
+                mController.getTransportControls().skipToNext();
+            } else if (action.equalsIgnoreCase(ACTION_STOP)) {
+                mController.getTransportControls().stop();
+            }
         }
     }
 
@@ -213,7 +269,7 @@ public class PlayerService extends Service implements
 	@Override
 	public void onStart(Intent intent, int startId) {
 		super.onStart(intent, startId);
-		log.debug("onStart()");
+        handleIntent(intent);
 	}
 
     @Override
@@ -228,7 +284,10 @@ public class PlayerService extends Service implements
 
 	@Override
 	public void onDestroy() {
-		super.onDestroy();
+        mMediaRouter.removeCallback(mMediaRouterCallback);
+
+
+        super.onDestroy();
 		if (mPlayer != null) {
 			mPlayer.release();
 		}

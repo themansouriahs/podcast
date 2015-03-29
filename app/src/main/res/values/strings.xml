@@ -212,6 +212,7 @@
     <string name="bulk_download_day">Last Day</string>
     <string name="bulk_download_week">Last Week</string>
     <string name="bulk_download_month">Last Month</string>
+    <string name="media_route_menu_title">Cast</string>
 
     <plurals name="subscriptions_imported">
         <item quantity="one">%d subscription was imported.</item>
