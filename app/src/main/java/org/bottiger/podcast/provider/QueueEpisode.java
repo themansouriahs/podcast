@@ -69,10 +69,13 @@ public class QueueEpisode implements Comparable {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
+
 		if (obj == null)
 			return false;
+
 		if (getClass() != obj.getClass())
 			return false;
+
 		QueueEpisode other = (QueueEpisode) obj;
 		if (episodeID != other.episodeID)
 			return false;

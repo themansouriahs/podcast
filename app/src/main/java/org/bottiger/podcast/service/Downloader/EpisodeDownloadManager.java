@@ -94,7 +94,8 @@ public class EpisodeDownloadManager extends Observable {
             return DownloadStatus.NOTHING;
         }
 
-		if (mDownloadQueue.contains(item)) {
+        QueueEpisode qe = new QueueEpisode(item);
+		if (mDownloadQueue.contains(qe)) {
             return DownloadStatus.PENDING;
         }
 
