@@ -39,6 +39,7 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
     public final static int STATE_DEFAULT = 0;
     public final static int STATE_DOWNLOAD = 1;
     public final static int STATE_DELETE = 2;
+    public final static int STATE_QUEUE = 3;
 
     private PlayerStatusObservable.STATUS mStatus = PlayerStatusObservable.STATUS.STOPPED;
     private long episodeId = -1;
@@ -183,6 +184,9 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
         //canvas.drawArc(buttonRectangle, -90, 360, true, baseColorPaint);
 
         if(mProgress!=0) {
+            if (getState() != PlayerButtonView.STATE_DEFAULT) {
+                setState(PlayerButtonView.STATE_DEFAULT);
+            }
             canvas.drawArc(buttonRectangle, -90, Math.round(360 * mProgress / 100F), false, foregroundColorPaint);
         }
 
