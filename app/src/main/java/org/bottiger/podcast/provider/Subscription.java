@@ -283,7 +283,7 @@ public class Subscription extends AbstractItem implements PaletteListener {
 			return false;
 	}
 
-	public int subscribe(Context context) {
+	public int subscribe(@NonNull final Context context) {
 		Subscription sub = Subscription.getByUrl(context.getContentResolver(),
 				url);
 
@@ -308,10 +308,14 @@ public class Subscription extends AbstractItem implements PaletteListener {
 			return ADD_FAIL_UNSUCCESS;
 		}
 
-		Subscription sub_test = Subscription.getByUrl(
+		final Subscription sub_test = Subscription.getByUrl(
 				context.getContentResolver(), url);
 
-        SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.SUBSCRIBE_TO_FEED);
+        if (sub_test != null) {
+            SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.SUBSCRIBE_TO_FEED);
+            sub_test.refresh(context);
+        }
+
 		return ADD_SUCCESS;
 
 	}
