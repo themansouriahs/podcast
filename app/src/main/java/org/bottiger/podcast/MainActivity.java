@@ -117,7 +117,7 @@ public class MainActivity extends FragmentContainerActivity implements
 
 		}
 		
-		if (ApplicationConfiguration.COPY_DATABASE && BuildConfig.DEV_MODE) {
+		if (BuildConfig.DEBUG) {
 			try {
 				SqliteCopy.backupDatabase();
 			} catch (IOException e) { // TODO Auto-generated catch block

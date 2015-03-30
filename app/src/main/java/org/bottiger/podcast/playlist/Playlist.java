@@ -142,6 +142,23 @@ public class Playlist implements OnDragStateChangedListener {
 		}
 	}
 
+    /**
+     *
+     * @param position
+     */
+    public void removeItem(int position) {
+        if (position < 0) {
+            throw new IllegalArgumentException("Position must be greater or equal to zero"); // NoI18N
+        }
+
+        int size = mInternalPlaylist.size();
+        if (size > position) {
+            if (mInternalPlaylist.remove(position) != null) {
+                notifyPlaylistRangeChanged(0, position);
+            }
+        }
+    }
+
 	/**
 	 * 
 	 * @param cursor
@@ -287,6 +304,9 @@ public class Playlist implements OnDragStateChangedListener {
             }
 
         }
+
+        // skip 'removed' episodes
+        where += " AND (" + ItemColumns.TABLE_NAME + "." + ItemColumns.PRIORITY + " >= 0)";
 
 
 		return where;

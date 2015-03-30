@@ -1157,6 +1157,11 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
         return Subscription.getById(argContext.getContentResolver(), sub_id);
     }
 
+    public void removeFromPlaylist(@NonNull ContentResolver argContentResolver) {
+        priority = -1;
+        update(argContentResolver);
+    }
+
     /**
 	 * Caching class for keeping items in memory
 	 */

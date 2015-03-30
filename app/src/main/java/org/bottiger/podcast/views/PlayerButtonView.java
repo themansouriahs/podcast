@@ -34,7 +34,7 @@ import org.bottiger.podcast.utils.PaletteCache;
  * TODO: document your custom view class.
  */
 //public class PlayerButtonView extends com.melnykov.fab.FloatingActionButton implements PlayerStatusObserver, PaletteListener, DownloadObserver {
-public class PlayerButtonView extends ImageButton implements PlayerStatusObserver, PaletteListener, DownloadObserver, View.OnClickListener {
+public class PlayerButtonView extends ImageButton implements PlayerStatusObserver, PaletteListener, DownloadObserver  { // View.OnClickListener
 
     public final static int STATE_DEFAULT = 0;
     public final static int STATE_DOWNLOAD = 1;
@@ -258,10 +258,11 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
         return getEpisode().getImageURL(getContext()); // FIXME
     }
 
+    /*
     @Override
     public void onClick(View v) {
-        return;
-    }
+        super(v);
+    }*/
 
     public interface DownloadStatus {
         void FileComplete();

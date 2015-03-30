@@ -32,19 +32,19 @@ public class ViewHolderTouchListener implements View.OnTouchListener {
     public boolean onTouch(View v, MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN){
 
-            if (mouseDown(holder.mPlayPauseButton, holder.mPlayPauseButton, event))
+            if (mouseDown(holder.mPlayPauseButton, event))
                 return true;
 
-            if (mouseDown(holder.downloadButton, holder.downloadButton, event))
+            if (mouseDown(holder.downloadButton, event))
                 return true;
 
-            if (mouseDown(holder.previousButton, holder.previousButton, event))
+            if (mouseDown(holder.removeButton, event))
                 return true;
 
-            if (mouseDown(holder.favoriteButton, holder.favoriteButton, event))
+            if (mouseDown(holder.favoriteButton, event))
                 return true;
 
-            if (mouseDown(holder.mForward, holder.mForward, event))
+            if (mouseDown(holder.mForward, event))
                 return true;
 
             fingerDown = event;
@@ -76,10 +76,11 @@ public class ViewHolderTouchListener implements View.OnTouchListener {
     /**
      * @return true of view was hit
      */
-    private boolean mouseDown(View argView, View.OnClickListener argClick, MotionEvent event) {
+    private boolean mouseDown(View argView, MotionEvent event) { // View.OnClickListener
         argView.getHitRect(viewRect);
         if (viewRect.contains((int)event.getX(), (int)event.getY())) {
-            argClick.onClick(null);
+            //argClick.onClick(null);
+            argView.callOnClick();
             resetTouchState();
             return true;
         }

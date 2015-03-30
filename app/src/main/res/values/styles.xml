@@ -12,6 +12,7 @@
         <item name="pause_invert_icon">@drawable/ic_pause_black</item>
         <item name="fast_forward_icon">@drawable/ic_action_fast_forward</item>
         <item name="rewind_icon">@drawable/ic_action_rewind</item>
+        <item name="ic_remove">@drawable/ic_highlight_remove_white</item>
         <item name="previous_icon">@drawable/ic_action_previous</item>
         <item name="ic_rewind">@drawable/ic_fast_rewind_white</item>
         <item name="ic_forward">@drawable/ic_fast_forward_white</item>
@@ -44,6 +45,7 @@
         <item name="pause_invert_icon">@drawable/ic_pause_black</item>
         <item name="fast_forward_icon">@drawable/ic_action_fast_forward</item>
         <item name="rewind_icon">@drawable/ic_action_rewind</item>
+        <item name="ic_remove">@drawable/ic_highlight_remove_white</item>
         <item name="previous_icon">@drawable/ic_action_previous</item>
         <item name="ic_rewind">@drawable/ic_fast_rewind_white</item>
         <item name="ic_forward">@drawable/ic_fast_forward_white</item>

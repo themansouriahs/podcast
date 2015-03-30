@@ -212,7 +212,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
      * @param position
      */
     public void bindExandedPlayer(final Context context, final FeedItem feedItem,
-                                  final PlaylistViewHolder holder, int position) {
+                                  final PlaylistViewHolder holder, final int position) {
         Log.v("PlaylistAdapter", "bindExandedPlayer");
 
         ThemeHelper themeHelper = new ThemeHelper(context);
@@ -248,16 +248,17 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         holder.mPlayPauseButton.setEpisodeId(id, PlayPauseImageView.LOCATION.PLAYLIST);
         holder.downloadButton.setEpisodeId(id);
         holder.favoriteButton.setEpisodeId(id);
-        holder.previousButton.setEpisodeId(id);
+        holder.removeButton.setEpisodeId(id);
         holder.downloadButton.setEpisode(feedItem);
 
 
-        holder.previousButton.setOnClickListener(new View.OnClickListener() {
+        holder.removeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (PodcastBaseFragment.mPlayerServiceBinder != null) {
-                    PodcastBaseFragment.mPlayerServiceBinder.getPlayer().rewind(feedItem);
-                }
+                PlaylistAdapter.toggle(holder, position);
+                feedItem.removeFromPlaylist(context.getContentResolver());
+                PlaylistAdapter.this.notifyItemRemoved(position);
+                mPlaylist.removeItem(position+PLAYLIST_OFFSET);
             }
         });
 
@@ -321,7 +322,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
         holder.mPlayPauseButton.unsetEpisodeId();
         holder.favoriteButton.unsetEpisodeId();
-        holder.previousButton.unsetEpisodeId();
+        holder.removeButton.unsetEpisodeId();
         holder.downloadButton.unsetEpisodeId();
 
         PaletteObservable.unregisterListener(holder.seekbar);
