@@ -2,6 +2,8 @@ package org.bottiger.podcast.provider;
 
 import java.util.HashMap;
 
+import org.bottiger.podcast.BuildConfig;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.utils.PodcastLog;
 
 import android.content.ContentProvider;
@@ -144,12 +146,12 @@ public class PodcastProvider extends ContentProvider {
 		}
 		SQLiteDatabase db = mHelper.getReadableDatabase();
         Cursor c = null;
+
         try {
-
-
             c = qb.query(db, projection, selection, selectionArgs, null,
                     null, orderBy);
-        } catch (Exception e) {
+        } catch (SQLException e) {
+            //VendorCrashReporter.report("no such column: primary_color", db.);
             throw e;
         }
 

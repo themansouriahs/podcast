@@ -20,9 +20,10 @@ import java.util.HashMap;
  */
 public class VendorAnalytics extends AbstractAnalytics implements IAnalytics {
 
-    private static final String CATEGORY_PLAYBACK = "Playback";
-    private static final String CATEGORY_BEHAVIOR = "Behavior";
-    private static final String CATEGORY_USAGE    = "Usage";
+    private static final String CATEGORY_PLAYBACK       = "Playback";
+    private static final String CATEGORY_BEHAVIOR       = "Behavior";
+    private static final String CATEGORY_USAGE          = "Usage";
+    private static final String CATEGORY_INFRASTRUKTURE = "Infrastructure";
 
     private Context mContext;
 
@@ -146,6 +147,13 @@ public class VendorAnalytics extends AbstractAnalytics implements IAnalytics {
             eventData.Category = CATEGORY_USAGE;
             eventData.Action = "OPML export";
             eventData.LabelID = "OPML";
+        }
+
+        if (argType == EVENT_TYPE.DATABASE_UPGRADE) {
+            eventData = new EventData();
+            eventData.Category = CATEGORY_INFRASTRUKTURE;
+            eventData.Action = "Upgrade";
+            eventData.LabelID = "Database upgrade";
         }
 
         if (eventData != null)
