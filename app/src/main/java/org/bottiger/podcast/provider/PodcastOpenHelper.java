@@ -1,5 +1,8 @@
 package org.bottiger.podcast.provider;
 
+import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.flavors.Analytics.IAnalytics;
+import org.bottiger.podcast.flavors.Analytics.VendorAnalytics;
 import org.bottiger.podcast.utils.PodcastLog;
 
 import android.content.Context;
@@ -36,13 +39,12 @@ public class PodcastOpenHelper extends SQLiteOpenHelper {
 
 	}
 
-    @Override
-    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
-    }
-
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        IAnalytics analytics = SoundWaves.sAnalytics;
+        if (analytics != null) {
+            analytics.trackEvent(IAnalytics.EVENT_TYPE.DATABASE_UPGRADE);
+        }
 
         if (oldVersion == 16 && newVersion == 17) {
             // Add new column
@@ -90,7 +92,13 @@ public class PodcastOpenHelper extends SQLiteOpenHelper {
 					+ SubscriptionColumns.REMOTE_ID + " VARCHAR(128), "
 					+ SubscriptionColumns.AUTO_DOWNLOAD + " INTEGER , "
 					+ SubscriptionColumns.PLAYLIST_POSITION + " INTEGER , "
-					+ SubscriptionColumns.IMAGE_URL + " VARCHAR(1024) " + ");";
+					+ SubscriptionColumns.IMAGE_URL + " VARCHAR(1024), "
+
+                    + SubscriptionColumns.PRIMARY_COLOR + " INTEGER DEFAULT 0 , "
+                    + SubscriptionColumns.PRIMARY_TINT_COLOR + " INTEGER DEFAULT 0 , "
+                    + SubscriptionColumns.SECONDARY_COLOR + " INTEGER DEFAULT 0 "
+
+                    + ");";
 
 			// http://www.sqlite.org/faq.html#q11
 			// INSERT INTO t1_backup SELECT a,b FROM t1;
@@ -108,7 +116,11 @@ public class PodcastOpenHelper extends SQLiteOpenHelper {
 					+ SubscriptionColumns.SERVER_ID + ", " + "\"\", "
 					+ SubscriptionColumns.AUTO_DOWNLOAD + ", "
 					+ SubscriptionColumns.PLAYLIST_POSITION + ", "
-					+ SubscriptionColumns.IMAGE_URL + " FROM subs;";
+					+ SubscriptionColumns.IMAGE_URL + ", "
+                    + SubscriptionColumns.PRIMARY_COLOR + ", "
+                    + SubscriptionColumns.PRIMARY_TINT_COLOR + ", "
+                    + SubscriptionColumns.SECONDARY_COLOR + " "
+                    + " FROM subs;";
 
 			// Add new column
 			String new_column = "ALTER TABLE " + SubscriptionColumns.TABLE_NAME

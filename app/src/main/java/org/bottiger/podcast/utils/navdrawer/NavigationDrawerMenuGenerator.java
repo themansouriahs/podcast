@@ -1,10 +1,13 @@
 package org.bottiger.podcast.utils.navdrawer;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.bottiger.podcast.ApplicationConfiguration;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.utils.TransitionUtils;
 
@@ -15,11 +18,13 @@ import java.util.LinkedList;
  */
 public class NavigationDrawerMenuGenerator {
 
+    private static final String FEEDBACK = "[Feedback]"; // NoI18N
+
     private final LinkedList<NavItem> mItems = new LinkedList<>();
 
     private Activity mActivity;
 
-    public NavigationDrawerMenuGenerator(@NonNull Activity argContext) {
+    public NavigationDrawerMenuGenerator(@NonNull final Activity argContext) {
         mActivity = argContext;
 
         mItems.add(new NavItem());
@@ -33,7 +38,10 @@ public class NavigationDrawerMenuGenerator {
         mItems.add(new NavItem(R.string.menu_feedback, R.drawable.ic_messenger_white, new INavOnClick() {
             @Override
             public void onClick() {
-                return;
+                Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
+                        "mailto", ApplicationConfiguration.ACRA_MAIL, null));
+                emailIntent.putExtra(Intent.EXTRA_SUBJECT, FEEDBACK);
+                argContext.startActivity(Intent.createChooser(emailIntent, argContext.getString(R.string.feedback_mail_client_picker)));
             }
         }));
         mItems.add(new NavItem());

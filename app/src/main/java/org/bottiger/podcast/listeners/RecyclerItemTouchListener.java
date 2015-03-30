@@ -65,13 +65,16 @@ public class RecyclerItemTouchListener implements RecyclerView.OnItemTouchListen
 
         int topHeight = holder.mMainContainer.getHeight();
 
-        if (mouseDown(holder.mPlayPauseButton, holder.mPlayPauseButton, event, topHeight))
+        if (mouseDown(holder.mPlayPauseButton, event, topHeight))
             return;
 
-        if (mouseDown(holder.downloadButton, holder.downloadButton, event, topHeight))
+        if (mouseDown(holder.downloadButton, event, topHeight))
             return;
 
-        if (mouseDown(holder.favoriteButton, holder.favoriteButton, event, topHeight))
+        if (mouseDown(holder.favoriteButton, event, topHeight))
+            return;
+
+        if (mouseDown(holder.removeButton, event, topHeight))
             return;
 
         int pos = rv.getChildPosition(childView);
@@ -87,7 +90,7 @@ public class RecyclerItemTouchListener implements RecyclerView.OnItemTouchListen
     /**
      * @return true of view was hit
      */
-    private boolean mouseDown(View argView, View.OnClickListener argClick, MotionEvent event, int topHeight) {
+    private boolean mouseDown(View argView, MotionEvent event, int topHeight) {
         //argView.getGlobalVisibleRect(viewRect);
 
         int[] locations = new int[2];
@@ -98,7 +101,8 @@ public class RecyclerItemTouchListener implements RecyclerView.OnItemTouchListen
         viewRect = new Rect(x,y, x+argView.getWidth(),y+argView.getHeight());
 
         if (viewRect.contains((int)event.getRawX(), (int)event.getRawY())) {
-            argClick.onClick(null);
+            //argClick.onClick(argView);
+            argView.callOnClick();
             resetTouchState();
             return true;
         }

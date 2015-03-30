@@ -28,7 +28,9 @@ import java.util.Date;
  */
 public class DialogBulkDownload {
 
-    private enum ACTION { DAY, WEEK, MONTH, NONE};
+    private static final int PLAYLIST_EPISODE_DOWNLOAD_COUNT = 10;
+
+    private enum ACTION { DAY, WEEK, MONTH, PLAYLIST, NONE};
     private ACTION mAction = ACTION.NONE;
 
     private Context mContext;
@@ -50,6 +52,11 @@ public class DialogBulkDownload {
         RadioButton dayButton = (RadioButton) view.findViewById(R.id.radio_day);
         RadioButton weekButton = (RadioButton) view.findViewById(R.id.radio_week);
         RadioButton monthButton = (RadioButton) view.findViewById(R.id.radio_month);
+        RadioButton playlistButton = (RadioButton) view.findViewById(R.id.radio_playlist);
+
+        Resources res = mContext.getResources();
+        String formattedString = res.getQuantityString(R.plurals.bulk_download_playlist, PLAYLIST_EPISODE_DOWNLOAD_COUNT, PLAYLIST_EPISODE_DOWNLOAD_COUNT);
+        playlistButton.setText(formattedString);
 
         dayButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -72,7 +79,13 @@ public class DialogBulkDownload {
             }
         });
 
-        Resources res = argActivity.getResources();
+        playlistButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                DialogBulkDownload.this.onRadioButtonClicked(ACTION.PLAYLIST, isChecked);
+            }
+        });
+
         String bulkDownloadInstructions = res.getString(R.string.bulk_download_instructions);
         textView.setText(bulkDownloadInstructions);
 
@@ -108,13 +121,15 @@ public class DialogBulkDownload {
 
         FeedItem episode;
         Date date;
-        int playlistSize = mPlaylist.size();
-        for (int i = 0; i < playlistSize; i++) {
+
+        int downloadCandidatesCount = Math.min(mPlaylist.size(), PLAYLIST_EPISODE_DOWNLOAD_COUNT);
+
+        for (int i = 0; i < downloadCandidatesCount; i++) {
             episode = mPlaylist.getItem(i);
             date = episode.getDateTime();
-            boolean doDownload = validDate(mAction, date);
+            boolean validDate = validDate(mAction, date);
 
-            if (doDownload) {
+            if (validDate) {
                 EpisodeDownloadManager.addItemToQueue(episode, EpisodeDownloadManager.QUEUE_POSITION.LAST);
             }
         }
@@ -134,6 +149,8 @@ public class DialogBulkDownload {
 
         if (argAction == ACTION.NONE) {
             return false;
+        } else if (argAction == ACTION.PLAYLIST) {
+            return true;
         } else if (argAction == ACTION.DAY) {
             ageMs = dayMs;
         } else if (argAction == ACTION.WEEK) {

@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ViewConfiguration;
 import android.widget.FrameLayout;
@@ -12,6 +13,8 @@ import android.widget.FrameLayout;
  * Created by apl on 27-03-2015.
  */
 public abstract class AbstractMultiShrinkScroller extends FrameLayout {
+
+    protected static final String TAG = "Scroller";
 
     protected float[] mLastEventPosition = { 0, 0 };
     protected int mTouchSlop;
@@ -41,8 +44,11 @@ public abstract class AbstractMultiShrinkScroller extends FrameLayout {
     protected boolean motionShouldStartDrag(MotionEvent event) {
         final float deltaX = event.getX() - mLastEventPosition[0];
         final float deltaY = event.getY() - mLastEventPosition[1];
+
+        Log.v(TAG, "updateLastEventPosition. DeltaY => " + deltaY + " RawY =>" + event.getRawY());
         final boolean draggedX = (deltaX > mTouchSlop || deltaX < -mTouchSlop);
-        final boolean draggedY = (deltaY > mTouchSlop || deltaY < -mTouchSlop);
+        //final boolean draggedY = (deltaY > mTouchSlop || deltaY < -mTouchSlop);
+        final boolean draggedY = Math.abs(deltaY) > mTouchSlop*2;
         //return draggedY && !draggedX;
         return draggedY;
     }

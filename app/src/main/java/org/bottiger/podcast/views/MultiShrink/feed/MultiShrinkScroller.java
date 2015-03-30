@@ -69,6 +69,8 @@ import org.bottiger.podcast.views.MultiShrink.MultiShrinkScroller.AbstractMultiS
  */
 public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
 
+    protected static final String TAG = "FeedScroller";
+
     /**
      * 1000 pixels per millisecond. Ie, 1 pixel per second.
      */
@@ -94,7 +96,6 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
      */
     private static final float MAXIMUM_FLING_VELOCITY = 2000;
 
-    private float[] mLastEventPosition = { 0, 0 };
     private VelocityTracker mVelocityTracker;
     private boolean mIsBeingDragged = false;
     private boolean mReceivedDown = false;
@@ -141,7 +142,6 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
 
     private final Scroller mScroller;
     private final EdgeEffect mEdgeGlowBottom;
-    private final int mTouchSlop;
     private final int mMaximumVelocity;
     private final int mMinimumVelocity;
     private final int mTransparentStartHeight;
@@ -245,7 +245,6 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
 
         mEdgeGlowBottom = new EdgeEffect(context);
         mScroller = new Scroller(context, sInterpolator);
-        mTouchSlop = configuration.getScaledTouchSlop();
         mMinimumVelocity = configuration.getScaledMinimumFlingVelocity();
         mMaximumVelocity = (int)TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP, MAXIMUM_FLING_VELOCITY,
@@ -424,7 +423,10 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
         // The only time we want to intercept touch events is when we are being dragged.
-        return shouldStartDrag(event);
+        boolean doIntercept = shouldStartDrag(event);
+
+        Log.v(TAG, "onInterceptTouchEvent: action => " + event.getAction() + " doIntercept => " + doIntercept);
+        return doIntercept;
     }
 
     private boolean shouldStartDrag(MotionEvent event) {
@@ -439,6 +441,7 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
             case MotionEvent.ACTION_DOWN:
                 updateLastEventPosition(event);
                 if (!mScroller.isFinished()) {
+                    Log.v(TAG, "shouldStartDrag intercepts on ACTION_DOWN");
                     startDrag();
                     return true;
                 } else {
@@ -452,6 +455,7 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
                 if (motionShouldStartDrag(event)) {
                     updateLastEventPosition(event);
                     startDrag();
+                    Log.v(TAG, "shouldStartDrag intercepts on ACTION_UP");
                     return true;
                 }
                 break;
@@ -1241,6 +1245,7 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
     }
 
     private void updateLastEventPosition(MotionEvent event) {
+        Log.v(TAG, "updateLastEventPosition. RawX => " + event.getX() + " RawY =>" + event.getY());
         mLastEventPosition[0] = event.getX();
         mLastEventPosition[1] = event.getY();
     }

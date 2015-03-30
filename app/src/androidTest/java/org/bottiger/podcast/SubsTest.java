@@ -36,6 +36,9 @@ public class SubsTest extends TestCase {
 
     /**
      * Problematic feeds from the crashlogs:
+     *
+     * 1) http://www.andymoor.com/ is wonky
+     * 2) http://streaming.radio24syv.dk/pls/24syv_64_IR.pls
      */
     private List<String> mProblematicFeeds = Arrays.asList("http://downloads.bbc.co.uk/podcasts/worldservice/wbnews/rss.xml");
 

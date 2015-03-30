@@ -47,14 +47,6 @@ public class SubscriptionColumns implements BaseColumns {
 			DESCRIPTION, LAST_UPDATED, LAST_ITEM_UPDATED, FAIL_COUNT, STATUS,
 			COMMENT, RATING, USERNAME, PASSWORD, SERVER_ID, REMOTE_ID, AUTO_DOWNLOAD,
 			PLAYLIST_POSITION, IMAGE_URL, PRIMARY_COLOR, PRIMARY_TINT_COLOR, SECONDARY_COLOR};
-	
-	  /** The index of the projection columns */
-	  public static final int COLUMN_INDEX_ID = 0;
-	  public static final int COLUMN_INDEX_URL = 1;
-	  public static final int COLUMN_INDEX_LINK = 2;
-	  public static final int COLUMN_INDEX_TITLE = 3;
-	  public static final int COLUMN_INDEX_DESCIPTION = 4;
-	  public static final int COLUMN_INDEX_LAST_UPDATED = 5;
 
 	public static final String DEFAULT_SORT_ORDER = _ID + " ASC";
 	public static final String sql_create_table = "CREATE TABLE " 

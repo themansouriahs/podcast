@@ -11,7 +11,8 @@ public interface IAnalytics {
                              PLAY_FROM_FEEDVIEW,
                              SUBSCRIBE_TO_FEED,
                              OPML_IMPORT,
-                             OPML_EXPORT
+                             OPML_EXPORT,
+                             DATABASE_UPGRADE
     };
 
     public void startTracking();

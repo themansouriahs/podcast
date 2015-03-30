@@ -2,14 +2,11 @@ package org.bottiger.podcast.flavors.Analytics;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
-import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
 import org.bottiger.podcast.ApplicationConfiguration;
-import org.bottiger.podcast.SoundWaves;
 
 import java.util.HashMap;
 
@@ -20,9 +17,10 @@ import java.util.HashMap;
  */
 public class VendorAnalytics extends AbstractAnalytics implements IAnalytics {
 
-    private static final String CATEGORY_PLAYBACK = "Playback";
-    private static final String CATEGORY_BEHAVIOR = "Behavior";
-    private static final String CATEGORY_USAGE    = "Usage";
+    private static final String CATEGORY_PLAYBACK       = "Playback";
+    private static final String CATEGORY_BEHAVIOR       = "Behavior";
+    private static final String CATEGORY_USAGE          = "Usage";
+    private static final String CATEGORY_INFRASTRUCTURE = "Infrastructure";
 
     private Context mContext;
 
@@ -82,7 +80,7 @@ public class VendorAnalytics extends AbstractAnalytics implements IAnalytics {
 
     private synchronized Tracker getTracker(TrackerName trackerId) {
         if (trackerId != TrackerName.APP_TRACKER) {
-            throw new IllegalStateException("TrackerName not suported");
+            throw new IllegalStateException("TrackerName not supported");
         }
 
         if (!mTrackers.containsKey(trackerId)) {
@@ -146,6 +144,13 @@ public class VendorAnalytics extends AbstractAnalytics implements IAnalytics {
             eventData.Category = CATEGORY_USAGE;
             eventData.Action = "OPML export";
             eventData.LabelID = "OPML";
+        }
+
+        if (argType == EVENT_TYPE.DATABASE_UPGRADE) {
+            eventData = new EventData();
+            eventData.Category = CATEGORY_INFRASTRUCTURE;
+            eventData.Action = "Upgrade";
+            eventData.LabelID = "Database upgrade";
         }
 
         if (eventData != null)

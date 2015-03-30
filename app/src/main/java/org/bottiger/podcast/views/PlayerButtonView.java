@@ -34,7 +34,7 @@ import org.bottiger.podcast.utils.PaletteCache;
  * TODO: document your custom view class.
  */
 //public class PlayerButtonView extends com.melnykov.fab.FloatingActionButton implements PlayerStatusObserver, PaletteListener, DownloadObserver {
-public class PlayerButtonView extends ImageButton implements PlayerStatusObserver, PaletteListener, DownloadObserver, View.OnClickListener {
+public class PlayerButtonView extends ImageButton implements PlayerStatusObserver, PaletteListener, DownloadObserver  { // View.OnClickListener
 
     public final static int STATE_DEFAULT = 0;
     public final static int STATE_DOWNLOAD = 1;
@@ -48,8 +48,8 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
     private static final int BITMAP_OFFSET = 5;
     private static final float RECTANGLE_SCALING = 1F;
 
-    private Paint baseColorPaint;
-    private Paint foregroundColorPaint;
+    protected Paint baseColorPaint;
+    protected Paint foregroundColorPaint;
     private RectF buttonRectangle;
     private RectF buttonRectangleBitmap;
 
@@ -240,9 +240,7 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
     @Override
     public void onPaletteFound(Palette argChangedPalette) {
         ColorExtractor extractor = new ColorExtractor(argChangedPalette);
-        //Palette.Swatch swatchDark = argChangedPalette.getDarkVibrantSwatch();
 
-        //int cd = swatchDark.getRgb();
         baseColorPaint.setColor(extractor.getPrimary()); // -1761607680
         foregroundColorPaint.setColor(extractor.getSecondary());
 
@@ -258,10 +256,11 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
         return getEpisode().getImageURL(getContext()); // FIXME
     }
 
+    /*
     @Override
     public void onClick(View v) {
-        return;
-    }
+        super(v);
+    }*/
 
     public interface DownloadStatus {
         void FileComplete();

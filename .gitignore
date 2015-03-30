@@ -23,7 +23,8 @@ local.properties
 proguard/
 
 # IntelliJ files
-.idea/*
+.idea
+.navigation
 *.iml
 
 # Maven output folder

@@ -1157,6 +1157,11 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
         return Subscription.getById(argContext.getContentResolver(), sub_id);
     }
 
+    public void removeFromPlaylist(@NonNull ContentResolver argContentResolver) {
+        priority = -1;
+        update(argContentResolver);
+    }
+
     /**
 	 * Caching class for keeping items in memory
 	 */
@@ -1173,17 +1178,26 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
         Picasso.with(context).load(getImageURL(context)).into(argTarget);
     }
 
+    @Nullable
 	@Override
-	public String getImageURL(Context context) {
+	public String getImageURL(@NonNull Context context) {
 		String imageURL = null;
-		if (!image.equals("")) {
-			imageURL = image;
-		} else {
-			Subscription subscription = Subscription.getById(
-					context.getContentResolver(), sub_id);
-			imageURL = subscription.imageURL;
 
-		}
+        if (!TextUtils.isEmpty(image))
+            return image;
+
+
+		Subscription subscription = Subscription.getById(
+					context.getContentResolver(), sub_id);
+
+        if (subscription == null)
+            return null;
+
+		imageURL = subscription.imageURL;
+
+        if (TextUtils.isEmpty(imageURL))
+            return null;
+
 		return imageURL;
 	}
 
