@@ -83,7 +83,7 @@ public class VendorAnalytics extends AbstractAnalytics implements IAnalytics {
 
     private synchronized Tracker getTracker(TrackerName trackerId) {
         if (trackerId != TrackerName.APP_TRACKER) {
-            throw new IllegalStateException("TrackerName not suported");
+            throw new IllegalStateException("TrackerName not supported");
         }
 
         if (!mTrackers.containsKey(trackerId)) {
