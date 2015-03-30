@@ -23,6 +23,12 @@
         android:orientation="vertical">
 
     <RadioButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:id="@+id/radio_playlist" />
+
+    <RadioButton
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"

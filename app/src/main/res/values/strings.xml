@@ -202,16 +202,21 @@
     <string name="opml_radio_export">Export subscriptions to OPML</string>
     <string name="opml_import_instructions">To import an OPML file, first copy it to: %1$s</string>
     <string name="opml_export_failed">Sorry. The export failed due to an unknown error :( Maybe you are running out of storage?</string>
-    <string name="opml_export_succes">Your subscriptions were succesfully exported to: %1$s</string>
+    <string name="opml_export_succes">Your subscriptions were successfully exported to: %1$s</string>
     <string name="pref_network_category_network_title">Network</string>
     <string name="pref_network_category_storage_title">Storage</string>
     <string name="pref_network_category_storage_experimental">Experimental</string>
     <string name="pref_delete_when_finished_title">Delete After Playback</string>
     <string name="pref_delete_when_finished_description">Episodes are automatically deleted after being played</string>
-    <string name="bulk_download_instructions">Download all episodes in the playlist for the</string>
-    <string name="bulk_download_day">Last Day</string>
-    <string name="bulk_download_week">Last Week</string>
-    <string name="bulk_download_month">Last Month</string>
+    <string name="bulk_download_instructions">Download all episodes in the playlist matching</string>
+    <string name="bulk_download_day">Published within the last 24 hours</string>
+    <string name="bulk_download_week">Published this Week</string>
+    <string name="bulk_download_month">Published this Month</string>
+
+    <plurals name="bulk_download_playlist">
+        <item quantity="one">First episode in the playlist</item>
+        <item quantity="other">Top %d episodes in the playlist</item>
+    </plurals>
 
     <plurals name="subscriptions_imported">
         <item quantity="one">%d subscription was imported.</item>
