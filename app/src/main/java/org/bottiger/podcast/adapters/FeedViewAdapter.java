@@ -58,8 +58,8 @@ public class FeedViewAdapter extends AbstractEpisodeCursorAdapter<FeedViewAdapte
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int i) {
-        mCursor.moveToPosition(i);
+    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
+        mCursor.moveToPosition(position);
 
         final FeedItem item = FeedItem.getByCursor(mCursor);
         final EpisodeViewHolder episodeViewHolder = (EpisodeViewHolder) viewHolder;

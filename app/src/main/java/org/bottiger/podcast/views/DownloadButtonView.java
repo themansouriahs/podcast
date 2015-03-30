@@ -8,17 +8,21 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.graphics.Palette;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.service.DownloadStatus;
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
+import org.bottiger.podcast.utils.ColorExtractor;
 
 /**
  * Created by apl on 02-09-2014.
  */
 public class DownloadButtonView extends PlayerButtonView implements View.OnClickListener {
+
+    private static final String TAG = "DownloadButtonView";
 
     private Context mContext;
     private FeedItem mEpisode;
@@ -115,19 +119,22 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
 
     @Override
     public void onClick(View view) {
+        String viewStr = view == null ? "null" : view.toString();
+        Log.d(TAG, "onCLick: view => " + viewStr);
 
         if (mEpisode == null) {
+            Log.e(TAG, "Episode is null");
             throw new IllegalStateException("Episode can not be null");
         }
 
         if (getState() == PlayerButtonView.STATE_DEFAULT) {
+            Log.v(TAG, "Queue download");
             EpisodeDownloadManager.addItemAndStartDownload(mEpisode, EpisodeDownloadManager.QUEUE_POSITION.FIRST, mContext.getApplicationContext());
             setState(PlayerButtonView.STATE_QUEUE);
         } else if (getState() == PlayerButtonView.STATE_DELETE) {
+            Log.v(TAG, "Delete file");
             mEpisode.delFile(mContext.getContentResolver());
             setState(PlayerButtonView.STATE_DEFAULT);
-        } else {
-            throw new IllegalStateException("State is not defined");
         }
     }
 

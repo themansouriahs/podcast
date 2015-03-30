@@ -48,8 +48,8 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
     private static final int BITMAP_OFFSET = 5;
     private static final float RECTANGLE_SCALING = 1F;
 
-    private Paint baseColorPaint;
-    private Paint foregroundColorPaint;
+    protected Paint baseColorPaint;
+    protected Paint foregroundColorPaint;
     private RectF buttonRectangle;
     private RectF buttonRectangleBitmap;
 
@@ -240,9 +240,7 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
     @Override
     public void onPaletteFound(Palette argChangedPalette) {
         ColorExtractor extractor = new ColorExtractor(argChangedPalette);
-        //Palette.Swatch swatchDark = argChangedPalette.getDarkVibrantSwatch();
 
-        //int cd = swatchDark.getRgb();
         baseColorPaint.setColor(extractor.getPrimary()); // -1761607680
         foregroundColorPaint.setColor(extractor.getSecondary());
 

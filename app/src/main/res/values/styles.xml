@@ -220,8 +220,8 @@
     </style>
 
     <style name="SmallFeedViewPlayPauseButton"  parent="@style/FeedViewPlayPauseButton">
-        <item name="android:layout_width">35dip</item>
-        <item name="android:layout_height">35dip</item>
+        <item name="android:layout_width">50dip</item>
+        <item name="android:layout_height">50dip</item>
     </style>
 
     <style name="SubscriptionHeaderFont" parent="@android:style/TextAppearance.Large">
