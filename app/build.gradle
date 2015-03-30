@@ -9,8 +9,8 @@ android {
         applicationId "org.bottiger.podcast"
         minSdkVersion 15
         targetSdkVersion 21
-        versionCode 105     // even - release. Odd - development
-        versionName "0.85" // even - release. Odd - development
+        versionCode 106     // even - release. Odd - development
+        versionName "0.85.1" // even - release. Odd - development
         //useJack = true
     }
 
@@ -18,7 +18,7 @@ android {
 
         dev {
             buildConfigField "boolean", "DEV_MODE", "true"
-            buildConfigField "boolean", "PRIVATE_MODE", "false"
+            buildConfigField "boolean", "PRIVATE_.1MODE", "false"
         }
 
         free {
