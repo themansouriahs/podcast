@@ -1,14 +1,20 @@
 package org.bottiger.podcast.flavors.MediaCast;
 
+import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.media.MediaControlIntent;
 import android.support.v7.media.MediaRouter;
 import android.util.Log;
 
 import com.google.android.gms.cast.ApplicationMetadata;
 import com.google.android.gms.cast.Cast;
 import com.google.android.gms.cast.CastDevice;
+import com.google.android.gms.cast.CastMediaControlIntent;
 import com.google.android.gms.cast.MediaInfo;
 import com.google.android.gms.cast.MediaMetadata;
 import com.google.android.gms.cast.MediaStatus;
@@ -17,6 +23,8 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+
+import org.bottiger.podcast.R;
 
 import java.io.IOException;
 
@@ -36,6 +44,11 @@ public class VendorMediaCast {
     private ConnectionFailedListener mConnectionFailedListener = new ConnectionFailedListener();
     private boolean mWaitingForReconnect = false;
     private boolean mApplicationStarted;
+
+    //cast demo
+    private PendingIntent mSessionStatusUpdateIntent;
+    private String mSessionId;
+    private MediaRouter.RouteInfo mCurrentRoute;
 
     private RemoteMediaPlayer mRemoteMediaPlayer = new RemoteMediaPlayer();
 
@@ -68,6 +81,8 @@ public class VendorMediaCast {
         mSoundWavesChannel = new SoundWavesChannel();
         mSelectedDevice = CastDevice.getFromBundle(info.getExtras());
         String routeId = info.getId();
+
+        mCurrentRoute = info;
 
         if (mSelectedDevice == null)
             return;
@@ -103,6 +118,7 @@ public class VendorMediaCast {
                     }
                 });
 
+        startSession();
         connect();
     }
 
@@ -157,6 +173,64 @@ public class VendorMediaCast {
         mApiClient.connect();
     }
 
+    private void startSession() {
+        Intent intent = new Intent(MediaControlIntent.ACTION_START_SESSION);
+        intent.addCategory(MediaControlIntent.CATEGORY_REMOTE_PLAYBACK);
+        intent.putExtra(MediaControlIntent.EXTRA_SESSION_STATUS_UPDATE_RECEIVER,
+                mSessionStatusUpdateIntent);
+        intent.putExtra(CastMediaControlIntent.EXTRA_CAST_APPLICATION_ID,
+                CastMediaControlIntent.DEFAULT_MEDIA_RECEIVER_APPLICATION_ID);
+        intent.putExtra(CastMediaControlIntent.EXTRA_CAST_RELAUNCH_APPLICATION,
+                false); // getRelaunchApp()
+        intent.putExtra(CastMediaControlIntent.EXTRA_DEBUG_LOGGING_ENABLED, true);
+        if (true) { // getStopAppWhenEndingSession()
+            intent.putExtra(CastMediaControlIntent.EXTRA_CAST_STOP_APPLICATION_WHEN_SESSION_ENDS,
+                    true);
+        }
+        sendIntentToRoute(intent, new ResultBundleHandler() {
+            @Override
+            public void handleResult(Bundle bundle) {
+                mSessionId = bundle.getString(MediaControlIntent.EXTRA_SESSION_ID);
+                Log.d(TAG, "Got a session ID of: " + mSessionId);
+            }
+        });
+    }
+    private interface ResultBundleHandler {
+        public void handleResult(Bundle bundle);
+    }
+
+    /*
+ * Sends a prebuilt media control intent to the selected route.
+ */
+    private void sendIntentToRoute(final Intent intent, final ResultBundleHandler resultHandler) {
+        String sessionId = intent.getStringExtra(MediaControlIntent.EXTRA_SESSION_ID);
+        Log.d(TAG, "sending intent to route: " + intent + ", session: " + sessionId);
+        if ((mCurrentRoute == null) || !mCurrentRoute.supportsControlRequest(intent)) {
+            Log.d(TAG, "route is null or doesn't support this request");
+            return;
+        }
+
+        mCurrentRoute.sendControlRequest(intent, new MediaRouter.ControlRequestCallback() {
+            @Override
+            public void onResult(Bundle data) {
+                Log.d(TAG, "got onResult for " + intent.getAction() + " with bundle " + data);
+                if (data != null) {
+                    if (resultHandler != null) {
+                        resultHandler.handleResult(data);
+                    }
+                } else {
+                    Log.w(TAG, "got onResult with a null bundle");
+                }
+            }
+
+            @Override
+            public void onError(String message, Bundle data) {
+                Log.w(TAG, "error");
+                //showErrorDialog(message != null ? message
+                //        : getString(R.string.mrp_request_failed));
+            }
+        });
+    }
 
     private class ConnectionCallbacks implements
             GoogleApiClient.ConnectionCallbacks {
