@@ -123,7 +123,10 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
                 viewHolder.mPlayPauseButton.setStatus(PlayerStatusObservable.STATUS.PAUSED);
                 mDownloadProgressObservable.registerObserver(viewHolder.downloadButton);
 
-                viewHolder.mItemBackground.setPaletteKey(item.getImageURL(mActivity));
+                String imageUrl = item.getImageURL(mActivity);
+                if (!TextUtils.isEmpty(imageUrl)) {
+                    viewHolder.mItemBackground.setPaletteKey(imageUrl);
+                }
 
                 if (mDownloadManager == null) {
                     mDownloadManager = (DownloadManager) mActivity
