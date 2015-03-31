@@ -126,8 +126,11 @@ public class NSRSS20 extends Namespace {
                     }
 				}
 			} else if (top.equals(PUBDATE) && second.equals(ITEM)) {
-				state.getCurrentItem().setPubDate(
-						SyndDateUtils.parseRFC822Date(content));
+                FeedItem item = state.getCurrentItem();
+                if (item != null) { // bug:  LearnOutLoud.com
+                    item.setPubDate(
+                            SyndDateUtils.parseRFC822Date(content));
+                }
 			} else if (top.equals(URL) && second.equals(IMAGE) && third != null && third.equals(CHANNEL)) {
 
 				if (!TextUtils.isEmpty(state.getSubscription().imageURL)) {
