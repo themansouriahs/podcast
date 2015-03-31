@@ -53,7 +53,8 @@ public class PlayerHandler {
                     }
                     break;
                 case TRACK_ENDED:
-                    boolean doPlayNext = mSharedpreferences.getBoolean(mPlayerService.getResources().getString(R.string.pref_delete_when_finished_key), CONTINUOUS_PLAYING_DEFAULT);
+                    String key = mPlayerService.getResources().getString(R.string.pref_continuously_playing_key);
+                    boolean doPlayNext = mSharedpreferences.getBoolean(key, CONTINUOUS_PLAYING_DEFAULT);
 
                     if (mPlayerService.getCurrentItem() != null) {
 
@@ -66,7 +67,6 @@ public class PlayerHandler {
                             } else if (doPlayNext) {
                                 mPlayerService.playNext();
                             }
-                            mPlayerService.setUpdateStatus(true);
                         }
                     }
 

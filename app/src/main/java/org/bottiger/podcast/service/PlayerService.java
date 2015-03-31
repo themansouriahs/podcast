@@ -66,16 +66,6 @@ public class PlayerService extends Service implements
 	
 	private static Playlist sPlaylist = new Playlist();
 
-	public static final int PlayerService_STATUS = 1;
-
-	private static final String WHERE = ItemColumns.STATUS + ">"
-			+ ItemColumns.ITEM_STATUS_MAX_DOWNLOADING_VIEW + " AND "
-			+ ItemColumns.STATUS + "<"
-			+ ItemColumns.ITEM_STATUS_MAX_PLAYLIST_VIEW + " AND "
-			+ ItemColumns.FAIL_COUNT + " > 100";
-
-	private static final String ORDER = ItemColumns.FAIL_COUNT + " ASC";
-
 	private final PodcastLog log = PodcastLog.getLog(getClass());
 
 	private SoundWavesPlayer mPlayer = null;
@@ -94,7 +84,6 @@ public class PlayerService extends Service implements
 	private ComponentName mControllerComponentName;
 
 	private FeedItem mItem = null;
-	private boolean mUpdate = false;
     private boolean mResumePlayback = false;
 
     private final String LOCK_NAME = "SoundWavesWifiLock";
@@ -397,7 +386,6 @@ public class PlayerService extends Service implements
 		mPlayer.stop();
 		mItem = null;
 		dis_notifyStatus();
-		mUpdate = true;
 	}
 
 	public boolean isInitialized() {
@@ -406,18 +394,6 @@ public class PlayerService extends Service implements
 
 	public boolean isPlaying() {
 		return mPlayer.isPlaying();
-	}
-
-	/**
-	 * Test of the extended_player is on pause right now
-	 * 
-	 * @return True if the extended_player is on pause right now
-	 */
-	public boolean isOnPause() {
-		if (isPlaying() || getCurrentItem() == null)
-			return false;
-
-		return true;
 	}
 
 	public long seek(long offset) {
@@ -435,49 +411,8 @@ public class PlayerService extends Service implements
 		return mPlayer.duration();
 	}
 
-	public int bufferProgress() {
-		int test = mPlayer.getBufferProgress();
-		return test;// mPlayer.bufferProgress;
-	}
-
-	public void setCurrentItem(FeedItem item) {
-		stop();
-		mItem = item;
-	}
-
 	public FeedItem getCurrentItem() {
 		return mItem;
-	}
-
-	public boolean getUpdateStatus() {
-		return mUpdate;
-	}
-
-	public void setUpdateStatus(boolean update) {
-		mUpdate = update;
-	}
-
-	private FeedItem getFirst() {
-		Cursor cursor = null;
-		try {
-
-			cursor = getContentResolver().query(ItemColumns.URI,
-					ItemColumns.ALL_COLUMNS, WHERE, null, ORDER);
-			if (cursor == null) {
-				return null;
-			}
-			cursor.moveToFirst();
-
-			FeedItem item = FeedItem.getByCursor(cursor);
-			return item;
-		} catch (Exception e) {
-
-		} finally {
-			if (cursor != null)
-				cursor.close();
-		}
-
-		return null;
 	}
 
 	/**
@@ -533,60 +468,6 @@ public class PlayerService extends Service implements
 
         if (wifiLock.isHeld())
             wifiLock.release();
-    }
-
-	/**
-	 * 
-	 * @param nextTrack
-	 */
-	public static void setNextTrack(NextTrack nextTrack) {
-		PlayerService.nextTrack = nextTrack;
-	}
-
-	public FeedItem getPrev(FeedItem item) {
-		FeedItem prev_item = null;
-		FeedItem curr_item = null;
-
-		Cursor cursor = null;
-
-		if (item == null) {
-			FeedItem.getByCursor(cursor);
-			return null;
-		}
-
-		try {
-			cursor = getContentResolver().query(ItemColumns.URI,
-					ItemColumns.ALL_COLUMNS, WHERE, null, ORDER);
-			if (cursor == null) {
-				return null;
-			}
-			cursor.moveToFirst();
-
-			do {
-				prev_item = curr_item;
-				curr_item = FeedItem.getByCursor(cursor);
-
-				if ((curr_item != null) && (item.id == curr_item.id)) {
-					return prev_item;
-				}
-
-			} while (cursor.moveToNext());
-
-		} catch (Exception e) {
-
-		} finally {
-			if (cursor != null)
-				cursor.close();
-		}
-
-		return null;
-	}
-
-	public boolean getPref() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
-        return prefs.getBoolean("pref_continuously_playing", false);
-
-
     }
 
 	private final IBinder binder = new PlayerBinder();

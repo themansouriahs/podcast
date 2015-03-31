@@ -228,7 +228,6 @@ public class SoundWavesPlayer extends MediaPlayer {
             mPlayerService.getCurrentItem().setDuration(mp.getDuration(), false);
             start();
             isPreparingMedia = false;
-            PlayerService.setNextTrack(PlayerService.NextTrack.NEXT_IN_PLAYLIST);
         }
     };
 
