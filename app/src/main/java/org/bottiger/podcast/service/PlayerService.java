@@ -287,6 +287,7 @@ public class PlayerService extends Service implements
         }
 
 		play(nextItem.getId());
+        sPlaylist.removeItem(0);
         sPlaylist.notifyPlaylistChanged();
 	}
 
