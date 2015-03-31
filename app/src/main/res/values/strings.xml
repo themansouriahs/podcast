@@ -212,7 +212,7 @@
     <string name="bulk_download_day">Published within the last 24 hours</string>
     <string name="bulk_download_week">Published this Week</string>
     <string name="bulk_download_month">Published this Month</string>
-    <string name="feedback_mail_client_picker" tools:ignore="MissingTranslation">Send feedback using</string>
+    <string name="feedback_mail_client_picker">Send feedback using</string>
 
     <plurals name="bulk_download_playlist">
         <item quantity="one">First episode in the playlist</item>
