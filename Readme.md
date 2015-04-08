@@ -1,5 +1,3 @@
-# Vacation from April 1. to April 7.
-
 # SoundWaves
 
 SoundWaves is a free, libre and open source app for fetching and listening to podcasts.
