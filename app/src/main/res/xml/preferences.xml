@@ -204,8 +204,8 @@
             android:title="@string/preferences_category_cloud" />
 
         <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="pref_cloud support"
+            android:defaultValue="false"
+            android:key="pref_cloud_support"
             android:summary="@string/pref_cloud_support_description"
             android:title="@string/pref_cloud_support_title" />
 
@@ -220,11 +220,23 @@
             android:key="advanced"
             android:title="@string/preferences_category_advanced" />
 
+        <PreferenceCategory
+            android:title="@string/pref_advanced_category_experimental"
+            android:key="@string/pref_advanced_category_experimental_key">
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/pref_screen_rotation_key"
+            android:summary="@string/pref_screen_rotation_description"
+            android:title="@string/pref_screen_rotation_title" />
+
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="pref_anonymous_feedback"
             android:summary="@string/pref_feedback_description"
             android:title="@string/pref_feedback_title" />
+
+    </PreferenceCategory>
 
     </PreferenceScreen>
 

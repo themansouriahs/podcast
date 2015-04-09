@@ -10,6 +10,7 @@ import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.service.HTTPDService;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.service.PodcastService;
+import org.bottiger.podcast.utils.PreferenceHelper;
 import org.bottiger.podcast.views.dialogs.DialogAddPodcast;
 import org.bottiger.podcast.utils.ThemeHelper;
 import org.bottiger.podcast.utils.TransitionUtils;
@@ -60,6 +61,8 @@ public class MainActivity extends FragmentContainerActivity implements
 	public static HTTPDService mHTTPDServiceBinder = null;
 
 	static boolean mBound = false;
+
+    static PreferenceHelper mPreferenceHelper = new PreferenceHelper();
 
 	// public static GoogleReader gReader = null;
 	public static CloudProvider gReader = null;
@@ -162,7 +165,8 @@ public class MainActivity extends FragmentContainerActivity implements
 
 		}
 
-		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		//setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        mPreferenceHelper.setOrientation(this, prefs);
 
 		/** Painless networking with Volley */
 		//RequestManager.init(this);
