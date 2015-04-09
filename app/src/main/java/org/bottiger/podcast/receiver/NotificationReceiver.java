@@ -15,7 +15,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.widget.RemoteViews;
 
-public class NotificationReceiver extends  BroadcastReceiver {
+public class NotificationReceiver extends BroadcastReceiver {
 
 	public static final String toggleAction = ApplicationConfiguration.packageName + ".TOGGLE";
 	public static final String nextAction = ApplicationConfiguration.packageName + ".NEXT";

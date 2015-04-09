@@ -30,7 +30,6 @@ public class PreferenceHelper implements SharedPreferences.OnSharedPreferenceCha
     private void setScreenOrientation(@NonNull Activity argActivity, @NonNull Boolean argAllowRotation) {
         if (argAllowRotation) {
             argActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
-            //argActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         } else {
             argActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
