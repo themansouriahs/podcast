@@ -3,7 +3,7 @@ package org.bottiger.podcast.receiver;
 
 import java.util.List;
 
-import org.bottiger.podcast.PodcastBaseFragment;
+import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.service.PlayerService;
 
 import android.content.BroadcastReceiver;
@@ -16,12 +16,12 @@ import android.view.KeyEvent;
 public class HeadsetReceiver extends BroadcastReceiver {
 
     private static List eventLog;
-    private PlayerService mPlayerServiceBinder = PodcastBaseFragment.mPlayerServiceBinder;
+    private PlayerService mPlayerServiceBinder = MainActivity.sBoundPlayerService;
 
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d("HeadsetReceiver", "Action: " + intent.getAction().toString() + "");
-        mPlayerServiceBinder = PodcastBaseFragment.mPlayerServiceBinder;
+        mPlayerServiceBinder = MainActivity.sBoundPlayerService;
 
         if (mPlayerServiceBinder == null) {
             Log.e("HeadsetReciever", "Warning, PlayerService is null");

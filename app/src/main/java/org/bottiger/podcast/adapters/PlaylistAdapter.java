@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.TreeSet;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.PodcastBaseFragment;
 import org.bottiger.podcast.R;
 
@@ -233,12 +234,12 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         long playerPosition = 0;
         long playerDuration = 0;
 
-        if (PodcastBaseFragment.mPlayerServiceBinder != null) {
+        if (MainActivity.sBoundPlayerService != null) {
             if (position == 0
-                    && PodcastBaseFragment.mPlayerServiceBinder.isPlaying()) {
-                playerPosition = PodcastBaseFragment.mPlayerServiceBinder
+                    && MainActivity.sBoundPlayerService.isPlaying()) {
+                playerPosition = MainActivity.sBoundPlayerService
                         .position();
-                playerDuration = PodcastBaseFragment.mPlayerServiceBinder
+                playerDuration = MainActivity.sBoundPlayerService
                         .duration();
             } else {
                 playerPosition = feedItem.offset;
@@ -283,12 +284,12 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         //RecentItemFragment.setProgressBar(holder.seekbar, playerDuration,
         //        playerPosition, secondary);
 
-        if (PodcastBaseFragment.mPlayerServiceBinder != null) {
+        if (MainActivity.sBoundPlayerService != null) {
             boolean isPlaying = false;
-            if (PodcastBaseFragment.mPlayerServiceBinder.isInitialized()) {
-                if (feedItem.getId() == PodcastBaseFragment.mPlayerServiceBinder
+            if (MainActivity.sBoundPlayerService.isInitialized()) {
+                if (feedItem.getId() == MainActivity.sBoundPlayerService
                         .getCurrentItem().id) {
-                    if (PodcastBaseFragment.mPlayerServiceBinder.isPlaying()) {
+                    if (MainActivity.sBoundPlayerService.isPlaying()) {
                         isPlaying = true;
                         PodcastBaseFragment.setCurrentTime(holder.currentTime);
                     }

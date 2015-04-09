@@ -6,6 +6,8 @@ import org.bottiger.podcast.AbstractEpisodeFragment.OnPlaylistRefreshListener;
 import org.bottiger.podcast.cloud.CloudProvider;
 import org.bottiger.podcast.cloud.drive.DriveSyncer;
 import org.bottiger.podcast.debug.SqliteCopy;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.service.HTTPDService;
 import org.bottiger.podcast.service.PlayerService;
@@ -28,13 +30,14 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Debug;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -49,14 +52,11 @@ public class MainActivity extends FragmentContainerActivity implements
 
 	private static final String ACCOUNT_KEY = "account";
 
-	public static final boolean SHOW_PULL_TO_REFRESH = true;
-	public static final boolean READER_SUPPORT = false;
-
-	private Drive mDriveService = null;
 	private final int REQUEST_AUTHORIZATION = 1;
 	private final int REQUEST_ACCOUNT_PICKER = 0;
 	private static GoogleAccountCredential mCredential;
 
+    public static PlayerService sBoundPlayerService = null;
 	public static PodcastService mPodcastServiceBinder = null;
 	public static HTTPDService mHTTPDServiceBinder = null;
 
@@ -71,13 +71,27 @@ public class MainActivity extends FragmentContainerActivity implements
 	protected boolean mInit = false;
 	public static Account mAccount;
 
-
-	private AudioManager mAudioManager;
-	private ComponentName mRemoteControlResponder;
+    private HeadsetReceiver receiver;
 
 	private SharedPreferences prefs;
 
 	private int currentTheme;
+
+    public ServiceConnection playerServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            Log.d("PlayerService", "onServiceConnected");
+            sBoundPlayerService = ((PlayerService.PlayerBinder) service)
+                    .getService();
+            PlayerStatusObservable.setActivity(MainActivity.this);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName className) {
+            Log.d("PlayerService", "onServiceDisconnected");
+            sBoundPlayerService = null;
+        }
+    };
 
 	public static ServiceConnection mHTTPDServiceConnection = new ServiceConnection() {
 		@Override
@@ -97,11 +111,14 @@ public class MainActivity extends FragmentContainerActivity implements
 		}
 	};
 
-	private HeadsetReceiver receiver;
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+        // Start the player service
+        startService(new Intent(this, PlayerService.class));
+        Intent bindIntent = new Intent(this, PlayerService.class);
+        bindService(bindIntent, playerServiceConnection, Context.BIND_AUTO_CREATE);
 
 		/*
 		 * BugSenseHandler.initAndStartSession(MainActivity.this, ((SoundWaves)
@@ -190,10 +207,6 @@ public class MainActivity extends FragmentContainerActivity implements
 		currentTheme = ThemeHelper.getTheme(prefs);
 		setTheme(currentTheme);
 
-		mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-		mRemoteControlResponder = new ComponentName(getPackageName(),
-				HeadsetReceiver.class.getName());
-
 		/*
 		IntentFilter receiverFilter = new IntentFilter(
 				Intent.ACTION_HEADSET_PLUG); */
@@ -203,6 +216,14 @@ public class MainActivity extends FragmentContainerActivity implements
 		registerReceiver(receiver, receiverFilter);
 
 	}
+
+    /**
+     * Return a reference to the playerservice if bound
+     */
+    @Nullable
+    public static PlayerService getPlayerService() {
+        return sBoundPlayerService;
+    }
 
 	/**
 	 * Set the current theme based on the preference
@@ -247,7 +268,7 @@ public class MainActivity extends FragmentContainerActivity implements
 				if (accountName != null) {
 					prefs.edit().putString(ACCOUNT_KEY, accountName).commit();
 					mCredential.setSelectedAccountName(accountName);
-					mDriveService = getDriveService(mCredential);
+					//mDriveService = getDriveService(mCredential);
 					// startCameraIntent();
 					// updateDatabase();
 					Account account = mCredential.getSelectedAccount();
@@ -283,7 +304,12 @@ public class MainActivity extends FragmentContainerActivity implements
 	protected void onDestroy() {
 		super.onDestroy();
 		unregisterReceiver(receiver);
-		//BugSenseHandler.closeSession(MainActivity.this);
+
+        try {
+            unbindService(playerServiceConnection);
+        } catch (Exception e) {
+            VendorCrashReporter.handleException(e);
+        }
 	}
 
 	@Override
@@ -327,11 +353,11 @@ public class MainActivity extends FragmentContainerActivity implements
 		// The extended_player can only be playing if the PlayerService has been bound
         /*
 		MenuItem menuItem = menu.findItem(R.id.menu_control);
-		if (PodcastBaseFragment.mPlayerServiceBinder != null) {
+		if (PodcastBaseFragment.sBoundPlayerService != null) {
 
-			if (PodcastBaseFragment.mPlayerServiceBinder.isPlaying()) {
+			if (PodcastBaseFragment.sBoundPlayerService.isPlaying()) {
 				menuItem.setIcon(themeHelper.getAttr(R.attr.pause_invert_icon));
-			} else if (PodcastBaseFragment.mPlayerServiceBinder.isOnPause()) {
+			} else if (PodcastBaseFragment.sBoundPlayerService.isOnPause()) {
 				menuItem.setIcon(themeHelper.getAttr(R.attr.play_invert_icon));
 			} else {
 				//menuItem.setVisible(false);
@@ -352,8 +378,8 @@ public class MainActivity extends FragmentContainerActivity implements
 		switch (item.getItemId()) {
             /*
 		case R.id.menu_control:
-			if (PodcastBaseFragment.mPlayerServiceBinder != null) {
-				PodcastBaseFragment.mPlayerServiceBinder.toggle();
+			if (PodcastBaseFragment.sBoundPlayerService != null) {
+				PodcastBaseFragment.sBoundPlayerService.toggle();
 			}
 			return true;*/
 		case R.id.menu_add:

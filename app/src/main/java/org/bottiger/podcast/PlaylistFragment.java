@@ -26,14 +26,12 @@ import org.bottiger.podcast.views.TextViewObserver;
 import org.bottiger.podcast.views.TopPlayer;
 import org.bottiger.podcast.views.MultiShrink.playlist.MultiShrinkScroller;
 import org.bottiger.podcast.views.dialogs.DialogBulkDownload;
-import org.bottiger.podcast.views.dialogs.DialogOPML;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
@@ -364,8 +362,8 @@ public class PlaylistFragment extends GeastureFragment implements
         mBackButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (PodcastBaseFragment.mPlayerServiceBinder != null) {
-                    PodcastBaseFragment.mPlayerServiceBinder.getPlayer().rewind(item);
+                if (MainActivity.sBoundPlayerService != null) {
+                    MainActivity.sBoundPlayerService.getPlayer().rewind(item);
                 }
             }
         });
@@ -373,8 +371,8 @@ public class PlaylistFragment extends GeastureFragment implements
         mForwardButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (PodcastBaseFragment.mPlayerServiceBinder != null) {
-                    PodcastBaseFragment.mPlayerServiceBinder.getPlayer().fastForward(item);
+                if (MainActivity.sBoundPlayerService != null) {
+                    MainActivity.sBoundPlayerService.getPlayer().fastForward(item);
                 }
             }
         });
