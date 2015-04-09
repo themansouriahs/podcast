@@ -95,6 +95,12 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         Log.v("PlaylistAdapter", "onBindViewHolder(pos: " + position + ")");
 
         final FeedItem item = mPlaylist.getItem(position+PLAYLIST_OFFSET);
+
+        if (item == null) {
+            // This should only happen if the playlist only contain 1 item
+            return;
+        }
+
         keepOne.bind(viewHolder, position);
 
         Log.d("ExpanderHelper", "pos: " + position + " episode: " + item.getTitle());
