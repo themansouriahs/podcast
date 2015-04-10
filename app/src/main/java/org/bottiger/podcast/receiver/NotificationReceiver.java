@@ -5,6 +5,7 @@ import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.notification.NotificationPlayer;
+import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.service.PlayerService;
 
 import android.content.BroadcastReceiver;
@@ -16,8 +17,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 
 	public static final String toggleAction = ApplicationConfiguration.packageName + ".TOGGLE";
 	public static final String nextAction = ApplicationConfiguration.packageName + ".NEXT";
-	
-	private PlayerService mPlayerServiceBinder = MainActivity.sBoundPlayerService;
+
 	private RemoteViews layout;
 	private NotificationPlayer np;
 	
@@ -27,31 +27,36 @@ public class NotificationReceiver extends BroadcastReceiver {
 		String action = intent.getAction();
 		layout = new RemoteViews(context.getPackageName(), R.layout.notification);
 
+        PlayerService playerService = MainActivity.getPlayerService();
+
         // FIXME we should start the service and not just return.
         // FIXME The user probably wants to start playing when the service isn't running
-        if (mPlayerServiceBinder == null) {
+        if (playerService == null) {
             VendorCrashReporter.report("PlayerService", "IS NULL");
             return;
         }
 
         if (action.equals(nextAction)) {
-            mPlayerServiceBinder.playNext();
+            playerService.playNext();
             return;
         }
 
 		
 		if (action.equals(toggleAction)) {
 			Boolean isPlaying = false;
-			if (mPlayerServiceBinder.isPlaying()) {
-				mPlayerServiceBinder.pause();
+			if (playerService.isPlaying()) {
+				playerService.pause();
 			} else {
-				mPlayerServiceBinder.start();
+				playerService.start();
 				isPlaying = true;
 			}
-			
-			np = new NotificationPlayer(context, mPlayerServiceBinder.getCurrentItem());
-            np.setPlayerService(mPlayerServiceBinder);
-			np.show(isPlaying);
+
+            FeedItem currentItem = playerService.getCurrentItem();
+            if (currentItem != null) {
+                np = new NotificationPlayer(context, playerService.getCurrentItem());
+                np.setPlayerService(playerService);
+                np.show(isPlaying);
+            }
 		}
 		
 	}
