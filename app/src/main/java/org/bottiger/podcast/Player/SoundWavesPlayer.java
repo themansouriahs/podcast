@@ -308,7 +308,11 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
     }
 
     public long seek(long whereto) {
-        seekTo((int) whereto);
+        if (isCasting()) {
+            mMediaCast.seekTo(whereto);
+        } else {
+            seekTo((int) whereto);
+        }
         return whereto;
     }
 
