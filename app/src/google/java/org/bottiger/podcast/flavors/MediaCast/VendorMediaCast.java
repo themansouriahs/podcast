@@ -25,16 +25,18 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.provider.FeedItem;
 
 import java.io.IOException;
+import java.net.URLConnection;
 
 /**
  * Created by apl on 28-03-2015.
  */
-public class VendorMediaCast {
+public class VendorMediaCast implements IMediaCast {
 
     private static final String TAG = "VendorMediaCast";
-    private static final String APPLICATION_ID = "id";
+    private static final String APPLICATION_ID = "CC1AD845";
     private final CastDevice mSelectedDevice;
 
     private Context mContext;
@@ -43,6 +45,7 @@ public class VendorMediaCast {
     private ConnectionCallbacks mConnectionCallbacks = new ConnectionCallbacks();
     private ConnectionFailedListener mConnectionFailedListener = new ConnectionFailedListener();
     private boolean mWaitingForReconnect = false;
+    private boolean mIsConnected = false;
     private boolean mApplicationStarted;
 
     //cast demo
@@ -143,6 +146,10 @@ public class VendorMediaCast {
 
     }
 
+    public void loadMedia() {
+        loadMedia("Test", "http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/sn/sn0430/sn0430.mp3", "audio/mpeg");
+    }
+
     public void loadMedia(@NonNull String argTitle, @NonNull String argUrl, @NonNull String argContentType) {
         MediaMetadata mediaMetadata = new MediaMetadata(MediaMetadata.MEDIA_TYPE_MOVIE);
         mediaMetadata.putString(MediaMetadata.KEY_TITLE, argTitle);
@@ -169,8 +176,44 @@ public class VendorMediaCast {
         }
     }
 
+    @Override
     public void connect() {
         mApiClient.connect();
+    }
+
+    @Override
+    public void disconnect() {
+        mApiClient.disconnect();
+    }
+
+    @Override
+    public boolean isConnected() {
+        return mIsConnected;
+    }
+
+    @Override
+    public boolean loadEpisode(FeedItem argEpisode) {
+        String title = argEpisode.getTitle();
+        String url = argEpisode.getURL();
+        String mimeType= URLConnection.guessContentTypeFromName(url);
+
+        loadMedia(title, url, mimeType);
+        return true;
+    }
+
+    @Override
+    public void play() {
+
+    }
+
+    @Override
+    public void pause() {
+
+    }
+
+    @Override
+    public void seekTo(long argPositionMs) {
+
     }
 
     private void startSession() {
@@ -237,12 +280,13 @@ public class VendorMediaCast {
 
         @Override
         public void onConnected(Bundle connectionHint) {
+            mIsConnected = true;
             if (mWaitingForReconnect) {
                 mWaitingForReconnect = false;
                 //reconnectChannels();
             } else {
                 try {
-                    /*
+
                     Cast.CastApi.launchApplication(mApiClient, APPLICATION_ID, false)
                             .setResultCallback(
                                     new ResultCallback<Cast.ApplicationConnectionResult>() {
@@ -255,13 +299,15 @@ public class VendorMediaCast {
                                                 String sessionId = result.getSessionId();
                                                 String applicationStatus = result.getApplicationStatus();
                                                 boolean wasLaunched = result.getWasLaunched();
+
+                                                loadMedia();
                                                 //...
                                             } else {
-                                                //teardown();
+                                                teardown();
                                             }
                                         }
                                     });
-                                    */
+
 
                 } catch (Exception e) {
                     Log.e(TAG, "Failed to launch application", e);
@@ -284,7 +330,7 @@ public class VendorMediaCast {
     }
 
     private void teardown() {
-
+        mIsConnected = false;
     }
 
     class SoundWavesChannel implements Cast.MessageReceivedCallback {
@@ -300,7 +346,7 @@ public class VendorMediaCast {
     }
 
     public void afterConnect() {
-        Cast.CastApi.launchApplication(mApiClient, "YOUR_APPLICATION_ID", false)
+        Cast.CastApi.launchApplication(mApiClient, APPLICATION_ID, false)
                 .setResultCallback(
                         new ResultCallback<Cast.ApplicationConnectionResult>() {
                             @Override
