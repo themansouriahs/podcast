@@ -37,6 +37,9 @@ public class InitialHeaderAdapter implements StickyHeadersAdapter<InitialHeaderA
 
         FeedItem item = mPlaylist.getItem(position+ PlaylistAdapter.PLAYLIST_OFFSET);
 
+        if (item == null)
+            return;
+
         headerViewHolder.letter.setVisibility(View.VISIBLE);
         if (position == mCurrentlyDragging) {
             headerViewHolder.letter.setVisibility(View.INVISIBLE);

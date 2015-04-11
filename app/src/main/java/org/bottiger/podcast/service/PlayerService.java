@@ -335,6 +335,7 @@ public class PlayerService extends Service implements
         }
 
 		play(nextItem.getId());
+        mMetaDataControllerWrapper.updateState(nextItem, true);
         sPlaylist.removeItem(0);
         sPlaylist.notifyPlaylistChanged();
 	}
