@@ -10,10 +10,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v7.media.MediaControlIntent;
 import android.support.v7.media.MediaItemMetadata;
 import android.support.v7.media.MediaItemStatus;
+import android.support.v7.media.MediaRouteSelector;
 import android.support.v7.media.MediaRouter;
 import android.support.v7.media.MediaSessionStatus;
 import android.text.TextUtils;
@@ -25,8 +27,12 @@ import com.google.android.gms.cast.MediaMetadata;
 import com.google.android.gms.common.images.WebImage;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.provider.FeedItem;
 
+import java.io.File;
+import java.net.URLConnection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -77,10 +83,24 @@ public class MediaRouteCast implements IMediaCast {
     private ResultBundleHandler mMediaResultHandler;
     private MediaInfo mPendingMedia;
 
+    private MediaRouteSelector mMediaRouteSelector;
+    private MediaRouter mMediaRouter;
+    private boolean mRouteSelected;
+    private boolean mDiscoveryActive;
+    private MediaRouter.Callback mMediaRouterCallback;
+
+    private MediaInfo mCurrentTrack;
+
+    private IMediaRouteStateListener mListener;
+
     @NonNull private Activity mActivity;
+    private int mPlayerState;
 
     public MediaRouteCast(Activity argActivity) {
         mActivity = argActivity;
+
+        mMediaRouter = MediaRouter.getInstance(mActivity.getApplicationContext());
+        mMediaRouterCallback = new MyMediaRouterCallback();
 
         // Construct a broadcast receiver and a PendingIntent for receiving session status
         // updates from the MRP.
@@ -126,6 +146,7 @@ public class MediaRouteCast implements IMediaCast {
 
 
         clearStreamState();
+        buildRouteSelector();
 
         // from onResume
         mActivity.registerReceiver(mSessionStatusBroadcastReceiver, mSessionStatusBroadcastIntentFilter);
@@ -144,35 +165,131 @@ public class MediaRouteCast implements IMediaCast {
 
     @Override
     public boolean isConnected() {
-        return false;
+        return mRouteSelected;
     }
 
     @Override
-    public boolean loadEpisode(FeedItem argEpisode) {
-        return false;
+    public boolean isPlaying() {
+        return mStreamAdvancing;
+    }
+
+    @Override
+    public boolean loadEpisode(@NonNull FeedItem argEpisode) {
+        String url = argEpisode.getURL();
+
+        if (TextUtils.isEmpty(url))
+            return false;
+
+        String mimeType= URLConnection.guessContentTypeFromName(url);
+
+        String subTitle = argEpisode.getSubscription(mActivity).getTitle();
+        String artWorkURI = argEpisode.getImageURL(mActivity);
+
+        MediaMetadata mediaMetadata = new MediaMetadata();
+        mediaMetadata.putString(MediaMetadata.KEY_TITLE, argEpisode.getTitle());
+        mediaMetadata.putString(MediaMetadata.KEY_ARTIST, subTitle);
+        //mediaMetadata.putString(MediaMetadata.KEY_ARTWORK_URI, artWorkURI);
+
+        MediaInfo.Builder mediaInfoBuilder = new MediaInfo.Builder(url)
+                .setContentType(mimeType)
+                .setStreamType(MediaInfo.STREAM_TYPE_BUFFERED)
+                .setMetadata(mediaMetadata);
+                //.setStreamType(streamType)
+                //.setContentType(mimeType)
+                //.setMetadata(metadata);
+
+        mCurrentTrack = mediaInfoBuilder.build();
+
+        return mCurrentTrack != null;
     }
 
     @Override
     public void play() {
 
+        if (mPlayerState == PLAYER_STATE_NONE) {
+            onPlayMedia(mCurrentTrack);
+            SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.MEDIA_ROUTING);
+            return;
+        }
+
+        if (mCurrentItemId == null) {
+            return;
+        }
+
+        String action = isPlaying() ? MediaControlIntent.ACTION_PAUSE : MediaControlIntent.ACTION_RESUME;
+
+        Intent intent = new Intent(action);
+        intent.addCategory(MediaControlIntent.CATEGORY_REMOTE_PLAYBACK);
+        intent.putExtra(MediaControlIntent.EXTRA_SESSION_ID, mSessionId);
+        sendIntentToRoute(intent, mMediaResultHandler);
+
     }
 
     @Override
     public void pause() {
+        if (mCurrentItemId == null) {
+            return;
+        }
 
+        Intent intent = new Intent(MediaControlIntent.ACTION_PAUSE);
+        intent.addCategory(MediaControlIntent.CATEGORY_REMOTE_PLAYBACK);
+        intent.putExtra(MediaControlIntent.EXTRA_SESSION_ID, mSessionId);
+        sendIntentToRoute(intent, mMediaResultHandler);
+    }
+
+    @Override
+    public void stop() {
+        pause();
+    }
+
+    @Override
+    public int getCurrentPosition() {
+        /*
+        long timeDiff = SystemClock.elapsedRealtime() - mStreamPositionTimestamp;
+        long currentEstimatedPosition = mLastKnownStreamPosition + timeDiff;
+        return (int)currentEstimatedPosition;*/
+        long extrapolatedStreamPosition = mLastKnownStreamPosition
+                + (SystemClock.uptimeMillis() - mStreamPositionTimestamp);
+        if (extrapolatedStreamPosition > mStreamDuration) {
+            extrapolatedStreamPosition = mStreamDuration;
+        }
+        return (int)extrapolatedStreamPosition;
     }
 
     @Override
     public void seekTo(long argPositionMs) {
+        if (mCurrentItemId == null) {
+            return;
+        }
 
+        //refreshPlaybackPosition(argPositionMs, -1);
+
+        Intent intent = new Intent(MediaControlIntent.ACTION_SEEK);
+        intent.addCategory(MediaControlIntent.CATEGORY_REMOTE_PLAYBACK);
+        intent.putExtra(MediaControlIntent.EXTRA_ITEM_ID, mCurrentItemId);
+        intent.putExtra(MediaControlIntent.EXTRA_ITEM_CONTENT_POSITION, argPositionMs);
+        intent.putExtra(MediaControlIntent.EXTRA_SESSION_ID, mSessionId);
+        sendIntentToRoute(intent, mMediaResultHandler);
+    }
+
+    public void registerStateChangedListener(IMediaRouteStateListener argListener) {
+        mListener = argListener;
+    }
+
+    public void unregisterStateChangedListener(IMediaRouteStateListener argListener) {
+        mListener = null;
     }
 
     private void clearStreamState() {
         mStreamAdvancing = false;
         mStreamPositionTimestamp = 0;
         mLastKnownStreamPosition = 0;
-        //setPlayerState(PLAYER_STATE_NONE);
+        setPlayerState(PLAYER_STATE_NONE);
         refreshPlaybackPosition(0, 0);
+    }
+
+    protected final void setPlayerState(int playerState) {
+        mPlayerState = playerState;
     }
 
     /**
@@ -260,7 +377,7 @@ public class MediaRouteCast implements IMediaCast {
                     playerState = PLAYER_STATE_BUFFERING;
                 }
 
-                //setPlayerState(playerState);
+                setPlayerState(playerState);
                 mCurrentItemId = itemId;
                 //setCurrentMediaMetadata(title, artist, imageUrl);
                 //updateButtonStates();
@@ -501,12 +618,92 @@ public class MediaRouteCast implements IMediaCast {
     private void clearCurrentMediaItem() {
         //setCurrentMediaMetadata(null, null, null);
         refreshPlaybackPosition(0, 0);
-        //setPlayerState(PLAYER_STATE_NONE);
+        setPlayerState(PLAYER_STATE_NONE);
         mCurrentItemId = null;
         //updateButtonStates();
     }
 
+    public void startDiscovery() {
+        mMediaRouter.addCallback(mMediaRouteSelector, mMediaRouterCallback,
+                MediaRouter.CALLBACK_FLAG_REQUEST_DISCOVERY);
+        mDiscoveryActive = true;
+    }
+
+    public void stopDiscovery() {
+        mMediaRouter.removeCallback(mMediaRouterCallback);
+        mDiscoveryActive = false;
+    }
+
+    public MediaRouteSelector getRouteSelector() {
+        return mMediaRouteSelector;
+    }
+
+    private void buildRouteSelector() {
+        mMediaRouteSelector = new MediaRouteSelector.Builder()
+                .addControlCategory(getControlCategory())
+                .build();
+    }
+
+    protected String getControlCategory() {
+        return CastMediaControlIntent.categoryForRemotePlayback(mReceiverApplicationId);
+    }
+
+    private void setSelectedRoute(MediaRouter.RouteInfo route) {
+        clearStreamState();
+        mCurrentRoute = route;
+        //setCurrentDeviceName(route != null ? route.getName() : null);
+    }
+
+    private void requestSessionStatus() {
+        if (mSessionId == null) {
+            return;
+        }
+
+        Intent intent = new Intent(MediaControlIntent.ACTION_GET_SESSION_STATUS);
+        intent.addCategory(MediaControlIntent.CATEGORY_REMOTE_PLAYBACK);
+        intent.putExtra(MediaControlIntent.EXTRA_SESSION_ID, mSessionId);
+        sendIntentToRoute(intent, null);
+    }
+
     private interface ResultBundleHandler {
         public void handleResult(Bundle bundle);
+    }
+
+    private class MyMediaRouterCallback extends MediaRouter.Callback {
+        @Override
+        public void onRouteSelected(MediaRouter router, MediaRouter.RouteInfo route) {
+            Log.d(TAG, "onRouteSelected: route=" + route);
+            mRouteSelected = true;
+            setSelectedRoute(route);
+            //updateButtonStates();
+            String routeId = route.getId();
+            if (routeId.equals(mLastRouteId) && (mSessionId != null)) {
+                // Try to rejoin the session by requesting status.
+                Log.d(TAG, "Trying to rejoin previous session");
+                requestSessionStatus();
+                //updateButtonStates();
+            }
+            mLastRouteId = routeId;
+
+            mListener.onStateChanged(MediaRouteCast.this);
+        }
+
+        @Override
+        public void onRouteUnselected(MediaRouter router, MediaRouter.RouteInfo route) {
+            Log.d(TAG, "onRouteUnselected: route=" + route);
+            mRouteSelected = false;
+            setSelectedRoute(null);
+            clearCurrentMediaItem();
+            mSessionActive = false;
+            mSessionId = null;
+            //updateButtonStates();
+
+            mListener.onStateChanged(MediaRouteCast.this);
+        }
+
+        @Override
+        public void onRouteVolumeChanged(MediaRouter router, MediaRouter.RouteInfo route) {
+            //refreshDeviceVolume(route.getVolume() / MAX_VOLUME_LEVEL, false);
+        }
     }
 }

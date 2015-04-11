@@ -16,6 +16,7 @@ import android.view.MenuItem;
 
 import com.google.android.gms.cast.CastMediaControlIntent;
 
+import org.bottiger.podcast.flavors.MediaCast.MediaRouteCast;
 import org.bottiger.podcast.flavors.MediaCast.VendorMediaCast;
 
 /**
@@ -28,6 +29,8 @@ public class MediaRouterPlaybackActivity extends ToolbarActivity {
     private MediaRouter mMediaRouter;
     private MediaRouteSelector mSelector;
     private VendorMediaCast mMediaCast;
+
+    protected MediaRouteCast mMediaRouteCast;
 
     private final MediaRouter.Callback mMediaRouterCallback =
             new MediaRouter.Callback() {
@@ -58,6 +61,7 @@ public class MediaRouterPlaybackActivity extends ToolbarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        /*
         mMediaRouter = MediaRouter.getInstance(getApplicationContext());
 
         // Create a route selector for the type of routes your app supports.
@@ -68,6 +72,20 @@ public class MediaRouterPlaybackActivity extends ToolbarActivity {
                 .addControlCategory(MediaControlIntent.CATEGORY_REMOTE_PLAYBACK)
                 //.addControlCategory(CastMediaControlIntent.DEFAULT_MEDIA_RECEIVER_APPLICATION_ID)
                 .build();
+                */
+        mMediaRouteCast = new MediaRouteCast(this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mMediaRouteCast.startDiscovery();
+    }
+
+    @Override
+    protected void onStop() {
+        mMediaRouteCast.stopDiscovery();
+        super.onStop();
     }
 
     @Override
@@ -82,7 +100,8 @@ public class MediaRouterPlaybackActivity extends ToolbarActivity {
         MediaRouteActionProvider mediaRouteActionProvider =
                 (MediaRouteActionProvider) MenuItemCompat.getActionProvider(
                         mediaRouteMenuItem);
-        mediaRouteActionProvider.setRouteSelector(mSelector);
+        //mediaRouteActionProvider.setRouteSelector(mSelector);
+        mediaRouteActionProvider.setRouteSelector(mMediaRouteCast.getRouteSelector());
 
         // Return true to show the menu.
         return true;

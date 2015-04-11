@@ -83,6 +83,7 @@ public class MainActivity extends FragmentContainerActivity implements
             Log.d("PlayerService", "onServiceConnected");
             sBoundPlayerService = ((PlayerService.PlayerBinder) service)
                     .getService();
+            sBoundPlayerService.setMediaCast(mMediaRouteCast);
             PlayerStatusObservable.setActivity(MainActivity.this);
         }
 

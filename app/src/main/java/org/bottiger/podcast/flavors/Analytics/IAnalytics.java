@@ -12,7 +12,8 @@ public interface IAnalytics {
                              SUBSCRIBE_TO_FEED,
                              OPML_IMPORT,
                              OPML_EXPORT,
-                             DATABASE_UPGRADE
+                             DATABASE_UPGRADE,
+                             MEDIA_ROUTING
     };
 
     public void startTracking();

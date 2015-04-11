@@ -192,6 +192,11 @@ public class VendorMediaCast implements IMediaCast {
     }
 
     @Override
+    public boolean isPlaying() {
+        return false;
+    }
+
+    @Override
     public boolean loadEpisode(FeedItem argEpisode) {
         String title = argEpisode.getTitle();
         String url = argEpisode.getURL();
@@ -212,7 +217,27 @@ public class VendorMediaCast implements IMediaCast {
     }
 
     @Override
+    public void stop() {
+
+    }
+
+    @Override
+    public int getCurrentPosition() {
+        return 0;
+    }
+
+    @Override
     public void seekTo(long argPositionMs) {
+
+    }
+
+    @Override
+    public void registerStateChangedListener(IMediaRouteStateListener argListener) {
+
+    }
+
+    @Override
+    public void unregisterStateChangedListener(IMediaRouteStateListener argListener) {
 
     }
 

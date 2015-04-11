@@ -7,6 +7,7 @@ import org.bottiger.podcast.Player.PlayerHandler;
 import org.bottiger.podcast.Player.PlayerPhoneListener;
 import org.bottiger.podcast.Player.PlayerStateManager;
 import org.bottiger.podcast.Player.SoundWavesPlayer;
+import org.bottiger.podcast.flavors.MediaCast.IMediaCast;
 import org.bottiger.podcast.flavors.MediaCast.VendorMediaCast;
 import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.playlist.Playlist;
@@ -84,33 +85,7 @@ public class PlayerService extends Service implements
     private LegacyRemoteController mLegacyRemoteController;
 
     // Google Cast
-    private MediaRouter mMediaRouter;
-    private MediaRouteSelector mSelector;
-    private VendorMediaCast mMediaCast;
-    private final MediaRouter.Callback mMediaRouterCallback =
-            new MediaRouter.Callback() {
-
-                @Override
-                public void onRouteSelected(MediaRouter router, MediaRouter.RouteInfo route) {
-                    Log.d(TAG, "onRouteSelected: route=" + route);
-
-                    mMediaCast = new VendorMediaCast(PlayerService.this, router, route);
-                }
-
-                @Override
-                public void onRouteUnselected(MediaRouter router, MediaRouter.RouteInfo route) {
-                    Log.d(TAG, "onRouteUnselected: route=" + route);
-
-                    mMediaCast = null;
-
-                }
-
-                @Override
-                public void onRoutePresentationDisplayChanged(
-                        MediaRouter router, MediaRouter.RouteInfo route) {
-                    Log.d(TAG, "onRoutePresentationDisplayChanged: route=" + route);
-                }
-            };
+    private IMediaCast mMediaCast;
 
 
     private NotificationManager mNotificationManager;
@@ -186,23 +161,9 @@ public class PlayerService extends Service implements
             mLegacyRemoteController = new LegacyRemoteController();
             mMetaDataControllerWrapper = new MetaDataControllerWrapper(mLegacyRemoteController);
         }
-
-        // Get the media router service.
-        mMediaRouter = MediaRouter.getInstance(this);
-        // Create a route selector for the type of routes your app supports.
-        mSelector = new MediaRouteSelector.Builder()
-                // These are the framework-supported intents
-                .addControlCategory(MediaControlIntent.CATEGORY_LIVE_AUDIO)
-                .addControlCategory(MediaControlIntent.CATEGORY_LIVE_VIDEO)
-                .addControlCategory(MediaControlIntent.CATEGORY_REMOTE_PLAYBACK)
-                .build();
-
     }
 
     private void handleIntent( Intent intent ) {
-
-        mMediaRouter.addCallback(mSelector, mMediaRouterCallback,
-                MediaRouter.CALLBACK_FLAG_REQUEST_DISCOVERY);
 
         if( intent == null || intent.getAction() == null )
             return;
@@ -273,9 +234,6 @@ public class PlayerService extends Service implements
 
 	@Override
 	public void onDestroy() {
-        mMediaRouter.removeCallback(mMediaRouterCallback);
-
-
         super.onDestroy();
 		if (mPlayer != null) {
 			mPlayer.release();
@@ -517,6 +475,11 @@ public class PlayerService extends Service implements
         if (isSteaming && mWifi.isConnected()) {
             wifiLock.acquire();
         }
+    }
+
+    public void setMediaCast(IMediaCast mMediaCast) {
+        this.mMediaCast = mMediaCast;
+        mMediaCast.registerStateChangedListener(getPlayer());
     }
 
     /**

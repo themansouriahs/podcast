@@ -14,6 +14,8 @@ import android.support.annotation.NonNull;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
+import org.bottiger.podcast.flavors.MediaCast.IMediaCast;
+import org.bottiger.podcast.flavors.MediaCast.IMediaRouteStateListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
@@ -25,7 +27,7 @@ import java.io.IOException;
 /**
  * Created by apl on 20-01-2015.
  */
-public class SoundWavesPlayer extends MediaPlayer {
+public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateListener {
 
     private static final float MARK_AS_LISTENED_RATIO_THRESHOLD = 0.9f;
     private static final float MARK_AS_LISTENED_MINUTES_LEFT_THRESHOLD = 5f;
@@ -40,6 +42,9 @@ public class SoundWavesPlayer extends MediaPlayer {
     // AudioManager
     private AudioManager mAudioManager;
     private ComponentName mControllerComponentName;
+
+    // GoogleCast
+    private IMediaCast mMediaCast;
 
     private boolean isPreparingMedia = false;
 
@@ -59,6 +64,13 @@ public class SoundWavesPlayer extends MediaPlayer {
     }
 
     public void setDataSourceAsync(String path, int startPos) {
+
+        if (isCasting()) {
+            mMediaCast.loadEpisode(mPlayerService.getCurrentItem());
+            start();
+            return;
+        }
+
         try {
 
             File f = new File(path);
@@ -103,6 +115,14 @@ public class SoundWavesPlayer extends MediaPlayer {
     }
 
     public void start() {
+
+        if (isCasting()) {
+            mMediaCast.play();
+            PlayerStatusObservable
+                    .updateStatus(PlayerStatusObservable.STATUS.PLAYING);
+            return;
+        }
+
         // Request audio focus for playback
         int result = mAudioManager.requestAudioFocus(mPlayerService,
                 // Use the music stream.
@@ -122,7 +142,14 @@ public class SoundWavesPlayer extends MediaPlayer {
     }
 
     public void stop() {
-        super.reset();
+
+        if (isCasting()) {
+            mMediaCast.stop();
+            return;
+        } else {
+            super.reset();
+        }
+
         mIsInitialized = false;
         mPlayerService.stopForeground(true);
         PlayerStatusObservable
@@ -136,6 +163,20 @@ public class SoundWavesPlayer extends MediaPlayer {
         mAudioManager
                 .unregisterMediaButtonEventReceiver(mControllerComponentName);
         mIsInitialized = false;
+    }
+
+    @Override
+    public boolean isPlaying() {
+        return super.isPlaying() || isPlayingUsingMediaRoute();
+    }
+
+    public boolean isPlayingUsingMediaRoute() {
+        return mMediaCast != null && mMediaCast.isPlaying();
+    }
+
+    @Override
+    public int getCurrentPosition() {
+        return isPlayingUsingMediaRoute() ? mMediaCast.getCurrentPosition() : super.getCurrentPosition();
     }
 
     public void rewind(FeedItem argItem) {
@@ -167,7 +208,14 @@ public class SoundWavesPlayer extends MediaPlayer {
      * Pause the current playing item
      */
     public void pause() {
-        super.pause();
+
+        if (isCasting()) {
+            mMediaCast.stop();
+            return;
+        } else {
+            super.pause();
+        }
+
         MarkAsListenedIfNeeded();
         PlayerStatusObservable
                 .updateStatus(PlayerStatusObservable.STATUS.PAUSED);
@@ -295,5 +343,35 @@ public class SoundWavesPlayer extends MediaPlayer {
         }
 
         episode.update(mPlayerService.getContentResolver());
+    }
+
+    @Override
+    public void onStateChanged(IMediaCast castProvider) {
+        if (castProvider == null)
+            return;
+
+        mMediaCast = castProvider;
+
+        if (mPlayerService == null)
+            return;
+
+        FeedItem episode = mPlayerService.getCurrentItem();
+
+        if (episode == null)
+            return;
+
+        if (mMediaCast.isConnected()) {
+            mMediaCast.loadEpisode(episode);
+
+
+            mMediaCast.seekTo(episode.offset);
+            //castProvider.play();
+            PlayerStatusObservable
+                    .updateStatus(PlayerStatusObservable.STATUS.PLAYING);
+        }
+    }
+
+    public boolean isCasting() {
+        return mMediaCast != null && mMediaCast.isConnected();
     }
 }
