@@ -13,6 +13,7 @@ import android.util.Xml;
 
 /** Writes OPML documents. */
 public class OpmlWriter {
+
 	private static final String TAG = "OpmlWriter";
 	private static final String ENCODING = "UTF-8";
 	private static final String OPML_VERSION = "2.0";
@@ -28,8 +29,8 @@ public class OpmlWriter {
 	 */
 	public void writeDocument(List<Subscription> feeds, Writer writer)
 			throws IllegalArgumentException, IllegalStateException, IOException {
-		if (MainActivity.debugging)
-			Log.d(TAG, "Starting to write document");
+
+        Log.d(TAG, "Starting to write document");
 		XmlSerializer xs = Xml.newSerializer();
 		xs.setOutput(writer);
 
@@ -61,7 +62,6 @@ public class OpmlWriter {
 		xs.endTag(null, OpmlSymbols.BODY);
 		xs.endTag(null, OpmlSymbols.OPML);
 		xs.endDocument();
-		if (MainActivity.debugging)
-			Log.d(TAG, "Finished writing document");
+		Log.d(TAG, "Finished writing document");
 	}
 }
