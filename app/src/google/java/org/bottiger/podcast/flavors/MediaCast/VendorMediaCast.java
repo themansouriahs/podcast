@@ -197,6 +197,11 @@ public class VendorMediaCast implements IMediaCast {
     }
 
     @Override
+    public boolean isActive() {
+        return false;
+    }
+
+    @Override
     public boolean loadEpisode(FeedItem argEpisode) {
         String title = argEpisode.getTitle();
         String url = argEpisode.getURL();

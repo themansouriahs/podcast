@@ -356,7 +356,8 @@ public class PlayerService extends Service implements
      * @return True of the songs start to play
      */
 	public boolean toggle(long id) {
-		if (mPlayer.isPlaying() == false || this.getCurrentItem().getId() != id) {
+        FeedItem item = getCurrentItem();
+		if (!mPlayer.isPlaying() || (item != null && item.getId() != id)) {
 			play(id);
             return true;
 		} else {

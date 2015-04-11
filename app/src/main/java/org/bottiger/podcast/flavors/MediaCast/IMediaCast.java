@@ -12,6 +12,7 @@ public interface IMediaCast {
 
     public boolean isConnected();
     public boolean isPlaying();
+    public boolean isActive();
 
     public boolean loadEpisode(FeedItem argEpisode);
 

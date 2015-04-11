@@ -79,9 +79,11 @@ public class MediaRouteCast implements IMediaCast {
     private long mStreamPositionTimestamp;
     private long mLastKnownStreamPosition;
     private long mStreamDuration;
-    private boolean mStreamAdvancing;
     private ResultBundleHandler mMediaResultHandler;
     private MediaInfo mPendingMedia;
+
+    private boolean mPlayingInitialized = false;
+    private boolean mStreamAdvancing;
 
     private MediaRouteSelector mMediaRouteSelector;
     private MediaRouter mMediaRouter;
@@ -174,6 +176,11 @@ public class MediaRouteCast implements IMediaCast {
     }
 
     @Override
+    public boolean isActive() {
+        return isConnected() && mCurrentTrack != null;
+    }
+
+    @Override
     public boolean loadEpisode(@NonNull FeedItem argEpisode) {
         String url = argEpisode.getURL();
 
@@ -206,6 +213,8 @@ public class MediaRouteCast implements IMediaCast {
     @Override
     public void play() {
 
+        mPlayingInitialized = true;
+
         if (mPlayerState == PLAYER_STATE_NONE) {
             onPlayMedia(mCurrentTrack);
             SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.MEDIA_ROUTING);
@@ -213,6 +222,7 @@ public class MediaRouteCast implements IMediaCast {
         }
 
         if (mCurrentItemId == null) {
+            mPlayingInitialized = false;
             return;
         }
 
@@ -227,6 +237,7 @@ public class MediaRouteCast implements IMediaCast {
 
     @Override
     public void pause() {
+        mPlayingInitialized = false;
         if (mCurrentItemId == null) {
             return;
         }
@@ -245,15 +256,30 @@ public class MediaRouteCast implements IMediaCast {
     @Override
     public int getCurrentPosition() {
         /*
-        long timeDiff = SystemClock.elapsedRealtime() - mStreamPositionTimestamp;
-        long currentEstimatedPosition = mLastKnownStreamPosition + timeDiff;
-        return (int)currentEstimatedPosition;*/
+        if ((mStreamPositionTimestamp != 0) && mStreamAdvancing
+                && (mCurrentItemId != null) && (mLastKnownStreamPosition < mStreamDuration)) {
+            long extrapolatedStreamPosition = mLastKnownStreamPosition
+                    + (SystemClock.uptimeMillis() - mStreamPositionTimestamp);
+            if (extrapolatedStreamPosition > mStreamDuration) {
+                extrapolatedStreamPosition = mStreamDuration;
+            }
+            return (int) extrapolatedStreamPosition;
+        }
+        return 0;*/
+        if (!mStreamAdvancing) {
+            return mLastKnownStreamPosition > 0 ? (int)mLastKnownStreamPosition : 0;
+        }
+
         long extrapolatedStreamPosition = mLastKnownStreamPosition
                 + (SystemClock.uptimeMillis() - mStreamPositionTimestamp);
         if (extrapolatedStreamPosition > mStreamDuration) {
             extrapolatedStreamPosition = mStreamDuration;
         }
-        return (int)extrapolatedStreamPosition;
+
+        if (extrapolatedStreamPosition <0 )
+            extrapolatedStreamPosition = 0;
+
+        return (int) extrapolatedStreamPosition;
     }
 
     @Override
@@ -390,6 +416,8 @@ public class MediaRouteCast implements IMediaCast {
 
                 // Only refresh playback position if stream is moving.
                 mStreamAdvancing = (playbackState == MediaItemStatus.PLAYBACK_STATE_PLAYING);
+                mPlayingInitialized = false;
+
                 if (mStreamAdvancing) {
                     refreshPlaybackPosition(mLastKnownStreamPosition, mStreamDuration);
                 }

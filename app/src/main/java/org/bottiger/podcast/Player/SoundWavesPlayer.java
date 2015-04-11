@@ -176,7 +176,7 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
 
     @Override
     public int getCurrentPosition() {
-        return isPlayingUsingMediaRoute() ? mMediaCast.getCurrentPosition() : super.getCurrentPosition();
+        return mMediaCast != null && mMediaCast.isActive() ? mMediaCast.getCurrentPosition() : super.getCurrentPosition();
     }
 
     public void rewind(FeedItem argItem) {

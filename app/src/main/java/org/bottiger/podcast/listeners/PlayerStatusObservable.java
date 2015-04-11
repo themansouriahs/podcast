@@ -64,7 +64,7 @@ public class PlayerStatusObservable {
                     if (ps != null) {
                         updateProgress(ps);
 
-                        int currentStatus = ps.isPlaying() ? STATUS.PLAYING.value : STATUS.STOPPED.value;
+                        int currentStatus = ps.isPlaying() || ps.getPlayer().isCasting() ? STATUS.PLAYING.value : STATUS.STOPPED.value;
                         inputMessage = sHandler.obtainMessage(currentStatus);
                         sHandler.sendMessageDelayed(inputMessage, REFRESH_INTERVAL);
                     }
@@ -107,9 +107,11 @@ public class PlayerStatusObservable {
     public static void updateProgress(@NonNull PlayerService argPlayerService) {
         FeedItem currentItem = argPlayerService.getCurrentItem();
         if (currentItem != null) {
+            int offset = argPlayerService.getPlayer().getCurrentPosition();
+            offset = argPlayerService.getPlayer().getCurrentPosition();
             updateEpisodeOffset(argPlayerService.getContentResolver(),
                     currentItem,
-                    argPlayerService.getPlayer().getCurrentPosition());
+                    offset);
 
             updateProgress(argPlayerService, currentItem);
         }
