@@ -40,14 +40,12 @@
             android:label="@string/title_activity_swipe" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
             <meta-data
                 android:name="com.google.android.apps.drive.APP_ID"
                 android:value="FILL_ME_IN" />
-
         </activity>
 
         <activity android:name="org.bottiger.podcast.FeedActivity"

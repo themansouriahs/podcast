@@ -7,13 +7,14 @@ import org.bottiger.podcast.utils.PodcastLog;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class PodcastOpenHelper extends SQLiteOpenHelper {
 
 	private final PodcastLog log = PodcastLog.getLog(getClass());
 
-	private final static int DBVERSION = 17;
+	private final static int DBVERSION = 18;
 	private final static String DBNAME = "podcast.db";
 
 	public PodcastOpenHelper(Context context) {
@@ -44,6 +45,29 @@ public class PodcastOpenHelper extends SQLiteOpenHelper {
         IAnalytics analytics = SoundWaves.sAnalytics;
         if (analytics != null) {
             analytics.trackEvent(IAnalytics.EVENT_TYPE.DATABASE_UPGRADE);
+        }
+
+        // In order to fix the horrible sqli column does not exist bug we add
+        // the colums to all versions from here
+        // This should just fail silently if the columns have been created
+        // properly in the past.
+        if (newVersion == 18) {
+            // Add new column
+            String new_item_column1 = "ALTER TABLE " + SubscriptionColumns.TABLE_NAME
+                    + " ADD COLUMN " + SubscriptionColumns.PRIMARY_COLOR + " INTEGER DEFAULT 0;";
+            String new_item_column2 = "ALTER TABLE " + SubscriptionColumns.TABLE_NAME
+                    + " ADD COLUMN " + SubscriptionColumns.PRIMARY_TINT_COLOR + " INTEGER DEFAULT 0;";
+            String new_item_column3 = "ALTER TABLE " + SubscriptionColumns.TABLE_NAME
+                    + " ADD COLUMN " + SubscriptionColumns.SECONDARY_COLOR + " INTEGER DEFAULT 0;";
+
+            try {
+                log.debug("Upgrading database to 187");
+                db.execSQL(new_item_column1);
+                db.execSQL(new_item_column2);
+                db.execSQL(new_item_column3);
+            } catch (SQLiteException sqle) {
+                log.debug("Tables already existed");
+            }
         }
 
         if (oldVersion == 16 && newVersion == 17) {

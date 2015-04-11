@@ -10,7 +10,6 @@ import android.graphics.Outline;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -19,11 +18,9 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewOutlineProvider;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 
-import org.bottiger.podcast.BuildConfig;
-import org.bottiger.podcast.PodcastBaseFragment;
+import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
@@ -233,7 +230,7 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
         if (type != null) {
             SoundWaves.sAnalytics.trackEvent(type);
         }
-        boolean isPlaying = PodcastBaseFragment.mPlayerServiceBinder.toggle(mEpisodeId);
+        boolean isPlaying = MainActivity.sBoundPlayerService.toggle(mEpisodeId);
 
         setStatus(isPlaying ? PlayerStatusObservable.STATUS.PLAYING : PlayerStatusObservable.STATUS.STOPPED);
 

@@ -216,6 +216,9 @@
     <string name="bulk_download_month">Published this Month</string>
     <string name="feedback_mail_client_picker">Send feedback using</string>
     <string name="mrp_request_failed">The MediaRoute request has failed.</string>
+    <string name="pref_advanced_category_experimental">Experimental settings</string>
+    <string name="pref_screen_rotation_title">Enable screen rotation</string>
+    <string name="pref_screen_rotation_description">Support for landscape orientation</string>
 
     <plurals name="bulk_download_playlist">
         <item quantity="one">First episode in the playlist</item>

@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Callback;
 
-import org.bottiger.podcast.PodcastBaseFragment;
+import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
@@ -69,10 +69,10 @@ public class FeedViewAdapter extends AbstractEpisodeCursorAdapter<FeedViewAdapte
         }
 
         boolean isPlaying = false;
-        if (PodcastBaseFragment.mPlayerServiceBinder != null && PodcastBaseFragment.mPlayerServiceBinder.isInitialized()) {
-            if (item.getId() == PodcastBaseFragment.mPlayerServiceBinder
+        if (MainActivity.sBoundPlayerService != null && MainActivity.sBoundPlayerService.isInitialized()) {
+            if (item.getId() == MainActivity.sBoundPlayerService
                     .getCurrentItem().id) {
-                if (PodcastBaseFragment.mPlayerServiceBinder.isPlaying()) {
+                if (MainActivity.sBoundPlayerService.isPlaying()) {
                     isPlaying = true;
                 }
             }

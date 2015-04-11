@@ -48,7 +48,7 @@ public abstract class AbstractMultiShrinkScroller extends FrameLayout {
         Log.v(TAG, "updateLastEventPosition. DeltaY => " + deltaY + " RawY =>" + event.getRawY());
         final boolean draggedX = (deltaX > mTouchSlop || deltaX < -mTouchSlop);
         //final boolean draggedY = (deltaY > mTouchSlop || deltaY < -mTouchSlop);
-        final boolean draggedY = Math.abs(deltaY) > mTouchSlop*2;
+        final boolean draggedY = Math.abs(deltaY) > mTouchSlop;
         //return draggedY && !draggedX;
         return draggedY;
     }

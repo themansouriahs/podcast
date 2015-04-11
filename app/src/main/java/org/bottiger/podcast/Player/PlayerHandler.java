@@ -1,9 +1,12 @@
 package org.bottiger.podcast.Player;
 
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
+import org.bottiger.podcast.R;
 import org.bottiger.podcast.service.PlayerService;
 
 /**
@@ -11,14 +14,20 @@ import org.bottiger.podcast.service.PlayerService;
  */
 public class PlayerHandler {
 
+    private static final boolean CONTINUOUS_PLAYING_DEFAULT = false;
+
     public static final int FADEIN = 0;
     public static final int TRACK_ENDED = 1;
     public static final int SERVER_DIED = 2;
 
     private static PlayerService mPlayerService;
 
+    @NonNull
+    private static SharedPreferences mSharedpreferences;
+
     public PlayerHandler(@NonNull PlayerService argPlayerService) {
         mPlayerService = argPlayerService;
+        mSharedpreferences = PreferenceManager.getDefaultSharedPreferences(mPlayerService.getApplicationContext());
     }
 
     public static final Handler handler = new Handler() {
@@ -44,7 +53,8 @@ public class PlayerHandler {
                     }
                     break;
                 case TRACK_ENDED:
-                    boolean repeat_mode = mPlayerService.getPref();
+                    String key = mPlayerService.getResources().getString(R.string.pref_continuously_playing_key);
+                    boolean doPlayNext = mSharedpreferences.getBoolean(key, CONTINUOUS_PLAYING_DEFAULT);
 
                     if (mPlayerService.getCurrentItem() != null) {
 
@@ -54,10 +64,9 @@ public class PlayerHandler {
                             if (nextItemId == -1) {
                                 mPlayerService.dis_notifyStatus();
                                 mPlayerService.getPlayer().stop();
-                            } else if (repeat_mode) {
+                            } else if (doPlayNext) {
                                 mPlayerService.playNext();
                             }
-                            mPlayerService.setUpdateStatus(true);
                         }
                     }
 

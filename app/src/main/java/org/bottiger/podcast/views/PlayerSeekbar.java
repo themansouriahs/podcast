@@ -16,11 +16,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewParent;
 import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import org.bottiger.podcast.PodcastBaseFragment;
+import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.EpisodeStatus;
 import org.bottiger.podcast.listeners.PaletteListener;
@@ -81,11 +80,11 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
             long timeMs = mEpisode.getDuration() * seekBar.getProgress()
                     / RANGE_MAX;
 
-            if (mEpisode.equals(PodcastBaseFragment.mPlayerServiceBinder.getCurrentItem())) {
-                PodcastBaseFragment.mPlayerServiceBinder.seek(timeMs);
+            if (mEpisode.equals(MainActivity.sBoundPlayerService.getCurrentItem())) {
+                MainActivity.sBoundPlayerService.seek(timeMs);
             } else {
-                mEpisode.updateOffset(PodcastBaseFragment.mPlayerServiceBinder.getContentResolver(), timeMs);
-                PlayerStatusObservable.updateProgress(PodcastBaseFragment.mPlayerServiceBinder, mEpisode);
+                mEpisode.updateOffset(MainActivity.sBoundPlayerService.getContentResolver(), timeMs);
+                PlayerStatusObservable.updateProgress(MainActivity.sBoundPlayerService, mEpisode);
                 setProgressMs(timeMs);
             }
 

@@ -167,7 +167,7 @@ public class NotificationPlayer {
 
         mBuilder.setOnlyAlertOnce(true);
 
-        Intent resultIntent = new Intent(mContext, NotificationReceiver.class);
+        Intent resultIntent = new Intent(mContext, MainActivity.class);
 
         // Sets a custom content view for the notification, including an image button.
         RemoteViews layout = new RemoteViews(mContext.getPackageName(), R.layout.notification);
@@ -202,7 +202,7 @@ public class NotificationPlayer {
         // your application to the Home screen.
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(mContext);
         // Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(MainActivity.class);
+        //stackBuilder.addParentStack(MainActivity.class);
         // Adds the Intent that starts the Activity to the top of the stack
         stackBuilder.addNextIntent(resultIntent);
 

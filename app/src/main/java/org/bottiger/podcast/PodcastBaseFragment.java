@@ -1,19 +1,13 @@
 package org.bottiger.podcast;
 
-import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.playlist.ReorderCursor;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.PodcastLog;
 
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.CursorAdapter;
@@ -28,9 +22,6 @@ public abstract class PodcastBaseFragment extends Fragment {
     protected RecyclerView.LayoutManager mLayoutManager;
 
     protected SharedPreferences sharedPreferences;
-
-	public static PlayerService mPlayerServiceBinder = null;
-	protected static ComponentName mService = null;
 
 	protected CursorAdapter mCursorAdapter;
 
@@ -64,22 +55,6 @@ public abstract class PodcastBaseFragment extends Fragment {
 		PodcastBaseFragment.mDuration = mDuration;
 	}
 
-	public ServiceConnection playerServiceConnection = new ServiceConnection() {
-		@Override
-		public void onServiceConnected(ComponentName className, IBinder service) {
-			mPlayerServiceBinder = ((PlayerService.PlayerBinder) service)
-					.getService();
-			PlayerStatusObservable.setActivity(getActivity());
-			// log.debug("onServiceConnected");
-		}
-
-		@Override
-		public void onServiceDisconnected(ComponentName className) {
-			mPlayerServiceBinder = null;
-			// log.debug("onServiceDisconnected");
-		}
-	};
-
     public RecyclerView getListView() {
         return currentView;
     }
@@ -93,13 +68,6 @@ public abstract class PodcastBaseFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		mService = getActivity().startService(
-				new Intent(getActivity(), PlayerService.class));
-
-		Intent bindIntent = new Intent(getActivity(), PlayerService.class);
-		getActivity().bindService(bindIntent, playerServiceConnection,
-				Context.BIND_AUTO_CREATE);
-
 		sharedPreferences = PreferenceManager
 				.getDefaultSharedPreferences(getActivity());
 
@@ -109,13 +77,6 @@ public abstract class PodcastBaseFragment extends Fragment {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		try {
-			// unbindService(playerServiceConnection);
-			getActivity().unbindService(playerServiceConnection);
-		} catch (Exception e) {
-			e.printStackTrace();
-
-		}
 	}
 
 	@Override
@@ -153,9 +114,9 @@ public abstract class PodcastBaseFragment extends Fragment {
 	}
 
     public static PlayerService getPlayerService() {
-        if (mPlayerServiceBinder == null) {
+        if (MainActivity.sBoundPlayerService == null) {
             throw new IllegalStateException("What should we do here?");
         }
-        return mPlayerServiceBinder;
+        return MainActivity.sBoundPlayerService;
     }
 }

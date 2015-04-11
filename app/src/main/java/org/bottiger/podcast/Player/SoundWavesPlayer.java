@@ -189,9 +189,12 @@ public class SoundWavesPlayer extends MediaPlayer {
             FeedItem item = mPlayerService.getCurrentItem();
 
             if (item != null) {
+
+                // Mark current as listened
                 item.markAsListened();
 
                if (mPlayerService != null) {
+                   // Delete if required
                     Resources resources = mPlayerService.getResources();
                     ContentResolver resolver = mPlayerService.getContentResolver();
                     boolean doDelete = mSharedpreferences.getBoolean(resources.getString(R.string.pref_delete_when_finished_key), DELETE_WHEN_FINISHED_DEFAULT);
@@ -225,7 +228,6 @@ public class SoundWavesPlayer extends MediaPlayer {
             mPlayerService.getCurrentItem().setDuration(mp.getDuration(), false);
             start();
             isPreparingMedia = false;
-            PlayerService.setNextTrack(PlayerService.NextTrack.NEXT_IN_PLAYLIST);
         }
     };
 

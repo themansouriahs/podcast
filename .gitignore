@@ -30,6 +30,10 @@ proguard/
 # Maven output folder
 target
 
+# Transifex
+tx.exe
+.tx
+
 # Misc
 .DS_Store
 Thumbs.db

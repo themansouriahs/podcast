@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import org.bottiger.podcast.ApplicationConfiguration;
-import org.bottiger.podcast.PodcastBaseFragment;
+import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.adapters.PlaylistAdapter;
 import org.bottiger.podcast.adapters.decoration.OnDragStateChangedListener;
 import org.bottiger.podcast.provider.DatabaseHelper;
@@ -249,7 +249,7 @@ public class Playlist implements OnDragStateChangedListener {
 				defaultOrder);
 		int amount = sharedPreferences.getInt(amountKey, amountValue);
 
-		PlayerService playerService = PodcastBaseFragment.mPlayerServiceBinder;
+		PlayerService playerService = MainActivity.sBoundPlayerService;
 
 		String playingFirst = "";
 		if (playerService != null && playerService.getCurrentItem() != null) {

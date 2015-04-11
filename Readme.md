@@ -9,11 +9,22 @@ SoundWaves is a free, libre and open source app for fetching and listening to po
 
 If you feel like helping out we are more than happy to accept any kind of help. There are a lot of programming - and non programming - tasks which needs to be done .  
 
+## Feedback, bug reports and feature requests
+
+I, as many other developers, aim to produce the best possible application for my users :) 
+However, this requires that I know what you want. If something (anything) is not working or a feature is missing, please create a bug report - it's a huge help.
+
+Getting feedback from my users is the best way of knowing what I should priorities next.
+
 ## Translations
 If you want to help translate SoundWaves into your language please head over to:
 https://www.transifex.com/projects/p/soundwaves/
 
 Unfortunately a (free) account is required.
+
+## UI Mockups
+
+If you have ideas for the look and feel, but not able to help programming. Just send me a mock-up or two of how you would like the 'workflow' of the application should be, and I'll may be testing it out.
 
 # Privacy
 
