@@ -1,5 +1,15 @@
 Changelog
 ==========
+
+version 0.88
+------------
+* Various crashes and bigfixes
+* Removed Drag&Drop handle from playlist until I found a better solution
+* Fixed crash regarding mallform feeds
+* Added a crude listview option for viewing the Subscriptions
+* Clicking the notification will open the player
+* Initial chromecast support in the proprietary version
+
 version 0.84
 ------------
 * Bulk download of the playlist
