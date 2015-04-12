@@ -80,7 +80,9 @@ public class MediaRouteCast implements IMediaCast {
     private long mLastKnownStreamPosition;
     private long mStreamDuration;
     private ResultBundleHandler mMediaResultHandler;
+
     private MediaInfo mPendingMedia;
+    private long mStartOffset = 0;
 
     private boolean mPlayingInitialized = false;
     private boolean mStreamAdvancing;
@@ -211,12 +213,12 @@ public class MediaRouteCast implements IMediaCast {
     }
 
     @Override
-    public void play() {
+    public void play(long argStartPosition) {
 
         mPlayingInitialized = true;
 
         if (mPlayerState == PLAYER_STATE_NONE) {
-            onPlayMedia(mCurrentTrack);
+            onPlayMedia(mCurrentTrack, argStartPosition);
             SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.MEDIA_ROUTING);
             return;
         }
@@ -471,7 +473,7 @@ public class MediaRouteCast implements IMediaCast {
                 if (mPendingMedia != null) {
                     MediaInfo media = mPendingMedia;
                     mPendingMedia = null;
-                    onPlayMedia(media);
+                    onPlayMedia(media, mStartOffset);
                 } else {
                     syncStatus();
                 }
@@ -499,7 +501,7 @@ public class MediaRouteCast implements IMediaCast {
         //updateButtonStates();
     }
 
-    protected void onPlayMedia(final MediaInfo media) {
+    protected void onPlayMedia(final MediaInfo media, final long argStartPosition) {
         if (media == null) {
             return;
         }
@@ -507,6 +509,7 @@ public class MediaRouteCast implements IMediaCast {
         if (mSessionId == null) {
             // Need to start a session first.
             mPendingMedia = media;
+            mStartOffset = argStartPosition;
             startSession();
             return;
         }
@@ -518,6 +521,7 @@ public class MediaRouteCast implements IMediaCast {
         Intent intent = new Intent(MediaControlIntent.ACTION_PLAY);
         intent.addCategory(MediaControlIntent.CATEGORY_REMOTE_PLAYBACK);
         intent.setDataAndType(Uri.parse(media.getContentId()), media.getContentType());
+        intent.putExtra(MediaControlIntent.EXTRA_ITEM_CONTENT_POSITION, argStartPosition);
         intent.putExtra(MediaControlIntent.EXTRA_SESSION_ID, mSessionId);
         intent.putExtra(MediaControlIntent.EXTRA_ITEM_STATUS_UPDATE_RECEIVER,
                 mMediaStatusUpdateIntent);

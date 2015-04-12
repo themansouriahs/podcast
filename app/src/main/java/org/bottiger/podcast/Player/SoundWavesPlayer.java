@@ -117,7 +117,7 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
     public void start() {
 
         if (isCasting()) {
-            mMediaCast.play();
+            mMediaCast.play(0);
             PlayerStatusObservable
                     .updateStatus(PlayerStatusObservable.STATUS.PLAYING);
             return;
@@ -366,10 +366,14 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
 
         if (mMediaCast.isConnected()) {
             mMediaCast.loadEpisode(episode);
-
-
             mMediaCast.seekTo(episode.offset);
-            //castProvider.play();
+
+            if (super.isPlaying()) {
+                int offst = super.getCurrentPosition();
+                super.pause();
+                mMediaCast.play(offst);
+            }
+
             PlayerStatusObservable
                     .updateStatus(PlayerStatusObservable.STATUS.PLAYING);
         }

@@ -16,7 +16,7 @@ public interface IMediaCast {
 
     public boolean loadEpisode(FeedItem argEpisode);
 
-    public void play();
+    public void play(long argStartPosition);
     public void pause();
     public void stop();
 

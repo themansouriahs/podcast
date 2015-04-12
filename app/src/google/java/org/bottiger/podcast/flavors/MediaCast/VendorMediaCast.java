@@ -212,7 +212,7 @@ public class VendorMediaCast implements IMediaCast {
     }
 
     @Override
-    public void play() {
+    public void play(long argStartPosition) {
 
     }
 
