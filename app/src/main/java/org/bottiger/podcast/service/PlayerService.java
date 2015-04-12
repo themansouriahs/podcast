@@ -8,7 +8,6 @@ import org.bottiger.podcast.Player.PlayerPhoneListener;
 import org.bottiger.podcast.Player.PlayerStateManager;
 import org.bottiger.podcast.Player.SoundWavesPlayer;
 import org.bottiger.podcast.flavors.MediaCast.IMediaCast;
-import org.bottiger.podcast.flavors.MediaCast.VendorMediaCast;
 import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;

@@ -1,11 +1,9 @@
 package org.bottiger.podcast.flavors.MediaCast;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
@@ -31,7 +29,6 @@ import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.provider.FeedItem;
 
-import java.io.File;
 import java.net.URLConnection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -39,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by apl on 11-04-2015.
  */
-public class MediaRouteCast implements IMediaCast {
+public class VendorMediaRouteCast implements IMediaCast {
 
     private static final String TAG = "MediaRouteCast";
     private static final String ACTION_RECEIVE_SESSION_STATUS_UPDATE =
@@ -100,7 +97,7 @@ public class MediaRouteCast implements IMediaCast {
     @NonNull private Activity mActivity;
     private int mPlayerState;
 
-    public MediaRouteCast(Activity argActivity) {
+    public VendorMediaRouteCast(Activity argActivity) {
         mActivity = argActivity;
 
         mMediaRouter = MediaRouter.getInstance(mActivity.getApplicationContext());
@@ -717,7 +714,7 @@ public class MediaRouteCast implements IMediaCast {
             }
             mLastRouteId = routeId;
 
-            mListener.onStateChanged(MediaRouteCast.this);
+            mListener.onStateChanged(VendorMediaRouteCast.this);
         }
 
         @Override
@@ -730,7 +727,7 @@ public class MediaRouteCast implements IMediaCast {
             mSessionId = null;
             //updateButtonStates();
 
-            mListener.onStateChanged(MediaRouteCast.this);
+            mListener.onStateChanged(VendorMediaRouteCast.this);
         }
 
         @Override

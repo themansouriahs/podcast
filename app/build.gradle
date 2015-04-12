@@ -14,6 +14,11 @@ android {
         //useJack = true
     }
 
+    //lintOptions {
+    //    checkReleaseBuilds false
+    //    abortOnError false
+    //}
+
     productFlavors {
 
         dev {
@@ -115,6 +120,7 @@ dependencies {
 
     // Amazon version
     amazonCompile fileTree(dir: 'src/amazon/libs', include: ['*.jar'])
+    amazonCompile 'com.google.android.gms:play-services-cast:7.0.0' // google cast
 
     // Play Store
     googleCompile 'com.google.android.gms:play-services-analytics:7.0.0' // analytics
