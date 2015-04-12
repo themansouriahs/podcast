@@ -153,6 +153,13 @@ public class VendorAnalytics extends AbstractAnalytics implements IAnalytics {
             eventData.LabelID = "Database upgrade";
         }
 
+        if (argType == EVENT_TYPE.MEDIA_ROUTING) {
+            eventData = new EventData();
+            eventData.Category = CATEGORY_USAGE;
+            eventData.Action = "MediaRouter";
+            eventData.LabelID = "Playing using MediaRouter";
+        }
+
         if (eventData != null)
             return eventData;
 
