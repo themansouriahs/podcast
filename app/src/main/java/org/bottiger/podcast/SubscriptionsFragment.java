@@ -67,7 +67,6 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
 		LOCAL, REMOTE, FEED, EMPTY
 	};
 
-    private Subscription mSubscription = null;
     public PodcastBaseFragment.OnItemSelectedListener mCLickListener = null;
 
 	private FragmentUtils mFragmentUtils;
@@ -75,7 +74,6 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
 	private GridView mGridView;
 	private TextView searchStatus;
 
-    private ContentObserver mContentObserver;
     private Cursor mCursor;
 
     private RelativeLayout mEmptySubscrptionList;
@@ -89,12 +87,13 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
 	private ContentType mContentType = ContentType.LOCAL;
 
     private SharedPreferences shareprefs;
-    private static final String PREF_SUBSCRIPTION_COLUMNS = "pref_subscriptions_columns";
+    private static String PREF_SUBSCRIPTION_COLUMNS;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
         mActivity = getActivity();
+        PREF_SUBSCRIPTION_COLUMNS = mActivity.getResources().getString(R.string.pref_subscriptions_columns_key);
         shareprefs = PreferenceManager.getDefaultSharedPreferences(mActivity.getApplicationContext());
 	}
 
@@ -169,6 +168,7 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
         super.onResume();
         if (mGridView.getNumColumns() != numberOfColumns(mActivity)) {
             mGridView.setNumColumns(numberOfColumns(mActivity));
+            loadCursor();
             mGridView.invalidate();
         }
     }
@@ -177,14 +177,18 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
+        loadCursor();
+	}
+
+    private void loadCursor() {
         mCursor = mFragmentUtils.getCursor();
 
         setSubscriptionBackground(mCursor);
-		CursorAdapter ca = getSubscriptionCursorAdapter(getActivity(), mCursor);
-		mFragmentUtils.setAdapter(ca);
-		fetchLocalCursor();
-		mGridView.setAdapter(ca);
-	}
+        CursorAdapter ca = getSubscriptionCursorAdapter(getActivity(), mCursor);
+        mFragmentUtils.setAdapter(ca);
+        fetchLocalCursor();
+        mGridView.setAdapter(ca);
+    }
 
     private void setSubscriptionBackground(Cursor argCursor) {
         if (argCursor == null || argCursor.getCount() == 0) {
@@ -302,10 +306,10 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
 		setSearchStatusVisible(false);
 	}
 
-	private static SubscriptionGridCursorAdapter gridSubscriptionCursorAdapter(
-			Context context, SubscriptionGridCursorAdapter.OnPopulateSubscriptionList observer, Cursor cursor) {
+	private SubscriptionGridCursorAdapter gridSubscriptionCursorAdapter(
+			Context context, SubscriptionGridCursorAdapter.OnPopulateSubscriptionList observer, Cursor cursor, int layout) {
 		return new SubscriptionGridCursorAdapter(context,
-				R.layout.subscription_grid_item, observer, cursor);
+				layout, observer, cursor, getGridItemLayout(mActivity));
 	}
 
 	String getWhere() {
@@ -339,7 +343,8 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
 			Cursor cursor) {
 		if ((mDisplayLayout == LayoutType.GRID)) {
             setSubscriptionBackground(cursor);
-            return gridSubscriptionCursorAdapter(context, this, cursor);
+            int layout = getGridItemLayout(mActivity);
+            return gridSubscriptionCursorAdapter(context, this, cursor, layout);
         } else
 			return null; //listSubscriptionCursorAdapter(context, cursor);
 	}
@@ -451,6 +456,11 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
     private int numberOfColumns(@NonNull Activity argActivity) {
         String number = shareprefs.getString(PREF_SUBSCRIPTION_COLUMNS, "2");
         return Integer.parseInt(number);
+    }
+
+    private int getGridItemLayout(@NonNull Activity argActivity) {
+        int columnsCOunt = numberOfColumns(argActivity);
+        return columnsCOunt == 1 ? R.layout.subscription_list_item : R.layout.subscription_grid_item ;
     }
 
 }

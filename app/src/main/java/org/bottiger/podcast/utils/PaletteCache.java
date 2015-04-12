@@ -27,7 +27,7 @@ public class PaletteCache {
         return mPaletteCache.get(argUrl);
     }
 
-    public static void generateAsync(@NonNull final String argUrl, @NonNull Bitmap argBitmap) {
+    public static void getAsync(@NonNull final String argUrl, @NonNull Bitmap argBitmap) {
         Palette.generateAsync(argBitmap, PALETTE_SIZE, new Palette.PaletteAsyncListener() {
             @Override
             public void onGenerated(Palette palette) {

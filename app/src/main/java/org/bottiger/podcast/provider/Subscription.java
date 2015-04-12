@@ -386,13 +386,13 @@ public class Subscription extends AbstractItem implements PaletteListener {
 		if (status >= 0)
 			cv.put(SubscriptionColumns.STATUS, status);
 
-        if (mPrimaryColor >= 0)
+        if (mPrimaryColor != -1)
             cv.put(SubscriptionColumns.PRIMARY_COLOR, mPrimaryColor);
 
-        if (mPrimaryTintColor >= 0)
+        if (mPrimaryTintColor != -1)
             cv.put(SubscriptionColumns.PRIMARY_TINT_COLOR, mPrimaryTintColor);
 
-        if (mSecondaryColor >= 0)
+        if (mSecondaryColor != -1)
             cv.put(SubscriptionColumns.SECONDARY_COLOR, mSecondaryColor);
 
 		// cv.put(SubscriptionColumns.COMMENT, "valuehejeh");
