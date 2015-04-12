@@ -1,9 +1,6 @@
 package org.bottiger.podcast;
 
 import org.bottiger.podcast.Animations.DepthPageTransformer;
-import org.bottiger.podcast.PodcastBaseFragment.OnItemSelectedListener;
-import org.bottiger.podcast.playlist.Playlist;
-import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.PodcastLog;
 import org.bottiger.podcast.views.MyCustomViewPager;
 import org.bottiger.podcast.views.SlidingTab.SlidingTabLayout;
@@ -14,7 +11,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -22,9 +18,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.transition.Scene;
 import android.util.Log;
 import android.view.ViewGroup;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class FragmentContainerActivity extends DrawerActivity {
@@ -148,9 +141,9 @@ public class FragmentContainerActivity extends DrawerActivity {
 
 		public static final int PLAYLIST = 0;
 		public static final int SUBSCRIPTION = 1;
-		public static final int FEED = 2;
+		public static final int DISCOVER = 2;
 
-		private static final int MAX_FRAGMENTS = 2;
+		private static final int MAX_FRAGMENTS = 3;
 
         private ViewPager mContainer;
 
@@ -185,6 +178,8 @@ public class FragmentContainerActivity extends DrawerActivity {
                     fragment = new SubscriptionsFragment();//new ViewPagerSubscriptionFragment();
                 } else if (position == PLAYLIST) {
                     fragment = new PlaylistFragment();
+                } else if (position == DISCOVER) {
+                    fragment = new DiscoveryFragment();
                 }
 
                 Bundle args = new Bundle();
@@ -207,7 +202,7 @@ public class FragmentContainerActivity extends DrawerActivity {
 				return getString(R.string.title_section3).toUpperCase();
 			case SUBSCRIPTION:
 				return getString(R.string.title_section1).toUpperCase();
-			case FEED:
+			case DISCOVER:
 				return getString(R.string.title_section2).toUpperCase();
 			}
 			return null;

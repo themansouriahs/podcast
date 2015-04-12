@@ -120,7 +120,7 @@
     <string name="no_data_found">No data found</string>
     <string name="already_subscribed">The channel has been subscribed</string>
     <string name="title_section3">Playlist</string>
-    <string name="title_section2">Feed</string>
+    <string name="title_section2">Discover</string>
     <string name="title_section1">Subscriptions</string>
     <string name="hello_world">Hello World!</string>
     <string name="menu_settings">Settings</string>
