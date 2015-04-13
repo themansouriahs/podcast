@@ -1,6 +1,11 @@
 Changelog
 ==========
 
+version 0.90
+------------
+* Various crashes and bug fixes
+* Much more snappy image loading
+
 version 0.88
 ------------
 * Various crashes and bigfixes
