@@ -6,8 +6,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.squareup.picasso.Callback;
-
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.adapters.PlaylistAdapter;
 import org.bottiger.podcast.adapters.viewholders.ExpandableViewHoldersUtil;
@@ -52,8 +50,6 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
     public PlayerButtonView favoriteButton;
     public PlayerButtonView removeButton;
     public DownloadButtonView downloadButton;
-
-    public Callback mPicassoCallback;
 
     // ImageView iv, TextView tv1, TextView tv2, TextView tv3, TextView tv4, TextView tv5, TextView tv6, ViewStub vs, View pv
     public PlaylistViewHolder(View view) {

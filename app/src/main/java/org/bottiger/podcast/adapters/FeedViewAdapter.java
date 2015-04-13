@@ -13,8 +13,6 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.squareup.picasso.Callback;
-
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
@@ -130,8 +128,6 @@ public class FeedViewAdapter extends AbstractEpisodeCursorAdapter<FeedViewAdapte
         public DownloadButtonView mDownloadButton;
 
         public boolean IsExpanded = false;
-
-        public Callback mPicassoCallback;
 
         @SuppressLint("WrongViewCast")
         public EpisodeViewHolder(View view) {

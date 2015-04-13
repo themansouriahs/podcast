@@ -3,7 +3,6 @@ package org.bottiger.podcast;
 import org.bottiger.podcast.adapters.PlaylistAdapter;
 import org.bottiger.podcast.adapters.decoration.DragSortRecycler;
 import org.bottiger.podcast.adapters.decoration.InitialHeaderAdapter;
-import org.bottiger.podcast.images.PicassoWrapper;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
@@ -34,6 +33,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -53,6 +53,7 @@ import android.widget.TextView;
 
 import com.eowise.recyclerview.stickyheaders.StickyHeadersBuilder;
 import com.eowise.recyclerview.stickyheaders.StickyHeadersItemDecoration;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.squareup.picasso.Callback;
 
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
@@ -76,7 +77,7 @@ public class PlaylistFragment extends GeastureFragment implements
     private MultiShrinkScroller mMultiShrinkScroller;
 
     private TopPlayer mTopPlayer;
-    private ImageView mPhoto;
+    private SimpleDraweeView mPhoto;
 
     private TextView mEpisodeTitle;
     private TextView mEpisodeInfo;
@@ -160,7 +161,7 @@ public class PlaylistFragment extends GeastureFragment implements
         mMultiShrinkScroller = (MultiShrinkScroller) mSwipeRefreshView.findViewById(R.id.playlist_container);
 
         mTopPlayer =   (TopPlayer) mSwipeRefreshView.findViewById(R.id.session_photo_container);
-        mPhoto =            (ImageView) mSwipeRefreshView.findViewById(R.id.session_photo);
+        mPhoto =            (SimpleDraweeView) mSwipeRefreshView.findViewById(R.id.session_photo);
 
         mPlaylistContainer = mSwipeRefreshView.findViewById(R.id.playlist_container);
         mEmptyPlaylistContainer = mSwipeRefreshView.findViewById(R.id.playlist_empty);
@@ -400,10 +401,15 @@ public class PlaylistFragment extends GeastureFragment implements
             mFavoriteButton.onPaletteFound(palette);
         }
 
+        /*
         BackgroundTransformation mImageTransformation = null;
         int height = TopPlayer.sizeLarge;//1080;//(int)(mPhoto.getHeight()*5.6);
         trans = BackgroundTransformation.getmImageTransformation(mActivity, mImageTransformation, height);
         PicassoWrapper.load(mActivity, item.image, mPhoto, trans, cb);
+        */
+
+        Uri uri = Uri.parse(item.image);
+        mPhoto.setImageURI(uri);
     }
     com.squareup.picasso.Transformation trans = null;
 

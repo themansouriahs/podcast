@@ -1,13 +1,9 @@
 package org.bottiger.podcast.adapters;
 
-import org.bottiger.podcast.ApplicationConfiguration;
 import org.bottiger.podcast.R;
-import org.bottiger.podcast.images.PicassoWrapper;
-import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.PaletteCache;
-import org.bottiger.podcast.views.SquareImageView;
 import org.bottiger.podcast.views.TintedFramelayout;
 
 import android.content.ContentResolver;

@@ -2,6 +2,7 @@
 <!-- Background photo -->
 <org.bottiger.podcast.views.TopPlayer
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:visibility="visible"
     android:id="@+id/session_photo_container"
     android:layout_alignParentTop="true"
@@ -11,11 +12,11 @@
     android:elevation="10dp"
     android:foreground="@drawable/photo_banner_scrim">
 
-    <ImageView
+    <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/session_photo"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop" />
+        fresco:actualImageScaleType="focusCrop"/>
 
     <View
         android:id="@+id/top_gradient"
