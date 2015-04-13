@@ -570,6 +570,10 @@ public class Subscription extends AbstractItem implements PaletteListener {
 		return imageURL;
 	}
 
+    public void setImageURL(String argUrl) {
+        imageURL = argUrl;
+    }
+
 	public String getUrl() {
 		return url;
 	}
