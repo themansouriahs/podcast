@@ -399,19 +399,13 @@ public class PlaylistFragment extends GeastureFragment implements
             mForwardButton.onPaletteFound(palette);
             mDownloadButton.onPaletteFound(palette);
             mFavoriteButton.onPaletteFound(palette);
+        } else {
+            PaletteCache.generate(item.image, getActivity());
         }
-
-        /*
-        BackgroundTransformation mImageTransformation = null;
-        int height = TopPlayer.sizeLarge;//1080;//(int)(mPhoto.getHeight()*5.6);
-        trans = BackgroundTransformation.getmImageTransformation(mActivity, mImageTransformation, height);
-        PicassoWrapper.load(mActivity, item.image, mPhoto, trans, cb);
-        */
 
         Uri uri = Uri.parse(item.image);
         mPhoto.setImageURI(uri);
     }
-    com.squareup.picasso.Transformation trans = null;
 
     private void recomputePhotoAndScrollingMetrics() {
         final int actionBarSize = UIUtils.calculateActionBarSize(mActivity);

@@ -1,6 +1,10 @@
 package org.bottiger.podcast.adapters;
 
+import java.util.List;
 import java.util.TreeSet;
+import java.util.concurrent.AbstractExecutorService;
+import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.bottiger.podcast.MainActivity;
@@ -13,6 +17,7 @@ import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.utils.DirectExecutor;
 import org.bottiger.podcast.utils.PaletteCache;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.ThemeHelper;
@@ -22,6 +27,7 @@ import org.bottiger.podcast.views.PlaylistViewHolder;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -38,12 +44,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.facebook.common.references.CloseableReference;
+import com.facebook.datasource.DataSource;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.controller.BaseControllerListener;
 import com.facebook.drawee.controller.ControllerListener;
 import com.facebook.drawee.interfaces.DraweeController;
+import com.facebook.imagepipeline.core.ExecutorSupplier;
+import com.facebook.imagepipeline.core.ImagePipeline;
+import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
+import com.facebook.imagepipeline.image.CloseableImage;
 import com.facebook.imagepipeline.image.ImageInfo;
 import com.facebook.imagepipeline.image.QualityInfo;
+import com.facebook.imagepipeline.request.ImageRequest;
+import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
 public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> {
 
@@ -56,6 +70,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
     public static ExpandableViewHoldersUtil.KeepOneH<PlaylistViewHolder> keepOne = new ExpandableViewHoldersUtil.KeepOneH<>();
 
+    private Activity mActivity;
     private View mOverlay;
 
     private DownloadProgressObservable mDownloadProgressObservable = null;
@@ -70,6 +85,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
     public PlaylistAdapter(@NonNull Activity argActivity, View argOverlay, DownloadProgressObservable argDownloadProgressObservable) {
         super(argActivity);
+        mActivity = argActivity;
         mOverlay = argOverlay;
         mInflater = (LayoutInflater) mActivity
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -97,6 +113,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         Log.v("PlaylistAdapter", "onBindViewHolder(pos: " + position + ")");
 
         final FeedItem item = mPlaylist.getItem(position+PLAYLIST_OFFSET);
+        final Activity activity = mActivity;
 
         if (item == null) {
             // This should only happen if the playlist only contain 1 item
@@ -151,6 +168,8 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
                 // http://frescolib.org/docs/getting-started.html#_
                 if (!TextUtils.isEmpty(item.image)) {
+                    final Uri frescoImageUrl = Uri.parse(item.image);
+
                     ControllerListener controllerListener = new BaseControllerListener<ImageInfo>() {
                         @Override
                         public void onFinalImageSet(
@@ -187,6 +206,40 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
                             } finally {
                                 mLock.unlock();
                             }*/
+
+                            ImageRequest request = ImageRequestBuilder
+                                    .newBuilderWithSource(frescoImageUrl)
+                                    .build();
+
+                            ImagePipeline imagePipeline = Fresco.getImagePipeline();
+                            DataSource<CloseableReference<CloseableImage>>
+                                    dataSource = imagePipeline.fetchDecodedImage(request, activity);
+
+
+                            DirectExecutor directExecutor = new DirectExecutor();
+                            dataSource.subscribe(new BaseBitmapDataSubscriber() {
+                                @Override
+                                public void onNewResultImpl(@Nullable Bitmap bitmap) {
+                                    // You can use the bitmap in only limited ways
+                                    // No need to do any cleanup.
+                                    String url = item.image;
+                                    mLock.lock();
+                                    try {
+
+                                        Palette palette = PaletteCache.get(url);
+                                        if (palette == null) {
+                                            PaletteCache.generate(url, bitmap);
+                                        }
+                                    } finally {
+                                        mLock.unlock();
+                                    }
+                                }
+
+                                @Override
+                                public void onFailureImpl(DataSource dataSource) {
+                                    // No cleanup required here.
+                                }
+                            }, directExecutor);
                         }
 
                         @Override
@@ -200,7 +253,6 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
                         }
                     };
 
-                    Uri frescoImageUrl = Uri.parse(item.image);
                     DraweeController controller = Fresco.newDraweeControllerBuilder()
                             .setControllerListener(controllerListener)
                             .setUri(frescoImageUrl).build();
