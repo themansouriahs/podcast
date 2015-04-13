@@ -9,7 +9,6 @@ import org.bottiger.podcast.PodcastBaseFragment;
 import org.bottiger.podcast.R;
 
 import org.bottiger.podcast.adapters.viewholders.ExpandableViewHoldersUtil;
-import org.bottiger.podcast.images.PicassoWrapper;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
@@ -25,11 +24,14 @@ import org.bottiger.podcast.views.PlaylistViewHolder;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
+import android.graphics.drawable.Animatable;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -38,16 +40,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.squareup.picasso.Callback;
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.controller.BaseControllerListener;
+import com.facebook.drawee.controller.ControllerListener;
+import com.facebook.drawee.interfaces.DraweeController;
+import com.facebook.imagepipeline.image.ImageInfo;
+import com.facebook.imagepipeline.image.QualityInfo;
 
 public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> {
+
+    private static final String TAG = "PlaylistAdapter";
 
     public static final int TYPE_EXPAND = 1;
 	public static final int TYPE_COLLAPSE = 2;
 
     public static final int PLAYLIST_OFFSET = 1;
 
-    public static ExpandableViewHoldersUtil.KeepOneH<PlaylistViewHolder> keepOne = new ExpandableViewHoldersUtil.KeepOneH<PlaylistViewHolder>();
+    public static ExpandableViewHoldersUtil.KeepOneH<PlaylistViewHolder> keepOne = new ExpandableViewHoldersUtil.KeepOneH<>();
 
     private View mOverlay;
 
@@ -60,12 +69,6 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
     private final ReentrantLock mLock = new ReentrantLock();
     StringBuilder mStringBuilder = new StringBuilder();
-
-
-    // memory leak!!!!
-    private static HashMap<String, Drawable> mBitmapCache = new HashMap<String, Drawable>();
-
-    private BackgroundTransformation mImageTransformation;
 
     public PlaylistAdapter(@NonNull Activity argActivity, View argOverlay, DownloadProgressObservable argDownloadProgressObservable) {
         super(argActivity);
@@ -147,50 +150,64 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
                     viewHolder.mSubTitle.setText(displayString);
                 }
 
-                viewHolder.mPicassoCallback = new Callback() {
 
-                    @Override
-                    public void onSuccess() {
-                        String url = item.image;
-                        mLock.lock();
-                        try {
-                            Drawable d = viewHolder.mItemBackground.getDrawable();
-                            mBitmapCache.put(url, d);
-
-                            Palette palette = PaletteCache.get(url);
-                            if (palette == null) {
-                                BitmapDrawable bd = (BitmapDrawable)d;
-                                PaletteCache.generate(url, bd.getBitmap());
+                // http://frescolib.org/docs/getting-started.html#_
+                if (!TextUtils.isEmpty(item.image)) {
+                    ControllerListener controllerListener = new BaseControllerListener<ImageInfo>() {
+                        @Override
+                        public void onFinalImageSet(
+                                String id,
+                                @Nullable ImageInfo imageInfo,
+                                @Nullable Animatable anim) {
+                            if (imageInfo == null) {
+                                return;
                             }
-                        } finally {
-                            mLock.unlock();
+                            QualityInfo qualityInfo = imageInfo.getQualityInfo();
+                            Log.d(TAG, "Final image received! "
+                                            + "Size %d x %d"
+                                            + "Quality level %d, good enough: %s, full quality: %s"
+                                            + imageInfo.getWidth()
+                                            + imageInfo.getHeight()
+                                            + qualityInfo.getQuality()
+                                            + qualityInfo.isOfGoodEnoughQuality()
+                                            + qualityInfo.isOfFullQuality());
+
+
+
+                            // legacy stuff :)
+                            String url = item.image;
+                            mLock.lock();
+                            try {
+                                Drawable d = viewHolder.mItemBackground.getDrawable();
+
+                                Palette palette = PaletteCache.get(url);
+                                if (palette == null) {
+                                    BitmapDrawable bd = (BitmapDrawable)d;
+                                    PaletteCache.generate(url, bd.getBitmap());
+                                }
+                            } finally {
+                                mLock.unlock();
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onError() {
-                        return;
-                    }
-                };
+                        @Override
+                        public void onIntermediateImageSet(String id, @Nullable ImageInfo imageInfo) {
+                            Log.d(TAG, "Intermediate image received");
+                        }
 
-                if ((item.image != null && !item.image.equals(""))) {
-                    String ii = item.image;
-                        //PicassoWrapper.load(mContext, ii, playlistViewHolder2.mPlayPauseButton);
+                        @Override
+                        public void onFailure(String id, Throwable throwable) {
+                            Log.e(TAG, "Error loading %s" + id);
+                        }
+                    };
 
-                    if (mBitmapCache.containsKey(ii)) {
-                        viewHolder.mItemBackground.setImageDrawable(mBitmapCache.get(ii));
-                    } else {
+                    Uri frescoImageUrl = Uri.parse(item.image);
 
-                        viewHolder.mItemBackground.setImageResource(0);
+                    DraweeController controller = Fresco.newDraweeControllerBuilder()
+                            .setControllerListener(controllerListener)
+                            .setUri(frescoImageUrl).build();
 
-                        int h = 1080;
-                        com.squareup.picasso.Transformation trans = BackgroundTransformation.getmImageTransformation(mActivity, mImageTransformation, h);
-                        PicassoWrapper.load(mActivity, ii, viewHolder.mItemBackground, trans, viewHolder.mPicassoCallback); // playlistViewHolder2.mItemBackground
-                        //PicassoWrapper.load(mActivity, ii, target, trans);
-                        //int color = item.getSubscription(mActivity).getPrimaryColor();
-                        //viewHolder.mItemBackground.setColorFilter(Color.RED, PorterDuff.Mode.LIGHTEN);
-                    }
-
+                    viewHolder.mItemBackground.setController(controller);
                 }
 
             }
@@ -321,10 +338,6 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
         if (holder.episode == null) {
             return;
-        } else {
-            if (!TextUtils.isEmpty(holder.episode.image)) {
-                mBitmapCache.remove(holder.episode.image);
-            }
         }
 
         mDownloadProgressObservable.unregisterObserver(holder.downloadButton);

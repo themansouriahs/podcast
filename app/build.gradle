@@ -19,6 +19,10 @@ android {
         abortOnError false
     }
 
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+    }
+
     productFlavors {
 
         dev {
@@ -111,6 +115,8 @@ dependencies {
 
     compile 'ch.acra:acra:4.6.+'
     compile 'com.github.anrwatchdog:anrwatchdog:1.+'
+
+    compile 'com.facebook.fresco:fresco:0.1.0+'
 
     // For testing only
     testCompile 'junit:junit:4.12'

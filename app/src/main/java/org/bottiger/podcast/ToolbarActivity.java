@@ -19,6 +19,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
+
 import org.bottiger.podcast.DrawerActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.TopActivity;
@@ -45,6 +47,8 @@ public class ToolbarActivity extends TopActivity {
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Fresco.initialize(this);
 
         setContentView(getLayout());
 
