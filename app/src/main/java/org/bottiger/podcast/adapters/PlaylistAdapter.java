@@ -1,6 +1,5 @@
 package org.bottiger.podcast.adapters;
 
-import java.util.HashMap;
 import java.util.TreeSet;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -14,7 +13,6 @@ import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
-import org.bottiger.podcast.utils.BackgroundTransformation;
 import org.bottiger.podcast.utils.PaletteCache;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.ThemeHelper;
@@ -174,7 +172,8 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
 
 
-                            // legacy stuff :)
+                            // FIXME legacy stuff :)
+                            /*
                             String url = item.image;
                             mLock.lock();
                             try {
@@ -187,7 +186,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
                                 }
                             } finally {
                                 mLock.unlock();
-                            }
+                            }*/
                         }
 
                         @Override
@@ -202,7 +201,6 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
                     };
 
                     Uri frescoImageUrl = Uri.parse(item.image);
-
                     DraweeController controller = Fresco.newDraweeControllerBuilder()
                             .setControllerListener(controllerListener)
                             .setUri(frescoImageUrl).build();
