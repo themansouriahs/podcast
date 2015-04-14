@@ -45,6 +45,7 @@ public abstract class AbstractPodcastAdapter<PlaylistViewHolder extends Recycler
 
     @Override
     public void notifyPlaylistRangeChanged(int from, int to) {
+        /*
         final int tmpmin = Math.min(from, to);
         final int min = tmpmin > this.getItemCount() ? this.getItemCount() : tmpmin;
 
@@ -62,6 +63,7 @@ public abstract class AbstractPodcastAdapter<PlaylistViewHolder extends Recycler
             int min2 = count;
             return;
         }
+        */
     }
 
 }

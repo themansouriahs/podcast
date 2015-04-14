@@ -164,7 +164,7 @@ public class NotificationPlayer {
                         .setContentTitle(item.title)
                         .setContentText(item.sub_title);
 
-        if (!mArtwork.isRecycled()) {
+        if (mArtwork != null && !mArtwork.isRecycled()) {
             mBuilder.setLargeIcon(icon);
         }
 
