@@ -162,8 +162,11 @@ public class NotificationPlayer {
                 new NotificationCompat.Builder(mContext)
                         .setSmallIcon(R.drawable.ic_stat_notify)
                         .setContentTitle(item.title)
-                        .setContentText(item.sub_title)
-                        .setLargeIcon(icon);
+                        .setContentText(item.sub_title);
+
+        if (!mArtwork.isRecycled()) {
+            mBuilder.setLargeIcon(icon);
+        }
 
         mBuilder.setOnlyAlertOnce(true);
 
