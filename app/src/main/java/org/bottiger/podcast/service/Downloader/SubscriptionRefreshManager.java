@@ -164,18 +164,22 @@ public class SubscriptionRefreshManager {
                 } catch (SAXException e) {
                     Log.d(DEBUG_KEY, "Parsing EXCEPTION: " + subscription);
                     VendorCrashReporter.handleException(e);
+                    VendorCrashReporter.report("subscription1", subscription.getUrl());
                     e.printStackTrace();
                 } catch (IOException e) {
                     Log.d(DEBUG_KEY, "Parsing EXCEPTION: " + subscription);
                     VendorCrashReporter.handleException(e);
+                    VendorCrashReporter.report("subscription2", subscription.getUrl());
                     e.printStackTrace();
                 } catch (ParserConfigurationException e) {
                     Log.d(DEBUG_KEY, "Parsing EXCEPTION: " + subscription);
                     VendorCrashReporter.handleException(e);
+                    VendorCrashReporter.report("subscription3", subscription.getUrl());
                     e.printStackTrace();
                 } catch (UnsupportedFeedtypeException e) {
                     Log.d(DEBUG_KEY, "Parsing EXCEPTION: " + subscription);
                     VendorCrashReporter.handleException(e);
+                    VendorCrashReporter.report("subscription4", subscription.getUrl());
                     e.printStackTrace();
                 }
 

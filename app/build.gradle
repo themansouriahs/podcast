@@ -96,7 +96,6 @@ dependencies {
     compile 'com.google.http-client:google-http-client-gson:+'
 
     compile 'com.android.support:support-v4:21+' // compile 'com.android.support:support-v4:+'
-    compile "com.android.support:support-v13:21+" // needed?
 
     compile 'com.android.support:appcompat-v7:21+'
     compile 'com.android.support:recyclerview-v7:21+'
