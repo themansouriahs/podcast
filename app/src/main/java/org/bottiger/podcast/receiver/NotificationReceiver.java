@@ -2,6 +2,7 @@ package org.bottiger.podcast.receiver;
 
 import org.bottiger.podcast.ApplicationConfiguration;
 import org.bottiger.podcast.MainActivity;
+import org.bottiger.podcast.Player.SoundWavesPlayer;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.notification.NotificationPlayer;
@@ -43,6 +44,11 @@ public class NotificationReceiver extends BroadcastReceiver {
 
 		
 		if (action.equals(toggleAction)) {
+            SoundWavesPlayer player = playerService.getPlayer();
+            if (!player.isInitialized()) {
+                return;
+            }
+
 			Boolean isPlaying = false;
 			if (playerService.isPlaying()) {
 				playerService.pause();
