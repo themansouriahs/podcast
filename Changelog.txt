@@ -1,7 +1,7 @@
 Changelog
 ==========
 
-version 0.90
+version 0.88.2
 ------------
 * Various crashes and bug fixes
 * Much more snappy image loading
