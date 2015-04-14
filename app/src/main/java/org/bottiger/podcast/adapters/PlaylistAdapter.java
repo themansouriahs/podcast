@@ -342,7 +342,8 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
             public void onClick(View v) {
                 PlaylistAdapter.toggle(holder, position);
                 feedItem.removeFromPlaylist(context.getContentResolver());
-                PlaylistAdapter.this.notifyItemRemoved(position);
+                //PlaylistAdapter.this.notifyItemRemoved(position);
+                notifyDataSetChanged();
                 mPlaylist.removeItem(position+PLAYLIST_OFFSET);
             }
         });
