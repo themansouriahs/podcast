@@ -75,6 +75,7 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
 	private GridView mGridView;
 	private TextView searchStatus;
 
+    private CursorAdapter mAdapter;
     private Cursor mCursor;
 
     private RelativeLayout mEmptySubscrptionList;
@@ -185,10 +186,10 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
         mCursor = mFragmentUtils.getCursor();
 
         setSubscriptionBackground(mCursor);
-        CursorAdapter ca = getSubscriptionCursorAdapter(getActivity(), mCursor);
-        mFragmentUtils.setAdapter(ca);
+        mAdapter = getSubscriptionCursorAdapter(getActivity(), mCursor);
+        mFragmentUtils.setAdapter(mAdapter);
         fetchLocalCursor();
-        mGridView.setAdapter(ca);
+        mGridView.setAdapter(mAdapter);
     }
 
     private void setSubscriptionBackground(Cursor argCursor) {
@@ -243,6 +244,7 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
                 InputMethodManager imm = (InputMethodManager) mActivity.getSystemService(
                         Context.INPUT_METHOD_SERVICE);
                 imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                mAdapter.notifyDataSetChanged();
 
                 return false;
             }

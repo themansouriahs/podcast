@@ -229,8 +229,8 @@ public class PlaylistFragment extends GeastureFragment implements
 
         mRecyclerView.setAdapter(mAdapter);
 
-        RecentItemsRecyclerListener l = new RecentItemsRecyclerListener(mAdapter);
-        mRecyclerView.setRecyclerListener(l);
+        //RecentItemsRecyclerListener l = new RecentItemsRecyclerListener(mAdapter);
+        //mRecyclerView.setRecyclerListener(l);
 
         // The bug where the player doesn't show up happens because the playlist is empty.
         // The playlist is empty if the context is null
@@ -247,6 +247,7 @@ public class PlaylistFragment extends GeastureFragment implements
         mSwipeRefreshView.fragment = this;
 
         // Build item decoration and add it to the RecyclerView
+        /*
         InitialHeaderAdapter initialHeaderAdapter = new InitialHeaderAdapter(mPlaylist);
         StickyHeadersItemDecoration decoration = new StickyHeadersBuilder()
                 .setAdapter(mAdapter)
@@ -257,6 +258,7 @@ public class PlaylistFragment extends GeastureFragment implements
                 .build();
 
         mRecyclerView.addItemDecoration(decoration);
+        */
 
         //////
 
@@ -264,6 +266,7 @@ public class PlaylistFragment extends GeastureFragment implements
 
 
         //////
+        /*
         DragSortRecycler dragSortRecycler = new DragSortRecycler();
         dragSortRecycler.setViewHandleId(R.id.drag_handle); //View you wish to use as the handle
 
@@ -273,8 +276,10 @@ public class PlaylistFragment extends GeastureFragment implements
 
         dragSortRecycler.setNavigationHeight(UIUtils.NavigationBarHeight(mActivity));
 
+
         mRecyclerView.addItemDecoration(dragSortRecycler);
         mRecyclerView.addOnItemTouchListener(dragSortRecycler);
+        */
         //mRecyclerView.setOnScrollListener(dragSortRecycler.getScrollListener());
         //////
 

@@ -38,7 +38,7 @@ public abstract class AbstractPodcastAdapter<PlaylistViewHolder extends Recycler
         mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                AbstractPodcastAdapter.this.notifyDataSetChanged();
+                //AbstractPodcastAdapter.this.notifyDataSetChanged();
             }
         });
     }
