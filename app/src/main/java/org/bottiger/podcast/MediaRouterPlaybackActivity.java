@@ -24,16 +24,11 @@ public class MediaRouterPlaybackActivity extends ToolbarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mMediaRouteCast = new VendorMediaRouteCast(this);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
         mMediaRouteCast.startDiscovery();
     }
 
     @Override
-    protected void onStop() {
+    protected void onDestroy() {
         mMediaRouteCast.stopDiscovery();
         super.onStop();
     }

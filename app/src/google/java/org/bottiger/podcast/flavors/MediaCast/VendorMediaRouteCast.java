@@ -148,10 +148,6 @@ public class VendorMediaRouteCast implements IMediaCast {
 
         clearStreamState();
         buildRouteSelector();
-
-        // from onResume
-        mActivity.registerReceiver(mSessionStatusBroadcastReceiver, mSessionStatusBroadcastIntentFilter);
-        mActivity.registerReceiver(mMediaStatusBroadcastReceiver, mMediaStatusBroadcastIntentFilter);
     }
 
     @Override
@@ -656,11 +652,19 @@ public class VendorMediaRouteCast implements IMediaCast {
         mMediaRouter.addCallback(mMediaRouteSelector, mMediaRouterCallback,
                 MediaRouter.CALLBACK_FLAG_REQUEST_DISCOVERY);
         mDiscoveryActive = true;
+
+        // from onResume
+        mActivity.registerReceiver(mSessionStatusBroadcastReceiver, mSessionStatusBroadcastIntentFilter);
+        mActivity.registerReceiver(mMediaStatusBroadcastReceiver, mMediaStatusBroadcastIntentFilter);
     }
 
     public void stopDiscovery() {
         mMediaRouter.removeCallback(mMediaRouterCallback);
         mDiscoveryActive = false;
+
+        // from onResume
+        mActivity.unregisterReceiver(mSessionStatusBroadcastReceiver);
+        mActivity.unregisterReceiver(mMediaStatusBroadcastReceiver);
     }
 
     public MediaRouteSelector getRouteSelector() {
