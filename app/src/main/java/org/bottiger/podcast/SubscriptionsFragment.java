@@ -36,6 +36,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
@@ -232,6 +233,19 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
                 return false;
             }
 
+        });
+
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                //Toast t = Toast.makeText(MainActivity.this, "close", Toast.LENGTH_SHORT);
+                //t.show();
+                InputMethodManager imm = (InputMethodManager) mActivity.getSystemService(
+                        Context.INPUT_METHOD_SERVICE);
+                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+
+                return false;
+            }
         });
 
 		
