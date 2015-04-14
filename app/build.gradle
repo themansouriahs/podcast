@@ -106,6 +106,8 @@ dependencies {
     compile 'com.melnykov:floatingactionbutton:1+' // floating action button
 
     compile 'commons-io:commons-io:2.4'
+    compile 'commons-validator:commons-validator:1.4.0'
+
     compile 'org.jsoup:jsoup:1.7.3'
 
     compile 'com.eowise:recyclerview-stickyheaders:0.5.1@aar'

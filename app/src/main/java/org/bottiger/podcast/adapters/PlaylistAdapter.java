@@ -7,11 +7,13 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.apache.commons.validator.routines.UrlValidator;
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.PodcastBaseFragment;
 import org.bottiger.podcast.R;
 
 import org.bottiger.podcast.adapters.viewholders.ExpandableViewHoldersUtil;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
@@ -167,7 +169,8 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
 
                 // http://frescolib.org/docs/getting-started.html#_
-                if (!TextUtils.isEmpty(item.image)) {
+                UrlValidator urlValidator = new UrlValidator();
+                if (!TextUtils.isEmpty(item.image) && urlValidator.isValid(item.image)) {
                     final Uri frescoImageUrl = Uri.parse(item.image);
 
                     ControllerListener controllerListener = new BaseControllerListener<ImageInfo>() {
@@ -207,39 +210,44 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
                                 mLock.unlock();
                             }*/
 
-                            ImageRequest request = ImageRequestBuilder
-                                    .newBuilderWithSource(frescoImageUrl)
-                                    .build();
+                            try {
+                                ImageRequest request = ImageRequestBuilder
+                                        .newBuilderWithSource(frescoImageUrl)
+                                        .build();
 
-                            ImagePipeline imagePipeline = Fresco.getImagePipeline();
-                            DataSource<CloseableReference<CloseableImage>>
-                                    dataSource = imagePipeline.fetchDecodedImage(request, activity);
+                                ImagePipeline imagePipeline = Fresco.getImagePipeline();
+                                DataSource<CloseableReference<CloseableImage>>
+                                        dataSource = imagePipeline.fetchDecodedImage(request, activity);
 
 
-                            DirectExecutor directExecutor = new DirectExecutor();
-                            dataSource.subscribe(new BaseBitmapDataSubscriber() {
-                                @Override
-                                public void onNewResultImpl(@Nullable Bitmap bitmap) {
-                                    // You can use the bitmap in only limited ways
-                                    // No need to do any cleanup.
-                                    String url = item.image;
-                                    mLock.lock();
-                                    try {
+                                DirectExecutor directExecutor = new DirectExecutor();
+                                dataSource.subscribe(new BaseBitmapDataSubscriber() {
+                                    @Override
+                                    public void onNewResultImpl(@Nullable Bitmap bitmap) {
+                                        // You can use the bitmap in only limited ways
+                                        // No need to do any cleanup.
+                                        String url = item.image;
+                                        mLock.lock();
+                                        try {
 
-                                        Palette palette = PaletteCache.get(url);
-                                        if (palette == null) {
-                                            PaletteCache.generate(url, bitmap);
+                                            Palette palette = PaletteCache.get(url);
+                                            if (palette == null) {
+                                                PaletteCache.generate(url, bitmap);
+                                            }
+                                        } finally {
+                                            mLock.unlock();
                                         }
-                                    } finally {
-                                        mLock.unlock();
                                     }
-                                }
 
-                                @Override
-                                public void onFailureImpl(DataSource dataSource) {
-                                    // No cleanup required here.
-                                }
-                            }, directExecutor);
+                                    @Override
+                                    public void onFailureImpl(DataSource dataSource) {
+                                        // No cleanup required here.
+                                    }
+                                }, directExecutor);
+
+                            } catch (Exception e) {
+                                VendorCrashReporter.handleException(e);
+                            }
                         }
 
                         @Override
