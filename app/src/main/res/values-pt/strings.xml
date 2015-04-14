@@ -1,6 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-
   <string name="subscription_no_title">(Sem título)</string>
   <string name="set">Definir</string>
   <string name="cancel">Cancelar</string>
@@ -198,16 +197,26 @@
   <string name="opml_radio_export">Exportar subscrições para ficheiro OPML</string>
   <string name="opml_import_instructions">Para importar um ficheiro OPML, coloque-o em: %1$s</string>
   <string name="opml_export_failed">A exportação falhou por uma razão desconhecida. Tem espaço livre no seu cartão SD?</string>
-  <string name="opml_export_succes">As subscrições foram exportadas para: %1$s</string>
+  <string name="opml_export_succes">As suas subscrições foram exportadas para: %1$s</string>
   <string name="pref_network_category_network_title">Rede</string>
   <string name="pref_network_category_storage_title">Armazenamento</string>
   <string name="pref_network_category_storage_experimental">Experimental</string>
   <string name="pref_delete_when_finished_title">Eliminar após reprodução</string>
   <string name="pref_delete_when_finished_description">Eliminar episódios automaticamente após a sua reprodução</string>
-  <string name="bulk_download_instructions">Transferir todos os episódios da lista de reprodução para</string>
-  <string name="bulk_download_day">Último dia</string>
-  <string name="bulk_download_week">Última semana</string>
-  <string name="bulk_download_month">Último mês</string>
+  <string name="media_route_menu_title">Cast</string>
+  <string name="bulk_download_instructions">Transferir todos os episódios coincidentes com</string>
+  <string name="bulk_download_day">Publicados nas últimas 24 horas</string>
+  <string name="bulk_download_week">Publicados nesta semana</string>
+  <string name="bulk_download_month">Publicados neste mês</string>
+  <string name="feedback_mail_client_picker">Enviar comentários utilizando</string>
+  <string name="mrp_request_failed">Falha de pedido MediaRoute.</string>
+  <string name="pref_advanced_category_experimental">Definições experimentais</string>
+  <string name="pref_screen_rotation_title">Ativar rotação de ecrã</string>
+  <string name="pref_screen_rotation_description">Suporte para modo horizontal</string>
+  <plurals name="bulk_download_playlist">
+    <item quantity="one">Primeiro episódio</item>
+    <item quantity="other">Primeiros %d episódios</item>
+  </plurals>
   <plurals name="subscriptions_imported">
     <item quantity="one">%d subscrição importada.</item>
     <item quantity="other">%d subscrições importadas.</item>
