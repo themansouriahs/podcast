@@ -33,7 +33,7 @@ public class NotificationReceiver extends BroadcastReceiver {
         // FIXME we should start the service and not just return.
         // FIXME The user probably wants to start playing when the service isn't running
         if (playerService == null) {
-            VendorCrashReporter.report("PlayerService", "IS NULL");
+            //VendorCrashReporter.report("PlayerService", "IS NULL");
             return;
         }
 
