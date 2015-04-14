@@ -405,6 +405,10 @@ public class PlaylistFragment extends GeastureFragment implements
 
         Uri uri = Uri.parse(item.image);
         mPhoto.setImageURI(uri);
+
+        if (mTopPlayer.getVisibleHeight() == 0) {
+            mTopPlayer.setPlayerHeight(1000);
+        }
     }
 
     private void recomputePhotoAndScrollingMetrics() {

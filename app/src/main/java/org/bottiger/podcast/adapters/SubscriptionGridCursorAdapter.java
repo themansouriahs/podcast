@@ -1,5 +1,6 @@
 package org.bottiger.podcast.adapters;
 
+import org.apache.commons.validator.routines.UrlValidator;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.ColorExtractor;
@@ -100,7 +101,11 @@ public class SubscriptionGridCursorAdapter extends AbstractGridPodcastAdapter {
                 tview.unsetSubscription();
                 tview.setSubscription(sub);
 
+                UrlValidator validator = new UrlValidator();
+                if (validator.isValid(logo)) {
+
                 try {
+
                     Uri uri = Uri.parse(logo);
                     ImageRequest request = ImageRequestBuilder
                             .newBuilderWithSource(uri)
@@ -126,6 +131,7 @@ public class SubscriptionGridCursorAdapter extends AbstractGridPodcastAdapter {
                 } catch (NullPointerException npe) {
                     // Uri.parse probably failed because logo==null
                 }
+            }
                 /*
                 Palette palette = PaletteCache.get(logo);
                 if (palette != null) {
