@@ -12,6 +12,7 @@ android {
         versionCode 114     // even - release. Odd - development
         versionName "0.88.4" // even - release. Odd - development
         //useJack = true
+        multiDexEnabled = true
     }
 
     lintOptions {
@@ -128,7 +129,7 @@ dependencies {
 
     // Amazon version
     amazonCompile fileTree(dir: 'src/amazon/libs', include: ['*.jar'])
-    //amazonCompile 'com.google.android.gms:play-services-cast:7.0.0' // google cast
+    amazonCompile 'com.google.android.gms:play-services-cast:7.0.0' // google cast
 
     // Play Store
     googleCompile 'com.google.android.gms:play-services-analytics:7.0.0' // analytics
