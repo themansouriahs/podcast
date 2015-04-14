@@ -1,8 +1,20 @@
 package org.bottiger.podcast.utils;
 
+import android.content.Context;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.graphics.Palette;
+
+import com.facebook.common.references.CloseableReference;
+import com.facebook.datasource.DataSource;
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.imagepipeline.core.ImagePipeline;
+import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
+import com.facebook.imagepipeline.image.CloseableImage;
+import com.facebook.imagepipeline.request.ImageRequest;
+import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PaletteObservable;
@@ -34,6 +46,48 @@ public class PaletteCache {
                 put(argUrl, palette);
             }
         });
+    }
+
+    public static void generate(@NonNull final String argUrl, @NonNull Context argContext) {
+
+        final Uri url;
+        try {
+            url = Uri.parse(argUrl);
+            if (url == null) {
+                return;
+            }
+        } catch (NullPointerException npe) {
+            return;
+        }
+
+        ImageRequest request = ImageRequestBuilder
+                .newBuilderWithSource(url)
+                .build();
+
+        ImagePipeline imagePipeline = Fresco.getImagePipeline();
+        DataSource<CloseableReference<CloseableImage>>
+                dataSource = imagePipeline.fetchDecodedImage(request, argContext);
+
+
+        DirectExecutor directExecutor = new DirectExecutor();
+
+        dataSource.subscribe(new BaseBitmapDataSubscriber() {
+            @Override
+            public void onNewResultImpl(@Nullable Bitmap bitmap) {
+                // You can use the bitmap in only limited ways
+                // No need to do any cleanup.
+                //mLock.lock();
+                    Palette palette = PaletteCache.get(argUrl);
+                    if (palette == null) {
+                        PaletteCache.generate(argUrl, bitmap, false);
+                    }
+            }
+
+            @Override
+            public void onFailureImpl(DataSource dataSource) {
+                // No cleanup required here.
+            }
+        }, directExecutor);
     }
 
     public static Palette generate(@NonNull String argUrl, @NonNull Bitmap argBitmap) {

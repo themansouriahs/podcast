@@ -1,7 +1,6 @@
 package org.bottiger.podcast;
 
 import org.bottiger.podcast.adapters.FeedViewAdapter;
-import org.bottiger.podcast.images.PicassoWrapper;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.playlist.FeedCursorLoader;
@@ -164,7 +163,7 @@ public class FeedFragment extends AbstractEpisodeFragment implements PaletteList
 
             String image = mSubscription.getImageURL();
             if (image != null && image != "") {
-                PicassoWrapper.load(mActivity, image, mTarget, mBackgroundTransformation);
+                //PicassoWrapper.load(mActivity, image, mTarget, mBackgroundTransformation);
 
                 mPalette = PaletteCache.get(image);
             }

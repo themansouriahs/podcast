@@ -293,7 +293,7 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
             public void run() {
                 if (!mIsTwoPanel) {
                     // We never want the height of the photo view to exceed its width.
-                    mMaximumHeaderHeight = mTopViewContainer.getWidth();
+                    mMaximumHeaderHeight = ((TopPlayer)mTopViewContainer).getMaximumSize();//mTopViewContainer.getWidth();
                     mIntermediateHeaderHeight = (int) (mMaximumHeaderHeight
                             * INTERMEDIATE_HEADER_HEIGHT_RATIO);
                 }
@@ -802,8 +802,15 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
      */
     private int getFullyCompressedHeaderHeight() {
         TopPlayer topPlayer = (TopPlayer)mTopViewContainer;
-        return Math.min(Math.min((int)topPlayer.getPlayerHeight() - getOverflowingChildViewSize(), // FIXME min max, not min min
-                topPlayer.getMinimumSize()), getMaximumScrollableHeaderHeight());
+
+        int h1 = (int)topPlayer.getPlayerHeight() - getOverflowingChildViewSize();
+        int h2 = topPlayer.getMinimumSize();
+        int h3 = getMaximumScrollableHeaderHeight();
+
+        int h4 = Math.min(h1, h2);
+
+        // FIXME min max, not min min
+        return Math.min(h4, h3);
     }
 
     /**

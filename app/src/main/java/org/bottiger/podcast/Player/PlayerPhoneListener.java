@@ -52,14 +52,14 @@ public class PlayerPhoneListener extends PhoneStateListener {
         if (mStoppedAt == null)
             return;
 
-        mStoppedAt = null;
-
         Date now = new Date();
 
         long msDiff = now.getTime()-mStoppedAt.getTime();
         if (msDiff < RESTART_THRESHOLD_SECONDS*1000) {
             mPlayerService.startAndFadeIn();
         }
+
+        mStoppedAt = null;
 
     }
 }

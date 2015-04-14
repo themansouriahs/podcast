@@ -12,6 +12,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.acra.ACRA;
 import org.apache.commons.io.input.XmlStreamReader;
+import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.provider.Subscription;
 import org.xml.sax.InputSource;
@@ -47,13 +48,18 @@ public class FeedHandler {
 
             saxParser.parse(inputSource, handler);
             inputStreamReader.close();
+
+            return handler.state.feed;
         } catch (UnsupportedFeedtypeException udte) {
             return null;
         } catch (Exception e) {
             String substring = subscription == null ? "null" : subscription.toString();
             VendorCrashReporter.report("feedContent", feedContent + " aaaaaand: subscription: " + substring);
-            throw e;
+            if (BuildConfig.DEBUG) {
+                throw e;
+            }
         }
-		return handler.state.feed;
+
+        return null;
 	}
 }

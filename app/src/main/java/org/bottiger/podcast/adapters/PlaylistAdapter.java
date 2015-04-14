@@ -1,21 +1,25 @@
 package org.bottiger.podcast.adapters;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.TreeSet;
+import java.util.concurrent.AbstractExecutorService;
+import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.apache.commons.validator.routines.UrlValidator;
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.PodcastBaseFragment;
 import org.bottiger.podcast.R;
 
 import org.bottiger.podcast.adapters.viewholders.ExpandableViewHoldersUtil;
-import org.bottiger.podcast.images.PicassoWrapper;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
-import org.bottiger.podcast.utils.BackgroundTransformation;
+import org.bottiger.podcast.utils.DirectExecutor;
 import org.bottiger.podcast.utils.PaletteCache;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.ThemeHelper;
@@ -25,11 +29,15 @@ import org.bottiger.podcast.views.PlaylistViewHolder;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Animatable;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -38,17 +46,33 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.squareup.picasso.Callback;
+import com.facebook.common.references.CloseableReference;
+import com.facebook.datasource.DataSource;
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.controller.BaseControllerListener;
+import com.facebook.drawee.controller.ControllerListener;
+import com.facebook.drawee.interfaces.DraweeController;
+import com.facebook.imagepipeline.core.ExecutorSupplier;
+import com.facebook.imagepipeline.core.ImagePipeline;
+import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
+import com.facebook.imagepipeline.image.CloseableImage;
+import com.facebook.imagepipeline.image.ImageInfo;
+import com.facebook.imagepipeline.image.QualityInfo;
+import com.facebook.imagepipeline.request.ImageRequest;
+import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
 public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> {
+
+    private static final String TAG = "PlaylistAdapter";
 
     public static final int TYPE_EXPAND = 1;
 	public static final int TYPE_COLLAPSE = 2;
 
     public static final int PLAYLIST_OFFSET = 1;
 
-    public static ExpandableViewHoldersUtil.KeepOneH<PlaylistViewHolder> keepOne = new ExpandableViewHoldersUtil.KeepOneH<PlaylistViewHolder>();
+    public static ExpandableViewHoldersUtil.KeepOneH<PlaylistViewHolder> keepOne = new ExpandableViewHoldersUtil.KeepOneH<>();
 
+    private Activity mActivity;
     private View mOverlay;
 
     private DownloadProgressObservable mDownloadProgressObservable = null;
@@ -61,14 +85,9 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
     private final ReentrantLock mLock = new ReentrantLock();
     StringBuilder mStringBuilder = new StringBuilder();
 
-
-    // memory leak!!!!
-    private static HashMap<String, Drawable> mBitmapCache = new HashMap<String, Drawable>();
-
-    private BackgroundTransformation mImageTransformation;
-
     public PlaylistAdapter(@NonNull Activity argActivity, View argOverlay, DownloadProgressObservable argDownloadProgressObservable) {
         super(argActivity);
+        mActivity = argActivity;
         mOverlay = argOverlay;
         mInflater = (LayoutInflater) mActivity
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -96,6 +115,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         Log.v("PlaylistAdapter", "onBindViewHolder(pos: " + position + ")");
 
         final FeedItem item = mPlaylist.getItem(position+PLAYLIST_OFFSET);
+        final Activity activity = mActivity;
 
         if (item == null) {
             // This should only happen if the playlist only contain 1 item
@@ -147,50 +167,105 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
                     viewHolder.mSubTitle.setText(displayString);
                 }
 
-                viewHolder.mPicassoCallback = new Callback() {
 
-                    @Override
-                    public void onSuccess() {
-                        String url = item.image;
-                        mLock.lock();
-                        try {
-                            Drawable d = viewHolder.mItemBackground.getDrawable();
-                            mBitmapCache.put(url, d);
+                // http://frescolib.org/docs/getting-started.html#_
+                UrlValidator urlValidator = new UrlValidator();
+                if (!TextUtils.isEmpty(item.image) && urlValidator.isValid(item.image)) {
+                    final Uri frescoImageUrl = Uri.parse(item.image);
 
-                            Palette palette = PaletteCache.get(url);
-                            if (palette == null) {
-                                BitmapDrawable bd = (BitmapDrawable)d;
-                                PaletteCache.generate(url, bd.getBitmap());
+                    ControllerListener controllerListener = new BaseControllerListener<ImageInfo>() {
+                        @Override
+                        public void onFinalImageSet(
+                                String id,
+                                @Nullable ImageInfo imageInfo,
+                                @Nullable Animatable anim) {
+                            if (imageInfo == null) {
+                                return;
                             }
-                        } finally {
-                            mLock.unlock();
+                            QualityInfo qualityInfo = imageInfo.getQualityInfo();
+                            Log.d(TAG, "Final image received! "
+                                            + "Size %d x %d"
+                                            + "Quality level %d, good enough: %s, full quality: %s"
+                                            + imageInfo.getWidth()
+                                            + imageInfo.getHeight()
+                                            + qualityInfo.getQuality()
+                                            + qualityInfo.isOfGoodEnoughQuality()
+                                            + qualityInfo.isOfFullQuality());
+
+
+
+                            // FIXME legacy stuff :)
+                            /*
+                            String url = item.image;
+                            mLock.lock();
+                            try {
+                                Drawable d = viewHolder.mItemBackground.getDrawable();
+
+                                Palette palette = PaletteCache.get(url);
+                                if (palette == null) {
+                                    BitmapDrawable bd = (BitmapDrawable)d;
+                                    PaletteCache.generate(url, bd.getBitmap());
+                                }
+                            } finally {
+                                mLock.unlock();
+                            }*/
+
+                            try {
+                                ImageRequest request = ImageRequestBuilder
+                                        .newBuilderWithSource(frescoImageUrl)
+                                        .build();
+
+                                ImagePipeline imagePipeline = Fresco.getImagePipeline();
+                                DataSource<CloseableReference<CloseableImage>>
+                                        dataSource = imagePipeline.fetchDecodedImage(request, activity);
+
+
+                                DirectExecutor directExecutor = new DirectExecutor();
+                                dataSource.subscribe(new BaseBitmapDataSubscriber() {
+                                    @Override
+                                    public void onNewResultImpl(@Nullable Bitmap bitmap) {
+                                        // You can use the bitmap in only limited ways
+                                        // No need to do any cleanup.
+                                        String url = item.image;
+                                        mLock.lock();
+                                        try {
+
+                                            Palette palette = PaletteCache.get(url);
+                                            if (palette == null) {
+                                                PaletteCache.generate(url, bitmap);
+                                            }
+                                        } finally {
+                                            mLock.unlock();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailureImpl(DataSource dataSource) {
+                                        // No cleanup required here.
+                                    }
+                                }, directExecutor);
+
+                            } catch (Exception e) {
+                                VendorCrashReporter.handleException(e);
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onError() {
-                        return;
-                    }
-                };
+                        @Override
+                        public void onIntermediateImageSet(String id, @Nullable ImageInfo imageInfo) {
+                            Log.d(TAG, "Intermediate image received");
+                        }
 
-                if ((item.image != null && !item.image.equals(""))) {
-                    String ii = item.image;
-                        //PicassoWrapper.load(mContext, ii, playlistViewHolder2.mPlayPauseButton);
+                        @Override
+                        public void onFailure(String id, Throwable throwable) {
+                            Log.e(TAG, "Error loading %s" + id);
+                        }
+                    };
 
-                    if (mBitmapCache.containsKey(ii)) {
-                        viewHolder.mItemBackground.setImageDrawable(mBitmapCache.get(ii));
-                    } else {
+                    DraweeController controller = Fresco.newDraweeControllerBuilder()
+                            .setControllerListener(controllerListener)
+                            .setUri(frescoImageUrl).build();
 
-                        viewHolder.mItemBackground.setImageResource(0);
-
-                        int h = 1080;
-                        com.squareup.picasso.Transformation trans = BackgroundTransformation.getmImageTransformation(mActivity, mImageTransformation, h);
-                        PicassoWrapper.load(mActivity, ii, viewHolder.mItemBackground, trans, viewHolder.mPicassoCallback); // playlistViewHolder2.mItemBackground
-                        //PicassoWrapper.load(mActivity, ii, target, trans);
-                        //int color = item.getSubscription(mActivity).getPrimaryColor();
-                        //viewHolder.mItemBackground.setColorFilter(Color.RED, PorterDuff.Mode.LIGHTEN);
-                    }
-
+                    viewHolder.mItemBackground.setController(controller);
                 }
 
             }
@@ -267,7 +342,8 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
             public void onClick(View v) {
                 PlaylistAdapter.toggle(holder, position);
                 feedItem.removeFromPlaylist(context.getContentResolver());
-                PlaylistAdapter.this.notifyItemRemoved(position);
+                //PlaylistAdapter.this.notifyItemRemoved(position);
+                notifyDataSetChanged();
                 mPlaylist.removeItem(position+PLAYLIST_OFFSET);
             }
         });
@@ -321,10 +397,6 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
         if (holder.episode == null) {
             return;
-        } else {
-            if (!TextUtils.isEmpty(holder.episode.image)) {
-                mBitmapCache.remove(holder.episode.image);
-            }
         }
 
         mDownloadProgressObservable.unregisterObserver(holder.downloadButton);

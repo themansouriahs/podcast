@@ -43,7 +43,7 @@ public class SubscriptionRefreshManager {
                                                             DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
 
     private Context mContext;
-    private RequestQueue mRequestQueue;
+    private static RequestQueue mRequestQueue;
 
     private RequestQueue.RequestFinishedListener<StringRequest> mFinishedListener = new RequestQueue.RequestFinishedListener<StringRequest>() {
         @Override
@@ -55,7 +55,9 @@ public class SubscriptionRefreshManager {
     public SubscriptionRefreshManager(@NonNull Context argContext) {
         mContext = argContext;
         RequestManager.initIfNeeded(mContext);
-        mRequestQueue = RequestManager.getRequestQueue();
+
+        if (mRequestQueue == null)
+            mRequestQueue = RequestManager.getRequestQueue();
     }
 
     Response.ErrorListener getFailureListener() {
@@ -164,18 +166,22 @@ public class SubscriptionRefreshManager {
                 } catch (SAXException e) {
                     Log.d(DEBUG_KEY, "Parsing EXCEPTION: " + subscription);
                     VendorCrashReporter.handleException(e);
+                    VendorCrashReporter.report("subscription1", subscription.getUrl());
                     e.printStackTrace();
                 } catch (IOException e) {
                     Log.d(DEBUG_KEY, "Parsing EXCEPTION: " + subscription);
                     VendorCrashReporter.handleException(e);
+                    VendorCrashReporter.report("subscription2", subscription.getUrl());
                     e.printStackTrace();
                 } catch (ParserConfigurationException e) {
                     Log.d(DEBUG_KEY, "Parsing EXCEPTION: " + subscription);
                     VendorCrashReporter.handleException(e);
+                    VendorCrashReporter.report("subscription3", subscription.getUrl());
                     e.printStackTrace();
                 } catch (UnsupportedFeedtypeException e) {
                     Log.d(DEBUG_KEY, "Parsing EXCEPTION: " + subscription);
                     VendorCrashReporter.handleException(e);
+                    VendorCrashReporter.report("subscription4", subscription.getUrl());
                     e.printStackTrace();
                 }
 

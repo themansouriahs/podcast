@@ -3,7 +3,6 @@ package org.bottiger.podcast;
 import org.bottiger.podcast.adapters.PlaylistAdapter;
 import org.bottiger.podcast.adapters.decoration.DragSortRecycler;
 import org.bottiger.podcast.adapters.decoration.InitialHeaderAdapter;
-import org.bottiger.podcast.images.PicassoWrapper;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
@@ -34,6 +33,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -53,6 +53,7 @@ import android.widget.TextView;
 
 import com.eowise.recyclerview.stickyheaders.StickyHeadersBuilder;
 import com.eowise.recyclerview.stickyheaders.StickyHeadersItemDecoration;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.squareup.picasso.Callback;
 
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
@@ -76,7 +77,7 @@ public class PlaylistFragment extends GeastureFragment implements
     private MultiShrinkScroller mMultiShrinkScroller;
 
     private TopPlayer mTopPlayer;
-    private ImageView mPhoto;
+    private SimpleDraweeView mPhoto;
 
     private TextView mEpisodeTitle;
     private TextView mEpisodeInfo;
@@ -160,7 +161,7 @@ public class PlaylistFragment extends GeastureFragment implements
         mMultiShrinkScroller = (MultiShrinkScroller) mSwipeRefreshView.findViewById(R.id.playlist_container);
 
         mTopPlayer =   (TopPlayer) mSwipeRefreshView.findViewById(R.id.session_photo_container);
-        mPhoto =            (ImageView) mSwipeRefreshView.findViewById(R.id.session_photo);
+        mPhoto =            (SimpleDraweeView) mSwipeRefreshView.findViewById(R.id.session_photo);
 
         mPlaylistContainer = mSwipeRefreshView.findViewById(R.id.playlist_container);
         mEmptyPlaylistContainer = mSwipeRefreshView.findViewById(R.id.playlist_empty);
@@ -228,8 +229,8 @@ public class PlaylistFragment extends GeastureFragment implements
 
         mRecyclerView.setAdapter(mAdapter);
 
-        RecentItemsRecyclerListener l = new RecentItemsRecyclerListener(mAdapter);
-        mRecyclerView.setRecyclerListener(l);
+        //RecentItemsRecyclerListener l = new RecentItemsRecyclerListener(mAdapter);
+        //mRecyclerView.setRecyclerListener(l);
 
         // The bug where the player doesn't show up happens because the playlist is empty.
         // The playlist is empty if the context is null
@@ -246,6 +247,7 @@ public class PlaylistFragment extends GeastureFragment implements
         mSwipeRefreshView.fragment = this;
 
         // Build item decoration and add it to the RecyclerView
+        /*
         InitialHeaderAdapter initialHeaderAdapter = new InitialHeaderAdapter(mPlaylist);
         StickyHeadersItemDecoration decoration = new StickyHeadersBuilder()
                 .setAdapter(mAdapter)
@@ -256,6 +258,7 @@ public class PlaylistFragment extends GeastureFragment implements
                 .build();
 
         mRecyclerView.addItemDecoration(decoration);
+        */
 
         //////
 
@@ -263,6 +266,7 @@ public class PlaylistFragment extends GeastureFragment implements
 
 
         //////
+        /*
         DragSortRecycler dragSortRecycler = new DragSortRecycler();
         dragSortRecycler.setViewHandleId(R.id.drag_handle); //View you wish to use as the handle
 
@@ -272,8 +276,10 @@ public class PlaylistFragment extends GeastureFragment implements
 
         dragSortRecycler.setNavigationHeight(UIUtils.NavigationBarHeight(mActivity));
 
+
         mRecyclerView.addItemDecoration(dragSortRecycler);
         mRecyclerView.addOnItemTouchListener(dragSortRecycler);
+        */
         //mRecyclerView.setOnScrollListener(dragSortRecycler.getScrollListener());
         //////
 
@@ -398,14 +404,17 @@ public class PlaylistFragment extends GeastureFragment implements
             mForwardButton.onPaletteFound(palette);
             mDownloadButton.onPaletteFound(palette);
             mFavoriteButton.onPaletteFound(palette);
+        } else {
+            PaletteCache.generate(item.image, getActivity());
         }
 
-        BackgroundTransformation mImageTransformation = null;
-        int height = TopPlayer.sizeLarge;//1080;//(int)(mPhoto.getHeight()*5.6);
-        trans = BackgroundTransformation.getmImageTransformation(mActivity, mImageTransformation, height);
-        PicassoWrapper.load(mActivity, item.image, mPhoto, trans, cb);
+        Uri uri = Uri.parse(item.image);
+        mPhoto.setImageURI(uri);
+
+        if (mTopPlayer.getVisibleHeight() == 0) {
+            mTopPlayer.setPlayerHeight(1000);
+        }
     }
-    com.squareup.picasso.Transformation trans = null;
 
     private void recomputePhotoAndScrollingMetrics() {
         final int actionBarSize = UIUtils.calculateActionBarSize(mActivity);

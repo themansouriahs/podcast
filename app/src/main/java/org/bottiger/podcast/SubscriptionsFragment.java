@@ -36,6 +36,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
@@ -74,6 +75,7 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
 	private GridView mGridView;
 	private TextView searchStatus;
 
+    private CursorAdapter mAdapter;
     private Cursor mCursor;
 
     private RelativeLayout mEmptySubscrptionList;
@@ -184,10 +186,10 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
         mCursor = mFragmentUtils.getCursor();
 
         setSubscriptionBackground(mCursor);
-        CursorAdapter ca = getSubscriptionCursorAdapter(getActivity(), mCursor);
-        mFragmentUtils.setAdapter(ca);
+        mAdapter = getSubscriptionCursorAdapter(getActivity(), mCursor);
+        mFragmentUtils.setAdapter(mAdapter);
         fetchLocalCursor();
-        mGridView.setAdapter(ca);
+        mGridView.setAdapter(mAdapter);
     }
 
     private void setSubscriptionBackground(Cursor argCursor) {
@@ -232,6 +234,20 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
                 return false;
             }
 
+        });
+
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                //Toast t = Toast.makeText(MainActivity.this, "close", Toast.LENGTH_SHORT);
+                //t.show();
+                InputMethodManager imm = (InputMethodManager) mActivity.getSystemService(
+                        Context.INPUT_METHOD_SERVICE);
+                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                mAdapter.notifyDataSetChanged();
+
+                return false;
+            }
         });
 
 		
