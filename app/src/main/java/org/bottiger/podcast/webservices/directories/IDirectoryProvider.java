@@ -13,6 +13,9 @@ public interface IDirectoryProvider {
         public void error(@NonNull Exception argException);
     }
 
+    @NonNull
+    public String getName();
+
     public void search(@NonNull ISearchParameters argParameters,
                        @NonNull Callback argCallback);
 

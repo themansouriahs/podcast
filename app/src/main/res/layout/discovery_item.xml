@@ -44,7 +44,6 @@
             android:textColor="@color/white_opaque"
             android:textSize="24sp"
             android:gravity="center_vertical"
-            android:singleLine="true"
             android:layout_marginLeft="20dp"
             />
 
@@ -59,7 +58,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Subscribed"/>
+            android:text="@string/discovery_subscribe"/>
 
         <Switch
             android:layout_width="wrap_content"

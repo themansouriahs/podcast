@@ -11,6 +11,12 @@ import org.bottiger.podcast.webservices.directories.generic.GenericDirectory;
  */
 public class Stitcher extends GenericDirectory {
 
+    private static final String NAME = "Stitcher";
+
+    public Stitcher() {
+        super(NAME);
+    }
+
     @Override
     public void search(@NonNull ISearchParameters argParameters, @NonNull Callback argCallback) {
 

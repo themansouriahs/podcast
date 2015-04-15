@@ -47,6 +47,12 @@
         />
 
     <View
+        android:id="@+id/discovery_recycler_bottom_filler"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_below="@+id/search_result_view"/>
+
+    <View
         android:id="@+id/discovery_recycler_top_gradient"
         android:background="@drawable/header_gradient_light"
         android:layout_width="match_parent"

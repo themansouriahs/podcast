@@ -29,10 +29,15 @@ import java.util.List;
  */
 public class GPodder extends GenericDirectory {
 
+    private static final String NAME = "gPodder";
     private static final String QUERY_SEPARATOR = " ";
 
     private UrlValidator mUrlValidator = new UrlValidator();
     private QueryGpodder asyncTask = null;
+
+    public GPodder() {
+        super(NAME);
+    }
 
     @Override
     public void search(@NonNull ISearchParameters argParameters, @NonNull Callback argCallback) {

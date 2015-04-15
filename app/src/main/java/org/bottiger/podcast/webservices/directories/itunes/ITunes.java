@@ -41,6 +41,8 @@ import java.util.Map;
  */
 public class ITunes extends GenericDirectory {
 
+    private static final String NAME = "iTunes";
+
     private static final String jsonTest = "{\n" +
             " \"resultCount\":50,\n" +
             " \"results\": [\n" +
@@ -64,6 +66,7 @@ public class ITunes extends GenericDirectory {
     private QueryITunes asyncTask = null;
 
     public ITunes() {
+        super(NAME);
         // to prevent exception when encountering unknown property:
         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         // to allow coercion of JSON empty String ("") to null Object value:
