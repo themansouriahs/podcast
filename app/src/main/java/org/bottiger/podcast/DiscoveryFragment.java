@@ -156,9 +156,10 @@ public class DiscoveryFragment extends Fragment {
 
         Message msg = createHandlerMessage(argQuery);
         if (argDelaySearch) {
-            mSearchHandler.sendMessage(msg);
-        } else {
             mSearchHandler.sendMessageDelayed(msg, HANDLER_DELAY);
+        } else {
+            mSearchHandler.sendMessage(msg);
+            mSearchView.clearFocus();
         }
     }
 
