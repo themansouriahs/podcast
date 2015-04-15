@@ -115,7 +115,7 @@ dependencies {
     compile 'org.jsoup:jsoup:1.7.3'
 
     compile 'com.eowise:recyclerview-stickyheaders:0.5.1@aar'
-    compile 'jp.wasabeef:recyclerview-animators:1.0.3'
+    compile 'jp.wasabeef:recyclerview-animators:1.2.0@aar'
     compile 'com.github.traex.rippleeffect:library:1+'
 
     compile 'ch.acra:acra:4.6.+'
