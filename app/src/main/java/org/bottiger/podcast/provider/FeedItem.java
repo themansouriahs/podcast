@@ -1542,12 +1542,12 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 		return null;
 	}
 
-    private static SimpleDateFormat sFormat = new SimpleDateFormat(default_format, Locale.US);
+    private static final SimpleDateFormat sFormat = new SimpleDateFormat(default_format, Locale.US);
 	public void setPubDate(Date parseRFC822Date) {
         try {
             this.date = sFormat.format(parseRFC822Date);
         } catch (NullPointerException npe) {
-            Log.e("Date parsing error:" , "Could not parse: " + parseRFC822Date.toString());
+            //Log.e("Date parsing error:" , "Could not parse: " + parseRFC822Date.toString());
             this.date = sFormat.format(new Date());
         }
 	}
