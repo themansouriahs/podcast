@@ -61,6 +61,7 @@
             android:text="@string/discovery_subscribe"/>
 
         <Switch
+            android:id="@+id/result_subscribe_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             />

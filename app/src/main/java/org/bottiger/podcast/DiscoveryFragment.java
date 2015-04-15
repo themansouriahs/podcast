@@ -1,6 +1,7 @@
 package org.bottiger.podcast;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 import org.bottiger.podcast.adapters.DiscoverySearchAdapter;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
+import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.webservices.directories.IDirectoryProvider;
 import org.bottiger.podcast.webservices.directories.ISearchParameters;
 import org.bottiger.podcast.webservices.directories.ISearchResult;
@@ -30,6 +32,8 @@ import java.lang.ref.WeakReference;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
 
 /**
  * Created by apl on 13-04-2015.
