@@ -2,6 +2,7 @@ package org.bottiger.podcast.webservices.directories;
 
 import android.support.annotation.NonNull;
 
+import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
 
 /**
@@ -10,5 +11,5 @@ import org.bottiger.podcast.provider.Subscription;
 public interface ISearchResult {
 
     @NonNull
-    public Iterable<Subscription> getResults();
+    public Iterable<ISubscription> getResults();
 }

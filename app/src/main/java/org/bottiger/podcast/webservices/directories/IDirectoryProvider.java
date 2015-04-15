@@ -9,8 +9,8 @@ public interface IDirectoryProvider {
 
     // Result callback
     interface Callback {
-        public void result(ISearchResult argResult);
-        public void error(Exception argException);
+        public void result(@NonNull ISearchResult argResult);
+        public void error(@NonNull Exception argException);
     }
 
     public void search(@NonNull ISearchParameters argParameters,

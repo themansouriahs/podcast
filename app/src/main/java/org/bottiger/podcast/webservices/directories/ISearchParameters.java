@@ -1,5 +1,7 @@
 package org.bottiger.podcast.webservices.directories;
 
+import android.support.annotation.NonNull;
+
 import java.util.List;
 
 /**
@@ -7,6 +9,8 @@ import java.util.List;
  */
 public interface ISearchParameters {
 
-    public void addKeyword(String argKeyword);
+    public void addSearchTerm(@NonNull String argKeyword);
+
+    @NonNull
     public List<String> getKeywords();
 }

@@ -32,7 +32,7 @@ import android.support.v7.graphics.Palette;
 
 import javax.annotation.Nullable;
 
-public class Subscription extends AbstractItem implements PaletteListener {
+public class Subscription extends AbstractItem implements ISubscription, PaletteListener {
 
 	public static final String TYPE_RSS2 = "rss";
 	public static final String TYPE_RSS091 = "rss";

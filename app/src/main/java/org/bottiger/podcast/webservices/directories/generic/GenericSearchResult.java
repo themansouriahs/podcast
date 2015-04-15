@@ -2,6 +2,7 @@ package org.bottiger.podcast.webservices.directories.generic;
 
 import android.support.annotation.NonNull;
 
+import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.webservices.directories.ISearchResult;
 
@@ -12,15 +13,15 @@ import java.util.LinkedList;
  */
 public class GenericSearchResult implements ISearchResult {
 
-    private LinkedList<Subscription> mSubscriptions = new LinkedList<>();
+    private LinkedList<ISubscription> mSubscriptions = new LinkedList<>();
 
-    public void addResult(@NonNull Subscription argSubscription) {
+    public void addResult(@NonNull ISubscription argSubscription) {
         mSubscriptions.add(argSubscription);
     }
 
     @NonNull
     @Override
-    public Iterable<Subscription> getResults() {
+    public Iterable<ISubscription> getResults() {
         return mSubscriptions;
     }
 }

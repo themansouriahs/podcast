@@ -2,6 +2,7 @@ package org.bottiger.podcast.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -22,13 +23,17 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
 
     private static final String TAG = "DiscoverySearchAdapter";
 
+    private Activity mActivity;
     private LayoutInflater mInflater;
 
+    private int mDefaultBackgroundColor = 0;
     private ArrayList<ISubscription> mDataset = new ArrayList<>();
 
     public DiscoverySearchAdapter(@NonNull Activity argActivity) {
-        mInflater = (LayoutInflater) argActivity
+        mActivity = argActivity;
+        mInflater = (LayoutInflater) mActivity
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mDefaultBackgroundColor = mActivity.getResources().getColor(R.color.colorPrimary);
     }
 
     @Override
@@ -44,7 +49,15 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
     @Override
     public void onBindViewHolder(final SearchResultViewHolder holder, final int position) {
         ISubscription subscription = mDataset.get(position);
+
         holder.title.setText(subscription.getTitle());
+
+        try {
+            Uri  uri = Uri.parse(subscription.getImageURL());
+            holder.image.setImageURI(uri);
+        } catch (NullPointerException npe) {
+            holder.image.setBackgroundColor(mDefaultBackgroundColor);
+        }
     }
 
     @Override
