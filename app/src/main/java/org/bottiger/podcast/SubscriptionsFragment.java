@@ -203,54 +203,7 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
 
 	@Override
 	public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
-
 		inflater.inflate(R.menu.subscription_actionbar, menu);
-
-
-        SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
-	    searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-
-            private QueryGpodder asyncTask = null;
-
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                menu.findItem(R.id.menu_search).collapseActionView();
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                // search goes here !!
-                if (newText != null && !newText.equals("")) {
-                    mFragmentUtils.getAdapter().changeCursor(newMatrixCursor());
-                    if (asyncTask != null && asyncTask.getStatus() != AsyncTask.Status.FINISHED)
-                        asyncTask.cancel(true);
-
-                    asyncTask = new QueryGpodder();
-                    asyncTask.execute(newText);
-                } else
-                    fetchLocalCursor();
-
-                return false;
-            }
-
-        });
-
-        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
-            @Override
-            public boolean onClose() {
-                //Toast t = Toast.makeText(MainActivity.this, "close", Toast.LENGTH_SHORT);
-                //t.show();
-                InputMethodManager imm = (InputMethodManager) mActivity.getSystemService(
-                        Context.INPUT_METHOD_SERVICE);
-                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-                mAdapter.notifyDataSetChanged();
-
-                return false;
-            }
-        });
-
-		
 		super.onCreateOptionsMenu(menu, inflater);
         return;
 	}
@@ -443,29 +396,6 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
 		}
 		
 		return hashValLong;
-	}
-	
-	private class QueryGpodder extends AsyncTask<String, Void, List<IPodcast>> {
-		
-		public QueryGpodder() {
-			setSearchStatusVisible(true);
-		}
-		
-		protected List<IPodcast> doInBackground(String... string) {
-			PublicClient gpodderClient = new PublicClient();
-			List<IPodcast> podcasts = null;
-			try {
-				podcasts = gpodderClient.searchPodcast(string[0]);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			
-			return podcasts;
-		}
-
-		protected void onPostExecute(List<IPodcast> podcasts) {
-			SubscriptionsFragment.this.cursorFromSearchResults(podcasts);
-		}
 	}
 
 

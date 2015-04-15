@@ -3,12 +3,6 @@
     xmlns:app="http://schemas.android.com/tools">
 
     <item
-        android:id="@+id/menu_search"
-        android:title="@string/menu_search"
-        appcompat:actionViewClass="android.support.v7.widget.SearchView"
-        appcompat:showAsAction="always"/>
-
-    <item
         android:id="@+id/menu_refresh_all_subscriptions"
         android:orderInCategory="2"
         android:title="@string/menu_refresh_feed_all">
