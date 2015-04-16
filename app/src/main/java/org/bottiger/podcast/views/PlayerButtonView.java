@@ -30,11 +30,12 @@ import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.PaletteCache;
 
+import java.lang.ref.WeakReference;
+
 /**
  * TODO: document your custom view class.
  */
-//public class PlayerButtonView extends com.melnykov.fab.FloatingActionButton implements PlayerStatusObserver, PaletteListener, DownloadObserver {
-public class PlayerButtonView extends ImageButton implements PlayerStatusObserver, PaletteListener, DownloadObserver  { // View.OnClickListener
+public class PlayerButtonView extends ImageButton implements PlayerStatusObserver, PaletteListener, DownloadObserver  {
 
     public final static int STATE_DEFAULT = 0;
     public final static int STATE_DOWNLOAD = 1;
@@ -54,13 +55,11 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
     private RectF buttonRectangleBitmap;
 
     private Context mContext;
-    private Bitmap s_Icon;
+    private WeakReference<Bitmap> s_Icon;
     private int defaultIcon;
 
     private int mCurrentState = 0;
     private SparseIntArray mStateIcons= new SparseIntArray();
-
-    private PaletteObservable mCurrentListener;
 
     private int mForegroundColor = getResources().getColor(R.color.colorPrimaryDark);
     private int mBackgroundColor = getResources().getColor(R.color.colorPrimaryDark);
@@ -112,7 +111,7 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
             }
 
             if (image > 0) {
-                s_Icon = BitmapFactory.decodeResource(getResources(), image);
+                s_Icon = new WeakReference<Bitmap>(BitmapFactory.decodeResource(getResources(), image));
             }
         }
         defaultIcon = image;
@@ -141,9 +140,9 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
     }
 
     public void setImage(int argImage) {
-        s_Icon = BitmapFactory.decodeResource(getResources(), argImage);
+        s_Icon = new WeakReference<Bitmap>(BitmapFactory.decodeResource(getResources(), argImage));
 
-        this.setImageBitmap(s_Icon);
+        this.setImageBitmap(s_Icon.get());
         this.invalidate();
     }
 
