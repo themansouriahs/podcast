@@ -5,9 +5,11 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.facebook.common.references.CloseableReference;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.imagepipeline.bitmaps.PlatformBitmapFactory;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.facebook.imagepipeline.request.Postprocessor;
@@ -70,16 +72,17 @@ public class FrescoHelper {
         }
 
         @Override
-        public String getName() {
-            return "SoundWavesDefaultPostprocessor";
+        public CloseableReference<Bitmap> process(Bitmap bitmap, PlatformBitmapFactory platformBitmapFactory) {
+            PaletteCache.generate(mUrl, bitmap);
+            if (mpostprocessor != null) {
+                mpostprocessor.process(bitmap, platformBitmapFactory);
+            }
+            return null;
         }
 
         @Override
-        public void process(Bitmap bitmap) {
-            PaletteCache.generate(mUrl, bitmap);
-            if (mpostprocessor != null) {
-                mpostprocessor.process(bitmap);
-            }
+        public String getName() {
+            return "SoundWavesDefaultPostprocessor";
         }
     }
 }

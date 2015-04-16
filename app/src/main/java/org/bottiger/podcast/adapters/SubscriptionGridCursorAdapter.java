@@ -95,6 +95,7 @@ public class SubscriptionGridCursorAdapter extends AbstractGridPodcastAdapter {
 
             boolean missingColor = sub.getPrimaryColor() == -1;
 
+            /*
             if (missingColor) {
 
                 TintedFramelayout tview = (TintedFramelayout) view;
@@ -132,35 +133,11 @@ public class SubscriptionGridCursorAdapter extends AbstractGridPodcastAdapter {
                     // Uri.parse probably failed because logo==null
                 }
             }
-                /*
-                Palette palette = PaletteCache.get(logo);
-                if (palette != null) {
-                    PaletteObservable.updatePalette(logo, palette);
-                } else {
-                    Target mTarget = new Target() {
-                        @Override
-                        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                            PaletteCache.generate(logo, bitmap);
-                        }
 
-                        @Override
-                        public void onBitmapFailed(Drawable errorDrawable) {
-
-                        }
-
-                        @Override
-                        public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-                        }
-                    };
-
-
-                    PicassoWrapper.simpleLoad(mContext, logo, mTarget);
-                }*/
 
             } else {
                 view.setBackgroundColor(sub.getPrimaryColor());
-            }
+            }*/
 
         } else {
             holder.gradient.setVisibility(View.VISIBLE);
@@ -188,42 +165,6 @@ public class SubscriptionGridCursorAdapter extends AbstractGridPodcastAdapter {
 
     public interface OnPopulateSubscriptionList {
         public void listPopulated(Cursor cursor);
-    }
-
-    private class BitmapTarget implements Target {
-
-        private Subscription mSubscription;
-        private View mView;
-        private ContentResolver mContentResolver;
-
-        public BitmapTarget(Subscription subscription, View view, ContentResolver contentResolver) {
-            mSubscription = subscription;
-            mView = view;
-            mContentResolver = contentResolver;
-        }
-
-        @Override
-        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-            Palette palette = PaletteCache.generate(mSubscription.getImageURL(), bitmap);
-            ColorExtractor colorExtractor = new ColorExtractor(palette);
-
-            mSubscription.setPrimaryColor(colorExtractor.getPrimary());
-            mSubscription.setSecondaryColor(colorExtractor.getSecondary());
-            mSubscription.setPrimaryTintColor(colorExtractor.getPrimaryTint());
-            mSubscription.update(mContentResolver);
-
-            mView.setBackgroundColor(mSubscription.getPrimaryColor());
-        }
-
-        @Override
-        public void onBitmapFailed(Drawable errorDrawable) {
-
-        }
-
-        @Override
-        public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-        }
     }
 
 

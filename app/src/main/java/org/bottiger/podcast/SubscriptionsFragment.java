@@ -166,6 +166,11 @@ public class SubscriptionsFragment extends Fragment implements SubscriptionGridC
 	}
 
     @Override
+    public void onDetach() {
+        super.onDetach();
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         if (mGridView.getNumColumns() != numberOfColumns(mActivity)) {

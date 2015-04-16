@@ -47,9 +47,6 @@ public class FragmentContainerActivity extends DrawerActivity {
 
     private SlidingTabLayout mSlidingTabLayout;
 
-    private Scene mSceneSubscriptions;
-    private Scene mSceneFeed;
-
     private MyCustomViewPager mInflatedViewStub;
 
     @Override
@@ -115,20 +112,11 @@ public class FragmentContainerActivity extends DrawerActivity {
 
         createScenes(mViewPager);
 	}
-	
-	public SectionsPagerAdapter getSectionsPagerAdapter() {
-		return this.mSectionsPagerAdapter;
-	}
-	
-	private void createDownloadFragment() {
-		DownloadFragment fragment = new DownloadFragment();
-		mFragmentManager.beginTransaction().replace(R.id.app_content, fragment).commit();
-	}
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
     private void createScenes(ViewGroup viewGroup) {
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            mSceneSubscriptions = Scene.getSceneForLayout(viewGroup, R.layout.subscription_list, this);
+            //mSceneSubscriptions = Scene.getSceneForLayout(viewGroup, R.layout.subscription_list, this);
         }
     }
 
@@ -175,11 +163,15 @@ public class FragmentContainerActivity extends DrawerActivity {
 
             if (fragment == null) {
                 if (position == SUBSCRIPTION) {
-                    fragment = new SubscriptionsFragment();//new ViewPagerSubscriptionFragment();
+                    fragment = new SubscriptionsFragment();
+                    //fragment = new DummyFragment();
                 } else if (position == PLAYLIST) {
                     fragment = new PlaylistFragment();
+                    //fragment = new DummyFragment();
                 } else if (position == DISCOVER) {
                     fragment = new DiscoveryFragment();
+                    //fragment = new DummyFragment();
+                    //fragment = new SubscriptionsFragment();
                 }
 
                 Bundle args = new Bundle();

@@ -27,10 +27,12 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
+import com.facebook.common.references.CloseableReference;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.controller.BaseControllerListener;
 import com.facebook.drawee.controller.ControllerListener;
 import com.facebook.drawee.interfaces.DraweeController;
+import com.facebook.imagepipeline.bitmaps.PlatformBitmapFactory;
 import com.facebook.imagepipeline.request.Postprocessor;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -133,29 +135,6 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
         }
     };
 
-    /*
-    Target target = new Target() {
-        @Override
-        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-            BitmapDrawable bd = new BitmapDrawable(getResources(), bitmap);
-            mPhotoView.setImageBitmap(bitmap);
-            analyzeWhitenessOfPhotoAsynchronously();
-
-            PaletteCache.generate(mUrl, bd.getBitmap());
-        }
-
-        @Override
-        public void onBitmapFailed(Drawable errorDrawable) {
-            return;
-        }
-
-        @Override
-        public void onPrepareLoad(Drawable placeHolderDrawable) {
-            return;
-        }
-    };*/
-
-
     public static void start(@NonNull Activity argActivity, long argId) {
         Intent intent = new Intent(argActivity, FeedActivity.class);
 
@@ -222,10 +201,14 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
 
         mUrl = mSubscription.getImageURL();
 
+
+        //FrescoHelper.loadImageInto(mPhotoView, mUrl, null);
         FrescoHelper.loadImageInto(mPhotoView, mUrl, new Postprocessor() {
+
             @Override
-            public void process(Bitmap bitmap) {
+            public CloseableReference<Bitmap> process(Bitmap bitmap, PlatformBitmapFactory platformBitmapFactory) {
                 analyzeWhitenessOfPhotoAsynchronously(bitmap);
+                return null;
             }
 
             @Override
@@ -273,10 +256,6 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
 
         mMultiShrinkScroller.initialize(mMultiShrinkScrollerListener, mExtraMode == MODE_FULLY_EXPANDED);
         mMultiShrinkScroller.setTitle(mSubscription.getTitle());
-
-        PaletteObservable.registerListener(this);
-        Palette palette = PaletteCache.get(mSubscription.getImageURL());
-        onPaletteFound(palette);
 
         // mMultiShrinkScroller needs to perform asynchronous measurements after initalize(), therefore
         // we can't mark this as GONE.
@@ -330,6 +309,20 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
         if (Build.VERSION.SDK_INT >= 18) {
             Trace.endSection();
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        PaletteObservable.registerListener(this);
+        Palette palette = PaletteCache.get(mSubscription.getImageURL());
+        onPaletteFound(palette);
+    }
+
+    @Override
+    protected void onStop() {
+        PaletteObservable.unregisterListener(this);
+        super.onStop();
     }
 
     private void processIntent(Intent argIntent) {
