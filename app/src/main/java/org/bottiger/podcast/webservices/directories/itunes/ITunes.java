@@ -112,6 +112,11 @@ public class ITunes extends GenericDirectory {
         return URLEncoder.encode(joinedKeywords, "UTF-8");
     }
 
+    @Override
+    protected AsyncTask getAsyncTask() {
+        return null;
+    }
+
     private class QueryITunes extends AsyncTask<String, Void, Void> {
 
         private URL mURL;

@@ -18,5 +18,6 @@ public interface IDirectoryProvider {
 
     public void search(@NonNull ISearchParameters argParameters,
                        @NonNull Callback argCallback);
+    public void abortSearch();
 
 }

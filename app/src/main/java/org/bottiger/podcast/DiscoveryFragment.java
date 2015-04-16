@@ -42,7 +42,8 @@ public class DiscoveryFragment extends Fragment {
 
     private static final String TAG = "DiscoveryFragment";
 
-    private static final int HANDLER_WHAT = 27407; // whatever
+    private static final int HANDLER_WHAT_SEARCH = 27407; // whatever
+    private static final int HANDLER_WHAT_CANCEL = 27408; // whatever
     private static final int HANDLER_DELAY = 300; // ms
     private static final String HANDLER_QUERY = "query";
     private SearchHandler mSearchHandler = new SearchHandler(this);
@@ -149,19 +150,26 @@ public class DiscoveryFragment extends Fragment {
         mDirectoryProvider.search(searchParameters, mSearchResultCallback);
     }
 
+    protected void abortSearch() {
+        mDirectoryProvider.abortSearch();
+    }
+
     private void searchviewQueryChanged(@NonNull String argQuery, boolean argDelaySearch) {
 
-        mSearchHandler.removeMessages(HANDLER_WHAT);
+        mSearchHandler.removeMessages(HANDLER_WHAT_SEARCH);
 
         if (TextUtils.isEmpty(argQuery)) {
             populateRecommendations();
             return;
         }
 
-        Message msg = createHandlerMessage(argQuery);
+        Message msg = createHandlerMessage(argQuery, HANDLER_WHAT_SEARCH);
         if (argDelaySearch) {
             mSearchHandler.sendMessageDelayed(msg, HANDLER_DELAY);
         } else {
+            Message abortMsg = createHandlerMessage(argQuery, HANDLER_WHAT_CANCEL);
+
+            mSearchHandler.sendMessage(abortMsg);
             mSearchHandler.sendMessage(msg);
             mSearchView.clearFocus();
         }
@@ -204,11 +212,11 @@ public class DiscoveryFragment extends Fragment {
         mSearchLabel.setText(labelText);
     }
 
-    private Message createHandlerMessage(String argQuery) {
+    private Message createHandlerMessage(String argQuery, int argWhat) {
         Bundle bundle = new Bundle();
         bundle.putString(HANDLER_QUERY, argQuery);
         Message msg = new Message();
-        msg.what = HANDLER_WHAT;
+        msg.what = argWhat;
         msg.setData(bundle);
         return msg;
     }
@@ -228,18 +236,18 @@ public class DiscoveryFragment extends Fragment {
         public void handleMessage(Message msg) {
             DiscoveryFragment fragment = mFragment.get();
             if (fragment != null) {
-                String query = msg.getData().getString(HANDLER_QUERY);
-                fragment.performSearch(query);
+                switch (msg.what) {
+                    case HANDLER_WHAT_SEARCH: {
+                        String query = msg.getData().getString(HANDLER_QUERY);
+                        fragment.performSearch(query);
+                        return;
+                    }
+                    case HANDLER_WHAT_CANCEL: {
+                        fragment.abortSearch();
+                        return;
+                    }
+                }
             }
         }
     }
-
-    /*
-    private static final Runnable sPerformSearch = new Runnable() {
-        @Override
-        public void run() {
-
-        }
-    };
-    */
 }

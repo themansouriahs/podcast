@@ -1,5 +1,6 @@
 package org.bottiger.podcast.webservices.directories.stitcher;
 
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
 import org.bottiger.podcast.webservices.directories.IDirectoryProvider;
@@ -20,5 +21,10 @@ public class Stitcher extends GenericDirectory {
     @Override
     public void search(@NonNull ISearchParameters argParameters, @NonNull Callback argCallback) {
 
+    }
+
+    @Override
+    protected AsyncTask getAsyncTask() {
+        return null;
     }
 }

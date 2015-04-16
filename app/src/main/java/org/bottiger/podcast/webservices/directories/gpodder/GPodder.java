@@ -33,10 +33,14 @@ public class GPodder extends GenericDirectory {
     private static final String QUERY_SEPARATOR = " ";
 
     private UrlValidator mUrlValidator = new UrlValidator();
-    private QueryGpodder asyncTask = null;
+    private QueryGpodder asyncTask;
 
     public GPodder() {
         super(NAME);
+    }
+
+    protected AsyncTask getAsyncTask() {
+        return asyncTask;
     }
 
     @Override
