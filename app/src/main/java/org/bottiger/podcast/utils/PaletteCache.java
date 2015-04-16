@@ -113,4 +113,8 @@ public class PaletteCache {
     public static boolean containsKey(@NonNull String argUrl) {
         return mPaletteCache.containsKey(argUrl);
     }
+
+    public static void generatePalletFromUrl(@Nullable String argUrl) {
+
+    }
 }

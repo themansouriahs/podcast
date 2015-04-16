@@ -21,7 +21,7 @@ import org.bottiger.podcast.R;
  * This entire class can be deleted once use of LetterTileDrawable is no longer used
  * inside QuickContactsActivity at all.
  */
-public class QuickFeedImage extends ImageView {
+public class QuickFeedImage extends com.facebook.drawee.view.SimpleDraweeView {
 
     private Drawable mOriginalDrawable;
     private BitmapDrawable mBitmapDrawable;
@@ -39,13 +39,6 @@ public class QuickFeedImage extends ImageView {
     public QuickFeedImage(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
-
-    @TargetApi(21)
-    public QuickFeedImage(Context context, AttributeSet attrs, int defStyleAttr,
-                          int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-    }
-
 
     public void setTint(int color) {
         if (mBitmapDrawable == null || mBitmapDrawable.getBitmap() == null

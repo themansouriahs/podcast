@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,16 +20,23 @@ import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.controller.BaseControllerListener;
+import com.facebook.drawee.controller.ControllerListener;
+import com.facebook.drawee.interfaces.DraweeController;
+import com.facebook.imagepipeline.request.Postprocessor;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import org.bottiger.podcast.adapters.FeedViewAdapter;
+import org.bottiger.podcast.images.FrescoHelper;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.playlist.FeedCursorLoader;
@@ -52,32 +60,13 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
 
     public static final int MODE_FULLY_EXPANDED = 4;
 
-    private static final String TAG = "FeedView";
+    private static final String TAG = "FeedActivity";
 
     private static final String KEY_THEME_COLOR = "theme_color";
 
     private static final int ANIMATION_STATUS_BAR_COLOR_CHANGE_DURATION = 150;
-    private static final int REQUEST_CODE_CONTACT_EDITOR_ACTIVITY = 1;
     private static final int DEFAULT_SCRIM_ALPHA = 0xC8;
     private static final int SCRIM_COLOR = Color.argb(DEFAULT_SCRIM_ALPHA, 0, 0, 0);
-    private static final int REQUEST_CODE_CONTACT_SELECTION_ACTIVITY = 2;
-    private static final String MIMETYPE_SMS = "vnd.android-dir/mms-sms";
-
-    /** This is the Intent action to install a shortcut in the launcher. */
-    private static final String ACTION_INSTALL_SHORTCUT =
-            "com.android.launcher.action.INSTALL_SHORTCUT";
-
-    @SuppressWarnings("deprecation")
-    private static final String LEGACY_AUTHORITY = android.provider.Contacts.AUTHORITY;
-
-    private static final String MIMETYPE_GPLUS_PROFILE =
-            "vnd.android.cursor.item/vnd.googleplus.profile";
-    private static final String INTENT_DATA_GPLUS_PROFILE_ADD_TO_CIRCLE = "Add to circle";
-    private static final String MIMETYPE_HANGOUTS =
-            "vnd.android.cursor.item/vnd.googleplus.profile.comm";
-    private static final String INTENT_DATA_HANGOUTS_VIDEO = "Start video call";
-    private static final String CALL_ORIGIN_QUICK_CONTACTS_ACTIVITY =
-            "com.android.contacts.quickcontact.QuickContactActivity";
 
     private int mStatusBarColor;
     private int mExtraMode = MODE_FULLY_EXPANDED;
@@ -144,6 +133,7 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
         }
     };
 
+    /*
     Target target = new Target() {
         @Override
         public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
@@ -163,7 +153,7 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
         public void onPrepareLoad(Drawable placeHolderDrawable) {
             return;
         }
-    };
+    };*/
 
 
     public static void start(@NonNull Activity argActivity, long argId) {
@@ -231,7 +221,20 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
 
 
         mUrl = mSubscription.getImageURL();
-        Picasso.with(this).load(mUrl).into(target);
+
+        FrescoHelper.loadImageInto(mPhotoView, mUrl, new Postprocessor() {
+            @Override
+            public void process(Bitmap bitmap) {
+                analyzeWhitenessOfPhotoAsynchronously(bitmap);
+            }
+
+            @Override
+            public String getName() {
+                return "IsWhite";
+            }
+        });
+
+        //PaletteCache.generatePalletFromUrl(mUrl);
 
         final View transparentView = findViewById(R.id.transparent_view);
         if (mMultiShrinkScroller != null) {
@@ -402,17 +405,11 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
      * Examine how many white pixels are in the bitmap in order to determine whether or not
      * we need gradient overlays on top of the image.
      */
-    private void analyzeWhitenessOfPhotoAsynchronously() {
-        final Drawable imageViewDrawable = mPhotoView.getDrawable();
+    private void analyzeWhitenessOfPhotoAsynchronously(@NonNull final Bitmap argBitmap) {
         new AsyncTask<Void, Void, Boolean>() {
             @Override
             protected Boolean doInBackground(Void... params) {
-                if (imageViewDrawable instanceof BitmapDrawable) {
-                    final Bitmap bitmap = ((BitmapDrawable) imageViewDrawable).getBitmap();
-                    return WhitenessUtils.isBitmapWhiteAtTopOrBottom(bitmap);
-                }
-                //return !(imageViewDrawable instanceof LetterTileDrawable);
-                return false;
+                return WhitenessUtils.isBitmapWhiteAtTopOrBottom(argBitmap);
             }
 
             @Override
