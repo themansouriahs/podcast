@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.facebook.common.references.CloseableReference;
+import com.facebook.common.references.ResourceReleaser;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -38,7 +39,7 @@ public class FrescoHelper {
         Defaultprocessor processor = new Defaultprocessor(argUrl, argPostprocessor);
 
         ImageRequest request = ImageRequestBuilder.newBuilderWithSource(uri)
-                .setPostprocessor(processor)
+                //.setPostprocessor(processor)
                 .build();
 
         return request;
@@ -73,16 +74,26 @@ public class FrescoHelper {
 
         @Override
         public CloseableReference<Bitmap> process(Bitmap bitmap, PlatformBitmapFactory platformBitmapFactory) {
-            PaletteCache.generate(mUrl, bitmap);
+            //PaletteCache.generate(mUrl, bitmap);
             if (mpostprocessor != null) {
                 mpostprocessor.process(bitmap, platformBitmapFactory);
             }
-            return null;
+
+            return toCloseableReference(bitmap);
         }
 
         @Override
         public String getName() {
             return "SoundWavesDefaultPostprocessor";
         }
+    }
+
+    public static CloseableReference<Bitmap> toCloseableReference(Bitmap argBitmap) {
+        return CloseableReference.of(argBitmap, new ResourceReleaser<Bitmap>() {
+            @Override
+            public void release(Bitmap value) {
+                value.recycle();
+            }
+        });
     }
 }

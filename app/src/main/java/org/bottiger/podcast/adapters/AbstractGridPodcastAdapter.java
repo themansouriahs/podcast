@@ -15,7 +15,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 public abstract class AbstractGridPodcastAdapter extends CursorAdapter {
 
 	protected LayoutInflater mInflater;

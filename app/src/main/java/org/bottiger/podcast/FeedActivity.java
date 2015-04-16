@@ -28,11 +28,16 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 import com.facebook.common.references.CloseableReference;
+import com.facebook.common.references.ResourceReleaser;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.controller.BaseControllerListener;
 import com.facebook.drawee.controller.ControllerListener;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.imagepipeline.bitmaps.PlatformBitmapFactory;
+import com.facebook.imagepipeline.image.CloseableBitmap;
+import com.facebook.imagepipeline.image.CloseableImage;
+import com.facebook.imagepipeline.image.CloseableStaticBitmap;
+import com.facebook.imagepipeline.image.ImmutableQualityInfo;
 import com.facebook.imagepipeline.request.Postprocessor;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -207,8 +212,10 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
 
             @Override
             public CloseableReference<Bitmap> process(Bitmap bitmap, PlatformBitmapFactory platformBitmapFactory) {
-                analyzeWhitenessOfPhotoAsynchronously(bitmap);
-                return null;
+                // we can not copy the bitmap inside here
+                //analyzeWhitenessOfPhotoAsynchronously(bitmap);
+
+                return FrescoHelper.toCloseableReference(bitmap);
             }
 
             @Override
