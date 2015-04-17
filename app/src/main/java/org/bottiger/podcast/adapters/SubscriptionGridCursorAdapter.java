@@ -1,44 +1,20 @@
 package org.bottiger.podcast.adapters;
 
-import org.apache.commons.validator.routines.UrlValidator;
+import org.bottiger.podcast.FeedActivity;
 import org.bottiger.podcast.R;
-import org.bottiger.podcast.adapters.viewholders.discovery.SearchResultViewHolder;
 import org.bottiger.podcast.adapters.viewholders.subscription.SubscriptionViewHolder;
 import org.bottiger.podcast.provider.Subscription;
-import org.bottiger.podcast.utils.ColorExtractor;
-import org.bottiger.podcast.utils.PaletteCache;
-import org.bottiger.podcast.views.TintedFramelayout;
 
-import android.content.ContentResolver;
+import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.support.annotation.Nullable;
-import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import com.android.volley.toolbox.NetworkImageView;
-import com.facebook.common.references.CloseableReference;
-import com.facebook.datasource.DataSource;
-import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.drawee.view.SimpleDraweeView;
-import com.facebook.imagepipeline.common.ResizeOptions;
-import com.facebook.imagepipeline.core.ImagePipeline;
-import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
-import com.facebook.imagepipeline.image.CloseableImage;
-import com.facebook.imagepipeline.request.ImageRequest;
-import com.facebook.imagepipeline.request.ImageRequestBuilder;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 
 public class SubscriptionGridCursorAdapter extends CursorRecyclerAdapter {
@@ -46,14 +22,14 @@ public class SubscriptionGridCursorAdapter extends CursorRecyclerAdapter {
     private static final String TAG = "SubscriptionGridAdapter";
 
     private final LayoutInflater mInflater;
-    private Context mContext;
+    private Activity mActivity;
     private int mItemLayout;
 
-    public SubscriptionGridCursorAdapter(Context context, Cursor cursor, int argItemLayout) {
+    public SubscriptionGridCursorAdapter(Activity argActivity, Cursor cursor, int argItemLayout) {
         super(cursor);
-        mContext = context;
+        mActivity = argActivity;
         mItemLayout = argItemLayout;
-        mInflater = (LayoutInflater) context
+        mInflater = (LayoutInflater) argActivity
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
@@ -78,9 +54,11 @@ public class SubscriptionGridCursorAdapter extends CursorRecyclerAdapter {
             e.printStackTrace();
         }
 
-        if (sub == null) {
+        if (null == sub) {
             return;
         }
+
+        final Subscription subscription = sub;
 
         String title = sub.title;
         final String logo = sub.imageURL;
@@ -109,7 +87,7 @@ public class SubscriptionGridCursorAdapter extends CursorRecyclerAdapter {
 
 
                     ImagePipeline imagePipeline = Fresco.getImagePipeline();
-                    DataSource<CloseableReference<CloseableImage>> dataSource = imagePipeline.fetchDecodedImage(request, mContext); //
+                    DataSource<CloseableReference<CloseableImage>> dataSource = imagePipeline.fetchDecodedImage(request, mActivity); //
 
                     dataSource.subscribe(new BaseBitmapDataSubscriber() {
                         @Override
@@ -149,6 +127,13 @@ public class SubscriptionGridCursorAdapter extends CursorRecyclerAdapter {
             Uri uri = Uri.parse(logo);
             holder.image.setImageURI(uri);
         }
+
+        argHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FeedActivity.start(mActivity, subscription.getId());
+            }
+        });
     }
 
     private boolean isListView() {
