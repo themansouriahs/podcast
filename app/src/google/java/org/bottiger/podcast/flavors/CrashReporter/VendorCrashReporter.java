@@ -10,6 +10,7 @@ import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
 import org.acra.ACRAConfigurationException;
 import org.acra.ReportingInteractionMode;
+import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.SoundWaves;
 
 /**
@@ -31,11 +32,13 @@ public class VendorCrashReporter {
     }
 	
 	public static void report(@NonNull String argKey, @NonNull String argValue) {
-        ACRA.getErrorReporter().putCustomData(argKey, argValue);
+        if (!BuildConfig.DEBUG)
+            ACRA.getErrorReporter().putCustomData(argKey, argValue);
     }
 
     public static void handleException(@NonNull Throwable argException) {
-        ACRA.getErrorReporter().handleException(argException);
+        if (!BuildConfig.DEBUG)
+            ACRA.getErrorReporter().handleException(argException);
     }
 
 }
