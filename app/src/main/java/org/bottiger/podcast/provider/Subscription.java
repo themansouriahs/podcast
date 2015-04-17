@@ -257,15 +257,6 @@ public class Subscription extends AbstractItem implements ISubscription, Palette
 	}
 
 	public void unsubscribe(Context context) {
-
-		// Unsubscribe from Google Reader
-		try {
-			MainActivity.gReader.removeSubscriptionfromReader(context,
-					MainActivity.mAccount, this);
-		} catch (Exception e) {
-
-		}
-
 		// Unsubscribe from local database
 		this.status = STATUS_UNSUBSCRIBED;
 		update(context.getContentResolver());
@@ -287,34 +278,40 @@ public class Subscription extends AbstractItem implements ISubscription, Palette
 		Subscription sub = Subscription.getByUrl(context.getContentResolver(),
 				url);
 
-		if (sub != null) {
-			return ADD_FAIL_DUP;
-		}
+        if (sub == null) {
+            ContentValues cv = new ContentValues();
+            cv.put(SubscriptionColumns.TITLE, title);
+            cv.put(SubscriptionColumns.URL, url);
+            cv.put(SubscriptionColumns.LINK, link);
+            cv.put(SubscriptionColumns.LAST_UPDATED, 0L);
+            cv.put(SubscriptionColumns.COMMENT, comment);
+            cv.put(SubscriptionColumns.DESCRIPTION, description);
+            cv.put(SubscriptionColumns.IMAGE_URL, imageURL);
+            cv.put(SubscriptionColumns.REMOTE_ID, sync_id);
+            cv.put(SubscriptionColumns.STATUS, STATUS_SUBSCRIBED);
+            Uri uri = context.getContentResolver().insert(SubscriptionColumns.URI,
+                    cv);
 
-		ContentValues cv = new ContentValues();
-		cv.put(SubscriptionColumns.TITLE, title);
-		cv.put(SubscriptionColumns.URL, url);
-		cv.put(SubscriptionColumns.LINK, link);
-		cv.put(SubscriptionColumns.LAST_UPDATED, 0L);
-		cv.put(SubscriptionColumns.COMMENT, comment);
-		cv.put(SubscriptionColumns.DESCRIPTION, description);
-		cv.put(SubscriptionColumns.IMAGE_URL, imageURL);
-		cv.put(SubscriptionColumns.REMOTE_ID, sync_id);
-		cv.put(SubscriptionColumns.STATUS, STATUS_SUBSCRIBED);
-		Uri uri = context.getContentResolver().insert(SubscriptionColumns.URI,
-				cv);
-		if (uri == null) {
-            VendorCrashReporter.report("SubscriptionFailed", "" + url);
-			return ADD_FAIL_UNSUCCESS;
-		}
-
-		final Subscription sub_test = Subscription.getByUrl(
-				context.getContentResolver(), url);
-
-        if (sub_test != null) {
-            SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.SUBSCRIBE_TO_FEED);
-            sub_test.refresh(context);
+            if (uri == null) {
+                VendorCrashReporter.report("SubscriptionFailed", "" + url);
+                return ADD_FAIL_UNSUCCESS;
+            }
+        } else {
+            // Update the current subscription
+            sub.status = STATUS_SUBSCRIBED;
+            sub.update(context.getContentResolver());
         }
+
+        if (sub == null) {
+            sub = Subscription.getByUrl(context.getContentResolver(), url);
+
+            if (sub == null) {
+                return ADD_FAIL_UNSUCCESS;
+            }
+        }
+
+        SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.SUBSCRIBE_TO_FEED);
+        sub.refresh(context);
 
 		return ADD_SUCCESS;
 
@@ -460,6 +457,9 @@ public class Subscription extends AbstractItem implements ISubscription, Palette
 				.getColumnIndex(SubscriptionColumns.LAST_ITEM_UPDATED));
 		sub.fail_count = cursor.getLong(cursor
 				.getColumnIndex(SubscriptionColumns.FAIL_COUNT));
+
+        sub.status = cursor.getLong(cursor
+                .getColumnIndex(SubscriptionColumns.STATUS));
 
         sub.mPrimaryColor = cursor.getInt(cursor
                 .getColumnIndex(SubscriptionColumns.PRIMARY_COLOR));

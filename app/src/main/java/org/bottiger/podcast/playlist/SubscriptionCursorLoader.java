@@ -35,7 +35,7 @@ public class SubscriptionCursorLoader extends GenericCursorLoader {
 	}
 	
 	public String getWhere() {		
-		String where = ItemColumns.SUBS_ID + "=" + subscription.getId();
+		String where = ItemColumns.STATUS + "==" + Subscription.STATUS_SUBSCRIBED;
 		return where;
 	}
 
