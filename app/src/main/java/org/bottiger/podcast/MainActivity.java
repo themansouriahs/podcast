@@ -391,7 +391,7 @@ public class MainActivity extends FragmentContainerActivity implements
             TransitionUtils.openSettings(this);
 			return true;
 		case R.id.menu_refresh:
-			SoundWaves.sSubscriptionRefreshManager.refreshALl();
+			SoundWaves.sSubscriptionRefreshManager.refreshAll();
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

@@ -3,7 +3,6 @@ package org.bottiger.podcast.service.Downloader;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
-import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -43,7 +42,7 @@ public class SubscriptionRefreshManager {
                                                             DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
 
     private Context mContext;
-    private static RequestQueue mRequestQueue;
+    private static RequestQueue sRequestQueue;
 
     private RequestQueue.RequestFinishedListener<StringRequest> mFinishedListener = new RequestQueue.RequestFinishedListener<StringRequest>() {
         @Override
@@ -56,8 +55,8 @@ public class SubscriptionRefreshManager {
         mContext = argContext;
         RequestManager.initIfNeeded(mContext);
 
-        if (mRequestQueue == null)
-            mRequestQueue = RequestManager.getRequestQueue();
+        if (sRequestQueue == null)
+            sRequestQueue = RequestManager.getRequestQueue();
     }
 
     Response.ErrorListener getFailureListener() {
@@ -77,8 +76,8 @@ public class SubscriptionRefreshManager {
 		};
 	}
 
-    public void refreshALl() {
-        Log.d(DEBUG_KEY, "refreshALl()");
+    public void refreshAll() {
+        Log.d(DEBUG_KEY, "refreshAll()");
         refresh(null, null);
     }
 
@@ -94,15 +93,15 @@ public class SubscriptionRefreshManager {
         EpisodeDownloadManager.isDownloading = true;
 
         if (subscription != null) {
-            addSubscriptionToQueue(subscription, mRequestQueue, argCallback);
+            addSubscriptionToQueue(subscription, sRequestQueue, argCallback);
         } else {
             populateQueue(mContext, argCallback);
         }
 
-        mRequestQueue.addRequestFinishedListener(mFinishedListener);
+        sRequestQueue.addRequestFinishedListener(mFinishedListener);
 
         Log.d(DEBUG_KEY, "starting refresh using Volley");
-        mRequestQueue.start();
+        sRequestQueue.start();
     }
 
     private void addSubscriptionToQueue(@NonNull Subscription argSubscription, RequestQueue requestQueue, IDownloadCompleteCallback argCallback) {
@@ -134,7 +133,7 @@ public class SubscriptionRefreshManager {
         Log.d(DEBUG_KEY, "Added to queue successfully: " + argSubscription);
     }
 
-    private class StringResponseListener implements Response.Listener<String> {
+    private static class StringResponseListener implements Response.Listener<String> {
 
 		FeedHandler feedHandler = new FeedHandler();
 		Subscription subscription;
@@ -151,9 +150,41 @@ public class SubscriptionRefreshManager {
 		@Override
 		public void onResponse(String response) {
             Log.d(DEBUG_KEY, "Volley response from: " + subscription);
-            new ParseFeedTask().execute(response);
+            //new ParseFeedTask().execute(response);
+
+            try {
+                Log.d(DEBUG_KEY, "Parsing: " + subscription);
+                feedHandler.parseFeed(contentResolver, subscription,
+                        response.replace("ï»¿", "")); // Byte Order Mark
+            } catch (SAXException e) {
+                Log.d(DEBUG_KEY, "Parsing EXCEPTION: " + subscription);
+                VendorCrashReporter.handleException(e);
+                VendorCrashReporter.report("subscription1", subscription.getUrl());
+                e.printStackTrace();
+            } catch (IOException e) {
+                Log.d(DEBUG_KEY, "Parsing EXCEPTION: " + subscription);
+                VendorCrashReporter.handleException(e);
+                VendorCrashReporter.report("subscription2", subscription.getUrl());
+                e.printStackTrace();
+            } catch (ParserConfigurationException e) {
+                Log.d(DEBUG_KEY, "Parsing EXCEPTION: " + subscription);
+                VendorCrashReporter.handleException(e);
+                VendorCrashReporter.report("subscription3", subscription.getUrl());
+                e.printStackTrace();
+            } catch (UnsupportedFeedtypeException e) {
+                Log.d(DEBUG_KEY, "Parsing EXCEPTION: " + subscription);
+                VendorCrashReporter.handleException(e);
+                VendorCrashReporter.report("subscription4", subscription.getUrl());
+                e.printStackTrace();
+            }
+
+            if (callback != null) {
+                Log.d(DEBUG_KEY, "Parsing callback for: " + subscription);
+                callback.complete(true);
+            }
 		}
 
+        /*
         private class ParseFeedTask extends AsyncTask<String, Void, Void> {
             protected Void doInBackground(String... responses) {
 
@@ -194,7 +225,8 @@ public class SubscriptionRefreshManager {
                     callback.complete(true);
                 }
             }
-        }
+
+        }*/
 
 
     }
@@ -202,18 +234,22 @@ public class SubscriptionRefreshManager {
     private int populateQueue(@NonNull Context argContext, @Nullable IDownloadCompleteCallback argCallback) {
         Log.d(DEBUG_KEY, "populateQueue");
 
-        Cursor subscriptionCursor;
+        Cursor subscriptionCursor = null;
         int subscriptionsAdded = 0;
 
-        subscriptionCursor = Subscription.allAsCursor(argContext
-                .getContentResolver());
+        try {
+            subscriptionCursor = Subscription.allAsCursor(argContext
+                    .getContentResolver());
 
-        while (subscriptionCursor.moveToNext()) {
+            while (subscriptionCursor.moveToNext()) {
 
-            Subscription sub = Subscription.getByCursor(subscriptionCursor);
+                Subscription sub = Subscription.getByCursor(subscriptionCursor);
 
-            addSubscriptionToQueue(sub, mRequestQueue, argCallback);
-            subscriptionsAdded++;
+                addSubscriptionToQueue(sub, sRequestQueue, argCallback);
+                subscriptionsAdded++;
+            }
+        } finally {
+            subscriptionCursor.close();
         }
 
         Log.d(DEBUG_KEY, "populateQueue added: " + subscriptionsAdded);

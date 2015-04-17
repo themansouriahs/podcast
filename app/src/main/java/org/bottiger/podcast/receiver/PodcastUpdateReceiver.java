@@ -30,7 +30,7 @@ public class PodcastUpdateReceiver extends BroadcastReceiver {
         wl.acquire();
 
 		SubscriptionRefreshManager subscriptionRefreshManager = new SubscriptionRefreshManager(context);
-        subscriptionRefreshManager.refreshALl();
+        subscriptionRefreshManager.refreshAll();
 		EpisodeDownloadManager.removeExpiredDownloadedPodcasts(context);
 		EpisodeDownloadManager.startDownload(context);
 

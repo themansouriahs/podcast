@@ -16,7 +16,7 @@ public class PodcastUpdateJobService extends JobService {
     public boolean onStartJob(JobParameters params) {
 
         SubscriptionRefreshManager subscriptionRefreshManager = new SubscriptionRefreshManager(this);
-        subscriptionRefreshManager.refreshALl();
+        subscriptionRefreshManager.refreshAll();
         EpisodeDownloadManager.removeExpiredDownloadedPodcasts(this);
         EpisodeDownloadManager.startDownload(this);
         return false;

@@ -227,7 +227,7 @@ public class PodcastService extends IntentService {
 		@Override
 		protected Void doInBackground(Void... params) {
             SubscriptionRefreshManager subscriptionRefreshManager = new SubscriptionRefreshManager(PodcastService.this);
-            subscriptionRefreshManager.refreshALl();
+            subscriptionRefreshManager.refreshAll();
 			return null;
 		}
 
