@@ -17,9 +17,22 @@ public class PodcastOpenHelper extends SQLiteOpenHelper {
 	private final static int DBVERSION = 18;
 	private final static String DBNAME = "podcast.db";
 
+    private static PodcastOpenHelper mInstance = null;
+
 	public PodcastOpenHelper(Context context) {
 		super(context, DBNAME, null, DBVERSION);
 	}
+
+    public static PodcastOpenHelper getInstance(Context argContext) {
+
+        // Use the application context, which will ensure that you
+        // don't accidentally leak an Activity's context.
+        // See this article for more information: http://bit.ly/6LRzfx
+        if (mInstance == null) {
+            mInstance = new PodcastOpenHelper(argContext.getApplicationContext());
+        }
+        return mInstance;
+    }
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {

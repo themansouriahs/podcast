@@ -34,7 +34,7 @@ public class FeedUpdater {
 		
 		FeedItem[] localItems = FeedItem.getByURL(contentResolver, urls, null);
 		
-		HashMap<String,FeedItem> itemDict = new HashMap<String,FeedItem>();
+		HashMap<String,FeedItem> itemDict = new HashMap<>();
 		for (FeedItem item : localItems) {
 			if (item != null)
 				itemDict.put(item.getURL(), item);
@@ -43,8 +43,8 @@ public class FeedUpdater {
 		subscription.update(contentResolver);
 
         Playlist playlist = null;
-        LinkedList<ContentValues> cvs = new LinkedList<ContentValues>();
-        HashMap<String, Integer> duplicateTest = new HashMap<String, Integer>();
+        LinkedList<ContentValues> cvs = new LinkedList<>();
+        HashMap<String, Integer> duplicateTest = new HashMap<>();
 
 		FeedItem localItem;
         int counter = 0;

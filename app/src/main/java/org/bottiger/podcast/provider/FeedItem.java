@@ -1240,7 +1240,7 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 		String updateLastUpdate = ", " + ItemColumns.LAST_UPDATE + "="
 				+ currentTime + " ";
 
-		PodcastOpenHelper helper = new PodcastOpenHelper(context);
+		PodcastOpenHelper helper = PodcastOpenHelper.getInstance(context);//new PodcastOpenHelper(context);
 		SQLiteDatabase db = helper.getWritableDatabase();
 		String action = "UPDATE " + ItemColumns.TABLE_NAME + " SET ";
 		String value = ItemColumns.PRIORITY + "=" + ItemColumns.PRIORITY + "+1"

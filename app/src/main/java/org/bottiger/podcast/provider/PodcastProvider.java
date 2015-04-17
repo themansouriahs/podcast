@@ -52,9 +52,9 @@ public class PodcastProvider extends ContentProvider {
 
 	@Override
 	public boolean onCreate() {
-		mHelper = new PodcastOpenHelper(getContext());
+		mHelper = PodcastOpenHelper.getInstance(getContext()); //new PodcastOpenHelper(getContext());
 		if (sItemProjectionMap == null) {
-			sItemProjectionMap = new HashMap<String, String>();
+			sItemProjectionMap = new HashMap<>();
 			for (int i = 0; i < ItemColumns.ALL_COLUMNS.length; i++) {
 				sItemProjectionMap.put(ItemColumns.ALL_COLUMNS[i],
 						ItemColumns.ALL_COLUMNS[i]);

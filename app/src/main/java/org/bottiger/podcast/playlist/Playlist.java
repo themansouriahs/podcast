@@ -19,6 +19,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteDatabaseLockedException;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.CursorAdapter;
@@ -362,7 +363,7 @@ public class Playlist implements OnDragStateChangedListener {
     }
 
 	public void populatePlaylist(int length, boolean force) {
-		if (mInternalPlaylist.size() >= length && !force) {
+        if (mInternalPlaylist.size() >= length && !force) {
             return;
         }
 
@@ -371,20 +372,30 @@ public class Playlist implements OnDragStateChangedListener {
             throw new IllegalStateException("Context can not be null");
         }
 
-		PodcastOpenHelper helper = new PodcastOpenHelper(mContext);
-		SQLiteDatabase database = helper.getWritableDatabase();
-		Cursor cursor = database.query(ItemColumns.TABLE_NAME,
-				ItemColumns.ALL_COLUMNS, getWhere(), null, null, null,
-				getOrder());
-
         int previousSize = mInternalPlaylist.size();
 
-		mInternalPlaylist.clear();
-		cursor.moveToPosition(-1);
+        Cursor cursor = null;
+        try {
+            PodcastOpenHelper helper = PodcastOpenHelper.getInstance(mContext);//new PodcastOpenHelper(mContext);
+            SQLiteDatabase database = helper.getReadableDatabase();
+
+            cursor = database.query(ItemColumns.TABLE_NAME,
+                    ItemColumns.ALL_COLUMNS, getWhere(), null, null, null,
+                    getOrder());
+
+
+        mInternalPlaylist.clear();
+        cursor.moveToPosition(-1);
 
         while (cursor.moveToNext()) {
-			setItem(cursor);
-		}
+            setItem(cursor);
+        }
+        } catch (Exception lockedEx) { //FIXME
+            return;
+        } finally {
+            if (cursor != null)
+                cursor.close();
+        }
 
         int newSize = mInternalPlaylist.size();
 
