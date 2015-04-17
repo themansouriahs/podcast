@@ -183,52 +183,6 @@ public class SubscriptionRefreshManager {
                 callback.complete(true);
             }
 		}
-
-        /*
-        private class ParseFeedTask extends AsyncTask<String, Void, Void> {
-            protected Void doInBackground(String... responses) {
-
-                String response = responses[0];
-
-                try {
-                    Log.d(DEBUG_KEY, "Parsing: " + subscription);
-                    feedHandler.parseFeed(contentResolver, subscription,
-                            response.replace("ï»¿", "")); // Byte Order Mark
-                } catch (SAXException e) {
-                    Log.d(DEBUG_KEY, "Parsing EXCEPTION: " + subscription);
-                    VendorCrashReporter.handleException(e);
-                    VendorCrashReporter.report("subscription1", subscription.getUrl());
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    Log.d(DEBUG_KEY, "Parsing EXCEPTION: " + subscription);
-                    VendorCrashReporter.handleException(e);
-                    VendorCrashReporter.report("subscription2", subscription.getUrl());
-                    e.printStackTrace();
-                } catch (ParserConfigurationException e) {
-                    Log.d(DEBUG_KEY, "Parsing EXCEPTION: " + subscription);
-                    VendorCrashReporter.handleException(e);
-                    VendorCrashReporter.report("subscription3", subscription.getUrl());
-                    e.printStackTrace();
-                } catch (UnsupportedFeedtypeException e) {
-                    Log.d(DEBUG_KEY, "Parsing EXCEPTION: " + subscription);
-                    VendorCrashReporter.handleException(e);
-                    VendorCrashReporter.report("subscription4", subscription.getUrl());
-                    e.printStackTrace();
-                }
-
-                return null;
-            }
-
-            protected void onPostExecute(Void result) {
-                if (callback != null) {
-                    Log.d(DEBUG_KEY, "Parsing callback for: " + subscription);
-                    callback.complete(true);
-                }
-            }
-
-        }*/
-
-
     }
 
     private int populateQueue(@NonNull Context argContext, @Nullable IDownloadCompleteCallback argCallback) {

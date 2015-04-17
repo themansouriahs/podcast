@@ -214,7 +214,7 @@ public class SubscriptionsFragment extends Fragment {
                 dialog.show();
             }
             case R.id.menu_refresh_all_subscriptions: {
-                SoundWaves.sSubscriptionRefreshManager.refreshALl();
+                SoundWaves.sSubscriptionRefreshManager.refreshAll();
             }
         }
         return super.onOptionsItemSelected(item);

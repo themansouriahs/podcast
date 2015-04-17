@@ -97,7 +97,7 @@ public class Subscription extends AbstractItem implements ISubscription, Palette
 
 	public static LinkedList<Subscription> allAsList(ContentResolver context) {
 		LinkedList<Subscription> subscriptions = new LinkedList<Subscription>();
-        Cursor cursor;
+        Cursor cursor = null;
         try {
             cursor = allAsCursor(context);
 
