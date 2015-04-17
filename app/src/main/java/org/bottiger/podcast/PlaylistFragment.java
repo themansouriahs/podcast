@@ -473,25 +473,6 @@ public class PlaylistFragment extends GeastureFragment implements
      }
 
      @Override
-     public boolean onContextItemSelected(MenuItem item) {
-
-         if (!AdapterView.AdapterContextMenuInfo.class.isInstance(item
-                 .getMenuInfo()))
-             return false;
-
-         if (CONTEXT_MENU == PLAYLIST_CONTEXT_MENU) {
-             return playlistContextMenu(item);
-         } else if (CONTEXT_MENU == SUBSCRIPTION_CONTEXT_MENU) {
-             if (CONTEXT_FRAGMENT != null)
-                 return ((SubscriptionsFragment) CONTEXT_FRAGMENT)
-                         .subscriptionContextMenu(item);
-         }
-
-         return false;
-
-     }
-
-     @Override
      public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
          inflater.inflate(R.menu.playlist_actionbar, menu);
          super.onCreateOptionsMenu(menu, inflater);

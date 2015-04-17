@@ -121,9 +121,10 @@ public class FragmentUtils {
 			// FIXME - should not be commented out
 			mAdapter = getAdapter(wrapped_cursor);
 
+            /*
             if (mAdapter instanceof SubscriptionGridCursorAdapter) {
                 ((SubscriptionGridCursorAdapter)mAdapter).notifyChange(wrapped_cursor);
-            }
+            }*/
 
 			mAdapter.changeCursor(wrapped_cursor);
 		}

@@ -2,6 +2,8 @@ package org.bottiger.podcast.adapters;
 
 import org.apache.commons.validator.routines.UrlValidator;
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.adapters.viewholders.discovery.SearchResultViewHolder;
+import org.bottiger.podcast.adapters.viewholders.subscription.SubscriptionViewHolder;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.PaletteCache;
@@ -15,7 +17,10 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.support.v7.graphics.Palette;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -36,57 +41,47 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 
-public class SubscriptionGridCursorAdapter extends AbstractGridPodcastAdapter {
+public class SubscriptionGridCursorAdapter extends CursorRecyclerAdapter {
 
-    private OnPopulateSubscriptionList mObersever;
+    private static final String TAG = "SubscriptionGridAdapter";
+
+    private final LayoutInflater mInflater;
+    private Context mContext;
     private int mItemLayout;
 
-	static class SubscriptionViewHolder {
-        SimpleDraweeView image;
-		TextView title;
-        View gradient;
-	}
-
-	public SubscriptionGridCursorAdapter(Context context,
-			int subscriptionGridItem, OnPopulateSubscriptionList observer, Cursor cursor, int argItemLayout) {
-		super(context, subscriptionGridItem, cursor);
-		mContext = context;
-        mObersever = observer;
+    public SubscriptionGridCursorAdapter(Context context, Cursor cursor, int argItemLayout) {
+        super(cursor);
+        mContext = context;
         mItemLayout = argItemLayout;
-	}
-
-    public void notifyChange(Cursor cursor) {
+        mInflater = (LayoutInflater) context
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
-	@Override
-	public View newView(Context context, Cursor cursor, ViewGroup parent) {
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        Log.v(TAG, "onCreateViewHolder");
 
-		View view = mInflater.inflate(mItemLayout, null);
-		
-		SubscriptionViewHolder holder = new SubscriptionViewHolder();
-		holder.image = (SimpleDraweeView) view.findViewById(R.id.grid_image);
-		holder.title = (TextView) view.findViewById(R.id.grid_title);
-        holder.gradient = view.findViewById(R.id.grid_item_gradient);
-		view.setTag(holder);
+        View view = mInflater.inflate(R.layout.subscription_grid_item, parent, false);
+        SubscriptionViewHolder holder = new SubscriptionViewHolder(view);
 
-		return view;
-	}
-	
-	@Override
-	public void bindView(View view, Context context, Cursor cursor) {
-		SubscriptionViewHolder holder = (SubscriptionViewHolder)view.getTag();
+        return holder;
+    }
 
-		Subscription sub = null;
-		try {
-			sub = Subscription.getByCursor(cursor);
-		} catch (IllegalStateException e) {
-			e.printStackTrace();
-		}
-		
-		if (sub == null) {
+    @Override
+    public void onBindViewHolderCursor(RecyclerView.ViewHolder argHolder, Cursor cursor) {
+        SubscriptionViewHolder holder = (SubscriptionViewHolder)argHolder;
+
+        Subscription sub = null;
+        try {
+            sub = Subscription.getByCursor(cursor);
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        }
+
+        if (sub == null) {
             return;
         }
-			
+
         String title = sub.title;
         final String logo = sub.imageURL;
 
@@ -154,18 +149,10 @@ public class SubscriptionGridCursorAdapter extends AbstractGridPodcastAdapter {
             Uri uri = Uri.parse(logo);
             holder.image.setImageURI(uri);
         }
-
-        if (mObersever != null)
-            mObersever.listPopulated(cursor);
-	}
+    }
 
     private boolean isListView() {
         return mItemLayout == R.layout.subscription_list_item;
     }
-
-    public interface OnPopulateSubscriptionList {
-        public void listPopulated(Cursor cursor);
-    }
-
 
 }
