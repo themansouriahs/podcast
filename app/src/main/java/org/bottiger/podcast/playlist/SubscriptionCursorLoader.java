@@ -27,9 +27,8 @@ public class SubscriptionCursorLoader extends GenericSubscriptionLoader {
 		return SubscriptionColumns.TITLE + " DESC";
 	}
 	
-	public String getWhere() {		
-		String where = "1";
-		//String where = SubscriptionColumns.STATUS + "!=" + Subscription.STATUS_UNSUBSCRIBED;
+	public String getWhere() {
+		String where = SubscriptionColumns.STATUS + "==" + Subscription.STATUS_SUBSCRIBED;
 		return where;
 	}
 
