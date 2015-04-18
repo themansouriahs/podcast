@@ -21,14 +21,17 @@ public class SubscriptionGridCursorAdapter extends CursorRecyclerAdapter {
 
     private static final String TAG = "SubscriptionGridAdapter";
 
+    private static final int GRID_TYPE = 1;
+    private static final int LIST_TYPE = 2;
+
     private final LayoutInflater mInflater;
     private Activity mActivity;
-    private int mItemLayout;
 
-    public SubscriptionGridCursorAdapter(Activity argActivity, Cursor cursor, int argItemLayout) {
+    private int numberOfColumns = 2;
+
+    public SubscriptionGridCursorAdapter(Activity argActivity, Cursor cursor) {
         super(cursor);
         mActivity = argActivity;
-        mItemLayout = argItemLayout;
         mInflater = (LayoutInflater) argActivity
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
@@ -37,7 +40,7 @@ public class SubscriptionGridCursorAdapter extends CursorRecyclerAdapter {
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Log.v(TAG, "onCreateViewHolder");
 
-        View view = mInflater.inflate(R.layout.subscription_grid_item, parent, false);
+        View view = mInflater.inflate(getGridItemLayout(), parent, false);
         SubscriptionViewHolder holder = new SubscriptionViewHolder(view);
 
         return holder;
@@ -136,8 +139,24 @@ public class SubscriptionGridCursorAdapter extends CursorRecyclerAdapter {
         });
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        return numberOfColumns == 1 ? LIST_TYPE : GRID_TYPE;
+    }
+
     private boolean isListView() {
-        return mItemLayout == R.layout.subscription_list_item;
+        return numberOfColumns == 1;
+    }
+
+    private int getGridItemLayout() {
+        return numberOfColumns == 1 ? R.layout.subscription_list_item : R.layout.subscription_grid_item ;
+    }
+
+    public void setNumberOfColumns(int argNumber) {
+        if (numberOfColumns != argNumber) {
+            numberOfColumns = argNumber;
+            notifyDataSetChanged();
+        }
     }
 
 }

@@ -35,7 +35,6 @@ public class SubscriptionsFragment extends Fragment {
 
     private GridLayoutManager mGridLayoutmanager;
     private RelativeLayout mEmptySubscrptionList;
-    private Cursor mCursor;
 
     private Activity mActivity;
     private FrameLayout mContainerView;
@@ -74,13 +73,8 @@ public class SubscriptionsFragment extends Fragment {
 
 		registerForContextMenu(mGridView);
 
-        /*
-        Cursor cursor = new CursorLoader(getActivity(),
-                SubscriptionColumns.URI, SubscriptionColumns.ALL_COLUMNS, getWhere(),
-                null, getOrder()).loadInBackground();
-                */
-
-        SubscriptionGridCursorAdapter adapter = new SubscriptionGridCursorAdapter(getActivity(), mCursor, getGridItemLayout());
+        Cursor mCursor = null;
+        SubscriptionGridCursorAdapter adapter = new SubscriptionGridCursorAdapter(getActivity(), mCursor);
 
         mGridLayoutmanager = new GridLayoutManager(getActivity(), numberOfColumns());
         mGridView.setHasFixedSize(true);
@@ -88,48 +82,6 @@ public class SubscriptionsFragment extends Fragment {
         mGridView.setAdapter(adapter);
 
         mCursorLoader = new SubscriptionCursorLoader(this, adapter, mCursor);
-
-        /*
-		mGridView.setOnCreateContextMenuListener(this);
-		mGridView.setOnItemClickListener(new OnItemClickListener() {
-
-			@Override
-			public void onItemClick(AdapterView<?> parent, View v,
-					int position, long id) {
-
-				Activity activity = SubscriptionsFragment.this.getActivity();
-				if (activity instanceof DrawerActivity) {
-
-					Cursor cursor = (Cursor) mGridView.getAdapter().getItem(
-							position);
-
-					Subscription sub = null;
-					try {
-						sub = Subscription.getByCursor(cursor);
-					} catch (IllegalStateException e) {
-						e.printStackTrace();
-					}
-
-					if (sub != null) {
-						if (mContentType.equals(ContentType.LOCAL))
-
-                            if (mCLickListener == null) {
-                                //((MainActivity) activity).onItemSelected(sub.getId());
-                                FeedActivity.start(getActivity(), sub.getId());
-                            } else {
-                                mCLickListener.onItemSelected(sub.getId());
-                            }
-						else {
-							sub.subscribe(getActivity());
-							String text = mActivity.getString(R.string.subscription_subscribing_to) + sub.getTitle();
-							Toast.makeText(getActivity(), text, Toast.LENGTH_SHORT).show();
-						}
-					}
-				}
-			}
-
-		});
-		*/
 
 		return mContainerView;
 	}
@@ -145,18 +97,14 @@ public class SubscriptionsFragment extends Fragment {
 
         if (mGridLayoutmanager.getSpanCount() != numberOfColumns()) {
             GridLayoutManager layoutmanager = new GridLayoutManager(getActivity(), numberOfColumns());
-            /*mGridView.setNumColumns(numberOfColumns(mActivity));
-            loadCursor();
-            mGridView.invalidate();*/
             mGridView.setLayoutManager(layoutmanager);
+            ((SubscriptionGridCursorAdapter)mGridView.getAdapter()).setNumberOfColumns(numberOfColumns());
         }
     }
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-
-        //loadCursor();
 	}
 
 /*
@@ -241,11 +189,6 @@ public class SubscriptionsFragment extends Fragment {
     private int numberOfColumns() {
         String number = shareprefs.getString(PREF_SUBSCRIPTION_COLUMNS, "2");
         return Integer.parseInt(number);
-    }
-
-    private int getGridItemLayout() {
-        int columnsCOunt = numberOfColumns();
-        return columnsCOunt == 1 ? R.layout.subscription_list_item : R.layout.subscription_grid_item ;
     }
 
 }
