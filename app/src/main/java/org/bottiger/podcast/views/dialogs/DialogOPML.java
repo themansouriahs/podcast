@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.res.Resources;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -61,7 +62,8 @@ public class DialogOPML {
             public void onClick(DialogInterface dialog, int id) {
                 OPMLImportExport importExport = new OPMLImportExport(argActivity);
                 if (mAction == ACTION.IMPORT) {
-                    importExport.importSubscriptions();
+                    //importExport.importSubscriptions();
+                    new ImportOPMLTask().execute(importExport);
                 }
 
                 if (mAction == ACTION.EXPORT) {
@@ -80,6 +82,13 @@ public class DialogOPML {
     private void onRadioButtonClicked(ACTION argACTION, boolean isChecked) {
         if (isChecked) {
             mAction = argACTION;
+        }
+    }
+
+    private static class ImportOPMLTask extends AsyncTask<OPMLImportExport, Void, Void> {
+        protected Void doInBackground(OPMLImportExport... opmlImportExports) {
+            opmlImportExports[0].importSubscriptions();
+            return null;
         }
     }
 }

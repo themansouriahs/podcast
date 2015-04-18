@@ -206,8 +206,6 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
 
         mUrl = mSubscription.getImageURL();
 
-
-        //FrescoHelper.loadImageInto(mPhotoView, mUrl, null);
         FrescoHelper.loadImageInto(mPhotoView, mUrl, new Postprocessor() {
 
             @Override

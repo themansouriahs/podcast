@@ -1,5 +1,6 @@
 package org.bottiger.podcast.playlist;
 
+import org.bottiger.podcast.PodcastBaseFragment;
 import org.bottiger.podcast.adapters.AbstractPodcastAdapter;
 import org.bottiger.podcast.adapters.FeedViewAdapter;
 import org.bottiger.podcast.adapters.PlaylistAdapter;
@@ -22,14 +23,17 @@ public class SubscriptionCursorLoader extends GenericSubscriptionLoader {
         super(fragment, adapter, cursor);
         loadCursor(LOADER_ID, SubscriptionColumns.URI, SubscriptionColumns.ALL_COLUMNS, getWhere(), getOrder());
     }
-	
-	private String getOrder() {
-		return SubscriptionColumns.TITLE + " ASC";
-	}
-	
-	public String getWhere() {
-		String where = SubscriptionColumns.STATUS + "==" + Subscription.STATUS_SUBSCRIBED;
-		return where;
-	}
+
+    String getWhere() {
+        String whereClause = SubscriptionColumns.STATUS + "<>"
+                + Subscription.STATUS_UNSUBSCRIBED;
+        whereClause = whereClause + " OR " + SubscriptionColumns.STATUS
+                + " IS NULL"; // Deprecated.
+        return whereClause;
+    }
+
+    String getOrder() {
+        return SubscriptionColumns.TITLE + " ASC";
+    }
 
 }

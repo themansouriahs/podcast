@@ -38,11 +38,6 @@ public abstract class GenericCursorLoader {
         this.mAdapter = adapter;
     }
 
-    public ReorderCursor getReorderCursor(Cursor cursor) {
-        return new ReorderCursor(mActivity, cursor);
-    }
-
-
     protected void loadCursor(int id, Uri columns, String[] projection,
 			String condition, String order) {
 		assert condition != null;

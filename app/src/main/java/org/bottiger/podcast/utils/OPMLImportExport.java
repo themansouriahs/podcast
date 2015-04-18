@@ -126,7 +126,7 @@ public class OPMLImportExport {
             mUpdater.commit(contentResolver);
 
             for (Subscription insertedSubscription : importedSubscriptions) {
-                insertedSubscription.refresh(mContext);
+                insertedSubscription.refreshAsync(mContext);
             }
         }
 

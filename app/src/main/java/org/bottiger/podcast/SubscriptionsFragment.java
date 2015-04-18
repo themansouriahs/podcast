@@ -1,13 +1,5 @@
 package org.bottiger.podcast;
 
-import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import org.bottiger.podcast.adapters.CursorRecyclerAdapter;
 import org.bottiger.podcast.adapters.SubscriptionGridCursorAdapter;
 import org.bottiger.podcast.playlist.SubscriptionCursorLoader;
 import org.bottiger.podcast.provider.Subscription;
@@ -17,21 +9,13 @@ import org.bottiger.podcast.views.dialogs.DialogOPML;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
-import android.content.CursorLoader;
 import android.content.SharedPreferences;
-import android.database.ContentObserver;
 import android.database.Cursor;
-import android.database.MatrixCursor;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.CursorAdapter;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -40,18 +24,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
-import android.widget.AdapterView.AdapterContextMenuInfo;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.FrameLayout;
-import android.widget.GridView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import com.dragontek.mygpoclient.pub.PublicClient;
-import com.dragontek.mygpoclient.simple.IPodcast;
 
 public class SubscriptionsFragment extends Fragment {
 
@@ -59,7 +33,9 @@ public class SubscriptionsFragment extends Fragment {
 	private View fragmentView;
 	private RecyclerView mGridView;
 
+    private GridLayoutManager mGridLayoutmanager;
     private RelativeLayout mEmptySubscrptionList;
+    private Cursor mCursor;
 
     private Activity mActivity;
     private FrameLayout mContainerView;
@@ -76,7 +52,7 @@ public class SubscriptionsFragment extends Fragment {
         shareprefs = PreferenceManager.getDefaultSharedPreferences(mActivity.getApplicationContext());
 	}
 
-    SubscriptionCursorLoader loader;
+    SubscriptionCursorLoader mCursorLoader;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -98,17 +74,20 @@ public class SubscriptionsFragment extends Fragment {
 
 		registerForContextMenu(mGridView);
 
+        /*
         Cursor cursor = new CursorLoader(getActivity(),
                 SubscriptionColumns.URI, SubscriptionColumns.ALL_COLUMNS, getWhere(),
                 null, getOrder()).loadInBackground();
+                */
 
-        SubscriptionGridCursorAdapter adapter = new SubscriptionGridCursorAdapter(getActivity(), cursor, getGridItemLayout());
+        SubscriptionGridCursorAdapter adapter = new SubscriptionGridCursorAdapter(getActivity(), mCursor, getGridItemLayout());
 
+        mGridLayoutmanager = new GridLayoutManager(getActivity(), numberOfColumns());
         mGridView.setHasFixedSize(true);
-        mGridView.setLayoutManager(new GridLayoutManager(getActivity(), numberOfColumns()));
+        mGridView.setLayoutManager(mGridLayoutmanager);
         mGridView.setAdapter(adapter);
 
-        loader = new SubscriptionCursorLoader(this, adapter, cursor);
+        mCursorLoader = new SubscriptionCursorLoader(this, adapter, mCursor);
 
         /*
 		mGridView.setOnCreateContextMenuListener(this);
@@ -163,12 +142,14 @@ public class SubscriptionsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        /*
-        if (mGridView.getNumColumns() != numberOfColumns(mActivity)) {
-            mGridView.setNumColumns(numberOfColumns(mActivity));
+
+        if (mGridLayoutmanager.getSpanCount() != numberOfColumns()) {
+            GridLayoutManager layoutmanager = new GridLayoutManager(getActivity(), numberOfColumns());
+            /*mGridView.setNumColumns(numberOfColumns(mActivity));
             loadCursor();
-            mGridView.invalidate();
-        }*/
+            mGridView.invalidate();*/
+            mGridView.setLayoutManager(layoutmanager);
+        }
     }
 
 	@Override
@@ -178,17 +159,7 @@ public class SubscriptionsFragment extends Fragment {
         //loadCursor();
 	}
 
-    /*
-    private void loadCursor() {
-        mCursor = mFragmentUtils.getCursor();
-
-        setSubscriptionBackground(mCursor);
-        mAdapter = getSubscriptionCursorAdapter(getActivity(), mCursor);
-        mFragmentUtils.setAdapter(mAdapter);
-        fetchLocalCursor();
-        mGridView.setAdapter(mAdapter);
-    }
-
+/*
     private void setSubscriptionBackground(Cursor argCursor) {
         if (argCursor == null || argCursor.getCount() == 0) {
             mEmptySubscrptionList.setVisibility(View.VISIBLE);
@@ -261,45 +232,11 @@ public class SubscriptionsFragment extends Fragment {
 		default:
 			return super.onContextItemSelected(menuItem);
 		}
-	}
-	
-	private void fetchLocalCursor() {
-		String order = getOrder();
-		String where = getWhere();
-		mFragmentUtils.startInit(0, SubscriptionColumns.URI,
-				SubscriptionColumns.ALL_COLUMNS, where, order);
-		mContentType = ContentType.LOCAL;
-		setSearchStatusVisible(false);
 	}*/
-
-	String getWhere() {
-		String whereClause = SubscriptionColumns.STATUS + "<>"
-				+ Subscription.STATUS_UNSUBSCRIBED;
-		whereClause = whereClause + " OR " + SubscriptionColumns.STATUS
-				+ " IS NULL"; // Deprecated.
-		return whereClause;
-	}
-
-	String getOrder() {
-		return PodcastBaseFragment.orderByFirst(SubscriptionColumns.TITLE
-				+ "<> ''")
-				+ ", " + SubscriptionColumns.TITLE + " ASC";
-	}
 
 	private int getLayoutType() {
 		return R.layout.subscription_list;
 	}
-
-    /*
-	public CursorAdapter getAdapter() {
-		// FIXME deprecated
-		Cursor cursor = new CursorLoader(getActivity(),
-				SubscriptionColumns.URI, SubscriptionColumns.ALL_COLUMNS, getWhere(),
-				null, getOrder()).loadInBackground();
-		return getSubscriptionCursorAdapter(getActivity(), cursor);
-	}*/
-
-
 
     private int numberOfColumns() {
         String number = shareprefs.getString(PREF_SUBSCRIPTION_COLUMNS, "2");

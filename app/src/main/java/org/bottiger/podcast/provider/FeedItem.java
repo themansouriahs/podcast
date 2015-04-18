@@ -289,7 +289,7 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 		StringBuilder queryBuilder = new StringBuilder();
 		queryBuilder.append(ItemColumns.URL + " IN (");
 		for (int i = 1; i <= urls.length; i++) {
-			queryBuilder.append("?");
+			queryBuilder.append("\"" + urls[i-1] + "\"");
 			if (i != urls.length)
 				queryBuilder.append(", ");
 		}
@@ -299,7 +299,7 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 		
 		try {
 			cursor = contentResolver.query(ItemColumns.URI,
-					ItemColumns.ALL_COLUMNS, where, urls, null);
+					ItemColumns.ALL_COLUMNS, where, null, null); //urls
 
 			int j = 0;
 			cursor.moveToPosition(-1);

@@ -25,6 +25,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.support.v4.util.LruCache;
@@ -339,6 +340,17 @@ public class Subscription extends AbstractItem implements ISubscription, Palette
 
 		return episodes;
 	}
+    private class RefreshSyncTask extends AsyncTask<Context, Void, Void> {
+        protected Void doInBackground(Context... contexts) {
+            refresh(contexts[0]);
+            return null;
+        }
+    }
+
+
+    public void refreshAsync(@NonNull final Context argContext) {
+        new RefreshSyncTask().execute(argContext);
+    }
 
     public void refresh(@NonNull final Context argContext) {
         SoundWaves.sSubscriptionRefreshManager.refresh(this, new IDownloadCompleteCallback() {
