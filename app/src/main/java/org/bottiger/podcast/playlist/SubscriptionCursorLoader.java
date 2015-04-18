@@ -24,7 +24,7 @@ public class SubscriptionCursorLoader extends GenericSubscriptionLoader {
     }
 	
 	private String getOrder() {
-		return SubscriptionColumns.TITLE + " DESC";
+		return SubscriptionColumns.TITLE + " ASC";
 	}
 	
 	public String getWhere() {
