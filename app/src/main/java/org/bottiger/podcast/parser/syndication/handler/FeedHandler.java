@@ -54,7 +54,7 @@ public class FeedHandler {
             return null;
         } catch (Exception e) {
             String substring = subscription == null ? "null" : subscription.toString();
-            VendorCrashReporter.report("feedContent", feedContent + " aaaaaand: subscription: " + substring);
+            //VendorCrashReporter.report("feedContent", feedContent + " aaaaaand: subscription: " + substring);
             if (BuildConfig.DEBUG) {
                 throw e;
             }
