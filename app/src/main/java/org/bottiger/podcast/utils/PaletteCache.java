@@ -31,7 +31,7 @@ public class PaletteCache {
 
     private static final int CACHE_SIZE = 100;
     private static final int PALETTE_SIZE = 24; /* 24 is default size. You can decrease this value to speed up palette generation */
-    
+
     private static LruCache<String, Palette> mPaletteCache = new LruCache<>(CACHE_SIZE);
 
     public static Palette get(@NonNull PaletteListener argPaletteListener) {
@@ -42,16 +42,11 @@ public class PaletteCache {
         return mPaletteCache.get(argUrl);
     }
 
-    public static void getAsync(@NonNull final String argUrl, @NonNull Bitmap argBitmap) {
-        Palette.generateAsync(argBitmap, PALETTE_SIZE, new Palette.PaletteAsyncListener() {
-            @Override
-            public void onGenerated(Palette palette) {
-                put(argUrl, palette);
-            }
-        });
+    public static void generate(@NonNull final String argUrl, @NonNull Context argContext) {
+        generate(argUrl, argContext, null);
     }
 
-    public static void generate(@NonNull final String argUrl, @NonNull Context argContext) {
+    public static void generate(@NonNull final String argUrl, @NonNull Context argContext, @Nullable PaletteListener argCallback) {
 
         final Uri url;
         try {

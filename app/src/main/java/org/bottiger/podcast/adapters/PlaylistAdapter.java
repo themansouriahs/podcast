@@ -77,7 +77,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
     private DownloadProgressObservable mDownloadProgressObservable = null;
 
-	public static TreeSet<Number> mExpandedItemID = new TreeSet<Number>();
+	public static TreeSet<Number> mExpandedItemID = new TreeSet<>();
 
 
 	private static DownloadManager mDownloadManager = null;
