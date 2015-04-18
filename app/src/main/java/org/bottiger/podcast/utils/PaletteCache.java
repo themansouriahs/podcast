@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.graphics.Palette;
+import android.util.LruCache;
 
 import com.facebook.common.references.CloseableReference;
 import com.facebook.datasource.DataSource;
@@ -28,8 +29,10 @@ import java.util.WeakHashMap;
  */
 public class PaletteCache {
 
+    private static final int CACHE_SIZE = 100;
     private static final int PALETTE_SIZE = 24; /* 24 is default size. You can decrease this value to speed up palette generation */
-    public static final HashMap<String,Palette> mPaletteCache = new HashMap<String, Palette>();
+    
+    private static LruCache<String, Palette> mPaletteCache = new LruCache<>(CACHE_SIZE);
 
     public static Palette get(@NonNull PaletteListener argPaletteListener) {
         return get(argPaletteListener.getPaletteUrl());
@@ -111,7 +114,8 @@ public class PaletteCache {
     }
 
     public static boolean containsKey(@NonNull String argUrl) {
-        return mPaletteCache.containsKey(argUrl);
+        return mPaletteCache.get(argUrl) != null;
+        //return mPaletteCache.containsKey(argUrl);
     }
 
     public static void generatePalletFromUrl(@Nullable String argUrl) {
