@@ -408,8 +408,10 @@ public class PlaylistFragment extends GeastureFragment implements
             PaletteCache.generate(item.image, getActivity());
         }
 
-        Uri uri = Uri.parse(item.image);
-        mPhoto.setImageURI(uri);
+        if (item != null) {
+            Uri uri = Uri.parse(item.image);
+            mPhoto.setImageURI(uri);
+        }
 
         if (mTopPlayer.getVisibleHeight() == 0) {
             mTopPlayer.setPlayerHeight(1000);
