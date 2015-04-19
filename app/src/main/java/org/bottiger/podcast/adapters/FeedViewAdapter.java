@@ -100,9 +100,11 @@ public class FeedViewAdapter extends AbstractEpisodeCursorAdapter<FeedViewAdapte
             episodeViewHolder.mDownloadButton.onPaletteFound(mPalette);
         }
 
-        Palette palette = PaletteCache.get(mSubscription);
-        if (palette != null)
-            mPalette = palette;
+        if (mSubscription.getPaletteUrl() != null) {
+            Palette palette = PaletteCache.get(mSubscription);
+            if (palette != null)
+                mPalette = palette;
+        }
     }
 
     @Override

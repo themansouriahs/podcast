@@ -28,6 +28,7 @@ public class SubscriptionGridCursorAdapter extends CursorRecyclerAdapter {
     private Activity mActivity;
 
     private int numberOfColumns = 2;
+    private int position = -1;
 
     public SubscriptionGridCursorAdapter(Activity argActivity, Cursor cursor) {
         super(cursor);
@@ -137,6 +138,20 @@ public class SubscriptionGridCursorAdapter extends CursorRecyclerAdapter {
                 FeedActivity.start(mActivity, subscription.getId());
             }
         });
+
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                setPosition((int)subscription.getId());
+                return false;
+            }
+        });
+    }
+
+    @Override
+    public void onViewRecycled(RecyclerView.ViewHolder holder) {
+        holder.itemView.setOnLongClickListener(null);
+        super.onViewRecycled(holder);
     }
 
     @Override
@@ -157,6 +172,14 @@ public class SubscriptionGridCursorAdapter extends CursorRecyclerAdapter {
             numberOfColumns = argNumber;
             notifyDataSetChanged();
         }
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
     }
 
 }

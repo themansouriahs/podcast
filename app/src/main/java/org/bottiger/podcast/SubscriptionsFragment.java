@@ -3,7 +3,6 @@ package org.bottiger.podcast;
 import org.bottiger.podcast.adapters.SubscriptionGridCursorAdapter;
 import org.bottiger.podcast.playlist.SubscriptionCursorLoader;
 import org.bottiger.podcast.provider.Subscription;
-import org.bottiger.podcast.provider.SubscriptionColumns;
 import org.bottiger.podcast.utils.FragmentUtils;
 import org.bottiger.podcast.views.dialogs.DialogOPML;
 
@@ -16,6 +15,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -29,12 +29,15 @@ import android.widget.RelativeLayout;
 
 public class SubscriptionsFragment extends Fragment {
 
+    private static final String TAG = "SubscriptionsFragment";
+
 	private FragmentUtils mFragmentUtils;
 	private View fragmentView;
 	private RecyclerView mGridView;
 
     private GridLayoutManager mGridLayoutmanager;
     private RelativeLayout mEmptySubscrptionList;
+    private SubscriptionGridCursorAdapter mAdapter;
 
     private Activity mActivity;
     private FrameLayout mContainerView;
@@ -74,14 +77,14 @@ public class SubscriptionsFragment extends Fragment {
 		registerForContextMenu(mGridView);
 
         Cursor mCursor = null;
-        SubscriptionGridCursorAdapter adapter = new SubscriptionGridCursorAdapter(getActivity(), mCursor);
+        mAdapter = new SubscriptionGridCursorAdapter(getActivity(), mCursor);
 
         mGridLayoutmanager = new GridLayoutManager(getActivity(), numberOfColumns());
         mGridView.setHasFixedSize(true);
         mGridView.setLayoutManager(mGridLayoutmanager);
-        mGridView.setAdapter(adapter);
+        mGridView.setAdapter(mAdapter);
 
-        mCursorLoader = new SubscriptionCursorLoader(this, adapter, mCursor);
+        mCursorLoader = new SubscriptionCursorLoader(this, mAdapter, mCursor);
 
 		return mContainerView;
 	}
@@ -147,40 +150,25 @@ public class SubscriptionsFragment extends Fragment {
 		inflater.inflate(R.menu.subscription_context, menu);
 		PlaylistFragment.setContextMenu(PlaylistFragment.SUBSCRIPTION_CONTEXT_MENU, this);
 	}
-	
-	/**
-	 * FIXME this should be moved somewhere else
-	 *
-	 * @return
-	 */
-    /*
-	public boolean subscriptionContextMenu(MenuItem menuItem) {
 
-		if (!AdapterView.AdapterContextMenuInfo.class.isInstance(menuItem
-				.getMenuInfo()))
-			return false;
+    public boolean onContextItemSelected(MenuItem menuItem) {
+        int position = -1;
+        try {
+            position = mAdapter.getPosition();
+        } catch (Exception e) {
+            Log.d(TAG, e.getLocalizedMessage(), e);
+            return super.onContextItemSelected(menuItem);
+        }
 
-		AdapterView.AdapterContextMenuInfo cmi = (AdapterView.AdapterContextMenuInfo) menuItem
-				.getMenuInfo();
-
-		Cursor cursor = getAdapter().getCursor();
-		int pos = cmi.position;
-		cursor.moveToPosition(pos);
-		Subscription subscription = Subscription.getByCursor(cursor);
-
-		AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuItem
-				.getMenuInfo();
-		switch (menuItem.getItemId()) {
-		case R.id.unsubscribe:
-			subscription.unsubscribe(getActivity());
-			CursorAdapter adapter = getAdapter();
-			if (adapter != null)
-				getAdapter().notifyDataSetChanged();
-			return true;
-		default:
-			return super.onContextItemSelected(menuItem);
-		}
-	}*/
+        switch (menuItem.getItemId()) {
+            case R.id.unsubscribe:
+                Subscription subscription = Subscription.getById(getActivity().getContentResolver(), position); // item.getSubscription(getActivity());
+                subscription.unsubscribe(getActivity());
+                return true;
+            default:
+                return super.onContextItemSelected(menuItem);
+        }
+    }
 
 	private int getLayoutType() {
 		return R.layout.subscription_list;

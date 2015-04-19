@@ -186,9 +186,11 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
         bindExandedPlayer(mActivity, item, viewHolder, position);
 
-        Palette palette = PaletteCache.get(item.image);
-        if (palette != null) {
-            PaletteObservable.updatePalette(item.image, palette);
+        if (item.image != null) {
+            Palette palette = PaletteCache.get(item.image);
+            if (palette != null) {
+                PaletteObservable.updatePalette(item.image, palette);
+            }
         }
 
         if (!doExpand) {

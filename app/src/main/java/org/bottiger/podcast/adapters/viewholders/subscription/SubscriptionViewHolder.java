@@ -1,6 +1,8 @@
 package org.bottiger.podcast.adapters.viewholders.subscription;
 
 import android.support.v7.widget.RecyclerView;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -12,7 +14,7 @@ import org.bottiger.podcast.R;
 /**
  * Created by apl on 15-04-2015.
  */
-public class SubscriptionViewHolder extends RecyclerView.ViewHolder {
+public class SubscriptionViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
 
     public TextView title;
     public SimpleDraweeView image;
@@ -25,5 +27,11 @@ public class SubscriptionViewHolder extends RecyclerView.ViewHolder {
         image = (SimpleDraweeView) itemView.findViewById(R.id.grid_image);
         gradient = (View) itemView.findViewById(R.id.grid_item_gradient);
 
+        itemView.setOnCreateContextMenuListener(this);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        //menu.setHeaderTitle("Select The Action");
     }
 }

@@ -410,7 +410,7 @@ public class PlaylistFragment extends GeastureFragment implements
             }
         }
 
-        if (item != null) {
+        if (item != null && item.image != null) {
             Uri uri = Uri.parse(item.image);
             mPhoto.setImageURI(uri);
         }

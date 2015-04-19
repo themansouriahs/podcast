@@ -305,8 +305,11 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
     protected void onStart() {
         super.onStart();
         PaletteObservable.registerListener(this);
-        Palette palette = PaletteCache.get(mSubscription.getPaletteUrl());
-        onPaletteFound(palette);
+
+        if (mSubscription.getPaletteUrl() != null) {
+            Palette palette = PaletteCache.get(mSubscription.getPaletteUrl());
+            onPaletteFound(palette);
+        }
     }
 
     @Override
