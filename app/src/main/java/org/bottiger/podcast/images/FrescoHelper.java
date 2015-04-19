@@ -1,9 +1,12 @@
 package org.bottiger.podcast.images;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.graphics.Palette;
+import android.util.Log;
 
 import com.facebook.common.references.CloseableReference;
 import com.facebook.common.references.ResourceReleaser;
@@ -11,17 +14,23 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.bitmaps.PlatformBitmapFactory;
+import com.facebook.imagepipeline.common.ResizeOptions;
+import com.facebook.imagepipeline.request.BasePostprocessor;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.facebook.imagepipeline.request.Postprocessor;
 
 import org.apache.commons.validator.routines.UrlValidator;
+import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.utils.PaletteCache;
 
 /**
  * Created by apl on 16-04-2015.
  */
 public class FrescoHelper {
+
+    private static final int MAX_WIDTH = 1024;
+    private static final int MAX_HEIGHT = 1024;
 
     private static UrlValidator validator = new UrlValidator();
 
@@ -36,10 +45,11 @@ public class FrescoHelper {
 
         Uri uri = Uri.parse(argUrl);
 
-        Defaultprocessor processor = new Defaultprocessor(argUrl, argPostprocessor);
+        Postprocessor processor = argPostprocessor != null ? argPostprocessor : new Defaultprocessor();
 
         ImageRequest request = ImageRequestBuilder.newBuilderWithSource(uri)
-                //.setPostprocessor(processor)
+                .setResizeOptions(new ResizeOptions(MAX_WIDTH, MAX_HEIGHT))
+                .setPostprocessor(processor)
                 .build();
 
         return request;
@@ -60,32 +70,8 @@ public class FrescoHelper {
                 .setOldController(argView.getController())
                 .build();
         argView.setController(controller);
-    }
-
-    private static class Defaultprocessor implements Postprocessor {
-
-        private String mUrl;
-        private Postprocessor mpostprocessor;
-
-        public Defaultprocessor(@NonNull String argUrl, @Nullable Postprocessor argPostprocessor) {
-            mUrl = argUrl;
-            mpostprocessor = argPostprocessor;
-        }
-
-        @Override
-        public CloseableReference<Bitmap> process(Bitmap bitmap, PlatformBitmapFactory platformBitmapFactory) {
-            //PaletteCache.generate(mUrl, bitmap);
-            if (mpostprocessor != null) {
-                mpostprocessor.process(bitmap, platformBitmapFactory);
-            }
-
-            return toCloseableReference(bitmap);
-        }
-
-        @Override
-        public String getName() {
-            return "SoundWavesDefaultPostprocessor";
-        }
+        //Uri uri = Uri.parse(argUrl);
+        //argView.setImageURI(uri);
     }
 
     public static CloseableReference<Bitmap> toCloseableReference(Bitmap argBitmap) {
@@ -95,5 +81,85 @@ public class FrescoHelper {
                 value.recycle();
             }
         });
+    }
+
+    private static class Defaultprocessor extends BasePostprocessor {
+
+        @Override
+        public void process(Bitmap bitmap) {
+            return;
+        }
+
+        @Override
+        public String getName() {
+            return "SoundWavesDefaultPostprocessor";
+        }
+    }
+
+    public static class PalettePostProcessor extends BasePostprocessor {
+
+        private Activity mActivity;
+        private String url;
+
+        public PalettePostProcessor(@NonNull Activity argActivity, @NonNull String argUrl) {
+            mActivity = argActivity;
+            url = argUrl;
+        }
+
+        @Override
+        public void process(Bitmap bitmap) {
+            // we can not copy the bitmap inside here
+            //analyzeWhitenessOfPhotoAsynchronously(bitmap);
+
+            //String url = item.image;
+            //mLock.lock();
+
+            if (bitmap.isRecycled())
+                return;
+
+            try {
+                Palette palette = PaletteCache.get(url);
+                if (palette == null) {
+                    //smallBitmap = FrescoHelper.copySmallBitmap(bitmap, platformBitmapFactory);
+
+                    final Palette palette1 = PaletteCache.generate(url, bitmap, false, false);
+                    if (palette1 != null) {
+                        mActivity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                PaletteObservable.updatePalette(url, palette1);
+                            }
+                        });
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return;
+        }
+
+        @Override
+        public String getName() {
+            return "PalettePostProcessor";
+        }
+    }
+
+    public static Bitmap copySmallBitmap(@NonNull Bitmap argBitmap, @NonNull PlatformBitmapFactory argPlatformBitmapFactory) {
+        CloseableReference<Bitmap> bitmapRef = argPlatformBitmapFactory.createBitmap(
+                argBitmap.getWidth() / 2,
+                argBitmap.getHeight() / 2);
+        try {
+            Bitmap destBitmap = bitmapRef.get();
+            for (int x = 0; x < destBitmap.getWidth(); x+=2) {
+                for (int y = 0; y < destBitmap.getHeight(); y+=2) {
+                    int color = argBitmap.getPixel(x, y);
+                    destBitmap.setPixel(x, y, color);
+                }
+            }
+            return CloseableReference.cloneOrNull(bitmapRef).get();
+        } finally {
+            CloseableReference.closeSafely(bitmapRef);
+        }
     }
 }

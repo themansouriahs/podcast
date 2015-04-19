@@ -14,6 +14,7 @@ import org.bottiger.podcast.R;
 
 import org.bottiger.podcast.adapters.viewholders.ExpandableViewHoldersUtil;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.images.FrescoHelper;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
@@ -52,6 +53,7 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.controller.BaseControllerListener;
 import com.facebook.drawee.controller.ControllerListener;
 import com.facebook.drawee.interfaces.DraweeController;
+import com.facebook.imagepipeline.bitmaps.PlatformBitmapFactory;
 import com.facebook.imagepipeline.core.ExecutorSupplier;
 import com.facebook.imagepipeline.core.ImagePipeline;
 import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
@@ -60,6 +62,7 @@ import com.facebook.imagepipeline.image.ImageInfo;
 import com.facebook.imagepipeline.image.QualityInfo;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
+import com.facebook.imagepipeline.request.Postprocessor;
 
 public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> {
 
@@ -171,101 +174,9 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
                 // http://frescolib.org/docs/getting-started.html#_
                 UrlValidator urlValidator = new UrlValidator();
                 if (!TextUtils.isEmpty(item.image) && urlValidator.isValid(item.image)) {
-                    final Uri frescoImageUrl = Uri.parse(item.image);
 
-                    ControllerListener controllerListener = new BaseControllerListener<ImageInfo>() {
-                        @Override
-                        public void onFinalImageSet(
-                                String id,
-                                @Nullable ImageInfo imageInfo,
-                                @Nullable Animatable anim) {
-                            if (imageInfo == null) {
-                                return;
-                            }
-                            QualityInfo qualityInfo = imageInfo.getQualityInfo();
-                            Log.d(TAG, "Final image received! "
-                                            + "Size %d x %d"
-                                            + "Quality level %d, good enough: %s, full quality: %s"
-                                            + imageInfo.getWidth()
-                                            + imageInfo.getHeight()
-                                            + qualityInfo.getQuality()
-                                            + qualityInfo.isOfGoodEnoughQuality()
-                                            + qualityInfo.isOfFullQuality());
-
-
-
-                            // FIXME legacy stuff :)
-                            /*
-                            String url = item.image;
-                            mLock.lock();
-                            try {
-                                Drawable d = viewHolder.mItemBackground.getDrawable();
-
-                                Palette palette = PaletteCache.get(url);
-                                if (palette == null) {
-                                    BitmapDrawable bd = (BitmapDrawable)d;
-                                    PaletteCache.generate(url, bd.getBitmap());
-                                }
-                            } finally {
-                                mLock.unlock();
-                            }*/
-
-                            try {
-                                ImageRequest request = ImageRequestBuilder
-                                        .newBuilderWithSource(frescoImageUrl)
-                                        .build();
-
-                                ImagePipeline imagePipeline = Fresco.getImagePipeline();
-                                DataSource<CloseableReference<CloseableImage>>
-                                        dataSource = imagePipeline.fetchDecodedImage(request, activity);
-
-
-                                DirectExecutor directExecutor = new DirectExecutor();
-                                dataSource.subscribe(new BaseBitmapDataSubscriber() {
-                                    @Override
-                                    public void onNewResultImpl(@Nullable Bitmap bitmap) {
-                                        // You can use the bitmap in only limited ways
-                                        // No need to do any cleanup.
-                                        String url = item.image;
-                                        mLock.lock();
-                                        try {
-
-                                            Palette palette = PaletteCache.get(url);
-                                            if (palette == null) {
-                                                PaletteCache.generate(url, bitmap);
-                                            }
-                                        } finally {
-                                            mLock.unlock();
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onFailureImpl(DataSource dataSource) {
-                                        // No cleanup required here.
-                                    }
-                                }, directExecutor);
-
-                            } catch (Exception e) {
-                                VendorCrashReporter.handleException(e);
-                            }
-                        }
-
-                        @Override
-                        public void onIntermediateImageSet(String id, @Nullable ImageInfo imageInfo) {
-                            Log.d(TAG, "Intermediate image received");
-                        }
-
-                        @Override
-                        public void onFailure(String id, Throwable throwable) {
-                            Log.e(TAG, "Error loading %s" + id);
-                        }
-                    };
-
-                    DraweeController controller = Fresco.newDraweeControllerBuilder()
-                            .setControllerListener(controllerListener)
-                            .setUri(frescoImageUrl).build();
-
-                    viewHolder.mItemBackground.setController(controller);
+                    FrescoHelper.PalettePostProcessor postProcessor = new FrescoHelper.PalettePostProcessor(mActivity, item.image);
+                    FrescoHelper.loadImageInto(viewHolder.mItemBackground, item.image, postProcessor);
                 }
 
             }

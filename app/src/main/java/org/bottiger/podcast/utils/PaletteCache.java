@@ -77,7 +77,7 @@ public class PaletteCache {
                 //mLock.lock();
                     Palette palette = PaletteCache.get(argUrl);
                     if (palette == null) {
-                        PaletteCache.generate(argUrl, bitmap, false);
+                        PaletteCache.generate(argUrl, bitmap, false, true);
                     }
             }
 
@@ -89,14 +89,15 @@ public class PaletteCache {
     }
 
     public static Palette generate(@NonNull String argUrl, @NonNull Bitmap argBitmap) {
-        return generate(argUrl, argBitmap, false);
+        return generate(argUrl, argBitmap, false, true);
     }
 
-    public static Palette generate(@NonNull String argUrl, @NonNull Bitmap argBitmap, Boolean forceUpdate) {
+    public static Palette generate(@NonNull String argUrl, @NonNull Bitmap argBitmap, Boolean forceUpdate, Boolean argNotificaChange) {
         Palette currentPalette = PaletteCache.get(argUrl);
         if (forceUpdate || currentPalette == null) {
             Palette palette = Palette.generate(argBitmap, PALETTE_SIZE);
-            put(argUrl, palette);
+            if (argNotificaChange)
+                put(argUrl, palette);
             return palette;
         }
 

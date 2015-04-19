@@ -206,23 +206,8 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
 
         mUrl = mSubscription.getImageURL();
 
-        FrescoHelper.loadImageInto(mPhotoView, mUrl, new Postprocessor() {
-
-            @Override
-            public CloseableReference<Bitmap> process(Bitmap bitmap, PlatformBitmapFactory platformBitmapFactory) {
-                // we can not copy the bitmap inside here
-                //analyzeWhitenessOfPhotoAsynchronously(bitmap);
-
-                return FrescoHelper.toCloseableReference(bitmap);
-            }
-
-            @Override
-            public String getName() {
-                return "IsWhite";
-            }
-        });
-
-        //PaletteCache.generatePalletFromUrl(mUrl);
+        FrescoHelper.PalettePostProcessor postProcessor = new FrescoHelper.PalettePostProcessor(this, mUrl);
+        FrescoHelper.loadImageInto(mPhotoView, mUrl, postProcessor);
 
         final View transparentView = findViewById(R.id.transparent_view);
         if (mMultiShrinkScroller != null) {
@@ -320,7 +305,7 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
     protected void onStart() {
         super.onStart();
         PaletteObservable.registerListener(this);
-        Palette palette = PaletteCache.get(mSubscription.getImageURL());
+        Palette palette = PaletteCache.get(mSubscription.getPaletteUrl());
         onPaletteFound(palette);
     }
 
@@ -392,6 +377,7 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
         mFloatingButton.onPaletteFound(argChangedPalette);
         UIUtils.tintStatusBar(extractor.getPrimary(), this);
         mStatusBarColor = extractor.getPrimary();
+        mAdapter.setPalette(argChangedPalette);
     }
 
     @Override
