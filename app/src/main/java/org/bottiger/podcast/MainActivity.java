@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import org.bottiger.podcast.AbstractEpisodeFragment.OnPlaylistRefreshListener;
 import org.bottiger.podcast.cloud.CloudProvider;
-import org.bottiger.podcast.cloud.drive.DriveSyncer;
 import org.bottiger.podcast.debug.SqliteCopy;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
@@ -41,10 +40,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.json.gson.GsonFactory;
-import com.google.api.services.drive.Drive;
 
 // Sliding
 public class MainActivity extends FragmentContainerActivity implements
@@ -54,7 +50,6 @@ public class MainActivity extends FragmentContainerActivity implements
 
 	private final int REQUEST_AUTHORIZATION = 1;
 	private final int REQUEST_ACCOUNT_PICKER = 0;
-	private static GoogleAccountCredential mCredential;
 
     public static PlayerService sBoundPlayerService = null;
 	public static PodcastService mPodcastServiceBinder = null;
@@ -148,6 +143,7 @@ public class MainActivity extends FragmentContainerActivity implements
 
 		if (prefs.getBoolean(SettingsActivity.CLOUD_SUPPORT, false) && false) {
 
+            /*
 			mCredential = GoogleAccountCredential.usingOAuth2(this,
 					DriveSyncer.getScope()); // "https://www.googleapis.com/auth/drive.appdata");
 												// //DriveScopes.DRIVE);
@@ -158,7 +154,7 @@ public class MainActivity extends FragmentContainerActivity implements
 						REQUEST_ACCOUNT_PICKER);
 			else
 				mCredential.setSelectedAccountName(prefs.getString(ACCOUNT_KEY,
-						""));
+						""));*/
 
             /*
             GOogle flavor
@@ -253,6 +249,7 @@ public class MainActivity extends FragmentContainerActivity implements
 		return false;
 	}
 
+    /*
 	public static GoogleAccountCredential getCredentials() {
 		return mCredential;
 	}
@@ -292,7 +289,7 @@ public class MainActivity extends FragmentContainerActivity implements
 			}
 			break;
 		}
-	}
+	}*/
 
 	@Override
 	protected void onPause() {
@@ -397,9 +394,10 @@ public class MainActivity extends FragmentContainerActivity implements
 		return super.onOptionsItemSelected(item);
 	}
 
+    /*
 	private Drive getDriveService(GoogleAccountCredential credential) {
 		return new Drive.Builder(AndroidHttp.newCompatibleTransport(),
 				new GsonFactory(), credential).build();
-	}
+	}*/
 
 }

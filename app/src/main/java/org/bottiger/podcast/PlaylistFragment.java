@@ -1,8 +1,6 @@
 package org.bottiger.podcast;
 
 import org.bottiger.podcast.adapters.PlaylistAdapter;
-import org.bottiger.podcast.adapters.decoration.DragSortRecycler;
-import org.bottiger.podcast.adapters.decoration.InitialHeaderAdapter;
 import org.bottiger.podcast.images.FrescoHelper;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.listeners.PaletteObservable;
@@ -52,8 +50,6 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.eowise.recyclerview.stickyheaders.StickyHeadersBuilder;
-import com.eowise.recyclerview.stickyheaders.StickyHeadersItemDecoration;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.squareup.picasso.Callback;
 

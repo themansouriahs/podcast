@@ -2,8 +2,6 @@ package org.bottiger.podcast.provider;
 
 import java.util.ArrayList;
 
-import com.google.common.collect.ObjectArrays;
-
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.Context;

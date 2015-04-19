@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 
-import com.github.anrwatchdog.ANRWatchDog;
 
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
