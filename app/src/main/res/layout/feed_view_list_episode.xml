@@ -1,19 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/group"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="5dp"
     android:animateLayoutChanges="true"
     >
-    <!--
-    android:paddingTop="5dp"
-    android:paddingBottom="5dp"
-    -->
 
     <org.bottiger.podcast.views.PlayPauseImageView
         android:id="@+id/play_pause_button"
         android:layout_marginRight="5dp"
+        style="@style/FeedViewPlayPauseButton" />
+
+    <org.bottiger.podcast.views.FeedViewQueueButton
+        android:id="@+id/queue_button"
+        android:layout_marginRight="5dp"
+        android:visibility="gone"
+        android:src="@drawable/ic_add_white"
+        android:layout_below="@id/play_pause_button"
         style="@style/FeedViewPlayPauseButton" />
 
     <org.bottiger.podcast.views.DownloadButtonView

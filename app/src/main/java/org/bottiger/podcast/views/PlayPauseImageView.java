@@ -67,7 +67,7 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
     private static Bitmap s_playIcon;
     private static Bitmap s_pauseIcon;
 
-    private Paint paint;
+    protected Paint paint;
     private Paint paintBorder;
 
     private int mPaintColor = getResources().getColor(R.color.colorPrimaryDark);
@@ -177,7 +177,10 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
 
         int bitmapx = centerX-icon.getWidth()/2;
         int bitmapy = centerY-icon.getHeight()/2;
-        canvas.drawBitmap(icon, bitmapx, bitmapy, paint);
+
+        if (drawIcon()) {
+            canvas.drawBitmap(icon, bitmapx, bitmapy, paint);
+        }
     }
 
     @Override
@@ -327,5 +330,9 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
                 outline.setOval(boundsRound);
             }
         }
+    }
+
+    protected boolean drawIcon() {
+        return true;
     }
 }

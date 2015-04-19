@@ -21,7 +21,9 @@ import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.PaletteCache;
 import org.bottiger.podcast.views.DownloadButtonView;
+import org.bottiger.podcast.views.FeedViewQueueButton;
 import org.bottiger.podcast.views.PlayPauseImageView;
+import org.bottiger.podcast.views.PlayerButtonView;
 
 /**
  * Created by apl on 02-09-2014.
@@ -81,13 +83,11 @@ public class FeedViewAdapter extends AbstractEpisodeCursorAdapter<FeedViewAdapte
 
         if (mIsExpanded != episodeViewHolder.IsExpanded) {
             episodeViewHolder.IsExpanded = mIsExpanded;
-            episodeViewHolder.modifyLayout();
+            episodeViewHolder.modifyLayout((RelativeLayout)viewHolder.itemView);
         }
 
-        Palette.Swatch swatch = null;//mPalette.getVibrantSwatch(); // .getDarkMutedColor(R.color.colorPrimaryDark);
-        int c = swatch != null ? swatch.getBodyTextColor() : R.color.white_opaque;
-
         episodeViewHolder.mPlayPauseButton.setEpisodeId(item.getId(), PlayPauseImageView.LOCATION.FEEDVIEW);
+        episodeViewHolder.mQueueButton.setEpisodeId(item.getId(), PlayPauseImageView.LOCATION.FEEDVIEW);
         episodeViewHolder.mPlayPauseButton.setStatus(isPlaying ? PlayerStatusObservable.STATUS.PLAYING : PlayerStatusObservable.STATUS.PAUSED);
 
 
@@ -96,6 +96,7 @@ public class FeedViewAdapter extends AbstractEpisodeCursorAdapter<FeedViewAdapte
 
         if (mPalette != null) {
             episodeViewHolder.mPlayPauseButton.onPaletteFound(mPalette);
+            episodeViewHolder.mQueueButton.onPaletteFound(mPalette);
             episodeViewHolder.mDownloadButton.onPaletteFound(mPalette);
         }
 
@@ -109,6 +110,8 @@ public class FeedViewAdapter extends AbstractEpisodeCursorAdapter<FeedViewAdapte
         final EpisodeViewHolder episodeViewHolder = (EpisodeViewHolder) viewHolder;
         mDownloadProgressObservable.unregisterObserver(episodeViewHolder.mDownloadButton);
         episodeViewHolder.mDownloadButton.unsetEpisodeId();
+        episodeViewHolder.mPlayPauseButton.unsetEpisodeId();
+        episodeViewHolder.mQueueButton.unsetEpisodeId();
     }
 
     @Override
@@ -123,9 +126,11 @@ public class FeedViewAdapter extends AbstractEpisodeCursorAdapter<FeedViewAdapte
 
     public class EpisodeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
+        public ViewGroup mContainer;
         public TextView mText;
         public TextView mDescription;
         public PlayPauseImageView mPlayPauseButton;
+        public FeedViewQueueButton mQueueButton;
         public DownloadButtonView mDownloadButton;
 
         public boolean IsExpanded = false;
@@ -135,9 +140,11 @@ public class FeedViewAdapter extends AbstractEpisodeCursorAdapter<FeedViewAdapte
             super(view);
             view.setOnClickListener(this);
 
+            mContainer = (ViewGroup) view.findViewById(R.id.group);
             mText = (TextView) view.findViewById(R.id.title);
             mDescription = (TextView) view.findViewById(R.id.episode_description);
             mPlayPauseButton = (PlayPauseImageView) view.findViewById(R.id.play_pause_button);
+            mQueueButton = (FeedViewQueueButton) view.findViewById(R.id.queue_button);
             mDownloadButton = (DownloadButtonView) view.findViewById(R.id.feedview_download_button);
         }
 
@@ -146,7 +153,7 @@ public class FeedViewAdapter extends AbstractEpisodeCursorAdapter<FeedViewAdapte
         public void onClick(View view) {
         }
 
-        public void modifyLayout() {
+        public void modifyLayout(@NonNull ViewGroup argParent) {
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mText.getLayoutParams();
 
             if (IsExpanded) {
@@ -159,10 +166,13 @@ public class FeedViewAdapter extends AbstractEpisodeCursorAdapter<FeedViewAdapte
                 params.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
             }
 
-            mText.setLayoutParams(params);
+            //mText.setLayoutParams(params);
 
             int visibility = IsExpanded ? View.VISIBLE : View.GONE;
             mDescription.setVisibility(visibility);
+            mQueueButton.setVisibility(visibility);
+
+            argParent.updateViewLayout(mText, params);
         }
     }
 

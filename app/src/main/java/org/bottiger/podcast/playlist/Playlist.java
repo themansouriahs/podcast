@@ -25,6 +25,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.widget.CursorAdapter;
 import android.util.Log;
 
+import com.dragontek.mygpoclient.feeds.Feed;
+
 public class Playlist implements OnDragStateChangedListener {
 
     public static final boolean SHOW_LISTENED_DEFAULT = true;
@@ -41,7 +43,7 @@ public class Playlist implements OnDragStateChangedListener {
 	private Context mContext;
 
     private HashSet<Long> mSubscriptions = new HashSet<>();
-	private static ArrayList<FeedItem> mInternalPlaylist = new ArrayList<FeedItem>();
+	private static ArrayList<FeedItem> mInternalPlaylist = new ArrayList<>();
 	private SharedPreferences sharedPreferences;
 
 	// Shared setting key/values
@@ -237,6 +239,41 @@ public class Playlist implements OnDragStateChangedListener {
         FeedItem movedItem = mInternalPlaylist.get(from);
         persist(mContext, movedItem, precedingItem, from, to);
 	}
+
+    public void queue(@NonNull FeedItem argEpisode) {
+
+        int currentPosition = -1;
+        int lastPlaylistPosition = -1;
+
+        for (int position = 0; position < mInternalPlaylist.size(); position++) {
+            FeedItem item = mInternalPlaylist.get(position);
+
+            // Find current position, if any
+            if (argEpisode.equals(item)) {
+                currentPosition = position;
+            }
+
+            // Find end of the queue
+            if (item.getPriority() <= 0 && lastPlaylistPosition < 0) {
+                lastPlaylistPosition = position;
+            }
+        }
+
+        if (currentPosition < 0) {
+            mInternalPlaylist.add(lastPlaylistPosition, argEpisode);
+            return;
+        }
+
+        if (lastPlaylistPosition > 0) {
+            move(currentPosition, lastPlaylistPosition);
+            return;
+        }
+
+        mInternalPlaylist.add(argEpisode);
+
+        notifyPlaylistChanged();
+
+    }
 
 	/**
 	 * 
