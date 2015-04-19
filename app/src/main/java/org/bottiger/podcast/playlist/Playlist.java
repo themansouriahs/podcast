@@ -261,15 +261,17 @@ public class Playlist implements OnDragStateChangedListener {
 
         if (currentPosition < 0) {
             mInternalPlaylist.add(lastPlaylistPosition, argEpisode);
+            notifyPlaylistChanged();
             return;
         }
 
         if (lastPlaylistPosition > 0) {
             move(currentPosition, lastPlaylistPosition);
+            notifyPlaylistChanged();
             return;
         }
 
-        mInternalPlaylist.add(argEpisode);
+        mInternalPlaylist.add(0, argEpisode);
 
         notifyPlaylistChanged();
 
