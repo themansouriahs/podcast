@@ -57,7 +57,7 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
     private FeedItem mEpisode;
     private long mEpisodeId = -1;
 
-    private Context mContext;
+    protected Context mContext;
 
     private RectF bounds;
     private Rect boundsRound = new Rect();

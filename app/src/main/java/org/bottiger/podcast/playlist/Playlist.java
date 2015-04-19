@@ -240,7 +240,7 @@ public class Playlist implements OnDragStateChangedListener {
         persist(mContext, movedItem, precedingItem, from, to);
 	}
 
-    public void queue(@NonNull FeedItem argEpisode) {
+    public void queue(@NonNull Context argContext, @NonNull FeedItem argEpisode) {
 
         int currentPosition = -1;
         int lastPlaylistPosition = -1;
@@ -253,6 +253,7 @@ public class Playlist implements OnDragStateChangedListener {
                 currentPosition = position;
             }
 
+
             // Find end of the queue
             if (item.getPriority() <= 0 && lastPlaylistPosition < 0) {
                 lastPlaylistPosition = position;
@@ -260,12 +261,20 @@ public class Playlist implements OnDragStateChangedListener {
         }
 
         if (currentPosition < 0) {
+
+            if (lastPlaylistPosition <= 0) {
+                argEpisode.setPriority(null, argContext);
+            } else {
+                FeedItem preceedingItem = mInternalPlaylist.get(lastPlaylistPosition-1);
+                argEpisode.setPriority(preceedingItem, argContext);
+            }
+
             mInternalPlaylist.add(lastPlaylistPosition, argEpisode);
             notifyPlaylistChanged();
             return;
         }
 
-        if (lastPlaylistPosition > 0) {
+        if (lastPlaylistPosition >= 0) {
             move(currentPosition, lastPlaylistPosition);
             notifyPlaylistChanged();
             return;

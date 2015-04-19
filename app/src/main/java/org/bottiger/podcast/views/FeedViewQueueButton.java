@@ -72,7 +72,7 @@ public class FeedViewQueueButton extends PlayPauseImageView {
         FeedItem item = getEpisode();
         Playlist playlist = Playlist.getActivePlaylist();
 
-        playlist.queue(item);
+        playlist.queue(mContext, item);
     }
 
     @Override
