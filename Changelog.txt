@@ -1,6 +1,14 @@
 Changelog
 ==========
 
+version 0.90
+------------
+* Lots and lots and lots of bug fixes and crashes
+* Serveral memory leaks
+* New Discover tab for searching Subscriptions
+* Better support for (large) OPML files
+* Queue episode button
+
 version 0.88.2
 ------------
 * Various crashes and bug fixes
