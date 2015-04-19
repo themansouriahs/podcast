@@ -396,16 +396,18 @@ public class PlaylistFragment extends GeastureFragment implements
         PlayerStatusObservable.registerListener(mPlayerSeekbar);
 
 
-        Palette palette = PaletteCache.get(item.image);
-        if (palette != null) {
-            mTopPlayer.onPaletteFound(palette);
-            mPlayPauseButton.onPaletteFound(palette);
-            mBackButton.onPaletteFound(palette);
-            mForwardButton.onPaletteFound(palette);
-            mDownloadButton.onPaletteFound(palette);
-            mFavoriteButton.onPaletteFound(palette);
-        } else {
-            PaletteCache.generate(item.image, getActivity());
+        if (item.image != null) {
+            Palette palette = PaletteCache.get(item.image);
+            if (palette != null) {
+                mTopPlayer.onPaletteFound(palette);
+                mPlayPauseButton.onPaletteFound(palette);
+                mBackButton.onPaletteFound(palette);
+                mForwardButton.onPaletteFound(palette);
+                mDownloadButton.onPaletteFound(palette);
+                mFavoriteButton.onPaletteFound(palette);
+            } else {
+                PaletteCache.generate(item.image, getActivity());
+            }
         }
 
         if (item != null) {
