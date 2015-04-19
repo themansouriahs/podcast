@@ -110,6 +110,7 @@
     <string name="discovery_subscribe">Subscribe</string>
     <string name="discovery_subscribe_toast">Subscribed to %s</string>
     <string name="discovery_unsubscribe_toast">Unsubscribed from %s</string>
+    <string name="subscription_no_title">(No title)</string>
 
     <plurals name="bulk_download_playlist">
         <item quantity="one">First episode in the playlist</item>
