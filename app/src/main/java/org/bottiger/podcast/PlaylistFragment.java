@@ -3,6 +3,7 @@ package org.bottiger.podcast;
 import org.bottiger.podcast.adapters.PlaylistAdapter;
 import org.bottiger.podcast.adapters.decoration.DragSortRecycler;
 import org.bottiger.podcast.adapters.decoration.InitialHeaderAdapter;
+import org.bottiger.podcast.images.FrescoHelper;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
@@ -410,13 +411,15 @@ public class PlaylistFragment extends GeastureFragment implements
             }
         }
 
-        if (item != null && item.image != null) {
-            Uri uri = Uri.parse(item.image);
+        if (item != null && item.getImageURL(getActivity()) != null) {
+            Uri uri = Uri.parse(item.getImageURL(getActivity()));
             mPhoto.setImageURI(uri);
+            //FrescoHelper.PalettePostProcessor postProcessor = new FrescoHelper.PalettePostProcessor(this, mUrl);
+            //FrescoHelper.loadImageInto(mPhotoView, mUrl, postProcessor);
         }
 
         if (mTopPlayer.getVisibleHeight() == 0) {
-            mTopPlayer.setPlayerHeight(1000);
+            mTopPlayer.setPlayerHeight(1500);
         }
     }
 

@@ -110,7 +110,7 @@ public class SubscriptionsFragment extends Fragment {
 		super.onActivityCreated(savedInstanceState);
 	}
 
-/*
+    /*
     private void setSubscriptionBackground(Cursor argCursor) {
         if (argCursor == null || argCursor.getCount() == 0) {
             mEmptySubscrptionList.setVisibility(View.VISIBLE);

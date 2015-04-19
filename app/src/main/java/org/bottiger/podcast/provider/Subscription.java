@@ -440,14 +440,14 @@ public class Subscription extends AbstractItem implements ISubscription, Palette
 		// Return item directly if cached
 		initCache();
 		synchronized (cache) {
-			Subscription cacheSub = cache.get(sub.id);
-			if (cacheSub != null && cacheSub.title != "") { // FIXME
-															// cacheItem.title
-															// != ""
-				sub = cacheSub;
-				return sub;
-			}
-		}
+            Subscription cacheSub = cache.get(sub.id);
+            if (cacheSub != null && cacheSub.title != "") { // FIXME
+                // cacheItem.title
+                // != ""
+                sub = cacheSub;
+                return sub;
+            }
+        }
 
 		int lastUpdatedIndex = cursor
 				.getColumnIndex(SubscriptionColumns.LAST_UPDATED);

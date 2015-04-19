@@ -1187,8 +1187,11 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
             return image;
 
 
+        /*
 		Subscription subscription = Subscription.getById(
 					context.getContentResolver(), sub_id);
+					*/
+        Subscription subscription = getSubscription(context);
 
         if (subscription == null)
             return null;
