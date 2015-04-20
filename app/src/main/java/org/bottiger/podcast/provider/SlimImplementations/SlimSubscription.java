@@ -1,16 +1,19 @@
 package org.bottiger.podcast.provider.SlimImplementations;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.bottiger.podcast.provider.ISubscription;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
  * Created by apl on 15-04-2015.
  */
-public class SlimSubscription implements ISubscription {
+public class SlimSubscription implements ISubscription, Parcelable {
 
     private String mTitle;
     private URL mURL;
@@ -74,5 +77,36 @@ public class SlimSubscription implements ISubscription {
     @Override
     public TYPE getType() {
         return TYPE.SLIM;
+    }
+
+    public int describeContents() {
+        return 0;
+    }
+
+    public void writeToParcel(Parcel out, int flags) {
+        out.writeString(mTitle);
+        out.writeString(mURL.toString());
+        out.writeString(mImageURL);
+    }
+
+    public static final Parcelable.Creator<SlimSubscription> CREATOR
+            = new Parcelable.Creator<SlimSubscription>() {
+        public SlimSubscription createFromParcel(Parcel in) {
+            return new SlimSubscription(in);
+        }
+
+        public SlimSubscription[] newArray(int size) {
+            return new SlimSubscription[size];
+        }
+    };
+
+    private SlimSubscription(Parcel in) {
+        mTitle = in.readString();
+        mImageURL = in.readString();
+        try {
+            mURL = new URL(in.readString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
     }
 }

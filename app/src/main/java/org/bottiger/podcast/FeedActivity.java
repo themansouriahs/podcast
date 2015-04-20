@@ -30,6 +30,8 @@ import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.playlist.FeedCursorLoader;
 import org.bottiger.podcast.playlist.ReorderCursor;
 import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.provider.SlimImplementations.SlimEpisode;
+import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
 import org.bottiger.podcast.utils.ColorExtractor;
@@ -41,6 +43,8 @@ import org.bottiger.podcast.views.FloatingActionButton;
 import org.bottiger.podcast.views.MultiShrink.feed.MultiShrinkScroller;
 import org.bottiger.podcast.views.MultiShrink.feed.QuickFeedImage;
 import org.bottiger.podcast.views.MultiShrink.feed.SchedulingUtils;
+
+import java.util.ArrayList;
 
 /**
  * Created by apl on 14-02-2015.
@@ -84,7 +88,11 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
     private boolean mIsExitAnimationInProgress;
     private boolean mHasComputedThemeColor;
 
+    public static final String FEED_ACTIVITY_IS_SLIM = "SlimActivity";
     public static final String SUBSCRIPTION_URL_KEY = "url";
+    public static final String SUBSCRIPTION_SLIM_KEY = "SlimSubscription";
+    public static final String EPISODES_SLIM_KEY = "SlimEpisodes";
+
     private ISubscription mSubscription = null;
 
     final MultiShrinkScroller.MultiShrinkScrollerListener mMultiShrinkScrollerListener
@@ -123,12 +131,23 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
     };
 
     public static void start(@NonNull Activity argActivity, @NonNull String argURL) {
-        Intent intent = new Intent(argActivity, FeedActivity.class);
-
         Bundle b = new Bundle();
+        b.putBoolean(FEED_ACTIVITY_IS_SLIM, false);
         b.putString(FeedActivity.SUBSCRIPTION_URL_KEY, argURL);
-        intent.putExtras(b);
+        startActivity(argActivity, b);
+    }
 
+    public static void startSlim(@NonNull Activity argActivity, @NonNull SlimSubscription argSubscription, @NonNull ArrayList<SlimEpisode> argEpisodes) {
+        Bundle b = new Bundle();
+        b.putBoolean(FEED_ACTIVITY_IS_SLIM, true);
+        b.putParcelable(SUBSCRIPTION_SLIM_KEY, argSubscription);
+        b.putParcelableArrayList(EPISODES_SLIM_KEY, argEpisodes);
+        startActivity(argActivity, b);
+    }
+
+    private static void startActivity(@NonNull Activity argActivity, @NonNull Bundle argBundle) {
+        Intent intent = new Intent(argActivity, FeedActivity.class);
+        intent.putExtras(argBundle);
         argActivity.startActivity(intent);
         argActivity.overridePendingTransition(R.anim.slide_in_bottom, R.anim.slide_out_bottom);
     }

@@ -18,6 +18,7 @@ import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.PaletteCache;
 import org.bottiger.podcast.views.DownloadButtonView;
@@ -28,16 +29,20 @@ import org.bottiger.podcast.views.PlayerButtonView;
 /**
  * Created by apl on 02-09-2014.
  */
-public class FeedViewAdapter extends AbstractEpisodeCursorAdapter<FeedViewAdapter.EpisodeViewHolder> {
+public class FeedViewAdapter extends RecyclerView.Adapter {
 
-    private Subscription mSubscription;
+    private ISubscription mSubscription;
+
+    protected Cursor mCursor;
+    protected Context mContext;
+    protected LayoutInflater mInflater;
+
+    protected Palette mPalette;
 
     private DownloadProgressObservable mDownloadProgressObservable;
-    private Palette mPalette;
     private boolean mIsExpanded = false;
 
     public FeedViewAdapter(Context context, Cursor dataset) {
-        super(dataset);
         mContext = context;
 
         mInflater = (LayoutInflater) context
@@ -59,9 +64,7 @@ public class FeedViewAdapter extends AbstractEpisodeCursorAdapter<FeedViewAdapte
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        mCursor.moveToPosition(position);
-
-        final FeedItem item = FeedItem.getByCursor(mCursor);
+        final FeedItem item = getItemForPosition(position);
         final EpisodeViewHolder episodeViewHolder = (EpisodeViewHolder) viewHolder;
 
         if (mSubscription == null) {
@@ -100,11 +103,7 @@ public class FeedViewAdapter extends AbstractEpisodeCursorAdapter<FeedViewAdapte
             episodeViewHolder.mDownloadButton.onPaletteFound(mPalette);
         }
 
-        if (mSubscription.getPaletteUrl() != null) {
-            Palette palette = PaletteCache.get(mSubscription);
-            if (palette != null)
-                mPalette = palette;
-        }
+        getPalette(mSubscription);
     }
 
     @Override
@@ -124,6 +123,20 @@ public class FeedViewAdapter extends AbstractEpisodeCursorAdapter<FeedViewAdapte
     public void setExpanded(boolean expanded) {
         this.mIsExpanded = expanded;
         notifyDataSetChanged();
+    }
+
+    protected FeedItem getItemForPosition(int argPosition) {
+        mCursor.moveToPosition(argPosition);
+        return FeedItem.getByCursor(mCursor);
+    }
+
+    protected void getPalette(ISubscription argSubscription) {
+        Subscription subscription = ((Subscription)argSubscription);
+        if ((subscription).getPaletteUrl() != null) {
+            Palette palette = PaletteCache.get(subscription);
+            if (palette != null)
+                mPalette = palette;
+        }
     }
 
     public class EpisodeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

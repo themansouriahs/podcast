@@ -41,7 +41,7 @@ import android.util.Log;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
-public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
+public class FeedItem extends AbstractItem implements IEpisode, Comparable<FeedItem> {
 
 	public static final int MAX_DOWNLOAD_FAIL = 5;
 
