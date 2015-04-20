@@ -1,5 +1,6 @@
 package org.bottiger.podcast.notification;
 
+import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.Player.PlayerStateManager;
 import org.bottiger.podcast.R;
@@ -14,6 +15,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.media.session.MediaController;
@@ -155,6 +157,8 @@ public class NotificationPlayer {
             return null;
         }
 
+
+
         String bitmapstring = icon == null ? "null" : "present";
         Log.d("NotificationPlayer", "Build notification, icon => " + bitmapstring);
 
@@ -168,9 +172,25 @@ public class NotificationPlayer {
             mBuilder.setLargeIcon(icon);
         }
 
+        mBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
+
         mBuilder.setOnlyAlertOnce(true);
 
         Intent resultIntent = new Intent(mContext, MainActivity.class);
+
+        int pause;
+        int play;
+        int next;
+
+        if (isLight(0)) {
+            pause = R.drawable.ic_play_arrow_black;
+            play = R.drawable.ic_pause_black;
+            next = R.drawable.ic_skip_next_black;
+        } else {
+            pause = R.drawable.ic_play_arrow_white;
+            play = R.drawable.ic_pause_white;
+            next = R.drawable.ic_skip_next_white;
+        }
 
         // Sets a custom content view for the notification, including an image button.
         RemoteViews layout = new RemoteViews(mContext.getPackageName(), R.layout.notification);
@@ -191,10 +211,11 @@ public class NotificationPlayer {
 
         //PlayerStatusListener.registerImageView(, mContext);
 
-        int srcId = R.drawable.ic_play_arrow_black;
-        if (isPlaying) srcId = R.drawable.ic_pause_black;
+        int srcId = pause;
+        if (isPlaying) srcId = play;
 
         layout.setImageViewResource(R.id.play_pause_button, srcId);
+        layout.setImageViewResource(R.id.next_button, next);
 
         mBuilder.setContent(layout);
 
@@ -253,9 +274,23 @@ public class NotificationPlayer {
         mBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
 
 
-        mBuilder.addAction(generateAction(android.R.drawable.ic_media_pause, "Pause", PlayerService.ACTION_PAUSE));
-        mBuilder.addAction(generateAction(android.R.drawable.ic_media_play, "Play", PlayerService.ACTION_PLAY));
-        mBuilder.addAction(generateAction(android.R.drawable.ic_media_next, "Next", PlayerService.ACTION_PLAY));
+        int pause;
+        int play;
+        int next;
+
+        if (!isLight(0)) {
+            pause = R.drawable.ic_play_arrow_black;
+            play = R.drawable.ic_pause_black;
+            next = R.drawable.ic_skip_next_black;
+        } else {
+            pause = R.drawable.ic_play_arrow_white;
+            play = R.drawable.ic_pause_white;
+            next = R.drawable.ic_skip_next_white;
+        }
+
+        mBuilder.addAction(generateAction(pause, "Pause", PlayerService.ACTION_PAUSE));
+        mBuilder.addAction(generateAction(play, "Play", PlayerService.ACTION_PLAY));
+        mBuilder.addAction(generateAction(next, "Next", PlayerService.ACTION_PLAY));
 
         Intent resultIntent = new Intent(mContext, NotificationReceiver.class);
         // The stack builder object will contain an artificial back stack for the
@@ -277,6 +312,24 @@ public class NotificationPlayer {
         mBuilder.setContentIntent(resultPendingIntent);
 
         return mBuilder;
+    }
+
+    /**
+     * http://stackoverflow.com/questions/4679715/is-there-a-way-to-tell-if-a-html-hex-colour-is-light-or-dark
+     *
+     * A more natural approach might be using the HSL colorspace. You can use the third component ("lightness") to figure out h
+     * ow light a colour is. That will work for most purposes.
+     *
+     * Plenty of descriptions out there by googling. Basically you take the colour component with the highest value
+     * (let's say it's red) and the one with the lowest (say, green). In this case:
+     *
+     * L = (red + green) / (255*2.0)
+     *
+     * Assuming you extracted your colours as values from 0 to 255. You'll get a value between 0 and 1. A light colour
+     * could be any colour with a lightness above a certain arbitrary value (for instance, 0.6).
+     */
+    private static boolean isLight(int argColor) {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
     }
 
 	

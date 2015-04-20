@@ -93,6 +93,9 @@
         <item name="android:spinnerItemStyle">@style/spinnerItemStyle</item>
     </style>
 
+    <style name="NotificationText" parent="android:TextAppearance.StatusBar.EventContent" />
+    <style name="NotificationTitle" parent="android:TextAppearance.StatusBar.EventContent.Title" />
+
     <style name="SoundWaves.PreferenceActivity.Light" parent="SoundWavesTheme.Light">
         <item name="android:windowTranslucentNavigation" tools:targetApi="19">false</item> <!-- actionbar and  bottom navigation -->
         <item name="android:windowTranslucentStatus" tools:targetApi="19">false</item> <!-- top statusbar -->
