@@ -5,10 +5,14 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by apl on 15-04-2015.
@@ -18,6 +22,7 @@ public class SlimSubscription implements ISubscription, Parcelable {
     private String mTitle;
     private URL mURL;
     private String mImageURL;
+    private ArrayList<SlimEpisode> mEpisodes = new ArrayList<>();
 
     public SlimSubscription(@NonNull String argTitle, @NonNull URL argURL, @Nullable String argImageURL) {
         mTitle = argTitle;
@@ -74,6 +79,14 @@ public class SlimSubscription implements ISubscription, Parcelable {
         return false;
     }
 
+    public ArrayList<SlimEpisode> getEpisodes() {
+        return mEpisodes;
+    }
+
+    public void getEpisodes(ArrayList<SlimEpisode> argEpisodes) {
+        mEpisodes = argEpisodes;
+    }
+
     @Override
     public TYPE getType() {
         return TYPE.SLIM;
@@ -84,9 +97,13 @@ public class SlimSubscription implements ISubscription, Parcelable {
     }
 
     public void writeToParcel(Parcel out, int flags) {
+        SlimEpisode[] episodeArray = mEpisodes.toArray(new SlimEpisode[mEpisodes.size()]);
+
+        // I think the order is important
         out.writeString(mTitle);
-        out.writeString(mURL.toString());
         out.writeString(mImageURL);
+        out.writeString(mURL.toString());
+        out.writeParcelableArray(episodeArray, PARCELABLE_WRITE_RETURN_VALUE);
     }
 
     public static final Parcelable.Creator<SlimSubscription> CREATOR
@@ -108,5 +125,6 @@ public class SlimSubscription implements ISubscription, Parcelable {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
+        mEpisodes = in.readArrayList(SlimEpisode.class.getClassLoader());
     }
 }

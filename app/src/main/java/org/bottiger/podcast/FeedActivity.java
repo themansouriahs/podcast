@@ -137,11 +137,10 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
         startActivity(argActivity, b);
     }
 
-    public static void startSlim(@NonNull Activity argActivity, @NonNull SlimSubscription argSubscription, @NonNull ArrayList<SlimEpisode> argEpisodes) {
+    public static void startSlim(@NonNull Activity argActivity, @NonNull SlimSubscription argSubscription) {
         Bundle b = new Bundle();
         b.putBoolean(FEED_ACTIVITY_IS_SLIM, true);
         b.putParcelable(SUBSCRIPTION_SLIM_KEY, argSubscription);
-        b.putParcelableArrayList(EPISODES_SLIM_KEY, argEpisodes);
         startActivity(argActivity, b);
     }
 

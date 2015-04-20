@@ -3,6 +3,7 @@ package org.bottiger.podcast.provider;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.SoundWaves;
@@ -328,7 +329,8 @@ public class Subscription extends AbstractItem implements ISubscription, Palette
 		context.delete(uri, null, null);
 	}
 
-	public LinkedList<FeedItem> getFeedItems(ContentResolver contentResolver) {
+	public List<IEpisode> getEpisodes() {
+        /*
 		LinkedList<FeedItem> episodes = new LinkedList<FeedItem>();
 		Cursor itemCursor = contentResolver.query(ItemColumns.URI,
 				ItemColumns.ALL_COLUMNS, ItemColumns.SUBS_ID + "==" + this.id,
@@ -337,8 +339,8 @@ public class Subscription extends AbstractItem implements ISubscription, Palette
 				.moveToNext()) {
 			episodes.add(FeedItem.getByCursor(itemCursor));
 		}
-
-		return episodes;
+        */
+		return null; //episodes;
 	}
     private class RefreshSyncTask extends AsyncTask<Context, Void, Void> {
         protected Void doInBackground(Context... contexts) {
