@@ -22,7 +22,7 @@ public class NSITunes extends Namespace{
 
 		if (localName.equals(IMAGE) ) { // && state.getSubscription().getImage() == null) {
 
-            state.getSubscription().imageURL = attributes.getValue(IMAGE_HREF);
+            state.getSubscription().setImageURL(attributes.getValue(IMAGE_HREF));
             /*
 			FeedImage image = new FeedImage();
 			image.setTitle(IMAGE_TITLE);

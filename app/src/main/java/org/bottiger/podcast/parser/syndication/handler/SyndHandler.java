@@ -10,6 +10,7 @@ import org.bottiger.podcast.parser.syndication.namespace.NSSimpleChapters;
 import org.bottiger.podcast.parser.syndication.namespace.Namespace;
 import org.bottiger.podcast.parser.syndication.namespace.SyndElement;
 import org.bottiger.podcast.parser.syndication.namespace.atom.NSAtom;
+import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
 import org.xml.sax.Attributes;
@@ -26,7 +27,7 @@ public class SyndHandler extends DefaultHandler {
 	private static final String DEFAULT_PREFIX = "";
 	protected HandlerState state;
 
-	public SyndHandler(ContentResolver contentResolver, Subscription feed, TypeGetter.Type type) {
+	public SyndHandler(ContentResolver contentResolver, ISubscription feed, TypeGetter.Type type) {
 		this.contentResolver = contentResolver;
 		state = new HandlerState(feed);
 		if (type == TypeGetter.Type.RSS20 || type == TypeGetter.Type.RSS091) {
@@ -128,12 +129,14 @@ public class SyndHandler extends DefaultHandler {
 	@Override
 	public void endDocument() throws SAXException {
 		super.endDocument();
-		Subscription subscription = state.getSubscription();
+		ISubscription subscription = state.getSubscription();
 
         Log.d(SubscriptionRefreshManager.DEBUG_KEY, "Done Parsing: " + subscription);
 		FeedUpdater updater = new FeedUpdater(contentResolver);
 
-		updater.updateDatabase(subscription, state.getItems());
+        if (subscription instanceof Subscription) {
+            updater.updateDatabase((Subscription)subscription, state.getItems());
+        }
         Log.d(SubscriptionRefreshManager.DEBUG_KEY, "Done updating database for: " + subscription);
 	}
 

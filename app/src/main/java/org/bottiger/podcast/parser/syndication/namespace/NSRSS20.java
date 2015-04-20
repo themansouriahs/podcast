@@ -5,6 +5,8 @@ import org.bottiger.podcast.parser.syndication.handler.HandlerState;
 import org.bottiger.podcast.parser.syndication.util.SyndDateUtils;
 import org.bottiger.podcast.parser.syndication.util.SyndTypeUtils;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.provider.Subscription;
 import org.jsoup.Jsoup;
 import org.xml.sax.Attributes;
 
@@ -46,7 +48,10 @@ public class NSRSS20 extends Namespace {
 		if (localName.equals(ITEM)) {
 			state.setCurrentItem(new FeedItem());
 			state.getItems().add(state.getCurrentItem());
-			state.getCurrentItem().setFeed(state.getSubscription());
+
+            if (state.getSubscription().getType() == ISubscription.TYPE.DEFAULT) {
+                state.getCurrentItem().setFeed((Subscription)state.getSubscription());
+            }
 
 		} else if (localName.equals(ENCLOSURE)) {
 			String type = attributes.getValue(ENC_TYPE);
@@ -118,7 +123,7 @@ public class NSRSS20 extends Namespace {
 			} else if (top.equals(LINK)) {
 				if (second.equals(CHANNEL)) {
 					// FIXME
-					state.getSubscription().setLink(content);
+					state.getSubscription().setURL(content);
 				} else if (second.equals(ITEM)) {
 					//state.getCurrentItem().setLink(content);
                     if (TextUtils.isEmpty(state.getCurrentItem().url)) {
@@ -133,13 +138,13 @@ public class NSRSS20 extends Namespace {
                 }
 			} else if (top.equals(URL) && second.equals(IMAGE) && third != null && third.equals(CHANNEL)) {
 
-				if (!TextUtils.isEmpty(state.getSubscription().imageURL)) {
-                    state.getSubscription().imageURL = content;
+				if (!TextUtils.isEmpty(state.getSubscription().getImageURL())) {
+                    state.getSubscription().setImageURL(content);
                 }
 
 			} else if (top.equals(ITUNES_IMAGE)) {
 
-                state.getSubscription().imageURL = content;
+                state.getSubscription().setImageURL(content);
 
             } else if (localName.equals(DESCR)) {
 				if (second.equals(CHANNEL)) {

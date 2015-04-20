@@ -29,6 +29,7 @@ import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.playlist.FeedCursorLoader;
 import org.bottiger.podcast.playlist.ReorderCursor;
+import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
 import org.bottiger.podcast.utils.ColorExtractor;
@@ -84,7 +85,7 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
     private boolean mHasComputedThemeColor;
 
     public static final String SUBSCRIPTION_URL_KEY = "url";
-    private Subscription mSubscription = null;
+    private ISubscription mSubscription = null;
 
     final MultiShrinkScroller.MultiShrinkScrollerListener mMultiShrinkScrollerListener
             = new MultiShrinkScroller.MultiShrinkScrollerListener() {
@@ -151,8 +152,8 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
             throw new IllegalStateException("Episode can not be null");
         }
 
-        if (mSubscription.IsDirty()) {
-            mSubscription.update(this.getContentResolver());
+        if (mSubscription.IsDirty() && mSubscription.getType() == ISubscription.TYPE.DEFAULT) {
+            ((Subscription)mSubscription).update(this.getContentResolver());
         }
 
         // Show QuickContact in front of soft input
@@ -222,8 +223,10 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
         mAdapter = new FeedViewAdapter(this, mCursor);
         mRecyclerView.setAdapter(mAdapter);
 
-        mCursorLoader = new FeedCursorLoader(this, mAdapter, mCursor, mSubscription);
-        mCursorLoader.requery();
+        if (mSubscription.getType() == ISubscription.TYPE.DEFAULT) {
+            mCursorLoader = new FeedCursorLoader(this, mAdapter, mCursor, (Subscription)mSubscription);
+            mCursorLoader.requery();
+        }
 
         mMultiShrinkScroller.initialize(mMultiShrinkScrollerListener, mExtraMode == MODE_FULLY_EXPANDED);
         mMultiShrinkScroller.setTitle(mSubscription.getTitle());
@@ -287,9 +290,11 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
         super.onStart();
         PaletteObservable.registerListener(this);
 
-        if (mSubscription.getPaletteUrl() != null) {
-            Palette palette = PaletteCache.get(mSubscription.getPaletteUrl());
-            onPaletteFound(palette);
+        if (mSubscription.getType() == ISubscription.TYPE.DEFAULT) {
+            if (((Subscription)mSubscription).getPaletteUrl() != null) {
+                Palette palette = PaletteCache.get(((Subscription)mSubscription).getPaletteUrl());
+                onPaletteFound(palette);
+            }
         }
     }
 

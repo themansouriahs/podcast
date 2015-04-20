@@ -21,6 +21,7 @@ import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.images.RequestManager;
 import org.bottiger.podcast.parser.syndication.handler.FeedHandler;
 import org.bottiger.podcast.parser.syndication.handler.UnsupportedFeedtypeException;
+import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
 import org.xml.sax.SAXException;
@@ -100,7 +101,7 @@ public class SubscriptionRefreshManager {
         refresh(null, null);
     }
 
-    public void refresh(Subscription subscription, IDownloadCompleteCallback argCallback) {
+    public void refresh(ISubscription subscription, IDownloadCompleteCallback argCallback) {
         Log.d(DEBUG_KEY, "refresh subscription: " + subscription + " (null => all)");
 
 
@@ -123,7 +124,7 @@ public class SubscriptionRefreshManager {
         //sRequestQueue.start();
     }
 
-    private void addSubscriptionToQueue(@NonNull final Context argContext, @NonNull final Subscription argSubscription, RequestQueue requestQueue, IDownloadCompleteCallback argCallback) {
+    private void addSubscriptionToQueue(@NonNull final Context argContext, @NonNull final ISubscription argSubscription, RequestQueue requestQueue, IDownloadCompleteCallback argCallback) {
         Log.d(DEBUG_KEY, "Adding to queue: " + argSubscription);
 
         if (argSubscription == null) {
@@ -131,7 +132,7 @@ public class SubscriptionRefreshManager {
             return;
         }
 
-        String subscriptionUrl = argSubscription.getUrl();
+        String subscriptionUrl = argSubscription.getURL().toString();
 
         if (TextUtils.isEmpty(subscriptionUrl)) {
             VendorCrashReporter.report(ACRA_KEY, "subscription.url=empty");
@@ -223,7 +224,7 @@ public class SubscriptionRefreshManager {
     }
 
     private static void processResponse(ContentResolver contentResolver,
-                                        IDownloadCompleteCallback argCallback, @NonNull Subscription subscription, String argResponse) {
+                                        IDownloadCompleteCallback argCallback, @NonNull ISubscription subscription, String argResponse) {
         Log.d(DEBUG_KEY, "Volley response from: " + subscription);
         //new ParseFeedTask().execute(response);
 
@@ -234,22 +235,22 @@ public class SubscriptionRefreshManager {
         } catch (SAXException e) {
             Log.d(DEBUG_KEY, "Parsing EXCEPTION: " + subscription);
             VendorCrashReporter.handleException(e);
-            VendorCrashReporter.report("subscription1", subscription.getUrl());
+            VendorCrashReporter.report("subscription1", subscription.getURL().toString());
             e.printStackTrace();
         } catch (IOException e) {
             Log.d(DEBUG_KEY, "Parsing EXCEPTION: " + subscription);
             VendorCrashReporter.handleException(e);
-            VendorCrashReporter.report("subscription2", subscription.getUrl());
+            VendorCrashReporter.report("subscription2", subscription.getURL().toString());
             e.printStackTrace();
         } catch (ParserConfigurationException e) {
             Log.d(DEBUG_KEY, "Parsing EXCEPTION: " + subscription);
             VendorCrashReporter.handleException(e);
-            VendorCrashReporter.report("subscription3", subscription.getUrl());
+            VendorCrashReporter.report("subscription3", subscription.getURL().toString());
             e.printStackTrace();
         } catch (UnsupportedFeedtypeException e) {
             Log.d(DEBUG_KEY, "Parsing EXCEPTION: " + subscription);
             VendorCrashReporter.handleException(e);
-            VendorCrashReporter.report("subscription4", subscription.getUrl());
+            VendorCrashReporter.report("subscription4", subscription.getURL().toString());
             e.printStackTrace();
         }
 

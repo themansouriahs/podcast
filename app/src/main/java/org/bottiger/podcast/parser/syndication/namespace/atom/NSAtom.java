@@ -6,6 +6,8 @@ import org.bottiger.podcast.parser.syndication.namespace.Namespace;
 import org.bottiger.podcast.parser.syndication.namespace.SyndElement;
 import org.bottiger.podcast.parser.syndication.util.SyndDateUtils;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.provider.Subscription;
 import org.xml.sax.Attributes;
 
 
@@ -59,7 +61,10 @@ public class NSAtom extends Namespace {
 		if (localName.equals(ENTRY)) {
 			state.setCurrentItem(new FeedItem());
 			state.getItems().add(state.getCurrentItem());
-			state.getCurrentItem().setFeed(state.getSubscription());
+
+            if (state.getSubscription().getType() == ISubscription.TYPE.DEFAULT) {
+                state.getCurrentItem().setFeed((Subscription)state.getSubscription());
+            }
 		} else if (localName.matches(isText)) {
 			String type = attributes.getValue(TEXT_TYPE);
 			return new AtomText(localName, this, type);
@@ -173,7 +178,7 @@ public class NSAtom extends Namespace {
 				}
 			} else if (top.equals(IMAGE)) {
 				//state.getSubscription().setImage(new FeedImage(content, null));
-				state.getSubscription().imageURL = content;
+				state.getSubscription().setImageURL(content);
 			}
 
 		}

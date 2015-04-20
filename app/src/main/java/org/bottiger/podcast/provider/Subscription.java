@@ -550,6 +550,11 @@ public class Subscription extends AbstractItem implements ISubscription, Palette
     }
 
     @Override
+    public TYPE getType() {
+        return TYPE.DEFAULT;
+    }
+
+    @Override
     public String getPaletteUrl() {
         return getImageURL();
     }
@@ -572,7 +577,13 @@ public class Subscription extends AbstractItem implements ISubscription, Palette
 		return null;
 	}
 
-	@Override
+    @NonNull
+    @Override
+    public String getURLString() {
+        return getURL() == null ? "" : getURL().toString();
+    }
+
+    @Override
 	public long getId() {
 		return id;
 	}

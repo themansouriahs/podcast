@@ -34,9 +34,45 @@ public class SlimSubscription implements ISubscription {
         return mURL;
     }
 
+    @NonNull
+    @Override
+    public String getURLString() {
+        return "";
+    }
+
     @Nullable
     @Override
     public String getImageURL() {
         return mImageURL;
+    }
+
+    @Override
+    public void setImageURL(@Nullable String argUrl) {
+
+    }
+
+    @Override
+    public void setTitle(@Nullable String argTitle) {
+
+    }
+
+    @Override
+    public void setDescription(@Nullable String argDescription) {
+
+    }
+
+    @Override
+    public void setURL(@Nullable String argUrl) {
+
+    }
+
+    @Override
+    public boolean IsDirty() {
+        return false;
+    }
+
+    @Override
+    public TYPE getType() {
+        return TYPE.SLIM;
     }
 }

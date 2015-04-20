@@ -14,15 +14,17 @@ import org.acra.ACRA;
 import org.apache.commons.io.input.XmlStreamReader;
 import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import android.content.ContentResolver;
+import android.support.annotation.NonNull;
 
 public class FeedHandler {
 
-	public Subscription parseFeed(ContentResolver contentResolver, Subscription subscription, String feedContent) throws SAXException, IOException,
+	public ISubscription parseFeed(ContentResolver contentResolver, @NonNull ISubscription subscription, String feedContent) throws SAXException, IOException,
 			ParserConfigurationException, UnsupportedFeedtypeException {
 
         if (subscription == null) {
@@ -40,7 +42,7 @@ public class FeedHandler {
             factory.setNamespaceAware(true);
             SAXParser saxParser = factory.newSAXParser();
             //File file = new File(feed.getFile_url());
-            File file = new File(subscription.url);
+            File file = new File(subscription.getURL().toString());
             InputStream stream = new ByteArrayInputStream(feedContent.getBytes());
 
             Reader inputStreamReader = new XmlStreamReader(stream, false, "UTF-8");
