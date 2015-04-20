@@ -23,6 +23,7 @@ import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.Subscription;
 import org.xmlpull.v1.XmlPullParserException;
 
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.Resources;
@@ -133,9 +134,22 @@ public class OPMLImportExport {
 		return numImported;
 	}
 
-	private void toastMsg(CharSequence msg) {
-		int duration = Toast.LENGTH_LONG;
-		Toast.makeText(mContext, msg, duration).show();
+	private void toastMsg(final CharSequence msg) {
+        Activity activity = null;
+
+        if (mContext instanceof Activity) {
+            activity = (Activity)mContext;
+        }
+
+        if (activity == null) return;
+
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                int duration = Toast.LENGTH_LONG;
+                Toast.makeText(mContext, msg, duration).show();
+            }
+        });
 	}
 
     public void exportSubscriptions() {

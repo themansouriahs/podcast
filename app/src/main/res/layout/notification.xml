@@ -10,6 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
         android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
         android:layout_alignParentLeft="true"
         android:layout_margin="0dp"
         android:contentDescription="Podcast icon"/>
@@ -21,12 +22,11 @@
             android:layout_marginTop="7dp"
             android:layout_marginLeft="7dp"
             android:text="Title"
-            style="Custom Notification Title"
+            android:textAppearance="@style/NotificationTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:singleLine="true"
             android:textSize="16sp"
-            android:textColor="@color/black"
              />
     <!--
     android:layout_marginRight="53dp"
@@ -40,12 +40,11 @@
             android:layout_marginTop="7dp"
             android:layout_marginLeft="7dp"
             android:text="Content"
-            style="Custom Notification Text"
+            android:textAppearance="@style/NotificationText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:singleLine="true"
-            android:textSize="16sp"
-            android:textColor="@color/grayStart"/>
+            android:textSize="16sp"/>
 
     <ImageView
         android:id="@+id/next_button"
