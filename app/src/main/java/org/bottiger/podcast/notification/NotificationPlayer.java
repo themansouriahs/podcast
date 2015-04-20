@@ -158,13 +158,29 @@ public class NotificationPlayer {
         }
 
 
+        int pause;
+        int play;
+        int next;
+        int smallIcon;
+
+        if (isLight(0)) {
+            pause = R.drawable.ic_play_arrow_black;
+            play = R.drawable.ic_pause_black;
+            next = R.drawable.ic_skip_next_black;
+            smallIcon = R.drawable.ic_stat_notify;
+        } else {
+            pause = R.drawable.ic_play_arrow_white;
+            play = R.drawable.ic_pause_white;
+            next = R.drawable.ic_skip_next_white;
+            smallIcon = R.drawable.ic_stat_notify_white;
+        }
 
         String bitmapstring = icon == null ? "null" : "present";
         Log.d("NotificationPlayer", "Build notification, icon => " + bitmapstring);
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(mContext)
-                        .setSmallIcon(R.drawable.ic_stat_notify)
+                        .setSmallIcon(smallIcon)
                         .setContentTitle(item.title)
                         .setContentText(item.sub_title);
 
@@ -173,24 +189,12 @@ public class NotificationPlayer {
         }
 
         mBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
+        mBuilder.setCategory("CATEGORY_TRANSPORT");
+        mBuilder.setPriority(NotificationCompat.PRIORITY_MAX);
 
         mBuilder.setOnlyAlertOnce(true);
 
         Intent resultIntent = new Intent(mContext, MainActivity.class);
-
-        int pause;
-        int play;
-        int next;
-
-        if (isLight(0)) {
-            pause = R.drawable.ic_play_arrow_black;
-            play = R.drawable.ic_pause_black;
-            next = R.drawable.ic_skip_next_black;
-        } else {
-            pause = R.drawable.ic_play_arrow_white;
-            play = R.drawable.ic_pause_white;
-            next = R.drawable.ic_skip_next_white;
-        }
 
         // Sets a custom content view for the notification, including an image button.
         RemoteViews layout = new RemoteViews(mContext.getPackageName(), R.layout.notification);
@@ -239,77 +243,6 @@ public class NotificationPlayer {
 
         mNotificationManager =
                 (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        return mBuilder;
-    }
-
-    @Nullable
-    @TargetApi(21)
-    private Notification.Builder mediaStyleNotification(@NonNull Boolean isPlaying, @NonNull PlayerService argPlayerService, @Nullable Bitmap icon) {
-
-        if (item == null) {
-            return null;
-        }
-
-        mNotificationManager =
-                (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        //Bitmap icon = new BitmapProvider(mContext, item).createBitmapFromMediaFile(128, 128);
-
-        PlayerStateManager playerStateManager = argPlayerService.getPlayerStateManager();
-        Notification.MediaStyle mediaStyle = new Notification.MediaStyle()
-                .setMediaSession(playerStateManager.getToken())
-                .setShowActionsInCompactView(0);
-
-        Notification.Builder mBuilder = new Notification.Builder(mContext)
-                .setSmallIcon(R.drawable.soundwaves) //.setSmallIcon(R.drawable.soundwaves)
-                .setLargeIcon(icon)     // setMediaSession(token, true)
-                .setContentTitle(item.title)     // these three lines are optional
-                .setContentText(item.sub_title)   // if you use
-                        //.setMediaSession(PlayerService.SESSION_ID, true) // , true)
-                .setStyle(mediaStyle);
-
-        mBuilder.setOngoing(true);
-        mBuilder.setShowWhen(false);
-        mBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
-
-
-        int pause;
-        int play;
-        int next;
-
-        if (!isLight(0)) {
-            pause = R.drawable.ic_play_arrow_black;
-            play = R.drawable.ic_pause_black;
-            next = R.drawable.ic_skip_next_black;
-        } else {
-            pause = R.drawable.ic_play_arrow_white;
-            play = R.drawable.ic_pause_white;
-            next = R.drawable.ic_skip_next_white;
-        }
-
-        mBuilder.addAction(generateAction(pause, "Pause", PlayerService.ACTION_PAUSE));
-        mBuilder.addAction(generateAction(play, "Play", PlayerService.ACTION_PLAY));
-        mBuilder.addAction(generateAction(next, "Next", PlayerService.ACTION_PLAY));
-
-        Intent resultIntent = new Intent(mContext, NotificationReceiver.class);
-        // The stack builder object will contain an artificial back stack for the
-        // started Activity.
-        // This ensures that navigating backward from the Activity leads out of
-        // your application to the Home screen.
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(mContext);
-        // Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(MainActivity.class);
-        // Adds the Intent that starts the Activity to the top of the stack
-        stackBuilder.addNextIntent(resultIntent);
-
-        PendingIntent resultPendingIntent =
-                stackBuilder.getPendingIntent(
-                        0,
-                        PendingIntent.FLAG_UPDATE_CURRENT
-                );
-
-        mBuilder.setContentIntent(resultPendingIntent);
 
         return mBuilder;
     }
