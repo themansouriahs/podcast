@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
+import org.bottiger.podcast.FeedActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.adapters.viewholders.discovery.SearchResultViewHolder;
 import org.bottiger.podcast.provider.ISubscription;
@@ -71,7 +72,15 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
             holder.image.setBackgroundColor(mDefaultBackgroundColor);
         }
 
-        URL url = subscription.getURL();
+        final URL url = subscription.getURL();
+
+        holder.image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FeedActivity.start(mActivity, url.toString());
+            }
+        });
+
         boolean isSubscribed = mSubscribedUrls.contains(url);
 
         holder.toggleSwitch.setOnCheckedChangeListener(null);

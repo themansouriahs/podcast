@@ -135,7 +135,7 @@ public class SubscriptionGridCursorAdapter extends CursorRecyclerAdapter {
         argHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FeedActivity.start(mActivity, subscription.getId());
+                FeedActivity.start(mActivity, subscription.getUrl());
             }
         });
 

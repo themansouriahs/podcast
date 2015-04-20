@@ -6,10 +6,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,27 +17,11 @@ import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
-
-import com.facebook.common.references.CloseableReference;
-import com.facebook.common.references.ResourceReleaser;
-import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.drawee.controller.BaseControllerListener;
-import com.facebook.drawee.controller.ControllerListener;
-import com.facebook.drawee.interfaces.DraweeController;
-import com.facebook.imagepipeline.bitmaps.PlatformBitmapFactory;
-import com.facebook.imagepipeline.image.CloseableBitmap;
-import com.facebook.imagepipeline.image.CloseableImage;
-import com.facebook.imagepipeline.image.CloseableStaticBitmap;
-import com.facebook.imagepipeline.image.ImmutableQualityInfo;
-import com.facebook.imagepipeline.request.Postprocessor;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import org.bottiger.podcast.adapters.FeedViewAdapter;
 import org.bottiger.podcast.images.FrescoHelper;
@@ -102,7 +83,7 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
     private boolean mIsExitAnimationInProgress;
     private boolean mHasComputedThemeColor;
 
-    public static final String SUBSCRIPTION_ID_KEY = "episodeID";
+    public static final String SUBSCRIPTION_URL_KEY = "url";
     private Subscription mSubscription = null;
 
     final MultiShrinkScroller.MultiShrinkScrollerListener mMultiShrinkScrollerListener
@@ -140,11 +121,11 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
         }
     };
 
-    public static void start(@NonNull Activity argActivity, long argId) {
+    public static void start(@NonNull Activity argActivity, @NonNull String argURL) {
         Intent intent = new Intent(argActivity, FeedActivity.class);
 
         Bundle b = new Bundle();
-        b.putLong(FeedActivity.SUBSCRIPTION_ID_KEY, argId);
+        b.putString(FeedActivity.SUBSCRIPTION_URL_KEY, argURL);
         intent.putExtras(b);
 
         argActivity.startActivity(intent);
@@ -320,8 +301,8 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
 
     private void processIntent(Intent argIntent) {
         Bundle b = getIntent().getExtras();
-        long value = b.getLong(SUBSCRIPTION_ID_KEY);
-        mSubscription = Subscription.getById(getContentResolver(), value);
+        String value = b.getString(SUBSCRIPTION_URL_KEY);
+        mSubscription = Subscription.getByUrl(getContentResolver(), value);
     }
 
     @Override
