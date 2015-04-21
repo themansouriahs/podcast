@@ -302,8 +302,8 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity {
 		mDrawerLayout.closeDrawer(mDrawerContainer);
 
 		if (position == 1) {
-			Intent intent = new Intent(this, DownloadActivity.class);
-			startActivity(intent);
+			//Intent intent = new Intent(this, DownloadActivity.class);
+			//startActivity(intent);
 		}
 	}
 
