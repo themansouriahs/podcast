@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,12 +16,13 @@ import android.widget.Toast;
 
 import org.bottiger.podcast.FeedActivity;
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.adapters.viewholders.discovery.SearchResultViewHolder;
 import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
-import org.bottiger.podcast.views.PlaylistViewHolder;
+import org.bottiger.podcast.service.IDownloadCompleteCallback;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -39,6 +41,20 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
     private int mDefaultBackgroundColor = 0;
     private ArrayList<ISubscription> mDataset = new ArrayList<>();
     private HashSet<URL> mSubscribedUrls = new HashSet<>();
+    private LruCache<String,SlimSubscription> mCache = new LruCache<>(10);
+
+    IDownloadCompleteCallback mRefreshCompleteCallback = new IDownloadCompleteCallback() {
+        @Override
+        public void complete(boolean argSucces, ISubscription argSubscription) {
+            if (!argSucces)
+                return;
+
+            if (argSubscription instanceof SlimSubscription) {
+                SlimSubscription slimSubscription = (SlimSubscription)argSubscription;
+                mCache.put(slimSubscription.getURLString(), slimSubscription);
+            }
+        }
+    };
 
     public DiscoverySearchAdapter(@NonNull Activity argActivity) {
         mActivity = argActivity;
@@ -77,7 +93,9 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
         holder.image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FeedActivity.start(mActivity, url.toString());
+                String urlString = url.toString();
+                SlimSubscription slimSubscription = mCache.get(urlString);
+                FeedActivity.startSlim(mActivity, urlString, slimSubscription);
             }
         });
 
@@ -91,6 +109,8 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
                 toggleSubscriptionStatus(subscription);
             }
         });
+
+        SoundWaves.sSubscriptionRefreshManager.refresh(subscription, mRefreshCompleteCallback);
     }
 
     @Override

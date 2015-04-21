@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Trace;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
@@ -137,10 +138,11 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
         startActivity(argActivity, b);
     }
 
-    public static void startSlim(@NonNull Activity argActivity, @NonNull SlimSubscription argSubscription) {
+    public static void startSlim(@NonNull Activity argActivity, @NonNull String argURL, @Nullable SlimSubscription argSubscription) {
         Bundle b = new Bundle();
         b.putBoolean(FEED_ACTIVITY_IS_SLIM, true);
-        b.putParcelable(SUBSCRIPTION_SLIM_KEY, argSubscription);
+        b.putString(FeedActivity.SUBSCRIPTION_URL_KEY, argURL);
+        b.putParcelable(SUBSCRIPTION_SLIM_KEY, argSubscription); // Not required, but nice to have if we already got it
         startActivity(argActivity, b);
     }
 
