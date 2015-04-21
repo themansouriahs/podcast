@@ -10,6 +10,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.os.Trace;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -25,6 +26,7 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 import org.bottiger.podcast.adapters.FeedViewAdapter;
+import org.bottiger.podcast.adapters.FeedViewDiscoveryAdapter;
 import org.bottiger.podcast.images.FrescoHelper;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PaletteObservable;
@@ -76,6 +78,8 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
     private FeedCursorLoader mCursorLoader;
     protected ReorderCursor mCursor = null;
     private String mUrl;
+
+    private boolean mIsSlimSubscription = false;
 
     /**
      *  This scrim's opacity is controlled in two different ways. 1) Before the initial entrance
@@ -166,7 +170,7 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
             getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
 
-        processIntent(getIntent());
+        processIntent();
 
         if (mSubscription == null) {
             throw new IllegalStateException("Episode can not be null");
@@ -240,7 +244,14 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
 
-        mAdapter = new FeedViewAdapter(this, mCursor);
+        if (mIsSlimSubscription) {
+            FeedViewDiscoveryAdapter adapter = new FeedViewDiscoveryAdapter(this, mCursor);
+            SlimSubscription slimSubscription = (SlimSubscription)mSubscription;
+            adapter.setDataset(slimSubscription.getEpisodes());
+        } else {
+            mAdapter = new FeedViewAdapter(this, mCursor);
+        }
+
         mRecyclerView.setAdapter(mAdapter);
 
         if (mSubscription.getType() == ISubscription.TYPE.DEFAULT) {
@@ -324,10 +335,20 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
         super.onStop();
     }
 
-    private void processIntent(Intent argIntent) {
+    private void processIntent() {
         Bundle b = getIntent().getExtras();
-        String value = b.getString(SUBSCRIPTION_URL_KEY);
-        mSubscription = Subscription.getByUrl(getContentResolver(), value);
+
+        boolean isSlim = b.getBoolean(FEED_ACTIVITY_IS_SLIM);
+        String url = b.getString(SUBSCRIPTION_URL_KEY);
+
+        if (isSlim) {
+            SlimSubscription slimSubscription = b.getParcelable(SUBSCRIPTION_SLIM_KEY);
+            mSubscription = slimSubscription;
+            mIsSlimSubscription = true;
+        } else {
+            mSubscription = Subscription.getByUrl(getContentResolver(), url);
+            mIsSlimSubscription = false;
+        }
     }
 
     @Override
@@ -348,7 +369,7 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
             case R.id.menu_refresh_feed:
                 SoundWaves.sSubscriptionRefreshManager.refresh(mSubscription, new IDownloadCompleteCallback() {
                     @Override
-                    public void complete(boolean succes) {
+                    public void complete(boolean succes, ISubscription argCallback) {
                         return;
                     }
                 });

@@ -8,6 +8,7 @@ import android.support.v7.graphics.Palette;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.provider.SlimImplementations.SlimEpisode;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.PaletteCache;
 
@@ -18,7 +19,7 @@ import java.util.ArrayList;
  */
 public class FeedViewDiscoveryAdapter extends FeedViewAdapter {
 
-    private ArrayList<IEpisode> mEpisodes = new ArrayList<>();
+    private ArrayList<SlimEpisode> mEpisodes = new ArrayList<>();
 
     public FeedViewDiscoveryAdapter(Context context, Cursor dataset) {
         super(context, dataset);
@@ -34,8 +35,11 @@ public class FeedViewDiscoveryAdapter extends FeedViewAdapter {
         return mEpisodes.size();
     }
 
-    public void setDataset(@NonNull ArrayList<IEpisode> argEpisodes) {
-        mEpisodes = argEpisodes;
+    public void setDataset(@NonNull ArrayList<SlimEpisode> argEpisodes) {
+        for (IEpisode episode : argEpisodes) {
+            if (episode instanceof SlimEpisode)
+                mEpisodes.add((SlimEpisode)episode);
+        }
     }
 
     @Override

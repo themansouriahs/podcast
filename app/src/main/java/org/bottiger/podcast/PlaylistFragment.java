@@ -9,6 +9,7 @@ import org.bottiger.podcast.listeners.RecentItemsRecyclerListener;
 import org.bottiger.podcast.listeners.RecyclerItemTouchListener;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
 import org.bottiger.podcast.service.PlayerService;
@@ -143,7 +144,7 @@ public class PlaylistFragment extends GeastureFragment implements
     }
 
     @Override
-    public void complete(boolean succes) {
+    public void complete(boolean succes, ISubscription argSubscription) {
         Log.d("PlaylistRefresh", "ending");
         mSwipeRefreshView.setRefreshing(false);
     }
@@ -546,4 +547,4 @@ public class PlaylistFragment extends GeastureFragment implements
             });
         }
     }
-}
+         }

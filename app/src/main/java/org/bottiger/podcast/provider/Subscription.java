@@ -358,7 +358,7 @@ public class Subscription extends AbstractItem implements ISubscription, Palette
     public void refresh(@NonNull final Context argContext) {
         SoundWaves.sSubscriptionRefreshManager.refresh(this, new IDownloadCompleteCallback() {
             @Override
-            public void complete(boolean succes) {
+            public void complete(boolean succes, ISubscription subscription) {
                 update(argContext.getContentResolver());
             }
         });
