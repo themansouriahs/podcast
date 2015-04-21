@@ -15,3 +15,18 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+# OKhhtp
+-dontwarn com.squareup.okhttp.**
+# Ignore warnings: https://github.com/square/okio/issues/60
+-dontwarn okio.**
+
+# Jackson xml parser
+-dontwarn javax.xml.**
+-dontwarn javax.xml.stream.events.**
+-dontwarn com.fasterxml.jackson.databind.**
+
+# apache
+-dontwarn org.apache.commons.**
+#-keep class org.apache.http.** { *; }
+#-dontwarn org.apache.httpcomponents.**
