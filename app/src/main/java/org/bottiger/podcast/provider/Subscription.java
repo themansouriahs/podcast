@@ -2,6 +2,7 @@ package org.bottiger.podcast.provider;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -329,7 +330,7 @@ public class Subscription extends AbstractItem implements ISubscription, Palette
 		context.delete(uri, null, null);
 	}
 
-	public List<IEpisode> getEpisodes() {
+	public ArrayList<IEpisode> getEpisodes() {
         /*
 		LinkedList<FeedItem> episodes = new LinkedList<FeedItem>();
 		Cursor itemCursor = contentResolver.query(ItemColumns.URI,

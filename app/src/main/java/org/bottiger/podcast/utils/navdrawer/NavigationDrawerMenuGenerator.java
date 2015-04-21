@@ -27,6 +27,8 @@ public class NavigationDrawerMenuGenerator {
     public NavigationDrawerMenuGenerator(@NonNull final Activity argContext) {
         mActivity = argContext;
 
+        /*
+        // Settings
         mItems.add(new NavItem());
         mItems.add(new NavItem(R.string.menu_settings, R.drawable.ic_settings_white, new INavOnClick() {
             @Override
@@ -34,6 +36,7 @@ public class NavigationDrawerMenuGenerator {
                 TransitionUtils.openSettings(mActivity);
             }
         }));
+        */
         mItems.add(new NavItem());
         mItems.add(new NavItem(R.string.menu_feedback, R.drawable.ic_messenger_white, new INavOnClick() {
             @Override
