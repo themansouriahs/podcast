@@ -28,5 +28,9 @@
 
 # apache
 -dontwarn org.apache.commons.**
-#-keep class org.apache.http.** { *; }
-#-dontwarn org.apache.httpcomponents.**
+
+#retrofit
+-dontwarn retrofit.**
+-keep class retrofit.** { *; }
+-keepattributes Signature
+-keepattributes Exceptions
