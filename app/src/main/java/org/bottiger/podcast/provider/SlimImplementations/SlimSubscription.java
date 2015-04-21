@@ -83,7 +83,7 @@ public class SlimSubscription implements ISubscription, Parcelable {
         return mEpisodes;
     }
 
-    public void getEpisodes(ArrayList<SlimEpisode> argEpisodes) {
+    public void setEpisodes(ArrayList<SlimEpisode> argEpisodes) {
         mEpisodes = argEpisodes;
     }
 

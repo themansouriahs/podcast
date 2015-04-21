@@ -2,6 +2,8 @@ package org.bottiger.podcast.provider;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
@@ -1313,6 +1315,21 @@ public class FeedItem extends AbstractItem implements IEpisode, Comparable<FeedI
         return title != null ? title : "";
 	}
 
+    @Override
+    public URL getUrl() {
+        try {
+            return new URL(url);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return null; // should never happen
+    }
+
+    @Override
+    public String getDescription() {
+        return content;
+    }
+
     /**
      * @return the title of the episode. Most feeds format the title in the feed as: 'FeedTittle: EpisodeTitle'. This method returns the episodetitle
      */
@@ -1344,8 +1361,13 @@ public class FeedItem extends AbstractItem implements IEpisode, Comparable<FeedI
 	public void setTitle(String title) {
 		this.title = title;
 	}
-	
-	public String getAuthor() {
+
+    @Override
+    public void setUrl(@NonNull URL argUrl) {
+
+    }
+
+    public String getAuthor() {
 		return author;
 	}
 

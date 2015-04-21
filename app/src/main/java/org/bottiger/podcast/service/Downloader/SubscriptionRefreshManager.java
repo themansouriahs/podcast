@@ -22,6 +22,7 @@ import org.bottiger.podcast.images.RequestManager;
 import org.bottiger.podcast.parser.syndication.handler.FeedHandler;
 import org.bottiger.podcast.parser.syndication.handler.UnsupportedFeedtypeException;
 import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
 import org.xml.sax.SAXException;
@@ -228,9 +229,11 @@ public class SubscriptionRefreshManager {
         Log.d(DEBUG_KEY, "Volley response from: " + subscription);
         //new ParseFeedTask().execute(response);
 
+        ISubscription parsedSubscription = null;
+
         try {
             Log.d(DEBUG_KEY, "Parsing: " + subscription);
-            feedHandler.parseFeed(contentResolver, subscription,
+            parsedSubscription = feedHandler.parseFeed(contentResolver, subscription,
                     argResponse.replace("ï»¿", "")); // Byte Order Mark
         } catch (SAXException e) {
             Log.d(DEBUG_KEY, "Parsing EXCEPTION: " + subscription);
@@ -256,7 +259,7 @@ public class SubscriptionRefreshManager {
 
         if (argCallback != null) {
             Log.d(DEBUG_KEY, "Parsing callback for: " + subscription);
-            argCallback.complete(true);
+            argCallback.complete(true, parsedSubscription);
         }
     }
 }

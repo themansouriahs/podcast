@@ -41,6 +41,10 @@ public class HandlerState {
 		return feed;
 	}
 
+    public void setSubscription(@NonNull ISubscription argSubscription) {
+        feed = argSubscription;
+    }
+
 	public ArrayList<FeedItem> getItems() {
 		return items;
 	}

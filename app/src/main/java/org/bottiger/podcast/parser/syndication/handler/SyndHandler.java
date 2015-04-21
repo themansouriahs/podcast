@@ -10,8 +10,12 @@ import org.bottiger.podcast.parser.syndication.namespace.NSSimpleChapters;
 import org.bottiger.podcast.parser.syndication.namespace.Namespace;
 import org.bottiger.podcast.parser.syndication.namespace.SyndElement;
 import org.bottiger.podcast.parser.syndication.namespace.atom.NSAtom;
+import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.provider.SlimImplementations.SlimEpisode;
+import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.provider.converter.EpisodeConverter;
 import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -19,6 +23,8 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import android.content.ContentResolver;
 import android.util.Log;
+
+import java.util.ArrayList;
 
 /** Superclass for all SAX Handlers which process Syndication formats */
 public class SyndHandler extends DefaultHandler {
@@ -132,12 +138,24 @@ public class SyndHandler extends DefaultHandler {
 		ISubscription subscription = state.getSubscription();
 
         Log.d(SubscriptionRefreshManager.DEBUG_KEY, "Done Parsing: " + subscription);
-		FeedUpdater updater = new FeedUpdater(contentResolver);
 
         if (subscription instanceof Subscription) {
+            FeedUpdater updater = new FeedUpdater(contentResolver);
             updater.updateDatabase((Subscription)subscription, state.getItems());
+            Log.d(SubscriptionRefreshManager.DEBUG_KEY, "Done updating database for: " + subscription);
+            return;
         }
-        Log.d(SubscriptionRefreshManager.DEBUG_KEY, "Done updating database for: " + subscription);
+
+        if (subscription instanceof SlimSubscription) {
+            SlimSubscription slimSubscription = (SlimSubscription)subscription;
+            ArrayList<SlimEpisode> slimEpisodes = new ArrayList<>();
+            for (FeedItem episode : state.getItems()) {
+                slimEpisodes.add(EpisodeConverter.toSlim(episode));
+            }
+            slimSubscription.setEpisodes(slimEpisodes);
+            Log.d(SubscriptionRefreshManager.DEBUG_KEY, "Replacing the subscription with a populated SlimSubscription:");
+            state.setSubscription(slimSubscription);
+        }
 	}
 
 	public HandlerState getState() {
