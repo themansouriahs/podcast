@@ -19,6 +19,7 @@ public class ApplicationConfiguration {
     public static final String formUriBasicAuthPassword = "";
 
 	// Web server certificate
+	public static final String CERTIFICATE_HOSTNAME = "";
 	public static final String CERTIFICATE_PIN_SHA1 = "";
 	
     // package name
