@@ -350,7 +350,7 @@ public class PlayerService extends Service implements
 			play(id);
             return true;
 		} else {
-			mPlayer.pause();
+			pause();
             return false;
 		}
 	}
@@ -476,7 +476,7 @@ public class PlayerService extends Service implements
      * Remove wakelocks
      */
     public void releaseWakelock() {
-        stopForeground(true);
+        //stopForeground(true);
         //mPlayer.release();
 
         if (wifiLock.isHeld())
