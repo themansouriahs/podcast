@@ -50,4 +50,14 @@ public class FeedViewDiscoveryAdapter extends FeedViewAdapter {
                 mPalette = palette;
         }
     }
+
+    @Override
+    protected IEpisode getItemForPosition(int argPosition) {
+        return mEpisodes.get(argPosition);
+    }
+
+    @Override
+    protected void bindButtons(@NonNull EpisodeViewHolder episodeViewHolder, @NonNull IEpisode argEpisode) {
+        return;
+    }
 }

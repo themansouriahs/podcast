@@ -18,6 +18,7 @@ import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.PaletteCache;
@@ -64,12 +65,39 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        final FeedItem item = getItemForPosition(position);
+        final IEpisode item = getItemForPosition(position);
         final EpisodeViewHolder episodeViewHolder = (EpisodeViewHolder) viewHolder;
+
+
+        episodeViewHolder.mText.setText(item.getTitle());
+        episodeViewHolder.mDescription.setText(item.getDescription());
+
+        if (mIsExpanded != episodeViewHolder.IsExpanded) {
+            episodeViewHolder.IsExpanded = mIsExpanded;
+            episodeViewHolder.modifyLayout((RelativeLayout)viewHolder.itemView);
+        }
+
+        bindButtons(episodeViewHolder, item);
+
+
+        mDownloadProgressObservable.registerObserver(episodeViewHolder.mDownloadButton);
+
+        if (mPalette != null) {
+            episodeViewHolder.mPlayPauseButton.onPaletteFound(mPalette);
+            episodeViewHolder.mQueueButton.onPaletteFound(mPalette);
+            episodeViewHolder.mDownloadButton.onPaletteFound(mPalette);
+        }
+
+    }
+
+    protected void bindButtons(@NonNull EpisodeViewHolder episodeViewHolder, @NonNull IEpisode argEpisode) {
+        FeedItem item = (FeedItem) argEpisode;
 
         if (mSubscription == null) {
             mSubscription = item.getSubscription(mContext);
         }
+
+        getPalette(mSubscription);
 
         boolean isPlaying = false;
         if (MainActivity.sBoundPlayerService != null && MainActivity.sBoundPlayerService.isInitialized()) {
@@ -81,29 +109,12 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
             }
         }
 
-        episodeViewHolder.mText.setText(item.getTitle());
-        episodeViewHolder.mDescription.setText(item.content);
-
-        if (mIsExpanded != episodeViewHolder.IsExpanded) {
-            episodeViewHolder.IsExpanded = mIsExpanded;
-            episodeViewHolder.modifyLayout((RelativeLayout)viewHolder.itemView);
-        }
-
         episodeViewHolder.mPlayPauseButton.setEpisodeId(item.getId(), PlayPauseImageView.LOCATION.FEEDVIEW);
         episodeViewHolder.mQueueButton.setEpisodeId(item.getId(), PlayPauseImageView.LOCATION.FEEDVIEW);
         episodeViewHolder.mPlayPauseButton.setStatus(isPlaying ? PlayerStatusObservable.STATUS.PLAYING : PlayerStatusObservable.STATUS.PAUSED);
 
 
         episodeViewHolder.mDownloadButton.setEpisode(item);
-        mDownloadProgressObservable.registerObserver(episodeViewHolder.mDownloadButton);
-
-        if (mPalette != null) {
-            episodeViewHolder.mPlayPauseButton.onPaletteFound(mPalette);
-            episodeViewHolder.mQueueButton.onPaletteFound(mPalette);
-            episodeViewHolder.mDownloadButton.onPaletteFound(mPalette);
-        }
-
-        getPalette(mSubscription);
     }
 
     @Override
@@ -125,7 +136,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
         notifyDataSetChanged();
     }
 
-    protected FeedItem getItemForPosition(int argPosition) {
+    protected IEpisode getItemForPosition(int argPosition) {
         mCursor.moveToPosition(argPosition);
         return FeedItem.getByCursor(mCursor);
     }

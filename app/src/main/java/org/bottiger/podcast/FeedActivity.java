@@ -262,6 +262,7 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
             FeedViewDiscoveryAdapter adapter = new FeedViewDiscoveryAdapter(this, mCursor);
             SlimSubscription slimSubscription = (SlimSubscription)mSubscription;
             adapter.setDataset(slimSubscription.getEpisodes());
+            mAdapter = adapter;
         } else {
             mAdapter = new FeedViewAdapter(this, mCursor);
         }
