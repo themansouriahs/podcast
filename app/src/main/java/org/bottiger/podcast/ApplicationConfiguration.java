@@ -18,6 +18,9 @@ public class ApplicationConfiguration {
     public static final String formUriBasicAuthLogin = "soundwaves2";
     public static final String formUriBasicAuthPassword = "";
 
+	// Web server certificate
+	public static final String CERTIFICATE_PIN_SHA1 = "";
+	
     // package name
     public static final String packageName = "org.bottiger.soundwaves";
 
