@@ -35,7 +35,7 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
     private static final boolean DELETE_WHEN_FINISHED_DEFAULT = false;
 
     private PlayerService mPlayerService;
-    private Handler mHandler;
+    private PlayerHandler mHandler;
     private boolean mIsInitialized = false;
     private boolean mIsStreaming = false;
 
@@ -227,7 +227,7 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
         return this.bufferProgress;
     }
 
-    public void setHandler(Handler handler) {
+    public void setHandler(PlayerHandler handler) {
         mHandler = handler;
     }
 
@@ -289,8 +289,7 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
                     mIsInitialized = false;
                     release();
 
-                    mHandler.sendMessageDelayed(
-                            mHandler.obtainMessage(PlayerHandler.SERVER_DIED), 2000);
+                    mHandler.sendMessageDelayed(PlayerHandler.SERVER_DIED, 2000);
                     return true;
                 default:
                     break;

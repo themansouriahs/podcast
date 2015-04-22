@@ -9,6 +9,8 @@ import android.support.annotation.NonNull;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.service.PlayerService;
 
+import java.lang.ref.WeakReference;
+
 /**
  * Created by apl on 20-01-2015.
  */
@@ -20,7 +22,8 @@ public class PlayerHandler {
     public static final int TRACK_ENDED = 1;
     public static final int SERVER_DIED = 2;
 
-    private static PlayerService mPlayerService;
+    private PlayerService mPlayerService;
+    private final InnerPlayerHandler mHandler;
 
     @NonNull
     private static SharedPreferences mSharedpreferences;
@@ -28,44 +31,69 @@ public class PlayerHandler {
     public PlayerHandler(@NonNull PlayerService argPlayerService) {
         mPlayerService = argPlayerService;
         mSharedpreferences = PreferenceManager.getDefaultSharedPreferences(mPlayerService.getApplicationContext());
+        mHandler  = new InnerPlayerHandler(mPlayerService);
     }
 
-    public static final Handler handler = new Handler() {
-        float mCurrentVolume = 1.0f;
+    public void sendEmptyMessage(int msg) {
+        mHandler.sendEmptyMessage(msg);
+    }
+
+    public void sendEmptyMessageDelayed(int msg, int delay) {
+        mHandler.sendEmptyMessageDelayed(msg, delay);
+    }
+
+    public void sendMessageDelayed(int msg, int delay) {
+        mHandler.sendMessageDelayed(
+                mHandler.obtainMessage(msg), delay);
+    }
+
+    private static class InnerPlayerHandler extends Handler {
+        private final WeakReference<PlayerService> mService;
+        private float mCurrentVolume = 1.0f;
+
+        public InnerPlayerHandler(PlayerService service) {
+            mService = new WeakReference<>(service);
+        }
 
         @Override
         public void handleMessage(Message msg) {
+
+            PlayerService playerService = mService.get();
+
+            if (playerService == null)
+                return;
+
             switch (msg.what) {
                 case FADEIN:
-                    if (!mPlayerService.isPlaying()) {
+                    if (!playerService.isPlaying()) {
                         mCurrentVolume = 0f;
-                        mPlayerService.getPlayer().setVolume(mCurrentVolume);
-                        mPlayerService.getPlayer().start();
-                        handler.sendEmptyMessageDelayed(FADEIN, 10);
+                        playerService.getPlayer().setVolume(mCurrentVolume);
+                        playerService.getPlayer().start();
+                        this.sendEmptyMessageDelayed(FADEIN, 10);
                     } else {
                         mCurrentVolume += 0.01f;
                         if (mCurrentVolume < 1.0f) {
-                            handler.sendEmptyMessageDelayed(FADEIN, 10);
+                            this.sendEmptyMessageDelayed(FADEIN, 10);
                         } else {
                             mCurrentVolume = 1.0f;
                         }
-                        mPlayerService.getPlayer().setVolume(mCurrentVolume);
+                        playerService.getPlayer().setVolume(mCurrentVolume);
                     }
                     break;
                 case TRACK_ENDED:
-                    String key = mPlayerService.getResources().getString(R.string.pref_continuously_playing_key);
+                    String key = playerService.getResources().getString(R.string.pref_continuously_playing_key);
                     boolean doPlayNext = mSharedpreferences.getBoolean(key, CONTINUOUS_PLAYING_DEFAULT);
 
-                    if (mPlayerService.getCurrentItem() != null) {
+                    if (playerService.getCurrentItem() != null) {
 
-                        if (mPlayerService.getNextTrack() == PlayerService.NextTrack.NEXT_IN_PLAYLIST) {
-                            long nextItemId = mPlayerService.getNextId();
+                        if (playerService.getNextTrack() == PlayerService.NextTrack.NEXT_IN_PLAYLIST) {
+                            long nextItemId = playerService.getNextId();
 
                             if (nextItemId == -1) {
-                                mPlayerService.dis_notifyStatus();
-                                mPlayerService.getPlayer().stop();
+                                playerService.dis_notifyStatus();
+                                playerService.getPlayer().stop();
                             } else if (doPlayNext) {
-                                mPlayerService.playNext();
+                                playerService.playNext();
                             }
                         }
                     }
@@ -77,6 +105,6 @@ public class PlayerHandler {
 
             }
         }
-    };
+    }
 
 }

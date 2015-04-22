@@ -34,6 +34,7 @@ import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 
 import javax.annotation.Nullable;
 
@@ -55,8 +56,6 @@ public class PlayerService extends Service implements
     public static final String ACTION_NEXT = "action_next";
     public static final String ACTION_PREVIOUS = "action_previous";
     public static final String ACTION_STOP = "action_stop";
-
-    private static PlayerHandler sPlayerHandler;
 
 	/** Which action to perform when a track ends */
 	public static enum NextTrack {
@@ -94,19 +93,16 @@ public class PlayerService extends Service implements
     private final String LOCK_NAME = "SoundWavesWifiLock";
     WifiManager.WifiLock wifiLock;
 
+    private PlayerHandler mPlayerHandler;
+
 	/**
 	 * Phone state listener. Will pause the playback when the phone is ringing
 	 * and continue it afterwards
 	 */
 	private PhoneStateListener mPhoneStateListener = new PlayerPhoneListener(this);
 
-    @TargetApi(21)
-    public PlayerStateManager getPlayerStateManager() {
-        return mPlayerStateManager;
-    }
-
 	public void startAndFadeIn() {
-        PlayerHandler.handler.sendEmptyMessageDelayed(PlayerHandler.FADEIN, 10);
+        mPlayerHandler.sendEmptyMessageDelayed(PlayerHandler.FADEIN, 10);
 	}
 
     public SoundWavesPlayer getPlayer() {
@@ -116,6 +112,7 @@ public class PlayerService extends Service implements
 	@Override
 	public void onCreate() {
 		super.onCreate();
+        Log.d(TAG, "PlayerService started");
 
         wifiLock = ((WifiManager) getSystemService(Context.WIFI_SERVICE))
                 .createWifiLock(WifiManager.WIFI_MODE_FULL, LOCK_NAME);
@@ -123,10 +120,10 @@ public class PlayerService extends Service implements
         sPlaylist.setContext(this);
 		sPlaylist.populatePlaylistIfEmpty();
 
-        sPlayerHandler = new PlayerHandler(this);
+        mPlayerHandler = new PlayerHandler(this);
 		
 		mPlayer = new SoundWavesPlayer(this);
-		mPlayer.setHandler(PlayerHandler.handler);
+		mPlayer.setHandler(mPlayerHandler);
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             mMediaSessionManager = (MediaSessionManager) getSystemService(MEDIA_SESSION_SERVICE);
