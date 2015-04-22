@@ -1,6 +1,5 @@
 package org.bottiger.podcast.service;
 
-import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.Player.LegacyRemoteController;
 import org.bottiger.podcast.Player.MetaDataControllerWrapper;
 import org.bottiger.podcast.Player.PlayerHandler;
@@ -11,7 +10,6 @@ import org.bottiger.podcast.flavors.MediaCast.IMediaCast;
 import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
-import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.utils.PodcastLog;
 
@@ -23,7 +21,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.session.MediaController;
 import android.media.session.MediaSessionManager;
@@ -35,12 +32,8 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
-import android.support.v7.media.MediaControlIntent;
-import android.support.v7.media.MediaRouteSelector;
-import android.support.v7.media.MediaRouter;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 
 import javax.annotation.Nullable;
 
@@ -270,7 +263,7 @@ public class PlayerService extends Service implements
 		if (mNotificationPlayer == null)
 			mNotificationPlayer = new NotificationPlayer(this, mItem);
 
-        mNotificationPlayer.setPlayerService(this);
+        mNotificationPlayer.setmPlayerService(this);
 		return mNotificationPlayer.show();
     }
 

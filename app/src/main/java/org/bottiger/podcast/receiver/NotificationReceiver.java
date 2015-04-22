@@ -4,7 +4,6 @@ import org.bottiger.podcast.ApplicationConfiguration;
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.Player.SoundWavesPlayer;
 import org.bottiger.podcast.R;
-import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.service.PlayerService;
@@ -59,8 +58,8 @@ public class NotificationReceiver extends BroadcastReceiver {
 
             FeedItem currentItem = playerService.getCurrentItem();
             if (currentItem != null) {
-                np = new NotificationPlayer(context, playerService.getCurrentItem());
-                np.setPlayerService(playerService);
+                np = new NotificationPlayer(playerService, playerService.getCurrentItem());
+                np.setmPlayerService(playerService);
                 np.show(isPlaying);
             }
 		}

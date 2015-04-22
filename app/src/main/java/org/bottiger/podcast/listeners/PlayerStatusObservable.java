@@ -165,9 +165,9 @@ public class PlayerStatusObservable {
                 startProgressUpdate();
 
                 if (np == null)
-				    np = new NotificationPlayer(mActivity, currentItem);
+				    np = new NotificationPlayer(ps, currentItem);
 
-                np.setPlayerService(ps);
+                np.setmPlayerService(ps);
 				np.setItem(currentItem);
 				np.show(status == STATUS.PLAYING);
 			}
