@@ -150,7 +150,10 @@ public class SyndHandler extends DefaultHandler {
             SlimSubscription slimSubscription = (SlimSubscription)subscription;
             ArrayList<SlimEpisode> slimEpisodes = new ArrayList<>();
             for (FeedItem episode : state.getItems()) {
-                slimEpisodes.add(EpisodeConverter.toSlim(episode));
+                SlimEpisode slimEpisode = EpisodeConverter.toSlim(episode);
+                if (slimEpisode != null) {
+                    slimEpisodes.add(EpisodeConverter.toSlim(episode));
+                }
             }
             slimSubscription.setEpisodes(slimEpisodes);
             Log.d(SubscriptionRefreshManager.DEBUG_KEY, "Replacing the subscription with a populated SlimSubscription:");

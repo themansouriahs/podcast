@@ -125,7 +125,7 @@ public class SubscriptionRefreshManager {
         //sRequestQueue.start();
     }
 
-    private void addSubscriptionToQueue(@NonNull final Context argContext, @NonNull final ISubscription argSubscription, RequestQueue requestQueue, IDownloadCompleteCallback argCallback) {
+    private void addSubscriptionToQueue(@NonNull final Context argContext, @NonNull final ISubscription argSubscription, RequestQueue requestQueue, final IDownloadCompleteCallback argCallback) {
         Log.d(DEBUG_KEY, "Adding to queue: " + argSubscription);
 
         if (argSubscription == null) {
@@ -171,7 +171,7 @@ public class SubscriptionRefreshManager {
 
                     if (response != null && response.isSuccessful()) {
                         String feedString = response.body().string();
-                        processResponse(argContext.getContentResolver(), null, argSubscription, feedString);
+                        processResponse(argContext.getContentResolver(), argCallback, argSubscription, feedString);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();

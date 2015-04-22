@@ -49,10 +49,13 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
             if (!argSucces)
                 return;
 
+            SlimSubscription slimSubscription = (SlimSubscription)argSubscription;
+            FeedActivity.startSlim(mActivity, slimSubscription.getURLString(), slimSubscription);
+            /*
             if (argSubscription instanceof SlimSubscription) {
                 SlimSubscription slimSubscription = (SlimSubscription)argSubscription;
                 mCache.put(slimSubscription.getURLString(), slimSubscription);
-            }
+            }*/
         }
     };
 
@@ -93,9 +96,11 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
         holder.image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String urlString = url.toString();
-                SlimSubscription slimSubscription = mCache.get(urlString);
-                FeedActivity.startSlim(mActivity, urlString, slimSubscription);
+                SoundWaves.sSubscriptionRefreshManager.refresh(subscription, mRefreshCompleteCallback);
+
+                //String urlString = url.toString();
+                //SlimSubscription slimSubscription = mCache.get(urlString);
+                //FeedActivity.startSlim(mActivity, urlString, slimSubscription);
             }
         });
 
@@ -110,7 +115,7 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
             }
         });
 
-        SoundWaves.sSubscriptionRefreshManager.refresh(subscription, mRefreshCompleteCallback);
+        //SoundWaves.sSubscriptionRefreshManager.refresh(subscription, mRefreshCompleteCallback);
     }
 
     @Override

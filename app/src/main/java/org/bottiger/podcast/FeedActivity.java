@@ -93,6 +93,7 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
     private boolean mIsExitAnimationInProgress;
     private boolean mHasComputedThemeColor;
 
+    public static final String FEED_ACTIVITY_EXTRA = "FeedActivityExtra";
     public static final String FEED_ACTIVITY_IS_SLIM = "SlimActivity";
     public static final String SUBSCRIPTION_URL_KEY = "url";
     public static final String SUBSCRIPTION_SLIM_KEY = "SlimSubscription";
@@ -139,15 +140,28 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
         Bundle b = new Bundle();
         b.putBoolean(FEED_ACTIVITY_IS_SLIM, false);
         b.putString(FeedActivity.SUBSCRIPTION_URL_KEY, argURL);
+        mFuckItHack = null;
         startActivity(argActivity, b);
     }
 
+    private static Bundle mFuckItHack = null;
     public static void startSlim(@NonNull Activity argActivity, @NonNull String argURL, @Nullable SlimSubscription argSubscription) {
         Bundle b = new Bundle();
+        Intent intent = new Intent(argActivity, FeedActivity.class);
         b.putBoolean(FEED_ACTIVITY_IS_SLIM, true);
         b.putString(FeedActivity.SUBSCRIPTION_URL_KEY, argURL);
         b.putParcelable(SUBSCRIPTION_SLIM_KEY, argSubscription); // Not required, but nice to have if we already got it
-        startActivity(argActivity, b);
+        mFuckItHack = b;
+
+        //intent.putExtra(FEED_ACTIVITY_IS_SLIM, true);
+        //intent.putExtra(FeedActivity.SUBSCRIPTION_URL_KEY, argURL);
+        //intent.putExtra(SUBSCRIPTION_SLIM_KEY, argSubscription); // Not required, but nice to have if we already got it
+        //intent.putExtra(b);
+        intent.putExtras(b);
+
+        //startActivity(argActivity, b);
+        argActivity.startActivity(intent);
+        //argActivity.overridePendingTransition(R.anim.slide_in_bottom, R.anim.slide_out_bottom);
     }
 
     private static void startActivity(@NonNull Activity argActivity, @NonNull Bundle argBundle) {
@@ -337,6 +351,9 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
 
     private void processIntent() {
         Bundle b = getIntent().getExtras();
+
+        if (mFuckItHack != null)
+            b = mFuckItHack;
 
         boolean isSlim = b.getBoolean(FEED_ACTIVITY_IS_SLIM);
         String url = b.getString(SUBSCRIPTION_URL_KEY);

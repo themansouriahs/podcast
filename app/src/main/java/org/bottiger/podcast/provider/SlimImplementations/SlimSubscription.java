@@ -11,6 +11,7 @@ import org.bottiger.podcast.provider.ISubscription;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -103,7 +104,9 @@ public class SlimSubscription implements ISubscription, Parcelable {
         out.writeString(mTitle);
         out.writeString(mImageURL);
         out.writeString(mURL.toString());
-        out.writeParcelableArray(episodeArray, PARCELABLE_WRITE_RETURN_VALUE);
+        //out.writeParcelableArray(episodeArray, PARCELABLE_WRITE_RETURN_VALUE);
+        //out.writeTypedList(mEpisodes);
+        out.writeList(mEpisodes);
     }
 
     public static final Parcelable.Creator<SlimSubscription> CREATOR
@@ -125,6 +128,9 @@ public class SlimSubscription implements ISubscription, Parcelable {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
+        //SlimEpisode[] episodeArray = (SlimEpisode[])in.readArray(SlimEpisode.class.getClassLoader());
+        //mEpisodes = new ArrayList( Arrays.asList(episodeArray) );
         mEpisodes = in.readArrayList(SlimEpisode.class.getClassLoader());
+
     }
 }
