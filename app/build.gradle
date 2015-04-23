@@ -2,8 +2,8 @@ apply plugin: 'idea'
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.1"
+    compileSdkVersion 22
+    buildToolsVersion "22.0.1"
 
     defaultConfig {
         applicationId "org.bottiger.podcast"
@@ -135,9 +135,9 @@ dependencies {
 
     // Amazon version
     amazonCompile fileTree(dir: 'src/amazon/libs', include: ['*.jar'])
-    amazonCompile 'com.google.android.gms:play-services-cast:7.0.0' // google cast
+    amazonCompile 'com.google.android.gms:play-services-cast:7.0.+' // google cast
 
     // Play Store
-    googleCompile 'com.google.android.gms:play-services-analytics:7.0.0' // analytics
-    googleCompile 'com.google.android.gms:play-services-cast:7.0.0' // google cast
+    googleCompile 'com.google.android.gms:play-services-analytics:7.0.+' // analytics
+    googleCompile 'com.google.android.gms:play-services-cast:7.0.+' // google cast
 }
