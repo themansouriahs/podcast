@@ -5,7 +5,6 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
@@ -14,21 +13,16 @@ import android.support.v7.graphics.Palette;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.SparseIntArray;
-import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.DownloadObserver;
 import org.bottiger.podcast.listeners.EpisodeStatus;
 import org.bottiger.podcast.listeners.PaletteListener;
-import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObserver;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.utils.ColorExtractor;
-import org.bottiger.podcast.utils.PaletteCache;
 
 import java.lang.ref.WeakReference;
 
@@ -121,12 +115,10 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
     public synchronized void setEpisodeId(long argId) {
         this.episodeId = argId;
         ensureEpisode();
-        PaletteObservable.registerListener(this);
     }
 
     public synchronized void unsetEpisodeId() {
         this.episodeId = -1;
-        PaletteObservable.unregisterListener(this);
     }
 
     public void setStatus(PlayerStatusObservable.STATUS argStatus) {

@@ -20,12 +20,9 @@ import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
-import org.bottiger.podcast.provider.Subscription;
-import org.bottiger.podcast.utils.PaletteCache;
 import org.bottiger.podcast.views.DownloadButtonView;
 import org.bottiger.podcast.views.FeedViewQueueButton;
 import org.bottiger.podcast.views.PlayPauseImageView;
-import org.bottiger.podcast.views.PlayerButtonView;
 
 /**
  * Created by apl on 02-09-2014.
@@ -142,12 +139,6 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
     }
 
     protected void getPalette(ISubscription argSubscription) {
-        Subscription subscription = ((Subscription)argSubscription);
-        if ((subscription).getPaletteUrl() != null) {
-            Palette palette = PaletteCache.get(subscription);
-            if (palette != null)
-                mPalette = palette;
-        }
     }
 
     public class EpisodeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

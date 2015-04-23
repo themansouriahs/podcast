@@ -3,14 +3,10 @@ package org.bottiger.podcast.adapters;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
-import android.support.v7.graphics.Palette;
 
-import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.SlimImplementations.SlimEpisode;
-import org.bottiger.podcast.provider.Subscription;
-import org.bottiger.podcast.utils.PaletteCache;
 
 import java.util.ArrayList;
 
@@ -44,11 +40,6 @@ public class FeedViewDiscoveryAdapter extends FeedViewAdapter {
 
     @Override
     protected void getPalette(ISubscription argSubscription) {
-        if (argSubscription.getImageURL() != null) {
-            Palette palette = PaletteCache.get(argSubscription.getImageURL());
-            if (palette != null)
-                mPalette = palette;
-        }
     }
 
     @Override

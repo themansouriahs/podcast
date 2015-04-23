@@ -1,11 +1,8 @@
 package org.bottiger.podcast;
 
 import org.bottiger.podcast.adapters.PlaylistAdapter;
-import org.bottiger.podcast.images.FrescoHelper;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
-import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
-import org.bottiger.podcast.listeners.RecentItemsRecyclerListener;
 import org.bottiger.podcast.listeners.RecyclerItemTouchListener;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
@@ -13,8 +10,7 @@ import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
 import org.bottiger.podcast.service.PlayerService;
-import org.bottiger.podcast.utils.BackgroundTransformation;
-import org.bottiger.podcast.utils.PaletteCache;
+import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.views.DownloadButtonView;
@@ -31,13 +27,10 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -48,11 +41,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.squareup.picasso.Callback;
 
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 
@@ -292,11 +283,6 @@ public class PlaylistFragment extends GeastureFragment implements
 
     @Override
     public void onPause() {
-        PaletteObservable.unregisterListener(mPlayPauseButton);
-        PaletteObservable.unregisterListener(mBackButton);
-        PaletteObservable.unregisterListener(mForwardButton);
-        PaletteObservable.unregisterListener(mDownloadButton);
-        PaletteObservable.unregisterListener(mFavoriteButton);
         super.onPause();
     }
 
@@ -319,22 +305,6 @@ public class PlaylistFragment extends GeastureFragment implements
 
 
     public void bindHeader(final FeedItem item) {
-        Callback cb = new Callback() {
-
-            @Override
-            public void onSuccess() {
-                Bitmap bitmap = ((BitmapDrawable)mPhoto.getDrawable()).getBitmap();
-                if (bitmap != null) {
-                    PaletteCache.generate(item.image, bitmap);
-                }
-            }
-
-            @Override
-            public void onError() {
-                return;
-            }
-        };
-
         mEpisodeTitle.setText(item.getTitle());
         mEpisodeInfo.setText("");
 
@@ -388,31 +358,24 @@ public class PlaylistFragment extends GeastureFragment implements
 
         mDownloadProgressObservable.registerObserver(mPlayerDownloadButton);
 
+        Activity activity = getActivity();
+
         mTopPlayer.setEpisodeId(item);
-        PaletteObservable.registerListener(mTopPlayer);
+
+        PaletteHelper.generate(item.getImageURL(activity), activity, mTopPlayer);
+        PaletteHelper.generate(item.getImageURL(activity), activity, mPlayPauseButton);
+        PaletteHelper.generate(item.getImageURL(activity), activity, mBackButton);
+        PaletteHelper.generate(item.getImageURL(activity), activity, mForwardButton);
+        PaletteHelper.generate(item.getImageURL(activity), activity, mDownloadButton);
+        PaletteHelper.generate(item.getImageURL(activity), activity, mFavoriteButton);
 
         PlayerStatusObservable.registerListener(mPlayerSeekbar);
 
 
-        if (item.image != null) {
-            Palette palette = PaletteCache.get(item.image);
-            if (palette != null) {
-                mTopPlayer.onPaletteFound(palette);
-                mPlayPauseButton.onPaletteFound(palette);
-                mBackButton.onPaletteFound(palette);
-                mForwardButton.onPaletteFound(palette);
-                mDownloadButton.onPaletteFound(palette);
-                mFavoriteButton.onPaletteFound(palette);
-            } else {
-                PaletteCache.generate(item.image, getActivity());
-            }
-        }
 
-        if (item != null && item.getImageURL(getActivity()) != null) {
-            Uri uri = Uri.parse(item.getImageURL(getActivity()));
+        if (item != null && item.getImageURL(activity) != null) {
+            Uri uri = Uri.parse(item.getImageURL(activity));
             mPhoto.setImageURI(uri);
-            //FrescoHelper.PalettePostProcessor postProcessor = new FrescoHelper.PalettePostProcessor(this, mUrl);
-            //FrescoHelper.loadImageInto(mPhotoView, mUrl, postProcessor);
         }
 
         if (mTopPlayer.getVisibleHeight() == 0) {

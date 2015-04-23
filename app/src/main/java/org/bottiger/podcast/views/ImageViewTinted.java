@@ -11,7 +11,6 @@ import android.util.AttributeSet;
 import android.widget.ImageView;
 
 import org.bottiger.podcast.listeners.PaletteListener;
-import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.utils.ColorExtractor;
 
 /**
@@ -35,7 +34,6 @@ public class ImageViewTinted extends com.facebook.drawee.view.SimpleDraweeView i
 
     public void setPaletteKey(@NonNull String argKey) {
         mPaletteKey = argKey;
-        PaletteObservable.registerListener(this);
     }
 
     @Override

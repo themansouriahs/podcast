@@ -1,6 +1,7 @@
 package org.bottiger.podcast.views;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -15,7 +16,6 @@ import android.widget.RelativeLayout;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.PaletteListener;
-import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.utils.UIUtils;
 
@@ -33,7 +33,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
 
     private int mPlayPauseLargeSize = -1;
 
-    private Context mContext;
+    private Activity mActivity;
     private FixedRecyclerView mRecyclerView;
 
     public static int sizeSmall                 =   -1;
@@ -109,25 +109,25 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
     }
 
     private void init(@NonNull Context argContext) {
-        mContext = argContext;
+        mActivity = (Activity)argContext;
 
-        sizeSmall = mContext.getResources().getDimensionPixelSize(R.dimen.top_player_size_minimum);
-        sizeMedium = mContext.getResources().getDimensionPixelSize(R.dimen.top_player_size_medium);
-        sizeLarge = mContext.getResources().getDimensionPixelSize(R.dimen.top_player_size_maximum);
+        sizeSmall = mActivity.getResources().getDimensionPixelSize(R.dimen.top_player_size_minimum);
+        sizeMedium = mActivity.getResources().getDimensionPixelSize(R.dimen.top_player_size_medium);
+        sizeLarge = mActivity.getResources().getDimensionPixelSize(R.dimen.top_player_size_maximum);
 
         screenHeight = sizeLarge;
 
-        sizeShrinkBuffer = (int)UIUtils.convertDpToPixel(100, mContext);
+        sizeShrinkBuffer = (int)UIUtils.convertDpToPixel(100, mActivity);
 
         sizeStartShrink = sizeSmall+sizeShrinkBuffer;
         //sizeLarge = 1080; // 1080
 
-        mSeekbarDeadzonePx        = (int)UIUtils.convertDpToPixel(mSeekbarDeadzone, mContext);
-        mSeekbarFadeDistancePx    = (int)UIUtils.convertDpToPixel(mSeekbarFadeDistance, mContext);
-        mTextFadeDistancePx       = (int)UIUtils.convertDpToPixel(mTextFadeDistance, mContext);
-        mTextInfoFadeDistancePx   = (int)UIUtils.convertDpToPixel(mTextInfoFadeDistance, mContext);
+        mSeekbarDeadzonePx        = (int)UIUtils.convertDpToPixel(mSeekbarDeadzone, mActivity);
+        mSeekbarFadeDistancePx    = (int)UIUtils.convertDpToPixel(mSeekbarFadeDistance, mActivity);
+        mTextFadeDistancePx       = (int)UIUtils.convertDpToPixel(mTextFadeDistance, mActivity);
+        mTextInfoFadeDistancePx   = (int)UIUtils.convertDpToPixel(mTextInfoFadeDistance, mActivity);
 
-        sizeActionbar = mContext.getResources().getDimensionPixelSize(R.dimen.action_bar_height);
+        sizeActionbar = mActivity.getResources().getDimensionPixelSize(R.dimen.action_bar_height);
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             setClipToOutline(true);
@@ -168,7 +168,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
 
         mPlayPauseLargeSize = mPlayPauseButton.getLayoutParams().height;
 
-        PaletteObservable.registerListener(mSeekbar);
+        //PaletteCache.generate(mEpisodeId.getImageURL(mActivity), mActivity, mSeekbar);
 
         mLargeLayout.SeekBarLeftMargin = 0;
         mLargeLayout.PlayPauseSize = mPlayPauseLargeSize;
@@ -415,12 +415,11 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
 
     public synchronized void setEpisodeId(FeedItem argEpisode) {
         this.mEpisodeId = argEpisode;
-        PaletteObservable.registerListener(this);
     }
 
     @Override
     public void onPaletteFound(Palette argChangedPalette) {
-        setBackgroundColor(StaticButtonColor(mContext, argChangedPalette));
+        setBackgroundColor(StaticButtonColor(mActivity, argChangedPalette));
         invalidate();
     }
 

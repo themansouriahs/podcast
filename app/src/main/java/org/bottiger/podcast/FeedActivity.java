@@ -10,7 +10,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.os.Trace;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -29,16 +28,14 @@ import org.bottiger.podcast.adapters.FeedViewAdapter;
 import org.bottiger.podcast.adapters.FeedViewDiscoveryAdapter;
 import org.bottiger.podcast.images.FrescoHelper;
 import org.bottiger.podcast.listeners.PaletteListener;
-import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.playlist.FeedCursorLoader;
 import org.bottiger.podcast.playlist.ReorderCursor;
 import org.bottiger.podcast.provider.ISubscription;
-import org.bottiger.podcast.provider.SlimImplementations.SlimEpisode;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
 import org.bottiger.podcast.utils.ColorExtractor;
-import org.bottiger.podcast.utils.PaletteCache;
+import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.utils.WhitenessUtils;
 import org.bottiger.podcast.views.FeedRecyclerView;
@@ -46,8 +43,6 @@ import org.bottiger.podcast.views.FloatingActionButton;
 import org.bottiger.podcast.views.MultiShrink.feed.MultiShrinkScroller;
 import org.bottiger.podcast.views.MultiShrink.feed.QuickFeedImage;
 import org.bottiger.podcast.views.MultiShrink.feed.SchedulingUtils;
-
-import java.util.ArrayList;
 
 /**
  * Created by apl on 14-02-2015.
@@ -334,19 +329,15 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
     @Override
     protected void onStart() {
         super.onStart();
-        PaletteObservable.registerListener(this);
 
         if (mSubscription.getType() == ISubscription.TYPE.DEFAULT) {
-            if (((Subscription)mSubscription).getPaletteUrl() != null) {
-                Palette palette = PaletteCache.get(((Subscription)mSubscription).getPaletteUrl());
-                onPaletteFound(palette);
-            }
+            Subscription subscription = (Subscription) mSubscription;
+            PaletteHelper.generate(subscription.getImageURL(), this, this);
         }
     }
 
     @Override
     protected void onStop() {
-        PaletteObservable.unregisterListener(this);
         super.onStop();
     }
 

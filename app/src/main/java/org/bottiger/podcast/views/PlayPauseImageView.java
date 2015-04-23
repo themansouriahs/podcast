@@ -27,7 +27,6 @@ import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.listeners.DownloadObserver;
 import org.bottiger.podcast.listeners.EpisodeStatus;
 import org.bottiger.podcast.listeners.PaletteListener;
-import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObserver;
 import org.bottiger.podcast.playlist.Playlist;
@@ -123,7 +122,6 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
     public synchronized void setEpisodeId(long argId, LOCATION argLocation) {
         this.mLocation = argLocation;
         this.mEpisodeId = argId;
-        PaletteObservable.registerListener(this);
 
         long offset = getEpisode().offset > 0 ? getEpisode().offset : 0;
         setProgressMs(offset);
@@ -132,7 +130,6 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
 
     public synchronized void unsetEpisodeId() {
         this.mEpisodeId = -1;
-        PaletteObservable.unregisterListener(this);
     }
 
     public void setStatus(PlayerStatusObservable.STATUS argStatus) {

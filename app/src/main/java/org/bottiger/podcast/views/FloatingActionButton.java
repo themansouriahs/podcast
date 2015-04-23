@@ -7,7 +7,6 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 
 import org.bottiger.podcast.listeners.PaletteListener;
-import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.utils.ColorExtractor;
 
 /**
@@ -35,7 +34,6 @@ public class FloatingActionButton extends com.melnykov.fab.FloatingActionButton 
 
     public void setPaletteUrl(String argURL) {
         mURL = argURL;
-        PaletteObservable.registerListener(this);
     }
 
     @Override

@@ -1,10 +1,6 @@
 package org.bottiger.podcast.adapters;
 
-import java.util.List;
 import java.util.TreeSet;
-import java.util.concurrent.AbstractExecutorService;
-import java.util.concurrent.Executor;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.validator.routines.UrlValidator;
@@ -13,15 +9,12 @@ import org.bottiger.podcast.PodcastBaseFragment;
 import org.bottiger.podcast.R;
 
 import org.bottiger.podcast.adapters.viewholders.ExpandableViewHoldersUtil;
-import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.images.FrescoHelper;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
-import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
-import org.bottiger.podcast.utils.DirectExecutor;
-import org.bottiger.podcast.utils.PaletteCache;
+import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.ThemeHelper;
 import org.bottiger.podcast.views.PlayPauseImageView;
@@ -30,39 +23,15 @@ import org.bottiger.podcast.views.PlaylistViewHolder;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Animatable;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.facebook.common.references.CloseableReference;
-import com.facebook.datasource.DataSource;
-import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.drawee.controller.BaseControllerListener;
-import com.facebook.drawee.controller.ControllerListener;
-import com.facebook.drawee.interfaces.DraweeController;
-import com.facebook.imagepipeline.bitmaps.PlatformBitmapFactory;
-import com.facebook.imagepipeline.core.ExecutorSupplier;
-import com.facebook.imagepipeline.core.ImagePipeline;
-import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
-import com.facebook.imagepipeline.image.CloseableImage;
-import com.facebook.imagepipeline.image.ImageInfo;
-import com.facebook.imagepipeline.image.QualityInfo;
-import com.facebook.imagepipeline.request.ImageRequest;
-import com.facebook.imagepipeline.request.ImageRequestBuilder;
-import com.facebook.imagepipeline.request.Postprocessor;
 
 public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> {
 
@@ -129,7 +98,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
         Log.d("ExpanderHelper", "pos: " + position + " episode: " + item.getTitle());
 
-        PaletteObservable.registerListener(viewHolder.mPlayPauseButton);
+        PaletteHelper.generate(item.getImageURL(activity), activity, viewHolder.mPlayPauseButton);
 
         int type = getItemViewType(position);
         boolean doExpand = type == TYPE_EXPAND; //  || position < 5
@@ -185,13 +154,6 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         }
 
         bindExandedPlayer(mActivity, item, viewHolder, position);
-
-        if (item.image != null) {
-            Palette palette = PaletteCache.get(item.image);
-            if (palette != null) {
-                PaletteObservable.updatePalette(item.image, palette);
-            }
-        }
 
         if (!doExpand) {
             View v = viewHolder.playerRelativeLayout;
@@ -319,9 +281,6 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         holder.favoriteButton.unsetEpisodeId();
         holder.removeButton.unsetEpisodeId();
         holder.downloadButton.unsetEpisodeId();
-
-        PaletteObservable.unregisterListener(holder.seekbar);
-
     }
 
     /**

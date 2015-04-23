@@ -5,8 +5,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.graphics.Palette;
-import android.util.Log;
 
 import com.facebook.common.references.CloseableReference;
 import com.facebook.common.references.ResourceReleaser;
@@ -21,8 +19,6 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.facebook.imagepipeline.request.Postprocessor;
 
 import org.apache.commons.validator.routines.UrlValidator;
-import org.bottiger.podcast.listeners.PaletteObservable;
-import org.bottiger.podcast.utils.PaletteCache;
 
 /**
  * Created by apl on 16-04-2015.
@@ -116,25 +112,6 @@ public class FrescoHelper {
 
             if (bitmap.isRecycled())
                 return;
-
-            try {
-                Palette palette = PaletteCache.get(url);
-                if (palette == null) {
-                    //smallBitmap = FrescoHelper.copySmallBitmap(bitmap, platformBitmapFactory);
-
-                    final Palette palette1 = PaletteCache.generate(url, bitmap, false, false);
-                    if (palette1 != null) {
-                        mActivity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                PaletteObservable.updatePalette(url, palette1);
-                            }
-                        });
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
 
             return;
         }

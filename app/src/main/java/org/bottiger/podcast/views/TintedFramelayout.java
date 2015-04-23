@@ -8,7 +8,6 @@ import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
 import org.bottiger.podcast.listeners.PaletteListener;
-import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.ColorExtractor;
 
@@ -43,12 +42,10 @@ public class TintedFramelayout extends FrameLayout implements PaletteListener {
 
     public void setSubscription(Subscription mSubscription) {
         this.mSubscription = mSubscription;
-        PaletteObservable.registerListener(this);
     }
 
     public void unsetSubscription() {
         mSubscription = null;
-        PaletteObservable.unregisterListener(this);
     }
 
     @Override
