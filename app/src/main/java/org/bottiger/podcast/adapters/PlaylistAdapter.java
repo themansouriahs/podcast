@@ -211,6 +211,10 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         holder.removeButton.setEpisodeId(id);
         holder.downloadButton.setEpisode(feedItem);
 
+        PaletteHelper.generate(feedItem.getImageURL(mActivity), mActivity, holder.downloadButton);
+        PaletteHelper.generate(feedItem.getImageURL(mActivity), mActivity, holder.favoriteButton);
+        PaletteHelper.generate(feedItem.getImageURL(mActivity), mActivity, holder.removeButton);
+
 
         holder.removeButton.setOnClickListener(new View.OnClickListener() {
             @Override
