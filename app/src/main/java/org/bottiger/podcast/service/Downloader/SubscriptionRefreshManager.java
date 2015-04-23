@@ -40,14 +40,8 @@ import javax.xml.parsers.ParserConfigurationException;
  */
 public class SubscriptionRefreshManager {
 
-    private static final int MY_SOCKET_TIMEOUT_MS = 300000; // 300 s
     private static final String ACRA_KEY = "SubscriptionRefreshManager";
     public static final String DEBUG_KEY = "SubscriptionRefresh";
-
-    private DefaultRetryPolicy mRetryPolicy = new DefaultRetryPolicy(
-                                                            MY_SOCKET_TIMEOUT_MS,
-                                                            DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                                                            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
 
 
     private final BlockingQueue<Runnable> mDecodeWorkQueue = new LinkedBlockingQueue<Runnable>();;
@@ -80,23 +74,6 @@ public class SubscriptionRefreshManager {
         }
     }
 
-    Response.ErrorListener getFailureListener() {
-		return new Response.ErrorListener() {
-
-			@Override
-			public void onErrorResponse(VolleyError error) { // Handle error
-                Log.e(DEBUG_KEY, "Volley error: " + error.toString());
-                if (error instanceof com.android.volley.ServerError) {
-
-				} else {
-					error.printStackTrace();
-					int i = 5;
-					i = i + i;
-				}
-			}
-		};
-	}
-
     public void refreshAll() {
         Log.d(DEBUG_KEY, "refreshAll()");
         refresh(null, null);
@@ -118,11 +95,6 @@ public class SubscriptionRefreshManager {
         } else {
             populateQueue(mContext, argCallback);
         }
-
-        //sRequestQueue.addRequestFinishedListener(mFinishedListener);
-
-        //Log.d(DEBUG_KEY, "starting refresh using Volley");
-        //sRequestQueue.start();
     }
 
     private void addSubscriptionToQueue(@NonNull final Context argContext, @NonNull final ISubscription argSubscription, RequestQueue requestQueue, final IDownloadCompleteCallback argCallback) {
@@ -139,23 +111,6 @@ public class SubscriptionRefreshManager {
             VendorCrashReporter.report(ACRA_KEY, "subscription.url=empty");
             return;
         }
-
-        /*
-        StringResponseListener responseListener = new StringResponseListener(mContext
-                .getContentResolver(), argCallback, argSubscription);
-
-        RequestFuture<String> future = RequestFuture.newFuture();
-
-        StringRequest request = new StringRequest(subscriptionUrl,
-                future,
-                getFailureListener());
-
-        request.setRetryPolicy(mRetryPolicy);
-
-        // Add the request to Volley
-        requestQueue.add(request);
-        Log.d(DEBUG_KEY, "Added to queue successfully: " + argSubscription);
-        */
 
         final OkHttpClient client = new OkHttpClient();
         final Request request = new Request.Builder()
@@ -178,25 +133,6 @@ public class SubscriptionRefreshManager {
                 }
             }
         });
-    }
-
-    private static class StringResponseListener implements Response.Listener<String> {
-
-		Subscription subscription;
-		ContentResolver contentResolver;
-        IDownloadCompleteCallback callback;
-
-		public StringResponseListener(ContentResolver contentResolver,
-                                      IDownloadCompleteCallback argCallback, @NonNull Subscription subscription) {
-			this.subscription = subscription;
-			this.contentResolver = contentResolver;
-            this.callback = argCallback;
-		}
-
-		@Override
-		public void onResponse(String response) {
-            processResponse(contentResolver, callback, subscription, response);
-		}
     }
 
     private int populateQueue(@NonNull Context argContext, @Nullable IDownloadCompleteCallback argCallback) {
