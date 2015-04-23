@@ -424,7 +424,7 @@ public class Playlist implements OnDragStateChangedListener {
 
         Cursor cursor = null;
         try {
-            PodcastOpenHelper helper = PodcastOpenHelper.getInstance(mContext);//new PodcastOpenHelper(mContext);
+            PodcastOpenHelper helper = PodcastOpenHelper.getInstance(mContext);//new PodcastOpenHelper(mActivity);
             SQLiteDatabase database = helper.getReadableDatabase();
 
             cursor = database.query(ItemColumns.TABLE_NAME,
@@ -553,8 +553,8 @@ public class Playlist implements OnDragStateChangedListener {
             //listener.notifyPlaylistRangeChanged(argFrom, argTo);
 
             final PlaylistChangeListener finalListener = listener;
-            //if (mContext instanceof Activity) {
-            //    ((Activity)mContext).runOnUiThread(new Runnable() {
+            //if (mActivity instanceof Activity) {
+            //    ((Activity)mActivity).runOnUiThread(new Runnable() {
             //        @Override
             //        public void run() {
                         finalListener.notifyPlaylistRangeChanged(argFrom, argTo);

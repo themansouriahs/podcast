@@ -55,7 +55,15 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.bottiger.podcast.MainActivity" />
+        </activity>
 
+        <activity android:name="org.bottiger.podcast.DiscoveryFeedActivity"
+            android:theme="@style/Theme.Transparent"
+            android:label="@string/app_name"
+            android:parentActivityName="org.bottiger.podcast.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.bottiger.podcast.MainActivity" />
         </activity>
 
         <activity

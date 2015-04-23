@@ -72,7 +72,7 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
 
 
         if (!isInEditMode()) {
-            //ThemeHelper themeHelper = new ThemeHelper(mContext);
+            //ThemeHelper themeHelper = new ThemeHelper(mActivity);
             //int downloadIcon = themeHelper.getAttr(download_icon); //R.drawable.av_download; // FIXME
             // http://stackoverflow.com/questions/7896615/android-how-to-get-value-of-an-attribute-in-code
 

@@ -68,7 +68,7 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
     private QuickFeedImage mPhotoView;
     private RecyclerView mRecyclerView;
     private MultiShrinkScroller mMultiShrinkScroller;
-    private FloatingActionButton mFloatingButton;
+    protected FloatingActionButton mFloatingButton;
     private FeedViewAdapter mAdapter;
     private FeedCursorLoader mCursorLoader;
     protected ReorderCursor mCursor = null;
@@ -94,7 +94,7 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
     public static final String SUBSCRIPTION_SLIM_KEY = "SlimSubscription";
     public static final String EPISODES_SLIM_KEY = "SlimEpisodes";
 
-    private ISubscription mSubscription = null;
+    protected ISubscription mSubscription = null;
 
     final MultiShrinkScroller.MultiShrinkScrollerListener mMultiShrinkScrollerListener
             = new MultiShrinkScroller.MultiShrinkScrollerListener() {
@@ -142,7 +142,7 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
     private static Bundle mFuckItHack = null;
     public static void startSlim(@NonNull Activity argActivity, @NonNull String argURL, @Nullable SlimSubscription argSubscription) {
         Bundle b = new Bundle();
-        Intent intent = new Intent(argActivity, FeedActivity.class);
+        Intent intent = new Intent(argActivity, DiscoveryFeedActivity.class);
         b.putBoolean(FEED_ACTIVITY_IS_SLIM, true);
         b.putString(FeedActivity.SUBSCRIPTION_URL_KEY, argURL);
         b.putParcelable(SUBSCRIPTION_SLIM_KEY, argSubscription); // Not required, but nice to have if we already got it
@@ -156,7 +156,7 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
 
         //startActivity(argActivity, b);
         argActivity.startActivity(intent);
-        //argActivity.overridePendingTransition(R.anim.slide_in_bottom, R.anim.slide_out_bottom);
+        argActivity.overridePendingTransition(R.anim.slide_in_bottom, R.anim.slide_out_bottom);
     }
 
     private static void startActivity(@NonNull Activity argActivity, @NonNull Bundle argBundle) {
@@ -254,12 +254,12 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
         mRecyclerView.setHasFixedSize(true);
 
         if (mIsSlimSubscription) {
-            FeedViewDiscoveryAdapter adapter = new FeedViewDiscoveryAdapter(this, mCursor);
+            FeedViewDiscoveryAdapter adapter = new FeedViewDiscoveryAdapter(this, mSubscription, mCursor);
             SlimSubscription slimSubscription = (SlimSubscription)mSubscription;
             adapter.setDataset(slimSubscription.getEpisodes());
             mAdapter = adapter;
         } else {
-            mAdapter = new FeedViewAdapter(this, mCursor);
+            mAdapter = new FeedViewAdapter(this, mSubscription, mCursor);
         }
 
         mRecyclerView.setAdapter(mAdapter);
@@ -364,7 +364,6 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.feedview, menu);
         return super.onCreateOptionsMenu(menu);
-
     }
 
     @Override

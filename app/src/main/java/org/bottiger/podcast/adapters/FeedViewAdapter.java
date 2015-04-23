@@ -1,10 +1,12 @@
 package org.bottiger.podcast.adapters;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -20,6 +22,7 @@ import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.views.DownloadButtonView;
 import org.bottiger.podcast.views.FeedViewQueueButton;
 import org.bottiger.podcast.views.PlayPauseImageView;
@@ -29,10 +32,10 @@ import org.bottiger.podcast.views.PlayPauseImageView;
  */
 public class FeedViewAdapter extends RecyclerView.Adapter {
 
-    private ISubscription mSubscription;
+    protected ISubscription mSubscription;
 
     protected Cursor mCursor;
-    protected Context mContext;
+    protected Activity mActivity;
     protected LayoutInflater mInflater;
 
     protected Palette mPalette;
@@ -40,13 +43,14 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
     private DownloadProgressObservable mDownloadProgressObservable;
     private boolean mIsExpanded = false;
 
-    public FeedViewAdapter(Context context, Cursor dataset) {
-        mContext = context;
+    public FeedViewAdapter(@NonNull Activity activity, @NonNull ISubscription argSubscription, @Nullable Cursor dataset) {
+        mActivity = activity;
+        mSubscription = argSubscription;
 
-        mInflater = (LayoutInflater) context
+        mInflater = (LayoutInflater) activity
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        mDownloadProgressObservable = new DownloadProgressObservable(mContext);
+        mDownloadProgressObservable = new DownloadProgressObservable(mActivity);
         setDataset(dataset);
     }
 
@@ -91,10 +95,8 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
         FeedItem item = (FeedItem) argEpisode;
 
         if (mSubscription == null) {
-            mSubscription = item.getSubscription(mContext);
+            mSubscription = item.getSubscription(mActivity);
         }
-
-        getPalette(mSubscription);
 
         boolean isPlaying = false;
         if (MainActivity.sBoundPlayerService != null && MainActivity.sBoundPlayerService.isInitialized()) {
@@ -110,8 +112,15 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
         episodeViewHolder.mQueueButton.setEpisodeId(item.getId(), PlayPauseImageView.LOCATION.FEEDVIEW);
         episodeViewHolder.mPlayPauseButton.setStatus(isPlaying ? PlayerStatusObservable.STATUS.PLAYING : PlayerStatusObservable.STATUS.PAUSED);
 
+        getPalette(episodeViewHolder);
 
         episodeViewHolder.mDownloadButton.setEpisode(item);
+    }
+
+    protected void getPalette(@NonNull EpisodeViewHolder episodeViewHolder) {
+        PaletteHelper.generate(mSubscription.getImageURL(), mActivity, episodeViewHolder.mDownloadButton);
+        PaletteHelper.generate(mSubscription.getImageURL(), mActivity, episodeViewHolder.mQueueButton);
+        PaletteHelper.generate(mSubscription.getImageURL(), mActivity, episodeViewHolder.mPlayPauseButton);
     }
 
     @Override
@@ -136,9 +145,6 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
     protected IEpisode getItemForPosition(int argPosition) {
         mCursor.moveToPosition(argPosition);
         return FeedItem.getByCursor(mCursor);
-    }
-
-    protected void getPalette(ISubscription argSubscription) {
     }
 
     public class EpisodeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

@@ -98,7 +98,7 @@ public class LegacyRemoteController {
         if (remoteControlClient != null && episode != null)
         {
             Log.d("RemoteController", "Updating remote control");
-            //int state = mContext.isPlaying() ? remoteControlClient.PLAYSTATE_PLAYING : remoteControlClient.PLAYSTATE_PAUSED;
+            //int state = mActivity.isPlaying() ? remoteControlClient.PLAYSTATE_PLAYING : remoteControlClient.PLAYSTATE_PAUSED;
             //remoteControlClient.setPlaybackState(state);
             updatePlayingState(mContext.isPlaying());
 

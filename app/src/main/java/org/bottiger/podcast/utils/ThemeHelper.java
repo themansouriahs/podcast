@@ -24,7 +24,7 @@ public class ThemeHelper {
 		TypedArray a = mContext.getTheme().obtainStyledAttributes(getTheme(prefs), new int[] {attr});     
 		int attributeResourceId = a.getResourceId(0, 0);
 		return attributeResourceId;
-		//Drawable drawable = mContext.getResources().getDrawable(attributeResourceId);
+		//Drawable drawable = mActivity.getResources().getDrawable(attributeResourceId);
 		//return drawable;
 	}
 	

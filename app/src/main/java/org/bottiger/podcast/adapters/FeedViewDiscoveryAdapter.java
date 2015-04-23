@@ -1,12 +1,16 @@
 package org.bottiger.podcast.adapters;
 
+import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.view.View;
 
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.SlimImplementations.SlimEpisode;
+import org.bottiger.podcast.utils.PaletteHelper;
 
 import java.util.ArrayList;
 
@@ -17,8 +21,8 @@ public class FeedViewDiscoveryAdapter extends FeedViewAdapter {
 
     private ArrayList<SlimEpisode> mEpisodes = new ArrayList<>();
 
-    public FeedViewDiscoveryAdapter(Context context, Cursor dataset) {
-        super(context, dataset);
+    public FeedViewDiscoveryAdapter(@NonNull Activity activity, @NonNull ISubscription argSubscription, @Nullable Cursor dataset) {
+        super(activity, argSubscription, dataset);
     }
 
     @Override
@@ -39,16 +43,16 @@ public class FeedViewDiscoveryAdapter extends FeedViewAdapter {
     }
 
     @Override
-    protected void getPalette(ISubscription argSubscription) {
-    }
-
-    @Override
     protected IEpisode getItemForPosition(int argPosition) {
         return mEpisodes.get(argPosition);
     }
 
     @Override
     protected void bindButtons(@NonNull EpisodeViewHolder episodeViewHolder, @NonNull IEpisode argEpisode) {
+
+        episodeViewHolder.mDownloadButton.setVisibility(View.GONE);
+
+        getPalette(episodeViewHolder);
         return;
     }
 }
