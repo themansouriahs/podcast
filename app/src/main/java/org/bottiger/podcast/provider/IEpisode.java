@@ -12,9 +12,14 @@ public interface IEpisode {
     public String getTitle();
     public URL getUrl();
     public String getDescription();
+    public String getAuthor();
+    public long getDuration();
 
     public void setTitle(@NonNull String argTitle);
     public void setUrl(@NonNull URL argUrl);
     public void setDescription(@NonNull String argDescription);
+    public void setDuration(long argDurationMs);
+
+    public boolean isDownloaded();
 
 }

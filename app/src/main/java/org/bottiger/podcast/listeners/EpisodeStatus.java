@@ -1,34 +1,36 @@
 package org.bottiger.podcast.listeners;
 
+import org.bottiger.podcast.provider.IEpisode;
+
 /**
  * Created by apl on 06-09-2014.
  */
 public class EpisodeStatus {
 
-    private long mEpisodeId = -1;
+    private IEpisode mEpisode = null;
     private PlayerStatusObservable.STATUS mStatus = PlayerStatusObservable.STATUS.STOPPED;
     private int mPosition = -1;
 
-    public EpisodeStatus(long argEpisodeId, PlayerStatusObservable.STATUS argStatus) {
-        mEpisodeId = argEpisodeId;
+    public EpisodeStatus(IEpisode argEpisode, PlayerStatusObservable.STATUS argStatus) {
+        mEpisode = argEpisode;
         mStatus = argStatus;
     }
 
-    public EpisodeStatus(long argEpisodeId, PlayerStatusObservable.STATUS argStatus, int argPosition) {
-        mEpisodeId = argEpisodeId;
+    public EpisodeStatus(IEpisode argEpisode, PlayerStatusObservable.STATUS argStatus, int argPosition) {
+        mEpisode = argEpisode;
         mStatus = argStatus;
         mPosition = argPosition;
     }
 
-    public static EpisodeStatus generateEpisodeStatsus(long argEpisodeId, PlayerStatusObservable.STATUS argStatus, Integer argPosition) {
+    public static EpisodeStatus generateEpisodeStatsus(IEpisode argEpisode, PlayerStatusObservable.STATUS argStatus, Integer argPosition) {
         if (argPosition == null) {
-            return new EpisodeStatus(argEpisodeId, argStatus);
+            return new EpisodeStatus(argEpisode, argStatus);
         }
-        return new EpisodeStatus(argEpisodeId, argStatus, argPosition);
+        return new EpisodeStatus(argEpisode, argStatus, argPosition);
     }
 
-    public long getEpisodeId() {
-        return mEpisodeId;
+    public IEpisode getEpisode() {
+        return mEpisode;
     }
 
     public int getPlaybackPositionMs() {

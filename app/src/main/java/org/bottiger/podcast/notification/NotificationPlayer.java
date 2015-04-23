@@ -3,6 +3,7 @@ package org.bottiger.podcast.notification;
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.receiver.NotificationReceiver;
 import org.bottiger.podcast.service.PlayerService;
 
@@ -28,7 +29,7 @@ import com.squareup.picasso.Target;
 public class NotificationPlayer {
 	
 	private PlayerService mPlayerService;
-	private FeedItem item;
+	private IEpisode item;
     private Bitmap mArtwork;
 
     private Notification mNotification;
@@ -54,11 +55,13 @@ public class NotificationPlayer {
 	private NotificationManager mNotificationManager = null;
 	private static int mId = 4260;
 	
-	public NotificationPlayer(@NonNull PlayerService argPlayerService, @NonNull FeedItem item) {
+	public NotificationPlayer(@NonNull PlayerService argPlayerService, @NonNull IEpisode item) {
 		super();
 		this.mPlayerService = argPlayerService;
 		this.item = item;
-        item.getArtworAsync(mPlayerService, loadtarget);
+        if (item instanceof FeedItem) {
+            ((FeedItem)item).getArtworAsync(mPlayerService, loadtarget);
+        }
 	}
 
     @Nullable
@@ -114,7 +117,7 @@ public class NotificationPlayer {
 		    mNotificationManager.cancel(mId);
 	}
 
-	public FeedItem getItem() {
+	public IEpisode getItem() {
 		return item;
 	}
 
@@ -171,8 +174,8 @@ public class NotificationPlayer {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(mPlayerService)
                         .setSmallIcon(smallIcon)
-                        .setContentTitle(item.title)
-                        .setContentText(item.sub_title);
+                        .setContentTitle(item.getTitle());
+                        //.setContentText(item.sub_title);
 
         if (mArtwork != null && !mArtwork.isRecycled()) {
             mBuilder.setLargeIcon(icon);
@@ -188,8 +191,8 @@ public class NotificationPlayer {
 
         // Sets a custom content view for the notification, including an image button.
         RemoteViews layout = new RemoteViews(mPlayerService.getPackageName(), R.layout.notification);
-        layout.setTextViewText(R.id.notification_title, item.title);
-        layout.setTextViewText(R.id.notification_content, item.sub_title);
+        layout.setTextViewText(R.id.notification_title, item.getTitle());
+        //layout.setTextViewText(R.id.notification_content, item.sub_title);
         layout.setImageViewBitmap(R.id.icon, icon);
 
         // Prepare intent which is triggered if the

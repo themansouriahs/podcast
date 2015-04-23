@@ -16,6 +16,7 @@ import com.squareup.picasso.Target;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.service.PlayerService;
 
@@ -93,7 +94,7 @@ public class LegacyRemoteController {
 
     public void updateMetaData()
     {
-        final FeedItem episode = mContext.getCurrentItem();
+        final IEpisode episode = mContext.getCurrentItem();
 
         if (remoteControlClient != null && episode != null)
         {
@@ -127,11 +128,13 @@ public class LegacyRemoteController {
                 }
             };
 
-            episode.getArtworAsync(mContext, target);
+            if (episode instanceof IEpisode) {
+                ((FeedItem)episode).getArtworAsync(mContext, target);
+            }
         }
     }
 
-    private void updateSimpleMetaData(RemoteControlClient.MetadataEditor editor, FeedItem episode) {
+    private void updateSimpleMetaData(RemoteControlClient.MetadataEditor editor, IEpisode episode) {
         editor.putLong(MediaMetadataRetriever.METADATA_KEY_DURATION, (long)1000);
         editor.putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, episode.getAuthor());
         editor.putString(MediaMetadataRetriever.METADATA_KEY_TITLE, episode.getTitle());

@@ -301,9 +301,9 @@ public class Playlist implements OnDragStateChangedListener {
 		PlayerService playerService = MainActivity.sBoundPlayerService;
 
 		String playingFirst = "";
-		if (playerService != null && playerService.getCurrentItem() != null) {
+		if (playerService != null && playerService.getCurrentItem() != null && playerService.getCurrentItem() instanceof FeedItem) {
 			playingFirst = "case " + ItemColumns.TABLE_NAME + "." + ItemColumns._ID + " when "
-					+ playerService.getCurrentItem().getId()
+					+ + ((FeedItem)playerService.getCurrentItem()).getId()
 					+ " then 1 else 2 end, ";
 		}
 		String prioritiesSecond = "case " + ItemColumns.TABLE_NAME + "." + ItemColumns.PRIORITY

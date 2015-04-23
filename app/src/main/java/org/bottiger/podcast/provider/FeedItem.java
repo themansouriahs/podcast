@@ -1095,6 +1095,10 @@ public class FeedItem extends AbstractItem implements IEpisode, Comparable<FeedI
 		*/
 	}
 
+    public void setDuration(long argDurationMs) {
+        setDuration(argDurationMs, true);
+    }
+
     public void setDuration(long argDurationMs, boolean argOverride) {
         if (!argOverride) {
             if (duration_ms > 0)

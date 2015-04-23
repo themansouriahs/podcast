@@ -18,6 +18,7 @@ import org.bottiger.podcast.flavors.MediaCast.IMediaCast;
 import org.bottiger.podcast.flavors.MediaCast.IMediaRouteStateListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.service.PlayerService;
 
@@ -234,12 +235,13 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
     MediaPlayer.OnCompletionListener listener = new MediaPlayer.OnCompletionListener() {
         @Override
         public void onCompletion(MediaPlayer mp) {
-            FeedItem item = mPlayerService.getCurrentItem();
+            IEpisode item = mPlayerService.getCurrentItem();
 
-            if (item != null) {
+            if (item != null && item instanceof FeedItem) {
 
+                FeedItem feedItem = (FeedItem)item;
                 // Mark current as listened
-                item.markAsListened();
+                feedItem.markAsListened();
 
                if (mPlayerService != null) {
                    // Delete if required
@@ -248,11 +250,11 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
                     boolean doDelete = mSharedpreferences.getBoolean(resources.getString(R.string.pref_delete_when_finished_key), DELETE_WHEN_FINISHED_DEFAULT);
 
                     if (doDelete) {
-                        item.delFile(resolver);
+                        feedItem.delFile(resolver);
 
                     }
 
-                   item.update(resolver);
+                   feedItem.update(resolver);
                 }
             }
 
@@ -273,7 +275,7 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
         @Override
         public void onPrepared(MediaPlayer mp) {
             mp.seekTo(startPos);
-            mPlayerService.getCurrentItem().setDuration(mp.getDuration(), false);
+            mPlayerService.getCurrentItem().setDuration(mp.getDuration());
             start();
             isPreparingMedia = false;
         }
@@ -323,7 +325,15 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
         if (mPlayerService == null)
             return;
 
-        FeedItem episode = mPlayerService.getCurrentItem();
+        IEpisode iepisode = mPlayerService.getCurrentItem();
+
+        FeedItem episode = null;
+        if (iepisode instanceof FeedItem) {
+            episode = (FeedItem)iepisode;
+        } else {
+            return;
+        }
+
         float playerPosition = (float) getCurrentPosition();
 
         if (episode == null)
@@ -358,14 +368,17 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
         if (mPlayerService == null)
             return;
 
-        FeedItem episode = mPlayerService.getCurrentItem();
+        IEpisode episode = mPlayerService.getCurrentItem();
 
         if (episode == null)
             return;
 
         if (mMediaCast.isConnected()) {
             mMediaCast.loadEpisode(episode);
-            mMediaCast.seekTo(episode.offset);
+
+            if (episode instanceof FeedItem) {
+                mMediaCast.seekTo(((FeedItem)episode).offset);
+            }
 
             if (super.isPlaying()) {
                 int offst = super.getCurrentPosition();

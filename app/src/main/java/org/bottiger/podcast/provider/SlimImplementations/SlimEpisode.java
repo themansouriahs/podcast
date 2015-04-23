@@ -17,6 +17,7 @@ public class SlimEpisode implements IEpisode, Parcelable {
     private String mTitle;
     private URL mUrl;
     private String mDescription;
+    private long mDuration = -1;
 
     public SlimEpisode(@NonNull String argTitle, @NonNull URL argUrl, @NonNull String argDescription) {
         mTitle = argTitle;
@@ -40,6 +41,16 @@ public class SlimEpisode implements IEpisode, Parcelable {
     }
 
     @Override
+    public String getAuthor() {
+        return ""; // FIXME
+    }
+
+    @Override
+    public long getDuration() {
+        return mDuration;
+    }
+
+    @Override
     public void setTitle(@NonNull String argTitle) {
         mTitle = argTitle;
     }
@@ -52,6 +63,16 @@ public class SlimEpisode implements IEpisode, Parcelable {
     @Override
     public void setDescription(@NonNull String argDescription) {
         mDescription = argDescription;
+    }
+
+    @Override
+    public void setDuration(long argDurationMs) {
+        mDuration = argDurationMs;
+    }
+
+    @Override
+    public boolean isDownloaded() {
+        return false;
     }
 
     public int describeContents() {

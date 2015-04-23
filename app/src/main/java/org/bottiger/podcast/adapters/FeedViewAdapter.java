@@ -100,16 +100,16 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
 
         boolean isPlaying = false;
         if (MainActivity.sBoundPlayerService != null && MainActivity.sBoundPlayerService.isInitialized()) {
-            if (item.getId() == MainActivity.sBoundPlayerService
-                    .getCurrentItem().id) {
+            if (item.getURL() == MainActivity.sBoundPlayerService
+                    .getCurrentItem().getUrl().toString()) {
                 if (MainActivity.sBoundPlayerService.isPlaying()) {
                     isPlaying = true;
                 }
             }
         }
 
-        episodeViewHolder.mPlayPauseButton.setEpisodeId(item.getId(), PlayPauseImageView.LOCATION.FEEDVIEW);
-        episodeViewHolder.mQueueButton.setEpisodeId(item.getId(), PlayPauseImageView.LOCATION.FEEDVIEW);
+        episodeViewHolder.mPlayPauseButton.setEpisode(item, PlayPauseImageView.LOCATION.FEEDVIEW);
+        episodeViewHolder.mQueueButton.setEpisode(item, PlayPauseImageView.LOCATION.FEEDVIEW);
         episodeViewHolder.mPlayPauseButton.setStatus(isPlaying ? PlayerStatusObservable.STATUS.PLAYING : PlayerStatusObservable.STATUS.PAUSED);
 
         getPalette(episodeViewHolder);

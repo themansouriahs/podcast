@@ -31,6 +31,7 @@ import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObserver;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.utils.ColorExtractor;
 
 /**
@@ -53,8 +54,7 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
 
     private PlayerStatusObservable.STATUS mStatus = PlayerStatusObservable.STATUS.STOPPED;
 
-    private FeedItem mEpisode;
-    private long mEpisodeId = -1;
+    private IEpisode mEpisode;
 
     protected Context mContext;
 
@@ -112,24 +112,22 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
     }
 
     @Override
-    public FeedItem getEpisode() {
-        if (mEpisode == null || mEpisode.getId() != mEpisodeId)
-            mEpisode = FeedItem.getById(this.getContext().getContentResolver(), mEpisodeId);
-
+    public IEpisode getEpisode() {
         return mEpisode;
     }
 
-    public synchronized void setEpisodeId(long argId, LOCATION argLocation) {
+    public synchronized void setEpisode(IEpisode argEpisode, LOCATION argLocation) {
         this.mLocation = argLocation;
-        this.mEpisodeId = argId;
+        this.mEpisode = argEpisode;
 
-        long offset = getEpisode().offset > 0 ? getEpisode().offset : 0;
+
+        long offset = mEpisode instanceof FeedItem && ((FeedItem)mEpisode).offset > 0 ? ((FeedItem)mEpisode).offset : 0;
         setProgressMs(offset);
         invalidate();
     }
 
     public synchronized void unsetEpisodeId() {
-        this.mEpisodeId = -1;
+        this.mEpisode = null;
     }
 
     public void setStatus(PlayerStatusObservable.STATUS argStatus) {
@@ -206,7 +204,7 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
 
     @Override
     public void onStateChange(EpisodeStatus argStatus) {
-        if (argStatus.getEpisodeId() != mEpisodeId) {
+        if (argStatus.getEpisode() != mEpisode) {
             return;
         }
 
@@ -230,11 +228,11 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
         if (type != null) {
             SoundWaves.sAnalytics.trackEvent(type);
         }
-        boolean isPlaying = MainActivity.sBoundPlayerService.toggle(mEpisodeId);
+        boolean isPlaying = MainActivity.sBoundPlayerService.toggle(mEpisode);
 
         setStatus(isPlaying ? PlayerStatusObservable.STATUS.PLAYING : PlayerStatusObservable.STATUS.STOPPED);
 
-        FeedItem item = getEpisode();
+        IEpisode item = getEpisode();
         Playlist playlist = Playlist.getActivePlaylist();
 
         if (playlist.contains(item)) {
@@ -258,7 +256,7 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
 
     @Override
     public String getPaletteUrl() {
-        return FeedItem.getById(getContext().getContentResolver(), mEpisodeId).getImageURL(getContext()); // FIXME
+        return mEpisode.getUrl().toString();
     }
 
     private static int smallSize = -1;

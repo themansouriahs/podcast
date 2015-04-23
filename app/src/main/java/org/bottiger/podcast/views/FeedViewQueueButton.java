@@ -15,6 +15,7 @@ import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 
 /**
  * Created by apl on 19-04-2015.
@@ -69,7 +70,7 @@ public class FeedViewQueueButton extends PlayPauseImageView {
 
     @Override
     public void onClick(View view) {
-        FeedItem item = getEpisode();
+        IEpisode item = getEpisode();
         Playlist playlist = Playlist.getActivePlaylist();
 
         playlist.queue(mContext, item);

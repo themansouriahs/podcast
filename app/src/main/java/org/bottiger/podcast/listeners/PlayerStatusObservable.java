@@ -6,6 +6,7 @@ import java.util.WeakHashMap;
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
 
 import android.app.Activity;
@@ -105,15 +106,16 @@ public class PlayerStatusObservable {
     }
 
     public static void updateProgress(@NonNull PlayerService argPlayerService) {
-        FeedItem currentItem = argPlayerService.getCurrentItem();
-        if (currentItem != null) {
+        IEpisode currentItem = argPlayerService.getCurrentItem();
+        if (currentItem != null && currentItem instanceof FeedItem) {
+            FeedItem feedItem = (FeedItem)currentItem;
             int offset = argPlayerService.getPlayer().getCurrentPosition();
             offset = argPlayerService.getPlayer().getCurrentPosition();
             updateEpisodeOffset(argPlayerService.getContentResolver(),
-                    currentItem,
+                    feedItem,
                     offset);
 
-            updateProgress(argPlayerService, currentItem);
+            updateProgress(argPlayerService, feedItem);
         }
     }
 
