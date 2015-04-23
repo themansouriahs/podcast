@@ -123,7 +123,7 @@ public class NSRSS20 extends Namespace {
 			} else if (top.equals(LINK)) {
 				if (second.equals(CHANNEL)) {
 					// FIXME
-					state.getSubscription().setURL(content);
+					// state.getSubscription().setURL(content);
 				} else if (second.equals(ITEM)) {
 					//state.getCurrentItem().setLink(content);
                     if (TextUtils.isEmpty(state.getCurrentItem().url)) {
