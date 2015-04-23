@@ -1,6 +1,7 @@
 package org.bottiger.podcast.adapters;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
@@ -43,19 +44,18 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
     private HashSet<URL> mSubscribedUrls = new HashSet<>();
     private LruCache<String,SlimSubscription> mCache = new LruCache<>(10);
 
+    private static ProgressDialog mProgress;
+
     IDownloadCompleteCallback mRefreshCompleteCallback = new IDownloadCompleteCallback() {
         @Override
         public void complete(boolean argSucces, ISubscription argSubscription) {
+            mProgress.dismiss();
+
             if (!argSucces)
                 return;
 
             SlimSubscription slimSubscription = (SlimSubscription)argSubscription;
             FeedActivity.startSlim(mActivity, slimSubscription.getURLString(), slimSubscription);
-            /*
-            if (argSubscription instanceof SlimSubscription) {
-                SlimSubscription slimSubscription = (SlimSubscription)argSubscription;
-                mCache.put(slimSubscription.getURLString(), slimSubscription);
-            }*/
         }
     };
 
@@ -64,6 +64,8 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
         mInflater = (LayoutInflater) mActivity
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mDefaultBackgroundColor = mActivity.getResources().getColor(R.color.colorPrimary);
+
+        mProgress = new ProgressDialog(mActivity);
 
         populateSubscribedUrls();
     }
@@ -96,11 +98,10 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
         holder.image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //mProgress.setTitle("Loading");
+                mProgress.setMessage(mActivity.getString(R.string.discovery_progress_loading_podcast_content));
+                mProgress.show();
                 SoundWaves.sSubscriptionRefreshManager.refresh(subscription, mRefreshCompleteCallback);
-
-                //String urlString = url.toString();
-                //SlimSubscription slimSubscription = mCache.get(urlString);
-                //FeedActivity.startSlim(mActivity, urlString, slimSubscription);
             }
         });
 

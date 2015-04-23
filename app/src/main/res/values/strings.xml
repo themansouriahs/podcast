@@ -114,6 +114,9 @@
     <string name="discovery_unsubscribe_toast">Unsubscribed from %s</string>
     <string name="subscription_no_title">(No title)</string>
 
+    <!-- When downloading and parsing the content of a feed -->
+    <string name="discovery_progress_loading_podcast_content">Fetching podcast content</string>
+
     <plurals name="bulk_download_playlist">
         <item quantity="one">First episode in the playlist</item>
         <item quantity="other">Top %d episodes in the playlist</item>
