@@ -111,7 +111,9 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
     }
 
     private void init(@NonNull Context argContext) {
-        mActivity = (Activity)argContext;
+
+        if (!isInEditMode())
+            mActivity = (Activity)argContext;
 
         int screenHeight = UIUtils.getScreenHeight(mActivity);
 

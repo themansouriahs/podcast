@@ -306,7 +306,7 @@ public class PlaylistFragment extends GeastureFragment implements
 
     public void bindHeader(final FeedItem item) {
         mEpisodeTitle.setText(item.getTitle());
-        mEpisodeInfo.setText("");
+        mEpisodeInfo.setText(item.getDescription());
 
         long duration = item.getDuration();
         if (duration > 0) {
