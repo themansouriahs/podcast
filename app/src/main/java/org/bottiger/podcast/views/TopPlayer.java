@@ -3,11 +3,13 @@ package org.bottiger.podcast.views;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Point;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.graphics.Palette;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Display;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -111,9 +113,11 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
     private void init(@NonNull Context argContext) {
         mActivity = (Activity)argContext;
 
+        int screenHeight = UIUtils.getScreenHeight(mActivity);
+
         sizeSmall = mActivity.getResources().getDimensionPixelSize(R.dimen.top_player_size_minimum);
         sizeMedium = mActivity.getResources().getDimensionPixelSize(R.dimen.top_player_size_medium);
-        sizeLarge = mActivity.getResources().getDimensionPixelSize(R.dimen.top_player_size_maximum);
+        sizeLarge = screenHeight- mActivity.getResources().getDimensionPixelSize(R.dimen.top_player_size_maximum_bottom);
 
         screenHeight = sizeLarge;
 

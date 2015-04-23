@@ -379,7 +379,7 @@ public class PlaylistFragment extends GeastureFragment implements
         }
 
         if (mTopPlayer.getVisibleHeight() == 0) {
-            mTopPlayer.setPlayerHeight(1500);
+            mTopPlayer.setPlayerHeight(mTopPlayer.getMaximumSize());
         }
     }
 

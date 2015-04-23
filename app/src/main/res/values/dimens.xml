@@ -33,6 +33,7 @@
     <dimen name="top_player_size_minimum">127dp</dimen>
     <dimen name="top_player_size_medium">150dp</dimen>
     <dimen name="top_player_size_maximum">280dp</dimen>
+    <dimen name="top_player_size_maximum_bottom">160dp</dimen>
 
     <dimen name="player_elevation">5dp</dimen>
 
