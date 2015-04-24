@@ -106,7 +106,6 @@
         android:layout_marginLeft="30dp"
         android:layout_marginRight="30dp"
         />
-    <!--         android:background="@color/blackWithAlpha" -->
 
     <TextView
         android:id="@+id/episode_info"
@@ -119,11 +118,14 @@
         android:textSize="16sp"
         android:layout_marginLeft="30dp"
         android:layout_marginRight="30dp"
+        />
+    <!--
+
         android:requiresFadingEdge="vertical"
         android:fadingEdge="vertical"
         android:fadingEdgeLength="80dp"
         android:ellipsize="marquee"
-        />
+        -->
 
 
 </org.bottiger.podcast.views.TopPlayer >

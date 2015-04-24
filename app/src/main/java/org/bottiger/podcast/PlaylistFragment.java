@@ -2,6 +2,7 @@ package org.bottiger.podcast;
 
 import org.bottiger.podcast.adapters.PlaylistAdapter;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
+import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.listeners.RecyclerItemTouchListener;
 import org.bottiger.podcast.playlist.Playlist;
@@ -31,6 +32,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -308,6 +310,10 @@ public class PlaylistFragment extends GeastureFragment implements
         mEpisodeTitle.setText(item.getTitle());
         mEpisodeInfo.setText(item.getDescription());
 
+        final int color =getResources().getColor(R.color.white_opaque);
+        mEpisodeTitle.setTextColor(color);
+        mEpisodeInfo.setTextColor(color);
+
         long duration = item.getDuration();
         if (duration > 0) {
             mTotalTime.setText(StrUtils.formatTime(duration));
@@ -358,7 +364,7 @@ public class PlaylistFragment extends GeastureFragment implements
 
         mDownloadProgressObservable.registerObserver(mPlayerDownloadButton);
 
-        Activity activity = getActivity();
+        final Activity activity = getActivity();
 
         mTopPlayer.setEpisodeId(item);
 
@@ -368,6 +374,25 @@ public class PlaylistFragment extends GeastureFragment implements
         PaletteHelper.generate(item.getImageURL(activity), activity, mForwardButton);
         PaletteHelper.generate(item.getImageURL(activity), activity, mDownloadButton);
         PaletteHelper.generate(item.getImageURL(activity), activity, mFavoriteButton);
+
+        PaletteHelper.generate(item.getImageURL(activity), activity, new PaletteListener() {
+            @Override
+            public void onPaletteFound(Palette argChangedPalette) {
+                Palette.Swatch swatch = argChangedPalette.getMutedSwatch();
+
+                if (swatch == null)
+                    return;
+
+                int colorText = swatch.getTitleTextColor();
+                mEpisodeTitle.setTextColor(color);
+                mEpisodeInfo.setTextColor(color);
+            }
+
+            @Override
+            public String getPaletteUrl() {
+                return item.getImageURL(activity);
+            }
+        });
 
         PlayerStatusObservable.registerListener(mPlayerSeekbar);
 
