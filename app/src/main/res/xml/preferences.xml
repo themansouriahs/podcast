@@ -118,6 +118,7 @@
 
         </PreferenceCategory>
 
+        <!--
         <PreferenceCategory
             android:title="@string/pref_notification_category_title"
             android:key="pref_notification_category">
@@ -129,6 +130,7 @@
                 android:title="@string/pref_notification_control" />
 
         </PreferenceCategory>
+        -->
 
     </PreferenceScreen>
 

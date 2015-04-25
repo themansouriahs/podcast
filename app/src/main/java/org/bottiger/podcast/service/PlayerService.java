@@ -265,10 +265,6 @@ public class PlayerService extends Service implements
     }
 
 	public void playNext() {
-		// assert playlistAdapter != null;
-
-		// Cursor firstItem = (Cursor) playlistAdapter.getItem(0);
-		// playlistAdapter.notifyDataSetChanged();
         FeedItem item = getCurrentItem();
         FeedItem nextItem = sPlaylist.getNext();
 
