@@ -32,21 +32,25 @@ android {
         dev {
             buildConfigField "boolean", "DEV_MODE", "true"
             buildConfigField "boolean", "PRIVATE_MODE", "false"
+            buildConfigField "boolean", "LIBRE_MODE", "true"
         }
 
         free {
             buildConfigField "boolean", "DEV_MODE", "false"
             buildConfigField "boolean", "PRIVATE_MODE", "true"
+            buildConfigField "boolean", "LIBRE_MODE", "true"
         }
 
         google {
             buildConfigField "boolean", "DEV_MODE", "false"
             buildConfigField "boolean", "PRIVATE_MODE", "false"
+            buildConfigField "boolean", "LIBRE_MODE", "false"
         }
 
         amazon {
             buildConfigField "boolean", "DEV_MODE", "false"
             buildConfigField "boolean", "PRIVATE_MODE", "false"
+            buildConfigField "boolean", "LIBRE_MODE", "false"
         }
     }
 

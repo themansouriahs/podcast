@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
 import org.bottiger.podcast.webservices.directories.IDirectoryProvider;
+import org.bottiger.podcast.webservices.directories.ISearchResult;
 
 /**
  * Created by apl on 13-04-2015.
@@ -29,6 +30,6 @@ public abstract class GenericDirectory implements IDirectoryProvider{
         task.cancel(true);
     }
 
-    protected abstract AsyncTask getAsyncTask();
+    protected abstract AsyncTask<String, Void, ISearchResult> getAsyncTask();
 
 }

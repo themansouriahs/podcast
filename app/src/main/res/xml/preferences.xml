@@ -118,20 +118,6 @@
 
         </PreferenceCategory>
 
-        <!--
-        <PreferenceCategory
-            android:title="@string/pref_notification_category_title"
-            android:key="pref_notification_category">
-
-            <CheckBoxPreference
-                android:defaultValue="true"
-                android:key="pref_notification_control"
-                android:summary="@string/pref_notification_control_description"
-                android:title="@string/pref_notification_control" />
-
-        </PreferenceCategory>
-        -->
-
     </PreferenceScreen>
 
     <PreferenceScreen
@@ -205,11 +191,31 @@
             android:key="cloud"
             android:title="@string/preferences_category_cloud" />
 
+        <PreferenceCategory
+            android:title="@string/pref_cloud_category_cloud_title"
+            android:key="pref_cloud_category_cloud">
+
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="pref_cloud_support"
             android:summary="@string/pref_cloud_support_description"
             android:title="@string/pref_cloud_support_title" />
+
+        </PreferenceCategory>
+
+        <PreferenceCategory
+            android:title="@string/pref_cloud_category_services_title"
+            android:key="@string/pref_cloud_category_cloud_services_key">
+
+            <ListPreference
+                android:dialogTitle="@string/pref_webservices_dialog_title"
+                android:entries="@array/entries_webservices_discovery_engine"
+                android:entryValues="@array/entryvalues_webservices_discovery_engine"
+                android:key="@string/pref_webservices_discovery_engine_key"
+                android:summary="@string/pref_webservices_discovery_description"
+                android:title="@string/pref_webservices_discovery_title" />
+
+        </PreferenceCategory>
 
     </PreferenceScreen>
 

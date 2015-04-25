@@ -11,15 +11,28 @@
         android:layout_height="wrap_content"
         android:background="@color/colorSecondary">
 
-    <SearchView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:background="@color/grayEnd"
-        android:elevation="5dp"
-        android:id="@+id/discovery_searchView"
-        android:queryHint="@string/search_query_hint"
-        android:layout_alignParentTop="true" />
+            <SearchView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:background="@color/grayEnd"
+                android:elevation="5dp"
+                android:id="@+id/discovery_searchView"
+                android:queryHint="@string/search_query_hint"
+                android:layout_alignParentTop="true"/>
+
+            <ImageButton
+                android:id="@+id/discovery_searchIcon"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_margin="20dp"
+                android:elevation="5dp"
+                android:layout_gravity="center_vertical"
+                android:scaleType="centerInside"
+                android:background="@android:color/transparent"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                />
 
 
     <TextView

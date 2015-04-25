@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.webservices.directories.IDirectoryProvider;
 import org.bottiger.podcast.webservices.directories.ISearchParameters;
+import org.bottiger.podcast.webservices.directories.ISearchResult;
 import org.bottiger.podcast.webservices.directories.generic.GenericDirectory;
 import org.bottiger.podcast.webservices.directories.generic.GenericSearchResult;
 
@@ -117,7 +118,7 @@ public class ITunes extends GenericDirectory {
         return null;
     }
 
-    private class QueryITunes extends AsyncTask<String, Void, Void> {
+    private class QueryITunes extends AsyncTask<String, Void, ISearchResult> {
 
         private URL mURL;
         private Callback mCallback;
@@ -127,7 +128,7 @@ public class ITunes extends GenericDirectory {
             mCallback = argCallback;
         }
 
-        protected Void doInBackground(String... string) {
+        protected ISearchResult doInBackground(String... string) {
 
             JsonNode node;
             TypeReference<List<SlimSubscription>> typeRef = new TypeReference<List<SlimSubscription>>(){};
@@ -157,15 +158,24 @@ public class ITunes extends GenericDirectory {
                 result.addResult(subscription);
             }
 
-            mCallback.result(result);
-            return null;
+            return result;
+        }
+
+        protected void onPostExecute(ISearchResult argResult) {
+            if (argResult != null) {
+                mCallback.result(argResult);
+            }
         }
     }
 
-    private class SlimSubscription {
+    private static class SlimSubscription {
         String title;
         String url;
         String imageurl;
+
+
+        public SlimSubscription() {
+        }
 
         public String getTitle() {
             return title;

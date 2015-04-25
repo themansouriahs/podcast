@@ -117,6 +117,14 @@
     <!-- When downloading and parsing the content of a feed -->
     <string name="discovery_progress_loading_podcast_content">Fetching podcast content</string>
 
+    <!-- Search engine for searching for new podcasts -->
+    <string name="discovery_select_backend">Select search engine</string>
+    <string name="pref_cloud_category_cloud_title">Cloud Support</string>
+    <string name="pref_cloud_category_services_title">Web Services</string>
+    <string name="pref_webservices_dialog_title">Podcast Search Engine</string>
+    <string name="pref_webservices_discovery_title">Search Engine</string>
+    <string name="pref_webservices_discovery_description">Web services used for searching for podcasts</string>
+
     <plurals name="bulk_download_playlist">
         <item quantity="one">First episode in the playlist</item>
         <item quantity="other">Top %d episodes in the playlist</item>

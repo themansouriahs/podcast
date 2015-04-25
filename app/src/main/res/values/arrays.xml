@@ -194,4 +194,15 @@
         <item>Sort by: Most recent</item>
         <item>Sort by: Oldest</item>
     </string-array>
+
+    <string-array name="entryvalues_webservices_discovery_engine">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+    <string-array name="entries_webservices_discovery_engine">
+        <item>gPodder</item>
+        <item>iTunes</item>
+    </string-array>
+
 </resources>
