@@ -89,6 +89,7 @@
   <string name="pref_network_category_storage_experimental">Experimentell</string>
   <string name="pref_delete_when_finished_title">Löschen nach der Wiedergabe</string>
   <string name="pref_delete_when_finished_description">Die Episoden nach der Wiedergabe automatisch löschen</string>
+  <!--For playing media on another device, like a chromecast-->
   <string name="media_route_menu_title">Besetzung</string>
   <string name="bulk_download_instructions">Alle Episoden nach Übereinstimmung in die Wiedergabeliste herunterladen</string>
   <string name="bulk_download_day">Veröffentlicht innerhalb der letzten 24 Stunden</string>
@@ -105,6 +106,9 @@
   <string name="discovery_subscribe">Abonnieren</string>
   <string name="discovery_subscribe_toast">Folgendes wurde abonniert %s</string>
   <string name="discovery_unsubscribe_toast">Das Abonnement von %s wurde beendet</string>
+  <string name="subscription_no_title">(Kein Titel)</string>
+  <!--When downloading and parsing the content of a feed-->
+  <!--Search engine for searching for new podcasts-->
   <plurals name="bulk_download_playlist">
     <item quantity="one">Erste Episode in der Wiedergabeliste</item>
     <item quantity="other">Beste %d Episoden in der Wiedergabeliste</item>

@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
   <string-array name="drawer_menu">
-    <item>Filtros da lista de reprodução</item>
-    <item>Transferindo itens</item>
+    <item>Filtros de la lista de reproducción</item>
+    <item>Descargando ítems</item>
   </string-array>
   <string-array name="entries_update">
     <item>30 minutos</item>
@@ -11,7 +11,7 @@
     <item>4 horas</item>
     <item>6 horas</item>
     <item>10 horas</item>
-    <item>1 dia</item>
+    <item>1 día</item>
   </string-array>
   <string-array name="entryvalues_update">
     <item>30</item>
@@ -23,12 +23,12 @@
     <item>1440</item>
   </string-array>
   <string-array name="entries_item_expire">
-    <item>1 dia</item>
-    <item>3 dias</item>
-    <item>5 dias</item>
+    <item>1 día</item>
+    <item>3 días</item>
+    <item>5 días</item>
     <item>1 semana</item>
     <item>2 semanas</item>
-    <item>1 mês</item>
+    <item>1 mes</item>
   </string-array>
   <string-array name="entryvalues_item_expire">
     <item>1</item>
@@ -65,22 +65,22 @@
   <string-array name="sort_select">
     <item>Ordenar por canal</item>
     <item>Ordenar por estado</item>
-    <item>Ordenar por data</item>
+    <item>Ordenar por fecha</item>
   </string-array>
   <string-array name="select_select">
-    <item>Tudo</item>
-    <item>Apenas novos</item>
-    <item>Apenas não reproduzidos</item>
-    <item>Apenas passíveis de reprodução</item>
+    <item>Todos</item>
+    <item>Sólo nuevos</item>
+    <item>Sólo sin reproducir</item>
+    <item>Sólo reproducibles</item>
   </string-array>
   <string-array name="backup_select">
-    <item>Importar de OPML</item>
-    <item>Exportar para OPML</item>
+    <item>Importar desde OPML</item>
+    <item>Exportar a OPML</item>
   </string-array>
   <string-array name="repeat_select">
-    <item>Não repetir</item>
-    <item>Repetir tudo</item>
-    <item>Repetir um</item>
+    <item>No repetir</item>
+    <item>Repetir todo</item>
+    <item>Repetir uno</item>
   </string-array>
   <string-array name="entries_pref_rewind_interval">
     <item>3 segundos</item>
@@ -143,9 +143,9 @@
     <item>60</item>
   </string-array>
   <string-array name="pref_subscriptions_columns_entries">
-    <item>Lista</item>
-    <item>2 colunas</item>
-    <item>3 colunas</item>
+    <item>Una lista</item>
+    <item>2 columnas</item>
+    <item>3 columnas</item>
   </string-array>
   <string-array name="pref_subscriptions_columns_entries_values">
     <item>1</item>
@@ -153,15 +153,7 @@
     <item>3</item>
   </string-array>
   <string-array name="playlist_sort_order">
-    <item>Ordenação: Mais recentes</item>
-    <item>Ordenação: Mais antigos</item>
-  </string-array>
-  <string-array name="entryvalues_webservices_discovery_engine">
-    <item>0</item>
-    <item>1</item>
-  </string-array>
-  <string-array name="entries_webservices_discovery_engine">
-    <item>gPodder</item>
-    <item>iTunes</item>
+    <item>Ordenar por más recientes</item>
+    <item>Ordenar por más antiguos</item>
   </string-array>
 </resources>

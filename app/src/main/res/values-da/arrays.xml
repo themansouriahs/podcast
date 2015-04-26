@@ -1,17 +1,17 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
   <string-array name="drawer_menu">
-    <item>Filtros da lista de reprodução</item>
-    <item>Transferindo itens</item>
+    <item>Playlist Filtre</item>
+    <item>Igangværende Downloads</item>
   </string-array>
   <string-array name="entries_update">
-    <item>30 minutos</item>
-    <item>1 hora</item>
-    <item>2 horas</item>
-    <item>4 horas</item>
-    <item>6 horas</item>
-    <item>10 horas</item>
-    <item>1 dia</item>
+    <item>30 minutter</item>
+    <item>1 time</item>
+    <item>2 timer</item>
+    <item>4 timer</item>
+    <item>6 timer</item>
+    <item>10 timer</item>
+    <item>1 dag</item>
   </string-array>
   <string-array name="entryvalues_update">
     <item>30</item>
@@ -23,12 +23,12 @@
     <item>1440</item>
   </string-array>
   <string-array name="entries_item_expire">
-    <item>1 dia</item>
-    <item>3 dias</item>
-    <item>5 dias</item>
-    <item>1 semana</item>
-    <item>2 semanas</item>
-    <item>1 mês</item>
+    <item>1 dag</item>
+    <item>3 dage</item>
+    <item>5 dage</item>
+    <item>1 uge</item>
+    <item>2 uger</item>
+    <item>1 måned</item>
   </string-array>
   <string-array name="entryvalues_item_expire">
     <item>1</item>
@@ -44,7 +44,7 @@
     <item>2 GB</item>
     <item>3 GB</item>
     <item>5 GB</item>
-    <item>Ilimitado</item>
+    <item>Ubegrænset</item>
   </string-array>
   <string-array name="entryvalues_downlaod_file_expire">
     <item>100</item>
@@ -63,33 +63,33 @@
     <item>100</item>
   </string-array>
   <string-array name="sort_select">
-    <item>Ordenar por canal</item>
-    <item>Ordenar por estado</item>
-    <item>Ordenar por data</item>
+    <item>Sorter efter Kanal</item>
+    <item>Sorter efter Status</item>
+    <item>Sorter efter Dato</item>
   </string-array>
   <string-array name="select_select">
-    <item>Tudo</item>
-    <item>Apenas novos</item>
-    <item>Apenas não reproduzidos</item>
-    <item>Apenas passíveis de reprodução</item>
+    <item>Alle</item>
+    <item>Kun nye</item>
+    <item>Kun upafspillede</item>
+    <item>Kun hentede</item>
   </string-array>
   <string-array name="backup_select">
-    <item>Importar de OPML</item>
-    <item>Exportar para OPML</item>
+    <item>Importer fra OPML</item>
+    <item>Exporter til OPML</item>
   </string-array>
   <string-array name="repeat_select">
-    <item>Não repetir</item>
-    <item>Repetir tudo</item>
-    <item>Repetir um</item>
+    <item>Ingen gentagelser</item>
+    <item>Gentag alle</item>
+    <item>Gentag en</item>
   </string-array>
   <string-array name="entries_pref_rewind_interval">
-    <item>3 segundos</item>
-    <item>5 segundos</item>
-    <item>7 segundos</item>
-    <item>10 segundos</item>
-    <item>15 segundos</item>
-    <item>20 segundos</item>
-    <item>30 segundos</item>
+    <item>3 sekunder</item>
+    <item>5 sekunder</item>
+    <item>7 sekunder</item>
+    <item>10 sekunder</item>
+    <item>15 sekunder</item>
+    <item>20 sekunder</item>
+    <item>30 sekunder</item>
   </string-array>
   <string-array name="entryvalues_pref_rewind_interval">
     <item>3</item>
@@ -101,11 +101,11 @@
     <item>30</item>
   </string-array>
   <string-array name="entries_pref_fast_forward_interval">
-    <item>5 segundos</item>
-    <item>10 segundos</item>
-    <item>15 segundos</item>
-    <item>20 segundos</item>
-    <item>30 segundos</item>
+    <item>5 sekunder</item>
+    <item>10 sekunder</item>
+    <item>15 sekunder</item>
+    <item>20 sekunder</item>
+    <item>30 sekunder</item>
   </string-array>
   <string-array name="entryvalues_pref_fast_forward_interval">
     <item>5</item>
@@ -129,11 +129,11 @@
     <item>50</item>
   </string-array>
   <string-array name="pref_player_seek_entries">
-    <item>5 segundos</item>
-    <item>10 segundos</item>
-    <item>20 segundos</item>
-    <item>30 segundos</item>
-    <item>1 minuto</item>
+    <item>5 sekunder</item>
+    <item>10 sekunder</item>
+    <item>20 sekunder</item>
+    <item>30 sekunder</item>
+    <item>1 minut</item>
   </string-array>
   <string-array name="pref_player_seek_entries_values">
     <item>5</item>
@@ -143,9 +143,9 @@
     <item>60</item>
   </string-array>
   <string-array name="pref_subscriptions_columns_entries">
-    <item>Lista</item>
-    <item>2 colunas</item>
-    <item>3 colunas</item>
+    <item>En liste</item>
+    <item>2 kolonner</item>
+    <item>3 kolonner</item>
   </string-array>
   <string-array name="pref_subscriptions_columns_entries_values">
     <item>1</item>
@@ -153,15 +153,7 @@
     <item>3</item>
   </string-array>
   <string-array name="playlist_sort_order">
-    <item>Ordenação: Mais recentes</item>
-    <item>Ordenação: Mais antigos</item>
-  </string-array>
-  <string-array name="entryvalues_webservices_discovery_engine">
-    <item>0</item>
-    <item>1</item>
-  </string-array>
-  <string-array name="entries_webservices_discovery_engine">
-    <item>gPodder</item>
-    <item>iTunes</item>
+    <item>Sorter efter: Nyeste</item>
+    <item>Sorter efter: Ældste</item>
   </string-array>
 </resources>

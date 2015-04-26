@@ -89,6 +89,7 @@
   <string name="pref_network_category_storage_experimental">Experimental</string>
   <string name="pref_delete_when_finished_title">Eliminar automaticamente</string>
   <string name="pref_delete_when_finished_description">Eliminar episódios após a sua reprodução</string>
+  <!--For playing media on another device, like a chromecast-->
   <string name="media_route_menu_title">Cast</string>
   <string name="bulk_download_instructions">Transferir todos os episódios coincidentes com:</string>
   <string name="bulk_download_day">Publicados nas últimas 24 horas</string>
@@ -105,6 +106,16 @@
   <string name="discovery_subscribe">Subscrever</string>
   <string name="discovery_subscribe_toast">%s foi subscrito</string>
   <string name="discovery_unsubscribe_toast">Cancelada a subscrição de %s</string>
+  <string name="subscription_no_title">(Sem título)</string>
+  <!--When downloading and parsing the content of a feed-->
+  <string name="discovery_progress_loading_podcast_content">Obtendo conteúdo do podcast</string>
+  <!--Search engine for searching for new podcasts-->
+  <string name="discovery_select_backend">Selecione o mecanismo de pesquisa</string>
+  <string name="pref_cloud_category_cloud_title">Suporte Cloud</string>
+  <string name="pref_cloud_category_services_title">Serviços web</string>
+  <string name="pref_webservices_dialog_title">Mecanismo de procura de podcasts</string>
+  <string name="pref_webservices_discovery_title">Mecanismo de pesquisa</string>
+  <string name="pref_webservices_discovery_description">Os serviços web utilizados para procurar podcasts</string>
   <plurals name="bulk_download_playlist">
     <item quantity="one">Primeiro episódio</item>
     <item quantity="other">Primeiros %d episódios</item>
