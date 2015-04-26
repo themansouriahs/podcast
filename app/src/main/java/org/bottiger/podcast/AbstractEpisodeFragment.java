@@ -79,11 +79,11 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 			return true;
 		}
 		case R.id.menu_clear_playlist: {
-			resetPlaylist(getActivity());
+			//resetPlaylist(getActivity());
 
-            Playlist playlist = getPlaylist();
+            Playlist playlist = Playlist.getActivePlaylist(); //getPlaylist();
 
-            playlist.resetPlaylist(mCursorAdapter);
+            playlist.resetPlaylist(null);
             //Playlist.resetOrder();
             int size = playlist.defaultSize();
             if (!playlist.isEmpty()) {
