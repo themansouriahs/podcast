@@ -154,6 +154,18 @@
 
     </RelativeLayout>
 
+    <TextView
+        android:id="@+id/playlist_position"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="@drawable/triangle_upper_right"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:gravity="right"
+        android:textColor="@color/white_opaque"
+        android:padding="6dp"
+        android:visibility="gone"/>
+
 
     <include layout="@layout/extended_player"
         android:layout_width="match_parent"

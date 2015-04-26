@@ -38,6 +38,7 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
     public TextView mCurrentPosition;
     public TextView mSlash;
     public TextView mFileSize;
+    public TextView mPlaylistPosition;
 
     // expnded extended_player
     public PlayerRelativeLayout playerRelativeLayout;
@@ -69,6 +70,7 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
         mCurrentPosition = (TextView) view.getTag(R.id.current_position);
         mSlash = (TextView) view.findViewById(R.id.time_slash);
         mFileSize = (TextView) view.findViewById(R.id.filesize);
+        mPlaylistPosition = (TextView) view.findViewById(R.id.playlist_position);
 
         mActionBarGradientView = view.findViewById(R.id.episode_top_gradient);
 
