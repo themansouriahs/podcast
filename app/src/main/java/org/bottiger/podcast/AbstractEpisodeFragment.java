@@ -144,7 +144,7 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 	}
 
 	@Deprecated
-	protected void resetPlaylist(Context context) {
+	protected static void resetPlaylist(Context context) {
 		// Update the database
 		String currentTime = String.valueOf(System.currentTimeMillis());
 		String updateLastUpdate = ", " + ItemColumns.LAST_UPDATE + "="
