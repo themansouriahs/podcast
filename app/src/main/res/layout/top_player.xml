@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Background photo -->
 <org.bottiger.podcast.views.TopPlayer
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
@@ -22,38 +21,8 @@
         android:id="@+id/top_gradient"
         android:background="@drawable/header_gradient"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="200dp"
         android:layout_gravity="top" />
-
-    <TextView
-        android:id="@+id/episode_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:text="@string/episode_title"
-        android:singleLine="true"
-        android:background="@color/blackWithAlpha"
-        android:textColor="@color/white_opaque"
-        android:textSize="30dp"
-        android:padding="5dp"
-        android:visibility="gone"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"/>
-
-    <TextView
-        android:id="@+id/episode_info"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/episode_title"
-        android:layout_above="@id/expanded_controls"
-        android:text="@string/episode_description"
-        android:background="@color/blackWithAlpha"
-        android:padding="5dp"
-        android:textColor="@color/white_opaque"
-        android:textSize="20dp"
-        android:visibility="gone"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"/>
 
     <org.bottiger.podcast.views.PlayerRelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -122,5 +91,41 @@
         android:layout_below="@id/expanded_controls"
         style="@style/tallerBarStyle"
         />
+
+
+    <TextView
+        android:id="@+id/episode_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/player_progress"
+        android:text="@string/episode_title"
+        android:textColor="@color/white_opaque"
+        android:textSize="22sp"
+        android:padding="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        />
+
+    <TextView
+        android:id="@+id/episode_info"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/episode_title"
+        android:text="@string/episode_description"
+        android:padding="5dp"
+        android:textColor="@color/white_opaque"
+        android:textSize="16sp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        />
+    <!--
+
+        android:requiresFadingEdge="vertical"
+        android:fadingEdge="vertical"
+        android:fadingEdgeLength="80dp"
+        android:ellipsize="marquee"
+        -->
+
 
 </org.bottiger.podcast.views.TopPlayer >

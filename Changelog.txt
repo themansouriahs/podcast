@@ -1,6 +1,18 @@
 Changelog
 ==========
 
+version 0.92
+------------
+* Lots of bug and crash fixes
+* Support for searching using iTunes
+* Support for opening a podcast in the search results
+* Removed unused settings
+* Added title and the description to the current playing episode
+* Ensured that the podcast player doesn't get killed when playing in the background
+* Fixed the notification player on KitKat
+* Fixed OPML import issues
+
+
 version 0.90
 ------------
 * Lots and lots and lots of bug fixes and crashes

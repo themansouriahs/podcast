@@ -2,10 +2,12 @@ package org.bottiger.podcast;
 
 import org.bottiger.podcast.adapters.PlaylistAdapter;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
+import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.listeners.RecyclerItemTouchListener;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
@@ -31,6 +33,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -230,7 +233,10 @@ public class PlaylistFragment extends GeastureFragment implements
         mPlaylist.populatePlaylistIfEmpty();
 
         if (!mPlaylist.isEmpty()) {
-            bindHeader(mPlaylist.first());
+            IEpisode episode = mPlaylist.first();
+            if (episode instanceof FeedItem) {
+                bindHeader((FeedItem)episode);
+            }
         }
 
         mSwipeRefreshView.fragment = this;
@@ -289,14 +295,14 @@ public class PlaylistFragment extends GeastureFragment implements
     @Override
     public void onResume() {
         if (mPlaylist != null) {
-            FeedItem item = mPlaylist.getItem(0);
+            IEpisode item = mPlaylist.getItem(0);
 
             if (item != null) {
                 mPlayPauseButton.setEpisode(item, PlayPauseImageView.LOCATION.PLAYLIST);
-                mBackButton.setEpisodeId(item.getId());
-                mForwardButton.setEpisodeId(item.getId());
-                mDownloadButton.setEpisodeId(item.getId());
-                mFavoriteButton.setEpisodeId(item.getId());
+                mBackButton.setEpisode(item);
+                mForwardButton.setEpisode(item);
+                mDownloadButton.setEpisode(item);
+                mFavoriteButton.setEpisode(item);
             }
         }
 
@@ -306,7 +312,11 @@ public class PlaylistFragment extends GeastureFragment implements
 
     public void bindHeader(final FeedItem item) {
         mEpisodeTitle.setText(item.getTitle());
-        mEpisodeInfo.setText("");
+        mEpisodeInfo.setText(item.getDescription());
+
+        final int color =getResources().getColor(R.color.white_opaque);
+        mEpisodeTitle.setTextColor(color);
+        mEpisodeInfo.setTextColor(color);
 
         long duration = item.getDuration();
         if (duration > 0) {
@@ -324,11 +334,11 @@ public class PlaylistFragment extends GeastureFragment implements
         mCurrentTime.setEpisode(item);
         mTotalTime.setEpisode(item);
 
-        mPlayPauseButton.setEpisode(item.getId(), PlayPauseImageView.LOCATION.PLAYLIST);
-        mBackButton.setEpisodeId(item.getId());
-        mForwardButton.setEpisodeId(item.getId());
-        mDownloadButton.setEpisodeId(item.getId());
-        mFavoriteButton.setEpisodeId(item.getId());
+        mPlayPauseButton.setEpisode(item, PlayPauseImageView.LOCATION.PLAYLIST);
+        mBackButton.setEpisode(item);
+        mForwardButton.setEpisode(item);
+        mDownloadButton.setEpisode(item);
+        mFavoriteButton.setEpisode(item);
 
         mPlayPauseButton.setStatus(PlayerStatusObservable.STATUS.PAUSED); // FIXME: This should not be static
         mDownloadProgressObservable.registerObserver(mDownloadButton);
@@ -358,7 +368,7 @@ public class PlaylistFragment extends GeastureFragment implements
 
         mDownloadProgressObservable.registerObserver(mPlayerDownloadButton);
 
-        Activity activity = getActivity();
+        final Activity activity = getActivity();
 
         mTopPlayer.setEpisodeId(item);
 
@@ -368,6 +378,25 @@ public class PlaylistFragment extends GeastureFragment implements
         PaletteHelper.generate(item.getImageURL(activity), activity, mForwardButton);
         PaletteHelper.generate(item.getImageURL(activity), activity, mDownloadButton);
         PaletteHelper.generate(item.getImageURL(activity), activity, mFavoriteButton);
+
+        PaletteHelper.generate(item.getImageURL(activity), activity, new PaletteListener() {
+            @Override
+            public void onPaletteFound(Palette argChangedPalette) {
+                Palette.Swatch swatch = argChangedPalette.getMutedSwatch();
+
+                if (swatch == null)
+                    return;
+
+                int colorText = swatch.getTitleTextColor();
+                mEpisodeTitle.setTextColor(color);
+                mEpisodeInfo.setTextColor(color);
+            }
+
+            @Override
+            public String getPaletteUrl() {
+                return item.getImageURL(activity);
+            }
+        });
 
         PlayerStatusObservable.registerListener(mPlayerSeekbar);
 
@@ -379,7 +408,7 @@ public class PlaylistFragment extends GeastureFragment implements
         }
 
         if (mTopPlayer.getVisibleHeight() == 0) {
-            mTopPlayer.setPlayerHeight(1500);
+            mTopPlayer.setPlayerHeight(mTopPlayer.getMaximumSize());
         }
     }
 
@@ -489,7 +518,10 @@ public class PlaylistFragment extends GeastureFragment implements
                 setPlaylistViewState(mPlaylist);
 
                 if (!mPlaylist.isEmpty()) {
-                    bindHeader(mPlaylist.first());
+                    IEpisode episode = mPlaylist.first();
+                    if (episode instanceof FeedItem) {
+                        bindHeader((FeedItem)episode);
+                    }
                 }
 
             }
@@ -503,7 +535,10 @@ public class PlaylistFragment extends GeastureFragment implements
             mActivity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    bindHeader(mPlaylist.first());
+                    IEpisode episode = mPlaylist.first();
+                    if (episode instanceof FeedItem) {
+                        bindHeader((FeedItem)episode);
+                    }
 
                     setPlaylistViewState(mPlaylist);
                 }

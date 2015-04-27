@@ -112,7 +112,7 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
 
     public void setEpisode(@NonNull FeedItem argItem) {
         mEpisode = argItem;
-        setEpisodeId(mEpisode.getId());
+        setEpisode(mEpisode);
         setState(calcState());
         setProgressPercent(0);
     }

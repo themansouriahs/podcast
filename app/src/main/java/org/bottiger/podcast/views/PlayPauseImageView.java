@@ -37,7 +37,6 @@ import org.bottiger.podcast.utils.ColorExtractor;
 /**
  * TODO: document your custom view class.
  */
-// imageview
 public class PlayPauseImageView extends ImageView implements PlayerStatusObserver,
                                                              PaletteListener,
                                                              DownloadObserver,

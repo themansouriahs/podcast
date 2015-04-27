@@ -68,7 +68,7 @@ public class HeadsetReceiver extends BroadcastReceiver {
                     break;
                 case KeyEvent.KEYCODE_MEDIA_NEXT:
                     //context.startService(new Intent(MusicService.ACTION_SKIP));
-                    playerService.play(playerService.getNextId());
+                    playerService.play(playerService.getNextId().getUrl().toString());
                     break;
                 case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
                     // TODO: ensure that doing this in rapid succession actually plays the

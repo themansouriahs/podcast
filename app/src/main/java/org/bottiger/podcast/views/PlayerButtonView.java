@@ -22,6 +22,7 @@ import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObserver;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.utils.ColorExtractor;
 
 import java.lang.ref.WeakReference;
@@ -37,7 +38,7 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
     public final static int STATE_QUEUE = 3;
 
     private PlayerStatusObservable.STATUS mStatus = PlayerStatusObservable.STATUS.STOPPED;
-    private long episodeId = -1;
+    private IEpisode mEpisode;
     private int mProgress = 0;
     private int mLastProgress = 0;
     private static final int BITMAP_OFFSET = 5;
@@ -112,13 +113,13 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
         mStateIcons.put(PlayerButtonView.STATE_DEFAULT, defaultIcon);
     }
 
-    public synchronized void setEpisodeId(long argId) {
-        this.episodeId = argId;
+    public synchronized void setEpisode(IEpisode argEpisode) {
+        this.mEpisode = argEpisode;
         ensureEpisode();
     }
 
     public synchronized void unsetEpisodeId() {
-        this.episodeId = -1;
+        this.mEpisode = null;
     }
 
     public void setStatus(PlayerStatusObservable.STATUS argStatus) {
@@ -197,15 +198,10 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
     }
 
     @Override
-    public FeedItem getEpisode() {
+    public IEpisode getEpisode() {
         ensureEpisode();
 
-        Log.d("Optimize", "Please optimize PlayButtonView.getEpisode");
-        FeedItem item = FeedItem.getById(this.getContext().getContentResolver(), episodeId);
-        if (item == null)
-            throw new IllegalStateException("Episode must not be null");
-
-        return item;
+        return mEpisode;
     }
 
     @Override
@@ -244,7 +240,7 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
 
     @Override
     public String getPaletteUrl() {
-        return getEpisode().getImageURL(getContext()); // FIXME
+        return mEpisode.getArtwork().toString();
     }
 
     /*
@@ -273,7 +269,7 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
     }
 
     private void ensureEpisode() {
-        if (episodeId < 0) {
+        if (mEpisode == null) {
             throw new IllegalStateException("Episode ID must be set before calling getEpisode");
         }
     }

@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.DownloadStatus;
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
 import org.bottiger.podcast.service.Downloader.engines.IDownloadEngine;
@@ -31,9 +32,9 @@ public class DownloadProgressObservable {
 	private static long REFRESH_INTERVAL = 50; // 16 ms => 60 fps
 	//TimeUnit.MILLISECONDS.convert(1,TimeUnit.SECONDS);
 
-	private static HashMap<Long, List<DownloadObserver>> mObservers = new HashMap<Long, List<DownloadObserver>>();
+	private static HashMap<IEpisode, List<DownloadObserver>> mObservers = new HashMap<>();
 	private static DownloadManager mDownloadManager = null;
-    private static HashMap<Long, IDownloadEngine> mPodcastDownloadManager = null;
+    private static HashMap<IEpisode, IDownloadEngine> mPodcastDownloadManager = null;
 
 	/**
 	 * Handler events types
@@ -153,21 +154,19 @@ public class DownloadProgressObservable {
 	 *
 	 */
 	public void registerObserver(@NonNull DownloadObserver argObserver) {
-        FeedItem observerFeedItem = argObserver.getEpisode();
+        IEpisode observerFeedItem = argObserver.getEpisode();
 
         if (observerFeedItem == null) {
             Log.d("Warning", "observerFeedItem is null - this should never happen");
             return;
         }
 
-        Long episodeId = observerFeedItem.getId();
-
         // Create a new list
-        if (!mObservers.containsKey(episodeId)) {
-            mObservers.put(episodeId, new LinkedList<DownloadObserver>());
+        if (!mObservers.containsKey(observerFeedItem)) {
+            mObservers.put(observerFeedItem, new LinkedList<DownloadObserver>());
         }
 
-        mObservers.get(episodeId).add(argObserver);
+        mObservers.get(observerFeedItem).add(argObserver);
 
         refreshUI();
 	}
@@ -178,18 +177,16 @@ public class DownloadProgressObservable {
      * Returns true if the observer was found and removed
 	 */
 	public boolean unregisterObserver(@NonNull DownloadObserver argObserver) {
-        FeedItem observerFeedItem = argObserver.getEpisode();
+        IEpisode observerFeedItem = argObserver.getEpisode();
 
         if (observerFeedItem == null)
             return false;
 
-        Long episodeId = observerFeedItem.getId();
-
-        if (!mObservers.containsKey(episodeId)) {
+        if (!mObservers.containsKey(observerFeedItem)) {
             return false;
         }
 
-        List<DownloadObserver> observers = mObservers.get(episodeId);
+        List<DownloadObserver> observers = mObservers.get(observerFeedItem);
 
         // Just in case the GC was here in between. This should not be a problem anymore since we now have a strong reference.
         if (observers == null) {
@@ -228,9 +225,5 @@ public class DownloadProgressObservable {
 		Message msg = sHandler.obtainMessage(REFRESH_UI);
 		sHandler.sendMessage(msg);
 	}
-
-    public static Map<Long,List<DownloadObserver>> getObservers() {
-        return mObservers;
-    }
 
 }

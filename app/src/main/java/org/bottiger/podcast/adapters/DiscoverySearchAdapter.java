@@ -129,6 +129,12 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
         return mDataset.size();
     }
 
+    @Override
+    public long getItemId(int argPosition) {
+        final ISubscription subscription = mDataset.get(argPosition);
+        return subscription.getURL().toString().hashCode(); // FIXME
+    }
+
     public void setDataset(@NonNull ArrayList<ISubscription> argDataset) {
         mDataset = argDataset;
         notifyDataSetChanged();

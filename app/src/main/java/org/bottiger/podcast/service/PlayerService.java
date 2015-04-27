@@ -375,14 +375,14 @@ public class PlayerService extends Service implements
 	}
 
 	public void start() {
-		if (mPlayer.isPlaying() == false) {
+		if (!mPlayer.isPlaying()) {
             takeWakelock(mPlayer.isSteaming());
 			mPlayer.start();
 		}
 	}
 
 	public void pause() {
-		if (mPlayer.isPlaying() == false) {
+		if (!mPlayer.isPlaying()) {
 			return;
 		}
 
@@ -413,6 +413,9 @@ public class PlayerService extends Service implements
 	}
 
 	public boolean isPlaying() {
+        if (!mPlayer.isInitialized())
+            return false;
+
 		return mPlayer.isPlaying();
 	}
 
@@ -438,11 +441,12 @@ public class PlayerService extends Service implements
 	/**
 	 * @return The ID of the next episode in the playlist
 	 */
-	public long getNextId() {
-		FeedItem next = sPlaylist.nextEpisode();
+    @Nullable
+	public IEpisode getNextId() {
+		IEpisode next = sPlaylist.nextEpisode();
 		if (next != null)
-			return next.getId();
-		return -1;
+			return next;
+		return null;
 	}
 
 	/**

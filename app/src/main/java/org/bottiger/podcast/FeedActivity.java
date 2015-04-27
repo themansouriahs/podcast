@@ -374,6 +374,21 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
                 //NavUtils.navigateUpFromSameTask(this);
                 mMultiShrinkScroller.scrollOffBottom();
                 return true;
+            case R.id.menu_sort_order:
+                FeedViewAdapter.ORDER order = mAdapter.getOrder();
+
+                FeedViewAdapter.ORDER newOrder = FeedViewAdapter.ORDER.OLDEST_FIRST;
+                int newLabel = R.string.menu_order_by_date_desc;
+
+                if (order == FeedViewAdapter.ORDER.OLDEST_FIRST) {
+                    newOrder = FeedViewAdapter.ORDER.RECENT_FIRST;
+                    newLabel = R.string.menu_order_by_date_desc;
+                }
+
+                item.setTitle(newLabel);
+                mAdapter.setOrder(newOrder);
+
+                return true;
             case R.id.menu_refresh_feed:
                 SoundWaves.sSubscriptionRefreshManager.refresh(mSubscription, new IDownloadCompleteCallback() {
                     @Override

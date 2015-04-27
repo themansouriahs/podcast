@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 
 import org.bottiger.podcast.ApplicationConfiguration;
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.utils.TransitionUtils;
 
 import java.util.LinkedList;
@@ -27,16 +28,23 @@ public class NavigationDrawerMenuGenerator {
     public NavigationDrawerMenuGenerator(@NonNull final Activity argContext) {
         mActivity = argContext;
 
-        /*
-        // Settings
+
+        // Clear playlist
         mItems.add(new NavItem());
-        mItems.add(new NavItem(R.string.menu_settings, R.drawable.ic_settings_white, new INavOnClick() {
+        mItems.add(new NavItem(R.string.menu_clear_playlist, R.drawable.ic_highlight_remove_white, new INavOnClick() {
             @Override
             public void onClick() {
-                TransitionUtils.openSettings(mActivity);
+                Playlist playlist = Playlist.getActivePlaylist();
+
+                playlist.resetPlaylist(null);
+                int size = playlist.defaultSize();
+                if (!playlist.isEmpty()) {
+                    playlist.populatePlaylist(size, true);
+                    //mAdapter.notifyDataSetChanged();
+                }
             }
         }));
-        */
+
         mItems.add(new NavItem());
         mItems.add(new NavItem(R.string.menu_feedback, R.drawable.ic_messenger_white, new INavOnClick() {
             @Override

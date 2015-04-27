@@ -143,6 +143,8 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
     }
 
     public void stop() {
+        if (!isInitialized())
+            return;
 
         if (isCasting()) {
             mMediaCast.stop();

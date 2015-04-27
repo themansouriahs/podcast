@@ -121,9 +121,9 @@ public class NotificationPlayer {
 		return item;
 	}
 
-	public void setItem(FeedItem item) {
+	public void setItem(IEpisode item) {
 		this.item = item;
-        item.getArtworAsync(mPlayerService, loadtarget);
+        //item.getArtworAsync(mPlayerService, loadtarget);
 	}
 	
 	public static int getNotificationId() {

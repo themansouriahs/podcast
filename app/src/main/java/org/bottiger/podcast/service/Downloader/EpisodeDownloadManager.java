@@ -11,6 +11,7 @@ import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.QueueEpisode;
 import org.bottiger.podcast.service.DownloadStatus;
@@ -54,7 +55,7 @@ public class EpisodeDownloadManager extends Observable {
 
 	public static FeedItem mDownloadingItem = null;
 	private static HashSet<Long> mDownloadingIDs = new HashSet<>();
-    public static HashMap<Long, IDownloadEngine> mDownloadingEpisodes = new HashMap<>();
+    public static HashMap<IEpisode, IDownloadEngine> mDownloadingEpisodes = new HashMap<>();
 
 	private static DownloadManager downloadManager;
 
@@ -115,20 +116,6 @@ public class EpisodeDownloadManager extends Observable {
 
 		return DownloadStatus.NOTHING;
 	}
-
-    public void fetchPLaylist() {
-        Playlist playlist = PlayerService.getPlaylist();
-        playlist.setContext(mContext);
-        playlist.populatePlaylistIfEmpty();
-
-        int max = playlist.size() > 5 ? 5 : playlist.size();
-        for (int i = 0; i < max; i++) {
-            FeedItem item = playlist.getItem(i);
-            if (item != null && !item.isDownloaded()) {
-                addItemToQueue(item, QUEUE_POSITION.LAST);
-            }
-        }
-    }
 
 	/**
 	 * Download all the episodes in the queue
@@ -218,7 +205,7 @@ public class EpisodeDownloadManager extends Observable {
             downloadEngine.addCallback(mDownloadCompleteCallback);
 
             downloadEngine.startDownload();
-            mDownloadingEpisodes.put(new Long(downloadingItem.getId()), downloadEngine);
+            mDownloadingEpisodes.put(downloadingItem, downloadEngine);
 
             getDownloadProgressObservable(mContext).addEpisode(downloadingItem);
         }

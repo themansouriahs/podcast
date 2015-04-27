@@ -157,11 +157,11 @@ public class PlayerStatusObservable {
 		// Update notification
 		PlayerService ps = MainActivity.sBoundPlayerService;
 		if (ps != null) {
-			FeedItem currentItem = ps.getCurrentItem();
+			IEpisode currentItem = ps.getCurrentItem();
 			if (currentItem != null) {
 
                 for (PlayerStatusObserver listener : mListeners.keySet()) {
-                    listener.onStateChange(EpisodeStatus.generateEpisodeStatsus(currentItem.getId(), status, (int)ps.position()));
+                    listener.onStateChange(EpisodeStatus.generateEpisodeStatsus(currentItem, status, (int)ps.position()));
                 }
 
                 startProgressUpdate();

@@ -14,6 +14,7 @@ import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.ThemeHelper;
@@ -86,7 +87,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
     public void onBindViewHolder(final PlaylistViewHolder viewHolder, final int position) {
         Log.v("PlaylistAdapter", "onBindViewHolder(pos: " + position + ")");
 
-        final FeedItem item = mPlaylist.getItem(position+PLAYLIST_OFFSET);
+        final IEpisode item = mPlaylist.getItem(position+PLAYLIST_OFFSET);
         final Activity activity = mActivity;
 
         if (item == null) {
@@ -98,7 +99,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
         Log.d("ExpanderHelper", "pos: " + position + " episode: " + item.getTitle());
 
-        PaletteHelper.generate(item.getImageURL(activity), activity, viewHolder.mPlayPauseButton);
+        PaletteHelper.generate(item.getArtwork(activity), activity, viewHolder.mPlayPauseButton);
 
         int type = getItemViewType(position);
         boolean doExpand = type == TYPE_EXPAND; //  || position < 5
@@ -110,19 +111,25 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
             if (item != null) {
 
-                viewHolder.mMainTitle.setText(item.getShortTitle());
-                viewHolder.mSubTitle.setText(getSubTitle(mActivity, item));
+                viewHolder.mMainTitle.setText(item.getTitle());
+                //viewHolder.mSubTitle.setText(getSubTitle(mActivity, item));
                 bindDuration(viewHolder, item);
+
+                viewHolder.mPlaylistPosition.setVisibility(View.GONE);
+                if (item.getPriority() > 0) {
+                    viewHolder.mPlaylistPosition.setText(Integer.toString(position));
+                    viewHolder.mPlaylistPosition.setVisibility(View.VISIBLE);
+                }
 
                 if (Build.VERSION.SDK_INT >= 16) {
                     viewHolder.mActionBarGradientView.setBackground(mActionBarGradientDrawable);
                 }
 
-                viewHolder.mPlayPauseButton.setEpisode(item.getId(), PlayPauseImageView.LOCATION.PLAYLIST);
+                viewHolder.mPlayPauseButton.setEpisode(item, PlayPauseImageView.LOCATION.PLAYLIST);
                 viewHolder.mPlayPauseButton.setStatus(PlayerStatusObservable.STATUS.PAUSED);
                 mDownloadProgressObservable.registerObserver(viewHolder.downloadButton);
 
-                String imageUrl = item.getImageURL(mActivity);
+                String imageUrl = item.getArtwork(mActivity);
                 if (!TextUtils.isEmpty(imageUrl)) {
                     viewHolder.mItemBackground.setPaletteKey(imageUrl);
                 }
@@ -132,20 +139,22 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
                             .getSystemService(Context.DOWNLOAD_SERVICE);
                 }
 
+                /*
                 if (item.sub_title != null) {
 
                     int stringLength = 150;
                     String displayString = item.content.length() < stringLength ? item.content : item.content.substring(0, stringLength);
                     viewHolder.mSubTitle.setText(displayString);
-                }
+                }*/
 
 
                 // http://frescolib.org/docs/getting-started.html#_
                 UrlValidator urlValidator = new UrlValidator();
-                if (!TextUtils.isEmpty(item.image) && urlValidator.isValid(item.image)) {
+                String image = item.getArtwork(mActivity);
+                if (!TextUtils.isEmpty(image) && urlValidator.isValid(image)) {
 
-                    FrescoHelper.PalettePostProcessor postProcessor = new FrescoHelper.PalettePostProcessor(mActivity, item.image);
-                    FrescoHelper.loadImageInto(viewHolder.mItemBackground, item.image, postProcessor);
+                    FrescoHelper.PalettePostProcessor postProcessor = new FrescoHelper.PalettePostProcessor(mActivity, image);
+                    FrescoHelper.loadImageInto(viewHolder.mItemBackground, image, postProcessor);
                 }
 
             }
@@ -171,7 +180,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
      * @param holder
      * @param position
      */
-    public void bindExandedPlayer(final Context context, final FeedItem feedItem,
+    public void bindExandedPlayer(final Context context, final IEpisode feedItem,
                                   final PlaylistViewHolder holder, final int position) {
         Log.v("PlaylistAdapter", "bindExandedPlayer");
 
@@ -204,12 +213,15 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         holder.seekbar.setEpisode(feedItem);
         holder.seekbar.setOverlay(mOverlay);
 
-        final long id = feedItem.getId();
-        holder.mPlayPauseButton.setEpisode(id, PlayPauseImageView.LOCATION.PLAYLIST);
-        holder.downloadButton.setEpisodeId(id);
-        holder.favoriteButton.setEpisodeId(id);
-        holder.removeButton.setEpisodeId(id);
+        holder.mPlayPauseButton.setEpisode(feedItem, PlayPauseImageView.LOCATION.PLAYLIST);
         holder.downloadButton.setEpisode(feedItem);
+        holder.favoriteButton.setEpisode(feedItem);
+        holder.removeButton.setEpisode(feedItem);
+        holder.downloadButton.setEpisode(feedItem);
+
+        PaletteHelper.generate(feedItem.getImageURL(mActivity), mActivity, holder.downloadButton);
+        PaletteHelper.generate(feedItem.getImageURL(mActivity), mActivity, holder.favoriteButton);
+        PaletteHelper.generate(feedItem.getImageURL(mActivity), mActivity, holder.removeButton);
 
 
         holder.removeButton.setOnClickListener(new View.OnClickListener() {
@@ -376,7 +388,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         return mStringBuilder.toString();
     }
 
-    private void bindDuration(@NonNull PlaylistViewHolder argHolder, @NonNull FeedItem argFeedItem) {
+    private void bindDuration(@NonNull PlaylistViewHolder argHolder, @NonNull IEpisode argFeedItem) {
 
         int visibility = View.INVISIBLE;
         String strDuration = "";

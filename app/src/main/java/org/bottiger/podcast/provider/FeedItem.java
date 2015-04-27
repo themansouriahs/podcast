@@ -1186,7 +1186,7 @@ public class FeedItem extends AbstractItem implements IEpisode, Comparable<FeedI
 
     @Nullable
 	@Override
-	public String getImageURL(@NonNull Context context) {
+	public String getArtwork(@NonNull Context context) {
 		String imageURL = null;
 
         if (!TextUtils.isEmpty(image))
@@ -1220,7 +1220,7 @@ public class FeedItem extends AbstractItem implements IEpisode, Comparable<FeedI
 	 * FeedItem is null the current FeedItem becomes the first item in the
 	 * playlist
 	 */
-	public void setPriority(FeedItem precedingItem, Context context) {
+	public void setPriority(IEpisode precedingItem, Context context) {
 		priority = precedingItem == null ? 1 : precedingItem.getPriority() + 1;
 		increateHigherPriorities(precedingItem, context);
 		// update(context.getContentResolver());
@@ -1243,7 +1243,7 @@ public class FeedItem extends AbstractItem implements IEpisode, Comparable<FeedI
 	 * @param minPriority
 	 * @param context
 	 */
-	private void increateHigherPriorities(FeedItem precedingItem,
+	private void increateHigherPriorities(IEpisode precedingItem,
 			Context context) {
 		String currentTime = String.valueOf(System.currentTimeMillis());
 		String updateLastUpdate = ", " + ItemColumns.LAST_UPDATE + "="
@@ -1368,6 +1368,11 @@ public class FeedItem extends AbstractItem implements IEpisode, Comparable<FeedI
 
     @Override
     public void setUrl(@NonNull URL argUrl) {
+
+    }
+
+    @Override
+    public void setArtwork(@NonNull URL argUrl) {
 
     }
 

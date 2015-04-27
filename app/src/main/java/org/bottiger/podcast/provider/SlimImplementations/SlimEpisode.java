@@ -1,5 +1,6 @@
 package org.bottiger.podcast.provider.SlimImplementations;
 
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -18,6 +19,8 @@ public class SlimEpisode implements IEpisode, Parcelable {
     private URL mUrl;
     private String mDescription;
     private long mDuration = -1;
+    private int mPriority;
+    private URL mArtworkUrl;
 
     public SlimEpisode(@NonNull String argTitle, @NonNull URL argUrl, @NonNull String argDescription) {
         mTitle = argTitle;
@@ -36,6 +39,11 @@ public class SlimEpisode implements IEpisode, Parcelable {
     }
 
     @Override
+    public URL getArtwork() {
+        return mArtworkUrl;
+    }
+
+    @Override
     public String getDescription() {
         return null;
     }
@@ -51,6 +59,11 @@ public class SlimEpisode implements IEpisode, Parcelable {
     }
 
     @Override
+    public int getPriority() {
+        return mPriority;
+    }
+
+    @Override
     public void setTitle(@NonNull String argTitle) {
         mTitle = argTitle;
     }
@@ -61,6 +74,11 @@ public class SlimEpisode implements IEpisode, Parcelable {
     }
 
     @Override
+    public void setArtwork(@NonNull URL argUrl) {
+        mArtworkUrl = argUrl;
+    }
+
+    @Override
     public void setDescription(@NonNull String argDescription) {
         mDescription = argDescription;
     }
@@ -68,6 +86,11 @@ public class SlimEpisode implements IEpisode, Parcelable {
     @Override
     public void setDuration(long argDurationMs) {
         mDuration = argDurationMs;
+    }
+
+    @Override
+    public void setPriority(IEpisode argPrecedingItem, @NonNull Context argContext) {
+        mPriority = argPrecedingItem.getPriority()+1;
     }
 
     @Override
