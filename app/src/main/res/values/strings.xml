@@ -28,6 +28,8 @@
     <string name="menu_clear_playlist">Clear Playlist</string>
     <string name="menu_import">Import/Export OPML</string>
     <string name="menu_add_podcast">Add Podcast</string>
+    <string name="menu_order_by_date_desc">Show most recent first</string>
+    <string name="menu_order_by_date_asc">Show oldest first</string>
     <string name="pref_feedback_title">Send anonymous feedback</string>
     <string name="pref_feedback_description">Send anonymous data about the app, such as crash reports, to the developer</string>
     <string name="pref_cloud_support_title">Enable Cloud Support</string>

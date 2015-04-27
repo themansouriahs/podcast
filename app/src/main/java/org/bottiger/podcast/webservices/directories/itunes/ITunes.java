@@ -4,17 +4,13 @@ import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import com.dragontek.mygpoclient.pub.PublicClient;
-import com.dragontek.mygpoclient.simple.IPodcast;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import org.bottiger.podcast.provider.Subscription;
-import org.bottiger.podcast.webservices.directories.IDirectoryProvider;
+import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.webservices.directories.ISearchParameters;
 import org.bottiger.podcast.webservices.directories.ISearchResult;
 import org.bottiger.podcast.webservices.directories.generic.GenericDirectory;
@@ -27,7 +23,6 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by apl on 13-04-2015.
@@ -131,8 +126,8 @@ public class ITunes extends GenericDirectory {
         protected ISearchResult doInBackground(String... string) {
 
             JsonNode node;
-            TypeReference<List<SlimSubscription>> typeRef = new TypeReference<List<SlimSubscription>>(){};
-            List<SlimSubscription> list = new LinkedList<>();
+            TypeReference<List<ITunesSlimSubscription>> typeRef = new TypeReference<List<ITunesSlimSubscription>>(){};
+            List<ITunesSlimSubscription> list = new LinkedList<>();
 
             try {
                 //node = mapper.readTree(jsonTest);
@@ -146,14 +141,19 @@ public class ITunes extends GenericDirectory {
 
             GenericSearchResult result = new GenericSearchResult();
 
-            for (SlimSubscription slimSubscription : list) {
-                String url = slimSubscription.getUrl();
+            for (ITunesSlimSubscription slimSubscription : list) {
+
+                URL url;
+                try {
+                    url = new URL(slimSubscription.getUrl());
+                } catch (MalformedURLException e) {
+                    continue;
+                }
                 String imageUrl = slimSubscription.getImageurl();
                 String title = slimSubscription.getTitle();
 
-                Subscription subscription = new Subscription(url);
-                subscription.setTitle(title);
-                subscription.setImageURL(imageUrl);
+                SlimSubscription subscription = new SlimSubscription(title, url, imageUrl);
+
 
                 result.addResult(subscription);
             }
@@ -168,13 +168,13 @@ public class ITunes extends GenericDirectory {
         }
     }
 
-    private static class SlimSubscription {
+    private static class ITunesSlimSubscription {
         String title;
         String url;
         String imageurl;
 
 
-        public SlimSubscription() {
+        public ITunesSlimSubscription() {
         }
 
         public String getTitle() {

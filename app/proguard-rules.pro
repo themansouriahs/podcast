@@ -16,11 +16,17 @@
 #   public *;
 #}
 
--keep class rg.bottiger.podcast
+-keep class org.bottiger.podcast
 
 -keep        class android.support.v13.** { *; }
 -keep        class android.support.v7.** { *; }
 -keep        class android.support.v4.** { *; }
+
+-keep public class org.bottiger.podcast.** {
+  public void set*(***);
+  public *** get*();
+  public boolean is*();
+}
 
 # OKhhtp
 -dontwarn com.squareup.okhttp.**
@@ -28,6 +34,17 @@
 -dontwarn okio.**
 
 # Jackson xml parser
+-keepattributes Signature
+-keepattributes *Annotation*,EnclosingMethod
+-keepnames class com.fasterxml.jackson.** {
+*;
+}
+-keepnames interface com.fasterxml.jackson.** {
+    *;
+}
+-keepclassmembers public final enum org.codehaus.jackson.annotate.JsonAutoDetect$Visibility {
+    public static final org.codehaus.jackson.annotate.JsonAutoDetect$Visibility *;
+}
 -dontwarn javax.xml.**
 -dontwarn javax.xml.stream.events.**
 -dontwarn com.fasterxml.jackson.databind.**
@@ -40,6 +57,11 @@
 -keep class retrofit.** { *; }
 -keepattributes Signature
 -keepattributes Exceptions
+
+#Jsoup
+-keep public class org.jsoup.** {
+public *;
+}
 
 #ACRA specifics
 # Restore some Source file names and restore approximate line numbers in the stack traces,

@@ -32,6 +32,8 @@ import org.bottiger.podcast.views.PlayPauseImageView;
  */
 public class FeedViewAdapter extends RecyclerView.Adapter {
 
+    public enum ORDER { RECENT_FIRST, OLDEST_FIRST};
+
     protected ISubscription mSubscription;
 
     protected Cursor mCursor;
@@ -42,6 +44,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
 
     private DownloadProgressObservable mDownloadProgressObservable;
     private boolean mIsExpanded = false;
+    protected ORDER mSortOrder = ORDER.RECENT_FIRST;
 
     public FeedViewAdapter(@NonNull Activity activity, @NonNull ISubscription argSubscription, @Nullable Cursor dataset) {
         mActivity = activity;
@@ -58,6 +61,15 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
         mCursor = c;
     }
 
+    public ORDER getOrder() {
+        return mSortOrder;
+    }
+
+    public void setOrder(ORDER argSortOrder) {
+        mSortOrder = argSortOrder;
+        notifyDataSetChanged();
+    }
+
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View view = mInflater.inflate(R.layout.feed_view_list_episode, viewGroup, false);
@@ -66,7 +78,8 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        final IEpisode item = getItemForPosition(position);
+        int dataPosition = getDatasetPosition(position);
+        final IEpisode item = getItemForPosition(dataPosition);
         final EpisodeViewHolder episodeViewHolder = (EpisodeViewHolder) viewHolder;
 
 
@@ -145,6 +158,14 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
     protected IEpisode getItemForPosition(int argPosition) {
         mCursor.moveToPosition(argPosition);
         return FeedItem.getByCursor(mCursor);
+    }
+
+    protected int getDatasetPosition(int argPosition) {
+        if (mSortOrder == ORDER.RECENT_FIRST)
+            return argPosition;
+
+        int position = argPosition;
+        return getItemCount() - position -1;
     }
 
     public class EpisodeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
