@@ -361,14 +361,14 @@ public class PlayerService extends Service implements
 	}
 
 	public void start() {
-		if (mPlayer.isPlaying() == false) {
+		if (!mPlayer.isPlaying()) {
             takeWakelock(mPlayer.isSteaming());
 			mPlayer.start();
 		}
 	}
 
 	public void pause() {
-		if (mPlayer.isPlaying() == false) {
+		if (!mPlayer.isPlaying()) {
 			return;
 		}
 
@@ -397,6 +397,9 @@ public class PlayerService extends Service implements
 	}
 
 	public boolean isPlaying() {
+        if (!mPlayer.isInitialized())
+            return false;
+
 		return mPlayer.isPlaying();
 	}
 
