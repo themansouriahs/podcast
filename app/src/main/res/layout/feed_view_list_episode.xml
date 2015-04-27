@@ -11,6 +11,7 @@
         android:id="@+id/play_pause_button_ripple"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:rv_rippleDuration="150"
         app:rv_centered="true">
     <org.bottiger.podcast.views.PlayPauseImageView
         android:id="@+id/play_pause_button"
@@ -24,25 +25,34 @@
         android:layout_below="@id/play_pause_button_ripple"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:rv_rippleDuration="100"
+        app:rv_rippleDuration="150"
         app:rv_centered="true">
     <org.bottiger.podcast.views.FeedViewQueueButton
         android:id="@+id/queue_button"
         android:layout_marginRight="5dp"
         android:visibility="gone"
         android:src="@drawable/ic_add_white"
-        style="@style/FeedViewPlayPauseButton" />
+        style="@style/FeedViewPlayPauseButton"
+        android:animateLayoutChanges="true"/>
     </com.andexert.library.RippleView>
 
+    <com.andexert.library.RippleView
+        android:id="@+id/feedview_download_button_ripple"
+        android:layout_alignParentRight="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:rv_rippleDuration="150"
+        app:rv_color="@color/colorPrimary"
+        app:rv_centered="true">
     <org.bottiger.podcast.views.DownloadButtonView
         android:id="@+id/feedview_download_button"
         android:src="@drawable/av_download_dark"
         android:background="@color/transparent"
-        android:layout_alignParentRight="true"
         android:padding="10dp"
         android:scaleType="fitCenter"
         android:layout_marginLeft="5dp"
         style="@style/SmallFeedViewPlayPauseButton" />
+    </com.andexert.library.RippleView>
 
 
     <TextView
@@ -56,7 +66,7 @@
         android:layout_marginTop="3dp"
         android:layout_centerVertical="true"
         android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@+id/feedview_download_button"
+        android:layout_toLeftOf="@+id/feedview_download_button_ripple"
         android:layout_toRightOf="@+id/play_pause_button_ripple"/>
 
     <TextView
@@ -68,8 +78,9 @@
         android:layout_height="wrap_content"
         android:text="Podcast Description"
         android:layout_below="@id/title"
-        android:layout_toLeftOf="@+id/feedview_download_button"
-        android:layout_toRightOf="@+id/play_pause_button_ripple"/>
+        android:layout_toLeftOf="@+id/feedview_download_button_ripple"
+        android:layout_toRightOf="@+id/play_pause_button_ripple"
+        android:animateLayoutChanges="true"/>
     <!--
         style="@style/AudioFileInfoOverlayText" -->
 

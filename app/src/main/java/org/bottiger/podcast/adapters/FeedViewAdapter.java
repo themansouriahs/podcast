@@ -1,5 +1,6 @@
 package org.bottiger.podcast.adapters;
 
+import android.animation.LayoutTransition;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -18,6 +19,7 @@ import android.widget.TextView;
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
+import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
@@ -130,10 +132,22 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
         episodeViewHolder.mDownloadButton.setEpisode(item);
     }
 
-    protected void getPalette(@NonNull EpisodeViewHolder episodeViewHolder) {
+    protected void getPalette(@NonNull final EpisodeViewHolder episodeViewHolder) {
         PaletteHelper.generate(mSubscription.getImageURL(), mActivity, episodeViewHolder.mDownloadButton);
         PaletteHelper.generate(mSubscription.getImageURL(), mActivity, episodeViewHolder.mQueueButton);
         PaletteHelper.generate(mSubscription.getImageURL(), mActivity, episodeViewHolder.mPlayPauseButton);
+        /*
+        PaletteHelper.generate(mSubscription.getImageURL(), mActivity, new PaletteListener() {
+            @Override
+            public void onPaletteFound(Palette argChangedPalette) {
+                episodeViewHolder.mQueueRipple.animateRipple();
+            }
+
+            @Override
+            public String getPaletteUrl() {
+                return mSubscription.getImageURL();
+            }
+        });*/
     }
 
     @Override
@@ -176,7 +190,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
         public PlayPauseImageView mPlayPauseButton;
         public FeedViewQueueButton mQueueButton;
         public DownloadButtonView mDownloadButton;
-        public View mQueueRipple;
+        public com.andexert.library.RippleView mQueueRipple;
 
         public boolean IsExpanded = false;
 
@@ -190,7 +204,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
             mDescription = (TextView) view.findViewById(R.id.episode_description);
             mPlayPauseButton = (PlayPauseImageView) view.findViewById(R.id.play_pause_button);
             mQueueButton = (FeedViewQueueButton) view.findViewById(R.id.queue_button);
-            mQueueRipple = view.findViewById(R.id.queue_button_ripple);
+            mQueueRipple = (com.andexert.library.RippleView) view.findViewById(R.id.queue_button_ripple);
             mDownloadButton = (DownloadButtonView) view.findViewById(R.id.feedview_download_button);
         }
 
@@ -200,6 +214,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
         }
 
         public void modifyLayout(@NonNull ViewGroup argParent) {
+
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mText.getLayoutParams();
 
             if (IsExpanded) {
@@ -220,6 +235,11 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
             mQueueRipple.setVisibility(visibility);
 
             argParent.updateViewLayout(mText, params);
+
+            //if (Build.VERSION.SDK_INT >= 17) {
+            //    LayoutTransition transition = argParent.getLayoutTransition();
+            //    transition.enableTransitionType(LayoutTransition.CHANGING);
+            //}
         }
     }
 
