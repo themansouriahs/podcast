@@ -114,12 +114,11 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
                 viewHolder.mSubTitle.setText(getSubTitle(mActivity, item));
                 bindDuration(viewHolder, item);
 
-                /*
                 viewHolder.mPlaylistPosition.setVisibility(View.GONE);
                 if (item.getPriority() > 0) {
                     viewHolder.mPlaylistPosition.setText(Integer.toString(position));
                     viewHolder.mPlaylistPosition.setVisibility(View.VISIBLE);
-                }*/
+                }
 
                 if (Build.VERSION.SDK_INT >= 16) {
                     viewHolder.mActionBarGradientView.setBackground(mActionBarGradientDrawable);
