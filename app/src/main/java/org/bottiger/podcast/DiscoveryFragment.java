@@ -91,7 +91,9 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
     public void onAttach(final Activity activity) {
         PreferenceManager.getDefaultSharedPreferences(activity.getApplicationContext()).registerOnSharedPreferenceChangeListener(this);
         mDiscoveryEngineKey = getResources().getString(R.string.pref_webservices_discovery_engine_key);
+
         super.onAttach(activity);
+
     }
 
     @Override

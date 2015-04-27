@@ -9,8 +9,8 @@ android {
         applicationId "org.bottiger.podcast"
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode 123     // even - release. Odd - development
-        versionName "0.92" // even - release. Odd - development
+        versionCode 124     // even - release. Odd - development
+        versionName "0.93" // even - release. Odd - development
         //useJack = true
         multiDexEnabled = true
     }
@@ -56,7 +56,13 @@ android {
 
     buildTypes {
         release {
-            //minifyEnabled true
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

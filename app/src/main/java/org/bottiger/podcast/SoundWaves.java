@@ -41,7 +41,7 @@ public class SoundWaves extends Application {
         super.onCreate();
 
         // The following line triggers the initialization of ACRA
-        if (!BuildConfig.DEBUG) {
+        if (!BuildConfig.DEBUG || System.currentTimeMillis() > 0) {
             // ACRA - crash reporter
             CrashReporterFactory.startReporter(this);
 
