@@ -4,6 +4,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 
 import java.io.File;
 import java.net.URL;
@@ -15,11 +16,11 @@ public interface IDownloadEngine {
 
     public void startDownload();
     public float getProgress();
-    public FeedItem getEpisode();
+    public IEpisode getEpisode();
     public void addCallback(Callback argCallback);
 
     interface Callback {
-        void downloadCompleted(long argEpisodeID);
-        void downloadInterrupted(long argEpisodeID);
+        void downloadCompleted(IEpisode argEpisode);
+        void downloadInterrupted(IEpisode argEpisode);
     }
 }

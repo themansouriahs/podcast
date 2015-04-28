@@ -2,6 +2,7 @@ package org.bottiger.podcast.service;
 
 import org.bottiger.podcast.SettingsActivity;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.receiver.PodcastUpdateReceiver;
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
 import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
@@ -92,13 +93,16 @@ public class PodcastService extends IntentService {
 		EpisodeDownloadManager.startDownload(getBaseContext());
 	}
 
-	public void downloadItem(ContentResolver context, FeedItem item) {
-		item.prepareDownload(context);
-		EpisodeDownloadManager.addItemToQueue(item, EpisodeDownloadManager.QUEUE_POSITION.LAST);
-		EpisodeDownloadManager.startDownload(getBaseContext());
+	public void downloadItem(ContentResolver context, IEpisode item) {
+        if (item instanceof FeedItem) {
+            FeedItem feedItem = (FeedItem)item;
+            feedItem.prepareDownload(context);
+            EpisodeDownloadManager.addItemToQueue(feedItem, EpisodeDownloadManager.QUEUE_POSITION.LAST);
+            EpisodeDownloadManager.startDownload(getBaseContext());
+        }
 	}
 
-	public FeedItem getDownloadingItem() {
+	public IEpisode getDownloadingItem() {
 		return EpisodeDownloadManager.getDownloadingItem();
 	}
 
