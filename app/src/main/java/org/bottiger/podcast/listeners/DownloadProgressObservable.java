@@ -50,7 +50,9 @@ public class DownloadProgressObservable {
     }
 
 	/**
-	 * Handler for updating the textviews
+	 * Unregister an Observer from being updated on progress updates
+     *
+     * Returns true if the observer was found and removed
 	 */
 	public static final Handler sHandler = new DownloadProgressHandler();
 
@@ -60,7 +62,7 @@ public class DownloadProgressObservable {
         private final ReentrantLock lock = new ReentrantLock();
 
         @Override
-		public void handleMessage(Message msg) {
+        public void handleMessage(Message msg) {
 
             // http://developer.android.com/reference/java/util/concurrent/locks/ReentrantLock.html
             lock.lock();  // block until condition holds
