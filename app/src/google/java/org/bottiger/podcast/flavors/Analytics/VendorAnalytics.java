@@ -2,6 +2,7 @@ package org.bottiger.podcast.flavors.Analytics;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -9,6 +10,7 @@ import com.google.android.gms.analytics.Tracker;
 import org.bottiger.podcast.ApplicationConfiguration;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by apl on 11-02-2015.
@@ -65,17 +67,28 @@ public class VendorAnalytics extends AbstractAnalytics implements IAnalytics {
     }
 
     public void trackEvent(EVENT_TYPE argEvent) {
+        trackEvent(argEvent, null);
+    }
+
+    public void trackEvent(EVENT_TYPE argEvent, @Nullable Integer argValue) {
         if (!doShare())
             return;
 
         EventData eventData = getEventData(argEvent);
 
-        // Build and send an Event.
-        getTracker(TrackerName.APP_TRACKER).send(new HitBuilders.EventBuilder()
+        HitBuilders.EventBuilder eventBuilder = new HitBuilders.EventBuilder()
                 .setCategory(eventData.Category)
                 .setAction(eventData.Action)
-                .setLabel(eventData.LabelID)
-                .build());
+                .setLabel(eventData.LabelID);
+
+        if (argValue != null) {
+            eventBuilder.setValue(argValue);
+        }
+
+        Map<String,String> event = eventBuilder.build();
+
+        // Build and send an Event.
+        getTracker(TrackerName.APP_TRACKER).send(event);
     }
 
     private synchronized Tracker getTracker(TrackerName trackerId) {
@@ -158,6 +171,13 @@ public class VendorAnalytics extends AbstractAnalytics implements IAnalytics {
             eventData.Category = CATEGORY_USAGE;
             eventData.Action = "MediaRouter";
             eventData.LabelID = "Playing using MediaRouter";
+        }
+
+        if (argType == EVENT_TYPE.REFRESH_DURATION) {
+            eventData = new EventData();
+            eventData.Category = CATEGORY_INFRASTRUCTURE;
+            eventData.Action = "RefreshFeeds";
+            eventData.LabelID = "Background feed refresh duration";
         }
 
         if (eventData != null)

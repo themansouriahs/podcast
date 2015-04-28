@@ -3,6 +3,7 @@ package org.bottiger.podcast.flavors.Analytics;
 import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
@@ -76,8 +77,11 @@ public class VendorAnalytics implements IAnalytics {
         }
     }
 
-    @Override
     public void trackEvent(EVENT_TYPE argEvent) {
+        trackEvent(argEvent, null);
+    }
+
+    public void trackEvent(EVENT_TYPE argEvent, @Nullable Integer argValue) {
         return;
     }
 
