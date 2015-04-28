@@ -30,9 +30,9 @@
     <string name="menu_add_podcast">Add Podcast</string>
     <string name="menu_order_by_date_desc">Show most recent first</string>
     <string name="menu_order_by_date_asc">Show oldest first</string>
-    <string name="pref_feedback_title">Send anonymous feedback</string>
+    <string name="pref_feedback_title">Send anonymous reports</string>
     <string name="pref_feedback_description">Send anonymous data about the app, such as crash reports, to the developer</string>
-    <string name="pref_cloud_support_title">Enable Cloud Support</string>
+    <string name="pref_cloud_support_title">Enable cloud support</string>
     <string name="pref_cloud_support_description">Cloud support will backup your data to the cloud and synchronize data between your devices</string>
     
     <string name="drawer_open">Open</string>
@@ -72,7 +72,7 @@
     <string name="pref_help_static_field_description">If you would like to help out there is plenty of things to do. It could be programming and it could be something completley different. I need help with translation, user experience, icons and graphics, a website and so forth. Head over to the project page on github (https://github.com/bottiger/SoundWaves) or send me an email: bottiger@gmail.com</string>
     <string name="podcast_title_unknown">No Title :(</string>
     <string name="playlist_empty">Empty Playlist</string>
-    <string name="subscription_instruction">Add new podcasts by using the search function or enter the URL manually</string>
+    <string name="subscription_instruction">Add new podcasts by using the discovery page to the right or import an OPML file.\n\nHowever, first please consider if you want to enabled/disable the options below.</string>
     <string name="filter_show_listened">Show Listened</string>
     <string name="auto_start_next">Auto Start Next</string>
     <string name="drawer_playlist_filters">Playlist Filters</string>
@@ -126,6 +126,7 @@
     <string name="pref_webservices_dialog_title">Podcast Search Engine</string>
     <string name="pref_webservices_discovery_title">Search Engine</string>
     <string name="pref_webservices_discovery_description">Web services used for searching for podcasts</string>
+    <string name="subscription_instruction_title">Thank you for trying out SoundWaves</string>
 
     <plurals name="bulk_download_playlist">
         <item quantity="one">First episode in the playlist</item>

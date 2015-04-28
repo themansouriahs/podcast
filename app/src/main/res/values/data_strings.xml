@@ -9,5 +9,7 @@
     <string name="pref_subscriptions_columns_key" translatable="false">pref_subscriptions_columns</string>
     <string name="pref_cloud_category_cloud_services_key" translatable="false">pref_cloud_category_cloud_services</string>
     <string name="pref_webservices_discovery_engine_key" translatable="false" >pref_webservices_discovery_engine</string>
+    <string name="pref_anonymous_feedback_key" translatable="false" >pref_anonymous_feedback</string>
+    <string name="pref_cloud_support_key" translatable="false" >pref_cloud_support</string>
 </resources>
 
