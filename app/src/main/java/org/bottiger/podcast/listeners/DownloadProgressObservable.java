@@ -31,7 +31,7 @@ public class DownloadProgressObservable {
 	private static long REFRESH_INTERVAL = 50; // 16 ms => 60 fps
 	//TimeUnit.MILLISECONDS.convert(1,TimeUnit.SECONDS);
 
-	private static HashMap<Long, List<DownloadObserver>> mObservers = new HashMap<Long, List<DownloadObserver>>();
+	private static HashMap<Long, List<DownloadObserver>> mObservers = new HashMap<>();
 	private static DownloadManager mDownloadManager = null;
     private static HashMap<Long, IDownloadEngine> mPodcastDownloadManager = null;
 
@@ -48,16 +48,103 @@ public class DownloadProgressObservable {
         mPodcastDownloadManager = EpisodeDownloadManager.mDownloadingEpisodes;
     }
 
-	/**
-	 * Handler for updating the textviews
+    /**
+	 * Register an Observer to be updated on progress updates
+	 *
 	 */
-	public static final Handler sHandler = new Handler() {
+	public void registerObserver(@NonNull DownloadObserver argObserver) {
+        FeedItem observerFeedItem = argObserver.getEpisode();
+
+        if (observerFeedItem == null) {
+            Log.d("Warning", "observerFeedItem is null - this should never happen");
+            return;
+        }
+
+        Long episodeId = observerFeedItem.getId();
+
+        // Create a new list
+        if (!mObservers.containsKey(episodeId)) {
+            mObservers.put(episodeId, new LinkedList<DownloadObserver>());
+        }
+
+        mObservers.get(episodeId).add(argObserver);
+
+        refreshUI();
+	}
+
+	/**
+	 * Unregister an Observer from being updated on progress updates
+     *
+     * Returns true if the observer was found and removed
+	 */
+	public boolean unregisterObserver(@NonNull DownloadObserver argObserver) {
+        FeedItem observerFeedItem = argObserver.getEpisode();
+
+        if (observerFeedItem == null)
+            return false;
+
+        Long episodeId = observerFeedItem.getId();
+
+        if (!mObservers.containsKey(episodeId)) {
+            return false;
+        }
+
+        List<DownloadObserver> observers = mObservers.get(episodeId);
+
+        // Just in case the GC was here in between. This should not be a problem anymore since we now have a strong reference.
+        if (observers == null) {
+            return false;
+        }
+
+       boolean isRemoved = observers.remove(argObserver);
+
+		/*
+		 * Stop the handler if the list is empty again
+		 */
+		if (mObservers.size() == 0) {
+			sHandler.removeMessages(REFRESH_UI);
+		}
+
+		return isRemoved;
+	}
+
+    public void addEpisode(@NonNull FeedItem argEpisode) {
+        Message msg = sHandler.obtainMessage(ADD_ID);
+        msg.obj = argEpisode;
+        sHandler.sendMessage(msg);
+    }
+
+    public static void deleteEpisode(@NonNull FeedItem argEpisode) {
+        Message msg = sHandler.obtainMessage(DELETED);
+        msg.obj = argEpisode;
+        sHandler.sendMessage(msg);
+    }
+
+	/**
+	 * Refrersh the UI handler
+	 */
+	private static void refreshUI() {
+		sHandler.removeMessages(REFRESH_UI);
+		Message msg = sHandler.obtainMessage(REFRESH_UI);
+		sHandler.sendMessage(msg);
+	}
+
+    public static Map<Long,List<DownloadObserver>> getObservers() {
+        return mObservers;
+    }
+
+    /**
+     * Handler for updating the textviews
+     */
+    public static final Handler sHandler = new DownloadProgressHandler();
+
+    private static class DownloadProgressHandler extends Handler {
 
         private List<FeedItem> mUpdateEpisodess = new LinkedList<FeedItem>();
         private final ReentrantLock lock = new ReentrantLock();
 
         @Override
-		public void handleMessage(Message msg) {
+        public void handleMessage(Message msg) {
 
             // http://developer.android.com/reference/java/util/concurrent/locks/ReentrantLock.html
             lock.lock();  // block until condition holds
@@ -146,91 +233,6 @@ public class DownloadProgressObservable {
                 lock.unlock();
             }
         }
-	};
-
-    /**
-	 * Register an Observer to be updated on progress updates
-	 *
-	 */
-	public void registerObserver(@NonNull DownloadObserver argObserver) {
-        FeedItem observerFeedItem = argObserver.getEpisode();
-
-        if (observerFeedItem == null) {
-            Log.d("Warning", "observerFeedItem is null - this should never happen");
-            return;
-        }
-
-        Long episodeId = observerFeedItem.getId();
-
-        // Create a new list
-        if (!mObservers.containsKey(episodeId)) {
-            mObservers.put(episodeId, new LinkedList<DownloadObserver>());
-        }
-
-        mObservers.get(episodeId).add(argObserver);
-
-        refreshUI();
-	}
-
-	/**
-	 * Unregister an Observer from being updated on progress updates
-     *
-     * Returns true if the observer was found and removed
-	 */
-	public boolean unregisterObserver(@NonNull DownloadObserver argObserver) {
-        FeedItem observerFeedItem = argObserver.getEpisode();
-
-        if (observerFeedItem == null)
-            return false;
-
-        Long episodeId = observerFeedItem.getId();
-
-        if (!mObservers.containsKey(episodeId)) {
-            return false;
-        }
-
-        List<DownloadObserver> observers = mObservers.get(episodeId);
-
-        // Just in case the GC was here in between. This should not be a problem anymore since we now have a strong reference.
-        if (observers == null) {
-            return false;
-        }
-
-       boolean isRemoved = observers.remove(argObserver);
-
-		/*
-		 * Stop the handler if the list is empty again
-		 */
-		if (mObservers.size() == 0) {
-			sHandler.removeMessages(REFRESH_UI);
-		}
-
-		return isRemoved;
-	}
-
-    public void addEpisode(@NonNull FeedItem argEpisode) {
-        Message msg = sHandler.obtainMessage(ADD_ID);
-        msg.obj = argEpisode;
-        sHandler.sendMessage(msg);
-    }
-
-    public static void deleteEpisode(@NonNull FeedItem argEpisode) {
-        Message msg = sHandler.obtainMessage(DELETED);
-        msg.obj = argEpisode;
-        sHandler.sendMessage(msg);
-    }
-
-	/**
-	 * Refrersh the UI handler
-	 */
-	private static void refreshUI() {
-		sHandler.removeMessages(REFRESH_UI);
-		Message msg = sHandler.obtainMessage(REFRESH_UI);
-		sHandler.sendMessage(msg);
-	}
-
-    public static Map<Long,List<DownloadObserver>> getObservers() {
-        return mObservers;
-    }
+    };
 
 }
