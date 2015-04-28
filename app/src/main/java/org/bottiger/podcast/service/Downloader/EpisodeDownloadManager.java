@@ -400,11 +400,12 @@ public class EpisodeDownloadManager extends Observable {
             return null;
         }
 
-        /*
+
         if (mDownloadingItem != null) {
             return mDownloadingItem;
         }
 
+        /*
 		long downloadReference = mDownloadingItem.getDownloadReferenceID();
 		Query query = new Query();
 		query.setFilterById(downloadReference);
