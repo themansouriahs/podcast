@@ -1,6 +1,7 @@
 package org.bottiger.podcast.flavors.Analytics;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 
 /**
  * Created by apl on 21-02-2015.
@@ -30,8 +31,11 @@ public class VendorAnalytics implements IAnalytics {
         return;
     }
 
-    @Override
     public void trackEvent(EVENT_TYPE argEvent) {
+        trackEvent(argEvent, null);
+    }
+
+    public void trackEvent(EVENT_TYPE argEvent, @Nullable Integer argValue) {
         return;
     }
 }

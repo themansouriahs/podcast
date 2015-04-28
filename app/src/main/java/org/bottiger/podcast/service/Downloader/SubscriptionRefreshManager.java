@@ -79,7 +79,7 @@ public class SubscriptionRefreshManager {
         refresh(null, null);
     }
 
-    public void refresh(ISubscription subscription, IDownloadCompleteCallback argCallback) {
+    public void refresh(@Nullable ISubscription subscription, @Nullable IDownloadCompleteCallback argCallback) {
         Log.d(DEBUG_KEY, "refresh subscription: " + subscription + " (null => all)");
 
 

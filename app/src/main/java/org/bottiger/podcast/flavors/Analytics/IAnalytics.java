@@ -1,5 +1,7 @@
 package org.bottiger.podcast.flavors.Analytics;
 
+import android.support.annotation.Nullable;
+
 /**
  * Created by apl on 21-02-2015.
  */
@@ -13,7 +15,8 @@ public interface IAnalytics {
                              OPML_IMPORT,
                              OPML_EXPORT,
                              DATABASE_UPGRADE,
-                             MEDIA_ROUTING
+                             MEDIA_ROUTING,
+                             REFRESH_DURATION
     };
 
     public void startTracking();
@@ -23,4 +26,5 @@ public interface IAnalytics {
     public void activityResume();
 
     public void trackEvent(EVENT_TYPE argEvent);
+    public void trackEvent(EVENT_TYPE argEvent, @Nullable Integer argValue);
 }
