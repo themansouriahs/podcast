@@ -4,6 +4,7 @@ import android.support.v7.media.MediaRouteSelector;
 
 import org.bottiger.podcast.MediaRouterPlaybackActivity;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 
 /**
  * Created by apl on 12-04-2015.
@@ -39,7 +40,7 @@ public class VendorMediaRouteCast implements IMediaCast {
     }
 
     @Override
-    public boolean loadEpisode(FeedItem argEpisode) {
+    public boolean loadEpisode(IEpisode argEpisode) {
         return false;
     }
 
