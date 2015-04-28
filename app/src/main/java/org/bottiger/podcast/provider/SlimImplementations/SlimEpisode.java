@@ -1,14 +1,18 @@
 package org.bottiger.podcast.provider.SlimImplementations;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.provider.ISubscription;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Date;
 
 /**
  * Created by apl on 21-04-2015.
@@ -21,6 +25,7 @@ public class SlimEpisode implements IEpisode, Parcelable {
     private long mDuration = -1;
     private int mPriority;
     private URL mArtworkUrl;
+    private long mOffset;
 
     public SlimEpisode(@NonNull String argTitle, @NonNull URL argUrl, @NonNull String argDescription) {
         mTitle = argTitle;
@@ -39,6 +44,10 @@ public class SlimEpisode implements IEpisode, Parcelable {
     }
 
     @Override
+    public String getArtwork(@NonNull Context argContext) {
+        return getArtwork().toString();
+    }
+
     public URL getArtwork() {
         return mArtworkUrl;
     }
@@ -61,6 +70,21 @@ public class SlimEpisode implements IEpisode, Parcelable {
     @Override
     public int getPriority() {
         return mPriority;
+    }
+
+    @Override
+    public ISubscription getSubscription(@NonNull Context argContext) {
+        return null;
+    }
+
+    @Override
+    public long getOffset() {
+        return mOffset;
+    }
+
+    @Override
+    public Date getDateTime() {
+        return null;
     }
 
     @Override
@@ -91,6 +115,11 @@ public class SlimEpisode implements IEpisode, Parcelable {
     @Override
     public void setPriority(IEpisode argPrecedingItem, @NonNull Context argContext) {
         mPriority = argPrecedingItem.getPriority()+1;
+    }
+
+    @Override
+    public void setOffset(@Nullable ContentResolver contentResolver, long i) {
+        mOffset = i;
     }
 
     @Override

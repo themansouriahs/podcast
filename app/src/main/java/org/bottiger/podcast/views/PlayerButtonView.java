@@ -240,7 +240,7 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
 
     @Override
     public String getPaletteUrl() {
-        return mEpisode.getArtwork().toString();
+        return mEpisode.getArtwork(mContext).toString();
     }
 
     /*

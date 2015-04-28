@@ -137,7 +137,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
         PaletteHelper.generate(mSubscription.getImageURL(), mActivity, episodeViewHolder.mQueueButton);
         PaletteHelper.generate(mSubscription.getImageURL(), mActivity, episodeViewHolder.mPlayPauseButton);
         /*
-        PaletteHelper.generate(mSubscription.getImageURL(), mActivity, new PaletteListener() {
+        PaletteHelper.generate(mSubscription.getArtwork(), mActivity, new PaletteListener() {
             @Override
             public void onPaletteFound(Palette argChangedPalette) {
                 episodeViewHolder.mQueueRipple.animateRipple();
@@ -145,7 +145,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
 
             @Override
             public String getPaletteUrl() {
-                return mSubscription.getImageURL();
+                return mSubscription.getArtwork();
             }
         });*/
     }

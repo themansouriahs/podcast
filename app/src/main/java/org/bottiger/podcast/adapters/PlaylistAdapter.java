@@ -201,7 +201,9 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
                 playerDuration = MainActivity.sBoundPlayerService
                         .duration();
             } else {
-                playerPosition = feedItem.offset;
+                if (feedItem instanceof FeedItem) {
+                    playerPosition = ((FeedItem)feedItem).offset;
+                }
                 playerDuration = 0;//feedItem.getDuration();
             }
         }
@@ -219,16 +221,19 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         holder.removeButton.setEpisode(feedItem);
         holder.downloadButton.setEpisode(feedItem);
 
-        PaletteHelper.generate(feedItem.getImageURL(mActivity), mActivity, holder.downloadButton);
-        PaletteHelper.generate(feedItem.getImageURL(mActivity), mActivity, holder.favoriteButton);
-        PaletteHelper.generate(feedItem.getImageURL(mActivity), mActivity, holder.removeButton);
+        PaletteHelper.generate(feedItem.getArtwork(mActivity), mActivity, holder.downloadButton);
+        PaletteHelper.generate(feedItem.getArtwork(mActivity), mActivity, holder.favoriteButton);
+        PaletteHelper.generate(feedItem.getArtwork(mActivity), mActivity, holder.removeButton);
 
 
         holder.removeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 PlaylistAdapter.toggle(holder, position);
-                feedItem.removeFromPlaylist(context.getContentResolver());
+
+                if (feedItem instanceof FeedItem) { // FIXME
+                    ((FeedItem)feedItem).removeFromPlaylist(context.getContentResolver());
+                }
                 //PlaylistAdapter.this.notifyItemRemoved(position);
                 notifyDataSetChanged();
                 mPlaylist.removeItem(position+PLAYLIST_OFFSET);
@@ -238,11 +243,12 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         mDownloadProgressObservable.registerObserver(holder.downloadButton);
 
         // PlayerActivity.setProgressBar(sb, feedItem);
+        /*
         long secondary = 0;
         if (feedItem.filesize != 0) {
             secondary = feedItem.isDownloaded() ? feedItem.getCurrentFileSize()
                     : (feedItem.chunkFilesize / feedItem.filesize);
-        }
+        }*/
 
         //RecentItemFragment.setProgressBar(holder.seekbar, playerDuration,
         //        playerPosition, secondary);
@@ -250,8 +256,8 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         if (MainActivity.sBoundPlayerService != null) {
             boolean isPlaying = false;
             if (MainActivity.sBoundPlayerService.isInitialized()) {
-                if (feedItem.getId() == MainActivity.sBoundPlayerService
-                        .getCurrentItem().id) {
+                if (feedItem.getUrl().toString() == MainActivity.sBoundPlayerService
+                        .getCurrentItem().getUrl().toString()) {
                     if (MainActivity.sBoundPlayerService.isPlaying()) {
                         isPlaying = true;
                         PodcastBaseFragment.setCurrentTime(holder.currentTime);
@@ -354,12 +360,12 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 	private static Long itemID(int position) {
         Log.v("PlaylistAdapter", "itemID");
         Playlist playlist = Playlist.getActivePlaylist();
-        FeedItem episode = playlist.getItem(position);
+        IEpisode episode = playlist.getItem(position);
 
         if (episode == null)
             return -1L;
 
-        Long id = episode.getId(); //Long.valueOf(((ReorderCursor) mCursor).getInt(mCursor.getColumnIndex(BaseColumns._ID)));
+        Long id = (long)episode.getUrl().toString().hashCode(); //FIXME
         return id;
 	}
 

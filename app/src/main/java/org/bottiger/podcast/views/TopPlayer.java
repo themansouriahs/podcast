@@ -174,7 +174,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
 
         mPlayPauseLargeSize = mPlayPauseButton.getLayoutParams().height;
 
-        //PaletteCache.generate(mEpisodeId.getImageURL(mActivity), mActivity, mSeekbar);
+        //PaletteCache.generate(mEpisodeId.getArtwork(mActivity), mActivity, mSeekbar);
 
         mLargeLayout.SeekBarLeftMargin = 0;
         mLargeLayout.PlayPauseSize = mPlayPauseLargeSize;

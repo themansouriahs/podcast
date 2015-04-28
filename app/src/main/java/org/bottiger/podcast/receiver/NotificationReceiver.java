@@ -6,6 +6,7 @@ import org.bottiger.podcast.Player.SoundWavesPlayer;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
 
 import android.content.BroadcastReceiver;
@@ -56,7 +57,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 				isPlaying = true;
 			}
 
-            FeedItem currentItem = playerService.getCurrentItem();
+            IEpisode currentItem = playerService.getCurrentItem();
             if (currentItem != null) {
                 np = new NotificationPlayer(playerService, playerService.getCurrentItem());
                 np.setmPlayerService(playerService);

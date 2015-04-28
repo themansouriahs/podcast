@@ -432,10 +432,12 @@ public class FeedItem extends AbstractItem implements IEpisode, Comparable<FeedI
 
 	}
 
-	public void updateOffset(ContentResolver contentResolver, long i) {
+	public void setOffset(ContentResolver contentResolver, long i) {
 		offset = (int) i;
-		lastUpdate = -1;
-		update(contentResolver);
+        if (contentResolver != null) {
+            lastUpdate = -1;
+            update(contentResolver);
+        }
 
 	}
 
@@ -1163,6 +1165,11 @@ public class FeedItem extends AbstractItem implements IEpisode, Comparable<FeedI
         return Subscription.getById(argContext.getContentResolver(), sub_id);
     }
 
+    @Override
+    public long getOffset() {
+        return offset;
+    }
+
     public void removeFromPlaylist(@NonNull ContentResolver argContentResolver) {
         priority = -1;
         update(argContentResolver);
@@ -1181,7 +1188,7 @@ public class FeedItem extends AbstractItem implements IEpisode, Comparable<FeedI
 
     @Nullable
     public void getArtworAsync(@NonNull Context context, @NonNull Target argTarget) {
-        Picasso.with(context).load(getImageURL(context)).into(argTarget);
+        Picasso.with(context).load(getArtwork(context)).into(argTarget);
     }
 
     @Nullable

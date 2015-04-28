@@ -185,7 +185,7 @@ public class VendorMediaRouteCast implements IMediaCast {
         String mimeType= URLConnection.guessContentTypeFromName(url);
 
         String subTitle = argEpisode.getSubscription(mActivity).getTitle();
-        String artWorkURI = argEpisode.getImageURL(mActivity);
+        String artWorkURI = argEpisode.getArtwork(mActivity);
 
         MediaMetadata mediaMetadata = new MediaMetadata();
         mediaMetadata.putString(MediaMetadata.KEY_TITLE, argEpisode.getTitle());

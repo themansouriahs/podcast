@@ -14,7 +14,6 @@ import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.utils.PodcastLog;
 
-import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.Service;
@@ -307,7 +306,7 @@ public class PlayerService extends Service implements
 
 			if (mPlayer.isPlaying()) {
                 if (isFeedItem) {
-                    feedItem.updateOffset(getContentResolver(), mPlayer.position());
+                    feedItem.setOffset(getContentResolver(), mPlayer.position());
                 }
 				stop();
 			}
@@ -388,7 +387,7 @@ public class PlayerService extends Service implements
 
 		if ((mItem != null)) {
             if (mItem instanceof FeedItem) {
-                ((FeedItem)mItem).updateOffset(getContentResolver(), mPlayer.position());
+                ((FeedItem)mItem).setOffset(getContentResolver(), mPlayer.position());
             }
 		} else {
 			log.error("playing but no item!!!");

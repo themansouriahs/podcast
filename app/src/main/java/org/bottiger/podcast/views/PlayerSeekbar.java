@@ -26,6 +26,7 @@ import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObserver;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.utils.UIUtils;
 
 import java.util.HashSet;
@@ -46,7 +47,7 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
     private boolean mPaintSeekInfo = false;
 
     private View mOverlay = null;
-    private FeedItem mEpisode = null;
+    private IEpisode mEpisode = null;
 
     private TextView mBackwards;
     private TextView mCurrent;
@@ -83,7 +84,7 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
             if (mEpisode.equals(MainActivity.sBoundPlayerService.getCurrentItem())) {
                 MainActivity.sBoundPlayerService.seek(timeMs);
             } else {
-                mEpisode.updateOffset(MainActivity.sBoundPlayerService.getContentResolver(), timeMs);
+                mEpisode.setOffset(MainActivity.sBoundPlayerService.getContentResolver(), timeMs);
                 PlayerStatusObservable.updateProgress(MainActivity.sBoundPlayerService, mEpisode);
                 setProgressMs(timeMs);
             }
@@ -110,7 +111,7 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
 
             long timeMs = mEpisode.getDuration() * seekBar.getProgress()
                     / RANGE_MAX;
-            mEpisode.offset = (int) timeMs;
+            mEpisode.setOffset(null, (long)timeMs);
         }
 
         @Override
@@ -203,7 +204,7 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
         setThumb(thumb);
     }
 
-    public void setEpisode(FeedItem argEpisode) {
+    public void setEpisode(IEpisode argEpisode) {
         if (mEpisode != null) {
             PlayerStatusObservable.unregisterListener(this);
         }
@@ -211,8 +212,8 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
         mEpisode = argEpisode;
         PlayerStatusObservable.registerListener(this);
 
-        if (mEpisode.offset > 0 && mEpisode.getDuration() > 0) {
-            float progress = (float)mEpisode.offset / mEpisode.duration_ms;
+        if (mEpisode.getOffset() > 0 && mEpisode.getDuration() > 0) {
+            float progress = (float)mEpisode.getOffset() / mEpisode.getDuration();
             setProgress((int)(progress*RANGE_MAX));
         }
     }
@@ -225,7 +226,7 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
     }
 
     @Override
-    public FeedItem getEpisode() {
+    public IEpisode getEpisode() {
         validateState();
         return mEpisode;
     }
@@ -382,7 +383,7 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
 
     @Override
     public String getPaletteUrl() {
-        return mEpisode.getImageURL(getContext());
+        return mEpisode.getArtwork(getContext());
     }
 
     public interface OnSeekListener {

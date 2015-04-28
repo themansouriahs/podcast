@@ -4,15 +4,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
-import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
-import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.PodcastLog;
 import org.json.simple.JSONObject;
@@ -593,7 +590,7 @@ public class Subscription extends AbstractItem implements ISubscription, Palette
 
 	@Override
 	@Deprecated
-	public String getImageURL(Context context) {
+	public String getArtwork(Context context) {
 		return getImageURL();
 	}
 

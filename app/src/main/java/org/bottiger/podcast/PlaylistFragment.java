@@ -372,14 +372,14 @@ public class PlaylistFragment extends GeastureFragment implements
 
         mTopPlayer.setEpisodeId(item);
 
-        PaletteHelper.generate(item.getImageURL(activity), activity, mTopPlayer);
-        PaletteHelper.generate(item.getImageURL(activity), activity, mPlayPauseButton);
-        PaletteHelper.generate(item.getImageURL(activity), activity, mBackButton);
-        PaletteHelper.generate(item.getImageURL(activity), activity, mForwardButton);
-        PaletteHelper.generate(item.getImageURL(activity), activity, mDownloadButton);
-        PaletteHelper.generate(item.getImageURL(activity), activity, mFavoriteButton);
+        PaletteHelper.generate(item.getArtwork(activity), activity, mTopPlayer);
+        PaletteHelper.generate(item.getArtwork(activity), activity, mPlayPauseButton);
+        PaletteHelper.generate(item.getArtwork(activity), activity, mBackButton);
+        PaletteHelper.generate(item.getArtwork(activity), activity, mForwardButton);
+        PaletteHelper.generate(item.getArtwork(activity), activity, mDownloadButton);
+        PaletteHelper.generate(item.getArtwork(activity), activity, mFavoriteButton);
 
-        PaletteHelper.generate(item.getImageURL(activity), activity, new PaletteListener() {
+        PaletteHelper.generate(item.getArtwork(activity), activity, new PaletteListener() {
             @Override
             public void onPaletteFound(Palette argChangedPalette) {
                 Palette.Swatch swatch = argChangedPalette.getMutedSwatch();
@@ -394,7 +394,7 @@ public class PlaylistFragment extends GeastureFragment implements
 
             @Override
             public String getPaletteUrl() {
-                return item.getImageURL(activity);
+                return item.getArtwork(activity);
             }
         });
 
@@ -402,8 +402,8 @@ public class PlaylistFragment extends GeastureFragment implements
 
 
 
-        if (item != null && item.getImageURL(activity) != null) {
-            Uri uri = Uri.parse(item.getImageURL(activity));
+        if (item != null && item.getArtwork(activity) != null) {
+            Uri uri = Uri.parse(item.getArtwork(activity));
             mPhoto.setImageURI(uri);
         }
 

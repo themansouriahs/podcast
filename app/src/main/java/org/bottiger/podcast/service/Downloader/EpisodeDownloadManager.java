@@ -88,12 +88,17 @@ public class EpisodeDownloadManager extends Observable {
      * @param item
      * @return
      */
-	public static DownloadStatus getStatus(FeedItem item) {
-        Log.d(DEBUG_KEY, "getStatus(): " + item);
+	public static DownloadStatus getStatus(IEpisode argEpisode) {
+        Log.d(DEBUG_KEY, "getStatus(): " + argEpisode);
 
-		if (item == null) {
+		if (argEpisode == null) {
             return DownloadStatus.NOTHING;
         }
+
+        if (!(argEpisode instanceof FeedItem))
+            return DownloadStatus.NOTHING;
+
+        FeedItem item = (FeedItem)argEpisode;
 
         QueueEpisode qe = new QueueEpisode(item);
 		if (mDownloadQueue.contains(qe)) {
@@ -431,8 +436,12 @@ public class EpisodeDownloadManager extends Observable {
 	/**
 	 * Add feeditem to the download queue
 	 */
-	public static synchronized void addItemToQueue(FeedItem argEpisode, QUEUE_POSITION argPosition) {
-		QueueEpisode queueItem = new QueueEpisode(argEpisode);
+	public static synchronized void addItemToQueue(IEpisode argEpisode, QUEUE_POSITION argPosition) {
+        if (!(argEpisode instanceof FeedItem)) {
+            return;
+        }
+
+		QueueEpisode queueItem = new QueueEpisode((FeedItem)argEpisode);
 
         if (argPosition == QUEUE_POSITION.ANYWHERE) {
             if (!mDownloadQueue.contains(queueItem))
@@ -457,7 +466,7 @@ public class EpisodeDownloadManager extends Observable {
 	 *
 	 * @param context
 	 */
-	public static void addItemAndStartDownload(@NonNull FeedItem item, @NonNull QUEUE_POSITION argPosition, @NonNull Context context) {
+	public static void addItemAndStartDownload(@NonNull IEpisode item, @NonNull QUEUE_POSITION argPosition, @NonNull Context context) {
         addItemToQueue(item, argPosition);
 		startDownload(context);
 	}
