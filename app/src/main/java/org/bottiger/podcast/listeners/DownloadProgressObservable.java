@@ -78,22 +78,22 @@ public class DownloadProgressObservable {
                                 throw new NullPointerException("Episode can not be null!");
                             }
 
-                            List<DownloadObserver> observers = mObservers.get(episode.getId());
+                            List<DownloadObserver> observers = mObservers.get(episode);
 
                             DownloadStatus status = EpisodeDownloadManager.getStatus(episode);
-                            IDownloadEngine download = mPodcastDownloadManager.get(episode.getId());
+                            IDownloadEngine download = mPodcastDownloadManager.get(episode);
 
                             int progress = -1;
 
                             switch (status) {
                                 case DOWNLOADING:
-                                    Log.d("Refresh UI:", "Downloading: "+ episode.title);
                                     if (download == null) {
                                         progress = episode.getProgress(mDownloadManager);
                                     } else {
                                         float progressFloat = download.getProgress();
                                         progress = (int)(progressFloat*100);
                                     }
+                                    Log.d("Refresh UI:", "Downloading: "+ episode.title + " (progress: " + progress + ")");
                                     break;
                                 case PENDING:
                                     Log.d("Refresh UI:", "Pending: "+ episode.title);
