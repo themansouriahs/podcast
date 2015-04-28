@@ -127,6 +127,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
                 viewHolder.mPlayPauseButton.setEpisode(item, PlayPauseImageView.LOCATION.PLAYLIST);
                 viewHolder.mPlayPauseButton.setStatus(PlayerStatusObservable.STATUS.PAUSED);
+                viewHolder.downloadButton.setEpisode(item);
                 mDownloadProgressObservable.registerObserver(viewHolder.downloadButton);
 
                 String imageUrl = item.getArtwork(mActivity);
