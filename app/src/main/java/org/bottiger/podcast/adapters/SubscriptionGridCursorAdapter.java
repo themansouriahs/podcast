@@ -9,6 +9,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
@@ -29,6 +30,8 @@ public class SubscriptionGridCursorAdapter extends CursorRecyclerAdapter {
 
     private int numberOfColumns = 2;
     private int position = -1;
+
+    private OnSubscriptionCountChanged mOnSubscriptionCountChanged = null;
 
     public SubscriptionGridCursorAdapter(Activity argActivity, Cursor cursor) {
         super(cursor);
@@ -180,6 +183,44 @@ public class SubscriptionGridCursorAdapter extends CursorRecyclerAdapter {
 
     public void setPosition(int position) {
         this.position = position;
+    }
+
+
+    @Override
+    public void changeCursor(Cursor cursor) {
+        super.changeCursor(cursor);
+        mOnSubscriptionCountChanged.newSubscriptionCount(getItemCount());
+    }
+
+    /**
+     * Swap in a new Cursor, returning the old Cursor.  Unlike
+     * {@link #changeCursor(Cursor)}, the returned old Cursor is <em>not</em>
+     * closed.
+     *
+     * @param newCursor The new cursor to be used.
+     * @return Returns the previously set Cursor, or null if there wasa not one.
+     * If the given new Cursor is the same instance is the previously set
+     * Cursor, null is also returned.
+     */
+    @Override
+    public Cursor swapCursor(Cursor newCursor) {
+        Cursor cursor = super.swapCursor(newCursor);
+        mOnSubscriptionCountChanged.newSubscriptionCount(getItemCount());
+        return cursor;
+    }
+
+    protected void onContentChanged() {
+        if (mOnSubscriptionCountChanged != null) {
+            mOnSubscriptionCountChanged.newSubscriptionCount(getItemCount());
+        }
+    }
+
+    public void setOnSubscriptionCountChangedListener(@Nullable OnSubscriptionCountChanged argOnSubscriptionCountChanged) {
+        mOnSubscriptionCountChanged = argOnSubscriptionCountChanged;
+    }
+
+    public interface OnSubscriptionCountChanged {
+        public void newSubscriptionCount(int argCount);
     }
 
 }

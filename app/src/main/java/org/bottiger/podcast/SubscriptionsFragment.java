@@ -13,6 +13,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -24,16 +25,26 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
-public class SubscriptionsFragment extends Fragment {
+public class SubscriptionsFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG = "SubscriptionsFragment";
+
+    private static final boolean SHARE_ANALYTICS_DEFAULT = !BuildConfig.LIBRE_MODE;
+    private static final boolean SHARE_CLOUD_DEFAULT = false;
+
+    private boolean mShowEmptyView = true;
 
 	private FragmentUtils mFragmentUtils;
 	private View fragmentView;
 	private RecyclerView mGridView;
+
+    private CheckBox mShareAnalytics;
+    private CheckBox mCloudServices;
 
     private GridLayoutManager mGridLayoutmanager;
     private RelativeLayout mEmptySubscrptionList;
@@ -44,6 +55,27 @@ public class SubscriptionsFragment extends Fragment {
 
     private SharedPreferences shareprefs;
     private static String PREF_SUBSCRIPTION_COLUMNS;
+    private static String PREF_SHARE_ANALYTICS_KEY;
+    private static String PREF_CLOUD_SUPPORT_KEY;
+
+    private Cursor mCursor = null;
+    private SubscriptionGridCursorAdapter.OnSubscriptionCountChanged mSubscriptionCountListener = new SubscriptionGridCursorAdapter.OnSubscriptionCountChanged() {
+        @Override
+        public void newSubscriptionCount(int argCount) {
+            boolean showEmpty = argCount == 0;
+            int visibility = showEmpty ? View.VISIBLE : View.GONE;
+
+            if (mShowEmptyView != showEmpty) {
+                if (showEmpty) {
+                    mEmptySubscrptionList.setVisibility(View.VISIBLE);
+                    mGridView.setVisibility(View.GONE);
+                } else {
+                    mEmptySubscrptionList.setVisibility(View.GONE);
+                    mGridView.setVisibility(View.VISIBLE);
+                }
+            }
+        }
+    };
 
 
     @Override
@@ -51,7 +83,10 @@ public class SubscriptionsFragment extends Fragment {
 		super.onCreate(savedInstanceState);
         mActivity = getActivity();
         PREF_SUBSCRIPTION_COLUMNS = mActivity.getResources().getString(R.string.pref_subscriptions_columns_key);
+        PREF_SHARE_ANALYTICS_KEY = mActivity.getResources().getString(R.string.pref_anonymous_feedback_key);
+        PREF_CLOUD_SUPPORT_KEY = mActivity.getResources().getString(R.string.pref_cloud_support_key);
         shareprefs = PreferenceManager.getDefaultSharedPreferences(mActivity.getApplicationContext());
+        shareprefs.registerOnSharedPreferenceChangeListener(this);
 	}
 
     SubscriptionCursorLoader mCursorLoader;
@@ -66,28 +101,64 @@ public class SubscriptionsFragment extends Fragment {
         mContainerView = (FrameLayout)inflater.inflate(R.layout.subscription_container, container, false);
         FrameLayout fragmentContainer = (FrameLayout)mContainerView.findViewById(R.id.subscription_fragment_container);
 
-		fragmentView = inflater.inflate(getLayoutType(), fragmentContainer, true);
 
+        // Empty View
         mEmptySubscrptionList = (RelativeLayout) mContainerView.findViewById(R.id.subscription_empty);
-        mEmptySubscrptionList.setVisibility(View.GONE);
 
+        mShareAnalytics = (CheckBox) mContainerView.findViewById(R.id.checkBox_usage);
+        mCloudServices =  (CheckBox) mContainerView.findViewById(R.id.checkBox_cloud);
+
+        onSharedPreferenceChanged(shareprefs, PREF_SHARE_ANALYTICS_KEY);
+        onSharedPreferenceChanged(shareprefs, PREF_CLOUD_SUPPORT_KEY);
+
+
+        //RecycelrView
+        mAdapter = new SubscriptionGridCursorAdapter(getActivity(), mCursor);
+        mAdapter.setOnSubscriptionCountChangedListener(mSubscriptionCountListener);
+        mCursorLoader = new SubscriptionCursorLoader(this, mAdapter, mCursor);
+
+        fragmentView = inflater.inflate(getLayoutType(), fragmentContainer, true);
 		mFragmentUtils = new FragmentUtils(getActivity(), fragmentView, this);
 		mGridView = (RecyclerView) fragmentView.findViewById(R.id.gridview);
-
 		registerForContextMenu(mGridView);
-
-        Cursor mCursor = null;
-        mAdapter = new SubscriptionGridCursorAdapter(getActivity(), mCursor);
 
         mGridLayoutmanager = new GridLayoutManager(getActivity(), numberOfColumns());
         mGridView.setHasFixedSize(true);
         mGridView.setLayoutManager(mGridLayoutmanager);
         mGridView.setAdapter(mAdapter);
-
-        mCursorLoader = new SubscriptionCursorLoader(this, mAdapter, mCursor);
+        //fragmentView.setVisibility(View.GONE);
+        mGridView.setVisibility(View.GONE);
 
 		return mContainerView;
 	}
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "onclick");
+            }
+        });
+
+        mShareAnalytics.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Log.d(TAG, "Setting " + PREF_SHARE_ANALYTICS_KEY + " to " + isChecked);
+                shareprefs.edit().putBoolean(PREF_SHARE_ANALYTICS_KEY, isChecked).commit();
+            }
+        });
+
+        mCloudServices.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Log.d(TAG, "Setting " + PREF_CLOUD_SUPPORT_KEY + " to " + isChecked);
+                shareprefs.edit().putBoolean(PREF_CLOUD_SUPPORT_KEY, isChecked).commit();
+            }
+        });
+    }
 
     @Override
     public void onDetach() {
@@ -179,4 +250,22 @@ public class SubscriptionsFragment extends Fragment {
         return Integer.parseInt(number);
     }
 
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key == PREF_SHARE_ANALYTICS_KEY) {
+            boolean isEnabled = sharedPreferences.getBoolean(key, SHARE_ANALYTICS_DEFAULT);
+            if (mShareAnalytics != null) {
+                mShareAnalytics.setChecked(isEnabled);
+            }
+            return;
+        }
+
+        if (key == PREF_CLOUD_SUPPORT_KEY) {
+            boolean isEnabled = sharedPreferences.getBoolean(key, SHARE_CLOUD_DEFAULT);
+            if (mCloudServices != null) {
+                mCloudServices.setChecked(isEnabled);
+            }
+            return;
+        }
+    }
 }
