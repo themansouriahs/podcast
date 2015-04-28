@@ -286,12 +286,6 @@ public class PlayerService extends Service implements
 
 	public void play(String argEpisodeURL) {
 
-        boolean isFeedItem = false;
-        if (mItem instanceof FeedItem) {
-            isFeedItem = true;
-        }
-        final FeedItem feedItem = isFeedItem ? (FeedItem)mItem : null;
-
 		// Pause the current episode in order to save the current state
 		if (mPlayer.isPlaying())
 			mPlayer.pause();
@@ -305,9 +299,7 @@ public class PlayerService extends Service implements
 			}
 
 			if (mPlayer.isPlaying()) {
-                if (isFeedItem) {
-                    feedItem.setOffset(getContentResolver(), mPlayer.position());
-                }
+                mItem.setOffset(getContentResolver(), mPlayer.position());
 				stop();
 			}
 		}
@@ -317,13 +309,16 @@ public class PlayerService extends Service implements
 		if (mItem == null)
 			return;
 
+        boolean isFeedItem = false;
+        if (mItem instanceof FeedItem) {
+            isFeedItem = true;
+        }
+        final FeedItem feedItem = isFeedItem ? (FeedItem)mItem : null;
+
 		String dataSource = mItem.isDownloaded() ? feedItem.getAbsolutePath()
 				: mItem.getUrl().toString();
 
-		int offset = 0;
-        if (isFeedItem) {
-            offset = feedItem.offset < 0 ? 0 : feedItem.offset;
-        }
+		int offset = mItem.getOffset() < 0 ? 0 : (int) mItem.getOffset();
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()    );
 
@@ -355,7 +350,7 @@ public class PlayerService extends Service implements
      */
 	public boolean toggle(@NonNull IEpisode argEpisode) {
         IEpisode item = getCurrentItem();
-		if (!mPlayer.isPlaying() || (item != null && item.getUrl() != argEpisode.getUrl())) {
+		if (!mPlayer.isPlaying() || (item != null && !argEpisode.getUrl().equals(item.getUrl()))) {
 			play(argEpisode.getUrl().toString());
             return true;
 		} else {
