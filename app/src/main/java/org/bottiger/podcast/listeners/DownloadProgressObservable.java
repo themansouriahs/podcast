@@ -52,9 +52,11 @@ public class DownloadProgressObservable {
 	/**
 	 * Handler for updating the textviews
 	 */
-	public static final Handler sHandler = new Handler() {
+	public static final Handler sHandler = new DownloadProgressHandler();
 
-        private List<FeedItem> mUpdateEpisodess = new LinkedList<FeedItem>();
+    private static class DownloadProgressHandler extends Handler {
+
+        private List<FeedItem> mUpdateEpisodess = new LinkedList<>();
         private final ReentrantLock lock = new ReentrantLock();
 
         @Override
