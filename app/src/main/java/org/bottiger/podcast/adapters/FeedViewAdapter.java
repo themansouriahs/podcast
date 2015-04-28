@@ -96,6 +96,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
         bindButtons(episodeViewHolder, item);
 
 
+        episodeViewHolder.mDownloadButton.setEpisode(item);
         mDownloadProgressObservable.registerObserver(episodeViewHolder.mDownloadButton);
 
         if (mPalette != null) {
