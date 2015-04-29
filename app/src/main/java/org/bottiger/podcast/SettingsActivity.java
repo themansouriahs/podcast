@@ -17,93 +17,84 @@
 package org.bottiger.podcast;
 
 import org.bottiger.podcast.service.PodcastService;
-import org.bottiger.podcast.utils.ThemeHelper;
 
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.preference.PreferenceActivity;
+import android.preference.ListPreference;
+import android.preference.Preference;
+import android.preference.PreferenceGroup;
 import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
+import android.view.View;
+import android.view.WindowManager;
 
-public class SettingsActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class SettingsActivity extends ToolbarActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
 	public static final String DARK_THEME_KEY = "pref_dark_theme";
+	public static final String KEY_FAST_FORWARD = "pref_player_forward_amount";
+	public static final String KEY_REWIND = "pref_player_backward_amount";
 	public static final String CLOUD_SUPPORT = "pref_cloud support";
 
 	public static final String HAPI_PREFS_FILE_NAME = "org.bottiger.podcast_preferences";
-	private PodcastService serviceBinder = null;
-	ComponentName service = null;
-
-	private ServiceConnection serviceConnection = new ServiceConnection() {
-		@Override
-		public void onServiceConnected(ComponentName className, IBinder service) {
-			serviceBinder = ((PodcastService.PodcastBinder) service)
-					.getService();
-		}
-
-		@Override
-		public void onServiceDisconnected(ComponentName className) {
-			serviceBinder = null;
-		}
-	};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+
 		// This is bizar, but works:
 		// http://stackoverflow.com/questions/11751498/how-to-change-preferenceactivity-theme
 		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(this);
-		setTheme(ThemeHelper.getTheme(prefs));
-		super.onCreate(savedInstanceState);
+				.getDefaultSharedPreferences(this.getApplicationContext());
+        setTheme(R.style.SoundWaves_PreferenceActivity_Light);
 
-		// Load the preferences from an XML resource
-		addPreferencesFromResource(R.xml.preferences);
+        super.onCreate(savedInstanceState);
 
-		service = startService(new Intent(this, PodcastService.class));
+        getFragmentManager().beginTransaction().replace(R.id.content_frame, new SoundWavesPreferenceFragment()).commit();
 
-		Intent bindIntent = new Intent(this, PodcastService.class);
-		bindService(bindIntent, serviceConnection, Context.BIND_AUTO_CREATE);
-
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 	}
+	
+	@Override
+    protected void onResume() {
+        super.onResume();
+        // Set up a listener whenever a key changes
+        getPreferences().registerOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Unregister the listener whenever a key changes
+        getPreferences().unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    protected int getLayout() {
+        return R.layout.preference_activity;
+    }
 
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
 			String key) {
 		if (key.equals(DARK_THEME_KEY)) {
 			recreate();
+			return;
 		}
 	}
 
-	@Override
-	protected void onResume() {
-		super.onResume();
-	    // Set up a listener whenever a key changes
-	    getPreferenceScreen().getSharedPreferences()
-	            .registerOnSharedPreferenceChangeListener(this);
-
-	}
-
-	@Override
-	protected void onPause() {
-
-		super.onPause();
-		if (serviceBinder != null)
-			serviceBinder.updateSetting();
-		
-	    // Unregister the listener whenever a key changes
-	    getPreferenceScreen().getSharedPreferences()
-	            .unregisterOnSharedPreferenceChangeListener(this);
-	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		unbindService(serviceConnection);
-		// stopService(new Intent(this, service.getClass()));
-	}
+    @Override
+    protected boolean transparentNavigationBar() {
+        return false;
+    }
 
 }

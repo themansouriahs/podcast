@@ -10,13 +10,21 @@ import org.bottiger.podcast.parser.syndication.namespace.NSSimpleChapters;
 import org.bottiger.podcast.parser.syndication.namespace.Namespace;
 import org.bottiger.podcast.parser.syndication.namespace.SyndElement;
 import org.bottiger.podcast.parser.syndication.namespace.atom.NSAtom;
+import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.provider.SlimImplementations.SlimEpisode;
+import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.provider.converter.EpisodeConverter;
+import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import android.content.ContentResolver;
 import android.util.Log;
+
+import java.util.ArrayList;
 
 /** Superclass for all SAX Handlers which process Syndication formats */
 public class SyndHandler extends DefaultHandler {
@@ -25,7 +33,7 @@ public class SyndHandler extends DefaultHandler {
 	private static final String DEFAULT_PREFIX = "";
 	protected HandlerState state;
 
-	public SyndHandler(ContentResolver contentResolver, Subscription feed, TypeGetter.Type type) {
+	public SyndHandler(ContentResolver contentResolver, ISubscription feed, TypeGetter.Type type) {
 		this.contentResolver = contentResolver;
 		state = new HandlerState(feed);
 		if (type == TypeGetter.Type.RSS20 || type == TypeGetter.Type.RSS091) {
@@ -127,10 +135,30 @@ public class SyndHandler extends DefaultHandler {
 	@Override
 	public void endDocument() throws SAXException {
 		super.endDocument();
-		//state.getFeed().setItems(state.getItems());
-		FeedUpdater updater = new FeedUpdater(contentResolver);
+		ISubscription subscription = state.getSubscription();
 
-		updater.updateDatabase(state.getFeed(), state.getItems());
+        Log.d(SubscriptionRefreshManager.DEBUG_KEY, "Done Parsing: " + subscription);
+
+        if (subscription instanceof Subscription) {
+            FeedUpdater updater = new FeedUpdater(contentResolver);
+            updater.updateDatabase((Subscription)subscription, state.getItems());
+            Log.d(SubscriptionRefreshManager.DEBUG_KEY, "Done updating database for: " + subscription);
+            return;
+        }
+
+        if (subscription instanceof SlimSubscription) {
+            SlimSubscription slimSubscription = (SlimSubscription)subscription;
+            ArrayList<SlimEpisode> slimEpisodes = new ArrayList<>();
+            for (FeedItem episode : state.getItems()) {
+                SlimEpisode slimEpisode = EpisodeConverter.toSlim(episode);
+                if (slimEpisode != null) {
+                    slimEpisodes.add(EpisodeConverter.toSlim(episode));
+                }
+            }
+            slimSubscription.setEpisodes(slimEpisodes);
+            Log.d(SubscriptionRefreshManager.DEBUG_KEY, "Replacing the subscription with a populated SlimSubscription:");
+            state.setSubscription(slimSubscription);
+        }
 	}
 
 	public HandlerState getState() {

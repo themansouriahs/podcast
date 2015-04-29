@@ -1,0 +1,159 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+  <string-array name="drawer_menu">
+    <item>Filtros de la lista de reproducción</item>
+    <item>Descargando ítems</item>
+  </string-array>
+  <string-array name="entries_update">
+    <item>30 minutos</item>
+    <item>1 hora</item>
+    <item>2 horas</item>
+    <item>4 horas</item>
+    <item>6 horas</item>
+    <item>10 horas</item>
+    <item>1 día</item>
+  </string-array>
+  <string-array name="entryvalues_update">
+    <item>30</item>
+    <item>60</item>
+    <item>120</item>
+    <item>240</item>
+    <item>360</item>
+    <item>600</item>
+    <item>1440</item>
+  </string-array>
+  <string-array name="entries_item_expire">
+    <item>1 día</item>
+    <item>3 días</item>
+    <item>5 días</item>
+    <item>1 semana</item>
+    <item>2 semanas</item>
+    <item>1 mes</item>
+  </string-array>
+  <string-array name="entryvalues_item_expire">
+    <item>1</item>
+    <item>3</item>
+    <item>5</item>
+    <item>7</item>
+    <item>14</item>
+    <item>30</item>
+  </string-array>
+  <string-array name="entries_download_file_expire">
+    <item>100 MB</item>
+    <item>1 GB</item>
+    <item>2 GB</item>
+    <item>3 GB</item>
+    <item>5 GB</item>
+    <item>Ilimitado</item>
+  </string-array>
+  <string-array name="entryvalues_downlaod_file_expire">
+    <item>100</item>
+    <item>1000</item>
+    <item>2000</item>
+    <item>3000</item>
+    <item>5000</item>
+    <item>-1</item>
+  </string-array>
+  <string-array name="entryvalues_spinner_number_of_episodes">
+    <item>10</item>
+    <item>20</item>
+    <item>30</item>
+    <item>40</item>
+    <item>50</item>
+    <item>100</item>
+  </string-array>
+  <string-array name="sort_select">
+    <item>Ordenar por canal</item>
+    <item>Ordenar por estado</item>
+    <item>Ordenar por fecha</item>
+  </string-array>
+  <string-array name="select_select">
+    <item>Todos</item>
+    <item>Sólo nuevos</item>
+    <item>Sólo sin reproducir</item>
+    <item>Sólo reproducibles</item>
+  </string-array>
+  <string-array name="backup_select">
+    <item>Importar desde OPML</item>
+    <item>Exportar a OPML</item>
+  </string-array>
+  <string-array name="repeat_select">
+    <item>No repetir</item>
+    <item>Repetir todo</item>
+    <item>Repetir uno</item>
+  </string-array>
+  <string-array name="entries_pref_rewind_interval">
+    <item>3 segundos</item>
+    <item>5 segundos</item>
+    <item>7 segundos</item>
+    <item>10 segundos</item>
+    <item>15 segundos</item>
+    <item>20 segundos</item>
+    <item>30 segundos</item>
+  </string-array>
+  <string-array name="entryvalues_pref_rewind_interval">
+    <item>3</item>
+    <item>5</item>
+    <item>7</item>
+    <item>10</item>
+    <item>15</item>
+    <item>20</item>
+    <item>30</item>
+  </string-array>
+  <string-array name="entries_pref_fast_forward_interval">
+    <item>5 segundos</item>
+    <item>10 segundos</item>
+    <item>15 segundos</item>
+    <item>20 segundos</item>
+    <item>30 segundos</item>
+  </string-array>
+  <string-array name="entryvalues_pref_fast_forward_interval">
+    <item>5</item>
+    <item>10</item>
+    <item>15</item>
+    <item>20</item>
+    <item>30</item>
+  </string-array>
+  <string-array name="entries_pref_max_new_items">
+    <item>5</item>
+    <item>10</item>
+    <item>20</item>
+    <item>30</item>
+    <item>50</item>
+  </string-array>
+  <string-array name="entryvalues_pref_max_new_items">
+    <item>5</item>
+    <item>10</item>
+    <item>20</item>
+    <item>30</item>
+    <item>50</item>
+  </string-array>
+  <string-array name="pref_player_seek_entries">
+    <item>5 segundos</item>
+    <item>10 segundos</item>
+    <item>20 segundos</item>
+    <item>30 segundos</item>
+    <item>1 minuto</item>
+  </string-array>
+  <string-array name="pref_player_seek_entries_values">
+    <item>5</item>
+    <item>10</item>
+    <item>20</item>
+    <item>30</item>
+    <item>60</item>
+  </string-array>
+  <string-array name="pref_subscriptions_columns_entries">
+    <item>Una lista</item>
+    <item>2 columnas</item>
+    <item>3 columnas</item>
+  </string-array>
+  <string-array name="pref_subscriptions_columns_entries_values">
+    <item>1</item>
+    <item>2</item>
+    <item>3</item>
+  </string-array>
+  <string-array name="playlist_sort_order">
+    <item>Ordenar por más recientes</item>
+    <item>Ordenar por más antiguos</item>
+  </string-array>
+</resources>

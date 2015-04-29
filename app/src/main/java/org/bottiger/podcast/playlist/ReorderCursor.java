@@ -47,7 +47,7 @@ public class ReorderCursor extends CursorWrapper
 
 		reorderCursor(from, to);
 
-        //Playlist.move(mContext, from, to);
+        //Playlist.move(mActivity, from, to);
 
 	}
 

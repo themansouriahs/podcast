@@ -11,6 +11,7 @@ import java.io.Reader;
 import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.io.input.XmlStreamReader;
 import org.bottiger.podcast.MainActivity;
+import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -29,9 +30,9 @@ public class TypeGetter {
 	private static final String ATOM_ROOT = "feed";
 	private static final String RSS_ROOT = "rss";
 
-	public Type getType(Subscription feed, String feedContent) throws UnsupportedFeedtypeException {
+	public Type getType(ISubscription feed, String feedContent) throws UnsupportedFeedtypeException {
 		XmlPullParserFactory factory;
-		if (feed.getUrl() != null) {
+		if (feed.getURL().toString() != null) {
 			try {
 				factory = XmlPullParserFactory.newInstance();
 				factory.setNamespaceAware(true);
@@ -43,7 +44,7 @@ public class TypeGetter {
 					if (eventType == XmlPullParser.START_TAG) {
 						String tag = xpp.getName();
 						if (tag.equals(ATOM_ROOT)) {
-							feed.setType(Subscription.TYPE_ATOM1);
+							//feed.setType(Subscription.TYPE_ATOM1); // FIXME
 							if (MainActivity.debugging)
 								Log.d(TAG, "Recognized type Atom");
 							return Type.ATOM;
@@ -53,7 +54,7 @@ public class TypeGetter {
 							if (strVersion != null) {
 
 								if (strVersion.equals("2.0")) {
-									feed.setType(Subscription.TYPE_RSS2);
+									//feed.setType(Subscription.TYPE_RSS2); // FIXME
 									if (MainActivity.debugging)
 										Log.d(TAG, "Recognized type RSS 2.0");
 									return Type.RSS20;
@@ -86,7 +87,7 @@ public class TypeGetter {
 		throw new UnsupportedFeedtypeException(Type.INVALID);
 	}
 
-	private Reader createReader(Subscription feed, String feedContent) {
+	private Reader createReader(ISubscription feed, String feedContent) {
 		Reader reader;
 		try {
 			//reader = new XmlStreamReader(new File(feed.getFile_url()));

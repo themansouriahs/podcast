@@ -1,0 +1,7 @@
+<resources>
+
+    <dimen name="action_bar_height">87dp</dimen>
+    <dimen name="navigation_bar_height">24dp</dimen>
+    <dimen name="header_bar_height">111dp</dimen>
+
+</resources>

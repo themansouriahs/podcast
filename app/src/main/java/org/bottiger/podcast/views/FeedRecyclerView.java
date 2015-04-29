@@ -30,11 +30,4 @@ public class FeedRecyclerView extends RecyclerView {
         return super.canScrollVertically(direction);
 
     }
-
-    /*
-    @Override
-    public boolean getCanScrollRecyclerView() {
-        return true;
-    }
-    */
 }

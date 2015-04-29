@@ -1,6 +1,5 @@
 package fi.iki.elonen;
 
-import org.apache.commons.io.IOUtils;
 import org.bottiger.podcast.utils.StreamDownloader;
 
 import java.io.BufferedReader;

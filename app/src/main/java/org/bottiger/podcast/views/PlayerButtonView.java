@@ -5,37 +5,36 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.graphics.Palette;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.SparseIntArray;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.DownloadObserver;
 import org.bottiger.podcast.listeners.EpisodeStatus;
 import org.bottiger.podcast.listeners.PaletteListener;
-import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObserver;
 import org.bottiger.podcast.provider.FeedItem;
-import org.bottiger.podcast.utils.PaletteCache;
+import org.bottiger.podcast.utils.ColorExtractor;
+
+import java.lang.ref.WeakReference;
 
 /**
  * TODO: document your custom view class.
  */
-//public class PlayerButtonView extends com.melnykov.fab.FloatingActionButton implements PlayerStatusObserver, PaletteListener, DownloadObserver {
-public class PlayerButtonView extends ImageButton implements PlayerStatusObserver, PaletteListener, DownloadObserver {
+public class PlayerButtonView extends ImageButton implements PlayerStatusObserver, PaletteListener, DownloadObserver  {
 
     public final static int STATE_DEFAULT = 0;
     public final static int STATE_DOWNLOAD = 1;
     public final static int STATE_DELETE = 2;
+    public final static int STATE_QUEUE = 3;
 
     private PlayerStatusObservable.STATUS mStatus = PlayerStatusObservable.STATUS.STOPPED;
     private long episodeId = -1;
@@ -44,22 +43,20 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
     private static final int BITMAP_OFFSET = 5;
     private static final float RECTANGLE_SCALING = 1F;
 
-    private Paint baseColorPaint;
-    private Paint foregroundColorPaint;
+    protected Paint baseColorPaint;
+    protected Paint foregroundColorPaint;
     private RectF buttonRectangle;
     private RectF buttonRectangleBitmap;
 
     private Context mContext;
-    private Bitmap s_Icon;
+    private WeakReference<Bitmap> s_Icon;
     private int defaultIcon;
 
     private int mCurrentState = 0;
     private SparseIntArray mStateIcons= new SparseIntArray();
 
-    private PaletteObservable mCurrentListener;
-
-    private int mForegroundColor = Color.CYAN;
-    private int mBackgroundColor = Color.RED;
+    private int mForegroundColor = getResources().getColor(R.color.colorPrimaryDark);
+    private int mBackgroundColor = getResources().getColor(R.color.colorPrimaryDark);
 
     public PlayerButtonView(Context context) {
         super(context);
@@ -79,7 +76,7 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
     private void init(Context context, AttributeSet attrs) {
 
         baseColorPaint = new Paint(Paint.LINEAR_TEXT_FLAG);
-        //baseColorPaint.setColor(mBackgroundColor);
+        baseColorPaint.setColor(mBackgroundColor);
         baseColorPaint.setColor(-1761607680);
         baseColorPaint.setTextSize(12.0F);
         baseColorPaint.setStyle(Paint.Style.FILL_AND_STROKE); // Paint.Style.STROKE
@@ -108,7 +105,7 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
             }
 
             if (image > 0) {
-                s_Icon = BitmapFactory.decodeResource(getResources(), image);
+                s_Icon = new WeakReference<Bitmap>(BitmapFactory.decodeResource(getResources(), image));
             }
         }
         defaultIcon = image;
@@ -118,18 +115,10 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
     public synchronized void setEpisodeId(long argId) {
         this.episodeId = argId;
         ensureEpisode();
-        PaletteObservable.registerListener(this);
-
-        /*
-        Palette palette = PaletteCache.get(this);
-        if (palette != null) {
-            onPaletteFound(palette);
-        }*/
     }
 
     public synchronized void unsetEpisodeId() {
         this.episodeId = -1;
-        PaletteObservable.unregisterListener(this);
     }
 
     public void setStatus(PlayerStatusObservable.STATUS argStatus) {
@@ -143,9 +132,9 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
     }
 
     public void setImage(int argImage) {
-        s_Icon = BitmapFactory.decodeResource(getResources(), argImage);
+        s_Icon = new WeakReference<Bitmap>(BitmapFactory.decodeResource(getResources(), argImage));
 
-        this.setImageBitmap(s_Icon);
+        this.setImageBitmap(s_Icon.get());
         this.invalidate();
     }
 
@@ -186,6 +175,9 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
         //canvas.drawArc(buttonRectangle, -90, 360, true, baseColorPaint);
 
         if(mProgress!=0) {
+            if (getState() != PlayerButtonView.STATE_DEFAULT) {
+                setState(PlayerButtonView.STATE_DEFAULT);
+            }
             canvas.drawArc(buttonRectangle, -90, Math.round(360 * mProgress / 100F), false, foregroundColorPaint);
         }
 
@@ -238,16 +230,15 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
 
     @Override
     public void onPaletteFound(Palette argChangedPalette) {
-        Palette.Swatch swatch = argChangedPalette.getVibrantSwatch();
-        Palette.Swatch swatchDark = argChangedPalette.getDarkVibrantSwatch();
+        ColorExtractor extractor = new ColorExtractor(argChangedPalette);
 
-        int cd = swatchDark.getRgb();
-        int c = swatch.getBodyTextColor();
-        baseColorPaint.setColor(cd); // -1761607680
-        //foregroundColorPaint.setColor(swatch.getBodyTextColor());
-        foregroundColorPaint.setColor(cd);
-        //super.setColorNormal(PlayerButtonView.ButtonColor(argChangedPalette));
-        setBackgroundColor(ButtonColor(argChangedPalette));
+        baseColorPaint.setColor(extractor.getPrimary()); // -1761607680
+        foregroundColorPaint.setColor(extractor.getSecondary());
+
+        if (argChangedPalette != null) {
+            setBackgroundColor(ButtonColor(argChangedPalette));
+        }
+
         invalidate();
     }
 
@@ -255,6 +246,12 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
     public String getPaletteUrl() {
         return getEpisode().getImageURL(getContext()); // FIXME
     }
+
+    /*
+    @Override
+    public void onClick(View v) {
+        super(v);
+    }*/
 
     public interface DownloadStatus {
         void FileComplete();
@@ -266,17 +263,13 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
         mDownloadCompletedCallback = argCallback;
     }
 
-    public static int StaticButtonColor(@NonNull Palette argPalette) {
-        Palette.Swatch color = argPalette.getVibrantSwatch();
-
-        if (color==null)
-            return Color.RED;
-
-        return color.getRgb();
+    public static int StaticButtonColor(@Nullable Context argContext, @NonNull Palette argPalette) {
+        ColorExtractor extractor = new ColorExtractor(argContext, argPalette);
+        return extractor.getPrimary();
     }
 
     public int ButtonColor(@NonNull Palette argPalette) {
-        return StaticButtonColor(argPalette);
+        return StaticButtonColor(mContext, argPalette);
     }
 
     private void ensureEpisode() {

@@ -1,6 +1,12 @@
 package org.bottiger.podcast.receiver;
 
-import org.bottiger.podcast.service.PodcastDownloadManager;
+import org.bottiger.podcast.flavors.Analytics.AnalyticsFactory;
+import org.bottiger.podcast.flavors.Analytics.IAnalytics;
+import org.bottiger.podcast.flavors.Analytics.VendorAnalytics;
+import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
+import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
+import org.bottiger.podcast.service.IDownloadCompleteCallback;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -22,15 +28,27 @@ public class PodcastUpdateReceiver extends BroadcastReceiver {
 
 	
     @Override
-    public void onReceive(Context context, Intent intent) 
-    {   
+    public void onReceive(final Context context, Intent intent)
+    {
+        final long startTime = System.currentTimeMillis();
+
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "");
         wl.acquire();
 
-		PodcastDownloadManager.start_update(context);
-		PodcastDownloadManager.removeExpiredDownloadedPodcasts(context);
-		PodcastDownloadManager.startDownload(context);
+		SubscriptionRefreshManager subscriptionRefreshManager = new SubscriptionRefreshManager(context);
+        subscriptionRefreshManager.refresh(null, new IDownloadCompleteCallback() {
+            @Override
+            public void complete(boolean succes, ISubscription argCallback) {
+                final long endTime = System.currentTimeMillis();
+                Integer timeDiff = (int)(endTime-startTime);
+                IAnalytics analytics = AnalyticsFactory.getAnalytics(context);
+                analytics.trackEvent(IAnalytics.EVENT_TYPE.REFRESH_DURATION, timeDiff);
+                return;
+            }
+        });
+		EpisodeDownloadManager.removeExpiredDownloadedPodcasts(context);
+		EpisodeDownloadManager.startDownload(context);
 
         wl.release();
     }

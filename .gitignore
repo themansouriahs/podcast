@@ -23,11 +23,16 @@ local.properties
 proguard/
 
 # IntelliJ files
-.idea/*
+.idea
+.navigation
 *.iml
 
 # Maven output folder
 target
+
+# Transifex
+tx.exe
+.tx
 
 # Misc
 .DS_Store

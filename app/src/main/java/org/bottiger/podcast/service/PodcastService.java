@@ -3,6 +3,8 @@ package org.bottiger.podcast.service;
 import org.bottiger.podcast.SettingsActivity;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.receiver.PodcastUpdateReceiver;
+import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
+import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
 import org.bottiger.podcast.utils.PodcastLog;
 
 import android.app.AlarmManager;
@@ -15,7 +17,6 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Binder;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
@@ -58,7 +59,7 @@ public class PodcastService extends IntentService {
 	public int pref_max_valid_size = 1000;
 
 	private PodcastUpdateReceiver updateManager = new PodcastUpdateReceiver();
-	private PodcastDownloadManager pdm = new PodcastDownloadManager();
+	private EpisodeDownloadManager pdm = new EpisodeDownloadManager();
 
 	// @Override
 	public void onStart(Context context, Intent intent, int startId) {
@@ -88,17 +89,17 @@ public class PodcastService extends IntentService {
 
 	@Deprecated
 	public void start_download() {
-		PodcastDownloadManager.startDownload(getBaseContext());
+		EpisodeDownloadManager.startDownload(getBaseContext());
 	}
 
 	public void downloadItem(ContentResolver context, FeedItem item) {
 		item.prepareDownload(context);
-		PodcastDownloadManager.addItemToQueue(item);
-		PodcastDownloadManager.startDownload(getBaseContext());
+		EpisodeDownloadManager.addItemToQueue(item, EpisodeDownloadManager.QUEUE_POSITION.LAST);
+		EpisodeDownloadManager.startDownload(getBaseContext());
 	}
 
 	public FeedItem getDownloadingItem() {
-		return PodcastDownloadManager.getDownloadingItem();
+		return EpisodeDownloadManager.getDownloadingItem();
 	}
 
 	/**
@@ -225,8 +226,8 @@ public class PodcastService extends IntentService {
 		 */
 		@Override
 		protected Void doInBackground(Void... params) {
-			// do stuff!
-			PodcastDownloadManager.start_update(PodcastService.this);
+            SubscriptionRefreshManager subscriptionRefreshManager = new SubscriptionRefreshManager(PodcastService.this);
+            subscriptionRefreshManager.refreshAll();
 			return null;
 		}
 

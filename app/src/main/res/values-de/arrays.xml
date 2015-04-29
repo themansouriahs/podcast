@@ -1,0 +1,86 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+  <string-array name="entryvalues_update">
+    <item>30</item>
+    <item>60</item>
+    <item>120</item>
+    <item>240</item>
+    <item>360</item>
+    <item>600</item>
+    <item>1440</item>
+  </string-array>
+  <string-array name="entryvalues_item_expire">
+    <item>1</item>
+    <item>3</item>
+    <item>5</item>
+    <item>7</item>
+    <item>14</item>
+    <item>30</item>
+  </string-array>
+  <string-array name="entries_download_file_expire">
+    <item>100 MB</item>
+    <item>1 GB</item>
+    <item>2 GB</item>
+    <item>3 GB</item>
+    <item>5 GB</item>
+    <item>Unbegrenzt</item>
+  </string-array>
+  <string-array name="entryvalues_downlaod_file_expire">
+    <item>100</item>
+    <item>1000</item>
+    <item>2000</item>
+    <item>3000</item>
+    <item>5000</item>
+    <item>-1</item>
+  </string-array>
+  <string-array name="entryvalues_spinner_number_of_episodes">
+    <item>10</item>
+    <item>20</item>
+    <item>30</item>
+    <item>40</item>
+    <item>50</item>
+    <item>100</item>
+  </string-array>
+  <string-array name="entryvalues_pref_rewind_interval">
+    <item>3</item>
+    <item>5</item>
+    <item>7</item>
+    <item>10</item>
+    <item>15</item>
+    <item>20</item>
+    <item>30</item>
+  </string-array>
+  <string-array name="entryvalues_pref_fast_forward_interval">
+    <item>5</item>
+    <item>10</item>
+    <item>15</item>
+    <item>20</item>
+    <item>30</item>
+  </string-array>
+  <string-array name="entries_pref_max_new_items">
+    <item>5</item>
+    <item>10</item>
+    <item>20</item>
+    <item>30</item>
+    <item>50</item>
+  </string-array>
+  <string-array name="entryvalues_pref_max_new_items">
+    <item>5</item>
+    <item>10</item>
+    <item>20</item>
+    <item>30</item>
+    <item>50</item>
+  </string-array>
+  <string-array name="pref_player_seek_entries_values">
+    <item>5</item>
+    <item>10</item>
+    <item>20</item>
+    <item>30</item>
+    <item>60</item>
+  </string-array>
+  <string-array name="pref_subscriptions_columns_entries_values">
+    <item>1</item>
+    <item>2</item>
+    <item>3</item>
+  </string-array>
+</resources>

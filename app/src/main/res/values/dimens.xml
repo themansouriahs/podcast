@@ -25,18 +25,23 @@
 
     <dimen name="seekbar_thumb_size">30dp</dimen>
 
+    <!-- See Dimen-v19 -->
     <dimen name="action_bar_height">87dp</dimen>
-    <dimen name="navigation_bar_height">24dp</dimen>
-    <dimen name="header_bar_height">111dp</dimen>
+    <dimen name="navigation_bar_height">0dp</dimen>
+    <dimen name="header_bar_height">87dp</dimen>
 
-    <dimen name="top_player_size_minimum">100dp</dimen>
+    <dimen name="top_player_size_minimum">127dp</dimen>
     <dimen name="top_player_size_medium">150dp</dimen>
-    <dimen name="top_player_size_maximum">220dp</dimen>
+    <dimen name="top_player_size_maximum">280dp</dimen>
+    <dimen name="top_player_size_maximum_bottom">160dp</dimen>
+
+    <dimen name="player_elevation">5dp</dimen>
 
     <dimen name="overlay_side_margin">40dp</dimen>
 
     <!-- top_player_size_maximum + action_bar_height -->
-    <dimen name="top_player_max_offset">376dp</dimen>
+    <!-- <dimen name="top_player_max_offset">376dp</dimen> -->
+    <dimen name="top_player_max_offset">280dp</dimen>
 
     <dimen name="item_height">130dp</dimen>
     <dimen name="section_div_height">20dp</dimen>
@@ -58,5 +63,14 @@
     <dimen name="playpause_button_size_normal">50dp</dimen>
     <dimen name="playpause_button_size">100dp</dimen>
     <dimen name="player_buttons_padding_left">70dp</dimen> <!-- around 2*playpause_button_size -->
+
+    <!-- Initial height of transparent space above QuickContacts -->
+    <dimen name="quickcontact_starting_empty_height">150dp</dimen>
+    <!-- Initial size of QuickContact's title size -->
+    <dimen name="quickcontact_maximum_title_size">36dp</dimen>
+    <!-- When QC is uncollapsed, the title has this much margin on its left, right and bottom -->
+    <dimen name="quickcontact_title_initial_margin">16dp</dimen>
+
+    <dimen name="quick_contact_toolbar_elevation">16dp</dimen>
     
 </resources>

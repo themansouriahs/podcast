@@ -15,3 +15,64 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+-keep class org.bottiger.podcast
+
+-keep        class android.support.v13.** { *; }
+-keep        class android.support.v7.** { *; }
+-keep        class android.support.v4.** { *; }
+
+-keep public class org.bottiger.podcast.** {
+  public void set*(***);
+  public *** get*();
+  public boolean is*();
+}
+
+# OKhhtp
+-dontwarn com.squareup.okhttp.**
+# Ignore warnings: https://github.com/square/okio/issues/60
+-dontwarn okio.**
+
+# Jackson xml parser
+-keepattributes Signature
+-keepattributes *Annotation*,EnclosingMethod
+-keepnames class com.fasterxml.jackson.** {
+*;
+}
+-keepnames interface com.fasterxml.jackson.** {
+    *;
+}
+-keepclassmembers public final enum org.codehaus.jackson.annotate.JsonAutoDetect$Visibility {
+    public static final org.codehaus.jackson.annotate.JsonAutoDetect$Visibility *;
+}
+-dontwarn javax.xml.**
+-dontwarn javax.xml.stream.events.**
+-dontwarn com.fasterxml.jackson.databind.**
+
+# apache
+-dontwarn org.apache.commons.**
+
+#retrofit
+-dontwarn retrofit.**
+-keep class retrofit.** { *; }
+-keepattributes Signature
+-keepattributes Exceptions
+
+#Jsoup
+-keep public class org.jsoup.** {
+public *;
+}
+
+#ACRA specifics
+# Restore some Source file names and restore approximate line numbers in the stack traces,
+# otherwise the stack traces are pretty useless
+-keepattributes SourceFile,LineNumberTable
+
+# ACRA needs "annotations" so add this...
+# Note: This may already be defined in the default "proguard-android-optimize.txt"
+# file in the SDK. If it is, then you don't need to duplicate it. See your
+# "project.properties" file to get the path to the default "proguard-android-optimize.txt".
+-keepattributes *Annotation*
+
+# Keep all the ACRA classes
+-keep class org.acra.** { *; }

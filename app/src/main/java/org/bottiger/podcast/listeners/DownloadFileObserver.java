@@ -4,6 +4,8 @@ import android.os.FileObserver;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import org.bottiger.podcast.provider.FeedItem;
+
 import java.io.File;
 import java.util.Date;
 import java.util.HashMap;
@@ -23,7 +25,7 @@ public class DownloadFileObserver extends FileObserver {
 
     private Date mLastUpdate;
     private Date mCurrentTime;
-    private HashMap<String, Long> mEpisodeIdLUT = new HashMap<String, Long>();
+    private HashMap<String, FeedItem> mEpisodeLUT = new HashMap<String, FeedItem>();
     private final ReentrantLock mLock = new ReentrantLock();
 
     private DownloadProgressObservable mProgressObservable;
@@ -37,7 +39,7 @@ public class DownloadFileObserver extends FileObserver {
     // Received three of these after the delete event while deleting a video through a separate file manager app:
     // 01-16 15:52:27.627: D/APP(4316): DownloadsObserver: onEvent(1073741856, null)
 
-    public DownloadFileObserver(@NonNull String path, @NonNull long argEpisodeId, @NonNull DownloadProgressObservable argDownloadProgressObservable) {
+    public DownloadFileObserver(@NonNull String path, @NonNull FeedItem argEpisode, @NonNull DownloadProgressObservable argDownloadProgressObservable) {
         super(path, flags);
 
         mPath = path;
@@ -45,11 +47,11 @@ public class DownloadFileObserver extends FileObserver {
         try {
             mLock.lock();
 
-            if (mEpisodeIdLUT.containsKey(path)) {
+            if (mEpisodeLUT.containsKey(path)) {
                 throw new IllegalStateException("The LUT must not already contain the file");
             }
 
-            mEpisodeIdLUT.put(path, argEpisodeId);
+            mEpisodeLUT.put(path, argEpisode);
 
         } finally {
             mLock.unlock();
@@ -83,7 +85,7 @@ public class DownloadFileObserver extends FileObserver {
             return;
         }
 
-        long episode = mEpisodeIdLUT.get(path);
+        FeedItem episode = mEpisodeLUT.get(path);
         switch (event) {
             case FileObserver.CLOSE_WRITE:
                 // Download complete, or paused when wifi is disconnected. Possibly reported more than once in a row.
@@ -93,8 +95,8 @@ public class DownloadFileObserver extends FileObserver {
                 try {
                     mLock.lock();
                     /*
-                    if (mEpisodeIdLUT.containsKey(path)) {
-                        mEpisodeIdLUT.remove(path);
+                    if (mEpisodeLUT.containsKey(path)) {
+                        mEpisodeLUT.remove(path);
                     }*/
                     mProgressObservable.addEpisode(episode);
                 } finally {
@@ -120,7 +122,7 @@ public class DownloadFileObserver extends FileObserver {
                         break;
                     }
 
-                    if (!mEpisodeIdLUT.containsKey(path)) {
+                    if (!mEpisodeLUT.containsKey(path)) {
                         break;
                     }
 

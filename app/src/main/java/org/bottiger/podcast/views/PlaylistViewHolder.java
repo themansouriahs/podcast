@@ -1,27 +1,15 @@
 package org.bottiger.podcast.views;
 
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
-import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.eowise.recyclerview.stickyheaders.StickyHeadersAdapter;
-import com.squareup.picasso.Callback;
-
 import org.bottiger.podcast.R;
-import org.bottiger.podcast.adapters.ItemCursorAdapter;
+import org.bottiger.podcast.adapters.PlaylistAdapter;
 import org.bottiger.podcast.adapters.viewholders.ExpandableViewHoldersUtil;
-import org.bottiger.podcast.listeners.PaletteObservable;
 import org.bottiger.podcast.provider.FeedItem;
-import org.bottiger.podcast.utils.PaletteCache;
-import org.bottiger.podcast.views.utils.PlaylistViewHolderExpanderHelper;
-
-import java.util.HashMap;
 
 /**
  * Created by apl on 30-07-2014.
@@ -31,7 +19,7 @@ import java.util.HashMap;
 public class PlaylistViewHolder extends RecyclerView.ViewHolder implements ExpandableViewHoldersUtil.Expandable, View.OnClickListener { //
 
     public FeedItem episode = null;
-    public ItemCursorAdapter mAdapter = null;
+    public PlaylistAdapter mAdapter = null;
 
     public RelativeLayoutWithBackground mLayout;
     public RelativeLayout mMainContainer;
@@ -40,16 +28,20 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
     public PlayerButtonView mForward;
     public PlayerButtonView mBackward;
 
-    public ImageView mItemBackground;
+    public View mActionBarGradientView;
+
+    public ImageViewTinted mItemBackground;
     public TextView mMainTitle;
     public TextView mSubTitle;
     public TextView mTimeDuration;
+    public ImageView mTimeDurationIcon;
     public TextView mCurrentPosition;
     public TextView mSlash;
     public TextView mFileSize;
+    public TextView mPlaylistPosition;
 
     // expnded extended_player
-    public PlayerLinearLayout playerLinearLayout;
+    public PlayerRelativeLayout playerRelativeLayout;
     public TextView timeSlash;
     public PlayerSeekbar seekbar;
     public TextView currentTime;
@@ -57,14 +49,8 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
     public TextView filesize;
 
     public PlayerButtonView favoriteButton;
-    public PlayerButtonView previousButton;
+    public PlayerButtonView removeButton;
     public DownloadButtonView downloadButton;
-
-    public Callback mPicassoCallback;
-
-    private boolean mIsExpanded;
-    private int mCollapsedHeight;
-    private int mExpandedHeight;
 
     // ImageView iv, TextView tv1, TextView tv2, TextView tv3, TextView tv4, TextView tv5, TextView tv6, ViewStub vs, View pv
     public PlaylistViewHolder(View view) {
@@ -74,77 +60,38 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
         mLayout = (RelativeLayoutWithBackground) view.findViewById(R.id.item);
         mMainContainer = (RelativeLayout) view.findViewById(R.id.main_player_container);
         mPlayPauseButton = (PlayPauseImageView) view.findViewById(R.id.list_image);
-        mForward = (PlayerButtonView) view.findViewById(R.id.fast_forward);
-        mBackward = (PlayerButtonView) view.findViewById(R.id.rewind);
-        mItemBackground = (ImageView) view.findViewById(R.id.item_background);
-        //mMainTitle = (TextView) view.findViewById(R.id.title);
-        mSubTitle = (TextView) view.findViewById(R.id.podcast);
-        mTimeDuration = (TextView) view.findViewById(R.id.duration);
+        //mForward = (PlayerButtonView) view.findViewById(R.id.fast_forward);
+        //mBackward = (PlayerButtonView) view.findViewById(R.id.rewind);
+        mItemBackground = (ImageViewTinted) view.findViewById(R.id.item_background);
+        mMainTitle = (TextView) view.findViewById(R.id.podcast_title);
+        mSubTitle = (TextView) view.findViewById(R.id.podcast_title_extra);
+        mTimeDuration = (TextView) view.findViewById(R.id.podcast_duration);
+        mTimeDurationIcon = (ImageView) view.findViewById(R.id.podcast_duration_ic);
         mCurrentPosition = (TextView) view.getTag(R.id.current_position);
         mSlash = (TextView) view.findViewById(R.id.time_slash);
         mFileSize = (TextView) view.findViewById(R.id.filesize);
+        mPlaylistPosition = (TextView) view.findViewById(R.id.playlist_position);
+
+        mActionBarGradientView = view.findViewById(R.id.episode_top_gradient);
 
         // Expanded layout
-        playerLinearLayout = (PlayerLinearLayout) view.findViewById(R.id.expanded_controls);
+        playerRelativeLayout = (PlayerRelativeLayout) view.findViewById(R.id.expanded_controls);
         timeSlash = (TextView) view.findViewById(R.id.time_slash);
         currentTime = (TextView) view
                 .findViewById(R.id.current_position);
         seekbar = (PlayerSeekbar) view.findViewById(R.id.player_progress);
 
         favoriteButton = (PlayerButtonView) view.findViewById(R.id.favorite);
-        previousButton = (PlayerButtonView) view.findViewById(R.id.previous);
+        removeButton = (PlayerButtonView) view.findViewById(R.id.remove_episode);
         downloadButton = (DownloadButtonView) view
                 .findViewById(R.id.download);
         duration = (TextView) view.findViewById(R.id.duration);
         filesize = (TextView) view.findViewById(R.id.filesize);
     }
 
-
-    public static void onClick(View view, PlaylistViewHolder viewHolder) {
-        if (viewHolder.episode == null) {
-            return;
-        }
-
-        if (viewHolder.mAdapter == null) {
-            return;
-        }
-
-        int listPost = viewHolder.getPosition();
-        int type = viewHolder.mAdapter.getTrueItemViewType(listPost);
-
-
-        boolean doAnimate = true;
-
-        //int newType = viewHolder.mAdapter.toggleItem(viewHolder.episode.getId());
-        int newType = type == ItemCursorAdapter.TYPE_EXPAND ? ItemCursorAdapter.TYPE_COLLAPS : ItemCursorAdapter.TYPE_EXPAND;
-
-
-        PlaylistViewHolderExpanderHelper helper = viewHolder.mAdapter.getExpanderHelper();
-
-        helper.newAnimator();
-        if (newType == ItemCursorAdapter.TYPE_EXPAND) {
-            if (helper.expandedView != null) {
-                helper.collapse(helper.expandedView, doAnimate);
-            }
-            helper.expand(viewHolder, doAnimate, true);
-            viewHolder.setExpanded(true);
-        } else {
-            helper.collapse(viewHolder, doAnimate);
-            viewHolder.setExpanded(false);
-        }
-        helper.playAnimator();
-
-        }
-
-    public boolean isExpanded() {
-        return mIsExpanded;
-    }
-
-    public void setExpanded(boolean isExpanded) {mIsExpanded = isExpanded;}
-
     @Override
     public View getExpandView() {
-        return playerLinearLayout;
+        return playerRelativeLayout;
     }
 
     @Override

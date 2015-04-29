@@ -1,38 +1,22 @@
 package org.bottiger.podcast;
 
-import java.util.HashMap;
-
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.DatabaseHelper;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
-import org.bottiger.podcast.provider.PodcastProvider;
-import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
 import org.bottiger.podcast.service.PlayerService;
-import org.bottiger.podcast.service.PodcastDownloadManager;
-import org.bottiger.podcast.utils.OPMLImportExport;
-import org.bottiger.podcast.utils.ThemeHelper;
 
-import android.accounts.Account;
 import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.CursorLoader;
-import android.support.v4.widget.CursorAdapter;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.ListView;
-import android.widget.Toast;
 
 public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 
@@ -70,39 +54,36 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 		prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 	}
 
+
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.episode_list, menu);
 
 		super.onCreateOptionsMenu(menu, inflater);
-
-		ThemeHelper themeHelper = new ThemeHelper(getActivity());
-		MenuItem menuItemSync = menu.findItem(R.id.menu_sync);
-		menuItemSync.setIcon(themeHelper.getAttr(R.attr.sync_icon));
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.menu_download_all: {
+		case R.id.menu_bulk_download: {
 			Cursor cursor = createCursor(getWhere(), getOrder());
 			cursor.moveToFirst();
 			while (cursor.isAfterLast() == false) {
 				FeedItem feedItem = FeedItem.getByCursor(cursor);
 				if (!feedItem.isDownloaded())
-					PodcastDownloadManager.addItemToQueue(feedItem);
+					EpisodeDownloadManager.addItemToQueue(feedItem, EpisodeDownloadManager.QUEUE_POSITION.ANYWHERE);
 
 				cursor.moveToNext();
 			}
-			PodcastDownloadManager.startDownload(getActivity());
+			EpisodeDownloadManager.startDownload(getActivity());
 			return true;
 		}
 		case R.id.menu_clear_playlist: {
-			resetPlaylist(getActivity());
+			//resetPlaylist(getActivity());
 
-            Playlist playlist = getPlaylist();
+            Playlist playlist = Playlist.getActivePlaylist(); //getPlaylist();
 
-            playlist.resetPlaylist(mCursorAdapter);
+            playlist.resetPlaylist(null);
             //Playlist.resetOrder();
             int size = playlist.defaultSize();
             if (!playlist.isEmpty()) {
@@ -111,41 +92,6 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
             }
             break;
 			//refreshView();
-		}
-		case R.id.menu_sync:
-            PodcastDownloadManager.start_update(getActivity());
-            break;
-                    /*
-			if (prefs.getBoolean(SettingsActivity.CLOUD_SUPPORT, true)) {
-				// Account account = mCredential.getSelectedAccount();
-				Account account = MainActivity.getCredentials()
-						.getSelectedAccount();
-				Bundle bundle = new Bundle();
-				bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-				bundle.putBoolean(ContentResolver.SYNC_EXTRAS_FORCE, true);
-				bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-				String auth = PodcastProvider.AUTHORITY;
-				auth = "org.bottiger.podcast.provider.PodcastProvider"; //
-				ContentResolver
-						.requestSync(
-								account,
-								"org.bottiger.podcast.provider.podcastprovider",
-								bundle);
-				ContentResolver.requestSync(account, auth, bundle);
-			} else {
-				CharSequence text = "Please enabled cloud support in the settings menu before attempting to sync";
-				int duration = Toast.LENGTH_LONG;
-
-				Toast toast = Toast.makeText(getActivity(), text, duration);
-				toast.show();
-			}
-
-			return true;
-			*/
-		case R.id.menu_import: {
-			OPMLImportExport importExport = new OPMLImportExport(getActivity());
-			importExport.importSubscriptions();
-			refreshView();
 		}
 		}
 		return super.onOptionsItemSelected(item);
@@ -182,7 +128,7 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 	public static String getOrder(String inputOrder, Integer amount) {
 		assert inputOrder != null;
 
-		PlayerService playerService = PodcastBaseFragment.mPlayerServiceBinder;
+		PlayerService playerService = MainActivity.sBoundPlayerService;
 
 		String playingFirst = "";
 		if (playerService != null && playerService.getCurrentItem() != null) {
@@ -198,7 +144,7 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 	}
 
 	@Deprecated
-	protected void resetPlaylist(Context context) {
+	protected static void resetPlaylist(Context context) {
 		// Update the database
 		String currentTime = String.valueOf(System.currentTimeMillis());
 		String updateLastUpdate = ", " + ItemColumns.LAST_UPDATE + "="

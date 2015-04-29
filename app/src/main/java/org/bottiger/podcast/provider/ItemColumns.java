@@ -11,18 +11,9 @@ import android.provider.BaseColumns;
 public class ItemColumns implements BaseColumns {
 
 	public static final int ITEM_STATUS_UNREAD = 0;
-	public static final int ITEM_STATUS_READ = 1;
-	public static final int ITEM_STATUS_MAX_READING_VIEW = 10;
-	public static final int ITEM_STATUS_DOWNLOAD_PAUSE = 15;
-	public static final int ITEM_STATUS_DOWNLOAD_QUEUE = 20;
-	public static final int ITEM_STATUS_DOWNLOADING_NOW = 21;
 
 	public static final int ITEM_STATUS_MAX_DOWNLOADING_VIEW = 30;
-	public static final int ITEM_STATUS_DOWNLOAD_PENDING = 31;
 	public static final int ITEM_STATUS_NO_PLAY = 50;
-	public static final int ITEM_STATUS_PLAY_READY = 51;
-	public static final int ITEM_STATUS_PLAYING_NOW = 52;
-	public static final int ITEM_STATUS_PLAY_PAUSE = 53;
 
 	// KEEP status has been replaced by the KEEP database column starting in DB
 	// version 13,
@@ -31,10 +22,6 @@ public class ItemColumns implements BaseColumns {
 	private static final int ITEM_STATUS_KEEP = 63;
 	public static final int ITEM_STATUS_PLAYED = 66;
 	public static final int ITEM_STATUS_MAX_PLAYLIST_VIEW = 100;
-
-	public static final int ITEM_STATUS_MIN_DELETE = 190;
-	public static final int ITEM_STATUS_DELETE = 195;
-	public static final int ITEM_STATUS_DELETED = 200;
 
 	public static final Uri URI = Uri.parse("content://"
 			+ PodcastProvider.AUTHORITY + "/items");
@@ -105,20 +92,35 @@ public class ItemColumns implements BaseColumns {
 	public static final String DEFAULT_SORT_ORDER = CREATED + " DESC";
 
 	public static final String sql_create_table = "CREATE TABLE " + TABLE_NAME
-			+ " (" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + REMOTE_ID
-			+ " VARCHAR(128), " + SUBS_ID + " INTEGER, " + TITLE
-			+ " VARCHAR(128), " + AUTHOR + " VARCHAR(128), " + DATE
-			+ " VARCHAR(64), " + LAST_UPDATE + " INTEGER, " + CONTENT
-			+ " TEXT, " + STATUS + " INTEGER, " + URL + " VARCHAR(1024) NOT NULL UNIQUE, "
-			+ RESOURCE + " VARCHAR(1024), " + FILESIZE + " INTEGER, "
-			+ CHUNK_FILESIZE + " INTEGER, " + DOWNLOAD_REFERENCE + " INTEGER, "
-			+ IS_DOWNLOADED + " INTEGER, " + EPISODE_NUMBER + " INTEGER, "
-			+ DURATION + " VARCHAR(16), " + IMAGE_URL + " VARCHAR(1024), "
-			+ DURATION_MS + " INTEGER, " + LENGTH + " INTEGER, " + OFFSET
-			+ " INTEGER, " + PATHNAME + " VARCHAR(128), " + FAIL_COUNT
-			+ " INTEGER, " + MEDIA_URI + " VARCHAR(128), " + SUB_TITLE
-			+ " VARCHAR(128), " + TYPE + " VARCHAR(64), " + CREATED
-			+ " INTEGER, " + LISTENED + " INTEGER NOT NULL DEFAULT 0, "
+			+ " ("
+            + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + REMOTE_ID + " VARCHAR(128), "
+            + SUBS_ID + " INTEGER, "
+            + TITLE + " VARCHAR(128), "
+            + AUTHOR + " VARCHAR(128), "
+            + DATE + " VARCHAR(64), "
+            + LAST_UPDATE + " INTEGER, "
+            + CONTENT + " TEXT, "
+            + STATUS + " INTEGER, "
+            + URL + " VARCHAR(1024) NOT NULL UNIQUE, "
+			+ RESOURCE + " VARCHAR(1024), "
+            + FILESIZE + " INTEGER, "
+			+ CHUNK_FILESIZE + " INTEGER, "
+            + DOWNLOAD_REFERENCE + " INTEGER, "
+			+ IS_DOWNLOADED + " INTEGER, "
+            + EPISODE_NUMBER + " INTEGER, "
+			+ DURATION + " VARCHAR(16), "
+            + IMAGE_URL + " VARCHAR(1024), "
+			+ DURATION_MS + " INTEGER, "
+            + LENGTH + " INTEGER, "
+            + OFFSET + " INTEGER, "
+            + PATHNAME + " VARCHAR(128), "
+            + FAIL_COUNT + " INTEGER, "
+            + MEDIA_URI + " VARCHAR(128), "
+            + SUB_TITLE + " VARCHAR(128), "
+            + TYPE + " VARCHAR(64), "
+            + CREATED + " INTEGER, "
+            + LISTENED + " INTEGER NOT NULL DEFAULT 0, "
 			+ PRIORITY + " INTEGER NOT NULL DEFAULT 0" + ");";
 
 	// To upgrade from database version 12 to version 13

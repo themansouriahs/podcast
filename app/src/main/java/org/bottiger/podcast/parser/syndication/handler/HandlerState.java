@@ -1,5 +1,7 @@
 package org.bottiger.podcast.parser.syndication.handler;
 
+import android.support.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Stack;
@@ -7,6 +9,7 @@ import java.util.Stack;
 import org.bottiger.podcast.parser.syndication.namespace.Namespace;
 import org.bottiger.podcast.parser.syndication.namespace.SyndElement;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
 
 /**
@@ -16,7 +19,7 @@ import org.bottiger.podcast.provider.Subscription;
 public class HandlerState {
 
 	/** Feed that the Handler is currently processing. */
-	protected Subscription feed;
+	protected ISubscription feed;
 	protected ArrayList<FeedItem> items;
 	protected FeedItem currentItem;
 	protected Stack<SyndElement> tagstack;
@@ -26,7 +29,7 @@ public class HandlerState {
 	/** Buffer for saving characters. */
 	protected StringBuffer contentBuf;
 
-	public HandlerState(Subscription feed) {
+	public HandlerState(@NonNull ISubscription feed) {
 		this.feed = feed;
 		items = new ArrayList<FeedItem>();
 		tagstack = new Stack<SyndElement>();
@@ -34,9 +37,13 @@ public class HandlerState {
 		defaultNamespaces = new Stack<Namespace>();
 	}
 
-	public Subscription getFeed() {
+	public ISubscription getSubscription() {
 		return feed;
 	}
+
+    public void setSubscription(@NonNull ISubscription argSubscription) {
+        feed = argSubscription;
+    }
 
 	public ArrayList<FeedItem> getItems() {
 		return items;

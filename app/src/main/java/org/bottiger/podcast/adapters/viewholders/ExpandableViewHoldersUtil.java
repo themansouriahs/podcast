@@ -8,7 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import org.bottiger.podcast.views.PlayPauseImageView;
-import org.bottiger.podcast.views.PlayerLinearLayout;
+import org.bottiger.podcast.views.PlayerRelativeLayout;
 import org.bottiger.podcast.views.PlaylistViewHolder;
 
 import java.util.List;
@@ -33,6 +33,7 @@ public class ExpandableViewHoldersUtil {
 
             final List<Animator> aList =LayoutAnimator.ofButton(holder.mPlayPauseButton, offset, mSmallButtonSize, mLargeButtonSize, true);
 
+            /*
             animator.addListener(new AnimatorListenerAdapter() {
                 @Override public void onAnimationEnd(Animator animation) {
                     final ObjectAnimator alphaAnimator = ObjectAnimator.ofFloat(expandView, View.ALPHA, 1);
@@ -40,14 +41,38 @@ public class ExpandableViewHoldersUtil {
                     alphaAnimator.start();
                 }
             });
+            */
+            final ObjectAnimator alphaAnimator = ObjectAnimator.ofFloat(expandView, View.ALPHA, 1);
+            alphaAnimator.addListener(new ViewHolderAnimator.ViewHolderAnimatorListener(holder));
+            alphaAnimator.start();
 
             AnimatorSet aSet = new AnimatorSet();
             aList.add(animator);
             aList.add(animator2);
+            aList.add(alphaAnimator);
             aSet.playTogether(aList);
-            //aSet.playTogether(animator, animator2);
+            aSet.addListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    holder.mMainContainer.bringToFront();
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animation) {
+
+                }
+            });
             aSet.start();
-            //animator.start();
         }
         else {
             expandView.setVisibility(View.VISIBLE);
@@ -95,7 +120,7 @@ public class ExpandableViewHoldersUtil {
     private static void calcOffset(PlaylistViewHolder viewHolder, int baseHeight) {
         if (offset > 0)
             return;
-        final PlayerLinearLayout player = viewHolder.playerLinearLayout;
+        final PlayerRelativeLayout player = viewHolder.playerRelativeLayout;
         int c = viewHolder.mPlayPauseButton.getBottom()-viewHolder.mPlayPauseButton.getTop();
         offset = baseHeight-c;
     }
@@ -105,7 +130,7 @@ public class ExpandableViewHoldersUtil {
     }
 
     public static class KeepOneH<VH extends PlaylistViewHolder & Expandable> {
-        private int _opened = -1;
+        public int _opened = -1; //private
 
         public void bind(VH holder, int pos) {
             if (pos == _opened)

@@ -1,0 +1,114 @@
+Changelog
+==========
+
+version 0.92
+------------
+* Lots of bug and crash fixes
+* Support for searching using iTunes
+* Support for opening a podcast in the search results
+* Removed unused settings
+* Added title and the description to the current playing episode
+* Ensured that the podcast player doesn't get killed when playing in the background
+* Fixed the notification player on KitKat
+* Fixed OPML import issues
+
+
+version 0.90
+------------
+* Lots and lots and lots of bug fixes and crashes
+* Serveral memory leaks
+* New Discover tab for searching Subscriptions
+* Better support for (large) OPML files
+* Queue episode button
+
+version 0.88.2
+------------
+* Various crashes and bug fixes
+* Much more snappy image loading
+
+version 0.88
+------------
+* Various crashes and bigfixes
+* Removed Drag&Drop handle from playlist until I found a better solution
+* Fixed crash regarding mallform feeds
+* Added a crude listview option for viewing the Subscriptions
+* Clicking the notification will open the player
+* Initial chromecast support in the proprietary version
+
+version 0.84
+------------
+* Bulk download of the playlist
+* Much more robust download queue
+* Skip to next button the in notification controls
+* Better album art on the lockscreen in lolipop
+* Fixed crashes
+* Fixed issue where the top episode in the playlist was missing
+* Fixed a scrolling issue in the playlist
+* More consistent string format
+* Robust 'download folder' size limits
+* Robust 'download only using wifi'
+* Refresh all subscriptions option
+* Delete when listened option
+
+version 0.82
+------------
+* A few crashes
+* Added some new information to the playlist
+* Fixed/Enhanced the OPML import/export.
+* Tinted the status bar
+* Added preference to show 3 columns with subscriptions
+* Fixed some localization issues
+* Added Analytics to the Google Play edition. Opt out is possible
+* Started styling the navigation drawer
+* Better streaming support. Seeking in a stream is not possible.
+* Episode duration is now much more reliable
+* "Show listened" in the playlist filters now works.
+
+version 0.80
+------------
+* A few crashes
+* new playlist UI
+* Fixed a few UI issues on lolipop
+
+version 0.78
+------------
+* More robust notification
+* More robust 'resume playback logic'
+* Updated dependencies
+* Leaner cache
+* Added progress information to the play/pause button
+* Various crashes
+
+version 0.76
+------------
+* Fixed crash
+
+version 0.74
+------------
+* Added crash e-mail crash reporter for the free flavor
+* Updated Playlist UI
+* Tweaked subscription UI
+* Tweaked UI colors
+* Started on a new and better notification
+
+version 0.72
+------------
+* Fixed crash when opening the settings 
+* Experimenting with a new playlist UI
+* Fixed crash on startup on 4.1.2
+
+version 0.70
+------------
+* Dependency cleanup
+* Added "Refresh" menu item to the Feed view
+
+Version 0.68
+-------------
+* Added a Changelog :)
+* Better looking navigation drawer
+* Some UI tweeks
+* Fixed the position of the empty subscription screen
+
+Version 0.66
+-------------
+* Fixed Crash

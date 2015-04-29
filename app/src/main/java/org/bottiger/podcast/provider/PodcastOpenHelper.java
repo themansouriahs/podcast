@@ -1,21 +1,38 @@
 package org.bottiger.podcast.provider;
 
+import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.flavors.Analytics.IAnalytics;
+import org.bottiger.podcast.flavors.Analytics.VendorAnalytics;
 import org.bottiger.podcast.utils.PodcastLog;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class PodcastOpenHelper extends SQLiteOpenHelper {
 
 	private final PodcastLog log = PodcastLog.getLog(getClass());
 
-	private final static int DBVERSION = 16;
+	private final static int DBVERSION = 18;
 	private final static String DBNAME = "podcast.db";
+
+    private static PodcastOpenHelper mInstance = null;
 
 	public PodcastOpenHelper(Context context) {
 		super(context, DBNAME, null, DBVERSION);
 	}
+
+    public static PodcastOpenHelper getInstance(Context argContext) {
+
+        // Use the application context, which will ensure that you
+        // don't accidentally leak an Activity's context.
+        // See this article for more information: http://bit.ly/6LRzfx
+        if (mInstance == null) {
+            mInstance = new PodcastOpenHelper(argContext.getApplicationContext());
+        }
+        return mInstance;
+    }
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
@@ -38,14 +55,48 @@ public class PodcastOpenHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		/*
-		if (oldVersion == 16 && newVersion == 17) {
-			// Delete duplicates
-			String sql_delete_duplicates = "DELETE n1 FROM "
-					+ ItemColumns.TABLE_NAME + " n1, " + ItemColumns.TABLE_NAME
-					+ " n2 WHERE n1.id > n2.id AND n1.url = n2.url";
-		}
-		*/
+        IAnalytics analytics = SoundWaves.sAnalytics;
+        if (analytics != null) {
+            analytics.trackEvent(IAnalytics.EVENT_TYPE.DATABASE_UPGRADE);
+        }
+
+        // In order to fix the horrible sqli column does not exist bug we add
+        // the colums to all versions from here
+        // This should just fail silently if the columns have been created
+        // properly in the past.
+        if (newVersion == 18) {
+            // Add new column
+            String new_item_column1 = "ALTER TABLE " + SubscriptionColumns.TABLE_NAME
+                    + " ADD COLUMN " + SubscriptionColumns.PRIMARY_COLOR + " INTEGER DEFAULT 0;";
+            String new_item_column2 = "ALTER TABLE " + SubscriptionColumns.TABLE_NAME
+                    + " ADD COLUMN " + SubscriptionColumns.PRIMARY_TINT_COLOR + " INTEGER DEFAULT 0;";
+            String new_item_column3 = "ALTER TABLE " + SubscriptionColumns.TABLE_NAME
+                    + " ADD COLUMN " + SubscriptionColumns.SECONDARY_COLOR + " INTEGER DEFAULT 0;";
+
+            try {
+                log.debug("Upgrading database to 187");
+                db.execSQL(new_item_column1);
+                db.execSQL(new_item_column2);
+                db.execSQL(new_item_column3);
+            } catch (SQLiteException sqle) {
+                log.debug("Tables already existed");
+            }
+        }
+
+        if (oldVersion == 16 && newVersion == 17) {
+            // Add new column
+            String new_item_column1 = "ALTER TABLE " + SubscriptionColumns.TABLE_NAME
+                    + " ADD COLUMN " + SubscriptionColumns.PRIMARY_COLOR + " INTEGER DEFAULT 0;";
+            String new_item_column2 = "ALTER TABLE " + SubscriptionColumns.TABLE_NAME
+                    + " ADD COLUMN " + SubscriptionColumns.PRIMARY_TINT_COLOR + " INTEGER DEFAULT 0;";
+            String new_item_column3 = "ALTER TABLE " + SubscriptionColumns.TABLE_NAME
+                    + " ADD COLUMN " + SubscriptionColumns.SECONDARY_COLOR + " INTEGER DEFAULT 0;";
+
+            log.debug("Upgrading database from version 16 to 17");
+            db.execSQL(new_item_column1);
+            db.execSQL(new_item_column2);
+            db.execSQL(new_item_column3);
+        }
 		if (oldVersion == 15 && newVersion == 16) {
 			// Add new column
 			String new_item_column = "ALTER TABLE " + ItemColumns.TABLE_NAME
@@ -78,7 +129,13 @@ public class PodcastOpenHelper extends SQLiteOpenHelper {
 					+ SubscriptionColumns.REMOTE_ID + " VARCHAR(128), "
 					+ SubscriptionColumns.AUTO_DOWNLOAD + " INTEGER , "
 					+ SubscriptionColumns.PLAYLIST_POSITION + " INTEGER , "
-					+ SubscriptionColumns.IMAGE_URL + " VARCHAR(1024) " + ");";
+					+ SubscriptionColumns.IMAGE_URL + " VARCHAR(1024), "
+
+                    + SubscriptionColumns.PRIMARY_COLOR + " INTEGER DEFAULT 0 , "
+                    + SubscriptionColumns.PRIMARY_TINT_COLOR + " INTEGER DEFAULT 0 , "
+                    + SubscriptionColumns.SECONDARY_COLOR + " INTEGER DEFAULT 0 "
+
+                    + ");";
 
 			// http://www.sqlite.org/faq.html#q11
 			// INSERT INTO t1_backup SELECT a,b FROM t1;
@@ -96,7 +153,11 @@ public class PodcastOpenHelper extends SQLiteOpenHelper {
 					+ SubscriptionColumns.SERVER_ID + ", " + "\"\", "
 					+ SubscriptionColumns.AUTO_DOWNLOAD + ", "
 					+ SubscriptionColumns.PLAYLIST_POSITION + ", "
-					+ SubscriptionColumns.IMAGE_URL + " FROM subs;";
+					+ SubscriptionColumns.IMAGE_URL + ", "
+                    + SubscriptionColumns.PRIMARY_COLOR + ", "
+                    + SubscriptionColumns.PRIMARY_TINT_COLOR + ", "
+                    + SubscriptionColumns.SECONDARY_COLOR + " "
+                    + " FROM subs;";
 
 			// Add new column
 			String new_column = "ALTER TABLE " + SubscriptionColumns.TABLE_NAME
@@ -141,11 +202,14 @@ public class PodcastOpenHelper extends SQLiteOpenHelper {
 					+ ItemColumns.sql_change_keep_status_to_played);
 			db.execSQL(ItemColumns.sql_change_keep_status_to_played);
 			log.debug("Done upgrading database");
-		} else if (oldVersion != newVersion) {
+		}
+
+        /*
+        else if (oldVersion != newVersion) {
 			// drop db
 			db.execSQL("DROP TABLE " + ItemColumns.TABLE_NAME);
 			db.execSQL("DROP TABLE " + SubscriptionColumns.TABLE_NAME);
 			onCreate(db);
-		}
+		}*/
 	}
 }

@@ -1,13 +1,21 @@
 package org.bottiger.podcast.Player;
 
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
+import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.flavors.Analytics.IAnalytics;
+import org.bottiger.podcast.flavors.MediaCast.IMediaCast;
+import org.bottiger.podcast.flavors.MediaCast.IMediaRouteStateListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
@@ -19,11 +27,15 @@ import java.io.IOException;
 /**
  * Created by apl on 20-01-2015.
  */
-public class SoundWavesPlayer extends MediaPlayer {
-    //private MediaPlayer mMediaPlayer = new MediaPlayer();
+public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateListener {
+
+    private static final float MARK_AS_LISTENED_RATIO_THRESHOLD = 0.9f;
+    private static final float MARK_AS_LISTENED_MINUTES_LEFT_THRESHOLD = 5f;
+
+    private static final boolean DELETE_WHEN_FINISHED_DEFAULT = false;
 
     private PlayerService mPlayerService;
-    private Handler mHandler;
+    private PlayerHandler mHandler;
     private boolean mIsInitialized = false;
     private boolean mIsStreaming = false;
 
@@ -31,7 +43,13 @@ public class SoundWavesPlayer extends MediaPlayer {
     private AudioManager mAudioManager;
     private ComponentName mControllerComponentName;
 
+    // GoogleCast
+    private IMediaCast mMediaCast;
+
     private boolean isPreparingMedia = false;
+
+    @NonNull
+    private SharedPreferences mSharedpreferences;
 
     int bufferProgress = 0;
 
@@ -42,11 +60,17 @@ public class SoundWavesPlayer extends MediaPlayer {
         this.mControllerComponentName = new ComponentName(mPlayerService,
                 HeadsetReceiver.class);
         this.mAudioManager = (AudioManager) mPlayerService.getSystemService(Context.AUDIO_SERVICE);
-        // mMediaPlayer.setWakeMode(PlayerService.this,
-        // PowerManager.PARTIAL_WAKE_LOCK);
+        mSharedpreferences = PreferenceManager.getDefaultSharedPreferences(mPlayerService.getApplicationContext());
     }
 
     public void setDataSourceAsync(String path, int startPos) {
+
+        if (isCasting()) {
+            mMediaCast.loadEpisode(mPlayerService.getCurrentItem());
+            start();
+            return;
+        }
+
         try {
 
             File f = new File(path);
@@ -91,7 +115,13 @@ public class SoundWavesPlayer extends MediaPlayer {
     }
 
     public void start() {
-        mPlayerService.notifyStatus();
+
+        if (isCasting()) {
+            mMediaCast.play(0);
+            PlayerStatusObservable
+                    .updateStatus(PlayerStatusObservable.STATUS.PLAYING);
+            return;
+        }
 
         // Request audio focus for playback
         int result = mAudioManager.requestAudioFocus(mPlayerService,
@@ -107,11 +137,21 @@ public class SoundWavesPlayer extends MediaPlayer {
 
             PlayerStatusObservable
                     .updateStatus(PlayerStatusObservable.STATUS.PLAYING);
+            SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.PLAY);
         }
     }
 
     public void stop() {
-        super.reset();
+        if (!isInitialized())
+            return;
+
+        if (isCasting()) {
+            mMediaCast.stop();
+            return;
+        } else {
+            super.reset();
+        }
+
         mIsInitialized = false;
         mPlayerService.stopForeground(true);
         PlayerStatusObservable
@@ -127,6 +167,20 @@ public class SoundWavesPlayer extends MediaPlayer {
         mIsInitialized = false;
     }
 
+    @Override
+    public boolean isPlaying() {
+        return super.isPlaying() || isPlayingUsingMediaRoute();
+    }
+
+    public boolean isPlayingUsingMediaRoute() {
+        return mMediaCast != null && mMediaCast.isPlaying();
+    }
+
+    @Override
+    public int getCurrentPosition() {
+        return mMediaCast != null && mMediaCast.isActive() ? mMediaCast.getCurrentPosition() : super.getCurrentPosition();
+    }
+
     public void rewind(FeedItem argItem) {
         if (mPlayerService == null)
             return;
@@ -138,13 +192,36 @@ public class SoundWavesPlayer extends MediaPlayer {
         }
     }
 
+    public void fastForward(FeedItem argItem) {
+        if (mPlayerService == null)
+            return;
+
+        String fastForwardAmount = mSharedpreferences.getString("pref_player_forward_amount", "60");
+        long seekTo = mPlayerService.position() + Integer.parseInt(fastForwardAmount)*1000; // to ms
+
+        if (argItem.equals(mPlayerService.getCurrentItem())) {
+            mPlayerService.seek(seekTo);
+        }
+
+        argItem.setPosition(mPlayerService.getContentResolver(), seekTo);
+    }
+
     /**
      * Pause the current playing item
      */
     public void pause() {
-        super.pause();
+
+        if (isCasting()) {
+            mMediaCast.stop();
+            return;
+        } else {
+            super.pause();
+        }
+
+        MarkAsListenedIfNeeded();
         PlayerStatusObservable
                 .updateStatus(PlayerStatusObservable.STATUS.PAUSED);
+        SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.PAUSE);
     }
 
     @Deprecated
@@ -152,7 +229,7 @@ public class SoundWavesPlayer extends MediaPlayer {
         return this.bufferProgress;
     }
 
-    public void setHandler(Handler handler) {
+    public void setHandler(PlayerHandler handler) {
         mHandler = handler;
     }
 
@@ -160,8 +237,26 @@ public class SoundWavesPlayer extends MediaPlayer {
         @Override
         public void onCompletion(MediaPlayer mp) {
             FeedItem item = mPlayerService.getCurrentItem();
-            // item.markAsListened();
-            // item.update(getContentResolver());
+
+            if (item != null) {
+
+                // Mark current as listened
+                item.markAsListened();
+
+               if (mPlayerService != null) {
+                   // Delete if required
+                    Resources resources = mPlayerService.getResources();
+                    ContentResolver resolver = mPlayerService.getContentResolver();
+                    boolean doDelete = mSharedpreferences.getBoolean(resources.getString(R.string.pref_delete_when_finished_key), DELETE_WHEN_FINISHED_DEFAULT);
+
+                    if (doDelete) {
+                        item.delFile(resolver);
+
+                    }
+
+                   item.update(resolver);
+                }
+            }
 
             if (!isPreparingMedia)
                 mHandler.sendEmptyMessage(PlayerHandler.TRACK_ENDED);
@@ -179,11 +274,10 @@ public class SoundWavesPlayer extends MediaPlayer {
     MediaPlayer.OnPreparedListener preparedlistener = new MediaPlayer.OnPreparedListener() {
         @Override
         public void onPrepared(MediaPlayer mp) {
-            // notifyChange(ASYNC_OPEN_COMPLETE);
             mp.seekTo(startPos);
+            mPlayerService.getCurrentItem().setDuration(mp.getDuration(), false);
             start();
             isPreparingMedia = false;
-            PlayerService.setNextTrack(PlayerService.NextTrack.NEXT_IN_PLAYLIST);
         }
     };
 
@@ -197,8 +291,7 @@ public class SoundWavesPlayer extends MediaPlayer {
                     mIsInitialized = false;
                     release();
 
-                    mHandler.sendMessageDelayed(
-                            mHandler.obtainMessage(PlayerHandler.SERVER_DIED), 2000);
+                    mHandler.sendMessageDelayed(PlayerHandler.SERVER_DIED, 2000);
                     return true;
                 default:
                     break;
@@ -216,11 +309,78 @@ public class SoundWavesPlayer extends MediaPlayer {
     }
 
     public long seek(long whereto) {
-        seekTo((int) whereto);
+        if (isCasting()) {
+            mMediaCast.seekTo(whereto);
+        } else {
+            seekTo((int) whereto);
+        }
         return whereto;
     }
 
     public void setVolume(float vol) {
         setVolume(vol, vol);
+    }
+
+    private void MarkAsListenedIfNeeded() {
+        if (mPlayerService == null)
+            return;
+
+        FeedItem episode = mPlayerService.getCurrentItem();
+        float playerPosition = (float) getCurrentPosition();
+
+        if (episode == null)
+            return;
+
+        long episodeDuration = episode.getDuration();
+
+        if (episodeDuration < 0 || playerPosition < 0)
+            return;
+
+        float progressPercent = playerPosition / episodeDuration;
+        double msLeft = episodeDuration - playerPosition;
+        double minLeft = msLeft / 1000 / 60;
+
+        boolean ratioThreshold   = progressPercent >= MARK_AS_LISTENED_RATIO_THRESHOLD;
+        boolean minutesThreshold = minLeft < MARK_AS_LISTENED_MINUTES_LEFT_THRESHOLD;
+
+        if (ratioThreshold || minutesThreshold) {
+            episode.markAsListened();
+        }
+
+        episode.update(mPlayerService.getContentResolver());
+    }
+
+    @Override
+    public void onStateChanged(IMediaCast castProvider) {
+        if (castProvider == null)
+            return;
+
+        mMediaCast = castProvider;
+
+        if (mPlayerService == null)
+            return;
+
+        FeedItem episode = mPlayerService.getCurrentItem();
+
+        if (episode == null)
+            return;
+
+        if (mMediaCast.isConnected()) {
+            mMediaCast.loadEpisode(episode);
+            mMediaCast.seekTo(episode.offset);
+
+            if (super.isPlaying()) {
+                int offst = super.getCurrentPosition();
+                super.pause();
+                mMediaCast.play(offst);
+            }
+
+            PlayerStatusObservable
+                    .updateStatus(PlayerStatusObservable.STATUS.PLAYING);
+        }
+    }
+
+    public boolean isCasting() {
+        return mMediaCast != null && mMediaCast.isConnected();
     }
 }

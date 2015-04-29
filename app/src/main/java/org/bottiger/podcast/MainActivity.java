@@ -4,16 +4,17 @@ import java.io.IOException;
 
 import org.bottiger.podcast.AbstractEpisodeFragment.OnPlaylistRefreshListener;
 import org.bottiger.podcast.cloud.CloudProvider;
-import org.bottiger.podcast.cloud.GoogleReader;
-import org.bottiger.podcast.cloud.drive.DriveSyncer;
 import org.bottiger.podcast.debug.SqliteCopy;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.service.HTTPDService;
 import org.bottiger.podcast.service.PlayerService;
-import org.bottiger.podcast.service.PodcastDownloadManager;
 import org.bottiger.podcast.service.PodcastService;
-import org.bottiger.podcast.utils.AddPodcastDialog;
+import org.bottiger.podcast.utils.PreferenceHelper;
+import org.bottiger.podcast.views.dialogs.DialogAddPodcast;
 import org.bottiger.podcast.utils.ThemeHelper;
+import org.bottiger.podcast.utils.TransitionUtils;
 
 
 import android.accounts.Account;
@@ -21,8 +22,6 @@ import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -30,44 +29,18 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.database.Cursor;
-import android.graphics.Bitmap.CompressFormat;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Debug;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.support.v4.widget.CursorAdapter;
-import android.support.v4.widget.DrawerLayout;
-import android.transition.Slide;
-import android.transition.Transition;
-import android.view.Gravity;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
+import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.gms.auth.UserRecoverableAuthException;
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.json.gson.GsonFactory;
-import com.google.api.services.drive.Drive;
 
 // Sliding
 public class MainActivity extends FragmentContainerActivity implements
@@ -75,18 +48,16 @@ public class MainActivity extends FragmentContainerActivity implements
 
 	private static final String ACCOUNT_KEY = "account";
 
-	public static final boolean SHOW_PULL_TO_REFRESH = true;
-	public static final boolean READER_SUPPORT = false;
-
-	private Drive mDriveService = null;
 	private final int REQUEST_AUTHORIZATION = 1;
 	private final int REQUEST_ACCOUNT_PICKER = 0;
-	private static GoogleAccountCredential mCredential;
 
+    public static PlayerService sBoundPlayerService = null;
 	public static PodcastService mPodcastServiceBinder = null;
 	public static HTTPDService mHTTPDServiceBinder = null;
 
 	static boolean mBound = false;
+
+    static PreferenceHelper mPreferenceHelper = new PreferenceHelper();
 
 	// public static GoogleReader gReader = null;
 	public static CloudProvider gReader = null;
@@ -95,13 +66,28 @@ public class MainActivity extends FragmentContainerActivity implements
 	protected boolean mInit = false;
 	public static Account mAccount;
 
-
-	private AudioManager mAudioManager;
-	private ComponentName mRemoteControlResponder;
+    private HeadsetReceiver receiver;
 
 	private SharedPreferences prefs;
 
 	private int currentTheme;
+
+    public ServiceConnection playerServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            Log.d("PlayerService", "onServiceConnected");
+            sBoundPlayerService = ((PlayerService.PlayerBinder) service)
+                    .getService();
+            sBoundPlayerService.setMediaCast(mMediaRouteCast);
+            PlayerStatusObservable.setActivity(MainActivity.this);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName className) {
+            Log.d("PlayerService", "onServiceDisconnected");
+            sBoundPlayerService = null;
+        }
+    };
 
 	public static ServiceConnection mHTTPDServiceConnection = new ServiceConnection() {
 		@Override
@@ -121,11 +107,14 @@ public class MainActivity extends FragmentContainerActivity implements
 		}
 	};
 
-	private HeadsetReceiver receiver;
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+        // Start the player service
+        startService(new Intent(this, PlayerService.class));
+        Intent bindIntent = new Intent(this, PlayerService.class);
+        bindService(bindIntent, playerServiceConnection, Context.BIND_AUTO_CREATE);
 
 		/*
 		 * BugSenseHandler.initAndStartSession(MainActivity.this, ((SoundWaves)
@@ -144,7 +133,7 @@ public class MainActivity extends FragmentContainerActivity implements
 
 		}
 		
-		if (ApplicationConfiguration.COPY_DATABASE) {
+		if (BuildConfig.DEBUG) {
 			try {
 				SqliteCopy.backupDatabase();
 			} catch (IOException e) { // TODO Auto-generated catch block
@@ -154,6 +143,7 @@ public class MainActivity extends FragmentContainerActivity implements
 
 		if (prefs.getBoolean(SettingsActivity.CLOUD_SUPPORT, false) && false) {
 
+            /*
 			mCredential = GoogleAccountCredential.usingOAuth2(this,
 					DriveSyncer.getScope()); // "https://www.googleapis.com/auth/drive.appdata");
 												// //DriveScopes.DRIVE);
@@ -164,7 +154,10 @@ public class MainActivity extends FragmentContainerActivity implements
 						REQUEST_ACCOUNT_PICKER);
 			else
 				mCredential.setSelectedAccountName(prefs.getString(ACCOUNT_KEY,
-						""));
+						""));*/
+
+            /*
+            GOogle flavor
 
 			new Thread(new Runnable() {
 				public void run() {
@@ -182,10 +175,12 @@ public class MainActivity extends FragmentContainerActivity implements
 					mDriveService = getDriveService(mCredential);
 				}
 			}); //.start();
+			*/
 
 		}
 
-		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		//setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        mPreferenceHelper.setOrientation(this, prefs);
 
 		/** Painless networking with Volley */
 		//RequestManager.init(this);
@@ -209,10 +204,6 @@ public class MainActivity extends FragmentContainerActivity implements
 		currentTheme = ThemeHelper.getTheme(prefs);
 		setTheme(currentTheme);
 
-		mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-		mRemoteControlResponder = new ComponentName(getPackageName(),
-				HeadsetReceiver.class.getName());
-
 		/*
 		IntentFilter receiverFilter = new IntentFilter(
 				Intent.ACTION_HEADSET_PLUG); */
@@ -221,18 +212,15 @@ public class MainActivity extends FragmentContainerActivity implements
 		receiver = new HeadsetReceiver();
 		registerReceiver(receiver, receiverFilter);
 
-
-
-		/*
-		 * }
-		 * 
-		 * public void onActivityCreated(Bundle savedInstanceState) {
-		 */
-		if (debugging) {
-			PodcastDownloadManager.cancelAllDownloads(this
-					.getApplicationContext());
-		}
 	}
+
+    /**
+     * Return a reference to the playerservice if bound
+     */
+    @Nullable
+    public static PlayerService getPlayerService() {
+        return sBoundPlayerService;
+    }
 
 	/**
 	 * Set the current theme based on the preference
@@ -261,6 +249,7 @@ public class MainActivity extends FragmentContainerActivity implements
 		return false;
 	}
 
+    /*
 	public static GoogleAccountCredential getCredentials() {
 		return mCredential;
 	}
@@ -277,7 +266,7 @@ public class MainActivity extends FragmentContainerActivity implements
 				if (accountName != null) {
 					prefs.edit().putString(ACCOUNT_KEY, accountName).commit();
 					mCredential.setSelectedAccountName(accountName);
-					mDriveService = getDriveService(mCredential);
+					//mDriveService = getDriveService(mCredential);
 					// startCameraIntent();
 					// updateDatabase();
 					Account account = mCredential.getSelectedAccount();
@@ -300,7 +289,7 @@ public class MainActivity extends FragmentContainerActivity implements
 			}
 			break;
 		}
-	}
+	}*/
 
 	@Override
 	protected void onPause() {
@@ -313,12 +302,17 @@ public class MainActivity extends FragmentContainerActivity implements
 	protected void onDestroy() {
 		super.onDestroy();
 		unregisterReceiver(receiver);
-		//BugSenseHandler.closeSession(MainActivity.this);
+
+        try {
+            unbindService(playerServiceConnection);
+        } catch (Exception e) {
+            VendorCrashReporter.handleException(e);
+        }
 	}
 
 	@Override
 	public void onRefreshPlaylist() {
-		mSectionsPagerAdapter.refreshData(SectionsPagerAdapter.PLAYLIST);
+		//mSectionsPagerAdapter.refreshData(SectionsPagerAdapter.PLAYLIST);
 	}
 
 	@Override
@@ -355,21 +349,22 @@ public class MainActivity extends FragmentContainerActivity implements
 		ThemeHelper themeHelper = new ThemeHelper(this);
 
 		// The extended_player can only be playing if the PlayerService has been bound
+        /*
 		MenuItem menuItem = menu.findItem(R.id.menu_control);
-		if (PodcastBaseFragment.mPlayerServiceBinder != null) {
+		if (PodcastBaseFragment.sBoundPlayerService != null) {
 
-			if (PodcastBaseFragment.mPlayerServiceBinder.isPlaying()) {
+			if (PodcastBaseFragment.sBoundPlayerService.isPlaying()) {
 				menuItem.setIcon(themeHelper.getAttr(R.attr.pause_invert_icon));
-			} else if (PodcastBaseFragment.mPlayerServiceBinder.isOnPause()) {
+			} else if (PodcastBaseFragment.sBoundPlayerService.isOnPause()) {
 				menuItem.setIcon(themeHelper.getAttr(R.attr.play_invert_icon));
 			} else {
 				//menuItem.setVisible(false);
 			}
 		} else {
 			//menuItem.setVisible(false);
-		}
+		}*/
 
-		return true;
+		return super.onCreateOptionsMenu(menu);
 
 	}
 
@@ -379,29 +374,30 @@ public class MainActivity extends FragmentContainerActivity implements
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+            /*
 		case R.id.menu_control:
-			if (PodcastBaseFragment.mPlayerServiceBinder != null) {
-				PodcastBaseFragment.mPlayerServiceBinder.toggle();
+			if (PodcastBaseFragment.sBoundPlayerService != null) {
+				PodcastBaseFragment.sBoundPlayerService.toggle();
 			}
-			return true;
+			return true;*/
 		case R.id.menu_add:
 			// mDriveUtils.driveAccount();
-			AddPodcastDialog.addPodcast(this);
+			DialogAddPodcast.addPodcast(this);
 			return true;
 		case R.id.menu_settings:
-			Intent i = new Intent(getBaseContext(), SettingsActivity.class);
-			startActivity(i);
+            TransitionUtils.openSettings(this);
 			return true;
 		case R.id.menu_refresh:
-			PodcastDownloadManager.start_update(this);
+			SoundWaves.sSubscriptionRefreshManager.refreshAll();
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
 
+    /*
 	private Drive getDriveService(GoogleAccountCredential credential) {
 		return new Drive.Builder(AndroidHttp.newCompatibleTransport(),
 				new GsonFactory(), credential).build();
-	}
+	}*/
 
 }

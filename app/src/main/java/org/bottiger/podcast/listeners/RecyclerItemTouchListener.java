@@ -5,7 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.MotionEvent;
 import android.view.View;
 
-import org.bottiger.podcast.adapters.ItemCursorAdapter;
+import org.bottiger.podcast.adapters.PlaylistAdapter;
 import org.bottiger.podcast.views.PlaylistViewHolder;
 
 /**
@@ -16,6 +16,8 @@ public class RecyclerItemTouchListener implements RecyclerView.OnItemTouchListen
     private MotionEvent fingerDown = null;
     private float fingerdownx = -1;
     private float fingerdowny = -1;
+
+    Rect viewRect = new Rect();
 
     private boolean mouseDown = false;
 
@@ -55,25 +57,62 @@ public class RecyclerItemTouchListener implements RecyclerView.OnItemTouchListen
 
     // keepOne.toggle(playlistViewHolder2);
 
-    public void onCLick(RecyclerView rv, MotionEvent e) {
-        View childView = rv.findChildViewUnder(e.getX(), e.getY());
+    public void onCLick(RecyclerView rv, MotionEvent event) {
+
+        View childView = rv.findChildViewUnder(event.getX(), event.getY());
         RecyclerView.ViewHolder viewHolder = rv.getChildViewHolder(childView);
-        final PlaylistViewHolder playlistViewHolder2 = (PlaylistViewHolder)viewHolder;
+        final PlaylistViewHolder holder = (PlaylistViewHolder)viewHolder;
 
-        Rect viewRect = new Rect();
+        int topHeight = holder.mMainContainer.getHeight();
 
-        playlistViewHolder2.mPlayPauseButton.getHitRect(viewRect);
-        if (viewRect.contains((int)e.getX(), (int)e.getY())) {
-            playlistViewHolder2.mPlayPauseButton.onClick(null);
-        } else {
-            ItemCursorAdapter.keepOne.toggle(playlistViewHolder2);
-        }
+        if (mouseDown(holder.mPlayPauseButton, event, topHeight))
+            return;
 
+        if (mouseDown(holder.downloadButton, event, topHeight))
+            return;
+
+        if (mouseDown(holder.favoriteButton, event, topHeight))
+            return;
+
+        if (mouseDown(holder.removeButton, event, topHeight))
+            return;
+
+        int pos = rv.getChildPosition(childView);
+        PlaylistAdapter.toggle(holder, pos);
     }
 
     @Override
     public void onTouchEvent(RecyclerView rv, MotionEvent e) {
         View childView = rv.findChildViewUnder(e.getX(), e.getY());
         childView.callOnClick();
+    }
+
+    /**
+     * @return true of view was hit
+     */
+    private boolean mouseDown(View argView, MotionEvent event, int topHeight) {
+        //argView.getGlobalVisibleRect(viewRect);
+
+        int[] locations = new int[2];
+        argView.getLocationOnScreen(locations);
+        int x = locations[0];
+        int y = locations[1];
+
+        viewRect = new Rect(x,y, x+argView.getWidth(),y+argView.getHeight());
+
+        if (viewRect.contains((int)event.getRawX(), (int)event.getRawY())) {
+            //argClick.onClick(argView);
+            argView.callOnClick();
+            resetTouchState();
+            return true;
+        }
+
+        return false;
+    }
+
+    private void resetTouchState() {
+        fingerDown = null;
+        fingerdownx = -1;
+        fingerdowny = -1;
     }
 }

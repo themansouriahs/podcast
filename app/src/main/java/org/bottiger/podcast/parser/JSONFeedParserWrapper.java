@@ -15,7 +15,7 @@ import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.gpodder.GPodderEpisodeWrapper;
 import org.bottiger.podcast.provider.gpodder.GPodderEpisodeWrapper.JSONFile;
 import org.bottiger.podcast.provider.gpodder.GPodderSubscriptionWrapper;
-import org.bottiger.podcast.service.PodcastDownloadManager;
+import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
 import org.bottiger.podcast.utils.PodcastLog;
 
 import android.content.ContentProviderOperation;
@@ -116,7 +116,7 @@ public class JSONFeedParserWrapper {
 			updateFeed(subscriptionWrapper, false);
 			end = System.currentTimeMillis();
 			Log.d("Parser Profiler", "updateFeed time: " + (end - start));
-			PodcastDownloadManager.startDownload(mContext);
+			EpisodeDownloadManager.startDownload(mContext);
 		}
 	}
 
@@ -276,7 +276,7 @@ public class JSONFeedParserWrapper {
 					 * Download podcasts
 					 */
 					if (autoDownload && item != null) {
-						PodcastDownloadManager.addItemToQueue(item);
+						EpisodeDownloadManager.addItemToQueue(item, EpisodeDownloadManager.QUEUE_POSITION.LAST);
 					}
 
 					subscription.fail_count = 0;

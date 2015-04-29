@@ -1,41 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/item"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical" >
+ <org.bottiger.podcast.views.TintedFramelayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:background="@color/colorPrimaryDark">
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
+    <View
+        android:id="@+id/grid_item_gradient"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/footer_gradient" />
+
+    <TextView
+        android:id="@+id/grid_title"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:singleLine="true"
+    	android:lines="1"
+        android:ellipsize="end"
+        android:textSize="22sp"
+        android:padding="20dp"
+        android:layout_gravity="center_vertical"
+        android:textColor="@android:color/white"
+        />
+    <!-- android:background="#AA000000" -->
 
-        <!-- ListRow Left sied Thumbnail image -->
-
-        <LinearLayout
-            android:id="@+id/thumbnail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_marginRight="7dip"
-            android:padding="0dip" >
-
-                                         <ImageView
-                    android:id="@+id/list_image"
-                    style="@style/PodcastImage" />
-
-        </LinearLayout>
-
-        <!-- Title Of Podcast -->
-
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/thumbnail"
-            android:layout_toRightOf="@+id/thumbnail"
-            style="@style/SubscriptionHeaderFont" />
-
-    </RelativeLayout>
-
-</LinearLayout>
+</org.bottiger.podcast.views.TintedFramelayout>

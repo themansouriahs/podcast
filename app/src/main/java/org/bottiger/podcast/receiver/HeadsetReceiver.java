@@ -1,9 +1,7 @@
 package org.bottiger.podcast.receiver;
 
 
-import java.util.List;
-
-import org.bottiger.podcast.PodcastBaseFragment;
+import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.service.PlayerService;
 
 import android.content.BroadcastReceiver;
@@ -15,40 +13,68 @@ import android.view.KeyEvent;
 
 public class HeadsetReceiver extends BroadcastReceiver {
 
-    private static List eventLog;
-    private PlayerService mPlayerServiceBinder = PodcastBaseFragment.mPlayerServiceBinder;
-
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d("HeadsetReceiver", "Action: " + intent.getAction().toString() + "");
+        PlayerService playerService = MainActivity.getPlayerService();
+
+        if (playerService == null) {
+            Log.e("HeadsetReciever", "Warning, PlayerService is null");
+            return;
+        }
 
         if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
-            mPlayerServiceBinder = PodcastBaseFragment.mPlayerServiceBinder;
-            if (mPlayerServiceBinder != null) {
-                if (mPlayerServiceBinder.isPlaying())
+            if (playerService != null) {
+                if (playerService.isPlaying())
                     Log.d("HeadsetReceiver", "ACTION_AUDIO_BECOMING_NOISY => Pause Player");
-                mPlayerServiceBinder.pause();
+                playerService.pause();
             }
         }
 
         if (Intent.ACTION_MEDIA_BUTTON.equals(intent.getAction())) {
-            KeyEvent event = (KeyEvent) intent
-                    .getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+            KeyEvent event = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
 
             if (event == null)
                 return;
 
+            if (event.getAction() != KeyEvent.ACTION_DOWN)
+                return;
+
             Log.d("HeadsetReceiver", "Action: " + intent.getAction().toString() + " KeyCode: " + event.getKeyCode());
-            if (KeyEvent.KEYCODE_HEADSETHOOK == event.getKeyCode()) {
-                if (KeyEvent.ACTION_DOWN == event.getAction()) {
-                    if (mPlayerServiceBinder.isPlaying()) {
+
+            switch (event.getKeyCode()) {
+                case KeyEvent.KEYCODE_HEADSETHOOK:
+                case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
+                    //context.startService(new Intent(MusicService.ACTION_TOGGLE_PLAYBACK));
+                    if (playerService.isPlaying()) {
                         Log.d("HeadsetReceiver", "ACTION_DOWN => Pause Player");
-                        mPlayerServiceBinder.pause();
+                        playerService.pause();
                     } else {
                         Log.d("HeadsetReceiver", "ACTION_DOWN => Start Player");
-                        mPlayerServiceBinder.start();
+                        playerService.start();
                     }
-                }
+                    break;
+                case KeyEvent.KEYCODE_MEDIA_PLAY:
+                    //context.startService(new Intent(MusicService.ACTION_PLAY));
+                    playerService.start();
+                    break;
+                case KeyEvent.KEYCODE_MEDIA_PAUSE:
+                    //context.startService(new Intent(MusicService.ACTION_PAUSE));
+                    playerService.pause();
+                    break;
+                case KeyEvent.KEYCODE_MEDIA_STOP:
+                    //context.startService(new Intent(MusicService.ACTION_STOP));
+                    playerService.stop();
+                    break;
+                case KeyEvent.KEYCODE_MEDIA_NEXT:
+                    //context.startService(new Intent(MusicService.ACTION_SKIP));
+                    playerService.play(playerService.getNextId());
+                    break;
+                case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
+                    // TODO: ensure that doing this in rapid succession actually plays the
+                    // previous song
+                    //context.startService(new Intent(MusicService.ACTION_REWIND));
+                    break;
             }
         }
     }

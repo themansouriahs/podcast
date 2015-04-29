@@ -21,9 +21,9 @@
         style="@style/PlaylistButton" />
 
     <org.bottiger.podcast.views.PlayerButtonView
-        android:id="@+id/previous"
+        android:id="@+id/remove_episode"
         android:padding="0dip"
-        android:src="?attr/previous_icon"
+        android:src="?attr/ic_remove"
         android:layout_toLeftOf="@id/favorite"
         style="@style/PlaylistButton" />
 

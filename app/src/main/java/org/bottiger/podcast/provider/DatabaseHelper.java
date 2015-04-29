@@ -2,8 +2,6 @@ package org.bottiger.podcast.provider;
 
 import java.util.ArrayList;
 
-import com.google.common.collect.ObjectArrays;
-
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -84,7 +82,7 @@ public class DatabaseHelper {
 		if (action == null || action.equals(""))
 			performAction = ACTION_TRANSACTION;
 
-		PodcastOpenHelper helper = new PodcastOpenHelper(context);
+		PodcastOpenHelper helper = PodcastOpenHelper.getInstance(context);//new PodcastOpenHelper(context);
 
 		if (performAction.equals(ACTION_UPDATE)) {
 
@@ -148,7 +146,7 @@ public class DatabaseHelper {
 
 	public static SQLiteStatement prepareFeedUpdateQuery(Context context,
 			String[] columnNames) {
-		PodcastOpenHelper helper = new PodcastOpenHelper(context);
+		PodcastOpenHelper helper = PodcastOpenHelper.getInstance(context);//new PodcastOpenHelper(context);
 		SQLiteDatabase database = helper.getWritableDatabase();
 		SQLiteStatement statment = buildFeedUpdateQuery(database, columnNames);
 		return statment;

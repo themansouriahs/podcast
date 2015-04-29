@@ -1,23 +1,19 @@
 package org.bottiger.podcast.listeners;
 
 
-import java.util.HashSet;
 import java.util.WeakHashMap;
 
-import org.bottiger.podcast.PodcastBaseFragment;
-import org.bottiger.podcast.R;
+import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.service.PlayerService;
-import org.bottiger.podcast.utils.ThemeHelper;
 
 import android.app.Activity;
-import android.content.Context;
+import android.content.ContentResolver;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
-import android.widget.ImageView;
 
 public class PlayerStatusObservable {
 
@@ -47,7 +43,7 @@ public class PlayerStatusObservable {
 
     private static PlayerService getsPlayerService() {
         if (sPlayerService == null)
-            sPlayerService = PodcastBaseFragment.mPlayerServiceBinder;
+            sPlayerService = MainActivity.sBoundPlayerService;
 
         return sPlayerService;
     }
@@ -68,7 +64,7 @@ public class PlayerStatusObservable {
                     if (ps != null) {
                         updateProgress(ps);
 
-                        int currentStatus = ps.isPlaying() ? STATUS.PLAYING.value : STATUS.STOPPED.value;
+                        int currentStatus = ps.isPlaying() || ps.getPlayer().isCasting() ? STATUS.PLAYING.value : STATUS.STOPPED.value;
                         inputMessage = sHandler.obtainMessage(currentStatus);
                         sHandler.sendMessageDelayed(inputMessage, REFRESH_INTERVAL);
                     }
@@ -111,13 +107,39 @@ public class PlayerStatusObservable {
     public static void updateProgress(@NonNull PlayerService argPlayerService) {
         FeedItem currentItem = argPlayerService.getCurrentItem();
         if (currentItem != null) {
+            int offset = argPlayerService.getPlayer().getCurrentPosition();
+            offset = argPlayerService.getPlayer().getCurrentPosition();
+            updateEpisodeOffset(argPlayerService.getContentResolver(),
+                    currentItem,
+                    offset);
 
-            for (PlayerStatusObserver listener : mListeners.keySet()) {
-                if (listener.getEpisode() == argPlayerService.getCurrentItem())
-                    listener.setProgressMs(argPlayerService.position());
+            updateProgress(argPlayerService, currentItem);
+        }
+    }
+
+    public static void updateProgress(@NonNull PlayerService argPlayerService, @NonNull FeedItem argEpisode) {
+        for (PlayerStatusObserver listener : mListeners.keySet()) {
+            if (argEpisode.equals(listener.getEpisode())) {
+                //listener.setProgressMs(argPlayerService.position());
+                listener.setProgressMs(argEpisode.offset);
             }
         }
     }
+
+    private static long lastUpdate = System.currentTimeMillis();
+    public static void updateEpisodeOffset(@NonNull ContentResolver argContentResolver,
+                                           @NonNull FeedItem argEpisode,
+                                           int argOffset) {
+        long now = System.currentTimeMillis();
+
+        // more than a second ago
+        if (now - lastUpdate > 1000) {
+            argEpisode.setPosition(argContentResolver, argOffset);
+            lastUpdate = now;
+        }
+    }
+
+    static NotificationPlayer np;
 
 	/**
 	 * Update the icons so they match the current status of the extended_player
@@ -131,7 +153,7 @@ public class PlayerStatusObservable {
 		}
 		
 		// Update notification
-		PlayerService ps = PodcastBaseFragment.mPlayerServiceBinder;
+		PlayerService ps = MainActivity.sBoundPlayerService;
 		if (ps != null) {
 			FeedItem currentItem = ps.getCurrentItem();
 			if (currentItem != null) {
@@ -142,9 +164,11 @@ public class PlayerStatusObservable {
 
                 startProgressUpdate();
 
-				NotificationPlayer np = new NotificationPlayer(mActivity, null);
+                if (np == null)
+				    np = new NotificationPlayer(ps, currentItem);
+
+                np.setmPlayerService(ps);
 				np.setItem(currentItem);
-                np.setPlayerService(ps);
 				np.show(status == STATUS.PLAYING);
 			}
 		}

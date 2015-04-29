@@ -38,20 +38,15 @@ public class SubscriptionColumns implements BaseColumns {
 	public static final String REMOTE_ID = "sync";	
 	public static final String AUTO_DOWNLOAD = "auto_download";	
 	public static final String PLAYLIST_POSITION = "playlist_id";		
-	
+
+    public static final String PRIMARY_COLOR = "primary_color";
+    public static final String PRIMARY_TINT_COLOR = "primary_tint_color";
+    public static final String SECONDARY_COLOR = "secondary_color";
 
 	public static final String[] ALL_COLUMNS = { _ID, URL, LINK, TITLE,
 			DESCRIPTION, LAST_UPDATED, LAST_ITEM_UPDATED, FAIL_COUNT, STATUS,
 			COMMENT, RATING, USERNAME, PASSWORD, SERVER_ID, REMOTE_ID, AUTO_DOWNLOAD,
-			PLAYLIST_POSITION, IMAGE_URL};
-	
-	  /** The index of the projection columns */
-	  public static final int COLUMN_INDEX_ID = 0;
-	  public static final int COLUMN_INDEX_URL = 1;
-	  public static final int COLUMN_INDEX_LINK = 2;
-	  public static final int COLUMN_INDEX_TITLE = 3;
-	  public static final int COLUMN_INDEX_DESCIPTION = 4;
-	  public static final int COLUMN_INDEX_LAST_UPDATED = 5;
+			PLAYLIST_POSITION, IMAGE_URL, PRIMARY_COLOR, PRIMARY_TINT_COLOR, SECONDARY_COLOR};
 
 	public static final String DEFAULT_SORT_ORDER = _ID + " ASC";
 	public static final String sql_create_table = "CREATE TABLE " 
@@ -73,7 +68,10 @@ public class SubscriptionColumns implements BaseColumns {
 		+ REMOTE_ID + " VARCHAR(128), " 		
 		+ AUTO_DOWNLOAD + " INTEGER , "
 		+ PLAYLIST_POSITION + " INTEGER , " 	
-		+ IMAGE_URL + " VARCHAR(1024) "
+		+ IMAGE_URL + " VARCHAR(1024), "
+        + PRIMARY_COLOR + " INTEGER DEFAULT 0 , "
+        + PRIMARY_TINT_COLOR + " INTEGER DEFAULT 0 , "
+        + SECONDARY_COLOR + " INTEGER DEFAULT 0 "
 		+ ");";
 
 	public static final String sql_index_subs_url = "CREATE UNIQUE INDEX IDX_"
@@ -122,7 +120,18 @@ public class SubscriptionColumns implements BaseColumns {
 		}		
 		if (values.containsKey(PLAYLIST_POSITION) == false) {
 			values.put(PLAYLIST_POSITION, -1);
-		}			
+		}
+
+        if (values.containsKey(PRIMARY_COLOR) == false) {
+            values.put(PRIMARY_COLOR, -1);
+        }
+        if (values.containsKey(PRIMARY_TINT_COLOR) == false) {
+            values.put(PRIMARY_TINT_COLOR, -1);
+        }
+        if (values.containsKey(SECONDARY_COLOR) == false) {
+            values.put(SECONDARY_COLOR, -1);
+        }
+
 		return values;
 	}
 }

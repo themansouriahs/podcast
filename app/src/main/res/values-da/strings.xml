@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+  <string name="app_name">SoundWaves</string>
+  <string name="unsubscribe">Afmeld</string>
+  <string name="pref_only_wifi_description">Download kun via WiFI</string>
+  <string name="pref_only_wifi_title">Kun Wi-Fi</string>
+  <string name="pref_dark_theme">Benyt mørkt tema for højere kontrast</string>
+  <string name="pref_dark_theme_title">Mørkt Tema</string>
+  <string name="pref_download_on_update_title">Automatisk Download</string>
+  <string name="pref_download_on_update_description">Download nye episoder når det er muligt</string>
+  <string name="pref_downloaded_expire_description">Indstil maximal pladsforbrug for downloadede episoder</string>
+  <string name="pref_downloaded_dialog_title">Historik størrelse</string>
+  <string name="dialog_title_add_sub">Tilføj podcast</string>
+  <string name="dialog_message_add_sub">Tilføj en URL</string>
+  <string name="title_section3">Playliste</string>
+  <string name="title_section2">Opdag</string>
+  <string name="title_section1">Podcasts</string>
+  <string name="hello_world">Hello World!</string>
+  <string name="menu_settings">Indstillinger</string>
+  <string name="title_activity_swipe">SoundWaves</string>
+  <string name="menu_download_all">Masse Download</string>
+  <string name="menu_clear_playlist">Ryd Playlisten</string>
+  <string name="menu_import">Importer/Exporter OPML</string>
+  <string name="menu_add_podcast">Tilføj Podcast</string>
+  <string name="pref_feedback_title">Send annonym feedback</string>
+  <string name="drawer_open">Åben</string>
+  <string name="drawer_close">Luk</string>
+  <string name="episode_title">Episode titel</string>
+  <string name="episode_description">Episodens beskrivelse</string>
+  <string name="pref_continuously_playing">Kontinuerlig afspilning</string>
+  <string name="preferences_category_help">Hjælp til</string>
+  <string name="preferences_category_ui">Interface</string>
+  <string name="preferences_category_player">Afspiller</string>
+  <string name="pref_player_forward_amount_title">Spol frem</string>
+  <string name="pref_player_backward_amount_title">Spol tilbage</string>
+  <string name="pref_player_forwards_amount_summary">Spol frem med %s </string>
+  <string name="pref_player_backwards_amount_summary">Spol tilbage med %s</string>
+  <string name="pref_playback_category_title">Afspilning</string>
+  <string name="preferences_category_about">Om</string>
+  <string name="pref_current_version_title">Version</string>
+  <string name="ok">OK</string>
+  <string name="playlist_filter_all">Alle Episoder</string>
+  <string name="playlist_filter_some">Valgte Episoder</string>
+  <string name="playlist_filter_prefix">Vis</string>
+  <string name="preference_first_run_key">Første kørsel</string>
+  <string name="menu_feedback">Tilbagemelding</string>
+  <string name="menu_refresh_feed">Opdater</string>
+  <string name="menu_refresh_feed_all">Opdater Alle</string>
+  <string name="podcast_title_unknown">Ingen Titel :(</string>
+  <string name="playlist_empty">Tom Playliste</string>
+  <string name="filter_show_listened">Vis hørte</string>
+  <string name="auto_start_next">Auto start næste</string>
+  <string name="drawer_playlist_filters">Playliste filtre</string>
+  <string name="drawer_player_settings">Afspiller indstillinger</string>
+  <string name="subscription_subscribing_to">Abonner på</string>
+  <string name="pref_subscriptions_category_title">Podcasts</string>
+  <string name="opml_radio_import">Importer OPML fil</string>
+  <string name="opml_radio_export">Exporter podcasts til OPML</string>
+  <!--For playing media on another device, like a chromecast-->
+  <!--When downloading and parsing the content of a feed-->
+  <!--Search engine for searching for new podcasts-->
+</resources>

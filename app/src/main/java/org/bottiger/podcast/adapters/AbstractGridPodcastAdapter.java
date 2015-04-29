@@ -15,7 +15,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 public abstract class AbstractGridPodcastAdapter extends CursorAdapter {
 
 	protected LayoutInflater mInflater;
@@ -26,20 +25,5 @@ public abstract class AbstractGridPodcastAdapter extends CursorAdapter {
         super(context, c);
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
-
-
-	/**
-	 * Sets the listItems icon Async using the UrlImageViewHelper from
-	 * https://github.com/koush/UrlImageViewHelper#readme
-	 * 
-	 * @param imageView
-	 * @param imageURL
-	 */
-	void setViewImageAsync(ImageView imageView, String imageURL) {
-		int cacheTime = 60000 * 60 * 24 * 31; // in ms
-		UrlImageViewHelper.loadUrlDrawable(imageView.getContext(), imageURL);
-		UrlImageViewHelper.setUrlDrawable(imageView, imageURL,
-				R.drawable.generic_podcast, cacheTime);
-	}
 
 }

@@ -14,8 +14,7 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Transformation;
 
-import org.acra.ACRA;
-import org.acra.log.ACRALog;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 
 /**
  * Created by apl on 09-11-2014.
@@ -101,9 +100,9 @@ public class FullScreenCenterCropTransformation implements Transformation {
                     "m_viewHeight:" + Double.toString(m_viewHeight) + " " +
                     "sourceWidth:" + Double.toString(sourceWidth) + " " +
                     "sourceHeight:" + Double.toString(sourceHeight) + " ";
-            ACRA.getErrorReporter()
-                    .putCustomData("TransformationBug", keyValue);
-            ACRA.getErrorReporter().handleException(iae);
+
+            VendorCrashReporter.report("TransformationBug", keyValue);
+            VendorCrashReporter.handleException(iae);
             return scaledBitmap;
         }
         scaledBitmap.recycle();

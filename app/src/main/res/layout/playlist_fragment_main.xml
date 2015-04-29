@@ -2,40 +2,18 @@
 <org.bottiger.podcast.views.SwipeRefreshExpandableLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/my_frame"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <FrameLayout
         android:id="@+id/overlay_container"
-        android:paddingTop="@dimen/header_bar_height"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+        <!-- android:paddingTop="@dimen/header_bar_height" -->
 
         <include layout="@layout/playlist_empty" />
 
-    <RelativeLayout
-        android:id="@+id/playlist_container"
-        android:visibility="gone"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipChildren="false"
-        android:elevation="0dp"
-        android:clipToPadding="false">
-
-        <include layout="@layout/top_player" />
-
-        <org.bottiger.podcast.views.FixedRecyclerView
-            android:id="@+id/my_recycler_view"
-            android:scrollbars="vertical"
-            android:translationY="@dimen/top_player_max_offset"
-            android:layout_alignParentTop="true"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:overScrollMode="never"
-            />
-
-
-    </RelativeLayout>
+        <include layout="@layout/playlist_scroller" />
 
         <include
             android:id="@+id/playlist_overlay"

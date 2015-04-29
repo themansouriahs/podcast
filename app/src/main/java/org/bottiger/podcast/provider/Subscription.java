@@ -2,12 +2,19 @@ package org.bottiger.podcast.provider;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.bottiger.podcast.MainActivity;
+import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.flavors.Analytics.IAnalytics;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.listeners.PaletteListener;
+import org.bottiger.podcast.service.IDownloadCompleteCallback;
+import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
+import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.PodcastLog;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
@@ -20,10 +27,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.provider.BaseColumns;
+import android.support.annotation.NonNull;
 import android.support.v4.util.LruCache;
+import android.support.v7.graphics.Palette;
 
-public class Subscription extends AbstractItem {
+import javax.annotation.Nullable;
+
+public class Subscription extends AbstractItem implements ISubscription, PaletteListener {
 
 	public static final String TYPE_RSS2 = "rss";
 	public static final String TYPE_RSS091 = "rss";
@@ -41,6 +53,8 @@ public class Subscription extends AbstractItem {
 	public final static String UNSUBSCRIBED = "unsubscribed";
 
 	private static SubscriptionLruCache cache = null;
+
+    private boolean mIsDirty = false;
 
 	public long id;
 	public String title;
@@ -60,6 +74,10 @@ public class Subscription extends AbstractItem {
 	public long lastItemUpdated;
 	public long fail_count;
 	public long auto_download;
+
+    private int mPrimaryColor;
+    private int mPrimaryTintColor;
+    private int mSecondaryColor;
 
 	public static void view(Activity act, long channel_id) {
 		Uri uri = ContentUris.withAppendedId(SubscriptionColumns.URI,
@@ -82,11 +100,16 @@ public class Subscription extends AbstractItem {
 
 	public static LinkedList<Subscription> allAsList(ContentResolver context) {
 		LinkedList<Subscription> subscriptions = new LinkedList<Subscription>();
-		Cursor cursor = allAsCursor(context);
+        Cursor cursor = null;
+        try {
+            cursor = allAsCursor(context);
 
-		while (cursor.moveToNext()) {
-			subscriptions.add(Subscription.getByCursor(cursor));
-		}
+            while (cursor.moveToNext()) {
+                subscriptions.add(Subscription.getByCursor(cursor));
+            }
+        } finally {
+            cursor.close();
+        }
 		return subscriptions;
 	}
 
@@ -225,6 +248,9 @@ public class Subscription extends AbstractItem {
 		auto_download = -1;
 		sync_id = null;
 		status = -1;
+        mPrimaryColor = -1;
+        mPrimaryTintColor = -1;
+        mSecondaryColor = -1;
 	}
 
 	public Subscription() {
@@ -239,15 +265,6 @@ public class Subscription extends AbstractItem {
 	}
 
 	public void unsubscribe(Context context) {
-
-		// Unsubscribe from Google Reader
-		try {
-			MainActivity.gReader.removeSubscriptionfromReader(context,
-					MainActivity.mAccount, this);
-		} catch (Exception e) {
-
-		}
-
 		// Unsubscribe from local database
 		this.status = STATUS_UNSUBSCRIBED;
 		update(context.getContentResolver());
@@ -265,35 +282,44 @@ public class Subscription extends AbstractItem {
 			return false;
 	}
 
-	public int subscribe(Context context) {
+	public int subscribe(@NonNull final Context context) {
 		Subscription sub = Subscription.getByUrl(context.getContentResolver(),
 				url);
 
-		if (sub != null) {
-			return ADD_FAIL_DUP;
-		}
+        if (sub == null) {
+            ContentValues cv = new ContentValues();
+            cv.put(SubscriptionColumns.TITLE, title);
+            cv.put(SubscriptionColumns.URL, url);
+            cv.put(SubscriptionColumns.LINK, link);
+            cv.put(SubscriptionColumns.LAST_UPDATED, 0L);
+            cv.put(SubscriptionColumns.COMMENT, comment);
+            cv.put(SubscriptionColumns.DESCRIPTION, description);
+            cv.put(SubscriptionColumns.IMAGE_URL, imageURL);
+            cv.put(SubscriptionColumns.REMOTE_ID, sync_id);
+            cv.put(SubscriptionColumns.STATUS, STATUS_SUBSCRIBED);
+            Uri uri = context.getContentResolver().insert(SubscriptionColumns.URI,
+                    cv);
 
-		ContentValues cv = new ContentValues();
-		cv.put(SubscriptionColumns.TITLE, title);
-		cv.put(SubscriptionColumns.URL, url);
-		cv.put(SubscriptionColumns.LINK, link);
-		cv.put(SubscriptionColumns.LAST_UPDATED, 0L);
-		cv.put(SubscriptionColumns.COMMENT, comment);
-		cv.put(SubscriptionColumns.DESCRIPTION, description);
-		cv.put(SubscriptionColumns.IMAGE_URL, imageURL);
-		cv.put(SubscriptionColumns.REMOTE_ID, sync_id);
-		cv.put(SubscriptionColumns.STATUS, STATUS_SUBSCRIBED);
-		Uri uri = context.getContentResolver().insert(SubscriptionColumns.URI,
-				cv);
-		if (uri == null) {
-			return ADD_FAIL_UNSUCCESS;
-		}
+            if (uri == null) {
+                VendorCrashReporter.report("SubscriptionFailed", "" + url);
+                return ADD_FAIL_UNSUCCESS;
+            }
+        } else {
+            // Update the current subscription
+            sub.status = STATUS_SUBSCRIBED;
+            sub.update(context.getContentResolver());
+        }
 
-		Subscription sub_test = Subscription.getByUrl(
-				context.getContentResolver(), url);
-		if (sub_test != null && MainActivity.gReader != null)
-			MainActivity.gReader.addSubscriptiontoReader(context,
-					MainActivity.mAccount, sub_test);
+        if (sub == null) {
+            sub = Subscription.getByUrl(context.getContentResolver(), url);
+
+            if (sub == null) {
+                return ADD_FAIL_UNSUCCESS;
+            }
+        }
+
+        SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.SUBSCRIBE_TO_FEED);
+        sub.refresh(context);
 
 		return ADD_SUCCESS;
 
@@ -304,7 +330,8 @@ public class Subscription extends AbstractItem {
 		context.delete(uri, null, null);
 	}
 
-	public LinkedList<FeedItem> getFeedItems(ContentResolver contentResolver) {
+	public ArrayList<IEpisode> getEpisodes() {
+        /*
 		LinkedList<FeedItem> episodes = new LinkedList<FeedItem>();
 		Cursor itemCursor = contentResolver.query(ItemColumns.URI,
 				ItemColumns.ALL_COLUMNS, ItemColumns.SUBS_ID + "==" + this.id,
@@ -313,9 +340,29 @@ public class Subscription extends AbstractItem {
 				.moveToNext()) {
 			episodes.add(FeedItem.getByCursor(itemCursor));
 		}
-
-		return episodes;
+        */
+		return null; //episodes;
 	}
+    private class RefreshSyncTask extends AsyncTask<Context, Void, Void> {
+        protected Void doInBackground(Context... contexts) {
+            refresh(contexts[0]);
+            return null;
+        }
+    }
+
+
+    public void refreshAsync(@NonNull final Context argContext) {
+        new RefreshSyncTask().execute(argContext);
+    }
+
+    public void refresh(@NonNull final Context argContext) {
+        SoundWaves.sSubscriptionRefreshManager.refresh(this, new IDownloadCompleteCallback() {
+            @Override
+            public void complete(boolean succes, ISubscription subscription) {
+                update(argContext.getContentResolver());
+            }
+        });
+    }
 
 	/**
 	 * Batch update
@@ -356,6 +403,15 @@ public class Subscription extends AbstractItem {
 		if (status >= 0)
 			cv.put(SubscriptionColumns.STATUS, status);
 
+        if (mPrimaryColor != -1)
+            cv.put(SubscriptionColumns.PRIMARY_COLOR, mPrimaryColor);
+
+        if (mPrimaryTintColor != -1)
+            cv.put(SubscriptionColumns.PRIMARY_TINT_COLOR, mPrimaryTintColor);
+
+        if (mSecondaryColor != -1)
+            cv.put(SubscriptionColumns.SECONDARY_COLOR, mSecondaryColor);
+
 		// cv.put(SubscriptionColumns.COMMENT, "valuehejeh");
 
 		// BaseColumns._ID + "=" + id
@@ -387,14 +443,14 @@ public class Subscription extends AbstractItem {
 		// Return item directly if cached
 		initCache();
 		synchronized (cache) {
-			Subscription cacheSub = cache.get(sub.id);
-			if (cacheSub != null && cacheSub.title != "") { // FIXME
-															// cacheItem.title
-															// != ""
-				sub = cacheSub;
-				return sub;
-			}
-		}
+            Subscription cacheSub = cache.get(sub.id);
+            if (cacheSub != null && cacheSub.title != "") { // FIXME
+                // cacheItem.title
+                // != ""
+                sub = cacheSub;
+                return sub;
+            }
+        }
 
 		int lastUpdatedIndex = cursor
 				.getColumnIndex(SubscriptionColumns.LAST_UPDATED);
@@ -422,6 +478,16 @@ public class Subscription extends AbstractItem {
 		sub.fail_count = cursor.getLong(cursor
 				.getColumnIndex(SubscriptionColumns.FAIL_COUNT));
 
+        sub.status = cursor.getLong(cursor
+                .getColumnIndex(SubscriptionColumns.STATUS));
+
+        sub.mPrimaryColor = cursor.getInt(cursor
+                .getColumnIndex(SubscriptionColumns.PRIMARY_COLOR));
+        sub.mPrimaryTintColor = cursor.getInt(cursor
+                .getColumnIndex(SubscriptionColumns.PRIMARY_TINT_COLOR));
+        sub.mSecondaryColor = cursor.getInt(cursor
+                .getColumnIndex(SubscriptionColumns.SECONDARY_COLOR));
+
 		// if item was not cached we put it in the cache
 		synchronized (cache) {
 			cache.put(sub.id, sub);
@@ -429,6 +495,30 @@ public class Subscription extends AbstractItem {
 
 		return sub;
 	}
+
+    public void setPrimaryColor(int argColor) {
+        mPrimaryColor = argColor;
+    }
+
+    public void setPrimaryTintColor(int argColor) {
+        mPrimaryTintColor = argColor;
+    }
+
+    public void setSecondaryColor(int argColor) {
+        mSecondaryColor = argColor;
+    }
+
+    public int getPrimaryColor() {
+        return mPrimaryColor;
+    }
+
+    public int getPrimaryTintColor() {
+        return mPrimaryTintColor;
+    }
+
+    public int getSecondaryColor() {
+        return mSecondaryColor;
+    }
 
 	@Override
 	public String toString() {
@@ -442,7 +532,37 @@ public class Subscription extends AbstractItem {
 		}
 	}
 
-	private static class SubscriptionLruCache extends
+    @Override
+    public void onPaletteFound(@Nullable Palette argChangedPalette) {
+        ColorExtractor extractor = new ColorExtractor(argChangedPalette);
+        int newPrimaryColor = extractor.getPrimary();
+        int newPrimaryTintColor = extractor.getPrimaryTint();
+        int newSecondaryColor = extractor.getSecondary();
+
+        if (newPrimaryColor != mPrimaryColor || newPrimaryTintColor != mPrimaryTintColor ||newSecondaryColor != mSecondaryColor) {
+            mIsDirty = true;
+        }
+
+        mPrimaryColor     = newPrimaryColor;
+        mPrimaryTintColor = newPrimaryTintColor;
+        mSecondaryColor   = newSecondaryColor;
+    }
+
+    public boolean IsDirty() {
+        return mIsDirty;
+    }
+
+    @Override
+    public TYPE getType() {
+        return TYPE.DEFAULT;
+    }
+
+    @Override
+    public String getPaletteUrl() {
+        return getImageURL();
+    }
+
+    private static class SubscriptionLruCache extends
 			LruCache<Long, Subscription> {
 
 		public SubscriptionLruCache(int maxSize) {
@@ -460,7 +580,13 @@ public class Subscription extends AbstractItem {
 		return null;
 	}
 
-	@Override
+    @NonNull
+    @Override
+    public String getURLString() {
+        return getURL() == null ? "" : getURL().toString();
+    }
+
+    @Override
 	public long getId() {
 		return id;
 	}
@@ -474,6 +600,10 @@ public class Subscription extends AbstractItem {
 	public String getImageURL() {
 		return imageURL;
 	}
+
+    public void setImageURL(String argUrl) {
+        imageURL = argUrl;
+    }
 
 	public String getUrl() {
 		return url;

@@ -2,21 +2,26 @@ package org.bottiger.podcast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 
-import org.bottiger.podcast.adapters.DrawerAdapter;
-import org.bottiger.podcast.views.ToolbarActivity;
+import org.bottiger.podcast.adapters.PlaylistContentSpinnerAdapter;
+import org.bottiger.podcast.playlist.Playlist;
+import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.utils.navdrawer.NavigationDrawerMenuGenerator;
+import org.bottiger.podcast.views.MultiSpinner;
+import org.bottiger.podcast.views.PlaylistContentSpinner;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.TypeEvaluator;
 import android.app.Fragment;
-import android.app.FragmentManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -27,14 +32,19 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CompoundButton;
 import android.widget.ExpandableListView;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.Spinner;
+import android.widget.Switch;
+import android.widget.TableLayout;
 
 import com.android.volley.toolbox.ImageLoader;
 
@@ -71,11 +81,22 @@ import com.android.volley.toolbox.ImageLoader;
  * overlay on top of the current content.
  * </p>
  */
-public abstract class DrawerActivity extends ToolbarActivity {
+public abstract class DrawerActivity extends MediaRouterPlaybackActivity {
 
-	protected DrawerLayout mDrawerLayout;
+    protected SharedPreferences mSharedPreferences;
+
+    protected DrawerLayout mDrawerLayout;
+    protected RelativeLayout mDrawerMainContent;
 	protected ExpandableListView mDrawerList;
-	protected LinearLayout mDrawerContainer;
+	protected FrameLayout mDrawerContainer;
+    protected TableLayout mDrawerTable;
+
+    protected Switch mPlaylistShowListened;
+    protected Switch mAutoPlayNext;
+    protected Spinner mPlaylistOrderSpinner;
+    protected PlaylistContentSpinner mPlaylistContentSpinner;
+    protected PlaylistContentSpinnerAdapter mPlaylistContentSpinnerAdapter;
+
 	protected ActionBarDrawerToggle mDrawerToggle;
 	protected String[] mListItems;
 
@@ -118,21 +139,86 @@ public abstract class DrawerActivity extends ToolbarActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
 		mTitle = mDrawerTitle = getTitle();
 		mListItems = getResources().getStringArray(R.array.drawer_menu);
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-		mDrawerContainer = (LinearLayout) findViewById(R.id.drawer_container);
+        mDrawerMainContent = (RelativeLayout) findViewById(R.id.outer_container);
+		mDrawerContainer = (FrameLayout) findViewById(R.id.drawer_container);
+        mDrawerTable = (TableLayout) findViewById(R.id.drawer_table);
 
-		parentItems = new ArrayList<String>(Arrays.asList(mListItems));
+        // if we can use windowTranslucentNavigation=true
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            FrameLayout.MarginLayoutParams params = (FrameLayout.MarginLayoutParams) mDrawerTable.getLayoutParams();
+            params.topMargin = getStatusBarHeight(getResources());
+
+            RelativeLayout.MarginLayoutParams params2 = (RelativeLayout.MarginLayoutParams) mDrawerMainContent.getLayoutParams();
+            params2.topMargin = getStatusBarHeight(getResources());
+
+            mDrawerMainContent.setLayoutParams(params2);
+            mDrawerTable.setLayoutParams(params);
+        }
+
+        final Playlist playlist = PlayerService.getPlaylist();
+
+        mPlaylistContentSpinner = (PlaylistContentSpinner) findViewById(R.id.drawer_playlist_source);
+        mPlaylistOrderSpinner = (Spinner) findViewById(R.id.drawer_playlist_sort_order);
+        mPlaylistShowListened = (Switch) findViewById(R.id.slidebar_show_listened);
+        mAutoPlayNext = (Switch) findViewById(R.id.slidebar_show_continues);
+
+        List<Subscription> list = Subscription.allAsList(getContentResolver());
+        LinkedList<String> slist = new LinkedList<>();
+        for (Subscription s : list) {
+            slist.add(s.getTitle());
+        }
+        MultiSpinnerListener multiSpinnerListener = new MultiSpinnerListener(playlist);
+        mPlaylistContentSpinner.setSubscriptions(list, "Hey there", multiSpinnerListener);
+
+        parentItems = new ArrayList<String>(Arrays.asList(mListItems));
 		// setGroupParents();
 		setChildData();
 
-		DrawerAdapter adapter = new DrawerAdapter(parentItems, childItems);
-		adapter.setInflater(
-				(LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE),
-				this);
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapterSortOrder = ArrayAdapter.createFromResource(this,
+                R.array.playlist_sort_order, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapterSortOrder.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        mPlaylistOrderSpinner.setAdapter(adapterSortOrder);
+        mPlaylistOrderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position == 0) {
+                    playlist.setSortOrder(Playlist.SORT.DATE_NEW); // new first
+                } else {
+                    playlist.setSortOrder(Playlist.SORT.DATE_OLD); // old first
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                return;
+            }
+        });
+
+        // Show listened
+        mPlaylistShowListened.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                playlist.setShowListened(isChecked);
+            }
+        });
+        boolean doShowListened = mSharedPreferences.getBoolean(ApplicationConfiguration.showListenedKey, Playlist.SHOW_LISTENED_DEFAULT);
+        if (doShowListened != mPlaylistShowListened.isChecked()) {
+            mPlaylistShowListened.setChecked(doShowListened);
+        }
+
+        initAutoPlayNextSwitch();
+
+        LinearLayout layout = (LinearLayout) findViewById(R.id.drawer_items);
+        NavigationDrawerMenuGenerator navigationDrawerMenuGenerator = new NavigationDrawerMenuGenerator(this);
+        navigationDrawerMenuGenerator.generate(layout);
 
 
         // enable ActionBar app icon to behave as action to toggle nav drawer
@@ -159,7 +245,9 @@ public abstract class DrawerActivity extends ToolbarActivity {
                 // onPrepareOptionsMenu()
             }
         };
+
         mDrawerLayout.setDrawerListener(mDrawerToggle);
+        mDrawerLayout.setScrimColor(Color.TRANSPARENT);
 
 
 		/*
@@ -181,7 +269,7 @@ public abstract class DrawerActivity extends ToolbarActivity {
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		// If the nav drawer is open, hide action items related to the content
 		// view
-		boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerContainer);
+	    boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerContainer);
 		/*
 		 * menu.findItem(R.id.action_websearch).setVisible(!drawerOpen);
 		 */
@@ -214,8 +302,8 @@ public abstract class DrawerActivity extends ToolbarActivity {
 		mDrawerLayout.closeDrawer(mDrawerContainer);
 
 		if (position == 1) {
-			Intent intent = new Intent(this, DownloadActivity.class);
-			startActivity(intent);
+			//Intent intent = new Intent(this, DownloadActivity.class);
+			//startActivity(intent);
 		}
 	}
 
@@ -264,6 +352,11 @@ public abstract class DrawerActivity extends ToolbarActivity {
 		// Pass any configuration change to the drawer toggls
 		mDrawerToggle.onConfigurationChanged(newConfig);
 	}
+    @Override
+    public void onResume() {
+        initAutoPlayNextSwitch();
+        super.onResume();
+    }
 
 	/**
 	 * Fragment that appears in the "content_frame", shows a planet
@@ -447,6 +540,53 @@ public abstract class DrawerActivity extends ToolbarActivity {
             mSwipeRefreshLayout.setProgressBarTop(0);
         }
         */
+    }
+
+    private void initAutoPlayNextSwitch() {
+        // Auto play next
+        final String playNextKey = getResources().getString(R.string.pref_continuously_playing_key);
+
+        mAutoPlayNext.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mSharedPreferences.edit().putBoolean(playNextKey, isChecked).commit();
+            }
+        });
+        mSharedPreferences.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                if (key == playNextKey) {
+                    mAutoPlayNext.setChecked(sharedPreferences.getBoolean(playNextKey, Playlist.PLAY_NEXT_DEFAULT));
+                }
+            }
+        });
+
+        boolean doPlayNext = mSharedPreferences.getBoolean(playNextKey, Playlist.PLAY_NEXT_DEFAULT);
+        if (doPlayNext != mAutoPlayNext.isChecked()) {
+            mAutoPlayNext.setChecked(doPlayNext);
+        }
+    }
+
+    class MultiSpinnerListener implements MultiSpinner.MultiSpinnerListener {
+
+        Playlist mPlaylist;
+
+        public MultiSpinnerListener(Playlist argPlaylist) {
+            mPlaylist = argPlaylist;
+        }
+
+        @Override
+        public void onItemsSelected(Long[] selected) {
+            int len = selected.length;
+
+            mPlaylist.clearSubscriptionID();
+
+            for (int i = 0; i < len; i++) {
+                mPlaylist.addSubscriptionID(selected[i]);
+            }
+
+            mPlaylist.notifyDatabaseChanged();
+        }
     }
 
 }

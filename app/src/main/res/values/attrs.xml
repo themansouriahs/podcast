@@ -25,6 +25,9 @@
     <attr name="rewind_icon" format="reference" />
     <attr name="favorite_outline" format="reference" />
     <attr name="previous_icon" format="reference" />
+    <attr name="ic_rewind" format="reference" />
+    <attr name="ic_forward" format="reference" />
+    <attr name="ic_remove" format="reference" />
     <attr name="play_invert_icon" format="reference" />
     <attr name="pause_invert_icon" format="reference" />
     <attr name="stop_icon" format="reference" />
@@ -40,6 +43,7 @@
     <attr name="search_invert_icon" format="reference" />
     <attr name="customBackground" format="reference" />
     <attr name="seekbar_handle" format="reference" />
+    <attr name="time_icon" format="reference" />
 
     <declare-styleable name="BezelImageView">
         <attr name="maskDrawable" format="reference" />

@@ -1,2 +1,4 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:appcompat="http://schemas.android.com/apk/res-auto">
 
-    <menu xmlns:android="http://schemas.android.com/apk/res/android"></menu>
+</menu>

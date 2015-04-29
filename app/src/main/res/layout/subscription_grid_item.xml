@@ -1,15 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
- <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent">
+ <FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <org.bottiger.podcast.views.SquareImageView
+    <org.bottiger.podcast.views.SquareImageViewFresco
         android:id="@+id/grid_image"
         style="@style/PodcastImage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop"
+        fresco:placeholderImage="@drawable/generic_podcast"
         />
+
+    <View
+        android:id="@+id/grid_item_gradient"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/footer_gradient" />
+
     <TextView
         android:id="@+id/grid_title"
         android:layout_width="match_parent"
@@ -23,6 +33,7 @@
         android:paddingBottom="10dp"
         android:layout_gravity="bottom"
         android:textColor="@android:color/white"
-        android:background="#AA000000"
         />
+    <!-- android:background="#AA000000" -->
+
 </FrameLayout>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<org.bottiger.podcast.views.PlayerLinearLayout
+<org.bottiger.podcast.views.PlayerRelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/expanded_controls"
     android:layout_width="match_parent"
@@ -22,4 +22,4 @@
             />
     <!-- android:layout_marginTop="80dp"-->
 
-</org.bottiger.podcast.views.PlayerLinearLayout>
+</org.bottiger.podcast.views.PlayerRelativeLayout>

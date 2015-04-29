@@ -1,12 +1,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-        <item
+    <!--
+    <item
         android:id="@+id/menu_control"
         android:icon="?attr/play_invert_icon"
         android:orderInCategory="1"
         app:showAsAction="always"
-        android:title="@string/menu_play"/>
+        android:title="@string/menu_play"/>-->
     <item
         android:id="@+id/menu_add"
         android:icon="@drawable/content_new"
@@ -18,11 +19,6 @@
         android:orderInCategory="100"
         app:showAsAction="never"
         android:title="@string/menu_settings">
-    </item>
-    <item
-        android:id="@+id/menu_refresh"
-        android:orderInCategory="200"
-        android:title="@string/refresh">
     </item>
 
 </menu>

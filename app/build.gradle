@@ -2,40 +2,75 @@ apply plugin: 'idea'
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.2"
+    compileSdkVersion 22
+    buildToolsVersion "22.0.1"
 
     defaultConfig {
         applicationId "org.bottiger.podcast"
-        minSdkVersion 16
-        targetSdkVersion 21
-        versionCode 67     // even - release. Odd - development
-        versionName "0.53" // even - release. Odd - development
+        minSdkVersion 15
+        targetSdkVersion 22
+        versionCode 124     // even - release. Odd - development
+        versionName "0.93" // even - release. Odd - development
         //useJack = true
+        multiDexEnabled = true
+    }
+
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
     }
 
     productFlavors {
+
+        dev {
+            buildConfigField "boolean", "DEV_MODE", "true"
+            buildConfigField "boolean", "PRIVATE_MODE", "false"
+            buildConfigField "boolean", "LIBRE_MODE", "true"
+        }
+
         free {
+            buildConfigField "boolean", "DEV_MODE", "false"
+            buildConfigField "boolean", "PRIVATE_MODE", "true"
+            buildConfigField "boolean", "LIBRE_MODE", "true"
         }
 
         google {
+            buildConfigField "boolean", "DEV_MODE", "false"
+            buildConfigField "boolean", "PRIVATE_MODE", "false"
+            buildConfigField "boolean", "LIBRE_MODE", "false"
         }
 
         amazon {
-            minSdkVersion 15
+            buildConfigField "boolean", "DEV_MODE", "false"
+            buildConfigField "boolean", "PRIVATE_MODE", "false"
+            buildConfigField "boolean", "LIBRE_MODE", "false"
         }
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            //minifyEnabled true
+            //shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 
     // http://stackoverflow.com/questions/22851103/android-studio-gradle-error-multiple-dex-files-define
     dexOptions {
-        preDexLibraries = false
+        //preDexLibraries = false
+        javaMaxHeapSize "4g"
     }
 
     compileOptions {
@@ -45,7 +80,7 @@ android {
 }
 
 repositories {
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    mavenCentral()
 }
 
 idea {
@@ -63,27 +98,56 @@ dependencies {
 
     compile 'com.mcxiaoke.volley:library:1.0.+'
 
-    compile 'com.squareup.picasso:picasso:2+'
-    compile 'com.google.apis:google-api-services-drive:+' exclude module: 'httpclient'
-    compile 'com.google.api-client:google-api-client-android:+'
+    compile 'com.squareup.okhttp:okhttp:2.2+'
+    compile 'com.squareup.okhttp:okhttp-urlconnection:2.2+'
+    compile 'com.squareup.retrofit:retrofit:1.9.0'
+
+    compile 'com.squareup.picasso:picasso:2.5.0'
+
+    compile ('com.googlecode.json-simple:json-simple:1.1.1') {
+        exclude module: 'junit'
+    }
+
+    //compile 'com.google.apis:google-api-services-drive:+'
+    //compile 'com.google.api-client:google-api-client-android:+'
     compile 'com.google.http-client:google-http-client-gson:+'
 
-    compile 'com.android.support:support-v4:+' // compile 'com.android.support:support-v4:+'
-    compile "com.android.support:support-v13:+" // needed?
+    compile 'com.android.support:support-v4:22+' // compile 'com.android.support:support-v4:+'
 
-    compile 'com.android.support:appcompat-v7:+'
-    compile 'com.android.support:palette-v7:+'
+    compile 'com.android.support:appcompat-v7:22+'
+    compile 'com.android.support:recyclerview-v7:22+'
+    compile 'com.android.support:palette-v7:22+'
+    compile 'com.android.support:cardview-v7:22+'
+    compile 'com.android.support:mediarouter-v7:22+'
 
     compile 'com.melnykov:floatingactionbutton:1+' // floating action button
 
-    compile 'com.google.android.gms:play-services:4.2.42'
+    compile 'commons-io:commons-io:2.4'
+    compile 'commons-validator:commons-validator:1.4.0'
 
-    compile 'com.android.support:recyclerview-v7:+'
-    compile 'com.android.support:palette-v7:+'
+    compile 'org.jsoup:jsoup:1.7.3'
+    compile 'com.github.traex.rippleeffect:library:1.2.4'
 
-    compile 'ch.acra:acra:4.5.0'
+    //compile 'com.eowise:recyclerview-stickyheaders:0.5.1@aar'
+    compile 'jp.wasabeef:recyclerview-animators:1.2.0@aar'
 
-    compile 'com.eowise:recyclerview-stickyheaders:0.5.1@aar'
-    compile 'jp.wasabeef:recyclerview-animators:1.0.3'
-    compile 'com.github.traex.rippleeffect:library:1+'
+    compile 'ch.acra:acra:4.6.+'
+    //compile 'com.github.anrwatchdog:anrwatchdog:1.+'
+
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.5+'
+    compile 'com.facebook.fresco:fresco:0.4.0+'
+
+    // For testing only
+    testCompile 'junit:junit:4.12'
+    testCompile "org.mockito:mockito-core:1.9.5"
+
+    // Free version
+
+    // Amazon version
+    amazonCompile fileTree(dir: 'src/amazon/libs', include: ['*.jar'])
+    amazonCompile 'com.google.android.gms:play-services-cast:7.0.+' // google cast
+
+    // Play Store
+    googleCompile 'com.google.android.gms:play-services-analytics:7.0.+' // analytics
+    googleCompile 'com.google.android.gms:play-services-cast:7.0.+' // google cast
 }

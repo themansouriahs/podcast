@@ -2,75 +2,84 @@ package org.bottiger.podcast;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
+
 
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
-import org.bottiger.soundwaves.Soundwaves;
+import org.bottiger.podcast.flavors.Analytics.AnalyticsFactory;
+import org.bottiger.podcast.flavors.Analytics.IAnalytics;
+import org.bottiger.podcast.flavors.CrashReporter.CrashReporterFactory;
+import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
 
-// Acra debugging
-/*
-@ReportsCrashes(
-	      formKey = "", // This is required for backward compatibility but not used
-	      formUri = "http://www.backendofyourchoice.com/reportpath"
-	  )
-*/
 //Acra debugging
-@ReportsCrashes(formKey = "", // This is required for backward compatibility but
+@ReportsCrashes(
         // not used
         formUri = "https://acra.bottiger.org/acra-soundwaves/_design/acra-storage/_update/report",
-        formUriBasicAuthLogin = "soundwaves", // optional
-        formUriBasicAuthPassword = "", // optional
+        formUriBasicAuthLogin = ApplicationConfiguration.formUriBasicAuthLogin, // optional
+        formUriBasicAuthPassword = ApplicationConfiguration.formUriBasicAuthPassword, // optional
         disableSSLCertValidation = true,
-        mode = ReportingInteractionMode.SILENT,
+        mode = ReportingInteractionMode.DIALOG,
         forceCloseDialogAfterToast=true,
         httpMethod = org.acra.sender.HttpSender.Method.POST,
         reportType = org.acra.sender.HttpSender.Type.JSON,
         socketTimeout = 10000)
-
 public class SoundWaves extends Application {
 
     private static Context context;
+    // Global constants
+    private Boolean mFirstRun = null;
 
-	// package name
-	public static final String packageName = "org.bottiger.soundwaves";
+    public static IAnalytics sAnalytics;
+    public static SubscriptionRefreshManager sSubscriptionRefreshManager;
 
-	// Bugsense API Key.
-	// https://www.bugsense.com/dashboard/project/
-	public final String bugSenseAPIKey = "";
-
-	// zubhium API Key.
-	public final String zubhiumAPIKey = "";
-
-	// Google API Key: https://code.google.com/apis/console/
-	// Get fingerprint like this:
-	// keytool -exportcert -alias androiddebugkey -keystore
-	// .android/debug.keystore -list -v
-	public final String googleReaderConsumerKey = "";
 
     @Override
     public void onCreate() {
         super.onCreate();
 
         // The following line triggers the initialization of ACRA
-        ACRA.init(this);
+        if (!BuildConfig.DEBUG || System.currentTimeMillis() > 0) {
+            // ACRA - crash reporter
+            CrashReporterFactory.startReporter(this);
+
+            // ANR
+            //new ANRWatchDog(10000 /*timeout*/).start();
+        }
+
+        sAnalytics = AnalyticsFactory.getAnalytics(this);
+        sAnalytics.startTracking();
 
         context = getApplicationContext();
+
+        sSubscriptionRefreshManager = new SubscriptionRefreshManager(context);
+
+        firstRun(context);
     }
 
     public static Context getAppContext() {
         return context;
     }
-	
-	public String getZubhiumAPIKey() {
-		return this.zubhiumAPIKey;
-	}
 
-	public String getBugSenseAPIKey() {
-		return this.bugSenseAPIKey;
-	}
+    private void firstRun(@NonNull Context argContext) {
+        SharedPreferences sharedPref = argContext.getSharedPreferences(ApplicationConfiguration.packageName, Context.MODE_PRIVATE);
+        String key = getString(R.string.preference_first_run_key);
+        boolean firstRun = sharedPref.getBoolean(key, true);
+        if (firstRun) {
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putBoolean(key, false);
+            editor.commit();
+        }
+        mFirstRun = firstRun;
+    }
 
-	public String getGoogleReaderConsumerKey() {
-		return this.googleReaderConsumerKey;
-	}
+    public boolean IsFirstRun() {
+        if (mFirstRun == null) {
+            throw new IllegalStateException("First run can not be null!");
+        }
+
+        return mFirstRun.booleanValue();
+    }
 }

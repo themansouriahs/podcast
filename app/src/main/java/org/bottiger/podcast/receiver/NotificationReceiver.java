@@ -1,24 +1,23 @@
 package org.bottiger.podcast.receiver;
 
-import org.bottiger.podcast.PodcastBaseFragment;
+import org.bottiger.podcast.ApplicationConfiguration;
+import org.bottiger.podcast.MainActivity;
+import org.bottiger.podcast.Player.SoundWavesPlayer;
 import org.bottiger.podcast.R;
-import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.notification.NotificationPlayer;
+import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.service.PlayerService;
 
-import android.app.NotificationManager;
-import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.widget.RemoteViews;
 
-public class NotificationReceiver extends  BroadcastReceiver {
+public class NotificationReceiver extends BroadcastReceiver {
 
-	public static final String toggleAction = SoundWaves.packageName + ".TOGGLE";
-	public static final String nextAction = SoundWaves.packageName + ".NEXT";
-	
-	private PlayerService mPlayerServiceBinder = PodcastBaseFragment.mPlayerServiceBinder;
+	public static final String toggleAction = ApplicationConfiguration.packageName + ".TOGGLE";
+	public static final String nextAction = ApplicationConfiguration.packageName + ".NEXT";
+
 	private RemoteViews layout;
 	private NotificationPlayer np;
 	
@@ -27,23 +26,43 @@ public class NotificationReceiver extends  BroadcastReceiver {
 		
 		String action = intent.getAction();
 		layout = new RemoteViews(context.getPackageName(), R.layout.notification);
+
+        PlayerService playerService = MainActivity.getPlayerService();
+
+        // FIXME we should start the service and not just return.
+        // FIXME The user probably wants to start playing when the service isn't running
+        if (playerService == null) {
+            //VendorCrashReporter.report("PlayerService", "IS NULL");
+            return;
+        }
+
+        if (action.equals(nextAction)) {
+            playerService.playNext();
+            return;
+        }
+
 		
 		if (action.equals(toggleAction)) {
+            SoundWavesPlayer player = playerService.getPlayer();
+            if (!player.isInitialized()) {
+                return;
+            }
+
 			Boolean isPlaying = false;
-			if (mPlayerServiceBinder.isPlaying()) {
-				mPlayerServiceBinder.pause();
+			if (playerService.isPlaying()) {
+				playerService.pause();
 			} else {
-				mPlayerServiceBinder.start();
+				playerService.start();
 				isPlaying = true;
 			}
-			
-			np = new NotificationPlayer(context, mPlayerServiceBinder.getCurrentItem());
-            np.setPlayerService(mPlayerServiceBinder);
-			np.show(isPlaying);
+
+            FeedItem currentItem = playerService.getCurrentItem();
+            if (currentItem != null) {
+                np = new NotificationPlayer(playerService, playerService.getCurrentItem());
+                np.setmPlayerService(playerService);
+                np.show(isPlaying);
+            }
 		}
-		
-		if (action.equals(nextAction)) {
-		} 
 		
 	}
 	

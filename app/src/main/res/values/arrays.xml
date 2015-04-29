@@ -17,8 +17,8 @@
 <resources>
     
      <string-array name="drawer_menu">
-         <item>Playlist Filters</item>
-        <item>Downloading items</item>
+        <item>Playlist Filters</item>
+        <item>Downloading Items</item>
     </string-array>
     
     <string-array name="entries_update">
@@ -160,5 +160,49 @@
         <item>20</item>  
         <item>30</item>  
 		<item>50</item>  
-    </string-array>	  	
+    </string-array>
+
+    <string-array name="pref_player_seek_entries">
+        <item>5 seconds</item>
+        <item>10 seconds</item>
+        <item>20 seconds</item>
+        <item>30 seconds</item>
+        <item>1 minute</item>
+    </string-array>
+
+    <string-array name="pref_player_seek_entries_values">
+        <item>5</item>
+        <item>10</item>
+        <item>20</item>
+        <item>30</item>
+        <item>60</item>
+    </string-array>
+
+    <string-array name="pref_subscriptions_columns_entries">
+        <item>A list</item>
+        <item>2 columns</item>
+        <item>3 columns</item>
+    </string-array>
+
+    <string-array name="pref_subscriptions_columns_entries_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="playlist_sort_order">
+        <item>Sort by: Most recent</item>
+        <item>Sort by: Oldest</item>
+    </string-array>
+
+    <string-array name="entryvalues_webservices_discovery_engine">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+    <string-array name="entries_webservices_discovery_engine">
+        <item>gPodder</item>
+        <item>iTunes</item>
+    </string-array>
+
 </resources>

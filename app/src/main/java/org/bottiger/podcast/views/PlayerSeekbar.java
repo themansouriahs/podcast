@@ -16,11 +16,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewParent;
 import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import org.bottiger.podcast.PodcastBaseFragment;
+import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.EpisodeStatus;
 import org.bottiger.podcast.listeners.PaletteListener;
@@ -81,8 +80,12 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
             long timeMs = mEpisode.getDuration() * seekBar.getProgress()
                     / RANGE_MAX;
 
-            if (mEpisode.equals(PodcastBaseFragment.mPlayerServiceBinder.getCurrentItem())) {
-                PodcastBaseFragment.mPlayerServiceBinder.seek(timeMs);
+            if (mEpisode.equals(MainActivity.sBoundPlayerService.getCurrentItem())) {
+                MainActivity.sBoundPlayerService.seek(timeMs);
+            } else {
+                mEpisode.updateOffset(MainActivity.sBoundPlayerService.getContentResolver(), timeMs);
+                PlayerStatusObservable.updateProgress(MainActivity.sBoundPlayerService, mEpisode);
+                setProgressMs(timeMs);
             }
 
             FixedRecyclerView.mSeekbarSeeking = false;
@@ -183,7 +186,6 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
 
         setMax(RANGE_MAX);
         setOnSeekBarChangeListener(onSeekBarChangeListener);
-        PlayerStatusObservable.registerListener(this);
         mStatus = PlayerStatusObservable.getStatus();
 
         // FIXME
@@ -202,10 +204,16 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
     }
 
     public void setEpisode(FeedItem argEpisode) {
-        mEpisode = argEpisode;
+        if (mEpisode != null) {
+            PlayerStatusObservable.unregisterListener(this);
+        }
 
-        if (mEpisode.offset > 0) {
-            setProgress(mEpisode.offset);
+        mEpisode = argEpisode;
+        PlayerStatusObservable.registerListener(this);
+
+        if (mEpisode.offset > 0 && mEpisode.getDuration() > 0) {
+            float progress = (float)mEpisode.offset / mEpisode.duration_ms;
+            setProgress((int)(progress*RANGE_MAX));
         }
     }
 
@@ -260,14 +268,11 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
             if (mOverlay != null) {
                 mOverlay.setLayoutParams(params);
                 mOverlay.setVisibility(VISIBLE);
-                //mOverlay.bringToFront();
             }
         } else {
             Log.d("PlayerSeekbar", "Remove seekinfo");
             if (mOverlay != null) {
                 mOverlay.setVisibility(GONE);
-                //mOverlay.setVisibility(VISIBLE);
-                //mOverlay.bringToFront();
             }
         }
     }
@@ -279,8 +284,11 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
         }
 
         if (progressMs < 0) {
-            throw new IllegalStateException("Progress must be positive");
+            Throwable ise = new IllegalStateException("Progress must be positive");
+            Log.e("PlayerSeekbar", "Progress must be positive ( " + progressMs + " )", ise);
+            return;
         }
+
         float progress = 0;
         float duration = mEpisode.getDuration();
 

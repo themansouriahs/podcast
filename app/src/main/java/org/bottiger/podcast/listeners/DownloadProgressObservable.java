@@ -6,29 +6,22 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.WeakHashMap;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.service.DownloadStatus;
-import org.bottiger.podcast.service.Downloader.IDownloadEngine;
-import org.bottiger.podcast.service.PodcastDownloadManager;
+import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
+import org.bottiger.podcast.service.Downloader.engines.IDownloadEngine;
+import org.bottiger.podcast.views.DownloadButtonView;
+import org.bottiger.podcast.views.PlayerButtonView;
 
 import android.app.DownloadManager;
 import android.content.Context;
-import android.database.ContentObservable;
-import android.database.ContentObserver;
-import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.widget.TextView;
-
-import com.google.api.client.util.DateTime;
 
 public class DownloadProgressObservable {
 
@@ -38,7 +31,7 @@ public class DownloadProgressObservable {
 	private static long REFRESH_INTERVAL = 50; // 16 ms => 60 fps
 	//TimeUnit.MILLISECONDS.convert(1,TimeUnit.SECONDS);
 
-	private static WeakHashMap<Long, List<DownloadObserver>> mObservers = new WeakHashMap<Long, List<DownloadObserver>>();
+	private static HashMap<Long, List<DownloadObserver>> mObservers = new HashMap<>();
 	private static DownloadManager mDownloadManager = null;
     private static HashMap<Long, IDownloadEngine> mPodcastDownloadManager = null;
 
@@ -47,108 +40,13 @@ public class DownloadProgressObservable {
 	 */
 	private static final int REFRESH_UI = 1;
     private static final int ADD_ID = 2;
+    private static final int DELETED = 3;
 
     public DownloadProgressObservable(Context context) {
         mDownloadManager = (DownloadManager) context
                 .getSystemService(Context.DOWNLOAD_SERVICE);
-        mPodcastDownloadManager = PodcastDownloadManager.mDownloadingEpisodes;
+        mPodcastDownloadManager = EpisodeDownloadManager.mDownloadingEpisodes;
     }
-
-	/**
-	 * Handler for updating the textviews
-	 */
-	public static final Handler sHandler = new Handler() {
-
-        private List<Long> mUpdateIDs = new LinkedList<Long>();
-        private final ReentrantLock lock = new ReentrantLock();
-
-        @Override
-		public void handleMessage(Message msg) {
-
-            // http://developer.android.com/reference/java/util/concurrent/locks/ReentrantLock.html
-            lock.lock();  // block until condition holds
-            try {
-
-                switch (msg.what) {
-                    case REFRESH_UI: {
-
-                        Log.d("Refresh UI:", "Run at: "+ (new Date().getTime()));
-
-                        Iterator<Long> iterator = mUpdateIDs.iterator();
-                        while (iterator.hasNext()) {
-                            //Long episodeId : mUpdateIDs
-                            Long episodeId = iterator.next();
-                            List<DownloadObserver> observers = mObservers.get(episodeId);
-
-                            if (observers == null) {
-                                continue;
-                            }
-
-                            if (observers.get(0) == null) {
-                                throw new IllegalStateException("huh");
-                            }
-
-                            FeedItem item = observers.get(0).getEpisode();
-
-                            if (item == null) {
-                                continue;
-                            }
-
-                            DownloadStatus status = PodcastDownloadManager.getStatus(item);
-                            IDownloadEngine download = mPodcastDownloadManager.get(item.getId());
-
-                            int progress = -1;
-
-                            switch (status) {
-                                case DOWNLOADING:
-                                    Log.d("Refresh UI:", "Downloading: "+ item.title);
-                                    if (download == null) {
-                                        progress = item.getProgress(mDownloadManager);
-                                    } else {
-                                        float progressFloat = download.getProgress();
-                                        progress = (int)(progressFloat*100);
-                                    }
-                                    break;
-                                case PENDING:
-                                    Log.d("Refresh UI:", "Pending: "+ item.title);
-                                    break;
-                                case DONE:
-                                case NOTHING:
-                                case ERROR:
-                                    Log.d("Refresh UI:", "End: "+ item.title);
-                                    progress = 100;
-                                    //mUpdateIDs.remove(episodeId);
-                                    iterator.remove();
-                                    break;
-                                default:
-                                    break;
-                            }
-
-                            if (progress >= 0) {
-                                for (DownloadObserver observer : observers) {
-                                    observer.setProgressPercent(progress);
-                                }
-                            }
-                        }
-
-                        if (!mUpdateIDs.isEmpty()) {
-                            msg = sHandler.obtainMessage(REFRESH_UI);
-                            sHandler.sendMessageDelayed(msg, REFRESH_INTERVAL);
-                        }
-                        break;
-                    }
-                    case ADD_ID: {
-                        Long episodeId = (Long) msg.obj;
-                        mUpdateIDs.add(episodeId);
-                        refreshUI();
-                        break;
-                    }
-                }
-            } finally {
-                lock.unlock();
-            }
-        }
-	};
 
     /**
 	 * Register an Observer to be updated on progress updates
@@ -210,9 +108,15 @@ public class DownloadProgressObservable {
 		return isRemoved;
 	}
 
-    public void addEpisode(long argEpisodeId) {
+    public void addEpisode(@NonNull FeedItem argEpisode) {
         Message msg = sHandler.obtainMessage(ADD_ID);
-        msg.obj = argEpisodeId;
+        msg.obj = argEpisode;
+        sHandler.sendMessage(msg);
+    }
+
+    public static void deleteEpisode(@NonNull FeedItem argEpisode) {
+        Message msg = sHandler.obtainMessage(DELETED);
+        msg.obj = argEpisode;
         sHandler.sendMessage(msg);
     }
 
@@ -225,8 +129,110 @@ public class DownloadProgressObservable {
 		sHandler.sendMessage(msg);
 	}
 
-    public static WeakHashMap<Long,List<DownloadObserver>> getObservers() {
+    public static Map<Long,List<DownloadObserver>> getObservers() {
         return mObservers;
     }
+
+    /**
+     * Handler for updating the textviews
+     */
+    public static final Handler sHandler = new DownloadProgressHandler();
+
+    private static class DownloadProgressHandler extends Handler {
+
+        private List<FeedItem> mUpdateEpisodess = new LinkedList<FeedItem>();
+        private final ReentrantLock lock = new ReentrantLock();
+
+        @Override
+        public void handleMessage(Message msg) {
+
+            // http://developer.android.com/reference/java/util/concurrent/locks/ReentrantLock.html
+            lock.lock();  // block until condition holds
+            try {
+
+                switch (msg.what) {
+                    case REFRESH_UI: {
+
+                        Log.d("Refresh UI:", "Run at: "+ (new Date().getTime()));
+
+                        Iterator<FeedItem> iterator = mUpdateEpisodess.iterator();
+                        while (iterator.hasNext()) {
+
+                            FeedItem episode = iterator.next();
+
+                            if (episode == null) {
+                                throw new NullPointerException("Episode can not be null!");
+                            }
+
+                            List<DownloadObserver> observers = mObservers.get(episode.getId());
+
+                            DownloadStatus status = EpisodeDownloadManager.getStatus(episode);
+                            IDownloadEngine download = mPodcastDownloadManager.get(episode.getId());
+
+                            int progress = -1;
+
+                            switch (status) {
+                                case DOWNLOADING:
+                                    Log.d("Refresh UI:", "Downloading: "+ episode.title);
+                                    if (download == null) {
+                                        progress = episode.getProgress(mDownloadManager);
+                                    } else {
+                                        float progressFloat = download.getProgress();
+                                        progress = (int)(progressFloat*100);
+                                    }
+                                    break;
+                                case PENDING:
+                                    Log.d("Refresh UI:", "Pending: "+ episode.title);
+                                    break;
+                                case DONE:
+                                case NOTHING:
+                                case ERROR:
+                                    Log.d("Refresh UI:", "End: "+ episode.title);
+                                    progress = 100;
+                                    //mUpdateEpisodess.remove(episodeId);
+                                    iterator.remove();
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            if (progress >= 0 && observers != null) {
+                                for (DownloadObserver observer : observers) {
+                                    observer.setProgressPercent(progress);
+                                }
+                            }
+                        }
+
+                        if (!mUpdateEpisodess.isEmpty()) {
+                            msg = sHandler.obtainMessage(REFRESH_UI);
+                            sHandler.sendMessageDelayed(msg, REFRESH_INTERVAL);
+                        }
+                        break;
+                    }
+                    case ADD_ID: {
+                        FeedItem episode = (FeedItem) msg.obj;
+                        mUpdateEpisodess.add(episode);
+                        refreshUI();
+                        break;
+                    }
+                    case DELETED: {
+                        FeedItem episode = (FeedItem) msg.obj;
+                        List<DownloadObserver> observers = mObservers.get(episode.getId());
+                        if (observers != null) {
+                            for (DownloadObserver observer : observers) {
+                                if (observer instanceof DownloadButtonView) {
+                                    DownloadButtonView dbv = (DownloadButtonView) observer;
+                                    dbv.setState(PlayerButtonView.STATE_DEFAULT);
+                                }
+                            }
+                        }
+                        break;
+                    }
+                }
+            } finally {
+                lock.unlock();
+            }
+        }
+    };
 
 }

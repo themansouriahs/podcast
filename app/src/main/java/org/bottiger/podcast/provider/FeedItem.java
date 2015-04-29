@@ -2,6 +2,8 @@ package org.bottiger.podcast.provider;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
@@ -10,12 +12,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 
-import org.acra.ACRA;
+import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.service.DownloadStatus;
-import org.bottiger.podcast.service.PodcastDownloadManager;
+import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
 import org.bottiger.podcast.utils.PodcastLog;
 import org.bottiger.podcast.utils.SDCardManager;
-import org.bottiger.podcast.utils.StrUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
@@ -30,18 +31,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.LruCache;
+import android.text.TextUtils;
+import android.text.format.DateFormat;
 import android.util.Log;
 
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
-public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
+public class FeedItem extends AbstractItem implements IEpisode, Comparable<FeedItem> {
 
 	public static final int MAX_DOWNLOAD_FAIL = 5;
 
@@ -289,7 +291,7 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 		StringBuilder queryBuilder = new StringBuilder();
 		queryBuilder.append(ItemColumns.URL + " IN (");
 		for (int i = 1; i <= urls.length; i++) {
-			queryBuilder.append("?");
+			queryBuilder.append("\"" + urls[i-1] + "\"");
 			if (i != urls.length)
 				queryBuilder.append(", ");
 		}
@@ -299,7 +301,7 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 		
 		try {
 			cursor = contentResolver.query(ItemColumns.URI,
-					ItemColumns.ALL_COLUMNS, where, urls, null);
+					ItemColumns.ALL_COLUMNS, where, null, null); //urls
 
 			int j = 0;
 			cursor.moveToPosition(-1);
@@ -635,6 +637,23 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 		return this.date;
 	}
 
+    /**
+     *   i.e "yyyy-MM-dd hh:mm:ss"
+     */
+    public String getDate(@NonNull Context argContext) {
+        java.text.DateFormat dateFormat = DateFormat.getMediumDateFormat(argContext);
+
+        long time;
+
+        try {
+            time = getDateTime().getTime();
+        } catch (NullPointerException npe) {
+            return "";
+        }
+
+        return dateFormat.format(time);
+    }
+
     private Date mDate = null;
     public static SimpleDateFormat sdf = new SimpleDateFormat(default_format, Locale.US);
     public Date getDateTime() {
@@ -765,7 +784,7 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 	 * @param downloadStatus
 	 */
 	public String getStatus(DownloadManager downloadManager) {
-		DownloadStatus downloadStatus = PodcastDownloadManager.getStatus(this);
+		DownloadStatus downloadStatus = EpisodeDownloadManager.getStatus(this);
 		String statusText = "";
 		switch (downloadStatus) {
 		case PENDING:
@@ -852,6 +871,7 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 				update(contentResolver);
 				File file = new File(getAbsolutePath());
 				if (file.exists() && file.delete()) {
+                    DownloadProgressObservable.deleteEpisode(this);
 					return true;
 				}
 			} catch (Exception e) {
@@ -915,7 +935,7 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 	public void setFilename(String filename) {
 		// Remove non ascii characters
 		//this.filename = filename.replaceAll("[^\\x00-\\x7F]", "");
-        this.filename = filename.replaceAll("[^(\\x41-\\x5A|\\x61-\\x7A|\\x2D-\\x39|\\x5F)]", ""); // only a-z A-Z 0-9 ./-_ http://www.asciitable.com/
+        this.filename = filename.replaceAll("[^(\\x41-\\x5A|\\x61-\\x7A|\\x2D|\\x2E|\\x30-\\x39|\\x5F)]", ""); // only a-z A-Z 0-9 .-_ http://www.asciitable.com/
 	}
 
 	public String getAbsolutePath() {
@@ -1033,9 +1053,12 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 	}
 
 	/**
-	 * @return the duration of the mp3 (or whatever) in milliseconds.
+     * The duration of the mp3 (or whatever) in milliseconds.
+	 * @return the duration in ms. -1 if unknown
 	 */
 	public long getDuration() {
+        return duration_ms;
+        /*
 		if (duration_ms > 0) {
 			if ("".equals(duration_string)) {
 				duration_ms = StrUtils.parseTimeToSeconds(duration_string);
@@ -1069,7 +1092,17 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 				return StrUtils.parseTimeToSeconds(duration_string);
 			}
 		}
+		*/
 	}
+
+    public void setDuration(long argDurationMs, boolean argOverride) {
+        if (!argOverride) {
+            if (duration_ms > 0)
+                return;
+        }
+
+        this.duration_ms = argDurationMs;
+    }
 
 	/**
 	 * @see java.lang.Object#hashCode()
@@ -1122,7 +1155,16 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 		}
 	}
 
-	/**
+    public Subscription getSubscription(@NonNull Context argContext) {
+        return Subscription.getById(argContext.getContentResolver(), sub_id);
+    }
+
+    public void removeFromPlaylist(@NonNull ContentResolver argContentResolver) {
+        priority = -1;
+        update(argContentResolver);
+    }
+
+    /**
 	 * Caching class for keeping items in memory
 	 */
 	private static class ItemLruCache extends LruCache<Long, FeedItem> {
@@ -1138,17 +1180,29 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
         Picasso.with(context).load(getImageURL(context)).into(argTarget);
     }
 
+    @Nullable
 	@Override
-	public String getImageURL(Context context) {
+	public String getImageURL(@NonNull Context context) {
 		String imageURL = null;
-		if (!image.equals("")) {
-			imageURL = image;
-		} else {
-			Subscription subscription = Subscription.getById(
-					context.getContentResolver(), sub_id);
-			imageURL = subscription.imageURL;
 
-		}
+        if (!TextUtils.isEmpty(image))
+            return image;
+
+
+        /*
+		Subscription subscription = Subscription.getById(
+					context.getContentResolver(), sub_id);
+					*/
+        Subscription subscription = getSubscription(context);
+
+        if (subscription == null)
+            return null;
+
+		imageURL = subscription.imageURL;
+
+        if (TextUtils.isEmpty(imageURL))
+            return null;
+
 		return imageURL;
 	}
 
@@ -1191,7 +1245,7 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 		String updateLastUpdate = ", " + ItemColumns.LAST_UPDATE + "="
 				+ currentTime + " ";
 
-		PodcastOpenHelper helper = new PodcastOpenHelper(context);
+		PodcastOpenHelper helper = PodcastOpenHelper.getInstance(context);//new PodcastOpenHelper(context);
 		SQLiteDatabase db = helper.getWritableDatabase();
 		String action = "UPDATE " + ItemColumns.TABLE_NAME + " SET ";
 		String value = ItemColumns.PRIORITY + "=" + ItemColumns.PRIORITY + "+1"
@@ -1261,6 +1315,45 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
         return title != null ? title : "";
 	}
 
+    @Override
+    public URL getUrl() {
+        try {
+            return new URL(url);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return null; // should never happen
+    }
+
+    @Override
+    public String getDescription() {
+        return content;
+    }
+
+    /**
+     * @return the title of the episode. Most feeds format the title in the feed as: 'FeedTittle: EpisodeTitle'. This method returns the episodetitle
+     */
+    public String getShortTitle() {
+        String separator = ":";
+        String longTitle = getTitle();
+        if (TextUtils.isEmpty(longTitle))
+            return longTitle;
+
+        int index = longTitle.indexOf(separator);
+
+        if (index < 0)
+            return longTitle;
+
+        String sub = longTitle.substring(index+1, longTitle.length());
+
+        String shortTitle = sub.trim();
+
+        if (TextUtils.isEmpty(shortTitle))
+            return longTitle;
+
+        return shortTitle;
+    }
+
 	/**
 	 * @param title
 	 *            the title to set
@@ -1268,8 +1361,13 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 	public void setTitle(String title) {
 		this.title = title;
 	}
-	
-	public String getAuthor() {
+
+    @Override
+    public void setUrl(@NonNull URL argUrl) {
+
+    }
+
+    public String getAuthor() {
 		return author;
 	}
 
@@ -1469,12 +1567,12 @@ public class FeedItem extends AbstractItem implements Comparable<FeedItem> {
 		return null;
 	}
 
-    private static SimpleDateFormat sFormat = new SimpleDateFormat(default_format, Locale.US);
+    private static final SimpleDateFormat sFormat = new SimpleDateFormat(default_format, Locale.US);
 	public void setPubDate(Date parseRFC822Date) {
         try {
             this.date = sFormat.format(parseRFC822Date);
         } catch (NullPointerException npe) {
-            Log.e("Date parsing error:" , "Could not parse: " + parseRFC822Date.toString());
+            //Log.e("Date parsing error:" , "Could not parse: " + parseRFC822Date.toString());
             this.date = sFormat.format(new Date());
         }
 	}

@@ -5,6 +5,8 @@ import org.bottiger.podcast.parser.syndication.handler.HandlerState;
 import org.bottiger.podcast.parser.syndication.util.SyndDateUtils;
 import org.bottiger.podcast.parser.syndication.util.SyndTypeUtils;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.provider.Subscription;
 import org.jsoup.Jsoup;
 import org.xml.sax.Attributes;
 
@@ -46,7 +48,10 @@ public class NSRSS20 extends Namespace {
 		if (localName.equals(ITEM)) {
 			state.setCurrentItem(new FeedItem());
 			state.getItems().add(state.getCurrentItem());
-			state.getCurrentItem().setFeed(state.getFeed());
+
+            if (state.getSubscription().getType() == ISubscription.TYPE.DEFAULT) {
+                state.getCurrentItem().setFeed((Subscription)state.getSubscription());
+            }
 
 		} else if (localName.equals(ENCLOSURE)) {
 			String type = attributes.getValue(ENC_TYPE);
@@ -80,7 +85,7 @@ public class NSRSS20 extends Namespace {
 				String parent = state.getTagstack().peek().getName();
 				if (parent.equals(CHANNEL)) {
 					// FIXME
-					//state.getFeed().setImage(new FeedImage());
+					//state.getSubscription().setImage(new FeedImage());
 				}
 			}
 		}
@@ -110,15 +115,15 @@ public class NSRSS20 extends Namespace {
 				if (second.equals(ITEM)) {
 					state.getCurrentItem().setTitle(content);
 				} else if (second.equals(CHANNEL)) {
-					state.getFeed().setTitle(content);
+					state.getSubscription().setTitle(content);
 				} else if (second.equals(IMAGE) && third != null && third.equals(CHANNEL)) {
 					// FIXME
-					//state.getFeed().getImage().setTitle(content);
+					//state.getSubscription().getImage().setTitle(content);
 				}
 			} else if (top.equals(LINK)) {
 				if (second.equals(CHANNEL)) {
 					// FIXME
-					state.getFeed().setLink(content);
+					// state.getSubscription().setURL(content);
 				} else if (second.equals(ITEM)) {
 					//state.getCurrentItem().setLink(content);
                     if (TextUtils.isEmpty(state.getCurrentItem().url)) {
@@ -126,21 +131,24 @@ public class NSRSS20 extends Namespace {
                     }
 				}
 			} else if (top.equals(PUBDATE) && second.equals(ITEM)) {
-				state.getCurrentItem().setPubDate(
-						SyndDateUtils.parseRFC822Date(content));
+                FeedItem item = state.getCurrentItem();
+                if (item != null) { // bug:  LearnOutLoud.com
+                    item.setPubDate(
+                            SyndDateUtils.parseRFC822Date(content));
+                }
 			} else if (top.equals(URL) && second.equals(IMAGE) && third != null && third.equals(CHANNEL)) {
 
-				if (!state.getFeed().imageURL.isEmpty()) {
-                    state.getFeed().imageURL = content;
+				if (!TextUtils.isEmpty(state.getSubscription().getImageURL())) {
+                    state.getSubscription().setImageURL(content);
                 }
 
 			} else if (top.equals(ITUNES_IMAGE)) {
 
-                state.getFeed().imageURL = content;
+                state.getSubscription().setImageURL(content);
 
             } else if (localName.equals(DESCR)) {
 				if (second.equals(CHANNEL)) {
-					state.getFeed().setDescription(content);
+					state.getSubscription().setDescription(content);
 				} else if (second.equals(ITEM)) {
 					String description = Jsoup.parse(content).text(); // FIXME make sure this is correct
 					state.getCurrentItem().setDescription(description);
@@ -148,7 +156,7 @@ public class NSRSS20 extends Namespace {
 
 			} else if (localName.equals(LANGUAGE)) {
 				// FIXME
-				//state.getFeed().setLanguage(content.toLowerCase());
+				//state.getSubscription().setLanguage(content.toLowerCase());
 			}
 		}
 	}

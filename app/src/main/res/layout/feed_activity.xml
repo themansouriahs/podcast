@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<org.bottiger.podcast.views.MultiShrink.feed.MultiShrinkScroller
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/multiscroller"
+    android:fillViewport="true"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <View
+            android:id="@+id/transparent_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp" />
+        <!-- android:layout_height="@dimen/quickcontact_starting_empty_height" -->
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/toolbar_parent">
+            <include layout="@layout/feed_activity_header" />
+
+        </RelativeLayout>
+
+        <include layout="@layout/feed_activity_content" />
+
+    </LinearLayout>
+
+    <!-- This title's maximum height must be less than the minimum size of its
+     parent ViewGroup because of an oddity in the way View#setScaleY() works. As a result,
+     this title can not be inside @style/quickcontact_header. -->
+    <include layout="@layout/feedview_title" />
+
+    <org.bottiger.podcast.views.FloatingActionButton
+        android:id="@+id/feedview_fap_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:layout_marginRight="40dp"
+        android:src="@drawable/ic_receipt_white"/>
+
+</org.bottiger.podcast.views.MultiShrink.feed.MultiShrinkScroller>
