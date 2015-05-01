@@ -25,7 +25,7 @@
     <string name="menu_settings">Settings</string>
     <string name="title_activity_swipe">SoundWaves</string>
     <string name="menu_download_all">Bulk Download</string>
-    <string name="menu_clear_playlist">Clear Playlist</string>
+    <string name="menu_clear_playlist">Reset Playlist</string>
     <string name="menu_import">Import/Export OPML</string>
     <string name="menu_add_podcast">Add Podcast</string>
     <string name="menu_order_by_date_desc">Show most recent first</string>

@@ -7,6 +7,7 @@ import org.bottiger.podcast.ApplicationConfiguration;
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.adapters.PlaylistAdapter;
 import org.bottiger.podcast.adapters.decoration.OnDragStateChangedListener;
+import org.bottiger.podcast.playlist.filters.SubscriptionFilter;
 import org.bottiger.podcast.provider.DatabaseHelper;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
@@ -28,7 +29,7 @@ import android.util.Log;
 
 import com.dragontek.mygpoclient.feeds.Feed;
 
-public class Playlist implements OnDragStateChangedListener {
+public class Playlist implements OnDragStateChangedListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
     public static final boolean SHOW_LISTENED_DEFAULT = true;
     public static final boolean PLAY_NEXT_DEFAULT     = false;
@@ -43,7 +44,10 @@ public class Playlist implements OnDragStateChangedListener {
 
 	private Context mContext;
 
-    private HashSet<Long> mSubscriptions = new HashSet<>();
+
+    private SubscriptionFilter mSubscriptionFilter;
+    //private HashSet<Long> mSubscriptions = new HashSet<>();
+
 	private static ArrayList<IEpisode> mInternalPlaylist = new ArrayList<>();
 	private SharedPreferences sharedPreferences;
 
@@ -59,7 +63,6 @@ public class Playlist implements OnDragStateChangedListener {
 
 
 	// http://stackoverflow.com/questions/1036754/difference-between-wait-and-sleep
-	private static Boolean lock = true;
 
     private static HashSet<PlaylistChangeListener> sPlaylistChangeListeners = new HashSet<PlaylistChangeListener>();
 
@@ -83,6 +86,7 @@ public class Playlist implements OnDragStateChangedListener {
             sharedPreferences = PreferenceManager
                     .getDefaultSharedPreferences(argContext);
             showListenedVal = sharedPreferences.getBoolean(showListenedKey, showListenedVal);
+            mSubscriptionFilter = new SubscriptionFilter(argContext);
         }
         this.mContext = argContext;
     }
@@ -339,26 +343,7 @@ public class Playlist implements OnDragStateChangedListener {
         //where += ItemColumns.TABLE_NAME + "." + ItemColumns.SUBS_ID + " IN (4)";
         where += " )";
 
-        // Limit the playlist to a fixed number of subscriptions
-        String where3 = "";
-
-        synchronized (mSubscriptions) {
-            if (!mSubscriptions.isEmpty()) {
-
-                where3 += " AND " + ItemColumns.SUBS_ID + " IN (";
-
-
-                for (Long id : mSubscriptions) {
-                    where3 += id + ",";
-                }
-
-                where3 = where3.substring(0, where3.length() - 1); // FIXME: ugly
-                where3 += ")";
-
-                where += where3;
-            }
-
-        }
+        where += " AND " + mSubscriptionFilter.toSQL();
 
         // skip 'removed' episodes
         where += " AND (" + ItemColumns.TABLE_NAME + "." + ItemColumns.PRIORITY + " >= 0)";
@@ -592,13 +577,15 @@ public class Playlist implements OnDragStateChangedListener {
     }
 
     public void addSubscriptionID(Long argID) {
-        if (mSubscriptions.contains(argID))
-            return;
-
-        mSubscriptions.add(argID);
+        mSubscriptionFilter.add(argID);
     }
 
     public void clearSubscriptionID() {
-        mSubscriptions.clear();
+        //mSubscriptions.clear(); // FIXME
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+
     }
 }

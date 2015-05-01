@@ -11,5 +11,6 @@
     <string name="pref_webservices_discovery_engine_key" translatable="false" >pref_webservices_discovery_engine</string>
     <string name="pref_anonymous_feedback_key" translatable="false" >pref_anonymous_feedback</string>
     <string name="pref_cloud_support_key" translatable="false" >pref_cloud_support</string>
+    <string name="pref_playlist_subscriptions_key" translatable="false" >pref_playlist_subscriptions</string>
 </resources>
 
