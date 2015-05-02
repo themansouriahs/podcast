@@ -1,11 +1,21 @@
 package org.bottiger.podcast.views;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.util.AttributeSet;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.LinearLayout;
+import android.widget.RadioGroup;
+import android.widget.TextView;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.playlist.Playlist;
+import org.bottiger.podcast.playlist.filters.SubscriptionFilter;
 import org.bottiger.podcast.provider.Subscription;
 
 import java.util.LinkedList;
@@ -18,12 +28,53 @@ public class PlaylistContentSpinner extends MultiSpinner {
 
     private Context mContext;
 
+    private Playlist mPlaylist;
+    private SubscriptionFilter mSubscriptionFilter;
+
     private ArrayAdapter<String> mAdapter;
     private List<Subscription> mSubscriptions;
+    private List<CheckBox> mCheckboxes = new LinkedList<>();
+
+    private RadioGroup mRadioGroup;
 
     private String mSpinnerPrefix;
     private String mShownAll;
     private String mShownSome;
+
+    private static boolean modifyingState = false;
+    private CompoundButton.OnCheckedChangeListener onCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            if (modifyingState)
+                return;
+
+            modifyingState = true;
+            setRadioButtonState();
+            modifyingState = false;
+        }
+    };
+    private RadioGroup.OnCheckedChangeListener RadioOnCheckedChangeListener = new RadioGroup.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(RadioGroup group, int checkedId) {
+            if (modifyingState)
+                return;
+
+            modifyingState = true;
+            switch (checkedId) {
+                case R.id.radioNone:
+                    checkNone();
+                    break;
+                case R.id.radioAll:
+                    checkAll();
+                    break;
+                case R.id.radioCustom:
+                    checkCustom();
+                    break;
+            }
+
+            modifyingState = false;
+        }
+    };
 
     public PlaylistContentSpinner(Context context) {
         super(context);
@@ -48,85 +99,153 @@ public class PlaylistContentSpinner extends MultiSpinner {
         mShownSome = mContext.getResources().getString(R.string.playlist_filter_some);
     }
 
+    /**
+     * The Opening the Dialog
+     * @return
+     */
     @Override
-    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+    public boolean performClick() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
-        if (which == 0) {
-            for (int i = 0; i < selected.length; i++) {
-                selected[i] = false;
-                boolean checked = i == 0 ? isChecked : false;
-                mAlertDialog.getListView().setItemChecked(i, checked);
-            }
-            selected[0] = isChecked;
-            return;
-        } else if (isChecked) {
-            selected[0] = false;
-            mAlertDialog.getListView().setItemChecked(0, false);
+        // Get the layout inflater
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+
+        View view = inflater.inflate(R.layout.filter_subscriptions, null);
+        LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.filter_subscription_checkboxes);
+
+        mRadioGroup = (RadioGroup) view.findViewById(R.id.subscription_selection_type);
+        mRadioGroup.setOnCheckedChangeListener(RadioOnCheckedChangeListener);
+
+        mCheckboxes.clear();
+        for (Subscription subscription : mSubscriptions) {
+            View itemView = inflater.inflate(R.layout.filter_subscriptions_item, null);
+            TextView tv = (TextView) itemView.findViewById(R.id.item_text);
+            final CheckBox checkBox = (CheckBox) itemView.findViewById(R.id.item_checkbox);
+            tv.setText(subscription.getTitle());
+
+            if (mSubscriptionFilter.isShown(subscription.getId()))
+                checkBox.setChecked(true);
+
+            checkBox.setOnCheckedChangeListener(onCheckedChangeListener);
+            itemView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    checkBox.setChecked(!checkBox.isChecked());
+                }
+            });
+
+            linearLayout.addView(itemView);
+
+            mCheckboxes.add(checkBox);
         }
 
-        if (isChecked)
-            selected[which] = true;
-        else
-            selected[which] = false;
+        setRadioButtonState();
+
+        // Inflate and set the layout for the dialog
+        // Pass null as the parent view because its going in the dialog layout
+        builder.setView(view);
+
+        // Add action buttons
+        builder.setPositiveButton(android.R.string.ok,
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (mRadioGroup.getCheckedRadioButtonId()) {
+                            case R.id.radioNone:
+                                mSubscriptionFilter.setMode(SubscriptionFilter.MODE.SHOW_NONE, getContext());
+                                break;
+                            case R.id.radioAll:
+                                mSubscriptionFilter.setMode(SubscriptionFilter.MODE.SHOW_ALL, getContext());
+                                break;
+                            case R.id.radioCustom: {
+                                mSubscriptionFilter.clear();
+                                for (int i = 0; i < mCheckboxes.size(); i++) {
+                                    CheckBox checkbox = mCheckboxes.get(i);
+                                    if (checkbox.isChecked()) {
+                                        Subscription subscription = mSubscriptions.get(i);
+                                        mSubscriptionFilter.add(subscription.getId());
+                                    }
+                                }
+                                mSubscriptionFilter.setMode(SubscriptionFilter.MODE.SHOW_SELECTED, getContext());
+                                break;
+                            }
+                        }
+
+                        mPlaylist.notifyPlaylistChanged();
+                        dialog.cancel();
+                    }
+                });
+
+        builder.setNegativeButton(android.R.string.cancel,
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+        builder.setOnCancelListener(this);
+
+        mAlertDialog = builder.show();
+        return true;
+    }
+
+    @Override
+    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
     }
 
     @Override
     public void onCancel(DialogInterface dialog) {
-        // refresh text on spinner
-
-        String spinnerText = "";
-
-        if (selected[0]) {
-            spinnerText = mSpinnerPrefix + " " + mShownAll;
-        } else {
-            spinnerText = mSpinnerPrefix + " " + mShownSome;
-        }
-
-        mAdapter = new ArrayAdapter<String>(getContext(),
-                android.R.layout.simple_spinner_item,
-                new String[]{spinnerText});
-        setAdapter(mAdapter);
-
-        if (selected[0]) {
-            listener.onItemsSelected(new Long[0]);
-        }
-
-        LinkedList<Long> ids = new LinkedList<>();
-        for (int i = 1; i < selected.length; i++) {
-            Subscription sub = mSubscriptions.get(i-1);
-
-            if (selected[i])
-                ids.add(sub.getId());
-
-        }
-        listener.onItemsSelected(ids.toArray(new Long[ids.size()]));
     }
 
-    public void setSubscriptions(List<Subscription> items, String allText,
-                         MultiSpinnerListener listener) {
-        List<String> mStrings = new LinkedList<>();
+    public void setSubscriptions(Playlist argPlaylist, List<Subscription> items) {
+        mPlaylist = argPlaylist;
+        mSubscriptionFilter = argPlaylist.getSubscriptionFilter();
+        mSubscriptions = items;
+    }
 
-        mStrings.add(mShownAll);
-        for (Subscription sub : items) {
-            mStrings.add(sub.getTitle());
+    private void checkAll() {
+        for (CheckBox checkBox : mCheckboxes) {
+            checkBox.setChecked(true);
+        }
+    }
+
+    private void checkNone() {
+        for (CheckBox checkBox : mCheckboxes) {
+            checkBox.setChecked(false);
+        }
+    }
+
+    private void checkCustom() {
+
+    }
+
+    private void setRadioButtonState() {
+        boolean anyChecked = false;
+        boolean anyUnchecked = false;
+        for (CheckBox checkBox : mCheckboxes) {
+            if (checkBox.isChecked()) {
+                anyChecked = true;
+            } else {
+                anyUnchecked = true;
+            }
         }
 
-        int offset = 1;
+        if (anyChecked && anyUnchecked) {
+            mRadioGroup.check(R.id.radioCustom);
+            return;
+        }
 
-        this.mSubscriptions = items;
-        this.items = mStrings;
-        this.defaultText = allText;
-        this.listener = listener;
+        if (anyChecked) {
+            mRadioGroup.check(R.id.radioAll);
+            return;
+        }
 
-        // all selected by default
-        selected = new boolean[items.size()+offset];
-        selected[0] = true;
-        for (int i = 0+offset; i < selected.length; i++)
-            selected[i] = false;
-
-        // all text on the spinner
-        mAdapter = new ArrayAdapter<String>(getContext(),
-                android.R.layout.simple_spinner_item, new String[]{mSpinnerPrefix + " " + mShownAll});
-        setAdapter(mAdapter);
+        if (anyUnchecked) {
+            mRadioGroup.check(R.id.radioNone);
+            return;
+        }
     }
 }

@@ -60,8 +60,8 @@
     <string name="preferences_category_about">About</string>
     <string name="pref_current_version_title">Version</string>
     <string name="ok">OK</string>
-    <string name="playlist_filter_all">All episodes</string>
-    <string name="playlist_filter_some">Selected episodes</string>
+    <string name="playlist_filter_all">All subscriptions</string>
+    <string name="playlist_filter_some">Custom selection</string>
     <string name="playlist_filter_prefix">Show:</string>
     <string name="preference_first_run_key">firstrun</string>
     <string name="menu_feedback">Feedback</string>
@@ -127,6 +127,8 @@
     <string name="pref_webservices_discovery_title">Search Engine</string>
     <string name="pref_webservices_discovery_description">Web services used for searching for podcasts</string>
     <string name="subscription_instruction_title">Thank you for trying out SoundWaves</string>
+    <string name="playlist_filter_introducion">Automatically populate the playlist with recent episodes from</string>
+    <string name="playlist_filter_none">Do not populate</string>
 
     <plurals name="bulk_download_playlist">
         <item quantity="one">First episode in the playlist</item>

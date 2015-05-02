@@ -580,6 +580,10 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
         mSubscriptionFilter.add(argID);
     }
 
+    public SubscriptionFilter getSubscriptionFilter() {
+        return mSubscriptionFilter;
+    }
+
     public void clearSubscriptionID() {
         //mSubscriptions.clear(); // FIXME
     }

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/filter_subscription_introduction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/playlist_filter_introducion"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
+
+    <RadioGroup
+        android:id="@+id/subscription_selection_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checkedButton="@+id/radioNone"
+        android:layout_margin="10dp"
+        android:layout_below="@id/filter_subscription_introduction">
+
+    <RadioButton
+        android:id="@+id/radioNone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/playlist_filter_none" />
+
+    <RadioButton
+        android:id="@+id/radioAll"
+        android:layout_below="@id/radioNone"
+        android:layout_alignLeft="@id/radioNone"
+        android:layout_alignStart="@id/radioNone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/playlist_filter_all" />
+
+    <RadioButton
+        android:id="@+id/radioCustom"
+        android:layout_below="@id/radioAll"
+        android:layout_alignLeft="@id/radioNone"
+        android:layout_alignStart="@id/radioNone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/playlist_filter_some" />
+
+    </RadioGroup>
+
+    <View
+        android:id="@+id/filter_subscription_line"
+        android:layout_below="@id/subscription_selection_type"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_margin="5dp"
+        android:background="@color/grayStart"/>
+
+    <LinearLayout
+        android:id="@+id/filter_subscription_checkboxes"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/filter_subscription_line"
+        android:layout_alignLeft="@+id/subscription_selection_type"
+        android:layout_alignStart="@+id/subscription_selection_type">
+
+    </LinearLayout>
+</RelativeLayout>

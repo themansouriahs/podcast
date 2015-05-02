@@ -17,7 +17,9 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Created by apl on 29-04-2015.
  */
-public class SubscriptionFilter implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class SubscriptionFilter implements IPlaylistFilter, SharedPreferences.OnSharedPreferenceChangeListener {
+
+    public enum MODE {SHOW_ALL, SHOW_NONE, SHOW_SELECTED};
 
     private final String SELECTED_SUBSCRIPTIONS_KEY;
     private static final String SEPARATOR = ",";
@@ -62,6 +64,55 @@ public class SubscriptionFilter implements SharedPreferences.OnSharedPreferenceC
         } finally {
             mLock.unlock();
         }
+    }
+
+    public boolean isShown(Long argID) {
+        try {
+            mLock.lock();
+
+            if (mFilterType == DisplayFilter.ALL)
+                return true;
+
+            if (mFilterType == DisplayFilter.MANUAL)
+                return false;
+
+            return mSubscriptions.contains(argID);
+        } finally {
+            mLock.unlock();
+        }
+    }
+
+    public MODE getMode() {
+        if (mFilterType == DisplayFilter.ALL) {
+            return MODE.SHOW_ALL;
+        }
+
+        if (mFilterType == DisplayFilter.MANUAL) {
+            return MODE.SHOW_NONE;
+        }
+
+        if (mFilterType == DisplayFilter.SELECTED) {
+            return MODE.SHOW_SELECTED;
+        }
+        return MODE.SHOW_NONE;
+    }
+
+    public void setMode(MODE argMode, Context argContext) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(argContext);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        if (argMode == MODE.SHOW_ALL) {
+            mFilterType = DisplayFilter.ALL;
+            editor.putString(SELECTED_SUBSCRIPTIONS_KEY, Long.toString(mFilterType));
+        } else if (argMode == MODE.SHOW_NONE) {
+            mFilterType = DisplayFilter.MANUAL;
+            editor.putString(SELECTED_SUBSCRIPTIONS_KEY, Long.toString(mFilterType));
+        } else if (argMode == MODE.SHOW_SELECTED) {
+            mFilterType = DisplayFilter.SELECTED;
+            editor.putString(SELECTED_SUBSCRIPTIONS_KEY, toPreferenceValue(mSubscriptions));
+        }
+
+        editor.commit();
     }
 
     public String toSQL() {

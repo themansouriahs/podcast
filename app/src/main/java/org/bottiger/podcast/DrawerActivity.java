@@ -161,6 +161,7 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity {
         }
 
         final Playlist playlist = PlayerService.getPlaylist();
+        playlist.setContext(this);
 
         mPlaylistContentSpinner = (PlaylistContentSpinner) findViewById(R.id.drawer_playlist_source);
         mPlaylistOrderSpinner = (Spinner) findViewById(R.id.drawer_playlist_sort_order);
@@ -172,8 +173,7 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity {
         for (Subscription s : list) {
             slist.add(s.getTitle());
         }
-        MultiSpinnerListener multiSpinnerListener = new MultiSpinnerListener(playlist);
-        mPlaylistContentSpinner.setSubscriptions(list, "Hey there", multiSpinnerListener);
+        mPlaylistContentSpinner.setSubscriptions(playlist, list);
 
         parentItems = new ArrayList<String>(Arrays.asList(mListItems));
 		// setGroupParents();
