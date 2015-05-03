@@ -129,6 +129,13 @@
     <string name="subscription_instruction_title">Thank you for trying out SoundWaves</string>
     <string name="playlist_filter_introducion">Automatically populate the playlist with recent episodes from</string>
     <string name="playlist_filter_none">Do not populate</string>
+    <string name="playlist_empty_title">Select playlist mode</string>
+    <string name="playlist_empty_text_top">Take a moment to think about how you want to use the app</string>
+    <string name="playlist_empty_text_bottom">You can always change how the playlist works swiping the menu from the left</string>
+    <string name="playlist_empty_mode_one">Queue episodes manually</string>
+    <string name="playlist_empty_mode_two">Recent episodes</string>
+    <string name="playlist_empty_mode_one_desc">The playlist will only contain episodes you have queued manually</string>
+    <string name="playlist_empty_mode_two_desc">The playlist will populate itself and always contain the most recent episodes. You can still queue selected episode manually</string>
 
     <plurals name="bulk_download_playlist">
         <item quantity="one">First episode in the playlist</item>
