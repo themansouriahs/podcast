@@ -11,6 +11,7 @@ public interface IAnalytics {
                              PAUSE,
                              PLAY_FROM_PLAYLIST,
                              PLAY_FROM_FEEDVIEW,
+                             PLAY_FROM_DISCOVERY,
                              SUBSCRIBE_TO_FEED,
                              OPML_IMPORT,
                              OPML_EXPORT,

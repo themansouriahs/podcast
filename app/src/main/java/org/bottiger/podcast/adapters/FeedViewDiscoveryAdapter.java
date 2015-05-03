@@ -11,6 +11,7 @@ import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.SlimImplementations.SlimEpisode;
 import org.bottiger.podcast.utils.PaletteHelper;
+import org.bottiger.podcast.views.PlayPauseImageView;
 
 import java.util.ArrayList;
 
@@ -50,6 +51,7 @@ public class FeedViewDiscoveryAdapter extends FeedViewAdapter {
     @Override
     protected void bindButtons(@NonNull EpisodeViewHolder episodeViewHolder, @NonNull IEpisode argEpisode) {
 
+        episodeViewHolder.mPlayPauseButton.setEpisode(argEpisode, PlayPauseImageView.LOCATION.DISCOVERY_FEEDVIEW);
         episodeViewHolder.mDownloadButton.setVisibility(View.GONE);
 
         getPalette(episodeViewHolder);

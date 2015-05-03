@@ -40,7 +40,7 @@ public class SlimEpisode implements IEpisode, Parcelable {
 
     @Override
     public URL getUrl() {
-        return null;
+        return mUrl;
     }
 
     @Override
@@ -54,7 +54,7 @@ public class SlimEpisode implements IEpisode, Parcelable {
 
     @Override
     public String getDescription() {
-        return null;
+        return mDescription;
     }
 
     @Override

@@ -45,7 +45,7 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
     private static final boolean DRAW_PROGRESS          = true;
     private static final boolean DRAW_PROGRESS_MARKER   = true;
 
-    public enum LOCATION { PLAYLIST, FEEDVIEW, OTHER };
+    public enum LOCATION { PLAYLIST, FEEDVIEW, DISCOVERY_FEEDVIEW, OTHER };
     private LOCATION mLocation = LOCATION.OTHER;
 
     private static final int START_ANGLE = -90;
@@ -290,6 +290,10 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
         }
 
         if (mLocation == LOCATION.FEEDVIEW) {
+            return IAnalytics.EVENT_TYPE.PLAY_FROM_FEEDVIEW;
+        }
+
+        if (mLocation == LOCATION.DISCOVERY_FEEDVIEW) {
             return IAnalytics.EVENT_TYPE.PLAY_FROM_FEEDVIEW;
         }
 
