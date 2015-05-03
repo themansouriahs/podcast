@@ -1194,16 +1194,11 @@ public class FeedItem extends AbstractItem implements IEpisode, Comparable<FeedI
     @Nullable
 	@Override
 	public String getArtwork(@NonNull Context context) {
-		String imageURL = null;
+		String imageURL;
 
         if (!TextUtils.isEmpty(image))
             return image;
 
-
-        /*
-		Subscription subscription = Subscription.getById(
-					context.getContentResolver(), sub_id);
-					*/
         Subscription subscription = getSubscription(context);
 
         if (subscription == null)

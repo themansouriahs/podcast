@@ -139,7 +139,7 @@ public class LegacyRemoteController {
         editor.putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, episode.getAuthor());
         editor.putString(MediaMetadataRetriever.METADATA_KEY_TITLE, episode.getTitle());
 
-        if (mCurrentAlbumArt != null) {
+        if (mCurrentAlbumArt != null && !mCurrentAlbumArt.isRecycled()) {
             editor.putBitmap(android.media.RemoteController.MetadataEditor.BITMAP_KEY_ARTWORK, mCurrentAlbumArt);
         }
 

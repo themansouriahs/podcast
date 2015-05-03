@@ -24,7 +24,7 @@ import org.bottiger.podcast.R;
 /**
  * Created by apl on 31-07-2014.
  */
-public class SwipeRefreshExpandableLayout extends FeedRefreshLayout implements Target {
+public class SwipeRefreshExpandableLayout extends FeedRefreshLayout {
 
     private Context mContext;
     private GestureDetector mDetector;
@@ -36,13 +36,6 @@ public class SwipeRefreshExpandableLayout extends FeedRefreshLayout implements T
     public PlaylistFragment fragment = null;
 
     public boolean mDownGeastureInProgress = false;
-    private boolean mCanScrollRecyclerView = false;
-
-    private boolean mRequestDisallowInterceptTouchEvent = false;
-
-    private ScrollState mCurrentScrollState = ScrollState.FULL_PLAYER;
-
-    public static enum ScrollState { FULL_PLAYER, PARTIAL_PLAYER, MINIMAIL_PLAYER, MINIMAIL_PLAYER_AND_SCROLLED_LIST }
 
     public SwipeRefreshExpandableLayout(Context context) {
         super(context);
@@ -65,37 +58,12 @@ public class SwipeRefreshExpandableLayout extends FeedRefreshLayout implements T
         mTopPlayer = (TopPlayer) findViewById(R.id.session_photo_container);
     }
 
-    public ScrollState getCurrentScrollState() {
-        return mCurrentScrollState;
-    }
-
-    public void setCurrentScrollState(ScrollState argScrollState) {
-        mCurrentScrollState = argScrollState;
-    }
-
-    public void setGestureListener(GestureDetector.OnGestureListener listener) {
-        mDetector = new GestureDetector(mContext, listener);
-    }
-
-    public OverScroller getOverScroller() {
-        return mScroller;
-    }
 
     public View mTarget;
 
 
-    //@Override
     public boolean canChildScrollUp() {
         return true;
-    }
-
-    private void delegateToTopPlayer(MotionEvent event) {
-        if (mRecycerView != null) { // && (mRecycerView.scrolledToTop() || (mCurrentScrollState != ScrollState.MINIMAIL_PLAYER_AND_SCROLLED_LIST))) {
-            if (!FixedRecyclerView.mSeekbarSeeking) {
-                Log.d("Delegate touch event", "event -> " + event.toString());
-                mDetector.onTouchEvent(event);
-            }
-        }
     }
 
     private int lastScrollPos = 0;
@@ -109,14 +77,6 @@ public class SwipeRefreshExpandableLayout extends FeedRefreshLayout implements T
             int diff = lastScrollPos-currentScrollPos;
             Log.d("GeatureDetector", "current fling pos => " + currentScrollPos + " last fling pos =>" + lastScrollPos + " diff => " + diff);
 
-            if (mCurrentScrollState == ScrollState.MINIMAIL_PLAYER) {
-                Log.d("ScrollType", "RecyclerView, dy =>" + diff);
-                //mRecycerView.scrollBy(0,diff);
-                mCurrentScrollState = ScrollState.MINIMAIL_PLAYER_AND_SCROLLED_LIST;
-            } else {
-                Log.d("ScrollType", "TopPlayer, dy => " + diff);
-                //fragment.scrollLayout(diff);
-            }
             lastScrollPos = currentScrollPos;
         }
     }
@@ -145,53 +105,6 @@ public class SwipeRefreshExpandableLayout extends FeedRefreshLayout implements T
         Log.d("SwipeRefreshExpandable", "return: " + TouchFromSuper);
         //return TouchFromSuper;
         return true;
-    }
-    @Override
-    public void requestDisallowInterceptTouchEvent(boolean argDisallow) {
-        mRequestDisallowInterceptTouchEvent = argDisallow;
-        super.requestDisallowInterceptTouchEvent(argDisallow);
-    }
-
-    /*
-    public boolean onInterceptTouchEvent(MotionEvent event) {
-
-        //delegateToTopPlayer(event);
-
-        switch (event.getAction())
-        {
-            case MotionEvent.ACTION_MOVE:
-                mDownGeastureInProgress = true;
-                //return true;
-                break;
-        }
-
-        Log.d("SwipeRefreshExpandable", "intercept =>" + mDownGeastureInProgress);
-        //return mDownGeastureInProgress;
-        return false;
-    }*/
-
-    public boolean getCanScrollRecyclerView() {
-        return mCanScrollRecyclerView;
-    }
-
-    public void setCanScrollRecyclerView(boolean mCanScrollRecyclerView) {
-        this.mCanScrollRecyclerView = mCanScrollRecyclerView;
-    }
-
-    @Override
-    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-        //setBackgroundDrawable(new BitmapDrawable(bitmap));
-        BitmapDrawable ob = new BitmapDrawable(getResources(),bitmap);
-        setBackground(ob);
-    }
-
-    @Override
-    public void onBitmapFailed(Drawable errorDrawable) {
-
-    }
-
-    @Override
-    public void onPrepareLoad(Drawable placeHolderDrawable) {
     }
 
 }
