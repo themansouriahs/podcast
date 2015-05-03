@@ -32,7 +32,7 @@ public class PlaylistContentSpinner extends MultiSpinner {
     private SubscriptionFilter mSubscriptionFilter;
 
     private ArrayAdapter<String> mAdapter;
-    private List<Subscription> mSubscriptions;
+    private List<Subscription> mSubscriptions = new LinkedList<>();
     private List<CheckBox> mCheckboxes = new LinkedList<>();
 
     private RadioGroup mRadioGroup;
@@ -105,6 +105,13 @@ public class PlaylistContentSpinner extends MultiSpinner {
      */
     @Override
     public boolean performClick() {
+        mSubscriptions.clear();
+        List<Subscription> list = Subscription.allAsList(mContext.getContentResolver());
+        for (Subscription s : list) {
+            if (s.getStatus() == Subscription.STATUS_SUBSCRIBED)
+                mSubscriptions.add(s);
+        }
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
         // Get the layout inflater
@@ -200,10 +207,9 @@ public class PlaylistContentSpinner extends MultiSpinner {
     public void onCancel(DialogInterface dialog) {
     }
 
-    public void setSubscriptions(Playlist argPlaylist, List<Subscription> items) {
+    public void setSubscriptions(Playlist argPlaylist) {
         mPlaylist = argPlaylist;
         mSubscriptionFilter = argPlaylist.getSubscriptionFilter();
-        mSubscriptions = items;
     }
 
     private void checkAll() {

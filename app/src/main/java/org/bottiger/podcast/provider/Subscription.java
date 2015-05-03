@@ -34,20 +34,13 @@ import javax.annotation.Nullable;
 
 public class Subscription extends AbstractItem implements ISubscription, PaletteListener {
 
-	public static final String TYPE_RSS2 = "rss";
-	public static final String TYPE_RSS091 = "rss";
-	public static final String TYPE_ATOM1 = "atom";
-
 	private final PodcastLog log = PodcastLog.getLog(getClass());
 
 	public final static int ADD_SUCCESS = 0;
-	public final static int ADD_FAIL_DUP = -1;
 	public final static int ADD_FAIL_UNSUCCESS = -2;
 
 	public final static int STATUS_SUBSCRIBED = 1;
 	public final static int STATUS_UNSUBSCRIBED = 2;
-
-	public final static String UNSUBSCRIBED = "unsubscribed";
 
 	private static SubscriptionLruCache cache = null;
 
@@ -84,48 +77,24 @@ public class Subscription extends AbstractItem implements ISubscription, Palette
 		act.startActivity(new Intent(Intent.ACTION_VIEW, uri));
 	}
 
-	public static void viewEpisodes(Activity act, long channel_id) {
-		Uri uri = ContentUris.withAppendedId(SubscriptionColumns.URI,
-				channel_id);
-		act.startActivity(new Intent(Intent.ACTION_EDIT, uri));
-	}
-
 	public static Cursor allAsCursor(ContentResolver context) {
 		return context.query(SubscriptionColumns.URI,
 				SubscriptionColumns.ALL_COLUMNS, null, null, null);
 	}
 
 	public static LinkedList<Subscription> allAsList(ContentResolver context) {
-		LinkedList<Subscription> subscriptions = new LinkedList<Subscription>();
-        Cursor cursor = null;
-        try {
-            cursor = allAsCursor(context);
-
-            while (cursor.moveToNext()) {
-                subscriptions.add(Subscription.getByCursor(cursor));
-            }
-        } finally {
-            cursor.close();
-        }
-		return subscriptions;
-	}
-
-	public static Subscription getBySQL(ContentResolver context, String where,
-			String order) {
-		Subscription sub = null;
+		LinkedList<Subscription> subscriptions = new LinkedList<>();
 		Cursor cursor = null;
-
 		try {
-			cursor = context.query(SubscriptionColumns.URI,
-					SubscriptionColumns.ALL_COLUMNS, where, null, order);
-			if (cursor.moveToFirst()) {
-				sub = Subscription.getByCursor(cursor);
+			cursor = allAsCursor(context);
+
+			while (cursor.moveToNext()) {
+				subscriptions.add(Subscription.getByCursor(cursor));
 			}
 		} finally {
-			if (cursor != null)
-				cursor.close();
+			cursor.close();
 		}
-		return sub;
+		return subscriptions;
 	}
 
 	public static Subscription getByUrl(ContentResolver contentResolver,
@@ -160,32 +129,6 @@ public class Subscription extends AbstractItem implements ISubscription, Palette
 		sub = fetchFromCursor(sub, cursor);
 		return sub;
 	}
-
-    public static Subscription getFirst(ContentResolver context) {
-
-        Cursor cursor = null;
-        Subscription sub = null;
-
-        initCache();
-
-        try {
-            cursor = context.query(SubscriptionColumns.URI,
-                    SubscriptionColumns.ALL_COLUMNS, "1", null, null);
-            if (cursor.moveToFirst()) {
-                sub = new Subscription();
-                sub = fetchFromCursor(sub, cursor);
-                cursor.close();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-
-        } finally {
-            if (cursor != null)
-                cursor.close();
-        }
-
-        return sub;
-    }
 
 	public static Subscription getById(ContentResolver context, long id) {
 		Cursor cursor = null;

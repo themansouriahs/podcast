@@ -168,12 +168,7 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity {
         mPlaylistShowListened = (Switch) findViewById(R.id.slidebar_show_listened);
         mAutoPlayNext = (Switch) findViewById(R.id.slidebar_show_continues);
 
-        List<Subscription> list = Subscription.allAsList(getContentResolver());
-        LinkedList<String> slist = new LinkedList<>();
-        for (Subscription s : list) {
-            slist.add(s.getTitle());
-        }
-        mPlaylistContentSpinner.setSubscriptions(playlist, list);
+        mPlaylistContentSpinner.setSubscriptions(playlist);
 
         parentItems = new ArrayList<String>(Arrays.asList(mListItems));
 		// setGroupParents();
