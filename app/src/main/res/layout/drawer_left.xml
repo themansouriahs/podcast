@@ -53,6 +53,13 @@
         android:paddingTop="5dip"
         android:paddingBottom="5dip">
 
+        <include
+            layout="@layout/drawer_item"
+            android:id="@+id/playlist_content"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_span="2" />
+        <!--
     <org.bottiger.podcast.views.PlaylistContentSpinner
         android:id="@+id/drawer_playlist_source"
         android:layout_width="match_parent"
@@ -61,6 +68,9 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:spinnerMode="dialog"
         android:layout_span="2"/>
+        -->
+
+
         <!--
 
         android:padding="20dp"

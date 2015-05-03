@@ -24,9 +24,10 @@ import java.util.List;
 /**
  * Created by apl on 19-02-2015.
  */
-public class PlaylistContentSpinner extends MultiSpinner {
+public class PlaylistContentSpinner  implements DialogInterface.OnMultiChoiceClickListener, DialogInterface.OnCancelListener {
 
     private Context mContext;
+    private AlertDialog mAlertDialog;
 
     private Playlist mPlaylist;
     private SubscriptionFilter mSubscriptionFilter;
@@ -77,18 +78,7 @@ public class PlaylistContentSpinner extends MultiSpinner {
     };
 
     public PlaylistContentSpinner(Context context) {
-        super(context);
         init(context);
-    }
-
-    public PlaylistContentSpinner(Context arg0, AttributeSet arg1) {
-        super(arg0, arg1);
-        init(arg0);
-    }
-
-    public PlaylistContentSpinner(Context arg0, AttributeSet arg1, int arg2) {
-        super(arg0, arg1, arg2);
-        init(arg0);
     }
 
     private void init(Context argContext) {
@@ -103,7 +93,6 @@ public class PlaylistContentSpinner extends MultiSpinner {
      * The Opening the Dialog
      * @return
      */
-    @Override
     public boolean performClick() {
         mSubscriptions.clear();
         List<Subscription> list = Subscription.allAsList(mContext.getContentResolver());
@@ -134,7 +123,7 @@ public class PlaylistContentSpinner extends MultiSpinner {
                 checkBox.setChecked(true);
 
             checkBox.setOnCheckedChangeListener(onCheckedChangeListener);
-            itemView.setOnClickListener(new OnClickListener() {
+            itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     checkBox.setChecked(!checkBox.isChecked());
@@ -253,5 +242,9 @@ public class PlaylistContentSpinner extends MultiSpinner {
             mRadioGroup.check(R.id.radioNone);
             return;
         }
+    }
+
+    private Context getContext() {
+        return mContext;
     }
 }

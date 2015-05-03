@@ -21,5 +21,6 @@
         android:layout_gravity="start|center_vertical"
         android:gravity="start|center_vertical"
         android:textSize="14sp"
-        android:text="Lorem Ipsum" />
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/drawer_text"/>
 </LinearLayout>

@@ -2,12 +2,9 @@ package org.bottiger.podcast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.bottiger.podcast.adapters.PlaylistContentSpinnerAdapter;
 import org.bottiger.podcast.playlist.Playlist;
-import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.navdrawer.NavigationDrawerMenuGenerator;
 import org.bottiger.podcast.views.MultiSpinner;
@@ -17,13 +14,13 @@ import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.TypeEvaluator;
 import android.app.Fragment;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -45,6 +42,7 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TableLayout;
+import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
 
@@ -94,11 +92,13 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity {
     protected Switch mPlaylistShowListened;
     protected Switch mAutoPlayNext;
     protected Spinner mPlaylistOrderSpinner;
-    protected PlaylistContentSpinner mPlaylistContentSpinner;
+    protected LinearLayout mPlaylistContentLayout;
     protected PlaylistContentSpinnerAdapter mPlaylistContentSpinnerAdapter;
 
 	protected ActionBarDrawerToggle mDrawerToggle;
 	protected String[] mListItems;
+
+    protected PlaylistContentSpinner mPlaylistContentSpinner;
 
 	private CharSequence mDrawerTitle;
 	private CharSequence mTitle;
@@ -163,12 +163,12 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity {
         final Playlist playlist = PlayerService.getPlaylist();
         playlist.setContext(this);
 
-        mPlaylistContentSpinner = (PlaylistContentSpinner) findViewById(R.id.drawer_playlist_source);
+        mPlaylistContentLayout = (LinearLayout) findViewById(R.id.playlist_content);
         mPlaylistOrderSpinner = (Spinner) findViewById(R.id.drawer_playlist_sort_order);
         mPlaylistShowListened = (Switch) findViewById(R.id.slidebar_show_listened);
         mAutoPlayNext = (Switch) findViewById(R.id.slidebar_show_continues);
 
-        mPlaylistContentSpinner.setSubscriptions(playlist);
+        bindPlaylistFilter(mPlaylistContentLayout, playlist);
 
         parentItems = new ArrayList<String>(Arrays.asList(mListItems));
 		// setGroupParents();
@@ -560,6 +560,24 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity {
         if (doPlayNext != mAutoPlayNext.isChecked()) {
             mAutoPlayNext.setChecked(doPlayNext);
         }
+    }
+
+    private void bindPlaylistFilter(@NonNull LinearLayout argView, @NonNull Playlist argPlaylist) {
+        mPlaylistContentSpinner = new PlaylistContentSpinner(this);
+        mPlaylistContentSpinner.setSubscriptions(argPlaylist);
+        argView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPlaylistContentSpinner.performClick();
+            }
+        });
+
+        String title = getResources().getString(R.string.drawer_playlist_filters);
+        TextView tv = (TextView) argView.findViewById(R.id.drawer_item_title);
+        tv.setText(title);
+
+        View imageView = argView.findViewById(R.id.drawer_item_icon);
+        imageView.setVisibility(View.GONE);
     }
 
     class MultiSpinnerListener implements MultiSpinner.MultiSpinnerListener {
