@@ -167,6 +167,10 @@ public class SyndHandler extends DefaultHandler {
             for (FeedItem episode : state.getItems()) {
                 SlimEpisode slimEpisode = EpisodeConverter.toSlim(episode);
 
+				if (slimEpisode == null) {
+					continue;
+				}
+
 				if (artwork != null) {
 					slimEpisode.setArtwork(artwork);
 				}
