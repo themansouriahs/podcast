@@ -182,18 +182,20 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
         return mMediaCast != null && mMediaCast.isActive() ? mMediaCast.getCurrentPosition() : super.getCurrentPosition();
     }
 
-    public void rewind(FeedItem argItem) {
+    public void rewind(IEpisode argItem) {
         if (mPlayerService == null)
             return;
 
-        argItem.setPosition(mPlayerService.getContentResolver(), 0);
+        if (argItem instanceof FeedItem) {
+            ((FeedItem)argItem).setPosition(mPlayerService.getContentResolver(), 0);
+        }
 
         if (argItem.equals(mPlayerService.getCurrentItem())) {
             mPlayerService.seek(0);
         }
     }
 
-    public void fastForward(FeedItem argItem) {
+    public void fastForward(IEpisode argItem) {
         if (mPlayerService == null)
             return;
 
@@ -204,7 +206,9 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
             mPlayerService.seek(seekTo);
         }
 
-        argItem.setPosition(mPlayerService.getContentResolver(), seekTo);
+        if (argItem instanceof FeedItem) {
+            ((FeedItem)argItem).setPosition(mPlayerService.getContentResolver(), seekTo);
+        }
     }
 
     /**

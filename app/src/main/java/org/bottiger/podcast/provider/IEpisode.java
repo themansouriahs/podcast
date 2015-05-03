@@ -13,25 +13,25 @@ import java.util.Date;
  */
 public interface IEpisode {
 
-    public String getTitle();
-    public URL getUrl();
-    public String getArtwork(@NonNull Context argContext);
-    public String getDescription();
-    public String getAuthor();
-    public long getDuration();
-    public int getPriority();
-    public ISubscription getSubscription(@NonNull Context argContext);
-    public long getOffset();
-    public Date getDateTime();
+    String getTitle();
+    URL getUrl();
+    @Nullable String getArtwork(@NonNull Context argContext);
+    String getDescription();
+    String getAuthor();
+    long getDuration();
+    int getPriority();
+    ISubscription getSubscription(@NonNull Context argContext);
+    long getOffset();
+    Date getDateTime();
 
-    public void setTitle(@NonNull String argTitle);
-    public void setUrl(@NonNull URL argUrl);
-    public void setArtwork(@NonNull URL argUrl);
-    public void setDescription(@NonNull String argDescription);
-    public void setDuration(long argDurationMs);
-    public void setPriority(IEpisode argPrecedingItem, @NonNull Context argContext);
-    public void setOffset(@Nullable ContentResolver contentResolver, long i);
+    void setTitle(@NonNull String argTitle);
+    void setUrl(@NonNull URL argUrl);
+    void setArtwork(@NonNull URL argUrl);
+    void setDescription(@NonNull String argDescription);
+    void setDuration(long argDurationMs);
+    void setPriority(IEpisode argPrecedingItem, @NonNull Context argContext);
+    void setOffset(@Nullable ContentResolver contentResolver, long i);
 
-    public boolean isDownloaded();
+    boolean isDownloaded();
 
 }

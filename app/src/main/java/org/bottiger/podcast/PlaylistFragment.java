@@ -35,6 +35,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -234,9 +235,7 @@ public class PlaylistFragment extends GeastureFragment implements
 
         if (!mPlaylist.isEmpty()) {
             IEpisode episode = mPlaylist.first();
-            if (episode instanceof FeedItem) {
-                bindHeader((FeedItem)episode);
-            }
+            bindHeader(episode);
         }
 
         mSwipeRefreshView.fragment = this;
@@ -310,7 +309,7 @@ public class PlaylistFragment extends GeastureFragment implements
     }
 
 
-    public void bindHeader(final FeedItem item) {
+    public void bindHeader(final IEpisode item) {
         mEpisodeTitle.setText(item.getTitle());
         mEpisodeInfo.setText(item.getDescription());
 
@@ -325,7 +324,7 @@ public class PlaylistFragment extends GeastureFragment implements
             mTotalTime.setText("");
         }
 
-        long offset = item.offset;
+        long offset = item.getOffset();
         if (offset > 0) {
             mCurrentTime.setText(StrUtils.formatTime(offset));
         } else {
@@ -372,31 +371,34 @@ public class PlaylistFragment extends GeastureFragment implements
 
         mTopPlayer.setEpisodeId(item);
 
-        PaletteHelper.generate(item.getArtwork(activity), activity, mTopPlayer);
-        PaletteHelper.generate(item.getArtwork(activity), activity, mPlayPauseButton);
-        PaletteHelper.generate(item.getArtwork(activity), activity, mBackButton);
-        PaletteHelper.generate(item.getArtwork(activity), activity, mForwardButton);
-        PaletteHelper.generate(item.getArtwork(activity), activity, mDownloadButton);
-        PaletteHelper.generate(item.getArtwork(activity), activity, mFavoriteButton);
+        String artworkURL = item.getArtwork(activity);
+        if (!TextUtils.isEmpty(artworkURL)) {
+            PaletteHelper.generate(artworkURL, activity, mTopPlayer);
+            PaletteHelper.generate(artworkURL, activity, mPlayPauseButton);
+            PaletteHelper.generate(artworkURL, activity, mBackButton);
+            PaletteHelper.generate(artworkURL, activity, mForwardButton);
+            PaletteHelper.generate(artworkURL, activity, mDownloadButton);
+            PaletteHelper.generate(artworkURL, activity, mFavoriteButton);
 
-        PaletteHelper.generate(item.getArtwork(activity), activity, new PaletteListener() {
-            @Override
-            public void onPaletteFound(Palette argChangedPalette) {
-                Palette.Swatch swatch = argChangedPalette.getMutedSwatch();
+            PaletteHelper.generate(artworkURL, activity, new PaletteListener() {
+                @Override
+                public void onPaletteFound(Palette argChangedPalette) {
+                    Palette.Swatch swatch = argChangedPalette.getMutedSwatch();
 
-                if (swatch == null)
-                    return;
+                    if (swatch == null)
+                        return;
 
-                int colorText = swatch.getTitleTextColor();
-                mEpisodeTitle.setTextColor(color);
-                mEpisodeInfo.setTextColor(color);
-            }
+                    int colorText = swatch.getTitleTextColor();
+                    mEpisodeTitle.setTextColor(color);
+                    mEpisodeInfo.setTextColor(color);
+                }
 
-            @Override
-            public String getPaletteUrl() {
-                return item.getArtwork(activity);
-            }
-        });
+                @Override
+                public String getPaletteUrl() {
+                    return item.getArtwork(activity);
+                }
+            });
+        }
 
         PlayerStatusObservable.registerListener(mPlayerSeekbar);
 
@@ -519,9 +521,7 @@ public class PlaylistFragment extends GeastureFragment implements
 
                 if (!mPlaylist.isEmpty()) {
                     IEpisode episode = mPlaylist.first();
-                    if (episode instanceof FeedItem) {
-                        bindHeader((FeedItem)episode);
-                    }
+                    bindHeader(episode);
                 }
 
             }
@@ -536,9 +536,7 @@ public class PlaylistFragment extends GeastureFragment implements
                 @Override
                 public void run() {
                     IEpisode episode = mPlaylist.first();
-                    if (episode instanceof FeedItem) {
-                        bindHeader((FeedItem)episode);
-                    }
+                    bindHeader(episode);
 
                     setPlaylistViewState(mPlaylist);
                 }

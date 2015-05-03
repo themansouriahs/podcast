@@ -43,9 +43,14 @@ public class SlimEpisode implements IEpisode, Parcelable {
         return mUrl;
     }
 
+    @Nullable
     @Override
     public String getArtwork(@NonNull Context argContext) {
-        return getArtwork().toString();
+        URL artwork = getArtwork();
+        if (artwork == null)
+            return null;
+
+        return artwork.toString();
     }
 
     public URL getArtwork() {
