@@ -219,7 +219,7 @@ public class SubscriptionsFragment extends Fragment implements SharedPreferences
 		super.onCreateContextMenu(menu, v, menuInfo);
 		MenuInflater inflater = getActivity().getMenuInflater();
 		inflater.inflate(R.menu.subscription_context, menu);
-		PlaylistFragment.setContextMenu(PlaylistFragment.SUBSCRIPTION_CONTEXT_MENU, this);
+		//PlaylistFragment.setContextMenu(PlaylistFragment.SUBSCRIPTION_CONTEXT_MENU, this);
 	}
 
     public boolean onContextItemSelected(MenuItem menuItem) {

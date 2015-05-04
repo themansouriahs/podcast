@@ -56,14 +56,7 @@ public class PlaylistFragment extends GeastureFragment implements
 		OnSharedPreferenceChangeListener, Playlist.PlaylistChangeListener, IDownloadCompleteCallback
          {
 
-    private static int CONTEXT_MENU = 0;
-	private static Fragment CONTEXT_FRAGMENT = null;
-
-	public final static int PLAYLIST_CONTEXT_MENU = 0;
 	public final static int SUBSCRIPTION_CONTEXT_MENU = 1;
-
-    private boolean mHasPhoto = false;
-    private static final float PHOTO_ASPECT_RATIO = 1.7777777f;
 
     private static final String PLAYLIST_WELCOME_DISMISSED = "playlist_welcome_dismissed";
     private static final boolean PLAYLIST_WELCOME_DISMISSED_DEFAULT = false;
@@ -88,9 +81,6 @@ public class PlaylistFragment extends GeastureFragment implements
     private PlayerButtonView mBackButton;
     private PlayerButtonView mDownloadButton;
     private PlayerButtonView mFavoriteButton;
-
-    private int mHeaderTopClearance;
-    private int mPhotoHeightPixels;
 
 	private SharedPreferences.OnSharedPreferenceChangeListener spChanged;
 
@@ -491,8 +481,6 @@ public class PlaylistFragment extends GeastureFragment implements
                                      ContextMenuInfo menuInfo) {
          super.onCreateContextMenu(menu, v, menuInfo);
          MenuInflater inflater = mActivity.getMenuInflater();
-         //inflater.inflate(R.menu.podcast_context, menu);
-         PlaylistFragment.setContextMenu(PLAYLIST_CONTEXT_MENU, this);
      }
 
      @Override
@@ -514,17 +502,6 @@ public class PlaylistFragment extends GeastureFragment implements
          }
          return super.onOptionsItemSelected(item);
      }
-
-	public boolean playlistContextMenu(MenuItem item) {
-		AdapterView.AdapterContextMenuInfo cmi = (AdapterView.AdapterContextMenuInfo) item
-				.getMenuInfo();
-        return true;
-	}
-
-	public static void setContextMenu(int menu, Fragment fragment) {
-		CONTEXT_MENU = menu;
-		CONTEXT_FRAGMENT = fragment;
-	}
 
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
