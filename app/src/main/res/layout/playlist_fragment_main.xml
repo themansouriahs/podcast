@@ -11,6 +11,8 @@
         android:layout_height="match_parent">
         <!-- android:paddingTop="@dimen/header_bar_height" -->
 
+        <include layout="@layout/playlist_welcome" />
+
         <include layout="@layout/playlist_empty" />
 
         <include layout="@layout/playlist_scroller" />

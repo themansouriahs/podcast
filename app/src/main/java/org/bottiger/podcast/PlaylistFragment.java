@@ -6,7 +6,6 @@ import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.listeners.RecyclerItemTouchListener;
 import org.bottiger.podcast.playlist.Playlist;
-import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
@@ -64,8 +63,12 @@ public class PlaylistFragment extends GeastureFragment implements
     private boolean mHasPhoto = false;
     private static final float PHOTO_ASPECT_RATIO = 1.7777777f;
 
+    private static final String PLAYLIST_WELCOME_DISMISSED = "playlist_welcome_dismissed";
+    private static final boolean PLAYLIST_WELCOME_DISMISSED_DEFAULT = false;
+
     private View mPlaylistContainer;
-    private View mEmptyPlaylistContainer;
+    private View mPlaylistWelcomeContainer;
+    private View mPlaylistEmptyContainer;
 
     private MultiShrinkScroller mMultiShrinkScroller;
 
@@ -157,7 +160,8 @@ public class PlaylistFragment extends GeastureFragment implements
         mPhoto =            (SimpleDraweeView) mSwipeRefreshView.findViewById(R.id.session_photo);
 
         mPlaylistContainer = mSwipeRefreshView.findViewById(R.id.playlist_container);
-        mEmptyPlaylistContainer = mSwipeRefreshView.findViewById(R.id.playlist_empty);
+        mPlaylistWelcomeContainer = mSwipeRefreshView.findViewById(R.id.playlist_welcome_screen);
+        mPlaylistEmptyContainer = mSwipeRefreshView.findViewById(R.id.playlist_empty);
 
         mEpisodeTitle         =    (TextView) mSwipeRefreshView.findViewById(R.id.episode_title);
         mEpisodeInfo         =    (TextView) mSwipeRefreshView.findViewById(R.id.episode_info);
@@ -414,31 +418,28 @@ public class PlaylistFragment extends GeastureFragment implements
         }
     }
 
-    private void recomputePhotoAndScrollingMetrics() {
-        final int actionBarSize = UIUtils.calculateActionBarSize(mActivity);
-        mHeaderTopClearance = actionBarSize - mTopPlayer.getPaddingTop();
-
-        mPhotoHeightPixels = mHeaderTopClearance;
-        if (mHasPhoto) {
-            mPhotoHeightPixels = (int) (mPhoto.getWidth() / PHOTO_ASPECT_RATIO);
-            mPhotoHeightPixels = Math.min(mPhotoHeightPixels, mSwipeRefreshView.getHeight() * 2 / 3);
-        }
-
-        ViewGroup.LayoutParams lp;
-        lp = mTopPlayer.getLayoutParams();
-        if (lp.height != mPhotoHeightPixels) {
-            lp.height = mPhotoHeightPixels;
-            mTopPlayer.setLayoutParams(lp);
-        }
-    }
-
     private void setPlaylistViewState(@NonNull Playlist argPlaylist) {
+
+        boolean dismissedWelcomePage = sharedPreferences.getBoolean(PLAYLIST_WELCOME_DISMISSED, PLAYLIST_WELCOME_DISMISSED_DEFAULT);
+
         if (argPlaylist.isEmpty()) {
             mPlaylistContainer.setVisibility(View.GONE);
-            mEmptyPlaylistContainer.setVisibility(View.VISIBLE);
+
+            if (dismissedWelcomePage) {
+                mPlaylistEmptyContainer.setVisibility(View.VISIBLE);
+                mPlaylistWelcomeContainer.setVisibility(View.GONE);
+            } else {
+                mPlaylistWelcomeContainer.setVisibility(View.VISIBLE);
+                mPlaylistEmptyContainer.setVisibility(View.GONE);
+            }
         } else {
+            if (!dismissedWelcomePage) {
+                sharedPreferences.edit().putBoolean(PLAYLIST_WELCOME_DISMISSED, true).commit();
+            }
+
             mPlaylistContainer.setVisibility(View.VISIBLE);
-            mEmptyPlaylistContainer.setVisibility(View.GONE);
+            mPlaylistWelcomeContainer.setVisibility(View.GONE);
+            mPlaylistEmptyContainer.setVisibility(View.GONE);
         }
     }
 

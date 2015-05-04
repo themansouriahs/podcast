@@ -1,99 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-    <RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/playlist_empty"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="10dp"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp">
-
-        <TextView
-            android:id="@+id/playlist_empty_header"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/playlist_empty_title"
-            android:layout_marginBottom="10dp"
-            android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"
-            />
-
-        <TextView
-            android:id="@+id/playlist_empty_text"
-            android:layout_below="@id/playlist_empty_header"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:text="@string/playlist_empty_text_top"/>
-
-    <View
-        android:id="@+id/playlist_empty_line_top"
-        android:layout_below="@id/playlist_empty_text"
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginBottom="5dp"
-        android:background="@color/grayStart"/>
-
-
-    <RadioGroup
-        android:id="@+id/subscription_selection_type"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:checkedButton="@+id/radioNone"
-        android:layout_below="@id/playlist_empty_line_top">
-
-        <RadioButton
-            android:id="@+id/radioNone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
-            android:text="@string/playlist_empty_mode_one" />
-
-        <TextView
-            android:id="@+id/radioNoneDescription"
-            android:layout_below="@id/radioNone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/grayDark"
-            android:text="@string/playlist_empty_mode_one_desc"/>
-
-        <RadioButton
-            android:id="@+id/radioAll"
-            android:layout_below="@id/radioNoneDescription"
-            android:layout_alignLeft="@id/radioNone"
-            android:layout_alignStart="@id/radioNone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
-            android:layout_marginTop="20dp"
-            android:text="@string/playlist_empty_mode_two" />
-
-        <TextView
-            android:id="@+id/radioAllDescription"
-            android:layout_below="@id/radioAll"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/grayDark"
-            android:text="@string/playlist_empty_mode_two_desc"/>
-
-    </RadioGroup>
-
-    <View
-        android:id="@+id/playlist_empty_line_bottom"
-        android:layout_below="@id/subscription_selection_type"
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="10dp"
-        android:background="@color/grayStart"/>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/playlist_empty"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/more_filters_text"
-        android:layout_below="@id/playlist_empty_line_bottom"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:textSize="16sp"
-        android:text="@string/playlist_empty_text_bottom"/>
-
-    </RelativeLayout>
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/playlist_empty"
+        android:layout_margin="30dp"
+        android:id="@+id/textView"
+        android:layout_gravity="center_horizontal" />
+</LinearLayout>
