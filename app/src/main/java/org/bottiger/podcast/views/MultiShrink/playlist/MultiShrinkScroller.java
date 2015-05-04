@@ -62,6 +62,7 @@ import org.bottiger.podcast.views.TopPlayer;
  */
 public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
 
+    private static final String TAG = "MultiShrinkScroller (p)";
     /**
      * 1000 pixels per millisecond. Ie, 1 pixel per second.
      */
@@ -346,6 +347,7 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
                 updateLastEventPosition(event);
                 if (!mScroller.isFinished()) {
                     startDrag();
+                    Log.d(TAG, "Stop fling and start dragging");
                     return true;
                 } else {
                     mReceivedDown = true;
@@ -358,6 +360,7 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
                 if (motionShouldStartDrag(event)) {
                     updateLastEventPosition(event);
                     startDrag();
+                    Log.d(TAG, "Start dragging playlist");
                     return true;
                 }
                 break;
