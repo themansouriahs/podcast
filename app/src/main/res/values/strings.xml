@@ -136,6 +136,7 @@
     <string name="playlist_empty_mode_two">Recent episodes</string>
     <string name="playlist_empty_mode_one_desc">The playlist will only contain episodes you have queued manually</string>
     <string name="playlist_empty_mode_two_desc">The playlist will populate itself and always contain the most recent episodes. You can still queue selected episode manually</string>
+    <string name="playlist_episode_dismissed">Episode removed</string>
 
     <plurals name="bulk_download_playlist">
         <item quantity="one">First episode in the playlist</item>

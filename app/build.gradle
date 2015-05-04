@@ -137,6 +137,8 @@ dependencies {
     compile 'com.fasterxml.jackson.core:jackson-databind:2.5+'
     compile 'com.facebook.fresco:fresco:0.4.0+'
 
+    compile 'com.cocosw:undobar:1.+@aar'
+
     // For testing only
     testCompile 'junit:junit:4.12'
     testCompile "org.mockito:mockito-core:1.9.5"

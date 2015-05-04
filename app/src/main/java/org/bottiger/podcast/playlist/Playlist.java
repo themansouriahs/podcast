@@ -149,7 +149,6 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
 			mInternalPlaylist.add(item);
 		}
 	}
-
     /**
      *
      * @param position

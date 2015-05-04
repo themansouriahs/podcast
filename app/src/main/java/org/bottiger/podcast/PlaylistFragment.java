@@ -31,6 +31,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.graphics.Palette;
@@ -48,6 +49,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.TextView;
 
+import com.cocosw.undobar.UndoBarController;
+import com.cocosw.undobar.UndoBarStyle;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
@@ -252,7 +255,7 @@ public class PlaylistFragment extends GeastureFragment implements
 
         //////
 
-        //mRecyclerView.addOnItemTouchListener(new RecyclerItemTouchListener());
+        mRecyclerView.addOnItemTouchListener(new RecyclerItemTouchListener());
 
         ///////
 
@@ -270,8 +273,35 @@ public class PlaylistFragment extends GeastureFragment implements
                                 for (int position : reverseSortedPositions) {
                                     //mItems.remove(position);
                                 }
+                                //mPlaylist.removeItemSilent(reverseSortedPositions[0]+1);
+                                //mAdapter.notifyItemRemoved(reverseSortedPositions[0]+1);
+                                final int itemPosition = reverseSortedPositions[0]+1;
+                                final IEpisode episode = mPlaylist.getItem(itemPosition);
+
+                                mPlaylist.removeItem(itemPosition);
                                 // do not call notifyItemRemoved for every item, it will cause gaps on deleting items
                                 mAdapter.notifyDataSetChanged();
+                                String episodeRemoved = getResources().getString(R.string.playlist_episode_dismissed);
+
+                                new UndoBarController.UndoBar(getActivity())
+                                        .message(episodeRemoved)
+                                        .listener(new UndoBarController.AdvancedUndoListener() {
+                                            @Override
+                                            public void onHide(Parcelable parcelable) {
+
+                                            }
+
+                                            @Override
+                                            public void onClear(@NonNull Parcelable[] parcelables) {
+
+                                            }
+
+                                            @Override
+                                            public void onUndo(Parcelable parcelable) {
+                                                mPlaylist.setItem(itemPosition, episode);
+                                                mAdapter.notifyDataSetChanged();
+                                            }
+                                        }).show();
                             }
                         });
         mRecyclerView.setOnTouchListener(touchListener);
@@ -295,7 +325,7 @@ public class PlaylistFragment extends GeastureFragment implements
         //mRecyclerView.setOnScrollListener(dragSortRecycler.getScrollListener());
         //////
 
-        mRecyclerView.setItemAnimator(new SlideInLeftAnimator());
+        //mRecyclerView.setItemAnimator(new SlideInLeftAnimator());
     }
 
     @Override
