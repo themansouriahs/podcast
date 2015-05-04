@@ -131,6 +131,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
                 mDownloadProgressObservable.registerObserver(viewHolder.downloadButton);
 
                 String imageUrl = item.getArtwork(mActivity);
+                //String imageUrl = item.getSubscription(mActivity).getImageURL();
                 if (!TextUtils.isEmpty(imageUrl)) {
                     viewHolder.mItemBackground.setPaletteKey(imageUrl);
                 }

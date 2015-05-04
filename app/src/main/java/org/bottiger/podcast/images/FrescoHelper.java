@@ -25,8 +25,12 @@ import org.apache.commons.validator.routines.UrlValidator;
  */
 public class FrescoHelper {
 
+    /*
     private static final int MAX_WIDTH = 1024;
     private static final int MAX_HEIGHT = 1024;
+    */
+    private static final int MAX_WIDTH = 256;
+    private static final int MAX_HEIGHT = 256;
 
     private static UrlValidator validator = new UrlValidator();
 
