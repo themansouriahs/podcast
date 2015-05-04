@@ -274,6 +274,7 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
 
             if (lastPlaylistPosition <= 0) {
                 argEpisode.setPriority(null, argContext);
+                lastPlaylistPosition = 0;
             } else {
                 IEpisode preceedingItem = mInternalPlaylist.get(lastPlaylistPosition-1);
                 argEpisode.setPriority(preceedingItem, argContext);

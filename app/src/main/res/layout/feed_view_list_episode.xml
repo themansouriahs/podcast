@@ -30,6 +30,7 @@
     <org.bottiger.podcast.views.FeedViewQueueButton
         android:id="@+id/queue_button"
         android:layout_marginRight="5dp"
+        android:padding="13dp"
         android:visibility="gone"
         android:src="@drawable/ic_add_white"
         style="@style/FeedViewPlayPauseButton"

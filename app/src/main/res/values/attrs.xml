@@ -54,4 +54,8 @@
         <attr name="image" format="reference"/>
     </declare-styleable>
 
+    <declare-styleable name="FeedViewQueueButton">
+        <attr name="lineColor" format="color"/>
+    </declare-styleable>
+
 </resources>
