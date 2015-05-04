@@ -331,7 +331,13 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
         // The only time we want to intercept touch events is when we are being dragged.
-        return shouldStartDrag(event) && !mRecyclerView.isDragging;
+        boolean doIntercept = shouldStartDrag(event) && !mRecyclerView.isDragging;
+
+        if (doIntercept) {
+            Log.d(TAG, "Intercept touches");
+        }
+
+        return doIntercept;
     }
 
     private boolean shouldStartDrag(MotionEvent event) {

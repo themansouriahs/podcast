@@ -252,7 +252,7 @@ public class PlaylistFragment extends GeastureFragment implements
 
         //////
 
-        mRecyclerView.addOnItemTouchListener(new RecyclerItemTouchListener());
+        //mRecyclerView.addOnItemTouchListener(new RecyclerItemTouchListener());
 
         ///////
 
