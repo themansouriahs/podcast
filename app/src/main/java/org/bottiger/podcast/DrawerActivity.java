@@ -8,7 +8,7 @@ import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.navdrawer.NavigationDrawerMenuGenerator;
 import org.bottiger.podcast.views.MultiSpinner;
-import org.bottiger.podcast.views.PlaylistContentSpinner;
+import org.bottiger.podcast.views.dialogs.DialogPlaylistContent;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
@@ -98,7 +98,7 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity {
 	protected ActionBarDrawerToggle mDrawerToggle;
 	protected String[] mListItems;
 
-    protected PlaylistContentSpinner mPlaylistContentSpinner;
+    protected DialogPlaylistContent mDialogPlaylistContent;
 
 	private CharSequence mDrawerTitle;
 	private CharSequence mTitle;
@@ -563,12 +563,12 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity {
     }
 
     private void bindPlaylistFilter(@NonNull LinearLayout argView, @NonNull Playlist argPlaylist) {
-        mPlaylistContentSpinner = new PlaylistContentSpinner(this);
-        mPlaylistContentSpinner.setSubscriptions(argPlaylist);
+        mDialogPlaylistContent = new DialogPlaylistContent(this);
+        mDialogPlaylistContent.setSubscriptions(argPlaylist);
         argView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPlaylistContentSpinner.performClick();
+                mDialogPlaylistContent.performClick();
             }
         });
 

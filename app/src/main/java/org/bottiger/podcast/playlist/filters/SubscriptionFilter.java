@@ -122,7 +122,8 @@ public class SubscriptionFilter implements IPlaylistFilter, SharedPreferences.On
             mLock.lock();
 
             if (mFilterType == DisplayFilter.MANUAL) {
-                return " 0 "; // false for all subscriptions
+                return "(" + ItemColumns.TABLE_NAME + "." + ItemColumns.PRIORITY + " > 0)";
+                //return " 0 "; // false for all subscriptions
             }
 
             if (mFilterType == DisplayFilter.ALL) {

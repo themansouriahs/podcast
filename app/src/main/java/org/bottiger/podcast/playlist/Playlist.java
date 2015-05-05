@@ -34,7 +34,7 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
     public static final boolean SHOW_LISTENED_DEFAULT = true;
     public static final boolean PLAY_NEXT_DEFAULT     = false;
 
-	private static int MAX_SIZE = 100;
+	public static int MAX_SIZE = 20;
     private static Playlist activePlaylist = null;
 
     private static final String mSortNew = "DESC";
@@ -385,7 +385,7 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
 	 */
 	public boolean populatePlaylistIfEmpty() {
 		if (mInternalPlaylist.isEmpty()) {
-            populatePlaylist(MAX_SIZE);
+            populatePlaylist();
             return true;
         }
         return false;
@@ -393,12 +393,9 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
 
 	/**
 	 * Populates the playlist up to a certain length
-	 * 
-	 * @param length
-	 *            of the playlist
 	 */
-    public void populatePlaylist(int length) {
-        populatePlaylist(length, false);
+    public void populatePlaylist() {
+        populatePlaylist(MAX_SIZE, false);
     }
 
 	public void populatePlaylist(int length, boolean force) {
