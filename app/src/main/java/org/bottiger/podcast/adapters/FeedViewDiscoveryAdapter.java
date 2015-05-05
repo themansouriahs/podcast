@@ -52,6 +52,7 @@ public class FeedViewDiscoveryAdapter extends FeedViewAdapter {
     protected void bindButtons(@NonNull EpisodeViewHolder episodeViewHolder, @NonNull IEpisode argEpisode) {
 
         episodeViewHolder.mPlayPauseButton.setEpisode(argEpisode, PlayPauseImageView.LOCATION.DISCOVERY_FEEDVIEW);
+        episodeViewHolder.mQueueButton.setEpisode(argEpisode, PlayPauseImageView.LOCATION.DISCOVERY_FEEDVIEW);
         episodeViewHolder.mDownloadButton.setVisibility(View.GONE);
 
         getPalette(episodeViewHolder);

@@ -118,8 +118,13 @@ public class SlimEpisode implements IEpisode, Parcelable {
     }
 
     @Override
-    public void setPriority(IEpisode argPrecedingItem, @NonNull Context argContext) {
-        mPriority = argPrecedingItem.getPriority()+1;
+    public void setPriority(@Nullable IEpisode argPrecedingItem, @NonNull Context argContext) {
+        int precedingPriority = 0;
+        if (argPrecedingItem != null) {
+            precedingPriority = argPrecedingItem.getPriority();
+        }
+
+        mPriority = precedingPriority +1;
     }
 
     @Override

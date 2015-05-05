@@ -110,6 +110,7 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
         PlayerStatusObservable.registerListener(this);
     }
 
+    @NonNull
     @Override
     public IEpisode getEpisode() {
         return mEpisode;

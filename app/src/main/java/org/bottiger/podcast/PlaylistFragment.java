@@ -119,7 +119,7 @@ public class PlaylistFragment extends GeastureFragment implements
         mDownloadProgressObservable = EpisodeDownloadManager.getDownloadProgressObservable(mActivity);
 
 		TopActivity.getPreferences().registerOnSharedPreferenceChangeListener(
-				spChanged);
+                spChanged);
 
 		if (savedInstanceState != null) {
 			// Restore last state for checked position.
@@ -336,6 +336,7 @@ public class PlaylistFragment extends GeastureFragment implements
 
     @Override
     public void onPause() {
+        mPlaylist.unregisterPlaylistChangeListener(this);
         super.onPause();
     }
 
@@ -353,6 +354,7 @@ public class PlaylistFragment extends GeastureFragment implements
             }
         }
 
+        mPlaylist.registerPlaylistChangeListener(this);
         super.onResume();
     }
 
@@ -490,20 +492,8 @@ public class PlaylistFragment extends GeastureFragment implements
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putLong(mExpandedEpisodeKey, mExpandedEpisodeId);
+        outState.putLong(mExpandedEpisodeKey, mExpandedEpisodeId);
 	}
-
-    @Override
-    public void onStart () {
-        super.onStart();
-        mPlaylist.registerPlaylistChangeListener(this);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        mPlaylist.unregisterPlaylistChangeListener(this);
-    }
 
 
      @Override
