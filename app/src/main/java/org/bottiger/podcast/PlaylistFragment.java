@@ -355,6 +355,7 @@ public class PlaylistFragment extends GeastureFragment implements
         }
 
         mPlaylist.registerPlaylistChangeListener(this);
+        notifyPlaylistChanged();
         super.onResume();
     }
 

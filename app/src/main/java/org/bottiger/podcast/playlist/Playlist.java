@@ -271,15 +271,39 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
 
         if (currentPosition < 0) {
 
+            IEpisode preceedingItem = null;
+            int preceedingPriority = 0;
+
             if (lastPlaylistPosition <= 0) {
-                argEpisode.setPriority(null, argContext);
-                lastPlaylistPosition = 0;
+                //argEpisode.setPriority(null, argContext);
+                lastPlaylistPosition = mInternalPlaylist.size();
             } else {
-                IEpisode preceedingItem = mInternalPlaylist.get(lastPlaylistPosition-1);
-                argEpisode.setPriority(preceedingItem, argContext);
+                preceedingItem = mInternalPlaylist.get(lastPlaylistPosition-1);
+                //argEpisode.setPriority(preceedingItem, argContext);
             }
 
+            if (preceedingItem == null) {
+                argEpisode.setPriority(1);
+            } else {
+                argEpisode.setPriority(preceedingItem.getPriority() + 1);
+            }
+
+            argEpisode.update(mContext.getContentResolver());
+
             mInternalPlaylist.add(lastPlaylistPosition, argEpisode);
+
+            for (int pos = lastPlaylistPosition+1; pos < mInternalPlaylist.size(); pos++) {
+                IEpisode episode = mInternalPlaylist.get(pos);
+
+                int priority = episode.getPriority();
+                if (priority > 0) {
+                    episode.setPriority(priority+1);
+                    episode.update(mContext.getContentResolver());
+                } else {
+                    break;
+                }
+            }
+
             notifyPlaylistChanged();
             return;
         }

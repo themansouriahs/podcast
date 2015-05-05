@@ -128,6 +128,11 @@ public class SlimEpisode implements IEpisode, Parcelable {
     }
 
     @Override
+    public void setPriority(int argPriority) {
+        mPriority = argPriority;
+    }
+
+    @Override
     public void setOffset(@Nullable ContentResolver contentResolver, long i) {
         mOffset = i;
     }
@@ -135,6 +140,11 @@ public class SlimEpisode implements IEpisode, Parcelable {
     @Override
     public boolean isDownloaded() {
         return false;
+    }
+
+    @Override
+    public void update(ContentResolver contentResolver) {
+        return;
     }
 
     public int describeContents() {

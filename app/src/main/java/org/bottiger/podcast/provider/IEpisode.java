@@ -29,9 +29,21 @@ public interface IEpisode {
     void setArtwork(@NonNull URL argUrl);
     void setDescription(@NonNull String argDescription);
     void setDuration(long argDurationMs);
-    void setPriority(IEpisode argPrecedingItem, @NonNull Context argContext);
     void setOffset(@Nullable ContentResolver contentResolver, long i);
 
+    /**
+     * -1 => nothing
+     * 0 => current playing item
+     * 1 => first item in the playlist
+     * 2 => second item in the playist
+     *
+     * @param argPriority
+     */
+    void setPriority(int argPriority);
+    void setPriority(IEpisode argPrecedingItem, @NonNull Context argContext);
+
     boolean isDownloaded();
+
+    void update(ContentResolver contentResolver);
 
 }

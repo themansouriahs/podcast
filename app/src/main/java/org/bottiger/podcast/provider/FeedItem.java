@@ -1238,6 +1238,11 @@ public class FeedItem extends AbstractItem implements IEpisode, Comparable<FeedI
 		update(contentResolver);
 	}
 
+	@Override
+	public void setPriority(int argPriority) {
+		priority = argPriority;
+	}
+
 	/**
 	 * Increase the priority of all items in the playlist after the current item
 	 * 
