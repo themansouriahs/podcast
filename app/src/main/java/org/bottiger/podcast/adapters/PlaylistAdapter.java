@@ -382,20 +382,6 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         keepOne.toggle(pvh);
     }
 
-    private String getSubTitle(@NonNull Context argContext, @NonNull FeedItem argFeedItem) {
-        mStringBuilder = new StringBuilder();
-        boolean needSeparator = false;
-
-        String date = argFeedItem.getDate(argContext);
-
-        if (!TextUtils.isEmpty(date)) {
-            mStringBuilder.append(date);
-            needSeparator = true;
-        }
-
-        return mStringBuilder.toString();
-    }
-
     private void bindDuration(@NonNull PlaylistViewHolder argHolder, @NonNull IEpisode argFeedItem) {
 
         int visibility = View.INVISIBLE;
