@@ -29,7 +29,8 @@ public class ExpandableViewHoldersUtil {
             int mSmallButtonSize = PlayPauseImageView.getSmallSize(expandView.getContext());
             int mLargeButtonSize = PlayPauseImageView.getLargeSize(expandView.getContext());
 
-            calcOffset(holder, ViewHolderAnimator.sStart);
+            // calcOffset(holder, ViewHolderAnimator.sStart);
+            calcOffset(holder, (int)(ViewHolderAnimator.sStart*1.45));
 
             final List<Animator> aList =LayoutAnimator.ofButton(holder.mPlayPauseButton, offset, mSmallButtonSize, mLargeButtonSize, true);
 
