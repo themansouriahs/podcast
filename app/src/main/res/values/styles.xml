@@ -35,6 +35,9 @@
 
         <item name="android:windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
+
+        <!-- fonts -->
+        <item name="android:textViewStyle">@style/RobotoTextViewStyle</item>
     </style>
 
     <style name="SoundWavesTheme.Light" parent="Theme.AppCompat.Light.NoActionBar">
@@ -91,6 +94,14 @@
 
         <!-- Spinner: http://stackoverflow.com/questions/16693941/spinner-text-size-does-not-change -->
         <item name="android:spinnerItemStyle">@style/spinnerItemStyle</item>
+
+
+        <!-- fonts -->
+        <item name="android:textViewStyle">@style/RobotoTextViewStyle</item>
+    </style>
+
+    <style name="RobotoTextViewStyle" parent="android:Widget.TextView">
+        <item name="android:fontFamily" tools:ignore="NewApi">sans-serif-thin</item>
     </style>
 
     <style name="NotificationText" parent="android:TextAppearance.StatusBar.EventContent" />

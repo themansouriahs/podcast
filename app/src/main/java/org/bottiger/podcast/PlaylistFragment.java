@@ -6,6 +6,7 @@ import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.listeners.RecyclerItemTouchListener;
 import org.bottiger.podcast.playlist.Playlist;
+import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
@@ -27,6 +28,7 @@ import org.bottiger.podcast.views.dialogs.DialogBulkDownload;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.ContentResolver;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.net.Uri;
@@ -270,14 +272,20 @@ public class PlaylistFragment extends GeastureFragment implements
 
                             @Override
                             public void onDismiss(RecyclerView recyclerView, int[] reverseSortedPositions) {
-                                for (int position : reverseSortedPositions) {
-                                    //mItems.remove(position);
-                                }
-                                //mPlaylist.removeItemSilent(reverseSortedPositions[0]+1);
-                                //mAdapter.notifyItemRemoved(reverseSortedPositions[0]+1);
+
                                 final int itemPosition = reverseSortedPositions[0]+1;
                                 final IEpisode episode = mPlaylist.getItem(itemPosition);
+                                final int currentPriority = episode.getPriority();
+                                final ContentResolver contentResolver = getActivity().getContentResolver();
 
+                                episode.setPriority(-1);
+
+                                if (episode instanceof FeedItem) {
+                                    FeedItem item = (FeedItem) episode;
+                                    item.markAsListened();
+                                }
+
+                                episode.update(contentResolver);
                                 mPlaylist.removeItem(itemPosition);
                                 // do not call notifyItemRemoved for every item, it will cause gaps on deleting items
                                 mAdapter.notifyDataSetChanged();
@@ -298,8 +306,16 @@ public class PlaylistFragment extends GeastureFragment implements
 
                                             @Override
                                             public void onUndo(Parcelable parcelable) {
+                                                episode.setPriority(currentPriority);
                                                 mPlaylist.setItem(itemPosition, episode);
                                                 mAdapter.notifyDataSetChanged();
+
+                                                if (episode instanceof FeedItem) {
+                                                    FeedItem item = (FeedItem) episode;
+                                                    item.markAsListened(0);
+                                                }
+
+                                                episode.update(contentResolver);
                                             }
                                         }).show();
                             }

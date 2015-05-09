@@ -1,6 +1,7 @@
 package org.bottiger.podcast.adapters;
 
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.validator.routines.UrlValidator;
@@ -17,6 +18,7 @@ import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.utils.ColorExtractor;
+import org.bottiger.podcast.utils.Crypto;
 import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.ThemeHelper;
@@ -112,13 +114,13 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
             public void onPaletteFound(Palette argChangedPalette) {
                 int white = mActivity.getResources().getColor(R.color.white_opaque);
 
-                ColorExtractor colorExtractor = new ColorExtractor(argChangedPalette);
+                ColorExtractor colorExtractor = new ColorExtractor(mActivity, argChangedPalette);
                 viewHolder.mLayout.setCardBackgroundColor(colorExtractor.getPrimary());
                 viewHolder.mMainTitle.setTextColor(colorExtractor.getTextColor());
                 //viewHolder.buttonLayout.setBackgroundColor(colorExtractor.getPrimary());
                 viewHolder.description.setTextColor(colorExtractor.getTextColor());
-                viewHolder.currentTime.setTextColor(white);
-                viewHolder.mTimeDuration.setTextColor(white);
+                viewHolder.currentTime.setTextColor(colorExtractor.getTextColor());
+                viewHolder.mTimeDuration.setTextColor(colorExtractor.getTextColor());
             }
 
             @Override
@@ -364,8 +366,9 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         if (episode == null)
             return -1L;
 
-        Long id = (long)episode.getUrl().toString().hashCode(); //FIXME
-        return id;
+        String url = episode.getUrl().toString();
+        //Long id = UUID.fromString(url).getLeastSignificantBits();
+        return (long)url.hashCode();
 	}
 
     @Override
