@@ -315,14 +315,21 @@ public class SwipeDismissRecyclerViewTouchListener implements View.OnTouchListen
 
                 if (mSwiping) {
                     mDownView.setTranslationX(deltaX - mSwipingSlop);
-                    mDownView.setAlpha(Math.max(0f, Math.min(1f,
-                            1f - 2f * Math.abs(deltaX) / mViewWidth)));
+                    mDownView.setAlpha(calcAlpha(deltaX, mViewWidth));
                     return true;
                 }
                 break;
             }
         }
         return false;
+    }
+
+    private static float calcAlpha(float deltaX, int viewWidth) {
+        /*
+        Math.max(0f, Math.min(1f,
+                1f - 2f * Math.abs(deltaX) / viewWidth));
+                */
+        return Math.max(0f, Math.min(1f, 1f - 1f * Math.abs(deltaX) / viewWidth));
     }
 
     class PendingDismissData implements Comparable<PendingDismissData> {
