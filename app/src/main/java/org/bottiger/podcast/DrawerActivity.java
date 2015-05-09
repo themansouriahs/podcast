@@ -572,7 +572,7 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity {
             }
         });
 
-        String title = getResources().getString(R.string.drawer_playlist_filters);
+        String title = getResources().getString(R.string.drawer_playlist_content_source);
         TextView tv = (TextView) argView.findViewById(R.id.drawer_item_title);
         tv.setText(title);
 

@@ -74,7 +74,7 @@
     <string name="subscription_instruction">Add new podcasts by using the discovery page to the right or import an OPML file.\n\nHowever, first please consider if you want to enabled/disable the options below.</string>
     <string name="filter_show_listened">Show Listened</string>
     <string name="auto_start_next">Auto Start Next</string>
-    <string name="drawer_playlist_filters">Playlist content</string>
+    <string name="drawer_playlist_filters">Playlist filters</string>
     <string name="drawer_player_settings">Player Settings</string>
     <string name="opml_not_found">"OPML not found. Rename your file as %1$s and place it at the root folder of the storage (SD Card)"</string>
     <string name="gpodder_searching">Searching using gPodder.net</string>
@@ -137,6 +137,7 @@
     <string name="playlist_empty_mode_one_desc">The playlist will only contain episodes you have queued manually</string>
     <string name="playlist_empty_mode_two_desc">The playlist will populate itself and always contain the most recent episodes. You can still queue selected episode manually</string>
     <string name="playlist_episode_dismissed">Episode removed</string>
+    <string name="drawer_playlist_content_source">Playlist content</string>
 
     <plurals name="bulk_download_playlist">
         <item quantity="one">First episode in the playlist</item>
