@@ -232,7 +232,7 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
         foregroundColorPaint.setColor(extractor.getSecondary());
 
         if (argChangedPalette != null) {
-            setBackgroundColor(ButtonColor(argChangedPalette));
+            //setBackgroundColor(ButtonColor(argChangedPalette));
         }
 
         invalidate();

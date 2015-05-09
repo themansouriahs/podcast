@@ -87,6 +87,7 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
     }
 
     private void init(Context argContext) {
+
         mContext = argContext;
 
         paint = new Paint(Paint.LINEAR_TEXT_FLAG);
@@ -99,6 +100,10 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
         paintBorder.setColor(mPaintBorderColor);
         paintBorder.setStyle(Paint.Style.STROKE);
         paintBorder.setStrokeWidth(5F);
+
+        if (isInEditMode()) {
+            return;
+        }
 
         setOnClickListener(this);
         if (s_playIcon == null || s_pauseIcon == null) {

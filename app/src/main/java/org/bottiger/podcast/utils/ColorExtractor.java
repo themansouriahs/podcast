@@ -17,6 +17,8 @@ public class ColorExtractor {
     private int mSecondary     = -1;
     private int mSecondaryTint = -1;
 
+    private int mTextColor     = -1;
+
     private Context mContext;
 
     public ColorExtractor(@Nullable Palette argPalette) {
@@ -33,6 +35,7 @@ public class ColorExtractor {
         loadPrimaryTintColor(argPalette);
         loadSecondaryColor(argPalette);
         loadSecondaryTintColor(argPalette);
+        loadTextColor(argPalette);
     }
 
     public int getPrimary() {
@@ -49,6 +52,22 @@ public class ColorExtractor {
 
     public int getSecondaryTint() {
         return mSecondaryTint;
+    }
+
+    public int getTextColor() {
+        return mTextColor;
+    }
+
+    private void loadTextColor(@Nullable Palette argPalette) {
+        Palette.Swatch swatch = argPalette != null ? argPalette.getDarkVibrantSwatch() : null;
+        if (swatch == null) {
+            if (mContext == null)
+                return;
+
+            mTextColor = mContext.getResources().getColor(R.color.white_opaque);
+            return;
+        }
+        mTextColor = swatch.getBodyTextColor();
     }
 
     private void loadPrimaryColor(@Nullable Palette argPalette) {
