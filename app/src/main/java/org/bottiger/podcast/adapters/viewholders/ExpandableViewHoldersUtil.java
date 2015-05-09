@@ -71,6 +71,7 @@ public class ExpandableViewHoldersUtil {
             holder.mTimeDuration.setGravity(Gravity.RIGHT);
 
             sPlayPauseParams.setMargins(sPlayPauseParams.leftMargin, 100, sPlayPauseParams.rightMargin, sPlayPauseParams.bottomMargin);
+            sPlayPauseParams.addRule(RelativeLayout.CENTER_VERTICAL, 0);
             holder.mPlayPauseButton.setLayoutParams(sPlayPauseParams);
 
 
@@ -112,6 +113,7 @@ public class ExpandableViewHoldersUtil {
 
         if (sPlayPauseParams != null) {
             sPlayPauseParams.setMargins(sPlayPauseParams.leftMargin, 0, sPlayPauseParams.rightMargin, sPlayPauseParams.bottomMargin);
+            sPlayPauseParams.addRule(RelativeLayout.CENTER_VERTICAL);
             holder.mPlayPauseButton.setLayoutParams(sPlayPauseParams);
         }
 

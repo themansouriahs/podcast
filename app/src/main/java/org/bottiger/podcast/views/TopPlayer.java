@@ -113,18 +113,21 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
 
     private void init(@NonNull Context argContext) {
 
-        if (!isInEditMode())
-            mActivity = (Activity)argContext;
+        int screenHeight = 1000;
 
-        int screenHeight = UIUtils.getScreenHeight(mActivity);
+        if (isInEditMode()) {
+            return;
+        }
+
+        mActivity = (Activity) argContext;
+        sizeShrinkBuffer = (int) UIUtils.convertDpToPixel(100, mActivity);
+        screenHeight = UIUtils.getScreenHeight(mActivity);
 
         sizeSmall = mActivity.getResources().getDimensionPixelSize(R.dimen.top_player_size_minimum);
         sizeMedium = mActivity.getResources().getDimensionPixelSize(R.dimen.top_player_size_medium);
         sizeLarge = screenHeight- mActivity.getResources().getDimensionPixelSize(R.dimen.top_player_size_maximum_bottom);
 
         screenHeight = sizeLarge;
-
-        sizeShrinkBuffer = (int)UIUtils.convertDpToPixel(100, mActivity);
 
         sizeStartShrink = sizeSmall+sizeShrinkBuffer;
         //sizeLarge = 1080; // 1080

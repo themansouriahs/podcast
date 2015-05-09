@@ -155,6 +155,7 @@
             style="@style/PodcastImage"
             android:id="@+id/list_image"
             android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
             android:layout_marginTop="15dp"
             android:layout_marginRight="10dp"
             android:padding="0dip"
@@ -171,12 +172,13 @@
             android:textColor="@color/white_opaque"
             android:layout_toRightOf="@id/left_image"
             android:layout_toLeftOf="@id/list_image"
-            android:layout_margin="5dp"/>
+            android:layout_margin="10dp"/>
 
         <ImageView
             android:id="@+id/podcast_duration_ic"
             android:layout_width="20dp"
             android:layout_height="20dp"
+            android:layout_marginRight="5dp"
             android:scaleType="fitXY"
             android:adjustViewBounds="true"
             android:src="@drawable/ic_access_time_white"
@@ -190,10 +192,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:singleLine="true"
-            android:textSize="15sp"
             android:layout_toRightOf="@+id/podcast_duration_ic"
             android:layout_alignTop="@+id/podcast_duration_ic"
             android:textColor="@color/white_opaque"
+            android:textSize="15sp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="60dp"
             android:textAlignment="gravity"

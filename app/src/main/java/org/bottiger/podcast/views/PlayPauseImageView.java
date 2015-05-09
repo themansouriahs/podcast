@@ -50,6 +50,7 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
 
     private static final int START_ANGLE = -90;
     private static final int DRAW_OFFSET = 5;
+    private static final int DRAW_WIDTH = 6;
 
     private PlayerStatusObservable.STATUS mStatus = PlayerStatusObservable.STATUS.STOPPED;
 
@@ -99,7 +100,7 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
         paintBorder = new Paint(Paint.ANTI_ALIAS_FLAG);
         paintBorder.setColor(mPaintBorderColor);
         paintBorder.setStyle(Paint.Style.STROKE);
-        paintBorder.setStrokeWidth(5F);
+        paintBorder.setStrokeWidth(DRAW_WIDTH);
 
         if (isInEditMode()) {
             return;
@@ -159,10 +160,10 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
         float radius = centerX-DRAW_OFFSET;
         canvas.drawCircle(centerX,centerY,radius,paint);
 
-        int diff2 = (int) (centerY-radius);
+        int diff2 =  DRAW_WIDTH;//(int) (centerY-radius);
         boolean updateOutline = bounds == null;
 
-        bounds = new RectF(DRAW_OFFSET, diff2, contentWidth - DRAW_OFFSET, contentWidth - DRAW_OFFSET + diff2); // DRAW_OFFSET-diff
+        bounds = new RectF(DRAW_OFFSET, diff2, contentWidth - DRAW_OFFSET, contentWidth - diff2); // DRAW_OFFSET-diff
 
         if (updateOutline) {
             onSizeChanged(0,0,0,0);

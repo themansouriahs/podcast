@@ -62,7 +62,7 @@
 
     <dimen name="playpause_button_size_normal">50dp</dimen>
     <dimen name="playpause_button_size">100dp</dimen>
-    <dimen name="player_buttons_padding_left">70dp</dimen> <!-- around 2*playpause_button_size -->
+    <dimen name="player_buttons_padding_left">40dp</dimen> <!-- around 2*playpause_button_size -->
 
     <!-- Initial height of transparent space above QuickContacts -->
     <dimen name="quickcontact_starting_empty_height">150dp</dimen>
