@@ -1225,7 +1225,7 @@ public class FeedItem extends AbstractItem implements IEpisode, Comparable<FeedI
 	public void setPriority(IEpisode precedingItem, Context context) {
 		priority = precedingItem == null ? 1 : precedingItem.getPriority() + 1;
 		increateHigherPriorities(precedingItem, context);
-		// update(context.getContentResolver());
+		update(context.getContentResolver());
 	}
 
 	public void setTopPriority(Context context) {

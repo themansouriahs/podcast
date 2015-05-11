@@ -210,7 +210,7 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
 
     @Override
     public void onStateChange(EpisodeStatus argStatus) {
-        if (argStatus.getEpisode() != mEpisode) {
+        if (!argStatus.getEpisode().equals(mEpisode)) {
             return;
         }
 
