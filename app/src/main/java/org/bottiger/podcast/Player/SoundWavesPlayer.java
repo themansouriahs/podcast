@@ -35,6 +35,13 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
 
     private static final boolean DELETE_WHEN_FINISHED_DEFAULT = false;
 
+    private final String PLAYER_ACTION_FASTFORWARD_KEY;
+    private final String PLAYER_ACTION_REWIND_KEY;
+
+    // needs to be a string
+    private final String PLAYER_ACTION_FASTFORWARD_DEFAULT_VALUE = "60";
+    private final String PLAYER_ACTION_REWIND_DEFAULT_VALUE = "60";
+
     private PlayerService mPlayerService;
     private PlayerHandler mHandler;
     private boolean mIsInitialized = false;
@@ -62,6 +69,10 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
                 HeadsetReceiver.class);
         this.mAudioManager = (AudioManager) mPlayerService.getSystemService(Context.AUDIO_SERVICE);
         mSharedpreferences = PreferenceManager.getDefaultSharedPreferences(mPlayerService.getApplicationContext());
+
+        Resources resources = argPlayerService.getResources();
+        PLAYER_ACTION_FASTFORWARD_KEY = resources.getString(R.string.pref_player_forward_amount_key);
+        PLAYER_ACTION_REWIND_KEY = resources.getString(R.string.pref_player_backward_amount_key);
     }
 
     public void setDataSourceAsync(String path, int startPos) {
@@ -186,12 +197,11 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
         if (mPlayerService == null)
             return;
 
-        if (argItem instanceof FeedItem) {
-            ((FeedItem)argItem).setPosition(mPlayerService.getContentResolver(), 0);
-        }
+        String rewindAmount = mSharedpreferences.getString(PLAYER_ACTION_REWIND_KEY, PLAYER_ACTION_REWIND_DEFAULT_VALUE);
+        long seekTo = mPlayerService.position() - Integer.parseInt(rewindAmount)*1000; // to ms
 
         if (argItem.equals(mPlayerService.getCurrentItem())) {
-            mPlayerService.seek(0);
+            mPlayerService.seek(seekTo);
         }
     }
 
@@ -199,15 +209,11 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
         if (mPlayerService == null)
             return;
 
-        String fastForwardAmount = mSharedpreferences.getString("pref_player_forward_amount", "60");
+        String fastForwardAmount = mSharedpreferences.getString(PLAYER_ACTION_FASTFORWARD_KEY, PLAYER_ACTION_FASTFORWARD_DEFAULT_VALUE);
         long seekTo = mPlayerService.position() + Integer.parseInt(fastForwardAmount)*1000; // to ms
 
         if (argItem.equals(mPlayerService.getCurrentItem())) {
             mPlayerService.seek(seekTo);
-        }
-
-        if (argItem instanceof FeedItem) {
-            ((FeedItem)argItem).setPosition(mPlayerService.getContentResolver(), seekTo);
         }
     }
 
