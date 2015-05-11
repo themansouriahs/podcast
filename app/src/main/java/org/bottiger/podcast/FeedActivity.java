@@ -24,6 +24,8 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
+import com.facebook.imagepipeline.request.BasePostprocessor;
+
 import org.bottiger.podcast.adapters.FeedViewAdapter;
 import org.bottiger.podcast.adapters.FeedViewDiscoveryAdapter;
 import org.bottiger.podcast.images.FrescoHelper;
@@ -221,7 +223,8 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
 
         mUrl = mSubscription.getImageURL();
 
-        FrescoHelper.PalettePostProcessor postProcessor = new FrescoHelper.PalettePostProcessor(this, mUrl);
+        //FrescoHelper.PalettePostProcessor postProcessor = new FrescoHelper.PalettePostProcessor(this, mUrl);
+        analyzeWhitenessOfPhotoPostProcessor postProcessor = new analyzeWhitenessOfPhotoPostProcessor(this, mMultiShrinkScroller);
         FrescoHelper.loadImageInto(mPhotoView, mUrl, postProcessor);
 
         final View transparentView = findViewById(R.id.transparent_view);
@@ -455,5 +458,42 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
                 mMultiShrinkScroller.setUseGradient(isWhite);
             }
         }.execute();
+    }
+
+    public static class analyzeWhitenessOfPhotoPostProcessor extends BasePostprocessor {
+
+        private Activity mActivity;
+        private MultiShrinkScroller mMultiShrinkScroller;
+
+        public analyzeWhitenessOfPhotoPostProcessor(@NonNull Activity argActivity,
+                                                    @NonNull MultiShrinkScroller argMultiShrinkScroller) {
+            mActivity = argActivity;
+            mMultiShrinkScroller = argMultiShrinkScroller;
+        }
+
+        @Override
+        public void process(Bitmap bitmap) {
+            // we can not copy the bitmap inside here
+            //analyzeWhitenessOfPhotoAsynchronously(bitmap);
+            final boolean isWhite = WhitenessUtils.isBitmapWhiteAtTopOrBottom(bitmap);
+
+            mActivity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mMultiShrinkScroller.setUseGradient(isWhite);
+                }
+            });
+
+            //String url = item.image;
+            //mLock.lock();
+
+
+            return;
+        }
+
+        @Override
+        public String getName() {
+            return "PalettePostProcessor";
+        }
     }
 }
