@@ -155,6 +155,7 @@ public class NotificationPlayer {
         int play;
         int next;
         int smallIcon;
+        int clear = R.drawable.ic_clear_grey;
 
         if (isLight(0)) {
             pause = R.drawable.ic_play_arrow_black;
@@ -199,12 +200,15 @@ public class NotificationPlayer {
         // notification is selected
         Intent toggleIntent = new Intent(NotificationReceiver.toggleAction);
         Intent nextIntent = new Intent(NotificationReceiver.nextAction);
+        Intent clearIntent = new Intent(NotificationReceiver.clearAction);
 
         PendingIntent pendingToggleIntent = PendingIntent.getBroadcast(mPlayerService, 0, toggleIntent, 0);
         PendingIntent pendingNextIntent = PendingIntent.getBroadcast(mPlayerService, 0, nextIntent, 0);
+        PendingIntent pendingClearIntent = PendingIntent.getBroadcast(mPlayerService, 0, clearIntent, 0);
 
         layout.setOnClickPendingIntent(R.id.play_pause_button,pendingToggleIntent);
         layout.setOnClickPendingIntent(R.id.next_button,pendingNextIntent);
+        layout.setOnClickPendingIntent(R.id.clear_button,pendingClearIntent);
 
         //PlayerStatusListener.registerImageView(, mPlayerService);
 
@@ -213,6 +217,7 @@ public class NotificationPlayer {
 
         layout.setImageViewResource(R.id.play_pause_button, srcId);
         layout.setImageViewResource(R.id.next_button, next);
+        layout.setImageViewResource(R.id.clear_button, clear);
 
         mBuilder.setContent(layout);
 

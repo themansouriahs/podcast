@@ -15,9 +15,18 @@
         android:layout_margin="0dp"
         android:contentDescription="Podcast icon"/>
 
+    <ImageView
+        android:id="@+id/clear_button"
+        android:layout_toRightOf="@id/icon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:adjustViewBounds="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/ic_clear_grey" />
+
     <TextView
             android:id="@+id/notification_title"
-            android:layout_toRightOf="@id/icon"
+            android:layout_toRightOf="@id/clear_button"
             android:layout_toLeftOf="@id/play_pause_button"
             android:layout_marginTop="7dp"
             android:layout_marginLeft="7dp"
@@ -43,6 +52,7 @@
             android:textAppearance="@style/NotificationText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             android:singleLine="true"
             android:textSize="16sp"/>
 

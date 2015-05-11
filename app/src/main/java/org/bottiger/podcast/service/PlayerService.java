@@ -214,7 +214,7 @@ public class PlayerService extends Service implements
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        handleIntent( intent );
+        handleIntent(intent);
 
         mMetaDataControllerWrapper.register(this);
 
@@ -417,6 +417,11 @@ public class PlayerService extends Service implements
 		mPlayer.stop();
 		mItem = null;
 		dis_notifyStatus();
+	}
+
+	public void halt() {
+		mPlayer.stop();
+		stopForeground(true);
 	}
 
 	public boolean isInitialized() {

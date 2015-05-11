@@ -18,6 +18,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 
 	public static final String toggleAction = ApplicationConfiguration.packageName + ".TOGGLE";
 	public static final String nextAction = ApplicationConfiguration.packageName + ".NEXT";
+    public static final String clearAction = ApplicationConfiguration.packageName + ".CLEAR";
 
 	private RemoteViews layout;
 	private NotificationPlayer np;
@@ -42,6 +43,10 @@ public class NotificationReceiver extends BroadcastReceiver {
             return;
         }
 
+        if (action.equals(clearAction)) {
+            playerService.halt();
+            return;
+        }
 		
 		if (action.equals(toggleAction)) {
             SoundWavesPlayer player = playerService.getPlayer();

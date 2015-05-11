@@ -151,6 +151,8 @@
                 </action>
                 <action android:name="org.bottiger.soundwaves.NEXT" >
                 </action>
+                <action android:name="org.bottiger.soundwaves.CLEAR" >
+                </action>
             </intent-filter>
         </receiver>
         <receiver android:name=".receiver.AutoStart" >
