@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import org.bottiger.podcast.ApplicationConfiguration;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.provider.ItemColumns;
 
@@ -19,12 +20,18 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class SubscriptionFilter implements IPlaylistFilter, SharedPreferences.OnSharedPreferenceChangeListener {
 
-    public enum MODE {SHOW_ALL, SHOW_NONE, SHOW_SELECTED};
+    public enum MODE {SHOW_ALL, SHOW_NONE, SHOW_SELECTED}
+
+    public static final boolean SHOW_LISTENED_DEFAULT = true;
 
     private final String SELECTED_SUBSCRIPTIONS_KEY;
+    private final String showListenedKey = ApplicationConfiguration.showListenedKey;
+
     private static final String SEPARATOR = ",";
 
     private Long mFilterType = DisplayFilter.MANUAL;
+    private boolean mShowListened = SHOW_LISTENED_DEFAULT;
+
     private final HashSet<Long> mSubscriptions = new HashSet<>();
     private ReentrantLock mLock = new ReentrantLock();
 
@@ -36,6 +43,7 @@ public class SubscriptionFilter implements IPlaylistFilter, SharedPreferences.On
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
         onSharedPreferenceChanged(sharedPreferences, SELECTED_SUBSCRIPTIONS_KEY);
+        onSharedPreferenceChanged(sharedPreferences, showListenedKey);
     }
 
     public void add(Long argID) {
@@ -116,6 +124,9 @@ public class SubscriptionFilter implements IPlaylistFilter, SharedPreferences.On
     }
 
     public String toSQL() {
+
+        String listened = (mShowListened) ? " 1 " : " " + ItemColumns.LISTENED + "== 0 ";
+
         String sql = "";
 
         try {
@@ -127,7 +138,7 @@ public class SubscriptionFilter implements IPlaylistFilter, SharedPreferences.On
             }
 
             if (mFilterType == DisplayFilter.ALL) {
-                return " 1 "; // true for all subscriptions
+                return listened; // true for all subscriptions
             }
 
             if (!mSubscriptions.isEmpty()) {
@@ -135,6 +146,7 @@ public class SubscriptionFilter implements IPlaylistFilter, SharedPreferences.On
                 sql = " " + ItemColumns.SUBS_ID + " IN (";
                 sql += TextUtils.join(",", mSubscriptions);
                 sql += ")";
+                sql += " AND " + listened;
             }
         } finally {
             mLock.unlock();
@@ -181,6 +193,8 @@ public class SubscriptionFilter implements IPlaylistFilter, SharedPreferences.On
             } finally {
                 mLock.unlock();
             }
+        } else if (key == ApplicationConfiguration.showListenedKey) {
+            mShowListened = sharedPreferences.getBoolean(showListenedKey, mShowListened);
         }
     }
 

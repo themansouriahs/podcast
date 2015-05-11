@@ -292,7 +292,7 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
 
             mInternalPlaylist.add(lastPlaylistPosition, argEpisode);
 
-            for (int pos = lastPlaylistPosition+1; pos < mInternalPlaylist.size(); pos++) {
+            for (int pos = lastPlaylistPosition; pos < mInternalPlaylist.size(); pos++) {
                 IEpisode episode = mInternalPlaylist.get(pos);
 
                 int priority = episode.getPriority();
@@ -353,14 +353,11 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
 	 */
 	public String getWhere() {
 
-        // show/hide listened episodes
-		Boolean showListened = sharedPreferences.getBoolean(showListenedKey,
-				showListenedVal);
-		String where = (showListened) ? "1==1" : ItemColumns.LISTENED + "== 0";
+        String where = "";
 
 
         // only find episodes from suscriptions which are not "unsubscribed"
-        where += " AND (";
+        where += "(";
         where += ItemColumns.TABLE_NAME + "." + ItemColumns.SUBS_ID + " IN (SELECT " + SubscriptionColumns.TABLE_NAME + "." + SubscriptionColumns._ID + " FROM "  +
                 SubscriptionColumns.TABLE_NAME + " WHERE " + SubscriptionColumns.TABLE_NAME + "." + SubscriptionColumns.STATUS + "<>"
                 + Subscription.STATUS_UNSUBSCRIBED + " OR " + SubscriptionColumns.TABLE_NAME + "." + SubscriptionColumns.STATUS + " IS NULL)";

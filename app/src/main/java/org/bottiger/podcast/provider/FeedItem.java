@@ -484,8 +484,8 @@ public class FeedItem extends AbstractItem implements IEpisode, Comparable<FeedI
 
         if (listened >= 0)
             cv.put(ItemColumns.LISTENED, listened);
-        if (priority >= 0)
-            cv.put(ItemColumns.PRIORITY, priority);
+
+		cv.put(ItemColumns.PRIORITY, priority);
 
         if (image != null)
             cv.put(ItemColumns.IMAGE_URL, image);
