@@ -304,10 +304,25 @@ public class PlayerService extends Service implements
 			}
 		}
 
+		IEpisode oldItem = mItem;
+
 		mItem = FeedItem.getByURL(getContentResolver(), argEpisodeURL);
 
 		if (mItem == null)
 			return;
+
+		if (oldItem != null && !oldItem.equals(mItem)) {
+			if (oldItem instanceof FeedItem) {
+				FeedItem oldFeedItem = (FeedItem)oldItem;
+				if (oldFeedItem.getOffset() > 0) {
+					oldFeedItem.markAsListened();
+					oldFeedItem.update(getContentResolver());
+
+					int pos = sPlaylist.getPosition(oldItem);
+					sPlaylist.removeItem(pos);
+				}
+			}
+		}
 
         boolean isFeedItem = false;
         if (mItem instanceof FeedItem) {
