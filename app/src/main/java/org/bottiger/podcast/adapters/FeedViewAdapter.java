@@ -34,7 +34,7 @@ import org.bottiger.podcast.views.PlayPauseImageView;
  */
 public class FeedViewAdapter extends RecyclerView.Adapter {
 
-    public enum ORDER { RECENT_FIRST, OLDEST_FIRST};
+    public enum ORDER { RECENT_FIRST, OLDEST_FIRST}
 
     protected ISubscription mSubscription;
 
@@ -116,8 +116,8 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
 
         boolean isPlaying = false;
         if (MainActivity.sBoundPlayerService != null && MainActivity.sBoundPlayerService.isInitialized()) {
-            if (item.getURL() == MainActivity.sBoundPlayerService
-                    .getCurrentItem().getUrl().toString()) {
+            if (item.getURL().equals(MainActivity.sBoundPlayerService
+                    .getCurrentItem().getUrl().toString())) {
                 if (MainActivity.sBoundPlayerService.isPlaying()) {
                     isPlaying = true;
                 }
