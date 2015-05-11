@@ -22,10 +22,12 @@
   <string name="menu_settings">Einstellungen</string>
   <string name="title_activity_swipe">SoundWaves</string>
   <string name="menu_download_all">Massendownload</string>
-  <string name="menu_clear_playlist">Wiedergabeliste löschen</string>
+  <string name="menu_clear_playlist">Wiedergabeliste zurücksetzen </string>
   <string name="menu_import">OPML Importieren/Exportieren</string>
   <string name="menu_add_podcast">Podcast hinzufügen</string>
-  <string name="pref_feedback_title">Feedback anonym senden</string>
+  <string name="menu_order_by_date_desc">DIe neuesten zuerst anzeigen</string>
+  <string name="menu_order_by_date_asc">DIe ältesten zuerst anzeigen</string>
+  <string name="pref_feedback_title">Anonyme Berichte senden</string>
   <string name="pref_feedback_description">Senden Sie anonyme Daten über die App wie Crash-Berichte, zu den Entwicklern</string>
   <string name="pref_cloud_support_title">Cloud-Unterstützung aktivieren</string>
   <string name="pref_cloud_support_description">Cloud-Unterstützung sichert Ihre Daten in die Cloud und synchronisiert ihre Daten zwischen Ihren Geräten</string>
@@ -54,8 +56,8 @@
   <string name="preferences_category_about">Über</string>
   <string name="pref_current_version_title">Version</string>
   <string name="ok">OK</string>
-  <string name="playlist_filter_all">Alle Episoden</string>
-  <string name="playlist_filter_some">Ausgewählte Episoden</string>
+  <string name="playlist_filter_all">Alle Abonnements</string>
+  <string name="playlist_filter_some">Benutzerdefinierte Auswahl</string>
   <string name="playlist_filter_prefix">Anzeigen:</string>
   <string name="preference_first_run_key">erster Durchlauf</string>
   <string name="menu_feedback">Feedback</string>
@@ -65,8 +67,7 @@
   <string name="pref_help_category_title">Unterstützen Sie uns SoundWaves weiterzuentwickeln</string>
   <string name="pref_help_static_field_description">Wenn Sie helfen möchten, gibt es reichlich Arbeit. Es könnte Programmierung sein oder eskönnte etwas komplett anderes sein. Ich brauche Hilfe bei Übersetzungen, Benutzererfahrungen, Icons und Grafiken, eine Internetseite und so weiter. Gehen Sie zu der Projektseite auf Github (https://github.com/bottiger/SoundWaves) oder senden Sie mir eine E-Mail: bottiger@gmail.com</string>
   <string name="podcast_title_unknown">Kein Titel :(</string>
-  <string name="playlist_empty">Leere Wiedergabeliste</string>
-  <string name="subscription_instruction">Fügen Sie neue Podcasts mit Hilfe der Suchfunktion oder geben Sie die URL manuell ein</string>
+  <string name="subscription_instruction">Fügen Sie neue Podcasts mithilfe der Seite Entdeckung nach rechts hinzu oder importieren Sie eine OPML-Datei.\n\nBeachten, Sie bitte zunächst, ob Sie die Optionen unten aktiviert/deaktiviert haben.</string>
   <string name="filter_show_listened">Bisher gehört Anzeige</string>
   <string name="auto_start_next">Automatisch nächstes starten</string>
   <string name="drawer_playlist_filters">Wiedergabelistefilter</string>
@@ -108,7 +109,27 @@
   <string name="discovery_unsubscribe_toast">Das Abonnement von %s wurde beendet</string>
   <string name="subscription_no_title">(Kein Titel)</string>
   <!--When downloading and parsing the content of a feed-->
+  <string name="discovery_progress_loading_podcast_content">Podcast-Inhalte abrufen </string>
   <!--Search engine for searching for new podcasts-->
+  <string name="discovery_select_backend">Suchmaschine auswählen</string>
+  <string name="pref_cloud_category_cloud_title">Cloud-Unterstützung</string>
+  <string name="pref_cloud_category_services_title">Webdienste</string>
+  <string name="pref_webservices_dialog_title">Podcast-Suchmaschine</string>
+  <string name="pref_webservices_discovery_title">Suchmaschine</string>
+  <string name="pref_webservices_discovery_description">Webdienste für die Suche nach Podcasts benutzen</string>
+  <string name="subscription_instruction_title">Vielen Dank für das Ausprobieren von SoundWaves</string>
+  <string name="playlist_filter_introducion">Automatisch die letzten Episoden folgender Serie in die Wiedergabeliste einfügen</string>
+  <string name="playlist_filter_none">Nichts einfügen</string>
+  <string name="playlist_empty">Die Widergabeliste ist leer :(</string>
+  <string name="playlist_empty_title">Wiedergabeliste-Modus auswählen</string>
+  <string name="playlist_empty_text_top">Nehmen Sie sich einen Moment Zeit, um darüber nachzudenken, wie Sie die App nutzen möchten</string>
+  <string name="playlist_empty_text_bottom">Sie können jederzeit ändern, wie die Wiedergabeliste funktioniert durch das Streichen des Menüs von links</string>
+  <string name="playlist_empty_mode_one">Episoden manuell in die Warteschlange einfügen</string>
+  <string name="playlist_empty_mode_two">Neueste Episoden</string>
+  <string name="playlist_empty_mode_one_desc">Die Wiedergabeliste wird nur Episoden enthalten die manuell in die Warteschlange gestellt wurden </string>
+  <string name="playlist_empty_mode_two_desc">Die Wiedergabeliste wird voll und enthält immer die aktuellsten Episoden. Sie können ausgewählte Episoden manuell in die  Warteschlange einfügen</string>
+  <string name="playlist_episode_dismissed">Episode entfernt</string>
+  <string name="drawer_playlist_content_source">Inhalt der Wiedergabeliste</string>
   <plurals name="bulk_download_playlist">
     <item quantity="one">Erste Episode in der Wiedergabeliste</item>
     <item quantity="other">Beste %d Episoden in der Wiedergabeliste</item>

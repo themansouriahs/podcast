@@ -22,10 +22,11 @@
   <string name="menu_settings">Configuración</string>
   <string name="title_activity_swipe">SoundWaves</string>
   <string name="menu_download_all">Descarga múltiple</string>
-  <string name="menu_clear_playlist">Limpiar lista de reproducción</string>
   <string name="menu_import">Importar/Exportar OPML</string>
   <string name="menu_add_podcast">Añadir podcast</string>
-  <string name="pref_feedback_title">Enviar información anónima</string>
+  <string name="menu_order_by_date_desc">Mostrar más recientes primero</string>
+  <string name="menu_order_by_date_asc">Mostrar más antiguos primero</string>
+  <string name="pref_feedback_title">Enviar informe anónimo</string>
   <string name="pref_feedback_description">Envía datos anónimos de la aplicación como informes de cierres repentinos al desarrollador</string>
   <string name="pref_cloud_support_title">Activar datos en la nube</string>
   <string name="pref_cloud_support_description"><i>Datos en la nube</i> realizará copias de seguridad de tus datos en la nube y sincronizará los datos de la aplicación en todos tus dispositivos</string>
@@ -35,7 +36,7 @@
   <string name="pref_stream_proxy">Esto puede requerir más tiempo por el almacenamiento en el buffer</string>
   <string name="episode_title">Título</string>
   <string name="episode_description">Descripción del podcast</string>
-  <string name="pref_continuously_playing">Reproducir sin parar</string>
+  <string name="pref_continuously_playing">Reproducción continua</string>
   <string name="pref_continuously_playing_description">Cuando termina un podcast, comienza el siguiente automáticamente</string>
   <string name="preferences_category_help">Ayuda a mejorar</string>
   <string name="preferences_category_ui">Interfaz de usuario</string>
@@ -54,8 +55,6 @@
   <string name="preferences_category_about">Acerca de</string>
   <string name="pref_current_version_title">Versión</string>
   <string name="ok">De acuerdo</string>
-  <string name="playlist_filter_all">Todos los podcast</string>
-  <string name="playlist_filter_some">Podcast escogidos</string>
   <string name="playlist_filter_prefix">Mostrar:</string>
   <string name="preference_first_run_key">firstrun</string>
   <string name="menu_feedback">Comentarios</string>
@@ -65,11 +64,9 @@
   <string name="pref_help_category_title">Ayuda en el desarrollo de SoundWaves</string>
   <string name="pref_help_static_field_description">Si quieres ayudar, hay muchas cosas que hacer. Bien podrías ayudar programando o bien algo completamente diferente. Necesito ayuda con las traducciones, la experiencia de usuario, iconos y gráficos, una página web y más. Dirígete a la página de proyecto en GitHub (https://github.com/bottiger/SoundWaves) o envíame un correo electrónico a esta dirección: bottiger@gmail.com.</string>
   <string name="podcast_title_unknown">Sin título :(</string>
-  <string name="playlist_empty">Lista de reproducción vacía</string>
-  <string name="subscription_instruction">Añadir nuevos podcast mediante la función de búsqueda o introduciendo la URL manualmente</string>
+  <string name="subscription_instruction">Añadir nuevos podcast mediante la página Descubrir a la derecha o importar un archivo OPML.\n\nSin embargo, por favor, antes de ello piensa si quieres activar o desactivar las opciones de más abajo.</string>
   <string name="filter_show_listened">Mostrar escuchados</string>
   <string name="auto_start_next">Empezar siguiente automáticamente</string>
-  <string name="drawer_playlist_filters">Filtros de reproducción</string>
   <string name="drawer_player_settings">Configuración del reproductor</string>
   <string name="opml_not_found">No se encuentra el archivo OPML. Renombra el archivo %1$s y ponlo en el la carpeta de root del almacenamiento externo (tarjeta SD).</string>
   <string name="gpodder_searching">Buscar mediante gPodder.net</string>
@@ -108,7 +105,15 @@
   <string name="discovery_unsubscribe_toast">Suscripción de %s cancelada</string>
   <string name="subscription_no_title">(Sin título)</string>
   <!--When downloading and parsing the content of a feed-->
+  <string name="discovery_progress_loading_podcast_content">Buscando contenido de podcast</string>
   <!--Search engine for searching for new podcasts-->
+  <string name="discovery_select_backend">Selecciona un motor de búsqueda</string>
+  <string name="pref_cloud_category_cloud_title">Datos en la nube</string>
+  <string name="pref_cloud_category_services_title">Servicios web</string>
+  <string name="pref_webservices_dialog_title">Motor de búsqueda de podcast</string>
+  <string name="pref_webservices_discovery_title">Motor de búsqueda</string>
+  <string name="pref_webservices_discovery_description">Servicios web utilizados para buscar podcast</string>
+  <string name="subscription_instruction_title">Gracias por probar SoundWaves</string>
   <plurals name="bulk_download_playlist">
     <item quantity="one">Primer podcast en la lista de reproducción</item>
     <item quantity="other">Los %d podcast más populares en la lista de reproducción</item>
