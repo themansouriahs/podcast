@@ -33,6 +33,9 @@
 # Ignore warnings: https://github.com/square/okio/issues/60
 -dontwarn okio.**
 
+#amazon
+-dontwarn com.amazonaws.**
+
 # Jackson xml parser
 -keepattributes Signature
 -keepattributes *Annotation*,EnclosingMethod
