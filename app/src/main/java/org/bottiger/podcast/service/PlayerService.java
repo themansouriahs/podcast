@@ -311,6 +311,8 @@ public class PlayerService extends Service implements
 		if (mItem == null)
 			return;
 
+
+		// Removed the current top episode from the playlist if it has been started
 		if (oldItem != null && !oldItem.equals(mItem)) {
 			if (oldItem instanceof FeedItem) {
 				FeedItem oldFeedItem = (FeedItem)oldItem;

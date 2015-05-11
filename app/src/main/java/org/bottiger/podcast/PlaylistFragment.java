@@ -406,7 +406,14 @@ public class PlaylistFragment extends GeastureFragment implements
         mDownloadButton.setEpisode(item);
         mFavoriteButton.setEpisode(item);
 
-        mPlayPauseButton.setStatus(PlayerStatusObservable.STATUS.PAUSED); // FIXME: This should not be static
+        if (MainActivity.sBoundPlayerService != null &&
+                MainActivity.sBoundPlayerService.getCurrentItem() != null &&
+                MainActivity.sBoundPlayerService.getCurrentItem().equals(item) &&
+                MainActivity.sBoundPlayerService.isPlaying()) {
+            mPlayPauseButton.setStatus(PlayerStatusObservable.STATUS.PLAYING);
+        } else {
+            mPlayPauseButton.setStatus(PlayerStatusObservable.STATUS.PAUSED);
+        }
         mDownloadProgressObservable.registerObserver(mDownloadButton);
 
         mBackButton.setOnClickListener(new View.OnClickListener() {
