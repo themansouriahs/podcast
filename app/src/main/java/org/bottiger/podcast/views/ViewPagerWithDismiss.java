@@ -49,7 +49,8 @@ public class ViewPagerWithDismiss extends ViewPager {
 
     @Override
     public boolean 	onInterceptTouchEvent(MotionEvent ev) {
-        Log.d(TAG, "onInterceptTouchEvent, x => " + ev.getX() + ", y => " + ev.getY());
-        return super.onInterceptTouchEvent(ev);
+        boolean doIntercept = super.onInterceptTouchEvent(ev);
+        Log.d(TAG, "onInterceptTouchEvent, x => " + ev.getX() + ", y => " + ev.getY() + " doIntercept: " + doIntercept);
+        return doIntercept;
     }
 }

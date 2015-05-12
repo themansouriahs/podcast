@@ -16,7 +16,10 @@
 #   public *;
 #}
 
--keep class org.bottiger.podcast
+-dontoptimize
+
+-keep class org.bottiger.podcast.** {*;}
+-keep class com.dragontek.mygpoclient.** {*;}
 
 -keep        class android.support.v13.** { *; }
 -keep        class android.support.v7.** { *; }
@@ -39,7 +42,6 @@
 -keep class com.amazon.** {*;}
 -keep class com.amazonaws.** {*;}
 -keepattributes *Annotation*
--dontoptimize
 
 # Jackson xml parser
 -keepattributes Signature
