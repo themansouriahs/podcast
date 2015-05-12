@@ -37,7 +37,7 @@
         <item name="windowActionBar">false</item>
 
         <!-- fonts -->
-        <item name="android:textViewStyle">@style/RobotoTextViewStyle</item>
+        <item name="android:textViewStyle">@style/SoundWavesTextViewStyle</item>
     </style>
 
     <style name="SoundWavesTheme.Light" parent="Theme.AppCompat.Light.NoActionBar">
@@ -97,11 +97,11 @@
 
 
         <!-- fonts -->
-        <item name="android:textViewStyle">@style/RobotoTextViewStyle</item>
+        <item name="android:textViewStyle">@style/SoundWavesTextViewStyle</item>
     </style>
 
-    <style name="RobotoTextViewStyle" parent="android:Widget.TextView">
-        <item name="android:fontFamily" tools:ignore="NewApi">sans-serif-thin</item>
+    <style name="SoundWavesTextViewStyle" parent="android:Widget.TextView">
+        <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
     </style>
 
     <style name="NotificationText" parent="android:TextAppearance.StatusBar.EventContent" />
@@ -301,12 +301,14 @@
     <!-- parent="Theme.AppCompat.Light.NoActionBar-->
     <style name="DrawerSwitchTextAppearance" parent="@android:style/TextAppearance.Small">
         <item name="android:textColor">@color/drawer_text</item>
+        <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
     </style>
 
     <style name="spinnerItemStyle">
         <item name="android:padding">10dp</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/drawer_text</item>
+        <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
         <!--<item name="android:background">@android:drawable/spinner_dropdown_background</item>-->
     </style>
     <!-- Navigation Drawer - End -->
