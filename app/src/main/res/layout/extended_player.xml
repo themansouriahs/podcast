@@ -4,10 +4,12 @@
     android:id="@+id/expanded_controls"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/red"
     android:layout_gravity="bottom"
     android:layout_alignParentBottom="true"
     android:descendantFocusability="afterDescendants"
     android:padding="@dimen/padding_medium"
+    android:elevation="4dp"
     android:orientation="vertical">
 
         <include layout="@layout/extended_player_buttons" />

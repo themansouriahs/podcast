@@ -62,6 +62,7 @@ import org.bottiger.podcast.views.TopPlayer;
  */
 public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
 
+    private static final String TAG = "MultiShrinkScroller (p)";
     /**
      * 1000 pixels per millisecond. Ie, 1 pixel per second.
      */
@@ -330,7 +331,13 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
         // The only time we want to intercept touch events is when we are being dragged.
-        return shouldStartDrag(event) && !mRecyclerView.isDragging;
+        boolean doIntercept = shouldStartDrag(event) && !mRecyclerView.isDragging;
+
+        if (doIntercept) {
+            Log.d(TAG, "Intercept touches");
+        }
+
+        return doIntercept;
     }
 
     private boolean shouldStartDrag(MotionEvent event) {
@@ -346,6 +353,7 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
                 updateLastEventPosition(event);
                 if (!mScroller.isFinished()) {
                     startDrag();
+                    Log.d(TAG, "Stop fling and start dragging");
                     return true;
                 } else {
                     mReceivedDown = true;
@@ -358,6 +366,7 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
                 if (motionShouldStartDrag(event)) {
                     updateLastEventPosition(event);
                     startDrag();
+                    Log.d(TAG, "Start dragging playlist");
                     return true;
                 }
                 break;

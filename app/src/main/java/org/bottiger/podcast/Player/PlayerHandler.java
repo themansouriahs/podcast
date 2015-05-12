@@ -7,6 +7,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
 
 import java.lang.ref.WeakReference;
@@ -87,9 +88,9 @@ public class PlayerHandler {
                     if (playerService.getCurrentItem() != null) {
 
                         if (playerService.getNextTrack() == PlayerService.NextTrack.NEXT_IN_PLAYLIST) {
-                            long nextItemId = playerService.getNextId();
+                            IEpisode nextItemId = playerService.getNextId();
 
-                            if (nextItemId == -1) {
+                            if (nextItemId == null) {
                                 playerService.dis_notifyStatus();
                                 playerService.getPlayer().stop();
                             } else if (doPlayNext) {

@@ -24,6 +24,7 @@ public class EpisodeConverter {
             return null;
 
         SlimEpisode slimEpisode = new SlimEpisode(title, url, description);
+
         return slimEpisode;
     }
 }

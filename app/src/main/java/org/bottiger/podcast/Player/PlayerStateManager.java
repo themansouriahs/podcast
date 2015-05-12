@@ -17,6 +17,7 @@ import com.squareup.picasso.Target;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.PlayerService;
 
@@ -32,7 +33,7 @@ public class PlayerStateManager {
     private static final String DEBUG_KEY = "PlayerStateManager";
     private static final String SESSION_TAG = "SWMediaSession";
 
-    private FeedItem mEpisode;
+    private IEpisode mEpisode;
     private Bitmap mAlbumArt;
 
     private MediaSession mSession;
@@ -84,7 +85,7 @@ public class PlayerStateManager {
         updateState(argEpisode, true);
     }
 
-    public void updateState(@NonNull FeedItem argEpisode, boolean updateAlbumArt) {
+    public void updateState(@NonNull IEpisode argEpisode, boolean updateAlbumArt) {
         String albumNull = mAlbumArt == null ? "Null" : "Not null";
         Log.d(DEBUG_KEY, "updateState: updateAlbumState: " + updateAlbumArt + " album: " + albumNull);
         MediaMetadata.Builder mMetaBuilder = new MediaMetadata.Builder();
@@ -94,7 +95,9 @@ public class PlayerStateManager {
         if (updateAlbumArt || mAlbumArt == null) {
             Log.d(DEBUG_KEY, "Updating album art");
             mEpisode = argEpisode;
-            argEpisode.getArtworAsync(mPlaserService, target);
+            if (argEpisode instanceof FeedItem) {
+                ((FeedItem)argEpisode).getArtworAsync(mPlaserService, target);
+            }
             return;
         } else {
             Log.d(DEBUG_KEY, "Found album art");
@@ -109,7 +112,7 @@ public class PlayerStateManager {
         mSession.setPlaybackState(stateBuilder.build());
     }
 
-    private void populateFastMediaMetadata(@NonNull MediaMetadata.Builder mMetaBuilder, @NonNull FeedItem argEpisode) {
+    private void populateFastMediaMetadata(@NonNull MediaMetadata.Builder mMetaBuilder, @NonNull IEpisode argEpisode) {
         //Subscription subscription = argEpisode.getSubscription(mPlaserService);
 
         mMetaBuilder.putText(MediaMetadata.METADATA_KEY_TITLE, argEpisode.getTitle());

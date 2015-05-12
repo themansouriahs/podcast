@@ -131,9 +131,9 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 		PlayerService playerService = MainActivity.sBoundPlayerService;
 
 		String playingFirst = "";
-		if (playerService != null && playerService.getCurrentItem() != null) {
+		if (playerService != null && playerService.getCurrentItem() != null && playerService.getCurrentItem() instanceof FeedItem) {
 			playingFirst = "case " + ItemColumns._ID + " when "
-					+ playerService.getCurrentItem().getId()
+            + ((FeedItem)playerService.getCurrentItem()).getId()
 					+ " then 1 else 2 end, ";
 		}
 		String prioritiesSecond = "case " + ItemColumns.PRIORITY

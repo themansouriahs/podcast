@@ -18,6 +18,7 @@ import org.bottiger.podcast.flavors.MediaCast.IMediaCast;
 import org.bottiger.podcast.flavors.MediaCast.IMediaRouteStateListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.service.PlayerService;
 
@@ -33,6 +34,13 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
     private static final float MARK_AS_LISTENED_MINUTES_LEFT_THRESHOLD = 5f;
 
     private static final boolean DELETE_WHEN_FINISHED_DEFAULT = false;
+
+    private final String PLAYER_ACTION_FASTFORWARD_KEY;
+    private final String PLAYER_ACTION_REWIND_KEY;
+
+    // needs to be a string
+    private final String PLAYER_ACTION_FASTFORWARD_DEFAULT_VALUE = "60";
+    private final String PLAYER_ACTION_REWIND_DEFAULT_VALUE = "60";
 
     private PlayerService mPlayerService;
     private PlayerHandler mHandler;
@@ -61,6 +69,10 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
                 HeadsetReceiver.class);
         this.mAudioManager = (AudioManager) mPlayerService.getSystemService(Context.AUDIO_SERVICE);
         mSharedpreferences = PreferenceManager.getDefaultSharedPreferences(mPlayerService.getApplicationContext());
+
+        Resources resources = argPlayerService.getResources();
+        PLAYER_ACTION_FASTFORWARD_KEY = resources.getString(R.string.pref_player_forward_amount_key);
+        PLAYER_ACTION_REWIND_KEY = resources.getString(R.string.pref_player_backward_amount_key);
     }
 
     public void setDataSourceAsync(String path, int startPos) {
@@ -181,29 +193,28 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
         return mMediaCast != null && mMediaCast.isActive() ? mMediaCast.getCurrentPosition() : super.getCurrentPosition();
     }
 
-    public void rewind(FeedItem argItem) {
+    public void rewind(IEpisode argItem) {
         if (mPlayerService == null)
             return;
 
-        argItem.setPosition(mPlayerService.getContentResolver(), 0);
+        String rewindAmount = mSharedpreferences.getString(PLAYER_ACTION_REWIND_KEY, PLAYER_ACTION_REWIND_DEFAULT_VALUE);
+        long seekTo = mPlayerService.position() - Integer.parseInt(rewindAmount)*1000; // to ms
 
         if (argItem.equals(mPlayerService.getCurrentItem())) {
-            mPlayerService.seek(0);
+            mPlayerService.seek(seekTo);
         }
     }
 
-    public void fastForward(FeedItem argItem) {
+    public void fastForward(IEpisode argItem) {
         if (mPlayerService == null)
             return;
 
-        String fastForwardAmount = mSharedpreferences.getString("pref_player_forward_amount", "60");
+        String fastForwardAmount = mSharedpreferences.getString(PLAYER_ACTION_FASTFORWARD_KEY, PLAYER_ACTION_FASTFORWARD_DEFAULT_VALUE);
         long seekTo = mPlayerService.position() + Integer.parseInt(fastForwardAmount)*1000; // to ms
 
         if (argItem.equals(mPlayerService.getCurrentItem())) {
             mPlayerService.seek(seekTo);
         }
-
-        argItem.setPosition(mPlayerService.getContentResolver(), seekTo);
     }
 
     /**
@@ -236,12 +247,13 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
     MediaPlayer.OnCompletionListener listener = new MediaPlayer.OnCompletionListener() {
         @Override
         public void onCompletion(MediaPlayer mp) {
-            FeedItem item = mPlayerService.getCurrentItem();
+            IEpisode item = mPlayerService.getCurrentItem();
 
-            if (item != null) {
+            if (item != null && item instanceof FeedItem) {
 
+                FeedItem feedItem = (FeedItem)item;
                 // Mark current as listened
-                item.markAsListened();
+                feedItem.markAsListened();
 
                if (mPlayerService != null) {
                    // Delete if required
@@ -250,11 +262,11 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
                     boolean doDelete = mSharedpreferences.getBoolean(resources.getString(R.string.pref_delete_when_finished_key), DELETE_WHEN_FINISHED_DEFAULT);
 
                     if (doDelete) {
-                        item.delFile(resolver);
+                        feedItem.delFile(resolver);
 
                     }
 
-                   item.update(resolver);
+                   feedItem.update(resolver);
                 }
             }
 
@@ -275,7 +287,7 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
         @Override
         public void onPrepared(MediaPlayer mp) {
             mp.seekTo(startPos);
-            mPlayerService.getCurrentItem().setDuration(mp.getDuration(), false);
+            mPlayerService.getCurrentItem().setDuration(mp.getDuration());
             start();
             isPreparingMedia = false;
         }
@@ -325,7 +337,15 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
         if (mPlayerService == null)
             return;
 
-        FeedItem episode = mPlayerService.getCurrentItem();
+        IEpisode iepisode = mPlayerService.getCurrentItem();
+
+        FeedItem episode = null;
+        if (iepisode instanceof FeedItem) {
+            episode = (FeedItem)iepisode;
+        } else {
+            return;
+        }
+
         float playerPosition = (float) getCurrentPosition();
 
         if (episode == null)
@@ -360,14 +380,17 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
         if (mPlayerService == null)
             return;
 
-        FeedItem episode = mPlayerService.getCurrentItem();
+        IEpisode episode = mPlayerService.getCurrentItem();
 
         if (episode == null)
             return;
 
         if (mMediaCast.isConnected()) {
             mMediaCast.loadEpisode(episode);
-            mMediaCast.seekTo(episode.offset);
+
+            if (episode instanceof FeedItem) {
+                mMediaCast.seekTo(((FeedItem)episode).offset);
+            }
 
             if (super.isPlaying()) {
                 int offst = super.getCurrentPosition();

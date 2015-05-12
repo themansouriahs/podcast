@@ -8,7 +8,7 @@ public interface WithIcon {
 	
 	public long getId();
 	
-	public String getImageURL(Context context);
+	public String getArtwork(Context context);
 	
 	public abstract String getDriveId();
 	

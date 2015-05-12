@@ -10,10 +10,10 @@ import org.bottiger.podcast.flavors.MediaCast.IMediaCast;
 import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.utils.PodcastLog;
 
-import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.Service;
@@ -32,6 +32,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -87,7 +88,7 @@ public class PlayerService extends Service implements
 	private AudioManager mAudioManager;
 	private ComponentName mControllerComponentName;
 
-	private FeedItem mItem = null;
+	private IEpisode mItem = null;
     private boolean mResumePlayback = false;
 
     private final String LOCK_NAME = "SoundWavesWifiLock";
@@ -213,7 +214,7 @@ public class PlayerService extends Service implements
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        handleIntent( intent );
+        handleIntent(intent);
 
         mMetaDataControllerWrapper.register(this);
 
@@ -265,11 +266,11 @@ public class PlayerService extends Service implements
     }
 
 	public void playNext() {
-        FeedItem item = getCurrentItem();
-        FeedItem nextItem = sPlaylist.getNext();
+        IEpisode item = getCurrentItem();
+        IEpisode nextItem = sPlaylist.getNext();
 
-		if (item != null) {
-            item.trackEnded(getContentResolver());
+		if (item != null && item instanceof FeedItem) {
+            ((FeedItem)item).trackEnded(getContentResolver());
         }
 
         if (nextItem == null) {
@@ -277,20 +278,20 @@ public class PlayerService extends Service implements
             return;
         }
 
-		play(nextItem.getId());
+		play(nextItem.getUrl().toString());
         mMetaDataControllerWrapper.updateState(nextItem, true);
         sPlaylist.removeItem(0);
         sPlaylist.notifyPlaylistChanged();
 	}
 
-	public void play(long id) {
+	public void play(String argEpisodeURL) {
 
 		// Pause the current episode in order to save the current state
 		if (mPlayer.isPlaying())
 			mPlayer.pause();
 
 		if (mItem != null) {
-			if ((mItem.id == id) && mPlayer.isInitialized()) {
+			if ((mItem.getUrl().toString() == argEpisodeURL) && mPlayer.isInitialized()) {
 				if (mPlayer.isPlaying() == false) {
 					start();
 				}
@@ -298,52 +299,76 @@ public class PlayerService extends Service implements
 			}
 
 			if (mPlayer.isPlaying()) {
-				mItem.updateOffset(getContentResolver(), mPlayer.position());
+                mItem.setOffset(getContentResolver(), mPlayer.position());
 				stop();
 			}
 		}
 
-		mItem = FeedItem.getById(getContentResolver(), id);
+		IEpisode oldItem = mItem;
+
+		mItem = FeedItem.getByURL(getContentResolver(), argEpisodeURL);
 
 		if (mItem == null)
 			return;
 
-		String dataSource = mItem.isDownloaded() ? mItem.getAbsolutePath()
-				: mItem.getURL();
 
-		int offset = mItem.offset < 0 ? 0 : mItem.offset;
+		// Removed the current top episode from the playlist if it has been started
+		if (oldItem != null && !oldItem.equals(mItem)) {
+			if (oldItem instanceof FeedItem) {
+				FeedItem oldFeedItem = (FeedItem)oldItem;
+				if (oldFeedItem.getOffset() > 0) {
+					oldFeedItem.markAsListened();
+					oldFeedItem.update(getContentResolver());
+
+					int pos = sPlaylist.getPosition(oldItem);
+					sPlaylist.removeItem(pos);
+				}
+			}
+		}
+
+        boolean isFeedItem = false;
+        if (mItem instanceof FeedItem) {
+            isFeedItem = true;
+        }
+        final FeedItem feedItem = isFeedItem ? (FeedItem)mItem : null;
+
+		String dataSource = mItem.isDownloaded() ? feedItem.getAbsolutePath()
+				: mItem.getUrl().toString();
+
+		int offset = mItem.getOffset() < 0 ? 0 : (int) mItem.getOffset();
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()    );
 
         if (offset == 0 && prefs.getBoolean("pref_stream_proxy", false))
-            dataSource = HTTPDService.proxyURL(mItem.id);
+            dataSource = HTTPDService.proxyURL(mItem.getUrl().toString());
 
 		mPlayer.setDataSourceAsync(dataSource, offset);
 
-        FeedItem item = getCurrentItem();
+        IEpisode item = getCurrentItem();
         if (item != null) {
             mMetaDataControllerWrapper.updateState(item, false);
         }
-		
-	    new Thread(new Runnable() {
-	        public void run() {
-	        	if (mItem.priority != 1)
-	        		mItem.setPriority(null, getApplication());
-	    		mItem.update(getContentResolver());
-	        }
-	    }).start();
+
+        if (isFeedItem) {
+            new Thread(new Runnable() {
+                public void run() {
+                    if (feedItem.priority != 1)
+                        feedItem.setPriority(null, getApplication());
+                    feedItem.update(getContentResolver());
+                }
+            }).start();
+        }
 	    
 	}
 
     /**
      *
-     * @param id
      * @return True of the songs start to play
      */
-	public boolean toggle(long id) {
-        FeedItem item = getCurrentItem();
-		if (!mPlayer.isPlaying() || (item != null && item.getId() != id)) {
-			play(id);
+	public boolean toggle(@NonNull IEpisode argEpisode) {
+        IEpisode item = getCurrentItem();
+		if (!mPlayer.isPlaying() || (item != null && !argEpisode.getUrl().equals(item.getUrl()))) {
+			play(argEpisode.getUrl().toString());
             return true;
 		} else {
 			pause();
@@ -373,7 +398,9 @@ public class PlayerService extends Service implements
 		}
 
 		if ((mItem != null)) {
-			mItem.updateOffset(getContentResolver(), mPlayer.position());
+            if (mItem instanceof FeedItem) {
+                ((FeedItem)mItem).setOffset(getContentResolver(), mPlayer.position());
+            }
 		} else {
 			log.error("playing but no item!!!");
 
@@ -390,6 +417,11 @@ public class PlayerService extends Service implements
 		mPlayer.stop();
 		mItem = null;
 		dis_notifyStatus();
+	}
+
+	public void halt() {
+		mPlayer.stop();
+		stopForeground(true);
 	}
 
 	public boolean isInitialized() {
@@ -418,18 +450,19 @@ public class PlayerService extends Service implements
 		return mPlayer.duration();
 	}
 
-	public FeedItem getCurrentItem() {
+	public IEpisode getCurrentItem() {
 		return mItem;
 	}
 
 	/**
 	 * @return The ID of the next episode in the playlist
 	 */
-	public long getNextId() {
-		FeedItem next = sPlaylist.nextEpisode();
+    @Nullable
+	public IEpisode getNextId() {
+		IEpisode next = sPlaylist.nextEpisode();
 		if (next != null)
-			return next.getId();
-		return -1;
+			return next;
+		return null;
 	}
 
 	/**

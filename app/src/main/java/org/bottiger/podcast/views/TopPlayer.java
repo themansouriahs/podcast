@@ -19,6 +19,7 @@ import android.widget.RelativeLayout;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.utils.UIUtils;
 
 import static org.bottiger.podcast.views.PlayerButtonView.StaticButtonColor;
@@ -28,7 +29,7 @@ import static org.bottiger.podcast.views.PlayerButtonView.StaticButtonColor;
  */
 public class TopPlayer extends RelativeLayout implements PaletteListener {
 
-    private FeedItem mEpisodeId;
+    private IEpisode mEpisodeId;
 
     private enum PlayerLayout { SMALL, MEDIUM, LARGE }
     private PlayerLayout mPlayerLayout = PlayerLayout.LARGE;
@@ -112,18 +113,21 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
 
     private void init(@NonNull Context argContext) {
 
-        if (!isInEditMode())
-            mActivity = (Activity)argContext;
+        int screenHeight = 1000;
 
-        int screenHeight = UIUtils.getScreenHeight(mActivity);
+        if (isInEditMode()) {
+            return;
+        }
+
+        mActivity = (Activity) argContext;
+        sizeShrinkBuffer = (int) UIUtils.convertDpToPixel(100, mActivity);
+        screenHeight = UIUtils.getScreenHeight(mActivity);
 
         sizeSmall = mActivity.getResources().getDimensionPixelSize(R.dimen.top_player_size_minimum);
         sizeMedium = mActivity.getResources().getDimensionPixelSize(R.dimen.top_player_size_medium);
         sizeLarge = screenHeight- mActivity.getResources().getDimensionPixelSize(R.dimen.top_player_size_maximum_bottom);
 
         screenHeight = sizeLarge;
-
-        sizeShrinkBuffer = (int)UIUtils.convertDpToPixel(100, mActivity);
 
         sizeStartShrink = sizeSmall+sizeShrinkBuffer;
         //sizeLarge = 1080; // 1080
@@ -174,7 +178,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
 
         mPlayPauseLargeSize = mPlayPauseButton.getLayoutParams().height;
 
-        //PaletteCache.generate(mEpisodeId.getImageURL(mActivity), mActivity, mSeekbar);
+        //PaletteCache.generate(mEpisodeId.getArtwork(mActivity), mActivity, mSeekbar);
 
         mLargeLayout.SeekBarLeftMargin = 0;
         mLargeLayout.PlayPauseSize = mPlayPauseLargeSize;
@@ -419,7 +423,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
         }
     }
 
-    public synchronized void setEpisodeId(FeedItem argEpisode) {
+    public synchronized void setEpisodeId(IEpisode argEpisode) {
         this.mEpisodeId = argEpisode;
     }
 

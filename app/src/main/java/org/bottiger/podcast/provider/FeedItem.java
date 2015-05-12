@@ -432,10 +432,12 @@ public class FeedItem extends AbstractItem implements IEpisode, Comparable<FeedI
 
 	}
 
-	public void updateOffset(ContentResolver contentResolver, long i) {
+	public void setOffset(ContentResolver contentResolver, long i) {
 		offset = (int) i;
-		lastUpdate = -1;
-		update(contentResolver);
+        if (contentResolver != null) {
+            lastUpdate = -1;
+            update(contentResolver);
+        }
 
 	}
 
@@ -482,8 +484,8 @@ public class FeedItem extends AbstractItem implements IEpisode, Comparable<FeedI
 
         if (listened >= 0)
             cv.put(ItemColumns.LISTENED, listened);
-        if (priority >= 0)
-            cv.put(ItemColumns.PRIORITY, priority);
+
+		cv.put(ItemColumns.PRIORITY, priority);
 
         if (image != null)
             cv.put(ItemColumns.IMAGE_URL, image);
@@ -1095,6 +1097,10 @@ public class FeedItem extends AbstractItem implements IEpisode, Comparable<FeedI
 		*/
 	}
 
+    public void setDuration(long argDurationMs) {
+        setDuration(argDurationMs, true);
+    }
+
     public void setDuration(long argDurationMs, boolean argOverride) {
         if (!argOverride) {
             if (duration_ms > 0)
@@ -1159,6 +1165,11 @@ public class FeedItem extends AbstractItem implements IEpisode, Comparable<FeedI
         return Subscription.getById(argContext.getContentResolver(), sub_id);
     }
 
+    @Override
+    public long getOffset() {
+        return offset;
+    }
+
     public void removeFromPlaylist(@NonNull ContentResolver argContentResolver) {
         priority = -1;
         update(argContentResolver);
@@ -1177,22 +1188,17 @@ public class FeedItem extends AbstractItem implements IEpisode, Comparable<FeedI
 
     @Nullable
     public void getArtworAsync(@NonNull Context context, @NonNull Target argTarget) {
-        Picasso.with(context).load(getImageURL(context)).into(argTarget);
+        Picasso.with(context).load(getArtwork(context)).into(argTarget);
     }
 
     @Nullable
 	@Override
-	public String getImageURL(@NonNull Context context) {
-		String imageURL = null;
+	public String getArtwork(@NonNull Context context) {
+		String imageURL;
 
         if (!TextUtils.isEmpty(image))
             return image;
 
-
-        /*
-		Subscription subscription = Subscription.getById(
-					context.getContentResolver(), sub_id);
-					*/
         Subscription subscription = getSubscription(context);
 
         if (subscription == null)
@@ -1216,10 +1222,10 @@ public class FeedItem extends AbstractItem implements IEpisode, Comparable<FeedI
 	 * FeedItem is null the current FeedItem becomes the first item in the
 	 * playlist
 	 */
-	public void setPriority(FeedItem precedingItem, Context context) {
+	public void setPriority(IEpisode precedingItem, Context context) {
 		priority = precedingItem == null ? 1 : precedingItem.getPriority() + 1;
 		increateHigherPriorities(precedingItem, context);
-		// update(context.getContentResolver());
+		update(context.getContentResolver());
 	}
 
 	public void setTopPriority(Context context) {
@@ -1232,6 +1238,11 @@ public class FeedItem extends AbstractItem implements IEpisode, Comparable<FeedI
 		update(contentResolver);
 	}
 
+	@Override
+	public void setPriority(int argPriority) {
+		priority = argPriority;
+	}
+
 	/**
 	 * Increase the priority of all items in the playlist after the current item
 	 * 
@@ -1239,7 +1250,7 @@ public class FeedItem extends AbstractItem implements IEpisode, Comparable<FeedI
 	 * @param minPriority
 	 * @param context
 	 */
-	private void increateHigherPriorities(FeedItem precedingItem,
+	private void increateHigherPriorities(IEpisode precedingItem,
 			Context context) {
 		String currentTime = String.valueOf(System.currentTimeMillis());
 		String updateLastUpdate = ", " + ItemColumns.LAST_UPDATE + "="
@@ -1364,6 +1375,11 @@ public class FeedItem extends AbstractItem implements IEpisode, Comparable<FeedI
 
     @Override
     public void setUrl(@NonNull URL argUrl) {
+
+    }
+
+    @Override
+    public void setArtwork(@NonNull URL argUrl) {
 
     }
 

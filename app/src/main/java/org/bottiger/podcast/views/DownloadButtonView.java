@@ -13,6 +13,7 @@ import android.view.View;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.DownloadStatus;
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
 import org.bottiger.podcast.utils.ColorExtractor;
@@ -25,7 +26,6 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
     private static final String TAG = "DownloadButtonView";
 
     private Context mContext;
-    private FeedItem mEpisode;
 
     private Drawable mStaticBackground = null;
     private int download_icon = R.drawable.ic_get_app_white;
@@ -106,13 +106,8 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
     }
 
     @Override
-    public FeedItem getEpisode() {
-        return mEpisode;
-    }
-
-    public void setEpisode(@NonNull FeedItem argItem) {
-        mEpisode = argItem;
-        setEpisodeId(mEpisode.getId());
+    public void setEpisode(@NonNull IEpisode argItem) {
+        super.setEpisode(argItem);
         setState(calcState());
         setProgressPercent(0);
     }
@@ -122,30 +117,33 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
         String viewStr = view == null ? "null" : view.toString();
         Log.d(TAG, "onCLick: view => " + viewStr);
 
-        if (mEpisode == null) {
+        if (getEpisode() == null) {
             Log.e(TAG, "Episode is null");
             throw new IllegalStateException("Episode can not be null");
         }
 
         if (getState() == PlayerButtonView.STATE_DEFAULT) {
             Log.v(TAG, "Queue download");
-            EpisodeDownloadManager.addItemAndStartDownload(mEpisode, EpisodeDownloadManager.QUEUE_POSITION.FIRST, mContext.getApplicationContext());
+            EpisodeDownloadManager.addItemAndStartDownload(getEpisode(), EpisodeDownloadManager.QUEUE_POSITION.FIRST, mContext.getApplicationContext());
             setState(PlayerButtonView.STATE_QUEUE);
         } else if (getState() == PlayerButtonView.STATE_DELETE) {
             Log.v(TAG, "Delete file");
-            mEpisode.delFile(mContext.getContentResolver());
-            setState(PlayerButtonView.STATE_DEFAULT);
+            IEpisode episode = getEpisode();
+            if (episode instanceof FeedItem) {
+                ((FeedItem)episode).delFile(mContext.getContentResolver());
+                setState(PlayerButtonView.STATE_DEFAULT);
+            }
         }
     }
 
     private int calcState() {
         //mEpisode.isDownloaded() ? PlayerButtonView.STATE_DELETE : PlayerButtonView.STATE_DEFAULT;
 
-        if (mEpisode.isDownloaded()) {
+        if (getEpisode().isDownloaded()) {
             return PlayerButtonView.STATE_DELETE;
         }
 
-        org.bottiger.podcast.service.DownloadStatus status = EpisodeDownloadManager.getStatus(mEpisode);
+        org.bottiger.podcast.service.DownloadStatus status = EpisodeDownloadManager.getStatus(getEpisode());
 
         if (status == org.bottiger.podcast.service.DownloadStatus.DOWNLOADING) {
             return PlayerButtonView.STATE_DEFAULT;

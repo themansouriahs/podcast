@@ -22,10 +22,12 @@
   <string name="menu_settings">Ρυθμίσεις</string>
   <string name="title_activity_swipe">SoundWaves</string>
   <string name="menu_download_all">Μαζική Λήψη</string>
-  <string name="menu_clear_playlist">Εκκαθαριση λίστας αναπαραγωγης</string>
+  <string name="menu_clear_playlist">Επαναφορά λίστας αναπαραγωγής</string>
   <string name="menu_import">Εισαγωγή/Εξαγωγή OPML</string>
   <string name="menu_add_podcast">Προσθήκη Podcast</string>
-  <string name="pref_feedback_title">Αποστολή ανώνυμης ανατροφοδότησης</string>
+  <string name="menu_order_by_date_desc">Εμφάνιση των πιο πρόσφατων πρώτα</string>
+  <string name="menu_order_by_date_asc">Εμφάνιση των παλαιότερων πρώτα</string>
+  <string name="pref_feedback_title">Αποστολή ανώνυμων αναφορών</string>
   <string name="pref_feedback_description">Αποστολή ανώνυμων δεδομένων σχετικά με την εφαρμογή, όπως αναφορές σφαλμάτων, στον προγραμματιστή</string>
   <string name="pref_cloud_support_title">Ενεργοποίηση υποστήριξης Cloud</string>
   <string name="pref_cloud_support_description">Η Cloud υποστήριξη θα δημιουργησει αντιγραφα ασφαλείας των δεδομένων σας στο cloud και θα συγχρονίσει τα δεδομένα μεταξύ των συσκευών σας</string>
@@ -54,8 +56,8 @@
   <string name="preferences_category_about">Σχετικά με</string>
   <string name="pref_current_version_title">Έκδοση</string>
   <string name="ok">OK</string>
-  <string name="playlist_filter_all">Όλα τα επεισόδια</string>
-  <string name="playlist_filter_some">Επιλεγμένα επεισόδια</string>
+  <string name="playlist_filter_all">Όλες οι συνδρομές</string>
+  <string name="playlist_filter_some">Προσαρμοσμένη επιλογή</string>
   <string name="playlist_filter_prefix">Εμφάνιση:</string>
   <string name="preference_first_run_key">πρώτη εκτέλεση</string>
   <string name="menu_feedback">Ανατροφοδότηση</string>
@@ -65,8 +67,7 @@
   <string name="pref_help_category_title">Βοηθηστε στην εξελιξη του SoundWaves</string>
   <string name="pref_help_static_field_description">Αν θέλετε να βοηθήσετε υπάρχουν πολλά πράγματα που μπορειτε να κάνετε. Θα μπορούσατε να ασχοληθητε με τον προγραμματισμό η θα να κανετε κάτι εντελως διαφορετικό. Χρειάζομαι βοήθεια με τις μετάφρασης, εμπειρία των χρηστών, εικόνες και γραφικά, μια ιστοσελίδα και ούτω καθεξής. Επικοινωνηστε μαζι μου στην σελίδα του λογισμικου στο GitHub (https://github.com/bottiger/SoundWaves) ή στείλτε μου ένα email: bottiger@gmail.com</string>
   <string name="podcast_title_unknown">Κανένας τίτλος :(</string>
-  <string name="playlist_empty">Κενή λίστα αναπαραγωγής</string>
-  <string name="subscription_instruction">Προσθήκη νέου podcast χρησιμοποιώντας την λειτουργία αναζήτησης ή εισάγετε το URL με μη αυτόματο τρόπο</string>
+  <string name="subscription_instruction">Προσθέστε νέα podcast χρησιμοποιώντας την σελίδα ανακάλυψης προς τα δεξιά ή εισαγάγετε ένα αρχείο OPML.\N\nΠαρακαλούμε να εξετάσετε αν θέλετε να ενεργοποιήσετε/απενεργοποιήσετε τις παρακάτω επιλογές.</string>
   <string name="filter_show_listened">Εμφάνιση ακρόασης</string>
   <string name="auto_start_next">Αυτοματη εναρξη επομενου</string>
   <string name="drawer_playlist_filters">Φίλτρα λίστας αναπαραγωγής </string>
@@ -108,7 +109,27 @@
   <string name="discovery_unsubscribe_toast">Διαγραφή απο %s</string>
   <string name="subscription_no_title">(Κανένας τίτλος)</string>
   <!--When downloading and parsing the content of a feed-->
+  <string name="discovery_progress_loading_podcast_content">Ανάκτηση περιεχομένου του podcast</string>
   <!--Search engine for searching for new podcasts-->
+  <string name="discovery_select_backend">Επιλογή μηχανής αναζήτησης</string>
+  <string name="pref_cloud_category_cloud_title">Υποστήριξη Cloud</string>
+  <string name="pref_cloud_category_services_title">Υπηρεσίες Web</string>
+  <string name="pref_webservices_dialog_title">Podcast Μηχανή Αναζήτησης</string>
+  <string name="pref_webservices_discovery_title">Μηχανή αναζήτησης</string>
+  <string name="pref_webservices_discovery_description">Οι υπηρεσίες web χρησιμοποιούνται για την αναζήτηση podcasts</string>
+  <string name="subscription_instruction_title">Σας ευχαριστούμε που δοκιμάζετε το SoundWaves</string>
+  <string name="playlist_filter_introducion">Αυτόματη συμπλήρωση της λίστας αναπαραγωγής με τα πρόσφατα επεισόδια από</string>
+  <string name="playlist_filter_none">Καμμια συμπλήρωση</string>
+  <string name="playlist_empty">Η λίστα αναπαραγωγής είναι κενή :(</string>
+  <string name="playlist_empty_title">Επιλέξτε την λειτουργία της λίστας αναπαραγωγής</string>
+  <string name="playlist_empty_text_top">Αφιερώστε λίγο χρόνο για να σκεφτείτε για πώς θέλετε να χρησιμοποιήσετε την εφαρμογή</string>
+  <string name="playlist_empty_text_bottom">Μπορείτε πάντα να αλλάξετε τον τρόπο λειτουργίας της λίστας αναπαραγωγής σύροντας το μενού από αριστερα</string>
+  <string name="playlist_empty_mode_one">Θεση επεισόδιων στην σειρά αναμονής με μη αυτόματο τρόπο</string>
+  <string name="playlist_empty_mode_two">Πρόσφατα επεισόδια</string>
+  <string name="playlist_empty_mode_one_desc">Η λίστας αναπαραγωγής θα περιλαμβάνει μόνο τα επεισόδια που έχετε στην σειρά αναμονής με μη αυτόματο τρόπο</string>
+  <string name="playlist_empty_mode_two_desc">Η λίστα αναπαραγωγής θα συμπλήρωθει η ίδια και θα περιέχει πάντα τα πιο πρόσφατα επεισόδια. Μπορείτε ακόμα να βαλετε στην σειρα αναμονης ενα επιλεγμένο επεισόδιο με μη αυτόματο τρόπο</string>
+  <string name="playlist_episode_dismissed">Το επεισόδιο αφαιρεθηκε</string>
+  <string name="drawer_playlist_content_source">Περιεχόμενο λίστας αναπαραγωγής</string>
   <plurals name="bulk_download_playlist">
     <item quantity="one">Πρώτο επεισόδιο στην λίστα αναπαραγωγής</item>
     <item quantity="other">Κορυφαία %d επεισόδια στην λίστα αναπαραγωγής</item>

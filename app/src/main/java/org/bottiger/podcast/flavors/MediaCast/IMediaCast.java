@@ -1,6 +1,7 @@
 package org.bottiger.podcast.flavors.MediaCast;
 
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 
 /**
  * Created by apl on 11-04-2015.
@@ -14,7 +15,7 @@ public interface IMediaCast {
     public boolean isPlaying();
     public boolean isActive();
 
-    public boolean loadEpisode(FeedItem argEpisode);
+    public boolean loadEpisode(IEpisode argEpisode);
 
     public void play(long argStartPosition);
     public void pause();

@@ -3,6 +3,7 @@ package org.bottiger.podcast.notification;
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.receiver.NotificationReceiver;
 import org.bottiger.podcast.service.PlayerService;
 
@@ -28,7 +29,7 @@ import com.squareup.picasso.Target;
 public class NotificationPlayer {
 	
 	private PlayerService mPlayerService;
-	private FeedItem item;
+	private IEpisode item;
     private Bitmap mArtwork;
 
     private Notification mNotification;
@@ -54,11 +55,13 @@ public class NotificationPlayer {
 	private NotificationManager mNotificationManager = null;
 	private static int mId = 4260;
 	
-	public NotificationPlayer(@NonNull PlayerService argPlayerService, @NonNull FeedItem item) {
+	public NotificationPlayer(@NonNull PlayerService argPlayerService, @NonNull IEpisode item) {
 		super();
 		this.mPlayerService = argPlayerService;
 		this.item = item;
-        item.getArtworAsync(mPlayerService, loadtarget);
+        if (item instanceof FeedItem) {
+            ((FeedItem)item).getArtworAsync(mPlayerService, loadtarget);
+        }
 	}
 
     @Nullable
@@ -114,13 +117,13 @@ public class NotificationPlayer {
 		    mNotificationManager.cancel(mId);
 	}
 
-	public FeedItem getItem() {
+	public IEpisode getItem() {
 		return item;
 	}
 
-	public void setItem(FeedItem item) {
+	public void setItem(IEpisode item) {
 		this.item = item;
-        item.getArtworAsync(mPlayerService, loadtarget);
+        //item.getArtworAsync(mPlayerService, loadtarget);
 	}
 	
 	public static int getNotificationId() {
@@ -152,6 +155,7 @@ public class NotificationPlayer {
         int play;
         int next;
         int smallIcon;
+        int clear = R.drawable.ic_clear_grey;
 
         if (isLight(0)) {
             pause = R.drawable.ic_play_arrow_black;
@@ -171,8 +175,8 @@ public class NotificationPlayer {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(mPlayerService)
                         .setSmallIcon(smallIcon)
-                        .setContentTitle(item.title)
-                        .setContentText(item.sub_title);
+                        .setContentTitle(item.getTitle());
+                        //.setContentText(item.sub_title);
 
         if (mArtwork != null && !mArtwork.isRecycled()) {
             mBuilder.setLargeIcon(icon);
@@ -188,20 +192,23 @@ public class NotificationPlayer {
 
         // Sets a custom content view for the notification, including an image button.
         RemoteViews layout = new RemoteViews(mPlayerService.getPackageName(), R.layout.notification);
-        layout.setTextViewText(R.id.notification_title, item.title);
-        layout.setTextViewText(R.id.notification_content, item.sub_title);
+        layout.setTextViewText(R.id.notification_title, item.getTitle());
+        //layout.setTextViewText(R.id.notification_content, item.sub_title);
         layout.setImageViewBitmap(R.id.icon, icon);
 
         // Prepare intent which is triggered if the
         // notification is selected
         Intent toggleIntent = new Intent(NotificationReceiver.toggleAction);
         Intent nextIntent = new Intent(NotificationReceiver.nextAction);
+        Intent clearIntent = new Intent(NotificationReceiver.clearAction);
 
         PendingIntent pendingToggleIntent = PendingIntent.getBroadcast(mPlayerService, 0, toggleIntent, 0);
         PendingIntent pendingNextIntent = PendingIntent.getBroadcast(mPlayerService, 0, nextIntent, 0);
+        PendingIntent pendingClearIntent = PendingIntent.getBroadcast(mPlayerService, 0, clearIntent, 0);
 
         layout.setOnClickPendingIntent(R.id.play_pause_button,pendingToggleIntent);
         layout.setOnClickPendingIntent(R.id.next_button,pendingNextIntent);
+        layout.setOnClickPendingIntent(R.id.clear_button,pendingClearIntent);
 
         //PlayerStatusListener.registerImageView(, mPlayerService);
 
@@ -210,6 +217,7 @@ public class NotificationPlayer {
 
         layout.setImageViewResource(R.id.play_pause_button, srcId);
         layout.setImageViewResource(R.id.next_button, next);
+        layout.setImageViewResource(R.id.clear_button, clear);
 
         mBuilder.setContent(layout);
 

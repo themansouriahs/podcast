@@ -6,6 +6,7 @@ import java.util.WeakHashMap;
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
 
 import android.app.Activity;
@@ -105,23 +106,24 @@ public class PlayerStatusObservable {
     }
 
     public static void updateProgress(@NonNull PlayerService argPlayerService) {
-        FeedItem currentItem = argPlayerService.getCurrentItem();
-        if (currentItem != null) {
+        IEpisode currentItem = argPlayerService.getCurrentItem();
+        if (currentItem != null && currentItem instanceof FeedItem) {
+            FeedItem feedItem = (FeedItem)currentItem;
             int offset = argPlayerService.getPlayer().getCurrentPosition();
             offset = argPlayerService.getPlayer().getCurrentPosition();
             updateEpisodeOffset(argPlayerService.getContentResolver(),
-                    currentItem,
+                    feedItem,
                     offset);
 
-            updateProgress(argPlayerService, currentItem);
+            updateProgress(argPlayerService, feedItem);
         }
     }
 
-    public static void updateProgress(@NonNull PlayerService argPlayerService, @NonNull FeedItem argEpisode) {
+    public static void updateProgress(@NonNull PlayerService argPlayerService, @NonNull IEpisode argEpisode) {
         for (PlayerStatusObserver listener : mListeners.keySet()) {
             if (argEpisode.equals(listener.getEpisode())) {
                 //listener.setProgressMs(argPlayerService.position());
-                listener.setProgressMs(argEpisode.offset);
+                listener.setProgressMs(argEpisode.getOffset());
             }
         }
     }
@@ -155,11 +157,11 @@ public class PlayerStatusObservable {
 		// Update notification
 		PlayerService ps = MainActivity.sBoundPlayerService;
 		if (ps != null) {
-			FeedItem currentItem = ps.getCurrentItem();
+			IEpisode currentItem = ps.getCurrentItem();
 			if (currentItem != null) {
 
                 for (PlayerStatusObserver listener : mListeners.keySet()) {
-                    listener.onStateChange(EpisodeStatus.generateEpisodeStatsus(currentItem.getId(), status, (int)ps.position()));
+                    listener.onStateChange(EpisodeStatus.generateEpisodeStatsus(currentItem, status, (int)ps.position()));
                 }
 
                 startProgressUpdate();

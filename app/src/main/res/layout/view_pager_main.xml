@@ -1,4 +1,4 @@
-<org.bottiger.podcast.views.MyCustomViewPager
+<org.bottiger.podcast.views.ViewPagerWithDismiss
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/pager"
         android:layout_width="match_parent"
@@ -20,4 +20,4 @@
         android:paddingTop="4dp"
         android:textColor="#fff" />
 
-</org.bottiger.podcast.views.MyCustomViewPager>
+</org.bottiger.podcast.views.ViewPagerWithDismiss>

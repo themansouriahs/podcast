@@ -46,8 +46,9 @@ public class HTTPDService extends Service {
 		mServer.run();
 	}
 
-    public static String proxyURL(long id) {
-        return host + ":" + String.valueOf(port) + "/?" + episode_key + "=" + String.valueOf(id);
+    public static String proxyURL(String argUrl) {
+        //return host + ":" + String.valueOf(port) + "/?" + episode_key + "=" + String.valueOf(id);
+        return "";
     }
 
 	public String getTest() {

@@ -138,6 +138,13 @@ public class VendorAnalytics extends AbstractAnalytics implements IAnalytics {
             eventData.LabelID = "FeedView";
         }
 
+        if (argType == EVENT_TYPE.PLAY_FROM_DISCOVERY) {
+            eventData = new EventData();
+            eventData.Category = CATEGORY_BEHAVIOR;
+            eventData.Action = "Play from discovery";
+            eventData.LabelID = "Discovery";
+        }
+
         if (argType == EVENT_TYPE.SUBSCRIBE_TO_FEED) {
             eventData = new EventData();
             eventData.Category = CATEGORY_USAGE;

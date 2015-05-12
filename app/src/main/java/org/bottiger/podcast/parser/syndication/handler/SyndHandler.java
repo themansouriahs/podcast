@@ -1,5 +1,6 @@
 package org.bottiger.podcast.parser.syndication.handler;
 
+import org.apache.commons.validator.routines.UrlValidator;
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.parser.FeedUpdater;
 import org.bottiger.podcast.parser.syndication.namespace.NSContent;
@@ -24,6 +25,8 @@ import org.xml.sax.helpers.DefaultHandler;
 import android.content.ContentResolver;
 import android.util.Log;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 
 /** Superclass for all SAX Handlers which process Syndication formats */
@@ -148,11 +151,32 @@ public class SyndHandler extends DefaultHandler {
 
         if (subscription instanceof SlimSubscription) {
             SlimSubscription slimSubscription = (SlimSubscription)subscription;
+
+			URL artwork = null;
+			String artworkString = slimSubscription.getImageURL();
+			UrlValidator urlValidator = new UrlValidator();
+			if (urlValidator.isValid(artworkString)) {
+				 try {
+					 artwork = new URL(artworkString);
+				 } catch (MalformedURLException mue) {
+					 artwork = null;
+				 }
+			}
+
             ArrayList<SlimEpisode> slimEpisodes = new ArrayList<>();
             for (FeedItem episode : state.getItems()) {
                 SlimEpisode slimEpisode = EpisodeConverter.toSlim(episode);
+
+				if (slimEpisode == null) {
+					continue;
+				}
+
+				if (artwork != null) {
+					slimEpisode.setArtwork(artwork);
+				}
+
                 if (slimEpisode != null) {
-                    slimEpisodes.add(EpisodeConverter.toSlim(episode));
+                    slimEpisodes.add(slimEpisode);
                 }
             }
             slimSubscription.setEpisodes(slimEpisodes);

@@ -11,6 +11,7 @@ import org.bottiger.podcast.listeners.EpisodeStatus;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObserver;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.utils.StrUtils;
 
 /**
@@ -18,7 +19,7 @@ import org.bottiger.podcast.utils.StrUtils;
  */
 public class TextViewObserver extends TextView implements PlayerStatusObserver {
 
-    protected FeedItem mEpisode = null;
+    protected IEpisode mEpisode = null;
 
     public TextViewObserver(Context context) {
         super(context);
@@ -37,7 +38,7 @@ public class TextViewObserver extends TextView implements PlayerStatusObserver {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
-    public void setEpisode(@NonNull FeedItem argEpisode) {
+    public void setEpisode(@NonNull IEpisode argEpisode) {
         if (mEpisode != null) {
             PlayerStatusObservable.unregisterListener(this);
         }
@@ -46,7 +47,7 @@ public class TextViewObserver extends TextView implements PlayerStatusObserver {
     }
 
     @Override
-    public FeedItem getEpisode() {
+    public IEpisode getEpisode() {
         return mEpisode;
     }
 

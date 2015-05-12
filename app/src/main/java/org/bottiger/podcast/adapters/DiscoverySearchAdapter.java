@@ -54,6 +54,10 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
             if (!argSucces)
                 return;
 
+            // FIXME why do I get Subscriptions here?
+            if (argSubscription instanceof Subscription)
+                return;
+
             SlimSubscription slimSubscription = (SlimSubscription)argSubscription;
             FeedActivity.startSlim(mActivity, slimSubscription.getURLString(), slimSubscription);
         }

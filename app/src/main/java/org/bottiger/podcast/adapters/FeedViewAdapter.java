@@ -34,7 +34,7 @@ import org.bottiger.podcast.views.PlayPauseImageView;
  */
 public class FeedViewAdapter extends RecyclerView.Adapter {
 
-    public enum ORDER { RECENT_FIRST, OLDEST_FIRST};
+    public enum ORDER { RECENT_FIRST, OLDEST_FIRST}
 
     protected ISubscription mSubscription;
 
@@ -96,6 +96,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
         bindButtons(episodeViewHolder, item);
 
 
+        episodeViewHolder.mDownloadButton.setEpisode(item);
         mDownloadProgressObservable.registerObserver(episodeViewHolder.mDownloadButton);
 
         if (mPalette != null) {
@@ -115,16 +116,16 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
 
         boolean isPlaying = false;
         if (MainActivity.sBoundPlayerService != null && MainActivity.sBoundPlayerService.isInitialized()) {
-            if (item.getId() == MainActivity.sBoundPlayerService
-                    .getCurrentItem().id) {
+            if (item.getURL().equals(MainActivity.sBoundPlayerService
+                    .getCurrentItem().getUrl().toString())) {
                 if (MainActivity.sBoundPlayerService.isPlaying()) {
                     isPlaying = true;
                 }
             }
         }
 
-        episodeViewHolder.mPlayPauseButton.setEpisodeId(item.getId(), PlayPauseImageView.LOCATION.FEEDVIEW);
-        episodeViewHolder.mQueueButton.setEpisodeId(item.getId(), PlayPauseImageView.LOCATION.FEEDVIEW);
+        episodeViewHolder.mPlayPauseButton.setEpisode(item, PlayPauseImageView.LOCATION.FEEDVIEW);
+        episodeViewHolder.mQueueButton.setEpisode(item, PlayPauseImageView.LOCATION.FEEDVIEW);
         episodeViewHolder.mPlayPauseButton.setStatus(isPlaying ? PlayerStatusObservable.STATUS.PLAYING : PlayerStatusObservable.STATUS.PAUSED);
 
         getPalette(episodeViewHolder);
@@ -137,7 +138,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
         PaletteHelper.generate(mSubscription.getImageURL(), mActivity, episodeViewHolder.mQueueButton);
         PaletteHelper.generate(mSubscription.getImageURL(), mActivity, episodeViewHolder.mPlayPauseButton);
         /*
-        PaletteHelper.generate(mSubscription.getImageURL(), mActivity, new PaletteListener() {
+        PaletteHelper.generate(mSubscription.getArtwork(), mActivity, new PaletteListener() {
             @Override
             public void onPaletteFound(Palette argChangedPalette) {
                 episodeViewHolder.mQueueRipple.animateRipple();
@@ -145,7 +146,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
 
             @Override
             public String getPaletteUrl() {
-                return mSubscription.getImageURL();
+                return mSubscription.getArtwork();
             }
         });*/
     }

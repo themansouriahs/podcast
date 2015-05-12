@@ -30,6 +30,7 @@
     <org.bottiger.podcast.views.FeedViewQueueButton
         android:id="@+id/queue_button"
         android:layout_marginRight="5dp"
+        android:padding="13dp"
         android:visibility="gone"
         android:src="@drawable/ic_add_white"
         style="@style/FeedViewPlayPauseButton"
@@ -63,7 +64,7 @@
         android:layout_height="wrap_content"
         android:singleLine="true"
         android:text="Podcast Title"
-        android:layout_marginTop="3dp"
+        android:layout_marginTop="10dp"
         android:layout_centerVertical="true"
         android:layout_alignParentTop="true"
         android:layout_toLeftOf="@+id/feedview_download_button_ripple"

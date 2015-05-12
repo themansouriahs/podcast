@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
 
 /**
@@ -29,7 +30,7 @@ public class MetaDataControllerWrapper {
         mLegacyRemoteController = argLegacyRemoteController;
     }
 
-    public void updateState(@NonNull FeedItem argEpisode, boolean updateAlbumArt) {
+    public void updateState(@NonNull IEpisode argEpisode, boolean updateAlbumArt) {
         if (Build.VERSION.SDK_INT >= 21) {
             mPlayerStateManager.updateState(argEpisode, updateAlbumArt);
         } else {

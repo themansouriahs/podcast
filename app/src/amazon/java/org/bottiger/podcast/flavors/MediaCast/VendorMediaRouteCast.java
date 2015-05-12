@@ -28,6 +28,7 @@ import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 
 import java.net.URLConnection;
 import java.util.List;
@@ -176,8 +177,8 @@ public class VendorMediaRouteCast implements IMediaCast {
     }
 
     @Override
-    public boolean loadEpisode(@NonNull FeedItem argEpisode) {
-        String url = argEpisode.getURL();
+    public boolean loadEpisode(@NonNull IEpisode argEpisode) {
+        String url = argEpisode.getUrl().toString();
 
         if (TextUtils.isEmpty(url))
             return false;
@@ -185,7 +186,7 @@ public class VendorMediaRouteCast implements IMediaCast {
         String mimeType= URLConnection.guessContentTypeFromName(url);
 
         String subTitle = argEpisode.getSubscription(mActivity).getTitle();
-        String artWorkURI = argEpisode.getImageURL(mActivity);
+        String artWorkURI = argEpisode.getArtwork(mActivity);
 
         MediaMetadata mediaMetadata = new MediaMetadata();
         mediaMetadata.putString(MediaMetadata.KEY_TITLE, argEpisode.getTitle());

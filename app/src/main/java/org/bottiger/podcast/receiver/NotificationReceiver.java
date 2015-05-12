@@ -6,6 +6,7 @@ import org.bottiger.podcast.Player.SoundWavesPlayer;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
 
 import android.content.BroadcastReceiver;
@@ -17,6 +18,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 
 	public static final String toggleAction = ApplicationConfiguration.packageName + ".TOGGLE";
 	public static final String nextAction = ApplicationConfiguration.packageName + ".NEXT";
+    public static final String clearAction = ApplicationConfiguration.packageName + ".CLEAR";
 
 	private RemoteViews layout;
 	private NotificationPlayer np;
@@ -41,6 +43,10 @@ public class NotificationReceiver extends BroadcastReceiver {
             return;
         }
 
+        if (action.equals(clearAction)) {
+            playerService.halt();
+            return;
+        }
 		
 		if (action.equals(toggleAction)) {
             SoundWavesPlayer player = playerService.getPlayer();
@@ -56,7 +62,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 				isPlaying = true;
 			}
 
-            FeedItem currentItem = playerService.getCurrentItem();
+            IEpisode currentItem = playerService.getCurrentItem();
             if (currentItem != null) {
                 np = new NotificationPlayer(playerService, playerService.getCurrentItem());
                 np.setmPlayerService(playerService);

@@ -18,6 +18,7 @@ import android.widget.TextView;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
 import org.bottiger.podcast.utils.OPMLImportExport;
 
@@ -119,7 +120,7 @@ public class DialogBulkDownload {
                 .getDefaultSharedPreferences(mContext);
         long bytesToKeep = EpisodeDownloadManager.bytesToKeep(sharedPreferences);
 
-        FeedItem episode;
+        IEpisode episode;
         Date date;
 
         int downloadCandidatesCount = Math.min(mPlaylist.size(), PLAYLIST_EPISODE_DOWNLOAD_COUNT);

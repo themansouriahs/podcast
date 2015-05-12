@@ -19,6 +19,7 @@ import java.util.HashSet;
 
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
 
 /**
@@ -36,15 +37,10 @@ public class OkHttpDownloader extends DownloadEngineBase {
 
     private double mProgress = 0;
 
-    public OkHttpDownloader(@NonNull FeedItem argEpisode) {
+    public OkHttpDownloader(@NonNull IEpisode argEpisode) {
         super(argEpisode);
 
-        try {
-            mURL = new URL(argEpisode.getURL());
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-            throw new IllegalArgumentException("URL was malformed");
-        }
+        mURL = argEpisode.getUrl();
     }
 
     @Override
@@ -56,44 +52,48 @@ public class OkHttpDownloader extends DownloadEngineBase {
         Thread downloadingThread = new Thread() {
             public void run() {
                 try {
-                    String filename =  Integer.toString(mEpisode.getEpisodeNumber()) + mEpisode.title.replace(' ', '_'); //Integer.toString(item.getEpisodeNumber()) + "_"
-                    mEpisode.setFilename(filename + ".mp3"); // .replaceAll("[^a-zA-Z0-9_-]", "") +
+                    if (mEpisode instanceof FeedItem) {
+                        FeedItem episode = (FeedItem) mEpisode;
 
-                    double contentLength = mConnection.getContentLength();
-                    InputStream inputStream = mConnection.getInputStream();
-                    FileOutputStream outputStream = new FileOutputStream(mEpisode.getAbsoluteTmpPath());
+                        String filename = Integer.toString(episode.getEpisodeNumber()) + episode.title.replace(' ', '_'); //Integer.toString(item.getEpisodeNumber()) + "_"
+                        episode.setFilename(filename + ".mp3"); // .replaceAll("[^a-zA-Z0-9_-]", "") +
+
+                        double contentLength = mConnection.getContentLength();
+                        InputStream inputStream = mConnection.getInputStream();
+                        FileOutputStream outputStream = new FileOutputStream(episode.getAbsoluteTmpPath());
 
 
-                    int bytesRead = -1;
-                    byte[] buffer = new byte[BUFFER_SIZE];
-                    while ((bytesRead = inputStream.read(buffer)) != -1) {
-                        outputStream.write(buffer, 0, bytesRead);
-                        mProgress += bytesRead / contentLength;
+                        int bytesRead = -1;
+                        byte[] buffer = new byte[BUFFER_SIZE];
+                        while ((bytesRead = inputStream.read(buffer)) != -1) {
+                            outputStream.write(buffer, 0, bytesRead);
+                            mProgress += bytesRead / contentLength;
+                        }
+
+                        outputStream.close();
+                        inputStream.close();
+
+                        File tmpFIle = new File(episode.getAbsoluteTmpPath());
+                        File finalFIle = new File(episode.getAbsolutePath());
+
+                        Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                        intent.setData(Uri.fromFile(finalFIle));
+                        SoundWaves.getAppContext().sendBroadcast(intent);
+
+                        EpisodeDownloadManager.mDownloadingItem = null;
+
+                        // If download was succesfull
+                        if (tmpFIle.exists() && tmpFIle.length() == contentLength) {
+                            tmpFIle.renameTo(finalFIle);
+                            onSucces(finalFIle);
+                        } else {
+                            onFailure(null);
+                        }
                     }
 
-                    outputStream.close();
-                    inputStream.close();
-
-                    File tmpFIle = new File(mEpisode.getAbsoluteTmpPath());
-                    File finalFIle = new File(mEpisode.getAbsolutePath());
-
-                    Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                    intent.setData(Uri.fromFile(finalFIle));
-                    SoundWaves.getAppContext().sendBroadcast(intent);
-
-                    EpisodeDownloadManager.mDownloadingItem = null;
-
-                    // If download was succesfull
-                    if (tmpFIle.exists() && tmpFIle.length() == contentLength) {
-                        tmpFIle.renameTo(finalFIle);
-                        onSucces(finalFIle);
-                    } else {
-                        onFailure(null);
-                    }
-
-                } catch (IOException e) {
+                }catch(IOException e){
                     onFailure(e);
-                } finally {
+                }finally{
                     mConnection.disconnect();
                 }
             }
@@ -118,14 +118,14 @@ public class OkHttpDownloader extends DownloadEngineBase {
         Log.d("Download", "Download succeeded");
 
         for (Callback callback : mExternalCallback) {
-            callback.downloadCompleted(mEpisode.getId());
+            callback.downloadCompleted(mEpisode);
         }
     }
 
     public void onFailure(IOException e) {
         Log.w("Download", "Download Failed");
         for (Callback callback : mExternalCallback) {
-            callback.downloadInterrupted(mEpisode.getId());
+            callback.downloadInterrupted(mEpisode);
         }
     }
 }

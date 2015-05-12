@@ -31,12 +31,12 @@ import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObserver;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.utils.ColorExtractor;
 
 /**
  * TODO: document your custom view class.
  */
-// imageview
 public class PlayPauseImageView extends ImageView implements PlayerStatusObserver,
                                                              PaletteListener,
                                                              DownloadObserver,
@@ -45,16 +45,16 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
     private static final boolean DRAW_PROGRESS          = true;
     private static final boolean DRAW_PROGRESS_MARKER   = true;
 
-    public enum LOCATION { PLAYLIST, FEEDVIEW, OTHER };
+    public enum LOCATION { PLAYLIST, FEEDVIEW, DISCOVERY_FEEDVIEW, OTHER };
     private LOCATION mLocation = LOCATION.OTHER;
 
     private static final int START_ANGLE = -90;
     private static final int DRAW_OFFSET = 5;
+    private static final int DRAW_WIDTH = 6;
 
     private PlayerStatusObservable.STATUS mStatus = PlayerStatusObservable.STATUS.STOPPED;
 
-    private FeedItem mEpisode;
-    private long mEpisodeId = -1;
+    private IEpisode mEpisode;
 
     protected Context mContext;
 
@@ -88,6 +88,7 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
     }
 
     private void init(Context argContext) {
+
         mContext = argContext;
 
         paint = new Paint(Paint.LINEAR_TEXT_FLAG);
@@ -99,7 +100,11 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
         paintBorder = new Paint(Paint.ANTI_ALIAS_FLAG);
         paintBorder.setColor(mPaintBorderColor);
         paintBorder.setStyle(Paint.Style.STROKE);
-        paintBorder.setStrokeWidth(5F);
+        paintBorder.setStrokeWidth(DRAW_WIDTH);
+
+        if (isInEditMode()) {
+            return;
+        }
 
         setOnClickListener(this);
         if (s_playIcon == null || s_pauseIcon == null) {
@@ -111,25 +116,24 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
         PlayerStatusObservable.registerListener(this);
     }
 
+    @NonNull
     @Override
-    public FeedItem getEpisode() {
-        if (mEpisode == null || mEpisode.getId() != mEpisodeId)
-            mEpisode = FeedItem.getById(this.getContext().getContentResolver(), mEpisodeId);
-
+    public IEpisode getEpisode() {
         return mEpisode;
     }
 
-    public synchronized void setEpisodeId(long argId, LOCATION argLocation) {
+    public synchronized void setEpisode(IEpisode argEpisode, LOCATION argLocation) {
         this.mLocation = argLocation;
-        this.mEpisodeId = argId;
+        this.mEpisode = argEpisode;
 
-        long offset = getEpisode().offset > 0 ? getEpisode().offset : 0;
+
+        long offset = mEpisode instanceof FeedItem && ((FeedItem)mEpisode).offset > 0 ? ((FeedItem)mEpisode).offset : 0;
         setProgressMs(offset);
         invalidate();
     }
 
     public synchronized void unsetEpisodeId() {
-        this.mEpisodeId = -1;
+        this.mEpisode = null;
     }
 
     public void setStatus(PlayerStatusObservable.STATUS argStatus) {
@@ -156,10 +160,10 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
         float radius = centerX-DRAW_OFFSET;
         canvas.drawCircle(centerX,centerY,radius,paint);
 
-        int diff2 = (int) (centerY-radius);
+        int diff2 =  DRAW_WIDTH;//(int) (centerY-radius);
         boolean updateOutline = bounds == null;
 
-        bounds = new RectF(DRAW_OFFSET, diff2, contentWidth - DRAW_OFFSET, contentWidth - DRAW_OFFSET + diff2); // DRAW_OFFSET-diff
+        bounds = new RectF(DRAW_OFFSET, diff2, contentWidth - DRAW_OFFSET, contentWidth - diff2); // DRAW_OFFSET-diff
 
         if (updateOutline) {
             onSizeChanged(0,0,0,0);
@@ -206,7 +210,7 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
 
     @Override
     public void onStateChange(EpisodeStatus argStatus) {
-        if (argStatus.getEpisodeId() != mEpisodeId) {
+        if (!argStatus.getEpisode().equals(mEpisode)) {
             return;
         }
 
@@ -230,11 +234,11 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
         if (type != null) {
             SoundWaves.sAnalytics.trackEvent(type);
         }
-        boolean isPlaying = MainActivity.sBoundPlayerService.toggle(mEpisodeId);
+        boolean isPlaying = MainActivity.sBoundPlayerService.toggle(mEpisode);
 
         setStatus(isPlaying ? PlayerStatusObservable.STATUS.PLAYING : PlayerStatusObservable.STATUS.STOPPED);
 
-        FeedItem item = getEpisode();
+        IEpisode item = getEpisode();
         Playlist playlist = Playlist.getActivePlaylist();
 
         if (playlist.contains(item)) {
@@ -258,7 +262,7 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
 
     @Override
     public String getPaletteUrl() {
-        return FeedItem.getById(getContext().getContentResolver(), mEpisodeId).getImageURL(getContext()); // FIXME
+        return mEpisode.getUrl().toString();
     }
 
     private static int smallSize = -1;
@@ -293,6 +297,10 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
         }
 
         if (mLocation == LOCATION.FEEDVIEW) {
+            return IAnalytics.EVENT_TYPE.PLAY_FROM_FEEDVIEW;
+        }
+
+        if (mLocation == LOCATION.DISCOVERY_FEEDVIEW) {
             return IAnalytics.EVENT_TYPE.PLAY_FROM_FEEDVIEW;
         }
 

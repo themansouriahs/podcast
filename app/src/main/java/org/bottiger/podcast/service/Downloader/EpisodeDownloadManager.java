@@ -11,6 +11,7 @@ import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.QueueEpisode;
 import org.bottiger.podcast.service.DownloadStatus;
@@ -52,16 +53,16 @@ public class EpisodeDownloadManager extends Observable {
 
     private static LinkedList<QueueEpisode> mDownloadQueue = new LinkedList<>();
 
-	public static FeedItem mDownloadingItem = null;
+	public static IEpisode mDownloadingItem = null;
 	private static HashSet<Long> mDownloadingIDs = new HashSet<>();
-    public static HashMap<Long, IDownloadEngine> mDownloadingEpisodes = new HashMap<>();
+    public static HashMap<IEpisode, IDownloadEngine> mDownloadingEpisodes = new HashMap<>();
 
 	private static DownloadManager downloadManager;
 
     private static IDownloadEngine.Callback mDownloadCompleteCallback = new IDownloadEngine.Callback() {
         @Override
-        public void downloadCompleted(long argID) {
-            FeedItem item = mDownloadingEpisodes.get(argID).getEpisode();
+        public void downloadCompleted(IEpisode argEpisode) {
+            FeedItem item = (FeedItem) argEpisode;
             item.setDownloaded(true);
             item.update(mContext.getContentResolver());
 
@@ -69,37 +70,41 @@ public class EpisodeDownloadManager extends Observable {
             intent.setData(Uri.fromFile(new File(item.getAbsolutePath())));
             mContext.sendBroadcast(intent);
 
-            removeDownloadingEpisode(argID);
+            removeDownloadingEpisode(argEpisode);
             removeExpiredDownloadedPodcasts(mContext);
 
             startDownload(mContext);
         }
 
         @Override
-        public void downloadInterrupted(long argID) {
-            removeDownloadingEpisode(argID);
+        public void downloadInterrupted(IEpisode argEpisode) {
+            removeDownloadingEpisode(argEpisode);
             startDownload(mContext);
         }
     };
 
     /**
      * Returns the status of the given FeedItem
-     * @param item
      * @return
      */
-	public static DownloadStatus getStatus(FeedItem item) {
-        Log.d(DEBUG_KEY, "getStatus(): " + item);
+	public static DownloadStatus getStatus(IEpisode argEpisode) {
+        Log.d(DEBUG_KEY, "getStatus(): " + argEpisode);
 
-		if (item == null) {
+		if (argEpisode == null) {
             return DownloadStatus.NOTHING;
         }
+
+        if (!(argEpisode instanceof FeedItem))
+            return DownloadStatus.NOTHING;
+
+        FeedItem item = (FeedItem)argEpisode;
 
         QueueEpisode qe = new QueueEpisode(item);
 		if (mDownloadQueue.contains(qe)) {
             return DownloadStatus.PENDING;
         }
 
-		FeedItem downloadingItem = getDownloadingItem();
+		IEpisode downloadingItem = getDownloadingItem();
 		if (downloadingItem != null) {
             if (item.equals(downloadingItem)) {
                 return DownloadStatus.DOWNLOADING;
@@ -115,20 +120,6 @@ public class EpisodeDownloadManager extends Observable {
 
 		return DownloadStatus.NOTHING;
 	}
-
-    public void fetchPLaylist() {
-        Playlist playlist = PlayerService.getPlaylist();
-        playlist.setContext(mContext);
-        playlist.populatePlaylistIfEmpty();
-
-        int max = playlist.size() > 5 ? 5 : playlist.size();
-        for (int i = 0; i < max; i++) {
-            FeedItem item = playlist.getItem(i);
-            if (item != null && !item.isDownloaded()) {
-                addItemToQueue(item, QUEUE_POSITION.LAST);
-            }
-        }
-    }
 
 	/**
 	 * Download all the episodes in the queue
@@ -218,7 +209,7 @@ public class EpisodeDownloadManager extends Observable {
             downloadEngine.addCallback(mDownloadCompleteCallback);
 
             downloadEngine.startDownload();
-            mDownloadingEpisodes.put(new Long(downloadingItem.getId()), downloadEngine);
+            mDownloadingEpisodes.put(downloadingItem, downloadEngine);
 
             getDownloadProgressObservable(mContext).addEpisode(downloadingItem);
         }
@@ -227,9 +218,9 @@ public class EpisodeDownloadManager extends Observable {
         return RESULT.OK;
 	}
 
-    public static void removeDownloadingEpisode(long argID) {
-        if (mDownloadingEpisodes.containsKey(argID)) {
-            mDownloadingEpisodes.remove(argID);
+    public static void removeDownloadingEpisode(IEpisode argEpisode) {
+        if (mDownloadingEpisodes.containsKey(argEpisode)) {
+            mDownloadingEpisodes.remove(argEpisode);
         } else {
             throw new IllegalStateException("No such epiode in download list");
         }
@@ -404,15 +395,17 @@ public class EpisodeDownloadManager extends Observable {
 	 * 
 	 * @return The downloading FeedItem
 	 */
-	public static FeedItem getDownloadingItem() {
+	public static IEpisode getDownloadingItem() {
 		if (mDownloadingItem == null) {
             return null;
         }
+
 
         if (mDownloadingItem != null) {
             return mDownloadingItem;
         }
 
+        /*
 		long downloadReference = mDownloadingItem.getDownloadReferenceID();
 		Query query = new Query();
 		query.setFilterById(downloadReference);
@@ -423,7 +416,7 @@ public class EpisodeDownloadManager extends Observable {
 
 			if (status == DownloadManager.STATUS_RUNNING)
 				return mDownloadingItem;
-		}
+		}*/
 
 		return null;
 	}
@@ -444,8 +437,12 @@ public class EpisodeDownloadManager extends Observable {
 	/**
 	 * Add feeditem to the download queue
 	 */
-	public static synchronized void addItemToQueue(FeedItem argEpisode, QUEUE_POSITION argPosition) {
-		QueueEpisode queueItem = new QueueEpisode(argEpisode);
+	public static synchronized void addItemToQueue(IEpisode argEpisode, QUEUE_POSITION argPosition) {
+        if (!(argEpisode instanceof FeedItem)) {
+            return;
+        }
+
+		QueueEpisode queueItem = new QueueEpisode((FeedItem)argEpisode);
 
         if (argPosition == QUEUE_POSITION.ANYWHERE) {
             if (!mDownloadQueue.contains(queueItem))
@@ -470,7 +467,7 @@ public class EpisodeDownloadManager extends Observable {
 	 *
 	 * @param context
 	 */
-	public static void addItemAndStartDownload(@NonNull FeedItem item, @NonNull QUEUE_POSITION argPosition, @NonNull Context context) {
+	public static void addItemAndStartDownload(@NonNull IEpisode item, @NonNull QUEUE_POSITION argPosition, @NonNull Context context) {
         addItemToQueue(item, argPosition);
 		startDownload(context);
 	}
