@@ -8,6 +8,10 @@
 # Java class files
 *.class
 
+#ndk
+app/libs
+app/obj
+
 # Generated files
 bin/
 gen/
