@@ -14,6 +14,8 @@ public class ViewPagerWithDismiss extends ViewPager {
 
     public static final String TAG = "ViewPagerWithDismiss";
 
+    float downX = -1;
+
     public ViewPagerWithDismiss(Context context) {
         super(context);
     }
@@ -49,7 +51,31 @@ public class ViewPagerWithDismiss extends ViewPager {
 
     @Override
     public boolean 	onInterceptTouchEvent(MotionEvent ev) {
+
         boolean doIntercept = super.onInterceptTouchEvent(ev);
+
+        if (getCurrentItem() > 0) {
+            return doIntercept;
+        }
+
+        switch (ev.getAction()) {
+            case MotionEvent.ACTION_DOWN: {
+                downX = ev.getRawX();
+                break;
+            }
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:{
+                downX = -1;
+                break;
+            }
+            case MotionEvent.ACTION_MOVE: {
+                float dx = ev.getRawX()-downX;
+                if (dx > 0)
+                    return false;
+                break;
+            }
+        }
+
         Log.d(TAG, "onInterceptTouchEvent, x => " + ev.getX() + ", y => " + ev.getY() + " doIntercept: " + doIntercept);
         return doIntercept;
     }
