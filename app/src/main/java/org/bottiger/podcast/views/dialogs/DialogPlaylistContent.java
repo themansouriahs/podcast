@@ -215,7 +215,13 @@ public class DialogPlaylistContent implements DialogInterface.OnMultiChoiceClick
     }
 
     private void checkCustom() {
+        for (int i = 0; i < mCheckboxes.size(); i++) {
+            CheckBox checkBox = mCheckboxes.get(i);
+            Subscription subscription = mSubscriptions.get(i);
 
+            if (mSubscriptionFilter.isShown(subscription.getId()))
+                checkBox.setChecked(true);
+        }
     }
 
     private void setRadioButtonState() {
