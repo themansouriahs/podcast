@@ -34,7 +34,12 @@
 -dontwarn okio.**
 
 #amazon
+-dontwarn com.amazon.**
 -dontwarn com.amazonaws.**
+-keep class com.amazon.** {*;}
+-keep class com.amazonaws.** {*;}
+-keepattributes *Annotation*
+-dontoptimize
 
 # Jackson xml parser
 -keepattributes Signature
