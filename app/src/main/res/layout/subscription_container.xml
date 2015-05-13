@@ -18,9 +18,9 @@
             android:layout_height="wrap_content"
             android:gravity="left"
             android:layout_marginLeft="0dp"
-            android:layout_marginBottom="-50dp"
+            android:layout_marginBottom="-20dp"
             android:layout_marginTop="-40dp"
-            android:textSize="130sp"
+            android:textSize="100sp"
             android:text="←"/>
 
         <TextView
@@ -29,34 +29,54 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_marginRight="0dp"
-            android:layout_marginBottom="-50dp"
+            android:layout_marginBottom="-20dp"
             android:layout_marginTop="-40dp"
-            android:textSize="130sp"
+            android:textSize="100sp"
             android:text="→"/>
 
         <TextView
             android:id="@+id/subscription_empty_text_left"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="36sp"
+            android:layout_weight="1"
+            android:textSize="22sp"
             android:text="@string/title_section3"
             android:gravity="left"
-            android:layout_alignTop="@+id/subscription_empty_text_right"
+            android:layout_below="@+id/subscription_empty_arrow_left"
+            android:paddingRight="10dp"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_alignRight="@+id/subscription_empty_arrow_left" />
+            android:layout_toLeftOf="@+id/subscription_empty_arrow_right"
+            android:layout_toStartOf="@+id/subscription_empty_arrow_right" />
 
         <TextView
             android:id="@+id/subscription_empty_text_right"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="22sp"
+            android:paddingLeft="10dp"
+            android:text="@string/title_section2"
+            android:layout_alignTop="@+id/subscription_empty_text_left"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_toRightOf="@+id/subscription_empty_arrow_left"
+            android:layout_toEndOf="@+id/subscription_empty_arrow_left"
+            android:gravity="right" />
+
+        <!--
+        <TextView
+            android:id="@+id/subscription_empty_text_right"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:gravity="right"
-            android:textSize="36sp"
+            android:textSize="26sp"
             android:layout_below="@id/subscription_empty_arrow_right"
             android:text="@string/title_section2"
             android:layout_alignParentRight="true"
             android:layout_toRightOf="@+id/subscription_empty_arrow_left"
-            android:layout_toEndOf="@+id/subscription_empty_arrow_left" />
+            android:layout_toEndOf="@+id/subscription_empty_arrow_left" />-->
 
         <TextView
             android:id="@+id/subscription_empty_text"
