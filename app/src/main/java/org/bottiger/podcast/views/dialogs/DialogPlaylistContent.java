@@ -221,6 +221,8 @@ public class DialogPlaylistContent implements DialogInterface.OnMultiChoiceClick
 
             if (mSubscriptionFilter.isShown(subscription.getId()))
                 checkBox.setChecked(true);
+            else
+                checkBox.setChecked(false);
         }
     }
 

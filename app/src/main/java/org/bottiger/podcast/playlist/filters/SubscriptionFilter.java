@@ -156,6 +156,7 @@ public class SubscriptionFilter implements IPlaylistFilter, SharedPreferences.On
 
     public void clear() {
         mFilterType = DisplayFilter.ALL;
+        mSubscriptions.clear();
     }
 
     @Override
