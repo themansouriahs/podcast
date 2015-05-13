@@ -82,7 +82,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         Log.v(TAG, "onCreateViewHolder");
 
         View view = mInflater.inflate(R.layout.episode_list, viewGroup, false);
-        PlaylistViewHolder holder = new PlaylistViewHolder(view);
+        PlaylistViewHolder holder = new PlaylistViewHolder(view, mActivity);
 
         return holder;
     }

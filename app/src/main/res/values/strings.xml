@@ -138,6 +138,7 @@
     <string name="playlist_empty_mode_two_desc">The playlist will populate itself and always contain the most recent episodes. You can still queue selected episode manually</string>
     <string name="playlist_episode_dismissed">Episode removed</string>
     <string name="drawer_playlist_content_source">Playlist content</string>
+    <string name="playlist_context_menu_playnext">Play next</string>
 
     <plurals name="bulk_download_playlist">
         <item quantity="one">First episode in the playlist</item>

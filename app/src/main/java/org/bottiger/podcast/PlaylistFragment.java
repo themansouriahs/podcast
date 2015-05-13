@@ -519,6 +519,18 @@ public class PlaylistFragment extends GeastureFragment implements
         outState.putLong(mExpandedEpisodeKey, mExpandedEpisodeId);
 	}
 
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.menu_playlist_context_play_next:
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
+
 
      @Override
      public void onCreateContextMenu(ContextMenu menu, View v,
