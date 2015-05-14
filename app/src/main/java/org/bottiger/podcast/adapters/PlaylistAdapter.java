@@ -243,22 +243,15 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
         mDownloadProgressObservable.registerObserver(holder.downloadButton);
 
-        // PlayerActivity.setProgressBar(sb, feedItem);
-        /*
-        long secondary = 0;
-        if (feedItem.filesize != 0) {
-            secondary = feedItem.isDownloaded() ? feedItem.getCurrentFileSize()
-                    : (feedItem.chunkFilesize / feedItem.filesize);
-        }*/
-
-        //RecentItemFragment.setProgressBar(holder.seekbar, playerDuration,
-        //        playerPosition, secondary);
 
         if (MainActivity.sBoundPlayerService != null) {
             boolean isPlaying = false;
             if (MainActivity.sBoundPlayerService.isInitialized()) {
-                if (feedItem.getUrl().toString() == MainActivity.sBoundPlayerService
-                        .getCurrentItem().getUrl().toString()) {
+                IEpisode currentEpisode = MainActivity.sBoundPlayerService.getCurrentItem();
+                if (currentEpisode == null)
+                    return;
+
+                if (feedItem != null && feedItem.getUrl() != null && feedItem.getUrl().toString().equals(currentEpisode.getUrl().toString())) {
                     if (MainActivity.sBoundPlayerService.isPlaying()) {
                         isPlaying = true;
                         PodcastBaseFragment.setCurrentTime(holder.currentTime);
