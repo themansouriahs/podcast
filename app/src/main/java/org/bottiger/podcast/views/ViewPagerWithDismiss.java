@@ -71,7 +71,7 @@ public class ViewPagerWithDismiss extends ViewPager {
             case MotionEvent.ACTION_MOVE: {
                 float dx = ev.getRawX()-downX;
                 if (dx > 0)
-                    return false;
+                    doIntercept = false;
                 break;
             }
         }
