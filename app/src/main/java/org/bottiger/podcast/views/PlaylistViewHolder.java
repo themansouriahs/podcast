@@ -105,7 +105,7 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
         mExpandedLayoutBottom = (ScrollView) view.findViewById(R.id.expanded_layout_bottom);
         description = (TextView) view.findViewById(R.id.podcast_description);
 
-        view.setOnCreateContextMenuListener(this);
+        //view.setOnCreateContextMenuListener(this);
     }
 
     @Override
