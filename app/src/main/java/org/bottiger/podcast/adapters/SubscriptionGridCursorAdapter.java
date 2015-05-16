@@ -33,11 +33,12 @@ public class SubscriptionGridCursorAdapter extends CursorRecyclerAdapter {
 
     private OnSubscriptionCountChanged mOnSubscriptionCountChanged = null;
 
-    public SubscriptionGridCursorAdapter(Activity argActivity, Cursor cursor) {
+    public SubscriptionGridCursorAdapter(Activity argActivity, Cursor cursor, int argColumnsCount) {
         super(cursor);
         mActivity = argActivity;
         mInflater = (LayoutInflater) argActivity
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        numberOfColumns = argColumnsCount;
     }
 
     @Override

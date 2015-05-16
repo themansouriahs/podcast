@@ -17,6 +17,7 @@ import org.bottiger.podcast.R;
 public class SubscriptionViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
 
     public TextView title;
+    public TextView subTitle;
     public SimpleDraweeView image;
     public View gradient;
 
@@ -24,6 +25,7 @@ public class SubscriptionViewHolder extends RecyclerView.ViewHolder implements V
         super(itemView);
 
         title = (TextView) itemView.findViewById(R.id.grid_title);
+        subTitle = (TextView) itemView.findViewById(R.id.grid_subtitle);
         image = (SimpleDraweeView) itemView.findViewById(R.id.grid_image);
         gradient = (View) itemView.findViewById(R.id.grid_item_gradient);
 
