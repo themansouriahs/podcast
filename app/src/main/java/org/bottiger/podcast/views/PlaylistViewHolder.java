@@ -1,6 +1,7 @@
 package org.bottiger.podcast.views;
 
 import android.app.Activity;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.ContextMenu;
@@ -66,6 +67,7 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
     public DownloadButtonView downloadButton;
 
     private Activity mActivity;
+    public String mArtwork;
 
     // ImageView iv, TextView tv1, TextView tv2, TextView tv3, TextView tv4, TextView tv5, TextView tv6, ViewStub vs, View pv
     public PlaylistViewHolder(View view, Activity argActivity) {
@@ -123,5 +125,17 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
         //super.onCreateContextMenu(menu, v, menuInfo);
         MenuInflater inflater = mActivity.getMenuInflater();
         //inflater.inflate(R.menu.playlist_context_menu, menu);
+    }
+
+    public void setArtwork(@Nullable String argArtwork) {
+        mArtwork = argArtwork;
+    }
+
+    public String getArtwork() {
+        return mArtwork;
+    }
+
+    public Activity getActivity() {
+        return mActivity;
     }
 }
