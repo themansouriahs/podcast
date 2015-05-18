@@ -49,7 +49,7 @@ A wakelock is required in order to keep the device alive while downloading new e
 Write access to the external storage is required in order to store episodes.
 * WRITE_EXTERNAL_STORAGE
 
-Knowlegde of the phone state is required in order to pause an episode if there is an incomming phone call. Unfortunatly this permission also grants the app permission to various other capabilities like reading the phone number. However, this is never done and should be verified by anyone who is worried about it. The Android API for getting the phone number is called "getLine1Number" and does not appear anywhere in the source code.
+Knowlegde of the phone state is required in order to pause an episode if there is an incomming phone call. Unfortunatly this permission also grants the app permission to various other capabilities like reading the phone number. However, this is never done and should be verified by anyone who is worried about it. The [Android API for getting the phone number](http://developer.android.com/reference/android/telephony/TelephonyManager.html#getLine1Number%28%29) is called "getLine1Number" and [does not appear anywhere in the source code](https://github.com/bottiger/SoundWaves/search?utf8=%E2%9C%93&q=getLine1Number). Expect for this readme file.
 * READ_PHONE_STATE
 
 In order to start fetching new episodes in the background without starting the app first we need to get notified when the device has booted up.
