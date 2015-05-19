@@ -56,6 +56,7 @@
 
         </FrameLayout>
 
+            <!--
             <Switch
                 android:id="@+id/result_subscribe_switch"
                 android:layout_width="wrap_content"
@@ -63,6 +64,16 @@
                 android:layout_below="@id/result_container"
                 android:layout_alignParentRight="true"
                 />
+                -->
+
+            <com.rey.material.widget.Switch
+                android:id="@+id/result_subscribe_switch"
+                style="@style/Material.Widget.Switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/result_container"
+                android:layout_alignParentRight="true"
+                android:checked="false"/>
 
             <TextView
                 android:layout_width="wrap_content"
