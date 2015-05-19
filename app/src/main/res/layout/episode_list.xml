@@ -21,6 +21,7 @@
         android:orientation="horizontal">
 
         <android.support.v7.widget.CardView
+            xmlns:fresco="http://schemas.android.com/apk/res-auto"
             android:id="@+id/left_image"
             android:layout_width="60dp"
             android:layout_height="60dp"
@@ -38,7 +39,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:alpha="1"/>
+                android:alpha="1"
+                fresco:roundAsCircle="true"/>
 
             <RelativeLayout
                 android:id="@+id/expanded_layout"
