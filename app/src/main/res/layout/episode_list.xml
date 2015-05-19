@@ -40,6 +40,7 @@
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
                 android:alpha="1"
+                fresco:roundWithOverlayColor="@color/white_opaque"
                 fresco:roundAsCircle="true"/>
 
             <RelativeLayout

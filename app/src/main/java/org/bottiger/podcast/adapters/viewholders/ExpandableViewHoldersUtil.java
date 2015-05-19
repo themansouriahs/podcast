@@ -18,6 +18,9 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
+import com.facebook.drawee.generic.GenericDraweeHierarchy;
+import com.facebook.drawee.generic.RoundingParams;
+
 import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.PaletteListener;
@@ -44,6 +47,7 @@ public class ExpandableViewHoldersUtil {
     private static RelativeLayout.LayoutParams sDurationParams;
     private static float sPodcastImageRadius;
 
+
     public static void openH(final PlaylistViewHolder holder, final View expandView, final boolean animate) {
         if (animate) {
             initTransition(holder);
@@ -61,6 +65,11 @@ public class ExpandableViewHoldersUtil {
 
             holder.mPodcastImage.setRadius(0);
             holder.mPodcastImage.setLayoutParams(newParams);
+
+            GenericDraweeHierarchy hierarchy = holder.mItemBackground.getHierarchy();
+            RoundingParams roundingParams = hierarchy.getRoundingParams();
+            roundingParams.setRoundAsCircle(false);
+            holder.mItemBackground.getHierarchy().setRoundingParams(roundingParams);
 
             sTitleParams.addRule(RelativeLayout.RIGHT_OF, 0);
             sTitleParams.addRule(RelativeLayout.LEFT_OF, 0);
@@ -142,6 +151,11 @@ public class ExpandableViewHoldersUtil {
             sPlayPauseParams.addRule(RelativeLayout.CENTER_VERTICAL);
             holder.mPlayPauseButton.setLayoutParams(sPlayPauseParams);
         }
+
+        GenericDraweeHierarchy hierarchy = holder.mItemBackground.getHierarchy();
+        RoundingParams roundingParams = hierarchy.getRoundingParams();
+        roundingParams.setRoundAsCircle(true);
+        holder.mItemBackground.getHierarchy().setRoundingParams(roundingParams);
 
         holder.mTimeDuration.setGravity(Gravity.LEFT);
         holder.mTimeDurationIcon.setVisibility(View.VISIBLE);
