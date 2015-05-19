@@ -11,12 +11,6 @@
     android:elevation="10dp"
     android:foreground="@drawable/photo_banner_scrim">
 
-    <com.facebook.drawee.view.SimpleDraweeView
-        android:id="@+id/session_photo"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        fresco:actualImageScaleType="focusCrop"/>
-
     <View
         android:id="@+id/top_gradient"
         android:background="@drawable/header_gradient"
@@ -95,20 +89,44 @@
         style="@style/tallerBarStyle"
         />
 
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_below="@id/player_progress"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="15dp">
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/session_photo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            fresco:actualImageScaleType="focusCrop"/>
+
+        <View
+            android:id="@+id/top_gradient_inner"
+            android:background="@drawable/header_gradient"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="top" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="15dp">
 
     <TextView
         android:id="@+id/episode_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/player_progress"
         android:text="@string/episode_title"
-        android:textColor="@color/white_opaque"
-        android:textSize="22sp"
-        android:padding="5dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
         />
+            <!--
+            android:textColor="@color/white_opaque"
+        android:textSize="22sp"
+            -->
 
     <TextView
         android:id="@+id/episode_info"
@@ -116,12 +134,18 @@
         android:layout_height="match_parent"
         android:layout_below="@id/episode_title"
         android:text="@string/episode_description"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        />
+            <!--
+
         android:padding="5dp"
         android:textColor="@color/white_opaque"
         android:textSize="16sp"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
-        />
+            -->
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
     <!--
 
         android:requiresFadingEdge="vertical"

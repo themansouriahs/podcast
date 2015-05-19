@@ -314,6 +314,10 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        if  (isInEditMode()) {
+            return;
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             setOutlineProvider(new CustomOutline(bounds));
         }
