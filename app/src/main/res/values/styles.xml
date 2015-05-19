@@ -299,7 +299,7 @@
 
     <!-- Navigation Drawer - Start -->
     <!-- parent="Theme.AppCompat.Light.NoActionBar-->
-    <style name="DrawerSwitchTextAppearance" parent="@android:style/TextAppearance.Small">
+    <style name="DrawerSwitchTextAppearance" parent="@style/Material.Widget.Switch">
         <item name="android:textColor">@color/drawer_text</item>
         <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
     </style>
