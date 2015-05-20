@@ -27,10 +27,15 @@ public class PodcastSubscriberActivity extends Activity {
         Log.v(TAG, "Starting PodcastSubscriberActivity"); // NoI18N
 
         Intent intent = getIntent();
-        Uri data = intent.getData();
 
         try {
-            url = new URL(data.toString());
+            if (Intent.ACTION_SEND.equals(intent.getAction())) {
+                String urlstr = intent.getStringExtra(Intent.EXTRA_TEXT);
+                url = new URL(urlstr);
+            } else {
+                Uri data = intent.getData();
+                url = new URL(data.toString());
+            }
         } catch (MalformedURLException e) {
             e.printStackTrace();
             finish();
@@ -46,6 +51,11 @@ public class PodcastSubscriberActivity extends Activity {
         IDownloadCompleteCallback mRefreshCompleteCallback = new IDownloadCompleteCallback() {
             @Override
             public void complete(boolean argSucces, ISubscription argSubscription) {
+
+                if (!argSucces) {
+                    finish();
+                }
+
                 mProgress.dismiss();
 
                 if (!argSucces)
