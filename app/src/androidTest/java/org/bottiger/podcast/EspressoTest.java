@@ -5,6 +5,12 @@ import android.test.ActivityInstrumentationTestCase2;
 
 import org.junit.Before;
 
+import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.swipeRight;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
+
 /**
  * Created by apl on 20-05-2015.
  */
@@ -27,18 +33,18 @@ public class EspressoTest extends ActivityInstrumentationTestCase2<MainActivity>
         mActivity = getActivity();
     }
 
-    public void testChangeText_sameActivity() {
+    public void testWelcomeScreen() {
         // Type text and then press the button.
-        int j = 5;
-        j = j+j;
-        /*
-        onView(withId(R.id.editTextUserInput))
-                .perform(typeText(STRING_TO_BE_TYPED), closeSoftKeyboard());
-        onView(withId(R.id.changeTextButton)).perform(click());
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withId(R.id.playlist_empty_header)).check(matches(isDisplayed()));
+    }
 
-        // Check that the text was changed.
-        ...
-        */
+    public void testSwipeToSubscriptionFragment() {
+        onView(withId(R.id.playlist_empty_header)).perform(swipeRight());
     }
 
 }
