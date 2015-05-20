@@ -192,7 +192,7 @@
 
     <instrumentation
         android:name="android.test.InstrumentationTestRunner"
-        android:label="Hapi Podcast test"
+        android:label="SoundWaves Podcatcher test"
         android:targetPackage="org.bottiger.podcast" />
 
 </manifest>
