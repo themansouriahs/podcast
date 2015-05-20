@@ -88,7 +88,7 @@ public class SubscriptionGridCursorAdapter extends CursorRecyclerAdapter {
         else
             holder.title.setText(R.string.subscription_no_title);
 
-        if (subscription.getLastUpdate() > 0) {
+        if (subscription.getLastUpdate() > 0 && holder.subTitle != null) {
             String reportDate = DateUtils.getRelativeTimeSpanString(subscription.getLastItemUpdated()).toString(); //df.format(date);
 
             String updatedAt = mActivity.getResources().getString(R.string.subscription_subtitle_updated_at);
