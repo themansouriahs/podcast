@@ -103,6 +103,18 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
             return;
         }
 
+        viewHolder.setArtwork(null);
+
+        UrlValidator urlValidator = new UrlValidator();
+        String image = item.getArtwork(mActivity);
+        if (!TextUtils.isEmpty(image) && urlValidator.isValid(image)) {
+
+            FrescoHelper.PalettePostProcessor postProcessor = new FrescoHelper.PalettePostProcessor(mActivity, image);
+            FrescoHelper.loadImageInto(viewHolder.mItemBackground, image, postProcessor);
+
+            viewHolder.setArtwork(image);
+        }
+
         keepOne.bind(viewHolder, position);
 
         Log.d("ExpanderHelper", "pos: " + position + " episode: " + item.getTitle());
@@ -115,12 +127,12 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
                 int white = mActivity.getResources().getColor(R.color.white_opaque);
 
                 ColorExtractor colorExtractor = new ColorExtractor(mActivity, argChangedPalette);
-                viewHolder.mLayout.setCardBackgroundColor(colorExtractor.getPrimary());
-                viewHolder.mMainTitle.setTextColor(colorExtractor.getTextColor());
-                //viewHolder.buttonLayout.setBackgroundColor(colorExtractor.getPrimary());
-                viewHolder.description.setTextColor(colorExtractor.getTextColor());
-                viewHolder.currentTime.setTextColor(colorExtractor.getTextColor());
-                viewHolder.mTimeDuration.setTextColor(colorExtractor.getTextColor());
+                //viewHolder.mLayout.setCardBackgroundColor(colorExtractor.getPrimary());
+                //viewHolder.mMainTitle.setTextColor(colorExtractor.getTextColor());
+                ////viewHolder.buttonLayout.setBackgroundColor(colorExtractor.getPrimary());
+                //viewHolder.description.setTextColor(colorExtractor.getTextColor());
+                //viewHolder.currentTime.setTextColor(colorExtractor.getTextColor());
+                //viewHolder.mTimeDuration.setTextColor(colorExtractor.getTextColor());
             }
 
             @Override
@@ -128,8 +140,6 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
                 return null;
             }
         });
-
-        int type = getItemViewType(position);
 
         viewHolder.episode = item;
         viewHolder.mAdapter = this;
@@ -154,21 +164,6 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
         viewHolder.downloadButton.setEpisode(item);
         mDownloadProgressObservable.registerObserver(viewHolder.downloadButton);
-
-        String imageUrl = item.getArtwork(mActivity);
-        //String imageUrl = item.getSubscription(mActivity).getImageURL();
-        //if (!TextUtils.isEmpty(imageUrl)) {
-        //    viewHolder.mItemBackground.setPaletteKey(imageUrl);
-        //}
-
-        // http://frescolib.org/docs/getting-started.html#_
-        UrlValidator urlValidator = new UrlValidator();
-        String image = item.getArtwork(mActivity);
-        if (!TextUtils.isEmpty(image) && urlValidator.isValid(image)) {
-
-            FrescoHelper.PalettePostProcessor postProcessor = new FrescoHelper.PalettePostProcessor(mActivity, image);
-            FrescoHelper.loadImageInto(viewHolder.mItemBackground, image, postProcessor);
-        }
 
 
         bindExandedPlayer(mActivity, item, viewHolder, position);

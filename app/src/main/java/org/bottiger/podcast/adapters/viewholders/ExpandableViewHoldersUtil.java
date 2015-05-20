@@ -6,7 +6,10 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.Activity;
+import android.content.Context;
 import android.os.Build;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.transition.TransitionManager;
 import android.view.Gravity;
@@ -15,8 +18,14 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
+import com.facebook.drawee.generic.GenericDraweeHierarchy;
+import com.facebook.drawee.generic.RoundingParams;
+
 import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.listeners.PaletteListener;
+import org.bottiger.podcast.utils.ColorExtractor;
+import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.views.FixedRecyclerView;
 import org.bottiger.podcast.views.PlayPauseImageView;
@@ -38,6 +47,7 @@ public class ExpandableViewHoldersUtil {
     private static RelativeLayout.LayoutParams sDurationParams;
     private static float sPodcastImageRadius;
 
+
     public static void openH(final PlaylistViewHolder holder, final View expandView, final boolean animate) {
         if (animate) {
             initTransition(holder);
@@ -55,6 +65,11 @@ public class ExpandableViewHoldersUtil {
 
             holder.mPodcastImage.setRadius(0);
             holder.mPodcastImage.setLayoutParams(newParams);
+
+            GenericDraweeHierarchy hierarchy = holder.mItemBackground.getHierarchy();
+            RoundingParams roundingParams = hierarchy.getRoundingParams();
+            roundingParams.setRoundAsCircle(false);
+            holder.mItemBackground.getHierarchy().setRoundingParams(roundingParams);
 
             sTitleParams.addRule(RelativeLayout.RIGHT_OF, 0);
             sTitleParams.addRule(RelativeLayout.LEFT_OF, 0);
@@ -80,6 +95,26 @@ public class ExpandableViewHoldersUtil {
             holder.mTimeDurationIcon.setVisibility(View.GONE);
             holder.mExpandedLayoutBottom.setVisibility(View.VISIBLE);
             expandView.setVisibility(View.VISIBLE);
+
+            PaletteHelper.generate(holder.getArtwork(), holder.getActivity(), new PaletteListener() {
+                @Override
+                public void onPaletteFound(Palette argChangedPalette) {
+                    int white = holder.getActivity().getResources().getColor(R.color.white_opaque);
+
+                    ColorExtractor colorExtractor = new ColorExtractor(holder.getActivity(), argChangedPalette);
+                    holder.mLayout.setCardBackgroundColor(colorExtractor.getPrimary());
+                    holder.mMainTitle.setTextColor(colorExtractor.getTextColor());
+                    ////viewHolder.buttonLayout.setBackgroundColor(colorExtractor.getPrimary());
+                    holder.description.setTextColor(colorExtractor.getTextColor());
+                    holder.currentTime.setTextColor(colorExtractor.getTextColor());
+                    holder.mTimeDuration.setTextColor(colorExtractor.getTextColor());
+                }
+
+                @Override
+                public String getPaletteUrl() {
+                    return null;
+                }
+            });
 
     }
 
@@ -117,10 +152,36 @@ public class ExpandableViewHoldersUtil {
             holder.mPlayPauseButton.setLayoutParams(sPlayPauseParams);
         }
 
+        GenericDraweeHierarchy hierarchy = holder.mItemBackground.getHierarchy();
+        RoundingParams roundingParams = hierarchy.getRoundingParams();
+        roundingParams.setRoundAsCircle(true);
+        holder.mItemBackground.getHierarchy().setRoundingParams(roundingParams);
+
         holder.mTimeDuration.setGravity(Gravity.LEFT);
         holder.mTimeDurationIcon.setVisibility(View.VISIBLE);
         holder.mExpandedLayoutBottom.setVisibility(View.GONE);
         expandView.setVisibility(View.GONE);
+
+        PaletteHelper.generate(holder.getArtwork(), holder.getActivity(), new PaletteListener() {
+            @Override
+            public void onPaletteFound(Palette argChangedPalette) {
+                int white = holder.getActivity().getResources().getColor(R.color.white_opaque);
+                int black = holder.getActivity().getResources().getColor(R.color.black);
+
+                ColorExtractor colorExtractor = new ColorExtractor(holder.getActivity(), argChangedPalette);
+                holder.mLayout.setCardBackgroundColor(white);
+                holder.mMainTitle.setTextColor(black);
+                ////viewHolder.buttonLayout.setBackgroundColor(colorExtractor.getPrimary());
+                holder.description.setTextColor(black);
+                holder.currentTime.setTextColor(black);
+                holder.mTimeDuration.setTextColor(black);
+            }
+
+            @Override
+            public String getPaletteUrl() {
+                return null;
+            }
+        });
 
     }
 

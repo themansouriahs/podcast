@@ -31,10 +31,10 @@ public class HandlerState {
 
 	public HandlerState(@NonNull ISubscription feed) {
 		this.feed = feed;
-		items = new ArrayList<FeedItem>();
-		tagstack = new Stack<SyndElement>();
-		namespaces = new HashMap<String, Namespace>();
-		defaultNamespaces = new Stack<Namespace>();
+		items = new ArrayList<>();
+		tagstack = new Stack<>();
+		namespaces = new HashMap<>();
+		defaultNamespaces = new Stack<>();
 	}
 
 	public ISubscription getSubscription() {

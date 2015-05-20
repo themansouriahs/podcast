@@ -1,23 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-<FrameLayout
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/item"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="5dp"
-    >
--->
+
 <android.support.v7.widget.CardView
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginLeft="1dp"
-    android:layout_marginRight="1dp"
-    android:layout_marginTop="1dp"
+    android:layout_marginLeft="0dp"
+    android:layout_marginRight="0dp"
+    android:layout_marginTop="1px"
     card_view:cardCornerRadius="2dp">
 
     <RelativeLayout
@@ -26,11 +17,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:paddingTop="1px"
         android:clipChildren="false"
         android:orientation="horizontal">
 
         <android.support.v7.widget.CardView
+            xmlns:fresco="http://schemas.android.com/apk/res-auto"
             android:id="@+id/left_image"
             android:layout_width="60dp"
             android:layout_height="60dp"
@@ -48,7 +39,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:alpha="1"/>
+                android:alpha="1"
+                fresco:roundWithOverlayColor="@color/white_opaque"
+                fresco:roundAsCircle="true"/>
 
             <RelativeLayout
                 android:id="@+id/expanded_layout"
@@ -170,11 +163,15 @@
             android:layout_height="wrap_content"
             android:text="@string/podcast_title_unknown"
             android:singleLine="true"
-            android:textSize="22sp"
-            android:textColor="@color/white_opaque"
             android:layout_toRightOf="@id/left_image"
             android:layout_toLeftOf="@id/list_image"
-            android:layout_margin="10dp"/>
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="5dp"/>
+        <!--
+            android:textSize="22sp" -->
 
         <ImageView
             android:id="@+id/podcast_duration_ic"
@@ -183,7 +180,7 @@
             android:layout_marginRight="5dp"
             android:scaleType="fitXY"
             android:adjustViewBounds="true"
-            android:src="@drawable/ic_access_time_white"
+            android:src="@drawable/ic_access_time_grey"
             android:layout_below="@+id/podcast_title"
             android:layout_alignStart="@id/podcast_title"
             android:layout_alignLeft="@id/podcast_title"
@@ -196,13 +193,11 @@
             android:singleLine="true"
             android:layout_toRightOf="@+id/podcast_duration_ic"
             android:layout_alignTop="@+id/podcast_duration_ic"
-            android:textColor="@color/white_opaque"
             android:textSize="15sp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="60dp"
             android:textAlignment="gravity"
             />
-        <!--             android:layout_below="@+id/podcast_title" -->
 
         <ScrollView
             android:id="@+id/expanded_layout_bottom"
@@ -219,86 +214,7 @@
 
         </ScrollView>
 
-        <!--
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Hey here"
-            android:textColor="@color/black"/>
-
-            <org.bottiger.podcast.views.DownloadButtonView
-                android:id="@+id/download"
-                android:padding="0dip"
-                style="@style/RightPlaylistButton" />
-
-            <org.bottiger.podcast.views.PlayerButtonView
-                android:id="@+id/favorite"
-                android:padding="0dip"
-                android:src="?attr/favorite_outline"
-                android:layout_toLeftOf="@id/download"
-                style="@style/PlaylistButton" />
-
-            <org.bottiger.podcast.views.PlayerButtonView
-                android:id="@+id/remove_episode"
-                android:padding="0dip"
-                android:src="?attr/ic_remove"
-                android:layout_toLeftOf="@id/favorite"
-                style="@style/PlaylistButton" />
-
-        </FrameLayout>
-
-        <include layout="@layout/extended_player_buttons" />
-
-        <org.bottiger.podcast.views.PlayerSeekbar
-            android:id="@+id/player_progress"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="10dp"
-            style="@style/tallerBarStyle"
-            />
-
-        <RelativeLayout
-            android:id="@+id/expanded_controls"
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:background="@color/red"
-            android:layout_below="@id/podcast_title"
-            android:padding="@dimen/padding_medium"
-            android:elevation="4dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Hey there"
-                android:textColor="@color/black"/>
-
-        </RelativeLayout>
-
-        <View
-            android:id="@+id/episode_top_gradient"
-            android:background="@drawable/header_gradient"
-            android:layout_width="match_parent"
-            android:layout_height="150dp"
-            android:visibility="gone"
-            android:layout_gravity="top" />
-
--->
-        <!--
-        <include layout="@layout/extended_player"
-            android:layout_width="match_parent"
-            android:layout_below="@+id/podcast_title"
-            android:layout_height="140dp"/>
-            -->
-        <!--
-            -->
 
     </RelativeLayout>
 
 </android.support.v7.widget.CardView>
-<!--
-</FrameLayout>
--->

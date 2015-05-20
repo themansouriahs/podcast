@@ -557,6 +557,14 @@ public class Subscription extends AbstractItem implements ISubscription, Palette
 		// update(contentResolver);
 	}
 
+	public void setLastItemUpdated(long argTimestamp) {
+		this.lastItemUpdated = argTimestamp;
+	}
+
+	public long getLastItemUpdated() {
+		return this.lastItemUpdated;
+	}
+
 	@Override
 	public long lastModificationDate() {
 		return lastUpdated;

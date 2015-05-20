@@ -40,7 +40,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
-import android.widget.Switch;
+import com.rey.material.widget.Switch;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
@@ -198,12 +198,13 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity {
         });
 
         // Show listened
-        mPlaylistShowListened.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        mPlaylistShowListened.setOnCheckedChangeListener(new Switch.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            public void onCheckedChanged(Switch aSwitch, boolean isChecked) {
                 playlist.setShowListened(isChecked);
             }
         });
+
         boolean doShowListened = mSharedPreferences.getBoolean(ApplicationConfiguration.showListenedKey, Playlist.SHOW_LISTENED_DEFAULT);
         if (doShowListened != mPlaylistShowListened.isChecked()) {
             mPlaylistShowListened.setChecked(doShowListened);
@@ -541,9 +542,9 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity {
         // Auto play next
         final String playNextKey = getResources().getString(R.string.pref_continuously_playing_key);
 
-        mAutoPlayNext.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        mAutoPlayNext.setOnCheckedChangeListener(new Switch.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            public void onCheckedChanged(Switch aSwitch, boolean isChecked) {
                 mSharedPreferences.edit().putBoolean(playNextKey, isChecked).commit();
             }
         });

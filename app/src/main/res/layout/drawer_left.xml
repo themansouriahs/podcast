@@ -149,18 +149,33 @@
         android:paddingTop="5dip"
         android:paddingBottom="5dip">
 
-        <Switch
-        android:id="@+id/slidebar_show_listened"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="14sp"
-        android:paddingLeft="10dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:text="@string/filter_show_listened"
-        android:layout_span="2"
-        style="@style/DrawerSwitchTextAppearance"
-            />
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_span="2"
+            android:paddingLeft="10dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="left|center_vertical"
+                android:text="@string/filter_show_listened"
+                android:textSize="14sp"
+                android:textColor="@color/drawer_text"
+                style="@style/SoundWavesTextViewStyle"
+                />
+
+            <com.rey.material.widget.Switch
+                android:id="@+id/slidebar_show_listened"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                style="@style/DrawerSwitchTextAppearance"
+                android:textSize="14sp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"/>
+
+        </FrameLayout>
 
     </TableRow>
 
@@ -206,6 +221,7 @@
         android:paddingTop="5dip"
         android:paddingBottom="5dip">
 
+        <!--
         <Switch
             android:id="@+id/slidebar_show_continues"
             android:layout_width="match_parent"
@@ -217,7 +233,36 @@
             android:text="@string/auto_start_next"
             android:layout_span="2"
             style="@style/DrawerSwitchTextAppearance" />
+            -->
         <!-- android:textAppearance="@style/DrawerSwitchTextAppearance" -->
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_span="2"
+            android:paddingLeft="10dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="left|center_vertical"
+                android:text="@string/auto_start_next"
+                android:textSize="14sp"
+                android:textColor="@color/drawer_text"
+                style="@style/SoundWavesTextViewStyle"
+                />
+
+        <com.rey.material.widget.Switch
+            android:id="@+id/slidebar_show_continues"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            style="@style/DrawerSwitchTextAppearance"
+            android:textSize="14sp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"/>
+
+        </FrameLayout>
 
     </TableRow>
 

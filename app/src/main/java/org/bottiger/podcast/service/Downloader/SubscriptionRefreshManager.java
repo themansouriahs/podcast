@@ -195,7 +195,7 @@ public class SubscriptionRefreshManager {
 
         if (argCallback != null) {
             Log.d(DEBUG_KEY, "Parsing callback for: " + subscription);
-            argCallback.complete(true, parsedSubscription);
+            argCallback.complete(parsedSubscription != null, parsedSubscription);
         }
     }
 }

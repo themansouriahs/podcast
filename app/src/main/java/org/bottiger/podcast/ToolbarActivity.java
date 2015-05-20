@@ -48,8 +48,6 @@ public class ToolbarActivity extends TopActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Fresco.initialize(this);
-
         setContentView(getLayout());
 
         mToolbar = (Toolbar) findViewById(R.id.my_awesome_toolbar);

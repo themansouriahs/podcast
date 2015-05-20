@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 
 
+import com.facebook.drawee.backends.pipeline.Fresco;
+
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
@@ -48,6 +50,8 @@ public class SoundWaves extends Application {
             // ANR
             //new ANRWatchDog(10000 /*timeout*/).start();
         }
+
+        Fresco.initialize(this);
 
         sAnalytics = AnalyticsFactory.getAnalytics(this);
         sAnalytics.startTracking();

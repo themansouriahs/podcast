@@ -138,7 +138,7 @@ public class NSRSS20 extends Namespace {
                 }
 			} else if (top.equals(URL) && second.equals(IMAGE) && third != null && third.equals(CHANNEL)) {
 
-				if (!TextUtils.isEmpty(state.getSubscription().getImageURL())) {
+				if (TextUtils.isEmpty(state.getSubscription().getImageURL())) {
                     state.getSubscription().setImageURL(content);
                 }
 

@@ -15,6 +15,8 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
+import com.rey.material.widget.Switch;
+
 import org.bottiger.podcast.FeedActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
@@ -113,9 +115,9 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
 
         holder.toggleSwitch.setOnCheckedChangeListener(null);
         holder.toggleSwitch.setChecked(isSubscribed);
-        holder.toggleSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        holder.toggleSwitch.setOnCheckedChangeListener(new Switch.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            public void onCheckedChanged(Switch aSwitch, boolean b) {
                 toggleSubscriptionStatus(subscription);
             }
         });
@@ -155,7 +157,7 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
         }
     }
 
-    private synchronized void toggleSubscriptionStatus(@NonNull ISubscription argSubscription) {
+    public synchronized void toggleSubscriptionStatus(@NonNull ISubscription argSubscription) {
         URL url = argSubscription.getURL();
         boolean isSubscribed = mSubscribedUrls.contains(url);
         Subscription subscription = new Subscription(url.toString());

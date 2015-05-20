@@ -113,7 +113,7 @@ public class SubscriptionsFragment extends Fragment implements SharedPreferences
 
 
         //RecycelrView
-        mAdapter = new SubscriptionGridCursorAdapter(getActivity(), mCursor);
+        mAdapter = new SubscriptionGridCursorAdapter(getActivity(), mCursor, numberOfColumns());
         mAdapter.setOnSubscriptionCountChangedListener(mSubscriptionCountListener);
         mCursorLoader = new SubscriptionCursorLoader(this, mAdapter, mCursor);
 
@@ -171,7 +171,11 @@ public class SubscriptionsFragment extends Fragment implements SharedPreferences
 
         if (mGridLayoutmanager.getSpanCount() != numberOfColumns()) {
             GridLayoutManager layoutmanager = new GridLayoutManager(getActivity(), numberOfColumns());
+            //mAdapter = new SubscriptionGridCursorAdapter(getActivity(), mCursor);
+
+
             mGridView.setLayoutManager(layoutmanager);
+            //mGridView.setAdapter(mAdapter);
             ((SubscriptionGridCursorAdapter)mGridView.getAdapter()).setNumberOfColumns(numberOfColumns());
         }
     }

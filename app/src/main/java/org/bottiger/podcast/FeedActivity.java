@@ -145,6 +145,7 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
     public static void startSlim(@NonNull Activity argActivity, @NonNull String argURL, @Nullable SlimSubscription argSubscription) {
         Bundle b = new Bundle();
         Intent intent = new Intent(argActivity, DiscoveryFeedActivity.class);
+
         b.putBoolean(FEED_ACTIVITY_IS_SLIM, true);
         b.putString(FeedActivity.SUBSCRIPTION_URL_KEY, argURL);
         b.putParcelable(SUBSCRIPTION_SLIM_KEY, argSubscription); // Not required, but nice to have if we already got it

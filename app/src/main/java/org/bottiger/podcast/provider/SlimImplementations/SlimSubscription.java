@@ -57,7 +57,7 @@ public class SlimSubscription implements ISubscription, Parcelable {
 
     @Override
     public void setImageURL(@Nullable String argUrl) {
-
+        mImageURL = argUrl;
     }
 
     @Override

@@ -66,7 +66,7 @@ public class FeedUpdater {
 				//item.update(contentResolver);
                 if (item.url != null && !duplicateTest.containsKey(item.url)) {
                     cvs.add(item.getContentValues(false));
-                    duplicateTest.put(item.url,counter);
+                    duplicateTest.put(item.url, counter);
                 }
 			}
 		}
@@ -74,7 +74,12 @@ public class FeedUpdater {
         ContentValues[] contentValuesArray = cvs.toArray(new ContentValues[cvs.size()]);
 
         try {
-            contentResolver.bulkInsert(ItemColumns.URI, contentValuesArray);
+            int rowsInserted = contentResolver.bulkInsert(ItemColumns.URI, contentValuesArray);
+			if (rowsInserted > 0) {
+				subscription.setLastItemUpdated(System.currentTimeMillis());
+				subscription.update(contentResolver);
+			}
+
             if (playlist != null) {
                 playlist.notifyDatabaseChanged();
             }
