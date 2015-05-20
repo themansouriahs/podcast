@@ -123,6 +123,7 @@
         android:layout_height="wrap_content"
         android:text="@string/episode_title"
         android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+        android:paddingBottom="5dp"
         />
 
     <TextView
