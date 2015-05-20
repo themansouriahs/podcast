@@ -157,7 +157,7 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
         }
     }
 
-    private synchronized void toggleSubscriptionStatus(@NonNull ISubscription argSubscription) {
+    public synchronized void toggleSubscriptionStatus(@NonNull ISubscription argSubscription) {
         URL url = argSubscription.getURL();
         boolean isSubscribed = mSubscribedUrls.contains(url);
         Subscription subscription = new Subscription(url.toString());
