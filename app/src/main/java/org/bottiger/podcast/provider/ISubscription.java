@@ -12,29 +12,29 @@ import java.util.List;
  */
 public interface ISubscription {
 
-    public enum TYPE { DEFAULT, SLIM };
+    enum TYPE { DEFAULT, SLIM };
 
     @NonNull
-    public String getTitle();
+    String getTitle();
 
     @NonNull
-    public URL getURL();
+    URL getURL();
 
     @NonNull
-    public String getURLString();
+    String getURLString();
 
     @Nullable
-    public String getImageURL();
+    String getImageURL();
 
     @NonNull
-    public ArrayList<? extends IEpisode> getEpisodes();
+    ArrayList<? extends IEpisode> getEpisodes();
 
-    public void setImageURL(@Nullable String argUrl);
-    public void setTitle(@Nullable String argTitle);
-    public void setDescription(@Nullable String argDescription);
-    public void setURL(@Nullable String argUrl);
+    void setImageURL(@Nullable String argUrl);
+    void setTitle(@Nullable String argTitle);
+    void setDescription(@Nullable String argDescription);
+    void setURL(@Nullable String argUrl);
 
-    public boolean IsDirty();
+    boolean IsDirty();
 
-    public TYPE getType();
+    TYPE getType();
 }
