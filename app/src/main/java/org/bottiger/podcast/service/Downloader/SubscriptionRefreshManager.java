@@ -21,6 +21,8 @@ import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.images.RequestManager;
 import org.bottiger.podcast.parser.syndication.handler.FeedHandler;
 import org.bottiger.podcast.parser.syndication.handler.UnsupportedFeedtypeException;
+import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
@@ -28,6 +30,7 @@ import org.bottiger.podcast.service.IDownloadCompleteCallback;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -83,21 +86,21 @@ public class SubscriptionRefreshManager {
         Log.d(DEBUG_KEY, "refresh subscription: " + subscription + " (null => all)");
 
 
-        if (EpisodeDownloadManager.updateConnectStatus(mContext) != EpisodeDownloadManager.NETWORK_STATE.OK) {
-            Log.d(DEBUG_KEY, "refresh aborted, no network");
+        if (!EpisodeDownloadManager.canPerform(EpisodeDownloadManager.ACTION.REFRESH_SUBSCRIPTION, mContext)) {
+            Log.d(DEBUG_KEY, "refresh aborted, not allowed"); // NoI18N
             return;
         }
 
         EpisodeDownloadManager.isDownloading = true;
 
         if (subscription != null) {
-            addSubscriptionToQueue(mContext, subscription, sRequestQueue, argCallback);
+            addSubscriptionToQueue(mContext, subscription, argCallback);
         } else {
             populateQueue(mContext, argCallback);
         }
     }
 
-    private void addSubscriptionToQueue(@NonNull final Context argContext, @NonNull final ISubscription argSubscription, RequestQueue requestQueue, final IDownloadCompleteCallback argCallback) {
+    private void addSubscriptionToQueue(@NonNull final Context argContext, @NonNull final ISubscription argSubscription, final IDownloadCompleteCallback argCallback) {
         Log.d(DEBUG_KEY, "Adding to queue: " + argSubscription);
 
         if (argSubscription == null) {
@@ -111,6 +114,30 @@ public class SubscriptionRefreshManager {
             VendorCrashReporter.report(ACRA_KEY, "subscription.url=empty");
             return;
         }
+
+        final IDownloadCompleteCallback wrappedCallback = new IDownloadCompleteCallback() {
+            @Override
+            public void complete(boolean argSucces, ISubscription argSubscription) {
+                if (argSucces && EpisodeDownloadManager.canPerform(EpisodeDownloadManager.ACTION.DOWNLOAD_AUTOMATICALLY, argContext)) {
+                    boolean startDownload = false;
+                    Date tenMinutesAgo = new Date(System.currentTimeMillis() - (10 * 60 * 1000));
+                    for (IEpisode episode : argSubscription.getEpisodes()) {
+                        if (episode instanceof FeedItem) {
+                            Date lastUpdate = new Date(((FeedItem)episode).getLastUpdate());
+                            if (lastUpdate.after(tenMinutesAgo)) {
+                                EpisodeDownloadManager.addItemToQueue(episode, EpisodeDownloadManager.QUEUE_POSITION.FIRST);
+                                startDownload = true;
+                            }
+                        }
+                    }
+
+                    if (startDownload)
+                        EpisodeDownloadManager.startDownload(argContext);
+                }
+
+                argCallback.complete(argSucces, argSubscription);
+            }
+        };
 
         final OkHttpClient client = new OkHttpClient();
         final Request request = new Request.Builder()
@@ -126,7 +153,7 @@ public class SubscriptionRefreshManager {
 
                     if (response != null && response.isSuccessful()) {
                         String feedString = response.body().string();
-                        processResponse(argContext.getContentResolver(), argCallback, argSubscription, feedString);
+                        processResponse(argContext.getContentResolver(), wrappedCallback, argSubscription, feedString);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -149,7 +176,7 @@ public class SubscriptionRefreshManager {
 
                 Subscription sub = Subscription.getByCursor(subscriptionCursor);
 
-                addSubscriptionToQueue(argContext, sub, sRequestQueue, argCallback);
+                addSubscriptionToQueue(argContext, sub, argCallback);
                 subscriptionsAdded++;
             }
         } finally {

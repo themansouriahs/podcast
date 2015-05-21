@@ -69,7 +69,9 @@ public class Subscription extends AbstractItem implements ISubscription, Palette
     private int mPrimaryTintColor;
     private int mSecondaryColor;
 
-	public static void view(Activity act, long channel_id) {
+    private final ArrayList<IEpisode> mEpisodes = new ArrayList<>();
+
+    public static void view(Activity act, long channel_id) {
 		Uri uri = ContentUris.withAppendedId(SubscriptionColumns.URI,
 				channel_id);
 		// Subscription channel = Subscription.getById(act.getContentResolver(),
@@ -102,8 +104,8 @@ public class Subscription extends AbstractItem implements ISubscription, Palette
 		Cursor cursor = null;
 		try {
 			cursor = contentResolver.query(SubscriptionColumns.URI,
-					SubscriptionColumns.ALL_COLUMNS, SubscriptionColumns.URL
-							+ "=?", new String[] { url }, null);
+                    SubscriptionColumns.ALL_COLUMNS, SubscriptionColumns.URL
+                            + "=?", new String[]{url}, null);
 			if (cursor.moveToFirst()) {
 				Subscription sub = new Subscription();
 				sub = fetchFromCursor(sub, cursor);
@@ -270,9 +272,13 @@ public class Subscription extends AbstractItem implements ISubscription, Palette
 		context.delete(uri, null, null);
 	}
 
-	public ArrayList<IEpisode> getEpisodes() {
-        /*
-		LinkedList<FeedItem> episodes = new LinkedList<FeedItem>();
+    public ArrayList<IEpisode> getEpisodes() {
+        return mEpisodes;
+    }
+
+	public ArrayList<IEpisode> getEpisodes(@NonNull ContentResolver contentResolver) {
+
+		LinkedList<FeedItem> episodes = new LinkedList<>();
 		Cursor itemCursor = contentResolver.query(ItemColumns.URI,
 				ItemColumns.ALL_COLUMNS, ItemColumns.SUBS_ID + "==" + this.id,
 				null, null);
@@ -280,9 +286,14 @@ public class Subscription extends AbstractItem implements ISubscription, Palette
 				.moveToNext()) {
 			episodes.add(FeedItem.getByCursor(itemCursor));
 		}
-        */
-		return null; //episodes;
+
+        mEpisodes.clear();
+        mEpisodes.addAll(episodes);
+
+		return mEpisodes;
 	}
+
+
     private class RefreshSyncTask extends AsyncTask<Context, Void, Void> {
         protected Void doInBackground(Context... contexts) {
             refresh(contexts[0]);
