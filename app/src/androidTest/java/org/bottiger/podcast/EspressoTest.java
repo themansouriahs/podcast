@@ -20,6 +20,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isNotChecked;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.Matchers.anyOf;
 
 /**
  * Created by apl on 20-05-2015.
@@ -61,9 +62,6 @@ public class EspressoTest extends ActivityInstrumentationTestCase2<MainActivity>
         onView(withId(R.id.radioAll)).check(matches(isChecked()));
     }
 
-    public void testNavigationDrawer() {
-    }
-
     /**
      * Based on https://code.google.com/p/android-test-kit/source/browse/espresso/libtests/src/main/java/com/google/android/apps/common/testing/ui/espresso/action/SwipeActionIntegrationTest.java?r=c4e4da01ca8d0fab31129c87f525f6e9ba1ecc02
      */
@@ -91,6 +89,39 @@ public class EspressoTest extends ActivityInstrumentationTestCase2<MainActivity>
                 .perform(swipeRight());
 
         onView(withId(R.id.playlist_empty_header)).check(matches(isDisplayed()));
+    }
+
+
+    public void testSubscribing() {
+        //onView(withId(R.id.playlist_empty_header)).check(matches(isDisplayed()));
+
+        // Go to the discovery fragmnt
+        onView(withId(R.id.app_content))
+                .perform(swipeRight())
+                .perform(swipeRight());
+
+        // Subscribe to a podcast
+
+        /*
+        onView(withId(R.id.search_result_view)).perform(
+                RecyclerViewActions.actionOnItemAtPosition(0, click()));
+        */
+        //onView(withId(R.id.app_content)).check(matches(hasDescendant(withId(R.id.discovery_search_container))));
+        //onView(withId(R.id.discovery_search_container)).check(matches(isDisplayed()));
+
+        //anyOf(withId(R.id.discovery_search_container), withId(R.id.result_subscribe_switch))).perform(click());
+
+        // Open the feed
+        /*
+        onView(withId(R.id.app_content))
+                .perform(swipeLeft());
+
+        // Verify the podcast is there
+        onView(withId(R.id.grid_title)).check(matches(isDisplayed()));
+
+        // open the activity
+        onView(withId(R.id.grid_title)).perform(click());
+        */
     }
 
 }
