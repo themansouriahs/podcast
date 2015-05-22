@@ -35,6 +35,7 @@ import org.bottiger.podcast.playlist.ReorderCursor;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.provider.SubscriptionLoader;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.PaletteHelper;
@@ -359,7 +360,7 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
             mSubscription = slimSubscription;
             mIsSlimSubscription = true;
         } else {
-            mSubscription = Subscription.getByUrl(getContentResolver(), url);
+            mSubscription = SubscriptionLoader.getByUrl(getContentResolver(), url);
             mIsSlimSubscription = false;
         }
     }

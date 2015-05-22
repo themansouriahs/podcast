@@ -17,6 +17,7 @@ import org.bottiger.podcast.R;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.playlist.filters.SubscriptionFilter;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.provider.SubscriptionLoader;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -95,7 +96,7 @@ public class DialogPlaylistContent implements DialogInterface.OnMultiChoiceClick
      */
     public boolean performClick() {
         mSubscriptions.clear();
-        List<Subscription> list = Subscription.allAsList(mContext.getContentResolver());
+        List<Subscription> list = SubscriptionLoader.allAsList(mContext.getContentResolver());
         for (Subscription s : list) {
             if (s.getStatus() == Subscription.STATUS_SUBSCRIBED)
                 mSubscriptions.add(s);

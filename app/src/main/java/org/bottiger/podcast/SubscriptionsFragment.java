@@ -3,6 +3,7 @@ package org.bottiger.podcast;
 import org.bottiger.podcast.adapters.SubscriptionGridCursorAdapter;
 import org.bottiger.podcast.playlist.SubscriptionCursorLoader;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.provider.SubscriptionLoader;
 import org.bottiger.podcast.utils.FragmentUtils;
 import org.bottiger.podcast.views.dialogs.DialogOPML;
 
@@ -237,7 +238,7 @@ public class SubscriptionsFragment extends Fragment implements SharedPreferences
 
         switch (menuItem.getItemId()) {
             case R.id.unsubscribe:
-                Subscription subscription = Subscription.getById(getActivity().getContentResolver(), position); // item.getSubscription(getActivity());
+                Subscription subscription = SubscriptionLoader.getById(getActivity().getContentResolver(), position); // item.getSubscription(getActivity());
                 subscription.unsubscribe(getActivity());
                 return true;
             default:

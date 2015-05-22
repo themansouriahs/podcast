@@ -6,6 +6,7 @@ import java.util.Iterator;
 
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.provider.SubscriptionLoader;
 
 import android.content.ContentResolver;
 
@@ -37,7 +38,7 @@ public class GPodderSubscriptionWrapper {
 
 		Subscription subscription;
 
-		subscription = Subscription.getByUrl(contentResolver, url);
+		subscription = SubscriptionLoader.getByUrl(contentResolver, url);
 		if (subscription == null) {
 			if (cachedSubscriptionObject != null)
 				cachedSubscriptionObject.reset();

@@ -4,6 +4,7 @@ import org.bottiger.podcast.FeedActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.adapters.viewholders.subscription.SubscriptionViewHolder;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.provider.SubscriptionLoader;
 
 import android.app.Activity;
 import android.content.Context;
@@ -62,7 +63,7 @@ public class SubscriptionGridCursorAdapter extends CursorRecyclerAdapter {
 
         Subscription sub = null;
         try {
-            sub = Subscription.getByCursor(cursor);
+            sub = SubscriptionLoader.getByCursor(cursor);
         } catch (IllegalStateException e) {
             e.printStackTrace();
         }

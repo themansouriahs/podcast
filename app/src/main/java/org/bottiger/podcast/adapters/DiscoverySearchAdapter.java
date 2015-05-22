@@ -24,6 +24,7 @@ import org.bottiger.podcast.adapters.viewholders.discovery.SearchResultViewHolde
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.provider.SubscriptionLoader;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
 
 import java.net.URL;
@@ -148,7 +149,7 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
 
     private void populateSubscribedUrls() {
         ContentResolver contentResolver = mActivity.getContentResolver();
-        LinkedList<Subscription> subscriptions = Subscription.allAsList(contentResolver);
+        LinkedList<Subscription> subscriptions = SubscriptionLoader.allAsList(contentResolver);
 
         for (Subscription subscription : subscriptions) {
             if (subscription.getStatus() == Subscription.STATUS_SUBSCRIBED) {

@@ -1161,7 +1161,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	}
 
     public Subscription getSubscription(@NonNull Context argContext) {
-        return Subscription.getById(argContext.getContentResolver(), sub_id);
+        return SubscriptionLoader.getById(argContext.getContentResolver(), sub_id);
     }
 
     @Override

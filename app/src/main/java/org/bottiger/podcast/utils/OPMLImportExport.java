@@ -21,6 +21,7 @@ import org.bottiger.podcast.parser.opml.OpmlWriter;
 import org.bottiger.podcast.provider.DatabaseHelper;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.provider.SubscriptionLoader;
 import org.xmlpull.v1.XmlPullParserException;
 
 import android.app.Activity;
@@ -102,7 +103,7 @@ public class OPMLImportExport {
 			// Test we if already have the item in out database.
 			// If not we add it.
 			boolean isAdded = false;
-			subscription = Subscription.getByUrl(contentResolver, url);
+			subscription = SubscriptionLoader.getByUrl(contentResolver, url);
 			if (subscription == null) {
 				subscription = new Subscription();
 				subscription.url = url;
@@ -171,7 +172,7 @@ public class OPMLImportExport {
         }
 
         OpmlWriter opmlWriter = new OpmlWriter();
-        List<Subscription> subscriptionList = Subscription.allAsList(contentResolver);
+        List<Subscription> subscriptionList = SubscriptionLoader.allAsList(contentResolver);
 
         try {
             opmlWriter.writeDocument(subscriptionList, fileWriter);

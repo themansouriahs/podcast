@@ -26,6 +26,7 @@ import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.provider.SubscriptionLoader;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
 import org.xml.sax.SAXException;
 
@@ -169,12 +170,12 @@ public class SubscriptionRefreshManager {
         int subscriptionsAdded = 0;
 
         try {
-            subscriptionCursor = Subscription.allAsCursor(argContext
+            subscriptionCursor = SubscriptionLoader.allAsCursor(argContext
                     .getContentResolver());
 
             while (subscriptionCursor.moveToNext()) {
 
-                Subscription sub = Subscription.getByCursor(subscriptionCursor);
+                Subscription sub = SubscriptionLoader.getByCursor(subscriptionCursor);
 
                 addSubscriptionToQueue(argContext, sub, argCallback);
                 subscriptionsAdded++;
