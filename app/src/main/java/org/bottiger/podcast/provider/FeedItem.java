@@ -43,7 +43,7 @@ import android.util.Log;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
-public class FeedItem extends AbstractItem implements IEpisode, Comparable<FeedItem> {
+public class FeedItem implements IEpisode, Comparable<FeedItem> {
 
 	public static final int MAX_DOWNLOAD_FAIL = 5;
 
@@ -782,8 +782,7 @@ public class FeedItem extends AbstractItem implements IEpisode, Comparable<FeedI
 	/**
 	 * Writes the currentstatus of the FeedItem with the giving ID to the
 	 * textView argument
-	 * 
-	 * @param downloadStatus
+	 *
 	 */
 	public String getStatus(DownloadManager downloadManager) {
 		DownloadStatus downloadStatus = EpisodeDownloadManager.getStatus(this);
@@ -1212,7 +1211,6 @@ public class FeedItem extends AbstractItem implements IEpisode, Comparable<FeedI
 		return imageURL;
 	}
 
-	@Override
 	public long getId() {
 		return id;
 	}
@@ -1247,7 +1245,6 @@ public class FeedItem extends AbstractItem implements IEpisode, Comparable<FeedI
 	 * Increase the priority of all items in the playlist after the current item
 	 * 
 	 * @param precedingItem
-	 * @param minPriority
 	 * @param context
 	 */
 	private void increateHigherPriorities(IEpisode precedingItem,
@@ -1400,168 +1397,8 @@ public class FeedItem extends AbstractItem implements IEpisode, Comparable<FeedI
 		return this.lastUpdate;
 	}
 
-	@Override
 	public long lastModificationDate() {
 		return this.lastUpdate;
-	}
-
-	@Override
-	public String getDriveId() {
-		return this.remote_id.equals("") ? null : this.remote_id;
-	}
-
-	@Override
-	public String toJSON() {
-		JSONObject json = new JSONObject();
-		// strings
-		json.put("url", getURL().toString());
-		json.put("remote_id", remote_id);
-		json.put("title", title);
-		json.put("author", author);
-		json.put("date", date);
-		json.put("content", content);
-		json.put("resource", resource);
-		json.put("duration_string", duration_string);
-		json.put("image", image);
-		json.put("filename", filename);
-		json.put("uri", uri);
-		json.put("subtitle", sub_title);
-
-		// long/int
-		json.put("duration_ms", duration_ms);
-		json.put("sub_id", sub_id);
-		json.put("filesize", filesize);
-		json.put("episodeNumber", episodeNumber);
-		json.put("offset", offset);
-		json.put("status", status);
-		json.put("listened", listened);
-		json.put("priority", priority);
-		json.put("length", length);
-		json.put("lastUpdate", lastUpdate);
-
-		return json.toJSONString();
-	}
-
-	public static FeedItem fromJSON(ContentResolver contentResolver, String json) {
-		FeedItem item = null;
-		boolean updateItem = false;
-		if (json != null) {
-			String url = null;
-			String remote_id = null;
-			String title = null;
-			String author = null;
-			String date = null;
-			String content = null;
-			String duration_string = null;
-			String image = null;
-			String filename = null;
-			String subtitle = null;
-
-			Number duration_ms = -1;
-			Number sub_id = -1;
-			Number filesize = -1;
-			Number episodeNumber = -1;
-			Number offset = -1;
-			Number status = -1;
-			Number listened = -1;
-			Number priority = -1;
-			Number length = -1;
-			Number lastUpdate = -1;
-
-			Object rootObject = JSONValue.parse(json);
-			JSONObject mainObject = (JSONObject) rootObject;
-			if (mainObject != null) {
-				url = mainObject.get("url").toString();
-
-				Object remoteIdObject = mainObject.get("remote_id");
-				if (remoteIdObject != null)
-					remote_id = mainObject.get("remote_id").toString();
-
-				title = mainObject.get("title").toString();
-				author = mainObject.get("author").toString();
-				date = mainObject.get("date").toString();
-				content = mainObject.get("content").toString();
-				duration_string = mainObject.get("duration_string").toString();
-				image = mainObject.get("image").toString();
-				filename = mainObject.get("filename").toString();
-				subtitle = mainObject.get("subtitle").toString();
-
-				duration_ms = (Number) mainObject.get("duration_ms");
-				sub_id = (Number) mainObject.get("sub_id");
-				filesize = (Number) mainObject.get("filesize");
-				episodeNumber = (Number) mainObject.get("episodeNumber");
-				offset = (Number) mainObject.get("offset");
-				status = (Number) mainObject.get("status");
-				listened = (Number) mainObject.get("listened");
-				priority = (Number) mainObject.get("priority");
-				length = (Number) mainObject.get("length");
-				lastUpdate = (Number) mainObject.get("lastUpdate");
-
-				item = FeedItem.getByURL(contentResolver, url);
-				if (item == null) {
-					item = new FeedItem();
-					updateItem = true;
-				} else {
-					updateItem = item.getLastUpdate() < lastUpdate.longValue();
-				}
-			}
-
-			if (url != null)
-				item.url = url;
-			if (remote_id != null)
-				item.remote_id = title;
-			if (title != null)
-				item.title = title;
-			if (author != null)
-				item.author = author;
-			if (date != null)
-				item.date = date;
-			if (content != null)
-				item.content = content;
-			if (duration_string != null)
-				item.duration_string = duration_string;
-			if (image != null)
-				item.image = image;
-			if (filename != null)
-				item.filename = filename;
-			if (subtitle != null)
-				item.sub_title = subtitle;
-
-			if (duration_ms.longValue() > -1)
-				item.duration_ms = duration_ms.longValue();
-			if (sub_id.longValue() > -1)
-				item.sub_id = sub_id.longValue();
-			if (filesize.longValue() > -1)
-				item.filesize = filesize.longValue();
-			if (episodeNumber.longValue() > -1)
-				item.episodeNumber = episodeNumber.intValue();
-			if (offset.longValue() > -1)
-				item.offset = offset.intValue();
-			if (status.longValue() > -1)
-				item.status = status.intValue();
-			if (listened.longValue() > -1)
-				item.listened = listened.intValue();
-			if (priority.longValue() > -1)
-				item.priority = priority.intValue();
-			if (length.longValue() > -1)
-				item.length = length.longValue();
-			if (lastUpdate.longValue() > -1)
-				item.lastUpdate = lastUpdate.longValue();
-
-			if (updateItem)
-				item.update(contentResolver);
-
-		}
-
-		return item;
-	}
-
-	/**
-	 * Run whenever the subscription has been updated to google drive
-	 */
-	public void setDriveId(String fileID) {
-		remote_id = fileID;
-		// update(contentResolver);
 	}
 
 	public void queue(Context context) {

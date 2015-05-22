@@ -32,7 +32,7 @@ import android.support.v7.graphics.Palette;
 
 import javax.annotation.Nullable;
 
-public class Subscription extends AbstractItem implements ISubscription, PaletteListener {
+public class Subscription implements ISubscription, PaletteListener {
 
 	private final PodcastLog log = PodcastLog.getLog(getClass());
 
@@ -315,6 +315,10 @@ public class Subscription extends AbstractItem implements ISubscription, Palette
         });
     }
 
+    public ContentProviderOperation update(ContentResolver contentResolver) {
+        return update(contentResolver, false, false);
+    }
+
 	/**
 	 * Batch update
 	 */
@@ -536,13 +540,11 @@ public class Subscription extends AbstractItem implements ISubscription, Palette
     public String getURLString() {
         return getURL() == null ? "" : getURL().toString();
     }
-
-    @Override
+    
 	public long getId() {
 		return id;
 	}
 
-	@Override
 	@Deprecated
 	public String getArtwork(Context context) {
 		return getImageURL();
@@ -576,7 +578,6 @@ public class Subscription extends AbstractItem implements ISubscription, Palette
 		return this.lastItemUpdated;
 	}
 
-	@Override
 	public long lastModificationDate() {
 		return lastUpdated;
 	}
@@ -593,11 +594,6 @@ public class Subscription extends AbstractItem implements ISubscription, Palette
 	}
 
 	@Override
-	public String getDriveId() {
-		return sync_id;
-	}
-
-	@Override
 	public String getTitle() {
 		return title;
 	}
@@ -611,7 +607,6 @@ public class Subscription extends AbstractItem implements ISubscription, Palette
 		this.url = url;
 	}
 
-	@Override
 	public String toJSON() {
 		JSONObject json = new JSONObject();
 		json.put("url", getURL().toString());
