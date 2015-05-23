@@ -7,6 +7,8 @@ import org.bottiger.podcast.ApplicationConfiguration;
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.adapters.PlaylistAdapter;
 import org.bottiger.podcast.adapters.decoration.OnDragStateChangedListener;
+import org.bottiger.podcast.flavors.Analytics.VendorAnalytics;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.playlist.filters.SubscriptionFilter;
 import org.bottiger.podcast.provider.DatabaseHelper;
 import org.bottiger.podcast.provider.FeedItem;
@@ -64,7 +66,7 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
 
 	// http://stackoverflow.com/questions/1036754/difference-between-wait-and-sleep
 
-    private static HashSet<PlaylistChangeListener> sPlaylistChangeListeners = new HashSet<PlaylistChangeListener>();
+    private static HashSet<PlaylistChangeListener> sPlaylistChangeListeners = new HashSet<>();
 
 	public Playlist(int length) {
 		this(length, false);
@@ -155,7 +157,8 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
      */
     public void removeItem(int position) {
         if (position < 0) {
-            throw new IllegalArgumentException("Position must be greater or equal to zero"); // NoI18N
+            VendorCrashReporter.report("Playlist remove", "Position must be greater or equal to zero"); // NoI18N
+            return;
         }
 
         int size = mInternalPlaylist.size();

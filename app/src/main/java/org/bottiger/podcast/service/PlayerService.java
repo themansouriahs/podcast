@@ -321,7 +321,9 @@ public class PlayerService extends Service implements
 					oldFeedItem.update(getContentResolver());
 
 					int pos = sPlaylist.getPosition(oldItem);
-					sPlaylist.removeItem(pos);
+					if (pos > 0) {
+						sPlaylist.removeItem(pos);
+					}
 				}
 			}
 		}
