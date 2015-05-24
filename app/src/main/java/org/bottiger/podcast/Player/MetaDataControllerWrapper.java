@@ -32,7 +32,7 @@ public class MetaDataControllerWrapper {
 
     public void updateState(@NonNull IEpisode argEpisode, boolean updateAlbumArt) {
         if (Build.VERSION.SDK_INT >= 21) {
-            mPlayerStateManager.updateState(argEpisode, updateAlbumArt);
+            mPlayerStateManager.updateState(argEpisode, updateAlbumArt, null);
         } else {
             mLegacyRemoteController.updateMetaData();
         }

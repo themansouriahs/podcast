@@ -40,9 +40,6 @@ import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.util.Log;
 
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
-
 public class FeedItem implements IEpisode, Comparable<FeedItem> {
 
 	public static final int MAX_DOWNLOAD_FAIL = 5;
@@ -1184,11 +1181,6 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 		}
 
 	}
-
-    @Nullable
-    public void getArtworAsync(@NonNull Context context, @NonNull Target argTarget) {
-        Picasso.with(context).load(getArtwork(context)).into(argTarget);
-    }
 
     @Nullable
 	@Override

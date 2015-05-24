@@ -2,31 +2,34 @@ package org.bottiger.podcast.Player;
 
 import android.app.PendingIntent;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
 import android.media.RemoteControlClient;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
+import com.facebook.datasource.DataSource;
 
-import org.bottiger.podcast.R;
-import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.images.FrescoHelper;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.service.PlayerService;
 
 /**
  * Created by apl on 11-02-2015.
+ *
+ * Used for anything below API level 21 (lolipop)
  */
 public class LegacyRemoteController {
+
+    private final String TAG = "RemoteController";
+
     private LegacyRemoteControlClient remoteControlClient;
     private PlayerService mContext;
-    private Bitmap mCurrentAlbumArt;
 
 
     public void register(PlayerService context)
@@ -37,7 +40,7 @@ public class LegacyRemoteController {
         {
             System.out.println("Trying to register it.");
 
-            mCurrentAlbumArt = BitmapFactory.decodeResource(context.getResources(), R.drawable.generic_podcast);
+            //mCurrentAlbumArt = BitmapFactory.decodeResource(context.getResources(), R.drawable.generic_podcast);
 
             AudioManager audioManager = (AudioManager) context.getSystemService(context.AUDIO_SERVICE);
 
@@ -99,48 +102,47 @@ public class LegacyRemoteController {
         if (remoteControlClient != null && episode != null)
         {
             Log.d("RemoteController", "Updating remote control");
-            //int state = mActivity.isPlaying() ? remoteControlClient.PLAYSTATE_PLAYING : remoteControlClient.PLAYSTATE_PAUSED;
-            //remoteControlClient.setPlaybackState(state);
             updatePlayingState(mContext.isPlaying());
 
             RemoteControlClient.MetadataEditor editor = remoteControlClient.editMetadata(true);
-            updateSimpleMetaData(editor, episode);
+            updateSimpleMetaData(editor, episode, null);
 
-            Target target = new Target() {
+            FrescoHelper.fetchBitmap(new FrescoHelper.IBitmapFetchJob() {
+                @NonNull
                 @Override
-                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                    Log.d("RemoteController", "Updating remote control (with background)");
-                    mCurrentAlbumArt = bitmap;
+                public Context getContext() {
+                    return mContext;
+                }
+
+                @NonNull
+                @Override
+                public String getUrl() {
+                    return episode.getArtwork(mContext);
+                }
+
+                @Override
+                public void onSucces(@Nullable Bitmap argBitmap) {
+                    Log.d(TAG, "Updating remote control (with background)");
                     RemoteControlClient.MetadataEditor editor = remoteControlClient.editMetadata(true);
-                    editor.putBitmap(android.media.RemoteController.MetadataEditor.BITMAP_KEY_ARTWORK, bitmap);
-                    updateSimpleMetaData(editor, episode);
+                    editor.putBitmap(android.media.RemoteController.MetadataEditor.BITMAP_KEY_ARTWORK, argBitmap);
+                    updateSimpleMetaData(editor, episode, argBitmap);
                 }
 
                 @Override
-                public void onBitmapFailed(Drawable errorDrawable) {
-                    Log.d("RemoteController", "BACKGROUND failed to load");
-                    return;
+                public void onFail(@Nullable DataSource argDataSource) {
+                    Log.d(TAG, "BACKGROUND failed to load");
                 }
-
-                @Override
-                public void onPrepareLoad(Drawable placeHolderDrawable) {
-                    return;
-                }
-            };
-
-            if (episode instanceof IEpisode) {
-                ((FeedItem)episode).getArtworAsync(mContext, target);
-            }
+            });
         }
     }
 
-    private void updateSimpleMetaData(RemoteControlClient.MetadataEditor editor, IEpisode episode) {
+    private void updateSimpleMetaData(RemoteControlClient.MetadataEditor editor, IEpisode episode, @Nullable Bitmap argBitmap) {
         editor.putLong(MediaMetadataRetriever.METADATA_KEY_DURATION, (long)1000);
         editor.putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, episode.getAuthor());
         editor.putString(MediaMetadataRetriever.METADATA_KEY_TITLE, episode.getTitle());
 
-        if (mCurrentAlbumArt != null && !mCurrentAlbumArt.isRecycled()) {
-            editor.putBitmap(android.media.RemoteController.MetadataEditor.BITMAP_KEY_ARTWORK, mCurrentAlbumArt);
+        if (argBitmap != null && !argBitmap.isRecycled()) {
+            editor.putBitmap(android.media.RemoteController.MetadataEditor.BITMAP_KEY_ARTWORK, argBitmap);
         }
 
         editor.apply();

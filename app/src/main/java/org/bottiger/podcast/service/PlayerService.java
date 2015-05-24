@@ -348,7 +348,7 @@ public class PlayerService extends Service implements
 
         IEpisode item = getCurrentItem();
         if (item != null) {
-            mMetaDataControllerWrapper.updateState(item, false);
+            mMetaDataControllerWrapper.updateState(item, true);
         }
 
         if (isFeedItem) {
