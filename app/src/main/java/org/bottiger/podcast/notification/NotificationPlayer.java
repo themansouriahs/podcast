@@ -2,10 +2,12 @@ package org.bottiger.podcast.notification;
 
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.images.FrescoHelper;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.receiver.NotificationReceiver;
 import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.utils.DirectExecutor;
 
 import android.annotation.TargetApi;
 import android.app.Notification;
@@ -23,45 +25,28 @@ import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.widget.RemoteViews;
 
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
+import com.facebook.common.references.CloseableReference;
+import com.facebook.datasource.DataSource;
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.imagepipeline.core.ImagePipeline;
+import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
+import com.facebook.imagepipeline.image.CloseableImage;
+import com.facebook.imagepipeline.request.ImageRequest;
 
 public class NotificationPlayer {
 	
 	private PlayerService mPlayerService;
 	private IEpisode item;
-    private Bitmap mArtwork;
 
     private Notification mNotification;
-
-    private Target loadtarget = new Target() {
-        @Override
-        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-            // do something with the Bitmap
-            mArtwork = bitmap;
-            refresh();
-        }
-
-        @Override
-        public void onBitmapFailed(Drawable errorDrawable) {
-            refresh();
-        }
-
-        @Override
-        public void onPrepareLoad(Drawable placeHolderDrawable) {
-        }
-    };
-	
 	private NotificationManager mNotificationManager = null;
-	private static int mId = 4260;
+
+	private static final int mId = 4260;
 	
 	public NotificationPlayer(@NonNull PlayerService argPlayerService, @NonNull IEpisode item) {
 		super();
 		this.mPlayerService = argPlayerService;
 		this.item = item;
-        if (item instanceof FeedItem) {
-            ((FeedItem)item).getArtworAsync(mPlayerService, loadtarget);
-        }
 	}
 
     @Nullable
@@ -78,7 +63,7 @@ public class NotificationPlayer {
 	public Notification show(Boolean isPlaying) {
 
 		// mId allows you to update the notification later on.
-        NotificationCompat.Builder builder = buildNotification(isPlaying, mPlayerService, mArtwork);
+        NotificationCompat.Builder builder = buildNotification(isPlaying, mPlayerService, null);
 
         if (builder == null)
             return null;
@@ -99,10 +84,10 @@ public class NotificationPlayer {
         mPlayerService = argPlayerService;
     }
 
-    public void refresh() {
+    public void refresh(@Nullable Bitmap argBitmap) {
         PlayerService ps = mPlayerService;
         if (ps != null) {
-            NotificationCompat.Builder notificationBuilder = buildNotification(ps.isPlaying(), mPlayerService, mArtwork);
+            NotificationCompat.Builder notificationBuilder = buildNotification(ps.isPlaying(), mPlayerService, argBitmap);
 
             if (notificationBuilder == null)
                 return;
@@ -123,28 +108,15 @@ public class NotificationPlayer {
 
 	public void setItem(IEpisode item) {
 		this.item = item;
-        //item.getArtworAsync(mPlayerService, loadtarget);
+        refresh(null);
 	}
 	
 	public static int getNotificationId() {
 		return mId;
 	}
 
-    @TargetApi(20)
-    private Notification.Action generateAction( int icon, String title, String intentAction ) {
-        Intent intent = new Intent( mPlayerService.getApplicationContext(), PlayerService.class );
-        intent.setAction( intentAction );
-        PendingIntent pendingIntent = PendingIntent.getService(mPlayerService.getApplicationContext(), 1, intent, 0);
-        return new Notification.Action.Builder( icon, title, pendingIntent ).build();
-    }
-
-
-	private NotificationCompat.Builder buildNotification(@NonNull Boolean isPlaying, @NonNull PlayerService argPlayerService, @Nullable Bitmap icon) {
-        return customStyleNotification(isPlaying, argPlayerService, icon);
-	}
-
     @Nullable
-    private NotificationCompat.Builder customStyleNotification(@NonNull Boolean isPlaying, @NonNull PlayerService argPlayerService, @Nullable Bitmap icon) {
+    private NotificationCompat.Builder buildNotification(@NonNull Boolean isPlaying, @NonNull PlayerService argPlayerService, @Nullable Bitmap argBitmap) {
 
         if (item == null) {
             return null;
@@ -169,18 +141,11 @@ public class NotificationPlayer {
             smallIcon = R.drawable.ic_stat_notify_white;
         }
 
-        String bitmapstring = icon == null ? "null" : "present";
-        Log.d("NotificationPlayer", "Build notification, icon => " + bitmapstring);
-
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(mPlayerService)
                         .setSmallIcon(smallIcon)
                         .setContentTitle(item.getTitle());
                         //.setContentText(item.sub_title);
-
-        if (icon != null && !icon.isRecycled()) {
-            mBuilder.setLargeIcon(icon);
-        }
 
         mBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
         mBuilder.setCategory("CATEGORY_TRANSPORT");
@@ -194,7 +159,40 @@ public class NotificationPlayer {
         RemoteViews layout = new RemoteViews(mPlayerService.getPackageName(), R.layout.notification);
         layout.setTextViewText(R.id.notification_title, item.getTitle());
         //layout.setTextViewText(R.id.notification_content, item.sub_title);
-        layout.setImageViewBitmap(R.id.icon, icon);
+
+        if (argBitmap != null && !argBitmap.isRecycled()) {
+            mBuilder.setLargeIcon(argBitmap);
+            layout.setImageViewBitmap(R.id.icon, argBitmap);
+        } else {
+
+            final String imageUrl = item.getArtwork(mPlayerService);
+
+            FrescoHelper.fetchBitmap(new FrescoHelper.IBitmapFetchJob() {
+                @NonNull
+                @Override
+                public Context getContext() {
+                    return mPlayerService.getApplicationContext();
+                }
+
+                @NonNull
+                @Override
+                public String getUrl() {
+                    return imageUrl;
+                }
+
+                @Override
+                public void onSucces(@Nullable Bitmap argBitmap) {
+                    if (argBitmap != null && !argBitmap.isRecycled())
+                        refresh(argBitmap);
+                }
+
+                @Override
+                public void onFail(@Nullable DataSource argDataSource) {
+
+                }
+            });
+
+        }
 
         // Prepare intent which is triggered if the
         // notification is selected

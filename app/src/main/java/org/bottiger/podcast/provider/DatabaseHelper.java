@@ -20,7 +20,7 @@ public class DatabaseHelper {
 	public static final String ACTION_UPDATE = "update";
 
 	/**
-	 * Add a operation to execute
+	 * Add a operation to onSucces
 	 * 
 	 * @return
 	 */

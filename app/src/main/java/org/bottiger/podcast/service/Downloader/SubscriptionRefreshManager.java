@@ -191,7 +191,7 @@ public class SubscriptionRefreshManager {
     private static void processResponse(ContentResolver contentResolver,
                                         IDownloadCompleteCallback argCallback, @NonNull ISubscription subscription, String argResponse) {
         Log.d(DEBUG_KEY, "Volley response from: " + subscription);
-        //new ParseFeedTask().execute(response);
+        //new ParseFeedTask().onSucces(response);
 
         ISubscription parsedSubscription = null;
 
