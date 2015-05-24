@@ -1,5 +1,6 @@
 package org.bottiger.podcast.Player;
 
+import android.annotation.TargetApi;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
@@ -31,17 +32,13 @@ public class LegacyRemoteController {
     private LegacyRemoteControlClient remoteControlClient;
     private PlayerService mContext;
 
-
+    @TargetApi(20)
     public void register(PlayerService context)
     {
         mContext = context;
 
         if (remoteControlClient == null)
         {
-            System.out.println("Trying to register it.");
-
-            //mCurrentAlbumArt = BitmapFactory.decodeResource(context.getResources(), R.drawable.generic_podcast);
-
             AudioManager audioManager = (AudioManager) context.getSystemService(context.AUDIO_SERVICE);
 
             ComponentName myEventReceiver = new ComponentName(context.getPackageName(), HeadsetReceiver.class.getName());
@@ -60,8 +57,6 @@ public class LegacyRemoteController {
                             | RemoteControlClient.FLAG_KEY_MEDIA_PAUSE
             );
             audioManager.registerRemoteControlClient(remoteControlClient);
-
-
         }
     }
 
@@ -95,14 +90,14 @@ public class LegacyRemoteController {
         }
     }
 
-    public void updateMetaData()
+    public void updateMetaData(boolean argIsPlaying)
     {
         final IEpisode episode = mContext.getCurrentItem();
 
         if (remoteControlClient != null && episode != null)
         {
             Log.d("RemoteController", "Updating remote control");
-            updatePlayingState(mContext.isPlaying());
+            updatePlayingState(argIsPlaying);
 
             RemoteControlClient.MetadataEditor editor = remoteControlClient.editMetadata(true);
             updateSimpleMetaData(editor, episode, null);
@@ -124,7 +119,7 @@ public class LegacyRemoteController {
                 public void onSucces(@Nullable Bitmap argBitmap) {
                     Log.d(TAG, "Updating remote control (with background)");
                     RemoteControlClient.MetadataEditor editor = remoteControlClient.editMetadata(true);
-                    editor.putBitmap(android.media.RemoteController.MetadataEditor.BITMAP_KEY_ARTWORK, argBitmap);
+                    //editor.putBitmap(android.media.RemoteController.MetadataEditor.BITMAP_KEY_ARTWORK, argBitmap);
                     updateSimpleMetaData(editor, episode, argBitmap);
                 }
 
@@ -142,7 +137,7 @@ public class LegacyRemoteController {
         editor.putString(MediaMetadataRetriever.METADATA_KEY_TITLE, episode.getTitle());
 
         if (argBitmap != null && !argBitmap.isRecycled()) {
-            editor.putBitmap(android.media.RemoteController.MetadataEditor.BITMAP_KEY_ARTWORK, argBitmap);
+            //editor.putBitmap(android.media.RemoteController.MetadataEditor.BITMAP_KEY_ARTWORK, argBitmap);
         }
 
         editor.apply();

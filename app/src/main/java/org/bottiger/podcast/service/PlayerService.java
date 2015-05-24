@@ -279,7 +279,7 @@ public class PlayerService extends Service implements
         }
 
 		play(nextItem.getUrl().toString());
-        mMetaDataControllerWrapper.updateState(nextItem, true);
+        mMetaDataControllerWrapper.updateState(nextItem, true, true);
         sPlaylist.removeItem(0);
         sPlaylist.notifyPlaylistChanged();
 	}
@@ -348,7 +348,7 @@ public class PlayerService extends Service implements
 
         IEpisode item = getCurrentItem();
         if (item != null) {
-            mMetaDataControllerWrapper.updateState(item, true);
+            mMetaDataControllerWrapper.updateState(item, true, true);
         }
 
         if (isFeedItem) {
@@ -391,6 +391,7 @@ public class PlayerService extends Service implements
 		if (!mPlayer.isPlaying()) {
             takeWakelock(mPlayer.isSteaming());
 			mPlayer.start();
+			mMetaDataControllerWrapper.updateState(mItem, true, false);
 		}
 	}
 
@@ -410,7 +411,7 @@ public class PlayerService extends Service implements
 		dis_notifyStatus();
 
 		mPlayer.pause();
-        mMetaDataControllerWrapper.updateState(mItem, false);
+        mMetaDataControllerWrapper.updateState(mItem, false, false);
         releaseWakelock();
 	}
 
