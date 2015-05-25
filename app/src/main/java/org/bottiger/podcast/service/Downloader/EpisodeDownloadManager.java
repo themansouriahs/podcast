@@ -8,6 +8,7 @@ import java.util.Observable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.playlist.Playlist;
@@ -214,7 +215,7 @@ public class EpisodeDownloadManager extends Observable {
             downloadEngine.startDownload();
             mDownloadingEpisodes.put(downloadingItem, downloadEngine);
 
-            getDownloadProgressObservable(mContext).addEpisode(downloadingItem);
+            getDownloadProgressObservable((SoundWaves)mContext.getApplicationContext()).addEpisode(downloadingItem);
         }
 
 
@@ -519,7 +520,7 @@ public class EpisodeDownloadManager extends Observable {
 
     private static DownloadProgressObservable mDownloadProgressObservable;
 
-    public static DownloadProgressObservable getDownloadProgressObservable(Context context) {
+    public static DownloadProgressObservable getDownloadProgressObservable(SoundWaves context) {
         if (mDownloadProgressObservable == null) {
             mDownloadProgressObservable = new DownloadProgressObservable(context);
         }

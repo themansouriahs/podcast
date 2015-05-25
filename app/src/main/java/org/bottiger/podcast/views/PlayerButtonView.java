@@ -30,7 +30,7 @@ import java.lang.ref.WeakReference;
 /**
  * TODO: document your custom view class.
  */
-public class PlayerButtonView extends ImageButton implements PlayerStatusObserver, PaletteListener, DownloadObserver  {
+public class PlayerButtonView extends ImageButton implements PlayerStatusObserver, PaletteListener  {
 
     public final static int STATE_DEFAULT = 0;
     public final static int STATE_DOWNLOAD = 1;
@@ -39,7 +39,7 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
 
     private PlayerStatusObservable.STATUS mStatus = PlayerStatusObservable.STATUS.STOPPED;
     private IEpisode mEpisode;
-    private int mProgress = 0;
+
     private int mLastProgress = 0;
     private static final int BITMAP_OFFSET = 5;
     private static final float RECTANGLE_SCALING = 1F;
@@ -55,6 +55,9 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
 
     private int mCurrentState = 0;
     private SparseIntArray mStateIcons= new SparseIntArray();
+
+    protected int mProgress = 0;
+    protected DownloadStatus mDownloadCompletedCallback = null;
 
     private int mForegroundColor = getResources().getColor(R.color.colorPrimaryDark);
     private int mBackgroundColor = getResources().getColor(R.color.colorPrimaryDark);
@@ -175,7 +178,7 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
 
         //canvas.drawArc(buttonRectangle, -90, 360, true, baseColorPaint);
 
-        if(mProgress!=0) {
+        if(mProgress!=0 && mProgress < 100) {
             if (getState() != PlayerButtonView.STATE_DEFAULT) {
                 setState(PlayerButtonView.STATE_DEFAULT);
             }
@@ -215,16 +218,6 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
     }
 
     @Override
-    public void setProgressPercent(int argProgress) {
-        mProgress = argProgress;
-        if (mDownloadCompletedCallback != null && mProgress == 100) {
-            mDownloadCompletedCallback.FileComplete();
-            setState(PlayerButtonView.STATE_DELETE);
-        }
-        this.invalidate();
-    }
-
-    @Override
     public void onPaletteFound(Palette argChangedPalette) {
         ColorExtractor extractor = new ColorExtractor(argChangedPalette);
 
@@ -243,17 +236,10 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
         return mEpisode.getArtwork(mContext).toString();
     }
 
-    /*
-    @Override
-    public void onClick(View v) {
-        super(v);
-    }*/
-
     public interface DownloadStatus {
         void FileComplete();
         void FileDeleted();
     }
-    private DownloadStatus mDownloadCompletedCallback = null;
 
     public void addDownloadCompletedCallback(DownloadStatus argCallback) {
         mDownloadCompletedCallback = argCallback;

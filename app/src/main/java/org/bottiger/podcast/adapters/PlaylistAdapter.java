@@ -163,7 +163,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         viewHolder.mPlayPauseButton.setStatus(PlayerStatusObservable.STATUS.PAUSED);
 
         viewHolder.downloadButton.setEpisode(item);
-        mDownloadProgressObservable.registerObserver(viewHolder.downloadButton);
+        //mDownloadProgressObservable.registerObserver(viewHolder.downloadButton);
 
 
         bindExandedPlayer(mActivity, item, viewHolder, position);
@@ -236,7 +236,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
             }
         });
 
-        mDownloadProgressObservable.registerObserver(holder.downloadButton);
+        //mDownloadProgressObservable.registerObserver(holder.downloadButton);
 
 
         if (MainActivity.sBoundPlayerService != null) {
@@ -281,7 +281,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
             return;
         }
 
-        mDownloadProgressObservable.unregisterObserver(holder.downloadButton);
+        //mDownloadProgressObservable.unregisterObserver(holder.downloadButton);
 
 
         holder.mPlayPauseButton.unsetEpisodeId();

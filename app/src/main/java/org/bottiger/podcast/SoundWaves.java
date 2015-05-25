@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 
 
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.squareup.otto.Bus;
 
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
@@ -37,6 +38,8 @@ public class SoundWaves extends Application {
     public static IAnalytics sAnalytics;
     public static SubscriptionRefreshManager sSubscriptionRefreshManager;
 
+    public static Bus sBus;
+
 
     @Override
     public void onCreate() {
@@ -61,6 +64,8 @@ public class SoundWaves extends Application {
         sSubscriptionRefreshManager = new SubscriptionRefreshManager(context);
 
         firstRun(context);
+
+        sBus = new Bus();
     }
 
     public static Context getAppContext() {
@@ -85,5 +90,9 @@ public class SoundWaves extends Application {
         }
 
         return mFirstRun.booleanValue();
+    }
+
+    public Bus getsBus() {
+        return sBus;
     }
 }

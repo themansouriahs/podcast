@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
@@ -55,7 +56,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
         mInflater = (LayoutInflater) activity
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        mDownloadProgressObservable = new DownloadProgressObservable(mActivity);
+        mDownloadProgressObservable = new DownloadProgressObservable((SoundWaves)mActivity.getApplicationContext());
         setDataset(dataset);
     }
 
@@ -97,7 +98,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
 
 
         episodeViewHolder.mDownloadButton.setEpisode(item);
-        mDownloadProgressObservable.registerObserver(episodeViewHolder.mDownloadButton);
+        //mDownloadProgressObservable.registerObserver(episodeViewHolder.mDownloadButton);
 
         if (mPalette != null) {
             episodeViewHolder.mPlayPauseButton.onPaletteFound(mPalette);
@@ -142,7 +143,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
     @Override
     public void onViewRecycled(RecyclerView.ViewHolder viewHolder) {
         final EpisodeViewHolder episodeViewHolder = (EpisodeViewHolder) viewHolder;
-        mDownloadProgressObservable.unregisterObserver(episodeViewHolder.mDownloadButton);
+        //mDownloadProgressObservable.unregisterObserver(episodeViewHolder.mDownloadButton);
         episodeViewHolder.mDownloadButton.unsetEpisodeId();
         episodeViewHolder.mPlayPauseButton.unsetEpisodeId();
         episodeViewHolder.mQueueButton.unsetEpisodeId();

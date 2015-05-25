@@ -100,7 +100,7 @@ public class PlaylistFragment extends GeastureFragment implements
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        mDownloadProgressObservable = new DownloadProgressObservable(mActivity);
+        mDownloadProgressObservable = new DownloadProgressObservable((SoundWaves)mActivity.getApplicationContext());
         mPlaylist = PlayerService.getPlaylist(this);
 
         super.onCreate(savedInstanceState);
@@ -118,7 +118,7 @@ public class PlaylistFragment extends GeastureFragment implements
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
-        mDownloadProgressObservable = EpisodeDownloadManager.getDownloadProgressObservable(mActivity);
+        mDownloadProgressObservable = EpisodeDownloadManager.getDownloadProgressObservable((SoundWaves)mActivity.getApplicationContext());
 
 		TopActivity.getPreferences().registerOnSharedPreferenceChangeListener(
                 spChanged);
@@ -414,7 +414,7 @@ public class PlaylistFragment extends GeastureFragment implements
         } else {
             mPlayPauseButton.setStatus(PlayerStatusObservable.STATUS.PAUSED);
         }
-        mDownloadProgressObservable.registerObserver(mDownloadButton);
+        //mDownloadProgressObservable.registerObserver(mDownloadButton);
 
         mBackButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -439,7 +439,7 @@ public class PlaylistFragment extends GeastureFragment implements
 
         mPlayerDownloadButton.setEpisode(item);
 
-        mDownloadProgressObservable.registerObserver(mPlayerDownloadButton);
+        //mDownloadProgressObservable.registerObserver(mPlayerDownloadButton);
 
         final Activity activity = getActivity();
 
