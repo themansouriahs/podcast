@@ -10,8 +10,6 @@ import android.transition.Transition;
 import android.view.Window;
 import android.view.WindowManager;
 
-import com.facebook.drawee.backends.pipeline.Fresco;
-
 public class TopActivity extends ActionBarActivity {
 	
 	private static SharedPreferences prefs;
