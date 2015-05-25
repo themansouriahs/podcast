@@ -47,7 +47,8 @@ public class RecyclerItemTouchListener implements RecyclerView.OnItemTouchListen
                         float diffy = Math.abs(fingerdowny-e.getRawY());
                         if (diffx < thresshold && diffy < thresshold) {
                             fingerDown=null;
-                            onCLick(rv, e);
+                            if (rv != null)
+                                onCLick(rv, e);
                         }
                     }
                     mMouseDownTime = -1;
