@@ -101,7 +101,7 @@ public class SubscriptionRefreshManager {
         }
     }
 
-    private void addSubscriptionToQueue(@NonNull final Context argContext, @NonNull final ISubscription argSubscription, final IDownloadCompleteCallback argCallback) {
+    private void addSubscriptionToQueue(@NonNull final Context argContext, @NonNull final ISubscription argSubscription, @Nullable final IDownloadCompleteCallback argCallback) {
         Log.d(DEBUG_KEY, "Adding to queue: " + argSubscription);
 
         if (argSubscription == null) {
@@ -136,7 +136,8 @@ public class SubscriptionRefreshManager {
                         EpisodeDownloadManager.startDownload(argContext);
                 }
 
-                argCallback.complete(argSucces, argSubscription);
+                if (argCallback != null)
+                    argCallback.complete(argSucces, argSubscription);
             }
         };
 
