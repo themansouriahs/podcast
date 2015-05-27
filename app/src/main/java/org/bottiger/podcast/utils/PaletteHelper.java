@@ -29,7 +29,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class PaletteHelper {
 
-    private static final int CACHE_SIZE = 100;
+    private static final int CACHE_SIZE = 20;
     private static final int PALETTE_SIZE = 24; /* 24 is default size. You can decrease this value to speed up palette generation */
 
     private static final ReentrantLock sLock = new ReentrantLock();
