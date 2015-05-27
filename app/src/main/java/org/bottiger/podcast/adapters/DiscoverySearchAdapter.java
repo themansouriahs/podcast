@@ -6,7 +6,9 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.LruCache;
 import android.view.LayoutInflater;
@@ -15,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
 import com.rey.material.widget.Switch;
 
 import org.bottiger.podcast.FeedActivity;
@@ -96,6 +99,7 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
         try {
             Uri  uri = Uri.parse(subscription.getImageURL());
             holder.image.setImageURI(uri);
+            holder.imageUrl = uri;
         } catch (NullPointerException npe) {
             holder.image.setBackgroundColor(mDefaultBackgroundColor);
         }
@@ -128,7 +132,21 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
 
     @Override
     public void onViewRecycled(SearchResultViewHolder holder) {
+        clearCache(holder);
         holder.toggleSwitch.setOnCheckedChangeListener(null);
+    }
+
+    @Override
+    public void onViewDetachedFromWindow(SearchResultViewHolder holder) {
+        clearCache(holder);
+        super.onViewDetachedFromWindow(holder);
+    }
+
+    private synchronized void clearCache(SearchResultViewHolder holder) {
+        if (holder.imageUrl != null) {
+            Fresco.getImagePipeline().evictFromMemoryCache(holder.imageUrl);
+            holder.imageUrl = null;
+        }
     }
 
     @Override

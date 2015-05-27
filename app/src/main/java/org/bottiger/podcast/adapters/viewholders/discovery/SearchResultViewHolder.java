@@ -1,5 +1,6 @@
 package org.bottiger.podcast.adapters.viewholders.discovery;
 
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Switch;
@@ -17,6 +18,8 @@ public class SearchResultViewHolder extends RecyclerView.ViewHolder {
     public TextView title;
     public SimpleDraweeView image;
     public com.rey.material.widget.Switch toggleSwitch;
+
+    public Uri imageUrl = null;
 
     public SearchResultViewHolder(View itemView) {
         super(itemView);

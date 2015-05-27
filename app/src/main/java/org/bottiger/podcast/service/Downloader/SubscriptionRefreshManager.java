@@ -3,6 +3,7 @@ package org.bottiger.podcast.service.Downloader;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -150,15 +151,31 @@ public class SubscriptionRefreshManager {
             @Override
             public void run() {
                 com.squareup.okhttp.Response response = null;
+                ISubscription parsedSubscription = null;
                 try {
                     response = client.newCall(request).execute();
 
                     if (response != null && response.isSuccessful()) {
                         String feedString = response.body().string();
-                        processResponse(argContext.getContentResolver(), wrappedCallback, argSubscription, feedString);
+                        parsedSubscription = processResponse(argContext, argSubscription, feedString);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
+                }
+
+                final ISubscription finalSubscription = parsedSubscription != null ? parsedSubscription : null;
+
+                if (wrappedCallback != null) {
+
+                    Handler mainHandler = new Handler(argContext.getMainLooper());
+                    Runnable myRunnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d(DEBUG_KEY, "Parsing callback for: " + argSubscription);
+                            wrappedCallback.complete(finalSubscription != null, finalSubscription);
+                        }
+                    };
+                    mainHandler.post(myRunnable);
                 }
             }
         });
@@ -189,8 +206,7 @@ public class SubscriptionRefreshManager {
         return subscriptionsAdded;
     }
 
-    private static void processResponse(ContentResolver contentResolver,
-                                        IDownloadCompleteCallback argCallback, @NonNull ISubscription subscription, String argResponse) {
+    private static ISubscription processResponse(Context argContext, @NonNull ISubscription subscription, String argResponse) {
         Log.d(DEBUG_KEY, "Volley response from: " + subscription);
         //new ParseFeedTask().onSucces(response);
 
@@ -198,7 +214,7 @@ public class SubscriptionRefreshManager {
 
         try {
             Log.d(DEBUG_KEY, "Parsing: " + subscription);
-            parsedSubscription = feedHandler.parseFeed(contentResolver, subscription,
+            parsedSubscription = feedHandler.parseFeed(argContext.getContentResolver(), subscription,
                     argResponse.replace("ï»¿", "")); // Byte Order Mark
         } catch (SAXException e) {
             Log.d(DEBUG_KEY, "Parsing EXCEPTION: " + subscription);
@@ -222,10 +238,7 @@ public class SubscriptionRefreshManager {
             e.printStackTrace();
         }
 
-        if (argCallback != null) {
-            Log.d(DEBUG_KEY, "Parsing callback for: " + subscription);
-            argCallback.complete(parsedSubscription != null, parsedSubscription);
-        }
+        return parsedSubscription;
     }
 }
 
