@@ -114,7 +114,7 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
         super.setEpisode(argItem);
 
         try {
-            SoundWaves.sBus.register(this);
+            //SoundWaves.sBus.register(this);
         } catch (IllegalArgumentException iae) {
             // Ignore
         }
@@ -122,11 +122,12 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
         setProgressPercent(new DownloadProgress());
     }
 
+    /*
     @Override
     public synchronized void unsetEpisodeId() {
         super.unsetEpisodeId();
         SoundWaves.sBus.unregister(this);
-    }
+    }*/
 
     @Subscribe
     public void setProgressPercent(@NonNull DownloadProgress argProgress) {

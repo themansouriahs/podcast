@@ -141,6 +141,20 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
     }
 
     @Override
+    public void onViewAttachedToWindow (RecyclerView.ViewHolder holder) {
+        super.onViewAttachedToWindow(holder);
+        final EpisodeViewHolder episodeViewHolder = (EpisodeViewHolder) holder;
+        SoundWaves.sBus.register(episodeViewHolder.mDownloadButton);
+    }
+
+    @Override
+    public void  onViewDetachedFromWindow(RecyclerView.ViewHolder holder) {
+        final EpisodeViewHolder episodeViewHolder = (EpisodeViewHolder) holder;
+        SoundWaves.sBus.unregister(episodeViewHolder.mDownloadButton);
+        super.onViewDetachedFromWindow(holder);
+    }
+
+    @Override
     public void onViewRecycled(RecyclerView.ViewHolder viewHolder) {
         final EpisodeViewHolder episodeViewHolder = (EpisodeViewHolder) viewHolder;
         //mDownloadProgressObservable.unregisterObserver(episodeViewHolder.mDownloadButton);
