@@ -8,10 +8,13 @@ import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.service.PlayerServiceCommands;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.IBinder;
+import android.support.annotation.NonNull;
 import android.widget.RemoteViews;
 
 public class NotificationReceiver extends BroadcastReceiver {
@@ -29,14 +32,11 @@ public class NotificationReceiver extends BroadcastReceiver {
 		String action = intent.getAction();
 		layout = new RemoteViews(context.getPackageName(), R.layout.notification);
 
-        PlayerService playerService = MainActivity.getPlayerService();
-
-        // FIXME we should start the service and not just return.
-        // FIXME The user probably wants to start playing when the service isn't running
-        if (playerService == null) {
-            //VendorCrashReporter.report("PlayerService", "IS NULL");
+        IBinder binder = peekService(context, new Intent(context, PlayerService.class));
+        if (binder == null)
             return;
-        }
+        PlayerService playerService = ((PlayerService.PlayerBinder) binder).getService();
+
 
         if (action.equals(nextAction)) {
             playerService.playNext();
@@ -49,25 +49,28 @@ public class NotificationReceiver extends BroadcastReceiver {
         }
 		
 		if (action.equals(toggleAction)) {
-            SoundWavesPlayer player = playerService.getPlayer();
-            if (!player.isInitialized()) {
-                return;
-            }
 
-			Boolean isPlaying = false;
-			if (playerService.isPlaying()) {
-				playerService.pause();
-			} else {
-				playerService.start();
-				isPlaying = true;
-			}
 
-            IEpisode currentItem = playerService.getCurrentItem();
-            if (currentItem != null) {
-                np = new NotificationPlayer(playerService, playerService.getCurrentItem());
-                np.setmPlayerService(playerService);
-                np.show(isPlaying);
-            }
+                    SoundWavesPlayer player = playerService.getPlayer();
+                    if (!player.isInitialized()) {
+                        return;
+                    }
+
+                    Boolean isPlaying = false;
+                    if (playerService.isPlaying()) {
+                        playerService.pause();
+                    } else {
+                        playerService.start();
+                        isPlaying = true;
+                    }
+
+                    IEpisode currentItem = playerService.getCurrentItem();
+                    if (currentItem != null) {
+                        np = new NotificationPlayer(playerService, playerService.getCurrentItem());
+                        np.setmPlayerService(playerService);
+                        np.show(isPlaying);
+                    }
+
 		}
 		
 	}

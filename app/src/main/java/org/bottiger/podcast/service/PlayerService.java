@@ -67,8 +67,6 @@ public class PlayerService extends Service implements
 	
 	private static Playlist sPlaylist = new Playlist();
 
-	private final PodcastLog log = PodcastLog.getLog(getClass());
-
 	private SoundWavesPlayer mPlayer = null;
     private MediaController mController;
 
@@ -136,7 +134,6 @@ public class PlayerService extends Service implements
 
 		this.mControllerComponentName = new ComponentName(this,
 				HeadsetReceiver.class);
-		log.debug("onCreate(): " + mControllerComponentName);
 		this.mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
 
@@ -228,14 +225,11 @@ public class PlayerService extends Service implements
 		if (mPlayer != null) {
 			mPlayer.release();
 		}
-
-		log.debug("onDestroy()");
 	}
 
 	@Override
 	public void onLowMemory() {
 		super.onLowMemory();
-		log.debug("onLowMemory()");
 	}
 
 	@Override
@@ -404,9 +398,6 @@ public class PlayerService extends Service implements
             if (mItem instanceof FeedItem) {
                 ((FeedItem)mItem).setOffset(getContentResolver(), mPlayer.position());
             }
-		} else {
-			log.error("playing but no item!!!");
-
 		}
 		dis_notifyStatus();
 
