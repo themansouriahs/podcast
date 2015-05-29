@@ -5,6 +5,7 @@ import java.util.HashSet;
 
 import org.bottiger.podcast.ApplicationConfiguration;
 import org.bottiger.podcast.MainActivity;
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.adapters.PlaylistAdapter;
 import org.bottiger.podcast.adapters.decoration.OnDragStateChangedListener;
 import org.bottiger.podcast.flavors.Analytics.VendorAnalytics;
@@ -30,6 +31,7 @@ import android.support.v4.widget.CursorAdapter;
 import android.util.Log;
 
 import com.dragontek.mygpoclient.feeds.Feed;
+import com.squareup.otto.Subscribe;
 
 public class Playlist implements OnDragStateChangedListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -37,15 +39,13 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
     public static final boolean PLAY_NEXT_DEFAULT     = false;
 
 	public static int MAX_SIZE = 20;
-    private static Playlist activePlaylist = null;
 
     private static final String mSortNew = "DESC";
     private static final String mSortOld = "ASC";
 
-    public enum SORT { DATE_NEW, DATE_OLD };
+    public enum SORT { DATE_NEW, DATE_OLD, NOT_SET };
 
 	private Context mContext;
-
 
     private SubscriptionFilter mSubscriptionFilter;
     //private HashSet<Long> mSubscriptions = new HashSet<>();
@@ -68,18 +68,16 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
 
     private static HashSet<PlaylistChangeListener> sPlaylistChangeListeners = new HashSet<>();
 
-	public Playlist(int length) {
-		this(length, false);
+	public Playlist(@NonNull Context argContext, int length) {
+		this(argContext, length, false);
 	}
 
-	public Playlist(int length, boolean isLocked) {
-        if (activePlaylist == null) {
-            activePlaylist = this;
-        }
+	public Playlist(@NonNull Context argContext, int length, boolean isLocked) {
+        setContext(argContext);
     }
 
-	public Playlist() {
-		this(MAX_SIZE);
+	public Playlist(@NonNull Context argContext) {
+		this(argContext, MAX_SIZE);
 	}
 
     public void setContext(@NonNull Context argContext) {
@@ -179,36 +177,6 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
 			setItem(position, FeedItem.getByCursor(cursor));
 		}
 	}
-
-    /**
-     * When new items are fetched from a remote destination we can use this method
-     * to notify the playlist about them instead of passing them back and forth in the database
-     */
-    public void notifyAbout(@NonNull FeedItem argEpisode) {
-
-        // TODO: Expand this with filters
-        int counter = 0;
-        boolean isAfter;
-
-        for (IEpisode episode : mInternalPlaylist) {
-            /*
-            isAfter = argEpisode.getDateTime().after(episode.getDateTime());
-            if (isAfter) {
-                final int size = mInternalPlaylist.size();
-
-                if (size == MAX_SIZE) {
-                    mInternalPlaylist.remove(mInternalPlaylist.size() - 1);
-                }
-
-                mInternalPlaylist.add(counter, argEpisode);
-
-                notifyPlaylistRangeChanged(counter, size - 1);
-                return;
-            }
-            counter++;
-            */
-        }
-    }
 
 	/**
 	 * @return The next item in the playlist
@@ -499,22 +467,6 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
         return mInternalPlaylist.get(0);
     }
 
-    public static Playlist getActivePlaylist() {
-        if (activePlaylist == null) {
-            throw new IllegalStateException("No Active Playlist"); // NoI18N
-        }
-        return activePlaylist;
-    }
-
-    public static void setActivePlaylist(@NonNull Playlist argPlaylist) {
-        if (argPlaylist != activePlaylist) {
-            activePlaylist = argPlaylist;
-            activePlaylist.notifyPlaylistChanged();
-        } else {
-            throw new IllegalStateException("New playlist is the same");
-        }
-    }
-
     private int dragStart = -1;
     @Override
     public void onDragStart(int position) {
@@ -549,12 +501,14 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
     }
 
     public void notifyPlaylistChanged() {
+        /*
         for (PlaylistChangeListener listener : sPlaylistChangeListeners) {
             if (listener == null) {
                 throw new IllegalStateException("Listener can ot be null");
             }
             listener.notifyPlaylistChanged();
-        }
+        }*/
+        SoundWaves.getBus().post(this);
     }
 
     public void notifyPlaylistRangeChanged(final int argFrom, final int argTo) {
@@ -573,6 +527,17 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
             //        }
             //    });
             //}
+        }
+    }
+
+    @Subscribe
+    public void onPlaylistChanged(@NonNull PlaylistData argPlaylistData) {
+        if (argPlaylistData.showListened != null) {
+            setShowListened(argPlaylistData.showListened.booleanValue());
+        }
+
+        if (argPlaylistData.sortOrder != null) {
+            setSortOrder(argPlaylistData.sortOrder);
         }
     }
 

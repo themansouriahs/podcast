@@ -3,6 +3,8 @@ package org.bottiger.podcast.views.dialogs;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +15,10 @@ import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.squareup.otto.Subscribe;
+
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.playlist.filters.SubscriptionFilter;
 import org.bottiger.podcast.provider.Subscription;
@@ -78,12 +83,14 @@ public class DialogPlaylistContent implements DialogInterface.OnMultiChoiceClick
         }
     };
 
-    public DialogPlaylistContent(Context context) {
-        init(context);
+    public DialogPlaylistContent(@NonNull Context context, @Nullable Playlist argPlaylist) {
+        SoundWaves.getBus().register(this);
+        init(context, argPlaylist);
     }
 
-    private void init(Context argContext) {
+    private void init(@NonNull Context argContext, @Nullable Playlist argPlaylist) {
         mContext = argContext;
+        setSubscriptions(argPlaylist);
 
         mSpinnerPrefix = mContext.getResources().getString(R.string.playlist_filter_prefix);
         mShownAll = mContext.getResources().getString(R.string.playlist_filter_all);
@@ -198,9 +205,12 @@ public class DialogPlaylistContent implements DialogInterface.OnMultiChoiceClick
     public void onCancel(DialogInterface dialog) {
     }
 
-    public void setSubscriptions(Playlist argPlaylist) {
+    @Subscribe
+    public void setSubscriptions(@Nullable Playlist argPlaylist) {
         mPlaylist = argPlaylist;
-        mSubscriptionFilter = argPlaylist.getSubscriptionFilter();
+
+        if (argPlaylist != null)
+            mSubscriptionFilter = argPlaylist.getSubscriptionFilter();
     }
 
     private void checkAll() {

@@ -107,7 +107,7 @@ public class DownloadProgressObservable {
                             }
 
                             if (downloadProgress != null) {
-                                mApplicationContext.getsBus().post(downloadProgress);
+                                mApplicationContext.getBus().post(downloadProgress);
                             }
                         }
 
@@ -126,7 +126,7 @@ public class DownloadProgressObservable {
                     case DELETED: {
                         IEpisode episode = (FeedItem) msg.obj;
                         DownloadProgress downloadProgress = new DownloadProgress(episode, DownloadStatus.DELETED, 0);
-                        mApplicationContext.getsBus().post(downloadProgress);
+                        mApplicationContext.getBus().post(downloadProgress);
                         break;
                     }
                 }

@@ -20,7 +20,6 @@ import org.bottiger.podcast.listeners.DownloadObserver;
 import org.bottiger.podcast.listeners.EpisodeStatus;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
-import org.bottiger.podcast.listeners.PlayerStatusObserver;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.utils.ColorExtractor;
@@ -30,7 +29,7 @@ import java.lang.ref.WeakReference;
 /**
  * TODO: document your custom view class.
  */
-public class PlayerButtonView extends ImageButton implements PlayerStatusObserver, PaletteListener  {
+public class PlayerButtonView extends ImageButton implements PaletteListener  {
 
     public final static int STATE_DEFAULT = 0;
     public final static int STATE_DOWNLOAD = 1;
@@ -200,21 +199,10 @@ public class PlayerButtonView extends ImageButton implements PlayerStatusObserve
         mLastProgress = mProgress;
     }
 
-    @Override
     public IEpisode getEpisode() {
         ensureEpisode();
 
         return mEpisode;
-    }
-
-    @Override
-    public void setProgressMs(long progressMs) {
-
-    }
-
-    @Override
-    public void onStateChange(EpisodeStatus argStatus) {
-
     }
 
     @Override

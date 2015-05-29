@@ -31,6 +31,13 @@
   public boolean is*();
 }
 
+# otto
+-keepattributes *Annotation*
+-keepclassmembers class ** {
+    @com.squareup.otto.Subscribe public *;
+    @com.squareup.otto.Produce public *;
+}
+
 # OKhhtp
 -dontwarn com.squareup.okhttp.**
 # Ignore warnings: https://github.com/square/okio/issues/60

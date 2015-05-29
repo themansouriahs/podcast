@@ -27,7 +27,6 @@ public class TextViewTotalTime extends TextViewObserver {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
-    @Override
     public void setProgressMs(long progressMs) {
         return;
     }

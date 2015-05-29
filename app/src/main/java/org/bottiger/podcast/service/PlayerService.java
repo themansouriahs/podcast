@@ -6,13 +6,14 @@ import org.bottiger.podcast.Player.PlayerHandler;
 import org.bottiger.podcast.Player.PlayerPhoneListener;
 import org.bottiger.podcast.Player.PlayerStateManager;
 import org.bottiger.podcast.Player.SoundWavesPlayer;
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.MediaCast.IMediaCast;
+import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
-import org.bottiger.podcast.utils.PodcastLog;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -65,7 +66,7 @@ public class PlayerService extends Service implements
 
 	private static NextTrack nextTrack = NextTrack.NEXT_IN_PLAYLIST;
 	
-	private static Playlist sPlaylist = new Playlist();
+	private Playlist mPlaylist;
 
 	private SoundWavesPlayer mPlayer = null;
     private MediaController mController;
@@ -116,8 +117,9 @@ public class PlayerService extends Service implements
         wifiLock = ((WifiManager) getSystemService(Context.WIFI_SERVICE))
                 .createWifiLock(WifiManager.WIFI_MODE_FULL, LOCK_NAME);
 
-        sPlaylist.setContext(this);
-		sPlaylist.populatePlaylistIfEmpty();
+        mPlaylist = new Playlist(this);
+		mPlaylist.populatePlaylistIfEmpty();
+		SoundWaves.getBus().register(mPlaylist);
 
         mPlayerHandler = new PlayerHandler(this);
 		
@@ -221,6 +223,7 @@ public class PlayerService extends Service implements
 
 	@Override
 	public void onDestroy() {
+		SoundWaves.getBus().unregister(mPlaylist);
         super.onDestroy();
 		if (mPlayer != null) {
 			mPlayer.release();
@@ -261,7 +264,7 @@ public class PlayerService extends Service implements
 
 	public void playNext() {
         IEpisode item = getCurrentItem();
-        IEpisode nextItem = sPlaylist.getNext();
+        IEpisode nextItem = mPlaylist.getNext();
 
 		if (item != null && item instanceof FeedItem) {
             ((FeedItem)item).trackEnded(getContentResolver());
@@ -274,8 +277,8 @@ public class PlayerService extends Service implements
 
 		play(nextItem.getUrl().toString());
         mMetaDataControllerWrapper.updateState(nextItem, true, true);
-        sPlaylist.removeItem(0);
-        sPlaylist.notifyPlaylistChanged();
+        mPlaylist.removeItem(0);
+        mPlaylist.notifyPlaylistChanged();
 	}
 
 	public void play(String argEpisodeURL) {
@@ -286,7 +289,7 @@ public class PlayerService extends Service implements
 
 		if (mItem != null) {
 			if ((mItem.getUrl().toString() == argEpisodeURL) && mPlayer.isInitialized()) {
-				if (mPlayer.isPlaying() == false) {
+				if (!mPlayer.isPlaying()) {
 					start();
 				}
 				return;
@@ -314,9 +317,9 @@ public class PlayerService extends Service implements
 					oldFeedItem.markAsListened();
 					oldFeedItem.update(getContentResolver());
 
-					int pos = sPlaylist.getPosition(oldItem);
+					int pos = mPlaylist.getPosition(oldItem);
 					if (pos > 0) {
-						sPlaylist.removeItem(pos);
+						mPlaylist.removeItem(pos);
 					}
 				}
 			}
@@ -333,7 +336,7 @@ public class PlayerService extends Service implements
 
 		int offset = mItem.getOffset() < 0 ? 0 : (int) mItem.getOffset();
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()    );
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
 
         if (offset == 0 && prefs.getBoolean("pref_stream_proxy", false))
             dataSource = HTTPDService.proxyURL(mItem.getUrl().toString());
@@ -453,7 +456,7 @@ public class PlayerService extends Service implements
 	 */
     @Nullable
 	public IEpisode getNextId() {
-		IEpisode next = sPlaylist.nextEpisode();
+		IEpisode next = mPlaylist.nextEpisode();
 		if (next != null)
 			return next;
 		return null;
@@ -517,16 +520,8 @@ public class PlayerService extends Service implements
 		}
 	}
 
-    public static synchronized Playlist getPlaylist() {
-        return getPlaylist(null);
-    }
-
-    public static synchronized Playlist getPlaylist(@Nullable Playlist.PlaylistChangeListener argListener) {
-        if (argListener != null) {
-            sPlaylist.registerPlaylistChangeListener(argListener);
-        }
-
-        return sPlaylist;
+    public Playlist getPlaylist() {
+        return mPlaylist;
     }
 
 }

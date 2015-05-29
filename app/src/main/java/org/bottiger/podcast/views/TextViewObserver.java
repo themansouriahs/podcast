@@ -7,9 +7,10 @@ import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
+import com.squareup.otto.Subscribe;
+
 import org.bottiger.podcast.listeners.EpisodeStatus;
-import org.bottiger.podcast.listeners.PlayerStatusObservable;
-import org.bottiger.podcast.listeners.PlayerStatusObserver;
+import org.bottiger.podcast.listeners.PlayerStatusProgressData;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.utils.StrUtils;
@@ -17,7 +18,7 @@ import org.bottiger.podcast.utils.StrUtils;
 /**
  * Created by apl on 25-03-2015.
  */
-public class TextViewObserver extends TextView implements PlayerStatusObserver {
+public class TextViewObserver extends TextView {
 
     protected IEpisode mEpisode = null;
 
@@ -39,29 +40,23 @@ public class TextViewObserver extends TextView implements PlayerStatusObserver {
     }
 
     public void setEpisode(@NonNull IEpisode argEpisode) {
-        if (mEpisode != null) {
-            PlayerStatusObservable.unregisterListener(this);
-        }
         mEpisode = argEpisode;
-        PlayerStatusObservable.registerListener(this);
     }
 
-    @Override
     public IEpisode getEpisode() {
         return mEpisode;
     }
 
-    @Override
-    public void setProgressMs(long progressMs) {
-        if (progressMs < 0)
+    @Subscribe
+    public void setProgressMs(PlayerStatusProgressData argPlayerProgress) {
+        if (argPlayerProgress.progressMs < 0)
             return;
 
-        setText(StrUtils.formatTime(progressMs));
+        setText(StrUtils.formatTime(argPlayerProgress.progressMs));
         invalidate();
     }
 
-    @Override
     public void onStateChange(EpisodeStatus argStatus) {
-        setProgressMs(argStatus.getPlaybackPositionMs());
+        setProgressMs(new PlayerStatusProgressData(argStatus.getPlaybackPositionMs()));
     }
 }

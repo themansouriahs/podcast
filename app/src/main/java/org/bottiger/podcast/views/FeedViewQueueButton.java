@@ -18,6 +18,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
+import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.IEpisode;
@@ -114,7 +115,7 @@ public class FeedViewQueueButton extends PlayPauseImageView {
     @Override
     public void onClick(View view) {
         IEpisode item = getEpisode();
-        Playlist playlist = Playlist.getActivePlaylist();
+        Playlist playlist = MainActivity.sBoundPlayerService.getPlaylist();
 
         if (playlist.contains(item)) {
             int position = playlist.getPosition(item);
@@ -128,7 +129,7 @@ public class FeedViewQueueButton extends PlayPauseImageView {
     @Override
     public synchronized void setEpisode(IEpisode argEpisode, LOCATION argLocation) {
         super.setEpisode(argEpisode, argLocation);
-        Playlist playlist = Playlist.getActivePlaylist();
+        Playlist playlist = MainActivity.sBoundPlayerService.getPlaylist();
         if (playlist.contains(argEpisode)) {
             cross(0);
         }

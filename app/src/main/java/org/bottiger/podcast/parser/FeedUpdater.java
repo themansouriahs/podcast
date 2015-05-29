@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import org.bottiger.podcast.MainActivity;
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
@@ -55,13 +57,6 @@ public class FeedUpdater {
 			if (localItem == null) {
 				if (item.image == null) {
                     item.image = subscription.getImageURL();
-                }
-
-                try {
-                    playlist = Playlist.getActivePlaylist();
-                    //playlist.notifyAbout(item);
-                } catch (IllegalStateException ise) {
-                    // its okay. We are running in a background job.
                 }
 
 				//item.update(contentResolver);

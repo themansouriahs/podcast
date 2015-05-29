@@ -17,47 +17,20 @@ import android.widget.TextView;
 
 public abstract class PodcastBaseFragment extends Fragment {
 
-    protected RecyclerView currentView;
     protected RecyclerView.Adapter mAdapter;
     protected RecyclerView.LayoutManager mLayoutManager;
 
     protected SharedPreferences sharedPreferences;
 
-	protected CursorAdapter mCursorAdapter;
-
-	protected final PodcastLog log = PodcastLog.getLog(getClass());
-
-    private Playlist mPlaylist;
 
 	protected ReorderCursor mCursor = null;
 
-	private static TextView mCurrentTime = null;
 	private static SeekBar mProgressBar = null;
-	private static TextView mDuration = null;
-
-	public TextView getCurrentTime() {
-		return mCurrentTime;
-	}
-
-	public static void setCurrentTime(TextView mCurrentTime) {
-		PodcastBaseFragment.mCurrentTime = mCurrentTime;
-	}
 
 	public SeekBar getProgress() {
 		return mProgressBar;
 	}
 
-	public void setProgressBar(SeekBar mProgress) {
-		PodcastBaseFragment.mProgressBar = mProgress;
-	}
-
-	public void setDuration(TextView mDuration) {
-		PodcastBaseFragment.mDuration = mDuration;
-	}
-
-    public RecyclerView getListView() {
-        return currentView;
-    }
 
 	// Container Activity must implement this interface
 	public interface OnItemSelectedListener {
@@ -71,7 +44,6 @@ public abstract class PodcastBaseFragment extends Fragment {
 		sharedPreferences = PreferenceManager
 				.getDefaultSharedPreferences(getActivity());
 
-        mPlaylist = getPlaylist();
 	}
 
 	@Override
@@ -95,28 +67,8 @@ public abstract class PodcastBaseFragment extends Fragment {
 		return this.mCursor;
 	}
 
-	public void refreshView() {
-		FeedItem.clearCache();
-	}
-
-    @Deprecated
-    public Playlist getPlaylist() {
-        return PlayerService.getPlaylist(null);
-    }
-
 	abstract String getWhere();
 
 	abstract String getOrder();
 
-	protected static String orderByFirst(String condition) {
-		String priorityOrder = "case when " + condition + " then 1 else 2 end";
-		return priorityOrder;
-	}
-
-    public static PlayerService getPlayerService() {
-        if (MainActivity.sBoundPlayerService == null) {
-            throw new IllegalStateException("What should we do here?");
-        }
-        return MainActivity.sBoundPlayerService;
-    }
 }

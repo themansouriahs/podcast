@@ -20,6 +20,8 @@ import android.view.View;
 import android.view.ViewOutlineProvider;
 import android.widget.ImageView;
 
+import com.squareup.otto.Subscribe;
+
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
@@ -28,8 +30,7 @@ import org.bottiger.podcast.listeners.DownloadObserver;
 import org.bottiger.podcast.listeners.EpisodeStatus;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
-import org.bottiger.podcast.listeners.PlayerStatusObserver;
-import org.bottiger.podcast.playlist.Playlist;
+import org.bottiger.podcast.listeners.PlayerStatusProgressData;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.utils.ColorExtractor;
@@ -37,8 +38,7 @@ import org.bottiger.podcast.utils.ColorExtractor;
 /**
  * TODO: document your custom view class.
  */
-public class PlayPauseImageView extends ImageView implements PlayerStatusObserver,
-                                                             PaletteListener,
+public class PlayPauseImageView extends ImageView implements PaletteListener,
                                                              DownloadObserver,
                                                              View.OnClickListener {
 
@@ -113,7 +113,6 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
             s_playIcon = BitmapFactory.decodeResource(getResources(), R.drawable.av_play, options);
             s_pauseIcon = BitmapFactory.decodeResource(getResources(), R.drawable.av_pause, options);
         }
-        PlayerStatusObservable.registerListener(this);
     }
 
     @NonNull
@@ -128,7 +127,7 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
 
 
         long offset = mEpisode instanceof FeedItem && ((FeedItem)mEpisode).offset > 0 ? ((FeedItem)mEpisode).offset : 0;
-        setProgressMs(offset);
+        setProgressMs(new PlayerStatusProgressData(offset));
         invalidate();
     }
 
@@ -184,12 +183,12 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
         }
     }
 
-    @Override
-    public void setProgressMs(long progressMs) {
+    @Subscribe
+    public void setProgressMs(PlayerStatusProgressData argPlayerProgress) {
 
         // copy from seekbar
 
-        if (progressMs < 0) {
+        if (argPlayerProgress.progressMs < 0) {
             throw new IllegalStateException("Progress must be positive");
         }
         float progress = 0;
@@ -201,14 +200,13 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
         }
 
         try {
-            progress = progressMs / duration * 100;
+            progress = argPlayerProgress.progressMs / duration * 100;
         } catch (Exception e) {
             e.printStackTrace();
         }
         setProgressPercent((int) progress);
     }
 
-    @Override
     public void onStateChange(EpisodeStatus argStatus) {
         if (!argStatus.getEpisode().equals(mEpisode)) {
             return;
@@ -238,20 +236,7 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
 
         setStatus(isPlaying ? PlayerStatusObservable.STATUS.PLAYING : PlayerStatusObservable.STATUS.STOPPED);
 
-        IEpisode item = getEpisode();
-        Playlist playlist = Playlist.getActivePlaylist();
-
-        if (playlist.contains(item)) {
-            int position = playlist.getPosition(item);
-
-            if (position != 0) {
-                playlist.move(position, 0);
-                playlist.notifyPlaylistRangeChanged(position, 0);
-            }
-        } else {
-            playlist.setItem(0, item);
-            playlist.notifyPlaylistRangeChanged(0, 0);
-        }
+        //SoundWaves.getBus().post(new PlaylistData().playlistChanged = true);
     }
 
     @Override

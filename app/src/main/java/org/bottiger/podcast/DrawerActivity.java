@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 import org.bottiger.podcast.adapters.PlaylistContentSpinnerAdapter;
 import org.bottiger.podcast.playlist.Playlist;
+import org.bottiger.podcast.playlist.PlaylistData;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.navdrawer.NavigationDrawerMenuGenerator;
 import org.bottiger.podcast.views.MultiSpinner;
@@ -160,15 +161,12 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity {
             mDrawerTable.setLayoutParams(params);
         }
 
-        final Playlist playlist = PlayerService.getPlaylist();
-        playlist.setContext(this);
-
         mPlaylistContentLayout = (LinearLayout) findViewById(R.id.playlist_content);
         mPlaylistOrderSpinner = (Spinner) findViewById(R.id.drawer_playlist_sort_order);
         mPlaylistShowListened = (Switch) findViewById(R.id.slidebar_show_listened);
         mAutoPlayNext = (Switch) findViewById(R.id.slidebar_show_continues);
 
-        bindPlaylistFilter(mPlaylistContentLayout, playlist);
+        bindPlaylistFilter(mPlaylistContentLayout);
 
         parentItems = new ArrayList<String>(Arrays.asList(mListItems));
 		// setGroupParents();
@@ -185,9 +183,11 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (position == 0) {
-                    playlist.setSortOrder(Playlist.SORT.DATE_NEW); // new first
+                    //playlist.setSortOrder(Playlist.SORT.DATE_NEW); // new first
+                    SoundWaves.getBus().post(new PlaylistData().sortOrder = Playlist.SORT.DATE_NEW); // new first
                 } else {
-                    playlist.setSortOrder(Playlist.SORT.DATE_OLD); // old first
+                    //playlist.setSortOrder(Playlist.SORT.DATE_OLD); // old first
+                    SoundWaves.getBus().post(new PlaylistData().sortOrder = Playlist.SORT.DATE_OLD); // old first
                 }
             }
 
@@ -201,7 +201,8 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity {
         mPlaylistShowListened.setOnCheckedChangeListener(new Switch.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(Switch aSwitch, boolean isChecked) {
-                playlist.setShowListened(isChecked);
+                //playlist.setShowListened(isChecked);
+                SoundWaves.getBus().post(new PlaylistData().showListened = isChecked);
             }
         });
 
@@ -250,6 +251,12 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity {
 		 * if (savedInstanceState == null) { selectItem(0); }
 		 */
 	}
+
+    @Override
+    protected void onDestroy() {
+        SoundWaves.getBus().unregister(mDialogPlaylistContent);
+        super.onDestroy();
+    }
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -563,9 +570,8 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity {
         }
     }
 
-    private void bindPlaylistFilter(@NonNull LinearLayout argView, @NonNull Playlist argPlaylist) {
-        mDialogPlaylistContent = new DialogPlaylistContent(this);
-        mDialogPlaylistContent.setSubscriptions(argPlaylist);
+    private void bindPlaylistFilter(@NonNull LinearLayout argView) {
+        mDialogPlaylistContent = new DialogPlaylistContent(this, getPlaylist());
         argView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

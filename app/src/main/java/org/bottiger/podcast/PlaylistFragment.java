@@ -35,6 +35,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
@@ -54,11 +55,13 @@ import android.widget.TextView;
 import com.cocosw.undobar.UndoBarController;
 import com.cocosw.undobar.UndoBarStyle;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.squareup.otto.Produce;
+import com.squareup.otto.Subscribe;
 
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 
 public class PlaylistFragment extends GeastureFragment implements
-		OnSharedPreferenceChangeListener, Playlist.PlaylistChangeListener, IDownloadCompleteCallback
+		OnSharedPreferenceChangeListener, IDownloadCompleteCallback
          {
 
 	public final static int SUBSCRIPTION_CONTEXT_MENU = 1;
@@ -101,15 +104,30 @@ public class PlaylistFragment extends GeastureFragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         mDownloadProgressObservable = new DownloadProgressObservable((SoundWaves)mActivity.getApplicationContext());
-        mPlaylist = PlayerService.getPlaylist(this);
-
         super.onCreate(savedInstanceState);
+        //SoundWaves.getBus().register(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        //SoundWaves.getBus().unregister(this);
+        super.onDestroy();
     }
 
     @Override
     public void onDestroyView() {
         EpisodeDownloadManager.resetDownloadProgressObservable();
+        SoundWaves.getBus().unregister(mAdapter);
+        SoundWaves.getBus().unregister(mPlayPauseButton);
+        SoundWaves.getBus().unregister(mPlayerSeekbar);
+        SoundWaves.getBus().unregister(mCurrentTime);
         super.onDestroyView();
+    }
+
+    @Produce
+    public Playlist producePlaylist() {
+        // Assuming 'lastAnswer' exists.
+        return new Playlist(mActivity);
     }
 
 	// Read here:
@@ -221,20 +239,17 @@ public class PlaylistFragment extends GeastureFragment implements
         mAdapter = new PlaylistAdapter(mActivity, mOverlay, mDownloadProgressObservable);
         mAdapter.setHasStableIds(true);
 
+        SoundWaves.getBus().register(mAdapter);
+        SoundWaves.getBus().register(mPlayPauseButton);
+        SoundWaves.getBus().register(mPlayerSeekbar);
+        SoundWaves.getBus().register(mCurrentTime);
+
         mRecyclerView.setAdapter(mAdapter);
 
         //RecentItemsRecyclerListener l = new RecentItemsRecyclerListener(mAdapter);
         //mRecyclerView.setRecyclerListener(l);
 
-        // The bug where the player doesn't show up happens because the playlist is empty.
-        // The playlist is empty if the context is null
-        // The context is set by the PlayerService
-        // I need to make sure that playerservice has been started at this point,
-        // or more realisticly that the header is fixed when the context is ready
-        mPlaylist.setContext(getActivity());
-        mPlaylist.populatePlaylistIfEmpty();
-
-        if (!mPlaylist.isEmpty()) {
+        if (mPlaylist != null && !mPlaylist.isEmpty()) {
             IEpisode episode = mPlaylist.first();
             bindHeader(episode);
         }
@@ -352,7 +367,6 @@ public class PlaylistFragment extends GeastureFragment implements
 
     @Override
     public void onPause() {
-        mPlaylist.unregisterPlaylistChangeListener(this);
         super.onPause();
     }
 
@@ -368,15 +382,17 @@ public class PlaylistFragment extends GeastureFragment implements
                 mDownloadButton.setEpisode(item);
                 mFavoriteButton.setEpisode(item);
             }
+            playlistChanged(mPlaylist);
         }
-
-        mPlaylist.registerPlaylistChangeListener(this);
-        notifyPlaylistChanged();
         super.onResume();
     }
 
 
     public void bindHeader(final IEpisode item) {
+
+        if (mEpisodeTitle == null)
+            return;
+
         mEpisodeTitle.setText(item.getTitle());
         mEpisodeInfo.setText(item.getDescription());
 
@@ -474,10 +490,6 @@ public class PlaylistFragment extends GeastureFragment implements
             });
         }
 
-        PlayerStatusObservable.registerListener(mPlayerSeekbar);
-
-
-
         if (item != null && item.getArtwork(activity) != null) {
             Uri uri = Uri.parse(item.getArtwork(activity));
             mPhoto.setImageURI(uri);
@@ -488,11 +500,11 @@ public class PlaylistFragment extends GeastureFragment implements
         }
     }
 
-    private void setPlaylistViewState(@NonNull Playlist argPlaylist) {
+    private void setPlaylistViewState(@Nullable Playlist argPlaylist) {
 
         boolean dismissedWelcomePage = sharedPreferences.getBoolean(PLAYLIST_WELCOME_DISMISSED, PLAYLIST_WELCOME_DISMISSED_DEFAULT);
 
-        if (argPlaylist.isEmpty()) {
+        if (argPlaylist == null || argPlaylist.isEmpty()) {
             mPlaylistContainer.setVisibility(View.GONE);
 
             if (dismissedWelcomePage) {
@@ -506,6 +518,9 @@ public class PlaylistFragment extends GeastureFragment implements
             if (!dismissedWelcomePage) {
                 sharedPreferences.edit().putBoolean(PLAYLIST_WELCOME_DISMISSED, true).commit();
             }
+
+            if (mPlaylistContainer == null)
+                return;
 
             mPlaylistContainer.setVisibility(View.VISIBLE);
             mPlaylistWelcomeContainer.setVisibility(View.GONE);
@@ -567,38 +582,15 @@ public class PlaylistFragment extends GeastureFragment implements
 		}
 	}
 
-    @Override
-    public void notifyPlaylistChanged() {
-        mActivity.runOnUiThread(new Runnable() {
+    @Subscribe
+    public void playlistChanged(@NonNull Playlist argPlaylist) {
+        mPlaylist = argPlaylist;
 
-            @Override
-            public void run() {
-                mPlaylist.populatePlaylistIfEmpty();
+        setPlaylistViewState(mPlaylist);
 
-                setPlaylistViewState(mPlaylist);
-
-                if (!mPlaylist.isEmpty()) {
-                    IEpisode episode = mPlaylist.first();
-                    bindHeader(episode);
-                }
-
-            }
-        });
-    }
-
-    @Override
-    public void notifyPlaylistRangeChanged(int from, int to) {
         if (!mPlaylist.isEmpty()) {
-
-            mActivity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    IEpisode episode = mPlaylist.first();
-                    bindHeader(episode);
-
-                    setPlaylistViewState(mPlaylist);
-                }
-            });
+            IEpisode episode = mPlaylist.first();
+            bindHeader(episode);
         }
     }
-         }
+}

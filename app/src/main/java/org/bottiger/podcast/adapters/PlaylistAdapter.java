@@ -9,6 +9,7 @@ import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.PodcastBaseFragment;
 import org.bottiger.podcast.R;
 
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.adapters.viewholders.ExpandableViewHoldersUtil;
 import org.bottiger.podcast.images.FrescoHelper;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
@@ -17,6 +18,7 @@ import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.Crypto;
 import org.bottiger.podcast.utils.PaletteHelper;
@@ -43,6 +45,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.facebook.imagepipeline.request.BasePostprocessor;
+import com.squareup.otto.Subscribe;
 
 public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> {
 
@@ -228,33 +231,13 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
                 PlaylistAdapter.toggle(holder, position);
 
                 if (feedItem instanceof FeedItem) { // FIXME
-                    ((FeedItem)feedItem).removeFromPlaylist(context.getContentResolver());
+                    ((FeedItem) feedItem).removeFromPlaylist(context.getContentResolver());
                 }
                 //PlaylistAdapter.this.notifyItemRemoved(position);
                 notifyDataSetChanged();
-                mPlaylist.removeItem(position+PLAYLIST_OFFSET);
+                mPlaylist.removeItem(position + PLAYLIST_OFFSET);
             }
         });
-
-        //mDownloadProgressObservable.registerObserver(holder.downloadButton);
-
-
-        if (MainActivity.sBoundPlayerService != null) {
-            boolean isPlaying = false;
-            if (MainActivity.sBoundPlayerService.isInitialized()) {
-                IEpisode currentEpisode = MainActivity.sBoundPlayerService.getCurrentItem();
-                if (currentEpisode == null)
-                    return;
-
-                if (feedItem != null && feedItem.getUrl() != null && feedItem.getUrl().toString().equals(currentEpisode.getUrl().toString())) {
-                    if (MainActivity.sBoundPlayerService.isPlaying()) {
-                        isPlaying = true;
-                        PodcastBaseFragment.setCurrentTime(holder.currentTime);
-                    }
-                }
-            }
-
-        }
     }
 
     @Override
@@ -288,6 +271,20 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         holder.favoriteButton.unsetEpisodeId();
         holder.removeButton.unsetEpisodeId();
         holder.downloadButton.unsetEpisodeId();
+    }
+
+    @Override
+    public void onViewAttachedToWindow (PlaylistViewHolder holder) {
+        super.onViewAttachedToWindow(holder);
+        SoundWaves.getBus().register(holder.mPlayPauseButton);
+        SoundWaves.getBus().register(holder.seekbar);
+    }
+
+    @Override
+    public void  onViewDetachedFromWindow(PlaylistViewHolder holder) {
+        SoundWaves.getBus().unregister(holder.mPlayPauseButton);
+        SoundWaves.getBus().unregister(holder.seekbar);
+        super.onViewDetachedFromWindow(holder);
     }
 
     /**
@@ -348,7 +345,12 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 	 */
 	private static Long itemID(int position) {
         Log.v("PlaylistAdapter", "itemID");
-        Playlist playlist = Playlist.getActivePlaylist();
+
+        PlayerService ps = MainActivity.sBoundPlayerService;
+        if (ps == null)
+            return -1L;
+
+        Playlist playlist = ps.getPlaylist();
         IEpisode episode = playlist.getItem(position);
 
         if (episode == null)
@@ -358,6 +360,12 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         //Long id = UUID.fromString(url).getLeastSignificantBits();
         return (long)url.hashCode();
 	}
+
+    @Subscribe
+    public void playlistChanged(@NonNull Playlist argPlaylist) {
+        mPlaylist = argPlaylist;
+        notifyDataSetChanged();
+    }
 
     @Override
     public long getItemId (int position) {

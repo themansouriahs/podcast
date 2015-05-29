@@ -4,12 +4,15 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewGroup;
 
 import org.bottiger.podcast.ApplicationConfiguration;
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.playlist.Playlist;
+import org.bottiger.podcast.playlist.PlaylistData;
 import org.bottiger.podcast.utils.TransitionUtils;
 
 import java.util.LinkedList;
@@ -34,14 +37,8 @@ public class NavigationDrawerMenuGenerator {
         mItems.add(new NavItem(R.string.menu_clear_playlist, R.drawable.ic_highlight_remove_white, new INavOnClick() {
             @Override
             public void onClick() {
-                Playlist playlist = Playlist.getActivePlaylist();
 
-                playlist.resetPlaylist(null);
-                int size = playlist.defaultSize();
-                if (!playlist.isEmpty()) {
-                    playlist.populatePlaylist(size, true);
-                    //mAdapter.notifyDataSetChanged();
-                }
+                SoundWaves.getBus().post(new PlaylistData().reset = true);
             }
         }));
 
