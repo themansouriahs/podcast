@@ -586,6 +586,9 @@ public class PlaylistFragment extends GeastureFragment implements
     public void playlistChanged(@NonNull Playlist argPlaylist) {
         mPlaylist = argPlaylist;
 
+        if (mPlaylistContainer == null)
+            return;
+
         setPlaylistViewState(mPlaylist);
 
         if (!mPlaylist.isEmpty()) {

@@ -13,8 +13,10 @@
         android:layout_height="wrap_content"
         app:rv_rippleDuration="150"
         app:rv_centered="true">
+
     <org.bottiger.podcast.views.PlayPauseImageView
         android:id="@+id/play_pause_button"
+        android:padding="0dp"
         android:layout_marginRight="5dp"
         style="@style/FeedViewPlayPauseButton" />
     </com.andexert.library.RippleView>

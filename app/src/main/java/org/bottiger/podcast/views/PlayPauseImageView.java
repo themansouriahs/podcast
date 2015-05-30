@@ -49,7 +49,7 @@ public class PlayPauseImageView extends ImageView implements PaletteListener,
     private LOCATION mLocation = LOCATION.OTHER;
 
     private static final int START_ANGLE = -90;
-    private static final int DRAW_OFFSET = 5;
+    private static final int DRAW_OFFSET = 6;
     private static final int DRAW_WIDTH = 6;
 
     private PlayerStatusObservable.STATUS mStatus = PlayerStatusObservable.STATUS.STOPPED;
@@ -63,8 +63,8 @@ public class PlayPauseImageView extends ImageView implements PaletteListener,
 
     private int mProgressPercent = 0;
 
-    private static Bitmap s_playIcon;
-    private static Bitmap s_pauseIcon;
+    private Bitmap mPlayIcon;
+    private Bitmap mPauseIcon;
 
     protected Paint paint;
     private Paint paintBorder;
@@ -107,12 +107,11 @@ public class PlayPauseImageView extends ImageView implements PaletteListener,
         }
 
         setOnClickListener(this);
-        if (s_playIcon == null || s_pauseIcon == null) {
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inScaled = false;
-            s_playIcon = BitmapFactory.decodeResource(getResources(), R.drawable.av_play, options);
-            s_pauseIcon = BitmapFactory.decodeResource(getResources(), R.drawable.av_pause, options);
-        }
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inScaled = false;
+        mPlayIcon = BitmapFactory.decodeResource(getResources(), R.drawable.av_play, options);
+        mPauseIcon = BitmapFactory.decodeResource(getResources(), R.drawable.av_pause, options);
     }
 
     @NonNull
@@ -156,7 +155,7 @@ public class PlayPauseImageView extends ImageView implements PaletteListener,
         int centerY = contentHeight/2;
 
         // Draw the background circle
-        float radius = centerX-DRAW_OFFSET;
+        float radius = centerX-DRAW_WIDTH;
         canvas.drawCircle(centerX,centerY,radius,paint);
 
         int diff2 =  DRAW_WIDTH;//(int) (centerY-radius);
@@ -168,18 +167,18 @@ public class PlayPauseImageView extends ImageView implements PaletteListener,
             onSizeChanged(0,0,0,0);
         }
 
-        if (DRAW_PROGRESS) {
+        if (DRAW_PROGRESS && mProgressPercent > 0) {
             canvas.drawArc(bounds, START_ANGLE, getProgressAngle(mProgressPercent), false, paintBorder);
         }
 
         // Draw the play/pause icon
-        Bitmap icon = mStatus == PlayerStatusObservable.STATUS.PLAYING ?  s_pauseIcon : s_playIcon;
+        Bitmap icon = mStatus == PlayerStatusObservable.STATUS.PLAYING ? mPauseIcon : mPlayIcon;
 
-        int bitmapx = centerX-icon.getWidth()/2;
-        int bitmapy = centerY-icon.getHeight()/2;
+        int bitmapx = (contentWidth >> 1) - icon.getWidth()/2;
+        int bitmapy = (contentHeight >> 1) - icon.getHeight()/2;
 
         if (drawIcon()) {
-            canvas.drawBitmap(icon, bitmapx, bitmapy, paint);
+            canvas.drawBitmap(icon, bitmapx-2*DRAW_OFFSET, bitmapy-2*DRAW_OFFSET, paint);
         }
     }
 
