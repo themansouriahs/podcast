@@ -174,11 +174,12 @@ public class PlayPauseImageView extends ImageView implements PaletteListener,
         // Draw the play/pause icon
         Bitmap icon = mStatus == PlayerStatusObservable.STATUS.PLAYING ? mPauseIcon : mPlayIcon;
 
-        int bitmapx = (contentWidth >> 1) - icon.getWidth()/2;
-        int bitmapy = (contentHeight >> 1) - icon.getHeight()/2;
+        int bitmapx = (contentWidth/2) - icon.getWidth()/2;
+        int bitmapy = (contentHeight/2) - icon.getHeight()/2;
 
         if (drawIcon()) {
-            canvas.drawBitmap(icon, bitmapx-2*DRAW_OFFSET, bitmapy-2*DRAW_OFFSET, paint);
+            //canvas.drawBitmap(icon, bitmapx-2*DRAW_OFFSET, bitmapy-2*DRAW_OFFSET, paint);
+            canvas.drawBitmap(icon, bitmapx, bitmapy, paint);
         }
     }
 
