@@ -341,6 +341,7 @@ public class PlayerService extends Service implements
         if (offset == 0 && prefs.getBoolean("pref_stream_proxy", false))
             dataSource = HTTPDService.proxyURL(mItem.getUrl().toString());
 
+        mPlaylist.setAsFrist(mItem);
 		mPlayer.setDataSourceAsync(dataSource, offset);
 
         IEpisode item = getCurrentItem();
@@ -349,14 +350,17 @@ public class PlayerService extends Service implements
         }
 
         if (isFeedItem) {
+            if (feedItem.priority != 1)
+                feedItem.setPriority(null, getApplication());
+            feedItem.update(getContentResolver());
+        }
+        /*
             new Thread(new Runnable() {
                 public void run() {
-                    if (feedItem.priority != 1)
-                        feedItem.setPriority(null, getApplication());
-                    feedItem.update(getContentResolver());
+
                 }
             }).start();
-        }
+        }*/
 	    
 	}
 
@@ -387,6 +391,7 @@ public class PlayerService extends Service implements
 	public void start() {
 		if (!mPlayer.isPlaying()) {
             takeWakelock(mPlayer.isSteaming());
+			mPlaylist.setAsFrist(mItem);
 			mPlayer.start();
 			mMetaDataControllerWrapper.updateState(mItem, true, false);
 		}

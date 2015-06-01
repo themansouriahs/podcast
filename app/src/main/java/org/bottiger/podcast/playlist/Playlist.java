@@ -136,6 +136,12 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
 		return mInternalPlaylist.indexOf(episode);
 	}
 
+    public void setAsFrist(@NonNull IEpisode item) {
+        mInternalPlaylist.remove(item);
+        mInternalPlaylist.add(0, item);
+        notifyPlaylistChanged();
+    }
+
 	/**
 	 * 
 	 * @param position
@@ -538,6 +544,12 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
 
         if (argPlaylistData.sortOrder != null) {
             setSortOrder(argPlaylistData.sortOrder);
+        }
+
+        if (argPlaylistData.reset) {
+            resetPlaylist(null);
+            mInternalPlaylist.clear();
+            populatePlaylist();
         }
     }
 

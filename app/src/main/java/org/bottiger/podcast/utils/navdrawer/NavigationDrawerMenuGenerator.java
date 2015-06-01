@@ -38,7 +38,10 @@ public class NavigationDrawerMenuGenerator {
             @Override
             public void onClick() {
 
-                SoundWaves.getBus().post(new PlaylistData().reset = true);
+                PlaylistData pld = new PlaylistData();
+                pld.reset = true;
+                SoundWaves.getBus().post(pld);
+
             }
         }));
 
