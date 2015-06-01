@@ -26,6 +26,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabaseLockedException;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.CursorAdapter;
@@ -564,6 +565,11 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
             populatePlaylist();
         }
 
+        if (argPlaylistData.playlistChanged != null) {
+            mInternalPlaylist.clear();
+            populatePlaylist(MAX_SIZE, true);
+        }
+
         if (argPlaylistData.onlyDownloaded != null) {
             showOnlyDownloaded(argPlaylistData.onlyDownloaded);
         }
@@ -616,5 +622,20 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 
+    }
+
+    public static void refresh(@NonNull Context argContext) {
+        // Notify the playlist about the change
+        Handler mainHandler = new Handler(argContext.getMainLooper());
+
+        Runnable myRunnable = new Runnable() {
+            @Override
+            public void run() {
+                PlaylistData pd = new PlaylistData();
+                pd.playlistChanged = true;
+                SoundWaves.getBus().post(pd);
+            }
+        };
+        mainHandler.post(myRunnable);
     }
 }

@@ -12,6 +12,7 @@ import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.playlist.Playlist;
+import org.bottiger.podcast.playlist.PlaylistData;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ItemColumns;
@@ -34,6 +35,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -73,6 +75,8 @@ public class EpisodeDownloadManager extends Observable {
             Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
             intent.setData(Uri.fromFile(new File(item.getAbsolutePath())));
             mContext.sendBroadcast(intent);
+
+            Playlist.refresh(mContext);
 
             removeDownloadingEpisode(argEpisode);
             removeExpiredDownloadedPodcasts(mContext);
@@ -239,13 +243,13 @@ public class EpisodeDownloadManager extends Observable {
 	 * 
 	 * @param context
 	 */
-	private static void deleteExpireFile(Context context, FeedItem item) {
+	private static void deleteExpireFile(@NonNull Context context, FeedItem item) {
 
 		if (item == null)
 			return;
 
 		ContentResolver contentResolver = context.getContentResolver();
-		item.delFile(contentResolver);
+		item.delFile(context);
 	}
 
 	/**

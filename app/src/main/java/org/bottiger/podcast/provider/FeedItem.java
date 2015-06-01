@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Locale;
 
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
+import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.service.DownloadStatus;
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
 import org.bottiger.podcast.utils.PodcastLog;
@@ -857,19 +858,20 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	/**
 	 * Deletes the downloaded file and updates the data in the database
 	 * 
-	 * @param contentResolver
+	 * @param argContext
 	 * @return True of the file was deleted succesfully
 	 */
-	public boolean delFile(ContentResolver contentResolver) {
+	public boolean delFile(@NonNull Context argContext) {
 
 		if (SDCardManager.getSDCardStatus()) {
 			try {
 				downloadReferenceID = -1;
 				setDownloaded(false);
-				update(contentResolver);
+				update(argContext.getContentResolver());
 				File file = new File(getAbsolutePath());
 				if (file.exists() && file.delete()) {
                     DownloadProgressObservable.deleteEpisode(this);
+					Playlist.refresh(argContext);
 					return true;
 				}
 			} catch (Exception e) {

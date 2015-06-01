@@ -167,7 +167,7 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
             Log.v(TAG, "Delete file");
             IEpisode episode = getEpisode();
             if (episode instanceof FeedItem) {
-                ((FeedItem)episode).delFile(mContext.getContentResolver());
+                ((FeedItem)episode).delFile(mContext);
                 setState(PlayerButtonView.STATE_DEFAULT);
             }
         }

@@ -264,7 +264,7 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
                     boolean doDelete = mSharedpreferences.getBoolean(resources.getString(R.string.pref_delete_when_finished_key), DELETE_WHEN_FINISHED_DEFAULT);
 
                     if (doDelete) {
-                        feedItem.delFile(resolver);
+                        feedItem.delFile(mPlayerService);
 
                     }
 
