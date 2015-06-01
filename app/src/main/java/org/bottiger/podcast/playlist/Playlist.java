@@ -5,6 +5,7 @@ import java.util.HashSet;
 
 import org.bottiger.podcast.ApplicationConfiguration;
 import org.bottiger.podcast.MainActivity;
+import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.adapters.PlaylistAdapter;
 import org.bottiger.podcast.adapters.decoration.OnDragStateChangedListener;
@@ -36,6 +37,7 @@ import com.squareup.otto.Subscribe;
 public class Playlist implements OnDragStateChangedListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
     public static final boolean SHOW_LISTENED_DEFAULT = true;
+    public static final boolean SHOW_ONLY_DOWNLOADED  = false;
     public static final boolean PLAY_NEXT_DEFAULT     = false;
 
 	public static int MAX_SIZE = 20;
@@ -56,6 +58,7 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
 	// Shared setting key/values
 	private final String showListenedKey = ApplicationConfiguration.showListenedKey;
 	private boolean showListenedVal = SHOW_LISTENED_DEFAULT;
+    private boolean showOnlyDownloadedVal = SHOW_ONLY_DOWNLOADED;
 	private String inputOrderKey = "inputOrder";
 	private String defaultOrder = mSortNew;
 	private String amountKey = "amountOfEpisodes";
@@ -86,6 +89,10 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
             sharedPreferences = PreferenceManager
                     .getDefaultSharedPreferences(argContext);
             showListenedVal = sharedPreferences.getBoolean(showListenedKey, showListenedVal);
+
+            String downloadKey = SoundWaves.getAppContext().getString(R.string.pref_only_downloaded_key);
+            showOnlyDownloadedVal = sharedPreferences.getBoolean(downloadKey, SHOW_ONLY_DOWNLOADED);
+
             mSubscriptionFilter = new SubscriptionFilter(argContext);
         }
         this.mContext = argContext;
@@ -343,6 +350,11 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
 
         where += " AND " + mSubscriptionFilter.toSQL();
 
+        // show only downloaded
+        if (showOnlyDownloadedVal) {
+            where += " AND (" + ItemColumns.IS_DOWNLOADED + "==1)";
+        }
+
         // skip 'removed' episodes
         where += " AND (" + ItemColumns.TABLE_NAME + "." + ItemColumns.PRIORITY + " >= 0)";
 
@@ -546,10 +558,25 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
             setSortOrder(argPlaylistData.sortOrder);
         }
 
-        if (argPlaylistData.reset) {
+        if (argPlaylistData.reset != null) {
             resetPlaylist(null);
             mInternalPlaylist.clear();
             populatePlaylist();
+        }
+
+        if (argPlaylistData.onlyDownloaded != null) {
+            showOnlyDownloaded(argPlaylistData.onlyDownloaded);
+        }
+    }
+
+    public void showOnlyDownloaded(boolean argOnlyDownloaded) {
+        boolean isChanged = showOnlyDownloadedVal != argOnlyDownloaded;
+        showOnlyDownloadedVal = argOnlyDownloaded;
+
+        if (isChanged) {
+            String key = SoundWaves.getAppContext().getString(R.string.pref_only_downloaded_key);
+            sharedPreferences.edit().putBoolean(key, argOnlyDownloaded).commit();
+            notifyDatabaseChanged();
         }
     }
 

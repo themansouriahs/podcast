@@ -179,6 +179,45 @@
 
     </TableRow>
 
+    <TableRow
+        android:id="@+id/drawer_playlist_subscription_show_downloaded"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="10dp"
+        android:paddingRight="5dp"
+        android:paddingTop="5dip"
+        android:paddingBottom="5dip">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_span="2"
+            android:paddingLeft="10dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="left|center_vertical"
+                android:text="@string/filter_show_only_downloaded"
+                android:textSize="14sp"
+                android:textColor="@color/drawer_text"
+                style="@style/SoundWavesTextViewStyle"
+                />
+
+            <com.rey.material.widget.Switch
+                android:id="@+id/slidebar_show_downloaded"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                style="@style/DrawerSwitchTextAppearance"
+                android:textSize="14sp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"/>
+
+        </FrameLayout>
+
+    </TableRow>
+
     <!-- Playlist Header -->
     <TableRow
         android:id="@+id/drawer_playback_header"

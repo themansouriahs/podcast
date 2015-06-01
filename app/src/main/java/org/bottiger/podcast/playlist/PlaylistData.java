@@ -6,6 +6,7 @@ package org.bottiger.podcast.playlist;
 public class PlaylistData {
     public Playlist.SORT sortOrder;
     public Boolean showListened;
+    public Boolean onlyDownloaded;
     public Boolean reset;
     public Boolean playlistChanged;
 }

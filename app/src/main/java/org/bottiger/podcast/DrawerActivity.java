@@ -92,6 +92,7 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity {
 
     protected Switch mPlaylistShowListened;
     protected Switch mAutoPlayNext;
+    protected Switch mOnlyDownloaded;
     protected Spinner mPlaylistOrderSpinner;
     protected LinearLayout mPlaylistContentLayout;
     protected PlaylistContentSpinnerAdapter mPlaylistContentSpinnerAdapter;
@@ -164,6 +165,7 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity {
         mPlaylistContentLayout = (LinearLayout) findViewById(R.id.playlist_content);
         mPlaylistOrderSpinner = (Spinner) findViewById(R.id.drawer_playlist_sort_order);
         mPlaylistShowListened = (Switch) findViewById(R.id.slidebar_show_listened);
+        mOnlyDownloaded = (Switch) findViewById(R.id.slidebar_show_downloaded);
         mAutoPlayNext = (Switch) findViewById(R.id.slidebar_show_continues);
 
         bindPlaylistFilter(mPlaylistContentLayout);
@@ -182,13 +184,15 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity {
         mPlaylistOrderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                PlaylistData pd = new PlaylistData();
                 if (position == 0) {
                     //playlist.setSortOrder(Playlist.SORT.DATE_NEW); // new first
-                    SoundWaves.getBus().post(new PlaylistData().sortOrder = Playlist.SORT.DATE_NEW); // new first
+                    pd.sortOrder = Playlist.SORT.DATE_NEW; // new first
                 } else {
                     //playlist.setSortOrder(Playlist.SORT.DATE_OLD); // old first
-                    SoundWaves.getBus().post(new PlaylistData().sortOrder = Playlist.SORT.DATE_OLD); // old first
+                    pd.sortOrder = Playlist.SORT.DATE_OLD;  // old first
                 }
+                SoundWaves.getBus().post(pd);
             }
 
             @Override
@@ -201,14 +205,31 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity {
         mPlaylistShowListened.setOnCheckedChangeListener(new Switch.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(Switch aSwitch, boolean isChecked) {
-                //playlist.setShowListened(isChecked);
-                SoundWaves.getBus().post(new PlaylistData().showListened = isChecked);
+                PlaylistData pd = new PlaylistData();
+                pd.showListened = isChecked;
+                SoundWaves.getBus().post(pd);
             }
         });
 
         boolean doShowListened = mSharedPreferences.getBoolean(ApplicationConfiguration.showListenedKey, Playlist.SHOW_LISTENED_DEFAULT);
         if (doShowListened != mPlaylistShowListened.isChecked()) {
             mPlaylistShowListened.setChecked(doShowListened);
+        }
+
+        // Show only downloaded
+        mOnlyDownloaded.setOnCheckedChangeListener(new Switch.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(Switch aSwitch, boolean isChecked) {
+                PlaylistData pd = new PlaylistData();
+                pd.onlyDownloaded = isChecked;
+                SoundWaves.getBus().post(pd);
+            }
+        });
+
+        String showOnlyDownloaded = getResources().getString(R.string.pref_only_downloaded_key);
+        boolean onlyDownloaded = mSharedPreferences.getBoolean(showOnlyDownloaded, Playlist.SHOW_ONLY_DOWNLOADED);
+        if (onlyDownloaded != mOnlyDownloaded.isChecked()) {
+            mOnlyDownloaded.setChecked(onlyDownloaded);
         }
 
         initAutoPlayNextSwitch();

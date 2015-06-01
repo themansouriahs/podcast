@@ -5,6 +5,7 @@
     <string name="pref_download_only_wifi_key" translatable="false">pref_download_only_wifi</string>
     <string name="pref_download_on_update_key" translatable="false">pref_download_on_update</string>
     <string name="pref_continuously_playing_key" translatable="false">pref_continuously_playing</string>
+    <string name="pref_only_downloaded_key" translatable="false">pref_only_downloaded</string>
     <string name="pref_advanced_category_experimental_key" translatable="false">pref_advanced_category_experimental</string>
     <string name="pref_screen_rotation_key" translatable="false">pref_screen_rotation</string>
     <string name="pref_subscriptions_columns_key" translatable="false">pref_subscriptions_columns</string>
