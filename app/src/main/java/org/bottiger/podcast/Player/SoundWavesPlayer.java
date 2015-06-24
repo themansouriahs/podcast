@@ -134,9 +134,11 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
 
     public void start() {
 
+        PlayerStatusData psd = new PlayerStatusData(mPlayerService.getCurrentItem(), PlayerStatusObservable.STATUS.PLAYING);
+
         if (isCasting()) {
             mMediaCast.play(0);
-            SoundWaves.getBus().post(new PlayerStatusData(PlayerStatusObservable.STATUS.PLAYING));
+            SoundWaves.getBus().post(psd);
             return;
         }
 
@@ -152,7 +154,7 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
                     .registerMediaButtonEventReceiver(mControllerComponentName);
             super.start();
 
-            SoundWaves.getBus().post(new PlayerStatusData(PlayerStatusObservable.STATUS.PLAYING));
+            SoundWaves.getBus().post(psd);
             SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.PLAY);
         }
     }
@@ -170,7 +172,8 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
 
         mIsInitialized = false;
         mPlayerService.stopForeground(true);
-        SoundWaves.getBus().post(new PlayerStatusData(PlayerStatusObservable.STATUS.STOPPED));
+        PlayerStatusData psd = new PlayerStatusData(mPlayerService.getCurrentItem(), PlayerStatusObservable.STATUS.STOPPED);
+        SoundWaves.getBus().post(psd);
     }
 
     public void release() {
@@ -233,7 +236,8 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
         }
 
         MarkAsListenedIfNeeded();
-        SoundWaves.getBus().post(new PlayerStatusData(PlayerStatusObservable.STATUS.PAUSED));
+        PlayerStatusData psd = new PlayerStatusData(mPlayerService.getCurrentItem(), PlayerStatusObservable.STATUS.PAUSED);
+        SoundWaves.getBus().post(psd);
         SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.PAUSE);
     }
 
@@ -400,7 +404,8 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
                 mMediaCast.play(offst);
             }
 
-            SoundWaves.getBus().post(new PlayerStatusData(PlayerStatusObservable.STATUS.PLAYING));
+            PlayerStatusData psd = new PlayerStatusData(mPlayerService.getCurrentItem(), PlayerStatusObservable.STATUS.PLAYING);
+            SoundWaves.getBus().post(psd);
         }
     }
 

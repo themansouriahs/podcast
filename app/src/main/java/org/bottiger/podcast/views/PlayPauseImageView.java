@@ -11,6 +11,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Build;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.graphics.Palette;
@@ -18,6 +19,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewOutlineProvider;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import com.squareup.otto.Subscribe;
@@ -29,6 +31,7 @@ import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.listeners.DownloadObserver;
 import org.bottiger.podcast.listeners.EpisodeStatus;
 import org.bottiger.podcast.listeners.PaletteListener;
+import org.bottiger.podcast.listeners.PlayerStatusData;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.listeners.PlayerStatusProgressData;
 import org.bottiger.podcast.provider.FeedItem;
@@ -38,7 +41,7 @@ import org.bottiger.podcast.utils.ColorExtractor;
 /**
  * TODO: document your custom view class.
  */
-public class PlayPauseImageView extends ImageView implements PaletteListener,
+public class PlayPauseImageView extends ImageButton implements PaletteListener,
                                                              DownloadObserver,
                                                              View.OnClickListener {
 
@@ -62,9 +65,6 @@ public class PlayPauseImageView extends ImageView implements PaletteListener,
     private Rect boundsRound = new Rect();
 
     private int mProgressPercent = 0;
-
-    private Bitmap mPlayIcon;
-    private Bitmap mPauseIcon;
 
     protected Paint paint;
     private Paint paintBorder;
@@ -102,16 +102,17 @@ public class PlayPauseImageView extends ImageView implements PaletteListener,
         paintBorder.setStyle(Paint.Style.STROKE);
         paintBorder.setStrokeWidth(DRAW_WIDTH);
 
+        setScaleType(ScaleType.CENTER);
+
+        if (Build.VERSION.SDK_INT >= 16) {
+            setBackground(null);
+        }
+
         if (isInEditMode()) {
             return;
         }
 
         setOnClickListener(this);
-
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inScaled = false;
-        mPlayIcon = BitmapFactory.decodeResource(getResources(), R.drawable.av_play, options);
-        mPauseIcon = BitmapFactory.decodeResource(getResources(), R.drawable.av_pause, options);
     }
 
     @NonNull
@@ -136,6 +137,15 @@ public class PlayPauseImageView extends ImageView implements PaletteListener,
 
     public void setStatus(PlayerStatusObservable.STATUS argStatus) {
         mStatus = argStatus;
+
+        int resid;
+        if (mStatus == PlayerStatusObservable.STATUS.PLAYING) {
+            resid = R.drawable.av_pause;
+        } else {
+            resid = R.drawable.av_play;
+        }
+        setImageResource(resid);
+
         this.invalidate();
     }
 
@@ -171,16 +181,7 @@ public class PlayPauseImageView extends ImageView implements PaletteListener,
             canvas.drawArc(bounds, START_ANGLE, getProgressAngle(mProgressPercent), false, paintBorder);
         }
 
-        // Draw the play/pause icon
-        Bitmap icon = mStatus == PlayerStatusObservable.STATUS.PLAYING ? mPauseIcon : mPlayIcon;
-
-        int bitmapx = (contentWidth/2) - icon.getWidth()/2;
-        int bitmapy = (contentHeight/2) - icon.getHeight()/2;
-
-        if (drawIcon()) {
-            //canvas.drawBitmap(icon, bitmapx-2*DRAW_OFFSET, bitmapy-2*DRAW_OFFSET, paint);
-            canvas.drawBitmap(icon, bitmapx, bitmapy, paint);
-        }
+        super.onDraw(canvas);
     }
 
     @Subscribe
@@ -192,7 +193,13 @@ public class PlayPauseImageView extends ImageView implements PaletteListener,
             throw new IllegalStateException("Progress must be positive");
         }
         float progress = 0;
-        float duration = getEpisode().getDuration();
+
+        IEpisode episode = getEpisode();
+
+        if (episode == null)
+            return;
+
+        float duration = episode.getDuration();
 
         if (duration <= 0) {
             Log.d("Warning", "Seekbar state may be invalid");
@@ -205,6 +212,20 @@ public class PlayPauseImageView extends ImageView implements PaletteListener,
             e.printStackTrace();
         }
         setProgressPercent((int) progress);
+    }
+
+    @Subscribe
+    public void onPlayerStateChange(PlayerStatusData argPlayerStatus) {
+        if (argPlayerStatus == null)
+            return;
+
+        if (!getEpisode().equals(argPlayerStatus.episode)) {
+
+            setStatus(PlayerStatusObservable.STATUS.PAUSED);
+            return;
+        }
+
+        setStatus(argPlayerStatus.status);
     }
 
     public void onStateChange(EpisodeStatus argStatus) {

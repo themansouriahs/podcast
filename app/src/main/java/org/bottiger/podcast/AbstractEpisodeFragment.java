@@ -16,9 +16,12 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.content.CursorLoader;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.squareup.otto.Subscribe;
 
@@ -56,15 +59,8 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		SoundWaves.getBus().register(this);
 		setHasOptionsMenu(true);
 		prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-	}
-
-	@Override
-	public void onDestroy() {
-		SoundWaves.getBus().unregister(this);
-		super.onDestroy();
 	}
 
 	@Subscribe

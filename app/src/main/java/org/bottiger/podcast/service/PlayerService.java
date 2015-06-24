@@ -8,6 +8,7 @@ import org.bottiger.podcast.Player.PlayerStateManager;
 import org.bottiger.podcast.Player.SoundWavesPlayer;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.MediaCast.IMediaCast;
+import org.bottiger.podcast.listeners.PlayerStatusData;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.playlist.Playlist;
@@ -37,6 +38,8 @@ import android.support.annotation.NonNull;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+
+import com.squareup.otto.Subscribe;
 
 import javax.annotation.Nullable;
 
@@ -120,6 +123,7 @@ public class PlayerService extends Service implements
         mPlaylist = new Playlist(this);
 		mPlaylist.populatePlaylistIfEmpty();
 		SoundWaves.getBus().register(mPlaylist);
+		SoundWaves.getBus().register(this);
 
         mPlayerHandler = new PlayerHandler(this);
 		
@@ -224,6 +228,7 @@ public class PlayerService extends Service implements
 	@Override
 	public void onDestroy() {
 		SoundWaves.getBus().unregister(mPlaylist);
+		SoundWaves.getBus().unregister(this);
         super.onDestroy();
 		if (mPlayer != null) {
 			mPlayer.release();
@@ -258,7 +263,7 @@ public class PlayerService extends Service implements
 		if (mNotificationPlayer == null)
 			mNotificationPlayer = new NotificationPlayer(this, mItem);
 
-        mNotificationPlayer.setmPlayerService(this);
+        mNotificationPlayer.setPlayerService(this);
 		return mNotificationPlayer.show();
     }
 
@@ -279,6 +284,16 @@ public class PlayerService extends Service implements
         mMetaDataControllerWrapper.updateState(nextItem, true, true);
         mPlaylist.removeItem(0);
         mPlaylist.notifyPlaylistChanged();
+	}
+
+	public void play() {
+		if (mPlayer == null)
+			return;
+
+		if (mPlayer.isPlaying())
+			return;
+
+		mPlayer.start();
 	}
 
 	public void play(String argEpisodeURL) {
@@ -341,6 +356,9 @@ public class PlayerService extends Service implements
         if (offset == 0 && prefs.getBoolean("pref_stream_proxy", false))
             dataSource = HTTPDService.proxyURL(mItem.getUrl().toString());
 
+
+		notifyStatus();
+
         mPlaylist.setAsFrist(mItem);
 		mPlayer.setDataSourceAsync(dataSource, offset);
 
@@ -354,13 +372,6 @@ public class PlayerService extends Service implements
                 feedItem.setPriority(null, getApplication());
             feedItem.update(getContentResolver());
         }
-        /*
-            new Thread(new Runnable() {
-                public void run() {
-
-                }
-            }).start();
-        }*/
 	    
 	}
 
@@ -442,6 +453,14 @@ public class PlayerService extends Service implements
 
 		return mPlayer.seek(offset);
 
+	}
+
+	@Subscribe
+	public void onPlayerStateChange(PlayerStatusData argPlayerStatus) {
+		if (argPlayerStatus == null)
+			return;
+
+		notifyStatus();
 	}
 
 	public long position() {

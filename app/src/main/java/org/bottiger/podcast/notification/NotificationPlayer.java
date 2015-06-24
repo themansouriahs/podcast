@@ -34,7 +34,9 @@ import com.facebook.imagepipeline.image.CloseableImage;
 import com.facebook.imagepipeline.request.ImageRequest;
 
 public class NotificationPlayer {
-	
+
+    private static final String TAG = "NotificationPlayer";
+
 	private PlayerService mPlayerService;
 	private IEpisode item;
 
@@ -80,7 +82,7 @@ public class NotificationPlayer {
 		return mNotification;
 	}
 
-    public void setmPlayerService(@NonNull PlayerService argPlayerService) {
+    public void setPlayerService(@NonNull PlayerService argPlayerService) {
         mPlayerService = argPlayerService;
     }
 
@@ -161,9 +163,12 @@ public class NotificationPlayer {
         //layout.setTextViewText(R.id.notification_content, item.sub_title);
 
         if (argBitmap != null && !argBitmap.isRecycled()) {
+            Log.d(TAG, "Creating notification with bitmap");
+
             mBuilder.setLargeIcon(argBitmap);
             layout.setImageViewBitmap(R.id.icon, argBitmap);
         } else {
+            Log.d(TAG, "Creating notification with no bitmap - fetching one");
 
             final String imageUrl = item.getArtwork(mPlayerService);
 
@@ -182,6 +187,7 @@ public class NotificationPlayer {
 
                 @Override
                 public void onSucces(@Nullable Bitmap argBitmap) {
+                    Log.d(TAG, "Bitmap fetched");
                     if (argBitmap != null && !argBitmap.isRecycled())
                         refresh(argBitmap);
                 }

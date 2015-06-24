@@ -1,20 +1,16 @@
 package org.bottiger.podcast.receiver;
 
 import org.bottiger.podcast.ApplicationConfiguration;
-import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.Player.SoundWavesPlayer;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.notification.NotificationPlayer;
-import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
-import org.bottiger.podcast.service.PlayerServiceCommands;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
-import android.support.annotation.NonNull;
 import android.widget.RemoteViews;
 
 public class NotificationReceiver extends BroadcastReceiver {
@@ -60,14 +56,14 @@ public class NotificationReceiver extends BroadcastReceiver {
                     if (playerService.isPlaying()) {
                         playerService.pause();
                     } else {
-                        playerService.start();
+                        playerService.play();
                         isPlaying = true;
                     }
 
                     IEpisode currentItem = playerService.getCurrentItem();
                     if (currentItem != null) {
                         np = new NotificationPlayer(playerService, playerService.getCurrentItem());
-                        np.setmPlayerService(playerService);
+                        np.setPlayerService(playerService);
                         np.show(isPlaying);
                     }
 

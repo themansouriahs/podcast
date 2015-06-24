@@ -49,8 +49,11 @@
             android:src="?attr/ic_forward"
             android:layout_alignParentRight="true"/>
 
+        <!-- style="@style/PodcastImage"
+
+            android:scaleType="center"
+            android:background="@null"-->
         <org.bottiger.podcast.views.PlayPauseImageView
-            style="@style/PodcastImage"
             android:id="@+id/play_pause_button"
             android:layout_width="70dp"
             android:layout_height="70dp"

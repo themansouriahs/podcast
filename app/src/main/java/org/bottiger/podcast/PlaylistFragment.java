@@ -44,6 +44,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -121,6 +122,7 @@ public class PlaylistFragment extends GeastureFragment implements
         SoundWaves.getBus().unregister(mPlayPauseButton);
         SoundWaves.getBus().unregister(mPlayerSeekbar);
         SoundWaves.getBus().unregister(mCurrentTime);
+        SoundWaves.getBus().unregister(this);
         super.onDestroyView();
     }
 
@@ -359,10 +361,17 @@ public class PlaylistFragment extends GeastureFragment implements
         //mRecyclerView.setItemAnimator(new SlideInLeftAnimator());
     }
 
+             @Override
+             public void onAttach(Activity activity) {
+                 mActivity = activity;
+                 super.onAttach(activity);
+             }
+
     @Override
-    public void onAttach(Activity activity) {
-        mActivity = activity;
-        super.onAttach(activity);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = super.onCreateView(inflater, container, savedInstanceState);
+        SoundWaves.getBus().register(this);
+        return view;
     }
 
     @Override
