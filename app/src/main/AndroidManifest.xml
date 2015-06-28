@@ -178,7 +178,7 @@
             </intent-filter>
         </receiver>
         <receiver android:name="org.bottiger.podcast.receiver.HeadsetReceiver" >
-            <intent-filter android:priority="1000000000000000" >
+            <intent-filter android:priority="999" >
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </receiver>
