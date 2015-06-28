@@ -95,6 +95,11 @@ public class RecyclerItemTouchListener implements RecyclerView.OnItemTouchListen
         childView.callOnClick();
     }
 
+    @Override
+    public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+        
+    }
+
     /**
      * @return true of view was hit
      */
