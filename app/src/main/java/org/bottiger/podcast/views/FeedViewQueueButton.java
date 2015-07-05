@@ -50,7 +50,7 @@ public class FeedViewQueueButton extends PlayPauseImageView {
 
     private static final long ANIMATION_DURATION_MS = 300l;
 
-    private static final int DEFAULT_COLOR = Color.WHITE;
+    private static final int DEFAULT_COLOR = Color.GRAY;
     private static final float DEFAULT_STROKE_WIDTH = 8f;
 
     // Arcs that define the set of all points between which the two lines are drawn
@@ -66,7 +66,7 @@ public class FeedViewQueueButton extends PlayPauseImageView {
     private float mArcLengthLeft;
     private float mArcLengthRight;
 
-    private static final Paint sPaint = new Paint();
+    private final Paint sPaint = new Paint();
     private int mColor = DEFAULT_COLOR;
     private RectF mRect;
     private PathMeasure mPathMeasure;
@@ -144,7 +144,8 @@ public class FeedViewQueueButton extends PlayPauseImageView {
         // Size will be used for width and height of the icon, plus the space in between
         TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.FeedViewQueueButton, 0, 0);
         try {
-            mColor = a.getColor(R.styleable.FeedViewQueueButton_lineColor, DEFAULT_COLOR);
+            //mColor = a.getColor(R.styleable.FeedViewQueueButton_lineColor, DEFAULT_COLOR);
+            mColor = DEFAULT_COLOR;
         } finally {
             a.recycle();
         }
@@ -152,7 +153,7 @@ public class FeedViewQueueButton extends PlayPauseImageView {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
+        //super.onDraw(canvas);
 
         setPointFromPercent(mArcTop, mArcLengthTop, mPercent, mFromXY);
         setPointFromPercent(mArcBottom, mArcLengthBottom, mPercent, mToXY);
@@ -292,6 +293,11 @@ public class FeedViewQueueButton extends PlayPauseImageView {
     private void setPercent(float percent) {
         mPercent = percent;
         invalidate();
+    }
+
+    @Override
+    protected boolean drawBackground() {
+        return false;
     }
 
     /**

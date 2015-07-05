@@ -166,7 +166,10 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
 
         // Draw the background circle
         float radius = centerX-DRAW_WIDTH;
-        canvas.drawCircle(centerX,centerY,radius,paint);
+
+        if (drawBackground()) {
+            canvas.drawCircle(centerX, centerY, radius, paint);
+        }
 
         int diff2 =  DRAW_WIDTH;//(int) (centerY-radius);
         boolean updateOutline = bounds == null;
@@ -348,6 +351,10 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
     }
 
     protected boolean drawIcon() {
+        return true;
+    }
+
+    protected boolean drawBackground() {
         return true;
     }
 }

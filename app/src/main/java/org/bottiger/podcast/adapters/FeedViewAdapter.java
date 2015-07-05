@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
+import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -218,6 +219,10 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
         }
 
         public void modifyLayout(@NonNull ViewGroup argParent) {
+
+            if (Build.VERSION.SDK_INT >= 19) {
+                TransitionManager.beginDelayedTransition(argParent);
+            }
 
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mText.getLayoutParams();
 
