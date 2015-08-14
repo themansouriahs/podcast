@@ -16,6 +16,8 @@
         <item name="previous_icon">@drawable/ic_action_previous</item>
         <item name="ic_rewind">@drawable/ic_fast_rewind_white</item>
         <item name="ic_forward">@drawable/ic_fast_forward_white</item>
+        <item name="ic_expand">@drawable/ic_expand_more_white</item>
+        <item name="ic_expand_less">@drawable/ic_expand_less_white</item>
         <item name="stop_icon">@drawable/av_stop</item>
         <item name="download_icon">@drawable/ic_get_app_white</item>
         <item name="delete_icon">@drawable/ic_action_delete</item>
@@ -52,6 +54,8 @@
         <item name="previous_icon">@drawable/ic_action_previous</item>
         <item name="ic_rewind">@drawable/ic_fast_rewind_white</item>
         <item name="ic_forward">@drawable/ic_fast_forward_white</item>
+        <item name="ic_expand">@drawable/ic_expand_more_white</item>
+        <item name="ic_expand_less">@drawable/ic_expand_less_white</item>
         <item name="stop_icon">@drawable/av_stop_dark</item>
         <item name="download_icon">@drawable/ic_get_app_white</item>
         <item name="delete_icon">@drawable/content_discard_dark</item>

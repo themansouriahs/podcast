@@ -120,10 +120,21 @@
             android:layout_height="match_parent"
             android:padding="15dp">
 
+            <ImageButton
+                android:id="@+id/episode_expand"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="?attr/ic_expand_less"
+                android:background="@null"
+                android:padding="0dp"
+                android:layout_alignParentRight="true"
+                />
+
     <TextView
         android:id="@+id/episode_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/episode_expand"
         android:text="@string/episode_title"
         android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
         android:paddingBottom="5dp"

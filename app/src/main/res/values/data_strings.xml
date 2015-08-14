@@ -16,5 +16,6 @@
     <string name="pref_playlist_subscriptions_key" translatable="false" >pref_playlist_subscriptions</string>
     <string name="pref_player_forward_amount_key" translatable="false" >pref_player_forward_amount</string>
     <string name="pref_player_backward_amount_key" translatable="false" >pref_player_backward_amount</string>
+    <string name="pref_top_player_text_expanded_key" translatable="false" >pref_top_player_text_expanded</string>
 </resources>
 

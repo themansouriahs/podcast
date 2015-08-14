@@ -3,22 +3,23 @@ package org.bottiger.podcast.views;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Point;
+import android.content.SharedPreferences;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.graphics.Palette;
+import android.transition.TransitionManager;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.Display;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.PaletteListener;
-import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.utils.UIUtils;
 
@@ -62,11 +63,16 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
 
     private boolean mCanScrollUp = true;
 
+    private String mDoDisplayTextKey;
+    private boolean mDoDisplayText = false;
+
     private PlayerRelativeLayout mPlayerControlsLinearLayout;
 
     private RelativeLayout mPlayerButtons;
     private int mPlayerButtonsHeight = -1;
 
+    private ImageButton mExpandEpisode;
+    private View mGradient;
     private View mEpisodeText;
     private View mEpisodeInfo;
     private View mPhoto;
@@ -83,6 +89,8 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
 
     private PlayerLayoutParameter mSmallLayout = new PlayerLayoutParameter();
     private PlayerLayoutParameter mLargeLayout = new PlayerLayoutParameter();
+
+    private SharedPreferences prefs;
 
     private class PlayerLayoutParameter {
         public int SeekBarLeftMargin;
@@ -120,6 +128,11 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
         }
 
         mActivity = (Activity) argContext;
+
+        prefs = PreferenceManager.getDefaultSharedPreferences(argContext);
+        mDoDisplayTextKey = mActivity.getResources().getString(R.string.pref_top_player_text_expanded_key);
+        mDoDisplayText = prefs.getBoolean(mDoDisplayTextKey, mDoDisplayText);
+
         sizeShrinkBuffer = (int) UIUtils.convertDpToPixel(100, mActivity);
         screenHeight = UIUtils.getScreenHeight(mActivity);
 
@@ -164,6 +177,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
         mPhoto = findViewById(R.id.session_photo);
 
         mPlayPauseButton = (PlayPauseImageView) findViewById(R.id.play_pause_button);
+        mExpandEpisode = (ImageButton)findViewById(R.id.episode_expand);
         mEpisodeText = findViewById(R.id.episode_title);
         mEpisodeInfo = findViewById(R.id.episode_info);
         mSeekbarContainer = findViewById(R.id.player_progress);
@@ -172,6 +186,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
         mDownloadButton = findViewById(R.id.download);
         mQueueButton = findViewById(R.id.queue);
         mFavoriteButton = findViewById(R.id.bookmark);
+        mGradient = findViewById(R.id.top_gradient_inner);
 
         mSeekbar = (PlayerSeekbar) findViewById(R.id.player_progress);
         mPlayerButtons = (RelativeLayout) findViewById(R.id.player_buttons);
@@ -183,6 +198,29 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
         mLargeLayout.SeekBarLeftMargin = 0;
         mLargeLayout.PlayPauseSize = mPlayPauseLargeSize;
         mLargeLayout.PlayPauseBottomMargin = ((RelativeLayout.LayoutParams)mPlayPauseButton.getLayoutParams()).bottomMargin;
+
+
+
+        mExpandEpisode.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    mDoDisplayText = !mDoDisplayText;
+                    if (Build.VERSION.SDK_INT >= 19)
+                        TransitionManager.beginDelayedTransition(mPlayerControlsLinearLayout);
+
+                    if (mDoDisplayText) {
+                        Log.d("TopPlayer", "ShowText");
+                        showText();
+                    } else {
+                        Log.d("TopPlayer", "HideText");
+                        hideText();
+                    }
+                } finally {
+                    prefs.edit().putBoolean(mDoDisplayTextKey, mDoDisplayText).commit();
+                }
+            }
+        });
     }
 
     @Override
@@ -462,6 +500,33 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
             return true;
         }
     }
+
+    private void hideText() {
+        mExpandEpisode.setImageResource(R.drawable.ic_expand_more_white);
+
+        fadeText(1.0f, 0.0f);
+    }
+
+    private void showText() {
+        mExpandEpisode.setImageResource(R.drawable.ic_expand_less_white);
+        mEpisodeText.setVisibility(VISIBLE);
+        mGradient.setVisibility(VISIBLE);
+        mEpisodeInfo.setVisibility(VISIBLE);
+
+        fadeText(0.0f, 1.0f);
+    }
+
+    private void fadeText(float argAlphaStart, float argAlphaEnd) {
+        mEpisodeText.setAlpha(argAlphaStart);
+        mEpisodeInfo.setAlpha(argAlphaStart);
+        mGradient.setAlpha(argAlphaStart);
+
+        mEpisodeText.animate().alpha(argAlphaEnd);
+        mEpisodeInfo.animate().alpha(argAlphaEnd);
+        mGradient.animate().alpha(argAlphaEnd);
+    }
+
+
 
 
 }
