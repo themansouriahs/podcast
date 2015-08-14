@@ -54,7 +54,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
 
     private static final int HANDLER_WHAT_SEARCH = 27407; // whatever
     private static final int HANDLER_WHAT_CANCEL = 27408; // whatever
-    private static final int HANDLER_DELAY = 300; // ms
+    private static final int HANDLER_DELAY = 1000; // ms
     private static final String HANDLER_QUERY = "query";
     private SearchHandler mSearchHandler = new SearchHandler(this);
 
@@ -73,6 +73,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
     private IDirectoryProvider.Callback mSearchResultCallback = new IDirectoryProvider.Callback() {
         @Override
         public void result(ISearchResult argResult) {
+            Log.d(TAG, "Search results for: " + argResult.getSearchQuery());
             ArrayList<ISubscription> subscriptions = new ArrayList<>();
             for (ISubscription subscription : argResult.getResults()) {
                 subscriptions.add(subscription);
@@ -187,6 +188,8 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
     }
 
     private void searchviewQueryChanged(@NonNull String argQuery, boolean argDelaySearch) {
+
+        Log.d(TAG, "searchviewQueryChanged: " + argQuery + " delay: " + argDelaySearch);
 
         mSearchHandler.removeMessages(HANDLER_WHAT_SEARCH);
 
@@ -305,10 +308,12 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
                 switch (msg.what) {
                     case HANDLER_WHAT_SEARCH: {
                         String query = msg.getData().getString(HANDLER_QUERY);
+                        Log.d(TAG, "Perform query: " + query);
                         fragment.performSearch(query);
                         return;
                     }
                     case HANDLER_WHAT_CANCEL: {
+                        Log.d(TAG, "abort query:");
                         fragment.abortSearch();
                         return;
                     }
