@@ -106,7 +106,7 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
 
         final URL url = subscription.getURL();
 
-        holder.image.setOnClickListener(new View.OnClickListener() {
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //mProgress.setTitle("Loading");
