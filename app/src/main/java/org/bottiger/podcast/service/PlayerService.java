@@ -132,8 +132,8 @@ public class PlayerService extends Service implements
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             mMediaSessionManager = (MediaSessionManager) getSystemService(MEDIA_SESSION_SERVICE);
-            mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         }
+		mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
 		TelephonyManager tmgr = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
 		tmgr.listen(mPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
@@ -249,6 +249,12 @@ public class PlayerService extends Service implements
 	 * Hide the notification
 	 */
     public void dis_notifyStatus() {
+
+        if (mNotificationManager == null)
+            mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        mNotificationManager.cancel(NotificationPlayer.NOTIFICATION_PLAYER_ID);
+
 		// //mNotificationManager.cancel(R.layout.playing_episode);
 		// setForeground(false);
 		if (mNotificationPlayer != null)
@@ -433,9 +439,9 @@ public class PlayerService extends Service implements
 	}
 
 	public void halt() {
+        stopForeground(true);
+        dis_notifyStatus();
 		mPlayer.stop();
-		stopForeground(true);
-		dis_notifyStatus();
 	}
 
 	public boolean isInitialized() {
@@ -460,8 +466,11 @@ public class PlayerService extends Service implements
 	public void onPlayerStateChange(PlayerStatusData argPlayerStatus) {
 		if (argPlayerStatus == null)
 			return;
-
-		notifyStatus();
+        if (argPlayerStatus.status == PlayerStatusObservable.STATUS.STOPPED) {
+            dis_notifyStatus();
+        } else {
+            notifyStatus();
+        }
 	}
 
 	public long position() {

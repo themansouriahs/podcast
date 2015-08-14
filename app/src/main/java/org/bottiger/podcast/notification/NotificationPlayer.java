@@ -3,20 +3,16 @@ package org.bottiger.podcast.notification;
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.images.FrescoHelper;
-import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.receiver.NotificationReceiver;
 import org.bottiger.podcast.service.PlayerService;
-import org.bottiger.podcast.utils.DirectExecutor;
 
-import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -25,13 +21,7 @@ import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.widget.RemoteViews;
 
-import com.facebook.common.references.CloseableReference;
 import com.facebook.datasource.DataSource;
-import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.imagepipeline.core.ImagePipeline;
-import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
-import com.facebook.imagepipeline.image.CloseableImage;
-import com.facebook.imagepipeline.request.ImageRequest;
 
 public class NotificationPlayer {
 
@@ -43,7 +33,7 @@ public class NotificationPlayer {
     private Notification mNotification;
 	private NotificationManager mNotificationManager = null;
 
-	private static final int mId = 4260;
+	public static final int NOTIFICATION_PLAYER_ID = 4260;
 	
 	public NotificationPlayer(@NonNull PlayerService argPlayerService, @NonNull IEpisode item) {
 		super();
@@ -64,7 +54,7 @@ public class NotificationPlayer {
     @Nullable
 	public Notification show(Boolean isPlaying) {
 
-		// mId allows you to update the notification later on.
+		// NOTIFICATION_PLAYER_ID allows you to update the notification later on.
         NotificationCompat.Builder builder = buildNotification(isPlaying, mPlayerService, null);
 
         if (builder == null)
@@ -77,7 +67,7 @@ public class NotificationPlayer {
 
 		mPlayerService.startForeground(getNotificationId(), mNotification);
 
-        mNotificationManager.notify(mId, mNotification);
+        mNotificationManager.notify(NOTIFICATION_PLAYER_ID, mNotification);
 
 		return mNotification;
 	}
@@ -95,13 +85,13 @@ public class NotificationPlayer {
                 return;
 
             mNotification = notificationBuilder.build();
-            mNotificationManager.notify(mId, mNotification);
+            mNotificationManager.notify(NOTIFICATION_PLAYER_ID, mNotification);
         }
     }
 	
 	public void hide() {
         if (mNotificationManager != null)
-		    mNotificationManager.cancel(mId);
+		    mNotificationManager.cancel(NOTIFICATION_PLAYER_ID);
 	}
 
 	public IEpisode getItem() {
@@ -114,7 +104,7 @@ public class NotificationPlayer {
 	}
 	
 	public static int getNotificationId() {
-		return mId;
+		return NOTIFICATION_PLAYER_ID;
 	}
 
     @Nullable
