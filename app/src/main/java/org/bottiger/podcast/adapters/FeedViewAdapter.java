@@ -1,6 +1,5 @@
 package org.bottiger.podcast.adapters;
 
-import android.animation.LayoutTransition;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -17,11 +16,9 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
-import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
@@ -117,10 +114,10 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
         }
 
         boolean isPlaying = false;
-        if (MainActivity.sBoundPlayerService != null && MainActivity.sBoundPlayerService.isInitialized()) {
-            if (item.getURL().equals(MainActivity.sBoundPlayerService
+        if (SoundWaves.sBoundPlayerService != null && SoundWaves.sBoundPlayerService.isInitialized()) {
+            if (item.getURL().equals(SoundWaves.sBoundPlayerService
                     .getCurrentItem().getUrl().toString())) {
-                if (MainActivity.sBoundPlayerService.isPlaying()) {
+                if (SoundWaves.sBoundPlayerService.isPlaying()) {
                     isPlaying = true;
                 }
             }

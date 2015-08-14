@@ -2,8 +2,6 @@ package org.bottiger.podcast.views;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Outline;
@@ -11,7 +9,6 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Build;
-import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.graphics.Palette;
@@ -20,11 +17,9 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewOutlineProvider;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 
 import com.squareup.otto.Subscribe;
 
-import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
@@ -256,7 +251,7 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
         if (type != null) {
             SoundWaves.sAnalytics.trackEvent(type);
         }
-        boolean isPlaying = MainActivity.sBoundPlayerService.toggle(mEpisode);
+        boolean isPlaying = SoundWaves.sBoundPlayerService.toggle(mEpisode);
 
         setStatus(isPlaying ? PlayerStatusObservable.STATUS.PLAYING : PlayerStatusObservable.STATUS.STOPPED);
 

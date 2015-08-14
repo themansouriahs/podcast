@@ -1,19 +1,13 @@
 package org.bottiger.podcast.listeners;
 
 
-import java.util.WeakHashMap;
-
-import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
 
-import android.app.Activity;
 import android.content.ContentResolver;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 
@@ -89,7 +83,7 @@ public class PlayerStatusObservable {
             switch (status) {
                 // The decoding is done
                 case PLAYING:
-                    PlayerService ps = MainActivity.sBoundPlayerService;
+                    PlayerService ps = SoundWaves.sBoundPlayerService;
 
                     if (ps != null) {
                         updateProgress(ps);

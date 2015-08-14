@@ -80,7 +80,7 @@ public class TopActivity extends ActionBarActivity {
 
     @Nullable
     protected Playlist getPlaylist() {
-        PlayerService ps = MainActivity.sBoundPlayerService;
+        PlayerService ps = SoundWaves.sBoundPlayerService;
 
         if (ps != null)
             return ps.getPlaylist();

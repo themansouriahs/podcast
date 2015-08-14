@@ -11,10 +11,8 @@ import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
-import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.StrUtils;
-import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.views.DownloadButtonView;
 import org.bottiger.podcast.views.PlayPauseImageView;
 import org.bottiger.podcast.views.PlayerButtonView;
@@ -50,7 +48,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.TextView;
 
 import com.cocosw.undobar.UndoBarController;
@@ -122,7 +119,6 @@ public class PlaylistFragment extends GeastureFragment implements
         SoundWaves.getBus().unregister(mPlayPauseButton);
         SoundWaves.getBus().unregister(mPlayerSeekbar);
         SoundWaves.getBus().unregister(mCurrentTime);
-        SoundWaves.getBus().unregister(this);
         super.onDestroyView();
     }
 
@@ -370,13 +366,13 @@ public class PlaylistFragment extends GeastureFragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
-        SoundWaves.getBus().register(this);
         return view;
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        SoundWaves.getBus().unregister(this);
     }
 
     @Override
@@ -394,6 +390,7 @@ public class PlaylistFragment extends GeastureFragment implements
             playlistChanged(mPlaylist);
         }
         super.onResume();
+        SoundWaves.getBus().register(this);
     }
 
 
@@ -431,10 +428,10 @@ public class PlaylistFragment extends GeastureFragment implements
         mDownloadButton.setEpisode(item);
         mFavoriteButton.setEpisode(item);
 
-        if (MainActivity.sBoundPlayerService != null &&
-                MainActivity.sBoundPlayerService.getCurrentItem() != null &&
-                MainActivity.sBoundPlayerService.getCurrentItem().equals(item) &&
-                MainActivity.sBoundPlayerService.isPlaying()) {
+        if (SoundWaves.sBoundPlayerService != null &&
+                SoundWaves.sBoundPlayerService.getCurrentItem() != null &&
+                SoundWaves.sBoundPlayerService.getCurrentItem().equals(item) &&
+                SoundWaves.sBoundPlayerService.isPlaying()) {
             mPlayPauseButton.setStatus(PlayerStatusObservable.STATUS.PLAYING);
         } else {
             mPlayPauseButton.setStatus(PlayerStatusObservable.STATUS.PAUSED);
@@ -444,8 +441,8 @@ public class PlaylistFragment extends GeastureFragment implements
         mBackButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (MainActivity.sBoundPlayerService != null) {
-                    MainActivity.sBoundPlayerService.getPlayer().rewind(item);
+                if (SoundWaves.sBoundPlayerService != null) {
+                    SoundWaves.sBoundPlayerService.getPlayer().rewind(item);
                 }
             }
         });
@@ -453,8 +450,8 @@ public class PlaylistFragment extends GeastureFragment implements
         mForwardButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (MainActivity.sBoundPlayerService != null) {
-                    MainActivity.sBoundPlayerService.getPlayer().fastForward(item);
+                if (SoundWaves.sBoundPlayerService != null) {
+                    SoundWaves.sBoundPlayerService.getPlayer().fastForward(item);
                 }
             }
         });

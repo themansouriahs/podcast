@@ -435,6 +435,7 @@ public class PlayerService extends Service implements
 	public void halt() {
 		mPlayer.stop();
 		stopForeground(true);
+		dis_notifyStatus();
 	}
 
 	public boolean isInitialized() {

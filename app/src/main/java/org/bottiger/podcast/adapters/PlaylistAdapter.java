@@ -1,12 +1,8 @@
 package org.bottiger.podcast.adapters;
 
 import java.util.TreeSet;
-import java.util.UUID;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.validator.routines.UrlValidator;
-import org.bottiger.podcast.MainActivity;
-import org.bottiger.podcast.PodcastBaseFragment;
 import org.bottiger.podcast.R;
 
 import org.bottiger.podcast.SoundWaves;
@@ -20,25 +16,21 @@ import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorExtractor;
-import org.bottiger.podcast.utils.Crypto;
 import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.ThemeHelper;
 import org.bottiger.podcast.views.PlayPauseImageView;
 import org.bottiger.podcast.views.PlaylistViewHolder;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -192,12 +184,12 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         long playerPosition = 0;
         long playerDuration = 0;
 
-        if (MainActivity.sBoundPlayerService != null) {
+        if (SoundWaves.sBoundPlayerService != null) {
             if (position == 0
-                    && MainActivity.sBoundPlayerService.isPlaying()) {
-                playerPosition = MainActivity.sBoundPlayerService
+                    && SoundWaves.sBoundPlayerService.isPlaying()) {
+                playerPosition = SoundWaves.sBoundPlayerService
                         .position();
-                playerDuration = MainActivity.sBoundPlayerService
+                playerDuration = SoundWaves.sBoundPlayerService
                         .duration();
             } else {
                 if (feedItem instanceof FeedItem) {
@@ -346,7 +338,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 	private static Long itemID(int position) {
         Log.v("PlaylistAdapter", "itemID");
 
-        PlayerService ps = MainActivity.sBoundPlayerService;
+        PlayerService ps = SoundWaves.sBoundPlayerService;
         if (ps == null)
             return -1L;
 

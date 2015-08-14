@@ -3,7 +3,6 @@ package org.bottiger.podcast;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.DatabaseHelper;
 import org.bottiger.podcast.provider.FeedItem;
-import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
 import org.bottiger.podcast.service.PlayerService;
@@ -16,12 +15,9 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.content.CursorLoader;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.squareup.otto.Subscribe;
 
@@ -140,7 +136,7 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 	public static String getOrder(String inputOrder, Integer amount) {
 		assert inputOrder != null;
 
-		PlayerService playerService = MainActivity.sBoundPlayerService;
+		PlayerService playerService = SoundWaves.sBoundPlayerService;
 
 		String playingFirst = "";
 		if (playerService != null && playerService.getCurrentItem() != null && playerService.getCurrentItem() instanceof FeedItem) {

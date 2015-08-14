@@ -4,12 +4,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import org.bottiger.podcast.ApplicationConfiguration;
-import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.adapters.PlaylistAdapter;
 import org.bottiger.podcast.adapters.decoration.OnDragStateChangedListener;
-import org.bottiger.podcast.flavors.Analytics.VendorAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.playlist.filters.SubscriptionFilter;
 import org.bottiger.podcast.provider.DatabaseHelper;
@@ -25,14 +23,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteDatabaseLockedException;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.CursorAdapter;
 import android.util.Log;
 
-import com.dragontek.mygpoclient.feeds.Feed;
 import com.squareup.otto.Subscribe;
 
 public class Playlist implements OnDragStateChangedListener, SharedPreferences.OnSharedPreferenceChangeListener {
@@ -320,7 +316,7 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
 				defaultOrder);
 		int amount = sharedPreferences.getInt(amountKey, amountValue);
 
-		PlayerService playerService = MainActivity.sBoundPlayerService;
+		PlayerService playerService = SoundWaves.sBoundPlayerService;
 
 		String playingFirst = "";
 		if (playerService != null && playerService.getCurrentItem() != null && playerService.getCurrentItem() instanceof FeedItem) {

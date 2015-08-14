@@ -18,12 +18,13 @@ import android.widget.FrameLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.listeners.EpisodeStatus;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.UIUtils;
 
 import java.util.HashSet;
@@ -76,10 +77,15 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
             long timeMs = mEpisode.getDuration() * seekBar.getProgress()
                     / RANGE_MAX;
 
-            if (mEpisode.equals(MainActivity.sBoundPlayerService.getCurrentItem())) {
-                MainActivity.sBoundPlayerService.seek(timeMs);
+            PlayerService ps = SoundWaves.sBoundPlayerService;
+
+            if (ps == null)
+                return;
+
+            if (mEpisode.equals(ps.getCurrentItem())) {
+                ps.seek(timeMs);
             } else {
-                mEpisode.setOffset(MainActivity.sBoundPlayerService.getContentResolver(), timeMs);
+                mEpisode.setOffset(ps.getContentResolver(), timeMs);
                 // FIXME
                 //PlayerStatusObservable.updateProgress(MainActivity.sBoundPlayerService, mEpisode);
                 setProgressMs(timeMs);
@@ -183,7 +189,7 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
 
         setMax(RANGE_MAX);
         setOnSeekBarChangeListener(onSeekBarChangeListener);
-        mIsPlaying = MainActivity.sBoundPlayerService != null && MainActivity.sBoundPlayerService.isPlaying();
+        mIsPlaying = SoundWaves.sBoundPlayerService != null && SoundWaves.sBoundPlayerService.isPlaying();
 
         // FIXME
         mSideMargin = (int)UIUtils.convertDpToPixel(40, getContext());
