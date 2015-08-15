@@ -181,6 +181,15 @@
         <item name="android:scaleType">fitStart</item>
     </style>
 
+    <style name="FeedViewRecyclerView">
+        <item name="android:scrollbarAlwaysDrawVerticalTrack">true</item>
+        <item name="android:scrollbarStyle">outsideOverlay</item>
+        <item name="android:scrollbars">vertical</item>
+        <item name="android:fadeScrollbars">false</item>
+        <item name="android:fastScrollEnabled">true</item>
+        <item name="android:scrollbarThumbVertical">@drawable/feed_view_scrollbar_thumb</item>
+    </style>
+
     <!-- <style name="PlayerButton" parent="@style/PodcastImageSIze">-->
     <!-- <item name="android:scaleType">fitStart</item> -->
     <style name="PlayerButton" parent="@style/PodcastImageSIze">
