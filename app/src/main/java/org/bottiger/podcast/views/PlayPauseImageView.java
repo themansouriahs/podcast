@@ -2,6 +2,7 @@ package org.bottiger.podcast.views;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Outline;
@@ -59,6 +60,7 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
     private RectF bounds;
     private Rect boundsRound = new Rect();
 
+    private boolean mDrawBackground;
     private int mProgressPercent = 0;
 
     protected Paint paint;
@@ -75,11 +77,13 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
     public PlayPauseImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
+        initAttr(attrs);
     }
 
     public PlayPauseImageView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init(context);
+        initAttr(attrs);
     }
 
     private void init(Context argContext) {
@@ -110,6 +114,20 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
         setOnClickListener(this);
     }
 
+    private void initAttr(AttributeSet attrs) {
+        TypedArray a = mContext.getTheme().obtainStyledAttributes(
+                attrs,
+                R.styleable.PlayPauseImageView,
+                0, 0);
+
+        try {
+            mDrawBackground = a.getBoolean(R.styleable.PlayPauseImageView_drawBackground, true);
+        } finally {
+            a.recycle();
+        }
+
+    }
+
     @NonNull
     @Override
     public IEpisode getEpisode() {
@@ -135,9 +153,9 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
 
         int resid;
         if (mStatus == PlayerStatusObservable.STATUS.PLAYING) {
-            resid = R.drawable.av_pause;
+            resid = drawBackground() ? R.drawable.ic_pause_white : R.drawable.ic_pause_black;
         } else {
-            resid = R.drawable.av_play;
+            resid = drawBackground() ? R.drawable.ic_play_arrow_white : R.drawable.ic_play_arrow_black;
         }
         setImageResource(resid);
 
@@ -350,6 +368,6 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
     }
 
     protected boolean drawBackground() {
-        return true;
+        return mDrawBackground;
     }
 }
