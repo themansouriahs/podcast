@@ -190,10 +190,12 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
         bounds = new RectF(DRAW_OFFSET, diff2, contentWidth - DRAW_OFFSET, contentWidth - diff2); // DRAW_OFFSET-diff
 
         if (updateOutline) {
-            onSizeChanged(0,0,0,0);
+            onSizeChanged(0, 0, 0, 0);
         }
 
-        if (DRAW_PROGRESS && mProgressPercent > 0) {
+        if (DRAW_PROGRESS && getEpisode().isMarkedAsListened()) {
+            canvas.drawCircle(centerX, centerY, radius, paintBorder);
+        } else if (DRAW_PROGRESS && mProgressPercent > 0) {
             canvas.drawArc(bounds, START_ANGLE, getProgressAngle(mProgressPercent), false, paintBorder);
         }
 

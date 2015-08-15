@@ -44,6 +44,7 @@ public interface IEpisode {
     void setPriority(IEpisode argPrecedingItem, @NonNull Context argContext);
 
     boolean isDownloaded();
+    boolean isMarkedAsListened();
 
     void update(ContentResolver contentResolver);
 
