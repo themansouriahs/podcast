@@ -1,12 +1,17 @@
 package org.bottiger.podcast.utils;
 
 
+import android.text.TextUtils;
+import android.text.format.DateFormat;
+import android.text.format.DateUtils;
+
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 
 public class StrUtils {
 
@@ -16,12 +21,11 @@ public class StrUtils {
      * Calculates the current position by parsing the Duration String
      * Kind of a hack
      */
-    public static String formatTime(FeedItem item) {
+    public static String formatDuration(IEpisode item) {
     	if (item.getDuration() == 0) 
     		return "00:00";
-    	long duration = item.getDuration();
-    	float progress = (float)item.offset / ((float)duration);
-    	return formatTime(progress, item.duration_string);
+
+		return DateUtils.formatElapsedTime(item.getDuration());
     }
     
     

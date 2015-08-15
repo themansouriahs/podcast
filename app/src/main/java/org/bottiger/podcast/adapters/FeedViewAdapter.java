@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.DateUtils;
 import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,9 +26,13 @@ import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.utils.PaletteHelper;
+import org.bottiger.podcast.utils.StrUtils;
+import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.views.DownloadButtonView;
 import org.bottiger.podcast.views.FeedViewQueueButton;
 import org.bottiger.podcast.views.PlayPauseImageView;
+
+import java.util.Formatter;
 
 /**
  * Created by apl on 02-09-2014.
@@ -47,6 +52,8 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
     private DownloadProgressObservable mDownloadProgressObservable;
     public static boolean mIsExpanded = false;
     protected ORDER mSortOrder = ORDER.RECENT_FIRST;
+
+    private StringBuilder mStringBuilder = new StringBuilder(100);
 
     public FeedViewAdapter(@NonNull Activity activity, @NonNull ISubscription argSubscription, @Nullable Cursor dataset) {
         mActivity = activity;
@@ -87,6 +94,18 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
 
         episodeViewHolder.mText.setText(item.getTitle());
         episodeViewHolder.mDescription.setText(item.getDescription());
+
+        android.text.format.Formatter formatter = new android.text.format.Formatter();
+        mStringBuilder.setLength(0);
+        if (item.getDuration() > 0)
+            mStringBuilder.append(DateUtils.formatElapsedTime(item.getDuration()/1000));
+        else
+            mStringBuilder.append("--:--");
+        mStringBuilder.append(", ");
+        mStringBuilder.append(formatter.formatShortFileSize(mActivity, item.getFilesize()));
+        mStringBuilder.append(", ");
+        mStringBuilder.append(DateUtils.formatDateTime(mActivity, item.getDateTime().getTime(), 0));
+        episodeViewHolder.mTextSecondary.setText(mStringBuilder.toString());
 
         if (mIsExpanded != episodeViewHolder.IsExpanded) {
             episodeViewHolder.IsExpanded = mIsExpanded;
@@ -189,6 +208,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
 
         public ViewGroup mContainer;
         public TextView mText;
+        public TextView mTextSecondary;
         public TextView mDescription;
         public PlayPauseImageView mPlayPauseButton;
         public FeedViewQueueButton mQueueButton;
@@ -204,6 +224,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
 
             mContainer = (ViewGroup) view.findViewById(R.id.group);
             mText = (TextView) view.findViewById(R.id.title);
+            mTextSecondary = (TextView) view.findViewById(R.id.subtitle);
             mDescription = (TextView) view.findViewById(R.id.episode_description);
             mPlayPauseButton = (PlayPauseImageView) view.findViewById(R.id.play_pause_button);
             mQueueButton = (FeedViewQueueButton) view.findViewById(R.id.queue_button);

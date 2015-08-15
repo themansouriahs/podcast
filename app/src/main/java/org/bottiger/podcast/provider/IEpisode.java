@@ -23,6 +23,7 @@ public interface IEpisode {
     ISubscription getSubscription(@NonNull Context argContext);
     long getOffset();
     Date getDateTime();
+    long getFilesize();
 
     void setTitle(@NonNull String argTitle);
     void setUrl(@NonNull URL argUrl);
