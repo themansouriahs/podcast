@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.transition.TransitionManager;
@@ -44,7 +45,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
     protected Palette mPalette;
 
     private DownloadProgressObservable mDownloadProgressObservable;
-    private boolean mIsExpanded = false;
+    public static boolean mIsExpanded = false;
     protected ORDER mSortOrder = ORDER.RECENT_FIRST;
 
     public FeedViewAdapter(@NonNull Activity activity, @NonNull ISubscription argSubscription, @Nullable Cursor dataset) {
@@ -217,9 +218,10 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
 
         public void modifyLayout(@NonNull ViewGroup argParent) {
 
-            if (Build.VERSION.SDK_INT >= 19) {
-                TransitionManager.beginDelayedTransition(argParent);
-            }
+
+            //if (Build.VERSION.SDK_INT >= 19) {
+            //    TransitionManager.beginDelayedTransition(argParent);
+            //}
 
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mText.getLayoutParams();
 
@@ -236,9 +238,17 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
             //mText.setLayoutParams(params);
 
             int visibility = IsExpanded ? View.VISIBLE : View.GONE;
+            float alphaStart = IsExpanded ? 0.0f : 1.0f;
+            float alphaEnd = IsExpanded ? 1.0f : 0.0f;
+
             mDescription.setVisibility(visibility);
             mQueueButton.setVisibility(visibility);
             mQueueRipple.setVisibility(visibility);
+
+            mDescription.setAlpha(alphaStart);
+            //mDescription.animate().alpha(alphaEnd).start();
+
+            ViewCompat.animate(mDescription).alpha(alphaEnd).start();
 
             argParent.updateViewLayout(mText, params);
 

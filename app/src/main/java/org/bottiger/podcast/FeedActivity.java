@@ -14,7 +14,9 @@ import android.os.Trace;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -28,6 +30,7 @@ import com.facebook.imagepipeline.request.BasePostprocessor;
 
 import org.bottiger.podcast.adapters.FeedViewAdapter;
 import org.bottiger.podcast.adapters.FeedViewDiscoveryAdapter;
+import org.bottiger.podcast.adapters.decoration.FeedViewItemAnimator;
 import org.bottiger.podcast.images.FrescoHelper;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.playlist.FeedCursorLoader;
@@ -50,7 +53,7 @@ import org.bottiger.podcast.views.MultiShrink.feed.SchedulingUtils;
 /**
  * Created by apl on 14-02-2015.
  */
-public class FeedActivity extends ActionBarActivity implements PaletteListener {
+public class FeedActivity extends AppCompatActivity implements PaletteListener {
 
     public static final int MODE_FULLY_EXPANDED = 4;
 
@@ -172,9 +175,7 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if (Build.VERSION.SDK_INT >= 18) {
-            Trace.beginSection("onCreate()");
-        }
+
         mSubscription = null;
 
         super.onCreate(savedInstanceState);
@@ -257,6 +258,7 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
 
+
         if (mIsSlimSubscription) {
             FeedViewDiscoveryAdapter adapter = new FeedViewDiscoveryAdapter(this, mSubscription, mCursor);
             SlimSubscription slimSubscription = (SlimSubscription)mSubscription;
@@ -323,10 +325,6 @@ public class FeedActivity extends ActionBarActivity implements PaletteListener {
                             }
                         }
                     });
-        }
-
-        if (Build.VERSION.SDK_INT >= 18) {
-            Trace.endSection();
         }
     }
 
