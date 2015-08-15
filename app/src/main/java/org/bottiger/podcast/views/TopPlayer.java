@@ -171,7 +171,9 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
     }
 
     @Override
-    protected void onFinishInflate () {
+    protected void onFinishInflate() {
+        super.onFinishInflate();
+
         mPlayerControlsLinearLayout = (PlayerRelativeLayout)findViewById(R.id.expanded_controls);
 
         mPhoto = findViewById(R.id.session_photo);
@@ -199,7 +201,12 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
         mLargeLayout.PlayPauseSize = mPlayPauseLargeSize;
         mLargeLayout.PlayPauseBottomMargin = ((RelativeLayout.LayoutParams)mPlayPauseButton.getLayoutParams()).bottomMargin;
 
-
+        if (!mDoDisplayText) {
+            mExpandEpisode.setImageResource(R.drawable.ic_expand_more_white);
+            mEpisodeText.setVisibility(GONE);
+            mGradient.setVisibility(GONE);
+            mEpisodeInfo.setVisibility(GONE);
+        }
 
         mExpandEpisode.setOnClickListener(new OnClickListener() {
             @Override
