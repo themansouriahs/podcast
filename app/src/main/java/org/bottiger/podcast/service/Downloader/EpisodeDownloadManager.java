@@ -1,18 +1,18 @@
 package org.bottiger.podcast.service.Downloader;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Observable;
-import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.io.FileUtils;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.playlist.Playlist;
-import org.bottiger.podcast.playlist.PlaylistData;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ItemColumns;
@@ -20,11 +20,9 @@ import org.bottiger.podcast.provider.QueueEpisode;
 import org.bottiger.podcast.service.DownloadStatus;
 import org.bottiger.podcast.service.Downloader.engines.IDownloadEngine;
 import org.bottiger.podcast.service.Downloader.engines.OkHttpDownloader;
-import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.SDCardManager;
 
 import android.app.DownloadManager;
-import android.app.DownloadManager.Query;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -35,7 +33,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -65,7 +62,7 @@ public class EpisodeDownloadManager extends Observable {
 
 	private static DownloadManager downloadManager;
 
-    private static IDownloadEngine.Callback mDownloadCompleteCallback = new IDownloadEngine.Callback() {
+    private static IDownloadEngine.Callback sDownloadCompleteCallback = new IDownloadEngine.Callback() {
         @Override
         public void downloadCompleted(IEpisode argEpisode) {
             FeedItem item = (FeedItem) argEpisode;
@@ -80,6 +77,7 @@ public class EpisodeDownloadManager extends Observable {
 
             removeDownloadingEpisode(argEpisode);
             removeExpiredDownloadedPodcasts(mContext);
+            removeTmpFolderCruft();
 
             startDownload(mContext);
         }
@@ -87,6 +85,7 @@ public class EpisodeDownloadManager extends Observable {
         @Override
         public void downloadInterrupted(IEpisode argEpisode) {
             removeDownloadingEpisode(argEpisode);
+            removeTmpFolderCruft();
             startDownload(mContext);
         }
     };
@@ -214,7 +213,7 @@ public class EpisodeDownloadManager extends Observable {
 			mDownloadingItem = downloadingItem;
 			*/
             IDownloadEngine downloadEngine = newEngine(downloadingItem);
-            downloadEngine.addCallback(mDownloadCompleteCallback);
+            downloadEngine.addCallback(sDownloadCompleteCallback);
 
             downloadEngine.startDownload();
             mDownloadingEpisodes.put(downloadingItem, downloadEngine);
@@ -258,6 +257,19 @@ public class EpisodeDownloadManager extends Observable {
 	public static void removeExpiredDownloadedPodcasts(Context context) {
 		new removeExpiredDownloadedPodcastsTask(context).execute();
 	}
+
+    public static void removeTmpFolderCruft() {
+        String tmpFolder = SDCardManager.getTmpDir();
+        Log.d(DEBUG_KEY, "Cleaning tmp folder: " + tmpFolder);
+        File dir = new File(tmpFolder);
+        if(dir.exists() && dir.isDirectory()) {
+            try {
+                FileUtils.cleanDirectory(dir);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
 	/**
 	 * Iterates through all the downloaded episodes and deletes the ones who
