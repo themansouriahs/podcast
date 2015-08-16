@@ -185,7 +185,7 @@ public class PlaylistFragment extends GeastureFragment implements
         mPlayPauseButton         =    (PlayPauseImageView) mSwipeRefreshView.findViewById(R.id.play_pause_button);
         mPlayerSeekbar          =    (PlayerSeekbar) mSwipeRefreshView.findViewById(R.id.player_progress);
         mPlayerDownloadButton   =    (DownloadButtonView) mSwipeRefreshView.findViewById(R.id.download);
-        mBackButton = (PlayerButtonView)mSwipeRefreshView.findViewById(R.id.previous);
+        mBackButton = (PlayerButtonView)mSwipeRefreshView.findViewById(R.id.rewind_button);
         mForwardButton = (PlayerButtonView)mSwipeRefreshView.findViewById(R.id.fast_forward_button);
         mDownloadButton = (PlayerButtonView)mSwipeRefreshView.findViewById(R.id.download);
         mFavoriteButton = (PlayerButtonView)mSwipeRefreshView.findViewById(R.id.favorite);
@@ -370,6 +370,18 @@ public class PlaylistFragment extends GeastureFragment implements
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        //SoundWaves.getBus().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        //SoundWaves.getBus().unregister(this);
+        super.onStop();
+    }
+
+    @Override
     public void onPause() {
         super.onPause();
         SoundWaves.getBus().unregister(this);
@@ -377,6 +389,7 @@ public class PlaylistFragment extends GeastureFragment implements
 
     @Override
     public void onResume() {
+        SoundWaves.getBus().register(this);
         if (mPlaylist != null) {
             IEpisode item = mPlaylist.getItem(0);
 
@@ -390,7 +403,6 @@ public class PlaylistFragment extends GeastureFragment implements
             playlistChanged(mPlaylist);
         }
         super.onResume();
-        SoundWaves.getBus().register(this);
     }
 
 

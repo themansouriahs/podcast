@@ -35,13 +35,45 @@
         android:paddingLeft="@dimen/padding_medium"
         android:orientation="vertical">
 
+        <!--
         <include layout="@layout/top_player_buttons" />
+        -->
+        <org.bottiger.podcast.views.DownloadButtonView
+            android:id="@+id/download"
+            android:padding="0dip"
+            android:src="@drawable/ic_fast_forward_white"
+            android:elevation="@dimen/player_elevation"
+            style="@style/RightTopPlayerButton"/>
+
+        <org.bottiger.podcast.views.PlayerButtonView
+            android:id="@+id/fullscreen_button"
+            android:padding="0dip"
+            android:src="?attr/fullscreen"
+            android:layout_toLeftOf="@id/download"
+            android:elevation="@dimen/player_elevation"
+            style="@style/TopPlayerButton" />
+
+        <org.bottiger.podcast.views.PlayerButtonView
+            android:id="@+id/favorite"
+            android:padding="0dip"
+            android:src="?attr/favorite_outline"
+            android:layout_toLeftOf="@id/fullscreen_button"
+            android:elevation="@dimen/player_elevation"
+            style="@style/TopPlayerButton" />
+
+        <org.bottiger.podcast.views.PlayerButtonView
+            android:id="@+id/sleep_button"
+            android:padding="0dip"
+            android:src="?attr/sleep"
+            android:layout_toLeftOf="@id/favorite"
+            android:elevation="@dimen/player_elevation"
+            style="@style/TopPlayerButton" />
 
         <org.bottiger.podcast.views.PlayerButtonView
             android:id="@+id/skip_to_next_button"
             style="@style/TopPlayerButton"
             android:layout_marginRight="10dp"
-            android:layout_marginLeft="-10dp"
+            android:layout_marginLeft="0dp"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="0dp"
             android:padding="0dip"
@@ -68,7 +100,7 @@
             android:id="@+id/current_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/previous"
+            android:layout_below="@id/sleep_button"
             android:paddingTop="5dp"
             android:textColor="@color/white_opaque"
             />
@@ -77,6 +109,7 @@
             android:id="@+id/total_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingRight="5dp"
             android:layout_alignParentRight="true"
             android:layout_below="@id/skip_to_next_button"
             android:paddingTop="5dp"

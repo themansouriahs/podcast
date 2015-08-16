@@ -33,6 +33,9 @@
         <item name="customBackground">@color/pitch_black</item>
         <item name="favorite_outline">@drawable/ic_favorite_outline_white</item>
         <item name="time_icon">@drawable/ic_access_time_white</item>
+        <item name="sleep">@drawable/ic_snooze_white</item>
+        <item name="fullscreen">@drawable/ic_fullscreen_white</item>
+        <item name="fullscreen_exit">@drawable/ic_fullscreen_exit_white</item>
         <!--<item name="seekbar_handle">@drawable/seekbar_handle2.9</item>-->
         <item name="android:actionBarStyle">@style/TranslucentActionBar</item>
 
@@ -72,6 +75,9 @@
         <item name="customBackground">@color/white_opaque</item>
         <item name="favorite_outline">@drawable/ic_favorite_outline_white</item>
         <item name="time_icon">@drawable/ic_access_time_white</item>
+        <item name="sleep">@drawable/ic_snooze_white</item>
+        <item name="fullscreen">@drawable/ic_fullscreen_white</item>
+        <item name="fullscreen_exit">@drawable/ic_fullscreen_exit_white</item>
         <!--<item name="seekbar_handle">@drawable/seekbar_handle</item>-->
 
         <item name="android:actionBarStyle">@style/TransparentActionBar</item>
@@ -195,7 +201,7 @@
     <!-- <style name="PlayerButton" parent="@style/PodcastImageSIze">-->
     <!-- <item name="android:scaleType">fitStart</item> -->
     <style name="PlayerButton" parent="@style/PodcastImageSIze">
-        <item name="android:layout_width">50dip</item>
+        <item name="android:layout_width">40dip</item>
         <item name="android:layout_height">50dip</item>
         <item name="android:layout_weight">1</item>
         <item tools:targetApi="21" name="android:elevation">@dimen/player_elevation</item>
@@ -210,13 +216,14 @@
     </style>
 
     <style name="RightPlaylistButton" parent="@style/PlaylistButton">
+        <item name="android:layout_width">40dip</item>
         <item name="android:layout_alignParentRight">true</item>
-        <item name="android:layout_marginRight">90dp</item>
+        <item name="android:layout_marginRight">40dp</item>
     </style>
 
     <style name="TopPlayerButton" parent="@style/PlaylistButton">
         <item name="android:layout_above">@id/player_progress</item>
-        <item name="android:layout_width">70dip</item>
+        <item name="android:layout_width">55dip</item>
         <item name="android:layout_marginBottom">0dp</item>
         <item name="android:layout_marginTop">10dp</item>
         <item name="android:padding">5dp</item>

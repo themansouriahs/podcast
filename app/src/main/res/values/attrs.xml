@@ -47,6 +47,9 @@
     <attr name="seekbar_handle" format="reference" />
     <attr name="time_icon" format="reference" />
     <attr name="skip_to_next" format="reference" />
+    <attr name="sleep" format="reference" />
+    <attr name="fullscreen" format="reference" />
+    <attr name="fullscreen_exit" format="reference" />
 
     <declare-styleable name="BezelImageView">
         <attr name="maskDrawable" format="reference" />
