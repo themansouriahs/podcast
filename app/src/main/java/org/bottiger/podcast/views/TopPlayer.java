@@ -30,6 +30,8 @@ import static org.bottiger.podcast.views.PlayerButtonView.StaticButtonColor;
  */
 public class TopPlayer extends RelativeLayout implements PaletteListener {
 
+    private static final String TAG = "TopPlayer";
+
     private IEpisode mEpisodeId;
 
     private enum PlayerLayout { SMALL, MEDIUM, LARGE }
@@ -63,6 +65,9 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
 
     private boolean mCanScrollUp = true;
 
+    private String mDoFullscreentKey;
+    private boolean mFullscreen = false;
+
     private String mDoDisplayTextKey;
     private boolean mDoDisplayText = false;
 
@@ -86,6 +91,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
     private View mDownloadButton;
     private View mQueueButton;
     private View mFavoriteButton;
+    private PlayerButtonView mFullscreenButton;
 
     private PlayerLayoutParameter mSmallLayout = new PlayerLayoutParameter();
     private PlayerLayoutParameter mLargeLayout = new PlayerLayoutParameter();
@@ -133,6 +139,10 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
         mDoDisplayTextKey = mActivity.getResources().getString(R.string.pref_top_player_text_expanded_key);
         mDoDisplayText = prefs.getBoolean(mDoDisplayTextKey, mDoDisplayText);
 
+        mDoFullscreentKey = mActivity.getResources().getString(R.string.pref_top_player_fullscreen_key);
+        mFullscreen = prefs.getBoolean(mDoFullscreentKey, mFullscreen);
+
+
         sizeShrinkBuffer = (int) UIUtils.convertDpToPixel(100, mActivity);
         screenHeight = UIUtils.getScreenHeight(mActivity);
 
@@ -166,7 +176,10 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
     }
 
     @Override
-         public boolean onTouchEvent(MotionEvent event) {
+    public boolean onTouchEvent(MotionEvent event) {
+        if (mFullscreen)
+            return true;
+
         return mRecyclerView.onTouchEvent(event);
     }
 
@@ -185,6 +198,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
         mSeekbarContainer = findViewById(R.id.player_progress);
         mForwardButton = findViewById(R.id.fast_forward_button);
         mBackButton = findViewById(R.id.rewind_button);
+        mFullscreenButton = (PlayerButtonView) findViewById(R.id.fullscreen_button);
         mDownloadButton = findViewById(R.id.download);
         mQueueButton = findViewById(R.id.queue);
         mFavoriteButton = findViewById(R.id.bookmark);
@@ -208,6 +222,8 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
             mEpisodeInfo.setVisibility(GONE);
         }
 
+        setFullscreenState(mFullscreen);
+
         mExpandEpisode.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -217,14 +233,25 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
                         TransitionManager.beginDelayedTransition(mPlayerControlsLinearLayout);
 
                     if (mDoDisplayText) {
-                        Log.d("TopPlayer", "ShowText");
+                        Log.d(TAG, "ShowText");
                         showText();
                     } else {
-                        Log.d("TopPlayer", "HideText");
+                        Log.d(TAG, "HideText");
                         hideText();
                     }
                 } finally {
                     prefs.edit().putBoolean(mDoDisplayTextKey, mDoDisplayText).commit();
+                }
+            }
+        });
+
+        mFullscreenButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    setFullscreenState(!mFullscreen);
+                } finally {
+                    prefs.edit().putBoolean(mDoFullscreentKey, mFullscreen).commit();
                 }
             }
         });
@@ -533,7 +560,28 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
         mGradient.animate().alpha(argAlphaEnd);
     }
 
+    private void setFullscreenState(boolean argNewState) {
+        if (argNewState == mFullscreen)
+            return;
 
+        mFullscreen = !mFullscreen;
+
+        if (mFullscreen) {
+            exitFullscreen();
+        } else {
+            goFullscreen();
+        }
+    }
+
+    private void goFullscreen() {
+        Log.d(TAG, "Enter fullscreen mode");
+        mFullscreenButton.setImageResource(R.drawable.ic_fullscreen_exit_white);
+    }
+
+    private void exitFullscreen() {
+        Log.d(TAG, "Exit fullscreen mode");
+        mFullscreenButton.setImageResource(R.drawable.ic_fullscreen_white);
+    }
 
 
 }
