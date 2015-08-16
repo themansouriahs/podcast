@@ -46,6 +46,7 @@
     <attr name="customBackground" format="reference" />
     <attr name="seekbar_handle" format="reference" />
     <attr name="time_icon" format="reference" />
+    <attr name="skip_to_next" format="reference" />
 
     <declare-styleable name="BezelImageView">
         <attr name="maskDrawable" format="reference" />

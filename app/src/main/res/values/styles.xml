@@ -11,6 +11,7 @@
         <item name="play_invert_icon">@drawable/ic_play_arrow_white</item>
         <item name="pause_invert_icon">@drawable/ic_pause_white</item>
         <item name="fast_forward_icon">@drawable/ic_action_fast_forward</item>
+        <item name="skip_to_next">@drawable/ic_skip_next_white</item>
         <item name="rewind_icon">@drawable/ic_action_rewind</item>
         <item name="ic_remove">@drawable/ic_highlight_remove_white</item>
         <item name="previous_icon">@drawable/ic_action_previous</item>
@@ -49,6 +50,7 @@
         <item name="play_invert_icon">@drawable/ic_play_arrow_black</item>
         <item name="pause_invert_icon">@drawable/ic_pause_black</item>
         <item name="fast_forward_icon">@drawable/ic_action_fast_forward</item>
+        <item name="skip_to_next">@drawable/ic_skip_next_white</item>
         <item name="rewind_icon">@drawable/ic_action_rewind</item>
         <item name="ic_remove">@drawable/ic_highlight_remove_white</item>
         <item name="previous_icon">@drawable/ic_action_previous</item>
@@ -218,6 +220,10 @@
         <item name="android:layout_marginBottom">0dp</item>
         <item name="android:layout_marginTop">10dp</item>
         <item name="android:padding">5dp</item>
+    </style>
+
+    <style name="SeekPlayerButton" parent="@style/PlaylistButton">
+        <item name="android:layout_width">30dip</item>
     </style>
 
     <style name="RightTopPlayerButton" parent="@style/TopPlayerButton">

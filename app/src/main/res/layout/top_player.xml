@@ -26,7 +26,7 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/expanded_controls"
         android:layout_width="match_parent"
-        android:layout_height="95dp"
+        android:layout_height="90dp"
         android:paddingTop="30dp"
         android:clipToPadding="false"
         android:layout_alignParentTop="true"
@@ -38,7 +38,7 @@
         <include layout="@layout/top_player_buttons" />
 
         <org.bottiger.podcast.views.PlayerButtonView
-            android:id="@+id/fast_forward_button"
+            android:id="@+id/skip_to_next_button"
             style="@style/TopPlayerButton"
             android:layout_marginRight="10dp"
             android:layout_marginLeft="-10dp"
@@ -46,7 +46,7 @@
             android:layout_marginBottom="0dp"
             android:padding="0dip"
             android:elevation="@dimen/player_elevation"
-            android:src="?attr/ic_forward"
+            android:src="?attr/skip_to_next"
             android:layout_alignParentRight="true"/>
 
         <!-- style="@style/PodcastImage"
@@ -57,7 +57,7 @@
             android:id="@+id/play_pause_button"
             android:layout_width="70dp"
             android:layout_height="70dp"
-            android:layout_toLeftOf="@id/fast_forward_button"
+            android:layout_toLeftOf="@id/skip_to_next_button"
             android:layout_marginTop="-15dp"
             android:layout_marginBottom="2dp"
             android:padding="0dip"
@@ -69,7 +69,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/previous"
-            android:padding="5dp"
+            android:paddingTop="5dp"
             android:textColor="@color/white_opaque"
             />
 
@@ -78,18 +78,37 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_below="@id/fast_forward_button"
-            android:padding="5dp"
+            android:layout_below="@id/skip_to_next_button"
+            android:paddingTop="5dp"
             android:textColor="@color/white_opaque"
             />
 
     </org.bottiger.podcast.views.PlayerRelativeLayout>
 
+    <org.bottiger.podcast.views.PlayerButtonView
+        android:id="@+id/rewind_button"
+        style="@style/SeekPlayerButton"
+        android:src="?attr/ic_rewind"
+        android:layout_below="@id/expanded_controls"
+        android:layout_alignParentLeft="true"/>
+
+    <org.bottiger.podcast.views.PlayerButtonView
+        android:id="@+id/fast_forward_button"
+        style="@style/SeekPlayerButton"
+        android:src="?attr/ic_forward"
+        android:layout_below="@id/expanded_controls"
+        android:layout_alignParentRight="true"/>
+
     <org.bottiger.podcast.views.PlayerSeekbar
         android:id="@+id/player_progress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/expanded_controls"
+        android:layout_marginTop="3dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:layout_alignTop="@id/rewind_button"
+        android:layout_toLeftOf="@id/fast_forward_button"
+        android:layout_toRightOf="@id/rewind_button"
         style="@style/tallerBarStyle"
         />
 

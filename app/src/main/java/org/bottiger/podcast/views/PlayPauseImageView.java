@@ -193,7 +193,7 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
             onSizeChanged(0, 0, 0, 0);
         }
 
-        if (DRAW_PROGRESS && getEpisode().isMarkedAsListened()) {
+        if (DRAW_PROGRESS && getEpisode() != null && getEpisode().isMarkedAsListened()) {
             canvas.drawCircle(centerX, centerY, radius, paintBorder);
         } else if (DRAW_PROGRESS && mProgressPercent > 0) {
             canvas.drawArc(bounds, START_ANGLE, getProgressAngle(mProgressPercent), false, paintBorder);

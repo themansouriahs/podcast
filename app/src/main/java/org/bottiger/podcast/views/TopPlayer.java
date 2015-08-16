@@ -184,7 +184,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
         mEpisodeInfo = findViewById(R.id.episode_info);
         mSeekbarContainer = findViewById(R.id.player_progress);
         mForwardButton = findViewById(R.id.fast_forward_button);
-        mBackButton = findViewById(R.id.previous);
+        mBackButton = findViewById(R.id.rewind_button);
         mDownloadButton = findViewById(R.id.download);
         mQueueButton = findViewById(R.id.queue);
         mFavoriteButton = findViewById(R.id.bookmark);
