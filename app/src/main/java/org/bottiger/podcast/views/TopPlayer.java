@@ -15,7 +15,9 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import org.bottiger.podcast.R;
@@ -76,13 +78,14 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
     private RelativeLayout mPlayerButtons;
     private int mPlayerButtonsHeight = -1;
 
+    private RelativeLayout mLayout;
     private ImageButton mExpandEpisode;
     private View mGradient;
     private View mEpisodeText;
     private View mEpisodeInfo;
     private View mPhoto;
     private PlayPauseImageView mPlayPauseButton;
-    private View mSeekbarContainer;
+    private View mImageContainer;
 
     private PlayerSeekbar mSeekbar;
 
@@ -135,7 +138,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
 
         mActivity = (Activity) argContext;
 
-        prefs = PreferenceManager.getDefaultSharedPreferences(argContext);
+        prefs = PreferenceManager.getDefaultSharedPreferences(argContext.getApplicationContext());
         mDoDisplayTextKey = mActivity.getResources().getString(R.string.pref_top_player_text_expanded_key);
         mDoDisplayText = prefs.getBoolean(mDoDisplayTextKey, mDoDisplayText);
 
@@ -167,25 +170,11 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
         }
     }
 
-    public void setRecyclerView(@NonNull FixedRecyclerView argRecyclerView) {
-        mRecyclerView = argRecyclerView;
-    }
-
-    public int maxTrans() {
-        return sizeSmall-sizeLarge;
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        if (mFullscreen)
-            return true;
-
-        return mRecyclerView.onTouchEvent(event);
-    }
-
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
+
+        mLayout = (RelativeLayout) findViewById(R.id.session_photo_container);
 
         mPlayerControlsLinearLayout = (PlayerRelativeLayout)findViewById(R.id.expanded_controls);
 
@@ -195,7 +184,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
         mExpandEpisode = (ImageButton)findViewById(R.id.episode_expand);
         mEpisodeText = findViewById(R.id.episode_title);
         mEpisodeInfo = findViewById(R.id.episode_info);
-        mSeekbarContainer = findViewById(R.id.player_progress);
+        mImageContainer = findViewById(R.id.player_progress);
         mForwardButton = findViewById(R.id.fast_forward_button);
         mBackButton = findViewById(R.id.rewind_button);
         mFullscreenButton = (PlayerButtonView) findViewById(R.id.fullscreen_button);
@@ -221,6 +210,15 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
             mGradient.setVisibility(GONE);
             mEpisodeInfo.setVisibility(GONE);
         }
+
+        // Give image a fixed height
+
+        //int width = mPhoto.getWidth();
+        //RelativeLayout.LayoutParams params = (LayoutParams) mPhoto.getLayoutParams();
+        //params.width = width;
+        //params.height = width;
+        //mPhoto.setLayoutParams(params);
+        mPhoto.getLayoutParams().height = mPhoto.getLayoutParams().width;
 
         setFullscreenState(mFullscreen);
 
@@ -249,7 +247,8 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
             @Override
             public void onClick(View v) {
                 try {
-                    setFullscreenState(!mFullscreen);
+                    mFullscreen = !mFullscreen;
+                    setFullscreenState(mFullscreen);
                 } finally {
                     prefs.edit().putBoolean(mDoFullscreentKey, mFullscreen).commit();
                 }
@@ -344,7 +343,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
         /*
         mPlayerControlsLinearLayout.setTranslationY(transYControl);
         mPlayPauseButton.setTranslationY(transYControl);
-        mSeekbarContainer.setTranslationY(transYControl);
+        mImageContainer.setTranslationY(transYControl);
         mForwardButton.setTranslationY(transYControl);
         */
 
@@ -390,7 +389,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
 
         mPlayerControlsLinearLayout.setTranslationY(transYControl);
         mPlayPauseButton.setTranslationY(transYControl);
-        mSeekbarContainer.setTranslationY(transYControl);
+        mImageContainer.setTranslationY(transYControl);
         mForwardButton.setTranslationY(transYControl);
 
         String size = "large";
@@ -422,7 +421,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
     }
 
     public float setSeekbarVisibility(float argTopPlayerHeight) {
-        return setGenericVisibility(mSeekbarContainer, sizeMedium, mSeekbarFadeDistancePx, argTopPlayerHeight);
+        return setGenericVisibility(mImageContainer, sizeMedium, mSeekbarFadeDistancePx, argTopPlayerHeight);
     }
 
     public float setBackgroundVisibility(float argTopPlayerHeight) {
@@ -561,26 +560,40 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
     }
 
     private void setFullscreenState(boolean argNewState) {
-        if (argNewState == mFullscreen)
-            return;
-
-        mFullscreen = !mFullscreen;
 
         if (mFullscreen) {
-            exitFullscreen();
-        } else {
             goFullscreen();
+        } else {
+            exitFullscreen();
         }
     }
+
+    private LinearLayout.LayoutParams paramCache;
 
     private void goFullscreen() {
         Log.d(TAG, "Enter fullscreen mode");
         mFullscreenButton.setImageResource(R.drawable.ic_fullscreen_exit_white);
+
+        mPhoto.getLayoutParams().height = mPhoto.getWidth();
+
+        // Main player layout
+        LinearLayout.LayoutParams paramCache = (LinearLayout.LayoutParams) mLayout.getLayoutParams();
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.MATCH_PARENT);
+        mLayout.setLayoutParams(layoutParams);
+
     }
 
     private void exitFullscreen() {
         Log.d(TAG, "Exit fullscreen mode");
         mFullscreenButton.setImageResource(R.drawable.ic_fullscreen_white);
+
+        // Main player layout
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                LayoutParams.MATCH_PARENT,
+                sizeLarge);
+        mLayout.setLayoutParams(layoutParams);
     }
 
 

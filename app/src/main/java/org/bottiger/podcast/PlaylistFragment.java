@@ -229,10 +229,6 @@ public class PlaylistFragment extends GeastureFragment implements
         mLayoutManager = new LinearLayoutManager(mActivity);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        //mRecyclerView.setOnScrollListener(this);
-
-        mTopPlayer.setRecyclerView(mRecyclerView);
-
         // specify an adapter (see also next example)
         mAdapter = new PlaylistAdapter(mActivity, mOverlay, mDownloadProgressObservable);
         mAdapter.setHasStableIds(true);

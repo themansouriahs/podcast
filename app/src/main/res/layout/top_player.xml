@@ -145,14 +145,13 @@
         style="@style/tallerBarStyle"
         />
 
-    <android.support.v7.widget.CardView
+    <org.bottiger.podcast.views.SquareCardView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginLeft="30dp"
         android:layout_marginRight="30dp"
         android:layout_below="@id/player_progress"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="15dp">
+        android:layout_marginTop="5dp">
 
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/session_photo"
@@ -168,6 +167,7 @@
             android:layout_gravity="top" />
 
         <RelativeLayout
+            android:id="@+id/image_container_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:padding="15dp">
@@ -192,17 +192,17 @@
         android:paddingBottom="5dp"
         />
 
-    <TextView
-        android:id="@+id/episode_info"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/episode_title"
-        android:text="@string/episode_description"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        />
+        <TextView
+            android:id="@+id/episode_info"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/episode_title"
+            android:text="@string/episode_description"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            />
         </RelativeLayout>
 
-    </android.support.v7.widget.CardView>
+    </org.bottiger.podcast.views.SquareCardView>
 
 
 </org.bottiger.podcast.views.TopPlayer >
