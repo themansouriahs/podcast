@@ -60,7 +60,7 @@
             android:layout_toLeftOf="@id/fullscreen_button"
             android:elevation="@dimen/player_elevation"
             style="@style/TopPlayerButton" />
-        
+
         <org.bottiger.podcast.views.PlayerButtonView
             android:id="@+id/favorite"
             android:padding="0dip"

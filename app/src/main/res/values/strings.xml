@@ -141,6 +141,7 @@
     <string name="playlist_context_menu_playnext">Play next</string>
     <string name="subscription_subtitle_updated_at">updated</string>
     <string name="filter_show_only_downloaded">Only downloaded</string>
+    <string name="action_filter">Filter Playlist</string>
 
     <plurals name="bulk_download_playlist">
         <item quantity="one">First episode in the playlist</item>
