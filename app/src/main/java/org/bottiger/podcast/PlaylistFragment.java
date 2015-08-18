@@ -22,6 +22,7 @@ import org.bottiger.podcast.views.TextViewObserver;
 import org.bottiger.podcast.views.TopPlayer;
 import org.bottiger.podcast.views.MultiShrink.playlist.MultiShrinkScroller;
 import org.bottiger.podcast.views.dialogs.DialogBulkDownload;
+import org.bottiger.podcast.views.dialogs.DialogPlaylistFilters;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -581,6 +582,12 @@ public class PlaylistFragment extends GeastureFragment implements
              case R.id.menu_bulk_download: {
                  DialogBulkDownload dialogBulkDownload = new DialogBulkDownload();
                  Dialog dialog = dialogBulkDownload.onCreateDialog(getActivity(), mPlaylist);
+                 dialog.show();
+                 return true;
+             }
+             case R.id.action_filter_playlist: {
+                 DialogPlaylistFilters dialogPlaylistFilters = new DialogPlaylistFilters();
+                 Dialog dialog = dialogPlaylistFilters.onCreateDialog(getActivity(), mPlaylist);
                  dialog.show();
                  return true;
              }
