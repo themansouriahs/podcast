@@ -5,7 +5,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.util.LongSparseArray;
 import android.util.AttributeSet;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -39,7 +41,7 @@ public class DialogPlaylistContent implements DialogInterface.OnMultiChoiceClick
     private SubscriptionFilter mSubscriptionFilter;
 
     private ArrayAdapter<String> mAdapter;
-    private List<Subscription> mSubscriptions = new LinkedList<>();
+    private LongSparseArray<Subscription> mSubscriptions = new LongSparseArray<>(50);
     private List<CheckBox> mCheckboxes = new LinkedList<>();
 
     private RadioGroup mRadioGroup;
@@ -106,7 +108,7 @@ public class DialogPlaylistContent implements DialogInterface.OnMultiChoiceClick
         List<Subscription> list = SubscriptionLoader.allAsList(mContext.getContentResolver());
         for (Subscription s : list) {
             if (s.getStatus() == Subscription.STATUS_SUBSCRIBED)
-                mSubscriptions.add(s);
+                mSubscriptions.append(s.getId(), s);
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -121,7 +123,10 @@ public class DialogPlaylistContent implements DialogInterface.OnMultiChoiceClick
         mRadioGroup.setOnCheckedChangeListener(RadioOnCheckedChangeListener);
 
         mCheckboxes.clear();
-        for (Subscription subscription : mSubscriptions) {
+        //for (Subscription subscription : mSubscriptions) {
+        for (int i = 0, nsize = mSubscriptions.size(); i < nsize; i++) {
+            Subscription subscription = mSubscriptions.valueAt(i);
+
             View itemView = inflater.inflate(R.layout.filter_subscriptions_item, null);
             TextView tv = (TextView) itemView.findViewById(R.id.item_text);
             final CheckBox checkBox = (CheckBox) itemView.findViewById(R.id.item_checkbox);

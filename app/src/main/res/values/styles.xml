@@ -326,14 +326,15 @@
     <!-- Navigation Drawer - Start -->
     <!-- parent="Theme.AppCompat.Light.NoActionBar-->
     <style name="DrawerSwitchTextAppearance" parent="@style/Material.Widget.Switch">
-        <item name="android:textColor">@color/drawer_text</item>
+        <item name="android:textColor">@color/filter_text</item>
         <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
     </style>
 
     <style name="spinnerItemStyle">
+        <item name="android:layout_width">match_parent</item>
         <item name="android:padding">10dp</item>
         <item name="android:textSize">14sp</item>
-        <item name="android:textColor">@color/drawer_text</item>
+        <item name="android:textColor">@color/filter_text</item>
         <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
         <!--<item name="android:background">@android:drawable/spinner_dropdown_background</item>-->
     </style>

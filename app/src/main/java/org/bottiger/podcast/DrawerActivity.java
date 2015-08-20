@@ -162,77 +162,15 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity {
             mDrawerTable.setLayoutParams(params);
         }
 
-        mPlaylistContentLayout = (LinearLayout) findViewById(R.id.playlist_content);
         mPlaylistOrderSpinner = (Spinner) findViewById(R.id.drawer_playlist_sort_order);
         mPlaylistShowListened = (Switch) findViewById(R.id.slidebar_show_listened);
         mOnlyDownloaded = (Switch) findViewById(R.id.slidebar_show_downloaded);
         mAutoPlayNext = (Switch) findViewById(R.id.slidebar_show_continues);
 
-        bindPlaylistFilter(mPlaylistContentLayout);
 
         parentItems = new ArrayList<String>(Arrays.asList(mListItems));
 		// setGroupParents();
 		setChildData();
-
-        // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> adapterSortOrder = ArrayAdapter.createFromResource(this,
-                R.array.playlist_sort_order, android.R.layout.simple_spinner_item);
-        // Specify the layout to use when the list of choices appears
-        adapterSortOrder.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // Apply the adapter to the spinner
-        mPlaylistOrderSpinner.setAdapter(adapterSortOrder);
-        mPlaylistOrderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                PlaylistData pd = new PlaylistData();
-                if (position == 0) {
-                    //playlist.setSortOrder(Playlist.SORT.DATE_NEW); // new first
-                    pd.sortOrder = Playlist.SORT.DATE_NEW; // new first
-                } else {
-                    //playlist.setSortOrder(Playlist.SORT.DATE_OLD); // old first
-                    pd.sortOrder = Playlist.SORT.DATE_OLD;  // old first
-                }
-                SoundWaves.getBus().post(pd);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                return;
-            }
-        });
-
-        // Show listened
-        mPlaylistShowListened.setOnCheckedChangeListener(new Switch.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(Switch aSwitch, boolean isChecked) {
-                PlaylistData pd = new PlaylistData();
-                pd.showListened = isChecked;
-                SoundWaves.getBus().post(pd);
-            }
-        });
-
-        boolean doShowListened = mSharedPreferences.getBoolean(ApplicationConfiguration.showListenedKey, Playlist.SHOW_LISTENED_DEFAULT);
-        if (doShowListened != mPlaylistShowListened.isChecked()) {
-            mPlaylistShowListened.setChecked(doShowListened);
-        }
-
-        // Show only downloaded
-        mOnlyDownloaded.setOnCheckedChangeListener(new Switch.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(Switch aSwitch, boolean isChecked) {
-                PlaylistData pd = new PlaylistData();
-                pd.onlyDownloaded = isChecked;
-                SoundWaves.getBus().post(pd);
-            }
-        });
-
-        String showOnlyDownloaded = getResources().getString(R.string.pref_only_downloaded_key);
-        boolean onlyDownloaded = mSharedPreferences.getBoolean(showOnlyDownloaded, Playlist.SHOW_ONLY_DOWNLOADED);
-        if (onlyDownloaded != mOnlyDownloaded.isChecked()) {
-            mOnlyDownloaded.setChecked(onlyDownloaded);
-        }
-
-        initAutoPlayNextSwitch();
 
         LinearLayout layout = (LinearLayout) findViewById(R.id.drawer_items);
         NavigationDrawerMenuGenerator navigationDrawerMenuGenerator = new NavigationDrawerMenuGenerator(this);
@@ -275,7 +213,6 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity {
 
     @Override
     protected void onDestroy() {
-        SoundWaves.getBus().unregister(mDialogPlaylistContent);
         super.onDestroy();
     }
 
@@ -378,7 +315,6 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity {
 	}
     @Override
     public void onResume() {
-        initAutoPlayNextSwitch();
         super.onResume();
     }
 
@@ -566,47 +502,8 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity {
         */
     }
 
-    private void initAutoPlayNextSwitch() {
-        // Auto play next
-        final String playNextKey = getResources().getString(R.string.pref_continuously_playing_key);
 
-        mAutoPlayNext.setOnCheckedChangeListener(new Switch.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(Switch aSwitch, boolean isChecked) {
-                mSharedPreferences.edit().putBoolean(playNextKey, isChecked).commit();
-            }
-        });
-        mSharedPreferences.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
-            @Override
-            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                if (key == playNextKey) {
-                    mAutoPlayNext.setChecked(sharedPreferences.getBoolean(playNextKey, Playlist.PLAY_NEXT_DEFAULT));
-                }
-            }
-        });
 
-        boolean doPlayNext = mSharedPreferences.getBoolean(playNextKey, Playlist.PLAY_NEXT_DEFAULT);
-        if (doPlayNext != mAutoPlayNext.isChecked()) {
-            mAutoPlayNext.setChecked(doPlayNext);
-        }
-    }
-
-    private void bindPlaylistFilter(@NonNull LinearLayout argView) {
-        mDialogPlaylistContent = new DialogPlaylistContent(this, getPlaylist());
-        argView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mDialogPlaylistContent.performClick();
-            }
-        });
-
-        String title = getResources().getString(R.string.drawer_playlist_content_source);
-        TextView tv = (TextView) argView.findViewById(R.id.drawer_item_title);
-        tv.setText(title);
-
-        View imageView = argView.findViewById(R.id.drawer_item_icon);
-        imageView.setVisibility(View.GONE);
-    }
 
     class MultiSpinnerListener implements MultiSpinner.MultiSpinnerListener {
 

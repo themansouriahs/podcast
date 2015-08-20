@@ -506,6 +506,7 @@ public class PlaylistFragment extends GeastureFragment implements
         }
 
         if (item != null && item.getArtwork(activity) != null) {
+            Log.d("MissingImage", "Setting image");
             Uri uri = Uri.parse(item.getArtwork(activity));
             mPhoto.setImageURI(uri);
         }
@@ -586,9 +587,8 @@ public class PlaylistFragment extends GeastureFragment implements
                  return true;
              }
              case R.id.action_filter_playlist: {
-                 DialogPlaylistFilters dialogPlaylistFilters = new DialogPlaylistFilters();
-                 Dialog dialog = dialogPlaylistFilters.onCreateDialog(getActivity(), mPlaylist);
-                 dialog.show();
+                 DialogPlaylistFilters dialogPlaylistFilters = DialogPlaylistFilters.newInstance();
+                 dialogPlaylistFilters.show(getFragmentManager(), getTag());
                  return true;
              }
          }

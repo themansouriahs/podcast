@@ -14,6 +14,9 @@
     <color name="drawer_background">@color/colorBgPrimaryDark</color>
     <color name="drawer_text">@color/white_opaque</color>
 
+    <!-- PLaylist filters -->
+    <color name="filter_text">@color/black</color>
+
     <color name="translucent_actionbar_background">@color/colorPrimary</color>
 
     <color name="blue">#33b5e5</color>

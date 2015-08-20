@@ -275,7 +275,6 @@ public class MainActivity extends FragmentContainerActivity implements
 
 	@Override
 	protected void onDestroy() {
-		super.onDestroy();
 		unregisterReceiver(receiver);
 
         try {
@@ -283,6 +282,7 @@ public class MainActivity extends FragmentContainerActivity implements
         } catch (Exception e) {
             VendorCrashReporter.handleException(e);
         }
+		super.onDestroy();
 	}
 
 	@Override

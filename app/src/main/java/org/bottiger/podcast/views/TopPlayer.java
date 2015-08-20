@@ -218,7 +218,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
         //params.width = width;
         //params.height = width;
         //mPhoto.setLayoutParams(params);
-        mPhoto.getLayoutParams().height = mPhoto.getLayoutParams().width;
+        //mPhoto.getLayoutParams().height = mPhoto.getLayoutParams().width;
 
         setFullscreenState(mFullscreen);
 
@@ -325,6 +325,10 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
 
     // returns actual visible height
     public float setPlayerHeight(float argScreenHeight) {
+
+        if (mFullscreen)
+            return getHeight();
+
         minimalEnsured = false;
         maximumEnsured = false;
 
@@ -574,7 +578,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
         Log.d(TAG, "Enter fullscreen mode");
         mFullscreenButton.setImageResource(R.drawable.ic_fullscreen_exit_white);
 
-        mPhoto.getLayoutParams().height = mPhoto.getWidth();
+        //mPhoto.getLayoutParams().height = mPhoto.getWidth();
 
         // Main player layout
         LinearLayout.LayoutParams paramCache = (LinearLayout.LayoutParams) mLayout.getLayoutParams();
