@@ -22,6 +22,7 @@ public class PlayerHandler {
     public static final int FADEIN = 0;
     public static final int TRACK_ENDED = 1;
     public static final int SERVER_DIED = 2;
+    public static final int FADEOUT = 3;
 
     private PlayerService mPlayerService;
     private final InnerPlayerHandler mHandler;
@@ -103,6 +104,24 @@ public class PlayerHandler {
 
                 case SERVER_DIED:
                     break;
+
+                case FADEOUT: {
+                    if (playerService.isPlaying()) {
+                        mCurrentVolume -= 0.01f;
+                        if (mCurrentVolume > 0.0f) {
+                            this.sendEmptyMessageDelayed(FADEOUT, 10);
+                        } else {
+                            mCurrentVolume = 0.0f;
+                        }
+                        playerService.getPlayer().setVolume(mCurrentVolume);
+
+                        if (mCurrentVolume <= 0.0f) {
+                            playerService.stop();
+                        }
+                    }
+
+                    break;
+                }
 
             }
         }
