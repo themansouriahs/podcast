@@ -108,14 +108,26 @@ public class PlayerService extends Service implements
         mPlayerHandler.sendEmptyMessageDelayed(PlayerHandler.FADEIN, 10);
 	}
 
+	public void FaceOutAndStop(int argDelayMs) {
+		mPlayerHandler.sendEmptyMessageDelayed(PlayerHandler.FADEOUT, argDelayMs);
+	}
+
     public SoundWavesPlayer getPlayer() {
         return mPlayer;
     }
+	private static PlayerService sInstance = null;
+
+	@Nullable
+	public static PlayerService getInstance() {
+		return sInstance;
+	}
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
         Log.d(TAG, "PlayerService started");
+
+		sInstance = this;
 
         wifiLock = ((WifiManager) getSystemService(Context.WIFI_SERVICE))
                 .createWifiLock(WifiManager.WIFI_MODE_FULL, LOCK_NAME);
@@ -227,6 +239,7 @@ public class PlayerService extends Service implements
 
 	@Override
 	public void onDestroy() {
+		sInstance = null;
 		SoundWaves.getBus().unregister(mPlaylist);
 		SoundWaves.getBus().unregister(this);
         super.onDestroy();

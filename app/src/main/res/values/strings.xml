@@ -144,6 +144,12 @@
     <string name="action_filter">Filter Playlist</string>
     <string name="apply_filters">Apply filters</string>
     <string name="reset_filters">Reset</string>
+    <string name="player_sleep">PLayer will sleep in</string>
+
+    <plurals name="player_sleep">
+        <item quantity="one">Player will sleep in %d minute</item>
+        <item quantity="other">Player will sleep in %d minutes</item>
+    </plurals>
 
     <plurals name="bulk_download_playlist">
         <item quantity="one">First episode in the playlist</item>

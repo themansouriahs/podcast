@@ -19,10 +19,12 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.UIUtils;
 
 import static org.bottiger.podcast.views.PlayerButtonView.StaticButtonColor;
@@ -95,6 +97,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
     private View mQueueButton;
     private View mFavoriteButton;
     private PlayerButtonView mFullscreenButton;
+    private PlayerButtonView mSleepButton;
 
     private PlayerLayoutParameter mSmallLayout = new PlayerLayoutParameter();
     private PlayerLayoutParameter mLargeLayout = new PlayerLayoutParameter();
@@ -192,6 +195,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
         mQueueButton = findViewById(R.id.queue);
         mFavoriteButton = findViewById(R.id.bookmark);
         mGradient = findViewById(R.id.top_gradient_inner);
+        mSleepButton = (PlayerButtonView) findViewById(R.id.sleep_button);
 
         mSeekbar = (PlayerSeekbar) findViewById(R.id.player_progress);
         mPlayerButtons = (RelativeLayout) findViewById(R.id.player_buttons);
@@ -219,6 +223,13 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
         //params.height = width;
         //mPhoto.setLayoutParams(params);
         //mPhoto.getLayoutParams().height = mPhoto.getLayoutParams().width;
+
+        mSleepButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sleepButtonPressed();
+            }
+        });
 
         setFullscreenState(mFullscreen);
 
@@ -254,6 +265,19 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
                 }
             }
         });
+    }
+
+    private void sleepButtonPressed() {
+        try {
+            PlayerService ps = PlayerService.getInstance();
+            int minutes = 30;
+            int onemin = 1000 * 60;
+            ps.FaceOutAndStop(onemin*minutes);
+            String toast = getResources().getQuantityString(R.plurals.player_sleep, minutes, minutes);
+            Toast.makeText(mActivity, toast, Toast.LENGTH_LONG).show();
+        } catch (NullPointerException npe) {
+            Log.d(TAG, "Could not connect to the Player");
+        }
     }
 
     @Override
