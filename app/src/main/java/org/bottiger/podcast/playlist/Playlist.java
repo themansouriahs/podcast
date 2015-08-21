@@ -425,9 +425,11 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
             PodcastOpenHelper helper = PodcastOpenHelper.getInstance(mContext);//new PodcastOpenHelper(mActivity);
             SQLiteDatabase database = helper.getReadableDatabase();
 
+            String where = getWhere();
+            String order = getOrder();
             cursor = database.query(ItemColumns.TABLE_NAME,
-                    ItemColumns.ALL_COLUMNS, getWhere(), null, null, null,
-                    getOrder());
+                    ItemColumns.ALL_COLUMNS, where, null, null, null,
+                    order);
 
 
         mInternalPlaylist.clear();

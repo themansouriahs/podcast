@@ -185,11 +185,37 @@ public class DialogPlaylistFilters extends DialogFragment {
         builder.setPositiveButton(R.string.apply_filters, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
-                //
+                setPlaylistFilters();
             }
         });
 
         return builder.create();
+    }
+
+    private void setPlaylistFilters() {
+        switch (mRadioGroup.getCheckedRadioButtonId()) {
+            case R.id.radioNone:
+                mSubscriptionFilter.setMode(SubscriptionFilter.MODE.SHOW_NONE, getContext());
+                break;
+            case R.id.radioAll:
+                mSubscriptionFilter.setMode(SubscriptionFilter.MODE.SHOW_ALL, getContext());
+                break;
+            case R.id.radioCustom: {
+                mSubscriptionFilter.clear();
+                for (int i = 0; i < mCheckboxes.size(); i++) {
+                    CheckBox checkbox = mCheckboxes.get(i);
+                    if (checkbox.isChecked()) {
+                        Subscription subscription = mSubscriptions.valueAt(i);
+                        mSubscriptionFilter.add(subscription.getId());
+                    }
+                }
+                mSubscriptionFilter.setMode(SubscriptionFilter.MODE.SHOW_SELECTED, getContext());
+                break;
+            }
+        }
+
+        mPlaylist.populatePlaylist(Playlist.MAX_SIZE, true);
+        mPlaylist.notifyPlaylistChanged();
     }
 
     private void initOnlyDownloaded() {
@@ -327,7 +353,7 @@ public class DialogPlaylistFilters extends DialogFragment {
     private void checkCustom() {
         for (int i = 0; i < mCheckboxes.size(); i++) {
             CheckBox checkBox = mCheckboxes.get(i);
-            Subscription subscription = mSubscriptions.get(i);
+            Subscription subscription = mSubscriptions.valueAt(i);
 
             if (mSubscriptionFilter.isShown(subscription.getId()))
                 checkBox.setChecked(true);
