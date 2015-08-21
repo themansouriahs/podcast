@@ -68,6 +68,13 @@
 
 # apache
 -dontwarn org.apache.commons.**
+-dontwarn org.apache.http.**
+
+# com.rey.material
+-dontwarn com.rey.material.**
+
+# webview ????
+-dontwarn android.webkit.**
 
 #retrofit
 -dontwarn retrofit.**
