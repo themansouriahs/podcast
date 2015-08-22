@@ -200,6 +200,15 @@
             android:summary="@string/pref_cloud_support_description"
             android:title="@string/pref_cloud_support_title" />
 
+        <org.bottiger.podcast.utils.preferenceUtils.GPodderAuthDialogPreference
+                android:key="@string/pref_gpodder_support_key"
+                android:title="@string/pref_gpodder_support_title"
+                android:dialogIcon="@drawable/discovery_gpodder"
+                android:dialogLayout="@layout/dialog_gpodder_auth"
+                android:positiveButtonText="@android:string/ok"
+                android:negativeButtonText="@android:string/cancel"
+                />
+
         </PreferenceCategory>
 
         <PreferenceCategory

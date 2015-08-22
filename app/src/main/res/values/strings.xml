@@ -144,6 +144,9 @@
     <string name="action_filter">Filter Playlist</string>
     <string name="apply_filters">Apply filters</string>
     <string name="reset_filters">Reset</string>
+    <string name="pref_gpodder_support_title">GPodder</string>
+    <string name="gpodder_username">username</string>
+    <string name="gpodder_password">password</string>
 
     <plurals name="player_sleep">
         <item quantity="one">Player will sleep in %d minute</item>

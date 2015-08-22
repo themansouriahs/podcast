@@ -17,9 +17,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+
+import com.facebook.drawee.view.SimpleDraweeView;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.PaletteListener;
@@ -85,7 +88,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
     private View mGradient;
     private View mEpisodeText;
     private View mEpisodeInfo;
-    private View mPhoto;
+    private SimpleDraweeView mPhoto;
     private PlayPauseImageView mPlayPauseButton;
     private View mImageContainer;
 
@@ -181,7 +184,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
 
         mPlayerControlsLinearLayout = (PlayerRelativeLayout)findViewById(R.id.expanded_controls);
 
-        mPhoto = findViewById(R.id.session_photo);
+        mPhoto = (SimpleDraweeView) findViewById(R.id.session_photo);
 
         mPlayPauseButton = (PlayPauseImageView) findViewById(R.id.play_pause_button);
         mExpandEpisode = (ImageButton)findViewById(R.id.episode_expand);

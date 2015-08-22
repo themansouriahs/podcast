@@ -10,16 +10,19 @@ import retrofit.http.Path;
  */
 public interface GPodderAPI {
 
+    public static final String baseUrl = "https://gpodder.net";
+
     /**
      * Auth string:
      * String basicAuth = "Basic " + Base64.encodeToString(String.format("%s:%s", "your_user_name", "your_password").getBytes(), Base64.NO_WRAP);
      *
      * From: http://stackoverflow.com/questions/21370620/retrofit-post-request-w-basic-http-authentication-cannot-retry-streamed-http
     */
-    @POST("/api/2/auth/{username]/login.json")
-    void login(@Path("user") String user, @Header("Authorization") String authorization, Callback<String> callback);
+    @POST("/api/2/auth/{username}/login.json")
+    //void login(@Path("user") String user, @Header("Authorization") String authorization, Callback<String> callback);
+    void login(@Path("username") String user, Callback<String> callback);
 
-    @POST("/api/2/auth/{username]/logout.json")
-    void logout(@Path("user") String user);
+    @POST("/api/2/auth/{username}/logout.json")
+    void logout(@Path("username") String user);
 
 }

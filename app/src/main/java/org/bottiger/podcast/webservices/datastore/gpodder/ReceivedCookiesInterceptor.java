@@ -28,6 +28,7 @@ public class ReceivedCookiesInterceptor implements Interceptor {
 
             for (String header : originalResponse.headers("Set-Cookie")) {
                 cookies.add(header);
+                ApiRequestInterceptor.cookie = header;
             }
 
             /*
@@ -35,6 +36,7 @@ public class ReceivedCookiesInterceptor implements Interceptor {
                     .putStringSet(Preferences.PREF_COOKIES, cookies)
                     .apply();
                     */
+
         }
 
         return originalResponse;

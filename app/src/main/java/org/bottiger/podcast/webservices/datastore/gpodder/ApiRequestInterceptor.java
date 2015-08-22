@@ -4,8 +4,15 @@ package org.bottiger.podcast.webservices.datastore.gpodder;
  * Created by apl on 23-05-2015.
  */
 
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Base64;
+
+import com.squareup.okhttp.Interceptor;
+import com.squareup.okhttp.Response;
+
+import java.io.IOException;
+import java.util.HashSet;
 
 import retrofit.RequestInterceptor;
 
@@ -14,7 +21,15 @@ import retrofit.RequestInterceptor;
  */
 public class ApiRequestInterceptor implements RequestInterceptor {
 
-    private String cookie;
+    private String mUsername;
+    private String mPassword;
+
+    public static String cookie;
+
+    public ApiRequestInterceptor(@NonNull String argUsername, @NonNull String argPassword) {
+        mUsername = argUsername;
+        mPassword = argPassword;
+    }
 
     @Override
     public void intercept(RequestInterceptor.RequestFacade requestFacade) {
@@ -22,9 +37,13 @@ public class ApiRequestInterceptor implements RequestInterceptor {
         if (!TextUtils.isEmpty(cookie)) {
             requestFacade.addHeader("Set-Cookie", cookie);
         }
+
+        final String authorizationValue = encodeCredentialsForBasicAuthorization();
+        requestFacade.addHeader("Authorization", authorizationValue);
     }
 
-    public void setUser(String user) {
-        this.cookie = user;
+    private String encodeCredentialsForBasicAuthorization() {
+        final String userAndPassword = mUsername + ":" + mPassword;
+        return "Basic " + Base64.encodeToString(userAndPassword.getBytes(), Base64.NO_WRAP);
     }
 }
