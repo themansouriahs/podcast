@@ -100,6 +100,7 @@ public *;
 
 # Keep all the ACRA classes
 -keep class org.acra.** { *; }
+-dontwarn org.acra.**
 
 
 #Fresco
