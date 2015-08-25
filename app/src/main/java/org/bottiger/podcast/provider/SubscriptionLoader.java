@@ -3,7 +3,9 @@ package org.bottiger.podcast.provider;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.provider.BaseColumns;
+import android.support.v4.util.LongSparseArray;
 import android.support.v4.util.LruCache;
+import android.util.SparseArray;
 
 import java.util.LinkedList;
 
@@ -26,6 +28,7 @@ public class SubscriptionLoader {
                 SubscriptionColumns.ALL_COLUMNS, null, null, null);
     }
 
+    @Deprecated
     public static LinkedList<Subscription> allAsList(ContentResolver context) {
         LinkedList<Subscription> subscriptions = new LinkedList<>();
         Cursor cursor = null;
@@ -34,6 +37,25 @@ public class SubscriptionLoader {
 
             while (cursor.moveToNext()) {
                 subscriptions.add(getByCursor(cursor));
+            }
+        } finally {
+            cursor.close();
+        }
+        return subscriptions;
+    }
+
+    public static LongSparseArray<ISubscription> asList(ContentResolver context) {
+        LongSparseArray<ISubscription> subscriptions = new LongSparseArray<>();
+        Cursor cursor = null;
+        try {
+            cursor = allAsCursor(context);
+
+            long key;
+            Subscription subscription;
+            while (cursor.moveToNext()) {
+                subscription = getByCursor(cursor);
+                key = subscription.getId();
+                subscriptions.append(key, subscription);
             }
         } finally {
             cursor.close();

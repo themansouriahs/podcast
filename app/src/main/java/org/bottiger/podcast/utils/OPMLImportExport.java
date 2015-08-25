@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,6 +21,7 @@ import org.bottiger.podcast.parser.opml.OpmlReader;
 import org.bottiger.podcast.parser.opml.OpmlWriter;
 import org.bottiger.podcast.provider.DatabaseHelper;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionLoader;
 import org.xmlpull.v1.XmlPullParserException;
@@ -28,6 +30,9 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.Resources;
+import android.support.v4.util.LongSparseArray;
+import android.util.Log;
+import android.util.SparseArray;
 import android.widget.Toast;
 
 public class OPMLImportExport {
@@ -184,4 +189,18 @@ public class OPMLImportExport {
         SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.OPML_EXPORT);
         toastMsg(opmlSuccesfullyExported);
     }
+
+	public static String toOPML(LongSparseArray<ISubscription> argSubscriptions) {
+		OpmlWriter opmlWriter = new OpmlWriter();
+		StringWriter sw = new StringWriter();
+
+		try {
+			opmlWriter.writeDocument(argSubscriptions, sw);
+		} catch (IOException e) {
+			Log.d("toOPML", "Failed converting subscriptions to OPML");
+			return "";
+		}
+
+		return sw.toString();
+	}
 }

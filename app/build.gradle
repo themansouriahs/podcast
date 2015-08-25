@@ -8,7 +8,7 @@ android {
     defaultConfig {
         applicationId "org.bottiger.podcast"
         minSdkVersion 15
-        targetSdkVersion 22
+        targetSdkVersion 23
         versionCode 146     // even - release. Odd - development
         versionName "0.98" // even - release. Odd - development
         //useJack = true
@@ -83,6 +83,14 @@ android {
     }
 }
 
+//allprojects {
+//    gradle.projectsEvaluated {
+//        tasks.withType(JavaCompile) {
+//            options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+//        }
+//    }
+//}
+
 repositories {
     mavenCentral()
 }
@@ -128,7 +136,7 @@ dependencies {
     compile 'com.github.traex.rippleeffect:library:1.2.4'
     //compile 'com.eowise:recyclerview-stickyheaders:0.5.1@aar'
     compile 'jp.wasabeef:recyclerview-animators:1.2.0@aar'
-    compile 'ch.acra:acra:4.6.+'
+    compile 'ch.acra:acra:4.6.2'
     //compile 'com.github.anrwatchdog:anrwatchdog:1.+'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.5+'
     compile 'com.facebook.fresco:fresco:0.6.1'

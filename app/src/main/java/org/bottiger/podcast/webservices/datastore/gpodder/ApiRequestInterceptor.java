@@ -35,11 +35,11 @@ public class ApiRequestInterceptor implements RequestInterceptor {
     public void intercept(RequestInterceptor.RequestFacade requestFacade) {
 
         if (!TextUtils.isEmpty(cookie)) {
-            requestFacade.addHeader("Set-Cookie", cookie);
+            requestFacade.addHeader("Cookie", cookie);
+        } else {
+            final String authorizationValue = encodeCredentialsForBasicAuthorization();
+            requestFacade.addHeader("Authorization", authorizationValue);
         }
-
-        final String authorizationValue = encodeCredentialsForBasicAuthorization();
-        requestFacade.addHeader("Authorization", authorizationValue);
     }
 
     private String encodeCredentialsForBasicAuthorization() {

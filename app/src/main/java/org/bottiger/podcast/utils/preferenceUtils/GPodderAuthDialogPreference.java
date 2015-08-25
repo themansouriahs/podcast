@@ -11,7 +11,9 @@ import android.view.View;
 import android.widget.EditText;
 
 import org.bottiger.podcast.R;
-import org.bottiger.podcast.webservices.datastore.gpodder.Authentication;
+import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.provider.SubscriptionLoader;
+import org.bottiger.podcast.webservices.datastore.gpodder.GPodderAPI;
 
 /**
  * The OptionDialogPreference will display a dialog, and will persist the
@@ -74,8 +76,9 @@ public class GPodderAuthDialogPreference extends DialogPreference {
         } else {
             String username = mUsernameView.getText().toString();
             String password = mPasswordView.getText().toString();
-            Authentication auth = new Authentication();
-            auth.authenticate(username, password);
+            
+            GPodderAPI api = new GPodderAPI(username, password);
+            //api.uploadSubscriptions(SubscriptionLoader.asList(getContext().getContentResolver()));
         }
     }
 
