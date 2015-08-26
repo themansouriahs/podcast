@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Created by Arvid on 8/25/2015.
  */
-public class UpdatedUrls {
+public class GActionsList {
     private long timestamp;
-    private List<List<String>> updated_urls;
+    private List<String> actions;
 }

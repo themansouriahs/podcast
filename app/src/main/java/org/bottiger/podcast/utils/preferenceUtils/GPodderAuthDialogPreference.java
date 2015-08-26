@@ -76,7 +76,7 @@ public class GPodderAuthDialogPreference extends DialogPreference {
         } else {
             String username = mUsernameView.getText().toString();
             String password = mPasswordView.getText().toString();
-            
+
             GPodderAPI api = new GPodderAPI(username, password);
             //api.uploadSubscriptions(SubscriptionLoader.asList(getContext().getContentResolver()));
         }
