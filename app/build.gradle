@@ -18,6 +18,8 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
+    useLibrary 'org.apache.http.legacy' // Need until GMS upgraded
+
     lintOptions {
         checkReleaseBuilds false
         abortOnError false
