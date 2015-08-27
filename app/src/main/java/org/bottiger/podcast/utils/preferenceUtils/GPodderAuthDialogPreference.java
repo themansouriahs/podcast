@@ -4,16 +4,24 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.DialogPreference;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.ContentLoadingProgressBar;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionLoader;
+import org.bottiger.podcast.utils.ThemeHelper;
 import org.bottiger.podcast.webservices.datastore.gpodder.GPodderAPI;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * The OptionDialogPreference will display a dialog, and will persist the
@@ -26,6 +34,10 @@ public class GPodderAuthDialogPreference extends DialogPreference {
 
     private EditText mUsernameView;
     private EditText mPasswordView;
+
+    private Button mTestCredentials;
+    private TextView mTestResult;
+    private ContentLoadingProgressBar mTestLoading;
 
     private String mUsernameKey;
     private String mPasswordKey;
@@ -50,9 +62,48 @@ public class GPodderAuthDialogPreference extends DialogPreference {
         mUsernameView = (EditText)view.findViewById(R.id.gpodder_username);
         mPasswordView = (EditText)view.findViewById(R.id.gpodder_password);
 
+        mTestCredentials = (Button)view.findViewById(R.id.test_credentials_button);
+        mTestResult = (TextView)view.findViewById(R.id.test_credentials_result);
+        mTestLoading = (ContentLoadingProgressBar)view.findViewById(R.id.test_credentials_loading);
+
+        mTestLoading.hide();
+
         SharedPreferences sharedPreferences = getSharedPreferences();
-        mUsernameView.setText(sharedPreferences.getString(mUsernameKey, ""));
-        mPasswordView.setText(sharedPreferences.getString(mPasswordKey, ""));
+
+        String username = sharedPreferences.getString(mUsernameKey, "");
+        String password = sharedPreferences.getString(mPasswordKey, "");
+
+        mUsernameView.setText(username);
+        mPasswordView.setText(password);
+
+        mTestCredentials.setEnabled(validateCredentials(username, password));
+
+        mTestCredentials.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mTestResult.setVisibility(View.GONE);
+                mTestLoading.show();
+                String username = mUsernameView.getText().toString();
+                String password = mPasswordView.getText().toString();
+                GPodderAPI api = new GPodderAPI(username, password, new Callback() {
+                    @Override
+                    public void success(Object o, Response response) {
+                        mTestLoading.hide();
+                        mTestResult.setVisibility(View.VISIBLE);
+                        mTestResult.setText(getContext().getResources().getString(R.string.generic_test_credentials_succes));
+                        mTestResult.setTextColor(getContext().getResources().getColor(R.color.green));
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        mTestLoading.hide();
+                        mTestResult.setVisibility(View.VISIBLE);
+                        mTestResult.setText(getContext().getResources().getString(R.string.generic_test_credentials_failed));
+                        mTestResult.setTextColor(getContext().getResources().getColor(R.color.red));
+                    }
+                });
+            }
+        });
     }
 
     @Override

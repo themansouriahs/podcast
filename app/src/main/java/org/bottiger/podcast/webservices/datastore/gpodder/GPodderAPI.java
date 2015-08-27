@@ -39,6 +39,10 @@ public class GPodderAPI {
     private boolean mAuthenticated = false;
 
     public GPodderAPI(@NonNull String argUsername, @NonNull String argPassword) {
+        this(argUsername, argPassword, null);
+    }
+
+    public GPodderAPI(@NonNull String argUsername, @NonNull String argPassword, @Nullable Callback argCallback) {
 
         mUsername = argUsername;
 
@@ -60,7 +64,7 @@ public class GPodderAPI {
                 .build()
                 .create(IGPodderAPI.class);
 
-        authenticate(api, null);
+        authenticate(api, argCallback);
     }
 
     public void uploadSubscriptions(final LongSparseArray<ISubscription> argSubscriptions) {
@@ -241,11 +245,11 @@ public class GPodderAPI {
             switch (response.getStatus()) {
                 case 401: {
                     // 401 Unauthorized
-                    return;
+                    break;
                 }
                 case 400: {
                     // If the client provides a cookie, but for a different username than the one given
-                    return;
+                    break;
                 }
             }
 

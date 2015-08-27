@@ -147,6 +147,9 @@
     <string name="pref_gpodder_support_title">GPodder</string>
     <string name="gpodder_username">username</string>
     <string name="gpodder_password">password</string>
+    <string name="generic_test_credentials">Test credentials</string>
+    <string name="generic_test_credentials_succes">Test succeeded</string>
+    <string name="generic_test_credentials_failed">Test failed</string>
 
     <plurals name="player_sleep">
         <item quantity="one">Player will sleep in %d minute</item>
