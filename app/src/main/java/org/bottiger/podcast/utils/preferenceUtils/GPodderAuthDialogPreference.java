@@ -115,22 +115,26 @@ public class GPodderAuthDialogPreference extends DialogPreference {
             String username = mUsernameView.getText().toString();
             String password = mPasswordView.getText().toString();
 
-            if (!validateCredentials(username, password))
-                return;
-
             SharedPreferences.Editor editor = getEditor();
-            editor.putString(mUsernameKey, username);
-            editor.putString(mPasswordKey, password);
-            editor.putBoolean(mCloudSupportKey, true);
-            editor.putBoolean(mGPodderSupportKey, true);
+
+            boolean validates = validateCredentials(username, password);
+            editor.putBoolean(mGPodderSupportKey, validates);
+            if (validates) {
+                editor.putString(mUsernameKey, username);
+                editor.putString(mPasswordKey, password);
+                editor.putBoolean(mCloudSupportKey, true);
+            }
+
             editor.commit();
-        } else {
+        }
+        /*else {
             String username = mUsernameView.getText().toString();
             String password = mPasswordView.getText().toString();
 
             GPodderAPI api = new GPodderAPI(username, password);
             //api.uploadSubscriptions(SubscriptionLoader.asList(getContext().getContentResolver()));
         }
+        */
     }
 
     private boolean validateCredentials(@Nullable String argUsername, @Nullable String argPassword) {

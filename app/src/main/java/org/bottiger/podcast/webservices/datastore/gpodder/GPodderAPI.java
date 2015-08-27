@@ -9,6 +9,8 @@ import android.util.SparseArray;
 import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.utils.OPMLImportExport;
+import org.bottiger.podcast.webservices.datastore.CallbackWrapper;
+import org.bottiger.podcast.webservices.datastore.IWebservice;
 import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.GSubscription;
 import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.SubscriptionChanges;
 import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.UpdatedUrls;
@@ -29,7 +31,7 @@ import retrofit.client.Response;
 /**
  * Created by Arvid on 8/23/2015.
  */
-public class GPodderAPI {
+public class GPodderAPI implements IWebservice {
 
     private static final String TAG = "GPodderAPI";
 
@@ -64,20 +66,24 @@ public class GPodderAPI {
                 .build()
                 .create(IGPodderAPI.class);
 
-        authenticate(api, argCallback);
+        authenticate(null, argCallback);
     }
 
     public void uploadSubscriptions(final LongSparseArray<ISubscription> argSubscriptions) {
+        uploadSubscriptions(argSubscriptions, null);
+    }
+
+    public void uploadSubscriptions(final LongSparseArray<ISubscription> argSubscriptions, @Nullable final ICallback argCallback) {
 
         if (mAuthenticated) {
-            uploadSubscriptionsInternal(argSubscriptions);
+            uploadSubscriptionsInternal(argSubscriptions, argCallback);
             return;
         }
 
-        authenticate(api, new Callback() {
+        authenticate(argCallback, new Callback() {
             @Override
             public void success(Object o, Response response) {
-                uploadSubscriptionsInternal(argSubscriptions);
+                uploadSubscriptionsInternal(argSubscriptions, argCallback);
             }
 
             @Override
@@ -87,7 +93,7 @@ public class GPodderAPI {
         });
     }
 
-    private void uploadSubscriptionsInternal(final LongSparseArray<ISubscription> argSubscriptions) {
+    private void uploadSubscriptionsInternal(final LongSparseArray<ISubscription> argSubscriptions, @Nullable ICallback argCalback) {
 
         //String test = "feeds.twit.tv/brickhouse.xml\nleoville.tv/podcasts/twit.xml";
         //String opml = OPMLImportExport.toOPML(argSubscriptions);
@@ -102,7 +108,7 @@ public class GPodderAPI {
             subscriptionList.add(feed.getURLString());
         }
 
-        api.uploadDeviceSubscriptions(subscriptionList, mUsername, GPodderUtils.getDeviceID(), new Callback<String>() {
+        CallbackWrapper<String> callback = new CallbackWrapper(argCalback, new Callback<String>() {
             @Override
             public void success(String s, Response response) {
                 Log.d(TAG, response.toString());
@@ -113,6 +119,8 @@ public class GPodderAPI {
                 Log.d(TAG, error.toString());
             }
         });
+
+        api.uploadDeviceSubscriptions(subscriptionList, mUsername, GPodderUtils.getDeviceID(), callback);
     }
 
     public void getDeviceSubscriptions() {
@@ -208,18 +216,22 @@ public class GPodderAPI {
         });
     }
 
-    private void authenticate(@NonNull final IGPodderAPI apiService, @Nullable Callback argCallback) {
+    public void authenticate(@Nullable ICallback argICallback) {
+        authenticate(argICallback, null);
+    }
+
+    private void authenticate(@Nullable ICallback argICallback, @Nullable Callback argCallback) {
 
         // Fetch data from: http://gpodder.net/clientconfig.json
 
-        AuthenticationCallback callback = new AuthenticationCallback(argCallback);
-        apiService.login(mUsername, callback);
+        AuthenticationCallback callback = new AuthenticationCallback(argICallback, argCallback);
+        api.login(mUsername, callback);
     }
 
     private class AuthenticationCallback extends CallbackWrapper {
 
-        public AuthenticationCallback(Callback argCallback) {
-            super(argCallback);
+        public AuthenticationCallback(@Nullable ICallback argICallback, @Nullable Callback argCallback) {
+            super(argICallback, argCallback);
         }
 
         @Override
@@ -257,30 +269,5 @@ public class GPodderAPI {
             super.failure(error);
         }
 
-    }
-
-    private class CallbackWrapper implements Callback {
-
-        private Callback mCallback;
-
-        public CallbackWrapper(@Nullable Callback argCallback) {
-            mCallback = argCallback;
-        }
-
-        @Override
-        public void success(Object o, Response response) {
-            if (mCallback == null)
-                return;
-
-            mCallback.success(o, response);
-        }
-
-        @Override
-        public void failure(RetrofitError error) {
-            if (mCallback == null)
-                return;
-
-            mCallback.failure(error);
-        }
     }
 }
