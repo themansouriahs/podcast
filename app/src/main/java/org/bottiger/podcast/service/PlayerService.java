@@ -6,13 +6,15 @@ import org.bottiger.podcast.Player.PlayerHandler;
 import org.bottiger.podcast.Player.PlayerPhoneListener;
 import org.bottiger.podcast.Player.PlayerStateManager;
 import org.bottiger.podcast.Player.SoundWavesPlayer;
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.MediaCast.IMediaCast;
+import org.bottiger.podcast.listeners.PlayerStatusData;
+import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
-import org.bottiger.podcast.utils.PodcastLog;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -36,6 +38,8 @@ import android.support.annotation.NonNull;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+
+import com.squareup.otto.Subscribe;
 
 import javax.annotation.Nullable;
 
@@ -65,9 +69,7 @@ public class PlayerService extends Service implements
 
 	private static NextTrack nextTrack = NextTrack.NEXT_IN_PLAYLIST;
 	
-	private static Playlist sPlaylist = new Playlist();
-
-	private final PodcastLog log = PodcastLog.getLog(getClass());
+	private Playlist mPlaylist;
 
 	private SoundWavesPlayer mPlayer = null;
     private MediaController mController;
@@ -106,20 +108,34 @@ public class PlayerService extends Service implements
         mPlayerHandler.sendEmptyMessageDelayed(PlayerHandler.FADEIN, 10);
 	}
 
+	public void FaceOutAndStop(int argDelayMs) {
+		mPlayerHandler.sendEmptyMessageDelayed(PlayerHandler.FADEOUT, argDelayMs);
+	}
+
     public SoundWavesPlayer getPlayer() {
         return mPlayer;
     }
+	private static PlayerService sInstance = null;
+
+	@Nullable
+	public static PlayerService getInstance() {
+		return sInstance;
+	}
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
         Log.d(TAG, "PlayerService started");
 
+		sInstance = this;
+
         wifiLock = ((WifiManager) getSystemService(Context.WIFI_SERVICE))
                 .createWifiLock(WifiManager.WIFI_MODE_FULL, LOCK_NAME);
 
-        sPlaylist.setContext(this);
-		sPlaylist.populatePlaylistIfEmpty();
+        mPlaylist = new Playlist(this);
+		mPlaylist.populatePlaylistIfEmpty();
+		SoundWaves.getBus().register(mPlaylist);
+		SoundWaves.getBus().register(this);
 
         mPlayerHandler = new PlayerHandler(this);
 		
@@ -128,15 +144,14 @@ public class PlayerService extends Service implements
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             mMediaSessionManager = (MediaSessionManager) getSystemService(MEDIA_SESSION_SERVICE);
-            mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         }
+		mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
 		TelephonyManager tmgr = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
 		tmgr.listen(mPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
 
 		this.mControllerComponentName = new ComponentName(this,
 				HeadsetReceiver.class);
-		log.debug("onCreate(): " + mControllerComponentName);
 		this.mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
 
@@ -224,18 +239,18 @@ public class PlayerService extends Service implements
 
 	@Override
 	public void onDestroy() {
+		sInstance = null;
+		SoundWaves.getBus().unregister(mPlaylist);
+		SoundWaves.getBus().unregister(this);
         super.onDestroy();
 		if (mPlayer != null) {
 			mPlayer.release();
 		}
-
-		log.debug("onDestroy()");
 	}
 
 	@Override
 	public void onLowMemory() {
 		super.onLowMemory();
-		log.debug("onLowMemory()");
 	}
 
 	@Override
@@ -247,6 +262,12 @@ public class PlayerService extends Service implements
 	 * Hide the notification
 	 */
     public void dis_notifyStatus() {
+
+        if (mNotificationManager == null)
+            mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        mNotificationManager.cancel(NotificationPlayer.NOTIFICATION_PLAYER_ID);
+
 		// //mNotificationManager.cancel(R.layout.playing_episode);
 		// setForeground(false);
 		if (mNotificationPlayer != null)
@@ -261,13 +282,13 @@ public class PlayerService extends Service implements
 		if (mNotificationPlayer == null)
 			mNotificationPlayer = new NotificationPlayer(this, mItem);
 
-        mNotificationPlayer.setmPlayerService(this);
+        mNotificationPlayer.setPlayerService(this);
 		return mNotificationPlayer.show();
     }
 
 	public void playNext() {
         IEpisode item = getCurrentItem();
-        IEpisode nextItem = sPlaylist.getNext();
+        IEpisode nextItem = mPlaylist.getNext();
 
 		if (item != null && item instanceof FeedItem) {
             ((FeedItem)item).trackEnded(getContentResolver());
@@ -279,9 +300,19 @@ public class PlayerService extends Service implements
         }
 
 		play(nextItem.getUrl().toString());
-        mMetaDataControllerWrapper.updateState(nextItem, true);
-        sPlaylist.removeItem(0);
-        sPlaylist.notifyPlaylistChanged();
+        mMetaDataControllerWrapper.updateState(nextItem, true, true);
+        mPlaylist.removeItem(0);
+        mPlaylist.notifyPlaylistChanged();
+	}
+
+	public void play() {
+		if (mPlayer == null)
+			return;
+
+		if (mPlayer.isPlaying())
+			return;
+
+		mPlayer.start();
 	}
 
 	public void play(String argEpisodeURL) {
@@ -292,7 +323,7 @@ public class PlayerService extends Service implements
 
 		if (mItem != null) {
 			if ((mItem.getUrl().toString() == argEpisodeURL) && mPlayer.isInitialized()) {
-				if (mPlayer.isPlaying() == false) {
+				if (!mPlayer.isPlaying()) {
 					start();
 				}
 				return;
@@ -320,8 +351,10 @@ public class PlayerService extends Service implements
 					oldFeedItem.markAsListened();
 					oldFeedItem.update(getContentResolver());
 
-					int pos = sPlaylist.getPosition(oldItem);
-					sPlaylist.removeItem(pos);
+					int pos = mPlaylist.getPosition(oldItem);
+					if (pos > 0) {
+						mPlaylist.removeItem(pos);
+					}
 				}
 			}
 		}
@@ -337,26 +370,26 @@ public class PlayerService extends Service implements
 
 		int offset = mItem.getOffset() < 0 ? 0 : (int) mItem.getOffset();
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()    );
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
 
         if (offset == 0 && prefs.getBoolean("pref_stream_proxy", false))
             dataSource = HTTPDService.proxyURL(mItem.getUrl().toString());
 
+
+		notifyStatus();
+
+        mPlaylist.setAsFrist(mItem);
 		mPlayer.setDataSourceAsync(dataSource, offset);
 
         IEpisode item = getCurrentItem();
         if (item != null) {
-            mMetaDataControllerWrapper.updateState(item, false);
+            mMetaDataControllerWrapper.updateState(item, true, true);
         }
 
         if (isFeedItem) {
-            new Thread(new Runnable() {
-                public void run() {
-                    if (feedItem.priority != 1)
-                        feedItem.setPriority(null, getApplication());
-                    feedItem.update(getContentResolver());
-                }
-            }).start();
+            if (feedItem.priority != 1)
+                feedItem.setPriority(null, getApplication());
+            feedItem.update(getContentResolver());
         }
 	    
 	}
@@ -388,7 +421,9 @@ public class PlayerService extends Service implements
 	public void start() {
 		if (!mPlayer.isPlaying()) {
             takeWakelock(mPlayer.isSteaming());
+			mPlaylist.setAsFrist(mItem);
 			mPlayer.start();
+			mMetaDataControllerWrapper.updateState(mItem, true, false);
 		}
 	}
 
@@ -401,14 +436,11 @@ public class PlayerService extends Service implements
             if (mItem instanceof FeedItem) {
                 ((FeedItem)mItem).setOffset(getContentResolver(), mPlayer.position());
             }
-		} else {
-			log.error("playing but no item!!!");
-
 		}
 		dis_notifyStatus();
 
 		mPlayer.pause();
-        mMetaDataControllerWrapper.updateState(mItem, false);
+        mMetaDataControllerWrapper.updateState(mItem, false, false);
         releaseWakelock();
 	}
 
@@ -420,8 +452,9 @@ public class PlayerService extends Service implements
 	}
 
 	public void halt() {
+        stopForeground(true);
+        dis_notifyStatus();
 		mPlayer.stop();
-		stopForeground(true);
 	}
 
 	public boolean isInitialized() {
@@ -442,6 +475,17 @@ public class PlayerService extends Service implements
 
 	}
 
+	@Subscribe
+	public void onPlayerStateChange(PlayerStatusData argPlayerStatus) {
+		if (argPlayerStatus == null)
+			return;
+        if (argPlayerStatus.status == PlayerStatusObservable.STATUS.STOPPED) {
+            dis_notifyStatus();
+        } else {
+            notifyStatus();
+        }
+	}
+
 	public long position() {
 		return mPlayer.position();
 	}
@@ -459,7 +503,7 @@ public class PlayerService extends Service implements
 	 */
     @Nullable
 	public IEpisode getNextId() {
-		IEpisode next = sPlaylist.nextEpisode();
+		IEpisode next = mPlaylist.nextEpisode();
 		if (next != null)
 			return next;
 		return null;
@@ -523,16 +567,8 @@ public class PlayerService extends Service implements
 		}
 	}
 
-    public static synchronized Playlist getPlaylist() {
-        return getPlaylist(null);
-    }
-
-    public static synchronized Playlist getPlaylist(@Nullable Playlist.PlaylistChangeListener argListener) {
-        if (argListener != null) {
-            sPlaylist.registerPlaylistChangeListener(argListener);
-        }
-
-        return sPlaylist;
+    public Playlist getPlaylist() {
+        return mPlaylist;
     }
 
 }

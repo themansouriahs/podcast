@@ -23,6 +23,7 @@ public interface IEpisode {
     ISubscription getSubscription(@NonNull Context argContext);
     long getOffset();
     Date getDateTime();
+    long getFilesize();
 
     void setTitle(@NonNull String argTitle);
     void setUrl(@NonNull URL argUrl);
@@ -43,6 +44,7 @@ public interface IEpisode {
     void setPriority(IEpisode argPrecedingItem, @NonNull Context argContext);
 
     boolean isDownloaded();
+    boolean isMarkedAsListened();
 
     void update(ContentResolver contentResolver);
 

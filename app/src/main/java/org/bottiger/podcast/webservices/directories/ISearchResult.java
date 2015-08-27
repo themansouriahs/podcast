@@ -11,5 +11,8 @@ import org.bottiger.podcast.provider.Subscription;
 public interface ISearchResult {
 
     @NonNull
+    public String getSearchQuery();
+
+    @NonNull
     public Iterable<ISubscription> getResults();
 }

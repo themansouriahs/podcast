@@ -4,11 +4,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import org.bottiger.podcast.MainActivity;
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.PodcastProvider;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
 import org.bottiger.podcast.views.PlayerButtonView;
 
 import android.content.ContentResolver;
@@ -56,17 +59,10 @@ public class FeedUpdater {
                     item.image = subscription.getImageURL();
                 }
 
-                try {
-                    playlist = Playlist.getActivePlaylist();
-                    //playlist.notifyAbout(item);
-                } catch (IllegalStateException ise) {
-                    // its okay. We are running in a background job.
-                }
-
 				//item.update(contentResolver);
                 if (item.url != null && !duplicateTest.containsKey(item.url)) {
                     cvs.add(item.getContentValues(false));
-                    duplicateTest.put(item.url,counter);
+                    duplicateTest.put(item.url, counter);
                 }
 			}
 		}
@@ -74,7 +70,12 @@ public class FeedUpdater {
         ContentValues[] contentValuesArray = cvs.toArray(new ContentValues[cvs.size()]);
 
         try {
-            contentResolver.bulkInsert(ItemColumns.URI, contentValuesArray);
+            int rowsInserted = contentResolver.bulkInsert(ItemColumns.URI, contentValuesArray);
+			if (rowsInserted > 0) {
+				subscription.setLastItemUpdated(System.currentTimeMillis());
+				subscription.update(contentResolver);
+			}
+
             if (playlist != null) {
                 playlist.notifyDatabaseChanged();
             }

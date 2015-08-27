@@ -1,7 +1,11 @@
 package org.bottiger.podcast.views;
 
+import android.app.Activity;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -20,7 +24,9 @@ import org.bottiger.podcast.provider.IEpisode;
  */
 // Provide a reference to the type of views that you are using
 // (custom viewholder)
-public class PlaylistViewHolder extends RecyclerView.ViewHolder implements ExpandableViewHoldersUtil.Expandable, View.OnClickListener { //
+public class PlaylistViewHolder extends RecyclerView.ViewHolder implements ExpandableViewHoldersUtil.Expandable,
+                                                                            View.OnClickListener,
+                                                                            View.OnCreateContextMenuListener { //
 
     public IEpisode episode = null;
     public PlaylistAdapter mAdapter = null;
@@ -60,10 +66,15 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
     public PlayerButtonView removeButton;
     public DownloadButtonView downloadButton;
 
+    private Activity mActivity;
+    public String mArtwork;
+
     // ImageView iv, TextView tv1, TextView tv2, TextView tv3, TextView tv4, TextView tv5, TextView tv6, ViewStub vs, View pv
-    public PlaylistViewHolder(View view) {
+    public PlaylistViewHolder(View view, Activity argActivity) {
         super(view);
         //view.setOnClickListener(this);
+
+        mActivity = argActivity;
 
         mLayout = (CardView) view.findViewById(R.id.item);
         mMainContainer = (RelativeLayout) view.findViewById(R.id.main_player_container);
@@ -95,6 +106,8 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
         buttonLayout = (LinearLayout) view.findViewById(R.id.expanded_buttons_layout);
         mExpandedLayoutBottom = (ScrollView) view.findViewById(R.id.expanded_layout_bottom);
         description = (TextView) view.findViewById(R.id.podcast_description);
+
+        //view.setOnCreateContextMenuListener(this);
     }
 
     @Override
@@ -105,5 +118,24 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
     @Override
     public void onClick(View v) {
         return;
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        //super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = mActivity.getMenuInflater();
+        //inflater.inflate(R.menu.playlist_context_menu, menu);
+    }
+
+    public void setArtwork(@Nullable String argArtwork) {
+        mArtwork = argArtwork;
+    }
+
+    public String getArtwork() {
+        return mArtwork;
+    }
+
+    public Activity getActivity() {
+        return mActivity;
     }
 }

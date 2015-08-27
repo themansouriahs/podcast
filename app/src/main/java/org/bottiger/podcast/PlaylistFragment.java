@@ -11,10 +11,8 @@ import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
-import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.StrUtils;
-import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.views.DownloadButtonView;
 import org.bottiger.podcast.views.PlayPauseImageView;
 import org.bottiger.podcast.views.PlayerButtonView;
@@ -24,6 +22,7 @@ import org.bottiger.podcast.views.TextViewObserver;
 import org.bottiger.podcast.views.TopPlayer;
 import org.bottiger.podcast.views.MultiShrink.playlist.MultiShrinkScroller;
 import org.bottiger.podcast.views.dialogs.DialogBulkDownload;
+import org.bottiger.podcast.views.dialogs.DialogPlaylistFilters;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -35,6 +34,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
@@ -43,22 +43,24 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.TextView;
 
 import com.cocosw.undobar.UndoBarController;
 import com.cocosw.undobar.UndoBarStyle;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.squareup.otto.Produce;
+import com.squareup.otto.Subscribe;
 
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 
 public class PlaylistFragment extends GeastureFragment implements
-		OnSharedPreferenceChangeListener, Playlist.PlaylistChangeListener, IDownloadCompleteCallback
+		OnSharedPreferenceChangeListener, IDownloadCompleteCallback
          {
 
 	public final static int SUBSCRIPTION_CONTEXT_MENU = 1;
@@ -100,16 +102,31 @@ public class PlaylistFragment extends GeastureFragment implements
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        mDownloadProgressObservable = new DownloadProgressObservable(mActivity);
-        mPlaylist = PlayerService.getPlaylist(this);
-
+        mDownloadProgressObservable = new DownloadProgressObservable((SoundWaves)mActivity.getApplicationContext());
         super.onCreate(savedInstanceState);
+        //SoundWaves.getBus().register(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        //SoundWaves.getBus().unregister(this);
+        super.onDestroy();
     }
 
     @Override
     public void onDestroyView() {
         EpisodeDownloadManager.resetDownloadProgressObservable();
+        SoundWaves.getBus().unregister(mAdapter);
+        SoundWaves.getBus().unregister(mPlayPauseButton);
+        SoundWaves.getBus().unregister(mPlayerSeekbar);
+        SoundWaves.getBus().unregister(mCurrentTime);
         super.onDestroyView();
+    }
+
+    @Produce
+    public Playlist producePlaylist() {
+        // Assuming 'lastAnswer' exists.
+        return new Playlist(mActivity);
     }
 
 	// Read here:
@@ -118,7 +135,7 @@ public class PlaylistFragment extends GeastureFragment implements
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
-        mDownloadProgressObservable = EpisodeDownloadManager.getDownloadProgressObservable(mActivity);
+        mDownloadProgressObservable = EpisodeDownloadManager.getDownloadProgressObservable((SoundWaves)mActivity.getApplicationContext());
 
 		TopActivity.getPreferences().registerOnSharedPreferenceChangeListener(
                 spChanged);
@@ -169,7 +186,7 @@ public class PlaylistFragment extends GeastureFragment implements
         mPlayPauseButton         =    (PlayPauseImageView) mSwipeRefreshView.findViewById(R.id.play_pause_button);
         mPlayerSeekbar          =    (PlayerSeekbar) mSwipeRefreshView.findViewById(R.id.player_progress);
         mPlayerDownloadButton   =    (DownloadButtonView) mSwipeRefreshView.findViewById(R.id.download);
-        mBackButton = (PlayerButtonView)mSwipeRefreshView.findViewById(R.id.previous);
+        mBackButton = (PlayerButtonView)mSwipeRefreshView.findViewById(R.id.rewind_button);
         mForwardButton = (PlayerButtonView)mSwipeRefreshView.findViewById(R.id.fast_forward_button);
         mDownloadButton = (PlayerButtonView)mSwipeRefreshView.findViewById(R.id.download);
         mFavoriteButton = (PlayerButtonView)mSwipeRefreshView.findViewById(R.id.favorite);
@@ -213,28 +230,21 @@ public class PlaylistFragment extends GeastureFragment implements
         mLayoutManager = new LinearLayoutManager(mActivity);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        //mRecyclerView.setOnScrollListener(this);
-
-        mTopPlayer.setRecyclerView(mRecyclerView);
-
         // specify an adapter (see also next example)
         mAdapter = new PlaylistAdapter(mActivity, mOverlay, mDownloadProgressObservable);
         mAdapter.setHasStableIds(true);
+
+        SoundWaves.getBus().register(mAdapter);
+        SoundWaves.getBus().register(mPlayPauseButton);
+        SoundWaves.getBus().register(mPlayerSeekbar);
+        SoundWaves.getBus().register(mCurrentTime);
 
         mRecyclerView.setAdapter(mAdapter);
 
         //RecentItemsRecyclerListener l = new RecentItemsRecyclerListener(mAdapter);
         //mRecyclerView.setRecyclerListener(l);
 
-        // The bug where the player doesn't show up happens because the playlist is empty.
-        // The playlist is empty if the context is null
-        // The context is set by the PlayerService
-        // I need to make sure that playerservice has been started at this point,
-        // or more realisticly that the header is fixed when the context is ready
-        mPlaylist.setContext(getActivity());
-        mPlaylist.populatePlaylistIfEmpty();
-
-        if (!mPlaylist.isEmpty()) {
+        if (mPlaylist != null && !mPlaylist.isEmpty()) {
             IEpisode episode = mPlaylist.first();
             bindHeader(episode);
         }
@@ -344,20 +354,39 @@ public class PlaylistFragment extends GeastureFragment implements
         //mRecyclerView.setItemAnimator(new SlideInLeftAnimator());
     }
 
+             @Override
+             public void onAttach(Activity activity) {
+                 mActivity = activity;
+                 super.onAttach(activity);
+             }
+
     @Override
-    public void onAttach(Activity activity) {
-        mActivity = activity;
-        super.onAttach(activity);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = super.onCreateView(inflater, container, savedInstanceState);
+        return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        //SoundWaves.getBus().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        //SoundWaves.getBus().unregister(this);
+        super.onStop();
     }
 
     @Override
     public void onPause() {
-        mPlaylist.unregisterPlaylistChangeListener(this);
         super.onPause();
+        SoundWaves.getBus().unregister(this);
     }
 
     @Override
     public void onResume() {
+        SoundWaves.getBus().register(this);
         if (mPlaylist != null) {
             IEpisode item = mPlaylist.getItem(0);
 
@@ -368,15 +397,17 @@ public class PlaylistFragment extends GeastureFragment implements
                 mDownloadButton.setEpisode(item);
                 mFavoriteButton.setEpisode(item);
             }
+            playlistChanged(mPlaylist);
         }
-
-        mPlaylist.registerPlaylistChangeListener(this);
-        notifyPlaylistChanged();
         super.onResume();
     }
 
 
     public void bindHeader(final IEpisode item) {
+
+        if (mEpisodeTitle == null)
+            return;
+
         mEpisodeTitle.setText(item.getTitle());
         mEpisodeInfo.setText(item.getDescription());
 
@@ -406,21 +437,21 @@ public class PlaylistFragment extends GeastureFragment implements
         mDownloadButton.setEpisode(item);
         mFavoriteButton.setEpisode(item);
 
-        if (MainActivity.sBoundPlayerService != null &&
-                MainActivity.sBoundPlayerService.getCurrentItem() != null &&
-                MainActivity.sBoundPlayerService.getCurrentItem().equals(item) &&
-                MainActivity.sBoundPlayerService.isPlaying()) {
+        if (SoundWaves.sBoundPlayerService != null &&
+                SoundWaves.sBoundPlayerService.getCurrentItem() != null &&
+                SoundWaves.sBoundPlayerService.getCurrentItem().equals(item) &&
+                SoundWaves.sBoundPlayerService.isPlaying()) {
             mPlayPauseButton.setStatus(PlayerStatusObservable.STATUS.PLAYING);
         } else {
             mPlayPauseButton.setStatus(PlayerStatusObservable.STATUS.PAUSED);
         }
-        mDownloadProgressObservable.registerObserver(mDownloadButton);
+        //mDownloadProgressObservable.registerObserver(mDownloadButton);
 
         mBackButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (MainActivity.sBoundPlayerService != null) {
-                    MainActivity.sBoundPlayerService.getPlayer().rewind(item);
+                if (SoundWaves.sBoundPlayerService != null) {
+                    SoundWaves.sBoundPlayerService.getPlayer().rewind(item);
                 }
             }
         });
@@ -428,8 +459,8 @@ public class PlaylistFragment extends GeastureFragment implements
         mForwardButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (MainActivity.sBoundPlayerService != null) {
-                    MainActivity.sBoundPlayerService.getPlayer().fastForward(item);
+                if (SoundWaves.sBoundPlayerService != null) {
+                    SoundWaves.sBoundPlayerService.getPlayer().fastForward(item);
                 }
             }
         });
@@ -439,7 +470,7 @@ public class PlaylistFragment extends GeastureFragment implements
 
         mPlayerDownloadButton.setEpisode(item);
 
-        mDownloadProgressObservable.registerObserver(mPlayerDownloadButton);
+        //mDownloadProgressObservable.registerObserver(mPlayerDownloadButton);
 
         final Activity activity = getActivity();
 
@@ -474,11 +505,8 @@ public class PlaylistFragment extends GeastureFragment implements
             });
         }
 
-        PlayerStatusObservable.registerListener(mPlayerSeekbar);
-
-
-
         if (item != null && item.getArtwork(activity) != null) {
+            Log.d("MissingImage", "Setting image");
             Uri uri = Uri.parse(item.getArtwork(activity));
             mPhoto.setImageURI(uri);
         }
@@ -488,11 +516,11 @@ public class PlaylistFragment extends GeastureFragment implements
         }
     }
 
-    private void setPlaylistViewState(@NonNull Playlist argPlaylist) {
+    private void setPlaylistViewState(@Nullable Playlist argPlaylist) {
 
         boolean dismissedWelcomePage = sharedPreferences.getBoolean(PLAYLIST_WELCOME_DISMISSED, PLAYLIST_WELCOME_DISMISSED_DEFAULT);
 
-        if (argPlaylist.isEmpty()) {
+        if (argPlaylist == null || argPlaylist.isEmpty()) {
             mPlaylistContainer.setVisibility(View.GONE);
 
             if (dismissedWelcomePage) {
@@ -507,6 +535,9 @@ public class PlaylistFragment extends GeastureFragment implements
                 sharedPreferences.edit().putBoolean(PLAYLIST_WELCOME_DISMISSED, true).commit();
             }
 
+            if (mPlaylistContainer == null)
+                return;
+
             mPlaylistContainer.setVisibility(View.VISIBLE);
             mPlaylistWelcomeContainer.setVisibility(View.GONE);
             mPlaylistEmptyContainer.setVisibility(View.GONE);
@@ -518,6 +549,18 @@ public class PlaylistFragment extends GeastureFragment implements
 		super.onSaveInstanceState(outState);
         outState.putLong(mExpandedEpisodeKey, mExpandedEpisodeId);
 	}
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.menu_playlist_context_play_next:
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
 
 
      @Override
@@ -543,6 +586,11 @@ public class PlaylistFragment extends GeastureFragment implements
                  dialog.show();
                  return true;
              }
+             case R.id.action_filter_playlist: {
+                 DialogPlaylistFilters dialogPlaylistFilters = DialogPlaylistFilters.newInstance();
+                 dialogPlaylistFilters.show(getFragmentManager(), getTag());
+                 return true;
+             }
          }
          return super.onOptionsItemSelected(item);
      }
@@ -555,38 +603,18 @@ public class PlaylistFragment extends GeastureFragment implements
 		}
 	}
 
-    @Override
-    public void notifyPlaylistChanged() {
-        mActivity.runOnUiThread(new Runnable() {
+    @Subscribe
+    public void playlistChanged(@NonNull Playlist argPlaylist) {
+        mPlaylist = argPlaylist;
 
-            @Override
-            public void run() {
-                mPlaylist.populatePlaylistIfEmpty();
+        if (mPlaylistContainer == null)
+            return;
 
-                setPlaylistViewState(mPlaylist);
+        setPlaylistViewState(mPlaylist);
 
-                if (!mPlaylist.isEmpty()) {
-                    IEpisode episode = mPlaylist.first();
-                    bindHeader(episode);
-                }
-
-            }
-        });
-    }
-
-    @Override
-    public void notifyPlaylistRangeChanged(int from, int to) {
         if (!mPlaylist.isEmpty()) {
-
-            mActivity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    IEpisode episode = mPlaylist.first();
-                    bindHeader(episode);
-
-                    setPlaylistViewState(mPlaylist);
-                }
-            });
+            IEpisode episode = mPlaylist.first();
+            bindHeader(episode);
         }
     }
-         }
+}

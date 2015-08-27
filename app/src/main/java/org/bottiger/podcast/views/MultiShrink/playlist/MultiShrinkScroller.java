@@ -7,6 +7,7 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -15,6 +16,7 @@ import android.graphics.ColorMatrix;
 import android.graphics.Rect;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
@@ -60,7 +62,7 @@ import org.bottiger.podcast.views.TopPlayer;
  * order to track velocity, modify EdgeEffect color & perform specific animations such as the ones
  * inside snapToBottom(). As a result this ViewGroup has non-standard talkback and keyboard support.
  */
-public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
+public class MultiShrinkScroller extends AbstractMultiShrinkScroller implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG = "MultiShrinkScroller (p)";
     /**
@@ -137,6 +139,10 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
     private final float mTopViewContainerElevation;
     private final boolean mIsTwoPanel;
     private final int mActionBarSize;
+
+    private boolean mTopPlayerFullscreen = false;
+    private String mDoFullscreentKey;
+    private SharedPreferences prefs;
 
     // Objects used to perform color filtering on the header. These are stored as fields for
     // the sole purpose of avoiding "new" operations inside animation loops.
@@ -253,6 +259,32 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
         // same, since the landscape and portrait ActionBar sizes can be different.
         mMinimumPortraitHeaderHeight = mMinimumHeaderHeight;
         attributeArray.recycle();
+
+        prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+        mDoFullscreentKey = context.getResources().getString(R.string.pref_top_player_fullscreen_key);
+        mTopPlayerFullscreen = prefs.getBoolean(mDoFullscreentKey, mTopPlayerFullscreen);
+
+        prefs.registerOnSharedPreferenceChangeListener(this);
+    }
+
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,String key)
+    {
+        if (key != mDoFullscreentKey)
+            return;
+
+        mTopPlayerFullscreen = prefs.getBoolean(mDoFullscreentKey, mTopPlayerFullscreen);
+    }
+
+    @Override
+    protected void onAttachedToWindow () {
+        prefs.registerOnSharedPreferenceChangeListener(this);
+        super.onAttachedToWindow();
+    }
+
+    @Override
+    protected void onDetachedFromWindow () {
+        super.onDetachedFromWindow();
+        prefs.unregisterOnSharedPreferenceChangeListener(this);
     }
 
     private int getTrackedYScroll() {
@@ -378,6 +410,9 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         final int action = event.getAction();
+
+        if (mTopPlayerFullscreen)
+            return false;
 
         if (mVelocityTracker == null) {
             mVelocityTracker = VelocityTracker.obtain();

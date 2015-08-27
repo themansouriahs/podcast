@@ -93,6 +93,12 @@ public class SlimEpisode implements IEpisode, Parcelable {
     }
 
     @Override
+    public long getFilesize() { return 0; }
+
+    @Override
+    public boolean isMarkedAsListened() { return false; }
+
+    @Override
     public void setTitle(@NonNull String argTitle) {
         mTitle = argTitle;
     }

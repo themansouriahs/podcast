@@ -22,5 +22,6 @@
         android:gravity="start|center_vertical"
         android:textSize="14sp"
         android:textAppearance="?android:attr/textAppearanceMedium"
+        style="@style/SoundWavesTextViewStyle"
         android:textColor="@color/drawer_text"/>
 </LinearLayout>

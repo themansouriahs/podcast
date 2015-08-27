@@ -1,13 +1,16 @@
 package org.bottiger.podcast.service.Downloader;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Observable;
-import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.io.FileUtils;
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
@@ -17,11 +20,9 @@ import org.bottiger.podcast.provider.QueueEpisode;
 import org.bottiger.podcast.service.DownloadStatus;
 import org.bottiger.podcast.service.Downloader.engines.IDownloadEngine;
 import org.bottiger.podcast.service.Downloader.engines.OkHttpDownloader;
-import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.SDCardManager;
 
 import android.app.DownloadManager;
-import android.app.DownloadManager.Query;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -40,12 +41,14 @@ public class EpisodeDownloadManager extends Observable {
 
     public static final String DEBUG_KEY = "EpisodeDownload";
     private static final boolean DOWNLOAD_WIFI_ONLY = false;
+    private static final boolean DOWNLOAD_AUTOMATICALLY = false;
 
     public static boolean isDownloading = false;
 
     public enum RESULT { OK, NO_STORAGE, OUT_OF_STORAGE, NO_CONNECTION }
     public enum QUEUE_POSITION { FIRST, LAST, ANYWHERE}
     public enum NETWORK_STATE { OK, RESTRICTED, DISCONNECTED }
+	public enum ACTION { REFRESH_SUBSCRIPTION, STREAM_EPISODE, DOWNLOAD_MANUALLY, DOWNLOAD_AUTOMATICALLY }
 
     private static SharedPreferences sSharedPreferences;
 
@@ -59,7 +62,7 @@ public class EpisodeDownloadManager extends Observable {
 
 	private static DownloadManager downloadManager;
 
-    private static IDownloadEngine.Callback mDownloadCompleteCallback = new IDownloadEngine.Callback() {
+    private static IDownloadEngine.Callback sDownloadCompleteCallback = new IDownloadEngine.Callback() {
         @Override
         public void downloadCompleted(IEpisode argEpisode) {
             FeedItem item = (FeedItem) argEpisode;
@@ -70,8 +73,11 @@ public class EpisodeDownloadManager extends Observable {
             intent.setData(Uri.fromFile(new File(item.getAbsolutePath())));
             mContext.sendBroadcast(intent);
 
+            Playlist.refresh(mContext);
+
             removeDownloadingEpisode(argEpisode);
             removeExpiredDownloadedPodcasts(mContext);
+            removeTmpFolderCruft();
 
             startDownload(mContext);
         }
@@ -79,6 +85,7 @@ public class EpisodeDownloadManager extends Observable {
         @Override
         public void downloadInterrupted(IEpisode argEpisode) {
             removeDownloadingEpisode(argEpisode);
+            removeTmpFolderCruft();
             startDownload(mContext);
         }
     };
@@ -138,7 +145,7 @@ public class EpisodeDownloadManager extends Observable {
         }
 
 		// Make sure we have access to external storage
-		if (SDCardManager.getSDCardStatusAndCreate() == false) {
+		if (!SDCardManager.getSDCardStatusAndCreate()) {
 			return RESULT.NO_STORAGE;
 		}
 
@@ -206,12 +213,12 @@ public class EpisodeDownloadManager extends Observable {
 			mDownloadingItem = downloadingItem;
 			*/
             IDownloadEngine downloadEngine = newEngine(downloadingItem);
-            downloadEngine.addCallback(mDownloadCompleteCallback);
+            downloadEngine.addCallback(sDownloadCompleteCallback);
 
             downloadEngine.startDownload();
             mDownloadingEpisodes.put(downloadingItem, downloadEngine);
 
-            getDownloadProgressObservable(mContext).addEpisode(downloadingItem);
+            getDownloadProgressObservable((SoundWaves)mContext.getApplicationContext()).addEpisode(downloadingItem);
         }
 
 
@@ -235,13 +242,13 @@ public class EpisodeDownloadManager extends Observable {
 	 * 
 	 * @param context
 	 */
-	private static void deleteExpireFile(Context context, FeedItem item) {
+	private static void deleteExpireFile(@NonNull Context context, FeedItem item) {
 
 		if (item == null)
 			return;
 
 		ContentResolver contentResolver = context.getContentResolver();
-		item.delFile(contentResolver);
+		item.delFile(context);
 	}
 
 	/**
@@ -250,6 +257,19 @@ public class EpisodeDownloadManager extends Observable {
 	public static void removeExpiredDownloadedPodcasts(Context context) {
 		new removeExpiredDownloadedPodcastsTask(context).execute();
 	}
+
+    public static void removeTmpFolderCruft() {
+        String tmpFolder = SDCardManager.getTmpDir();
+        Log.d(DEBUG_KEY, "Cleaning tmp folder: " + tmpFolder);
+        File dir = new File(tmpFolder);
+        if(dir.exists() && dir.isDirectory()) {
+            try {
+                FileUtils.cleanDirectory(dir);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
 	/**
 	 * Iterates through all the downloaded episodes and deletes the ones who
@@ -340,6 +360,47 @@ public class EpisodeDownloadManager extends Observable {
 
 		}
 	}
+
+    public static boolean canPerform(ACTION argAction, @NonNull Context argContext) {
+        Log.d(DEBUG_KEY, "canPerform: " + argAction);
+
+        if (sSharedPreferences == null) {
+            sSharedPreferences = PreferenceManager
+                    .getDefaultSharedPreferences(argContext);
+        }
+
+        NETWORK_STATE networkState = updateConnectStatus(argContext);
+
+        if (networkState == NETWORK_STATE.DISCONNECTED)
+            return false;
+
+        Resources resources = argContext.getResources();
+
+        String only_wifi_key = resources.getString(R.string.pref_download_only_wifi_key);
+        String automatic_download_key = resources.getString(R.string.pref_download_on_update_key);
+
+        boolean wifiOnly = sSharedPreferences.getBoolean(only_wifi_key, DOWNLOAD_WIFI_ONLY);
+        boolean automaticDownload = sSharedPreferences.getBoolean(automatic_download_key, DOWNLOAD_AUTOMATICALLY);
+
+        if (argAction == ACTION.DOWNLOAD_AUTOMATICALLY) {
+            if (!automaticDownload)
+                return false;
+
+            if (wifiOnly)
+                return networkState == NETWORK_STATE.OK;
+            else
+                return networkState == NETWORK_STATE.OK || networkState == NETWORK_STATE.RESTRICTED;
+        }
+
+        if (    argAction == ACTION.STREAM_EPISODE ||
+                argAction == ACTION.REFRESH_SUBSCRIPTION ||
+                argAction == ACTION.DOWNLOAD_MANUALLY) {
+            return networkState == NETWORK_STATE.OK || networkState == NETWORK_STATE.RESTRICTED;
+        }
+
+        VendorCrashReporter.report(DEBUG_KEY, "canPerform defaults to false. Action: " + argAction);
+        return false; // FIXME this should never happen. Ensure we never get here
+    }
 
 	protected static NETWORK_STATE updateConnectStatus(@NonNull Context argContext) {
 		Log.d(DEBUG_KEY, "updateConnectStatus");
@@ -475,7 +536,7 @@ public class EpisodeDownloadManager extends Observable {
 
     private static DownloadProgressObservable mDownloadProgressObservable;
 
-    public static DownloadProgressObservable getDownloadProgressObservable(Context context) {
+    public static DownloadProgressObservable getDownloadProgressObservable(SoundWaves context) {
         if (mDownloadProgressObservable == null) {
             mDownloadProgressObservable = new DownloadProgressObservable(context);
         }

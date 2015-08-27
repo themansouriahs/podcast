@@ -13,10 +13,21 @@ import java.util.LinkedList;
  */
 public class GenericSearchResult implements ISearchResult {
 
+    private final String mQuery;
     private LinkedList<ISubscription> mSubscriptions = new LinkedList<>();
+
+    public GenericSearchResult(@NonNull String argQuery) {
+        mQuery = argQuery;
+    }
 
     public void addResult(@NonNull ISubscription argSubscription) {
         mSubscriptions.add(argSubscription);
+    }
+
+    @NonNull
+    @Override
+    public String getSearchQuery() {
+        return mQuery;
     }
 
     @NonNull

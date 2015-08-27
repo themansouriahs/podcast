@@ -95,7 +95,7 @@ public class ITunes extends GenericDirectory {
             return;
         }
 
-        asyncTask = new QueryITunes(url, argCallback);
+        asyncTask = new QueryITunes(url, searchTerm, argCallback);
         asyncTask.execute();
     }
 
@@ -110,17 +110,19 @@ public class ITunes extends GenericDirectory {
 
     @Override
     protected AsyncTask getAsyncTask() {
-        return null;
+        return asyncTask;
     }
 
     private class QueryITunes extends AsyncTask<String, Void, ISearchResult> {
 
         private URL mURL;
         private Callback mCallback;
+        private String mKeywords;
 
-        public QueryITunes(@NonNull URL argUrl, @NonNull Callback argCallback) {
+        public QueryITunes(@NonNull URL argUrl, @NonNull String argKeywords, @NonNull Callback argCallback) {
             mURL = argUrl;
             mCallback = argCallback;
+            mKeywords = argKeywords;
         }
 
         protected ISearchResult doInBackground(String... string) {
@@ -139,7 +141,7 @@ public class ITunes extends GenericDirectory {
                 mCallback.error(e);
             }
 
-            GenericSearchResult result = new GenericSearchResult();
+            GenericSearchResult result = new GenericSearchResult(mKeywords);
 
             for (ITunesSlimSubscription slimSubscription : list) {
 

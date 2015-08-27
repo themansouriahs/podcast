@@ -62,7 +62,7 @@ public class GPodder extends GenericDirectory {
         protected ISearchResult doInBackground(String... string) {
             PublicClient gpodderClient = new PublicClient();
             List<IPodcast> podcasts;
-            GenericSearchResult result = new GenericSearchResult();
+            GenericSearchResult result = new GenericSearchResult(string[0]);
 
             try {
                 podcasts = gpodderClient.searchPodcast(string[0]);

@@ -1,6 +1,5 @@
 package org.bottiger.podcast.views;
 
-import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -19,14 +18,13 @@ import android.widget.FrameLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.listeners.EpisodeStatus;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
-import org.bottiger.podcast.listeners.PlayerStatusObserver;
-import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.UIUtils;
 
 import java.util.HashSet;
@@ -35,14 +33,12 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by apl on 03-09-2014.
  */
-public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, PaletteListener {
+public class PlayerSeekbar extends SeekBar implements PaletteListener {
 
     private static final int RANGE_MIN = 0;
     private static final int RANGE_MAX = 1000;
 
     private int mSideMargin = 0;
-
-    private static ObjectAnimator animator;
 
     private boolean mPaintSeekInfo = false;
 
@@ -60,7 +56,7 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
     private int mStartSeekPosition = -1;
     private long mDurationMs = -1;
 
-    private PlayerStatusObservable.STATUS mStatus = PlayerStatusObservable.STATUS.PAUSED;
+    private boolean mIsPlaying = false;
     private boolean mIsTouching = false;
     private HashSet<OnSeekListener> mSeekListeners = new HashSet<OnSeekListener>();
 
@@ -81,11 +77,17 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
             long timeMs = mEpisode.getDuration() * seekBar.getProgress()
                     / RANGE_MAX;
 
-            if (mEpisode.equals(MainActivity.sBoundPlayerService.getCurrentItem())) {
-                MainActivity.sBoundPlayerService.seek(timeMs);
+            PlayerService ps = SoundWaves.sBoundPlayerService;
+
+            if (ps == null)
+                return;
+
+            if (mEpisode.equals(ps.getCurrentItem())) {
+                ps.seek(timeMs);
             } else {
-                mEpisode.setOffset(MainActivity.sBoundPlayerService.getContentResolver(), timeMs);
-                PlayerStatusObservable.updateProgress(MainActivity.sBoundPlayerService, mEpisode);
+                mEpisode.setOffset(ps.getContentResolver(), timeMs);
+                // FIXME
+                //PlayerStatusObservable.updateProgress(MainActivity.sBoundPlayerService, mEpisode);
                 setProgressMs(timeMs);
             }
 
@@ -187,7 +189,7 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
 
         setMax(RANGE_MAX);
         setOnSeekBarChangeListener(onSeekBarChangeListener);
-        mStatus = PlayerStatusObservable.getStatus();
+        mIsPlaying = SoundWaves.sBoundPlayerService != null && SoundWaves.sBoundPlayerService.isPlaying();
 
         // FIXME
         mSideMargin = (int)UIUtils.convertDpToPixel(40, getContext());
@@ -205,12 +207,7 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
     }
 
     public void setEpisode(IEpisode argEpisode) {
-        if (mEpisode != null) {
-            PlayerStatusObservable.unregisterListener(this);
-        }
-
         mEpisode = argEpisode;
-        PlayerStatusObservable.registerListener(this);
 
         if (mEpisode.getOffset() > 0 && mEpisode.getDuration() > 0) {
             float progress = (float)mEpisode.getOffset() / mEpisode.getDuration();
@@ -225,7 +222,6 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
         mForwards =  (TextView) mOverlay.findViewById(R.id.seekbar_time_forward);
     }
 
-    @Override
     public IEpisode getEpisode() {
         validateState();
         return mEpisode;
@@ -278,7 +274,6 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
         }
     }
 
-    @Override
     public void setProgressMs(long progressMs) {
         if (isTouching()) {
             return;
@@ -306,11 +301,10 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
         setProgress((int) progress);
     }
 
-    @Override
     public void onStateChange(EpisodeStatus argStatus) {
         validateState();
 
-        mStatus = argStatus.getStatus();
+        mIsPlaying = argStatus.getStatus() == PlayerStatusObservable.STATUS.PLAYING;
 
         float currentPositionMs = argStatus.getPlaybackPositionMs() < 0 ? 0 : argStatus.getPlaybackPositionMs();
         double episodeLenghtMS = (double)mEpisode.getDuration();
@@ -320,7 +314,7 @@ public class PlayerSeekbar extends SeekBar implements PlayerStatusObserver, Pale
             //throw new IllegalStateException("Illegal Seekbar State: current position: " + currentPositionMs + ", episode length: " + episodeLenghtMS);
         }
 
-        if (mStatus == PlayerStatusObservable.STATUS.PLAYING) {
+        if (mIsPlaying) {
             float progress = currentPositionMs / mEpisode.getDuration() * RANGE_MAX;
             setProgress((int) progress);
         }

@@ -6,7 +6,9 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.LruCache;
 import android.view.LayoutInflater;
@@ -15,6 +17,8 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
+
 import org.bottiger.podcast.FeedActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
@@ -22,6 +26,7 @@ import org.bottiger.podcast.adapters.viewholders.discovery.SearchResultViewHolde
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.provider.SubscriptionLoader;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
 
 import java.net.URL;
@@ -93,13 +98,14 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
         try {
             Uri  uri = Uri.parse(subscription.getImageURL());
             holder.image.setImageURI(uri);
+            holder.imageUrl = uri;
         } catch (NullPointerException npe) {
             holder.image.setBackgroundColor(mDefaultBackgroundColor);
         }
 
         final URL url = subscription.getURL();
 
-        holder.image.setOnClickListener(new View.OnClickListener() {
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //mProgress.setTitle("Loading");
@@ -125,7 +131,21 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
 
     @Override
     public void onViewRecycled(SearchResultViewHolder holder) {
+        clearCache(holder);
         holder.toggleSwitch.setOnCheckedChangeListener(null);
+    }
+
+    @Override
+    public void onViewDetachedFromWindow(SearchResultViewHolder holder) {
+        clearCache(holder);
+        super.onViewDetachedFromWindow(holder);
+    }
+
+    private synchronized void clearCache(SearchResultViewHolder holder) {
+        if (holder.imageUrl != null) {
+            Fresco.getImagePipeline().evictFromMemoryCache(holder.imageUrl);
+            holder.imageUrl = null;
+        }
     }
 
     @Override
@@ -146,7 +166,7 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
 
     private void populateSubscribedUrls() {
         ContentResolver contentResolver = mActivity.getContentResolver();
-        LinkedList<Subscription> subscriptions = Subscription.allAsList(contentResolver);
+        LinkedList<Subscription> subscriptions = SubscriptionLoader.allAsList(contentResolver);
 
         for (Subscription subscription : subscriptions) {
             if (subscription.getStatus() == Subscription.STATUS_SUBSCRIBED) {
@@ -155,7 +175,7 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
         }
     }
 
-    private synchronized void toggleSubscriptionStatus(@NonNull ISubscription argSubscription) {
+    public synchronized void toggleSubscriptionStatus(@NonNull ISubscription argSubscription) {
         URL url = argSubscription.getURL();
         boolean isSubscribed = mSubscribedUrls.contains(url);
         Subscription subscription = new Subscription(url.toString());

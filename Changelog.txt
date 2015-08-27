@@ -1,6 +1,16 @@
 Changelog
 ==========
 
+version 0.96
+------------
+* Fixed a few crashes
+* Updated the layout of the Subscription page when displaying it in list mode
+* Updated the layout of the player
+* Updated the layout of the playlist
+* Made it possible to open the Podcast Feed view from an external application
+* Made it possible to subscribe the a podcast from an external application
+* Fixed a lot of UI bugs on kitkat
+
 version 0.92
 ------------
 * Lots of bug and crash fixes

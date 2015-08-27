@@ -1,24 +1,31 @@
 package org.bottiger.podcast.images;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.facebook.cache.common.CacheKey;
 import com.facebook.common.references.CloseableReference;
 import com.facebook.common.references.ResourceReleaser;
+import com.facebook.datasource.DataSource;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.bitmaps.PlatformBitmapFactory;
 import com.facebook.imagepipeline.common.ResizeOptions;
+import com.facebook.imagepipeline.core.ImagePipeline;
+import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
+import com.facebook.imagepipeline.image.CloseableImage;
 import com.facebook.imagepipeline.request.BasePostprocessor;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.facebook.imagepipeline.request.Postprocessor;
 
 import org.apache.commons.validator.routines.UrlValidator;
+import org.bottiger.podcast.utils.DirectExecutor;
 
 /**
  * Created by apl on 16-04-2015.
@@ -126,6 +133,30 @@ public class FrescoHelper {
         }
     }
 
+    public static void fetchBitmap(@NonNull final IBitmapFetchJob argBitmapFetchJob) {
+        ImagePipeline imagePipeline = Fresco.getImagePipeline();
+        ImageRequest imageRequest = FrescoHelper.getImageRequest(argBitmapFetchJob.getUrl(), null);
+        DataSource<CloseableReference<CloseableImage>> dataSource =
+                imagePipeline.fetchDecodedImage(imageRequest, argBitmapFetchJob.getContext());
+
+        dataSource.subscribe(new BaseBitmapDataSubscriber() {
+                                 @Override
+                                 public void onNewResultImpl(@Nullable Bitmap bitmap) {
+                                     // You can use the bitmap in only limited ways
+                                     // No need to do any cleanup.
+                                     argBitmapFetchJob.onSucces(bitmap);
+                                 }
+
+                                 @Override
+                                 public void onFailureImpl(DataSource dataSource) {
+                                     // No cleanup required here.
+                                     argBitmapFetchJob.onFail(dataSource);
+                                 }
+                             },
+                new DirectExecutor());
+
+    }
+
     public static Bitmap copySmallBitmap(@NonNull Bitmap argBitmap, @NonNull PlatformBitmapFactory argPlatformBitmapFactory) {
         CloseableReference<Bitmap> bitmapRef = argPlatformBitmapFactory.createBitmap(
                 argBitmap.getWidth() / 2,
@@ -141,6 +172,39 @@ public class FrescoHelper {
             return CloseableReference.cloneOrNull(bitmapRef).get();
         } finally {
             CloseableReference.closeSafely(bitmapRef);
+        }
+    }
+
+    public interface IBitmapFetchJob {
+
+        @NonNull Context getContext();
+        @NonNull String getUrl();
+
+        void onSucces(@Nullable Bitmap argBitmap);
+        void onFail(@Nullable DataSource argDataSource);
+    }
+
+    abstract class BaseBitmapFetchJob implements IBitmapFetchJob {
+
+        @NonNull
+        private Context context;
+
+        @NonNull
+        private String url;
+
+        public BaseBitmapFetchJob(@NonNull String argUrl, @NonNull Context argContext) {
+            url = argUrl;
+            context = argContext;
+        }
+
+        @NonNull
+        public Context getContext() {
+            return context;
+        }
+
+        @NonNull
+        public String getUrl() {
+            return url;
         }
     }
 }

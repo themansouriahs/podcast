@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+    <ScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <TableLayout
+        android:id="@+id/drawer_table"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <!-- Playlist Header -->
+    <TableRow
+        android:id="@+id/drawer_playlist_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="10dp"
+        android:paddingTop="5dip"
+        android:paddingBottom="5dip"
+        android:layout_marginBottom="5dp"
+        android:background="@color/colorPrimary">
+
+        <TextView
+            android:id="@+id/drawer_playlist_filter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left|bottom"
+            android:layout_gravity="bottom"
+            android:text="@string/drawer_playlist_filters"
+            android:padding="10dp"
+            android:textSize="18sp"
+            android:textColor="@color/white_opaque"
+            style="@style/SoundWavesTextViewStyle"
+            />
+
+    </TableRow>
+
+    <!-- Playlist Sort Order -->
+    <TableRow
+        android:id="@+id/drawer_playlist_subscription_sorting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="10dp"
+        android:paddingRight="5dp"
+        android:paddingTop="5dip"
+        android:paddingBottom="5dip">
+
+        <Spinner
+            android:id="@+id/drawer_playlist_sort_order"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginRight="10dp"
+            android:spinnerMode="dropdown"
+            android:layout_span="2"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/drawer_playlist_subscription_show_listened"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="10dp"
+        android:paddingRight="5dp"
+        android:paddingTop="5dip"
+        android:paddingBottom="5dip">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_span="2"
+            android:layout_weight="1"
+            android:paddingLeft="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="left|center_vertical"
+                android:text="@string/filter_show_listened"
+                android:textSize="14sp"
+                android:textColor="@color/filter_text"
+                style="@style/SoundWavesTextViewStyle"
+                />
+
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/slidebar_show_listened"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                style="@style/DrawerSwitchTextAppearance"
+                android:textSize="14sp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"/>
+
+        </FrameLayout>
+
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/drawer_playlist_subscription_show_downloaded"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="10dp"
+        android:paddingRight="5dp"
+        android:paddingTop="5dip"
+        android:paddingBottom="5dip">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_span="2"
+            android:layout_weight="1"
+            android:paddingLeft="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="left|center_vertical"
+                android:text="@string/filter_show_only_downloaded"
+                android:textSize="14sp"
+                android:textColor="@color/filter_text"
+                style="@style/SoundWavesTextViewStyle"
+                />
+
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/slidebar_show_downloaded"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                style="@style/DrawerSwitchTextAppearance"
+                android:textSize="14sp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"/>
+
+        </FrameLayout>
+
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/drawer_playlist_continues"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="10dp"
+        android:paddingRight="5dp"
+        android:paddingTop="5dip"
+        android:paddingBottom="5dip">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_span="2"
+            android:layout_weight="1"
+            android:paddingLeft="10dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="left|center_vertical"
+                android:text="@string/auto_start_next"
+                android:textSize="14sp"
+                android:textColor="@color/filter_text"
+                style="@style/SoundWavesTextViewStyle"
+                />
+
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/slidebar_show_continues"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                style="@style/DrawerSwitchTextAppearance"
+                android:textSize="14sp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"/>
+
+        </FrameLayout>
+
+    </TableRow>
+
+
+        <!-- Playlist Header -->
+        <TableRow
+            android:id="@+id/drawer_playlist_subscription_filter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:paddingRight="5dp"
+            android:paddingTop="5dip"
+            android:paddingBottom="5dip">
+
+            <RelativeLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <View
+                    android:id="@+id/filter_subscription_line_top"
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginBottom="5dp"
+                    android:background="@color/grayStart"/>
+
+                <TextView
+                    android:id="@+id/filter_subscription_introduction"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/playlist_filter_introducion"
+                    android:layout_below="@id/filter_subscription_line_top"
+                    style="@style/SoundWavesTextViewStyle" />
+                    <!-- android:textAppearance="@style/TextAppearance.AppCompat.Title"/> -->
+
+                <RadioGroup
+                    android:id="@+id/subscription_selection_type"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checkedButton="@+id/radioNone"
+                    android:layout_margin="10dp"
+                    android:layout_below="@id/filter_subscription_introduction">
+
+                    <RadioButton
+                        android:id="@+id/radioNone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-light"
+                        android:text="@string/playlist_filter_none" />
+
+                    <RadioButton
+                        android:id="@+id/radioAll"
+                        android:layout_below="@id/radioNone"
+                        android:layout_alignLeft="@id/radioNone"
+                        android:layout_alignStart="@id/radioNone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-light"
+                        android:text="@string/playlist_filter_all" />
+
+                    <RadioButton
+                        android:id="@+id/radioCustom"
+                        android:layout_below="@id/radioAll"
+                        android:layout_alignLeft="@id/radioNone"
+                        android:layout_alignStart="@id/radioNone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-light"
+                        android:text="@string/playlist_filter_some" />
+
+                </RadioGroup>
+
+                <View
+                    android:id="@+id/filter_subscription_line"
+                    android:layout_below="@id/subscription_selection_type"
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:background="@color/grayStart"/>
+
+                <LinearLayout
+                    android:id="@+id/filter_subscription_checkboxes"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/filter_subscription_line"
+                    android:layout_alignLeft="@+id/subscription_selection_type"
+                    android:layout_alignStart="@+id/subscription_selection_type">
+
+                </LinearLayout>
+            </RelativeLayout>
+
+        </TableRow>
+
+
+    </TableLayout>
+
+
+
+    </ScrollView>

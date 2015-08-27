@@ -16,7 +16,10 @@
 #   public *;
 #}
 
--keep class org.bottiger.podcast
+-dontoptimize
+
+-keep class org.bottiger.podcast.** {*;}
+-keep class com.dragontek.mygpoclient.** {*;}
 
 -keep        class android.support.v13.** { *; }
 -keep        class android.support.v7.** { *; }
@@ -26,6 +29,13 @@
   public void set*(***);
   public *** get*();
   public boolean is*();
+}
+
+# otto
+-keepattributes *Annotation*
+-keepclassmembers class ** {
+    @com.squareup.otto.Subscribe public *;
+    @com.squareup.otto.Produce public *;
 }
 
 # OKhhtp
@@ -39,7 +49,6 @@
 -keep class com.amazon.** {*;}
 -keep class com.amazonaws.** {*;}
 -keepattributes *Annotation*
--dontoptimize
 
 # Jackson xml parser
 -keepattributes Signature
@@ -59,6 +68,13 @@
 
 # apache
 -dontwarn org.apache.commons.**
+-dontwarn org.apache.http.**
+
+# com.revy.material
+-dontwarn com.rey.material.**
+
+# webview
+-dontwarn android.webkit.**
 
 #retrofit
 -dontwarn retrofit.**
@@ -84,3 +100,21 @@ public *;
 
 # Keep all the ACRA classes
 -keep class org.acra.** { *; }
+-dontwarn org.acra.**
+
+
+#Fresco
+# Keep our interfaces so they can be used by other ProGuard rules.
+# See http://sourceforge.net/p/proguard/bugs/466/
+-keep,allowobfuscation @interface com.facebook.common.internal.DoNotStrip
+
+# Do not strip any method/class that is annotated with @DoNotStrip
+-keep @com.facebook.common.internal.DoNotStrip class *
+-keepclassmembers class * {
+    @com.facebook.common.internal.DoNotStrip *;
+}
+-dontwarn okio.**
+-dontwarn javax.annotation.**
+
+-keep class com.facebook.imagepipeline.gif.** { *; }
+-keep class com.facebook.imagepipeline.webp.** { *; }

@@ -70,7 +70,6 @@
   <string name="subscription_instruction">Προσθέστε νέα podcast χρησιμοποιώντας την σελίδα ανακάλυψης προς τα δεξιά ή εισαγάγετε ένα αρχείο OPML.\N\nΠαρακαλούμε να εξετάσετε αν θέλετε να ενεργοποιήσετε/απενεργοποιήσετε τις παρακάτω επιλογές.</string>
   <string name="filter_show_listened">Εμφάνιση ακρόασης</string>
   <string name="auto_start_next">Αυτοματη εναρξη επομενου</string>
-  <string name="drawer_playlist_filters">Φίλτρα λίστας αναπαραγωγής </string>
   <string name="drawer_player_settings">Ρυθμίσεις του Player</string>
   <string name="opml_not_found">OPML δεν βρέθηκε. Μετονομάστε το αρχείο σας ως %1$s και τοποθετήστε το στον ριζικό φάκελο της αποθήκευσης (κάρτα SD)</string>
   <string name="gpodder_searching">Αναζήτηση χρησιμοποιώντας το gPodder.net</string>

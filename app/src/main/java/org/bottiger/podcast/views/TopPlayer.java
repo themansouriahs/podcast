@@ -3,23 +3,31 @@ package org.bottiger.podcast.views;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Point;
+import android.content.SharedPreferences;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.graphics.Palette;
+import android.transition.TransitionManager;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.Display;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
+
+import com.facebook.drawee.view.SimpleDraweeView;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.PaletteListener;
-import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.UIUtils;
 
 import static org.bottiger.podcast.views.PlayerButtonView.StaticButtonColor;
@@ -28,6 +36,8 @@ import static org.bottiger.podcast.views.PlayerButtonView.StaticButtonColor;
  * Created by apl on 30-09-2014.
  */
 public class TopPlayer extends RelativeLayout implements PaletteListener {
+
+    private static final String TAG = "TopPlayer";
 
     private IEpisode mEpisodeId;
 
@@ -62,16 +72,25 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
 
     private boolean mCanScrollUp = true;
 
+    private String mDoFullscreentKey;
+    private boolean mFullscreen = false;
+
+    private String mDoDisplayTextKey;
+    private boolean mDoDisplayText = false;
+
     private PlayerRelativeLayout mPlayerControlsLinearLayout;
 
     private RelativeLayout mPlayerButtons;
     private int mPlayerButtonsHeight = -1;
 
+    private RelativeLayout mLayout;
+    private ImageButton mExpandEpisode;
+    private View mGradient;
     private View mEpisodeText;
     private View mEpisodeInfo;
-    private View mPhoto;
+    private SimpleDraweeView mPhoto;
     private PlayPauseImageView mPlayPauseButton;
-    private View mSeekbarContainer;
+    private View mImageContainer;
 
     private PlayerSeekbar mSeekbar;
 
@@ -80,9 +99,13 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
     private View mDownloadButton;
     private View mQueueButton;
     private View mFavoriteButton;
+    private PlayerButtonView mFullscreenButton;
+    private PlayerButtonView mSleepButton;
 
     private PlayerLayoutParameter mSmallLayout = new PlayerLayoutParameter();
     private PlayerLayoutParameter mLargeLayout = new PlayerLayoutParameter();
+
+    private SharedPreferences prefs;
 
     private class PlayerLayoutParameter {
         public int SeekBarLeftMargin;
@@ -120,6 +143,15 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
         }
 
         mActivity = (Activity) argContext;
+
+        prefs = PreferenceManager.getDefaultSharedPreferences(argContext.getApplicationContext());
+        mDoDisplayTextKey = mActivity.getResources().getString(R.string.pref_top_player_text_expanded_key);
+        mDoDisplayText = prefs.getBoolean(mDoDisplayTextKey, mDoDisplayText);
+
+        mDoFullscreentKey = mActivity.getResources().getString(R.string.pref_top_player_fullscreen_key);
+        mFullscreen = prefs.getBoolean(mDoFullscreentKey, mFullscreen);
+
+
         sizeShrinkBuffer = (int) UIUtils.convertDpToPixel(100, mActivity);
         screenHeight = UIUtils.getScreenHeight(mActivity);
 
@@ -144,34 +176,29 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
         }
     }
 
-    public void setRecyclerView(@NonNull FixedRecyclerView argRecyclerView) {
-        mRecyclerView = argRecyclerView;
-    }
-
-    public int maxTrans() {
-        return sizeSmall-sizeLarge;
-    }
-
     @Override
-         public boolean onTouchEvent(MotionEvent event) {
-        return mRecyclerView.onTouchEvent(event);
-    }
+    protected void onFinishInflate() {
+        super.onFinishInflate();
 
-    @Override
-    protected void onFinishInflate () {
+        mLayout = (RelativeLayout) findViewById(R.id.session_photo_container);
+
         mPlayerControlsLinearLayout = (PlayerRelativeLayout)findViewById(R.id.expanded_controls);
 
-        mPhoto = findViewById(R.id.session_photo);
+        mPhoto = (SimpleDraweeView) findViewById(R.id.session_photo);
 
         mPlayPauseButton = (PlayPauseImageView) findViewById(R.id.play_pause_button);
+        mExpandEpisode = (ImageButton)findViewById(R.id.episode_expand);
         mEpisodeText = findViewById(R.id.episode_title);
         mEpisodeInfo = findViewById(R.id.episode_info);
-        mSeekbarContainer = findViewById(R.id.player_progress);
+        mImageContainer = findViewById(R.id.player_progress);
         mForwardButton = findViewById(R.id.fast_forward_button);
-        mBackButton = findViewById(R.id.previous);
+        mBackButton = findViewById(R.id.rewind_button);
+        mFullscreenButton = (PlayerButtonView) findViewById(R.id.fullscreen_button);
         mDownloadButton = findViewById(R.id.download);
         mQueueButton = findViewById(R.id.queue);
         mFavoriteButton = findViewById(R.id.bookmark);
+        mGradient = findViewById(R.id.top_gradient_inner);
+        mSleepButton = (PlayerButtonView) findViewById(R.id.sleep_button);
 
         mSeekbar = (PlayerSeekbar) findViewById(R.id.player_progress);
         mPlayerButtons = (RelativeLayout) findViewById(R.id.player_buttons);
@@ -183,6 +210,77 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
         mLargeLayout.SeekBarLeftMargin = 0;
         mLargeLayout.PlayPauseSize = mPlayPauseLargeSize;
         mLargeLayout.PlayPauseBottomMargin = ((RelativeLayout.LayoutParams)mPlayPauseButton.getLayoutParams()).bottomMargin;
+
+        if (!mDoDisplayText) {
+            mExpandEpisode.setImageResource(R.drawable.ic_expand_more_white);
+            mEpisodeText.setVisibility(GONE);
+            mGradient.setVisibility(GONE);
+            mEpisodeInfo.setVisibility(GONE);
+        }
+
+        // Give image a fixed height
+
+        //int width = mPhoto.getWidth();
+        //RelativeLayout.LayoutParams params = (LayoutParams) mPhoto.getLayoutParams();
+        //params.width = width;
+        //params.height = width;
+        //mPhoto.setLayoutParams(params);
+        //mPhoto.getLayoutParams().height = mPhoto.getLayoutParams().width;
+
+        mSleepButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sleepButtonPressed();
+            }
+        });
+
+        setFullscreenState(mFullscreen);
+
+        mExpandEpisode.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    mDoDisplayText = !mDoDisplayText;
+                    if (Build.VERSION.SDK_INT >= 19)
+                        TransitionManager.beginDelayedTransition(mPlayerControlsLinearLayout);
+
+                    if (mDoDisplayText) {
+                        Log.d(TAG, "ShowText");
+                        showText();
+                    } else {
+                        Log.d(TAG, "HideText");
+                        hideText();
+                    }
+                } finally {
+                    prefs.edit().putBoolean(mDoDisplayTextKey, mDoDisplayText).commit();
+                }
+            }
+        });
+
+        mFullscreenButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    mFullscreen = !mFullscreen;
+                    setFullscreenState(mFullscreen);
+                } finally {
+                    prefs.edit().putBoolean(mDoFullscreentKey, mFullscreen).commit();
+                }
+            }
+        });
+    }
+
+    private void sleepButtonPressed() {
+        try {
+            PlayerService ps = PlayerService.getInstance();
+            int minutes = 30;
+            int onemin = 1000 * 60;
+            ps.FaceOutAndStop(onemin*minutes);
+            String toast = getResources().getQuantityString(R.plurals.player_sleep, minutes, minutes);
+            Toast.makeText(mActivity, toast, Toast.LENGTH_LONG).show();
+        } catch (NullPointerException npe) {
+            Log.d(TAG, "Could not connect to the Player");
+        }
     }
 
     @Override
@@ -254,6 +352,10 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
 
     // returns actual visible height
     public float setPlayerHeight(float argScreenHeight) {
+
+        if (mFullscreen)
+            return getHeight();
+
         minimalEnsured = false;
         maximumEnsured = false;
 
@@ -272,7 +374,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
         /*
         mPlayerControlsLinearLayout.setTranslationY(transYControl);
         mPlayPauseButton.setTranslationY(transYControl);
-        mSeekbarContainer.setTranslationY(transYControl);
+        mImageContainer.setTranslationY(transYControl);
         mForwardButton.setTranslationY(transYControl);
         */
 
@@ -318,7 +420,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
 
         mPlayerControlsLinearLayout.setTranslationY(transYControl);
         mPlayPauseButton.setTranslationY(transYControl);
-        mSeekbarContainer.setTranslationY(transYControl);
+        mImageContainer.setTranslationY(transYControl);
         mForwardButton.setTranslationY(transYControl);
 
         String size = "large";
@@ -350,7 +452,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
     }
 
     public float setSeekbarVisibility(float argTopPlayerHeight) {
-        return setGenericVisibility(mSeekbarContainer, sizeMedium, mSeekbarFadeDistancePx, argTopPlayerHeight);
+        return setGenericVisibility(mImageContainer, sizeMedium, mSeekbarFadeDistancePx, argTopPlayerHeight);
     }
 
     public float setBackgroundVisibility(float argTopPlayerHeight) {
@@ -461,6 +563,68 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
             mRecyclerView.fling((int)velocityX*0, (int)-velocityY);
             return true;
         }
+    }
+
+    private void hideText() {
+        mExpandEpisode.setImageResource(R.drawable.ic_expand_more_white);
+
+        fadeText(1.0f, 0.0f);
+    }
+
+    private void showText() {
+        mExpandEpisode.setImageResource(R.drawable.ic_expand_less_white);
+        mEpisodeText.setVisibility(VISIBLE);
+        mGradient.setVisibility(VISIBLE);
+        mEpisodeInfo.setVisibility(VISIBLE);
+
+        fadeText(0.0f, 1.0f);
+    }
+
+    private void fadeText(float argAlphaStart, float argAlphaEnd) {
+        mEpisodeText.setAlpha(argAlphaStart);
+        mEpisodeInfo.setAlpha(argAlphaStart);
+        mGradient.setAlpha(argAlphaStart);
+
+        mEpisodeText.animate().alpha(argAlphaEnd);
+        mEpisodeInfo.animate().alpha(argAlphaEnd);
+        mGradient.animate().alpha(argAlphaEnd);
+    }
+
+    private void setFullscreenState(boolean argNewState) {
+
+        if (mFullscreen) {
+            goFullscreen();
+        } else {
+            exitFullscreen();
+        }
+    }
+
+    private LinearLayout.LayoutParams paramCache;
+
+    private void goFullscreen() {
+        Log.d(TAG, "Enter fullscreen mode");
+        mFullscreenButton.setImageResource(R.drawable.ic_fullscreen_exit_white);
+
+        //mPhoto.getLayoutParams().height = mPhoto.getWidth();
+
+        // Main player layout
+        LinearLayout.LayoutParams paramCache = (LinearLayout.LayoutParams) mLayout.getLayoutParams();
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.MATCH_PARENT);
+        mLayout.setLayoutParams(layoutParams);
+
+    }
+
+    private void exitFullscreen() {
+        Log.d(TAG, "Exit fullscreen mode");
+        mFullscreenButton.setImageResource(R.drawable.ic_fullscreen_white);
+
+        // Main player layout
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                LayoutParams.MATCH_PARENT,
+                sizeLarge);
+        mLayout.setLayoutParams(layoutParams);
     }
 
 

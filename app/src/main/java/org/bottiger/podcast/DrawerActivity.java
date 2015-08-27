@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 import org.bottiger.podcast.adapters.PlaylistContentSpinnerAdapter;
 import org.bottiger.podcast.playlist.Playlist;
+import org.bottiger.podcast.playlist.PlaylistData;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.navdrawer.NavigationDrawerMenuGenerator;
 import org.bottiger.podcast.views.MultiSpinner;
@@ -40,7 +41,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
@@ -89,8 +89,9 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity {
 	protected FrameLayout mDrawerContainer;
     protected TableLayout mDrawerTable;
 
-    protected Switch mPlaylistShowListened;
-    protected Switch mAutoPlayNext;
+    protected android.support.v7.widget.SwitchCompat mPlaylistShowListened;
+    protected android.support.v7.widget.SwitchCompat mAutoPlayNext;
+    protected android.support.v7.widget.SwitchCompat mOnlyDownloaded;
     protected Spinner mPlaylistOrderSpinner;
     protected LinearLayout mPlaylistContentLayout;
     protected PlaylistContentSpinnerAdapter mPlaylistContentSpinnerAdapter;
@@ -160,56 +161,15 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity {
             mDrawerTable.setLayoutParams(params);
         }
 
-        final Playlist playlist = PlayerService.getPlaylist();
-        playlist.setContext(this);
-
-        mPlaylistContentLayout = (LinearLayout) findViewById(R.id.playlist_content);
         mPlaylistOrderSpinner = (Spinner) findViewById(R.id.drawer_playlist_sort_order);
-        mPlaylistShowListened = (Switch) findViewById(R.id.slidebar_show_listened);
-        mAutoPlayNext = (Switch) findViewById(R.id.slidebar_show_continues);
+        mPlaylistShowListened = (android.support.v7.widget.SwitchCompat) findViewById(R.id.slidebar_show_listened);
+        mOnlyDownloaded = (android.support.v7.widget.SwitchCompat) findViewById(R.id.slidebar_show_downloaded);
+        mAutoPlayNext = (android.support.v7.widget.SwitchCompat) findViewById(R.id.slidebar_show_continues);
 
-        bindPlaylistFilter(mPlaylistContentLayout, playlist);
 
         parentItems = new ArrayList<String>(Arrays.asList(mListItems));
 		// setGroupParents();
 		setChildData();
-
-        // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> adapterSortOrder = ArrayAdapter.createFromResource(this,
-                R.array.playlist_sort_order, android.R.layout.simple_spinner_item);
-        // Specify the layout to use when the list of choices appears
-        adapterSortOrder.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // Apply the adapter to the spinner
-        mPlaylistOrderSpinner.setAdapter(adapterSortOrder);
-        mPlaylistOrderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (position == 0) {
-                    playlist.setSortOrder(Playlist.SORT.DATE_NEW); // new first
-                } else {
-                    playlist.setSortOrder(Playlist.SORT.DATE_OLD); // old first
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                return;
-            }
-        });
-
-        // Show listened
-        mPlaylistShowListened.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                playlist.setShowListened(isChecked);
-            }
-        });
-        boolean doShowListened = mSharedPreferences.getBoolean(ApplicationConfiguration.showListenedKey, Playlist.SHOW_LISTENED_DEFAULT);
-        if (doShowListened != mPlaylistShowListened.isChecked()) {
-            mPlaylistShowListened.setChecked(doShowListened);
-        }
-
-        initAutoPlayNextSwitch();
 
         LinearLayout layout = (LinearLayout) findViewById(R.id.drawer_items);
         NavigationDrawerMenuGenerator navigationDrawerMenuGenerator = new NavigationDrawerMenuGenerator(this);
@@ -249,6 +209,11 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity {
 		 * if (savedInstanceState == null) { selectItem(0); }
 		 */
 	}
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -349,7 +314,6 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity {
 	}
     @Override
     public void onResume() {
-        initAutoPlayNextSwitch();
         super.onResume();
     }
 
@@ -537,48 +501,8 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity {
         */
     }
 
-    private void initAutoPlayNextSwitch() {
-        // Auto play next
-        final String playNextKey = getResources().getString(R.string.pref_continuously_playing_key);
 
-        mAutoPlayNext.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mSharedPreferences.edit().putBoolean(playNextKey, isChecked).commit();
-            }
-        });
-        mSharedPreferences.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
-            @Override
-            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                if (key == playNextKey) {
-                    mAutoPlayNext.setChecked(sharedPreferences.getBoolean(playNextKey, Playlist.PLAY_NEXT_DEFAULT));
-                }
-            }
-        });
 
-        boolean doPlayNext = mSharedPreferences.getBoolean(playNextKey, Playlist.PLAY_NEXT_DEFAULT);
-        if (doPlayNext != mAutoPlayNext.isChecked()) {
-            mAutoPlayNext.setChecked(doPlayNext);
-        }
-    }
-
-    private void bindPlaylistFilter(@NonNull LinearLayout argView, @NonNull Playlist argPlaylist) {
-        mDialogPlaylistContent = new DialogPlaylistContent(this);
-        mDialogPlaylistContent.setSubscriptions(argPlaylist);
-        argView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mDialogPlaylistContent.performClick();
-            }
-        });
-
-        String title = getResources().getString(R.string.drawer_playlist_content_source);
-        TextView tv = (TextView) argView.findViewById(R.id.drawer_item_title);
-        tv.setText(title);
-
-        View imageView = argView.findViewById(R.id.drawer_item_icon);
-        imageView.setVisibility(View.GONE);
-    }
 
     class MultiSpinnerListener implements MultiSpinner.MultiSpinnerListener {
 

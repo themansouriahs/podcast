@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.util.SparseArray;
 
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.OkUrlFactory;
@@ -31,7 +32,7 @@ public class OkHttpDownloader extends DownloadEngineBase {
 
     private final OkHttpClient mOkHttpClient = new OkHttpClient();
     private HttpURLConnection mConnection;
-    private final HashSet<Callback> mExternalCallback = new HashSet<Callback>();
+    private final SparseArray<Callback> mExternalCallback = new SparseArray<>();
 
     private URL mURL;
 
@@ -111,20 +112,27 @@ public class OkHttpDownloader extends DownloadEngineBase {
         if (argCallback == null) {
             throw new IllegalArgumentException("Callback may not be null");
         }
-        mExternalCallback.add(argCallback);
+
+        int newKey = mExternalCallback.size() == 0 ? 0 : mExternalCallback.keyAt(mExternalCallback.size()-1) + 1;
+        mExternalCallback.append(newKey, argCallback);
     }
 
     private void onSucces(File response)  throws IOException {
         Log.d("Download", "Download succeeded");
 
-        for (Callback callback : mExternalCallback) {
+        for(int i = 0; i < mExternalCallback.size(); i++) {
+            int key = mExternalCallback.keyAt(i);
+            Callback callback = mExternalCallback.valueAt(key);
             callback.downloadCompleted(mEpisode);
         }
     }
 
     public void onFailure(IOException e) {
         Log.w("Download", "Download Failed");
-        for (Callback callback : mExternalCallback) {
+
+        for(int i = 0; i < mExternalCallback.size(); i++) {
+            int key = mExternalCallback.keyAt(i);
+            Callback callback = mExternalCallback.valueAt(key);
             callback.downloadInterrupted(mEpisode);
         }
     }

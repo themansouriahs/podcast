@@ -1,24 +1,22 @@
 package org.bottiger.podcast.Player;
 
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.media.MediaMetadata;
-import android.media.RemoteControlClient;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
+import com.facebook.datasource.DataSource;
 
-import org.bottiger.podcast.R;
+import org.bottiger.podcast.images.FrescoHelper;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
-import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.PlayerService;
 
 /**
@@ -33,32 +31,8 @@ public class PlayerStateManager {
     private static final String DEBUG_KEY = "PlayerStateManager";
     private static final String SESSION_TAG = "SWMediaSession";
 
-    private IEpisode mEpisode;
-    private Bitmap mAlbumArt;
-
     private MediaSession mSession;
-    private PlayerService mPlaserService;
-
-    private Target target = new Target() {
-        @Override
-        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-            Log.d(DEBUG_KEY, "Updating remote control (with background)");
-            mAlbumArt = bitmap;
-            //updateSimpleMetaData(editor, episode);
-            updateState(mEpisode, false);
-        }
-
-        @Override
-        public void onBitmapFailed(Drawable errorDrawable) {
-            Log.d(DEBUG_KEY, "BACKGROUND failed to load");
-            return;
-        }
-
-        @Override
-        public void onPrepareLoad(Drawable placeHolderDrawable) {
-            return;
-        }
-    };
+    private PlayerService mPlayerService;
 
     public PlayerStateManager(@NonNull PlayerService argService) {
         Log.d(DEBUG_KEY, "Constructor");
@@ -66,11 +40,11 @@ public class PlayerStateManager {
         if (Build.VERSION.SDK_INT < 21) {
             throw new IllegalStateException("This should never have been called using this SDK level");
         }
-        mPlaserService = argService;
+        mPlayerService = argService;
         mSession = new MediaSession(argService, SESSION_TAG);
         mSession.setActive(true);
-        mSession.setFlags(  MediaSession.FLAG_HANDLES_MEDIA_BUTTONS |
-                            MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
+        mSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS |
+                MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
     }
 
     public void release() {
@@ -82,29 +56,49 @@ public class PlayerStateManager {
     }
 
     public void updateState(@NonNull FeedItem argEpisode) {
-        updateState(argEpisode, true);
+        updateState(argEpisode, true, null);
     }
 
-    public void updateState(@NonNull IEpisode argEpisode, boolean updateAlbumArt) {
-        String albumNull = mAlbumArt == null ? "Null" : "Not null";
-        Log.d(DEBUG_KEY, "updateState: updateAlbumState: " + updateAlbumArt + " album: " + albumNull);
+    public void updateState(@NonNull final IEpisode argEpisode, boolean updateAlbumArt, @Nullable Bitmap argBitmap) {
+        Log.d(DEBUG_KEY, "updateState: updateAlbumState: " + updateAlbumArt);
         MediaMetadata.Builder mMetaBuilder = new MediaMetadata.Builder();
 
         populateFastMediaMetadata(mMetaBuilder, argEpisode);
 
-        if (updateAlbumArt || mAlbumArt == null) {
-            Log.d(DEBUG_KEY, "Updating album art");
-            mEpisode = argEpisode;
-            if (argEpisode instanceof FeedItem) {
-                ((FeedItem)argEpisode).getArtworAsync(mPlaserService, target);
-            }
-            return;
-        } else {
+        if (argBitmap != null && !argBitmap.isRecycled()) {
             Log.d(DEBUG_KEY, "Found album art");
-            mMetaBuilder.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, mAlbumArt);
-            mMetaBuilder.putBitmap(MediaMetadata.METADATA_KEY_ART, mAlbumArt);
-            mMetaBuilder.putBitmap(MediaMetadata.METADATA_KEY_DISPLAY_ICON, mAlbumArt);
+            mMetaBuilder.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, argBitmap);
+            mMetaBuilder.putBitmap(MediaMetadata.METADATA_KEY_ART, argBitmap);
+            mMetaBuilder.putBitmap(MediaMetadata.METADATA_KEY_DISPLAY_ICON, argBitmap);
         }
+
+        if (updateAlbumArt) {
+            FrescoHelper.fetchBitmap(new FrescoHelper.IBitmapFetchJob() {
+                @NonNull
+                @Override
+                public Context getContext() {
+                    return mPlayerService;
+                }
+
+                @NonNull
+                @Override
+                public String getUrl() {
+                    return argEpisode.getArtwork(mPlayerService);
+                }
+
+                @Override
+                public void onSucces(@Nullable Bitmap argBitmap) {
+                    Log.d(DEBUG_KEY, "Updating remote control (with background)");
+                    updateState(argEpisode, false, argBitmap);
+                }
+
+                @Override
+                public void onFail(@Nullable DataSource argDataSource) {
+                    Log.d(DEBUG_KEY, "BACKGROUND failed to load");
+                }
+            });
+        }
+
 
         PlaybackState.Builder stateBuilder = getPlaybackState();
 
@@ -113,7 +107,7 @@ public class PlayerStateManager {
     }
 
     private void populateFastMediaMetadata(@NonNull MediaMetadata.Builder mMetaBuilder, @NonNull IEpisode argEpisode) {
-        //Subscription subscription = argEpisode.getSubscription(mPlaserService);
+        //Subscription subscription = argEpisode.getSubscription(mPlayerService);
 
         mMetaBuilder.putText(MediaMetadata.METADATA_KEY_TITLE, argEpisode.getTitle());
         mMetaBuilder.putText(MediaMetadata.METADATA_KEY_ALBUM, "yo");

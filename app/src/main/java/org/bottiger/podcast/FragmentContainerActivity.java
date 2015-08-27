@@ -161,6 +161,7 @@ public class FragmentContainerActivity extends DrawerActivity {
 
 
             if (fragment == null) {
+
                 if (position == SUBSCRIPTION) {
                     fragment = new SubscriptionsFragment();
                 } else if (position == PLAYLIST) {
@@ -168,6 +169,7 @@ public class FragmentContainerActivity extends DrawerActivity {
                 } else if (position == DISCOVER) {
                     fragment = new DiscoveryFragment();
                 }
+
 
                 if (fragment == null)
                     fragment = new DummyFragment();

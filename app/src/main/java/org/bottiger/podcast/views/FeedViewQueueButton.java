@@ -4,8 +4,6 @@ import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -20,13 +18,9 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
-import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.flavors.Analytics.IAnalytics;
-import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.playlist.Playlist;
-import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 
 /**
@@ -56,7 +50,7 @@ public class FeedViewQueueButton extends PlayPauseImageView {
 
     private static final long ANIMATION_DURATION_MS = 300l;
 
-    private static final int DEFAULT_COLOR = Color.WHITE;
+    private static final int DEFAULT_COLOR = Color.GRAY;
     private static final float DEFAULT_STROKE_WIDTH = 8f;
 
     // Arcs that define the set of all points between which the two lines are drawn
@@ -72,7 +66,7 @@ public class FeedViewQueueButton extends PlayPauseImageView {
     private float mArcLengthLeft;
     private float mArcLengthRight;
 
-    private Paint mPaint = new Paint();
+    private final Paint sPaint = new Paint();
     private int mColor = DEFAULT_COLOR;
     private RectF mRect;
     private PathMeasure mPathMeasure;
@@ -121,7 +115,7 @@ public class FeedViewQueueButton extends PlayPauseImageView {
     @Override
     public void onClick(View view) {
         IEpisode item = getEpisode();
-        Playlist playlist = Playlist.getActivePlaylist();
+        Playlist playlist = SoundWaves.sBoundPlayerService.getPlaylist();
 
         if (playlist.contains(item)) {
             int position = playlist.getPosition(item);
@@ -135,7 +129,7 @@ public class FeedViewQueueButton extends PlayPauseImageView {
     @Override
     public synchronized void setEpisode(IEpisode argEpisode, LOCATION argLocation) {
         super.setEpisode(argEpisode, argLocation);
-        Playlist playlist = Playlist.getActivePlaylist();
+        Playlist playlist = SoundWaves.sBoundPlayerService.getPlaylist();
         if (playlist.contains(argEpisode)) {
             cross(0);
         }
@@ -150,7 +144,8 @@ public class FeedViewQueueButton extends PlayPauseImageView {
         // Size will be used for width and height of the icon, plus the space in between
         TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.FeedViewQueueButton, 0, 0);
         try {
-            mColor = a.getColor(R.styleable.FeedViewQueueButton_lineColor, DEFAULT_COLOR);
+            //mColor = a.getColor(R.styleable.FeedViewQueueButton_lineColor, DEFAULT_COLOR);
+            mColor = DEFAULT_COLOR;
         } finally {
             a.recycle();
         }
@@ -158,17 +153,17 @@ public class FeedViewQueueButton extends PlayPauseImageView {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
+        //super.onDraw(canvas);
 
         setPointFromPercent(mArcTop, mArcLengthTop, mPercent, mFromXY);
         setPointFromPercent(mArcBottom, mArcLengthBottom, mPercent, mToXY);
 
-        canvas.drawLine(mFromXY[0], mFromXY[1], mToXY[0], mToXY[1], mPaint);
+        canvas.drawLine(mFromXY[0], mFromXY[1], mToXY[0], mToXY[1], sPaint);
 
         setPointFromPercent(mArcLeft, mArcLengthLeft, mPercent, mFromXY);
         setPointFromPercent(mArcRight, mArcLengthRight, mPercent, mToXY);
 
-        canvas.drawLine(mFromXY[0], mFromXY[1], mToXY[0], mToXY[1], mPaint);
+        canvas.drawLine(mFromXY[0], mFromXY[1], mToXY[0], mToXY[1], sPaint);
     }
 
     @Override
@@ -222,7 +217,7 @@ public class FeedViewQueueButton extends PlayPauseImageView {
 
     public void setColor(int argb) {
         mColor = argb;
-        mPaint.setColor(argb);
+        sPaint.setColor(argb);
         invalidate();
     }
 
@@ -300,6 +295,11 @@ public class FeedViewQueueButton extends PlayPauseImageView {
         invalidate();
     }
 
+    @Override
+    protected boolean drawBackground() {
+        return false;
+    }
+
     /**
      * Perform measurements and pre-calculations.  This should be called any time
      * the view measurements or visuals are changed, such as with a call to {@link #setPadding(int, int, int, int)}
@@ -334,11 +334,11 @@ public class FeedViewQueueButton extends PlayPauseImageView {
         mPathMeasure.setPath(mArcRight, false);
         mArcLengthRight = mPathMeasure.getLength();
 
-        mPaint.setAntiAlias(true);
-        mPaint.setColor(mColor);
-        mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setStrokeCap(Paint.Cap.SQUARE);
-        mPaint.setStrokeWidth(DEFAULT_STROKE_WIDTH);
+        sPaint.setAntiAlias(true);
+        sPaint.setColor(mColor);
+        sPaint.setStyle(Paint.Style.STROKE);
+        sPaint.setStrokeCap(Paint.Cap.SQUARE);
+        sPaint.setStrokeWidth(DEFAULT_STROKE_WIDTH);
 
         mFromXY = new float[]{0f, 0f};
         mToXY = new float[]{0f, 0f};

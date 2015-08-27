@@ -13,10 +13,13 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v4.content.CursorLoader;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+
+import com.squareup.otto.Subscribe;
 
 public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 
@@ -26,6 +29,8 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 
 	String showListenedKey = "showListened";
 	Boolean showListenedVal = true;
+
+	private Playlist mPlaylist = null;
 
 	// Container Activity must implement this interface
 	// http://developer.android.com/training/basics/fragments/communicating.html
@@ -52,6 +57,11 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(true);
 		prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+	}
+
+	@Subscribe
+	public void playlistChanged(@NonNull Playlist argPlaylist) {
+		mPlaylist = argPlaylist;
 	}
 
 
@@ -81,13 +91,11 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 		case R.id.menu_clear_playlist: {
 			//resetPlaylist(getActivity());
 
-            Playlist playlist = Playlist.getActivePlaylist(); //getPlaylist();
-
-            playlist.resetPlaylist(null);
+            mPlaylist.resetPlaylist(null);
             //Playlist.resetOrder();
-            int size = playlist.defaultSize();
-            if (!playlist.isEmpty()) {
-                playlist.populatePlaylist(size, true);
+            int size = mPlaylist.defaultSize();
+            if (!mPlaylist.isEmpty()) {
+				mPlaylist.populatePlaylist(size, true);
                 mAdapter.notifyDataSetChanged();
             }
             break;
@@ -128,7 +136,7 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 	public static String getOrder(String inputOrder, Integer amount) {
 		assert inputOrder != null;
 
-		PlayerService playerService = MainActivity.sBoundPlayerService;
+		PlayerService playerService = SoundWaves.sBoundPlayerService;
 
 		String playingFirst = "";
 		if (playerService != null && playerService.getCurrentItem() != null && playerService.getCurrentItem() instanceof FeedItem) {

@@ -1,20 +1,26 @@
 package org.bottiger.podcast.receiver;
 
 import org.bottiger.podcast.ApplicationConfiguration;
-import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.Player.SoundWavesPlayer;
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.notification.NotificationPlayer;
-import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
 
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.IBinder;
+import android.support.annotation.NonNull;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 public class NotificationReceiver extends BroadcastReceiver {
+
+    private static final String TAG = "NotificationReceiver";
 
 	public static final String toggleAction = ApplicationConfiguration.packageName + ".TOGGLE";
 	public static final String nextAction = ApplicationConfiguration.packageName + ".NEXT";
@@ -22,6 +28,24 @@ public class NotificationReceiver extends BroadcastReceiver {
 
 	private RemoteViews layout;
 	private NotificationPlayer np;
+
+    private static String saction = "";
+
+    public ServiceConnection playerServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            Log.d(TAG, "PlayerService, onServiceConnected");
+            PlayerService service2 = ((PlayerService.PlayerBinder) service)
+                    .getService();
+
+            executeCommand(service2, saction);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName className) {
+            Log.d(TAG, "PlayerService, onServiceDisconnected");
+        }
+    };
 	
 	@Override
 	public void onReceive(Context context, Intent intent) {
@@ -29,15 +53,22 @@ public class NotificationReceiver extends BroadcastReceiver {
 		String action = intent.getAction();
 		layout = new RemoteViews(context.getPackageName(), R.layout.notification);
 
-        PlayerService playerService = MainActivity.getPlayerService();
-
-        // FIXME we should start the service and not just return.
-        // FIXME The user probably wants to start playing when the service isn't running
-        if (playerService == null) {
-            //VendorCrashReporter.report("PlayerService", "IS NULL");
+        IBinder binder = peekService(context, new Intent(context, PlayerService.class));
+        if (binder == null) {
+            //saction = action;
+            //Intent i = new Intent(context, PlayerService.class);
+            //context.startService(i);
+            //context.bindService(i, playerServiceConnection, Context.BIND_AUTO_CREATE);
+            ((SoundWaves)context.getApplicationContext()).startService();
             return;
         }
 
+        PlayerService playerService = ((PlayerService.PlayerBinder) binder).getService();
+
+        executeCommand(playerService, action);
+	}
+
+    private void executeCommand(@NonNull PlayerService playerService, @NonNull String action) {
         if (action.equals(nextAction)) {
             playerService.playNext();
             return;
@@ -47,29 +78,31 @@ public class NotificationReceiver extends BroadcastReceiver {
             playerService.halt();
             return;
         }
-		
-		if (action.equals(toggleAction)) {
+
+        if (action.equals(toggleAction)) {
+
+
             SoundWavesPlayer player = playerService.getPlayer();
             if (!player.isInitialized()) {
                 return;
             }
 
-			Boolean isPlaying = false;
-			if (playerService.isPlaying()) {
-				playerService.pause();
-			} else {
-				playerService.start();
-				isPlaying = true;
-			}
+            Boolean isPlaying = false;
+            if (playerService.isPlaying()) {
+                playerService.pause();
+            } else {
+                playerService.play();
+                isPlaying = true;
+            }
 
             IEpisode currentItem = playerService.getCurrentItem();
             if (currentItem != null) {
                 np = new NotificationPlayer(playerService, playerService.getCurrentItem());
-                np.setmPlayerService(playerService);
+                np.setPlayerService(playerService);
                 np.show(isPlaying);
             }
-		}
-		
-	}
+
+        }
+    }
 	
 }

@@ -4,13 +4,17 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBarActivity;
 import android.transition.Slide;
 import android.transition.Transition;
 import android.view.Window;
 import android.view.WindowManager;
 
-import com.facebook.drawee.backends.pipeline.Fresco;
+import com.squareup.otto.Bus;
+
+import org.bottiger.podcast.playlist.Playlist;
+import org.bottiger.podcast.service.PlayerService;
 
 public class TopActivity extends ActionBarActivity {
 	
@@ -21,6 +25,7 @@ public class TopActivity extends ActionBarActivity {
         getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
 
         super.onCreate(savedInstanceState);
+        SoundWaves.getBus().register(this);
 
         boolean transparentStatus = transparentNavigationBar();
         /*
@@ -45,6 +50,12 @@ public class TopActivity extends ActionBarActivity {
 	}
 
     @Override
+    protected void onDestroy() {
+        SoundWaves.getBus().unregister(this);
+        super.onDestroy();
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
         SoundWaves.sAnalytics.activityPause();
@@ -65,6 +76,16 @@ public class TopActivity extends ActionBarActivity {
      */
     protected boolean transparentNavigationBar() {
         return true;
+    }
+
+    @Nullable
+    protected Playlist getPlaylist() {
+        PlayerService ps = SoundWaves.sBoundPlayerService;
+
+        if (ps != null)
+            return ps.getPlaylist();
+
+        return null;
     }
 
 }

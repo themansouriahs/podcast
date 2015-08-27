@@ -156,6 +156,7 @@ public class SubscriptionFilter implements IPlaylistFilter, SharedPreferences.On
 
     public void clear() {
         mFilterType = DisplayFilter.ALL;
+        mSubscriptions.clear();
     }
 
     @Override
@@ -174,7 +175,7 @@ public class SubscriptionFilter implements IPlaylistFilter, SharedPreferences.On
                 if (prefrenceValue.contains(SEPARATOR)) {
                     for (Long subscriptionId : parsePreference(prefrenceValue)) {
                         mSubscriptions.add(subscriptionId);
-                        mFilterType = DisplayFilter.MANUAL;
+                        mFilterType = DisplayFilter.SELECTED;
                     }
                     return;
                 }

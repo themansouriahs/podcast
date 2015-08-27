@@ -3,7 +3,11 @@ package org.bottiger.podcast.views.dialogs;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.util.LongSparseArray;
 import android.util.AttributeSet;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -13,10 +17,14 @@ import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.squareup.otto.Subscribe;
+
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.playlist.filters.SubscriptionFilter;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.provider.SubscriptionLoader;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -33,7 +41,7 @@ public class DialogPlaylistContent implements DialogInterface.OnMultiChoiceClick
     private SubscriptionFilter mSubscriptionFilter;
 
     private ArrayAdapter<String> mAdapter;
-    private List<Subscription> mSubscriptions = new LinkedList<>();
+    private LongSparseArray<Subscription> mSubscriptions = new LongSparseArray<>(50);
     private List<CheckBox> mCheckboxes = new LinkedList<>();
 
     private RadioGroup mRadioGroup;
@@ -77,12 +85,14 @@ public class DialogPlaylistContent implements DialogInterface.OnMultiChoiceClick
         }
     };
 
-    public DialogPlaylistContent(Context context) {
-        init(context);
+    public DialogPlaylistContent(@NonNull Context context, @Nullable Playlist argPlaylist) {
+        SoundWaves.getBus().register(this);
+        init(context, argPlaylist);
     }
 
-    private void init(Context argContext) {
+    private void init(@NonNull Context argContext, @Nullable Playlist argPlaylist) {
         mContext = argContext;
+        setSubscriptions(argPlaylist);
 
         mSpinnerPrefix = mContext.getResources().getString(R.string.playlist_filter_prefix);
         mShownAll = mContext.getResources().getString(R.string.playlist_filter_all);
@@ -95,10 +105,10 @@ public class DialogPlaylistContent implements DialogInterface.OnMultiChoiceClick
      */
     public boolean performClick() {
         mSubscriptions.clear();
-        List<Subscription> list = Subscription.allAsList(mContext.getContentResolver());
+        List<Subscription> list = SubscriptionLoader.allAsList(mContext.getContentResolver());
         for (Subscription s : list) {
             if (s.getStatus() == Subscription.STATUS_SUBSCRIBED)
-                mSubscriptions.add(s);
+                mSubscriptions.append(s.getId(), s);
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -113,7 +123,10 @@ public class DialogPlaylistContent implements DialogInterface.OnMultiChoiceClick
         mRadioGroup.setOnCheckedChangeListener(RadioOnCheckedChangeListener);
 
         mCheckboxes.clear();
-        for (Subscription subscription : mSubscriptions) {
+        //for (Subscription subscription : mSubscriptions) {
+        for (int i = 0, nsize = mSubscriptions.size(); i < nsize; i++) {
+            Subscription subscription = mSubscriptions.valueAt(i);
+
             View itemView = inflater.inflate(R.layout.filter_subscriptions_item, null);
             TextView tv = (TextView) itemView.findViewById(R.id.item_text);
             final CheckBox checkBox = (CheckBox) itemView.findViewById(R.id.item_checkbox);
@@ -197,9 +210,12 @@ public class DialogPlaylistContent implements DialogInterface.OnMultiChoiceClick
     public void onCancel(DialogInterface dialog) {
     }
 
-    public void setSubscriptions(Playlist argPlaylist) {
+    @Subscribe
+    public void setSubscriptions(@Nullable Playlist argPlaylist) {
         mPlaylist = argPlaylist;
-        mSubscriptionFilter = argPlaylist.getSubscriptionFilter();
+
+        if (argPlaylist != null)
+            mSubscriptionFilter = argPlaylist.getSubscriptionFilter();
     }
 
     private void checkAll() {
@@ -215,7 +231,15 @@ public class DialogPlaylistContent implements DialogInterface.OnMultiChoiceClick
     }
 
     private void checkCustom() {
+        for (int i = 0; i < mCheckboxes.size(); i++) {
+            CheckBox checkBox = mCheckboxes.get(i);
+            Subscription subscription = mSubscriptions.get(i);
 
+            if (mSubscriptionFilter.isShown(subscription.getId()))
+                checkBox.setChecked(true);
+            else
+                checkBox.setChecked(false);
+        }
     }
 
     private void setRadioButtonState() {

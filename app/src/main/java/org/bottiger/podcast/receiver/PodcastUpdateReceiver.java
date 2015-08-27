@@ -33,7 +33,7 @@ public class PodcastUpdateReceiver extends BroadcastReceiver {
         final long startTime = System.currentTimeMillis();
 
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "");
+        final PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "");
         wl.acquire();
 
 		SubscriptionRefreshManager subscriptionRefreshManager = new SubscriptionRefreshManager(context);
@@ -41,16 +41,17 @@ public class PodcastUpdateReceiver extends BroadcastReceiver {
             @Override
             public void complete(boolean succes, ISubscription argCallback) {
                 final long endTime = System.currentTimeMillis();
-                Integer timeDiff = (int)(endTime-startTime);
+                Integer timeDiff = (int) (endTime - startTime);
                 IAnalytics analytics = AnalyticsFactory.getAnalytics(context);
                 analytics.trackEvent(IAnalytics.EVENT_TYPE.REFRESH_DURATION, timeDiff);
+
+                EpisodeDownloadManager.removeExpiredDownloadedPodcasts(context);
+                EpisodeDownloadManager.startDownload(context);
+
+                wl.release();
                 return;
             }
         });
-		EpisodeDownloadManager.removeExpiredDownloadedPodcasts(context);
-		EpisodeDownloadManager.startDownload(context);
-
-        wl.release();
     }
 
     public static void setUpdate(Context context)

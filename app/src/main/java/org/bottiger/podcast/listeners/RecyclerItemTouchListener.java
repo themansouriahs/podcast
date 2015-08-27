@@ -1,9 +1,11 @@
 package org.bottiger.podcast.listeners;
 
 import android.graphics.Rect;
+import android.os.SystemClock;
 import android.support.v7.widget.RecyclerView;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 
 import org.bottiger.podcast.adapters.PlaylistAdapter;
 import org.bottiger.podcast.views.PlaylistViewHolder;
@@ -16,6 +18,8 @@ public class RecyclerItemTouchListener implements RecyclerView.OnItemTouchListen
     private MotionEvent fingerDown = null;
     private float fingerdownx = -1;
     private float fingerdowny = -1;
+
+    private long mMouseDownTime = -1;
 
     Rect viewRect = new Rect();
 
@@ -31,19 +35,23 @@ public class RecyclerItemTouchListener implements RecyclerView.OnItemTouchListen
                 fingerDown = e;
                 fingerdownx = e.getRawX();
                 fingerdowny = e.getRawY();
+                mMouseDownTime = System.currentTimeMillis();
                 mouseDown = true;
                 break;
             case MotionEvent.ACTION_UP:
-                if (mouseDown) {
+                long timeDiff = System.currentTimeMillis()-mMouseDownTime;
+                if (mouseDown && timeDiff < ViewConfiguration.getLongPressTimeout()) {
                     if (fingerDown != null) {
                         float thresshold = 10;
                         float diffx = Math.abs(fingerdownx-e.getRawX());
                         float diffy = Math.abs(fingerdowny-e.getRawY());
                         if (diffx < thresshold && diffy < thresshold) {
                             fingerDown=null;
-                            onCLick(rv, e);
+                            if (rv != null)
+                                onCLick(rv, e);
                         }
                     }
+                    mMouseDownTime = -1;
                     mouseDown = false;
                     return true;
                 }
@@ -85,6 +93,11 @@ public class RecyclerItemTouchListener implements RecyclerView.OnItemTouchListen
     public void onTouchEvent(RecyclerView rv, MotionEvent e) {
         View childView = rv.findChildViewUnder(e.getX(), e.getY());
         childView.callOnClick();
+    }
+
+    @Override
+    public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+        
     }
 
     /**

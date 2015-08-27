@@ -11,7 +11,11 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
+import com.squareup.otto.Subscribe;
+
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.listeners.DownloadProgress;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.DownloadStatus;
@@ -86,13 +90,13 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
             @Override
             public void FileComplete() {
                 setState(PlayerButtonView.STATE_DELETE);
-                setProgressPercent(0);
+                setProgressPercent(new DownloadProgress());
             }
 
             @Override
             public void FileDeleted() {
                 setState(PlayerButtonView.STATE_DEFAULT);
-                setProgressPercent(0);
+                setProgressPercent(new DownloadProgress());
             }
         });
     }
@@ -108,8 +112,41 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
     @Override
     public void setEpisode(@NonNull IEpisode argItem) {
         super.setEpisode(argItem);
+
+        try {
+            //SoundWaves.sBus.register(this);
+        } catch (IllegalArgumentException iae) {
+            // Ignore
+        }
         setState(calcState());
-        setProgressPercent(0);
+        setProgressPercent(new DownloadProgress());
+    }
+
+    /*
+    @Override
+    public synchronized void unsetEpisodeId() {
+        super.unsetEpisodeId();
+        SoundWaves.sBus.unregister(this);
+    }*/
+
+    @Subscribe
+    public void setProgressPercent(@NonNull DownloadProgress argProgress) {
+        if (!getEpisode().equals(argProgress.getEpisode()))
+            return;
+
+        mProgress = argProgress.getProgress();
+        if (mProgress == 100) {
+            if (mDownloadCompletedCallback != null) {
+                mDownloadCompletedCallback.FileComplete();
+            }
+            setState(PlayerButtonView.STATE_DELETE);
+        }
+
+        if (argProgress.getStatus() == org.bottiger.podcast.service.DownloadStatus.DELETED) {
+            setState(PlayerButtonView.STATE_DEFAULT);
+        }
+
+        this.invalidate();
     }
 
     @Override
@@ -130,7 +167,7 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
             Log.v(TAG, "Delete file");
             IEpisode episode = getEpisode();
             if (episode instanceof FeedItem) {
-                ((FeedItem)episode).delFile(mContext.getContentResolver());
+                ((FeedItem)episode).delFile(mContext);
                 setState(PlayerButtonView.STATE_DEFAULT);
             }
         }

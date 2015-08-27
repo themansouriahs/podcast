@@ -14,13 +14,16 @@
 
     <org.bottiger.podcast.views.FeedRecyclerView
         android:id="@+id/feed_recycler_view"
+        style="@style/FeedViewRecyclerView"
         android:scrollbars="vertical"
+        android:fadeScrollbars="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@color/white_opaque"
         android:overScrollMode="never"
         />
-
+<!--
+-->
     <View
         android:id="@+id/empty_end_column"
         android:layout_width="0dp"

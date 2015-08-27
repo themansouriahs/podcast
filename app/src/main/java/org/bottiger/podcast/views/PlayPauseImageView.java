@@ -2,8 +2,7 @@ package org.bottiger.podcast.views;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Outline;
@@ -18,18 +17,19 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewOutlineProvider;
-import android.widget.ImageView;
+import android.widget.ImageButton;
 
-import org.bottiger.podcast.MainActivity;
+import com.squareup.otto.Subscribe;
+
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.listeners.DownloadObserver;
 import org.bottiger.podcast.listeners.EpisodeStatus;
 import org.bottiger.podcast.listeners.PaletteListener;
+import org.bottiger.podcast.listeners.PlayerStatusData;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
-import org.bottiger.podcast.listeners.PlayerStatusObserver;
-import org.bottiger.podcast.playlist.Playlist;
+import org.bottiger.podcast.listeners.PlayerStatusProgressData;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.utils.ColorExtractor;
@@ -37,8 +37,7 @@ import org.bottiger.podcast.utils.ColorExtractor;
 /**
  * TODO: document your custom view class.
  */
-public class PlayPauseImageView extends ImageView implements PlayerStatusObserver,
-                                                             PaletteListener,
+public class PlayPauseImageView extends ImageButton implements PaletteListener,
                                                              DownloadObserver,
                                                              View.OnClickListener {
 
@@ -49,7 +48,7 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
     private LOCATION mLocation = LOCATION.OTHER;
 
     private static final int START_ANGLE = -90;
-    private static final int DRAW_OFFSET = 5;
+    private static final int DRAW_OFFSET = 6;
     private static final int DRAW_WIDTH = 6;
 
     private PlayerStatusObservable.STATUS mStatus = PlayerStatusObservable.STATUS.STOPPED;
@@ -61,10 +60,8 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
     private RectF bounds;
     private Rect boundsRound = new Rect();
 
+    private boolean mDrawBackground;
     private int mProgressPercent = 0;
-
-    private static Bitmap s_playIcon;
-    private static Bitmap s_pauseIcon;
 
     protected Paint paint;
     private Paint paintBorder;
@@ -80,11 +77,13 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
     public PlayPauseImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
+        initAttr(attrs);
     }
 
     public PlayPauseImageView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init(context);
+        initAttr(attrs);
     }
 
     private void init(Context argContext) {
@@ -102,18 +101,31 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
         paintBorder.setStyle(Paint.Style.STROKE);
         paintBorder.setStrokeWidth(DRAW_WIDTH);
 
+        setScaleType(ScaleType.CENTER);
+
+        if (Build.VERSION.SDK_INT >= 16) {
+            setBackground(null);
+        }
+
         if (isInEditMode()) {
             return;
         }
 
         setOnClickListener(this);
-        if (s_playIcon == null || s_pauseIcon == null) {
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inScaled = false;
-            s_playIcon = BitmapFactory.decodeResource(getResources(), R.drawable.av_play, options);
-            s_pauseIcon = BitmapFactory.decodeResource(getResources(), R.drawable.av_pause, options);
+    }
+
+    private void initAttr(AttributeSet attrs) {
+        TypedArray a = mContext.getTheme().obtainStyledAttributes(
+                attrs,
+                R.styleable.PlayPauseImageView,
+                0, 0);
+
+        try {
+            mDrawBackground = a.getBoolean(R.styleable.PlayPauseImageView_drawBackground, true);
+        } finally {
+            a.recycle();
         }
-        PlayerStatusObservable.registerListener(this);
+
     }
 
     @NonNull
@@ -128,7 +140,7 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
 
 
         long offset = mEpisode instanceof FeedItem && ((FeedItem)mEpisode).offset > 0 ? ((FeedItem)mEpisode).offset : 0;
-        setProgressMs(offset);
+        setProgressMs(new PlayerStatusProgressData(offset));
         invalidate();
     }
 
@@ -138,6 +150,15 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
 
     public void setStatus(PlayerStatusObservable.STATUS argStatus) {
         mStatus = argStatus;
+
+        int resid;
+        if (mStatus == PlayerStatusObservable.STATUS.PLAYING) {
+            resid = drawBackground() ? R.drawable.ic_pause_white : R.drawable.ic_pause_black;
+        } else {
+            resid = drawBackground() ? R.drawable.ic_play_arrow_white : R.drawable.ic_play_arrow_black;
+        }
+        setImageResource(resid);
+
         this.invalidate();
     }
 
@@ -157,8 +178,11 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
         int centerY = contentHeight/2;
 
         // Draw the background circle
-        float radius = centerX-DRAW_OFFSET;
-        canvas.drawCircle(centerX,centerY,radius,paint);
+        float radius = centerX-DRAW_WIDTH;
+
+        if (drawBackground()) {
+            canvas.drawCircle(centerX, centerY, radius, paint);
+        }
 
         int diff2 =  DRAW_WIDTH;//(int) (centerY-radius);
         boolean updateOutline = bounds == null;
@@ -166,34 +190,34 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
         bounds = new RectF(DRAW_OFFSET, diff2, contentWidth - DRAW_OFFSET, contentWidth - diff2); // DRAW_OFFSET-diff
 
         if (updateOutline) {
-            onSizeChanged(0,0,0,0);
+            onSizeChanged(0, 0, 0, 0);
         }
 
-        if (DRAW_PROGRESS) {
+        if (DRAW_PROGRESS && getEpisode() != null && getEpisode().isMarkedAsListened()) {
+            canvas.drawCircle(centerX, centerY, radius, paintBorder);
+        } else if (DRAW_PROGRESS && mProgressPercent > 0) {
             canvas.drawArc(bounds, START_ANGLE, getProgressAngle(mProgressPercent), false, paintBorder);
         }
 
-        // Draw the play/pause icon
-        Bitmap icon = mStatus == PlayerStatusObservable.STATUS.PLAYING ?  s_pauseIcon : s_playIcon;
-
-        int bitmapx = centerX-icon.getWidth()/2;
-        int bitmapy = centerY-icon.getHeight()/2;
-
-        if (drawIcon()) {
-            canvas.drawBitmap(icon, bitmapx, bitmapy, paint);
-        }
+        super.onDraw(canvas);
     }
 
-    @Override
-    public void setProgressMs(long progressMs) {
+    @Subscribe
+    public void setProgressMs(PlayerStatusProgressData argPlayerProgress) {
 
         // copy from seekbar
 
-        if (progressMs < 0) {
+        if (argPlayerProgress.progressMs < 0) {
             throw new IllegalStateException("Progress must be positive");
         }
         float progress = 0;
-        float duration = getEpisode().getDuration();
+
+        IEpisode episode = getEpisode();
+
+        if (episode == null)
+            return;
+
+        float duration = episode.getDuration();
 
         if (duration <= 0) {
             Log.d("Warning", "Seekbar state may be invalid");
@@ -201,14 +225,27 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
         }
 
         try {
-            progress = progressMs / duration * 100;
+            progress = argPlayerProgress.progressMs / duration * 100;
         } catch (Exception e) {
             e.printStackTrace();
         }
         setProgressPercent((int) progress);
     }
 
-    @Override
+    @Subscribe
+    public void onPlayerStateChange(PlayerStatusData argPlayerStatus) {
+        if (argPlayerStatus == null)
+            return;
+
+        if (!getEpisode().equals(argPlayerStatus.episode)) {
+
+            setStatus(PlayerStatusObservable.STATUS.PAUSED);
+            return;
+        }
+
+        setStatus(argPlayerStatus.status);
+    }
+
     public void onStateChange(EpisodeStatus argStatus) {
         if (!argStatus.getEpisode().equals(mEpisode)) {
             return;
@@ -234,24 +271,11 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
         if (type != null) {
             SoundWaves.sAnalytics.trackEvent(type);
         }
-        boolean isPlaying = MainActivity.sBoundPlayerService.toggle(mEpisode);
+        boolean isPlaying = SoundWaves.sBoundPlayerService.toggle(mEpisode);
 
         setStatus(isPlaying ? PlayerStatusObservable.STATUS.PLAYING : PlayerStatusObservable.STATUS.STOPPED);
 
-        IEpisode item = getEpisode();
-        Playlist playlist = Playlist.getActivePlaylist();
-
-        if (playlist.contains(item)) {
-            int position = playlist.getPosition(item);
-
-            if (position != 0) {
-                playlist.move(position, 0);
-                playlist.notifyPlaylistRangeChanged(position, 0);
-            }
-        } else {
-            playlist.setItem(0, item);
-            playlist.notifyPlaylistRangeChanged(0, 0);
-        }
+        //SoundWaves.getBus().post(new PlaylistData().playlistChanged = true);
     }
 
     @Override
@@ -314,6 +338,10 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        if  (isInEditMode()) {
+            return;
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             setOutlineProvider(new CustomOutline(bounds));
         }
@@ -339,5 +367,9 @@ public class PlayPauseImageView extends ImageView implements PlayerStatusObserve
 
     protected boolean drawIcon() {
         return true;
+    }
+
+    protected boolean drawBackground() {
+        return mDrawBackground;
     }
 }

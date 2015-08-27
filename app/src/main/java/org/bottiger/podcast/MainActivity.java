@@ -6,7 +6,6 @@ import org.bottiger.podcast.AbstractEpisodeFragment.OnPlaylistRefreshListener;
 import org.bottiger.podcast.cloud.CloudProvider;
 import org.bottiger.podcast.debug.SqliteCopy;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.service.HTTPDService;
 import org.bottiger.podcast.service.PlayerService;
@@ -18,12 +17,9 @@ import org.bottiger.podcast.utils.TransitionUtils;
 
 
 import android.accounts.Account;
-import android.accounts.AccountManager;
-import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.content.ComponentName;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -36,7 +32,6 @@ import android.os.Debug;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -51,7 +46,6 @@ public class MainActivity extends FragmentContainerActivity implements
 	private final int REQUEST_AUTHORIZATION = 1;
 	private final int REQUEST_ACCOUNT_PICKER = 0;
 
-    public static PlayerService sBoundPlayerService = null;
 	public static PodcastService mPodcastServiceBinder = null;
 	public static HTTPDService mHTTPDServiceBinder = null;
 
@@ -71,23 +65,6 @@ public class MainActivity extends FragmentContainerActivity implements
 	private SharedPreferences prefs;
 
 	private int currentTheme;
-
-    public ServiceConnection playerServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            Log.d("PlayerService", "onServiceConnected");
-            sBoundPlayerService = ((PlayerService.PlayerBinder) service)
-                    .getService();
-            sBoundPlayerService.setMediaCast(mMediaRouteCast);
-            PlayerStatusObservable.setActivity(MainActivity.this);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName className) {
-            Log.d("PlayerService", "onServiceDisconnected");
-            sBoundPlayerService = null;
-        }
-    };
 
 	public static ServiceConnection mHTTPDServiceConnection = new ServiceConnection() {
 		@Override
@@ -112,9 +89,7 @@ public class MainActivity extends FragmentContainerActivity implements
 		super.onCreate(savedInstanceState);
 
         // Start the player service
-        startService(new Intent(this, PlayerService.class));
-        Intent bindIntent = new Intent(this, PlayerService.class);
-        bindService(bindIntent, playerServiceConnection, Context.BIND_AUTO_CREATE);
+		((SoundWaves)getApplicationContext()).startService();
 
 		/*
 		 * BugSenseHandler.initAndStartSession(MainActivity.this, ((SoundWaves)
@@ -219,7 +194,7 @@ public class MainActivity extends FragmentContainerActivity implements
      */
     @Nullable
     public static PlayerService getPlayerService() {
-        return sBoundPlayerService;
+        return SoundWaves.sBoundPlayerService;
     }
 
 	/**
@@ -300,14 +275,14 @@ public class MainActivity extends FragmentContainerActivity implements
 
 	@Override
 	protected void onDestroy() {
-		super.onDestroy();
 		unregisterReceiver(receiver);
 
         try {
-            unbindService(playerServiceConnection);
+            unbindService(((SoundWaves)getApplicationContext()).playerServiceConnection);
         } catch (Exception e) {
             VendorCrashReporter.handleException(e);
         }
+		super.onDestroy();
 	}
 
 	@Override

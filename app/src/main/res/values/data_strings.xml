@@ -3,7 +3,9 @@
     <string name="pref_interface_other_category_key" translatable="false">pref_interface_other_category</string>
     <string name="pref_delete_when_finished_key" translatable="false">pref_delete_when_finished</string>
     <string name="pref_download_only_wifi_key" translatable="false">pref_download_only_wifi</string>
+    <string name="pref_download_on_update_key" translatable="false">pref_download_on_update</string>
     <string name="pref_continuously_playing_key" translatable="false">pref_continuously_playing</string>
+    <string name="pref_only_downloaded_key" translatable="false">pref_only_downloaded</string>
     <string name="pref_advanced_category_experimental_key" translatable="false">pref_advanced_category_experimental</string>
     <string name="pref_screen_rotation_key" translatable="false">pref_screen_rotation</string>
     <string name="pref_subscriptions_columns_key" translatable="false">pref_subscriptions_columns</string>
@@ -11,8 +13,13 @@
     <string name="pref_webservices_discovery_engine_key" translatable="false" >pref_webservices_discovery_engine</string>
     <string name="pref_anonymous_feedback_key" translatable="false" >pref_anonymous_feedback</string>
     <string name="pref_cloud_support_key" translatable="false" >pref_cloud_support</string>
+    <string name="pref_gpodder_support_key" translatable="false" >pref_gpodder_support</string>
+    <string name="pref_gpodder_username_key" translatable="false" >pref_gpodder_username</string>
+    <string name="pref_gpodder_password_key" translatable="false" >pref_gpodder_password</string>
     <string name="pref_playlist_subscriptions_key" translatable="false" >pref_playlist_subscriptions</string>
     <string name="pref_player_forward_amount_key" translatable="false" >pref_player_forward_amount</string>
     <string name="pref_player_backward_amount_key" translatable="false" >pref_player_backward_amount</string>
+    <string name="pref_top_player_text_expanded_key" translatable="false" >pref_top_player_text_expanded</string>
+    <string name="pref_top_player_fullscreen_key" translatable="false" >pref_top_player_fullscreen</string>
 </resources>
 

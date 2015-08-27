@@ -2,18 +2,23 @@ apply plugin: 'idea'
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 22
-    buildToolsVersion "22.0.1"
+    compileSdkVersion 23
+    buildToolsVersion "23.0.0"
 
     defaultConfig {
         applicationId "org.bottiger.podcast"
         minSdkVersion 15
-        targetSdkVersion 22
-        versionCode 128     // even - release. Odd - development
-        versionName "0.94" // even - release. Odd - development
+        targetSdkVersion 23
+        versionCode 146     // even - release. Odd - development
+        versionName "0.98" // even - release. Odd - development
         //useJack = true
         multiDexEnabled = true
+
+        // Espresso
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+
+    useLibrary 'org.apache.http.legacy' // Need until GMS upgraded
 
     lintOptions {
         checkReleaseBuilds false
@@ -25,6 +30,7 @@ android {
         exclude 'META-INF/NOTICE.txt'
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/NOTICE'
+        exclude 'LICENSE.txt'
     }
 
     productFlavors {
@@ -63,7 +69,7 @@ android {
         debug {
             //minifyEnabled true
             //shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            //proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 
@@ -78,6 +84,14 @@ android {
         targetCompatibility JavaVersion.VERSION_1_7
     }
 }
+
+//allprojects {
+//    gradle.projectsEvaluated {
+//        tasks.withType(JavaCompile) {
+//            options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+//        }
+//    }
+//}
 
 repositories {
     mavenCentral()
@@ -94,62 +108,78 @@ idea {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.mcxiaoke.volley:library:1.0.+'
-
-    compile 'com.squareup.okhttp:okhttp:2.2+'
-    compile 'com.squareup.okhttp:okhttp-urlconnection:2.2+'
+    compile 'com.squareup.okhttp:okhttp:2.3.0'                // okhhtp 2.4.0 is buggy with retrifit 1.9.0
+    compile 'com.squareup.okhttp:okhttp-urlconnection:2.3.0'
     compile 'com.squareup.retrofit:retrofit:1.9.0'
-
-    compile 'com.squareup.picasso:picasso:2.5.0'
-
-    compile ('com.googlecode.json-simple:json-simple:1.1.1') {
+    compile 'com.squareup:otto:1.3.7'
+    compile('com.googlecode.json-simple:json-simple:1.1.1') {
         exclude module: 'junit'
     }
-
     //compile 'com.google.apis:google-api-services-drive:+'
+
     //compile 'com.google.api-client:google-api-client-android:+'
     compile 'com.google.http-client:google-http-client-gson:+'
-
-    compile 'com.android.support:support-v4:22+' // compile 'com.android.support:support-v4:+'
-
-    compile 'com.android.support:appcompat-v7:22+'
-    compile 'com.android.support:recyclerview-v7:22+'
-    compile 'com.android.support:palette-v7:22+'
-    compile 'com.android.support:cardview-v7:22+'
-    compile 'com.android.support:mediarouter-v7:22+'
-
-    compile 'com.melnykov:floatingactionbutton:1+' // floating action button
-
-    compile 'commons-io:commons-io:2.4'
+    compile 'com.android.support:support-v4:23.0.0'
+    compile 'com.android.support:appcompat-v7:23.0.0'
+    compile 'com.android.support:recyclerview-v7:23.0.0'
+    compile 'com.android.support:palette-v7:23.0.0'
+    compile 'com.android.support:cardview-v7:23.0.0'
+    compile 'com.android.support:mediarouter-v7:23.0.0'
+    compile 'com.android.support:design:23.0.0'
+    compile 'com.melnykov:floatingactionbutton:1+'
+    // floating action button
+    compile ('commons-io:commons-io:2.4') {
+        exclude group: 'org.apache.httpcomponents', module: 'httpclient'
+    }
     compile 'commons-validator:commons-validator:1.4.0'
-
     compile 'org.jsoup:jsoup:1.7.3'
-    compile 'com.github.traex.rippleeffect:library:1.2.4'
-
     //compile 'com.eowise:recyclerview-stickyheaders:0.5.1@aar'
     compile 'jp.wasabeef:recyclerview-animators:1.2.0@aar'
-
-    compile 'ch.acra:acra:4.6.+'
+    compile 'ch.acra:acra:4.6.2'
     //compile 'com.github.anrwatchdog:anrwatchdog:1.+'
-
     compile 'com.fasterxml.jackson.core:jackson-databind:2.5+'
-    compile 'com.facebook.fresco:fresco:0.4.0+'
-
+    compile 'com.facebook.fresco:fresco:0.6.1'
     compile 'com.cocosw:undobar:1.+@aar'
-
     // For testing only
     testCompile 'junit:junit:4.12'
-    testCompile "org.mockito:mockito-core:1.9.5"
+    testCompile 'org.mockito:mockito-core:1.9.5'
+    configurations.all {
+        resolutionStrategy.force 'com.android.support:support-annotations:22.1.1'
+    }
+    // Espresso
+
+    // https://developer.android.com/training/testing/ui-testing/espresso-testing.html
+    androidTestCompile 'com.android.support.test:runner:0.2'
+    androidTestCompile 'com.android.support.test:rules:0.2'
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.1') {
+        //exclude group: 'javax.inject'
+        exclude group: 'com.google.code.findbugs'
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
+    //androidTestCompile('com.android.support.test:testing-support-lib:0.1')
+
+    //androidTestCompile( 'com.android.support.test.espresso:espresso-contrib:2.1') {
+
+    //exclude group: 'javax.inject'
+
+    //    exclude group: 'com.google.code.findbugs'
+
+    //    exclude group: 'com.android.support', module: 'support-annotations'
+
+    //}
 
     // Free version
 
     // Amazon version
     amazonCompile fileTree(dir: 'src/amazon/libs', include: ['*.jar'])
-    amazonCompile 'com.google.android.gms:play-services-cast:7.0.+' // google cast
+    amazonCompile 'com.google.android.gms:play-services-cast:7.8.0'
+    // google cast
 
     // Play Store
-    googleCompile 'com.google.android.gms:play-services-analytics:7.0.+' // analytics
-    googleCompile 'com.google.android.gms:play-services-cast:7.0.+' // google cast
+    googleCompile 'com.google.android.gms:play-services-analytics:7.8.0'
+    // analytics
+    googleCompile 'com.google.android.gms:play-services-cast:7.8.0'
+    // google cast
 }

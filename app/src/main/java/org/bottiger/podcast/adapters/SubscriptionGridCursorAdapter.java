@@ -4,6 +4,7 @@ import org.bottiger.podcast.FeedActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.adapters.viewholders.subscription.SubscriptionViewHolder;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.provider.SubscriptionLoader;
 
 import android.app.Activity;
 import android.content.Context;
@@ -12,10 +13,15 @@ import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 public class SubscriptionGridCursorAdapter extends CursorRecyclerAdapter {
@@ -33,11 +39,12 @@ public class SubscriptionGridCursorAdapter extends CursorRecyclerAdapter {
 
     private OnSubscriptionCountChanged mOnSubscriptionCountChanged = null;
 
-    public SubscriptionGridCursorAdapter(Activity argActivity, Cursor cursor) {
+    public SubscriptionGridCursorAdapter(Activity argActivity, Cursor cursor, int argColumnsCount) {
         super(cursor);
         mActivity = argActivity;
         mInflater = (LayoutInflater) argActivity
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        numberOfColumns = argColumnsCount;
     }
 
     @Override
@@ -56,7 +63,7 @@ public class SubscriptionGridCursorAdapter extends CursorRecyclerAdapter {
 
         Subscription sub = null;
         try {
-            sub = Subscription.getByCursor(cursor);
+            sub = SubscriptionLoader.getByCursor(cursor);
         } catch (IllegalStateException e) {
             e.printStackTrace();
         }
@@ -72,53 +79,6 @@ public class SubscriptionGridCursorAdapter extends CursorRecyclerAdapter {
 
         if (isListView()) {
             holder.gradient.setVisibility(View.GONE);
-
-            boolean missingColor = sub.getPrimaryColor() == -1;
-
-            /*
-            if (missingColor) {
-
-                TintedFramelayout tview = (TintedFramelayout) view;
-                tview.unsetSubscription();
-                tview.setSubscription(sub);
-
-                UrlValidator validator = new UrlValidator();
-                if (validator.isValid(logo)) {
-
-                try {
-
-                    Uri uri = Uri.parse(logo);
-                    ImageRequest request = ImageRequestBuilder
-                            .newBuilderWithSource(uri)
-                            .build();
-
-
-                    ImagePipeline imagePipeline = Fresco.getImagePipeline();
-                    DataSource<CloseableReference<CloseableImage>> dataSource = imagePipeline.fetchDecodedImage(request, mActivity); //
-
-                    dataSource.subscribe(new BaseBitmapDataSubscriber() {
-                        @Override
-                        public void onNewResultImpl(@Nullable Bitmap bitmap) {
-                            PaletteCache.generate(logo, bitmap);
-                            // You can use the bitmap in only limited ways
-                            // No need to do any cleanup.
-                        }
-
-                        @Override
-                        public void onFailureImpl(DataSource dataSource) {
-                            // No cleanup required here.
-                        }
-                    }, null);
-                } catch (NullPointerException npe) {
-                    // Uri.parse probably failed because logo==null
-                }
-            }
-
-
-            } else {
-                view.setBackgroundColor(sub.getPrimaryColor());
-            }*/
-
         } else {
             holder.gradient.setVisibility(View.VISIBLE);
         }
@@ -128,6 +88,13 @@ public class SubscriptionGridCursorAdapter extends CursorRecyclerAdapter {
             holder.title.setText(title);
         else
             holder.title.setText(R.string.subscription_no_title);
+
+        if (subscription.getLastUpdate() > 0 && holder.subTitle != null) {
+            String reportDate = DateUtils.getRelativeTimeSpanString(subscription.getLastItemUpdated()).toString(); //df.format(date);
+
+            String updatedAt = mActivity.getResources().getString(R.string.subscription_subtitle_updated_at);
+            holder.subTitle.setText(updatedAt + " " + reportDate);
+        }
 
 
         if (holder.image != null && !TextUtils.isEmpty(logo)) {
