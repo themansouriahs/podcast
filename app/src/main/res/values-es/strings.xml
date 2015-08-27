@@ -22,6 +22,7 @@
   <string name="menu_settings">Configuración</string>
   <string name="title_activity_swipe">SoundWaves</string>
   <string name="menu_download_all">Descarga múltiple</string>
+  <string name="menu_clear_playlist">Restablecer</string>
   <string name="menu_import">Importar/Exportar OPML</string>
   <string name="menu_add_podcast">Añadir podcast</string>
   <string name="menu_order_by_date_desc">Mostrar más recientes primero</string>
@@ -55,6 +56,8 @@
   <string name="preferences_category_about">Acerca de</string>
   <string name="pref_current_version_title">Versión</string>
   <string name="ok">De acuerdo</string>
+  <string name="playlist_filter_all">Todas las suscripciones</string>
+  <string name="playlist_filter_some">Selección personalizada</string>
   <string name="playlist_filter_prefix">Mostrar:</string>
   <string name="preference_first_run_key">firstrun</string>
   <string name="menu_feedback">Comentarios</string>
@@ -67,6 +70,7 @@
   <string name="subscription_instruction">Añadir nuevos podcast mediante la página Descubrir a la derecha o importar un archivo OPML.\n\nSin embargo, por favor, antes de ello piensa si quieres activar o desactivar las opciones de más abajo.</string>
   <string name="filter_show_listened">Mostrar escuchados</string>
   <string name="auto_start_next">Empezar siguiente automáticamente</string>
+  <string name="drawer_playlist_filters">Filtros de la lista de reproducción</string>
   <string name="drawer_player_settings">Configuración del reproductor</string>
   <string name="opml_not_found">No se encuentra el archivo OPML. Renombra el archivo %1$s y ponlo en el la carpeta de root del almacenamiento externo (tarjeta SD).</string>
   <string name="gpodder_searching">Buscar mediante gPodder.net</string>
@@ -114,6 +118,21 @@
   <string name="pref_webservices_discovery_title">Motor de búsqueda</string>
   <string name="pref_webservices_discovery_description">Servicios web utilizados para buscar podcast</string>
   <string name="subscription_instruction_title">Gracias por probar SoundWaves</string>
+  <string name="playlist_filter_introducion">Rellenar la lista automáticamente con podcast recientes de</string>
+  <string name="playlist_filter_none">No rellenar</string>
+  <string name="playlist_empty">Lista de reproducción vacía :(</string>
+  <string name="playlist_empty_title">Seleccionar el modo de la lista de reproducción</string>
+  <string name="playlist_empty_text_top">Párate un momento a pensar cómo quieres utilizar la aplicación</string>
+  <string name="playlist_empty_text_bottom">Siempre puedes elegir cómo funciona la lista de reproducción mediante el menú lateral a la izquierda</string>
+  <string name="playlist_empty_mode_one">Añadir podcast a la cola de forma manual</string>
+  <string name="playlist_empty_mode_two">Podcast recientes</string>
+  <string name="playlist_empty_mode_one_desc">La lista de reproducción sólo contendrá podcast añadidos manualmente</string>
+  <string name="playlist_empty_mode_two_desc">La lista de reproducción se rellenará ella sola y siempre contendrá los podcast más recientes. No obstante, siempre podrás añadir los podcast que desees</string>
+  <string name="playlist_episode_dismissed">Podcast eliminado</string>
+  <string name="drawer_playlist_content_source">Contenido de la lista de reproducción</string>
+  <string name="playlist_context_menu_playnext">Reproducir siguiente</string>
+  <string name="subscription_subtitle_updated_at">actualizado</string>
+  <string name="filter_show_only_downloaded">Sólo descargados</string>
   <plurals name="bulk_download_playlist">
     <item quantity="one">Primer podcast en la lista de reproducción</item>
     <item quantity="other">Los %d podcast más populares en la lista de reproducción</item>
