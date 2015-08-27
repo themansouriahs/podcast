@@ -22,9 +22,9 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 
-import com.rey.material.widget.Switch;
 import com.squareup.otto.Subscribe;
 
 import org.bottiger.podcast.ApplicationConfiguration;
@@ -60,9 +60,9 @@ public class DialogPlaylistFilters extends DialogFragment {
 
     private RadioGroup mRadioGroup;
 
-    protected Switch mPlaylistShowListened;
-    protected Switch mAutoPlayNext;
-    protected Switch mOnlyDownloaded;
+    protected android.support.v7.widget.SwitchCompat mPlaylistShowListened;
+    protected android.support.v7.widget.SwitchCompat mAutoPlayNext;
+    protected android.support.v7.widget.SwitchCompat mOnlyDownloaded;
     protected Spinner mPlaylistOrderSpinner;
 
 
@@ -139,9 +139,9 @@ public class DialogPlaylistFilters extends DialogFragment {
         View view = inflater.inflate(R.layout.dialog_playlist_filters, null);
 
             mPlaylistOrderSpinner = (Spinner) view.findViewById(R.id.drawer_playlist_sort_order);
-            mPlaylistShowListened = (Switch) view.findViewById(R.id.slidebar_show_listened);
-            mOnlyDownloaded = (Switch) view.findViewById(R.id.slidebar_show_downloaded);
-            mAutoPlayNext = (Switch) view.findViewById(R.id.slidebar_show_continues);
+            mPlaylistShowListened = (android.support.v7.widget.SwitchCompat) view.findViewById(R.id.slidebar_show_listened);
+            mOnlyDownloaded = (android.support.v7.widget.SwitchCompat) view.findViewById(R.id.slidebar_show_downloaded);
+            mAutoPlayNext = (android.support.v7.widget.SwitchCompat) view.findViewById(R.id.slidebar_show_continues);
 
         initSubscriptionFilter(inflater, view);
 
@@ -221,9 +221,9 @@ public class DialogPlaylistFilters extends DialogFragment {
     private void initOnlyDownloaded() {
 
         // Show only downloaded
-        mOnlyDownloaded.setOnCheckedChangeListener(new Switch.OnCheckedChangeListener() {
+        mOnlyDownloaded.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(Switch aSwitch, boolean isChecked) {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 PlaylistData pd = new PlaylistData();
                 pd.onlyDownloaded = isChecked;
                 SoundWaves.getBus().post(pd);
@@ -239,9 +239,9 @@ public class DialogPlaylistFilters extends DialogFragment {
 
     private void initShowListened() {
         // Show listened
-        mPlaylistShowListened.setOnCheckedChangeListener(new Switch.OnCheckedChangeListener() {
+        mPlaylistShowListened.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(Switch aSwitch, boolean isChecked) {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 PlaylistData pd = new PlaylistData();
                 pd.showListened = isChecked;
                 SoundWaves.getBus().post(pd);
@@ -259,9 +259,9 @@ public class DialogPlaylistFilters extends DialogFragment {
         // Auto play next
         final String playNextKey = getResources().getString(R.string.pref_continuously_playing_key);
 
-        mAutoPlayNext.setOnCheckedChangeListener(new Switch.OnCheckedChangeListener() {
+        mAutoPlayNext.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(Switch aSwitch, boolean isChecked) {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mSharedPreferences.edit().putBoolean(playNextKey, isChecked).commit();
             }
         });

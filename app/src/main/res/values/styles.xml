@@ -325,7 +325,7 @@
 
     <!-- Navigation Drawer - Start -->
     <!-- parent="Theme.AppCompat.Light.NoActionBar-->
-    <style name="DrawerSwitchTextAppearance" parent="@style/Material.Widget.Switch">
+    <style name="DrawerSwitchTextAppearance">
         <item name="android:textColor">@color/filter_text</item>
         <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
     </style>

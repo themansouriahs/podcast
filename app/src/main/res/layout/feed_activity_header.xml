@@ -68,12 +68,11 @@
         android:visibility="gone"
         android:layout_alignParentBottom="true">
 
-        <com.rey.material.widget.Button
+        <Button
             android:id="@+id/feed_subscribe_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/discovery_subscribe"
-            app:rd_enable="true"/>
+            android:text="@string/discovery_subscribe"  />
 
     </FrameLayout>
 

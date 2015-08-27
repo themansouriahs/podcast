@@ -17,7 +17,7 @@ public class SearchResultViewHolder extends RecyclerView.ViewHolder {
 
     public TextView title;
     public SimpleDraweeView image;
-    public com.rey.material.widget.Switch toggleSwitch;
+    public android.support.v7.widget.SwitchCompat toggleSwitch;
 
     public Uri imageUrl = null;
 
@@ -26,7 +26,7 @@ public class SearchResultViewHolder extends RecyclerView.ViewHolder {
 
         title = (TextView) itemView.findViewById(R.id.result_title);
         image = (SimpleDraweeView) itemView.findViewById(R.id.result_image);
-        toggleSwitch = (com.rey.material.widget.Switch) itemView.findViewById(R.id.result_subscribe_switch);
+        toggleSwitch = (android.support.v7.widget.SwitchCompat) itemView.findViewById(R.id.result_subscribe_switch);
 
     }
 }

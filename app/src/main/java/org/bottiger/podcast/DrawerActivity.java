@@ -41,7 +41,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
-import com.rey.material.widget.Switch;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
@@ -90,9 +89,9 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity {
 	protected FrameLayout mDrawerContainer;
     protected TableLayout mDrawerTable;
 
-    protected Switch mPlaylistShowListened;
-    protected Switch mAutoPlayNext;
-    protected Switch mOnlyDownloaded;
+    protected android.support.v7.widget.SwitchCompat mPlaylistShowListened;
+    protected android.support.v7.widget.SwitchCompat mAutoPlayNext;
+    protected android.support.v7.widget.SwitchCompat mOnlyDownloaded;
     protected Spinner mPlaylistOrderSpinner;
     protected LinearLayout mPlaylistContentLayout;
     protected PlaylistContentSpinnerAdapter mPlaylistContentSpinnerAdapter;
@@ -163,9 +162,9 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity {
         }
 
         mPlaylistOrderSpinner = (Spinner) findViewById(R.id.drawer_playlist_sort_order);
-        mPlaylistShowListened = (Switch) findViewById(R.id.slidebar_show_listened);
-        mOnlyDownloaded = (Switch) findViewById(R.id.slidebar_show_downloaded);
-        mAutoPlayNext = (Switch) findViewById(R.id.slidebar_show_continues);
+        mPlaylistShowListened = (android.support.v7.widget.SwitchCompat) findViewById(R.id.slidebar_show_listened);
+        mOnlyDownloaded = (android.support.v7.widget.SwitchCompat) findViewById(R.id.slidebar_show_downloaded);
+        mAutoPlayNext = (android.support.v7.widget.SwitchCompat) findViewById(R.id.slidebar_show_continues);
 
 
         parentItems = new ArrayList<String>(Arrays.asList(mListItems));

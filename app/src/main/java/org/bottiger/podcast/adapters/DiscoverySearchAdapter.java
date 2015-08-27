@@ -18,7 +18,6 @@ import android.widget.CompoundButton;
 import android.widget.Toast;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.rey.material.widget.Switch;
 
 import org.bottiger.podcast.FeedActivity;
 import org.bottiger.podcast.R;
@@ -120,9 +119,9 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
 
         holder.toggleSwitch.setOnCheckedChangeListener(null);
         holder.toggleSwitch.setChecked(isSubscribed);
-        holder.toggleSwitch.setOnCheckedChangeListener(new Switch.OnCheckedChangeListener() {
+        holder.toggleSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(Switch aSwitch, boolean b) {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 toggleSubscriptionStatus(subscription);
             }
         });

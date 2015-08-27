@@ -5,6 +5,7 @@ import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.widget.Button;
 
 import org.bottiger.podcast.adapters.DiscoverySearchAdapter;
 import org.bottiger.podcast.provider.Subscription;
@@ -19,7 +20,7 @@ public class DiscoveryFeedActivity extends FeedActivity {
 
     private static final String TAG = "DiscoveryFeedActivity";
 
-    protected com.rey.material.widget.Button mSubscribeButton;
+    protected Button mSubscribeButton;
     protected View mSubscribeContainer;
 
     @Override
@@ -29,7 +30,7 @@ public class DiscoveryFeedActivity extends FeedActivity {
         PaletteHelper.generate(mSubscription.getImageURL(), this, mFloatingButton);
 
         mSubscribeContainer = findViewById(R.id.feed_subscribe_layout);
-        mSubscribeButton = (com.rey.material.widget.Button) findViewById(R.id.feed_subscribe_button);
+        mSubscribeButton = (Button) findViewById(R.id.feed_subscribe_button);
 
         mSubscribeContainer.setVisibility(View.VISIBLE);
 

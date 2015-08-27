@@ -213,7 +213,6 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
         public PlayPauseImageView mPlayPauseButton;
         public FeedViewQueueButton mQueueButton;
         public DownloadButtonView mDownloadButton;
-        public com.andexert.library.RippleView mQueueRipple;
 
         public boolean IsExpanded = false;
 
@@ -228,7 +227,6 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
             mDescription = (TextView) view.findViewById(R.id.episode_description);
             mPlayPauseButton = (PlayPauseImageView) view.findViewById(R.id.play_pause_button);
             mQueueButton = (FeedViewQueueButton) view.findViewById(R.id.queue_button);
-            mQueueRipple = (com.andexert.library.RippleView) view.findViewById(R.id.queue_button_ripple);
             mDownloadButton = (DownloadButtonView) view.findViewById(R.id.feedview_download_button);
         }
 
@@ -264,7 +262,6 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
 
             mDescription.setVisibility(visibility);
             mQueueButton.setVisibility(visibility);
-            mQueueRipple.setVisibility(visibility);
 
             mDescription.setAlpha(alphaStart);
             //mDescription.animate().alpha(alphaEnd).start();

@@ -18,9 +18,8 @@
         android:layout_alignParentLeft="true"
         />
 
-    <com.rey.material.widget.Switch
+    <android.support.v7.widget.SwitchCompat
         android:id="@+id/result_subscribe_switch"
-        style="@style/Material.Widget.Switch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"

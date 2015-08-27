@@ -84,7 +84,7 @@
                 style="@style/SoundWavesTextViewStyle"
                 />
 
-            <com.rey.material.widget.Switch
+            <android.support.v7.widget.SwitchCompat
                 android:id="@+id/slidebar_show_listened"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -124,7 +124,7 @@
                 style="@style/SoundWavesTextViewStyle"
                 />
 
-            <com.rey.material.widget.Switch
+            <android.support.v7.widget.SwitchCompat
                 android:id="@+id/slidebar_show_downloaded"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -164,7 +164,7 @@
                 style="@style/SoundWavesTextViewStyle"
                 />
 
-            <com.rey.material.widget.Switch
+            <android.support.v7.widget.SwitchCompat
                 android:id="@+id/slidebar_show_continues"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
