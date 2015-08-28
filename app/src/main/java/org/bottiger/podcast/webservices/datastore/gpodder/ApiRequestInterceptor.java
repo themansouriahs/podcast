@@ -8,14 +8,6 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Base64;
 
-import com.squareup.okhttp.Interceptor;
-import com.squareup.okhttp.Response;
-
-import java.io.IOException;
-import java.util.HashSet;
-
-import retrofit.RequestInterceptor;
-
 /**
  * Interceptor used to authorize requests.
  */

@@ -4,29 +4,20 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.LongSparseArray;
 import android.util.Log;
-import android.util.SparseArray;
 
 import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.provider.ISubscription;
-import org.bottiger.podcast.utils.OPMLImportExport;
 import org.bottiger.podcast.webservices.datastore.CallbackWrapper;
 import org.bottiger.podcast.webservices.datastore.IWebservice;
 import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.GSubscription;
 import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.SubscriptionChanges;
-import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.UpdatedUrls;
 
-import java.io.UnsupportedEncodingException;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import retrofit.Callback;
-import retrofit.RestAdapter;
-import retrofit.RetrofitError;
-import retrofit.client.Header;
-import retrofit.client.OkClient;
-import retrofit.client.Response;
+import retrofit.Response;
+import retrofit.http.Header;
 
 /**
  * Created by Arvid on 8/23/2015.
@@ -82,12 +73,12 @@ public class GPodderAPI implements IWebservice {
 
         authenticate(argCallback, new Callback() {
             @Override
-            public void success(Object o, Response response) {
+            public void onResponse(Response response) {
                 uploadSubscriptionsInternal(argSubscriptions, argCallback);
             }
 
             @Override
-            public void failure(RetrofitError error) {
+            public void onFailure(Throwable error) {
                 Log.d(TAG, error.toString());
             }
         });
@@ -110,12 +101,12 @@ public class GPodderAPI implements IWebservice {
 
         CallbackWrapper<String> callback = new CallbackWrapper(argCalback, new Callback<String>() {
             @Override
-            public void success(String s, Response response) {
+            public void onResponse(Response<String> response) {
                 Log.d(TAG, response.toString());
             }
 
             @Override
-            public void failure(RetrofitError error) {
+            public void onFailure(Throwable error) {
                 Log.d(TAG, error.toString());
             }
         });
@@ -132,12 +123,12 @@ public class GPodderAPI implements IWebservice {
 
         api.getDeviceSubscriptions(mUsername, GPodderUtils.getDeviceID(), new Callback<List<GSubscription>>() {
             @Override
-            public void success(List<GSubscription> gSubscriptions, Response response) {
+            public void onResponse(Response<List<GSubscription>> response) {
                 Log.d(TAG, response.toString());
             }
 
             @Override
-            public void failure(RetrofitError error) {
+            public void onFailure(Throwable error) {
                 Log.d(TAG, error.toString());
             }
         });
@@ -152,12 +143,12 @@ public class GPodderAPI implements IWebservice {
 
         api.getSubscriptions(mUsername, new Callback<List<GSubscription>>() {
             @Override
-            public void success(List<GSubscription> gSubscriptions, Response response) {
+            public void onResponse(Response<List<GSubscription>> response) {
                 Log.d(TAG, response.toString());
             }
 
             @Override
-            public void failure(RetrofitError error) {
+            public void onFailure(Throwable error) {
                 Log.d(TAG, error.toString());
             }
         });
@@ -172,12 +163,12 @@ public class GPodderAPI implements IWebservice {
 
         api.getDeviceSubscriptionsChanges(mUsername, GPodderUtils.getDeviceID(), argSince, new Callback<SubscriptionChanges>() {
             @Override
-            public void success(SubscriptionChanges s, Response response) {
+            public void onResponse(Response<SubscriptionChanges> response) {
                 Log.d(TAG, response.toString());
             }
 
             @Override
-            public void failure(RetrofitError error) {
+            public void onFailure(Throwable error) {
                 Log.d(TAG, error.toString());
             }
         });
@@ -204,13 +195,13 @@ public class GPodderAPI implements IWebservice {
 
         api.uploadDeviceSubscriptionsChanges(changes, mUsername, GPodderUtils.getDeviceID(), new Callback<String>() {
             @Override
-            public void success(String s, Response response) {
+            public void onResponse(Response<String> response) {
                 Log.d(TAG, response.toString());
                 //UpdatedUrls updatedUrls = new Gson
             }
 
             @Override
-            public void failure(RetrofitError error) {
+            public void onFailure(Throwable error) {
                 Log.d(TAG, error.toString());
             }
         });
@@ -235,7 +226,7 @@ public class GPodderAPI implements IWebservice {
         }
 
         @Override
-        public void success(Object o, Response response) {
+        public void onResponse(Response response) {
             mAuthenticated = true;
 
             int numHeaders = response.getHeaders().size();
@@ -246,11 +237,11 @@ public class GPodderAPI implements IWebservice {
                     ApiRequestInterceptor.cookie = header.getValue().split(";")[0];
                 }
             }
-            super.success(o, response);
+            super.onResponse(o, response);
         }
 
         @Override
-        public void failure(RetrofitError error) {
+        public void onFailure(Throwable error) {
             mAuthenticated = false;
             Response response = error.getResponse();
 
@@ -266,7 +257,7 @@ public class GPodderAPI implements IWebservice {
             }
 
             Log.d(TAG, error.toString());
-            super.failure(error);
+            super.onFailure(error);
         }
 
     }
