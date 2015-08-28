@@ -5,6 +5,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.util.LongSparseArray;
 import android.util.Log;
 
+import com.squareup.okhttp.OkHttpClient;
+
 import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.webservices.datastore.CallbackWrapper;
@@ -15,9 +17,12 @@ import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.Subscription
 import java.util.LinkedList;
 import java.util.List;
 
+import retrofit.Call;
 import retrofit.Callback;
 import retrofit.Response;
+import retrofit.Retrofit;
 import retrofit.http.Header;
+import retrofit.http.Headers;
 
 /**
  * Created by Arvid on 8/23/2015.
@@ -41,21 +46,23 @@ public class GPodderAPI implements IWebservice {
 
         ApiRequestInterceptor requestInterceptor = new ApiRequestInterceptor(argUsername, argPassword);
 
-        RestAdapter.LogLevel logLevel = BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.BASIC;
+        //RestAdapter.LogLevel logLevel = BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.BASIC;
 
-        api = new RestAdapter.Builder()
-                .setRequestInterceptor(requestInterceptor)
-                .setEndpoint(IGPodderAPI.baseUrl)
-                .setClient(new OkClient()) // The default client didn't handle well responses like 401
-                .setLogLevel(logLevel)
-                .setLog(new RestAdapter.Log() {
-                    @Override
-                    public void log(String message) {
-                        Log.d("retrofit", message);
-                    }
-                })
+        OkHttpClient client = new OkHttpClient();
+        client.interceptors().add(new ApiRequestInterceptor(argUsername, argPassword));
+
+        api = new Retrofit.Builder()
+                .baseUrl(IGPodderAPI.baseUrl)
+                .client(client) // The default client didn't handle well responses like 401
                 .build()
                 .create(IGPodderAPI.class);
+        //.setLogLevel(logLevel)
+        //.setLog(new RestAdapter.Log() {
+        //    @Override
+        //    public void log(String message) {
+        //Log.d("retrofit", message);
+        //}
+        //})
 
         authenticate(null, argCallback);
     }
@@ -111,7 +118,7 @@ public class GPodderAPI implements IWebservice {
             }
         });
 
-        api.uploadDeviceSubscriptions(subscriptionList, mUsername, GPodderUtils.getDeviceID(), callback);
+        api.uploadDeviceSubscriptions(subscriptionList, mUsername, GPodderUtils.getDeviceID()).enqueue(callback);
     }
 
     public void getDeviceSubscriptions() {
@@ -121,7 +128,7 @@ public class GPodderAPI implements IWebservice {
             return;
         }
 
-        api.getDeviceSubscriptions(mUsername, GPodderUtils.getDeviceID(), new Callback<List<GSubscription>>() {
+        api.getDeviceSubscriptions(mUsername, GPodderUtils.getDeviceID()).enqueue(new Callback<List<GSubscription>>() {
             @Override
             public void onResponse(Response<List<GSubscription>> response) {
                 Log.d(TAG, response.toString());
@@ -141,7 +148,7 @@ public class GPodderAPI implements IWebservice {
             return;
         }
 
-        api.getSubscriptions(mUsername, new Callback<List<GSubscription>>() {
+        api.getSubscriptions(mUsername).enqueue(new Callback<List<GSubscription>>() {
             @Override
             public void onResponse(Response<List<GSubscription>> response) {
                 Log.d(TAG, response.toString());
@@ -161,7 +168,7 @@ public class GPodderAPI implements IWebservice {
             return;
         }
 
-        api.getDeviceSubscriptionsChanges(mUsername, GPodderUtils.getDeviceID(), argSince, new Callback<SubscriptionChanges>() {
+        api.getDeviceSubscriptionsChanges(mUsername, GPodderUtils.getDeviceID(), argSince).enqueue(new Callback<SubscriptionChanges>() {
             @Override
             public void onResponse(Response<SubscriptionChanges> response) {
                 Log.d(TAG, response.toString());
@@ -193,7 +200,7 @@ public class GPodderAPI implements IWebservice {
             changes.remove.add(subscription.getURLString());
         }
 
-        api.uploadDeviceSubscriptionsChanges(changes, mUsername, GPodderUtils.getDeviceID(), new Callback<String>() {
+        api.uploadDeviceSubscriptionsChanges(changes, mUsername, GPodderUtils.getDeviceID()).enqueue(new Callback<String>() {
             @Override
             public void onResponse(Response<String> response) {
                 Log.d(TAG, response.toString());
@@ -216,7 +223,7 @@ public class GPodderAPI implements IWebservice {
         // Fetch data from: http://gpodder.net/clientconfig.json
 
         AuthenticationCallback callback = new AuthenticationCallback(argICallback, argCallback);
-        api.login(mUsername, callback);
+        api.login(mUsername).enqueue(callback);
     }
 
     private class AuthenticationCallback extends CallbackWrapper {
@@ -229,20 +236,24 @@ public class GPodderAPI implements IWebservice {
         public void onResponse(Response response) {
             mAuthenticated = true;
 
-            int numHeaders = response.getHeaders().size();
+            com.squareup.okhttp.Headers headers = response.headers();
+            int numHeaders = headers.size();
 
+            String name, value;
             for (int i = 0; i < numHeaders; i++) {
-                Header header = response.getHeaders().get(i);
-                if (header.getName().equals("Set-Cookie") && header.getValue().startsWith("sessionid")) {
-                    ApiRequestInterceptor.cookie = header.getValue().split(";")[0];
+                name = headers.name(i);
+                value = headers.value(i);
+                if (name.equals("Set-Cookie") && name.startsWith("sessionid")) {
+                    ApiRequestInterceptor.cookie = value.split(";")[0];
                 }
             }
-            super.onResponse(o, response);
+            super.onResponse(response);
         }
 
         @Override
         public void onFailure(Throwable error) {
             mAuthenticated = false;
+            /*
             Response response = error.getResponse();
 
             switch (response.getStatus()) {
@@ -255,7 +266,7 @@ public class GPodderAPI implements IWebservice {
                     break;
                 }
             }
-
+            */
             Log.d(TAG, error.toString());
             super.onFailure(error);
         }
