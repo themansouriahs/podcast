@@ -5,6 +5,7 @@ import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.GDevice;
 import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.GDeviceUpdates;
 import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.GEpisode;
 import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.GEpisodeAction;
+import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.GNull;
 import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.GSetting;
 import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.GSubscription;
 import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.GTag;
@@ -40,7 +41,7 @@ public interface IGPodderAPI {
     */
     @POST("/api/2/auth/{username}/login.json")
     //void login(@Path("user") String user, @Header("Authorization") String authorization, Callback<String> callback);
-    Call login(@Path("username") String user);
+    Call<GNull> login(@Path("username") String user);
 
     @POST("/api/2/auth/{username}/logout.json")
     void logout(@Path("username") String user);

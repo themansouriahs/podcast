@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.util.LongSparseArray;
 import android.util.Log;
 
+import com.google.api.client.json.gson.GsonFactory;
 import com.squareup.okhttp.OkHttpClient;
 
 import org.bottiger.podcast.BuildConfig;
@@ -19,6 +20,7 @@ import java.util.List;
 
 import retrofit.Call;
 import retrofit.Callback;
+import retrofit.GsonConverterFactory;
 import retrofit.Response;
 import retrofit.Retrofit;
 import retrofit.http.Header;
@@ -53,6 +55,7 @@ public class GPodderAPI implements IWebservice {
 
         api = new Retrofit.Builder()
                 .baseUrl(IGPodderAPI.baseUrl)
+                .addConverterFactory(GsonConverterFactory.create())
                 .client(client) // The default client didn't handle well responses like 401
                 .build()
                 .create(IGPodderAPI.class);
