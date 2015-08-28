@@ -10,6 +10,7 @@ import android.media.MediaPlayer;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
@@ -24,12 +25,14 @@ import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.service.PlayerService;
 
 import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 /**
  * Created by apl on 20-01-2015.
  */
-public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateListener {
+public class SoundWavesPlayer extends SoundWavesPlayerBase implements IMediaRouteStateListener {
 
     private static final float MARK_AS_LISTENED_RATIO_THRESHOLD = 0.9f;
     private static final float MARK_AS_LISTENED_MINUTES_LEFT_THRESHOLD = 5f;
@@ -67,6 +70,7 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
     int startPos = 0;
 
     public SoundWavesPlayer(@NonNull PlayerService argPlayerService) {
+        super(argPlayerService);
         mPlayerService = argPlayerService;
         this.mControllerComponentName = new ComponentName(mPlayerService,
                 HeadsetReceiver.class);
@@ -95,7 +99,14 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
             mIsStreaming = !f.exists();
 
             reset();
-            setDataSource(path);
+            if (mIsStreaming)
+                setDataSource(path);
+            else {
+                //FileInputStream fis = new FileInputStream(path);
+                //FileDescriptor fd = fis.getFD();
+                //setDataSource(fd);
+                setDataSource(path);
+            }
             setAudioStreamType(AudioManager.STREAM_MUSIC);
 
             this.startPos = startPos;
@@ -250,9 +261,9 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
         mHandler = handler;
     }
 
-    MediaPlayer.OnCompletionListener listener = new MediaPlayer.OnCompletionListener() {
+    GenericMediaPlayerInterface.OnCompletionListener listener = new GenericMediaPlayerInterface.OnCompletionListener() {
         @Override
-        public void onCompletion(MediaPlayer mp) {
+        public void onCompletion(GenericMediaPlayerInterface mp) {
             IEpisode item = mPlayerService.getCurrentItem();
 
             if (item != null && item instanceof FeedItem) {
@@ -282,16 +293,17 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
         }
     };
 
-    MediaPlayer.OnBufferingUpdateListener bufferListener = new MediaPlayer.OnBufferingUpdateListener() {
+    GenericMediaPlayerInterface.OnBufferingUpdateListener bufferListener = new GenericMediaPlayerInterface.OnBufferingUpdateListener() {
         @Override
-        public void onBufferingUpdate(MediaPlayer mp, int percent) {
+        public void onBufferingUpdate(GenericMediaPlayerInterface mp, int percent) {
             SoundWavesPlayer.this.bufferProgress = percent;
         }
     };
 
-    MediaPlayer.OnPreparedListener preparedlistener = new MediaPlayer.OnPreparedListener() {
+
+    GenericMediaPlayerInterface.OnPreparedListener preparedlistener = new GenericMediaPlayerInterface.OnPreparedListener() {
         @Override
-        public void onPrepared(MediaPlayer mp) {
+        public void onPrepared(GenericMediaPlayerInterface mp) {
             mp.seekTo(startPos);
             mPlayerService.getCurrentItem().setDuration(mp.getDuration());
             start();
@@ -299,24 +311,29 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
         }
     };
 
-    MediaPlayer.OnErrorListener errorListener = new MediaPlayer.OnErrorListener() {
+    GenericMediaPlayerInterface.OnErrorListener errorListener = new GenericMediaPlayerInterface.OnErrorListener() {
         @Override
-        public boolean onError(MediaPlayer mp, int what, int extra) {
-            switch (what) {
-                case MediaPlayer.MEDIA_ERROR_SERVER_DIED:
-
-                    mPlayerService.dis_notifyStatus();
-                    mIsInitialized = false;
-                    release();
-
-                    mHandler.sendMessageDelayed(PlayerHandler.SERVER_DIED, 2000);
-                    return true;
-                default:
-                    break;
-            }
-            return false;
+        public boolean onError(GenericMediaPlayerInterface mp, int what, int extra) {
+            return errorCallback(mp, what, extra);
         }
     };
+
+
+    protected boolean errorCallback(GenericMediaPlayerInterface argMp, int what, int extra) {
+        switch (what) {
+            case MediaPlayer.MEDIA_ERROR_SERVER_DIED:
+
+                mPlayerService.dis_notifyStatus();
+                mIsInitialized = false;
+                release();
+
+                mHandler.sendMessageDelayed(PlayerHandler.SERVER_DIED, 2000);
+                return true;
+            default:
+                break;
+        }
+        return false;
+    }
 
     public long duration() {
         return getDuration();

@@ -21,5 +21,6 @@
     <string name="pref_player_backward_amount_key" translatable="false" >pref_player_backward_amount</string>
     <string name="pref_top_player_text_expanded_key" translatable="false" >pref_top_player_text_expanded</string>
     <string name="pref_top_player_fullscreen_key" translatable="false" >pref_top_player_fullscreen</string>
+    <string name="pref_use_soundengine_key" translatable="false" >pref_use_soundengine</string>
 </resources>
 
