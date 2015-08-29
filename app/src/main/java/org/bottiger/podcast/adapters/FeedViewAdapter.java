@@ -32,6 +32,7 @@ import org.bottiger.podcast.views.DownloadButtonView;
 import org.bottiger.podcast.views.FeedViewQueueButton;
 import org.bottiger.podcast.views.PlayPauseImageView;
 
+import java.util.Date;
 import java.util.Formatter;
 
 /**
@@ -104,7 +105,11 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
         mStringBuilder.append(", ");
         mStringBuilder.append(formatter.formatShortFileSize(mActivity, item.getFilesize()));
         mStringBuilder.append(", ");
-        mStringBuilder.append(DateUtils.formatDateTime(mActivity, item.getDateTime().getTime(), 0));
+
+        Date date = item.getDateTime();
+        if (date != null)
+            mStringBuilder.append(DateUtils.formatDateTime(mActivity, item.getDateTime().getTime(), 0));
+        
         episodeViewHolder.mTextSecondary.setText(mStringBuilder.toString());
 
         if (mIsExpanded != episodeViewHolder.IsExpanded) {
