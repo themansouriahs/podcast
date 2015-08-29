@@ -23,6 +23,15 @@ typedef struct sonicInstStruct *sonicInst;
 #define getInst(sonicID) ((sonicInst)((char *)NULL + (sonicID)))
 
 /* Initialize the C data structure */
+JNIEXPORT jlong JNICALL Java_org_bottiger_podcast_Player_sonic_Sonic_initNative(
+        JNIEnv *env,
+        jobject obj,
+        jint sampleRate,
+        jint channels) {
+    return 0;
+}
+
+/* Initialize the C data structure */
 jlong Java_org_vinuxproject_sonic_Sonic_initNative(
     JNIEnv *env,
     jobject thiz,

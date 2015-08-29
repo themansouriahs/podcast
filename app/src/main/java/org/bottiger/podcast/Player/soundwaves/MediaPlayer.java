@@ -819,7 +819,10 @@ public class MediaPlayer {
         if ((this.mpi == null) || (this.mpi.mContext == null)) {
             return false;
         }
-        return isPrestoLibraryInstalled(this.mpi.mContext);
+
+        return true;
+        // FIXME
+        //return isPrestoLibraryInstalled(this.mpi.mContext);
     }
 
     /**

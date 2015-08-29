@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -99,6 +100,10 @@ public class SoundWavesPlayer extends SoundWavesPlayerBase implements IMediaRout
             mIsStreaming = !f.exists();
 
             reset();
+
+            Uri uri = Uri.parse(path);
+            setDataSource(mPlayerService, uri);
+            /*
             if (mIsStreaming)
                 setDataSource(path);
             else {
@@ -106,7 +111,7 @@ public class SoundWavesPlayer extends SoundWavesPlayerBase implements IMediaRout
                 //FileDescriptor fd = fis.getFD();
                 //setDataSource(fd);
                 setDataSource(path);
-            }
+            }*/
             setAudioStreamType(AudioManager.STREAM_MUSIC);
 
             this.startPos = startPos;

@@ -62,6 +62,14 @@
             style="@style/TopPlayerButton" />
 
         <org.bottiger.podcast.views.PlayerButtonView
+            android:id="@+id/speed_button"
+            android:padding="0dip"
+            android:src="?attr/sleep"
+            android:layout_toLeftOf="@id/sleep_button"
+            android:elevation="@dimen/player_elevation"
+            style="@style/TopPlayerButton" />
+
+        <org.bottiger.podcast.views.PlayerButtonView
             android:id="@+id/favorite"
             android:padding="0dip"
             android:src="?attr/favorite_outline"

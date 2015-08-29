@@ -9,17 +9,15 @@ import android.text.TextUtils;
 import android.util.Base64;
 
 import com.squareup.okhttp.Interceptor;
+import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
 import java.io.IOException;
-import java.util.HashSet;
-
-import retrofit.RequestInterceptor;
 
 /**
  * Interceptor used to authorize requests.
  */
-public class ApiRequestInterceptor implements RequestInterceptor {
+public class ApiRequestInterceptor implements Interceptor {
 
     private String mUsername;
     private String mPassword;
@@ -32,14 +30,21 @@ public class ApiRequestInterceptor implements RequestInterceptor {
     }
 
     @Override
-    public void intercept(RequestInterceptor.RequestFacade requestFacade) {
+    public Response intercept(Chain chain) throws IOException {
+
+        Request request = chain.request();
 
         if (!TextUtils.isEmpty(cookie)) {
-            requestFacade.addHeader("Cookie", cookie);
+            request.headers().newBuilder().add("Cookie", cookie).build();
         } else {
             final String authorizationValue = encodeCredentialsForBasicAuthorization();
-            requestFacade.addHeader("Authorization", authorizationValue);
+            //requestFacade.addHeader("Authorization", authorizationValue);
+            request.headers().newBuilder().add("Authorization", authorizationValue).build();
         }
+
+        Response response = chain.proceed(request);
+
+        return response;
     }
 
     private String encodeCredentialsForBasicAuthorization() {

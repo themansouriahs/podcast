@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
+import org.bottiger.podcast.Player.SoundWavesPlayer;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.provider.IEpisode;
@@ -101,6 +102,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
     private View mFavoriteButton;
     private PlayerButtonView mFullscreenButton;
     private PlayerButtonView mSleepButton;
+    private PlayerButtonView mSpeedpButton;
 
     private PlayerLayoutParameter mSmallLayout = new PlayerLayoutParameter();
     private PlayerLayoutParameter mLargeLayout = new PlayerLayoutParameter();
@@ -199,6 +201,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
         mFavoriteButton = findViewById(R.id.bookmark);
         mGradient = findViewById(R.id.top_gradient_inner);
         mSleepButton = (PlayerButtonView) findViewById(R.id.sleep_button);
+        mSpeedpButton = (PlayerButtonView) findViewById(R.id.speed_button);
 
         mSeekbar = (PlayerSeekbar) findViewById(R.id.player_progress);
         mPlayerButtons = (RelativeLayout) findViewById(R.id.player_buttons);
@@ -265,6 +268,17 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
                     setFullscreenState(mFullscreen);
                 } finally {
                     prefs.edit().putBoolean(mDoFullscreentKey, mFullscreen).commit();
+                }
+            }
+        });
+
+        mSpeedpButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PlayerService ps = PlayerService.getInstance();
+                SoundWavesPlayer player = ps.getPlayer();
+                if (player.canSetSpeed()) {
+                    player.setPlaybackSpeed(2.0f);
                 }
             }
         });

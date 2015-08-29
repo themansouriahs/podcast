@@ -3,6 +3,9 @@
  * Method:    _init
  * Signature: (II)J
  */
+jlong Java_org_bottiger_podcast_Player_sonic_Sonic_initNative
+  (JNIEnv *, jobject, jint, jint);
+
 jlong Java_org_vinuxproject_sonic_Sonic_initNativeNative
   (JNIEnv *, jobject, jint, jint);
 

@@ -39,6 +39,10 @@ import org.bottiger.podcast.service.PlayerService;
         socketTimeout = 10000)
 public class SoundWaves extends Application {
 
+    static {
+        System.loadLibrary("sonic");
+    }
+
     //public static PlayerService sBoundPlayerService = null;
     private static Context context;
     // Global constants

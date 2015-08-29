@@ -54,21 +54,10 @@ model {
             }
         }
 
-        //useLibrary = 'org.apache.http.legacy' // Need until GMS upgraded
-
         lintOptions.with {
             checkReleaseBuilds = false
             abortOnError = false
         }
-
-        // http://stackoverflow.com/questions/22851103/android-studio-gradle-error-multiple-dex-files-define
-        //dexOptions.with {
-        //    //preDexLibraries = false
-        //    javaMaxHeapSize = "4g"
-        // }
-
-
-        //pickFirst = 'META-INF/LICENSE.txt'
 
     }
 
@@ -222,10 +211,12 @@ idea {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.mcxiaoke.volley:library:1.0.+'
-    compile 'com.squareup.okhttp:okhttp:2.3.0'
-    // okhhtp 2.4.0 is buggy with retrifit 1.9.0
-    compile 'com.squareup.okhttp:okhttp-urlconnection:2.3.0'
-    compile 'com.squareup.retrofit:retrofit:1.9.0'
+
+    compile 'com.squareup.okhttp:okhttp:2.5.0'
+    compile 'com.squareup.okhttp:okhttp-urlconnection:2.5.0'
+    compile 'com.squareup.retrofit:retrofit:2.0.0-beta1'
+    compile 'com.squareup.retrofit:converter-gson:2.0.0-beta1'
+
     compile 'com.squareup:otto:1.3.7'
     compile('com.googlecode.json-simple:json-simple:1.1.1') {
         exclude module: 'junit'
@@ -254,6 +245,8 @@ dependencies {
     compile 'com.fasterxml.jackson.core:jackson-databind:2.5+'
     compile 'com.facebook.fresco:fresco:0.6.1'
     compile 'com.cocosw:undobar:1.+@aar'
+
+
     /*
         // For testing only
         testCompile 'junit:junit:4.12'
@@ -270,7 +263,20 @@ dependencies {
             exclude group: 'com.google.code.findbugs'
             exclude group: 'com.android.support', module: 'support-annotations'
         }
-        */
+    */
+
+    //androidTestCompile('com.android.support.test:testing-support-lib:0.1')
+
+    //androidTestCompile( 'com.android.support.test.espresso:espresso-contrib:2.1') {
+
+    //exclude group: 'javax.inject'
+
+    //    exclude group: 'com.google.code.findbugs'
+
+    //    exclude group: 'com.android.support', module: 'support-annotations'
+
+    //}
+
     // Free version
     // Amazon version
     //amazonCompile fileTree(dir: 'src/amazon/libs', include: ['*.jar'])

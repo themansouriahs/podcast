@@ -20,8 +20,7 @@ import org.bottiger.podcast.utils.ThemeHelper;
 import org.bottiger.podcast.webservices.datastore.gpodder.GPodderAPI;
 
 import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit.Response;
 
 /**
  * The OptionDialogPreference will display a dialog, and will persist the
@@ -87,7 +86,7 @@ public class GPodderAuthDialogPreference extends DialogPreference {
                 String password = mPasswordView.getText().toString();
                 GPodderAPI api = new GPodderAPI(username, password, new Callback() {
                     @Override
-                    public void success(Object o, Response response) {
+                    public void onResponse(Response response) {
                         mTestLoading.hide();
                         mTestResult.setVisibility(View.VISIBLE);
                         mTestResult.setText(getContext().getResources().getString(R.string.generic_test_credentials_succes));
@@ -95,7 +94,7 @@ public class GPodderAuthDialogPreference extends DialogPreference {
                     }
 
                     @Override
-                    public void failure(RetrofitError error) {
+                    public void onFailure(Throwable t) {
                         mTestLoading.hide();
                         mTestResult.setVisibility(View.VISIBLE);
                         mTestResult.setText(getContext().getResources().getString(R.string.generic_test_credentials_failed));

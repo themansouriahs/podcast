@@ -6,9 +6,7 @@ import android.support.v4.util.LongSparseArray;
 
 import org.bottiger.podcast.provider.ISubscription;
 
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit.Response;
 
 /**
  * Created by Arvid on 8/27/2015.
@@ -21,8 +19,8 @@ public interface IWebservice {
     void uploadSubscriptions(LongSparseArray<ISubscription> argSubscriptions, @Nullable ICallback argCallback);
 
     interface ICallback<T> {
-        void success(T s, Response response);
-        void failure(String error);
+        void onResponse(Response response);
+        void onFailure(Throwable throwable);
     }
 
 }

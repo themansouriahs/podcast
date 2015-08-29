@@ -5,6 +5,7 @@ import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.GDevice;
 import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.GDeviceUpdates;
 import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.GEpisode;
 import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.GEpisodeAction;
+import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.GNull;
 import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.GSetting;
 import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.GSubscription;
 import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.GTag;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import retrofit.Call;
 import retrofit.Callback;
 import retrofit.http.Body;
 import retrofit.http.GET;
@@ -39,7 +41,7 @@ public interface IGPodderAPI {
     */
     @POST("/api/2/auth/{username}/login.json")
     //void login(@Path("user") String user, @Header("Authorization") String authorization, Callback<String> callback);
-    void login(@Path("username") String user, Callback<String> callback);
+    Call<GNull> login(@Path("username") String user);
 
     @POST("/api/2/auth/{username}/logout.json")
     void logout(@Path("username") String user);
@@ -51,23 +53,23 @@ public interface IGPodderAPI {
 
     // Get Subscriptions of Device
     @GET("/subscriptions/{username}/{deviceid}.json")
-    void getDeviceSubscriptions(@Path("username") String user, @Path("deviceid") String device, Callback<List<GSubscription>> callback);
+    Call<List<GSubscription>> getDeviceSubscriptions(@Path("username") String user, @Path("deviceid") String device);
 
     // Get Subscriptions
     @GET("/subscriptions/{username}.json")
-    void getSubscriptions(@Path("username") String user, Callback<List<GSubscription>> callback);
+    Call<List<GSubscription>> getSubscriptions(@Path("username") String user);
 
     // Upload Subscriptions of Device
     @PUT("/subscriptions/{username}/{deviceid}.json")
-    void uploadDeviceSubscriptions(@Body List<String> subscriptions, @Path("username") String user, @Path("deviceid") String device, Callback<String> callback);
+    Call<String> uploadDeviceSubscriptions(@Body List<String> subscriptions, @Path("username") String user, @Path("deviceid") String device);
 
     // Upload Subscription Changes
     @POST("/api/2/subscriptions/{username}/{deviceid}.json")
-    void uploadDeviceSubscriptionsChanges(@Body SubscriptionChanges subscriptionChanges, @Path("username") String user, @Path("deviceid") String device, Callback<String> callback);
+    Call<String> uploadDeviceSubscriptionsChanges(@Body SubscriptionChanges subscriptionChanges, @Path("username") String user, @Path("deviceid") String device);
 
     // Get Subscription Changes
     @GET("/api/2/subscriptions/{username}/{deviceid}.json")
-    void getDeviceSubscriptionsChanges(@Path("username") String user, @Path("deviceid") String device, @Query("since") long since, Callback<SubscriptionChanges> callback);
+    Call<SubscriptionChanges> getDeviceSubscriptionsChanges(@Path("username") String user, @Path("deviceid") String device, @Query("since") long since);
 
     /*
         Episode actions: http://gpoddernet.readthedocs.org/en/latest/api/reference/events.html
@@ -75,18 +77,16 @@ public interface IGPodderAPI {
 
     // Upload Episode Actions
     @POST("/api/2/episodes/{username}.json")
-    void uploadEpisodeActions(@Body List<GEpisodeAction> actions,
-                              @Path("username") String username,
-                              Callback<UpdatedUrls> callback);
+    Call<UpdatedUrls> uploadEpisodeActions(@Body List<GEpisodeAction> actions,
+                              @Path("username") String username);
 
     // Get Episode Actions
     @GET("/api/2/episodes/{username}.json")
-    void getEpisodeActions(@Path("username") String user,
+    Call<GActionsList> getEpisodeActions(@Path("username") String user,
                            @Query("podcast") String podcast,
                            @Query("device") String device,
                            @Query("since") long since,
-                           @Query("aggregated ") boolean aggregated,
-                           Callback<GActionsList> callback);
+                           @Query("aggregated ") boolean aggregated);
 
     /*
         Directory API: http://gpoddernet.readthedocs.org/en/latest/api/reference/directory.html
@@ -94,27 +94,27 @@ public interface IGPodderAPI {
 
     // Retrieve Top Tags
     @GET("/api/2/tags/{count}.json")
-    void getTopTags(@Path("count") int amount, Callback<GTag> callback);
+    Call<GTag> getTopTags(@Path("count") int amount);
 
     // Retrieve Podcasts for Tag
     @GET("/api/2/tag/{tag}/{count}.json")
-    void getPodcastForTag(@Path("tag") String tag, @Path("count") int amount, Callback<List<GSubscription>> callback);
+    Call<List<GSubscription>> getPodcastForTag(@Path("tag") String tag, @Path("count") int amount);
 
     // Retrieve Podcast Data
     @GET("/api/2/data/podcast.json")
-    void getPodcastData(@Query("url") String podcastURL, Callback<GSubscription> callback);
+    Call<GSubscription> getPodcastData(@Query("url") String podcastURL);
 
     // Retrieve Episode Data
     @GET("/api/2/data/episode.json")
-    void getEpisodeData(@Query("url") String episodeURL, Callback<GEpisode> callback);
+    Callback<GEpisode> getEpisodeData(@Query("url") String episodeURL);
 
     // Podcast Toplist¶
     @GET("/toplist/{number}.json")
-    void getPodcastToplist(@Path("count") int amount, Callback<List<GSubscription>> callback);
+    Call<List<GSubscription>> getPodcastToplist(@Path("count") int amount);
 
     // Podcast Search
     @GET("/search.json")
-    void search(@Query("q") String query, @Query("scale_logo") String scale_logo, Callback<List<GSubscription>> callback);
+    Call<List<GSubscription>> search(@Query("q") String query, @Query("scale_logo") String scale_logo);
 
     /*
         Suggestions API: http://gpoddernet.readthedocs.org/en/latest/api/reference/suggestions.html
@@ -122,7 +122,7 @@ public interface IGPodderAPI {
 
     // Retrieve Suggested Podcasts
     @GET("/suggestions/{number}.json")
-    void suggestedPodcasts(@Path("number") int amount, Callback<List<GSubscription>> callback);
+    Call<List<GSubscription>> suggestedPodcasts(@Path("number") int amount);
 
     /*
         Device API: http://gpoddernet.readthedocs.org/en/latest/api/reference/devices.html
@@ -130,19 +130,18 @@ public interface IGPodderAPI {
 
     // Update Device Data
     @POST("/api/2/devices/{username}/{deviceid}.json")
-    void updateDeviceData(@Path("username") String username, @Path("deviceid") String deviceid, @Body GDevice device);
+    Call updateDeviceData(@Path("username") String username, @Path("deviceid") String deviceid, @Body GDevice device);
 
     // List devices
     @POST("/api/2/devices/{username}.json")
-    void getDeviceList(@Path("username") String username, Callback<List<GDevice>> callback);
+    Call<List<GDevice>> getDeviceList(@Path("username") String username);
 
     // Get device updates
     @GET("/api/2/updates/{username}/{deviceid}.json")
-    void getDeviceUpdate(@Path("username") String username,
+    Call<GDeviceUpdates> getDeviceUpdate(@Path("username") String username,
                          @Path("deviceid") String deviceid,
                          @Query("since") long since,
-                         @Query("include_actions") boolean includeActions,
-                         Callback<GDeviceUpdates> callback);
+                         @Query("include_actions") boolean includeActions);
 
     /*
         Save Settings: http://gpoddernet.readthedocs.org/en/latest/api/reference/settings.html
@@ -150,7 +149,7 @@ public interface IGPodderAPI {
 
     // Save settings
     @POST("/api/2/settings/{username}/{scope}.json")
-    void saveSettings(@Path("username") String username,
+    Call saveSettings(@Path("username") String username,
                       @Path("scope") String scope,
                       @Body GSetting settings,
                       @Query("podcast") String podcast,
@@ -159,12 +158,11 @@ public interface IGPodderAPI {
 
     // Get settings
     @GET("/api/2/settings/{username}/{scope}.json")
-    void getSettings(@Path("username") String username,
+    Call<Map<String,String>> getSettings(@Path("username") String username,
                      @Path("scope") String scope,
                      @Query("podcast") String podcast,
                      @Query("device") String device,
-                     @Query("episode") String episode,
-                     Callback<Map<String,String>> callback);
+                     @Query("episode") String episode);
 
     /*
         Favorites API: http://gpoddernet.readthedocs.org/en/latest/api/reference/favorites.html
@@ -172,7 +170,7 @@ public interface IGPodderAPI {
 
     // Get Favorite Episodes
     @GET("/api/2/favorites/{username}.json")
-    void getFavorites(@Path("username") String username, Callback<List<GEpisode>> callback);
+    Call<List<GEpisode>> getFavorites(@Path("username") String username);
 
     /*
         Device Synchronization API: http://gpoddernet.readthedocs.org/en/latest/api/reference/sync.html
@@ -180,5 +178,5 @@ public interface IGPodderAPI {
 
     // Get Sync Status
     @GET("/api/2/sync-devices/{username}.json")
-    void getSyncStatus(@Path("username") String username);
+    Call getSyncStatus(@Path("username") String username);
 }
