@@ -53,19 +53,26 @@
             android:elevation="@dimen/player_elevation"
             style="@style/TopPlayerButton" />
 
+        <Button
+            android:layout_width="55dp"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:id="@+id/speed_button"
+            android:padding="0dip"
+            android:text="1.0 x"
+            android:textSize="16dp"
+            android:textColor="@color/white_opaque"
+            android:fontFamily="sans-serif"
+            android:textStyle="bold"
+            android:layout_toLeftOf="@id/fullscreen_button"
+            android:elevation="@dimen/player_elevation" />
+        <!-- style="@style/TopPlayerButton" -->
+
         <org.bottiger.podcast.views.PlayerButtonView
             android:id="@+id/sleep_button"
             android:padding="0dip"
             android:src="?attr/sleep"
-            android:layout_toLeftOf="@id/fullscreen_button"
-            android:elevation="@dimen/player_elevation"
-            style="@style/TopPlayerButton" />
-
-        <org.bottiger.podcast.views.PlayerButtonView
-            android:id="@+id/speed_button"
-            android:padding="0dip"
-            android:src="?attr/sleep"
-            android:layout_toLeftOf="@id/sleep_button"
+            android:layout_toLeftOf="@id/speed_button"
             android:elevation="@dimen/player_elevation"
             style="@style/TopPlayerButton" />
 

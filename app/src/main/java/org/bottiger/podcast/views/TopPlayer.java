@@ -15,6 +15,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -102,7 +103,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
     private View mFavoriteButton;
     private PlayerButtonView mFullscreenButton;
     private PlayerButtonView mSleepButton;
-    private PlayerButtonView mSpeedpButton;
+    private Button mSpeedpButton;
 
     private PlayerLayoutParameter mSmallLayout = new PlayerLayoutParameter();
     private PlayerLayoutParameter mLargeLayout = new PlayerLayoutParameter();
@@ -201,7 +202,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
         mFavoriteButton = findViewById(R.id.bookmark);
         mGradient = findViewById(R.id.top_gradient_inner);
         mSleepButton = (PlayerButtonView) findViewById(R.id.sleep_button);
-        mSpeedpButton = (PlayerButtonView) findViewById(R.id.speed_button);
+        mSpeedpButton = (Button) findViewById(R.id.speed_button);
 
         mSeekbar = (PlayerSeekbar) findViewById(R.id.player_progress);
         mPlayerButtons = (RelativeLayout) findViewById(R.id.player_buttons);
