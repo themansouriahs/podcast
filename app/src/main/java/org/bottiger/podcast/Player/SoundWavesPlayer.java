@@ -170,8 +170,8 @@ public class SoundWavesPlayer extends SoundWavesPlayerBase implements IMediaRout
                     .registerMediaButtonEventReceiver(mControllerComponentName);
             super.start();
 
-            SoundWaves.getBus().post(psd);
-            SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.PLAY);
+            //SoundWaves.getBus().post(psd);
+            //SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.PLAY);
         }
     }
 

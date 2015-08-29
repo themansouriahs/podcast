@@ -40,8 +40,10 @@ import org.bottiger.podcast.service.PlayerService;
 public class SoundWaves extends Application {
 
     static {
-        System.loadLibrary("sonic");
+        System.loadLibrary("hello-jni");
     }
+
+    public native String stringFromJNI();
 
     //public static PlayerService sBoundPlayerService = null;
     private static Context context;

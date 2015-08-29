@@ -17,9 +17,17 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
+# Sonic
 LOCAL_MODULE    := sonic
 LOCAL_SRC_FILES := sonicjni.c sonic.c
 LOCAL_CFLAGS    := -Wall
 LOCAL_LDLIBS    := -llog
+
+include $(BUILD_SHARED_LIBRARY)
+
+# Build library 2
+include $(CLEAR_VARS)
+LOCAL_MODULE := swutils
+LOCAL_SRC_FILES := SoundWavesUtils.cpp
 
 include $(BUILD_SHARED_LIBRARY)

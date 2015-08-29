@@ -170,11 +170,13 @@ model {
     }
 
     android.ndk {
-        moduleName = "native"
+        moduleName = "hello-jni"
+        abiFilters += "armeabi-v7a"
     }
 
     // Configures source set directory.
 
+    /*
     android.sources {
         main {
             jni {
@@ -184,6 +186,7 @@ model {
             }
         }
     }
+    */
 }
 
 //allprojects {
