@@ -1,8 +1,10 @@
 package org.bottiger.podcast.Player;
 
+import android.Manifest;
 import android.content.Context;
 import android.media.AudioManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresPermission;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 
@@ -25,6 +27,7 @@ public class PlayerPhoneListener extends PhoneStateListener {
         mPlayerService = argPlayerService;
     }
 
+    @RequiresPermission(Manifest.permission_group.PHONE)
     @Override
     public void onCallStateChanged(int state, String incomingNumber) {
         if (state == TelephonyManager.CALL_STATE_RINGING) {
