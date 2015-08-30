@@ -101,11 +101,7 @@ public class DialogPlaylistFilters extends DialogFragment {
     };
 
     public static DialogPlaylistFilters newInstance() {
-        //mContext = argActivity;
         DialogPlaylistFilters frag = new DialogPlaylistFilters();
-        Bundle args = new Bundle();
-        args.putInt("title", 2);
-        frag.setArguments(args);
         return frag;
     }
 
@@ -121,13 +117,13 @@ public class DialogPlaylistFilters extends DialogFragment {
         ((SoundWaves)getActivity().getApplicationContext()).getBus().unregister(this);
     }
 
-        @Override
+    @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         //public Dialog onCreateDialog(@NonNull Playlist argPlaylist) {
         mPlaylist = ((SoundWaves)getActivity().getApplicationContext()).sBoundPlayerService.getPlaylist();
         mContext = getActivity();
 
-            mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
 
         setSubscriptions(mPlaylist);
 

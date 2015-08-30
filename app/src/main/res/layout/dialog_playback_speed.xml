@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/dialog_playback_speed_title"
+        android:padding="10dp"
+        android:textSize="18sp"
+        android:textColor="@color/white_opaque"
+        android:background="@color/colorPrimary"
+        style="@style/SoundWavesTextViewStyle" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="-"
+            android:id="@+id/playback_decrement_button" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="1.0x"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:textColor="@color/black"
+            android:id="@+id/playback_speed_value"/>
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="+"
+            android:id="@+id/playback_increment_button" />
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/filter_subscription_line"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:background="@color/grayStart"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/dialog_playback_speed_scope"
+        android:padding="10dp"
+        android:textSize="18sp"
+        android:textColor="@color/black"
+        style="@style/SoundWavesTextViewStyle"/>
+
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <RadioButton
+            android:id="@+id/radio_playback_speed_episode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dialog_playback_speed_episode"
+            android:checked="true" />
+
+        <RadioButton
+            android:id="@+id/radio_playback_speed_subscription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dialog_playback_speed_subscription" />
+
+        <RadioButton
+            android:id="@+id/radio_playback_speed_global"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dialog_playback_speed_global" />
+
+    </RadioGroup>
+
+</LinearLayout>

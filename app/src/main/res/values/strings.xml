@@ -152,6 +152,11 @@
     <string name="generic_test_credentials_failed">Test failed</string>
     <string name="pref_use_soundengine_title">Custom Sound Engine</string>
     <string name="pref_use_soundengine_description">Enables advanced features like variable playback speed</string>
+    <string name="dialog_playback_speed_episode">This episode only</string>
+    <string name="dialog_playback_speed_subscription">All episodes in from this podcast</string>
+    <string name="dialog_playback_speed_global">All episodes</string>
+    <string name="dialog_playback_speed_title">Playback speed</string>
+    <string name="dialog_playback_speed_scope">Apply change to</string>
 
     <plurals name="player_sleep">
         <item quantity="one">Player will sleep in %d minute</item>

@@ -31,6 +31,8 @@ import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.UIUtils;
+import org.bottiger.podcast.views.dialogs.DialogPlaybackSpeed;
+import org.bottiger.podcast.views.dialogs.DialogPlaylistFilters;
 
 import static org.bottiger.podcast.views.PlayerButtonView.StaticButtonColor;
 
@@ -276,11 +278,15 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
         mSpeedpButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                DialogPlaybackSpeed dialogPlaybackSpeed = DialogPlaybackSpeed.newInstance(DialogPlaybackSpeed.EPISODE);
+                dialogPlaybackSpeed.show(mActivity.getFragmentManager(), DialogPlaybackSpeed.class.getName());
+                /*
                 PlayerService ps = PlayerService.getInstance();
                 SoundWavesPlayer player = ps.getPlayer();
                 if (player.canSetSpeed()) {
                     player.setPlaybackSpeed(2.0f);
                 }
+                */
             }
         });
     }
