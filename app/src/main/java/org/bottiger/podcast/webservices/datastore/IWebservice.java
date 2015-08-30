@@ -19,7 +19,7 @@ public interface IWebservice {
     void uploadSubscriptions(LongSparseArray<ISubscription> argSubscriptions, @Nullable ICallback argCallback);
 
     interface ICallback<T> {
-        void onResponse(Response response);
+        void onResponse(Response<T> response);
         void onFailure(Throwable throwable);
     }
 

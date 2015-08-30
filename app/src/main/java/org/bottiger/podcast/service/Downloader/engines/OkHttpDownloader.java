@@ -128,7 +128,7 @@ public class OkHttpDownloader extends DownloadEngineBase {
     }
 
     public void onFailure(IOException e) {
-        Log.w("Download", "Download Failed");
+        Log.w("Download", "Download Failed: " + e.getMessage());
 
         for(int i = 0; i < mExternalCallback.size(); i++) {
             int key = mExternalCallback.keyAt(i);

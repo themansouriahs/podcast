@@ -16,6 +16,7 @@ import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 
+import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.Service;
@@ -35,6 +36,7 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresPermission;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -122,6 +124,7 @@ public class PlayerService extends Service implements
 		return sInstance;
 	}
 
+	@RequiresPermission(Manifest.permission.READ_PHONE_STATE)
 	@Override
 	public void onCreate() {
 		super.onCreate();

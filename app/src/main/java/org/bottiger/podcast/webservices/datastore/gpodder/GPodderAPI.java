@@ -38,17 +38,17 @@ public class GPodderAPI implements IWebservice {
 
     private boolean mAuthenticated = false;
 
-    public GPodderAPI(@NonNull String argUsername, @NonNull String argPassword) {
+    public GPodderAPI() {
+        this(null, null, null);
+    }
+
+    public GPodderAPI(@Nullable String argUsername, @Nullable String argPassword) {
         this(argUsername, argPassword, null);
     }
 
-    public GPodderAPI(@NonNull String argUsername, @NonNull String argPassword, @Nullable Callback argCallback) {
+    public GPodderAPI(@Nullable String argUsername, @Nullable String argPassword, @Nullable Callback argCallback) {
 
         mUsername = argUsername;
-
-        ApiRequestInterceptor requestInterceptor = new ApiRequestInterceptor(argUsername, argPassword);
-
-        //RestAdapter.LogLevel logLevel = BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.BASIC;
 
         OkHttpClient client = new OkHttpClient();
         client.interceptors().add(new ApiRequestInterceptor(argUsername, argPassword));
@@ -59,15 +59,31 @@ public class GPodderAPI implements IWebservice {
                 .client(client) // The default client didn't handle well responses like 401
                 .build()
                 .create(IGPodderAPI.class);
-        //.setLogLevel(logLevel)
-        //.setLog(new RestAdapter.Log() {
-        //    @Override
-        //    public void log(String message) {
-        //Log.d("retrofit", message);
-        //}
-        //})
 
-        authenticate(null, argCallback);
+        if (mUsername != null) {
+            authenticate(null, argCallback);
+        }
+    }
+
+    public Call<List<GSubscription>> search(@NonNull final String argSearchTerm, @Nullable final IWebservice.ICallback<List<GSubscription>> argICallback) {
+        Call<List<GSubscription>> result = api.search(argSearchTerm);
+        result.enqueue(new Callback<List<GSubscription>>() {
+            @Override
+            public void onResponse(Response<List<GSubscription>> response) {
+
+                if (argICallback == null)
+                    return;
+
+                argICallback.onResponse(response);
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                Log.d(TAG, t.toString());
+            }
+        });
+
+        return result;
     }
 
     public void uploadSubscriptions(final LongSparseArray<ISubscription> argSubscriptions) {

@@ -8,8 +8,10 @@ import java.util.LinkedList;
 import java.util.Observable;
 
 import org.apache.commons.io.FileUtils;
+import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.TopActivity;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.playlist.Playlist;
@@ -22,17 +24,21 @@ import org.bottiger.podcast.service.Downloader.engines.IDownloadEngine;
 import org.bottiger.podcast.service.Downloader.engines.OkHttpDownloader;
 import org.bottiger.podcast.utils.SDCardManager;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -45,7 +51,7 @@ public class EpisodeDownloadManager extends Observable {
 
     public static boolean isDownloading = false;
 
-    public enum RESULT { OK, NO_STORAGE, OUT_OF_STORAGE, NO_CONNECTION }
+    public enum RESULT { OK, NO_STORAGE, OUT_OF_STORAGE, NO_CONNECTION, NEED_PERMISSION }
     public enum QUEUE_POSITION { FIRST, LAST, ANYWHERE}
     public enum NETWORK_STATE { OK, RESTRICTED, DISCONNECTED }
 	public enum ACTION { REFRESH_SUBSCRIPTION, STREAM_EPISODE, DOWNLOAD_MANUALLY, DOWNLOAD_AUTOMATICALLY }
@@ -137,6 +143,32 @@ public class EpisodeDownloadManager extends Observable {
 
         if (mContext == null) {
             mContext = argContext;
+        }
+
+        if (Build.VERSION.SDK_INT >= 23 &&
+                (mContext.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
+                 mContext.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)  != PackageManager.PERMISSION_GRANTED)) {
+
+            if (!(mContext instanceof Activity))
+                return RESULT.NEED_PERMISSION;
+
+            TopActivity activity = (TopActivity)mContext;
+
+            // Should we show an explanation?
+            /*
+            if (activity.shouldShowRequestPermissionRationale(
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                // Explain to the user why we need to read the contacts
+            }*/
+
+            activity.requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
+                                                     Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                        TopActivity.PERMISSION_TO_DOWNLOAD);
+
+            // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+            // app-defined int constant
+
+            return RESULT.NEED_PERMISSION;
         }
 
         if (sSharedPreferences == null) {

@@ -223,7 +223,9 @@
 
     <style name="TopPlayerButton" parent="@style/PlaylistButton">
         <item name="android:layout_above">@id/player_progress</item>
-        <item name="android:layout_width">55dip</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_weight">1</item>
+        <!--<item name="android:maxWidth">55dip</item>-->
         <item name="android:layout_marginBottom">0dp</item>
         <item name="android:layout_marginTop">10dp</item>
         <item name="android:padding">5dp</item>

@@ -19,6 +19,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Trace;
 import android.support.annotation.NonNull;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.MarginLayoutParamsCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;

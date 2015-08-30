@@ -115,6 +115,8 @@ public interface IGPodderAPI {
     // Podcast Search
     @GET("/search.json")
     Call<List<GSubscription>> search(@Query("q") String query, @Query("scale_logo") String scale_logo);
+    @GET("/search.json")
+    Call<List<GSubscription>> search(@Query("q") String query);
 
     /*
         Suggestions API: http://gpoddernet.readthedocs.org/en/latest/api/reference/suggestions.html

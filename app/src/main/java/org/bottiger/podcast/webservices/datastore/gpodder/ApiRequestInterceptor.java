@@ -5,6 +5,7 @@ package org.bottiger.podcast.webservices.datastore.gpodder;
  */
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Base64;
 
@@ -19,12 +20,12 @@ import java.io.IOException;
  */
 public class ApiRequestInterceptor implements Interceptor {
 
-    private String mUsername;
-    private String mPassword;
+    @Nullable private String mUsername;
+    @Nullable private String mPassword;
 
     public static String cookie;
 
-    public ApiRequestInterceptor(@NonNull String argUsername, @NonNull String argPassword) {
+    public ApiRequestInterceptor(@Nullable  String argUsername, @Nullable String argPassword) {
         mUsername = argUsername;
         mPassword = argPassword;
     }
@@ -34,12 +35,14 @@ public class ApiRequestInterceptor implements Interceptor {
 
         Request request = chain.request();
 
-        if (!TextUtils.isEmpty(cookie)) {
-            request.headers().newBuilder().add("Cookie", cookie).build();
-        } else {
-            final String authorizationValue = encodeCredentialsForBasicAuthorization();
-            //requestFacade.addHeader("Authorization", authorizationValue);
-            request.headers().newBuilder().add("Authorization", authorizationValue).build();
+        if (shouldAuthenticate()) {
+            if (!TextUtils.isEmpty(cookie)) {
+                request.headers().newBuilder().add("Cookie", cookie).build();
+            } else {
+                final String authorizationValue = encodeCredentialsForBasicAuthorization();
+                //requestFacade.addHeader("Authorization", authorizationValue);
+                request.headers().newBuilder().add("Authorization", authorizationValue).build();
+            }
         }
 
         Response response = chain.proceed(request);
@@ -50,5 +53,9 @@ public class ApiRequestInterceptor implements Interceptor {
     private String encodeCredentialsForBasicAuthorization() {
         final String userAndPassword = mUsername + ":" + mPassword;
         return "Basic " + Base64.encodeToString(userAndPassword.getBytes(), Base64.NO_WRAP);
+    }
+
+    private boolean shouldAuthenticate() {
+        return mUsername != null;
     }
 }
