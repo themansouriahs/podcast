@@ -27,8 +27,6 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.dragontek.mygpoclient.http.HttpClient;
-
 import fi.iki.elonen.HelloServer;
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoHTTPD.Method;
