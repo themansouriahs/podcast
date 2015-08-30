@@ -1,6 +1,7 @@
 package org.bottiger.podcast;
 
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -11,12 +12,13 @@ import android.transition.Transition;
 import android.view.Window;
 import android.view.WindowManager;
 
-import com.squareup.otto.Bus;
-
 import org.bottiger.podcast.playlist.Playlist;
+import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
 import org.bottiger.podcast.service.PlayerService;
 
 public class TopActivity extends ActionBarActivity {
+
+    public static final int PERMISSION_TO_DOWNLOAD = 555;
 	
 	private static SharedPreferences prefs;
 
@@ -86,6 +88,18 @@ public class TopActivity extends ActionBarActivity {
             return ps.getPlaylist();
 
         return null;
+    }
+
+    public void onRequestPermissionsResult (int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == PERMISSION_TO_DOWNLOAD) {
+            for (int i = 0; i < grantResults.length; i++) {
+                if (grantResults[i] == PackageManager.PERMISSION_DENIED)
+                    return;
+            }
+
+            EpisodeDownloadManager.startDownload(this);
+            return;
+        }
     }
 
 }
