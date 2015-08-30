@@ -1,5 +1,6 @@
 package org.bottiger.podcast.views;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.ScrollView;
@@ -20,6 +21,7 @@ public class MyScrollView extends ScrollView {
         super(context, attrs, defStyleAttr);
     }
 
+    @TargetApi(21)
     public MyScrollView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
     }

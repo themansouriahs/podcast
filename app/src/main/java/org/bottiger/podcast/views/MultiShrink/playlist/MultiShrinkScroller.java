@@ -276,13 +276,13 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller implements 
     }
 
     @Override
-    protected void onAttachedToWindow () {
+    public void onAttachedToWindow () {
         prefs.registerOnSharedPreferenceChangeListener(this);
         super.onAttachedToWindow();
     }
 
     @Override
-    protected void onDetachedFromWindow () {
+    public void onDetachedFromWindow () {
         super.onDetachedFromWindow();
         prefs.unregisterOnSharedPreferenceChangeListener(this);
     }

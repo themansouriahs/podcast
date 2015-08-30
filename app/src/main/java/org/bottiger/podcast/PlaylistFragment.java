@@ -35,6 +35,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
@@ -51,8 +52,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.cocosw.undobar.UndoBarController;
-import com.cocosw.undobar.UndoBarStyle;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.squareup.otto.Produce;
 import com.squareup.otto.Subscribe;
@@ -165,7 +164,7 @@ public class PlaylistFragment extends GeastureFragment implements
 
     @SuppressLint("WrongViewCast")
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    public void onViewCreated(final View view, Bundle savedInstanceState) {
         super.onViewCreated(view,savedInstanceState);
 
         mMultiShrinkScroller = (MultiShrinkScroller) mSwipeRefreshView.findViewById(R.id.playlist_container);
@@ -301,21 +300,10 @@ public class PlaylistFragment extends GeastureFragment implements
                                 mAdapter.notifyDataSetChanged();
                                 String episodeRemoved = getResources().getString(R.string.playlist_episode_dismissed);
 
-                                new UndoBarController.UndoBar(getActivity())
-                                        .message(episodeRemoved)
-                                        .listener(new UndoBarController.AdvancedUndoListener() {
+                                Snackbar.make(view, episodeRemoved, Snackbar.LENGTH_LONG)
+                                        .setAction(R.string.playlist_episode_dismissed_undo, new View.OnClickListener() {
                                             @Override
-                                            public void onHide(Parcelable parcelable) {
-
-                                            }
-
-                                            @Override
-                                            public void onClear(@NonNull Parcelable[] parcelables) {
-
-                                            }
-
-                                            @Override
-                                            public void onUndo(Parcelable parcelable) {
+                                            public void onClick(View v) {
                                                 episode.setPriority(currentPriority);
                                                 mPlaylist.setItem(itemPosition, episode);
                                                 mAdapter.notifyDataSetChanged();
@@ -328,6 +316,10 @@ public class PlaylistFragment extends GeastureFragment implements
                                                 episode.update(contentResolver);
                                             }
                                         }).show();
+
+                                //snackbar.getView().setLa
+
+                                  //      .show();
                             }
                         });
         mRecyclerView.setOnTouchListener(touchListener);

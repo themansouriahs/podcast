@@ -36,7 +36,8 @@ public abstract class AbstractMultiShrinkScroller extends FrameLayout {
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public AbstractMultiShrinkScroller(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
+        //super(context, attrs, defStyleAttr, defStyleRes);
+        super(context, attrs, defStyleAttr);
         final ViewConfiguration configuration = ViewConfiguration.get(context);
         mTouchSlop = configuration.getScaledTouchSlop();
     }

@@ -141,8 +141,7 @@ dependencies {
     compile 'ch.acra:acra:4.6.2'
     //compile 'com.github.anrwatchdog:anrwatchdog:1.+'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.5+'
-    compile 'com.facebook.fresco:fresco:0.6.1'
-    compile 'com.cocosw:undobar:1.+@aar'
+    compile 'com.facebook.fresco:fresco:0.7.0'
 
     // For testing only
     testCompile 'junit:junit:4.12'
