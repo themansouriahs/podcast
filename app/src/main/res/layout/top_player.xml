@@ -38,40 +38,47 @@
         <!--
         <include layout="@layout/top_player_buttons" />
         -->
-        <org.bottiger.podcast.views.DownloadButtonView
-            android:id="@+id/download"
-            android:padding="0dip"
-            android:src="@drawable/ic_fast_forward_white"
-            android:elevation="@dimen/player_elevation"
-            style="@style/RightTopPlayerButton"/>
+        <LinearLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_toLeftOf="@id/play_pause_button">
 
-        <org.bottiger.podcast.views.PlayerButtonView
-            android:id="@+id/fullscreen_button"
-            android:padding="0dip"
-            android:src="?attr/fullscreen"
-            android:layout_toLeftOf="@id/download"
-            android:elevation="@dimen/player_elevation"
-            style="@style/TopPlayerButton" />
+            <org.bottiger.podcast.views.PlayerButtonView
+                android:id="@+id/sleep_button"
+                android:padding="0dip"
+                android:src="?attr/sleep"
+                android:elevation="@dimen/player_elevation"
+                style="@style/TopPlayerButton" />
 
-        <org.bottiger.podcast.views.PlayerButtonView
-            android:id="@+id/sleep_button"
-            android:padding="0dip"
-            android:src="?attr/sleep"
-            android:layout_toLeftOf="@id/fullscreen_button"
-            android:elevation="@dimen/player_elevation"
-            style="@style/TopPlayerButton" />
+            <org.bottiger.podcast.views.PlayerButtonView
+                android:id="@+id/fullscreen_button"
+                android:padding="0dip"
+                android:src="?attr/fullscreen"
+                android:elevation="@dimen/player_elevation"
+                style="@style/TopPlayerButton" />
 
-        <org.bottiger.podcast.views.PlayerButtonView
-            android:id="@+id/favorite"
-            android:padding="0dip"
-            android:src="?attr/favorite_outline"
-            android:layout_toLeftOf="@id/sleep_button"
-            android:elevation="@dimen/player_elevation"
-            android:visibility="gone"
-            style="@style/TopPlayerButton" />
+            <org.bottiger.podcast.views.DownloadButtonView
+                android:id="@+id/download"
+                android:padding="0dip"
+                android:src="@drawable/ic_fast_forward_white"
+                android:elevation="@dimen/player_elevation"
+                style="@style/TopPlayerButton"/>
+
+            <org.bottiger.podcast.views.PlayerButtonView
+                android:id="@+id/favorite"
+                android:padding="0dip"
+                android:src="?attr/favorite_outline"
+                android:elevation="@dimen/player_elevation"
+                android:visibility="gone"
+                style="@style/TopPlayerButton" />
+
+        </LinearLayout>
 
         <org.bottiger.podcast.views.PlayerButtonView
             android:id="@+id/skip_to_next_button"
+            android:layout_width="55dp"
             style="@style/TopPlayerButton"
             android:layout_marginRight="10dp"
             android:layout_marginLeft="0dp"
@@ -97,15 +104,6 @@
             android:elevation="@dimen/player_elevation" />
         <!-- android:paddingLeft="14dip" -->
 
-        <org.bottiger.podcast.views.TextViewObserver
-            android:id="@+id/current_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/sleep_button"
-            android:paddingTop="5dp"
-            android:textColor="@color/white_opaque"
-            />
-
         <org.bottiger.podcast.views.TextViewTotalTime
             android:id="@+id/total_time"
             android:layout_width="wrap_content"
@@ -113,6 +111,15 @@
             android:paddingRight="5dp"
             android:layout_alignParentRight="true"
             android:layout_below="@id/skip_to_next_button"
+            android:paddingTop="10dp"
+            android:textColor="@color/white_opaque"
+            />
+
+        <org.bottiger.podcast.views.TextViewObserver
+            android:id="@+id/current_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/total_time"
             android:paddingTop="5dp"
             android:textColor="@color/white_opaque"
             />

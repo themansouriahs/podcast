@@ -41,14 +41,4 @@ public class PlayerRelativeLayout extends RelativeLayout {
 
         this.getLayoutParams().height = argHeight;
     }
-
-    @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
-        String tag = "PlayerLinearLayout intercept";
-        Log.d(tag, "------------");
-        Log.d(tag, ev.toString());
-        Log.d(tag, "------------");
-        return false; //super.onInterceptTouchEvent(ev);
-    }
-
 }
