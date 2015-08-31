@@ -151,29 +151,4 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 		return order;
 	}
 
-	@Deprecated
-	protected static void resetPlaylist(Context context) {
-		// Update the database
-		String currentTime = String.valueOf(System.currentTimeMillis());
-		String updateLastUpdate = ", " + ItemColumns.LAST_UPDATE + "="
-				+ currentTime + " ";
-
-		// We remove the playlist position for all items in the playlist.
-		String action = "UPDATE " + ItemColumns.TABLE_NAME + " SET ";
-		String value = ItemColumns.PRIORITY + "=0" + updateLastUpdate;
-		String where = "WHERE " + ItemColumns.PRIORITY + "<> 0";
-
-		// Also update the timestamp of the top item in order to indicate to the
-		// drivesyncer
-		// Our data is up tp date.
-		String where2 = " OR " + ItemColumns._ID + "==(select "
-				+ ItemColumns._ID + " from " + ItemColumns.TABLE_NAME
-				+ " order by " + ItemColumns.DATE + " desc limit 1)";
-
-		String sql = action + value + where + where2;
-
-		DatabaseHelper dbHelper = new DatabaseHelper();
-		//dbHelper.executeSQL(context, sql, mAdapter);
-	}
-
 }

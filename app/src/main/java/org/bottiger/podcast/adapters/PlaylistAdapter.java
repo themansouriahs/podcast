@@ -1,5 +1,6 @@
 package org.bottiger.podcast.adapters;
 
+import java.lang.ref.WeakReference;
 import java.util.TreeSet;
 
 import org.apache.commons.validator.routines.UrlValidator;
@@ -53,6 +54,9 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
     private Activity mActivity;
     private View mOverlay;
 
+    private boolean mFirstItem = true;
+    private WeakReference<ViewGroup> mViewGroup = new WeakReference<>(null);
+
     private DownloadProgressObservable mDownloadProgressObservable = null;
 
 	public static TreeSet<Number> mExpandedItemID = new TreeSet<>();
@@ -75,6 +79,16 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
     @Override
     public PlaylistViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         Log.v(TAG, "onCreateViewHolder");
+
+        // FIXME: Find a better solution ASAP
+        if (mFirstItem) {
+            mFirstItem = false;
+            if (viewGroup != null) {
+                for (int i = 0; i < 16; i++) {
+                    onCreateViewHolder(viewGroup, getItemViewType(i));
+                }
+            }
+        }
 
         View view = mInflater.inflate(R.layout.episode_list, viewGroup, false);
         PlaylistViewHolder holder = new PlaylistViewHolder(view, mActivity);
