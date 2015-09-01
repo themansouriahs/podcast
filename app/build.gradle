@@ -1,6 +1,6 @@
 apply plugin: 'idea'
 apply plugin: 'com.android.application'
-apply plugin: 'io.fabric'
+//apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion 23
@@ -149,9 +149,11 @@ dependencies {
     }
     compile 'commons-validator:commons-validator:1.4.0'
     compile 'org.jsoup:jsoup:1.7.3'
-    //compile 'com.eowise:recyclerview-stickyheaders:0.5.1@aar'
     compile 'jp.wasabeef:recyclerview-animators:1.2.0@aar'
-    compile 'ch.acra:acra:4.6.2'
+
+    //compile 'ch.acra:acra:4.6.2'
+
+
     //compile 'com.github.anrwatchdog:anrwatchdog:1.+'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.5+'
     compile 'com.facebook.fresco:fresco:0.7.0'

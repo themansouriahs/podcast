@@ -10,7 +10,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.acra.ACRA;
 import org.apache.commons.io.input.XmlStreamReader;
 import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
