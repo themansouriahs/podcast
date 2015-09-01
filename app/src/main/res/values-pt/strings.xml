@@ -14,7 +14,7 @@
   <string name="pref_notification_control">Controlos na notificação</string>
   <string name="pref_notification_control_description">Mostrar controlos do reprodutor na área de notificações</string>
   <string name="dialog_title_add_sub">Adicionar podcast</string>
-  <string name="dialog_message_add_sub">Por favor digite um URL:</string>
+  <string name="dialog_message_add_sub">Por favor escreva um URL:</string>
   <string name="title_section3">Lista de reprodução</string>
   <string name="title_section2">Descobrir</string>
   <string name="title_section1">Subscrições</string>
@@ -131,6 +131,21 @@
   <string name="playlist_episode_dismissed">Episódio removido</string>
   <string name="drawer_playlist_content_source">Conteúdo da lista de reprodução</string>
   <string name="playlist_context_menu_playnext">Reproduzir seguinte</string>
+  <string name="subscription_subtitle_updated_at">atualizada</string>
+  <string name="filter_show_only_downloaded">Apenas os transferidos</string>
+  <string name="action_filter">Filtrar lista de reprodução</string>
+  <string name="apply_filters">Aplicar filtros</string>
+  <string name="reset_filters">Repor</string>
+  <string name="pref_gpodder_support_title">GPodder</string>
+  <string name="gpodder_username">nome de utilizador</string>
+  <string name="gpodder_password">palavra-passe</string>
+  <string name="generic_test_credentials">Testar credenciais</string>
+  <string name="generic_test_credentials_succes">Credenciais válidas</string>
+  <string name="generic_test_credentials_failed">Credenciais inválidas</string>
+  <plurals name="player_sleep">
+    <item quantity="one">O reprodutor parará em %d minuto</item>
+    <item quantity="other">O reprodutor parará em %d minutos</item>
+  </plurals>
   <plurals name="bulk_download_playlist">
     <item quantity="one">Primeiro episódio da lista de reprodução</item>
     <item quantity="other">Primeiros %d episódios da lista de reprodução</item>
