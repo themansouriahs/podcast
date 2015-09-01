@@ -14,6 +14,8 @@
         <item name="skip_to_next">@drawable/ic_skip_next_white</item>
         <item name="rewind_icon">@drawable/ic_action_rewind</item>
         <item name="ic_remove">@drawable/ic_highlight_remove_white</item>
+        <item name="ic_remove_inv">@drawable/ic_highlight_remove_black</item>
+        <item name="favorite_outline_inv">@drawable/ic_favorite_outline_black</item>
         <item name="previous_icon">@drawable/ic_action_previous</item>
         <item name="ic_rewind">@drawable/ic_fast_rewind_white</item>
         <item name="ic_forward">@drawable/ic_fast_forward_white</item>
@@ -79,6 +81,8 @@
         <item name="fullscreen">@drawable/ic_fullscreen_white</item>
         <item name="fullscreen_exit">@drawable/ic_fullscreen_exit_white</item>
         <!--<item name="seekbar_handle">@drawable/seekbar_handle</item>-->
+        <item name="ic_remove_inv">@drawable/ic_highlight_remove_black</item>
+        <item name="favorite_outline_inv">@drawable/ic_favorite_outline_black</item>
 
         <item name="android:actionBarStyle">@style/TransparentActionBar</item>
 

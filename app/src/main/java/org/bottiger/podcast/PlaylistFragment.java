@@ -32,11 +32,9 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -55,8 +53,6 @@ import android.widget.TextView;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.squareup.otto.Produce;
 import com.squareup.otto.Subscribe;
-
-import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 
 public class PlaylistFragment extends GeastureFragment implements
 		OnSharedPreferenceChangeListener, IDownloadCompleteCallback
@@ -85,7 +81,6 @@ public class PlaylistFragment extends GeastureFragment implements
     private DownloadButtonView mPlayerDownloadButton;
     private PlayerButtonView mForwardButton;
     private PlayerButtonView mBackButton;
-    private PlayerButtonView mDownloadButton;
     private PlayerButtonView mFavoriteButton;
 
 	private SharedPreferences.OnSharedPreferenceChangeListener spChanged;
@@ -187,7 +182,6 @@ public class PlaylistFragment extends GeastureFragment implements
         mPlayerDownloadButton   =    (DownloadButtonView) mSwipeRefreshView.findViewById(R.id.download);
         mBackButton = (PlayerButtonView)mSwipeRefreshView.findViewById(R.id.rewind_button);
         mForwardButton = (PlayerButtonView)mSwipeRefreshView.findViewById(R.id.fast_forward_button);
-        mDownloadButton = (PlayerButtonView)mSwipeRefreshView.findViewById(R.id.download);
         mFavoriteButton = (PlayerButtonView)mSwipeRefreshView.findViewById(R.id.favorite);
 
         setPlaylistViewState(mPlaylist);
@@ -386,7 +380,7 @@ public class PlaylistFragment extends GeastureFragment implements
                 mPlayPauseButton.setEpisode(item, PlayPauseImageView.LOCATION.PLAYLIST);
                 mBackButton.setEpisode(item);
                 mForwardButton.setEpisode(item);
-                mDownloadButton.setEpisode(item);
+                mPlayerDownloadButton.setEpisode(item);
                 mFavoriteButton.setEpisode(item);
             }
             playlistChanged(mPlaylist);
@@ -426,7 +420,7 @@ public class PlaylistFragment extends GeastureFragment implements
         mPlayPauseButton.setEpisode(item, PlayPauseImageView.LOCATION.PLAYLIST);
         mBackButton.setEpisode(item);
         mForwardButton.setEpisode(item);
-        mDownloadButton.setEpisode(item);
+        mPlayerDownloadButton.setEpisode(item);
         mFavoriteButton.setEpisode(item);
 
         if (SoundWaves.sBoundPlayerService != null &&
@@ -474,7 +468,7 @@ public class PlaylistFragment extends GeastureFragment implements
             PaletteHelper.generate(artworkURL, activity, mPlayPauseButton);
             PaletteHelper.generate(artworkURL, activity, mBackButton);
             PaletteHelper.generate(artworkURL, activity, mForwardButton);
-            PaletteHelper.generate(artworkURL, activity, mDownloadButton);
+            PaletteHelper.generate(artworkURL, activity, mPlayerDownloadButton);
             PaletteHelper.generate(artworkURL, activity, mFavoriteButton);
 
             PaletteHelper.generate(artworkURL, activity, new PaletteListener() {

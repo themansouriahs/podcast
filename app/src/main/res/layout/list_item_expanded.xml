@@ -41,7 +41,7 @@
             style="@style/PlayerButton" />
 
         <org.bottiger.podcast.views.DownloadButtonView
-            android:id="@+id/download"
+            android:id="@+id/expanded_download"
             android:padding="0dip"
             android:elevation="8dp"
             style="@style/PlayerButton" />

@@ -4,8 +4,8 @@ import java.lang.ref.WeakReference;
 import java.util.TreeSet;
 
 import org.apache.commons.validator.routines.UrlValidator;
-import org.bottiger.podcast.R;
 
+import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.adapters.viewholders.ExpandableViewHoldersUtil;
 import org.bottiger.podcast.images.FrescoHelper;
@@ -27,7 +27,6 @@ import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
@@ -37,7 +36,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.facebook.imagepipeline.request.BasePostprocessor;
 import com.squareup.otto.Subscribe;
 
 public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> {
@@ -119,7 +117,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         if (!TextUtils.isEmpty(image) && urlValidator.isValid(image)) {
 
             FrescoHelper.PalettePostProcessor postProcessor = new FrescoHelper.PalettePostProcessor(mActivity, image);
-            FrescoHelper.loadImageInto(viewHolder.mItemBackground, image, postProcessor);
+            FrescoHelper.loadImageInto(viewHolder.mPodcastImage, image, postProcessor);
 
             viewHolder.setArtwork(image);
         }
@@ -164,10 +162,6 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
             viewHolder.mPlaylistPosition.setVisibility(View.GONE);
         }
 
-        if (Build.VERSION.SDK_INT >= 16) {
-            //viewHolder.mActionBarGradientView.setBackground(mActionBarGradientDrawable);
-        }
-
         viewHolder.mPlayPauseButton.setEpisode(item, PlayPauseImageView.LOCATION.PLAYLIST);
         viewHolder.mPlayPauseButton.setStatus(PlayerStatusObservable.STATUS.PAUSED);
 
@@ -192,8 +186,6 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
 
         ThemeHelper themeHelper = new ThemeHelper(context);
-
-        //holder.playerRelativeLayout.setVisibility(View.VISIBLE);
 
         long playerPosition = 0;
         long playerDuration = 0;
@@ -396,6 +388,6 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         }
 
         argHolder.mTimeDuration.setText(strDuration);
-        argHolder.mTimeDurationIcon.setVisibility(visibility);
+        //argHolder.mTimeDurationIcon.setVisibility(visibility);
     }
 }

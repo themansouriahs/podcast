@@ -1,38 +1,23 @@
 package org.bottiger.podcast.adapters.viewholders;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.app.Activity;
-import android.content.Context;
-import android.os.Build;
+import android.graphics.Color;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.transition.TransitionManager;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import com.facebook.drawee.generic.GenericDraweeHierarchy;
 import com.facebook.drawee.generic.RoundingParams;
 
-import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.PaletteHelper;
-import org.bottiger.podcast.utils.UIUtils;
-import org.bottiger.podcast.views.FixedRecyclerView;
-import org.bottiger.podcast.views.PlayPauseImageView;
-import org.bottiger.podcast.views.PlayerRelativeLayout;
 import org.bottiger.podcast.views.PlaylistViewHolder;
-
-import java.util.List;
 
 /**
  * Created by apl on 20-01-2015.
@@ -43,58 +28,46 @@ public class ExpandableViewHoldersUtil {
 
     private static RelativeLayout.LayoutParams sPlayPauseParams;
     private static RelativeLayout.LayoutParams sTitleParams;
-    private static RelativeLayout.LayoutParams sPodcastImageParams;
+    private static RelativeLayout.LayoutParams sPodcastExpandedLayoutParams;
     private static RelativeLayout.LayoutParams sDurationParams;
-    private static float sPodcastImageRadius;
+    private static ViewGroup.LayoutParams sImageParams;
 
 
     public static void openH(final PlaylistViewHolder holder, final View expandView, final boolean animate) {
         if (animate) {
             initTransition(holder);
         }
-
-            if (sPodcastImageParams == null) {
-                sPodcastImageParams = (RelativeLayout.LayoutParams) holder.mPodcastImage.getLayoutParams();
+            if (sPodcastExpandedLayoutParams == null) {
+                sPodcastExpandedLayoutParams = (RelativeLayout.LayoutParams) holder.mExpandedLayoutControls.getLayoutParams();
                 sPlayPauseParams = (RelativeLayout.LayoutParams) holder.mPlayPauseButton.getLayoutParams();
-                sPodcastImageRadius = holder.mPodcastImage.getRadius();
                 sTitleParams = (RelativeLayout.LayoutParams) holder.mMainTitle.getLayoutParams();
                 sDurationParams = (RelativeLayout.LayoutParams) holder.mTimeDuration.getLayoutParams();
+                sImageParams = (ViewGroup.LayoutParams) holder.mPodcastImage.getLayoutParams();
             }
 
-            RelativeLayout.LayoutParams newParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 600);
+            int roundingRadius = (int) holder.mPodcastImage.getContext().getResources().getDimension(R.dimen.playlist_image_radius_large);
+            int imageSize = (int) holder.mPodcastImage.getContext().getResources().getDimension(R.dimen.playlist_image_size_large);
 
-            holder.mPodcastImage.setRadius(0);
-            holder.mPodcastImage.setLayoutParams(newParams);
+            sImageParams.width = imageSize;
+            sImageParams.height = imageSize;
+            holder.mPodcastImage.setLayoutParams(sImageParams);
 
-            GenericDraweeHierarchy hierarchy = holder.mItemBackground.getHierarchy();
+            GenericDraweeHierarchy hierarchy = holder.mPodcastImage.getHierarchy();
             RoundingParams roundingParams = hierarchy.getRoundingParams();
-            roundingParams.setRoundAsCircle(false);
-            holder.mItemBackground.getHierarchy().setRoundingParams(roundingParams);
+            roundingParams.setCornersRadius(roundingRadius);
+            holder.mPodcastImage.getHierarchy().setRoundingParams(roundingParams);
 
-            sTitleParams.addRule(RelativeLayout.RIGHT_OF, 0);
-            sTitleParams.addRule(RelativeLayout.LEFT_OF, 0);
             holder.mMainTitle.setLayoutParams(sTitleParams);
-
-            //sDurationParams.addRule(RelativeLayout.ALIGN_TOP, R.id.expanded_buttons_layout);
-            //sDurationParams.addRule(RelativeLayout.ALIGN_TOP, 0);
-            //sDurationParams.addRule(RelativeLayout.ALIGN_BASELINE, R.id.expanded_buttons_layout);
-            sDurationParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-            //sDurationParams.addRule(RelativeLayout.RIGHT_OF, R.id.expanded_buttons_layout);
-
-            sDurationParams.setMargins(0, 405, 10, 0);
-            holder.mTimeDuration.setLayoutParams(sDurationParams);
-            holder.mTimeDuration.setGravity(Gravity.RIGHT);
+            holder.mMainTitle.setSingleLine(false);
+            holder.mMainTitle.setTextColor(Color.BLACK);
 
             sPlayPauseParams.setMargins(sPlayPauseParams.leftMargin, 100, sPlayPauseParams.rightMargin, sPlayPauseParams.bottomMargin);
             sPlayPauseParams.addRule(RelativeLayout.CENTER_VERTICAL, 0);
-            holder.mPlayPauseButton.setLayoutParams(sPlayPauseParams);
 
-
-            holder.mActionBarGradientView.setAlpha(1);
-
-            holder.mTimeDurationIcon.setVisibility(View.GONE);
             holder.mExpandedLayoutBottom.setVisibility(View.VISIBLE);
             expandView.setVisibility(View.VISIBLE);
+
+            holder.buttonLayout.setVisibility(View.VISIBLE);
 
             PaletteHelper.generate(holder.getArtwork(), holder.getActivity(), new PaletteListener() {
                 @Override
@@ -102,12 +75,12 @@ public class ExpandableViewHoldersUtil {
                     int white = holder.getActivity().getResources().getColor(R.color.white_opaque);
 
                     ColorExtractor colorExtractor = new ColorExtractor(holder.getActivity(), argChangedPalette);
-                    holder.mLayout.setCardBackgroundColor(colorExtractor.getPrimary());
-                    holder.mMainTitle.setTextColor(colorExtractor.getTextColor());
+                    //holder.mLayout.setCardBackgroundColor(colorExtractor.getPrimary());
+                    //holder.mMainTitle.setTextColor(colorExtractor.getTextColor());
                     ////viewHolder.buttonLayout.setBackgroundColor(colorExtractor.getPrimary());
-                    holder.description.setTextColor(colorExtractor.getTextColor());
-                    holder.currentTime.setTextColor(colorExtractor.getTextColor());
-                    holder.mTimeDuration.setTextColor(colorExtractor.getTextColor());
+                    //holder.description.setTextColor(colorExtractor.getTextColor());
+                    //holder.currentTime.setTextColor(colorExtractor.getTextColor());
+                    //holder.mTimeDuration.setTextColor(colorExtractor.getTextColor());
                 }
 
                 @Override
@@ -125,25 +98,6 @@ public class ExpandableViewHoldersUtil {
             initTransition(holder);
         }
 
-
-        if (sPodcastImageParams != null) {
-            holder.mPodcastImage.setLayoutParams(sPodcastImageParams);
-            holder.mPodcastImage.setRadius(sPodcastImageRadius);
-        }
-
-        if (sTitleParams != null) {
-            sTitleParams.addRule(RelativeLayout.RIGHT_OF, R.id.left_image);
-            sTitleParams.addRule(RelativeLayout.LEFT_OF, R.id.list_image);
-            holder.mMainTitle.setLayoutParams(sTitleParams);
-        }
-
-        if (sDurationParams != null) {
-            sDurationParams.addRule(RelativeLayout.ALIGN_TOP, R.id.podcast_duration_ic);
-            sDurationParams.addRule(RelativeLayout.RIGHT_OF, R.id.podcast_duration_ic);
-            sDurationParams.setMargins(0, 0, 0, 0);
-            holder.mTimeDuration.setLayoutParams(sDurationParams);
-        }
-
         holder.mActionBarGradientView.setAlpha(0);
 
         if (sPlayPauseParams != null) {
@@ -152,14 +106,20 @@ public class ExpandableViewHoldersUtil {
             holder.mPlayPauseButton.setLayoutParams(sPlayPauseParams);
         }
 
-        GenericDraweeHierarchy hierarchy = holder.mItemBackground.getHierarchy();
-        RoundingParams roundingParams = hierarchy.getRoundingParams();
-        roundingParams.setRoundAsCircle(true);
-        holder.mItemBackground.getHierarchy().setRoundingParams(roundingParams);
 
-        holder.mTimeDuration.setGravity(Gravity.LEFT);
-        holder.mTimeDurationIcon.setVisibility(View.VISIBLE);
+        if (sImageParams != null) {
+            int sizePixels = (int) holder.mPodcastImage.getContext().getResources().getDimension(R.dimen.playlist_image_size_small);
+            sImageParams.width = sizePixels;
+            sImageParams.height = sizePixels;
+            holder.mPodcastImage.setLayoutParams(sImageParams);
+        }
+
+        GenericDraweeHierarchy hierarchy = holder.mPodcastImage.getHierarchy();
+        RoundingParams roundingParams = hierarchy.getRoundingParams();
+        //roundingParams.setRoundAsCircle(true);
+        holder.mPodcastImage.getHierarchy().setRoundingParams(roundingParams);
         holder.mExpandedLayoutBottom.setVisibility(View.GONE);
+        holder.buttonLayout.setVisibility(View.GONE);
         expandView.setVisibility(View.GONE);
 
         PaletteHelper.generate(holder.getArtwork(), holder.getActivity(), new PaletteListener() {

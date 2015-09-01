@@ -14,13 +14,10 @@ import android.view.View;
 import com.squareup.otto.Subscribe;
 
 import org.bottiger.podcast.R;
-import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.listeners.DownloadProgress;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
-import org.bottiger.podcast.service.DownloadStatus;
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
-import org.bottiger.podcast.utils.ColorExtractor;
 
 /**
  * Created by apl on 02-09-2014.
@@ -70,6 +67,23 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
                     download_icon = R.drawable.ic_get_app_grey;
                     qeueed_icon = R.drawable.ic_schedule_grey;
                     delete_icon = R.drawable.ic_delete_grey;
+                }
+            }
+        }
+
+        if (getId() == R.id.expanded_download) {
+            if (attrs != null) {
+                int[] attrsArray = new int[]{
+                        android.R.attr.background, // 0
+                };
+                TypedArray ta = mContext.obtainStyledAttributes(attrs, attrsArray);
+                mStaticBackground = ta.getDrawable(0);
+                ta.recycle();
+
+                if (mStaticBackground != getResources().getDrawable(R.color.colorPrimaryDark)) {
+                    download_icon = R.drawable.ic_get_app_black;
+                    qeueed_icon = R.drawable.ic_schedule_black;
+                    delete_icon = R.drawable.ic_delete_black;
                 }
             }
         }

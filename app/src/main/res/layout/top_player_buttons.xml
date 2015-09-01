@@ -9,7 +9,7 @@
     >
 
     <org.bottiger.podcast.views.DownloadButtonView
-        android:id="@+id/download"
+        android:id="@+id/expanded_download"
         android:padding="0dip"
         android:src="@drawable/ic_fast_forward_white"
         android:elevation="@dimen/player_elevation"
@@ -19,7 +19,7 @@
         android:id="@+id/favorite"
         android:padding="0dip"
         android:src="?attr/favorite_outline"
-        android:layout_toLeftOf="@id/download"
+        android:layout_toLeftOf="@id/expanded_download"
         android:elevation="@dimen/player_elevation"
         style="@style/TopPlayerButton" />
 
