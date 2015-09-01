@@ -10,7 +10,6 @@ import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
