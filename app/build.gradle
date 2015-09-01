@@ -189,6 +189,9 @@ dependencies {
     // Amazon version
     amazonCompile fileTree(dir: 'src/amazon/libs', include: ['*.jar'])
     amazonCompile 'com.google.android.gms:play-services-cast:7.8.0'
+    amazonCompile('com.crashlytics.sdk.android:crashlytics:2.5.1@aar') {
+        transitive = true;
+    }
     // google cast
 
     // Play Store
