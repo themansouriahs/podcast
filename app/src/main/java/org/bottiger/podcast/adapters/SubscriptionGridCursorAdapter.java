@@ -97,10 +97,15 @@ public class SubscriptionGridCursorAdapter extends CursorRecyclerAdapter {
         }
 
 
+        Uri uri = null;
         if (holder.image != null && !TextUtils.isEmpty(logo)) {
-            Uri uri = Uri.parse(logo);
-            holder.image.setImageURI(uri);
+            uri = Uri.parse(logo);
+        } else {
+            uri = Uri.parse("android.resource://" + mActivity.getPackageName() + "/" + R.drawable.generic_podcast);
         }
+
+        if (uri != null)
+            holder.image.setImageURI(uri);
 
         argHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
