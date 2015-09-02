@@ -20,7 +20,6 @@ import android.widget.TextView;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
@@ -50,7 +49,6 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
 
     protected Palette mPalette;
 
-    private DownloadProgressObservable mDownloadProgressObservable;
     public static boolean mIsExpanded = false;
     protected ORDER mSortOrder = ORDER.RECENT_FIRST;
 
@@ -63,7 +61,6 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
         mInflater = (LayoutInflater) activity
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        mDownloadProgressObservable = new DownloadProgressObservable((SoundWaves)mActivity.getApplicationContext());
         setDataset(dataset);
     }
 
