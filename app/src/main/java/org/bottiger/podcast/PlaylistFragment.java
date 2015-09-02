@@ -368,6 +368,9 @@ public class PlaylistFragment extends GeastureFragment implements
     public void onPause() {
         super.onPause();
         SoundWaves.getBus().unregister(this);
+        if (mPlaylist != null){
+            SoundWaves.getBus().unregister(mPlayerDownloadButton);
+        }
     }
 
     @Override
@@ -382,6 +385,7 @@ public class PlaylistFragment extends GeastureFragment implements
                 mForwardButton.setEpisode(item);
                 mPlayerDownloadButton.setEpisode(item);
                 mFavoriteButton.setEpisode(item);
+                SoundWaves.getBus().register(mPlayerDownloadButton);
             }
             playlistChanged(mPlaylist);
         }
