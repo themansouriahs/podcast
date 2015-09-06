@@ -1,5 +1,6 @@
 package org.bottiger.podcast;
 
+import android.app.ActivityManager;
 import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
@@ -11,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
 
@@ -21,6 +23,8 @@ import org.bottiger.podcast.flavors.Analytics.AnalyticsFactory;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.CrashReporterFactory;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.images.FrescoHelper;
+import org.bottiger.podcast.images.LollipopBitmapMemoryCacheParamsSupplier;
 import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
 import org.bottiger.podcast.service.PlayerService;
 
@@ -78,7 +82,8 @@ public class SoundWaves extends Application {
             //new ANRWatchDog(10000 /*timeout*/).start();
         }
 
-        Fresco.initialize(this);
+        ImagePipelineConfig imagePipelineConfig = FrescoHelper.getImagePipelineConfig(this);
+        Fresco.initialize(getApplicationContext(), imagePipelineConfig);
 
         sAnalytics = AnalyticsFactory.getAnalytics(this);
         sAnalytics.startTracking();

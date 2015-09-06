@@ -164,8 +164,10 @@ public class FragmentContainerActivity extends DrawerActivity {
 
                 if (position == SUBSCRIPTION) {
                     fragment = new SubscriptionsFragment();
+                    //fragment = new DummyFragment();
                 } else if (position == PLAYLIST) {
                     fragment = new PlaylistFragment();
+                    //fragment = new DummyFragment();
                 } else if (position == DISCOVER) {
                     fragment = new DiscoveryFragment();
                 }

@@ -1,8 +1,10 @@
 package org.bottiger.podcast.adapters;
 
+import org.apache.commons.validator.routines.UrlValidator;
 import org.bottiger.podcast.FeedActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.adapters.viewholders.subscription.SubscriptionViewHolder;
+import org.bottiger.podcast.images.FrescoHelper;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionLoader;
 
@@ -104,8 +106,19 @@ public class SubscriptionGridCursorAdapter extends CursorRecyclerAdapter {
             uri = Uri.parse("android.resource://" + mActivity.getPackageName() + "/" + R.drawable.generic_podcast);
         }
 
+        UrlValidator urlValidator = new UrlValidator();
+        String image = uri.toString();
+        if (!TextUtils.isEmpty(image) && urlValidator.isValid(image)) {
+
+            FrescoHelper.PalettePostProcessor postProcessor = new FrescoHelper.PalettePostProcessor(mActivity, image);
+            FrescoHelper.loadImageInto(holder.image, image, postProcessor);
+
+        }
+
+        /*
         if (uri != null)
             holder.image.setImageURI(uri);
+            */
 
         argHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
