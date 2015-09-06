@@ -18,6 +18,7 @@ import org.bottiger.podcast.service.Downloader.engines.IDownloadEngine;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 public class DownloadProgressObservable {
@@ -68,10 +69,11 @@ public class DownloadProgressObservable {
 
                         Log.d("Refresh UI:", "Run at: "+ (new Date().getTime()));
 
-                        Iterator<FeedItem> iterator = mUpdateEpisodess.iterator();
-                        while (iterator.hasNext()) {
+                        //Iterator<FeedItem> iterator = mUpdateEpisodess.iterator();
+                        //while (iterator.hasNext()) {
+                        for (int i = 0; i < mUpdateEpisodess.size(); i++) {
 
-                            FeedItem episode = iterator.next();
+                            FeedItem episode = mUpdateEpisodess.get(i); //iterator.next();
 
                             if (episode == null) {
                                 throw new NullPointerException("Episode can not be null!");
@@ -82,15 +84,17 @@ public class DownloadProgressObservable {
 
                             DownloadProgress downloadProgress = null;
 
-                            int progress;
+                            int progress = -1;
 
                             switch (status) {
                                 case DOWNLOADING:
-                                    float progressFloat = download.getProgress();
-                                    progress = (int)(progressFloat*100);
+                                    if (download != null) {
+                                        float progressFloat = download.getProgress();
+                                        progress = (int) (progressFloat * 100);
 
-                                    downloadProgress = new DownloadProgress(episode, status, progress);
-                                    Log.d("Refresh UI:", "Downloading: "+ episode.title + " (progress: " + progress + ")");
+                                        downloadProgress = new DownloadProgress(episode, status, progress);
+                                    }
+                                    Log.d("Refresh UI:", "Downloading: " + episode.title + " (progress: " + progress + ")");
                                     break;
                                 case PENDING:
                                     Log.d("Refresh UI:", "Pending: "+ episode.title);
@@ -100,7 +104,7 @@ public class DownloadProgressObservable {
                                 case ERROR:
                                     Log.d("Refresh UI:", "End: "+ episode.title);
                                     downloadProgress = new DownloadProgress(episode, status, 100);
-                                    iterator.remove();
+                                    mUpdateEpisodess.remove(i);
                                     break;
                                 default:
                                     break;
