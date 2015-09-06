@@ -15,13 +15,17 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.content.CursorLoader;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import com.squareup.otto.Produce;
 import com.squareup.otto.Subscribe;
 
 public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
+
+	private static final String TAG = "AbstractEpisodeFragment";
 
 	protected OnPlaylistRefreshListener mActivityCallback;
 
@@ -64,7 +68,6 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 		mPlaylist = argPlaylist;
 	}
 
-
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.episode_list, menu);
@@ -89,17 +92,19 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 			return true;
 		}
 		case R.id.menu_clear_playlist: {
-			//resetPlaylist(getActivity());
+
+			if (mPlaylist == null) {
+				Log.wtf(TAG, "Playlist should not be null"); // NoI18N
+				break;
+			}
 
             mPlaylist.resetPlaylist(null);
-            //Playlist.resetOrder();
             int size = mPlaylist.defaultSize();
             if (!mPlaylist.isEmpty()) {
 				mPlaylist.populatePlaylist(size, true);
                 mAdapter.notifyDataSetChanged();
             }
             break;
-			//refreshView();
 		}
 		}
 		return super.onOptionsItemSelected(item);

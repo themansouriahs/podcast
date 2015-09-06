@@ -53,7 +53,7 @@ import org.bottiger.podcast.views.MultiShrink.feed.SchedulingUtils;
 /**
  * Created by apl on 14-02-2015.
  */
-public class FeedActivity extends AppCompatActivity implements PaletteListener {
+public class FeedActivity extends TopActivity implements PaletteListener {
 
     public static final int MODE_FULLY_EXPANDED = 4;
 

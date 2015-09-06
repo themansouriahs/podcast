@@ -10,12 +10,14 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.OkUrlFactory;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.MalformedInputException;
 import java.util.HashSet;
 
 import org.bottiger.podcast.SoundWaves;
@@ -88,7 +90,8 @@ public class OkHttpDownloader extends DownloadEngineBase {
                             tmpFIle.renameTo(finalFIle);
                             onSucces(finalFIle);
                         } else {
-                            onFailure(null);
+                            String msg = "Wrong file size. Expected: " + tmpFIle.length() + ", got: " + contentLength; // NoI18N
+                            onFailure(new FileNotFoundException(msg));
                         }
                     }
 
