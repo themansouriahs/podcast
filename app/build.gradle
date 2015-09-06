@@ -1,6 +1,5 @@
 apply plugin: 'idea'
 apply plugin: 'com.android.application'
-apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion 23
@@ -94,19 +93,8 @@ android {
 //    }
 //}
 
-buildscript {
-    repositories {
-        maven { url 'https://maven.fabric.io/public' }
-    }
-
-    dependencies {
-        classpath 'io.fabric.tools:gradle:1.+'
-    }
-}
-
 repositories {
     mavenCentral()
-    maven { url 'https://maven.fabric.io/public' }
 }
 
 idea {
@@ -156,6 +144,8 @@ dependencies {
     compile 'com.fasterxml.jackson.core:jackson-databind:2.5+'
     compile 'com.facebook.fresco:fresco:0.7.0'
 
+    compile 'com.bugsnag:bugsnag-android:+'
+
     // For testing only
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.9.5'
@@ -189,9 +179,6 @@ dependencies {
     // Amazon version
     amazonCompile fileTree(dir: 'src/amazon/libs', include: ['*.jar'])
     amazonCompile 'com.google.android.gms:play-services-cast:7.8.0'
-    amazonCompile('com.crashlytics.sdk.android:crashlytics:2.5.1@aar') {
-        transitive = true;
-    }
     // google cast
 
     // Play Store
@@ -199,7 +186,4 @@ dependencies {
     // analytics
     googleCompile 'com.google.android.gms:play-services-cast:7.8.0'
     // google cast
-    googleCompile('com.crashlytics.sdk.android:crashlytics:2.5.1@aar') {
-        transitive = true;
-    }
 }

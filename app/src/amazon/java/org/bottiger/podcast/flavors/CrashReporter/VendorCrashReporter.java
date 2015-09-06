@@ -3,14 +3,13 @@ package org.bottiger.podcast.flavors.CrashReporter;
 import android.app.Application;
 import android.support.annotation.NonNull;
 
-import com.crashlytics.android.Crashlytics;
+import com.bugsnag.android.Bugsnag;
 
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
 import org.acra.ACRAConfigurationException;
 import org.acra.ReportingInteractionMode;
 
-import io.fabric.sdk.android.Fabric;
 
 /**
  * Created by apl on 26-02-2015.
@@ -20,7 +19,7 @@ import io.fabric.sdk.android.Fabric;
 public class VendorCrashReporter {
 
     public static void init(@NonNull Application argApplication) {
-        Fabric.with(argApplication, new Crashlytics());
+        Bugsnag.init(argApplication);
         /*
         ACRAConfiguration config = ACRA.getNewDefaultConfig(argApplication);
         try {
