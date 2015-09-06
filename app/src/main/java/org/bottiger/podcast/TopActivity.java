@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.transition.Slide;
 import android.transition.Transition;
 import android.view.Window;
@@ -16,7 +17,7 @@ import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
 import org.bottiger.podcast.service.PlayerService;
 
-public class TopActivity extends ActionBarActivity {
+public class TopActivity extends AppCompatActivity {
 
     public static final int PERMISSION_TO_DOWNLOAD = 555;
 	
