@@ -141,6 +141,13 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
 	}
 
     public void setAsFrist(@NonNull IEpisode item) {
+
+        if (mInternalPlaylist.isEmpty()) {
+            mInternalPlaylist.add(0, item);
+            notifyPlaylistChanged();
+            return;
+        }
+
         if (item.equals(mInternalPlaylist.get(0)))
             return;
 
