@@ -2,7 +2,6 @@
 <org.bottiger.podcast.views.TopPlayer
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
-    xmlns:card_view="http://schemas.android.com/tools"
     android:visibility="visible"
     android:id="@+id/session_photo_container"
     android:layout_alignParentTop="true"

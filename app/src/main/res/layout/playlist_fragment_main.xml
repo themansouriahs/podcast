@@ -1,15 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<org.bottiger.podcast.views.SwipeRefreshExpandableLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/my_frame"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!--
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/overlay_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        -->
+
+        <include layout="@layout/playlist_welcome" />
+
+        <include layout="@layout/playlist_empty" />
+
+        <include layout="@layout/playlist_scroller_content"/>
+
+    <!--
+    </android.support.v4.widget.NestedScrollView>
+    -->
+
+
+    <!--
     <FrameLayout
         android:id="@+id/overlay_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <!-- android:paddingTop="@dimen/header_bar_height" -->
 
         <include layout="@layout/playlist_welcome" />
 
@@ -23,5 +43,6 @@
             layout="@layout/seekbar_overlay" />
 
     </FrameLayout>
+    -->
 
-</org.bottiger.podcast.views.SwipeRefreshExpandableLayout>
+</FrameLayout>

@@ -20,7 +20,7 @@
             android:layout_below="@+id/my_awesome_toolbar"/>
 
      <!-- The Main layout -->
-        <org.bottiger.podcast.views.ViewPagerWithDismiss
+        <android.support.v4.view.ViewPager
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/app_content"
             android:layout_below="@+id/sliding_tabs"
@@ -34,7 +34,7 @@
                 android:layout_height="match_parent" >
             </FrameLayout>
 
-        </org.bottiger.podcast.views.ViewPagerWithDismiss>
+        </android.support.v4.view.ViewPager>
 
     </RelativeLayout>
 

@@ -2,7 +2,6 @@ package org.bottiger.podcast;
 
 import org.bottiger.podcast.Animations.DepthPageTransformer;
 import org.bottiger.podcast.utils.PodcastLog;
-import org.bottiger.podcast.views.ViewPagerWithDismiss;
 import org.bottiger.podcast.views.SlidingTab.SlidingTabLayout;
 
 import android.annotation.TargetApi;
@@ -46,7 +45,7 @@ public class FragmentContainerActivity extends DrawerActivity {
 
     private SlidingTabLayout mSlidingTabLayout;
 
-    private ViewPagerWithDismiss mInflatedViewStub;
+    private ViewPager mInflatedViewStub;
 
     @Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -59,7 +58,7 @@ public class FragmentContainerActivity extends DrawerActivity {
 
 		mFragmentTransaction = mFragmentManager.beginTransaction();
 
-		mInflatedViewStub = (ViewPagerWithDismiss) findViewById(R.id.app_content);
+		mInflatedViewStub = (ViewPager) findViewById(R.id.app_content);
 
 		// ViewPager setup
         mViewPager = mInflatedViewStub;

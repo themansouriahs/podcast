@@ -4,40 +4,36 @@ import org.bottiger.podcast.adapters.PlaylistAdapter;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
-import org.bottiger.podcast.listeners.RecyclerItemTouchListener;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
-import org.bottiger.podcast.provider.ISubscription;
-import org.bottiger.podcast.service.IDownloadCompleteCallback;
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
+import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.views.DownloadButtonView;
 import org.bottiger.podcast.views.PlayPauseImageView;
 import org.bottiger.podcast.views.PlayerButtonView;
 import org.bottiger.podcast.views.PlayerSeekbar;
-import org.bottiger.podcast.views.SwipeDismissRecyclerViewTouchListener;
 import org.bottiger.podcast.views.TextViewObserver;
 import org.bottiger.podcast.views.TopPlayer;
-import org.bottiger.podcast.views.MultiShrink.playlist.MultiShrinkScroller;
 import org.bottiger.podcast.views.dialogs.DialogBulkDownload;
 import org.bottiger.podcast.views.dialogs.DialogPlaylistFilters;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -54,11 +50,8 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.squareup.otto.Produce;
 import com.squareup.otto.Subscribe;
 
-public class PlaylistFragment extends GeastureFragment implements
-		OnSharedPreferenceChangeListener, IDownloadCompleteCallback
-         {
-
-	public final static int SUBSCRIPTION_CONTEXT_MENU = 1;
+public class PlaylistFragment extends AbstractEpisodeFragment implements OnSharedPreferenceChangeListener
+    {
 
     private static final String PLAYLIST_WELCOME_DISMISSED = "playlist_welcome_dismissed";
     private static final boolean PLAYLIST_WELCOME_DISMISSED_DEFAULT = false;
@@ -66,8 +59,6 @@ public class PlaylistFragment extends GeastureFragment implements
     private View mPlaylistContainer;
     private View mPlaylistWelcomeContainer;
     private View mPlaylistEmptyContainer;
-
-    private MultiShrinkScroller mMultiShrinkScroller;
 
     private TopPlayer mTopPlayer;
     private SimpleDraweeView mPhoto;
@@ -83,6 +74,9 @@ public class PlaylistFragment extends GeastureFragment implements
     private PlayerButtonView mBackButton;
     private PlayerButtonView mFavoriteButton;
 
+    private RecyclerView mRecyclerView;
+    private View mOverlay;
+
 	private SharedPreferences.OnSharedPreferenceChangeListener spChanged;
 
 	/** ID of the current expanded episode */
@@ -92,18 +86,16 @@ public class PlaylistFragment extends GeastureFragment implements
     DownloadProgressObservable mDownloadProgressObservable = null;
 
     private Playlist mPlaylist;
-    private Activity mActivity;
+    private Context mContext;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        mDownloadProgressObservable = new DownloadProgressObservable((SoundWaves)mActivity.getApplicationContext());
+        mDownloadProgressObservable = new DownloadProgressObservable((SoundWaves) mContext.getApplicationContext());
         super.onCreate(savedInstanceState);
-        //SoundWaves.getBus().register(this);
     }
 
     @Override
     public void onDestroy() {
-        //SoundWaves.getBus().unregister(this);
         super.onDestroy();
     }
 
@@ -117,19 +109,13 @@ public class PlaylistFragment extends GeastureFragment implements
         super.onDestroyView();
     }
 
-    @Produce
-    public Playlist producePlaylist() {
-        // Assuming 'lastAnswer' exists.
-        return new Playlist(mActivity);
-    }
-
 	// Read here:
 	// http://developer.android.com/reference/android/app/Fragment.html#Layout
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
-        mDownloadProgressObservable = EpisodeDownloadManager.getDownloadProgressObservable((SoundWaves)mActivity.getApplicationContext());
+        mDownloadProgressObservable = EpisodeDownloadManager.getDownloadProgressObservable((SoundWaves) mContext.getApplicationContext());
 
 		TopActivity.getPreferences().registerOnSharedPreferenceChangeListener(
                 spChanged);
@@ -143,88 +129,41 @@ public class PlaylistFragment extends GeastureFragment implements
 	}
 
     @Override
-    public void onRefresh() {
-        Log.d("PlaylistRefresh", "starting");
-        mSwipeRefreshView.setRefreshing(true);
-        SoundWaves.sSubscriptionRefreshManager.refresh(null, this);
-    }
-
-    @Override
-    public void complete(boolean succes, ISubscription argSubscription) {
-        Log.d("PlaylistRefresh", "ending");
-        mSwipeRefreshView.setRefreshing(false);
-    }
-
-
-
-    @SuppressLint("WrongViewCast")
-    @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         super.onViewCreated(view,savedInstanceState);
 
-        mMultiShrinkScroller = (MultiShrinkScroller) mSwipeRefreshView.findViewById(R.id.playlist_container);
+        mTopPlayer =   (TopPlayer) view.findViewById(R.id.session_photo_container);
+        mPhoto =            (SimpleDraweeView) view.findViewById(R.id.session_photo);
 
-        mTopPlayer =   (TopPlayer) mSwipeRefreshView.findViewById(R.id.session_photo_container);
-        mPhoto =            (SimpleDraweeView) mSwipeRefreshView.findViewById(R.id.session_photo);
+        mPlaylistContainer = view.findViewById(R.id.playlist_container);
+        mPlaylistWelcomeContainer = view.findViewById(R.id.playlist_welcome_screen);
+        mPlaylistEmptyContainer = view.findViewById(R.id.playlist_empty);
 
-        mPlaylistContainer = mSwipeRefreshView.findViewById(R.id.playlist_container);
-        mPlaylistWelcomeContainer = mSwipeRefreshView.findViewById(R.id.playlist_welcome_screen);
-        mPlaylistEmptyContainer = mSwipeRefreshView.findViewById(R.id.playlist_empty);
+        mEpisodeTitle         =    (TextView) view.findViewById(R.id.episode_title);
+        mEpisodeInfo         =    (TextView) view.findViewById(R.id.episode_info);
 
-        mEpisodeTitle         =    (TextView) mSwipeRefreshView.findViewById(R.id.episode_title);
-        mEpisodeInfo         =    (TextView) mSwipeRefreshView.findViewById(R.id.episode_info);
+        mCurrentTime       =    (TextViewObserver) view.findViewById(R.id.current_time);
+        mTotalTime         =    (TextViewObserver) view.findViewById(R.id.total_time);
 
-        mCurrentTime       =    (TextViewObserver) mSwipeRefreshView.findViewById(R.id.current_time);
-        mTotalTime         =    (TextViewObserver) mSwipeRefreshView.findViewById(R.id.total_time);
+        mPlayPauseButton         =    (PlayPauseImageView) view.findViewById(R.id.play_pause_button);
+        mPlayerSeekbar          =    (PlayerSeekbar) view.findViewById(R.id.player_progress);
+        mPlayerDownloadButton   =    (DownloadButtonView) view.findViewById(R.id.download);
+        mBackButton = (PlayerButtonView)view.findViewById(R.id.rewind_button);
+        mForwardButton = (PlayerButtonView)view.findViewById(R.id.fast_forward_button);
+        mFavoriteButton = (PlayerButtonView)view.findViewById(R.id.favorite);
 
-        mPlayPauseButton         =    (PlayPauseImageView) mSwipeRefreshView.findViewById(R.id.play_pause_button);
-        mPlayerSeekbar          =    (PlayerSeekbar) mSwipeRefreshView.findViewById(R.id.player_progress);
-        mPlayerDownloadButton   =    (DownloadButtonView) mSwipeRefreshView.findViewById(R.id.download);
-        mBackButton = (PlayerButtonView)mSwipeRefreshView.findViewById(R.id.rewind_button);
-        mForwardButton = (PlayerButtonView)mSwipeRefreshView.findViewById(R.id.fast_forward_button);
-        mFavoriteButton = (PlayerButtonView)mSwipeRefreshView.findViewById(R.id.favorite);
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.my_recycler_view);
+        mOverlay = view.findViewById(R.id.playlist_overlay);
 
         setPlaylistViewState(mPlaylist);
 
-        mMultiShrinkScroller.initialize(new MultiShrinkScroller.MultiShrinkScrollerListener() {
-            @Override
-            public void onScrolledOffBottom() {
-
-            }
-
-            @Override
-            public void onStartScrollOffBottom() {
-
-            }
-
-            @Override
-            public void onTransparentViewHeightChange(float ratio) {
-
-            }
-
-            @Override
-            public void onEntranceAnimationDone() {
-
-            }
-
-            @Override
-            public void onEnterFullscreen() {
-
-            }
-
-            @Override
-            public void onExitFullscreen() {
-
-            }
-        }, true);
-
         // use a linear layout manager
-        //mLayoutManager = new ExpandableLayoutManager(mActivity, mSwipeRefreshView, mTopPlayer, mRecyclerView, mPhoto);
-        mLayoutManager = new LinearLayoutManager(mActivity);
+        //mLayoutManager = new ExpandableLayoutManager(mContext, mSwipeRefreshView, mTopPlayer, mRecyclerView, mPhoto);
+        mLayoutManager = new LinearLayoutManager(mContext);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
-        mAdapter = new PlaylistAdapter(mActivity, mOverlay, mDownloadProgressObservable);
+        mAdapter = new PlaylistAdapter(getActivity(), mOverlay, mDownloadProgressObservable);
         mAdapter.setHasStableIds(true);
 
         SoundWaves.getBus().register(mAdapter);
@@ -242,28 +181,12 @@ public class PlaylistFragment extends GeastureFragment implements
             bindHeader(episode);
         }
 
-        mSwipeRefreshView.fragment = this;
 
-        // Build item decoration and add it to the RecyclerView
-        /*
-        InitialHeaderAdapter initialHeaderAdapter = new InitialHeaderAdapter(mPlaylist);
-        StickyHeadersItemDecoration decoration = new StickyHeadersBuilder()
-                .setAdapter(mAdapter)
-                .setRecyclerView(mRecyclerView)
-                .setStickyHeadersAdapter(
-                        initialHeaderAdapter, // Class that implements StickyHeadersAdapter
-                        true)     // Decoration position relative to a item
-                .build();
-
-        mRecyclerView.addItemDecoration(decoration);
-        */
-
-        //////
-
-        mRecyclerView.addOnItemTouchListener(new RecyclerItemTouchListener());
+        //mRecyclerView.addOnItemTouchListener(new RecyclerItemTouchListener());
 
         ///////
 
+        /*
         SwipeDismissRecyclerViewTouchListener touchListener =
                 new SwipeDismissRecyclerViewTouchListener(
                         mRecyclerView,
@@ -317,65 +240,85 @@ public class PlaylistFragment extends GeastureFragment implements
                             }
                         });
         mRecyclerView.setOnTouchListener(touchListener);
-
-
-        //////
-        /*
-        DragSortRecycler dragSortRecycler = new DragSortRecycler();
-        dragSortRecycler.setViewHandleId(R.id.drag_handle); //View you wish to use as the handle
-
-        dragSortRecycler.setOnDragStateChangedListener(initialHeaderAdapter);
-        dragSortRecycler.setOnDragStateChangedListener(mPlaylist);
-        dragSortRecycler.setOnDragStateChangedListener(mRecyclerView);
-
-        dragSortRecycler.setNavigationHeight(UIUtils.NavigationBarHeight(mActivity));
-
-
-        mRecyclerView.addItemDecoration(dragSortRecycler);
-        mRecyclerView.addOnItemTouchListener(dragSortRecycler);
         */
-        //mRecyclerView.setOnScrollListener(dragSortRecycler.getScrollListener());
-        //////
+
+        // init swipe to dismiss logic
+        /*
+        ItemTouchHelper swipeToDismissTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(
+                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                // callback for drag-n-drop, false to skip this feature
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                // callback for swipe to dismiss, removing item from data and adapter
+                //items.remove(viewHolder.getAdapterPosition());
+                final int itemPosition = viewHolder.getAdapterPosition()+1;
+                final IEpisode episode = mPlaylist.getItem(itemPosition);
+                final int currentPriority = episode.getPriority();
+                final ContentResolver contentResolver = getActivity().getContentResolver();
+
+                episode.setPriority(-1);
+
+                if (episode instanceof FeedItem) {
+                    FeedItem item = (FeedItem) episode;
+                    item.markAsListened();
+                }
+
+
+                mAdapter.notifyItemRemoved(viewHolder.getAdapterPosition());
+            }
+        });
+        swipeToDismissTouchHelper.attachToRecyclerView(mRecyclerView);
+        */
+
+
 
         //mRecyclerView.setItemAnimator(new SlideInLeftAnimator());
     }
 
-             @Override
-             public void onAttach(Activity activity) {
-                 mActivity = activity;
-                 super.onAttach(activity);
-             }
+    @Override
+    public void onAttach(Context context) {
+        mContext = context;
+        super.onAttach(context);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
+
+        view = inflater.inflate(R.layout.playlist_fragment_main, container, false);
+
         return view;
     }
 
     @Override
     public void onStart() {
+        SoundWaves.getBus().register(this);
         super.onStart();
-        //SoundWaves.getBus().register(this);
     }
 
     @Override
     public void onStop() {
-        //SoundWaves.getBus().unregister(this);
         super.onStop();
+        SoundWaves.getBus().unregister(this);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        SoundWaves.getBus().unregister(this);
-        if (mPlaylist != null){
+        //SoundWaves.getBus().unregister(this);
+        if (mPlaylist != null && mPlaylist.getItem(0) != null){
             SoundWaves.getBus().unregister(mPlayerDownloadButton);
         }
     }
 
     @Override
     public void onResume() {
-        SoundWaves.getBus().register(this);
+        //SoundWaves.getBus().register(this);
         if (mPlaylist != null) {
             IEpisode item = mPlaylist.getItem(0);
 
@@ -464,7 +407,7 @@ public class PlaylistFragment extends GeastureFragment implements
 
         final Activity activity = getActivity();
 
-        mTopPlayer.setEpisodeId(item);
+        //mTopPlayer.setEpisodeId(item);
 
         String artworkURL = item.getArtwork(activity);
         if (!TextUtils.isEmpty(artworkURL)) {
@@ -557,7 +500,7 @@ public class PlaylistFragment extends GeastureFragment implements
      public void onCreateContextMenu(ContextMenu menu, View v,
                                      ContextMenuInfo menuInfo) {
          super.onCreateContextMenu(menu, v, menuInfo);
-         MenuInflater inflater = mActivity.getMenuInflater();
+         MenuInflater inflater = getActivity().getMenuInflater();
      }
 
      @Override
@@ -593,6 +536,21 @@ public class PlaylistFragment extends GeastureFragment implements
 		}
 	}
 
+    @Produce
+    public Playlist producePlaylist() {
+        Playlist playlist = mPlaylist;
+
+        if (playlist != null)
+            return playlist;
+
+        PlayerService service = PlayerService.getInstance();
+        if (service != null) {
+            mPlaylist = service.getPlaylist();
+        }
+
+        return mPlaylist;
+    }
+
     @Subscribe
     public void playlistChanged(@NonNull Playlist argPlaylist) {
         mPlaylist = argPlaylist;
@@ -607,4 +565,5 @@ public class PlaylistFragment extends GeastureFragment implements
             bindHeader(episode);
         }
     }
-}
+
+    }
