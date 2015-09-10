@@ -372,7 +372,7 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
         }
 
         // skip 'removed' episodes
-        where += " AND (" + ItemColumns.TABLE_NAME + "." + ItemColumns.PRIORITY + " >= 0)";
+        //where += " AND (" + ItemColumns.TABLE_NAME + "." + ItemColumns.PRIORITY + " >= 0)";
 
 
 		return where;
@@ -537,13 +537,6 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
     }
 
     public void notifyPlaylistChanged() {
-        /*
-        for (PlaylistChangeListener listener : sPlaylistChangeListeners) {
-            if (listener == null) {
-                throw new IllegalStateException("Listener can ot be null");
-            }
-            listener.notifyPlaylistChanged();
-        }*/
         SoundWaves.getBus().post(this);
     }
 

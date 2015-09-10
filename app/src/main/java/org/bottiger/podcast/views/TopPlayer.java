@@ -1,12 +1,22 @@
 package org.bottiger.podcast.views;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.os.TraceCompat;
+import android.support.v4.view.GestureDetectorCompat;
+import android.support.v4.view.MotionEventCompat;
+import android.support.v4.view.NestedScrollingChild;
+import android.support.v4.view.NestedScrollingChildHelper;
+import android.support.v4.view.ScrollingView;
+import android.support.v4.view.ViewCompat;
+import android.support.v4.view.ViewConfigurationCompat;
 import android.support.v7.graphics.Palette;
 import android.transition.TransitionManager;
 import android.util.AttributeSet;
@@ -14,7 +24,9 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -24,28 +36,37 @@ import com.facebook.drawee.view.SimpleDraweeView;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.PaletteListener;
-import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.UIUtils;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 import static org.bottiger.podcast.views.PlayerButtonView.StaticButtonColor;
 
 /**
  * Created by apl on 30-09-2014.
  */
-public class TopPlayer extends RelativeLayout implements PaletteListener {
+public class TopPlayer extends RelativeLayout implements PaletteListener, ScrollingView, NestedScrollingChild {
 
     private static final String TAG = "TopPlayer";
 
-    private IEpisode mEpisodeId;
+    private final NestedScrollingChildHelper scrollingChildHelper;
+    private ViewConfiguration mViewConfiguration;  // getScaledTouchSlop
 
-    private enum PlayerLayout { SMALL, MEDIUM, LARGE }
-    private PlayerLayout mPlayerLayout = PlayerLayout.LARGE;
+    public static final int SMALL = 0;
+    public static final int MEDIUM = 1;
+    public static final int LARGE = 2;
+
+    @IntDef({SMALL, MEDIUM, LARGE})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface PlayerLayout {}
+
+    private @PlayerLayout int mPlayerLayout = LARGE;
 
     private int mPlayPauseLargeSize = -1;
 
-    private Activity mActivity;
-    private FixedRecyclerView mRecyclerView;
+    private Context mContext;
 
     public static int sizeSmall                 =   -1;
     public static int sizeMedium                =   -1;
@@ -103,6 +124,9 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
     private PlayerLayoutParameter mSmallLayout = new PlayerLayoutParameter();
     private PlayerLayoutParameter mLargeLayout = new PlayerLayoutParameter();
 
+    private GestureDetectorCompat mGestureDetector;
+    private TopPLayerScrollGestureListener mTopPLayerScrollGestureListener;
+
     private SharedPreferences prefs;
 
     private class PlayerLayoutParameter {
@@ -112,27 +136,38 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
     }
 
     public TopPlayer(Context context) {
-        super(context);
-        init(context);
+        super(context, null);
+        scrollingChildHelper = new NestedScrollingChildHelper(this);
+        //init(context);
     }
 
     public TopPlayer(Context context, AttributeSet attrs) {
         super(context, attrs);
+        scrollingChildHelper = new NestedScrollingChildHelper(this);
         init(context);
     }
 
     public TopPlayer(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        scrollingChildHelper = new NestedScrollingChildHelper(this);
         init(context);
     }
 
     @TargetApi(21)
     public TopPlayer(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
+        scrollingChildHelper = new NestedScrollingChildHelper(this);
         init(context);
     }
 
     private void init(@NonNull Context argContext) {
+
+        mTopPLayerScrollGestureListener = new TopPLayerScrollGestureListener();
+        scrollingChildHelper.setNestedScrollingEnabled(true);
+
+        mGestureDetector = new GestureDetectorCompat(argContext,mTopPLayerScrollGestureListener);
+
+        mViewConfiguration = ViewConfiguration.get(argContext);
 
         int screenHeight = 1000;
 
@@ -140,38 +175,50 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
             return;
         }
 
-        mActivity = (Activity) argContext;
+        mContext = argContext;
 
         prefs = PreferenceManager.getDefaultSharedPreferences(argContext.getApplicationContext());
-        mDoDisplayTextKey = mActivity.getResources().getString(R.string.pref_top_player_text_expanded_key);
+        mDoDisplayTextKey = argContext.getResources().getString(R.string.pref_top_player_text_expanded_key);
         mDoDisplayText = prefs.getBoolean(mDoDisplayTextKey, mDoDisplayText);
 
-        mDoFullscreentKey = mActivity.getResources().getString(R.string.pref_top_player_fullscreen_key);
+        mDoFullscreentKey = argContext.getResources().getString(R.string.pref_top_player_fullscreen_key);
         mFullscreen = prefs.getBoolean(mDoFullscreentKey, mFullscreen);
 
 
-        sizeShrinkBuffer = (int) UIUtils.convertDpToPixel(100, mActivity);
-        screenHeight = UIUtils.getScreenHeight(mActivity);
+        sizeShrinkBuffer = (int) UIUtils.convertDpToPixel(100, argContext);
+        screenHeight = UIUtils.getScreenHeight(argContext);
 
-        sizeSmall = mActivity.getResources().getDimensionPixelSize(R.dimen.top_player_size_minimum);
-        sizeMedium = mActivity.getResources().getDimensionPixelSize(R.dimen.top_player_size_medium);
-        sizeLarge = screenHeight- mActivity.getResources().getDimensionPixelSize(R.dimen.top_player_size_maximum_bottom);
+        sizeSmall = argContext.getResources().getDimensionPixelSize(R.dimen.top_player_size_minimum);
+        sizeMedium = argContext.getResources().getDimensionPixelSize(R.dimen.top_player_size_medium);
+        sizeLarge = screenHeight- argContext.getResources().getDimensionPixelSize(R.dimen.top_player_size_maximum_bottom);
 
         screenHeight = sizeLarge;
 
         sizeStartShrink = sizeSmall+sizeShrinkBuffer;
         //sizeLarge = 1080; // 1080
 
-        mSeekbarDeadzonePx        = (int)UIUtils.convertDpToPixel(mSeekbarDeadzone, mActivity);
-        mSeekbarFadeDistancePx    = (int)UIUtils.convertDpToPixel(mSeekbarFadeDistance, mActivity);
-        mTextFadeDistancePx       = (int)UIUtils.convertDpToPixel(mTextFadeDistance, mActivity);
-        mTextInfoFadeDistancePx   = (int)UIUtils.convertDpToPixel(mTextInfoFadeDistance, mActivity);
+        mSeekbarDeadzonePx        = (int)UIUtils.convertDpToPixel(mSeekbarDeadzone, argContext);
+        mSeekbarFadeDistancePx    = (int)UIUtils.convertDpToPixel(mSeekbarFadeDistance, argContext);
+        mTextFadeDistancePx       = (int)UIUtils.convertDpToPixel(mTextFadeDistance, argContext);
+        mTextInfoFadeDistancePx   = (int)UIUtils.convertDpToPixel(mTextInfoFadeDistance, argContext);
 
-        sizeActionbar = mActivity.getResources().getDimensionPixelSize(R.dimen.action_bar_height);
+        sizeActionbar = argContext.getResources().getDimensionPixelSize(R.dimen.action_bar_height);
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             setClipToOutline(true);
         }
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        //assert getLayoutParams() != null;
+
+        /*
+        CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams)getLayoutParams();
+        lp.set .setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED|AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL ); // SCROLL_FLAG_EXIT_UNTIL_COLLAPSED|AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL
+        setLayoutParams(lp);
+        */
     }
 
     @Override
@@ -202,8 +249,6 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
         mPlayerButtons = (RelativeLayout) findViewById(R.id.player_buttons);
 
         mPlayPauseLargeSize = mPlayPauseButton.getLayoutParams().height;
-
-        //PaletteCache.generate(mEpisodeId.getArtwork(mActivity), mActivity, mSeekbar);
 
         mLargeLayout.SeekBarLeftMargin = 0;
         mLargeLayout.PlayPauseSize = mPlayPauseLargeSize;
@@ -275,7 +320,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
             int onemin = 1000 * 60;
             ps.FaceOutAndStop(onemin*minutes);
             String toast = getResources().getQuantityString(R.plurals.player_sleep, minutes, minutes);
-            Toast.makeText(mActivity, toast, Toast.LENGTH_LONG).show();
+            Toast.makeText(mContext, toast, Toast.LENGTH_LONG).show();
         } catch (NullPointerException npe) {
             Log.d(TAG, "Could not connect to the Player");
         }
@@ -348,7 +393,12 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
         return screenHeight;
     }
 
-    // returns actual visible height
+    public void scrollBy(float argY) {
+        float oldHeight = getPlayerHeight();
+        setPlayerHeight(oldHeight - argY);
+    }
+
+    // returns the new height
     public float setPlayerHeight(float argScreenHeight) {
 
         if (mFullscreen)
@@ -377,13 +427,18 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
         */
 
         //setTranslationY(transYControl);
+
+        float minScreenHeight = screenHeight < sizeSmall ? sizeSmall : screenHeight;
+        float minMaxScreenHeight = screenHeight > sizeLarge ? sizeLarge : screenHeight;
+        screenHeight = minMaxScreenHeight;
+
         ViewGroup.LayoutParams lp = getLayoutParams();
-        lp.height = (int)screenHeight;
+        lp.height = (int)minMaxScreenHeight;
         setLayoutParams(lp);
 
 
         if (System.currentTimeMillis() > 0) {
-            return -1;
+            return minMaxScreenHeight;
         }
 
         Log.d("setTranslationXYZ", "argScreenHeight: " +  argScreenHeight);
@@ -393,7 +448,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
         Log.d("setTranslationXYZ", "maxScreenHeight: " +  maxScreenHeight);
 
         float transY;
-        float minMaxScreenHeight = maxScreenHeight;
+        float minMaxScreenHeight2 = maxScreenHeight;
         minMaxScreenHeight = minMaxScreenHeight < sizeSmall ? sizeSmall : minMaxScreenHeight;
         mCanScrollUp = maxScreenHeight > sizeSmall;
 
@@ -499,7 +554,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
 
     public boolean isMinimumSize() {
         //return !mCanScrollUp;
-        return sizeSmall == getHeight()+getTranslationY();
+        return sizeSmall >= getHeight()+getTranslationY();
     }
 
     public int getMinimumSize() {
@@ -512,7 +567,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
 
     public boolean isMaximumSize() {
         Log.d("MaximumSize", "Trans: " + getTranslationY());
-        return mPlayerLayout == PlayerLayout.LARGE && getTranslationY() >= 0; // FIXME: refine
+        return mPlayerLayout == LARGE && getTranslationY() >= 0; // FIXME: refine
     }
 
     private void translatePhotoY(@NonNull View argImageView , float amount) {
@@ -523,44 +578,15 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
         }
     }
 
-    public synchronized void setEpisodeId(IEpisode argEpisode) {
-        this.mEpisodeId = argEpisode;
-    }
-
     @Override
     public void onPaletteFound(Palette argChangedPalette) {
-        setBackgroundColor(StaticButtonColor(mActivity, argChangedPalette));
+        setBackgroundColor(StaticButtonColor(mContext, argChangedPalette));
         invalidate();
     }
 
     @Override
     public String getPaletteUrl() {
         return mPlayPauseButton.getPaletteUrl();
-    }
-
-    class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
-        private static final String DEBUG_TAG = "Gestures";
-
-        private FixedRecyclerView mRecyclerView;
-
-        public MyGestureListener(FixedRecyclerView argRecyclerView) {
-            mRecyclerView = argRecyclerView;
-        }
-
-        @Override
-        public  boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            Log.d(DEBUG_TAG,"onDown: " + e1.toString());
-            mRecyclerView.scrollBy((int)distanceX*0, (int)distanceY);
-            return true;
-        }
-
-        @Override
-        public boolean onFling(MotionEvent event1, MotionEvent event2,
-                               float velocityX, float velocityY) {
-            Log.d(DEBUG_TAG, "onFling: " + event1.toString()+event2.toString());
-            mRecyclerView.fling((int)velocityX*0, (int)-velocityY);
-            return true;
-        }
     }
 
     private void hideText() {
@@ -623,6 +649,245 @@ public class TopPlayer extends RelativeLayout implements PaletteListener {
                 LayoutParams.MATCH_PARENT,
                 sizeLarge);
         mLayout.setLayoutParams(layoutParams);
+    }
+
+
+    private int mLastTouchY;
+    private int mInitialTouchY;
+    private float startH;
+    private int mScrollPointerId;
+    private final int[] mScrollOffset = new int[2];
+    private final int[] mScrollConsumed = new int[2];
+    private final int[] mNestedOffsets = new int[2];
+    private int mScrollState = 0;
+    private int mTouchSlop;
+
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+
+        mGestureDetector.onTouchEvent(event);
+
+        int xvel;
+        int dx = 0; // no horizontal scrolling
+        boolean canScrollVertically = true;
+
+        MotionEvent vtev = MotionEvent.obtain(event);
+
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN: {
+                this.mScrollPointerId = MotionEventCompat.getPointerId(event, 0);
+                mInitialTouchY = this.mLastTouchY = (int)(event.getY() + 0.5F);
+                startH = getPlayerHeight();
+
+                this.scrollingChildHelper.startNestedScroll(View.SCROLL_AXIS_VERTICAL);
+                Log.v(TAG, "Initiate scroll tracking: y: " + mInitialTouchY + " h: " + startH); // NoI18N
+                return true;
+            }
+            case MotionEvent.ACTION_UP: {
+                this.mScrollState = 0;
+                this.scrollingChildHelper.stopNestedScroll();
+            }
+            case MotionEvent.ACTION_MOVE: {
+                xvel = MotionEventCompat.findPointerIndex(event, this.mScrollPointerId);
+                if(xvel < 0) {
+                    Log.e("RecyclerView", "Error processing scroll; pointer index for id " + this.mScrollPointerId + " not found. Did any MotionEvents get skipped?");
+                    return false;
+                }
+
+                int yvel = (int)(MotionEventCompat.getX(event, xvel) + 0.5F);
+                int y = (int)(MotionEventCompat.getY(event, xvel) + 0.5F);
+                int dy = this.mLastTouchY - y;
+                if(this.dispatchNestedPreScroll(dx, dy, this.mScrollConsumed, this.mScrollOffset)) {
+                    dy -= this.mScrollConsumed[1];
+                    vtev.offsetLocation((float)this.mScrollOffset[0], (float)this.mScrollOffset[1]);
+                    this.mNestedOffsets[0] += this.mScrollOffset[0];
+                    this.mNestedOffsets[1] += this.mScrollOffset[1];
+                }
+
+                if(this.mScrollState != 1) {
+                    boolean startScroll = false;
+
+                    if(canScrollVertically && Math.abs(dy) > this.mTouchSlop) {
+                        if(dy > 0) {
+                            dy -= this.mTouchSlop;
+                        } else {
+                            dy += this.mTouchSlop;
+                        }
+
+                        startScroll = true;
+                    }
+
+                    if(startScroll) {
+                        ViewParent parent = this.getParent();
+                        if(parent != null) {
+                            parent.requestDisallowInterceptTouchEvent(true);
+                        }
+
+                        this.mScrollState = 1;
+                        // this.setScrollState(1); //FIXME
+                    }
+                }
+
+                if(this.mScrollState == 1) {
+                    this.mLastTouchY = y - this.mScrollOffset[1];
+                    if(this.scrollByInternal(canScrollVertically?dy:0, vtev)) {
+                        this.getParent().requestDisallowInterceptTouchEvent(true);
+                    }
+                }
+                break;
+            }
+        }
+
+        return super.onTouchEvent(event);
+    }
+
+    boolean scrollByInternal(int y, MotionEvent ev) {
+
+        final int consumedX = 0;  // always 0
+        final int unconsumedX = 0; // always 0
+
+        int unconsumedY = 0;
+        int consumedY = 0;
+
+        float height = getPlayerHeight();
+        float diff = y;
+        float newHeight = height-diff >= sizeSmall ? height-diff : sizeSmall;
+
+        float heightDiffResult = height-newHeight;
+        unconsumedY = (int)(diff-heightDiffResult);
+        consumedY = unconsumedY - (int)diff;
+
+
+
+        if(this.dispatchNestedScroll(consumedX, consumedY, unconsumedX, unconsumedY, this.mScrollOffset)) {
+            this.mLastTouchY -= this.mScrollOffset[1];
+            if(ev != null) {
+                ev.offsetLocation((float)this.mScrollOffset[0], (float)this.mScrollOffset[1]);
+            }
+
+            this.mNestedOffsets[0] += this.mScrollOffset[0];
+            this.mNestedOffsets[1] += this.mScrollOffset[1];
+        } else if(ViewCompat.getOverScrollMode(this) != ViewCompat.OVER_SCROLL_NEVER) {
+            if(ev != null) {
+                //this.pullGlows(ev.getX(), (float)unconsumedX, ev.getY(), (float)unconsumedY);
+            }
+
+            //this.considerReleasingGlowsOnScroll(x, y);
+        }
+
+        boolean doScroll = consumedX != 0 || consumedY != 0;
+
+        if(doScroll) {
+            //this.dispatchOnScrolled(consumedX, consumedY);
+            setPlayerHeight(newHeight);
+            Log.v(TAG, "Set height: H: " + height + " diff: " + diff + " newH: " + newHeight); // NoI18N
+        }
+
+        if(!this.awakenScrollBars()) {
+            this.invalidate();
+        }
+
+        return doScroll;
+    }
+
+    class TopPLayerScrollGestureListener extends GestureDetector.SimpleOnGestureListener {
+        private static final String DEBUG_TAG = "Gestures";
+
+        public TopPLayerScrollGestureListener() {
+        }
+
+        @Override
+        public  boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            Log.d(DEBUG_TAG, "onDown: " + e1.toString());
+            //if (Math.abs(e1.getY() - e2.getY()) > ViewConfigurationCompat.getScaledPagingTouchSlop(TopPlayer.this.mViewConfiguration)) {
+                TopPlayer.this.dispatchNestedScroll(0, 0, (int) distanceX, (int) distanceY, new int[2]);
+                return true;
+            //}
+            //return false;
+        }
+
+        @Override
+        public boolean onFling(MotionEvent event1, MotionEvent event2,
+                               float velocityX, float velocityY) {
+            Log.d(DEBUG_TAG, "onFling: " + event1.toString() + event2.toString());
+            //mRecyclerView.fling((int)velocityX*0, (int)-velocityY);
+            TopPlayer.this.dispatchNestedFling(velocityX, -velocityY, false);
+            return true;
+        }
+    }
+
+    // Nested scrolling
+    public void setNestedScrollingEnabled(boolean enabled) {
+        scrollingChildHelper.setNestedScrollingEnabled(enabled);
+    }
+
+    public boolean isNestedScrollingEnabled() {
+        return scrollingChildHelper.isNestedScrollingEnabled();
+    }
+
+    public boolean startNestedScroll(int axes) {
+        return scrollingChildHelper.startNestedScroll(axes);
+    }
+
+    public void stopNestedScroll() {
+        scrollingChildHelper.stopNestedScroll();
+    }
+
+    public boolean hasNestedScrollingParent() {
+        return scrollingChildHelper.hasNestedScrollingParent();
+    }
+
+    public boolean dispatchNestedScroll(int dxConsumed, int dyConsumed, int dxUnconsumed,
+                                        int dyUnconsumed, int[] offsetInWindow) {
+
+        return scrollingChildHelper.dispatchNestedScroll(dxConsumed, dyConsumed, dxUnconsumed,
+                dyUnconsumed, offsetInWindow);
+    }
+
+    public boolean dispatchNestedPreScroll(int dx, int dy, int[] consumed, int[] offsetInWindow) {
+        return scrollingChildHelper.dispatchNestedPreScroll(dx, dy, consumed, offsetInWindow);
+    }
+
+    public boolean dispatchNestedFling(float velocityX, float velocityY, boolean consumed) {
+        return scrollingChildHelper.dispatchNestedFling(velocityX, velocityY, consumed);
+    }
+
+    public boolean dispatchNestedPreFling(float velocityX, float velocityY) {
+        return scrollingChildHelper.dispatchNestedPreFling(velocityX, velocityY);
+    }
+
+
+    // ScrollingView
+
+    // Compute the horizontal extent of the horizontal scrollbar's thumb within the horizontal range.
+    public int computeHorizontalScrollOffset() {
+        return 0;// this.mLayout.canScrollHorizontally()?this.mLayout.computeHorizontalScrollOffset(this.mState):0;
+    }
+
+    // Compute the horizontal offset of the horizontal scrollbar's thumb within the horizontal range.
+    public int computeHorizontalScrollExtent() {
+        return 0;// this.mLayout.canScrollHorizontally()?this.mLayout.computeHorizontalScrollExtent(this.mState):0;
+    }
+
+    // Compute the horizontal range that the horizontal scrollbar represents.
+    public int computeHorizontalScrollRange() {
+        return 0;// this.mLayout.canScrollHorizontally()?this.mLayout.computeHorizontalScrollRange(this.mState):0;
+    }
+
+    // Compute the vertical extent of the vertical scrollbar's thumb within the vertical range.
+    public int computeVerticalScrollOffset() {
+        return 0;// this.mLayout.canScrollVertically()?this.mLayout.computeVerticalScrollOffset(this.mState):0;
+    }
+
+    // Compute the vertical offset of the vertical scrollbar's thumb within the horizontal range.
+    public int computeVerticalScrollExtent() {
+        return 0;// this.mLayout.canScrollVertically()?this.mLayout.computeVerticalScrollExtent(this.mState):0;
+    }
+
+    // Compute the vertical range that the vertical scrollbar represents.
+    public int computeVerticalScrollRange() {
+        return 0;// this.mLayout.canScrollVertically()?this.mLayout.computeVerticalScrollRange(this.mState):0;
     }
 
 

@@ -42,6 +42,7 @@ import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
+import android.view.ContextThemeWrapper;
 import android.view.Display;
 import android.view.View;
 import android.view.Window;
@@ -162,8 +163,9 @@ public class UIUtils {
         }
     }
 
-    public static int getScreenHeight(@NonNull Activity argActivity) {
-        Display display = argActivity.getWindowManager().getDefaultDisplay();
+    public static int getScreenHeight(@NonNull Context argContext) {
+        WindowManager windowManager = (WindowManager) argContext.getSystemService(Context.WINDOW_SERVICE);
+        Display display = windowManager.getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
         int width = size.x;

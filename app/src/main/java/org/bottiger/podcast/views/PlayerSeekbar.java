@@ -91,7 +91,7 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
                 setProgressMs(timeMs);
             }
 
-            FixedRecyclerView.mSeekbarSeeking = false;
+            //FixedRecyclerView.mSeekbarSeeking = false;
             invalidate();
         }
 
@@ -100,7 +100,7 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
             Log.d("PlayerSeekbar state", "onStartTrackingTouch");
             validateState();
 
-            FixedRecyclerView.mSeekbarSeeking = true;
+            //FixedRecyclerView.mSeekbarSeeking = true;
 
             if (mDurationMs < 0) {
                 mDurationMs = mEpisode.getDuration();

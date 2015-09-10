@@ -385,10 +385,6 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 		return item;
 	}
 
-	public static FeedItem getMostRecent(ContentResolver context) {
-		return getBySQL(context, "1==1", "_id DESC");
-	}
-
 	public FeedItem() {
 		reset();
 	}
