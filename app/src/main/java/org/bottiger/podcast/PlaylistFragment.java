@@ -1,6 +1,7 @@
 package org.bottiger.podcast;
 
 import org.bottiger.podcast.adapters.PlaylistAdapter;
+import org.bottiger.podcast.images.FrescoHelper;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
@@ -539,10 +540,10 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
             });
         }
 
-        if (item != null && item.getArtwork(activity) != null) {
-            Log.d("MissingImage", "Setting image");
-            Uri uri = Uri.parse(item.getArtwork(activity));
-            mPhoto.setImageURI(uri);
+        String artworkUrl = item.getArtwork(activity);
+        if (item != null && artworkUrl != null) {
+            Log.v("MissingImage", "Setting image");
+            FrescoHelper.loadImageInto(mPhoto, artworkUrl, null);
         }
 
         if (mTopPlayer.getVisibleHeight() == 0) {
