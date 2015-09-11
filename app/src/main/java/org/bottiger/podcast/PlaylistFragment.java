@@ -26,6 +26,10 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -243,9 +247,36 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         */
 
         // init swipe to dismiss logic
-        /*
         ItemTouchHelper swipeToDismissTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(
-                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT, ItemTouchHelper.RIGHT) {
+
+            @Override
+            public void onChildDraw(Canvas c,
+                                    RecyclerView recyclerView,
+                                    RecyclerView.ViewHolder viewHolder,
+                                    float dX,
+                                    float dY,
+                                    int actionState,
+                                    boolean isCurrentlyActive) {
+
+                if (actionState != ItemTouchHelper.ACTION_STATE_SWIPE)
+                    return;
+
+                // http://stackoverflow.com/questions/30820806/adding-a-colored-background-with-text-icon-under-swiped-row-when-using-androids
+                View itemView = viewHolder.itemView;
+
+                Paint p = new Paint();
+                int color = getResources().getColor(R.color.colorBgPrimary);
+                //p.setARGB(255, 0, 255, 0);
+                p.setColor(color);
+
+                c.drawRect((float) itemView.getLeft(), (float) itemView.getTop(), dX,
+                        (float) itemView.getBottom(), p);
+
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+
+            }
+
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
                 // callback for drag-n-drop, false to skip this feature
@@ -256,6 +287,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                 // callback for swipe to dismiss, removing item from data and adapter
                 //items.remove(viewHolder.getAdapterPosition());
+
                 final int itemPosition = viewHolder.getAdapterPosition()+1;
                 final IEpisode episode = mPlaylist.getItem(itemPosition);
                 final int currentPriority = episode.getPriority();
@@ -273,7 +305,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
             }
         });
         swipeToDismissTouchHelper.attachToRecyclerView(mRecyclerView);
-        */
+
 
 
 
