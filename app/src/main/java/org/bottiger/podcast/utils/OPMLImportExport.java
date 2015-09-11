@@ -40,10 +40,8 @@ public class OPMLImportExport {
 	public static final String filename = "podcasts.opml";
     public static final String filenameOut = "podcasts_export.opml";
 
-	public static final File file = new File(SDCardManager.getSDCardDir() + "/"
-			+ filename);
-    public static final File fileOut = new File(SDCardManager.getExportDir() + "/"
-            + filenameOut);
+	public static File file;
+    public static File fileOut;
 	private static CharSequence opmlNotFound;
     private static CharSequence opmlFailedToExport;
     private static CharSequence opmlSuccesfullyExported;
@@ -62,6 +60,13 @@ public class OPMLImportExport {
         opmlNotFound = String.format(res.getString(R.string.opml_not_found), filename);
         opmlFailedToExport = res.getString(R.string.opml_export_failed);
         opmlSuccesfullyExported = String.format(res.getString(R.string.opml_export_succes), fileOut);
+
+		try {
+			file = new File(SDCardManager.getSDCardDir() + "/" + filename);
+			fileOut = new File(SDCardManager.getExportDir() + "/" + filenameOut);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public int importSubscriptions() {
