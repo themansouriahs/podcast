@@ -8,6 +8,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.graphics.Palette;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -227,7 +228,7 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
         return mEpisode;
     }
 
-    private FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(0 ,0);
+    private CoordinatorLayout.LayoutParams params = new CoordinatorLayout.LayoutParams(0 ,0);
     //private RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(200, 400);
     private int[] loc = new int[2];
 
