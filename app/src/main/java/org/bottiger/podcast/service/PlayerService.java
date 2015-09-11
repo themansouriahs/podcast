@@ -43,6 +43,8 @@ import android.util.Log;
 
 import com.squareup.otto.Subscribe;
 
+import java.io.IOException;
+
 import javax.annotation.Nullable;
 
 /**
@@ -368,8 +370,14 @@ public class PlayerService extends Service implements
         }
         final FeedItem feedItem = isFeedItem ? (FeedItem)mItem : null;
 
-		String dataSource = mItem.isDownloaded() ? feedItem.getAbsolutePath()
-				: mItem.getUrl().toString();
+		String dataSource = null;
+		String dataSourceUrl = mItem.getUrl().toString();
+		try {
+			dataSource = mItem.isDownloaded() ? feedItem.getAbsolutePath()
+                    : dataSourceUrl;
+		} catch (IOException e) {
+			dataSource = dataSourceUrl;
+		}
 
 		int offset = mItem.getOffset() < 0 ? 0 : (int) mItem.getOffset();
 

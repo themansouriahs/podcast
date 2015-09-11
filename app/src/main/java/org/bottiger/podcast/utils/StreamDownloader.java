@@ -1,5 +1,7 @@
 package org.bottiger.podcast.utils;
 
+import android.support.annotation.Nullable;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -28,7 +30,12 @@ public class StreamDownloader {
 
     public static synchronized boolean persist() {
         if (item != null && file != null) {
-            File newFile = new File(item.getAbsolutePath());
+            File newFile = null;
+            try {
+                newFile = new File(item.getAbsolutePath());
+            } catch (IOException e) {
+                return false;
+            }
             try {
                 org.apache.commons.io.FileUtils.moveFile(file, newFile);
                 item.setDownloaded(true);
@@ -41,11 +48,16 @@ public class StreamDownloader {
         }
         return false;
     }
-	
+
+    @Nullable
 	public static File getFile(String argFilename) {
         String filename = argFilename == null ? defaultFilename : argFilename;
-        file = new File(SDCardManager.getTmpDir() + "/" + filename);
-		return file;
+        try {
+            file = new File(SDCardManager.getTmpDir() + "/" + filename);
+        } catch (IOException e) {
+            return null;
+        }
+        return file;
 	}
 
     private static void reset() {

@@ -1,6 +1,7 @@
 package org.bottiger.podcast.provider;
 
 import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -42,6 +43,8 @@ import android.text.format.DateFormat;
 import android.util.Log;
 
 public class FeedItem implements IEpisode, Comparable<FeedItem> {
+
+	private static final String TAG = "FeedItem";
 
 	public static final int MAX_DOWNLOAD_FAIL = 5;
 
@@ -611,7 +614,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	}
 
 	/**
-	 * @see http://docs.oracle.com/javase/6/docs/api/java/lang/String.html#compareTo
+	 * http://docs.oracle.com/javase/6/docs/api/java/lang/String.html#compareTo
 	 *      %28java.lang.String%29
 	 * @return True of the current FeedItem is newer than the supplied argument
 	 */
@@ -871,21 +874,12 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 					return true;
 				}
 			} catch (Exception e) {
-				log.warn("del file failed : " + getAbsolutePath() + "  " + e);
+				Log.w(TAG, "del file failed : " + filename.toString() + "  " + e);
 			}
 		}
 
 		return false;
 
-	}
-
-	public void prepareDownload(ContentResolver context) {
-		if (getAbsolutePath().equals("") || getAbsolutePath().equals("0")) {
-			String filenameFromURL = resource.substring(resource
-					.lastIndexOf("/") + 1);
-			filename = this.sub_id + "_" + filenameFromURL;
-		}
-		update(context);
 	}
 
 	public void downloadSuccess(ContentResolver contentResolver) {
@@ -899,10 +893,15 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	}
 
 	public long getCurrentFileSize() {
-		String file = getAbsolutePath();
+		String file = null;
+		try {
+			file = getAbsolutePath();
+		} catch (IOException e) {
+			return -1;
+		}
 		if (file != null)
 			return new File(file).length();
-		return 0;
+		return -1;
 	}
 
 	public String getFilename() {
@@ -934,11 +933,11 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
         this.filename = filename.replaceAll("[^(\\x41-\\x5A|\\x61-\\x7A|\\x2D|\\x2E|\\x30-\\x39|\\x5F)]", ""); // only a-z A-Z 0-9 .-_ http://www.asciitable.com/
 	}
 
-	public String getAbsolutePath() {
+	public String getAbsolutePath() throws IOException {
 		return SDCardManager.pathFromFilename(this);
 	}
 
-	public String getAbsoluteTmpPath() {
+	public String getAbsoluteTmpPath() throws IOException {
 		return SDCardManager.pathTmpFromFilename(this);
 	}
 
@@ -1000,9 +999,14 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
             e.printStackTrace();
         }
 
-		File f = new File(getAbsolutePath());
+		File f = null;
+		try {
+			f = new File(getAbsolutePath());
+		} catch (IOException e) {
+			return false;
+		}
 
-        if (f == null)
+		if (f == null)
             return false;
 
 		if (f.exists())
