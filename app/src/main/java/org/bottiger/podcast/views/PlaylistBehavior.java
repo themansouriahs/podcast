@@ -27,7 +27,7 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
     private TopPlayer mTopPlayer;
     private RecyclerView mRecyclerView;
 
-    
+
 
     private static final int DOWN = -1;
     private static final int UP = 1;
