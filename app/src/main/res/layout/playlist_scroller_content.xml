@@ -255,17 +255,18 @@
             </RelativeLayout>
 
         </org.bottiger.podcast.views.SquareCardView>
+
+            <View
+                android:id="@+id/gradient_bottom"
+                android:background="@drawable/top_player_bottom_gradient_tinted"
+                android:layout_width="match_parent"
+                android:layout_height="15dp"
+                android:layout_alignParentBottom="true"
+                android:visibility="gone"
+                android:elevation="12dp"/>
+
     </org.bottiger.podcast.views.TopPlayer >
 
-
-<!--
-
-    -->
-
-
-    <!--
-        android:layout_alignParentTop="true"
-        -->
     <org.bottiger.podcast.views.FixedRecyclerView
         android:id="@+id/my_recycler_view"
         android:scrollbars="vertical"

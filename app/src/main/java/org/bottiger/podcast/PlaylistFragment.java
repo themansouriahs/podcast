@@ -37,10 +37,12 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -86,6 +88,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
     private PlayerButtonView mForwardButton;
     private PlayerButtonView mBackButton;
     private PlayerButtonView mFavoriteButton;
+    private View mGradientBottomTopPlayer;
 
     private RecyclerView mRecyclerView;
     private View mOverlay;
@@ -174,6 +177,8 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         mBackButton = (PlayerButtonView)view.findViewById(R.id.rewind_button);
         mForwardButton = (PlayerButtonView)view.findViewById(R.id.fast_forward_button);
         mFavoriteButton = (PlayerButtonView)view.findViewById(R.id.favorite);
+
+        mGradientBottomTopPlayer = (View) view.findViewById(R.id.gradient_bottom);
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.my_recycler_view);
         mOverlay = view.findViewById(R.id.playlist_overlay);
@@ -529,8 +534,20 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                         return;
 
                     int colorText = swatch.getTitleTextColor();
+                    int colorBackground = swatch.getRgb();
+
                     mEpisodeTitle.setTextColor(color);
                     mEpisodeInfo.setTextColor(color);
+
+                    Drawable  normalDrawable = getResources().getDrawable(R.drawable.top_player_bottom_gradient_tinted);
+                    Drawable wrapDrawable = DrawableCompat.wrap(normalDrawable);
+                    DrawableCompat.setTint(wrapDrawable, colorBackground);
+                    if (Build.VERSION.SDK_INT >= 16) {
+                        mGradientBottomTopPlayer.setBackground(wrapDrawable);
+                    } else {
+                        mGradientBottomTopPlayer.setBackgroundDrawable(wrapDrawable);
+                    }
+                    mGradientBottomTopPlayer.setVisibility(View.VISIBLE);
                 }
 
                 @Override
