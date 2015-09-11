@@ -160,6 +160,15 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         //mDownloadProgressObservable.registerObserver(viewHolder.downloadButton);
 
 
+        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                                                   @Override
+                                                   public void onClick(View v) {
+                                                       PlaylistAdapter.toggle(viewHolder, position);
+                                                   }
+                                               });
+
+
+
         bindExandedPlayer(mActivity, item, viewHolder, position);
     }
 
