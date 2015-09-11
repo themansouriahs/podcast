@@ -53,21 +53,34 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
     @Override
     public boolean onLayoutChild(CoordinatorLayout parent, View child, int layoutDirection) {
         Log.d(TAG, "onLayoutChild, child: " + child.getClass().getName() + " layoutDirection: " + layoutDirection);
+
+        if (mTopPlayer == null) {
+            mTopPlayer = (TopPlayer) parent.findViewById(R.id.session_photo_container);
+        }
+
+        if (mRecyclerView == null) {
+            mRecyclerView = (RecyclerView) parent.findViewById(R.id.my_recycler_view);
+        }
+
+        int height = mTopPlayer.getLayoutParams().height;
+        //mRecyclerView.setTranslationY(-height);
+
         return false;
     }
 
     @Override
     public boolean layoutDependsOn(CoordinatorLayout parent, View child, View dependency) {
         Log.d(TAG, "layoutDependsOn, child: " + child.getClass().getName() + " dependency: " + dependency.getClass().getName());
-        boolean val = (dependency.getId() == R.id.session_photo_container);
-        return val;
+        boolean corectChild = (child.getId() == R.id.my_recycler_view);
+        boolean correctDependency = (dependency.getId() == R.id.session_photo_container);
+        return corectChild && correctDependency;
     }
 
     @Override
     public boolean onDependentViewChanged(CoordinatorLayout parent, View child, View dependency) {
-        float translationY = dependency.getScrollY();
-
-        //Utils.logD(this.getClass().getSimpleName(), "dependency changed by" + translationY);
+        Log.d(TAG, "onDependentViewChanged, child: " + child.getClass().getName() + " dependency: " + dependency.getClass().getName());
+        int height = mTopPlayer.getLayoutParams().height;
+        mRecyclerView.setTranslationY(height);
         return true;
     }
 
@@ -87,25 +100,27 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
     public void	onNestedPreScroll(CoordinatorLayout coordinatorLayout, View child, View target, int dx, int dy, int[] consumed) {
         Log.d(TAG, "onNestedPreScroll, child: " + child.getClass().getName() + " target: " + target.getClass().getName());
 
+        /*
         if (target instanceof TopPlayer) {
 
         }
+        */
+        if (target instanceof FixedRecyclerView && dy > 0) {
 
-        if (target instanceof FixedRecyclerView) {
-            if (dy > 0) {
                 if (!mTopPlayer.isMinimumSize()) {
                     // scroll up (to smaller topplayer)
-                    float oldHeight = mTopPlayer.getPlayerHeight();
-                    float newHeight = mTopPlayer.setPlayerHeight(oldHeight - dy);
-                    consumed[1] = (int) (oldHeight - newHeight);
+                    //float oldHeight = mTopPlayer.getPlayerHeight();
+                    //float newHeight = mTopPlayer.setPlayerHeight(oldHeight - dy);
+                    float newHeight = mTopPlayer.scrollBy(dy);
+                    consumed[1] = (int) dy;//(oldHeight - newHeight);
                 }
-            }
         }
+
     }
 
     @Override
     public void onNestedScroll(CoordinatorLayout coordinatorLayout, View child, View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed) {
-        Log.v(TAG, "onNestedScroll, child: " + child.getClass().getName() + " target: " + target.getClass().getName() + "dyC: " + dyConsumed + " dyUC: " + dyUnconsumed);
+        Log.v(TAG, "onNestedScroll, child: " + child.getClass().getName() + " target: " + target.getClass().getName() + " dyC: " + dyConsumed + " dyUC: " + dyUnconsumed);
 
         // if we are pulling down, but do not consume all the pulls
         if (dyUnconsumed < 0) {
@@ -114,9 +129,11 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
             float newHeight = 0;
 
             //if (!mTopPlayer.isMinimumSize()) {
-                oldHeight = mTopPlayer.getPlayerHeight();
-                newHeight = mTopPlayer.setPlayerHeight(oldHeight - dyUnconsumed);
+                //oldHeight = mTopPlayer.getPlayerHeight();
+                //newHeight = mTopPlayer.setPlayerHeight(oldHeight - dyUnconsumed);
             //}
+
+            newHeight = mTopPlayer.scrollBy(dyUnconsumed);
 
             diff = (int)(oldHeight-newHeight);
             if (diff == 0)
@@ -125,6 +142,12 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
             //dyUnconsumed -= diff;
 
             //mRecyclerView.scrollBy(0, dyUnconsumed);
+        }
+
+        if (dyUnconsumed > 0) {
+            if (!mTopPlayer.isMinimumSize()) {
+                mTopPlayer.scrollBy(dyUnconsumed);
+            }
         }
 
     }

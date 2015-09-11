@@ -210,18 +210,6 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
     }
 
     @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        //assert getLayoutParams() != null;
-
-        /*
-        CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams)getLayoutParams();
-        lp.set .setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED|AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL ); // SCROLL_FLAG_EXIT_UNTIL_COLLAPSED|AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL
-        setLayoutParams(lp);
-        */
-    }
-
-    @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
 
@@ -393,13 +381,14 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         return screenHeight;
     }
 
-    public void scrollBy(float argY) {
+    public synchronized float scrollBy(float argY) {
         float oldHeight = getPlayerHeight();
-        setPlayerHeight(oldHeight - argY);
+        return setPlayerHeight(oldHeight - argY);
     }
 
     // returns the new height
     public float setPlayerHeight(float argScreenHeight) {
+        Log.v(TAG, "Player height is set to: " + argScreenHeight);
 
         if (mFullscreen)
             return getHeight();
@@ -736,10 +725,10 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
                 }
 
                 if(this.mScrollState == 1) {
-                    this.mLastTouchY = y - this.mScrollOffset[1];
-                    if(this.scrollByInternal(canScrollVertically?dy:0, vtev)) {
-                        this.getParent().requestDisallowInterceptTouchEvent(true);
-                    }
+                    //this.mLastTouchY = y - this.mScrollOffset[1];
+                    //if(this.scrollByInternal(canScrollVertically?dy:0, vtev)) {
+                    //    this.getParent().requestDisallowInterceptTouchEvent(true);
+                    //}
                 }
                 break;
             }
