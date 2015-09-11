@@ -6,6 +6,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/tools">
 
+    <!--
+        app:layout_behavior="org.bottiger.podcast.views.PlaylistBehavior"
+        -->
+
 <!--
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
@@ -14,18 +18,22 @@
         >
 -->
 
+    <!--
     <org.bottiger.podcast.views.PlaylistScrollerParent
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true"
+        android:background="@color/blue"
         app:layout_behavior="org.bottiger.podcast.views.PlaylistBehavior">
+-->
 
-
-
+<!--
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+        -->
+
 
         <org.bottiger.podcast.views.TopPlayer
         xmlns:fresco="http://schemas.android.com/apk/res-auto"
@@ -37,8 +45,7 @@
         android:layout_height="@dimen/top_player_size_maximum"
         android:minHeight="@dimen/top_player_size_minimum"
         android:elevation="10dp"
-        android:foreground="@drawable/photo_banner_scrim"
-        app:layout_scrollFlags="enterAlwaysCollapsed">
+        android:foreground="@drawable/photo_banner_scrim">
 
         <View
             android:id="@+id/top_gradient"
@@ -288,13 +295,13 @@
     <!--
     </android.support.design.widget.AppBarLayout>
 
-
+    </LinearLayout>
     -->
 
 
-    </LinearLayout>
+<!--
     </org.bottiger.podcast.views.PlaylistScrollerParent>
-
+-->
     <include
         android:id="@+id/playlist_overlay"
         android:animateLayoutChanges="true"
