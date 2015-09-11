@@ -7,12 +7,12 @@
 
         <org.bottiger.podcast.views.ImageViewTinted
             android:id="@+id/grid_image"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="@dimen/playlist_image_size_small"
+            android:layout_height="@dimen/playlist_image_size_small"
             android:layout_margin="10dp"
             android:scaleType="centerCrop"
             android:layout_gravity="center_vertical"
-            fresco:roundAsCircle="true" />
+            fresco:roundedCornerRadius="@dimen/playlist_image_radius_small"/>
 
     <View
         android:id="@+id/grid_item_gradient"
@@ -31,7 +31,7 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
         android:text="Harry Potter and the method of rationality"
         android:layout_toRightOf="@id/grid_image"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginEnd="10dp"
         />
