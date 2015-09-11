@@ -78,16 +78,6 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
     public PlaylistViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         Log.v(TAG, "onCreateViewHolder");
 
-        // FIXME: Find a better solution ASAP
-        if (mFirstItem) {
-            mFirstItem = false;
-            if (viewGroup != null) {
-                for (int i = 0; i < 16; i++) {
-                    onCreateViewHolder(viewGroup, getItemViewType(i));
-                }
-            }
-        }
-
         View view = mInflater.inflate(R.layout.episode_list, viewGroup, false);
         PlaylistViewHolder holder = new PlaylistViewHolder(view, mActivity);
 
@@ -134,6 +124,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
                 int white = mActivity.getResources().getColor(R.color.white_opaque);
 
                 ColorExtractor colorExtractor = new ColorExtractor(mActivity, argChangedPalette);
+                viewHolder.setEpisodePrimaryColor(colorExtractor.getPrimary());
                 //viewHolder.mLayout.setCardBackgroundColor(colorExtractor.getPrimary());
                 //viewHolder.mMainTitle.setTextColor(colorExtractor.getTextColor());
                 ////viewHolder.buttonLayout.setBackgroundColor(colorExtractor.getPrimary());

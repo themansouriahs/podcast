@@ -16,6 +16,7 @@ import org.bottiger.podcast.views.DownloadButtonView;
 import org.bottiger.podcast.views.PlayPauseImageView;
 import org.bottiger.podcast.views.PlayerButtonView;
 import org.bottiger.podcast.views.PlayerSeekbar;
+import org.bottiger.podcast.views.PlaylistViewHolder;
 import org.bottiger.podcast.views.TextViewObserver;
 import org.bottiger.podcast.views.TopPlayer;
 import org.bottiger.podcast.views.dialogs.DialogBulkDownload;
@@ -60,8 +61,9 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.squareup.otto.Produce;
 import com.squareup.otto.Subscribe;
 
-public class PlaylistFragment extends AbstractEpisodeFragment implements OnSharedPreferenceChangeListener
-    {
+public class PlaylistFragment extends AbstractEpisodeFragment implements OnSharedPreferenceChangeListener {
+
+    private static final String TAG = "PlaylistFragment";
 
     private static final String PLAYLIST_WELCOME_DISMISSED = "playlist_welcome_dismissed";
     private static final boolean PLAYLIST_WELCOME_DISMISSED_DEFAULT = false;
@@ -95,6 +97,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
 	// ItemTouchHelperResources
     private Paint mSwipePaint = new Paint();
+    private Paint mSwipeIconPaint = new Paint();
     private Bitmap mSwipeIcon;
     private int mSwipeBgColor = R.color.colorBgPrimaryDark;
     private int mSwipeIconID = R.drawable.ic_hearing_white;
@@ -277,13 +280,21 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                 if (actionState != ItemTouchHelper.ACTION_STATE_SWIPE)
                     return;
 
+                PlaylistViewHolder playlistViewHolder = null;
+                if (viewHolder instanceof PlaylistViewHolder) {
+                    playlistViewHolder = (PlaylistViewHolder) viewHolder;
+                }
+
+                if (playlistViewHolder == null) {
+                    Log.wtf(TAG, "playlistViewHolder should never be null"); // NoI18N
+                    return;
+                }
+
                 // http://stackoverflow.com/questions/30820806/adding-a-colored-background-with-text-icon-under-swiped-row-when-using-androids
                 View itemView = viewHolder.itemView;
 
-                Paint p = new Paint();
-                int color = getResources().getColor(R.color.colorBgPrimary);
-                //p.setARGB(255, 0, 255, 0);
-                p.setColor(color);
+                int color = playlistViewHolder.hasColor() ? playlistViewHolder.getEpisodePrimaryColor() : getResources().getColor(R.color.colorBgPrimary);
+                mSwipePaint.setColor(color);
 
                 c.drawRect((float) itemView.getLeft(), (float) itemView.getTop(), dX,
                         (float) itemView.getBottom(), mSwipePaint);
@@ -291,11 +302,10 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                 int height2 = mSwipeIcon.getHeight()/2;
                 int heightView = itemView.getHeight();
                 int bitmapTopPos = heightView/2-height2+itemView.getTop();
-                Paint p2 = new Paint();
 
                 int bitmapLeftPos = (int)UIUtils.convertDpToPixel(25, getContext());
 
-                c.drawBitmap(mSwipeIcon, bitmapLeftPos, bitmapTopPos, p2);
+                c.drawBitmap(mSwipeIcon, bitmapLeftPos, bitmapTopPos, mSwipeIconPaint);
 
                 super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
 
@@ -312,7 +322,17 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                 // callback for swipe to dismiss, removing item from data and adapter
                 //items.remove(viewHolder.getAdapterPosition());
 
-                final int itemPosition = viewHolder.getAdapterPosition()+1;
+                PlaylistViewHolder playlistViewHolder = null;
+                if (viewHolder instanceof PlaylistViewHolder) {
+                    playlistViewHolder = (PlaylistViewHolder) viewHolder;
+                }
+
+                if (playlistViewHolder == null) {
+                    Log.wtf(TAG, "playlistViewHolder should never be null"); // NoI18N
+                    return;
+                }
+
+                final int itemPosition = playlistViewHolder.getAdapterPosition()+1;
                 final IEpisode episode = mPlaylist.getItem(itemPosition);
                 final int currentPriority = episode.getPriority();
                 final ContentResolver contentResolver = getActivity().getContentResolver();

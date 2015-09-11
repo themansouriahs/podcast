@@ -62,6 +62,9 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
     private Activity mActivity;
     public String mArtwork;
 
+    private boolean mHasColor;
+    private int mEpisodePrimaryColor;
+
     // ImageView iv, TextView tv1, TextView tv2, TextView tv3, TextView tv4, TextView tv5, TextView tv6, ViewStub vs, View pv
     public PlaylistViewHolder(View view, Activity argActivity) {
         super(view);
@@ -110,5 +113,18 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
 
     public Activity getActivity() {
         return mActivity;
+    }
+
+    public int getEpisodePrimaryColor() {
+        return mEpisodePrimaryColor;
+    }
+
+    public void setEpisodePrimaryColor(int mEpisodePrimaryColor) {
+        this.mEpisodePrimaryColor = mEpisodePrimaryColor;
+        this.mHasColor = true;
+    }
+
+    public boolean hasColor() {
+        return mHasColor;
     }
 }
