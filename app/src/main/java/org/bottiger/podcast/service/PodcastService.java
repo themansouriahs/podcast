@@ -88,24 +88,6 @@ public class PodcastService extends IntentService {
 		}
 	}
 
-	@Deprecated
-	public void start_download() {
-		EpisodeDownloadManager.startDownload(getBaseContext());
-	}
-
-	public void downloadItem(ContentResolver context, IEpisode item) {
-        if (item instanceof FeedItem) {
-            FeedItem feedItem = (FeedItem)item;
-            feedItem.prepareDownload(context);
-            EpisodeDownloadManager.addItemToQueue(feedItem, EpisodeDownloadManager.QUEUE_POSITION.LAST);
-            EpisodeDownloadManager.startDownload(getBaseContext());
-        }
-	}
-
-	public IEpisode getDownloadingItem() {
-		return EpisodeDownloadManager.getDownloadingItem();
-	}
-
 	/**
 	 * Creates and intent to be executed when the alarm goes of.
 	 * 

@@ -2,6 +2,7 @@ package org.bottiger.podcast.receiver;
 
 
 import java.io.File;
+import java.io.IOException;
 
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
@@ -14,6 +15,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.util.Log;
 
 /**
  * Receives event when a download is complete. If the file is succesfully
@@ -23,6 +25,8 @@ import android.net.Uri;
  * 
  */
 public class DownloadManagerReceiver extends BroadcastReceiver {
+
+	private static final String TAG = "DownloadManagerReceiver";
 
 	private DownloadManager downloadManager;
 
@@ -107,9 +111,19 @@ public class DownloadManagerReceiver extends BroadcastReceiver {
 			//item.image = imageURL; // FIXME
 		}
 
+		String tmpDir;
+
 		// Rename the file
 		File oldFile = new File(currentLocation);
-		File newFileName = new File(item.getAbsolutePath());
+		File newFileName = null;
+		try {
+			newFileName = new File(item.getAbsolutePath());
+			tmpDir = SDCardManager.getTmpDir();
+		} catch (IOException e) {
+			Log.w(TAG, "Could not access external filename"); // NOI18N
+			e.printStackTrace();
+			return;
+		}
 		oldFile.renameTo(newFileName);
 
         Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
@@ -124,7 +138,7 @@ public class DownloadManagerReceiver extends BroadcastReceiver {
 		 * might build up here if downloads are aborted for various reasons.
 		 */
 		if (EpisodeDownloadManager.getmDownloadingIDs().size() == 0) {
-			File directory = new File(SDCardManager.getTmpDir());
+			File directory = new File(tmpDir);
 
 			// Get all files in directory
 

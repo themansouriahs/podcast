@@ -76,7 +76,12 @@ public class EpisodeDownloadManager extends Observable {
             item.update(mContext.getContentResolver());
 
             Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-            intent.setData(Uri.fromFile(new File(item.getAbsolutePath())));
+            try {
+                intent.setData(Uri.fromFile(new File(item.getAbsolutePath())));
+            } catch (IOException e) {
+                Log.w(DEBUG_KEY, "Could not add file to media scanner"); // NoI18N
+                e.printStackTrace();
+            }
             mContext.sendBroadcast(intent);
 
             Playlist.refresh(mContext);
@@ -290,17 +295,26 @@ public class EpisodeDownloadManager extends Observable {
 		new removeExpiredDownloadedPodcastsTask(context).execute();
 	}
 
-    public static void removeTmpFolderCruft() {
-        String tmpFolder = SDCardManager.getTmpDir();
-        Log.d(DEBUG_KEY, "Cleaning tmp folder: " + tmpFolder);
+    public static boolean removeTmpFolderCruft() {
+        String tmpFolder = null;
+        try {
+            tmpFolder = SDCardManager.getTmpDir();
+        } catch (IOException e) {
+            Log.w(DEBUG_KEY, "Could not access tmp storage. removeTmpFolderCruft() returns without success"); // NoI18N
+            return false;
+        }
+        Log.d(DEBUG_KEY, "Cleaning tmp folder: " + tmpFolder); // NoI18N
         File dir = new File(tmpFolder);
         if(dir.exists() && dir.isDirectory()) {
             try {
                 FileUtils.cleanDirectory(dir);
             } catch (IOException e) {
                 e.printStackTrace();
+                return false;
             }
         }
+
+        return  true;
     }
 
 	/**
