@@ -11,6 +11,7 @@ import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.StrUtils;
+import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.views.DownloadButtonView;
 import org.bottiger.podcast.views.PlayPauseImageView;
 import org.bottiger.podcast.views.PlayerButtonView;
@@ -26,14 +27,18 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -48,6 +53,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -87,6 +93,12 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 	private long mExpandedEpisodeId = -1;
 	private String mExpandedEpisodeKey = "currentExpanded";
 
+	// ItemTouchHelperResources
+    private Paint mSwipePaint = new Paint();
+    private Bitmap mSwipeIcon;
+    private int mSwipeBgColor = R.color.colorBgPrimaryDark;
+    private int mSwipeIconID = R.drawable.ic_hearing_white;
+
     DownloadProgressObservable mDownloadProgressObservable = null;
 
     private Playlist mPlaylist;
@@ -95,6 +107,9 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
     @Override
     public void onCreate(Bundle savedInstanceState) {
         mDownloadProgressObservable = new DownloadProgressObservable((SoundWaves) mContext.getApplicationContext());
+        int color = getResources().getColor(mSwipeBgColor);
+        mSwipePaint.setColor(color);
+        mSwipeIcon = BitmapFactory.decodeResource(getResources(), mSwipeIconID);
         super.onCreate(savedInstanceState);
     }
 
@@ -271,7 +286,16 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                 p.setColor(color);
 
                 c.drawRect((float) itemView.getLeft(), (float) itemView.getTop(), dX,
-                        (float) itemView.getBottom(), p);
+                        (float) itemView.getBottom(), mSwipePaint);
+
+                int height2 = mSwipeIcon.getHeight()/2;
+                int heightView = itemView.getHeight();
+                int bitmapTopPos = heightView/2-height2+itemView.getTop();
+                Paint p2 = new Paint();
+
+                int bitmapLeftPos = (int)UIUtils.convertDpToPixel(25, getContext());
+
+                c.drawBitmap(mSwipeIcon, bitmapLeftPos, bitmapTopPos, p2);
 
                 super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
 
@@ -300,6 +324,31 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                     item.markAsListened();
                 }
 
+                //String episodeRemoved = getResources().getString(R.string.playlist_episode_dismissed);
+                Snackbar snack = Snackbar.make(view, R.string.playlist_episode_dismissed, Snackbar.LENGTH_LONG)
+                        .setAction(R.string.playlist_episode_dismissed_undo, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                episode.setPriority(currentPriority);
+                                mPlaylist.setItem(itemPosition, episode);
+                                mAdapter.notifyDataSetChanged();
+
+                                if (episode instanceof FeedItem) {
+                                    FeedItem item = (FeedItem) episode;
+                                    item.markAsListened(0);
+                                }
+
+                                episode.update(contentResolver);
+                            }
+                        })
+                        .setActionTextColor(getResources().getColor(R.color.white_opaque));
+
+                View view = snack.getView();
+                FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)view.getLayoutParams();
+                params.bottomMargin = DrawerActivity.getStatusBarHeight(getResources())*2;
+                view.setLayoutParams(params);
+
+                snack.show();
 
                 mAdapter.notifyItemRemoved(viewHolder.getAdapterPosition());
             }
