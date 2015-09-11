@@ -429,7 +429,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         //setTranslationY(transYControl);
 
         float minScreenHeight = screenHeight < sizeSmall ? sizeSmall : screenHeight;
-        float minMaxScreenHeight = screenHeight > sizeLarge ? sizeLarge : screenHeight;
+        float minMaxScreenHeight = minScreenHeight > sizeLarge ? sizeLarge : minScreenHeight;
         screenHeight = minMaxScreenHeight;
 
         ViewGroup.LayoutParams lp = getLayoutParams();
