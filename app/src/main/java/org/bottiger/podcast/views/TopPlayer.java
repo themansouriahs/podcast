@@ -695,9 +695,15 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
                     return false;
                 }
 
+
                 int yvel = (int)(MotionEventCompat.getX(event, xvel) + 0.5F);
                 int y = (int)(MotionEventCompat.getY(event, xvel) + 0.5F);
                 int dy = this.mLastTouchY - y;
+
+                if (dy < ViewConfigurationCompat.getScaledPagingTouchSlop(TopPlayer.this.mViewConfiguration)) {
+                    return false;
+                }
+
                 if(this.dispatchNestedPreScroll(dx, dy, this.mScrollConsumed, this.mScrollOffset)) {
                     dy -= this.mScrollConsumed[1];
                     vtev.offsetLocation((float)this.mScrollOffset[0], (float)this.mScrollOffset[1]);
@@ -738,6 +744,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
                 break;
             }
         }
+
 
         return super.onTouchEvent(event);
     }
@@ -799,12 +806,20 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
 
         @Override
         public  boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            Log.d(DEBUG_TAG, "onDown: " + e1.toString());
-            //if (Math.abs(e1.getY() - e2.getY()) > ViewConfigurationCompat.getScaledPagingTouchSlop(TopPlayer.this.mViewConfiguration)) {
+            Log.d(DEBUG_TAG, "onScroll: e1Y: " + e1.getY() + " e2Y: " + e2.getY());
+
+            float y1 = e1.getY();
+            float y2 = e2.getY();
+
+            float diffY = Math.abs(y1 - y2);
+            if (diffY > ViewConfigurationCompat.getScaledPagingTouchSlop(TopPlayer.this.mViewConfiguration)) {
+                Log.d(DEBUG_TAG, "onScroll: dispatchScroll: diffY: " + diffY);
                 TopPlayer.this.dispatchNestedScroll(0, 0, (int) distanceX, (int) distanceY, new int[2]);
                 return true;
-            //}
-            //return false;
+            }
+
+            Log.d(DEBUG_TAG, "onScroll: ignore: diffY: " + diffY);
+            return true;
         }
 
         @Override
