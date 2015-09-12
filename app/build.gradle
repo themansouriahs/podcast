@@ -3,14 +3,14 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.0"
+    buildToolsVersion "23.0.1"
 
     defaultConfig {
         applicationId "org.bottiger.podcast"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 152     // even - release. Odd - development
-        versionName "0.101" // even - release. Odd - development
+        versionCode 154     // even - release. Odd - development
+        versionName "0.102" // even - release. Odd - development
         //useJack = true
         multiDexEnabled = true
 
