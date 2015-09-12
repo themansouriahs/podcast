@@ -60,6 +60,8 @@ public class FeedActivity extends TopActivity implements PaletteListener {
 
     private static final String KEY_THEME_COLOR = "theme_color";
 
+    private Toolbar mToolbar;
+
     // Feed Settings
     private boolean mSettingsRevealed = false;
     private final int SETTINGS_REVEAL_DURATION = 200; // in ms
@@ -224,8 +226,8 @@ public class FeedActivity extends TopActivity implements PaletteListener {
         mFloatingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mExpandedLayout = !mExpandedLayout;
-                mAdapter.setExpanded(mExpandedLayout);
+                //mExpandedLayout = !mExpandedLayout;
+                //mAdapter.setExpanded(mExpandedLayout);
 
                 // get the center for the clipping circle
                 int cx = (mRevealLayout.getLeft() + mRevealLayout.getRight());
@@ -257,10 +259,13 @@ public class FeedActivity extends TopActivity implements PaletteListener {
                         public void onAnimationEnd() {
                             mRevealLayout.setVisibility(View.INVISIBLE);
                             mFloatingButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_tune_white));
+                            mToolbar.setTitle(mSubscription.getTitle());
                         }
                     });
                     mRevealAnimator.start();
                 } else {
+
+                    // Open Settings
 
                     mRevealAnimator =
                             ViewAnimationUtils.createCircularReveal(mRevealLayout, cx, cy, 0, finalRadius);
@@ -269,6 +274,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
 
                     mRevealLayout.setVisibility(View.VISIBLE);
                     mFloatingButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_clear_white));
+                    mToolbar.setTitle(R.string.menu_settings);
                     mRevealAnimator.start();
                 }
                 mSettingsRevealed = !mSettingsRevealed;
@@ -291,10 +297,10 @@ public class FeedActivity extends TopActivity implements PaletteListener {
             });
         }
 
-        final Toolbar toolbar = (Toolbar) findViewById(R.id.feed_view_toolbar);
+        mToolbar = (Toolbar) findViewById(R.id.feed_view_toolbar);
 
-        toolbar.setTitle(mSubscription.getTitle());
-        setSupportActionBar(toolbar);
+        mToolbar.setTitle(mSubscription.getTitle());
+        setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 

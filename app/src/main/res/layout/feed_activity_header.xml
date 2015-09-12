@@ -29,6 +29,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <!--
         <FrameLayout
             android:id="@+id/feed_activity_settings_container"
             android:layout_width="match_parent"
@@ -37,6 +38,8 @@
             android:visibility="invisible">
 
         </FrameLayout>
+        -->
+        <include layout="@layout/feed_activity_settings"/>
 
     </io.codetail.widget.RevealFrameLayout>
 

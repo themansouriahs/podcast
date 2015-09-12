@@ -151,6 +151,11 @@
     <string name="generic_test_credentials">Test credentials</string>
     <string name="generic_test_credentials_succes">Test succeeded</string>
     <string name="generic_test_credentials_failed">Test failed</string>
+    <string name="feed_settings_show_description">Show episode description</string>
+    <string name="feed_settings_in_playlist">Add new episodes to the playlist</string>
+    <string name="feed_settings_download_new">Download new episodes</string>
+    <string name="feed_settings_delete_when_listened">Delete when listened</string>
+    <string name="feed_settings_intro">These settings will override the SoundWaves defaults for this specific podcast.</string>
 
     <plurals name="player_sleep">
         <item quantity="one">Player will sleep in %d minute</item>
