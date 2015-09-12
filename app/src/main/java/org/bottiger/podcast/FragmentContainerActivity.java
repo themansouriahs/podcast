@@ -77,7 +77,7 @@ public class FragmentContainerActivity extends DrawerActivity {
             @Override
             public void onPageSelected(int position) {
                 int lockMode = position == 0 ? DrawerLayout.LOCK_MODE_UNLOCKED : DrawerLayout.LOCK_MODE_LOCKED_CLOSED;
-                mDrawerLayout.setDrawerLockMode(lockMode);
+                //mDrawerLayout.setDrawerLockMode(lockMode);
             }
         });
 
