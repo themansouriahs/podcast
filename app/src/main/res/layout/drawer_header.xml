@@ -2,24 +2,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:id="@+id/drawer_container"
-    android:layout_width="260dp"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="left"
     android:background="@color/drawer_background">
 
-<TableLayout
-    android:id="@+id/drawer_table"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <TableRow
-        android:id="@+id/drawer_header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <RelativeLayout
+    <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="110dp"
+            android:layout_height="170dp"
             android:layout_span="2"
             android:layout_weight="1">
 
@@ -63,37 +53,5 @@
                 />
 
         </RelativeLayout>
-
-    </TableRow>
-
-    <TableRow
-        android:id="@+id/drawer_settings"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <LinearLayout
-            android:id="@+id/drawer_items"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_span="2"
-            android:layout_weight="1">
-
-            <!--
-            <include layout="@layout/drawer_separator" />
-
-            <include layout="@layout/drawer_item" />
-
-            <include layout="@layout/drawer_separator" />
-            -->
-
-            <!-- FeedBack button -->
-
-        </LinearLayout>
-
-    </TableRow>
-
-
-</TableLayout>
 
 </FrameLayout>
