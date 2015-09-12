@@ -75,13 +75,13 @@ public class SoundWaves extends Application {
         super.onCreate();
 
         // The following line triggers the initialization of ACRA
-        if (!BuildConfig.DEBUG) { //  || System.currentTimeMillis() > 0
+        //if (!BuildConfig.DEBUG) { //  || System.currentTimeMillis() > 0
             // ACRA - crash reporter
             CrashReporterFactory.startReporter(this);
 
             // ANR
             //new ANRWatchDog(10000 /*timeout*/).start();
-        }
+        //}
 
         ImagePipelineConfig imagePipelineConfig = FrescoHelper.getImagePipelineConfig(this);
         Fresco.initialize(getApplicationContext(), imagePipelineConfig);

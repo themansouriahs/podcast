@@ -10,13 +10,9 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Trace;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -24,13 +20,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.FrameLayout;
 
 import com.facebook.imagepipeline.request.BasePostprocessor;
 
 import org.bottiger.podcast.adapters.FeedViewAdapter;
 import org.bottiger.podcast.adapters.FeedViewDiscoveryAdapter;
-import org.bottiger.podcast.adapters.decoration.FeedViewItemAnimator;
 import org.bottiger.podcast.images.FrescoHelper;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.playlist.FeedCursorLoader;
@@ -50,6 +46,9 @@ import org.bottiger.podcast.views.MultiShrink.feed.MultiShrinkScroller;
 import org.bottiger.podcast.views.MultiShrink.feed.QuickFeedImage;
 import org.bottiger.podcast.views.MultiShrink.feed.SchedulingUtils;
 
+import io.codetail.animation.SupportAnimator;
+import io.codetail.animation.ViewAnimationUtils;
+
 /**
  * Created by apl on 14-02-2015.
  */
@@ -60,6 +59,11 @@ public class FeedActivity extends TopActivity implements PaletteListener {
     private static final String TAG = "FeedActivity";
 
     private static final String KEY_THEME_COLOR = "theme_color";
+
+    // Feed Settings
+    private boolean mSettingsRevealed = false;
+    private final int SETTINGS_REVEAL_DURATION = 200; // in ms
+    private SupportAnimator mRevealAnimator;
 
     private static final int ANIMATION_STATUS_BAR_COLOR_CHANGE_DURATION = 150;
     private static final int DEFAULT_SCRIM_ALPHA = 0xC8;
@@ -75,6 +79,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
     private RecyclerView mRecyclerView;
     private MultiShrinkScroller mMultiShrinkScroller;
     protected FloatingActionButton mFloatingButton;
+    private FrameLayout mRevealLayout;
     private FeedViewAdapter mAdapter;
     private FeedCursorLoader mCursorLoader;
     protected ReorderCursor mCursor = null;
@@ -206,6 +211,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
         mPhotoView = (QuickFeedImage) findViewById(R.id.photo);
         mMultiShrinkScroller = (MultiShrinkScroller) findViewById(R.id.multiscroller);
         mFloatingButton = (FloatingActionButton) findViewById(R.id.feedview_fap_button);
+        mRevealLayout = (FrameLayout) findViewById(R.id.feed_activity_settings_container);
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             FrameLayout.MarginLayoutParams params = (FrameLayout.MarginLayoutParams) mMultiShrinkScroller.getLayoutParams();
@@ -220,6 +226,52 @@ public class FeedActivity extends TopActivity implements PaletteListener {
             public void onClick(View v) {
                 mExpandedLayout = !mExpandedLayout;
                 mAdapter.setExpanded(mExpandedLayout);
+
+                // get the center for the clipping circle
+                int cx = (mRevealLayout.getLeft() + mRevealLayout.getRight());
+                int cy = (mRevealLayout.getTop() + mRevealLayout.getBottom());
+
+                // get the final radius for the clipping circle
+                int finalRadius = Math.max(mRevealLayout.getWidth(), mRevealLayout.getHeight());
+
+
+                if (mSettingsRevealed) {
+                    mRevealAnimator =
+                            ViewAnimationUtils.createCircularReveal(mRevealLayout, cx, cy, finalRadius, 0);
+                    mRevealAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+                    mRevealAnimator.setDuration(SETTINGS_REVEAL_DURATION);
+                    mRevealAnimator.addListener(new SupportAnimator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart() {
+                        }
+
+                        @Override
+                        public void onAnimationCancel() {
+                        }
+
+                        @Override
+                        public void onAnimationRepeat() {
+                        }
+
+                        @Override
+                        public void onAnimationEnd() {
+                            mRevealLayout.setVisibility(View.INVISIBLE);
+                            mFloatingButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_tune_white));
+                        }
+                    });
+                    mRevealAnimator.start();
+                } else {
+
+                    mRevealAnimator =
+                            ViewAnimationUtils.createCircularReveal(mRevealLayout, cx, cy, 0, finalRadius);
+                    mRevealAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+                    mRevealAnimator.setDuration(SETTINGS_REVEAL_DURATION);
+
+                    mRevealLayout.setVisibility(View.VISIBLE);
+                    mFloatingButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_clear_white));
+                    mRevealAnimator.start();
+                }
+                mSettingsRevealed = !mSettingsRevealed;
             }
         });
 
@@ -328,6 +380,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
         }
     }
 
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -430,6 +483,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
         ColorExtractor extractor = new ColorExtractor(this, argChangedPalette);
         mMultiShrinkScroller.setHeaderTintColor(extractor.getPrimary());
         mFloatingButton.onPaletteFound(argChangedPalette);
+        mRevealLayout.setBackgroundColor(extractor.getPrimary());
         UIUtils.tintStatusBar(extractor.getPrimary(), this);
         mStatusBarColor = extractor.getPrimary();
         mAdapter.setPalette(argChangedPalette);

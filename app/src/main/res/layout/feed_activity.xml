@@ -40,6 +40,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="right"
         android:layout_marginRight="40dp"
-        android:src="@drawable/ic_receipt_white"/>
+        android:src="@drawable/ic_tune_white"/>
 
 </org.bottiger.podcast.views.MultiShrink.feed.MultiShrinkScroller>

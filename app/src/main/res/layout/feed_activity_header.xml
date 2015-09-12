@@ -24,6 +24,22 @@
         android:clickable="false"
         android:scaleType="centerCrop" />
 
+    <io.codetail.widget.RevealFrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <FrameLayout
+            android:id="@+id/feed_activity_settings_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white_opaque"
+            android:visibility="invisible">
+
+        </FrameLayout>
+
+    </io.codetail.widget.RevealFrameLayout>
+
     <View
         android:id="@+id/photo_touch_intercept_overlay"
         android:layout_width="match_parent"
