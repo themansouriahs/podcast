@@ -197,7 +197,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
             throw new IllegalStateException("Episode can not be null");
         }
 
-        if (mSubscription.IsDirty() && mSubscription.getType() == ISubscription.TYPE.DEFAULT) {
+        if (mSubscription.IsDirty() && mSubscription.getType() == ISubscription.DEFAULT) {
             ((Subscription)mSubscription).update(this.getContentResolver());
         }
 
@@ -328,7 +328,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
 
         mRecyclerView.setAdapter(mAdapter);
 
-        if (mSubscription.getType() == ISubscription.TYPE.DEFAULT) {
+        if (mSubscription.getType() == ISubscription.DEFAULT) {
             mCursorLoader = new FeedCursorLoader(this, mAdapter, mCursor, (Subscription)mSubscription);
             mCursorLoader.requery();
         }
@@ -391,7 +391,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
     protected void onStart() {
         super.onStart();
 
-        if (mSubscription.getType() == ISubscription.TYPE.DEFAULT) {
+        if (mSubscription.getType() == ISubscription.DEFAULT) {
             Subscription subscription = (Subscription) mSubscription;
             PaletteHelper.generate(subscription.getImageURL(), this, this);
         }

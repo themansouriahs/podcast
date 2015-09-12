@@ -43,10 +43,12 @@ public class SubscriptionColumns implements BaseColumns {
     public static final String PRIMARY_TINT_COLOR = "primary_tint_color";
     public static final String SECONDARY_COLOR = "secondary_color";
 
+	public static final String SETTINGS = "settings";
+
 	public static final String[] ALL_COLUMNS = { _ID, URL, LINK, TITLE,
 			DESCRIPTION, LAST_UPDATED, LAST_ITEM_UPDATED, FAIL_COUNT, STATUS,
 			COMMENT, RATING, USERNAME, PASSWORD, SERVER_ID, REMOTE_ID, AUTO_DOWNLOAD,
-			PLAYLIST_POSITION, IMAGE_URL, PRIMARY_COLOR, PRIMARY_TINT_COLOR, SECONDARY_COLOR};
+			PLAYLIST_POSITION, IMAGE_URL, PRIMARY_COLOR, PRIMARY_TINT_COLOR, SECONDARY_COLOR, SETTINGS};
 
 	public static final String DEFAULT_SORT_ORDER = _ID + " ASC";
 	public static final String sql_create_table = "CREATE TABLE " 
@@ -71,7 +73,8 @@ public class SubscriptionColumns implements BaseColumns {
 		+ IMAGE_URL + " VARCHAR(1024), "
         + PRIMARY_COLOR + " INTEGER DEFAULT 0 , "
         + PRIMARY_TINT_COLOR + " INTEGER DEFAULT 0 , "
-        + SECONDARY_COLOR + " INTEGER DEFAULT 0 "
+		+ SECONDARY_COLOR + " INTEGER DEFAULT 0 , "
+        + SETTINGS + " INTEGER DEFAULT -1 "
 		+ ");";
 
 	public static final String sql_index_subs_url = "CREATE UNIQUE INDEX IDX_"
@@ -131,6 +134,9 @@ public class SubscriptionColumns implements BaseColumns {
         if (values.containsKey(SECONDARY_COLOR) == false) {
             values.put(SECONDARY_COLOR, -1);
         }
+		if (values.containsKey(SETTINGS) == false) {
+			values.put(SETTINGS, -1);
+		}
 
 		return values;
 	}

@@ -49,7 +49,7 @@ public class NSRSS20 extends Namespace {
 			state.setCurrentItem(new FeedItem());
 			state.getItems().add(state.getCurrentItem());
 
-            if (state.getSubscription().getType() == ISubscription.TYPE.DEFAULT) {
+            if (state.getSubscription().getType() == ISubscription.DEFAULT) {
                 state.getCurrentItem().setFeed((Subscription)state.getSubscription());
             }
 

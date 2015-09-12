@@ -80,6 +80,11 @@ public class SlimSubscription implements ISubscription, Parcelable {
         return false;
     }
 
+    @Override
+    public boolean IsSubscribed() {
+        return false;
+    }
+
     public ArrayList<SlimEpisode> getEpisodes() {
         return mEpisodes;
     }
@@ -89,8 +94,8 @@ public class SlimSubscription implements ISubscription, Parcelable {
     }
 
     @Override
-    public TYPE getType() {
-        return TYPE.SLIM;
+    public @Type int getType() {
+        return ISubscription.SLIM;
     }
 
     public int describeContents() {

@@ -14,7 +14,7 @@ public class PodcastOpenHelper extends SQLiteOpenHelper {
 
 	private final PodcastLog log = PodcastLog.getLog(getClass());
 
-	private final static int DBVERSION = 18;
+	private final static int DBVERSION = 19;
 	private final static String DBNAME = "podcast.db";
 
     private static PodcastOpenHelper mInstance = null;
@@ -59,6 +59,8 @@ public class PodcastOpenHelper extends SQLiteOpenHelper {
         if (analytics != null) {
             analytics.trackEvent(IAnalytics.EVENT_TYPE.DATABASE_UPGRADE);
         }
+
+		// Add new stuff to the bottom
 
         // In order to fix the horrible sqli column does not exist bug we add
         // the colums to all versions from here
@@ -211,5 +213,14 @@ public class PodcastOpenHelper extends SQLiteOpenHelper {
 			db.execSQL("DROP TABLE " + SubscriptionColumns.TABLE_NAME);
 			onCreate(db);
 		}*/
+
+
+		if (oldVersion < 19) {
+			String new_settings_column = "ALTER TABLE " + SubscriptionColumns.TABLE_NAME
+					+ " ADD COLUMN " + SubscriptionColumns.SETTINGS + " INTEGER DEFAULT -1;";
+
+			log.debug("Upgrading database to version 19");
+			db.execSQL(new_settings_column);
+		}
 	}
 }

@@ -30,6 +30,17 @@ public class Subscription implements ISubscription, PaletteListener {
 
 	private static final String TAG = "Subscription";
 
+	private static final int SHOW_EPISODE_DESCRIPTION_SET = 1;
+	private static final int SHOW_EPISODE_DESCRIPTION = (1 << 1);
+	private static final int ADD_NEW_TO_PLAYLIST_SET = (1 << 2);
+	private static final int ADD_NEW_TO_PLAYLIST = (1 << 3);
+	private static final int DOWNLOAD_NEW_EPISODES_SET = (1 << 4);
+	private static final int DOWNLOAD_NEW_EPISODES = (1 << 5);
+	private static final int DELETE_AFTER_PLAYBACK_SET = (1 << 6);
+	private static final int DELETE_AFTER_PLAYBACK = (1 << 7);
+	private static final int LIST_OLDEST_FIRST_SET = (1 << 8);
+	private static final int LIST_OLDEST_FIRST = (1 << 9);
+
 	public final static int ADD_SUCCESS = 0;
 	public final static int ADD_FAIL_UNSUCCESS = -2;
 
@@ -57,6 +68,11 @@ public class Subscription implements ISubscription, PaletteListener {
     private int mPrimaryColor;
     private int mPrimaryTintColor;
     private int mSecondaryColor;
+
+	/**
+	 * Settings is a bitmasked int with various settings
+	 */
+	private int mSettings;
 
     private final ArrayList<IEpisode> mEpisodes = new ArrayList<>();
 
@@ -86,6 +102,7 @@ public class Subscription implements ISubscription, PaletteListener {
         mPrimaryColor = -1;
         mPrimaryTintColor = -1;
         mSecondaryColor = -1;
+		mSettings = -1;
 	}
 
 	public Subscription() {
@@ -132,6 +149,7 @@ public class Subscription implements ISubscription, PaletteListener {
             cv.put(SubscriptionColumns.IMAGE_URL, imageURL);
             cv.put(SubscriptionColumns.REMOTE_ID, sync_id);
             cv.put(SubscriptionColumns.STATUS, STATUS_SUBSCRIBED);
+			cv.put(SubscriptionColumns.SETTINGS, -1);
             Uri uri = context.getContentResolver().insert(SubscriptionColumns.URI,
                     cv);
 
@@ -251,6 +269,9 @@ public class Subscription implements ISubscription, PaletteListener {
 		if (status >= 0)
 			cv.put(SubscriptionColumns.STATUS, status);
 
+		if (mSettings >= 0)
+			cv.put(SubscriptionColumns.SETTINGS, mSettings);
+
         if (mPrimaryColor != -1)
             cv.put(SubscriptionColumns.PRIMARY_COLOR, mPrimaryColor);
 
@@ -334,9 +355,14 @@ public class Subscription implements ISubscription, PaletteListener {
         return mIsDirty;
     }
 
-    @Override
-    public TYPE getType() {
-        return TYPE.DEFAULT;
+	@Override
+	public boolean IsSubscribed() {
+		return status == STATUS_SUBSCRIBED;
+	}
+
+	@Override
+    public @Type int getType() {
+        return ISubscription.DEFAULT;
     }
 
     @Override
@@ -425,4 +451,99 @@ public class Subscription implements ISubscription, PaletteListener {
 	public void setDescription(String content) {
 		this.description = content;
 	}
+
+
+	/**
+	 * http://stackoverflow.com/questions/4549131/bitmask-question
+	 *
+	 * bitmask |= TRADEABLE; // Sets the flag using bitwise OR
+	 * bitmask &= ~TRADEABLE; // Clears the flag using bitwise AND and NOT
+	 * bitmask ^= TRADEABLE; // Toggles the flag using bitwise XOR
+	 */
+	private boolean appDefault = false;
+
+	public boolean isListOldestFirst() {
+		if (IsSettingEnabled(LIST_OLDEST_FIRST_SET))
+			return appDefault;
+
+		return IsSettingEnabled(LIST_OLDEST_FIRST);
+	}
+
+	public void setListOldestFirst(boolean listOldestFirst) {
+		mSettings |= LIST_OLDEST_FIRST_SET;
+
+		if (listOldestFirst)
+			mSettings |= LIST_OLDEST_FIRST;
+		else
+			mSettings &= LIST_OLDEST_FIRST;
+	}
+
+	public boolean isDeleteWhenListened() {
+		if (IsSettingEnabled(DELETE_AFTER_PLAYBACK_SET))
+			return appDefault;
+
+		return IsSettingEnabled(DELETE_AFTER_PLAYBACK);
+	}
+
+	public void setDeleteWhenListened(boolean deleteWhenListened) {
+		mSettings |= DELETE_AFTER_PLAYBACK_SET;
+
+		if (deleteWhenListened)
+			mSettings |= DELETE_AFTER_PLAYBACK;
+		else
+			mSettings &= DELETE_AFTER_PLAYBACK;
+	}
+
+	public boolean isDownloadNew() {
+		if (IsSettingEnabled(DOWNLOAD_NEW_EPISODES_SET))
+			return appDefault;
+
+		return IsSettingEnabled(DOWNLOAD_NEW_EPISODES);
+	}
+
+	public void setDownloadNew(boolean downloadNew) {
+		mSettings |= DOWNLOAD_NEW_EPISODES_SET;
+
+		if (downloadNew)
+			mSettings |= DOWNLOAD_NEW_EPISODES;
+		else
+			mSettings &= DOWNLOAD_NEW_EPISODES;
+	}
+
+	public boolean isAddNewToPlaylist() {
+		if (IsSettingEnabled(ADD_NEW_TO_PLAYLIST_SET))
+			return appDefault;
+
+		return IsSettingEnabled(ADD_NEW_TO_PLAYLIST);
+	}
+
+	public void setAddNewToPlaylist(boolean addNewToPlaylist) {
+		mSettings |= ADD_NEW_TO_PLAYLIST_SET;
+
+		if (addNewToPlaylist)
+			mSettings |= ADD_NEW_TO_PLAYLIST;
+		else
+			mSettings &= ADD_NEW_TO_PLAYLIST;
+	}
+
+	public boolean isShowDescription() {
+		if (IsSettingEnabled(SHOW_EPISODE_DESCRIPTION_SET))
+			return appDefault;
+
+		return IsSettingEnabled(SHOW_EPISODE_DESCRIPTION);
+	}
+
+	public void setShowDescription(boolean showDescription) {
+		mSettings |= SHOW_EPISODE_DESCRIPTION_SET;
+
+		if (showDescription)
+			mSettings |= SHOW_EPISODE_DESCRIPTION;
+		else
+			mSettings &= SHOW_EPISODE_DESCRIPTION;
+	}
+
+	private boolean IsSettingEnabled(int setting) {
+		return (setting & mSettings) != 0;
+	}
+
 }
