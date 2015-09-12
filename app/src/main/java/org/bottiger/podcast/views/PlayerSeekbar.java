@@ -267,7 +267,7 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
             int translationY = (int)((View)this.getParent()).getTranslationY();
             Log.v(TAG, "trans => " + translationY);
             Log.v(TAG, "loc0 => " + loc[0] + " loc0 => " +loc[1]);
-            params.setMargins(mSideMargin, offset, mSideMargin, 0);
+            //params.setMargins(mSideMargin, offset, mSideMargin, 0);
 
 
             if (mOverlay != null) {
