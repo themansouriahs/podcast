@@ -33,31 +33,6 @@
             fresco:roundAsCircle="false"
             fresco:roundedCornerRadius="@dimen/playlist_image_radius_small"/>
 
-        <LinearLayout
-            android:id="@+id/expanded_buttons_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/podcast_image"
-            android:layout_alignBottom="@id/podcast_image"
-            android:visibility="gone">
-            <!-- android:layout_toLeftOf="@id/duration" -->
-
-            <org.bottiger.podcast.views.DownloadButtonView
-                android:id="@+id/expanded_download"
-                style="@style/PlaylistButton" />
-
-            <org.bottiger.podcast.views.PlayerButtonView
-                android:id="@+id/favorite"
-                android:src="?attr/favorite_outline_inv"
-                style="@style/PlaylistButton" />
-
-            <org.bottiger.podcast.views.PlayerButtonView
-                android:id="@+id/remove_episode"
-                android:src="?attr/ic_remove_inv"
-                style="@style/PlaylistButton" />
-
-        </LinearLayout>
-
         <RelativeLayout
             android:id="@+id/expanded_layout_controls"
             android:layout_width="match_parent"
@@ -134,6 +109,32 @@
             android:padding="0dip"
             android:elevation="8dp"/>
 
+
+        <LinearLayout
+            android:id="@+id/expanded_buttons_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/podcast_image"
+            android:layout_toLeftOf="@+id/list_image"
+            android:layout_alignBottom="@id/podcast_image"
+            android:visibility="gone">
+            <!-- android:layout_toLeftOf="@id/duration" -->
+
+            <org.bottiger.podcast.views.DownloadButtonView
+                android:id="@+id/expanded_download"
+                style="@style/PlaylistButton" />
+
+            <org.bottiger.podcast.views.PlayerButtonView
+                android:id="@+id/favorite"
+                android:src="?attr/favorite_outline_inv"
+                style="@style/PlaylistButton" />
+
+            <org.bottiger.podcast.views.PlayerButtonView
+                android:id="@+id/remove_episode"
+                android:src="?attr/ic_remove_inv"
+                style="@style/PlaylistButton" />
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/podcast_title"

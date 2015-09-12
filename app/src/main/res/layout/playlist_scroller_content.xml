@@ -180,6 +180,7 @@
         <org.bottiger.podcast.views.PlayerButtonView
             android:id="@+id/rewind_button"
             style="@style/SeekPlayerButton"
+            android:layout_marginLeft="5dp"
             android:src="?attr/ic_rewind"
             android:layout_below="@id/expanded_controls"
             android:layout_alignParentLeft="true"/>
@@ -188,6 +189,7 @@
             android:id="@+id/fast_forward_button"
             style="@style/SeekPlayerButton"
             android:src="?attr/ic_forward"
+            android:layout_marginRight="5dp"
             android:layout_below="@id/expanded_controls"
             android:layout_alignParentRight="true"/>
 
@@ -195,7 +197,7 @@
             android:id="@+id/player_progress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
+            android:layout_marginTop="9dp"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:layout_alignTop="@id/rewind_button"
@@ -268,6 +270,8 @@
                 android:background="@drawable/top_player_bottom_gradient_tinted"
                 android:layout_width="match_parent"
                 android:layout_height="15dp"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
                 android:layout_alignParentBottom="true"
                 android:visibility="gone"
                 android:elevation="12dp"/>

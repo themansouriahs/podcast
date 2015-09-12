@@ -4,9 +4,12 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.graphics.Palette;
@@ -35,6 +38,8 @@ import java.util.concurrent.TimeUnit;
  * Created by apl on 03-09-2014.
  */
 public class PlayerSeekbar extends SeekBar implements PaletteListener {
+
+    private static final String TAG = "PlayerSeekbar";
 
     private static final int RANGE_MIN = 0;
     private static final int RANGE_MAX = 1000;
@@ -196,15 +201,17 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
         mSideMargin = (int)UIUtils.convertDpToPixel(40, getContext());
         //argContext.getResources().getDimensionPixelSize(R.dimen.action_bar_height);
 
+
+        /*
         int seekbarHeight = argContext.getResources().getDimensionPixelSize(R.dimen.seekbar_thumb_size);
         int seebarWidth = seekbarHeight / 3 *2;
 
         Drawable thumb = getResources().getDrawable(R.drawable.seekbar_handle);
         Bitmap bitmap = ((BitmapDrawable) thumb).getBitmap();
         thumb = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, seebarWidth, seekbarHeight, true));
-        //thumb = new BitmapDrawable(getResources(), Bitmap.createBitmap(bitmap));
 
         setThumb(thumb);
+        */
     }
 
     public void setEpisode(IEpisode argEpisode) {
@@ -235,16 +242,15 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        //mOverlay.setTranslationY(800);
 
-        Log.d("mPaintSeekInfo", "draw with mPaintSeekInfo => " + mPaintSeekInfo);
+        Log.v(TAG, "draw with mPaintSeekInfo => " + mPaintSeekInfo);
 
         if (isInEditMode()) {
             return;
         }
 
         if (mPaintSeekInfo) {
-            Log.d("PlayerSeekbar", "Draw seekinfo");
+            Log.v(TAG, "Draw seekinfo");
             if (params.height == 0) {
                 mOverlay.setVisibility(INVISIBLE);
                 params.height = mOverlay.getHeight();
@@ -259,9 +265,10 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
             this.getLocationOnScreen(loc);
             int offset = loc[1] - (int)UIUtils.convertDpToPixel(200, getContext()); //FIXME this.getHeight()*4;
             int translationY = (int)((View)this.getParent()).getTranslationY();
-            Log.d("PlayerSeekbar", "trans => " + translationY);
-            Log.d("PlayerSeekbar", "loc0 => " + loc[0] + " loc0 => " +loc[1]);
+            Log.v(TAG, "trans => " + translationY);
+            Log.v(TAG, "loc0 => " + loc[0] + " loc0 => " +loc[1]);
             params.setMargins(mSideMargin, offset, mSideMargin, 0);
+
 
             if (mOverlay != null) {
                 mOverlay.setLayoutParams(params);
@@ -282,7 +289,7 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
 
         if (progressMs < 0) {
             Throwable ise = new IllegalStateException("Progress must be positive");
-            Log.e("PlayerSeekbar", "Progress must be positive ( " + progressMs + " )", ise);
+            Log.e(TAG, "Progress must be positive ( " + progressMs + " )", ise);
             return;
         }
 
@@ -323,9 +330,8 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        String tag = "Seekbar";
-        Log.d(tag, event.toString());
-        Log.d(tag, "------------");
+        Log.v(TAG, event.toString());
+        Log.v(TAG, "------------");
         requestParentTouchRecursive(getParent(), true);
 
         if (!isEnabled()) {
@@ -344,7 +350,7 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
                 break;
             case MotionEvent.ACTION_MOVE:
                 int pos = (int) (getMax() * event.getX() / getWidth());
-                Log.d(tag, "pos => " + pos);
+                Log.v(TAG, "pos => " + pos);
                 setProgress(pos);
                 onSeekBarChangeListener.onProgressChanged(this, pos, true);
                 //onSizeChanged(getWidth(), getHeight(), 0, 0);

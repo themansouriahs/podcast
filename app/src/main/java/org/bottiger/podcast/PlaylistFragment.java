@@ -10,6 +10,7 @@ import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
 import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.UIUtils;
@@ -34,8 +35,10 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -178,7 +181,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         mForwardButton = (PlayerButtonView)view.findViewById(R.id.fast_forward_button);
         mFavoriteButton = (PlayerButtonView)view.findViewById(R.id.favorite);
 
-        mGradientBottomTopPlayer = (View) view.findViewById(R.id.gradient_bottom);
+        mGradientBottomTopPlayer = view.findViewById(R.id.gradient_bottom);
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.my_recycler_view);
         mOverlay = view.findViewById(R.id.playlist_overlay);
@@ -466,7 +469,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         if (offset > 0) {
             mCurrentTime.setText(StrUtils.formatTime(offset));
         } else {
-            mCurrentTime.setText("");
+            mCurrentTime.setText("00:00");
         }
         mCurrentTime.setEpisode(item);
         mTotalTime.setEpisode(item);
@@ -507,6 +510,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
         mPlayerSeekbar.setEpisode(item);
         mPlayerSeekbar.setOverlay(mOverlay);
+        mPlayerSeekbar.getProgressDrawable().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
 
         mPlayerDownloadButton.setEpisode(item);
 
@@ -536,11 +540,26 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                     int colorText = swatch.getTitleTextColor();
                     int colorBackground = swatch.getRgb();
 
+                    ColorExtractor extractor = new ColorExtractor(getActivity(), argChangedPalette);
+
                     mEpisodeTitle.setTextColor(color);
                     mEpisodeInfo.setTextColor(color);
 
-                    Drawable  normalDrawable = getResources().getDrawable(R.drawable.top_player_bottom_gradient_tinted);
-                    Drawable wrapDrawable = DrawableCompat.wrap(normalDrawable);
+                    int transparentgradientColor;
+                    int gradientColor = extractor.getPrimary();
+                    //gradientColor = Color.BLUE;
+
+                    int alpha = 0;
+                    int red = Color.red(gradientColor);
+                    int green = Color.green(gradientColor);
+                    int blue = Color.blue(gradientColor);
+                    transparentgradientColor = Color.argb(alpha, red, green, blue);
+
+                    //Drawable  normalDrawable = getResources().getDrawable(R.drawable.top_player_bottom_gradient_tinted);
+                    GradientDrawable gd = new GradientDrawable(
+                            GradientDrawable.Orientation.TOP_BOTTOM,
+                            new int[] {transparentgradientColor,gradientColor});
+                    Drawable wrapDrawable = DrawableCompat.wrap(gd);
                     DrawableCompat.setTint(wrapDrawable, colorBackground);
                     if (Build.VERSION.SDK_INT >= 16) {
                         mGradientBottomTopPlayer.setBackground(wrapDrawable);
