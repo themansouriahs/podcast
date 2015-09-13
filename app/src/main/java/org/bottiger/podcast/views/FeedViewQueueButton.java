@@ -359,6 +359,14 @@ public class FeedViewQueueButton extends PlayPauseImageView {
 
     }
 
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+        int width = getMeasuredWidth();
+        setMeasuredDimension(width, width);
+    }
+
     /**
      * Internal saved state
      */

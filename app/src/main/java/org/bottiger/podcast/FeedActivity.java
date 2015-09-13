@@ -204,7 +204,14 @@ public class FeedActivity extends TopActivity implements PaletteListener {
 
         setContentView(R.layout.feed_activity);
 
-        //mMaterialColorMapUtils = new MaterialColorMapUtils(getResources());
+        if (mIsSlimSubscription) {
+            FeedViewDiscoveryAdapter adapter = new FeedViewDiscoveryAdapter(this, mSubscription, mCursor);
+            SlimSubscription slimSubscription = (SlimSubscription)mSubscription;
+            adapter.setDataset(slimSubscription.getEpisodes());
+            mAdapter = adapter;
+        } else {
+            mAdapter = new FeedViewAdapter(this, mSubscription, mCursor);
+        }
 
 
         mPhotoView = (QuickFeedImage) findViewById(R.id.photo);
@@ -220,6 +227,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
                     mAdapter.setExpanded(isChecked);
                 }
             });
+            mAdapter.setExpanded(((Subscription) mSubscription).isShowDescription());
         }
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -322,16 +330,6 @@ public class FeedActivity extends TopActivity implements PaletteListener {
         mRecyclerView = (FeedRecyclerView) findViewById(R.id.feed_recycler_view);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
-
-
-        if (mIsSlimSubscription) {
-            FeedViewDiscoveryAdapter adapter = new FeedViewDiscoveryAdapter(this, mSubscription, mCursor);
-            SlimSubscription slimSubscription = (SlimSubscription)mSubscription;
-            adapter.setDataset(slimSubscription.getEpisodes());
-            mAdapter = adapter;
-        } else {
-            mAdapter = new FeedViewAdapter(this, mSubscription, mCursor);
-        }
 
         mRecyclerView.setAdapter(mAdapter);
 
