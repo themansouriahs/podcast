@@ -16,7 +16,7 @@ import org.bottiger.podcast.utils.ColorExtractor;
 /**
  * Created by apl on 21-03-2015.
  */
-public class ImageViewTinted extends com.facebook.drawee.view.SimpleDraweeView implements PaletteListener {
+public class ImageViewTinted extends ImageView implements PaletteListener {
 
     String mPaletteKey = null;
 

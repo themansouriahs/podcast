@@ -38,6 +38,13 @@
     @com.squareup.otto.Produce public *;
 }
 
+#glide
+-keep public class * implements com.bumptech.glide.module.GlideModule
+-keep public enum com.bumptech.glide.load.resource.bitmap.ImageHeaderParser$** {
+    **[] $VALUES;
+    public *;
+}
+
 # OKhhtp
 -dontwarn com.squareup.okhttp.**
 # Ignore warnings: https://github.com/square/okio/issues/60

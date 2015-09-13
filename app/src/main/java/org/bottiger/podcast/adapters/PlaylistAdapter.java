@@ -26,8 +26,11 @@ import org.bottiger.podcast.views.PlaylistViewHolder;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -36,6 +39,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.squareup.otto.Subscribe;
 
 public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> {
@@ -106,8 +111,19 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         String image = item.getArtwork(mActivity);
         if (!TextUtils.isEmpty(image) && urlValidator.isValid(image)) {
 
-            FrescoHelper.PalettePostProcessor postProcessor = new FrescoHelper.PalettePostProcessor(mActivity, image);
-            FrescoHelper.loadImageInto(viewHolder.mPodcastImage, image, postProcessor);
+            //FrescoHelper.PalettePostProcessor postProcessor = new FrescoHelper.PalettePostProcessor(mActivity, image);
+            //FrescoHelper.loadImageInto(viewHolder.mPodcastImage, image, postProcessor);
+            Glide.with(mActivity).load(image).asBitmap().into(new BitmapImageViewTarget(viewHolder.mPodcastImage) {
+                @Override
+                protected void setResource(Bitmap resource) {
+                    RoundedBitmapDrawable circularBitmapDrawable =
+                            RoundedBitmapDrawableFactory.create(mActivity.getResources(), resource);
+                    float radius = mActivity.getResources().getDimension(R.dimen.playlist_image_radius_small);
+                    //circularBitmapDrawable.setCircular(true);
+                    circularBitmapDrawable.setCornerRadius(radius);
+                    viewHolder.mPodcastImage.setImageDrawable(circularBitmapDrawable);
+                }
+            });
 
             viewHolder.setArtwork(image);
         }

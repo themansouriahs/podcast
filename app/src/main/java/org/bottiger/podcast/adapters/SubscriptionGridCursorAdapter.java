@@ -21,6 +21,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -110,8 +113,9 @@ public class SubscriptionGridCursorAdapter extends CursorRecyclerAdapter {
         String image = uri.toString();
         if (!TextUtils.isEmpty(image) && urlValidator.isValid(image)) {
 
-            FrescoHelper.PalettePostProcessor postProcessor = new FrescoHelper.PalettePostProcessor(mActivity, image);
-            FrescoHelper.loadImageInto(holder.image, image, postProcessor);
+            //FrescoHelper.PalettePostProcessor postProcessor = new FrescoHelper.PalettePostProcessor(mActivity, image);
+            //FrescoHelper.loadImageInto(holder.image, image, postProcessor);
+            Glide.with(mActivity).load(image).into(holder.image);
 
         }
 

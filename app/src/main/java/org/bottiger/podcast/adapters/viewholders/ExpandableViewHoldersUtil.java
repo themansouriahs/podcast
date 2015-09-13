@@ -12,6 +12,7 @@ import android.widget.RelativeLayout;
 
 import com.facebook.drawee.generic.GenericDraweeHierarchy;
 import com.facebook.drawee.generic.RoundingParams;
+import com.facebook.drawee.view.SimpleDraweeView;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.PaletteListener;
@@ -52,10 +53,12 @@ public class ExpandableViewHoldersUtil {
             sImageParams.height = imageSize;
             holder.mPodcastImage.setLayoutParams(sImageParams);
 
-            GenericDraweeHierarchy hierarchy = holder.mPodcastImage.getHierarchy();
-            RoundingParams roundingParams = hierarchy.getRoundingParams();
-            roundingParams.setCornersRadius(roundingRadius);
-            holder.mPodcastImage.getHierarchy().setRoundingParams(roundingParams);
+            /*
+                GenericDraweeHierarchy hierarchy = holder.mPodcastImage.getHierarchy();
+                RoundingParams roundingParams = hierarchy.getRoundingParams();
+                roundingParams.setCornersRadius(roundingRadius);
+                holder.mPodcastImage.getHierarchy().setRoundingParams(roundingParams);
+            */
 
             holder.mMainTitle.setLayoutParams(sTitleParams);
             holder.mMainTitle.setSingleLine(false);
@@ -114,10 +117,13 @@ public class ExpandableViewHoldersUtil {
             holder.mPodcastImage.setLayoutParams(sImageParams);
         }
 
+        /*
         GenericDraweeHierarchy hierarchy = holder.mPodcastImage.getHierarchy();
         RoundingParams roundingParams = hierarchy.getRoundingParams();
         //roundingParams.setRoundAsCircle(true);
         holder.mPodcastImage.getHierarchy().setRoundingParams(roundingParams);
+        */
+
         holder.mExpandedLayoutBottom.setVisibility(View.GONE);
         holder.buttonLayout.setVisibility(View.GONE);
         expandView.setVisibility(View.GONE);

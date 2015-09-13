@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.views.ImageViewTinted;
 
 /**
  * Created by apl on 15-04-2015.
@@ -18,7 +19,7 @@ public class SubscriptionViewHolder extends RecyclerView.ViewHolder implements V
 
     public TextView title;
     public TextView subTitle;
-    public SimpleDraweeView image;
+    public ImageViewTinted image;
     public View gradient;
 
     public SubscriptionViewHolder(View itemView) {
@@ -26,7 +27,7 @@ public class SubscriptionViewHolder extends RecyclerView.ViewHolder implements V
 
         title = (TextView) itemView.findViewById(R.id.grid_title);
         subTitle = (TextView) itemView.findViewById(R.id.grid_subtitle);
-        image = (SimpleDraweeView) itemView.findViewById(R.id.grid_image);
+        image = (ImageViewTinted) itemView.findViewById(R.id.grid_image);
         gradient = (View) itemView.findViewById(R.id.grid_item_gradient);
 
         itemView.setOnCreateContextMenuListener(this);

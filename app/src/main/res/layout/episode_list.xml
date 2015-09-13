@@ -21,7 +21,7 @@
         android:clipChildren="false"
         android:orientation="horizontal">
 
-        <org.bottiger.podcast.views.ImageViewTinted
+        <org.bottiger.podcast.views.SquareImageViewFresco
             android:id="@+id/podcast_image"
             android:layout_width="@dimen/playlist_image_size_small"
             android:layout_height="@dimen/playlist_image_size_small"
