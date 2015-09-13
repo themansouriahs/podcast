@@ -45,6 +45,7 @@ import org.bottiger.podcast.views.FloatingActionButton;
 import org.bottiger.podcast.views.MultiShrink.feed.MultiShrinkScroller;
 import org.bottiger.podcast.views.MultiShrink.feed.QuickFeedImage;
 import org.bottiger.podcast.views.MultiShrink.feed.SchedulingUtils;
+import org.bottiger.podcast.views.utils.SubscriptionSettingsUtils;
 
 import io.codetail.animation.SupportAnimator;
 import io.codetail.animation.ViewAnimationUtils;
@@ -63,6 +64,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
     private Toolbar mToolbar;
 
     // Feed Settings
+    private SubscriptionSettingsUtils mSubscriptionSettingsUtils;
     private boolean mSettingsRevealed = false;
     private final int SETTINGS_REVEAL_DURATION = 200; // in ms
     private SupportAnimator mRevealAnimator;
@@ -74,8 +76,6 @@ public class FeedActivity extends TopActivity implements PaletteListener {
     private int mStatusBarColor;
     private int mExtraMode = MODE_FULLY_EXPANDED;
     private boolean mHasAlreadyBeenOpened;
-
-    private boolean mExpandedLayout = false;
 
     private QuickFeedImage mPhotoView;
     private RecyclerView mRecyclerView;
@@ -97,9 +97,6 @@ public class FeedActivity extends TopActivity implements PaletteListener {
      */
     private ColorDrawable mWindowScrim;
     private boolean mIsEntranceAnimationFinished;
-    //private MaterialColorMapUtils mMaterialColorMapUtils;
-    private boolean mIsExitAnimationInProgress;
-    private boolean mHasComputedThemeColor;
 
     public static final String FEED_ACTIVITY_EXTRA = "FeedActivityExtra";
     public static final String FEED_ACTIVITY_IS_SLIM = "SlimActivity";
@@ -128,7 +125,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
 
         @Override
         public void onStartScrollOffBottom() {
-            mIsExitAnimationInProgress = true;
+
         }
 
         @Override
@@ -215,6 +212,16 @@ public class FeedActivity extends TopActivity implements PaletteListener {
         mFloatingButton = (FloatingActionButton) findViewById(R.id.feedview_fap_button);
         mRevealLayout = (FrameLayout) findViewById(R.id.feed_activity_settings_container);
 
+        if (mSubscription instanceof Subscription) {
+            mSubscriptionSettingsUtils = new SubscriptionSettingsUtils(mRevealLayout, (Subscription)mSubscription);
+            mSubscriptionSettingsUtils.setShowDescriptionListener(new SubscriptionSettingsUtils.OnSettingsChangedListener() {
+                @Override
+                public void OnSettingsChanged(boolean isChecked) {
+                    mAdapter.setExpanded(isChecked);
+                }
+            });
+        }
+
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             FrameLayout.MarginLayoutParams params = (FrameLayout.MarginLayoutParams) mMultiShrinkScroller.getLayoutParams();
             params.topMargin = ToolbarActivity.getStatusBarHeight(getResources());
@@ -234,12 +241,12 @@ public class FeedActivity extends TopActivity implements PaletteListener {
                 int cy = (mRevealLayout.getTop() + mRevealLayout.getBottom());
 
                 // get the final radius for the clipping circle
-                int finalRadius = Math.max(mRevealLayout.getWidth(), mRevealLayout.getHeight());
+                int revealRadius = Math.max(mRevealLayout.getWidth(), mRevealLayout.getHeight());
 
 
                 if (mSettingsRevealed) {
                     mRevealAnimator =
-                            ViewAnimationUtils.createCircularReveal(mRevealLayout, cx, cy, finalRadius, 0);
+                            ViewAnimationUtils.createCircularReveal(mRevealLayout, cx, cy, revealRadius, 0);
                     mRevealAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
                     mRevealAnimator.setDuration(SETTINGS_REVEAL_DURATION);
                     mRevealAnimator.addListener(new SupportAnimator.AnimatorListener() {
@@ -268,7 +275,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
                     // Open Settings
 
                     mRevealAnimator =
-                            ViewAnimationUtils.createCircularReveal(mRevealLayout, cx, cy, 0, finalRadius);
+                            ViewAnimationUtils.createCircularReveal(mRevealLayout, cx, cy, 0, revealRadius);
                     mRevealAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
                     mRevealAnimator.setDuration(SETTINGS_REVEAL_DURATION);
 

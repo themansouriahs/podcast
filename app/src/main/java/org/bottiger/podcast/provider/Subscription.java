@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
@@ -17,9 +18,11 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.graphics.Palette;
 import android.util.Log;
@@ -29,6 +32,8 @@ import javax.annotation.Nullable;
 public class Subscription implements ISubscription, PaletteListener {
 
 	private static final String TAG = "Subscription";
+
+	private static SharedPreferences sSharedPreferences = null;
 
 	private static final int SHOW_EPISODE_DESCRIPTION_SET = 1;
 	private static final int SHOW_EPISODE_DESCRIPTION = (1 << 1);
@@ -40,6 +45,11 @@ public class Subscription implements ISubscription, PaletteListener {
 	private static final int DELETE_AFTER_PLAYBACK = (1 << 7);
 	private static final int LIST_OLDEST_FIRST_SET = (1 << 8);
 	private static final int LIST_OLDEST_FIRST = (1 << 9);
+
+	private final int mOldestFirstID = R.string.pref_list_oldest_first_key;
+	private final int mDeleteAfterPlaybackID = R.string.pref_delete_when_finished_key;
+	private final int mAutoDownloadID = R.string.pref_download_on_update_key;
+	private final int mPlaylistSubscriptionsID = R.string.pref_playlist_subscriptions_key;
 
 	public final static int ADD_SUCCESS = 0;
 	public final static int ADD_FAIL_UNSUCCESS = -2;
@@ -107,10 +117,13 @@ public class Subscription implements ISubscription, PaletteListener {
 
 	public Subscription() {
 		reset();
+		if (sSharedPreferences == null) {
+			sSharedPreferences = PreferenceManager.getDefaultSharedPreferences(SoundWaves.getAppContext());
+		}
 	}
 
 	public Subscription(String url_link) {
-		reset();
+		this();
 		url = url_link;
 		title = url_link;
 		link = url_link;
@@ -460,90 +473,107 @@ public class Subscription implements ISubscription, PaletteListener {
 	 * bitmask &= ~TRADEABLE; // Clears the flag using bitwise AND and NOT
 	 * bitmask ^= TRADEABLE; // Toggles the flag using bitwise XOR
 	 */
-	private boolean appDefault = false;
+	private boolean appDefault = true;
 
 	public boolean isListOldestFirst() {
-		if (IsSettingEnabled(LIST_OLDEST_FIRST_SET))
-			return appDefault;
+		if (!IsSettingEnabled(LIST_OLDEST_FIRST_SET))
+			return getApplicationValue(mOldestFirstID, false);
 
 		return IsSettingEnabled(LIST_OLDEST_FIRST);
 	}
 
 	public void setListOldestFirst(boolean listOldestFirst) {
+        mSettings = mSettings < 0 ? 0 : mSettings;
 		mSettings |= LIST_OLDEST_FIRST_SET;
 
 		if (listOldestFirst)
 			mSettings |= LIST_OLDEST_FIRST;
 		else
-			mSettings &= LIST_OLDEST_FIRST;
+			mSettings &= ~LIST_OLDEST_FIRST;
 	}
 
 	public boolean isDeleteWhenListened() {
-		if (IsSettingEnabled(DELETE_AFTER_PLAYBACK_SET))
-			return appDefault;
+		if (!IsSettingEnabled(DELETE_AFTER_PLAYBACK_SET))
+			return getApplicationValue(mDeleteAfterPlaybackID, false);
 
 		return IsSettingEnabled(DELETE_AFTER_PLAYBACK);
 	}
 
 	public void setDeleteWhenListened(boolean deleteWhenListened) {
+        mSettings = mSettings < 0 ? 0 : mSettings;
 		mSettings |= DELETE_AFTER_PLAYBACK_SET;
 
 		if (deleteWhenListened)
 			mSettings |= DELETE_AFTER_PLAYBACK;
 		else
-			mSettings &= DELETE_AFTER_PLAYBACK;
+			mSettings &= ~DELETE_AFTER_PLAYBACK;
 	}
 
 	public boolean isDownloadNew() {
-		if (IsSettingEnabled(DOWNLOAD_NEW_EPISODES_SET))
-			return appDefault;
+		if (!IsSettingEnabled(DOWNLOAD_NEW_EPISODES_SET))
+			return getApplicationValue(mAutoDownloadID, false);
 
 		return IsSettingEnabled(DOWNLOAD_NEW_EPISODES);
 	}
 
 	public void setDownloadNew(boolean downloadNew) {
+        mSettings = mSettings < 0 ? 0 : mSettings;
 		mSettings |= DOWNLOAD_NEW_EPISODES_SET;
 
 		if (downloadNew)
 			mSettings |= DOWNLOAD_NEW_EPISODES;
 		else
-			mSettings &= DOWNLOAD_NEW_EPISODES;
+			mSettings &= ~DOWNLOAD_NEW_EPISODES;
 	}
 
 	public boolean isAddNewToPlaylist() {
-		if (IsSettingEnabled(ADD_NEW_TO_PLAYLIST_SET))
-			return appDefault;
+		if (!IsSettingEnabled(ADD_NEW_TO_PLAYLIST_SET))
+			return true;
 
 		return IsSettingEnabled(ADD_NEW_TO_PLAYLIST);
 	}
 
 	public void setAddNewToPlaylist(boolean addNewToPlaylist) {
+        mSettings = mSettings < 0 ? 0 : mSettings;
 		mSettings |= ADD_NEW_TO_PLAYLIST_SET;
 
 		if (addNewToPlaylist)
 			mSettings |= ADD_NEW_TO_PLAYLIST;
 		else
-			mSettings &= ADD_NEW_TO_PLAYLIST;
+			mSettings &= ~ADD_NEW_TO_PLAYLIST;
 	}
 
 	public boolean isShowDescription() {
-		if (IsSettingEnabled(SHOW_EPISODE_DESCRIPTION_SET))
-			return appDefault;
+		if (!IsSettingEnabled(SHOW_EPISODE_DESCRIPTION_SET))
+			return true;
 
 		return IsSettingEnabled(SHOW_EPISODE_DESCRIPTION);
 	}
 
 	public void setShowDescription(boolean showDescription) {
+        mSettings = mSettings < 0 ? 0 : mSettings;
 		mSettings |= SHOW_EPISODE_DESCRIPTION_SET;
 
 		if (showDescription)
 			mSettings |= SHOW_EPISODE_DESCRIPTION;
 		else
-			mSettings &= SHOW_EPISODE_DESCRIPTION;
+			mSettings &= ~SHOW_EPISODE_DESCRIPTION;
 	}
 
 	private boolean IsSettingEnabled(int setting) {
-		return (setting & mSettings) != 0;
+		return mSettings > 0 && ((setting & mSettings) != 0);
 	}
+
+	private boolean getApplicationValue(int argId, boolean argDefault) {
+		String key = SoundWaves.getAppContext().getResources().getString(argId);
+		return sSharedPreferences.getBoolean(key, argDefault);
+	}
+
+	/*
+	private void setApplicationValue(int argId, boolean argDefault) {
+		String key = SoundWaves.getAppContext().getResources().getString(argId);
+		sSharedPreferences.edit().putBoolean(key, argDefault).commit();
+	}
+	*/
 
 }

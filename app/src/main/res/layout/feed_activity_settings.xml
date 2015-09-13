@@ -53,7 +53,7 @@
             />
 
         <android.support.v7.widget.SwitchCompat
-            android:id="@+id/feed_ignore_playlist_switch"
+            android:id="@+id/feed_add_to_playlist_switch"
             style="@style/FeedActivitySettingsSwitchStyle"
             android:layout_column="1"
             android:layout_row="2"/>
