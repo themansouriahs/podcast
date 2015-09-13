@@ -87,7 +87,7 @@ public class SubscriptionSettingsUtils {
         mListOldestFirst.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mSubscription.setShowDescription(isChecked);
+                mSubscription.setListOldestFirst(isChecked);
                 OnSwitchChangedHandler(isChecked, contentResolver, mListOldestFirstListener);
             }
         });

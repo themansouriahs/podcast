@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Build;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
@@ -31,6 +32,8 @@ import org.bottiger.podcast.views.DownloadButtonView;
 import org.bottiger.podcast.views.FeedViewQueueButton;
 import org.bottiger.podcast.views.PlayPauseImageView;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.Date;
 import java.util.Formatter;
 
@@ -39,7 +42,11 @@ import java.util.Formatter;
  */
 public class FeedViewAdapter extends RecyclerView.Adapter {
 
-    public enum ORDER { RECENT_FIRST, OLDEST_FIRST}
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({RECENT_FIRST, OLDEST_FIRST})
+    public @interface Order {}
+    public static final int RECENT_FIRST = 0;
+    public static final int OLDEST_FIRST = 1;
 
     protected ISubscription mSubscription;
 
@@ -50,7 +57,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
     protected Palette mPalette;
 
     public static boolean mIsExpanded = false;
-    protected ORDER mSortOrder = ORDER.RECENT_FIRST;
+    protected @Order int mSortOrder = RECENT_FIRST;
 
     private StringBuilder mStringBuilder = new StringBuilder(100);
 
@@ -68,11 +75,11 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
         mCursor = c;
     }
 
-    public ORDER getOrder() {
+    public @Order int getOrder() {
         return mSortOrder;
     }
 
-    public void setOrder(ORDER argSortOrder) {
+    public void setOrder(@Order int argSortOrder) {
         mSortOrder = argSortOrder;
         notifyDataSetChanged();
     }
@@ -199,7 +206,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
     }
 
     protected int getDatasetPosition(int argPosition) {
-        if (mSortOrder == ORDER.RECENT_FIRST)
+        if (mSortOrder == RECENT_FIRST)
             return argPosition;
 
         int position = argPosition;

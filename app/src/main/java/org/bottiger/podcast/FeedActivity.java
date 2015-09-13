@@ -228,6 +228,16 @@ public class FeedActivity extends TopActivity implements PaletteListener {
                 }
             });
             mAdapter.setExpanded(((Subscription) mSubscription).isShowDescription());
+
+            mSubscriptionSettingsUtils.setListOldestFirstListener(new SubscriptionSettingsUtils.OnSettingsChangedListener() {
+                @Override
+                public void OnSettingsChanged(boolean isChecked) {
+                    @FeedViewAdapter.Order int sortOrder = ((Subscription) mSubscription).isListOldestFirst() ?  FeedViewAdapter.OLDEST_FIRST : FeedViewAdapter.RECENT_FIRST;
+                    mAdapter.setOrder(sortOrder);
+                }
+            });
+            @FeedViewAdapter.Order int sortOrder = ((Subscription) mSubscription).isListOldestFirst() ?  FeedViewAdapter.OLDEST_FIRST : FeedViewAdapter.RECENT_FIRST;
+            mAdapter.setOrder(sortOrder);
         }
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -439,21 +449,6 @@ public class FeedActivity extends TopActivity implements PaletteListener {
             case android.R.id.home:
                 //NavUtils.navigateUpFromSameTask(this);
                 mMultiShrinkScroller.scrollOffBottom();
-                return true;
-            case R.id.menu_sort_order:
-                FeedViewAdapter.ORDER order = mAdapter.getOrder();
-
-                FeedViewAdapter.ORDER newOrder = FeedViewAdapter.ORDER.OLDEST_FIRST;
-                int newLabel = R.string.menu_order_by_date_desc;
-
-                if (order == FeedViewAdapter.ORDER.OLDEST_FIRST) {
-                    newOrder = FeedViewAdapter.ORDER.RECENT_FIRST;
-                    newLabel = R.string.menu_order_by_date_desc;
-                }
-
-                item.setTitle(newLabel);
-                mAdapter.setOrder(newOrder);
-
                 return true;
             case R.id.menu_refresh_feed:
                 SoundWaves.sSubscriptionRefreshManager.refresh(mSubscription, new IDownloadCompleteCallback() {
