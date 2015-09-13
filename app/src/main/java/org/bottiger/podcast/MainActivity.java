@@ -6,6 +6,7 @@ import org.bottiger.podcast.AbstractEpisodeFragment.OnPlaylistRefreshListener;
 import org.bottiger.podcast.cloud.CloudProvider;
 import org.bottiger.podcast.debug.SqliteCopy;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.service.jobservice.PodcastUpdater;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.service.HTTPDService;
 import org.bottiger.podcast.service.PlayerService;
@@ -34,8 +35,6 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.view.Menu;
 import android.view.MenuItem;
-
-import com.google.api.client.json.gson.GsonFactory;
 
 // Sliding
 public class MainActivity extends FragmentContainerActivity implements
@@ -300,9 +299,6 @@ public class MainActivity extends FragmentContainerActivity implements
 			if (mCursor != null)
 				mCursor.close();
 		}
-
-		PodcastService.setupAlarm(this);
-
 	}
 
 	@Override

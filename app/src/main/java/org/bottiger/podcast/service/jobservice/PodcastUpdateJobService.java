@@ -1,4 +1,4 @@
-package org.bottiger.podcast.service;
+package org.bottiger.podcast.service.jobservice;
 
 import android.annotation.TargetApi;
 import android.app.job.JobParameters;

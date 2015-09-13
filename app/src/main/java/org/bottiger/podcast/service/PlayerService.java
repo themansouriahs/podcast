@@ -15,6 +15,7 @@ import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
+import org.bottiger.podcast.service.jobservice.PodcastUpdater;
 
 import android.Manifest;
 import android.app.Notification;
@@ -102,6 +103,8 @@ public class PlayerService extends Service implements
 
     private PlayerHandler mPlayerHandler;
 
+	private PodcastUpdater mPodcastUpdater;
+
 	/**
 	 * Phone state listener. Will pause the playback when the phone is ringing
 	 * and continue it afterwards
@@ -141,6 +144,8 @@ public class PlayerService extends Service implements
 		mPlaylist.populatePlaylistIfEmpty();
 		SoundWaves.getBus().register(mPlaylist);
 		SoundWaves.getBus().register(this);
+
+		mPodcastUpdater = new PodcastUpdater(this);
 
         mPlayerHandler = new PlayerHandler(this);
 		
