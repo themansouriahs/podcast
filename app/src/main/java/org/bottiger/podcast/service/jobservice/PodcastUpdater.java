@@ -9,17 +9,21 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Build;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
+import org.bottiger.podcast.R;
 import org.bottiger.podcast.service.PodcastService;
 
 /**
  * Created by apl on 11-09-2014.
  */
 public class PodcastUpdater {
+
+    private static final float UPDATE_FREQUENCY_MIN = 60f;
 
     private static final int PodcastUpdaterId = 36324;
 
@@ -34,20 +38,30 @@ public class PodcastUpdater {
     }
 
     @TargetApi(21)
-    private void scheduleUpdateUsingJobScheduler(@NonNull Context argContext) {
+    private boolean scheduleUpdateUsingJobScheduler(@NonNull Context argContext) {
         ComponentName receiver = new ComponentName(argContext, PodcastUpdateJobService.class);
 
-        JobInfo uploadTask = new JobInfo.Builder(PodcastUpdaterId, receiver)
-                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(argContext);
+        Resources resources = argContext.getResources();
+
+        String wifiOnlyKey = resources.getString(R.string.pref_download_only_wifi_key);
+        boolean wifiOnlyDefault = resources.getBoolean(R.bool.pref_download_only_wifi_default);
+        boolean wifiOnly = sharedPreferences.getBoolean(wifiOnlyKey, wifiOnlyDefault);
+        int networkType = wifiOnly ? JobInfo.NETWORK_TYPE_UNMETERED : JobInfo.NETWORK_TYPE_ANY;
+
+        long updateFrequencyMs = alarmInterval(UPDATE_FREQUENCY_MIN); // to ms
+
+        JobInfo refreshFeedsTask = new JobInfo.Builder(PodcastUpdaterId, receiver)
+                .setRequiredNetworkType(networkType)
                 .setPersisted(true) // Persist across boots
-                .setRequiresCharging(true)
-                .setRequiresDeviceIdle(true)
+                .setRequiresCharging(false)
+                .setRequiresDeviceIdle(false)
+                .setPeriodic(updateFrequencyMs)
                 .build();
 
-        String test = Context.JOB_SCHEDULER_SERVICE;
         JobScheduler jobScheduler =
-                (JobScheduler) argContext.getSystemService(test); // Context.JOB_SCHEDULER_SERVICE
-        jobScheduler.schedule(uploadTask);
+                (JobScheduler) argContext.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        return jobScheduler.schedule(refreshFeedsTask) == JobScheduler.RESULT_SUCCESS;
     }
 
     /**
@@ -72,8 +86,8 @@ public class PodcastUpdater {
         return SystemClock.elapsedRealtime() + alarmInterval(minutes);
     }
 
-    private static long alarmInterval(long minutes) {
-        return Long.valueOf(minutes * 60 * 1000); // minutes to milliseconds
+    private static long alarmInterval(float minutes) {
+        return (long)(minutes * 60 * 1000); // minutes to milliseconds
     }
 
 
@@ -86,7 +100,7 @@ public class PodcastUpdater {
         // Refresh interval
         SharedPreferences prefs = PreferenceManager
                 .getDefaultSharedPreferences(context);
-        long minutes = prefs.getLong("interval", 60);
+        long minutes = prefs.getLong("interval", (long)UPDATE_FREQUENCY_MIN);
 
         PendingIntent pi = getAlarmIntent(context);
         setAlarm(context, pi, 15, minutes);

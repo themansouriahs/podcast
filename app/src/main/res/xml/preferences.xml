@@ -140,7 +140,7 @@
             android:title="@string/pref_download_on_update_title" />
 
         <CheckBoxPreference
-            android:defaultValue="false"
+            android:defaultValue="@bool/pref_download_only_wifi_default"
             android:key="@string/pref_download_only_wifi_key"
             android:summary="@string/pref_only_wifi_description"
             android:title="@string/pref_only_wifi_title" />
