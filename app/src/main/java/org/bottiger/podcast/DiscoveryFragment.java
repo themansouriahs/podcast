@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.OvershootInterpolator;
 import android.widget.ImageButton;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -41,12 +42,18 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 
+import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
+import jp.wasabeef.recyclerview.animators.adapters.AlphaInAnimationAdapter;
+
 /**
  * Created by apl on 13-04-2015.
  */
 public class DiscoveryFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG = "DiscoveryFragment";
+
+    // Animations
+    private static final int ANIMATION_DURATION = 400;
 
     // Match with entries_webservices_discovery_engine
     private static final int GPODDER_INDEX = 0;
@@ -158,14 +165,12 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
         mResultsAdapter = new DiscoverySearchAdapter(getActivity());
         mResultsAdapter.setHasStableIds(true);
 
-        //mResultsAdapter = new AlphaInAnimationAdapter(discoveryAdapter);
-        //mResultsAdapter.setDuration(1000);
-        //recyclerView.setAdapter(alphaAdapter);
-
         mResultsRecyclerView = (RecyclerView) view.findViewById(R.id.search_result_view);
         mResultsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mResultsRecyclerView.setHasFixedSize(true);
         mResultsRecyclerView.setAdapter(mResultsAdapter);
+        mResultsRecyclerView.setItemAnimator(new SlideInUpAnimator(new OvershootInterpolator(1f)));
+        mResultsRecyclerView.getItemAnimator().setAddDuration(ANIMATION_DURATION);
 
         populateRecommendations();
 
