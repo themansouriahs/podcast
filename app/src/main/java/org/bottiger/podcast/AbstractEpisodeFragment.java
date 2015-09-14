@@ -27,8 +27,6 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 
 	private static final String TAG = "AbstractEpisodeFragment";
 
-	protected OnPlaylistRefreshListener mActivityCallback;
-
 	private SharedPreferences prefs;
 
 	String showListenedKey = "showListened";
@@ -36,24 +34,9 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 
 	private Playlist mPlaylist = null;
 
-	// Container Activity must implement this interface
-	// http://developer.android.com/training/basics/fragments/communicating.html
-	public interface OnPlaylistRefreshListener {
-		public void onRefreshPlaylist();
-	}
-
 	@Override
 	public void onAttach(Context context) {
 		super.onAttach(context);
-
-		// This makes sure that the container activity has implemented
-		// the callback interface. If not, it throws an exception
-		try {
-			mActivityCallback = (OnPlaylistRefreshListener) context;
-		} catch (ClassCastException e) {
-			throw new ClassCastException(context.toString()
-					+ " must implement OnHeadlineSelectedListener");
-		}
 	}
 
 	@Override
