@@ -2,34 +2,27 @@ package org.bottiger.podcast;
 
 import java.io.IOException;
 
-import org.bottiger.podcast.cloud.CloudProvider;
 import org.bottiger.podcast.debug.SqliteCopy;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.service.jobservice.PodcastUpdater;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
-import org.bottiger.podcast.service.HTTPDService;
 import org.bottiger.podcast.service.PlayerService;
-import org.bottiger.podcast.service.PodcastService;
+import org.bottiger.podcast.service.syncadapter.CloudSyncUtils;
 import org.bottiger.podcast.utils.PreferenceHelper;
 import org.bottiger.podcast.views.dialogs.DialogAddPodcast;
 import org.bottiger.podcast.utils.ThemeHelper;
 import org.bottiger.podcast.utils.TransitionUtils;
 
 
-import android.accounts.Account;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Debug;
-import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -41,6 +34,8 @@ import com.facebook.imagepipeline.core.ImagePipeline;
 
 // Sliding
 public class MainActivity extends FragmentContainerActivity {
+
+	private static final String TAG = "MainActivity";
 
     static PreferenceHelper mPreferenceHelper = new PreferenceHelper();
 
@@ -92,9 +87,13 @@ public class MainActivity extends FragmentContainerActivity {
 		receiver = new HeadsetReceiver();
 		registerReceiver(receiver, receiverFilter);
 
+		if (Build.VERSION.SDK_INT >= 23) {
+			CloudSyncUtils.startCloudSync(this);
+		}
+
 	}
 
-    /**
+	/**
      * Return a reference to the playerservice if bound
      */
     @Nullable
