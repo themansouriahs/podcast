@@ -92,7 +92,7 @@ public class DownloadManagerReceiver extends BroadcastReceiver {
 	 * @param context
 	 */
 	private void updateFeedItemIfSuccessful(Cursor c, FeedItem item,
-			long downloadId, Context context) {
+			long downloadId, Context context) throws SecurityException {
 
 		String currentLocation = c.getString(c
 				.getColumnIndex(DownloadManager.COLUMN_LOCAL_FILENAME));
