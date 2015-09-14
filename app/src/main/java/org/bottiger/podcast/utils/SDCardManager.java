@@ -41,31 +41,32 @@ public class SDCardManager {
         return b;
     }
 
-    @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
     public static String getExportDir() throws IOException, SecurityException {
         return getSDCardDir() + APP_DIR + EXPORT_DIR;
     }
 
-    @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
 	public static String getDownloadDir() throws IOException, SecurityException {
 		return getSDCardDir() + DOWNLOAD_DIR;
 	}
 
-    @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
 	public static String getTmpDir() throws IOException, SecurityException {
 		return getSDCardDir() + APP_DIR + TMP_DIR;
 	}
 
-    @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
 	public static File getCacheDir() throws IOException, SecurityException {
 		return  returnDir(getSDCardDir() + APP_DIR + CACHE_DIR);
 	}
 
-    @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
 	public static File getThumbnailCacheDir() throws IOException, SecurityException {
 		return  returnDir(getSDCardDir() + APP_DIR + CACHE_DIR + THUMBNAIL_CACHE);
 	}
-	
+
+    @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
 	private static File returnDir(String path) throws IOException {
 		File dir = new File(path);
 		if (!dir.exists() && !dir.mkdir()) {
@@ -74,7 +75,7 @@ public class SDCardManager {
 		return dir;		
 	}
 
-	@RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
     public static String getSDCardDir() throws IOException {
 
         if (sSDCardDirCache != null) {
