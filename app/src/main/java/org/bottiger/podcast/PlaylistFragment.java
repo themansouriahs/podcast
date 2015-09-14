@@ -413,8 +413,8 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
     @Override
     public void onStop() {
-        super.onStop();
         SoundWaves.getBus().unregister(this);
+        super.onStop();
     }
 
     @Override

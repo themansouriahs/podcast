@@ -17,9 +17,6 @@ import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
 
-import org.acra.ACRA;
-import org.acra.ReportingInteractionMode;
-import org.acra.annotation.ReportsCrashes;
 import org.bottiger.podcast.flavors.Analytics.AnalyticsFactory;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.CrashReporterFactory;
@@ -30,6 +27,7 @@ import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
 import org.bottiger.podcast.service.PlayerService;
 
 //Acra debugging
+/*
 @ReportsCrashes(
         // not used
         formUri = "https://acra.bottiger.org/acra-soundwaves/_design/acra-storage/_update/report",
@@ -41,6 +39,7 @@ import org.bottiger.podcast.service.PlayerService;
         httpMethod = org.acra.sender.HttpSender.Method.POST,
         reportType = org.acra.sender.HttpSender.Type.JSON,
         socketTimeout = 10000)
+        */
 public class SoundWaves extends Application {
 
     //public static PlayerService sBoundPlayerService = null;

@@ -8,10 +8,6 @@ import android.util.Log;
 
 import com.bugsnag.android.Bugsnag;
 
-import org.acra.ACRA;
-import org.acra.ACRAConfiguration;
-import org.acra.ACRAConfigurationException;
-import org.acra.ReportingInteractionMode;
 import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.SoundWaves;
 
