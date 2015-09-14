@@ -162,9 +162,9 @@ dependencies {
     // Espresso
 
     // https://developer.android.com/training/testing/ui-testing/espresso-testing.html
-    androidTestCompile 'com.android.support.test:runner:0.2'
-    androidTestCompile 'com.android.support.test:rules:0.2'
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.1') {
+    androidTestCompile 'com.android.support.test:runner:0.3'
+    androidTestCompile 'com.android.support.test:rules:0.3'
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2') {
         //exclude group: 'javax.inject'
         exclude group: 'com.google.code.findbugs'
         exclude group: 'com.android.support', module: 'support-annotations'
