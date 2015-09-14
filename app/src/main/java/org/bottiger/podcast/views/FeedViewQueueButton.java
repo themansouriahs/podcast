@@ -22,6 +22,7 @@ import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.service.PlayerService;
 
 /**
  * Created by apl on 19-04-2015.
@@ -129,9 +130,12 @@ public class FeedViewQueueButton extends PlayPauseImageView {
     @Override
     public synchronized void setEpisode(IEpisode argEpisode, LOCATION argLocation) {
         super.setEpisode(argEpisode, argLocation);
-        Playlist playlist = SoundWaves.sBoundPlayerService.getPlaylist();
-        if (playlist.contains(argEpisode)) {
-            cross(0);
+        PlayerService ps = SoundWaves.sBoundPlayerService;
+        if (ps != null) {
+            Playlist playlist = ps.getPlaylist();
+            if (playlist.contains(argEpisode)) {
+                cross(0);
+            }
         }
     }
 
