@@ -33,8 +33,12 @@ import android.os.Debug;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.imagepipeline.core.ImagePipeline;
 
 // Sliding
 public class MainActivity extends FragmentContainerActivity implements
@@ -305,9 +309,16 @@ public class MainActivity extends FragmentContainerActivity implements
 	public void onLowMemory() {
 		super.onLowMemory();
 		mInit = true;
+	}
 
-		log.debug("onLowMemory()");
-		// finish();
+	@Override
+	public void onTrimMemory(int level) {
+		super.onTrimMemory(level);
+		if (level >= TRIM_MEMORY_MODERATE ) {
+			// Clear fresco cache
+			ImagePipeline imagePipeline = Fresco.getImagePipeline();
+			imagePipeline.clearMemoryCaches();
+		}
 	}
 
 	/**
