@@ -113,7 +113,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
             //FrescoHelper.PalettePostProcessor postProcessor = new FrescoHelper.PalettePostProcessor(mActivity, image);
             //FrescoHelper.loadImageInto(viewHolder.mPodcastImage, image, postProcessor);
-            Glide.with(mActivity).load(image).asBitmap().into(new BitmapImageViewTarget(viewHolder.mPodcastImage) {
+            Glide.with(mActivity).load(image).asBitmap().centerCrop().into(new BitmapImageViewTarget(viewHolder.mPodcastImage) {
                 @Override
                 protected void setResource(Bitmap resource) {
                     RoundedBitmapDrawable circularBitmapDrawable =

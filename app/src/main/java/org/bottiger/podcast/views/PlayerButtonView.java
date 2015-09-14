@@ -80,7 +80,6 @@ public class PlayerButtonView extends ImageButton implements PaletteListener  {
 
         baseColorPaint = new Paint(Paint.LINEAR_TEXT_FLAG);
         baseColorPaint.setColor(mBackgroundColor);
-        baseColorPaint.setColor(-1761607680);
         baseColorPaint.setTextSize(12.0F);
         baseColorPaint.setStyle(Paint.Style.FILL_AND_STROKE); // Paint.Style.STROKE
         baseColorPaint.setStrokeWidth(10F);

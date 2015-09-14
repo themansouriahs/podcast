@@ -115,7 +115,7 @@ public class SubscriptionGridCursorAdapter extends CursorRecyclerAdapter {
 
             //FrescoHelper.PalettePostProcessor postProcessor = new FrescoHelper.PalettePostProcessor(mActivity, image);
             //FrescoHelper.loadImageInto(holder.image, image, postProcessor);
-            Glide.with(mActivity).load(image).into(holder.image);
+            Glide.with(mActivity).load(image).centerCrop().into(holder.image);
 
         }
 

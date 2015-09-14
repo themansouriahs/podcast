@@ -7,12 +7,16 @@ import org.bottiger.podcast.provider.SubscriptionLoader;
 import org.bottiger.podcast.utils.FragmentUtils;
 import org.bottiger.podcast.views.dialogs.DialogOPML;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.GridLayoutManager;
@@ -207,9 +211,14 @@ public class SubscriptionsFragment extends Fragment implements SharedPreferences
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_import: {
-                DialogOPML dialogOPML = new DialogOPML();
-                Dialog dialog = dialogOPML.onCreateDialog(getActivity());
-                dialog.show();
+
+                try {
+                    TopActivity topActivity = (TopActivity) getActivity();
+                    openImportExportDialog(topActivity);
+                } catch (ClassCastException cce) {
+                    Log.wtf(TAG, "Activity (" + getActivity().getClass().getName() + ") could not be cast to TopActivity." +
+                            "This is needed in order to requets filesystem permission. Exception: " + cce.toString()); // NoI18N
+                }
             }
             case R.id.menu_refresh_all_subscriptions: {
                 SoundWaves.sSubscriptionRefreshManager.refreshAll();
@@ -272,5 +281,40 @@ public class SubscriptionsFragment extends Fragment implements SharedPreferences
             }
             return;
         }
+    }
+
+    public static void openImportExportDialog(@NonNull TopActivity argActivity) {
+
+        if (!checkPermission(argActivity))
+            return;
+
+        DialogOPML dialogOPML = new DialogOPML();
+        Dialog dialog = dialogOPML.onCreateDialog(argActivity);
+        dialog.show();
+    }
+
+    /**
+     *
+     * @return True if the permissions are granted
+     */
+    private static boolean checkPermission(@NonNull TopActivity argActivity) {
+        if (Build.VERSION.SDK_INT >= 23 &&
+                (argActivity.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
+                        argActivity.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)  != PackageManager.PERMISSION_GRANTED)) {
+            // TODO: Consider calling
+            //    public void requestPermissions(@NonNull String[] permissions, int requestCode)
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for Activity#requestPermissions for more details.
+            argActivity.requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    TopActivity.PERMISSION_TO_IMPORT_EXPORT);
+
+            return false;
+        }
+
+        return true;
     }
 }

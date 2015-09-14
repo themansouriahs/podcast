@@ -422,7 +422,11 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         super.onPause();
         //SoundWaves.getBus().unregister(this);
         if (mPlaylist != null && mPlaylist.getItem(0) != null){
-            SoundWaves.getBus().unregister(mPlayerDownloadButton);
+            try {
+                SoundWaves.getBus().unregister(mPlayerDownloadButton);
+            } catch ( Exception e) {
+
+            }
         }
     }
 

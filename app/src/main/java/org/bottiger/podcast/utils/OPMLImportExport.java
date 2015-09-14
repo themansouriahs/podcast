@@ -13,65 +13,64 @@ import java.util.List;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.TopActivity;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
-import org.bottiger.podcast.flavors.Analytics.VendorAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.parser.opml.OpmlElement;
 import org.bottiger.podcast.parser.opml.OpmlReader;
 import org.bottiger.podcast.parser.opml.OpmlWriter;
 import org.bottiger.podcast.provider.DatabaseHelper;
-import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionLoader;
 import org.xmlpull.v1.XmlPullParserException;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.res.Resources;
+import android.support.annotation.NonNull;
+import android.support.annotation.RequiresPermission;
 import android.support.v4.util.LongSparseArray;
 import android.util.Log;
-import android.util.SparseArray;
 import android.widget.Toast;
 
 public class OPMLImportExport {
 
-	public static final String filename = "podcasts.opml";
-    public static final String filenameOut = "podcasts_export.opml";
+	private static final String filename = "podcasts.opml";
+	private static final String filenameOut = "podcasts_export.opml";
 
-	public static File file;
-    public static File fileOut;
-	private static CharSequence opmlNotFound;
-    private static CharSequence opmlFailedToExport;
-    private static CharSequence opmlSuccesfullyExported;
+	public File file;
+	public File fileOut;
+	private CharSequence opmlNotFound;
+	private CharSequence opmlFailedToExport;
+	private CharSequence opmlSuccesfullyExported;
 
-	private static String nSubscriptionsImported;
-
-	private Context mContext;
+	private Activity mActivity;
 	private ContentResolver contentResolver;
 	private DatabaseHelper mUpdater = new DatabaseHelper();
 
-	public OPMLImportExport(Context context) {
-		this.mContext = context;
+    @RequiresPermission(allOf = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE})
+	public OPMLImportExport(Activity context) {
+		this.mActivity = context;
 		this.contentResolver = context.getContentResolver();
 
-        Resources res = mContext.getResources();
-        opmlNotFound = String.format(res.getString(R.string.opml_not_found), filename);
-        opmlFailedToExport = res.getString(R.string.opml_export_failed);
-        opmlSuccesfullyExported = String.format(res.getString(R.string.opml_export_succes), fileOut);
-
-		try {
-			file = new File(SDCardManager.getSDCardDir() + "/" + filename);
-			fileOut = new File(SDCardManager.getExportDir() + "/" + filenameOut);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		Resources res = mActivity.getResources();
+		opmlNotFound = String.format(res.getString(R.string.opml_not_found), filename);
+		opmlFailedToExport = res.getString(R.string.opml_export_failed);
+		opmlSuccesfullyExported = String.format(res.getString(R.string.opml_export_succes), fileOut);
 	}
 
 	public int importSubscriptions() {
 		int numImported = 0;
 		BufferedReader reader;
+
+		if (!initInputOutputFiles()) {
+			return 0;
+		}
+
 		try {
 			reader = new BufferedReader(new FileReader(file));
 
@@ -91,7 +90,7 @@ public class OPMLImportExport {
 		}
 
 		if (numImported > 0) {
-            Resources res = mContext.getResources();
+			Resources res = mActivity.getResources();
             String formattedString = res.getQuantityString(R.plurals.subscriptions_imported, numImported, numImported);
             toastMsg(formattedString);
             SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.OPML_IMPORT);
@@ -119,7 +118,7 @@ public class OPMLImportExport {
 				subscription.url = url;
 				if (title != null && !title.equals(""))
 					subscription.setTitle(title);
-				subscription.subscribe(mContext);
+				subscription.subscribe(mActivity);
 				isAdded = true;
 			} else if (subscription.getStatus() == Subscription.STATUS_UNSUBSCRIBED) {
 				subscription.status = Subscription.STATUS_SUBSCRIBED;
@@ -138,7 +137,7 @@ public class OPMLImportExport {
             mUpdater.commit(contentResolver);
 
             for (Subscription insertedSubscription : importedSubscriptions) {
-                insertedSubscription.refreshAsync(mContext);
+                insertedSubscription.refreshAsync(mActivity);
             }
         }
 
@@ -148,8 +147,8 @@ public class OPMLImportExport {
 	private void toastMsg(final CharSequence msg) {
         Activity activity = null;
 
-        if (mContext instanceof Activity) {
-            activity = (Activity)mContext;
+        if (mActivity instanceof Activity) {
+            activity = (Activity) mActivity;
         }
 
         if (activity == null) return;
@@ -158,12 +157,17 @@ public class OPMLImportExport {
             @Override
             public void run() {
                 int duration = Toast.LENGTH_LONG;
-                Toast.makeText(mContext, msg, duration).show();
+                Toast.makeText(mActivity, msg, duration).show();
             }
         });
 	}
 
     public void exportSubscriptions() {
+
+        if (!initInputOutputFiles()) {
+            return;
+        }
+
         FileWriter fileWriter = null;
 
         try {
@@ -207,5 +211,32 @@ public class OPMLImportExport {
 		}
 
 		return sw.toString();
+	}
+
+    @NonNull
+    public static String getFilename() {
+        return filename;
+    }
+
+	/**
+	 *
+	 * @return true if everything is OK. Returns false if there was an IOException
+	 * @throws SecurityException
+	 */
+	@RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+	private boolean initInputOutputFiles() throws SecurityException {
+
+		if (file != null && fileOut != null)
+			return true;
+
+		try {
+			file = new File(SDCardManager.getSDCardDir() + "/" + filename);
+			fileOut = new File(SDCardManager.getExportDir() + "/" + filenameOut);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+
+		return true;
 	}
 }

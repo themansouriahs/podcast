@@ -27,6 +27,7 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -102,7 +103,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
     private RelativeLayout mPlayerButtons;
     private int mPlayerButtonsHeight = -1;
 
-    private RelativeLayout mLayout;
+    private TopPlayer mLayout;
     private ImageButton mExpandEpisode;
     private View mGradient;
     private View mEpisodeText;
@@ -213,7 +214,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
     protected void onFinishInflate() {
         super.onFinishInflate();
 
-        mLayout = (RelativeLayout) findViewById(R.id.session_photo_container);
+        mLayout = (TopPlayer) findViewById(R.id.session_photo_container);
 
         mPlayerControlsLinearLayout = (PlayerRelativeLayout)findViewById(R.id.expanded_controls);
 
@@ -621,10 +622,10 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         //mPhoto.getLayoutParams().height = mPhoto.getWidth();
 
         // Main player layout
-        LinearLayout.LayoutParams paramCache = (LinearLayout.LayoutParams) mLayout.getLayoutParams();
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                RelativeLayout.LayoutParams.MATCH_PARENT,
-                RelativeLayout.LayoutParams.MATCH_PARENT);
+        //CoordinatorLayout.LayoutParams paramCache = (CoordinatorLayout.LayoutParams) mLayout.getLayoutParams();
+        CoordinatorLayout.LayoutParams layoutParams = new CoordinatorLayout.LayoutParams(
+                LayoutParams.MATCH_PARENT,
+                LayoutParams.MATCH_PARENT);
         mLayout.setLayoutParams(layoutParams);
 
     }
@@ -634,7 +635,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         mFullscreenButton.setImageResource(R.drawable.ic_fullscreen_white);
 
         // Main player layout
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+        CoordinatorLayout.LayoutParams layoutParams = new CoordinatorLayout.LayoutParams(
                 LayoutParams.MATCH_PARENT,
                 sizeLarge);
         mLayout.setLayoutParams(layoutParams);

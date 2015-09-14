@@ -33,40 +33,49 @@ public class SDCardManager {
         return android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED);
     }
 
-    public static boolean getSDCardStatusAndCreate() {
+    @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    public static boolean getSDCardStatusAndCreate() throws SecurityException {
         boolean b = getSDCardStatus();
         if (b)
             createDir();
         return b;
     }
 
-    public static String getExportDir() throws IOException {
+    @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+    public static String getExportDir() throws IOException, SecurityException {
         return getSDCardDir() + APP_DIR + EXPORT_DIR;
     }
 
-	public static String getDownloadDir() throws IOException {
+    @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+	public static String getDownloadDir() throws IOException, SecurityException {
 		return getSDCardDir() + DOWNLOAD_DIR;
 	}
-	
-	public static String getTmpDir() throws IOException {
+
+    @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+	public static String getTmpDir() throws IOException, SecurityException {
 		return getSDCardDir() + APP_DIR + TMP_DIR;
 	}
-	
-	public static File getCacheDir() throws IOException {
+
+    @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+	public static File getCacheDir() throws IOException, SecurityException {
 		return  returnDir(getSDCardDir() + APP_DIR + CACHE_DIR);
 	}
-	
-	public static File getThumbnailCacheDir() throws IOException {
+
+    @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+	public static File getThumbnailCacheDir() throws IOException, SecurityException {
 		return  returnDir(getSDCardDir() + APP_DIR + CACHE_DIR + THUMBNAIL_CACHE);
 	}
-	
-	private static File returnDir(String path) {
+
+    @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+	private static File returnDir(String path) throws IOException {
 		File dir = new File(path);
-		if (!dir.exists()) dir.mkdir();
+		if (!dir.exists() && !dir.mkdir()) {
+            throw new IOException("Could not create folder: " + dir.toString()); // NoI18N
+        }
 		return dir;		
 	}
 
-	@RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
     public static String getSDCardDir() throws IOException {
 
         if (sSDCardDirCache != null) {
@@ -109,8 +118,8 @@ public class SDCardManager {
 	}
 
 
-	private static boolean createDir()
-	{
+    @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+	private static boolean createDir() throws SecurityException {
         File file = null;
         try {
             file = new File(getDownloadDir());
@@ -118,9 +127,9 @@ public class SDCardManager {
             return false;
         }
         boolean exists = (file.exists());
-		if (!exists) {
-			return file.mkdirs();
-		}
+        if (!exists) {
+            return file.mkdirs();
+        }
 
         try {
             file = new File(getExportDir());
@@ -128,13 +137,12 @@ public class SDCardManager {
             return false;
         }
         exists = (file.exists());
-		if (!exists) {
-			return file.mkdirs();
-		}		
-		return true;
-	}	
-	
-	public static String pathFromFilename(FeedItem item) throws IOException {
+
+        return exists || file.mkdirs();
+    }
+
+    @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+	public static String pathFromFilename(FeedItem item) throws IOException, SecurityException {
 		if (item.getFilename() == null || item.getFilename().equals("")) {
 			return "";
 		} else {
@@ -142,21 +150,23 @@ public class SDCardManager {
 		}
 	}
 	
-	public static String pathTmpFromFilename(FeedItem item) throws IOException {
+	public static String pathTmpFromFilename(FeedItem item) throws IOException, SecurityException {
 		if (item.getFilename() == null || item.getFilename().equals("")) {
 			return "";
 		} else {
 			return pathTmpFromFilename(item.getFilename());
 		}
 	}
-	
-	public static String pathTmpFromFilename(String item) throws IOException {
+
+    @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+	public static String pathTmpFromFilename(String item) throws IOException, SecurityException {
 		String folder = SDCardManager.getTmpDir();
 		returnDir(folder);
 		return folder + "/" + item;
 	}
-	
-	public static String pathFromFilename(String item) throws IOException {
+
+    @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+	public static String pathFromFilename(String item) throws IOException, SecurityException {
 		String folder = SDCardManager.getDownloadDir();
 		returnDir(folder);
 		return folder + "/" + item;

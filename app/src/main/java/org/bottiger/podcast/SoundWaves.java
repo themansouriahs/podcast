@@ -53,6 +53,10 @@ public class SoundWaves extends Application {
 
     private static Bus sBus = new Bus(ThreadEnforcer.MAIN);
 
+    public static class PlayerServiceBound {
+        public boolean isConnected;
+    }
+
     public static PlayerService sBoundPlayerService = null; // deprecated
     public ServiceConnection playerServiceConnection = new ServiceConnection() {
         @Override
@@ -60,7 +64,9 @@ public class SoundWaves extends Application {
             Log.d("PlayerService", "onServiceConnected");
             sBoundPlayerService = ((PlayerService.PlayerBinder) service)
                     .getService();
-            //sBoundPlayerService.setMediaCast(mMediaRouteCast); FIXME reenable
+            PlayerServiceBound playerServiceBound = new PlayerServiceBound();
+            playerServiceBound.isConnected = true;
+            sBus.post(playerServiceBound);
         }
 
         @Override
