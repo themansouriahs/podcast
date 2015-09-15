@@ -2,13 +2,14 @@ package org.bottiger.podcast.service.Downloader;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Observable;
 
 import org.apache.commons.io.FileUtils;
-import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.TopActivity;
@@ -40,21 +41,48 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
 public class EpisodeDownloadManager extends Observable {
 
-    public static final String DEBUG_KEY = "EpisodeDownload";
+    public static final String TAG = "EpisodeDownload";
     private static final boolean DOWNLOAD_WIFI_ONLY = false;
     private static final boolean DOWNLOAD_AUTOMATICALLY = false;
 
     public static boolean isDownloading = false;
 
-    public enum RESULT { OK, NO_STORAGE, OUT_OF_STORAGE, NO_CONNECTION, NEED_PERMISSION }
-    public enum QUEUE_POSITION { FIRST, LAST, ANYWHERE}
-    public enum NETWORK_STATE { OK, RESTRICTED, DISCONNECTED }
-	public enum ACTION { REFRESH_SUBSCRIPTION, STREAM_EPISODE, DOWNLOAD_MANUALLY, DOWNLOAD_AUTOMATICALLY }
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({OK, NO_STORAGE, OUT_OF_STORAGE, NO_CONNECTION, NEED_PERMISSION})
+    public @interface Result {}
+    public static final int OK = 1;
+    public static final int NO_STORAGE = 2;
+    public static final int OUT_OF_STORAGE = 3;
+    public static final int NO_CONNECTION = 4;
+    public static final int NEED_PERMISSION = 5;
+
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({FIRST, LAST, ANYWHERE})
+    public @interface QueuePosition {}
+    public static final int FIRST = 1;
+    public static final int LAST = 2;
+    public static final int ANYWHERE = 3;
+
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({NETWORK_OK, NETWORK_RESTRICTED, NETWORK_DISCONNECTED})
+    public @interface NetworkState {}
+    public static final int NETWORK_OK = 1;
+    public static final int NETWORK_RESTRICTED = 2;
+    public static final int NETWORK_DISCONNECTED = 3;
+
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({ACTION_REFRESH_SUBSCRIPTION, ACTION_STREAM_EPISODE, ACTION_DOWNLOAD_MANUALLY, ACTION_DOWNLOAD_AUTOMATICALLY})
+    public @interface Action {}
+    public static final int ACTION_REFRESH_SUBSCRIPTION = 1;
+    public static final int ACTION_STREAM_EPISODE = 2;
+    public static final int ACTION_DOWNLOAD_MANUALLY = 3;
+    public static final int ACTION_DOWNLOAD_AUTOMATICALLY = 3;
 
     private static SharedPreferences sSharedPreferences;
 
@@ -79,7 +107,7 @@ public class EpisodeDownloadManager extends Observable {
             try {
                 intent.setData(Uri.fromFile(new File(item.getAbsolutePath())));
             } catch (IOException e) {
-                Log.w(DEBUG_KEY, "Could not add file to media scanner"); // NoI18N
+                Log.w(TAG, "Could not add file to media scanner"); // NoI18N
                 e.printStackTrace();
             }
             mContext.sendBroadcast(intent);
@@ -89,6 +117,9 @@ public class EpisodeDownloadManager extends Observable {
             removeDownloadingEpisode(argEpisode);
             removeExpiredDownloadedPodcasts(mContext);
             removeTmpFolderCruft();
+
+            // clear the reference
+            item = null;
 
             startDownload(mContext);
         }
@@ -106,7 +137,7 @@ public class EpisodeDownloadManager extends Observable {
      * @return
      */
 	public static DownloadStatus getStatus(IEpisode argEpisode) {
-        Log.d(DEBUG_KEY, "getStatus(): " + argEpisode);
+        Log.d(TAG, "getStatus(): " + argEpisode);
 
 		if (argEpisode == null) {
             return DownloadStatus.NOTHING;
@@ -144,7 +175,7 @@ public class EpisodeDownloadManager extends Observable {
 	 *
 	 * @param argContext
 	 */
-	public static synchronized RESULT startDownload(@NonNull final Context argContext) {
+	public static synchronized @Result int startDownload(@NonNull final Context argContext) {
 
         if (mContext == null) {
             mContext = argContext;
@@ -155,7 +186,7 @@ public class EpisodeDownloadManager extends Observable {
                  mContext.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)  != PackageManager.PERMISSION_GRANTED)) {
 
             if (!(mContext instanceof Activity))
-                return RESULT.NEED_PERMISSION;
+                return NEED_PERMISSION;
 
             TopActivity activity = (TopActivity)mContext;
 
@@ -173,7 +204,7 @@ public class EpisodeDownloadManager extends Observable {
             // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
             // app-defined int constant
 
-            return RESULT.NEED_PERMISSION;
+            return NEED_PERMISSION;
         }
 
         if (sSharedPreferences == null) {
@@ -183,11 +214,11 @@ public class EpisodeDownloadManager extends Observable {
 
 		// Make sure we have access to external storage
 		if (!SDCardManager.getSDCardStatusAndCreate()) {
-			return RESULT.NO_STORAGE;
+			return NO_STORAGE;
 		}
 
-		if (updateConnectStatus(argContext) != NETWORK_STATE.OK) {
-			return RESULT.NO_CONNECTION;
+		if (updateConnectStatus(argContext) != NETWORK_OK) {
+			return NO_CONNECTION;
 		}
 
 		downloadManager = (DownloadManager) argContext
@@ -259,7 +290,7 @@ public class EpisodeDownloadManager extends Observable {
         }
 
 
-        return RESULT.OK;
+        return OK;
 	}
 
     public static void removeDownloadingEpisode(IEpisode argEpisode) {
@@ -300,10 +331,10 @@ public class EpisodeDownloadManager extends Observable {
         try {
             tmpFolder = SDCardManager.getTmpDir();
         } catch (IOException e) {
-            Log.w(DEBUG_KEY, "Could not access tmp storage. removeTmpFolderCruft() returns without success"); // NoI18N
+            Log.w(TAG, "Could not access tmp storage. removeTmpFolderCruft() returns without success"); // NoI18N
             return false;
         }
-        Log.d(DEBUG_KEY, "Cleaning tmp folder: " + tmpFolder); // NoI18N
+        Log.d(TAG, "Cleaning tmp folder: " + tmpFolder); // NoI18N
         File dir = new File(tmpFolder);
         if(dir.exists() && dir.isDirectory()) {
             try {
@@ -407,17 +438,17 @@ public class EpisodeDownloadManager extends Observable {
 		}
 	}
 
-    public static boolean canPerform(ACTION argAction, @NonNull Context argContext) {
-        Log.d(DEBUG_KEY, "canPerform: " + argAction);
+    public static boolean canPerform(@Action int argAction, @NonNull Context argContext) {
+        Log.d(TAG, "canPerform: " + argAction);
 
         if (sSharedPreferences == null) {
             sSharedPreferences = PreferenceManager
                     .getDefaultSharedPreferences(argContext);
         }
 
-        NETWORK_STATE networkState = updateConnectStatus(argContext);
+        @NetworkState int networkState = updateConnectStatus(argContext);
 
-        if (networkState == NETWORK_STATE.DISCONNECTED)
+        if (networkState == NETWORK_DISCONNECTED)
             return false;
 
         Resources resources = argContext.getResources();
@@ -428,28 +459,28 @@ public class EpisodeDownloadManager extends Observable {
         boolean wifiOnly = sSharedPreferences.getBoolean(only_wifi_key, DOWNLOAD_WIFI_ONLY);
         boolean automaticDownload = sSharedPreferences.getBoolean(automatic_download_key, DOWNLOAD_AUTOMATICALLY);
 
-        if (argAction == ACTION.DOWNLOAD_AUTOMATICALLY) {
+        if (argAction == ACTION_DOWNLOAD_AUTOMATICALLY) {
             if (!automaticDownload)
                 return false;
 
             if (wifiOnly)
-                return networkState == NETWORK_STATE.OK;
+                return networkState == NETWORK_OK;
             else
-                return networkState == NETWORK_STATE.OK || networkState == NETWORK_STATE.RESTRICTED;
+                return networkState == NETWORK_OK || networkState == NETWORK_RESTRICTED;
         }
 
-        if (    argAction == ACTION.STREAM_EPISODE ||
-                argAction == ACTION.REFRESH_SUBSCRIPTION ||
-                argAction == ACTION.DOWNLOAD_MANUALLY) {
-            return networkState == NETWORK_STATE.OK || networkState == NETWORK_STATE.RESTRICTED;
+        if (    argAction == ACTION_STREAM_EPISODE ||
+                argAction == ACTION_REFRESH_SUBSCRIPTION ||
+                argAction == ACTION_DOWNLOAD_MANUALLY) {
+            return networkState == NETWORK_OK || networkState == NETWORK_RESTRICTED;
         }
 
-        VendorCrashReporter.report(DEBUG_KEY, "canPerform defaults to false. Action: " + argAction);
+        VendorCrashReporter.report(TAG, "canPerform defaults to false. Action: " + argAction);
         return false; // FIXME this should never happen. Ensure we never get here
     }
 
-	protected static NETWORK_STATE updateConnectStatus(@NonNull Context argContext) {
-		Log.d(DEBUG_KEY, "updateConnectStatus");
+	protected static @NetworkState int updateConnectStatus(@NonNull Context argContext) {
+		Log.d(TAG, "updateConnectStatus");
 
         if (sSharedPreferences == null) {
             sSharedPreferences = PreferenceManager
@@ -460,17 +491,17 @@ public class EpisodeDownloadManager extends Observable {
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
 
         if (cm == null) {
-            return NETWORK_STATE.DISCONNECTED;
+            return NETWORK_DISCONNECTED;
         }
 
         NetworkInfo info = cm.getActiveNetworkInfo();
 
         if (info == null) {
-            return NETWORK_STATE.DISCONNECTED;
+            return NETWORK_DISCONNECTED;
         }
 
         if (!info.isConnected()) {
-            return NETWORK_STATE.DISCONNECTED;
+            return NETWORK_DISCONNECTED;
         }
 
         int networkType = info.getType();
@@ -480,7 +511,7 @@ public class EpisodeDownloadManager extends Observable {
             case ConnectivityManager.TYPE_WIFI:
             case ConnectivityManager.TYPE_WIMAX:
             case ConnectivityManager.TYPE_VPN:
-                return NETWORK_STATE.OK;
+                return NETWORK_OK;
             case ConnectivityManager.TYPE_MOBILE:
             case ConnectivityManager.TYPE_MOBILE_DUN:
             case ConnectivityManager.TYPE_MOBILE_HIPRI:
@@ -490,11 +521,11 @@ public class EpisodeDownloadManager extends Observable {
                 String only_wifi_key = resources.getString(R.string.pref_download_only_wifi_key);
                 boolean wifiOnly = sSharedPreferences.getBoolean(only_wifi_key, DOWNLOAD_WIFI_ONLY);
 
-                return wifiOnly ? NETWORK_STATE.RESTRICTED : NETWORK_STATE.OK;
+                return wifiOnly ? NETWORK_RESTRICTED : NETWORK_OK;
             }
         }
 
-        return NETWORK_STATE.OK;
+        return NETWORK_OK;
 	}
 
 	/**
@@ -544,14 +575,14 @@ public class EpisodeDownloadManager extends Observable {
 	/**
 	 * Add feeditem to the download queue
 	 */
-	public static synchronized void addItemToQueue(IEpisode argEpisode, QUEUE_POSITION argPosition) {
+	public static synchronized void addItemToQueue(IEpisode argEpisode, @QueuePosition int argPosition) {
         if (!(argEpisode instanceof FeedItem)) {
             return;
         }
 
 		QueueEpisode queueItem = new QueueEpisode((FeedItem)argEpisode);
 
-        if (argPosition == QUEUE_POSITION.ANYWHERE) {
+        if (argPosition == ANYWHERE) {
             if (!mDownloadQueue.contains(queueItem))
                 mDownloadQueue.add(queueItem);
 
@@ -562,9 +593,9 @@ public class EpisodeDownloadManager extends Observable {
             mDownloadQueue.remove(queueItem);
         }
 
-        if (argPosition == QUEUE_POSITION.FIRST) {
+        if (argPosition == FIRST) {
             mDownloadQueue.addFirst(queueItem);
-        } else if (argPosition == QUEUE_POSITION.LAST) {
+        } else if (argPosition == LAST) {
             mDownloadQueue.addLast(queueItem);
         }
 	}
@@ -574,7 +605,7 @@ public class EpisodeDownloadManager extends Observable {
 	 *
 	 * @param context
 	 */
-	public static void addItemAndStartDownload(@NonNull IEpisode item, @NonNull QUEUE_POSITION argPosition, @NonNull Context context) {
+	public static void addItemAndStartDownload(@NonNull IEpisode item, @NonNull @QueuePosition int argPosition, @NonNull Context context) {
         addItemToQueue(item, argPosition);
 		startDownload(context);
 	}

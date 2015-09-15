@@ -276,7 +276,7 @@ public class JSONFeedParserWrapper {
 					 * Download podcasts
 					 */
 					if (autoDownload && item != null) {
-						EpisodeDownloadManager.addItemToQueue(item, EpisodeDownloadManager.QUEUE_POSITION.LAST);
+						EpisodeDownloadManager.addItemToQueue(item, EpisodeDownloadManager.LAST);
 					}
 
 					subscription.fail_count = 0;

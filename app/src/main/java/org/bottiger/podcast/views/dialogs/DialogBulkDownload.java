@@ -131,7 +131,7 @@ public class DialogBulkDownload {
             boolean validDate = validDate(mAction, date);
 
             if (validDate) {
-                EpisodeDownloadManager.addItemToQueue(episode, EpisodeDownloadManager.QUEUE_POSITION.LAST);
+                EpisodeDownloadManager.addItemToQueue(episode, EpisodeDownloadManager.LAST);
             }
         }
 

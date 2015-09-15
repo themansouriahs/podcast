@@ -88,7 +88,7 @@ public class SubscriptionRefreshManager {
         Log.d(DEBUG_KEY, "refresh subscription: " + subscription + " (null => all)");
 
 
-        if (!EpisodeDownloadManager.canPerform(EpisodeDownloadManager.ACTION.REFRESH_SUBSCRIPTION, mContext)) {
+        if (!EpisodeDownloadManager.canPerform(EpisodeDownloadManager.ACTION_REFRESH_SUBSCRIPTION, mContext)) {
             Log.d(DEBUG_KEY, "refresh aborted, not allowed"); // NoI18N
             return;
         }
@@ -120,14 +120,14 @@ public class SubscriptionRefreshManager {
         final IDownloadCompleteCallback wrappedCallback = new IDownloadCompleteCallback() {
             @Override
             public void complete(boolean argSucces, ISubscription argSubscription) {
-                if (argSucces && EpisodeDownloadManager.canPerform(EpisodeDownloadManager.ACTION.DOWNLOAD_AUTOMATICALLY, argContext)) {
+                if (argSucces && EpisodeDownloadManager.canPerform(EpisodeDownloadManager.ACTION_DOWNLOAD_AUTOMATICALLY, argContext)) {
                     boolean startDownload = false;
                     Date tenMinutesAgo = new Date(System.currentTimeMillis() - (10 * 60 * 1000));
                     for (IEpisode episode : argSubscription.getEpisodes()) {
                         if (episode instanceof FeedItem) {
                             Date lastUpdate = new Date(((FeedItem)episode).getLastUpdate());
                             if (lastUpdate.after(tenMinutesAgo)) {
-                                EpisodeDownloadManager.addItemToQueue(episode, EpisodeDownloadManager.QUEUE_POSITION.FIRST);
+                                EpisodeDownloadManager.addItemToQueue(episode, EpisodeDownloadManager.FIRST);
                                 startDownload = true;
                             }
                         }

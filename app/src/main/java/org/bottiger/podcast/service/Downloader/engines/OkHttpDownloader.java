@@ -79,9 +79,11 @@ public class OkHttpDownloader extends DownloadEngineBase {
                         File tmpFIle = new File(episode.getAbsoluteTmpPath());
                         File finalFIle = new File(episode.getAbsolutePath());
 
-                        Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                        intent.setData(Uri.fromFile(finalFIle));
-                        SoundWaves.getAppContext().sendBroadcast(intent);
+                        // This seems to be done in the sDownloadCompleteCallback
+                        //
+                        //Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                        //intent.setData(Uri.fromFile(finalFIle));
+                        //SoundWaves.getAppContext().sendBroadcast(intent);
 
                         EpisodeDownloadManager.mDownloadingItem = null;
 
