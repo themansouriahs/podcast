@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.SparseArray;
+import android.webkit.MimeTypeMap;
 
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.OkUrlFactory;
@@ -36,7 +37,7 @@ public class OkHttpDownloader extends DownloadEngineBase {
     private HttpURLConnection mConnection;
     private final SparseArray<Callback> mExternalCallback = new SparseArray<>();
 
-    private URL mURL;
+    private final URL mURL;
 
     private double mProgress = 0;
 
@@ -58,8 +59,10 @@ public class OkHttpDownloader extends DownloadEngineBase {
                     if (mEpisode instanceof FeedItem) {
                         FeedItem episode = (FeedItem) mEpisode;
 
+                        String extension = MimeTypeMap.getFileExtensionFromUrl(mURL.toString());
+
                         String filename = Integer.toString(episode.getEpisodeNumber()) + episode.title.replace(' ', '_'); //Integer.toString(item.getEpisodeNumber()) + "_"
-                        episode.setFilename(filename + ".mp3"); // .replaceAll("[^a-zA-Z0-9_-]", "") +
+                        episode.setFilename(filename + "." + extension); // .replaceAll("[^a-zA-Z0-9_-]", "") +
 
                         double contentLength = mConnection.getContentLength();
                         InputStream inputStream = mConnection.getInputStream();

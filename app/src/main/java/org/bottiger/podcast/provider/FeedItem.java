@@ -17,6 +17,7 @@ import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.service.DownloadStatus;
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
+import org.bottiger.podcast.utils.BitMaskUtils;
 import org.bottiger.podcast.utils.PodcastLog;
 import org.bottiger.podcast.utils.SDCardManager;
 import org.json.simple.JSONObject;
@@ -46,7 +47,8 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 
 	private static final String TAG = "FeedItem";
 
-	public static final int MAX_DOWNLOAD_FAIL = 5;
+    // Se Subscription.java for details
+    private static final int IS_VIDEO = 1;
 
 	private final PodcastLog log = PodcastLog.getLog(getClass());
 	private static ItemLruCache cache = null;
@@ -161,9 +163,10 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	public int offset;
 
 	/**
-	 * Deprecated status from before forking
+	 * This was a deprecated status from before I forked the project.
+	 * Now I will use it as a bitmask for keeping track of episode specific status related things,
+	 * like "is this episode a video or not"
 	 */
-	@Deprecated
 	public int status;
 
 	@Deprecated
@@ -479,6 +482,8 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
         if (lastUpdate > 0)
             cv.put(ItemColumns.LAST_UPDATE, lastUpdate);
 
+        if (status > 0)
+            cv.put(ItemColumns.STATUS, status);
         if (listened >= 0)
             cv.put(ItemColumns.LISTENED, listened);
 
@@ -598,6 +603,9 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 			if (duration_ms > 0) {
 				cv.put(ItemColumns.DURATION_MS, duration_ms);
 			}
+            if (status >= 0) {
+                cv.put(ItemColumns.STATUS, status);
+            }
 			if (sub_title != null) {
 				cv.put(ItemColumns.SUB_TITLE, sub_title);
 			}
@@ -749,9 +757,11 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 		item.episodeNumber = cursor.getInt(cursor
 				.getColumnIndex(ItemColumns.EPISODE_NUMBER));
 		item.duration_string = cursor.getString(cursor
-				.getColumnIndex(ItemColumns.DURATION));
+                .getColumnIndex(ItemColumns.DURATION));
 		item.duration_ms = cursor.getLong(cursor
-				.getColumnIndex(ItemColumns.DURATION_MS));
+                .getColumnIndex(ItemColumns.DURATION_MS));
+        item.status = cursor.getInt(cursor
+                .getColumnIndex(ItemColumns.STATUS));
 		item.lastUpdate = cursor.getLong(cursor
 				.getColumnIndex(ItemColumns.LAST_UPDATE));
 		item.sub_title = cursor.getString(cursor
@@ -1431,4 +1441,25 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	public void setLink(String href) {
 		this.url = href;
 	}
+
+    public boolean isVideo() {
+        if (!BitMaskUtils.IsBitmaskInitialized(status))
+            return false;
+
+        return IsSettingEnabled(IS_VIDEO);
+    }
+
+    public void setIsVideo(boolean argIsVideo) {
+        status = status < 0 ? 0 : status;
+        status |= IS_VIDEO;
+
+        if (argIsVideo)
+            status |= IS_VIDEO;
+        else
+            status &= ~IS_VIDEO;
+    }
+
+    private boolean IsSettingEnabled(int setting) {
+        return BitMaskUtils.IsBitSet(status, setting);
+    }
 }

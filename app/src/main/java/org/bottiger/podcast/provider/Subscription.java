@@ -11,6 +11,7 @@ import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
+import org.bottiger.podcast.utils.BitMaskUtils;
 import org.bottiger.podcast.utils.ColorExtractor;
 
 import android.content.ContentProviderOperation;
@@ -561,7 +562,8 @@ public class Subscription implements ISubscription, PaletteListener {
 	}
 
 	private boolean IsSettingEnabled(int setting) {
-		return mSettings > 0 && ((setting & mSettings) != 0);
+		//return mSettings > 0 && ((setting & mSettings) != 0);
+		return BitMaskUtils.IsBitSet(mSettings, setting);
 	}
 
 	private boolean getApplicationValue(int argId, boolean argDefault) {

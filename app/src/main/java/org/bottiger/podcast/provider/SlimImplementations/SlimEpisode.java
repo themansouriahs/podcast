@@ -99,6 +99,16 @@ public class SlimEpisode implements IEpisode, Parcelable {
     public boolean isMarkedAsListened() { return false; }
 
     @Override
+    public boolean isVideo() {
+        return false;
+    }
+
+    @Override
+    public void setIsVideo(boolean argIsVideo) {
+
+    }
+
+    @Override
     public void setTitle(@NonNull String argTitle) {
         mTitle = argTitle;
     }

@@ -46,6 +46,9 @@ public interface IEpisode {
     boolean isDownloaded();
     boolean isMarkedAsListened();
 
+    boolean isVideo();
+    void setIsVideo(boolean argIsVideo);
+
     void update(ContentResolver contentResolver);
 
 }

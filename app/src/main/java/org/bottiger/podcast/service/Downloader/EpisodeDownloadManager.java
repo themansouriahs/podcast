@@ -44,6 +44,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
 
 public class EpisodeDownloadManager extends Observable {
 
@@ -52,6 +53,8 @@ public class EpisodeDownloadManager extends Observable {
     private static final boolean DOWNLOAD_AUTOMATICALLY = false;
 
     public static boolean isDownloading = false;
+
+    private static final String MIME_VIDEO = "video";
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({OK, NO_STORAGE, OUT_OF_STORAGE, NO_CONNECTION, NEED_PERMISSION})
@@ -96,11 +99,28 @@ public class EpisodeDownloadManager extends Observable {
 
 	private static DownloadManager downloadManager;
 
+    private static String getMimeType(String fileUrl) {
+        String extension = MimeTypeMap.getFileExtensionFromUrl(fileUrl);
+        return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+    }
+
     private static IDownloadEngine.Callback sDownloadCompleteCallback = new IDownloadEngine.Callback() {
         @Override
         public void downloadCompleted(IEpisode argEpisode) {
             FeedItem item = (FeedItem) argEpisode;
             item.setDownloaded(true);
+
+            String mimetype = null;
+            try {
+                mimetype = getMimeType(item.getAbsolutePath());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            if (mimetype != null && mimetype.toLowerCase().contains(MIME_VIDEO)) {
+                item.setIsVideo(true);
+            }
+
             item.update(mContext.getContentResolver());
 
             Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
@@ -110,6 +130,8 @@ public class EpisodeDownloadManager extends Observable {
                 Log.w(TAG, "Could not add file to media scanner"); // NoI18N
                 e.printStackTrace();
             }
+
+
             mContext.sendBroadcast(intent);
 
             Playlist.refresh(mContext);
