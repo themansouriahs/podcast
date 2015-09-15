@@ -1,7 +1,6 @@
 package org.bottiger.podcast.utils;
 
 import org.bottiger.podcast.PodcastBaseFragment.OnItemSelectedListener;
-import org.bottiger.podcast.adapters.SubscriptionGridCursorAdapter;
 import org.bottiger.podcast.provider.FeedItem;
 
 import android.app.Activity;
@@ -122,8 +121,8 @@ public class FragmentUtils {
 			mAdapter = getAdapter(wrapped_cursor);
 
             /*
-            if (mAdapter instanceof SubscriptionGridCursorAdapter) {
-                ((SubscriptionGridCursorAdapter)mAdapter).notifyChange(wrapped_cursor);
+            if (mAdapter instanceof SubscriptionCursorAdapter) {
+                ((SubscriptionCursorAdapter)mAdapter).notifyChange(wrapped_cursor);
             }*/
 
 			mAdapter.changeCursor(wrapped_cursor);

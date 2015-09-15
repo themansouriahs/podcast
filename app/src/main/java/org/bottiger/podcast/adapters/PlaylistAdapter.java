@@ -7,6 +7,7 @@ import org.apache.commons.validator.routines.UrlValidator;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.ToolbarActivity;
 import org.bottiger.podcast.adapters.viewholders.ExpandableViewHoldersUtil;
 import org.bottiger.podcast.images.FrescoHelper;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
@@ -18,6 +19,7 @@ import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.PaletteHelper;
+import org.bottiger.podcast.utils.SharedAdapterUtils;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.ThemeHelper;
 import org.bottiger.podcast.views.PlayPauseImageView;
@@ -26,6 +28,7 @@ import org.bottiger.podcast.views.PlaylistViewHolder;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
@@ -104,6 +107,19 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
             // This should only happen if the playlist only contain 1 item
             return;
         }
+
+        /*
+        int left = viewHolder.mLayout.getPaddingLeft();
+        int right = viewHolder.mLayout.getPaddingRight();
+        int top = viewHolder.mLayout.getPaddingTop();
+        int bottom = viewHolder.mLayout.getPaddingTop();
+
+        Resources resources = viewHolder.mLayout.getResources();
+        int newBottomPadding = position == getItemCount()-1 ? ToolbarActivity.getNavigationBarHeight(resources) : 0;
+
+        viewHolder.mLayout.setContentPadding(left, top, right, newBottomPadding);
+        */
+        SharedAdapterUtils.AddPaddingToLastElement(viewHolder.mLayout, 0, position == getItemCount()-1);
 
         viewHolder.setArtwork(null);
 

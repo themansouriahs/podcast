@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.Scroller;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.ToolbarActivity;
 
 /**
  * Created by aplb on 08-09-2015.
@@ -27,7 +28,7 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
     private TopPlayer mTopPlayer;
     private RecyclerView mRecyclerView;
 
-
+    private int mRecyclerViewBottomPadding;
 
     private static final int DOWN = -1;
     private static final int UP = 1;
@@ -39,14 +40,6 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
 
     @Override
     public boolean onInterceptTouchEvent(CoordinatorLayout parent, View child, MotionEvent ev) {
-        if (mTopPlayer == null) {
-            mTopPlayer = (TopPlayer) parent.findViewById(R.id.session_photo_container);
-        }
-
-        if (mRecyclerView == null) {
-            mRecyclerView = (RecyclerView) parent.findViewById(R.id.my_recycler_view);
-        }
-
         return false;
     }
 
@@ -60,6 +53,7 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
 
         if (mRecyclerView == null) {
             mRecyclerView = (RecyclerView) parent.findViewById(R.id.my_recycler_view);
+            mRecyclerViewBottomPadding = mRecyclerView.getPaddingBottom();
         }
 
         int height = mTopPlayer.getLayoutParams().height;
@@ -81,6 +75,12 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
         Log.d(TAG, "onDependentViewChanged, child: " + child.getClass().getName() + " dependency: " + dependency.getClass().getName());
         int height = mTopPlayer.getLayoutParams().height;
         mRecyclerView.setTranslationY(height);
+
+        int left = mRecyclerView.getPaddingLeft();
+        int right = mRecyclerView.getPaddingRight();
+        int top = mRecyclerView.getPaddingTop();
+
+        mRecyclerView.setPadding(left, top, right, mRecyclerViewBottomPadding+height);
         return true;
     }
 

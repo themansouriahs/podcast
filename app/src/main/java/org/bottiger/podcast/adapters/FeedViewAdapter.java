@@ -26,6 +26,7 @@ import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.utils.PaletteHelper;
+import org.bottiger.podcast.utils.SharedAdapterUtils;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.views.DownloadButtonView;
@@ -95,6 +96,8 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
         int dataPosition = getDatasetPosition(position);
         final IEpisode item = getItemForPosition(dataPosition);
         final EpisodeViewHolder episodeViewHolder = (EpisodeViewHolder) viewHolder;
+
+        SharedAdapterUtils.AddPaddingToLastElement(((EpisodeViewHolder) viewHolder).mContainer, 0, position == getItemCount()-1);
 
 
         episodeViewHolder.mText.setText(item.getTitle());

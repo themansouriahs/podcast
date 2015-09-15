@@ -121,7 +121,7 @@ public class ToolbarActivity extends TopActivity {
             @Override
             public void onAnimationUpdate(ValueAnimator animator) {
                 //textView.setBackgroundColor((Integer)animator.getAnimatedValue());
-                Integer alphaValue = (Integer)animator.getAnimatedValue();
+                Integer alphaValue = (Integer) animator.getAnimatedValue();
 
                 mToolbar.getBackground().mutate().setAlpha(alphaValue);
                 mPagerTitleStrip.getBackground().mutate().setAlpha(alphaValue);
@@ -132,6 +132,15 @@ public class ToolbarActivity extends TopActivity {
         });
         mColorAnimation.setDuration(getResources().getInteger(android.R.integer.config_mediumAnimTime));
         mColorAnimation.start();
+    }
+
+    public static int getNavigationBarHeight(Resources res) {
+        int result = 0;
+        int resourceId = res.getIdentifier("navigation_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = res.getDimensionPixelSize(resourceId);
+        }
+        return result;
     }
 
     protected static int getStatusBarHeight(Resources res) {

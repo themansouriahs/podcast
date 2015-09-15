@@ -2,8 +2,13 @@
  <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/subscription_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
 
     <org.bottiger.podcast.views.SquareImageViewFresco
         android:id="@+id/grid_image"
@@ -35,5 +40,7 @@
         android:textColor="@android:color/white"
         />
     <!-- android:background="#AA000000" -->
+
+    </FrameLayout>
 
 </FrameLayout>

@@ -17,6 +17,7 @@ import org.bottiger.podcast.views.ImageViewTinted;
  */
 public class SubscriptionViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
 
+    public View container; // the type of this view depends on if it's a list or a grid
     public TextView title;
     public TextView subTitle;
     public ImageViewTinted image;
@@ -25,6 +26,7 @@ public class SubscriptionViewHolder extends RecyclerView.ViewHolder implements V
     public SubscriptionViewHolder(View itemView) {
         super(itemView);
 
+        container = itemView.findViewById(R.id.subscription_container);
         title = (TextView) itemView.findViewById(R.id.grid_title);
         subTitle = (TextView) itemView.findViewById(R.id.grid_subtitle);
         image = (ImageViewTinted) itemView.findViewById(R.id.grid_image);

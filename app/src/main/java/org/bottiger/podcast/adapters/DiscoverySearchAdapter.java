@@ -28,6 +28,7 @@ import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionLoader;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
+import org.bottiger.podcast.utils.SharedAdapterUtils;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -102,6 +103,8 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
         } catch (NullPointerException npe) {
             holder.image.setBackgroundColor(mDefaultBackgroundColor);
         }
+
+        SharedAdapterUtils.AddPaddingToLastElement(holder.container, 0, position == mDataset.size()-1);
 
         final URL url = subscription.getURL();
 

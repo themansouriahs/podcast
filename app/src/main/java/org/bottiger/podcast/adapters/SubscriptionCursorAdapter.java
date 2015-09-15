@@ -3,13 +3,16 @@ package org.bottiger.podcast.adapters;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.bottiger.podcast.FeedActivity;
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.ToolbarActivity;
 import org.bottiger.podcast.adapters.viewholders.subscription.SubscriptionViewHolder;
 import org.bottiger.podcast.images.FrescoHelper;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionLoader;
+import org.bottiger.podcast.utils.SharedAdapterUtils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.Nullable;
@@ -29,9 +32,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 
-public class SubscriptionGridCursorAdapter extends CursorRecyclerAdapter {
+public class SubscriptionCursorAdapter extends CursorRecyclerAdapter {
 
-    private static final String TAG = "SubscriptionGridAdapter";
+    private static final String TAG = "SubscriptionAdapter";
 
     private static final int GRID_TYPE = 1;
     private static final int LIST_TYPE = 2;
@@ -44,7 +47,7 @@ public class SubscriptionGridCursorAdapter extends CursorRecyclerAdapter {
 
     private OnSubscriptionCountChanged mOnSubscriptionCountChanged = null;
 
-    public SubscriptionGridCursorAdapter(Activity argActivity, Cursor cursor, int argColumnsCount) {
+    public SubscriptionCursorAdapter(Activity argActivity, Cursor cursor, int argColumnsCount) {
         super(cursor);
         mActivity = argActivity;
         mInflater = (LayoutInflater) argActivity
@@ -76,6 +79,18 @@ public class SubscriptionGridCursorAdapter extends CursorRecyclerAdapter {
         if (null == sub) {
             return;
         }
+
+        // Add some padding to the last element in order to compensate for the transparent navigationbar
+        SharedAdapterUtils.AddPaddingToLastElement(holder.container, 0, cursor.getPosition() == getItemCount()-1);
+        /*
+        int left = argHolder.itemView.getPaddingLeft();
+        int right = argHolder.itemView.getPaddingRight();
+        int top = argHolder.itemView.getPaddingTop();
+        int bottom = argHolder.itemView.getPaddingTop();
+        Resources resources = argHolder.itemView.getResources();
+        int newBottomPadding = position == getItemCount() ? ToolbarActivity.getNavigationBarHeight(resources) : 0;
+        argHolder.itemView.setPadding(left, top, right, newBottomPadding);
+        */
 
         final Subscription subscription = sub;
 

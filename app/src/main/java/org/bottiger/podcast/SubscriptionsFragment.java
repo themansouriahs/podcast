@@ -1,6 +1,6 @@
 package org.bottiger.podcast;
 
-import org.bottiger.podcast.adapters.SubscriptionGridCursorAdapter;
+import org.bottiger.podcast.adapters.SubscriptionCursorAdapter;
 import org.bottiger.podcast.playlist.SubscriptionCursorLoader;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionLoader;
@@ -18,7 +18,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -53,7 +52,7 @@ public class SubscriptionsFragment extends Fragment implements SharedPreferences
 
     private GridLayoutManager mGridLayoutmanager;
     private RelativeLayout mEmptySubscrptionList;
-    private SubscriptionGridCursorAdapter mAdapter;
+    private SubscriptionCursorAdapter mAdapter;
 
     private Activity mActivity;
     private FrameLayout mContainerView;
@@ -64,7 +63,7 @@ public class SubscriptionsFragment extends Fragment implements SharedPreferences
     private static String PREF_CLOUD_SUPPORT_KEY;
 
     private Cursor mCursor = null;
-    private SubscriptionGridCursorAdapter.OnSubscriptionCountChanged mSubscriptionCountListener = new SubscriptionGridCursorAdapter.OnSubscriptionCountChanged() {
+    private SubscriptionCursorAdapter.OnSubscriptionCountChanged mSubscriptionCountListener = new SubscriptionCursorAdapter.OnSubscriptionCountChanged() {
         @Override
         public void newSubscriptionCount(int argCount) {
             boolean showEmpty = argCount == 0;
@@ -118,7 +117,7 @@ public class SubscriptionsFragment extends Fragment implements SharedPreferences
 
 
         //RecycelrView
-        mAdapter = new SubscriptionGridCursorAdapter(getActivity(), mCursor, numberOfColumns());
+        mAdapter = new SubscriptionCursorAdapter(getActivity(), mCursor, numberOfColumns());
         mAdapter.setOnSubscriptionCountChangedListener(mSubscriptionCountListener);
         mCursorLoader = new SubscriptionCursorLoader(this, mAdapter, mCursor);
 
@@ -176,12 +175,12 @@ public class SubscriptionsFragment extends Fragment implements SharedPreferences
 
         if (mGridLayoutmanager.getSpanCount() != numberOfColumns()) {
             GridLayoutManager layoutmanager = new GridLayoutManager(getActivity(), numberOfColumns());
-            //mAdapter = new SubscriptionGridCursorAdapter(getActivity(), mCursor);
+            //mAdapter = new SubscriptionCursorAdapter(getActivity(), mCursor);
 
 
             mGridView.setLayoutManager(layoutmanager);
             //mGridView.setAdapter(mAdapter);
-            ((SubscriptionGridCursorAdapter)mGridView.getAdapter()).setNumberOfColumns(numberOfColumns());
+            ((SubscriptionCursorAdapter)mGridView.getAdapter()).setNumberOfColumns(numberOfColumns());
         }
     }
 
