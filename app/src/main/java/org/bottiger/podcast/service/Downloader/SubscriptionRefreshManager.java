@@ -155,7 +155,7 @@ public class SubscriptionRefreshManager {
                 try {
                     response = client.newCall(request).execute();
 
-                    if (response != null && response.isSuccessful()) {
+                    if (response != null && response.body() != null && response.isSuccessful()) {
                         String feedString = response.body().string();
                         parsedSubscription = processResponse(argContext, argSubscription, feedString);
                     }
