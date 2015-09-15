@@ -2,6 +2,7 @@ package org.bottiger.podcast.webservices.directories.stitcher;
 
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import org.bottiger.podcast.webservices.directories.IDirectoryProvider;
 import org.bottiger.podcast.webservices.directories.ISearchParameters;
@@ -20,6 +21,16 @@ public class Stitcher extends GenericDirectory {
 
     @Override
     public void search(@NonNull ISearchParameters argParameters, @NonNull Callback argCallback) {
+
+    }
+
+    @Override
+    public void toplist(@NonNull Callback argCallback) {
+
+    }
+
+    @Override
+    public void toplist(int amount, @Nullable String argTag, @NonNull Callback argCallback) {
 
     }
 

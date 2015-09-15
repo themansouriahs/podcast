@@ -2,7 +2,9 @@ package org.bottiger.podcast.webservices.datastore.gpodder;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.text.TextUtilsCompat;
 import android.support.v4.util.LongSparseArray;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.api.client.json.gson.GsonFactory;
@@ -37,6 +39,18 @@ public class GPodderAPI implements IWebservice {
     private String mUsername;
 
     private boolean mAuthenticated = false;
+
+    private final Callback mDummyCallback = new Callback<String>() {
+        @Override
+        public void onResponse(Response<String> response) {
+            Log.d(TAG, response.toString());
+        }
+
+        @Override
+        public void onFailure(Throwable error) {
+            Log.d(TAG, error.toString());
+        }
+    };
 
     public GPodderAPI() {
         this(null, null, null);
@@ -125,17 +139,7 @@ public class GPodderAPI implements IWebservice {
             subscriptionList.add(feed.getURLString());
         }
 
-        CallbackWrapper<String> callback = new CallbackWrapper(argCalback, new Callback<String>() {
-            @Override
-            public void onResponse(Response<String> response) {
-                Log.d(TAG, response.toString());
-            }
-
-            @Override
-            public void onFailure(Throwable error) {
-                Log.d(TAG, error.toString());
-            }
-        });
+        CallbackWrapper<String> callback = new CallbackWrapper(argCalback, mDummyCallback);
 
         api.uploadDeviceSubscriptions(subscriptionList, mUsername, GPodderUtils.getDeviceID()).enqueue(callback);
     }
@@ -235,6 +239,21 @@ public class GPodderAPI implements IWebservice {
 
     public void authenticate(@Nullable ICallback argICallback) {
         authenticate(argICallback, null);
+    }
+
+    public Call<List<GSubscription>> getTopList(int amount, @Nullable String argTag, @Nullable ICallback<List<GSubscription>> argCallback) {
+        Call<List<GSubscription>> call;
+
+        if (TextUtils.isEmpty(argTag)) {
+            call = api.getPodcastToplist(amount);
+        } else {
+            call = api.getPodcastForTag(argTag, amount);
+        }
+
+        CallbackWrapper callbackWrapper = new CallbackWrapper(argCallback, mDummyCallback);
+        call.enqueue(callbackWrapper);
+
+        return call;
     }
 
     private void authenticate(@Nullable ICallback argICallback, @Nullable Callback argCallback) {

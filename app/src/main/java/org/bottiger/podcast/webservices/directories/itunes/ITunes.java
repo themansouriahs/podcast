@@ -2,6 +2,7 @@ package org.bottiger.podcast.webservices.directories.itunes;
 
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -11,6 +12,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
+import org.bottiger.podcast.webservices.directories.IDirectoryProvider;
 import org.bottiger.podcast.webservices.directories.ISearchParameters;
 import org.bottiger.podcast.webservices.directories.ISearchResult;
 import org.bottiger.podcast.webservices.directories.generic.GenericDirectory;
@@ -97,6 +99,16 @@ public class ITunes extends GenericDirectory {
 
         asyncTask = new QueryITunes(url, searchTerm, argCallback);
         asyncTask.execute();
+    }
+
+    @Override
+    public void toplist(@NonNull Callback argCallback) {
+        // FIXME
+    }
+
+    @Override
+    public void toplist(int amount, @Nullable String argTag, @NonNull Callback argCallback) {
+        // FIXME
     }
 
     private String generateUrl(@NonNull String argTerm) {

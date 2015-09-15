@@ -365,7 +365,7 @@
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/filter_text</item>
         <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
-        <!--<item name="android:background">@android:drawable/spinner_dropdown_background</item>-->
+        <item name="android:background">@android:drawable/spinner_dropdown_background</item>
     </style>
     <!-- Navigation Drawer - End -->
 

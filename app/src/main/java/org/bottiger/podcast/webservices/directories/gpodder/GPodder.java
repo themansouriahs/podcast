@@ -2,6 +2,7 @@ package org.bottiger.podcast.webservices.directories.gpodder;
 
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.apache.commons.validator.routines.UrlValidator;
@@ -51,42 +52,16 @@ public class GPodder extends GenericDirectory {
 
     @Override
     public void search(@NonNull ISearchParameters argParameters, @NonNull final Callback argCallback) {
-        String searchTerm = TextUtils.join(QUERY_SEPARATOR, argParameters.getKeywords());
-        final GenericSearchResult result = new GenericSearchResult(searchTerm);
+        final String searchTerm = TextUtils.join(QUERY_SEPARATOR, argParameters.getKeywords());
 
         mCall = mGPodderAPI.search(searchTerm, new IWebservice.ICallback<List<GSubscription>>() {
             @Override
             public void onResponse(Response<List<GSubscription>> response) {
 
-                if (response == null || !response.isSuccess())
+                if (!isSuccesfull(response))
                     return;
 
-                //return podcasts;
-                for (GSubscription podcast : response.body()) {
-                    String title = podcast.getTitle();
-                    String urlString = podcast.getUrl();
-                    String imageUrl = podcast.getLogoUrl();
-
-                    if (TextUtils.isEmpty(title)) {
-                        continue;
-                    }
-
-                    if (!mUrlValidator.isValid(urlString)) {
-                        continue;
-                    }
-
-                    URL url;
-                    try {
-                        url = new URL(urlString);
-                    } catch (MalformedURLException e) {
-                        VendorCrashReporter.report("URL invalid", urlString);
-                        continue;
-                    }
-
-                    ISubscription subscription = new SlimSubscription(title, url, imageUrl);
-                    result.addResult(subscription);
-                }
-
+                GenericSearchResult result = parseResponse(searchTerm, response);
                 argCallback.result(result);
             }
 
@@ -102,5 +77,75 @@ public class GPodder extends GenericDirectory {
             return;
 
         mCall.cancel();
+    }
+
+    public void toplist(@NonNull final Callback argCallback) {
+        toplist(TOPLIST_AMOUNT, null, argCallback);
+    }
+
+    public void toplist(int amount, @Nullable String argTag, @NonNull final Callback argCallback) {
+
+        mCall = mGPodderAPI.getTopList(amount, argTag, new IWebservice.ICallback<List<GSubscription>>() {
+            @Override
+            public void onResponse(Response<List<GSubscription>> response) {
+                if (!isSuccesfull(response))
+                    return;
+
+                GenericSearchResult result = parseResponse("", response);
+                argCallback.result(result);
+
+                argCallback.result(result);
+            }
+
+            @Override
+            public void onFailure(Throwable throwable) {
+
+            }
+        });
+    }
+
+    private static boolean isSuccesfull(@Nullable Response argResponse) {
+        return argResponse != null && argResponse.isSuccess();
+    }
+
+    private GenericSearchResult parseResponse(@NonNull String argSearchQuery, @Nullable Response<List<GSubscription>> argResponse) {
+        final GenericSearchResult result = new GenericSearchResult(argSearchQuery);
+
+        if (!isSuccesfull(argResponse)) {
+            return null;
+        }
+
+        //return podcasts;
+        List<GSubscription> gsubscriptions = argResponse.body();
+        GSubscription podcast;
+
+        for (int i = 0; i < gsubscriptions.size(); i++) {
+            podcast = gsubscriptions.get(i);
+
+            String title = podcast.getTitle();
+            String urlString = podcast.getUrl();
+            String imageUrl = podcast.getLogoUrl();
+
+            if (TextUtils.isEmpty(title)) {
+                continue;
+            }
+
+            if (!mUrlValidator.isValid(urlString)) {
+                continue;
+            }
+
+            URL url;
+            try {
+                url = new URL(urlString);
+            } catch (MalformedURLException e) {
+                VendorCrashReporter.report("URL invalid", urlString);
+                continue;
+            }
+
+            ISubscription subscription = new SlimSubscription(title, url, imageUrl);
+            result.addResult(subscription);
+        }
+
+        return result;
     }
 }

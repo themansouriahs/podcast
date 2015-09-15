@@ -108,9 +108,9 @@ public interface IGPodderAPI {
     @GET("/api/2/data/episode.json")
     Callback<GEpisode> getEpisodeData(@Query("url") String episodeURL);
 
-    // Podcast Toplist¶
+    // Podcast Toplist
     @GET("/toplist/{number}.json")
-    Call<List<GSubscription>> getPodcastToplist(@Path("count") int amount);
+    Call<List<GSubscription>> getPodcastToplist(@Path("number") int amount);
 
     // Podcast Search
     @GET("/search.json")
