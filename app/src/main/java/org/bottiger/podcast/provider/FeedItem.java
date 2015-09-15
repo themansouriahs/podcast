@@ -2,6 +2,8 @@ package org.bottiger.podcast.provider;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -36,6 +38,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.provider.BaseColumns;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.LruCache;
@@ -949,6 +952,42 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 
 	public String getAbsoluteTmpPath() throws IOException {
 		return SDCardManager.pathTmpFromFilename(this);
+	}
+
+	@Nullable
+	public Uri getFileLocation(@Location int argLocation) {
+		boolean isDownloaded = isDownloaded();
+
+		if (!isDownloaded && argLocation == REQUIRE_LOCAL)
+			return null;
+
+		Uri uri;
+
+		if (argLocation == REQUIRE_REMOTE) {
+			uri = Uri.parse(getURL());
+			return uri;
+		}
+
+		if (isDownloaded) {
+			try {
+				//Uri.Builder builder = new Uri.Builder();
+				//builder.scheme("file");
+				//builder.path("/" + getAbsolutePath());
+				// uri = builder.build();
+
+				File file = new File(getAbsolutePath());
+				uri = Uri.fromFile(file);
+
+				//uri = Uri.parse(getAbsolutePath());
+
+				if (argLocation == PREFER_LOCAL)
+					return uri;
+			} catch (IOException ioe) {
+				Log.w(TAG, "Failed to get local file path. " + ioe.toString()); // NoI18N
+			}
+		}
+
+		return Uri.parse(getURL());
 	}
 
     // in ms

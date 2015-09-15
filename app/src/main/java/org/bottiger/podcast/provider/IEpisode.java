@@ -2,9 +2,14 @@ package org.bottiger.podcast.provider;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.net.Uri;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.io.IOException;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.net.URL;
 import java.util.Date;
 
@@ -12,6 +17,13 @@ import java.util.Date;
  * Created by apl on 21-04-2015.
  */
 public interface IEpisode {
+
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({PREFER_LOCAL, REQUIRE_LOCAL, REQUIRE_REMOTE})
+    @interface Location {}
+    int PREFER_LOCAL = 1;
+    int REQUIRE_LOCAL = 2;
+    int REQUIRE_REMOTE = 3;
 
     String getTitle();
     URL getUrl();
@@ -31,6 +43,9 @@ public interface IEpisode {
     void setDescription(@NonNull String argDescription);
     void setDuration(long argDurationMs);
     void setOffset(@Nullable ContentResolver contentResolver, long i);
+
+    @Nullable
+    Uri getFileLocation(@Location int argLocation);
 
     /**
      * -1 => nothing

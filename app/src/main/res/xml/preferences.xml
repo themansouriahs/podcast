@@ -116,6 +116,12 @@
                 android:summary="@string/pref_continuously_playing_description"
                 android:title="@string/pref_continuously_playing" />
 
+            <CheckBoxPreference
+                android:defaultValue="@bool/pref_open_video_externally_default"
+                android:key="@string/pref_open_video_externally_key"
+                android:summary="@string/pref_open_video_externally_description"
+                android:title="@string/pref_open_video_externally" />
+
         </PreferenceCategory>
 
     </PreferenceScreen>

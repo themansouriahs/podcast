@@ -48,7 +48,9 @@ public class SDCardManager {
 
     @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
 	public static String getDownloadDir() throws IOException, SecurityException {
-		return getSDCardDir() + DOWNLOAD_DIR;
+		//return getSDCardDir() + DOWNLOAD_DIR;
+        return Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PODCASTS).toString();
 	}
 
     @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)

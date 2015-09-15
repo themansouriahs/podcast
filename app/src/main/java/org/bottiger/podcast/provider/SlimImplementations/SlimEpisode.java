@@ -2,6 +2,7 @@ package org.bottiger.podcast.provider.SlimImplementations;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -151,6 +152,15 @@ public class SlimEpisode implements IEpisode, Parcelable {
     @Override
     public void setOffset(@Nullable ContentResolver contentResolver, long i) {
         mOffset = i;
+    }
+
+    @Nullable
+    @Override
+    public Uri getFileLocation(@Location int argLocation) {
+        if (argLocation == REQUIRE_LOCAL || mUrl == null)
+            return null;
+
+        return Uri.parse(mUrl.toString());
     }
 
     @Override

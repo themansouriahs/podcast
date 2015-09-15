@@ -99,7 +99,7 @@ public class EpisodeDownloadManager extends Observable {
 
 	private static DownloadManager downloadManager;
 
-    private static String getMimeType(String fileUrl) {
+    public static String getMimeType(String fileUrl) {
         String extension = MimeTypeMap.getFileExtensionFromUrl(fileUrl);
         return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
     }

@@ -1,7 +1,11 @@
 package org.bottiger.podcast.views;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -9,7 +13,10 @@ import android.graphics.Outline;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.graphics.Palette;
@@ -17,6 +24,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewOutlineProvider;
+import android.webkit.MimeTypeMap;
 import android.widget.ImageButton;
 
 import com.squareup.otto.Subscribe;
@@ -32,7 +40,11 @@ import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.listeners.PlayerStatusProgressData;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
 import org.bottiger.podcast.utils.ColorExtractor;
+import org.bottiger.podcast.views.dialogs.DialogOpenVideoExternally;
+
+import java.io.IOException;
 
 /**
  * TODO: document your custom view class.
@@ -41,8 +53,12 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
                                                              DownloadObserver,
                                                              View.OnClickListener {
 
+    private static final String TAG = "PlayPauseImageView";
+
     private static final boolean DRAW_PROGRESS          = true;
     private static final boolean DRAW_PROGRESS_MARKER   = true;
+
+    private static final String MIME_VIDEO = "video/*";
 
     public enum LOCATION { PLAYLIST, FEEDVIEW, DISCOVERY_FEEDVIEW, OTHER };
     private LOCATION mLocation = LOCATION.OTHER;
@@ -271,11 +287,68 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
         if (type != null) {
             SoundWaves.sAnalytics.trackEvent(type);
         }
-        boolean isPlaying = SoundWaves.sBoundPlayerService.toggle(mEpisode);
 
+        // If the file is a video we offer to open it in another external player
+        if (mEpisode.isVideo()) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+            String hasAskedKey = getResources().getString(R.string.pref_ask_about_video_key);
+            boolean hasAsked = prefs.getBoolean(hasAskedKey, false);
+
+            boolean doOpenExternally = false;
+
+            if (!hasAsked) {
+                DialogOpenVideoExternally dialogOpenVideoExternally = DialogOpenVideoExternally.newInstance(mEpisode);
+
+                try {
+                    Activity activity = (Activity) mContext;
+                    dialogOpenVideoExternally.show(activity.getFragmentManager(), "dialog");
+                } catch (ClassCastException cce) {
+                    Log.wtf(TAG, "Could not case the context to an activity. " + cce.toString());
+                } finally {
+                    prefs.edit().putBoolean(hasAskedKey, true).commit();
+                }
+
+                /**
+                 * The Dialog is show async, and since we are in a view and not an activity or a fragment
+                 * There is no clean way to get a callback. Therefore we are going to handle everything inside the
+                 * Dialog
+                 */
+                return;
+            }
+
+            boolean openExternallyDefault = getResources().getBoolean(R.bool.pref_open_video_externally_default);
+            String openExternallyKey = getResources().getString(R.string.pref_open_video_externally_key);
+            doOpenExternally = prefs.getBoolean(openExternallyKey, openExternallyDefault);
+
+
+            if (doOpenExternally) {
+                openVideoExternally(mEpisode, mContext);
+                return;
+            }
+
+        }
+
+        boolean isPlaying = SoundWaves.sBoundPlayerService.toggle(mEpisode);
         setStatus(isPlaying ? PlayerStatusObservable.STATUS.PLAYING : PlayerStatusObservable.STATUS.STOPPED);
 
         //SoundWaves.getBus().post(new PlaylistData().playlistChanged = true);
+    }
+
+    public static void openVideoExternally(@NonNull IEpisode argEpisode, @NonNull Context argContext) {
+        Uri uri = argEpisode.getFileLocation(IEpisode.PREFER_LOCAL);
+
+        String mimetype;
+        if (argEpisode.isDownloaded()) {
+            mimetype = EpisodeDownloadManager.getMimeType(argEpisode.getFileLocation(IEpisode.REQUIRE_LOCAL).toString());
+        } else {
+            String extension = MimeTypeMap.getFileExtensionFromUrl(argEpisode.getFileLocation(IEpisode.REQUIRE_REMOTE).toString());
+            mimetype = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+        }
+
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        intent.setDataAndType(uri, mimetype);
+        //argContext.startActivity(Intent.createChooser(intent, argContext.getString(R.string.choose_player_for_open_video_externally)));
+        argContext.startActivity(intent);
     }
 
     @Override

@@ -159,6 +159,13 @@
     <string name="feed_settings_delete_when_listened">Delete when listened</string>
     <string name="feed_settings_intro">These settings will override the SoundWaves defaults for this specific podcast.</string>
     <string name="feed_settings_oldest_first">List oldest episodes first</string>
+    <string name="choose_player_for_open_video_externally">Choose player for viewing the episode</string>
+    <string name="open_video_externally_title">Open video in another player?</string>
+    <string name="open_video_externally_body">This episode is a video, which is not supported by this app. You can open it in another video player, or choose to stay here for audio only.</string>
+    <string name="open_video_externally_confirm">Open video player</string>
+    <string name="open_video_externally_reject">Play audio</string>
+    <string name="pref_open_video_externally">Open videos in an external player</string>
+    <string name="pref_open_video_externally_description">This app does not play video. You can choose to open video files in another player, otherwise they will play as audio only.</string>
 
     <plurals name="player_sleep">
         <item quantity="one">Player will sleep in %d minute</item>
