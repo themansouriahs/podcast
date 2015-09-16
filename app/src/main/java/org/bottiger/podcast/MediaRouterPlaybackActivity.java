@@ -49,7 +49,11 @@ public class MediaRouterPlaybackActivity extends ToolbarActivity {
 
     @Override
     protected void onPause() {
-        SoundWaves.getBus().unregister(mMediaRouterEventReciever);
+        try {
+            SoundWaves.getBus().unregister(mMediaRouterEventReciever);
+        } catch (Exception e) {
+            Log.wtf(TAG, "Could not unregister. I should investigate.");
+        }
         super.onPause();
     }
 
