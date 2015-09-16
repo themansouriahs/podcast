@@ -5,11 +5,6 @@ import android.support.annotation.NonNull;
 
 import com.bugsnag.android.Bugsnag;
 
-import org.acra.ACRA;
-import org.acra.ACRAConfiguration;
-import org.acra.ACRAConfigurationException;
-import org.acra.ReportingInteractionMode;
-
 
 /**
  * Created by apl on 26-02-2015.
