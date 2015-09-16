@@ -57,6 +57,8 @@ public class OPMLImportExport {
 		this.mActivity = context;
 		this.contentResolver = context.getContentResolver();
 
+		initInputOutputFiles();
+
 		Resources res = mActivity.getResources();
 		opmlNotFound = String.format(res.getString(R.string.opml_not_found), filename);
 		opmlFailedToExport = res.getString(R.string.opml_export_failed);

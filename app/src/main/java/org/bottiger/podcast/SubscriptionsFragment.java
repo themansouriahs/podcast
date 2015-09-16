@@ -41,7 +41,7 @@ public class SubscriptionsFragment extends Fragment implements SharedPreferences
     private static final boolean SHARE_ANALYTICS_DEFAULT = !BuildConfig.LIBRE_MODE;
     private static final boolean SHARE_CLOUD_DEFAULT = false;
 
-    private boolean mShowEmptyView = true;
+    private Boolean mShowEmptyView = null;
 
 	private FragmentUtils mFragmentUtils;
 	private View fragmentView;
@@ -69,14 +69,15 @@ public class SubscriptionsFragment extends Fragment implements SharedPreferences
             boolean showEmpty = argCount == 0;
             int visibility = showEmpty ? View.VISIBLE : View.GONE;
 
-            if (mShowEmptyView != showEmpty) {
+            if (mShowEmptyView == null || mShowEmptyView.booleanValue() != showEmpty) {
                 if (showEmpty) {
                     mEmptySubscrptionList.setVisibility(View.VISIBLE);
-                    mGridView.setVisibility(View.GONE);
+                    //mGridView.setVisibility(View.GONE);
                 } else {
                     mEmptySubscrptionList.setVisibility(View.GONE);
-                    mGridView.setVisibility(View.VISIBLE);
+                    //mGridView.setVisibility(View.VISIBLE);
                 }
+                mShowEmptyView = showEmpty;
             }
         }
     };
@@ -116,8 +117,10 @@ public class SubscriptionsFragment extends Fragment implements SharedPreferences
         onSharedPreferenceChanged(shareprefs, PREF_CLOUD_SUPPORT_KEY);
 
 
+
         //RecycelrView
         mAdapter = new SubscriptionCursorAdapter(getActivity(), mCursor, numberOfColumns());
+
         mAdapter.setOnSubscriptionCountChangedListener(mSubscriptionCountListener);
         mCursorLoader = new SubscriptionCursorLoader(this, mAdapter, mCursor);
 
@@ -133,7 +136,9 @@ public class SubscriptionsFragment extends Fragment implements SharedPreferences
         //fragmentView.setVisibility(View.GONE);
         mGridView.setVisibility(View.GONE);
 
+
 		return mContainerView;
+
 	}
 
     @Override
@@ -188,16 +193,6 @@ public class SubscriptionsFragment extends Fragment implements SharedPreferences
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 	}
-
-    /*
-    private void setSubscriptionBackground(Cursor argCursor) {
-        if (argCursor == null || argCursor.getCount() == 0) {
-            mEmptySubscrptionList.setVisibility(View.VISIBLE);
-            return;
-        }
-
-        mEmptySubscrptionList.setVisibility(View.GONE);
-    }*/
 
 	@Override
 	public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
