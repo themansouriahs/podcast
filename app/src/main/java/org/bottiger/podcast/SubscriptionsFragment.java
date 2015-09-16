@@ -43,8 +43,6 @@ public class SubscriptionsFragment extends Fragment implements SharedPreferences
 
     private Boolean mShowEmptyView = null;
 
-	private FragmentUtils mFragmentUtils;
-	private View fragmentView;
 	private RecyclerView mGridView;
 
     private CheckBox mShareAnalytics;
@@ -67,15 +65,12 @@ public class SubscriptionsFragment extends Fragment implements SharedPreferences
         @Override
         public void newSubscriptionCount(int argCount) {
             boolean showEmpty = argCount == 0;
-            int visibility = showEmpty ? View.VISIBLE : View.GONE;
 
-            if (mShowEmptyView == null || mShowEmptyView.booleanValue() != showEmpty) {
+            if (mShowEmptyView == null || mShowEmptyView != showEmpty) {
                 if (showEmpty) {
                     mEmptySubscrptionList.setVisibility(View.VISIBLE);
-                    //mGridView.setVisibility(View.GONE);
                 } else {
                     mEmptySubscrptionList.setVisibility(View.GONE);
-                    //mGridView.setVisibility(View.VISIBLE);
                 }
                 mShowEmptyView = showEmpty;
             }
@@ -103,9 +98,7 @@ public class SubscriptionsFragment extends Fragment implements SharedPreferences
 
         setHasOptionsMenu(true);
 
-        mContainerView = (FrameLayout)inflater.inflate(R.layout.subscription_container, container, false);
-        FrameLayout fragmentContainer = (FrameLayout)mContainerView.findViewById(R.id.subscription_fragment_container);
-
+        mContainerView = (FrameLayout)inflater.inflate(R.layout.subscription_fragment, container, false);
 
         // Empty View
         mEmptySubscrptionList = (RelativeLayout) mContainerView.findViewById(R.id.subscription_empty);
@@ -116,26 +109,19 @@ public class SubscriptionsFragment extends Fragment implements SharedPreferences
         onSharedPreferenceChanged(shareprefs, PREF_SHARE_ANALYTICS_KEY);
         onSharedPreferenceChanged(shareprefs, PREF_CLOUD_SUPPORT_KEY);
 
-
-
         //RecycelrView
         mAdapter = new SubscriptionCursorAdapter(getActivity(), mCursor, numberOfColumns());
 
         mAdapter.setOnSubscriptionCountChangedListener(mSubscriptionCountListener);
         mCursorLoader = new SubscriptionCursorLoader(this, mAdapter, mCursor);
 
-        fragmentView = inflater.inflate(getLayoutType(), fragmentContainer, true);
-		mFragmentUtils = new FragmentUtils(getActivity(), fragmentView, this);
-		mGridView = (RecyclerView) fragmentView.findViewById(R.id.gridview);
+		mGridView = (RecyclerView) mContainerView.findViewById(R.id.gridview);
 		registerForContextMenu(mGridView);
 
         mGridLayoutmanager = new GridLayoutManager(getActivity(), numberOfColumns());
         mGridView.setHasFixedSize(true);
         mGridView.setLayoutManager(mGridLayoutmanager);
         mGridView.setAdapter(mAdapter);
-        //fragmentView.setVisibility(View.GONE);
-        mGridView.setVisibility(View.GONE);
-
 
 		return mContainerView;
 
@@ -250,7 +236,7 @@ public class SubscriptionsFragment extends Fragment implements SharedPreferences
     }
 
 	private int getLayoutType() {
-		return R.layout.subscription_list;
+		return R.layout.subscription_fragment;
 	}
 
     private int numberOfColumns() {

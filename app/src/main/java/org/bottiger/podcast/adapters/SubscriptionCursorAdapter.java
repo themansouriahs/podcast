@@ -205,7 +205,7 @@ public class SubscriptionCursorAdapter extends CursorRecyclerAdapter {
     }
 
     private boolean isLastItem(int argPosition) {
-        return argPosition == getItemCount()-1;
+        return argPosition +1 == getItemCount();
     }
 
     private boolean isListView() {
@@ -233,7 +233,12 @@ public class SubscriptionCursorAdapter extends CursorRecyclerAdapter {
 
     @Override
     public int getItemCount() {
-        return super.getItemCount() +1; // one footer please
+        int count = super.getItemCount();
+
+        if (count == 0) // If there are 0 subscriptions we do not want to return 1
+            return count;
+
+        return count +1; // one footer please
     }
 
 
