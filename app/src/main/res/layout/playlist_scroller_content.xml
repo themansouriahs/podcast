@@ -6,35 +6,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/tools">
 
-    <!--
-        app:layout_behavior="org.bottiger.podcast.views.PlaylistBehavior"
-        -->
-
-<!--
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/appbar"
-        android:layout_height="match_parent"
-        android:layout_width="match_parent"
-        >
--->
-
-    <!--
-    <org.bottiger.podcast.views.PlaylistScrollerParent
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true"
-        android:background="@color/blue"
-        app:layout_behavior="org.bottiger.podcast.views.PlaylistBehavior">
--->
-
-<!--
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-        -->
-
-
         <org.bottiger.podcast.views.TopPlayer
         xmlns:fresco="http://schemas.android.com/apk/res-auto"
         android:visibility="visible"
@@ -44,19 +15,30 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/top_player_size_maximum"
         android:minHeight="@dimen/top_player_size_minimum"
-        android:elevation="10dp"
-        android:foreground="@drawable/photo_banner_scrim">
+        >
+            <!--
+            android:foreground="@drawable/photo_banner_scrim"
+            -->
 
+
+            <!--
+            android:background="@drawable/header_gradient"
+            -->
+
+            <!--
         <View
             android:id="@+id/top_gradient"
-            android:background="@drawable/header_gradient"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="top" />
-        <!--
-        android:layout_height="200dp"
-        -->
+            -->
 
+            <!--
+            android:clipToPadding="false"
+            android:layout_alignParentRight="true"
+            android:descendantFocusability="afterDescendants"
+            android:orientation="vertical"
+            -->
         <org.bottiger.podcast.views.PlayerRelativeLayout
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/expanded_controls"
@@ -65,14 +47,8 @@
             android:paddingTop="20dp"
             android:clipToPadding="false"
             android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
-            android:descendantFocusability="afterDescendants"
-            android:paddingLeft="@dimen/padding_medium"
-            android:orientation="vertical">
+            android:paddingLeft="@dimen/padding_medium">
 
-            <!--
-            <include layout="@layout/top_player_buttons" />
-            -->
             <LinearLayout
                 xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
@@ -111,9 +87,6 @@
                         android:elevation="@dimen/player_elevation"
                         />
 
-                    <!--
-                    style="@style/TopPlayerButton"
-                    -->
                 </RelativeLayout>
 
 
@@ -140,10 +113,6 @@
                 android:src="?attr/skip_to_next"
                 android:layout_alignParentRight="true"/>
 
-            <!-- style="@style/PodcastImage"
-
-                android:scaleType="center"
-                android:background="@null"-->
             <org.bottiger.podcast.views.PlayPauseImageView
                 android:id="@+id/play_pause_button"
                 android:layout_width="70dp"
@@ -153,7 +122,6 @@
                 android:layout_marginBottom="2dp"
                 android:padding="0dip"
                 android:elevation="@dimen/player_elevation" />
-            <!-- android:paddingLeft="14dip" -->
 
             <org.bottiger.podcast.views.TextViewTotalTime
                 android:id="@+id/total_time"
@@ -287,62 +255,10 @@
         app:layout_anchor="@id/session_photo_container"
         app:layout_anchorGravity="bottom"
         />
-    <!--
-            app:layout_anchor="@id/appbar"
-        app:layout_anchorGravity="bottom"
-        -->
 
-    <!--
-    app:layout_scrollFlags="scroll|enterAlways"
-    -->
-
-    <!--
-    </android.support.design.widget.AppBarLayout>
-
-    </LinearLayout>
-    -->
-
-
-<!--
-    </org.bottiger.podcast.views.PlaylistScrollerParent>
--->
     <include
         android:id="@+id/playlist_overlay"
         android:animateLayoutChanges="true"
         layout="@layout/seekbar_overlay" />
-
-
-
-        <!--
-    <android.support.v4.widget.NestedScrollView
-        android:id="@+id/feed_scrollviewChild"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-        <View
-            android:id="@+id/empty_start_column"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"/>
-
-
-
-        <View
-            android:id="@+id/empty_end_column"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"/>
-
-        </FrameLayout>
-
-
-    </android.support.v4.widget.NestedScrollView>
-    -->
-    <!--
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    -->
 
 </android.support.design.widget.CoordinatorLayout>

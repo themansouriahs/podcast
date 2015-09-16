@@ -441,7 +441,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
             IEpisode item = mPlaylist.getItem(0);
 
             if (item != null) {
-                mPlayPauseButton.setEpisode(item, PlayPauseImageView.LOCATION.PLAYLIST);
+                mPlayPauseButton.setEpisode(item, PlayPauseImageView.PLAYLIST);
                 mBackButton.setEpisode(item);
                 mForwardButton.setEpisode(item);
                 mPlayerDownloadButton.setEpisode(item);
@@ -482,7 +482,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         mCurrentTime.setEpisode(item);
         mTotalTime.setEpisode(item);
 
-        mPlayPauseButton.setEpisode(item, PlayPauseImageView.LOCATION.PLAYLIST);
+        mPlayPauseButton.setEpisode(item, PlayPauseImageView.PLAYLIST);
         mBackButton.setEpisode(item);
         mForwardButton.setEpisode(item);
         mPlayerDownloadButton.setEpisode(item);
@@ -569,12 +569,15 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                             new int[] {transparentgradientColor,gradientColor});
                     Drawable wrapDrawable = DrawableCompat.wrap(gd);
                     DrawableCompat.setTint(wrapDrawable, colorBackground);
+
+                    /*
                     if (Build.VERSION.SDK_INT >= 16) {
                         mGradientBottomTopPlayer.setBackground(wrapDrawable);
                     } else {
                         mGradientBottomTopPlayer.setBackgroundDrawable(wrapDrawable);
                     }
                     mGradientBottomTopPlayer.setVisibility(View.VISIBLE);
+                    */
                 }
 
                 @Override

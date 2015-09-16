@@ -4,6 +4,7 @@ import org.apache.commons.validator.routines.UrlValidator;
 import org.bottiger.podcast.FeedActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.ToolbarActivity;
+import org.bottiger.podcast.adapters.viewholders.FooterViewHolder;
 import org.bottiger.podcast.adapters.viewholders.subscription.SubscriptionViewHolder;
 import org.bottiger.podcast.images.FrescoHelper;
 import org.bottiger.podcast.provider.Subscription;
@@ -15,6 +16,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -23,6 +25,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridLayout;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
@@ -38,6 +41,7 @@ public class SubscriptionCursorAdapter extends CursorRecyclerAdapter {
 
     private static final int GRID_TYPE = 1;
     private static final int LIST_TYPE = 2;
+    private static final int FOOTER_TYPE = 3;
 
     private final LayoutInflater mInflater;
     private Activity mActivity;
@@ -59,14 +63,43 @@ public class SubscriptionCursorAdapter extends CursorRecyclerAdapter {
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Log.v(TAG, "onCreateViewHolder");
 
-        View view = mInflater.inflate(getGridItemLayout(), parent, false);
-        SubscriptionViewHolder holder = new SubscriptionViewHolder(view);
+        RecyclerView.ViewHolder holder = null;
+
+        switch (viewType)
+        {
+            case FOOTER_TYPE: {
+                View view = mInflater.inflate(R.layout.recycler_item_empty_footer, parent, false);
+                holder = new FooterViewHolder(view);
+                break;
+            }
+            default: {
+                View view = mInflater.inflate(getGridItemLayout(), parent, false);
+                holder = new SubscriptionViewHolder(view);
+                break;
+            }
+        }
 
         return holder;
     }
 
     @Override
-    public void onBindViewHolderCursor(RecyclerView.ViewHolder argHolder, Cursor cursor) {
+    public void onBindViewHolderCursor(RecyclerView.ViewHolder argHolder, Cursor cursor, int position) {
+
+        // In case we are dealing with the footer
+        if (isLastItem(position)) {
+            FooterViewHolder footer = (FooterViewHolder)argHolder;
+            //footer.getFooter().getLayoutParams().height = ToolbarActivity.getNavigationBarHeight(mActivity.getResources());
+
+            android.support.v7.widget.GridLayoutManager.LayoutParams params = (android.support.v7.widget.GridLayoutManager.LayoutParams)footer.getFooter().getLayoutParams();
+            params.height = ToolbarActivity.getNavigationBarHeight(mActivity.getResources());
+            //params.columnSpec = GridLayout.spec(0, numberOfColumns-1);
+            //params.s
+            footer.getFooter().setLayoutParams(params);
+            footer.getFooter().requestLayout();
+
+            return;
+        }
+
         SubscriptionViewHolder holder = (SubscriptionViewHolder)argHolder;
 
         Subscription sub = null;
@@ -81,7 +114,9 @@ public class SubscriptionCursorAdapter extends CursorRecyclerAdapter {
         }
 
         // Add some padding to the last element in order to compensate for the transparent navigationbar
-        SharedAdapterUtils.AddPaddingToLastElement(holder.container, 0, cursor.getPosition() == getItemCount()-1);
+        //int itemsLeft = cursor.getCount()-cursor.getPosition();
+        //boolean isLastRow = cursor.getPosition()
+        //SharedAdapterUtils.AddPaddingToLastElement(holder.container, 0, cursor.getPosition() == getItemCount()-1);
         /*
         int left = argHolder.itemView.getPaddingLeft();
         int right = argHolder.itemView.getPaddingRight();
@@ -130,7 +165,7 @@ public class SubscriptionCursorAdapter extends CursorRecyclerAdapter {
 
             //FrescoHelper.PalettePostProcessor postProcessor = new FrescoHelper.PalettePostProcessor(mActivity, image);
             //FrescoHelper.loadImageInto(holder.image, image, postProcessor);
-            Glide.with(mActivity).load(image).centerCrop().into(holder.image);
+            Glide.with(mActivity).load(image).centerCrop().placeholder(R.drawable.white).into(holder.image);
 
         }
 
@@ -163,7 +198,14 @@ public class SubscriptionCursorAdapter extends CursorRecyclerAdapter {
 
     @Override
     public int getItemViewType(int position) {
+        if (isLastItem(position))
+            return FOOTER_TYPE;
+
         return numberOfColumns == 1 ? LIST_TYPE : GRID_TYPE;
+    }
+
+    private boolean isLastItem(int argPosition) {
+        return argPosition == getItemCount()-1;
     }
 
     private boolean isListView() {
@@ -187,6 +229,11 @@ public class SubscriptionCursorAdapter extends CursorRecyclerAdapter {
 
     public void setPosition(int position) {
         this.position = position;
+    }
+
+    @Override
+    public int getItemCount() {
+        return super.getItemCount() +1; // one footer please
     }
 
 

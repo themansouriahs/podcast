@@ -208,8 +208,9 @@ public class PlayerButtonView extends ImageButton implements PaletteListener  {
     public void onPaletteFound(Palette argChangedPalette) {
         ColorExtractor extractor = new ColorExtractor(argChangedPalette);
 
-        baseColorPaint.setColor(extractor.getPrimary()); // -1761607680
-        foregroundColorPaint.setColor(extractor.getSecondary());
+        //baseColorPaint.setColor(extractor.getPrimary()); // -1761607680
+        baseColorPaint.setColor(extractor.getSecondary()); // -1761607680
+        foregroundColorPaint.setColor(extractor.getSecondaryTint());
 
         if (argChangedPalette != null) {
             //setBackgroundColor(ButtonColor(argChangedPalette));

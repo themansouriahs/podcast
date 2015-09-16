@@ -17,6 +17,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.ColorInt;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.graphics.Palette;
@@ -45,6 +47,8 @@ import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.views.dialogs.DialogOpenVideoExternally;
 
 import java.io.IOException;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
  * TODO: document your custom view class.
@@ -60,8 +64,16 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
 
     private static final String MIME_VIDEO = "video/*";
 
-    public enum LOCATION { PLAYLIST, FEEDVIEW, DISCOVERY_FEEDVIEW, OTHER };
-    private LOCATION mLocation = LOCATION.OTHER;
+    //public enum LOCATION { PLAYLIST, FEEDVIEW, DISCOVERY_FEEDVIEW, OTHER };
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({PLAYLIST, FEEDVIEW, DISCOVERY_FEEDVIEW, OTHER})
+    public @interface ButtonLocation {}
+    public static final int PLAYLIST = 1;
+    public static final int FEEDVIEW = 2;
+    public static final int DISCOVERY_FEEDVIEW = 3;
+    public static final int OTHER = 4;
+
+    private @ButtonLocation int mLocation = OTHER;
 
     private static final int START_ANGLE = -90;
     private static final int DRAW_OFFSET = 6;
@@ -73,7 +85,7 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
 
     protected Context mContext;
 
-    private RectF bounds;
+    private RectF bounds = new RectF();
     private Rect boundsRound = new Rect();
 
     private boolean mDrawBackground;
@@ -150,7 +162,7 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
         return mEpisode;
     }
 
-    public synchronized void setEpisode(IEpisode argEpisode, LOCATION argLocation) {
+    public synchronized void setEpisode(IEpisode argEpisode, @ButtonLocation int argLocation) {
         this.mLocation = argLocation;
         this.mEpisode = argEpisode;
 
@@ -178,8 +190,16 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
         this.invalidate();
     }
 
-    public void setColor(int argColor, int argOuterColor) {
-        paint.setColor(argColor);
+    public void setColor(@ColorInt int argColor, @ColorInt int argOuterColor) {
+        float scale = 1.3f;
+        float red = Color.red(argColor)*scale;
+        float green = Color.green(argColor)*scale;
+        float blue = Color.blue(argColor)*scale;
+
+        int newColor = Color.argb(255, (int)red, (int)green, (int)blue);
+
+        float darkPrimary = newColor;
+        paint.setColor((int)darkPrimary);
         paintBorder.setColor(argOuterColor);
         this.invalidate();
     }
@@ -203,7 +223,10 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
         int diff2 =  DRAW_WIDTH;//(int) (centerY-radius);
         boolean updateOutline = bounds == null;
 
-        bounds = new RectF(DRAW_OFFSET, diff2, contentWidth - DRAW_OFFSET, contentWidth - diff2); // DRAW_OFFSET-diff
+        bounds.left =DRAW_OFFSET;
+        bounds.top = diff2;
+        bounds.right = contentWidth - DRAW_OFFSET;
+        bounds.bottom = contentWidth - diff2;
 
         if (updateOutline) {
             onSizeChanged(0, 0, 0, 0);
@@ -355,6 +378,7 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
     public void onPaletteFound(Palette argChangedPalette) {
         ColorExtractor extractor = new ColorExtractor(mContext, argChangedPalette);
         setColor(extractor.getPrimary(), extractor.getSecondary());
+        //setColor(extractor.getSecondary(), extractor.getSecondaryTint());
     }
 
     @Override
@@ -389,15 +413,15 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
 
     @Nullable
     private IAnalytics.EVENT_TYPE getEventType() {
-        if (mLocation == LOCATION.PLAYLIST) {
+        if (mLocation == PLAYLIST) {
             return IAnalytics.EVENT_TYPE.PLAY_FROM_PLAYLIST;
         }
 
-        if (mLocation == LOCATION.FEEDVIEW) {
+        if (mLocation == FEEDVIEW) {
             return IAnalytics.EVENT_TYPE.PLAY_FROM_FEEDVIEW;
         }
 
-        if (mLocation == LOCATION.DISCOVERY_FEEDVIEW) {
+        if (mLocation == DISCOVERY_FEEDVIEW) {
             return IAnalytics.EVENT_TYPE.PLAY_FROM_FEEDVIEW;
         }
 

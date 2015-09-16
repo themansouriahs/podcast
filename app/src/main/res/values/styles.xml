@@ -41,6 +41,13 @@
         <!--<item name="seekbar_handle">@drawable/seekbar_handle2.9</item>-->
         <item name="android:actionBarStyle">@style/TranslucentActionBar</item>
 
+        <item name="android:windowBackground">@null</item>
+        <item name="themeBackground">@color/pitch_black</item>
+
+        <!--<item name="android:background">@color/pitch_black</item>
+        <item name="android:windowBackground">@color/pitch_black</item>-->
+        <!--<item name="android:colorBackground">@color/pitch_black</item>-->
+
         <item name="android:windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
 
@@ -85,6 +92,15 @@
         <item name="favorite_outline_inv">@drawable/ic_favorite_outline_black</item>
 
         <item name="android:actionBarStyle">@style/TransparentActionBar</item>
+
+        <item name="android:windowBackground">@null</item>
+        <item name="themeBackground">@color/white_opaque</item>
+        <!--
+        <item name="android:background">@color/white_opaque</item>
+
+        <item name="android:windowBackground">@color/white_opaque</item>
+        -->
+        <!--<item name="android:colorBackground">@color/white_opaque</item>-->
 
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorSecondary</item>

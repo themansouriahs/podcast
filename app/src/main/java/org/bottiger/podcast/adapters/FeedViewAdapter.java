@@ -155,8 +155,8 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
             }
         }
 
-        episodeViewHolder.mPlayPauseButton.setEpisode(item, PlayPauseImageView.LOCATION.FEEDVIEW);
-        episodeViewHolder.mQueueButton.setEpisode(item, PlayPauseImageView.LOCATION.FEEDVIEW);
+        episodeViewHolder.mPlayPauseButton.setEpisode(item, PlayPauseImageView.FEEDVIEW);
+        episodeViewHolder.mQueueButton.setEpisode(item, PlayPauseImageView.FEEDVIEW);
         episodeViewHolder.mPlayPauseButton.setStatus(isPlaying ? PlayerStatusObservable.STATUS.PLAYING : PlayerStatusObservable.STATUS.PAUSED);
 
         getPalette(episodeViewHolder);

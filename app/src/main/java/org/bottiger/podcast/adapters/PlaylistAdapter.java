@@ -185,7 +185,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
             viewHolder.mPlaylistPosition.setVisibility(View.GONE);
         }
 
-        viewHolder.mPlayPauseButton.setEpisode(item, PlayPauseImageView.LOCATION.PLAYLIST);
+        viewHolder.mPlayPauseButton.setEpisode(item, PlayPauseImageView.PLAYLIST);
         viewHolder.mPlayPauseButton.setStatus(PlayerStatusObservable.STATUS.PAUSED);
 
         viewHolder.downloadButton.setEpisode(item);
@@ -244,7 +244,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         holder.seekbar.setEpisode(feedItem);
         holder.seekbar.setOverlay(mOverlay);
 
-        holder.mPlayPauseButton.setEpisode(feedItem, PlayPauseImageView.LOCATION.PLAYLIST);
+        holder.mPlayPauseButton.setEpisode(feedItem, PlayPauseImageView.PLAYLIST);
         holder.downloadButton.setEpisode(feedItem);
         holder.favoriteButton.setEpisode(feedItem);
         holder.removeButton.setEpisode(feedItem);

@@ -49,8 +49,8 @@ public class MediaRouterPlaybackActivity extends ToolbarActivity {
 
     @Override
     protected void onPause() {
-        super.onPause();
         SoundWaves.getBus().unregister(mMediaRouterEventReciever);
+        super.onPause();
     }
 
     @Override

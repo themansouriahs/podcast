@@ -570,6 +570,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
 
     @Override
     public void onPaletteFound(Palette argChangedPalette) {
+        // FIXME
         setBackgroundColor(StaticButtonColor(mContext, argChangedPalette));
         invalidate();
     }

@@ -128,7 +128,7 @@ public class FeedViewQueueButton extends PlayPauseImageView {
     }
 
     @Override
-    public synchronized void setEpisode(IEpisode argEpisode, LOCATION argLocation) {
+    public synchronized void setEpisode(IEpisode argEpisode, @ButtonLocation int argLocation) {
         super.setEpisode(argEpisode, argLocation);
         PlayerService ps = SoundWaves.sBoundPlayerService;
         if (ps != null) {

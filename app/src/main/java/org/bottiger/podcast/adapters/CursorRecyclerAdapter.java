@@ -29,6 +29,7 @@ import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.widget.Filter;
 import android.widget.FilterQueryProvider;
 import android.widget.Filterable;
@@ -87,17 +88,18 @@ public abstract class CursorRecyclerAdapter<VH
      * android.database.Cursor)}.
      *
      * @param holder {@inheritDoc}
-     * @param i {@inheritDoc}
+     * @param position {@inheritDoc}
      */
     @Override
-    public void onBindViewHolder(VH holder, int i){
+    public void onBindViewHolder(VH holder, int position){
         if (!mDataValid) {
             throw new IllegalStateException("this should only be called when the cursor is valid");
         }
-        if (!mCursor.moveToPosition(i)) {
-            throw new IllegalStateException("couldn't move cursor to position " + i);
+        if (!mCursor.moveToPosition(position)) {
+            //throw new IllegalStateException("couldn't move cursor to position " + position);
+            Log.d("", "couldn't move cursor to position " + position);
         }
-        onBindViewHolderCursor(holder, mCursor);
+        onBindViewHolderCursor(holder, mCursor, position);
     }
 
     /**
@@ -108,8 +110,9 @@ public abstract class CursorRecyclerAdapter<VH
      * @param holder View holder.
      * @param cursor The cursor from which to get the data. The cursor is already
      * moved to the correct position.
+     * @param position The position of the viewHolder
      */
-    public abstract void onBindViewHolderCursor(VH holder, Cursor cursor);
+    public abstract void onBindViewHolderCursor(VH holder, Cursor cursor, int position);
 
     @Override
     public int getItemCount() {
