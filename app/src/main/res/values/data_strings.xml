@@ -24,5 +24,6 @@
     <string name="pref_list_oldest_first_key" translatable="false" >pref_list_oldest_first</string>
     <string name="pref_ask_about_video_key" translatable="false" >pref_ask_about_video</string>
     <string name="pref_open_video_externally_key" translatable="false" >pref_open_video_externally</string>
+    <string name="pref_dark_theme_key" translatable="false" >pref_dark_theme</string>
 </resources>
 

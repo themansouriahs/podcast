@@ -31,17 +31,13 @@ import android.preference.Preference;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.WindowManager;
 
 public class SettingsActivity extends ToolbarActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
-	public static final String DARK_THEME_KEY = "pref_dark_theme";
-	public static final String KEY_FAST_FORWARD = "pref_player_forward_amount";
-	public static final String KEY_REWIND = "pref_player_backward_amount";
-	public static final String CLOUD_SUPPORT = "pref_cloud support";
-
-	public static final String HAPI_PREFS_FILE_NAME = "org.bottiger.podcast_preferences";
+	public static String DARK_THEME_KEY = "";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +46,12 @@ public class SettingsActivity extends ToolbarActivity implements SharedPreferenc
 		// http://stackoverflow.com/questions/11751498/how-to-change-preferenceactivity-theme
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(this.getApplicationContext());
-        setTheme(R.style.SoundWaves_PreferenceActivity_Light);
+
+        DARK_THEME_KEY = getResources().getString(R.string.pref_dark_theme_key);
+        boolean lightTheme = prefs.getBoolean(DARK_THEME_KEY, false);
+        int style = lightTheme ||System.currentTimeMillis() > 0 ? R.style.PreferenceTheme : R.style.PreferenceThemeDark;
+
+        setTheme(style);
 
         super.onCreate(savedInstanceState);
 
@@ -86,7 +87,7 @@ public class SettingsActivity extends ToolbarActivity implements SharedPreferenc
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
 			String key) {
-		if (key.equals(DARK_THEME_KEY)) {
+		if (!TextUtils.isEmpty(DARK_THEME_KEY) && key.equals(DARK_THEME_KEY)) {
 			recreate();
 			return;
 		}

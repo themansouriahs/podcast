@@ -132,6 +132,18 @@
         <item name="android:textViewStyle">@style/SoundWavesTextViewStyle</item>
     </style>
 
+    <style name="PreferenceTheme" parent="SoundWavesTheme.Light">
+        <item name="android:windowBackground">@color/white_opaque</item>
+        <item name="android:textColor">@color/pitch_black</item>
+        <!--<item name="android:listViewStyle">@style/listViewPrefs</item>-->
+    </style>
+
+    <style name="PreferenceThemeDark" parent="SoundWavesTheme.Light">
+        <item name="android:windowBackground">@color/pitch_black</item>
+        <item name="android:textColor">@color/white_opaque</item>
+        <!--<item name="android:listViewStyle">@style/listViewPrefs</item>-->
+    </style>
+
     <style name="SoundWavesTextViewStyle" parent="android:Widget.TextView">
         <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
     </style>
