@@ -45,7 +45,7 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
 
     @Override
     public boolean onLayoutChild(CoordinatorLayout parent, View child, int layoutDirection) {
-        Log.d(TAG, "onLayoutChild, child: " + child.getClass().getName() + " layoutDirection: " + layoutDirection);
+        Log.v(TAG, "onLayoutChild, child: " + child.getClass().getName() + " layoutDirection: " + layoutDirection);
 
         if (mTopPlayer == null) {
             mTopPlayer = (TopPlayer) parent.findViewById(R.id.session_photo_container);
@@ -64,7 +64,7 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
 
     @Override
     public boolean layoutDependsOn(CoordinatorLayout parent, View child, View dependency) {
-        Log.d(TAG, "layoutDependsOn, child: " + child.getClass().getName() + " dependency: " + dependency.getClass().getName());
+        Log.v(TAG, "layoutDependsOn, child: " + child.getClass().getName() + " dependency: " + dependency.getClass().getName());
         boolean corectChild = (child.getId() == R.id.my_recycler_view);
         boolean correctDependency = (dependency.getId() == R.id.session_photo_container);
         return corectChild && correctDependency;
@@ -72,7 +72,7 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
 
     @Override
     public boolean onDependentViewChanged(CoordinatorLayout parent, View child, View dependency) {
-        Log.d(TAG, "onDependentViewChanged, child: " + child.getClass().getName() + " dependency: " + dependency.getClass().getName());
+        Log.v(TAG, "onDependentViewChanged, child: " + child.getClass().getName() + " dependency: " + dependency.getClass().getName());
         int height = mTopPlayer.getLayoutParams().height;
         mRecyclerView.setTranslationY(height);
 
@@ -86,7 +86,7 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
 
     @Override
     public boolean onStartNestedScroll(CoordinatorLayout coordinatorLayout, View child, View directTargetChild, View target, int nestedScrollAxes) {
-        Log.d(TAG, "onStartNestedScroll, child: " + child.getClass().getName() + " target: " + target.getClass().getName());
+        Log.v(TAG, "onStartNestedScroll, child: " + child.getClass().getName() + " target: " + target.getClass().getName());
 
         boolean isTopPlayer = target instanceof TopPlayer;
         boolean canScrollPlaylist = mRecyclerView.canScrollVertically(-1);
@@ -98,7 +98,7 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
 
     @Override
     public void	onNestedPreScroll(CoordinatorLayout coordinatorLayout, View child, View target, int dx, int dy, int[] consumed) {
-        Log.d(TAG, "onNestedPreScroll, child: " + child.getClass().getName() + " target: " + target.getClass().getName());
+        Log.v(TAG, "onNestedPreScroll, child: " + child.getClass().getName() + " target: " + target.getClass().getName());
 
         /*
         if (target instanceof TopPlayer) {

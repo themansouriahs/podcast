@@ -620,15 +620,12 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         Log.d(TAG, "Enter fullscreen mode");
         mFullscreenButton.setImageResource(R.drawable.ic_fullscreen_exit_white);
 
-        //mPhoto.getLayoutParams().height = mPhoto.getWidth();
-
         // Main player layout
-        //CoordinatorLayout.LayoutParams paramCache = (CoordinatorLayout.LayoutParams) mLayout.getLayoutParams();
         CoordinatorLayout.LayoutParams layoutParams = new CoordinatorLayout.LayoutParams(
                 LayoutParams.MATCH_PARENT,
                 LayoutParams.MATCH_PARENT);
         mLayout.setLayoutParams(layoutParams);
-
+        mLayout.bringToFront();
     }
 
     private void exitFullscreen() {
