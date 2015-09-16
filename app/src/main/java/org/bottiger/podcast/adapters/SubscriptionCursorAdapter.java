@@ -240,7 +240,7 @@ public class SubscriptionCursorAdapter extends CursorRecyclerAdapter {
     @Override
     public void changeCursor(Cursor cursor) {
         super.changeCursor(cursor);
-        mOnSubscriptionCountChanged.newSubscriptionCount(cursor.getCount());
+        mOnSubscriptionCountChanged.newSubscriptionCount(super.getItemCount());
 
     }
 
@@ -257,7 +257,7 @@ public class SubscriptionCursorAdapter extends CursorRecyclerAdapter {
     @Override
     public Cursor swapCursor(Cursor newCursor) {
         Cursor cursor = super.swapCursor(newCursor);
-        mOnSubscriptionCountChanged.newSubscriptionCount(newCursor.getCount());
+        mOnSubscriptionCountChanged.newSubscriptionCount(super.getItemCount());
         return cursor;
     }
 
