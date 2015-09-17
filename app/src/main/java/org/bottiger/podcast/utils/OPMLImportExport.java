@@ -232,7 +232,7 @@ public class OPMLImportExport {
 			return true;
 
 		try {
-			file = new File(SDCardManager.getSDCardDir() + "/" + filename);
+			file = new File(SDCardManager.getSDCardRootDir() + "/" + filename);
 			fileOut = new File(SDCardManager.getExportDir() + "/" + filenameOut);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -240,5 +240,23 @@ public class OPMLImportExport {
 		}
 
 		return true;
+	}
+
+	public File getExportFile() {
+		initInputOutputFiles();
+		return fileOut;
+	}
+
+	public File getImportFile() {
+		initInputOutputFiles();
+		return file;
+	}
+
+	public static String getImportFilename() {
+		return filename;
+	}
+
+	public static String getExportFilename() {
+		return filenameOut;
 	}
 }

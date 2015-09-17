@@ -1,16 +1,21 @@
 package org.bottiger.podcast.TestUtils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.v4.util.LongSparseArray;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.PodcastOpenHelper;
+import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionColumns;
+import org.bottiger.podcast.provider.SubscriptionLoader;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -107,6 +112,16 @@ public class TestUtils {
                         .perform(swipeLeft());
                 break;
             }
+        }
+    }
+
+    public static void unsubscribeAll(@NonNull Activity argActivity) {
+        LongSparseArray<ISubscription> list = SubscriptionLoader.asList(argActivity.getContentResolver());
+        for(int i = 0; i < list.size(); i++) {
+            long key = list.keyAt(i);
+            // get the object by the key.
+            Subscription subscription = (Subscription)list.get(key);
+            subscription.unsubscribe(argActivity);
         }
     }
 }

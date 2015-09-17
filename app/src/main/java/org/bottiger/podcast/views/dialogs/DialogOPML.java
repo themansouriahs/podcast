@@ -10,9 +10,11 @@ import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresPermission;
+import android.support.annotation.StringRes;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -76,7 +78,7 @@ public class DialogOPML {
         textView.setText(opmlImportInstructions);
 
         builder.setView(view);
-        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(getPositiveString(), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
                 OPMLImportExport importExport = new OPMLImportExport(argActivity);
@@ -90,7 +92,7 @@ public class DialogOPML {
                 }
             }
         });
-        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(getNegativeString(), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 //DialogOPML.this.getDialog().cancel();
             }
@@ -109,5 +111,16 @@ public class DialogOPML {
             opmlImportExports[0].importSubscriptions();
             return null;
         }
+    }
+
+    // Used for testing in case I change them in the future
+    @StringRes
+    public static int getPositiveString() {
+        return android.R.string.ok;
+    }
+
+    @StringRes
+    public static int getNegativeString() {
+        return android.R.string.cancel;
     }
 }

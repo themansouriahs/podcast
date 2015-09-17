@@ -3,6 +3,7 @@ package org.bottiger.podcast;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.matcher.ViewMatchers;
 import android.test.ActivityInstrumentationTestCase2;
+import android.test.suitebuilder.annotation.LargeTest;
 
 import org.bottiger.podcast.TestUtils.RecyclerTestUtils;
 import org.bottiger.podcast.TestUtils.TestUtils;
@@ -18,6 +19,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 /**
  * Created by aplb on 17-09-2015.
  */
+@LargeTest
 public class FeedViewTest extends ActivityInstrumentationTestCase2<MainActivity> {
 
     private static final int FIRST_ITEM = 0;

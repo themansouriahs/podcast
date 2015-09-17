@@ -42,8 +42,13 @@ public class SDCardManager {
     }
 
     @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+    public static String getSDCardRootDir() throws IOException, SecurityException {
+        return Environment.getExternalStorageDirectory().getAbsolutePath();
+    }
+
+    @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
     public static String getExportDir() throws IOException, SecurityException {
-        return getSDCardDir() + APP_DIR + EXPORT_DIR;
+        return getSDCardRootDir();
     }
 
     @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
