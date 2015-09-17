@@ -146,18 +146,21 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
         }
 
         boolean isPlaying = false;
+        @PlayerStatusObservable.PlayerStatus int playerStatus = PlayerStatusObservable.STOPPED;
         if (SoundWaves.sBoundPlayerService != null && SoundWaves.sBoundPlayerService.isInitialized()) {
             if (item.getURL().equals(SoundWaves.sBoundPlayerService
                     .getCurrentItem().getUrl().toString())) {
                 if (SoundWaves.sBoundPlayerService.isPlaying()) {
                     isPlaying = true;
                 }
+                playerStatus = SoundWaves.sBoundPlayerService.getPlayer().getStatus();
             }
         }
 
         episodeViewHolder.mPlayPauseButton.setEpisode(item, PlayPauseImageView.FEEDVIEW);
         episodeViewHolder.mQueueButton.setEpisode(item, PlayPauseImageView.FEEDVIEW);
-        episodeViewHolder.mPlayPauseButton.setStatus(isPlaying ? PlayerStatusObservable.PLAYING : PlayerStatusObservable.PAUSED);
+        //episodeViewHolder.mPlayPauseButton.setStatus(isPlaying ? PlayerStatusObservable.PLAYING : PlayerStatusObservable.PAUSED);
+        episodeViewHolder.mPlayPauseButton.setStatus(playerStatus);
 
         getPalette(episodeViewHolder);
 

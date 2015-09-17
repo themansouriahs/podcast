@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Outline;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -19,11 +20,14 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.view.animation.LinearOutSlowInInterpolator;
 import android.support.v7.graphics.Palette;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewOutlineProvider;
+import android.view.animation.Animation;
+import android.view.animation.RotateAnimation;
 import android.webkit.MimeTypeMap;
 import android.widget.ImageButton;
 
@@ -41,6 +45,7 @@ import org.bottiger.podcast.listeners.PlayerStatusProgressData;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
+import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.views.dialogs.DialogOpenVideoExternally;
 
@@ -58,6 +63,17 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
 
     private static final boolean DRAW_PROGRESS          = true;
     private static final boolean DRAW_PROGRESS_MARKER   = true;
+
+    private static final int FPS = 60;
+    private static final long ANIMATION_DURATION = 10000; // in ms, 10 seconds
+    private static final long ANIMATION_APPEAR_THRESHOLD = 250; // time before we show the animation
+    private static final long ANIMATION_HIDE_THRESHOLD = 1000; // minimum time we display the animation if it appears
+
+    private final Matrix mMatrix = new Matrix(); // transformation matrix
+    private long mStartTime = System.currentTimeMillis();
+    private long mPreparingAnimationStarted = -1;
+
+    private static final LinearOutSlowInInterpolator interperter = new LinearOutSlowInInterpolator();
 
     private static final String MIME_VIDEO = "video/*";
 
@@ -83,6 +99,8 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
 
     private RectF bounds = new RectF();
     private Rect boundsRound = new Rect();
+
+    private Animation rotateAnimation;
 
     private boolean mDrawBackground;
     private int mProgressPercent = 0;
@@ -173,14 +191,20 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
     }
 
     public void setStatus(@PlayerStatusObservable.PlayerStatus int argStatus) {
-        mStatus = argStatus;
 
         int resid;
-        if (mStatus == PlayerStatusObservable.PLAYING) {
+        if (argStatus == PlayerStatusObservable.PLAYING) {
             resid = drawBackground() ? R.drawable.ic_pause_white : R.drawable.ic_pause_black;
         } else {
             resid = drawBackground() ? R.drawable.ic_play_arrow_white : R.drawable.ic_play_arrow_black;
         }
+
+        mStatus = argStatus;
+
+        if (mStatus == PlayerStatusObservable.PREPARING) {
+            mStartTime = System.currentTimeMillis();
+        }
+
         setImageResource(resid);
 
         this.invalidate();
@@ -228,13 +252,48 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
             onSizeChanged(0, 0, 0, 0);
         }
 
-        if (DRAW_PROGRESS && getEpisode() != null && getEpisode().isMarkedAsListened()) {
-            canvas.drawCircle(centerX, centerY, radius, paintBorder);
-        } else if (DRAW_PROGRESS && mProgressPercent > 0) {
-            canvas.drawArc(bounds, START_ANGLE, getProgressAngle(mProgressPercent), false, paintBorder);
+        if (mStatus != PlayerStatusObservable.PREPARING) {
+            if (DRAW_PROGRESS && getEpisode() != null && getEpisode().isMarkedAsListened()) {
+                canvas.drawCircle(centerX, centerY, radius, paintBorder);
+            } else if (DRAW_PROGRESS && mProgressPercent > 0) {
+                canvas.drawArc(bounds, START_ANGLE, getProgressAngle(mProgressPercent), false, paintBorder);
+            }
         }
 
         super.onDraw(canvas);
+
+        long elapsedTime = System.currentTimeMillis() - mStartTime;
+        if (mStatus == PlayerStatusObservable.PREPARING || animationStartedLessThanOneSecondAgo(mPreparingAnimationStarted)) {
+
+            if (mPreparingAnimationStarted == -1)
+                mPreparingAnimationStarted = System.currentTimeMillis();
+
+            // Draw the animation
+            float angle = (80 * elapsedTime / 1000) % 360;
+
+            //mMatrix.postRotate(30 * elapsedTime/1000);        // rotate 30° every second
+            mMatrix.setRotate(angle, centerX, centerY);
+            //mMatrix.postTranslate(100 * elapsedTime/1000, 0); // move 100 pixels to the right
+            // other transformations...
+            canvas.concat(mMatrix);        // call this before drawing on the canvas!!
+
+            float zeroToOne = angle / 360;
+            float zeroToTwo = zeroToOne * 2;
+            float minusOneToOne = zeroToTwo - 1;
+            float onezeroone = Math.abs(minusOneToOne) * -1 + 1;
+
+            float interp = onezeroone;
+            //Log.d("Rorate", "angle: " + angle + " interp: " + interp);
+            canvas.drawArc(bounds, START_ANGLE, interperter.getInterpolation(interp) * 360, false, paintBorder);
+
+            this.postInvalidateDelayed(1000 / FPS);
+        } else {
+            mPreparingAnimationStarted = -1;
+        }
+    }
+
+    private boolean animationStartedLessThanOneSecondAgo(long argFirstDisplayed) {
+        return System.currentTimeMillis()-argFirstDisplayed < 1000 && argFirstDisplayed != -1;
     }
 
     @Subscribe
@@ -281,18 +340,6 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
         setStatus(argPlayerStatus.status);
     }
 
-    public void onStateChange(EpisodeStatus argStatus) {
-        if (!argStatus.getEpisode().equals(mEpisode)) {
-            return;
-        }
-
-        if (mStatus == argStatus.getStatus()) {
-            return;
-        }
-
-        setStatus(argStatus.getStatus());
-    }
-
     @Override
     public void setProgressPercent(int argProgress) {
         mProgressPercent = argProgress;
@@ -302,10 +349,9 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
     @Override
     public void onClick(View view) {
 
-        IAnalytics.EVENT_TYPE type = getEventType();
-        if (type != null) {
-            SoundWaves.sAnalytics.trackEvent(type);
-        }
+        PlayerService ps = SoundWaves.sBoundPlayerService;
+        boolean isPlaying = ps.isPlaying() && mEpisode.equals(ps.getCurrentItem());
+        setStatus(isPlaying ? PlayerStatusObservable.PAUSED : PlayerStatusObservable.PREPARING);
 
         // If the file is a video we offer to open it in another external player
         if (mEpisode.isVideo()) {
@@ -347,10 +393,15 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
 
         }
 
-        boolean isPlaying = SoundWaves.sBoundPlayerService.toggle(mEpisode);
-        setStatus(isPlaying ? PlayerStatusObservable.PREPARING : PlayerStatusObservable.STOPPED);
+        isPlaying = SoundWaves.sBoundPlayerService.toggle(mEpisode);
+        //setStatus(isPlaying ? PlayerStatusObservable.PREPARING : PlayerStatusObservable.STOPPED);
 
         //SoundWaves.getBus().post(new PlaylistData().playlistChanged = true);
+
+        IAnalytics.EVENT_TYPE type = getEventType();
+        if (type != null) {
+            SoundWaves.sAnalytics.trackEvent(type);
+        }
     }
 
     public static void openVideoExternally(@NonNull IEpisode argEpisode, @NonNull Context argContext) {

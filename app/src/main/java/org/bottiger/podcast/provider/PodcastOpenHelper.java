@@ -2,7 +2,6 @@ package org.bottiger.podcast.provider;
 
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
-import org.bottiger.podcast.flavors.Analytics.VendorAnalytics;
 import org.bottiger.podcast.utils.PodcastLog;
 
 import android.content.Context;
