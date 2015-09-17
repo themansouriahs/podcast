@@ -136,7 +136,7 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
 
     public void start() {
 
-        PlayerStatusData psd = new PlayerStatusData(mPlayerService.getCurrentItem(), PlayerStatusObservable.STATUS.PLAYING);
+        PlayerStatusData psd = new PlayerStatusData(mPlayerService.getCurrentItem(), PlayerStatusObservable.PLAYING);
 
         // If we are using a Chromecats we send the file to it
         if (isCasting()) {
@@ -175,7 +175,7 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
 
         mIsInitialized = false;
         mPlayerService.stopForeground(true);
-        PlayerStatusData psd = new PlayerStatusData(mPlayerService.getCurrentItem(), PlayerStatusObservable.STATUS.STOPPED);
+        PlayerStatusData psd = new PlayerStatusData(mPlayerService.getCurrentItem(), PlayerStatusObservable.STOPPED);
         SoundWaves.getBus().post(psd);
     }
 
@@ -239,7 +239,7 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
         }
 
         MarkAsListenedIfNeeded();
-        PlayerStatusData psd = new PlayerStatusData(mPlayerService.getCurrentItem(), PlayerStatusObservable.STATUS.PAUSED);
+        PlayerStatusData psd = new PlayerStatusData(mPlayerService.getCurrentItem(), PlayerStatusObservable.PAUSED);
         SoundWaves.getBus().post(psd);
         SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.PAUSE);
     }
@@ -407,7 +407,7 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
                 mMediaCast.play(offst);
             }
 
-            PlayerStatusData psd = new PlayerStatusData(mPlayerService.getCurrentItem(), PlayerStatusObservable.STATUS.PLAYING);
+            PlayerStatusData psd = new PlayerStatusData(mPlayerService.getCurrentItem(), PlayerStatusObservable.PLAYING);
             SoundWaves.getBus().post(psd);
         }
     }

@@ -312,7 +312,7 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
     public void onStateChange(EpisodeStatus argStatus) {
         validateState();
 
-        mIsPlaying = argStatus.getStatus() == PlayerStatusObservable.STATUS.PLAYING;
+        mIsPlaying = argStatus.getStatus() == PlayerStatusObservable.PLAYING;
 
         float currentPositionMs = argStatus.getPlaybackPositionMs() < 0 ? 0 : argStatus.getPlaybackPositionMs();
         double episodeLenghtMS = (double)mEpisode.getDuration();

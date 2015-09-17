@@ -2,7 +2,6 @@ package org.bottiger.podcast.views;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,7 +14,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IntDef;
@@ -46,7 +44,6 @@ import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.views.dialogs.DialogOpenVideoExternally;
 
-import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -64,7 +61,6 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
 
     private static final String MIME_VIDEO = "video/*";
 
-    //public enum LOCATION { PLAYLIST, FEEDVIEW, DISCOVERY_FEEDVIEW, OTHER };
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({PLAYLIST, FEEDVIEW, DISCOVERY_FEEDVIEW, OTHER})
     public @interface ButtonLocation {}
@@ -79,7 +75,7 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
     private static final int DRAW_OFFSET = 6;
     private static final int DRAW_WIDTH = 6;
 
-    private PlayerStatusObservable.STATUS mStatus = PlayerStatusObservable.STATUS.STOPPED;
+    private @PlayerStatusObservable.PlayerStatus int mStatus = PlayerStatusObservable.STOPPED;
 
     private IEpisode mEpisode;
 
@@ -176,11 +172,11 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
         this.mEpisode = null;
     }
 
-    public void setStatus(PlayerStatusObservable.STATUS argStatus) {
+    public void setStatus(@PlayerStatusObservable.PlayerStatus int argStatus) {
         mStatus = argStatus;
 
         int resid;
-        if (mStatus == PlayerStatusObservable.STATUS.PLAYING) {
+        if (mStatus == PlayerStatusObservable.PLAYING) {
             resid = drawBackground() ? R.drawable.ic_pause_white : R.drawable.ic_pause_black;
         } else {
             resid = drawBackground() ? R.drawable.ic_play_arrow_white : R.drawable.ic_play_arrow_black;
@@ -278,7 +274,7 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
 
         if (!getEpisode().equals(argPlayerStatus.episode)) {
 
-            setStatus(PlayerStatusObservable.STATUS.PAUSED);
+            setStatus(PlayerStatusObservable.PAUSED);
             return;
         }
 
@@ -352,7 +348,7 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
         }
 
         boolean isPlaying = SoundWaves.sBoundPlayerService.toggle(mEpisode);
-        setStatus(isPlaying ? PlayerStatusObservable.STATUS.PLAYING : PlayerStatusObservable.STATUS.STOPPED);
+        setStatus(isPlaying ? PlayerStatusObservable.PREPARING : PlayerStatusObservable.STOPPED);
 
         //SoundWaves.getBus().post(new PlaylistData().playlistChanged = true);
     }

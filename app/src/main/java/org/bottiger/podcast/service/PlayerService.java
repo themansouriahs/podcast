@@ -36,6 +36,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresPermission;
 import android.telephony.PhoneStateListener;
@@ -45,6 +46,8 @@ import android.util.Log;
 import com.squareup.otto.Subscribe;
 
 import java.io.IOException;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 import javax.annotation.Nullable;
 
@@ -68,11 +71,14 @@ public class PlayerService extends Service implements
     public static final String ACTION_STOP = "action_stop";
 
 	/** Which action to perform when a track ends */
-	public static enum NextTrack {
-		NONE, NEW_TRACK, NEXT_IN_PLAYLIST
-	}
+	@Retention(RetentionPolicy.SOURCE)
+	@IntDef({NONE, NEW_TRACK, NEXT_IN_PLAYLIST})
+	public @interface NextTrack {}
+	public static final int NONE = 1;
+	public static final int NEW_TRACK = 2;
+	public static final int NEXT_IN_PLAYLIST = 3;
 
-	private static NextTrack nextTrack = NextTrack.NEXT_IN_PLAYLIST;
+	private static @PlayerService.NextTrack int nextTrack = NEXT_IN_PLAYLIST;
 	
 	private Playlist mPlaylist;
 
@@ -495,7 +501,7 @@ public class PlayerService extends Service implements
 	public void onPlayerStateChange(PlayerStatusData argPlayerStatus) {
 		if (argPlayerStatus == null)
 			return;
-        if (argPlayerStatus.status == PlayerStatusObservable.STATUS.STOPPED) {
+        if (argPlayerStatus.status == PlayerStatusObservable.STOPPED) {
             dis_notifyStatus();
         } else {
             notifyStatus();
@@ -531,7 +537,7 @@ public class PlayerService extends Service implements
 	 * 
 	 * @return The type of episode to be played next
 	 */
-	public static NextTrack getNextTrack() {
+	public static @NextTrack int getNextTrack() {
 		return nextTrack;
 	}
 

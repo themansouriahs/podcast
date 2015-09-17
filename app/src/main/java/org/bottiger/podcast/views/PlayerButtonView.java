@@ -36,7 +36,7 @@ public class PlayerButtonView extends ImageButton implements PaletteListener  {
     public final static int STATE_DELETE = 2;
     public final static int STATE_QUEUE = 3;
 
-    private PlayerStatusObservable.STATUS mStatus = PlayerStatusObservable.STATUS.STOPPED;
+    private @PlayerStatusObservable.PlayerStatus int mStatus = PlayerStatusObservable.STOPPED;
     private IEpisode mEpisode;
 
     private int mLastProgress = 0;
@@ -123,7 +123,7 @@ public class PlayerButtonView extends ImageButton implements PaletteListener  {
         this.mEpisode = null;
     }
 
-    public void setStatus(PlayerStatusObservable.STATUS argStatus) {
+    public void setStatus(@PlayerStatusObservable.PlayerStatus int argStatus) {
         mStatus = argStatus;
         this.invalidate();
     }

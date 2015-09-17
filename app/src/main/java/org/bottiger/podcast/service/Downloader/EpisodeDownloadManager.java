@@ -85,7 +85,7 @@ public class EpisodeDownloadManager extends Observable {
     public static final int ACTION_REFRESH_SUBSCRIPTION = 1;
     public static final int ACTION_STREAM_EPISODE = 2;
     public static final int ACTION_DOWNLOAD_MANUALLY = 3;
-    public static final int ACTION_DOWNLOAD_AUTOMATICALLY = 3;
+    public static final int ACTION_DOWNLOAD_AUTOMATICALLY = 4;
 
     private static SharedPreferences sSharedPreferences;
 

@@ -8,21 +8,21 @@ import org.bottiger.podcast.provider.IEpisode;
 public class EpisodeStatus {
 
     private IEpisode mEpisode = null;
-    private PlayerStatusObservable.STATUS mStatus = PlayerStatusObservable.STATUS.STOPPED;
+    private @PlayerStatusObservable.PlayerStatus int mStatus = PlayerStatusObservable.STOPPED;
     private int mPosition = -1;
 
-    public EpisodeStatus(IEpisode argEpisode, PlayerStatusObservable.STATUS argStatus) {
+    public EpisodeStatus(IEpisode argEpisode, @PlayerStatusObservable.PlayerStatus int argStatus) {
         mEpisode = argEpisode;
         mStatus = argStatus;
     }
 
-    public EpisodeStatus(IEpisode argEpisode, PlayerStatusObservable.STATUS argStatus, int argPosition) {
+    public EpisodeStatus(IEpisode argEpisode, @PlayerStatusObservable.PlayerStatus int argStatus, int argPosition) {
         mEpisode = argEpisode;
         mStatus = argStatus;
         mPosition = argPosition;
     }
 
-    public static EpisodeStatus generateEpisodeStatsus(IEpisode argEpisode, PlayerStatusObservable.STATUS argStatus, Integer argPosition) {
+    public static EpisodeStatus generateEpisodeStatsus(IEpisode argEpisode, @PlayerStatusObservable.PlayerStatus int argStatus, Integer argPosition) {
         if (argPosition == null) {
             return new EpisodeStatus(argEpisode, argStatus);
         }
@@ -37,7 +37,7 @@ public class EpisodeStatus {
         return mPosition;
     }
 
-    public PlayerStatusObservable.STATUS getStatus() {
+    public @PlayerStatusObservable.PlayerStatus int getStatus() {
         return mStatus;
     }
 }

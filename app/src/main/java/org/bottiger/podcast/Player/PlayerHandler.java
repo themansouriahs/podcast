@@ -88,7 +88,7 @@ public class PlayerHandler {
 
                     if (playerService.getCurrentItem() != null) {
 
-                        if (playerService.getNextTrack() == PlayerService.NextTrack.NEXT_IN_PLAYLIST) {
+                        if (playerService.getNextTrack() == PlayerService.NEXT_IN_PLAYLIST) {
                             IEpisode nextItemId = playerService.getNextId();
 
                             if (nextItemId == null) {

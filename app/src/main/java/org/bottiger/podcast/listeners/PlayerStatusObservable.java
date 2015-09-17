@@ -9,9 +9,13 @@ import org.bottiger.podcast.service.PlayerService;
 import android.content.ContentResolver;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 
 import com.squareup.otto.Subscribe;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 public class PlayerStatusObservable {
 
@@ -20,21 +24,16 @@ public class PlayerStatusObservable {
      */
     private final static long REFRESH_INTERVAL = 100; // 16 ms => 60 fps
 
-	public enum STATUS {
-		PLAYING(0), PAUSED(1), STOPPED(2);
-
-        private int value;
-        private STATUS(int value){
-            this.value = value;
-        }
-	}
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({PLAYING, PAUSED, STOPPED, PREPARING})
+    public @interface PlayerStatus {}
+    public static final int PLAYING = 1;
+    public static final int PAUSED = 2;
+    public static final int STOPPED = 3;
+    public static final int PREPARING = 4;
 
     private static Handler sHandler = new ProgressHandler();
     private static long lastUpdate = System.currentTimeMillis();
-
-    public static STATUS statusFromInt(int i) {
-        return STATUS.values()[i];
-    }
 
     public static void updateProgress(@NonNull PlayerService argPlayerService) {
         IEpisode currentItem = argPlayerService.getCurrentItem();
@@ -63,10 +62,10 @@ public class PlayerStatusObservable {
 
     @Subscribe
     public void startProgressUpdate(PlayerStatusData argPlayerStatus) {
-        sHandler.removeMessages(STATUS.PLAYING.value);
+        sHandler.removeMessages(PLAYING);
 
-        if (argPlayerStatus.status == STATUS.PLAYING) {
-            Message msg = sHandler.obtainMessage(STATUS.PLAYING.value);
+        if (argPlayerStatus.status == PLAYING) {
+            Message msg = sHandler.obtainMessage(PLAYING);
             sHandler.sendMessage(msg);
         }
     }
@@ -79,8 +78,7 @@ public class PlayerStatusObservable {
             //PhotoTask photoTask = (PhotoTask) inputMessage.obj;
 
             // Gets the ImageView for this task
-            STATUS status = statusFromInt(inputMessage.what);
-            switch (status) {
+            switch (inputMessage.what) {
                 // The decoding is done
                 case PLAYING:
                     PlayerService ps = SoundWaves.sBoundPlayerService;
@@ -88,7 +86,7 @@ public class PlayerStatusObservable {
                     if (ps != null) {
                         updateProgress(ps);
 
-                        int currentStatus = ps.isPlaying() || ps.getPlayer().isCasting() ? STATUS.PLAYING.value : STATUS.STOPPED.value;
+                        int currentStatus = ps.isPlaying() || ps.getPlayer().isCasting() ? PLAYING : STOPPED;
                         inputMessage = sHandler.obtainMessage(currentStatus);
                         sHandler.sendMessageDelayed(inputMessage, REFRESH_INTERVAL);
                     }

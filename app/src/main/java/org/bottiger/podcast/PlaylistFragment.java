@@ -445,9 +445,9 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                 SoundWaves.sBoundPlayerService.getCurrentItem() != null &&
                 SoundWaves.sBoundPlayerService.getCurrentItem().equals(item) &&
                 SoundWaves.sBoundPlayerService.isPlaying()) {
-            mPlayPauseButton.setStatus(PlayerStatusObservable.STATUS.PLAYING);
+            mPlayPauseButton.setStatus(PlayerStatusObservable.PLAYING);
         } else {
-            mPlayPauseButton.setStatus(PlayerStatusObservable.STATUS.PAUSED);
+            mPlayPauseButton.setStatus(PlayerStatusObservable.PAUSED);
         }
 
         mBackButton.setOnClickListener(new View.OnClickListener() {

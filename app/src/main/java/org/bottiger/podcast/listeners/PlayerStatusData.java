@@ -7,17 +7,11 @@ import org.bottiger.podcast.provider.IEpisode;
  */
 public class PlayerStatusData {
 
-    public PlayerStatusObservable.STATUS status = PlayerStatusObservable.STATUS.STOPPED;
+    public @PlayerStatusObservable.PlayerStatus int status = PlayerStatusObservable.STOPPED;
     public IEpisode episode = null;
 
-    public PlayerStatusData(IEpisode argEpisode, PlayerStatusObservable.STATUS argStatus) {
+    public PlayerStatusData(IEpisode argEpisode, @PlayerStatusObservable.PlayerStatus int argStatus) {
         status = argStatus;
         episode = argEpisode;
     }
-    /*
-        public IEpisode getEpisode();
-    public void setProgressMs(long progressMs); // progress in ms
-    public void onStateChange(EpisodeStatus argStatus);
-     */
-
 }
