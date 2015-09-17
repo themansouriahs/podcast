@@ -99,6 +99,10 @@ public class SDCardManager {
         // Find the external dir with the most free space.
         for (int i = 0; i < dirs.length; i++) {
             tmpDir = dirs[i];
+
+            if (tmpDir == null)
+                continue;
+
             StatFs statFs = new StatFs(tmpDir.getAbsolutePath());
             long freeBytes = 0;
 
@@ -114,14 +118,23 @@ public class SDCardManager {
             }
         }
 
+        /**
+         * FIXME
+         * We could not find an external location, find another one!
+         * This seems to be an issue with some samsung devices,
+         * I should probably investigate it at some point
+         */
+        if (externalDir == null) {
+            externalDir = SoundWaves.getAppContext().getFilesDir();
+        }
+
+
         if (externalDir == null) {
             throw new IOException("Cannot find external dir"); // NoI18N
         }
 
         sSDCardDirCache = externalDir.getAbsolutePath();
         return sSDCardDirCache;
-		//File sdDir = new File(Environment.getExternalStorageDirectory().getPath());
-		//return sdDir.getAbsolutePath();
 	}
 
 
@@ -137,13 +150,6 @@ public class SDCardManager {
         if (!exists) {
             return file.mkdirs();
         }
-
-        try {
-            file = new File(getExportDir());
-        } catch (IOException e) {
-            return false;
-        }
-        exists = (file.exists());
 
         return exists || file.mkdirs();
     }
