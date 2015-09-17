@@ -11,6 +11,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.transition.Slide;
 import android.transition.Transition;
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -118,6 +119,10 @@ public class TopActivity extends AppCompatActivity {
                 return;
             }
         }
+    }
+
+    protected void importOPMLButtonCallback() {
+        SubscriptionsFragment.openImportExportDialog(this);
     }
 
     /**

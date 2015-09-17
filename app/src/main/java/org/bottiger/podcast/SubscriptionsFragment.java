@@ -29,12 +29,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
-public class SubscriptionsFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class SubscriptionsFragment extends Fragment implements View.OnClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG = "SubscriptionsFragment";
 
@@ -50,6 +51,7 @@ public class SubscriptionsFragment extends Fragment implements SharedPreferences
 
     private GridLayoutManager mGridLayoutmanager;
     private RelativeLayout mEmptySubscrptionList;
+    private Button mEmptySubscrptionImportOPMLButton;
     private SubscriptionCursorAdapter mAdapter;
 
     private Activity mActivity;
@@ -102,12 +104,10 @@ public class SubscriptionsFragment extends Fragment implements SharedPreferences
 
         // Empty View
         mEmptySubscrptionList = (RelativeLayout) mContainerView.findViewById(R.id.subscription_empty);
+        mEmptySubscrptionImportOPMLButton = (Button) mContainerView.findViewById(R.id.import_opml_button);
 
         mShareAnalytics = (CheckBox) mContainerView.findViewById(R.id.checkBox_usage);
         mCloudServices =  (CheckBox) mContainerView.findViewById(R.id.checkBox_cloud);
-
-        onSharedPreferenceChanged(shareprefs, PREF_SHARE_ANALYTICS_KEY);
-        onSharedPreferenceChanged(shareprefs, PREF_CLOUD_SUPPORT_KEY);
 
         //RecycelrView
         mAdapter = new SubscriptionCursorAdapter(getActivity(), mCursor, numberOfColumns());
@@ -128,15 +128,27 @@ public class SubscriptionsFragment extends Fragment implements SharedPreferences
 	}
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        view.setOnClickListener(new View.OnClickListener() {
+        mEmptySubscrptionImportOPMLButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(TAG, "onclick");
+                if (getActivity() instanceof TopActivity) {
+                    openImportExportDialog((TopActivity)getActivity());
+                } else {
+                    Log.wtf(TAG, "getActivity() is not an instance of TopActivity. Please investigate"); // NoI18N
+                }
             }
         });
+
+        onSharedPreferenceChanged(shareprefs, PREF_SHARE_ANALYTICS_KEY);
+        onSharedPreferenceChanged(shareprefs, PREF_CLOUD_SUPPORT_KEY);
 
         mShareAnalytics.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -174,11 +186,6 @@ public class SubscriptionsFragment extends Fragment implements SharedPreferences
             ((SubscriptionCursorAdapter)mGridView.getAdapter()).setNumberOfColumns(numberOfColumns());
         }
     }
-
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-	}
 
 	@Override
 	public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
@@ -234,10 +241,6 @@ public class SubscriptionsFragment extends Fragment implements SharedPreferences
                 return super.onContextItemSelected(menuItem);
         }
     }
-
-	private int getLayoutType() {
-		return R.layout.subscription_fragment;
-	}
 
     private int numberOfColumns() {
         String number = shareprefs.getString(PREF_SUBSCRIPTION_COLUMNS, "2");
@@ -296,5 +299,10 @@ public class SubscriptionsFragment extends Fragment implements SharedPreferences
         }
 
         return true;
+    }
+
+    @Override
+    public void onClick(View v) {
+        Log.d(TAG, "Onclikc");
     }
 }

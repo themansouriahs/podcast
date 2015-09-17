@@ -204,74 +204,10 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
         mRecyclerView.setAdapter(mAdapter);
 
-        //RecentItemsRecyclerListener l = new RecentItemsRecyclerListener(mAdapter);
-        //mRecyclerView.setRecyclerListener(l);
-
         if (mPlaylist != null && !mPlaylist.isEmpty()) {
             IEpisode episode = mPlaylist.first();
             bindHeader(episode);
         }
-
-
-        //mRecyclerView.addOnItemTouchListener(new RecyclerItemTouchListener());
-
-        ///////
-
-        /*
-        SwipeDismissRecyclerViewTouchListener touchListener =
-                new SwipeDismissRecyclerViewTouchListener(
-                        mRecyclerView,
-                        new SwipeDismissRecyclerViewTouchListener.DismissCallbacks() {
-                            @Override
-                            public boolean canDismiss(int position) {
-                                return true;
-                            }
-
-                            @Override
-                            public void onDismiss(RecyclerView recyclerView, int[] reverseSortedPositions) {
-
-                                final int itemPosition = reverseSortedPositions[0]+1;
-                                final IEpisode episode = mPlaylist.getItem(itemPosition);
-                                final int currentPriority = episode.getPriority();
-                                final ContentResolver contentResolver = getActivity().getContentResolver();
-
-                                episode.setPriority(-1);
-
-                                if (episode instanceof FeedItem) {
-                                    FeedItem item = (FeedItem) episode;
-                                    item.markAsListened();
-                                }
-
-                                episode.update(contentResolver);
-                                mPlaylist.removeItem(itemPosition);
-                                // do not call notifyItemRemoved for every item, it will cause gaps on deleting items
-                                mAdapter.notifyDataSetChanged();
-                                String episodeRemoved = getResources().getString(R.string.playlist_episode_dismissed);
-
-                                Snackbar.make(view, episodeRemoved, Snackbar.LENGTH_LONG)
-                                        .setAction(R.string.playlist_episode_dismissed_undo, new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                episode.setPriority(currentPriority);
-                                                mPlaylist.setItem(itemPosition, episode);
-                                                mAdapter.notifyDataSetChanged();
-
-                                                if (episode instanceof FeedItem) {
-                                                    FeedItem item = (FeedItem) episode;
-                                                    item.markAsListened(0);
-                                                }
-
-                                                episode.update(contentResolver);
-                                            }
-                                        }).show();
-
-                                //snackbar.getView().setLa
-
-                                  //      .show();
-                            }
-                        });
-        mRecyclerView.setOnTouchListener(touchListener);
-        */
 
         // init swipe to dismiss logic
         ItemTouchHelper swipeToDismissTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(
@@ -383,11 +319,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
             }
         });
         swipeToDismissTouchHelper.attachToRecyclerView(mRecyclerView);
-
-
-
-
-        //mRecyclerView.setItemAnimator(new SlideInLeftAnimator());
     }
 
     @Override
@@ -715,4 +646,4 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         }
     }
 
-    }
+}

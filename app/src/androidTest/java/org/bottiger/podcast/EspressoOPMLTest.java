@@ -81,6 +81,21 @@ public class EspressoOPMLTest extends ActivityInstrumentationTestCase2<MainActiv
         onView(withId(R.id.radio_export)).inRoot(isDialog()).check(matches(isDisplayed()));
     }
 
+    public void testImportOPMLButton() {
+
+        // close the dialog
+        onView(withText(DialogOPML.getNegativeString())).perform(click());
+
+        onView(withText(R.string.opml_radio_import)).check(matches(not(isDisplayed())));
+
+        TestUtils.unsubscribeAll(getActivity());
+
+        onView(withId(R.id.import_opml_button)).check(matches(isDisplayed()));
+        onView(withId(R.id.import_opml_button)).perform(click());
+
+        onView(withText(R.string.opml_radio_import)).check(matches(isDisplayed()));
+    }
+
     public void testExportFeeds() {
 
         File expectedFile = expectedExportedFile();
@@ -120,7 +135,7 @@ public class EspressoOPMLTest extends ActivityInstrumentationTestCase2<MainActiv
         // Start the import
         onView(withId(R.id.radio_import))
                 .perform(click());
-        onView(withText(R.string.opml_radio_import));
+        onView(withText(R.string.opml_radio_import)).check(matches(isDisplayed()));
         onView(withText(DialogOPML.getPositiveString())).perform(click());
 
         for (int i = 0; i < NUMBER_OF_SUBSCRIPTIONS; i++) {
@@ -146,7 +161,7 @@ public class EspressoOPMLTest extends ActivityInstrumentationTestCase2<MainActiv
         onView(withId(R.id.radio_export))
                 .perform(click());
 
-        onView(withText(R.string.opml_radio_import));
+        onView(withText(R.string.opml_radio_import)).check(matches(isDisplayed()));
 
         onView(withText(DialogOPML.getPositiveString())).perform(click());
         //onView(withText(R.string.opml_radio_import)).check(matches(not(isDisplayed())));

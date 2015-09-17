@@ -5,6 +5,17 @@
     android:layout_height="match_parent"
     android:background="?attr/themeBackground">
 
+    <!--
+    We want to keep this abouve the "no subscriptions" layout because even if
+    it's invisible it intercepts all clicks
+    -->
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/gridview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:numColumns="2"
+        android:stretchMode="columnWidth" />
+
     <RelativeLayout
         android:id="@+id/subscription_empty"
         android:layout_width="match_parent"
@@ -92,13 +103,15 @@
             android:layout_alignLeft="@id/checkBox_usage"
             android:layout_centerHorizontal="true" />
 
-    </RelativeLayout>
+        <Button
+            android:id="@+id/import_opml_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/checkBox_cloud"
+            android:layout_marginTop="15dp"
+            android:layout_centerHorizontal="true"
+            android:text="@string/opml_radio_import"/>
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/gridview"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:numColumns="2"
-            android:stretchMode="columnWidth" />
+    </RelativeLayout>
 
 </FrameLayout>

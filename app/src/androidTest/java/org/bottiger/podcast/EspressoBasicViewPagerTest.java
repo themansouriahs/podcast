@@ -24,15 +24,15 @@ import static org.hamcrest.Matchers.anyOf;
 /**
  * Created by apl on 20-05-2015.
  */
-public class EspressoBasicNavigationTest extends ActivityInstrumentationTestCase2<MainActivity> {
+public class EspressoBasicViewPagerTest extends ActivityInstrumentationTestCase2<MainActivity> {
 
     private MainActivity mActivity;
 
-    public EspressoBasicNavigationTest() {
+    public EspressoBasicViewPagerTest() {
         super(MainActivity.class);
     }
 
-    public EspressoBasicNavigationTest(Class<MainActivity> activityClass) {
+    public EspressoBasicViewPagerTest(Class<MainActivity> activityClass) {
         super(activityClass);
     }
 
