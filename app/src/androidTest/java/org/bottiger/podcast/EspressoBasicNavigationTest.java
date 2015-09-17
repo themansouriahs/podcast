@@ -1,12 +1,10 @@
 package org.bottiger.podcast;
 
 import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.Espresso;
-import android.support.test.espresso.action.ViewActions;
-import android.support.test.espresso.matcher.ViewMatchers;
 import android.test.ActivityInstrumentationTestCase2;
 
-import org.hamcrest.Matchers;
+import org.bottiger.podcast.TestUtils.RecyclerTestUtils;
+import org.bottiger.podcast.TestUtils.TestUtils;
 import org.junit.Before;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -22,26 +20,31 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.anyOf;
 
+
 /**
  * Created by apl on 20-05-2015.
  */
-public class EspressoTest extends ActivityInstrumentationTestCase2<MainActivity> {
+public class EspressoBasicNavigationTest extends ActivityInstrumentationTestCase2<MainActivity> {
 
     private MainActivity mActivity;
 
-    public EspressoTest() {
-        super("org.bottiger.podcast", MainActivity.class);
+    public EspressoBasicNavigationTest() {
+        super(MainActivity.class);
     }
 
-    public EspressoTest(Class<MainActivity> activityClass) {
+    public EspressoBasicNavigationTest(Class<MainActivity> activityClass) {
         super(activityClass);
     }
 
     @Before
     public void setUp() throws Exception {
+
+        mActivity = getActivity();
+
+        TestUtils.clearAllData(mActivity);
+
         super.setUp();
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
-        mActivity = getActivity();
     }
 
     // https://github.com/googlesamples/android-testing/blob/master/downloads/espresso-cheat-sheet-2.1.0.pdf
@@ -77,7 +80,7 @@ public class EspressoTest extends ActivityInstrumentationTestCase2<MainActivity>
         onView(withId(R.id.app_content))
                 .check(matches(hasDescendant(withId(R.id.subscription_empty))));
 
-        onView(withId(R.id.subscription_empty))
+        onView(withId(R.id.app_content))
                 .perform(swipeLeft());
 
         onView(withId(R.id.app_content))
@@ -93,35 +96,10 @@ public class EspressoTest extends ActivityInstrumentationTestCase2<MainActivity>
 
 
     public void testSubscribing() {
-        //onView(withId(R.id.playlist_empty_header)).check(matches(isDisplayed()));
 
-        // Go to the discovery fragmnt
-        onView(withId(R.id.app_content))
-                .perform(swipeRight())
-                .perform(swipeRight());
+        TestUtils.clearDatabase(mActivity);
 
-        // Subscribe to a podcast
-
-        /*
-        onView(withId(R.id.search_result_view)).perform(
-                RecyclerViewActions.actionOnItemAtPosition(0, click()));
-        */
-        //onView(withId(R.id.app_content)).check(matches(hasDescendant(withId(R.id.discovery_search_container))));
-        //onView(withId(R.id.discovery_search_container)).check(matches(isDisplayed()));
-
-        //anyOf(withId(R.id.discovery_search_container), withId(R.id.result_subscribe_switch))).perform(click());
-
-        // Open the feed
-        /*
-        onView(withId(R.id.app_content))
-                .perform(swipeLeft());
-
-        // Verify the podcast is there
-        onView(withId(R.id.grid_title)).check(matches(isDisplayed()));
-
-        // open the activity
-        onView(withId(R.id.grid_title)).perform(click());
-        */
+        TestUtils.subscribe(4);
     }
 
 }

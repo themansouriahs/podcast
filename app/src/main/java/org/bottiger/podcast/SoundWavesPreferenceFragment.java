@@ -22,8 +22,6 @@ import org.bottiger.podcast.utils.ThemeHelper;
  */
 public class SoundWavesPreferenceFragment extends PreferenceFragment {
 
-    private Context mContext;
-
     public static final String CURRENT_VERSION = "pref_current_version";
 
     @Override
@@ -37,7 +35,6 @@ public class SoundWavesPreferenceFragment extends PreferenceFragment {
 
     @Override
     public void onAttach (Context argContext) {
-        mContext = argContext;
         super.onAttach(argContext);
     }
 
@@ -46,10 +43,10 @@ public class SoundWavesPreferenceFragment extends PreferenceFragment {
         super.onActivityCreated(savedInstanceState);
 
         Preference prefVersion = findPreference(CURRENT_VERSION);
-        String packageName = mContext.getApplicationContext().getPackageName();
+        String packageName = getActivity().getApplicationContext().getPackageName();
         String version = "Unknown";
         try {
-            version = mContext.getPackageManager().getPackageInfo(packageName, 0).versionName;
+            version = getActivity().getPackageManager().getPackageInfo(packageName, 0).versionName;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
@@ -68,11 +65,11 @@ public class SoundWavesPreferenceFragment extends PreferenceFragment {
         //ThemeHelper helper = new ThemeHelper(mContext);
         //int color = helper.getAttr(R.attr.themeBackground);
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         int theme = ThemeHelper.getTheme(prefs);
 
         // Parse MyCustomStyle, using Context.obtainStyledAttributes()
-        TypedArray ta = mContext.obtainStyledAttributes(theme, attrs);
+        TypedArray ta = getActivity().obtainStyledAttributes(theme, attrs);
 
         // Fetch the text from your style like this.
         //String text = ta.getString(2);
