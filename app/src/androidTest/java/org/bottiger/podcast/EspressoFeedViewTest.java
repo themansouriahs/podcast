@@ -20,15 +20,15 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
  * Created by aplb on 17-09-2015.
  */
 @LargeTest
-public class FeedViewTest extends ActivityInstrumentationTestCase2<MainActivity> {
+public class EspressoFeedViewTest extends ActivityInstrumentationTestCase2<MainActivity> {
 
     private static final int FIRST_ITEM = 0;
 
-    public FeedViewTest() {
+    public EspressoFeedViewTest() {
         super(MainActivity.class);
     }
 
-    public FeedViewTest(Class<MainActivity> activityClass) {
+    public EspressoFeedViewTest(Class<MainActivity> activityClass) {
         super(activityClass);
     }
 

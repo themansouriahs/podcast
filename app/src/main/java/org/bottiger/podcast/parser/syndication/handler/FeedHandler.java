@@ -40,8 +40,7 @@ public class FeedHandler {
             SAXParserFactory factory = SAXParserFactory.newInstance();
             factory.setNamespaceAware(true);
             SAXParser saxParser = factory.newSAXParser();
-            //File file = new File(feed.getFile_url());
-            File file = new File(subscription.getURL().toString());
+
             InputStream stream = new ByteArrayInputStream(feedContent.getBytes());
 
             Reader inputStreamReader = new XmlStreamReader(stream, false, "UTF-8");

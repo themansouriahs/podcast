@@ -6,6 +6,7 @@ import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.playlist.Playlist;
+import org.bottiger.podcast.playlist.filters.SubscriptionFilter;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
@@ -36,11 +37,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
-import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -60,7 +58,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.FrameLayout;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -76,7 +76,10 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
     private View mPlaylistContainer;
     private View mPlaylistWelcomeContainer;
+
     private View mPlaylistEmptyContainer;
+    private RadioButton mPopulateManually;
+    private RadioButton mPopulateAutomatically;
 
     private TopPlayer mTopPlayer;
     private SimpleDraweeView mPhoto;
@@ -166,7 +169,10 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
         mPlaylistContainer = view.findViewById(R.id.playlist_container);
         mPlaylistWelcomeContainer = view.findViewById(R.id.playlist_welcome_screen);
+
         mPlaylistEmptyContainer = view.findViewById(R.id.playlist_empty);
+        mPopulateManually       = (RadioButton) view.findViewById(R.id.radioNone);
+        mPopulateAutomatically  = (RadioButton) view.findViewById(R.id.radioAll);
 
         mEpisodeTitle         =    (TextView) view.findViewById(R.id.episode_title);
         mEpisodeInfo         =    (TextView) view.findViewById(R.id.episode_info);
@@ -208,6 +214,24 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
             IEpisode episode = mPlaylist.first();
             bindHeader(episode);
         }
+
+        mPopulateManually.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    Playlist.changePlaylistFilter(getContext(), mPlaylist, SubscriptionFilter.SHOW_ALL);
+                }
+            }
+        });
+
+        mPopulateAutomatically.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    Playlist.changePlaylistFilter(getContext(), mPlaylist, SubscriptionFilter.SHOW_NONE);
+                }
+            }
+        });
 
         // init swipe to dismiss logic
         ItemTouchHelper swipeToDismissTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(
@@ -329,10 +353,8 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = super.onCreateView(inflater, container, savedInstanceState);
-
-        view = inflater.inflate(R.layout.playlist_fragment_main, container, false);
-
+        super.onCreateView(inflater, container, savedInstanceState);
+        View view = inflater.inflate(R.layout.playlist_fragment_main, container, false);
         return view;
     }
 
@@ -427,7 +449,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         } else {
             mPlayPauseButton.setStatus(PlayerStatusObservable.STATUS.PAUSED);
         }
-        //mDownloadProgressObservable.registerObserver(mDownloadButton);
 
         mBackButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -453,11 +474,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
         mPlayerDownloadButton.setEpisode(item);
 
-        //mDownloadProgressObservable.registerObserver(mPlayerDownloadButton);
-
         final Activity activity = getActivity();
-
-        //mTopPlayer.setEpisodeId(item);
 
         String artworkURL = item.getArtwork(activity);
         if (!TextUtils.isEmpty(artworkURL)) {
@@ -486,7 +503,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
                     int transparentgradientColor;
                     int gradientColor = extractor.getPrimary();
-                    //gradientColor = Color.BLUE;
 
                     int alpha = 0;
                     int red = Color.red(gradientColor);
@@ -500,15 +516,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                             new int[] {transparentgradientColor,gradientColor});
                     Drawable wrapDrawable = DrawableCompat.wrap(gd);
                     DrawableCompat.setTint(wrapDrawable, colorBackground);
-
-                    /*
-                    if (Build.VERSION.SDK_INT >= 16) {
-                        mGradientBottomTopPlayer.setBackground(wrapDrawable);
-                    } else {
-                        mGradientBottomTopPlayer.setBackgroundDrawable(wrapDrawable);
-                    }
-                    mGradientBottomTopPlayer.setVisibility(View.VISIBLE);
-                    */
                 }
 
                 @Override

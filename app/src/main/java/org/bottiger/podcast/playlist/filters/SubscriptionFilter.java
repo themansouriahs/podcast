@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.preference.PreferenceManager;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -12,6 +13,8 @@ import org.bottiger.podcast.ApplicationConfiguration;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.provider.ItemColumns;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.HashSet;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -20,7 +23,12 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class SubscriptionFilter implements IPlaylistFilter, SharedPreferences.OnSharedPreferenceChangeListener {
 
-    public enum MODE {SHOW_ALL, SHOW_NONE, SHOW_SELECTED}
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({SHOW_ALL, SHOW_NONE, SHOW_SELECTED})
+    public @interface Mode {}
+    public static final int SHOW_ALL = 1;
+    public static final int SHOW_NONE = 2;
+    public static final int SHOW_SELECTED = 3;
 
     public static final boolean SHOW_LISTENED_DEFAULT = true;
 
@@ -90,32 +98,32 @@ public class SubscriptionFilter implements IPlaylistFilter, SharedPreferences.On
         }
     }
 
-    public MODE getMode() {
+    public @Mode int getMode() {
         if (mFilterType == DisplayFilter.ALL) {
-            return MODE.SHOW_ALL;
+            return SHOW_ALL;
         }
 
         if (mFilterType == DisplayFilter.MANUAL) {
-            return MODE.SHOW_NONE;
+            return SHOW_NONE;
         }
 
         if (mFilterType == DisplayFilter.SELECTED) {
-            return MODE.SHOW_SELECTED;
+            return SHOW_SELECTED;
         }
-        return MODE.SHOW_NONE;
+        return SHOW_NONE;
     }
 
-    public void setMode(MODE argMode, Context argContext) {
+    public void setMode(@Mode int argMode, Context argContext) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(argContext);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        if (argMode == MODE.SHOW_ALL) {
+        if (argMode == SHOW_ALL) {
             mFilterType = DisplayFilter.ALL;
             editor.putString(SELECTED_SUBSCRIPTIONS_KEY, Long.toString(mFilterType));
-        } else if (argMode == MODE.SHOW_NONE) {
+        } else if (argMode == SHOW_NONE) {
             mFilterType = DisplayFilter.MANUAL;
             editor.putString(SELECTED_SUBSCRIPTIONS_KEY, Long.toString(mFilterType));
-        } else if (argMode == MODE.SHOW_SELECTED) {
+        } else if (argMode == SHOW_SELECTED) {
             mFilterType = DisplayFilter.SELECTED;
             editor.putString(SELECTED_SUBSCRIPTIONS_KEY, toPreferenceValue(mSubscriptions));
         }

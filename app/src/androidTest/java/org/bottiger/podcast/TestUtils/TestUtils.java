@@ -72,6 +72,7 @@ public class TestUtils {
 
     /**
      * This assumes to be called from the viewpager
+     * It returns to the subscription fragment
      *
      * @param argAmount
      * @return true if everything goes well
