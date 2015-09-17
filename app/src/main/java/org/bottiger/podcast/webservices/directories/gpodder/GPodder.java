@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.Log;
 
 import org.apache.commons.validator.routines.UrlValidator;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
@@ -32,6 +33,8 @@ import retrofit.Response;
  * Created by apl on 13-04-2015.
  */
 public class GPodder extends GenericDirectory {
+
+    private static final String TAG = "GPodder";
 
     private static final String NAME = "gPodder";
     private static final String QUERY_SEPARATOR = " ";
@@ -73,10 +76,25 @@ public class GPodder extends GenericDirectory {
     }
 
     public void abortSearch() {
-        if (mCall == null)
-            return;
+        /**
+         * Her ewe should just call:
+         * mCall.cancel();
+         *
+         * However, this is not working, so for now we are spawning a new thread.
+         * https://github.com/square/okhttp/issues/1592
+         *
+         * Maybe I have to make a better solution
+         */
+        new Thread(new Runnable() {
+            public void run() {
+                if (mCall == null)
+                    return;
 
-        mCall.cancel();
+                mCall.cancel();
+                Log.i(TAG, "Call canceled");
+            }
+        }).start();
+
     }
 
     public void toplist(@NonNull final Callback argCallback) {
