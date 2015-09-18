@@ -83,8 +83,8 @@ public class FeedUpdater {
 			}
 
             if (playlist != null) {
-                playlist.notifyDatabaseChanged();
-				//playlist.refresh(SoundWaves.getAppContext());
+                //playlist.notifyDatabaseChanged();
+				playlist.refresh(SoundWaves.getAppContext());
             }
         } catch (SQLiteConstraintException e) {
             FeedItem[] localItems2 = FeedItem.getByURL(contentResolver, urls, null);
