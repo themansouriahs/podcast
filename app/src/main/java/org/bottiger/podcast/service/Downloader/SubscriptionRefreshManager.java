@@ -118,19 +118,30 @@ public class SubscriptionRefreshManager {
                 ISubscription parsedSubscription = null;
                 try {
                     if (response != null && response.body() != null && response.isSuccessful()) {
+
+                        /**
+                         * FIXME: https://github.com/square/okhttp/issues/1362
+                         *
+                         * This can (and will) fail with an out of memory exception when the response is too large.
+                         */
                         String feedString = response.body().string();
+
                         parsedSubscription = processResponse(argContext, argSubscription, feedString);
+
+                        final ISubscription finalSubscription = parsedSubscription != null ? parsedSubscription : null;
+
+                        Log.d(TAG, "Parsing callback for: " + argSubscription);
+                        wrappedCallback.complete(finalSubscription != null, finalSubscription);
+
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
+                } catch (NullPointerException npe) {
+                    npe.printStackTrace();
+                } finally {
+                    if (argSubscription != null)
+                        argSubscription.setIsRefreshing(false);
                 }
-
-                final ISubscription finalSubscription = parsedSubscription != null ? parsedSubscription : null;
-
-                Log.d(TAG, "Parsing callback for: " + argSubscription);
-                wrappedCallback.complete(finalSubscription != null, finalSubscription);
-
-                argSubscription.setIsRefreshing(false);
             }
         });
     }
