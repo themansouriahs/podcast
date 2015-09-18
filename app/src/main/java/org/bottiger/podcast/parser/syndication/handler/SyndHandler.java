@@ -140,13 +140,13 @@ public class SyndHandler extends DefaultHandler {
 		super.endDocument();
 		ISubscription subscription = state.getSubscription();
 
-        Log.d(SubscriptionRefreshManager.DEBUG_KEY, "Done Parsing: " + subscription);
+        Log.d(SubscriptionRefreshManager.TAG, "Done Parsing: " + subscription);
 
         if (subscription instanceof Subscription) {
             FeedUpdater updater = new FeedUpdater(contentResolver);
             updater.updateDatabase((Subscription)subscription, state.getItems());
 			((Subscription)subscription).getEpisodes(contentResolver);
-            Log.d(SubscriptionRefreshManager.DEBUG_KEY, "Done updating database for: " + subscription);
+            Log.d(SubscriptionRefreshManager.TAG, "Done updating database for: " + subscription);
             return;
         }
 
@@ -181,7 +181,7 @@ public class SyndHandler extends DefaultHandler {
                 }
             }
             slimSubscription.setEpisodes(slimEpisodes);
-            Log.d(SubscriptionRefreshManager.DEBUG_KEY, "Replacing the subscription with a populated SlimSubscription:");
+            Log.d(SubscriptionRefreshManager.TAG, "Replacing the subscription with a populated SlimSubscription:");
             state.setSubscription(slimSubscription);
         }
 	}
