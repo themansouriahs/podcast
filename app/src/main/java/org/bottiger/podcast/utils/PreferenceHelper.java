@@ -4,7 +4,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.preference.PreferenceManager;
+import android.support.annotation.BoolRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 
 import org.bottiger.podcast.R;
 
@@ -41,5 +44,15 @@ public class PreferenceHelper implements SharedPreferences.OnSharedPreferenceCha
             Boolean allowRotation = sharedPreferences.getBoolean(mPrefKey, false);
             setScreenOrientation(mActivity, allowRotation);
         }
+    }
+
+    public static boolean getBooleanPreferenceValue(@NonNull Context argContext,
+                                             @StringRes int argKeyId,
+                                             @BoolRes int argDefaultId) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(argContext);
+        String key = argContext.getResources().getString(argKeyId);
+        boolean defaultValue = argContext.getResources().getBoolean(argDefaultId);
+
+        return prefs.getBoolean(key, defaultValue);
     }
 }

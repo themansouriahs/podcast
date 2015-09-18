@@ -59,6 +59,7 @@ public class Subscription implements ISubscription, PaletteListener {
 	public final static int STATUS_UNSUBSCRIBED = 2;
 
     private boolean mIsDirty = false;
+	private boolean mIsRefreshing = false;
 
     /**
      * See SubscriptionColumns for documentation
@@ -375,6 +376,16 @@ public class Subscription implements ISubscription, PaletteListener {
 	}
 
 	@Override
+	public boolean IsRefreshing() {
+		return mIsRefreshing;
+	}
+
+	@Override
+	public void setIsRefreshing(boolean argIsRefreshing) {
+		mIsRefreshing = argIsRefreshing;
+	}
+
+	@Override
     public @Type int getType() {
         return ISubscription.DEFAULT;
     }
@@ -510,9 +521,9 @@ public class Subscription implements ISubscription, PaletteListener {
 			mSettings &= ~DELETE_AFTER_PLAYBACK;
 	}
 
-	public boolean isDownloadNew() {
+	public boolean doDownloadNew(boolean argDefault) {
 		if (!IsSettingEnabled(DOWNLOAD_NEW_EPISODES_SET))
-			return getApplicationValue(mAutoDownloadID, false);
+			return argDefault;
 
 		return IsSettingEnabled(DOWNLOAD_NEW_EPISODES);
 	}
@@ -570,12 +581,5 @@ public class Subscription implements ISubscription, PaletteListener {
 		String key = SoundWaves.getAppContext().getResources().getString(argId);
 		return sSharedPreferences.getBoolean(key, argDefault);
 	}
-
-	/*
-	private void setApplicationValue(int argId, boolean argDefault) {
-		String key = SoundWaves.getAppContext().getResources().getString(argId);
-		sSharedPreferences.edit().putBoolean(key, argDefault).commit();
-	}
-	*/
 
 }

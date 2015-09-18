@@ -44,5 +44,8 @@ public interface ISubscription {
     boolean IsDirty();
     boolean IsSubscribed();
 
+    boolean IsRefreshing();
+    void setIsRefreshing(boolean argIsRefreshing);
+
     @Type int getType();
 }

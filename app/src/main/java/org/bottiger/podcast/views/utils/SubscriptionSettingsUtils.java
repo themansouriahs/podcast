@@ -1,6 +1,9 @@
 package org.bottiger.podcast.views.utils;
 
 import android.content.ContentResolver;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.SwitchCompat;
@@ -9,6 +12,7 @@ import android.widget.CompoundButton;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.utils.PreferenceHelper;
 
 /**
  * Created by aplb on 13-09-2015.
@@ -50,7 +54,8 @@ public class SubscriptionSettingsUtils {
         mDeleteAfterPlayback = (SwitchCompat) mLayout.findViewById(R.id.feed_auto_delete_switch);
         mListOldestFirst = (SwitchCompat) mLayout.findViewById(R.id.feed_oldest_first_switch);
 
-        final ContentResolver contentResolver = mLayout.getContext().getContentResolver();
+        final Context context = mLayout.getContext();
+        final ContentResolver contentResolver = context.getContentResolver();
 
         mShowDescription.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -92,9 +97,13 @@ public class SubscriptionSettingsUtils {
             }
         });
 
+        boolean defaultValue = PreferenceHelper.getBooleanPreferenceValue(context,
+                                R.string.pref_download_on_update_key,
+                                R.bool.pref_download_on_update_default);
+
         mShowDescription.setChecked(mSubscription.isShowDescription());
         mAddNewToPlaylist.setChecked(mSubscription.isAddNewToPlaylist());
-        mAutoDownload.setChecked(mSubscription.isDownloadNew());
+        mAutoDownload.setChecked(mSubscription.doDownloadNew(defaultValue));
         mDeleteAfterPlayback.setChecked(mSubscription.isDeleteWhenListened());
         mListOldestFirst.setChecked(mSubscription.isListOldestFirst());
     }

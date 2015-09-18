@@ -25,6 +25,7 @@ import org.bottiger.podcast.service.IDownloadCompleteCallback;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -39,11 +40,13 @@ public class SubscriptionRefreshManager {
 
     private static FeedHandler mFeedHandler = new FeedHandler();
     final OkHttpClient mOkClient = new OkHttpClient();
+    final Handler mainHandler;
 
     private Context mContext;
 
     public SubscriptionRefreshManager(@NonNull Context argContext) {
         mContext = argContext;
+        mainHandler = new Handler(argContext.getMainLooper());
     }
 
     public void refreshAll() {
@@ -51,19 +54,19 @@ public class SubscriptionRefreshManager {
         refresh(null, null);
     }
 
-    public void refresh(@Nullable ISubscription subscription, @Nullable IDownloadCompleteCallback argCallback) {
-        Log.d(TAG, "refresh subscription: " + subscription + " (null => all)");
+    public void refresh(@Nullable ISubscription argSubscription, @Nullable IDownloadCompleteCallback argCallback) {
+        Log.d(TAG, "refresh subscription: " + argSubscription + " (null => all)");
 
-        if (!EpisodeDownloadManager.canPerform(EpisodeDownloadManager.ACTION_REFRESH_SUBSCRIPTION, mContext)) {
+        if (!EpisodeDownloadManager.canPerform(EpisodeDownloadManager.ACTION_REFRESH_SUBSCRIPTION, mContext, argSubscription)) {
             Log.d(TAG, "refresh aborted, not allowed"); // NoI18N
             return;
         }
 
 
-        if (subscription != null) {
-            addSubscriptionToQueue(mContext, subscription, argCallback);
+        if (argSubscription != null) {
+            addSubscriptionToQueue(mContext, argSubscription, argCallback);
         } else {
-            populateQueue(mContext, argCallback);
+            addAllSubscriptionsToQueue(mContext, argCallback);
         }
     }
 
@@ -84,11 +87,21 @@ public class SubscriptionRefreshManager {
 
         final IDownloadCompleteCallback wrappedCallback = new IDownloadCompleteCallback() {
             @Override
-            public void complete(boolean argSucces, ISubscription argSubscription) {
-                downloadCompleteCallback(argContext, argSubscription, argCallback, argSucces);
+            public void complete(final boolean argSucces, final ISubscription argSubscription) {
+                downloadNewEpisodeskCallback(argContext, argSubscription);
+
+                Runnable myRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        if (argCallback != null)
+                            argCallback.complete(argSucces, argSubscription);
+                    }
+                };
+                mainHandler.post(myRunnable);
             }
         };
 
+        argSubscription.setIsRefreshing(true);
 
         final Request request = new Request.Builder()
                 .url(subscriptionUrl)
@@ -97,7 +110,7 @@ public class SubscriptionRefreshManager {
         mOkClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Request request, IOException e) {
-
+                wrappedCallback.complete(false, argSubscription);
             }
 
             @Override
@@ -114,21 +127,16 @@ public class SubscriptionRefreshManager {
 
                 final ISubscription finalSubscription = parsedSubscription != null ? parsedSubscription : null;
 
-                Handler mainHandler = new Handler(argContext.getMainLooper());
-                Runnable myRunnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        Log.d(TAG, "Parsing callback for: " + argSubscription);
-                        wrappedCallback.complete(finalSubscription != null, finalSubscription);
-                    }
-                };
-                mainHandler.post(myRunnable);
+                Log.d(TAG, "Parsing callback for: " + argSubscription);
+                wrappedCallback.complete(finalSubscription != null, finalSubscription);
+
+                argSubscription.setIsRefreshing(false);
             }
         });
     }
 
-    private int populateQueue(@NonNull Context argContext, @Nullable IDownloadCompleteCallback argCallback) {
-        Log.d(TAG, "populateQueue");
+    private int addAllSubscriptionsToQueue(@NonNull Context argContext, @Nullable IDownloadCompleteCallback argCallback) {
+        Log.d(TAG, "addAllSubscriptionsToQueue");
 
         Cursor subscriptionCursor = null;
         int subscriptionsAdded = 0;
@@ -148,7 +156,7 @@ public class SubscriptionRefreshManager {
             subscriptionCursor.close();
         }
 
-        Log.d(TAG, "populateQueue added: " + subscriptionsAdded);
+        Log.d(TAG, "addAllSubscriptionsToQueue added: " + subscriptionsAdded);
         return subscriptionsAdded;
     }
 
@@ -186,26 +194,29 @@ public class SubscriptionRefreshManager {
         return parsedSubscription;
     }
 
-    private void downloadCompleteCallback(@NonNull Context argContext, @NonNull ISubscription argSubscription, @Nullable IDownloadCompleteCallback argCallback, boolean argSucces) {
-        if (argSucces && EpisodeDownloadManager.canPerform(EpisodeDownloadManager.ACTION_DOWNLOAD_AUTOMATICALLY, argContext)) {
+    private void downloadNewEpisodeskCallback(@NonNull Context argContext, @NonNull ISubscription argSubscription) {
+        if (EpisodeDownloadManager.canPerform(EpisodeDownloadManager.ACTION_DOWNLOAD_AUTOMATICALLY,
+                argContext,
+                argSubscription)) {
             boolean startDownload = false;
             Date tenMinutesAgo = new Date(System.currentTimeMillis() - (10 * 60 * 1000));
-            for (IEpisode episode : argSubscription.getEpisodes()) {
+
+            ArrayList<? extends IEpisode> episodes = argSubscription.getEpisodes();
+            for (int i = 0; i < episodes.size(); i++) {
+                IEpisode episode = episodes.get(i);
                 if (episode instanceof FeedItem) {
                     Date lastUpdate = new Date(((FeedItem)episode).getLastUpdate());
                     if (lastUpdate.after(tenMinutesAgo)) {
-                        EpisodeDownloadManager.addItemToQueue(episode, EpisodeDownloadManager.FIRST);
+                        EpisodeDownloadManager.addItemToQueue(episode, EpisodeDownloadManager.LAST);
                         startDownload = true;
                     }
                 }
             }
 
-            if (startDownload)
+            if (startDownload) {
                 EpisodeDownloadManager.startDownload(argContext);
+            }
         }
-
-        if (argCallback != null)
-            argCallback.complete(argSucces, argSubscription);
     }
 }
 

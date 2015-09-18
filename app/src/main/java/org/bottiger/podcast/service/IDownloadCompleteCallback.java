@@ -1,5 +1,8 @@
 package org.bottiger.podcast.service;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.SlimImplementations.SlimEpisode;
@@ -12,6 +15,6 @@ import java.util.List;
  */
 public interface IDownloadCompleteCallback {
 
-    public void complete(boolean argSucces, ISubscription argSubscription);
+    void complete(boolean argSucces, @NonNull ISubscription argSubscription);
 
 }

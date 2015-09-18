@@ -18,8 +18,10 @@ import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.QueueEpisode;
+import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.DownloadStatus;
 import org.bottiger.podcast.service.Downloader.engines.IDownloadEngine;
 import org.bottiger.podcast.service.Downloader.engines.OkHttpDownloader;
@@ -460,14 +462,12 @@ public class EpisodeDownloadManager extends Observable {
 		}
 	}
 
-    public static boolean canPerform(@Action int argAction, @NonNull Context argContext) {
+    public static boolean canPerform(@Action int argAction,
+                                     @NonNull Context argContext,
+                                     @NonNull ISubscription argSubscription) {
         Log.d(TAG, "canPerform: " + argAction);
 
-        if (sSharedPreferences == null) {
-            sSharedPreferences = PreferenceManager
-                    .getDefaultSharedPreferences(argContext);
-        }
-
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(argContext);
         @NetworkState int networkState = updateConnectStatus(argContext);
 
         if (networkState == NETWORK_DISCONNECTED)
@@ -478,23 +478,30 @@ public class EpisodeDownloadManager extends Observable {
         String only_wifi_key = resources.getString(R.string.pref_download_only_wifi_key);
         String automatic_download_key = resources.getString(R.string.pref_download_on_update_key);
 
-        boolean wifiOnly = sSharedPreferences.getBoolean(only_wifi_key, DOWNLOAD_WIFI_ONLY);
-        boolean automaticDownload = sSharedPreferences.getBoolean(automatic_download_key, DOWNLOAD_AUTOMATICALLY);
+        boolean wifiOnly = prefs.getBoolean(only_wifi_key, DOWNLOAD_WIFI_ONLY);
+        boolean automaticDownload = prefs.getBoolean(automatic_download_key, DOWNLOAD_AUTOMATICALLY);
 
-        if (argAction == ACTION_DOWNLOAD_AUTOMATICALLY) {
-            if (!automaticDownload)
-                return false;
+        if (argSubscription instanceof Subscription) {
+            Subscription subscription = (Subscription) argSubscription;
 
-            if (wifiOnly)
-                return networkState == NETWORK_OK;
-            else
-                return networkState == NETWORK_OK || networkState == NETWORK_RESTRICTED;
+            automaticDownload = subscription.doDownloadNew(automaticDownload);
         }
 
-        if (    argAction == ACTION_STREAM_EPISODE ||
-                argAction == ACTION_REFRESH_SUBSCRIPTION ||
-                argAction == ACTION_DOWNLOAD_MANUALLY) {
-            return networkState == NETWORK_OK || networkState == NETWORK_RESTRICTED;
+        switch (argAction) {
+            case ACTION_DOWNLOAD_AUTOMATICALLY: {
+                if (!automaticDownload)
+                    return false;
+
+                if (wifiOnly)
+                    return networkState == NETWORK_OK;
+                else
+                    return networkState == NETWORK_OK || networkState == NETWORK_RESTRICTED;
+            }
+            case ACTION_DOWNLOAD_MANUALLY:
+            case ACTION_REFRESH_SUBSCRIPTION:
+            case ACTION_STREAM_EPISODE: {
+                return networkState == NETWORK_OK || networkState == NETWORK_RESTRICTED;
+            }
         }
 
         VendorCrashReporter.report(TAG, "canPerform defaults to false. Action: " + argAction);

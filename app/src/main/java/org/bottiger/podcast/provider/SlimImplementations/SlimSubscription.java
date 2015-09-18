@@ -85,6 +85,16 @@ public class SlimSubscription implements ISubscription, Parcelable {
         return false;
     }
 
+    @Override
+    public boolean IsRefreshing() {
+        return false;
+    }
+
+    @Override
+    public void setIsRefreshing(boolean argIsRefreshing) {
+
+    }
+
     public ArrayList<SlimEpisode> getEpisodes() {
         return mEpisodes;
     }
