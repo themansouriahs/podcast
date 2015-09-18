@@ -103,6 +103,8 @@
   <string name="pref_screen_rotation_description">Suporte para modo horizontal</string>
   <string name="search_query_hint">Procurar através de %s</string>
   <string name="discovery_recommendations">Recomendado pelo autor</string>
+  <string name="discovery_recommendations_trending">Tendências</string>
+  <string name="discovery_recommendations_popular">Popular</string>
   <string name="discovery_search_results">Resultados para: <i>%s</i></string>
   <string name="discovery_subscribe">Subscrever</string>
   <string name="discovery_subscribe_toast">%s foi subscrito</string>
@@ -129,6 +131,7 @@
   <string name="playlist_empty_mode_one_desc">A lista de reprodução será preenchida pelos episódios colocados manualmente</string>
   <string name="playlist_empty_mode_two_desc">A lista de reprodução será preenchida automaticamente com os episódios mais recentes. No entanto, também pode adicionar os episódios manualmente.</string>
   <string name="playlist_episode_dismissed">Episódio removido</string>
+  <string name="playlist_episode_dismissed_undo">Anular</string>
   <string name="drawer_playlist_content_source">Conteúdo da lista de reprodução</string>
   <string name="playlist_context_menu_playnext">Reproduzir seguinte</string>
   <string name="subscription_subtitle_updated_at">atualizada</string>
@@ -142,6 +145,18 @@
   <string name="generic_test_credentials">Testar credenciais</string>
   <string name="generic_test_credentials_succes">Credenciais válidas</string>
   <string name="generic_test_credentials_failed">Credenciais inválidas</string>
+  <string name="feed_settings_show_description">Mostrar descrição do episódio</string>
+  <string name="feed_settings_in_playlist">Adicionar novos episódios à lista de reprodução</string>
+  <string name="feed_settings_download_new">Transferir novos episódios</string>
+  <string name="feed_settings_delete_when_listened">Eliminar após a reprodução</string>
+  <string name="feed_settings_intro">Estas definições irão substituir as predefinições do SoundWaves para este podcast.</string>
+  <string name="feed_settings_oldest_first">Mostrar episódios antigos no inicio</string>
+  <string name="open_video_externally_title">Abrir vídeo em outro reprodutor?</string>
+  <string name="open_video_externally_body">Este é um episódio de vídeos e não é suportado por esta aplicação. Pode abrir o episódio no seu reprodutor de vídeos ou utilizar esta aplicação para ouvir o áudio.</string>
+  <string name="open_video_externally_confirm">Abrir reprodutor de vídeo</string>
+  <string name="open_video_externally_reject">Reproduzir áudio</string>
+  <string name="pref_open_video_externally">Abrir vídeos em reprodutor externo</string>
+  <string name="pref_open_video_externally_description">O SoundWaves não consegue reproduzir vídeos. Pode abrir os ficheiros de vídeo com outra aplicação ou utilizar o SoundWaves para reproduzir o áudio.</string>
   <plurals name="player_sleep">
     <item quantity="one">O reprodutor parará em %d minuto</item>
     <item quantity="other">O reprodutor parará em %d minutos</item>
