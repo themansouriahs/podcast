@@ -92,10 +92,6 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         return holder;
     }
 
-    private final int[] mGradientColors = new int[] {0,0xDD000000};
-    private GradientDrawable mActionBarGradientDrawable = new GradientDrawable(
-            GradientDrawable.Orientation.BOTTOM_TOP, mGradientColors);
-
     @Override
     public void onBindViewHolder(final PlaylistViewHolder viewHolder, final int position) {
         Log.v(TAG, "onBindViewHolder(pos: " + position + ")");
