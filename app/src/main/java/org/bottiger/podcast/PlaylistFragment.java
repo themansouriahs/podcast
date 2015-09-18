@@ -15,6 +15,7 @@ import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.UIUtils;
+import org.bottiger.podcast.views.CustomLinearLayoutManager;
 import org.bottiger.podcast.views.DownloadButtonView;
 import org.bottiger.podcast.views.PlayPauseImageView;
 import org.bottiger.podcast.views.PlayerButtonView;
@@ -196,7 +197,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
         // use a linear layout manager
         //mLayoutManager = new ExpandableLayoutManager(mContext, mSwipeRefreshView, mTopPlayer, mRecyclerView, mPhoto);
-        mLayoutManager = new LinearLayoutManager(mContext);
+        mLayoutManager = new CustomLinearLayoutManager(mContext);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
@@ -312,6 +313,8 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                     FeedItem item = (FeedItem) episode;
                     item.markAsListened();
                 }
+
+                mPlaylist.removeItem(itemPosition);
 
                 //String episodeRemoved = getResources().getString(R.string.playlist_episode_dismissed);
                 Snackbar snack = Snackbar.make(view, R.string.playlist_episode_dismissed, Snackbar.LENGTH_LONG)
