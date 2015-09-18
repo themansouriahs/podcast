@@ -57,7 +57,7 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
         }
 
         int height = mTopPlayer.getLayoutParams().height;
-        //mRecyclerView.setTranslationY(-height);
+        mRecyclerView.setTranslationY(height);
 
         return false;
     }

@@ -516,7 +516,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                     //Drawable  normalDrawable = getResources().getDrawable(R.drawable.top_player_bottom_gradient_tinted);
                     GradientDrawable gd = new GradientDrawable(
                             GradientDrawable.Orientation.TOP_BOTTOM,
-                            new int[] {transparentgradientColor,gradientColor});
+                            new int[]{transparentgradientColor, gradientColor});
                     Drawable wrapDrawable = DrawableCompat.wrap(gd);
                     DrawableCompat.setTint(wrapDrawable, colorBackground);
                 }
@@ -536,6 +536,10 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
         if (mTopPlayer.getVisibleHeight() == 0) {
             mTopPlayer.setPlayerHeight(mTopPlayer.getMaximumSize());
+        }
+
+        if (mTopPlayer.isFullscreen()) {
+            mTopPlayer.setFullscreen(true, false);
         }
     }
 

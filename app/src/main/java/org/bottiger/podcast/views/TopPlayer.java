@@ -7,9 +7,7 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.os.TraceCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.NestedScrollingChild;
@@ -18,6 +16,9 @@ import android.support.v4.view.ScrollingView;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewConfigurationCompat;
 import android.support.v7.graphics.Palette;
+import android.transition.ChangeBounds;
+import android.transition.Scene;
+import android.transition.Transition;
 import android.transition.TransitionManager;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -27,7 +28,6 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -58,6 +58,8 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
     public static final int SMALL = 0;
     public static final int MEDIUM = 1;
     public static final int LARGE = 2;
+
+    private static long ANIMATION_DURATION = 100L;
 
     @IntDef({SMALL, MEDIUM, LARGE})
     @Retention(RetentionPolicy.SOURCE)
@@ -266,7 +268,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
             }
         });
 
-        setFullscreenState(mFullscreen);
+        setFullscreen(mFullscreen, false);
 
         mExpandEpisode.setOnClickListener(new OnClickListener() {
             @Override
@@ -294,7 +296,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
             public void onClick(View v) {
                 try {
                     mFullscreen = !mFullscreen;
-                    setFullscreenState(mFullscreen);
+                    setFullscreen(mFullscreen, true);
                 } finally {
                     prefs.edit().putBoolean(mDoFullscreentKey, mFullscreen).commit();
                 }
@@ -605,7 +607,13 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         mGradient.animate().alpha(argAlphaEnd);
     }
 
-    private void setFullscreenState(boolean argNewState) {
+    public void setFullscreen(boolean argNewState, boolean doAnimate) {
+
+        if (doAnimate && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            Transition trans = new ChangeBounds();
+            trans.setDuration(ANIMATION_DURATION);
+            TransitionManager.go(new Scene(this), trans);
+        }
 
         if (mFullscreen) {
             goFullscreen();
@@ -637,6 +645,11 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
                 LayoutParams.MATCH_PARENT,
                 sizeLarge);
         mLayout.setLayoutParams(layoutParams);
+        setPlayerHeight(sizeLarge);
+    }
+
+    public boolean isFullscreen() {
+        return mFullscreen;
     }
 
 
