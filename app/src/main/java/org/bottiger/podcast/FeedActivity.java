@@ -291,7 +291,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
                 } else {
 
                     // Open Settings
-
+                    mMultiShrinkScroller.expandHeader();
                     mRevealAnimator =
                             ViewAnimationUtils.createCircularReveal(mRevealLayout, cx, cy, 0, revealRadius);
                     mRevealAnimator.setInterpolator(new AccelerateDecelerateInterpolator());

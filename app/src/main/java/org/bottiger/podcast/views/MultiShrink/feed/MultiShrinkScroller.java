@@ -535,7 +535,7 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
     /**
      * Expand to maximum size.
      */
-    private void expandHeader() {
+    public void expandHeader() {
         if (getHeaderHeight() != mMaximumHeaderHeight) {
             final ObjectAnimator animator = ObjectAnimator.ofInt(this, "headerHeight",
                     mMaximumHeaderHeight);
