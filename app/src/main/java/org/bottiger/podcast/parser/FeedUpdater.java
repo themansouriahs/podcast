@@ -12,6 +12,7 @@ import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.PodcastProvider;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
+import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.views.PlayerButtonView;
 
 import android.content.ContentResolver;
@@ -45,7 +46,12 @@ public class FeedUpdater {
 		
 		subscription.update(contentResolver);
 
-        Playlist playlist = null;
+		PlayerService ps = PlayerService.getInstance();
+		Playlist playlist = null;
+
+		if (ps != null) {
+			playlist = PlayerService.getInstance().getPlaylist();
+		}
         LinkedList<ContentValues> cvs = new LinkedList<>();
         HashMap<String, Integer> duplicateTest = new HashMap<>();
 
@@ -78,6 +84,7 @@ public class FeedUpdater {
 
             if (playlist != null) {
                 playlist.notifyDatabaseChanged();
+				//playlist.refresh(SoundWaves.getAppContext());
             }
         } catch (SQLiteConstraintException e) {
             FeedItem[] localItems2 = FeedItem.getByURL(contentResolver, urls, null);
