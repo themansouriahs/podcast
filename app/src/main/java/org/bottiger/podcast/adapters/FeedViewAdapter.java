@@ -271,7 +271,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
 
             //mText.setLayoutParams(params);
 
-            int visibility = IsExpanded ? View.VISIBLE : View.GONE;
+            int visibility = IsExpanded ? View.VISIBLE : View.INVISIBLE;
             float alphaStart = IsExpanded ? 0.0f : 1.0f;
             float alphaEnd = IsExpanded ? 1.0f : 0.0f;
 

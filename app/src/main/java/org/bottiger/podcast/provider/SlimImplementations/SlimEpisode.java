@@ -27,8 +27,11 @@ public class SlimEpisode implements IEpisode, Parcelable {
     private int mPriority;
     private URL mArtworkUrl;
     private long mOffset;
+    private long mFilesize = 0;
 
-    public SlimEpisode(@NonNull String argTitle, @NonNull URL argUrl, @NonNull String argDescription) {
+    public SlimEpisode(@NonNull String argTitle,
+                       @NonNull URL argUrl,
+                       @NonNull String argDescription) {
         mTitle = argTitle;
         mUrl = argUrl;
         mDescription = argDescription;
@@ -94,7 +97,7 @@ public class SlimEpisode implements IEpisode, Parcelable {
     }
 
     @Override
-    public long getFilesize() { return 0; }
+    public long getFilesize() { return mFilesize; }
 
     @Override
     public boolean isMarkedAsListened() { return false; }
@@ -177,10 +180,16 @@ public class SlimEpisode implements IEpisode, Parcelable {
         return 0;
     }
 
+    public void setFilesize(long argFilesize) {
+        mFilesize = argFilesize;
+    }
+
     public void writeToParcel(Parcel out, int flags) {
         out.writeString(mTitle);
         out.writeString(mUrl.toString());
         out.writeString(mDescription);
+        out.writeLong(mFilesize);
+        out.writeLong(mDuration);
     }
 
     public static final Parcelable.Creator<SlimEpisode> CREATOR
@@ -202,5 +211,7 @@ public class SlimEpisode implements IEpisode, Parcelable {
             e.printStackTrace();
         }
         mDescription = in.readString();
+        mFilesize = in.readLong();
+        mDuration = in.readLong();
     }
 }

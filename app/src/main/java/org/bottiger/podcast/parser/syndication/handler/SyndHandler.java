@@ -99,37 +99,31 @@ public class SyndHandler extends DefaultHandler {
 					state.defaultNamespaces.push(new NSAtom());
 				} else if (prefix.equals(NSAtom.NSTAG)) {
 					state.namespaces.put(uri, new NSAtom());
-					if (MainActivity.debugging)
-						Log.d(TAG, "Recognized Atom namespace");
+					Log.d(TAG, "Recognized Atom namespace");
 				}
 			} else if (uri.equals(NSContent.NSURI)
 					&& prefix.equals(NSContent.NSTAG)) {
 				state.namespaces.put(uri, new NSContent());
-				if (MainActivity.debugging)
-					Log.d(TAG, "Recognized Content namespace");
+				Log.d(TAG, "Recognized Content namespace");
 			} else if (uri.equals(NSITunes.NSURI)
 					&& prefix.equals(NSITunes.NSTAG)) {
 				state.namespaces.put(uri, new NSITunes());
-				if (MainActivity.debugging)
-					Log.d(TAG, "Recognized ITunes namespace");
+				Log.d(TAG, "Recognized ITunes namespace");
 			} else if (uri.equals(NSSimpleChapters.NSURI)
 					&& prefix.matches(NSSimpleChapters.NSTAG)) {
 				state.namespaces.put(uri, new NSSimpleChapters());
-				if (MainActivity.debugging)
-					Log.d(TAG, "Recognized SimpleChapters namespace");
+				Log.d(TAG, "Recognized SimpleChapters namespace");
 			} else if (uri.equals(NSMedia.NSURI)
 					&& prefix.equals(NSMedia.NSTAG)) {
 				state.namespaces.put(uri, new NSMedia());
-				if (MainActivity.debugging)
-					Log.d(TAG, "Recognized media namespace");
+				Log.d(TAG, "Recognized media namespace");
 			}
 		}
 	}
 
 	private Namespace getHandlingNamespace(String uri, String qName) {
 		Namespace handler = state.namespaces.get(uri);
-		if (handler == null && !state.defaultNamespaces.empty()
-				&& !qName.contains(":")) {
+		if (handler == null && !state.defaultNamespaces.empty() && !qName.contains(":")) {
 			handler = state.defaultNamespaces.peek();
 		}
 		return handler;

@@ -3,10 +3,16 @@ package org.bottiger.podcast.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 
+import org.bottiger.podcast.R;
+import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.SlimImplementations.SlimEpisode;
@@ -27,6 +33,11 @@ public class FeedViewDiscoveryAdapter extends FeedViewAdapter {
     }
 
     @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+        return super.onCreateViewHolder(viewGroup, i);
+    }
+
+    @Override
     public void setDataset(Cursor c) {
         return;
     }
@@ -37,9 +48,9 @@ public class FeedViewDiscoveryAdapter extends FeedViewAdapter {
     }
 
     public void setDataset(@NonNull ArrayList<SlimEpisode> argEpisodes) {
-        for (IEpisode episode : argEpisodes) {
-            if (episode instanceof SlimEpisode)
-                mEpisodes.add((SlimEpisode)episode);
+        for (int i = 0; i < argEpisodes.size(); i++) {
+            SlimEpisode episode = argEpisodes.get(i);
+            mEpisodes.add(episode);
         }
     }
 
@@ -51,9 +62,22 @@ public class FeedViewDiscoveryAdapter extends FeedViewAdapter {
     @Override
     protected void bindButtons(@NonNull EpisodeViewHolder episodeViewHolder, @NonNull IEpisode argEpisode) {
 
+        //episodeViewHolder.mDescription.setVisibility(View.VISIBLE);
+        episodeViewHolder.IsExpanded = true;
+        episodeViewHolder.modifyLayout((RelativeLayout)episodeViewHolder.itemView);
+
         episodeViewHolder.mPlayPauseButton.setEpisode(argEpisode, PlayPauseImageView.DISCOVERY_FEEDVIEW);
         episodeViewHolder.mQueueButton.setEpisode(argEpisode, PlayPauseImageView.DISCOVERY_FEEDVIEW);
-        episodeViewHolder.mDownloadButton.setVisibility(View.GONE);
+        episodeViewHolder.mDownloadButton.setVisibility(View.INVISIBLE);
+
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) episodeViewHolder.mQueueButton.getLayoutParams();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            params.removeRule(RelativeLayout.BELOW);
+        } else {
+            params.addRule(RelativeLayout.BELOW, 0);
+        }
+
+        episodeViewHolder.mPlayPauseButton.setStatus(PlayerStatusObservable.STOPPED);
 
         getPalette(episodeViewHolder);
         return;
