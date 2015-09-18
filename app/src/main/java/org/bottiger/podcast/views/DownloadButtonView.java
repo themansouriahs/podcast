@@ -2,8 +2,11 @@ package org.bottiger.podcast.views;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.graphics.Palette;
@@ -29,9 +32,15 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
     private Context mContext;
 
     private Drawable mStaticBackground = null;
-    private int download_icon = R.drawable.ic_get_app_white;
-    private int qeueed_icon = R.drawable.ic_schedule_white;
-    private int delete_icon = R.drawable.ic_delete_white;
+    private @DrawableRes int download_icon = R.drawable.ic_get_app_white;
+    private @DrawableRes int qeueed_icon = R.drawable.ic_schedule_white;
+    private @DrawableRes int delete_icon = R.drawable.ic_delete_white;
+
+    private static final int BITMAP_OFFSET = 5;
+    private static final float RECTANGLE_SCALING = 1F;
+
+    private RectF buttonRectangle;
+    private int mLastProgress = 0;
 
     public DownloadButtonView(Context context) {
         super(context);
@@ -50,6 +59,8 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
 
     private void init(Context argContext, @Nullable AttributeSet attrs) {
         mContext = argContext;
+
+        buttonRectangle = new RectF();
 
         setOnClickListener(this);
 
@@ -116,6 +127,28 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
     }
 
     @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+
+        float halfW = getWidth()*RECTANGLE_SCALING;
+
+        int left = 0;
+        int width = (int)(halfW);
+        int top = 0;
+
+        buttonRectangle.set(left+BITMAP_OFFSET, top+BITMAP_OFFSET, left + width-BITMAP_OFFSET, top + width-BITMAP_OFFSET);
+
+        if(mProgress!=0 && mProgress < 100) {
+            if (getState() != PlayerButtonView.STATE_DEFAULT) {
+                setState(PlayerButtonView.STATE_DEFAULT);
+            }
+            canvas.drawArc(buttonRectangle, -90, Math.round(360 * mProgress / 100F), false, foregroundColorPaint);
+        }
+
+        mLastProgress = mProgress;
+    }
+
+    @Override
     public int ButtonColor(@NonNull Palette argPalette) {
         if (mStaticBackground != null)
             return Color.argb(0, 0, 0, 0); // transparent
@@ -127,21 +160,9 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
     public void setEpisode(@NonNull IEpisode argItem) {
         super.setEpisode(argItem);
 
-        try {
-            //SoundWaves.sBus.register(this);
-        } catch (IllegalArgumentException iae) {
-            // Ignore
-        }
         setState(calcState());
         setProgressPercent(new DownloadProgress());
     }
-
-    /*
-    @Override
-    public synchronized void unsetEpisodeId() {
-        super.unsetEpisodeId();
-        SoundWaves.sBus.unregister(this);
-    }*/
 
     @Subscribe
     public void setProgressPercent(@NonNull DownloadProgress argProgress) {

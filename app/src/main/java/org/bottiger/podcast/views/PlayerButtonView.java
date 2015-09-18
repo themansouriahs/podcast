@@ -39,14 +39,8 @@ public class PlayerButtonView extends ImageButton implements PaletteListener  {
     private @PlayerStatusObservable.PlayerStatus int mStatus = PlayerStatusObservable.STOPPED;
     private IEpisode mEpisode;
 
-    private int mLastProgress = 0;
-    private static final int BITMAP_OFFSET = 5;
-    private static final float RECTANGLE_SCALING = 1F;
-
     protected Paint baseColorPaint;
     protected Paint foregroundColorPaint;
-    private RectF buttonRectangle;
-    private RectF buttonRectangleBitmap;
 
     private Context mContext;
     private WeakReference<Bitmap> s_Icon;
@@ -91,9 +85,6 @@ public class PlayerButtonView extends ImageButton implements PaletteListener  {
         foregroundColorPaint.setStyle(Paint.Style.STROKE); // Paint.Style.FILL_AND_STROKE
         foregroundColorPaint.setStrokeWidth(10F);
         foregroundColorPaint.setAntiAlias(true);
-
-        buttonRectangle = new RectF();
-        buttonRectangleBitmap = new RectF();
 
         mContext = context;
 
@@ -165,37 +156,10 @@ public class PlayerButtonView extends ImageButton implements PaletteListener  {
     protected void onDraw(Canvas canvas) {
         long startTime = System.currentTimeMillis();
         super.onDraw(canvas);
+    }
 
-        float halfW = getWidth()*RECTANGLE_SCALING;
-
-        int left = (int)0;
-        int width = (int)(halfW);
-        int top = (int)0;
-
-        buttonRectangle.set(left+BITMAP_OFFSET, top+BITMAP_OFFSET, left + width-BITMAP_OFFSET, top + width-BITMAP_OFFSET);
-
-        //canvas.drawArc(buttonRectangle, -90, 360, true, baseColorPaint);
-
-        if(mProgress!=0 && mProgress < 100) {
-            if (getState() != PlayerButtonView.STATE_DEFAULT) {
-                setState(PlayerButtonView.STATE_DEFAULT);
-            }
-            canvas.drawArc(buttonRectangle, -90, Math.round(360 * mProgress / 100F), false, foregroundColorPaint);
-        }
-
-        buttonRectangleBitmap = buttonRectangle;
-        buttonRectangleBitmap.bottom -= BITMAP_OFFSET;
-        buttonRectangleBitmap.top -= BITMAP_OFFSET;
-        buttonRectangleBitmap.left -= BITMAP_OFFSET;
-        buttonRectangleBitmap.right -= BITMAP_OFFSET;
-
-        if (s_Icon == null) {
-            Log.w("PlayerButton", "s_Icon is null");
-            return;
-        }
-
-        //canvas.drawBitmap(s_Icon, null, buttonRectangle, baseColorPaint);
-        mLastProgress = mProgress;
+    protected int getProgress() {
+        return mProgress;
     }
 
     public IEpisode getEpisode() {
@@ -208,13 +172,8 @@ public class PlayerButtonView extends ImageButton implements PaletteListener  {
     public void onPaletteFound(Palette argChangedPalette) {
         ColorExtractor extractor = new ColorExtractor(argChangedPalette);
 
-        //baseColorPaint.setColor(extractor.getPrimary()); // -1761607680
         baseColorPaint.setColor(extractor.getSecondary()); // -1761607680
-        foregroundColorPaint.setColor(extractor.getSecondaryTint());
-
-        if (argChangedPalette != null) {
-            //setBackgroundColor(ButtonColor(argChangedPalette));
-        }
+        foregroundColorPaint.setColor(extractor.getSecondary());
 
         invalidate();
     }

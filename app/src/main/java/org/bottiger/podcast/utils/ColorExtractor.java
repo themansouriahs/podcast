@@ -87,7 +87,7 @@ public class ColorExtractor {
 
     private void loadSecondaryTintColor(@Nullable Palette argPalette) {
         Palette.Swatch swatch = argPalette != null ? argPalette.getLightMutedSwatch() : null;
-        mSecondary = getColor(swatch, R.color.colorAccent);
+        mSecondaryTint = getColor(swatch, R.color.colorAccent);
     }
 
     private int getColor(@Nullable Palette.Swatch argSwatch, int defaultColorResource) {
