@@ -24,6 +24,8 @@ public class SoundWavesPreferenceFragment extends PreferenceFragment {
 
     public static final String CURRENT_VERSION = "pref_current_version";
 
+    private Context mContext;
+
     @Override
     public void onCreate(final Bundle savedInstanceState)
     {
@@ -35,6 +37,7 @@ public class SoundWavesPreferenceFragment extends PreferenceFragment {
 
     @Override
     public void onAttach (Context argContext) {
+        mContext = argContext;
         super.onAttach(argContext);
     }
 
@@ -65,11 +68,11 @@ public class SoundWavesPreferenceFragment extends PreferenceFragment {
         //ThemeHelper helper = new ThemeHelper(mContext);
         //int color = helper.getAttr(R.attr.themeBackground);
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
         int theme = ThemeHelper.getTheme(prefs);
 
         // Parse MyCustomStyle, using Context.obtainStyledAttributes()
-        TypedArray ta = getActivity().obtainStyledAttributes(theme, attrs);
+        TypedArray ta = mContext.obtainStyledAttributes(theme, attrs);
 
         // Fetch the text from your style like this.
         //String text = ta.getString(2);
