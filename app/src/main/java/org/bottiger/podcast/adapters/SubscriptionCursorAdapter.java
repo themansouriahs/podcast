@@ -12,10 +12,12 @@ import org.bottiger.podcast.provider.SubscriptionLoader;
 import org.bottiger.podcast.utils.SharedAdapterUtils;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
@@ -156,17 +158,23 @@ public class SubscriptionCursorAdapter extends CursorRecyclerAdapter {
         if (holder.image != null && !TextUtils.isEmpty(logo)) {
             uri = Uri.parse(logo);
         } else {
-            uri = Uri.parse("android.resource://" + mActivity.getPackageName() + "/" + R.drawable.generic_podcast);
+            //uri = Uri.parse("android.resource://" + mActivity.getPackageName() + "/" + R.drawable.generic_podcast);
+            //uri = ResourceToUri(mActivity, R.drawable.generic_podcast);
         }
 
         UrlValidator urlValidator = new UrlValidator();
-        String image = uri.toString();
-        if (!TextUtils.isEmpty(image) && urlValidator.isValid(image)) {
 
-            //FrescoHelper.PalettePostProcessor postProcessor = new FrescoHelper.PalettePostProcessor(mActivity, image);
-            //FrescoHelper.loadImageInto(holder.image, image, postProcessor);
-            Glide.with(mActivity).load(image).centerCrop().placeholder(R.drawable.white).into(holder.image);
+        if (uri != null) {
+            String image = uri.toString();
+            if (!TextUtils.isEmpty(image) && urlValidator.isValid(image)) {
 
+                //FrescoHelper.PalettePostProcessor postProcessor = new FrescoHelper.PalettePostProcessor(mActivity, image);
+                //FrescoHelper.loadImageInto(holder.image, image, postProcessor);
+                Glide.with(mActivity).load(image).centerCrop().placeholder(R.drawable.generic_podcast).into(holder.image);
+
+            }
+        } else {
+            Glide.with(mActivity).load(R.drawable.generic_podcast).centerCrop().into(holder.image);
         }
 
         /*
@@ -189,6 +197,17 @@ public class SubscriptionCursorAdapter extends CursorRecyclerAdapter {
             }
         });
     }
+
+
+
+    public static Uri ResourceToUri (Context context, @DrawableRes int resID) {
+        return Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" +
+                context.getResources().getResourcePackageName(resID) + '/' +
+                context.getResources().getResourceTypeName(resID) + '/' +
+                context.getResources().getResourceEntryName(resID) );
+    }
+
+
 
     @Override
     public void onViewRecycled(RecyclerView.ViewHolder holder) {

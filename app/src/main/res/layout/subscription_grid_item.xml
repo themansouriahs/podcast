@@ -21,7 +21,7 @@
     <View
         android:id="@+id/grid_item_gradient"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_height="35dp"
         android:layout_gravity="bottom"
         android:background="@drawable/footer_gradient" />
 
