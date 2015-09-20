@@ -63,6 +63,11 @@ public class SoundWavesPreferenceFragment extends PreferenceFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
 
+        // On Android 4.3 onAttach() is not called
+        if (mContext == null) {
+            mContext = getActivity();
+        }
+
         // The attributes you want retrieved
         int[] attrs = {R.attr.themeBackground};
         //ThemeHelper helper = new ThemeHelper(mContext);
