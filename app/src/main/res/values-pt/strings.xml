@@ -151,6 +151,7 @@
   <string name="feed_settings_delete_when_listened">Eliminar após a reprodução</string>
   <string name="feed_settings_intro">Estas definições irão substituir as predefinições do SoundWaves para este podcast.</string>
   <string name="feed_settings_oldest_first">Mostrar episódios antigos no inicio</string>
+  <string name="choose_player_for_open_video_externally">Escolher reprodutor para ver o episódio</string>
   <string name="open_video_externally_title">Abrir vídeo em outro reprodutor?</string>
   <string name="open_video_externally_body">Este é um episódio de vídeos e não é suportado por esta aplicação. Pode abrir o episódio no seu reprodutor de vídeos ou utilizar esta aplicação para ouvir o áudio.</string>
   <string name="open_video_externally_confirm">Abrir reprodutor de vídeo</string>
