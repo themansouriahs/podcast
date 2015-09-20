@@ -154,8 +154,14 @@ public class SubscriptionRefreshManager {
                                 downloadNewEpisodeskCallback(argContext, argSubscription);
                             }
                         } catch (XmlPullParserException e) {
-                            e.printStackTrace();
                             Log.d(TAG, "Parsing error " + e.toString());
+
+                            String[] keys = new String[1];
+                            String[] values = new String[1];
+
+                            keys[0] = "url";
+                            values[0] = TextUtils.isEmpty(argSubscription.getURLString()) ? "No url" : argSubscription.getURLString(); // NoI18N
+                            VendorCrashReporter.handleException(e, keys, values);
                         }
 
                         final ISubscription finalSubscription = parsedSubscription != null ? parsedSubscription : null;

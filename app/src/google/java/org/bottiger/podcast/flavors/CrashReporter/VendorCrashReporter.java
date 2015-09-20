@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.bugsnag.android.Bugsnag;
+import com.bugsnag.android.MetaData;
 
 import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.SoundWaves;
@@ -35,17 +36,27 @@ public class VendorCrashReporter {
     }
 	
 	public static void report(@NonNull String argKey, @NonNull String argValue) {
-        /*
-        if (!BuildConfig.DEBUG)
-            ACRA.getErrorReporter().putCustomData(argKey, argValue);
-            */
+        MetaData metaData = new MetaData();
+        metaData.addToTab("User", argKey, argValue);
+        Bugsnag.notify(new Exception("Non-fatal"), metaData);
     }
 
     public static void handleException(@NonNull Throwable argException) {
+        Bugsnag.notify(argException);
         /*
         if (!BuildConfig.DEBUG)
             ACRA.getErrorReporter().handleException(argException);
             */
+    }
+
+    public static void handleException(@NonNull Throwable argException, @NonNull String[] argKey, @NonNull String[] argValue) {
+        MetaData metaData = new MetaData();
+
+        for(int i = 0; i < argKey.length; i++) {
+            metaData.addToTab("User", argKey[i], argValue[i]);
+        }
+
+        Bugsnag.notify(argException, metaData);
     }
 
 }
