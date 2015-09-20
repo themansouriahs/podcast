@@ -2,9 +2,12 @@ package org.bottiger.podcast;
 
 import android.support.test.InstrumentationRegistry;
 import android.test.ActivityInstrumentationTestCase2;
+import android.text.TextUtils;
 
 import org.bottiger.podcast.TestUtils.RecyclerTestUtils;
 import org.bottiger.podcast.TestUtils.TestUtils;
+import org.bottiger.podcast.playlist.Playlist;
+import org.bottiger.podcast.service.PlayerService;
 import org.junit.Before;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -41,14 +44,20 @@ public class EspressoBasicViewPagerTest extends ActivityInstrumentationTestCase2
 
         mActivity = getActivity();
 
-        TestUtils.clearAllData(mActivity);
-
         super.setUp();
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
     }
 
+    @Before
+    public void cleanData() {
+        TestUtils.clearAllData(mActivity);
+    }
+
     // https://github.com/googlesamples/android-testing/blob/master/downloads/espresso-cheat-sheet-2.1.0.pdf
     public void testWelcomeScreen() {
+
+        TestUtils.ViewPagerMove(TestUtils.LEFT);
+
         // Validate initial state
         onView(withId(R.id.playlist_empty_header)).check(matches(isDisplayed()));
 
@@ -69,6 +78,9 @@ public class EspressoBasicViewPagerTest extends ActivityInstrumentationTestCase2
      * Based on https://code.google.com/p/android-test-kit/source/browse/espresso/libtests/src/main/java/com/google/android/apps/common/testing/ui/espresso/action/SwipeActionIntegrationTest.java?r=c4e4da01ca8d0fab31129c87f525f6e9ba1ecc02
      */
     public void testSwipeToSubscriptionFragment() {
+
+        TestUtils.ViewPagerMove(TestUtils.LEFT);
+
         onView(withId(R.id.playlist_empty_header)).check(matches(isDisplayed()));
 
         onView(withId(R.id.app_content))

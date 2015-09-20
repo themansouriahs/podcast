@@ -227,7 +227,7 @@
     </application>
 
     <instrumentation
-        android:name="android.test.InstrumentationTestRunner"
+        android:name="android.support.test.runner.AndroidJUnitRunner"
         android:label="SoundWaves Podcatcher test"
         android:targetPackage="org.bottiger.podcast" />
 
