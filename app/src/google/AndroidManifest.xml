@@ -7,6 +7,9 @@
         <meta-data android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
+        <meta-data android:name="com.google.android.backup.api_key"
+            android:value="AEdPqrEAAAAIbL9pyk7PhnT_qw7sZY1zFYRc-w8CKQ-3VFm_Ng" />
+
     </application>
 
 </manifest>
