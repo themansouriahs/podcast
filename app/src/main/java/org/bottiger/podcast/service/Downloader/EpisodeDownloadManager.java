@@ -101,6 +101,10 @@ public class EpisodeDownloadManager extends Observable {
 
 	private static DownloadManager downloadManager;
 
+    public static boolean isVideo(String argMimeType) {
+        return argMimeType != null && argMimeType.toLowerCase().contains(MIME_VIDEO);
+    }
+
     public static String getMimeType(String fileUrl) {
         String extension = MimeTypeMap.getFileExtensionFromUrl(fileUrl);
         return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
@@ -119,9 +123,10 @@ public class EpisodeDownloadManager extends Observable {
                 e.printStackTrace();
             }
 
-            if (mimetype != null && mimetype.toLowerCase().contains(MIME_VIDEO)) {
-                item.setIsVideo(true);
-            }
+            //if (mimetype != null && mimetype.toLowerCase().contains(MIME_VIDEO)) {
+            //    item.setIsVideo(true);
+            //}
+            item.setIsVideo(isVideo(mimetype));
 
             item.update(mContext.getContentResolver());
 

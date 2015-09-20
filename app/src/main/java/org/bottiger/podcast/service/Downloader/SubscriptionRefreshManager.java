@@ -1,5 +1,6 @@
 package org.bottiger.podcast.service.Downloader;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Handler;
@@ -13,18 +14,32 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
+import org.apache.commons.io.input.BOMInputStream;
+import org.apache.commons.io.input.XmlStreamReader;
+import org.apache.commons.validator.routines.UrlValidator;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.parser.FeedParser;
+import org.bottiger.podcast.parser.FeedUpdater;
 import org.bottiger.podcast.parser.syndication.handler.FeedHandler;
 import org.bottiger.podcast.parser.syndication.handler.UnsupportedFeedtypeException;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.provider.SlimImplementations.SlimEpisode;
+import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionLoader;
+import org.bottiger.podcast.provider.converter.EpisodeConverter;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
 import org.xml.sax.SAXException;
+import org.xmlpull.v1.XmlPullParserException;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -41,6 +56,7 @@ public class SubscriptionRefreshManager {
     private static FeedHandler mFeedHandler = new FeedHandler();
     final OkHttpClient mOkClient = new OkHttpClient();
     final Handler mainHandler;
+    final FeedParser mFeedParser = new FeedParser();
 
     private Context mContext;
 
@@ -88,7 +104,6 @@ public class SubscriptionRefreshManager {
         final IDownloadCompleteCallback wrappedCallback = new IDownloadCompleteCallback() {
             @Override
             public void complete(final boolean argSucces, final ISubscription argSubscription) {
-                downloadNewEpisodeskCallback(argContext, argSubscription);
 
                 Runnable myRunnable = new Runnable() {
                     @Override
@@ -124,9 +139,24 @@ public class SubscriptionRefreshManager {
                          *
                          * This can (and will) fail with an out of memory exception when the response is too large.
                          */
-                        String feedString = response.body().string();
+                        //String str = response.body().string();
 
-                        parsedSubscription = processResponse(argContext, argSubscription, feedString);
+                        //InputStream feedString = new BOMInputStream(response.body().byteStream());
+                        //Reader feedString = response.body().charStream();
+
+                        //parsedSubscription = processResponse(argContext, argSubscription, feedString);
+                        try {
+                            parsedSubscription = mFeedParser.parse(argSubscription, response.body().byteStream());
+                            //parsedSubscription.setURL(response.request().httpUrl().toString());
+
+                            postProcess(argContext.getContentResolver(), argSubscription);
+                            if (argSubscription instanceof Subscription) {
+                                downloadNewEpisodeskCallback(argContext, argSubscription);
+                            }
+                        } catch (XmlPullParserException e) {
+                            e.printStackTrace();
+                            Log.d(TAG, "Parsing error " + e.toString());
+                        }
 
                         final ISubscription finalSubscription = parsedSubscription != null ? parsedSubscription : null;
 
@@ -171,15 +201,18 @@ public class SubscriptionRefreshManager {
         return subscriptionsAdded;
     }
 
-    private static ISubscription processResponse(Context argContext, @NonNull ISubscription subscription, String argResponse) {
+    private static ISubscription processResponse(Context argContext, @NonNull ISubscription subscription, InputStream argResponse) {
         Log.v(TAG, "Http response from: " + subscription);
 
         ISubscription parsedSubscription = null;
 
         try {
             Log.d(TAG, "Parsing: " + subscription);
+            parsedSubscription = mFeedHandler.parseFeed(argContext.getContentResolver(), subscription, argResponse); // Byte Order Mark
+            /*
             parsedSubscription = mFeedHandler.parseFeed(argContext.getContentResolver(), subscription,
                     argResponse.replace("ï»¿", "")); // Byte Order Mark
+             */
         } catch (SAXException e) {
             Log.d(TAG, "Parsing EXCEPTION: " + subscription);
             VendorCrashReporter.handleException(e);
@@ -212,14 +245,16 @@ public class SubscriptionRefreshManager {
             boolean startDownload = false;
             Date tenMinutesAgo = new Date(System.currentTimeMillis() - (10 * 60 * 1000));
 
-            ArrayList<? extends IEpisode> episodes = argSubscription.getEpisodes();
-            for (int i = 0; i < episodes.size(); i++) {
-                IEpisode episode = episodes.get(i);
-                if (episode instanceof FeedItem) {
-                    Date lastUpdate = new Date(((FeedItem)episode).getLastUpdate());
-                    if (lastUpdate.after(tenMinutesAgo)) {
-                        EpisodeDownloadManager.addItemToQueue(episode, EpisodeDownloadManager.LAST);
-                        startDownload = true;
+            if (argSubscription instanceof Subscription) {
+                ArrayList<? extends IEpisode> episodes = argSubscription.getEpisodes();
+                for (int i = 0; i < episodes.size(); i++) {
+                    IEpisode episode = episodes.get(i);
+                    if (episode instanceof FeedItem) {
+                        Date lastUpdate = new Date(((FeedItem) episode).getLastUpdate());
+                        if (lastUpdate.after(tenMinutesAgo)) {
+                            EpisodeDownloadManager.addItemToQueue(episode, EpisodeDownloadManager.LAST);
+                            startDownload = true;
+                        }
                     }
                 }
             }
@@ -227,6 +262,54 @@ public class SubscriptionRefreshManager {
             if (startDownload) {
                 EpisodeDownloadManager.startDownload(argContext);
             }
+        }
+    }
+
+    private void postProcess(@NonNull ContentResolver argContentResolver, @NonNull ISubscription argSubscription) {
+        Log.d(SubscriptionRefreshManager.TAG, "Done Parsing: " + argSubscription);
+
+        if (argSubscription instanceof Subscription) {
+            Subscription subscription = (Subscription)argSubscription;
+            FeedUpdater updater = new FeedUpdater(argContentResolver);
+            updater.updateDatabase(subscription);
+            ((Subscription)argSubscription).getEpisodes(argContentResolver);
+            Log.d(SubscriptionRefreshManager.TAG, "Done updating database for: " + argSubscription);
+            return;
+        }
+
+        if (argSubscription instanceof SlimSubscription) {
+            SlimSubscription slimSubscription = (SlimSubscription) argSubscription;
+
+            URL artwork = null;
+            String artworkString = slimSubscription.getImageURL();
+            UrlValidator urlValidator = new UrlValidator();
+            if (urlValidator.isValid(artworkString)) {
+                try {
+                    artwork = new URL(artworkString);
+                } catch (MalformedURLException mue) {
+                    artwork = null;
+                }
+            }
+
+            /*
+            ArrayList<SlimEpisode> slimEpisodes = new ArrayList<>();
+            for (IEpisode episode : argSubscription.getEpisodes()) {
+                SlimEpisode slimEpisode = EpisodeConverter.toSlim(episode);
+
+                if (slimEpisode == null) {
+                    continue;
+                }
+
+                if (artwork != null) {
+                    slimEpisode.setArtwork(artwork);
+                }
+
+                if (slimEpisode != null) {
+                    slimEpisodes.add(slimEpisode);
+                }
+            }
+            slimSubscription.setEpisodes(slimEpisodes);4*/
+            Log.d(SubscriptionRefreshManager.TAG, "Replacing the subscription with a populated SlimSubscription:");
         }
     }
 }

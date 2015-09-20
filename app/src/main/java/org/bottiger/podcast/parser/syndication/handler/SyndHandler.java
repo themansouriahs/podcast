@@ -138,7 +138,7 @@ public class SyndHandler extends DefaultHandler {
 
         if (subscription instanceof Subscription) {
             FeedUpdater updater = new FeedUpdater(contentResolver);
-            updater.updateDatabase((Subscription)subscription, state.getItems());
+            updater.updateDatabase((Subscription)subscription);
 			((Subscription)subscription).getEpisodes(contentResolver);
             Log.d(SubscriptionRefreshManager.TAG, "Done updating database for: " + subscription);
             return;

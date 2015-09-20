@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.provider.converter.EpisodeConverter;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -73,6 +74,17 @@ public class SlimSubscription implements ISubscription, Parcelable {
     @Override
     public void setURL(@Nullable String argUrl) {
 
+    }
+
+    @Override
+    public void setLink(@Nullable String argLink) {
+
+    }
+
+    @Override
+    public void addEpisode(@Nullable IEpisode episode) {
+        SlimEpisode slimEpisode = EpisodeConverter.toSlim(episode);
+        mEpisodes.add(slimEpisode);
     }
 
     @Override

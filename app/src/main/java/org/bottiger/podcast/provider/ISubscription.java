@@ -41,6 +41,9 @@ public interface ISubscription {
     void setDescription(@Nullable String argDescription);
     void setURL(@Nullable String argUrl);
 
+    void setLink(@Nullable String argLink);
+    void addEpisode(@Nullable IEpisode episode);
+
     boolean IsDirty();
     boolean IsSubscribed();
 

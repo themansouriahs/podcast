@@ -88,13 +88,12 @@ public class Subscription implements ISubscription, PaletteListener {
 
     private final ArrayList<IEpisode> mEpisodes = new ArrayList<>();
 
+	public void setLink(@NonNull String argLink) {
+		this.link = argLink;
+	}
 
 	public String getLink() {
 		return link;
-	}
-
-	public void setLink(String link) {
-		this.link = link;
 	}
 
 	public void reset() {
@@ -151,7 +150,7 @@ public class Subscription implements ISubscription, PaletteListener {
 
 	public int subscribe(@NonNull final Context context) {
 		Subscription sub = SubscriptionLoader.getByUrl(context.getContentResolver(),
-                url);
+				url);
 
         if (sub == null) {
             ContentValues cv = new ContentValues();
@@ -198,10 +197,6 @@ public class Subscription implements ISubscription, PaletteListener {
 		context.delete(uri, null, null);
 	}
 
-    public ArrayList<IEpisode> getEpisodes() {
-        return mEpisodes;
-    }
-
 	public ArrayList<IEpisode> getEpisodes(@NonNull ContentResolver contentResolver) {
 
 		LinkedList<FeedItem> episodes = new LinkedList<>();
@@ -219,6 +214,13 @@ public class Subscription implements ISubscription, PaletteListener {
 		return mEpisodes;
 	}
 
+	public ArrayList<IEpisode> getEpisodes() {
+		return mEpisodes;
+	}
+
+	public void addEpisode(@NonNull IEpisode argEpisode) {
+		mEpisodes.add(argEpisode);
+	}
 
     private class RefreshSyncTask extends AsyncTask<Context, Void, Void> {
         protected Void doInBackground(Context... contexts) {
@@ -347,7 +349,7 @@ public class Subscription implements ISubscription, PaletteListener {
 
 	@Override
 	public String toString() {
-		return "Subscription: " + this.url;
+		return "Subscription: " + this.title + " (" + this.url + ")";
 	}
 
     @Override

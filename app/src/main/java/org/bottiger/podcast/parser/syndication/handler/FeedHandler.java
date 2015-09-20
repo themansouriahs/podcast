@@ -23,11 +23,11 @@ import android.support.annotation.NonNull;
 
 public class FeedHandler {
 
-	public ISubscription parseFeed(ContentResolver contentResolver, @NonNull ISubscription subscription, String feedContent) throws SAXException, IOException,
+	public ISubscription parseFeed(ContentResolver contentResolver, @NonNull ISubscription subscription, InputStream feedContent) throws SAXException, IOException,
 			ParserConfigurationException, UnsupportedFeedtypeException {
 
         if (subscription == null) {
-            VendorCrashReporter.report("feedContent", feedContent);
+            VendorCrashReporter.report("feedContent", feedContent.toString());
         }
 
         SyndHandler handler;
@@ -41,7 +41,7 @@ public class FeedHandler {
             factory.setNamespaceAware(true);
             SAXParser saxParser = factory.newSAXParser();
 
-            InputStream stream = new ByteArrayInputStream(feedContent.getBytes());
+            InputStream stream = feedContent;//new ByteArrayInputStream(feedContent.getBytes());
 
             Reader inputStreamReader = new XmlStreamReader(stream, false, "UTF-8");
             InputSource inputSource = new InputSource(inputStreamReader);

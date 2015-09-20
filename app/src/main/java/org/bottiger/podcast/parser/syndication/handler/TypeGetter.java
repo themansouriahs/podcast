@@ -30,7 +30,7 @@ public class TypeGetter {
 	private static final String ATOM_ROOT = "feed";
 	private static final String RSS_ROOT = "rss";
 
-	public Type getType(ISubscription feed, String feedContent) throws UnsupportedFeedtypeException {
+	public Type getType(ISubscription feed, InputStream feedContent) throws UnsupportedFeedtypeException {
 		XmlPullParserFactory factory;
 		if (feed.getURL().toString() != null) {
 			try {
@@ -82,18 +82,17 @@ public class TypeGetter {
 				e.printStackTrace();
 			}
 		}
-		if (MainActivity.debugging)
-			Log.d(TAG, "Type is invalid");
+		Log.d(TAG, "Type is invalid");
 		throw new UnsupportedFeedtypeException(Type.INVALID);
 	}
 
-	private Reader createReader(ISubscription feed, String feedContent) {
+	private Reader createReader(ISubscription feed, InputStream feedContent) {
 		Reader reader;
 		try {
 			//reader = new XmlStreamReader(new File(feed.getFile_url()));
 			
 			// http://stackoverflow.com/questions/4897876/reading-utf-8-bom-marker
-			InputStream stream = new ByteArrayInputStream(feedContent.getBytes("UTF-8"));
+			InputStream stream = checkForUtf8BOMAndDiscardIfAny(feedContent);//new ByteArrayInputStream(feedContent.getBytes("UTF-8"));
 			BOMInputStream bomIn = new BOMInputStream(stream);
 			reader = new XmlStreamReader(bomIn);
 		} catch (FileNotFoundException e) {
