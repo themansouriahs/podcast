@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
@@ -99,6 +100,10 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
 
         SharedAdapterUtils.AddPaddingToLastElement(((EpisodeViewHolder) viewHolder).mContainer, 0, position == getItemCount()-1);
 
+        if (item == null) {
+            VendorCrashReporter.report("FeedViewAdapter", "item is null for: " + mSubscription);
+            return;
+        }
 
         episodeViewHolder.mText.setText(item.getTitle());
         episodeViewHolder.mDescription.setText(item.getDescription());
