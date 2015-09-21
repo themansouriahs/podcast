@@ -8,4 +8,8 @@ import java.util.List;
 public class UpdatedUrls {
     private long timestamp;
     private List<List<String>> updated_urls;
+
+    public long getTimestamp() {
+        return timestamp;
+    }
 }

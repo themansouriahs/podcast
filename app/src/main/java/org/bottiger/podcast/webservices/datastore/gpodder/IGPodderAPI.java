@@ -65,7 +65,7 @@ public interface IGPodderAPI {
 
     // Upload Subscription Changes
     @POST("/api/2/subscriptions/{username}/{deviceid}.json")
-    Call<String> uploadDeviceSubscriptionsChanges(@Body SubscriptionChanges subscriptionChanges, @Path("username") String user, @Path("deviceid") String device);
+    Call<UpdatedUrls> uploadDeviceSubscriptionsChanges(@Body SubscriptionChanges subscriptionChanges, @Path("username") String user, @Path("deviceid") String device);
 
     // Get Subscription Changes
     @GET("/api/2/subscriptions/{username}/{deviceid}.json")
