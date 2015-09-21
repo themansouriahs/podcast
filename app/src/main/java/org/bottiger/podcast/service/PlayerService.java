@@ -115,7 +115,7 @@ public class PlayerService extends Service implements
 	 * Phone state listener. Will pause the playback when the phone is ringing
 	 * and continue it afterwards
 	 */
-	private PhoneStateListener mPhoneStateListener = new PlayerPhoneListener(this);
+	private PhoneStateListener mPhoneStateListener;
 
 	public void startAndFadeIn() {
         mPlayerHandler.sendEmptyMessageDelayed(PlayerHandler.FADEIN, 10);
@@ -163,8 +163,7 @@ public class PlayerService extends Service implements
         }
 		mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
-		TelephonyManager tmgr = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-		tmgr.listen(mPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
+		mPhoneStateListener = new PlayerPhoneListener(this);
 
 		this.mControllerComponentName = new ComponentName(this,
 				HeadsetReceiver.class);
@@ -552,10 +551,13 @@ public class PlayerService extends Service implements
         NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
         if (mNotificationPlayer != null) {
-            Notification notification = mNotificationPlayer.getNotification();
+			/*
+            Notification notification = mNotificationPlayer.getNotification(true);
             if (notification != null) {
                 startForeground(NotificationPlayer.getNotificationId(), notification);
             }
+            */
+			mNotificationPlayer.show(isPlaying());
         }
 
         mPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);

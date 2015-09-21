@@ -42,11 +42,6 @@ public class NotificationPlayer {
 	}
 
     @Nullable
-    public Notification getNotification() {
-        return mNotification;
-    }
-
-    @Nullable
 	public Notification show() {
 		return show(true);
 	}

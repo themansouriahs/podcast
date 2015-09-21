@@ -14,6 +14,11 @@ import java.util.Date;
 
 /**
  * Created by apl on 20-01-2015.
+ *
+ * This class is used for listening to changes in the phone state.
+ * We monitor this because we want to handle the situation where the user was listening
+ * to a podcast and a phone call comes in. The phone call will stop the podcast, but if it's a
+ * short call we want to resume the playback afterwards.
  */
 public class PlayerPhoneListener extends PhoneStateListener {
 
@@ -25,6 +30,14 @@ public class PlayerPhoneListener extends PhoneStateListener {
 
     public PlayerPhoneListener(@NonNull PlayerService argPlayerService) {
         mPlayerService = argPlayerService;
+        listenForChanges(true);
+    }
+
+    public void listenForChanges(boolean argDoListen) {
+        TelephonyManager tmgr = (TelephonyManager) mPlayerService.getSystemService(Context.TELEPHONY_SERVICE);
+
+        final int listenToChanges = argDoListen ? PhoneStateListener.LISTEN_CALL_STATE : PhoneStateListener.LISTEN_NONE;
+        tmgr.listen(this, listenToChanges);
     }
 
     @RequiresPermission(Manifest.permission_group.PHONE)
