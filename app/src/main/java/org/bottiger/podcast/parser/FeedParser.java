@@ -8,6 +8,7 @@ import android.util.Log;
 import android.util.Xml;
 import android.widget.TextView;
 
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
@@ -300,9 +301,15 @@ public class FeedParser {
                         Date date = readDate(parser);
                         if (date != null)
                             episode.setPubDate(date);
-                    } catch (ParseException e) {
+                    } catch (Exception e) {
                         Log.w(TAG, "Could not parse date from subscription: " + argSubscription);
-                        e.printStackTrace();
+                        String[] keys = new String[1];
+                        String[] values = new String[1];
+
+                        keys[0] = "Date parse error";
+                        values[0]  = argSubscription.getURLString();
+
+                        VendorCrashReporter.handleException(e, keys, values);
                     }
                     break;
                 }

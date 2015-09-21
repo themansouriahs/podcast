@@ -53,7 +53,7 @@ public class VendorCrashReporter {
         MetaData metaData = new MetaData();
 
         for(int i = 0; i < argKey.length; i++) {
-            metaData.addToTab("User", argKey[i], argValue[i]);
+            metaData.addToTab("Extra", argKey[i], argValue[i]);
         }
 
         Bugsnag.notify(argException, metaData);
