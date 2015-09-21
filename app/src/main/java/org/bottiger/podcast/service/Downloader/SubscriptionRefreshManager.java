@@ -244,7 +244,7 @@ public class SubscriptionRefreshManager {
         return parsedSubscription;
     }
 
-    private void downloadNewEpisodeskCallback(@NonNull Context argContext, @NonNull ISubscription argSubscription) {
+    private void downloadNewEpisodeskCallback(final @NonNull Context argContext, @NonNull ISubscription argSubscription) {
         if (EpisodeDownloadManager.canPerform(EpisodeDownloadManager.ACTION_DOWNLOAD_AUTOMATICALLY,
                 argContext,
                 argSubscription)) {
@@ -266,7 +266,13 @@ public class SubscriptionRefreshManager {
             }
 
             if (startDownload) {
-                EpisodeDownloadManager.startDownload(argContext);
+                Runnable myRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        EpisodeDownloadManager.startDownload(argContext);
+                    }
+                };
+                mainHandler.post(myRunnable);
             }
         }
     }
