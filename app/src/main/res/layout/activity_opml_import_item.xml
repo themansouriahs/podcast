@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <variable name="handlers"
+            type="org.bottiger.podcast.activities.openopml.OpenOpmlFromIntentActivity"/>
+        <variable name="subscription"
+            type="org.bottiger.podcast.provider.SlimImplementations.SlimSubscription"
+            />
+        <import type="android.view.View"/>
+    </data>
+
+    <!--
+    Magic numbers from:
+        https://www.google.com/design/spec/components/lists.html#lists-specs
+    -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="16dp"
+        android:paddingBottom="16dp">
+
+    <TextView
+        android:id="@+id/opml_subscription_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@{subscription.title}"
+        style="@style/SoundWavesTextViewStyle"
+        android:layout_marginRight="72dp"
+        />
+
+    <TextView
+        android:id="@+id/opml_is_subscribed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="(Already subscribing)"
+        style="@style/SoundWavesTextViewStyle"
+        android:layout_alignLeft="@id/opml_subscription_title"
+        android:layout_alignStart="@id/opml_subscription_title"
+        android:layout_below="@id/opml_subscription_title"
+        android:textColor="@color/colorPrimary"
+        android:visibility="@{subscription.IsSubscribed ? View.VISIBLE : View.GONE}"
+        />
+
+        <!--
+                android:layout_alignTop="@id/opml_subscription_title"
+        android:layout_alignBottom="@id/opml_subscription_title"
+        -->
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignTop="@id/opml_subscription_title"
+        android:layout_alignBottom="@id/opml_subscription_title"
+        android:paddingLeft="16dp"
+        android:layout_alignParentRight="true"
+        android:checked="@{subscription.IsSubscribed}"
+        android:enabled="@{!subscription.IsSubscribed}" />
+        <!--
+        android:onClick="@{subscription.IsSubscribed ? handlers.onClickRemoveMark : handlers.onClickMark}"/>
+        -->
+
+    </RelativeLayout>
+
+</layout>

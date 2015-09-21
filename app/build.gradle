@@ -1,5 +1,6 @@
 apply plugin: 'idea'
 apply plugin: 'com.android.application'
+apply plugin: 'com.android.databinding'
 
 android {
     compileSdkVersion 23

@@ -7,6 +7,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,6 +23,7 @@ import org.bottiger.podcast.parser.opml.OpmlReader;
 import org.bottiger.podcast.parser.opml.OpmlWriter;
 import org.bottiger.podcast.provider.DatabaseHelper;
 import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionLoader;
 import org.xmlpull.v1.XmlPullParserException;
@@ -53,9 +56,9 @@ public class OPMLImportExport {
     @RequiresPermission(allOf = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE})
-	public OPMLImportExport(Activity context) {
-		this.mActivity = context;
-		this.contentResolver = context.getContentResolver();
+	public OPMLImportExport(Activity argActivity) {
+		this.mActivity = argActivity;
+		this.contentResolver = argActivity.getContentResolver();
 
 		initInputOutputFiles();
 
@@ -63,6 +66,63 @@ public class OPMLImportExport {
 		opmlNotFound = String.format(res.getString(R.string.opml_not_found), filename);
 		opmlFailedToExport = res.getString(R.string.opml_export_failed);
 		opmlSuccesfullyExported = String.format(res.getString(R.string.opml_export_succes), fileOut);
+	}
+
+	@RequiresPermission(allOf = {
+			Manifest.permission.READ_EXTERNAL_STORAGE,
+			Manifest.permission.WRITE_EXTERNAL_STORAGE})
+	public List<SlimSubscription> readSubscriptionsFromOPML(@NonNull File argOPMLFile) {
+
+		int numImported = 0;
+		BufferedReader reader;
+		ArrayList<OpmlElement> elements = new ArrayList<>();
+		LinkedList<SlimSubscription> opmlSubscriptions = new LinkedList<>();
+
+		try {
+			reader = new BufferedReader(new FileReader(argOPMLFile));
+
+			OpmlReader omplReader = new OpmlReader();
+			elements = omplReader.readDocument(reader);
+		} catch (FileNotFoundException e) {
+			toastMsg(opmlNotFound);
+		} catch (XmlPullParserException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		for (int i = 0; i < elements.size(); i++) {
+			OpmlElement element = elements.get(i);
+
+			String url = element.getXmlUrl();
+			String title = element.getText();
+
+			URL parsedUrl = null;
+			try {
+				parsedUrl = new URL(url);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+				continue;
+			}
+
+			SlimSubscription slimSubscription = new SlimSubscription(title, parsedUrl, null);
+
+			// Test we if already have the item in out database.
+			// If not we add it.
+			boolean isAlreadySubscribed = false;
+			Subscription subscription = SubscriptionLoader.getByUrl(contentResolver, url);
+			if (subscription != null && subscription.status == Subscription.STATUS_SUBSCRIBED) {
+				isAlreadySubscribed = true;
+			}
+
+			slimSubscription.setIsSubscribed(isAlreadySubscribed);
+			opmlSubscriptions.add(slimSubscription);
+		}
+
+		//return opmlSubscriptions.toArray(new SlimSubscription[opmlSubscriptions.size()]);
+		return opmlSubscriptions;
 	}
 
 	public int importSubscriptions() {

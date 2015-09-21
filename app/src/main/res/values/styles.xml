@@ -148,6 +148,12 @@
         <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
     </style>
 
+    <style name="SoundWavesListTextViewStyle" parent="SoundWavesTextViewStyle">
+        <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingBottom">20dp</item>
+    </style>
+
     <style name="FeedActivitySettingsTextStyle" parent="SoundWavesTextViewStyle">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>

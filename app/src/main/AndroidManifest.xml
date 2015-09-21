@@ -131,6 +131,29 @@
                 <data android:mimeType="text/plain"/>
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".activities.openopml.OpenOpmlFromIntentActivity"
+            android:configChanges="keyboardHidden|orientation">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                    android:host="*"
+                    android:pathPattern=".*\\.opml"
+                    android:scheme="file"
+                    android:mimeType="*/*"/>
+                <data
+                    android:host="*"
+                    android:pathPattern=".*\\.opml"
+                    android:scheme="content"
+                    android:mimeType="*/*"/>
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".SettingsActivity"
             android:label="Settings">

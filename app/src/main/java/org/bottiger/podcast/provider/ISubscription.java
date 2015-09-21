@@ -45,6 +45,11 @@ public interface ISubscription {
     void addEpisode(@Nullable IEpisode episode);
 
     boolean IsDirty();
+
+    /**
+     * Determines if we are subscribed to a Subscription with the same URL
+     * @return
+     */
     boolean IsSubscribed();
 
     boolean IsRefreshing();
