@@ -128,10 +128,12 @@ public class DialogBulkDownload {
         for (int i = 0; i < downloadCandidatesCount; i++) {
             episode = mPlaylist.getItem(i);
             date = episode.getDateTime();
-            boolean validDate = validDate(mAction, date);
+            if (date != null) {
+                boolean validDate = validDate(mAction, date);
 
-            if (validDate) {
-                EpisodeDownloadManager.addItemToQueue(episode, EpisodeDownloadManager.LAST);
+                if (validDate) {
+                    EpisodeDownloadManager.addItemToQueue(episode, EpisodeDownloadManager.LAST);
+                }
             }
         }
 

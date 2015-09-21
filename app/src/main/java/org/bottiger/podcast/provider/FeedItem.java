@@ -666,14 +666,18 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 
     private Date mDate = null;
     public static SimpleDateFormat sdf = new SimpleDateFormat(default_format, Locale.US);
-    public Date getDateTime() {
+
+	@Nullable
+	public Date getDateTime() {
 
         if (mDate == null) {
             try {
                 mDate = sdf.parse(date);
             } catch (ParseException pe) {
                 throw new IllegalArgumentException("Datestring must be parsable");
-            }
+            } catch (Exception e) {
+				return null;
+			}
         }
         return mDate;
     }
