@@ -193,13 +193,6 @@ public class FeedParser {
                 continue;
             }
 
-            /*
-            if (FEED_TYPE_ITUNES.equals(prefix)) {
-                readSubscriptionItunesTag(parser, prefix, argSubscription);
-                continue;
-            }
-            */
-
             switch (name) {
                 case SUBSCRIPTION_TITLE_TAG: {
                     argSubscription.setTitle(readTitle(parser));
