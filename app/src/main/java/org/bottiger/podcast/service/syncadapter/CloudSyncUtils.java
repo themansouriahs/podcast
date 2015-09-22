@@ -37,7 +37,7 @@ public class CloudSyncUtils {
     public static final String AUTHORITY = "org.bottiger.podcast.provider.PodcastProvider";
     // An account type, in the form of a domain name
     // See authenticator.xml
-    public static final String ACCOUNT_TYPE = "soundwavesapp.com";
+    public static final String ACCOUNT_TYPE = "com.soundwavesapp.sync";
     // The account name
     public static final String ACCOUNT = "Cloud sync";
     // Instance fields
@@ -53,6 +53,8 @@ public class CloudSyncUtils {
         AccountManager accountManager =
                 (AccountManager) argContext.getSystemService(
                         argContext.ACCOUNT_SERVICE);
+
+        ContentResolver mResolver = argContext.getContentResolver();
         /*
          * Add the account and account type, no password or user data
          * If successful, return the Account object, otherwise report an error.
@@ -69,10 +71,27 @@ public class CloudSyncUtils {
              * The account exists or some other error occurred. Log this, report it,
              * or handle it internally.
              */
-            return false;
+            //return false;
         }
 
-        registerContentObserver(argContext.getContentResolver());
+        Bundle settingsBundle = new Bundle();
+        settingsBundle.putBoolean(
+                ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        settingsBundle.putBoolean(
+                ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+        /*
+
+
+         * Request the sync for the default account, authority, and
+         * manual sync settings
+         */
+        mResolver.setIsSyncable(newAccount, AUTHORITY, 1);
+        //mResolver.setSyncAutomatically(newAccount, AUTHORITY, true);
+        mResolver.requestSync(newAccount, AUTHORITY, settingsBundle);
+
+        //registerContentObserver(argContext.getContentResolver());
+
+
         return true;
     }
 

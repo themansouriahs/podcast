@@ -12,6 +12,7 @@ import android.util.Base64;
 import com.squareup.okhttp.Interceptor;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
+import com.squareup.okhttp.ResponseBody;
 
 import java.io.IOException;
 
@@ -34,6 +35,7 @@ public class ApiRequestInterceptor implements Interceptor {
     public Response intercept(Chain chain) throws IOException {
 
         Request request = chain.request();
+        Request.Builder requestBuidler = request.newBuilder();
 
         if (shouldAuthenticate()) {
             if (!TextUtils.isEmpty(cookie)) {
@@ -41,13 +43,32 @@ public class ApiRequestInterceptor implements Interceptor {
             } else {
                 final String authorizationValue = encodeCredentialsForBasicAuthorization();
                 //requestFacade.addHeader("Authorization", authorizationValue);
-                request.headers().newBuilder().add("Authorization", authorizationValue).build();
+                //request.headers().newBuilder().add("Authorization", authorizationValue).build();
+                requestBuidler.addHeader("Authorization", authorizationValue);
             }
         }
 
+        request = requestBuidler.build();
+
         Response response = chain.proceed(request);
 
-        return response;
+        /**
+         * FIXME: Remove when this have been fixed: https://github.com/square/retrofit/issues/1071
+         */
+        //if (response.body().contentLength() < 0) {
+        String r = response.body().string();
+
+        if (TextUtils.isEmpty(r)) {
+            r = "{}";
+        }
+
+            return response.newBuilder()
+                    .body(ResponseBody.create(response.body().contentType(), r))
+                    .build();
+        //}
+
+
+        //return response;
     }
 
     private String encodeCredentialsForBasicAuthorization() {

@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 /**
  * Created by aplb on 14-09-2015.
@@ -13,6 +14,8 @@ import android.support.annotation.Nullable;
  * onPerformSync().
  */
 public class CloudSyncService extends Service {
+
+    private static final String TAG = "CloudSyncService";
 
     // Storage for an instance of the sync adapter
     private static CloudSyncAdapter sSyncAdapter = null;
@@ -29,6 +32,7 @@ public class CloudSyncService extends Service {
          * Set the sync adapter as syncable
          * Disallow parallel syncs
          */
+        Log.i(TAG, "service created");
         synchronized (sSyncAdapterLock) {
             if (sSyncAdapter == null) {
                 sSyncAdapter = new CloudSyncAdapter(getApplicationContext(), true);
@@ -50,7 +54,7 @@ public class CloudSyncService extends Service {
          * in the base class code when the SyncAdapter
          * constructors call super()
          */
-
+        Log.i(TAG, "service bound");
         return sSyncAdapter.getSyncAdapterBinder();
     }
 }

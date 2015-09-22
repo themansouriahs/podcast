@@ -11,15 +11,15 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
     <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.READ_SYNC_STATS" />
     <uses-permission android:name="android.permission.MEDIA_CONTENT_CONTROL" />
 
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.READ_SYNC_STATS" />
     <uses-permission-sdk-m android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
 
     <uses-feature android:name="android.hardware.telephony" android:required="false" />
@@ -69,6 +69,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.bottiger.podcast.MainActivity" />
         </activity>
+
+        <provider
+            android:name="org.bottiger.podcast.provider.PodcastProvider"
+            android:authorities="org.bottiger.podcast.provider.PodcastProvider"
+            android:syncable="true">
+        </provider>
 
         <service android:name="org.bottiger.podcast.service.jobservice.PodcastUpdateJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
@@ -193,10 +199,11 @@
                 android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/authenticator" />
         </service>
+
+        <!-- android:process=":sync" -->
         <service
             android:name="org.bottiger.podcast.service.syncadapter.CloudSyncService"
-            android:exported="true"
-            android:process=":sync">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.content.SyncAdapter"/>
             </intent-filter>
@@ -234,12 +241,6 @@
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </receiver>
-
-        <provider
-            android:name="org.bottiger.podcast.provider.PodcastProvider"
-            android:authorities="org.bottiger.podcast.provider.PodcastProvider"
-            android:syncable="true">
-        </provider>
 
         <!--
         Don't be a dick :)

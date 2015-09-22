@@ -113,8 +113,14 @@ public class GPodderAPI implements IWebservice {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(argContext);
         long lastSync = prefs.getLong(key, 0);
 
+        long timestamp = -1;
+        @SynchronizationResult int returnValue = SYNCHRONIZATION_OK;
+
         if (lastSync == 0) {
-            return initialSynchronization(argContext, argLocalSubscriptions);
+            returnValue = initialSynchronization(argContext, argLocalSubscriptions);
+            if (returnValue == SYNCHRONIZATION_OK) {
+                timestamp = System.currentTimeMillis();
+            }
         } else {
 
             /**
@@ -178,24 +184,32 @@ public class GPodderAPI implements IWebservice {
 
             UpdatedUrls updatedUrls = updatedUrlsResponse.body();
 
-            long timestamp = updatedUrls.getTimestamp();
-            if (timestamp > 0) {
-                prefs.edit().putLong(key, timestamp);
-            }
-
-            return SYNCHRONIZATION_OK;
+            timestamp = updatedUrls.getTimestamp();
         }
+
+        if (timestamp > 0) {
+            prefs.edit().putLong(key, timestamp);
+        }
+
+        return returnValue;
     }
 
     public @SynchronizationResult int initialSynchronization(@NonNull Context argContext, @NonNull LongSparseArray<Subscription> argLocalSubscriptions) throws IOException {
 
-        Call<List<GSubscription>> deviceSubscriptions = api.getDeviceSubscriptions(mUsername, GPodderUtils.getDeviceID());
-        Response<List<GSubscription>> deviceSubscriptionsResponse = deviceSubscriptions.execute();
+        Call<String[]> deviceSubscriptions = api.getDeviceSubscriptions(mUsername, GPodderUtils.getDeviceID());
+        Response<String[]> deviceSubscriptionsResponse = deviceSubscriptions.execute();
 
         if (!deviceSubscriptionsResponse.isSuccess())
             return SERVER_ERROR;
 
-        List<GSubscription> fetchedSubscriptions = deviceSubscriptionsResponse.body();
+        int s = deviceSubscriptionsResponse.body().length;
+        GSubscription[] hack = new GSubscription[deviceSubscriptionsResponse.body().length];
+        for (int i = 0; i < s; i++) {
+            hack[i] = new GSubscription();
+            hack[i].setUrl(deviceSubscriptionsResponse.body()[i]);
+        }
+
+        GSubscription[] fetchedSubscriptions = hack;
         List<GSubscription> newSubscriptions = new LinkedList<>();
 
         Map<String, Subscription> localSubscriptionMap;
@@ -218,8 +232,8 @@ public class GPodderAPI implements IWebservice {
 
         String url;
         GSubscription gSubscription;
-        for (int i = 0; i < fetchedSubscriptions.size(); i++) {
-            gSubscription = fetchedSubscriptions.get(i);
+        for (int i = 0; i < fetchedSubscriptions.length; i++) {
+            gSubscription = fetchedSubscriptions[i];
             url = gSubscription.getUrl();
 
             // If the remote collection contains subscriptions we don't know about
@@ -234,8 +248,8 @@ public class GPodderAPI implements IWebservice {
         for (int i = 0; i < newSubscriptions.size(); i++) {
             gSubscription = newSubscriptions.get(i);
             newLocalSubscription = new Subscription(gSubscription.getUrl());
-            newLocalSubscription.setTitle(gSubscription.getTitle());
-            newLocalSubscription.setImageURL(gSubscription.getLogoUrl());
+            //newLocalSubscription.setTitle(gSubscription.getTitle());
+            //newLocalSubscription.setImageURL(gSubscription.getLogoUrl());
             newLocalSubscription.subscribe(argContext);
         }
 
@@ -314,9 +328,9 @@ public class GPodderAPI implements IWebservice {
             return;
         }
 
-        api.getDeviceSubscriptions(mUsername, GPodderUtils.getDeviceID()).enqueue(new Callback<List<GSubscription>>() {
+        api.getDeviceSubscriptions(mUsername, GPodderUtils.getDeviceID()).enqueue(new Callback<String[]>() {
             @Override
-            public void onResponse(Response<List<GSubscription>> response) {
+            public void onResponse(Response<String[]> response) {
                 Log.d(TAG, response.toString());
             }
 
@@ -426,6 +440,11 @@ public class GPodderAPI implements IWebservice {
         AuthenticationCallback callback = new AuthenticationCallback(null, null);
         Response response = api.login(mUsername).execute();
 
+        if (response.isSuccess()) {
+            storeAuthenticationCookie(response);
+            return true;
+        }
+
         return response.isSuccess();
     }
 
@@ -482,5 +501,19 @@ public class GPodderAPI implements IWebservice {
             super.onFailure(error);
         }
 
+    }
+
+    private void storeAuthenticationCookie(Response argResponse) {
+        com.squareup.okhttp.Headers headers = argResponse.headers();
+        int numHeaders = headers.size();
+
+        String name, value;
+        for (int i = 0; i < numHeaders; i++) {
+            name = headers.name(i);
+            value = headers.value(i);
+            if (name.equals("Set-Cookie") && name.startsWith("sessionid")) {
+                ApiRequestInterceptor.cookie = value.split(";")[0];
+            }
+        }
     }
 }

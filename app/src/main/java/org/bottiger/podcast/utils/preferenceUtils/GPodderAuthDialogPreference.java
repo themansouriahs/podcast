@@ -87,10 +87,18 @@ public class GPodderAuthDialogPreference extends DialogPreference {
                 GPodderAPI api = new GPodderAPI(username, password, new Callback() {
                     @Override
                     public void onResponse(Response response) {
-                        mTestLoading.hide();
-                        mTestResult.setVisibility(View.VISIBLE);
-                        mTestResult.setText(getContext().getResources().getString(R.string.generic_test_credentials_succes));
-                        mTestResult.setTextColor(getContext().getResources().getColor(R.color.green));
+
+                        if (response.isSuccess()) {
+                            mTestLoading.hide();
+                            mTestResult.setVisibility(View.VISIBLE);
+                            mTestResult.setText(getContext().getResources().getString(R.string.generic_test_credentials_succes));
+                            mTestResult.setTextColor(getContext().getResources().getColor(R.color.green));
+                        } else {
+                            mTestLoading.hide();
+                            mTestResult.setVisibility(View.VISIBLE);
+                            mTestResult.setText(getContext().getResources().getString(R.string.generic_test_credentials_failed));
+                            mTestResult.setTextColor(getContext().getResources().getColor(R.color.red));
+                        }
                     }
 
                     @Override

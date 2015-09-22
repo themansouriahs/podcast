@@ -18,6 +18,7 @@ import java.util.Set;
 
 import retrofit.Call;
 import retrofit.Callback;
+import retrofit.Retrofit;
 import retrofit.http.Body;
 import retrofit.http.GET;
 import retrofit.http.Header;
@@ -41,7 +42,7 @@ public interface IGPodderAPI {
     */
     @POST("/api/2/auth/{username}/login.json")
     //void login(@Path("user") String user, @Header("Authorization") String authorization, Callback<String> callback);
-    Call<GNull> login(@Path("username") String user);
+    Call<com.squareup.okhttp.ResponseBody> login(@Path("username") String user);
 
     @POST("/api/2/auth/{username}/logout.json")
     void logout(@Path("username") String user);
@@ -53,7 +54,7 @@ public interface IGPodderAPI {
 
     // Get Subscriptions of Device
     @GET("/subscriptions/{username}/{deviceid}.json")
-    Call<List<GSubscription>> getDeviceSubscriptions(@Path("username") String user, @Path("deviceid") String device);
+    Call<String[]> getDeviceSubscriptions(@Path("username") String user, @Path("deviceid") String device);
 
     // Get Subscriptions
     @GET("/subscriptions/{username}.json")

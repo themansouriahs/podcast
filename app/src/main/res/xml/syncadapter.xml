@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<sync-adapter xmlns:android="http://schemas.android.com/apk/res/android"
+<sync-adapter
+    xmlns:android="http://schemas.android.com/apk/res/android"
         android:contentAuthority="org.bottiger.podcast.provider.PodcastProvider"
-        android:accountType="com.google"
+        android:accountType="com.soundwavesapp.sync"
         android:userVisible="true"
+        android:allowParallelSyncs="false"
         android:isAlwaysSyncable="true"
         android:supportsUploading="true" />
