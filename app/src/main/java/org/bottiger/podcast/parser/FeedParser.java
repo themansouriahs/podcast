@@ -293,8 +293,9 @@ public class FeedParser {
                     break;
                 }
                 case EPISODE_DESCRIPTION_TAG: {
+                    String description = readSimpleTag(parser, EPISODE_DESCRIPTION_TAG);
                     if (TextUtils.isEmpty(episode.getDescription())) {
-                        episode.setDescription(readSimpleTag(parser, EPISODE_DESCRIPTION_TAG));
+                        episode.setDescription(description);
                     }
                     break;
                 }
@@ -367,7 +368,7 @@ public class FeedParser {
                 } else {
                     // We assume it's the number of minutes
                     try {
-                        duration = Long.getLong(unparsedDuration) * 60 * 1000; // to ms
+                        duration = Long.parseLong(unparsedDuration) * 60 * 1000; // to ms
                     } catch (NullPointerException npe) {
                         // I have observed feeds with malform duration
                         duration = -1;

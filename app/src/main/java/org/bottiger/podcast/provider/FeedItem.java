@@ -24,6 +24,7 @@ import org.bottiger.podcast.utils.PodcastLog;
 import org.bottiger.podcast.utils.SDCardManager;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.jsoup.Jsoup;
 
 import android.app.Activity;
 import android.app.DownloadManager;
@@ -1484,7 +1485,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	}
 
 	public void setDescription(String content2) {
-		this.content = content2;
+		this.content = Jsoup.parse(content2).text();
 	}
 
 	public void setLink(String href) {
