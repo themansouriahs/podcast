@@ -416,7 +416,8 @@ public class FeedParser {
         parser.require(XmlPullParser.START_TAG, ns, EPISODE_PUB_DATE_TAG);
         String pubDate = readText(parser);
         parser.require(XmlPullParser.END_TAG, ns, EPISODE_PUB_DATE_TAG);
-        return DateUtils.parseRFC3339Date(pubDate);
+        //return DateUtils.parseRFC3339Date(pubDate);
+        return DateUtils.parse(pubDate);
     }
 
     // Processes pubdate tag of an item in the feed.
@@ -424,7 +425,8 @@ public class FeedParser {
         parser.require(XmlPullParser.START_TAG, ns, SUBSCRIPTION_PUB_DATE_TAG);
         String pubDate = readText(parser);
         parser.require(XmlPullParser.END_TAG, ns, SUBSCRIPTION_PUB_DATE_TAG);
-        return DateUtils.parseRFC3339Date(pubDate);
+        //return DateUtils.parseRFC3339Date(pubDate);
+        return DateUtils.parse(pubDate);
     }
 
     // Processes link tags in the feed.
