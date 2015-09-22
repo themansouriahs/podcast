@@ -1,5 +1,6 @@
 package org.bottiger.podcast.parser;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -33,12 +34,19 @@ public class FeedUpdater {
 		ArrayList<IEpisode> items = subscription.getEpisodes();
 		int size = items.size();
 		
-		String[] urls = new String[size];
+		ArrayList<String> urls = new ArrayList<>(size);
+		URL url;
 		for (int i = 0; i < size; i++) {
-			urls[i] = items.get(i).getUrl().toString();
+			url = items.get(i).getUrl();
+
+			if(url != null) {
+				urls.add(url.toString());
+			}
 		}
+
+		String[] urlArray = urls.toArray(new String[urls.size()]);
 		
-		FeedItem[] localItems = FeedItem.getByURL(contentResolver, urls, null);
+		FeedItem[] localItems = FeedItem.getByURL(contentResolver, urlArray, null);
 		
 		HashMap<String,FeedItem> itemDict = new HashMap<>();
 		for (FeedItem item : localItems) {
@@ -103,9 +111,9 @@ public class FeedUpdater {
 		 */
                 StringBuilder queryBuilder = new StringBuilder();
                 queryBuilder.append(ItemColumns.URL + " IN (");
-                for (int i = 1; i <= urls.length; i++) {
-                    queryBuilder.append("\"" + urls[i-1] + "\"");
-                    if (i != urls.length)
+                for (int i = 1; i <= urlArray.length; i++) {
+                    queryBuilder.append("\"" + urlArray[i-1] + "\"");
+                    if (i != urlArray.length)
                         queryBuilder.append(", ");
                 }
                 queryBuilder.append(")");
@@ -116,7 +124,7 @@ public class FeedUpdater {
                 return;
             }
 
-            FeedItem[] localItems2 = FeedItem.getByURL(contentResolver, urls, null);
+            FeedItem[] localItems2 = FeedItem.getByURL(contentResolver, urlArray, null);
             return;
         }
 		

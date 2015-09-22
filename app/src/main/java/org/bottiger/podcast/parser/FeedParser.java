@@ -366,7 +366,12 @@ public class FeedParser {
                     }
                 } else {
                     // We assume it's the number of minutes
-                    duration = Long.getLong(unparsedDuration) * 60 * 1000; // to ms
+                    try {
+                        duration = Long.getLong(unparsedDuration) * 60 * 1000; // to ms
+                    } catch (NullPointerException npe) {
+                        // I have observed feeds with malform duration
+                        duration = -1;
+                    }
                 }
 
                 episode.setDuration(duration);
@@ -461,7 +466,12 @@ public class FeedParser {
         String mimeType = parser.getAttributeValue(null, EPISODE_ENCLOSURE_MIMETYPE);
 
         enclosure.url = url;
-        enclosure.filesize = Long.parseLong(fileSize);
+        try {
+            enclosure.filesize = Long.parseLong(fileSize);
+        }
+        catch (Exception e) {
+            enclosure.filesize = -1;
+        }
         enclosure.mimeType = mimeType;
 
         readText(parser);
