@@ -62,7 +62,7 @@ public interface IGPodderAPI {
 
     // Upload Subscriptions of Device
     @PUT("/subscriptions/{username}/{deviceid}.json")
-    Call<String> uploadDeviceSubscriptions(@Body List<String> subscriptions, @Path("username") String user, @Path("deviceid") String device);
+    Call<com.squareup.okhttp.ResponseBody> uploadDeviceSubscriptions(@Body List<String> subscriptions, @Path("username") String user, @Path("deviceid") String device);
 
     // Upload Subscription Changes
     @POST("/api/2/subscriptions/{username}/{deviceid}.json")

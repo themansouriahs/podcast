@@ -15,6 +15,7 @@ import android.util.Log;
 
 import com.google.api.client.json.gson.GsonFactory;
 import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.ResponseBody;
 
 import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.R;
@@ -253,6 +254,21 @@ public class GPodderAPI implements IWebservice {
             newLocalSubscription.subscribe(argContext);
         }
 
+
+        /**
+         * Upload local subscriptions to gpodder
+         */
+        List<String> localSubscriptionUrls = new LinkedList<>();
+        for (int i = 0; i < argLocalSubscriptions.size(); i++) {
+            newLocalSubscription = argLocalSubscriptions.valueAt(i);
+            localSubscriptionUrls.add(newLocalSubscription.getURLString());
+        }
+        Response response = api.uploadDeviceSubscriptions(localSubscriptionUrls, mUsername, GPodderUtils.getDeviceID()).execute();
+
+        if (!response.isSuccess()) {
+            return SERVER_ERROR;
+        }
+
         return SYNCHRONIZATION_OK;
     }
 
@@ -316,7 +332,7 @@ public class GPodderAPI implements IWebservice {
             subscriptionList.add(feed.getURLString());
         }
 
-        CallbackWrapper<String> callback = new CallbackWrapper(argCalback, mDummyCallback);
+        CallbackWrapper<ResponseBody> callback = new CallbackWrapper(argCalback, mDummyCallback);
 
         api.uploadDeviceSubscriptions(subscriptionList, mUsername, GPodderUtils.getDeviceID()).enqueue(callback);
     }
