@@ -80,6 +80,12 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	public String url;
 
 	/**
+	 * Currently not persisted.
+	 * A link to the show notes
+	 */
+	public String link_show_notes;
+
+	/**
 	 * Title of the episode
 	 */
 	public String title;
@@ -1482,7 +1488,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	}
 
 	public void setLink(String href) {
-		this.url = href;
+		this.link_show_notes = href;
 	}
 
     public boolean isVideo() {

@@ -97,6 +97,7 @@ public class FeedParser {
     private static final String EPISODE_PUB_DATE_TAG = "pubDate";
     private static final String EPISODE_SOURCE_TAG = "source";
 
+    final String EPISODE_ENCLOSURE_URL = "url"; // in bytes
     final String EPISODE_ENCLOSURE_FILESISZE = "length"; // in bytes
     final String EPISODE_ENCLOSURE_MIMETYPE = "type";
     final String ITUNES_IMAGE_HREF = "href";
@@ -319,6 +320,7 @@ public class FeedParser {
                 }
                 case EPISODE_ENCLOSURE_TAG: {
                     EpisodeEnclosure enclosure = readEnclosure(parser);
+                    episode.setURL(enclosure.url);
                     episode.setFilesize(enclosure.filesize);
                     episode.setIsVideo(EpisodeDownloadManager.isVideo(enclosure.mimeType));
                     break;
@@ -451,12 +453,16 @@ public class FeedParser {
 
         parser.require(XmlPullParser.START_TAG, ns, EPISODE_ENCLOSURE_TAG);
         String tag = parser.getName();
+
+        String url = parser.getAttributeValue(null, EPISODE_ENCLOSURE_URL);
         String fileSize = parser.getAttributeValue(null, EPISODE_ENCLOSURE_FILESISZE);
         String mimeType = parser.getAttributeValue(null, EPISODE_ENCLOSURE_MIMETYPE);
 
-        enclosure.url = readText(parser);
+        enclosure.url = url;
         enclosure.filesize = Long.parseLong(fileSize);
         enclosure.mimeType = mimeType;
+
+        readText(parser);
 
         parser.require(XmlPullParser.END_TAG, ns, EPISODE_ENCLOSURE_TAG);
         return enclosure;
