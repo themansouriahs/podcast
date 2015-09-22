@@ -222,6 +222,7 @@ public class FeedParser {
                     if (TextUtils.isEmpty(argSubscription.getImageURL())) {
                         String image = readSubscriptionImage(parser);
                         argSubscription.setImageURL(image);
+                        parser.nextTag();
                     }
                     break;
                 }
@@ -375,6 +376,7 @@ public class FeedParser {
                 String image = parser.getAttributeValue(null, ITUNES_IMAGE_HREF);
                 URL url = new URL(image);
                 episode.setArtwork(url);
+                parser.nextTag();
                 break;
             }
             case ITUNES_SUMMARY_TAG: {
