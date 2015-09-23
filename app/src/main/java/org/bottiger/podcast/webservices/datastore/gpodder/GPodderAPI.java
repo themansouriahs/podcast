@@ -1,8 +1,10 @@
 package org.bottiger.podcast.webservices.datastore.gpodder;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
+import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
@@ -11,7 +13,9 @@ import android.support.v4.text.TextUtilsCompat;
 import android.support.v4.util.LongSparseArray;
 import android.text.TextUtils;
 import android.util.ArrayMap;
+import android.util.ArraySet;
 import android.util.Log;
+import android.util.Pair;
 
 import com.google.api.client.json.gson.GsonFactory;
 import com.squareup.okhttp.OkHttpClient;
@@ -34,9 +38,11 @@ import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import retrofit.Call;
 import retrofit.Callback;
@@ -52,13 +58,16 @@ import retrofit.http.Headers;
 public class GPodderAPI implements IWebservice {
 
     private static final String TAG = "GPodderAPI";
+    private static final boolean RESPECT_GPODDER_URL_SANITIZER = false;
 
     private IGPodderAPI api;
     private String mUsername;
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({SYNCHRONIZATION_OK, AUTHENTICATION_ERROR, SERVER_ERROR})
-    public @interface SynchronizationResult {}
+    public @interface SynchronizationResult {
+    }
+
     public static final int SYNCHRONIZATION_OK = 1;
     public static final int AUTHENTICATION_ERROR = 2;
     public static final int SERVER_ERROR = 3;
@@ -104,7 +113,9 @@ public class GPodderAPI implements IWebservice {
         }
     }
 
-    public @SynchronizationResult int synchronize(@NonNull Context argContext, @NonNull LongSparseArray<Subscription> argLocalSubscriptions) throws IOException {
+    public
+    @SynchronizationResult
+    int synchronize(@NonNull Context argContext, @NonNull LongSparseArray<Subscription> argLocalSubscriptions) throws IOException {
 
         Response response = api.login(mUsername).execute();
         if (!response.isSuccess())
@@ -114,100 +125,120 @@ public class GPodderAPI implements IWebservice {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(argContext);
         long lastSync = prefs.getLong(key, 0);
 
-        long timestamp = -1;
+        long timestamp;
         @SynchronizationResult int returnValue = SYNCHRONIZATION_OK;
 
-        if (lastSync == 0) {
-            returnValue = initialSynchronization(argContext, argLocalSubscriptions);
-            if (returnValue == SYNCHRONIZATION_OK) {
-                timestamp = System.currentTimeMillis();
-            }
-        } else {
 
-            /**
-             * Fetch changes from the server
-             */
+        /**
+         * Fetch changes from the server
+         */
+        Set<String> subscribedUrls = getUrls(argLocalSubscriptions);
 
-            long lastCall = lastSync; // FIXME
-            Call<SubscriptionChanges> subscriptionsChanges = api.getDeviceSubscriptionsChanges(mUsername, GPodderUtils.getDeviceID(), lastCall);
-            Response<SubscriptionChanges> subscriptionsChangesResponse = subscriptionsChanges.execute();
+        Call<SubscriptionChanges> subscriptionsChanges = api.getDeviceSubscriptionsChanges(mUsername, GPodderUtils.getDeviceID(), lastSync); // lastCall
+        Response<SubscriptionChanges> subscriptionsChangesResponse = subscriptionsChanges.execute();
 
-            if (!subscriptionsChangesResponse.isSuccess())
-                return SERVER_ERROR;
+        if (!subscriptionsChangesResponse.isSuccess())
+            return SERVER_ERROR;
 
-            SubscriptionChanges subscriptionsChangesResult = subscriptionsChangesResponse.body();
-            List<String> added = subscriptionsChangesResult.add;
-            List<String> removed = subscriptionsChangesResult.remove;
+        SubscriptionChanges subscriptionsChangesResult = subscriptionsChangesResponse.body();
+        List<String> added = subscriptionsChangesResult.add;
+        List<String> removed = subscriptionsChangesResult.remove;
 
-            String newUrl;
-            Subscription changedSubscription;
-            for (int i = 0; i < added.size(); i++) {
-                newUrl = added.get(i);
-                changedSubscription = new Subscription(newUrl);
-                changedSubscription.subscribe(argContext);
-            }
+        added.removeAll(subscribedUrls);
 
-            for (int i = 0; i < removed.size(); i++) {
-                newUrl = removed.get(i);
-                changedSubscription = SubscriptionLoader.getByUrl(argContext.getContentResolver(), newUrl);
-                if (changedSubscription != null) {
-                    changedSubscription.unsubscribe(argContext);
-                } else {
-                    Log.w(TAG, "gPodder removed a subscription we don't know about! url: " + newUrl); // NoI18N
-                    VendorCrashReporter.report("Removed unknown subscription", newUrl); // NoI18N
-                }
-            }
-
-            /**
-             * Upload changes from the client
-             */
-
-            // FIXME: Fuck, at the moment we do not have a "subscribed_at" timesstamp on Subscriptions.
-            // We just upload all of them
-            SubscriptionChanges localSubscriptionsChanges= new SubscriptionChanges();
-            for(int i = 0; i < argLocalSubscriptions.size(); i++) {
-                long arrayKey = argLocalSubscriptions.keyAt(i);
-                // get the object by the key.
-                ISubscription subscription = argLocalSubscriptions.get(arrayKey);
-
-                if (subscription.IsSubscribed()) {
-                    localSubscriptionsChanges.add.add(subscription.getURLString());
-                } else {
-                    localSubscriptionsChanges.remove.add(subscription.getURLString());
-                }
-            }
-
-            Call<UpdatedUrls> updatedUrlsCall = api.uploadDeviceSubscriptionsChanges(localSubscriptionsChanges, mUsername, GPodderUtils.getDeviceID());
-            Response<UpdatedUrls> updatedUrlsResponse = updatedUrlsCall.execute();
-
-            if (!updatedUrlsResponse.isSuccess())
-                return SERVER_ERROR;
-
-            UpdatedUrls updatedUrls = updatedUrlsResponse.body();
-
-            timestamp = updatedUrls.getTimestamp();
+        String newUrl;
+        Subscription changedSubscription;
+        for (int i = 0; i < added.size(); i++) {
+            newUrl = added.get(i);
+            changedSubscription = new Subscription(newUrl);
+            changedSubscription.subscribe(argContext);
         }
 
+        /**
+         * Upload changes from the client to gpodder
+         */
+        String[] gPodderDeviceSubscriptions;
+        Set<String> gPodderSubscriptionsSet = getSet();
+        try {
+            gPodderDeviceSubscriptions = getDeviceSubscriptionsAsStrings();
+        } catch (IOException ioe) {
+            return SERVER_ERROR;
+        }
+
+        for (int i = 0; i < gPodderDeviceSubscriptions.length; i++) {
+            gPodderSubscriptionsSet.add(gPodderDeviceSubscriptions[i]);
+        }
+        gPodderDeviceSubscriptions = null;
+
+        // FIXME: Fuck, at the moment we do not have a "subscribed_at" timesstamp on Subscriptions.
+        // We just upload all of them
+        SubscriptionChanges localSubscriptionsChanges = new SubscriptionChanges();
+        String url;
+        for (int i = 0; i < argLocalSubscriptions.size(); i++) {
+            long arrayKey = argLocalSubscriptions.keyAt(i);
+            Subscription subscription = argLocalSubscriptions.get(arrayKey);
+            url = subscription.getURLString();
+
+            if (removed.contains(url)) {
+                if (subscription.IsSubscribed()) {
+                    subscription.unsubscribe(argContext);
+                } else {
+                    Log.w(TAG, "gPodder removed a subscription we are not subscribed to: " + url); // NoI18N
+                    VendorCrashReporter.report("Removed unknown subscription", url); // NoI18N
+                }
+            }
+
+
+            if (subscription.IsSubscribed() && !gPodderSubscriptionsSet.contains(subscription)) {
+                localSubscriptionsChanges.add.add(url);
+            }
+
+            if (subscription.IsSubscribed()) {
+                //localSubscriptionsChanges.remove.add(url);
+                gPodderSubscriptionsSet.remove(url);
+            }
+        }
+
+        // We are not subscribed to the URL's there are left
+        localSubscriptionsChanges.remove.addAll(gPodderSubscriptionsSet);
+
+        Call<UpdatedUrls> updatedUrlsCall = api.uploadDeviceSubscriptionsChanges(localSubscriptionsChanges, mUsername, GPodderUtils.getDeviceID());
+        Response<UpdatedUrls> updatedUrlsResponse = updatedUrlsCall.execute();
+
+        if (!updatedUrlsResponse.isSuccess())
+            return SERVER_ERROR;
+
+        UpdatedUrls updatedUrls = updatedUrlsResponse.body();
+
+        if (RESPECT_GPODDER_URL_SANITIZER) {
+            updateLocalUrls(argLocalSubscriptions, updatedUrls.getUpdatedUrls());
+        }
+
+        timestamp = updatedUrls.getTimestamp();
+
         if (timestamp > 0) {
-            prefs.edit().putLong(key, timestamp);
+            prefs.edit().putLong(key, timestamp).commit();
         }
 
         return returnValue;
     }
 
-    public @SynchronizationResult int initialSynchronization(@NonNull Context argContext, @NonNull LongSparseArray<Subscription> argLocalSubscriptions) throws IOException {
+    public
+    @SynchronizationResult
+    int initialSynchronization(@NonNull Context argContext, @NonNull LongSparseArray<Subscription> argLocalSubscriptions) throws IOException {
 
-        Call<String[]> deviceSubscriptions = api.getDeviceSubscriptions(mUsername, GPodderUtils.getDeviceID());
-        Response<String[]> deviceSubscriptionsResponse = deviceSubscriptions.execute();
-
-        if (!deviceSubscriptionsResponse.isSuccess())
+        String[] deviceSubscriptions;
+        try {
+            deviceSubscriptions = getDeviceSubscriptionsAsStrings();
+        } catch (IOException ioe) {
             return SERVER_ERROR;
+        }
 
-        int s = deviceSubscriptionsResponse.body().length;
-        GSubscription[] hack = new GSubscription[deviceSubscriptionsResponse.body().length];
+        int s = deviceSubscriptions.length;
+        GSubscription[] hack = new GSubscription[deviceSubscriptions.length];
         for (int i = 0; i < s; i++) {
             hack[i] = new GSubscription();
-            hack[i].setUrl(deviceSubscriptionsResponse.body()[i]);
+            hack[i].setUrl(deviceSubscriptions[i]);
         }
 
         GSubscription[] fetchedSubscriptions = hack;
@@ -222,7 +253,7 @@ public class GPodderAPI implements IWebservice {
         }
 
         Subscription value;
-        for(int i = 0; i < argLocalSubscriptions.size(); i++) {
+        for (int i = 0; i < argLocalSubscriptions.size(); i++) {
             long arrayKey = argLocalSubscriptions.keyAt(i);
             ISubscription subscription = argLocalSubscriptions.get(arrayKey);
 
@@ -249,8 +280,6 @@ public class GPodderAPI implements IWebservice {
         for (int i = 0; i < newSubscriptions.size(); i++) {
             gSubscription = newSubscriptions.get(i);
             newLocalSubscription = new Subscription(gSubscription.getUrl());
-            //newLocalSubscription.setTitle(gSubscription.getTitle());
-            //newLocalSubscription.setImageURL(gSubscription.getLogoUrl());
             newLocalSubscription.subscribe(argContext);
         }
 
@@ -404,14 +433,12 @@ public class GPodderAPI implements IWebservice {
 
         ISubscription subscription;
 
-        for (int i = 0; i < argAdded.size(); i++)
-        {
+        for (int i = 0; i < argAdded.size(); i++) {
             subscription = argAdded.valueAt(i);
             changes.add.add(subscription.getURLString());
         }
 
-        for (int i = 0; i < argRemoved.size(); i++)
-        {
+        for (int i = 0; i < argRemoved.size(); i++) {
             subscription = argRemoved.valueAt(i);
             changes.remove.add(subscription.getURLString());
         }
@@ -529,6 +556,55 @@ public class GPodderAPI implements IWebservice {
             value = headers.value(i);
             if (name.equals("Set-Cookie") && name.startsWith("sessionid")) {
                 ApiRequestInterceptor.cookie = value.split(";")[0];
+            }
+        }
+    }
+
+    @NonNull
+    private static Set<String> getUrls(@NonNull LongSparseArray<Subscription> argLocalSubscriptions) {
+        Set<String> urls = getSet();
+
+        for (int i = 0; i < argLocalSubscriptions.size(); i++) {
+            long arrayKey = argLocalSubscriptions.keyAt(i);
+            // get the object by the key.
+            ISubscription subscription = argLocalSubscriptions.get(arrayKey);
+            urls.add(subscription.getURLString());
+        }
+
+        return urls;
+    }
+
+    private static Set<String> getSet() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            return new ArraySet<>();
+        } else {
+            return new HashSet<>();
+        }
+    }
+
+    private String[] getDeviceSubscriptionsAsStrings() throws IOException {
+        Call<String[]> deviceSubscriptions = api.getDeviceSubscriptions(mUsername, GPodderUtils.getDeviceID());
+        Response<String[]> deviceSubscriptionsResponse = deviceSubscriptions.execute();
+
+        if (!deviceSubscriptionsResponse.isSuccess())
+            throw new IOException("Could not contact server"); // NoI18N
+
+        return deviceSubscriptionsResponse.body();
+    }
+
+    private void updateLocalUrls(LongSparseArray<Subscription> argLocalSubscriptions, Set<Pair<String, String>> updatedUrls) {
+        for (int i = 0; i < argLocalSubscriptions.size(); i++) {
+            long arrayKey = argLocalSubscriptions.keyAt(i);
+            // get the object by the key.
+            Subscription subscription = argLocalSubscriptions.get(arrayKey);
+            String url = subscription.getURLString();
+
+            //if (updatedUrls.)
+            for (Pair<String, String> p : updatedUrls) {
+                if (p.first.equals(url)) {
+                    subscription.updateUrl(p.second);
+                    continue;
+                }
             }
         }
     }

@@ -222,7 +222,12 @@ public class Subscription implements ISubscription, PaletteListener {
 		mEpisodes.add(argEpisode);
 	}
 
-    private class RefreshSyncTask extends AsyncTask<Context, Void, Void> {
+	public void updateUrl(String second) {
+		// FIXME Update the url of the subscription
+	}
+
+
+	private class RefreshSyncTask extends AsyncTask<Context, Void, Void> {
         protected Void doInBackground(Context... contexts) {
             refresh(contexts[0]);
             return null;
