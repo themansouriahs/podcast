@@ -104,8 +104,8 @@ public class DateUtils {
         put("^\\d{4}/\\d{1,2}/\\d{1,2}\\s\\d{1,2}:\\d{2}:\\d{2}$", "yyyy/MM/dd HH:mm:ss");
         put("^\\d{1,2}\\s[a-z]{3}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}$", "dd MMM yyyy HH:mm:ss");
         put("^\\d{1,2}\\s[a-z]{4,}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}$", "dd MMMM yyyy HH:mm:ss");
-        put("^[A-Za-z]{3},\\s\\d{1,2}\\s[A-Za-z]{3}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}\\s-[0-9]+$", "EEE, dd MMM yyyy HH:mm:ss Z");
-        put("^[A-Za-z]{3},\\s\\d{1,2}\\s[A-Za-z]{3}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}\\s[A-Za-z0-9+-]+$", "EEE, dd MMM yyyy HH:mm:ss z");
+        put("^[A-Za-z]{3},\\s\\d{1,2}\\s[A-Za-z]{3,9}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}\\s-[0-9]+$", "EEE, dd MMM yyyy HH:mm:ss Z");
+        put("^[A-Za-z]{3},\\s\\d{1,2}\\s[A-Za-z]{3,9}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}\\s[A-Za-z0-9+-]+$", "EEE, dd MMM yyyy HH:mm:ss z");
     }};
 
 

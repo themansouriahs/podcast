@@ -254,6 +254,7 @@ public class FeedParser {
             case ITUNES_IMAGE_TAG: {
                 String image = parser.getAttributeValue(null, ITUNES_IMAGE_HREF);
                 argSubscription.setImageURL(image);
+                parser.nextTag();
                 break;
             }
             default: {
