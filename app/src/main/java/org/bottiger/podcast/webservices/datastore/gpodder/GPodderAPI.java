@@ -116,7 +116,7 @@ public class GPodderAPI implements IWebservice {
 
     /**
      * TODO: api.updateDeviceData always fail
-     * TODO: String where = String.format("%s>%d", ItemColumns.LAST_UPDATE, lastSync); always returns everything
+     * TODO: sometime failes: if (!updatedUrlsResponse.isSuccess()); return SERVER_ERROR;
      *
      * @param argContext
      * @param argLocalSubscriptions
@@ -241,7 +241,7 @@ public class GPodderAPI implements IWebservice {
         /**
          * Sync Episode actions
          */
-        String where = String.format("%s>%d", ItemColumns.LAST_UPDATE, lastSync);
+        String where = String.format("%s>%d", ItemColumns.LAST_UPDATE, lastSync*1000);
         FeedItem[] items = FeedCursorLoader.asCursor(argContext.getContentResolver(), where);
 
         Call<GActionsList> actionList = api.getEpisodeActions(mUsername, null, null, lastSync, true);
