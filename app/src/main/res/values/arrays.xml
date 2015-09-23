@@ -182,12 +182,14 @@
         <item>A list</item>
         <item>2 columns</item>
         <item>3 columns</item>
+        <item>4 columns</item>
     </string-array>
 
     <string-array name="pref_subscriptions_columns_entries_values">
         <item>1</item>
         <item>2</item>
         <item>3</item>
+        <item>4</item>
     </string-array>
 
     <string-array name="playlist_sort_order">
