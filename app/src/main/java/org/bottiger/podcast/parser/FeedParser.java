@@ -369,6 +369,9 @@ public class FeedParser {
                     // We assume it's the number of minutes
                     try {
                         duration = Long.parseLong(unparsedDuration) * 60 * 1000; // to ms
+                    } catch (NumberFormatException nfe) {
+                        // I have observed feeds with malform duration
+                        duration = -1;
                     } catch (NullPointerException npe) {
                         // I have observed feeds with malform duration
                         duration = -1;
