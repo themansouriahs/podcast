@@ -232,7 +232,7 @@ public class SubscriptionCursorAdapter extends CursorRecyclerAdapter {
     }
 
     private int getGridItemLayout() {
-        return numberOfColumns == 1 ? R.layout.subscription_list_item : R.layout.subscription_grid_item ;
+        return isListView() ? R.layout.subscription_list_item : R.layout.subscription_grid_item ;
     }
 
     public void setNumberOfColumns(int argNumber) {
