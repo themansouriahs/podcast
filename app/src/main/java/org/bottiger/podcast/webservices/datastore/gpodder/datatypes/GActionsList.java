@@ -7,5 +7,9 @@ import java.util.List;
  */
 public class GActionsList {
     private long timestamp;
-    private List<String> actions;
+    private GEpisodeAction[] actions;
+
+    public GEpisodeAction[] getActions() {
+        return actions;
+    }
 }

@@ -21,16 +21,14 @@ public class GEpisodeAction {
     @Retention(RetentionPolicy.SOURCE)
     public @interface Action {}
 
-    @Action String episodeAction = NA;
-
-    private String podcast; // The feed URL to the podcast feed the episode belongs to (required)
-    private String episode; // The media URL of the episode (required)
-    private String device; // The device ID on which the action has taken place (see Devices)
-    private String action; // One of: download, play, delete, new (required)
-    private String timestamp; // A UTC timestamp when the action took place, in ISO 8601 format
-    private long started; // Only valid for “play”. the position (in seconds) at which the client started playback. Requires position and total to be set.
-    private long position; // Only valid for “play”. the position (in seconds) at which the client stopped playback
-    private long total; // Only valid for “play”. the total length of the file in seconds. Requires position and started to be set.
+    public String podcast; // The feed URL to the podcast feed the episode belongs to (required)
+    public String episode; // The media URL of the episode (required)
+    public String device; // The device ID on which the action has taken place (see Devices)
+    public String action; // One of: download, play, delete, new (required)
+    public String timestamp; // A UTC timestamp when the action took place, in ISO 8601 format
+    public long started; // Only valid for “play”. the position (in seconds) at which the client started playback. Requires position and total to be set.
+    public long position; // Only valid for “play”. the position (in seconds) at which the client stopped playback
+    public long total; // Only valid for “play”. the total length of the file in seconds. Requires position and started to be set.
 
     @Action
     public String getAction() {

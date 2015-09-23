@@ -41,6 +41,14 @@ public class CloudSyncUtils {
     // The account name
     public static final String ACCOUNT = "Cloud sync";
     // Instance fields
+
+    // Sync interval constants
+    public static final long SECONDS_PER_MINUTE = 60L;
+    public static final long SYNC_INTERVAL_IN_MINUTES = 180L; // 3 hours
+    public static final long SYNC_INTERVAL =
+            SYNC_INTERVAL_IN_MINUTES *
+                    SECONDS_PER_MINUTE;
+
     @Nullable
     Account mAccount;
 
@@ -85,11 +93,18 @@ public class CloudSyncUtils {
          * Request the sync for the default account, authority, and
          * manual sync settings
          */
-        mResolver.setIsSyncable(newAccount, AUTHORITY, 1);
-        //mResolver.setSyncAutomatically(newAccount, AUTHORITY, true);
-        mResolver.requestSync(newAccount, AUTHORITY, settingsBundle);
+        //mResolver.setIsSyncable(newAccount, AUTHORITY, 1);
+        mResolver.setSyncAutomatically(newAccount, AUTHORITY, true);
+        //mResolver.requestSync(newAccount, AUTHORITY, settingsBundle);
 
-        //registerContentObserver(argContext.getContentResolver());
+        /*
+         * Turn on periodic syncing
+         */
+        ContentResolver.addPeriodicSync(
+                newAccount,
+                AUTHORITY,
+                Bundle.EMPTY,
+                SYNC_INTERVAL);
 
 
         return true;

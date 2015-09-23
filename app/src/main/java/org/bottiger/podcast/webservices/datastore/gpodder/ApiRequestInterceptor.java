@@ -16,6 +16,8 @@ import com.squareup.okhttp.ResponseBody;
 
 import java.io.IOException;
 
+import okio.Buffer;
+
 /**
  * Interceptor used to authorize requests.
  */
@@ -37,20 +39,51 @@ public class ApiRequestInterceptor implements Interceptor {
         Request request = chain.request();
         Request.Builder requestBuidler = request.newBuilder();
 
+        boolean authenticating = false;
         if (shouldAuthenticate()) {
             if (!TextUtils.isEmpty(cookie)) {
-                request.headers().newBuilder().add("Cookie", cookie).build();
+                requestBuidler.addHeader("Cookie", cookie);
             } else {
                 final String authorizationValue = encodeCredentialsForBasicAuthorization();
                 //requestFacade.addHeader("Authorization", authorizationValue);
                 //request.headers().newBuilder().add("Authorization", authorizationValue).build();
                 requestBuidler.addHeader("Authorization", authorizationValue);
+                authenticating = true;
             }
         }
 
         request = requestBuidler.build();
+/*
+    private static String bodyToString(final Request request){
 
+        try {
+            final Request copy = request.newBuilder().build();
+            final Buffer buffer = new Buffer();
+            copy.body().writeTo(buffer);
+            return buffer.readUtf8();
+        } catch (final IOException e) {
+            return "did not work";
+        }
+    }
+ */
+        //String body = bodyToString(request);
+        final Buffer buffer = new Buffer();
         Response response = chain.proceed(request);
+
+        //body = body + "1";
+        if (authenticating) {
+            com.squareup.okhttp.Headers headers = response.headers();
+            int numHeaders = headers.size();
+
+            String name, value;
+            for (int i = 0; i < numHeaders; i++) {
+                name = headers.name(i);
+                value = headers.value(i);
+                if (name.equals("Set-Cookie") && value.startsWith("sessionid")) {
+                    ApiRequestInterceptor.cookie = value.split(";")[0];
+                }
+            }
+        }
 
         /**
          * FIXME: Remove when this have been fixed: https://github.com/square/retrofit/issues/1071

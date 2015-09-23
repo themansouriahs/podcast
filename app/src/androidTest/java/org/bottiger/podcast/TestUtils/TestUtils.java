@@ -117,7 +117,7 @@ public class TestUtils {
     }
 
     public static void unsubscribeAll(@NonNull Activity argActivity) {
-        LongSparseArray<ISubscription> list = SubscriptionLoader.asList(argActivity.getContentResolver());
+        LongSparseArray<ISubscription> list = SubscriptionLoader.asList(argActivity.getContentResolver(), true);
         for(int i = 0; i < list.size(); i++) {
             long key = list.keyAt(i);
             // get the object by the key.

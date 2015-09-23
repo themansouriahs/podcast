@@ -78,8 +78,8 @@ public interface IGPodderAPI {
 
     // Upload Episode Actions
     @POST("/api/2/episodes/{username}.json")
-    Call<UpdatedUrls> uploadEpisodeActions(@Body List<GEpisodeAction> actions,
-                              @Path("username") String username);
+    Call<UpdatedUrls> uploadEpisodeActions(@Body GEpisodeAction[] actions,
+                                            @Path("username") String username);
 
     // Get Episode Actions
     @GET("/api/2/episodes/{username}.json")
@@ -133,7 +133,7 @@ public interface IGPodderAPI {
 
     // Update Device Data
     @POST("/api/2/devices/{username}/{deviceid}.json")
-    Call updateDeviceData(@Path("username") String username, @Path("deviceid") String deviceid, @Body GDevice device);
+    Call<com.squareup.okhttp.ResponseBody> updateDeviceData(@Path("username") String username, @Path("deviceid") String deviceid, @Body GDevice device);
 
     // List devices
     @POST("/api/2/devices/{username}.json")

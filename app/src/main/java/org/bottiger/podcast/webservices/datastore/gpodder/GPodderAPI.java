@@ -1,15 +1,13 @@
 package org.bottiger.podcast.webservices.datastore.gpodder;
 
-import android.annotation.TargetApi;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
-import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.text.TextUtilsCompat;
 import android.support.v4.util.LongSparseArray;
 import android.text.TextUtils;
 import android.util.ArrayMap;
@@ -17,19 +15,21 @@ import android.util.ArraySet;
 import android.util.Log;
 import android.util.Pair;
 
-import com.google.api.client.json.gson.GsonFactory;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.ResponseBody;
 
-import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.playlist.FeedCursorLoader;
+import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.Subscription;
-import org.bottiger.podcast.provider.SubscriptionLoader;
-import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.webservices.datastore.CallbackWrapper;
 import org.bottiger.podcast.webservices.datastore.IWebservice;
+import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.GActionsList;
+import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.GDevice;
+import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.GEpisodeAction;
 import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.GSubscription;
 import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.SubscriptionChanges;
 import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.UpdatedUrls;
@@ -37,20 +37,21 @@ import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.UpdatedUrls;
 import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 
 import retrofit.Call;
 import retrofit.Callback;
 import retrofit.GsonConverterFactory;
 import retrofit.Response;
 import retrofit.Retrofit;
-import retrofit.http.Header;
-import retrofit.http.Headers;
 
 /**
  * Created by Arvid on 8/23/2015.
@@ -113,6 +114,15 @@ public class GPodderAPI implements IWebservice {
         }
     }
 
+    /**
+     * TODO: api.updateDeviceData always fail
+     * TODO: String where = String.format("%s>%d", ItemColumns.LAST_UPDATE, lastSync); always returns everything
+     *
+     * @param argContext
+     * @param argLocalSubscriptions
+     * @return
+     * @throws IOException
+     */
     public
     @SynchronizationResult
     int synchronize(@NonNull Context argContext, @NonNull LongSparseArray<Subscription> argLocalSubscriptions) throws IOException {
@@ -120,6 +130,13 @@ public class GPodderAPI implements IWebservice {
         Response response = api.login(mUsername).execute();
         if (!response.isSuccess())
             return AUTHENTICATION_ERROR;
+
+        GDevice device = new GDevice();
+        device.caption = GPodderUtils.getDeviceCaption();
+        device.type = GPodderUtils.getDeviceID();
+        Response responseDevice = api.updateDeviceData(mUsername, GPodderUtils.getDeviceID(), device).execute();
+        //if (!responseDevice.isSuccess())
+        //    return SERVER_ERROR;
 
         String key = argContext.getResources().getString(R.string.gpodder_last_sync_key);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(argContext);
@@ -132,7 +149,7 @@ public class GPodderAPI implements IWebservice {
         /**
          * Fetch changes from the server
          */
-        Set<String> subscribedUrls = getUrls(argLocalSubscriptions);
+        Set<String> subscribedUrls = getSubscribedUrls(argLocalSubscriptions);
 
         Call<SubscriptionChanges> subscriptionsChanges = api.getDeviceSubscriptionsChanges(mUsername, GPodderUtils.getDeviceID(), lastSync); // lastCall
         Response<SubscriptionChanges> subscriptionsChangesResponse = subscriptionsChanges.execute();
@@ -218,6 +235,109 @@ public class GPodderAPI implements IWebservice {
 
         if (timestamp > 0) {
             prefs.edit().putLong(key, timestamp).commit();
+        }
+
+
+        /**
+         * Sync Episode actions
+         */
+        String where = String.format("%s>%d", ItemColumns.LAST_UPDATE, lastSync);
+        FeedItem[] items = FeedCursorLoader.asCursor(argContext.getContentResolver(), where);
+
+        Call<GActionsList> actionList = api.getEpisodeActions(mUsername, null, null, lastSync, true);
+        Response<GActionsList> actionListResponse = actionList.execute();
+
+        if (!actionListResponse.isSuccess())
+            return SERVER_ERROR;
+
+        GEpisodeAction[] remoteActions = actionListResponse.body().getActions();
+
+        if (items != null) {
+            List<GEpisodeAction> actions = new LinkedList<>();
+            GEpisodeAction action;
+            for (int i = 0; i < items.length; i++) {
+                FeedItem item = items[i];
+                action = new GEpisodeAction();
+
+                action.podcast = getSubscriptionUrlForEpisode(argLocalSubscriptions, item);
+                action.episode = item.getURL();
+                action.device = GPodderUtils.getDeviceID();
+
+                if (TextUtils.isEmpty(action.podcast)) {
+                    continue;
+                }
+
+                try {
+                    DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
+                    df.setTimeZone(TimeZone.getDefault());
+                    String nowAsISO = df.format(item.getDateTime());
+                    action.timestamp = nowAsISO;
+                } catch (Exception e) {
+                    continue;
+                }
+
+                if (item.getOffset() > 0) {
+                    action.action = GEpisodeAction.PLAY;
+                } else {
+                    continue;
+                }
+                /*
+                else if (item.isDownloaded()) {
+                    action.action = GEpisodeAction.DOWNLOAD;
+                } else {
+                    action.action = GEpisodeAction.NEW;
+                }
+                */
+
+                if (action.action == GEpisodeAction.PLAY) {
+                    // we currently can not support action.started
+                    action.started = 0;
+
+                    action.position = (item.getOffset()/1000);
+
+                    long duration = item.getDuration();
+                    if (duration > 0) {
+                        action.total = duration;
+
+                        if (item.isListened()) {
+                            action.position = duration;
+                        }
+                    }
+                }
+
+                actions.add(action);
+
+                if (remoteActions != null) {
+                    for (int j = 0; j < remoteActions.length; j++) {
+                        if (remoteActions[j].episode == action.episode) {
+                            remoteActions[j] = null;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            Call<UpdatedUrls> uploadEpisodesCall = api.uploadEpisodeActions(actions.toArray(new GEpisodeAction[actions.size()]), mUsername);
+            Response<UpdatedUrls> uploadEpisodesResponse = uploadEpisodesCall.execute();
+
+            if (!uploadEpisodesResponse.isSuccess()) {
+                return SERVER_ERROR;
+            }
+        }
+
+        if (remoteActions != null) {
+            GEpisodeAction action;
+            FeedItem item;
+            ContentResolver resolver = argContext.getContentResolver();
+            for (int i = 0; i < remoteActions.length; i++) {
+                action = remoteActions[i];
+                if (action != null && action.action == GEpisodeAction.PLAY) {
+                    item = FeedItem.getByURL(resolver, action.episode);
+                    if (item != null) {
+                        item.setOffset(resolver, action.position*1000);
+                    }
+                }
+            }
         }
 
         return returnValue;
@@ -484,7 +604,6 @@ public class GPodderAPI implements IWebservice {
         Response response = api.login(mUsername).execute();
 
         if (response.isSuccess()) {
-            storeAuthenticationCookie(response);
             return true;
         }
 
@@ -508,18 +627,6 @@ public class GPodderAPI implements IWebservice {
         @Override
         public void onResponse(Response response) {
             mAuthenticated = true;
-
-            com.squareup.okhttp.Headers headers = response.headers();
-            int numHeaders = headers.size();
-
-            String name, value;
-            for (int i = 0; i < numHeaders; i++) {
-                name = headers.name(i);
-                value = headers.value(i);
-                if (name.equals("Set-Cookie") && name.startsWith("sessionid")) {
-                    ApiRequestInterceptor.cookie = value.split(";")[0];
-                }
-            }
             super.onResponse(response);
         }
 
@@ -546,6 +653,7 @@ public class GPodderAPI implements IWebservice {
 
     }
 
+    /*
     private void storeAuthenticationCookie(Response argResponse) {
         com.squareup.okhttp.Headers headers = argResponse.headers();
         int numHeaders = headers.size();
@@ -559,16 +667,18 @@ public class GPodderAPI implements IWebservice {
             }
         }
     }
+    */
 
     @NonNull
-    private static Set<String> getUrls(@NonNull LongSparseArray<Subscription> argLocalSubscriptions) {
+    private static Set<String> getSubscribedUrls(@NonNull LongSparseArray<Subscription> argLocalSubscriptions) {
         Set<String> urls = getSet();
 
         for (int i = 0; i < argLocalSubscriptions.size(); i++) {
             long arrayKey = argLocalSubscriptions.keyAt(i);
             // get the object by the key.
             ISubscription subscription = argLocalSubscriptions.get(arrayKey);
-            urls.add(subscription.getURLString());
+            if (subscription.IsSubscribed())
+                urls.add(subscription.getURLString());
         }
 
         return urls;
@@ -608,4 +718,20 @@ public class GPodderAPI implements IWebservice {
             }
         }
     }
+
+    private String getSubscriptionUrlForEpisode(LongSparseArray<Subscription> argLocalSubscriptions, FeedItem item) {
+        if (argLocalSubscriptions == null || item == null)
+            return "";
+
+        for (int i = 0; i < argLocalSubscriptions.size(); i++) {
+            long key = argLocalSubscriptions.keyAt(i);
+            Subscription subscription = argLocalSubscriptions.get(key);
+            if (subscription.getId() == item.sub_id) {
+                return subscription.getURLString();
+            }
+        }
+
+        return "";
+    }
+
 }

@@ -69,7 +69,7 @@ public class CloudSyncAdapter extends AbstractThreadedSyncAdapter {
             }
 
             LongSparseArray<ISubscription> iSubscriptionLongSparseArray =
-                    SubscriptionLoader.asList(getContext().getContentResolver());
+                    SubscriptionLoader.asList(getContext().getContentResolver(), true);
 
             // FIXME Hack to convet types
             LongSparseArray<Subscription> subscriptionLongSparseArray = new LongSparseArray<>(iSubscriptionLongSparseArray.size());
@@ -81,7 +81,13 @@ public class CloudSyncAdapter extends AbstractThreadedSyncAdapter {
                 subscriptionLongSparseArray.put(arrayKey, (Subscription)subscription);
             }
 
-            mGPodderAPI.synchronize(getContext(), subscriptionLongSparseArray);
+            @GPodderAPI.SynchronizationResult int result = mGPodderAPI.synchronize(getContext(), subscriptionLongSparseArray);
+
+            if (result == GPodderAPI.SYNCHRONIZATION_OK) {
+                Log.d(TAG, "gPodder synchronization complete!");
+            } else {
+                Log.d(TAG, "gPodder synchronization failed");
+            }
         } catch (IOException e) {
             VendorCrashReporter.handleException(e);
         }
