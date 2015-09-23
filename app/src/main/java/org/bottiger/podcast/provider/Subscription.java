@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import org.apache.commons.validator.routines.UrlValidator;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
@@ -21,6 +22,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
@@ -222,8 +224,74 @@ public class Subscription implements ISubscription, PaletteListener {
 		mEpisodes.add(argEpisode);
 	}
 
-	public void updateUrl(String second) {
-		// FIXME Update the url of the subscription
+	/**
+	 * This method updates the URL of the subscription.
+	 *
+	 * @param argNewUrl
+	 */
+	public void updateUrl(@NonNull Context argContext, @Nullable String argNewUrl) {
+
+		// We run a sanity check because we do not want to run the rest of the code without a context
+		if (argContext == null) {
+			throw new IllegalStateException("Context can not be null"); // NoI18N
+		}
+
+		URL url;
+		try {
+			url = new URL(argNewUrl);
+		} catch (MalformedURLException e) {
+			failUpdateUrl(argNewUrl);
+			return;
+		}
+
+		UrlValidator validator = new UrlValidator();
+		if (!validator.isValid(url.toString())) {
+			failUpdateUrl(url.toString());
+			return;
+		}
+
+		// I currently doesn't test that the new url can be parsed and contains content
+
+		// Ok, the url should be valid
+		// generate the SQL
+		String sqlUpdateSubscription = String.format("UPDATE %s SET %s=%s WHERE %s=%s LIMIT 1",
+								SubscriptionColumns.TABLE_NAME,
+								SubscriptionColumns.URL,
+								url.toString(),
+								SubscriptionColumns.URL,
+								this.url);
+		/*
+		String sqlUpdateItems = String.format("UPDATE %s SET %s=%s WHERE %s=%s LIMIT 1",
+								ItemColumns.TABLE_NAME,
+								ItemColumns.URL,
+								url.toString(),
+								ItemColumns.URL,
+								this.url);;
+		*/
+		PodcastOpenHelper helper = PodcastOpenHelper.getInstance(argContext);
+		SQLiteDatabase db = helper.getWritableDatabase();
+
+		db.beginTransaction();
+		try {
+			db.execSQL(sqlUpdateSubscription);
+			//db.execSQL(sqlUpdateItems);
+			/*
+			this.url = url.toString();
+			for (int i = 0; i < getEpisodes().size(); i++) {
+				IEpisode episode = getEpisodes().get(0);
+				if (episode instanceof FeedItem) {
+					FeedItem feedItem = (FeedItem) episode;
+					feedItem.sub
+				}
+			}*/
+			db.setTransactionSuccessful();
+		} finally {
+			db.endTransaction();
+		}
+	}
+
+	private void failUpdateUrl(@Nullable String argNewUrl) {
+		VendorCrashReporter.report("updateURL failed", "Unable to change subscription url to: " + argNewUrl); // NoI18N
 	}
 
 

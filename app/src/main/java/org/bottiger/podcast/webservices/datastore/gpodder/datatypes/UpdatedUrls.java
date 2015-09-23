@@ -32,6 +32,9 @@ public class UpdatedUrls {
             updatedUrls = new HashSet<>();
         }
 
+        if (updated_urls == null)
+            return updatedUrls;
+
         for (int i = 0; i < updated_urls.length; i++) {
             String[] urls = updated_urls[0];
             String oldUrl = urls[0];

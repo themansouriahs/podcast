@@ -58,7 +58,7 @@ import retrofit.http.Headers;
 public class GPodderAPI implements IWebservice {
 
     private static final String TAG = "GPodderAPI";
-    private static final boolean RESPECT_GPODDER_URL_SANITIZER = false;
+    private static final boolean RESPECT_GPODDER_URL_SANITIZER = true;
 
     private IGPodderAPI api;
     private String mUsername;
@@ -211,7 +211,7 @@ public class GPodderAPI implements IWebservice {
         UpdatedUrls updatedUrls = updatedUrlsResponse.body();
 
         if (RESPECT_GPODDER_URL_SANITIZER) {
-            updateLocalUrls(argLocalSubscriptions, updatedUrls.getUpdatedUrls());
+            updateLocalUrls(argContext, argLocalSubscriptions, updatedUrls.getUpdatedUrls());
         }
 
         timestamp = updatedUrls.getTimestamp();
@@ -592,7 +592,7 @@ public class GPodderAPI implements IWebservice {
         return deviceSubscriptionsResponse.body();
     }
 
-    private void updateLocalUrls(LongSparseArray<Subscription> argLocalSubscriptions, Set<Pair<String, String>> updatedUrls) {
+    private void updateLocalUrls(@NonNull Context argContext, LongSparseArray<Subscription> argLocalSubscriptions, Set<Pair<String, String>> updatedUrls) {
         for (int i = 0; i < argLocalSubscriptions.size(); i++) {
             long arrayKey = argLocalSubscriptions.keyAt(i);
             // get the object by the key.
@@ -602,7 +602,7 @@ public class GPodderAPI implements IWebservice {
             //if (updatedUrls.)
             for (Pair<String, String> p : updatedUrls) {
                 if (p.first.equals(url)) {
-                    subscription.updateUrl(p.second);
+                    subscription.updateUrl(argContext, p.second);
                     continue;
                 }
             }
