@@ -1,39 +1,30 @@
 package org.bottiger.podcast;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import org.bottiger.podcast.adapters.PlaylistContentSpinnerAdapter;
-import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.playlist.PlaylistData;
-import org.bottiger.podcast.service.PlayerService;
-import org.bottiger.podcast.utils.navdrawer.NavigationDrawerMenuGenerator;
-import org.bottiger.podcast.views.MultiSpinner;
-import org.bottiger.podcast.views.dialogs.DialogPlaylistContent;
+import org.bottiger.podcast.views.SlidingTab.SlidingTabLayout;
 
-import android.animation.ArgbEvaluator;
-import android.animation.ObjectAnimator;
-import android.animation.TypeEvaluator;
+import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.Fragment;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.view.LayoutInflater;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.RelativeLayout;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public abstract class DrawerActivity extends MediaRouterPlaybackActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -45,8 +36,21 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity impleme
     protected ActionBarDrawerToggle mDrawerToggle;
     private Activity mActivity;
 
-    protected RelativeLayout mDrawerMainContent;
+    protected ViewGroup mDrawerMainContent;
     private NavigationView mNavigationView;
+    private Toolbar mToolbar;
+    private View mFragmentTop;
+    private View mHeaderContainerBackground;
+    private ViewPager mAppContent;
+    private SlidingTabLayout mSlidingTabLayout;
+
+    private int mFragmentTopPosition = -1;
+    private ViewTreeObserver mVto;
+
+    public List<TopFound> listeners = new LinkedList<>();
+    public interface TopFound {
+        void topfound(int i);
+    }
 
 
 	@Override
@@ -54,10 +58,16 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity impleme
 		super.onCreate(savedInstanceState);
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        mDrawerMainContent = (RelativeLayout) findViewById(R.id.outer_container);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mNavigationView = (NavigationView) findViewById(R.id.navigation_drawer);
+        mToolbar = (Toolbar) findViewById(R.id.my_awesome_toolbar);
+        mFragmentTop = (View) findViewById(R.id.fragment_top);
+        mHeaderContainerBackground = findViewById(R.id.header_container_background);
+        mAppContent = (ViewPager) findViewById(R.id.app_content);
+        mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
         mNavigationView.setNavigationItemSelectedListener(this);
+
+        observeToolbarHeight(mFragmentTop);
 
         // ActionBarDrawerToggle ties together the the proper interactions
         // between the sliding drawer and the action bar app icon
@@ -72,16 +82,38 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity impleme
 
         // if we can use windowTranslucentNavigation=true
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            //FrameLayout.MarginLayoutParams params = (FrameLayout.MarginLayoutParams) mDrawerTable.getLayoutParams();
-            //params.topMargin = getStatusBarHeight(getResources());
+            //RelativeLayout.MarginLayoutParams params2 = (RelativeLayout.MarginLayoutParams) mDrawerMainContent.getLayoutParams();
+            //params2.topMargin = getStatusBarHeight(getResources());
+            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) mDrawerLayout.getLayoutParams();
+            params.topMargin = getStatusBarHeight(getResources());
+            mDrawerLayout.setLayoutParams(params);
 
-            RelativeLayout.MarginLayoutParams params2 = (RelativeLayout.MarginLayoutParams) mDrawerMainContent.getLayoutParams();
-            params2.topMargin = getStatusBarHeight(getResources());
-
-            mDrawerMainContent.setLayoutParams(params2);
-            //mDrawerTable.setLayoutParams(params);
+            //mDrawerMainContent.setLayoutParams(params2);
         }
 
+    }
+
+    public void goFullScreen(@NonNull View argFullScreenView) {
+        mToolbar.bringToFront();
+    }
+
+    public void exitFullScreen(@NonNull View argFullScreenView) {
+
+    }
+
+    public int getFragmentTop() {
+        return mFragmentTopPosition;
+    }
+
+    private int getToolbarBottomPosition() {
+        if (mFragmentTopPosition > 0) {
+            return mFragmentTopPosition;
+        }
+
+        int[] location = new int[2];
+        mFragmentTop.getLocationOnScreen(location);
+        //return location[1];// - mFragmentTop.getHeight();// + mSlidingTabLayout.getHeight();
+        return mToolbar.getHeight() + mSlidingTabLayout.getHeight();
     }
 
 
@@ -132,5 +164,43 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity impleme
 	public boolean onOptionsItemSelected(MenuItem item) {
         return super.onOptionsItemSelected(item);
 	}
+
+    private void observeToolbarHeight(@NonNull final View argToolbarContainer) {
+
+        mVto = argToolbarContainer.getViewTreeObserver();
+
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            mVto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                @TargetApi(16)
+                public void onGlobalLayout() {
+                    argToolbarContainer.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    setViewPagerTopPadding(argToolbarContainer);
+
+                }
+            });
+        } else {
+            mVto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    argToolbarContainer.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                    setViewPagerTopPadding(argToolbarContainer);
+
+                }
+            });
+        }
+    }
+
+    private void setViewPagerTopPadding(@NonNull final View argToolbar) {
+        mFragmentTopPosition = mToolbar.getHeight() + mSlidingTabLayout.getHeight(); //argToolbar.getTop();
+
+        if (mFragmentTopPosition > 0) {
+            for (TopFound topfound: listeners) {
+                // FIXME: ensure this is correct
+                topfound.topfound(mFragmentTopPosition);
+            }
+            listeners = new LinkedList<>();
+        }
+    }
 
 }

@@ -67,9 +67,12 @@
         <attr name="lineColor" format="color"/>
     </declare-styleable>
 
-
     <declare-styleable name="PlayPauseImageView">
        <attr name="drawBackground" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="DictatingView">
+        <attr name="dictatingView" format="integer" />
     </declare-styleable>
 
 </resources>

@@ -23,7 +23,9 @@ import android.view.ViewGroup;
 import android.view.animation.OvershootInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.SearchView;
 
 import org.bottiger.podcast.adapters.DiscoverySearchAdapter;
@@ -49,7 +51,7 @@ import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
  * Created by apl on 13-04-2015.
  */
 public class DiscoveryFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener,
-        AdapterView.OnItemSelectedListener {
+        AdapterView.OnItemSelectedListener, DrawerActivity.TopFound {
 
     private static final String TAG = "DiscoveryFragment";
 
@@ -78,6 +80,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
     private String mSpinnerPopular;
     private String mSpinnerTrending;
 
+    private RelativeLayout mContainer;
     private SearchView mSearchView;
     private AppCompatSpinner mSpinner;
     private ImageButton mSearchEngineButton;
@@ -126,8 +129,33 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
     }
 
     @Override
+    public void topfound(int i) {
+        Log.d(TAG, "dfdsf");
+        //mContainerView.setPadding(0,i,0,0);
+        setTopMargin(i);
+    }
+
+    private void setTopMargin(int i) {
+        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) mContainer.getLayoutParams();
+        params.topMargin = i;
+        mContainer.setLayoutParams(params);
+    }
+
+    @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        mContainer = (RelativeLayout) view.findViewById(R.id.discovery_container);
+
+        MainActivity ms = ((MainActivity) getActivity());
+        int top = ms.getFragmentTop();
+        if (top < 0) {
+            ((MainActivity) getActivity()).listeners.add(this);
+        }
+        top = ms.getFragmentTop();
+        if (top > 0) {
+            setTopMargin(top);
+        }
 
         Resources resource = getResources();
 
@@ -394,7 +422,6 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
     public void onNothingSelected(AdapterView<?> parent) {
         return;
     }
-
 
     /**
      * Create a handler to perform the search query

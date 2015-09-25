@@ -35,6 +35,7 @@ import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
+import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.service.PlayerService;
@@ -633,7 +634,9 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
                 LayoutParams.MATCH_PARENT,
                 LayoutParams.MATCH_PARENT);
         mLayout.setLayoutParams(layoutParams);
+        //mLayout.setTranslationY(-100);
         mLayout.bringToFront();
+        ((MainActivity)getContext()).goFullScreen(mLayout);
     }
 
     private void exitFullscreen() {

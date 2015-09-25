@@ -1,49 +1,89 @@
-<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!--
+    android:background="?attr/themeBackground"
+    -->
     <RelativeLayout
-        android:id="@+id/outer_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <include layout="@layout/toolbar_actionbar" />
-
-        <!-- Sliding Tabs -->
-        <org.bottiger.podcast.views.SlidingTab.SlidingTabLayout
-            android:id="@+id/sliding_tabs"
+        <!--
+        <LinearLayout
+            xmlns:custom="http://schemas.android.com/apk/res/org.bottiger.podcast"
+            android:id="@+id/header_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/colorAccent"
-            android:layout_below="@+id/my_awesome_toolbar"/>
+            android:layout_alignParentTop="true"
+            android:orientation="vertical">
+            -->
+
+            <!-- The height here is just an initial guess. It will be calculated in
+            the drawer activity
+            -->
+            <org.bottiger.podcast.views.ViewBackground
+                xmlns:custom="http://schemas.android.com/apk/res/org.bottiger.podcast"
+                android:id="@+id/header_container_background"
+                android:layout_width="match_parent"
+                android:layout_height="85dp"
+                android:background="?attr/colorPrimary"
+                custom:dictatingView="@+id/my_awesome_toolbar">
+            </org.bottiger.podcast.views.ViewBackground>
+
+            <!-- Sliding Tabs -->
+            <org.bottiger.podcast.views.SlidingTab.SlidingTabLayout
+                android:id="@+id/sliding_tabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/colorAccent"
+                android:layout_below="@+id/header_container_background"/>
+
+        <View
+            android:id="@+id/fragment_top"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_below="@id/sliding_tabs"/>
+
+        <!--
+        </LinearLayout>
+        -->
 
      <!-- The Main layout -->
         <android.support.v4.view.ViewPager
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/app_content"
-            android:layout_below="@+id/sliding_tabs"
-            android:background="?attr/themeBackground"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            >
+            />
 
-            <FrameLayout
-                android:id="@+id/pager_content"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" >
-            </FrameLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        </android.support.v4.view.ViewPager>
+        <!--
+<include layout="@layout/toolbar_actionbar" />
+
+android:background="?attr/colorPrimary"
+android:minHeight="?attr/actionBarSize"
+-->
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/my_awesome_toolbar"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_width="match_parent"
+        android:gravity="top"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+    </android.support.v7.widget.Toolbar>
+
+    </FrameLayout>
 
     </RelativeLayout>
 
     <!-- The Drawer -->
-    <!--<include layout="@layout/drawer_header" />
-
-            app:headerLayout="@layout/drawer_header"
-    -->
     <android.support.design.widget.NavigationView
         android:id="@+id/navigation_drawer"
         android:layout_width="wrap_content"

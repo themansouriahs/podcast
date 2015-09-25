@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -35,7 +36,9 @@ import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
-public class SubscriptionsFragment extends Fragment implements View.OnClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
+public class SubscriptionsFragment extends Fragment implements View.OnClickListener,
+                                                                SharedPreferences.OnSharedPreferenceChangeListener,
+                                                                DrawerActivity.TopFound {
 
     private static final String TAG = "SubscriptionsFragment";
 
@@ -53,6 +56,7 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
     private RelativeLayout mEmptySubscrptionList;
     private Button mEmptySubscrptionImportOPMLButton;
     private SubscriptionCursorAdapter mAdapter;
+    private FrameLayout mGridContainerView;
 
     private Activity mActivity;
     private FrameLayout mContainerView;
@@ -106,6 +110,8 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
         mEmptySubscrptionList = (RelativeLayout) mContainerView.findViewById(R.id.subscription_empty);
         mEmptySubscrptionImportOPMLButton = (Button) mContainerView.findViewById(R.id.import_opml_button);
 
+        mGridContainerView = (FrameLayout) mContainerView.findViewById(R.id.subscription_grid_container);
+
         mShareAnalytics = (CheckBox) mContainerView.findViewById(R.id.checkBox_usage);
         mCloudServices =  (CheckBox) mContainerView.findViewById(R.id.checkBox_cloud);
 
@@ -134,6 +140,7 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
+        ((MainActivity)getActivity()).listeners.add(this);
         super.onViewCreated(view, savedInstanceState);
 
         mEmptySubscrptionImportOPMLButton.setOnClickListener(new View.OnClickListener() {
@@ -299,5 +306,17 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
     @Override
     public void onClick(View v) {
         Log.d(TAG, "Onclikc");
+    }
+
+    @Override
+    public void topfound(int i) {
+        Log.d(TAG, "dfdsf");
+        //mContainerView.setPadding(0,i,0,0);
+        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) mGridView.getLayoutParams();
+        FrameLayout.LayoutParams params2 = (FrameLayout.LayoutParams) mEmptySubscrptionList.getLayoutParams();
+        params2.topMargin = i;
+        params.topMargin = i;
+        mGridView.setLayoutParams(params);
+        mEmptySubscrptionList.setLayoutParams(params);
     }
 }

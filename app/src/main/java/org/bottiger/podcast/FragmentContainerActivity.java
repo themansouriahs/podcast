@@ -20,7 +20,11 @@ import android.view.ViewGroup;
 
 public class FragmentContainerActivity extends DrawerActivity {
 
-	@Deprecated
+    public static final int PLAYLIST = 0;
+    public static final int SUBSCRIPTION = 1;
+    public static final int DISCOVER = 2;
+
+    @Deprecated
 	public static final boolean debugging = ApplicationConfiguration.DEBUGGING;
 
 	protected final PodcastLog log = PodcastLog.getDebugLog(getClass(), 0);
@@ -105,7 +109,7 @@ public class FragmentContainerActivity extends DrawerActivity {
         mViewPager.setPageTransformer(true, new DepthPageTransformer());
 
         if (((SoundWaves)getApplication()).IsFirstRun())
-            mViewPager.setCurrentItem(1);
+            mViewPager.setCurrentItem(SUBSCRIPTION);
 
 
         createScenes(mViewPager);
@@ -124,10 +128,6 @@ public class FragmentContainerActivity extends DrawerActivity {
 	 */
 	public class SectionsPagerAdapter extends FragmentPagerAdapter {
 		// http://stackoverflow.com/questions/10396321/remove-fragment-page-from-viewpager-in-android/10399127#10399127
-
-		public static final int PLAYLIST = 0;
-		public static final int SUBSCRIPTION = 1;
-		public static final int DISCOVER = 2;
 
 		private static final int MAX_FRAGMENTS = 3;
 
@@ -182,6 +182,11 @@ public class FragmentContainerActivity extends DrawerActivity {
             mFragments[position] = fragment;
 			return fragment;
 		}
+
+        @Override
+        public void setPrimaryItem (ViewGroup container, int position, Object object) {
+            Log.d("sdfjsd", container.toString());
+        }
 
 		@Override
 		public int getCount() {
