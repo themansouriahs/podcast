@@ -629,11 +629,21 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         Log.d(TAG, "Enter fullscreen mode");
         mFullscreenButton.setImageResource(R.drawable.ic_fullscreen_exit_white);
 
+        int topmargin = ((MainActivity)getContext()).getFragmentTop();
+        /*CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)mLayout.getLayoutParams();
+        if (params != null) {
+            topmargin = params.topMargin;
+            params.setMargins(0, 0, 0, 0);
+            //mLayout.setLayoutParams(params);
+        }*/
+
         // Main player layout
         CoordinatorLayout.LayoutParams layoutParams = new CoordinatorLayout.LayoutParams(
                 LayoutParams.MATCH_PARENT,
                 LayoutParams.MATCH_PARENT);
         mLayout.setLayoutParams(layoutParams);
+        mLayout.setPadding(0, topmargin, 0, 0);
+
         //mLayout.setTranslationY(-100);
         mLayout.bringToFront();
         ((MainActivity)getContext()).goFullScreen(mLayout);
@@ -643,11 +653,17 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         Log.d(TAG, "Exit fullscreen mode");
         mFullscreenButton.setImageResource(R.drawable.ic_fullscreen_white);
 
+        int topmargin = 0;
         // Main player layout
         CoordinatorLayout.LayoutParams layoutParams = new CoordinatorLayout.LayoutParams(
                 LayoutParams.MATCH_PARENT,
                 sizeLarge);
+
+        topmargin = ((MainActivity)getContext()).getFragmentTop();
+        layoutParams.setMargins(0, topmargin, 0, 0);
         mLayout.setLayoutParams(layoutParams);
+        mLayout.setPadding(0,0,0,0);
+
         setPlayerHeight(sizeLarge);
     }
 

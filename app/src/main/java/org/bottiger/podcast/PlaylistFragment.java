@@ -43,6 +43,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.graphics.Palette;
@@ -68,7 +69,8 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.squareup.otto.Produce;
 import com.squareup.otto.Subscribe;
 
-public class PlaylistFragment extends AbstractEpisodeFragment implements OnSharedPreferenceChangeListener {
+public class PlaylistFragment extends AbstractEpisodeFragment implements OnSharedPreferenceChangeListener,
+                                                                        DrawerActivity.TopFound {
 
     private static final String TAG = "PlaylistFragment";
 
@@ -163,6 +165,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
+        //((MainActivity)getActivity()).listeners.add(this);
         super.onViewCreated(view,savedInstanceState);
 
         mTopPlayer =   (TopPlayer) view.findViewById(R.id.session_photo_container);
@@ -233,6 +236,16 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                 }
             }
         });
+
+        MainActivity ms = ((MainActivity) getActivity());
+        int top = ms.getFragmentTop();
+        if (top < 0) {
+            ((MainActivity) getActivity()).listeners.add(this);
+        }
+        top = ms.getFragmentTop();
+        if (top > 0) {
+            topfound(top);
+        }
 
         // init swipe to dismiss logic
         ItemTouchHelper swipeToDismissTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(
@@ -660,4 +673,20 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         }
     }
 
+    @Override
+    public void topfound(int i) {
+        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) mTopPlayer.getLayoutParams();
+        FrameLayout.LayoutParams params2 = (FrameLayout.LayoutParams) mPlaylistEmptyContainer.getLayoutParams();
+        CoordinatorLayout.LayoutParams params3 = (CoordinatorLayout.LayoutParams) mRecyclerView.getLayoutParams();
+        params2.topMargin = i;
+        params3.topMargin = i;
+        if (!mTopPlayer.isFullscreen()) {
+            params.topMargin = i;
+            mTopPlayer.setLayoutParams(params);
+        } else {
+            mTopPlayer.setPadding(0, i ,0, 0);
+        }
+        mPlaylistEmptyContainer.setLayoutParams(params);
+        mRecyclerView.setLayoutParams(params3);
+    }
 }
