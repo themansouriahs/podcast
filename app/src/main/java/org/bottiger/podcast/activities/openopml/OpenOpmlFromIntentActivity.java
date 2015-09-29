@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.pm.PackageManager;
-import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,9 +12,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import org.bottiger.podcast.R;
-import org.bottiger.podcast.activities.openopml.OpenOpmlAdapter;
-import org.bottiger.podcast.databinding.ActivityOpmlImportItemBinding;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
+import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.OPMLImportExport;
 
 import java.io.File;
@@ -28,7 +26,7 @@ import java.util.List;
 public class OpenOpmlFromIntentActivity extends Activity {
     private static final String TAG = "OpenOpmlFromIntentActivity";
 
-    private List<SlimSubscription> mSubscription = new LinkedList<>();
+    private List<SlimSubscription> mSubscriptions = new LinkedList<>();
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -53,18 +51,17 @@ public class OpenOpmlFromIntentActivity extends Activity {
             }
         }
         OPMLImportExport opmlImportExport = new OPMLImportExport(this);
-        List<SlimSubscription> subscriptions = new LinkedList<>();
         try {
             Uri uri = getIntent().getData();
 
             File opmlFile = new File(uri.getPath());
 
-            subscriptions = opmlImportExport.readSubscriptionsFromOPML(opmlFile);
+            mSubscriptions = opmlImportExport.readSubscriptionsFromOPML(opmlFile);
         } catch (Exception e) {
             new AlertDialog.Builder(this).setMessage("Cannot open XML - Reason: " + e.getMessage()).show();
         }
 
-        mAdapter = new OpenOpmlAdapter(subscriptions);
+        mAdapter = new OpenOpmlAdapter(mSubscriptions);
         mRecyclerView = (RecyclerView) findViewById(R.id.opml_subscription_list);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -72,6 +69,20 @@ public class OpenOpmlFromIntentActivity extends Activity {
     }
 
     public void import_click(View view) {
-        return;
+        boolean didImport = false;
+        Subscription newSubscription;
+        SlimSubscription subscription;
+        for (int i = 0; i < mSubscriptions.size(); i++) {
+            subscription = mSubscriptions.get(i);
+            if (subscription.IsDirty()) {
+                newSubscription = new Subscription(subscription.getURLString());
+                newSubscription.subscribe(this);
+                didImport = true;
+            }
+        }
+
+        if (didImport) {
+            finish();
+        }
     }
 }

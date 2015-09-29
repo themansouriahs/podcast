@@ -51,7 +51,7 @@ public class SlimSubscription implements ISubscription, Parcelable {
     @NonNull
     @Override
     public String getURLString() {
-        return "";
+        return mURL.toString();
     }
 
     @Nullable
@@ -94,6 +94,11 @@ public class SlimSubscription implements ISubscription, Parcelable {
     @Override
     public boolean IsDirty() {
         return mIsDirty;
+    }
+
+    public void markForSubscription(boolean argDoSubscribe) {
+        setIsSubscribed(argDoSubscribe);
+        mIsDirty = argDoSubscribe;
     }
 
     /**

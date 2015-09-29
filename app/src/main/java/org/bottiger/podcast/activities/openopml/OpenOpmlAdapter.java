@@ -34,6 +34,8 @@ public class OpenOpmlAdapter extends RecyclerView.Adapter<OpenOpmlViewHolder> {
     @Override
     public void onBindViewHolder(OpenOpmlViewHolder holder, int position) {
         final SlimSubscription subscription = mSlimSubscriptions.get(position);
+        holder.setSubscription(subscription);
+        holder.getBinding().setVariable(BR.handlers, holder);
         holder.getBinding().setVariable(BR.subscription, subscription);
         holder.getBinding().executePendingBindings();
     }
