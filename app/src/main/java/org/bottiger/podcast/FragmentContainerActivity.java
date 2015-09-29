@@ -1,10 +1,14 @@
 package org.bottiger.podcast;
 
 import org.bottiger.podcast.Animations.DepthPageTransformer;
+import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.utils.PodcastLog;
+import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.views.SlidingTab.SlidingTabLayout;
+import org.bottiger.podcast.views.TopPlayer;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -105,8 +109,8 @@ public class FragmentContainerActivity extends DrawerActivity {
 
         });
 
-
-        mViewPager.setPageTransformer(true, new DepthPageTransformer());
+//         android:background="?attr/themeBackground"
+        mViewPager.setPageTransformer(true, new DepthPageTransformer(mDrawerLayout));
 
         if (((SoundWaves)getApplication()).IsFirstRun())
             mViewPager.setCurrentItem(SUBSCRIPTION);
@@ -185,7 +189,24 @@ public class FragmentContainerActivity extends DrawerActivity {
 
         @Override
         public void setPrimaryItem (ViewGroup container, int position, Object object) {
-            Log.d("sdfjsd", container.toString());
+            Activity activity = this.getItem(position).getActivity();
+            boolean HasTinted = false;
+            if (activity != null) {
+                if (position == PLAYLIST) {
+                    PlaylistFragment playlistFragment = (PlaylistFragment) mFragments[PLAYLIST];
+                    TopPlayer topPlayer = playlistFragment.getTopPlayer();
+                    if (topPlayer != null && topPlayer.isFullscreen()) {
+                        int color = topPlayer.getBackGroundColor();
+                        UIUtils.tintStatusBar(color, activity);
+                        HasTinted = true;
+                    }
+                }
+
+                if (!HasTinted) {
+                    UIUtils.resetStatusBar(activity, null);
+                }
+            }
+            super.setPrimaryItem(container, position, object);
         }
 
 		@Override

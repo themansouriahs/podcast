@@ -33,7 +33,9 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -51,6 +53,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import org.bottiger.podcast.BuildConfig;
+import org.bottiger.podcast.R;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -259,7 +262,7 @@ public class UIUtils {
     }
 
     public static int setColorAlpha(int color, float alpha) {
-        int alpha_int = Math.min(Math.max((int)(alpha * 255.0f), 0), 255);
+        int alpha_int = Math.min(Math.max((int) (alpha * 255.0f), 0), 255);
         return Color.argb(alpha_int, Color.red(color), Color.green(color), Color.blue(color));
     }
 
@@ -360,6 +363,26 @@ public class UIUtils {
             Window window = argActivity.getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(argColor);
+        }
+    }
+
+    @TargetApi(21)
+    public static void resetStatusBar(@NonNull Activity argActivity, @Nullable Resources.Theme argTheme) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            Window window = argActivity.getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            int color;
+            @ColorRes int colorRes = R.color.colorPrimary;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                color = argActivity.getResources().getColor(colorRes, argTheme);
+            } else {
+                color = argActivity.getResources().getColor(colorRes);
+            }
+            int r = Color.red(color);
+            int g = Color.green(color);
+            int b = Color.blue(color);
+            int opaqueColor = Color.argb(255, r, g ,b);
+            window.setStatusBarColor(opaqueColor);
         }
     }
 

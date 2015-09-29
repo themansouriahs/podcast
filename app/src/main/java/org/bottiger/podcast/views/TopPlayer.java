@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.support.annotation.ColorInt;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
@@ -130,6 +131,8 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
 
     private GestureDetectorCompat mGestureDetector;
     private TopPLayerScrollGestureListener mTopPLayerScrollGestureListener;
+
+    private @ColorInt int mBackgroundColor = -1;
 
     private SharedPreferences prefs;
 
@@ -573,8 +576,8 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
 
     @Override
     public void onPaletteFound(Palette argChangedPalette) {
-        // FIXME
-        setBackgroundColor(StaticButtonColor(mContext, argChangedPalette));
+        mBackgroundColor = StaticButtonColor(mContext, argChangedPalette);
+        setBackgroundColor(mBackgroundColor);
         invalidate();
     }
 
@@ -608,6 +611,10 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         mGradient.animate().alpha(argAlphaEnd);
     }
 
+    public @ColorInt int getBackGroundColor() {
+        return mBackgroundColor;
+    }
+
     public void setFullscreen(boolean argNewState, boolean doAnimate) {
 
         if (doAnimate && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -622,8 +629,6 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
             exitFullscreen();
         }
     }
-
-    private LinearLayout.LayoutParams paramCache;
 
     private void goFullscreen() {
         Log.d(TAG, "Enter fullscreen mode");
@@ -646,7 +651,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
 
         //mLayout.setTranslationY(-100);
         mLayout.bringToFront();
-        ((MainActivity)getContext()).goFullScreen(mLayout);
+        ((MainActivity)getContext()).goFullScreen(mLayout, mBackgroundColor);
     }
 
     private void exitFullscreen() {
@@ -662,9 +667,10 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         topmargin = ((MainActivity)getContext()).getFragmentTop();
         layoutParams.setMargins(0, topmargin, 0, 0);
         mLayout.setLayoutParams(layoutParams);
-        mLayout.setPadding(0,0,0,0);
+        mLayout.setPadding(0, 0, 0, 0);
 
         setPlayerHeight(sizeLarge);
+        ((MainActivity)getContext()).exitFullScreen(mLayout);
     }
 
     public boolean isFullscreen() {

@@ -148,7 +148,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 	// http://developer.android.com/reference/android/app/Fragment.html#Layout
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
+        super.onActivityCreated(savedInstanceState);
 
         mDownloadProgressObservable = EpisodeDownloadManager.getDownloadProgressObservable((SoundWaves) mContext.getApplicationContext());
 
@@ -671,6 +671,10 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
             IEpisode episode = mPlaylist.first();
             bindHeader(episode);
         }
+    }
+
+    public TopPlayer getTopPlayer() {
+        return mTopPlayer;
     }
 
     @Override

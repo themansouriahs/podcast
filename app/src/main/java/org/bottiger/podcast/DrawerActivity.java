@@ -1,6 +1,7 @@
 package org.bottiger.podcast;
 
 import org.bottiger.podcast.playlist.PlaylistData;
+import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.views.SlidingTab.SlidingTabLayout;
 
 import android.annotation.TargetApi;
@@ -11,6 +12,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.ViewPager;
@@ -93,12 +95,13 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity impleme
 
     }
 
-    public void goFullScreen(@NonNull View argFullScreenView) {
+    public void goFullScreen(@NonNull View argFullScreenView, @ColorInt int argColor) {
         mToolbar.bringToFront();
+        UIUtils.tintStatusBar(argColor, this);
     }
 
     public void exitFullScreen(@NonNull View argFullScreenView) {
-
+        UIUtils.resetStatusBar(this, null);
     }
 
     public int getFragmentTop() {

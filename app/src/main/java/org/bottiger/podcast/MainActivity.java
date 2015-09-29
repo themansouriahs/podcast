@@ -176,7 +176,6 @@ public class MainActivity extends FragmentContainerActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.activity_swipe, menu);
 		return super.onCreateOptionsMenu(menu);
-
 	}
 
 	/**
