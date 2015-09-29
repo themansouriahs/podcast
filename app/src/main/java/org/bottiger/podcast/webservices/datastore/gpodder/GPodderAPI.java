@@ -77,7 +77,7 @@ public class GPodderAPI implements IWebservice {
 
     private final Callback mDummyCallback = new Callback<String>() {
         @Override
-        public void onResponse(Response<String> response) {
+        public void onResponse(Response<String> response, Retrofit argRetrofit) {
             Log.d(TAG, response.toString());
         }
 
@@ -425,12 +425,12 @@ public class GPodderAPI implements IWebservice {
         Call<List<GSubscription>> result = api.search(argSearchTerm);
         result.enqueue(new Callback<List<GSubscription>>() {
             @Override
-            public void onResponse(Response<List<GSubscription>> response) {
+            public void onResponse(Response<List<GSubscription>> response, Retrofit argRetrofit) {
 
                 if (argICallback == null)
                     return;
 
-                argICallback.onResponse(response);
+                argICallback.onResponse(response, argRetrofit);
             }
 
             @Override
@@ -455,7 +455,7 @@ public class GPodderAPI implements IWebservice {
 
         authenticate(argCallback, new Callback() {
             @Override
-            public void onResponse(Response response) {
+            public void onResponse(Response response, Retrofit argRetrofit) {
                 uploadSubscriptionsInternal(argSubscriptions, argCallback);
             }
 
@@ -495,7 +495,7 @@ public class GPodderAPI implements IWebservice {
 
         api.getDeviceSubscriptions(mUsername, GPodderUtils.getDeviceID()).enqueue(new Callback<String[]>() {
             @Override
-            public void onResponse(Response<String[]> response) {
+            public void onResponse(Response<String[]> response, Retrofit argRetrofit) {
                 Log.d(TAG, response.toString());
             }
 
@@ -515,7 +515,7 @@ public class GPodderAPI implements IWebservice {
 
         api.getSubscriptions(mUsername).enqueue(new Callback<List<GSubscription>>() {
             @Override
-            public void onResponse(Response<List<GSubscription>> response) {
+            public void onResponse(Response<List<GSubscription>> response, Retrofit argRetrofit) {
                 Log.d(TAG, response.toString());
             }
 
@@ -535,7 +535,7 @@ public class GPodderAPI implements IWebservice {
 
         api.getDeviceSubscriptionsChanges(mUsername, GPodderUtils.getDeviceID(), argSince).enqueue(new Callback<SubscriptionChanges>() {
             @Override
-            public void onResponse(Response<SubscriptionChanges> response) {
+            public void onResponse(Response<SubscriptionChanges> response, Retrofit argRetrofit) {
                 Log.d(TAG, response.toString());
             }
 
@@ -565,7 +565,7 @@ public class GPodderAPI implements IWebservice {
 
         api.uploadDeviceSubscriptionsChanges(changes, mUsername, GPodderUtils.getDeviceID()).enqueue(new Callback<UpdatedUrls>() {
             @Override
-            public void onResponse(Response<UpdatedUrls> response) {
+            public void onResponse(Response<UpdatedUrls> response, Retrofit argRetrofit) {
                 Log.d(TAG, response.toString());
                 //UpdatedUrls updatedUrls = new Gson
             }
@@ -625,9 +625,9 @@ public class GPodderAPI implements IWebservice {
         }
 
         @Override
-        public void onResponse(Response response) {
+        public void onResponse(Response response, Retrofit argRetrofit) {
             mAuthenticated = true;
-            super.onResponse(response);
+            super.onResponse(response, argRetrofit);
         }
 
         @Override

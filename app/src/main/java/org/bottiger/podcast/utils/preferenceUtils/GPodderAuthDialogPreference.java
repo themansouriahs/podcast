@@ -21,6 +21,7 @@ import org.bottiger.podcast.webservices.datastore.gpodder.GPodderAPI;
 
 import retrofit.Callback;
 import retrofit.Response;
+import retrofit.Retrofit;
 
 /**
  * The OptionDialogPreference will display a dialog, and will persist the
@@ -86,7 +87,7 @@ public class GPodderAuthDialogPreference extends DialogPreference {
                 String password = mPasswordView.getText().toString();
                 GPodderAPI api = new GPodderAPI(username, password, new Callback() {
                     @Override
-                    public void onResponse(Response response) {
+                    public void onResponse(Response response, Retrofit argRetrofit) {
 
                         if (response.isSuccess()) {
                             mTestLoading.hide();

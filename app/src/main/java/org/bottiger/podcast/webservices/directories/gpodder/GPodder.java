@@ -28,6 +28,7 @@ import java.util.List;
 
 import retrofit.Call;
 import retrofit.Response;
+import retrofit.Retrofit;
 
 /**
  * Created by apl on 13-04-2015.
@@ -59,7 +60,7 @@ public class GPodder extends GenericDirectory {
 
         mCall = mGPodderAPI.search(searchTerm, new IWebservice.ICallback<List<GSubscription>>() {
             @Override
-            public void onResponse(Response<List<GSubscription>> response) {
+            public void onResponse(Response<List<GSubscription>> response, Retrofit argRetrofit) {
 
                 if (!isSuccesfull(response))
                     return;
@@ -105,7 +106,7 @@ public class GPodder extends GenericDirectory {
 
         mCall = mGPodderAPI.getTopList(amount, argTag, new IWebservice.ICallback<List<GSubscription>>() {
             @Override
-            public void onResponse(Response<List<GSubscription>> response) {
+            public void onResponse(Response<List<GSubscription>> response, Retrofit argRetrofit) {
                 if (!isSuccesfull(response))
                     return;
 

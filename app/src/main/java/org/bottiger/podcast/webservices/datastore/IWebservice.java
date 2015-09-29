@@ -11,6 +11,7 @@ import java.util.List;
 
 import retrofit.Call;
 import retrofit.Response;
+import retrofit.Retrofit;
 
 /**
  * Created by Arvid on 8/27/2015.
@@ -25,7 +26,7 @@ public interface IWebservice {
     void uploadSubscriptions(LongSparseArray<ISubscription> argSubscriptions, @Nullable ICallback argCallback);
 
     interface ICallback<T> {
-        void onResponse(Response<T> response);
+        void onResponse(Response<T> response, Retrofit argRetrofit);
         void onFailure(Throwable throwable);
     }
 
