@@ -41,6 +41,7 @@ import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionLoader;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
 import org.bottiger.podcast.utils.ColorExtractor;
+import org.bottiger.podcast.utils.ColorUtils;
 import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.utils.WhitenessUtils;
@@ -344,6 +345,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
         mRecyclerView = (FeedRecyclerView) findViewById(R.id.feed_recycler_view);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setBackgroundColor(ColorUtils.getBackgroundColor(this));
 
         mRecyclerView.setAdapter(mAdapter);
 

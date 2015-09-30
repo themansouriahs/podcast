@@ -17,6 +17,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.utils.ColorExtractor;
+import org.bottiger.podcast.utils.ColorUtils;
 import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.views.PlaylistViewHolder;
 
@@ -101,8 +102,6 @@ public class ExpandableViewHoldersUtil {
             initTransition(holder);
         }
 
-        holder.mActionBarGradientView.setAlpha(0);
-
         if (sPlayPauseParams != null) {
             sPlayPauseParams.setMargins(sPlayPauseParams.leftMargin, 0, sPlayPauseParams.rightMargin, sPlayPauseParams.bottomMargin);
             sPlayPauseParams.addRule(RelativeLayout.CENTER_VERTICAL);
@@ -131,8 +130,8 @@ public class ExpandableViewHoldersUtil {
         PaletteHelper.generate(holder.getArtwork(), holder.getActivity(), new PaletteListener() {
             @Override
             public void onPaletteFound(Palette argChangedPalette) {
-                int white = holder.getActivity().getResources().getColor(R.color.white_opaque);
-                int black = holder.getActivity().getResources().getColor(R.color.black);
+                int white = ColorUtils.getBackgroundColor(holder.getActivity()); //holder.getActivity().getResources().getColor(R.color.white_opaque);
+                int black = ColorUtils.getTextColor(holder.getActivity()); //holder.getActivity().getResources().getColor(R.color.black);
 
                 ColorExtractor colorExtractor = new ColorExtractor(holder.getActivity(), argChangedPalette);
                 holder.mLayout.setCardBackgroundColor(white);

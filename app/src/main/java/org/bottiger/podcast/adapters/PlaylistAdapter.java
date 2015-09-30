@@ -18,6 +18,7 @@ import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorExtractor;
+import org.bottiger.podcast.utils.ColorUtils;
 import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.SharedAdapterUtils;
 import org.bottiger.podcast.utils.StrUtils;
@@ -30,6 +31,7 @@ import android.app.DownloadManager;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
@@ -104,17 +106,9 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
             return;
         }
 
-        /*
-        int left = viewHolder.mLayout.getPaddingLeft();
-        int right = viewHolder.mLayout.getPaddingRight();
-        int top = viewHolder.mLayout.getPaddingTop();
-        int bottom = viewHolder.mLayout.getPaddingTop();
+        Context context = SoundWaves.getAppContext();
+        int textColor = item.isMarkedAsListened() ? ColorUtils.getTextColor(context) : ColorUtils.getFadedTextColor(context);
 
-        Resources resources = viewHolder.mLayout.getResources();
-        int newBottomPadding = position == getItemCount()-1 ? ToolbarActivity.getNavigationBarHeight(resources) : 0;
-
-        viewHolder.mLayout.setContentPadding(left, top, right, newBottomPadding);
-        */
         SharedAdapterUtils.AddPaddingToLastElement(viewHolder.mLayout, 0, position == getItemCount()-1);
 
         viewHolder.setArtwork(null);
@@ -171,6 +165,8 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         viewHolder.mAdapter = this;
 
         viewHolder.mMainTitle.setText(item.getTitle());
+        viewHolder.mMainTitle.setTextColor(textColor);
+
         viewHolder.description.setText(item.getDescription());
         bindDuration(viewHolder, item);
 

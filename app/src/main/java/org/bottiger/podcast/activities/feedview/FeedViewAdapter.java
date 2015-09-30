@@ -27,6 +27,7 @@ import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.utils.ColorUtils;
 import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.SharedAdapterUtils;
 import org.bottiger.podcast.utils.StrUtils;
@@ -108,10 +109,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
         }
 
         Context context = SoundWaves.getAppContext();
-        ThemeHelper helper = new ThemeHelper(context);
-        int textColorID = item.isMarkedAsListened() ? R.attr.themeTextColorFaded : R.attr.themeTextColorPrimary;
-        int colorRes = helper.getAttr(textColorID);
-        int color = ContextCompat.getColor(context, colorRes);
+        int color = item.isMarkedAsListened() ? ColorUtils.getTextColor(context) : ColorUtils.getFadedTextColor(context);
 
         episodeViewHolder.mText.setText(item.getTitle());
         episodeViewHolder.mText.setTextColor(color);

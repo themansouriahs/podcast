@@ -32,8 +32,6 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
     public PlayerButtonView mForward;
     public PlayerButtonView mBackward;
 
-    public View mActionBarGradientView;
-
     public ScrollView mExpandedLayoutBottom;
 
     public ImageViewTinted mPodcastImage;
@@ -80,8 +78,6 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
         //mTimeDurationIcon = (ImageView) view.findViewById(R.id.podcast_duration_ic);
         mCurrentPosition = (TextView) view.getTag(R.id.current_position);
         mPlaylistPosition = (TextView) view.findViewById(R.id.playlist_position);
-
-        mActionBarGradientView = view.findViewById(R.id.episode_top_gradient);
 
         // Expanded layout
         mExpandedLayoutControls = (RelativeLayout) view.findViewById(R.id.expanded_layout_controls);
