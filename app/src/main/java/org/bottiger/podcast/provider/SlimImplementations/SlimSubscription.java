@@ -136,6 +136,11 @@ public class SlimSubscription implements ISubscription, Parcelable {
         return ISubscription.SLIM;
     }
 
+    @Override
+    public int getPrimaryColor() {
+        return -1;
+    }
+
     public int describeContents() {
         return 0;
     }

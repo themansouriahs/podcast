@@ -230,7 +230,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
             return argPosition;
 
         int position = argPosition;
-        return getItemCount() - position;
+        return getItemCount() - position -1;
     }
 
     public class EpisodeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

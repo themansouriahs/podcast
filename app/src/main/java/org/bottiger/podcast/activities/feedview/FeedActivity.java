@@ -12,6 +12,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,6 +25,8 @@ import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.FrameLayout;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.facebook.imagepipeline.request.BasePostprocessor;
 
 import org.bottiger.podcast.DiscoveryFeedActivity;
@@ -48,7 +52,7 @@ import org.bottiger.podcast.utils.WhitenessUtils;
 import org.bottiger.podcast.views.FeedRecyclerView;
 import org.bottiger.podcast.views.FloatingActionButton;
 import org.bottiger.podcast.views.MultiShrink.feed.MultiShrinkScroller;
-import org.bottiger.podcast.views.MultiShrink.feed.QuickFeedImage;
+import org.bottiger.podcast.views.MultiShrink.feed.FeedViewTopImage;
 import org.bottiger.podcast.views.MultiShrink.feed.SchedulingUtils;
 import org.bottiger.podcast.views.utils.SubscriptionSettingsUtils;
 
@@ -82,7 +86,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
     private int mExtraMode = MODE_FULLY_EXPANDED;
     private boolean mHasAlreadyBeenOpened;
 
-    private QuickFeedImage mPhotoView;
+    private FeedViewTopImage mPhotoView;
     private RecyclerView mRecyclerView;
     private MultiShrinkScroller mMultiShrinkScroller;
     protected FloatingActionButton mFloatingButton;
@@ -219,7 +223,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
         }
 
 
-        mPhotoView = (QuickFeedImage) findViewById(R.id.photo);
+        mPhotoView = (FeedViewTopImage) findViewById(R.id.photo);
         mMultiShrinkScroller = (MultiShrinkScroller) findViewById(R.id.multiscroller);
         mFloatingButton = (FloatingActionButton) findViewById(R.id.feedview_fap_button);
         mRevealLayout = (FrameLayout) findViewById(R.id.feed_activity_settings_container);
@@ -314,8 +318,24 @@ public class FeedActivity extends TopActivity implements PaletteListener {
 
         mUrl = mSubscription.getImageURL();
 
-        analyzeWhitenessOfPhotoPostProcessor postProcessor = new analyzeWhitenessOfPhotoPostProcessor(this, mMultiShrinkScroller);
-        FrescoHelper.loadImageInto(mPhotoView, mUrl, postProcessor);
+        mPhotoView.setBackgroundColor(mSubscription.getPrimaryColor());
+        ColorDrawable cd = new ColorDrawable(mSubscription.getPrimaryColor());
+
+        //analyzeWhitenessOfPhotoPostProcessor postProcessor = new analyzeWhitenessOfPhotoPostProcessor(this, mMultiShrinkScroller);
+        //FrescoHelper.loadImageInto(mPhotoView, mUrl, postProcessor);
+        Glide.with(this)
+                .load(mUrl)
+                .asBitmap()
+                .placeholder(cd)
+                .fitCenter()
+                .into(new BitmapImageViewTarget(mPhotoView) {
+                    @Override
+                    protected void setResource(Bitmap resource) {
+                        boolean isWhite = WhitenessUtils.isBitmapWhiteAtTopOrBottom(resource);
+                        mMultiShrinkScroller.setUseGradient(isWhite);
+                        mPhotoView.setImageBitmap(resource);
+                    }
+                });
 
         final View transparentView = findViewById(R.id.transparent_view);
         if (mMultiShrinkScroller != null) {

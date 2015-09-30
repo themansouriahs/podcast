@@ -17,28 +17,20 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <org.bottiger.podcast.views.MultiShrink.feed.QuickFeedImage
+    <org.bottiger.podcast.views.MultiShrink.feed.FeedViewTopImage
         android:id="@+id/photo"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clickable="false"
-        android:scaleType="centerCrop" />
+        android:scaleType="centerCrop"
+        android:src="@color/white_opaque"
+        />
 
     <io.codetail.widget.RevealFrameLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!--
-        <FrameLayout
-            android:id="@+id/feed_activity_settings_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/white_opaque"
-            android:visibility="invisible">
-
-        </FrameLayout>
-        -->
         <include layout="@layout/feed_activity_settings"/>
 
     </io.codetail.widget.RevealFrameLayout>

@@ -1,5 +1,6 @@
 package org.bottiger.podcast.provider;
 
+import android.support.annotation.ColorInt;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -56,4 +57,5 @@ public interface ISubscription {
     void setIsRefreshing(boolean argIsRefreshing);
 
     @Type int getType();
+    @ColorInt int getPrimaryColor();
 }
