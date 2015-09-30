@@ -682,8 +682,10 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) mTopPlayer.getLayoutParams();
         FrameLayout.LayoutParams params2 = (FrameLayout.LayoutParams) mPlaylistEmptyContainer.getLayoutParams();
         CoordinatorLayout.LayoutParams params3 = (CoordinatorLayout.LayoutParams) mRecyclerView.getLayoutParams();
+        FrameLayout.LayoutParams params4 = (FrameLayout.LayoutParams) mPlaylistWelcomeContainer.getLayoutParams();
         params2.topMargin = i;
         params3.topMargin = i;
+        params4.topMargin = i;
         if (!mTopPlayer.isFullscreen()) {
             params.topMargin = i;
             mTopPlayer.setLayoutParams(params);
@@ -693,5 +695,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         }
         mPlaylistEmptyContainer.setLayoutParams(params);
         mRecyclerView.setLayoutParams(params3);
+        mPlaylistWelcomeContainer.setLayoutParams(params4);
     }
 }
