@@ -166,6 +166,8 @@
     <string name="open_video_externally_reject">Play audio</string>
     <string name="pref_open_video_externally">Open videos in an external player</string>
     <string name="pref_open_video_externally_description">This app does not play video. You can choose to open video files in another player, otherwise they will play as audio only.</string>
+    <string name="pref_help_beta_title">Join BETA testing</string>
+    <string name="pref_help_beta_description">If you would like to help out with beta testing of new features you can do so by visiting this page: https://play.google.com/apps/testing/org.bottiger.podcast</string>
 
     <plurals name="player_sleep">
         <item quantity="one">Player will sleep in %d minute</item>

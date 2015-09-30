@@ -39,6 +39,18 @@
 
         </PreferenceCategory>
 
+        <PreferenceCategory
+            android:title="@string/pref_help_beta_title"
+            android:key="pref_help_category">
+
+            <Preference
+                android:key="pref_help_static_field_2"
+                android:selectable="false"
+                android:persistent="false"
+                android:summary="@string/pref_help_beta_description"/>
+
+        </PreferenceCategory>
+
     </PreferenceScreen>
 
     <PreferenceScreen
