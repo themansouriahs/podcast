@@ -53,6 +53,8 @@
     <attr name="fullscreen" format="reference" />
     <attr name="fullscreen_exit" format="reference" />
     <attr name="themeBackground" format="reference" />
+    <attr name="themeTextColorPrimary" format="reference" />
+    <attr name="themeTextColorFaded" format="reference" />
 
     <declare-styleable name="BezelImageView">
         <attr name="maskDrawable" format="reference" />

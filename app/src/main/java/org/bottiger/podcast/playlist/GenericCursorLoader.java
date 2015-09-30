@@ -10,7 +10,7 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 
-import org.bottiger.podcast.adapters.FeedViewAdapter;
+import org.bottiger.podcast.activities.feedview.FeedViewAdapter;
 
 public abstract class GenericCursorLoader {
 

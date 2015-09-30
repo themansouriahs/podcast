@@ -1,4 +1,4 @@
-package org.bottiger.podcast;
+package org.bottiger.podcast.activities.feedview;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
@@ -25,7 +25,11 @@ import android.widget.FrameLayout;
 
 import com.facebook.imagepipeline.request.BasePostprocessor;
 
-import org.bottiger.podcast.adapters.FeedViewAdapter;
+import org.bottiger.podcast.DiscoveryFeedActivity;
+import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.ToolbarActivity;
+import org.bottiger.podcast.TopActivity;
 import org.bottiger.podcast.adapters.FeedViewDiscoveryAdapter;
 import org.bottiger.podcast.images.FrescoHelper;
 import org.bottiger.podcast.listeners.PaletteListener;

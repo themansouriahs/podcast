@@ -1,24 +1,20 @@
 package org.bottiger.podcast.adapters;
 
 import org.apache.commons.validator.routines.UrlValidator;
-import org.bottiger.podcast.FeedActivity;
+import org.bottiger.podcast.activities.feedview.FeedActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.ToolbarActivity;
 import org.bottiger.podcast.adapters.viewholders.FooterViewHolder;
 import org.bottiger.podcast.adapters.viewholders.subscription.SubscriptionViewHolder;
-import org.bottiger.podcast.images.FrescoHelper;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionLoader;
-import org.bottiger.podcast.utils.SharedAdapterUtils;
 
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.DrawableRes;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -27,14 +23,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridLayout;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.BitmapImageViewTarget;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 
 public class SubscriptionCursorAdapter extends CursorRecyclerAdapter {

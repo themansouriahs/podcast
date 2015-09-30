@@ -1,7 +1,6 @@
 package org.bottiger.podcast.adapters;
 
 import android.app.Activity;
-import android.content.Context;
 import android.database.Cursor;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -11,12 +10,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
-import org.bottiger.podcast.R;
+import org.bottiger.podcast.activities.feedview.FeedViewAdapter;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.SlimImplementations.SlimEpisode;
-import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.views.PlayPauseImageView;
 
 import java.util.ArrayList;

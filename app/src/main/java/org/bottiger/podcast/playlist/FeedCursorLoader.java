@@ -6,11 +6,10 @@ import android.support.v4.app.Fragment;
 
 import android.database.Cursor;
 
-import org.bottiger.podcast.adapters.FeedViewAdapter;
+import org.bottiger.podcast.activities.feedview.FeedViewAdapter;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.Subscription;
-import org.bottiger.podcast.provider.SubscriptionColumns;
 
 /**
  * Created by apl on 02-09-2014.

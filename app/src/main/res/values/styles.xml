@@ -43,6 +43,8 @@
 
         <item name="android:windowBackground">@null</item>
         <item name="themeBackground">@color/pitch_black</item>
+        <item name="themeTextColorPrimary">@color/white_opaque</item>
+        <item name="themeTextColorFaded">@color/grayDark</item>
 
         <!--<item name="android:background">@color/pitch_black</item>
         <item name="android:windowBackground">@color/pitch_black</item>-->
@@ -95,6 +97,8 @@
 
         <item name="android:windowBackground">@null</item>
         <item name="themeBackground">@color/white_opaque</item>
+        <item name="themeTextColorPrimary">@color/pitch_black</item>
+        <item name="themeTextColorFaded">@color/grayDark</item>
         <!--
         <item name="android:background">@color/white_opaque</item>
 

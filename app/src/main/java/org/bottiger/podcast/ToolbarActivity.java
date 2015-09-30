@@ -143,7 +143,7 @@ public class ToolbarActivity extends TopActivity {
         return result;
     }
 
-    protected static int getStatusBarHeight(Resources res) {
+    public static int getStatusBarHeight(Resources res) {
         int result = 0;
         int resourceId = res.getIdentifier("status_bar_height", "dimen", "android");
         if (resourceId > 0) {

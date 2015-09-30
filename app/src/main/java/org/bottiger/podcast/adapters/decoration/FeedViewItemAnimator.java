@@ -4,7 +4,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import org.bottiger.podcast.adapters.FeedViewAdapter;
+import org.bottiger.podcast.activities.feedview.FeedViewAdapter;
 
 /**
  * Created by Arvid on 8/15/2015.

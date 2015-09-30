@@ -4,8 +4,7 @@ import android.app.Activity;
 import android.database.Cursor;
 import android.support.v4.app.Fragment;
 
-import org.bottiger.podcast.adapters.AbstractPodcastAdapter;
-import org.bottiger.podcast.adapters.FeedViewAdapter;
+import org.bottiger.podcast.activities.feedview.FeedViewAdapter;
 import org.bottiger.podcast.provider.ItemColumns;
 
 public class PlaylistCursorLoader extends GenericCursorLoader {

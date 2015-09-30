@@ -43,6 +43,7 @@ public class EspressoBasicViewPagerTest extends ActivityInstrumentationTestCase2
     public void setUp() throws Exception {
 
         mActivity = getActivity();
+        cleanData();
 
         super.setUp();
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
