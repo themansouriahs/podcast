@@ -8,7 +8,7 @@
     android:clipChildren="false"
     android:clipToPadding="false">
 
-        <org.bottiger.podcast.views.TopPlayer
+    <org.bottiger.podcast.views.TopPlayer
         xmlns:fresco="http://schemas.android.com/apk/res-auto"
         android:visibility="visible"
         android:id="@+id/session_photo_container"
@@ -18,29 +18,7 @@
         android:layout_height="@dimen/top_player_size_maximum"
         android:minHeight="@dimen/top_player_size_minimum"
         >
-            <!--
-            android:foreground="@drawable/photo_banner_scrim"
-            -->
 
-
-            <!--
-            android:background="@drawable/header_gradient"
-            -->
-
-            <!--
-        <View
-            android:id="@+id/top_gradient"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="top" />
-            -->
-
-            <!--
-            android:clipToPadding="false"
-            android:layout_alignParentRight="true"
-            android:descendantFocusability="afterDescendants"
-            android:orientation="vertical"
-            -->
         <org.bottiger.podcast.views.PlayerRelativeLayout
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/expanded_controls"
@@ -164,7 +142,7 @@
             android:layout_alignParentRight="true"/>
 
         <org.bottiger.podcast.views.PlayerSeekbar
-            android:id="@+id/player_progress"
+            android:id="@+id/player_center_square"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="9dp"
@@ -177,18 +155,20 @@
             />
 
         <org.bottiger.podcast.views.SquareCardView
+            android:id="@+id/top_player_center_square"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp"
-            android:layout_below="@id/player_progress"
-            android:layout_marginTop="5dp">
+            android:layout_marginLeft="@dimen/top_player_center_square_margin"
+            android:layout_marginRight="@dimen/top_player_center_square_margin"
+            android:layout_below="@id/player_center_square"
+            android:layout_marginTop="@dimen/top_player_center_square_margin_top">
 
-            <com.facebook.drawee.view.SimpleDraweeView
+            <org.bottiger.podcast.views.SquareImageViewFresco
                 android:id="@+id/session_photo"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                fresco:actualImageScaleType="centerCrop"/>
+                android:layout_height="match_parent"/>
+            <!--
+                fresco:actualImageScaleType="centerCrop" -->
 
             <View
                 android:id="@+id/top_gradient_inner"

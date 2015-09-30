@@ -94,6 +94,11 @@ public class SubscriptionRefreshManager {
             return;
         }
 
+        if (argSubscription.getURL() == null) {
+            VendorCrashReporter.report(ACRA_KEY, "subscription.url=null");
+            return;
+        }
+
         String subscriptionUrl = argSubscription.getURL().toString();
 
         if (TextUtils.isEmpty(subscriptionUrl)) {

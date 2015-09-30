@@ -275,7 +275,7 @@
     </style>
 
     <style name="TopPlayerButton" parent="@style/PlaylistButton">
-        <item name="android:layout_above">@id/player_progress</item>
+        <item name="android:layout_above">@id/player_center_square</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">40dp</item>
         <item name="android:layout_weight">1</item>

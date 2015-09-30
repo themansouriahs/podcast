@@ -17,6 +17,7 @@ import android.support.v4.view.ScrollingView;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewConfigurationCompat;
 import android.support.v7.graphics.Palette;
+import android.support.v7.widget.CardView;
 import android.transition.ChangeBounds;
 import android.transition.Scene;
 import android.transition.Transition;
@@ -30,11 +31,8 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
-
-import com.facebook.drawee.view.SimpleDraweeView;
 
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
@@ -81,7 +79,6 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
     public static int sizeStartShrink           =   -1;
     public static int sizeShrinkBuffer           =   -1;
 
-    private boolean mSeekbarVisible             =   true;
     private int mSeekbarDeadzone                =   20; // dp
     private int mSeekbarFadeDistance            =   20; // dp
     private int mTextInfoFadeDistance           =   100; // dp
@@ -107,12 +104,15 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
     private RelativeLayout mPlayerButtons;
     private int mPlayerButtonsHeight = -1;
 
+    private int mCenterSquareMarginTop = -1;
+    private float mCenterSquareMargin = -1;
+
     private TopPlayer mLayout;
     private ImageButton mExpandEpisode;
     private View mGradient;
     private View mEpisodeText;
     private View mEpisodeInfo;
-    private SimpleDraweeView mPhoto;
+    private SquareImageViewFresco mPhoto;
     private PlayPauseImageView mPlayPauseButton;
     private View mImageContainer;
 
@@ -224,13 +224,13 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
 
         mPlayerControlsLinearLayout = (PlayerRelativeLayout)findViewById(R.id.expanded_controls);
 
-        mPhoto = (SimpleDraweeView) findViewById(R.id.session_photo);
+        mPhoto = (SquareImageViewFresco) findViewById(R.id.session_photo);
 
         mPlayPauseButton = (PlayPauseImageView) findViewById(R.id.play_pause_button);
         mExpandEpisode = (ImageButton)findViewById(R.id.episode_expand);
         mEpisodeText = findViewById(R.id.episode_title);
         mEpisodeInfo = findViewById(R.id.episode_info);
-        mImageContainer = findViewById(R.id.player_progress);
+        mImageContainer = findViewById(R.id.top_player_center_square);
         mForwardButton = findViewById(R.id.fast_forward_button);
         mBackButton = findViewById(R.id.rewind_button);
         mFullscreenButton = (PlayerButtonView) findViewById(R.id.fullscreen_button);
@@ -240,10 +240,12 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         mGradient = findViewById(R.id.top_gradient_inner);
         mSleepButton = (PlayerButtonView) findViewById(R.id.sleep_button);
 
-        mSeekbar = (PlayerSeekbar) findViewById(R.id.player_progress);
         mPlayerButtons = (RelativeLayout) findViewById(R.id.player_buttons);
 
         mPlayPauseLargeSize = mPlayPauseButton.getLayoutParams().height;
+
+        mCenterSquareMarginTop = (int)getResources().getDimension(R.dimen.top_player_center_square_margin_top);
+        mCenterSquareMargin = getResources().getDimension(R.dimen.top_player_center_square_margin);
 
         mLargeLayout.SeekBarLeftMargin = 0;
         mLargeLayout.PlayPauseSize = mPlayPauseLargeSize;
@@ -255,15 +257,6 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
             mGradient.setVisibility(GONE);
             mEpisodeInfo.setVisibility(GONE);
         }
-
-        // Give image a fixed height
-
-        //int width = mPhoto.getWidth();
-        //RelativeLayout.LayoutParams params = (LayoutParams) mPhoto.getLayoutParams();
-        //params.width = width;
-        //params.height = width;
-        //mPhoto.setLayoutParams(params);
-        //mPhoto.getLayoutParams().height = mPhoto.getLayoutParams().width;
 
         mSleepButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -634,13 +627,8 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         Log.d(TAG, "Enter fullscreen mode");
         mFullscreenButton.setImageResource(R.drawable.ic_fullscreen_exit_white);
 
-        int topmargin = ((MainActivity)getContext()).getFragmentTop();
-        /*CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)mLayout.getLayoutParams();
-        if (params != null) {
-            topmargin = params.topMargin;
-            params.setMargins(0, 0, 0, 0);
-            //mLayout.setLayoutParams(params);
-        }*/
+        MainActivity activity = ((MainActivity)getContext());
+        int topmargin = activity.getFragmentTop() - activity.getSlidingTabsHeight();
 
         // Main player layout
         CoordinatorLayout.LayoutParams layoutParams = new CoordinatorLayout.LayoutParams(
@@ -648,6 +636,11 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
                 LayoutParams.MATCH_PARENT);
         mLayout.setLayoutParams(layoutParams);
         mLayout.setPadding(0, topmargin, 0, 0);
+
+        int smallMargin = (int)mCenterSquareMargin/2;
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mImageContainer.getLayoutParams();
+        params.setMargins(smallMargin,mCenterSquareMarginTop,smallMargin,0);
+        mImageContainer.setLayoutParams(params);
 
         //mLayout.setTranslationY(-100);
         mLayout.bringToFront();
@@ -667,7 +660,11 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         topmargin = ((MainActivity)getContext()).getFragmentTop();
         layoutParams.setMargins(0, topmargin, 0, 0);
         mLayout.setLayoutParams(layoutParams);
-        mLayout.setPadding(0, 0, 0, 0);
+        mLayout.setPadding(0, mCenterSquareMarginTop, 0, 0);
+
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mImageContainer.getLayoutParams();
+        params.setMargins((int)mCenterSquareMargin, 0, (int)mCenterSquareMargin, 0);
+        mImageContainer.setLayoutParams(params);
 
         setPlayerHeight(sizeLarge);
         ((MainActivity)getContext()).exitFullScreen(mLayout);

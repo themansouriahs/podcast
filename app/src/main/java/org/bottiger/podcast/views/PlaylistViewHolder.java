@@ -87,7 +87,7 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
         mExpandedLayoutControls = (RelativeLayout) view.findViewById(R.id.expanded_layout_controls);
         currentTime = (TextView) view
                 .findViewById(R.id.current_position);
-        seekbar = (PlayerSeekbar) view.findViewById(R.id.player_progress);
+        seekbar = (PlayerSeekbar) view.findViewById(R.id.player_center_square);
 
         favoriteButton = (PlayerButtonView) view.findViewById(R.id.favorite);
         removeButton = (PlayerButtonView) view.findViewById(R.id.remove_episode);

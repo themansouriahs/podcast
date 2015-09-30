@@ -108,6 +108,10 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity impleme
         return mFragmentTopPosition;
     }
 
+    public int getSlidingTabsHeight() {
+        return mSlidingTabLayout.getHeight();
+    }
+
     private int getToolbarBottomPosition() {
         if (mFragmentTopPosition > 0) {
             return mFragmentTopPosition;

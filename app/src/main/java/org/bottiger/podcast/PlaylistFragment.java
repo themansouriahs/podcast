@@ -1,7 +1,6 @@
 package org.bottiger.podcast;
 
 import org.bottiger.podcast.adapters.PlaylistAdapter;
-import org.bottiger.podcast.images.FrescoHelper;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
@@ -12,6 +11,7 @@ import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorExtractor;
+import org.bottiger.podcast.utils.ImageLoaderUtils;
 import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.UIUtils;
@@ -21,6 +21,7 @@ import org.bottiger.podcast.views.PlayPauseImageView;
 import org.bottiger.podcast.views.PlayerButtonView;
 import org.bottiger.podcast.views.PlayerSeekbar;
 import org.bottiger.podcast.views.PlaylistViewHolder;
+import org.bottiger.podcast.views.SquareImageViewFresco;
 import org.bottiger.podcast.views.TextViewObserver;
 import org.bottiger.podcast.views.TopPlayer;
 import org.bottiger.podcast.views.dialogs.DialogBulkDownload;
@@ -47,7 +48,6 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.graphics.Palette;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
@@ -65,7 +65,6 @@ import android.widget.FrameLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
-import com.facebook.drawee.view.SimpleDraweeView;
 import com.squareup.otto.Produce;
 import com.squareup.otto.Subscribe;
 
@@ -85,7 +84,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
     private RadioButton mPopulateAutomatically;
 
     private TopPlayer mTopPlayer;
-    private SimpleDraweeView mPhoto;
+    private SquareImageViewFresco mPhoto;
 
     private TextView mEpisodeTitle;
     private TextView mEpisodeInfo;
@@ -169,7 +168,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         super.onViewCreated(view,savedInstanceState);
 
         mTopPlayer =   (TopPlayer) view.findViewById(R.id.session_photo_container);
-        mPhoto =            (SimpleDraweeView) view.findViewById(R.id.session_photo);
+        mPhoto =            (SquareImageViewFresco) view.findViewById(R.id.session_photo);
 
         mPlaylistContainer = view.findViewById(R.id.playlist_container);
         mPlaylistWelcomeContainer = view.findViewById(R.id.playlist_welcome_screen);
@@ -185,7 +184,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         mTotalTime         =    (TextViewObserver) view.findViewById(R.id.total_time);
 
         mPlayPauseButton         =    (PlayPauseImageView) view.findViewById(R.id.play_pause_button);
-        mPlayerSeekbar          =    (PlayerSeekbar) view.findViewById(R.id.player_progress);
+        mPlayerSeekbar          =    (PlayerSeekbar) view.findViewById(R.id.player_center_square);
         mPlayerDownloadButton   =    (DownloadButtonView) view.findViewById(R.id.download);
         mBackButton = (PlayerButtonView)view.findViewById(R.id.rewind_button);
         mForwardButton = (PlayerButtonView)view.findViewById(R.id.fast_forward_button);
@@ -544,7 +543,8 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         String artworkUrl = item.getArtwork(activity);
         if (item != null && artworkUrl != null) {
             Log.v("MissingImage", "Setting image");
-            FrescoHelper.loadImageInto(mPhoto, artworkUrl, null);
+            //FrescoHelper.loadImageInto(mPhoto, artworkUrl, null);
+            ImageLoaderUtils.loadImageInto(mPhoto, artworkUrl, false);
         }
 
         if (mTopPlayer.getVisibleHeight() == 0) {
@@ -688,7 +688,8 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
             params.topMargin = i;
             mTopPlayer.setLayoutParams(params);
         } else {
-            mTopPlayer.setPadding(0, i ,0, 0);
+            mTopPlayer.setFullscreen(true, false);
+            //mTopPlayer.setPadding(0, i ,0, 0);
         }
         mPlaylistEmptyContainer.setLayoutParams(params);
         mRecyclerView.setLayoutParams(params3);
