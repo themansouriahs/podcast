@@ -262,15 +262,22 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
             mCurrent.setText(mCurrentText);
             mForwards.setText(mForwardText);
 
-            this.getLocationOnScreen(loc);
-            int offset = loc[1] - (int)UIUtils.convertDpToPixel(200, getContext()); //FIXME this.getHeight()*4;
+            this.getLocationInWindow(loc);
+
+            int top = loc[1];
+            top = getTop();
+            int offset =  (int)UIUtils.convertDpToPixel(50, getContext()); //FIXME this.getHeight()*4;
             int translationY = (int)((View)this.getParent()).getTranslationY();
             Log.v(TAG, "trans => " + translationY);
-            Log.v(TAG, "loc0 => " + loc[0] + " loc0 => " +loc[1]);
+            Log.v(TAG, "loc0 => " + loc[0] + " loc0 => " + loc[1] + " offset => " + offset);
             //params.setMargins(mSideMargin, offset, mSideMargin, 0);
+            params.setMargins(0, offset, 0, 0);
 
 
             if (mOverlay != null) {
+                mOverlay.getLocationOnScreen(loc);
+                Log.v(TAG, "Overlay: loc0 => " + loc[0] + " loc0 => " + loc[1]);
+                //mOverlay.setPadding(0,offset,0,0);
                 mOverlay.setLayoutParams(params);
                 mOverlay.setVisibility(VISIBLE);
             }
