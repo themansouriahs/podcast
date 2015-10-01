@@ -62,7 +62,7 @@ public class FeedViewDiscoveryAdapter extends FeedViewAdapter {
 
         //episodeViewHolder.mDescription.setVisibility(View.VISIBLE);
         episodeViewHolder.DisplayDescription = true;
-        episodeViewHolder.modifyLayout((RelativeLayout)episodeViewHolder.itemView);
+        //episodeViewHolder.modifyLayout((RelativeLayout)episodeViewHolder.itemView);
 
         episodeViewHolder.mPlayPauseButton.setEpisode(argEpisode, PlayPauseImageView.DISCOVERY_FEEDVIEW);
         episodeViewHolder.mQueueButton.setEpisode(argEpisode, PlayPauseImageView.DISCOVERY_FEEDVIEW);

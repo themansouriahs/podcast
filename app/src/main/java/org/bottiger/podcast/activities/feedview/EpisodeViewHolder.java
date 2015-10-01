@@ -2,7 +2,9 @@ package org.bottiger.podcast.activities.feedview;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Build;
+import android.support.annotation.ColorInt;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
@@ -10,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.transition.AutoTransition;
 import android.transition.TransitionManager;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
@@ -27,18 +30,27 @@ import java.lang.annotation.RetentionPolicy;
 /**
  * Created by aplb on 01-10-2015.
  */
-public class EpisodeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+public class EpisodeViewHolder extends RecyclerView.ViewHolder {
 
+    private static final String TAG = "EpisodeViewHolder";
 
     @Retention(RetentionPolicy.SOURCE)
-    @IntDef({EXPANDED, COLLAPSED, COLLAPSED_WITH_DESCRIPTION})
+    @IntDef({EXPANDED, COLLAPSED, COLLAPSED_WITH_DESCRIPTION, COLLAPSED_LISTENED})
     public @interface DisplayState {}
     public static final int EXPANDED = 0;
     public static final int COLLAPSED = 1;
     public static final int COLLAPSED_WITH_DESCRIPTION = 2;
+    public static final int COLLAPSED_LISTENED = 3;
 
     @EpisodeViewHolder.DisplayState
     int mState = COLLAPSED;
+
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({GONE, SHORT, LONG})
+    public @interface DescriptionLength {}
+    public static final int GONE = 0;
+    public static final int SHORT = 1;
+    public static final int LONG = 2;
 
 
     public ViewGroup mContainer;
@@ -52,10 +64,13 @@ public class EpisodeViewHolder extends RecyclerView.ViewHolder implements View.O
     public boolean DisplayDescription = false;
     public boolean IsMarkedAsListened = false;
 
+    public @ColorInt int mPrimaryColor = Color.BLACK;
+    public @ColorInt int mFadedColor = Color.GRAY;
+
     @SuppressLint("WrongViewCast")
     public EpisodeViewHolder(View view) {
         super(view);
-        view.setOnClickListener(this);
+        //view.setOnClickListener(this);
 
         mContainer = (ViewGroup) view.findViewById(R.id.group);
         mTitle = (TextView) view.findViewById(R.id.title);
@@ -67,8 +82,7 @@ public class EpisodeViewHolder extends RecyclerView.ViewHolder implements View.O
     }
 
 
-    @Override
-    public void onClick(View view) {
+    public @DisplayState int toggleState() {
 
         if (Build.VERSION.SDK_INT >= 19) {
             AutoTransition autoTransition = new AutoTransition();
@@ -76,88 +90,106 @@ public class EpisodeViewHolder extends RecyclerView.ViewHolder implements View.O
             TransitionManager.beginDelayedTransition((ViewGroup)mContainer.getParent(), autoTransition);
         }
 
-        Context context = view.getContext();
-
-        if (mState == EXPANDED) {
-            doCollapse(context);
-            setIsRecyclable(true);
-            mState = DisplayDescription ? COLLAPSED_WITH_DESCRIPTION : COLLAPSED;
+        @DisplayState int newState;
+        if (mState != EXPANDED) {
+            newState = EXPANDED;
+        } else if (IsMarkedAsListened) {
+            newState = COLLAPSED_LISTENED;
+        } else if (DisplayDescription) {
+            newState = COLLAPSED_WITH_DESCRIPTION;
         } else {
-            doExpand(context);
-            setIsRecyclable(false);
-            mState = EXPANDED;
+            newState = COLLAPSED;
         }
-        view.postInvalidate();
-        return;
+
+        setState(newState);
+        mState = newState;
+
+        return mState;
     }
 
-    private void doExpand(@NonNull Context argContext) {
-
-        int color = ColorUtils.getTextColor(argContext);
-
-        mTitle.setTextColor(color);
-        mDescription.setTextColor(color);
-
-        mDescription.setVisibility(View.VISIBLE);
-        mDescription.setMaxLines(Integer.MAX_VALUE);
-        mDescription.setEllipsize(null);
-    }
-
-    private void doCollapse(@NonNull Context argContext) {
-        int color = !IsMarkedAsListened ? ColorUtils.getTextColor(argContext) : ColorUtils.getFadedTextColor(argContext);
-
-        mTitle.setTextColor(color);
-        mDescription.setTextColor(color);
-
-        int lines = mDescription.getResources().getInteger(R.integer.feed_activity_description_lines_default);
-        mDescription.setMaxLines(lines);
-        mDescription.setEllipsize(TextUtils.TruncateAt.END);
-
-        if (IsMarkedAsListened || !DisplayDescription) {
-            mDescription.setVisibility(View.GONE);
-        } else {
-
-        }
-    }
-
-    public void modifyLayout(@NonNull ViewGroup argParent) {
-
-
-        //if (Build.VERSION.SDK_INT >= 19) {
-        //    TransitionManager.beginDelayedTransition(argParent);
-        //}
-
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mTitle.getLayoutParams();
-
-        if (DisplayDescription) {
-            if (Build.VERSION.SDK_INT >= 17) {
-                params.removeRule(RelativeLayout.CENTER_VERTICAL);
-            } else {
-                params.addRule(RelativeLayout.CENTER_VERTICAL, 0);
+    public void setState(@DisplayState int argState) {
+        Log.d(TAG, "Settings viewholder state to: " + argState);
+        switch(argState) {
+            case EXPANDED: {
+                setStateExpanded();
+                break;
             }
-        } else {
-            params.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
+            case COLLAPSED: {
+                setStateCollapsed();
+                break;
+            }
+            case COLLAPSED_WITH_DESCRIPTION: {
+                setStateCollapsedWithDescription();
+                break;
+            }
+            case COLLAPSED_LISTENED: {
+                setStateListenedCollapsed();
+                break;
+            }
         }
+        mState = argState;
+    }
 
-        //mTitle.setLayoutParams(params);
+    private void setStateExpanded() {
+        setTextColor(false);
+        setButtonsVisibility(true, true);
+        setDescriptionLength(LONG);
+        setIsRecyclable(false);
+    }
 
-        int visibility = DisplayDescription ? View.VISIBLE : View.GONE;
-        float alphaStart = DisplayDescription ? 0.0f : 1.0f;
-        float alphaEnd = DisplayDescription ? 1.0f : 0.0f;
+    private void setStateCollapsed() {
+        setTextColor(false);
+        setButtonsVisibility(true, false);
+        setDescriptionLength(GONE);
+        setIsRecyclable(true);
+    }
 
-        mDescription.setVisibility(visibility);
-        mQueueButton.setVisibility(visibility);
+    private void setStateCollapsedWithDescription() {
+        setTextColor(false);
+        setButtonsVisibility(true, true);
+        setDescriptionLength(SHORT);
+        setIsRecyclable(true);
+    }
 
-        //mDescription.setAlpha(alphaStart);
-        //mDescription.animate().alpha(alphaEnd).start();
+    private void setStateListenedCollapsed() {
+        setTextColor(true);
+        setButtonsVisibility(true, false);
+        setDescriptionLength(GONE);
+        setIsRecyclable(true);
+    }
 
-        //ViewCompat.animate(mDescription).alpha(alphaEnd).start();
+    private void setTextColor(boolean argFaded) {
+        int textColor = argFaded ? mFadedColor : mPrimaryColor;
+        mTitle.setTextColor(textColor);
+        mDescription.setTextColor(textColor);
+    }
 
-        argParent.updateViewLayout(mTitle, params);
+    private void setButtonsVisibility(boolean argDownloadVisible, boolean argQueueVisible) {
+        int downloadVisibility = argDownloadVisible ? View.VISIBLE : View.INVISIBLE;
+        int queueVisibility = argQueueVisible ? View.VISIBLE : View.GONE;
+        mDownloadButton.setVisibility(downloadVisibility);
+        mQueueButton.setVisibility(queueVisibility);
+    }
 
-        //if (Build.VERSION.SDK_INT >= 17) {
-        //    LayoutTransition transition = argParent.getLayoutTransition();
-        //    transition.enableTransitionType(LayoutTransition.CHANGING);
-        //}
+    private void setDescriptionLength(@DescriptionLength int argLength) {
+        switch (argLength) {
+            case GONE: {
+                mDescription.setVisibility(View.GONE);
+                break;
+            }
+            case SHORT: {
+                int lines = mDescription.getResources().getInteger(R.integer.feed_activity_description_lines_default);
+                mDescription.setMaxLines(lines);
+                mDescription.setEllipsize(TextUtils.TruncateAt.END);
+                mDescription.setVisibility(View.VISIBLE);
+                break;
+            }
+            case LONG: {
+                mDescription.setMaxLines(Integer.MAX_VALUE);
+                mDescription.setEllipsize(null);
+                mDescription.setVisibility(View.VISIBLE);
+                break;
+            }
+        }
     }
 }
