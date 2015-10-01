@@ -80,13 +80,19 @@
         android:layout_alignRight="@id/title"
         />
 
+    <!--
+        android:maxHeight="80dp"
+        -->
     <TextView
         android:id="@+id/episode_description"
-        android:visibility="gone"
-        android:textColor="@color/black"
+        android:visibility="visible"
         android:textSize="14sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:maxLines="@integer/feed_activity_description_lines_default"
+        android:fadingEdge="vertical"
+        android:fadingEdgeLength="70dp"
+        android:ellipsize="end"
         android:text="Podcast Description"
         android:layout_below="@id/subtitle"
         android:layout_toLeftOf="@+id/feedview_download_button"

@@ -18,6 +18,7 @@
     <!-- Feed View - Start -->
     <dimen name="feed_activity_setting_caption_width">70dp</dimen>
     <dimen name="feed_activity_setting_control_width">30dp</dimen>
+    <integer name="feed_activity_description_lines_default">3</integer>
     <!-- Feed View - End -->
 
     <dimen name="playlist_margin">1px</dimen>

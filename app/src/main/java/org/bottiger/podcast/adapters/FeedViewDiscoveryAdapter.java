@@ -5,11 +5,11 @@ import android.database.Cursor;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
+import org.bottiger.podcast.activities.feedview.EpisodeViewHolder;
 import org.bottiger.podcast.activities.feedview.FeedViewAdapter;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.provider.IEpisode;
@@ -31,7 +31,7 @@ public class FeedViewDiscoveryAdapter extends FeedViewAdapter {
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+    public EpisodeViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         return super.onCreateViewHolder(viewGroup, i);
     }
 
@@ -61,7 +61,7 @@ public class FeedViewDiscoveryAdapter extends FeedViewAdapter {
     protected void bindButtons(@NonNull EpisodeViewHolder episodeViewHolder, @NonNull IEpisode argEpisode) {
 
         //episodeViewHolder.mDescription.setVisibility(View.VISIBLE);
-        episodeViewHolder.IsExpanded = true;
+        episodeViewHolder.DisplayDescription = true;
         episodeViewHolder.modifyLayout((RelativeLayout)episodeViewHolder.itemView);
 
         episodeViewHolder.mPlayPauseButton.setEpisode(argEpisode, PlayPauseImageView.DISCOVERY_FEEDVIEW);

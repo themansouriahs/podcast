@@ -18,7 +18,7 @@ public class ColorUtils {
     }
 
     public static @ColorInt int getFadedTextColor(@NonNull Context argContext) {
-        return getColor(argContext, R.attr.themeTextColorPrimary);
+        return getColor(argContext, R.attr.themeTextColorFaded);
     }
 
     public static @ColorInt int getBackgroundColor(@NonNull Context argContext) {

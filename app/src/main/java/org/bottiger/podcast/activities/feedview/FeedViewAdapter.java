@@ -1,24 +1,18 @@
 package org.bottiger.podcast.activities.feedview;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
-import android.os.Build;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
-import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
@@ -30,22 +24,16 @@ import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.utils.ColorUtils;
 import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.SharedAdapterUtils;
-import org.bottiger.podcast.utils.StrUtils;
-import org.bottiger.podcast.utils.ThemeHelper;
-import org.bottiger.podcast.utils.UIUtils;
-import org.bottiger.podcast.views.DownloadButtonView;
-import org.bottiger.podcast.views.FeedViewQueueButton;
 import org.bottiger.podcast.views.PlayPauseImageView;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Date;
-import java.util.Formatter;
 
 /**
  * Created by apl on 02-09-2014.
  */
-public class FeedViewAdapter extends RecyclerView.Adapter {
+public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({RECENT_FIRST, OLDEST_FIRST})
@@ -90,18 +78,18 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+    public EpisodeViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View view = mInflater.inflate(R.layout.feed_view_list_episode, viewGroup, false);
         return new EpisodeViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
+    public void onBindViewHolder(EpisodeViewHolder viewHolder, int position) {
         int dataPosition = getDatasetPosition(position);
         final IEpisode item = getItemForPosition(dataPosition);
-        final EpisodeViewHolder episodeViewHolder = (EpisodeViewHolder) viewHolder;
+        final EpisodeViewHolder episodeViewHolder = viewHolder;
 
-        SharedAdapterUtils.AddPaddingToLastElement(((EpisodeViewHolder) viewHolder).mContainer, 0, position == getItemCount()-1);
+        SharedAdapterUtils.AddPaddingToLastElement((viewHolder).mContainer, 0, position == getItemCount()-1);
 
         if (item == null) {
             VendorCrashReporter.report("FeedViewAdapter", "item is null for: " + mSubscription);
@@ -109,13 +97,15 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
         }
 
         Context context = SoundWaves.getAppContext();
-        int color = item.isMarkedAsListened() ? ColorUtils.getTextColor(context) : ColorUtils.getFadedTextColor(context);
+        int color = !item.isMarkedAsListened() ? ColorUtils.getTextColor(context) : ColorUtils.getFadedTextColor(context);
 
-        episodeViewHolder.mText.setText(item.getTitle());
-        episodeViewHolder.mText.setTextColor(color);
+        episodeViewHolder.mTitle.setText(item.getTitle());
+        episodeViewHolder.mTitle.setTextColor(color);
 
         episodeViewHolder.mDescription.setText(item.getDescription());
         episodeViewHolder.mDescription.setTextColor(color);
+
+        episodeViewHolder.IsMarkedAsListened = item.isMarkedAsListened();
 
         android.text.format.Formatter formatter = new android.text.format.Formatter();
         mStringBuilder.setLength(0);
@@ -133,9 +123,14 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
 
         episodeViewHolder.mTextSecondary.setText(mStringBuilder.toString());
 
-        if (mIsExpanded != episodeViewHolder.IsExpanded) {
-            episodeViewHolder.IsExpanded = mIsExpanded;
-            episodeViewHolder.modifyLayout((RelativeLayout)viewHolder.itemView);
+        if (mIsExpanded != episodeViewHolder.DisplayDescription) {
+            episodeViewHolder.DisplayDescription = mIsExpanded;
+        }
+
+        if (mIsExpanded && !item.isMarkedAsListened()) {
+            episodeViewHolder.modifyLayout((RelativeLayout) viewHolder.itemView);
+        } else {
+            episodeViewHolder.mDescription.setVisibility(View.GONE);
         }
 
         bindButtons(episodeViewHolder, item);
@@ -188,21 +183,21 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
     }
 
     @Override
-    public void onViewAttachedToWindow (RecyclerView.ViewHolder holder) {
+    public void onViewAttachedToWindow (EpisodeViewHolder holder) {
         super.onViewAttachedToWindow(holder);
         final EpisodeViewHolder episodeViewHolder = (EpisodeViewHolder) holder;
         SoundWaves.getBus().register(episodeViewHolder.mDownloadButton);
     }
 
     @Override
-    public void  onViewDetachedFromWindow(RecyclerView.ViewHolder holder) {
+    public void  onViewDetachedFromWindow(EpisodeViewHolder holder) {
         final EpisodeViewHolder episodeViewHolder = (EpisodeViewHolder) holder;
         SoundWaves.getBus().unregister(episodeViewHolder.mDownloadButton);
         super.onViewDetachedFromWindow(holder);
     }
 
     @Override
-    public void onViewRecycled(RecyclerView.ViewHolder viewHolder) {
+    public void onViewRecycled(EpisodeViewHolder viewHolder) {
         final EpisodeViewHolder episodeViewHolder = (EpisodeViewHolder) viewHolder;
         //mDownloadProgressObservable.unregisterObserver(episodeViewHolder.mDownloadButton);
         episodeViewHolder.mDownloadButton.unsetEpisodeId();
@@ -231,79 +226,6 @@ public class FeedViewAdapter extends RecyclerView.Adapter {
 
         int position = argPosition;
         return getItemCount() - position -1;
-    }
-
-    public class EpisodeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
-        public ViewGroup mContainer;
-        public TextView mText;
-        public TextView mTextSecondary;
-        public TextView mDescription;
-        public PlayPauseImageView mPlayPauseButton;
-        public FeedViewQueueButton mQueueButton;
-        public DownloadButtonView mDownloadButton;
-
-        public boolean IsExpanded = false;
-
-        @SuppressLint("WrongViewCast")
-        public EpisodeViewHolder(View view) {
-            super(view);
-            view.setOnClickListener(this);
-
-            mContainer = (ViewGroup) view.findViewById(R.id.group);
-            mText = (TextView) view.findViewById(R.id.title);
-            mTextSecondary = (TextView) view.findViewById(R.id.subtitle);
-            mDescription = (TextView) view.findViewById(R.id.episode_description);
-            mPlayPauseButton = (PlayPauseImageView) view.findViewById(R.id.play_pause_button);
-            mQueueButton = (FeedViewQueueButton) view.findViewById(R.id.queue_button);
-            mDownloadButton = (DownloadButtonView) view.findViewById(R.id.feedview_download_button);
-        }
-
-
-        @Override
-        public void onClick(View view) {
-        }
-
-        public void modifyLayout(@NonNull ViewGroup argParent) {
-
-
-            //if (Build.VERSION.SDK_INT >= 19) {
-            //    TransitionManager.beginDelayedTransition(argParent);
-            //}
-
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mText.getLayoutParams();
-
-            if (IsExpanded) {
-                if (Build.VERSION.SDK_INT >= 17) {
-                    params.removeRule(RelativeLayout.CENTER_VERTICAL);
-                } else {
-                    params.addRule(RelativeLayout.CENTER_VERTICAL, 0);
-                }
-            } else {
-                params.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
-            }
-
-            //mText.setLayoutParams(params);
-
-            int visibility = IsExpanded ? View.VISIBLE : View.INVISIBLE;
-            float alphaStart = IsExpanded ? 0.0f : 1.0f;
-            float alphaEnd = IsExpanded ? 1.0f : 0.0f;
-
-            mDescription.setVisibility(visibility);
-            mQueueButton.setVisibility(visibility);
-
-            mDescription.setAlpha(alphaStart);
-            //mDescription.animate().alpha(alphaEnd).start();
-
-            ViewCompat.animate(mDescription).alpha(alphaEnd).start();
-
-            argParent.updateViewLayout(mText, params);
-
-            //if (Build.VERSION.SDK_INT >= 17) {
-            //    LayoutTransition transition = argParent.getLayoutTransition();
-            //    transition.enableTransitionType(LayoutTransition.CHANGING);
-            //}
-        }
     }
 
     public void setPalette(@NonNull Palette argPalette) {
