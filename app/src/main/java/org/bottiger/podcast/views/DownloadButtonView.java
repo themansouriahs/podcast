@@ -21,6 +21,8 @@ import org.bottiger.podcast.listeners.DownloadProgress;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
+import org.bottiger.podcast.utils.ColorUtils;
+import org.bottiger.podcast.utils.ThemeHelper;
 
 /**
  * Created by apl on 02-09-2014.
@@ -142,7 +144,7 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
             if (getState() != PlayerButtonView.STATE_DEFAULT) {
                 setState(PlayerButtonView.STATE_DEFAULT);
             }
-            canvas.drawArc(buttonRectangle, -90, Math.round(360 * mProgress / 100F), false, foregroundColorPaint);
+            canvas.drawArc(buttonRectangle, -90, Math.round(360 * mProgress / 100F), false, mForegroundColorPaint);
         }
 
         mLastProgress = mProgress;

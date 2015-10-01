@@ -38,6 +38,7 @@ import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.utils.ColorUtils;
 import org.bottiger.podcast.utils.UIUtils;
 
 import java.lang.annotation.Retention;
@@ -569,7 +570,8 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
 
     @Override
     public void onPaletteFound(Palette argChangedPalette) {
-        mBackgroundColor = StaticButtonColor(mContext, argChangedPalette);
+        int color = ColorUtils.getBackgroundColor(getContext());
+        mBackgroundColor = StaticButtonColor(mContext, argChangedPalette, color);
         setBackgroundColor(mBackgroundColor);
         invalidate();
     }

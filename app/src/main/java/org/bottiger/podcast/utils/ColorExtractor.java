@@ -1,6 +1,7 @@
 package org.bottiger.podcast.utils;
 
 import android.content.Context;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.graphics.Palette;
@@ -12,25 +13,43 @@ import org.bottiger.podcast.R;
  */
 public class ColorExtractor {
 
-    private int mPrimary       = -1;
-    private int mPrimaryTint   = -1;
-    private int mSecondary     = -1;
-    private int mSecondaryTint = -1;
+    private @ColorInt int mBaseColor      = -1;
 
-    private int mTextColor     = -1;
+    private @ColorInt int mPrimary       = -1;
+    private @ColorInt int mPrimaryTint   = -1;
+    private @ColorInt int mSecondary     = -1;
+    private @ColorInt int mSecondaryTint = -1;
+
+    private @ColorInt int mTextColor     = -1;
 
     private Context mContext;
 
     public ColorExtractor(@Nullable Palette argPalette) {
-        init(argPalette);
+        init(argPalette, -1);
+    }
+
+    public ColorExtractor(@Nullable Palette argPalette, @ColorInt int argBaseColor) {
+        init(argPalette, argBaseColor);
     }
 
     public ColorExtractor(@NonNull Context argContext, @Nullable Palette argPalette) {
         mContext = argContext;
-        init(argPalette);
+        init(argPalette, -1);
     }
 
-    private void init(@Nullable Palette argPalette) {
+    public ColorExtractor(@NonNull Context argContext, @Nullable Palette argPalette, @ColorInt int argBaseColor) {
+        mContext = argContext;
+        init(argPalette, argBaseColor);
+    }
+
+    private void init(@Nullable Palette argPalette, @ColorInt int argBaseColor) {
+        mBaseColor = argBaseColor;
+
+        mPrimary = mBaseColor;
+        mPrimaryTint = mBaseColor;
+        mSecondary = mBaseColor;
+        mSecondaryTint = mBaseColor;
+
         loadPrimaryColor(argPalette);
         loadPrimaryTintColor(argPalette);
         loadSecondaryColor(argPalette);
@@ -38,22 +57,27 @@ public class ColorExtractor {
         loadTextColor(argPalette);
     }
 
+    @ColorInt
     public int getPrimary() {
         return mPrimary;
     }
 
+    @ColorInt
     public int getPrimaryTint() {
         return mPrimaryTint;
     }
 
+    @ColorInt
     public int getSecondary() {
         return mSecondary;
     }
 
+    @ColorInt
     public int getSecondaryTint() {
         return mSecondaryTint;
     }
 
+    @ColorInt
     public int getTextColor() {
         return mTextColor;
     }
@@ -93,7 +117,7 @@ public class ColorExtractor {
     private int getColor(@Nullable Palette.Swatch argSwatch, int defaultColorResource) {
         if (argSwatch == null) {
             if (mContext == null)
-                return -1;
+                return mBaseColor;
 
             return mContext.getResources().getColor(defaultColorResource);
         }
