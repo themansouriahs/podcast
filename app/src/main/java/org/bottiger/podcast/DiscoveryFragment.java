@@ -357,8 +357,12 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
                 }
             }
 
-            updateSpinnerValues(mSpinnerByAuthor);
-            setQueryHint();
+            // FIXME: I do not fully understand why this is needed
+            // bug: 5600e81488f8ad5351d0bdd7
+            if (isAdded()) {
+                updateSpinnerValues(mSpinnerByAuthor);
+                setQueryHint();
+            }
         }
     }
 
