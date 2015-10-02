@@ -4,8 +4,7 @@
     android:id="@+id/group"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="5dp"
-    android:animateLayoutChanges="true">
+    android:layout_margin="5dp">
 
     <org.bottiger.podcast.views.PlayPauseImageView
         android:id="@+id/play_pause_button"
@@ -16,11 +15,9 @@
 
     <org.bottiger.podcast.views.DownloadButtonView
         android:id="@+id/feedview_download_button"
-        android:src="@drawable/av_download_dark"
-        android:background="@color/transparent"
+        android:background="@null"
         android:layout_alignParentRight="true"
         android:padding="10dp"
-        android:scaleType="fitCenter"
         android:layout_marginLeft="5dp"
         style="@style/SmallFeedViewPlayPauseButton" />
 
@@ -29,22 +26,19 @@
             android:visibility="gone"
             android:src="@drawable/ic_add_white"
             android:layout_below="@id/feedview_download_button"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="12dp"
-            android:padding="5dp"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
+            android:layout_alignLeft="@id/feedview_download_button"
+            android:layout_alignRight="@id/feedview_download_button"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:animateLayoutChanges="true"/>
+
     <!--
-                android:layout_marginRight="5dp"
-     style="@style/FeedViewPlayPauseButton"
-    -->
-
-
-
+            android:textColor="?attr/themeTextColorPrimary"
+            -->
     <TextView
         android:id="@+id/title"
-        android:textColor="@color/black"
         android:textSize="16sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -67,6 +61,9 @@
         android:layout_below="@id/title"
         />
 
+    <!--
+            android:textColor="?attr/themeTextColorFaded"
+    -->
     <TextView
         android:id="@+id/subtitle"
         android:layout_width="wrap_content"
@@ -82,13 +79,19 @@
         android:layout_alignRight="@id/title"
         />
 
+    <!--
+        android:maxHeight="80dp"
+        -->
     <TextView
         android:id="@+id/episode_description"
-        android:visibility="gone"
-        android:textColor="@color/black"
+        android:visibility="visible"
         android:textSize="14sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:maxLines="@integer/feed_activity_description_lines_default"
+        android:fadingEdge="vertical"
+        android:fadingEdgeLength="70dp"
+        android:ellipsize="end"
         android:text="Podcast Description"
         android:layout_below="@id/subtitle"
         android:layout_toLeftOf="@+id/feedview_download_button"

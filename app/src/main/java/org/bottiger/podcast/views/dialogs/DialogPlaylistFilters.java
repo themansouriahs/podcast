@@ -3,7 +3,6 @@ package org.bottiger.podcast.views.dialogs;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -14,7 +13,6 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.util.LongSparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
@@ -22,16 +20,13 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
 
 import org.bottiger.podcast.ApplicationConfiguration;
-import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.adapters.PlaylistContentSpinnerAdapter;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.playlist.PlaylistData;
 import org.bottiger.podcast.playlist.filters.SubscriptionFilter;
@@ -156,11 +151,11 @@ public class DialogPlaylistFilters extends DialogFragment {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 PlaylistData pd = new PlaylistData();
                 if (position == 0) {
-                    //playlist.setSortOrder(Playlist.SORT.DATE_NEW); // new first
-                    pd.sortOrder = Playlist.SORT.DATE_NEW; // new first
+                    //playlist.setSortOrder(Playlist.SORT.DATE_NEW_FIRST); // new first
+                    pd.sortOrder = Playlist.DATE_NEW_FIRST; // new first
                 } else {
-                    //playlist.setSortOrder(Playlist.SORT.DATE_OLD); // old first
-                    pd.sortOrder = Playlist.SORT.DATE_OLD;  // old first
+                    //playlist.setSortOrder(Playlist.SORT.DATE_OLD_FIRST); // old first
+                    pd.sortOrder = Playlist.DATE_OLD_FIRST;  // old first
                 }
                 SoundWaves.getBus().post(pd);
             }
@@ -191,10 +186,10 @@ public class DialogPlaylistFilters extends DialogFragment {
     private void setPlaylistFilters() {
         switch (mRadioGroup.getCheckedRadioButtonId()) {
             case R.id.radioNone:
-                mSubscriptionFilter.setMode(SubscriptionFilter.MODE.SHOW_NONE, getContext());
+                mSubscriptionFilter.setMode(SubscriptionFilter.SHOW_NONE, getContext());
                 break;
             case R.id.radioAll:
-                mSubscriptionFilter.setMode(SubscriptionFilter.MODE.SHOW_ALL, getContext());
+                mSubscriptionFilter.setMode(SubscriptionFilter.SHOW_ALL, getContext());
                 break;
             case R.id.radioCustom: {
                 mSubscriptionFilter.clear();
@@ -205,7 +200,7 @@ public class DialogPlaylistFilters extends DialogFragment {
                         mSubscriptionFilter.add(subscription.getId());
                     }
                 }
-                mSubscriptionFilter.setMode(SubscriptionFilter.MODE.SHOW_SELECTED, getContext());
+                mSubscriptionFilter.setMode(SubscriptionFilter.SHOW_SELECTED, getContext());
                 break;
             }
         }

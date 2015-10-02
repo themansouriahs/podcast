@@ -7,66 +7,132 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.TopActivity;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
-import org.bottiger.podcast.flavors.Analytics.VendorAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.parser.opml.OpmlElement;
 import org.bottiger.podcast.parser.opml.OpmlReader;
 import org.bottiger.podcast.parser.opml.OpmlWriter;
 import org.bottiger.podcast.provider.DatabaseHelper;
-import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionLoader;
 import org.xmlpull.v1.XmlPullParserException;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.res.Resources;
+import android.support.annotation.NonNull;
+import android.support.annotation.RequiresPermission;
 import android.support.v4.util.LongSparseArray;
 import android.util.Log;
-import android.util.SparseArray;
 import android.widget.Toast;
 
 public class OPMLImportExport {
 
-	public static final String filename = "podcasts.opml";
-    public static final String filenameOut = "podcasts_export.opml";
+	private static final String filename = "podcasts.opml";
+	private static final String filenameOut = "podcasts_export.opml";
 
-	public static final File file = new File(SDCardManager.getSDCardDir() + "/"
-			+ filename);
-    public static final File fileOut = new File(SDCardManager.getExportDir() + "/"
-            + filenameOut);
-	private static CharSequence opmlNotFound;
-    private static CharSequence opmlFailedToExport;
-    private static CharSequence opmlSuccesfullyExported;
+	public File file;
+	public File fileOut;
+	private CharSequence opmlNotFound;
+	private CharSequence opmlFailedToExport;
+	private CharSequence opmlSuccesfullyExported;
 
-	private static String nSubscriptionsImported;
-
-	private Context mContext;
+	private Activity mActivity;
 	private ContentResolver contentResolver;
 	private DatabaseHelper mUpdater = new DatabaseHelper();
 
-	public OPMLImportExport(Context context) {
-		this.mContext = context;
-		this.contentResolver = context.getContentResolver();
+    @RequiresPermission(allOf = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE})
+	public OPMLImportExport(Activity argActivity) {
+		this.mActivity = argActivity;
+		this.contentResolver = argActivity.getContentResolver();
 
-        Resources res = mContext.getResources();
-        opmlNotFound = String.format(res.getString(R.string.opml_not_found), filename);
-        opmlFailedToExport = res.getString(R.string.opml_export_failed);
-        opmlSuccesfullyExported = String.format(res.getString(R.string.opml_export_succes), fileOut);
+		initInputOutputFiles();
+
+		Resources res = mActivity.getResources();
+		opmlNotFound = String.format(res.getString(R.string.opml_not_found), filename);
+		opmlFailedToExport = res.getString(R.string.opml_export_failed);
+		opmlSuccesfullyExported = String.format(res.getString(R.string.opml_export_succes), fileOut);
+	}
+
+	@RequiresPermission(allOf = {
+			Manifest.permission.READ_EXTERNAL_STORAGE,
+			Manifest.permission.WRITE_EXTERNAL_STORAGE})
+	public List<SlimSubscription> readSubscriptionsFromOPML(@NonNull File argOPMLFile) {
+
+		int numImported = 0;
+		BufferedReader reader;
+		ArrayList<OpmlElement> elements = new ArrayList<>();
+		LinkedList<SlimSubscription> opmlSubscriptions = new LinkedList<>();
+
+		try {
+			reader = new BufferedReader(new FileReader(argOPMLFile));
+
+			OpmlReader omplReader = new OpmlReader();
+			elements = omplReader.readDocument(reader);
+		} catch (FileNotFoundException e) {
+			toastMsg(opmlNotFound);
+		} catch (XmlPullParserException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		for (int i = 0; i < elements.size(); i++) {
+			OpmlElement element = elements.get(i);
+
+			String url = element.getXmlUrl();
+			String title = element.getText();
+
+			URL parsedUrl = null;
+			try {
+				parsedUrl = new URL(url);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+				continue;
+			}
+
+			SlimSubscription slimSubscription = new SlimSubscription(title, parsedUrl, null);
+
+			// Test we if already have the item in out database.
+			// If not we add it.
+			boolean isAlreadySubscribed = false;
+			Subscription subscription = SubscriptionLoader.getByUrl(contentResolver, url);
+			if (subscription != null && subscription.status == Subscription.STATUS_SUBSCRIBED) {
+				isAlreadySubscribed = true;
+			}
+
+			slimSubscription.setIsSubscribed(isAlreadySubscribed);
+			opmlSubscriptions.add(slimSubscription);
+		}
+
+		//return opmlSubscriptions.toArray(new SlimSubscription[opmlSubscriptions.size()]);
+		return opmlSubscriptions;
 	}
 
 	public int importSubscriptions() {
 		int numImported = 0;
 		BufferedReader reader;
+
+		if (!initInputOutputFiles()) {
+			return 0;
+		}
+
 		try {
 			reader = new BufferedReader(new FileReader(file));
 
@@ -86,7 +152,7 @@ public class OPMLImportExport {
 		}
 
 		if (numImported > 0) {
-            Resources res = mContext.getResources();
+			Resources res = mActivity.getResources();
             String formattedString = res.getQuantityString(R.plurals.subscriptions_imported, numImported, numImported);
             toastMsg(formattedString);
             SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.OPML_IMPORT);
@@ -114,7 +180,7 @@ public class OPMLImportExport {
 				subscription.url = url;
 				if (title != null && !title.equals(""))
 					subscription.setTitle(title);
-				subscription.subscribe(mContext);
+				subscription.subscribe(mActivity);
 				isAdded = true;
 			} else if (subscription.getStatus() == Subscription.STATUS_UNSUBSCRIBED) {
 				subscription.status = Subscription.STATUS_SUBSCRIBED;
@@ -133,7 +199,7 @@ public class OPMLImportExport {
             mUpdater.commit(contentResolver);
 
             for (Subscription insertedSubscription : importedSubscriptions) {
-                insertedSubscription.refreshAsync(mContext);
+                insertedSubscription.refreshAsync(mActivity);
             }
         }
 
@@ -143,8 +209,8 @@ public class OPMLImportExport {
 	private void toastMsg(final CharSequence msg) {
         Activity activity = null;
 
-        if (mContext instanceof Activity) {
-            activity = (Activity)mContext;
+        if (mActivity instanceof Activity) {
+            activity = (Activity) mActivity;
         }
 
         if (activity == null) return;
@@ -153,12 +219,17 @@ public class OPMLImportExport {
             @Override
             public void run() {
                 int duration = Toast.LENGTH_LONG;
-                Toast.makeText(mContext, msg, duration).show();
+                Toast.makeText(mActivity, msg, duration).show();
             }
         });
 	}
 
     public void exportSubscriptions() {
+
+        if (!initInputOutputFiles()) {
+            return;
+        }
+
         FileWriter fileWriter = null;
 
         try {
@@ -202,5 +273,50 @@ public class OPMLImportExport {
 		}
 
 		return sw.toString();
+	}
+
+    @NonNull
+    public static String getFilename() {
+        return filename;
+    }
+
+	/**
+	 *
+	 * @return true if everything is OK. Returns false if there was an IOException
+	 * @throws SecurityException
+	 */
+	@RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+	private boolean initInputOutputFiles() throws SecurityException {
+
+		if (file != null && fileOut != null)
+			return true;
+
+		try {
+			file = new File(SDCardManager.getSDCardRootDir() + "/" + filename);
+			fileOut = new File(SDCardManager.getExportDir() + "/" + filenameOut);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+
+		return true;
+	}
+
+	public File getExportFile() {
+		initInputOutputFiles();
+		return fileOut;
+	}
+
+	public File getImportFile() {
+		initInputOutputFiles();
+		return file;
+	}
+
+	public static String getImportFilename() {
+		return filename;
+	}
+
+	public static String getExportFilename() {
+		return filenameOut;
 	}
 }

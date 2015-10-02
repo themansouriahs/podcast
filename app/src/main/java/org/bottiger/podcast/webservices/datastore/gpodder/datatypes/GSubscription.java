@@ -32,4 +32,9 @@ public class GSubscription {
     public String getLogoUrl() {
         return logo_url != null ? logo_url : "";
     }
+
+    @NonNull
+    public void setUrl(String argUrl) {
+        this.url = argUrl;
+    }
 }

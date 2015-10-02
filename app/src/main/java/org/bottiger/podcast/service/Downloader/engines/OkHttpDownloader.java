@@ -5,17 +5,20 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.SparseArray;
+import android.webkit.MimeTypeMap;
 
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.OkUrlFactory;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.MalformedInputException;
 import java.util.HashSet;
 
 import org.bottiger.podcast.SoundWaves;
@@ -34,7 +37,7 @@ public class OkHttpDownloader extends DownloadEngineBase {
     private HttpURLConnection mConnection;
     private final SparseArray<Callback> mExternalCallback = new SparseArray<>();
 
-    private URL mURL;
+    private final URL mURL;
 
     private double mProgress = 0;
 
@@ -56,8 +59,10 @@ public class OkHttpDownloader extends DownloadEngineBase {
                     if (mEpisode instanceof FeedItem) {
                         FeedItem episode = (FeedItem) mEpisode;
 
+                        String extension = MimeTypeMap.getFileExtensionFromUrl(mURL.toString());
+
                         String filename = Integer.toString(episode.getEpisodeNumber()) + episode.title.replace(' ', '_'); //Integer.toString(item.getEpisodeNumber()) + "_"
-                        episode.setFilename(filename + ".mp3"); // .replaceAll("[^a-zA-Z0-9_-]", "") +
+                        episode.setFilename(filename + "." + extension); // .replaceAll("[^a-zA-Z0-9_-]", "") +
 
                         double contentLength = mConnection.getContentLength();
                         InputStream inputStream = mConnection.getInputStream();
@@ -77,9 +82,11 @@ public class OkHttpDownloader extends DownloadEngineBase {
                         File tmpFIle = new File(episode.getAbsoluteTmpPath());
                         File finalFIle = new File(episode.getAbsolutePath());
 
-                        Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                        intent.setData(Uri.fromFile(finalFIle));
-                        SoundWaves.getAppContext().sendBroadcast(intent);
+                        // This seems to be done in the sDownloadCompleteCallback
+                        //
+                        //Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                        //intent.setData(Uri.fromFile(finalFIle));
+                        //SoundWaves.getAppContext().sendBroadcast(intent);
 
                         EpisodeDownloadManager.mDownloadingItem = null;
 
@@ -88,7 +95,8 @@ public class OkHttpDownloader extends DownloadEngineBase {
                             tmpFIle.renameTo(finalFIle);
                             onSucces(finalFIle);
                         } else {
-                            onFailure(null);
+                            String msg = "Wrong file size. Expected: " + tmpFIle.length() + ", got: " + contentLength; // NoI18N
+                            onFailure(new FileNotFoundException(msg));
                         }
                     }
 

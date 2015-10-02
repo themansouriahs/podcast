@@ -4,42 +4,52 @@ import org.bottiger.podcast.adapters.PlaylistAdapter;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
-import org.bottiger.podcast.listeners.RecyclerItemTouchListener;
 import org.bottiger.podcast.playlist.Playlist;
+import org.bottiger.podcast.playlist.filters.SubscriptionFilter;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
-import org.bottiger.podcast.provider.ISubscription;
-import org.bottiger.podcast.service.IDownloadCompleteCallback;
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
+import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.utils.ColorExtractor;
+import org.bottiger.podcast.utils.ImageLoaderUtils;
 import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.StrUtils;
+import org.bottiger.podcast.utils.UIUtils;
+import org.bottiger.podcast.views.CustomLinearLayoutManager;
 import org.bottiger.podcast.views.DownloadButtonView;
 import org.bottiger.podcast.views.PlayPauseImageView;
 import org.bottiger.podcast.views.PlayerButtonView;
 import org.bottiger.podcast.views.PlayerSeekbar;
-import org.bottiger.podcast.views.SwipeDismissRecyclerViewTouchListener;
+import org.bottiger.podcast.views.PlaylistViewHolder;
+import org.bottiger.podcast.views.SquareImageViewFresco;
 import org.bottiger.podcast.views.TextViewObserver;
 import org.bottiger.podcast.views.TopPlayer;
-import org.bottiger.podcast.views.MultiShrink.playlist.MultiShrinkScroller;
 import org.bottiger.podcast.views.dialogs.DialogBulkDownload;
 import org.bottiger.podcast.views.dialogs.DialogPlaylistFilters;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.net.Uri;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.graphics.Palette;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -50,31 +60,31 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
+import android.widget.FrameLayout;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
-import com.facebook.drawee.view.SimpleDraweeView;
 import com.squareup.otto.Produce;
 import com.squareup.otto.Subscribe;
 
-import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
+public class PlaylistFragment extends AbstractEpisodeFragment implements OnSharedPreferenceChangeListener,
+                                                                        DrawerActivity.TopFound {
 
-public class PlaylistFragment extends GeastureFragment implements
-		OnSharedPreferenceChangeListener, IDownloadCompleteCallback
-         {
-
-	public final static int SUBSCRIPTION_CONTEXT_MENU = 1;
+    private static final String TAG = "PlaylistFragment";
 
     private static final String PLAYLIST_WELCOME_DISMISSED = "playlist_welcome_dismissed";
     private static final boolean PLAYLIST_WELCOME_DISMISSED_DEFAULT = false;
 
     private View mPlaylistContainer;
     private View mPlaylistWelcomeContainer;
-    private View mPlaylistEmptyContainer;
 
-    private MultiShrinkScroller mMultiShrinkScroller;
+    private View mPlaylistEmptyContainer;
+    private RadioButton mPopulateManually;
+    private RadioButton mPopulateAutomatically;
 
     private TopPlayer mTopPlayer;
-    private SimpleDraweeView mPhoto;
+    private SquareImageViewFresco mPhoto;
 
     private TextView mEpisodeTitle;
     private TextView mEpisodeInfo;
@@ -85,8 +95,11 @@ public class PlaylistFragment extends GeastureFragment implements
     private DownloadButtonView mPlayerDownloadButton;
     private PlayerButtonView mForwardButton;
     private PlayerButtonView mBackButton;
-    private PlayerButtonView mDownloadButton;
     private PlayerButtonView mFavoriteButton;
+    private View mGradientBottomTopPlayer;
+
+    private RecyclerView mRecyclerView;
+    private View mOverlay;
 
 	private SharedPreferences.OnSharedPreferenceChangeListener spChanged;
 
@@ -94,21 +107,29 @@ public class PlaylistFragment extends GeastureFragment implements
 	private long mExpandedEpisodeId = -1;
 	private String mExpandedEpisodeKey = "currentExpanded";
 
+	// ItemTouchHelperResources
+    private Paint mSwipePaint = new Paint();
+    private Paint mSwipeIconPaint = new Paint();
+    private Bitmap mSwipeIcon;
+    private int mSwipeBgColor = R.color.colorBgPrimaryDark;
+    private int mSwipeIconID = R.drawable.ic_hearing_white;
+
     DownloadProgressObservable mDownloadProgressObservable = null;
 
     private Playlist mPlaylist;
-    private Activity mActivity;
+    private Context mContext;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        mDownloadProgressObservable = new DownloadProgressObservable((SoundWaves)mActivity.getApplicationContext());
+        mDownloadProgressObservable = new DownloadProgressObservable((SoundWaves) mContext.getApplicationContext());
+        int color = getResources().getColor(mSwipeBgColor);
+        mSwipePaint.setColor(color);
+        mSwipeIcon = BitmapFactory.decodeResource(getResources(), mSwipeIconID);
         super.onCreate(savedInstanceState);
-        //SoundWaves.getBus().register(this);
     }
 
     @Override
     public void onDestroy() {
-        //SoundWaves.getBus().unregister(this);
         super.onDestroy();
     }
 
@@ -122,19 +143,13 @@ public class PlaylistFragment extends GeastureFragment implements
         super.onDestroyView();
     }
 
-    @Produce
-    public Playlist producePlaylist() {
-        // Assuming 'lastAnswer' exists.
-        return new Playlist(mActivity);
-    }
-
 	// Read here:
 	// http://developer.android.com/reference/android/app/Fragment.html#Layout
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
+        super.onActivityCreated(savedInstanceState);
 
-        mDownloadProgressObservable = EpisodeDownloadManager.getDownloadProgressObservable((SoundWaves)mActivity.getApplicationContext());
+        mDownloadProgressObservable = EpisodeDownloadManager.getDownloadProgressObservable((SoundWaves) mContext.getApplicationContext());
 
 		TopActivity.getPreferences().registerOnSharedPreferenceChangeListener(
                 spChanged);
@@ -148,89 +163,47 @@ public class PlaylistFragment extends GeastureFragment implements
 	}
 
     @Override
-    public void onRefresh() {
-        Log.d("PlaylistRefresh", "starting");
-        mSwipeRefreshView.setRefreshing(true);
-        SoundWaves.sSubscriptionRefreshManager.refresh(null, this);
-    }
-
-    @Override
-    public void complete(boolean succes, ISubscription argSubscription) {
-        Log.d("PlaylistRefresh", "ending");
-        mSwipeRefreshView.setRefreshing(false);
-    }
-
-
-
-    @SuppressLint("WrongViewCast")
-    @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
+        //((MainActivity)getActivity()).listeners.add(this);
         super.onViewCreated(view,savedInstanceState);
 
-        mMultiShrinkScroller = (MultiShrinkScroller) mSwipeRefreshView.findViewById(R.id.playlist_container);
+        mTopPlayer =   (TopPlayer) view.findViewById(R.id.session_photo_container);
+        mPhoto =            (SquareImageViewFresco) view.findViewById(R.id.session_photo);
 
-        mTopPlayer =   (TopPlayer) mSwipeRefreshView.findViewById(R.id.session_photo_container);
-        mPhoto =            (SimpleDraweeView) mSwipeRefreshView.findViewById(R.id.session_photo);
+        mPlaylistContainer = view.findViewById(R.id.playlist_container);
+        mPlaylistWelcomeContainer = view.findViewById(R.id.playlist_welcome_screen);
 
-        mPlaylistContainer = mSwipeRefreshView.findViewById(R.id.playlist_container);
-        mPlaylistWelcomeContainer = mSwipeRefreshView.findViewById(R.id.playlist_welcome_screen);
-        mPlaylistEmptyContainer = mSwipeRefreshView.findViewById(R.id.playlist_empty);
+        mPlaylistEmptyContainer = view.findViewById(R.id.playlist_empty);
+        mPopulateManually       = (RadioButton) view.findViewById(R.id.radioNone);
+        mPopulateAutomatically  = (RadioButton) view.findViewById(R.id.radioAll);
 
-        mEpisodeTitle         =    (TextView) mSwipeRefreshView.findViewById(R.id.episode_title);
-        mEpisodeInfo         =    (TextView) mSwipeRefreshView.findViewById(R.id.episode_info);
+        mEpisodeTitle         =    (TextView) view.findViewById(R.id.episode_title);
+        mEpisodeInfo         =    (TextView) view.findViewById(R.id.episode_info);
 
-        mCurrentTime       =    (TextViewObserver) mSwipeRefreshView.findViewById(R.id.current_time);
-        mTotalTime         =    (TextViewObserver) mSwipeRefreshView.findViewById(R.id.total_time);
+        mCurrentTime       =    (TextViewObserver) view.findViewById(R.id.current_time);
+        mTotalTime         =    (TextViewObserver) view.findViewById(R.id.total_time);
 
-        mPlayPauseButton         =    (PlayPauseImageView) mSwipeRefreshView.findViewById(R.id.play_pause_button);
-        mPlayerSeekbar          =    (PlayerSeekbar) mSwipeRefreshView.findViewById(R.id.player_progress);
-        mPlayerDownloadButton   =    (DownloadButtonView) mSwipeRefreshView.findViewById(R.id.download);
-        mBackButton = (PlayerButtonView)mSwipeRefreshView.findViewById(R.id.rewind_button);
-        mForwardButton = (PlayerButtonView)mSwipeRefreshView.findViewById(R.id.fast_forward_button);
-        mDownloadButton = (PlayerButtonView)mSwipeRefreshView.findViewById(R.id.download);
-        mFavoriteButton = (PlayerButtonView)mSwipeRefreshView.findViewById(R.id.favorite);
+        mPlayPauseButton         =    (PlayPauseImageView) view.findViewById(R.id.play_pause_button);
+        mPlayerSeekbar          =    (PlayerSeekbar) view.findViewById(R.id.player_center_square);
+        mPlayerDownloadButton   =    (DownloadButtonView) view.findViewById(R.id.download);
+        mBackButton = (PlayerButtonView)view.findViewById(R.id.rewind_button);
+        mForwardButton = (PlayerButtonView)view.findViewById(R.id.fast_forward_button);
+        mFavoriteButton = (PlayerButtonView)view.findViewById(R.id.favorite);
+
+        mGradientBottomTopPlayer = view.findViewById(R.id.gradient_bottom);
+
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.my_recycler_view);
+        mOverlay = view.findViewById(R.id.playlist_overlay);
 
         setPlaylistViewState(mPlaylist);
 
-        mMultiShrinkScroller.initialize(new MultiShrinkScroller.MultiShrinkScrollerListener() {
-            @Override
-            public void onScrolledOffBottom() {
-
-            }
-
-            @Override
-            public void onStartScrollOffBottom() {
-
-            }
-
-            @Override
-            public void onTransparentViewHeightChange(float ratio) {
-
-            }
-
-            @Override
-            public void onEntranceAnimationDone() {
-
-            }
-
-            @Override
-            public void onEnterFullscreen() {
-
-            }
-
-            @Override
-            public void onExitFullscreen() {
-
-            }
-        }, true);
-
         // use a linear layout manager
-        //mLayoutManager = new ExpandableLayoutManager(mActivity, mSwipeRefreshView, mTopPlayer, mRecyclerView, mPhoto);
-        mLayoutManager = new LinearLayoutManager(mActivity);
+        //mLayoutManager = new ExpandableLayoutManager(mContext, mSwipeRefreshView, mTopPlayer, mRecyclerView, mPhoto);
+        mLayoutManager = new CustomLinearLayoutManager(mContext);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
-        mAdapter = new PlaylistAdapter(mActivity, mOverlay, mDownloadProgressObservable);
+        mAdapter = new PlaylistAdapter(getActivity(), mOverlay);
         mAdapter.setHasStableIds(true);
 
         SoundWaves.getBus().register(mAdapter);
@@ -240,154 +213,208 @@ public class PlaylistFragment extends GeastureFragment implements
 
         mRecyclerView.setAdapter(mAdapter);
 
-        //RecentItemsRecyclerListener l = new RecentItemsRecyclerListener(mAdapter);
-        //mRecyclerView.setRecyclerListener(l);
-
         if (mPlaylist != null && !mPlaylist.isEmpty()) {
             IEpisode episode = mPlaylist.first();
             bindHeader(episode);
         }
 
-        mSwipeRefreshView.fragment = this;
+        mPopulateManually.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    Playlist.changePlaylistFilter(getContext(), mPlaylist, SubscriptionFilter.SHOW_ALL);
+                }
+            }
+        });
 
-        // Build item decoration and add it to the RecyclerView
-        /*
-        InitialHeaderAdapter initialHeaderAdapter = new InitialHeaderAdapter(mPlaylist);
-        StickyHeadersItemDecoration decoration = new StickyHeadersBuilder()
-                .setAdapter(mAdapter)
-                .setRecyclerView(mRecyclerView)
-                .setStickyHeadersAdapter(
-                        initialHeaderAdapter, // Class that implements StickyHeadersAdapter
-                        true)     // Decoration position relative to a item
-                .build();
+        mPopulateAutomatically.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    Playlist.changePlaylistFilter(getContext(), mPlaylist, SubscriptionFilter.SHOW_NONE);
+                }
+            }
+        });
 
-        mRecyclerView.addItemDecoration(decoration);
-        */
+        MainActivity ms = ((MainActivity) getActivity());
+        int top = ms.getFragmentTop();
+        if (top < 0) {
+            ((MainActivity) getActivity()).listeners.add(this);
+        }
+        top = ms.getFragmentTop();
+        if (top > 0) {
+            topfound(top);
+        }
 
-        //////
+        // init swipe to dismiss logic
+        ItemTouchHelper swipeToDismissTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(
+                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT, ItemTouchHelper.RIGHT) {
 
-        mRecyclerView.addOnItemTouchListener(new RecyclerItemTouchListener());
+            @Override
+            public void onChildDraw(Canvas c,
+                                    RecyclerView recyclerView,
+                                    RecyclerView.ViewHolder viewHolder,
+                                    float dX,
+                                    float dY,
+                                    int actionState,
+                                    boolean isCurrentlyActive) {
 
-        ///////
+                if (actionState != ItemTouchHelper.ACTION_STATE_SWIPE)
+                    return;
 
-        SwipeDismissRecyclerViewTouchListener touchListener =
-                new SwipeDismissRecyclerViewTouchListener(
-                        mRecyclerView,
-                        new SwipeDismissRecyclerViewTouchListener.DismissCallbacks() {
+                PlaylistViewHolder playlistViewHolder = null;
+                if (viewHolder instanceof PlaylistViewHolder) {
+                    playlistViewHolder = (PlaylistViewHolder) viewHolder;
+                }
+
+                if (playlistViewHolder == null) {
+                    Log.wtf(TAG, "playlistViewHolder should never be null"); // NoI18N
+                    return;
+                }
+
+                // http://stackoverflow.com/questions/30820806/adding-a-colored-background-with-text-icon-under-swiped-row-when-using-androids
+                View itemView = viewHolder.itemView;
+
+                int color = playlistViewHolder.hasColor() ? playlistViewHolder.getEpisodePrimaryColor() : getResources().getColor(R.color.colorBgPrimary);
+                mSwipePaint.setColor(color);
+
+                c.drawRect((float) itemView.getLeft(), (float) itemView.getTop(), dX,
+                        (float) itemView.getBottom(), mSwipePaint);
+
+                int height2 = mSwipeIcon.getHeight()/2;
+                int heightView = itemView.getHeight();
+                int bitmapTopPos = heightView/2-height2+itemView.getTop();
+
+                int bitmapLeftPos = (int)UIUtils.convertDpToPixel(25, getContext());
+
+                c.drawBitmap(mSwipeIcon, bitmapLeftPos, bitmapTopPos, mSwipeIconPaint);
+
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+
+            }
+
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                // callback for drag-n-drop, false to skip this feature
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                // callback for swipe to dismiss, removing item from data and adapter
+                //items.remove(viewHolder.getAdapterPosition());
+
+                PlaylistViewHolder playlistViewHolder = null;
+                if (viewHolder instanceof PlaylistViewHolder) {
+                    playlistViewHolder = (PlaylistViewHolder) viewHolder;
+                }
+
+                if (playlistViewHolder == null) {
+                    Log.wtf(TAG, "playlistViewHolder should never be null"); // NoI18N
+                    return;
+                }
+
+                final int itemPosition = playlistViewHolder.getAdapterPosition()+1;
+                final IEpisode episode = mPlaylist.getItem(itemPosition);
+                final int currentPriority = episode.getPriority();
+                final ContentResolver contentResolver = getActivity().getContentResolver();
+
+                episode.setPriority(-1);
+
+                if (episode instanceof FeedItem) {
+                    FeedItem item = (FeedItem) episode;
+                    item.markAsListened();
+                }
+
+                mPlaylist.removeItem(itemPosition);
+
+                //String episodeRemoved = getResources().getString(R.string.playlist_episode_dismissed);
+                Snackbar snack = Snackbar.make(view, R.string.playlist_episode_dismissed, Snackbar.LENGTH_LONG)
+                        .setAction(R.string.playlist_episode_dismissed_undo, new View.OnClickListener() {
                             @Override
-                            public boolean canDismiss(int position) {
-                                return true;
-                            }
-
-                            @Override
-                            public void onDismiss(RecyclerView recyclerView, int[] reverseSortedPositions) {
-
-                                final int itemPosition = reverseSortedPositions[0]+1;
-                                final IEpisode episode = mPlaylist.getItem(itemPosition);
-                                final int currentPriority = episode.getPriority();
-                                final ContentResolver contentResolver = getActivity().getContentResolver();
-
-                                episode.setPriority(-1);
+                            public void onClick(View v) {
+                                episode.setPriority(currentPriority);
+                                mPlaylist.setItem(itemPosition, episode);
+                                mAdapter.notifyDataSetChanged();
 
                                 if (episode instanceof FeedItem) {
                                     FeedItem item = (FeedItem) episode;
-                                    item.markAsListened();
+                                    item.markAsListened(0);
                                 }
 
                                 episode.update(contentResolver);
-                                mPlaylist.removeItem(itemPosition);
-                                // do not call notifyItemRemoved for every item, it will cause gaps on deleting items
-                                mAdapter.notifyDataSetChanged();
-                                String episodeRemoved = getResources().getString(R.string.playlist_episode_dismissed);
-
-                                Snackbar.make(view, episodeRemoved, Snackbar.LENGTH_LONG)
-                                        .setAction(R.string.playlist_episode_dismissed_undo, new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                episode.setPriority(currentPriority);
-                                                mPlaylist.setItem(itemPosition, episode);
-                                                mAdapter.notifyDataSetChanged();
-
-                                                if (episode instanceof FeedItem) {
-                                                    FeedItem item = (FeedItem) episode;
-                                                    item.markAsListened(0);
-                                                }
-
-                                                episode.update(contentResolver);
-                                            }
-                                        }).show();
-
-                                //snackbar.getView().setLa
-
-                                  //      .show();
                             }
-                        });
-        mRecyclerView.setOnTouchListener(touchListener);
+                        })
+                        .setActionTextColor(getResources().getColor(R.color.white_opaque));
 
+                View view = snack.getView();
+                FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)view.getLayoutParams();
+                params.bottomMargin = DrawerActivity.getStatusBarHeight(getResources())*2;
+                view.setLayoutParams(params);
 
-        //////
-        /*
-        DragSortRecycler dragSortRecycler = new DragSortRecycler();
-        dragSortRecycler.setViewHandleId(R.id.drag_handle); //View you wish to use as the handle
+                snack.show();
 
-        dragSortRecycler.setOnDragStateChangedListener(initialHeaderAdapter);
-        dragSortRecycler.setOnDragStateChangedListener(mPlaylist);
-        dragSortRecycler.setOnDragStateChangedListener(mRecyclerView);
-
-        dragSortRecycler.setNavigationHeight(UIUtils.NavigationBarHeight(mActivity));
-
-
-        mRecyclerView.addItemDecoration(dragSortRecycler);
-        mRecyclerView.addOnItemTouchListener(dragSortRecycler);
-        */
-        //mRecyclerView.setOnScrollListener(dragSortRecycler.getScrollListener());
-        //////
-
-        //mRecyclerView.setItemAnimator(new SlideInLeftAnimator());
+                mAdapter.notifyItemRemoved(viewHolder.getAdapterPosition());
+            }
+        });
+        swipeToDismissTouchHelper.attachToRecyclerView(mRecyclerView);
     }
 
-             @Override
-             public void onAttach(Activity activity) {
-                 mActivity = activity;
-                 super.onAttach(activity);
-             }
+    @Override
+    public void onAttach(Context context) {
+        mContext = context;
+        super.onAttach(context);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = super.onCreateView(inflater, container, savedInstanceState);
+        super.onCreateView(inflater, container, savedInstanceState);
+        View view = inflater.inflate(R.layout.playlist_fragment_main, container, false);
         return view;
     }
 
     @Override
     public void onStart() {
+        Log.d(TAG, "onStart");
         super.onStart();
-        //SoundWaves.getBus().register(this);
     }
 
     @Override
     public void onStop() {
-        //SoundWaves.getBus().unregister(this);
+        Log.d(TAG, "onStop");
         super.onStop();
     }
 
     @Override
     public void onPause() {
-        super.onPause();
+        Log.d(TAG, "onPause");
         SoundWaves.getBus().unregister(this);
+        super.onPause();
+        //SoundWaves.getBus().unregister(this);
+        if (mPlaylist != null && mPlaylist.getItem(0) != null){
+            try {
+                SoundWaves.getBus().unregister(mPlayerDownloadButton);
+            } catch ( Exception e) {
+
+            }
+        }
     }
 
     @Override
     public void onResume() {
+        Log.d(TAG, "onResume");
         SoundWaves.getBus().register(this);
+        //SoundWaves.getBus().register(this);
         if (mPlaylist != null) {
             IEpisode item = mPlaylist.getItem(0);
 
             if (item != null) {
-                mPlayPauseButton.setEpisode(item, PlayPauseImageView.LOCATION.PLAYLIST);
+                mPlayPauseButton.setEpisode(item, PlayPauseImageView.PLAYLIST);
                 mBackButton.setEpisode(item);
                 mForwardButton.setEpisode(item);
-                mDownloadButton.setEpisode(item);
+                mPlayerDownloadButton.setEpisode(item);
                 mFavoriteButton.setEpisode(item);
+                SoundWaves.getBus().register(mPlayerDownloadButton);
             }
             playlistChanged(mPlaylist);
         }
@@ -418,26 +445,25 @@ public class PlaylistFragment extends GeastureFragment implements
         if (offset > 0) {
             mCurrentTime.setText(StrUtils.formatTime(offset));
         } else {
-            mCurrentTime.setText("");
+            mCurrentTime.setText("00:00");
         }
         mCurrentTime.setEpisode(item);
         mTotalTime.setEpisode(item);
 
-        mPlayPauseButton.setEpisode(item, PlayPauseImageView.LOCATION.PLAYLIST);
+        mPlayPauseButton.setEpisode(item, PlayPauseImageView.PLAYLIST);
         mBackButton.setEpisode(item);
         mForwardButton.setEpisode(item);
-        mDownloadButton.setEpisode(item);
+        mPlayerDownloadButton.setEpisode(item);
         mFavoriteButton.setEpisode(item);
 
         if (SoundWaves.sBoundPlayerService != null &&
                 SoundWaves.sBoundPlayerService.getCurrentItem() != null &&
                 SoundWaves.sBoundPlayerService.getCurrentItem().equals(item) &&
                 SoundWaves.sBoundPlayerService.isPlaying()) {
-            mPlayPauseButton.setStatus(PlayerStatusObservable.STATUS.PLAYING);
+            mPlayPauseButton.setStatus(PlayerStatusObservable.PLAYING);
         } else {
-            mPlayPauseButton.setStatus(PlayerStatusObservable.STATUS.PAUSED);
+            mPlayPauseButton.setStatus(PlayerStatusObservable.PAUSED);
         }
-        //mDownloadProgressObservable.registerObserver(mDownloadButton);
 
         mBackButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -459,14 +485,11 @@ public class PlaylistFragment extends GeastureFragment implements
 
         mPlayerSeekbar.setEpisode(item);
         mPlayerSeekbar.setOverlay(mOverlay);
+        mPlayerSeekbar.getProgressDrawable().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
 
         mPlayerDownloadButton.setEpisode(item);
 
-        //mDownloadProgressObservable.registerObserver(mPlayerDownloadButton);
-
         final Activity activity = getActivity();
-
-        mTopPlayer.setEpisodeId(item);
 
         String artworkURL = item.getArtwork(activity);
         if (!TextUtils.isEmpty(artworkURL)) {
@@ -474,7 +497,7 @@ public class PlaylistFragment extends GeastureFragment implements
             PaletteHelper.generate(artworkURL, activity, mPlayPauseButton);
             PaletteHelper.generate(artworkURL, activity, mBackButton);
             PaletteHelper.generate(artworkURL, activity, mForwardButton);
-            PaletteHelper.generate(artworkURL, activity, mDownloadButton);
+            PaletteHelper.generate(artworkURL, activity, mPlayerDownloadButton);
             PaletteHelper.generate(artworkURL, activity, mFavoriteButton);
 
             PaletteHelper.generate(artworkURL, activity, new PaletteListener() {
@@ -486,8 +509,28 @@ public class PlaylistFragment extends GeastureFragment implements
                         return;
 
                     int colorText = swatch.getTitleTextColor();
+                    int colorBackground = swatch.getRgb();
+
+                    ColorExtractor extractor = new ColorExtractor(getActivity(), argChangedPalette);
+
                     mEpisodeTitle.setTextColor(color);
                     mEpisodeInfo.setTextColor(color);
+
+                    int transparentgradientColor;
+                    int gradientColor = extractor.getPrimary();
+
+                    int alpha = 0;
+                    int red = Color.red(gradientColor);
+                    int green = Color.green(gradientColor);
+                    int blue = Color.blue(gradientColor);
+                    transparentgradientColor = Color.argb(alpha, red, green, blue);
+
+                    //Drawable  normalDrawable = getResources().getDrawable(R.drawable.top_player_bottom_gradient_tinted);
+                    GradientDrawable gd = new GradientDrawable(
+                            GradientDrawable.Orientation.TOP_BOTTOM,
+                            new int[]{transparentgradientColor, gradientColor});
+                    Drawable wrapDrawable = DrawableCompat.wrap(gd);
+                    DrawableCompat.setTint(wrapDrawable, colorBackground);
                 }
 
                 @Override
@@ -497,14 +540,19 @@ public class PlaylistFragment extends GeastureFragment implements
             });
         }
 
-        if (item != null && item.getArtwork(activity) != null) {
-            Log.d("MissingImage", "Setting image");
-            Uri uri = Uri.parse(item.getArtwork(activity));
-            mPhoto.setImageURI(uri);
+        String artworkUrl = item.getArtwork(activity);
+        if (item != null && artworkUrl != null) {
+            Log.v("MissingImage", "Setting image");
+            //FrescoHelper.loadImageInto(mPhoto, artworkUrl, null);
+            ImageLoaderUtils.loadImageInto(mPhoto, artworkUrl, false);
         }
 
         if (mTopPlayer.getVisibleHeight() == 0) {
             mTopPlayer.setPlayerHeight(mTopPlayer.getMaximumSize());
+        }
+
+        if (mTopPlayer.isFullscreen()) {
+            mTopPlayer.setFullscreen(true, false);
         }
     }
 
@@ -559,7 +607,7 @@ public class PlaylistFragment extends GeastureFragment implements
      public void onCreateContextMenu(ContextMenu menu, View v,
                                      ContextMenuInfo menuInfo) {
          super.onCreateContextMenu(menu, v, menuInfo);
-         MenuInflater inflater = mActivity.getMenuInflater();
+         MenuInflater inflater = getActivity().getMenuInflater();
      }
 
      @Override
@@ -595,6 +643,21 @@ public class PlaylistFragment extends GeastureFragment implements
 		}
 	}
 
+    @Produce
+    public Playlist producePlaylist() {
+        Playlist playlist = mPlaylist;
+
+        if (playlist != null)
+            return playlist;
+
+        PlayerService service = PlayerService.getInstance();
+        if (service != null) {
+            mPlaylist = service.getPlaylist();
+        }
+
+        return mPlaylist;
+    }
+
     @Subscribe
     public void playlistChanged(@NonNull Playlist argPlaylist) {
         mPlaylist = argPlaylist;
@@ -608,5 +671,30 @@ public class PlaylistFragment extends GeastureFragment implements
             IEpisode episode = mPlaylist.first();
             bindHeader(episode);
         }
+    }
+
+    public TopPlayer getTopPlayer() {
+        return mTopPlayer;
+    }
+
+    @Override
+    public void topfound(int i) {
+        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) mTopPlayer.getLayoutParams();
+        FrameLayout.LayoutParams params2 = (FrameLayout.LayoutParams) mPlaylistEmptyContainer.getLayoutParams();
+        CoordinatorLayout.LayoutParams params3 = (CoordinatorLayout.LayoutParams) mRecyclerView.getLayoutParams();
+        FrameLayout.LayoutParams params4 = (FrameLayout.LayoutParams) mPlaylistWelcomeContainer.getLayoutParams();
+        params2.topMargin = i;
+        params3.topMargin = i;
+        params4.topMargin = i;
+        if (!mTopPlayer.isFullscreen()) {
+            params.topMargin = i;
+            mTopPlayer.setLayoutParams(params);
+        } else {
+            mTopPlayer.setFullscreen(true, false);
+            //mTopPlayer.setPadding(0, i ,0, 0);
+        }
+        mPlaylistEmptyContainer.setLayoutParams(params);
+        mRecyclerView.setLayoutParams(params3);
+        mPlaylistWelcomeContainer.setLayoutParams(params4);
     }
 }

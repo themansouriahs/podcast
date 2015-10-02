@@ -22,5 +22,10 @@
     <string name="pref_top_player_text_expanded_key" translatable="false" >pref_top_player_text_expanded</string>
     <string name="pref_top_player_fullscreen_key" translatable="false" >pref_top_player_fullscreen</string>
     <string name="pref_use_soundengine_key" translatable="false" >pref_use_soundengine</string>
+    <string name="pref_list_oldest_first_key" translatable="false" >pref_list_oldest_first</string>
+    <string name="pref_ask_about_video_key" translatable="false" >pref_ask_about_video</string>
+    <string name="pref_open_video_externally_key" translatable="false" >pref_open_video_externally</string>
+    <string name="pref_dark_theme_key" translatable="false" >pref_dark_theme</string>
+    <string name="gpodder_last_sync_key" translatable="false">gpodder_last_sync</string>
 </resources>
 

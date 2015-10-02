@@ -2,7 +2,6 @@ package org.bottiger.podcast.receiver;
 
 import org.bottiger.podcast.flavors.Analytics.AnalyticsFactory;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
-import org.bottiger.podcast.flavors.Analytics.VendorAnalytics;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
 import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;

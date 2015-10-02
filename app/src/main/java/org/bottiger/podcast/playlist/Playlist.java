@@ -1,5 +1,7 @@
 package org.bottiger.podcast.playlist;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -25,7 +27,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.widget.CursorAdapter;
 import android.util.Log;
 
@@ -42,9 +46,17 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
     private static final String mSortNew = "DESC";
     private static final String mSortOld = "ASC";
 
-    public enum SORT { DATE_NEW, DATE_OLD, NOT_SET };
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({DATE_NEW_FIRST, DATE_OLD_FIRST, NOT_SET})
+    public @interface SortOrder {}
+    public static final int DATE_NEW_FIRST = 0;
+    public static final int DATE_OLD_FIRST = 1;
+    public static final int NOT_SET = 2;
 
-	private Context mContext;
+    private int mSortOrder = DATE_NEW_FIRST;
+
+
+    private Context mContext;
 
     private SubscriptionFilter mSubscriptionFilter;
     //private HashSet<Long> mSubscriptions = new HashSet<>();
@@ -60,8 +72,6 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
 	private String defaultOrder = mSortNew;
 	private String amountKey = "amountOfEpisodes";
 	private int amountValue = 20;
-
-    private SORT mSortOrder = SORT.DATE_NEW;
 
 
 	// http://stackoverflow.com/questions/1036754/difference-between-wait-and-sleep
@@ -131,8 +141,8 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
         return getItem(1);
     }
 
-	/**
-	 * 
+    /**
+     *
 	 * @param episode
 	 * @return The position of the episode
 	 */
@@ -141,6 +151,13 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
 	}
 
     public void setAsFrist(@NonNull IEpisode item) {
+
+        if (mInternalPlaylist.isEmpty()) {
+            mInternalPlaylist.add(0, item);
+            notifyPlaylistChanged();
+            return;
+        }
+
         if (item.equals(mInternalPlaylist.get(0)))
             return;
 
@@ -325,7 +342,7 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
 					+ " then 1 else 2 end, ";
 		}
 		String prioritiesSecond = "case " + ItemColumns.TABLE_NAME + "." + ItemColumns.PRIORITY
-				+ " when 0 then 2 else 1 end, " + ItemColumns.TABLE_NAME + "." + ItemColumns.PRIORITY + ", ";
+				+ " when 0 then 1 else 2 end DESC, " + ItemColumns.TABLE_NAME + "." + ItemColumns.PRIORITY + " DESC, ";
 		String order = playingFirst + prioritiesSecond + ItemColumns.TABLE_NAME + "." + ItemColumns.DATE + " "
 				+ inputOrder + " LIMIT " + amount; // before:
 		return order;
@@ -356,7 +373,7 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
         }
 
         // skip 'removed' episodes
-        where += " AND (" + ItemColumns.TABLE_NAME + "." + ItemColumns.PRIORITY + " >= 0)";
+        //where += " AND (" + ItemColumns.TABLE_NAME + "." + ItemColumns.PRIORITY + " >= 0)";
 
 
 		return where;
@@ -521,13 +538,6 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
     }
 
     public void notifyPlaylistChanged() {
-        /*
-        for (PlaylistChangeListener listener : sPlaylistChangeListeners) {
-            if (listener == null) {
-                throw new IllegalStateException("Listener can ot be null");
-            }
-            listener.notifyPlaylistChanged();
-        }*/
         SoundWaves.getBus().post(this);
     }
 
@@ -556,7 +566,7 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
             setShowListened(argPlaylistData.showListened.booleanValue());
         }
 
-        if (argPlaylistData.sortOrder != null) {
+        if (argPlaylistData.sortOrder != NOT_SET) {
             setSortOrder(argPlaylistData.sortOrder);
         }
 
@@ -587,12 +597,12 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
         }
     }
 
-    public void setSortOrder(SORT argSortOrder) {
+    public void setSortOrder(@SortOrder int argSortOrder) {
         boolean isChanged = mSortOrder != argSortOrder;
         mSortOrder = argSortOrder;
 
         if (isChanged) {
-            String order = mSortOrder == SORT.DATE_NEW ? mSortNew : mSortOld;
+            String order = mSortOrder == DATE_NEW_FIRST ? mSortNew : mSortOld;
             sharedPreferences.edit().putString(inputOrderKey, order).commit();
             notifyDatabaseChanged();
         }
@@ -638,5 +648,14 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
             }
         };
         mainHandler.post(myRunnable);
+    }
+
+    public static void changePlaylistFilter(@NonNull Context argContext, @Nullable Playlist argPlaylist, @SubscriptionFilter.Mode int argMode) {
+        if (argPlaylist == null)
+            return;
+
+        SubscriptionFilter filter = argPlaylist.getSubscriptionFilter();
+        filter.setMode(argMode, argContext);
+        argPlaylist.notifyDatabaseChanged();
     }
 }

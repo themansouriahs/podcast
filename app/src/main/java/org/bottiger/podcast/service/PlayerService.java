@@ -1,7 +1,6 @@
 package org.bottiger.podcast.service;
 
 import org.bottiger.podcast.Player.LegacyRemoteController;
-import org.bottiger.podcast.Player.MetaDataControllerWrapper;
 import org.bottiger.podcast.Player.PlayerHandler;
 import org.bottiger.podcast.Player.PlayerPhoneListener;
 import org.bottiger.podcast.Player.PlayerStateManager;
@@ -15,6 +14,7 @@ import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
+import org.bottiger.podcast.service.jobservice.PodcastUpdater;
 
 import android.Manifest;
 import android.app.Notification;
@@ -25,7 +25,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
-import android.media.session.MediaController;
 import android.media.session.MediaSessionManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -34,14 +33,21 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.os.RemoteException;
 import android.preference.PreferenceManager;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresPermission;
+import android.support.v4.media.session.MediaControllerCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.telephony.PhoneStateListener;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.squareup.otto.Subscribe;
+
+import java.io.IOException;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 import javax.annotation.Nullable;
 
@@ -65,18 +71,20 @@ public class PlayerService extends Service implements
     public static final String ACTION_STOP = "action_stop";
 
 	/** Which action to perform when a track ends */
-	public static enum NextTrack {
-		NONE, NEW_TRACK, NEXT_IN_PLAYLIST
-	}
+	@Retention(RetentionPolicy.SOURCE)
+	@IntDef({NONE, NEW_TRACK, NEXT_IN_PLAYLIST})
+	public @interface NextTrack {}
+	public static final int NONE = 1;
+	public static final int NEW_TRACK = 2;
+	public static final int NEXT_IN_PLAYLIST = 3;
 
-	private static NextTrack nextTrack = NextTrack.NEXT_IN_PLAYLIST;
+	private static @PlayerService.NextTrack int nextTrack = NEXT_IN_PLAYLIST;
 	
 	private Playlist mPlaylist;
 
 	private SoundWavesPlayer mPlayer = null;
-    private MediaController mController;
+    private MediaControllerCompat mController;
 
-    private MetaDataControllerWrapper mMetaDataControllerWrapper;
     private PlayerStateManager mPlayerStateManager;
     private LegacyRemoteController mLegacyRemoteController;
 
@@ -100,11 +108,13 @@ public class PlayerService extends Service implements
 
     private PlayerHandler mPlayerHandler;
 
+	private PodcastUpdater mPodcastUpdater;
+
 	/**
 	 * Phone state listener. Will pause the playback when the phone is ringing
 	 * and continue it afterwards
 	 */
-	private PhoneStateListener mPhoneStateListener = new PlayerPhoneListener(this);
+	private PhoneStateListener mPhoneStateListener;
 
 	public void startAndFadeIn() {
         mPlayerHandler.sendEmptyMessageDelayed(PlayerHandler.FADEIN, 10);
@@ -140,7 +150,16 @@ public class PlayerService extends Service implements
 		SoundWaves.getBus().register(mPlaylist);
 		SoundWaves.getBus().register(this);
 
+		mPodcastUpdater = new PodcastUpdater(this);
+
         mPlayerHandler = new PlayerHandler(this);
+
+		mPlayerStateManager = new PlayerStateManager(this);
+		try {
+			mController = new MediaControllerCompat(getApplicationContext(), mPlayerStateManager.getToken()); // .fromToken( mSession.getSessionToken() );
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
 		
 		mPlayer = new SoundWavesPlayer(this);
 		mPlayer.setHandler(mPlayerHandler);
@@ -150,25 +169,11 @@ public class PlayerService extends Service implements
         }
 		mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
-		TelephonyManager tmgr = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-		tmgr.listen(mPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
+		mPhoneStateListener = new PlayerPhoneListener(this);
 
 		this.mControllerComponentName = new ComponentName(this,
 				HeadsetReceiver.class);
 		this.mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-
-
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            // from https://github.com/googlesamples/android-MediaBrowserService/blob/master/Application/src/main/java/com/example/android/mediabrowserservice/MusicService.java
-            // Start a new MediaSession
-            mPlayerStateManager = new PlayerStateManager(this);
-            mController = new MediaController(getApplicationContext(), mPlayerStateManager.getToken()); // .fromToken( mSession.getSessionToken() );
-
-            mMetaDataControllerWrapper = new MetaDataControllerWrapper(mPlayerStateManager);
-        } else {
-            mLegacyRemoteController = new LegacyRemoteController();
-            mMetaDataControllerWrapper = new MetaDataControllerWrapper(mLegacyRemoteController);
-        }
     }
 
     private void handleIntent( Intent intent ) {
@@ -234,8 +239,6 @@ public class PlayerService extends Service implements
     public int onStartCommand(Intent intent, int flags, int startId) {
         handleIntent(intent);
 
-        mMetaDataControllerWrapper.register(this);
-
         //return super.onStartCommand(intent, flags, startId);
         return START_STICKY;
     }
@@ -280,13 +283,14 @@ public class PlayerService extends Service implements
 	/**
 	 * Display a notification with the current podcast
 	 */
-    public Notification notifyStatus() {
+    public void notifyStatus(@NonNull IEpisode argItem) {
 
 		if (mNotificationPlayer == null)
-			mNotificationPlayer = new NotificationPlayer(this, mItem);
+			mNotificationPlayer = new NotificationPlayer(this, argItem);
 
+		mItem = argItem;
         mNotificationPlayer.setPlayerService(this);
-		return mNotificationPlayer.show();
+		mNotificationPlayer.show(argItem);
     }
 
 	public void playNext() {
@@ -303,7 +307,7 @@ public class PlayerService extends Service implements
         }
 
 		play(nextItem.getUrl().toString());
-        mMetaDataControllerWrapper.updateState(nextItem, true, true);
+        //mMetaDataControllerWrapper.updateState(nextItem, true, true);
         mPlaylist.removeItem(0);
         mPlaylist.notifyPlaylistChanged();
 	}
@@ -368,8 +372,14 @@ public class PlayerService extends Service implements
         }
         final FeedItem feedItem = isFeedItem ? (FeedItem)mItem : null;
 
-		String dataSource = mItem.isDownloaded() ? feedItem.getAbsolutePath()
-				: mItem.getUrl().toString();
+		String dataSource = null;
+		String dataSourceUrl = mItem.getUrl().toString();
+		try {
+			dataSource = mItem.isDownloaded() ? feedItem.getAbsolutePath()
+                    : dataSourceUrl;
+		} catch (IOException e) {
+			dataSource = dataSourceUrl;
+		}
 
 		int offset = mItem.getOffset() < 0 ? 0 : (int) mItem.getOffset();
 
@@ -378,15 +388,12 @@ public class PlayerService extends Service implements
         if (offset == 0 && prefs.getBoolean("pref_stream_proxy", false))
             dataSource = HTTPDService.proxyURL(mItem.getUrl().toString());
 
-
-		notifyStatus();
-
-        mPlaylist.setAsFrist(mItem);
+		mPlaylist.setAsFrist(mItem);
 		mPlayer.setDataSourceAsync(dataSource, offset);
 
         IEpisode item = getCurrentItem();
         if (item != null) {
-            mMetaDataControllerWrapper.updateState(item, true, true);
+			updateMetadata(item);
         }
 
         if (isFeedItem) {
@@ -395,6 +402,12 @@ public class PlayerService extends Service implements
             feedItem.update(getContentResolver());
         }
 	    
+	}
+
+	private void updateMetadata(IEpisode item) {
+		notifyStatus(item);
+		mPlayerStateManager.updateMedia(item);
+		//mMetaDataControllerWrapper.updateState(item, true, true);
 	}
 
     /**
@@ -426,7 +439,7 @@ public class PlayerService extends Service implements
             takeWakelock(mPlayer.isSteaming());
 			mPlaylist.setAsFrist(mItem);
 			mPlayer.start();
-			mMetaDataControllerWrapper.updateState(mItem, true, false);
+			//mMetaDataControllerWrapper.updateState(mItem, true, false);
 		}
 	}
 
@@ -443,7 +456,7 @@ public class PlayerService extends Service implements
 		dis_notifyStatus();
 
 		mPlayer.pause();
-        mMetaDataControllerWrapper.updateState(mItem, false, false);
+        //mMetaDataControllerWrapper.updateState(mItem, false, false);
         releaseWakelock();
 	}
 
@@ -482,10 +495,10 @@ public class PlayerService extends Service implements
 	public void onPlayerStateChange(PlayerStatusData argPlayerStatus) {
 		if (argPlayerStatus == null)
 			return;
-        if (argPlayerStatus.status == PlayerStatusObservable.STATUS.STOPPED) {
+        if (argPlayerStatus.status == PlayerStatusObservable.STOPPED) {
             dis_notifyStatus();
         } else {
-            notifyStatus();
+            notifyStatus(mItem);
         }
 	}
 
@@ -518,7 +531,7 @@ public class PlayerService extends Service implements
 	 * 
 	 * @return The type of episode to be played next
 	 */
-	public static NextTrack getNextTrack() {
+	public static @NextTrack int getNextTrack() {
 		return nextTrack;
 	}
 
@@ -533,10 +546,13 @@ public class PlayerService extends Service implements
         NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
         if (mNotificationPlayer != null) {
-            Notification notification = mNotificationPlayer.getNotification();
+			/*
+            Notification notification = mNotificationPlayer.getNotification(true);
             if (notification != null) {
                 startForeground(NotificationPlayer.getNotificationId(), notification);
             }
+            */
+			mNotificationPlayer.show(isPlaying(), mItem);
         }
 
         mPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
@@ -573,5 +589,9 @@ public class PlayerService extends Service implements
     public Playlist getPlaylist() {
         return mPlaylist;
     }
+
+	public PlayerStateManager getPlayerStateManager() {
+		return mPlayerStateManager;
+	}
 
 }

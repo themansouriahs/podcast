@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.bottiger.podcast" >
+
+    <application>
+
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="50c5c1ca71f12ac3ffdcc0fe338318a6ca9ac616" />
+
+    </application>
+
+</manifest>

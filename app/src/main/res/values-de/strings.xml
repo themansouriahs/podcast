@@ -122,7 +122,6 @@
   <string name="playlist_empty">Die Widergabeliste ist leer :(</string>
   <string name="playlist_empty_title">Wiedergabeliste-Modus auswählen</string>
   <string name="playlist_empty_text_top">Nehmen Sie sich einen Moment Zeit, um darüber nachzudenken, wie Sie die App nutzen möchten</string>
-  <string name="playlist_empty_text_bottom">Sie können jederzeit ändern, wie die Wiedergabeliste funktioniert durch das Streichen des Menüs von links</string>
   <string name="playlist_empty_mode_one">Episoden manuell in die Warteschlange einfügen</string>
   <string name="playlist_empty_mode_two">Neueste Episoden</string>
   <string name="playlist_empty_mode_one_desc">Die Wiedergabeliste wird nur Episoden enthalten die manuell in die Warteschlange gestellt wurden </string>

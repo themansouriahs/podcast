@@ -1,6 +1,9 @@
 package org.bottiger.podcast.views;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v7.graphics.Palette;
 import android.text.TextUtils;
@@ -12,7 +15,7 @@ import org.bottiger.podcast.utils.ColorExtractor;
 /**
  * Created by apl on 12-02-2015.
  */
-public class FloatingActionButton extends com.melnykov.fab.FloatingActionButton implements PaletteListener {
+public class FloatingActionButton extends android.support.design.widget.FloatingActionButton implements PaletteListener {
 
     private String mURL;
     private Context mContext;
@@ -32,28 +35,11 @@ public class FloatingActionButton extends com.melnykov.fab.FloatingActionButton 
         mContext = context;
     }
 
-    public void setPaletteUrl(String argURL) {
-        mURL = argURL;
-    }
-
     @Override
     public void onPaletteFound(Palette argChangedPalette) {
-
-        /*
-        Palette.Swatch s = argChangedPalette.getVibrantSwatch();
-        int color = PlayerButtonView.StaticButtonColor(argChangedPalette);
-        int colorPressed = argChangedPalette.getLightMutedSwatch().getRgb();
-        //int colorRipple = argChangedPalette.getLightVibrantSwatch().getRgb();
-        int colorRipple = s == null ? color : s.getRgb();
-
-        super.setColorNormal(color);
-        super.setColorPressed(colorPressed);
-        super.setColorRipple(colorRipple);
-        */
         ColorExtractor extractor = new ColorExtractor(mContext, argChangedPalette);
-        super.setColorNormal(extractor.getPrimary());
-        super.setColorPressed(extractor.getSecondary());
-        super.setColorRipple(extractor.getPrimaryTint());
+        setBackgroundTintList(ColorStateList.valueOf(extractor.getPrimary()));
+        super.setRippleColor(extractor.getPrimaryTint());
 
         invalidate();
     }

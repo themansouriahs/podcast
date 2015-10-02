@@ -10,7 +10,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.acra.ACRA;
 import org.apache.commons.io.input.XmlStreamReader;
 import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
@@ -24,11 +23,11 @@ import android.support.annotation.NonNull;
 
 public class FeedHandler {
 
-	public ISubscription parseFeed(ContentResolver contentResolver, @NonNull ISubscription subscription, String feedContent) throws SAXException, IOException,
+	public ISubscription parseFeed(ContentResolver contentResolver, @NonNull ISubscription subscription, InputStream feedContent) throws SAXException, IOException,
 			ParserConfigurationException, UnsupportedFeedtypeException {
 
         if (subscription == null) {
-            VendorCrashReporter.report("feedContent", feedContent);
+            VendorCrashReporter.report("feedContent", feedContent.toString());
         }
 
         SyndHandler handler;
@@ -41,9 +40,8 @@ public class FeedHandler {
             SAXParserFactory factory = SAXParserFactory.newInstance();
             factory.setNamespaceAware(true);
             SAXParser saxParser = factory.newSAXParser();
-            //File file = new File(feed.getFile_url());
-            File file = new File(subscription.getURL().toString());
-            InputStream stream = new ByteArrayInputStream(feedContent.getBytes());
+
+            InputStream stream = feedContent;//new ByteArrayInputStream(feedContent.getBytes());
 
             Reader inputStreamReader = new XmlStreamReader(stream, false, "UTF-8");
             InputSource inputSource = new InputSource(inputStreamReader);

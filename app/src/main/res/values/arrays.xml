@@ -31,7 +31,7 @@
         <item>1 day</item>  
     </string-array>
 
-    <string-array name="entryvalues_update">
+    <string-array name="entryvalues_update" translatable="false">
         <item>30</item>
         <item>60</item>
         <item>120</item>  
@@ -50,7 +50,7 @@
         <item>1 month</item>
     </string-array>
 
-    <string-array name="entryvalues_item_expire">
+    <string-array name="entryvalues_item_expire" translatable="false">
         <item>1</item>
         <item>3</item>
         <item>5</item>  
@@ -68,7 +68,7 @@
         <item>Unlimited</item>
     </string-array>
 
-    <string-array name="entryvalues_downlaod_file_expire">
+    <string-array name="entryvalues_downlaod_file_expire" translatable="false">
         <item>100</item>
         <item>1000</item>
         <item>2000</item>  
@@ -77,7 +77,7 @@
         <item>-1</item>
     </string-array>
     
-    <string-array name="entryvalues_spinner_number_of_episodes">
+    <string-array name="entryvalues_spinner_number_of_episodes" translatable="false">
         <item>10</item>
         <item>20</item>
         <item>30</item>  
@@ -120,7 +120,7 @@
         <item>30 seconds</item>
     </string-array>
 
-    <string-array name="entryvalues_pref_rewind_interval">
+    <string-array name="entryvalues_pref_rewind_interval" translatable="false">
     	<item>3</item>
         <item>5</item>
         <item>7</item>
@@ -138,7 +138,7 @@
         <item>30 seconds</item>
     </string-array>
 
-    <string-array name="entryvalues_pref_fast_forward_interval">
+    <string-array name="entryvalues_pref_fast_forward_interval" translatable="false">
         <item>5</item>	
         <item>10</item>
         <item>15</item>  
@@ -146,7 +146,7 @@
 		<item>30</item>  
     </string-array>	  	
 	
-    <string-array name="entries_pref_max_new_items">
+    <string-array name="entries_pref_max_new_items" translatable="false">
         <item>5</item>	
         <item>10</item>
         <item>20</item>
@@ -154,7 +154,7 @@
         <item>50</item>
     </string-array>
 
-    <string-array name="entryvalues_pref_max_new_items">
+    <string-array name="entryvalues_pref_max_new_items" translatable="false">
         <item>5</item>	
         <item>10</item>
         <item>20</item>  
@@ -170,7 +170,7 @@
         <item>1 minute</item>
     </string-array>
 
-    <string-array name="pref_player_seek_entries_values">
+    <string-array name="pref_player_seek_entries_values" translatable="false">
         <item>5</item>
         <item>10</item>
         <item>20</item>
@@ -182,12 +182,14 @@
         <item>A list</item>
         <item>2 columns</item>
         <item>3 columns</item>
+        <item>4 columns</item>
     </string-array>
 
-    <string-array name="pref_subscriptions_columns_entries_values">
+    <string-array name="pref_subscriptions_columns_entries_values" translatable="false">
         <item>1</item>
         <item>2</item>
         <item>3</item>
+        <item>4</item>
     </string-array>
 
     <string-array name="playlist_sort_order">
@@ -195,7 +197,7 @@
         <item>Sort by: Oldest</item>
     </string-array>
 
-    <string-array name="entryvalues_webservices_discovery_engine">
+    <string-array name="entryvalues_webservices_discovery_engine" translatable="false">
         <item>0</item>
         <item>1</item>
     </string-array>
@@ -203,6 +205,12 @@
     <string-array name="entries_webservices_discovery_engine">
         <item>gPodder</item>
         <item>iTunes</item>
+    </string-array>
+
+    <string-array name="discovery_spinner_array">
+        <item>@string/discovery_recommendations</item>
+        <item>@string/discovery_recommendations_trending</item>
+        <item>@string/discovery_recommendations_popular</item>
     </string-array>
 
 </resources>

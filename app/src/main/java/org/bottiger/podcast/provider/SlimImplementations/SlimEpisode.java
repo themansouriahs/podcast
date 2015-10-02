@@ -2,6 +2,7 @@ package org.bottiger.podcast.provider.SlimImplementations;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -26,8 +27,11 @@ public class SlimEpisode implements IEpisode, Parcelable {
     private int mPriority;
     private URL mArtworkUrl;
     private long mOffset;
+    private long mFilesize = 0;
 
-    public SlimEpisode(@NonNull String argTitle, @NonNull URL argUrl, @NonNull String argDescription) {
+    public SlimEpisode(@NonNull String argTitle,
+                       @NonNull URL argUrl,
+                       @NonNull String argDescription) {
         mTitle = argTitle;
         mUrl = argUrl;
         mDescription = argDescription;
@@ -93,10 +97,25 @@ public class SlimEpisode implements IEpisode, Parcelable {
     }
 
     @Override
-    public long getFilesize() { return 0; }
+    public Date getCreatedAt() {
+        return new Date();
+    }
+
+    @Override
+    public long getFilesize() { return mFilesize; }
 
     @Override
     public boolean isMarkedAsListened() { return false; }
+
+    @Override
+    public boolean isVideo() {
+        return false;
+    }
+
+    @Override
+    public void setIsVideo(boolean argIsVideo) {
+
+    }
 
     @Override
     public void setTitle(@NonNull String argTitle) {
@@ -143,6 +162,15 @@ public class SlimEpisode implements IEpisode, Parcelable {
         mOffset = i;
     }
 
+    @Nullable
+    @Override
+    public Uri getFileLocation(@Location int argLocation) {
+        if (argLocation == REQUIRE_LOCAL || mUrl == null)
+            return null;
+
+        return Uri.parse(mUrl.toString());
+    }
+
     @Override
     public boolean isDownloaded() {
         return false;
@@ -157,10 +185,16 @@ public class SlimEpisode implements IEpisode, Parcelable {
         return 0;
     }
 
+    public void setFilesize(long argFilesize) {
+        mFilesize = argFilesize;
+    }
+
     public void writeToParcel(Parcel out, int flags) {
         out.writeString(mTitle);
         out.writeString(mUrl.toString());
         out.writeString(mDescription);
+        out.writeLong(mFilesize);
+        out.writeLong(mDuration);
     }
 
     public static final Parcelable.Creator<SlimEpisode> CREATOR
@@ -182,5 +216,7 @@ public class SlimEpisode implements IEpisode, Parcelable {
             e.printStackTrace();
         }
         mDescription = in.readString();
+        mFilesize = in.readLong();
+        mDuration = in.readLong();
     }
 }

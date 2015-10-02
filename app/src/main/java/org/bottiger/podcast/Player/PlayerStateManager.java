@@ -1,22 +1,27 @@
 package org.bottiger.podcast.Player;
 
-import android.annotation.TargetApi;
+import android.content.ComponentName;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.media.MediaMetadata;
 import android.media.session.MediaSession;
-import android.media.session.PlaybackState;
-import android.os.Build;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.facebook.datasource.DataSource;
 
 import org.bottiger.podcast.images.FrescoHelper;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.service.PlayerService;
 
 /**
@@ -25,116 +30,107 @@ import org.bottiger.podcast.service.PlayerService;
  * http://stackoverflow.com/questions/28124708/android-notification-mediastyle-not-responding-to-mediasession-updates
  *
  */
-@TargetApi(21)
-public class PlayerStateManager {
+public class PlayerStateManager extends MediaSessionCompat.Callback {
 
-    private static final String DEBUG_KEY = "PlayerStateManager";
+    private static final String TAG = "PlayerStateManager";
     private static final String SESSION_TAG = "SWMediaSession";
 
-    private MediaSession mSession;
+    private MediaSessionCompat mSession;
     private PlayerService mPlayerService;
 
     public PlayerStateManager(@NonNull PlayerService argService) {
-        Log.d(DEBUG_KEY, "Constructor");
+        Log.d(TAG, "Constructor");
 
-        if (Build.VERSION.SDK_INT < 21) {
-            throw new IllegalStateException("This should never have been called using this SDK level");
-        }
         mPlayerService = argService;
-        mSession = new MediaSession(argService, SESSION_TAG);
+        ComponentName mediaButtonReceiver = new ComponentName(argService, HeadsetReceiver.class);
+        mSession = new MediaSessionCompat(argService, SESSION_TAG, mediaButtonReceiver, null);
+        mSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
+                MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+        mSession.setCallback(this);
         mSession.setActive(true);
-        mSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS |
-                MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
     }
 
     public void release() {
         mSession.release();
     }
 
-    public MediaSession.Token getToken() {
+    public MediaSessionCompat.Token getToken() {
         return mSession.getSessionToken();
     }
 
-    public void updateState(@NonNull FeedItem argEpisode) {
-        updateState(argEpisode, true, null);
-    }
-
-    public void updateState(@NonNull final IEpisode argEpisode, boolean updateAlbumArt, @Nullable Bitmap argBitmap) {
-        Log.d(DEBUG_KEY, "updateState: updateAlbumState: " + updateAlbumArt);
-        MediaMetadata.Builder mMetaBuilder = new MediaMetadata.Builder();
-
+    public void updateMedia(@NonNull IEpisode argEpisode) {
+        Log.d(TAG, "Update media: episode: " + argEpisode); // NoI18N
+        final MediaMetadataCompat.Builder mMetaBuilder = new MediaMetadataCompat.Builder();
         populateFastMediaMetadata(mMetaBuilder, argEpisode);
 
-        if (argBitmap != null && !argBitmap.isRecycled()) {
-            Log.d(DEBUG_KEY, "Found album art");
-            mMetaBuilder.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, argBitmap);
-            mMetaBuilder.putBitmap(MediaMetadata.METADATA_KEY_ART, argBitmap);
-            mMetaBuilder.putBitmap(MediaMetadata.METADATA_KEY_DISPLAY_ICON, argBitmap);
+        int bitmapSize = 512;
+
+        String url = argEpisode.getArtwork(mPlayerService);
+        if (url == null) {
+            mSession.setMetadata(mMetaBuilder.build());
+            return;
         }
 
-        if (updateAlbumArt) {
-            FrescoHelper.fetchBitmap(new FrescoHelper.IBitmapFetchJob() {
-                @NonNull
-                @Override
-                public Context getContext() {
-                    return mPlayerService;
-                }
+        Glide.with(mPlayerService)
+                .load(url)
+                .asBitmap()
+                .into(new SimpleTarget<Bitmap>(bitmapSize, bitmapSize) {
+                    @Override
+                    public void onResourceReady(Bitmap argBitmap, GlideAnimation anim) {
+                        mMetaBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, argBitmap);
+                        mMetaBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, argBitmap);
+                        mMetaBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON, argBitmap);
+                        mSession.setMetadata(mMetaBuilder.build());
+                    }
 
-                @NonNull
-                @Override
-                public String getUrl() {
-                    return argEpisode.getArtwork(mPlayerService);
-                }
+                    @Override
+                    public void onLoadFailed(Exception e, Drawable errorDrawable) {
+                        mSession.setMetadata(mMetaBuilder.build());
+                    }
+                });
+    }
 
-                @Override
-                public void onSucces(@Nullable Bitmap argBitmap) {
-                    Log.d(DEBUG_KEY, "Updating remote control (with background)");
-                    updateState(argEpisode, false, argBitmap);
-                }
+    public void updateState(@PlaybackStateCompat.State int argState, long argPosition, float argPlaybackSpeed) {
+        Log.d(TAG, "Update State:"); // NoI18N
 
-                @Override
-                public void onFail(@Nullable DataSource argDataSource) {
-                    Log.d(DEBUG_KEY, "BACKGROUND failed to load");
-                }
-            });
-        }
-
-
-        PlaybackState.Builder stateBuilder = getPlaybackState();
-
-        mSession.setMetadata(mMetaBuilder.build());
+        PlaybackStateCompat.Builder stateBuilder = getPlaybackState(argState, argPosition, argPlaybackSpeed);
         mSession.setPlaybackState(stateBuilder.build());
     }
 
-    private void populateFastMediaMetadata(@NonNull MediaMetadata.Builder mMetaBuilder, @NonNull IEpisode argEpisode) {
+    private void populateFastMediaMetadata(@NonNull MediaMetadataCompat.Builder mMetaBuilder, @NonNull IEpisode argEpisode) {
         //Subscription subscription = argEpisode.getSubscription(mPlayerService);
 
-        mMetaBuilder.putText(MediaMetadata.METADATA_KEY_TITLE, argEpisode.getTitle());
-        mMetaBuilder.putText(MediaMetadata.METADATA_KEY_ALBUM, "yo");
-        mMetaBuilder.putText(MediaMetadata.METADATA_KEY_ARTIST, argEpisode.getAuthor());
-        mMetaBuilder.putText(MediaMetadata.METADATA_KEY_ALBUM_ARTIST, "ko");
-        mMetaBuilder.putLong(MediaMetadata.METADATA_KEY_TRACK_NUMBER, 3);
-        mMetaBuilder.putLong(MediaMetadata.METADATA_KEY_NUM_TRACKS, 15);
-        mMetaBuilder.putLong(MediaMetadata.METADATA_KEY_DISC_NUMBER, 1);
+        mMetaBuilder.putText(MediaMetadataCompat.METADATA_KEY_TITLE, argEpisode.getTitle());
+        //mMetaBuilder.putText(MediaMetadataCompat.METADATA_KEY_ALBUM, "yo");
+        mMetaBuilder.putText(MediaMetadataCompat.METADATA_KEY_ARTIST, argEpisode.getAuthor());
+        //mMetaBuilder.putText(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST, "ko");
+        //mMetaBuilder.putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, 3);
+        //mMetaBuilder.putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, 15);
+        //mMetaBuilder.putLong(MediaMetadataCompat.METADATA_KEY_DISC_NUMBER, 1);
     }
 
-    private PlaybackState.Builder getPlaybackState() {
-        PlaybackState.Builder stateBuilder = new PlaybackState.Builder();
+    private PlaybackStateCompat.Builder getPlaybackState(@PlaybackStateCompat.State int argState, long argPosition, float argPlaybackSpeed) {
+        PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder();
 
         stateBuilder.setActiveQueueItemId(MediaSession.QueueItem.UNKNOWN_ID);
 
-        long actions = PlaybackState.ACTION_PLAY_PAUSE |
-                        PlaybackState.ACTION_REWIND |
-                        PlaybackState.ACTION_PLAY |
-                        PlaybackState.ACTION_PAUSE |
-                        PlaybackState.ACTION_STOP |
-                        PlaybackState.ACTION_FAST_FORWARD |
-                        PlaybackState.ACTION_SEEK_TO |
-                        PlaybackState.ACTION_SKIP_TO_NEXT |
-                        PlaybackState.ACTION_SKIP_TO_PREVIOUS;
+        long actions =  PlaybackStateCompat.ACTION_PLAY_PAUSE |
+                        PlaybackStateCompat.ACTION_REWIND |
+                        PlaybackStateCompat.ACTION_STOP |
+                        PlaybackStateCompat.ACTION_FAST_FORWARD |
+                        PlaybackStateCompat.ACTION_SEEK_TO |
+                        PlaybackStateCompat.ACTION_SKIP_TO_NEXT |
+                        PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS;
+
+        if (argState == PlaybackStateCompat.ACTION_PLAY) {
+            actions |= PlaybackStateCompat.ACTION_PAUSE;
+        } else {
+            actions |= PlaybackStateCompat.ACTION_PLAY;
+        }
 
         stateBuilder.setActions(actions);
-        stateBuilder.setState(PlaybackState.STATE_PLAYING, 0, 1.0f);
+        //stateBuilder.setState(PlaybackStateCompat.STATE_PLAYING, 0, 1.0f);
+        stateBuilder.setState(argState, argPosition, argPlaybackSpeed, SystemClock.elapsedRealtime());
 
         return stateBuilder;
     }

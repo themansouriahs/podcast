@@ -1,6 +1,7 @@
 package org.bottiger.podcast.images;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -17,6 +18,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.bitmaps.PlatformBitmapFactory;
 import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.core.ImagePipeline;
+import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
 import com.facebook.imagepipeline.image.CloseableImage;
 import com.facebook.imagepipeline.request.BasePostprocessor;
@@ -25,6 +27,7 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.facebook.imagepipeline.request.Postprocessor;
 
 import org.apache.commons.validator.routines.UrlValidator;
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.utils.DirectExecutor;
 
 /**
@@ -36,8 +39,8 @@ public class FrescoHelper {
     private static final int MAX_WIDTH = 1024;
     private static final int MAX_HEIGHT = 1024;
     */
-    private static final int MAX_WIDTH = 256;
-    private static final int MAX_HEIGHT = 256;
+    private static final int MAX_WIDTH = 256; // 256
+    private static final int MAX_HEIGHT = 256; //256
 
     private static UrlValidator validator = new UrlValidator();
 
@@ -76,6 +79,7 @@ public class FrescoHelper {
                 .setImageRequest(request)
                 .setOldController(argView.getController())
                 .build();
+
         argView.setController(controller);
         //Uri uri = Uri.parse(argUrl);
         //argView.setImageURI(uri);
@@ -88,6 +92,15 @@ public class FrescoHelper {
                 value.recycle();
             }
         });
+    }
+
+    public static ImagePipelineConfig getImagePipelineConfig(@NonNull SoundWaves argContext) {
+        ActivityManager activityManager = (ActivityManager) argContext.getSystemService(argContext.ACTIVITY_SERVICE);
+        ImagePipelineConfig imagePipelineConfig = ImagePipelineConfig
+                .newBuilder(argContext)
+                .setBitmapMemoryCacheParamsSupplier(new LollipopBitmapMemoryCacheParamsSupplier(activityManager))
+                .build();
+        return imagePipelineConfig;
     }
 
     private static class Defaultprocessor extends BasePostprocessor {

@@ -22,7 +22,7 @@
         </LinearLayout>
 
         <org.bottiger.podcast.views.PlayerSeekbar
-            android:id="@+id/player_progress"
+            android:id="@+id/player_center_square"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content" />
 
@@ -41,7 +41,7 @@
             style="@style/PlayerButton" />
 
         <org.bottiger.podcast.views.DownloadButtonView
-            android:id="@+id/download"
+            android:id="@+id/expanded_download"
             android:padding="0dip"
             android:elevation="8dp"
             style="@style/PlayerButton" />

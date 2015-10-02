@@ -1,8 +1,12 @@
 package org.bottiger.podcast.provider;
 
+import android.support.annotation.ColorInt;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +16,11 @@ import java.util.List;
  */
 public interface ISubscription {
 
-    enum TYPE { DEFAULT, SLIM };
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({DEFAULT, SLIM})
+    @interface Type {}
+    int DEFAULT = 0;
+    int SLIM = 1;
 
     @NonNull
     String getTitle();
@@ -34,7 +42,20 @@ public interface ISubscription {
     void setDescription(@Nullable String argDescription);
     void setURL(@Nullable String argUrl);
 
+    void setLink(@Nullable String argLink);
+    void addEpisode(@Nullable IEpisode episode);
+
     boolean IsDirty();
 
-    TYPE getType();
+    /**
+     * Determines if we are subscribed to a Subscription with the same URL
+     * @return
+     */
+    boolean IsSubscribed();
+
+    boolean IsRefreshing();
+    void setIsRefreshing(boolean argIsRefreshing);
+
+    @Type int getType();
+    @ColorInt int getPrimaryColor();
 }

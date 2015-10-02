@@ -3,8 +3,10 @@ package org.bottiger.podcast.provider.converter;
 import android.content.ContentResolver;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.SlimImplementations.SlimEpisode;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -17,7 +19,7 @@ import java.net.URL;
 public class EpisodeConverter {
 
     @Nullable
-    public static SlimEpisode toSlim(@NonNull FeedItem argEpisode) {
+    public static SlimEpisode toSlim(@NonNull IEpisode argEpisode) {
 
         String title = argEpisode.getTitle();
         String description = argEpisode.getDescription();
@@ -27,6 +29,16 @@ public class EpisodeConverter {
             return null;
 
         SlimEpisode slimEpisode = new SlimEpisode(title, url, description);
+
+        if (argEpisode.getFilesize() > 0)
+            slimEpisode.setFilesize(argEpisode.getFilesize());
+
+        if (argEpisode.getDuration() > 0)
+            slimEpisode.setDuration(argEpisode.getDuration());
+
+        if (!TextUtils.isEmpty(argEpisode.getDescription())) {
+            slimEpisode.setDescription(argEpisode.getDescription());
+        }
 
         return slimEpisode;
     }

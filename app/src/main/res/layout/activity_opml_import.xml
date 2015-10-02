@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?attr/themeBackground">
+
+    <android.support.v7.widget.Toolbar
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/opml_import_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/themeBackground"
+        android:elevation="4dp"
+        >
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:textSize="32sp"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="OPML content"
+            android:id="@+id/textView2" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginBottom="8dp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Select the podcasts you wish to subscribe to"
+            android:id="@+id/textView3"
+            android:layout_below="@id/textView2"/>
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.Toolbar>
+
+    <Button
+        android:id="@+id/opml_subscription_import_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:onClick="import_click"
+        android:text="Import"/>
+
+        <!--
+        Magic numbers from:
+            https://www.google.com/design/spec/components/lists.html#lists-specs
+        -->
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/opml_subscription_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/opml_import_toolbar"
+            android:layout_above="@id/opml_subscription_import_button"
+            android:layout_marginTop="8dp"
+            />
+
+    </RelativeLayout>

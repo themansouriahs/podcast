@@ -1,11 +1,13 @@
 package org.bottiger.podcast.adapters;
 
+import java.lang.ref.WeakReference;
 import java.util.TreeSet;
 
 import org.apache.commons.validator.routines.UrlValidator;
-import org.bottiger.podcast.R;
 
+import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.ToolbarActivity;
 import org.bottiger.podcast.adapters.viewholders.ExpandableViewHoldersUtil;
 import org.bottiger.podcast.images.FrescoHelper;
 import org.bottiger.podcast.listeners.DownloadProgressObservable;
@@ -16,7 +18,9 @@ import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorExtractor;
+import org.bottiger.podcast.utils.ColorUtils;
 import org.bottiger.podcast.utils.PaletteHelper;
+import org.bottiger.podcast.utils.SharedAdapterUtils;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.ThemeHelper;
 import org.bottiger.podcast.views.PlayPauseImageView;
@@ -25,9 +29,13 @@ import org.bottiger.podcast.views.PlaylistViewHolder;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
-import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -36,7 +44,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.facebook.imagepipeline.request.BasePostprocessor;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.squareup.otto.Subscribe;
 
 public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> {
@@ -53,20 +62,16 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
     private Activity mActivity;
     private View mOverlay;
 
-    private DownloadProgressObservable mDownloadProgressObservable = null;
-
 	public static TreeSet<Number> mExpandedItemID = new TreeSet<>();
 
 	private static DownloadManager mDownloadManager = null;
 
-    public PlaylistAdapter(@NonNull Activity argActivity, View argOverlay, DownloadProgressObservable argDownloadProgressObservable) {
+    public PlaylistAdapter(@NonNull Activity argActivity, View argOverlay) {
         super(argActivity);
         mActivity = argActivity;
         mOverlay = argOverlay;
         mInflater = (LayoutInflater) mActivity
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        mDownloadProgressObservable = argDownloadProgressObservable;
-
         mDownloadManager = (DownloadManager) mActivity.getSystemService(Context.DOWNLOAD_SERVICE);
 
         notifyDataSetChanged();
@@ -82,10 +87,6 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         return holder;
     }
 
-    private final int[] mGradientColors = new int[] {0,0xDD000000};
-    private GradientDrawable mActionBarGradientDrawable = new GradientDrawable(
-            GradientDrawable.Orientation.BOTTOM_TOP, mGradientColors);
-
     @Override
     public void onBindViewHolder(final PlaylistViewHolder viewHolder, final int position) {
         Log.v(TAG, "onBindViewHolder(pos: " + position + ")");
@@ -98,14 +99,30 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
             return;
         }
 
+        Context context = SoundWaves.getAppContext();
+        int textColor = item.isMarkedAsListened() ? ColorUtils.getTextColor(context) : ColorUtils.getFadedTextColor(context);
+
+        SharedAdapterUtils.AddPaddingToLastElement(viewHolder.mLayout, 0, position == getItemCount()-1);
+
         viewHolder.setArtwork(null);
 
         UrlValidator urlValidator = new UrlValidator();
         String image = item.getArtwork(mActivity);
         if (!TextUtils.isEmpty(image) && urlValidator.isValid(image)) {
 
-            FrescoHelper.PalettePostProcessor postProcessor = new FrescoHelper.PalettePostProcessor(mActivity, image);
-            FrescoHelper.loadImageInto(viewHolder.mItemBackground, image, postProcessor);
+            //FrescoHelper.PalettePostProcessor postProcessor = new FrescoHelper.PalettePostProcessor(mActivity, image);
+            //FrescoHelper.loadImageInto(viewHolder.mPodcastImage, image, postProcessor);
+            Glide.with(mActivity).load(image).asBitmap().centerCrop().into(new BitmapImageViewTarget(viewHolder.mPodcastImage) {
+                @Override
+                protected void setResource(Bitmap resource) {
+                    RoundedBitmapDrawable circularBitmapDrawable =
+                            RoundedBitmapDrawableFactory.create(mActivity.getResources(), resource);
+                    float radius = mActivity.getResources().getDimension(R.dimen.playlist_image_radius_small);
+                    //circularBitmapDrawable.setCircular(true);
+                    circularBitmapDrawable.setCornerRadius(radius);
+                    viewHolder.mPodcastImage.setImageDrawable(circularBitmapDrawable);
+                }
+            });
 
             viewHolder.setArtwork(image);
         }
@@ -122,6 +139,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
                 int white = mActivity.getResources().getColor(R.color.white_opaque);
 
                 ColorExtractor colorExtractor = new ColorExtractor(mActivity, argChangedPalette);
+                viewHolder.setEpisodePrimaryColor(colorExtractor.getPrimary());
                 //viewHolder.mLayout.setCardBackgroundColor(colorExtractor.getPrimary());
                 //viewHolder.mMainTitle.setTextColor(colorExtractor.getTextColor());
                 ////viewHolder.buttonLayout.setBackgroundColor(colorExtractor.getPrimary());
@@ -140,6 +158,8 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         viewHolder.mAdapter = this;
 
         viewHolder.mMainTitle.setText(item.getTitle());
+        viewHolder.mMainTitle.setTextColor(textColor);
+
         viewHolder.description.setText(item.getDescription());
         bindDuration(viewHolder, item);
 
@@ -150,15 +170,20 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
             viewHolder.mPlaylistPosition.setVisibility(View.GONE);
         }
 
-        if (Build.VERSION.SDK_INT >= 16) {
-            //viewHolder.mActionBarGradientView.setBackground(mActionBarGradientDrawable);
-        }
-
-        viewHolder.mPlayPauseButton.setEpisode(item, PlayPauseImageView.LOCATION.PLAYLIST);
-        viewHolder.mPlayPauseButton.setStatus(PlayerStatusObservable.STATUS.PAUSED);
+        viewHolder.mPlayPauseButton.setEpisode(item, PlayPauseImageView.PLAYLIST);
+        viewHolder.mPlayPauseButton.setStatus(PlayerStatusObservable.PAUSED);
 
         viewHolder.downloadButton.setEpisode(item);
         //mDownloadProgressObservable.registerObserver(viewHolder.downloadButton);
+
+
+        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                                                   @Override
+                                                   public void onClick(View v) {
+                                                       PlaylistAdapter.toggle(viewHolder, position);
+                                                   }
+                                               });
+
 
 
         bindExandedPlayer(mActivity, item, viewHolder, position);
@@ -178,8 +203,6 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
 
         ThemeHelper themeHelper = new ThemeHelper(context);
-
-        //holder.playerRelativeLayout.setVisibility(View.VISIBLE);
 
         long playerPosition = 0;
         long playerDuration = 0;
@@ -206,7 +229,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         holder.seekbar.setEpisode(feedItem);
         holder.seekbar.setOverlay(mOverlay);
 
-        holder.mPlayPauseButton.setEpisode(feedItem, PlayPauseImageView.LOCATION.PLAYLIST);
+        holder.mPlayPauseButton.setEpisode(feedItem, PlayPauseImageView.PLAYLIST);
         holder.downloadButton.setEpisode(feedItem);
         holder.favoriteButton.setEpisode(feedItem);
         holder.removeButton.setEpisode(feedItem);
@@ -256,9 +279,6 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
             return;
         }
 
-        //mDownloadProgressObservable.unregisterObserver(holder.downloadButton);
-
-
         holder.mPlayPauseButton.unsetEpisodeId();
         holder.favoriteButton.unsetEpisodeId();
         holder.removeButton.unsetEpisodeId();
@@ -269,12 +289,14 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
     public void onViewAttachedToWindow (PlaylistViewHolder holder) {
         super.onViewAttachedToWindow(holder);
         SoundWaves.getBus().register(holder.mPlayPauseButton);
+        SoundWaves.getBus().register(holder.downloadButton);
         SoundWaves.getBus().register(holder.seekbar);
     }
 
     @Override
     public void  onViewDetachedFromWindow(PlaylistViewHolder holder) {
         SoundWaves.getBus().unregister(holder.mPlayPauseButton);
+        SoundWaves.getBus().unregister(holder.downloadButton);
         SoundWaves.getBus().unregister(holder.seekbar);
         super.onViewDetachedFromWindow(holder);
     }
@@ -382,6 +404,6 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         }
 
         argHolder.mTimeDuration.setText(strDuration);
-        argHolder.mTimeDurationIcon.setVisibility(visibility);
+        //argHolder.mTimeDurationIcon.setVisibility(visibility);
     }
 }

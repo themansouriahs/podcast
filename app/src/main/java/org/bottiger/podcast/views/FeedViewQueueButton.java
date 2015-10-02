@@ -22,6 +22,7 @@ import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.service.PlayerService;
 
 /**
  * Created by apl on 19-04-2015.
@@ -127,11 +128,14 @@ public class FeedViewQueueButton extends PlayPauseImageView {
     }
 
     @Override
-    public synchronized void setEpisode(IEpisode argEpisode, LOCATION argLocation) {
+    public synchronized void setEpisode(IEpisode argEpisode, @ButtonLocation int argLocation) {
         super.setEpisode(argEpisode, argLocation);
-        Playlist playlist = SoundWaves.sBoundPlayerService.getPlaylist();
-        if (playlist.contains(argEpisode)) {
-            cross(0);
+        PlayerService ps = SoundWaves.sBoundPlayerService;
+        if (ps != null) {
+            Playlist playlist = ps.getPlaylist();
+            if (playlist.contains(argEpisode)) {
+                cross(0);
+            }
         }
     }
 
@@ -357,6 +361,14 @@ public class FeedViewQueueButton extends PlayPauseImageView {
         mPathMeasure.setPath(path, false);
         mPathMeasure.getPosTan(length * percentFromState, points, null);
 
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+        int width = getMeasuredWidth();
+        setMeasuredDimension(width, width);
     }
 
     /**

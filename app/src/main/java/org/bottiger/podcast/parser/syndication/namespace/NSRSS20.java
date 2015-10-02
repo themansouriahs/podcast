@@ -11,7 +11,13 @@ import org.jsoup.Jsoup;
 import org.xml.sax.Attributes;
 
 import android.text.TextUtils;
+import android.text.format.DateFormat;
 import android.util.Log;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * SAX-Parser for reading RSS-Feeds
@@ -49,10 +55,9 @@ public class NSRSS20 extends Namespace {
 			state.setCurrentItem(new FeedItem());
 			state.getItems().add(state.getCurrentItem());
 
-            if (state.getSubscription().getType() == ISubscription.TYPE.DEFAULT) {
+            if (state.getSubscription().getType() == ISubscription.DEFAULT) {
                 state.getCurrentItem().setFeed((Subscription)state.getSubscription());
             }
-
 		} else if (localName.equals(ENCLOSURE)) {
 			String type = attributes.getValue(ENC_TYPE);
 			String url = attributes.getValue(ENC_URL);
@@ -66,20 +71,14 @@ public class NSRSS20 extends Namespace {
 				try {
 					size = Long.parseLong(attributes.getValue(ENC_LEN));
 				} catch (NumberFormatException e) {
-					if (MainActivity.debugging)
-						Log.d(TAG, "Length attribute could not be parsed.");
+					Log.d(TAG, "Length attribute could not be parsed.");
 				}
-				
-				//state.getCurrentItem().setMedia(
-				//		new FeedMedia(state.getCurrentItem(), url, size, type));
+
 				FeedItem item = state.getCurrentItem();
 				item.setURL(url);
 				item.setFilesize(size);
 				item.setType(type);
 			}
-			
-			
-
 		} else if (localName.equals(IMAGE)) {
 			if (state.getTagstack().size() >= 1) {
 				String parent = state.getTagstack().peek().getName();
@@ -134,7 +133,7 @@ public class NSRSS20 extends Namespace {
                 FeedItem item = state.getCurrentItem();
                 if (item != null) { // bug:  LearnOutLoud.com
                     item.setPubDate(
-                            SyndDateUtils.parseRFC822Date(content));
+							SyndDateUtils.parseRFC822Date(content));
                 }
 			} else if (top.equals(URL) && second.equals(IMAGE) && third != null && third.equals(CHANNEL)) {
 

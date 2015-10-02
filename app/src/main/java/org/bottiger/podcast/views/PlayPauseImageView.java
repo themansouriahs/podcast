@@ -1,22 +1,34 @@
 package org.bottiger.podcast.views;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Outline;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.net.Uri;
 import android.os.Build;
+import android.preference.PreferenceManager;
+import android.support.annotation.ColorInt;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.view.animation.LinearOutSlowInInterpolator;
 import android.support.v7.graphics.Palette;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewOutlineProvider;
+import android.view.animation.Animation;
+import android.view.animation.RotateAnimation;
+import android.webkit.MimeTypeMap;
 import android.widget.ImageButton;
 
 import com.squareup.otto.Subscribe;
@@ -32,7 +44,13 @@ import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.listeners.PlayerStatusProgressData;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
+import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorExtractor;
+import org.bottiger.podcast.views.dialogs.DialogOpenVideoExternally;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
  * TODO: document your custom view class.
@@ -41,24 +59,48 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
                                                              DownloadObserver,
                                                              View.OnClickListener {
 
+    private static final String TAG = "PlayPauseImageView";
+
     private static final boolean DRAW_PROGRESS          = true;
     private static final boolean DRAW_PROGRESS_MARKER   = true;
 
-    public enum LOCATION { PLAYLIST, FEEDVIEW, DISCOVERY_FEEDVIEW, OTHER };
-    private LOCATION mLocation = LOCATION.OTHER;
+    private static final int FPS = 60;
+    private static final long ANIMATION_DURATION = 10000; // in ms, 10 seconds
+    private static final long ANIMATION_APPEAR_THRESHOLD = 250; // time before we show the animation
+    private static final long ANIMATION_HIDE_THRESHOLD = 1000; // minimum time we display the animation if it appears
+
+    private final Matrix mMatrix = new Matrix(); // transformation matrix
+    private long mStartTime = System.currentTimeMillis();
+    private long mPreparingAnimationStarted = -1;
+
+    private static final LinearOutSlowInInterpolator interperter = new LinearOutSlowInInterpolator();
+
+    private static final String MIME_VIDEO = "video/*";
+
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({PLAYLIST, FEEDVIEW, DISCOVERY_FEEDVIEW, OTHER})
+    public @interface ButtonLocation {}
+    public static final int PLAYLIST = 1;
+    public static final int FEEDVIEW = 2;
+    public static final int DISCOVERY_FEEDVIEW = 3;
+    public static final int OTHER = 4;
+
+    private @ButtonLocation int mLocation = OTHER;
 
     private static final int START_ANGLE = -90;
     private static final int DRAW_OFFSET = 6;
     private static final int DRAW_WIDTH = 6;
 
-    private PlayerStatusObservable.STATUS mStatus = PlayerStatusObservable.STATUS.STOPPED;
+    private @PlayerStatusObservable.PlayerStatus int mStatus = PlayerStatusObservable.STOPPED;
 
     private IEpisode mEpisode;
 
     protected Context mContext;
 
-    private RectF bounds;
+    private RectF bounds = new RectF();
     private Rect boundsRound = new Rect();
+
+    private Animation rotateAnimation;
 
     private boolean mDrawBackground;
     private int mProgressPercent = 0;
@@ -134,7 +176,7 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
         return mEpisode;
     }
 
-    public synchronized void setEpisode(IEpisode argEpisode, LOCATION argLocation) {
+    public synchronized void setEpisode(IEpisode argEpisode, @ButtonLocation int argLocation) {
         this.mLocation = argLocation;
         this.mEpisode = argEpisode;
 
@@ -148,22 +190,36 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
         this.mEpisode = null;
     }
 
-    public void setStatus(PlayerStatusObservable.STATUS argStatus) {
-        mStatus = argStatus;
+    public void setStatus(@PlayerStatusObservable.PlayerStatus int argStatus) {
 
         int resid;
-        if (mStatus == PlayerStatusObservable.STATUS.PLAYING) {
+        if (argStatus == PlayerStatusObservable.PLAYING) {
             resid = drawBackground() ? R.drawable.ic_pause_white : R.drawable.ic_pause_black;
         } else {
             resid = drawBackground() ? R.drawable.ic_play_arrow_white : R.drawable.ic_play_arrow_black;
         }
+
+        mStatus = argStatus;
+
+        if (mStatus == PlayerStatusObservable.PREPARING) {
+            mStartTime = System.currentTimeMillis();
+        }
+
         setImageResource(resid);
 
         this.invalidate();
     }
 
-    public void setColor(int argColor, int argOuterColor) {
-        paint.setColor(argColor);
+    public void setColor(@ColorInt int argColor, @ColorInt int argOuterColor) {
+        float scale = 1.3f;
+        float red = Color.red(argColor)*scale;
+        float green = Color.green(argColor)*scale;
+        float blue = Color.blue(argColor)*scale;
+
+        int newColor = Color.argb(255, (int)red, (int)green, (int)blue);
+
+        float darkPrimary = newColor;
+        paint.setColor((int)darkPrimary);
         paintBorder.setColor(argOuterColor);
         this.invalidate();
     }
@@ -187,19 +243,57 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
         int diff2 =  DRAW_WIDTH;//(int) (centerY-radius);
         boolean updateOutline = bounds == null;
 
-        bounds = new RectF(DRAW_OFFSET, diff2, contentWidth - DRAW_OFFSET, contentWidth - diff2); // DRAW_OFFSET-diff
+        bounds.left =DRAW_OFFSET;
+        bounds.top = diff2;
+        bounds.right = contentWidth - DRAW_OFFSET;
+        bounds.bottom = contentWidth - diff2;
 
         if (updateOutline) {
             onSizeChanged(0, 0, 0, 0);
         }
 
-        if (DRAW_PROGRESS && getEpisode() != null && getEpisode().isMarkedAsListened()) {
-            canvas.drawCircle(centerX, centerY, radius, paintBorder);
-        } else if (DRAW_PROGRESS && mProgressPercent > 0) {
-            canvas.drawArc(bounds, START_ANGLE, getProgressAngle(mProgressPercent), false, paintBorder);
+        if (mStatus != PlayerStatusObservable.PREPARING) {
+            if (DRAW_PROGRESS && getEpisode() != null && mProgressPercent >= 100) {
+                canvas.drawCircle(centerX, centerY, radius, paintBorder);
+            } else if (DRAW_PROGRESS && mProgressPercent > 0) {
+                canvas.drawArc(bounds, START_ANGLE, getProgressAngle(mProgressPercent), false, paintBorder);
+            }
         }
 
         super.onDraw(canvas);
+
+        long elapsedTime = System.currentTimeMillis() - mStartTime;
+        if (mStatus == PlayerStatusObservable.PREPARING || animationStartedLessThanOneSecondAgo(mPreparingAnimationStarted)) {
+
+            if (mPreparingAnimationStarted == -1)
+                mPreparingAnimationStarted = System.currentTimeMillis();
+
+            // Draw the animation
+            float angle = (80 * elapsedTime / 1000) % 360;
+
+            //mMatrix.postRotate(30 * elapsedTime/1000);        // rotate 30° every second
+            mMatrix.setRotate(angle, centerX, centerY);
+            //mMatrix.postTranslate(100 * elapsedTime/1000, 0); // move 100 pixels to the right
+            // other transformations...
+            canvas.concat(mMatrix);        // call this before drawing on the canvas!!
+
+            float zeroToOne = angle / 360;
+            float zeroToTwo = zeroToOne * 2;
+            float minusOneToOne = zeroToTwo - 1;
+            float onezeroone = Math.abs(minusOneToOne) * -1 + 1;
+
+            float interp = onezeroone;
+            //Log.d("Rorate", "angle: " + angle + " interp: " + interp);
+            canvas.drawArc(bounds, START_ANGLE, interperter.getInterpolation(interp) * 360, false, paintBorder);
+
+            this.postInvalidateDelayed(1000 / FPS);
+        } else {
+            mPreparingAnimationStarted = -1;
+        }
+    }
+
+    private boolean animationStartedLessThanOneSecondAgo(long argFirstDisplayed) {
+        return System.currentTimeMillis()-argFirstDisplayed < 1000 && argFirstDisplayed != -1;
     }
 
     @Subscribe
@@ -237,25 +331,16 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
         if (argPlayerStatus == null)
             return;
 
+        if (getEpisode() == null)
+            return;
+
         if (!getEpisode().equals(argPlayerStatus.episode)) {
 
-            setStatus(PlayerStatusObservable.STATUS.PAUSED);
+            setStatus(PlayerStatusObservable.PAUSED);
             return;
         }
 
         setStatus(argPlayerStatus.status);
-    }
-
-    public void onStateChange(EpisodeStatus argStatus) {
-        if (!argStatus.getEpisode().equals(mEpisode)) {
-            return;
-        }
-
-        if (mStatus == argStatus.getStatus()) {
-            return;
-        }
-
-        setStatus(argStatus.getStatus());
     }
 
     @Override
@@ -267,21 +352,83 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
     @Override
     public void onClick(View view) {
 
+        PlayerService ps = SoundWaves.sBoundPlayerService;
+        boolean isPlaying = ps.isPlaying() && mEpisode.equals(ps.getCurrentItem());
+        setStatus(isPlaying ? PlayerStatusObservable.PAUSED : PlayerStatusObservable.PREPARING);
+
+        // If the file is a video we offer to open it in another external player
+        if (mEpisode.isVideo()) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+            String hasAskedKey = getResources().getString(R.string.pref_ask_about_video_key);
+            boolean hasAsked = prefs.getBoolean(hasAskedKey, false);
+
+            boolean doOpenExternally = false;
+
+            if (!hasAsked) {
+                DialogOpenVideoExternally dialogOpenVideoExternally = DialogOpenVideoExternally.newInstance(mEpisode);
+
+                try {
+                    Activity activity = (Activity) mContext;
+                    dialogOpenVideoExternally.show(activity.getFragmentManager(), "dialog");
+                } catch (ClassCastException cce) {
+                    Log.wtf(TAG, "Could not case the context to an activity. " + cce.toString());
+                } finally {
+                    prefs.edit().putBoolean(hasAskedKey, true).commit();
+                }
+
+                /**
+                 * The Dialog is show async, and since we are in a view and not an activity or a fragment
+                 * There is no clean way to get a callback. Therefore we are going to handle everything inside the
+                 * Dialog
+                 */
+                return;
+            }
+
+            boolean openExternallyDefault = getResources().getBoolean(R.bool.pref_open_video_externally_default);
+            String openExternallyKey = getResources().getString(R.string.pref_open_video_externally_key);
+            doOpenExternally = prefs.getBoolean(openExternallyKey, openExternallyDefault);
+
+
+            if (doOpenExternally) {
+                openVideoExternally(mEpisode, mContext);
+                return;
+            }
+
+        }
+
+        isPlaying = SoundWaves.sBoundPlayerService.toggle(mEpisode);
+        //setStatus(isPlaying ? PlayerStatusObservable.PREPARING : PlayerStatusObservable.STOPPED);
+
+        //SoundWaves.getBus().post(new PlaylistData().playlistChanged = true);
+
         IAnalytics.EVENT_TYPE type = getEventType();
         if (type != null) {
             SoundWaves.sAnalytics.trackEvent(type);
         }
-        boolean isPlaying = SoundWaves.sBoundPlayerService.toggle(mEpisode);
+    }
 
-        setStatus(isPlaying ? PlayerStatusObservable.STATUS.PLAYING : PlayerStatusObservable.STATUS.STOPPED);
+    public static void openVideoExternally(@NonNull IEpisode argEpisode, @NonNull Context argContext) {
+        Uri uri = argEpisode.getFileLocation(IEpisode.PREFER_LOCAL);
 
-        //SoundWaves.getBus().post(new PlaylistData().playlistChanged = true);
+        String mimetype;
+        if (argEpisode.isDownloaded()) {
+            mimetype = EpisodeDownloadManager.getMimeType(argEpisode.getFileLocation(IEpisode.REQUIRE_LOCAL).toString());
+        } else {
+            String extension = MimeTypeMap.getFileExtensionFromUrl(argEpisode.getFileLocation(IEpisode.REQUIRE_REMOTE).toString());
+            mimetype = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+        }
+
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        intent.setDataAndType(uri, mimetype);
+        //argContext.startActivity(Intent.createChooser(intent, argContext.getString(R.string.choose_player_for_open_video_externally)));
+        argContext.startActivity(intent);
     }
 
     @Override
     public void onPaletteFound(Palette argChangedPalette) {
         ColorExtractor extractor = new ColorExtractor(mContext, argChangedPalette);
         setColor(extractor.getPrimary(), extractor.getSecondary());
+        //setColor(extractor.getSecondary(), extractor.getSecondaryTint());
     }
 
     @Override
@@ -316,15 +463,15 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
 
     @Nullable
     private IAnalytics.EVENT_TYPE getEventType() {
-        if (mLocation == LOCATION.PLAYLIST) {
+        if (mLocation == PLAYLIST) {
             return IAnalytics.EVENT_TYPE.PLAY_FROM_PLAYLIST;
         }
 
-        if (mLocation == LOCATION.FEEDVIEW) {
+        if (mLocation == FEEDVIEW) {
             return IAnalytics.EVENT_TYPE.PLAY_FROM_FEEDVIEW;
         }
 
-        if (mLocation == LOCATION.DISCOVERY_FEEDVIEW) {
+        if (mLocation == DISCOVERY_FEEDVIEW) {
             return IAnalytics.EVENT_TYPE.PLAY_FROM_FEEDVIEW;
         }
 

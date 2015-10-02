@@ -62,7 +62,7 @@ public class NSAtom extends Namespace {
 			state.setCurrentItem(new FeedItem());
 			state.getItems().add(state.getCurrentItem());
 
-            if (state.getSubscription().getType() == ISubscription.TYPE.DEFAULT) {
+            if (state.getSubscription().getType() == ISubscription.DEFAULT) {
                 state.getCurrentItem().setFeed((Subscription)state.getSubscription());
             }
 		} else if (localName.matches(isText)) {

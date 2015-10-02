@@ -1,24 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     package="org.bottiger.podcast">
 
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
     <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.READ_SYNC_STATS" />
+    <uses-permission android:name="android.permission.MEDIA_CONTENT_CONTROL" />
+
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
-    <uses-permission android:name="android.permission.MEDIA_CONTENT_CONTROL" />
+    <uses-permission android:name="android.permission.READ_SYNC_STATS" />
+    <uses-permission-sdk-m android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
 
     <uses-feature android:name="android.hardware.telephony" android:required="false" />
 
@@ -50,7 +52,7 @@
                 android:value="FILL_ME_IN" />
         </activity>
 
-        <activity android:name="org.bottiger.podcast.FeedActivity"
+        <activity android:name=".activities.feedview.FeedActivity"
             android:theme="@style/Theme.Transparent"
             android:label="@string/app_name"
             android:parentActivityName="org.bottiger.podcast.MainActivity" >
@@ -68,15 +70,14 @@
                 android:value="org.bottiger.podcast.MainActivity" />
         </activity>
 
-        <service
-            android:exported="true"
-            android:name="org.bottiger.podcast.Player.prestissimo.SoundService"
-            tools:ignore="ExportedService" >
-            <intent-filter>
-                <action android:name="com.aocate.intent.PLAY_AUDIO_ADJUST_SPEED_0_8" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </service>
+        <provider
+            android:name="org.bottiger.podcast.provider.PodcastProvider"
+            android:authorities="org.bottiger.podcast.provider.PodcastProvider"
+            android:syncable="true">
+        </provider>
+
+        <service android:name="org.bottiger.podcast.service.jobservice.PodcastUpdateJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <activity
             android:name=".NotificationReveiverActivity"
@@ -97,6 +98,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data android:scheme="http" />
+                <data android:scheme="https" />
                 <data android:host="*" />
                 <data android:pathPattern=".*\\.xml" />
                 <data android:pathPattern=".*\\.rss" />
@@ -135,9 +137,32 @@
                 <data android:mimeType="text/plain"/>
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".activities.openopml.OpenOpmlFromIntentActivity"
+            android:configChanges="keyboardHidden|orientation">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                    android:host="*"
+                    android:pathPattern=".*\\.opml"
+                    android:scheme="file"
+                    android:mimeType="*/*"/>
+                <data
+                    android:host="*"
+                    android:pathPattern=".*\\.opml"
+                    android:scheme="content"
+                    android:mimeType="*/*"/>
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".SettingsActivity"
-            android:label="Settings" >
+            android:label="Settings">
         </activity>
 
         <service android:name="org.bottiger.podcast.service.NotificationListener"
@@ -164,6 +189,29 @@
             android:name="org.bottiger.podcast.service.DownloadService"
             android:enabled="true" >
         </service>
+
+        <service
+            android:name="org.bottiger.podcast.service.syncadapter.AuthenticatorService">
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
+        </service>
+
+        <!-- android:process=":sync" -->
+        <service
+            android:name="org.bottiger.podcast.service.syncadapter.CloudSyncService"
+            android:exported="true"
+            android:process=":sync">
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter"/>
+            </intent-filter>
+            <meta-data android:name="android.content.SyncAdapter"
+                android:resource="@xml/syncadapter" />
+        </service>
+
         <receiver
             android:name="PodcastUpdateManager"
             android:process=":remote" >
@@ -175,6 +223,10 @@
                 <action android:name="org.bottiger.soundwaves.NEXT" >
                 </action>
                 <action android:name="org.bottiger.soundwaves.CLEAR" >
+                </action>
+                <action android:name="org.bottiger.soundwaves.PLAY" >
+                </action>
+                <action android:name="org.bottiger.soundwaves.PAUSE" >
                 </action>
             </intent-filter>
         </receiver>
@@ -195,15 +247,21 @@
             </intent-filter>
         </receiver>
 
-        <provider
-            android:name="org.bottiger.podcast.provider.PodcastProvider"
-            android:authorities="org.bottiger.podcast.provider.PodcastProvider" >
-        </provider>
+        <!--
+        Don't be a dick :)
+        -->
+        <meta-data
+            android:name="com.bugsnag.android.API_KEY"
+            android:value="cb1654e5ce7afda81ad5c189540d5ecc"/>
+
+        <meta-data
+            android:name="org.bottiger.podcast.images.SoundWavesGlideModule"
+            android:value="GlideModule" />
 
     </application>
 
     <instrumentation
-        android:name="android.test.InstrumentationTestRunner"
+        android:name="android.support.test.runner.AndroidJUnitRunner"
         android:label="SoundWaves Podcatcher test"
         android:targetPackage="org.bottiger.podcast" />
 

@@ -1,166 +1,71 @@
 apply plugin: 'idea'
-apply plugin: 'com.android.model.application'
+apply plugin: 'com.android.application'
+apply plugin: 'com.android.databinding'
 
-model {
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.1"
 
-    //sourceCompatibility = JavaVersion.VERSION_1_7
-    //targetCompatibility = JavaVersion.VERSION_1_7
+    defaultConfig {
+        applicationId "org.bottiger.podcast"
+        minSdkVersion 15
+        targetSdkVersion 23
+        versionCode 186     // even - release. Odd - development
+        versionName "0.110" // even - release. Odd - development
+        //useJack = true
+        multiDexEnabled = true
 
-    android {
-        compileSdkVersion = 23
-        buildToolsVersion = "23.0.0"
-
-        packagingOptions.with {
-            exclude 'META-INF/LICENSE.txt'
-            exclude 'META-INF/LICENSE.txt'
-            exclude 'META-INF/NOTICE.txt'
-            exclude 'META-INF/LICENSE'
-            exclude 'META-INF/NOTICE'
-            exclude 'LICENSE.txt'
-        }
-
-        defaultConfig.with {
-            applicationId = "org.bottiger.podcast"
-            minSdkVersion.apiLevel = 15
-            targetSdkVersion.apiLevel = 23
-            versionCode = 148     // even - release. Odd - development
-            versionName = "0.98.2" // even - release. Odd - development
-            useJack = true
-            multiDexEnabled = true
-
-            // Espresso
-            testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
-
-            buildConfigFields.with {
-                create() {
-                    type = "boolean"
-                    name = "DEV_MODE"
-                    value = "false"
-                }
-            }
-            buildConfigFields.with {
-                create() {
-                    type = "boolean"
-                    name = "PRIVATE_MODE"
-                    value = "true"
-                }
-            }
-            buildConfigFields.with {
-                create() {
-                    type = "boolean"
-                    name = "LIBRE_MODE"
-                    value = "true"
-                }
-            }
-        }
-
-        lintOptions.with {
-            checkReleaseBuilds = false
-            abortOnError = false
-        }
-
+        // Espresso
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
-    /*
-    android.compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_7
-        targetCompatibility = JavaVersion.VERSION_1_7
+    //useLibrary 'org.apache.http.legacy' // Need until GMS upgraded
+
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
     }
-    */
 
-    android.productFlavors {
-        create("free") {
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+        exclude 'LICENSE.txt'
+    }
 
+    productFlavors {
+
+        dev {
+            buildConfigField "boolean", "DEV_MODE", "true"
+            buildConfigField "boolean", "PRIVATE_MODE", "false"
+            buildConfigField "boolean", "LIBRE_MODE", "true"
+        }
+
+        free {
+            buildConfigField "boolean", "DEV_MODE", "false"
+            buildConfigField "boolean", "PRIVATE_MODE", "true"
+            buildConfigField "boolean", "LIBRE_MODE", "true"
+        }
+
+        google {
+            buildConfigField "boolean", "DEV_MODE", "false"
+            buildConfigField "boolean", "PRIVATE_MODE", "false"
+            buildConfigField "boolean", "LIBRE_MODE", "false"
+        }
+
+        amazon {
+            buildConfigField "boolean", "DEV_MODE", "false"
+            buildConfigField "boolean", "PRIVATE_MODE", "false"
+            buildConfigField "boolean", "LIBRE_MODE", "false"
         }
     }
-    /*
-    android.productFlavors {
 
-        create("free") {
-            buildConfigField.with {
-                create() {
-                    type = "boolean"
-                    name = "DEV_MODE"
-                    value = "false"
-                }
-            }
-            buildConfigField.with {
-                create() {
-                    type = "boolean"
-                    name = "PRIVATE_MODE"
-                    value = "true"
-                }
-            }
-            buildConfigField.with {
-                create() {
-                    type = "boolean"
-                    name = "LIBRE_MODE"
-                    value = "true"
-                }
-            }
-        }
-
-        create("google") {
-            buildConfigField.with {
-                create() {
-                    type = "boolean"
-                    name = "DEV_MODE"
-                    value = "false"
-                }
-            }
-            buildConfigField.with {
-                create() {
-                    type = "boolean"
-                    name = "PRIVATE_MODE"
-                    value = "false"
-                }
-            }
-            buildConfigField.with {
-                create() {
-                    type = "boolean"
-                    name = "LIBRE_MODE"
-                    value = "false"
-                }
-            }
-            //buildConfigField "boolean", "DEV_MODE", "false"
-            //buildConfigField "boolean", "PRIVATE_MODE", "false"
-            //buildConfigField "boolean", "LIBRE_MODE", "false"
-        }
-
-        create("amazon") {
-            buildConfigField.with {
-                create() {
-                    type = "boolean"
-                    name = "DEV_MODE"
-                    value = "false"
-                }
-            }
-            buildConfigField.with {
-                create() {
-                    type = "boolean"
-                    name = "PRIVATE_MODE"
-                    value = "false"
-                }
-            }
-            buildConfigField.with {
-                create() {
-                    type = "boolean"
-                    name = "LIBRE_MODE"
-                    value = "false"
-                }
-            }
-            //buildConfigField "boolean", "DEV_MODE", "false"
-            //buildConfigField "boolean", "PRIVATE_MODE", "false"
-            //buildConfigField "boolean", "LIBRE_MODE", "false"
-        }
-    }*/
-
-    android.buildTypes {
+    buildTypes {
         release {
-            minifyEnabled = true
-            shrinkResources = true
-            //proguardFiles += getDefaultProguardFile('proguard-android.txt')
-            proguardFiles += 'proguard-rules.pro'
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
             //minifyEnabled true
@@ -169,24 +74,16 @@ model {
         }
     }
 
-    android.ndk {
-        moduleName = "hello-jni"
-        abiFilters += "armeabi-v7a"
+    // http://stackoverflow.com/questions/22851103/android-studio-gradle-error-multiple-dex-files-define
+    dexOptions {
+        //preDexLibraries = false
+        javaMaxHeapSize "4g"
     }
 
-    // Configures source set directory.
-
-    /*
-    android.sources {
-        main {
-            jni {
-                source {
-                    srcDir 'jni'
-                }
-            }
-        }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
     }
-    */
 }
 
 //allprojects {
@@ -213,64 +110,74 @@ idea {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.mcxiaoke.volley:library:1.0.19'
-
+    //compile 'com.mcxiaoke.volley:library:1.0.19'
     compile 'com.squareup.okhttp:okhttp:2.5.0'
     compile 'com.squareup.okhttp:okhttp-urlconnection:2.5.0'
-    compile 'com.squareup.retrofit:retrofit:2.0.0-beta1'
-    compile 'com.squareup.retrofit:converter-gson:2.0.0-beta1'
-
-    compile 'com.squareup:otto:1.3.7'
+    compile 'com.squareup.retrofit:retrofit:2.0.0-beta2'
+    compile 'com.squareup.retrofit:converter-gson:2.0.0-beta2'
+    compile 'com.squareup:otto:1.3.8'
     compile('com.googlecode.json-simple:json-simple:1.1.1') {
         exclude module: 'junit'
     }
     //compile 'com.google.apis:google-api-services-drive:+'
+
+    //compile 'io.reactivex:rxandroid:1.0.1'
+    // Because RxAndroid releases are few and far between, it is recommended you also
+    // explicitly depend on RxJava's latest version for bug fixes and new features.
+    //compile 'io.reactivex:rxjava:1.0.14'
+
+    // Glide
+    compile 'com.github.bumptech.glide:glide:3.6.1'
+
     //compile 'com.google.api-client:google-api-client-android:+'
     compile 'com.google.http-client:google-http-client-gson:1.20.0'
-    compile 'com.android.support:support-v4:23.0.0'
-    compile 'com.android.support:appcompat-v7:23.0.0'
-    compile 'com.android.support:recyclerview-v7:23.0.0'
-    compile 'com.android.support:palette-v7:23.0.0'
-    compile 'com.android.support:cardview-v7:23.0.0'
-    compile 'com.android.support:mediarouter-v7:23.0.0'
-    compile 'com.android.support:design:23.0.0'
-    compile 'com.android.support:percent:23.0.0'
-    compile 'com.melnykov:floatingactionbutton:1.3.0'
+    compile 'com.android.support:support-v4:23.0.1'
+    compile 'com.android.support:appcompat-v7:23.0.1'
+    compile 'com.android.support:recyclerview-v7:23.0.1'
+    compile 'com.android.support:palette-v7:23.0.1'
+    compile 'com.android.support:cardview-v7:23.0.1'
+    compile 'com.android.support:mediarouter-v7:23.0.1'
+    compile 'com.android.support:design:23.0.1'
+    compile 'com.android.support:percent:23.0.1'
     // floating action button
-    compile('commons-io:commons-io:2.4') {
+
+    compile ('commons-io:commons-io:2.4') {
         exclude group: 'org.apache.httpcomponents', module: 'httpclient'
     }
     compile 'commons-validator:commons-validator:1.4.0'
-    compile 'org.jsoup:jsoup:1.7.3'
+    compile 'org.jsoup:jsoup:1.8.3'
     //compile 'com.eowise:recyclerview-stickyheaders:0.5.1@aar'
-    compile 'jp.wasabeef:recyclerview-animators:1.2.0@aar'
-    compile 'ch.acra:acra:4.6.2'
+    compile 'jp.wasabeef:recyclerview-animators:1.3.0'
+    //compile 'ch.acra:acra:4.6.2'
     //compile 'com.github.anrwatchdog:anrwatchdog:1.+'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.5.4'
     compile 'com.facebook.fresco:fresco:0.7.0'
 
+    compile 'com.bugsnag:bugsnag-android:3.2.6'
+
+    // For testing only
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-core:1.9.5'
     configurations.all {
-        resolutionStrategy.force 'com.android.support:support-annotations:23.0.0'
+        resolutionStrategy.force 'com.android.support:support-annotations:23.0.1'
+        resolutionStrategy.force 'com.google.code.findbugs:jsr305:2.0.1'
     }
+    // Espresso
 
-
-        // For testing only
-        // should be testCompile
-        compile 'junit:junit:4.12'
-        compile 'org.mockito:mockito-core:1.9.5'
-
-        // Espresso
-        // https://developer.android.com/training/testing/ui-testing/espresso-testing.html
-        // should be androidTestCompile
-        compile 'com.android.support.test:runner:0.2'
-        compile 'com.android.support.test:rules:0.2'
-        compile('com.android.support.test.espresso:espresso-core:2.1') {
-            //exclude group: 'javax.inject'
-            exclude group: 'com.google.code.findbugs'
-            exclude group: 'com.android.support', module: 'support-annotations'
-        }
-
-
+    // https://developer.android.com/training/testing/ui-testing/espresso-testing.html
+    androidTestCompile 'com.android.support.test:runner:0.3'
+    androidTestCompile 'com.android.support.test:rules:0.3'
+    androidTestCompile('com.android.support.test.espresso:espresso-contrib:2.2') {
+        exclude module: 'support-annotations'
+        exclude module: 'support-v4'
+        exclude module: 'support-v13'
+        exclude module: 'recyclerview-v7'
+    }
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2') {
+        //exclude group: 'javax.inject'
+        //exclude group: 'com.google.code.findbugs'
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
     //androidTestCompile('com.android.support.test:testing-support-lib:0.1')
 
     //androidTestCompile( 'com.android.support.test.espresso:espresso-contrib:2.1') {
@@ -284,13 +191,15 @@ dependencies {
     //}
 
     // Free version
+
     // Amazon version
-    //amazonCompile fileTree(dir: 'src/amazon/libs', include: ['*.jar'])
-    //amazonCompile 'com.google.android.gms:play-services-cast:7.8.0'
+    amazonCompile fileTree(dir: 'src/amazon/libs', include: ['*.jar'])
+    amazonCompile 'com.google.android.gms:play-services-cast:7.8.0'
     // google cast
+
     // Play Store
-    //googleCompile 'com.google.android.gms:play-services-analytics:7.8.0'
+    googleCompile 'com.google.android.gms:play-services-analytics:7.8.0'
     // analytics
-    //googleCompile 'com.google.android.gms:play-services-cast:7.8.0'
+    googleCompile 'com.google.android.gms:play-services-cast:7.8.0'
     // google cast
 }

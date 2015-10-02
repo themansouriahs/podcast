@@ -31,11 +31,31 @@
   public boolean is*();
 }
 
+##
+## Remove verbose, non critical logs
+## http://stackoverflow.com/questions/13218772/removing-log-call-using-proguard
+##
+-assumenosideeffects class android.util.Log {
+public static *** d(...);
+public static *** v(...);
+public static *** i(...);
+public static *** w(...);
+#public static *** e(...);
+#public static *** wtf(...);
+    }
+
 # otto
 -keepattributes *Annotation*
 -keepclassmembers class ** {
     @com.squareup.otto.Subscribe public *;
     @com.squareup.otto.Produce public *;
+}
+
+#glide
+-keep public class * implements com.bumptech.glide.module.GlideModule
+-keep public enum com.bumptech.glide.load.resource.bitmap.ImageHeaderParser$** {
+    **[] $VALUES;
+    public *;
 }
 
 # OKhhtp

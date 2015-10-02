@@ -1,12 +1,12 @@
 package org.bottiger.podcast.receiver;
 
+import org.bottiger.podcast.service.jobservice.PodcastUpdater;
 import org.bottiger.podcast.service.PodcastService;
 
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.SystemClock;
 
 public class PowerReceiver extends BroadcastReceiver {
 
@@ -35,8 +35,8 @@ public class PowerReceiver extends BroadcastReceiver {
 		}
 
 		if (interval > 0) {
-			PendingIntent pendingAlarm = PodcastService.getAlarmIntent(context);
-			PodcastService.setAlarm(context, pendingAlarm, nextRefresh, interval);
+			PendingIntent pendingAlarm = PodcastUpdater.getAlarmIntent(context);
+			PodcastUpdater.setAlarm(context, pendingAlarm, nextRefresh, interval);
 		}
 	}
 

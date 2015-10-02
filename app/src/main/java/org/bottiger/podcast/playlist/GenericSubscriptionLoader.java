@@ -9,18 +9,16 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.widget.RecyclerView;
 
-import org.bottiger.podcast.adapters.FeedViewAdapter;
-import org.bottiger.podcast.adapters.SubscriptionGridCursorAdapter;
+import org.bottiger.podcast.adapters.SubscriptionCursorAdapter;
 
 public abstract class GenericSubscriptionLoader {
 
     final LoaderManager mSupportLoaderManager;
     final Activity mActivity;
-    final SubscriptionGridCursorAdapter mAdapter;
+    final SubscriptionCursorAdapter mAdapter;
 
-	public GenericSubscriptionLoader(Fragment fragment, SubscriptionGridCursorAdapter adapter, Cursor cursor) {
+	public GenericSubscriptionLoader(Fragment fragment, SubscriptionCursorAdapter adapter, Cursor cursor) {
         this.mSupportLoaderManager = fragment.getLoaderManager();
         this.mActivity = fragment.getActivity();
         this.mAdapter = adapter;

@@ -1,20 +1,24 @@
 package org.bottiger.podcast;
 
-import org.bottiger.podcast.adapters.SubscriptionGridCursorAdapter;
+import org.bottiger.podcast.adapters.SubscriptionCursorAdapter;
 import org.bottiger.podcast.playlist.SubscriptionCursorLoader;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionLoader;
 import org.bottiger.podcast.utils.FragmentUtils;
 import org.bottiger.podcast.views.dialogs.DialogOPML;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.AppCompatCheckBox;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -26,22 +30,23 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
-public class SubscriptionsFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class SubscriptionsFragment extends Fragment implements View.OnClickListener,
+                                                                SharedPreferences.OnSharedPreferenceChangeListener,
+                                                                DrawerActivity.TopFound {
 
     private static final String TAG = "SubscriptionsFragment";
 
     private static final boolean SHARE_ANALYTICS_DEFAULT = !BuildConfig.LIBRE_MODE;
     private static final boolean SHARE_CLOUD_DEFAULT = false;
 
-    private boolean mShowEmptyView = true;
+    private Boolean mShowEmptyView = null;
 
-	private FragmentUtils mFragmentUtils;
-	private View fragmentView;
 	private RecyclerView mGridView;
 
     private CheckBox mShareAnalytics;
@@ -49,7 +54,9 @@ public class SubscriptionsFragment extends Fragment implements SharedPreferences
 
     private GridLayoutManager mGridLayoutmanager;
     private RelativeLayout mEmptySubscrptionList;
-    private SubscriptionGridCursorAdapter mAdapter;
+    private Button mEmptySubscrptionImportOPMLButton;
+    private SubscriptionCursorAdapter mAdapter;
+    private FrameLayout mGridContainerView;
 
     private Activity mActivity;
     private FrameLayout mContainerView;
@@ -60,20 +67,18 @@ public class SubscriptionsFragment extends Fragment implements SharedPreferences
     private static String PREF_CLOUD_SUPPORT_KEY;
 
     private Cursor mCursor = null;
-    private SubscriptionGridCursorAdapter.OnSubscriptionCountChanged mSubscriptionCountListener = new SubscriptionGridCursorAdapter.OnSubscriptionCountChanged() {
+    private SubscriptionCursorAdapter.OnSubscriptionCountChanged mSubscriptionCountListener = new SubscriptionCursorAdapter.OnSubscriptionCountChanged() {
         @Override
         public void newSubscriptionCount(int argCount) {
             boolean showEmpty = argCount == 0;
-            int visibility = showEmpty ? View.VISIBLE : View.GONE;
 
-            if (mShowEmptyView != showEmpty) {
+            if (mShowEmptyView == null || mShowEmptyView != showEmpty) {
                 if (showEmpty) {
                     mEmptySubscrptionList.setVisibility(View.VISIBLE);
-                    mGridView.setVisibility(View.GONE);
                 } else {
                     mEmptySubscrptionList.setVisibility(View.GONE);
-                    mGridView.setVisibility(View.VISIBLE);
                 }
+                mShowEmptyView = showEmpty;
             }
         }
     };
@@ -99,50 +104,58 @@ public class SubscriptionsFragment extends Fragment implements SharedPreferences
 
         setHasOptionsMenu(true);
 
-        mContainerView = (FrameLayout)inflater.inflate(R.layout.subscription_container, container, false);
-        FrameLayout fragmentContainer = (FrameLayout)mContainerView.findViewById(R.id.subscription_fragment_container);
-
+        mContainerView = (FrameLayout)inflater.inflate(R.layout.subscription_fragment, container, false);
 
         // Empty View
         mEmptySubscrptionList = (RelativeLayout) mContainerView.findViewById(R.id.subscription_empty);
+        mEmptySubscrptionImportOPMLButton = (Button) mContainerView.findViewById(R.id.import_opml_button);
+
+        mGridContainerView = (FrameLayout) mContainerView.findViewById(R.id.subscription_grid_container);
 
         mShareAnalytics = (CheckBox) mContainerView.findViewById(R.id.checkBox_usage);
         mCloudServices =  (CheckBox) mContainerView.findViewById(R.id.checkBox_cloud);
 
-        onSharedPreferenceChanged(shareprefs, PREF_SHARE_ANALYTICS_KEY);
-        onSharedPreferenceChanged(shareprefs, PREF_CLOUD_SUPPORT_KEY);
-
-
         //RecycelrView
-        mAdapter = new SubscriptionGridCursorAdapter(getActivity(), mCursor, numberOfColumns());
+        mAdapter = new SubscriptionCursorAdapter(getActivity(), mCursor, numberOfColumns());
+
         mAdapter.setOnSubscriptionCountChangedListener(mSubscriptionCountListener);
         mCursorLoader = new SubscriptionCursorLoader(this, mAdapter, mCursor);
 
-        fragmentView = inflater.inflate(getLayoutType(), fragmentContainer, true);
-		mFragmentUtils = new FragmentUtils(getActivity(), fragmentView, this);
-		mGridView = (RecyclerView) fragmentView.findViewById(R.id.gridview);
+		mGridView = (RecyclerView) mContainerView.findViewById(R.id.gridview);
 		registerForContextMenu(mGridView);
 
         mGridLayoutmanager = new GridLayoutManager(getActivity(), numberOfColumns());
         mGridView.setHasFixedSize(true);
         mGridView.setLayoutManager(mGridLayoutmanager);
         mGridView.setAdapter(mAdapter);
-        //fragmentView.setVisibility(View.GONE);
-        mGridView.setVisibility(View.GONE);
 
 		return mContainerView;
+
 	}
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
+        ((MainActivity)getActivity()).listeners.add(this);
         super.onViewCreated(view, savedInstanceState);
 
-        view.setOnClickListener(new View.OnClickListener() {
+        mEmptySubscrptionImportOPMLButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(TAG, "onclick");
+                if (getActivity() instanceof TopActivity) {
+                    openImportExportDialog((TopActivity)getActivity());
+                } else {
+                    Log.wtf(TAG, "getActivity() is not an instance of TopActivity. Please investigate"); // NoI18N
+                }
             }
         });
+
+        onSharedPreferenceChanged(shareprefs, PREF_SHARE_ANALYTICS_KEY);
+        onSharedPreferenceChanged(shareprefs, PREF_CLOUD_SUPPORT_KEY);
 
         mShareAnalytics.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -168,33 +181,13 @@ public class SubscriptionsFragment extends Fragment implements SharedPreferences
 
     @Override
     public void onResume() {
-        super.onResume();
-
         if (mGridLayoutmanager.getSpanCount() != numberOfColumns()) {
-            GridLayoutManager layoutmanager = new GridLayoutManager(getActivity(), numberOfColumns());
-            //mAdapter = new SubscriptionGridCursorAdapter(getActivity(), mCursor);
-
-
-            mGridView.setLayoutManager(layoutmanager);
-            //mGridView.setAdapter(mAdapter);
-            ((SubscriptionGridCursorAdapter)mGridView.getAdapter()).setNumberOfColumns(numberOfColumns());
+            mGridLayoutmanager = new GridLayoutManager(getActivity(), numberOfColumns());
+            mGridView.setLayoutManager(mGridLayoutmanager);
+            ((SubscriptionCursorAdapter)mGridView.getAdapter()).setNumberOfColumns(numberOfColumns());
         }
+        super.onResume();
     }
-
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-	}
-
-    /*
-    private void setSubscriptionBackground(Cursor argCursor) {
-        if (argCursor == null || argCursor.getCount() == 0) {
-            mEmptySubscrptionList.setVisibility(View.VISIBLE);
-            return;
-        }
-
-        mEmptySubscrptionList.setVisibility(View.GONE);
-    }*/
 
 	@Override
 	public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
@@ -207,9 +200,14 @@ public class SubscriptionsFragment extends Fragment implements SharedPreferences
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_import: {
-                DialogOPML dialogOPML = new DialogOPML();
-                Dialog dialog = dialogOPML.onCreateDialog(getActivity());
-                dialog.show();
+
+                try {
+                    TopActivity topActivity = (TopActivity) getActivity();
+                    openImportExportDialog(topActivity);
+                } catch (ClassCastException cce) {
+                    Log.wtf(TAG, "Activity (" + getActivity().getClass().getName() + ") could not be cast to TopActivity." +
+                            "This is needed in order to requets filesystem permission. Exception: " + cce.toString()); // NoI18N
+                }
             }
             case R.id.menu_refresh_all_subscriptions: {
                 SoundWaves.sSubscriptionRefreshManager.refreshAll();
@@ -246,10 +244,6 @@ public class SubscriptionsFragment extends Fragment implements SharedPreferences
         }
     }
 
-	private int getLayoutType() {
-		return R.layout.subscription_list;
-	}
-
     private int numberOfColumns() {
         String number = shareprefs.getString(PREF_SUBSCRIPTION_COLUMNS, "2");
         return Integer.parseInt(number);
@@ -272,5 +266,57 @@ public class SubscriptionsFragment extends Fragment implements SharedPreferences
             }
             return;
         }
+    }
+
+    public static void openImportExportDialog(@NonNull TopActivity argActivity) {
+
+        if (!checkPermission(argActivity))
+            return;
+
+        DialogOPML dialogOPML = new DialogOPML();
+        Dialog dialog = dialogOPML.onCreateDialog(argActivity);
+        dialog.show();
+    }
+
+    /**
+     *
+     * @return True if the permissions are granted
+     */
+    private static boolean checkPermission(@NonNull TopActivity argActivity) {
+        if (Build.VERSION.SDK_INT >= 23 &&
+                (argActivity.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
+                        argActivity.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)  != PackageManager.PERMISSION_GRANTED)) {
+            // TODO: Consider calling
+            //    public void requestPermissions(@NonNull String[] permissions, int requestCode)
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for Activity#requestPermissions for more details.
+            argActivity.requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    TopActivity.PERMISSION_TO_IMPORT_EXPORT);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public void onClick(View v) {
+        Log.d(TAG, "Onclikc");
+    }
+
+    @Override
+    public void topfound(int i) {
+        Log.d(TAG, "dfdsf");
+        //mContainerView.setPadding(0,i,0,0);
+        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) mGridView.getLayoutParams();
+        FrameLayout.LayoutParams params2 = (FrameLayout.LayoutParams) mEmptySubscrptionList.getLayoutParams();
+        params2.topMargin = i;
+        params.topMargin = i;
+        mGridView.setLayoutParams(params);
+        mEmptySubscrptionList.setLayoutParams(params);
     }
 }

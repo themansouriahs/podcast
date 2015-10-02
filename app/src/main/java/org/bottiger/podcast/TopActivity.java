@@ -5,20 +5,32 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.transition.Slide;
 import android.transition.Transition;
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
 import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.utils.OPMLImportExport;
 
-public class TopActivity extends ActionBarActivity {
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
-    public static final int PERMISSION_TO_DOWNLOAD = 555;
+public class TopActivity extends AppCompatActivity {
+
+    // Filesystem Permisssion
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({PERMISSION_TO_DOWNLOAD, PERMISSION_TO_IMPORT_EXPORT})
+    public @interface PermissionCallback {}
+    public static final int PERMISSION_TO_DOWNLOAD = 1;
+    public static final int PERMISSION_TO_IMPORT_EXPORT = 2;
 	
 	private static SharedPreferences prefs;
 
@@ -91,15 +103,40 @@ public class TopActivity extends ActionBarActivity {
     }
 
     public void onRequestPermissionsResult (int requestCode, String[] permissions, int[] grantResults) {
-        if (requestCode == PERMISSION_TO_DOWNLOAD) {
-            for (int i = 0; i < grantResults.length; i++) {
-                if (grantResults[i] == PackageManager.PERMISSION_DENIED)
-                    return;
-            }
 
-            EpisodeDownloadManager.startDownload(this);
+        if (PermissionDenied(grantResults)) {
             return;
         }
+
+        switch (requestCode) {
+        //if (requestCode == PERMISSION_TO_DOWNLOAD) {
+            case PERMISSION_TO_DOWNLOAD: {
+                EpisodeDownloadManager.startDownload(this);
+                return;
+            }
+            case PERMISSION_TO_IMPORT_EXPORT: {
+                SubscriptionsFragment.openImportExportDialog(this);
+                return;
+            }
+        }
+    }
+
+    protected void importOPMLButtonCallback() {
+        SubscriptionsFragment.openImportExportDialog(this);
+    }
+
+    /**
+     *
+     * @param grantResults
+     * @return False if one or more permission was denied
+     */
+    private boolean PermissionDenied(int[] grantResults) {
+        for (int i = 0; i < grantResults.length; i++) {
+            if (grantResults[i] == PackageManager.PERMISSION_DENIED)
+                return true;
+        }
+
+        return false;
     }
 
 }

@@ -3,6 +3,7 @@ package org.bottiger.podcast.Player;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.media.AudioManager;
@@ -11,7 +12,7 @@ import android.net.Uri;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.util.Log;
+import android.support.v4.media.session.PlaybackStateCompat;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
@@ -47,8 +48,12 @@ public class SoundWavesPlayer extends SoundWavesPlayerBase implements IMediaRout
     private final String PLAYER_ACTION_FASTFORWARD_DEFAULT_VALUE = "60";
     private final String PLAYER_ACTION_REWIND_DEFAULT_VALUE = "60";
 
+    private @PlayerStatusObservable.PlayerStatus int mStatus;
+
     private PlayerService mPlayerService;
     private PlayerHandler mHandler;
+    private PlayerStateManager mPlayerStateManager;
+
     private boolean mIsInitialized = false;
     private boolean mIsStreaming = false;
 
@@ -67,12 +72,13 @@ public class SoundWavesPlayer extends SoundWavesPlayerBase implements IMediaRout
     private SharedPreferences mSharedpreferences;
 
     int bufferProgress = 0;
-
     int startPos = 0;
+    float playbackSpeed = 1.0f;
 
     public SoundWavesPlayer(@NonNull PlayerService argPlayerService) {
         super(argPlayerService);
         mPlayerService = argPlayerService;
+        mPlayerStateManager = argPlayerService.getPlayerStateManager();
         this.mControllerComponentName = new ComponentName(mPlayerService,
                 HeadsetReceiver.class);
         this.mAudioManager = (AudioManager) mPlayerService.getSystemService(Context.AUDIO_SERVICE);
@@ -88,9 +94,13 @@ public class SoundWavesPlayer extends SoundWavesPlayerBase implements IMediaRout
 
     public void setDataSourceAsync(String path, int startPos) {
 
+        mStatus = PlayerStatusObservable.PREPARING;
+        mPlayerStateManager.updateState(PlaybackStateCompat.STATE_CONNECTING, startPos, playbackSpeed);
+
         if (isCasting()) {
             mMediaCast.loadEpisode(mPlayerService.getCurrentItem());
             start();
+            mPlayerStateManager.updateState(PlaybackStateCompat.STATE_PLAYING, startPos, playbackSpeed);
             return;
         }
 
@@ -98,6 +108,10 @@ public class SoundWavesPlayer extends SoundWavesPlayerBase implements IMediaRout
 
             File f = new File(path);
             mIsStreaming = !f.exists();
+
+            if (mIsStreaming) {
+                mPlayerStateManager.updateState(PlaybackStateCompat.STATE_BUFFERING, startPos, playbackSpeed);
+            }
 
             reset();
 
@@ -135,6 +149,10 @@ public class SoundWavesPlayer extends SoundWavesPlayerBase implements IMediaRout
         mIsInitialized = true;
     }
 
+    public @PlayerStatusObservable.PlayerStatus int getStatus() {
+        return mStatus;
+    }
+
     public boolean isSteaming() { return  mIsStreaming; }
 
     public boolean isInitialized() {
@@ -150,8 +168,12 @@ public class SoundWavesPlayer extends SoundWavesPlayerBase implements IMediaRout
 
     public void start() {
 
-        PlayerStatusData psd = new PlayerStatusData(mPlayerService.getCurrentItem(), PlayerStatusObservable.STATUS.PLAYING);
+        mStatus = PlayerStatusObservable.PLAYING;
+        mPlayerStateManager.updateState(PlaybackStateCompat.STATE_PLAYING, getCurrentPosition(), playbackSpeed);
 
+        PlayerStatusData psd = new PlayerStatusData(mPlayerService.getCurrentItem(), PlayerStatusObservable.PLAYING);
+
+        // If we are using a Chromecats we send the file to it
         if (isCasting()) {
             mMediaCast.play(0);
             SoundWaves.getBus().post(psd);
@@ -186,9 +208,10 @@ public class SoundWavesPlayer extends SoundWavesPlayerBase implements IMediaRout
             super.reset();
         }
 
+        mStatus = PlayerStatusObservable.STOPPED;
         mIsInitialized = false;
         mPlayerService.stopForeground(true);
-        PlayerStatusData psd = new PlayerStatusData(mPlayerService.getCurrentItem(), PlayerStatusObservable.STATUS.STOPPED);
+        PlayerStatusData psd = new PlayerStatusData(mPlayerService.getCurrentItem(), PlayerStatusObservable.STOPPED);
         SoundWaves.getBus().post(psd);
     }
 
@@ -199,6 +222,7 @@ public class SoundWavesPlayer extends SoundWavesPlayerBase implements IMediaRout
         mAudioManager
                 .unregisterMediaButtonEventReceiver(mControllerComponentName);
         mIsInitialized = false;
+        mStatus = PlayerStatusObservable.STOPPED;
     }
 
     @Override
@@ -251,8 +275,10 @@ public class SoundWavesPlayer extends SoundWavesPlayerBase implements IMediaRout
             super.pause();
         }
 
+        mStatus = PlayerStatusObservable.PAUSED;
+
         MarkAsListenedIfNeeded();
-        PlayerStatusData psd = new PlayerStatusData(mPlayerService.getCurrentItem(), PlayerStatusObservable.STATUS.PAUSED);
+        PlayerStatusData psd = new PlayerStatusData(mPlayerService.getCurrentItem(), PlayerStatusObservable.PAUSED);
         SoundWaves.getBus().post(psd);
         SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.PAUSE);
     }
@@ -269,6 +295,7 @@ public class SoundWavesPlayer extends SoundWavesPlayerBase implements IMediaRout
     GenericMediaPlayerInterface.OnCompletionListener listener = new GenericMediaPlayerInterface.OnCompletionListener() {
         @Override
         public void onCompletion(GenericMediaPlayerInterface mp) {
+            mPlayerStateManager.updateState(PlaybackStateCompat.STATE_STOPPED, 0, playbackSpeed);
             IEpisode item = mPlayerService.getCurrentItem();
 
             if (item != null && item instanceof FeedItem) {
@@ -319,6 +346,20 @@ public class SoundWavesPlayer extends SoundWavesPlayerBase implements IMediaRout
     GenericMediaPlayerInterface.OnErrorListener errorListener = new GenericMediaPlayerInterface.OnErrorListener() {
         @Override
         public boolean onError(GenericMediaPlayerInterface mp, int what, int extra) {
+            mStatus = PlayerStatusObservable.STOPPED;
+            mPlayerStateManager.updateState(PlaybackStateCompat.STATE_ERROR, startPos, playbackSpeed);
+            switch (what) {
+                case MediaPlayer.MEDIA_ERROR_SERVER_DIED:
+
+                    mPlayerService.dis_notifyStatus();
+                    mIsInitialized = false;
+                    release();
+
+                    mHandler.sendMessageDelayed(PlayerHandler.SERVER_DIED, 2000);
+                    return true;
+                default:
+                    break;
+            }
             return errorCallback(mp, what, extra);
         }
     };
@@ -426,7 +467,8 @@ public class SoundWavesPlayer extends SoundWavesPlayerBase implements IMediaRout
                 mMediaCast.play(offst);
             }
 
-            PlayerStatusData psd = new PlayerStatusData(mPlayerService.getCurrentItem(), PlayerStatusObservable.STATUS.PLAYING);
+            mStatus = PlayerStatusObservable.PLAYING;
+            PlayerStatusData psd = new PlayerStatusData(mPlayerService.getCurrentItem(), PlayerStatusObservable.PLAYING);
             SoundWaves.getBus().post(psd);
         }
     }

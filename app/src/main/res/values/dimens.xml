@@ -16,10 +16,16 @@
 <resources>
 
     <!-- Feed View - Start -->
-
+    <dimen name="feed_activity_setting_caption_width">70dp</dimen>
+    <dimen name="feed_activity_setting_control_width">30dp</dimen>
+    <integer name="feed_activity_description_lines_default">3</integer>
     <!-- Feed View - End -->
 
-    <dimen name="playlist_margin">0dp</dimen>
+    <dimen name="playlist_margin">1px</dimen>
+    <dimen name="playlist_image_size_small">70dp</dimen>
+    <dimen name="playlist_image_radius_small">7dp</dimen>
+    <dimen name="playlist_image_size_large">90dp</dimen>
+    <dimen name="playlist_image_radius_large">9dp</dimen>
 
     <dimen name="activity_horizontal_margin">64dp</dimen>
 
@@ -34,6 +40,9 @@
     <dimen name="top_player_size_medium">150dp</dimen>
     <dimen name="top_player_size_maximum">280dp</dimen>
     <dimen name="top_player_size_maximum_bottom">160dp</dimen>
+
+    <dimen name="top_player_center_square_margin_top">5dp</dimen>
+    <dimen name="top_player_center_square_margin">30dp</dimen>
 
     <dimen name="player_elevation">5dp</dimen>
 

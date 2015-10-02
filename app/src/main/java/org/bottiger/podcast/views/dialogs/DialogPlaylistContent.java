@@ -162,10 +162,10 @@ public class DialogPlaylistContent implements DialogInterface.OnMultiChoiceClick
                     public void onClick(DialogInterface dialog, int which) {
                         switch (mRadioGroup.getCheckedRadioButtonId()) {
                             case R.id.radioNone:
-                                mSubscriptionFilter.setMode(SubscriptionFilter.MODE.SHOW_NONE, getContext());
+                                mSubscriptionFilter.setMode(SubscriptionFilter.SHOW_NONE, getContext());
                                 break;
                             case R.id.radioAll:
-                                mSubscriptionFilter.setMode(SubscriptionFilter.MODE.SHOW_ALL, getContext());
+                                mSubscriptionFilter.setMode(SubscriptionFilter.SHOW_ALL, getContext());
                                 break;
                             case R.id.radioCustom: {
                                 mSubscriptionFilter.clear();
@@ -176,7 +176,7 @@ public class DialogPlaylistContent implements DialogInterface.OnMultiChoiceClick
                                         mSubscriptionFilter.add(subscription.getId());
                                     }
                                 }
-                                mSubscriptionFilter.setMode(SubscriptionFilter.MODE.SHOW_SELECTED, getContext());
+                                mSubscriptionFilter.setMode(SubscriptionFilter.SHOW_SELECTED, getContext());
                                 break;
                             }
                         }

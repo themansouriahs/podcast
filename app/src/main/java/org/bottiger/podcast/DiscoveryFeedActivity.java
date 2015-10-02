@@ -1,13 +1,12 @@
 package org.bottiger.podcast;
 
 import android.os.Bundle;
-import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 
-import org.bottiger.podcast.adapters.DiscoverySearchAdapter;
+import org.bottiger.podcast.activities.feedview.FeedActivity;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.PaletteHelper;
 

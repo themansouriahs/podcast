@@ -1,6 +1,9 @@
 package org.bottiger.podcast.provider;
 
 import java.io.File;
+import java.io.IOException;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -16,10 +19,12 @@ import org.bottiger.podcast.listeners.DownloadProgressObservable;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.service.DownloadStatus;
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
+import org.bottiger.podcast.utils.BitMaskUtils;
 import org.bottiger.podcast.utils.PodcastLog;
 import org.bottiger.podcast.utils.SDCardManager;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.jsoup.Jsoup;
 
 import android.app.Activity;
 import android.app.DownloadManager;
@@ -34,6 +39,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.provider.BaseColumns;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.LruCache;
@@ -43,7 +49,10 @@ import android.util.Log;
 
 public class FeedItem implements IEpisode, Comparable<FeedItem> {
 
-	public static final int MAX_DOWNLOAD_FAIL = 5;
+	private static final String TAG = "FeedItem";
+
+    // Se Subscription.java for details
+    private static final int IS_VIDEO = 1;
 
 	private final PodcastLog log = PodcastLog.getLog(getClass());
 	private static ItemLruCache cache = null;
@@ -70,6 +79,12 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	 * http://podcast.dr.dk/P1/p1debat/2013/p1debat_1301171220.mp3
 	 */
 	public String url;
+
+	/**
+	 * Currently not persisted.
+	 * A link to the show notes
+	 */
+	public String link_show_notes;
 
 	/**
 	 * Title of the episode
@@ -158,9 +173,10 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	public int offset;
 
 	/**
-	 * Deprecated status from before forking
+	 * This was a deprecated status from before I forked the project.
+	 * Now I will use it as a bitmask for keeping track of episode specific status related things,
+	 * like "is this episode a video or not"
 	 */
-	@Deprecated
 	public int status;
 
 	@Deprecated
@@ -177,7 +193,8 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	public int listened;
 
 	/**
-	 * Priority in the playlist
+	 * Priority in the playlist. Higher priority value is higher up in the playlist.
+	 * Default is 1
 	 */
 	public int priority;
 
@@ -203,8 +220,10 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	 */
 	public String sub_title;
 
-	@Deprecated
-	public long created;
+	/**
+	 * The time the episode was created locally
+	 */
+	public long created_at;
 
 	public String type;
 
@@ -385,10 +404,6 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 		return item;
 	}
 
-	public static FeedItem getMostRecent(ContentResolver context) {
-		return getBySQL(context, "1==1", "_id DESC");
-	}
-
 	public FeedItem() {
 		reset();
 	}
@@ -414,7 +429,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 		length = -1;
 		lastUpdate = -1;
 		listened = -1;
-		priority = -1;
+		priority = 0;
 		filesize = -1;
 		chunkFilesize = -1;
 		downloadReferenceID = -1;
@@ -422,7 +437,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 		isDownloaded = null;
 		duration_ms = -1;
 
-		created = -1;
+		created_at = -1;
 		sub_title = null;
 		sub_id = -1;
 
@@ -437,6 +452,12 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
             update(contentResolver);
         }
 
+	}
+
+	@NonNull
+	public static ContentValues addCreatedAtToContentValues(ContentValues argCV) {
+		argCV.put(ItemColumns.CREATED, System.currentTimeMillis());
+		return argCV;
 	}
 
     public ContentValues getContentValues(Boolean silent) {
@@ -480,6 +501,8 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
         if (lastUpdate > 0)
             cv.put(ItemColumns.LAST_UPDATE, lastUpdate);
 
+        if (status > 0)
+            cv.put(ItemColumns.STATUS, status);
         if (listened >= 0)
             cv.put(ItemColumns.LISTENED, listened);
 
@@ -599,6 +622,9 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 			if (duration_ms > 0) {
 				cv.put(ItemColumns.DURATION_MS, duration_ms);
 			}
+            if (status >= 0) {
+                cv.put(ItemColumns.STATUS, status);
+            }
 			if (sub_title != null) {
 				cv.put(ItemColumns.SUB_TITLE, sub_title);
 			}
@@ -615,7 +641,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	}
 
 	/**
-	 * @see http://docs.oracle.com/javase/6/docs/api/java/lang/String.html#compareTo
+	 * http://docs.oracle.com/javase/6/docs/api/java/lang/String.html#compareTo
 	 *      %28java.lang.String%29
 	 * @return True of the current FeedItem is newer than the supplied argument
 	 */
@@ -656,14 +682,18 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 
     private Date mDate = null;
     public static SimpleDateFormat sdf = new SimpleDateFormat(default_format, Locale.US);
-    public Date getDateTime() {
+
+	@Nullable
+	public Date getDateTime() {
 
         if (mDate == null) {
             try {
                 mDate = sdf.parse(date);
             } catch (ParseException pe) {
                 throw new IllegalArgumentException("Datestring must be parsable");
-            }
+            } catch (Exception e) {
+				return null;
+			}
         }
         return mDate;
     }
@@ -753,6 +783,8 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 				.getColumnIndex(ItemColumns.DURATION));
 		item.duration_ms = cursor.getLong(cursor
 				.getColumnIndex(ItemColumns.DURATION_MS));
+        item.status = cursor.getInt(cursor
+				.getColumnIndex(ItemColumns.STATUS));
 		item.lastUpdate = cursor.getLong(cursor
 				.getColumnIndex(ItemColumns.LAST_UPDATE));
 		item.sub_title = cursor.getString(cursor
@@ -763,6 +795,8 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 				.getColumnIndex(ItemColumns.LISTENED));
 		item.priority = cursor.getInt(cursor
 				.getColumnIndex(ItemColumns.PRIORITY));
+		item.created_at = cursor.getInt(cursor
+				.getColumnIndex(ItemColumns.CREATED));
 
 		// if item was not cached we put it in the cache
 		synchronized (cache) {
@@ -875,21 +909,12 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 					return true;
 				}
 			} catch (Exception e) {
-				log.warn("del file failed : " + getAbsolutePath() + "  " + e);
+				Log.w(TAG, "del file failed : " + filename.toString() + "  " + e);
 			}
 		}
 
 		return false;
 
-	}
-
-	public void prepareDownload(ContentResolver context) {
-		if (getAbsolutePath().equals("") || getAbsolutePath().equals("0")) {
-			String filenameFromURL = resource.substring(resource
-					.lastIndexOf("/") + 1);
-			filename = this.sub_id + "_" + filenameFromURL;
-		}
-		update(context);
 	}
 
 	public void downloadSuccess(ContentResolver contentResolver) {
@@ -903,10 +928,15 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	}
 
 	public long getCurrentFileSize() {
-		String file = getAbsolutePath();
+		String file = null;
+		try {
+			file = getAbsolutePath();
+		} catch (IOException e) {
+			return -1;
+		}
 		if (file != null)
 			return new File(file).length();
-		return 0;
+		return -1;
 	}
 
 	public String getFilename() {
@@ -938,12 +968,48 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
         this.filename = filename.replaceAll("[^(\\x41-\\x5A|\\x61-\\x7A|\\x2D|\\x2E|\\x30-\\x39|\\x5F)]", ""); // only a-z A-Z 0-9 .-_ http://www.asciitable.com/
 	}
 
-	public String getAbsolutePath() {
+	public String getAbsolutePath() throws IOException {
 		return SDCardManager.pathFromFilename(this);
 	}
 
-	public String getAbsoluteTmpPath() {
+	public String getAbsoluteTmpPath() throws IOException {
 		return SDCardManager.pathTmpFromFilename(this);
+	}
+
+	@Nullable
+	public Uri getFileLocation(@Location int argLocation) {
+		boolean isDownloaded = isDownloaded();
+
+		if (!isDownloaded && argLocation == REQUIRE_LOCAL)
+			return null;
+
+		Uri uri;
+
+		if (argLocation == REQUIRE_REMOTE) {
+			uri = Uri.parse(getURL());
+			return uri;
+		}
+
+		if (isDownloaded) {
+			try {
+				//Uri.Builder builder = new Uri.Builder();
+				//builder.scheme("file");
+				//builder.path("/" + getAbsolutePath());
+				// uri = builder.build();
+
+				File file = new File(getAbsolutePath());
+				uri = Uri.fromFile(file);
+
+				//uri = Uri.parse(getAbsolutePath());
+
+				if (argLocation == PREFER_LOCAL)
+					return uri;
+			} catch (IOException ioe) {
+				Log.w(TAG, "Failed to get local file path. " + ioe.toString()); // NoI18N
+			}
+		}
+
+		return Uri.parse(getURL());
 	}
 
     // in ms
@@ -976,6 +1042,10 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 		return itemURL;
 	}
 
+	public Date getCreatedAt() {
+		return new Date(created_at);
+	}
+
 	public long getFilesize() {
 		return filesize;
 	}
@@ -1004,9 +1074,14 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
             e.printStackTrace();
         }
 
-		File f = new File(getAbsolutePath());
+		File f = null;
+		try {
+			f = new File(getAbsolutePath());
+		} catch (IOException e) {
+			return false;
+		}
 
-        if (f == null)
+		if (f == null)
             return false;
 
 		if (f.exists())
@@ -1169,7 +1244,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
     }
 
     public void removeFromPlaylist(@NonNull ContentResolver argContentResolver) {
-        priority = -1;
+        priority = 0;
         update(argContentResolver);
     }
 
@@ -1425,10 +1500,31 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	}
 
 	public void setDescription(String content2) {
-		this.content = content2;
+		this.content = Jsoup.parse(content2).text();
 	}
 
 	public void setLink(String href) {
-		this.url = href;
+		this.link_show_notes = href;
 	}
+
+    public boolean isVideo() {
+        if (!BitMaskUtils.IsBitmaskInitialized(status))
+            return false;
+
+        return IsSettingEnabled(IS_VIDEO);
+    }
+
+    public void setIsVideo(boolean argIsVideo) {
+        status = status < 0 ? 0 : status;
+        status |= IS_VIDEO;
+
+        if (argIsVideo)
+            status |= IS_VIDEO;
+        else
+            status &= ~IS_VIDEO;
+    }
+
+    private boolean IsSettingEnabled(int setting) {
+        return BitMaskUtils.IsBitSet(status, setting);
+    }
 }

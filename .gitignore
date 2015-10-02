@@ -15,6 +15,7 @@ app/obj
 # Generated files
 bin/
 gen/
+captures/
 
 # Gradle files
 .gradle/

@@ -13,14 +13,22 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
+import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v7.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.support.v4.media.MediaMetadataCompat;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 import android.widget.RemoteViews;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.facebook.datasource.DataSource;
 
 public class NotificationPlayer {
@@ -42,50 +50,33 @@ public class NotificationPlayer {
 	}
 
     @Nullable
-    public Notification getNotification() {
-        return mNotification;
-    }
-
-    @Nullable
-	public Notification show() {
-		return show(true);
+	public void show(@NonNull final IEpisode argItem) {
+		show(true, argItem);
 	}
 
     @Nullable
-	public Notification show(Boolean isPlaying) {
+	public void show(final Boolean isPlaying, @NonNull final IEpisode argItem) {
 
-		// NOTIFICATION_PLAYER_ID allows you to update the notification later on.
-        NotificationCompat.Builder builder = buildNotification(isPlaying, mPlayerService, null);
+        if (!argItem.equals(item)) {
+            item = argItem;
+        }
 
-        if (builder == null)
-            return null;
+        if (item == null)
+            return;
 
-        mNotification = builder.build();
+        //mPlayerService.startForeground(getNotificationId(), mNotification);
 
-        if (mNotification == null)
-            return null;
-
-		mPlayerService.startForeground(getNotificationId(), mNotification);
-
-        mNotificationManager.notify(NOTIFICATION_PLAYER_ID, mNotification);
-
-		return mNotification;
+        showNotification(isPlaying);
 	}
 
     public void setPlayerService(@NonNull PlayerService argPlayerService) {
         mPlayerService = argPlayerService;
     }
 
-    public void refresh(@Nullable Bitmap argBitmap) {
+    public void refresh() {
         PlayerService ps = mPlayerService;
         if (ps != null) {
-            NotificationCompat.Builder notificationBuilder = buildNotification(ps.isPlaying(), mPlayerService, argBitmap);
-
-            if (notificationBuilder == null)
-                return;
-
-            mNotification = notificationBuilder.build();
-            mNotificationManager.notify(NOTIFICATION_PLAYER_ID, mNotification);
+            showNotification(ps.isPlaying());
         }
     }
 	
@@ -100,20 +91,14 @@ public class NotificationPlayer {
 
 	public void setItem(IEpisode item) {
 		this.item = item;
-        refresh(null);
 	}
 	
 	public static int getNotificationId() {
 		return NOTIFICATION_PLAYER_ID;
 	}
 
-    @Nullable
+    @NonNull
     private NotificationCompat.Builder buildNotification(@NonNull Boolean isPlaying, @NonNull PlayerService argPlayerService, @Nullable Bitmap argBitmap) {
-
-        if (item == null) {
-            return null;
-        }
-
 
         int pause;
         int play;
@@ -133,14 +118,58 @@ public class NotificationPlayer {
             smallIcon = R.drawable.ic_stat_notify_white;
         }
 
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(mPlayerService)
-                        .setSmallIcon(smallIcon)
-                        .setContentTitle(item.getTitle());
-                        //.setContentText(item.sub_title);
+        String title = item.getTitle();
+        String content = "";
+        try {
+            content = item.getSubscription(mPlayerService).getTitle();
+        } catch (Exception e) {
+            // Ignore
+        }
+
+        int toggleIconId = pause;
+        if (isPlaying) toggleIconId = play;
+
+        // Prepare intent which is triggered if the
+        // notification is selected
+        Intent toggleIntent = new Intent(NotificationReceiver.toggleAction);
+        Intent nextIntent = new Intent(NotificationReceiver.nextAction);
+        Intent clearIntent = new Intent(NotificationReceiver.clearAction);
+        Intent playIntent = new Intent(NotificationReceiver.playAction);
+        Intent pauseIntent = new Intent(NotificationReceiver.pauseAction);
+
+        PendingIntent pendingToggleIntent = PendingIntent.getBroadcast(mPlayerService, 0, toggleIntent, 0);
+        PendingIntent pendingNextIntent = PendingIntent.getBroadcast(mPlayerService, 0, nextIntent, 0);
+        PendingIntent pendingClearIntent = PendingIntent.getBroadcast(mPlayerService, 0, clearIntent, 0);
+        PendingIntent pendingPauseIntent = PendingIntent.getBroadcast(mPlayerService, 0, pauseIntent, 0);
+        PendingIntent pendingPlayIntent = PendingIntent.getBroadcast(mPlayerService, 0, playIntent, 0);
+
+        // yes, the play/pause icons are inverted for now
+        NotificationCompat.Action actionToggle = new NotificationCompat.Action(toggleIconId, "Toggle", pendingToggleIntent);
+        NotificationCompat.Action actionPlay = new NotificationCompat.Action(pause, "Play", pendingPlayIntent);
+        NotificationCompat.Action actionPause = new NotificationCompat.Action(play, "Pause", pendingPauseIntent);
+        NotificationCompat.Action actionNext = new NotificationCompat.Action(next, "Next", pendingNextIntent);
+        NotificationCompat.Action actionClear = new NotificationCompat.Action(clear, "Clear", pendingClearIntent);
+
+        NotificationCompat.MediaStyle mediaStyle = new NotificationCompat.MediaStyle();
+        mediaStyle.setShowActionsInCompactView(0);
+        mediaStyle.setShowCancelButton(true);
+        MediaSessionCompat.Token mediaSessionToken = mPlayerService.getPlayerStateManager().getToken();
+
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(mPlayerService);
+        mBuilder.setSmallIcon(smallIcon);
+        mBuilder.setContentTitle(title);
+        mBuilder.setContentText(content);
+
+        // Should I use this? I'm not sure.
+        mBuilder.setStyle(mediaStyle
+                .setMediaSession(mediaSessionToken));
+        mBuilder.addAction(actionToggle);
+        mBuilder.addAction(actionNext);
+        mBuilder.addAction(actionClear);
+        //mBuilder.setProgress(100,  50, false);
 
         mBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
-        mBuilder.setCategory("CATEGORY_TRANSPORT");
+        mBuilder.setCategory("CATEGORY_TRANSPORT"); // Media transport control for playback
         mBuilder.setPriority(NotificationCompat.PRIORITY_MAX);
 
         mBuilder.setOnlyAlertOnce(true);
@@ -149,68 +178,28 @@ public class NotificationPlayer {
 
         // Sets a custom content view for the notification, including an image button.
         RemoteViews layout = new RemoteViews(mPlayerService.getPackageName(), R.layout.notification);
-        layout.setTextViewText(R.id.notification_title, item.getTitle());
-        //layout.setTextViewText(R.id.notification_content, item.sub_title);
+        layout.setTextViewText(R.id.notification_title, title);
+        layout.setTextViewText(R.id.notification_content, content);
+
+
+        int visibility = isPlaying ? View.INVISIBLE : View.VISIBLE;
+        layout.setViewVisibility(R.id.clear_button, visibility);
 
         if (argBitmap != null && !argBitmap.isRecycled()) {
             Log.d(TAG, "Creating notification with bitmap");
 
             mBuilder.setLargeIcon(argBitmap);
             layout.setImageViewBitmap(R.id.icon, argBitmap);
-        } else {
-            Log.d(TAG, "Creating notification with no bitmap - fetching one");
-
-            final String imageUrl = item.getArtwork(mPlayerService);
-
-            FrescoHelper.fetchBitmap(new FrescoHelper.IBitmapFetchJob() {
-                @NonNull
-                @Override
-                public Context getContext() {
-                    return mPlayerService.getApplicationContext();
-                }
-
-                @NonNull
-                @Override
-                public String getUrl() {
-                    return imageUrl;
-                }
-
-                @Override
-                public void onSucces(@Nullable Bitmap argBitmap) {
-                    Log.d(TAG, "Bitmap fetched");
-                    if (argBitmap != null && !argBitmap.isRecycled())
-                        refresh(argBitmap);
-                }
-
-                @Override
-                public void onFail(@Nullable DataSource argDataSource) {
-
-                }
-            });
-
         }
 
-        // Prepare intent which is triggered if the
-        // notification is selected
-        Intent toggleIntent = new Intent(NotificationReceiver.toggleAction);
-        Intent nextIntent = new Intent(NotificationReceiver.nextAction);
-        Intent clearIntent = new Intent(NotificationReceiver.clearAction);
-
-        PendingIntent pendingToggleIntent = PendingIntent.getBroadcast(mPlayerService, 0, toggleIntent, 0);
-        PendingIntent pendingNextIntent = PendingIntent.getBroadcast(mPlayerService, 0, nextIntent, 0);
-        PendingIntent pendingClearIntent = PendingIntent.getBroadcast(mPlayerService, 0, clearIntent, 0);
-
         layout.setOnClickPendingIntent(R.id.play_pause_button,pendingToggleIntent);
-        layout.setOnClickPendingIntent(R.id.next_button,pendingNextIntent);
+        //layout.setOnClickPendingIntent(R.id.next_button,pendingNextIntent);
         layout.setOnClickPendingIntent(R.id.clear_button,pendingClearIntent);
 
         //PlayerStatusListener.registerImageView(, mPlayerService);
 
-        int srcId = pause;
-        if (isPlaying) srcId = play;
-
-        layout.setImageViewResource(R.id.play_pause_button, srcId);
-        layout.setImageViewResource(R.id.next_button, next);
+        layout.setImageViewResource(R.id.play_pause_button, toggleIconId);
+        //layout.setImageViewResource(R.id.next_button, next);
         layout.setImageViewResource(R.id.clear_button, clear);
 
         mBuilder.setContent(layout);
@@ -237,6 +226,37 @@ public class NotificationPlayer {
                 (NotificationManager) mPlayerService.getSystemService(Context.NOTIFICATION_SERVICE);
 
         return mBuilder;
+    }
+
+    private void showNotification(final boolean isPlaying) {
+        String url = item.getArtwork(mPlayerService);
+        if (TextUtils.isEmpty(url)) {
+
+            // NOTIFICATION_PLAYER_ID allows you to update the notification later on.
+            displayNotification(isPlaying, null);
+        } else {
+            Glide.with(mPlayerService)
+                    .load(url)
+                    .asBitmap()
+                    .into(new SimpleTarget<Bitmap>(512, 512) {
+                        @Override
+                        public void onResourceReady(Bitmap argBitmap, GlideAnimation anim) {
+                            displayNotification(isPlaying, argBitmap);
+                        }
+
+                        @Override
+                        public void onLoadFailed(Exception e, Drawable errorDrawable) {
+                            return;
+                        }
+                    });
+        }
+    }
+
+    private void displayNotification(boolean isPlaying, @Nullable Bitmap argBitmap) {
+        NotificationCompat.Builder builder = buildNotification(isPlaying, mPlayerService, argBitmap);
+        mNotification = builder.build();
+        mPlayerService.startForeground(getNotificationId(), mNotification);
+        mNotificationManager.notify(NOTIFICATION_PLAYER_ID, mNotification);
     }
 
     /**

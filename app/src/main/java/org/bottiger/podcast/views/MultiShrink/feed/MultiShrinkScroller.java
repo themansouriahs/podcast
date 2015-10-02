@@ -19,7 +19,6 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Trace;
 import android.support.annotation.NonNull;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.MarginLayoutParamsCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
@@ -104,7 +103,7 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
     private FeedRecyclerView mRecyclerView;
     private View mScrollViewChild;
     private View mToolbar;
-    private QuickFeedImage mPhotoView;
+    private FeedViewTopImage mPhotoView;
     private View mPhotoViewContainer;
     private View mTransparentView;
     private MultiShrinkScrollerListener mListener;
@@ -305,7 +304,7 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
         mListener = listener;
         mIsOpenContactSquare = isOpenContactSquare;
 
-        mPhotoView = (QuickFeedImage) findViewById(R.id.photo);
+        mPhotoView = (FeedViewTopImage) findViewById(R.id.photo);
 
         mTitleGradientView = findViewById(R.id.title_gradient);
         mActionBarGradientView = findViewById(R.id.action_bar_gradient);
@@ -535,7 +534,7 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
     /**
      * Expand to maximum size.
      */
-    private void expandHeader() {
+    public void expandHeader() {
         if (getHeaderHeight() != mMaximumHeaderHeight) {
             final ObjectAnimator animator = ObjectAnimator.ofInt(this, "headerHeight",
                     mMaximumHeaderHeight);

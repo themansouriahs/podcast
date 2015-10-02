@@ -1,10 +1,11 @@
 package org.bottiger.podcast.receiver;
 
-import org.bottiger.podcast.service.PodcastService;
+import org.bottiger.podcast.service.jobservice.PodcastUpdater;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 
 public class AutoStart extends BroadcastReceiver
 {   
@@ -20,9 +21,11 @@ public class AutoStart extends BroadcastReceiver
             // Note that a BroadcastReceiver is *NOT* a Context. Thus, we can't use
             // "this" whenever we need to pass a reference to the current context.
             // Thankfully, Android will supply a valid Context as the first parameter
-            
-        	
-        	PodcastService.setupAlarm(context);
+
+            // API 21 and above persists the JobService across reboots
+        	if (Build.VERSION.SDK_INT < 21) {
+                PodcastUpdater.setupAlarm(context);
+            }
         }
     }
 }

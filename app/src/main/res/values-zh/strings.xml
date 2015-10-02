@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+  <!--For playing media on another device, like a chromecast-->
+  <!--When downloading and parsing the content of a feed-->
+  <!--Search engine for searching for new podcasts-->
+</resources>

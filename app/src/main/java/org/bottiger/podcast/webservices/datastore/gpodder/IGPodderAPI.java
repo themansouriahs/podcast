@@ -18,6 +18,7 @@ import java.util.Set;
 
 import retrofit.Call;
 import retrofit.Callback;
+import retrofit.Retrofit;
 import retrofit.http.Body;
 import retrofit.http.GET;
 import retrofit.http.Header;
@@ -41,7 +42,7 @@ public interface IGPodderAPI {
     */
     @POST("/api/2/auth/{username}/login.json")
     //void login(@Path("user") String user, @Header("Authorization") String authorization, Callback<String> callback);
-    Call<GNull> login(@Path("username") String user);
+    Call<com.squareup.okhttp.ResponseBody> login(@Path("username") String user);
 
     @POST("/api/2/auth/{username}/logout.json")
     void logout(@Path("username") String user);
@@ -53,7 +54,7 @@ public interface IGPodderAPI {
 
     // Get Subscriptions of Device
     @GET("/subscriptions/{username}/{deviceid}.json")
-    Call<List<GSubscription>> getDeviceSubscriptions(@Path("username") String user, @Path("deviceid") String device);
+    Call<String[]> getDeviceSubscriptions(@Path("username") String user, @Path("deviceid") String device);
 
     // Get Subscriptions
     @GET("/subscriptions/{username}.json")
@@ -61,11 +62,11 @@ public interface IGPodderAPI {
 
     // Upload Subscriptions of Device
     @PUT("/subscriptions/{username}/{deviceid}.json")
-    Call<String> uploadDeviceSubscriptions(@Body List<String> subscriptions, @Path("username") String user, @Path("deviceid") String device);
+    Call<com.squareup.okhttp.ResponseBody> uploadDeviceSubscriptions(@Body List<String> subscriptions, @Path("username") String user, @Path("deviceid") String device);
 
     // Upload Subscription Changes
     @POST("/api/2/subscriptions/{username}/{deviceid}.json")
-    Call<String> uploadDeviceSubscriptionsChanges(@Body SubscriptionChanges subscriptionChanges, @Path("username") String user, @Path("deviceid") String device);
+    Call<UpdatedUrls> uploadDeviceSubscriptionsChanges(@Body SubscriptionChanges subscriptionChanges, @Path("username") String user, @Path("deviceid") String device);
 
     // Get Subscription Changes
     @GET("/api/2/subscriptions/{username}/{deviceid}.json")
@@ -77,8 +78,8 @@ public interface IGPodderAPI {
 
     // Upload Episode Actions
     @POST("/api/2/episodes/{username}.json")
-    Call<UpdatedUrls> uploadEpisodeActions(@Body List<GEpisodeAction> actions,
-                              @Path("username") String username);
+    Call<UpdatedUrls> uploadEpisodeActions(@Body GEpisodeAction[] actions,
+                                            @Path("username") String username);
 
     // Get Episode Actions
     @GET("/api/2/episodes/{username}.json")
@@ -108,9 +109,9 @@ public interface IGPodderAPI {
     @GET("/api/2/data/episode.json")
     Callback<GEpisode> getEpisodeData(@Query("url") String episodeURL);
 
-    // Podcast Toplist¶
+    // Podcast Toplist
     @GET("/toplist/{number}.json")
-    Call<List<GSubscription>> getPodcastToplist(@Path("count") int amount);
+    Call<List<GSubscription>> getPodcastToplist(@Path("number") int amount);
 
     // Podcast Search
     @GET("/search.json")
@@ -132,7 +133,7 @@ public interface IGPodderAPI {
 
     // Update Device Data
     @POST("/api/2/devices/{username}/{deviceid}.json")
-    Call updateDeviceData(@Path("username") String username, @Path("deviceid") String deviceid, @Body GDevice device);
+    Call<com.squareup.okhttp.ResponseBody> updateDeviceData(@Path("username") String username, @Path("deviceid") String deviceid, @Body GDevice device);
 
     // List devices
     @POST("/api/2/devices/{username}.json")

@@ -4,6 +4,7 @@ import android.support.annotation.Nullable;
 
 import retrofit.Callback;
 import retrofit.Response;
+import retrofit.Retrofit;
 
 /**
  * Created by Arvid on 8/27/2015.
@@ -19,12 +20,12 @@ public class CallbackWrapper<T> implements Callback<T>, IWebservice.ICallback {
     }
 
     @Override
-    public void onResponse(Response response) {
+    public void onResponse(Response response, Retrofit argRetrofit) {
         if (mCallback != null)
-            mCallback.onResponse(response);
+            mCallback.onResponse(response, argRetrofit);
 
         if (mICallback != null)
-            mICallback.onResponse(response);
+            mICallback.onResponse(response, argRetrofit);
     }
 
     @Override

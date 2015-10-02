@@ -12,6 +12,9 @@
         android:layout_height="match_parent"/>
 
 
+    <!--
+    android:background="?attr/themeBackground"
+    -->
     <org.bottiger.podcast.views.FeedRecyclerView
         android:id="@+id/feed_recycler_view"
         style="@style/FeedViewRecyclerView"
@@ -19,7 +22,6 @@
         android:fadeScrollbars="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/white_opaque"
         android:overScrollMode="never"
         />
 <!--

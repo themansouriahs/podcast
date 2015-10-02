@@ -9,6 +9,10 @@ SoundWaves is a free, libre and open source app for fetching and listening to po
 
 If you feel like helping out we are more than happy to accept any kind of help. There are a lot of programming - and non programming - tasks which needs to be done .  
 
+## BETA Testing
+
+You can opt in as a beta tester here: http://play.google.com/apps/testing/org.bottiger.podcast
+
 ## Feedback, bug reports and feature requests
 
 I, as many other developers, aim to produce the best possible application for my users :) 

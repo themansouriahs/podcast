@@ -1,5 +1,6 @@
 package org.bottiger.podcast;
 
+import android.app.ActivityManager;
 import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
@@ -10,22 +11,23 @@ import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-
+import com.bugsnag.android.Bugsnag;
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
 
-import org.acra.ACRA;
-import org.acra.ReportingInteractionMode;
-import org.acra.annotation.ReportsCrashes;
 import org.bottiger.podcast.flavors.Analytics.AnalyticsFactory;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.CrashReporterFactory;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.images.FrescoHelper;
+import org.bottiger.podcast.images.LollipopBitmapMemoryCacheParamsSupplier;
 import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
 import org.bottiger.podcast.service.PlayerService;
 
 //Acra debugging
+/*
 @ReportsCrashes(
         // not used
         formUri = "https://acra.bottiger.org/acra-soundwaves/_design/acra-storage/_update/report",
@@ -37,6 +39,7 @@ import org.bottiger.podcast.service.PlayerService;
         httpMethod = org.acra.sender.HttpSender.Method.POST,
         reportType = org.acra.sender.HttpSender.Type.JSON,
         socketTimeout = 10000)
+        */
 public class SoundWaves extends Application {
 
     static {
@@ -55,6 +58,10 @@ public class SoundWaves extends Application {
 
     private static Bus sBus = new Bus(ThreadEnforcer.MAIN);
 
+    public static class PlayerServiceBound {
+        public boolean isConnected;
+    }
+
     public static PlayerService sBoundPlayerService = null; // deprecated
     public ServiceConnection playerServiceConnection = new ServiceConnection() {
         @Override
@@ -62,7 +69,9 @@ public class SoundWaves extends Application {
             Log.d("PlayerService", "onServiceConnected");
             sBoundPlayerService = ((PlayerService.PlayerBinder) service)
                     .getService();
-            //sBoundPlayerService.setMediaCast(mMediaRouteCast); FIXME reenable
+            PlayerServiceBound playerServiceBound = new PlayerServiceBound();
+            playerServiceBound.isConnected = true;
+            sBus.post(playerServiceBound);
         }
 
         @Override
@@ -77,15 +86,16 @@ public class SoundWaves extends Application {
         super.onCreate();
 
         // The following line triggers the initialization of ACRA
-        if (!BuildConfig.DEBUG) { //  || System.currentTimeMillis() > 0
+        //if (!BuildConfig.DEBUG) { //  || System.currentTimeMillis() > 0
             // ACRA - crash reporter
             CrashReporterFactory.startReporter(this);
 
             // ANR
             //new ANRWatchDog(10000 /*timeout*/).start();
-        }
+        //}
 
-        Fresco.initialize(this);
+        ImagePipelineConfig imagePipelineConfig = FrescoHelper.getImagePipelineConfig(this);
+        Fresco.initialize(getApplicationContext(), imagePipelineConfig);
 
         sAnalytics = AnalyticsFactory.getAnalytics(this);
         sAnalytics.startTracking();

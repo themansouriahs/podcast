@@ -15,6 +15,7 @@ import org.bottiger.podcast.R;
  */
 public class SearchResultViewHolder extends RecyclerView.ViewHolder {
 
+    public View container;
     public TextView title;
     public SimpleDraweeView image;
     public android.support.v7.widget.SwitchCompat toggleSwitch;
@@ -24,6 +25,7 @@ public class SearchResultViewHolder extends RecyclerView.ViewHolder {
     public SearchResultViewHolder(View itemView) {
         super(itemView);
 
+        container = itemView.findViewById(R.id.container);
         title = (TextView) itemView.findViewById(R.id.result_title);
         image = (SimpleDraweeView) itemView.findViewById(R.id.result_image);
         toggleSwitch = (android.support.v7.widget.SwitchCompat) itemView.findViewById(R.id.result_subscribe_switch);

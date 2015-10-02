@@ -39,6 +39,18 @@
 
         </PreferenceCategory>
 
+        <PreferenceCategory
+            android:title="@string/pref_help_beta_title"
+            android:key="pref_help_category">
+
+            <Preference
+                android:key="pref_help_static_field_2"
+                android:selectable="false"
+                android:persistent="false"
+                android:summary="@string/pref_help_beta_description"/>
+
+        </PreferenceCategory>
+
     </PreferenceScreen>
 
     <PreferenceScreen
@@ -71,7 +83,7 @@
 
         <CheckBoxPreference
             android:defaultValue="false"
-            android:key="pref_dark_theme"
+            android:key="@string/pref_dark_theme_key"
             android:summary="@string/pref_dark_theme"
             android:title="@string/pref_dark_theme_title" />
 
@@ -116,6 +128,12 @@
                 android:summary="@string/pref_continuously_playing_description"
                 android:title="@string/pref_continuously_playing" />
 
+            <CheckBoxPreference
+                android:defaultValue="@bool/pref_open_video_externally_default"
+                android:key="@string/pref_open_video_externally_key"
+                android:summary="@string/pref_open_video_externally_description"
+                android:title="@string/pref_open_video_externally" />
+
         </PreferenceCategory>
 
     </PreferenceScreen>
@@ -140,7 +158,7 @@
             android:title="@string/pref_download_on_update_title" />
 
         <CheckBoxPreference
-            android:defaultValue="false"
+            android:defaultValue="@bool/pref_download_only_wifi_default"
             android:key="@string/pref_download_only_wifi_key"
             android:summary="@string/pref_only_wifi_description"
             android:title="@string/pref_only_wifi_title" />

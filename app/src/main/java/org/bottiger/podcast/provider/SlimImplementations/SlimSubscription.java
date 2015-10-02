@@ -4,9 +4,11 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.view.View;
 
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.provider.converter.EpisodeConverter;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -24,6 +26,9 @@ public class SlimSubscription implements ISubscription, Parcelable {
     private URL mURL;
     private String mImageURL;
     private ArrayList<SlimEpisode> mEpisodes = new ArrayList<>();
+
+    private boolean mIsSubscribed = false;
+    private boolean mIsDirty = false;
 
     public SlimSubscription(@NonNull String argTitle, @NonNull URL argURL, @Nullable String argImageURL) {
         mTitle = argTitle;
@@ -46,7 +51,7 @@ public class SlimSubscription implements ISubscription, Parcelable {
     @NonNull
     @Override
     public String getURLString() {
-        return "";
+        return mURL.toString();
     }
 
     @Nullable
@@ -76,8 +81,46 @@ public class SlimSubscription implements ISubscription, Parcelable {
     }
 
     @Override
+    public void setLink(@Nullable String argLink) {
+
+    }
+
+    @Override
+    public void addEpisode(@Nullable IEpisode episode) {
+        SlimEpisode slimEpisode = EpisodeConverter.toSlim(episode);
+        mEpisodes.add(slimEpisode);
+    }
+
+    @Override
     public boolean IsDirty() {
+        return mIsDirty;
+    }
+
+    public void markForSubscription(boolean argDoSubscribe) {
+        setIsSubscribed(argDoSubscribe);
+        mIsDirty = argDoSubscribe;
+    }
+
+    /**
+     * See comment in the interface
+     */
+    @Override
+    public boolean IsSubscribed() {
+        return mIsSubscribed;
+    }
+
+    public void setIsSubscribed(boolean argIsSubscribed) {
+        mIsSubscribed = argIsSubscribed;
+    }
+
+    @Override
+    public boolean IsRefreshing() {
         return false;
+    }
+
+    @Override
+    public void setIsRefreshing(boolean argIsRefreshing) {
+
     }
 
     public ArrayList<SlimEpisode> getEpisodes() {
@@ -89,8 +132,13 @@ public class SlimSubscription implements ISubscription, Parcelable {
     }
 
     @Override
-    public TYPE getType() {
-        return TYPE.SLIM;
+    public @Type int getType() {
+        return ISubscription.SLIM;
+    }
+
+    @Override
+    public int getPrimaryColor() {
+        return -1;
     }
 
     public int describeContents() {

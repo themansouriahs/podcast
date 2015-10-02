@@ -142,16 +142,6 @@
     <item>30</item>
     <item>60</item>
   </string-array>
-  <string-array name="pref_subscriptions_columns_entries">
-    <item>En liste</item>
-    <item>2 kolonner</item>
-    <item>3 kolonner</item>
-  </string-array>
-  <string-array name="pref_subscriptions_columns_entries_values">
-    <item>1</item>
-    <item>2</item>
-    <item>3</item>
-  </string-array>
   <string-array name="playlist_sort_order">
     <item>Sorter efter: Nyeste</item>
     <item>Sorter efter: Ældste</item>

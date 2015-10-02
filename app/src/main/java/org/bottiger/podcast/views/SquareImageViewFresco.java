@@ -5,7 +5,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.ImageView;
 
-public class SquareImageViewFresco extends com.facebook.drawee.view.SimpleDraweeView {
+public class SquareImageViewFresco extends ImageViewTinted {
     public SquareImageViewFresco(Context context) {
         super(context);
     }

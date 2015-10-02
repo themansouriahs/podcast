@@ -1,11 +1,13 @@
 package org.bottiger.podcast.playlist;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.support.v4.app.Fragment;
 
 import android.database.Cursor;
 
-import org.bottiger.podcast.adapters.FeedViewAdapter;
+import org.bottiger.podcast.activities.feedview.FeedViewAdapter;
+import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.Subscription;
 
@@ -48,5 +50,27 @@ public class FeedCursorLoader extends GenericCursorLoader {
         long id = subscription == null ? 5 : subscription.getId();
         String where = ItemColumns.SUBS_ID + "=" + id;
         return where;
+    }
+
+    public static FeedItem[] asCursor(ContentResolver context, String argWhere) {
+        Cursor cursor = null;
+        FeedItem[] items;
+
+        try {
+            cursor = context.query(ItemColumns.URI,
+                    ItemColumns.ALL_COLUMNS, argWhere, null, null);
+
+            items = new FeedItem[cursor.getCount()];
+
+            int i = 0;
+            while (cursor.moveToNext()) {
+                items[i] = FeedItem.getByCursor(cursor);
+                i++;
+            }
+        } finally {
+            cursor.close();
+        }
+
+        return items;
     }
 }

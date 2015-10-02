@@ -2,87 +2,48 @@ package org.bottiger.podcast;
 
 import java.io.IOException;
 
-import org.bottiger.podcast.AbstractEpisodeFragment.OnPlaylistRefreshListener;
-import org.bottiger.podcast.cloud.CloudProvider;
 import org.bottiger.podcast.debug.SqliteCopy;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
-import org.bottiger.podcast.service.HTTPDService;
 import org.bottiger.podcast.service.PlayerService;
-import org.bottiger.podcast.service.PodcastService;
+import org.bottiger.podcast.service.syncadapter.CloudSyncUtils;
 import org.bottiger.podcast.utils.PreferenceHelper;
 import org.bottiger.podcast.views.dialogs.DialogAddPodcast;
 import org.bottiger.podcast.utils.ThemeHelper;
 import org.bottiger.podcast.utils.TransitionUtils;
 
 
-import android.accounts.Account;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Debug;
-import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.google.api.client.json.gson.GsonFactory;
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.imagepipeline.core.ImagePipeline;
 
 // Sliding
-public class MainActivity extends FragmentContainerActivity implements
-		OnPlaylistRefreshListener {
+public class MainActivity extends FragmentContainerActivity {
 
-	private static final String ACCOUNT_KEY = "account";
-
-	private final int REQUEST_AUTHORIZATION = 1;
-	private final int REQUEST_ACCOUNT_PICKER = 0;
-
-	public static PodcastService mPodcastServiceBinder = null;
-	public static HTTPDService mHTTPDServiceBinder = null;
-
-	static boolean mBound = false;
+	private static final String TAG = "MainActivity";
 
     static PreferenceHelper mPreferenceHelper = new PreferenceHelper();
-
-	// public static GoogleReader gReader = null;
-	public static CloudProvider gReader = null;
-
-	protected static Cursor mCursor = null;
-	protected boolean mInit = false;
-	public static Account mAccount;
 
     private HeadsetReceiver receiver;
 
 	private SharedPreferences prefs;
 
 	private int currentTheme;
-
-	public static ServiceConnection mHTTPDServiceConnection = new ServiceConnection() {
-		@Override
-		public void onServiceConnected(ComponentName className, IBinder service) {
-			mHTTPDServiceBinder = ((HTTPDService.HTTPDBinder) service)
-					.getService();
-			String out = mHTTPDServiceBinder.getTest();
-			// android.util.Log.d("nanoHTTPD", out);
-
-			// init webserver
-
-		}
-
-		@Override
-		public void onServiceDisconnected(ComponentName className) {
-			mHTTPDServiceBinder = null;
-		}
-	};
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -91,14 +52,6 @@ public class MainActivity extends FragmentContainerActivity implements
         // Start the player service
 		((SoundWaves)getApplicationContext()).startService();
 
-		/*
-		 * BugSenseHandler.initAndStartSession(MainActivity.this, ((SoundWaves)
-		 * this.getApplication()).getBugSenseAPIKey());
-		 */
-		// 3132
-		//PodcastOpenHelper helper = new PodcastOpenHelper(this);
-		//helper.getWritableDatabase().execSQL("update subscriptions set status = " + Subscription.STATUS_SUBSCRIBED);
-		
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
 		if (ApplicationConfiguration.TRACE_STARTUP) {
@@ -116,65 +69,12 @@ public class MainActivity extends FragmentContainerActivity implements
 			}
 		}
 
-		if (prefs.getBoolean(SettingsActivity.CLOUD_SUPPORT, false) && false) {
-
-            /*
-			mCredential = GoogleAccountCredential.usingOAuth2(this,
-					DriveSyncer.getScope()); // "https://www.googleapis.com/auth/drive.appdata");
-												// //DriveScopes.DRIVE);
-			// mCredential = GoogleAccountCredential.usingOAuth2(this,
-			// DriveScopes.DRIVE_FILE); //DriveScopes.DRIVE);
-			if (!prefs.contains(ACCOUNT_KEY))
-				startActivityForResult(mCredential.newChooseAccountIntent(),
-						REQUEST_ACCOUNT_PICKER);
-			else
-				mCredential.setSelectedAccountName(prefs.getString(ACCOUNT_KEY,
-						""));*/
-
-            /*
-            GOogle flavor
-
-			new Thread(new Runnable() {
-				public void run() {
-					try {
-    						mCredential.getToken();
-					} catch (Exception e) {
-						e.printStackTrace();
-						if (e instanceof UserRecoverableAuthException) {
-							startActivityForResult(
-									((UserRecoverableAuthException) e)
-											.getIntent(), REQUEST_AUTHORIZATION);
-						}
-					}
-
-					mDriveService = getDriveService(mCredential);
-				}
-			}); //.start();
-			*/
-
-		}
-
 		//setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         mPreferenceHelper.setOrientation(this, prefs);
-
-		/** Painless networking with Volley */
-		//RequestManager.init(this);
-		//ImageCacheManager.getInstance().init(this, this.getPackageCodePath(),
-		//		DISK_IMAGECACHE_SIZE, DISK_IMAGECACHE_COMPRESS_FORMAT,
-		//		DISK_IMAGECACHE_QUALITY, CacheType.MEMORY);
 
 		// Start Application services
 		if (!isMyServiceRunning(PlayerService.class.getName()))
 			startService(new Intent(this, PlayerService.class));
-
-        /*
-		if (!isMyServiceRunning(HTTPDService.class.getName())) {
-			startService(new Intent(this, HTTPDService.class));
-
-			Intent bindIntent = new Intent(this, HTTPDService.class);
-			bindService(bindIntent, mHTTPDServiceConnection,
-					Context.BIND_AUTO_CREATE);
-		}*/
 
 		currentTheme = ThemeHelper.getTheme(prefs);
 		setTheme(currentTheme);
@@ -187,9 +87,13 @@ public class MainActivity extends FragmentContainerActivity implements
 		receiver = new HeadsetReceiver();
 		registerReceiver(receiver, receiverFilter);
 
+		if (Build.VERSION.SDK_INT >= 23) {
+			CloudSyncUtils.startCloudSync(this);
+		}
+
 	}
 
-    /**
+	/**
      * Return a reference to the playerservice if bound
      */
     @Nullable
@@ -224,48 +128,6 @@ public class MainActivity extends FragmentContainerActivity implements
 		return false;
 	}
 
-    /*
-	public static GoogleAccountCredential getCredentials() {
-		return mCredential;
-	}
-
-	@Override
-	protected void onActivityResult(final int requestCode,
-			final int resultCode, final Intent data) {
-		switch (requestCode) {
-		case REQUEST_ACCOUNT_PICKER:
-			if (resultCode == RESULT_OK && data != null
-					&& data.getExtras() != null) {
-				String accountName = data
-						.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-				if (accountName != null) {
-					prefs.edit().putString(ACCOUNT_KEY, accountName).commit();
-					mCredential.setSelectedAccountName(accountName);
-					//mDriveService = getDriveService(mCredential);
-					// startCameraIntent();
-					// updateDatabase();
-					Account account = mCredential.getSelectedAccount();
-					Bundle bundle = new Bundle();
-					bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED,
-							true);
-					bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-					ContentResolver.requestSync(account,
-							"org.bottiger.podcast.provider.podcastprovider",
-							bundle);
-				}
-			}
-			break;
-		case REQUEST_AUTHORIZATION:
-			if (resultCode == Activity.RESULT_OK) {
-				// saveFileToDrive();
-			} else {
-				startActivityForResult(mCredential.newChooseAccountIntent(),
-						REQUEST_ACCOUNT_PICKER);
-			}
-			break;
-		}
-	}*/
-
 	@Override
 	protected void onPause() {
 		super.onPause();
@@ -286,32 +148,24 @@ public class MainActivity extends FragmentContainerActivity implements
 	}
 
 	@Override
-	public void onRefreshPlaylist() {
-		//mSectionsPagerAdapter.refreshData(SectionsPagerAdapter.PLAYLIST);
-	}
-
-	@Override
 	public void onResume() {
 		super.onResume();
 		refreshTheme();
-		if (mInit) {
-			mInit = false;
-
-			if (mCursor != null)
-				mCursor.close();
-		}
-
-		PodcastService.setupAlarm(this);
-
 	}
 
 	@Override
 	public void onLowMemory() {
 		super.onLowMemory();
-		mInit = true;
+	}
 
-		log.debug("onLowMemory()");
-		// finish();
+	@Override
+	public void onTrimMemory(int level) {
+		super.onTrimMemory(level);
+		if (level >= TRIM_MEMORY_MODERATE ) {
+			// Clear fresco cache
+			ImagePipeline imagePipeline = Fresco.getImagePipeline();
+			imagePipeline.clearMemoryCaches();
+		}
 	}
 
 	/**
@@ -321,26 +175,7 @@ public class MainActivity extends FragmentContainerActivity implements
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.activity_swipe, menu);
-		ThemeHelper themeHelper = new ThemeHelper(this);
-
-		// The extended_player can only be playing if the PlayerService has been bound
-        /*
-		MenuItem menuItem = menu.findItem(R.id.menu_control);
-		if (PodcastBaseFragment.sBoundPlayerService != null) {
-
-			if (PodcastBaseFragment.sBoundPlayerService.isPlaying()) {
-				menuItem.setIcon(themeHelper.getAttr(R.attr.pause_invert_icon));
-			} else if (PodcastBaseFragment.sBoundPlayerService.isOnPause()) {
-				menuItem.setIcon(themeHelper.getAttr(R.attr.play_invert_icon));
-			} else {
-				//menuItem.setVisible(false);
-			}
-		} else {
-			//menuItem.setVisible(false);
-		}*/
-
 		return super.onCreateOptionsMenu(menu);
-
 	}
 
 	/**
@@ -349,14 +184,7 @@ public class MainActivity extends FragmentContainerActivity implements
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-            /*
-		case R.id.menu_control:
-			if (PodcastBaseFragment.sBoundPlayerService != null) {
-				PodcastBaseFragment.sBoundPlayerService.toggle();
-			}
-			return true;*/
 		case R.id.menu_add:
-			// mDriveUtils.driveAccount();
 			DialogAddPodcast.addPodcast(this);
 			return true;
 		case R.id.menu_settings:
@@ -368,11 +196,4 @@ public class MainActivity extends FragmentContainerActivity implements
 		}
 		return super.onOptionsItemSelected(item);
 	}
-
-    /*
-	private Drive getDriveService(GoogleAccountCredential credential) {
-		return new Drive.Builder(AndroidHttp.newCompatibleTransport(),
-				new GsonFactory(), credential).build();
-	}*/
-
 }

@@ -14,6 +14,8 @@
         <item name="skip_to_next">@drawable/ic_skip_next_white</item>
         <item name="rewind_icon">@drawable/ic_action_rewind</item>
         <item name="ic_remove">@drawable/ic_highlight_remove_white</item>
+        <item name="ic_remove_inv">@drawable/ic_highlight_remove_black</item>
+        <item name="favorite_outline_inv">@drawable/ic_favorite_outline_black</item>
         <item name="previous_icon">@drawable/ic_action_previous</item>
         <item name="ic_rewind">@drawable/ic_fast_rewind_white</item>
         <item name="ic_forward">@drawable/ic_fast_forward_white</item>
@@ -38,6 +40,15 @@
         <item name="fullscreen_exit">@drawable/ic_fullscreen_exit_white</item>
         <!--<item name="seekbar_handle">@drawable/seekbar_handle2.9</item>-->
         <item name="android:actionBarStyle">@style/TranslucentActionBar</item>
+
+        <item name="android:windowBackground">@null</item>
+        <item name="themeBackground">@color/pitch_black</item>
+        <item name="themeTextColorPrimary">@color/white_opaque</item>
+        <item name="themeTextColorFaded">@color/grayDark</item>
+
+        <!--<item name="android:background">@color/pitch_black</item>
+        <item name="android:windowBackground">@color/pitch_black</item>-->
+        <!--<item name="android:colorBackground">@color/pitch_black</item>-->
 
         <item name="android:windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
@@ -79,8 +90,21 @@
         <item name="fullscreen">@drawable/ic_fullscreen_white</item>
         <item name="fullscreen_exit">@drawable/ic_fullscreen_exit_white</item>
         <!--<item name="seekbar_handle">@drawable/seekbar_handle</item>-->
+        <item name="ic_remove_inv">@drawable/ic_highlight_remove_black</item>
+        <item name="favorite_outline_inv">@drawable/ic_favorite_outline_black</item>
 
         <item name="android:actionBarStyle">@style/TransparentActionBar</item>
+
+        <item name="android:windowBackground">@null</item>
+        <item name="themeBackground">@color/white_opaque</item>
+        <item name="themeTextColorPrimary">@color/pitch_black</item>
+        <item name="themeTextColorFaded">@color/grayDark</item>
+        <!--
+        <item name="android:background">@color/white_opaque</item>
+
+        <item name="android:windowBackground">@color/white_opaque</item>
+        -->
+        <!--<item name="android:colorBackground">@color/white_opaque</item>-->
 
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorSecondary</item>
@@ -112,12 +136,62 @@
         <item name="android:textViewStyle">@style/SoundWavesTextViewStyle</item>
     </style>
 
+    <style name="PreferenceTheme" parent="SoundWavesTheme.Light">
+        <item name="android:windowBackground">@color/white_opaque</item>
+        <item name="android:textColor">@color/pitch_black</item>
+        <!--<item name="android:listViewStyle">@style/listViewPrefs</item>-->
+    </style>
+
+    <style name="PreferenceThemeDark" parent="SoundWavesTheme.Light">
+        <item name="android:windowBackground">@color/pitch_black</item>
+        <item name="android:textColor">@color/white_opaque</item>
+        <!--<item name="android:listViewStyle">@style/listViewPrefs</item>-->
+    </style>
+
     <style name="SoundWavesTextViewStyle" parent="android:Widget.TextView">
         <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
     </style>
 
+    <style name="SoundWavesListTextViewStyle" parent="SoundWavesTextViewStyle">
+        <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingBottom">20dp</item>
+    </style>
+
+    <style name="FeedActivitySettingsTextStyle" parent="SoundWavesTextViewStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
+        <item name="android:textSize">18sp</item>
+
+    </style>
+
+    <style name="FeedActivitySettingsSwitchStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">right</item>
+        <item name="android:checked">false</item>
+    </style>
+
+    <!--
     <style name="NotificationText" parent="android:TextAppearance.StatusBar.EventContent" />
     <style name="NotificationTitle" parent="android:TextAppearance.StatusBar.EventContent.Title" />
+    -->
+    <style name="NotificationTitle" parent="android:TextAppearance.Material.Notification.Title"></style>
+    <style name="NotificationText" parent="android:TextAppearance.Material.Notification"></style>
+
+    <!--
+    <style name="NotificationTitle">
+        <item name="textColor">@color/primary_text_default_material_light</item>
+        <item name="textSize">@dimen/notification_title_text_size</item>
+    </style>
+
+    <style name="NotificationContent">
+        <item name="textColor">@color/primary_text_default_material_light</item>
+        <item name="textSize">@dimen/notification_title_text_size</item>
+    </style>
+    -->
+
 
     <style name="SoundWaves.PreferenceActivity.Light" parent="SoundWavesTheme.Light">
         <item name="android:windowTranslucentNavigation" tools:targetApi="19">false</item> <!-- actionbar and  bottom navigation -->
@@ -222,13 +296,14 @@
     </style>
 
     <style name="TopPlayerButton" parent="@style/PlaylistButton">
-        <item name="android:layout_above">@id/player_progress</item>
+        <item name="android:layout_above">@id/player_center_square</item>
         <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">40dp</item>
         <item name="android:layout_weight">1</item>
         <!--<item name="android:maxWidth">55dip</item>-->
         <item name="android:layout_marginBottom">0dp</item>
-        <item name="android:layout_marginTop">10dp</item>
-        <item name="android:padding">5dp</item>
+        <item name="android:layout_marginTop">5dp</item>
+        <item name="android:padding">0dp</item>
     </style>
 
     <style name="SeekPlayerButton" parent="@style/PlaylistButton">
@@ -319,10 +394,17 @@
 
     <style name="tallerBarStyle">
         <item name="android:indeterminateOnly">false</item>
+
+
+        <!--
         <item name="android:progressDrawable">@drawable/player_seekbar_progress</item>
         <item name="android:indeterminateDrawable">@android:drawable/progress_indeterminate_horizontal</item>
+        -->
+
+        <!--
         <item name="android:minHeight">10dip</item>
         <item name="android:maxHeight">10dip</item>
+        -->
     </style>
 
     <!-- Navigation Drawer - Start -->
@@ -338,7 +420,7 @@
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/filter_text</item>
         <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
-        <!--<item name="android:background">@android:drawable/spinner_dropdown_background</item>-->
+        <item name="android:background">@android:drawable/spinner_dropdown_background</item>
     </style>
     <!-- Navigation Drawer - End -->
 

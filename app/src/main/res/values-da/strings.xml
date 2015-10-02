@@ -19,8 +19,14 @@
   <string name="menu_settings">Indstillinger</string>
   <string name="title_activity_swipe">SoundWaves</string>
   <string name="menu_download_all">Masse Download</string>
+  <string name="menu_clear_playlist">Nulstil playliste</string>
   <string name="menu_import">Importer/Exporter OPML</string>
   <string name="menu_add_podcast">Tilføj Podcast</string>
+  <string name="menu_order_by_date_desc">Vis nyeste først</string>
+  <string name="menu_order_by_date_asc">Vis ældste først</string>
+  <string name="pref_feedback_title">Send anonymiserede rapporter</string>
+  <string name="pref_feedback_description">Send anonymisered data angående app\'en og evt problemer</string>
+  <string name="pref_cloud_support_title">aktiver understøttelese af \'skyen\'</string>
   <string name="drawer_open">Åben</string>
   <string name="drawer_close">Luk</string>
   <string name="episode_title">Episode titel</string>

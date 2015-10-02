@@ -2,8 +2,11 @@ package org.bottiger.podcast.views;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.graphics.Palette;
@@ -14,13 +17,13 @@ import android.view.View;
 import com.squareup.otto.Subscribe;
 
 import org.bottiger.podcast.R;
-import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.DownloadProgress;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
-import org.bottiger.podcast.service.DownloadStatus;
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
-import org.bottiger.podcast.utils.ColorExtractor;
+import org.bottiger.podcast.utils.ColorUtils;
+import org.bottiger.podcast.utils.ThemeHelper;
 
 /**
  * Created by apl on 02-09-2014.
@@ -32,9 +35,15 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
     private Context mContext;
 
     private Drawable mStaticBackground = null;
-    private int download_icon = R.drawable.ic_get_app_white;
-    private int qeueed_icon = R.drawable.ic_schedule_white;
-    private int delete_icon = R.drawable.ic_delete_white;
+    private @DrawableRes int download_icon = R.drawable.ic_get_app_white;
+    private @DrawableRes int qeueed_icon = R.drawable.ic_schedule_white;
+    private @DrawableRes int delete_icon = R.drawable.ic_delete_white;
+
+    private static final int BITMAP_OFFSET = 5;
+    private static final float RECTANGLE_SCALING = 1F;
+
+    private RectF buttonRectangle;
+    private int mLastProgress = 0;
 
     public DownloadButtonView(Context context) {
         super(context);
@@ -54,6 +63,8 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
     private void init(Context argContext, @Nullable AttributeSet attrs) {
         mContext = argContext;
 
+        buttonRectangle = new RectF();
+
         setOnClickListener(this);
 
         // Detect of we have defined a background color for the view
@@ -70,6 +81,23 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
                     download_icon = R.drawable.ic_get_app_grey;
                     qeueed_icon = R.drawable.ic_schedule_grey;
                     delete_icon = R.drawable.ic_delete_grey;
+                }
+            }
+        }
+
+        if (getId() == R.id.expanded_download) {
+            if (attrs != null) {
+                int[] attrsArray = new int[]{
+                        android.R.attr.background, // 0
+                };
+                TypedArray ta = mContext.obtainStyledAttributes(attrs, attrsArray);
+                mStaticBackground = ta.getDrawable(0);
+                ta.recycle();
+
+                if (mStaticBackground != getResources().getDrawable(R.color.colorPrimaryDark)) {
+                    download_icon = R.drawable.ic_get_app_black;
+                    qeueed_icon = R.drawable.ic_schedule_black;
+                    delete_icon = R.drawable.ic_delete_black;
                 }
             }
         }
@@ -102,6 +130,28 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
     }
 
     @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+
+        float halfW = getWidth()*RECTANGLE_SCALING;
+
+        int left = 0;
+        int width = (int)(halfW);
+        int top = 0;
+
+        buttonRectangle.set(left+BITMAP_OFFSET, top+BITMAP_OFFSET, left + width-BITMAP_OFFSET, top + width-BITMAP_OFFSET);
+
+        if(mProgress!=0 && mProgress < 100) {
+            if (getState() != PlayerButtonView.STATE_DEFAULT) {
+                setState(PlayerButtonView.STATE_DEFAULT);
+            }
+            canvas.drawArc(buttonRectangle, -90, Math.round(360 * mProgress / 100F), false, mForegroundColorPaint);
+        }
+
+        mLastProgress = mProgress;
+    }
+
+    @Override
     public int ButtonColor(@NonNull Palette argPalette) {
         if (mStaticBackground != null)
             return Color.argb(0, 0, 0, 0); // transparent
@@ -113,26 +163,24 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
     public void setEpisode(@NonNull IEpisode argItem) {
         super.setEpisode(argItem);
 
-        try {
-            //SoundWaves.sBus.register(this);
-        } catch (IllegalArgumentException iae) {
-            // Ignore
-        }
         setState(calcState());
         setProgressPercent(new DownloadProgress());
     }
 
-    /*
-    @Override
-    public synchronized void unsetEpisodeId() {
-        super.unsetEpisodeId();
-        SoundWaves.sBus.unregister(this);
-    }*/
-
     @Subscribe
     public void setProgressPercent(@NonNull DownloadProgress argProgress) {
-        if (!getEpisode().equals(argProgress.getEpisode()))
+
+        /*
+        FIXME: Becasue we register each button ASAP we can have a registered button without a EpisodeID
+                I should take a look at that.
+         */
+        try {
+            if (!getEpisode().equals(argProgress.getEpisode()))
+                return;
+        } catch (Exception e) {
+            VendorCrashReporter.handleException(e);
             return;
+        }
 
         mProgress = argProgress.getProgress();
         if (mProgress == 100) {
@@ -161,7 +209,7 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
 
         if (getState() == PlayerButtonView.STATE_DEFAULT) {
             Log.v(TAG, "Queue download");
-            EpisodeDownloadManager.addItemAndStartDownload(getEpisode(), EpisodeDownloadManager.QUEUE_POSITION.FIRST, mContext);
+            EpisodeDownloadManager.addItemAndStartDownload(getEpisode(), EpisodeDownloadManager.FIRST, mContext);
             setState(PlayerButtonView.STATE_QUEUE);
         } else if (getState() == PlayerButtonView.STATE_DELETE) {
             Log.v(TAG, "Delete file");

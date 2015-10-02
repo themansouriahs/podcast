@@ -4,7 +4,8 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import org.bottiger.podcast.adapters.FeedViewAdapter;
+import org.bottiger.podcast.activities.feedview.EpisodeViewHolder;
+import org.bottiger.podcast.activities.feedview.FeedViewAdapter;
 
 /**
  * Created by Arvid on 8/15/2015.
@@ -14,7 +15,7 @@ public class FeedViewItemAnimator extends DefaultItemAnimator {
     @Override
     public boolean animateChange (RecyclerView.ViewHolder oldHolder, RecyclerView.ViewHolder newHolder, int fromLeft, int fromTop, int toLeft, int toTop) {
 
-        FeedViewAdapter.EpisodeViewHolder episodeViewHolder = ((FeedViewAdapter.EpisodeViewHolder)oldHolder);
+        EpisodeViewHolder episodeViewHolder = ((EpisodeViewHolder)oldHolder);
 
         if(episodeViewHolder != null)
         {

@@ -1,11 +1,14 @@
 package org.bottiger.podcast;
 
 import org.bottiger.podcast.Animations.DepthPageTransformer;
+import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.utils.PodcastLog;
-import org.bottiger.podcast.views.ViewPagerWithDismiss;
+import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.views.SlidingTab.SlidingTabLayout;
+import org.bottiger.podcast.views.TopPlayer;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -21,7 +24,11 @@ import android.view.ViewGroup;
 
 public class FragmentContainerActivity extends DrawerActivity {
 
-	@Deprecated
+    public static final int PLAYLIST = 0;
+    public static final int SUBSCRIPTION = 1;
+    public static final int DISCOVER = 2;
+
+    @Deprecated
 	public static final boolean debugging = ApplicationConfiguration.DEBUGGING;
 
 	protected final PodcastLog log = PodcastLog.getDebugLog(getClass(), 0);
@@ -46,7 +53,7 @@ public class FragmentContainerActivity extends DrawerActivity {
 
     private SlidingTabLayout mSlidingTabLayout;
 
-    private ViewPagerWithDismiss mInflatedViewStub;
+    private ViewPager mInflatedViewStub;
 
     @Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -59,7 +66,7 @@ public class FragmentContainerActivity extends DrawerActivity {
 
 		mFragmentTransaction = mFragmentManager.beginTransaction();
 
-		mInflatedViewStub = (ViewPagerWithDismiss) findViewById(R.id.app_content);
+		mInflatedViewStub = (ViewPager) findViewById(R.id.app_content);
 
 		// ViewPager setup
         mViewPager = mInflatedViewStub;
@@ -78,7 +85,7 @@ public class FragmentContainerActivity extends DrawerActivity {
             @Override
             public void onPageSelected(int position) {
                 int lockMode = position == 0 ? DrawerLayout.LOCK_MODE_UNLOCKED : DrawerLayout.LOCK_MODE_LOCKED_CLOSED;
-                mDrawerLayout.setDrawerLockMode(lockMode);
+                //mDrawerLayout.setDrawerLockMode(lockMode);
             }
         });
 
@@ -102,11 +109,11 @@ public class FragmentContainerActivity extends DrawerActivity {
 
         });
 
-
-        mViewPager.setPageTransformer(true, new DepthPageTransformer());
+//         android:background="?attr/themeBackground"
+        mViewPager.setPageTransformer(true, new DepthPageTransformer(mDrawerLayout));
 
         if (((SoundWaves)getApplication()).IsFirstRun())
-            mViewPager.setCurrentItem(1);
+            mViewPager.setCurrentItem(SUBSCRIPTION);
 
 
         createScenes(mViewPager);
@@ -125,10 +132,6 @@ public class FragmentContainerActivity extends DrawerActivity {
 	 */
 	public class SectionsPagerAdapter extends FragmentPagerAdapter {
 		// http://stackoverflow.com/questions/10396321/remove-fragment-page-from-viewpager-in-android/10399127#10399127
-
-		public static final int PLAYLIST = 0;
-		public static final int SUBSCRIPTION = 1;
-		public static final int DISCOVER = 2;
 
 		private static final int MAX_FRAGMENTS = 3;
 
@@ -164,8 +167,10 @@ public class FragmentContainerActivity extends DrawerActivity {
 
                 if (position == SUBSCRIPTION) {
                     fragment = new SubscriptionsFragment();
+                    //fragment = new DummyFragment();
                 } else if (position == PLAYLIST) {
                     fragment = new PlaylistFragment();
+                    //fragment = new DummyFragment();
                 } else if (position == DISCOVER) {
                     fragment = new DiscoveryFragment();
                 }
@@ -181,6 +186,28 @@ public class FragmentContainerActivity extends DrawerActivity {
             mFragments[position] = fragment;
 			return fragment;
 		}
+
+        @Override
+        public void setPrimaryItem (ViewGroup container, int position, Object object) {
+            Activity activity = this.getItem(position).getActivity();
+            boolean HasTinted = false;
+            if (activity != null) {
+                if (position == PLAYLIST) {
+                    PlaylistFragment playlistFragment = (PlaylistFragment) mFragments[PLAYLIST];
+                    TopPlayer topPlayer = playlistFragment.getTopPlayer();
+                    if (topPlayer != null && topPlayer.isFullscreen()) {
+                        int color = topPlayer.getBackGroundColor();
+                        UIUtils.tintStatusBar(color, activity);
+                        HasTinted = true;
+                    }
+                }
+
+                if (!HasTinted) {
+                    UIUtils.resetStatusBar(activity, null);
+                }
+            }
+            super.setPrimaryItem(container, position, object);
+        }
 
 		@Override
 		public int getCount() {

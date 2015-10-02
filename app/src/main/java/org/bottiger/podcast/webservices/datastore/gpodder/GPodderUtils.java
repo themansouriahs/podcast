@@ -6,6 +6,14 @@ package org.bottiger.podcast.webservices.datastore.gpodder;
 public class GPodderUtils {
 
     public static String getDeviceID() {
-        return "TestID";
+        return android.os.Build.MODEL.replaceAll("\\s", "");
+    }
+
+    public static String getDeviceCaption() {
+        return "SoundWaves gPodder sync"; // NoI18N
+    }
+
+    public static String getDeviceType() {
+        return "Android device"; // NoI18N
     }
 }

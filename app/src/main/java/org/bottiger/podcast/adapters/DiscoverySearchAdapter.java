@@ -6,9 +6,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.util.Log;
 import android.util.LruCache;
 import android.view.LayoutInflater;
@@ -19,7 +17,7 @@ import android.widget.Toast;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 
-import org.bottiger.podcast.FeedActivity;
+import org.bottiger.podcast.activities.feedview.FeedActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.adapters.viewholders.discovery.SearchResultViewHolder;
@@ -28,6 +26,7 @@ import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionLoader;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
+import org.bottiger.podcast.utils.SharedAdapterUtils;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -102,6 +101,8 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
         } catch (NullPointerException npe) {
             holder.image.setBackgroundColor(mDefaultBackgroundColor);
         }
+
+        SharedAdapterUtils.AddPaddingToLastElement(holder.container, 0, position == mDataset.size()-1);
 
         final URL url = subscription.getURL();
 

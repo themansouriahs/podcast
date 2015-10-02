@@ -44,7 +44,7 @@ public class SubscriptionLoader {
         return subscriptions;
     }
 
-    public static LongSparseArray<ISubscription> asList(ContentResolver context) {
+    public static LongSparseArray<ISubscription> asList(ContentResolver context, boolean argIncludeUnsubscribed) {
         LongSparseArray<ISubscription> subscriptions = new LongSparseArray<>();
         Cursor cursor = null;
         try {
@@ -54,8 +54,10 @@ public class SubscriptionLoader {
             Subscription subscription;
             while (cursor.moveToNext()) {
                 subscription = getByCursor(cursor);
-                key = subscription.getId();
-                subscriptions.append(key, subscription);
+                if (argIncludeUnsubscribed || subscription.IsSubscribed()) {
+                    key = subscription.getId();
+                    subscriptions.append(key, subscription);
+                }
             }
         } finally {
             cursor.close();

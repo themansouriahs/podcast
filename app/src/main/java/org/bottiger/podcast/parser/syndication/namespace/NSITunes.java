@@ -1,8 +1,12 @@
 package org.bottiger.podcast.parser.syndication.namespace;
 
 import org.bottiger.podcast.parser.syndication.handler.HandlerState;
+import org.bottiger.podcast.provider.FeedItem;
 import org.xml.sax.Attributes;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 public class NSITunes extends Namespace{
@@ -14,21 +18,15 @@ public class NSITunes extends Namespace{
 	private static final String IMAGE_HREF = "href";
 	
 	private static final String AUTHOR = "author";
+	public final static String DURATION = "duration";
 	
 	
 	@Override
 	public SyndElement handleElementStart(String localName, HandlerState state,
 			Attributes attributes) {
 
-		if (localName.equals(IMAGE) ) { // && state.getSubscription().getImage() == null) {
-
+		if (localName.equals(IMAGE) ) {
             state.getSubscription().setImageURL(attributes.getValue(IMAGE_HREF));
-            /*
-			FeedImage image = new FeedImage();
-			image.setTitle(IMAGE_TITLE);
-			image.setDownload_url(attributes.getValue(IMAGE_HREF));
-			state.getSubscription().setImage(image);
-			*/
 		}
 		
 		return new SyndElement(localName, this);
@@ -36,9 +34,20 @@ public class NSITunes extends Namespace{
 
 	@Override
 	public void handleElementEnd(String localName, HandlerState state) {
-		if (localName.equals(AUTHOR)) {
-			// FIXME
-			//state.getSubscription().setAuthor(state.getContentBuf().toString());
+		if (localName.equals(DURATION)) {
+			try {
+				String durationString = state.getContentBuf().toString();
+				SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss");
+				Date date = sdf.parse(durationString);
+
+				long duration = date.getTime();
+
+				FeedItem item = state.getCurrentItem();
+				item.setDuration(duration, true);
+
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
 		}
 		
 	}

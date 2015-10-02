@@ -5,11 +5,14 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import org.apache.commons.validator.routines.UrlValidator;
+import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
+import org.bottiger.podcast.utils.BitMaskUtils;
 import org.bottiger.podcast.utils.ColorExtractor;
 
 import android.content.ContentProviderOperation;
@@ -17,9 +20,12 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.graphics.Palette;
 import android.util.Log;
@@ -30,6 +36,24 @@ public class Subscription implements ISubscription, PaletteListener {
 
 	private static final String TAG = "Subscription";
 
+	private static SharedPreferences sSharedPreferences = null;
+
+	private static final int SHOW_EPISODE_DESCRIPTION_SET = 1;
+	private static final int SHOW_EPISODE_DESCRIPTION = (1 << 1);
+	private static final int ADD_NEW_TO_PLAYLIST_SET = (1 << 2);
+	private static final int ADD_NEW_TO_PLAYLIST = (1 << 3);
+	private static final int DOWNLOAD_NEW_EPISODES_SET = (1 << 4);
+	private static final int DOWNLOAD_NEW_EPISODES = (1 << 5);
+	private static final int DELETE_AFTER_PLAYBACK_SET = (1 << 6);
+	private static final int DELETE_AFTER_PLAYBACK = (1 << 7);
+	private static final int LIST_OLDEST_FIRST_SET = (1 << 8);
+	private static final int LIST_OLDEST_FIRST = (1 << 9);
+
+	private final int mOldestFirstID = R.string.pref_list_oldest_first_key;
+	private final int mDeleteAfterPlaybackID = R.string.pref_delete_when_finished_key;
+	private final int mAutoDownloadID = R.string.pref_download_on_update_key;
+	private final int mPlaylistSubscriptionsID = R.string.pref_playlist_subscriptions_key;
+
 	public final static int ADD_SUCCESS = 0;
 	public final static int ADD_FAIL_UNSUCCESS = -2;
 
@@ -37,6 +61,7 @@ public class Subscription implements ISubscription, PaletteListener {
 	public final static int STATUS_UNSUBSCRIBED = 2;
 
     private boolean mIsDirty = false;
+	private boolean mIsRefreshing = false;
 
     /**
      * See SubscriptionColumns for documentation
@@ -58,15 +83,19 @@ public class Subscription implements ISubscription, PaletteListener {
     private int mPrimaryTintColor;
     private int mSecondaryColor;
 
+	/**
+	 * Settings is a bitmasked int with various settings
+	 */
+	private int mSettings;
+
     private final ArrayList<IEpisode> mEpisodes = new ArrayList<>();
 
+	public void setLink(@NonNull String argLink) {
+		this.link = argLink;
+	}
 
 	public String getLink() {
 		return link;
-	}
-
-	public void setLink(String link) {
-		this.link = link;
 	}
 
 	public void reset() {
@@ -86,14 +115,18 @@ public class Subscription implements ISubscription, PaletteListener {
         mPrimaryColor = -1;
         mPrimaryTintColor = -1;
         mSecondaryColor = -1;
+		mSettings = -1;
 	}
 
 	public Subscription() {
 		reset();
+		if (sSharedPreferences == null) {
+			sSharedPreferences = PreferenceManager.getDefaultSharedPreferences(SoundWaves.getAppContext());
+		}
 	}
 
 	public Subscription(String url_link) {
-		reset();
+		this();
 		url = url_link;
 		title = url_link;
 		link = url_link;
@@ -119,7 +152,7 @@ public class Subscription implements ISubscription, PaletteListener {
 
 	public int subscribe(@NonNull final Context context) {
 		Subscription sub = SubscriptionLoader.getByUrl(context.getContentResolver(),
-                url);
+				url);
 
         if (sub == null) {
             ContentValues cv = new ContentValues();
@@ -132,6 +165,7 @@ public class Subscription implements ISubscription, PaletteListener {
             cv.put(SubscriptionColumns.IMAGE_URL, imageURL);
             cv.put(SubscriptionColumns.REMOTE_ID, sync_id);
             cv.put(SubscriptionColumns.STATUS, STATUS_SUBSCRIBED);
+			cv.put(SubscriptionColumns.SETTINGS, -1);
             Uri uri = context.getContentResolver().insert(SubscriptionColumns.URI,
                     cv);
 
@@ -165,10 +199,6 @@ public class Subscription implements ISubscription, PaletteListener {
 		context.delete(uri, null, null);
 	}
 
-    public ArrayList<IEpisode> getEpisodes() {
-        return mEpisodes;
-    }
-
 	public ArrayList<IEpisode> getEpisodes(@NonNull ContentResolver contentResolver) {
 
 		LinkedList<FeedItem> episodes = new LinkedList<>();
@@ -186,8 +216,86 @@ public class Subscription implements ISubscription, PaletteListener {
 		return mEpisodes;
 	}
 
+	public ArrayList<IEpisode> getEpisodes() {
+		return mEpisodes;
+	}
 
-    private class RefreshSyncTask extends AsyncTask<Context, Void, Void> {
+	public void addEpisode(@NonNull IEpisode argEpisode) {
+		mEpisodes.add(argEpisode);
+	}
+
+	/**
+	 * This method updates the URL of the subscription.
+	 *
+	 * @param argNewUrl
+	 */
+	public void updateUrl(@NonNull Context argContext, @Nullable String argNewUrl) {
+
+		// We run a sanity check because we do not want to run the rest of the code without a context
+		if (argContext == null) {
+			throw new IllegalStateException("Context can not be null"); // NoI18N
+		}
+
+		URL url;
+		try {
+			url = new URL(argNewUrl);
+		} catch (MalformedURLException e) {
+			failUpdateUrl(argNewUrl);
+			return;
+		}
+
+		UrlValidator validator = new UrlValidator();
+		if (!validator.isValid(url.toString())) {
+			failUpdateUrl(url.toString());
+			return;
+		}
+
+		// I currently doesn't test that the new url can be parsed and contains content
+
+		// Ok, the url should be valid
+		// generate the SQL
+		String sqlUpdateSubscription = String.format("UPDATE %s SET %s=%s WHERE %s=%s LIMIT 1",
+								SubscriptionColumns.TABLE_NAME,
+								SubscriptionColumns.URL,
+								url.toString(),
+								SubscriptionColumns.URL,
+								this.url);
+		/*
+		String sqlUpdateItems = String.format("UPDATE %s SET %s=%s WHERE %s=%s LIMIT 1",
+								ItemColumns.TABLE_NAME,
+								ItemColumns.URL,
+								url.toString(),
+								ItemColumns.URL,
+								this.url);;
+		*/
+		PodcastOpenHelper helper = PodcastOpenHelper.getInstance(argContext);
+		SQLiteDatabase db = helper.getWritableDatabase();
+
+		db.beginTransaction();
+		try {
+			db.execSQL(sqlUpdateSubscription);
+			//db.execSQL(sqlUpdateItems);
+			/*
+			this.url = url.toString();
+			for (int i = 0; i < getEpisodes().size(); i++) {
+				IEpisode episode = getEpisodes().get(0);
+				if (episode instanceof FeedItem) {
+					FeedItem feedItem = (FeedItem) episode;
+					feedItem.sub
+				}
+			}*/
+			db.setTransactionSuccessful();
+		} finally {
+			db.endTransaction();
+		}
+	}
+
+	private void failUpdateUrl(@Nullable String argNewUrl) {
+		VendorCrashReporter.report("updateURL failed", "Unable to change subscription url to: " + argNewUrl); // NoI18N
+	}
+
+
+	private class RefreshSyncTask extends AsyncTask<Context, Void, Void> {
         protected Void doInBackground(Context... contexts) {
             refresh(contexts[0]);
             return null;
@@ -251,6 +359,9 @@ public class Subscription implements ISubscription, PaletteListener {
 		if (status >= 0)
 			cv.put(SubscriptionColumns.STATUS, status);
 
+		if (mSettings >= 0)
+			cv.put(SubscriptionColumns.SETTINGS, mSettings);
+
         if (mPrimaryColor != -1)
             cv.put(SubscriptionColumns.PRIMARY_COLOR, mPrimaryColor);
 
@@ -311,7 +422,7 @@ public class Subscription implements ISubscription, PaletteListener {
 
 	@Override
 	public String toString() {
-		return "Subscription: " + this.url;
+		return "Subscription: " + this.title + " (" + this.url + ")";
 	}
 
     @Override
@@ -334,9 +445,24 @@ public class Subscription implements ISubscription, PaletteListener {
         return mIsDirty;
     }
 
-    @Override
-    public TYPE getType() {
-        return TYPE.DEFAULT;
+	@Override
+	public boolean IsSubscribed() {
+		return status == STATUS_SUBSCRIBED;
+	}
+
+	@Override
+	public boolean IsRefreshing() {
+		return mIsRefreshing;
+	}
+
+	@Override
+	public void setIsRefreshing(boolean argIsRefreshing) {
+		mIsRefreshing = argIsRefreshing;
+	}
+
+	@Override
+    public @Type int getType() {
+        return ISubscription.DEFAULT;
     }
 
     @Override
@@ -425,4 +551,110 @@ public class Subscription implements ISubscription, PaletteListener {
 	public void setDescription(String content) {
 		this.description = content;
 	}
+
+
+	/**
+	 * http://stackoverflow.com/questions/4549131/bitmask-question
+	 *
+	 * bitmask |= TRADEABLE; // Sets the flag using bitwise OR
+	 * bitmask &= ~TRADEABLE; // Clears the flag using bitwise AND and NOT
+	 * bitmask ^= TRADEABLE; // Toggles the flag using bitwise XOR
+	 */
+	private boolean appDefault = true;
+
+	public boolean isListOldestFirst() {
+		if (!IsSettingEnabled(LIST_OLDEST_FIRST_SET))
+			return getApplicationValue(mOldestFirstID, false);
+
+		return IsSettingEnabled(LIST_OLDEST_FIRST);
+	}
+
+	public void setListOldestFirst(boolean listOldestFirst) {
+        mSettings = mSettings < 0 ? 0 : mSettings;
+		mSettings |= LIST_OLDEST_FIRST_SET;
+
+		if (listOldestFirst)
+			mSettings |= LIST_OLDEST_FIRST;
+		else
+			mSettings &= ~LIST_OLDEST_FIRST;
+	}
+
+	public boolean isDeleteWhenListened() {
+		if (!IsSettingEnabled(DELETE_AFTER_PLAYBACK_SET))
+			return getApplicationValue(mDeleteAfterPlaybackID, false);
+
+		return IsSettingEnabled(DELETE_AFTER_PLAYBACK);
+	}
+
+	public void setDeleteWhenListened(boolean deleteWhenListened) {
+        mSettings = mSettings < 0 ? 0 : mSettings;
+		mSettings |= DELETE_AFTER_PLAYBACK_SET;
+
+		if (deleteWhenListened)
+			mSettings |= DELETE_AFTER_PLAYBACK;
+		else
+			mSettings &= ~DELETE_AFTER_PLAYBACK;
+	}
+
+	public boolean doDownloadNew(boolean argDefault) {
+		if (!IsSettingEnabled(DOWNLOAD_NEW_EPISODES_SET))
+			return argDefault;
+
+		return IsSettingEnabled(DOWNLOAD_NEW_EPISODES);
+	}
+
+	public void setDownloadNew(boolean downloadNew) {
+        mSettings = mSettings < 0 ? 0 : mSettings;
+		mSettings |= DOWNLOAD_NEW_EPISODES_SET;
+
+		if (downloadNew)
+			mSettings |= DOWNLOAD_NEW_EPISODES;
+		else
+			mSettings &= ~DOWNLOAD_NEW_EPISODES;
+	}
+
+	public boolean isAddNewToPlaylist() {
+		if (!IsSettingEnabled(ADD_NEW_TO_PLAYLIST_SET))
+			return true;
+
+		return IsSettingEnabled(ADD_NEW_TO_PLAYLIST);
+	}
+
+	public void setAddNewToPlaylist(boolean addNewToPlaylist) {
+        mSettings = mSettings < 0 ? 0 : mSettings;
+		mSettings |= ADD_NEW_TO_PLAYLIST_SET;
+
+		if (addNewToPlaylist)
+			mSettings |= ADD_NEW_TO_PLAYLIST;
+		else
+			mSettings &= ~ADD_NEW_TO_PLAYLIST;
+	}
+
+	public boolean isShowDescription() {
+		if (!IsSettingEnabled(SHOW_EPISODE_DESCRIPTION_SET))
+			return true;
+
+		return IsSettingEnabled(SHOW_EPISODE_DESCRIPTION);
+	}
+
+	public void setShowDescription(boolean showDescription) {
+        mSettings = mSettings < 0 ? 0 : mSettings;
+		mSettings |= SHOW_EPISODE_DESCRIPTION_SET;
+
+		if (showDescription)
+			mSettings |= SHOW_EPISODE_DESCRIPTION;
+		else
+			mSettings &= ~SHOW_EPISODE_DESCRIPTION;
+	}
+
+	private boolean IsSettingEnabled(int setting) {
+		//return mSettings > 0 && ((setting & mSettings) != 0);
+		return BitMaskUtils.IsBitSet(mSettings, setting);
+	}
+
+	private boolean getApplicationValue(int argId, boolean argDefault) {
+		String key = SoundWaves.getAppContext().getResources().getString(argId);
+		return sSharedPreferences.getBoolean(key, argDefault);
+	}
+
 }

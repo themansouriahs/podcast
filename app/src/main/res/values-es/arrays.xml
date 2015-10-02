@@ -164,4 +164,9 @@
     <item>gPodder</item>
     <item>iTunes</item>
   </string-array>
+  <string-array name="discovery_spinner_array">
+    <item>@string/discovery_recommendations</item>
+    <item>@string/discovery_recommendations_trending</item>
+    <item>@string/discovery_recommendations_popular</item>
+  </string-array>
 </resources>
