@@ -342,7 +342,7 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
 					+ " then 1 else 2 end, ";
 		}
 		String prioritiesSecond = "case " + ItemColumns.TABLE_NAME + "." + ItemColumns.PRIORITY
-				+ " when 0 then 2 else 1 end, " + ItemColumns.TABLE_NAME + "." + ItemColumns.PRIORITY + ", ";
+				+ " when 0 then 1 else 2 end DESC, " + ItemColumns.TABLE_NAME + "." + ItemColumns.PRIORITY + " DESC, ";
 		String order = playingFirst + prioritiesSecond + ItemColumns.TABLE_NAME + "." + ItemColumns.DATE + " "
 				+ inputOrder + " LIMIT " + amount; // before:
 		return order;

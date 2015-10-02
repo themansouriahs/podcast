@@ -193,7 +193,8 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	public int listened;
 
 	/**
-	 * Priority in the playlist
+	 * Priority in the playlist. Higher priority value is higher up in the playlist.
+	 * Default is 1
 	 */
 	public int priority;
 
@@ -426,7 +427,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 		length = -1;
 		lastUpdate = -1;
 		listened = -1;
-		priority = -1;
+		priority = 0;
 		filesize = -1;
 		chunkFilesize = -1;
 		downloadReferenceID = -1;
@@ -1229,7 +1230,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
     }
 
     public void removeFromPlaylist(@NonNull ContentResolver argContentResolver) {
-        priority = -1;
+        priority = 0;
         update(argContentResolver);
     }
 

@@ -77,8 +77,8 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 		case R.id.menu_clear_playlist: {
 
 			if (mPlaylist == null) {
+				mPlaylist = SoundWaves.sBoundPlayerService.getPlaylist();
 				Log.wtf(TAG, "Playlist should not be null"); // NoI18N
-				break;
 			}
 
             mPlaylist.resetPlaylist(null);
