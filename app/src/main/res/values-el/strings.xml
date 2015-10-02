@@ -122,7 +122,6 @@
   <string name="playlist_empty">Η λίστα αναπαραγωγής είναι κενή :(</string>
   <string name="playlist_empty_title">Επιλέξτε την λειτουργία της λίστας αναπαραγωγής</string>
   <string name="playlist_empty_text_top">Αφιερώστε λίγο χρόνο για να σκεφτείτε για πώς θέλετε να χρησιμοποιήσετε την εφαρμογή</string>
-  <string name="playlist_empty_text_bottom">Μπορείτε πάντα να αλλάξετε τον τρόπο λειτουργίας της λίστας αναπαραγωγής σύροντας το μενού από αριστερα</string>
   <string name="playlist_empty_mode_one">Θεση επεισόδιων στην σειρά αναμονής με μη αυτόματο τρόπο</string>
   <string name="playlist_empty_mode_two">Πρόσφατα επεισόδια</string>
   <string name="playlist_empty_mode_one_desc">Η λίστας αναπαραγωγής θα περιλαμβάνει μόνο τα επεισόδια που έχετε στην σειρά αναμονής με μη αυτόματο τρόπο</string>
