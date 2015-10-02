@@ -236,6 +236,7 @@
         android:overScrollMode="never"
         app:layout_anchor="@id/session_photo_container"
         app:layout_anchorGravity="bottom"
+        android:background="?attr/themeBackground"
         />
 
     <include
