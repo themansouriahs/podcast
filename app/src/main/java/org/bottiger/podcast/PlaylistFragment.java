@@ -203,7 +203,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
-        mAdapter = new PlaylistAdapter(getActivity(), mOverlay, mDownloadProgressObservable);
+        mAdapter = new PlaylistAdapter(getActivity(), mOverlay);
         mAdapter.setHasStableIds(true);
 
         SoundWaves.getBus().register(mAdapter);

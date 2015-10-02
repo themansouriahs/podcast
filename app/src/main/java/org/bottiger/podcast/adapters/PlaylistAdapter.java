@@ -62,23 +62,16 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
     private Activity mActivity;
     private View mOverlay;
 
-    private boolean mFirstItem = true;
-    private WeakReference<ViewGroup> mViewGroup = new WeakReference<>(null);
-
-    private DownloadProgressObservable mDownloadProgressObservable = null;
-
 	public static TreeSet<Number> mExpandedItemID = new TreeSet<>();
 
 	private static DownloadManager mDownloadManager = null;
 
-    public PlaylistAdapter(@NonNull Activity argActivity, View argOverlay, DownloadProgressObservable argDownloadProgressObservable) {
+    public PlaylistAdapter(@NonNull Activity argActivity, View argOverlay) {
         super(argActivity);
         mActivity = argActivity;
         mOverlay = argOverlay;
         mInflater = (LayoutInflater) mActivity
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        mDownloadProgressObservable = argDownloadProgressObservable;
-
         mDownloadManager = (DownloadManager) mActivity.getSystemService(Context.DOWNLOAD_SERVICE);
 
         notifyDataSetChanged();
@@ -286,9 +279,6 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
             return;
         }
 
-        //mDownloadProgressObservable.unregisterObserver(holder.downloadButton);
-
-
         holder.mPlayPauseButton.unsetEpisodeId();
         holder.favoriteButton.unsetEpisodeId();
         holder.removeButton.unsetEpisodeId();
@@ -299,12 +289,14 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
     public void onViewAttachedToWindow (PlaylistViewHolder holder) {
         super.onViewAttachedToWindow(holder);
         SoundWaves.getBus().register(holder.mPlayPauseButton);
+        SoundWaves.getBus().register(holder.downloadButton);
         SoundWaves.getBus().register(holder.seekbar);
     }
 
     @Override
     public void  onViewDetachedFromWindow(PlaylistViewHolder holder) {
         SoundWaves.getBus().unregister(holder.mPlayPauseButton);
+        SoundWaves.getBus().unregister(holder.downloadButton);
         SoundWaves.getBus().unregister(holder.seekbar);
         super.onViewDetachedFromWindow(holder);
     }

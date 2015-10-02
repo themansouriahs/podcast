@@ -186,25 +186,21 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
 
     @Override
     public void onViewAttachedToWindow (EpisodeViewHolder holder) {
+        SoundWaves.getBus().register(holder.mDownloadButton);
         super.onViewAttachedToWindow(holder);
-        final EpisodeViewHolder episodeViewHolder = (EpisodeViewHolder) holder;
-        SoundWaves.getBus().register(episodeViewHolder.mDownloadButton);
     }
 
     @Override
     public void  onViewDetachedFromWindow(EpisodeViewHolder holder) {
-        final EpisodeViewHolder episodeViewHolder = (EpisodeViewHolder) holder;
-        SoundWaves.getBus().unregister(episodeViewHolder.mDownloadButton);
+        SoundWaves.getBus().unregister(holder.mDownloadButton);
         super.onViewDetachedFromWindow(holder);
     }
 
     @Override
     public void onViewRecycled(EpisodeViewHolder viewHolder) {
-        final EpisodeViewHolder episodeViewHolder = (EpisodeViewHolder) viewHolder;
-        //mDownloadProgressObservable.unregisterObserver(episodeViewHolder.mDownloadButton);
-        episodeViewHolder.mDownloadButton.unsetEpisodeId();
-        episodeViewHolder.mPlayPauseButton.unsetEpisodeId();
-        episodeViewHolder.mQueueButton.unsetEpisodeId();
+        viewHolder.mDownloadButton.unsetEpisodeId();
+        viewHolder.mPlayPauseButton.unsetEpisodeId();
+        viewHolder.mQueueButton.unsetEpisodeId();
     }
 
     @Override

@@ -17,6 +17,7 @@ import android.view.View;
 import com.squareup.otto.Subscribe;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.DownloadProgress;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
@@ -168,8 +169,18 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
 
     @Subscribe
     public void setProgressPercent(@NonNull DownloadProgress argProgress) {
-        if (!getEpisode().equals(argProgress.getEpisode()))
+
+        /*
+        FIXME: Becasue we register each button ASAP we can have a registered button without a EpisodeID
+                I should take a look at that.
+         */
+        try {
+            if (!getEpisode().equals(argProgress.getEpisode()))
+                return;
+        } catch (Exception e) {
+            VendorCrashReporter.handleException(e);
             return;
+        }
 
         mProgress = argProgress.getProgress();
         if (mProgress == 100) {
