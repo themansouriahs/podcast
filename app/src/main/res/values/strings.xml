@@ -68,8 +68,8 @@
     <string name="menu_refresh_feed">Refresh</string>
     <string name="menu_refresh_feed_all">Refresh All</string>
     <string name="crash_toast">Crash :( Please help by sending a crash report</string>
-    <string name="pref_help_category_title">Help Building SoundWaves</string>
-    <string name="pref_help_static_field_description">If you would like to help out there is plenty of things to do. It could be programming and it could be something completley different. I need help with translation, user experience, icons and graphics, a website and so forth. Head over to the project page on github (https://github.com/bottiger/SoundWaves) or send me an email: bottiger@gmail.com</string>
+    <string name="pref_help_category_title">Help Build SoundWaves</string>
+    <string name="pref_help_static_field_description">If you would like to help out, there are plenty of things to do. It could be programming or it could be something completely different. I need help with translations, UI, icons/graphics, building a website, and so forth. Head over to the project page on GitHub (github.com/bottiger/SoundWaves) or send me an email: bottiger@gmail.com</string>
     <string name="podcast_title_unknown">No Title :(</string>
     <string name="subscription_instruction">Add new podcasts by using the discovery page to the right or import an OPML file.\n\nHowever, first please consider if you want to enabled/disable the options below.</string>
     <string name="filter_show_listened">Show Listened</string>
@@ -165,7 +165,7 @@
     <string name="open_video_externally_confirm">Open video player</string>
     <string name="open_video_externally_reject">Play audio</string>
     <string name="pref_open_video_externally">Open videos in an external player</string>
-    <string name="pref_open_video_externally_description">This app does not play video. You can choose to open video files in another player, otherwise they will play as audio only.</string>
+    <string name="pref_open_video_externally_description">This app does not play video. You can choose to open video files in another player; otherwise they will play as audio only.</string>
     <string name="pref_help_beta_title">Join BETA testing</string>
     <string name="pref_help_beta_description">If you would like to help out with beta testing of new features you can do so by visiting this page: https://play.google.com/apps/testing/org.bottiger.podcast</string>
 
