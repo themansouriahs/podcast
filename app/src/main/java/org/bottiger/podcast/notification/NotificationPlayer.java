@@ -148,6 +148,7 @@ public class NotificationPlayer {
         NotificationCompat.Action actionPlay = new NotificationCompat.Action(pause, "Play", pendingPlayIntent);
         NotificationCompat.Action actionPause = new NotificationCompat.Action(play, "Pause", pendingPauseIntent);
         NotificationCompat.Action actionNext = new NotificationCompat.Action(next, "Next", pendingNextIntent);
+        NotificationCompat.Action actionClear = new NotificationCompat.Action(clear, "Clear", pendingClearIntent);
 
         NotificationCompat.MediaStyle mediaStyle = new NotificationCompat.MediaStyle();
         mediaStyle.setShowActionsInCompactView(0);
@@ -164,6 +165,7 @@ public class NotificationPlayer {
                 .setMediaSession(mediaSessionToken));
         mBuilder.addAction(actionToggle);
         mBuilder.addAction(actionNext);
+        mBuilder.addAction(actionClear);
         //mBuilder.setProgress(100,  50, false);
 
         mBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
