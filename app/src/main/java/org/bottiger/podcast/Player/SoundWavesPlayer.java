@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.v4.media.session.PlaybackStateCompat;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
@@ -49,6 +50,8 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
 
     private PlayerService mPlayerService;
     private PlayerHandler mHandler;
+    private PlayerStateManager mPlayerStateManager;
+
     private boolean mIsInitialized = false;
     private boolean mIsStreaming = false;
 
@@ -67,11 +70,12 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
     private SharedPreferences mSharedpreferences;
 
     int bufferProgress = 0;
-
     int startPos = 0;
+    float playbackSpeed = 1.0f;
 
     public SoundWavesPlayer(@NonNull PlayerService argPlayerService) {
         mPlayerService = argPlayerService;
+        mPlayerStateManager = argPlayerService.getPlayerStateManager();
         this.mControllerComponentName = new ComponentName(mPlayerService,
                 HeadsetReceiver.class);
         this.mAudioManager = (AudioManager) mPlayerService.getSystemService(Context.AUDIO_SERVICE);
@@ -88,10 +92,12 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
     public void setDataSourceAsync(String path, int startPos) {
 
         mStatus = PlayerStatusObservable.PREPARING;
+        mPlayerStateManager.updateState(PlaybackStateCompat.STATE_CONNECTING, startPos, playbackSpeed);
 
         if (isCasting()) {
             mMediaCast.loadEpisode(mPlayerService.getCurrentItem());
             start();
+            mPlayerStateManager.updateState(PlaybackStateCompat.STATE_PLAYING, startPos, playbackSpeed);
             return;
         }
 
@@ -99,6 +105,10 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
 
             File f = new File(path);
             mIsStreaming = !f.exists();
+
+            if (mIsStreaming) {
+                mPlayerStateManager.updateState(PlaybackStateCompat.STATE_BUFFERING, startPos, playbackSpeed);
+            }
 
             reset();
             setDataSource(path);
@@ -145,6 +155,7 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
     public void start() {
 
         mStatus = PlayerStatusObservable.PLAYING;
+        mPlayerStateManager.updateState(PlaybackStateCompat.STATE_PLAYING, getCurrentPosition(), playbackSpeed);
 
         PlayerStatusData psd = new PlayerStatusData(mPlayerService.getCurrentItem(), PlayerStatusObservable.PLAYING);
 
@@ -270,6 +281,7 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
     MediaPlayer.OnCompletionListener listener = new MediaPlayer.OnCompletionListener() {
         @Override
         public void onCompletion(MediaPlayer mp) {
+            mPlayerStateManager.updateState(PlaybackStateCompat.STATE_STOPPED, 0, playbackSpeed);
             IEpisode item = mPlayerService.getCurrentItem();
 
             if (item != null && item instanceof FeedItem) {
@@ -320,6 +332,7 @@ public class SoundWavesPlayer extends MediaPlayer implements IMediaRouteStateLis
         @Override
         public boolean onError(MediaPlayer mp, int what, int extra) {
             mStatus = PlayerStatusObservable.STOPPED;
+            mPlayerStateManager.updateState(PlaybackStateCompat.STATE_ERROR, startPos, playbackSpeed);
             switch (what) {
                 case MediaPlayer.MEDIA_ERROR_SERVER_DIED:
 

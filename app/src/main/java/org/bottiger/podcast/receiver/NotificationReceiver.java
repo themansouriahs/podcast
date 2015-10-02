@@ -99,7 +99,7 @@ public class NotificationReceiver extends BroadcastReceiver {
             if (currentItem != null) {
                 np = new NotificationPlayer(playerService, playerService.getCurrentItem());
                 np.setPlayerService(playerService);
-                np.show(isPlaying);
+                np.show(isPlaying, currentItem);
             }
 
         }
