@@ -80,8 +80,11 @@ public class FeedUpdater {
                 }
 
 				//item.update(contentResolver);
+				ContentValues cv;
                 if (feedItem.url != null && !duplicateTest.containsKey(feedItem.url)) {
-                    cvs.add(feedItem.getContentValues(false));
+					cv = feedItem.getContentValues(false);
+					cv = FeedItem.addCreatedAtToContentValues(cv);
+                    cvs.add(cv);
                     duplicateTest.put(feedItem.url, counter);
                 }
 			}

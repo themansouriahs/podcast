@@ -220,8 +220,10 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	 */
 	public String sub_title;
 
-	@Deprecated
-	public long created;
+	/**
+	 * The time the episode was created locally
+	 */
+	public long created_at;
 
 	public String type;
 
@@ -435,7 +437,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 		isDownloaded = null;
 		duration_ms = -1;
 
-		created = -1;
+		created_at = -1;
 		sub_title = null;
 		sub_id = -1;
 
@@ -450,6 +452,12 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
             update(contentResolver);
         }
 
+	}
+
+	@NonNull
+	public static ContentValues addCreatedAtToContentValues(ContentValues argCV) {
+		argCV.put(ItemColumns.CREATED, System.currentTimeMillis());
+		return argCV;
 	}
 
     public ContentValues getContentValues(Boolean silent) {
@@ -772,11 +780,11 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 		item.episodeNumber = cursor.getInt(cursor
 				.getColumnIndex(ItemColumns.EPISODE_NUMBER));
 		item.duration_string = cursor.getString(cursor
-                .getColumnIndex(ItemColumns.DURATION));
+				.getColumnIndex(ItemColumns.DURATION));
 		item.duration_ms = cursor.getLong(cursor
-                .getColumnIndex(ItemColumns.DURATION_MS));
+				.getColumnIndex(ItemColumns.DURATION_MS));
         item.status = cursor.getInt(cursor
-                .getColumnIndex(ItemColumns.STATUS));
+				.getColumnIndex(ItemColumns.STATUS));
 		item.lastUpdate = cursor.getLong(cursor
 				.getColumnIndex(ItemColumns.LAST_UPDATE));
 		item.sub_title = cursor.getString(cursor
@@ -787,6 +795,8 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 				.getColumnIndex(ItemColumns.LISTENED));
 		item.priority = cursor.getInt(cursor
 				.getColumnIndex(ItemColumns.PRIORITY));
+		item.created_at = cursor.getInt(cursor
+				.getColumnIndex(ItemColumns.CREATED));
 
 		// if item was not cached we put it in the cache
 		synchronized (cache) {
@@ -1030,6 +1040,10 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 		else if (resource != null && resource.length() > 1)
 			itemURL = resource;
 		return itemURL;
+	}
+
+	public Date getCreatedAt() {
+		return new Date(created_at);
 	}
 
 	public long getFilesize() {

@@ -35,6 +35,7 @@ public interface IEpisode {
     ISubscription getSubscription(@NonNull Context argContext);
     long getOffset();
     Date getDateTime();
+    Date getCreatedAt();
     long getFilesize();
 
     void setTitle(@NonNull String argTitle);

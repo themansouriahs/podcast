@@ -3,10 +3,19 @@ package org.bottiger.podcast.service.jobservice;
 import android.annotation.TargetApi;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
+import android.support.annotation.NonNull;
+import android.support.v4.util.TimeUtils;
 import android.util.Log;
 
+import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
 import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
+import org.bottiger.podcast.service.IDownloadCompleteCallback;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by apl on 09-11-2014.
@@ -21,9 +30,31 @@ public class PodcastUpdateJobService extends JobService {
         Log.d(TAG, "Job started");
 
         SubscriptionRefreshManager subscriptionRefreshManager = new SubscriptionRefreshManager(this);
-        subscriptionRefreshManager.refreshAll();
-        EpisodeDownloadManager.removeExpiredDownloadedPodcasts(this);
-        EpisodeDownloadManager.startDownload(this);
+        subscriptionRefreshManager.refresh(null, new IDownloadCompleteCallback() {
+            @Override
+            public void complete(boolean argSucces, @NonNull ISubscription argSubscription) {
+
+                ArrayList<? extends IEpisode> episodes = argSubscription.getEpisodes();
+                IEpisode episode;
+                if (episodes != null) {
+                    for (int i = 0; i < episodes.size(); i++) {
+                        episode = episodes.get(i);
+                        long createdAt = episode.getCreatedAt().getTime();
+                        long now = System.currentTimeMillis();
+                        float buffer = 1.2f;
+
+                        long minutes = TimeUnit.MILLISECONDS.toMinutes(now - createdAt);
+
+                        if (minutes <= PodcastUpdater.UPDATE_FREQUENCY_MIN*buffer) {
+                            EpisodeDownloadManager.addItemToQueue(episode,EpisodeDownloadManager.ANYWHERE);
+                        }
+                    }
+
+                    EpisodeDownloadManager.removeExpiredDownloadedPodcasts(PodcastUpdateJobService.this);
+                    EpisodeDownloadManager.startDownload(PodcastUpdateJobService.this);
+                }
+            }
+        });
 
         return false;
     }

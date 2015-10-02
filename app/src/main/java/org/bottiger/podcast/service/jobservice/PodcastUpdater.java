@@ -23,7 +23,7 @@ import org.bottiger.podcast.service.PodcastService;
  */
 public class PodcastUpdater {
 
-    private static final float UPDATE_FREQUENCY_MIN = 60f;
+    public static final float UPDATE_FREQUENCY_MIN = 60f;
 
     private static final int PodcastUpdaterId = 36324;
 

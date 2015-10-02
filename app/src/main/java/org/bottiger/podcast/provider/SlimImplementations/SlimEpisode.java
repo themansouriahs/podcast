@@ -97,6 +97,11 @@ public class SlimEpisode implements IEpisode, Parcelable {
     }
 
     @Override
+    public Date getCreatedAt() {
+        return new Date();
+    }
+
+    @Override
     public long getFilesize() { return mFilesize; }
 
     @Override
