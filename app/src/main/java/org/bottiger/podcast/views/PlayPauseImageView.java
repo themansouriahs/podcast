@@ -331,6 +331,9 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
         if (argPlayerStatus == null)
             return;
 
+        if (getEpisode() == null)
+            return;
+
         if (!getEpisode().equals(argPlayerStatus.episode)) {
 
             setStatus(PlayerStatusObservable.PAUSED);
