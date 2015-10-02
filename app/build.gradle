@@ -17,6 +17,21 @@ android {
 
         // Espresso
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+
+        ndk {
+            moduleName "hello-jni"
+            //moduleName "sonic"
+            //moduleName "swutils"
+        }
+
+    }
+
+    // Point Gradle at the directory where you want to root all of your native code
+    // There is a default directory but I prefer to control which directories to use
+    // and there will be a point later where keeping control over this is important
+    sourceSets.main {
+        jni.srcDirs = ["src/main/jni"];
     }
 
     //useLibrary 'org.apache.http.legacy' // Need until GMS upgraded

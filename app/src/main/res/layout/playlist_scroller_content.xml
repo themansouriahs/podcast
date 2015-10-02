@@ -36,6 +36,20 @@
                 android:orientation="horizontal"
                 android:layout_toLeftOf="@id/play_pause_button">
 
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:id="@+id/speed_button"
+                    android:text="1.0x"
+                    android:paddingBottom="2dp"
+                    android:textSize="16dp"
+                    android:textColor="@color/white_opaque"
+                    android:fontFamily="sans-serif"
+                    android:textStyle="bold"
+                    android:elevation="@dimen/player_elevation" />
+
                 <org.bottiger.podcast.views.PlayerButtonView
                     android:id="@+id/sleep_button"
                     android:padding="0dip"
