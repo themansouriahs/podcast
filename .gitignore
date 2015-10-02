@@ -9,8 +9,8 @@
 *.class
 
 #ndk
-app/libs
-app/obj
+app/src/main/libs
+app/src/main/obj
 
 # Generated files
 bin/
