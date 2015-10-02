@@ -25,6 +25,10 @@ public class NotificationReceiver extends BroadcastReceiver {
 	public static final String toggleAction = ApplicationConfiguration.packageName + ".TOGGLE";
 	public static final String nextAction = ApplicationConfiguration.packageName + ".NEXT";
     public static final String clearAction = ApplicationConfiguration.packageName + ".CLEAR";
+    public static final String playAction = ApplicationConfiguration.packageName + ".PLAY";
+    public static final String pauseAction = ApplicationConfiguration.packageName + ".PAUSE";
+    public static final String fastForwardAction = ApplicationConfiguration.packageName + ".FAST_FORWARD";
+    public static final String rewindAction = ApplicationConfiguration.packageName + ".REWIND";
 
 	private RemoteViews layout;
 	private NotificationPlayer np;
@@ -76,6 +80,16 @@ public class NotificationReceiver extends BroadcastReceiver {
 
         if (action.equals(clearAction)) {
             playerService.halt();
+            return;
+        }
+
+        if (action.equals(playAction)) {
+            playerService.play();
+            return;
+        }
+
+        if (action.equals(pauseAction)) {
+            playerService.pause();
             return;
         }
 

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.media.session.MediaSession;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.media.MediaMetadataCompat;
@@ -115,17 +116,21 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
 
         long actions =  PlaybackStateCompat.ACTION_PLAY_PAUSE |
                         PlaybackStateCompat.ACTION_REWIND |
-                        PlaybackStateCompat.ACTION_PLAY |
-                        PlaybackStateCompat.ACTION_PAUSE |
                         PlaybackStateCompat.ACTION_STOP |
                         PlaybackStateCompat.ACTION_FAST_FORWARD |
                         PlaybackStateCompat.ACTION_SEEK_TO |
                         PlaybackStateCompat.ACTION_SKIP_TO_NEXT |
                         PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS;
 
+        if (argState == PlaybackStateCompat.ACTION_PLAY) {
+            actions |= PlaybackStateCompat.ACTION_PAUSE;
+        } else {
+            actions |= PlaybackStateCompat.ACTION_PLAY;
+        }
+
         stateBuilder.setActions(actions);
         //stateBuilder.setState(PlaybackStateCompat.STATE_PLAYING, 0, 1.0f);
-        stateBuilder.setState(argState, argPosition, argPlaybackSpeed);
+        stateBuilder.setState(argState, argPosition, argPlaybackSpeed, SystemClock.elapsedRealtime());
 
         return stateBuilder;
     }

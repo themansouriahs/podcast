@@ -224,6 +224,10 @@
                 </action>
                 <action android:name="org.bottiger.soundwaves.CLEAR" >
                 </action>
+                <action android:name="org.bottiger.soundwaves.PLAY" >
+                </action>
+                <action android:name="org.bottiger.soundwaves.PAUSE" >
+                </action>
             </intent-filter>
         </receiver>
         <receiver android:name=".receiver.AutoStart" >

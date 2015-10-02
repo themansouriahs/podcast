@@ -173,8 +173,25 @@
         <item name="android:checked">false</item>
     </style>
 
+    <!--
     <style name="NotificationText" parent="android:TextAppearance.StatusBar.EventContent" />
     <style name="NotificationTitle" parent="android:TextAppearance.StatusBar.EventContent.Title" />
+    -->
+    <style name="NotificationTitle" parent="android:TextAppearance.Material.Notification.Title"></style>
+    <style name="NotificationText" parent="android:TextAppearance.Material.Notification"></style>
+
+    <!--
+    <style name="NotificationTitle">
+        <item name="textColor">@color/primary_text_default_material_light</item>
+        <item name="textSize">@dimen/notification_title_text_size</item>
+    </style>
+
+    <style name="NotificationContent">
+        <item name="textColor">@color/primary_text_default_material_light</item>
+        <item name="textSize">@dimen/notification_title_text_size</item>
+    </style>
+    -->
+
 
     <style name="SoundWaves.PreferenceActivity.Light" parent="SoundWavesTheme.Light">
         <item name="android:windowTranslucentNavigation" tools:targetApi="19">false</item> <!-- actionbar and  bottom navigation -->
