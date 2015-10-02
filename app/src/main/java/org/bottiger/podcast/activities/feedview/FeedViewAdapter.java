@@ -104,8 +104,11 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
         episodeViewHolder.mPrimaryColor = ColorUtils.getTextColor(context);
         episodeViewHolder.mFadedColor = ColorUtils.getFadedTextColor(context);
 
-        episodeViewHolder.mTitle.setText(item.getTitle());
-        episodeViewHolder.mDescription.setText(item.getDescription());
+        if (item.getTitle() != null)
+            episodeViewHolder.mTitle.setText(item.getTitle());
+
+        if (item.getDescription() != null)
+            episodeViewHolder.mDescription.setText(item.getDescription());
 
         episodeViewHolder.IsMarkedAsListened = item.isMarkedAsListened();
         episodeViewHolder.DisplayDescription = mIsExpanded;
