@@ -7,9 +7,11 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.TextView;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
@@ -23,7 +25,7 @@ import java.util.List;
 /**
  * Created by aplb on 21-09-2015.
  */
-public class OpenOpmlFromIntentActivity extends Activity {
+public class OpenOpmlFromIntentActivity extends AppCompatActivity {
     private static final String TAG = "OpenOpmlFromIntentActivity";
 
     private List<SlimSubscription> mSubscriptions = new LinkedList<>();
@@ -35,8 +37,12 @@ public class OpenOpmlFromIntentActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_opml_import);
-        //ActivityOpmlImportItemBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_opml_import);
-        //binding.setHandlers(this);
+
+        TextView toolbarTitle = (TextView) findViewById(R.id.helper_toolbar_title);
+        TextView toolbarDescription = (TextView) findViewById(R.id.helper_toolbar_description);
+
+        toolbarTitle.setText(R.string.opml_import_toolbar_title);
+        toolbarDescription.setText(R.string.opml_import_toolbar_description);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -65,7 +71,6 @@ public class OpenOpmlFromIntentActivity extends Activity {
         mRecyclerView = (RecyclerView) findViewById(R.id.opml_subscription_list);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-
     }
 
     public void import_click(View view) {
