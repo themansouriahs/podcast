@@ -34,6 +34,9 @@ public class PodcastUpdateJobService extends JobService {
             @Override
             public void complete(boolean argSucces, @NonNull ISubscription argSubscription) {
 
+                if (argSubscription == null)
+                    return;
+
                 ArrayList<? extends IEpisode> episodes = argSubscription.getEpisodes();
                 IEpisode episode;
                 if (episodes != null) {
