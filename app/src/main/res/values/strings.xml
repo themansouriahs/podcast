@@ -3,20 +3,19 @@
 
     <string name="app_name">SoundWaves</string>
     <string name="unsubscribe">Unsubscribe</string>
-    <string name="pref_only_wifi_description">Download file only when Wi-Fi connected</string>
-    <string name="pref_only_wifi_title">Wi-Fi Only</string>
+    <string name="pref_only_wifi_description">Wait until connected to Wi-Fi to download files</string>
+    <string name="pref_only_wifi_title">Wi-Fi only downloading</string>
     <string name="pref_dark_theme">Enable dark theme for higher contrast</string>
-    <string name="pref_dark_theme_title">Dark Theme</string>
-    <string name="pref_download_on_update_title">Automatic Download</string>
-    <string name="pref_download_on_update_description">Download new episodes when possible</string>
+    <string name="pref_dark_theme_title">Dark theme</string>
+    <string name="pref_download_on_update_title">Automatic download</string>
+    <string name="pref_download_on_update_description">Download new episodes automatically when they are available</string>
 
 
-    <string name="pref_downloaded_expire_description">Setup maximum size of downloaded items</string>
-    <string name="pref_downloaded_expire_title">Podcast History Size</string>
-    <string name="pref_downloaded_dialog_title">History Size</string>
+    <string name="pref_downloaded_expire_description">%s</string>
+    <string name="pref_downloaded_expire_title">Podcast download limit</string>
     <string name="pref_notification_control">Notification Controls</string>
     <string name="pref_notification_control_description">Show small player in notification area</string>
-    <string name="dialog_title_add_sub">Add Podcast</string>
+    <string name="dialog_title_add_sub">Add podcast</string>
     <string name="dialog_message_add_sub">Please enter an URL:</string>
     <string name="title_section3">Playlist</string>
     <string name="title_section2">Discover</string>
@@ -24,10 +23,10 @@
     <string name="hello_world">Hello World!</string>
     <string name="menu_settings">Settings</string>
     <string name="title_activity_swipe">SoundWaves</string>
-    <string name="menu_download_all">Bulk Download</string>
-    <string name="menu_clear_playlist">Reset Playlist</string>
-    <string name="menu_import">Import/Export OPML</string>
-    <string name="menu_add_podcast">Add Podcast</string>
+    <string name="menu_download_all">Bulk download</string>
+    <string name="menu_clear_playlist">Reset playlist</string>
+    <string name="menu_import">Import/export OPML</string>
+    <string name="menu_add_podcast">Add podcast</string>
     <string name="menu_order_by_date_desc">Show most recent first</string>
     <string name="menu_order_by_date_asc">Show oldest first</string>
     <string name="pref_feedback_title">Send anonymous reports</string>
@@ -37,24 +36,24 @@
     
     <string name="drawer_open">Open</string>
     <string name="drawer_close">Close</string>
-    <string name="pref_stream_proxy_title">Download While Streaming</string>
+    <string name="pref_stream_proxy_title">Download while streaming</string>
     <string name="pref_stream_proxy">This may require some extra time buffering</string>
     <string name="episode_title">Episode Title</string>
     <string name="episode_description">Episode Description</string>
-    <string name="pref_continuously_playing">Continuously Playing</string>
-    <string name="pref_continuously_playing_description">When an episode end, start the next one automatically</string>
-    <string name="preferences_category_help">Help Out</string>
-    <string name="preferences_category_ui">User Interface</string>
+    <string name="pref_continuously_playing">Continuous playback</string>
+    <string name="pref_continuously_playing_description">When an episode ends, start the next one automatically</string>
+    <string name="preferences_category_help">Help out</string>
+    <string name="preferences_category_ui">User interface</string>
     <string name="preferences_category_player">Player</string>
-    <string name="preferences_category_network">Network &amp; Storage</string>
-    <string name="preferences_category_cloud">Cloud Support</string>
+    <string name="preferences_category_network">Network &amp; storage</string>
+    <string name="preferences_category_cloud">Cloud support</string>
     <string name="preferences_category_advanced">Advanced</string>
-    <string name="pref_player_forward_amount_dialog_title">How much should the fast forward button go forward</string>
-    <string name="pref_player_backward_amount_dialog_title">How much should the rewind button go back</string>
-    <string name="pref_player_forward_amount_title">Fast Forward</string>
+    <string name="pref_player_forward_amount_dialog_title">Fast forward amount</string>
+    <string name="pref_player_backward_amount_dialog_title">Rewind amount</string>
+    <string name="pref_player_forward_amount_title">Fast forward</string>
     <string name="pref_player_backward_amount_title">Rewind</string>
-    <string name="pref_player_forwards_amount_summary">Fast forward %s at the time</string>
-    <string name="pref_player_backwards_amount_summary">Rewind %s at the time</string>
+    <string name="pref_player_forwards_amount_summary">Fast forward %s at a time</string>
+    <string name="pref_player_backwards_amount_summary">Rewind %s at a time</string>
     <string name="pref_playback_category_title">Playback</string>
     <string name="pref_notification_category_title">Notification</string>
     <string name="preferences_category_about">About</string>
@@ -66,10 +65,10 @@
     <string name="preference_first_run_key">firstrun</string>
     <string name="menu_feedback">Feedback</string>
     <string name="menu_refresh_feed">Refresh</string>
-    <string name="menu_refresh_feed_all">Refresh All</string>
+    <string name="menu_refresh_feed_all">Refresh</string>
     <string name="crash_toast">Crash :( Please help by sending a crash report</string>
-    <string name="pref_help_category_title">Help Building SoundWaves</string>
-    <string name="pref_help_static_field_description">If you would like to help out there is plenty of things to do. It could be programming and it could be something completley different. I need help with translation, user experience, icons and graphics, a website and so forth. Head over to the project page on github (https://github.com/bottiger/SoundWaves) or send me an email: bottiger@gmail.com</string>
+    <string name="pref_help_category_title">Help Build SoundWaves</string>
+    <string name="pref_help_static_field_description">If you would like to help out, there are plenty of things to do. It could be programming or it could be something completely different. I need help with translations, UI, icons/graphics, building a website, and so forth. Head over to the project page on GitHub (github.com/bottiger/SoundWaves) or send me an email: bottiger@gmail.com</string>
     <string name="podcast_title_unknown">No Title :(</string>
     <string name="subscription_instruction">Add new podcasts by using the discovery page to the right or import an OPML file.\n\nHowever, first please consider if you want to enabled/disable the options below.</string>
     <string name="filter_show_listened">Show Listened</string>
@@ -80,9 +79,9 @@
     <string name="gpodder_searching">Searching using gPodder.net</string>
     <string name="subscription_subscribing_to">"Subscribing to: "</string>
     <string name="pref_subscriptions_category_title">Subscriptions</string>
-    <string name="pref_subscriptions_columns_dialog_title">Number of columns used for displaying your subscriptions</string>
-    <string name="pref_subscriptions_columns_title">Subscription Columns</string>
-    <string name="pref_subscriptions_columns_summary">Number of columns for displaying subscriptions</string>
+    <string name="pref_subscriptions_columns_dialog_title">Subscription columns</string>
+    <string name="pref_subscriptions_columns_title">Subscription columns</string>
+    <string name="pref_subscriptions_columns_summary">%s</string>
     <string name="pref_interface_other_category_title">Other</string>
     <string name="opml_radio_import">Import OPML file</string>
     <string name="opml_radio_export">Export subscriptions to OPML</string>
@@ -92,7 +91,7 @@
     <string name="pref_network_category_network_title">Network</string>
     <string name="pref_network_category_storage_title">Storage</string>
     <string name="pref_network_category_storage_experimental">Experimental</string>
-    <string name="pref_delete_when_finished_title">Delete After Playback</string>
+    <string name="pref_delete_when_finished_title">Delete after playback</string>
     <string name="pref_delete_when_finished_description">Episodes are automatically deleted after being played</string>
 
     <!-- For playing media on another device, like a chromecast -->
@@ -122,10 +121,10 @@
 
     <!-- Search engine for searching for new podcasts -->
     <string name="discovery_select_backend">Select search engine</string>
-    <string name="pref_cloud_category_cloud_title">Cloud Support</string>
-    <string name="pref_cloud_category_services_title">Web Services</string>
-    <string name="pref_webservices_dialog_title">Podcast Search Engine</string>
-    <string name="pref_webservices_discovery_title">Search Engine</string>
+    <string name="pref_cloud_category_cloud_title">Cloud support</string>
+    <string name="pref_cloud_category_services_title">Web services</string>
+    <string name="pref_webservices_dialog_title">Podcast search engine</string>
+    <string name="pref_webservices_discovery_title">Podcast search engine</string>
     <string name="pref_webservices_discovery_description">Web services used for searching for podcasts</string>
     <string name="subscription_instruction_title">Thank you for trying out SoundWaves</string>
     <string name="playlist_filter_introducion">Automatically populate the playlist with recent episodes from</string>
@@ -137,7 +136,7 @@
     <string name="playlist_empty_mode_one">Queue episodes manually</string>
     <string name="playlist_empty_mode_two">Recent episodes</string>
     <string name="playlist_empty_mode_one_desc">The playlist will only contain episodes you have queued manually</string>
-    <string name="playlist_empty_mode_two_desc">The playlist will populate itself and always contain the most recent episodes. You can still queue selected episode manually</string>
+    <string name="playlist_empty_mode_two_desc">The playlist will populate itself and always contain the most recent episodes. You can still queue selected episodes manually</string>
     <string name="playlist_episode_dismissed">Episode removed</string>
     <string name="playlist_episode_dismissed_undo">Undo</string>
     <string name="drawer_playlist_content_source">Playlist content</string>
@@ -165,7 +164,7 @@
     <string name="open_video_externally_confirm">Open video player</string>
     <string name="open_video_externally_reject">Play audio</string>
     <string name="pref_open_video_externally">Open videos in an external player</string>
-    <string name="pref_open_video_externally_description">This app does not play video. You can choose to open video files in another player, otherwise they will play as audio only.</string>
+    <string name="pref_open_video_externally_description">This app does not play video. You can choose to open video files in another player; otherwise they will play as audio only.</string>
     <string name="pref_help_beta_title">Join BETA testing</string>
     <string name="pref_help_beta_description">If you would like to help out with beta testing of new features you can do so by visiting this page: https://play.google.com/apps/testing/org.bottiger.podcast</string>
 
