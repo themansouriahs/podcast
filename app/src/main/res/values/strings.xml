@@ -22,6 +22,7 @@
     <string name="title_section1">Subscriptions</string>
     <string name="hello_world">Hello World!</string>
     <string name="menu_settings">Settings</string>
+    <string name="menu_downloading">Downloading</string>
     <string name="title_activity_swipe">SoundWaves</string>
     <string name="menu_download_all">Bulk download</string>
     <string name="menu_clear_playlist">Reset playlist</string>
@@ -167,6 +168,7 @@
     <string name="pref_open_video_externally_description">This app does not play video. You can choose to open video files in another player; otherwise they will play as audio only.</string>
     <string name="pref_help_beta_title">Join BETA testing</string>
     <string name="pref_help_beta_description">If you would like to help out with beta testing of new features you can do so by visiting this page: https://play.google.com/apps/testing/org.bottiger.podcast</string>
+    <string name="activity_download_name">Download Manager</string>
 
     <plurals name="player_sleep">
         <item quantity="one">Player will sleep in %d minute</item>

@@ -1,6 +1,8 @@
 package org.bottiger.podcast;
 
+import org.bottiger.podcast.activities.downloadmanager.DownloadManagerActivity;
 import org.bottiger.podcast.playlist.PlaylistData;
+import org.bottiger.podcast.utils.TransitionUtils;
 import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.views.SlidingTab.SlidingTabLayout;
 
@@ -141,7 +143,10 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity impleme
                 startActivity(Intent.createChooser(emailIntent, getString(R.string.feedback_mail_client_picker)));
                 return true;
             }
-
+            case R.id.navigation_downloading: {
+                TransitionUtils.openDownloadManager(this);
+                return true;
+            }
         }
 
         return false;

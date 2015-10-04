@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-        <item
-            android:id="@+id/navigation_clear"
-            android:checked="true"
-            android:icon="@drawable/ic_highlight_remove_white"
-            android:title="@string/menu_clear_playlist"/>
-        <item
-            android:id="@+id/navigation_feedback"
-            android:icon="@drawable/ic_messenger_white"
-            android:title="@string/menu_feedback"/>
+    <item
+        android:id="@+id/navigation_clear"
+        android:checked="true"
+        android:icon="@drawable/ic_highlight_remove_white"
+        android:title="@string/menu_clear_playlist"/>
+    <item
+        android:id="@+id/navigation_feedback"
+        android:icon="@drawable/ic_messenger_white"
+        android:title="@string/menu_feedback"/>
+    <item
+        android:id="@+id/navigation_downloading"
+        android:icon="@drawable/ic_expand_more_grey"
+        android:title="@string/menu_downloading"/>
 
 </menu>
