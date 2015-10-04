@@ -13,7 +13,6 @@
 
     <string name="pref_downloaded_expire_description">%s</string>
     <string name="pref_downloaded_expire_title">Podcast download limit</string>
-    <string name="pref_downloaded_dialog_title">History Size</string>
     <string name="pref_notification_control">Notification Controls</string>
     <string name="pref_notification_control_description">Show small player in notification area</string>
     <string name="dialog_title_add_sub">Add podcast</string>
