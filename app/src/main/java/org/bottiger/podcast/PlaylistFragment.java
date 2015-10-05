@@ -544,7 +544,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         if (item != null && artworkUrl != null) {
             Log.v("MissingImage", "Setting image");
             //FrescoHelper.loadImageInto(mPhoto, artworkUrl, null);
-            ImageLoaderUtils.loadImageInto(mPhoto, artworkUrl, false);
+            ImageLoaderUtils.loadImageInto(mPhoto, artworkUrl, false, false);
         }
 
         if (mTopPlayer.getVisibleHeight() == 0) {

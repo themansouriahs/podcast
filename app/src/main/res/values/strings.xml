@@ -175,6 +175,17 @@
     <string name="download_manager_toolbar_description">Episodes scheduled for download</string>
     <string name="menu_clear_download">clear</string>
 
+    <!--
+    Used for displaying the download progress of a file. Example: "1.2 MB of 53 MB" (the unit, MB, is handled by the framework)
+    When the progress is 0 (we have not started downloading) we should just show the total file size. Example "53 MB"
+    -->
+    <plurals name="download_progress">
+        <item quantity="zero">%2$s</item>
+        <item quantity="one">%1$s of %2$s</item>
+        <item quantity="few">%1$s of %2$s</item>
+        <item quantity="other">%1$s of %2$s</item>
+    </plurals>
+
     <plurals name="player_sleep">
         <item quantity="one">Player will sleep in %d minute</item>
         <item quantity="other">Player will sleep in %d minutes</item>
