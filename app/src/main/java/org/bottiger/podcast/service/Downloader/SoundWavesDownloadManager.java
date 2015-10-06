@@ -547,6 +547,24 @@ public class SoundWavesDownloadManager extends Observable {
         }
 	}
 
+    /**
+     * Add feeditem to the download queue
+     */
+    public synchronized void removeFromQueue(IEpisode argEpisode) {
+        IEpisode episode;
+        QueueEpisode qEpisode;
+        for (int i = 0; i < mDownloadQueue.size(); i++) {
+            qEpisode = mDownloadQueue.get(i);
+            if (qEpisode != null) {
+                episode = qEpisode.getEpisode();
+                if (episode.equals(argEpisode)) {
+                    mDownloadQueue.remove(argEpisode);
+                }
+            }
+
+        }
+    }
+
     public List<QueueEpisode> getQueue() {
         return mDownloadQueue;
     }

@@ -7,6 +7,7 @@ import android.databinding.ObservableField;
 import android.databinding.ObservableInt;
 import android.support.annotation.NonNull;
 import android.text.format.Formatter;
+import android.view.View;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.provider.IEpisode;
@@ -22,11 +23,16 @@ public class DownloadViewModel {
     public final ObservableInt progress = new ObservableInt();
 
     private Context mContext;
+    private DownloadManagerAdapter mAdapter;
     private IEpisode mEpisode;
     private int mPosition;
 
-    public DownloadViewModel(@NonNull Context argContext, @NonNull IEpisode argEpisode, int argPosition) {
+    public DownloadViewModel(@NonNull Context argContext,
+                             @NonNull DownloadManagerAdapter argAdapter,
+                             @NonNull IEpisode argEpisode,
+                             int argPosition) {
         mContext = argContext;
+        mAdapter = argAdapter;
         mEpisode = argEpisode;
         mPosition = argPosition;
         updateProgress(isFirst() ? 60 : 0);
@@ -44,7 +50,7 @@ public class DownloadViewModel {
 
         double currentFilesize = 0;
 
-        if (isFirst() && progress.get() != 0) {
+        if (progress.get() != 0) {
             currentFilesize = (double) mEpisode.getFilesize() * progress.get() / 100.0;
         }
 
@@ -78,4 +84,9 @@ public class DownloadViewModel {
         progress.set(argProgress);
         subtitle.set(makeSubtitle());
     }
+
+    public void onClickRemove(View view) {
+        mAdapter.removed(mPosition);
+    }
+
 }

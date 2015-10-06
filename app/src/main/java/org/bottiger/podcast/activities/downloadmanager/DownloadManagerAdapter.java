@@ -32,6 +32,7 @@ public class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemVie
 
     @NonNull
     private Context mContext;
+    private SoundWavesDownloadManager mDownloadManager;
     private List<IEpisode> mDownloadingEpisodes = new LinkedList<>();
     private List<DownloadViewModel> mViewModels = new LinkedList<>();
 
@@ -44,12 +45,11 @@ public class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemVie
         long fileSize = 142356744;
 
         PlayerService ps = PlayerService.getInstance();
-        SoundWavesDownloadManager downloadManager;
         List<QueueEpisode> queue = new LinkedList<>();
         if (ps != null) {
-            downloadManager = ps.getDownloadManager();
-            queue = downloadManager.getQueue();
-            IEpisode downloadingEpisode = downloadManager.getDownloadingItem();
+            mDownloadManager = ps.getDownloadManager();
+            queue = mDownloadManager.getQueue();
+            IEpisode downloadingEpisode = mDownloadManager.getDownloadingItem();
             if (downloadingEpisode != null)
                 mDownloadingEpisodes.add(downloadingEpisode);
         }
@@ -100,7 +100,7 @@ public class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemVie
     @Override
     public void onBindViewHolder(DownloadItemViewHolder holder, int position) {
         final IEpisode episode = mDownloadingEpisodes.get(position);
-        DownloadViewModel viewModel = new DownloadViewModel(mContext, episode, position);
+        DownloadViewModel viewModel = new DownloadViewModel(mContext, this, episode, position);
         mViewModels.add(viewModel);
         holder.getBinding().setVariable(BR.viewModel, viewModel);
 
@@ -110,6 +110,14 @@ public class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemVie
     @Override
     public int getItemCount() {
         return mDownloadingEpisodes.size();
+    }
+
+    public void removed(int argPosition) {
+        super.notifyItemRemoved(argPosition);
+        IEpisode episode = mDownloadingEpisodes.get(argPosition);
+        mDownloadManager.removeFromQueue(episode);
+        mDownloadingEpisodes.remove(episode);
+        super.notifyDataSetChanged();
     }
 
     public void downloadComplete(@NonNull IEpisode argEpisode) {
