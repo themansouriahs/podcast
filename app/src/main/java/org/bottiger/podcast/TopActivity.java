@@ -10,12 +10,19 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.transition.Slide;
 import android.transition.Transition;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
+
+import com.squareup.otto.Produce;
+import com.squareup.otto.Subscribe;
 
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.utils.TransitionUtils;
+import org.bottiger.podcast.views.dialogs.DialogAddPodcast;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -30,13 +37,14 @@ public class TopActivity extends AppCompatActivity {
     public static final int PERMISSION_TO_IMPORT_EXPORT = 2;
 	
 	private static SharedPreferences prefs;
+    private Menu mMenu;
+    private OttoSubscriberHack mOttoSubscriberHack = new OttoSubscriberHack();
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
         getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
 
         super.onCreate(savedInstanceState);
-        SoundWaves.getBus().register(this);
 
         boolean transparentStatus = transparentNavigationBar();
         /*
@@ -62,12 +70,13 @@ public class TopActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        SoundWaves.getBus().unregister(this);
         super.onDestroy();
     }
 
     @Override
     protected void onPause() {
+        SoundWaves.getBus().unregister(this);
+        SoundWaves.getBus().unregister(mOttoSubscriberHack);
         super.onPause();
         SoundWaves.sAnalytics.activityPause();
     }
@@ -75,7 +84,10 @@ public class TopActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        SoundWaves.getBus().register(this);
+        SoundWaves.getBus().register(mOttoSubscriberHack);
         SoundWaves.sAnalytics.activityResume();
+        initDownloadManagerOptionsMenu();
     }
 
     public static SharedPreferences getPreferences() {
@@ -97,6 +109,29 @@ public class TopActivity extends AppCompatActivity {
             return ps.getPlaylist();
 
         return null;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        mMenu = menu;
+        getMenuInflater().inflate(R.menu.top_options_menu, menu);
+        initDownloadManagerOptionsMenu();
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    /**
+     * Right corner menu options
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_download_manager: {
+                TransitionUtils.openDownloadManager(this);
+                return true;
+            }
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     public void onRequestPermissionsResult (int requestCode, String[] permissions, int[] grantResults) {
@@ -136,6 +171,31 @@ public class TopActivity extends AppCompatActivity {
         }
 
         return false;
+    }
+
+    private void initDownloadManagerOptionsMenu() {
+        if (mMenu == null)
+            return;
+
+        MenuItem item = mMenu.findItem(R.id.menu_download_manager);
+        PlayerService ps = PlayerService.getInstance();
+
+        if (ps == null)
+            return;
+
+        item.setVisible(ps.getDownloadManager().getDownloadingItem() != null);
+    }
+
+    // https://github.com/square/otto/issues/83
+    class OttoSubscriberHack {
+
+        @Subscribe
+        public void showDownloadManager(SoundWavesDownloadManager.DownloadManagerChanged event)
+        {
+            MenuItem item = TopActivity.this.mMenu.findItem(R.id.menu_download_manager);
+            item.setVisible(event.queueSize > 0);
+        }
+
     }
 
 }

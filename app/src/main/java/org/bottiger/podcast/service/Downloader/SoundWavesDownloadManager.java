@@ -45,6 +45,8 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
@@ -52,6 +54,8 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
+
+import com.squareup.otto.Produce;
 
 public class SoundWavesDownloadManager extends Observable {
 
@@ -246,6 +250,8 @@ public class SoundWavesDownloadManager extends Observable {
                 mEngine.startDownload();
 
                 mProgressPublisher.addEpisode(downloadingItem);
+
+                postQueueChangedEvent();
             }
         } finally {
             mQueueLock.unlock();
@@ -517,6 +523,7 @@ public class SoundWavesDownloadManager extends Observable {
 
 	public void notifyDownloadComplete() {
 		mDownloadingItem = null;
+        postQueueChangedEvent();
 	}
 
 	/**
@@ -558,6 +565,7 @@ public class SoundWavesDownloadManager extends Observable {
             }
 
         } finally {
+            postQueueChangedEvent();
             mQueueLock.unlock();
         }
 	}
@@ -582,6 +590,7 @@ public class SoundWavesDownloadManager extends Observable {
                 }
             }
         } finally {
+            postQueueChangedEvent();
             mQueueLock.unlock();
         }
     }
@@ -689,5 +698,33 @@ public class SoundWavesDownloadManager extends Observable {
             notifyDownloadComplete();
             startDownload();
         }
+    }
+
+    public DownloadManagerChanged produceDownloadManagerState() {
+        final DownloadManagerChanged event = new DownloadManagerChanged();
+        int extraFromCurrentDownload = getDownloadingItem() != null ? 1 : 0;
+        event.queueSize = mDownloadQueue.size()+extraFromCurrentDownload;
+
+        return event;
+    }
+
+    private void postQueueChangedEvent() {
+        final DownloadManagerChanged event = produceDownloadManagerState();
+
+        Handler handler = new Handler(Looper.getMainLooper());
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            SoundWaves.getBus().post(event);
+        } else {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    SoundWaves.getBus().post(event);
+                }
+            });
+        }
+    }
+
+    public class DownloadManagerChanged {
+        public int queueSize;
     }
 }

@@ -39,6 +39,7 @@ public class DownloadManagerActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.helper_toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         TextView toolbarTitle = (TextView) findViewById(R.id.helper_toolbar_title);
         TextView toolbarDescription = (TextView) findViewById(R.id.helper_toolbar_description);

@@ -59,8 +59,6 @@ public class MediaRouterPlaybackActivity extends ToolbarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-
         MediaRouteSelector mediaRouteSelector = mMediaRouteCast.getRouteSelector();
 
         if (mediaRouteSelector != null) {
@@ -76,7 +74,7 @@ public class MediaRouterPlaybackActivity extends ToolbarActivity {
         }
 
         // Return true to show the menu.
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
     /**
