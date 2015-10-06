@@ -11,7 +11,9 @@ import org.bottiger.podcast.BR;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.provider.QueueEpisode;
 import org.bottiger.podcast.provider.SlimImplementations.SlimEpisode;
+import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.Downloader.engines.IDownloadEngine;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ImageLoaderUtils;
@@ -41,11 +43,22 @@ public class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemVie
 
         long fileSize = 142356744;
 
-        PlayerService ps = SoundWaves.sBoundPlayerService;
+        PlayerService ps = PlayerService.getInstance();
+        SoundWavesDownloadManager downloadManager;
+        List<QueueEpisode> queue = new LinkedList<>();
         if (ps != null) {
-            //mPodcastDownloadManager = ps.getDownloadManager();
+            downloadManager = ps.getDownloadManager();
+            queue = downloadManager.getQueue();
+            IEpisode downloadingEpisode = downloadManager.getDownloadingItem();
+            if (downloadingEpisode != null)
+                mDownloadingEpisodes.add(downloadingEpisode);
         }
 
+        for (int i = 0; i < queue.size(); i++) {
+            mDownloadingEpisodes.add(queue.get(i).getEpisode());
+        }
+
+        /*
         URL url = null;
         URL urlImage = null;
         try {
@@ -73,6 +86,7 @@ public class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemVie
         mDownloadingEpisodes.add(episode2);
         mDownloadingEpisodes.add(episode3);
         mDownloadingEpisodes.add(episode4);
+        */
     }
 
     @Override
@@ -98,12 +112,16 @@ public class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemVie
         return mDownloadingEpisodes.size();
     }
 
+    public void downloadComplete(@NonNull IEpisode argEpisode) {
+
+    }
+
     public void updateProgress(@NonNull IEpisode argEpisode, int argProgress) {
         for (int i = 0; i < mViewModels.size(); i++) {
             DownloadViewModel viewModel = mViewModels.get(i);
             IEpisode episode = viewModel.getEpisode();
             if (argEpisode.equals(episode)) {
-                viewModel.progress.set(argProgress);
+                viewModel.updateProgress(argProgress);
             }
         }
     }

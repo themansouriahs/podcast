@@ -20,6 +20,7 @@ import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.activities.openopml.OpenOpmlAdapter;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.DownloadProgress;
+import org.bottiger.podcast.service.DownloadStatus;
 
 /**
  * Created by aplb on 04-10-2015.
@@ -101,6 +102,10 @@ public class DownloadManagerActivity extends AppCompatActivity {
     public void setProgressPercent(@NonNull DownloadProgress argProgress) {
         if (mAdapter == null) {
             VendorCrashReporter.report("setProgress with null adapter", ""); // NoI18N
+            return;
+        }
+
+        if (argProgress.getStatus() == DownloadStatus.DONE) {
             return;
         }
 

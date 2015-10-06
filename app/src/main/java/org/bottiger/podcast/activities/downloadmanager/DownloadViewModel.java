@@ -18,6 +18,7 @@ public class DownloadViewModel {
 
     private static final int MAX_PROGRESS = 100;
 
+    public final ObservableField<String> subtitle = new ObservableField<>();
     public final ObservableInt progress = new ObservableInt();
 
     private Context mContext;
@@ -28,7 +29,7 @@ public class DownloadViewModel {
         mContext = argContext;
         mEpisode = argEpisode;
         mPosition = argPosition;
-        progress.set(isFirst() ? 60 : 0);
+        updateProgress(isFirst() ? 60 : 0);
     }
 
     public IEpisode getEpisode() {
@@ -39,12 +40,12 @@ public class DownloadViewModel {
         return mEpisode.getTitle();
     }
 
-    public String getSubtitle() {
+    private String makeSubtitle() {
 
         double currentFilesize = 0;
 
         if (isFirst() && progress.get() != 0) {
-            currentFilesize = (double) mEpisode.getFilesize() * 100.0 / progress.get();
+            currentFilesize = (double) mEpisode.getFilesize() * progress.get() / 100.0;
         }
 
         Resources res = mContext.getResources();
@@ -60,7 +61,7 @@ public class DownloadViewModel {
         }
 
         return res.getQuantityString(R.plurals.download_progress,
-                (int)currentFilesize,
+                (int) currentFilesize,
                 currentFilesizeFormatted,
                 totalFilesizeFormatted);
     }
@@ -69,11 +70,12 @@ public class DownloadViewModel {
         return MAX_PROGRESS;
     }
 
-    //public int getProgress() {
-    //    return isFirst() ? 60 : 0;
-    //}
-
     private boolean isFirst() {
         return mPosition == 0;
+    }
+
+    public void updateProgress(int argProgress) {
+        progress.set(argProgress);
+        subtitle.set(makeSubtitle());
     }
 }

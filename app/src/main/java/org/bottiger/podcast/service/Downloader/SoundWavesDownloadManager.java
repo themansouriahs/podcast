@@ -7,6 +7,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Set;
 
@@ -545,6 +546,10 @@ public class SoundWavesDownloadManager extends Observable {
             mDownloadQueue.addLast(queueItem);
         }
 	}
+
+    public List<QueueEpisode> getQueue() {
+        return mDownloadQueue;
+    }
 
 	/**
 	 * Add feeditem to the download queue and start downloading at once

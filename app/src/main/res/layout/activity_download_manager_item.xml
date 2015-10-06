@@ -48,6 +48,8 @@
             android:text="@{viewModel.title}"
             android:hint="Episode Title"
             android:layout_marginRight="72dp"
+            android:singleLine="true"
+            android:ellipsize="end"
             android:layout_toRightOf="@id/download_episode_image"
             style="@style/SoundWavesListTitleStyle"
             />
