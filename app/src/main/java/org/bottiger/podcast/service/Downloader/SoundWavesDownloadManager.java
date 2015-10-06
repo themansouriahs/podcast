@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.io.FileUtils;
 import org.bottiger.podcast.R;
@@ -104,6 +105,7 @@ public class SoundWavesDownloadManager extends Observable {
 
 	private Context mContext = null;
 
+    private final ReentrantLock mQueueLock = new ReentrantLock();
     private LinkedList<QueueEpisode> mDownloadQueue = new LinkedList<>();
 
 	private IEpisode mDownloadingItem = null;
@@ -230,18 +232,23 @@ public class SoundWavesDownloadManager extends Observable {
 		//downloadManager = (DownloadManager) argContext
 		//		.getSystemService(Context.DOWNLOAD_SERVICE);
 
-		if (getDownloadingItem() == null && mDownloadQueue.size() > 0) {
-			QueueEpisode nextInQueue = mDownloadQueue.pollFirst(); //getNextItem();
-			FeedItem downloadingItem = FeedItem.getById(mContext.getContentResolver(), nextInQueue.getId());
+        mQueueLock.lock();
+        try {
+            if (getDownloadingItem() == null && mDownloadQueue.size() > 0) {
+                QueueEpisode nextInQueue = mDownloadQueue.pollFirst(); //getNextItem();
+                FeedItem downloadingItem = FeedItem.getById(mContext.getContentResolver(), nextInQueue.getId());
 
-            mEngine = newEngine(downloadingItem);
-            mEngine.addCallback(mDownloadCompleteCallback);
+                mEngine = newEngine(downloadingItem);
+                mEngine.addCallback(mDownloadCompleteCallback);
 
-            mDownloadingItem = downloadingItem;
+                mDownloadingItem = downloadingItem;
 
-            mEngine.startDownload();
+                mEngine.startDownload();
 
-            mProgressPublisher.addEpisode(downloadingItem);
+                mProgressPublisher.addEpisode(downloadingItem);
+            }
+        } finally {
+            mQueueLock.unlock();
         }
 
 
@@ -522,51 +529,86 @@ public class SoundWavesDownloadManager extends Observable {
 	/**
 	 * Add feeditem to the download queue
 	 */
-	public synchronized void addItemToQueue(IEpisode argEpisode, @QueuePosition int argPosition) {
-        if (!(argEpisode instanceof FeedItem)) {
-            return;
-        }
+	public void addItemToQueue(IEpisode argEpisode, @QueuePosition int argPosition) {
 
-		QueueEpisode queueItem = new QueueEpisode((FeedItem)argEpisode);
+        mQueueLock.lock();
+        try {
 
-        if (argPosition == ANYWHERE) {
-            if (!mDownloadQueue.contains(queueItem))
-                mDownloadQueue.add(queueItem);
+            if (!(argEpisode instanceof FeedItem)) {
+                return;
+            }
 
-            return;
-        }
+		    QueueEpisode queueItem = new QueueEpisode((FeedItem)argEpisode);
 
-        if (mDownloadQueue.contains(queueItem)) {
-            mDownloadQueue.remove(queueItem);
-        }
+            if (argPosition == ANYWHERE) {
+                if (!mDownloadQueue.contains(queueItem))
+                    mDownloadQueue.add(queueItem);
 
-        if (argPosition == FIRST) {
-            mDownloadQueue.addFirst(queueItem);
-        } else if (argPosition == LAST) {
-            mDownloadQueue.addLast(queueItem);
+                return;
+            }
+
+            if (mDownloadQueue.contains(queueItem)) {
+                mDownloadQueue.remove(queueItem);
+            }
+
+            if (argPosition == FIRST) {
+                mDownloadQueue.addFirst(queueItem);
+            } else if (argPosition == LAST) {
+                mDownloadQueue.addLast(queueItem);
+            }
+
+        } finally {
+            mQueueLock.unlock();
         }
 	}
 
     /**
      * Add feeditem to the download queue
      */
-    public synchronized void removeFromQueue(IEpisode argEpisode) {
-        IEpisode episode;
-        QueueEpisode qEpisode;
-        for (int i = 0; i < mDownloadQueue.size(); i++) {
-            qEpisode = mDownloadQueue.get(i);
-            if (qEpisode != null) {
-                episode = qEpisode.getEpisode();
-                if (episode.equals(argEpisode)) {
-                    mDownloadQueue.remove(argEpisode);
+    public void removeFromQueue(IEpisode argEpisode) {
+
+        mQueueLock.lock();
+        try {
+            IEpisode episode;
+            QueueEpisode qEpisode;
+            for (int i = 0; i < mDownloadQueue.size(); i++) {
+                qEpisode = mDownloadQueue.get(i);
+                if (qEpisode != null) {
+                    episode = qEpisode.getEpisode();
+                    if (episode.equals(argEpisode)) {
+                        mDownloadQueue.remove(i);
+                        return;
+                    }
                 }
             }
-
+        } finally {
+            mQueueLock.unlock();
         }
     }
 
     public List<QueueEpisode> getQueue() {
         return mDownloadQueue;
+    }
+
+    public void cancelCurrentDownload() {
+        mEngine.abort();
+    }
+
+    // True if succesfull
+    public boolean move(int from, int to) {
+        if (from < 0 || to >= mDownloadQueue.size()) {
+            return false;
+        }
+
+        mQueueLock.lock();
+        try {
+            QueueEpisode episode = mDownloadQueue.get(from);
+            mDownloadQueue.remove(from);
+            mDownloadQueue.add(to, episode);
+            return true;
+        } finally {
+            mQueueLock.unlock();
+        }
     }
 
 	/**
@@ -644,6 +686,7 @@ public class SoundWavesDownloadManager extends Observable {
         public void downloadInterrupted(IEpisode argEpisode) {
             removeDownloadingEpisode(argEpisode);
             removeTmpFolderCruft();
+            notifyDownloadComplete();
             startDownload();
         }
     }

@@ -115,7 +115,11 @@ public class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemVie
     public void removed(int argPosition) {
         super.notifyItemRemoved(argPosition);
         IEpisode episode = mDownloadingEpisodes.get(argPosition);
-        mDownloadManager.removeFromQueue(episode);
+        if (argPosition == 0) {
+            mDownloadManager.cancelCurrentDownload();
+        } else {
+            mDownloadManager.removeFromQueue(episode);
+        }
         mDownloadingEpisodes.remove(episode);
         super.notifyDataSetChanged();
     }

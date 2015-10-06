@@ -13,6 +13,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InterruptedIOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -31,6 +32,8 @@ public class OkHttpDownloader extends DownloadEngineBase {
     private HttpURLConnection mConnection;
     private final SparseArray<Callback> mExternalCallback = new SparseArray<>();
     private SoundWavesDownloadManager mSoundWavesDownloadManager;
+
+    private volatile boolean mAborted = false;
 
     private final URL mURL;
 
@@ -65,6 +68,11 @@ public class OkHttpDownloader extends DownloadEngineBase {
                         int bytesRead = -1;
                         byte[] buffer = new byte[BUFFER_SIZE];
                         while ((bytesRead = inputStream.read(buffer)) != -1) {
+                            if (mAborted) {
+                                onFailure(new InterruptedIOException());
+                                return;
+                            }
+
                             outputStream.write(buffer, 0, bytesRead);
                             mProgress += bytesRead / contentLength;
                         }
@@ -118,7 +126,7 @@ public class OkHttpDownloader extends DownloadEngineBase {
 
     @Override
     public void abort() {
-        // FIXME not implemented
+        mAborted = true;
     }
 
     private void onSucces(File response)  throws IOException {
