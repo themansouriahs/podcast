@@ -693,7 +693,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
             mTopPlayer.setFullscreen(true, false);
             //mTopPlayer.setPadding(0, i ,0, 0);
         }
-        mPlaylistEmptyContainer.setLayoutParams(params);
+        mPlaylistEmptyContainer.setLayoutParams(params2);
         mRecyclerView.setLayoutParams(params3);
         mPlaylistWelcomeContainer.setLayoutParams(params4);
     }

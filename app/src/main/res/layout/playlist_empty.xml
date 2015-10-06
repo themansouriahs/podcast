@@ -3,7 +3,9 @@
     android:id="@+id/playlist_empty"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="?attr/themeBackground"
+    >
 
     <TextView
         android:layout_width="wrap_content"
