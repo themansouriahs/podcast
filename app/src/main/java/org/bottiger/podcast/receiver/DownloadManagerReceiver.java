@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.bottiger.podcast.provider.FeedItem;
-import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
+import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.utils.SDCardManager;
 
 import android.app.DownloadManager;
@@ -50,15 +50,6 @@ public class DownloadManagerReceiver extends BroadcastReceiver {
 				FeedItem item = FeedItem.getByDownloadReference(
 						context.getContentResolver(), downloadId);
 
-                /*
-                HashMap<Long, List<DownloadObserver>> fileObserverHashMap = DownloadProgressPublisher.getObservers();
-                if (fileObserverHashMap.containsKey(item.getId())) {
-                    List<DownloadObserver> observers = fileObserverHashMap.get(item.getId());
-                    for (DownloadObserver downloadObserver : observers) {
-                        downloadObserver.setProgressPercent(100);
-                    }
-                }*/
-
 				if (item != null) {
 
 					if (DownloadManager.STATUS_SUCCESSFUL == c
@@ -73,13 +64,13 @@ public class DownloadManagerReceiver extends BroadcastReceiver {
 					// Start next download
 					
 					// Reset downloadingItem 
-					EpisodeDownloadManager.notifyDownloadComplete(item);
+					//SoundWavesDownloadManager.notifyDownloadComplete(item);
 					
-					EpisodeDownloadManager.startDownload(context);
+					//SoundWavesDownloadManager.startDownload(context);
 				}
 			}
 
-			EpisodeDownloadManager.removeExpiredDownloadedPodcasts(context);
+			SoundWavesDownloadManager.removeExpiredDownloadedPodcasts(context);
 		}
 	}
 	
@@ -130,14 +121,14 @@ public class DownloadManagerReceiver extends BroadcastReceiver {
         intent.setData(Uri.fromFile(newFileName));
         context.sendBroadcast(intent);
 
-		if (EpisodeDownloadManager.getmDownloadingIDs().contains(downloadId))
-			EpisodeDownloadManager.getmDownloadingIDs().remove(downloadId);
+		//if (SoundWavesDownloadManager.getmDownloadingIDs().contains(downloadId))
+		//	SoundWavesDownloadManager.getmDownloadingIDs().remove(downloadId);
 
 		/*
 		 * If no more files are being downloaded we purge the tmp dir. Things
 		 * might build up here if downloads are aborted for various reasons.
 		 */
-		if (EpisodeDownloadManager.getmDownloadingIDs().size() == 0) {
+		//if (SoundWavesDownloadManager.getmDownloadingIDs().size() == 0) {
 			File directory = new File(tmpDir);
 
 			// Get all files in directory
@@ -152,6 +143,6 @@ public class DownloadManagerReceiver extends BroadcastReceiver {
 					System.out.println("Failed to delete " + file);
 				}
 			}
-		}
+		//}
 	}
 }

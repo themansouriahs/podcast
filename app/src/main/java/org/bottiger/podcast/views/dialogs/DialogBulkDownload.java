@@ -17,10 +17,9 @@ import android.widget.TextView;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.playlist.Playlist;
-import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
-import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
-import org.bottiger.podcast.utils.OPMLImportExport;
+import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
+import org.bottiger.podcast.service.PlayerService;
 
 import java.util.Date;
 
@@ -116,9 +115,14 @@ public class DialogBulkDownload {
             return;
         }
 
+        PlayerService ps = PlayerService.getInstance();
+        SoundWavesDownloadManager downloadManager = null;
+        if (ps != null)
+            downloadManager = ps.getDownloadManager();
+
         SharedPreferences sharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(mContext);
-        long bytesToKeep = EpisodeDownloadManager.bytesToKeep(sharedPreferences);
+        long bytesToKeep = SoundWavesDownloadManager.bytesToKeep(sharedPreferences);
 
         IEpisode episode;
         Date date;
@@ -131,13 +135,14 @@ public class DialogBulkDownload {
             if (date != null) {
                 boolean validDate = validDate(mAction, date);
 
-                if (validDate) {
-                    EpisodeDownloadManager.addItemToQueue(episode, EpisodeDownloadManager.LAST);
+                if (validDate && downloadManager != null) {
+                    downloadManager.addItemToQueue(episode, SoundWavesDownloadManager.LAST);
                 }
             }
         }
 
-        EpisodeDownloadManager.startDownload(mContext);
+        if (downloadManager != null)
+        downloadManager.startDownload();
 
     }
 

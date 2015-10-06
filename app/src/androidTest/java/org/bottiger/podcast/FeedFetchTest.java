@@ -16,10 +16,6 @@
 
 package org.bottiger.podcast;
 
-import org.bottiger.podcast.service.PodcastService;
-
-import android.content.Intent;
-
 
 public class FeedFetchTest extends android.test.ServiceTestCase<PodcastService> {
 

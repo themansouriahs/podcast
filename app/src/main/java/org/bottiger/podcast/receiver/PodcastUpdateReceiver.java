@@ -1,11 +1,13 @@
 package org.bottiger.podcast.receiver;
 
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.Analytics.AnalyticsFactory;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.provider.ISubscription;
-import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
+import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
+import org.bottiger.podcast.service.PlayerService;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -35,6 +37,10 @@ public class PodcastUpdateReceiver extends BroadcastReceiver {
         final PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "");
         wl.acquire();
 
+        final SoundWavesDownloadManager downloadManager;
+        PlayerService playerService = PlayerService.getInstance();
+        downloadManager = playerService != null ? playerService.getDownloadManager() : new SoundWavesDownloadManager(context);
+
 		SubscriptionRefreshManager subscriptionRefreshManager = new SubscriptionRefreshManager(context);
         subscriptionRefreshManager.refresh(null, new IDownloadCompleteCallback() {
             @Override
@@ -44,8 +50,10 @@ public class PodcastUpdateReceiver extends BroadcastReceiver {
                 IAnalytics analytics = AnalyticsFactory.getAnalytics(context);
                 analytics.trackEvent(IAnalytics.EVENT_TYPE.REFRESH_DURATION, timeDiff);
 
-                EpisodeDownloadManager.removeExpiredDownloadedPodcasts(context);
-                EpisodeDownloadManager.startDownload(context);
+
+
+                SoundWavesDownloadManager.removeExpiredDownloadedPodcasts(context);
+                downloadManager.startDownload();
 
                 wl.release();
                 return;

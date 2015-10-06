@@ -7,18 +7,15 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.transition.Slide;
 import android.transition.Transition;
-import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 
 import org.bottiger.podcast.playlist.Playlist;
-import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
+import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.PlayerService;
-import org.bottiger.podcast.utils.OPMLImportExport;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -109,9 +106,11 @@ public class TopActivity extends AppCompatActivity {
         }
 
         switch (requestCode) {
-        //if (requestCode == PERMISSION_TO_DOWNLOAD) {
             case PERMISSION_TO_DOWNLOAD: {
-                EpisodeDownloadManager.startDownload(this);
+                PlayerService ps = SoundWaves.sBoundPlayerService;
+                if (ps == null)
+                    return;
+                ps.getDownloadManager().startDownload();
                 return;
             }
             case PERMISSION_TO_IMPORT_EXPORT: {

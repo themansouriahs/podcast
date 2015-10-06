@@ -16,24 +16,11 @@
 
 package org.bottiger.podcast;
 
-import org.bottiger.podcast.service.PodcastService;
-
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.preference.ListPreference;
-import android.preference.Preference;
-import android.preference.PreferenceGroup;
 import android.preference.PreferenceManager;
-import android.preference.PreferenceScreen;
 import android.text.TextUtils;
 import android.view.View;
-import android.view.WindowManager;
 
 public class SettingsActivity extends ToolbarActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 

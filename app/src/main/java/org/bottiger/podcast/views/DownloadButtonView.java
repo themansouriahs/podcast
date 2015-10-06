@@ -17,13 +17,13 @@ import android.view.View;
 import com.squareup.otto.Subscribe;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.DownloadProgress;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
-import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
-import org.bottiger.podcast.utils.ColorUtils;
-import org.bottiger.podcast.utils.ThemeHelper;
+import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
+import org.bottiger.podcast.service.PlayerService;
 
 /**
  * Created by apl on 02-09-2014.
@@ -209,8 +209,11 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
 
         if (getState() == PlayerButtonView.STATE_DEFAULT) {
             Log.v(TAG, "Queue download");
-            EpisodeDownloadManager.addItemAndStartDownload(getEpisode(), EpisodeDownloadManager.FIRST, mContext);
-            setState(PlayerButtonView.STATE_QUEUE);
+            PlayerService ps = PlayerService.getInstance();
+            if (ps != null) {
+                ps.getDownloadManager().addItemAndStartDownload(getEpisode(), SoundWavesDownloadManager.FIRST);
+                setState(PlayerButtonView.STATE_QUEUE);
+            }
         } else if (getState() == PlayerButtonView.STATE_DELETE) {
             Log.v(TAG, "Delete file");
             IEpisode episode = getEpisode();
@@ -222,13 +225,17 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
     }
 
     private int calcState() {
-        //mEpisode.isDownloaded() ? PlayerButtonView.STATE_DELETE : PlayerButtonView.STATE_DEFAULT;
+
+        PlayerService ps = SoundWaves.sBoundPlayerService;
+
+        if (ps == null)
+            return PlayerButtonView.STATE_DELETE;
 
         if (getEpisode().isDownloaded()) {
             return PlayerButtonView.STATE_DELETE;
         }
 
-        org.bottiger.podcast.service.DownloadStatus status = EpisodeDownloadManager.getStatus(getEpisode());
+        org.bottiger.podcast.service.DownloadStatus status = ps.getDownloadManager().getStatus(getEpisode());
 
         if (status == org.bottiger.podcast.service.DownloadStatus.DOWNLOADING) {
             return PlayerButtonView.STATE_DEFAULT;

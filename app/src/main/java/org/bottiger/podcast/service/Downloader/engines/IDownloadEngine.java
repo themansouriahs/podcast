@@ -14,10 +14,11 @@ import java.net.URL;
  */
 public interface IDownloadEngine {
 
-    public void startDownload();
-    public float getProgress();
-    public IEpisode getEpisode();
-    public void addCallback(Callback argCallback);
+    void startDownload();
+    float getProgress();
+    IEpisode getEpisode();
+    void addCallback(Callback argCallback);
+    void abort();
 
     interface Callback {
         void downloadCompleted(IEpisode argEpisode);

@@ -181,10 +181,6 @@
             </intent-filter>
         </service>
         <service
-            android:name="org.bottiger.podcast.service.PodcastService"
-            android:enabled="true" >
-        </service>
-        <service
             android:name="org.bottiger.podcast.service.PlayerService"
             android:enabled="true"
             android:permission="android.permission.MEDIA_CONTENT_CONTROL">

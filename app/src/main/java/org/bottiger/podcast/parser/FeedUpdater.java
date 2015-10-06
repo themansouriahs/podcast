@@ -5,17 +5,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ItemColumns;
-import org.bottiger.podcast.provider.PodcastProvider;
 import org.bottiger.podcast.provider.Subscription;
-import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
 import org.bottiger.podcast.service.PlayerService;
-import org.bottiger.podcast.views.PlayerButtonView;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;

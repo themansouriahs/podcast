@@ -8,7 +8,7 @@ import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.playlist.filters.SubscriptionFilter;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
-import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
+import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.ImageLoaderUtils;
@@ -114,14 +114,11 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
     private int mSwipeBgColor = R.color.colorBgPrimaryDark;
     private int mSwipeIconID = R.drawable.ic_hearing_white;
 
-    DownloadProgressPublisher mDownloadProgressObservable = null;
-
     private Playlist mPlaylist;
     private Context mContext;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        mDownloadProgressObservable = new DownloadProgressPublisher((SoundWaves) mContext.getApplicationContext());
         int color = getResources().getColor(mSwipeBgColor);
         mSwipePaint.setColor(color);
         mSwipeIcon = BitmapFactory.decodeResource(getResources(), mSwipeIconID);
@@ -135,7 +132,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
     @Override
     public void onDestroyView() {
-        EpisodeDownloadManager.resetDownloadProgressObservable();
         SoundWaves.getBus().unregister(mAdapter);
         SoundWaves.getBus().unregister(mPlayPauseButton);
         SoundWaves.getBus().unregister(mPlayerSeekbar);
@@ -148,8 +144,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        mDownloadProgressObservable = EpisodeDownloadManager.getDownloadProgressObservable((SoundWaves) mContext.getApplicationContext());
 
 		TopActivity.getPreferences().registerOnSharedPreferenceChangeListener(
                 spChanged);

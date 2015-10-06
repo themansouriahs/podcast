@@ -6,14 +6,13 @@ import android.support.annotation.StringDef;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Xml;
-import android.widget.TextView;
 
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
-import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
+import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.utils.DateUtils;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -318,7 +317,7 @@ public class FeedParser {
                     EpisodeEnclosure enclosure = readEnclosure(parser);
                     episode.setURL(enclosure.url);
                     episode.setFilesize(enclosure.filesize);
-                    episode.setIsVideo(EpisodeDownloadManager.isVideo(enclosure.mimeType));
+                    episode.setIsVideo(SoundWavesDownloadManager.isVideo(enclosure.mimeType));
                     break;
                 }
                 case EPISODE_CATEGORY_TAG:

@@ -56,7 +56,9 @@ public class SoundWaves extends Application {
         public boolean isConnected;
     }
 
-    public static PlayerService sBoundPlayerService = null; // deprecated
+    @Deprecated
+    public static PlayerService sBoundPlayerService = null;
+
     public ServiceConnection playerServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {

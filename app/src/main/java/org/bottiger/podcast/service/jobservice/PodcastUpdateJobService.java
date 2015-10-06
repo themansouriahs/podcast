@@ -4,17 +4,16 @@ import android.annotation.TargetApi;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
 import android.support.annotation.NonNull;
-import android.support.v4.util.TimeUtils;
 import android.util.Log;
 
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
-import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
+import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
+import org.bottiger.podcast.service.PlayerService;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -37,6 +36,11 @@ public class PodcastUpdateJobService extends JobService {
                 if (argSubscription == null)
                     return;
 
+                PlayerService ps = PlayerService.getInstance();
+                SoundWavesDownloadManager downloadManager = null;
+                if (ps != null)
+                    downloadManager = ps.getDownloadManager();
+
                 ArrayList<? extends IEpisode> episodes = argSubscription.getEpisodes();
                 IEpisode episode;
                 if (episodes != null) {
@@ -49,12 +53,14 @@ public class PodcastUpdateJobService extends JobService {
                         long minutes = TimeUnit.MILLISECONDS.toMinutes(now - createdAt);
 
                         if (minutes <= PodcastUpdater.UPDATE_FREQUENCY_MIN*buffer) {
-                            EpisodeDownloadManager.addItemToQueue(episode,EpisodeDownloadManager.ANYWHERE);
+                            if (downloadManager != null)
+                                downloadManager.addItemToQueue(episode, SoundWavesDownloadManager.ANYWHERE);
                         }
                     }
 
-                    EpisodeDownloadManager.removeExpiredDownloadedPodcasts(PodcastUpdateJobService.this);
-                    EpisodeDownloadManager.startDownload(PodcastUpdateJobService.this);
+                    SoundWavesDownloadManager.removeExpiredDownloadedPodcasts(PodcastUpdateJobService.this);
+                    if (downloadManager != null)
+                        downloadManager.startDownload();
                 }
             }
         });

@@ -16,7 +16,7 @@ import java.util.Locale;
 import org.bottiger.podcast.listeners.DownloadProgressPublisher;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.service.DownloadStatus;
-import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
+import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.utils.BitMaskUtils;
 import org.bottiger.podcast.utils.PodcastLog;
 import org.bottiger.podcast.utils.SDCardManager;
@@ -811,8 +811,9 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	 * textView argument
 	 *
 	 */
+	/*
 	public String getStatus(DownloadManager downloadManager) {
-		DownloadStatus downloadStatus = EpisodeDownloadManager.getStatus(this);
+		DownloadStatus downloadStatus = SoundWavesDownloadManager.getStatus(this);
 		String statusText = "";
 		switch (downloadStatus) {
 		case PENDING:
@@ -832,6 +833,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 		}
 		return statusText;
 	}
+	*/
 
 	/**
 	 * Get the current download progress as a int .

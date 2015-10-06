@@ -2,7 +2,6 @@ package org.bottiger.podcast.service;
 
 import org.bottiger.podcast.SettingsActivity;
 import org.bottiger.podcast.receiver.PodcastUpdateReceiver;
-import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
 import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
 import org.bottiger.podcast.utils.PodcastLog;
 
@@ -30,32 +29,7 @@ public class PodcastService extends IntentService {
 	private WakeLock mWakeLock;
 	private final String TAG = "wakelock";
 
-	public static final int UPDATE_PODCAST = 100;
-
 	private final PodcastLog log = PodcastLog.getLog(getClass());
-
-	public static final String UPDATE_DOWNLOAD_STATUS = PodcastService.class
-			.getName() + ".UPDATE_DOWNLOAD_STATUS";
-
-	public static final int NO_CONNECT = 1;
-	public static final int WIFI_CONNECT = 2;
-	public static final int MOBILE_CONNECT = 4;
-
-	public int pref_connection_sel = MOBILE_CONNECT | WIFI_CONNECT;
-
-	private static final long ONE_MINUTE = 60L * 1000L;
-	private static final long ONE_HOUR = 60L * ONE_MINUTE;
-	private static final long ONE_DAY = 24L * ONE_HOUR;
-
-	public long pref_update_wifi = 0;
-	public long pref_update_mobile = 0;
-	public long pref_item_expire = 0;
-	public long pref_download_file_expire = 1000;
-	public long pref_played_file_expire = 0;
-	public int pref_max_valid_size = 1000;
-
-	private PodcastUpdateReceiver updateManager = new PodcastUpdateReceiver();
-	private EpisodeDownloadManager pdm = new EpisodeDownloadManager();
 
 	// @Override
 	public void onStart(Context context, Intent intent, int startId) {

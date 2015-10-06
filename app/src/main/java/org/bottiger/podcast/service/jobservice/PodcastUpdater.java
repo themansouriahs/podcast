@@ -11,11 +11,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.service.PodcastService;
 
 /**
@@ -72,12 +74,6 @@ public class PodcastUpdater {
      */
     public static PendingIntent getAlarmIntent(Context context) {
         Intent i = new Intent(context, PodcastService.class);
-
-        /*
-         * Not used at the moment Bundle bundle = new Bundle();
-         * bundle.putLong("intervalMinutes", alarmInterval(intervalMinutes));
-         * i.putExtra("schedule", bundle);
-         */
 
         return PendingIntent.getService(context, 0, i, 0);
     }

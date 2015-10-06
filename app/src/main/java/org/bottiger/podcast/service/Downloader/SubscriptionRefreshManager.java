@@ -14,9 +14,8 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
-import org.apache.commons.io.input.BOMInputStream;
-import org.apache.commons.io.input.XmlStreamReader;
 import org.apache.commons.validator.routines.UrlValidator;
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.parser.FeedParser;
 import org.bottiger.podcast.parser.FeedUpdater;
@@ -25,19 +24,16 @@ import org.bottiger.podcast.parser.syndication.handler.UnsupportedFeedtypeExcept
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
-import org.bottiger.podcast.provider.SlimImplementations.SlimEpisode;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionLoader;
-import org.bottiger.podcast.provider.converter.EpisodeConverter;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
+import org.bottiger.podcast.service.PlayerService;
 import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlPullParserException;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -73,7 +69,7 @@ public class SubscriptionRefreshManager {
     public void refresh(@Nullable ISubscription argSubscription, @Nullable IDownloadCompleteCallback argCallback) {
         Log.d(TAG, "refresh subscription: " + argSubscription + " (null => all)");
 
-        if (!EpisodeDownloadManager.canPerform(EpisodeDownloadManager.ACTION_REFRESH_SUBSCRIPTION, mContext, argSubscription)) {
+        if (!SoundWavesDownloadManager.canPerform(SoundWavesDownloadManager.ACTION_REFRESH_SUBSCRIPTION, mContext, argSubscription)) {
             Log.d(TAG, "refresh aborted, not allowed"); // NoI18N
             return;
         }
@@ -257,11 +253,13 @@ public class SubscriptionRefreshManager {
     }
 
     private void downloadNewEpisodeskCallback(final @NonNull Context argContext, @NonNull ISubscription argSubscription) {
-        if (EpisodeDownloadManager.canPerform(EpisodeDownloadManager.ACTION_DOWNLOAD_AUTOMATICALLY,
+        if (SoundWavesDownloadManager.canPerform(SoundWavesDownloadManager.ACTION_DOWNLOAD_AUTOMATICALLY,
                 argContext,
                 argSubscription)) {
             boolean startDownload = false;
             Date tenMinutesAgo = new Date(System.currentTimeMillis() - (10 * 60 * 1000));
+
+            final PlayerService ps = SoundWaves.sBoundPlayerService;
 
             if (argSubscription instanceof Subscription) {
                 ArrayList<? extends IEpisode> episodes = argSubscription.getEpisodes();
@@ -270,18 +268,21 @@ public class SubscriptionRefreshManager {
                     if (episode instanceof FeedItem) {
                         Date lastUpdate = new Date(((FeedItem) episode).getLastUpdate());
                         if (lastUpdate.after(tenMinutesAgo)) {
-                            EpisodeDownloadManager.addItemToQueue(episode, EpisodeDownloadManager.LAST);
-                            startDownload = true;
+
+                            if (ps != null) {
+                                ps.getDownloadManager().addItemToQueue(episode, SoundWavesDownloadManager.LAST);
+                                startDownload = true;
+                            }
                         }
                     }
                 }
             }
 
-            if (startDownload) {
+            if (startDownload && ps != null) {
                 Runnable myRunnable = new Runnable() {
                     @Override
                     public void run() {
-                        EpisodeDownloadManager.startDownload(argContext);
+                        ps.getDownloadManager().startDownload();
                     }
                 };
                 mainHandler.post(myRunnable);

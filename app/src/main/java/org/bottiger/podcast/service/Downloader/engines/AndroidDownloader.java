@@ -27,4 +27,9 @@ public class AndroidDownloader extends DownloadEngineBase {
     public void addCallback(Callback argCallback) {
 
     }
+
+    @Override
+    public void abort() {
+
+    }
 }

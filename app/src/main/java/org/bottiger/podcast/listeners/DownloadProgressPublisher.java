@@ -12,7 +12,7 @@ import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.DownloadStatus;
-import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
+import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.Downloader.engines.IDownloadEngine;
 
 import android.os.Handler;
@@ -29,9 +29,14 @@ public class DownloadProgressPublisher {
 	private static final long REFRESH_INTERVAL = 50; // 16 ms => 60 fps
 	//TimeUnit.MILLISECONDS.convert(1,TimeUnit.SECONDS);
 
-    private static HashMap<IEpisode, IDownloadEngine> mPodcastDownloadManager = null;
-
     private static SoundWaves mApplicationContext;
+
+    /**
+     * Unregister an Observer from being updated on progress updates
+     *
+     * Returns true if the observer was found and removed
+     */
+    public static Handler sHandler;
 
 	/**
 	 * Handler events types
@@ -40,19 +45,18 @@ public class DownloadProgressPublisher {
     private static final int ADD_ID = 2;
     private static final int DELETED = 3;
 
-    public DownloadProgressPublisher(@NonNull SoundWaves context) {
-        mPodcastDownloadManager = EpisodeDownloadManager.mDownloadingEpisodes;
+    public DownloadProgressPublisher(@NonNull SoundWaves context, @NonNull SoundWavesDownloadManager argDownloadManager) {
+        sHandler = new DownloadProgressHandler(argDownloadManager);
         mApplicationContext = context;
     }
 
-	/**
-	 * Unregister an Observer from being updated on progress updates
-     *
-     * Returns true if the observer was found and removed
-	 */
-	public static final Handler sHandler = new DownloadProgressHandler();
-
     private static class DownloadProgressHandler extends Handler {
+
+        private SoundWavesDownloadManager mDownloadManager;
+
+        public DownloadProgressHandler(@NonNull SoundWavesDownloadManager argDownloadManager) {
+            mDownloadManager = argDownloadManager;
+        }
 
         private List<FeedItem> mUpdateEpisodess = new LinkedList<>();
         private final ReentrantLock lock = new ReentrantLock();
@@ -79,8 +83,8 @@ public class DownloadProgressPublisher {
                                 throw new NullPointerException("Episode can not be null!");
                             }
 
-                            DownloadStatus status = EpisodeDownloadManager.getStatus(episode);
-                            IDownloadEngine download = mPodcastDownloadManager.get(episode);
+                            DownloadStatus status = mDownloadManager.getStatus(episode);
+                            IDownloadEngine download = mDownloadManager.getCurrentDownloadProcess();
 
                             DownloadProgress downloadProgress = null;
 
