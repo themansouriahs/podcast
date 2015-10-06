@@ -1,7 +1,9 @@
 package org.bottiger.podcast.Player;
 
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.media.session.MediaSession;
@@ -22,6 +24,7 @@ import org.bottiger.podcast.images.FrescoHelper;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
+import org.bottiger.podcast.receiver.NotificationReceiver;
 import org.bottiger.podcast.service.PlayerService;
 
 /**
@@ -38,6 +41,10 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
     private MediaSessionCompat mSession;
     private PlayerService mPlayerService;
 
+    /**
+     * Started when the PlayerService is started
+     * @param argService
+     */
     public PlayerStateManager(@NonNull PlayerService argService) {
         Log.d(TAG, "Constructor");
 
@@ -46,6 +53,12 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
         mSession = new MediaSessionCompat(argService, SESSION_TAG, mediaButtonReceiver, null);
         mSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
                 MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+
+        Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
+        PendingIntent pendingMediaButtonIntent = PendingIntent.getBroadcast(mPlayerService, 0, mediaButtonIntent, 0);
+        mSession.setMediaButtonReceiver(pendingMediaButtonIntent);
+
+
         mSession.setCallback(this);
         mSession.setActive(true);
     }
