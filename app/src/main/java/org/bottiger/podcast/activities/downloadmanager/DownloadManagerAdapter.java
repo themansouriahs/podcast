@@ -3,24 +3,23 @@ package org.bottiger.podcast.activities.downloadmanager;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bumptech.glide.Glide;
-
 import org.bottiger.podcast.BR;
 import org.bottiger.podcast.R;
-import org.bottiger.podcast.activities.openopml.OpenOpmlViewHolder;
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.SlimImplementations.SlimEpisode;
-import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
+import org.bottiger.podcast.service.Downloader.engines.IDownloadEngine;
+import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ImageLoaderUtils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -32,12 +31,20 @@ public class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemVie
     @NonNull
     private Context mContext;
     private List<IEpisode> mDownloadingEpisodes = new LinkedList<>();
+    private List<DownloadViewModel> mViewModels = new LinkedList<>();
+
+    HashMap<IEpisode, IDownloadEngine> mPodcastDownloadManager;
 
     public DownloadManagerAdapter(@NonNull Context argContext) {
         super();
         mContext = argContext;
 
         long fileSize = 142356744;
+
+        PlayerService ps = SoundWaves.sBoundPlayerService;
+        if (ps != null) {
+            //mPodcastDownloadManager = ps.getDownloadManager();
+        }
 
         URL url = null;
         URL urlImage = null;
@@ -80,6 +87,7 @@ public class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemVie
     public void onBindViewHolder(DownloadItemViewHolder holder, int position) {
         final IEpisode episode = mDownloadingEpisodes.get(position);
         DownloadViewModel viewModel = new DownloadViewModel(mContext, episode, position);
+        mViewModels.add(viewModel);
         holder.getBinding().setVariable(BR.viewModel, viewModel);
 
         ImageLoaderUtils.loadImageInto(holder.mImageView, episode.getArtwork(mContext).toString(), false, true);
@@ -88,6 +96,16 @@ public class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemVie
     @Override
     public int getItemCount() {
         return mDownloadingEpisodes.size();
+    }
+
+    public void updateProgress(@NonNull IEpisode argEpisode, int argProgress) {
+        for (int i = 0; i < mViewModels.size(); i++) {
+            DownloadViewModel viewModel = mViewModels.get(i);
+            IEpisode episode = viewModel.getEpisode();
+            if (argEpisode.equals(episode)) {
+                viewModel.progress.set(argProgress);
+            }
+        }
     }
 
     boolean onItemMove(int fromPosition, int toPosition) {

@@ -1,7 +1,7 @@
 package org.bottiger.podcast;
 
 import org.bottiger.podcast.adapters.PlaylistAdapter;
-import org.bottiger.podcast.listeners.DownloadProgressObservable;
+import org.bottiger.podcast.listeners.DownloadProgressPublisher;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.playlist.Playlist;
@@ -114,14 +114,14 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
     private int mSwipeBgColor = R.color.colorBgPrimaryDark;
     private int mSwipeIconID = R.drawable.ic_hearing_white;
 
-    DownloadProgressObservable mDownloadProgressObservable = null;
+    DownloadProgressPublisher mDownloadProgressObservable = null;
 
     private Playlist mPlaylist;
     private Context mContext;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        mDownloadProgressObservable = new DownloadProgressObservable((SoundWaves) mContext.getApplicationContext());
+        mDownloadProgressObservable = new DownloadProgressPublisher((SoundWaves) mContext.getApplicationContext());
         int color = getResources().getColor(mSwipeBgColor);
         mSwipePaint.setColor(color);
         mSwipeIcon = BitmapFactory.decodeResource(getResources(), mSwipeIconID);

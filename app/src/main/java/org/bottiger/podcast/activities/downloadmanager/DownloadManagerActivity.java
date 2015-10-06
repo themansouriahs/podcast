@@ -3,6 +3,7 @@ package org.bottiger.podcast.activities.downloadmanager;
 import android.graphics.Canvas;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,8 +13,13 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.widget.TextView;
 
+import com.squareup.otto.Subscribe;
+
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.activities.openopml.OpenOpmlAdapter;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.listeners.DownloadProgress;
 
 /**
  * Created by aplb on 04-10-2015.
@@ -77,6 +83,28 @@ public class DownloadManagerActivity extends AppCompatActivity {
         };
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(mRecyclerView);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        SoundWaves.getBus().register(this);
+    }
+
+    @Override
+    public void onPause() {
+        SoundWaves.getBus().unregister(this);
+        super.onPause();
+    }
+
+    @Subscribe
+    public void setProgressPercent(@NonNull DownloadProgress argProgress) {
+        if (mAdapter == null) {
+            VendorCrashReporter.report("setProgress with null adapter", ""); // NoI18N
+            return;
+        }
+
+        mAdapter.updateProgress(argProgress.getEpisode(), argProgress.getProgress());
     }
 
     @Override

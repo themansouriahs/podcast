@@ -14,6 +14,8 @@ import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
+import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
+import org.bottiger.podcast.service.Downloader.engines.IDownloadEngine;
 import org.bottiger.podcast.service.jobservice.PodcastUpdater;
 
 import android.Manifest;
@@ -48,6 +50,7 @@ import com.squareup.otto.Subscribe;
 import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.HashMap;
 
 import javax.annotation.Nullable;
 
@@ -592,6 +595,10 @@ public class PlayerService extends Service implements
 
 	public PlayerStateManager getPlayerStateManager() {
 		return mPlayerStateManager;
+	}
+
+	public HashMap<IEpisode, IDownloadEngine> getDownloadManager() {
+		return EpisodeDownloadManager.mDownloadingEpisodes;
 	}
 
 }

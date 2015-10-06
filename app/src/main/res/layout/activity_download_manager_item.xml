@@ -75,7 +75,7 @@
             android:layout_marginRight="5dp"
             android:indeterminate="false"
             android:max="@{viewModel.maxProgress}"
-            android:progress="@{viewModel.Progress}"
+            android:progress="@{viewModel.progress}"
             />
 
     </RelativeLayout>

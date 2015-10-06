@@ -51,7 +51,7 @@ public class DownloadManagerReceiver extends BroadcastReceiver {
 						context.getContentResolver(), downloadId);
 
                 /*
-                HashMap<Long, List<DownloadObserver>> fileObserverHashMap = DownloadProgressObservable.getObservers();
+                HashMap<Long, List<DownloadObserver>> fileObserverHashMap = DownloadProgressPublisher.getObservers();
                 if (fileObserverHashMap.containsKey(item.getId())) {
                     List<DownloadObserver> observers = fileObserverHashMap.get(item.getId());
                     for (DownloadObserver downloadObserver : observers) {

@@ -14,7 +14,7 @@ import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.TopActivity;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.listeners.DownloadProgressObservable;
+import org.bottiger.podcast.listeners.DownloadProgressPublisher;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
@@ -53,9 +53,6 @@ public class EpisodeDownloadManager extends Observable {
     public static final String TAG = "EpisodeDownload";
     private static final boolean DOWNLOAD_WIFI_ONLY = false;
     private static final boolean DOWNLOAD_AUTOMATICALLY = false;
-
-    public static boolean isDownloading = false;
-
     private static final String MIME_VIDEO = "video";
 
     @Retention(RetentionPolicy.SOURCE)
@@ -645,11 +642,11 @@ public class EpisodeDownloadManager extends Observable {
 	}
 
 
-    private static DownloadProgressObservable mDownloadProgressObservable;
+    private static DownloadProgressPublisher mDownloadProgressObservable;
 
-    public static DownloadProgressObservable getDownloadProgressObservable(SoundWaves context) {
+    public static DownloadProgressPublisher getDownloadProgressObservable(SoundWaves context) {
         if (mDownloadProgressObservable == null) {
-            mDownloadProgressObservable = new DownloadProgressObservable(context);
+            mDownloadProgressObservable = new DownloadProgressPublisher(context);
         }
         return mDownloadProgressObservable;
     }

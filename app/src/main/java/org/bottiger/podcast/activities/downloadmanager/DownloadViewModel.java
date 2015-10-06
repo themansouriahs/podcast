@@ -2,6 +2,9 @@ package org.bottiger.podcast.activities.downloadmanager;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.databinding.BaseObservable;
+import android.databinding.ObservableField;
+import android.databinding.ObservableInt;
 import android.support.annotation.NonNull;
 import android.text.format.Formatter;
 
@@ -15,6 +18,8 @@ public class DownloadViewModel {
 
     private static final int MAX_PROGRESS = 100;
 
+    public final ObservableInt progress = new ObservableInt();
+
     private Context mContext;
     private IEpisode mEpisode;
     private int mPosition;
@@ -23,6 +28,11 @@ public class DownloadViewModel {
         mContext = argContext;
         mEpisode = argEpisode;
         mPosition = argPosition;
+        progress.set(isFirst() ? 60 : 0);
+    }
+
+    public IEpisode getEpisode() {
+        return mEpisode;
     }
 
     public String getTitle() {
@@ -33,8 +43,8 @@ public class DownloadViewModel {
 
         double currentFilesize = 0;
 
-        if (isFirst() && getProgress() != 0) {
-            currentFilesize = (double) mEpisode.getFilesize() * 100.0 / getProgress();
+        if (isFirst() && progress.get() != 0) {
+            currentFilesize = (double) mEpisode.getFilesize() * 100.0 / progress.get();
         }
 
         Resources res = mContext.getResources();
@@ -59,9 +69,9 @@ public class DownloadViewModel {
         return MAX_PROGRESS;
     }
 
-    public int getProgress() {
-        return isFirst() ? 60 : 0;
-    }
+    //public int getProgress() {
+    //    return isFirst() ? 60 : 0;
+    //}
 
     private boolean isFirst() {
         return mPosition == 0;
