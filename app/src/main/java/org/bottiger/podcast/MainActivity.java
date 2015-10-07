@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.bottiger.podcast.debug.SqliteCopy;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
+import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.service.syncadapter.CloudSyncUtils;
 import org.bottiger.podcast.utils.PreferenceHelper;
@@ -31,6 +32,7 @@ import android.view.MenuItem;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipeline;
+import com.squareup.otto.Subscribe;
 
 // Sliding
 public class MainActivity extends FragmentContainerActivity {
@@ -129,13 +131,6 @@ public class MainActivity extends FragmentContainerActivity {
 	}
 
 	@Override
-	protected void onPause() {
-		super.onPause();
-		if (ApplicationConfiguration.TRACE_STARTUP)
-			Debug.stopMethodTracing();
-	}
-
-	@Override
 	protected void onDestroy() {
 		unregisterReceiver(receiver);
 
@@ -144,23 +139,30 @@ public class MainActivity extends FragmentContainerActivity {
         } catch (Exception e) {
             VendorCrashReporter.handleException(e);
         }
-		super.onDestroy();
+        super.onDestroy();
 	}
 
 	@Override
 	public void onResume() {
-		super.onResume();
+        super.onResume();
 		refreshTheme();
 	}
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (ApplicationConfiguration.TRACE_STARTUP)
+            Debug.stopMethodTracing();
+    }
+
 	@Override
 	public void onLowMemory() {
-		super.onLowMemory();
+        super.onLowMemory();
 	}
 
 	@Override
 	public void onTrimMemory(int level) {
-		super.onTrimMemory(level);
+        super.onTrimMemory(level);
 		if (level >= TRIM_MEMORY_MODERATE ) {
 			// Clear fresco cache
 			ImagePipeline imagePipeline = Fresco.getImagePipeline();
@@ -184,16 +186,20 @@ public class MainActivity extends FragmentContainerActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.menu_add:
-			DialogAddPodcast.addPodcast(this);
-			return true;
-		case R.id.menu_settings:
-            TransitionUtils.openSettings(this);
-			return true;
-		case R.id.menu_refresh:
-			SoundWaves.sSubscriptionRefreshManager.refreshAll();
-			return true;
+			case R.id.menu_add: {
+				DialogAddPodcast.addPodcast(this);
+				return true;
+			}
+			case R.id.menu_settings: {
+				TransitionUtils.openSettings(this);
+				return true;
+			}
+			case R.id.menu_refresh: {
+				SoundWaves.sSubscriptionRefreshManager.refreshAll();
+				return true;
+			}
 		}
+
 		return super.onOptionsItemSelected(item);
 	}
 }

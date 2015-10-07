@@ -13,8 +13,10 @@ public class QueueEpisode implements Comparable {
 	private String title;
 	private long episodeID;
 	private Integer queuePriority;
+	private IEpisode mEpisode;
 
 	public QueueEpisode(FeedItem episode) {
+		mEpisode = episode;
 		title = episode.getTitle();
 		episodeID = episode.getId();
 		
@@ -24,7 +26,11 @@ public class QueueEpisode implements Comparable {
 		else
 			queuePriority = (int) episodeID; 
 	}
-	
+
+	public IEpisode getEpisode() {
+		return mEpisode;
+	}
+
 	public long getId() {
 		return episodeID;
 	}

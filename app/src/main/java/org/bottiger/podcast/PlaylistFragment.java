@@ -1,14 +1,14 @@
 package org.bottiger.podcast;
 
 import org.bottiger.podcast.adapters.PlaylistAdapter;
-import org.bottiger.podcast.listeners.DownloadProgressObservable;
+import org.bottiger.podcast.listeners.DownloadProgressPublisher;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.playlist.filters.SubscriptionFilter;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
-import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
+import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.ImageLoaderUtils;
@@ -114,14 +114,11 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
     private int mSwipeBgColor = R.color.colorBgPrimaryDark;
     private int mSwipeIconID = R.drawable.ic_hearing_white;
 
-    DownloadProgressObservable mDownloadProgressObservable = null;
-
     private Playlist mPlaylist;
     private Context mContext;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        mDownloadProgressObservable = new DownloadProgressObservable((SoundWaves) mContext.getApplicationContext());
         int color = getResources().getColor(mSwipeBgColor);
         mSwipePaint.setColor(color);
         mSwipeIcon = BitmapFactory.decodeResource(getResources(), mSwipeIconID);
@@ -135,7 +132,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
     @Override
     public void onDestroyView() {
-        EpisodeDownloadManager.resetDownloadProgressObservable();
         SoundWaves.getBus().unregister(mAdapter);
         SoundWaves.getBus().unregister(mPlayPauseButton);
         SoundWaves.getBus().unregister(mPlayerSeekbar);
@@ -148,8 +144,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        mDownloadProgressObservable = EpisodeDownloadManager.getDownloadProgressObservable((SoundWaves) mContext.getApplicationContext());
 
 		TopActivity.getPreferences().registerOnSharedPreferenceChangeListener(
                 spChanged);
@@ -544,7 +538,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         if (item != null && artworkUrl != null) {
             Log.v("MissingImage", "Setting image");
             //FrescoHelper.loadImageInto(mPhoto, artworkUrl, null);
-            ImageLoaderUtils.loadImageInto(mPhoto, artworkUrl, false);
+            ImageLoaderUtils.loadImageInto(mPhoto, artworkUrl, false, false);
         }
 
         if (mTopPlayer.getVisibleHeight() == 0) {
@@ -693,7 +687,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
             mTopPlayer.setFullscreen(true, false);
             //mTopPlayer.setPadding(0, i ,0, 0);
         }
-        mPlaylistEmptyContainer.setLayoutParams(params);
+        mPlaylistEmptyContainer.setLayoutParams(params2);
         mRecyclerView.setLayoutParams(params3);
         mPlaylistWelcomeContainer.setLayoutParams(params4);
     }

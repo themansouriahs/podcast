@@ -1,7 +1,7 @@
 package org.bottiger.podcast.receiver;
 
+import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.service.jobservice.PodcastUpdater;
-import org.bottiger.podcast.service.PodcastService;
 
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -20,7 +20,7 @@ public class PowerReceiver extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 		String action = intent.getAction();
 
-		Intent alarmIntent = new Intent(context, PodcastService.class);
+		Intent alarmIntent = new Intent(context, PlayerService.class);
 		int interval = -1;
 		int nextRefresh = -1;
 

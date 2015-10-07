@@ -27,7 +27,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewOutlineProvider;
 import android.view.animation.Animation;
-import android.view.animation.RotateAnimation;
 import android.webkit.MimeTypeMap;
 import android.widget.ImageButton;
 
@@ -37,14 +36,13 @@ import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.listeners.DownloadObserver;
-import org.bottiger.podcast.listeners.EpisodeStatus;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PlayerStatusData;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.listeners.PlayerStatusProgressData;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
-import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
+import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.views.dialogs.DialogOpenVideoExternally;
@@ -412,7 +410,7 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
 
         String mimetype;
         if (argEpisode.isDownloaded()) {
-            mimetype = EpisodeDownloadManager.getMimeType(argEpisode.getFileLocation(IEpisode.REQUIRE_LOCAL).toString());
+            mimetype = SoundWavesDownloadManager.getMimeType(argEpisode.getFileLocation(IEpisode.REQUIRE_LOCAL).toString());
         } else {
             String extension = MimeTypeMap.getFileExtensionFromUrl(argEpisode.getFileLocation(IEpisode.REQUIRE_REMOTE).toString());
             mimetype = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);

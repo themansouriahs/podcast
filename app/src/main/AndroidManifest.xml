@@ -70,6 +70,14 @@
                 android:value="org.bottiger.podcast.MainActivity" />
         </activity>
 
+        <activity android:name=".activities.downloadmanager.DownloadManagerActivity"
+            android:label="@string/activity_download_name"
+            android:parentActivityName="org.bottiger.podcast.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.bottiger.podcast.MainActivity" />
+        </activity>
+
         <provider
             android:name="org.bottiger.podcast.provider.PodcastProvider"
             android:authorities="org.bottiger.podcast.provider.PodcastProvider"
@@ -171,10 +179,6 @@
             <intent-filter>
                 <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
-        </service>
-        <service
-            android:name="org.bottiger.podcast.service.PodcastService"
-            android:enabled="true" >
         </service>
         <service
             android:name="org.bottiger.podcast.service.PlayerService"

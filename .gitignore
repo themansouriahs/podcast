@@ -16,6 +16,8 @@ app/src/main/obj
 bin/
 gen/
 captures/
+libs/
+obj/
 
 # Gradle files
 .gradle/

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <org.bottiger.podcast.views.ImageViewTinted
+        android:id="@+id/list_episode_image"
+        android:layout_width="@dimen/playlist_image_size_small"
+        android:layout_height="@dimen/playlist_image_size_small"
+        android:layout_alignParentLeft="true"
+        />
+
+    <TextView
+        android:id="@+id/download_episode_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/SoundWavesTextViewStyle"
+        android:layout_marginRight="72dp"
+        android:layout_toRightOf="@id/list_episode_image"
+        />
+
+</merge>

@@ -14,10 +14,10 @@ import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
+import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.jobservice.PodcastUpdater;
 
 import android.Manifest;
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.ComponentName;
@@ -39,7 +39,6 @@ import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresPermission;
 import android.support.v4.media.session.MediaControllerCompat;
-import android.support.v4.media.session.PlaybackStateCompat;
 import android.telephony.PhoneStateListener;
 import android.util.Log;
 
@@ -70,6 +69,8 @@ public class PlayerService extends Service implements
     public static final String ACTION_PREVIOUS = "action_previous";
     public static final String ACTION_STOP = "action_stop";
 
+	public static final String ACTION_REFRESH_FEEDS = "action_refresh_feeds";
+
 	/** Which action to perform when a track ends */
 	@Retention(RetentionPolicy.SOURCE)
 	@IntDef({NONE, NEW_TRACK, NEXT_IN_PLAYLIST})
@@ -85,6 +86,7 @@ public class PlayerService extends Service implements
 	private SoundWavesPlayer mPlayer = null;
     private MediaControllerCompat mController;
 
+	private SoundWavesDownloadManager mDownloadManager;
     private PlayerStateManager mPlayerStateManager;
     private LegacyRemoteController mLegacyRemoteController;
 
@@ -151,7 +153,7 @@ public class PlayerService extends Service implements
 		SoundWaves.getBus().register(this);
 
 		mPodcastUpdater = new PodcastUpdater(this);
-
+		mDownloadManager = new SoundWavesDownloadManager(this);
         mPlayerHandler = new PlayerHandler(this);
 
 		mPlayerStateManager = new PlayerStateManager(this);
@@ -181,15 +183,24 @@ public class PlayerService extends Service implements
         if( intent == null || intent.getAction() == null )
             return;
 
-        String action = intent.getAction();
+        String action = intent.getAction().toLowerCase();
 
-        if( action.equalsIgnoreCase( ACTION_PLAY ) ) {
-            //mController.getTransportControls().play();
-            start();
-        } else if( action.equalsIgnoreCase( ACTION_PAUSE ) ) {
-            //mController.getTransportControls().pause();
-            pause();
-        }
+		switch (action) {
+			case ACTION_PLAY: {
+				//mController.getTransportControls().play();
+				start();
+				break;
+			}
+			case ACTION_PAUSE: {
+				//mController.getTransportControls().pause();
+				pause();
+				break;
+			}
+			case ACTION_REFRESH_FEEDS: {
+				refreshFeeds();
+				return;
+			}
+		}
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (action.equalsIgnoreCase(ACTION_FAST_FORWARD)) {
@@ -237,7 +248,7 @@ public class PlayerService extends Service implements
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        handleIntent(intent);
+		handleIntent(intent);
 
         //return super.onStartCommand(intent, flags, startId);
         return START_STICKY;
@@ -562,6 +573,10 @@ public class PlayerService extends Service implements
         }
     }
 
+	private void refreshFeeds() {
+
+	}
+
     public void setMediaCast(IMediaCast mMediaCast) {
         this.mMediaCast = mMediaCast;
         mMediaCast.registerStateChangedListener(getPlayer());
@@ -592,6 +607,11 @@ public class PlayerService extends Service implements
 
 	public PlayerStateManager getPlayerStateManager() {
 		return mPlayerStateManager;
+	}
+
+	@NonNull
+	public SoundWavesDownloadManager getDownloadManager() {
+		return mDownloadManager;
 	}
 
 }

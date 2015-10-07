@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+<android.support.v7.widget.Toolbar
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/helper_toolbar"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/themeBackground"
+    android:elevation="4dp"
+    android:paddingBottom="8dp">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <!--
+            android:layout_marginLeft="16dp"
+            -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="16dp"
+            android:textSize="28sp"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:hint="Actvity Title"
+            android:id="@+id/helper_toolbar_title" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@id/helper_toolbar_title"
+            android:layout_alignLeft="@id/helper_toolbar_title"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:hint="Description of what we can do"
+            android:id="@+id/helper_toolbar_description"
+            android:layout_below="@id/helper_toolbar_title"
+            tools:ignore="HardcodedText" />
+
+    </RelativeLayout>
+
+</android.support.v7.widget.Toolbar>
+
+</merge>

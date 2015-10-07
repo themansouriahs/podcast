@@ -111,7 +111,9 @@ public class StrUtils {
 		int status = (int) d;
 		return status;
 	}
-	
+
+	// http://developer.android.com/reference/android/text/format/Formatter.html#formatFileSize%28android.content.Context,%20long%29
+	@Deprecated
 	public static String formatLength(int length) {
 
 		length /= 1024;

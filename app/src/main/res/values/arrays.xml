@@ -77,7 +77,7 @@
         <item>-1</item>
     </string-array>
     
-    <string-array name="entryvalues_spinner_number_of_episodes" translatable="false">
+    <string-array name="entryvalues_spinner_number_of_episodes">
         <item>10</item>
         <item>20</item>
         <item>30</item>  
@@ -138,7 +138,7 @@
         <item>30 seconds</item>
     </string-array>
 
-    <string-array name="entryvalues_pref_fast_forward_interval" translatable="false">
+    <string-array name="entryvalues_pref_fast_forward_interval">
         <item>5</item>	
         <item>10</item>
         <item>15</item>  
@@ -146,7 +146,7 @@
 		<item>30</item>  
     </string-array>	  	
 	
-    <string-array name="entries_pref_max_new_items" translatable="false">
+    <string-array name="entries_pref_max_new_items">
         <item>5</item>	
         <item>10</item>
         <item>20</item>
@@ -154,7 +154,7 @@
         <item>50</item>
     </string-array>
 
-    <string-array name="entryvalues_pref_max_new_items" translatable="false">
+    <string-array name="entryvalues_pref_max_new_items">
         <item>5</item>	
         <item>10</item>
         <item>20</item>  
@@ -170,7 +170,7 @@
         <item>1 minute</item>
     </string-array>
 
-    <string-array name="pref_player_seek_entries_values" translatable="false">
+    <string-array name="pref_player_seek_entries_values">
         <item>5</item>
         <item>10</item>
         <item>20</item>
@@ -207,7 +207,7 @@
         <item>iTunes</item>
     </string-array>
 
-    <string-array name="discovery_spinner_array">
+    <string-array name="discovery_spinner_array" translatable="false">
         <item>@string/discovery_recommendations</item>
         <item>@string/discovery_recommendations_trending</item>
         <item>@string/discovery_recommendations_popular</item>

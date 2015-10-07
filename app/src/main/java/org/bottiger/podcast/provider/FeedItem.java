@@ -2,8 +2,6 @@ package org.bottiger.podcast.provider;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -15,15 +13,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 
-import org.bottiger.podcast.listeners.DownloadProgressObservable;
+import org.bottiger.podcast.listeners.DownloadProgressPublisher;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.service.DownloadStatus;
-import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
+import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.utils.BitMaskUtils;
 import org.bottiger.podcast.utils.PodcastLog;
 import org.bottiger.podcast.utils.SDCardManager;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.jsoup.Jsoup;
 
 import android.app.Activity;
@@ -39,7 +35,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.provider.BaseColumns;
-import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.LruCache;
@@ -816,8 +811,9 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	 * textView argument
 	 *
 	 */
+	/*
 	public String getStatus(DownloadManager downloadManager) {
-		DownloadStatus downloadStatus = EpisodeDownloadManager.getStatus(this);
+		DownloadStatus downloadStatus = SoundWavesDownloadManager.getStatus(this);
 		String statusText = "";
 		switch (downloadStatus) {
 		case PENDING:
@@ -837,6 +833,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 		}
 		return statusText;
 	}
+	*/
 
 	/**
 	 * Get the current download progress as a int .
@@ -904,7 +901,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 				update(argContext.getContentResolver());
 				File file = new File(getAbsolutePath());
 				if (file.exists() && file.delete()) {
-                    DownloadProgressObservable.deleteEpisode(this);
+                    DownloadProgressPublisher.deleteEpisode(this);
 					Playlist.refresh(argContext);
 					return true;
 				}

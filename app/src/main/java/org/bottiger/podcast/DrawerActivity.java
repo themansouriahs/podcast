@@ -1,6 +1,8 @@
 package org.bottiger.podcast;
 
+import org.bottiger.podcast.activities.downloadmanager.DownloadManagerActivity;
 import org.bottiger.podcast.playlist.PlaylistData;
+import org.bottiger.podcast.utils.TransitionUtils;
 import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.views.SlidingTab.SlidingTabLayout;
 
@@ -127,24 +129,36 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity impleme
     // More details: http://blog.xebia.com/2015/06/09/android-design-support-navigationview/
     public boolean onNavigationItemSelected (MenuItem item) {
 
+        boolean isHandled = false;
+
         switch (item.getItemId()) {
             case R.id.navigation_clear: {
+                isHandled = true;
                 PlaylistData pld = new PlaylistData();
                 pld.reset = true;
                 SoundWaves.getBus().post(pld);
-                return true;
+                break;
             }
             case R.id.navigation_feedback: {
+                isHandled = true;
                 Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-                        "mailto", ApplicationConfiguration.ACRA_MAIL, null));
+                        "mailto", ApplicationConfiguration.ACRA_MAIL, null)); // NoI18N
                 emailIntent.putExtra(Intent.EXTRA_SUBJECT, FEEDBACK);
                 startActivity(Intent.createChooser(emailIntent, getString(R.string.feedback_mail_client_picker)));
-                return true;
+                break;
             }
-
+            case R.id.navigation_downloading: {
+                isHandled = true;
+                TransitionUtils.openDownloadManager(this);
+                break;
+            }
         }
 
-        return false;
+        if (isHandled) {
+            mDrawerLayout.closeDrawers();
+        }
+
+        return isHandled;
     }
 
     @Override

@@ -1,7 +1,5 @@
 package org.bottiger.podcast.service.Downloader.engines;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.SparseArray;
@@ -15,16 +13,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InterruptedIOException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.MalformedInputException;
-import java.util.HashSet;
 
-import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
-import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
+import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 
 /**
  * Created by apl on 17-09-2014.
@@ -36,14 +31,17 @@ public class OkHttpDownloader extends DownloadEngineBase {
     private final OkHttpClient mOkHttpClient = new OkHttpClient();
     private HttpURLConnection mConnection;
     private final SparseArray<Callback> mExternalCallback = new SparseArray<>();
+    private SoundWavesDownloadManager mSoundWavesDownloadManager;
+
+    private volatile boolean mAborted = false;
 
     private final URL mURL;
 
     private double mProgress = 0;
 
-    public OkHttpDownloader(@NonNull IEpisode argEpisode) {
+    public OkHttpDownloader(@NonNull IEpisode argEpisode, @NonNull SoundWavesDownloadManager argDownloadManager) {
         super(argEpisode);
-
+        mSoundWavesDownloadManager = argDownloadManager;
         mURL = argEpisode.getUrl();
     }
 
@@ -51,8 +49,6 @@ public class OkHttpDownloader extends DownloadEngineBase {
     public void startDownload() {
         mProgress = 0;
         mConnection = new OkUrlFactory(mOkHttpClient).open(mURL);
-        EpisodeDownloadManager.mDownloadingItem = mEpisode;
-
         Thread downloadingThread = new Thread() {
             public void run() {
                 try {
@@ -72,6 +68,11 @@ public class OkHttpDownloader extends DownloadEngineBase {
                         int bytesRead = -1;
                         byte[] buffer = new byte[BUFFER_SIZE];
                         while ((bytesRead = inputStream.read(buffer)) != -1) {
+                            if (mAborted) {
+                                onFailure(new InterruptedIOException());
+                                return;
+                            }
+
                             outputStream.write(buffer, 0, bytesRead);
                             mProgress += bytesRead / contentLength;
                         }
@@ -87,8 +88,6 @@ public class OkHttpDownloader extends DownloadEngineBase {
                         //Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
                         //intent.setData(Uri.fromFile(finalFIle));
                         //SoundWaves.getAppContext().sendBroadcast(intent);
-
-                        EpisodeDownloadManager.mDownloadingItem = null;
 
                         // If download was succesfull
                         if (tmpFIle.exists() && tmpFIle.length() == contentLength) {
@@ -123,6 +122,11 @@ public class OkHttpDownloader extends DownloadEngineBase {
 
         int newKey = mExternalCallback.size() == 0 ? 0 : mExternalCallback.keyAt(mExternalCallback.size()-1) + 1;
         mExternalCallback.append(newKey, argCallback);
+    }
+
+    @Override
+    public void abort() {
+        mAborted = true;
     }
 
     private void onSucces(File response)  throws IOException {

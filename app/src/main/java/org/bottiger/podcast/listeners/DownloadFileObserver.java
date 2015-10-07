@@ -28,7 +28,7 @@ public class DownloadFileObserver extends FileObserver {
     private HashMap<String, FeedItem> mEpisodeLUT = new HashMap<String, FeedItem>();
     private final ReentrantLock mLock = new ReentrantLock();
 
-    private DownloadProgressObservable mProgressObservable;
+    private DownloadProgressPublisher mProgressObservable;
 
     private static final int flags =
             FileObserver.CLOSE_WRITE
@@ -39,7 +39,7 @@ public class DownloadFileObserver extends FileObserver {
     // Received three of these after the delete event while deleting a video through a separate file manager app:
     // 01-16 15:52:27.627: D/APP(4316): DownloadsObserver: onEvent(1073741856, null)
 
-    public DownloadFileObserver(@NonNull String path, @NonNull FeedItem argEpisode, @NonNull DownloadProgressObservable argDownloadProgressObservable) {
+    public DownloadFileObserver(@NonNull String path, @NonNull FeedItem argEpisode, @NonNull DownloadProgressPublisher argDownloadProgressObservable) {
         super(path, flags);
 
         mPath = path;

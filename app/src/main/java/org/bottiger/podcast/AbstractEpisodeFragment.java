@@ -1,13 +1,11 @@
 package org.bottiger.podcast;
 
 import org.bottiger.podcast.playlist.Playlist;
-import org.bottiger.podcast.provider.DatabaseHelper;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
-import org.bottiger.podcast.service.Downloader.EpisodeDownloadManager;
+import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.PlayerService;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -20,7 +18,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import com.squareup.otto.Produce;
 import com.squareup.otto.Subscribe;
 
 public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
@@ -64,14 +61,21 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 		case R.id.menu_bulk_download: {
 			Cursor cursor = createCursor(getWhere(), getOrder());
 			cursor.moveToFirst();
+
+			PlayerService ps = SoundWaves.sBoundPlayerService;
+			if (ps == null)
+				return false;
+
+			SoundWavesDownloadManager downloadManager = ps.getDownloadManager();
+
 			while (cursor.isAfterLast() == false) {
 				FeedItem feedItem = FeedItem.getByCursor(cursor);
 				if (!feedItem.isDownloaded())
-					EpisodeDownloadManager.addItemToQueue(feedItem, EpisodeDownloadManager.ANYWHERE);
+					downloadManager.addItemToQueue(feedItem, SoundWavesDownloadManager.ANYWHERE);
 
 				cursor.moveToNext();
 			}
-			EpisodeDownloadManager.startDownload(getActivity());
+			downloadManager.startDownload();
 			return true;
 		}
 		case R.id.menu_clear_playlist: {

@@ -61,10 +61,10 @@
             android:text="Podcats Title"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:textSize="16sp"
             android:gravity="center_vertical"
-            android:layout_marginLeft="10dp"
+            style="@style/SoundWavesListTitleStyle"
             />
+            <!-- <item name="android:paddingTop">16dp</item> -->
 
         </FrameLayout>
 

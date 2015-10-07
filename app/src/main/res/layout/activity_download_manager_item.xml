@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable name="viewModel"
+            type="org.bottiger.podcast.activities.downloadmanager.DownloadViewModel"
+            />
+    </data>
+
+    <!--
+    Magic numbers from:
+        https://www.google.com/design/spec/components/lists.html#lists-specs
+    -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="16dp"
+        android:elevation="10dp">
+
+        <!--
+        <include layout="@layout/list_episode_base"
+            bind:episode="@{episode}"/>
+            -->
+        <org.bottiger.podcast.views.ImageViewTinted
+            android:id="@+id/download_episode_image"
+            android:layout_width="@dimen/playlist_image_size_small"
+            android:layout_height="@dimen/playlist_image_size_small"
+            android:layout_alignParentLeft="true"
+            />
+
+        <ImageButton
+            android:id="@+id/download_remove"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="?attr/ic_remove_inv"
+            android:layout_alignTop="@id/download_episode_image"
+            android:layout_alignBottom="@id/download_episode_image"
+            android:layout_alignParentRight="true"
+            android:background="@null"
+            android:onClick="@{viewModel.onClickRemove}"
+            />
+
+        <TextView
+            android:id="@+id/download_episode_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{viewModel.title}"
+            android:hint="Episode Title"
+            android:layout_marginRight="72dp"
+            android:singleLine="true"
+            android:ellipsize="middle"
+            android:layout_toRightOf="@id/download_episode_image"
+            style="@style/SoundWavesListTitleStyle"
+            />
+
+        <TextView
+            android:id="@+id/download_episode_status_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{viewModel.subtitle}"
+            android:hint="19 of 32 MB"
+            style="@style/SoundWavesTextViewStyle"
+            android:layout_below="@id/download_episode_title"
+            android:layout_alignStart="@id/download_episode_title"
+            android:layout_alignLeft="@id/download_episode_title"
+            />
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:layout_below="@id/download_episode_status_text"
+            android:layout_alignStart="@id/download_episode_title"
+            android:layout_alignLeft="@id/download_episode_title"
+            android:layout_toLeftOf="@id/download_remove"
+            android:layout_marginRight="5dp"
+            android:indeterminate="false"
+            android:max="@{viewModel.maxProgress}"
+            android:progress="@{viewModel.progress}"
+            />
+
+    </RelativeLayout>
+
+</layout>
