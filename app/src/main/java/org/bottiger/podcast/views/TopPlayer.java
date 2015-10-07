@@ -87,6 +87,8 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
     public static int sizeStartShrink           =   -1;
     public static int sizeShrinkBuffer           =   -1;
 
+    public static int sizeImageContainer        =   -1;
+
     private int mSeekbarDeadzone                =   20; // dp
     private int mSeekbarFadeDistance            =   20; // dp
     private int mTextInfoFadeDistance           =   100; // dp
@@ -120,7 +122,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
     private View mGradient;
     private View mEpisodeText;
     private View mEpisodeInfo;
-    private SquareImageViewFresco mPhoto;
+    private ImageViewTinted mPhoto;
     private PlayPauseImageView mPlayPauseButton;
     private View mImageContainer;
 
@@ -201,7 +203,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         mFullscreen = prefs.getBoolean(mDoFullscreentKey, mFullscreen);
 
 
-        sizeShrinkBuffer = (int) UIUtils.convertDpToPixel(100, argContext);
+        sizeShrinkBuffer = (int) UIUtils.convertDpToPixel(400, argContext);
         screenHeight = UIUtils.getScreenHeight(argContext);
 
         sizeSmall = argContext.getResources().getDimensionPixelSize(R.dimen.top_player_size_minimum);
@@ -233,7 +235,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
 
         mPlayerControlsLinearLayout = (PlayerRelativeLayout)findViewById(R.id.expanded_controls);
 
-        mPhoto = (SquareImageViewFresco) findViewById(R.id.session_photo);
+        mPhoto = (ImageViewTinted) findViewById(R.id.session_photo);
 
         mPlayPauseButton = (PlayPauseImageView) findViewById(R.id.play_pause_button);
         mExpandEpisode = (ImageButton)findViewById(R.id.episode_expand);
@@ -256,6 +258,8 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
 
         mCenterSquareMarginTop = (int)getResources().getDimension(R.dimen.top_player_center_square_margin_top);
         mCenterSquareMargin = getResources().getDimension(R.dimen.top_player_center_square_margin);
+
+        //setNormalImageSize(0);
 
         mLargeLayout.SeekBarLeftMargin = 0;
         mLargeLayout.PlayPauseSize = mPlayPauseLargeSize;
@@ -412,12 +416,29 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         return setPlayerHeight(oldHeight - argY);
     }
 
+    private void setNormalImageSize(float offset) {
+        if (offset > 0)
+            offset = 0;
+
+        RelativeLayout.LayoutParams rlp;
+        rlp = (LayoutParams) mImageContainer.getLayoutParams();
+        rlp.width = sizeImageContainer;
+        rlp.height = (int) (sizeImageContainer + offset);
+        mImageContainer.setLayoutParams(rlp);
+    }
+
     // returns the new height
     public float setPlayerHeight(float argScreenHeight) {
         Log.v(TAG, "Player height is set to: " + argScreenHeight);
 
         if (mFullscreen)
             return getHeight();
+
+        if (sizeImageContainer <= 0) {
+            //sizeImageContainer = mImageContainer.getHeight();
+            float margin = getResources().getDimension(R.dimen.top_player_center_square_margin);
+            sizeImageContainer = (int) (mLayout.getWidth() - 2*margin);
+        }
 
         minimalEnsured = false;
         maximumEnsured = false;
@@ -434,6 +455,11 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         float transYControl = argOffset/2;
 
         setBackgroundVisibility(screenHeight);
+
+        if (sizeImageContainer > 0) {
+            setNormalImageSize(argOffset);
+        }
+        //mImageContainer.getLayoutParams().height
         /*
         mPlayerControlsLinearLayout.setTranslationY(transYControl);
         mPlayPauseButton.setTranslationY(transYControl);
@@ -666,10 +692,13 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
 
         int smallMargin = (int)mCenterSquareMargin/2;
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mImageContainer.getLayoutParams();
-        params.setMargins(smallMargin,mCenterSquareMarginTop,smallMargin,0);
+        params.setMargins(smallMargin, mCenterSquareMarginTop, smallMargin, 0);
+        params.width = mLayout.getWidth()-2*smallMargin;
+        params.height = mLayout.getWidth()-2*smallMargin;
         mImageContainer.setLayoutParams(params);
 
-        //mLayout.setTranslationY(-100);
+
+
         mLayout.bringToFront();
         ((MainActivity)getContext()).goFullScreen(mLayout, mBackgroundColor);
     }
@@ -689,9 +718,13 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         mLayout.setLayoutParams(layoutParams);
         mLayout.setPadding(0, mCenterSquareMarginTop, 0, 0);
 
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mImageContainer.getLayoutParams();
-        params.setMargins((int)mCenterSquareMargin, 0, (int)mCenterSquareMargin, 0);
-        mImageContainer.setLayoutParams(params);
+        if (mLayout.getWidth() > 0) {
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mImageContainer.getLayoutParams();
+            params.setMargins((int) mCenterSquareMargin, 0, (int) mCenterSquareMargin, 0);
+            params.width = (int) (mLayout.getWidth() - 2 * mCenterSquareMargin);
+            params.height = (int) (mLayout.getWidth() - 2 * mCenterSquareMargin);
+            mImageContainer.setLayoutParams(params);
+        }
 
         setPlayerHeight(sizeLarge);
         ((MainActivity)getContext()).exitFullScreen(mLayout);

@@ -17,11 +17,11 @@ import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.views.CustomLinearLayoutManager;
 import org.bottiger.podcast.views.DownloadButtonView;
+import org.bottiger.podcast.views.ImageViewTinted;
 import org.bottiger.podcast.views.PlayPauseImageView;
 import org.bottiger.podcast.views.PlayerButtonView;
 import org.bottiger.podcast.views.PlayerSeekbar;
 import org.bottiger.podcast.views.PlaylistViewHolder;
-import org.bottiger.podcast.views.SquareImageViewFresco;
 import org.bottiger.podcast.views.TextViewObserver;
 import org.bottiger.podcast.views.TopPlayer;
 import org.bottiger.podcast.views.dialogs.DialogBulkDownload;
@@ -84,7 +84,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
     private RadioButton mPopulateAutomatically;
 
     private TopPlayer mTopPlayer;
-    private SquareImageViewFresco mPhoto;
+    private ImageViewTinted mPhoto;
 
     private TextView mEpisodeTitle;
     private TextView mEpisodeInfo;
@@ -162,7 +162,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         super.onViewCreated(view,savedInstanceState);
 
         mTopPlayer =   (TopPlayer) view.findViewById(R.id.session_photo_container);
-        mPhoto =            (SquareImageViewFresco) view.findViewById(R.id.session_photo);
+        mPhoto =            (ImageViewTinted) view.findViewById(R.id.session_photo);
 
         mPlaylistContainer = view.findViewById(R.id.playlist_container);
         mPlaylistWelcomeContainer = view.findViewById(R.id.playlist_welcome_screen);
