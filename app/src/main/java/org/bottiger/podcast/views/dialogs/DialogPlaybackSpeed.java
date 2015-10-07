@@ -15,6 +15,7 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.service.PlayerService;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -101,7 +102,7 @@ public class DialogPlaybackSpeed extends DialogFragment {
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
-                setPlaybackSpeed();
+                setPlaybackSpeed(mCurrentPlaybackSpeed);
             }
         });
         builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -156,8 +157,11 @@ public class DialogPlaybackSpeed extends DialogFragment {
         return String.format("%.1f", mCurrentPlaybackSpeed) + "x"; // NoI18N
     }
 
-    private void setPlaybackSpeed() {
-
+    private void setPlaybackSpeed(float argSpeed) {
+        PlayerService ps = PlayerService.getInstance();
+        if (ps != null) {
+            ps.getPlayer().setPlaybackSpeed(argSpeed);
+        }
     }
 
 }
