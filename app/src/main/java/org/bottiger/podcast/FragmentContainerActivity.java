@@ -72,6 +72,7 @@ public class FragmentContainerActivity extends DrawerActivity {
         mViewPager = mInflatedViewStub;
         mSectionsPagerAdapter = new SectionsPagerAdapter(mFragmentManager, mViewPager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+        mViewPager.setOffscreenPageLimit(3);
 
 
         //mViewPager.setOnPageChangeListener(mPageChangeListener);
@@ -135,14 +136,10 @@ public class FragmentContainerActivity extends DrawerActivity {
 
 		private static final int MAX_FRAGMENTS = 3;
 
-        private ViewPager mContainer;
-
 		private Fragment[] mFragments = new Fragment[MAX_FRAGMENTS];
-        private ViewGroup mViewGroup;
 
 		public SectionsPagerAdapter(FragmentManager fm, ViewPager container) {
 			super(fm);
-            mContainer = container;
 		}
 
 		// Hack:
@@ -227,50 +224,5 @@ public class FragmentContainerActivity extends DrawerActivity {
 			return null;
 		}
 
-    }
-
-    /**
-     * This class represents a tab to be displayed by {@link ViewPager} and it's associated
-     * {@link SlidingTabLayout}.
-     */
-    static class SamplePagerItem {
-        private final CharSequence mTitle;
-        private final int mIndicatorColor;
-        private final int mDividerColor;
-
-        SamplePagerItem(CharSequence title, int indicatorColor, int dividerColor) {
-            mTitle = title;
-            mIndicatorColor = indicatorColor;
-            mDividerColor = dividerColor;
-        }
-
-        /**
-         * @return A new {@link Fragment} to be displayed by a {@link ViewPager}
-         */
-        Fragment createFragment() {
-            return null;//return ContentFragment.newInstance(mTitle, mIndicatorColor, mDividerColor);
-        }
-
-        /**
-         * @return the title which represents this tab. In this sample this is used directly by
-         * {@link android.support.v4.view.PagerAdapter#getPageTitle(int)}
-         */
-        CharSequence getTitle() {
-            return mTitle;
-        }
-
-        /**
-         * @return the color to be used for indicator on the {@link SlidingTabLayout}
-         */
-        int getIndicatorColor() {
-            return mIndicatorColor;
-        }
-
-        /**
-         * @return the color to be used for right divider on the {@link SlidingTabLayout}
-         */
-        int getDividerColor() {
-            return mDividerColor;
-        }
     }
 }

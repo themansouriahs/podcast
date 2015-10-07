@@ -17,6 +17,8 @@
 package org.bottiger.podcast;
 
 
+import org.bottiger.podcast.service.PodcastService;
+
 public class FeedFetchTest extends android.test.ServiceTestCase<PodcastService> {
 
 	PodcastService PodcastServiceInstance;
