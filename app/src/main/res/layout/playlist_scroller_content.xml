@@ -17,6 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/top_player_size_maximum"
         android:minHeight="@dimen/top_player_size_minimum"
+        android:background="?attr/themeBackground"
         >
 
         <org.bottiger.podcast.views.PlayerRelativeLayout
@@ -161,14 +162,15 @@
             android:layout_marginLeft="@dimen/top_player_center_square_margin"
             android:layout_marginRight="@dimen/top_player_center_square_margin"
             android:layout_below="@id/player_center_square"
-            android:layout_marginTop="@dimen/top_player_center_square_margin_top">
+            android:layout_marginTop="@dimen/top_player_center_square_margin_top"
+            android:paddingBottom="@dimen/top_player_center_square_margin_top">
 
-            <org.bottiger.podcast.views.SquareImageViewFresco
+            <org.bottiger.podcast.views.ImageViewTinted
                 android:id="@+id/session_photo"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
-            <!--
-                fresco:actualImageScaleType="centerCrop" -->
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                />
 
             <View
                 android:id="@+id/top_gradient_inner"
