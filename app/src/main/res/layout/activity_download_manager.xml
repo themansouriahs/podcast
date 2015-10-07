@@ -20,4 +20,15 @@
         android:layout_marginTop="8dp"
         />
 
+    <TextView
+        android:id="@+id/download_empty_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/download_manager_empty_title"
+        android:layout_below="@id/helper_toolbar"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:textSize="22sp"
+        android:visibility="gone"/>
+
 </RelativeLayout>

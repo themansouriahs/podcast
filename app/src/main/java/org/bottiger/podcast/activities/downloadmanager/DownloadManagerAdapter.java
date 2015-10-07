@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import org.bottiger.podcast.BR;
 import org.bottiger.podcast.R;
@@ -36,13 +37,12 @@ public class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemVie
     private List<IEpisode> mDownloadingEpisodes = new LinkedList<>();
     private List<DownloadViewModel> mViewModels = new LinkedList<>();
 
-    HashMap<IEpisode, IDownloadEngine> mPodcastDownloadManager;
+    private TextView mEmptyTextView;
 
-    public DownloadManagerAdapter(@NonNull Context argContext) {
+    public DownloadManagerAdapter(@NonNull Context argContext, @NonNull TextView argEmptyTextView) {
         super();
         mContext = argContext;
-
-        long fileSize = 142356744;
+        mEmptyTextView = argEmptyTextView;
 
         PlayerService ps = PlayerService.getInstance();
         List<QueueEpisode> queue = new LinkedList<>();
@@ -57,6 +57,8 @@ public class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemVie
         for (int i = 0; i < queue.size(); i++) {
             mDownloadingEpisodes.add(queue.get(i).getEpisode());
         }
+
+        setEmptyTextViewVisibility();
 
         /*
         URL url = null;
@@ -121,6 +123,7 @@ public class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemVie
             mDownloadManager.removeFromQueue(episode);
         }
         mDownloadingEpisodes.remove(episode);
+        setEmptyTextViewVisibility();
         super.notifyDataSetChanged();
     }
 
@@ -150,5 +153,10 @@ public class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemVie
         }
         notifyItemMoved(fromPosition, toPosition);
         return true;
+    }
+
+    private void setEmptyTextViewVisibility() {
+        int visibility = mDownloadingEpisodes.size() > 0 ? View.GONE : View.VISIBLE;
+        mEmptyTextView.setVisibility(visibility);
     }
 }

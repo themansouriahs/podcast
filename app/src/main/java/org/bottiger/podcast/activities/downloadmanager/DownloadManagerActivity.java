@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
+import android.view.View;
 import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
@@ -38,16 +39,23 @@ public class DownloadManagerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_download_manager);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.helper_toolbar);
+        toolbar.setTitleTextAppearance(this, R.style.ToolbarTitleTextApperance);
+        toolbar.setSubtitleTextAppearance(this, R.style.ToolbarSubtitleTextApperance);
+        toolbar.setTitle(R.string.download_manager_toolbar_title);
+        toolbar.setSubtitle(R.string.download_manager_toolbar_description);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         TextView toolbarTitle = (TextView) findViewById(R.id.helper_toolbar_title);
         TextView toolbarDescription = (TextView) findViewById(R.id.helper_toolbar_description);
+        TextView emptyText = (TextView) findViewById(R.id.download_empty_text);
 
-        toolbarTitle.setText(R.string.download_manager_toolbar_title);
-        toolbarDescription.setText(R.string.download_manager_toolbar_description);
+        toolbarTitle.setVisibility(View.GONE);
+        toolbarDescription.setVisibility(View.GONE);
+        //toolbarTitle.setText(R.string.download_manager_toolbar_title);
+        //toolbarDescription.setText(R.string.download_manager_toolbar_description);
 
-        mAdapter = new DownloadManagerAdapter(this);
+        mAdapter = new DownloadManagerAdapter(this, emptyText);
         mRecyclerView = (RecyclerView) findViewById(R.id.download_queue_list);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));

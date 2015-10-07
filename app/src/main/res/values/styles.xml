@@ -148,6 +148,16 @@
         <!--<item name="android:listViewStyle">@style/listViewPrefs</item>-->
     </style>
 
+    <style name="ToolbarTitleTextApperance" parent="@android:style/TextAppearance.Medium">
+        <!--<item name="android:textColor">@color/pitch_black</item>-->
+        <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
+        <item name="android:textSize">28sp</item>
+    </style>
+
+    <style name="ToolbarSubtitleTextApperance" parent="@android:style/TextAppearance.Small">
+        <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
+    </style>
+
     <style name="SoundWavesTextViewStyle" parent="android:Widget.TextView">
         <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
     </style>
