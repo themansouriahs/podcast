@@ -2,14 +2,12 @@ package org.bottiger.podcast.Player;
 
 import android.app.PendingIntent;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.media.session.MediaSession;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -18,13 +16,9 @@ import android.util.Log;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
-import com.facebook.datasource.DataSource;
 
-import org.bottiger.podcast.images.FrescoHelper;
-import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
-import org.bottiger.podcast.receiver.NotificationReceiver;
 import org.bottiger.podcast.service.PlayerService;
 
 /**

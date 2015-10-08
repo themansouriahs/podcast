@@ -15,7 +15,6 @@
         style="@style/PodcastImage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        fresco:placeholderImage="@drawable/generic_podcast"
         />
 
     <View

@@ -151,7 +151,8 @@ dependencies {
     //compile 'ch.acra:acra:4.6.2'
     //compile 'com.github.anrwatchdog:anrwatchdog:1.+'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.5.4'
-    compile 'com.facebook.fresco:fresco:0.7.0'
+    //compile 'com.facebook.fresco:fresco:0.7.0'
+    compile 'com.nineoldandroids:library:2.4.0'
 
     compile 'com.bugsnag:bugsnag-android:3.2.6'
 

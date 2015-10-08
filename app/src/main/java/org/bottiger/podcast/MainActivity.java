@@ -30,8 +30,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.imagepipeline.core.ImagePipeline;
 import com.squareup.otto.Subscribe;
 
 // Sliding
@@ -165,8 +163,6 @@ public class MainActivity extends FragmentContainerActivity {
         super.onTrimMemory(level);
 		if (level >= TRIM_MEMORY_MODERATE ) {
 			// Clear fresco cache
-			ImagePipeline imagePipeline = Fresco.getImagePipeline();
-			imagePipeline.clearMemoryCaches();
 		}
 	}
 

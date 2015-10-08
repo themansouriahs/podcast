@@ -7,8 +7,6 @@ import android.view.View;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import com.facebook.drawee.view.SimpleDraweeView;
-
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.views.ImageViewTinted;
 

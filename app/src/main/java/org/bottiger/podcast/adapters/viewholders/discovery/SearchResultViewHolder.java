@@ -6,9 +6,9 @@ import android.view.View;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import com.facebook.drawee.view.SimpleDraweeView;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.views.ImageViewTinted;
 
 /**
  * Created by apl on 15-04-2015.
@@ -17,7 +17,7 @@ public class SearchResultViewHolder extends RecyclerView.ViewHolder {
 
     public View container;
     public TextView title;
-    public SimpleDraweeView image;
+    public ImageViewTinted image;
     public android.support.v7.widget.SwitchCompat toggleSwitch;
 
     public Uri imageUrl = null;
@@ -27,7 +27,7 @@ public class SearchResultViewHolder extends RecyclerView.ViewHolder {
 
         container = itemView.findViewById(R.id.container);
         title = (TextView) itemView.findViewById(R.id.result_title);
-        image = (SimpleDraweeView) itemView.findViewById(R.id.result_image);
+        image = (ImageViewTinted) itemView.findViewById(R.id.result_image);
         toggleSwitch = (android.support.v7.widget.SwitchCompat) itemView.findViewById(R.id.result_subscribe_switch);
 
     }

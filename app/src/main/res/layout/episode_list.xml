@@ -29,9 +29,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             android:layout_alignParentLeft="true"
-            android:scaleType="centerCrop"
-            fresco:roundAsCircle="false"
-            fresco:roundedCornerRadius="@dimen/playlist_image_radius_small"/>
+            android:scaleType="centerCrop"/>
 
         <RelativeLayout
             android:id="@+id/expanded_layout_controls"
