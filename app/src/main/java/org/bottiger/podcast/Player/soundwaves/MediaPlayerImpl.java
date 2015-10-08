@@ -23,12 +23,12 @@ import android.util.Log;
 
 public abstract class MediaPlayerImpl {
 	private static final String MPI_TAG = "MediaPlayerImpl";
-	protected final MediaPlayer owningMediaPlayer;
+	protected final NDKMediaPlayer owningMediaPlayer;
 	protected final Context mContext;
 	protected int muteOnPreparedCount = 0;
 	protected int muteOnSeekCount = 0;
 
-	public MediaPlayerImpl(MediaPlayer owningMediaPlayer, Context context) {
+	public MediaPlayerImpl(NDKMediaPlayer owningMediaPlayer, Context context) {
 		this.owningMediaPlayer = owningMediaPlayer;
 
 		this.mContext = context;

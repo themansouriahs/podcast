@@ -175,8 +175,7 @@
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/session_photo"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            fresco:actualImageScaleType="centerCrop"/>
+            android:layout_height="match_parent"/>
 
         <View
             android:id="@+id/top_gradient_inner"

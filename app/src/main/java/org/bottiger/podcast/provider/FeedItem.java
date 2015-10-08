@@ -163,7 +163,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	/**
 	 * Last position during playback in ms Should match seekTo(int)
 	 * http://developer
-	 * .android.com/reference/android/media/MediaPlayer.html#seekTo(int)
+	 * .android.com/reference/android/media/NDKMediaPlayer.html#seekTo(int)
 	 */
 	public int offset;
 

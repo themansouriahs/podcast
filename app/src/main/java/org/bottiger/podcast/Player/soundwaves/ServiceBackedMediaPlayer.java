@@ -14,7 +14,7 @@
 //
 // -----------------------------------------------------------------------
 // Compared to the original version, this class been slightly modified so
-// that any acquired WakeLocks are only held while the MediaPlayer is
+// that any acquired WakeLocks are only held while the NDKMediaPlayer is
 // playing (see the stayAwake method for more details).
 
 
@@ -35,7 +35,7 @@ import android.os.PowerManager.WakeLock;
 import android.util.Log;
 
 import org.bottiger.podcast.BuildConfig;
-import org.bottiger.podcast.Player.soundwaves.MediaPlayer.State;
+import org.bottiger.podcast.Player.soundwaves.NDKMediaPlayer.State;
 import com.aocate.presto.service.IDeathCallback_0_8;
 import com.aocate.presto.service.IOnBufferingUpdateListenerCallback_0_8;
 import com.aocate.presto.service.IOnCompletionListenerCallback_0_8;
@@ -49,7 +49,7 @@ import com.aocate.presto.service.IPlayMedia_0_8;
 
 /**
  * Class for connecting to remote speed-altering, media playing Service
- * Note that there is unusually high coupling between MediaPlayer and this 
+ * Note that there is unusually high coupling between NDKMediaPlayer and this
  * class.  This is an unfortunate compromise, since the alternative was to
  * track state in two different places in this code (plus the internal state
  * of the remote media player).
@@ -65,7 +65,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 	protected IPlayMedia_0_8 pmInterface = null;
 	private Intent playMediaServiceIntent = null;
 	// In some cases, we're going to have to replace the
-	// android.media.MediaPlayer on the fly, and we don't want to touch the
+	// android.media.NDKMediaPlayer on the fly, and we don't want to touch the
 	// wrong media player.
 
 	private long sessionId = 0;
@@ -76,13 +76,13 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 
 	// So here's the major problem
 	// Sometimes the service won't exist or won't be connected,
-	// so start with an android.media.MediaPlayer, and when
+	// so start with an android.media.NDKMediaPlayer, and when
 	// the service is connected, use that from then on
-	public ServiceBackedMediaPlayer(MediaPlayer owningMediaPlayer, final Context context, final ServiceConnection serviceConnection) {
+	public ServiceBackedMediaPlayer(NDKMediaPlayer owningMediaPlayer, final Context context, final ServiceConnection serviceConnection) {
 		super(owningMediaPlayer, context);
 		Log.d(SBMP_TAG, "Instantiating ServiceBackedMediaPlayer 87");
 		this.playMediaServiceIntent = 
-			MediaPlayer.getPrestoServiceIntent(context, INTENT_NAME);
+			NDKMediaPlayer.getPrestoServiceIntent(context, INTENT_NAME);
 		this.mPlayMediaServiceConnection = new ServiceConnection() {
 			public void onServiceConnected(ComponentName name, IBinder service) {
 				IPlayMedia_0_8 tmpPlayMediaInterface = IPlayMedia_0_8.Stub.asInterface((IBinder) service);
@@ -99,7 +99,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 						// This is really bad if this fails
 					} catch (RemoteException e) {
 						e.printStackTrace();
-						ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+						ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 					}
 				}
 
@@ -135,14 +135,14 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 		Log.d(SBMP_TAG, "Connecting PlayMediaService 124");
 		if (!ConnectPlayMediaService()) {
             Log.e(SBMP_TAG, "bindService failed");
-			ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+			ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 		}
 	}
 
 	private boolean ConnectPlayMediaService() {
 		Log.d(SBMP_TAG, "ConnectPlayMediaService()");
 
-		if (MediaPlayer.isIntentAvailable(mContext, INTENT_NAME)) {
+		if (NDKMediaPlayer.isIntentAvailable(mContext, INTENT_NAME)) {
 			Log.d(SBMP_TAG, INTENT_NAME + " is available");
 			if (pmInterface == null) {
 				try {
@@ -173,7 +173,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 
 		if (pmInterface == null) {
 			if (!ConnectPlayMediaService()) {
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		if (pmInterface != null) {
@@ -182,7 +182,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 				return pmInterface.canSetPitch(ServiceBackedMediaPlayer.this.sessionId);
 			} catch (RemoteException e) {
 				e.printStackTrace();
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		return false;
@@ -197,7 +197,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 		Log.d(SBMP_TAG, "canSetSpeed() 180");
 		if (pmInterface == null) {
 			if (!ConnectPlayMediaService()) {
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		if (pmInterface != null) {
@@ -206,7 +206,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 				return pmInterface.canSetSpeed(ServiceBackedMediaPlayer.this.sessionId);
 			} catch (RemoteException e) {
 				e.printStackTrace();
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		return false;
@@ -258,7 +258,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 		Log.d(SBMP_TAG, "getCurrentPitchStepsAdjustment() 240");
 		if (pmInterface == null) {
 			if (!ConnectPlayMediaService()) {
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		if (pmInterface != null) {
@@ -268,21 +268,21 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 					ServiceBackedMediaPlayer.this.sessionId);
 			} catch (RemoteException e) {
 				e.printStackTrace();
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		return 0f;
 	}
 	
 	/**
-	 * Functions identically to android.media.MediaPlayer.getCurrentPosition()
+	 * Functions identically to android.media.NDKMediaPlayer.getCurrentPosition()
 	 * @return Current position (in milliseconds)
 	 */
 	@Override
 	public int getCurrentPosition() {
 		if (pmInterface == null) {
 			if (!ConnectPlayMediaService()) {
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		try {
@@ -290,7 +290,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 				ServiceBackedMediaPlayer.this.sessionId);
 		} catch (RemoteException e) {
 			e.printStackTrace();
-			ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+			ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 		}
 		return 0;
 	}
@@ -304,7 +304,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 		Log.d(SBMP_TAG, "getCurrentSpeedMultiplier() 286");
 		if (pmInterface == null) {
 			if (!ConnectPlayMediaService()) {
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		if (pmInterface != null) {
@@ -314,14 +314,14 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 					ServiceBackedMediaPlayer.this.sessionId);
 			} catch (RemoteException e) {
 				e.printStackTrace();
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		return 1;
 	}
 
 	/**
-	 * Functions identically to android.media.MediaPlayer.getDuration()
+	 * Functions identically to android.media.NDKMediaPlayer.getDuration()
 	 * @return Length of the track (in milliseconds)
 	 */
 	@Override
@@ -329,14 +329,14 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 		Log.d(SBMP_TAG, "getDuration() 311");
 		if (pmInterface == null) {
 			if (!ConnectPlayMediaService()) {
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		try {
 			return pmInterface.getDuration(ServiceBackedMediaPlayer.this.sessionId);
 		} catch (RemoteException e) {
 			e.printStackTrace();
-			ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+			ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 		}
 		return 0;
 	}
@@ -350,7 +350,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 		Log.d(SBMP_TAG, "getMaxSpeedMultiplier() 332");
 		if (pmInterface == null) {
 			if (!ConnectPlayMediaService()) {
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		if (pmInterface != null) {
@@ -360,7 +360,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 					ServiceBackedMediaPlayer.this.sessionId);
 			} catch (RemoteException e) {
 				e.printStackTrace();
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		return 1f;
@@ -375,7 +375,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 		Log.d(SBMP_TAG, "getMinSpeedMultiplier() 357");
 		if (pmInterface == null) {
 			if (!ConnectPlayMediaService()) {
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		if (pmInterface != null) {
@@ -385,7 +385,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 					ServiceBackedMediaPlayer.this.sessionId);
 			} catch (RemoteException e) {
 				e.printStackTrace();
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		return 1f;
@@ -395,14 +395,14 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 		Log.d(SBMP_TAG, "getVersionCode");
 		if (pmInterface == null) {
 			if (!ConnectPlayMediaService()) {
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		try {
 			return pmInterface.getVersionCode();
 		} catch (RemoteException e) {
 			e.printStackTrace();
-			ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+			ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 		}
 		return 0;
 	}
@@ -411,14 +411,14 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 		Log.d(SBMP_TAG, "getVersionName");
 		if (pmInterface == null) {
 			if (!ConnectPlayMediaService()) {
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		try {
 			return pmInterface.getVersionName();
 		} catch (RemoteException e) {
 			e.printStackTrace();
-			ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+			ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 		}
 		return "";
 	}
@@ -428,7 +428,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 	}
 	
 	/**
-	 * Functions identically to android.media.MediaPlayer.isLooping()
+	 * Functions identically to android.media.NDKMediaPlayer.isLooping()
 	 * @return True if the track is looping
 	 */
 	@Override
@@ -436,27 +436,27 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 		Log.d(SBMP_TAG, "isLooping() 382");
 		if (pmInterface == null) {
 			if (!ConnectPlayMediaService()) {
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		try {
 			return pmInterface.isLooping(ServiceBackedMediaPlayer.this.sessionId);
 		} catch (RemoteException e) {
 			e.printStackTrace();
-			ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+			ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 		}
 		return false;
 	}
 
 	/**
-	 * Functions identically to android.media.MediaPlayer.isPlaying()
+	 * Functions identically to android.media.NDKMediaPlayer.isPlaying()
 	 * @return True if the track is playing
 	 */
 	@Override
 	public boolean isPlaying() {
 		if (pmInterface == null) {
 			if (!ConnectPlayMediaService()) {
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		if (pmInterface != null) {
@@ -464,14 +464,14 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 				return pmInterface.isPlaying(ServiceBackedMediaPlayer.this.sessionId);
 			} catch (RemoteException e) {
 				e.printStackTrace();
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		return false;
 	}
 	
 	/**
-	 * Functions identically to android.media.MediaPlayer.pause()
+	 * Functions identically to android.media.NDKMediaPlayer.pause()
 	 * Pauses the track
 	 */
 	@Override
@@ -479,20 +479,20 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 		Log.d(SBMP_TAG, "pause() 424");
 		if (pmInterface == null) {
 			if (!ConnectPlayMediaService()) {
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		try {
 			pmInterface.pause(ServiceBackedMediaPlayer.this.sessionId);
 		} catch (RemoteException e) {
 			e.printStackTrace();
-			ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+			ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 		}
         stayAwake(false);
 	}
 	
 	/**
-	 * Functions identically to android.media.MediaPlayer.prepare()
+	 * Functions identically to android.media.NDKMediaPlayer.prepare()
 	 * Prepares the track.  This or prepareAsync must be called before start()
 	 */
 	@Override
@@ -503,7 +503,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 			Log.d(SBMP_TAG, "prepare: pmInterface is null");
 			if (!ConnectPlayMediaService()) {
 				Log.d(SBMP_TAG, "prepare: Failed to connect play media service");
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		if (pmInterface != null) {
@@ -515,14 +515,14 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 			} catch (RemoteException e) {
 				Log.d(SBMP_TAG, "prepare: RemoteException");
 				e.printStackTrace();
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		Log.d(SBMP_TAG, "Done with prepare()");
 	}
 	
 	/**
-	 * Functions identically to android.media.MediaPlayer.prepareAsync()
+	 * Functions identically to android.media.NDKMediaPlayer.prepareAsync()
 	 * Prepares the track.  This or prepare must be called before start()
 	 */
 	@Override
@@ -530,19 +530,19 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 		Log.d(SBMP_TAG, "prepareAsync() 469");
 		if (pmInterface == null) {
 			if (!ConnectPlayMediaService()) {
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		try {
 			pmInterface.prepareAsync(ServiceBackedMediaPlayer.this.sessionId);
 		} catch (RemoteException e) {
 			e.printStackTrace();
-			ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+			ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 		}
 	}
 
 	/**
-	 * Functions identically to android.media.MediaPlayer.release()
+	 * Functions identically to android.media.NDKMediaPlayer.release()
 	 * Releases the underlying resources used by the media player.
 	 */
 	@Override
@@ -550,7 +550,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 		Log.d(SBMP_TAG, "release() 492");
 		if (pmInterface == null) {
 			if (!ConnectPlayMediaService()) {
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		if (pmInterface != null) {
@@ -559,7 +559,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 				pmInterface.release(ServiceBackedMediaPlayer.this.sessionId);
 			} catch (RemoteException e) {
 				e.printStackTrace();
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 			mContext.unbindService(this.mPlayMediaServiceConnection);
 			// Don't try to keep awake (if we were)
@@ -575,7 +575,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 	}
 
 	/**
-	 * Functions identically to android.media.MediaPlayer.reset()
+	 * Functions identically to android.media.NDKMediaPlayer.reset()
 	 * Resets the track to idle state
 	 */
 	@Override
@@ -583,20 +583,20 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 		Log.d(SBMP_TAG, "reset() 523");
 		if (pmInterface == null) {
 			if (!ConnectPlayMediaService()) {
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		try {
 			pmInterface.reset(ServiceBackedMediaPlayer.this.sessionId);
 		} catch (RemoteException e) {
 			e.printStackTrace();
-			ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+			ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 		}
         stayAwake(false);
 	}
 
 	/**
-	 * Functions identically to android.media.MediaPlayer.seekTo(int msec)
+	 * Functions identically to android.media.NDKMediaPlayer.seekTo(int msec)
 	 * Seeks to msec in the track
 	 */
 	@Override
@@ -604,19 +604,19 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 		Log.d(SBMP_TAG, "seekTo(" + msec + ")");
 		if (pmInterface == null) {
 			if (!ConnectPlayMediaService()) {
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		try {
 			pmInterface.seekTo(ServiceBackedMediaPlayer.this.sessionId, msec);
 		} catch (RemoteException e) {
 			e.printStackTrace();
-			ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+			ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 		}
 	}
 	
 	/**
-	 * Functions identically to android.media.MediaPlayer.setAudioStreamType(int streamtype)
+	 * Functions identically to android.media.NDKMediaPlayer.setAudioStreamType(int streamtype)
 	 * Sets the audio stream type.
 	 */
 	@Override
@@ -624,7 +624,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 		Log.d(SBMP_TAG, "setAudioStreamType(" + streamtype + ")");
 		if (pmInterface == null) {
 			if (!ConnectPlayMediaService()) {
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		try {
@@ -633,13 +633,13 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 				this.mAudioStreamType);
 		} catch (RemoteException e) {
 			e.printStackTrace();
-			ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+			ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 		}
 	}
 
 
 	/**
-	 * Functions identically to android.media.MediaPlayer.setDataSource(Context context, Uri uri)
+	 * Functions identically to android.media.NDKMediaPlayer.setDataSource(Context context, Uri uri)
 	 * Sets uri as data source in the context given
 	 */
 	@Override
@@ -647,7 +647,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 		Log.d(SBMP_TAG, "setDataSource(context, uri)");
 		if (pmInterface == null) {
 			if (!ConnectPlayMediaService()) {
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		try {
@@ -656,12 +656,12 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 				uri);
 		} catch (RemoteException e) {
 			e.printStackTrace();
-			ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+			ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 		}
 	}
 
 	/**
-	 * Functions identically to android.media.MediaPlayer.setDataSource(String path)
+	 * Functions identically to android.media.NDKMediaPlayer.setDataSource(String path)
 	 * Sets the data source of the track to a file given.
 	 */
 	@Override
@@ -669,11 +669,11 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 		Log.d(SBMP_TAG, "setDataSource(path)");
 		if (pmInterface == null) {
 			if (!ConnectPlayMediaService()) {
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		if (pmInterface == null) {
-			ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+			ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 		}
 		else {
 			try {
@@ -682,7 +682,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 					path);
 			} catch (RemoteException e) {
 				e.printStackTrace();
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 	}
@@ -700,7 +700,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 		try {
 			if (pmInterface == null) {
 				if (!ConnectPlayMediaService()) {
-					ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+					ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 				}
 			}
 			if (pmInterface != null) {
@@ -711,7 +711,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 						enableSpeedAdjustment);
 				} catch (RemoteException e) {
 					e.printStackTrace();
-					ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+					ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 				}
 			}
 		}
@@ -722,7 +722,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 
 
 	/**
-	 * Functions identically to android.media.MediaPlayer.setLooping(boolean loop)
+	 * Functions identically to android.media.NDKMediaPlayer.setLooping(boolean loop)
 	 * Sets the track to loop infinitely if loop is true, play once if loop is false
 	 */
 	@Override
@@ -730,14 +730,14 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 		Log.d(SBMP_TAG, "setLooping(" + loop + ")");
 		if (pmInterface == null) {
 			if (!ConnectPlayMediaService()) {
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		try {
 			pmInterface.setLooping(ServiceBackedMediaPlayer.this.sessionId, loop);
 		} catch (RemoteException e) {
 			e.printStackTrace();
-			ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+			ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 		}
 	}
 
@@ -753,7 +753,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 		Log.d(SBMP_TAG, "setPitchStepsAdjustment(" + pitchSteps + ")");
 		if (pmInterface == null) {
 			if (!ConnectPlayMediaService()) {
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		if (pmInterface != null) {
@@ -764,7 +764,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 					pitchSteps);
 			} catch (RemoteException e) {
 				e.printStackTrace();
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 	}
@@ -780,7 +780,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 		Log.d(SBMP_TAG, "setPlaybackPitch(" + f + ")");
 		if (pmInterface == null) {
 			if (!ConnectPlayMediaService()) {
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		if (pmInterface != null) {
@@ -791,7 +791,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 					f);
 			} catch (RemoteException e) {
 				e.printStackTrace();
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 	}
@@ -806,7 +806,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 		Log.d(SBMP_TAG, "setPlaybackSpeed(" + f + ")");
 		if (pmInterface == null) {
 			if (!ConnectPlayMediaService()) {
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		if (pmInterface != null) {
@@ -817,7 +817,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 					f);
 			} catch (RemoteException e) {
 				e.printStackTrace();
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 	}
@@ -826,7 +826,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 	public void setSpeedAdjustmentAlgorithm(int algorithm) {
 		if (pmInterface == null) {
 			if (!ConnectPlayMediaService()) {
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		try {
@@ -835,12 +835,12 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 				algorithm);
 		} catch (RemoteException e) {
 			e.printStackTrace();
-			ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+			ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 		}
 	}
 
 	/**
-	 * Functions identically to android.media.MediaPlayer.setVolume(float leftVolume, float rightVolume)
+	 * Functions identically to android.media.NDKMediaPlayer.setVolume(float leftVolume, float rightVolume)
 	 * Sets the stereo volume
 	 */
 	@Override
@@ -848,7 +848,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 		Log.d(SBMP_TAG, "setVolume(" + leftVolume + ", " + rightVolume + ")");
 		if (pmInterface == null) {
 			if (!ConnectPlayMediaService()) {
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		try {
@@ -858,12 +858,12 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 				rightVolume);
 		} catch (RemoteException e) {
 			e.printStackTrace();
-			ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+			ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 		}
 	}
 	
 	/**
-	 * Functions identically to android.media.MediaPlayer.setWakeMode(Context context, int mode)
+	 * Functions identically to android.media.NDKMediaPlayer.setWakeMode(Context context, int mode)
 	 * Acquires a wake lock in the context given.  You must request the appropriate permissions
 	 * in your AndroidManifest.xml file.
 	 */
@@ -929,7 +929,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 				mOnBufferingUpdateCallback);
 		} catch (RemoteException e) {
 			e.printStackTrace();
-			ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+			ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 		}
 	}
 
@@ -958,7 +958,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 				this.mOnCompletionCallback);
 		} catch (RemoteException e) {
 			e.printStackTrace();
-			ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+			ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 		}
 	}
 	
@@ -987,7 +987,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 				this.mOnErrorCallback);
 		} catch (RemoteException e) {
 			e.printStackTrace();
-			ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+			ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 		}
 	}
 	
@@ -1016,7 +1016,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 				this.mOnInfoCallback);
 		} catch (RemoteException e) {
 			e.printStackTrace();
-			ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+			ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 		}
 	}
 
@@ -1045,7 +1045,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 				this.mOnPitchAdjustmentAvailableChangedCallback);
 		} catch (RemoteException e) {
 			e.printStackTrace();
-			ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+			ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 		}
 	}
 
@@ -1087,7 +1087,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 				this.mOnPreparedCallback);
 		} catch (RemoteException e) {
 			e.printStackTrace();
-			ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+			ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 		}
 	}
 
@@ -1124,7 +1124,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 				this.mOnSeekCompleteCallback);
 		} catch (RemoteException e) {
 			e.printStackTrace();
-			ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+			ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 		}
 	}
 	
@@ -1154,12 +1154,12 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 				this.mOnSpeedAdjustmentAvailableChangedCallback);
 		} catch (RemoteException e) {
 			e.printStackTrace();
-			ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+			ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 		}
 	}
 
 	/**
-	 * Functions identically to android.media.MediaPlayer.start()
+	 * Functions identically to android.media.NDKMediaPlayer.start()
 	 * Starts a track playing
 	 */
 	@Override
@@ -1167,20 +1167,20 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 		Log.d(SBMP_TAG, "start()");
 		if (pmInterface == null) {
 			if (!ConnectPlayMediaService()) {
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		try {
 			pmInterface.start(ServiceBackedMediaPlayer.this.sessionId);
 		} catch (RemoteException e) {
 			e.printStackTrace();
-			ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+			ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 		}
         stayAwake(true);
 	}
 
 	/**
-	 * Functions identically to android.media.MediaPlayer.stop()
+	 * Functions identically to android.media.NDKMediaPlayer.stop()
 	 * Stops a track playing and resets its position to the start.
 	 */
 	@Override
@@ -1188,14 +1188,14 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 		Log.d(SBMP_TAG, "stop()");
 		if (pmInterface == null) {
 			if (!ConnectPlayMediaService()) {
-				ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			}
 		}
 		try {
 			pmInterface.stop(ServiceBackedMediaPlayer.this.sessionId);
 		} catch (RemoteException e) {
 			e.printStackTrace();
-			ServiceBackedMediaPlayer.this.error(MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+			ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 		}
         stayAwake(false);
 	}

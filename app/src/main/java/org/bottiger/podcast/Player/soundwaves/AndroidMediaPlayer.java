@@ -159,7 +159,7 @@ public class AndroidMediaPlayer extends MediaPlayerImpl {
 		}
 	};
 	
-	public AndroidMediaPlayer(org.bottiger.podcast.Player.soundwaves.MediaPlayer owningMediaPlayer, Context context) {
+	public AndroidMediaPlayer(NDKMediaPlayer owningMediaPlayer, Context context) {
 		super(owningMediaPlayer, context);
 		
 		mp = new MediaPlayer();
@@ -171,7 +171,7 @@ public class AndroidMediaPlayer extends MediaPlayerImpl {
 //            	Log.d(AMP_TAG, "Instantiating new AndroidMediaPlayer from Handler");
 //            	lock.lock();
 //            	if (mp == null) {
-//            		mp = new MediaPlayer();
+//            		mp = new NDKMediaPlayer();
 //            	}
 //            	lock.unlock();
 //            }
@@ -195,7 +195,7 @@ public class AndroidMediaPlayer extends MediaPlayerImpl {
 //        }
         
         if (mp == null) {
-        	throw new IllegalStateException("Did not instantiate android.media.MediaPlayer successfully");
+        	throw new IllegalStateException("Did not instantiate android.media.NDKMediaPlayer successfully");
         }
         
         mp.setOnBufferingUpdateListener(this.onBufferingUpdateListener);

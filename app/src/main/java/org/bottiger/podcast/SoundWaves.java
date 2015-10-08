@@ -35,9 +35,11 @@ import org.bottiger.podcast.service.PlayerService;
         */
 public class SoundWaves extends Application {
 
+    /*
     static {
         System.loadLibrary("hello-jni");
     }
+    */
 
     public native String stringFromJNI();
 

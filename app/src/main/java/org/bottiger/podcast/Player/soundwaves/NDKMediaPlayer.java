@@ -34,23 +34,23 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class MediaPlayer {
+public class NDKMediaPlayer {
     public static final String TAG = "SoundWavesMediaPlayer";
 
     public interface OnBufferingUpdateListener {
-        public abstract void onBufferingUpdate(MediaPlayer arg0, int percent);
+        public abstract void onBufferingUpdate(NDKMediaPlayer arg0, int percent);
     }
 
     public interface OnCompletionListener {
-        public abstract void onCompletion(MediaPlayer arg0);
+        public abstract void onCompletion(NDKMediaPlayer arg0);
     }
 
     public interface OnErrorListener {
-        public abstract boolean onError(MediaPlayer arg0, int what, int extra);
+        public abstract boolean onError(NDKMediaPlayer arg0, int what, int extra);
     }
 
     public interface OnInfoListener {
-        public abstract boolean onInfo(MediaPlayer arg0, int what, int extra);
+        public abstract boolean onInfo(NDKMediaPlayer arg0, int what, int extra);
     }
 
     public interface OnPitchAdjustmentAvailableChangedListener {
@@ -59,15 +59,15 @@ public class MediaPlayer {
          * @param pitchAdjustmentAvailable True if pitch adjustment is available, false if not
          */
         public abstract void onPitchAdjustmentAvailableChanged(
-                MediaPlayer arg0, boolean pitchAdjustmentAvailable);
+                NDKMediaPlayer arg0, boolean pitchAdjustmentAvailable);
     }
 
     public interface OnPreparedListener {
-        public abstract void onPrepared(MediaPlayer arg0);
+        public abstract void onPrepared(NDKMediaPlayer arg0);
     }
 
     public interface OnSeekCompleteListener {
-        public abstract void onSeekComplete(MediaPlayer arg0);
+        public abstract void onSeekComplete(NDKMediaPlayer arg0);
     }
 
     public interface OnSpeedAdjustmentAvailableChangedListener {
@@ -76,7 +76,7 @@ public class MediaPlayer {
          * @param speedAdjustmentAvailable True if speed adjustment is available, false if not
          */
         public abstract void onSpeedAdjustmentAvailableChanged(
-                MediaPlayer arg0, boolean speedAdjustmentAvailable);
+                NDKMediaPlayer arg0, boolean speedAdjustmentAvailable);
     }
 
     public enum State {
@@ -184,7 +184,7 @@ public class MediaPlayer {
     protected boolean enableSpeedAdjustment = true;
     private int lastKnownPosition = 0;
     // In some cases, we're going to have to replace the
-    // android.media.MediaPlayer on the fly, and we don't want to touch the
+    // android.media.NDKMediaPlayer on the fly, and we don't want to touch the
     // wrong media player, so lock it way too much.
     ReentrantLock lock = new ReentrantLock();
     private int mAudioStreamType = AudioManager.STREAM_MUSIC;
@@ -222,10 +222,10 @@ public class MediaPlayer {
     OnInfoListener onInfoListener = null;
 
     // Special case. Pitch adjustment ceases to be available when we switch
-    // to the android.media.MediaPlayer (though it is not guaranteed to be
+    // to the android.media.NDKMediaPlayer (though it is not guaranteed to be
     // available when using the ServiceBackedMediaPlayer)
     OnPitchAdjustmentAvailableChangedListener onPitchAdjustmentAvailableChangedListener = new OnPitchAdjustmentAvailableChangedListener() {
-        public void onPitchAdjustmentAvailableChanged(MediaPlayer arg0,
+        public void onPitchAdjustmentAvailableChanged(NDKMediaPlayer arg0,
                                                       boolean pitchAdjustmentAvailable) {
             lock.lock();
             try {
@@ -233,13 +233,13 @@ public class MediaPlayer {
                         .d(
                                 MP_TAG,
                                 "onPitchAdjustmentAvailableChangedListener.onPitchAdjustmentAvailableChanged being called");
-                if (MediaPlayer.this.pitchAdjustmentAvailable != pitchAdjustmentAvailable) {
+                if (NDKMediaPlayer.this.pitchAdjustmentAvailable != pitchAdjustmentAvailable) {
                     Log.d(MP_TAG, "Pitch adjustment state has changed from "
-                            + MediaPlayer.this.pitchAdjustmentAvailable
+                            + NDKMediaPlayer.this.pitchAdjustmentAvailable
                             + " to " + pitchAdjustmentAvailable);
-                    MediaPlayer.this.pitchAdjustmentAvailable = pitchAdjustmentAvailable;
-                    if (MediaPlayer.this.pitchAdjustmentAvailableChangedListener != null) {
-                        MediaPlayer.this.pitchAdjustmentAvailableChangedListener
+                    NDKMediaPlayer.this.pitchAdjustmentAvailable = pitchAdjustmentAvailable;
+                    if (NDKMediaPlayer.this.pitchAdjustmentAvailableChangedListener != null) {
+                        NDKMediaPlayer.this.pitchAdjustmentAvailableChangedListener
                                 .onPitchAdjustmentAvailableChanged(arg0,
                                         pitchAdjustmentAvailable);
                     }
@@ -251,13 +251,13 @@ public class MediaPlayer {
     };
     OnPitchAdjustmentAvailableChangedListener pitchAdjustmentAvailableChangedListener = null;
 
-    MediaPlayer.OnPreparedListener onPreparedListener = new MediaPlayer.OnPreparedListener() {
-        public void onPrepared(MediaPlayer arg0) {
+    NDKMediaPlayer.OnPreparedListener onPreparedListener = new NDKMediaPlayer.OnPreparedListener() {
+        public void onPrepared(NDKMediaPlayer arg0) {
             Log.d(MP_TAG, "onPreparedListener 242 setting state to PREPARED");
-            MediaPlayer.this.state = State.PREPARED;
-            if (MediaPlayer.this.preparedListener != null) {
+            NDKMediaPlayer.this.state = State.PREPARED;
+            if (NDKMediaPlayer.this.preparedListener != null) {
                 Log.d(MP_TAG, "Calling preparedListener");
-                MediaPlayer.this.preparedListener.onPrepared(arg0);
+                NDKMediaPlayer.this.preparedListener.onPrepared(arg0);
             }
             Log.d(MP_TAG, "Wrap up onPreparedListener");
         }
@@ -267,10 +267,10 @@ public class MediaPlayer {
     OnSeekCompleteListener onSeekCompleteListener = null;
 
     // Special case. Speed adjustment ceases to be available when we switch
-    // to the android.media.MediaPlayer (though it is not guaranteed to be
+    // to the android.media.NDKMediaPlayer (though it is not guaranteed to be
     // available when using the ServiceBackedMediaPlayer)
     OnSpeedAdjustmentAvailableChangedListener onSpeedAdjustmentAvailableChangedListener = new OnSpeedAdjustmentAvailableChangedListener() {
-        public void onSpeedAdjustmentAvailableChanged(MediaPlayer arg0,
+        public void onSpeedAdjustmentAvailableChanged(NDKMediaPlayer arg0,
                                                       boolean speedAdjustmentAvailable) {
             lock.lock();
             try {
@@ -278,13 +278,13 @@ public class MediaPlayer {
                         .d(
                                 MP_TAG,
                                 "onSpeedAdjustmentAvailableChangedListener.onSpeedAdjustmentAvailableChanged being called");
-                if (MediaPlayer.this.speedAdjustmentAvailable != speedAdjustmentAvailable) {
+                if (NDKMediaPlayer.this.speedAdjustmentAvailable != speedAdjustmentAvailable) {
                     Log.d(MP_TAG, "Speed adjustment state has changed from "
-                            + MediaPlayer.this.speedAdjustmentAvailable
+                            + NDKMediaPlayer.this.speedAdjustmentAvailable
                             + " to " + speedAdjustmentAvailable);
-                    MediaPlayer.this.speedAdjustmentAvailable = speedAdjustmentAvailable;
-                    if (MediaPlayer.this.speedAdjustmentAvailableChangedListener != null) {
-                        MediaPlayer.this.speedAdjustmentAvailableChangedListener
+                    NDKMediaPlayer.this.speedAdjustmentAvailable = speedAdjustmentAvailable;
+                    if (NDKMediaPlayer.this.speedAdjustmentAvailableChangedListener != null) {
+                        NDKMediaPlayer.this.speedAdjustmentAvailableChangedListener
                                 .onSpeedAdjustmentAvailableChanged(arg0,
                                         speedAdjustmentAvailable);
                     }
@@ -298,17 +298,17 @@ public class MediaPlayer {
 
     private int speedAdjustmentAlgorithm = SpeedAdjustmentAlgorithm.SONIC;
 
-    public MediaPlayer(final Context context) {
+    public NDKMediaPlayer(final Context context) {
         this(context, true);
     }
 
-    public MediaPlayer(final Context context, boolean useService) {
+    public NDKMediaPlayer(final Context context, boolean useService) {
         this.mContext = context;
         this.useService = useService;
 
         // So here's the major problem
         // Sometimes the service won't exist or won't be connected,
-        // so start with an android.media.MediaPlayer, and when
+        // so start with an android.media.NDKMediaPlayer, and when
         // the service is connected, use that from then on
         this.mpi = this.amp = new AndroidMediaPlayer(this, context);
 
@@ -369,17 +369,17 @@ public class MediaPlayer {
                                         public void run() {
                                             // This lock probably isn't granular
                                             // enough
-                                            MediaPlayer.this.lock.lock();
+                                            NDKMediaPlayer.this.lock.lock();
                                             Log.d(MP_TAG,
                                                     "onServiceConnected 257");
                                             try {
-                                                MediaPlayer.this
+                                                NDKMediaPlayer.this
                                                         .switchMediaPlayerImpl(
-                                                                MediaPlayer.this.amp,
-                                                                MediaPlayer.this.sbmp);
+                                                                NDKMediaPlayer.this.amp,
+                                                                NDKMediaPlayer.this.sbmp);
                                                 Log.d(MP_TAG, "End onServiceConnected 362");
                                             } finally {
-                                                MediaPlayer.this.lock.unlock();
+                                                NDKMediaPlayer.this.lock.unlock();
                                             }
                                         }
                                     });
@@ -388,17 +388,17 @@ public class MediaPlayer {
 
                                 public void onServiceDisconnected(
                                         ComponentName className) {
-                                    MediaPlayer.this.lock.lock();
+                                    NDKMediaPlayer.this.lock.lock();
                                     try {
                                         // Can't get any more useful information
                                         // out of sbmp
-                                        if (MediaPlayer.this.sbmp != null) {
-                                            MediaPlayer.this.sbmp.release();
+                                        if (NDKMediaPlayer.this.sbmp != null) {
+                                            NDKMediaPlayer.this.sbmp.release();
                                         }
                                         // Unlike most other cases, sbmp gets set
                                         // to null since there's nothing useful
                                         // backing it now
-                                        MediaPlayer.this.sbmp = null;
+                                        NDKMediaPlayer.this.sbmp = null;
 
                                         if (mServiceDisconnectedHandler == null) {
                                             mServiceDisconnectedHandler = new Handler(new Callback() {
@@ -407,17 +407,17 @@ public class MediaPlayer {
                                                     // clone anything from null
                                                     lock.lock();
                                                     try {
-                                                        if (MediaPlayer.this.amp == null) {
+                                                        if (NDKMediaPlayer.this.amp == null) {
                                                             // This should never be in this state
-                                                            MediaPlayer.this.amp = new AndroidMediaPlayer(
-                                                                    MediaPlayer.this,
-                                                                    MediaPlayer.this.mContext);
+                                                            NDKMediaPlayer.this.amp = new AndroidMediaPlayer(
+                                                                    NDKMediaPlayer.this,
+                                                                    NDKMediaPlayer.this.mContext);
                                                         }
                                                         // Use sbmp instead of null in case by some miracle it's
                                                         // been restored in the meantime
-                                                        MediaPlayer.this.switchMediaPlayerImpl(
-                                                                MediaPlayer.this.sbmp,
-                                                                MediaPlayer.this.amp);
+                                                        NDKMediaPlayer.this.switchMediaPlayerImpl(
+                                                                NDKMediaPlayer.this.sbmp,
+                                                                NDKMediaPlayer.this.amp);
                                                         return true;
                                                     } finally {
                                                         lock.unlock();
@@ -438,7 +438,7 @@ public class MediaPlayer {
                                         // what the user wants, not what they
                                         // get
                                     } finally {
-                                        MediaPlayer.this.lock.unlock();
+                                        NDKMediaPlayer.this.lock.unlock();
                                     }
                                 }
                             }
@@ -472,7 +472,7 @@ public class MediaPlayer {
                     // Nothing to copy to (maybe this should throw an error?)
                     || ((to instanceof ServiceBackedMediaPlayer) && !((ServiceBackedMediaPlayer) to).isConnected())
                     // ServiceBackedMediaPlayer hasn't yet connected, onServiceConnected will take care of the transition
-                    || (MediaPlayer.this.state == State.END)) {
+                    || (NDKMediaPlayer.this.state == State.END)) {
                 // State.END is after a release(), no further functions should
                 // be called on this class and from is likely to have problems
                 // retrieving state that won't be used anyway
@@ -488,7 +488,7 @@ public class MediaPlayer {
 
             // Do this first so we don't have to prepare the same
             // data file twice
-            to.setEnableSpeedAdjustment(MediaPlayer.this.enableSpeedAdjustment);
+            to.setEnableSpeedAdjustment(NDKMediaPlayer.this.enableSpeedAdjustment);
 
             // This is a reasonable place to set all of these,
             // none of them require prepare() or the like first
@@ -498,12 +498,12 @@ public class MediaPlayer {
             to.setPitchStepsAdjustment(this.mPitchStepsAdjustment);
             Log.d(MP_TAG, "Setting playback speed to " + this.mSpeedMultiplier);
             to.setPlaybackSpeed(this.mSpeedMultiplier);
-            to.setVolume(MediaPlayer.this.mLeftVolume,
-                    MediaPlayer.this.mRightVolume);
+            to.setVolume(NDKMediaPlayer.this.mLeftVolume,
+                    NDKMediaPlayer.this.mRightVolume);
             to.setWakeMode(this.mContext, this.mWakeMode);
 
             Log.d(MP_TAG, "asserting at least one data source is null");
-            assert ((MediaPlayer.this.stringDataSource == null) || (MediaPlayer.this.uriDataSource == null));
+            assert ((NDKMediaPlayer.this.stringDataSource == null) || (NDKMediaPlayer.this.uriDataSource == null));
 
             if (uriDataSource != null) {
                 Log.d(MP_TAG, "switchMediaPlayerImpl(): uriDataSource != null");
@@ -672,7 +672,7 @@ public class MediaPlayer {
     }
 
     /**
-     * Functions identically to android.media.MediaPlayer.getCurrentPosition()
+     * Functions identically to android.media.NDKMediaPlayer.getCurrentPosition()
      * Accurate only to frame size of encoded data (26 ms for MP3s)
      *
      * @return Current position (in milliseconds)
@@ -701,7 +701,7 @@ public class MediaPlayer {
     }
 
     /**
-     * Functions identically to android.media.MediaPlayer.getDuration()
+     * Functions identically to android.media.NDKMediaPlayer.getDuration()
      *
      * @return Length of the track (in milliseconds)
      */
@@ -782,7 +782,7 @@ public class MediaPlayer {
     }
 
     /**
-     * Functions identically to android.media.MediaPlayer.isLooping()
+     * Functions identically to android.media.NDKMediaPlayer.isLooping()
      *
      * @return True if the track is looping
      */
@@ -796,7 +796,7 @@ public class MediaPlayer {
     }
 
     /**
-     * Functions identically to android.media.MediaPlayer.isPlaying()
+     * Functions identically to android.media.NDKMediaPlayer.isPlaying()
      *
      * @return True if the track is playing
      */
@@ -810,7 +810,7 @@ public class MediaPlayer {
     }
 
     /**
-     * Returns true if this MediaPlayer has access to the Presto
+     * Returns true if this NDKMediaPlayer has access to the Presto
      * library
      *
      * @return True if the Presto library is installed
@@ -826,7 +826,7 @@ public class MediaPlayer {
     }
 
     /**
-     * Open the Android Market page in the same context as this MediaPlayer
+     * Open the Android Market page in the same context as this NDKMediaPlayer
      */
     public void openPrestoMarketIntent() {
         if ((this.mpi != null) && (this.mpi.mContext != null)) {
@@ -835,7 +835,7 @@ public class MediaPlayer {
     }
 
     /**
-     * Functions identically to android.media.MediaPlayer.pause() Pauses the
+     * Functions identically to android.media.NDKMediaPlayer.pause() Pauses the
      * track
      */
     public void pause() {
@@ -852,7 +852,7 @@ public class MediaPlayer {
     }
 
     /**
-     * Functions identically to android.media.MediaPlayer.prepare() Prepares the
+     * Functions identically to android.media.NDKMediaPlayer.prepare() Prepares the
      * track. This or prepareAsync must be called before start()
      */
     public void prepare() throws IllegalStateException, IOException {
@@ -873,7 +873,7 @@ public class MediaPlayer {
     }
 
     /**
-     * Functions identically to android.media.MediaPlayer.prepareAsync()
+     * Functions identically to android.media.NDKMediaPlayer.prepareAsync()
      * Prepares the track. This or prepare must be called before start()
      */
     public void prepareAsync() {
@@ -891,13 +891,13 @@ public class MediaPlayer {
     }
 
     /**
-     * Functions identically to android.media.MediaPlayer.release() Releases the
+     * Functions identically to android.media.NDKMediaPlayer.release() Releases the
      * underlying resources used by the media player.
      */
     public void release() {
         lock.lock();
         try {
-            Log.d(MP_TAG, "Releasing MediaPlayer 791");
+            Log.d(MP_TAG, "Releasing NDKMediaPlayer 791");
 
             this.state = State.END;
             if (this.amp != null) {
@@ -924,7 +924,7 @@ public class MediaPlayer {
     }
 
     /**
-     * Functions identically to android.media.MediaPlayer.reset() Resets the
+     * Functions identically to android.media.NDKMediaPlayer.reset() Resets the
      * track to idle state
      */
     public void reset() {
@@ -940,7 +940,7 @@ public class MediaPlayer {
     }
 
     /**
-     * Functions identically to android.media.MediaPlayer.seekTo(int msec) Seeks
+     * Functions identically to android.media.NDKMediaPlayer.seekTo(int msec) Seeks
      * to msec in the track
      */
     public void seekTo(int msec) throws IllegalStateException {
@@ -953,7 +953,7 @@ public class MediaPlayer {
     }
 
     /**
-     * Functions identically to android.media.MediaPlayer.setAudioStreamType(int
+     * Functions identically to android.media.NDKMediaPlayer.setAudioStreamType(int
      * streamtype) Sets the audio stream type.
      */
     public void setAudioStreamType(int streamtype) {
@@ -967,7 +967,7 @@ public class MediaPlayer {
     }
 
     /**
-     * Functions identically to android.media.MediaPlayer.setDataSource(Context
+     * Functions identically to android.media.NDKMediaPlayer.setDataSource(Context
      * context, Uri uri) Sets uri as data source in the context given
      */
     public void setDataSource(Context context, Uri uri)
@@ -988,7 +988,7 @@ public class MediaPlayer {
     }
 
     /**
-     * Functions identically to android.media.MediaPlayer.setDataSource(String
+     * Functions identically to android.media.NDKMediaPlayer.setDataSource(String
      * path) Sets the data source of the track to a file given.
      */
     public void setDataSource(String path) throws IllegalArgumentException,
@@ -1025,7 +1025,7 @@ public class MediaPlayer {
     }
 
     /**
-     * Functions identically to android.media.MediaPlayer.setLooping(boolean
+     * Functions identically to android.media.NDKMediaPlayer.setLooping(boolean
      * loop) Sets the track to loop infinitely if loop is true, play once if
      * loop is false
      */
@@ -1128,7 +1128,7 @@ public class MediaPlayer {
     }
 
     /**
-     * Functions identically to android.media.MediaPlayer.setVolume(float
+     * Functions identically to android.media.NDKMediaPlayer.setVolume(float
      * leftVolume, float rightVolume) Sets the stereo volume
      */
     public void setVolume(float leftVolume, float rightVolume) {
@@ -1143,7 +1143,7 @@ public class MediaPlayer {
     }
 
     /**
-     * Functions identically to android.media.MediaPlayer.setWakeMode(Context
+     * Functions identically to android.media.NDKMediaPlayer.setWakeMode(Context
      * context, int mode) Acquires a wake lock in the context given. You must
      * request the appropriate permissions in your AndroidManifest.xml file.
      */
@@ -1159,7 +1159,7 @@ public class MediaPlayer {
 
     /**
      * Functions identically to
-     * android.media.MediaPlayer.setOnCompletionListener(OnCompletionListener
+     * android.media.NDKMediaPlayer.setOnCompletionListener(OnCompletionListener
      * listener) Sets a listener to be used when a track completes playing.
      */
     public void setOnBufferingUpdateListener(OnBufferingUpdateListener listener) {
@@ -1173,7 +1173,7 @@ public class MediaPlayer {
 
     /**
      * Functions identically to
-     * android.media.MediaPlayer.setOnCompletionListener(OnCompletionListener
+     * android.media.NDKMediaPlayer.setOnCompletionListener(OnCompletionListener
      * listener) Sets a listener to be used when a track completes playing.
      */
     public void setOnCompletionListener(OnCompletionListener listener) {
@@ -1187,7 +1187,7 @@ public class MediaPlayer {
 
     /**
      * Functions identically to
-     * android.media.MediaPlayer.setOnErrorListener(OnErrorListener listener)
+     * android.media.NDKMediaPlayer.setOnErrorListener(OnErrorListener listener)
      * Sets a listener to be used when a track encounters an error.
      */
     public void setOnErrorListener(OnErrorListener listener) {
@@ -1201,7 +1201,7 @@ public class MediaPlayer {
 
     /**
      * Functions identically to
-     * android.media.MediaPlayer.setOnInfoListener(OnInfoListener listener) Sets
+     * android.media.NDKMediaPlayer.setOnInfoListener(OnInfoListener listener) Sets
      * a listener to be used when a track has info.
      */
     public void setOnInfoListener(OnInfoListener listener) {
@@ -1229,7 +1229,7 @@ public class MediaPlayer {
 
     /**
      * Functions identically to
-     * android.media.MediaPlayer.setOnPreparedListener(OnPreparedListener
+     * android.media.NDKMediaPlayer.setOnPreparedListener(OnPreparedListener
      * listener) Sets a listener to be used when a track finishes preparing.
      */
     public void setOnPreparedListener(OnPreparedListener listener) {
@@ -1237,7 +1237,7 @@ public class MediaPlayer {
         Log.d(MP_TAG, " ++++++++++++++++++++++++++++++++++++++++++++ setOnPreparedListener");
         try {
             this.preparedListener = listener;
-            // For this one, we do not explicitly set the MediaPlayer or the
+            // For this one, we do not explicitly set the NDKMediaPlayer or the
             // Service listener. This is because in addition to calling the
             // listener provided by the client, it's necessary to change
             // state to PREPARED. See prepareAsync for implementation details
@@ -1248,7 +1248,7 @@ public class MediaPlayer {
 
     /**
      * Functions identically to
-     * android.media.MediaPlayer.setOnSeekCompleteListener
+     * android.media.NDKMediaPlayer.setOnSeekCompleteListener
      * (OnSeekCompleteListener listener) Sets a listener to be used when a track
      * finishes seeking.
      */
@@ -1276,7 +1276,7 @@ public class MediaPlayer {
     }
 
     /**
-     * Functions identically to android.media.MediaPlayer.start() Starts a track
+     * Functions identically to android.media.NDKMediaPlayer.start() Starts a track
      * playing
      */
     public void start() {
@@ -1295,7 +1295,7 @@ public class MediaPlayer {
     }
 
     /**
-     * Functions identically to android.media.MediaPlayer.stop() Stops a track
+     * Functions identically to android.media.NDKMediaPlayer.stop() Stops a track
      * playing and resets its position to the start.
      */
     public void stop() {

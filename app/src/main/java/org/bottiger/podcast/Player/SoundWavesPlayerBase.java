@@ -8,8 +8,7 @@ import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import org.bottiger.podcast.Player.soundwaves.MediaPlayer;
-import org.bottiger.podcast.Player.soundwaves.MediaPlayerImpl;
+import org.bottiger.podcast.Player.soundwaves.NDKMediaPlayer;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.service.PlayerService;
 
@@ -35,7 +34,7 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
     private static final boolean ANDROID_ENGINE_AS_DEFAULT = true;
 
     private android.media.MediaPlayer mDefaultMediaPlayer;
-    private MediaPlayer mCustomMediaPlayer;
+    private NDKMediaPlayer mCustomMediaPlayer;
 
     public SoundWavesPlayerBase(@NonNull PlayerService argPlayerService) {
         SharedPreferences prefs = PreferenceManager
@@ -44,7 +43,7 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
         boolean useCustomEngine = prefs.getBoolean(key, !ANDROID_ENGINE_AS_DEFAULT);
 
         if (useCustomEngine) {
-            mCustomMediaPlayer = new MediaPlayer(argPlayerService, true);
+            mCustomMediaPlayer = new NDKMediaPlayer(argPlayerService, true);
         } else {
             mDefaultMediaPlayer = new android.media.MediaPlayer();
             mDefaultMediaPlayer.reset();
@@ -451,9 +450,9 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
                 break;
             }
             case SOUNDWAVES: {
-                mCustomMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                mCustomMediaPlayer.setOnPreparedListener(new NDKMediaPlayer.OnPreparedListener() {
                     @Override
-                    public void onPrepared(MediaPlayer arg0) {
+                    public void onPrepared(NDKMediaPlayer arg0) {
                         listener.onPrepared(SoundWavesPlayerBase.this);
                     }
                 });
@@ -475,9 +474,9 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
                 break;
             }
             case SOUNDWAVES: {
-                mCustomMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+                mCustomMediaPlayer.setOnErrorListener(new NDKMediaPlayer.OnErrorListener() {
                     @Override
-                    public boolean onError(MediaPlayer arg0, int what, int extra) {
+                    public boolean onError(NDKMediaPlayer arg0, int what, int extra) {
                         return listener.onError(SoundWavesPlayerBase.this, what, extra);
                     }
                 });
@@ -499,9 +498,9 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
                 break;
             }
             case SOUNDWAVES: {
-                mCustomMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                mCustomMediaPlayer.setOnCompletionListener(new NDKMediaPlayer.OnCompletionListener() {
                     @Override
-                    public void onCompletion(MediaPlayer arg0) {
+                    public void onCompletion(NDKMediaPlayer arg0) {
                         listener.onCompletion(SoundWavesPlayerBase.this);
                     }
                 });
@@ -523,9 +522,9 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
                 break;
             }
             case SOUNDWAVES: {
-                mCustomMediaPlayer.setOnBufferingUpdateListener(new MediaPlayer.OnBufferingUpdateListener() {
+                mCustomMediaPlayer.setOnBufferingUpdateListener(new NDKMediaPlayer.OnBufferingUpdateListener() {
                     @Override
-                    public void onBufferingUpdate(MediaPlayer arg0, int percent) {
+                    public void onBufferingUpdate(NDKMediaPlayer arg0, int percent) {
                         listener.onBufferingUpdate(SoundWavesPlayerBase.this, percent);
                     }
                 });

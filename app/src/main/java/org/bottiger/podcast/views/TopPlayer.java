@@ -36,8 +36,6 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.facebook.drawee.view.SimpleDraweeView;
-
 import org.bottiger.podcast.Player.SoundWavesPlayer;
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
