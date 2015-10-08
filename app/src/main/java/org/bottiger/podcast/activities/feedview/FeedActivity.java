@@ -12,8 +12,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -27,7 +25,6 @@ import android.widget.FrameLayout;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
-import com.facebook.imagepipeline.request.BasePostprocessor;
 
 import org.bottiger.podcast.DiscoveryFeedActivity;
 import org.bottiger.podcast.R;
@@ -35,7 +32,6 @@ import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.ToolbarActivity;
 import org.bottiger.podcast.TopActivity;
 import org.bottiger.podcast.adapters.FeedViewDiscoveryAdapter;
-import org.bottiger.podcast.images.FrescoHelper;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.playlist.FeedCursorLoader;
 import org.bottiger.podcast.playlist.ReorderCursor;
@@ -543,42 +539,5 @@ public class FeedActivity extends TopActivity implements PaletteListener {
                 mMultiShrinkScroller.setUseGradient(isWhite);
             }
         }.execute();
-    }
-
-    public static class analyzeWhitenessOfPhotoPostProcessor extends BasePostprocessor {
-
-        private Activity mActivity;
-        private MultiShrinkScroller mMultiShrinkScroller;
-
-        public analyzeWhitenessOfPhotoPostProcessor(@NonNull Activity argActivity,
-                                                    @NonNull MultiShrinkScroller argMultiShrinkScroller) {
-            mActivity = argActivity;
-            mMultiShrinkScroller = argMultiShrinkScroller;
-        }
-
-        @Override
-        public void process(Bitmap bitmap) {
-            // we can not copy the bitmap inside here
-            //analyzeWhitenessOfPhotoAsynchronously(bitmap);
-            final boolean isWhite = WhitenessUtils.isBitmapWhiteAtTopOrBottom(bitmap);
-
-            mActivity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mMultiShrinkScroller.setUseGradient(isWhite);
-                }
-            });
-
-            //String url = item.image;
-            //mLock.lock();
-
-
-            return;
-        }
-
-        @Override
-        public String getName() {
-            return "PalettePostProcessor";
-        }
     }
 }

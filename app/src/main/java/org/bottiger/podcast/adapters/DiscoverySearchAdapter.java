@@ -15,8 +15,6 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
-import com.facebook.drawee.backends.pipeline.Fresco;
-
 import org.bottiger.podcast.activities.feedview.FeedActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
@@ -26,6 +24,7 @@ import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionLoader;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
+import org.bottiger.podcast.utils.ImageLoaderUtils;
 import org.bottiger.podcast.utils.SharedAdapterUtils;
 
 import java.net.URL;
@@ -95,12 +94,19 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
         holder.title.setText(subscription.getTitle());
 
         try {
+            ImageLoaderUtils.loadImageInto(holder.image, subscription.getImageURL(), true, true);
+        } catch (NullPointerException npe) {
+            holder.image.setBackgroundColor(mDefaultBackgroundColor);
+        }
+        /*
+        try {
             Uri  uri = Uri.parse(subscription.getImageURL());
             holder.image.setImageURI(uri);
             holder.imageUrl = uri;
         } catch (NullPointerException npe) {
             holder.image.setBackgroundColor(mDefaultBackgroundColor);
         }
+        */
 
         SharedAdapterUtils.AddPaddingToLastElement(holder.container, 0, position == mDataset.size()-1);
 
@@ -144,7 +150,6 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
 
     private synchronized void clearCache(SearchResultViewHolder holder) {
         if (holder.imageUrl != null) {
-            Fresco.getImagePipeline().evictFromMemoryCache(holder.imageUrl);
             holder.imageUrl = null;
         }
     }

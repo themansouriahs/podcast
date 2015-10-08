@@ -34,7 +34,7 @@
             android:id="@+id/download_remove"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="?attr/ic_remove_inv"
+            android:src="?attr/ic_close_inv"
             android:layout_alignTop="@id/download_episode_image"
             android:layout_alignBottom="@id/download_episode_image"
             android:layout_alignParentRight="true"

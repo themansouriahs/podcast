@@ -2,7 +2,6 @@ package org.bottiger.podcast.notification;
 
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
-import org.bottiger.podcast.images.FrescoHelper;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.receiver.NotificationReceiver;
 import org.bottiger.podcast.service.PlayerService;
@@ -20,7 +19,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v7.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
-import android.support.v4.media.MediaMetadataCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -29,7 +27,6 @@ import android.widget.RemoteViews;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
-import com.facebook.datasource.DataSource;
 
 public class NotificationPlayer {
 

@@ -13,9 +13,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.facebook.datasource.DataSource;
-
-import org.bottiger.podcast.images.FrescoHelper;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.service.PlayerService;
@@ -87,47 +84,6 @@ public class LegacyRemoteController {
         if (remoteControlClient != null)
         {
             remoteControlClient.setPlaybackState(RemoteControlClient.PLAYSTATE_STOPPED);
-        }
-    }
-
-    public void updateMetaData(boolean argIsPlaying)
-    {
-        final IEpisode episode = mContext.getCurrentItem();
-
-        if (remoteControlClient != null && episode != null)
-        {
-            Log.d("RemoteController", "Updating remote control");
-            updatePlayingState(argIsPlaying);
-
-            RemoteControlClient.MetadataEditor editor = remoteControlClient.editMetadata(true);
-            updateSimpleMetaData(editor, episode, null);
-
-            FrescoHelper.fetchBitmap(new FrescoHelper.IBitmapFetchJob() {
-                @NonNull
-                @Override
-                public Context getContext() {
-                    return mContext;
-                }
-
-                @NonNull
-                @Override
-                public String getUrl() {
-                    return episode.getArtwork(mContext);
-                }
-
-                @Override
-                public void onSucces(@Nullable Bitmap argBitmap) {
-                    Log.d(TAG, "Updating remote control (with background)");
-                    RemoteControlClient.MetadataEditor editor = remoteControlClient.editMetadata(true);
-                    //editor.putBitmap(android.media.RemoteController.MetadataEditor.BITMAP_KEY_ARTWORK, argBitmap);
-                    updateSimpleMetaData(editor, episode, argBitmap);
-                }
-
-                @Override
-                public void onFail(@Nullable DataSource argDataSource) {
-                    Log.d(TAG, "BACKGROUND failed to load");
-                }
-            });
         }
     }
 
