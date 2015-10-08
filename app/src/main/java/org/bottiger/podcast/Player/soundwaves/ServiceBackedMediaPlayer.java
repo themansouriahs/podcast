@@ -35,6 +35,7 @@ import android.os.PowerManager.WakeLock;
 import android.util.Log;
 
 import org.bottiger.podcast.BuildConfig;
+import org.bottiger.podcast.Player.prestissimo.SoundService;
 import org.bottiger.podcast.Player.soundwaves.NDKMediaPlayer.State;
 import com.aocate.presto.service.IDeathCallback_0_8;
 import com.aocate.presto.service.IOnBufferingUpdateListenerCallback_0_8;
@@ -142,7 +143,8 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 	private boolean ConnectPlayMediaService() {
 		Log.d(SBMP_TAG, "ConnectPlayMediaService()");
 
-		if (NDKMediaPlayer.isIntentAvailable(mContext, INTENT_NAME)) {
+		// FIXME
+		//if (NDKMediaPlayer.isIntentAvailable(mContext, INTENT_NAME)) {
 			Log.d(SBMP_TAG, INTENT_NAME + " is available");
 			if (pmInterface == null) {
 				try {
@@ -156,11 +158,13 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 				Log.d(SBMP_TAG, "Service already bound");
 				return true;
 			}
+		/*
 		}
 		else {
 			Log.d(SBMP_TAG, INTENT_NAME + " is not available");
 			return false;
 		}
+		*/
 	}
 
 	/**

@@ -30,6 +30,8 @@ import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.RemoteException;
 import android.util.Log;
 
@@ -213,15 +215,21 @@ public class Track {
                             mCurrentState = STATE_PREPARED;
                             Log.d(TAG_TRACK, "State changed to STATE_PREPARED");
                         }
-                        try {
-                            preparedCallback.onPrepared();
-
-                        } catch (RemoteException e) {
-                            // Binder should handle our death
-                            Log.e(TAG_TRACK,
-                                    "RemoteException trying to call onPrepared after prepareAsync",
-                                    e);
-                        }
+                         final IOnPreparedListenerCallback_0_8 preparedListenerCallback08 = preparedCallback;
+                            Handler handler = new Handler(Looper.getMainLooper());
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        preparedListenerCallback08.onPrepared();
+                                    } catch (RemoteException e) {
+                                    // Binder should handle our death
+                                    Log.e(TAG_TRACK,
+                                            "RemoteException trying to call onPrepared after prepareAsync",
+                                            e);
+                                    }
+                                }
+                            });
 
                     }
                 });

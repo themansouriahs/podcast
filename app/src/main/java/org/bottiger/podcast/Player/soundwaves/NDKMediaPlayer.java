@@ -29,6 +29,7 @@ import android.os.Message;
 import android.util.Log;
 
 import org.bottiger.podcast.BuildConfig;
+import org.bottiger.podcast.Player.prestissimo.SoundService;
 
 import java.io.IOException;
 import java.util.List;
@@ -124,6 +125,11 @@ public class NDKMediaPlayer {
         final Intent actionIntent = new Intent(action);
         List<ResolveInfo> list = packageManager.queryIntentServices(actionIntent,
                 PackageManager.MATCH_DEFAULT_ONLY);
+
+        Intent intent = new Intent(context, SoundService.class);
+        Log.i(TAG, "Returning intent:" + intent.toString());
+        return intent;
+        /*
         if (list.size() > 0) {
             ResolveInfo first = list.get(0);
             if (first.serviceInfo != null) {
@@ -138,7 +144,7 @@ public class NDKMediaPlayer {
             }
         } else {
             return null;
-        }
+        }*/
     }
 
     /**

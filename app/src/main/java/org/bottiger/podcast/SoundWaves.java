@@ -10,9 +10,11 @@ import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.aocate.presto.service.IPlayMedia_0_8;
 import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
 
+import org.bottiger.podcast.Player.prestissimo.SoundService;
 import org.bottiger.podcast.flavors.Analytics.AnalyticsFactory;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.CrashReporterFactory;
@@ -60,12 +62,14 @@ public class SoundWaves extends Application {
     @Deprecated
     public static PlayerService sBoundPlayerService = null;
 
+    public IPlayMedia_0_8 soundService;
+
     public ServiceConnection playerServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
             Log.d("PlayerService", "onServiceConnected");
             sBoundPlayerService = ((PlayerService.PlayerBinder) service)
-                    .getService();
+                        .getService();
             PlayerServiceBound playerServiceBound = new PlayerServiceBound();
             playerServiceBound.isConnected = true;
             sBus.post(playerServiceBound);
@@ -75,6 +79,20 @@ public class SoundWaves extends Application {
         public void onServiceDisconnected(ComponentName className) {
             Log.d("PlayerService", "onServiceDisconnected");
             sBoundPlayerService = null;
+        }
+    };
+
+    public ServiceConnection soundEngineServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            Log.d("SoundEngine", "onServiceConnected");
+            soundService = IPlayMedia_0_8.Stub.asInterface(service);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName className) {
+            Log.d("SoundEngine", "onServiceDisconnected");
+            soundService = null;
         }
     };
 
@@ -111,7 +129,13 @@ public class SoundWaves extends Application {
         startService(serviceIntent);
         Intent bindIntent = new Intent(this, PlayerService.class);
         bindService(bindIntent, playerServiceConnection, Context.BIND_AUTO_CREATE);
-        Log.i("SoundWaves", "Connected");
+
+        /*
+        Intent soundServiceIntent = new Intent(this, SoundService.class);
+        startService(soundServiceIntent);
+        Intent soundBindIntent = new Intent(this, SoundService.class);
+        bindService(soundBindIntent, soundEngineServiceConnection, Context.BIND_AUTO_CREATE);
+        */
     }
 
     private void firstRun(@NonNull Context argContext) {

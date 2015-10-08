@@ -186,6 +186,10 @@
             android:permission="android.permission.MEDIA_CONTENT_CONTROL">
         </service>
         <service
+            android:name="org.bottiger.podcast.Player.prestissimo.SoundService"
+            android:enabled="true">
+        </service>
+        <service
             android:name="org.bottiger.podcast.service.HTTPDService"
             android:enabled="true" >
         </service>

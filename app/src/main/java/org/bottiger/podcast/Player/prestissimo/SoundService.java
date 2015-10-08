@@ -18,6 +18,7 @@ import android.annotation.TargetApi;
 import android.app.Service;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Binder;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
@@ -46,7 +47,7 @@ public class SoundService extends Service {
     public void onCreate() {
         super.onCreate();
         Log.d(TAG_SERVICE, "Service created");
-        mTracks = new SparseArray<Track>();
+        mTracks = new SparseArray<>();
     }
 
     @Override
@@ -498,4 +499,10 @@ public class SoundService extends Service {
         }
 
     };
+
+    public class SoundBinder extends Binder {
+        public SoundService getService() {
+            return SoundService.this;
+        }
+    }
 }
