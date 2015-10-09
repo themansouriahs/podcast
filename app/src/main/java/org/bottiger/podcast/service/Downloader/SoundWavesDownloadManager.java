@@ -12,7 +12,6 @@ import java.util.Observable;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.commons.io.FileUtils;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.TopActivity;
@@ -28,6 +27,7 @@ import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.DownloadStatus;
 import org.bottiger.podcast.service.Downloader.engines.IDownloadEngine;
 import org.bottiger.podcast.service.Downloader.engines.OkHttpDownloader;
+import org.bottiger.podcast.utils.FileUtils;
 import org.bottiger.podcast.utils.SDCardManager;
 
 import android.Manifest;
@@ -304,12 +304,7 @@ public class SoundWavesDownloadManager extends Observable {
         Log.d(TAG, "Cleaning tmp folder: " + tmpFolder); // NoI18N
         File dir = new File(tmpFolder);
         if(dir.exists() && dir.isDirectory()) {
-            try {
-                FileUtils.cleanDirectory(dir);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return false;
-            }
+            return FileUtils.cleanDirectory(dir);
         }
 
         return  true;

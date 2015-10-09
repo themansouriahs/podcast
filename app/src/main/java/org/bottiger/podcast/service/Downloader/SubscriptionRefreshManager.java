@@ -19,8 +19,6 @@ import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.parser.FeedParser;
 import org.bottiger.podcast.parser.FeedUpdater;
-import org.bottiger.podcast.parser.syndication.handler.FeedHandler;
-import org.bottiger.podcast.parser.syndication.handler.UnsupportedFeedtypeException;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
@@ -29,17 +27,13 @@ import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionLoader;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
 import org.bottiger.podcast.service.PlayerService;
-import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * Created by apl on 26-03-2015.
@@ -49,7 +43,6 @@ public class SubscriptionRefreshManager {
     private static final String ACRA_KEY = "SubscriptionRefreshManager";
     public static final String TAG = "SubscriptionRefresh";
 
-    private static FeedHandler mFeedHandler = new FeedHandler();
     final OkHttpClient mOkClient = new OkHttpClient();
     final Handler mainHandler;
     final FeedParser mFeedParser = new FeedParser();
@@ -213,43 +206,6 @@ public class SubscriptionRefreshManager {
 
         Log.d(TAG, "addAllSubscriptionsToQueue added: " + subscriptionsAdded);
         return subscriptionsAdded;
-    }
-
-    private static ISubscription processResponse(Context argContext, @NonNull ISubscription subscription, InputStream argResponse) {
-        Log.v(TAG, "Http response from: " + subscription);
-
-        ISubscription parsedSubscription = null;
-
-        try {
-            Log.d(TAG, "Parsing: " + subscription);
-            parsedSubscription = mFeedHandler.parseFeed(argContext.getContentResolver(), subscription, argResponse); // Byte Order Mark
-            /*
-            parsedSubscription = mFeedHandler.parseFeed(argContext.getContentResolver(), subscription,
-                    argResponse.replace("ï»¿", "")); // Byte Order Mark
-             */
-        } catch (SAXException e) {
-            Log.d(TAG, "Parsing EXCEPTION: " + subscription);
-            VendorCrashReporter.handleException(e);
-            VendorCrashReporter.report("subscription1", subscription.getURL().toString());
-            e.printStackTrace();
-        } catch (IOException e) {
-            Log.d(TAG, "Parsing EXCEPTION: " + subscription);
-            VendorCrashReporter.handleException(e);
-            VendorCrashReporter.report("subscription2", subscription.getURL().toString());
-            e.printStackTrace();
-        } catch (ParserConfigurationException e) {
-            Log.d(TAG, "Parsing EXCEPTION: " + subscription);
-            VendorCrashReporter.handleException(e);
-            VendorCrashReporter.report("subscription3", subscription.getURL().toString());
-            e.printStackTrace();
-        } catch (UnsupportedFeedtypeException e) {
-            Log.d(TAG, "Parsing EXCEPTION: " + subscription);
-            VendorCrashReporter.handleException(e);
-            VendorCrashReporter.report("subscription4", subscription.getURL().toString());
-            e.printStackTrace();
-        }
-
-        return parsedSubscription;
     }
 
     private void downloadNewEpisodeskCallback(final @NonNull Context argContext, @NonNull ISubscription argSubscription) {

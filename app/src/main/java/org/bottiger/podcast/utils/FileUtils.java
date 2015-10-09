@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
 public class FileUtils {
+
 	public static boolean copy_file(String src, String dst)
 	{
         FileInputStream fileInputStream = null;
@@ -52,5 +53,26 @@ public class FileUtils {
 
 		return title+"_"+id+".mp3";
 	}
+
+    public static boolean cleanDirectory(File argDir) {
+        if(argDir == null){
+            return false;
+        }
+
+        if (!argDir.isDirectory()) {
+            return false;
+        }
+
+        File[] flist = argDir.listFiles();
+        if (flist != null && flist.length > 0) {
+            for (File f : flist) {
+                if (!cleanDirectory(f)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
 
 }
