@@ -21,6 +21,10 @@
     <integer name="feed_activity_description_lines_default">3</integer>
     <!-- Feed View - End -->
 
+    <!-- SoundWaves Player - Start -->
+    <integer name="soundwaves_player_speed_default">10</integer>
+    <!-- SoundWaves Player - End -->
+
     <dimen name="playlist_margin">1px</dimen>
     <dimen name="playlist_image_size_small">70dp</dimen>
     <dimen name="playlist_image_radius_small">7dp</dimen>

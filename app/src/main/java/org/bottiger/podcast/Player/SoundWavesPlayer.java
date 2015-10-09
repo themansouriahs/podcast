@@ -1,4 +1,4 @@
-package org.bottiger.podcast.Player;
+package org.bottiger.podcast.player;
 
 import android.content.ComponentName;
 import android.content.ContentResolver;
@@ -19,8 +19,6 @@ import org.bottiger.podcast.flavors.MediaCast.IMediaCast;
 import org.bottiger.podcast.flavors.MediaCast.IMediaRouteStateListener;
 import org.bottiger.podcast.listeners.PlayerStatusData;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
-import org.bottiger.podcast.player.GenericMediaPlayerInterface;
-import org.bottiger.podcast.player.PlayerHandler;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.receiver.HeadsetReceiver;

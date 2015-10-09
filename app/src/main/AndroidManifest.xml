@@ -189,6 +189,10 @@
             android:name="org.bottiger.podcast.service.DownloadService"
             android:enabled="true" >
         </service>
+        <service
+            android:name=".player.sonic.SoundService"
+            android:enabled="true">
+        </service>
 
         <service
             android:name="org.bottiger.podcast.service.syncadapter.AuthenticatorService">

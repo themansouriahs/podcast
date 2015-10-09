@@ -34,6 +34,7 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.player.SoundWavesPlayer;
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
@@ -41,10 +42,17 @@ import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorUtils;
 import org.bottiger.podcast.utils.UIUtils;
+import org.bottiger.podcast.utils.rxbus.RxBus;
+import org.bottiger.podcast.utils.rxbus.RxBusSimpleEvents;
 import org.bottiger.podcast.views.dialogs.DialogPlaybackSpeed;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 
 import static org.bottiger.podcast.views.PlayerButtonView.StaticButtonColor;
 
@@ -138,6 +146,8 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
     private GestureDetectorCompat mGestureDetector;
     private TopPLayerScrollGestureListener mTopPLayerScrollGestureListener;
 
+    private CompositeSubscription mRxSubscriptions;
+
     private @ColorInt int mBackgroundColor = -1;
 
     private SharedPreferences prefs;
@@ -205,10 +215,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         sizeMedium = argContext.getResources().getDimensionPixelSize(R.dimen.top_player_size_medium);
         sizeLarge = screenHeight- argContext.getResources().getDimensionPixelSize(R.dimen.top_player_size_maximum_bottom);
 
-        screenHeight = sizeLarge;
-
         sizeStartShrink = sizeSmall+sizeShrinkBuffer;
-        //sizeLarge = 1080; // 1080
 
         mSeekbarDeadzonePx        = (int)UIUtils.convertDpToPixel(mSeekbarDeadzone, argContext);
         mSeekbarFadeDistancePx    = (int)UIUtils.convertDpToPixel(mSeekbarFadeDistance, argContext);
@@ -253,8 +260,6 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
 
         mCenterSquareMarginTop = (int)getResources().getDimension(R.dimen.top_player_center_square_margin_top);
         mCenterSquareMargin = getResources().getDimension(R.dimen.top_player_center_square_margin);
-
-        //setNormalImageSize(0);
 
         mLargeLayout.SeekBarLeftMargin = 0;
         mLargeLayout.PlayPauseSize = mPlayPauseLargeSize;
@@ -331,6 +336,45 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         });
     }
 
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        RxBus bus = SoundWaves.getRxBus();
+
+        bus.toObserverable()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<Object>() {
+                    @Override
+                    public void call(Object event) {
+                        if (event instanceof RxBusSimpleEvents.PlaybackSpeedChanged) {
+                            RxBusSimpleEvents.PlaybackSpeedChanged playbackSpeedChanged = (RxBusSimpleEvents.PlaybackSpeedChanged) event;
+                            mSpeedpButton.setText(playbackSpeedChanged.speed + "X");
+                        }
+                    }
+                });
+/*
+        mRxSubscriptions = new CompositeSubscription();
+        mRxSubscriptions//
+                .add(bus.toObserverable()//
+                        .subscribe(new Action1<Object>() {
+                            @Override
+                            public void call(Object event) {
+                                if (event instanceof RxBusSimpleEvents.PlaybackSpeedChanged) {
+                                    RxBusSimpleEvents.PlaybackSpeedChanged playbackSpeedChanged = (RxBusSimpleEvents.PlaybackSpeedChanged) event;
+                                    mSpeedpButton.setText(playbackSpeedChanged.speed + "X");
+                                }
+                            }
+                        }));
+                        */
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        mRxSubscriptions.unsubscribe();
+    }
+
     private void sleepButtonPressed() {
         try {
             PlayerService ps = PlayerService.getInstance();
@@ -350,6 +394,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
     }
 
     private boolean minimalEnsured = false;
+
     public void ensureMinimalLayout() {
         if (minimalEnsured)
             return;

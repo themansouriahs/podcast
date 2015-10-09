@@ -61,7 +61,6 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 	
 	private static final String SBMP_TAG = "ServiceBackedMP";
 
-	private ServiceConnection mPlayMediaServiceConnection = null;
 	protected ISoundWavesEngine pmInterface = null;
 	private Intent playMediaServiceIntent = null;
 	// In some cases, we're going to have to replace the
@@ -74,6 +73,8 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 
 	private WakeLock mWakeLock = null;
 
+	private ServiceConnection mPlayMediaServiceConnection = null;
+
 	// So here's the major problem
 	// Sometimes the service won't exist or won't be connected,
 	// so start with an android.media.NDKMediaPlayer, and when
@@ -81,54 +82,17 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 	public ServiceBackedMediaPlayer(NDKMediaPlayer owningMediaPlayer, final Context context, final ServiceConnection serviceConnection) {
 		super(owningMediaPlayer, context);
 		Log.d(SBMP_TAG, "Instantiating ServiceBackedMediaPlayer 87");
-		this.playMediaServiceIntent = 
-			NDKMediaPlayer.getPrestoServiceIntent(context, INTENT_NAME);
+
+		this.playMediaServiceIntent =
+			NDKMediaPlayer.getNDKServiceIntent(context);
+
 		this.mPlayMediaServiceConnection = new ServiceConnection() {
 			public void onServiceConnected(ComponentName name, IBinder service) {
-				ISoundWavesEngine tmpPlayMediaInterface = ISoundWavesEngine.Stub.asInterface((IBinder) service);
-				
-				Log.d(SBMP_TAG, "Setting up pmInterface 94");
-				if (ServiceBackedMediaPlayer.this.sessionId == 0) {
-					try {
-						// The IDeathCallback isn't a conventional callback.
-						// It exists so that if the client ceases to exist,
-						// the Service becomes aware of that and can shut
-						// down whatever it needs to shut down
-						ServiceBackedMediaPlayer.this.sessionId = tmpPlayMediaInterface.startSession(new IDeathCallback.Stub() {
-						});
-						// This is really bad if this fails
-					} catch (RemoteException e) {
-						e.printStackTrace();
-						ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
-					}
-				}
-
-				Log.d(SBMP_TAG, "Assigning pmInterface");
-				
-				ServiceBackedMediaPlayer.this.setOnBufferingUpdateCallback(tmpPlayMediaInterface);
-				ServiceBackedMediaPlayer.this.setOnCompletionCallback(tmpPlayMediaInterface);
-				ServiceBackedMediaPlayer.this.setOnErrorCallback(tmpPlayMediaInterface);
-				ServiceBackedMediaPlayer.this.setOnInfoCallback(tmpPlayMediaInterface);
-				ServiceBackedMediaPlayer.this.setOnPitchAdjustmentAvailableChangedListener(tmpPlayMediaInterface);
-				ServiceBackedMediaPlayer.this.setOnPreparedCallback(tmpPlayMediaInterface);
-				ServiceBackedMediaPlayer.this.setOnSeekCompleteCallback(tmpPlayMediaInterface);
-				ServiceBackedMediaPlayer.this.setOnSpeedAdjustmentAvailableChangedCallback(tmpPlayMediaInterface);
-				
-				// In order to avoid race conditions from the sessionId or listener not being assigned
-				pmInterface = tmpPlayMediaInterface;
-				
-				Log.d(SBMP_TAG, "Invoking onServiceConnected");
-				serviceConnection.onServiceConnected(name, service);
+				onMediaServiceConnected(name, service, serviceConnection);
 			}
-			
+
 			public void onServiceDisconnected(ComponentName name) {
-				Log.d(SBMP_TAG, "onServiceDisconnected 114");
-				
-				pmInterface = null;
-				
-				sessionId = 0;
-				
-				serviceConnection.onServiceDisconnected(name);
+				onMediaServiceDisconnected(name, serviceConnection);
 			}
 		};
 		
@@ -1190,5 +1154,52 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 			ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 		}
         stayAwake(false);
+	}
+
+	private void onMediaServiceConnected(ComponentName name, IBinder service, ServiceConnection serviceConnection) {
+		ISoundWavesEngine tmpPlayMediaInterface = ISoundWavesEngine.Stub.asInterface((IBinder) service);
+
+		Log.d(SBMP_TAG, "Setting up pmInterface 94");
+		if (ServiceBackedMediaPlayer.this.sessionId == 0) {
+			try {
+				// The IDeathCallback isn't a conventional callback.
+				// It exists so that if the client ceases to exist,
+				// the Service becomes aware of that and can shut
+				// down whatever it needs to shut down
+				ServiceBackedMediaPlayer.this.sessionId = tmpPlayMediaInterface.startSession(new IDeathCallback.Stub() {
+				});
+				// This is really bad if this fails
+			} catch (RemoteException e) {
+				e.printStackTrace();
+				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+			}
+		}
+
+		Log.d(SBMP_TAG, "Assigning pmInterface");
+
+		ServiceBackedMediaPlayer.this.setOnBufferingUpdateCallback(tmpPlayMediaInterface);
+		ServiceBackedMediaPlayer.this.setOnCompletionCallback(tmpPlayMediaInterface);
+		ServiceBackedMediaPlayer.this.setOnErrorCallback(tmpPlayMediaInterface);
+		ServiceBackedMediaPlayer.this.setOnInfoCallback(tmpPlayMediaInterface);
+		ServiceBackedMediaPlayer.this.setOnPitchAdjustmentAvailableChangedListener(tmpPlayMediaInterface);
+		ServiceBackedMediaPlayer.this.setOnPreparedCallback(tmpPlayMediaInterface);
+		ServiceBackedMediaPlayer.this.setOnSeekCompleteCallback(tmpPlayMediaInterface);
+		ServiceBackedMediaPlayer.this.setOnSpeedAdjustmentAvailableChangedCallback(tmpPlayMediaInterface);
+
+		// In order to avoid race conditions from the sessionId or listener not being assigned
+		pmInterface = tmpPlayMediaInterface;
+
+		Log.d(SBMP_TAG, "Invoking onServiceConnected");
+		serviceConnection.onServiceConnected(name, service);
+	}
+
+	private void onMediaServiceDisconnected(ComponentName name, ServiceConnection serviceConnection) {
+		Log.d(SBMP_TAG, "onServiceDisconnected 114");
+
+		pmInterface = null;
+
+		sessionId = 0;
+
+		serviceConnection.onServiceDisconnected(name);
 	}
 }

@@ -18,6 +18,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.media.AudioManager;
@@ -29,7 +30,12 @@ import android.os.Message;
 import android.util.Log;
 
 import org.bottiger.podcast.BuildConfig;
+import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.player.sonic.SoundService;
+import org.bottiger.podcast.utils.PreferenceHelper;
+import org.bottiger.podcast.utils.rxbus.RxBus;
+import org.bottiger.podcast.utils.rxbus.RxBusSimpleEvents;
 
 import java.io.IOException;
 import java.util.List;
@@ -37,185 +43,30 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class NDKMediaPlayer {
     public static final String TAG = "SoundWavesMediaPlayer";
-
-    public interface OnBufferingUpdateListener {
-        void onBufferingUpdate(NDKMediaPlayer arg0, int percent);
-    }
-
-    public interface OnCompletionListener {
-        void onCompletion(NDKMediaPlayer arg0);
-    }
-
-    public interface OnErrorListener {
-        boolean onError(NDKMediaPlayer arg0, int what, int extra);
-    }
-
-    public interface OnInfoListener {
-        boolean onInfo(NDKMediaPlayer arg0, int what, int extra);
-    }
-
-    public interface OnPitchAdjustmentAvailableChangedListener {
-        /**
-         * @param arg0                     The owning media player
-         * @param pitchAdjustmentAvailable True if pitch adjustment is available, false if not
-         */
-        void onPitchAdjustmentAvailableChanged(
-                NDKMediaPlayer arg0, boolean pitchAdjustmentAvailable);
-    }
-
-    public interface OnPreparedListener {
-        void onPrepared(NDKMediaPlayer arg0);
-    }
-
-    public interface OnSeekCompleteListener {
-        void onSeekComplete(NDKMediaPlayer arg0);
-    }
-
-    public interface OnSpeedAdjustmentAvailableChangedListener {
-        /**
-         * @param arg0                     The owning media player
-         * @param speedAdjustmentAvailable True if speed adjustment is available, false if not
-         */
-        void onSpeedAdjustmentAvailableChanged(
-                NDKMediaPlayer arg0, boolean speedAdjustmentAvailable);
-    }
-
-    public enum State {
-        IDLE, INITIALIZED, PREPARED, STARTED, PAUSED, STOPPED, PREPARING, PLAYBACK_COMPLETED, END, ERROR
-    }
-
-    private static Uri SPEED_ADJUSTMENT_MARKET_URI = Uri
-            .parse("market://details?id=com.aocate.presto");
-
-    private static Intent prestoMarketIntent = null;
-
     public static final int MEDIA_ERROR_SERVER_DIED = android.media.MediaPlayer.MEDIA_ERROR_SERVER_DIED;
     public static final int MEDIA_ERROR_UNKNOWN = android.media.MediaPlayer.MEDIA_ERROR_UNKNOWN;
     public static final int MEDIA_ERROR_NOT_VALID_FOR_PROGRESSIVE_PLAYBACK = android.media.MediaPlayer.MEDIA_ERROR_NOT_VALID_FOR_PROGRESSIVE_PLAYBACK;
-
-    /**
-     * Indicates whether the specified action can be used as an intent. This
-     * method queries the package manager for installed packages that can
-     * respond to an intent with the specified action. If no suitable package is
-     * found, this method returns false.
-     *
-     * @param context The application's environment.
-     * @param action  The Intent action to check for availability.
-     * @return True if an Intent with the specified action can be sent and
-     * responded to, false otherwise.
-     */
-    public static boolean isIntentAvailable(Context context, String action) {
-        final PackageManager packageManager = context.getPackageManager();
-        final Intent intent = new Intent(action);
-        List<ResolveInfo> list = packageManager.queryIntentServices(intent,
-                PackageManager.MATCH_DEFAULT_ONLY);
-        return list.size() > 0;
-    }
-
-    /**
-     * Returns an explicit Intent for a service that accepts the given Intent
-     * or null if no such service was found.
-     *
-     * @param context The application's environment.
-     * @param action  The Intent action to check for availability.
-     * @return The explicit service Intent or null if no service was found.
-     */
-    public static Intent getPrestoServiceIntent(Context context, String action) {
-        final PackageManager packageManager = context.getPackageManager();
-        final Intent actionIntent = new Intent(action);
-        List<ResolveInfo> list = packageManager.queryIntentServices(actionIntent,
-                PackageManager.MATCH_DEFAULT_ONLY);
-
-        Intent intent = new Intent(context, SoundService.class);
-        Log.i(TAG, "Returning intent:" + intent.toString());
-        return intent;
-        /*
-        if (list.size() > 0) {
-            ResolveInfo first = list.get(0);
-            if (first.serviceInfo != null) {
-                Intent intent = new Intent();
-                intent.setComponent(new ComponentName(first.serviceInfo.packageName,
-                        first.serviceInfo.name));
-                Log.i(TAG, "Returning intent:" + intent.toString());
-                return intent;
-            } else {
-                Log.e(TAG, "Found service that accepts " + action + ", but serviceInfo was null");
-                return null;
-            }
-        } else {
-            return null;
-        }*/
-    }
-
-    /**
-     * Indicates whether the Presto library is installed
-     *
-     * @param context The context to use to query the package manager.
-     * @return True if the Presto library is installed, false if not.
-     */
-    public static boolean isPrestoLibraryInstalled(Context context) {
-        return isIntentAvailable(context, ServiceBackedMediaPlayer.INTENT_NAME);
-    }
-
-    /**
-     * Return an Intent that opens the Android Market page for the speed
-     * alteration library
-     *
-     * @return The Intent for the Presto library on the Android Market
-     */
-    public static Intent getPrestoMarketIntent() {
-        if (prestoMarketIntent == null) {
-            prestoMarketIntent = new Intent(Intent.ACTION_VIEW,
-                    SPEED_ADJUSTMENT_MARKET_URI);
-        }
-        return prestoMarketIntent;
-    }
-
-    /**
-     * Open the Android Market page for the Presto library
-     *
-     * @param context The context from which to open the Android Market page
-     */
-    public static void openPrestoMarketIntent(Context context) {
-        context.startActivity(getPrestoMarketIntent());
-    }
-
     private static final String MP_TAG = "ReplacementMediaPlayer";
-
     private static final double PITCH_STEP_CONSTANT = 1.0594630943593;
-
-    private AndroidMediaPlayer amp = null;
+    private static Uri SPEED_ADJUSTMENT_MARKET_URI = Uri
+            .parse("market://details?id=com.aocate.presto");
+    private static Intent prestoMarketIntent = null;
     // This is whether speed adjustment should be enabled (by the Service)
     // To avoid the Service entirely, set useService to false
     protected boolean enableSpeedAdjustment = true;
-    private int lastKnownPosition = 0;
+    protected boolean pitchAdjustmentAvailable = false;
+    protected boolean speedAdjustmentAvailable = false;
     // In some cases, we're going to have to replace the
     // android.media.NDKMediaPlayer on the fly, and we don't want to touch the
     // wrong media player, so lock it way too much.
     ReentrantLock lock = new ReentrantLock();
-    private int mAudioStreamType = AudioManager.STREAM_MUSIC;
-    private Context mContext;
-    private boolean mIsLooping = false;
-    private float mLeftVolume = 1f;
-    private float mPitchStepsAdjustment = 0f;
-    private float mRightVolume = 1f;
-    private float mSpeedMultiplier = 1f;
-    private int mWakeMode = 0;
     MediaPlayerImpl mpi = null;
-    protected boolean pitchAdjustmentAvailable = false;
-    private ServiceBackedMediaPlayer sbmp = null;
-    protected boolean speedAdjustmentAvailable = false;
-
-    private Handler mServiceDisconnectedHandler = null;
-
     // Some parts of state cannot be found by calling MediaPlayerImpl functions,
     // so store our own state. This also helps copy state when changing
     // implementations
     State state = State.INITIALIZED;
     String stringDataSource = null;
     Uri uriDataSource = null;
-    private boolean useService = false;
-
     // Naming Convention for Listeners
     // Most listeners can both be set by clients and called by MediaPlayImpls
     // There are a few that have to do things in this class as well as calling
@@ -226,7 +77,7 @@ public class NDKMediaPlayer {
     OnCompletionListener onCompletionListener = null;
     OnErrorListener onErrorListener = null;
     OnInfoListener onInfoListener = null;
-
+    OnPitchAdjustmentAvailableChangedListener pitchAdjustmentAvailableChangedListener = null;
     // Special case. Pitch adjustment ceases to be available when we switch
     // to the android.media.NDKMediaPlayer (though it is not guaranteed to be
     // available when using the ServiceBackedMediaPlayer)
@@ -255,8 +106,7 @@ public class NDKMediaPlayer {
             }
         }
     };
-    OnPitchAdjustmentAvailableChangedListener pitchAdjustmentAvailableChangedListener = null;
-
+    OnPreparedListener preparedListener = null;
     NDKMediaPlayer.OnPreparedListener onPreparedListener = new NDKMediaPlayer.OnPreparedListener() {
         public void onPrepared(NDKMediaPlayer arg0) {
             Log.d(MP_TAG, "onPreparedListener 242 setting state to PREPARED");
@@ -268,10 +118,8 @@ public class NDKMediaPlayer {
             Log.d(MP_TAG, "Wrap up onPreparedListener");
         }
     };
-
-    OnPreparedListener preparedListener = null;
     OnSeekCompleteListener onSeekCompleteListener = null;
-
+    OnSpeedAdjustmentAvailableChangedListener speedAdjustmentAvailableChangedListener = null;
     // Special case. Speed adjustment ceases to be available when we switch
     // to the android.media.NDKMediaPlayer (though it is not guaranteed to be
     // available when using the ServiceBackedMediaPlayer)
@@ -300,12 +148,35 @@ public class NDKMediaPlayer {
             }
         }
     };
-    OnSpeedAdjustmentAvailableChangedListener speedAdjustmentAvailableChangedListener = null;
-
+    private AndroidMediaPlayer amp = null;
+    private int lastKnownPosition = 0;
+    private int mAudioStreamType = AudioManager.STREAM_MUSIC;
+    private Context mContext;
+    private boolean mIsLooping = false;
+    private float mLeftVolume = 1f;
+    private float mPitchStepsAdjustment = 0f;
+    private float mRightVolume = 1f;
+    private float mSpeedMultiplier = -1f;
+    private int mWakeMode = 0;
+    private ServiceBackedMediaPlayer sbmp = null;
+    private Handler mServiceDisconnectedHandler = null;
+    private boolean useService = false;
     private int speedAdjustmentAlgorithm = SpeedAdjustmentAlgorithm.SONIC;
+
+    private ServiceConnection mNDKPlayerServiceConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, final IBinder service) {
+            onNDKPlayerConnected(className, service);
+        }
+
+        public void onServiceDisconnected(
+                ComponentName className) {
+            onNDKPlayerDisconnected(className);
+        }
+    };
 
     public NDKMediaPlayer(final Context context) {
         this(context, true);
+        this.mContext = context;
     }
 
     public NDKMediaPlayer(final Context context, boolean useService) {
@@ -324,9 +195,69 @@ public class NDKMediaPlayer {
         setupMpi(context);
     }
 
+    /**
+     * Indicates whether the specified action can be used as an intent. This
+     * method queries the package manager for installed packages that can
+     * respond to an intent with the specified action. If no suitable package is
+     * found, this method returns false.
+     *
+     * @param context The application's environment.
+     * @param action  The Intent action to check for availability.
+     * @return True if an Intent with the specified action can be sent and
+     * responded to, false otherwise.
+     */
+    public static boolean isIntentAvailable(Context context, String action) {
+        final PackageManager packageManager = context.getPackageManager();
+        final Intent intent = new Intent(action);
+        List<ResolveInfo> list = packageManager.queryIntentServices(intent,
+                PackageManager.MATCH_DEFAULT_ONLY);
+        return list.size() > 0;
+    }
+
+    /**
+     * Returns an explicit Intent for a service that accepts the given Intent
+     * or null if no such service was found.
+     *
+     * @param context The application's environment.
+     * @param action  The Intent action to check for availability.
+     * @return The explicit service Intent or null if no service was found.
+     */
+    public static Intent getNDKServiceIntent(Context context) {
+        Intent intent = new Intent(context, SoundService.class);
+        Log.i(TAG, "Returning intent:" + intent.toString());
+        return intent;
+    }
+
+    /**
+     * Return an Intent that opens the Android Market page for the speed
+     * alteration library
+     *
+     * @return The Intent for the Presto library on the Android Market
+     */
+    public static Intent getPrestoMarketIntent() {
+        if (prestoMarketIntent == null) {
+            prestoMarketIntent = new Intent(Intent.ACTION_VIEW,
+                    SPEED_ADJUSTMENT_MARKET_URI);
+        }
+        return prestoMarketIntent;
+    }
+
+    /**
+     * Open the Android Market page for the Presto library
+     *
+     * @param context The context from which to open the Android Market page
+     */
+    public static void openPrestoMarketIntent(Context context) {
+        context.startActivity(getPrestoMarketIntent());
+    }
+
+    private static float getPitchStepsAdjustment(float pitch) {
+        return (float) (Math.log(pitch) / (2 * Math.log(PITCH_STEP_CONSTANT)));
+    }
+
     private boolean invalidServiceConnectionConfiguration() {
         if (!(this.mpi instanceof ServiceBackedMediaPlayer)) {
-            if (this.useService && isPrestoLibraryInstalled()) {
+            if (this.useService) {
                 // In this case, the Presto library has been installed
                 // or something while playing sound
                 // We could be using the service, but we're not
@@ -340,7 +271,7 @@ public class NDKMediaPlayer {
         } else {
             if (BuildConfig.DEBUG && !(this.mpi instanceof ServiceBackedMediaPlayer))
                 throw new AssertionError();
-            if (this.useService && isPrestoLibraryInstalled()) {
+            if (this.useService) {
                 // We should be using the service, and we are. Great!
                 Log.d(MP_TAG, "We could be using a ServiceBackedMediaPlayer and we are 327");
                 return false;
@@ -358,7 +289,7 @@ public class NDKMediaPlayer {
             Log.d(MP_TAG, "setupMpi 336");
             // Check if the client wants to use the service at all,
             // then if we're already using the right kind of media player
-            if (this.useService && isPrestoLibraryInstalled()) {
+            if (this.useService) {
                 if ((this.mpi != null)
                         && (this.mpi instanceof ServiceBackedMediaPlayer)) {
                     Log.d(MP_TAG, "Already using ServiceBackedMediaPlayer");
@@ -366,89 +297,7 @@ public class NDKMediaPlayer {
                 }
                 if (this.sbmp == null) {
                     Log.d(MP_TAG, "Instantiating new ServiceBackedMediaPlayer 346");
-                    this.sbmp = new ServiceBackedMediaPlayer(this, context,
-                            new ServiceConnection() {
-                                public void onServiceConnected(
-                                        ComponentName className,
-                                        final IBinder service) {
-                                    Thread t = new Thread(new Runnable() {
-                                        public void run() {
-                                            // This lock probably isn't granular
-                                            // enough
-                                            NDKMediaPlayer.this.lock.lock();
-                                            Log.d(MP_TAG,
-                                                    "onServiceConnected 257");
-                                            try {
-                                                NDKMediaPlayer.this
-                                                        .switchMediaPlayerImpl(
-                                                                NDKMediaPlayer.this.amp,
-                                                                NDKMediaPlayer.this.sbmp);
-                                                Log.d(MP_TAG, "End onServiceConnected 362");
-                                            } finally {
-                                                NDKMediaPlayer.this.lock.unlock();
-                                            }
-                                        }
-                                    });
-                                    t.start();
-                                }
-
-                                public void onServiceDisconnected(
-                                        ComponentName className) {
-                                    NDKMediaPlayer.this.lock.lock();
-                                    try {
-                                        // Can't get any more useful information
-                                        // out of sbmp
-                                        if (NDKMediaPlayer.this.sbmp != null) {
-                                            NDKMediaPlayer.this.sbmp.release();
-                                        }
-                                        // Unlike most other cases, sbmp gets set
-                                        // to null since there's nothing useful
-                                        // backing it now
-                                        NDKMediaPlayer.this.sbmp = null;
-
-                                        if (mServiceDisconnectedHandler == null) {
-                                            mServiceDisconnectedHandler = new Handler(new Callback() {
-                                                public boolean handleMessage(Message msg) {
-                                                    // switchMediaPlayerImpl won't try to
-                                                    // clone anything from null
-                                                    lock.lock();
-                                                    try {
-                                                        if (NDKMediaPlayer.this.amp == null) {
-                                                            // This should never be in this state
-                                                            NDKMediaPlayer.this.amp = new AndroidMediaPlayer(
-                                                                    NDKMediaPlayer.this,
-                                                                    NDKMediaPlayer.this.mContext);
-                                                        }
-                                                        // Use sbmp instead of null in case by some miracle it's
-                                                        // been restored in the meantime
-                                                        NDKMediaPlayer.this.switchMediaPlayerImpl(
-                                                                NDKMediaPlayer.this.sbmp,
-                                                                NDKMediaPlayer.this.amp);
-                                                        return true;
-                                                    } finally {
-                                                        lock.unlock();
-                                                    }
-                                                }
-                                            });
-                                        }
-
-                                        // This code needs to execute on the
-                                        // original thread to instantiate
-                                        // the new object in the right place
-                                        mServiceDisconnectedHandler
-                                                .sendMessage(
-                                                        mServiceDisconnectedHandler
-                                                                .obtainMessage());
-                                        // Note that we do NOT want to set
-                                        // useService. useService is about
-                                        // what the user wants, not what they
-                                        // get
-                                    } finally {
-                                        NDKMediaPlayer.this.lock.unlock();
-                                    }
-                                }
-                            }
-                    );
+                    this.sbmp = new ServiceBackedMediaPlayer(this, context, mNDKPlayerServiceConnection);
                 }
                 switchMediaPlayerImpl(this.amp, this.sbmp);
             } else {
@@ -502,8 +351,8 @@ public class NDKMediaPlayer {
             to.setSpeedAdjustmentAlgorithm(this.speedAdjustmentAlgorithm);
             to.setLooping(this.mIsLooping);
             to.setPitchStepsAdjustment(this.mPitchStepsAdjustment);
-            Log.d(MP_TAG, "Setting playback speed to " + this.mSpeedMultiplier);
-            to.setPlaybackSpeed(this.mSpeedMultiplier);
+            Log.d(MP_TAG, "Setting playback speed to " + getPlaybackSpeedMultiplier());
+            to.setPlaybackSpeed(getPlaybackSpeedMultiplier());
             to.setVolume(NDKMediaPlayer.this.mLeftVolume,
                     NDKMediaPlayer.this.mRightVolume);
             to.setWakeMode(this.mContext, this.mWakeMode);
@@ -802,6 +651,21 @@ public class NDKMediaPlayer {
     }
 
     /**
+     * Functions identically to android.media.NDKMediaPlayer.setLooping(boolean
+     * loop) Sets the track to loop infinitely if loop is true, play once if
+     * loop is false
+     */
+    public void setLooping(boolean loop) {
+        lock.lock();
+        try {
+            this.mIsLooping = loop;
+            this.mpi.setLooping(loop);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
      * Functions identically to android.media.NDKMediaPlayer.isPlaying()
      *
      * @return True if the track is playing
@@ -813,22 +677,6 @@ public class NDKMediaPlayer {
         } finally {
             lock.unlock();
         }
-    }
-
-    /**
-     * Returns true if this NDKMediaPlayer has access to the Presto
-     * library
-     *
-     * @return True if the Presto library is installed
-     */
-    public boolean isPrestoLibraryInstalled() {
-        if ((this.mpi == null) || (this.mpi.mContext == null)) {
-            return false;
-        }
-
-        return true;
-        // FIXME
-        //return isPrestoLibraryInstalled(this.mpi.mContext);
     }
 
     /**
@@ -1031,21 +879,6 @@ public class NDKMediaPlayer {
     }
 
     /**
-     * Functions identically to android.media.NDKMediaPlayer.setLooping(boolean
-     * loop) Sets the track to loop infinitely if loop is true, play once if
-     * loop is false
-     */
-    public void setLooping(boolean loop) {
-        lock.lock();
-        try {
-            this.mIsLooping = loop;
-            this.mpi.setLooping(loop);
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    /**
      * Sets the number of steps (in a musical scale) by which playback is
      * currently shifted. When greater than zero, pitch is shifted up. When less
      * than zero, pitch is shifted down.
@@ -1080,10 +913,6 @@ public class NDKMediaPlayer {
         }
     }
 
-    private static float getPitchStepsAdjustment(float pitch) {
-        return (float) (Math.log(pitch) / (2 * Math.log(PITCH_STEP_CONSTANT)));
-    }
-
     /**
      * Sets the percentage by which pitch is currently shifted. When greater
      * than zero, pitch is shifted up. When less than zero, pitch is shifted
@@ -1112,6 +941,7 @@ public class NDKMediaPlayer {
         try {
             this.mSpeedMultiplier = f;
             this.mpi.setPlaybackSpeed(f);
+            notifyAboutPlaybackSpeedChange(f);
         } finally {
             lock.unlock();
         }
@@ -1315,5 +1145,148 @@ public class NDKMediaPlayer {
         } finally {
             lock.unlock();
         }
+    }
+
+    private void onNDKPlayerConnected(ComponentName className,
+                                      final IBinder service) {
+        Thread t = new Thread(new Runnable() {
+            public void run() {
+                // This lock probably isn't granular
+                // enough
+                NDKMediaPlayer.this.lock.lock();
+                Log.d(MP_TAG,
+                        "onServiceConnected 257");
+                try {
+                    NDKMediaPlayer.this
+                            .switchMediaPlayerImpl(
+                                    NDKMediaPlayer.this.amp,
+                                    NDKMediaPlayer.this.sbmp);
+                    Log.d(MP_TAG, "End onServiceConnected 362");
+                } finally {
+                    NDKMediaPlayer.this.lock.unlock();
+                }
+            }
+        });
+        t.start();
+    }
+
+    private void onNDKPlayerDisconnected(ComponentName className) {
+        NDKMediaPlayer.this.lock.lock();
+        try {
+            Log.d(MP_TAG,
+                    "onServiceDisconnected");
+            // Can't get any more useful information
+            // out of sbmp
+            if (NDKMediaPlayer.this.sbmp != null) {
+                NDKMediaPlayer.this.sbmp.release();
+            }
+            // Unlike most other cases, sbmp gets set
+            // to null since there's nothing useful
+            // backing it now
+            NDKMediaPlayer.this.sbmp = null;
+
+            if (mServiceDisconnectedHandler == null) {
+                mServiceDisconnectedHandler = new Handler(new Callback() {
+                    public boolean handleMessage(Message msg) {
+                        // switchMediaPlayerImpl won't try to
+                        // clone anything from null
+                        lock.lock();
+                        try {
+                            if (NDKMediaPlayer.this.amp == null) {
+                                // This should never be in this state
+                                NDKMediaPlayer.this.amp = new AndroidMediaPlayer(
+                                        NDKMediaPlayer.this,
+                                        NDKMediaPlayer.this.mContext);
+                            }
+                            // Use sbmp instead of null in case by some miracle it's
+                            // been restored in the meantime
+                            NDKMediaPlayer.this.switchMediaPlayerImpl(
+                                    NDKMediaPlayer.this.sbmp,
+                                    NDKMediaPlayer.this.amp);
+                            return true;
+                        } finally {
+                            lock.unlock();
+                        }
+                    }
+                });
+            }
+
+            // This code needs to execute on the
+            // original thread to instantiate
+            // the new object in the right place
+            mServiceDisconnectedHandler
+                    .sendMessage(
+                            mServiceDisconnectedHandler
+                                    .obtainMessage());
+            // Note that we do NOT want to set
+            // useService. useService is about
+            // what the user wants, not what they
+            // get
+        } finally {
+            NDKMediaPlayer.this.lock.unlock();
+        }
+    }
+
+    public enum State {
+        IDLE, INITIALIZED, PREPARED, STARTED, PAUSED, STOPPED, PREPARING, PLAYBACK_COMPLETED, END, ERROR
+    }
+
+    public interface OnBufferingUpdateListener {
+        void onBufferingUpdate(NDKMediaPlayer arg0, int percent);
+    }
+
+    public interface OnCompletionListener {
+        void onCompletion(NDKMediaPlayer arg0);
+    }
+
+    public interface OnErrorListener {
+        boolean onError(NDKMediaPlayer arg0, int what, int extra);
+    }
+
+    public interface OnInfoListener {
+        boolean onInfo(NDKMediaPlayer arg0, int what, int extra);
+    }
+
+    public interface OnPitchAdjustmentAvailableChangedListener {
+        /**
+         * @param arg0                     The owning media player
+         * @param pitchAdjustmentAvailable True if pitch adjustment is available, false if not
+         */
+        void onPitchAdjustmentAvailableChanged(
+                NDKMediaPlayer arg0, boolean pitchAdjustmentAvailable);
+    }
+
+    public interface OnPreparedListener {
+        void onPrepared(NDKMediaPlayer arg0);
+    }
+
+    public interface OnSeekCompleteListener {
+        void onSeekComplete(NDKMediaPlayer arg0);
+    }
+
+    public interface OnSpeedAdjustmentAvailableChangedListener {
+        /**
+         * @param arg0                     The owning media player
+         * @param speedAdjustmentAvailable True if speed adjustment is available, false if not
+         */
+        void onSpeedAdjustmentAvailableChanged(
+                NDKMediaPlayer arg0, boolean speedAdjustmentAvailable);
+    }
+
+    private float getPlaybackSpeedMultiplier() {
+        if (mSpeedMultiplier < 0) {
+            int playbackspeed = PreferenceHelper.getIntegerPreferenceValue(mContext,
+                    R.string.soundwaves_player_playback_speed_key,
+                    R.integer.soundwaves_player_speed_default);
+            mSpeedMultiplier = playbackspeed/10.0f;
+            notifyAboutPlaybackSpeedChange(mSpeedMultiplier);
+        }
+
+        return mSpeedMultiplier;
+    }
+
+    private void notifyAboutPlaybackSpeedChange(float argNewSpeed) {
+        RxBus bus = SoundWaves.getRxBus();
+        bus.send(new RxBusSimpleEvents.PlaybackSpeedChanged(argNewSpeed));
     }
 }

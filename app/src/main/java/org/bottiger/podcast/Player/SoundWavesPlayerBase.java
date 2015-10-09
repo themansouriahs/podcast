@@ -108,7 +108,7 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
             }
         }
 
-        return 0;
+        return 1.0f; // default speed is 1x
     }
 
     @Override

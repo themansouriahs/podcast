@@ -19,21 +19,8 @@ import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.CrashReporterFactory;
 import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
 import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.utils.rxbus.RxBus;
 
-//Acra debugging
-/*
-@ReportsCrashes(
-        // not used
-        formUri = "https://acra.bottiger.org/acra-soundwaves/_design/acra-storage/_update/report",
-        formUriBasicAuthLogin = ApplicationConfiguration.formUriBasicAuthLogin, // optional
-        formUriBasicAuthPassword = ApplicationConfiguration.formUriBasicAuthPassword, // optional
-        disableSSLCertValidation = true,
-        mode = ReportingInteractionMode.DIALOG,
-        forceCloseDialogAfterToast=true,
-        httpMethod = org.acra.sender.HttpSender.Method.POST,
-        reportType = org.acra.sender.HttpSender.Type.JSON,
-        socketTimeout = 10000)
-        */
 public class SoundWaves extends Application {
 
     /*
@@ -53,6 +40,7 @@ public class SoundWaves extends Application {
     public static SubscriptionRefreshManager sSubscriptionRefreshManager;
 
     private static Bus sBus = new Bus(ThreadEnforcer.MAIN);
+    private static RxBus _rxBus = null;
 
     public static class PlayerServiceBound {
         public boolean isConnected;
@@ -159,5 +147,14 @@ public class SoundWaves extends Application {
 
     public static Bus getBus() {
         return sBus;
+    }
+
+    // This is better done with a DI Library like Dagger
+    public static RxBus getRxBus() {
+        if (_rxBus == null) {
+            _rxBus = new RxBus();
+        }
+
+        return _rxBus;
     }
 }

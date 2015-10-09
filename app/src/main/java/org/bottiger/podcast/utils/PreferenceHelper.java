@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.preference.PreferenceManager;
 import android.support.annotation.BoolRes;
+import android.support.annotation.IntegerRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 
@@ -54,5 +55,15 @@ public class PreferenceHelper implements SharedPreferences.OnSharedPreferenceCha
         boolean defaultValue = argContext.getResources().getBoolean(argDefaultId);
 
         return prefs.getBoolean(key, defaultValue);
+    }
+
+    public static int getIntegerPreferenceValue(@NonNull Context argContext,
+                                                    @StringRes int argKeyId,
+                                                    @IntegerRes int argDefaultId) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(argContext);
+        String key = argContext.getResources().getString(argKeyId);
+        Integer defaultValue = argContext.getResources().getInteger(argDefaultId);
+
+        return prefs.getInt(key, defaultValue);
     }
 }
