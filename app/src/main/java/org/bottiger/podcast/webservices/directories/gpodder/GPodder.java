@@ -5,8 +5,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Patterns;
+import android.webkit.URLUtil;
 
-import org.apache.commons.validator.routines.UrlValidator;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
@@ -39,8 +40,6 @@ public class GPodder extends GenericDirectory {
 
     private static final String NAME = "gPodder";
     private static final String QUERY_SEPARATOR = " ";
-
-    private UrlValidator mUrlValidator = new UrlValidator();
 
     private GPodderAPI mGPodderAPI;
     private Call mCall;
@@ -149,7 +148,7 @@ public class GPodder extends GenericDirectory {
                 continue;
             }
 
-            if (!mUrlValidator.isValid(urlString)) {
+            if (!Patterns.WEB_URL.matcher(urlString).matches()) {
                 continue;
             }
 

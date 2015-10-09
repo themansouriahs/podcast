@@ -5,7 +5,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import org.apache.commons.validator.routines.UrlValidator;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
@@ -29,6 +28,8 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.graphics.Palette;
 import android.util.Log;
+import android.util.Patterns;
+import android.webkit.URLUtil;
 
 import javax.annotation.Nullable;
 
@@ -244,8 +245,7 @@ public class Subscription implements ISubscription, PaletteListener {
 			return;
 		}
 
-		UrlValidator validator = new UrlValidator();
-		if (!validator.isValid(url.toString())) {
+		if (Patterns.WEB_URL.matcher(url.toString()).matches()) {
 			failUpdateUrl(url.toString());
 			return;
 		}

@@ -1,6 +1,5 @@
 package org.bottiger.podcast.adapters;
 
-import org.apache.commons.validator.routines.UrlValidator;
 import org.bottiger.podcast.activities.feedview.FeedActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.ToolbarActivity;
@@ -20,9 +19,11 @@ import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.URLUtil;
 
 import com.bumptech.glide.Glide;
 
@@ -152,11 +153,9 @@ public class SubscriptionCursorAdapter extends CursorRecyclerAdapter {
             //uri = ResourceToUri(mActivity, R.drawable.generic_podcast);
         }
 
-        UrlValidator urlValidator = new UrlValidator();
-
         if (uri != null) {
             String image = uri.toString();
-            if (!TextUtils.isEmpty(image) && urlValidator.isValid(image)) {
+            if (!TextUtils.isEmpty(image) && Patterns.WEB_URL.matcher(image).matches()) {
 
                 //FrescoHelper.PalettePostProcessor postProcessor = new FrescoHelper.PalettePostProcessor(mActivity, image);
                 //FrescoHelper.loadImageInto(holder.image, image, postProcessor);

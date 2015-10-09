@@ -8,13 +8,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Patterns;
+import android.webkit.URLUtil;
 
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
-import org.apache.commons.validator.routines.UrlValidator;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.parser.FeedParser;
@@ -263,8 +264,7 @@ public class SubscriptionRefreshManager {
 
             URL artwork = null;
             String artworkString = slimSubscription.getImageURL();
-            UrlValidator urlValidator = new UrlValidator();
-            if (urlValidator.isValid(artworkString)) {
+            if (Patterns.WEB_URL.matcher(artworkString).matches()) {
                 try {
                     artwork = new URL(artworkString);
                 } catch (MalformedURLException mue) {
