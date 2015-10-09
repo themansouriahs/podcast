@@ -38,8 +38,6 @@ import org.bottiger.podcast.utils.UIUtils;
 import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
-import rx.Observable;
-
 /**
  * Created by apl on 03-09-2014.
  */
