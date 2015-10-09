@@ -59,7 +59,9 @@ import retrofit.Retrofit;
 public class GPodderAPI implements IWebservice {
 
     private static final String TAG = "GPodderAPI";
-    private static final boolean RESPECT_GPODDER_URL_SANITIZER = true;
+
+    // This seems to mess up my model since I use the url as a primary key
+    private static final boolean RESPECT_GPODDER_URL_SANITIZER = false;
 
     private IGPodderAPI api;
     private String mUsername;
