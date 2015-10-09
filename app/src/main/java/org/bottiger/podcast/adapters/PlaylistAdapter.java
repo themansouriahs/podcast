@@ -2,8 +2,6 @@ package org.bottiger.podcast.adapters;
 
 import java.util.TreeSet;
 
-import org.apache.commons.validator.routines.UrlValidator;
-
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.adapters.viewholders.ExpandableViewHoldersUtil;
@@ -33,9 +31,11 @@ import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.URLUtil;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
@@ -99,9 +99,8 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
         viewHolder.setArtwork(null);
 
-        UrlValidator urlValidator = new UrlValidator();
         String image = item.getArtwork(mActivity);
-        if (!TextUtils.isEmpty(image) && urlValidator.isValid(image)) {
+        if (!TextUtils.isEmpty(image) && Patterns.WEB_URL.matcher(image).matches()) {
 
             //FrescoHelper.PalettePostProcessor postProcessor = new FrescoHelper.PalettePostProcessor(mActivity, image);
             //FrescoHelper.loadImageInto(viewHolder.mPodcastImage, image, postProcessor);

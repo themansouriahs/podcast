@@ -1,6 +1,5 @@
 package org.bottiger.podcast.parser.syndication.handler;
 
-import org.apache.commons.validator.routines.UrlValidator;
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.parser.FeedUpdater;
 import org.bottiger.podcast.parser.syndication.namespace.NSContent;
@@ -24,6 +23,8 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import android.content.ContentResolver;
 import android.util.Log;
+import android.util.Patterns;
+import android.webkit.URLUtil;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -149,8 +150,7 @@ public class SyndHandler extends DefaultHandler {
 
 			URL artwork = null;
 			String artworkString = slimSubscription.getImageURL();
-			UrlValidator urlValidator = new UrlValidator();
-			if (urlValidator.isValid(artworkString)) {
+			if (Patterns.WEB_URL.matcher(artworkString).matches()) {
 				 try {
 					 artwork = new URL(artworkString);
 				 } catch (MalformedURLException mue) {
