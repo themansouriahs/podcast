@@ -33,7 +33,7 @@ public class FeedParser {
 
     private static final String TAG = "FeedParser";
 
-    String[] DURATION_FORMATS = {"HH:mm:ss", "HH:mm"};
+    String[] DURATION_FORMATS = {"HH:mm:ss", "mm:ss"};
 
     // We don't use namespaces
     private static final String ns = null;
