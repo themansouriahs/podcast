@@ -61,7 +61,7 @@
                 android:text="xx:xx "/>
 
             <org.bottiger.podcast.views.PlayerSeekbar
-                android:id="@+id/player_center_square"
+                android:id="@+id/top_player_seekbar"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@id/current_position"
