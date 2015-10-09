@@ -21,6 +21,7 @@ import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorUtils;
 import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.SharedAdapterUtils;
@@ -161,13 +162,13 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
 
         boolean isPlaying = false;
         @PlayerStatusObservable.PlayerStatus int playerStatus = PlayerStatusObservable.STOPPED;
-        if (SoundWaves.sBoundPlayerService != null && SoundWaves.sBoundPlayerService.isInitialized()) {
-            if (item.getURL().equals(SoundWaves.sBoundPlayerService
-                    .getCurrentItem().getUrl().toString())) {
-                if (SoundWaves.sBoundPlayerService.isPlaying()) {
+        PlayerService ps = PlayerService.getInstance();
+        if (ps != null && ps.isInitialized()) {
+            if (item.getURL().equals(ps.getCurrentItem().getUrl().toString())) {
+                if (ps.isPlaying()) {
                     isPlaying = true;
                 }
-                playerStatus = SoundWaves.sBoundPlayerService.getPlayer().getStatus();
+                playerStatus = ps.getPlayer().getStatus();
             }
         }
 
@@ -241,8 +242,12 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
         else
             mStringBuilder.append("--:--");
         mStringBuilder.append(", ");
-        mStringBuilder.append(sFormatter.formatShortFileSize(mActivity, argItem.getFilesize()));
-        mStringBuilder.append(", ");
+
+        long filesize = argItem.getFilesize();
+        if (filesize > 0) {
+            mStringBuilder.append(sFormatter.formatShortFileSize(mActivity, argItem.getFilesize()));
+            mStringBuilder.append(", ");
+        }
 
         Date date = argItem.getDateTime();
         if (date != null)

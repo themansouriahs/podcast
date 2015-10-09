@@ -316,7 +316,11 @@ public class FeedParser {
                 case EPISODE_ENCLOSURE_TAG: {
                     EpisodeEnclosure enclosure = readEnclosure(parser);
                     episode.setURL(enclosure.url);
-                    episode.setFilesize(enclosure.filesize);
+
+                    // Planet money seems to tag all files with filesize 0
+                    if (enclosure.filesize > 0)
+                        episode.setFilesize(enclosure.filesize);
+
                     episode.setIsVideo(SoundWavesDownloadManager.isVideo(enclosure.mimeType));
                     break;
                 }
