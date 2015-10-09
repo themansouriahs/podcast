@@ -18,7 +18,7 @@
 // playing (see the stayAwake method for more details).
 
 
-package org.bottiger.podcast.Player.soundwaves;
+package org.bottiger.podcast.player.soundwaves;
 
 import java.io.IOException;
 
@@ -35,18 +35,17 @@ import android.os.PowerManager.WakeLock;
 import android.util.Log;
 
 import org.bottiger.podcast.BuildConfig;
-import org.bottiger.podcast.Player.prestissimo.SoundService;
-import org.bottiger.podcast.Player.soundwaves.NDKMediaPlayer.State;
-import com.aocate.presto.service.IDeathCallback_0_8;
-import com.aocate.presto.service.IOnBufferingUpdateListenerCallback_0_8;
-import com.aocate.presto.service.IOnCompletionListenerCallback_0_8;
-import com.aocate.presto.service.IOnErrorListenerCallback_0_8;
-import com.aocate.presto.service.IOnInfoListenerCallback_0_8;
-import com.aocate.presto.service.IOnPitchAdjustmentAvailableChangedListenerCallback_0_8;
-import com.aocate.presto.service.IOnPreparedListenerCallback_0_8;
-import com.aocate.presto.service.IOnSeekCompleteListenerCallback_0_8;
-import com.aocate.presto.service.IOnSpeedAdjustmentAvailableChangedListenerCallback_0_8;
-import com.aocate.presto.service.IPlayMedia_0_8;
+import org.bottiger.podcast.player.soundwaves.NDKMediaPlayer.State;
+import org.bottiger.podcast.player.sonic.service.IDeathCallback;
+import org.bottiger.podcast.player.sonic.service.IOnBufferingUpdateListenerCallback;
+import org.bottiger.podcast.player.sonic.service.IOnCompletionListenerCallback;
+import org.bottiger.podcast.player.sonic.service.IOnErrorListenerCallback;
+import org.bottiger.podcast.player.sonic.service.IOnInfoListenerCallback;
+import org.bottiger.podcast.player.sonic.service.IOnPitchAdjustmentAvailableChangedListenerCallback;
+import org.bottiger.podcast.player.sonic.service.IOnPreparedListenerCallback;
+import org.bottiger.podcast.player.sonic.service.IOnSeekCompleteListenerCallback;
+import org.bottiger.podcast.player.sonic.service.IOnSpeedAdjustmentAvailableChangedListenerCallback;
+import org.bottiger.podcast.player.sonic.service.ISoundWavesEngine;
 
 /**
  * Class for connecting to remote speed-altering, media playing Service
@@ -63,7 +62,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 	private static final String SBMP_TAG = "ServiceBackedMP";
 
 	private ServiceConnection mPlayMediaServiceConnection = null;
-	protected IPlayMedia_0_8 pmInterface = null;
+	protected ISoundWavesEngine pmInterface = null;
 	private Intent playMediaServiceIntent = null;
 	// In some cases, we're going to have to replace the
 	// android.media.NDKMediaPlayer on the fly, and we don't want to touch the
@@ -86,7 +85,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 			NDKMediaPlayer.getPrestoServiceIntent(context, INTENT_NAME);
 		this.mPlayMediaServiceConnection = new ServiceConnection() {
 			public void onServiceConnected(ComponentName name, IBinder service) {
-				IPlayMedia_0_8 tmpPlayMediaInterface = IPlayMedia_0_8.Stub.asInterface((IBinder) service);
+				ISoundWavesEngine tmpPlayMediaInterface = ISoundWavesEngine.Stub.asInterface((IBinder) service);
 				
 				Log.d(SBMP_TAG, "Setting up pmInterface 94");
 				if (ServiceBackedMediaPlayer.this.sessionId == 0) {
@@ -95,7 +94,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 						// It exists so that if the client ceases to exist,
 						// the Service becomes aware of that and can shut
 						// down whatever it needs to shut down
-						ServiceBackedMediaPlayer.this.sessionId = tmpPlayMediaInterface.startSession(new IDeathCallback_0_8.Stub() {
+						ServiceBackedMediaPlayer.this.sessionId = tmpPlayMediaInterface.startSession(new IDeathCallback.Stub() {
 						});
 						// This is really bad if this fails
 					} catch (RemoteException e) {
@@ -142,29 +141,18 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 
 	private boolean ConnectPlayMediaService() {
 		Log.d(SBMP_TAG, "ConnectPlayMediaService()");
-
-		// FIXME
-		//if (NDKMediaPlayer.isIntentAvailable(mContext, INTENT_NAME)) {
-			Log.d(SBMP_TAG, INTENT_NAME + " is available");
-			if (pmInterface == null) {
-				try {
-					Log.d(SBMP_TAG, "Binding service");
-					return mContext.bindService(playMediaServiceIntent, mPlayMediaServiceConnection, Context.BIND_AUTO_CREATE);
-				} catch (Exception e) {
-                    Log.e(SBMP_TAG, "Could not bind with service", e);
-					return false;
-				}
-			} else {
-				Log.d(SBMP_TAG, "Service already bound");
-				return true;
+		if (pmInterface == null) {
+			try {
+				Log.d(SBMP_TAG, "Binding service");
+				return mContext.bindService(playMediaServiceIntent, mPlayMediaServiceConnection, Context.BIND_AUTO_CREATE);
+			} catch (Exception e) {
+                Log.e(SBMP_TAG, "Could not bind with service", e);
+				return false;
 			}
-		/*
+		} else {
+			Log.d(SBMP_TAG, "Service already bound");
+			return true;
 		}
-		else {
-			Log.d(SBMP_TAG, INTENT_NAME + " is not available");
-			return false;
-		}
-		*/
 	}
 
 	/**
@@ -908,11 +896,11 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
         }
     }
 
-	private IOnBufferingUpdateListenerCallback_0_8.Stub mOnBufferingUpdateCallback = null;
-	private void setOnBufferingUpdateCallback(IPlayMedia_0_8 iface) {
+	private IOnBufferingUpdateListenerCallback.Stub mOnBufferingUpdateCallback = null;
+	private void setOnBufferingUpdateCallback(ISoundWavesEngine iface) {
 		try {
 			if (this.mOnBufferingUpdateCallback == null) {
-				mOnBufferingUpdateCallback = new IOnBufferingUpdateListenerCallback_0_8.Stub() {
+				mOnBufferingUpdateCallback = new IOnBufferingUpdateListenerCallback.Stub() {
 					public void onBufferingUpdate(int percent)
 					throws RemoteException {
 						owningMediaPlayer.lock.lock();
@@ -937,11 +925,11 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 		}
 	}
 
-	private IOnCompletionListenerCallback_0_8.Stub mOnCompletionCallback = null;
-	private void setOnCompletionCallback(IPlayMedia_0_8 iface) {
+	private IOnCompletionListenerCallback.Stub mOnCompletionCallback = null;
+	private void setOnCompletionCallback(ISoundWavesEngine iface) {
 		try {
 			if (this.mOnCompletionCallback == null) {
-				this.mOnCompletionCallback = new IOnCompletionListenerCallback_0_8.Stub() {
+				this.mOnCompletionCallback = new IOnCompletionListenerCallback.Stub() {
 					public void onCompletion() throws RemoteException {
 						owningMediaPlayer.lock.lock();
 						Log.d(SBMP_TAG, "onCompletionListener being called");
@@ -966,11 +954,11 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 		}
 	}
 	
-	private IOnErrorListenerCallback_0_8.Stub mOnErrorCallback = null;
-	private void setOnErrorCallback(IPlayMedia_0_8 iface) {
+	private IOnErrorListenerCallback.Stub mOnErrorCallback = null;
+	private void setOnErrorCallback(ISoundWavesEngine iface) {
 		try {
 			if (this.mOnErrorCallback == null) {
-				this.mOnErrorCallback = new IOnErrorListenerCallback_0_8.Stub() {
+				this.mOnErrorCallback = new IOnErrorListenerCallback.Stub() {
 					public boolean onError(int what, int extra) throws RemoteException {
 						owningMediaPlayer.lock.lock();
                         stayAwake(false);
@@ -995,11 +983,11 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 		}
 	}
 	
-	private IOnInfoListenerCallback_0_8.Stub mOnInfoCallback = null;
-	private void setOnInfoCallback(IPlayMedia_0_8 iface) {
+	private IOnInfoListenerCallback.Stub mOnInfoCallback = null;
+	private void setOnInfoCallback(ISoundWavesEngine iface) {
 		try {
 			if (this.mOnInfoCallback == null) {
-				this.mOnInfoCallback = new IOnInfoListenerCallback_0_8.Stub() {
+				this.mOnInfoCallback = new IOnInfoListenerCallback.Stub() {
 					public boolean onInfo(int what, int extra) throws RemoteException {
 						owningMediaPlayer.lock.lock();
 						try {
@@ -1024,11 +1012,11 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 		}
 	}
 
-	private IOnPitchAdjustmentAvailableChangedListenerCallback_0_8.Stub mOnPitchAdjustmentAvailableChangedCallback = null;
-	private void setOnPitchAdjustmentAvailableChangedListener(IPlayMedia_0_8 iface) {
+	private IOnPitchAdjustmentAvailableChangedListenerCallback.Stub mOnPitchAdjustmentAvailableChangedCallback = null;
+	private void setOnPitchAdjustmentAvailableChangedListener(ISoundWavesEngine iface) {
 		try {
 			if (this.mOnPitchAdjustmentAvailableChangedCallback == null) {
-				this.mOnPitchAdjustmentAvailableChangedCallback = new IOnPitchAdjustmentAvailableChangedListenerCallback_0_8.Stub() {
+				this.mOnPitchAdjustmentAvailableChangedCallback = new IOnPitchAdjustmentAvailableChangedListenerCallback.Stub() {
 					public void onPitchAdjustmentAvailableChanged(
 							boolean pitchAdjustmentAvailable)
 							throws RemoteException {
@@ -1053,11 +1041,11 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 		}
 	}
 
-	private IOnPreparedListenerCallback_0_8.Stub mOnPreparedCallback = null;
-	private void setOnPreparedCallback(IPlayMedia_0_8 iface) {
+	private IOnPreparedListenerCallback.Stub mOnPreparedCallback = null;
+	private void setOnPreparedCallback(ISoundWavesEngine iface) {
 		try {
 			if (this.mOnPreparedCallback == null) {
-				this.mOnPreparedCallback = new IOnPreparedListenerCallback_0_8.Stub() {
+				this.mOnPreparedCallback = new IOnPreparedListenerCallback.Stub() {
 					public void onPrepared() throws RemoteException {
 						owningMediaPlayer.lock.lock();
 						Log.d(SBMP_TAG, "setOnPreparedCallback.mOnPreparedCallback.onPrepared 1050");
@@ -1095,11 +1083,11 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 		}
 	}
 
-	private IOnSeekCompleteListenerCallback_0_8.Stub mOnSeekCompleteCallback = null;
-	private void setOnSeekCompleteCallback(IPlayMedia_0_8 iface) {
+	private IOnSeekCompleteListenerCallback.Stub mOnSeekCompleteCallback = null;
+	private void setOnSeekCompleteCallback(ISoundWavesEngine iface) {
 		try {
 			if (this.mOnSeekCompleteCallback == null) {
-				this.mOnSeekCompleteCallback = new IOnSeekCompleteListenerCallback_0_8.Stub() {
+				this.mOnSeekCompleteCallback = new IOnSeekCompleteListenerCallback.Stub() {
 					public void onSeekComplete() throws RemoteException {
 						Log.d(SBMP_TAG, "onSeekComplete() 941");
 						owningMediaPlayer.lock.lock();
@@ -1132,12 +1120,12 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 		}
 	}
 	
-	private IOnSpeedAdjustmentAvailableChangedListenerCallback_0_8.Stub mOnSpeedAdjustmentAvailableChangedCallback = null;
-	private void setOnSpeedAdjustmentAvailableChangedCallback(IPlayMedia_0_8 iface) {
+	private IOnSpeedAdjustmentAvailableChangedListenerCallback.Stub mOnSpeedAdjustmentAvailableChangedCallback = null;
+	private void setOnSpeedAdjustmentAvailableChangedCallback(ISoundWavesEngine iface) {
 		try {
 			Log.d(SBMP_TAG, "Setting the service of on speed adjustment available changed");
 			if (this.mOnSpeedAdjustmentAvailableChangedCallback == null) {
-				this.mOnSpeedAdjustmentAvailableChangedCallback = new IOnSpeedAdjustmentAvailableChangedListenerCallback_0_8.Stub() {
+				this.mOnSpeedAdjustmentAvailableChangedCallback = new IOnSpeedAdjustmentAvailableChangedListenerCallback.Stub() {
 					public void onSpeedAdjustmentAvailableChanged(
 							boolean speedAdjustmentAvailable)
 							throws RemoteException {

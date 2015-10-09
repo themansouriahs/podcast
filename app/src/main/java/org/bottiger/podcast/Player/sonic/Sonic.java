@@ -5,7 +5,7 @@
 // application, but any changes you make to sonic.c or sonic.h need to
 // be shared under the LGPL license.
 
-package org.bottiger.podcast.Player.sonic;
+package org.bottiger.podcast.player.sonic;
 
 public class Sonic
 {

@@ -3,7 +3,7 @@
 // For clarification, I asked if he intended to place it in the public domain,
 // and he said I have permission to do whatever I like with the code.
 
-package org.bottiger.podcast.Player.sonic;
+package org.bottiger.podcast.player.sonic;
 
 import android.media.AudioFormat;
 import android.media.AudioManager;

@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.aocate.presto.service;
+package org.bottiger.podcast.player.sonic.service;
 
-oneway interface IDeathCallback_0_8 {
+interface IOnPreparedListenerCallback {
+	void onPrepared();
 }

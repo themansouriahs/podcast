@@ -1,4 +1,4 @@
-package org.bottiger.podcast.Player;
+package org.bottiger.podcast.player;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -8,7 +8,7 @@ import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import org.bottiger.podcast.Player.soundwaves.NDKMediaPlayer;
+import org.bottiger.podcast.player.soundwaves.NDKMediaPlayer;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.service.PlayerService;
 

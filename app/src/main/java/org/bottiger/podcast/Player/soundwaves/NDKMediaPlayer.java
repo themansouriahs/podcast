@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.bottiger.podcast.Player.soundwaves;
+package org.bottiger.podcast.player.soundwaves;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -29,7 +29,7 @@ import android.os.Message;
 import android.util.Log;
 
 import org.bottiger.podcast.BuildConfig;
-import org.bottiger.podcast.Player.prestissimo.SoundService;
+import org.bottiger.podcast.player.sonic.SoundService;
 
 import java.io.IOException;
 import java.util.List;
@@ -39,19 +39,19 @@ public class NDKMediaPlayer {
     public static final String TAG = "SoundWavesMediaPlayer";
 
     public interface OnBufferingUpdateListener {
-        public abstract void onBufferingUpdate(NDKMediaPlayer arg0, int percent);
+        void onBufferingUpdate(NDKMediaPlayer arg0, int percent);
     }
 
     public interface OnCompletionListener {
-        public abstract void onCompletion(NDKMediaPlayer arg0);
+        void onCompletion(NDKMediaPlayer arg0);
     }
 
     public interface OnErrorListener {
-        public abstract boolean onError(NDKMediaPlayer arg0, int what, int extra);
+        boolean onError(NDKMediaPlayer arg0, int what, int extra);
     }
 
     public interface OnInfoListener {
-        public abstract boolean onInfo(NDKMediaPlayer arg0, int what, int extra);
+        boolean onInfo(NDKMediaPlayer arg0, int what, int extra);
     }
 
     public interface OnPitchAdjustmentAvailableChangedListener {
@@ -59,16 +59,16 @@ public class NDKMediaPlayer {
          * @param arg0                     The owning media player
          * @param pitchAdjustmentAvailable True if pitch adjustment is available, false if not
          */
-        public abstract void onPitchAdjustmentAvailableChanged(
+        void onPitchAdjustmentAvailableChanged(
                 NDKMediaPlayer arg0, boolean pitchAdjustmentAvailable);
     }
 
     public interface OnPreparedListener {
-        public abstract void onPrepared(NDKMediaPlayer arg0);
+        void onPrepared(NDKMediaPlayer arg0);
     }
 
     public interface OnSeekCompleteListener {
-        public abstract void onSeekComplete(NDKMediaPlayer arg0);
+        void onSeekComplete(NDKMediaPlayer arg0);
     }
 
     public interface OnSpeedAdjustmentAvailableChangedListener {
@@ -76,7 +76,7 @@ public class NDKMediaPlayer {
          * @param arg0                     The owning media player
          * @param speedAdjustmentAvailable True if speed adjustment is available, false if not
          */
-        public abstract void onSpeedAdjustmentAvailableChanged(
+        void onSpeedAdjustmentAvailableChanged(
                 NDKMediaPlayer arg0, boolean speedAdjustmentAvailable);
     }
 

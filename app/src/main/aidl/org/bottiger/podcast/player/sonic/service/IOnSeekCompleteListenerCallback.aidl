@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.aocate.presto.service;
+package org.bottiger.podcast.player.sonic.service;
 
-interface IOnPitchAdjustmentAvailableChangedListenerCallback_0_8 {
-	void onPitchAdjustmentAvailableChanged(boolean pitchAdjustmentAvailable);
+interface IOnSeekCompleteListenerCallback {
+	void onSeekComplete();
 }

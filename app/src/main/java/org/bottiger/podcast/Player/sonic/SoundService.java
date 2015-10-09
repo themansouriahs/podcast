@@ -12,21 +12,31 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-package com.falconware.prestissimo;
+package org.bottiger.podcast.player.sonic;
 
+import android.annotation.TargetApi;
 import android.app.Service;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Binder;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 import android.util.SparseArray;
 
-import com.aocate.presto.service.*;
+import org.bottiger.podcast.player.sonic.service.IDeathCallback;
+import org.bottiger.podcast.player.sonic.service.IOnBufferingUpdateListenerCallback;
+import org.bottiger.podcast.player.sonic.service.IOnCompletionListenerCallback;
+import org.bottiger.podcast.player.sonic.service.IOnErrorListenerCallback;
+import org.bottiger.podcast.player.sonic.service.IOnInfoListenerCallback;
+import org.bottiger.podcast.player.sonic.service.IOnPitchAdjustmentAvailableChangedListenerCallback;
+import org.bottiger.podcast.player.sonic.service.IOnPreparedListenerCallback;
+import org.bottiger.podcast.player.sonic.service.IOnSeekCompleteListenerCallback;
+import org.bottiger.podcast.player.sonic.service.IOnSpeedAdjustmentAvailableChangedListenerCallback;
+import org.bottiger.podcast.player.sonic.service.ISoundWavesEngine;
 
-
-public abstract class SoundService extends Service {
-
+@TargetApi(16)
+public class SoundService extends Service {
     private SparseArray<Track> mTracks;
     private static int trackId = 0;
 
@@ -37,7 +47,7 @@ public abstract class SoundService extends Service {
     public void onCreate() {
         super.onCreate();
         Log.d(TAG_SERVICE, "Service created");
-        mTracks = new SparseArray<Track>();
+        mTracks = new SparseArray<>();
     }
 
     @Override
@@ -69,7 +79,7 @@ public abstract class SoundService extends Service {
         }
     }
 
-    private final IPlayMedia_0_8.Stub mBinder = new IPlayMedia_0_8.Stub() {
+    private final ISoundWavesEngine.Stub mBinder = new ISoundWavesEngine.Stub() {
 
         @Override
         public boolean canSetPitch(long sessionId) {
@@ -183,7 +193,7 @@ public abstract class SoundService extends Service {
 
         @Override
         public void registerOnBufferingUpdateCallback(long sessionId,
-                IOnBufferingUpdateListenerCallback_0_8 cb) {
+                                                      IOnBufferingUpdateListenerCallback cb) {
             Track track;
             synchronized (this) {
                 track = mTracks.get((int) sessionId);
@@ -193,7 +203,7 @@ public abstract class SoundService extends Service {
 
         @Override
         public void registerOnCompletionCallback(long sessionId,
-                IOnCompletionListenerCallback_0_8 cb) {
+                                                 IOnCompletionListenerCallback cb) {
             Track track;
             synchronized (this) {
                 track = mTracks.get((int) sessionId);
@@ -203,7 +213,7 @@ public abstract class SoundService extends Service {
 
         @Override
         public void registerOnErrorCallback(long sessionId,
-                IOnErrorListenerCallback_0_8 cb) {
+                                            IOnErrorListenerCallback cb) {
             Track track;
             synchronized (this) {
                 track = mTracks.get((int) sessionId);
@@ -213,7 +223,7 @@ public abstract class SoundService extends Service {
 
         @Override
         public void registerOnInfoCallback(long sessionId,
-                IOnInfoListenerCallback_0_8 cb) {
+                                           IOnInfoListenerCallback cb) {
             Track track;
             synchronized (this) {
                 track = mTracks.get((int) sessionId);
@@ -224,7 +234,7 @@ public abstract class SoundService extends Service {
         @Override
         public void registerOnPitchAdjustmentAvailableChangedCallback(
                 long sessionId,
-                IOnPitchAdjustmentAvailableChangedListenerCallback_0_8 cb) {
+                IOnPitchAdjustmentAvailableChangedListenerCallback cb) {
             Track track;
             synchronized (this) {
                 track = mTracks.get((int) sessionId);
@@ -234,7 +244,7 @@ public abstract class SoundService extends Service {
 
         @Override
         public void registerOnPreparedCallback(long sessionId,
-                IOnPreparedListenerCallback_0_8 cb) {
+                                               IOnPreparedListenerCallback cb) {
             Track track;
             synchronized (this) {
                 track = mTracks.get((int) sessionId);
@@ -244,7 +254,7 @@ public abstract class SoundService extends Service {
 
         @Override
         public void registerOnSeekCompleteCallback(long sessionId,
-                IOnSeekCompleteListenerCallback_0_8 cb) {
+                                                   IOnSeekCompleteListenerCallback cb) {
             Track track;
             synchronized (this) {
                 track = mTracks.get((int) sessionId);
@@ -255,7 +265,7 @@ public abstract class SoundService extends Service {
         @Override
         public void registerOnSpeedAdjustmentAvailableChangedCallback(
                 long sessionId,
-                IOnSpeedAdjustmentAvailableChangedListenerCallback_0_8 cb) {
+                IOnSpeedAdjustmentAvailableChangedListenerCallback cb) {
             Track track;
             synchronized (this) {
                 track = mTracks.get((int) sessionId);
@@ -326,7 +336,7 @@ public abstract class SoundService extends Service {
 
         @Override
         public void setEnableSpeedAdjustment(long sessionId,
-                boolean enableSpeedAdjustment) {
+                                             boolean enableSpeedAdjustment) {
 
         }
 
@@ -391,7 +401,7 @@ public abstract class SoundService extends Service {
         }
 
         @Override
-        public long startSession(IDeathCallback_0_8 cb) {
+        public long startSession(IDeathCallback cb) {
             Log.d(TAG_API, "Calling startSession");
             final int sessionId = trackId++;
             Log.d(TAG_API, "Registering new sessionId: " + sessionId);
@@ -405,7 +415,7 @@ public abstract class SoundService extends Service {
                     }
                 }, 0);
             } catch (RemoteException e) {
-                Log.e(TAG_API,
+                Log.wtf(TAG_API,
                         "Service died when trying to set what to do when it dies.  Good luck!",
                         e);
             }
@@ -432,28 +442,28 @@ public abstract class SoundService extends Service {
 
         @Override
         public void unregisterOnBufferingUpdateCallback(long sessionId,
-                IOnBufferingUpdateListenerCallback_0_8 cb) {
+                                                        IOnBufferingUpdateListenerCallback cb) {
             Log.e("SoundService",
                     "In unregisterOnBufferingUpdateCallback. This should never happen!");
         }
 
         @Override
         public void unregisterOnCompletionCallback(long sessionId,
-                IOnCompletionListenerCallback_0_8 cb) {
+                                                   IOnCompletionListenerCallback cb) {
             Log.e("SoundService",
                     "In unregisterOnCompletionCallback. This should never happen!");
         }
 
         @Override
         public void unregisterOnErrorCallback(long sessionId,
-                IOnErrorListenerCallback_0_8 cb) {
+                                              IOnErrorListenerCallback cb) {
             Log.e("SoundService",
                     "In unregisterOnErrorCallback. This should never happen!");
         }
 
         @Override
         public void unregisterOnInfoCallback(long sessionId,
-                IOnInfoListenerCallback_0_8 cb) {
+                                             IOnInfoListenerCallback cb) {
             Log.e("SoundService",
                     "In unregisterOnInfoCallback. This should never happen!");
         }
@@ -461,21 +471,21 @@ public abstract class SoundService extends Service {
         @Override
         public void unregisterOnPitchAdjustmentAvailableChangedCallback(
                 long sessionId,
-                IOnPitchAdjustmentAvailableChangedListenerCallback_0_8 cb) {
+                IOnPitchAdjustmentAvailableChangedListenerCallback cb) {
             Log.e("SoundService",
                     "In unregisterOnPitchAdjustmentAvailableChangedCallback. This should never happen!");
         }
 
         @Override
         public void unregisterOnPreparedCallback(long sessionId,
-                IOnPreparedListenerCallback_0_8 cb) {
+                                                 IOnPreparedListenerCallback cb) {
             Log.e("SoundService",
                     "In unregisterOnPreparedCallback. This should never happen!");
         }
 
         @Override
         public void unregisterOnSeekCompleteCallback(long sessionId,
-                IOnSeekCompleteListenerCallback_0_8 cb) {
+                                                     IOnSeekCompleteListenerCallback cb) {
             Log.e("SoundService",
                     "In unregisterOnSeekCompleteCallback. This should never happen!");
         }
@@ -483,10 +493,16 @@ public abstract class SoundService extends Service {
         @Override
         public void unregisterOnSpeedAdjustmentAvailableChangedCallback(
                 long sessionId,
-                IOnSpeedAdjustmentAvailableChangedListenerCallback_0_8 cb) {
+                IOnSpeedAdjustmentAvailableChangedListenerCallback cb) {
             Log.e("SoundService",
                     "In unregisterOnSpeedAdjustmentAvailableChangedCallback. This should never happen!");
         }
 
     };
+
+    public class SoundBinder extends Binder {
+        public SoundService getService() {
+            return SoundService.this;
+        }
+    }
 }

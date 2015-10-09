@@ -12,13 +12,11 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-package org.bottiger.podcast.Player.prestissimo;
+package org.bottiger.podcast.player.sonic;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.locks.ReentrantLock;
-
-import org.bottiger.podcast.Player.sonic.Sonic;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -35,15 +33,15 @@ import android.os.Looper;
 import android.os.RemoteException;
 import android.util.Log;
 
-import com.aocate.presto.service.IDeathCallback_0_8;
-import com.aocate.presto.service.IOnBufferingUpdateListenerCallback_0_8;
-import com.aocate.presto.service.IOnCompletionListenerCallback_0_8;
-import com.aocate.presto.service.IOnErrorListenerCallback_0_8;
-import com.aocate.presto.service.IOnInfoListenerCallback_0_8;
-import com.aocate.presto.service.IOnPitchAdjustmentAvailableChangedListenerCallback_0_8;
-import com.aocate.presto.service.IOnPreparedListenerCallback_0_8;
-import com.aocate.presto.service.IOnSeekCompleteListenerCallback_0_8;
-import com.aocate.presto.service.IOnSpeedAdjustmentAvailableChangedListenerCallback_0_8;
+import org.bottiger.podcast.player.sonic.service.IDeathCallback;
+import org.bottiger.podcast.player.sonic.service.IOnBufferingUpdateListenerCallback;
+import org.bottiger.podcast.player.sonic.service.IOnCompletionListenerCallback;
+import org.bottiger.podcast.player.sonic.service.IOnErrorListenerCallback;
+import org.bottiger.podcast.player.sonic.service.IOnInfoListenerCallback;
+import org.bottiger.podcast.player.sonic.service.IOnPitchAdjustmentAvailableChangedListenerCallback;
+import org.bottiger.podcast.player.sonic.service.IOnPreparedListenerCallback;
+import org.bottiger.podcast.player.sonic.service.IOnSeekCompleteListenerCallback;
+import org.bottiger.podcast.player.sonic.service.IOnSpeedAdjustmentAvailableChangedListenerCallback;
 
 @TargetApi(16)
 public class Track {
@@ -84,19 +82,19 @@ public class Track {
 
     // The aidl interface should automatically implement stubs for these, so
     // don't initialize or require null checks.
-    protected IOnErrorListenerCallback_0_8 errorCallback;
-    protected IOnCompletionListenerCallback_0_8 completionCallback;
-    protected IOnBufferingUpdateListenerCallback_0_8 bufferingUpdateCallback;
-    protected IOnInfoListenerCallback_0_8 infoCallback;
-    protected IOnPitchAdjustmentAvailableChangedListenerCallback_0_8 pitchAdjustmentAvailableChangedCallback;
-    protected IOnPreparedListenerCallback_0_8 preparedCallback;
-    protected IOnSeekCompleteListenerCallback_0_8 seekCompleteCallback;
-    protected IOnSpeedAdjustmentAvailableChangedListenerCallback_0_8 speedAdjustmentAvailableChangedCallback;
+    protected IOnErrorListenerCallback errorCallback;
+    protected IOnCompletionListenerCallback completionCallback;
+    protected IOnBufferingUpdateListenerCallback bufferingUpdateCallback;
+    protected IOnInfoListenerCallback infoCallback;
+    protected IOnPitchAdjustmentAvailableChangedListenerCallback pitchAdjustmentAvailableChangedCallback;
+    protected IOnPreparedListenerCallback preparedCallback;
+    protected IOnSeekCompleteListenerCallback seekCompleteCallback;
+    protected IOnSpeedAdjustmentAvailableChangedListenerCallback speedAdjustmentAvailableChangedCallback;
 
     // Don't know how to persist this other than pass it in and 'hold' it
-    private final IDeathCallback_0_8 mDeath;
+    private final IDeathCallback mDeath;
 
-    public Track(Context context, IDeathCallback_0_8 cb) {
+    public Track(Context context, IDeathCallback cb) {
         mCurrentState = STATE_IDLE;
         mCurrentSpeed = (float) 1.0;
         mCurrentPitch = (float) 1.0;
@@ -215,7 +213,7 @@ public class Track {
                             mCurrentState = STATE_PREPARED;
                             Log.d(TAG_TRACK, "State changed to STATE_PREPARED");
                         }
-                         final IOnPreparedListenerCallback_0_8 preparedListenerCallback08 = preparedCallback;
+                         final IOnPreparedListenerCallback preparedListenerCallback08 = preparedCallback;
                             Handler handler = new Handler(Looper.getMainLooper());
                             handler.post(new Runnable() {
                                 @Override

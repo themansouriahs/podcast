@@ -23,7 +23,7 @@ typedef struct sonicInstStruct *sonicInst;
 #define getInst(sonicID) ((sonicInst)((char *)NULL + (sonicID)))
 
 /* Initialize the C data structure */
-JNIEXPORT jlong JNICALL Java_org_bottiger_podcast_Player_sonic_Sonic_initNative(
+JNIEXPORT jlong JNICALL Java_org_bottiger_podcast_player_sonic_Sonic_initNative(
         JNIEnv *env,
         jobject obj,
         jint sampleRate,
@@ -49,7 +49,7 @@ JNIEXPORT jlong JNICALL Java_org_bottiger_podcast_Player_sonic_Sonic_initNative(
 
 
 // Teardown the C data structure.
-void Java_org_bottiger_podcast_Player_sonic_Sonic_closeNative(
+void Java_org_bottiger_podcast_player_sonic_Sonic_closeNative(
     JNIEnv *env,
     jobject thiz,
     jlong sonicID)
@@ -67,7 +67,7 @@ void Java_org_bottiger_podcast_Player_sonic_Sonic_closeNative(
    lenBytes bytes will be read from buffer into the sound alteration object
    buffer is not guaranteed not to change after this function is called,
    so data should be copied from it */
-jboolean Java_org_bottiger_podcast_Player_sonic_Sonic_putBytesNative(
+jboolean Java_org_bottiger_podcast_player_sonic_Sonic_putBytesNative(
     JNIEnv *env,
     jobject thiz,
     jlong sonicID,
@@ -98,7 +98,7 @@ if(remainingBytes != 0) {
 // Get bytes representing sped up/slowed down sound and put up to lenBytes
 // into ret.
 // Returns number of bytes read, or -1 if we run out of memory.
-jint Java_org_bottiger_podcast_Player_sonic_Sonic_receiveBytesNative(
+jint Java_org_bottiger_podcast_player_sonic_Sonic_receiveBytesNative(
     JNIEnv *env,
     jobject thiz,
     jlong sonicID,
@@ -131,7 +131,7 @@ jint Java_org_bottiger_podcast_Player_sonic_Sonic_receiveBytesNative(
 }
 
 // Set pitch in sound alteration object
-void Java_org_bottiger_podcast_Player_sonic_Sonic_setPitchNative(
+void Java_org_bottiger_podcast_player_sonic_Sonic_setPitchNative(
     JNIEnv *env,
     jobject thiz,
     jlong sonicID,
@@ -143,7 +143,7 @@ void Java_org_bottiger_podcast_Player_sonic_Sonic_setPitchNative(
 }
 
 // Get the current pitch.
-jfloat Java_org_bottiger_podcast_Player_sonic_Sonic_getPitchNative(
+jfloat Java_org_bottiger_podcast_player_sonic_Sonic_getPitchNative(
     JNIEnv *env,
     jobject thiz,
     jlong sonicID)
@@ -155,7 +155,7 @@ jfloat Java_org_bottiger_podcast_Player_sonic_Sonic_getPitchNative(
 
 // Speed up the sound and increase the pitch, or slow down the sound and
 // decrease the pitch.
-void Java_org_bottiger_podcast_Player_sonic_Sonic_setRateNative(
+void Java_org_bottiger_podcast_player_sonic_Sonic_setRateNative(
     JNIEnv *env,
     jobject thiz,
     jlong sonicID,
@@ -167,7 +167,7 @@ void Java_org_bottiger_podcast_Player_sonic_Sonic_setRateNative(
 }
 
 // Return the current playback rate.
-jfloat Java_org_bottiger_podcast_Player_sonic_Sonic_getRateNative(
+jfloat Java_org_bottiger_podcast_player_sonic_Sonic_getRateNative(
     JNIEnv *env,
     jobject thiz,
     jlong sonicID)
@@ -178,7 +178,7 @@ jfloat Java_org_bottiger_podcast_Player_sonic_Sonic_getRateNative(
 }
 
 // Get the current sample rate.
-jint Java_org_bottiger_podcast_Player_sonic_Sonic_getSampleRateNative(
+jint Java_org_bottiger_podcast_player_sonic_Sonic_getSampleRateNative(
     JNIEnv *env,
     jobject thiz,
     jlong sonicID)
@@ -189,7 +189,7 @@ jint Java_org_bottiger_podcast_Player_sonic_Sonic_getSampleRateNative(
 }
 
 // Set the sample rate.
-void Java_org_bottiger_podcast_Player_sonic_Sonic_setSampleRateNative(
+void Java_org_bottiger_podcast_player_sonic_Sonic_setSampleRateNative(
     JNIEnv *env,
     jobject thiz,
     jlong sonicID,
@@ -201,7 +201,7 @@ void Java_org_bottiger_podcast_Player_sonic_Sonic_setSampleRateNative(
 }
 
 // Get the current number of channels.
-jint Java_org_bottiger_podcast_Player_sonic_Sonic_getNumChannelsNative(
+jint Java_org_bottiger_podcast_player_sonic_Sonic_getNumChannelsNative(
     JNIEnv *env,
     jobject thiz,
     jlong sonicID)
@@ -212,7 +212,7 @@ jint Java_org_bottiger_podcast_Player_sonic_Sonic_getNumChannelsNative(
 }
 
 // Set the number of channels.
-void Java_org_bottiger_podcast_Player_sonic_Sonic_setNumChannelsNative(
+void Java_org_bottiger_podcast_player_sonic_Sonic_setNumChannelsNative(
     JNIEnv *env,
     jobject thiz,
     jlong sonicID,
@@ -224,7 +224,7 @@ void Java_org_bottiger_podcast_Player_sonic_Sonic_setNumChannelsNative(
 }
 
 // Get the current speed.
-jfloat Java_org_bottiger_podcast_Player_sonic_Sonic_getSpeedNative(
+jfloat Java_org_bottiger_podcast_player_sonic_Sonic_getSpeedNative(
     JNIEnv *env,
     jobject thiz,
     jlong sonicID)
@@ -235,7 +235,7 @@ jfloat Java_org_bottiger_podcast_Player_sonic_Sonic_getSpeedNative(
 }
 
 // Change the speed.
-void Java_org_bottiger_podcast_Player_sonic_Sonic_setSpeedNative(
+void Java_org_bottiger_podcast_player_sonic_Sonic_setSpeedNative(
     JNIEnv *env,
     jobject thiz,
     jlong sonicID,
@@ -247,7 +247,7 @@ void Java_org_bottiger_podcast_Player_sonic_Sonic_setSpeedNative(
 }
 
 // Get the current volume.
-jfloat Java_org_bottiger_podcast_Player_sonic_Sonic_getVolumeNative(
+jfloat Java_org_bottiger_podcast_player_sonic_Sonic_getVolumeNative(
     JNIEnv *env,
     jobject thiz,
     jlong sonicID)
@@ -258,7 +258,7 @@ jfloat Java_org_bottiger_podcast_Player_sonic_Sonic_getVolumeNative(
 }
 
 // Change the volume.
-void Java_org_bottiger_podcast_Player_sonic_Sonic_setVolumeNative(
+void Java_org_bottiger_podcast_player_sonic_Sonic_setVolumeNative(
     JNIEnv *env,
     jobject thiz,
     jlong sonicID,
@@ -270,7 +270,7 @@ void Java_org_bottiger_podcast_Player_sonic_Sonic_setVolumeNative(
 }
 
 // Get the current chord pitch setting.
-jboolean Java_org_bottiger_podcast_Player_sonic_Sonic_getChordPitchNative(
+jboolean Java_org_bottiger_podcast_player_sonic_Sonic_getChordPitchNative(
     JNIEnv *env,
     jobject thiz,
     jlong sonicID)
@@ -281,7 +281,7 @@ jboolean Java_org_bottiger_podcast_Player_sonic_Sonic_getChordPitchNative(
 }
 
 // Set chord pitch mode on or off.  Default is off.
-void Java_org_bottiger_podcast_Player_sonic_Sonic_setChordPitchNative(
+void Java_org_bottiger_podcast_player_sonic_Sonic_setChordPitchNative(
     JNIEnv *env,
     jobject thiz,
     jlong sonicID,
@@ -294,7 +294,7 @@ void Java_org_bottiger_podcast_Player_sonic_Sonic_setChordPitchNative(
 
 // Returns the number of bytes that can be read from the speed alteration
 // object
-jint Java_org_bottiger_podcast_Player_sonic_Sonic_availableBytesNative(
+jint Java_org_bottiger_podcast_player_sonic_Sonic_availableBytesNative(
     JNIEnv *env,
     jobject thiz,
     jlong sonicID)
@@ -306,7 +306,7 @@ jint Java_org_bottiger_podcast_Player_sonic_Sonic_availableBytesNative(
 }
 
 // Process any samples still in a sonic buffer.
-void Java_org_bottiger_podcast_Player_sonic_Sonic_flushNative(
+void Java_org_bottiger_podcast_player_sonic_Sonic_flushNative(
     JNIEnv *env,
     jobject thiz,
     jlong sonicID)

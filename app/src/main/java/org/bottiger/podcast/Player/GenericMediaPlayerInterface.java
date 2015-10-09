@@ -1,11 +1,9 @@
-package org.bottiger.podcast.Player;
+package org.bottiger.podcast.player;
 
 import android.content.Context;
 import android.net.Uri;
-import android.util.Log;
 
 import java.io.IOException;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by Arvid on 8/28/2015.

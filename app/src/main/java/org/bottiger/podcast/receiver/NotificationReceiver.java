@@ -1,7 +1,7 @@
 package org.bottiger.podcast.receiver;
 
 import org.bottiger.podcast.ApplicationConfiguration;
-import org.bottiger.podcast.Player.SoundWavesPlayer;
+import org.bottiger.podcast.player.SoundWavesPlayer;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.notification.NotificationPlayer;

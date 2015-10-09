@@ -1,4 +1,4 @@
-package org.bottiger.podcast.Player;
+package org.bottiger.podcast.player;
 
 import android.app.PendingIntent;
 import android.content.ComponentName;

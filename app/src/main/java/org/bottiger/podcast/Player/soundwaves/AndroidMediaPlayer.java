@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.bottiger.podcast.Player.soundwaves;
+package org.bottiger.podcast.player.soundwaves;
 
 import android.content.Context;
 import android.media.MediaPlayer;

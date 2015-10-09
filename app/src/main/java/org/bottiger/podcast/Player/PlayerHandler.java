@@ -1,4 +1,4 @@
-package org.bottiger.podcast.Player;
+package org.bottiger.podcast.player;
 
 import android.content.SharedPreferences;
 import android.os.Handler;

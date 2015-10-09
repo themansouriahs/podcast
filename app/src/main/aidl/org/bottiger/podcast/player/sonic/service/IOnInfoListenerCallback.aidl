@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.aocate.presto.service;
+package org.bottiger.podcast.player.sonic.service;
 
-interface IOnErrorListenerCallback_0_8 {
-	boolean onError(int what, int extra);
+interface IOnInfoListenerCallback {
+	boolean onInfo(int what, int extra);
 }

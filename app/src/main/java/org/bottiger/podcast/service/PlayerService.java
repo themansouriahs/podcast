@@ -1,10 +1,10 @@
 package org.bottiger.podcast.service;
 
-import org.bottiger.podcast.Player.LegacyRemoteController;
-import org.bottiger.podcast.Player.PlayerHandler;
-import org.bottiger.podcast.Player.PlayerPhoneListener;
-import org.bottiger.podcast.Player.PlayerStateManager;
-import org.bottiger.podcast.Player.SoundWavesPlayer;
+import org.bottiger.podcast.player.LegacyRemoteController;
+import org.bottiger.podcast.player.PlayerHandler;
+import org.bottiger.podcast.player.PlayerPhoneListener;
+import org.bottiger.podcast.player.PlayerStateManager;
+import org.bottiger.podcast.player.SoundWavesPlayer;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.MediaCast.IMediaCast;
 import org.bottiger.podcast.listeners.PlayerStatusData;

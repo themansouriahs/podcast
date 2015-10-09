@@ -10,11 +10,10 @@ import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.aocate.presto.service.IPlayMedia_0_8;
+import org.bottiger.podcast.player.sonic.service.ISoundWavesEngine;
 import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
 
-import org.bottiger.podcast.Player.prestissimo.SoundService;
 import org.bottiger.podcast.flavors.Analytics.AnalyticsFactory;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.CrashReporterFactory;
@@ -62,7 +61,7 @@ public class SoundWaves extends Application {
     @Deprecated
     public static PlayerService sBoundPlayerService = null;
 
-    public IPlayMedia_0_8 soundService;
+    public ISoundWavesEngine soundService;
 
     public ServiceConnection playerServiceConnection = new ServiceConnection() {
         @Override
@@ -86,7 +85,7 @@ public class SoundWaves extends Application {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
             Log.d("SoundEngine", "onServiceConnected");
-            soundService = IPlayMedia_0_8.Stub.asInterface(service);
+            soundService = ISoundWavesEngine.Stub.asInterface(service);
         }
 
         @Override
