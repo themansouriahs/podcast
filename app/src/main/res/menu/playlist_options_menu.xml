@@ -6,4 +6,9 @@
         android:title="@string/action_filter"
         app:showAsAction="ifRoom"/>
 
+    <item android:id="@+id/action_fullscreen_player"
+        android:icon="@drawable/ic_fullscreen_white_24px"
+        android:title="@string/action_enter_fullscreen"
+        app:showAsAction="ifRoom"/>
+
 </menu>

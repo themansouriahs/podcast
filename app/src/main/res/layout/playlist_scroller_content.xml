@@ -64,7 +64,8 @@
                     android:padding="0dip"
                     android:src="?attr/fullscreen"
                     android:elevation="@dimen/player_elevation"
-                    style="@style/TopPlayerButton" />
+                    style="@style/TopPlayerButton"
+                    android:visibility="gone"/>
 
 
                 <RelativeLayout
@@ -102,7 +103,7 @@
                 style="@style/TopPlayerButton"
                 android:layout_marginRight="10dp"
                 android:layout_marginLeft="0dp"
-                android:layout_alignTop="@id/fullscreen_button"
+                android:layout_alignTop="@id/sleep_button"
                 android:padding="0dip"
                 android:elevation="@dimen/player_elevation"
                 android:src="?attr/skip_to_next"

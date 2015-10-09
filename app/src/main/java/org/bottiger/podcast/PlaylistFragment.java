@@ -604,7 +604,8 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
      @Override
      public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
-         inflater.inflate(R.menu.playlist_actionbar, menu);
+         inflater.inflate(R.menu.playlist_options_menu, menu);
+         setOptionMenuState(menu.findItem(R.id.action_fullscreen_player));
          super.onCreateOptionsMenu(menu, inflater);
          return;
      }
@@ -623,9 +624,33 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                  dialogPlaylistFilters.show(getFragmentManager(), getTag());
                  return true;
              }
+             case R.id.action_fullscreen_player: {
+                 boolean isFullscreen = mTopPlayer.isFullscreen();
+                 mTopPlayer.setFullscreen(!isFullscreen, true);
+                 setOptionMenuState(item);
+                 return true;
+             }
          }
          return super.onOptionsItemSelected(item);
      }
+
+    private void setOptionMenuState(MenuItem item) {
+        if (item == null)
+            return;
+
+        switch (item.getItemId()) {
+            case R.id.action_fullscreen_player: {
+                if (mTopPlayer.isFullscreen()) {
+                    item.setTitle(R.string.action_exit_fullscreen);
+                    item.setIcon(R.drawable.ic_fullscreen_exit_white_24px);
+                } else {
+                    item.setTitle(R.string.action_enter_fullscreen);
+                    item.setIcon(R.drawable.ic_fullscreen_white_24px);
+                }
+                break;
+            }
+        }
+    }
 
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,

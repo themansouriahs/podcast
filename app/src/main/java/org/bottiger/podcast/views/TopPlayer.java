@@ -353,20 +353,6 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
                         }
                     }
                 });
-/*
-        mRxSubscriptions = new CompositeSubscription();
-        mRxSubscriptions//
-                .add(bus.toObserverable()//
-                        .subscribe(new Action1<Object>() {
-                            @Override
-                            public void call(Object event) {
-                                if (event instanceof RxBusSimpleEvents.PlaybackSpeedChanged) {
-                                    RxBusSimpleEvents.PlaybackSpeedChanged playbackSpeedChanged = (RxBusSimpleEvents.PlaybackSpeedChanged) event;
-                                    mSpeedpButton.setText(playbackSpeedChanged.speed + "X");
-                                }
-                            }
-                        }));
-                        */
     }
 
     @Override
@@ -707,18 +693,22 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         return mBackgroundColor;
     }
 
-    public void setFullscreen(boolean argNewState, boolean doAnimate) {
+    public synchronized void setFullscreen(boolean argNewState, boolean doAnimate) {
+        mFullscreen = argNewState;
+        try {
+            if (doAnimate && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                Transition trans = new ChangeBounds();
+                trans.setDuration(ANIMATION_DURATION);
+                TransitionManager.go(new Scene(this), trans);
+            }
 
-        if (doAnimate && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            Transition trans = new ChangeBounds();
-            trans.setDuration(ANIMATION_DURATION);
-            TransitionManager.go(new Scene(this), trans);
-        }
-
-        if (mFullscreen) {
-            goFullscreen();
-        } else {
-            exitFullscreen();
+            if (mFullscreen) {
+                goFullscreen();
+            } else {
+                exitFullscreen();
+            }
+        } finally {
+            prefs.edit().putBoolean(mDoFullscreentKey, argNewState).apply();
         }
     }
 
