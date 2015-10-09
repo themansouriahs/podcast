@@ -307,10 +307,22 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
                     mFullscreen = !mFullscreen;
                     setFullscreen(mFullscreen, true);
                 } finally {
-                    prefs.edit().putBoolean(mDoFullscreentKey, mFullscreen).commit();
+                    prefs.edit().putBoolean(mDoFullscreentKey, mFullscreen).apply();
                 }
             }
         });
+
+        // Need to be called after the ndk player is connected
+        String key = getResources().getString(R.string.pref_use_soundengine_key);
+        boolean useCustomEngine = prefs.getBoolean(key, false);
+        int visibility = useCustomEngine ? View.VISIBLE : View.GONE;
+        mSpeedpButton.setVisibility(visibility);
+
+        PlayerService ps = PlayerService.getInstance();
+        if (ps != null) {
+            SoundWavesPlayer player = ps.getPlayer();
+            mSpeedpButton.setText(player.getCurrentSpeedMultiplier() + "X");
+        }
 
         mSpeedpButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -318,13 +330,6 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
                 MainActivity activity = ((MainActivity)getContext());
                 DialogPlaybackSpeed dialogPlaybackSpeed = DialogPlaybackSpeed.newInstance(DialogPlaybackSpeed.EPISODE);
                 dialogPlaybackSpeed.show(activity.getFragmentManager(), DialogPlaybackSpeed.class.getName());
-                /*
-                PlayerService ps = PlayerService.getInstance();
-                SoundWavesPlayer player = ps.getPlayer();
-                if (player.canSetSpeed()) {
-                    player.setPlaybackSpeed(2.0f);
-                }
-                */
             }
         });
     }
