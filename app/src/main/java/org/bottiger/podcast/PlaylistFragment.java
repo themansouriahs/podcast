@@ -1,14 +1,12 @@
 package org.bottiger.podcast;
 
 import org.bottiger.podcast.adapters.PlaylistAdapter;
-import org.bottiger.podcast.listeners.DownloadProgressPublisher;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.playlist.filters.SubscriptionFilter;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
-import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.ImageLoaderUtils;
@@ -178,7 +176,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         mTotalTime         =    (TextViewObserver) view.findViewById(R.id.total_time);
 
         mPlayPauseButton         =    (PlayPauseImageView) view.findViewById(R.id.play_pause_button);
-        mPlayerSeekbar          =    (PlayerSeekbar) view.findViewById(R.id.player_center_square);
+        mPlayerSeekbar          =    (PlayerSeekbar) view.findViewById(R.id.top_player_seekbar);
         mPlayerDownloadButton   =    (DownloadButtonView) view.findViewById(R.id.download);
         mBackButton = (PlayerButtonView)view.findViewById(R.id.rewind_button);
         mForwardButton = (PlayerButtonView)view.findViewById(R.id.fast_forward_button);

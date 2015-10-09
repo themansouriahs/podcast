@@ -355,6 +355,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
             return;
 
         Log.d("TopPlayer", "ensure minimum");
+
         int argScreenHeight = sizeSmall;
         int trans = sizeSmall-sizeLarge;
         //setPlayerHeight(sizeSmall, sizeSmall-sizeLarge);

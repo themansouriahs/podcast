@@ -9,6 +9,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
@@ -76,23 +77,32 @@ public class StrUtils {
     	String currentTime = formatTime((long)(durationInSeconds*progress)*1000);
     	return currentTime;
     }
-    
-    public static String formatTime(long ms) {
-    	long s = ms / 1000;
-    	long m = s / 60;
-    	s = s % 60;
-    	long h = m / 60;
-    	m = m % 60;
-    	String m_s = mTimeDecimalFormat.format(m) + ":" 
-    		+ mTimeDecimalFormat.format(s);
-    	if (h > 0) {
-    		// show also hour
-    		return "" + h + ":" + m_s;
-    	} else {
-    		// Show only minute:second
-    		return m_s;
-    	}
-    }
+
+	/*
+	Fast but not so readable.
+	From here: http://stackoverflow.com/questions/9027317/how-to-convert-milliseconds-to-hhmmss-format
+ 	*/
+	public static String formatTime(final long millis) {
+		long seconds = TimeUnit.MILLISECONDS.toSeconds(millis)
+				- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis));
+		long minutes = TimeUnit.MILLISECONDS.toMinutes(millis)
+				- TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis));
+		long hours = TimeUnit.MILLISECONDS.toHours(millis);
+
+		StringBuilder b = new StringBuilder();
+
+		if (hours > 0) {
+			b.append(hours < 10 ? String.valueOf("" + hours) : String.valueOf(hours));
+			b.append(":");
+		}
+
+		b.append(minutes == 0 ? "00" : minutes < 10 ? String.valueOf("0" + minutes) :
+				String.valueOf(minutes));
+		b.append(":");
+		b.append(seconds == 0 ? "00" : seconds < 10 ? String.valueOf("0" + seconds) :
+				String.valueOf(seconds));
+		return b.toString();
+	}
     
 	public static String formatDownloadString(int offset, long length) {
 		double d = 100.0 * offset / length;

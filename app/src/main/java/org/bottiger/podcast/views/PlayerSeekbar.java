@@ -22,17 +22,23 @@ import android.widget.FrameLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.squareup.otto.Subscribe;
+
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.listeners.EpisodeStatus;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
+import org.bottiger.podcast.listeners.PlayerStatusProgressData;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.UIUtils;
 
 import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
+
+import rx.Observable;
 
 /**
  * Created by apl on 03-09-2014.
@@ -40,11 +46,7 @@ import java.util.concurrent.TimeUnit;
 public class PlayerSeekbar extends SeekBar implements PaletteListener {
 
     private static final String TAG = "PlayerSeekbar";
-
-    private static final int RANGE_MIN = 0;
     private static final int RANGE_MAX = 1000;
-
-    private int mSideMargin = 0;
 
     private boolean mPaintSeekInfo = false;
 
@@ -64,7 +66,9 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
 
     private boolean mIsPlaying = false;
     private boolean mIsTouching = false;
-    private HashSet<OnSeekListener> mSeekListeners = new HashSet<OnSeekListener>();
+
+    private CoordinatorLayout.LayoutParams params = new CoordinatorLayout.LayoutParams(0 ,0);
+    private int[] loc = new int[2];
 
     private OnSeekBarChangeListener onSeekBarChangeListener = new OnSeekBarChangeListener() {
 
@@ -83,7 +87,7 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
             long timeMs = mEpisode.getDuration() * seekBar.getProgress()
                     / RANGE_MAX;
 
-            PlayerService ps = SoundWaves.sBoundPlayerService;
+            PlayerService ps = PlayerService.getInstance();
 
             if (ps == null)
                 return;
@@ -92,12 +96,9 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
                 ps.seek(timeMs);
             } else {
                 mEpisode.setOffset(ps.getContentResolver(), timeMs);
-                // FIXME
-                //PlayerStatusObservable.updateProgress(MainActivity.sBoundPlayerService, mEpisode);
                 setProgressMs(timeMs);
             }
 
-            //FixedRecyclerView.mSeekbarSeeking = false;
             invalidate();
         }
 
@@ -105,8 +106,6 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
         public void onStartTrackingTouch(SeekBar seekBar) {
             Log.d("PlayerSeekbar state", "onStartTrackingTouch");
             validateState();
-
-            //FixedRecyclerView.mSeekbarSeeking = true;
 
             if (mDurationMs < 0) {
                 mDurationMs = mEpisode.getDuration();
@@ -119,7 +118,7 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
 
             long timeMs = mEpisode.getDuration() * seekBar.getProgress()
                     / RANGE_MAX;
-            mEpisode.setOffset(null, (long)timeMs);
+            mEpisode.setOffset(null, timeMs);
         }
 
         @Override
@@ -151,70 +150,51 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
             long diffMs = (long)(SeekDiff*mDurationMs);
 
             if (SeekDiff > 0) {
-                mForwardText = "+" + msToString(diffMs);
+                mForwardText = "+" + StrUtils.formatTime(diffMs);
                 mBackwardsText = "";
             } else {
                 mForwardText = "";
-                mBackwardsText = "-" + msToString(-diffMs);
+                mBackwardsText = "-" + StrUtils.formatTime(-diffMs);
             }
 
-            mCurrentText = msToString(currentPositionMs);
-
-            for (OnSeekListener seekListener : mSeekListeners) {
-                seekListener.seekTo(progress, RANGE_MIN, RANGE_MAX);
-            }
+            mCurrentText = StrUtils.formatTime(currentPositionMs);
         }
     };
 
 
     public PlayerSeekbar(Context context) {
         super(context);
-        init(context);
+        init();
     }
 
     public PlayerSeekbar(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init(context);
+        init();
     }
 
     public PlayerSeekbar(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init(context);
+        init();
     }
 
     @TargetApi(21)
     public PlayerSeekbar(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        init(context);
+        init();
     }
 
-    public void init(@NonNull Context argContext) {
+    private void init() {
         if (isInEditMode()) {
             return;
         }
 
         setMax(RANGE_MAX);
         setOnSeekBarChangeListener(onSeekBarChangeListener);
-        mIsPlaying = SoundWaves.sBoundPlayerService != null && SoundWaves.sBoundPlayerService.isPlaying();
-
-        // FIXME
-        mSideMargin = (int)UIUtils.convertDpToPixel(40, getContext());
-        //argContext.getResources().getDimensionPixelSize(R.dimen.action_bar_height);
-
-
-        /*
-        int seekbarHeight = argContext.getResources().getDimensionPixelSize(R.dimen.seekbar_thumb_size);
-        int seebarWidth = seekbarHeight / 3 *2;
-
-        Drawable thumb = getResources().getDrawable(R.drawable.seekbar_handle);
-        Bitmap bitmap = ((BitmapDrawable) thumb).getBitmap();
-        thumb = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, seebarWidth, seekbarHeight, true));
-
-        setThumb(thumb);
-        */
+        PlayerService ps = PlayerService.getInstance();
+        mIsPlaying = ps != null && ps.isPlaying();
     }
 
-    public void setEpisode(IEpisode argEpisode) {
+    public void setEpisode(@NonNull IEpisode argEpisode) {
         mEpisode = argEpisode;
 
         if (mEpisode.getOffset() > 0 && mEpisode.getDuration() > 0) {
@@ -234,10 +214,6 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
         validateState();
         return mEpisode;
     }
-
-    private CoordinatorLayout.LayoutParams params = new CoordinatorLayout.LayoutParams(0 ,0);
-    //private RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(200, 400);
-    private int[] loc = new int[2];
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -264,20 +240,15 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
 
             this.getLocationInWindow(loc);
 
-            int top = loc[1];
-            top = getTop();
             int offset =  (int)UIUtils.convertDpToPixel(50, getContext()); //FIXME this.getHeight()*4;
             int translationY = (int)((View)this.getParent()).getTranslationY();
             Log.v(TAG, "trans => " + translationY);
             Log.v(TAG, "loc0 => " + loc[0] + " loc0 => " + loc[1] + " offset => " + offset);
-            //params.setMargins(mSideMargin, offset, mSideMargin, 0);
             params.setMargins(0, offset, 0, 0);
-
 
             if (mOverlay != null) {
                 mOverlay.getLocationOnScreen(loc);
                 Log.v(TAG, "Overlay: loc0 => " + loc[0] + " loc0 => " + loc[1]);
-                //mOverlay.setPadding(0,offset,0,0);
                 mOverlay.setLayoutParams(params);
                 mOverlay.setVisibility(VISIBLE);
             }
@@ -287,6 +258,14 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
                 mOverlay.setVisibility(GONE);
             }
         }
+    }
+
+    @Subscribe
+    public void setProgressMs(PlayerStatusProgressData argPlayerProgress) {
+        if (argPlayerProgress.progressMs < 0)
+            return;
+
+        setProgressMs(argPlayerProgress.progressMs);
     }
 
     public void setProgressMs(long progressMs) {
@@ -316,6 +295,7 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
         setProgress((int) progress);
     }
 
+    @Subscribe
     public void onStateChange(EpisodeStatus argStatus) {
         validateState();
 
@@ -394,22 +374,6 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
         return mEpisode.getArtwork(getContext());
     }
 
-    public interface OnSeekListener {
-        public void seekTo(int argCurrentSeekValue, int argMinValue, int argMaxValue);
-    }
-
-    public void registerListener(OnSeekListener argListener) {
-        mSeekListeners.add(argListener);
-    }
-
-    public void unregisterListener(OnSeekListener argListener) {
-        if (!mSeekListeners.contains(argListener)) {
-            throw new IllegalArgumentException("Listener not registered");
-        }
-
-        mSeekListeners.remove(argListener);
-    }
-
     public void validateState() {
         if (mEpisode == null) {
             throw new IllegalStateException("Episode needs to be set");
@@ -429,31 +393,6 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
             //Log.d("PlayerSeekbar", nextParent.toString() + " -> " + argDisallowTouch);
             requestParentTouchRecursive(nextParent, argDisallowTouch);
         }
-    }
-
-    /*
-    Fast but not so readable. From here: http://stackoverflow.com/questions/9027317/how-to-convert-milliseconds-to-hhmmss-format
-     */
-    public static String msToString(final long millis) {
-        long seconds = TimeUnit.MILLISECONDS.toSeconds(millis)
-                - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis));
-        long minutes = TimeUnit.MILLISECONDS.toMinutes(millis)
-                - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis));
-        long hours = TimeUnit.MILLISECONDS.toHours(millis);
-
-        StringBuilder b = new StringBuilder();
-
-        if (hours > 0) {
-            b.append(hours < 10 ? String.valueOf("" + hours) : String.valueOf(hours));
-            b.append(":");
-        }
-
-        b.append(minutes == 0 ? "00" : minutes < 10 ? String.valueOf("0" + minutes) :
-                String.valueOf(minutes));
-        b.append(":");
-        b.append(seconds == 0 ? "00" : seconds < 10 ? String.valueOf("0" + seconds) :
-                String.valueOf(seconds));
-        return b.toString();
     }
 
     public boolean isTouching() {
