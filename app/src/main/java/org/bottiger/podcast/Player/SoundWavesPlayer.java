@@ -1,4 +1,4 @@
-package org.bottiger.podcast.player;
+package org.bottiger.podcast.Player;
 
 import android.content.ComponentName;
 import android.content.ContentResolver;
@@ -19,6 +19,8 @@ import org.bottiger.podcast.flavors.MediaCast.IMediaCast;
 import org.bottiger.podcast.flavors.MediaCast.IMediaRouteStateListener;
 import org.bottiger.podcast.listeners.PlayerStatusData;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
+import org.bottiger.podcast.player.GenericMediaPlayerInterface;
+import org.bottiger.podcast.player.PlayerHandler;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
@@ -30,7 +32,7 @@ import java.io.IOException;
 /**
  * Created by apl on 20-01-2015.
  */
-public class SoundWavesPlayer extends SoundWavesPlayerBase implements IMediaRouteStateListener {
+public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlayerBase implements IMediaRouteStateListener {
 
     private static final float MARK_AS_LISTENED_RATIO_THRESHOLD = 0.9f;
     private static final float MARK_AS_LISTENED_MINUTES_LEFT_THRESHOLD = 5f;
@@ -47,8 +49,8 @@ public class SoundWavesPlayer extends SoundWavesPlayerBase implements IMediaRout
     private @PlayerStatusObservable.PlayerStatus int mStatus;
 
     private PlayerService mPlayerService;
-    private PlayerHandler mHandler;
-    private PlayerStateManager mPlayerStateManager;
+    private org.bottiger.podcast.player.PlayerHandler mHandler;
+    private org.bottiger.podcast.player.PlayerStateManager mPlayerStateManager;
 
     private boolean mIsInitialized = false;
     private boolean mIsStreaming = false;

@@ -396,8 +396,10 @@ public class PlayerService extends Service implements
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
 
+		/*
         if (offset == 0 && prefs.getBoolean("pref_stream_proxy", false))
             dataSource = HTTPDService.proxyURL(mItem.getUrl().toString());
+		*/
 
 		mPlaylist.setAsFrist(mItem);
 		mPlayer.setDataSourceAsync(dataSource, offset);
