@@ -4,60 +4,9 @@
     <color name="white_opaque">#FFFFFFFF</color>
     <color name="pitch_black">#FF000000</color>
 
-    <style name="SoundWavesTheme" parent="Theme.AppCompat.NoActionBar">
-        <item name="playpause_icon">@drawable/ic_play_arrow_black</item>
-        <item name="play_icon">@drawable/ic_play_arrow_black</item>
-        <item name="pause_icon">@drawable/ic_pause_black</item>
-        <item name="play_invert_icon">@drawable/ic_play_arrow_white</item>
-        <item name="pause_invert_icon">@drawable/ic_pause_white</item>
-        <item name="fast_forward_icon">@drawable/ic_action_fast_forward</item>
-        <item name="skip_to_next">@drawable/ic_skip_next_white</item>
-        <item name="rewind_icon">@drawable/ic_action_rewind</item>
-        <item name="ic_remove">@drawable/ic_highlight_remove_white</item>
-        <item name="ic_remove_inv">@drawable/ic_highlight_remove_black</item>
-        <item name="ic_close_inv">@drawable/ic_close_24dp</item>
-        <item name="favorite_outline_inv">@drawable/ic_favorite_outline_black</item>
-        <item name="previous_icon">@drawable/ic_action_previous</item>
-        <item name="ic_rewind">@drawable/ic_fast_rewind_white</item>
-        <item name="ic_forward">@drawable/ic_fast_forward_white</item>
-        <item name="ic_expand">@drawable/ic_expand_more_white</item>
-        <item name="ic_expand_less">@drawable/ic_expand_less_white</item>
-        <item name="stop_icon">@drawable/av_stop</item>
-        <item name="download_icon">@drawable/ic_get_app_white</item>
-        <item name="delete_icon">@drawable/ic_action_delete</item>
-        <item name="backspace_icon">@drawable/content_backspace</item>
-        <item name="queue_icon">@drawable/av_add_to_queue</item>
-        <item name="info_icon">@drawable/collections_view_as_list</item>
-        <item name="new_icon">@drawable/content_new</item>
-        <item name="sync_icon">@drawable/refresh</item>
-        <item name="sync_invert_icon">@drawable/action_search</item>
-        <item name="search_icon">@drawable/action_search</item>
-        <item name="search_invert_icon">@drawable/action_search</item>
-        <item name="customBackground">@color/pitch_black</item>
-        <item name="favorite_outline">@drawable/ic_favorite_outline_white</item>
-        <item name="time_icon">@drawable/ic_access_time_white</item>
-        <item name="sleep">@drawable/ic_snooze_white</item>
-        <item name="fullscreen">@drawable/ic_fullscreen_white</item>
-        <item name="fullscreen_exit">@drawable/ic_fullscreen_exit_white</item>
-        <!--<item name="seekbar_handle">@drawable/seekbar_handle2.9</item>-->
-        <item name="android:actionBarStyle">@style/TranslucentActionBar</item>
-
-        <item name="android:windowBackground">@null</item>
-        <item name="themeBackground">@color/pitch_black</item>
-        <item name="themeTextColorPrimary">@color/white_opaque</item>
-        <item name="themeTextColorFaded">@color/grayDark</item>
-
-        <!--<item name="android:background">@color/pitch_black</item>
-        <item name="android:windowBackground">@color/pitch_black</item>-->
-        <!--<item name="android:colorBackground">@color/pitch_black</item>-->
-
-        <item name="android:windowNoTitle">true</item>
-        <item name="windowActionBar">false</item>
-
-        <!-- fonts -->
-        <item name="android:textViewStyle">@style/SoundWavesTextViewStyle</item>
-    </style>
-
+    <!--
+        Light Theme
+    -->
     <style name="SoundWavesTheme.Light" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="playpause_icon">@drawable/ic_play_arrow_white</item>
         <item name="play_icon">@drawable/ic_play_arrow_white</item>
@@ -133,6 +82,63 @@
         <!-- Spinner: http://stackoverflow.com/questions/16693941/spinner-text-size-does-not-change -->
         <item name="android:spinnerItemStyle">@style/spinnerItemStyle</item>
 
+
+        <!-- fonts -->
+        <item name="android:textViewStyle">@style/SoundWavesTextViewStyle</item>
+    </style>
+
+    <!--
+    Dark Theme
+    -->
+    <style name="SoundWavesTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="playpause_icon">@drawable/ic_play_arrow_black</item>
+        <item name="play_icon">@drawable/ic_play_arrow_black</item>
+        <item name="pause_icon">@drawable/ic_pause_black</item>
+        <item name="play_invert_icon">@drawable/ic_play_arrow_white</item>
+        <item name="pause_invert_icon">@drawable/ic_pause_white</item>
+        <item name="fast_forward_icon">@drawable/ic_action_fast_forward</item>
+        <item name="skip_to_next">@drawable/ic_skip_next_white</item>
+        <item name="rewind_icon">@drawable/ic_action_rewind</item>
+        <item name="ic_remove">@drawable/ic_highlight_remove_white</item>
+        <item name="ic_remove_inv">@drawable/ic_highlight_remove_black</item>
+        <item name="ic_close_inv">@drawable/ic_close_24dp</item>
+        <item name="favorite_outline_inv">@drawable/ic_favorite_outline_black</item>
+        <item name="previous_icon">@drawable/ic_action_previous</item>
+        <item name="ic_rewind">@drawable/ic_fast_rewind_white</item>
+        <item name="ic_forward">@drawable/ic_fast_forward_white</item>
+        <item name="ic_expand">@drawable/ic_expand_more_white</item>
+        <item name="ic_expand_less">@drawable/ic_expand_less_white</item>
+        <item name="stop_icon">@drawable/av_stop</item>
+        <item name="download_icon">@drawable/ic_get_app_white</item>
+        <item name="delete_icon">@drawable/ic_action_delete</item>
+        <item name="backspace_icon">@drawable/content_backspace</item>
+        <item name="queue_icon">@drawable/av_add_to_queue</item>
+        <item name="info_icon">@drawable/collections_view_as_list</item>
+        <item name="new_icon">@drawable/content_new</item>
+        <item name="sync_icon">@drawable/refresh</item>
+        <item name="sync_invert_icon">@drawable/action_search</item>
+        <item name="search_icon">@drawable/action_search</item>
+        <item name="search_invert_icon">@drawable/action_search</item>
+        <item name="customBackground">@color/pitch_black</item>
+        <item name="favorite_outline">@drawable/ic_favorite_outline_white</item>
+        <item name="time_icon">@drawable/ic_access_time_white</item>
+        <item name="sleep">@drawable/ic_snooze_white</item>
+        <item name="fullscreen">@drawable/ic_fullscreen_white</item>
+        <item name="fullscreen_exit">@drawable/ic_fullscreen_exit_white</item>
+        <!--<item name="seekbar_handle">@drawable/seekbar_handle2.9</item>-->
+        <item name="android:actionBarStyle">@style/TranslucentActionBar</item>
+
+        <item name="android:windowBackground">@null</item>
+        <item name="themeBackground">@color/pitch_black</item>
+        <item name="themeTextColorPrimary">@color/white_opaque</item>
+        <item name="themeTextColorFaded">@color/grayDark</item>
+
+        <!--<item name="android:background">@color/pitch_black</item>
+        <item name="android:windowBackground">@color/pitch_black</item>-->
+        <!--<item name="android:colorBackground">@color/pitch_black</item>-->
+
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
 
         <!-- fonts -->
         <item name="android:textViewStyle">@style/SoundWavesTextViewStyle</item>

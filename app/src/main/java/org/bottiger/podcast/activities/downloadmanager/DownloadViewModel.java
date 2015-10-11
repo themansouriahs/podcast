@@ -66,8 +66,7 @@ public class DownloadViewModel {
             return totalFilesizeFormatted;
         }
 
-        return res.getQuantityString(R.plurals.download_progress,
-                (int) currentFilesize,
+        return res.getString(R.string.download_progress,
                 currentFilesizeFormatted,
                 totalFilesizeFormatted);
     }
