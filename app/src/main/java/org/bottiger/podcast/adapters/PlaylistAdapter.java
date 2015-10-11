@@ -223,12 +223,12 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
         holder.mPlayPauseButton.setEpisode(feedItem, PlayPauseImageView.PLAYLIST);
         holder.downloadButton.setEpisode(feedItem);
-        holder.favoriteButton.setEpisode(feedItem);
+        //holder.favoriteButton.setEpisode(feedItem);
         holder.removeButton.setEpisode(feedItem);
         holder.downloadButton.setEpisode(feedItem);
 
         PaletteHelper.generate(feedItem.getArtwork(mActivity), mActivity, holder.downloadButton);
-        PaletteHelper.generate(feedItem.getArtwork(mActivity), mActivity, holder.favoriteButton);
+        //PaletteHelper.generate(feedItem.getArtwork(mActivity), mActivity, holder.favoriteButton);
         PaletteHelper.generate(feedItem.getArtwork(mActivity), mActivity, holder.removeButton);
 
 
@@ -272,7 +272,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         }
 
         holder.mPlayPauseButton.unsetEpisodeId();
-        holder.favoriteButton.unsetEpisodeId();
+        //holder.favoriteButton.unsetEpisodeId();
         holder.removeButton.unsetEpisodeId();
         holder.downloadButton.unsetEpisodeId();
     }

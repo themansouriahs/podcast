@@ -248,8 +248,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         mBackButton = findViewById(R.id.rewind_button);
         mFullscreenButton = (PlayerButtonView) findViewById(R.id.fullscreen_button);
         mDownloadButton = findViewById(R.id.download);
-        mQueueButton = findViewById(R.id.queue);
-        mFavoriteButton = findViewById(R.id.bookmark);
+        mFavoriteButton = findViewById(R.id.favorite);
         mGradient = findViewById(R.id.top_gradient_inner);
         mSleepButton = (PlayerButtonView) findViewById(R.id.sleep_button);
         mSpeedpButton = (Button) findViewById(R.id.speed_button);
@@ -358,7 +357,8 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        mRxSubscriptions.unsubscribe();
+        if (mRxSubscriptions != null)
+            mRxSubscriptions.unsubscribe();
     }
 
     private void sleepButtonPressed() {

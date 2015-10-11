@@ -10,6 +10,8 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.github.ivbaranov.mfb.MaterialFavoriteButton;
+
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.adapters.PlaylistAdapter;
 import org.bottiger.podcast.adapters.viewholders.ExpandableViewHoldersUtil;
@@ -53,7 +55,7 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
     public TextView filesize;
     public TextView description;
 
-    public PlayerButtonView favoriteButton;
+    public MaterialFavoriteButton favoriteButton;
     public PlayerButtonView removeButton;
     public DownloadButtonView downloadButton;
 
@@ -85,7 +87,7 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
                 .findViewById(R.id.current_position);
         seekbar = (PlayerSeekbar) view.findViewById(R.id.top_player_seekbar);
 
-        favoriteButton = (PlayerButtonView) view.findViewById(R.id.favorite);
+        favoriteButton = (MaterialFavoriteButton) view.findViewById(R.id.favorite);
         removeButton = (PlayerButtonView) view.findViewById(R.id.remove_episode);
         downloadButton = (DownloadButtonView) view
                 .findViewById(R.id.expanded_download);

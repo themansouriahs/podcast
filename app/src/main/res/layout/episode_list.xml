@@ -115,10 +115,26 @@
                 android:id="@+id/expanded_download"
                 style="@style/PlaylistButton" />
 
+
+            <com.github.ivbaranov.mfb.MaterialFavoriteButton
+                xmlns:custom="http://schemas.android.com/apk/res/org.bottiger.podcast"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                custom:mfb_animate_favorite="true"
+                custom:mfb_favorite_image="@drawable/ic_favorite_black"
+                custom:mfb_not_favorite_image="@drawable/ic_favorite_outline_black"
+                custom:mfb_rotation_duration="100"
+                custom:mfb_bounce_duration="150"
+                android:layout_marginTop="-6dp"
+                android:id="@+id/favorite"
+                />
+
+            <!--
             <org.bottiger.podcast.views.PlayerButtonView
                 android:id="@+id/favorite"
                 android:src="?attr/favorite_outline_inv"
                 style="@style/PlaylistButton" />
+                -->
 
             <org.bottiger.podcast.views.PlayerButtonView
                 android:id="@+id/remove_episode"

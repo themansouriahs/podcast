@@ -87,13 +87,17 @@
                 </RelativeLayout>
 
 
-                <org.bottiger.podcast.views.PlayerButtonView
+                <com.github.ivbaranov.mfb.MaterialFavoriteButton
+                    xmlns:custom="http://schemas.android.com/apk/res/org.bottiger.podcast"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    custom:mfb_animate_favorite="true"
+                    custom:mfb_favorite_image="@drawable/ic_favorite_white_24px"
+                    custom:mfb_not_favorite_image="@drawable/ic_favorite_border_white_24px"
+                    custom:mfb_rotation_duration="100"
+                    custom:mfb_bounce_duration="150"
                     android:id="@+id/favorite"
-                    android:padding="0dip"
-                    android:src="?attr/favorite_outline"
-                    android:elevation="@dimen/player_elevation"
-                    android:visibility="gone"
-                    style="@style/TopPlayerButton" />
+                    android:padding="5dip"  />
 
             </LinearLayout>
 

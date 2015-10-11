@@ -63,6 +63,7 @@ import android.widget.FrameLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
+import com.github.ivbaranov.mfb.MaterialFavoriteButton;
 import com.squareup.otto.Produce;
 import com.squareup.otto.Subscribe;
 
@@ -93,7 +94,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
     private DownloadButtonView mPlayerDownloadButton;
     private PlayerButtonView mForwardButton;
     private PlayerButtonView mBackButton;
-    private PlayerButtonView mFavoriteButton;
+    private MaterialFavoriteButton mFavoriteButton;
     private View mGradientBottomTopPlayer;
 
     private RecyclerView mRecyclerView;
@@ -180,7 +181,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         mPlayerDownloadButton   =    (DownloadButtonView) view.findViewById(R.id.download);
         mBackButton = (PlayerButtonView)view.findViewById(R.id.rewind_button);
         mForwardButton = (PlayerButtonView)view.findViewById(R.id.fast_forward_button);
-        mFavoriteButton = (PlayerButtonView)view.findViewById(R.id.favorite);
+        mFavoriteButton = (MaterialFavoriteButton)view.findViewById(R.id.favorite);
 
         mGradientBottomTopPlayer = view.findViewById(R.id.gradient_bottom);
 
@@ -405,7 +406,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                 mBackButton.setEpisode(item);
                 mForwardButton.setEpisode(item);
                 mPlayerDownloadButton.setEpisode(item);
-                mFavoriteButton.setEpisode(item);
+                //mFavoriteButton.setEpisode(item);
                 SoundWaves.getBus().register(mPlayerDownloadButton);
             }
             playlistChanged(mPlaylist);
@@ -446,7 +447,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         mBackButton.setEpisode(item);
         mForwardButton.setEpisode(item);
         mPlayerDownloadButton.setEpisode(item);
-        mFavoriteButton.setEpisode(item);
+        //mFavoriteButton.setEpisode(item);
 
         if (SoundWaves.sBoundPlayerService != null &&
                 SoundWaves.sBoundPlayerService.getCurrentItem() != null &&
@@ -490,7 +491,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
             PaletteHelper.generate(artworkURL, activity, mBackButton);
             PaletteHelper.generate(artworkURL, activity, mForwardButton);
             PaletteHelper.generate(artworkURL, activity, mPlayerDownloadButton);
-            PaletteHelper.generate(artworkURL, activity, mFavoriteButton);
+            //PaletteHelper.generate(artworkURL, activity, mFavoriteButton);
 
             PaletteHelper.generate(artworkURL, activity, new PaletteListener() {
                 @Override
