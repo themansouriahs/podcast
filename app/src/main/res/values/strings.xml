@@ -22,7 +22,7 @@
     <string name="title_section1">Subscriptions</string>
     <string name="hello_world">Hello World!</string>
     <string name="menu_settings">Settings</string>
-    <string name="menu_downloading">Downloading</string>
+    <string name="menu_downloading">Download Manager</string>
     <string name="title_activity_swipe">SoundWaves</string>
     <string name="menu_download_all">Bulk download</string>
     <string name="menu_clear_playlist">Reset playlist</string>
@@ -173,7 +173,7 @@
     <string name="opml_import_toolbar_description">Select the podcasts you wish to subscribe to</string>
     <string name="download_manager_toolbar_title">Download Queue</string>
     <string name="download_manager_toolbar_description">Episodes scheduled for download</string>
-    <string name="menu_clear_download">clear</string>
+    <string name="menu_clear_download">Clear</string>
     <string name="download_manager_empty_title">No download in progress</string>
 
     <!--
