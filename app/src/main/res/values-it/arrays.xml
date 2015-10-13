@@ -13,15 +13,6 @@
     <item>10 ore </item>
     <item>1 giorno</item>
   </string-array>
-  <string-array name="entryvalues_update">
-    <item>30</item>
-    <item>60</item>
-    <item>120</item>
-    <item>240</item>
-    <item>360</item>
-    <item>600</item>
-    <item>1440</item>
-  </string-array>
   <string-array name="entries_item_expire">
     <item>1 giorno</item>
     <item>3 giorni</item>
@@ -30,14 +21,6 @@
     <item>2 settimane</item>
     <item>1 mese</item>
   </string-array>
-  <string-array name="entryvalues_item_expire">
-    <item>1</item>
-    <item>3</item>
-    <item>5</item>
-    <item>7</item>
-    <item>14</item>
-    <item>30</item>
-  </string-array>
   <string-array name="entries_download_file_expire">
     <item>100 MB</item>
     <item>1 GB</item>
@@ -45,22 +28,6 @@
     <item>3 GB</item>
     <item>5 GB</item>
     <item>Illimitato</item>
-  </string-array>
-  <string-array name="entryvalues_downlaod_file_expire">
-    <item>100</item>
-    <item>1000</item>
-    <item>2000</item>
-    <item>3000</item>
-    <item>5000</item>
-    <item>-1</item>
-  </string-array>
-  <string-array name="entryvalues_spinner_number_of_episodes">
-    <item>10</item>
-    <item>20</item>
-    <item>30</item>
-    <item>40</item>
-    <item>50</item>
-    <item>100</item>
   </string-array>
   <string-array name="sort_select">
     <item>Ordina per canale</item>
@@ -91,41 +58,11 @@
     <item>20 secondi</item>
     <item>30 secondi</item>
   </string-array>
-  <string-array name="entryvalues_pref_rewind_interval">
-    <item>3</item>
-    <item>5</item>
-    <item>7</item>
-    <item>10</item>
-    <item>15</item>
-    <item>20</item>
-    <item>30</item>
-  </string-array>
   <string-array name="entries_pref_fast_forward_interval">
     <item>5 secondi</item>
     <item>10 secondi</item>
     <item>15 secondi</item>
     <item>20 secondi</item>
     <item>30 secondi</item>
-  </string-array>
-  <string-array name="entryvalues_pref_fast_forward_interval">
-    <item>5</item>
-    <item>10</item>
-    <item>15</item>
-    <item>20</item>
-    <item>30</item>
-  </string-array>
-  <string-array name="entries_pref_max_new_items">
-    <item>5</item>
-    <item>10</item>
-    <item>20</item>
-    <item>30</item>
-    <item>50</item>
-  </string-array>
-  <string-array name="entryvalues_pref_max_new_items">
-    <item>5</item>
-    <item>10</item>
-    <item>20</item>
-    <item>30</item>
-    <item>50</item>
   </string-array>
 </resources>

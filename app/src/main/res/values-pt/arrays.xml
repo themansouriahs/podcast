@@ -13,15 +13,6 @@
     <item>10 horas</item>
     <item>1 dia</item>
   </string-array>
-  <string-array name="entryvalues_update">
-    <item>30</item>
-    <item>60</item>
-    <item>120</item>
-    <item>240</item>
-    <item>360</item>
-    <item>600</item>
-    <item>1440</item>
-  </string-array>
   <string-array name="entries_item_expire">
     <item>1 dia</item>
     <item>3 dias</item>
@@ -30,14 +21,6 @@
     <item>2 semanas</item>
     <item>1 mês</item>
   </string-array>
-  <string-array name="entryvalues_item_expire">
-    <item>1</item>
-    <item>3</item>
-    <item>5</item>
-    <item>7</item>
-    <item>14</item>
-    <item>30</item>
-  </string-array>
   <string-array name="entries_download_file_expire">
     <item>100 MB</item>
     <item>1 GB</item>
@@ -45,14 +28,6 @@
     <item>3 GB</item>
     <item>5 GB</item>
     <item>Ilimitado</item>
-  </string-array>
-  <string-array name="entryvalues_downlaod_file_expire">
-    <item>100</item>
-    <item>1000</item>
-    <item>2000</item>
-    <item>3000</item>
-    <item>5000</item>
-    <item>-1</item>
   </string-array>
   <string-array name="entryvalues_spinner_number_of_episodes">
     <item>10</item>
@@ -90,15 +65,6 @@
     <item>15 segundos</item>
     <item>20 segundos</item>
     <item>30 segundos</item>
-  </string-array>
-  <string-array name="entryvalues_pref_rewind_interval">
-    <item>3</item>
-    <item>5</item>
-    <item>7</item>
-    <item>10</item>
-    <item>15</item>
-    <item>20</item>
-    <item>30</item>
   </string-array>
   <string-array name="entries_pref_fast_forward_interval">
     <item>5 segundos</item>
@@ -148,19 +114,9 @@
     <item>3 colunas</item>
     <item>4 colunas</item>
   </string-array>
-  <string-array name="pref_subscriptions_columns_entries_values">
-    <item>1</item>
-    <item>2</item>
-    <item>3</item>
-    <item>4</item>
-  </string-array>
   <string-array name="playlist_sort_order">
     <item>Ordenação: Mais recentes</item>
     <item>Ordenação: Mais antigos</item>
-  </string-array>
-  <string-array name="entryvalues_webservices_discovery_engine">
-    <item>0</item>
-    <item>1</item>
   </string-array>
   <string-array name="entries_webservices_discovery_engine">
     <item>gPodder</item>
