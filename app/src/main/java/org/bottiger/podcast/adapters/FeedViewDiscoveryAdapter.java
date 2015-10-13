@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.util.SortedList;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
@@ -26,8 +27,8 @@ public class FeedViewDiscoveryAdapter extends FeedViewAdapter {
 
     private ArrayList<SlimEpisode> mEpisodes = new ArrayList<>();
 
-    public FeedViewDiscoveryAdapter(@NonNull Activity activity, @NonNull ISubscription argSubscription, @Nullable Cursor dataset) {
-        super(activity, argSubscription, dataset);
+    public FeedViewDiscoveryAdapter(@NonNull Activity activity, @NonNull ISubscription argSubscription) {
+        super(activity, argSubscription);
     }
 
     @Override
@@ -36,16 +37,11 @@ public class FeedViewDiscoveryAdapter extends FeedViewAdapter {
     }
 
     @Override
-    public void setDataset(Cursor c) {
-        return;
-    }
-
-    @Override
     public int getItemCount() {
         return mEpisodes.size();
     }
 
-    public void setDataset(@NonNull ArrayList<SlimEpisode> argEpisodes) {
+    public void setDataset(@NonNull SortedList<SlimEpisode> argEpisodes) {
         for (int i = 0; i < argEpisodes.size(); i++) {
             SlimEpisode episode = argEpisodes.get(i);
             mEpisodes.add(episode);

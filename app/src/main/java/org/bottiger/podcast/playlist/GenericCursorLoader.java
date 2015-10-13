@@ -85,7 +85,7 @@ public abstract class GenericCursorLoader {
 			// PodcastBaseFragment.this);
 			final Cursor wrapped_cursor = cursor; // getReorderCursor(cursor);
 
-			mAdapter.setDataset(wrapped_cursor); //.changeCursor(wrapped_cursor);
+			//mAdapter.setDataset(wrapped_cursor); //.changeCursor(wrapped_cursor);
             mAdapter.notifyDataSetChanged();
 
 			// Update playlist
@@ -98,7 +98,7 @@ public abstract class GenericCursorLoader {
 			// This is called when the last Cursor provided to onLoadFinished()
 			// above is about to be closed. We need to make sure we are no
 			// longer using it.
-			mAdapter.setDataset(null); //.swapCursor(null);
+			//mAdapter.setDataset(null); //.swapCursor(null);
 		}
 	};
 
@@ -128,7 +128,7 @@ public abstract class GenericCursorLoader {
             // PodcastBaseFragment.this);
             final Cursor wrapped_cursor = data; // getReorderCursor(cursor);
 
-            mAdapter.setDataset(wrapped_cursor); //.changeCursor(wrapped_cursor);
+            //mAdapter.setDataset(wrapped_cursor); //.changeCursor(wrapped_cursor);
             mAdapter.notifyDataSetChanged();
 
             // Update playlist
@@ -141,7 +141,7 @@ public abstract class GenericCursorLoader {
             // This is called when the last Cursor provided to onLoadFinished()
             // above is about to be closed. We need to make sure we are no
             // longer using it.
-            mAdapter.setDataset(null); //.swapCursor(null);
+            //mAdapter.setDataset(null); //.swapCursor(null);
         }
     };
 

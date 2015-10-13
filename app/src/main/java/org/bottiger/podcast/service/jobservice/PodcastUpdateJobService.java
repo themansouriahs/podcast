@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
 import android.support.annotation.NonNull;
+import android.support.v7.util.SortedList;
 import android.util.Log;
 
 import org.bottiger.podcast.provider.IEpisode;
@@ -41,7 +42,7 @@ public class PodcastUpdateJobService extends JobService {
                 if (ps != null)
                     downloadManager = ps.getDownloadManager();
 
-                ArrayList<? extends IEpisode> episodes = argSubscription.getEpisodes();
+                SortedList<? extends IEpisode> episodes = argSubscription.getEpisodes();
                 IEpisode episode;
                 if (episodes != null) {
                     for (int i = 0; i < episodes.size(); i++) {

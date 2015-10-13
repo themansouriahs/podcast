@@ -16,6 +16,7 @@ import org.bottiger.podcast.service.PlayerService;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteConstraintException;
+import android.support.v7.util.SortedList;
 
 public class FeedUpdater {
 	
@@ -27,7 +28,7 @@ public class FeedUpdater {
 	
 	public void updateDatabase(Subscription subscription) {
 
-		ArrayList<IEpisode> items = subscription.getEpisodes();
+		SortedList<IEpisode> items = subscription.getEpisodes();
 		int size = items.size();
 		
 		ArrayList<String> urls = new ArrayList<>(size);
@@ -50,7 +51,7 @@ public class FeedUpdater {
 				itemDict.put(item.getURL(), item);
 		}
 		
-		subscription.update(contentResolver);
+		//subscription.update(contentResolver);
 
 		PlayerService ps = PlayerService.getInstance();
 		Playlist playlist = null;
@@ -92,7 +93,7 @@ public class FeedUpdater {
             int rowsInserted = contentResolver.bulkInsert(ItemColumns.URI, contentValuesArray);
 			if (rowsInserted > 0) {
 				subscription.setLastItemUpdated(System.currentTimeMillis());
-				subscription.update(contentResolver);
+				//subscription.update(contentResolver);
 			}
 
             if (playlist != null) {

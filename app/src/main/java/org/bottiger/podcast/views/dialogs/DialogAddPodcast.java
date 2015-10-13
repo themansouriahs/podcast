@@ -5,6 +5,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.provider.Subscription;
 
 import android.annotation.SuppressLint;
@@ -70,9 +71,13 @@ public class DialogAddPodcast {
 					public void onClick(DialogInterface dialog, int whichButton) {
 
 						try {
+							/*
 							URL url = new URL(input.getText().toString());
 							Subscription sub = new Subscription(url.toString());
 							sub.subscribe(activity.getApplicationContext());
+							*/
+							URL url = new URL(input.getText().toString());
+							SoundWaves.getLibraryInstance().subscribe(url.toString());
 						} catch (MalformedURLException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();

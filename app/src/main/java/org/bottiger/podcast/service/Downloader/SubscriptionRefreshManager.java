@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.util.SortedList;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Patterns;
@@ -23,7 +24,6 @@ import org.bottiger.podcast.parser.FeedUpdater;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
-import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionLoader;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
@@ -60,6 +60,13 @@ public class SubscriptionRefreshManager {
         refresh(null, null);
     }
 
+    public Subscription refreshSync(@NonNull Context argContext, @NonNull Subscription argSubscription) throws IOException {
+        final Request request = getRequest(argSubscription);
+        Response response = mOkClient.newCall(request).execute();
+        handleHttpResponse(argContext, argSubscription, response, null);
+        return argSubscription;
+    }
+
     public void refresh(@Nullable ISubscription argSubscription, @Nullable IDownloadCompleteCallback argCallback) {
         Log.d(TAG, "refresh subscription: " + argSubscription + " (null => all)");
 
@@ -76,7 +83,9 @@ public class SubscriptionRefreshManager {
         }
     }
 
-    private void addSubscriptionToQueue(@NonNull final Context argContext, @NonNull final ISubscription argSubscription, @Nullable final IDownloadCompleteCallback argCallback) {
+    private void addSubscriptionToQueue(@NonNull final Context argContext,
+                                        @NonNull final ISubscription argSubscription,
+                                        @Nullable final IDownloadCompleteCallback argCallback) {
         Log.d(TAG, "Adding to queue: " + argSubscription);
 
         if (argSubscription == null) {
@@ -113,9 +122,7 @@ public class SubscriptionRefreshManager {
 
         argSubscription.setIsRefreshing(true);
 
-        final Request request = new Request.Builder()
-                .url(subscriptionUrl)
-                .build();
+        final Request request = getRequest(argSubscription);
 
         mOkClient.newCall(request).enqueue(new Callback() {
             @Override
@@ -125,61 +132,7 @@ public class SubscriptionRefreshManager {
 
             @Override
             public void onResponse(Response response) throws IOException {
-                ISubscription parsedSubscription = null;
-                try {
-                    if (response != null && response.body() != null && response.isSuccessful()) {
-
-                        /**
-                         * FIXME: https://github.com/square/okhttp/issues/1362
-                         *
-                         * This can (and will) fail with an out of memory exception when the response is too large.
-                         */
-                        //String str = response.body().string();
-
-                        //InputStream feedString = new BOMInputStream(response.body().byteStream());
-                        //Reader feedString = response.body().charStream();
-
-                        //parsedSubscription = processResponse(argContext, argSubscription, feedString);
-                        try {
-                            parsedSubscription = mFeedParser.parse(argSubscription, response.body().byteStream());
-                            //parsedSubscription.setURL(response.request().httpUrl().toString());
-
-                            postProcess(argContext.getContentResolver(), argSubscription);
-                            if (argSubscription instanceof Subscription) {
-                                downloadNewEpisodeskCallback(argContext, argSubscription);
-                            }
-                        } catch (XmlPullParserException e) {
-                            Log.d(TAG, "Parsing error " + e.toString());
-
-                            String[] keys = new String[1];
-                            String[] values = new String[1];
-
-                            keys[0] = "url";
-                            values[0] = TextUtils.isEmpty(argSubscription.getURLString()) ? "No url" : argSubscription.getURLString(); // NoI18N
-                            VendorCrashReporter.handleException(e, keys, values);
-                        } catch (Exception e) {
-                            Log.d(TAG, "Parsing error " + e.toString());
-
-                            String[] keys = new String[1];
-                            String[] values = new String[1];
-
-                            keys[0] = "url";
-                            values[0] = TextUtils.isEmpty(argSubscription.getURLString()) ? "No url" : argSubscription.getURLString(); // NoI18N
-                            VendorCrashReporter.handleException(e, keys, values);
-                        }
-
-                        final ISubscription finalSubscription = parsedSubscription != null ? parsedSubscription : null;
-
-                        Log.d(TAG, "Parsing callback for: " + argSubscription);
-                        wrappedCallback.complete(finalSubscription != null, finalSubscription);
-
-                    }
-                } catch (NullPointerException npe) {
-                    npe.printStackTrace();
-                } finally {
-                    if (argSubscription != null)
-                        argSubscription.setIsRefreshing(false);
-                }
+                handleHttpResponse(argContext, argSubscription, response, argCallback);
             }
         });
     }
@@ -219,7 +172,7 @@ public class SubscriptionRefreshManager {
             final PlayerService ps = SoundWaves.sBoundPlayerService;
 
             if (argSubscription instanceof Subscription) {
-                ArrayList<? extends IEpisode> episodes = argSubscription.getEpisodes();
+                SortedList<? extends IEpisode> episodes = argSubscription.getEpisodes();
                 for (int i = 0; i < episodes.size(); i++) {
                     IEpisode episode = episodes.get(i);
                     if (episode instanceof FeedItem) {
@@ -247,50 +200,75 @@ public class SubscriptionRefreshManager {
         }
     }
 
+    @Deprecated
     private void postProcess(@NonNull ContentResolver argContentResolver, @NonNull ISubscription argSubscription) {
         Log.d(SubscriptionRefreshManager.TAG, "Done Parsing: " + argSubscription);
 
         if (argSubscription instanceof Subscription) {
             Subscription subscription = (Subscription)argSubscription;
+            SoundWaves.getLibraryInstance().updateSubscription(subscription);
+            /*
             FeedUpdater updater = new FeedUpdater(argContentResolver);
             updater.updateDatabase(subscription);
             ((Subscription)argSubscription).getEpisodes(argContentResolver);
+            */
             Log.d(SubscriptionRefreshManager.TAG, "Done updating database for: " + argSubscription);
             return;
         }
+    }
 
-        if (argSubscription instanceof SlimSubscription) {
-            SlimSubscription slimSubscription = (SlimSubscription) argSubscription;
+    private static Request getRequest(@NonNull ISubscription argSubscription) {
+        return new Request.Builder()
+                .url(argSubscription.getURLString())
+                .build();
+    }
 
-            URL artwork = null;
-            String artworkString = slimSubscription.getImageURL();
-            if (Patterns.WEB_URL.matcher(artworkString).matches()) {
+    private void handleHttpResponse(@NonNull Context argContext,
+                                    @NonNull ISubscription argSubscription,
+                                    @NonNull Response response,
+                                    @Nullable final IDownloadCompleteCallback argCallback) {
+        ISubscription parsedSubscription = null;
+        try {
+            if (response != null && response.body() != null && response.isSuccessful()) {
                 try {
-                    artwork = new URL(artworkString);
-                } catch (MalformedURLException mue) {
-                    artwork = null;
+                    parsedSubscription = mFeedParser.parse(argSubscription, response.body().byteStream());
+
+                    postProcess(argContext.getContentResolver(), argSubscription);
+                    if (argSubscription instanceof Subscription) {
+                        downloadNewEpisodeskCallback(argContext, argSubscription);
+                    }
+                } catch (XmlPullParserException e) {
+                    Log.d(TAG, "Parsing error " + e.toString());
+
+                    String[] keys = new String[1];
+                    String[] values = new String[1];
+
+                    keys[0] = "url";
+                    values[0] = TextUtils.isEmpty(argSubscription.getURLString()) ? "No url" : argSubscription.getURLString(); // NoI18N
+                    VendorCrashReporter.handleException(e, keys, values);
+                } catch (Exception e) {
+                    Log.d(TAG, "Parsing error " + e.toString());
+
+                    String[] keys = new String[1];
+                    String[] values = new String[1];
+
+                    keys[0] = "url";
+                    values[0] = TextUtils.isEmpty(argSubscription.getURLString()) ? "No url" : argSubscription.getURLString(); // NoI18N
+                    VendorCrashReporter.handleException(e, keys, values);
                 }
+
+                final ISubscription finalSubscription = parsedSubscription != null ? parsedSubscription : null;
+
+                Log.d(TAG, "Parsing callback for: " + argSubscription);
+                if (argCallback != null)
+                    argCallback.complete(finalSubscription != null, finalSubscription);
+
             }
-
-            /*
-            ArrayList<SlimEpisode> slimEpisodes = new ArrayList<>();
-            for (IEpisode episode : argSubscription.getEpisodes()) {
-                SlimEpisode slimEpisode = EpisodeConverter.toSlim(episode);
-
-                if (slimEpisode == null) {
-                    continue;
-                }
-
-                if (artwork != null) {
-                    slimEpisode.setArtwork(artwork);
-                }
-
-                if (slimEpisode != null) {
-                    slimEpisodes.add(slimEpisode);
-                }
-            }
-            slimSubscription.setEpisodes(slimEpisodes);4*/
-            Log.d(SubscriptionRefreshManager.TAG, "Replacing the subscription with a populated SlimSubscription:");
+        } catch (NullPointerException npe) {
+            npe.printStackTrace();
+        } finally {
+            if (argSubscription != null)
+                argSubscription.setIsRefreshing(false);
         }
     }
 }

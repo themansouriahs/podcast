@@ -37,9 +37,10 @@ public class DiscoveryFeedActivity extends FeedActivity {
             @Override
             public void onClick(View v) {
 
-                URL url = mSubscription.getURL();
-                Subscription subscription = new Subscription(url.toString());
-                subscription.subscribe(DiscoveryFeedActivity.this);
+                //URL url = mSubscription.getURL();
+                //Subscription subscription = new Subscription(url.toString());
+                //subscription.subscribe(DiscoveryFeedActivity.this);
+                SoundWaves.getLibraryInstance().subscribe(mSubscription.getURL().toString());
 
                 // if (Build.VERSION.SDK_INT >= 19) {
                 //TransitionManager.beginDelayedTransition(mSubscribeContainer);

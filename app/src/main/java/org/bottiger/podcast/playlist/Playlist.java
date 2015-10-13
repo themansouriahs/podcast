@@ -3,7 +3,9 @@ package org.bottiger.podcast.playlist;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.bottiger.podcast.ApplicationConfiguration;
 import org.bottiger.podcast.R;
@@ -11,10 +13,12 @@ import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.adapters.PlaylistAdapter;
 import org.bottiger.podcast.adapters.decoration.OnDragStateChangedListener;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.playlist.filters.SubscriptionFilter;
 import org.bottiger.podcast.provider.DatabaseHelper;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.PodcastOpenHelper;
 import org.bottiger.podcast.provider.Subscription;
@@ -31,11 +35,13 @@ import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.CursorAdapter;
+import android.support.v7.util.SortedList;
 import android.util.Log;
 
+import com.google.api.client.util.DateTime;
 import com.squareup.otto.Subscribe;
 
-public class Playlist implements OnDragStateChangedListener, SharedPreferences.OnSharedPreferenceChangeListener {
+public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     public static final boolean SHOW_LISTENED_DEFAULT = true;
     public static final boolean SHOW_ONLY_DOWNLOADED  = false;
@@ -55,11 +61,10 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
 
     private int mSortOrder = DATE_NEW_FIRST;
 
-
     private Context mContext;
+    private Library mLibrary;
 
     private SubscriptionFilter mSubscriptionFilter;
-    //private HashSet<Long> mSubscriptions = new HashSet<>();
 
 	private static ArrayList<IEpisode> mInternalPlaylist = new ArrayList<>();
 	private SharedPreferences sharedPreferences;
@@ -76,8 +81,6 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
 
 	// http://stackoverflow.com/questions/1036754/difference-between-wait-and-sleep
 
-    private static HashSet<PlaylistChangeListener> sPlaylistChangeListeners = new HashSet<>();
-
 	public Playlist(@NonNull Context argContext, int length) {
 		this(argContext, length, false);
 	}
@@ -91,6 +94,8 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
 	}
 
     public void setContext(@NonNull Context argContext) {
+
+        mLibrary = SoundWaves.getLibraryInstance();
 
         if (mContext == null) {
             sharedPreferences = PreferenceManager
@@ -191,9 +196,7 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
 
         int size = mInternalPlaylist.size();
         if (size > position) {
-            if (mInternalPlaylist.remove(position) != null) {
-                notifyPlaylistRangeChanged(0, position);
-            }
+            mInternalPlaylist.remove(position);
         }
     }
 
@@ -239,8 +242,6 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
             min = to;
             max = from;
         }
-
-        notifyPlaylistRangeChanged(min-1, max-1);
 
         IEpisode precedingItem = to == 0 ? null : mInternalPlaylist.get(to-1);
         IEpisode movedItem = mInternalPlaylist.get(from);
@@ -348,6 +349,16 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
 		return order;
 	}
 
+    class Condition {
+        boolean isDownloaded;
+        boolean isMarkedAsListened;
+        Set<ISubscription> subscriptions;
+    }
+
+    class Order {
+
+    }
+
 	/**
 	 * 
 	 * @return A SQL formatted string of the where clause
@@ -437,6 +448,105 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
 
         int previousSize = mInternalPlaylist.size();
 
+        SortedList<IEpisode> episodes = mLibrary.newEpisodeSortedList(new SortedList.Callback<IEpisode>() {
+            @Override
+            public int compare(IEpisode o1, IEpisode o2) {
+
+                int E1_FIRST = 1;
+                int E2_FIRST = -1;
+
+                if (o1 == null)
+                    return E2_FIRST;
+
+                if (o2 == null)
+                    return E1_FIRST;
+
+                int p1 = o1.getPriority();
+                int p2 = o2.getPriority();
+
+                if (p1 != p2) {
+                    return p1 > p2 ? E1_FIRST : E2_FIRST;
+                }
+
+                Date dt1 = o1.getDateTime();
+
+                if (dt1 == null)
+                    return E2_FIRST;
+
+                Date dt2 = o2.getDateTime();
+
+                if (dt2 == null)
+                    return E1_FIRST;
+
+                return dt2.compareTo(dt1);
+            }
+
+            @Override
+            public void onInserted(int position, int count) {
+
+            }
+
+            @Override
+            public void onRemoved(int position, int count) {
+
+            }
+
+            @Override
+            public void onMoved(int fromPosition, int toPosition) {
+
+            }
+
+            @Override
+            public void onChanged(int position, int count) {
+
+            }
+
+            @Override
+            public boolean areContentsTheSame(IEpisode oldItem, IEpisode newItem) {
+                return false;
+            }
+
+            @Override
+            public boolean areItemsTheSame(IEpisode item1, IEpisode item2) {
+                return false;
+            }
+        });
+
+        mInternalPlaylist.clear();
+        for (int i = 0; i < episodes.size(); i++) {
+
+            IEpisode episode = episodes.get(i);
+
+            boolean subscriptionIsShown = false;
+            boolean downloadStateIsShown = false;
+            boolean listenedStateIsShown = false;
+
+            // Filter based on shown subscriptions
+            if (episode instanceof FeedItem) {
+                FeedItem item = (FeedItem)episode;
+                subscriptionIsShown = mSubscriptionFilter.isShown(item.sub_id);
+            }
+
+            // Filter based on 'is listened'
+            if (mSubscriptionFilter.showListened() || !episode.isMarkedAsListened()) {
+                listenedStateIsShown = true;
+            }
+
+            // Filter based on donwload state
+            if (!showOnlyDownloadedVal || episode.isDownloaded()) {
+                downloadStateIsShown = true;
+            }
+
+            boolean doAdd = subscriptionIsShown && downloadStateIsShown && listenedStateIsShown;
+
+            if (doAdd) {
+                mInternalPlaylist.add(episode);
+            }
+
+            if (mInternalPlaylist.size() >= length)
+                break;
+        }
+        /*
         Cursor cursor = null;
         try {
             PodcastOpenHelper helper = PodcastOpenHelper.getInstance(mContext);//new PodcastOpenHelper(mActivity);
@@ -461,6 +571,7 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
             if (cursor != null)
                 cursor.close();
         }
+        */
 
         int newSize = mInternalPlaylist.size();
 
@@ -504,32 +615,9 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
         return mInternalPlaylist.get(0);
     }
 
-    private int dragStart = -1;
-    @Override
-    public void onDragStart(int position) {
-        dragStart = position+ PlaylistAdapter.PLAYLIST_OFFSET;
-    }
-
-    @Override
-    public void onDragStop(int position) {
-        move(dragStart, position+ PlaylistAdapter.PLAYLIST_OFFSET);
-        dragStart = -1;
-    }
-
     public interface PlaylistChangeListener {
-        public void notifyPlaylistChanged();
-        public void notifyPlaylistRangeChanged(int from, int to);
-    }
-
-    public synchronized void registerPlaylistChangeListener(@NonNull PlaylistChangeListener argChangeListener) {
-        if (sPlaylistChangeListeners.contains(argChangeListener))
-            return;
-
-        sPlaylistChangeListeners.add(argChangeListener);
-    }
-
-    public synchronized void unregisterPlaylistChangeListener(@NonNull PlaylistChangeListener argChangeListener) {
-        sPlaylistChangeListeners.remove(argChangeListener);
+        void notifyPlaylistChanged();
+        void notifyPlaylistRangeChanged(int from, int to);
     }
 
     public void notifyDatabaseChanged() {
@@ -539,25 +627,6 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
 
     public void notifyPlaylistChanged() {
         SoundWaves.getBus().post(this);
-    }
-
-    public void notifyPlaylistRangeChanged(final int argFrom, final int argTo) {
-        for (PlaylistChangeListener listener : sPlaylistChangeListeners) {
-            if (listener == null) {
-                throw new IllegalStateException("Listener can ot be null");
-            }
-            //listener.notifyPlaylistRangeChanged(argFrom, argTo);
-
-            final PlaylistChangeListener finalListener = listener;
-            //if (mActivity instanceof Activity) {
-            //    ((Activity)mActivity).runOnUiThread(new Runnable() {
-            //        @Override
-            //        public void run() {
-                        finalListener.notifyPlaylistRangeChanged(argFrom, argTo);
-            //        }
-            //    });
-            //}
-        }
     }
 
     @Subscribe
@@ -618,16 +687,8 @@ public class Playlist implements OnDragStateChangedListener, SharedPreferences.O
         }
     }
 
-    public void addSubscriptionID(Long argID) {
-        mSubscriptionFilter.add(argID);
-    }
-
     public SubscriptionFilter getSubscriptionFilter() {
         return mSubscriptionFilter;
-    }
-
-    public void clearSubscriptionID() {
-        //mSubscriptions.clear(); // FIXME
     }
 
     @Override

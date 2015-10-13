@@ -23,6 +23,7 @@ public class SubscriptionLoader {
         }
     }
 
+    @Deprecated
     public static Cursor allAsCursor(ContentResolver context) {
         return context.query(SubscriptionColumns.URI,
                 SubscriptionColumns.ALL_COLUMNS, null, null, null);
@@ -44,6 +45,7 @@ public class SubscriptionLoader {
         return subscriptions;
     }
 
+    @Deprecated
     public static LongSparseArray<ISubscription> asList(ContentResolver context, boolean argIncludeUnsubscribed) {
         LongSparseArray<ISubscription> subscriptions = new LongSparseArray<>();
         Cursor cursor = null;
@@ -65,6 +67,7 @@ public class SubscriptionLoader {
         return subscriptions;
     }
 
+    @Deprecated
     public static Subscription getByUrl(ContentResolver contentResolver,
                                         String url) {
         Cursor cursor = null;

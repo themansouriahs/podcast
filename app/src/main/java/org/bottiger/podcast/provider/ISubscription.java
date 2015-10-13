@@ -4,6 +4,7 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.util.SortedList;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -35,7 +36,7 @@ public interface ISubscription {
     String getImageURL();
 
     @NonNull
-    ArrayList<? extends IEpisode> getEpisodes();
+    SortedList<? extends IEpisode> getEpisodes();
 
     void setImageURL(@Nullable String argUrl);
     void setTitle(@Nullable String argTitle);

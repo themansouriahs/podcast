@@ -18,6 +18,7 @@ import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.TopActivity;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.parser.opml.OpmlElement;
 import org.bottiger.podcast.parser.opml.OpmlReader;
 import org.bottiger.podcast.parser.opml.OpmlWriter;
@@ -166,35 +167,19 @@ public class OPMLImportExport {
         List<Subscription> importedSubscriptions = new LinkedList<>();
 
 		Subscription subscription;
+		Library library = SoundWaves.getLibraryInstance();
 
 		for (OpmlElement element : elements) {
 			String url = element.getXmlUrl();
-			String title = element.getText();
 
-			// Test we if already have the item in out database.
-			// If not we add it.
-			boolean isAdded = false;
-			subscription = SubscriptionLoader.getByUrl(contentResolver, url);
-			if (subscription == null) {
-				subscription = new Subscription();
-				subscription.url = url;
-				if (title != null && !title.equals(""))
-					subscription.setTitle(title);
-				subscription.subscribe(mActivity);
-				isAdded = true;
-			} else if (subscription.getStatus() == Subscription.STATUS_UNSUBSCRIBED) {
-				subscription.status = Subscription.STATUS_SUBSCRIBED;
-				isAdded = true;
-			}
-
-			if (isAdded) {
-				mUpdater.addOperation(subscription.update(contentResolver,
-						true, true));
+			if (!library.IsSubscribed(url)) {
+				SoundWaves.getLibraryInstance().subscribe(url);
 				numImported++;
-                importedSubscriptions.add(subscription);
+				importedSubscriptions.add(SoundWaves.getLibraryInstance().getSubscription(url));
 			}
 		}
 
+		/*
 		if (numImported > 0) {
             mUpdater.commit(contentResolver);
 
@@ -202,6 +187,7 @@ public class OPMLImportExport {
                 insertedSubscription.refreshAsync(mActivity);
             }
         }
+        */
 
 		return numImported;
 	}

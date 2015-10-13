@@ -148,7 +148,8 @@ public class PlayerService extends Service implements
                 .createWifiLock(WifiManager.WIFI_MODE_FULL, LOCK_NAME);
 
         mPlaylist = new Playlist(this);
-		mPlaylist.populatePlaylistIfEmpty();
+		//mPlaylist.populatePlaylistIfEmpty();
+		SoundWaves.getLibraryInstance().loadPlaylist(mPlaylist);
 		SoundWaves.getBus().register(mPlaylist);
 		SoundWaves.getBus().register(this);
 

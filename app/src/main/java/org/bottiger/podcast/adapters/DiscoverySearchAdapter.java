@@ -98,15 +98,6 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
         } catch (NullPointerException npe) {
             holder.image.setBackgroundColor(mDefaultBackgroundColor);
         }
-        /*
-        try {
-            Uri  uri = Uri.parse(subscription.getImageURL());
-            holder.image.setImageURI(uri);
-            holder.imageUrl = uri;
-        } catch (NullPointerException npe) {
-            holder.image.setBackgroundColor(mDefaultBackgroundColor);
-        }
-        */
 
         SharedAdapterUtils.AddPaddingToLastElement(holder.container, 0, position == mDataset.size()-1);
 
@@ -115,10 +106,14 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //mProgress.setTitle("Loading");
-                mProgress.setMessage(mActivity.getString(R.string.discovery_progress_loading_podcast_content));
-                mProgress.show();
-                SoundWaves.sSubscriptionRefreshManager.refresh(subscription, mRefreshCompleteCallback);
+                if (SoundWaves.getLibraryInstance().containsSubscription(subscription)) {
+                    Subscription localsubscription = SoundWaves.getLibraryInstance().getSubscription(subscription.getURLString());
+                    FeedActivity.start(mActivity, localsubscription);
+                } else {
+                    mProgress.setMessage(mActivity.getString(R.string.discovery_progress_loading_podcast_content));
+                    mProgress.show();
+                    SoundWaves.sSubscriptionRefreshManager.refresh(subscription, mRefreshCompleteCallback);
+                }
             }
         });
 
@@ -206,10 +201,12 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
     }
 
     private void subscribe(@NonNull Subscription argSubscription) {
-        argSubscription.subscribe(mActivity);
+        //argSubscription.subscribe(mActivity);
+        SoundWaves.getLibraryInstance().subscribe(argSubscription.getURLString());
     }
 
     private void unsubscribe(@NonNull Subscription argSubscription) {
-        argSubscription.unsubscribe(mActivity);
+        //argSubscription.unsubscribe(mActivity);
+        SoundWaves.getLibraryInstance().unsubscribe(argSubscription.getURLString());
     }
 }

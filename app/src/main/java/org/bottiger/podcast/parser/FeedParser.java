@@ -211,11 +211,9 @@ public class FeedParser {
                     break;
                 }
                 case SUBSCRIPTION_IMAGE_TAG: {
-                    if (TextUtils.isEmpty(argSubscription.getImageURL())) {
-                        String image = readSubscriptionImage(parser);
-                        argSubscription.setImageURL(image);
-                        parser.nextTag();
-                    }
+                    String image = readSubscriptionImage(parser);
+                    argSubscription.setImageURL(image);
+                    parser.nextTag();
                     break;
                 }
                 case SUBSCRIPTION_PUB_DATE_TAG:

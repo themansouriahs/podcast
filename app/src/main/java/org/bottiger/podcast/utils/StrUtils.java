@@ -1,9 +1,11 @@
 package org.bottiger.podcast.utils;
 
 
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.text.format.DateUtils;
+import android.util.Patterns;
 
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -28,6 +30,13 @@ public class StrUtils {
 
 		return DateUtils.formatElapsedTime(item.getDuration());
     }
+
+	public static boolean isValidUrl(@Nullable String argUrl) {
+		if (argUrl == null)
+			return false;
+
+		return Patterns.WEB_URL.matcher(argUrl).matches();
+	}
     
     
     public static int parseTimeToSeconds(String duration) {

@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.listeners.DownloadProgressPublisher;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.service.DownloadStatus;
@@ -49,10 +50,10 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
     // Se Subscription.java for details
     private static final int IS_VIDEO = 1;
 
-	private final PodcastLog log = PodcastLog.getLog(getClass());
-	private static ItemLruCache cache = null;
+	//private final PodcastLog log = PodcastLog.getLog(getClass());
+	//private static ItemLruCache cache = null;
 
-	private DatabaseHelper mBulkUpdater = null;
+	//private DatabaseHelper mBulkUpdater = null;
 
 	/*
 	 * Let's document these retared fields! They are totally impossible to guess
@@ -67,6 +68,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	/**
 	 * Unique ID of the file on the remote server
 	 */
+	@Deprecated
 	public String remote_id;
 
 	/**
@@ -110,6 +112,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	/**
 	 * Duration as String hh:mm:ss or mm:ss 02:23:34
 	 */
+	@Deprecated
 	public String duration_string;
 
 	/**
@@ -135,6 +138,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	/**
 	 * Size of the file on disk in bytes
 	 */
+	@Deprecated
 	public long chunkFilesize;
 
 	/**
@@ -145,6 +149,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	/**
 	 * Episode number.
 	 */
+	@Deprecated
 	public int episodeNumber;
 
 	/**
@@ -153,6 +158,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	 * /android/app/DownloadManager.html#enqueue
 	 * (android.app.DownloadManager.Request)
 	 */
+	@Deprecated
 	private long downloadReferenceID;
 
 	/**
@@ -318,7 +324,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 			int j = 0;
 			cursor.moveToPosition(-1);
 			while (cursor.moveToNext()) {
-				items[j] = FeedItem.getByCursor(cursor, cachedFeedItem);
+				items[j] = FeedItem.fetchFromCursor(cursor, cachedFeedItem);
 				j++;
 			}
 			cursor.close();
@@ -356,16 +362,6 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 		Cursor cursor = null;
 		FeedItem item = null;
 
-		initCache();
-
-		// Return item directly if cached
-		synchronized (cache) {
-			item = cache.get(id);
-			if (item != null) {
-				return item;
-			}
-		}
-
 		try {
 			String where = BaseColumns._ID + " = " + id;
 
@@ -391,11 +387,6 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 
 	public static FeedItem getByCursor(Cursor cursor) {
 		FeedItem item = fetchFromCursor(cursor, null);
-		return item;
-	}
-
-	public static FeedItem getByCursor(Cursor cursor, FeedItem cachedFeedItem) {
-		FeedItem item = fetchFromCursor(cursor, cachedFeedItem);
 		return item;
 	}
 
@@ -518,13 +509,8 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	public ContentProviderOperation update(ContentResolver contentResolver,
 			boolean batchUpdate, boolean silent) {
 
-		log.debug("item update start");
 
 		ContentProviderOperation contentUpdate = null;
-
-		initCache();
-		if (this.id > 0)
-			cache.remove(this.id);
 
 		ContentValues cv = getContentValues(silent);
 
@@ -542,9 +528,9 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 			int numUpdatedRows = contentResolver.update(ItemColumns.URI, cv,
 					condition, null);
 			if (numUpdatedRows == 1) {
-                log.debug("update OK");
+				Log.d("FeedItem", "update OK");
             } else if (numUpdatedRows == 0) {
-				log.debug("update NOT OK. Insert instead");
+				Log.d("FeedItem", "update NOT OK. Insert instead");
 				contentResolver.insert(ItemColumns.URI, cv);
 			} else {
                 throw new IllegalStateException("Never update more than one row here");
@@ -568,7 +554,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	}
 
 	public Uri insert(ContentResolver contentResolver) {
-		log.debug("item insert start");
+		Log.d("FeedItem", "item insert start");
 		try {
 
 			ContentValues cv = new ContentValues();
@@ -700,7 +686,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 			return sdf.parse(date)
 					.getTime();
 		} catch (ParseException e) {
-			log.debug(" first fail");
+			Log.d("FeedItem", "first fail");
 		}
 
 		for (String format : DATE_FORMATS) {
@@ -712,44 +698,35 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 			} catch (ParseException e) {
 			}
 		}
-		log.warn("cannot parser date: " + date);
+		Log.d("FeedItem", "cannot parser date: " + date);
 		return 0L;
 	}
 
+	@Deprecated
 	private static FeedItem fetchFromCursor(Cursor cursor) {
 		return fetchFromCursor(cursor, null);
 	}
 
-	private static FeedItem fetchFromCursor(Cursor cursor,
-			FeedItem cachedFeedItem) {
+	public static FeedItem fetchFromCursor(Cursor cursor,
+			FeedItem item) {
 
-		FeedItem item;
-		if (cachedFeedItem != null) {
-			cachedFeedItem.reset();
-			item = cachedFeedItem;
+		//long start = System.currentTimeMillis();
+
+		if (item != null) {
+			item.reset();
 		} else
 			item = new FeedItem();
 
+		long end1 = System.currentTimeMillis();
+
 		item.id = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
 
-		// Return item directly if cached
-		initCache();
-		synchronized (cache) {
-			FeedItem cacheItem = cache.get(item.id);
-			if (cacheItem != null && cacheItem.title != "") { // FIXME
-																// cacheItem.title
-																// != ""
-				item = cacheItem;
-				return item;
-			}
-		}
-
 		int idx = cursor.getColumnIndex(ItemColumns.RESOURCE);
-		item.resource = cursor.getString(idx);
+		//item.resource = cursor.getString(idx);
 		item.filename = cursor.getString(cursor
 				.getColumnIndex(ItemColumns.PATHNAME));
-		item.remote_id = cursor.getString(cursor
-				.getColumnIndex(ItemColumns.REMOTE_ID));
+		//item.remote_id = cursor.getString(cursor
+		//		.getColumnIndex(ItemColumns.REMOTE_ID));
 		item.offset = cursor.getInt(cursor.getColumnIndex(ItemColumns.OFFSET));
 		item.url = cursor.getString(cursor.getColumnIndex(ItemColumns.URL));
 		item.image = cursor.getString(cursor
@@ -763,19 +740,20 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 		item.filesize = cursor.getLong(cursor
 				.getColumnIndex(ItemColumns.FILESIZE));
 		item.length = cursor.getLong(cursor.getColumnIndex(ItemColumns.LENGTH));
-		item.chunkFilesize = cursor.getLong(cursor
-				.getColumnIndex(ItemColumns.CHUNK_FILESIZE));
-		item.downloadReferenceID = cursor.getLong(cursor
-				.getColumnIndex(ItemColumns.DOWNLOAD_REFERENCE));
+		//item.chunkFilesize = cursor.getLong(cursor
+		//		.getColumnIndex(ItemColumns.CHUNK_FILESIZE));
+		//item.downloadReferenceID = cursor.getLong(cursor
+		//		.getColumnIndex(ItemColumns.DOWNLOAD_REFERENCE));
 
 		int intVal = cursor.getInt(cursor
 				.getColumnIndex(ItemColumns.IS_DOWNLOADED));
 		item.isDownloaded = intVal == 1;
 
-		item.episodeNumber = cursor.getInt(cursor
-				.getColumnIndex(ItemColumns.EPISODE_NUMBER));
-		item.duration_string = cursor.getString(cursor
-				.getColumnIndex(ItemColumns.DURATION));
+		//item.episodeNumber = cursor.getInt(cursor
+		//		.getColumnIndex(ItemColumns.EPISODE_NUMBER));
+
+		//item.duration_string = cursor.getString(cursor
+		//		.getColumnIndex(ItemColumns.DURATION));
 		item.duration_ms = cursor.getLong(cursor
 				.getColumnIndex(ItemColumns.DURATION_MS));
         item.status = cursor.getInt(cursor
@@ -793,10 +771,9 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 		item.created_at = cursor.getInt(cursor
 				.getColumnIndex(ItemColumns.CREATED));
 
-		// if item was not cached we put it in the cache
-		synchronized (cache) {
-			cache.put(item.id, item);
-		}
+		//long end2 = System.currentTimeMillis();
+
+		//Log.d("fetchFromCursor", "1: " + (end1-start) + " ms. 2: " + (end2-start) + " ms.");
 
 		return item;
 	}
@@ -1215,24 +1192,10 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 		return true;
 	}
 
-	/**
-	 * Clear the cache
-	 */
-	public static void clearCache() {
-		if (cache != null) {
-			cache.evictAll();
-		}
-	}
-
-	private static void initCache() {
-		if (cache == null) {
-			int memoryClass = 5 * 1024 * 1024; // FIXME use getMemoryClass()
-			cache = new ItemLruCache(memoryClass);
-		}
-	}
-
+	@Nullable
     public Subscription getSubscription(@NonNull Context argContext) {
-        return SubscriptionLoader.getById(argContext.getContentResolver(), sub_id);
+		return (Subscription)SoundWaves.getLibraryInstance().getSubscription(sub_id);
+        //return SubscriptionLoader.getById(argContext.getContentResolver(), sub_id);
     }
 
     @Override

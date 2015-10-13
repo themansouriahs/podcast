@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.CompoundButton;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.PreferenceHelper;
 
@@ -111,7 +112,6 @@ public class SubscriptionSettingsUtils {
     private void OnSwitchChangedHandler(boolean isChecked,
                                         @NonNull ContentResolver argContentResolver,
                                         @Nullable OnSettingsChangedListener argOnSettingsChangedListener) {
-        mSubscription.update(argContentResolver);
         if (argOnSettingsChangedListener != null) {
             argOnSettingsChangedListener.OnSettingsChanged(isChecked);
         }

@@ -1,35 +1,34 @@
 package org.bottiger.podcast.provider;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PaletteListener;
-import org.bottiger.podcast.service.IDownloadCompleteCallback;
+import org.bottiger.podcast.model.SubscriptionChanged;
 import org.bottiger.podcast.utils.BitMaskUtils;
 import org.bottiger.podcast.utils.ColorExtractor;
 
-import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.ContentUris;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.v7.graphics.Palette;
-import android.util.Log;
+import android.support.v7.util.SortedList;
+import android.text.TextUtils;
 import android.util.Patterns;
-import android.webkit.URLUtil;
 
 import javax.annotation.Nullable;
 
@@ -52,16 +51,16 @@ public class Subscription implements ISubscription, PaletteListener {
 
 	private final int mOldestFirstID = R.string.pref_list_oldest_first_key;
 	private final int mDeleteAfterPlaybackID = R.string.pref_delete_when_finished_key;
-	private final int mAutoDownloadID = R.string.pref_download_on_update_key;
-	private final int mPlaylistSubscriptionsID = R.string.pref_playlist_subscriptions_key;
 
-	public final static int ADD_SUCCESS = 0;
-	public final static int ADD_FAIL_UNSUCCESS = -2;
 
-	public final static int STATUS_SUBSCRIBED = 1;
-	public final static int STATUS_UNSUBSCRIBED = 2;
+	@Retention(RetentionPolicy.SOURCE)
+	@IntDef({STATUS_SUBSCRIBED, STATUS_UNSUBSCRIBED})
+	public @interface Subscribed {}
+	public static final int STATUS_SUBSCRIBED = 1;
+	public static final int STATUS_UNSUBSCRIBED = 2;
 
     private boolean mIsDirty = false;
+	private boolean mIsLoaded = false;
 	private boolean mIsRefreshing = false;
 
     /**
@@ -79,7 +78,7 @@ public class Subscription implements ISubscription, PaletteListener {
 	public long lastUpdated;
 	public long lastItemUpdated;
 	public long fail_count;
-	public long auto_download;
+	@Deprecated public long auto_download;
     private int mPrimaryColor;
     private int mPrimaryTintColor;
     private int mSecondaryColor;
@@ -89,7 +88,61 @@ public class Subscription implements ISubscription, PaletteListener {
 	 */
 	private int mSettings;
 
-    private final ArrayList<IEpisode> mEpisodes = new ArrayList<>();
+    private SortedList<IEpisode> mEpisodes;
+	private SortedList.Callback<IEpisode> mEpisodesListCallback = new SortedList.Callback<IEpisode>() {
+
+		@Override
+		public int compare(IEpisode o1, IEpisode o2) {
+
+			if (o1 == null)
+				return 1;
+
+			if (o2 == null)
+				return -1;
+
+			Date dt1 = o1.getDateTime();
+
+			if (dt1 == null)
+				return 1;
+
+			Date dt2 = o2.getDateTime();
+
+			if (dt2 == null)
+				return -1;
+
+			return o2.getDateTime().compareTo(o1.getDateTime());
+		}
+
+		@Override
+		public void onInserted(int position, int count) {
+
+		}
+
+		@Override
+		public void onRemoved(int position, int count) {
+
+		}
+
+		@Override
+		public void onMoved(int fromPosition, int toPosition) {
+
+		}
+
+		@Override
+		public void onChanged(int position, int count) {
+
+		}
+
+		@Override
+		public boolean areContentsTheSame(IEpisode oldItem, IEpisode newItem) {
+			return false;
+		}
+
+		@Override
+		public boolean areItemsTheSame(IEpisode item1, IEpisode item2) {
+			return false;
+		}
+	};
 
 	public void setLink(@NonNull String argLink) {
 		this.link = argLink;
@@ -124,6 +177,7 @@ public class Subscription implements ISubscription, PaletteListener {
 		if (sSharedPreferences == null) {
 			sSharedPreferences = PreferenceManager.getDefaultSharedPreferences(SoundWaves.getAppContext());
 		}
+		init();
 	}
 
 	public Subscription(String url_link) {
@@ -131,68 +185,11 @@ public class Subscription implements ISubscription, PaletteListener {
 		url = url_link;
 		title = url_link;
 		link = url_link;
+		init();
 	}
 
-	public void unsubscribe(Context context) {
-		// Unsubscribe from local database
-		this.status = STATUS_UNSUBSCRIBED;
-		update(context.getContentResolver());
-		deleteEpisodes(context);
-	}
-
-	private boolean deleteEpisodes(Context context) {
-		String where = ItemColumns.SUBS_ID + " = ?";
-		String[] selectionArgs = { String.valueOf(id) };
-		int deletedRows = context.getContentResolver().delete(ItemColumns.URI,
-				where, selectionArgs);
-		if (deletedRows > 1) {
-			return true;
-		} else
-			return false;
-	}
-
-	public int subscribe(@NonNull final Context context) {
-		Subscription sub = SubscriptionLoader.getByUrl(context.getContentResolver(),
-				url);
-
-        if (sub == null) {
-            ContentValues cv = new ContentValues();
-            cv.put(SubscriptionColumns.TITLE, title);
-            cv.put(SubscriptionColumns.URL, url);
-            cv.put(SubscriptionColumns.LINK, link);
-            cv.put(SubscriptionColumns.LAST_UPDATED, 0L);
-            cv.put(SubscriptionColumns.COMMENT, comment);
-            cv.put(SubscriptionColumns.DESCRIPTION, description);
-            cv.put(SubscriptionColumns.IMAGE_URL, imageURL);
-            cv.put(SubscriptionColumns.REMOTE_ID, sync_id);
-            cv.put(SubscriptionColumns.STATUS, STATUS_SUBSCRIBED);
-			cv.put(SubscriptionColumns.SETTINGS, -1);
-            Uri uri = context.getContentResolver().insert(SubscriptionColumns.URI,
-                    cv);
-
-            if (uri == null) {
-                VendorCrashReporter.report("SubscriptionFailed", "" + url);
-                return ADD_FAIL_UNSUCCESS;
-            }
-        } else {
-            // Update the current subscription
-            sub.status = STATUS_SUBSCRIBED;
-            sub.update(context.getContentResolver());
-        }
-
-        if (sub == null) {
-            sub = SubscriptionLoader.getByUrl(context.getContentResolver(), url);
-
-            if (sub == null) {
-                return ADD_FAIL_UNSUCCESS;
-            }
-        }
-
-        SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.SUBSCRIBE_TO_FEED);
-        sub.refresh(context);
-
-		return ADD_SUCCESS;
-
+	private void init() {
+		mEpisodes = new SortedList(IEpisode.class, mEpisodesListCallback);
 	}
 
 	public void delete(ContentResolver context) {
@@ -200,9 +197,9 @@ public class Subscription implements ISubscription, PaletteListener {
 		context.delete(uri, null, null);
 	}
 
-	public ArrayList<IEpisode> getEpisodes(@NonNull ContentResolver contentResolver) {
+	public SortedList<IEpisode> getEpisodes(@NonNull ContentResolver contentResolver) {
 
-		LinkedList<FeedItem> episodes = new LinkedList<>();
+		LinkedList<IEpisode> episodes = new LinkedList<>();
 		Cursor itemCursor = contentResolver.query(ItemColumns.URI,
 				ItemColumns.ALL_COLUMNS, ItemColumns.SUBS_ID + "==" + this.id,
 				null, null);
@@ -217,7 +214,7 @@ public class Subscription implements ISubscription, PaletteListener {
 		return mEpisodes;
 	}
 
-	public ArrayList<IEpisode> getEpisodes() {
+	public SortedList<IEpisode> getEpisodes() {
 		return mEpisodes;
 	}
 
@@ -294,108 +291,6 @@ public class Subscription implements ISubscription, PaletteListener {
 		VendorCrashReporter.report("updateURL failed", "Unable to change subscription url to: " + argNewUrl); // NoI18N
 	}
 
-
-	private class RefreshSyncTask extends AsyncTask<Context, Void, Void> {
-        protected Void doInBackground(Context... contexts) {
-            refresh(contexts[0]);
-            return null;
-        }
-    }
-
-
-    public void refreshAsync(@NonNull final Context argContext) {
-        new RefreshSyncTask().execute(argContext);
-    }
-
-    public void refresh(@NonNull final Context argContext) {
-        SoundWaves.sSubscriptionRefreshManager.refresh(this, new IDownloadCompleteCallback() {
-            @Override
-            public void complete(boolean succes, ISubscription subscription) {
-                update(argContext.getContentResolver());
-            }
-        });
-    }
-
-    public ContentProviderOperation update(ContentResolver contentResolver) {
-        return update(contentResolver, false, false);
-    }
-
-	/**
-	 * Batch update
-	 */
-	public ContentProviderOperation update(ContentResolver contentResolver,
-			boolean batchUpdate, boolean silent) {
-
-		ContentProviderOperation contentUpdate = null;
-		ContentValues cv = new ContentValues();
-
-		if (title != null)
-			cv.put(SubscriptionColumns.TITLE, title);
-		if (url != null)
-			cv.put(SubscriptionColumns.URL, url);
-		if (imageURL != null)
-			cv.put(SubscriptionColumns.IMAGE_URL, imageURL);
-		if (description != null)
-			cv.put(SubscriptionColumns.DESCRIPTION, description);
-
-		if (fail_count <= 0 && !silent) {
-			lastUpdated = Long.valueOf(System.currentTimeMillis());
-		} else {
-			lastUpdated = 0;
-		}
-		cv.put(SubscriptionColumns.LAST_UPDATED, lastUpdated);
-
-		if (fail_count >= 0)
-			cv.put(SubscriptionColumns.FAIL_COUNT, fail_count);
-
-		if (lastItemUpdated >= 0)
-			cv.put(SubscriptionColumns.LAST_ITEM_UPDATED, lastItemUpdated);
-
-		if (auto_download >= 0)
-			cv.put(SubscriptionColumns.AUTO_DOWNLOAD, auto_download);
-
-		cv.put(SubscriptionColumns.REMOTE_ID, sync_id);
-
-		if (status >= 0)
-			cv.put(SubscriptionColumns.STATUS, status);
-
-		if (mSettings >= 0)
-			cv.put(SubscriptionColumns.SETTINGS, mSettings);
-
-        if (mPrimaryColor != -1)
-            cv.put(SubscriptionColumns.PRIMARY_COLOR, mPrimaryColor);
-
-        if (mPrimaryTintColor != -1)
-            cv.put(SubscriptionColumns.PRIMARY_TINT_COLOR, mPrimaryTintColor);
-
-        if (mSecondaryColor != -1)
-            cv.put(SubscriptionColumns.SECONDARY_COLOR, mSecondaryColor);
-
-		// cv.put(SubscriptionColumns.COMMENT, "valuehejeh");
-
-		// BaseColumns._ID + "=" + id
-		String condition = SubscriptionColumns.URL + "='" + url + "'";
-		if (batchUpdate) {
-			contentUpdate = ContentProviderOperation
-					.newUpdate(SubscriptionColumns.URI).withValues(cv)
-					.withSelection(condition, null).withYieldAllowed(true)
-					.build();
-		} else {
-			int numUpdatedRows = contentResolver.update(
-					SubscriptionColumns.URI, cv, condition, null);
-			if (numUpdatedRows == 1)
-				Log.d(TAG, "update OK");
-			else {
-				Log.d(TAG, "update NOT OK. Insert instead");
-				contentResolver.insert(SubscriptionColumns.URI, cv);
-			}
-		}
-
-		return contentUpdate;
-	}
-
-
-
     public void setPrimaryColor(int argColor) {
         mPrimaryColor = argColor;
     }
@@ -444,6 +339,14 @@ public class Subscription implements ISubscription, PaletteListener {
     public boolean IsDirty() {
         return mIsDirty;
     }
+
+	public boolean IsLoaded() {
+		return mIsLoaded;
+	}
+
+	public void setIsLoaded(boolean argIsLoaded) {
+		mIsLoaded = argIsLoaded;
+	}
 
 	@Override
 	public boolean IsSubscribed() {
@@ -499,6 +402,9 @@ public class Subscription implements ISubscription, PaletteListener {
 	}
 
     public void setImageURL(String argUrl) {
+		if (imageURL != null && imageURL.equals(argUrl))
+			return;
+
         imageURL = argUrl;
     }
 
@@ -529,6 +435,15 @@ public class Subscription implements ISubscription, PaletteListener {
 		return STATUS_SUBSCRIBED;
 	}
 
+	public void setStatus(@Subscribed int argStatus) {
+		status = argStatus;
+		notifyPropertyChanged();
+	}
+
+	public int getSettings() {
+		return mSettings;
+	}
+
 	@Override
 	public String getTitle() {
 		return title;
@@ -543,13 +458,9 @@ public class Subscription implements ISubscription, PaletteListener {
 		this.url = url;
 	}
 
-	public void setType(String typeRss2) {
-		// TODO Auto-generated method stub
-
-	}
-
 	public void setDescription(String content) {
 		this.description = content;
+		notifyPropertyChanged();
 	}
 
 
@@ -577,6 +488,8 @@ public class Subscription implements ISubscription, PaletteListener {
 			mSettings |= LIST_OLDEST_FIRST;
 		else
 			mSettings &= ~LIST_OLDEST_FIRST;
+
+		notifyPropertyChanged();
 	}
 
 	public boolean isDeleteWhenListened() {
@@ -594,6 +507,8 @@ public class Subscription implements ISubscription, PaletteListener {
 			mSettings |= DELETE_AFTER_PLAYBACK;
 		else
 			mSettings &= ~DELETE_AFTER_PLAYBACK;
+
+		notifyPropertyChanged();
 	}
 
 	public boolean doDownloadNew(boolean argDefault) {
@@ -611,6 +526,8 @@ public class Subscription implements ISubscription, PaletteListener {
 			mSettings |= DOWNLOAD_NEW_EPISODES;
 		else
 			mSettings &= ~DOWNLOAD_NEW_EPISODES;
+
+		notifyPropertyChanged();
 	}
 
 	public boolean isAddNewToPlaylist() {
@@ -628,6 +545,8 @@ public class Subscription implements ISubscription, PaletteListener {
 			mSettings |= ADD_NEW_TO_PLAYLIST;
 		else
 			mSettings &= ~ADD_NEW_TO_PLAYLIST;
+
+		notifyPropertyChanged();
 	}
 
 	public boolean isShowDescription() {
@@ -645,6 +564,8 @@ public class Subscription implements ISubscription, PaletteListener {
 			mSettings |= SHOW_EPISODE_DESCRIPTION;
 		else
 			mSettings &= ~SHOW_EPISODE_DESCRIPTION;
+
+		notifyPropertyChanged();
 	}
 
 	private boolean IsSettingEnabled(int setting) {
@@ -655,6 +576,10 @@ public class Subscription implements ISubscription, PaletteListener {
 	private boolean getApplicationValue(int argId, boolean argDefault) {
 		String key = SoundWaves.getAppContext().getResources().getString(argId);
 		return sSharedPreferences.getBoolean(key, argDefault);
+	}
+
+	private void notifyPropertyChanged() {
+		SoundWaves.getRxBus().send(new SubscriptionChanged(getId(), SubscriptionChanged.CHANGED));
 	}
 
 }

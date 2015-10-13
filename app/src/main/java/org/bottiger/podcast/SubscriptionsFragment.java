@@ -1,6 +1,8 @@
 package org.bottiger.podcast;
 
+import org.bottiger.podcast.adapters.SubscriptionAdapter;
 import org.bottiger.podcast.adapters.SubscriptionCursorAdapter;
+import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.playlist.SubscriptionCursorLoader;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionLoader;
@@ -52,10 +54,12 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
     private CheckBox mShareAnalytics;
     private CheckBox mCloudServices;
 
+    private Library mLibrary;
+
     private GridLayoutManager mGridLayoutmanager;
     private RelativeLayout mEmptySubscrptionList;
     private Button mEmptySubscrptionImportOPMLButton;
-    private SubscriptionCursorAdapter mAdapter;
+    private SubscriptionAdapter mAdapter;
     private FrameLayout mGridContainerView;
 
     private Activity mActivity;
@@ -66,36 +70,38 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
     private static String PREF_SHARE_ANALYTICS_KEY;
     private static String PREF_CLOUD_SUPPORT_KEY;
 
-    private Cursor mCursor = null;
     private SubscriptionCursorAdapter.OnSubscriptionCountChanged mSubscriptionCountListener = new SubscriptionCursorAdapter.OnSubscriptionCountChanged() {
         @Override
         public void newSubscriptionCount(int argCount) {
-            boolean showEmpty = argCount == 0;
-
-            if (mShowEmptyView == null || mShowEmptyView != showEmpty) {
-                if (showEmpty) {
-                    mEmptySubscrptionList.setVisibility(View.VISIBLE);
-                } else {
-                    mEmptySubscrptionList.setVisibility(View.GONE);
-                }
-                mShowEmptyView = showEmpty;
-            }
+            setSubscriptionFragmentLayout(argCount);
         }
     };
+
+    private void setSubscriptionFragmentLayout(int argSubscriptionCount) {
+        boolean showEmpty = argSubscriptionCount == 0;
+
+        if (mShowEmptyView == null || mShowEmptyView != showEmpty) {
+            if (showEmpty) {
+                mEmptySubscrptionList.setVisibility(View.VISIBLE);
+            } else {
+                mEmptySubscrptionList.setVisibility(View.GONE);
+            }
+            mShowEmptyView = showEmpty;
+        }
+    }
 
 
     @Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
         mActivity = getActivity();
+        mLibrary = SoundWaves.getLibraryInstance();
         PREF_SUBSCRIPTION_COLUMNS = mActivity.getResources().getString(R.string.pref_subscriptions_columns_key);
         PREF_SHARE_ANALYTICS_KEY = mActivity.getResources().getString(R.string.pref_anonymous_feedback_key);
         PREF_CLOUD_SUPPORT_KEY = mActivity.getResources().getString(R.string.pref_cloud_support_key);
         shareprefs = PreferenceManager.getDefaultSharedPreferences(mActivity.getApplicationContext());
         shareprefs.registerOnSharedPreferenceChangeListener(this);
 	}
-
-    SubscriptionCursorLoader mCursorLoader;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -116,10 +122,8 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
         mCloudServices =  (CheckBox) mContainerView.findViewById(R.id.checkBox_cloud);
 
         //RecycelrView
-        mAdapter = new SubscriptionCursorAdapter(getActivity(), mCursor, numberOfColumns());
-
-        mAdapter.setOnSubscriptionCountChangedListener(mSubscriptionCountListener);
-        mCursorLoader = new SubscriptionCursorLoader(this, mAdapter, mCursor);
+        mAdapter = new SubscriptionAdapter(getActivity(), mLibrary, numberOfColumns());
+        setSubscriptionFragmentLayout(mLibrary.getSubscriptions().size());
 
 		mGridView = (RecyclerView) mContainerView.findViewById(R.id.gridview);
 		registerForContextMenu(mGridView);
@@ -237,7 +241,8 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
         switch (menuItem.getItemId()) {
             case R.id.unsubscribe:
                 Subscription subscription = SubscriptionLoader.getById(getActivity().getContentResolver(), position); // item.getSubscription(getActivity());
-                subscription.unsubscribe(getActivity());
+                //subscription.unsubscribe(getActivity());
+                SoundWaves.getLibraryInstance().unsubscribe(subscription.getURLString());
                 return true;
             default:
                 return super.onContextItemSelected(menuItem);

@@ -88,8 +88,6 @@ public class FeedActivity extends TopActivity implements PaletteListener {
     protected FloatingActionButton mFloatingButton;
     private FrameLayout mRevealLayout;
     private FeedViewAdapter mAdapter;
-    private FeedCursorLoader mCursorLoader;
-    protected ReorderCursor mCursor = null;
     private String mUrl;
 
     private boolean mIsSlimSubscription = false;
@@ -146,10 +144,13 @@ public class FeedActivity extends TopActivity implements PaletteListener {
         }
     };
 
-    public static void start(@NonNull Activity argActivity, @NonNull String argURL) {
+    public static void start(@NonNull Activity argActivity, @NonNull Subscription argSubscription) {
+        if (!argSubscription.IsLoaded()) {
+            SoundWaves.getLibraryInstance().loadEpisodes(argSubscription);
+        }
         Bundle b = new Bundle();
         b.putBoolean(FEED_ACTIVITY_IS_SLIM, false);
-        b.putString(FeedActivity.SUBSCRIPTION_URL_KEY, argURL);
+        b.putString(FeedActivity.SUBSCRIPTION_URL_KEY, argSubscription.getURLString());
         mFuckItHack = null;
         startActivity(argActivity, b);
     }
@@ -199,9 +200,11 @@ public class FeedActivity extends TopActivity implements PaletteListener {
             throw new IllegalStateException("Episode can not be null");
         }
 
+        /*
         if (mSubscription.IsDirty() && mSubscription.getType() == ISubscription.DEFAULT) {
             ((Subscription)mSubscription).update(this.getContentResolver());
         }
+        */
 
         // Show QuickContact in front of soft input
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM,
@@ -210,12 +213,12 @@ public class FeedActivity extends TopActivity implements PaletteListener {
         setContentView(R.layout.feed_activity);
 
         if (mIsSlimSubscription) {
-            FeedViewDiscoveryAdapter adapter = new FeedViewDiscoveryAdapter(this, mSubscription, mCursor);
+            FeedViewDiscoveryAdapter adapter = new FeedViewDiscoveryAdapter(this, mSubscription);
             SlimSubscription slimSubscription = (SlimSubscription)mSubscription;
             adapter.setDataset(slimSubscription.getEpisodes());
             mAdapter = adapter;
         } else {
-            mAdapter = new FeedViewAdapter(this, mSubscription, mCursor);
+            mAdapter = new FeedViewAdapter(this, mSubscription);
         }
 
 
@@ -365,11 +368,6 @@ public class FeedActivity extends TopActivity implements PaletteListener {
 
         mRecyclerView.setAdapter(mAdapter);
 
-        if (mSubscription.getType() == ISubscription.DEFAULT) {
-            mCursorLoader = new FeedCursorLoader(this, mAdapter, mCursor, (Subscription)mSubscription);
-            mCursorLoader.requery();
-        }
-
         mMultiShrinkScroller.initialize(mMultiShrinkScrollerListener, mExtraMode == MODE_FULLY_EXPANDED);
         mMultiShrinkScroller.setTitle(mSubscription.getTitle());
 
@@ -453,7 +451,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
             mSubscription = slimSubscription;
             mIsSlimSubscription = true;
         } else {
-            mSubscription = SubscriptionLoader.getByUrl(getContentResolver(), url);
+            mSubscription = SoundWaves.getLibraryInstance().getSubscription(url);
             mIsSlimSubscription = false;
         }
     }

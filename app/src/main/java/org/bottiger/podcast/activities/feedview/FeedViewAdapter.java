@@ -18,6 +18,7 @@ import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
+import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
@@ -45,7 +46,6 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
 
     protected ISubscription mSubscription;
 
-    protected Cursor mCursor;
     protected Activity mActivity;
     protected LayoutInflater mInflater;
 
@@ -59,18 +59,12 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
     private static android.text.format.Formatter sFormatter = new android.text.format.Formatter();
     private StringBuilder mStringBuilder = new StringBuilder(100);
 
-    public FeedViewAdapter(@NonNull Activity activity, @NonNull ISubscription argSubscription, @Nullable Cursor dataset) {
+    public FeedViewAdapter(@NonNull Activity activity, @NonNull ISubscription argSubscription) {
         mActivity = activity;
         mSubscription = argSubscription;
 
         mInflater = (LayoutInflater) activity
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-        setDataset(dataset);
-    }
-
-    public void setDataset(Cursor c) {
-        mCursor = c;
     }
 
     public @Order int getOrder() {
@@ -209,7 +203,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
 
     @Override
     public int getItemCount() {
-        return mCursor == null ? 0 : mCursor.getCount();
+        return mSubscription.getEpisodes().size();
     }
 
     public void setExpanded(boolean expanded) {
@@ -218,8 +212,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
     }
 
     protected IEpisode getItemForPosition(int argPosition) {
-        mCursor.moveToPosition(argPosition);
-        return FeedItem.getByCursor(mCursor);
+        return mSubscription.getEpisodes().get(argPosition);
     }
 
     protected int getDatasetPosition(int argPosition) {

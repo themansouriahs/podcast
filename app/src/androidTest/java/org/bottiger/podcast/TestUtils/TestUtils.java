@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.util.LongSparseArray;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.PodcastOpenHelper;
@@ -122,7 +123,8 @@ public class TestUtils {
             long key = list.keyAt(i);
             // get the object by the key.
             Subscription subscription = (Subscription)list.get(key);
-            subscription.unsubscribe(argActivity);
+            //subscription.unsubscribe(argActivity);
+            SoundWaves.getLibraryInstance().unsubscribe(subscription.getURLString());
         }
     }
 }

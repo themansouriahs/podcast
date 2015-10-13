@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.OPMLImportExport;
@@ -80,8 +81,9 @@ public class OpenOpmlFromIntentActivity extends AppCompatActivity {
         for (int i = 0; i < mSubscriptions.size(); i++) {
             subscription = mSubscriptions.get(i);
             if (subscription.IsDirty()) {
-                newSubscription = new Subscription(subscription.getURLString());
-                newSubscription.subscribe(this);
+                //newSubscription = new Subscription(subscription.getURLString());
+                //newSubscription.subscribe(this);
+                SoundWaves.getLibraryInstance().subscribe(subscription.getURLString());
                 didImport = true;
             }
         }

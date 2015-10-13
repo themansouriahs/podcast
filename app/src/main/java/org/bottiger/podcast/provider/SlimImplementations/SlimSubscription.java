@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.util.SortedList;
 import android.view.View;
 
 import org.bottiger.podcast.provider.IEpisode;
@@ -25,7 +26,7 @@ public class SlimSubscription implements ISubscription, Parcelable {
     private String mTitle;
     private URL mURL;
     private String mImageURL;
-    private ArrayList<SlimEpisode> mEpisodes = new ArrayList<>();
+    private SortedList<SlimEpisode> mEpisodes;
 
     private boolean mIsSubscribed = false;
     private boolean mIsDirty = false;
@@ -34,6 +35,7 @@ public class SlimSubscription implements ISubscription, Parcelable {
         mTitle = argTitle;
         mURL = argURL;
         mImageURL = argImageURL;
+        mEpisodes = new SortedList<SlimEpisode>(SlimEpisode.class, null);
     }
 
     @NonNull
@@ -123,11 +125,11 @@ public class SlimSubscription implements ISubscription, Parcelable {
 
     }
 
-    public ArrayList<SlimEpisode> getEpisodes() {
+    public SortedList<SlimEpisode> getEpisodes() {
         return mEpisodes;
     }
 
-    public void setEpisodes(ArrayList<SlimEpisode> argEpisodes) {
+    public void setEpisodes(SortedList<SlimEpisode> argEpisodes) {
         mEpisodes = argEpisodes;
     }
 
@@ -146,7 +148,12 @@ public class SlimSubscription implements ISubscription, Parcelable {
     }
 
     public void writeToParcel(Parcel out, int flags) {
-        SlimEpisode[] episodeArray = mEpisodes.toArray(new SlimEpisode[mEpisodes.size()]);
+        ArrayList<SlimEpisode> episodeArray = new ArrayList<>();
+
+        for (int i = 0; i < mEpisodes.size(); i++) {
+            episodeArray.add(mEpisodes.get(i));
+        }
+        //mEpisodes.toArray(new SlimEpisode[mEpisodes.size()]);
 
         // I think the order is important
         out.writeString(mTitle);
@@ -154,7 +161,7 @@ public class SlimSubscription implements ISubscription, Parcelable {
         out.writeString(mURL.toString());
         //out.writeParcelableArray(episodeArray, PARCELABLE_WRITE_RETURN_VALUE);
         //out.writeTypedList(mEpisodes);
-        out.writeList(mEpisodes);
+        out.writeList(episodeArray);
     }
 
     public static final Parcelable.Creator<SlimSubscription> CREATOR
@@ -178,7 +185,12 @@ public class SlimSubscription implements ISubscription, Parcelable {
         }
         //SlimEpisode[] episodeArray = (SlimEpisode[])in.readArray(SlimEpisode.class.getClassLoader());
         //mEpisodes = new ArrayList( Arrays.asList(episodeArray) );
-        mEpisodes = in.readArrayList(SlimEpisode.class.getClassLoader());
+        ArrayList<SlimEpisode> episodeArray = in.readArrayList(SlimEpisode.class.getClassLoader());
+
+        mEpisodes.clear();
+        for (int i = 0; i < episodeArray.size(); i++) {
+            mEpisodes.add(episodeArray.get(i));
+        }
 
     }
 }

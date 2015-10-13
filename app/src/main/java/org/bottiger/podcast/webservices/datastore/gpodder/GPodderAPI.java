@@ -19,6 +19,7 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.ResponseBody;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.playlist.FeedCursorLoader;
 import org.bottiger.podcast.provider.FeedItem;
@@ -169,8 +170,11 @@ public class GPodderAPI implements IWebservice {
         Subscription changedSubscription;
         for (int i = 0; i < added.size(); i++) {
             newUrl = added.get(i);
+            /*
             changedSubscription = new Subscription(newUrl);
             changedSubscription.subscribe(argContext);
+            */
+            SoundWaves.getLibraryInstance().subscribe(newUrl);
         }
 
         /**
@@ -200,7 +204,8 @@ public class GPodderAPI implements IWebservice {
 
             if (removed.contains(url)) {
                 if (subscription.IsSubscribed()) {
-                    subscription.unsubscribe(argContext);
+                    //subscription.unsubscribe(argContext);
+                    SoundWaves.getLibraryInstance().unsubscribe(subscription.getURLString());
                 } else {
                     Log.w(TAG, "gPodder removed a subscription we are not subscribed to: " + url); // NoI18N
                     VendorCrashReporter.report("Removed unknown subscription", url); // NoI18N
@@ -401,8 +406,11 @@ public class GPodderAPI implements IWebservice {
         Subscription newLocalSubscription;
         for (int i = 0; i < newSubscriptions.size(); i++) {
             gSubscription = newSubscriptions.get(i);
+            /*
             newLocalSubscription = new Subscription(gSubscription.getUrl());
             newLocalSubscription.subscribe(argContext);
+            */
+            SoundWaves.getLibraryInstance().subscribe(gSubscription.getUrl());
         }
 
 

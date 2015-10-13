@@ -131,6 +131,10 @@ public class SubscriptionFilter implements IPlaylistFilter, SharedPreferences.On
         editor.commit();
     }
 
+    public boolean showListened() {
+        return mShowListened;
+    }
+
     public String toSQL() {
 
         String listened = (mShowListened) ? " 1 " : " " + ItemColumns.LISTENED + "== 0 ";

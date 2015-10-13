@@ -1,13 +1,5 @@
 package org.bottiger.podcast.adapters;
 
-import org.bottiger.podcast.activities.feedview.FeedActivity;
-import org.bottiger.podcast.R;
-import org.bottiger.podcast.ToolbarActivity;
-import org.bottiger.podcast.adapters.viewholders.FooterViewHolder;
-import org.bottiger.podcast.adapters.viewholders.subscription.SubscriptionViewHolder;
-import org.bottiger.podcast.provider.Subscription;
-import org.bottiger.podcast.provider.SubscriptionLoader;
-
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -23,12 +15,30 @@ import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.URLUtil;
 
 import com.bumptech.glide.Glide;
 
+import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.ToolbarActivity;
+import org.bottiger.podcast.activities.feedview.FeedActivity;
+import org.bottiger.podcast.adapters.viewholders.FooterViewHolder;
+import org.bottiger.podcast.adapters.viewholders.subscription.SubscriptionViewHolder;
+import org.bottiger.podcast.model.Library;
+import org.bottiger.podcast.model.SubscriptionChanged;
+import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.provider.SubscriptionLoader;
+import org.bottiger.podcast.utils.rxbus.RxBusSimpleEvents;
 
-public class SubscriptionCursorAdapter extends CursorRecyclerAdapter {
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
+
+/**
+ * Created by aplb on 11-10-2015.
+ */
+public class SubscriptionAdapter extends RecyclerView.Adapter {
 
     private static final String TAG = "SubscriptionAdapter";
 
@@ -38,18 +48,36 @@ public class SubscriptionCursorAdapter extends CursorRecyclerAdapter {
 
     private final LayoutInflater mInflater;
     private Activity mActivity;
+    private Library mLibrary;
 
     private int numberOfColumns = 2;
     private int position = -1;
 
-    private OnSubscriptionCountChanged mOnSubscriptionCountChanged = null;
-
-    public SubscriptionCursorAdapter(Activity argActivity, Cursor cursor, int argColumnsCount) {
-        super(cursor);
+    public SubscriptionAdapter(Activity argActivity, Library argLibrary, int argColumnsCount) {
         mActivity = argActivity;
         mInflater = (LayoutInflater) argActivity
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         numberOfColumns = argColumnsCount;
+        mLibrary = argLibrary;
+
+        SoundWaves.getRxBus().toObserverable()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<Object>() {
+                    @Override
+                    public void call(Object event) {
+                        if (event instanceof SubscriptionChanged) {
+                            SubscriptionChanged subscriptionChanged = (SubscriptionChanged) event;
+                            if (subscriptionChanged.getAction() == SubscriptionChanged.ADDED) {
+                                notifyDataSetChanged();
+                            }
+
+                            if (subscriptionChanged.getAction() == SubscriptionChanged.REMOVED) {
+                                notifyDataSetChanged();
+                            }
+                        }
+                    }
+                });
     }
 
     @Override
@@ -76,7 +104,7 @@ public class SubscriptionCursorAdapter extends CursorRecyclerAdapter {
     }
 
     @Override
-    public void onBindViewHolderCursor(RecyclerView.ViewHolder argHolder, Cursor cursor, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder argHolder, int position) {
 
         // In case we are dealing with the footer
         if (isLastItem(position)) {
@@ -97,7 +125,8 @@ public class SubscriptionCursorAdapter extends CursorRecyclerAdapter {
 
         Subscription sub = null;
         try {
-            sub = SubscriptionLoader.getByCursor(cursor);
+            //sub = SubscriptionLoader.getByCursor(cursor);
+            sub = (Subscription)mLibrary.getSubscriptions().get(position);
         } catch (IllegalStateException e) {
             e.printStackTrace();
         }
@@ -122,8 +151,8 @@ public class SubscriptionCursorAdapter extends CursorRecyclerAdapter {
 
         final Subscription subscription = sub;
 
-        String title = sub.title;
-        final String logo = sub.imageURL;
+        String title = sub.getTitle();
+        final String logo = sub.getImageURL();
 
         if (isListView()) {
             holder.gradient.setVisibility(View.GONE);
@@ -166,11 +195,6 @@ public class SubscriptionCursorAdapter extends CursorRecyclerAdapter {
             Glide.with(mActivity).load(R.drawable.generic_podcast).centerCrop().into(holder.image);
         }
 
-        /*
-        if (uri != null)
-            holder.image.setImageURI(uri);
-            */
-
         argHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -186,16 +210,6 @@ public class SubscriptionCursorAdapter extends CursorRecyclerAdapter {
             }
         });
     }
-
-
-
-    public static Uri ResourceToUri (Context context, @DrawableRes int resID) {
-        return Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" +
-                context.getResources().getResourcePackageName(resID) + '/' +
-                context.getResources().getResourceTypeName(resID) + '/' +
-                context.getResources().getResourceEntryName(resID) );
-    }
-
 
 
     @Override
@@ -241,51 +255,12 @@ public class SubscriptionCursorAdapter extends CursorRecyclerAdapter {
 
     @Override
     public int getItemCount() {
-        int count = super.getItemCount();
+        int count = mLibrary.getSubscriptions().size();
 
         if (count == 0) // If there are 0 subscriptions we do not want to return 1
             return count;
 
         return count +1; // one footer please
-    }
-
-
-    @Override
-    public void changeCursor(Cursor cursor) {
-        super.changeCursor(cursor);
-        mOnSubscriptionCountChanged.newSubscriptionCount(super.getItemCount());
-
-    }
-
-    /**
-     * Swap in a new Cursor, returning the old Cursor.  Unlike
-     * {@link #changeCursor(Cursor)}, the returned old Cursor is <em>not</em>
-     * closed.
-     *
-     * @param newCursor The new cursor to be used.
-     * @return Returns the previously set Cursor, or null if there wasa not one.
-     * If the given new Cursor is the same instance is the previously set
-     * Cursor, null is also returned.
-     */
-    @Override
-    public Cursor swapCursor(Cursor newCursor) {
-        Cursor cursor = super.swapCursor(newCursor);
-        mOnSubscriptionCountChanged.newSubscriptionCount(super.getItemCount());
-        return cursor;
-    }
-
-    protected void onContentChanged() {
-        if (mOnSubscriptionCountChanged != null) {
-            mOnSubscriptionCountChanged.newSubscriptionCount(super.getItemCount());
-        }
-    }
-
-    public void setOnSubscriptionCountChangedListener(@Nullable OnSubscriptionCountChanged argOnSubscriptionCountChanged) {
-        mOnSubscriptionCountChanged = argOnSubscriptionCountChanged;
-    }
-
-    public interface OnSubscriptionCountChanged {
-        public void newSubscriptionCount(int argCount);
     }
 
 }

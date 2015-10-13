@@ -10,6 +10,7 @@ import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.player.sonic.service.ISoundWavesEngine;
 import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
@@ -41,6 +42,8 @@ public class SoundWaves extends Application {
 
     private static Bus sBus = new Bus(ThreadEnforcer.MAIN);
     private static RxBus _rxBus = null;
+
+    private static Library sLibrary = null;
 
     public static class PlayerServiceBound {
         public boolean isConnected;
@@ -101,6 +104,8 @@ public class SoundWaves extends Application {
 
         context = getApplicationContext();
 
+        sLibrary = new Library(this);
+
         sSubscriptionRefreshManager = new SubscriptionRefreshManager(context);
 
         firstRun(context);
@@ -156,5 +161,13 @@ public class SoundWaves extends Application {
         }
 
         return _rxBus;
+    }
+
+    public static Library getLibraryInstance() {
+        if (sLibrary == null) {
+            sLibrary = new Library(getAppContext());
+        }
+
+        return sLibrary;
     }
 }
