@@ -30,12 +30,17 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
 
     private int mRecyclerViewBottomPadding;
 
+    private static final int MAX_VELOCITY_Y = 5000;
+
     private static final int DOWN = -1;
     private static final int UP = 1;
 
+    // From AppBarLayout
+    private Runnable mFlingRunnable;
+    private ScrollerCompat mScroller;
+
     public PlaylistBehavior(Context context, AttributeSet attrs) {
         Log.v(TAG, "Created");
-        //mScroller = new Scroller(context, sInterpolator);
     }
 
     @Override
@@ -89,11 +94,11 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
     public boolean onStartNestedScroll(CoordinatorLayout coordinatorLayout, View child, View directTargetChild, View target, int nestedScrollAxes) {
         Log.v(TAG, "onStartNestedScroll, child: " + child.getClass().getName() + " target: " + target.getClass().getName());
 
-        boolean isTopPlayer = target instanceof TopPlayer;
-        boolean canScrollPlaylist = mRecyclerView.canScrollVertically(-1);
-        boolean canShrinkTopPlayer = mTopPlayer.isMinimumSize();
+        if (mScroller != null && !mScroller.isFinished()) {
+            mScroller.abortAnimation();
+        }
 
-        //return !canScrollPlaylist;
+        mRecyclerView.canScrollVertically(-1);
         return true;
     }
 
@@ -195,11 +200,6 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
         return true;
     }
 
-
-    // From AppBarLayout
-    private Runnable mFlingRunnable;
-    private ScrollerCompat mScroller;
-
     private boolean fling(CoordinatorLayout coordinatorLayout, View layout, int minOffset, int maxOffset, float velocityY) {
         if(this.mFlingRunnable != null) {
             layout.removeCallbacks(this.mFlingRunnable);
@@ -209,7 +209,7 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
             this.mScroller = ScrollerCompat.create(layout.getContext());
         }
 
-        this.mScroller.fling(0, 20000, 0, Math.round(velocityY), 0, 0, minOffset, maxOffset);
+        this.mScroller.fling(0, MAX_VELOCITY_Y, 0, Math.round(velocityY), 0, 0, minOffset, maxOffset);
         if(this.mScroller.computeScrollOffset()) {
             this.mFlingRunnable = new PlaylistBehavior.FlingRunnable(coordinatorLayout, layout);
             ViewCompat.postOnAnimation(layout, this.mFlingRunnable);
