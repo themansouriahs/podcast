@@ -50,15 +50,16 @@ public class SlimEpisode implements IEpisode, Parcelable {
     @Nullable
     @Override
     public String getArtwork(@NonNull Context argContext) {
-        URL artwork = getArtwork();
+        String artwork = getArtwork();
         if (artwork == null)
             return null;
 
-        return artwork.toString();
+        return artwork;
     }
 
-    public URL getArtwork() {
-        return mArtworkUrl;
+    @Override
+    public String getArtwork() {
+        return mArtworkUrl.toString();
     }
 
     @Override
@@ -174,11 +175,6 @@ public class SlimEpisode implements IEpisode, Parcelable {
     @Override
     public boolean isDownloaded() {
         return false;
-    }
-
-    @Override
-    public void update(ContentResolver contentResolver) {
-        return;
     }
 
     public int describeContents() {

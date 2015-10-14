@@ -27,7 +27,8 @@ public interface IEpisode {
 
     String getTitle();
     URL getUrl();
-    @Nullable String getArtwork(@NonNull Context argContext);
+    @Deprecated @Nullable String getArtwork(@NonNull Context argContext);
+    @Nullable String getArtwork();
     String getDescription();
     String getAuthor();
     long getDuration();
@@ -64,7 +65,5 @@ public interface IEpisode {
 
     boolean isVideo();
     void setIsVideo(boolean argIsVideo);
-
-    void update(ContentResolver contentResolver);
 
 }

@@ -391,7 +391,7 @@ public class SoundWavesDownloadManager extends Observable {
 
 						if (deleteFile) {
 							item.setDownloaded(false);
-							item.update(mContext.getContentResolver());
+                            SoundWaves.getLibraryInstance().updateEpisode(item);
 						}
 						//cursor.moveToNext();
 					}
@@ -677,7 +677,7 @@ public class SoundWavesDownloadManager extends Observable {
 
             item.setIsVideo(getFileType(mimetype) == VIDEO);
 
-            item.update(mContext.getContentResolver());
+            SoundWaves.getLibraryInstance().updateEpisode(item);
 
             Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
             try {

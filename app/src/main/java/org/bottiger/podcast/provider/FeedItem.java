@@ -10,7 +10,6 @@ import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
 
 import org.bottiger.podcast.SoundWaves;
@@ -21,15 +20,12 @@ import org.bottiger.podcast.utils.BitMaskUtils;
 import org.bottiger.podcast.utils.SDCardManager;
 import org.jsoup.Jsoup;
 
-import android.app.Activity;
 import android.app.DownloadManager;
 import android.app.DownloadManager.Query;
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -296,179 +292,11 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 		return argCV;
 	}
 
-    public ContentValues getContentValues(Boolean silent) {
-        ContentValues cv = new ContentValues();
-
-        if (title != null)
-            cv.put(ItemColumns.TITLE, title);
-        if (content != null)
-            cv.put(ItemColumns.CONTENT, content);
-        if (filename != null)
-            cv.put(ItemColumns.PATHNAME, filename);
-        if (date != null)
-            cv.put(ItemColumns.DATE, date);
-        if (sub_id > 0)
-            cv.put(ItemColumns.SUBS_ID, sub_id);
-
-        if (url != null) {
-            cv.put(ItemColumns.URL, url);
-            cv.put(ItemColumns.RESOURCE, url);
-        }
-        if (remote_id != null)
-            cv.put(ItemColumns.REMOTE_ID, remote_id);
-        if (filesize >= 0)
-            cv.put(ItemColumns.FILESIZE, filesize);
-        if (downloadReferenceID >= 0)
-            cv.put(ItemColumns.DOWNLOAD_REFERENCE, downloadReferenceID);
-        if (episodeNumber >= 0)
-            cv.put(ItemColumns.EPISODE_NUMBER, episodeNumber);
-        if (chunkFilesize >= 0)
-            cv.put(ItemColumns.LENGTH, length);
-        if (duration_ms >= 0)
-            cv.put(ItemColumns.DURATION_MS, duration_ms);
-        if (chunkFilesize >= 0)
-            cv.put(ItemColumns.CHUNK_FILESIZE, chunkFilesize);
-        if (offset >= 0)
-            cv.put(ItemColumns.OFFSET, offset);
-
-        if (!silent) {
-            lastUpdate = Long.valueOf(System.currentTimeMillis());
-        }
-        if (lastUpdate > 0)
-            cv.put(ItemColumns.LAST_UPDATE, lastUpdate);
-
-        if (status > 0)
-            cv.put(ItemColumns.STATUS, status);
-        if (listened >= 0)
-            cv.put(ItemColumns.LISTENED, listened);
-
-		cv.put(ItemColumns.PRIORITY, priority);
-
-        if (image != null)
-            cv.put(ItemColumns.IMAGE_URL, image);
-
-        if (isDownloaded != null)
-            cv.put(ItemColumns.IS_DOWNLOADED, isDownloaded);
-
-        return cv;
-    }
-
-	/**
-	 * Batch update
-	 */
-	public ContentProviderOperation update(ContentResolver contentResolver,
-			boolean batchUpdate, boolean silent) {
-
-
-		ContentProviderOperation contentUpdate = null;
-
-		ContentValues cv = getContentValues(silent);
-
-		// BaseColumns._ID + "=" + id
-		String condition = ItemColumns.URL + "='" + url + "'";
-		// String condition = ItemColumns.URL + "='?' AND "+ ItemColumns.URL +
-		// "='?'"; // BUG!
-		// http://code.google.com/p/android/issues/detail?id=56062
-		if (batchUpdate) {
-			contentUpdate = ContentProviderOperation.newUpdate(ItemColumns.URI)
-					.withValues(cv).withSelection(condition, null) // new
-																	// String[]{url})
-					.withYieldAllowed(true).build();
-		} else {
-			int numUpdatedRows = contentResolver.update(ItemColumns.URI, cv,
-					condition, null);
-			if (numUpdatedRows == 1) {
-				Log.d("FeedItem", "update OK");
-            } else if (numUpdatedRows == 0) {
-				Log.d("FeedItem", "update NOT OK. Insert instead");
-				contentResolver.insert(ItemColumns.URI, cv);
-			} else {
-                throw new IllegalStateException("Never update more than one row here");
-            }
-		}
-		return contentUpdate;
-	}
-
 	/**
 	 * Update the FeedItem in the database
 	 */
-	public void silentUpdate(ContentResolver contentResolver) {
-		update(contentResolver, false, true);
-	}
-
-	/**
-	 * Update the FeedItem in the database
-	 */
-	public void update(ContentResolver contentResolver) {
-		update(contentResolver, false, false);
-	}
-
-	public Uri insert(ContentResolver contentResolver) {
-		Log.d("FeedItem", "item insert start");
-		try {
-
-			ContentValues cv = new ContentValues();
-			if (filename != null)
-				cv.put(ItemColumns.PATHNAME, filename);
-			if (remote_id != null)
-				cv.put(ItemColumns.REMOTE_ID, remote_id);
-			if (offset >= 0)
-				cv.put(ItemColumns.OFFSET, offset);
-			if (lastUpdate >= 0)
-				cv.put(ItemColumns.LAST_UPDATE, lastUpdate);
-
-			if (sub_id >= 0)
-				cv.put(ItemColumns.SUBS_ID, sub_id);
-			if (url != null)
-				cv.put(ItemColumns.URL, url);
-			if (image != null)
-				cv.put(ItemColumns.IMAGE_URL, image);
-			if (title != null)
-				cv.put(ItemColumns.TITLE, title);
-
-			if (author != null)
-				cv.put(ItemColumns.AUTHOR, author);
-			if (date != null)
-				cv.put(ItemColumns.DATE, date);
-			if (content != null)
-				cv.put(ItemColumns.CONTENT, content);
-			if (resource != null)
-				cv.put(ItemColumns.RESOURCE, resource);
-			if (filesize >= 0)
-				cv.put(ItemColumns.FILESIZE, filesize);
-			if (downloadReferenceID >= 0)
-				cv.put(ItemColumns.DOWNLOAD_REFERENCE, downloadReferenceID);
-
-			if (isDownloaded != null)
-				cv.put(ItemColumns.IS_DOWNLOADED, isDownloaded);
-
-			if (episodeNumber >= 0)
-				cv.put(ItemColumns.EPISODE_NUMBER, episodeNumber);
-			if (length >= 0)
-				cv.put(ItemColumns.LENGTH, length);
-			if (duration_string != null) {
-				// Log.w("ITEM","  duration: " + duration);
-				cv.put(ItemColumns.DURATION, duration_string);
-			}
-			if (duration_ms > 0) {
-				cv.put(ItemColumns.DURATION_MS, duration_ms);
-			}
-            if (status >= 0) {
-                cv.put(ItemColumns.STATUS, status);
-            }
-			if (sub_title != null) {
-				cv.put(ItemColumns.SUB_TITLE, sub_title);
-			}
-			if (listened >= 0)
-				cv.put(ItemColumns.LISTENED, listened);
-
-			if (priority >= 0)
-				cv.put(ItemColumns.PRIORITY, priority);
-
-			return contentResolver.insert(ItemColumns.URI, cv);
-
-		} finally {
-		}
+	private void update(ContentResolver contentResolver) {
+		SoundWaves.getLibraryInstance().updateEpisode(this);
 	}
 
 	/**
@@ -492,6 +320,10 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	public String getDate() {
 		// log.debug(" getDate() start");
 		return this.date;
+	}
+
+	public long getSubscriptionId() {
+		return this.sub_id;
 	}
 
     /**
@@ -571,8 +403,6 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 
 		item.id = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
 
-		int idx = cursor.getColumnIndex(ItemColumns.RESOURCE);
-		//item.resource = cursor.getString(idx);
 		item.filename = cursor.getString(cursor
 				.getColumnIndex(ItemColumns.PATHNAME));
 		//item.remote_id = cursor.getString(cursor
@@ -632,35 +462,6 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	public String toString() {
 		return "Feed: " + title;
 	}
-
-	/**
-	 * Writes the currentstatus of the FeedItem with the giving ID to the
-	 * textView argument
-	 *
-	 */
-	/*
-	public String getStatus(DownloadManager downloadManager) {
-		DownloadStatus downloadStatus = SoundWavesDownloadManager.getStatus(this);
-		String statusText = "";
-		switch (downloadStatus) {
-		case PENDING:
-			statusText = "waiting";
-			break;
-		case DOWNLOADING:
-			statusText = "Downloading: " + Integer.toString(getProgress(downloadManager));
-			break;
-		case DONE:
-			statusText = "Downloaded";
-			break;
-		case ERROR:
-			statusText = "Error";
-			break;
-		default:
-			statusText = "";
-		}
-		return statusText;
-	}
-	*/
 
 	/**
 	 * Get the current download progress as a int .
@@ -951,6 +752,10 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 		this.listened = hasBeenListened;
 	}
 
+	public int getListenedValue() {
+		return listened;
+	}
+
 	/**
      * The duration of the mp3 (or whatever) in milliseconds.
 	 * @return the duration in ms. -1 if unknown
@@ -1043,8 +848,15 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	}
 
 	@Nullable
+	public Subscription getSubscription() {
+		return SoundWaves.getLibraryInstance().getSubscription(sub_id);
+		//return SubscriptionLoader.getById(argContext.getContentResolver(), sub_id);
+	}
+
+	@Nullable
+	@Deprecated
     public Subscription getSubscription(@NonNull Context argContext) {
-		return (Subscription)SoundWaves.getLibraryInstance().getSubscription(sub_id);
+		return SoundWaves.getLibraryInstance().getSubscription(sub_id);
         //return SubscriptionLoader.getById(argContext.getContentResolver(), sub_id);
     }
 
@@ -1069,25 +881,31 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 
 	}
 
-    @Nullable
-	@Override
-	public String getArtwork(@NonNull Context context) {
+	@Nullable
+	public String getArtwork() {
 		String imageURL;
 
-        if (!TextUtils.isEmpty(image))
-            return image;
+		if (!TextUtils.isEmpty(image))
+			return image;
 
-        Subscription subscription = getSubscription(context);
+		Subscription subscription = getSubscription();
 
-        if (subscription == null)
-            return null;
+		if (subscription == null)
+			return null;
 
 		imageURL = subscription.imageURL;
 
-        if (TextUtils.isEmpty(imageURL))
-            return null;
+		if (TextUtils.isEmpty(imageURL))
+			return null;
 
 		return imageURL;
+	}
+
+	@Deprecated
+    @Nullable
+	@Override
+	public String getArtwork(@NonNull Context context) {
+		return getArtwork();
 	}
 
 	public long getId() {
@@ -1315,6 +1133,10 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 
 	public void setLink(String href) {
 		this.link_show_notes = href;
+	}
+
+	public int getStatus() {
+		return status;
 	}
 
     public boolean isVideo() {

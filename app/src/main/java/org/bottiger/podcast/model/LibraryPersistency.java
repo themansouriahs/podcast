@@ -13,7 +13,6 @@ import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
-import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionColumns;
@@ -36,7 +35,7 @@ public class LibraryPersistency {
     }
 
     public void persist(FeedItem argEpisode) {
-        ContentValues cv = argEpisode.getContentValues(true);
+        ContentValues cv = getEpisodeContentValues(argEpisode, true);
 
         // BaseColumns._ID + "=" + id
         String condition = ItemColumns.URL + "='" + argEpisode.getURL() + "'";
@@ -126,6 +125,30 @@ public class LibraryPersistency {
         }
 
         return contentUpdate;
+    }
+
+    private ContentValues getEpisodeContentValues(FeedItem argItem, Boolean silent) {
+        ContentValues cv = new ContentValues();
+
+        cv.put(ItemColumns.TITLE, argItem.getTitle());
+        cv.put(ItemColumns.CONTENT, argItem.getDescription());
+        cv.put(ItemColumns.PATHNAME, argItem.getFilename());
+        cv.put(ItemColumns.DATE, argItem.getDate());
+        cv.put(ItemColumns.SUBS_ID, argItem.getSubscriptionId());
+        cv.put(ItemColumns.URL, argItem.getURL());
+        cv.put(ItemColumns.FILESIZE, argItem.getFilesize());
+        cv.put(ItemColumns.DURATION_MS, argItem.getDuration());
+        cv.put(ItemColumns.OFFSET, argItem.getOffset());
+        cv.put(ItemColumns.STATUS, argItem.getStatus());
+        cv.put(ItemColumns.LISTENED, argItem.getListenedValue());
+        cv.put(ItemColumns.PRIORITY, argItem.getPriority());
+        cv.put(ItemColumns.IMAGE_URL, argItem.getArtwork());
+        cv.put(ItemColumns.IS_DOWNLOADED, argItem.isDownloaded());
+
+        if (!silent)
+            cv.put(ItemColumns.LAST_UPDATE, System.currentTimeMillis());
+
+        return cv;
     }
 
     private boolean deleteEpisodes(@NonNull Subscription argSubscription) {

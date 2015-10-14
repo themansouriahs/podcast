@@ -311,7 +311,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
 
                     }
 
-                   feedItem.update(resolver);
+                   SoundWaves.getLibraryInstance().updateEpisode(feedItem);
                 }
             }
 
@@ -432,7 +432,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
             episode.markAsListened();
         }
 
-        episode.update(mPlayerService.getContentResolver());
+        SoundWaves.getLibraryInstance().updateEpisode(episode);
     }
 
     @Override

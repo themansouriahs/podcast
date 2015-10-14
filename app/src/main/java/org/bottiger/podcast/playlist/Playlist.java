@@ -279,7 +279,7 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
                 argEpisode.setPriority(preceedingItem.getPriority() + 1);
             }
 
-            argEpisode.update(mContext.getContentResolver());
+            SoundWaves.getLibraryInstance().updateEpisode(argEpisode);
 
             mInternalPlaylist.add(lastPlaylistPosition, argEpisode);
 
@@ -289,7 +289,7 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
                 int priority = episode.getPriority();
                 if (priority > 0) {
                     episode.setPriority(priority+1);
-                    episode.update(mContext.getContentResolver());
+                    SoundWaves.getLibraryInstance().updateEpisode(episode);
                 } else {
                     break;
                 }

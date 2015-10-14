@@ -335,7 +335,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                                     item.markAsListened(0);
                                 }
 
-                                episode.update(contentResolver);
+                                SoundWaves.getLibraryInstance().updateEpisode(episode);
                             }
                         })
                         .setActionTextColor(getResources().getColor(R.color.white_opaque));

@@ -368,7 +368,7 @@ public class PlayerService extends Service implements
 				FeedItem oldFeedItem = (FeedItem)oldItem;
 				if (oldFeedItem.getOffset() > 0) {
 					oldFeedItem.markAsListened();
-					oldFeedItem.update(getContentResolver());
+					SoundWaves.getLibraryInstance().updateEpisode(oldFeedItem);
 
 					int pos = mPlaylist.getPosition(oldItem);
 					if (pos > 0) {
@@ -413,7 +413,7 @@ public class PlayerService extends Service implements
         if (isFeedItem) {
             if (feedItem.priority != 1)
                 feedItem.setPriority(null, getApplication());
-            feedItem.update(getContentResolver());
+			SoundWaves.getLibraryInstance().updateEpisode(feedItem);
         }
 	    
 	}
