@@ -6,8 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.ArrayMap;
 import android.support.v7.util.SortedList;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.util.SortedListAdapterCallback;
 import android.util.Log;
 
 import com.squareup.sqlbrite.BriteDatabase;
@@ -28,7 +26,6 @@ import org.bottiger.podcast.utils.StrUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 import rx.Observable;
@@ -268,7 +265,7 @@ public class Library {
                     FeedItem episode;
 
                     while (cursor.moveToNext()) {
-                        episode = FeedItem.fetchFromCursor(cursor, null);
+                        episode = LibraryPersistency.fetchEpisodeFromCursor(cursor, null);
                         addEpisode(episode);
                         argPlaylist.setItem(counter, episode);
                         counter++;
@@ -344,7 +341,7 @@ public class Library {
 
                             while (cursor.moveToNext()) {
                                 //long start = System.currentTimeMillis();
-                                FeedItem item = FeedItem.fetchFromCursor(cursor, emptyItems[counter]);
+                                FeedItem item = LibraryPersistency.fetchEpisodeFromCursor(cursor, emptyItems[counter]);
                                 //long end1 = System.currentTimeMillis();
 
                                 //subscription = subscriptionMap.get(item.sub_id);

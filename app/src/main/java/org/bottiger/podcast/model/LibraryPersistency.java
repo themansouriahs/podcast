@@ -4,7 +4,9 @@ import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
+import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -149,6 +151,40 @@ public class LibraryPersistency {
             cv.put(ItemColumns.LAST_UPDATE, System.currentTimeMillis());
 
         return cv;
+    }
+
+    public static FeedItem fetchEpisodeFromCursor(Cursor cursor,
+                                                  FeedItem item) {
+
+        if (item != null) {
+            item.reset();
+        } else
+            item = new FeedItem();
+
+        item.id = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
+        item.filename = cursor.getString(cursor.getColumnIndex(ItemColumns.PATHNAME));
+        item.offset = cursor.getInt(cursor.getColumnIndex(ItemColumns.OFFSET));
+        item.url = cursor.getString(cursor.getColumnIndex(ItemColumns.URL));
+        item.image = cursor.getString(cursor.getColumnIndex(ItemColumns.IMAGE_URL));
+        item.title = cursor.getString(cursor.getColumnIndex(ItemColumns.TITLE));
+        item.author = cursor.getString(cursor.getColumnIndex(ItemColumns.AUTHOR));
+        item.date = cursor.getString(cursor.getColumnIndex(ItemColumns.DATE));
+        item.content = cursor.getString(cursor.getColumnIndex(ItemColumns.CONTENT));
+        item.filesize = cursor.getLong(cursor.getColumnIndex(ItemColumns.FILESIZE));
+        item.length = cursor.getLong(cursor.getColumnIndex(ItemColumns.LENGTH));
+        int intVal = cursor.getInt(cursor.getColumnIndex(ItemColumns.IS_DOWNLOADED));
+        item.isDownloaded = intVal == 1;
+
+        item.duration_ms = cursor.getLong(cursor.getColumnIndex(ItemColumns.DURATION_MS));
+        item.status = cursor.getInt(cursor.getColumnIndex(ItemColumns.STATUS));
+        item.lastUpdate = cursor.getLong(cursor.getColumnIndex(ItemColumns.LAST_UPDATE));
+        item.sub_title = cursor.getString(cursor.getColumnIndex(ItemColumns.SUB_TITLE));
+        item.sub_id = cursor.getLong(cursor.getColumnIndex(ItemColumns.SUBS_ID));
+        item.listened = cursor.getInt(cursor.getColumnIndex(ItemColumns.LISTENED));
+        item.priority = cursor.getInt(cursor.getColumnIndex(ItemColumns.PRIORITY));
+        item.created_at = cursor.getInt(cursor.getColumnIndex(ItemColumns.CREATED));
+
+        return item;
     }
 
     private boolean deleteEpisodes(@NonNull Subscription argSubscription) {

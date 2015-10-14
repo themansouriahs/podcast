@@ -55,7 +55,7 @@ public class PlayerStatusObservable {
 
         // more than a second ago
         if (now - lastUpdate > 1000) {
-            argEpisode.setPosition(argContentResolver, argOffset);
+            argEpisode.setPosition(argOffset);
             lastUpdate = now;
         }
     }

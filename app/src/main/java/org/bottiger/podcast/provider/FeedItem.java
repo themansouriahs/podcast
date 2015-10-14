@@ -133,7 +133,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	/**
 	 * Filename of the episode on disk. sn209.mp3
 	 */
-	private String filename;
+	public String filename;
 
 	/**
 	 * Episode number.
@@ -153,7 +153,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	/**
 	 * Flags for filtering downloaded items
 	 */
-	private Boolean isDownloaded;
+	public Boolean isDownloaded;
 
 	/**
 	 * Last position during playback in ms Should match seekTo(int)
@@ -215,11 +215,6 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	 */
 	public long created_at;
 
-	public String type;
-
-	@Deprecated
-	private long m_date;
-
 	static String[] DATE_FORMATS = {
 			"EEE, dd MMM yyyy HH:mm:ss Z",
 			"EEE, d MMM yy HH:mm z",
@@ -236,6 +231,12 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 
 	public static String default_format = "yyyy-MM-dd HH:mm:ss Z";
 
+	private Date mDate = null;
+	public static SimpleDateFormat sdf = new SimpleDateFormat(default_format, Locale.US);
+
+	private int iterWithoutChange = 0;
+	private int lastProgress = -1;
+
 	public FeedItem() {
 		reset();
 	}
@@ -250,7 +251,6 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 		duration_string = null;
 		filename = null;
 		uri = null;
-		type = null;
 		image = null;
 		remote_id = null;
 
@@ -273,28 +273,22 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 		sub_title = null;
 		sub_id = -1;
 
-		m_date = -1;
-
 	}
 
 	public void setOffset(ContentResolver contentResolver, long i) {
 		offset = (int) i;
         if (contentResolver != null) {
             lastUpdate = -1;
-            update(contentResolver);
+			//update(contentResolver);
         }
 
-	}
-
-	@NonNull
-	public static ContentValues addCreatedAtToContentValues(ContentValues argCV) {
-		argCV.put(ItemColumns.CREATED, System.currentTimeMillis());
-		return argCV;
+		notifyPropertyChanged();
 	}
 
 	/**
 	 * Update the FeedItem in the database
 	 */
+	@Deprecated
 	private void update(ContentResolver contentResolver) {
 		SoundWaves.getLibraryInstance().updateEpisode(this);
 	}
@@ -309,42 +303,16 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 		return comparator > 0;
 	}
 
-	@Deprecated
-	public long getLongDate() {
-		return m_date;
-	}
-
 	/**
 	 * @return the PublishingDate as default_format = "yyyy-MM-dd HH:mm:ss Z"
 	 */
 	public String getDate() {
-		// log.debug(" getDate() start");
 		return this.date;
 	}
 
 	public long getSubscriptionId() {
 		return this.sub_id;
 	}
-
-    /**
-     *   i.e "yyyy-MM-dd hh:mm:ss"
-     */
-    public String getDate(@NonNull Context argContext) {
-        java.text.DateFormat dateFormat = DateFormat.getMediumDateFormat(argContext);
-
-        long time;
-
-        try {
-            time = getDateTime().getTime();
-        } catch (NullPointerException npe) {
-            return "";
-        }
-
-        return dateFormat.format(time);
-    }
-
-    private Date mDate = null;
-    public static SimpleDateFormat sdf = new SimpleDateFormat(default_format, Locale.US);
 
 	@Nullable
 	public Date getDateTime() {
@@ -360,103 +328,6 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
         }
         return mDate;
     }
-
-	@Deprecated
-	private long parse() {
-		long l = 0;
-		try {
-			return sdf.parse(date)
-					.getTime();
-		} catch (ParseException e) {
-			Log.d("FeedItem", "first fail");
-		}
-
-		for (String format : DATE_FORMATS) {
-			try {
-				l = new SimpleDateFormat(format, Locale.US).parse(date)
-						.getTime();
-				default_format = format;
-				return l;
-			} catch (ParseException e) {
-			}
-		}
-		Log.d("FeedItem", "cannot parser date: " + date);
-		return 0L;
-	}
-
-	@Deprecated
-	private static FeedItem fetchFromCursor(Cursor cursor) {
-		return fetchFromCursor(cursor, null);
-	}
-
-	public static FeedItem fetchFromCursor(Cursor cursor,
-			FeedItem item) {
-
-		//long start = System.currentTimeMillis();
-
-		if (item != null) {
-			item.reset();
-		} else
-			item = new FeedItem();
-
-		long end1 = System.currentTimeMillis();
-
-		item.id = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
-
-		item.filename = cursor.getString(cursor
-				.getColumnIndex(ItemColumns.PATHNAME));
-		//item.remote_id = cursor.getString(cursor
-		//		.getColumnIndex(ItemColumns.REMOTE_ID));
-		item.offset = cursor.getInt(cursor.getColumnIndex(ItemColumns.OFFSET));
-		item.url = cursor.getString(cursor.getColumnIndex(ItemColumns.URL));
-		item.image = cursor.getString(cursor
-				.getColumnIndex(ItemColumns.IMAGE_URL));
-		item.title = cursor.getString(cursor.getColumnIndex(ItemColumns.TITLE));
-		item.author = cursor.getString(cursor
-				.getColumnIndex(ItemColumns.AUTHOR));
-		item.date = cursor.getString(cursor.getColumnIndex(ItemColumns.DATE));
-		item.content = cursor.getString(cursor
-				.getColumnIndex(ItemColumns.CONTENT));
-		item.filesize = cursor.getLong(cursor
-				.getColumnIndex(ItemColumns.FILESIZE));
-		item.length = cursor.getLong(cursor.getColumnIndex(ItemColumns.LENGTH));
-		//item.chunkFilesize = cursor.getLong(cursor
-		//		.getColumnIndex(ItemColumns.CHUNK_FILESIZE));
-		//item.downloadReferenceID = cursor.getLong(cursor
-		//		.getColumnIndex(ItemColumns.DOWNLOAD_REFERENCE));
-
-		int intVal = cursor.getInt(cursor
-				.getColumnIndex(ItemColumns.IS_DOWNLOADED));
-		item.isDownloaded = intVal == 1;
-
-		//item.episodeNumber = cursor.getInt(cursor
-		//		.getColumnIndex(ItemColumns.EPISODE_NUMBER));
-
-		//item.duration_string = cursor.getString(cursor
-		//		.getColumnIndex(ItemColumns.DURATION));
-		item.duration_ms = cursor.getLong(cursor
-				.getColumnIndex(ItemColumns.DURATION_MS));
-        item.status = cursor.getInt(cursor
-				.getColumnIndex(ItemColumns.STATUS));
-		item.lastUpdate = cursor.getLong(cursor
-				.getColumnIndex(ItemColumns.LAST_UPDATE));
-		item.sub_title = cursor.getString(cursor
-				.getColumnIndex(ItemColumns.SUB_TITLE));
-		item.sub_id = cursor
-				.getLong(cursor.getColumnIndex(ItemColumns.SUBS_ID));
-		item.listened = cursor.getInt(cursor
-				.getColumnIndex(ItemColumns.LISTENED));
-		item.priority = cursor.getInt(cursor
-				.getColumnIndex(ItemColumns.PRIORITY));
-		item.created_at = cursor.getInt(cursor
-				.getColumnIndex(ItemColumns.CREATED));
-
-		//long end2 = System.currentTimeMillis();
-
-		//Log.d("fetchFromCursor", "1: " + (end1-start) + " ms. 2: " + (end2-start) + " ms.");
-
-		return item;
-	}
 
 	@Override
 	public String toString() {
@@ -511,8 +382,6 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
         lastProgress = percentInt;
 		return percentInt;
 	}
-    private int iterWithoutChange = 0;
-    private int lastProgress = -1;
 
 	/**
 	 * Deletes the downloaded file and updates the data in the database
@@ -544,12 +413,14 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 
 	public void downloadSuccess(ContentResolver contentResolver) {
 		filesize = getCurrentFileSize();
-		update(contentResolver);
+		//update(contentResolver);
+		notifyPropertyChanged();
 	}
 
 	public void endDownload(ContentResolver context) {
 		lastUpdate = Long.valueOf(System.currentTimeMillis());
-		update(context);
+		//update(context);
+		notifyPropertyChanged();
 	}
 
 	public long getCurrentFileSize() {
@@ -591,6 +462,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 		// Remove non ascii characters
 		//this.filename = filename.replaceAll("[^\\x00-\\x7F]", "");
         this.filename = filename.replaceAll("[^(\\x41-\\x5A|\\x61-\\x7A|\\x2D|\\x2E|\\x30-\\x39|\\x5F)]", ""); // only a-z A-Z 0-9 .-_ http://www.asciitable.com/
+		notifyPropertyChanged();
 	}
 
 	public String getAbsolutePath() throws IOException {
@@ -638,9 +510,12 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	}
 
     // in ms
-	public void setPosition(ContentResolver contentResolver, long pos) {
+	public void setPosition(long pos) {
+		if (offset == pos)
+			return;
+
 		this.offset = (int) pos;
-		update(contentResolver);
+		notifyPropertyChanged();
 	}
 
 	@Override
@@ -654,16 +529,18 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 		 */
 	}
 	
-	public void setURL(String url) {
-		this.url = url;
+	public void setURL(String argUrl) {
+		if (url != null && url.equals(argUrl))
+
+		url = argUrl;
+		notifyPropertyChanged();
 	}
 
 	public String getURL() {
 		String itemURL = "";
 		if (url != null && url.length() > 1)
 			itemURL = url;
-		else if (resource != null && resource.length() > 1)
-			itemURL = resource;
+
 		return itemURL;
 	}
 
@@ -675,16 +552,12 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 		return filesize;
 	}
 
-	public void setFilesize(long filesize) {
-		this.filesize = filesize;
-	}
+	public void setFilesize(long argFilesize) {
+		if (filesize  == argFilesize)
+			return;
 
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
+		filesize = argFilesize;
+		notifyPropertyChanged();
 	}
 
 	/**
@@ -727,8 +600,12 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	 * @param isDownloaded
 	 *            the isDownloaded to set
 	 */
-	public void setDownloaded(boolean isDownloaded) {
-		this.isDownloaded = isDownloaded;
+	public void setDownloaded(boolean argIsDownloaded) {
+		if (isDownloaded == argIsDownloaded)
+			return;
+
+		isDownloaded = argIsDownloaded;
+		notifyPropertyChanged();
 	}
 
 	/**
@@ -749,7 +626,11 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	 * @params 1 for listened. 0 for unlistened. -1 for undefined
 	 */
 	public void markAsListened(int hasBeenListened) {
-		this.listened = hasBeenListened;
+		if (listened == hasBeenListened)
+			return;
+
+		listened = hasBeenListened;
+		notifyPropertyChanged();
 	}
 
 	public int getListenedValue() {
@@ -762,41 +643,6 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	 */
 	public long getDuration() {
         return duration_ms;
-        /*
-		if (duration_ms > 0) {
-			if ("".equals(duration_string)) {
-				duration_ms = StrUtils.parseTimeToSeconds(duration_string);
-			}
-			return duration_ms;
-		}
-
-		if (isDownloaded()) {
-			MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-			try {
-				String path = getAbsolutePath();
-				retriever.setDataSource(path);
-			} catch (RuntimeException e) {
-				e.printStackTrace();
-				return this.length;
-			}
-			String mediaID = retriever
-					.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-			if (mediaID != null) {
-                duration_ms = Long.parseLong(mediaID);
-                return duration_ms;
-            } else {
-                return -1;
-            }
-		} else {
-			if (this.duration_string == null || this.duration_string.equals(""))
-				return this.length;
-			else {
-				// String offsetString = StrUtils.getTimeFromOffset(this.offset,
-				// this.length, this.duration);
-				return StrUtils.parseTimeToSeconds(duration_string);
-			}
-		}
-		*/
 	}
 
     public void setDuration(long argDurationMs) {
@@ -804,12 +650,16 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
     }
 
     public void setDuration(long argDurationMs, boolean argOverride) {
+		if (duration_ms == argDurationMs)
+			return;
+
         if (!argOverride) {
             if (duration_ms > 0)
                 return;
         }
 
-        this.duration_ms = argDurationMs;
+        duration_ms = argDurationMs;
+		notifyPropertyChanged();
     }
 
 	/**
@@ -866,20 +716,9 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
     }
 
     public void removeFromPlaylist(@NonNull ContentResolver argContentResolver) {
-        priority = 0;
-        update(argContentResolver);
+        setPriority(0);
+        //update(argContentResolver);
     }
-
-    /**
-	 * Caching class for keeping items in memory
-	 */
-	private static class ItemLruCache extends LruCache<Long, FeedItem> {
-
-		public ItemLruCache(int maxSize) {
-			super(maxSize);
-		}
-
-	}
 
 	@Nullable
 	public String getArtwork() {
@@ -920,22 +759,23 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	public void setPriority(IEpisode precedingItem, Context context) {
 		priority = precedingItem == null ? 1 : precedingItem.getPriority() + 1;
 		increateHigherPriorities(precedingItem, context);
-		update(context.getContentResolver());
-	}
-
-	public void setTopPriority(Context context) {
-		setPriority(null, context);
+		//update(context.getContentResolver());
+		notifyPropertyChanged();
 	}
 
 	public void trackEnded(ContentResolver contentResolver) {
 		priority = 0;
 		markAsListened();
-		update(contentResolver);
+		//update(contentResolver);
 	}
 
 	@Override
 	public void setPriority(int argPriority) {
+		if (priority == argPriority)
+			return;
+
 		priority = argPriority;
+		notifyPropertyChanged();
 	}
 
 	/**
@@ -991,26 +831,10 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	}
 
 	/**
-	 * @param downloadReferenceID
-	 *            the downloadReferenceID to set
-	 */
-	public void setDownloadReferenceID(long downloadReferenceID) {
-		this.downloadReferenceID = downloadReferenceID;
-	}
-
-	/**
 	 * @return the episodeNumber
 	 */
 	public int getEpisodeNumber() {
 		return episodeNumber;
-	}
-
-	/**
-	 * @param episodeNumber
-	 *            the episodeNumber to set
-	 */
-	public void setEpisodeNumber(int episodeNumber) {
-		this.episodeNumber = episodeNumber;
 	}
 
 	/**
@@ -1035,54 +859,46 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
         return content;
     }
 
-    /**
-     * @return the title of the episode. Most feeds format the title in the feed as: 'FeedTittle: EpisodeTitle'. This method returns the episodetitle
-     */
-    public String getShortTitle() {
-        String separator = ":";
-        String longTitle = getTitle();
-        if (TextUtils.isEmpty(longTitle))
-            return longTitle;
-
-        int index = longTitle.indexOf(separator);
-
-        if (index < 0)
-            return longTitle;
-
-        String sub = longTitle.substring(index+1, longTitle.length());
-
-        String shortTitle = sub.trim();
-
-        if (TextUtils.isEmpty(shortTitle))
-            return longTitle;
-
-        return shortTitle;
-    }
-
 	/**
 	 * @param title
 	 *            the title to set
 	 */
-	public void setTitle(String title) {
-		this.title = title;
+	public void setTitle(String argTitle) {
+		if (title != null && title.equals(argTitle))
+			return;
+
+		title = argTitle;
+		notifyPropertyChanged();
 	}
 
     @Override
     public void setUrl(@NonNull URL argUrl) {
+		if(url != null && url.equals(argUrl.toString()))
+			return;
 
+		url = argUrl.toString();
+		notifyPropertyChanged();
     }
 
     @Override
     public void setArtwork(@NonNull URL argUrl) {
+		if (image != null && argUrl != null && image.equals(argUrl.toString()))
+			return;
 
+		image = argUrl.toString();
+		notifyPropertyChanged();
     }
 
     public String getAuthor() {
 		return author;
 	}
 
-	public void setAuthor(String author) {
-		this.author = author;
+	public void setAuthor(String argAuthor) {
+		if (author != null && author.equals(argAuthor))
+			return;
+
+		author = argAuthor;
+		notifyPropertyChanged();
 	}
 
 	/**
@@ -1110,11 +926,16 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	}
 
 	public void setFeed(Subscription feed) {
-		this.sub_id = feed.getId();
-	}
+		if (feed == null)
+			return;
 
-	public Object getMedia() {
-		return null;
+		long id = feed.getId();
+
+		if (sub_id == id)
+			return;
+
+		this.sub_id = id;
+		notifyPropertyChanged();
 	}
 
     private static final SimpleDateFormat sFormat = new SimpleDateFormat(default_format, Locale.US);
@@ -1129,10 +950,15 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 
 	public void setDescription(String content2) {
 		this.content = Jsoup.parse(content2).text();
+		notifyPropertyChanged();
 	}
 
-	public void setLink(String href) {
-		this.link_show_notes = href;
+	public void setPageLink(String argLink) {
+		if (link_show_notes != null && link_show_notes.equals(argLink))
+			return;
+
+		link_show_notes = argLink;
+		notifyPropertyChanged();
 	}
 
 	public int getStatus() {
@@ -1154,6 +980,8 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
             status |= IS_VIDEO;
         else
             status &= ~IS_VIDEO;
+
+		notifyPropertyChanged();
     }
 
     private boolean IsSettingEnabled(int setting) {

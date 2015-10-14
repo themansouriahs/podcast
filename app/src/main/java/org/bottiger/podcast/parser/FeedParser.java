@@ -280,7 +280,7 @@ public class FeedParser {
                     break;
                 }
                 case EPISODE_LINK_TAG: {
-                    episode.setLink(readSimpleTag(parser, EPISODE_LINK_TAG));
+                    episode.setPageLink(readSimpleTag(parser, EPISODE_LINK_TAG));
                     break;
                 }
                 case EPISODE_DESCRIPTION_TAG: {
