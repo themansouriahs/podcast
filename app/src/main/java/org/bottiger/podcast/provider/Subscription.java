@@ -192,28 +192,6 @@ public class Subscription implements ISubscription, PaletteListener {
 		mEpisodes = new SortedList(IEpisode.class, mEpisodesListCallback);
 	}
 
-	public void delete(ContentResolver context) {
-		Uri uri = ContentUris.withAppendedId(SubscriptionColumns.URI, id);
-		context.delete(uri, null, null);
-	}
-
-	public SortedList<IEpisode> getEpisodes(@NonNull ContentResolver contentResolver) {
-
-		LinkedList<IEpisode> episodes = new LinkedList<>();
-		Cursor itemCursor = contentResolver.query(ItemColumns.URI,
-				ItemColumns.ALL_COLUMNS, ItemColumns.SUBS_ID + "==" + this.id,
-				null, null);
-		for (boolean more = itemCursor.moveToFirst(); more; more = itemCursor
-				.moveToNext()) {
-			episodes.add(FeedItem.getByCursor(itemCursor));
-		}
-
-        mEpisodes.clear();
-        mEpisodes.addAll(episodes);
-
-		return mEpisodes;
-	}
-
 	public SortedList<IEpisode> getEpisodes() {
 		return mEpisodes;
 	}
@@ -292,15 +270,27 @@ public class Subscription implements ISubscription, PaletteListener {
 	}
 
     public void setPrimaryColor(int argColor) {
+		if (mPrimaryColor == argColor)
+			return;
+
         mPrimaryColor = argColor;
+		notifyPropertyChanged();
     }
 
     public void setPrimaryTintColor(int argColor) {
+		if (mPrimaryTintColor == argColor)
+			return;
+
         mPrimaryTintColor = argColor;
+		notifyPropertyChanged();
     }
 
     public void setSecondaryColor(int argColor) {
+		if (mSecondaryColor == argColor)
+			return;
+
         mSecondaryColor = argColor;
+		notifyPropertyChanged();
     }
 
     public int getPrimaryColor() {
@@ -334,6 +324,7 @@ public class Subscription implements ISubscription, PaletteListener {
         mPrimaryColor     = newPrimaryColor;
         mPrimaryTintColor = newPrimaryTintColor;
         mSecondaryColor   = newSecondaryColor;
+		notifyPropertyChanged();
     }
 
     public boolean IsDirty() {
@@ -360,7 +351,11 @@ public class Subscription implements ISubscription, PaletteListener {
 
 	@Override
 	public void setIsRefreshing(boolean argIsRefreshing) {
+		if (mIsRefreshing == argIsRefreshing)
+			return;
+
 		mIsRefreshing = argIsRefreshing;
+		notifyPropertyChanged();
 	}
 
 	@Override
@@ -406,6 +401,7 @@ public class Subscription implements ISubscription, PaletteListener {
 			return;
 
         imageURL = argUrl;
+		notifyPropertyChanged();
     }
 
 	public String getUrl() {
@@ -413,7 +409,11 @@ public class Subscription implements ISubscription, PaletteListener {
 	}
 
 	public void setLastItemUpdated(long argTimestamp) {
+		if (lastItemUpdated == argTimestamp)
+			return;
+
 		this.lastItemUpdated = argTimestamp;
+		notifyPropertyChanged();
 	}
 
 	public long getLastItemUpdated() {
@@ -436,6 +436,9 @@ public class Subscription implements ISubscription, PaletteListener {
 	}
 
 	public void setStatus(@Subscribed int argStatus) {
+		if (status == argStatus)
+			return;
+
 		status = argStatus;
 		notifyPropertyChanged();
 	}
@@ -450,16 +453,27 @@ public class Subscription implements ISubscription, PaletteListener {
 	}
 
 	@Override
-	public void setTitle(String title) {
-		this.title = title;
+	public void setTitle(String argTitle) {
+		if (title != null && title.equals(argTitle))
+			return;
+
+		title = argTitle;
+		notifyPropertyChanged();
 	}
 
-	public void setURL(String url) {
-		this.url = url;
+	public void setURL(String argUrl) {
+		if (url != null && url.equals(argUrl))
+			return;
+
+		url = argUrl;
+		notifyPropertyChanged();
 	}
 
 	public void setDescription(String content) {
-		this.description = content;
+		if (description != null && description.equals(content))
+			return;
+
+		description = content;
 		notifyPropertyChanged();
 	}
 
