@@ -21,11 +21,12 @@ public class SquareCardView extends FrameLayout {
         super(context, attrs, defStyleAttr);
     }
 
-    /*
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, widthMeasureSpec);
-        setMeasuredDimension(getMeasuredWidth(), getMeasuredWidth()); //Snap to width
+        setMeasuredDimension(widthMeasureSpec, widthMeasureSpec); //Snap to width
     }
-    */
+
+
 }

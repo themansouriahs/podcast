@@ -64,7 +64,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
     private static final String TAG = "TopPlayer";
 
     private final NestedScrollingChildHelper scrollingChildHelper;
-    private ViewConfiguration mViewConfiguration;  // getScaledTouchSlop
+    private ViewConfiguration mViewConfiguration;
 
     public static final int SMALL = 0;
     public static final int MEDIUM = 1;
@@ -90,21 +90,12 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
     public static int sizeStartShrink           =   -1;
     public static int sizeShrinkBuffer           =   -1;
 
-    public static int sizeImageContainer        =   -1;
-
     private int mSeekbarDeadzone                =   20; // dp
     private int mSeekbarFadeDistance            =   20; // dp
     private int mTextInfoFadeDistance           =   100; // dp
     private int mTextFadeDistance               =   20; // dp
 
     private float screenHeight;
-
-    private int mSeekbarDeadzonePx;
-    private int mSeekbarFadeDistancePx;
-    private int mTextFadeDistancePx;
-    private int mTextInfoFadeDistancePx;
-
-    private boolean mCanScrollUp = true;
 
     private String mDoFullscreentKey;
     private boolean mFullscreen = false;
@@ -114,9 +105,6 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
 
     private PlayerRelativeLayout mPlayerControlsLinearLayout;
 
-    private RelativeLayout mPlayerButtons;
-    private int mPlayerButtonsHeight = -1;
-
     private int mCenterSquareMarginTop = -1;
     private float mCenterSquareMargin = -1;
 
@@ -125,30 +113,30 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
     private View mGradient;
     private View mEpisodeText;
     private View mEpisodeInfo;
-    private ImageViewTinted mPhoto;
     private PlayPauseImageView mPlayPauseButton;
     private View mImageContainer;
 
-    private PlayerSeekbar mSeekbar;
-
-    private View mForwardButton;
-    private View mBackButton;
-    private View mDownloadButton;
-    private View mQueueButton;
-    private View mFavoriteButton;
     private PlayerButtonView mFullscreenButton;
     private PlayerButtonView mSleepButton;
     private Button mSpeedpButton;
 
-    private PlayerLayoutParameter mSmallLayout = new PlayerLayoutParameter();
     private PlayerLayoutParameter mLargeLayout = new PlayerLayoutParameter();
 
     private GestureDetectorCompat mGestureDetector;
     private TopPLayerScrollGestureListener mTopPLayerScrollGestureListener;
 
-    private CompositeSubscription mRxSubscriptions;
-
     private @ColorInt int mBackgroundColor = -1;
+    private boolean maximumEnsured = false;
+
+    private int mLastTouchY;
+    private int mInitialTouchY;
+    private float startH;
+    private int mScrollPointerId;
+    private final int[] mScrollOffset = new int[2];
+    private final int[] mScrollConsumed = new int[2];
+    private final int[] mNestedOffsets = new int[2];
+    private int mScrollState = 0;
+    private int mTouchSlop;
 
     private SharedPreferences prefs;
 
@@ -217,11 +205,6 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
 
         sizeStartShrink = sizeSmall+sizeShrinkBuffer;
 
-        mSeekbarDeadzonePx        = (int)UIUtils.convertDpToPixel(mSeekbarDeadzone, argContext);
-        mSeekbarFadeDistancePx    = (int)UIUtils.convertDpToPixel(mSeekbarFadeDistance, argContext);
-        mTextFadeDistancePx       = (int)UIUtils.convertDpToPixel(mTextFadeDistance, argContext);
-        mTextInfoFadeDistancePx   = (int)UIUtils.convertDpToPixel(mTextInfoFadeDistance, argContext);
-
         sizeActionbar = argContext.getResources().getDimensionPixelSize(R.dimen.action_bar_height);
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -237,23 +220,15 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
 
         mPlayerControlsLinearLayout = (PlayerRelativeLayout)findViewById(R.id.expanded_controls);
 
-        mPhoto = (ImageViewTinted) findViewById(R.id.session_photo);
-
         mPlayPauseButton = (PlayPauseImageView) findViewById(R.id.play_pause_button);
         mExpandEpisode = (ImageButton)findViewById(R.id.episode_expand);
         mEpisodeText = findViewById(R.id.episode_title);
         mEpisodeInfo = findViewById(R.id.episode_info);
         mImageContainer = findViewById(R.id.top_player_center_square);
-        mForwardButton = findViewById(R.id.fast_forward_button);
-        mBackButton = findViewById(R.id.rewind_button);
         mFullscreenButton = (PlayerButtonView) findViewById(R.id.fullscreen_button);
-        mDownloadButton = findViewById(R.id.download);
-        mFavoriteButton = findViewById(R.id.favorite);
         mGradient = findViewById(R.id.top_gradient_inner);
         mSleepButton = (PlayerButtonView) findViewById(R.id.sleep_button);
         mSpeedpButton = (Button) findViewById(R.id.speed_button);
-
-        mPlayerButtons = (RelativeLayout) findViewById(R.id.player_buttons);
 
         mPlayPauseLargeSize = mPlayPauseButton.getLayoutParams().height;
 
@@ -338,9 +313,8 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        RxBus bus = SoundWaves.getRxBus();
 
-        bus.toObserverable()
+        SoundWaves.getRxBus().toObserverable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<Object>() {
@@ -357,8 +331,6 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        if (mRxSubscriptions != null)
-            mRxSubscriptions.unsubscribe();
     }
 
     private void sleepButtonPressed() {
@@ -379,66 +351,6 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         super.onSizeChanged(w, h, oldw, oldh);
     }
 
-    private boolean minimalEnsured = false;
-
-    public void ensureMinimalLayout() {
-        if (minimalEnsured)
-            return;
-
-        Log.d("TopPlayer", "ensure minimum");
-
-        int argScreenHeight = sizeSmall;
-        int trans = sizeSmall-sizeLarge;
-        //setPlayerHeight(sizeSmall, sizeSmall-sizeLarge);
-        setTranslationY(trans);
-
-        // Set seekbar visibility
-        setSeekbarVisibility(argScreenHeight);
-
-        // Set TextBox visibility
-        setTextVisibility(argScreenHeight);
-        setTextInfoVisibility(argScreenHeight);
-
-        translatePhotoY(mPhoto, trans);
-
-        /*
-        mPlayerControlsLinearLayout.setTranslationY(-trans);
-        mPlayPauseButton.setTranslationY(-trans);
-        mForwardButton.setTranslationY(-trans);
-        */
-
-        minimalEnsured = true;
-    }
-
-    private boolean maximumEnsured = false;
-    public void ensureMaximumLayout() {
-        if (maximumEnsured)
-            return;
-
-        Log.d("TopPlayer", "ensure maximum");
-        int argScreenHeight = sizeLarge;
-        int trans = 0;
-        //setPlayerHeight(sizeSmall, sizeSmall-sizeLarge);
-        setTranslationY(trans);
-
-        // Set seekbar visibility
-        setSeekbarVisibility(argScreenHeight);
-
-        // Set TextBox visibility
-        setTextVisibility(argScreenHeight);
-        setTextInfoVisibility(argScreenHeight);
-
-        translatePhotoY(mPhoto, trans);
-        mEpisodeText.setTranslationY(-trans);
-        mEpisodeInfo.setTranslationY(-trans);
-
-        mPlayerControlsLinearLayout.setTranslationY(0);
-        mPlayPauseButton.setTranslationY(0);
-        mForwardButton.setTranslationY(0);
-
-        maximumEnsured = true;
-    }
-
     public float getPlayerHeight() {
         return screenHeight;
     }
@@ -448,17 +360,6 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         return setPlayerHeight(oldHeight - argY);
     }
 
-    private void setNormalImageSize(float offset) {
-        if (offset > 0)
-            offset = 0;
-
-        RelativeLayout.LayoutParams rlp;
-        rlp = (LayoutParams) mImageContainer.getLayoutParams();
-        rlp.width = sizeImageContainer;
-        rlp.height = (int) (sizeImageContainer + offset);
-        mImageContainer.setLayoutParams(rlp);
-    }
-
     // returns the new height
     public float setPlayerHeight(float argScreenHeight) {
         Log.v(TAG, "Player height is set to: " + argScreenHeight);
@@ -466,13 +367,6 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         if (mFullscreen)
             return getHeight();
 
-        if (sizeImageContainer <= 0) {
-            //sizeImageContainer = mImageContainer.getHeight();
-            float margin = getResources().getDimension(R.dimen.top_player_center_square_margin);
-            sizeImageContainer = (int) (mLayout.getWidth() - 2*margin);
-        }
-
-        minimalEnsured = false;
         maximumEnsured = false;
 
         if (!validateState()) {
@@ -484,22 +378,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         screenHeight = argScreenHeight;
         float argOffset = argScreenHeight-sizeLarge;
 
-        float transYControl = argOffset/2;
-
         setBackgroundVisibility(screenHeight);
-
-        if (sizeImageContainer > 0) {
-            setNormalImageSize(argOffset);
-        }
-        //mImageContainer.getLayoutParams().height
-        /*
-        mPlayerControlsLinearLayout.setTranslationY(transYControl);
-        mPlayPauseButton.setTranslationY(transYControl);
-        mImageContainer.setTranslationY(transYControl);
-        mForwardButton.setTranslationY(transYControl);
-        */
-
-        //setTranslationY(transYControl);
 
         float minScreenHeight = screenHeight < sizeSmall ? sizeSmall : screenHeight;
         float minMaxScreenHeight = minScreenHeight > sizeLarge ? sizeLarge : minScreenHeight;
@@ -509,80 +388,11 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         lp.height = (int)minMaxScreenHeight;
         setLayoutParams(lp);
 
-
-        if (System.currentTimeMillis() > 0) {
-            return minMaxScreenHeight;
-        }
-
-        Log.d("setTranslationXYZ", "argScreenHeight: " +  argScreenHeight);
-
-        float maxScreenHeight = argScreenHeight > sizeLarge ? sizeLarge : argScreenHeight;
-
-        Log.d("setTranslationXYZ", "maxScreenHeight: " +  maxScreenHeight);
-
-        float transY;
-        float minMaxScreenHeight2 = maxScreenHeight;
-        minMaxScreenHeight = minMaxScreenHeight < sizeSmall ? sizeSmall : minMaxScreenHeight;
-        mCanScrollUp = maxScreenHeight > sizeSmall;
-
-        Log.d("TopPlayerInput", "(canScrollUp: " + mCanScrollUp + ")maxScreenHeight -> " + maxScreenHeight + "ScreenOffset -> " + argOffset);
-
-        //mPhoto.setTranslationY(-(argOffset/2));
-        translatePhotoY(mPhoto, argOffset);
-
-        mEpisodeText.setTranslationY(-argOffset);
-        mEpisodeInfo.setTranslationY(-argOffset);
-
-        //float transYControl = -argOffset < sizeStartShrink ? -argOffset : sizeStartShrink;
-        transYControl = -1;
-
-        if (minMaxScreenHeight > sizeStartShrink) {
-            transYControl = -argOffset;
-        } else {
-            transYControl = sizeLarge-sizeStartShrink;
-        }
-
-        Log.d("TopPlayerInput", "transYControl: minMax->" + minMaxScreenHeight + " trans-> " + transYControl + " -arg-> " + -argOffset);
-
-        mPlayerControlsLinearLayout.setTranslationY(transYControl);
-        mPlayPauseButton.setTranslationY(transYControl);
-        mImageContainer.setTranslationY(transYControl);
-        mForwardButton.setTranslationY(transYControl);
-
-        String size = "large";
-
-        transY = minMaxScreenHeight-sizeLarge;
-        Log.d("setTranslationXYZ", "minMaxScreenHeight: " +  minMaxScreenHeight);
-
-        setTranslationY(transY);
-
-        // Set seekbar visibility
-        setSeekbarVisibility(argScreenHeight);
-
-        // Set TextBox visibility
-        setTextVisibility(argScreenHeight);
-        setTextInfoVisibility(argScreenHeight);
-
-        Log.d("setTranslationXYZ", size + ": " +  getLayoutParams().height + " trans: " + transY);
-
-        Log.d("TopPlayerInputk", "layoutparams =>" + getLayoutParams().height + "Translation =>" + transY + " minMaxHeight =>" + minMaxScreenHeight);
-        return minMaxScreenHeight; // return newVisibleHeight
-    }
-
-    public float setTextVisibility(float argTopPlayerHeight) {
-        return setGenericVisibility(mEpisodeText, sizeMedium, mTextFadeDistancePx, argTopPlayerHeight);
-    }
-
-    public float setTextInfoVisibility(float argTopPlayerHeight) {
-        return setGenericVisibility(mEpisodeInfo, sizeLarge, mTextInfoFadeDistancePx, argTopPlayerHeight);
-    }
-
-    public float setSeekbarVisibility(float argTopPlayerHeight) {
-        return setGenericVisibility(mImageContainer, sizeMedium, mSeekbarFadeDistancePx, argTopPlayerHeight);
+        return minMaxScreenHeight;
     }
 
     public float setBackgroundVisibility(float argTopPlayerHeight) {
-        return setGenericVisibility(mPhoto, sizeStartShrink, sizeShrinkBuffer, argTopPlayerHeight);
+        return setGenericVisibility(mImageContainer, getMaximumSize(), 300, argTopPlayerHeight);
     }
 
     public float setGenericVisibility(@NonNull View argView, int argVisibleHeight, int argFadeDistance, float argTopPlayerHeight) {
@@ -604,6 +414,16 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
             VisibilityFraction = DistanceFromVisible / thressholdDiff;
         }
 
+        float scaleFraction = 1f - (1f - VisibilityFraction)/10;
+        argView.setScaleX(scaleFraction);
+        argView.setScaleY(scaleFraction);
+
+        if (VisibilityFraction > 0f) {
+            float newHeight = argVisibleHeight - argVisibleHeight * scaleFraction;
+            float translationY = newHeight / 2;
+            argView.setTranslationY(-translationY);
+        }
+
         argView.setAlpha(VisibilityFraction);
 
         return VisibilityFraction;
@@ -621,34 +441,12 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         return true;
     }
 
-    public boolean isMinimumSize(int argHeight) {
-        return sizeSmall >= argHeight;
-    }
-
     public boolean isMinimumSize() {
-        //return !mCanScrollUp;
         return sizeSmall >= getHeight()+getTranslationY();
-    }
-
-    public int getMinimumSize() {
-        return sizeSmall;
     }
 
     public int getMaximumSize() {
         return sizeLarge;
-    }
-
-    public boolean isMaximumSize() {
-        Log.d("MaximumSize", "Trans: " + getTranslationY());
-        return mPlayerLayout == LARGE && getTranslationY() >= 0; // FIXME: refine
-    }
-
-    private void translatePhotoY(@NonNull View argImageView , float amount) {
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            argImageView.setTranslationY(-(amount/2));
-        } else {
-            //argImageView.setTranslationY(-amount);
-        }
     }
 
     @Override
@@ -770,18 +568,6 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         return mFullscreen;
     }
 
-
-    private int mLastTouchY;
-    private int mInitialTouchY;
-    private float startH;
-    private int mScrollPointerId;
-    private final int[] mScrollOffset = new int[2];
-    private final int[] mScrollConsumed = new int[2];
-    private final int[] mNestedOffsets = new int[2];
-    private int mScrollState = 0;
-    private int mTouchSlop;
-
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
@@ -864,57 +650,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
             }
         }
 
-
         return super.onTouchEvent(event);
-    }
-
-    boolean scrollByInternal(int y, MotionEvent ev) {
-
-        final int consumedX = 0;  // always 0
-        final int unconsumedX = 0; // always 0
-
-        int unconsumedY = 0;
-        int consumedY = 0;
-
-        float height = getPlayerHeight();
-        float diff = y;
-        float newHeight = height-diff >= sizeSmall ? height-diff : sizeSmall;
-
-        float heightDiffResult = height-newHeight;
-        unconsumedY = (int)(diff-heightDiffResult);
-        consumedY = unconsumedY - (int)diff;
-
-
-
-        if(this.dispatchNestedScroll(consumedX, consumedY, unconsumedX, unconsumedY, this.mScrollOffset)) {
-            this.mLastTouchY -= this.mScrollOffset[1];
-            if(ev != null) {
-                ev.offsetLocation((float)this.mScrollOffset[0], (float)this.mScrollOffset[1]);
-            }
-
-            this.mNestedOffsets[0] += this.mScrollOffset[0];
-            this.mNestedOffsets[1] += this.mScrollOffset[1];
-        } else if(ViewCompat.getOverScrollMode(this) != ViewCompat.OVER_SCROLL_NEVER) {
-            if(ev != null) {
-                //this.pullGlows(ev.getX(), (float)unconsumedX, ev.getY(), (float)unconsumedY);
-            }
-
-            //this.considerReleasingGlowsOnScroll(x, y);
-        }
-
-        boolean doScroll = consumedX != 0 || consumedY != 0;
-
-        if(doScroll) {
-            //this.dispatchOnScrolled(consumedX, consumedY);
-            setPlayerHeight(newHeight);
-            Log.v(TAG, "Set height: H: " + height + " diff: " + diff + " newH: " + newHeight); // NoI18N
-        }
-
-        if(!this.awakenScrollBars()) {
-            this.invalidate();
-        }
-
-        return doScroll;
     }
 
     class TopPLayerScrollGestureListener extends GestureDetector.SimpleOnGestureListener {
@@ -945,7 +681,6 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         public boolean onFling(MotionEvent event1, MotionEvent event2,
                                float velocityX, float velocityY) {
             Log.d(DEBUG_TAG, "onFling: " + event1.toString() + event2.toString());
-            //mRecyclerView.fling((int)velocityX*0, (int)-velocityY);
             TopPlayer.this.dispatchNestedFling(velocityX, -velocityY, false);
             return true;
         }
