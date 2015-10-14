@@ -3,6 +3,7 @@ package org.bottiger.podcast.views;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.ColorInt;
@@ -14,7 +15,6 @@ import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.NestedScrollingChild;
 import android.support.v4.view.NestedScrollingChildHelper;
 import android.support.v4.view.ScrollingView;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewConfigurationCompat;
 import android.support.v7.graphics.Palette;
 import android.transition.ChangeBounds;
@@ -34,15 +34,17 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.github.ivbaranov.mfb.MaterialFavoriteButton;
+
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.player.SoundWavesPlayer;
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.ColorUtils;
 import org.bottiger.podcast.utils.UIUtils;
-import org.bottiger.podcast.utils.rxbus.RxBus;
 import org.bottiger.podcast.utils.rxbus.RxBusSimpleEvents;
 import org.bottiger.podcast.views.dialogs.DialogPlaybackSpeed;
 
@@ -52,7 +54,6 @@ import java.lang.annotation.RetentionPolicy;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
-import rx.subscriptions.CompositeSubscription;
 
 import static org.bottiger.podcast.views.PlayerButtonView.StaticButtonColor;
 
@@ -119,6 +120,11 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
     private PlayerButtonView mFullscreenButton;
     private PlayerButtonView mSleepButton;
     private Button mSpeedpButton;
+    private PlayerButtonView mDownloadButton;
+    private MaterialFavoriteButton mFavoriteButton;
+    private PlayerButtonView mFastForwardButton;
+    private PlayerButtonView mRewindButton;
+    private PlayerButtonView mSkipNextButton;
 
     private PlayerLayoutParameter mLargeLayout = new PlayerLayoutParameter();
 
@@ -229,6 +235,11 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         mGradient = findViewById(R.id.top_gradient_inner);
         mSleepButton = (PlayerButtonView) findViewById(R.id.sleep_button);
         mSpeedpButton = (Button) findViewById(R.id.speed_button);
+        mDownloadButton = (PlayerButtonView) findViewById(R.id.download);
+        mFavoriteButton = (MaterialFavoriteButton) findViewById(R.id.favorite);
+        mFastForwardButton = (PlayerButtonView) findViewById(R.id.fast_forward_button);
+        mRewindButton = (PlayerButtonView) findViewById(R.id.rewind_button);
+        mSkipNextButton = (PlayerButtonView) findViewById(R.id.skip_to_next_button);
 
         mPlayPauseLargeSize = mPlayPauseButton.getLayoutParams().height;
 
@@ -451,9 +462,34 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
 
     @Override
     public void onPaletteFound(Palette argChangedPalette) {
+        ColorExtractor extractor = new ColorExtractor(argChangedPalette, ColorUtils.getTextColor(getContext()));
+        ColorExtractor backgroundExtractor = new ColorExtractor(argChangedPalette, ColorUtils.getBackgroundColor(getContext()));
         int color = ColorUtils.getBackgroundColor(getContext());
         mBackgroundColor = StaticButtonColor(mContext, argChangedPalette, color);
         setBackgroundColor(mBackgroundColor);
+        //setBackgroundColor(backgroundExtractor.getPrimary());
+
+        /*
+        setBackgroundColor(backgroundExtractor.getSecondaryTint());
+        ColorUtils.tintButton(mSleepButton, extractor);
+        ColorUtils.tintButton(mDownloadButton, extractor);
+        ColorUtils.tintButton(mFavoriteButton, extractor);
+        ColorUtils.tintButton(mSleepButton, extractor);
+        ColorUtils.tintButton(mSkipNextButton, extractor);
+        ColorUtils.tintButton(mFastForwardButton, extractor);
+        ColorUtils.tintButton(mRewindButton, extractor);
+        ColorUtils.tintButton(mSpeedpButton, extractor);
+        */
+        int textColor = ColorUtils.getBackgroundColor(getContext());
+        ColorUtils.tintButton(mSleepButton,       textColor);
+        ColorUtils.tintButton(mDownloadButton,    textColor);
+        ColorUtils.tintButton(mFavoriteButton,    textColor);
+        ColorUtils.tintButton(mSleepButton,       textColor);
+        ColorUtils.tintButton(mSkipNextButton,    textColor);
+        ColorUtils.tintButton(mFastForwardButton, textColor);
+        ColorUtils.tintButton(mRewindButton,      textColor);
+        ColorUtils.tintButton(mSpeedpButton,      textColor);
+
         invalidate();
     }
 

@@ -1,9 +1,12 @@
 package org.bottiger.podcast.utils;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.graphics.Palette;
 
 import org.bottiger.podcast.R;
@@ -21,6 +24,8 @@ public class ColorExtractor {
     private @ColorInt int mSecondaryTint = -1;
 
     private @ColorInt int mTextColor     = -1;
+
+    private ColorStateList mColorStateList;
 
     private Context mContext;
 
@@ -55,6 +60,7 @@ public class ColorExtractor {
         loadSecondaryColor(argPalette);
         loadSecondaryTintColor(argPalette);
         loadTextColor(argPalette);
+        setColorStateList();
     }
 
     @ColorInt
@@ -82,25 +88,49 @@ public class ColorExtractor {
         return mTextColor;
     }
 
+    @Nullable
+    public ColorStateList getColorStateList() {
+        return mColorStateList;
+    }
+
+    private void setColorStateList() {
+        int[][] states = new int[][] {
+                new int[] { android.R.attr.state_enabled}, // enabled
+                new int[] {-android.R.attr.state_enabled}, // disabled
+                new int[] {-android.R.attr.state_checked}, // unchecked
+                new int[] { android.R.attr.state_pressed}  // pressed
+        };
+
+        // Remember to update tintButton() if you change this
+        int[] colors = new int[] {
+                getPrimary(),
+                getPrimary(),
+                getPrimary(),
+                getPrimary()
+        };
+
+        mColorStateList = new ColorStateList(states, colors);
+    }
+
     private void loadTextColor(@Nullable Palette argPalette) {
         Palette.Swatch swatch = argPalette != null ? argPalette.getDarkVibrantSwatch() : null;
         if (swatch == null) {
             if (mContext == null)
                 return;
 
-            mTextColor = mContext.getResources().getColor(R.color.white_opaque);
+            mTextColor = ContextCompat.getColor(mContext, R.color.white_opaque);
             return;
         }
         mTextColor = swatch.getBodyTextColor();
     }
 
     private void loadPrimaryColor(@Nullable Palette argPalette) {
-        Palette.Swatch swatch = argPalette != null ? argPalette.getDarkVibrantSwatch() : null;
+        Palette.Swatch swatch = argPalette != null ? argPalette.getDarkVibrantSwatch() : null; // was dark
         mPrimary = getColor(swatch, R.color.colorPrimary);
     }
 
     private void loadPrimaryTintColor(@Nullable Palette argPalette) {
-        Palette.Swatch swatch = argPalette != null ? argPalette.getLightVibrantSwatch() : null;
+        Palette.Swatch swatch = argPalette != null ? argPalette.getLightMutedSwatch() : null; // was light
         mPrimaryTint = getColor(swatch, R.color.colorPrimaryDark);
     }
 
@@ -119,7 +149,7 @@ public class ColorExtractor {
             if (mContext == null)
                 return mBaseColor;
 
-            return mContext.getResources().getColor(defaultColorResource);
+            return ContextCompat.getColor(mContext, defaultColorResource);
         }
 
         return argSwatch.getRgb();

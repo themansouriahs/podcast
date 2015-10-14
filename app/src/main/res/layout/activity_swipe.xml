@@ -18,7 +18,7 @@
                 android:id="@+id/header_container_background"
                 android:layout_width="match_parent"
                 android:layout_height="85dp"
-                android:background="?attr/colorPrimary"
+                android:background="?attr/colorAccent"
                 custom:dictatingView="@+id/my_awesome_toolbar">
             </org.bottiger.podcast.views.ViewBackground>
 

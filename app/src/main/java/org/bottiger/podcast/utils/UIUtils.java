@@ -369,7 +369,11 @@ public class UIUtils {
 
     public static void resetStatusBar(@NonNull Activity argActivity) {
         int color = ContextCompat.getColor(argActivity, R.color.colorPrimaryDark);
-        tintStatusBar(color, argActivity);
+        int r = Color.red(color);
+        int g = Color.green(color);
+        int b = Color.blue(color);
+        int opaqueColor = Color.argb(255, r, g, b);
+        tintStatusBar(opaqueColor, argActivity);
     }
 
 
