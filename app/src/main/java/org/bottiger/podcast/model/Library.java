@@ -23,6 +23,8 @@ import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionColumns;
 import org.bottiger.podcast.provider.SubscriptionLoader;
 import org.bottiger.podcast.utils.StrUtils;
+import org.bottiger.podcast.utils.rxbus.RxBus;
+import org.bottiger.podcast.utils.rxbus.RxBusSimpleEvents;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -114,6 +116,21 @@ public class Library {
 
         //loadPlaylist(PlayerService.getInstance().getPlaylist());
         loadSubscriptions();
+
+        SoundWaves.getRxBus().toObserverable()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<Object>() {
+                    @Override
+                    public void call(Object event) {
+                        if (event instanceof EpisodeChanged) {
+                            EpisodeChanged episodeChanged = (EpisodeChanged) event;
+                            IEpisode episode = getEpisode(episodeChanged.getId());
+                            updateEpisode(episode);
+                        }
+                        return;
+                    }
+                });
     }
 
     public void addEpisode(FeedItem argEpisode) {

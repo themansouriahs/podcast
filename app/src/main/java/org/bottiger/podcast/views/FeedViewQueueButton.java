@@ -116,13 +116,18 @@ public class FeedViewQueueButton extends PlayPauseImageView {
     @Override
     public void onClick(View view) {
         IEpisode item = getEpisode();
-        Playlist playlist = SoundWaves.sBoundPlayerService.getPlaylist();
+        PlayerService ps = PlayerService.getInstance();
+
+        if (ps == null)
+            return;
+
+        Playlist playlist = ps.getPlaylist();
 
         if (playlist.contains(item)) {
             int position = playlist.getPosition(item);
             playlist.removeItem(position);
         } else {
-            playlist.queue(mContext, item);
+            playlist.queue(item);
         }
         toggle();
     }

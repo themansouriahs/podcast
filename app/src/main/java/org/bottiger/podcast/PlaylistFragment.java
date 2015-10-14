@@ -310,7 +310,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                 final int itemPosition = playlistViewHolder.getAdapterPosition()+1;
                 final IEpisode episode = mPlaylist.getItem(itemPosition);
                 final int currentPriority = episode.getPriority();
-                final ContentResolver contentResolver = getActivity().getContentResolver();
 
                 episode.setPriority(-1);
 

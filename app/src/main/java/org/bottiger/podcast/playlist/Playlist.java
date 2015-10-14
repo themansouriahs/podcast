@@ -240,7 +240,7 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
         }
 	}
 
-    public void queue(@NonNull Context argContext, @NonNull IEpisode argEpisode) {
+    public void queue(@NonNull IEpisode argEpisode) {
 
         int currentPosition = -1;
         int lastPlaylistPosition = -1;
@@ -263,14 +263,11 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
         if (currentPosition < 0) {
 
             IEpisode preceedingItem = null;
-            int preceedingPriority = 0;
 
             if (lastPlaylistPosition <= 0) {
-                //argEpisode.setPriority(null, argContext);
                 lastPlaylistPosition = mInternalPlaylist.size();
             } else {
                 preceedingItem = mInternalPlaylist.get(lastPlaylistPosition-1);
-                //argEpisode.setPriority(preceedingItem, argContext);
             }
 
             if (preceedingItem == null) {
@@ -373,7 +370,7 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
         }
 
         // skip 'removed' episodes
-        //where += " AND (" + ItemColumns.TABLE_NAME + "." + ItemColumns.PRIORITY + " >= 0)";
+        where += " OR (" + ItemColumns.TABLE_NAME + "." + ItemColumns.PRIORITY + " >= 0)";
 
 
 		return where;
