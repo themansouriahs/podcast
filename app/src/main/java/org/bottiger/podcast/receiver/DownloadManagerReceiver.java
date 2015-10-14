@@ -47,6 +47,9 @@ public class DownloadManagerReceiver extends BroadcastReceiver {
 				int columnIndex = c
 						.getColumnIndex(DownloadManager.COLUMN_STATUS);
 
+				/*
+				Deprecated code
+
 				FeedItem item = FeedItem.getByDownloadReference(
 						context.getContentResolver(), downloadId);
 
@@ -68,6 +71,7 @@ public class DownloadManagerReceiver extends BroadcastReceiver {
 					
 					//SoundWavesDownloadManager.startDownload(context);
 				}
+				*/
 			}
 
 			SoundWavesDownloadManager.removeExpiredDownloadedPodcasts(context);

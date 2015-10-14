@@ -3,6 +3,7 @@ package org.bottiger.podcast.provider;
 import java.util.HashMap;
 
 import org.bottiger.podcast.BuildConfig;
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.utils.PodcastLog;
 
@@ -192,8 +193,7 @@ public class PodcastProvider extends ContentProvider {
 				 * FIXME Hardcode UNIQUE URL
 				 */
 				String url = initialValues.getAsString(ItemColumns.URL);
-				FeedItem testItem = FeedItem.getByURL(getContext()
-						.getContentResolver(), url);
+				FeedItem testItem = SoundWaves.getLibraryInstance().getEpisode(url);
 				if (testItem != null) {
 					throw new Exception("Duplicate URL for FeedItem");
 				} else {

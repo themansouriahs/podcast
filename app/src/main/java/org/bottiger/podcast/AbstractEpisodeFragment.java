@@ -58,30 +58,10 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.menu_bulk_download: {
-			Cursor cursor = createCursor(getWhere(), getOrder());
-			cursor.moveToFirst();
-
-			PlayerService ps = SoundWaves.sBoundPlayerService;
-			if (ps == null)
-				return false;
-
-			SoundWavesDownloadManager downloadManager = ps.getDownloadManager();
-
-			while (cursor.isAfterLast() == false) {
-				FeedItem feedItem = FeedItem.getByCursor(cursor);
-				if (!feedItem.isDownloaded())
-					downloadManager.addItemToQueue(feedItem, SoundWavesDownloadManager.ANYWHERE);
-
-				cursor.moveToNext();
-			}
-			downloadManager.startDownload();
-			return true;
-		}
 		case R.id.menu_clear_playlist: {
 
 			if (mPlaylist == null) {
-				mPlaylist = SoundWaves.sBoundPlayerService.getPlaylist();
+				mPlaylist = PlayerService.getInstance().getPlaylist();
 				Log.wtf(TAG, "Playlist should not be null"); // NoI18N
 			}
 

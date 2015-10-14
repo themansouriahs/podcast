@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -240,7 +241,8 @@ public class SoundWavesDownloadManager extends Observable {
         try {
             if (getDownloadingItem() == null && mDownloadQueue.size() > 0) {
                 QueueEpisode nextInQueue = mDownloadQueue.pollFirst(); //getNextItem();
-                FeedItem downloadingItem = FeedItem.getById(mContext.getContentResolver(), nextInQueue.getId());
+                //FeedItem downloadingItem = FeedItem.getById(mContext.getContentResolver(), nextInQueue.getId());
+                FeedItem downloadingItem = SoundWaves.getLibraryInstance().getEpisode(nextInQueue.getId());
 
                 mEngine = newEngine(downloadingItem);
                 mEngine.addCallback(mDownloadCompleteCallback);
@@ -346,16 +348,31 @@ public class SoundWavesDownloadManager extends Observable {
 				// sort by nevest first
 				String sortOrder = ItemColumns.LAST_UPDATE + " DESC";
 
+                /*
 				Cursor cursor = mContext.getContentResolver().query(
 						ItemColumns.URI, ItemColumns.ALL_COLUMNS, where, null,
 						sortOrder);
 
-				LinkedList<String> filesToKeep = new LinkedList<String>();
-				cursor.moveToFirst();
-				while (cursor.isAfterLast() == false) {
-					boolean deleteFile = true;
+						cursor.moveToFirst();
+						*/
+
+                ArrayList<IEpisode> episodes = SoundWaves.getLibraryInstance().getEpisodes();
+
+				LinkedList<String> filesToKeep = new LinkedList<>();
+
+				//while (cursor.isAfterLast() == false) {
+                IEpisode episode;
+                FeedItem item;
+                for (int i = 0; i < episodes.size(); i++) {
+                    boolean deleteFile = true;
 					// Extract data.
-					FeedItem item = FeedItem.getByCursor(cursor);
+                    episode = episodes.get(i);
+                    try {
+                        item = (FeedItem) episode;
+                    } catch (ClassCastException cce) {
+                        continue;
+                    }
+
 					if (item != null) {
 						File file = new File(item.getAbsolutePath());
 
@@ -376,7 +393,7 @@ public class SoundWavesDownloadManager extends Observable {
 							item.setDownloaded(false);
 							item.update(mContext.getContentResolver());
 						}
-						cursor.moveToNext();
+						//cursor.moveToNext();
 					}
 				}
 

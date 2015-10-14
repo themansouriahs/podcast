@@ -52,6 +52,10 @@ public class Library {
 
     @NonNull
     private ArrayList<IEpisode> mEpisodes = new ArrayList<>();
+    @NonNull
+    private ArrayMap<String, FeedItem> mEpisodesUrlLUT = new ArrayMap<>();
+    @NonNull
+    private ArrayMap<Long, FeedItem> mEpisodesIdLUT = new ArrayMap<>();
 
     @NonNull
     private SortedList<Subscription> mActiveSubscriptions;
@@ -121,10 +125,12 @@ public class Library {
             if (argEpisode == null)
                 return;
 
-            if (mEpisodes.contains(argEpisode))
+            if (mEpisodesUrlLUT.containsKey(argEpisode.getURL()))
                 return;
 
             mEpisodes.add(argEpisode);
+            mEpisodesUrlLUT.put(argEpisode.getURL(), argEpisode);
+            mEpisodesIdLUT.put(argEpisode.getId(), argEpisode);
         } finally {
             mLock.unlock();
         }
@@ -188,12 +194,29 @@ public class Library {
         return mActiveSubscriptions;
     }
 
+    @Nullable
     public Subscription getSubscription(@NonNull String argUrl) {
         return mSubscriptionUrlLUT.get(argUrl);
     }
 
+    @Nullable
     public Subscription getSubscription(@NonNull Long argId) {
         return mSubscriptionIdLUT.get(argId);
+    }
+
+    @Nullable
+    public ArrayList<IEpisode> getEpisodes() {
+        return mEpisodes;
+    }
+
+    @Nullable
+    public FeedItem getEpisode(@NonNull String argUrl) {
+        return mEpisodesUrlLUT.get(argUrl);
+    }
+
+    @Nullable
+    public FeedItem getEpisode(@NonNull long argId) {
+        return mEpisodesIdLUT.get(argId);
     }
 
     public SortedList<IEpisode> newEpisodeSortedList(SortedList.Callback<IEpisode> argCallback) {

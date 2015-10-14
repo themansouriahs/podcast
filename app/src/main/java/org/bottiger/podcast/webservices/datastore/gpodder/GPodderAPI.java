@@ -9,6 +9,7 @@ import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.LongSparseArray;
+import android.support.v7.util.SortedList;
 import android.text.TextUtils;
 import android.util.ArrayMap;
 import android.util.ArraySet;
@@ -21,8 +22,8 @@ import com.squareup.okhttp.ResponseBody;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.playlist.FeedCursorLoader;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.Subscription;
@@ -40,6 +41,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -248,8 +250,23 @@ public class GPodderAPI implements IWebservice {
         /**
          * Sync Episode actions
          */
-        String where = String.format("%s>%d", ItemColumns.LAST_UPDATE, lastSync*1000);
-        FeedItem[] items = FeedCursorLoader.asCursor(argContext.getContentResolver(), where);
+        //String where = String.format("%s>%d", ItemColumns.LAST_UPDATE, lastSync * 1000);
+        //FeedItem[] items = FeedCursorLoader.asCursor(argContext.getContentResolver(), where);
+        ArrayList<IEpisode> allItems = SoundWaves.getLibraryInstance().getEpisodes();
+        List<FeedItem> recentlySyncedItems = new LinkedList<>();
+        IEpisode episode;
+        FeedItem eitem;
+        for (int i = 0; i < allItems.size(); i++) {
+            episode = allItems.get(i);
+            if (episode instanceof FeedItem) {
+                eitem = (FeedItem) episode;
+                if (eitem.lastModificationDate() > lastSync * 1000) {
+                    recentlySyncedItems.add(eitem);
+                }
+            }
+        }
+
+        FeedItem[] items = recentlySyncedItems.toArray(new FeedItem[recentlySyncedItems.size()]);
 
         Call<GActionsList> actionList = api.getEpisodeActions(mUsername, null, null, lastSync, true);
         Response<GActionsList> actionListResponse = actionList.execute();
@@ -339,7 +356,8 @@ public class GPodderAPI implements IWebservice {
             for (int i = 0; i < remoteActions.length; i++) {
                 action = remoteActions[i];
                 if (action != null && action.action == GEpisodeAction.PLAY) {
-                    item = FeedItem.getByURL(resolver, action.episode);
+                    //item = FeedItem.getByURL(resolver, action.episode);
+                    item = SoundWaves.getLibraryInstance().getEpisode(action.episode);
                     if (item != null) {
                         item.setOffset(resolver, action.position*1000);
                     }

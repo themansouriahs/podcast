@@ -36,27 +36,7 @@ public class FragmentUtils {
 	private OnItemSelectedListener mListener;
 	private Cursor mCursor;
 
-	protected final PodcastLog log = PodcastLog.getLog(getClass());
-	
-	public void startInit(int id, Uri columns, String[] projection,
-			String condition, String order) {
-		assert condition != null;
-		assert order != null;
-		assert projection != null;
 
-		// Prepare the loader. Either re-connect with an existing one,
-		// or start a new one.
-		Bundle mBundle = new Bundle();
-		mBundle.putParcelable("uri", columns);
-		mBundle.putStringArray("projection", projection);
-		mBundle.putString("order", order);
-		mBundle.putString("condition", condition);
-		
-		// FIXME
-		mFragment.getLoaderManager().restartLoader(id, mBundle, loaderCallback);
-		// //getLoaderManager().initLoader(id, mBundle, loaderCallback);
-	}
-	
 	/*
 	 * This is a huge hack. FIXME
 	 */
@@ -94,109 +74,6 @@ public class FragmentUtils {
 
 	public void setFragment(Fragment fragment) {
 		this.mFragment = fragment;
-	}
-	
-	private LoaderManager.LoaderCallbacks<Cursor> loaderCallback = new LoaderCallbacks<Cursor>() {
-
-		@Override
-		public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
-
-			Uri uri = bundle.getParcelable("uri");
-			String[] projection = bundle.getStringArray("projection");
-
-			String order = bundle.getString("order");
-			String condition = bundle.getString("condition");
-
-			return new CursorLoader(mActivity, uri, projection, condition,
-					null, order);
-		}
-
-		@Override
-		public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-			
-			// https://github.com/bauerca/drag-sort-listview/issues/20
-			final ReorderCursor wrapped_cursor = new ReorderCursor(cursor);
-			
-			// FIXME - should not be commented out
-			mAdapter = getAdapter(wrapped_cursor);
-
-            /*
-            if (mAdapter instanceof SubscriptionCursorAdapter) {
-                ((SubscriptionCursorAdapter)mAdapter).notifyChange(wrapped_cursor);
-            }*/
-
-			mAdapter.changeCursor(wrapped_cursor);
-		}
-
-		@Override
-		public void onLoaderReset(Loader<Cursor> loader) {
-			// This is called when the last Cursor provided to onLoadFinished()
-			// above is about to be closed. We need to make sure we are no
-			// longer using it.
-			mAdapter.swapCursor(null);
-			
-			// https://github.com/bauerca/drag-sort-listview/issues/20
-			//((CursorAdapter) getListView().getAdapter()).swap(null);
-
-		}
-	};
-	
-	class ReorderCursor extends CursorWrapper {
-
-	    ReorderCursor(Cursor cursor) {
-	        super(cursor);
-
-	        _remapping = new SparseIntArray();
-	    }
-
-	     public void drop(final int from, final int to) {	
-	    	
-	        // Update remapping
-	        final int remapped_from = getRemappedPosition(from);
-	        if (from > to)
-	            for (int position = from; position > to; position--)
-	                _remapping.put(position, getRemappedPosition(position - 1));
-	        else // shift up
-	            for (int position = from; position < to; position++)
-	                _remapping.put(position, getRemappedPosition(position + 1)); 
-	        _remapping.put(to, remapped_from);
-	         
-	         
-			new Thread(new Runnable() {
-				public void run() {
-						        
-	        		if (from != to) {
-						FeedItem precedingItem = null;
-						if (to > 0) {
-							Cursor precedingItemCursor = (Cursor) mAdapter
-									.getItem(to - 1);
-							precedingItem = FeedItem
-									.getByCursor(precedingItemCursor);
-						}
-
-						Cursor item = (Cursor) mAdapter.getItem(to);
-						FeedItem feedItem = FeedItem.getByCursor(item);
-
-						Context c = FragmentUtils.this.mActivity;
-						feedItem.setPriority(precedingItem, c);
-					}		
-				}
-			}).start();
-					
-			mAdapter.notifyDataSetChanged();
-			
-	     }
-
-	    @Override
-	    public boolean moveToPosition(int position) {
-	    	return super.moveToPosition(getRemappedPosition(position));
-	    }
-
-	    private int getRemappedPosition(int position) {
-	        return _remapping.get(position, position);
-	    }
-
-	    private final SparseIntArray _remapping;
 	}
 
 }

@@ -25,7 +25,8 @@ public class FeedUpdater {
 	public FeedUpdater(ContentResolver contentResolver) {
 		this.contentResolver = contentResolver;
 	}
-	
+
+	@Deprecated
 	public void updateDatabase(Subscription subscription) {
 
 		SortedList<IEpisode> items = subscription.getEpisodes();
@@ -43,7 +44,7 @@ public class FeedUpdater {
 
 		String[] urlArray = urls.toArray(new String[urls.size()]);
 		
-		FeedItem[] localItems = FeedItem.getByURL(contentResolver, urlArray, null);
+		FeedItem[] localItems = null;//FeedItem.getByURL(contentResolver, urlArray, null);
 		
 		HashMap<String,FeedItem> itemDict = new HashMap<>();
 		for (FeedItem item : localItems) {
@@ -124,7 +125,6 @@ public class FeedUpdater {
                 return;
             }
 
-            FeedItem[] localItems2 = FeedItem.getByURL(contentResolver, urlArray, null);
             return;
         }
 		

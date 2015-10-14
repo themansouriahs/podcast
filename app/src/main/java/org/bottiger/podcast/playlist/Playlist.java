@@ -201,17 +201,6 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
     }
 
 	/**
-	 * 
-	 * @param cursor
-	 */
-	public void setItem(Cursor cursor) {
-		int position = cursor.getPosition();
-		if (position < MAX_SIZE) {
-			setItem(position, FeedItem.getByCursor(cursor));
-		}
-	}
-
-	/**
 	 * @return The next item in the playlist
 	 */
 	public IEpisode nextEpisode() {

@@ -356,7 +356,7 @@ public class PlayerService extends Service implements
 
 		IEpisode oldItem = mItem;
 
-		mItem = FeedItem.getByURL(getContentResolver(), argEpisodeURL);
+		mItem = SoundWaves.getLibraryInstance().getEpisode(argEpisodeURL);
 
 		if (mItem == null)
 			return;

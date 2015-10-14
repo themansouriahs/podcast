@@ -15,11 +15,9 @@ import java.util.Locale;
 
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.listeners.DownloadProgressPublisher;
+import org.bottiger.podcast.model.EpisodeChanged;
 import org.bottiger.podcast.playlist.Playlist;
-import org.bottiger.podcast.service.DownloadStatus;
-import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.utils.BitMaskUtils;
-import org.bottiger.podcast.utils.PodcastLog;
 import org.bottiger.podcast.utils.SDCardManager;
 import org.jsoup.Jsoup;
 
@@ -49,11 +47,6 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 
     // Se Subscription.java for details
     private static final int IS_VIDEO = 1;
-
-	//private final PodcastLog log = PodcastLog.getLog(getClass());
-	//private static ItemLruCache cache = null;
-
-	//private DatabaseHelper mBulkUpdater = null;
 
 	/*
 	 * Let's document these retared fields! They are totally impossible to guess
@@ -231,164 +224,21 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	@Deprecated
 	private long m_date;
 
-	static String[] DATE_FORMATS = { "EEE, dd MMM yyyy HH:mm:ss Z",
-			"EEE, d MMM yy HH:mm z", "EEE, d MMM yyyy HH:mm:ss z",
-			"EEE, d MMM yyyy HH:mm z", "d MMM yy HH:mm z",
-			"d MMM yy HH:mm:ss z", "d MMM yyyy HH:mm z",
-			"d MMM yyyy HH:mm:ss z", "yyyy-MM-dd HH:mm", "yyyy-MM-dd HH:mm:ss",
-			"EEE,dd MMM yyyy HH:mm:ss Z", };
+	static String[] DATE_FORMATS = {
+			"EEE, dd MMM yyyy HH:mm:ss Z",
+			"EEE, d MMM yy HH:mm z",
+			"EEE, d MMM yyyy HH:mm:ss z",
+			"EEE, d MMM yyyy HH:mm z",
+			"d MMM yy HH:mm z",
+			"d MMM yy HH:mm:ss z",
+			"d MMM yyyy HH:mm z",
+			"d MMM yyyy HH:mm:ss z",
+			"yyyy-MM-dd HH:mm",
+			"yyyy-MM-dd HH:mm:ss",
+			"EEE,dd MMM yyyy HH:mm:ss Z"
+	};
 
 	public static String default_format = "yyyy-MM-dd HH:mm:ss Z";
-
-	public static void view(Activity act, long item_id) {
-		Uri uri = ContentUris.withAppendedId(ItemColumns.URI, item_id);
-		act.startActivity(new Intent(Intent.ACTION_EDIT, uri));
-	}
-
-	public static Cursor allAsCursor(ContentResolver context,
-			Subscription subscription, String oldestDate) {
-		String strID = String.valueOf(subscription.getId());
-		if (oldestDate != null) {
-			return context.query(ItemColumns.URI, ItemColumns.ALL_COLUMNS,
-					ItemColumns.SUBS_ID + "=? AND " + ItemColumns.DATE + ">?",
-					new String[] { strID, oldestDate }, null);
-		}
-		return context.query(ItemColumns.URI, ItemColumns.ALL_COLUMNS,
-				ItemColumns.SUBS_ID + "=?", new String[] { strID }, null);
-	}
-
-	public static HashMap<String, FeedItem> allAsList(ContentResolver context,
-			Subscription subscription, String oldestDate) {
-		HashMap<String, FeedItem> item = new HashMap<String, FeedItem>();
-		Cursor cursor = allAsCursor(context, subscription, oldestDate);
-
-		while (cursor.moveToNext()) {
-			FeedItem currentItem = FeedItem.getByCursor(cursor);
-			item.put(currentItem.url, currentItem);
-		}
-		cursor.close();
-		return item;
-	}
-
-	@Deprecated
-	public static FeedItem getBySQL(ContentResolver context, String where,
-			String order) {
-		FeedItem item = null;
-		Cursor cursor = null;
-
-		try {
-			cursor = context.query(ItemColumns.URI, ItemColumns.ALL_COLUMNS,
-					where, null, order);
-			if (cursor.moveToFirst()) {
-				item = FeedItem.getByCursor(cursor);
-			}
-		} finally {
-			if (cursor != null)
-				cursor.close();
-		}
-		return item;
-
-	}
-	
-	public static FeedItem[] getByURL(ContentResolver contentResolver, String[] urls) {
-		return getByURL(contentResolver, urls, null);
-	}
-
-	public static FeedItem getByURL(ContentResolver contentResolver, String url) {
-		return getByURL(contentResolver, new String[]{url}, null)[0];
-	}
-
-	public static FeedItem[] getByURL(ContentResolver contentResolver,
-			String[] urls, FeedItem cachedFeedItem) {
-		FeedItem[] items = new FeedItem[urls.length];
-		Cursor cursor = null;
-
-		/*
-		 * Build a query with the correct amount of ?,?,?
-		 */
-		StringBuilder queryBuilder = new StringBuilder();
-		queryBuilder.append(ItemColumns.URL + " IN (");
-		for (int i = 1; i <= urls.length; i++) {
-			queryBuilder.append("\"" + urls[i-1] + "\"");
-			if (i != urls.length)
-				queryBuilder.append(", ");
-		}
-		queryBuilder.append(")");
-		String where = queryBuilder.toString();
-		//String where = ItemColumns.URL + " = ?";
-		
-		try {
-			cursor = contentResolver.query(ItemColumns.URI,
-					ItemColumns.ALL_COLUMNS, where, null, null); //urls
-
-			int j = 0;
-			cursor.moveToPosition(-1);
-			while (cursor.moveToNext()) {
-				items[j] = FeedItem.fetchFromCursor(cursor, cachedFeedItem);
-				j++;
-			}
-			cursor.close();
-		} catch (ArrayIndexOutOfBoundsException e) {
-            items[1] = null;
-        } finally {
-			if (cursor != null)
-				cursor.close();
-		}
-		return items;
-
-	}
-
-	public static FeedItem getByDownloadReference(
-			ContentResolver contentResolver, long id) {
-		FeedItem item = null;
-		Cursor cursor = null;
-
-		String where = ItemColumns.DOWNLOAD_REFERENCE + " = " + id;
-		try {
-			cursor = contentResolver.query(ItemColumns.URI,
-					ItemColumns.ALL_COLUMNS, where, null, null);
-			if (cursor.moveToFirst()) {
-				item = FeedItem.getByCursor(cursor);
-			}
-		} finally {
-			if (cursor != null)
-				cursor.close();
-		}
-		return item;
-
-	}
-
-	public static FeedItem getById(ContentResolver contentResolver, long id) {
-		Cursor cursor = null;
-		FeedItem item = null;
-
-		try {
-			String where = BaseColumns._ID + " = " + id;
-
-			cursor = contentResolver.query(ItemColumns.URI,
-					ItemColumns.ALL_COLUMNS, where, null, null);
-			if (cursor.moveToFirst()) {
-				item = fetchFromCursor(cursor);
-
-				cursor.close();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-
-		} finally {
-
-			if (cursor != null)
-				cursor.close();
-
-		}
-
-		return item;
-	}
-
-	public static FeedItem getByCursor(Cursor cursor) {
-		FeedItem item = fetchFromCursor(cursor, null);
-		return item;
-	}
 
 	public FeedItem() {
 		reset();
@@ -1487,4 +1337,8 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
     private boolean IsSettingEnabled(int setting) {
         return BitMaskUtils.IsBitSet(status, setting);
     }
+
+	private void notifyPropertyChanged() {
+		SoundWaves.getRxBus().send(new EpisodeChanged(getId(), EpisodeChanged.CHANGED));
+	}
 }

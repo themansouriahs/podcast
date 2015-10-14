@@ -33,8 +33,6 @@ import org.bottiger.podcast.ToolbarActivity;
 import org.bottiger.podcast.TopActivity;
 import org.bottiger.podcast.adapters.FeedViewDiscoveryAdapter;
 import org.bottiger.podcast.listeners.PaletteListener;
-import org.bottiger.podcast.playlist.FeedCursorLoader;
-import org.bottiger.podcast.playlist.ReorderCursor;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;

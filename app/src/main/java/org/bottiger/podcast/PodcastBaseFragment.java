@@ -1,7 +1,6 @@
 package org.bottiger.podcast;
 
 import org.bottiger.podcast.playlist.Playlist;
-import org.bottiger.podcast.playlist.ReorderCursor;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.PodcastLog;
@@ -22,8 +21,6 @@ public abstract class PodcastBaseFragment extends Fragment {
 
     protected SharedPreferences sharedPreferences;
 
-
-	protected ReorderCursor mCursor = null;
 
 	private static SeekBar mProgressBar = null;
 
@@ -60,11 +57,6 @@ public abstract class PodcastBaseFragment extends Fragment {
 	@Override
 	public void onResume() {
 		super.onResume();
-	}
-
-
-	public ReorderCursor getCursor() {
-		return this.mCursor;
 	}
 
 	abstract String getWhere();
