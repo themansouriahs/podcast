@@ -125,12 +125,6 @@ public class SubscriptionCursorAdapter extends CursorRecyclerAdapter {
         String title = sub.title;
         final String logo = sub.imageURL;
 
-        if (isListView()) {
-            holder.gradient.setVisibility(View.GONE);
-        } else {
-            holder.gradient.setVisibility(View.VISIBLE);
-        }
-
 
         if (title != null && !title.equals(""))
             holder.title.setText(title);

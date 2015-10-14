@@ -51,29 +51,6 @@ public class FeedViewTopImage extends ImageViewTinted {
         postInvalidate();
     }
 
-
-    /*
-    @Override
-    public void setImageDrawable(Drawable drawable) {
-        // There is no way to avoid all this casting. Blending modes aren't equally
-        // supported for all drawable types.
-        BitmapDrawable bitmapDrawable;
-
-        bitmapDrawable = (BitmapDrawable) drawable;
-
-        if (bitmapDrawable == null) {
-            return;
-            //bitmapDrawable = (BitmapDrawable) getResources().getDrawable(
-            //        R.drawable.generic_podcast);
-        }
-
-        mOriginalDrawable = drawable;
-        mBitmapDrawable = bitmapDrawable;
-        setTint(mTintColor);
-        super.setImageDrawable(bitmapDrawable);
-    }
-    */
-
     @Override
     public Drawable getDrawable() {
         return mOriginalDrawable;

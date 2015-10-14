@@ -230,11 +230,13 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
 
     public String getSecondaryText(@NonNull IEpisode argItem) {
         mStringBuilder.setLength(0);
-        if (argItem.getDuration() > 0)
-            mStringBuilder.append(DateUtils.formatElapsedTime(argItem.getDuration()/1000));
-        else
-            mStringBuilder.append("--:--");
-        mStringBuilder.append(", ");
+        if (argItem.getDuration() > 0) {
+            mStringBuilder.append(DateUtils.formatElapsedTime(argItem.getDuration() / 1000));
+            mStringBuilder.append(", ");
+        }
+        //else
+        //    mStringBuilder.append("--:--");
+
 
         long filesize = argItem.getFilesize();
         if (filesize > 0) {

@@ -5,7 +5,7 @@
     android:id="@+id/group"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="5dp">
+    android:layout_marginTop="3dp">
 
     <org.bottiger.podcast.views.PlayPauseImageView
         android:id="@+id/play_pause_button"
@@ -46,7 +46,6 @@
         android:text="Podcast Title"
         style="@style/TextAppearance.AppCompat.Body1"
         android:layout_marginTop="10dp"
-        android:layout_centerVertical="true"
         android:layout_alignParentTop="true"
         android:layout_toLeftOf="@+id/feedview_download_button"
         android:layout_toRightOf="@+id/play_pause_button"/>
@@ -82,9 +81,6 @@
         android:layout_alignRight="@id/title"
         />
 
-    <!--
-        android:maxHeight="80dp"
-        -->
     <TextView
         android:id="@+id/episode_description"
         android:visibility="visible"
@@ -100,8 +96,14 @@
         android:layout_toLeftOf="@+id/feedview_download_button"
         android:layout_toRightOf="@+id/play_pause_button"
         android:layout_marginTop="5dp"
+        android:paddingBottom="10dp"
         android:animateLayoutChanges="true"/>
-    <!--
-        style="@style/AudioFileInfoOverlayText" -->
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/grayStart"
+        android:paddingTop="10dp"
+        android:layout_alignParentBottom="true"/>
 
 </RelativeLayout>

@@ -6,9 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <FrameLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
     <org.bottiger.podcast.views.SquareImageViewFresco
         android:id="@+id/grid_image"
@@ -22,7 +22,17 @@
         android:layout_width="match_parent"
         android:layout_height="35dp"
         android:layout_gravity="bottom"
-        android:background="@drawable/footer_gradient" />
+        android:background="@drawable/footer_gradient"
+        android:visibility="gone"/>
+
+        <FrameLayout
+            android:id="@+id/subscription_text_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:padding="2dp"
+            android:visibility="gone"
+            android:background="@color/red">
 
     <TextView
         android:id="@+id/grid_title"
@@ -31,6 +41,7 @@
         android:singleLine="true"
     	android:lines="1"
         android:ellipsize="end"
+        style="@style/TextAppearance.AppCompat.Body1"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
         android:paddingTop="10dp"
@@ -38,8 +49,9 @@
         android:layout_gravity="bottom"
         android:textColor="@android:color/white"
         />
-    <!-- android:background="#AA000000" -->
 
-    </FrameLayout>
+        </FrameLayout>
+
+    </RelativeLayout>
 
 </FrameLayout>

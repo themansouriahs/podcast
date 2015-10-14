@@ -187,7 +187,7 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
         if (mGridLayoutmanager.getSpanCount() != numberOfColumns()) {
             mGridLayoutmanager = new GridLayoutManager(getActivity(), numberOfColumns());
             mGridView.setLayoutManager(mGridLayoutmanager);
-            ((SubscriptionCursorAdapter)mGridView.getAdapter()).setNumberOfColumns(numberOfColumns());
+            ((SubscriptionAdapter)mGridView.getAdapter()).setNumberOfColumns(numberOfColumns());
         }
         super.onResume();
     }

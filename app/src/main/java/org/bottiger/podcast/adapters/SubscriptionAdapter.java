@@ -4,9 +4,17 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
+import android.support.v4.graphics.drawable.DrawableCompat;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
@@ -17,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
@@ -24,11 +33,14 @@ import org.bottiger.podcast.ToolbarActivity;
 import org.bottiger.podcast.activities.feedview.FeedActivity;
 import org.bottiger.podcast.adapters.viewholders.FooterViewHolder;
 import org.bottiger.podcast.adapters.viewholders.subscription.SubscriptionViewHolder;
+import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.model.SubscriptionChanged;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionLoader;
+import org.bottiger.podcast.utils.ColorExtractor;
+import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.rxbus.RxBusSimpleEvents;
 
 import rx.android.schedulers.AndroidSchedulers;
@@ -121,7 +133,7 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
             return;
         }
 
-        SubscriptionViewHolder holder = (SubscriptionViewHolder)argHolder;
+        final SubscriptionViewHolder holder = (SubscriptionViewHolder)argHolder;
 
         Subscription sub = null;
         try {
@@ -135,31 +147,10 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
             return;
         }
 
-        // Add some padding to the last element in order to compensate for the transparent navigationbar
-        //int itemsLeft = cursor.getCount()-cursor.getPosition();
-        //boolean isLastRow = cursor.getPosition()
-        //SharedAdapterUtils.AddPaddingToLastElement(holder.container, 0, cursor.getPosition() == getItemCount()-1);
-        /*
-        int left = argHolder.itemView.getPaddingLeft();
-        int right = argHolder.itemView.getPaddingRight();
-        int top = argHolder.itemView.getPaddingTop();
-        int bottom = argHolder.itemView.getPaddingTop();
-        Resources resources = argHolder.itemView.getResources();
-        int newBottomPadding = position == getItemCount() ? ToolbarActivity.getNavigationBarHeight(resources) : 0;
-        argHolder.itemView.setPadding(left, top, right, newBottomPadding);
-        */
-
         final Subscription subscription = sub;
 
         String title = sub.getTitle();
         final String logo = sub.getImageURL();
-
-        if (isListView()) {
-            holder.gradient.setVisibility(View.GONE);
-        } else {
-            holder.gradient.setVisibility(View.VISIBLE);
-        }
-
 
         if (title != null && !title.equals(""))
             holder.title.setText(title);
@@ -177,9 +168,21 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
         Uri uri = null;
         if (holder.image != null && !TextUtils.isEmpty(logo)) {
             uri = Uri.parse(logo);
-        } else {
-            //uri = Uri.parse("android.resource://" + mActivity.getPackageName() + "/" + R.drawable.generic_podcast);
-            //uri = ResourceToUri(mActivity, R.drawable.generic_podcast);
+
+            PaletteHelper.generate(logo, mActivity, new PaletteListener() {
+                @Override
+                public void onPaletteFound(Palette argChangedPalette) {
+                    ColorExtractor extractor = new ColorExtractor(argChangedPalette);
+                    holder.text_container.setBackgroundColor(extractor.getPrimary());
+                    holder.title.setTextColor(extractor.getTextColor());
+                }
+
+                @Override
+                public String getPaletteUrl() {
+                    return logo;
+                }
+            });
+
         }
 
         if (uri != null) {
@@ -188,7 +191,29 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
 
                 //FrescoHelper.PalettePostProcessor postProcessor = new FrescoHelper.PalettePostProcessor(mActivity, image);
                 //FrescoHelper.loadImageInto(holder.image, image, postProcessor);
+
+
                 Glide.with(mActivity).load(image).centerCrop().placeholder(R.drawable.generic_podcast).into(holder.image);
+
+                /*
+                Glide.with(mActivity)
+                        .load(image)
+                        .asBitmap()
+                        .centerCrop()
+                        .placeholder(R.drawable.generic_podcast)
+                        .into(new BitmapImageViewTarget(holder.image) {
+                    @Override
+                    protected void setResource(Bitmap resource) {
+                        RoundedBitmapDrawable circularBitmapDrawable =
+                        RoundedBitmapDrawableFactory.create(mActivity.getResources(), resource);
+                        float radius = mActivity.getResources().getDimension(R.dimen.playlist_image_radius_small);
+
+                        circularBitmapDrawable.setCornerRadius(radius);
+
+                        holder.image.setImageDrawable(circularBitmapDrawable);
+                    }
+                });
+                */
 
             }
         } else {

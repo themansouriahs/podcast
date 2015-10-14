@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -19,7 +20,7 @@ public class SubscriptionViewHolder extends RecyclerView.ViewHolder implements V
     public TextView title;
     public TextView subTitle;
     public ImageViewTinted image;
-    public View gradient;
+    public FrameLayout text_container;
 
     public SubscriptionViewHolder(View itemView) {
         super(itemView);
@@ -28,7 +29,7 @@ public class SubscriptionViewHolder extends RecyclerView.ViewHolder implements V
         title = (TextView) itemView.findViewById(R.id.grid_title);
         subTitle = (TextView) itemView.findViewById(R.id.grid_subtitle);
         image = (ImageViewTinted) itemView.findViewById(R.id.grid_image);
-        gradient = (View) itemView.findViewById(R.id.grid_item_gradient);
+        text_container = (FrameLayout)itemView.findViewById(R.id.subscription_text_container);
 
         itemView.setOnCreateContextMenuListener(this);
     }
