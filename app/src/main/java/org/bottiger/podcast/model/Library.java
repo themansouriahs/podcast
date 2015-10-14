@@ -28,6 +28,7 @@ import org.bottiger.podcast.utils.StrUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 import rx.Observable;
@@ -206,6 +207,13 @@ public class Library {
             return false;
 
         return mSubscriptionUrlLUT.containsKey(argSubscription.getURLString());
+    }
+
+    public boolean containsEpisode(@Nullable IEpisode argEpisode) {
+        if (argEpisode == null)
+            return false;
+
+        return mEpisodes.contains(argEpisode);
     }
 
     private void invalidate() {
@@ -416,6 +424,23 @@ public class Library {
 
     public void updateSubscription(Subscription argSubscription) {
         mLibraryPersistency.persist(argSubscription);
+
+        // Update new episodes
+        SortedList<IEpisode> episodes = argSubscription.getEpisodes();
+        for (int i = 0; i < episodes.size(); i++) {
+            IEpisode episode = episodes.get(i);
+            if (!containsEpisode(episode)) {
+                updateEpisode(episode);
+            }
+        }
+    }
+
+    public void updateEpisode(IEpisode argEpisode) {
+        if (argEpisode instanceof FeedItem) {
+            FeedItem item = (FeedItem) argEpisode;
+            addEpisode(item);
+            mLibraryPersistency.persist(item);
+        }
     }
 
     private int compareSubscriptions(ISubscription s1, ISubscription s2) {

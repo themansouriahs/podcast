@@ -126,7 +126,7 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
         Subscription sub = null;
         try {
             //sub = SubscriptionLoader.getByCursor(cursor);
-            sub = (Subscription)mLibrary.getSubscriptions().get(position);
+            sub = mLibrary.getSubscriptions().get(position);
         } catch (IllegalStateException e) {
             e.printStackTrace();
         }

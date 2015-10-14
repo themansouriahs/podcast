@@ -11,6 +11,7 @@ import android.util.Log;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.ItemColumns;
@@ -34,8 +35,25 @@ public class LibraryPersistency {
         mLibrary = argLibrary;
     }
 
-    public void persist(IEpisode argEpisode) {
+    public void persist(FeedItem argEpisode) {
+        ContentValues cv = argEpisode.getContentValues(true);
 
+        // BaseColumns._ID + "=" + id
+        String condition = ItemColumns.URL + "='" + argEpisode.getURL() + "'";
+        // String condition = ItemColumns.URL + "='?' AND "+ ItemColumns.URL +
+        // "='?'"; // BUG!
+        // http://code.google.com/p/android/issues/detail?id=56062
+
+            int numUpdatedRows = mContentResolver.update(ItemColumns.URI, cv,
+                    condition, null);
+            if (numUpdatedRows == 1) {
+                Log.d("FeedItem", "update OK");
+            } else if (numUpdatedRows == 0) {
+                Log.d("FeedItem", "update NOT OK. Insert instead");
+                mContentResolver.insert(ItemColumns.URI, cv);
+            } else {
+                throw new IllegalStateException("Never update more than one row here");
+            }
     }
 
     public void persist(Collection<IEpisode> argEpisodes) {
