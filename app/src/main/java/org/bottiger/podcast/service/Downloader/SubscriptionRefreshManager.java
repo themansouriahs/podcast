@@ -35,6 +35,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by apl on 26-03-2015.
@@ -140,22 +141,12 @@ public class SubscriptionRefreshManager {
     private int addAllSubscriptionsToQueue(@NonNull Context argContext, @Nullable IDownloadCompleteCallback argCallback) {
         Log.d(TAG, "addAllSubscriptionsToQueue");
 
-        Cursor subscriptionCursor = null;
         int subscriptionsAdded = 0;
 
-        try {
-            subscriptionCursor = SubscriptionLoader.allAsCursor(argContext
-                    .getContentResolver());
-
-            while (subscriptionCursor.moveToNext()) {
-
-                Subscription sub = SubscriptionLoader.getByCursor(subscriptionCursor);
-
-                addSubscriptionToQueue(argContext, sub, argCallback);
-                subscriptionsAdded++;
-            }
-        } finally {
-            subscriptionCursor.close();
+        SortedList<Subscription> subscriptions = SoundWaves.getLibraryInstance().getSubscriptions();
+        for (int i = 0; i < subscriptions.size(); i++) {
+           addSubscriptionToQueue(argContext, subscriptions.get(i), argCallback);
+           subscriptionsAdded++;
         }
 
         Log.d(TAG, "addAllSubscriptionsToQueue added: " + subscriptionsAdded);

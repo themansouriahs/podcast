@@ -10,6 +10,7 @@ import org.bottiger.podcast.provider.Subscription;
 import org.xmlpull.v1.XmlSerializer;
 
 import android.support.v4.util.LongSparseArray;
+import android.support.v7.util.SortedList;
 import android.util.Log;
 import android.util.SparseArray;
 import android.util.Xml;
@@ -83,7 +84,7 @@ public class OpmlWriter {
 	 * @throws IllegalArgumentException
 	 */
 	@Deprecated
-	public void writeDocument(List<Subscription> feeds, Writer writer)
+	public void writeDocument(SortedList<Subscription> feeds, Writer writer)
 			throws IllegalArgumentException, IllegalStateException, IOException {
 
 		Log.d(TAG, "Starting to write document");
@@ -101,7 +102,8 @@ public class OpmlWriter {
 		xs.endTag(null, OpmlSymbols.HEAD);
 
 		xs.startTag(null, OpmlSymbols.BODY);
-		for (Subscription feed : feeds) {
+		for (int i = 0; i < feeds.size(); i++) {
+			Subscription feed = feeds.get(i);
 			xs.startTag(null, OpmlSymbols.OUTLINE);
 			xs.attribute(null, OpmlSymbols.TEXT, feed.getTitle());
 			xs.attribute(null, OpmlSymbols.TITLE, feed.getTitle());

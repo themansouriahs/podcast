@@ -3,7 +3,6 @@ package org.bottiger.podcast;
 import org.bottiger.podcast.adapters.SubscriptionAdapter;
 import org.bottiger.podcast.adapters.SubscriptionCursorAdapter;
 import org.bottiger.podcast.model.Library;
-import org.bottiger.podcast.playlist.SubscriptionCursorLoader;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionLoader;
 import org.bottiger.podcast.utils.FragmentUtils;
@@ -240,9 +239,8 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
 
         switch (menuItem.getItemId()) {
             case R.id.unsubscribe:
-                Subscription subscription = SubscriptionLoader.getById(getActivity().getContentResolver(), position); // item.getSubscription(getActivity());
-                //subscription.unsubscribe(getActivity());
-                SoundWaves.getLibraryInstance().unsubscribe(subscription.getURLString());
+                //Subscription subscription = SoundWaves.getLibraryInstance().getSubscription((long)position);
+                //SoundWaves.getLibraryInstance().unsubscribe(subscription.getURLString());
                 return true;
             default:
                 return super.onContextItemSelected(menuItem);

@@ -8,6 +8,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.v4.util.LongSparseArray;
+import android.support.v7.util.SortedList;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
@@ -118,11 +119,10 @@ public class TestUtils {
     }
 
     public static void unsubscribeAll(@NonNull Activity argActivity) {
-        LongSparseArray<ISubscription> list = SubscriptionLoader.asList(argActivity.getContentResolver(), true);
+        SortedList<Subscription> list = SoundWaves.getLibraryInstance().getSubscriptions();
         for(int i = 0; i < list.size(); i++) {
-            long key = list.keyAt(i);
             // get the object by the key.
-            Subscription subscription = (Subscription)list.get(key);
+            Subscription subscription = list.get(i);
             //subscription.unsubscribe(argActivity);
             SoundWaves.getLibraryInstance().unsubscribe(subscription.getURLString());
         }

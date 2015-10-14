@@ -11,6 +11,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.util.LongSparseArray;
+import android.support.v7.util.SortedList;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -275,8 +276,10 @@ public class DialogPlaylistFilters extends DialogFragment {
         //LinearLayout mPlaylistContentLayout = (LinearLayout) view.findViewById(R.id.playlist_content);
         //bindPlaylistFilter(mPlaylistContentLayout);
         mSubscriptions.clear();
-        List<Subscription> list = SubscriptionLoader.allAsList(mContext.getContentResolver());
-        for (Subscription s : list) {
+
+        SortedList<Subscription> list = SoundWaves.getLibraryInstance().getSubscriptions();
+        for (int i = 0; i < list.size(); i++) {
+            Subscription s = list.get(i);
             if (s.getStatus() == Subscription.STATUS_SUBSCRIBED)
                 mSubscriptions.append(s.getId(), s);
         }

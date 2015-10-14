@@ -192,7 +192,7 @@ public class Library {
         return mSubscriptionUrlLUT.get(argUrl);
     }
 
-    public ISubscription getSubscription(@NonNull Long argId) {
+    public Subscription getSubscription(@NonNull Long argId) {
         return mSubscriptionIdLUT.get(argId);
     }
 

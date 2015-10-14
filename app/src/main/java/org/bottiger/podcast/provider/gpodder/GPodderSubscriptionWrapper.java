@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionLoader;
@@ -38,7 +39,7 @@ public class GPodderSubscriptionWrapper {
 
 		Subscription subscription;
 
-		subscription = SubscriptionLoader.getByUrl(contentResolver, url);
+		subscription = SoundWaves.getLibraryInstance().getSubscription(url);
 		if (subscription == null) {
 			if (cachedSubscriptionObject != null)
 				cachedSubscriptionObject.reset();

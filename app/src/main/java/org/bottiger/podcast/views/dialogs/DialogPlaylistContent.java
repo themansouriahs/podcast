@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.LongSparseArray;
+import android.support.v7.util.SortedList;
 import android.util.AttributeSet;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -105,8 +106,9 @@ public class DialogPlaylistContent implements DialogInterface.OnMultiChoiceClick
      */
     public boolean performClick() {
         mSubscriptions.clear();
-        List<Subscription> list = SubscriptionLoader.allAsList(mContext.getContentResolver());
-        for (Subscription s : list) {
+        SortedList<Subscription> list = SoundWaves.getLibraryInstance().getSubscriptions();
+        for (int i = 0; i < list.size(); i++) {
+            Subscription s = list.get(i);
             if (s.getStatus() == Subscription.STATUS_SUBSCRIBED)
                 mSubscriptions.append(s.getId(), s);
         }

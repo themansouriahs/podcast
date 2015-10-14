@@ -9,10 +9,12 @@ import android.content.SyncResult;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.util.LongSparseArray;
+import android.support.v7.util.SortedList;
 import android.util.Log;
 
 import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
@@ -68,17 +70,15 @@ public class CloudSyncAdapter extends AbstractThreadedSyncAdapter {
                 return;
             }
 
-            LongSparseArray<ISubscription> iSubscriptionLongSparseArray =
-                    SubscriptionLoader.asList(getContext().getContentResolver(), true);
+            SortedList<Subscription> iSubscriptionLongSparseArray = SoundWaves.getLibraryInstance().getSubscriptions();
 
             // FIXME Hack to convet types
             LongSparseArray<Subscription> subscriptionLongSparseArray = new LongSparseArray<>(iSubscriptionLongSparseArray.size());
             Subscription value;
             for(int i = 0; i < iSubscriptionLongSparseArray.size(); i++) {
-                long arrayKey = iSubscriptionLongSparseArray.keyAt(i);
-                ISubscription subscription = iSubscriptionLongSparseArray.get(arrayKey);
+                Subscription subscription = iSubscriptionLongSparseArray.get(i);
 
-                subscriptionLongSparseArray.put(arrayKey, (Subscription)subscription);
+                subscriptionLongSparseArray.put(subscription.getId(), subscription);
             }
 
             @GPodderAPI.SynchronizationResult int result = mGPodderAPI.synchronize(getContext(), subscriptionLongSparseArray);

@@ -36,6 +36,7 @@ import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresPermission;
 import android.support.v4.util.LongSparseArray;
+import android.support.v7.util.SortedList;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -113,7 +114,7 @@ public class OPMLImportExport {
 			// Test we if already have the item in out database.
 			// If not we add it.
 			boolean isAlreadySubscribed = false;
-			Subscription subscription = SubscriptionLoader.getByUrl(contentResolver, url);
+			Subscription subscription = SoundWaves.getLibraryInstance().getSubscription(url);
 			if (subscription != null && subscription.status == Subscription.STATUS_SUBSCRIBED) {
 				isAlreadySubscribed = true;
 			}
@@ -234,7 +235,7 @@ public class OPMLImportExport {
         }
 
         OpmlWriter opmlWriter = new OpmlWriter();
-        List<Subscription> subscriptionList = SubscriptionLoader.allAsList(contentResolver);
+        SortedList<Subscription> subscriptionList = SoundWaves.getLibraryInstance().getSubscriptions();
 
         try {
             opmlWriter.writeDocument(subscriptionList, fileWriter);

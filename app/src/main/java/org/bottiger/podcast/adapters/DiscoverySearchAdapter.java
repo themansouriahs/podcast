@@ -6,6 +6,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.LruCache;
@@ -166,10 +167,11 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
     }
 
     private void populateSubscribedUrls() {
-        ContentResolver contentResolver = mActivity.getContentResolver();
-        LinkedList<Subscription> subscriptions = SubscriptionLoader.allAsList(contentResolver);
+        SortedList<Subscription> subscriptionSortedList = SoundWaves.getLibraryInstance().getSubscriptions();
 
-        for (Subscription subscription : subscriptions) {
+        Subscription subscription;
+        for (int i = 0; i < subscriptionSortedList.size(); i++) {
+            subscription = subscriptionSortedList.get(i);
             if (subscription.getStatus() == Subscription.STATUS_SUBSCRIBED) {
                 mSubscribedUrls.add(subscription.getURL());
             }
