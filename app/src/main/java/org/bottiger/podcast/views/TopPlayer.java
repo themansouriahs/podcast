@@ -3,6 +3,7 @@ package org.bottiger.podcast.views;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Build;
 import android.preference.PreferenceManager;
@@ -127,6 +128,8 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
     private PlayerButtonView mRewindButton;
     private PlayerButtonView mSkipNextButton;
 
+    private ImageViewTinted mPhoto;
+
     private PlayerLayoutParameter mLargeLayout = new PlayerLayoutParameter();
 
     private GestureDetectorCompat mGestureDetector;
@@ -223,7 +226,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
     protected void onFinishInflate() {
         super.onFinishInflate();
 
-        mLayout = (TopPlayer) findViewById(R.id.session_photo_container);
+        mLayout = (TopPlayer) findViewById(R.id.top_player);
 
         mPlayerControlsLinearLayout = (PlayerRelativeLayout)findViewById(R.id.expanded_controls);
 
@@ -241,6 +244,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         mFastForwardButton = (PlayerButtonView) findViewById(R.id.fast_forward_button);
         mRewindButton = (PlayerButtonView) findViewById(R.id.rewind_button);
         mSkipNextButton = (PlayerButtonView) findViewById(R.id.skip_to_next_button);
+        mPhoto = (ImageViewTinted) findViewById(R.id.session_photo);
 
         mPlayPauseLargeSize = mPlayPauseButton.getLayoutParams().height;
 
@@ -471,6 +475,24 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         mBackgroundColor = StaticButtonColor(mContext, argChangedPalette, color);
         setBackgroundColor(mBackgroundColor);
         //setBackgroundColor(backgroundExtractor.getPrimary());
+
+        int[][] states = new int[][] {
+        new int[] { android.R.attr.state_enabled}, // enabled
+                new int[] {-android.R.attr.state_enabled}, // disabled
+                new int[] {-android.R.attr.state_checked}, // unchecked
+                new int[] { android.R.attr.state_pressed}  // pressed
+    };
+
+    // Remember to update tintButton() if you change this
+    int[] colors = new int[] {
+            Color.BLACK,
+            Color.BLACK,
+            Color.BLACK,
+            Color.BLACK
+    };
+
+    ColorStateList colorStateList = new ColorStateList(states, colors);
+        //mPhoto.setImageTintList(colorStateList);
 
         /*
         setBackgroundColor(backgroundExtractor.getSecondaryTint());
