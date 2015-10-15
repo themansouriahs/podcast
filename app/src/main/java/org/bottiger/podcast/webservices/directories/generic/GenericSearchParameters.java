@@ -20,7 +20,7 @@ public class GenericSearchParameters implements ISearchParameters {
 
         for (String keyword : keywords) {
             if (!TextUtils.isEmpty(keyword)) {
-                mKeywords.add(argKeyword);
+                mKeywords.add(keyword);
             }
         }
     }
