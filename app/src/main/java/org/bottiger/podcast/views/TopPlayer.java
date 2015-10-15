@@ -308,7 +308,8 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         PlayerService ps = PlayerService.getInstance();
         if (ps != null) {
             SoundWavesPlayer player = ps.getPlayer();
-            mSpeedpButton.setText(player.getCurrentSpeedMultiplier() + "X");
+            float speedMultiplier = player.getCurrentSpeedMultiplier();
+            mSpeedpButton.setText(speedMultiplier + "X");
         }
 
         mSpeedpButton.setOnClickListener(new OnClickListener() {

@@ -112,7 +112,7 @@ public class DialogPlaybackSpeed extends DialogFragment {
                                     setSpeed(playbackSpeedChanged.speed);
 
                                     if (mRadioGlobal.isChecked()) {
-                                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+                                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mActivity);
                                         String key = getResources().getString(R.string.soundwaves_player_playback_speed_key);
                                         int storedSpeed = Math.round(playbackSpeedChanged.speed * 10);
                                         prefs.edit().putInt(key, storedSpeed).apply();
