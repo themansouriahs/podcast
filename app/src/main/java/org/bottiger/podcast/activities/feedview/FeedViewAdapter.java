@@ -67,6 +67,11 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
+    public void setDataset(@NonNull ISubscription argSubscription) {
+        mSubscription = argSubscription;
+        notifyDataSetChanged();
+    }
+
     public @Order int getOrder() {
         return mSortOrder;
     }

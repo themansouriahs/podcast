@@ -25,8 +25,6 @@ import java.util.ArrayList;
  */
 public class FeedViewDiscoveryAdapter extends FeedViewAdapter {
 
-    private ArrayList<SlimEpisode> mEpisodes = new ArrayList<>();
-
     public FeedViewDiscoveryAdapter(@NonNull Activity activity, @NonNull ISubscription argSubscription) {
         super(activity, argSubscription);
     }
@@ -37,28 +35,14 @@ public class FeedViewDiscoveryAdapter extends FeedViewAdapter {
     }
 
     @Override
-    public int getItemCount() {
-        return mEpisodes.size();
-    }
-
-    public void setDataset(@NonNull SortedList<SlimEpisode> argEpisodes) {
-        for (int i = 0; i < argEpisodes.size(); i++) {
-            SlimEpisode episode = argEpisodes.get(i);
-            mEpisodes.add(episode);
-        }
-    }
-
-    @Override
     protected IEpisode getItemForPosition(int argPosition) {
-        return mEpisodes.get(argPosition);
+        return mSubscription.getEpisodes().get(argPosition);
     }
 
     @Override
     protected void bindButtons(@NonNull EpisodeViewHolder episodeViewHolder, @NonNull IEpisode argEpisode) {
 
-        //episodeViewHolder.mDescription.setVisibility(View.VISIBLE);
         episodeViewHolder.DisplayDescription = true;
-        //episodeViewHolder.modifyLayout((RelativeLayout)episodeViewHolder.itemView);
 
         episodeViewHolder.mPlayPauseButton.setEpisode(argEpisode, PlayPauseImageView.DISCOVERY_FEEDVIEW);
         episodeViewHolder.mQueueButton.setEpisode(argEpisode, PlayPauseImageView.DISCOVERY_FEEDVIEW);

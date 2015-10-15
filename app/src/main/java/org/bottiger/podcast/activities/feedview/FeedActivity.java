@@ -3,6 +3,7 @@ package org.bottiger.podcast.activities.feedview;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -10,6 +11,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.graphics.Palette;
@@ -106,6 +109,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
     public static final String EPISODES_SLIM_KEY = "SlimEpisodes";
 
     protected ISubscription mSubscription = null;
+    private static ProgressDialog mProgress;
 
     final MultiShrinkScroller.MultiShrinkScrollerListener mMultiShrinkScrollerListener
             = new MultiShrinkScroller.MultiShrinkScrollerListener() {
@@ -142,6 +146,29 @@ public class FeedActivity extends TopActivity implements PaletteListener {
         }
     };
 
+    IDownloadCompleteCallback mRefreshCompleteCallback = new IDownloadCompleteCallback() {
+        @Override
+        public void complete(boolean argSucces, ISubscription argSubscription) {
+            mProgress.dismiss();
+
+            if (!argSucces)
+                return;
+
+            // FIXME why do I get Subscriptions here?
+            if (argSubscription instanceof Subscription)
+                return;
+
+            final SlimSubscription slimSubscription = (SlimSubscription)argSubscription;
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    mAdapter.setDataset(slimSubscription);
+                }
+            });
+        }
+    };
+
     public static void start(@NonNull Activity argActivity, @NonNull Subscription argSubscription) {
         if (!argSubscription.IsLoaded()) {
             SoundWaves.getLibraryInstance().loadEpisodes(argSubscription);
@@ -163,13 +190,8 @@ public class FeedActivity extends TopActivity implements PaletteListener {
         b.putParcelable(SUBSCRIPTION_SLIM_KEY, argSubscription); // Not required, but nice to have if we already got it
         mFuckItHack = b;
 
-        //intent.putExtra(FEED_ACTIVITY_IS_SLIM, true);
-        //intent.putExtra(FeedActivity.SUBSCRIPTION_URL_KEY, argURL);
-        //intent.putExtra(SUBSCRIPTION_SLIM_KEY, argSubscription); // Not required, but nice to have if we already got it
-        //intent.putExtra(b);
         intent.putExtras(b);
 
-        //startActivity(argActivity, b);
         argActivity.startActivity(intent);
         argActivity.overridePendingTransition(R.anim.slide_in_bottom, R.anim.slide_out_bottom);
     }
@@ -195,14 +217,8 @@ public class FeedActivity extends TopActivity implements PaletteListener {
         processIntent();
 
         if (mSubscription == null) {
-            throw new IllegalStateException("Episode can not be null");
+            throw new IllegalStateException("Subscription can not be null");
         }
-
-        /*
-        if (mSubscription.IsDirty() && mSubscription.getType() == ISubscription.DEFAULT) {
-            ((Subscription)mSubscription).update(this.getContentResolver());
-        }
-        */
 
         // Show QuickContact in front of soft input
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM,
@@ -211,10 +227,12 @@ public class FeedActivity extends TopActivity implements PaletteListener {
         setContentView(R.layout.feed_activity);
 
         if (mIsSlimSubscription) {
+            mProgress = new ProgressDialog(this);
+            mProgress.setMessage(getString(R.string.discovery_progress_loading_podcast_content));
+            mProgress.show();
             FeedViewDiscoveryAdapter adapter = new FeedViewDiscoveryAdapter(this, mSubscription);
-            SlimSubscription slimSubscription = (SlimSubscription)mSubscription;
-            adapter.setDataset(slimSubscription.getEpisodes());
             mAdapter = adapter;
+            SoundWaves.sSubscriptionRefreshManager.refresh(mSubscription, mRefreshCompleteCallback);
         } else {
             mAdapter = new FeedViewAdapter(this, mSubscription);
         }

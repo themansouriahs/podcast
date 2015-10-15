@@ -35,7 +35,7 @@ public class SlimSubscription implements ISubscription, Parcelable {
         mTitle = argTitle;
         mURL = argURL;
         mImageURL = argImageURL;
-        mEpisodes = new SortedList<SlimEpisode>(SlimEpisode.class, null);
+        initEpisodes();
     }
 
     @NonNull
@@ -161,7 +161,7 @@ public class SlimSubscription implements ISubscription, Parcelable {
         out.writeString(mURL.toString());
         //out.writeParcelableArray(episodeArray, PARCELABLE_WRITE_RETURN_VALUE);
         //out.writeTypedList(mEpisodes);
-        out.writeList(episodeArray);
+        //out.writeList(episodeArray);
     }
 
     public static final Parcelable.Creator<SlimSubscription> CREATOR
@@ -176,6 +176,7 @@ public class SlimSubscription implements ISubscription, Parcelable {
     };
 
     private SlimSubscription(Parcel in) {
+        initEpisodes();
         mTitle = in.readString();
         mImageURL = in.readString();
         try {
@@ -183,14 +184,54 @@ public class SlimSubscription implements ISubscription, Parcelable {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-        //SlimEpisode[] episodeArray = (SlimEpisode[])in.readArray(SlimEpisode.class.getClassLoader());
-        //mEpisodes = new ArrayList( Arrays.asList(episodeArray) );
+
+        /*
         ArrayList<SlimEpisode> episodeArray = in.readArrayList(SlimEpisode.class.getClassLoader());
 
         mEpisodes.clear();
         for (int i = 0; i < episodeArray.size(); i++) {
             mEpisodes.add(episodeArray.get(i));
         }
+        */
 
+    }
+
+    private void initEpisodes() {
+        mEpisodes = new SortedList<>(SlimEpisode.class, new SortedList.Callback<SlimEpisode>() {
+            @Override
+            public int compare(SlimEpisode o1, SlimEpisode o2) {
+                return 0;
+            }
+
+            @Override
+            public void onInserted(int position, int count) {
+
+            }
+
+            @Override
+            public void onRemoved(int position, int count) {
+
+            }
+
+            @Override
+            public void onMoved(int fromPosition, int toPosition) {
+
+            }
+
+            @Override
+            public void onChanged(int position, int count) {
+
+            }
+
+            @Override
+            public boolean areContentsTheSame(SlimEpisode oldItem, SlimEpisode newItem) {
+                return false;
+            }
+
+            @Override
+            public boolean areItemsTheSame(SlimEpisode item1, SlimEpisode item2) {
+                return false;
+            }
+        });
     }
 }

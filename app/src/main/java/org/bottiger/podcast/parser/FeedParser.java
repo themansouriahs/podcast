@@ -257,7 +257,7 @@ public class FeedParser {
     // to their respective "read" methods for processing. Otherwise, skips the tag.
     private IEpisode readEpisode(XmlPullParser parser, @NonNull ISubscription argSubscription) throws XmlPullParserException, IOException {
         parser.require(XmlPullParser.START_TAG, ns, EPISODE_ITEM_TAG);
-        FeedItem episode = new FeedItem();
+        FeedItem episode = new FeedItem(true);
         if (argSubscription instanceof Subscription) {
             episode.setFeed((Subscription)argSubscription);
         }
@@ -332,6 +332,7 @@ public class FeedParser {
             }
         }
 
+        episode.setIsParsing(false);
         return episode;
     }
 

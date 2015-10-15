@@ -46,34 +46,12 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
     private int mDefaultBackgroundColor = 0;
     private ArrayList<ISubscription> mDataset = new ArrayList<>();
     private HashSet<URL> mSubscribedUrls = new HashSet<>();
-    private LruCache<String,SlimSubscription> mCache = new LruCache<>(10);
-
-    private static ProgressDialog mProgress;
-
-    IDownloadCompleteCallback mRefreshCompleteCallback = new IDownloadCompleteCallback() {
-        @Override
-        public void complete(boolean argSucces, ISubscription argSubscription) {
-            mProgress.dismiss();
-
-            if (!argSucces)
-                return;
-
-            // FIXME why do I get Subscriptions here?
-            if (argSubscription instanceof Subscription)
-                return;
-
-            SlimSubscription slimSubscription = (SlimSubscription)argSubscription;
-            FeedActivity.startSlim(mActivity, slimSubscription.getURLString(), slimSubscription);
-        }
-    };
 
     public DiscoverySearchAdapter(@NonNull Activity argActivity) {
         mActivity = argActivity;
         mInflater = (LayoutInflater) mActivity
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mDefaultBackgroundColor = mActivity.getResources().getColor(R.color.colorPrimary);
-
-        mProgress = new ProgressDialog(mActivity);
 
         populateSubscribedUrls();
     }
@@ -111,9 +89,7 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
                     Subscription localsubscription = SoundWaves.getLibraryInstance().getSubscription(subscription.getURLString());
                     FeedActivity.start(mActivity, localsubscription);
                 } else {
-                    mProgress.setMessage(mActivity.getString(R.string.discovery_progress_loading_podcast_content));
-                    mProgress.show();
-                    SoundWaves.sSubscriptionRefreshManager.refresh(subscription, mRefreshCompleteCallback);
+                    FeedActivity.startSlim(mActivity, subscription.getURLString(), (SlimSubscription)subscription);
                 }
             }
         });
@@ -203,12 +179,10 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
     }
 
     private void subscribe(@NonNull Subscription argSubscription) {
-        //argSubscription.subscribe(mActivity);
         SoundWaves.getLibraryInstance().subscribe(argSubscription.getURLString());
     }
 
     private void unsubscribe(@NonNull Subscription argSubscription) {
-        //argSubscription.unsubscribe(mActivity);
         SoundWaves.getLibraryInstance().unsubscribe(argSubscription.getURLString());
     }
 }

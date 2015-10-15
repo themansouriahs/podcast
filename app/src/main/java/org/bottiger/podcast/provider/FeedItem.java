@@ -237,7 +237,14 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	private int iterWithoutChange = 0;
 	private int lastProgress = -1;
 
+	private boolean mIsParsing = false;
+
 	public FeedItem() {
+		reset();
+	}
+
+	public FeedItem(boolean isParsing) {
+		mIsParsing = isParsing;
 		reset();
 	}
 
@@ -531,6 +538,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	
 	public void setURL(String argUrl) {
 		if (url != null && url.equals(argUrl))
+			return;
 
 		url = argUrl;
 		notifyPropertyChanged();
@@ -988,7 +996,15 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
         return BitMaskUtils.IsBitSet(status, setting);
     }
 
+	public void setIsParsing(boolean argIsParsing) {
+		mIsParsing = argIsParsing;
+
+		if (!mIsParsing)
+			notifyPropertyChanged();
+	}
+
 	private void notifyPropertyChanged() {
-		SoundWaves.getRxBus().send(new EpisodeChanged(getId(), EpisodeChanged.CHANGED));
+		if (!mIsParsing)
+			SoundWaves.getRxBus().send(new EpisodeChanged(getId(), EpisodeChanged.CHANGED));
 	}
 }

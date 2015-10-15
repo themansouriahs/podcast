@@ -243,7 +243,11 @@ public class Library {
         if (argSubscription == null)
             return false;
 
-        return mSubscriptionUrlLUT.containsKey(argSubscription.getURLString());
+        ISubscription subscription = mSubscriptionUrlLUT.get(argSubscription.getURLString());
+        if (subscription == null)
+            return false;
+
+        return subscription.IsSubscribed();
     }
 
     public boolean containsEpisode(@Nullable IEpisode argEpisode) {
