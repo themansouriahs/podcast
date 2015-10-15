@@ -355,7 +355,9 @@ public class Subscription implements ISubscription, PaletteListener {
 			return;
 
 		mIsRefreshing = argIsRefreshing;
-		notifyPropertyChanged();
+
+		if (!mIsRefreshing)
+			notifyPropertyChanged();
 	}
 
 	@Override
@@ -593,7 +595,8 @@ public class Subscription implements ISubscription, PaletteListener {
 	}
 
 	private void notifyPropertyChanged() {
-		SoundWaves.getRxBus().send(new SubscriptionChanged(getId(), SubscriptionChanged.CHANGED));
+		if (!mIsRefreshing)
+			SoundWaves.getRxBus().send(new SubscriptionChanged(getId(), SubscriptionChanged.CHANGED));
 	}
 
 }
