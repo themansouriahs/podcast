@@ -1001,12 +1001,19 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 		mIsParsing = argIsParsing;
 
 		if (!mIsParsing)
-			notifyPropertyChanged();
+			notifyPropertyChanged(EpisodeChanged.PARSED);
 	}
 
+	private void notifyPropertyChanged(@EpisodeChanged.Action int argAction) {
+		if (!mIsParsing) {
+			SoundWaves.getRxBus().send(new EpisodeChanged(getId(), getURL(), argAction));
+		}
+	}
+
+	@Deprecated
 	private void notifyPropertyChanged() {
 		if (!mIsParsing) {
-			SoundWaves.getRxBus().send(new EpisodeChanged(getId(), EpisodeChanged.CHANGED));
+			SoundWaves.getRxBus().send(new EpisodeChanged(getId(), getURL(), EpisodeChanged.CHANGED));
 		}
 	}
 }

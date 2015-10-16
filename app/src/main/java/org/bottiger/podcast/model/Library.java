@@ -124,12 +124,14 @@ public class Library {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<EpisodeChanged>() {
                     @Override
-                    public void call(EpisodeChanged event) {
-                        //if (event instanceof EpisodeChanged) {
-                            EpisodeChanged episodeChanged = (EpisodeChanged) event;
-                            IEpisode episode = getEpisode(episodeChanged.getId());
-                            updateEpisode(episode);
-                        //}
+                    public void call(EpisodeChanged episodeChanged) {
+                        if (episodeChanged.getAction() == EpisodeChanged.PARSED) {
+                            if (mEpisodesUrlLUT.containsKey(episodeChanged.getUrl()))
+                                return;
+                        }
+
+                        IEpisode episode = getEpisode(episodeChanged.getId());
+                        updateEpisode(episode);
                         return;
                     }
                 });
