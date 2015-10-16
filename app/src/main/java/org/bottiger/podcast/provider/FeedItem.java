@@ -11,6 +11,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.listeners.DownloadProgressPublisher;
@@ -36,6 +37,8 @@ import android.support.v4.util.LruCache;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.util.Log;
+
+import rx.functions.Action1;
 
 public class FeedItem implements IEpisode, Comparable<FeedItem> {
 
@@ -1005,6 +1008,11 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 
 	private void notifyPropertyChanged() {
 		if (!mIsParsing)
-			SoundWaves.getRxBus().send(new EpisodeChanged(getId(), EpisodeChanged.CHANGED));
+			SoundWaves.getRxBus().toObserverable().sample(1, TimeUnit.SECONDS).doOnNext(new Action1<Object>() {
+				@Override
+				public void call(Object o) {
+					new EpisodeChanged(getId(), EpisodeChanged.CHANGED);
+				}
+			});
 	}
 }

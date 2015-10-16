@@ -6,11 +6,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.concurrent.TimeUnit;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PaletteListener;
+import org.bottiger.podcast.model.EpisodeChanged;
 import org.bottiger.podcast.model.SubscriptionChanged;
 import org.bottiger.podcast.utils.BitMaskUtils;
 import org.bottiger.podcast.utils.ColorExtractor;
@@ -31,6 +33,8 @@ import android.text.TextUtils;
 import android.util.Patterns;
 
 import javax.annotation.Nullable;
+
+import rx.functions.Action1;
 
 public class Subscription implements ISubscription, PaletteListener {
 
@@ -596,7 +600,12 @@ public class Subscription implements ISubscription, PaletteListener {
 
 	private void notifyPropertyChanged() {
 		if (!mIsRefreshing)
-			SoundWaves.getRxBus().send(new SubscriptionChanged(getId(), SubscriptionChanged.CHANGED));
+			SoundWaves.getRxBus().toObserverable().sample(1, TimeUnit.SECONDS).doOnNext(new Action1<Object>() {
+				@Override
+				public void call(Object o) {
+					new SubscriptionChanged(getId(), SubscriptionChanged.CHANGED);
+				}
+			});
 	}
 
 }
