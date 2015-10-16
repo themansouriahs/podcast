@@ -428,7 +428,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         mEpisodeTitle.setText(item.getTitle());
         mEpisodeInfo.setText(item.getDescription());
 
-        final int color = ContextCompat.getColor(getContext(), R.color.white_opaque);
+        final int color = ContextCompat.getColor(getContext(), R.color.pitch_black);
         mEpisodeTitle.setTextColor(color);
         mEpisodeInfo.setTextColor(color);
 
@@ -534,7 +534,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
                 @Override
                 public String getPaletteUrl() {
-                    return item.getArtwork(activity);
+                    return item.getArtwork();
                 }
             });
         }
@@ -543,7 +543,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         if (item != null && artworkUrl != null) {
             Log.v("MissingImage", "Setting image");
             BlurTransformation blur = new BlurTransformation(getContext(), 25);
-            //ImageLoaderUtils.loadImageInto(mPhoto, artworkUrl, blur, false, false);
+            ImageLoaderUtils.loadImageInto(mPhoto, artworkUrl, null, false, false);
         }
 
         if (mTopPlayer.getVisibleHeight() == 0) {

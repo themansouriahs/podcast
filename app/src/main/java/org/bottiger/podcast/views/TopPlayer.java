@@ -29,9 +29,11 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.view.ViewParent;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -62,7 +64,7 @@ import static org.bottiger.podcast.views.PlayerButtonView.StaticButtonColor;
 /**
  * Created by apl on 30-09-2014.
  */
-public class TopPlayer extends RelativeLayout implements PaletteListener, ScrollingView, NestedScrollingChild {
+public class TopPlayer extends LinearLayout implements PaletteListener, ScrollingView, NestedScrollingChild {
 
     private static final String TAG = "TopPlayer";
 
@@ -98,6 +100,9 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
     private int mTextInfoFadeDistance           =   100; // dp
     private int mTextFadeDistance               =   20; // dp
 
+    private int mControlWidth = -1;
+    private int mControlHeight = -1;
+
     private float screenHeight;
 
     private String mDoFullscreentKey;
@@ -112,6 +117,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
     private float mCenterSquareMargin = -1;
 
     private TopPlayer mLayout;
+    private LinearLayout mControls;
     private ImageButton mExpandEpisode;
     private View mGradient;
     private View mEpisodeText;
@@ -227,8 +233,10 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         super.onFinishInflate();
 
         mLayout = (TopPlayer) findViewById(R.id.top_player);
-
+        mControls = (LinearLayout) findViewById(R.id.top_player_controls);
         mPlayerControlsLinearLayout = (PlayerRelativeLayout)findViewById(R.id.expanded_controls);
+
+        getPlayerControlHeight(mControls);
 
         mPlayPauseButton = (PlayPauseImageView) findViewById(R.id.play_pause_button);
         mExpandEpisode = (ImageButton)findViewById(R.id.episode_expand);
@@ -391,10 +399,10 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
             return -1;
         }
 
-        Log.v("TopPlayer", "setPlayerHeight: " +  argScreenHeight);
+        Log.v("TopPlayer", "setPlayerHeight: " + argScreenHeight);
+
 
         screenHeight = argScreenHeight;
-        float argOffset = argScreenHeight-sizeLarge;
 
         setBackgroundVisibility(screenHeight);
 
@@ -406,7 +414,14 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         lp.height = (int)minMaxScreenHeight;
         setLayoutParams(lp);
 
+        float controlTransY = minMaxScreenHeight-mControlHeight;
+        Log.v("TopPlayer", "controlTransY: " +  controlTransY);
+        if (controlTransY >= 0)
+            controlTransY = 0;
+        mControls.setTranslationY(controlTransY);
+
         return minMaxScreenHeight;
+
     }
 
     public float setBackgroundVisibility(float argTopPlayerHeight) {
@@ -473,7 +488,7 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         ColorExtractor backgroundExtractor = new ColorExtractor(argChangedPalette, ColorUtils.getBackgroundColor(getContext()));
         int color = ColorUtils.getBackgroundColor(getContext());
         mBackgroundColor = StaticButtonColor(mContext, argChangedPalette, color);
-        setBackgroundColor(mBackgroundColor);
+        //setBackgroundColor(mBackgroundColor);
         //setBackgroundColor(backgroundExtractor.getPrimary());
 
         int[][] states = new int[][] {
@@ -546,6 +561,22 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         mEpisodeText.animate().alpha(argAlphaEnd);
         mEpisodeInfo.animate().alpha(argAlphaEnd);
         mGradient.animate().alpha(argAlphaEnd);
+    }
+
+
+    private void getPlayerControlHeight(@NonNull final View argView) {
+        ViewTreeObserver viewTreeObserver = argView.getViewTreeObserver();
+        if (viewTreeObserver.isAlive()) {
+            viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    UIUtils.removeOnGlobalLayoutListener(argView, this);
+                    mControlWidth = argView.getWidth();
+                    mControlHeight = argView.getHeight();
+                    argView.getLayoutParams().height = mControlHeight;
+                }
+            });
+        }
     }
 
     public @ColorInt int getBackGroundColor() {
