@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.Xml;
 
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
@@ -146,7 +147,8 @@ public class FeedParser {
                 subscription = readChannel(parser, subscription);
             }
             else if (name.equals(EPISODE_ITEM_TAG)) {
-                subscription.addEpisode(readEpisode(parser, subscription));
+                //subscription.addEpisode(readEpisode(parser, subscription));
+                SoundWaves.getLibraryInstance().addEpisode(readEpisode(parser, subscription));
             } else {
                 skip(parser);
             }
@@ -207,7 +209,8 @@ public class FeedParser {
                 }
                 case EPISODE_ITEM_TAG: {
                     IEpisode episode = readEpisode(parser, argSubscription);
-                    argSubscription.addEpisode(episode);
+                    //argSubscription.addEpisode(episode);
+                    SoundWaves.getLibraryInstance().addEpisode(episode);
                     break;
                 }
                 case SUBSCRIPTION_IMAGE_TAG: {

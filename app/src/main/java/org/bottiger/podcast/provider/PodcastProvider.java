@@ -189,25 +189,15 @@ public class PodcastProvider extends ContentProvider {
 		case TYPE_ALL_ITEMS:
 
 			try {
-				/**
-				 * FIXME Hardcode UNIQUE URL
-				 */
-				String url = initialValues.getAsString(ItemColumns.URL);
-				FeedItem testItem = SoundWaves.getLibraryInstance().getEpisode(url);
-				if (testItem != null) {
-					throw new Exception("Duplicate URL for FeedItem");
-				} else {
-
-					values = ItemColumns.checkValues(initialValues, uri);
-					id = db.insertOrThrow(ItemColumns.TABLE_NAME,
-							ItemColumns.RESOURCE, values);
-					if (id > 0) {
-						newUri = ContentUris
-								.withAppendedId(ItemColumns.URI, id);
-						getContext().getContentResolver().notifyChange(newUri,
-								null);
-						return newUri;
-					}
+				values = ItemColumns.checkValues(initialValues, uri);
+				id = db.insertOrThrow(ItemColumns.TABLE_NAME,
+						ItemColumns.RESOURCE, values);
+				if (id > 0) {
+					newUri = ContentUris
+							.withAppendedId(ItemColumns.URI, id);
+					getContext().getContentResolver().notifyChange(newUri,
+							null);
+					return newUri;
 				}
 			} catch (Exception e) {
 				log.warn("Failed to insert item into", e);

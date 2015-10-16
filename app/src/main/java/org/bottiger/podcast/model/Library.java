@@ -28,6 +28,7 @@ import org.bottiger.podcast.utils.rxbus.RxBusSimpleEvents;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import rx.Observable;
@@ -133,18 +134,31 @@ public class Library {
                 });
     }
 
-    public void addEpisode(FeedItem argEpisode) {
+    public void addEpisode(IEpisode argEpisode) {
         mLock.lock();
+        FeedItem item = null;
+        if (argEpisode instanceof FeedItem)
+            item = (FeedItem)argEpisode;
+
+        if (item == null)
+            return;
+
         try {
             if (argEpisode == null)
                 return;
 
-            if (mEpisodesUrlLUT.containsKey(argEpisode.getURL()))
+            if (mEpisodesUrlLUT.containsKey(item.getURL()))
                 return;
 
             mEpisodes.add(argEpisode);
-            mEpisodesUrlLUT.put(argEpisode.getURL(), argEpisode);
-            mEpisodesIdLUT.put(argEpisode.getId(), argEpisode);
+            mEpisodesUrlLUT.put(item.getURL(), item);
+            mEpisodesIdLUT.put(item.getId(), item);
+
+            Subscription subscription = item.getSubscription();
+            if (subscription != null) {
+                subscription.addEpisode(item);
+            }
+
         } finally {
             mLock.unlock();
         }
@@ -488,7 +502,13 @@ public class Library {
         return s1.getTitle().compareTo(s2.getTitle());
     }
 
-    private void notifySubscriptionChanged(long argId, @SubscriptionChanged.Action int argAction) {
-        SoundWaves.getRxBus().send(new SubscriptionChanged(argId, argAction));
+    private void notifySubscriptionChanged(final long argId, @SubscriptionChanged.Action final int argAction) {
+        //SoundWaves.getRxBus().send(new SubscriptionChanged(argId, argAction));
+        SoundWaves.getRxBus().toObserverable().sample(1, TimeUnit.SECONDS).doOnNext(new Action1<Object>() {
+            @Override
+            public void call(Object o) {
+                new SubscriptionChanged(argId, argAction);
+            }
+        });
     }
 }

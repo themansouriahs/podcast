@@ -201,6 +201,8 @@ public class Subscription implements ISubscription, PaletteListener {
 	}
 
 	public void addEpisode(@NonNull IEpisode argEpisode) {
+		//SoundWaves.getLibraryInstance().addEpisode((FeedItem) argEpisode);
+
 		mEpisodes.add(argEpisode);
 	}
 
@@ -600,12 +602,7 @@ public class Subscription implements ISubscription, PaletteListener {
 
 	private void notifyPropertyChanged() {
 		if (!mIsRefreshing)
-			SoundWaves.getRxBus().toObserverable().sample(1, TimeUnit.SECONDS).doOnNext(new Action1<Object>() {
-				@Override
-				public void call(Object o) {
-					new SubscriptionChanged(getId(), SubscriptionChanged.CHANGED);
-				}
-			});
+			SoundWaves.getRxBus().send(new SubscriptionChanged(getId(), SubscriptionChanged.CHANGED));
 	}
 
 }

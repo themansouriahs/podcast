@@ -11,8 +11,6 @@ import android.provider.BaseColumns;
 public class ItemColumns implements BaseColumns {
 
 	public static final int ITEM_STATUS_UNREAD = 0;
-
-	public static final int ITEM_STATUS_MAX_DOWNLOADING_VIEW = 30;
 	public static final int ITEM_STATUS_NO_PLAY = 50;
 
 	// KEEP status has been replaced by the KEEP database column starting in DB
@@ -21,7 +19,6 @@ public class ItemColumns implements BaseColumns {
 	// are all in this file.
 	private static final int ITEM_STATUS_KEEP = 63;
 	public static final int ITEM_STATUS_PLAYED = 66;
-	public static final int ITEM_STATUS_MAX_PLAYLIST_VIEW = 100;
 
 	public static final Uri URI = Uri.parse("content://"
 			+ PodcastProvider.AUTHORITY + "/items");
@@ -146,103 +143,105 @@ public class ItemColumns implements BaseColumns {
 			+ LAST_UPDATE + ");";
 
 	public static ContentValues checkValues(ContentValues values, Uri uri) {
-		if (values.containsKey(SUBS_ID) == false) {
+		if (!values.containsKey(SUBS_ID)) {
 			throw new SQLException(
 					"Fail to insert row because SUBS_ID is needed " + uri);
 		}
 
-		if (values.containsKey(URL) == false) {
+		if (!values.containsKey(URL)) {
 			values.put(URL, "");
 		}
 
-		if (values.containsKey(TITLE) == false) {
+		if (!values.containsKey(TITLE)) {
 			values.put(TITLE, "unknow");
 		}
 
-		if (values.containsKey(REMOTE_ID) == false) {
+		if (!values.containsKey(REMOTE_ID)) {
 			values.put(REMOTE_ID, "");
 		}
 
-		if (values.containsKey(AUTHOR) == false) {
+		if (!values.containsKey(AUTHOR)) {
 			values.put(AUTHOR, "");
 		}
 
-		Long now = Long.valueOf(System.currentTimeMillis());
+		Long now = System.currentTimeMillis();
 
-		if (values.containsKey(LAST_UPDATE) == false) {
+		if (!values.containsKey(LAST_UPDATE)) {
 			values.put(LAST_UPDATE, now);
 		}
 
-		if (values.containsKey(DATE) == false) {
+		if (!values.containsKey(DATE)) {
 			SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
 			Date currentTime = new Date();
 			values.put(DATE, formatter.format(currentTime));
 		}
 
-		if (values.containsKey(CONTENT) == false) {
+		if (!values.containsKey(CONTENT)) {
 			values.put(CONTENT, "");
 		}
 
-		if (values.containsKey(STATUS) == false) {
+		if (!values.containsKey(STATUS)) {
 			values.put(STATUS, ITEM_STATUS_UNREAD);
 		}
 
-		if (values.containsKey(RESOURCE) == false) {
+		/*
+		if (!values.containsKey(RESOURCE)) {
 			throw new SQLException(
 					"Fail to insert row because RESOURCE is needed " + uri);
 		}
+		*/
 
-		if (values.containsKey(DURATION) == false) {
+		if (!values.containsKey(DURATION)) {
 			values.put(DURATION, "");
 		}
 
-		if (values.containsKey(FILESIZE) == false) {
+		if (!values.containsKey(FILESIZE)) {
 			values.put(FILESIZE, "");
 		}
 
-		if (values.containsKey(CHUNK_FILESIZE) == false) {
+		if (!values.containsKey(CHUNK_FILESIZE)) {
 			values.put(CHUNK_FILESIZE, "");
 		}
 
-		if (values.containsKey(IMAGE_URL) == false) {
+		if (!values.containsKey(IMAGE_URL)) {
 			values.put(IMAGE_URL, "");
 		}
 
-		if (values.containsKey(LENGTH) == false) {
+		if (!values.containsKey(LENGTH)) {
 			values.put(LENGTH, 0);
 		}
 
-		if (values.containsKey(OFFSET) == false) {
+		if (!values.containsKey(OFFSET)) {
 			values.put(OFFSET, 0);
 		}
 
-		if (values.containsKey(PATHNAME) == false) {
+		if (!values.containsKey(PATHNAME)) {
 			values.put(PATHNAME, "");
 		}
 
-		if (values.containsKey(FAIL_COUNT) == false) {
+		if (!values.containsKey(FAIL_COUNT)) {
 			values.put(FAIL_COUNT, 0);
 		}
 
-		if (values.containsKey(MEDIA_URI) == false) {
+		if (!values.containsKey(MEDIA_URI)) {
 			values.put(MEDIA_URI, "");
 		}
 
-		if (values.containsKey(SUB_TITLE) == false) {
+		if (!values.containsKey(SUB_TITLE)) {
 			values.put(SUB_TITLE, "");
 		}
 
-		if (values.containsKey(CREATED) == false) {
+		if (!values.containsKey(CREATED)) {
 			values.put(CREATED, now);
 		}
-		if (values.containsKey(TYPE) == false) {
+		if (!values.containsKey(TYPE)) {
 			values.put(TYPE, "");
 		}
-		if (values.containsKey(LISTENED) == false) {
+		if (!values.containsKey(LISTENED)) {
 			values.put(LISTENED, 0);
 		}
 
-		if (values.containsKey(PRIORITY) == false) {
+		if (!values.containsKey(PRIORITY)) {
 			values.put(PRIORITY, 0);
 		}
 		return values;

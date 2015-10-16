@@ -711,14 +711,12 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	@Nullable
 	public Subscription getSubscription() {
 		return SoundWaves.getLibraryInstance().getSubscription(sub_id);
-		//return SubscriptionLoader.getById(argContext.getContentResolver(), sub_id);
 	}
 
 	@Nullable
 	@Deprecated
     public Subscription getSubscription(@NonNull Context argContext) {
 		return SoundWaves.getLibraryInstance().getSubscription(sub_id);
-        //return SubscriptionLoader.getById(argContext.getContentResolver(), sub_id);
     }
 
     @Override
@@ -1007,12 +1005,8 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	}
 
 	private void notifyPropertyChanged() {
-		if (!mIsParsing)
-			SoundWaves.getRxBus().toObserverable().sample(1, TimeUnit.SECONDS).doOnNext(new Action1<Object>() {
-				@Override
-				public void call(Object o) {
-					new EpisodeChanged(getId(), EpisodeChanged.CHANGED);
-				}
-			});
+		if (!mIsParsing) {
+			SoundWaves.getRxBus().send(new EpisodeChanged(getId(), EpisodeChanged.CHANGED));
+		}
 	}
 }

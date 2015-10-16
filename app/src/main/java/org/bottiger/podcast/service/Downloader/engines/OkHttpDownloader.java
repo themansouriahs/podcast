@@ -15,11 +15,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
+import org.bottiger.podcast.utils.StrUtils;
 
 /**
  * Created by apl on 17-09-2014.
@@ -48,10 +50,16 @@ public class OkHttpDownloader extends DownloadEngineBase {
     @Override
     public void startDownload() {
         mProgress = 0;
-        mConnection = new OkUrlFactory(mOkHttpClient).open(mURL);
         Thread downloadingThread = new Thread() {
             public void run() {
                 try {
+                    if (mURL == null || !StrUtils.isValidUrl(mURL.toString())) {
+                        onFailure(new MalformedURLException());
+                        return;
+                    }
+
+                    mConnection = new OkUrlFactory(mOkHttpClient).open(mURL);
+
                     if (mEpisode instanceof FeedItem) {
                         FeedItem episode = (FeedItem) mEpisode;
 
@@ -99,9 +107,9 @@ public class OkHttpDownloader extends DownloadEngineBase {
                         }
                     }
 
-                }catch(IOException e){
+                } catch (IOException e){
                     onFailure(e);
-                }finally{
+                } finally{
                     mConnection.disconnect();
                 }
             }
