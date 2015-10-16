@@ -39,23 +39,25 @@ public class ImageLoaderUtils {
                                      @Nullable String argUrl,
                                      boolean argUsePlaceholder,
                                      boolean argRoundedCorners) {
-        loadImageUsingGlide(argImageView, argUrl, null, argUsePlaceholder, argRoundedCorners);
+        loadImageUsingGlide(argImageView, argUrl, null, true, argUsePlaceholder, argRoundedCorners);
     }
 
     public static void loadImageInto(@NonNull View argImageView,
                                      @Nullable String argUrl,
                                      @Nullable Transformation argTransformation,
+                                     boolean argDoCrop,
                                      boolean argUsePlaceholder,
                                      boolean argRoundedCorners) {
         if (argUrl == null)
             return;
 
-        loadImageUsingGlide(argImageView, argUrl, argTransformation, argUsePlaceholder, argRoundedCorners);
+        loadImageUsingGlide(argImageView, argUrl, argTransformation, argDoCrop, argUsePlaceholder, argRoundedCorners);
     }
 
     private static void loadImageUsingGlide(final @NonNull View argTargetView,
                                             @Nullable String argUrl,
                                             @Nullable Transformation argTransformation,
+                                            boolean argDoCrop,
                                             boolean argUsePlaceholder,
                                             final boolean argRounddedCorners) {
         sContext = argTargetView.getContext();
@@ -77,7 +79,12 @@ public class ImageLoaderUtils {
             return;
         }
 
-        BitmapRequestBuilder builder = request.asBitmap().centerCrop();
+        BitmapRequestBuilder builder = request.asBitmap();
+
+        if (argDoCrop)
+            builder.centerCrop();
+        else
+            builder.fitCenter();
 
         if (argUsePlaceholder) {
             builder.placeholder(R.drawable.generic_podcast);

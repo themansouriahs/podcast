@@ -425,7 +425,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
     }
 
     public float setBackgroundVisibility(float argTopPlayerHeight) {
-        return setGenericVisibility(mImageContainer, getMaximumSize(), 300, argTopPlayerHeight);
+        return setGenericVisibility(mPhoto, getMaximumSize(), 300, argTopPlayerHeight);
     }
 
     public float setGenericVisibility(@NonNull View argView, int argVisibleHeight, int argFadeDistance, float argTopPlayerHeight) {
@@ -489,7 +489,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         int color = ColorUtils.getBackgroundColor(getContext());
         mBackgroundColor = StaticButtonColor(mContext, argChangedPalette, color);
         //setBackgroundColor(mBackgroundColor);
-        //setBackgroundColor(backgroundExtractor.getPrimary());
+        setBackgroundColor(argChangedPalette.getLightVibrantColor(ColorUtils.getBackgroundColor(getContext())));
 
         int[][] states = new int[][] {
         new int[] { android.R.attr.state_enabled}, // enabled

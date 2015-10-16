@@ -103,10 +103,10 @@ public class ColorExtractor {
 
         // Remember to update tintButton() if you change this
         int[] colors = new int[] {
-                getPrimary(),
-                getPrimary(),
-                getPrimary(),
-                getPrimary()
+                getSecondaryTint(),
+                getSecondaryTint(),
+                getSecondaryTint(),
+                getSecondaryTint()
         };
 
         mColorStateList = new ColorStateList(states, colors);
@@ -140,7 +140,7 @@ public class ColorExtractor {
     }
 
     private void loadSecondaryTintColor(@Nullable Palette argPalette) {
-        Palette.Swatch swatch = argPalette != null ? argPalette.getLightMutedSwatch() : null;
+        Palette.Swatch swatch = argPalette != null ? argPalette.getLightVibrantSwatch() : null;
         mSecondaryTint = getColor(swatch, R.color.colorAccent);
     }
 

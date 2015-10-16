@@ -543,7 +543,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         if (item != null && artworkUrl != null) {
             Log.v("MissingImage", "Setting image");
             BlurTransformation blur = new BlurTransformation(getContext(), 25);
-            ImageLoaderUtils.loadImageInto(mPhoto, artworkUrl, null, false, false);
+            ImageLoaderUtils.loadImageInto(mPhoto, artworkUrl, null, false, false, false);
         }
 
         if (mTopPlayer.getVisibleHeight() == 0) {
