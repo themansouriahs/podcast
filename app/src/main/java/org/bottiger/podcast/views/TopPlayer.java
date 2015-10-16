@@ -50,6 +50,7 @@ import org.bottiger.podcast.views.dialogs.DialogPlaybackSpeed;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.concurrent.TimeUnit;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -327,15 +328,16 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         super.onAttachedToWindow();
 
         SoundWaves.getRxBus().toObserverable()
+                .ofType(RxBusSimpleEvents.PlaybackSpeedChanged.class)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<Object>() {
+                .subscribe(new Action1<RxBusSimpleEvents.PlaybackSpeedChanged>() {
                     @Override
-                    public void call(Object event) {
-                        if (event instanceof RxBusSimpleEvents.PlaybackSpeedChanged) {
+                    public void call(RxBusSimpleEvents.PlaybackSpeedChanged event) {
+                        //if (event instanceof RxBusSimpleEvents.PlaybackSpeedChanged) {
                             RxBusSimpleEvents.PlaybackSpeedChanged playbackSpeedChanged = (RxBusSimpleEvents.PlaybackSpeedChanged) event;
                             mSpeedpButton.setText(playbackSpeedChanged.speed + "X");
-                        }
+                        //}
                     }
                 });
     }

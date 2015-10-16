@@ -43,6 +43,8 @@ import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.rxbus.RxBusSimpleEvents;
 
+import java.util.concurrent.TimeUnit;
+
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
@@ -73,21 +75,22 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
         mLibrary = argLibrary;
 
         SoundWaves.getRxBus().toObserverable()
+                .ofType(SubscriptionChanged.class)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<Object>() {
+                .subscribe(new Action1<SubscriptionChanged>() {
                     @Override
-                    public void call(Object event) {
-                        if (event instanceof SubscriptionChanged) {
-                            SubscriptionChanged subscriptionChanged = (SubscriptionChanged) event;
-                            if (subscriptionChanged.getAction() == SubscriptionChanged.ADDED) {
-                                notifyDataSetChanged();
-                            }
-
-                            if (subscriptionChanged.getAction() == SubscriptionChanged.REMOVED) {
-                                notifyDataSetChanged();
-                            }
+                    public void call(SubscriptionChanged event) {
+                        //if (event instanceof SubscriptionChanged) {
+                        SubscriptionChanged subscriptionChanged = (SubscriptionChanged) event;
+                        if (subscriptionChanged.getAction() == SubscriptionChanged.ADDED) {
+                            notifyDataSetChanged();
                         }
+
+                        if (subscriptionChanged.getAction() == SubscriptionChanged.REMOVED) {
+                            notifyDataSetChanged();
+                        }
+                        //}
                     }
                 });
     }

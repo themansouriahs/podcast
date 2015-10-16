@@ -119,16 +119,17 @@ public class Library {
         loadSubscriptions();
 
         SoundWaves.getRxBus().toObserverable()
+                .ofType(EpisodeChanged.class)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<Object>() {
+                .subscribe(new Action1<EpisodeChanged>() {
                     @Override
-                    public void call(Object event) {
-                        if (event instanceof EpisodeChanged) {
+                    public void call(EpisodeChanged event) {
+                        //if (event instanceof EpisodeChanged) {
                             EpisodeChanged episodeChanged = (EpisodeChanged) event;
                             IEpisode episode = getEpisode(episodeChanged.getId());
                             updateEpisode(episode);
-                        }
+                        //}
                         return;
                     }
                 });
@@ -503,12 +504,14 @@ public class Library {
     }
 
     private void notifySubscriptionChanged(final long argId, @SubscriptionChanged.Action final int argAction) {
-        //SoundWaves.getRxBus().send(new SubscriptionChanged(argId, argAction));
+        SoundWaves.getRxBus().send(new SubscriptionChanged(argId, argAction));
+        /*
         SoundWaves.getRxBus().toObserverable().sample(1, TimeUnit.SECONDS).doOnNext(new Action1<Object>() {
             @Override
             public void call(Object o) {
                 new SubscriptionChanged(argId, argAction);
             }
         });
+        */
     }
 }

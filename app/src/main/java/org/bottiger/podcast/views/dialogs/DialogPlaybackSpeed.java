@@ -24,6 +24,7 @@ import org.bottiger.podcast.utils.rxbus.RxBusSimpleEvents;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.concurrent.TimeUnit;
 
 import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
@@ -104,10 +105,11 @@ public class DialogPlaybackSpeed extends DialogFragment {
 
         mRxSubscriptions
                 .add(SoundWaves.getRxBus().toObserverable()
-                        .subscribe(new Action1<Object>() {
+                        .ofType(RxBusSimpleEvents.PlaybackSpeedChanged.class)
+                        .subscribe(new Action1<RxBusSimpleEvents.PlaybackSpeedChanged>() {
                             @Override
-                            public void call(Object event) {
-                                if (event instanceof RxBusSimpleEvents.PlaybackSpeedChanged) {
+                            public void call(RxBusSimpleEvents.PlaybackSpeedChanged event) {
+                                //if (event instanceof RxBusSimpleEvents.PlaybackSpeedChanged) {
                                     RxBusSimpleEvents.PlaybackSpeedChanged playbackSpeedChanged = (RxBusSimpleEvents.PlaybackSpeedChanged) event;
                                     setSpeed(playbackSpeedChanged.speed);
 
@@ -117,7 +119,7 @@ public class DialogPlaybackSpeed extends DialogFragment {
                                         int storedSpeed = Math.round(playbackSpeedChanged.speed * 10);
                                         prefs.edit().putInt(key, storedSpeed).apply();
                                     }
-                                }
+                                //}
                             }
                         }));
 
