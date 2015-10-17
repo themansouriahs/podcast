@@ -617,7 +617,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         mLayout.setPadding(0, topmargin, 0, 0);
 
         int smallMargin = (int)mCenterSquareMargin/2;
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mImageContainer.getLayoutParams();
+        LayoutParams params = (LayoutParams) mImageContainer.getLayoutParams();
         params.setMargins(smallMargin, mCenterSquareMarginTop, smallMargin, 0);
         params.width = mLayout.getWidth()-2*smallMargin;
         params.height = mLayout.getWidth()-2*smallMargin;
@@ -645,7 +645,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         mLayout.setPadding(0, mCenterSquareMarginTop, 0, 0);
 
         if (mLayout.getWidth() > 0) {
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mImageContainer.getLayoutParams();
+            LayoutParams params = (LayoutParams) mImageContainer.getLayoutParams();
             params.setMargins((int) mCenterSquareMargin, 0, (int) mCenterSquareMargin, 0);
             params.width = (int) (mLayout.getWidth() - 2 * mCenterSquareMargin);
             params.height = (int) (mLayout.getWidth() - 2 * mCenterSquareMargin);
