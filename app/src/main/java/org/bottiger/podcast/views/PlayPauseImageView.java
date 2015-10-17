@@ -53,7 +53,7 @@ import java.lang.annotation.RetentionPolicy;
 /**
  * TODO: document your custom view class.
  */
-public class PlayPauseImageView extends ImageButton implements PaletteListener,
+public class PlayPauseImageView extends PlayPauseView implements PaletteListener,
                                                              DownloadObserver,
                                                              View.OnClickListener {
 
@@ -110,7 +110,7 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
     private int mPaintBorderColor = Color.WHITE;
 
     public PlayPauseImageView(Context context) {
-        super(context);
+        super(context, null);
         init(context);
     }
 
@@ -121,7 +121,7 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
     }
 
     public PlayPauseImageView(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
+        super(context, attrs);
         init(context);
         initAttr(attrs);
     }
@@ -141,7 +141,7 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
         paintBorder.setStyle(Paint.Style.STROKE);
         paintBorder.setStrokeWidth(DRAW_WIDTH);
 
-        setScaleType(ScaleType.CENTER);
+        //setScaleType(ScaleType.CENTER);
 
         if (Build.VERSION.SDK_INT >= 16) {
             setBackground(null);
@@ -203,13 +203,14 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
             mStartTime = System.currentTimeMillis();
         }
 
-        setImageResource(resid);
+        //setImageResource(resid);
 
         this.invalidate();
     }
 
     public void setColor(@ColorInt int argColor, @ColorInt int argOuterColor) {
         float scale = 1.3f;
+        scale = 1.8f;
         float red = Color.red(argColor)*scale;
         float green = Color.green(argColor)*scale;
         float blue = Color.blue(argColor)*scale;
@@ -217,11 +218,15 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
         int newColor = Color.argb(255, (int)red, (int)green, (int)blue);
 
         float darkPrimary = newColor;
+        /*
         paint.setColor((int)darkPrimary);
         paintBorder.setColor(argOuterColor);
         this.invalidate();
+        */
+        setBackgroundColor(newColor);
     }
 
+    /*
     @Override
     protected void onDraw(Canvas canvas) {
 
@@ -289,6 +294,7 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
             mPreparingAnimationStarted = -1;
         }
     }
+    */
 
     private boolean animationStartedLessThanOneSecondAgo(long argFirstDisplayed) {
         return System.currentTimeMillis()-argFirstDisplayed < 1000 && argFirstDisplayed != -1;
@@ -350,7 +356,7 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
     @Override
     public void onClick(View view) {
 
-        PlayerService ps = SoundWaves.sBoundPlayerService;
+        PlayerService ps = PlayerService.getInstance();
         boolean isPlaying = ps.isPlaying() && mEpisode.equals(ps.getCurrentItem());
         setStatus(isPlaying ? PlayerStatusObservable.PAUSED : PlayerStatusObservable.PREPARING);
 
@@ -425,7 +431,7 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
     @Override
     public void onPaletteFound(Palette argChangedPalette) {
         ColorExtractor extractor = new ColorExtractor(mContext, argChangedPalette);
-        setColor(extractor.getPrimary(), extractor.getSecondary());
+        setColor(extractor.getSecondaryTint(), extractor.getSecondary());
         //setColor(extractor.getSecondary(), extractor.getSecondaryTint());
     }
 
@@ -486,6 +492,13 @@ public class PlayPauseImageView extends ImageButton implements PaletteListener,
         if  (isInEditMode()) {
             return;
         }
+
+        /*
+        bounds.top = 0;
+        bounds.left = 0;
+        bounds.bottom = h;
+        bounds.right = w;
+        */
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             setOutlineProvider(new CustomOutline(bounds));

@@ -182,7 +182,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         mCurrentTime       =    (TextViewObserver) view.findViewById(R.id.current_time);
         mTotalTime         =    (TextViewObserver) view.findViewById(R.id.total_time);
 
-        mPlayPauseButton         =    (PlayPauseImageView) view.findViewById(R.id.play_pause_button);
+        mPlayPauseButton         =    (PlayPauseImageView) view.findViewById(R.id.playpause);
         mPlayerSeekbar          =    (PlayerSeekbar) view.findViewById(R.id.top_player_seekbar);
         mPlayerDownloadButton   =    (DownloadButtonView) view.findViewById(R.id.download);
         mBackButton = (PlayerButtonView)view.findViewById(R.id.rewind_button);
@@ -463,6 +463,13 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         } else {
             mPlayPauseButton.setStatus(PlayerStatusObservable.PAUSED);
         }
+
+        mPlayPauseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPlayPauseButton.toggle();
+            }
+        });
 
         mBackButton.setOnClickListener(new View.OnClickListener() {
             @Override

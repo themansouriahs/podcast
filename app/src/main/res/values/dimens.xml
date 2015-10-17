@@ -25,6 +25,16 @@
     <integer name="soundwaves_player_speed_default">10</integer>
     <!-- SoundWaves Player - End -->
 
+    <!-- Play Pause Button Drawable - Start -->
+    <dimen name="pause_bar_width">6dp</dimen>
+    <dimen name="pause_bar_distance">3dp</dimen>
+    <dimen name="pause_bar_height">15dp</dimen>
+    <!--<dimen name="pause_bar_width">48dp</dimen>
+    <dimen name="pause_bar_distance">40dp</dimen>
+    <dimen name="pause_bar_height">144dp</dimen>
+    -->
+    <!-- Play Pause Button Drawable - End -->
+
     <dimen name="playlist_margin">1px</dimen>
     <dimen name="playlist_image_size_small">70dp</dimen>
     <dimen name="playlist_image_radius_small">7dp</dimen>
@@ -74,7 +84,7 @@
     <dimen name="action_bar_auto_hide_min_y">152dp</dimen>
     <dimen name="action_bar_auto_hide_sensivity">48dp</dimen>
 
-    <dimen name="playpause_button_size_normal">50dp</dimen>
+    <dimen name="playpause_button_size_normal">40dp</dimen>
     <dimen name="playpause_button_size">100dp</dimen>
     <dimen name="player_buttons_padding_left">40dp</dimen> <!-- around 2*playpause_button_size -->
 

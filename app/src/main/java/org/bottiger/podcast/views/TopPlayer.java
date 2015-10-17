@@ -238,7 +238,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
 
         getPlayerControlHeight(mControls);
 
-        mPlayPauseButton = (PlayPauseImageView) findViewById(R.id.play_pause_button);
+        mPlayPauseButton = (PlayPauseImageView) findViewById(R.id.playpause);
         mExpandEpisode = (ImageButton)findViewById(R.id.episode_expand);
         mEpisodeText = findViewById(R.id.episode_title);
         mEpisodeInfo = findViewById(R.id.episode_info);
@@ -261,7 +261,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
 
         mLargeLayout.SeekBarLeftMargin = 0;
         mLargeLayout.PlayPauseSize = mPlayPauseLargeSize;
-        mLargeLayout.PlayPauseBottomMargin = ((RelativeLayout.LayoutParams)mPlayPauseButton.getLayoutParams()).bottomMargin;
+        //mLargeLayout.PlayPauseBottomMargin = ((LinearLayout.LayoutParams)mPlayPauseButton.getLayoutParams()).bottomMargin;
 
         if (!mDoDisplayText) {
             mExpandEpisode.setImageResource(R.drawable.ic_expand_more_white);
