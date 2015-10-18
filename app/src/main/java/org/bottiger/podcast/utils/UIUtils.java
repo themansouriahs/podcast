@@ -44,6 +44,9 @@ import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.StyleSpan;
+import android.transition.AutoTransition;
+import android.transition.Transition;
+import android.transition.TransitionSet;
 import android.util.DisplayMetrics;
 import android.view.ContextThemeWrapper;
 import android.view.Display;
@@ -177,6 +180,14 @@ public class UIUtils {
         int height = size.y;
 
         return height;
+    }
+
+    @TargetApi(19)
+    public static Transition getDefaultTransition(@NonNull Resources argResources) {
+        AutoTransition autoTransition = new AutoTransition();
+        autoTransition.setDuration(argResources.getInteger(R.integer.animation_quick));
+        autoTransition.setOrdering(TransitionSet.ORDERING_TOGETHER);
+        return autoTransition;
     }
 
     public static void removeOnGlobalLayoutListener(View v, ViewTreeObserver.OnGlobalLayoutListener listener){

@@ -61,8 +61,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
@@ -101,6 +103,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
     private PlayerButtonView mForwardButton;
     private PlayerButtonView mBackButton;
     private MaterialFavoriteButton mFavoriteButton;
+    private ImageButton mMoreButton;
 
     private RecyclerView mRecyclerView;
     private View mOverlay;
@@ -187,6 +190,8 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         mBackButton = (PlayerButtonView)view.findViewById(R.id.rewind_button);
         mForwardButton = (PlayerButtonView)view.findViewById(R.id.fast_forward_button);
         mFavoriteButton = (MaterialFavoriteButton)view.findViewById(R.id.favorite);
+
+        mMoreButton = (ImageButton) view.findViewById(R.id.player_more_button);
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.my_recycler_view);
         mOverlay = view.findViewById(R.id.playlist_overlay);

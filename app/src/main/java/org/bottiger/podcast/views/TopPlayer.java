@@ -18,10 +18,12 @@ import android.support.v4.view.NestedScrollingChildHelper;
 import android.support.v4.view.ScrollingView;
 import android.support.v4.view.ViewConfigurationCompat;
 import android.support.v7.graphics.Palette;
+import android.transition.AutoTransition;
 import android.transition.ChangeBounds;
 import android.transition.Scene;
 import android.transition.Transition;
 import android.transition.TransitionManager;
+import android.transition.TransitionSet;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -33,6 +35,7 @@ import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.view.ViewParent;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -111,8 +114,6 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
     private String mDoDisplayTextKey;
     private boolean mDoDisplayText = false;
 
-    private PlayerRelativeLayout mPlayerControlsLinearLayout;
-
     private int mCenterSquareMarginTop = -1;
     private float mCenterSquareMargin = -1;
 
@@ -131,6 +132,10 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
     private PlayerButtonView mFastForwardButton;
     private PlayerButtonView mRewindButton;
     private PlayerButtonView mSkipNextButton;
+    private ImageButton mMoreButton;
+
+    private ImageView mTriangle;
+    private LinearLayout mExpandedActionsBar;
 
     private ImageViewTinted mPhoto;
 
@@ -232,7 +237,6 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
 
         mLayout = (TopPlayer) findViewById(R.id.top_player);
         mControls = (LinearLayout) findViewById(R.id.top_player_controls);
-        mPlayerControlsLinearLayout = (PlayerRelativeLayout)findViewById(R.id.expanded_controls);
 
         getPlayerControlHeight(mControls);
 
@@ -249,6 +253,10 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         mRewindButton = (PlayerButtonView) findViewById(R.id.rewind_button);
         mSkipNextButton = (PlayerButtonView) findViewById(R.id.skip_to_next_button);
         mPhoto = (ImageViewTinted) findViewById(R.id.session_photo);
+        mMoreButton = (ImageButton) findViewById(R.id.player_more_button);
+
+        mTriangle = (ImageView) findViewById(R.id.visual_triangle);
+        mExpandedActionsBar = (LinearLayout) findViewById(R.id.expanded_action_bar);
 
         mPlayPauseLargeSize = mPlayPauseButton.getLayoutParams().height;
 
@@ -269,14 +277,18 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
 
         setFullscreen(mFullscreen, false);
 
-        /*
-        mExpandEpisode.setOnClickListener(new OnClickListener() {
+        if (mDoDisplayText) {
+            showText();
+        }
+
+        mMoreButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
                     mDoDisplayText = !mDoDisplayText;
-                    if (Build.VERSION.SDK_INT >= 19)
-                        TransitionManager.beginDelayedTransition(mPlayerControlsLinearLayout);
+                    if (Build.VERSION.SDK_INT >= 19) {
+                        TransitionManager.beginDelayedTransition(mLayout, UIUtils.getDefaultTransition(getResources()));
+                    }
 
                     if (mDoDisplayText) {
                         Log.d(TAG, "ShowText");
@@ -286,11 +298,11 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
                         hideText();
                     }
                 } finally {
-                    prefs.edit().putBoolean(mDoDisplayTextKey, mDoDisplayText).commit();
+                    prefs.edit().putBoolean(mDoDisplayTextKey, mDoDisplayText).apply();
                 }
             }
         });
-        */
+
 
         mFullscreenButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -533,17 +545,19 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
 
     private void hideText() {
         //mExpandEpisode.setImageResource(R.drawable.ic_expand_more_white);
-
-        fadeText(1.0f, 0.0f);
+        //fadeText(1.0f, 0.0f);
+        mTriangle.setVisibility(GONE);
+        mExpandedActionsBar.setVisibility(GONE);
     }
 
     private void showText() {
         //mExpandEpisode.setImageResource(R.drawable.ic_expand_less_white);
-        mEpisodeText.setVisibility(VISIBLE);
-        mGradient.setVisibility(VISIBLE);
-        mEpisodeInfo.setVisibility(VISIBLE);
-
-        fadeText(0.0f, 1.0f);
+        //mEpisodeText.setVisibility(VISIBLE);
+        //mGradient.setVisibility(VISIBLE);
+        //mEpisodeInfo.setVisibility(VISIBLE);
+        //fadeText(0.0f, 1.0f);
+        mTriangle.setVisibility(VISIBLE);
+        mExpandedActionsBar.setVisibility(VISIBLE);
     }
 
     private void fadeText(float argAlphaStart, float argAlphaEnd) {

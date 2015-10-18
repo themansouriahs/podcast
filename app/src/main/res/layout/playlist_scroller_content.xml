@@ -240,82 +240,96 @@
 
                 <ImageView
                     android:id="@+id/visual_triangle"
+                    android:visibility="gone"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_marginTop="-20dp"
                     android:src="@drawable/top_player_triangle"
-                    android:scaleType="centerInside"
+                    android:scaleType="center"
+                    android:layout_centerVertical="true"
+                    android:layout_gravity="center"
                     android:elevation="5dp"
                     android:layout_below="@id/player_more_button"
                     android:layout_alignLeft="@id/player_more_button"
                     android:layout_alignRight="@id/player_more_button"/>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:elevation="5dp"
-                    android:background="@color/white_opaque"
-                    android:layout_below="@id/visual_triangle">
-
-                    <Button
-                        android:layout_width="60dp"
-                        android:layout_height="wrap_content"
-                        android:background="@null"
-                        android:id="@+id/speed_button"
-                        android:text="1.0x"
-                        android:paddingBottom="2dp"
-                        android:textSize="16dp"
-                        android:textColor="@color/pitch_black"
-                        android:fontFamily="sans-serif"
-                        android:textStyle="bold"
-                        android:elevation="@dimen/player_elevation" />
-
-                    <org.bottiger.podcast.views.PlayerButtonView
-                        android:id="@+id/sleep_button"
-                        android:padding="0dip"
-                        android:src="?attr/sleep_inv"
-                        android:elevation="@dimen/player_elevation"
-                        style="@style/TopPlayerButton" />
-
-                    <org.bottiger.podcast.views.PlayerButtonView
-                        android:id="@+id/fullscreen_button"
-                        android:padding="0dip"
-                        android:src="?attr/fullscreen_inv"
-                        android:elevation="@dimen/player_elevation"
-                        style="@style/TopPlayerButton"
-                        />
-
-                    <RelativeLayout
-                        android:layout_width="60dp"
-                        android:layout_height="match_parent">
-
-                        <org.bottiger.podcast.views.DownloadButtonView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:id="@+id/download"
-                            android:padding="0dip"
-                            android:background="@null"
-                            android:layout_centerHorizontal="true"
-                            android:src="@drawable/download"
-                            android:elevation="@dimen/player_elevation"
-                            />
-
-                    </RelativeLayout>
-
-
-                </LinearLayout>
-
             </android.support.percent.PercentRelativeLayout>
 
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_marginBottom="20dp">
+
+            <LinearLayout
+                android:id="@+id/expanded_action_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:elevation="5dp"
+                android:background="@color/white_opaque"
+                android:layout_below="@id/visual_triangle"
+                android:layout_marginBottom="10dp"
+                android:visibility="gone">
+
+                <Button
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:id="@+id/speed_button"
+                    android:text="1.0x"
+                    android:paddingBottom="2dp"
+                    android:textSize="16dp"
+                    android:textColor="@color/pitch_black"
+                    android:fontFamily="sans-serif"
+                    android:textStyle="bold"
+                    android:elevation="@dimen/player_elevation" />
+
+                <org.bottiger.podcast.views.PlayerButtonView
+                    android:id="@+id/sleep_button"
+                    android:padding="0dip"
+                    android:src="?attr/sleep_inv"
+                    android:elevation="@dimen/player_elevation"
+                    style="@style/TopPlayerButton" />
+
+                <org.bottiger.podcast.views.PlayerButtonView
+                    android:id="@+id/fullscreen_button"
+                    android:padding="0dip"
+                    android:src="?attr/fullscreen_inv"
+                    android:elevation="@dimen/player_elevation"
+                    style="@style/TopPlayerButton"
+                    />
+
+                <RelativeLayout
+                    android:layout_width="60dp"
+                    android:layout_height="match_parent">
+
+                    <org.bottiger.podcast.views.DownloadButtonView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:id="@+id/download"
+                        android:padding="0dip"
+                        android:background="@null"
+                        android:layout_centerHorizontal="true"
+                        android:src="@drawable/download"
+                        android:elevation="@dimen/player_elevation"
+                        />
+
+                </RelativeLayout>
+
+
+            </LinearLayout>
 
         <org.bottiger.podcast.views.ImageViewTinted
             android:id="@+id/session_photo"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerInside"
-            android:layout_marginBottom="20dp"
+            android:adjustViewBounds="true"
             />
+
+        </LinearLayout>
 
     </org.bottiger.podcast.views.TopPlayer >
 
