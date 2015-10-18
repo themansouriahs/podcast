@@ -118,12 +118,10 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
 
     private TopPlayer mLayout;
     private LinearLayout mControls;
-    private ImageButton mExpandEpisode;
     private View mGradient;
     private View mEpisodeText;
     private View mEpisodeInfo;
     private PlayPauseImageView mPlayPauseButton;
-    private View mImageContainer;
 
     private PlayerButtonView mFullscreenButton;
     private PlayerButtonView mSleepButton;
@@ -239,10 +237,8 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         getPlayerControlHeight(mControls);
 
         mPlayPauseButton = (PlayPauseImageView) findViewById(R.id.playpause);
-        mExpandEpisode = (ImageButton)findViewById(R.id.episode_expand);
         mEpisodeText = findViewById(R.id.episode_title);
         mEpisodeInfo = findViewById(R.id.episode_info);
-        mImageContainer = findViewById(R.id.top_player_center_square);
         mFullscreenButton = (PlayerButtonView) findViewById(R.id.fullscreen_button);
         mGradient = findViewById(R.id.top_gradient_inner);
         mSleepButton = (PlayerButtonView) findViewById(R.id.sleep_button);
@@ -263,12 +259,6 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         mLargeLayout.PlayPauseSize = mPlayPauseLargeSize;
         //mLargeLayout.PlayPauseBottomMargin = ((LinearLayout.LayoutParams)mPlayPauseButton.getLayoutParams()).bottomMargin;
 
-        if (!mDoDisplayText) {
-            mExpandEpisode.setImageResource(R.drawable.ic_expand_more_white);
-            mEpisodeText.setVisibility(GONE);
-            mGradient.setVisibility(GONE);
-            mEpisodeInfo.setVisibility(GONE);
-        }
 
         mSleepButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -279,6 +269,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
 
         setFullscreen(mFullscreen, false);
 
+        /*
         mExpandEpisode.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -299,6 +290,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
                 }
             }
         });
+        */
 
         mFullscreenButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -525,9 +517,9 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         ColorUtils.tintButton(mDownloadButton,    textColor);
         ColorUtils.tintButton(mFavoriteButton,    textColor);
         ColorUtils.tintButton(mSleepButton,       textColor);
-        ColorUtils.tintButton(mSkipNextButton,    textColor);
-        ColorUtils.tintButton(mFastForwardButton, textColor);
-        ColorUtils.tintButton(mRewindButton,      textColor);
+        //ColorUtils.tintButton(mSkipNextButton,    textColor);
+        //ColorUtils.tintButton(mFastForwardButton, textColor);
+        //ColorUtils.tintButton(mRewindButton,      textColor);
         ColorUtils.tintButton(mSpeedpButton,      textColor);
         ColorUtils.tintButton(mFullscreenButton,  textColor);
 
@@ -540,13 +532,13 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
     }
 
     private void hideText() {
-        mExpandEpisode.setImageResource(R.drawable.ic_expand_more_white);
+        //mExpandEpisode.setImageResource(R.drawable.ic_expand_more_white);
 
         fadeText(1.0f, 0.0f);
     }
 
     private void showText() {
-        mExpandEpisode.setImageResource(R.drawable.ic_expand_less_white);
+        //mExpandEpisode.setImageResource(R.drawable.ic_expand_less_white);
         mEpisodeText.setVisibility(VISIBLE);
         mGradient.setVisibility(VISIBLE);
         mEpisodeInfo.setVisibility(VISIBLE);
@@ -617,12 +609,14 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         mLayout.setLayoutParams(layoutParams);
         mLayout.setPadding(0, topmargin, 0, 0);
 
+        /*
         int smallMargin = (int)mCenterSquareMargin/2;
         LayoutParams params = (LayoutParams) mImageContainer.getLayoutParams();
         params.setMargins(smallMargin, mCenterSquareMarginTop, smallMargin, 0);
         params.width = mLayout.getWidth()-2*smallMargin;
         params.height = mLayout.getWidth()-2*smallMargin;
         mImageContainer.setLayoutParams(params);
+        */
 
 
 
@@ -645,6 +639,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         mLayout.setLayoutParams(layoutParams);
         mLayout.setPadding(0, mCenterSquareMarginTop, 0, 0);
 
+        /*
         if (mLayout.getWidth() > 0) {
             LayoutParams params = (LayoutParams) mImageContainer.getLayoutParams();
             params.setMargins((int) mCenterSquareMargin, 0, (int) mCenterSquareMargin, 0);
@@ -652,6 +647,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
             params.height = (int) (mLayout.getWidth() - 2 * mCenterSquareMargin);
             mImageContainer.setLayoutParams(params);
         }
+        */
 
         setPlayerHeight(sizeLarge);
         ((MainActivity)getContext()).exitFullScreen(mLayout);

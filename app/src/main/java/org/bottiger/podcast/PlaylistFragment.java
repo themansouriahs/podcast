@@ -101,7 +101,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
     private PlayerButtonView mForwardButton;
     private PlayerButtonView mBackButton;
     private MaterialFavoriteButton mFavoriteButton;
-    private View mGradientBottomTopPlayer;
 
     private RecyclerView mRecyclerView;
     private View mOverlay;
@@ -188,8 +187,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         mBackButton = (PlayerButtonView)view.findViewById(R.id.rewind_button);
         mForwardButton = (PlayerButtonView)view.findViewById(R.id.fast_forward_button);
         mFavoriteButton = (MaterialFavoriteButton)view.findViewById(R.id.favorite);
-
-        mGradientBottomTopPlayer = view.findViewById(R.id.gradient_bottom);
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.my_recycler_view);
         mOverlay = view.findViewById(R.id.playlist_overlay);
@@ -408,8 +405,8 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
             if (item != null) {
                 mPlayPauseButton.setEpisode(item, PlayPauseImageView.PLAYLIST);
-                mBackButton.setEpisode(item);
-                mForwardButton.setEpisode(item);
+                //mBackButton.setEpisode(item);
+                //mForwardButton.setEpisode(item);
                 mPlayerDownloadButton.setEpisode(item);
                 //mFavoriteButton.setEpisode(item);
                 SoundWaves.getBus().register(mPlayerDownloadButton);
@@ -449,8 +446,8 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         mTotalTime.setEpisode(item);
 
         mPlayPauseButton.setEpisode(item, PlayPauseImageView.PLAYLIST);
-        mBackButton.setEpisode(item);
-        mForwardButton.setEpisode(item);
+        //mBackButton.setEpisode(item);
+        //mForwardButton.setEpisode(item);
         mPlayerDownloadButton.setEpisode(item);
         //mFavoriteButton.setEpisode(item);
 
@@ -464,6 +461,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
             mPlayPauseButton.setStatus(PlayerStatusObservable.PAUSED);
         }
 
+        /*
         mPlayPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -488,6 +486,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                 }
             }
         });
+        */
 
         mPlayerSeekbar.setEpisode(item);
         mPlayerSeekbar.setOverlay(mOverlay);
@@ -499,13 +498,15 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
         String artworkURL = item.getArtwork();
         if (!TextUtils.isEmpty(artworkURL)) {
+
             PaletteHelper.generate(artworkURL, activity, mTopPlayer);
+            /*
             PaletteHelper.generate(artworkURL, activity, mPlayPauseButton);
             PaletteHelper.generate(artworkURL, activity, mBackButton);
             PaletteHelper.generate(artworkURL, activity, mForwardButton);
             PaletteHelper.generate(artworkURL, activity, mPlayerDownloadButton);
             //PaletteHelper.generate(artworkURL, activity, mFavoriteButton);
-
+*/
             PaletteHelper.generate(artworkURL, activity, new PaletteListener() {
                 @Override
                 public void onPaletteFound(Palette argChangedPalette) {
@@ -544,6 +545,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                     return item.getArtwork();
                 }
             });
+
         }
 
         String artworkUrl = item.getArtwork();
