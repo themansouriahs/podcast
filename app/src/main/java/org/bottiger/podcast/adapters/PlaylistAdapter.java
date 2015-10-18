@@ -57,15 +57,12 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
 	public static TreeSet<Number> mExpandedItemID = new TreeSet<>();
 
-	private static DownloadManager mDownloadManager = null;
-
     public PlaylistAdapter(@NonNull Activity argActivity, View argOverlay) {
         super(argActivity);
         mActivity = argActivity;
         mOverlay = argOverlay;
         mInflater = (LayoutInflater) mActivity
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        mDownloadManager = (DownloadManager) mActivity.getSystemService(Context.DOWNLOAD_SERVICE);
 
         notifyDataSetChanged();
     }
@@ -99,18 +96,14 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
         viewHolder.setArtwork(null);
 
-        String image = item.getArtwork(mActivity);
-        if (!TextUtils.isEmpty(image) && Patterns.WEB_URL.matcher(image).matches()) {
-
-            //FrescoHelper.PalettePostProcessor postProcessor = new FrescoHelper.PalettePostProcessor(mActivity, image);
-            //FrescoHelper.loadImageInto(viewHolder.mPodcastImage, image, postProcessor);
+        String image = item.getArtwork();
+        if (StrUtils.isValidUrl(image)) {
             Glide.with(mActivity).load(image).asBitmap().centerCrop().into(new BitmapImageViewTarget(viewHolder.mPodcastImage) {
                 @Override
                 protected void setResource(Bitmap resource) {
                     RoundedBitmapDrawable circularBitmapDrawable =
                             RoundedBitmapDrawableFactory.create(mActivity.getResources(), resource);
                     float radius = mActivity.getResources().getDimension(R.dimen.playlist_image_radius_small);
-                    //circularBitmapDrawable.setCircular(true);
                     circularBitmapDrawable.setCornerRadius(radius);
                     viewHolder.mPodcastImage.setImageDrawable(circularBitmapDrawable);
                 }
@@ -123,7 +116,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
         Log.d("ExpanderHelper", "pos: " + position + " episode: " + item.getTitle());
 
-        String artwork = item.getArtwork(activity);
+        String artwork = item.getArtwork();
         PaletteHelper.generate(artwork, activity, viewHolder.mPlayPauseButton);
         PaletteHelper.generate(artwork, activity, new PaletteListener() {
             @Override
@@ -379,8 +372,6 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
     }
 
     public static void toggle(PlaylistViewHolder pvh, int pos) {
-        Long id = itemID(pos+PLAYLIST_OFFSET);
-        //toggleItem(id);
         keepOne.toggle(pvh);
     }
 
