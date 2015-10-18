@@ -520,7 +520,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         ColorUtils.tintButton(mRewindButton, extractor);
         ColorUtils.tintButton(mSpeedpButton, extractor);
         */
-        int textColor = ColorUtils.getBackgroundColor(getContext());
+        int textColor = ColorUtils.getTextColor(getContext());
         ColorUtils.tintButton(mSleepButton,       textColor);
         ColorUtils.tintButton(mDownloadButton,    textColor);
         ColorUtils.tintButton(mFavoriteButton,    textColor);
@@ -529,6 +529,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         ColorUtils.tintButton(mFastForwardButton, textColor);
         ColorUtils.tintButton(mRewindButton,      textColor);
         ColorUtils.tintButton(mSpeedpButton,      textColor);
+        ColorUtils.tintButton(mFullscreenButton,  textColor);
 
         invalidate();
     }
