@@ -19,12 +19,10 @@ import android.support.v4.view.NestedScrollingChildHelper;
 import android.support.v4.view.ScrollingView;
 import android.support.v4.view.ViewConfigurationCompat;
 import android.support.v7.graphics.Palette;
-import android.transition.AutoTransition;
 import android.transition.ChangeBounds;
 import android.transition.Scene;
 import android.transition.Transition;
 import android.transition.TransitionManager;
-import android.transition.TransitionSet;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -38,7 +36,6 @@ import android.view.ViewParent;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.github.ivbaranov.mfb.MaterialFavoriteButton;
@@ -57,7 +54,6 @@ import org.bottiger.podcast.views.dialogs.DialogPlaybackSpeed;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.concurrent.TimeUnit;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -130,8 +126,8 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
     private Button mSpeedpButton;
     private PlayerButtonView mDownloadButton;
     private MaterialFavoriteButton mFavoriteButton;
-    private PlayerButtonView mFastForwardButton;
-    private PlayerButtonView mRewindButton;
+    private ImageView mFastForwardButton;
+    private ImageView mRewindButton;
     private PlayerButtonView mSkipNextButton;
     private ImageButton mMoreButton;
 
@@ -250,8 +246,8 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         mSpeedpButton = (Button) findViewById(R.id.speed_button);
         mDownloadButton = (PlayerButtonView) findViewById(R.id.download);
         mFavoriteButton = (MaterialFavoriteButton) findViewById(R.id.favorite);
-        mFastForwardButton = (PlayerButtonView) findViewById(R.id.fast_forward_button);
-        mRewindButton = (PlayerButtonView) findViewById(R.id.rewind_button);
+        mFastForwardButton = (ImageView) findViewById(R.id.top_player_fastforward);
+        mRewindButton = (ImageView) findViewById(R.id.top_player_rewind);
         mSkipNextButton = (PlayerButtonView) findViewById(R.id.skip_to_next_button);
         mPhoto = (ImageViewTinted) findViewById(R.id.session_photo);
         mMoreButton = (ImageButton) findViewById(R.id.player_more_button);
@@ -303,6 +299,25 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
             }
         });
 
+        mRewindButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PlayerService ps = PlayerService.getInstance();
+                if (ps != null) {
+                    ps.getPlayer().rewind(ps.getCurrentItem());
+                }
+            }
+        });
+
+        mFastForwardButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PlayerService ps = PlayerService.getInstance();
+                if (ps != null) {
+                    ps.getPlayer().fastForward(ps.getCurrentItem());
+                }
+            }
+        });
 
         mFullscreenButton.setOnClickListener(new OnClickListener() {
             @Override

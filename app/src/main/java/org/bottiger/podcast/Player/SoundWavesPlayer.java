@@ -10,6 +10,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.media.session.PlaybackStateCompat;
 
 import org.bottiger.podcast.R;
@@ -235,8 +236,11 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         return mMediaCast != null && mMediaCast.isActive() ? mMediaCast.getCurrentPosition() : super.getCurrentPosition();
     }
 
-    public void rewind(IEpisode argItem) {
+    public void rewind(@Nullable IEpisode argItem) {
         if (mPlayerService == null)
+            return;
+
+        if (argItem == null)
             return;
 
         String rewindAmount = mSharedpreferences.getString(PLAYER_ACTION_REWIND_KEY, PLAYER_ACTION_REWIND_DEFAULT_VALUE);
@@ -247,8 +251,11 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         }
     }
 
-    public void fastForward(IEpisode argItem) {
+    public void fastForward(@Nullable IEpisode argItem) {
         if (mPlayerService == null)
+            return;
+
+        if (argItem == null)
             return;
 
         String fastForwardAmount = mSharedpreferences.getString(PLAYER_ACTION_FASTFORWARD_KEY, PLAYER_ACTION_FASTFORWARD_DEFAULT_VALUE);

@@ -195,7 +195,7 @@
                 </FrameLayout>
 
                 <net.steamcrafted.materialiconlib.MaterialIconView
-                    android:id="@+id/previous"
+                    android:id="@+id/top_player_rewind"
                     app:layout_widthPercent="25%"
                     android:layout_height="42dp"
                     android:layout_weight="0.7"
@@ -210,7 +210,7 @@
                     android:layout_toStartOf="@id/play_button_container"/>
 
                 <net.steamcrafted.materialiconlib.MaterialIconView
-                    android:id="@+id/next"
+                    android:id="@+id/top_player_fastforward"
                     app:layout_widthPercent="25%"
                     android:layout_height="42dp"
                     android:layout_weight="0.7"
@@ -231,10 +231,10 @@
                     android:layout_weight="0"
                     android:src="@drawable/ic_more_vert_24dp"
                     android:background="@null"
-                    android:layout_alignTop="@id/next"
-                    android:layout_alignBottom="@id/next"
-                    android:layout_toRightOf="@id/next"
-                    android:layout_toEndOf="@id/next"
+                    android:layout_alignTop="@id/top_player_fastforward"
+                    android:layout_alignBottom="@id/top_player_fastforward"
+                    android:layout_toRightOf="@id/top_player_fastforward"
+                    android:layout_toEndOf="@id/top_player_fastforward"
                     />
 
 
