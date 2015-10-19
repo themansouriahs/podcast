@@ -214,7 +214,7 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
 
     public void setColor(@ColorInt int argColor, @ColorInt int argOuterColor) {
         float scale = 1.3f;
-        scale = 1.8f;
+        //scale = 1.8f;
         float red = Color.red(argColor)*scale;
         float green = Color.green(argColor)*scale;
         float blue = Color.blue(argColor)*scale;
