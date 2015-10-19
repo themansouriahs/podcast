@@ -560,10 +560,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
             ImageLoaderUtils.loadImageInto(mPhoto, artworkUrl, null, false, false, false);
         }
 
-        if (mTopPlayer.getVisibleHeight() == 0) {
-            mTopPlayer.setPlayerHeight(mTopPlayer.getMaximumSize());
-        }
-
         if (mTopPlayer.isFullscreen()) {
             mTopPlayer.setFullscreen(true, false);
         }
@@ -585,7 +581,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
             }
         } else {
             if (!dismissedWelcomePage) {
-                sharedPreferences.edit().putBoolean(PLAYLIST_WELCOME_DISMISSED, true).commit();
+                sharedPreferences.edit().putBoolean(PLAYLIST_WELCOME_DISMISSED, true).apply();
             }
 
             if (mPlaylistContainer == null)

@@ -238,20 +238,27 @@
                     />
 
 
-                <ImageView
+                <FrameLayout
                     android:id="@+id/visual_triangle"
                     android:visibility="gone"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="-20dp"
-                    android:src="@drawable/top_player_triangle"
-                    android:scaleType="center"
-                    android:layout_centerVertical="true"
-                    android:layout_gravity="center"
-                    android:elevation="5dp"
                     android:layout_below="@id/player_more_button"
                     android:layout_alignLeft="@id/player_more_button"
-                    android:layout_alignRight="@id/player_more_button"/>
+                    android:layout_alignRight="@id/player_more_button"
+                    android:gravity="center_horizontal|bottom">
+
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:src="@drawable/top_player_triangle"
+                        android:scaleType="center"
+                        android:layout_centerHorizontal="true"
+                        android:layout_gravity="center_horizontal|bottom"
+                        android:elevation="5dp" />
+
+                </FrameLayout>
 
             </android.support.percent.PercentRelativeLayout>
 

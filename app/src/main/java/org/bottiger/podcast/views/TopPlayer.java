@@ -11,6 +11,7 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.NestedScrollingChild;
@@ -134,7 +135,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
     private PlayerButtonView mSkipNextButton;
     private ImageButton mMoreButton;
 
-    private ImageView mTriangle;
+    private View mTriangle;
     private LinearLayout mExpandedActionsBar;
 
     private ImageViewTinted mPhoto;
@@ -255,18 +256,17 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         mPhoto = (ImageViewTinted) findViewById(R.id.session_photo);
         mMoreButton = (ImageButton) findViewById(R.id.player_more_button);
 
-        mTriangle = (ImageView) findViewById(R.id.visual_triangle);
+        mTriangle = findViewById(R.id.visual_triangle);
         mExpandedActionsBar = (LinearLayout) findViewById(R.id.expanded_action_bar);
 
         mPlayPauseLargeSize = mPlayPauseButton.getLayoutParams().height;
+        mPlayPauseButton.setIconColor(Color.WHITE);
 
         mCenterSquareMarginTop = (int)getResources().getDimension(R.dimen.top_player_center_square_margin_top);
         mCenterSquareMargin = getResources().getDimension(R.dimen.top_player_center_square_margin);
 
         mLargeLayout.SeekBarLeftMargin = 0;
         mLargeLayout.PlayPauseSize = mPlayPauseLargeSize;
-        //mLargeLayout.PlayPauseBottomMargin = ((LinearLayout.LayoutParams)mPlayPauseButton.getLayoutParams()).bottomMargin;
-
 
         mSleepButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -493,7 +493,11 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         int color = ColorUtils.getBackgroundColor(getContext());
         mBackgroundColor = StaticButtonColor(mContext, argChangedPalette, color);
         //setBackgroundColor(mBackgroundColor);
-        setBackgroundColor(argChangedPalette.getLightVibrantColor(ColorUtils.getBackgroundColor(getContext())));
+        int bgcolor = ContextCompat.getColor(getContext(), R.color.playlist_background);
+        int playcolor = ContextCompat.getColor(getContext(), R.color.colorPrimaryDark);
+        setBackgroundColor(argChangedPalette.getLightVibrantColor(bgcolor));
+
+        mPlayPauseButton.setBackgroundColor(argChangedPalette.getDarkVibrantColor(playcolor));
 
         int[][] states = new int[][] {
         new int[] { android.R.attr.state_enabled}, // enabled

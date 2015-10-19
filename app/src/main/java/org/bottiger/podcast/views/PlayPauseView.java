@@ -7,7 +7,6 @@ import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Outline;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
@@ -26,6 +25,8 @@ import android.widget.FrameLayout;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.views.drawables.PlayPauseDrawable;
+
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by aplb on 17-10-2015.
@@ -46,6 +47,8 @@ public class PlayPauseView extends FrameLayout {
             };
 
     private static final long PLAY_PAUSE_ANIMATION_DURATION = 200;
+
+    private ReentrantLock mLock = new ReentrantLock();
 
     private final PlayPauseDrawable mDrawable;
     private final Paint mPaint = new Paint();
@@ -133,6 +136,11 @@ public class PlayPauseView extends FrameLayout {
         mDrawable.draw(canvas);
     }
 
+    public void setIconColor(@ColorInt int argColor) {
+        mDrawable.setTint(argColor);
+        invalidate();
+    }
+
     public void setBackgroundColor(@ColorInt int argColor) {
         mBackgroundColor = argColor;
         mPauseBackgroundColor = argColor;
@@ -140,20 +148,45 @@ public class PlayPauseView extends FrameLayout {
         invalidate();
     }
 
-    public void toggle() {
-        if (mAnimatorSet != null) {
-            mAnimatorSet.cancel();
-        }
+    public void setState(@PlayPauseDrawable.IconState int argState) {
+        mLock.lock();
+        try {
+            if (argState == mDrawable.getIconState())
+                return;
 
-        mAnimatorSet = new AnimatorSet();
-        final boolean isPlay = mDrawable.isPlay();
-        final ObjectAnimator colorAnim = ObjectAnimator.ofInt(this, COLOR, isPlay ? mPauseBackgroundColor : mPlayBackgroundColor);
-        colorAnim.setEvaluator(new ArgbEvaluator());
-        final Animator pausePlayAnim = mDrawable.getPausePlayAnimator();
-        mAnimatorSet.setInterpolator(new DecelerateInterpolator());
-        mAnimatorSet.setDuration(PLAY_PAUSE_ANIMATION_DURATION);
-        mAnimatorSet.playTogether(colorAnim, pausePlayAnim);
-        mAnimatorSet.start();
+            if (mAnimatorSet != null && mAnimatorSet.isRunning())
+                return;
+
+            mDrawable.setState(argState);
+            //animateChange(argState);
+        } finally {
+            mLock.unlock();
+        }
+    }
+
+    public void animateChange(@PlayPauseDrawable.IconState int argState) {
+        mLock.lock();
+        try {
+            if (mAnimatorSet != null) {
+                mAnimatorSet.cancel();
+            }
+
+            mAnimatorSet = new AnimatorSet();
+            final boolean isPlay = mDrawable.isPlaying();
+            final ObjectAnimator colorAnim = ObjectAnimator.ofInt(this, COLOR, isPlay ? mPauseBackgroundColor : mPlayBackgroundColor);
+            colorAnim.setEvaluator(new ArgbEvaluator());
+            final Animator pausePlayAnim = argState == PlayPauseDrawable.IS_PLAYING ? mDrawable.getPauseAnimator(): mDrawable.getPlayAnimator();
+            mAnimatorSet.setInterpolator(new DecelerateInterpolator());
+            mAnimatorSet.setDuration(PLAY_PAUSE_ANIMATION_DURATION);
+            mAnimatorSet.playTogether(colorAnim, pausePlayAnim);
+            mAnimatorSet.start();
+        } finally {
+            mLock.unlock();
+        }
+    }
+
+    public boolean IsDisplayingPlayIcon() {
+        return !mDrawable.isPlaying();
     }
 
     private void setViewSize(final int w, final int h) {

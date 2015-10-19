@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <color name="white_opaque">#FFFFFFFF</color>
+    <color name="pitch_black">#FF000000</color>
+    <color name="transparent">#00000000</color>
+
     <color name="colorPrimary">#660000</color>
     <color name="colorSecondary">#cc0000</color>
     <color name="colorPrimaryDark">#990000</color>
@@ -32,5 +37,4 @@
     <color name="default_background">#FFFFFF</color>
     <color name="playlist_background">#E6E6DC</color>
 
-    <color name="transparent">#00000000</color>
 </resources>

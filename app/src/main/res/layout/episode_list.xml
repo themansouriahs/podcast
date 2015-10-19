@@ -98,6 +98,7 @@
             android:layout_marginTop="15dp"
             android:layout_marginRight="10dp"
             android:padding="0dip"
+            android:visibility="gone"
             android:elevation="8dp"/>
 
 

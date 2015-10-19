@@ -24,6 +24,7 @@ import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
@@ -115,6 +116,8 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         keepOne.bind(viewHolder, position);
 
         Log.d("ExpanderHelper", "pos: " + position + " episode: " + item.getTitle());
+
+        viewHolder.mPlayPauseButton.setIconColor(Color.WHITE);
 
         String artwork = item.getArtwork();
         PaletteHelper.generate(artwork, activity, viewHolder.mPlayPauseButton);

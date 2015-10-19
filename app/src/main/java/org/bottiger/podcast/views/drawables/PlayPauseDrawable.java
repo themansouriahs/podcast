@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
@@ -14,14 +13,24 @@ import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.IntDef;
+import android.util.Log;
 import android.util.Property;
 
-import org.bottiger.podcast.R;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
  * Created by aplb on 17-10-2015.
  */
 public class PlayPauseDrawable extends Drawable {
+
+    @IntDef({IS_PLAYING, IS_PAUSED})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface IconState {}
+
+    public static final int IS_PLAYING = 1;
+    public static final int IS_PAUSED = 2;
 
     private static final Property<PlayPauseDrawable, Float> PROGRESS =
             new Property<PlayPauseDrawable, Float>(Float.class, "progress") {
@@ -40,24 +49,20 @@ public class PlayPauseDrawable extends Drawable {
     private final Path mRightPauseBar = new Path();
     private final Paint mPaint = new Paint();
     private final RectF mBounds = new RectF();
-    private final float mPauseBarWidth;
-    private final float mPauseBarHeight;
-    private final float mPauseBarDistance;
+    private float mPauseBarWidth = -1;
+    private float mPauseBarHeight = -1;
+    private float mPauseBarDistance = -1;
 
     private float mWidth = -1;
     private float mHeight = -1;
 
-    private float mProgress;
-    private boolean mIsPlay;
+    private float mProgress = 1;
+    private boolean mIsPlaying;
 
     public PlayPauseDrawable(Context context) {
-        final Resources res = context.getResources();
         mPaint.setAntiAlias(true);
         mPaint.setStyle(Paint.Style.FILL);
         mPaint.setColor(Color.BLACK);
-        mPauseBarWidth = res.getDimensionPixelSize(R.dimen.pause_bar_width);
-        mPauseBarHeight = res.getDimensionPixelSize(R.dimen.pause_bar_height);
-        mPauseBarDistance = res.getDimensionPixelSize(R.dimen.pause_bar_distance);
     }
 
     @Override
@@ -74,6 +79,12 @@ public class PlayPauseDrawable extends Drawable {
         if (mWidth <= 0) {
             mWidth = canvas.getWidth();
             mHeight = canvas.getHeight();
+        }
+
+        if (mPauseBarHeight < 0) {
+            mPauseBarHeight = (int)mHeight/3;
+            mPauseBarWidth = (int)mWidth/10;
+            mPauseBarDistance = (int)mWidth/10;
         }
 
         mLeftPauseBar.rewind();
@@ -113,8 +124,8 @@ public class PlayPauseDrawable extends Drawable {
 
         // (1) Pause --> Play: rotate 0 to 90 degrees clockwise.
         // (2) Play --> Pause: rotate 90 to 180 degrees clockwise.
-        final float rotationProgress = mIsPlay ? 1 - mProgress : mProgress;
-        final float startingRotation = mIsPlay ? 90 : 0;
+        final float rotationProgress = mIsPlaying ? 1 - mProgress : mProgress;
+        final float startingRotation = mIsPlaying ? 90 : 0;
         canvas.rotate(lerp(startingRotation, startingRotation + 90, rotationProgress), mWidth / 2f, mHeight / 2f);
 
         // Position the pause/play button in the center of the drawable's bounds.
@@ -124,22 +135,62 @@ public class PlayPauseDrawable extends Drawable {
         canvas.drawPath(mLeftPauseBar, mPaint);
         canvas.drawPath(mRightPauseBar, mPaint);
 
+        Log.d("ttt", "mIsPlaying:" + mIsPlaying + " mProgress:" + mProgress);
+
         canvas.restore();
     }
 
     public Animator getPausePlayAnimator() {
-        final Animator anim = ObjectAnimator.ofFloat(this, PROGRESS, mIsPlay ? 1 : 0, mIsPlay ? 0 : 1);
+        final Animator anim = ObjectAnimator.ofFloat(this, PROGRESS, mIsPlaying ? 1 : 0, mIsPlaying ? 0 : 1);
         anim.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                mIsPlay = !mIsPlay;
+                mIsPlaying = !mIsPlaying;
+            }
+        });
+        return anim;
+    }
+    public Animator getPauseAnimator() {
+        final Animator anim = ObjectAnimator.ofFloat(this, PROGRESS, 1, 0);
+        anim.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mIsPlaying = false;
             }
         });
         return anim;
     }
 
-    public boolean isPlay() {
-        return mIsPlay;
+
+    public Animator getPlayAnimator() {
+        final Animator anim = ObjectAnimator.ofFloat(this, PROGRESS, 0, 1);
+        anim.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mIsPlaying = true;
+            }
+        });
+        return anim;
+    }
+
+    public boolean isPlaying() {
+        return mIsPlaying;
+    }
+
+    public void setState(@IconState int argState) {
+        if (argState == IS_PLAYING) {
+            Log.d("ttt", "is_playing");
+            mIsPlaying = true;
+            setProgress(0);
+        } else {
+            Log.d("ttt", "is_paused");
+            mIsPlaying = false;
+            setProgress(1);
+        }
+    }
+
+    public @IconState int getIconState() {
+        return mIsPlaying ? IS_PLAYING : IS_PAUSED;
     }
 
     private void setProgress(float progress) {

@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Outline;
@@ -20,6 +19,7 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.animation.LinearOutSlowInInterpolator;
 import android.support.v7.graphics.Palette;
 import android.util.AttributeSet;
@@ -28,7 +28,6 @@ import android.view.View;
 import android.view.ViewOutlineProvider;
 import android.view.animation.Animation;
 import android.webkit.MimeTypeMap;
-import android.widget.ImageButton;
 
 import com.squareup.otto.Subscribe;
 
@@ -46,6 +45,7 @@ import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.views.dialogs.DialogOpenVideoExternally;
+import org.bottiger.podcast.views.drawables.PlayPauseDrawable;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -106,7 +106,7 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
     protected Paint paint;
     private Paint paintBorder;
 
-    private int mPaintColor = getResources().getColor(R.color.colorPrimaryDark);
+    private int mPaintColor;
     private int mPaintBorderColor = Color.WHITE;
 
     public PlayPauseImageView(Context context) {
@@ -129,6 +129,8 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
     private void init(Context argContext) {
 
         mContext = argContext;
+
+        mPaintColor = ContextCompat.getColor(mContext, R.color.colorPrimaryDark);
 
         paint = new Paint(Paint.LINEAR_TEXT_FLAG);
         paint.setColor(mPaintColor);
@@ -190,11 +192,15 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
 
     public void setStatus(@PlayerStatusObservable.PlayerStatus int argStatus) {
 
-        int resid;
         if (argStatus == PlayerStatusObservable.PLAYING) {
-            resid = drawBackground() ? R.drawable.ic_pause_white : R.drawable.ic_pause_black;
+            if (IsDisplayingPlayIcon()) {
+                //setState(PlayPauseDrawable.IS_PLAYING);
+                animateChange(PlayPauseDrawable.IS_PLAYING);
+            }
         } else {
-            resid = drawBackground() ? R.drawable.ic_play_arrow_white : R.drawable.ic_play_arrow_black;
+            if (!IsDisplayingPlayIcon()) { // we are not displayign the play icon, we should
+                setState(PlayPauseDrawable.IS_PAUSED);
+            }
         }
 
         mStatus = argStatus;
@@ -202,8 +208,6 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
         if (mStatus == PlayerStatusObservable.PREPARING) {
             mStartTime = System.currentTimeMillis();
         }
-
-        //setImageResource(resid);
 
         this.invalidate();
     }
@@ -358,7 +362,16 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
 
         PlayerService ps = PlayerService.getInstance();
         boolean isPlaying = ps.isPlaying() && mEpisode.equals(ps.getCurrentItem());
-        setStatus(isPlaying ? PlayerStatusObservable.PAUSED : PlayerStatusObservable.PREPARING);
+
+        if (isPlaying) {
+            //toggle();
+            //setStatus(PlayerStatusObservable.PAUSED);
+            animateChange(PlayPauseDrawable.IS_PAUSED);
+        } else {
+            setStatus(PlayerStatusObservable.PREPARING);
+        }
+
+        //setStatus(isPlaying ? PlayerStatusObservable.PAUSED : PlayerStatusObservable.PREPARING);
 
         // If the file is a video we offer to open it in another external player
         if (mEpisode.isVideo()) {
