@@ -152,7 +152,7 @@
             android:key="pref_network_category_network">
 
         <CheckBoxPreference
-            android:defaultValue="true"
+            android:defaultValue="@bool/pref_download_on_update_default"
             android:key="@string/pref_download_on_update_key"
             android:summary="@string/pref_download_on_update_description"
             android:title="@string/pref_download_on_update_title" />
