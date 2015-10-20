@@ -6,8 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
+import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Outline;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -20,12 +20,12 @@ import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.animation.LinearOutSlowInInterpolator;
 import android.support.v7.graphics.Palette;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewOutlineProvider;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.webkit.MimeTypeMap;
 
@@ -62,18 +62,17 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
     private static final boolean DRAW_PROGRESS          = true;
     private static final boolean DRAW_PROGRESS_MARKER   = true;
 
+    private static final int DRAW_ANGLE_OFFSET = -90;
     private static final int FPS = 60;
     private static final long ANIMATION_DURATION = 10000; // in ms, 10 seconds
     private static final long ANIMATION_APPEAR_THRESHOLD = 250; // time before we show the animation
     private static final long ANIMATION_HIDE_THRESHOLD = 1000; // minimum time we display the animation if it appears
 
-    private final Matrix mMatrix = new Matrix(); // transformation matrix
     private long mStartTime = System.currentTimeMillis();
     private long mPreparingAnimationStarted = -1;
+    private boolean mAnimationNeedsAligning = false;
 
-    private static final LinearOutSlowInInterpolator interperter = new LinearOutSlowInInterpolator();
-
-    private static final String MIME_VIDEO = "video/*";
+    private static final AccelerateDecelerateInterpolator interperter1 = new AccelerateDecelerateInterpolator();
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({PLAYLIST, FEEDVIEW, DISCOVERY_FEEDVIEW, OTHER})
@@ -86,7 +85,7 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
     private @ButtonLocation int mLocation = OTHER;
 
     private static final int START_ANGLE = -90;
-    private static final int DRAW_OFFSET = 6;
+    private static final int DRAW_OFFSET = 0;
     private static final int DRAW_WIDTH = 6;
 
     private @PlayerStatusObservable.PlayerStatus int mStatus = PlayerStatusObservable.STOPPED;
@@ -97,6 +96,9 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
 
     private RectF bounds = new RectF();
     private Rect boundsRound = new Rect();
+
+    boolean mFoundStart = false;
+    boolean mFoundEnd = false;
 
     private Animation rotateAnimation;
 
@@ -230,9 +232,13 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
         setBackgroundColor(newColor);
     }
 
-    /*
+
     @Override
     protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+
+        if (!DRAW_PROGRESS)
+            return;
 
         int contentWidth = getWidth();
         int contentHeight = getHeight();
@@ -240,65 +246,105 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
         int centerX = contentWidth/2;
         int centerY = contentHeight/2;
 
-        // Draw the background circle
         float radius = centerX-DRAW_WIDTH;
 
-        if (drawBackground()) {
-            canvas.drawCircle(centerX, centerY, radius, paint);
-        }
-
-        int diff2 =  DRAW_WIDTH;//(int) (centerY-radius);
+        int drawOffset =  DRAW_WIDTH/2;
         boolean updateOutline = bounds == null;
 
-        bounds.left =DRAW_OFFSET;
-        bounds.top = diff2;
-        bounds.right = contentWidth - DRAW_OFFSET;
-        bounds.bottom = contentWidth - diff2;
+        bounds.left =drawOffset;
+        bounds.top = drawOffset;
+        bounds.right = contentWidth - drawOffset;
+        bounds.bottom = contentWidth - drawOffset;
 
         if (updateOutline) {
             onSizeChanged(0, 0, 0, 0);
         }
 
-        if (mStatus != PlayerStatusObservable.PREPARING) {
-            if (DRAW_PROGRESS && getEpisode() != null && mProgressPercent >= 100) {
-                canvas.drawCircle(centerX, centerY, radius, paintBorder);
-            } else if (DRAW_PROGRESS && mProgressPercent > 0) {
-                canvas.drawArc(bounds, START_ANGLE, getProgressAngle(mProgressPercent), false, paintBorder);
+        double elapsedTime = System.currentTimeMillis() - mStartTime;
+        boolean showRotatingAnimation = mStatus == PlayerStatusObservable.PREPARING;// || animationStartedLessThanOneSecondAgo(mPreparingAnimationStarted);
+        boolean refreshButton = false;
+
+        double defaultStartAngle = 0.0;
+        double defaultEndAngle = 360.0;
+
+        if (showRotatingAnimation) {
+            // Draw undetermint progress indicator
+            refreshButton = true;
+            mFoundStart = false;
+            mFoundEnd = false;
+
+            mAnimationNeedsAligning = true;
+            if (mPreparingAnimationStarted == -1) {
+                mPreparingAnimationStarted = System.currentTimeMillis();
             }
+
+            double angles[] = getCircleAngles(elapsedTime);
+
+            defaultStartAngle = angles[0];
+            defaultEndAngle = angles[1];
+
+        } else if (!mAnimationNeedsAligning) {
+            // Draw normal progress
+            mPreparingAnimationStarted = -1;
+            defaultEndAngle = getProgressAngle(mProgressPercent);
+        } else {
+            // Align the rotating progress indication with the current progress
+            refreshButton = true;
+
+            double angles[] = getCircleAngles(elapsedTime);
+
+            double currentStart = angles[0];
+            double currentEnd = angles[1];
+
+            double endGoal = getProgressAngle(mProgressPercent);
+
+            if (Math.abs(currentStart) < 2 || mFoundStart) {
+                currentStart = 0;
+                mFoundStart = true;
+            }
+
+            if (Math.abs(currentEnd-endGoal) < 2 || mFoundEnd) {
+                currentEnd = endGoal;
+                mFoundEnd = true;
+            }
+
+            defaultStartAngle = currentStart;
+            defaultEndAngle = currentEnd;
+
+            if (mFoundStart && mFoundEnd) {
+                refreshButton = false;
+                mAnimationNeedsAligning = false;
+            }
+
         }
 
-        super.onDraw(canvas);
+        defaultStartAngle = defaultStartAngle + DRAW_ANGLE_OFFSET;
+        defaultEndAngle = defaultEndAngle + DRAW_ANGLE_OFFSET;
 
-        long elapsedTime = System.currentTimeMillis() - mStartTime;
-        if (mStatus == PlayerStatusObservable.PREPARING || animationStartedLessThanOneSecondAgo(mPreparingAnimationStarted)) {
+        Log.v(TAG, "startAngle: " + defaultStartAngle + " endAngle: " + defaultEndAngle + " elapsed:" + elapsedTime);
+        canvas.drawArc(bounds, (float)defaultStartAngle, (float)(defaultEndAngle - defaultStartAngle), false, paintBorder);
 
-            if (mPreparingAnimationStarted == -1)
-                mPreparingAnimationStarted = System.currentTimeMillis();
-
-            // Draw the animation
-            float angle = (80 * elapsedTime / 1000) % 360;
-
-            //mMatrix.postRotate(30 * elapsedTime/1000);        // rotate 30° every second
-            mMatrix.setRotate(angle, centerX, centerY);
-            //mMatrix.postTranslate(100 * elapsedTime/1000, 0); // move 100 pixels to the right
-            // other transformations...
-            canvas.concat(mMatrix);        // call this before drawing on the canvas!!
-
-            float zeroToOne = angle / 360;
-            float zeroToTwo = zeroToOne * 2;
-            float minusOneToOne = zeroToTwo - 1;
-            float onezeroone = Math.abs(minusOneToOne) * -1 + 1;
-
-            float interp = onezeroone;
-            //Log.d("Rorate", "angle: " + angle + " interp: " + interp);
-            canvas.drawArc(bounds, START_ANGLE, interperter.getInterpolation(interp) * 360, false, paintBorder);
-
+        if (refreshButton) {
             this.postInvalidateDelayed(1000 / FPS);
-        } else {
-            mPreparingAnimationStarted = -1;
         }
     }
-    */
+
+    private static double[] getCircleAngles(double argElapsedTime) {
+        double angle = (argElapsedTime / 10.0) % 360;
+
+        double zeroToOne = (angle) / 360.0f;
+        double zeroToTwo = zeroToOne * 2;
+        double minusOneToOne = zeroToTwo - 1;
+        double onezeroone = Math.abs(Math.abs(minusOneToOne) * -1);
+
+        double[] out = new double[2];
+
+        out[0] = angle;
+        out[1] = interperter1.getInterpolation((float)onezeroone) * 360;
+
+        return out;
+    }
+
 
     private boolean animationStartedLessThanOneSecondAgo(long argFirstDisplayed) {
         return System.currentTimeMillis()-argFirstDisplayed < 1000 && argFirstDisplayed != -1;
@@ -368,6 +414,7 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
             //setStatus(PlayerStatusObservable.PAUSED);
             animateChange(PlayPauseDrawable.IS_PAUSED);
         } else {
+            animateChange(PlayPauseDrawable.IS_PAUSED);
             setStatus(PlayerStatusObservable.PREPARING);
         }
 
@@ -505,13 +552,6 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
         if  (isInEditMode()) {
             return;
         }
-
-        /*
-        bounds.top = 0;
-        bounds.left = 0;
-        bounds.bottom = h;
-        bounds.right = w;
-        */
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             setOutlineProvider(new CustomOutline(bounds));

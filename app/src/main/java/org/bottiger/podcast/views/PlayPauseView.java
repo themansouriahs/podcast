@@ -60,8 +60,8 @@ public class PlayPauseView extends FrameLayout {
     private int mWidth;
     private int mHeight;
 
-    private @ColorRes int color1 = R.color.green;
-    private @ColorRes int color2 = R.color.red;
+    private @ColorRes int color1 = R.color.colorPrimary;
+    private @ColorRes int color2 = R.color.colorPrimary;
 
     public PlayPauseView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -131,7 +131,6 @@ public class PlayPauseView extends FrameLayout {
         final float radius = Math.min(mWidth, mHeight) / 2f;
         super.onDraw(canvas);
         mPaint.setColor(mBackgroundColor);
-        //mShadow.setShadowLayer(10.0f, 0.0f, 2.0f, 0xFF000000);
         canvas.drawCircle(mWidth / 2f, mHeight / 2f, radius, mPaint);
         mDrawable.draw(canvas);
     }

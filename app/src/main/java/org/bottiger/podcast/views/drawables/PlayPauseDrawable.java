@@ -14,7 +14,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.IntDef;
-import android.util.Log;
 import android.util.Property;
 
 import java.lang.annotation.Retention;
@@ -36,12 +35,12 @@ public class PlayPauseDrawable extends Drawable {
             new Property<PlayPauseDrawable, Float>(Float.class, "progress") {
                 @Override
                 public Float get(PlayPauseDrawable d) {
-                    return d.getProgress();
+                    return d.getTransformationProgress();
                 }
 
                 @Override
                 public void set(PlayPauseDrawable d, Float value) {
-                    d.setProgress(value);
+                    d.setTransformationProgress(value);
                 }
             };
 
@@ -56,7 +55,7 @@ public class PlayPauseDrawable extends Drawable {
     private float mWidth = -1;
     private float mHeight = -1;
 
-    private float mProgress = 1;
+    private float mTransformationProgress = 1;
     private boolean mIsPlaying;
 
     public PlayPauseDrawable(Context context) {
@@ -91,13 +90,13 @@ public class PlayPauseDrawable extends Drawable {
         mRightPauseBar.rewind();
 
         // The current distance between the two pause bars.
-        final float barDist = lerp(mPauseBarDistance, 0, mProgress);
+        final float barDist = lerp(mPauseBarDistance, 0, mTransformationProgress);
         // The current width of each pause bar.
-        final float barWidth = lerp(mPauseBarWidth, mPauseBarHeight / 2f, mProgress);
+        final float barWidth = lerp(mPauseBarWidth, mPauseBarHeight / 2f, mTransformationProgress);
         // The current position of the left pause bar's top left coordinate.
-        final float firstBarTopLeft = lerp(0, barWidth, mProgress);
+        final float firstBarTopLeft = lerp(0, barWidth, mTransformationProgress);
         // The current position of the right pause bar's top right coordinate.
-        final float secondBarTopRight = lerp(2 * barWidth + barDist, barWidth + barDist, mProgress);
+        final float secondBarTopRight = lerp(2 * barWidth + barDist, barWidth + barDist, mTransformationProgress);
 
         // Draw the left pause bar. The left pause bar transforms into the
         // top half of the play button triangle by animating the position of the
@@ -120,11 +119,11 @@ public class PlayPauseDrawable extends Drawable {
         canvas.save();
 
         // Translate the play button a tiny bit to the right so it looks more centered.
-        canvas.translate(lerp(0, mPauseBarHeight / 8f, mProgress), 0);
+        canvas.translate(lerp(0, mPauseBarHeight / 8f, mTransformationProgress), 0);
 
         // (1) Pause --> Play: rotate 0 to 90 degrees clockwise.
         // (2) Play --> Pause: rotate 90 to 180 degrees clockwise.
-        final float rotationProgress = mIsPlaying ? 1 - mProgress : mProgress;
+        final float rotationProgress = mIsPlaying ? 1 - mTransformationProgress : mTransformationProgress;
         final float startingRotation = mIsPlaying ? 90 : 0;
         canvas.rotate(lerp(startingRotation, startingRotation + 90, rotationProgress), mWidth / 2f, mHeight / 2f);
 
@@ -135,21 +134,11 @@ public class PlayPauseDrawable extends Drawable {
         canvas.drawPath(mLeftPauseBar, mPaint);
         canvas.drawPath(mRightPauseBar, mPaint);
 
-        Log.d("ttt", "mIsPlaying:" + mIsPlaying + " mProgress:" + mProgress);
+        // Draw the circle around the button
 
         canvas.restore();
     }
 
-    public Animator getPausePlayAnimator() {
-        final Animator anim = ObjectAnimator.ofFloat(this, PROGRESS, mIsPlaying ? 1 : 0, mIsPlaying ? 0 : 1);
-        anim.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                mIsPlaying = !mIsPlaying;
-            }
-        });
-        return anim;
-    }
     public Animator getPauseAnimator() {
         final Animator anim = ObjectAnimator.ofFloat(this, PROGRESS, 1, 0);
         anim.addListener(new AnimatorListenerAdapter() {
@@ -179,13 +168,11 @@ public class PlayPauseDrawable extends Drawable {
 
     public void setState(@IconState int argState) {
         if (argState == IS_PLAYING) {
-            Log.d("ttt", "is_playing");
             mIsPlaying = true;
-            setProgress(0);
+            setTransformationProgress(0);
         } else {
-            Log.d("ttt", "is_paused");
             mIsPlaying = false;
-            setProgress(1);
+            setTransformationProgress(1);
         }
     }
 
@@ -193,13 +180,13 @@ public class PlayPauseDrawable extends Drawable {
         return mIsPlaying ? IS_PLAYING : IS_PAUSED;
     }
 
-    private void setProgress(float progress) {
-        mProgress = progress;
+    private void setTransformationProgress(float progress) {
+        mTransformationProgress = progress;
         invalidateSelf();
     }
 
-    private float getProgress() {
-        return mProgress;
+    private float getTransformationProgress() {
+        return mTransformationProgress;
     }
 
     @Override
