@@ -151,7 +151,6 @@
                 android:layout_height="wrap_content"
                 >
 
-
                 <!-- buttons -->
                 <FrameLayout
                     android:id="@+id/play_button_container"
@@ -196,7 +195,7 @@
 
                 <net.steamcrafted.materialiconlib.MaterialIconView
                     android:id="@+id/top_player_rewind"
-                    app:layout_widthPercent="25%"
+                    app:layout_widthPercent="20%"
                     android:layout_height="42dp"
                     android:layout_weight="0.7"
                     android:background="?attr/selectableItemBackgroundBorderless"
@@ -211,7 +210,7 @@
 
                 <net.steamcrafted.materialiconlib.MaterialIconView
                     android:id="@+id/top_player_fastforward"
-                    app:layout_widthPercent="25%"
+                    app:layout_widthPercent="20%"
                     android:layout_height="42dp"
                     android:layout_weight="0.7"
                     android:background="?attr/selectableItemBackgroundBorderless"
@@ -236,6 +235,27 @@
                     android:layout_toRightOf="@id/top_player_fastforward"
                     android:layout_toEndOf="@id/top_player_fastforward"
                     />
+
+                <RelativeLayout
+                    android:layout_width="60dp"
+                    android:layout_height="match_parent"
+                    android:layout_alignTop="@id/top_player_rewind"
+                    android:layout_alignBottom="@id/top_player_rewind"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginLeft="10dp">
+
+                    <org.bottiger.podcast.views.DownloadButtonView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:id="@+id/download"
+                        android:padding="0dip"
+                        android:background="@null"
+                        android:layout_centerHorizontal="true"
+                        android:src="@drawable/download"
+                        android:elevation="@dimen/player_elevation"
+                        />
+
+                </RelativeLayout>
 
 
                 <FrameLayout
@@ -307,24 +327,6 @@
                     android:elevation="@dimen/player_elevation"
                     style="@style/TopPlayerButton"
                     />
-
-                <RelativeLayout
-                    android:layout_width="60dp"
-                    android:layout_height="match_parent">
-
-                    <org.bottiger.podcast.views.DownloadButtonView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:id="@+id/download"
-                        android:padding="0dip"
-                        android:background="@null"
-                        android:layout_centerHorizontal="true"
-                        android:src="@drawable/download"
-                        android:elevation="@dimen/player_elevation"
-                        />
-
-                </RelativeLayout>
-
 
             </LinearLayout>
 
