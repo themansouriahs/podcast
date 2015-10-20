@@ -30,6 +30,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.graphics.Palette;
 import android.support.v7.util.SortedList;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Patterns;
 
 import javax.annotation.Nullable;
@@ -201,8 +202,6 @@ public class Subscription implements ISubscription, PaletteListener {
 	}
 
 	public void addEpisode(@NonNull IEpisode argEpisode) {
-		//SoundWaves.getLibraryInstance().addEpisode((FeedItem) argEpisode);
-
 		mEpisodes.add(argEpisode);
 	}
 
