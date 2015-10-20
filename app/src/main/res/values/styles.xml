@@ -354,19 +354,6 @@
         <item name="android:scaleType">fitStart</item>
     </style>
 
-    <style name="FeedViewPlayPauseButton">
-        <item name="android:layout_width">50dip</item>
-        <item name="android:layout_height">50dip</item>
-        <item name="android:layout_margin">5dip</item>
-        <item name="android:scaleType">center</item>
-        <!--<item tools:targetApi="21" name="android:elevation">@dimen/player_elevation</item>-->
-    </style>
-
-    <style name="SmallFeedViewPlayPauseButton"  parent="@style/FeedViewPlayPauseButton">
-        <item name="android:layout_width">50dip</item>
-        <item name="android:layout_height">50dip</item>
-    </style>
-
     <style name="SubscriptionHeaderFont" parent="@android:style/TextAppearance.Large">
         <item name="android:layout_width">fill_parent</item>
         <item name="android:layout_height">wrap_content</item>

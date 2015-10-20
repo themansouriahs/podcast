@@ -70,7 +70,6 @@ public class EpisodeViewHolder extends RecyclerView.ViewHolder {
     @SuppressLint("WrongViewCast")
     public EpisodeViewHolder(View view) {
         super(view);
-        //view.setOnClickListener(this);
 
         mContainer = (ViewGroup) view.findViewById(R.id.group);
         mTitle = (TextView) view.findViewById(R.id.title);
@@ -79,6 +78,8 @@ public class EpisodeViewHolder extends RecyclerView.ViewHolder {
         mPlayPauseButton = (PlayPauseImageView) view.findViewById(R.id.play_pause_button);
         mQueueButton = (FeedViewQueueButton) view.findViewById(R.id.queue_button);
         mDownloadButton = (DownloadButtonView) view.findViewById(R.id.feedview_download_button);
+
+        mPlayPauseButton.setIconColor(Color.WHITE);
     }
 
 

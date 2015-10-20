@@ -444,7 +444,7 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
     @Override
     public void onPaletteFound(Palette argChangedPalette) {
         ColorExtractor extractor = new ColorExtractor(mContext, argChangedPalette);
-        setColor(extractor.getSecondaryTint(), extractor.getSecondary());
+        setColor(extractor.getPrimary(), extractor.getSecondaryTint());
         //setColor(extractor.getSecondary(), extractor.getSecondaryTint());
     }
 
