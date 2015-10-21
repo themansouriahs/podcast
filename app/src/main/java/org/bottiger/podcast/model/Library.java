@@ -139,6 +139,7 @@ public class Library {
 
     public void addEpisode(IEpisode argEpisode) {
         mLock.lock();
+        try {
         FeedItem item = null;
         if (argEpisode instanceof FeedItem)
             item = (FeedItem)argEpisode;
@@ -146,7 +147,6 @@ public class Library {
         if (item == null)
             return;
 
-        try {
             if (argEpisode == null)
                 return;
 
@@ -346,18 +346,8 @@ public class Library {
                     @Override
                     public void call(SqlBrite.Query query) {
                         Cursor cursor = null;
-                        //mEpisodes.clear();
-
-                /*
-                HashMap<Long, Subscription> subscriptionMap = new HashMap<>(mActiveSubscriptions.size());
-                Subscription subscription;
-                for (int i = 0; i < mActiveSubscriptions.size(); i++) {
-                    subscription = (Subscription) mActiveSubscriptions.get(i);
-                    subscriptionMap.put(subscription.getId(), subscription);
-                }*/
 
                         long start = 0;
-
                         int counter = 0;
                         try {
                             cursor = query.run();
@@ -370,28 +360,14 @@ public class Library {
                                 emptyItems = new FeedItem[cursor.getCount()];
 
                                 for (int i = 0; i < emptyItems.length; i++) {
-                                    //long start = System.currentTimeMillis();
                                     emptyItems[i] = new FeedItem();
-                                    //long end = System.currentTimeMillis();
-                                    //Log.d("allocateEpisode", i + ": " + (end-start));
                                 }
                             }
 
                             while (cursor.moveToNext()) {
-                                //long start = System.currentTimeMillis();
                                 FeedItem item = LibraryPersistency.fetchEpisodeFromCursor(cursor, emptyItems[counter]);
-                                //long end1 = System.currentTimeMillis();
-
-                                //subscription = subscriptionMap.get(item.sub_id);
-                                //long end2 = System.currentTimeMillis();
-                                //if (subscription != null) {
-                                argSubscription.addEpisode(item);
                                 addEpisode(item);
-                                //}
-
                                 counter++;
-                                //long end3 = System.currentTimeMillis();
-                                //Log.d("loadEpisode", "1: " + (end1-start) + " ms. 2: " + (end2-start) + " ms. 3: " + (end3-start));
                             }
 
                             argSubscription.setIsLoaded(true);

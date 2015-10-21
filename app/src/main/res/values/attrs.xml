@@ -56,6 +56,11 @@
     <attr name="themeBackground" format="reference" />
     <attr name="themeTextColorPrimary" format="reference" />
     <attr name="themeTextColorFaded" format="reference" />
+    <attr name="delete_inv" format="reference" />
+    <attr name="download_inv" format="reference" />
+    <attr name="sleep_inv" format="reference" />
+    <attr name="fullscreen_inv" format="reference" />
+    <attr name="fullscreen_exit_inv" format="reference" />
 
     <declare-styleable name="BezelImageView">
         <attr name="maskDrawable" format="reference" />

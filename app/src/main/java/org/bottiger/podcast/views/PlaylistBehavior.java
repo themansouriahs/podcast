@@ -1,7 +1,6 @@
 package org.bottiger.podcast.views;
 
 import android.content.Context;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ScrollerCompat;
@@ -12,11 +11,8 @@ import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.animation.Interpolator;
-import android.widget.LinearLayout;
-import android.widget.Scroller;
 
 import org.bottiger.podcast.R;
-import org.bottiger.podcast.ToolbarActivity;
 
 /**
  * Created by aplb on 08-09-2015.
@@ -52,7 +48,7 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
     public boolean onLayoutChild(CoordinatorLayout parent, View child, int layoutDirection) {
 
         if (mTopPlayer == null) {
-            mTopPlayer = (TopPlayer) parent.findViewById(R.id.session_photo_container);
+            mTopPlayer = (TopPlayer) parent.findViewById(R.id.top_player);
         }
 
         if (mRecyclerView == null) {
@@ -72,7 +68,7 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
     public boolean layoutDependsOn(CoordinatorLayout parent, View child, View dependency) {
         Log.v(TAG, "layoutDependsOn, child: " + child.getClass().getName() + " dependency: " + dependency.getClass().getName());
         boolean corectChild = (child.getId() == R.id.my_recycler_view);
-        boolean correctDependency = (dependency.getId() == R.id.session_photo_container);
+        boolean correctDependency = (dependency.getId() == R.id.top_player);
         return corectChild && correctDependency;
     }
 

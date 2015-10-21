@@ -27,7 +27,6 @@ import org.bottiger.podcast.views.dialogs.DialogPlaylistFilters;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -40,10 +39,14 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptIntrinsicBlur;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
@@ -58,14 +61,19 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.github.ivbaranov.mfb.MaterialFavoriteButton;
 import com.squareup.otto.Produce;
 import com.squareup.otto.Subscribe;
+
+import jp.wasabeef.glide.transformations.BlurTransformation;
 
 public class PlaylistFragment extends AbstractEpisodeFragment implements OnSharedPreferenceChangeListener,
                                                                         DrawerActivity.TopFound {
@@ -95,7 +103,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
     private PlayerButtonView mForwardButton;
     private PlayerButtonView mBackButton;
     private MaterialFavoriteButton mFavoriteButton;
-    private View mGradientBottomTopPlayer;
+    private ImageButton mMoreButton;
 
     private RecyclerView mRecyclerView;
     private View mOverlay;
@@ -160,7 +168,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         //((MainActivity)getActivity()).listeners.add(this);
         super.onViewCreated(view,savedInstanceState);
 
-        mTopPlayer =   (TopPlayer) view.findViewById(R.id.session_photo_container);
+        mTopPlayer =   (TopPlayer) view.findViewById(R.id.top_player);
         mPhoto =            (ImageViewTinted) view.findViewById(R.id.session_photo);
 
         mPlaylistContainer = view.findViewById(R.id.playlist_container);
@@ -170,20 +178,20 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         mPopulateManually       = (RadioButton) view.findViewById(R.id.radioNone);
         mPopulateAutomatically  = (RadioButton) view.findViewById(R.id.radioAll);
 
-        mEpisodeTitle         =    (TextView) view.findViewById(R.id.episode_title);
-        mEpisodeInfo         =    (TextView) view.findViewById(R.id.episode_info);
+        mEpisodeTitle         =    (TextView) view.findViewById(R.id.player_title);
+        mEpisodeInfo         =    (TextView) view.findViewById(R.id.player_podcast);
 
         mCurrentTime       =    (TextViewObserver) view.findViewById(R.id.current_time);
         mTotalTime         =    (TextViewObserver) view.findViewById(R.id.total_time);
 
-        mPlayPauseButton         =    (PlayPauseImageView) view.findViewById(R.id.play_pause_button);
+        mPlayPauseButton         =    (PlayPauseImageView) view.findViewById(R.id.playpause);
         mPlayerSeekbar          =    (PlayerSeekbar) view.findViewById(R.id.top_player_seekbar);
         mPlayerDownloadButton   =    (DownloadButtonView) view.findViewById(R.id.download);
         mBackButton = (PlayerButtonView)view.findViewById(R.id.rewind_button);
         mForwardButton = (PlayerButtonView)view.findViewById(R.id.fast_forward_button);
         mFavoriteButton = (MaterialFavoriteButton)view.findViewById(R.id.favorite);
 
-        mGradientBottomTopPlayer = view.findViewById(R.id.gradient_bottom);
+        mMoreButton = (ImageButton) view.findViewById(R.id.player_more_button);
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.my_recycler_view);
         mOverlay = view.findViewById(R.id.playlist_overlay);
@@ -402,8 +410,8 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
             if (item != null) {
                 mPlayPauseButton.setEpisode(item, PlayPauseImageView.PLAYLIST);
-                mBackButton.setEpisode(item);
-                mForwardButton.setEpisode(item);
+                //mBackButton.setEpisode(item);
+                //mForwardButton.setEpisode(item);
                 mPlayerDownloadButton.setEpisode(item);
                 //mFavoriteButton.setEpisode(item);
                 SoundWaves.getBus().register(mPlayerDownloadButton);
@@ -422,7 +430,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         mEpisodeTitle.setText(item.getTitle());
         mEpisodeInfo.setText(item.getDescription());
 
-        final int color =getResources().getColor(R.color.white_opaque);
+        final int color = ContextCompat.getColor(getContext(), R.color.pitch_black);
         mEpisodeTitle.setTextColor(color);
         mEpisodeInfo.setTextColor(color);
 
@@ -443,25 +451,34 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         mTotalTime.setEpisode(item);
 
         mPlayPauseButton.setEpisode(item, PlayPauseImageView.PLAYLIST);
-        mBackButton.setEpisode(item);
-        mForwardButton.setEpisode(item);
+        //mBackButton.setEpisode(item);
+        //mForwardButton.setEpisode(item);
         mPlayerDownloadButton.setEpisode(item);
         //mFavoriteButton.setEpisode(item);
 
-        if (SoundWaves.sBoundPlayerService != null &&
-                SoundWaves.sBoundPlayerService.getCurrentItem() != null &&
-                SoundWaves.sBoundPlayerService.getCurrentItem().equals(item) &&
-                SoundWaves.sBoundPlayerService.isPlaying()) {
+        final PlayerService ps = PlayerService.getInstance();
+        if (ps != null &&
+                ps.getCurrentItem() != null &&
+                ps.getCurrentItem().equals(item) &&
+                ps.isPlaying()) {
             mPlayPauseButton.setStatus(PlayerStatusObservable.PLAYING);
         } else {
             mPlayPauseButton.setStatus(PlayerStatusObservable.PAUSED);
         }
 
+        /*
+        mPlayPauseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPlayPauseButton.toggle();
+            }
+        });
+
         mBackButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (SoundWaves.sBoundPlayerService != null) {
-                    SoundWaves.sBoundPlayerService.getPlayer().rewind(item);
+                if (ps != null) {
+                    ps.getPlayer().rewind(item);
                 }
             }
         });
@@ -469,11 +486,12 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         mForwardButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (SoundWaves.sBoundPlayerService != null) {
-                    SoundWaves.sBoundPlayerService.getPlayer().fastForward(item);
+                if (ps != null) {
+                    ps.getPlayer().fastForward(item);
                 }
             }
         });
+        */
 
         mPlayerSeekbar.setEpisode(item);
         mPlayerSeekbar.setOverlay(mOverlay);
@@ -483,15 +501,17 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
         final Activity activity = getActivity();
 
-        String artworkURL = item.getArtwork(activity);
+        String artworkURL = item.getArtwork();
         if (!TextUtils.isEmpty(artworkURL)) {
+
             PaletteHelper.generate(artworkURL, activity, mTopPlayer);
+            /*
             PaletteHelper.generate(artworkURL, activity, mPlayPauseButton);
             PaletteHelper.generate(artworkURL, activity, mBackButton);
             PaletteHelper.generate(artworkURL, activity, mForwardButton);
             PaletteHelper.generate(artworkURL, activity, mPlayerDownloadButton);
             //PaletteHelper.generate(artworkURL, activity, mFavoriteButton);
-
+*/
             PaletteHelper.generate(artworkURL, activity, new PaletteListener() {
                 @Override
                 public void onPaletteFound(Palette argChangedPalette) {
@@ -527,20 +547,17 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
                 @Override
                 public String getPaletteUrl() {
-                    return item.getArtwork(activity);
+                    return item.getArtwork();
                 }
             });
+
         }
 
-        String artworkUrl = item.getArtwork(activity);
+        String artworkUrl = item.getArtwork();
         if (item != null && artworkUrl != null) {
             Log.v("MissingImage", "Setting image");
-            //FrescoHelper.loadImageInto(mPhoto, artworkUrl, null);
-            ImageLoaderUtils.loadImageInto(mPhoto, artworkUrl, false, false);
-        }
-
-        if (mTopPlayer.getVisibleHeight() == 0) {
-            mTopPlayer.setPlayerHeight(mTopPlayer.getMaximumSize());
+            BlurTransformation blur = new BlurTransformation(getContext(), 25);
+            ImageLoaderUtils.loadImageInto(mPhoto, artworkUrl, null, false, false, false);
         }
 
         if (mTopPlayer.isFullscreen()) {
@@ -564,7 +581,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
             }
         } else {
             if (!dismissedWelcomePage) {
-                sharedPreferences.edit().putBoolean(PLAYLIST_WELCOME_DISMISSED, true).commit();
+                sharedPreferences.edit().putBoolean(PLAYLIST_WELCOME_DISMISSED, true).apply();
             }
 
             if (mPlaylistContainer == null)

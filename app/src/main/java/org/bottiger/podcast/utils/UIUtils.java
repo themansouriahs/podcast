@@ -44,10 +44,14 @@ import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.StyleSpan;
+import android.transition.AutoTransition;
+import android.transition.Transition;
+import android.transition.TransitionSet;
 import android.util.DisplayMetrics;
 import android.view.ContextThemeWrapper;
 import android.view.Display;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -176,6 +180,22 @@ public class UIUtils {
         int height = size.y;
 
         return height;
+    }
+
+    @TargetApi(19)
+    public static Transition getDefaultTransition(@NonNull Resources argResources) {
+        AutoTransition autoTransition = new AutoTransition();
+        autoTransition.setDuration(argResources.getInteger(R.integer.animation_quick));
+        autoTransition.setOrdering(TransitionSet.ORDERING_TOGETHER);
+        return autoTransition;
+    }
+
+    public static void removeOnGlobalLayoutListener(View v, ViewTreeObserver.OnGlobalLayoutListener listener){
+        if (Build.VERSION.SDK_INT < 16) {
+            v.getViewTreeObserver().removeGlobalOnLayoutListener(listener);
+        } else {
+            v.getViewTreeObserver().removeOnGlobalLayoutListener(listener);
+        }
     }
 
     private static final int BRIGHTNESS_THRESHOLD = 130;

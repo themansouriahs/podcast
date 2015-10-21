@@ -133,13 +133,15 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        float halfW = getWidth()*RECTANGLE_SCALING;
+        int width = getWidth();
+        int height = getHeight();
 
-        int left = 0;
-        int width = (int)(halfW);
-        int top = 0;
+        int rectSize = Math.min(width, height);
 
-        buttonRectangle.set(left+BITMAP_OFFSET, top+BITMAP_OFFSET, left + width-BITMAP_OFFSET, top + width-BITMAP_OFFSET);
+        int left = width>height ? (width-rectSize)/2 : 0;
+        int top = width<height ? (height-rectSize)/2 : 0;
+
+        buttonRectangle.set(left+BITMAP_OFFSET, top+BITMAP_OFFSET, left + rectSize-BITMAP_OFFSET, top + rectSize-BITMAP_OFFSET);
 
         if(mProgress!=0 && mProgress < 100) {
             if (getState() != PlayerButtonView.STATE_DEFAULT) {

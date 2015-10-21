@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.graphics.Palette;
@@ -525,8 +526,9 @@ public class FeedActivity extends TopActivity implements PaletteListener {
         ColorExtractor extractor = new ColorExtractor(this, argChangedPalette);
         mMultiShrinkScroller.setHeaderTintColor(extractor.getPrimary());
         mFloatingButton.onPaletteFound(argChangedPalette);
-        mRevealLayout.setBackgroundColor(extractor.getPrimary());
-        UIUtils.tintStatusBar(extractor.getPrimary(), this);
+        @ColorInt int feedColor = extractor.getPrimary();
+        mRevealLayout.setBackgroundColor(feedColor);
+        UIUtils.tintStatusBar(feedColor, this);
         mStatusBarColor = extractor.getPrimary();
         mAdapter.setPalette(argChangedPalette);
     }

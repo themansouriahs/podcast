@@ -17,10 +17,7 @@ import android.widget.SeekBar;
 
 import org.bottiger.podcast.R;
 
-/**
- * TODO: document your custom view class.
- */
-public class PlayerRelativeLayout extends RelativeLayout {
+public class PlayerRelativeLayout extends android.support.percent.PercentRelativeLayout {
 
     public PlayerRelativeLayout(Context context) {
         super(context);

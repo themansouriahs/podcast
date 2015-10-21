@@ -1,18 +1,12 @@
 package org.bottiger.podcast.views;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.OverScroller;
 
 import org.bottiger.podcast.PlaylistFragment;
@@ -52,7 +46,7 @@ public class SwipeRefreshExpandableLayout extends FeedRefreshLayout {
     @Override
     protected void onFinishInflate () {
         mRecycerView = (FixedRecyclerView) findViewById(R.id.my_recycler_view);
-        mTopPlayer = (TopPlayer) findViewById(R.id.session_photo_container);
+        mTopPlayer = (TopPlayer) findViewById(R.id.top_player);
     }
 
 

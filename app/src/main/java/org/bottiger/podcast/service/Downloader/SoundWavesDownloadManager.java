@@ -690,7 +690,7 @@ public class SoundWavesDownloadManager extends Observable {
 
             mContext.sendBroadcast(intent);
 
-            Playlist.refresh(mContext);
+            //Playlist.refresh(mContext);
 
             removeDownloadingEpisode(argEpisode);
             removeExpiredDownloadedPodcasts(mContext);

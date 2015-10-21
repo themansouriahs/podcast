@@ -25,15 +25,14 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class PaletteHelper {
 
-    private static final int CACHE_SIZE = 20;
+    private static final int CACHE_SIZE = 40;
     private static final int PALETTE_SIZE = 24; /* 24 is default size. You can decrease this value to speed up palette generation */
 
     private static final ReentrantLock sLock = new ReentrantLock();
 
     private static LruCache<String, Palette> mPaletteCache = new LruCache<>(CACHE_SIZE);
-    private static HashMap<String, HashSet<PaletteListener>> mWaiting = new HashMap<>();
 
-    public static synchronized void generate(@NonNull final String argUrl, @NonNull final Activity argActivity, @Nullable final PaletteListener ... argCallbacks) {
+    public static void generate(@NonNull final String argUrl, @NonNull final Activity argActivity, @Nullable final PaletteListener ... argCallbacks) {
 
         if (!Patterns.WEB_URL.matcher(argUrl).matches())
             return;
@@ -48,13 +47,6 @@ public class PaletteHelper {
                 return;
             }
 
-            boolean isWaiting = mWaiting.containsKey(argUrl);
-
-            addToWaiingLine(argUrl, argCallbacks);
-
-            if (isWaiting)
-                return;
-
         } finally {
             sLock.unlock();
         }
@@ -63,13 +55,13 @@ public class PaletteHelper {
         Glide.with(argActivity)
                 .load(argUrl)
                 .asBitmap()
-                .into(new SimpleTarget<Bitmap>(100,100) {
+                .into(new SimpleTarget<Bitmap>(200, 200) {
                     @Override
                     public void onResourceReady(Bitmap resource, GlideAnimation glideAnimation) {
                         // You can use the bitmap in only limited ways
                         // No need to do any cleanup.
                         //mLock.lock();
-                        final Palette palette = Palette.generate(resource, PALETTE_SIZE);
+                        final Palette palette = Palette.from(resource).generate();// .generate(resource, PALETTE_SIZE);
 
                         sLock.lock();
                         try {
@@ -78,12 +70,7 @@ public class PaletteHelper {
                                 mPaletteCache.put(argUrl, palette);
                             }
 
-                            final HashSet<PaletteListener> listeners = mWaiting.get(argUrl);
-
-                            if (listeners == null)
-                                return;
-
-                            for (final PaletteListener listener : listeners) {
+                            for (final PaletteListener listener : argCallbacks) {
 
                                 argActivity.runOnUiThread(new Runnable() {
                                     @Override
@@ -93,8 +80,6 @@ public class PaletteHelper {
                                 });
 
                             }
-
-                            mWaiting.put(argUrl, new HashSet<PaletteListener>());
                         } finally {
                             sLock.unlock();
                         }
@@ -102,33 +87,7 @@ public class PaletteHelper {
 
                     @Override
                     public void onLoadFailed(Exception e, Drawable errorDrawable) {
-                        sLock.lock();
-                        try {
-                            mWaiting.remove(argUrl);
-                        } finally {
-                            sLock.unlock();
-                        }
                     }
                 });
-    }
-
-    private static void addToWaiingLine(@NonNull String argUrl, @Nullable PaletteListener ... argNewCallbacks) {
-        HashSet<PaletteListener> listeners = mWaiting.get(argUrl);
-
-        if (listeners == null) {
-            listeners = new HashSet<>();
-        }
-
-        if (argNewCallbacks == null)
-            return;
-
-        for (PaletteListener callback : argNewCallbacks) {
-            if (listeners.contains(callback))
-                continue;
-
-            listeners.add(callback);
-        }
-
-        mWaiting.put(argUrl, listeners);
     }
 }

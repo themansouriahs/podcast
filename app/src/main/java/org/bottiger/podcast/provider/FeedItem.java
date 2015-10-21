@@ -403,13 +403,13 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 
 		if (SDCardManager.getSDCardStatus()) {
 			try {
-				downloadReferenceID = -1;
 				setDownloaded(false);
 				update(argContext.getContentResolver());
 				File file = new File(getAbsolutePath());
 				if (file.exists() && file.delete()) {
                     DownloadProgressPublisher.deleteEpisode(this);
-					Playlist.refresh(argContext);
+					//Playlist.refresh(argContext);
+					notifyPropertyChanged(EpisodeChanged.CHANGED);
 					return true;
 				}
 			} catch (Exception e) {
@@ -616,7 +616,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 			return;
 
 		isDownloaded = argIsDownloaded;
-		notifyPropertyChanged();
+		notifyPropertyChanged(EpisodeChanged.CHANGED);
 	}
 
 	/**

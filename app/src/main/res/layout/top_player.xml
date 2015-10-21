@@ -4,7 +4,7 @@
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
     xmlns:card_view="http://schemas.android.com/tools"
     android:visibility="visible"
-    android:id="@+id/session_photo_container"
+    android:id="@+id/top_player"
     android:layout_alignParentTop="true"
     android:animateLayoutChanges="true"
     android:layout_width="match_parent"

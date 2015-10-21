@@ -32,7 +32,7 @@ public class StrUtils {
     }
 
 	public static boolean isValidUrl(@Nullable String argUrl) {
-		if (argUrl == null)
+		if (TextUtils.isEmpty(argUrl))
 			return false;
 
 		return Patterns.WEB_URL.matcher(argUrl).matches();

@@ -15,6 +15,7 @@ import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.ColorUtils;
 import org.bottiger.podcast.utils.PaletteHelper;
+import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.views.PlaylistViewHolder;
 
 /**
@@ -193,7 +194,7 @@ public class ExpandableViewHoldersUtil {
         if (viewGroup == null)
             return;
 
-        sTransitionManager.beginDelayedTransition(viewGroup);
+        sTransitionManager.beginDelayedTransition(viewGroup, UIUtils.getDefaultTransition(argPlaylistViewHolder.mLayout.getResources()));
     }
 
 }

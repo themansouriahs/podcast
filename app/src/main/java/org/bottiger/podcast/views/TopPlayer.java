@@ -3,6 +3,7 @@ package org.bottiger.podcast.views;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Build;
 import android.preference.PreferenceManager;
@@ -10,6 +11,7 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.NestedScrollingChild;
@@ -28,10 +30,12 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.view.ViewParent;
 import android.widget.ImageButton;
-import android.widget.RelativeLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.github.ivbaranov.mfb.MaterialFavoriteButton;
@@ -50,7 +54,6 @@ import org.bottiger.podcast.views.dialogs.DialogPlaybackSpeed;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.concurrent.TimeUnit;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -61,7 +64,7 @@ import static org.bottiger.podcast.views.PlayerButtonView.StaticButtonColor;
 /**
  * Created by apl on 30-09-2014.
  */
-public class TopPlayer extends RelativeLayout implements PaletteListener, ScrollingView, NestedScrollingChild {
+public class TopPlayer extends LinearLayout implements PaletteListener, ScrollingView, NestedScrollingChild {
 
     private static final String TAG = "TopPlayer";
 
@@ -97,6 +100,9 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
     private int mTextInfoFadeDistance           =   100; // dp
     private int mTextFadeDistance               =   20; // dp
 
+    private int mControlWidth = -1;
+    private int mControlHeight = -1;
+
     private float screenHeight;
 
     private String mDoFullscreentKey;
@@ -105,27 +111,30 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
     private String mDoDisplayTextKey;
     private boolean mDoDisplayText = false;
 
-    private PlayerRelativeLayout mPlayerControlsLinearLayout;
-
     private int mCenterSquareMarginTop = -1;
     private float mCenterSquareMargin = -1;
 
     private TopPlayer mLayout;
-    private ImageButton mExpandEpisode;
+    private LinearLayout mControls;
     private View mGradient;
     private View mEpisodeText;
     private View mEpisodeInfo;
     private PlayPauseImageView mPlayPauseButton;
-    private View mImageContainer;
 
     private PlayerButtonView mFullscreenButton;
     private PlayerButtonView mSleepButton;
     private Button mSpeedpButton;
     private PlayerButtonView mDownloadButton;
     private MaterialFavoriteButton mFavoriteButton;
-    private PlayerButtonView mFastForwardButton;
-    private PlayerButtonView mRewindButton;
+    private ImageView mFastForwardButton;
+    private ImageView mRewindButton;
     private PlayerButtonView mSkipNextButton;
+    private ImageButton mMoreButton;
+
+    private View mTriangle;
+    private LinearLayout mExpandedActionsBar;
+
+    private ImageViewTinted mPhoto;
 
     private PlayerLayoutParameter mLargeLayout = new PlayerLayoutParameter();
 
@@ -223,40 +232,37 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
     protected void onFinishInflate() {
         super.onFinishInflate();
 
-        mLayout = (TopPlayer) findViewById(R.id.session_photo_container);
+        mLayout = (TopPlayer) findViewById(R.id.top_player);
+        mControls = (LinearLayout) findViewById(R.id.top_player_controls);
 
-        mPlayerControlsLinearLayout = (PlayerRelativeLayout)findViewById(R.id.expanded_controls);
+        getPlayerControlHeight(mControls);
 
-        mPlayPauseButton = (PlayPauseImageView) findViewById(R.id.play_pause_button);
-        mExpandEpisode = (ImageButton)findViewById(R.id.episode_expand);
+        mPlayPauseButton = (PlayPauseImageView) findViewById(R.id.playpause);
         mEpisodeText = findViewById(R.id.episode_title);
         mEpisodeInfo = findViewById(R.id.episode_info);
-        mImageContainer = findViewById(R.id.top_player_center_square);
         mFullscreenButton = (PlayerButtonView) findViewById(R.id.fullscreen_button);
         mGradient = findViewById(R.id.top_gradient_inner);
         mSleepButton = (PlayerButtonView) findViewById(R.id.sleep_button);
         mSpeedpButton = (Button) findViewById(R.id.speed_button);
         mDownloadButton = (PlayerButtonView) findViewById(R.id.download);
         mFavoriteButton = (MaterialFavoriteButton) findViewById(R.id.favorite);
-        mFastForwardButton = (PlayerButtonView) findViewById(R.id.fast_forward_button);
-        mRewindButton = (PlayerButtonView) findViewById(R.id.rewind_button);
+        mFastForwardButton = (ImageView) findViewById(R.id.top_player_fastforward);
+        mRewindButton = (ImageView) findViewById(R.id.top_player_rewind);
         mSkipNextButton = (PlayerButtonView) findViewById(R.id.skip_to_next_button);
+        mPhoto = (ImageViewTinted) findViewById(R.id.session_photo);
+        mMoreButton = (ImageButton) findViewById(R.id.player_more_button);
+
+        mTriangle = findViewById(R.id.visual_triangle);
+        mExpandedActionsBar = (LinearLayout) findViewById(R.id.expanded_action_bar);
 
         mPlayPauseLargeSize = mPlayPauseButton.getLayoutParams().height;
+        mPlayPauseButton.setIconColor(Color.WHITE);
 
         mCenterSquareMarginTop = (int)getResources().getDimension(R.dimen.top_player_center_square_margin_top);
         mCenterSquareMargin = getResources().getDimension(R.dimen.top_player_center_square_margin);
 
         mLargeLayout.SeekBarLeftMargin = 0;
         mLargeLayout.PlayPauseSize = mPlayPauseLargeSize;
-        mLargeLayout.PlayPauseBottomMargin = ((RelativeLayout.LayoutParams)mPlayPauseButton.getLayoutParams()).bottomMargin;
-
-        if (!mDoDisplayText) {
-            mExpandEpisode.setImageResource(R.drawable.ic_expand_more_white);
-            mEpisodeText.setVisibility(GONE);
-            mGradient.setVisibility(GONE);
-            mEpisodeInfo.setVisibility(GONE);
-        }
 
         mSleepButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -267,13 +273,18 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
 
         setFullscreen(mFullscreen, false);
 
-        mExpandEpisode.setOnClickListener(new OnClickListener() {
+        if (mDoDisplayText) {
+            showText();
+        }
+
+        mMoreButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
                     mDoDisplayText = !mDoDisplayText;
-                    if (Build.VERSION.SDK_INT >= 19)
-                        TransitionManager.beginDelayedTransition(mPlayerControlsLinearLayout);
+                    if (Build.VERSION.SDK_INT >= 19) {
+                        TransitionManager.beginDelayedTransition(mLayout, UIUtils.getDefaultTransition(getResources()));
+                    }
 
                     if (mDoDisplayText) {
                         Log.d(TAG, "ShowText");
@@ -283,7 +294,27 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
                         hideText();
                     }
                 } finally {
-                    prefs.edit().putBoolean(mDoDisplayTextKey, mDoDisplayText).commit();
+                    prefs.edit().putBoolean(mDoDisplayTextKey, mDoDisplayText).apply();
+                }
+            }
+        });
+
+        mRewindButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PlayerService ps = PlayerService.getInstance();
+                if (ps != null) {
+                    ps.getPlayer().rewind(ps.getCurrentItem());
+                }
+            }
+        });
+
+        mFastForwardButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PlayerService ps = PlayerService.getInstance();
+                if (ps != null) {
+                    ps.getPlayer().fastForward(ps.getCurrentItem());
                 }
             }
         });
@@ -387,10 +418,10 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
             return -1;
         }
 
-        Log.v("TopPlayer", "setPlayerHeight: " +  argScreenHeight);
+        Log.v("TopPlayer", "setPlayerHeight: " + argScreenHeight);
+
 
         screenHeight = argScreenHeight;
-        float argOffset = argScreenHeight-sizeLarge;
 
         setBackgroundVisibility(screenHeight);
 
@@ -402,11 +433,18 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         lp.height = (int)minMaxScreenHeight;
         setLayoutParams(lp);
 
+        float controlTransY = minMaxScreenHeight-mControlHeight;
+        Log.v("TopPlayer", "controlTransY: " +  controlTransY);
+        if (controlTransY >= 0)
+            controlTransY = 0;
+        mControls.setTranslationY(controlTransY);
+
         return minMaxScreenHeight;
+
     }
 
     public float setBackgroundVisibility(float argTopPlayerHeight) {
-        return setGenericVisibility(mImageContainer, getMaximumSize(), 300, argTopPlayerHeight);
+        return setGenericVisibility(mPhoto, getMaximumSize(), 300, argTopPlayerHeight);
     }
 
     public float setGenericVisibility(@NonNull View argView, int argVisibleHeight, int argFadeDistance, float argTopPlayerHeight) {
@@ -469,8 +507,30 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         ColorExtractor backgroundExtractor = new ColorExtractor(argChangedPalette, ColorUtils.getBackgroundColor(getContext()));
         int color = ColorUtils.getBackgroundColor(getContext());
         mBackgroundColor = StaticButtonColor(mContext, argChangedPalette, color);
-        setBackgroundColor(mBackgroundColor);
-        //setBackgroundColor(backgroundExtractor.getPrimary());
+        //setBackgroundColor(mBackgroundColor);
+        int bgcolor = ContextCompat.getColor(getContext(), R.color.playlist_background);
+        int playcolor = ContextCompat.getColor(getContext(), R.color.colorPrimaryDark);
+        setBackgroundColor(argChangedPalette.getLightVibrantColor(bgcolor));
+
+        mPlayPauseButton.setBackgroundColor(argChangedPalette.getDarkVibrantColor(playcolor));
+
+        int[][] states = new int[][] {
+        new int[] { android.R.attr.state_enabled}, // enabled
+                new int[] {-android.R.attr.state_enabled}, // disabled
+                new int[] {-android.R.attr.state_checked}, // unchecked
+                new int[] { android.R.attr.state_pressed}  // pressed
+    };
+
+    // Remember to update tintButton() if you change this
+    int[] colors = new int[] {
+            Color.BLACK,
+            Color.BLACK,
+            Color.BLACK,
+            Color.BLACK
+    };
+
+    ColorStateList colorStateList = new ColorStateList(states, colors);
+        //mPhoto.setImageTintList(colorStateList);
 
         /*
         setBackgroundColor(backgroundExtractor.getSecondaryTint());
@@ -483,15 +543,16 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         ColorUtils.tintButton(mRewindButton, extractor);
         ColorUtils.tintButton(mSpeedpButton, extractor);
         */
-        int textColor = ColorUtils.getBackgroundColor(getContext());
+        int textColor = ColorUtils.getTextColor(getContext());
         ColorUtils.tintButton(mSleepButton,       textColor);
         ColorUtils.tintButton(mDownloadButton,    textColor);
         ColorUtils.tintButton(mFavoriteButton,    textColor);
         ColorUtils.tintButton(mSleepButton,       textColor);
-        ColorUtils.tintButton(mSkipNextButton,    textColor);
-        ColorUtils.tintButton(mFastForwardButton, textColor);
-        ColorUtils.tintButton(mRewindButton,      textColor);
+        //ColorUtils.tintButton(mSkipNextButton,    textColor);
+        //ColorUtils.tintButton(mFastForwardButton, textColor);
+        //ColorUtils.tintButton(mRewindButton,      textColor);
         ColorUtils.tintButton(mSpeedpButton,      textColor);
+        ColorUtils.tintButton(mFullscreenButton,  textColor);
 
         invalidate();
     }
@@ -502,18 +563,20 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
     }
 
     private void hideText() {
-        mExpandEpisode.setImageResource(R.drawable.ic_expand_more_white);
-
-        fadeText(1.0f, 0.0f);
+        //mExpandEpisode.setImageResource(R.drawable.ic_expand_more_white);
+        //fadeText(1.0f, 0.0f);
+        mTriangle.setVisibility(GONE);
+        mExpandedActionsBar.setVisibility(GONE);
     }
 
     private void showText() {
-        mExpandEpisode.setImageResource(R.drawable.ic_expand_less_white);
-        mEpisodeText.setVisibility(VISIBLE);
-        mGradient.setVisibility(VISIBLE);
-        mEpisodeInfo.setVisibility(VISIBLE);
-
-        fadeText(0.0f, 1.0f);
+        //mExpandEpisode.setImageResource(R.drawable.ic_expand_less_white);
+        //mEpisodeText.setVisibility(VISIBLE);
+        //mGradient.setVisibility(VISIBLE);
+        //mEpisodeInfo.setVisibility(VISIBLE);
+        //fadeText(0.0f, 1.0f);
+        mTriangle.setVisibility(VISIBLE);
+        mExpandedActionsBar.setVisibility(VISIBLE);
     }
 
     private void fadeText(float argAlphaStart, float argAlphaEnd) {
@@ -524,6 +587,22 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         mEpisodeText.animate().alpha(argAlphaEnd);
         mEpisodeInfo.animate().alpha(argAlphaEnd);
         mGradient.animate().alpha(argAlphaEnd);
+    }
+
+
+    private void getPlayerControlHeight(@NonNull final View argView) {
+        ViewTreeObserver viewTreeObserver = argView.getViewTreeObserver();
+        if (viewTreeObserver.isAlive()) {
+            viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    UIUtils.removeOnGlobalLayoutListener(argView, this);
+                    mControlWidth = argView.getWidth();
+                    mControlHeight = argView.getHeight();
+                    argView.getLayoutParams().height = mControlHeight;
+                }
+            });
+        }
     }
 
     public @ColorInt int getBackGroundColor() {
@@ -563,12 +642,14 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         mLayout.setLayoutParams(layoutParams);
         mLayout.setPadding(0, topmargin, 0, 0);
 
+        /*
         int smallMargin = (int)mCenterSquareMargin/2;
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mImageContainer.getLayoutParams();
+        LayoutParams params = (LayoutParams) mImageContainer.getLayoutParams();
         params.setMargins(smallMargin, mCenterSquareMarginTop, smallMargin, 0);
         params.width = mLayout.getWidth()-2*smallMargin;
         params.height = mLayout.getWidth()-2*smallMargin;
         mImageContainer.setLayoutParams(params);
+        */
 
 
 
@@ -591,13 +672,15 @@ public class TopPlayer extends RelativeLayout implements PaletteListener, Scroll
         mLayout.setLayoutParams(layoutParams);
         mLayout.setPadding(0, mCenterSquareMarginTop, 0, 0);
 
+        /*
         if (mLayout.getWidth() > 0) {
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mImageContainer.getLayoutParams();
+            LayoutParams params = (LayoutParams) mImageContainer.getLayoutParams();
             params.setMargins((int) mCenterSquareMargin, 0, (int) mCenterSquareMargin, 0);
             params.width = (int) (mLayout.getWidth() - 2 * mCenterSquareMargin);
             params.height = (int) (mLayout.getWidth() - 2 * mCenterSquareMargin);
             mImageContainer.setLayoutParams(params);
         }
+        */
 
         setPlayerHeight(sizeLarge);
         ((MainActivity)getContext()).exitFullScreen(mLayout);

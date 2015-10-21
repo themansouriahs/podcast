@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
 
-    <color name="white_opaque">#FFFFFFFF</color>
-    <color name="pitch_black">#FF000000</color>
-
     <!--
         Light Theme
     -->
@@ -39,6 +36,11 @@
         <item name="sleep">@drawable/ic_snooze_white</item>
         <item name="fullscreen">@drawable/ic_fullscreen_white</item>
         <item name="fullscreen_exit">@drawable/ic_fullscreen_exit_white</item>
+        <item name="delete_inv">@drawable/ic_delete_24dp</item>
+        <item name="download_inv">@drawable/ic_get_app_black</item>
+        <item name="sleep_inv">@drawable/ic_snooze_black</item>
+        <item name="fullscreen_inv">@drawable/ic_fullscreen_black</item>
+        <item name="fullscreen_exit_inv">@drawable/ic_fullscreen_exit_black</item>
         <!--<item name="seekbar_handle">@drawable/seekbar_handle</item>-->
         <item name="ic_remove_inv">@drawable/ic_highlight_remove_black</item>
         <item name="ic_close_inv">@drawable/ic_close_24dp</item>
@@ -125,6 +127,11 @@
         <item name="sleep">@drawable/ic_snooze_white</item>
         <item name="fullscreen">@drawable/ic_fullscreen_white</item>
         <item name="fullscreen_exit">@drawable/ic_fullscreen_exit_white</item>
+        <item name="delete_inv">@drawable/ic_delete_24dp</item>
+        <item name="download_inv">@drawable/ic_get_app_black</item>
+        <item name="sleep_inv">@drawable/ic_snooze_black</item>
+        <item name="fullscreen_inv">@drawable/ic_fullscreen_black</item>
+        <item name="fullscreen_exit_inv">@drawable/ic_fullscreen_exit_black</item>
         <!--<item name="seekbar_handle">@drawable/seekbar_handle2.9</item>-->
         <item name="android:actionBarStyle">@style/TranslucentActionBar</item>
 
@@ -317,15 +324,13 @@
         <item name="android:layout_marginRight">40dp</item>
     </style>
 
-    <style name="TopPlayerButton" parent="@style/PlaylistButton">
-        <item name="android:layout_above">@id/top_player_seekbar</item>
-        <item name="android:layout_width">match_parent</item>
+    <style name="TopPlayerButton">
+        <item name="android:layout_width">60dp</item>
         <item name="android:layout_height">40dp</item>
-        <item name="android:layout_weight">1</item>
-        <!--<item name="android:maxWidth">55dip</item>-->
         <item name="android:layout_marginBottom">0dp</item>
         <item name="android:layout_marginTop">5dp</item>
         <item name="android:padding">0dp</item>
+        <item name="android:background">@null</item>
     </style>
 
     <style name="SeekPlayerButton" parent="@style/PlaylistButton">
@@ -347,19 +352,6 @@
     <style name="PodcastImage" parent="@style/PodcastImageSIze">
         <!--<item name="android:src">@drawable/generic_podcast</item>-->
         <item name="android:scaleType">fitStart</item>
-    </style>
-
-    <style name="FeedViewPlayPauseButton">
-        <item name="android:layout_width">50dip</item>
-        <item name="android:layout_height">50dip</item>
-        <item name="android:layout_margin">5dip</item>
-        <item name="android:scaleType">center</item>
-        <!--<item tools:targetApi="21" name="android:elevation">@dimen/player_elevation</item>-->
-    </style>
-
-    <style name="SmallFeedViewPlayPauseButton"  parent="@style/FeedViewPlayPauseButton">
-        <item name="android:layout_width">50dip</item>
-        <item name="android:layout_height">50dip</item>
     </style>
 
     <style name="SubscriptionHeaderFont" parent="@android:style/TextAppearance.Large">

@@ -190,10 +190,6 @@ public class MainActivity extends FragmentContainerActivity {
 				TransitionUtils.openSettings(this);
 				return true;
 			}
-			case R.id.menu_refresh: {
-				SoundWaves.sSubscriptionRefreshManager.refreshAll();
-				return true;
-			}
 		}
 
 		return super.onOptionsItemSelected(item);

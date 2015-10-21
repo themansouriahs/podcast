@@ -17,6 +17,7 @@ import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.widget.ImageButton;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
@@ -29,7 +30,7 @@ import org.bottiger.podcast.service.PlayerService;
  *
  * This class is almost exclusively based on https://github.com/bottiger/crossview
  */
-public class FeedViewQueueButton extends PlayPauseImageView {
+public class FeedViewQueueButton extends PlayerButtonView implements View.OnClickListener {
 
     /**
      * Flag to denote the "plus" configuration
@@ -71,6 +72,8 @@ public class FeedViewQueueButton extends PlayPauseImageView {
     private int mColor = DEFAULT_COLOR;
     private RectF mRect;
     private PathMeasure mPathMeasure;
+
+    private IEpisode mEpisode;
 
     private float[] mFromXY;
     private float[] mToXY;
@@ -132,21 +135,16 @@ public class FeedViewQueueButton extends PlayPauseImageView {
         toggle();
     }
 
-    @Override
-    public synchronized void setEpisode(IEpisode argEpisode, @ButtonLocation int argLocation) {
-        super.setEpisode(argEpisode, argLocation);
-        PlayerService ps = SoundWaves.sBoundPlayerService;
+    public synchronized void setEpisode(IEpisode argEpisode, @PlayPauseImageView.ButtonLocation int argLocation) {
+        mEpisode = argEpisode;
+        //super.setEpisode(argEpisode, argLocation);
+        PlayerService ps = PlayerService.getInstance();
         if (ps != null) {
             Playlist playlist = ps.getPlaylist();
             if (playlist.contains(argEpisode)) {
                 cross(0);
             }
         }
-    }
-
-    @Override
-    protected boolean drawIcon() {
-        return false;
     }
 
     private void readXmlAttributes(Context context, AttributeSet attrs) {
@@ -304,11 +302,6 @@ public class FeedViewQueueButton extends PlayPauseImageView {
         invalidate();
     }
 
-    @Override
-    protected boolean drawBackground() {
-        return false;
-    }
-
     /**
      * Perform measurements and pre-calculations.  This should be called any time
      * the view measurements or visuals are changed, such as with a call to {@link #setPadding(int, int, int, int)}
@@ -348,6 +341,8 @@ public class FeedViewQueueButton extends PlayPauseImageView {
         sPaint.setStyle(Paint.Style.STROKE);
         sPaint.setStrokeCap(Paint.Cap.SQUARE);
         sPaint.setStrokeWidth(DEFAULT_STROKE_WIDTH);
+
+        setBackground(null);
 
         mFromXY = new float[]{0f, 0f};
         mToXY = new float[]{0f, 0f};
