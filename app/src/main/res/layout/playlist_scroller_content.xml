@@ -13,13 +13,13 @@
         android:layout_alignParentTop="true"
         android:animateLayoutChanges="true"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/top_player_size_maximum"
+        android:layout_height="match_parent"
         android:minHeight="@dimen/top_player_size_minimum"
         android:background="?attr/themeBackground"
         android:paddingTop="20dp"
         android:orientation="vertical"
         android:elevation="5dp"
-        >
+        > <!-- @dimen/top_player_size_maximum -->
 
         <LinearLayout
             android:id="@+id/top_player_controls"

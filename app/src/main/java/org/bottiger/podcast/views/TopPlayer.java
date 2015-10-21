@@ -219,6 +219,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         sizeMedium = argContext.getResources().getDimensionPixelSize(R.dimen.top_player_size_medium);
         sizeLarge = screenHeight- argContext.getResources().getDimensionPixelSize(R.dimen.top_player_size_maximum_bottom);
 
+
         sizeStartShrink = sizeSmall+sizeShrinkBuffer;
 
         sizeActionbar = argContext.getResources().getDimensionPixelSize(R.dimen.action_bar_height);
@@ -226,6 +227,30 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             setClipToOutline(true);
         }
+    }
+
+    @SuppressWarnings("ResourceType")
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        if (sizeLarge > 0){
+            int hSize = MeasureSpec.getSize(heightMeasureSpec);
+            int hMode = MeasureSpec.getMode(heightMeasureSpec);
+
+            switch (hMode){
+                case MeasureSpec.AT_MOST:
+                    heightMeasureSpec = MeasureSpec.makeMeasureSpec(Math.min(hSize, sizeLarge), MeasureSpec.AT_MOST);
+                    break;
+                case MeasureSpec.UNSPECIFIED:
+                    heightMeasureSpec = MeasureSpec.makeMeasureSpec(sizeLarge, MeasureSpec.AT_MOST);
+                    break;
+                case MeasureSpec.EXACTLY:
+                    heightMeasureSpec = MeasureSpec.makeMeasureSpec(Math.min(hSize, sizeLarge), MeasureSpec.EXACTLY);
+                    break;
+            }
+        }
+
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        setMeasuredDimension(widthMeasureSpec, heightMeasureSpec);
     }
 
     @Override

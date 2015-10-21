@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Interpolator;
 
 import org.bottiger.podcast.R;
@@ -56,7 +57,7 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
             mRecyclerViewBottomPadding = mRecyclerView.getPaddingBottom();
         }
 
-        int height = mTopPlayer.getLayoutParams().height;
+        int height = (int)mTopPlayer.getPlayerHeight(); //mTopPlayer.getLayoutParams().height;
         mRecyclerView.setTranslationY(height);
 
         Log.v(TAG, "onLayoutChild, child: " + child.getClass().getName() + " layoutDirection: " + layoutDirection + " height: " + height);
