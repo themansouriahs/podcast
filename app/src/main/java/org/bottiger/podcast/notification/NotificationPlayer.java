@@ -148,7 +148,7 @@ public class NotificationPlayer {
         NotificationCompat.Action actionClear = new NotificationCompat.Action(clear, "Clear", pendingClearIntent);
 
         NotificationCompat.MediaStyle mediaStyle = new NotificationCompat.MediaStyle();
-        mediaStyle.setShowActionsInCompactView(0);
+        mediaStyle.setShowActionsInCompactView(1, 2);
         mediaStyle.setShowCancelButton(true);
         MediaSessionCompat.Token mediaSessionToken = mPlayerService.getPlayerStateManager().getToken();
 
@@ -160,9 +160,9 @@ public class NotificationPlayer {
         // Should I use this? I'm not sure.
         mBuilder.setStyle(mediaStyle
                 .setMediaSession(mediaSessionToken));
-        mBuilder.addAction(actionToggle);
         mBuilder.addAction(actionNext);
         mBuilder.addAction(actionClear);
+        mBuilder.addAction(actionToggle);
         //mBuilder.setProgress(100,  50, false);
 
         mBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
