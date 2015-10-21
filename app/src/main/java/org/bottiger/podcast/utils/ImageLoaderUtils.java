@@ -25,8 +25,6 @@ import com.bumptech.glide.request.target.Target;
 
 import org.bottiger.podcast.R;
 
-import jp.wasabeef.glide.transformations.ColorFilterTransformation;
-
 /**
  * Created by aplb on 30-09-2015.
  */
@@ -72,12 +70,14 @@ public class ImageLoaderUtils {
 
         DrawableTypeRequest request = Glide.with(sContext).load(argUrl);
 
+        /*
         if (argTransformation != null) {
             int c = Color.argb(50, 0,0,0);
             Transformation t = new ColorFilterTransformation(argTargetView.getContext(), c);
             request.bitmapTransform(argTransformation, t).into((ImageView)argTargetView);
             return;
         }
+        */
 
         BitmapRequestBuilder builder = request.asBitmap();
 

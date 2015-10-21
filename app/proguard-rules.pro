@@ -58,10 +58,17 @@ public static *** w(...);
     public *;
 }
 
-# OKhhtp
+# okhttp
 -dontwarn com.squareup.okhttp.**
+-keep class com.squareup.okhttp.** { *; }
 # Ignore warnings: https://github.com/square/okio/issues/60
 -dontwarn okio.**
+
+#retrofit
+-dontwarn retrofit.**
+-keep class retrofit.** { *; }
+-keepattributes Signature
+-keepattributes Exceptions
 
 #amazon
 -dontwarn com.amazon.**
@@ -96,12 +103,6 @@ public static *** w(...);
 # webview
 -dontwarn android.webkit.**
 
-#retrofit
--dontwarn retrofit.**
--keep class retrofit.** { *; }
--keepattributes Signature
--keepattributes Exceptions
-
 #Jsoup
 -keep public class org.jsoup.** {
 public *;
@@ -118,23 +119,5 @@ public *;
 # "project.properties" file to get the path to the default "proguard-android-optimize.txt".
 -keepattributes *Annotation*
 
-# Keep all the ACRA classes
--keep class org.acra.** { *; }
--dontwarn org.acra.**
-
-
-#Fresco
-# Keep our interfaces so they can be used by other ProGuard rules.
-# See http://sourceforge.net/p/proguard/bugs/466/
--keep,allowobfuscation @interface com.facebook.common.internal.DoNotStrip
-
-# Do not strip any method/class that is annotated with @DoNotStrip
--keep @com.facebook.common.internal.DoNotStrip class *
--keepclassmembers class * {
-    @com.facebook.common.internal.DoNotStrip *;
-}
--dontwarn okio.**
--dontwarn javax.annotation.**
-
--keep class com.facebook.imagepipeline.gif.** { *; }
--keep class com.facebook.imagepipeline.webp.** { *; }
+# RxJava/RxAndroid
+-dontwarn rx.internal.util.unsafe.**

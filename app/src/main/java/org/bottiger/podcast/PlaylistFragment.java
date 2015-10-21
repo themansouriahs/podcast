@@ -73,8 +73,6 @@ import com.github.ivbaranov.mfb.MaterialFavoriteButton;
 import com.squareup.otto.Produce;
 import com.squareup.otto.Subscribe;
 
-import jp.wasabeef.glide.transformations.BlurTransformation;
-
 public class PlaylistFragment extends AbstractEpisodeFragment implements OnSharedPreferenceChangeListener,
                                                                         DrawerActivity.TopFound {
 
@@ -556,7 +554,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         String artworkUrl = item.getArtwork();
         if (item != null && artworkUrl != null) {
             Log.v("MissingImage", "Setting image");
-            BlurTransformation blur = new BlurTransformation(getContext(), 25);
             ImageLoaderUtils.loadImageInto(mPhoto, artworkUrl, null, false, false, false);
         }
 
