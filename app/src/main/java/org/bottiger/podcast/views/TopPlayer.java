@@ -71,20 +71,6 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
     private final NestedScrollingChildHelper scrollingChildHelper;
     private ViewConfiguration mViewConfiguration;
 
-    public static final int SMALL = 0;
-    public static final int MEDIUM = 1;
-    public static final int LARGE = 2;
-
-    private static long ANIMATION_DURATION = 100L;
-
-    @IntDef({SMALL, MEDIUM, LARGE})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface PlayerLayout {}
-
-    private @PlayerLayout int mPlayerLayout = LARGE;
-
-    private int mPlayPauseLargeSize = -1;
-
     private Context mContext;
 
     public static int sizeSmall                 =   -1;
@@ -95,12 +81,6 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
     public static int sizeStartShrink           =   -1;
     public static int sizeShrinkBuffer           =   -1;
 
-    private int mSeekbarDeadzone                =   20; // dp
-    private int mSeekbarFadeDistance            =   20; // dp
-    private int mTextInfoFadeDistance           =   100; // dp
-    private int mTextFadeDistance               =   20; // dp
-
-    private int mControlWidth = -1;
     private int mControlHeight = -1;
 
     private float screenHeight;
@@ -112,7 +92,6 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
     private boolean mDoDisplayText = false;
 
     private int mCenterSquareMarginTop = -1;
-    private float mCenterSquareMargin = -1;
 
     private TopPlayer mLayout;
     private LinearLayout mControls;
@@ -128,7 +107,6 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
     private MaterialFavoriteButton mFavoriteButton;
     private ImageView mFastForwardButton;
     private ImageView mRewindButton;
-    private PlayerButtonView mSkipNextButton;
     private ImageButton mMoreButton;
 
     private View mTriangle;
@@ -142,7 +120,6 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
     private TopPLayerScrollGestureListener mTopPLayerScrollGestureListener;
 
     private @ColorInt int mBackgroundColor = -1;
-    private boolean maximumEnsured = false;
 
     private int mLastTouchY;
     private int mInitialTouchY;
@@ -152,20 +129,17 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
     private final int[] mScrollConsumed = new int[2];
     private final int[] mNestedOffsets = new int[2];
     private int mScrollState = 0;
-    private int mTouchSlop;
 
     private SharedPreferences prefs;
 
     private class PlayerLayoutParameter {
         public int SeekBarLeftMargin;
         public int PlayPauseSize;
-        public int PlayPauseBottomMargin;
     }
 
     public TopPlayer(Context context) {
         super(context, null);
         scrollingChildHelper = new NestedScrollingChildHelper(this);
-        //init(context);
     }
 
     public TopPlayer(Context context, AttributeSet attrs) {
@@ -196,7 +170,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
 
         mViewConfiguration = ViewConfiguration.get(argContext);
 
-        int screenHeight = 1000;
+        int screenHeight;
 
         if (isInEditMode()) {
             return;
@@ -219,9 +193,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         sizeMedium = argContext.getResources().getDimensionPixelSize(R.dimen.top_player_size_medium);
         sizeLarge = screenHeight- argContext.getResources().getDimensionPixelSize(R.dimen.top_player_size_maximum_bottom);
 
-
         sizeStartShrink = sizeSmall+sizeShrinkBuffer;
-
         sizeActionbar = argContext.getResources().getDimensionPixelSize(R.dimen.action_bar_height);
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -273,18 +245,16 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         mFavoriteButton = (MaterialFavoriteButton) findViewById(R.id.favorite);
         mFastForwardButton = (ImageView) findViewById(R.id.top_player_fastforward);
         mRewindButton = (ImageView) findViewById(R.id.top_player_rewind);
-        mSkipNextButton = (PlayerButtonView) findViewById(R.id.skip_to_next_button);
         mPhoto = (ImageViewTinted) findViewById(R.id.session_photo);
         mMoreButton = (ImageButton) findViewById(R.id.player_more_button);
 
         mTriangle = findViewById(R.id.visual_triangle);
         mExpandedActionsBar = (LinearLayout) findViewById(R.id.expanded_action_bar);
 
-        mPlayPauseLargeSize = mPlayPauseButton.getLayoutParams().height;
+        int mPlayPauseLargeSize = mPlayPauseButton.getLayoutParams().height;
         mPlayPauseButton.setIconColor(Color.WHITE);
 
         mCenterSquareMarginTop = (int)getResources().getDimension(R.dimen.top_player_center_square_margin_top);
-        mCenterSquareMargin = getResources().getDimension(R.dimen.top_player_center_square_margin);
 
         mLargeLayout.SeekBarLeftMargin = 0;
         mLargeLayout.PlayPauseSize = mPlayPauseLargeSize;
@@ -390,10 +360,8 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
                 .subscribe(new Action1<RxBusSimpleEvents.PlaybackSpeedChanged>() {
                     @Override
                     public void call(RxBusSimpleEvents.PlaybackSpeedChanged event) {
-                        //if (event instanceof RxBusSimpleEvents.PlaybackSpeedChanged) {
-                            RxBusSimpleEvents.PlaybackSpeedChanged playbackSpeedChanged = (RxBusSimpleEvents.PlaybackSpeedChanged) event;
-                            mSpeedpButton.setText(playbackSpeedChanged.speed + "X");
-                        //}
+                        RxBusSimpleEvents.PlaybackSpeedChanged playbackSpeedChanged = event;
+                        mSpeedpButton.setText(playbackSpeedChanged.speed + "X");
                     }
                 });
     }
@@ -436,8 +404,6 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
 
         if (mFullscreen)
             return getHeight();
-
-        maximumEnsured = false;
 
         if (!validateState()) {
             return -1;
@@ -528,56 +494,20 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
 
     @Override
     public void onPaletteFound(Palette argChangedPalette) {
-        ColorExtractor extractor = new ColorExtractor(argChangedPalette, ColorUtils.getTextColor(getContext()));
-        ColorExtractor backgroundExtractor = new ColorExtractor(argChangedPalette, ColorUtils.getBackgroundColor(getContext()));
+        int textColor = ColorUtils.getTextColor(getContext());
         int color = ColorUtils.getBackgroundColor(getContext());
         mBackgroundColor = StaticButtonColor(mContext, argChangedPalette, color);
-        //setBackgroundColor(mBackgroundColor);
         int bgcolor = ContextCompat.getColor(getContext(), R.color.playlist_background);
         int playcolor = ContextCompat.getColor(getContext(), R.color.colorPrimaryDark);
         setBackgroundColor(argChangedPalette.getLightVibrantColor(bgcolor));
 
         mPlayPauseButton.setBackgroundColor(argChangedPalette.getDarkVibrantColor(playcolor));
 
-        int[][] states = new int[][] {
-        new int[] { android.R.attr.state_enabled}, // enabled
-                new int[] {-android.R.attr.state_enabled}, // disabled
-                new int[] {-android.R.attr.state_checked}, // unchecked
-                new int[] { android.R.attr.state_pressed}  // pressed
-    };
-
-    // Remember to update tintButton() if you change this
-    int[] colors = new int[] {
-            Color.BLACK,
-            Color.BLACK,
-            Color.BLACK,
-            Color.BLACK
-    };
-
-    ColorStateList colorStateList = new ColorStateList(states, colors);
-        //mPhoto.setImageTintList(colorStateList);
-
-        /*
-        setBackgroundColor(backgroundExtractor.getSecondaryTint());
-        ColorUtils.tintButton(mSleepButton, extractor);
-        ColorUtils.tintButton(mDownloadButton, extractor);
-        ColorUtils.tintButton(mFavoriteButton, extractor);
-        ColorUtils.tintButton(mSleepButton, extractor);
-        ColorUtils.tintButton(mSkipNextButton, extractor);
-        ColorUtils.tintButton(mFastForwardButton, extractor);
-        ColorUtils.tintButton(mRewindButton, extractor);
-        ColorUtils.tintButton(mSpeedpButton, extractor);
-        */
-        int textColor = ColorUtils.getTextColor(getContext());
-        ColorUtils.tintButton(mSleepButton,       textColor);
-        ColorUtils.tintButton(mDownloadButton,    textColor);
         ColorUtils.tintButton(mFavoriteButton,    textColor);
-        ColorUtils.tintButton(mSleepButton,       textColor);
-        //ColorUtils.tintButton(mSkipNextButton,    textColor);
-        //ColorUtils.tintButton(mFastForwardButton, textColor);
-        //ColorUtils.tintButton(mRewindButton,      textColor);
+        ColorUtils.tintButton(mDownloadButton,    textColor);
         ColorUtils.tintButton(mSpeedpButton,      textColor);
         ColorUtils.tintButton(mFullscreenButton,  textColor);
+
 
         invalidate();
     }
@@ -588,18 +518,12 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
     }
 
     private void hideText() {
-        //mExpandEpisode.setImageResource(R.drawable.ic_expand_more_white);
-        //fadeText(1.0f, 0.0f);
         mTriangle.setVisibility(GONE);
         mExpandedActionsBar.setVisibility(GONE);
     }
 
     private void showText() {
-        //mExpandEpisode.setImageResource(R.drawable.ic_expand_less_white);
-        //mEpisodeText.setVisibility(VISIBLE);
-        //mGradient.setVisibility(VISIBLE);
-        //mEpisodeInfo.setVisibility(VISIBLE);
-        //fadeText(0.0f, 1.0f);
+
         mTriangle.setVisibility(VISIBLE);
         mExpandedActionsBar.setVisibility(VISIBLE);
     }
@@ -622,7 +546,6 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
                 @Override
                 public void onGlobalLayout() {
                     UIUtils.removeOnGlobalLayoutListener(argView, this);
-                    mControlWidth = argView.getWidth();
                     mControlHeight = argView.getHeight();
                     argView.getLayoutParams().height = mControlHeight;
                 }
@@ -639,7 +562,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         try {
             if (doAnimate && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 Transition trans = new ChangeBounds();
-                trans.setDuration(ANIMATION_DURATION);
+                trans.setDuration(getResources().getInteger(R.integer.animation_quick));
                 TransitionManager.go(new Scene(this), trans);
             }
 
@@ -667,17 +590,6 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         mLayout.setLayoutParams(layoutParams);
         mLayout.setPadding(0, topmargin, 0, 0);
 
-        /*
-        int smallMargin = (int)mCenterSquareMargin/2;
-        LayoutParams params = (LayoutParams) mImageContainer.getLayoutParams();
-        params.setMargins(smallMargin, mCenterSquareMarginTop, smallMargin, 0);
-        params.width = mLayout.getWidth()-2*smallMargin;
-        params.height = mLayout.getWidth()-2*smallMargin;
-        mImageContainer.setLayoutParams(params);
-        */
-
-
-
         mLayout.bringToFront();
         ((MainActivity)getContext()).goFullScreen(mLayout, mBackgroundColor);
     }
@@ -686,26 +598,15 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         Log.d(TAG, "Exit fullscreen mode");
         mFullscreenButton.setImageResource(R.drawable.ic_fullscreen_white);
 
-        int topmargin = 0;
         // Main player layout
         CoordinatorLayout.LayoutParams layoutParams = new CoordinatorLayout.LayoutParams(
                 LayoutParams.MATCH_PARENT,
                 sizeLarge);
 
-        topmargin = ((MainActivity)getContext()).getFragmentTop();
+        int topmargin = ((MainActivity)getContext()).getFragmentTop();
         layoutParams.setMargins(0, topmargin, 0, 0);
         mLayout.setLayoutParams(layoutParams);
         mLayout.setPadding(0, mCenterSquareMarginTop, 0, 0);
-
-        /*
-        if (mLayout.getWidth() > 0) {
-            LayoutParams params = (LayoutParams) mImageContainer.getLayoutParams();
-            params.setMargins((int) mCenterSquareMargin, 0, (int) mCenterSquareMargin, 0);
-            params.width = (int) (mLayout.getWidth() - 2 * mCenterSquareMargin);
-            params.height = (int) (mLayout.getWidth() - 2 * mCenterSquareMargin);
-            mImageContainer.setLayoutParams(params);
-        }
-        */
 
         setPlayerHeight(sizeLarge);
         ((MainActivity)getContext()).exitFullScreen(mLayout);
@@ -747,8 +648,6 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
                     return false;
                 }
 
-
-                int yvel = (int)(MotionEventCompat.getX(event, xvel) + 0.5F);
                 int y = (int)(MotionEventCompat.getY(event, xvel) + 0.5F);
                 int dy = this.mLastTouchY - y;
 
@@ -766,13 +665,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
                 if(this.mScrollState != 1) {
                     boolean startScroll = false;
 
-                    if(canScrollVertically && Math.abs(dy) > this.mTouchSlop) {
-                        if(dy > 0) {
-                            dy -= this.mTouchSlop;
-                        } else {
-                            dy += this.mTouchSlop;
-                        }
-
+                    if(Math.abs(dy) > 0) {
                         startScroll = true;
                     }
 
@@ -783,15 +676,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
                         }
 
                         this.mScrollState = 1;
-                        // this.setScrollState(1); //FIXME
                     }
-                }
-
-                if(this.mScrollState == 1) {
-                    //this.mLastTouchY = y - this.mScrollOffset[1];
-                    //if(this.scrollByInternal(canScrollVertically?dy:0, vtev)) {
-                    //    this.getParent().requestDisallowInterceptTouchEvent(true);
-                    //}
                 }
                 break;
             }
