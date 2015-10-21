@@ -10,7 +10,7 @@ android {
         applicationId "org.bottiger.podcast"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 193     // even - release. Odd - development
+        versionCode 194     // even - release. Odd - development
         versionName "0.113" // even - release. Odd - development
         //useJack = true
         multiDexEnabled = true
@@ -101,14 +101,6 @@ android {
     }
 }
 
-//allprojects {
-//    gradle.projectsEvaluated {
-//        tasks.withType(JavaCompile) {
-//            options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
-//        }
-//    }
-//}
-
 repositories {
     mavenCentral()
 }
@@ -160,7 +152,6 @@ dependencies {
 
     compile 'org.jsoup:jsoup:1.8.3'
     compile 'jp.wasabeef:recyclerview-animators:2.0.0'
-    //compile 'jp.wasabeef:glide-transformations:1.2.1'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.5.4'
     compile 'com.nineoldandroids:library:2.4.0'
 
@@ -173,6 +164,7 @@ dependencies {
         resolutionStrategy.force 'com.android.support:support-annotations:23.0.1'
         resolutionStrategy.force 'com.google.code.findbugs:jsr305:2.0.1'
     }
+
     // Espresso
 
     // https://developer.android.com/training/testing/ui-testing/espresso-testing.html
@@ -185,21 +177,8 @@ dependencies {
         exclude module: 'recyclerview-v7'
     }
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2') {
-        //exclude group: 'javax.inject'
-        //exclude group: 'com.google.code.findbugs'
         exclude group: 'com.android.support', module: 'support-annotations'
     }
-    //androidTestCompile('com.android.support.test:testing-support-lib:0.1')
-
-    //androidTestCompile( 'com.android.support.test.espresso:espresso-contrib:2.1') {
-
-    //exclude group: 'javax.inject'
-
-    //    exclude group: 'com.google.code.findbugs'
-
-    //    exclude group: 'com.android.support', module: 'support-annotations'
-
-    //}
 
     // Free version
 
