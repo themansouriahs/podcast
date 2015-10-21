@@ -59,10 +59,6 @@ public class NotificationReceiver extends BroadcastReceiver {
 
         IBinder binder = peekService(context, new Intent(context, PlayerService.class));
         if (binder == null) {
-            //saction = action;
-            //Intent i = new Intent(context, PlayerService.class);
-            //context.startService(i);
-            //context.bindService(i, playerServiceConnection, Context.BIND_AUTO_CREATE);
             ((SoundWaves)context.getApplicationContext()).startService();
             return;
         }

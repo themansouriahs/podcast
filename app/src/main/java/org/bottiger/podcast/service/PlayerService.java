@@ -38,6 +38,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresPermission;
+import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.telephony.PhoneStateListener;
 import android.util.Log;
@@ -241,14 +242,10 @@ public class PlayerService extends Service implements
 		}
 	}
 
-	@Override
-	public void onStart(Intent intent, int startId) {
-		super.onStart(intent, startId);
-        handleIntent(intent);
-	}
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+		Log.d(TAG, "onStartCommand");
+		MediaButtonReceiver.handleIntent(mPlayerStateManager.getSession(), intent);
 		handleIntent(intent);
 
         //return super.onStartCommand(intent, flags, startId);
@@ -450,6 +447,12 @@ public class PlayerService extends Service implements
 
 	public void start() {
 		if (!mPlayer.isPlaying()) {
+			if (mItem == null)
+				mItem = mPlaylist.getItem(0);
+
+			if (mItem == null)
+				return;
+
             takeWakelock(mPlayer.isSteaming());
 			mPlaylist.setAsFrist(mItem);
 			mPlayer.start();
@@ -464,13 +467,12 @@ public class PlayerService extends Service implements
 
 		if ((mItem != null)) {
             if (mItem instanceof FeedItem) {
-                ((FeedItem)mItem).setOffset(getContentResolver(), mPlayer.position());
+                (mItem).setOffset(getContentResolver(), mPlayer.position());
             }
 		}
 		dis_notifyStatus();
 
 		mPlayer.pause();
-        //mMetaDataControllerWrapper.updateState(mItem, false, false);
         releaseWakelock();
 	}
 

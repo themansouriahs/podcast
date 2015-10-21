@@ -12,6 +12,7 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
+import android.view.KeyEvent;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
@@ -19,6 +20,7 @@ import com.bumptech.glide.request.target.SimpleTarget;
 
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
+import org.bottiger.podcast.receiver.NotificationReceiver;
 import org.bottiger.podcast.service.PlayerService;
 
 /**
@@ -51,6 +53,10 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
         Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
         PendingIntent pendingMediaButtonIntent = PendingIntent.getBroadcast(mPlayerService, 0, mediaButtonIntent, 0);
         mSession.setMediaButtonReceiver(pendingMediaButtonIntent);
+
+        Intent toggleIntent = new Intent(NotificationReceiver.toggleAction);
+        PendingIntent pendingToggleIntent = PendingIntent.getBroadcast(mPlayerService, 0, toggleIntent, 0);
+        mSession.setMediaButtonReceiver(pendingToggleIntent);
 
 
         mSession.setCallback(this);
@@ -102,6 +108,28 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
 
         PlaybackStateCompat.Builder stateBuilder = getPlaybackState(argState, argPosition, argPlaybackSpeed);
         mSession.setPlaybackState(stateBuilder.build());
+    }
+
+    public MediaSessionCompat getSession() {
+        return mSession;
+    }
+
+    @Override
+    public void onPlay() {
+        Log.d(TAG, "onPlay");
+    }
+
+    @Override
+    public void onPause() {
+        Log.d(TAG, "onPause");
+    }
+
+    @Override
+    public boolean	onMediaButtonEvent(Intent mediaButtonEvent) {
+        Log.d(TAG, "onMediaButtonEvent");
+        KeyEvent event = mediaButtonEvent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+        boolean wasHandled = HeadsetReceiver.handleMediaButtonEvent(event, mPlayerService);
+        return wasHandled;
     }
 
     private void populateFastMediaMetadata(@NonNull MediaMetadataCompat.Builder mMetaBuilder, @NonNull IEpisode argEpisode) {
