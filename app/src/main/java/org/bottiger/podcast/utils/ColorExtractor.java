@@ -118,7 +118,7 @@ public class ColorExtractor {
             if (mContext == null)
                 return;
 
-            mTextColor = ContextCompat.getColor(mContext, R.color.white_opaque);
+            mTextColor = ContextCompat.getColor(mContext, R.color.pitch_black);
             return;
         }
         mTextColor = swatch.getBodyTextColor();

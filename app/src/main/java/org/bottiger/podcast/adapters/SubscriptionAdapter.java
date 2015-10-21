@@ -128,8 +128,6 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
 
             android.support.v7.widget.GridLayoutManager.LayoutParams params = (android.support.v7.widget.GridLayoutManager.LayoutParams)footer.getFooter().getLayoutParams();
             params.height = ToolbarActivity.getNavigationBarHeight(mActivity.getResources());
-            //params.columnSpec = GridLayout.spec(0, numberOfColumns-1);
-            //params.s
             footer.getFooter().setLayoutParams(params);
             footer.getFooter().requestLayout();
 
@@ -140,7 +138,6 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
 
         Subscription sub = null;
         try {
-            //sub = SubscriptionLoader.getByCursor(cursor);
             sub = mLibrary.getSubscriptions().get(position);
         } catch (IllegalStateException e) {
             e.printStackTrace();
@@ -155,7 +152,7 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
         String title = sub.getTitle();
         final String logo = sub.getImageURL();
 
-        if (title != null && !title.equals(""))
+        if (!TextUtils.isEmpty(title))
             holder.title.setText(title);
         else
             holder.title.setText(R.string.subscription_no_title);
@@ -176,8 +173,9 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
                 @Override
                 public void onPaletteFound(Palette argChangedPalette) {
                     ColorExtractor extractor = new ColorExtractor(argChangedPalette);
-                    holder.text_container.setBackgroundColor(extractor.getPrimary());
-                    holder.title.setTextColor(extractor.getTextColor());
+                    if (holder.text_container != null)
+                        holder.text_container.setBackgroundColor(extractor.getPrimary());
+                    //holder.title.setTextColor(extractor.getTextColor());
                 }
 
                 @Override
@@ -192,31 +190,27 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
             String image = uri.toString();
             if (!TextUtils.isEmpty(image) && Patterns.WEB_URL.matcher(image).matches()) {
 
-                //FrescoHelper.PalettePostProcessor postProcessor = new FrescoHelper.PalettePostProcessor(mActivity, image);
-                //FrescoHelper.loadImageInto(holder.image, image, postProcessor);
+                if (getItemViewType(position) == GRID_TYPE) {
+                    Glide.with(mActivity).load(image).centerCrop().placeholder(R.drawable.generic_podcast).into(holder.image);
+                } else {
+                    Glide.with(mActivity)
+                            .load(image)
+                            .asBitmap()
+                            .centerCrop()
+                            .placeholder(R.drawable.generic_podcast)
+                            .into(new BitmapImageViewTarget(holder.image) {
+                                @Override
+                                protected void setResource(Bitmap resource) {
+                                    RoundedBitmapDrawable circularBitmapDrawable =
+                                            RoundedBitmapDrawableFactory.create(mActivity.getResources(), resource);
+                                    float radius = mActivity.getResources().getDimension(R.dimen.playlist_image_radius_small);
 
+                                    circularBitmapDrawable.setCornerRadius(radius);
 
-                Glide.with(mActivity).load(image).centerCrop().placeholder(R.drawable.generic_podcast).into(holder.image);
-
-                /*
-                Glide.with(mActivity)
-                        .load(image)
-                        .asBitmap()
-                        .centerCrop()
-                        .placeholder(R.drawable.generic_podcast)
-                        .into(new BitmapImageViewTarget(holder.image) {
-                    @Override
-                    protected void setResource(Bitmap resource) {
-                        RoundedBitmapDrawable circularBitmapDrawable =
-                        RoundedBitmapDrawableFactory.create(mActivity.getResources(), resource);
-                        float radius = mActivity.getResources().getDimension(R.dimen.playlist_image_radius_small);
-
-                        circularBitmapDrawable.setCornerRadius(radius);
-
-                        holder.image.setImageDrawable(circularBitmapDrawable);
-                    }
-                });
-                */
+                                    holder.image.setImageDrawable(circularBitmapDrawable);
+                                }
+                            });
+                }
 
             }
         } else {

@@ -31,8 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:padding="2dp"
-            android:visibility="gone"
-            android:background="@color/red">
+            android:visibility="gone">
 
     <TextView
         android:id="@+id/grid_title"
