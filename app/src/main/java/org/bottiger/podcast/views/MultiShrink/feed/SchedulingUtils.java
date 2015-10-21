@@ -11,19 +11,6 @@ import android.view.ViewTreeObserver.OnPreDrawListener;
 public class SchedulingUtils {
 
 
-    /** Runs a piece of code after the next layout run */
-    public static void doAfterLayout(final View view, final Runnable runnable) {
-        final OnGlobalLayoutListener listener = new OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                // Layout pass done, unregister for further events
-                view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                runnable.run();
-            }
-        };
-        view.getViewTreeObserver().addOnGlobalLayoutListener(listener);
-    }
-
     /** Runs a piece of code just before the next draw, after layout and measurement */
     public static void doOnPreDraw(final View view, final boolean drawNextFrame,
                                    final Runnable runnable) {

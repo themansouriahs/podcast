@@ -342,7 +342,9 @@ public class FeedViewQueueButton extends PlayerButtonView implements View.OnClic
         sPaint.setStrokeCap(Paint.Cap.SQUARE);
         sPaint.setStrokeWidth(DEFAULT_STROKE_WIDTH);
 
-        setBackground(null);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            setBackground(null);
+        }
 
         mFromXY = new float[]{0f, 0f};
         mToXY = new float[]{0f, 0f};

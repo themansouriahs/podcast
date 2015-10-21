@@ -472,7 +472,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 		// Remove non ascii characters
 		//this.filename = filename.replaceAll("[^\\x00-\\x7F]", "");
         this.filename = filename.replaceAll("[^(\\x41-\\x5A|\\x61-\\x7A|\\x2D|\\x2E|\\x30-\\x39|\\x5F)]", ""); // only a-z A-Z 0-9 .-_ http://www.asciitable.com/
-		notifyPropertyChanged();
+		notifyPropertyChanged(EpisodeChanged.CHANGED);
 	}
 
 	public String getAbsolutePath() throws IOException {
