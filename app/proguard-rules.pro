@@ -120,4 +120,16 @@ public *;
 -keepattributes *Annotation*
 
 # RxJava/RxAndroid
--dontwarn rx.internal.util.unsafe.**
+#-keep class sun.misc.Unsafe.** { *; }
+#-keep class rx.internal.util.unsafe.** { *; }
+-dontwarn sun.misc.**
+
+-keepclassmembers class rx.internal.util.unsafe.*ArrayQueue*Field* {
+   long producerIndex;
+   long consumerIndex;
+}
+
+-keepclassmembers class rx.internal.util.unsafe.BaseLinkedQueueProducerNodeRef {
+   long producerNode;
+   long consumerNode;
+}
