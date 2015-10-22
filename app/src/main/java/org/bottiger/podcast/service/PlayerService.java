@@ -89,7 +89,6 @@ public class PlayerService extends Service implements
 
 	private SoundWavesDownloadManager mDownloadManager;
     private PlayerStateManager mPlayerStateManager;
-    private LegacyRemoteController mLegacyRemoteController;
 
     // Google Cast
     private IMediaCast mMediaCast;
@@ -180,45 +179,6 @@ public class PlayerService extends Service implements
 		this.mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
     }
 
-    private void handleIntent( Intent intent ) {
-
-        if( intent == null || intent.getAction() == null )
-            return;
-
-        String action = intent.getAction().toLowerCase();
-
-		switch (action) {
-			case ACTION_PLAY: {
-				//mController.getTransportControls().play();
-				start();
-				break;
-			}
-			case ACTION_PAUSE: {
-				//mController.getTransportControls().pause();
-				pause();
-				break;
-			}
-			case ACTION_REFRESH_FEEDS: {
-				refreshFeeds();
-				return;
-			}
-		}
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            if (action.equalsIgnoreCase(ACTION_FAST_FORWARD)) {
-                mController.getTransportControls().fastForward();
-            } else if (action.equalsIgnoreCase(ACTION_REWIND)) {
-                mController.getTransportControls().rewind();
-            } else if (action.equalsIgnoreCase(ACTION_PREVIOUS)) {
-                mController.getTransportControls().skipToPrevious();
-            } else if (action.equalsIgnoreCase(ACTION_NEXT)) {
-                mController.getTransportControls().skipToNext();
-            } else if (action.equalsIgnoreCase(ACTION_STOP)) {
-                mController.getTransportControls().stop();
-            }
-        }
-    }
-
 	@Override
 	public void onAudioFocusChange(int focusChange) {
 		if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
@@ -234,8 +194,6 @@ public class PlayerService extends Service implements
 				mResumePlayback = false;
 			}
 		} else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
-			mAudioManager
-					.unregisterMediaButtonEventReceiver(mControllerComponentName);
 			mAudioManager.abandonAudioFocus(this);
 			// Stop playback
 			stop();
@@ -246,7 +204,6 @@ public class PlayerService extends Service implements
     public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.d(TAG, "onStartCommand");
 		MediaButtonReceiver.handleIntent(mPlayerStateManager.getSession(), intent);
-		handleIntent(intent);
 
         //return super.onStartCommand(intent, flags, startId);
         return START_STICKY;
@@ -283,8 +240,6 @@ public class PlayerService extends Service implements
 
         mNotificationManager.cancel(NotificationPlayer.NOTIFICATION_PLAYER_ID);
 
-		// //mNotificationManager.cancel(R.layout.playing_episode);
-		// setForeground(false);
 		if (mNotificationPlayer != null)
 			mNotificationPlayer.hide();
 	}
@@ -328,7 +283,13 @@ public class PlayerService extends Service implements
 		if (mPlayer.isPlaying())
 			return;
 
-		mPlayer.start();
+        if (mItem == null)
+            mItem = mPlaylist.getItem(0);
+
+        if (mItem == null)
+            return;
+
+		play(mItem.getUrl().toString());
 	}
 
 	public void play(String argEpisodeURL) {
@@ -392,13 +353,6 @@ public class PlayerService extends Service implements
 
 		int offset = mItem.getOffset() < 0 ? 0 : (int) mItem.getOffset();
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
-
-		/*
-        if (offset == 0 && prefs.getBoolean("pref_stream_proxy", false))
-            dataSource = HTTPDService.proxyURL(mItem.getUrl().toString());
-		*/
-
 		mPlaylist.setAsFrist(mItem);
 		mPlayer.setDataSourceAsync(dataSource, offset);
 
@@ -418,7 +372,6 @@ public class PlayerService extends Service implements
 	private void updateMetadata(IEpisode item) {
 		notifyStatus(item);
 		mPlayerStateManager.updateMedia(item);
-		//mMetaDataControllerWrapper.updateState(item, true, true);
 	}
 
     /**
@@ -426,7 +379,24 @@ public class PlayerService extends Service implements
      * @return True of the songs start to play
      */
 	public boolean toggle(@NonNull IEpisode argEpisode) {
-        IEpisode item = getCurrentItem();
+
+
+        if (mPlayer.isPlaying()) {
+            IEpisode item = getCurrentItem();
+            if (argEpisode.equals(item)) {
+                pause();
+                return false;
+            }
+        }
+
+        play(argEpisode.getUrl().toString());
+        return true;
+
+        /*
+        if (item == null) {
+            play(argEpisode.getUrl().toString());
+        }
+
 		if (!mPlayer.isPlaying() || (item != null && !argEpisode.getUrl().equals(item.getUrl()))) {
 			play(argEpisode.getUrl().toString());
             return true;
@@ -434,6 +404,7 @@ public class PlayerService extends Service implements
 			pause();
             return false;
 		}
+		*/
 	}
 
 	@Deprecated
@@ -445,7 +416,7 @@ public class PlayerService extends Service implements
 		}
 	}
 
-	public void start() {
+	private void start() {
 		if (!mPlayer.isPlaying()) {
 			if (mItem == null)
 				mItem = mPlaylist.getItem(0);
@@ -456,7 +427,6 @@ public class PlayerService extends Service implements
             takeWakelock(mPlayer.isSteaming());
 			mPlaylist.setAsFrist(mItem);
 			mPlayer.start();
-			//mMetaDataControllerWrapper.updateState(mItem, true, false);
 		}
 	}
 
@@ -562,12 +532,6 @@ public class PlayerService extends Service implements
         NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
         if (mNotificationPlayer != null) {
-			/*
-            Notification notification = mNotificationPlayer.getNotification(true);
-            if (notification != null) {
-                startForeground(NotificationPlayer.getNotificationId(), notification);
-            }
-            */
 			mNotificationPlayer.show(isPlaying(), mItem);
         }
 
@@ -577,10 +541,6 @@ public class PlayerService extends Service implements
             wifiLock.acquire();
         }
     }
-
-	private void refreshFeeds() {
-
-	}
 
     public void setMediaCast(IMediaCast mMediaCast) {
         this.mMediaCast = mMediaCast;

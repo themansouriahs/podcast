@@ -58,12 +58,12 @@ public class HeadsetReceiver extends BroadcastReceiver {
                     argPlayerService.pause();
                 } else {
                     Log.d("HeadsetReceiver", "ACTION_DOWN => Start Player");
-                    argPlayerService.start();
+                    argPlayerService.play();
                 }
                 break;
             case KeyEvent.KEYCODE_MEDIA_PLAY:
                 //context.startService(new Intent(MusicService.ACTION_PLAY));
-                argPlayerService.start();
+                argPlayerService.play();
                 break;
             case KeyEvent.KEYCODE_MEDIA_PAUSE:
                 //context.startService(new Intent(MusicService.ACTION_PAUSE));

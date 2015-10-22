@@ -185,8 +185,6 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
                 AudioManager.AUDIOFOCUS_GAIN);
 
         if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-            mAudioManager
-                    .registerMediaButtonEventReceiver(mControllerComponentName);
             super.start();
 
             SoundWaves.getBus().post(psd);

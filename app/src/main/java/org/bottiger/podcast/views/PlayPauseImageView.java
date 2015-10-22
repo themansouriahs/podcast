@@ -407,11 +407,13 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
     public void onClick(View view) {
 
         PlayerService ps = PlayerService.getInstance();
+
+        if (ps == null)
+            return;
+
         boolean isPlaying = ps.isPlaying() && mEpisode.equals(ps.getCurrentItem());
 
         if (isPlaying) {
-            //toggle();
-            //setStatus(PlayerStatusObservable.PAUSED);
             animateChange(PlayPauseDrawable.IS_PAUSED);
         } else {
             animateChange(PlayPauseDrawable.IS_PAUSED);
@@ -460,10 +462,7 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
 
         }
 
-        isPlaying = SoundWaves.sBoundPlayerService.toggle(mEpisode);
-        //setStatus(isPlaying ? PlayerStatusObservable.PREPARING : PlayerStatusObservable.STOPPED);
-
-        //SoundWaves.getBus().post(new PlaylistData().playlistChanged = true);
+        ps.toggle(mEpisode);
 
         IAnalytics.EVENT_TYPE type = getEventType();
         if (type != null) {
