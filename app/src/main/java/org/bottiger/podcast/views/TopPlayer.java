@@ -204,7 +204,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
     @SuppressWarnings("ResourceType")
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        if (sizeLarge > 0){
+        if (sizeLarge > 0 && !mFullscreen){
             int hSize = MeasureSpec.getSize(heightMeasureSpec);
             int hMode = MeasureSpec.getMode(heightMeasureSpec);
 
