@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
 
     <string name="app_name">SoundWaves</string>
     <string name="unsubscribe">Unsubscribe</string>
@@ -13,8 +13,6 @@
 
     <string name="pref_downloaded_expire_description">%s</string>
     <string name="pref_downloaded_expire_title">Podcast download limit</string>
-    <string name="pref_notification_control">Notification Controls</string>
-    <string name="pref_notification_control_description">Show small player in notification area</string>
     <string name="dialog_title_add_sub">Add podcast</string>
     <string name="dialog_message_add_sub">Please enter an URL:</string>
     <string name="title_section3">Playlist</string>
@@ -28,8 +26,6 @@
     <string name="menu_clear_playlist">Reset playlist</string>
     <string name="menu_import">Import/export OPML</string>
     <string name="menu_add_podcast">Add podcast</string>
-    <string name="menu_order_by_date_desc">Show most recent first</string>
-    <string name="menu_order_by_date_asc">Show oldest first</string>
     <string name="pref_feedback_title">Send anonymous reports</string>
     <string name="pref_feedback_description">Send anonymous data about the app, such as crash reports, to the developer</string>
     <string name="pref_cloud_support_title">Enable cloud support</string>
@@ -56,7 +52,6 @@
     <string name="pref_player_forwards_amount_summary">Fast forward %s at a time</string>
     <string name="pref_player_backwards_amount_summary">Rewind %s at a time</string>
     <string name="pref_playback_category_title">Playback</string>
-    <string name="pref_notification_category_title">Notification</string>
     <string name="preferences_category_about">About</string>
     <string name="pref_current_version_title">Version</string>
     <string name="ok">OK</string>
@@ -75,10 +70,7 @@
     <string name="filter_show_listened">Show Listened</string>
     <string name="auto_start_next">Auto Start Next</string>
     <string name="drawer_playlist_filters">Playlist Filters</string>
-    <string name="drawer_player_settings">Player Settings</string>
     <string name="opml_not_found">"OPML not found. Rename your file as %1$s and place it at the root folder of the storage (SD Card)"</string>
-    <string name="gpodder_searching">Searching using gPodder.net</string>
-    <string name="subscription_subscribing_to">"Subscribing to: "</string>
     <string name="pref_subscriptions_category_title">Subscriptions</string>
     <string name="pref_subscriptions_columns_dialog_title">Subscription columns</string>
     <string name="pref_subscriptions_columns_title">Subscription columns</string>
@@ -127,7 +119,6 @@
     <string name="pref_webservices_dialog_title">Podcast search engine</string>
     <string name="pref_webservices_discovery_title">Podcast search engine</string>
     <string name="pref_webservices_discovery_description">Web services used for searching for podcasts</string>
-    <string name="subscription_instruction_title">Thank you for trying out SoundWaves</string>
     <string name="playlist_filter_introducion">Automatically populate the playlist with recent episodes from</string>
     <string name="playlist_filter_none">Do not populate</string>
     <string name="playlist_empty">Playlist is empty :(</string>
@@ -140,13 +131,11 @@
     <string name="playlist_empty_mode_two_desc">The playlist will populate itself and always contain the most recent episodes. You can still queue selected episodes manually</string>
     <string name="playlist_episode_dismissed">Episode removed</string>
     <string name="playlist_episode_dismissed_undo">Undo</string>
-    <string name="drawer_playlist_content_source">Playlist content</string>
     <string name="playlist_context_menu_playnext">Play next</string>
     <string name="subscription_subtitle_updated_at">updated</string>
     <string name="filter_show_only_downloaded">Only downloaded</string>
     <string name="action_filter">Filter Playlist</string>
     <string name="apply_filters">Apply filters</string>
-    <string name="reset_filters">Reset</string>
     <string name="pref_gpodder_support_title">GPodder</string>
     <string name="gpodder_username">username</string>
     <string name="gpodder_password">password</string>
@@ -166,7 +155,6 @@
     <string name="feed_settings_delete_when_listened">Delete when listened</string>
     <string name="feed_settings_intro">These settings will override the SoundWaves defaults for this specific podcast.</string>
     <string name="feed_settings_oldest_first">List oldest episodes first</string>
-    <string name="choose_player_for_open_video_externally">Choose player for viewing the episode</string>
     <string name="open_video_externally_title">Open video in another player?</string>
     <string name="open_video_externally_body">This episode is a video, which is not supported by this app. You can open it in another video player, or choose to stay here for audio only.</string>
     <string name="open_video_externally_confirm">Open video player</string>
