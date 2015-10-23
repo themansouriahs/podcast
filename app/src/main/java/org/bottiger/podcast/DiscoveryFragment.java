@@ -223,8 +223,10 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
         mResultsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mResultsRecyclerView.setHasFixedSize(true);
         mResultsRecyclerView.setAdapter(mResultsAdapter);
-        mResultsRecyclerView.setItemAnimator(new SlideInUpAnimator(new OvershootInterpolator(1f)));
-        mResultsRecyclerView.getItemAnimator().setAddDuration(ANIMATION_DURATION);
+
+        // FIXME Add animation back when they are working
+        //mResultsRecyclerView.setItemAnimator(new SlideInUpAnimator(new OvershootInterpolator(1f)));
+        //mResultsRecyclerView.getItemAnimator().setAddDuration(ANIMATION_DURATION);
 
         populateRecommendations();
 
