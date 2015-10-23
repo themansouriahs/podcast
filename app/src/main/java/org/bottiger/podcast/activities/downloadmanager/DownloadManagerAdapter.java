@@ -44,15 +44,11 @@ public class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemVie
         mContext = argContext;
         mEmptyTextView = argEmptyTextView;
 
-        PlayerService ps = PlayerService.getInstance();
-        List<QueueEpisode> queue = new LinkedList<>();
-        if (ps != null) {
-            mDownloadManager = ps.getDownloadManager();
-            queue = mDownloadManager.getQueue();
-            IEpisode downloadingEpisode = mDownloadManager.getDownloadingItem();
-            if (downloadingEpisode != null)
-                mDownloadingEpisodes.add(downloadingEpisode);
-        }
+        mDownloadManager = SoundWaves.getDownloadManager();
+        List<QueueEpisode> queue = mDownloadManager.getQueue();
+        IEpisode downloadingEpisode = mDownloadManager.getDownloadingItem();
+        if (downloadingEpisode != null)
+            mDownloadingEpisodes.add(downloadingEpisode);
 
         for (int i = 0; i < queue.size(); i++) {
             mDownloadingEpisodes.add(queue.get(i).getEpisode());

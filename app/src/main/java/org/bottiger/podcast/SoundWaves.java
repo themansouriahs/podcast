@@ -18,6 +18,7 @@ import com.squareup.otto.ThreadEnforcer;
 import org.bottiger.podcast.flavors.Analytics.AnalyticsFactory;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.CrashReporterFactory;
+import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.rxbus.RxBus;
@@ -39,6 +40,7 @@ public class SoundWaves extends Application {
 
     public static IAnalytics sAnalytics;
     public static SubscriptionRefreshManager sSubscriptionRefreshManager;
+    private static SoundWavesDownloadManager sDownloadManager;
 
     private static Bus sBus = new Bus(ThreadEnforcer.MAIN);
     private static RxBus _rxBus = null;
@@ -104,6 +106,7 @@ public class SoundWaves extends Application {
 
         context = getApplicationContext();
 
+        sDownloadManager = new SoundWavesDownloadManager(this);
         sLibrary = new Library(this);
 
         sSubscriptionRefreshManager = new SubscriptionRefreshManager(context);
@@ -161,6 +164,11 @@ public class SoundWaves extends Application {
         }
 
         return _rxBus;
+    }
+
+    @NonNull
+    public static SoundWavesDownloadManager getDownloadManager() {
+        return sDownloadManager;
     }
 
     public static Library getLibraryInstance() {

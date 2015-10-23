@@ -16,6 +16,7 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
@@ -115,10 +116,7 @@ public class DialogBulkDownload {
             return;
         }
 
-        PlayerService ps = PlayerService.getInstance();
-        SoundWavesDownloadManager downloadManager = null;
-        if (ps != null)
-            downloadManager = ps.getDownloadManager();
+        SoundWavesDownloadManager downloadManager = SoundWaves.getDownloadManager();
 
         SharedPreferences sharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(mContext);

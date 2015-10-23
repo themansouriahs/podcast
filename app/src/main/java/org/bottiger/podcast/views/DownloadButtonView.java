@@ -216,11 +216,8 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
 
         if (getState() == PlayerButtonView.STATE_DEFAULT) {
             Log.v(TAG, "Queue download");
-            PlayerService ps = PlayerService.getInstance();
-            if (ps != null) {
-                ps.getDownloadManager().addItemAndStartDownload(getEpisode(), SoundWavesDownloadManager.FIRST);
-                setState(PlayerButtonView.STATE_QUEUE);
-            }
+            SoundWaves.getDownloadManager().addItemAndStartDownload(getEpisode(), SoundWavesDownloadManager.FIRST);
+            setState(PlayerButtonView.STATE_QUEUE);
         } else if (getState() == PlayerButtonView.STATE_DELETE) {
             Log.v(TAG, "Delete file");
             IEpisode episode = getEpisode();
@@ -242,7 +239,7 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
             return PlayerButtonView.STATE_DELETE;
         }
 
-        org.bottiger.podcast.service.DownloadStatus status = ps.getDownloadManager().getStatus(getEpisode());
+        org.bottiger.podcast.service.DownloadStatus status = SoundWaves.getDownloadManager().getStatus(getEpisode());
 
         if (status == org.bottiger.podcast.service.DownloadStatus.DOWNLOADING) {
             return PlayerButtonView.STATE_DEFAULT;

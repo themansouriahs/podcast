@@ -142,10 +142,7 @@ public class TopActivity extends AppCompatActivity {
 
         switch (requestCode) {
             case PERMISSION_TO_DOWNLOAD: {
-                PlayerService ps = SoundWaves.sBoundPlayerService;
-                if (ps == null)
-                    return;
-                ps.getDownloadManager().startDownload();
+                SoundWaves.getDownloadManager().startDownload();
                 return;
             }
             case PERMISSION_TO_IMPORT_EXPORT: {
@@ -183,7 +180,7 @@ public class TopActivity extends AppCompatActivity {
         if (ps == null)
             return;
 
-        item.setVisible(ps.getDownloadManager().getDownloadingItem() != null);
+        item.setVisible(SoundWaves.getDownloadManager().getDownloadingItem() != null);
     }
 
     // https://github.com/square/otto/issues/83

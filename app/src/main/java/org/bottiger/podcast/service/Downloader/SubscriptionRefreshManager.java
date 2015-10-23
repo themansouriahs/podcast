@@ -169,21 +169,18 @@ public class SubscriptionRefreshManager {
                     if (episode instanceof FeedItem) {
                         Date lastUpdate = new Date(((FeedItem) episode).getLastUpdate());
                         if (lastUpdate.after(tenMinutesAgo)) {
-
-                            if (ps != null) {
-                                ps.getDownloadManager().addItemToQueue(episode, SoundWavesDownloadManager.LAST);
-                                startDownload = true;
-                            }
+                            SoundWaves.getDownloadManager().addItemToQueue(episode, SoundWavesDownloadManager.LAST);
+                            startDownload = true;
                         }
                     }
                 }
             }
 
-            if (startDownload && ps != null) {
+            if (startDownload) {
                 Runnable myRunnable = new Runnable() {
                     @Override
                     public void run() {
-                        ps.getDownloadManager().startDownload();
+                        SoundWaves.getDownloadManager().startDownload();
                     }
                 };
                 mainHandler.post(myRunnable);
@@ -220,7 +217,7 @@ public class SubscriptionRefreshManager {
                                     @Nullable final IDownloadCompleteCallback argCallback) {
         ISubscription parsedSubscription = null;
         try {
-            if (response != null && response.body() != null && response.isSuccessful()) {
+            if (response.body() != null && response.isSuccessful()) {
                 try {
                     parsedSubscription = mFeedParser.parse(argSubscription, response.body().byteStream());
 

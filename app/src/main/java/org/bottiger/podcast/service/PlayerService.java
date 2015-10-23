@@ -86,8 +86,6 @@ public class PlayerService extends Service implements
 
 	private SoundWavesPlayer mPlayer = null;
     private MediaControllerCompat mController;
-
-	private SoundWavesDownloadManager mDownloadManager;
     private PlayerStateManager mPlayerStateManager;
 
     // Google Cast
@@ -154,7 +152,7 @@ public class PlayerService extends Service implements
 		SoundWaves.getBus().register(this);
 
 		mPodcastUpdater = new PodcastUpdater(this);
-		mDownloadManager = new SoundWavesDownloadManager(this);
+
         mPlayerHandler = new PlayerHandler(this);
 
 		mPlayerStateManager = new PlayerStateManager(this);
@@ -555,11 +553,6 @@ public class PlayerService extends Service implements
 
 	public PlayerStateManager getPlayerStateManager() {
 		return mPlayerStateManager;
-	}
-
-	@NonNull
-	public SoundWavesDownloadManager getDownloadManager() {
-		return mDownloadManager;
 	}
 
 }

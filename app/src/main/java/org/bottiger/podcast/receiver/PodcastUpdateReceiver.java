@@ -38,8 +38,7 @@ public class PodcastUpdateReceiver extends BroadcastReceiver {
         wl.acquire();
 
         final SoundWavesDownloadManager downloadManager;
-        PlayerService playerService = PlayerService.getInstance();
-        downloadManager = playerService != null ? playerService.getDownloadManager() : new SoundWavesDownloadManager(context);
+        downloadManager = SoundWaves.getDownloadManager();
 
 		SubscriptionRefreshManager subscriptionRefreshManager = new SubscriptionRefreshManager(context);
         subscriptionRefreshManager.refresh(null, new IDownloadCompleteCallback() {
@@ -49,9 +48,7 @@ public class PodcastUpdateReceiver extends BroadcastReceiver {
                 Integer timeDiff = (int) (endTime - startTime);
                 IAnalytics analytics = AnalyticsFactory.getAnalytics(context);
                 analytics.trackEvent(IAnalytics.EVENT_TYPE.REFRESH_DURATION, timeDiff);
-
-
-
+                
                 SoundWavesDownloadManager.removeExpiredDownloadedPodcasts(context);
                 downloadManager.startDownload();
 

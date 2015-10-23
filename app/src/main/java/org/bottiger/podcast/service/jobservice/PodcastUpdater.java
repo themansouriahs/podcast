@@ -19,13 +19,14 @@ import android.support.annotation.NonNull;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.service.PodcastService;
+import org.bottiger.podcast.utils.PreferenceHelper;
 
 /**
  * Created by apl on 11-09-2014.
  */
 public class PodcastUpdater {
 
-    public static final float UPDATE_FREQUENCY_MIN = 60f;
+    public static final float UPDATE_FREQUENCY_MIN = 1f;
 
     private static final int PodcastUpdaterId = 36324;
 
@@ -43,12 +44,10 @@ public class PodcastUpdater {
     private boolean scheduleUpdateUsingJobScheduler(@NonNull Context argContext) {
         ComponentName receiver = new ComponentName(argContext, PodcastUpdateJobService.class);
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(argContext);
-        Resources resources = argContext.getResources();
+        boolean wifiOnly = PreferenceHelper.getBooleanPreferenceValue(argContext,
+                R.string.pref_download_only_wifi_key,
+                R.bool.pref_delete_when_finished_default);
 
-        String wifiOnlyKey = resources.getString(R.string.pref_download_only_wifi_key);
-        boolean wifiOnlyDefault = resources.getBoolean(R.bool.pref_download_only_wifi_default);
-        boolean wifiOnly = sharedPreferences.getBoolean(wifiOnlyKey, wifiOnlyDefault);
         int networkType = wifiOnly ? JobInfo.NETWORK_TYPE_UNMETERED : JobInfo.NETWORK_TYPE_ANY;
 
         long updateFrequencyMs = alarmInterval(UPDATE_FREQUENCY_MIN); // to ms

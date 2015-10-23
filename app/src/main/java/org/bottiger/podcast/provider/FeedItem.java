@@ -46,6 +46,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 
     // Se Subscription.java for details
     private static final int IS_VIDEO = 1;
+	private static final int HAS_BEEN_DOWNLOADED_ONCE = (1 << 2);
 
 	/*
 	 * Let's document these retared fields! They are totally impossible to guess
@@ -616,6 +617,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 			return;
 
 		isDownloaded = argIsDownloaded;
+		setHasBeenDownloadedOnce(true);
 		notifyPropertyChanged(EpisodeChanged.CHANGED);
 	}
 
@@ -973,7 +975,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 			return;
 
 		link_show_notes = argLink;
-		notifyPropertyChanged();
+		notifyPropertyChanged(EpisodeChanged.CHANGED);
 	}
 
 	public int getStatus() {
@@ -987,6 +989,25 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
         return IsSettingEnabled(IS_VIDEO);
     }
 
+	public boolean hasBeenDownloadedOnce() {
+		if (!BitMaskUtils.IsBitmaskInitialized(status))
+			return false;
+
+		return IsSettingEnabled(HAS_BEEN_DOWNLOADED_ONCE);
+	}
+
+	private void setHasBeenDownloadedOnce(boolean argHasBeenDownloaded) {
+		status = status < 0 ? 0 : status;
+		status |= HAS_BEEN_DOWNLOADED_ONCE;
+
+		if (argHasBeenDownloaded)
+			status |= HAS_BEEN_DOWNLOADED_ONCE;
+		else
+			status &= ~HAS_BEEN_DOWNLOADED_ONCE;
+
+		notifyPropertyChanged(EpisodeChanged.CHANGED);
+	}
+
     public void setIsVideo(boolean argIsVideo) {
         status = status < 0 ? 0 : status;
         status |= IS_VIDEO;
@@ -996,7 +1017,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
         else
             status &= ~IS_VIDEO;
 
-		notifyPropertyChanged();
+		notifyPropertyChanged(EpisodeChanged.CHANGED);
     }
 
     private boolean IsSettingEnabled(int setting) {

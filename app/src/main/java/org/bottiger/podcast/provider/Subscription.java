@@ -590,7 +590,6 @@ public class Subscription implements ISubscription, PaletteListener {
 	}
 
 	private boolean IsSettingEnabled(int setting) {
-		//return mSettings > 0 && ((setting & mSettings) != 0);
 		return BitMaskUtils.IsBitSet(mSettings, setting);
 	}
 

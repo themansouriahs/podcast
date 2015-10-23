@@ -7,14 +7,19 @@ import android.support.annotation.NonNull;
 import android.support.v7.util.SortedList;
 import android.util.Log;
 
+import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
 import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.utils.PreferenceHelper;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -25,6 +30,8 @@ public class PodcastUpdateJobService extends JobService {
 
     private static final String TAG = "PodcastUpdateJobService";
 
+    private static final int HOURS = 48;
+
     @Override
     public boolean onStartJob(JobParameters params) {
         Log.d(TAG, "Job started");
@@ -34,35 +41,57 @@ public class PodcastUpdateJobService extends JobService {
             @Override
             public void complete(boolean argSucces, @NonNull ISubscription argSubscription) {
 
-                if (argSubscription == null)
+                boolean downloadOnUpdate = PreferenceHelper.getBooleanPreferenceValue(getApplicationContext(),
+                        R.string.pref_download_on_update_key,
+                        R.bool.pref_download_on_update_default);
+
+                if (!downloadOnUpdate)
                     return;
 
-                PlayerService ps = PlayerService.getInstance();
-                SoundWavesDownloadManager downloadManager = null;
-                if (ps != null)
-                    downloadManager = ps.getDownloadManager();
+                SoundWavesDownloadManager downloadManager = SoundWaves.getDownloadManager();
 
                 SortedList<? extends IEpisode> episodes = argSubscription.getEpisodes();
-                IEpisode episode;
-                if (episodes != null) {
-                    for (int i = 0; i < episodes.size(); i++) {
-                        episode = episodes.get(i);
-                        long createdAt = episode.getCreatedAt().getTime();
-                        long now = System.currentTimeMillis();
-                        float buffer = 1.2f;
+                FeedItem episode;
 
-                        long minutes = TimeUnit.MILLISECONDS.toMinutes(now - createdAt);
-
-                        if (minutes <= PodcastUpdater.UPDATE_FREQUENCY_MIN*buffer) {
-                            if (downloadManager != null)
-                                downloadManager.addItemToQueue(episode, SoundWavesDownloadManager.ANYWHERE);
-                        }
+                for (int i = 0; i < episodes.size(); i++) {
+                    /**
+                     * Currently we download an episode if:
+                     *
+                     * 1) We should download automaticlly (checked abouve)
+                     * 2) It is less than 48 hours old
+                     * 3) It has not been downloaded before
+                     *
+                     */
+                    episode = (FeedItem)episodes.get(i);
+                    Date episodeDate = episode.getDateTime();
+                    if (episodeDate != null) {
+                        episodeDate = episode.getCreatedAt();
                     }
 
-                    SoundWavesDownloadManager.removeExpiredDownloadedPodcasts(PodcastUpdateJobService.this);
-                    if (downloadManager != null)
-                        downloadManager.startDownload();
+                    if (episodeDate != null) {
+                        long createdAt = episodeDate.getTime();
+                        long now = System.currentTimeMillis();
+                        long hoursOld = TimeUnit.MILLISECONDS.toHours(now - createdAt);
+
+                        if (hoursOld <= HOURS && !episode.hasBeenDownloadedOnce()) {
+                            downloadManager.addItemToQueue(episode, SoundWavesDownloadManager.ANYWHERE);
+                        }
+                    } else {
+                        Log.w(TAG, "EpisodeDate not set");
+                    }
+
+                    /*
+                    float buffer = 1.2f;
+                    long minutes = TimeUnit.MILLISECONDS.toMinutes(now - createdAt);
+                    if (minutes <= PodcastUpdater.UPDATE_FREQUENCY_MIN*buffer) {
+                        downloadManager.addItemToQueue(episode, SoundWavesDownloadManager.ANYWHERE);
+                    }
+                    */
                 }
+
+                SoundWavesDownloadManager.removeExpiredDownloadedPodcasts(PodcastUpdateJobService.this);
+                downloadManager.startDownload();
+
             }
         });
 

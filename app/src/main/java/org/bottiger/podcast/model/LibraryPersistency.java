@@ -51,6 +51,7 @@ public class LibraryPersistency {
                 Log.d("FeedItem", "update OK");
             } else if (numUpdatedRows == 0) {
                 Log.d("FeedItem", "update NOT OK. Insert instead");
+                cv.put(ItemColumns.CREATED, System.currentTimeMillis());
                 mContentResolver.insert(ItemColumns.URI, cv);
             } else {
                 throw new IllegalStateException("Never update more than one row here");
