@@ -8,6 +8,7 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.bottiger.podcast.model.EpisodeChanged;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 
@@ -151,6 +152,11 @@ public class SlimEpisode implements IEpisode, Parcelable {
         }
 
         mPriority = precedingPriority +1;
+    }
+
+    @Override
+    public void removePriority() {
+        mPriority = -1;
     }
 
     @Override

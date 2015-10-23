@@ -52,29 +52,23 @@ public class HeadsetReceiver extends BroadcastReceiver {
         switch (event.getKeyCode()) {
             case KeyEvent.KEYCODE_HEADSETHOOK:
             case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
-                //context.startService(new Intent(MusicService.ACTION_TOGGLE_PLAYBACK));
-                if (argPlayerService.isPlaying()) {
-                    Log.d("HeadsetReceiver", "ACTION_DOWN => Pause Player");
-                    argPlayerService.pause();
-                } else {
-                    Log.d("HeadsetReceiver", "ACTION_DOWN => Start Player");
-                    argPlayerService.play();
-                }
+                Log.d("HeadsetReceiver", "ACTION_DOWN => Toggle Player");
+                argPlayerService.toggle();
                 break;
             case KeyEvent.KEYCODE_MEDIA_PLAY:
-                //context.startService(new Intent(MusicService.ACTION_PLAY));
+                Log.d("HeadsetReceiver", "ACTION_DOWN => Play Player");
                 argPlayerService.play();
                 break;
             case KeyEvent.KEYCODE_MEDIA_PAUSE:
-                //context.startService(new Intent(MusicService.ACTION_PAUSE));
+                Log.d("HeadsetReceiver", "ACTION_DOWN => Pause Player");
                 argPlayerService.pause();
                 break;
             case KeyEvent.KEYCODE_MEDIA_STOP:
-                //context.startService(new Intent(MusicService.ACTION_STOP));
+                Log.d("HeadsetReceiver", "ACTION_DOWN => Stop Player");
                 argPlayerService.stop();
                 break;
             case KeyEvent.KEYCODE_MEDIA_NEXT:
-                //context.startService(new Intent(MusicService.ACTION_SKIP));
+                // FIXME implement this
                 argPlayerService.play(argPlayerService.getNextId().getUrl().toString());
                 break;
             case KeyEvent.KEYCODE_MEDIA_PREVIOUS:

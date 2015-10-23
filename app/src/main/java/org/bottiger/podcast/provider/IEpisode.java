@@ -59,6 +59,7 @@ public interface IEpisode {
      */
     void setPriority(int argPriority);
     void setPriority(IEpisode argPrecedingItem, @NonNull Context argContext);
+    void removePriority();
 
     boolean isDownloaded();
     boolean isMarkedAsListened();

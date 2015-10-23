@@ -12,6 +12,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.util.Log;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
@@ -24,6 +25,7 @@ import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.utils.PreferenceHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,6 +34,8 @@ import java.io.IOException;
  * Created by apl on 20-01-2015.
  */
 public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlayerBase implements IMediaRouteStateListener {
+
+    private static final String TAG = "SoundWavesPlayerBase";
 
     private static final float MARK_AS_LISTENED_RATIO_THRESHOLD = 0.9f;
     private static final float MARK_AS_LISTENED_MINUTES_LEFT_THRESHOLD = 5f;
@@ -114,22 +118,13 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
 
             Uri uri = Uri.parse(path);
             setDataSource(mPlayerService, uri);
-            /*
-            if (mIsStreaming)
-                setDataSource(path);
-            else {
-                //FileInputStream fis = new FileInputStream(path);
-                //FileDescriptor fd = fis.getFD();
-                //setDataSource(fd);
-                setDataSource(path);
-            }*/
+
             setAudioStreamType(AudioManager.STREAM_MUSIC);
 
             this.startPos = startPos;
             this.isPreparingMedia = true;
 
             setOnPreparedListener(preparedlistener);
-            prepareAsync();
         } catch (IOException ex) {
             // TODO: notify the user why the file couldn't be opened
             mIsInitialized = false;
@@ -139,9 +134,11 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
             mIsInitialized = false;
             return;
         }
-        setOnCompletionListener(listener);
+        setOnCompletionListener(completionListener);
         setOnBufferingUpdateListener(bufferListener);
         setOnErrorListener(errorListener);
+
+        prepareAsync();
 
         mIsInitialized = true;
     }
@@ -293,36 +290,56 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         mHandler = handler;
     }
 
-    GenericMediaPlayerInterface.OnCompletionListener listener = new GenericMediaPlayerInterface.OnCompletionListener() {
+    /**
+     * Only called when the track is complete. Not when it is stopped or interrupted.
+     */
+    GenericMediaPlayerInterface.OnCompletionListener completionListener = new GenericMediaPlayerInterface.OnCompletionListener() {
         @Override
         public void onCompletion(GenericMediaPlayerInterface mp) {
+            Log.d(TAG, "OnCompletionListener");
             mPlayerStateManager.updateState(PlaybackStateCompat.STATE_STOPPED, 0, playbackSpeed);
-            IEpisode item = mPlayerService.getCurrentItem();
-
-            if (item != null && item instanceof FeedItem) {
-
-                FeedItem feedItem = (FeedItem)item;
-                // Mark current as listened
-                feedItem.markAsListened();
-
-               if (mPlayerService != null) {
-                   // Delete if required
-                    Resources resources = mPlayerService.getResources();
-                    ContentResolver resolver = mPlayerService.getContentResolver();
-                    boolean doDelete = mSharedpreferences.getBoolean(resources.getString(R.string.pref_delete_when_finished_key), DELETE_WHEN_FINISHED_DEFAULT);
-
-                    if (doDelete) {
-                        feedItem.delFile(mPlayerService);
-
-                    }
-
-                   SoundWaves.getLibraryInstance().updateEpisode(feedItem);
-                }
-            }
 
             if (!isPreparingMedia)
                 mHandler.sendEmptyMessage(PlayerHandler.TRACK_ENDED);
 
+            if (mPlayerService == null) {
+                return;
+            }
+
+            IEpisode item = mPlayerService.getCurrentItem();
+
+            if (item == null)
+                return;
+
+            if (item instanceof FeedItem) {
+
+                FeedItem feedItem = (FeedItem)item;
+
+                // Delete if required
+                boolean doDelete = PreferenceHelper.getBooleanPreferenceValue(mPlayerService,
+                        R.string.pref_delete_when_finished_key,
+                        R.bool.pref_delete_when_finished_default);
+
+                if (doDelete) {
+                    feedItem.delFile(mPlayerService);
+                }
+
+                // Mark current as listened
+                feedItem.markAsListened();
+
+                SoundWaves.getLibraryInstance().updateEpisode(feedItem);
+            }
+
+            mPlayerService.getPlaylist().removeItem(0);
+            mPlayerService.stop();
+
+            boolean doPlayNext = PreferenceHelper.getBooleanPreferenceValue(mPlayerService,
+                    R.string.pref_continuously_playing_key,
+                    R.bool.pref_delete_when_finished_default);
+
+            if (doPlayNext) {
+                mPlayerService.play();
+            }
         }
     };
 

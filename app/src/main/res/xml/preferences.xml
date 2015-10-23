@@ -123,7 +123,7 @@
                 android:summary="@string/pref_player_backwards_amount_summary" />
 
             <CheckBoxPreference
-                android:defaultValue="false"
+                android:defaultValue="@bool/pref_continuously_playing_default"
                 android:key="@string/pref_continuously_playing_key"
                 android:summary="@string/pref_continuously_playing_description"
                 android:title="@string/pref_continuously_playing" />
@@ -170,7 +170,7 @@
             android:key="pref_network_category_storage">
 
         <CheckBoxPreference
-            android:defaultValue="false"
+            android:defaultValue="@bool/pref_delete_when_finished_default"
             android:key="@string/pref_delete_when_finished_key"
             android:summary="@string/pref_delete_when_finished_description"
             android:title="@string/pref_delete_when_finished_title" />

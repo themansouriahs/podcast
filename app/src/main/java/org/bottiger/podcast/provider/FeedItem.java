@@ -641,7 +641,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 			return;
 
 		listened = hasBeenListened;
-		notifyPropertyChanged();
+		notifyPropertyChanged(EpisodeChanged.CHANGED);
 	}
 
 	public int getListenedValue() {
@@ -784,7 +784,13 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 			return;
 
 		priority = argPriority;
-		notifyPropertyChanged();
+		notifyPropertyChanged(EpisodeChanged.CHANGED);
+	}
+
+	@Override
+	public void removePriority() {
+		priority = -1;
+		notifyPropertyChanged(EpisodeChanged.CHANGED);
 	}
 
 	/**

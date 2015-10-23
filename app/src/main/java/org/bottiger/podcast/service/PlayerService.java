@@ -204,8 +204,6 @@ public class PlayerService extends Service implements
     public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.d(TAG, "onStartCommand");
 		MediaButtonReceiver.handleIntent(mPlayerStateManager.getSession(), intent);
-
-        //return super.onStartCommand(intent, flags, startId);
         return START_STICKY;
     }
 
@@ -271,7 +269,6 @@ public class PlayerService extends Service implements
         }
 
 		play(nextItem.getUrl().toString());
-        //mMetaDataControllerWrapper.updateState(nextItem, true, true);
         mPlaylist.removeItem(0);
         mPlaylist.notifyPlaylistChanged();
 	}
@@ -299,7 +296,7 @@ public class PlayerService extends Service implements
 			mPlayer.pause();
 
 		if (mItem != null) {
-			if ((mItem.getUrl().toString() == argEpisodeURL) && mPlayer.isInitialized()) {
+			if ((mItem.getUrl().toString().equals(argEpisodeURL)) && mPlayer.isInitialized()) {
 				if (!mPlayer.isPlaying()) {
 					start();
 				}
@@ -324,15 +321,15 @@ public class PlayerService extends Service implements
 		if (oldItem != null && !oldItem.equals(mItem)) {
 			if (oldItem instanceof FeedItem) {
 				FeedItem oldFeedItem = (FeedItem)oldItem;
-				if (oldFeedItem.getOffset() > 0) {
-					oldFeedItem.markAsListened();
-					SoundWaves.getLibraryInstance().updateEpisode(oldFeedItem);
-
+				if (oldFeedItem.getPriority() > 0) {
 					int pos = mPlaylist.getPosition(oldItem);
-					if (pos > 0) {
+					if (pos >= 0) {
 						mPlaylist.removeItem(pos);
 					}
 				}
+
+				oldFeedItem.removePriority();
+				//SoundWaves.getLibraryInstance().updateEpisode(oldFeedItem);
 			}
 		}
 
@@ -391,29 +388,15 @@ public class PlayerService extends Service implements
 
         play(argEpisode.getUrl().toString());
         return true;
-
-        /*
-        if (item == null) {
-            play(argEpisode.getUrl().toString());
-        }
-
-		if (!mPlayer.isPlaying() || (item != null && !argEpisode.getUrl().equals(item.getUrl()))) {
-			play(argEpisode.getUrl().toString());
-            return true;
-		} else {
-			pause();
-            return false;
-		}
-		*/
 	}
 
-	@Deprecated
 	public void toggle() {
-		if (mPlayer.isPlaying() == false && mItem != null) {
-			start();
-		} else {
-			pause();
-		}
+		IEpisode episode = mPlaylist.getItem(0);
+
+		if (episode == null)
+			return;
+
+		toggle(episode);
 	}
 
 	private void start() {

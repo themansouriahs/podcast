@@ -198,6 +198,7 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
         if (size > position) {
             mInternalPlaylist.remove(position);
         }
+        notifyPlaylistChanged();
     }
 
 	/**
