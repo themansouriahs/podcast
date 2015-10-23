@@ -434,6 +434,10 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 		notifyPropertyChanged();
 	}
 
+    public boolean isPersisted() {
+        return id > 0;
+    }
+
 	public long getCurrentFileSize() {
 		String file = null;
 		try {

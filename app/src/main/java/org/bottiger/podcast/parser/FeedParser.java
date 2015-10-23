@@ -147,7 +147,6 @@ public class FeedParser {
                 subscription = readChannel(parser, subscription);
             }
             else if (name.equals(EPISODE_ITEM_TAG)) {
-                //subscription.addEpisode(readEpisode(parser, subscription));
                 SoundWaves.getLibraryInstance().addEpisode(readEpisode(parser, subscription));
             } else {
                 skip(parser);

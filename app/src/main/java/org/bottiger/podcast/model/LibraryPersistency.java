@@ -52,7 +52,9 @@ public class LibraryPersistency {
             } else if (numUpdatedRows == 0) {
                 Log.d("FeedItem", "update NOT OK. Insert instead");
                 cv.put(ItemColumns.CREATED, System.currentTimeMillis());
-                mContentResolver.insert(ItemColumns.URI, cv);
+                Uri result = mContentResolver.insert(ItemColumns.URI, cv);
+                long newId = getId(result.toString());
+                argEpisode.id = newId;
             } else {
                 throw new IllegalStateException("Never update more than one row here");
             }
@@ -197,5 +199,23 @@ public class LibraryPersistency {
             return true;
         } else
             return false;
+    }
+
+    private long getId(String argUri) {
+        String s = argUri;
+        int res = 0;
+        int p = 1;
+        int i = s.length()-1;
+        while(i >= 0){
+            int d = s.charAt(i) - '0';
+            if (d>=0 && d<=9)
+                res += d * p;
+            else
+                break;
+            i--;
+            p *= 10;
+        }
+
+        return res;
     }
 }

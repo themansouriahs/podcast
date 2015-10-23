@@ -166,6 +166,10 @@ public class Library {
             mEpisodesUrlLUT.put(item.getURL(), item);
             mEpisodesIdLUT.put(item.getId(), item);
 
+            if (!item.isPersisted()) {
+                updateEpisode(item);
+            }
+
             Subscription subscription = item.getSubscription();
             if (subscription != null) {
                 subscription.addEpisode(item);
