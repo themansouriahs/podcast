@@ -39,8 +39,12 @@ public class FeedViewDiscoveryAdapter extends FeedViewAdapter {
         return mSubscription.getEpisodes().get(argPosition);
     }
 
+    //protected void bindButtons(@NonNull EpisodeViewHolder episodeViewHolder, @NonNull IEpisode argEpisode) {
     @Override
-    protected void bindButtons(@NonNull EpisodeViewHolder episodeViewHolder, @NonNull IEpisode argEpisode) {
+    public void onBindViewHolder(EpisodeViewHolder episodeViewHolder, final int position) {
+        super.onBindViewHolder(episodeViewHolder, position);
+        int dataPosition = getDatasetPosition(position);
+        final IEpisode argEpisode = getItemForPosition(dataPosition);
 
         episodeViewHolder.DisplayDescription = true;
 

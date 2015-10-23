@@ -166,6 +166,7 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
         super.setEpisode(argItem);
 
         setState(calcState());
+
         setProgressPercent(new DownloadProgress());
     }
 
@@ -177,8 +178,12 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
                 I should take a look at that.
          */
         try {
-            if (!getEpisode().equals(argProgress.getEpisode()))
+            if (!getEpisode().equals(argProgress.getEpisode())) {
+                mProgress = 0;
+                setState(PlayerButtonView.STATE_DEFAULT);
+                invalidate();
                 return;
+            }
         } catch (Exception e) {
             VendorCrashReporter.handleException(e);
             return;

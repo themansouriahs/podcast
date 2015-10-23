@@ -56,7 +56,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
 
     private ArrayList<Integer> mExpanededItems = new ArrayList<>();
 
-    private static android.text.format.Formatter sFormatter = new android.text.format.Formatter();
+    private static final android.text.format.Formatter sFormatter = new android.text.format.Formatter();
     private StringBuilder mStringBuilder = new StringBuilder(100);
 
     public FeedViewAdapter(@NonNull Activity activity, @NonNull ISubscription argSubscription) {
@@ -138,11 +138,20 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
             }
         });
 
-        bindButtons(episodeViewHolder, item);
+        @PlayerStatusObservable.PlayerStatus int playerStatus = PlayerStatusObservable.STOPPED;
 
+        PlayerService ps = PlayerService.getInstance();
+        if (ps != null && ps.isInitialized() && item.equals(ps.getCurrentItem())) {
+            playerStatus = ps.getPlayer().getStatus();
+        }
+
+        episodeViewHolder.mPlayPauseButton.setEpisode(item, PlayPauseImageView.FEEDVIEW);
+        episodeViewHolder.mQueueButton.setEpisode(item, PlayPauseImageView.FEEDVIEW);
+        episodeViewHolder.mPlayPauseButton.setStatus(playerStatus);
+
+        getPalette(episodeViewHolder);
 
         episodeViewHolder.mDownloadButton.setEpisode(item);
-        //mDownloadProgressObservable.registerObserver(episodeViewHolder.mDownloadButton);
 
         if (mPalette != null) {
             episodeViewHolder.mPlayPauseButton.onPaletteFound(mPalette);
@@ -150,35 +159,6 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
             episodeViewHolder.mDownloadButton.onPaletteFound(mPalette);
         }
 
-    }
-
-    protected void bindButtons(@NonNull EpisodeViewHolder episodeViewHolder, @NonNull IEpisode argEpisode) {
-        FeedItem item = (FeedItem) argEpisode;
-
-        if (mSubscription == null) {
-            mSubscription = item.getSubscription(mActivity);
-        }
-
-        boolean isPlaying = false;
-        @PlayerStatusObservable.PlayerStatus int playerStatus = PlayerStatusObservable.STOPPED;
-        PlayerService ps = PlayerService.getInstance();
-        if (ps != null && ps.isInitialized()) {
-            if (item.getURL().equals(ps.getCurrentItem().getUrl().toString())) {
-                if (ps.isPlaying()) {
-                    isPlaying = true;
-                }
-                playerStatus = ps.getPlayer().getStatus();
-            }
-        }
-
-        episodeViewHolder.mPlayPauseButton.setEpisode(item, PlayPauseImageView.FEEDVIEW);
-        episodeViewHolder.mQueueButton.setEpisode(item, PlayPauseImageView.FEEDVIEW);
-        //episodeViewHolder.mPlayPauseButton.setStatus(isPlaying ? PlayerStatusObservable.PLAYING : PlayerStatusObservable.PAUSED);
-        episodeViewHolder.mPlayPauseButton.setStatus(playerStatus);
-
-        getPalette(episodeViewHolder);
-
-        episodeViewHolder.mDownloadButton.setEpisode(item);
     }
 
     protected void getPalette(@NonNull final EpisodeViewHolder episodeViewHolder) {
@@ -239,9 +219,6 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
             mStringBuilder.append(DateUtils.formatElapsedTime(argItem.getDuration() / 1000));
             mStringBuilder.append(", ");
         }
-        //else
-        //    mStringBuilder.append("--:--");
-
 
         long filesize = argItem.getFilesize();
         if (filesize > 0) {
