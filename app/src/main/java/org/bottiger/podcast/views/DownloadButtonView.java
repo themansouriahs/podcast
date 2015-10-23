@@ -180,7 +180,7 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
         try {
             if (!getEpisode().equals(argProgress.getEpisode())) {
                 mProgress = 0;
-                setState(PlayerButtonView.STATE_DEFAULT);
+                setState(calcState());
                 invalidate();
                 return;
             }
@@ -230,10 +230,10 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
 
     private int calcState() {
 
-        PlayerService ps = SoundWaves.sBoundPlayerService;
+        PlayerService ps = PlayerService.getInstance();
 
         if (ps == null)
-            return PlayerButtonView.STATE_DELETE;
+            return PlayerButtonView.STATE_DOWNLOAD;
 
         if (getEpisode().isDownloaded()) {
             return PlayerButtonView.STATE_DELETE;

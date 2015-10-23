@@ -36,12 +36,16 @@ import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.plugins.RxJavaErrorHandler;
+import rx.plugins.RxJavaPlugins;
 import rx.schedulers.Schedulers;
 
 /**
  * Created by aplb on 11-10-2015.
  */
 public class Library {
+
+    private static final String TAG = "Library";
 
     @NonNull private Context mContext;
     @NonNull private SqlBrite mSqlBrite = SqlBrite.create();
@@ -115,7 +119,6 @@ public class Library {
 
         mActiveSubscriptions = new SortedList<>(Subscription.class, mSubscriptionsListCallback);
 
-        //loadPlaylist(PlayerService.getInstance().getPlaylist());
         loadSubscriptions();
 
         SoundWaves.getRxBus().toObserverable()
@@ -133,6 +136,12 @@ public class Library {
                         IEpisode episode = getEpisode(episodeChanged.getId());
                         updateEpisode(episode);
                         return;
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        VendorCrashReporter.handleException(throwable);
+                        Log.w(TAG, "Error");
                     }
                 });
     }

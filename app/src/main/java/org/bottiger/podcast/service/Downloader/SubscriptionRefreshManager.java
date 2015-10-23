@@ -248,7 +248,7 @@ public class SubscriptionRefreshManager {
                 final ISubscription finalSubscription = parsedSubscription != null ? parsedSubscription : null;
 
                 Log.d(TAG, "Parsing callback for: " + argSubscription);
-                if (argCallback != null)
+                if (argCallback != null && finalSubscription != null)
                     argCallback.complete(finalSubscription != null, finalSubscription);
 
             }

@@ -26,7 +26,7 @@ import org.bottiger.podcast.utils.PreferenceHelper;
  */
 public class PodcastUpdater {
 
-    public static final float UPDATE_FREQUENCY_MIN = 1f;
+    public static final float UPDATE_FREQUENCY_MIN = 60f;
 
     private static final int PodcastUpdaterId = 36324;
 

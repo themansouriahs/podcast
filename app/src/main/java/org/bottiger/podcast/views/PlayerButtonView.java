@@ -123,7 +123,7 @@ public class PlayerButtonView extends ImageButton implements PaletteListener  {
     }
 
     public void setImage(int argImage) {
-        s_Icon = new WeakReference<Bitmap>(BitmapFactory.decodeResource(getResources(), argImage));
+        s_Icon = new WeakReference<>(BitmapFactory.decodeResource(getResources(), argImage));
 
         this.setImageBitmap(s_Icon.get());
         this.invalidate();

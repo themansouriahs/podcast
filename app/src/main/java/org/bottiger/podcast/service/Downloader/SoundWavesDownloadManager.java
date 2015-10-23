@@ -18,6 +18,7 @@ import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.TopActivity;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.DownloadProgressPublisher;
+import org.bottiger.podcast.model.EpisodeChanged;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
@@ -29,6 +30,7 @@ import org.bottiger.podcast.service.DownloadStatus;
 import org.bottiger.podcast.service.Downloader.engines.IDownloadEngine;
 import org.bottiger.podcast.service.Downloader.engines.OkHttpDownloader;
 import org.bottiger.podcast.utils.FileUtils;
+import org.bottiger.podcast.utils.PreferenceHelper;
 import org.bottiger.podcast.utils.SDCardManager;
 
 import android.Manifest;
@@ -58,15 +60,17 @@ import android.webkit.MimeTypeMap;
 
 import com.squareup.otto.Produce;
 
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
+
 public class SoundWavesDownloadManager extends Observable {
 
-    public static final String TAG = "EpisodeDownload";
-
-    private static final boolean DOWNLOAD_WIFI_ONLY = false;
-    private static final boolean DOWNLOAD_AUTOMATICALLY = false;
+    private static final String TAG = "SWDownloadManager";
 
     private static final String MIME_AUDIO = "audio";
     private static final String MIME_VIDEO = "video";
+    private static final String MIME_OTHER = "other";
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({OK, NO_STORAGE, OUT_OF_STORAGE, NO_CONNECTION, NEED_PERMISSION})
@@ -106,8 +110,6 @@ public class SoundWavesDownloadManager extends Observable {
     public static final int ACTION_DOWNLOAD_MANUALLY = 3;
     public static final int ACTION_DOWNLOAD_AUTOMATICALLY = 4;
 
-    private SharedPreferences sSharedPreferences;
-
 	private Context mContext = null;
 
     private final ReentrantLock mQueueLock = new ReentrantLock();
@@ -115,7 +117,6 @@ public class SoundWavesDownloadManager extends Observable {
 
 	private IEpisode mDownloadingItem = null;
     private IDownloadEngine mEngine = null;
-	private Set<Long> mDownloadingIDs = new HashSet<>();
 
     private DownloadProgressPublisher mProgressPublisher;
     private IDownloadEngine.Callback mDownloadCompleteCallback;
@@ -123,7 +124,25 @@ public class SoundWavesDownloadManager extends Observable {
     public SoundWavesDownloadManager(@NonNull Context argContext) {
         mContext = argContext;
         mDownloadCompleteCallback = new DownloadCompleteCallback(argContext);
-        mProgressPublisher = new DownloadProgressPublisher((SoundWaves)SoundWaves.getAppContext(), this);
+        mProgressPublisher = new DownloadProgressPublisher((SoundWaves) SoundWaves.getAppContext(), this);
+
+        SoundWaves.getRxBus().toObserverable()
+                .ofType(DownloadManagerChanged.class)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<DownloadManagerChanged>() {
+                    @Override
+                    public void call(DownloadManagerChanged downloadManagerChanged) {
+                        Log.w(TAG, "DownloadManagerChanged, size: " + downloadManagerChanged.queueSize);
+                        startDownload();
+                        return;
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        Log.w(TAG, "Erorr");
+                    }
+                });
     }
 
     public static @SoundWavesDownloadManager.MimeType int getFileType(@Nullable String argMimeType) {
@@ -156,7 +175,7 @@ public class SoundWavesDownloadManager extends Observable {
      * @return
      */
 	public DownloadStatus getStatus(IEpisode argEpisode) {
-        Log.d(TAG, "getStatus(): " + argEpisode);
+        Log.v(TAG, "getStatus(): " + argEpisode);
 
 		if (argEpisode == null) {
             return DownloadStatus.NOTHING;
@@ -220,11 +239,6 @@ public class SoundWavesDownloadManager extends Observable {
             return NEED_PERMISSION;
         }
 
-        if (sSharedPreferences == null) {
-            sSharedPreferences = PreferenceManager
-                    .getDefaultSharedPreferences(mContext);
-        }
-
 		// Make sure we have access to external storage
 		if (!SDCardManager.getSDCardStatusAndCreate()) {
 			return NO_STORAGE;
@@ -249,6 +263,7 @@ public class SoundWavesDownloadManager extends Observable {
 
                 mDownloadingItem = downloadingItem;
 
+                Log.d(TAG, "Start downloading: " + downloadingItem);
                 mEngine.startDownload();
 
                 mProgressPublisher.addEpisode(downloadingItem);
@@ -284,7 +299,6 @@ public class SoundWavesDownloadManager extends Observable {
 		if (item == null)
 			return;
 
-		ContentResolver contentResolver = context.getContentResolver();
 		item.delFile(context);
 	}
 
@@ -296,7 +310,7 @@ public class SoundWavesDownloadManager extends Observable {
 	}
 
     public static boolean removeTmpFolderCruft() {
-        String tmpFolder = null;
+        String tmpFolder;
         try {
             tmpFolder = SDCardManager.getTmpDir();
         } catch (IOException e) {
@@ -342,26 +356,10 @@ public class SoundWavesDownloadManager extends Observable {
             long bytesToKeep = bytesToKeep(sharedPreferences);
 
 			try {
-				// Fetch all downloaded podcasts
-				String where = ItemColumns.IS_DOWNLOADED + "==1";
-
-				// sort by nevest first
-				String sortOrder = ItemColumns.LAST_UPDATE + " DESC";
-
-                /*
-				Cursor cursor = mContext.getContentResolver().query(
-						ItemColumns.URI, ItemColumns.ALL_COLUMNS, where, null,
-						sortOrder);
-
-						cursor.moveToFirst();
-						*/
-
                 ArrayList<IEpisode> episodes = SoundWaves.getLibraryInstance().getEpisodes();
+                LinkedList<String> filesToKeep = new LinkedList<>();
 
-				LinkedList<String> filesToKeep = new LinkedList<>();
-
-				//while (cursor.isAfterLast() == false) {
-                IEpisode episode;
+				IEpisode episode;
                 FeedItem item;
                 for (int i = 0; i < episodes.size(); i++) {
                     boolean deleteFile = true;
@@ -420,21 +418,20 @@ public class SoundWavesDownloadManager extends Observable {
     public static boolean canPerform(@Action int argAction,
                                      @NonNull Context argContext,
                                      @NonNull ISubscription argSubscription) {
-        Log.d(TAG, "canPerform: " + argAction);
+        Log.v(TAG, "canPerform: " + argAction);
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(argContext);
         @NetworkState int networkState = updateConnectStatus(argContext);
 
         if (networkState == NETWORK_DISCONNECTED)
             return false;
 
-        Resources resources = argContext.getResources();
+        boolean wifiOnly = PreferenceHelper.getBooleanPreferenceValue(argContext,
+                R.string.pref_download_only_wifi_key,
+                R.bool.pref_download_only_wifi_default);
 
-        String only_wifi_key = resources.getString(R.string.pref_download_only_wifi_key);
-        String automatic_download_key = resources.getString(R.string.pref_download_on_update_key);
-
-        boolean wifiOnly = prefs.getBoolean(only_wifi_key, DOWNLOAD_WIFI_ONLY);
-        boolean automaticDownload = prefs.getBoolean(automatic_download_key, DOWNLOAD_AUTOMATICALLY);
+        boolean automaticDownload = PreferenceHelper.getBooleanPreferenceValue(argContext,
+                R.string.pref_download_on_update_key,
+                R.bool.pref_download_on_update_default);
 
         if (argSubscription instanceof Subscription) {
             Subscription subscription = (Subscription) argSubscription;
@@ -463,15 +460,8 @@ public class SoundWavesDownloadManager extends Observable {
         return false; // FIXME this should never happen. Ensure we never get here
     }
 
-	protected static @NetworkState int updateConnectStatus(@NonNull Context argContext) {
-		Log.d(TAG, "updateConnectStatus");
-
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(argContext);
-
-        if (sharedPreferences == null) {
-            sharedPreferences = PreferenceManager
-                    .getDefaultSharedPreferences(argContext);
-        }
+	private static @NetworkState int updateConnectStatus(@NonNull Context argContext) {
+		Log.v(TAG, "updateConnectStatus");
 
         ConnectivityManager cm = (ConnectivityManager) argContext
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -503,9 +493,9 @@ public class SoundWavesDownloadManager extends Observable {
             case ConnectivityManager.TYPE_MOBILE_HIPRI:
             case ConnectivityManager.TYPE_MOBILE_MMS:
             {
-                Resources resources = argContext.getResources();
-                String only_wifi_key = resources.getString(R.string.pref_download_only_wifi_key);
-                boolean wifiOnly = sharedPreferences.getBoolean(only_wifi_key, DOWNLOAD_WIFI_ONLY);
+                boolean wifiOnly = PreferenceHelper.getBooleanPreferenceValue(argContext,
+                        R.string.pref_download_only_wifi_key,
+                        R.bool.pref_download_only_wifi_default);
 
                 return wifiOnly ? NETWORK_RESTRICTED : NETWORK_OK;
             }
@@ -539,16 +529,10 @@ public class SoundWavesDownloadManager extends Observable {
 	}
 
 	/**
-	 * @return the mDownloadingIDs
-	 */
-	public Set<Long> getmDownloadingIDs() {
-		return mDownloadingIDs;
-	}
-
-	/**
 	 * Add feeditem to the download queue
 	 */
 	public void addItemToQueue(IEpisode argEpisode, @QueuePosition int argPosition) {
+        Log.d(TAG, "Adding item to queue: " + argEpisode);
 
         mQueueLock.lock();
         try {
@@ -723,17 +707,23 @@ public class SoundWavesDownloadManager extends Observable {
     private void postQueueChangedEvent() {
         final DownloadManagerChanged event = produceDownloadManagerState();
 
+        Log.d(TAG, "posting DownloadManagerChanged event");
+        SoundWaves.getRxBus().send(event);
+        Log.d(TAG, "DownloadManagerChanged event posted");
+        /*
         Handler handler = new Handler(Looper.getMainLooper());
         if (Looper.myLooper() == Looper.getMainLooper()) {
-            SoundWaves.getBus().post(event);
+
         } else {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
                     SoundWaves.getBus().post(event);
+                    Log.d(TAG, "DownloadManagerChanged event posted");
                 }
             });
         }
+        */
     }
 
     public class DownloadManagerChanged {
