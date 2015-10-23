@@ -17,6 +17,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.service.PodcastService;
 import org.bottiger.podcast.utils.PreferenceHelper;
@@ -24,13 +25,15 @@ import org.bottiger.podcast.utils.PreferenceHelper;
 /**
  * Created by apl on 11-09-2014.
  */
-public class PodcastUpdater {
+public class PodcastUpdater implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     public static final float UPDATE_FREQUENCY_MIN = 60f;
 
     private static final int PodcastUpdaterId = 36324;
 
     public PodcastUpdater(@NonNull Context argContext) {
+
+        PreferenceManager.getDefaultSharedPreferences(argContext).registerOnSharedPreferenceChangeListener(this);
 
         if (Build.VERSION.SDK_INT >= 21) {
             scheduleUpdateUsingJobScheduler(argContext);
@@ -43,26 +46,32 @@ public class PodcastUpdater {
     @TargetApi(21)
     private boolean scheduleUpdateUsingJobScheduler(@NonNull Context argContext) {
         ComponentName receiver = new ComponentName(argContext, PodcastUpdateJobService.class);
-
         boolean wifiOnly = PreferenceHelper.getBooleanPreferenceValue(argContext,
                 R.string.pref_download_only_wifi_key,
                 R.bool.pref_delete_when_finished_default);
-
         int networkType = wifiOnly ? JobInfo.NETWORK_TYPE_UNMETERED : JobInfo.NETWORK_TYPE_ANY;
-
         long updateFrequencyMs = alarmInterval(UPDATE_FREQUENCY_MIN); // to ms
 
-        JobInfo refreshFeedsTask = new JobInfo.Builder(PodcastUpdaterId, receiver)
-                .setRequiredNetworkType(networkType)
-                .setPersisted(true) // Persist across boots
-                .setRequiresCharging(false)
-                .setRequiresDeviceIdle(false)
-                .setPeriodic(updateFrequencyMs)
-                .build();
+        JobInfo refreshFeedsTask = getJobInfo(receiver, networkType, updateFrequencyMs);
 
         JobScheduler jobScheduler =
                 (JobScheduler) argContext.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+
+        jobScheduler.cancel(PodcastUpdaterId);
         return jobScheduler.schedule(refreshFeedsTask) == JobScheduler.RESULT_SUCCESS;
+    }
+
+    @TargetApi(21)
+    private JobInfo getJobInfo(@NonNull ComponentName argComponentName, int argNetworkType, long argUpdateFrequencyMs) {
+        JobInfo refreshFeedsTask = new JobInfo.Builder(PodcastUpdaterId, argComponentName)
+                .setRequiredNetworkType(argNetworkType)
+                .setPersisted(true) // Persist across boots
+                .setRequiresCharging(false)
+                .setRequiresDeviceIdle(false)
+                .setPeriodic(argUpdateFrequencyMs)
+                .build();
+
+        return refreshFeedsTask;
     }
 
     /**
@@ -118,6 +127,15 @@ public class PodcastUpdater {
             am.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
                     nextAlarm(nextAlarmMinutes),
                     alarmInterval(intervalMinutes), pi);
+        }
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        String wifiKey = SoundWaves.getAppContext().getResources().getString(R.string.pref_download_only_wifi_key);
+
+        if (wifiKey.equals(key)) {
+            scheduleUpdateUsingJobScheduler(SoundWaves.getAppContext());
         }
     }
 }
