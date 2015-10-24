@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.graphics.Palette;
+import android.text.TextUtils;
 import android.util.LruCache;
 import android.util.Patterns;
 import android.webkit.URLUtil;
@@ -34,7 +35,7 @@ public class PaletteHelper {
 
     public static void generate(@NonNull final String argUrl, @NonNull final Activity argActivity, @Nullable final PaletteListener ... argCallbacks) {
 
-        if (!Patterns.WEB_URL.matcher(argUrl).matches())
+        if (TextUtils.isEmpty(argUrl) || !Patterns.WEB_URL.matcher(argUrl).matches())
             return;
 
         try {
