@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
   <string-array name="drawer_menu">
-    <item>Playlist Filtre</item>
+    <item>Playliste Filtre</item>
     <item>Igangværende Downloads</item>
   </string-array>
   <string-array name="entries_update">
@@ -28,6 +28,14 @@
     <item>3 GB</item>
     <item>5 GB</item>
     <item>Ubegrænset</item>
+  </string-array>
+  <string-array name="entryvalues_spinner_number_of_episodes">
+    <item>10</item>
+    <item>20</item>
+    <item>30</item>
+    <item>40</item>
+    <item>50</item>
+    <item>100</item>
   </string-array>
   <string-array name="sort_select">
     <item>Sorter efter Kanal</item>
@@ -65,6 +73,27 @@
     <item>20 sekunder</item>
     <item>30 sekunder</item>
   </string-array>
+  <string-array name="entryvalues_pref_fast_forward_interval">
+    <item>5</item>
+    <item>10</item>
+    <item>15</item>
+    <item>20</item>
+    <item>30</item>
+  </string-array>
+  <string-array name="entries_pref_max_new_items">
+    <item>5</item>
+    <item>10</item>
+    <item>20</item>
+    <item>30</item>
+    <item>50</item>
+  </string-array>
+  <string-array name="entryvalues_pref_max_new_items">
+    <item>5</item>
+    <item>10</item>
+    <item>20</item>
+    <item>30</item>
+    <item>50</item>
+  </string-array>
   <string-array name="pref_player_seek_entries">
     <item>5 sekunder</item>
     <item>10 sekunder</item>
@@ -72,8 +101,25 @@
     <item>30 sekunder</item>
     <item>1 minut</item>
   </string-array>
+  <string-array name="pref_player_seek_entries_values">
+    <item>5</item>
+    <item>10</item>
+    <item>20</item>
+    <item>30</item>
+    <item>60</item>
+  </string-array>
+  <string-array name="pref_subscriptions_columns_entries">
+    <item>En liste</item>
+    <item>2 kolonner</item>
+    <item>3 kolonner</item>
+    <item>4 kolonner</item>
+  </string-array>
   <string-array name="playlist_sort_order">
     <item>Sorter efter: Nyeste</item>
     <item>Sorter efter: Ældste</item>
+  </string-array>
+  <string-array name="entries_webservices_discovery_engine">
+    <item>gPodder</item>
+    <item>iTunes</item>
   </string-array>
 </resources>

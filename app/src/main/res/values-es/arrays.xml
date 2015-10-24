@@ -29,6 +29,14 @@
     <item>5 GB</item>
     <item>Ilimitado</item>
   </string-array>
+  <string-array name="entryvalues_spinner_number_of_episodes">
+    <item>10</item>
+    <item>20</item>
+    <item>30</item>
+    <item>40</item>
+    <item>50</item>
+    <item>100</item>
+  </string-array>
   <string-array name="sort_select">
     <item>Ordenar por canal</item>
     <item>Ordenar por estado</item>
@@ -65,12 +73,46 @@
     <item>20 segundos</item>
     <item>30 segundos</item>
   </string-array>
+  <string-array name="entryvalues_pref_fast_forward_interval">
+    <item>5</item>
+    <item>10</item>
+    <item>15</item>
+    <item>20</item>
+    <item>30</item>
+  </string-array>
+  <string-array name="entries_pref_max_new_items">
+    <item>5</item>
+    <item>10</item>
+    <item>20</item>
+    <item>30</item>
+    <item>50</item>
+  </string-array>
+  <string-array name="entryvalues_pref_max_new_items">
+    <item>5</item>
+    <item>10</item>
+    <item>20</item>
+    <item>30</item>
+    <item>50</item>
+  </string-array>
   <string-array name="pref_player_seek_entries">
     <item>5 segundos</item>
     <item>10 segundos</item>
     <item>20 segundos</item>
     <item>30 segundos</item>
     <item>1 minuto</item>
+  </string-array>
+  <string-array name="pref_player_seek_entries_values">
+    <item>5</item>
+    <item>10</item>
+    <item>20</item>
+    <item>30</item>
+    <item>60</item>
+  </string-array>
+  <string-array name="pref_subscriptions_columns_entries">
+    <item>Una lista</item>
+    <item>2 columnas</item>
+    <item>3 columnas</item>
+    <item>4 columnas</item>
   </string-array>
   <string-array name="playlist_sort_order">
     <item>Ordenar por más recientes</item>

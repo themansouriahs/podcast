@@ -19,6 +19,7 @@
   <string name="title_section1">Subscrições</string>
   <string name="hello_world">Olá mundo!</string>
   <string name="menu_settings">Definições</string>
+  <string name="menu_downloading">Gestor de transferências</string>
   <string name="title_activity_swipe">SoundWaves</string>
   <string name="menu_download_all">Transferência em lote</string>
   <string name="menu_clear_playlist">Repor lista de reprodução</string>
@@ -144,6 +145,13 @@
   <string name="generic_test_credentials">Testar credenciais</string>
   <string name="generic_test_credentials_succes">Credenciais válidas</string>
   <string name="generic_test_credentials_failed">Credenciais inválidas</string>
+  <string name="pref_use_soundengine_title">Mecanismo áudio personalizado</string>
+  <string name="pref_use_soundengine_description">Ativar funções avançadas como a velocidade variável de reprodução</string>
+  <string name="dialog_playback_speed_episode">Este episódio</string>
+  <string name="dialog_playback_speed_subscription">Todos os episódios deste podcast</string>
+  <string name="dialog_playback_speed_global">Todos os episódios</string>
+  <string name="dialog_playback_speed_title">Velocidade de reprodução</string>
+  <string name="dialog_playback_speed_scope">Aplicar alterações a</string>
   <string name="feed_settings_show_description">Mostrar descrição do episódio</string>
   <string name="feed_settings_in_playlist">Adicionar novos episódios à lista de reprodução</string>
   <string name="feed_settings_download_new">Transferir novos episódios</string>
@@ -164,7 +172,10 @@
   <string name="opml_import_toolbar_description">Selecione os podcasts que deseja subscrever</string>
   <string name="download_manager_toolbar_title">Fila de transferências</string>
   <string name="download_manager_toolbar_description">Episódios agendados para transferência</string>
+  <string name="menu_clear_download">Limpar</string>
   <string name="download_manager_empty_title">Nenhuma transferência em curso</string>
+  <string name="action_enter_fullscreen">Reprodutor em ecrã completo</string>
+  <string name="action_exit_fullscreen">Sair de ecrã completo</string>
   <!--Used for displaying the download progress of a file. Example: "1.2 MB of 53 MB" (the unit, MB, is handled by the framework)
     When the progress is 0 (we have not started downloading) we should just show the total file size. Example "53 MB"-->
   <string name="download_progress">%1$s de %2$s</string>
