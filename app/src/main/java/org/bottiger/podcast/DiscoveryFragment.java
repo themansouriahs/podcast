@@ -20,7 +20,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.OvershootInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
@@ -28,7 +27,7 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.SearchView;
 
-import org.bottiger.podcast.adapters.DiscoverySearchAdapter;
+import org.bottiger.podcast.activities.discovery.DiscoverySearchAdapter;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.views.dialogs.DialogSearchDirectory;
@@ -44,8 +43,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 
 /**
  * Created by apl on 13-04-2015.

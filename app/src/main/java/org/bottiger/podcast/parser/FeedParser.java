@@ -12,6 +12,8 @@ import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.provider.SlimImplementations.SlimEpisode;
+import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.utils.DateUtils;
@@ -120,8 +122,12 @@ public class FeedParser {
         public long filesize;
     }
 
+    private boolean mParsingSlim = false;
+
     public ISubscription parse(@NonNull ISubscription argSubscription, InputStream in) throws XmlPullParserException, IOException {
         try {
+            mParsingSlim = argSubscription instanceof SlimSubscription;
+
             XmlPullParser parser = Xml.newPullParser();
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
             parser.setInput(in, null);
@@ -147,7 +153,12 @@ public class FeedParser {
                 subscription = readChannel(parser, subscription);
             }
             else if (name.equals(EPISODE_ITEM_TAG)) {
-                SoundWaves.getLibraryInstance().addEpisode(readEpisode(parser, subscription));
+                IEpisode episode = readEpisode(parser, subscription);
+                if (isParsingSlimSubscription()) {
+                    subscription.addEpisode(episode);
+                } else {
+                    SoundWaves.getLibraryInstance().addEpisode(episode);
+                }
             } else {
                 skip(parser);
             }
@@ -208,8 +219,12 @@ public class FeedParser {
                 }
                 case EPISODE_ITEM_TAG: {
                     IEpisode episode = readEpisode(parser, argSubscription);
-                    //argSubscription.addEpisode(episode);
-                    SoundWaves.getLibraryInstance().addEpisode(episode);
+
+                    if (isParsingSlimSubscription()) {
+                        argSubscription.addEpisode(episode);
+                    } else {
+                        SoundWaves.getLibraryInstance().addEpisode(episode);
+                    }
                     break;
                 }
                 case SUBSCRIPTION_IMAGE_TAG: {
@@ -259,9 +274,15 @@ public class FeedParser {
     // to their respective "read" methods for processing. Otherwise, skips the tag.
     private IEpisode readEpisode(XmlPullParser parser, @NonNull ISubscription argSubscription) throws XmlPullParserException, IOException {
         parser.require(XmlPullParser.START_TAG, ns, EPISODE_ITEM_TAG);
-        FeedItem episode = new FeedItem(true);
-        if (argSubscription instanceof Subscription) {
-            episode.setFeed((Subscription)argSubscription);
+
+        IEpisode episode;
+
+        if (isParsingSlimSubscription()) {
+            episode = new SlimEpisode();
+        } else {
+            FeedItem item = new FeedItem(true);
+            item.setFeed((Subscription)argSubscription);
+            episode = item;
         }
 
         while (parser.next() != XmlPullParser.END_TAG) {
@@ -338,7 +359,7 @@ public class FeedParser {
         return episode;
     }
 
-    private void readEpisodeItunesTag(@NonNull XmlPullParser parser, @NonNull String name, @NonNull FeedItem episode) throws IOException, XmlPullParserException {
+    private void readEpisodeItunesTag(@NonNull XmlPullParser parser, @NonNull String name, @NonNull IEpisode episode) throws IOException, XmlPullParserException {
         switch (name) {
             case ITUNES_DURATION_TAG: {
                 // The duration should be of the format hh:mm:ss, or hh:mm
@@ -521,6 +542,10 @@ public class FeedParser {
             parser.nextTag();
         }
         return result;
+    }
+
+    private boolean isParsingSlimSubscription() {
+        return mParsingSlim;
     }
 
 }

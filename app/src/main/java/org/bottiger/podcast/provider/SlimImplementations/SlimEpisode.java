@@ -30,6 +30,9 @@ public class SlimEpisode implements IEpisode, Parcelable {
     private long mOffset;
     private long mFilesize = 0;
 
+    public SlimEpisode() {
+    }
+
     public SlimEpisode(@NonNull String argTitle,
                        @NonNull URL argUrl,
                        @NonNull String argDescription) {
@@ -120,6 +123,10 @@ public class SlimEpisode implements IEpisode, Parcelable {
     }
 
     @Override
+    public void setIsParsing(boolean argIsParsing) {
+    }
+
+    @Override
     public void setTitle(@NonNull String argTitle) {
         mTitle = argTitle;
     }
@@ -189,6 +196,26 @@ public class SlimEpisode implements IEpisode, Parcelable {
 
     public void setFilesize(long argFilesize) {
         mFilesize = argFilesize;
+    }
+
+    @Override
+    public void setURL(String argUrl) {
+
+    }
+
+    @Override
+    public void setAuthor(String argAuthor) {
+
+    }
+
+    @Override
+    public void setPubDate(Date argPubDate) {
+
+    }
+
+    @Override
+    public void setPageLink(String argPageLink) {
+
     }
 
     public void writeToParcel(Parcel out, int flags) {

@@ -1,4 +1,4 @@
-package org.bottiger.podcast.adapters;
+package org.bottiger.podcast.activities.discovery;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -104,8 +104,6 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
                 toggleSubscriptionStatus(subscription);
             }
         });
-
-        //SoundWaves.sSubscriptionRefreshManager.refresh(subscription, mRefreshCompleteCallback);
     }
 
     @Override

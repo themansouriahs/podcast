@@ -1,4 +1,4 @@
-package org.bottiger.podcast.adapters;
+package org.bottiger.podcast.activities.discovery;
 
 import android.app.Activity;
 import android.database.Cursor;

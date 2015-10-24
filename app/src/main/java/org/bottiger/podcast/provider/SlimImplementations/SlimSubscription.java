@@ -89,7 +89,13 @@ public class SlimSubscription implements ISubscription, Parcelable {
 
     @Override
     public void addEpisode(@Nullable IEpisode episode) {
-        SlimEpisode slimEpisode = EpisodeConverter.toSlim(episode);
+        SlimEpisode slimEpisode;
+        boolean isSlimEpisode = episode instanceof SlimEpisode;
+        if (!isSlimEpisode) {
+            slimEpisode = EpisodeConverter.toSlim(episode);
+        } else {
+            slimEpisode = (SlimEpisode)episode;
+        }
         mEpisodes.add(slimEpisode);
     }
 
