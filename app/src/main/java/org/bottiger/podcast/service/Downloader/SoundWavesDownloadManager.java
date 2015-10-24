@@ -726,7 +726,7 @@ public class SoundWavesDownloadManager extends Observable {
         */
     }
 
-    public class DownloadManagerChanged {
+    public static class DownloadManagerChanged {
         public int queueSize;
     }
 }

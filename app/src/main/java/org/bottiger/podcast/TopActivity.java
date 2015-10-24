@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.transition.Slide;
 import android.transition.Transition;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
@@ -27,7 +28,13 @@ import org.bottiger.podcast.views.dialogs.DialogAddPodcast;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
+
 public class TopActivity extends AppCompatActivity {
+
+    private static final String TAG = "TopActivity";
 
     // Filesystem Permisssion
     @Retention(RetentionPolicy.SOURCE)
@@ -38,7 +45,6 @@ public class TopActivity extends AppCompatActivity {
 	
 	private static SharedPreferences prefs;
     private Menu mMenu;
-    private OttoSubscriberHack mOttoSubscriberHack = new OttoSubscriberHack();
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +72,25 @@ public class TopActivity extends AppCompatActivity {
             ViewServer.get(this).addWindow(this);
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        SoundWaves.getRxBus().toObserverable()
+                .ofType(SoundWavesDownloadManager.DownloadManagerChanged.class)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<SoundWavesDownloadManager.DownloadManagerChanged>() {
+                    @Override
+                    public void call(SoundWavesDownloadManager.DownloadManagerChanged downloadManagerChanged) {
+                        Log.d(TAG, "DownloadManagerChanged, size: " + downloadManagerChanged.queueSize);
+                        showDownloadManager(downloadManagerChanged);
+                        return;
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        Log.w(TAG, "Erorr");
+                    }
+                });
+
 	}
 
     @Override
@@ -76,7 +101,6 @@ public class TopActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         SoundWaves.getBus().unregister(this);
-        SoundWaves.getBus().unregister(mOttoSubscriberHack);
         super.onPause();
         SoundWaves.sAnalytics.activityPause();
     }
@@ -85,7 +109,6 @@ public class TopActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         SoundWaves.getBus().register(this);
-        SoundWaves.getBus().register(mOttoSubscriberHack);
         SoundWaves.sAnalytics.activityResume();
         initDownloadManagerOptionsMenu();
     }
@@ -183,16 +206,10 @@ public class TopActivity extends AppCompatActivity {
         item.setVisible(SoundWaves.getDownloadManager().getDownloadingItem() != null);
     }
 
-    // https://github.com/square/otto/issues/83
-    class OttoSubscriberHack {
-
-        @Subscribe
-        public void showDownloadManager(SoundWavesDownloadManager.DownloadManagerChanged event)
-        {
-            MenuItem item = TopActivity.this.mMenu.findItem(R.id.menu_download_manager);
-            item.setVisible(event.queueSize > 0);
-        }
-
+    public void showDownloadManager(SoundWavesDownloadManager.DownloadManagerChanged event)
+    {
+        MenuItem item = TopActivity.this.mMenu.findItem(R.id.menu_download_manager);
+        item.setVisible(event.queueSize > 0);
     }
 
 }
