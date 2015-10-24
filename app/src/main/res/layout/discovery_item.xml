@@ -10,15 +10,12 @@
     android:layout_marginRight="10dp"
     android:layout_marginTop="10dp">
 
-    <!--
-        fresco:viewAspectRatio="1.0"
-        fresco:roundedCornerRadius="@dimen/playlist_image_radius_small"
-        -->
     <org.bottiger.podcast.views.ImageViewTinted
         android:id="@+id/result_image"
         android:layout_width="@dimen/playlist_image_size_small"
         android:layout_height="@dimen/playlist_image_size_small"
         android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         />
 
     <android.support.v7.widget.SwitchCompat
@@ -26,22 +23,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:layout_alignBottom="@id/result_image"
         android:layout_alignTop="@id/result_image"
         android:checked="false"/>
-    <!--
-    android:layout_centerVertical="true"
-    -->
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/discovery_subscribe"
-        android:layout_toLeftOf="@id/result_subscribe_switch"
-        android:layout_alignTop="@id/result_subscribe_switch"
-        android:layout_alignBottom="@id/result_subscribe_switch"
-        android:gravity="center_vertical"
-        android:visibility="gone"/>
 
         <FrameLayout
             android:id="@+id/result_container"
@@ -50,23 +35,15 @@
             android:layout_toRightOf="@id/result_image"
             android:layout_toLeftOf="@id/result_subscribe_switch">
 
-        <View
-            android:id="@+id/result_top_gradient"
-            android:background="@drawable/header_gradient"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone"
-            android:layout_gravity="top" />
-
         <TextView
             android:id="@+id/result_title"
-            android:text="Podcats Title"
+            android:hint="Podcats Title"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
-            style="@style/SoundWavesListTitleStyle"
+            style="@style/TextAppearance.AppCompat.Body1"
+            android:layout_marginLeft="10dp"
             />
-            <!-- <item name="android:paddingTop">16dp</item> -->
 
         </FrameLayout>
 
