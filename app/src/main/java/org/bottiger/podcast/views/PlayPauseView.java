@@ -156,14 +156,13 @@ public class PlayPauseView extends FrameLayout {
             if (mAnimatorSet != null && mAnimatorSet.isRunning())
                 return;
 
-            mDrawable.setState(argState);
-            //animateChange(argState);
+            //mDrawable.setState(argState);
         } finally {
             mLock.unlock();
         }
     }
 
-    public void animateChange(@PlayPauseDrawable.IconState int argState) {
+    public void animateChangeFrom(@PlayPauseDrawable.IconState int argFromState) {
         mLock.lock();
         try {
             if (mAnimatorSet != null) {
@@ -174,7 +173,7 @@ public class PlayPauseView extends FrameLayout {
             final boolean isPlay = mDrawable.isPlaying();
             final ObjectAnimator colorAnim = ObjectAnimator.ofInt(this, COLOR, isPlay ? mPauseBackgroundColor : mPlayBackgroundColor);
             colorAnim.setEvaluator(new ArgbEvaluator());
-            final Animator pausePlayAnim = argState == PlayPauseDrawable.IS_PLAYING ? mDrawable.getPauseAnimator(): mDrawable.getPlayAnimator();
+            final Animator pausePlayAnim = argFromState == PlayPauseDrawable.IS_PLAYING ? mDrawable.getToPauseAnimator(): mDrawable.getToPlayAnimator();
             mAnimatorSet.setInterpolator(new DecelerateInterpolator());
             mAnimatorSet.setDuration(PLAY_PAUSE_ANIMATION_DURATION);
             mAnimatorSet.playTogether(colorAnim, pausePlayAnim);

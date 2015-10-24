@@ -14,6 +14,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.IntDef;
+import android.util.Log;
 import android.util.Property;
 
 import java.lang.annotation.Retention;
@@ -23,6 +24,8 @@ import java.lang.annotation.RetentionPolicy;
  * Created by aplb on 17-10-2015.
  */
 public class PlayPauseDrawable extends Drawable {
+
+    private static final String TAG = "PlayPauseDrawable";
 
     @IntDef({IS_PLAYING, IS_PAUSED})
     @Retention(RetentionPolicy.SOURCE)
@@ -135,15 +138,24 @@ public class PlayPauseDrawable extends Drawable {
         canvas.drawPath(mRightPauseBar, mPaint);
 
         // Draw the circle around the button
+        Log.v(TAG, "id: " + hashCode() + " progress:" + mTransformationProgress + " playing:" + mIsPlaying);
 
         canvas.restore();
     }
 
-    public Animator getPauseAnimator() {
-        final Animator anim = ObjectAnimator.ofFloat(this, PROGRESS, 1, 0);
+    /**
+     *
+     * Note to self. Progress = 1 => play icon  - |>
+     *               Progress = 0 => pause icon - ||
+     *
+     */
+
+    public Animator getToPauseAnimator() {
+        final Animator anim = ObjectAnimator.ofFloat(this, PROGRESS, 0, 1);
         anim.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
+                Log.v(TAG, "mIsPlaying: false");
                 mIsPlaying = false;
             }
         });
@@ -151,11 +163,12 @@ public class PlayPauseDrawable extends Drawable {
     }
 
 
-    public Animator getPlayAnimator() {
-        final Animator anim = ObjectAnimator.ofFloat(this, PROGRESS, 0, 1);
+    public Animator getToPlayAnimator() {
+        final Animator anim = ObjectAnimator.ofFloat(this, PROGRESS, 1, 0);
         anim.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
+                Log.v(TAG, "mIsPlaying: true");
                 mIsPlaying = true;
             }
         });
@@ -168,9 +181,11 @@ public class PlayPauseDrawable extends Drawable {
 
     public void setState(@IconState int argState) {
         if (argState == IS_PLAYING) {
+            Log.v(TAG, "mIsPlaying: true");
             mIsPlaying = true;
             setTransformationProgress(0);
         } else {
+            Log.v(TAG, "mIsPlaying: false");
             mIsPlaying = false;
             setTransformationProgress(1);
         }
@@ -181,6 +196,7 @@ public class PlayPauseDrawable extends Drawable {
     }
 
     private void setTransformationProgress(float progress) {
+        Log.v(TAG, "SetTransform Progress: " + progress + " hash: " + hashCode());
         mTransformationProgress = progress;
         invalidateSelf();
     }

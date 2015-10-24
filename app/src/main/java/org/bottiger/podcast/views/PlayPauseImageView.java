@@ -88,6 +88,9 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
     private static final int DRAW_OFFSET = 0;
     private static final int DRAW_WIDTH = 6;
 
+    private double mLastProgressStart = -1;
+    private double mLastProgressEnd = -1;
+
     private @PlayerStatusObservable.PlayerStatus int mStatus = PlayerStatusObservable.STOPPED;
 
     private IEpisode mEpisode;
@@ -196,12 +199,11 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
 
         if (argStatus == PlayerStatusObservable.PLAYING) {
             if (IsDisplayingPlayIcon()) {
-                //setState(PlayPauseDrawable.IS_PLAYING);
-                animateChange(PlayPauseDrawable.IS_PLAYING);
+                animateChangeFrom(PlayPauseDrawable.IS_PAUSED);
             }
         } else {
-            if (!IsDisplayingPlayIcon()) { // we are not displayign the play icon, we should
-                setState(PlayPauseDrawable.IS_PAUSED);
+            if (!IsDisplayingPlayIcon()) { // we are not displaying the play icon, we should
+                setState(PlayPauseDrawable.IS_PLAYING);
             }
         }
 
@@ -297,16 +299,20 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
             double currentEnd = angles[1];
 
             double endGoal = getProgressAngle(mProgressPercent);
+            double startGoal = getProgressAngle(0);
 
-            if (Math.abs(currentStart) < 2 || mFoundStart) {
+            if (Math.abs(currentStart-startGoal) > Math.abs(mLastProgressStart) || mFoundStart) {
                 currentStart = 0;
                 mFoundStart = true;
             }
 
-            if (Math.abs(currentEnd-endGoal) < 2 || mFoundEnd) {
+            if (Math.abs(currentEnd-endGoal) > Math.abs(mLastProgressEnd) || mFoundEnd) {
                 currentEnd = endGoal;
                 mFoundEnd = true;
             }
+
+            mLastProgressStart = currentStart;
+            mLastProgressEnd = currentEnd;
 
             defaultStartAngle = currentStart;
             defaultEndAngle = currentEnd;
@@ -321,7 +327,7 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
         defaultStartAngle = defaultStartAngle + DRAW_ANGLE_OFFSET;
         defaultEndAngle = defaultEndAngle + DRAW_ANGLE_OFFSET;
 
-        Log.v(TAG, "startAngle: " + defaultStartAngle + " endAngle: " + defaultEndAngle + " elapsed:" + elapsedTime);
+        Log.v(TAG, "startAngle: " + defaultStartAngle + " endAngle: " + defaultEndAngle + " elapsed:" + elapsedTime + " lastStart: " + mLastProgressStart + " lastEnd: " + mLastProgressEnd);
         canvas.drawArc(bounds, (float)defaultStartAngle, (float)(defaultEndAngle - defaultStartAngle), false, paintBorder);
 
         if (refreshButton) {
@@ -385,9 +391,6 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
         if (argPlayerStatus == null)
             return;
 
-        if (getEpisode() == null)
-            return;
-
         if (!getEpisode().equals(argPlayerStatus.episode)) {
 
             setStatus(PlayerStatusObservable.PAUSED);
@@ -414,9 +417,9 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
         boolean isPlaying = ps.isPlaying() && mEpisode.equals(ps.getCurrentItem());
 
         if (isPlaying) {
-            animateChange(PlayPauseDrawable.IS_PAUSED);
+            animateChangeFrom(PlayPauseDrawable.IS_PLAYING);
         } else {
-            animateChange(PlayPauseDrawable.IS_PAUSED);
+            animateChangeFrom(PlayPauseDrawable.IS_PAUSED);
             setStatus(PlayerStatusObservable.PREPARING);
         }
 
@@ -439,7 +442,7 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
                 } catch (ClassCastException cce) {
                     Log.wtf(TAG, "Could not case the context to an activity. " + cce.toString());
                 } finally {
-                    prefs.edit().putBoolean(hasAskedKey, true).commit();
+                    prefs.edit().putBoolean(hasAskedKey, true).apply();
                 }
 
                 /**
