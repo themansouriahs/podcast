@@ -20,6 +20,7 @@ import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionColumns;
 
 import java.util.Collection;
+import java.util.Date;
 
 /**
  * Created by aplb on 12-10-2015.
@@ -138,7 +139,6 @@ public class LibraryPersistency {
         cv.put(ItemColumns.TITLE, argItem.getTitle());
         cv.put(ItemColumns.CONTENT, argItem.getDescription());
         cv.put(ItemColumns.PATHNAME, argItem.getFilename());
-        cv.put(ItemColumns.DATE, argItem.getDate());
         cv.put(ItemColumns.SUBS_ID, argItem.getSubscriptionId());
         cv.put(ItemColumns.URL, argItem.getURL());
         cv.put(ItemColumns.FILESIZE, argItem.getFilesize());
@@ -149,6 +149,13 @@ public class LibraryPersistency {
         cv.put(ItemColumns.PRIORITY, argItem.getPriority());
         cv.put(ItemColumns.IMAGE_URL, argItem.getArtwork());
         cv.put(ItemColumns.IS_DOWNLOADED, argItem.isDownloaded());
+
+        // cv.put(ItemColumns.DATE, argItem.getDate());
+        Date date = argItem.getDateTime();
+        if (date != null) {
+            long time = date.getTime();
+            cv.put(ItemColumns.PUB_DATE, time);
+        }
 
         if (!silent)
             cv.put(ItemColumns.LAST_UPDATE, System.currentTimeMillis());
@@ -172,6 +179,7 @@ public class LibraryPersistency {
         item.title = cursor.getString(cursor.getColumnIndex(ItemColumns.TITLE));
         item.author = cursor.getString(cursor.getColumnIndex(ItemColumns.AUTHOR));
         item.date = cursor.getString(cursor.getColumnIndex(ItemColumns.DATE));
+        item.pub_date = cursor.getLong(cursor.getColumnIndex(ItemColumns.PUB_DATE));
         item.content = cursor.getString(cursor.getColumnIndex(ItemColumns.CONTENT));
         item.filesize = cursor.getLong(cursor.getColumnIndex(ItemColumns.FILESIZE));
         item.length = cursor.getLong(cursor.getColumnIndex(ItemColumns.LENGTH));

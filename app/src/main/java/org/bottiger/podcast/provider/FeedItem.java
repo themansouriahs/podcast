@@ -89,7 +89,13 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	/**
 	 * Date Published
 	 */
+    @Deprecated
 	public String date;
+
+    /**
+     * Date Published
+     */
+    public long pub_date;
 
 	/**
 	 * Episode description in text
@@ -234,6 +240,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	};
 
 	public static String default_format = "yyyy-MM-dd HH:mm:ss Z";
+    private static final SimpleDateFormat sFormat = new SimpleDateFormat(default_format, Locale.US);
 
 	private Date mDate = null;
 	public static SimpleDateFormat sdf = new SimpleDateFormat(default_format, Locale.US);
@@ -283,6 +290,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 		created_at = -1;
 		sub_title = null;
 		sub_id = -1;
+        pub_date = -1;
 
 	}
 
@@ -318,6 +326,10 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	 * @return the PublishingDate as default_format = "yyyy-MM-dd HH:mm:ss Z"
 	 */
 	public String getDate() {
+        if (pub_date > 0) {
+            return sFormat.format(new Date(pub_date));
+        }
+
 		return this.date;
 	}
 
@@ -327,6 +339,9 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 
 	@Nullable
 	public Date getDateTime() {
+        if (pub_date > 0) {
+            return new Date(pub_date);
+        }
 
         if (mDate == null) {
             try {
@@ -959,14 +974,26 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 		notifyPropertyChanged();
 	}
 
-    private static final SimpleDateFormat sFormat = new SimpleDateFormat(default_format, Locale.US);
-	public void setPubDate(Date parseRFC822Date) {
+	public void setPubDate(@Nullable Date argPubDate) {
+        if (argPubDate == null)
+            return;
+
+        long pubDate = argPubDate.getTime();
+
+        if (pubDate == pub_date)
+            return;
+
+        pub_date = pubDate;
+
+        /*
         try {
             this.date = sFormat.format(parseRFC822Date);
         } catch (NullPointerException npe) {
             //Log.e("Date parsing error:" , "Could not parse: " + parseRFC822Date.toString());
             this.date = sFormat.format(new Date());
         }
+        */
+        notifyPropertyChanged(EpisodeChanged.CHANGED);
 	}
 
 	public void setDescription(String content2) {

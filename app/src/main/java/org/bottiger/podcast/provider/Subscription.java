@@ -83,6 +83,7 @@ public class Subscription implements ISubscription, PaletteListener {
 	public long lastUpdated;
 	public long lastItemUpdated;
 	public long fail_count;
+	public int new_episodes;
 	@Deprecated public long auto_download;
     private int mPrimaryColor;
     private int mPrimaryTintColor;
@@ -175,6 +176,7 @@ public class Subscription implements ISubscription, PaletteListener {
         mPrimaryTintColor = -1;
         mSecondaryColor = -1;
 		mSettings = -1;
+		new_episodes = -1;
 	}
 
 	public Subscription() {
@@ -452,6 +454,14 @@ public class Subscription implements ISubscription, PaletteListener {
 
 	public int getSettings() {
 		return mSettings;
+	}
+
+	public int getNewEpisodes() {
+		return new_episodes <= 0 ? 0 : new_episodes;
+	}
+
+	public void setNewEpisodes(int argNewEpisodes) {
+		new_episodes = argNewEpisodes;
 	}
 
 	@Override

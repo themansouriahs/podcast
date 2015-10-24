@@ -28,6 +28,8 @@ import org.bottiger.podcast.utils.rxbus.RxBusSimpleEvents;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -291,8 +293,39 @@ public class Library {
         return;
     }
 
+    /**
+     * Get all the subscriptions from the database.
+     *
+     * @return
+     */
     private String getAllSubscriptions() {
-        return "SELECT * FROM " + SubscriptionColumns.TABLE_NAME;
+        // SELECT *, (SELECT count(item._id) FROM item WHERE item.subs_id == subscriptions._id
+        // AND item.pub_date>1445210057385) AS new_episodes FROM subscriptions
+
+        int newThresholdInDays = 6;
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        cal.add(Calendar.DAY_OF_YEAR,-newThresholdInDays);
+        Date threshold= cal.getTime();
+        long thresholdTimestamp = threshold.getTime();
+
+        StringBuilder builder = new StringBuilder(200);
+        builder.append("SELECT ");
+        builder.append("*, ");
+        builder.append("(SELECT count(");
+        builder.append(ItemColumns.TABLE_NAME + "." + ItemColumns._ID);
+        builder.append(") ");
+        builder.append("FROM " + ItemColumns.TABLE_NAME + " ");
+        builder.append("WHERE ");
+        builder.append(ItemColumns.TABLE_NAME + "." + ItemColumns.SUBS_ID + " == ");
+        builder.append(SubscriptionColumns.TABLE_NAME + "." + SubscriptionColumns._ID);
+        builder.append(" AND ");
+        builder.append(ItemColumns.TABLE_NAME + "." + ItemColumns.PUB_DATE + ">" + thresholdTimestamp + ") ");
+        builder.append("AS " + SubscriptionColumns.NEW_EPISODES + " ");
+        builder.append("FROM " + SubscriptionColumns.TABLE_NAME + " ");
+
+        return builder.toString();
     }
 
     private String getAllEpisodes(@NonNull Subscription argSubscription) {

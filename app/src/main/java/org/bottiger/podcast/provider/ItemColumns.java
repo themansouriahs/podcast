@@ -37,7 +37,10 @@ public class ItemColumns implements BaseColumns {
 
 	public static final String AUTHOR = "author";
 
+	@Deprecated
 	public static final String DATE = "date";
+
+	public static final String PUB_DATE = "pub_date";
 
 	public static final String LAST_UPDATE = "last_update";
 
@@ -84,7 +87,7 @@ public class ItemColumns implements BaseColumns {
 			CHUNK_FILESIZE, DURATION, LENGTH, OFFSET, PATHNAME, FAIL_COUNT,
 			MEDIA_URI, SUB_TITLE, CREATED, TYPE, LISTENED, IMAGE_URL,
 			DOWNLOAD_REFERENCE, EPISODE_NUMBER, IS_DOWNLOADED, DURATION_MS,
-			PRIORITY, REMOTE_ID };
+			PRIORITY, REMOTE_ID, PUB_DATE };
 
 	public static final String DEFAULT_SORT_ORDER = CREATED + " DESC";
 
@@ -118,7 +121,9 @@ public class ItemColumns implements BaseColumns {
             + TYPE + " VARCHAR(64), "
             + CREATED + " INTEGER, "
             + LISTENED + " INTEGER NOT NULL DEFAULT 0, "
-			+ PRIORITY + " INTEGER NOT NULL DEFAULT 0" + ");";
+			+ PRIORITY + " INTEGER NOT NULL DEFAULT 0, "
+			+ PUB_DATE + " INTEGER NOT NULL DEFAULT -1 "
+			+ ");";
 
 	// To upgrade from database version 12 to version 13
 	public static final String sql_upgrade_table_add_keep_column = "ALTER TABLE "
@@ -141,6 +146,14 @@ public class ItemColumns implements BaseColumns {
 	public static final String sql_index_item_created = "CREATE INDEX IDX_"
 			+ TABLE_NAME + "_" + LAST_UPDATE + " ON " + TABLE_NAME + " ("
 			+ LAST_UPDATE + ");";
+
+	//24-10-2015'	public static final String sql_index_item_created = "CREATE INDEX IDX_"
+	public static final String sql_index_item_subid = "CREATE INDEX IDX_"
+			+ TABLE_NAME + "_" + SUBS_ID + " ON " + TABLE_NAME + " ("
+			+ SUBS_ID + ");";
+	public static final String sql_index_item_status = "CREATE INDEX IDX_"
+			+ TABLE_NAME + "_" + STATUS + " ON " + TABLE_NAME + " ("
+			+ STATUS + ");";
 
 	public static ContentValues checkValues(ContentValues values, Uri uri) {
 		if (!values.containsKey(SUBS_ID)) {

@@ -64,6 +64,12 @@ public class SubscriptionLoader {
         sub.setSecondaryColor(cursor.getInt(cursor
                 .getColumnIndex(SubscriptionColumns.SECONDARY_COLOR)));
 
+        int newEpisodesIndex = cursor
+                .getColumnIndex(SubscriptionColumns.NEW_EPISODES);
+        if (newEpisodesIndex > 0) {
+            sub.setNewEpisodes(cursor.getInt(newEpisodesIndex));
+        }
+
         return sub;
     }
 

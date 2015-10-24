@@ -13,7 +13,7 @@ public class PodcastOpenHelper extends SQLiteOpenHelper {
 
 	private final PodcastLog log = PodcastLog.getLog(getClass());
 
-	private final static int DBVERSION = 19;
+	private final static int DBVERSION = 20;
 	private final static String DBNAME = "podcast.db";
 
     private static PodcastOpenHelper mInstance = null;
@@ -43,13 +43,8 @@ public class PodcastOpenHelper extends SQLiteOpenHelper {
 		db.execSQL(ItemColumns.sql_create_table);
 		db.execSQL(ItemColumns.sql_index_item_res);
 		db.execSQL(ItemColumns.sql_index_item_created);
-
-		// db.execSQL(SubscriptionColumns.sql_insert_default);
-		// db.execSQL(SubscriptionColumns.sql_insert_default1);
-		// db.execSQL(SubscriptionColumns.sql_insert_default2);
-		// db.execSQL(SubscriptionColumns.sql_insert_default3);
-		// db.execSQL(SubscriptionColumns.sql_insert_default4);
-
+		db.execSQL(ItemColumns.sql_index_item_subid);
+		db.execSQL(ItemColumns.sql_index_item_status);
 	}
 
 	@Override
@@ -220,6 +215,16 @@ public class PodcastOpenHelper extends SQLiteOpenHelper {
 
 			log.debug("Upgrading database to version 19");
 			db.execSQL(new_settings_column);
+		}
+
+		if (oldVersion < 20) {
+			String new_settings_column = "ALTER TABLE " + ItemColumns.TABLE_NAME
+					+ " ADD COLUMN " + ItemColumns.PUB_DATE + " INTEGER NOT NULL DEFAULT -1;";
+
+			log.debug("Upgrading database to version 20");
+			db.execSQL(new_settings_column);
+			db.execSQL(ItemColumns.sql_index_item_subid);
+			db.execSQL(ItemColumns.sql_index_item_status);
 		}
 	}
 }

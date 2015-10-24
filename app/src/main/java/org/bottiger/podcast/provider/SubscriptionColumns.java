@@ -43,6 +43,9 @@ public class SubscriptionColumns implements BaseColumns {
     public static final String PRIMARY_TINT_COLOR = "primary_tint_color";
     public static final String SECONDARY_COLOR = "secondary_color";
 
+	// virtual column
+	public static final String NEW_EPISODES = "new_episodes";
+
 	public static final String SETTINGS = "settings";
 
 	public static final String[] ALL_COLUMNS = { _ID, URL, LINK, TITLE,
