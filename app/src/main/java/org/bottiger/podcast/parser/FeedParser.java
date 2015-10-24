@@ -316,8 +316,9 @@ public class FeedParser {
                 case EPISODE_PUB_DATE_TAG: {
                     try {
                         Date date = readDate(parser);
-                        if (date != null)
-                            episode.setPubDate(date);
+                        if (date != null) {
+                            episode.setPubDate(DateUtils.preventDateInTheFutre(date));
+                        }
                     } catch (Exception e) {
                         Log.w(TAG, "Could not parse date from subscription: " + argSubscription);
                         String[] keys = new String[1];
