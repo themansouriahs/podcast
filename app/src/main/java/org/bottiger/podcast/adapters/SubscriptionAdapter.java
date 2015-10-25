@@ -165,6 +165,20 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
         }
 
 
+        if (holder.new_episodes_counter != null && holder.new_episodes != null) {
+
+            boolean hasNewEpisodes = subscription.getNewEpisodes() > 0;
+            int visibility = hasNewEpisodes ? View.VISIBLE : View.GONE;
+
+            if (hasNewEpisodes) {
+                holder.new_episodes_counter.setText(subscription.getNewEpisodes());
+            }
+
+            holder.new_episodes_counter.setVisibility(visibility);
+            holder.new_episodes.setVisibility(visibility);
+        }
+
+
         Uri uri = null;
         if (holder.image != null && !TextUtils.isEmpty(logo)) {
             uri = Uri.parse(logo);

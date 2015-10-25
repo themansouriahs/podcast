@@ -22,6 +22,9 @@ public class SubscriptionViewHolder extends RecyclerView.ViewHolder implements V
     public ImageViewTinted image;
     public FrameLayout text_container;
 
+    public TextView new_episodes_counter;
+    public TextView new_episodes;
+
     public SubscriptionViewHolder(View itemView) {
         super(itemView);
 
@@ -30,6 +33,9 @@ public class SubscriptionViewHolder extends RecyclerView.ViewHolder implements V
         subTitle = (TextView) itemView.findViewById(R.id.grid_subtitle);
         image = (ImageViewTinted) itemView.findViewById(R.id.grid_image);
         text_container = (FrameLayout)itemView.findViewById(R.id.subscription_text_container);
+
+        new_episodes_counter = (TextView) itemView.findViewById(R.id.new_episodes_counter);
+        new_episodes = (TextView) itemView.findViewById(R.id.new_episodes);
 
         itemView.setOnCreateContextMenuListener(this);
     }

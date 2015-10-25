@@ -179,6 +179,9 @@
     -->
     <string name="download_progress">%1$s of %2$s</string>
 
+    <!-- In the context: "4 new [episodes]" -->
+    <string name="subscription_list_new">New</string>
+
 
     <plurals name="player_sleep">
         <item quantity="one">Player will sleep in %d minute</item>

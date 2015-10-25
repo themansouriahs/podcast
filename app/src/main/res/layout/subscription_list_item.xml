@@ -14,6 +14,30 @@
         android:layout_gravity="center_vertical"/>
 
     <TextView
+        android:id="@+id/new_episodes_counter"
+        android:layout_width="30dp"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
+        android:hint="4"
+        android:gravity="center"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        />
+
+    <TextView
+        android:id="@+id/new_episodes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/subscription_list_new"
+        android:layout_below="@id/new_episodes_counter"
+        android:layout_alignLeft="@id/new_episodes_counter"
+        android:layout_alignRight="@id/new_episodes_counter"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        />
+
+    <TextView
         android:id="@+id/grid_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -24,11 +48,12 @@
         android:hint="Harry Potter and the method of rationality"
         android:layout_toRightOf="@id/grid_image"
         android:layout_toEndOf="@id/grid_image"
+        android:layout_toLeftOf="@id/new_episodes_counter"
+        android:layout_toStartOf="@id/new_episodes_counter"
         android:layout_marginTop="10dp"
-        android:layout_marginRight="10dp"
+        android:layout_marginRight="20dp"
         android:layout_marginEnd="10dp"
         />
-    <!--         android:textAppearance="@style/TextAppearance.AppCompat.Body2" -->
 
     <TextView
         android:id="@+id/grid_subtitle"
@@ -41,9 +66,5 @@
         android:layout_alignLeft="@id/grid_title"
         android:layout_alignStart="@id/grid_title"
         />
-    <!--
-        -->
-
-    <!-- android:background="#AA000000" -->
 
 </RelativeLayout>
