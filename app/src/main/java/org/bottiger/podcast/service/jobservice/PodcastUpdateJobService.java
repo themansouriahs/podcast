@@ -12,6 +12,7 @@ import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
@@ -44,6 +45,12 @@ public class PodcastUpdateJobService extends JobService {
                 boolean downloadOnUpdate = PreferenceHelper.getBooleanPreferenceValue(getApplicationContext(),
                         R.string.pref_download_on_update_key,
                         R.bool.pref_download_on_update_default);
+
+                // Override the default download setting if needed.
+                if (argSubscription instanceof Subscription) {
+                    Subscription subscription = (Subscription)argSubscription;
+                    downloadOnUpdate = subscription.doDownloadNew(downloadOnUpdate);
+                }
 
                 if (!downloadOnUpdate)
                     return;
