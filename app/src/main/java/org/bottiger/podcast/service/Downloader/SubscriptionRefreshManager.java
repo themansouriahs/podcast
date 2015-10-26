@@ -245,7 +245,7 @@ public class SubscriptionRefreshManager {
                     VendorCrashReporter.handleException(e, keys, values);
                 }
 
-                final ISubscription finalSubscription = parsedSubscription != null ? parsedSubscription : null;
+                final ISubscription finalSubscription = parsedSubscription != null ? argSubscription : null;
 
                 Log.d(TAG, "Parsing callback for: " + argSubscription);
                 if (argCallback != null && finalSubscription != null)

@@ -71,7 +71,7 @@ public class PodcastUpdateJobService extends JobService {
                      */
                     episode = (FeedItem)episodes.get(i);
                     Date episodeDate = episode.getDateTime();
-                    if (episodeDate != null) {
+                    if (episodeDate != null && episode.getCreatedAt().getTime() > 0) {
                         episodeDate = episode.getCreatedAt();
                     }
 

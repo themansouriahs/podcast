@@ -158,11 +158,10 @@ public class Library {
         if (item == null)
             return;
 
-            if (argEpisode == null)
+            if (mEpisodesUrlLUT.containsKey(item.getURL())) {
+                // FIXME we should update the content of the model episode
                 return;
-
-            if (mEpisodesUrlLUT.containsKey(item.getURL()))
-                return;
+            }
 
             mEpisodes.add(argEpisode);
             mEpisodesUrlLUT.put(item.getURL(), item);

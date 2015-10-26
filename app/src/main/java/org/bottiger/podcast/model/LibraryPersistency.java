@@ -52,7 +52,9 @@ public class LibraryPersistency {
                 Log.d("FeedItem", "update OK");
             } else if (numUpdatedRows == 0) {
                 Log.d("FeedItem", "update NOT OK. Insert instead");
+                long createdAt = System.currentTimeMillis();
                 cv.put(ItemColumns.CREATED, System.currentTimeMillis());
+                argEpisode.created_at = createdAt;
                 Uri result = mContentResolver.insert(ItemColumns.URI, cv);
                 long newId = getId(result.toString());
                 argEpisode.id = newId;
@@ -193,7 +195,7 @@ public class LibraryPersistency {
         item.sub_id = cursor.getLong(cursor.getColumnIndex(ItemColumns.SUBS_ID));
         item.listened = cursor.getInt(cursor.getColumnIndex(ItemColumns.LISTENED));
         item.priority = cursor.getInt(cursor.getColumnIndex(ItemColumns.PRIORITY));
-        item.created_at = cursor.getInt(cursor.getColumnIndex(ItemColumns.CREATED));
+        item.created_at = cursor.getLong(cursor.getColumnIndex(ItemColumns.CREATED));
 
         return item;
     }
