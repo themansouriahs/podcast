@@ -11,34 +11,25 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.listeners.DownloadProgressPublisher;
 import org.bottiger.podcast.model.EpisodeChanged;
-import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.utils.BitMaskUtils;
 import org.bottiger.podcast.utils.SDCardManager;
 import org.jsoup.Jsoup;
 
 import android.app.DownloadManager;
 import android.app.DownloadManager.Query;
-import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.util.LruCache;
 import android.text.TextUtils;
-import android.text.format.DateFormat;
 import android.util.Log;
-
-import rx.functions.Action1;
 
 public class FeedItem implements IEpisode, Comparable<FeedItem> {
 
@@ -239,11 +230,13 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 			"EEE,dd MMM yyyy HH:mm:ss Z"
 	};
 
-	public static String default_format = "yyyy-MM-dd HH:mm:ss Z";
+	public static String default_formatZ = "yyyy-MM-dd HH:mm:ss Z";
+	public static String default_format = "yyyy-MM-dd HH:mm:ss";
     private static final SimpleDateFormat sFormat = new SimpleDateFormat(default_format, Locale.US);
+	public static SimpleDateFormat sFormatZ = new SimpleDateFormat(default_formatZ, Locale.US);
 
 	private Date mDate = null;
-	public static SimpleDateFormat sdf = new SimpleDateFormat(default_format, Locale.US);
+
 
 	private int iterWithoutChange = 0;
 	private int lastProgress = -1;
@@ -345,9 +338,15 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 
         if (mDate == null) {
             try {
-                mDate = sdf.parse(date);
+                mDate = sFormat.parse(date);
             } catch (ParseException pe) {
-                throw new IllegalArgumentException("Datestring must be parsable");
+
+				try {
+					mDate = sFormatZ.parse(date);
+				} catch (ParseException e) {
+					e.printStackTrace();
+					throw new IllegalArgumentException("Datestring must be parsable");
+				}
             } catch (Exception e) {
 				return null;
 			}

@@ -378,7 +378,8 @@ public class Library {
                         addSubscription(subscription);
                     }
                 } finally {
-                    cursor.close();
+                    if(cursor != null)
+                        cursor.close();
                 }
             }
         });
@@ -418,7 +419,8 @@ public class Library {
 
                             argSubscription.setIsLoaded(true);
                         } finally {
-                            cursor.close();
+                            if(cursor != null)
+                                cursor.close();
                             long end = System.currentTimeMillis();
                             Log.d("loadAllEpisodes", "1: " + (end - start) + " ms");
                         }
