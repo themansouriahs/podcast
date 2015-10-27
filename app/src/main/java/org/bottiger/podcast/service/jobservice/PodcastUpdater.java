@@ -18,6 +18,7 @@ import android.support.annotation.NonNull;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.service.PodcastService;
 import org.bottiger.podcast.utils.PreferenceHelper;
@@ -45,6 +46,12 @@ public class PodcastUpdater implements SharedPreferences.OnSharedPreferenceChang
 
     @TargetApi(21)
     private boolean scheduleUpdateUsingJobScheduler(@NonNull Context argContext) {
+
+        if (Build.VERSION.SDK_INT < 21) {
+            VendorCrashReporter.report("IllegalState", "scheduleUpdateUsingJobScheduler");
+            return false;
+        }
+
         ComponentName receiver = new ComponentName(argContext, PodcastUpdateJobService.class);
         boolean wifiOnly = PreferenceHelper.getBooleanPreferenceValue(argContext,
                 R.string.pref_download_only_wifi_key,
@@ -132,6 +139,11 @@ public class PodcastUpdater implements SharedPreferences.OnSharedPreferenceChang
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+
+        if (Build.VERSION.SDK_INT < 21) {
+            return;
+        }
+
         String wifiKey = SoundWaves.getAppContext().getResources().getString(R.string.pref_download_only_wifi_key);
 
         if (wifiKey.equals(key)) {
