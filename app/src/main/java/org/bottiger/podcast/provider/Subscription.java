@@ -406,10 +406,16 @@ public class Subscription implements ISubscription, PaletteListener {
 	}
 
     public void setImageURL(String argUrl) {
+
+		// FIXME tmp repair code. Remove in a future version
+		if (argUrl == null)
+			return;
+		argUrl = argUrl.trim();
+
 		if (imageURL != null && imageURL.equals(argUrl))
 			return;
 
-        imageURL = argUrl;
+        imageURL = argUrl.trim();
 		notifyPropertyChanged();
     }
 
@@ -474,7 +480,7 @@ public class Subscription implements ISubscription, PaletteListener {
 		if (title != null && title.equals(argTitle))
 			return;
 
-		title = argTitle;
+		title = argTitle.trim();
 		notifyPropertyChanged();
 	}
 
@@ -482,7 +488,7 @@ public class Subscription implements ISubscription, PaletteListener {
 		if (url != null && url.equals(argUrl))
 			return;
 
-		url = argUrl;
+		url = argUrl.trim();
 		notifyPropertyChanged();
 	}
 
@@ -490,7 +496,7 @@ public class Subscription implements ISubscription, PaletteListener {
 		if (description != null && description.equals(content))
 			return;
 
-		description = content;
+		description = content.trim();
 		notifyPropertyChanged();
 	}
 

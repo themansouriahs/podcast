@@ -466,6 +466,7 @@ public class Library {
                         } else {
                             subscription.setStatus(Subscription.STATUS_SUBSCRIBED);
                         }
+
                         try {
                             SoundWaves.sSubscriptionRefreshManager.refreshSync(mContext, subscription);
                         } catch (IOException e) {
