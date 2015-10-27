@@ -1,4 +1,4 @@
-package org.bottiger.podcast.model;
+package org.bottiger.podcast.model.events;
 
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
@@ -9,7 +9,7 @@ import java.lang.annotation.RetentionPolicy;
 /**
  * Created by aplb on 13-10-2015.
  */
-public class EpisodeChanged {
+public class EpisodeChanged implements ItemChanged {
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({ADDED, REMOVED, CHANGED, PARSED})

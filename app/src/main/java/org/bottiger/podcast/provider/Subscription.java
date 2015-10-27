@@ -5,37 +5,26 @@ import java.lang.annotation.RetentionPolicy;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.concurrent.TimeUnit;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PaletteListener;
-import org.bottiger.podcast.model.EpisodeChanged;
-import org.bottiger.podcast.model.SubscriptionChanged;
+import org.bottiger.podcast.model.events.SubscriptionChanged;
 import org.bottiger.podcast.utils.BitMaskUtils;
 import org.bottiger.podcast.utils.ColorExtractor;
 
-import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.v7.graphics.Palette;
 import android.support.v7.util.SortedList;
-import android.text.TextUtils;
-import android.util.Log;
 import android.util.Patterns;
 
 import javax.annotation.Nullable;
-
-import rx.functions.Action1;
 
 public class Subscription implements ISubscription, PaletteListener {
 
@@ -460,6 +449,10 @@ public class Subscription implements ISubscription, PaletteListener {
 
 	public int getSettings() {
 		return mSettings;
+	}
+
+	public void setSettings(int argSettings) {
+		mSettings = argSettings;
 	}
 
 	public int getNewEpisodes() {

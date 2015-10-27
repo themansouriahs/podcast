@@ -57,6 +57,9 @@ public class SubscriptionLoader {
         sub.status = cursor.getLong(cursor
                 .getColumnIndex(SubscriptionColumns.STATUS));
 
+        sub.setSettings(cursor.getInt(cursor
+                .getColumnIndex(SubscriptionColumns.SETTINGS)));
+
         sub.setPrimaryColor(cursor.getInt(cursor
                 .getColumnIndex(SubscriptionColumns.PRIMARY_COLOR)));
         sub.setPrimaryTintColor(cursor.getInt(cursor

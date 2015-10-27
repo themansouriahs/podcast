@@ -14,7 +14,7 @@ import java.util.Locale;
 
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.listeners.DownloadProgressPublisher;
-import org.bottiger.podcast.model.EpisodeChanged;
+import org.bottiger.podcast.model.events.EpisodeChanged;
 import org.bottiger.podcast.utils.BitMaskUtils;
 import org.bottiger.podcast.utils.SDCardManager;
 import org.jsoup.Jsoup;

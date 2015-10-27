@@ -13,6 +13,9 @@ import com.squareup.sqlbrite.SqlBrite;
 
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.model.events.EpisodeChanged;
+import org.bottiger.podcast.model.events.ItemChanged;
+import org.bottiger.podcast.model.events.SubscriptionChanged;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
@@ -23,14 +26,11 @@ import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionColumns;
 import org.bottiger.podcast.provider.SubscriptionLoader;
 import org.bottiger.podcast.utils.StrUtils;
-import org.bottiger.podcast.utils.rxbus.RxBus;
-import org.bottiger.podcast.utils.rxbus.RxBusSimpleEvents;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import rx.Observable;
@@ -38,8 +38,6 @@ import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
-import rx.plugins.RxJavaErrorHandler;
-import rx.plugins.RxJavaPlugins;
 import rx.schedulers.Schedulers;
 
 /**
@@ -124,20 +122,21 @@ public class Library {
         loadSubscriptions();
 
         SoundWaves.getRxBus().toObserverable()
-                .ofType(EpisodeChanged.class)
+                .ofType(ItemChanged.class)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<EpisodeChanged>() {
+                .subscribe(new Action1<ItemChanged>() {
                     @Override
-                    public void call(EpisodeChanged episodeChanged) {
-                        if (episodeChanged.getAction() == EpisodeChanged.PARSED) {
-                            if (mEpisodesUrlLUT.containsKey(episodeChanged.getUrl()))
-                                return;
+                    public void call(ItemChanged itemChangedEvent) {
+                        if (itemChangedEvent instanceof EpisodeChanged) {
+                            handleChangedEvent((EpisodeChanged) itemChangedEvent);
+                            return;
                         }
 
-                        IEpisode episode = getEpisode(episodeChanged.getId());
-                        updateEpisode(episode);
-                        return;
+                        if (itemChangedEvent instanceof SubscriptionChanged) {
+                            handleChangedEvent((SubscriptionChanged) itemChangedEvent);
+                            return;
+                        }
                     }
                 }, new Action1<Throwable>() {
                     @Override
@@ -146,6 +145,21 @@ public class Library {
                         Log.w(TAG, "Error");
                     }
                 });
+    }
+
+    public void handleChangedEvent(SubscriptionChanged argSubscriptionChanged) {
+        Subscription subscription = getSubscription(argSubscriptionChanged.getId());
+        updateSubscription(subscription);
+    }
+
+    public void handleChangedEvent(EpisodeChanged argEpisodeChanged) {
+        if (argEpisodeChanged.getAction() == EpisodeChanged.PARSED) {
+            if (mEpisodesUrlLUT.containsKey(argEpisodeChanged.getUrl()))
+                return;
+        }
+
+        IEpisode episode = getEpisode(argEpisodeChanged.getId());
+        updateEpisode(episode);
     }
 
     public void addEpisode(IEpisode argEpisode) {
