@@ -26,6 +26,7 @@ import org.bottiger.podcast.service.Downloader.engines.OkHttpDownloader;
 import org.bottiger.podcast.utils.FileUtils;
 import org.bottiger.podcast.utils.PreferenceHelper;
 import org.bottiger.podcast.utils.SDCardManager;
+import org.bottiger.podcast.utils.StrUtils;
 
 import android.Manifest;
 import android.app.Activity;
@@ -68,11 +69,12 @@ public class SoundWavesDownloadManager extends Observable {
     public static final int NEED_PERMISSION = 5;
 
     @Retention(RetentionPolicy.SOURCE)
-    @IntDef({FIRST, LAST, ANYWHERE})
+    @IntDef({FIRST, LAST, ANYWHERE, STARTED_MANUALLY})
     public @interface QueuePosition {}
     public static final int FIRST = 1;
     public static final int LAST = 2;
     public static final int ANYWHERE = 3;
+    public static final int STARTED_MANUALLY = 4;
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({AUDIO, VIDEO, OTHER})
@@ -230,29 +232,43 @@ public class SoundWavesDownloadManager extends Observable {
 			return NO_STORAGE;
 		}
 
-		if (updateConnectStatus(mContext) != NETWORK_OK) {
-			return NO_CONNECTION;
-		}
-
-		//downloadManager = (DownloadManager) argContext
-		//		.getSystemService(Context.DOWNLOAD_SERVICE);
+        @NetworkState int networkState = updateConnectStatus(mContext);
 
         mQueueLock.lock();
         try {
             if (getDownloadingItem() == null && mDownloadQueue.size() > 0) {
-                QueueEpisode nextInQueue = mDownloadQueue.pollFirst(); //getNextItem();
-                //FeedItem downloadingItem = FeedItem.getById(mContext.getContentResolver(), nextInQueue.getId());
-                FeedItem downloadingItem = SoundWaves.getLibraryInstance().getEpisode(nextInQueue.getId());
 
-                mEngine = newEngine(downloadingItem);
-                mEngine.addCallback(mDownloadCompleteCallback);
+                for (int i = 0; i < mDownloadQueue.size(); i++) {
+                    QueueEpisode nextInQueue = mDownloadQueue.pollFirst(); //getNextItem();
+                    FeedItem downloadingItem = SoundWaves.getLibraryInstance().getEpisode(nextInQueue.getId());
 
-                mDownloadingItem = downloadingItem;
+                    if (downloadingItem == null)
+                        continue;
 
-                Log.d(TAG, "Start downloading: " + downloadingItem);
-                mEngine.startDownload();
+                    if (!StrUtils.isValidUrl(downloadingItem.getURL()))
+                        continue;
 
-                mProgressPublisher.addEpisode(downloadingItem);
+                    if (!nextInQueue.IsStartedManually() && networkState != NETWORK_OK) {
+                        //return NO_CONNECTION;
+                        continue;
+                    }
+
+                    if (nextInQueue.IsStartedManually() && !(networkState == NETWORK_OK || networkState == NETWORK_RESTRICTED)) {
+                        continue;
+                    }
+
+                    mEngine = newEngine(downloadingItem);
+                    mEngine.addCallback(mDownloadCompleteCallback);
+
+                    mDownloadingItem = downloadingItem;
+
+                    Log.d(TAG, "Start downloading: " + downloadingItem);
+                    mEngine.startDownload();
+
+                    mProgressPublisher.addEpisode(downloadingItem);
+
+                    break;
+                }
 
                 postQueueChangedEvent();
             }
@@ -272,7 +288,7 @@ public class SoundWavesDownloadManager extends Observable {
     }
 
     public IDownloadEngine newEngine(@NonNull FeedItem argEpisode) {
-        return new OkHttpDownloader(argEpisode, this);
+        return new OkHttpDownloader(argEpisode);
     }
 
 	/**
@@ -529,6 +545,12 @@ public class SoundWavesDownloadManager extends Observable {
 
 		    QueueEpisode queueItem = new QueueEpisode((FeedItem)argEpisode);
 
+            if (argPosition == STARTED_MANUALLY) {
+                queueItem.setStartedManually(true);
+                mDownloadQueue.addLast(queueItem);
+                return;
+            }
+
             if (argPosition == ANYWHERE) {
                 if (!mDownloadQueue.contains(queueItem))
                     mDownloadQueue.add(queueItem);
@@ -605,7 +627,7 @@ public class SoundWavesDownloadManager extends Observable {
 	/**
 	 * Add feeditem to the download queue and start downloading at once
 	 */
-	public void addItemAndStartDownload(@NonNull IEpisode item, @NonNull @QueuePosition int argPosition) {
+	public void addItemAndStartDownload(@NonNull IEpisode item, @QueuePosition int argPosition) {
         addItemToQueue(item, argPosition);
 		startDownload();
 	}

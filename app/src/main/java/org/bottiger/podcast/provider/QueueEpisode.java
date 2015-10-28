@@ -14,6 +14,7 @@ public class QueueEpisode implements Comparable {
 	private long episodeID;
 	private Integer queuePriority;
 	private IEpisode mEpisode;
+	private boolean mStartedManually = false;
 
 	public QueueEpisode(FeedItem episode) {
 		mEpisode = episode;
@@ -45,6 +46,14 @@ public class QueueEpisode implements Comparable {
 
 	public void setPriority(Integer priority) {
 		queuePriority = priority;
+	}
+
+	public boolean IsStartedManually() {
+		return mStartedManually;
+	}
+
+	public void setStartedManually(boolean argStartedManually) {
+		mStartedManually = argStartedManually;
 	}
 
 	@Override

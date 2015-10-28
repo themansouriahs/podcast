@@ -216,7 +216,7 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
 
         if (getState() == PlayerButtonView.STATE_DEFAULT) {
             Log.v(TAG, "Queue download");
-            SoundWaves.getDownloadManager().addItemAndStartDownload(getEpisode(), SoundWavesDownloadManager.FIRST);
+            SoundWaves.getDownloadManager().addItemAndStartDownload(getEpisode(), SoundWavesDownloadManager.STARTED_MANUALLY);
             setState(PlayerButtonView.STATE_QUEUE);
         } else if (getState() == PlayerButtonView.STATE_DELETE) {
             Log.v(TAG, "Delete file");

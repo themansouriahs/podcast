@@ -33,7 +33,6 @@ public class OkHttpDownloader extends DownloadEngineBase {
     private final OkHttpClient mOkHttpClient = new OkHttpClient();
     private HttpURLConnection mConnection;
     private final SparseArray<Callback> mExternalCallback = new SparseArray<>();
-    private SoundWavesDownloadManager mSoundWavesDownloadManager;
 
     private volatile boolean mAborted = false;
 
@@ -41,9 +40,8 @@ public class OkHttpDownloader extends DownloadEngineBase {
 
     private double mProgress = 0;
 
-    public OkHttpDownloader(@NonNull IEpisode argEpisode, @NonNull SoundWavesDownloadManager argDownloadManager) {
+    public OkHttpDownloader(@NonNull IEpisode argEpisode) {
         super(argEpisode);
-        mSoundWavesDownloadManager = argDownloadManager;
         mURL = argEpisode.getUrl();
     }
 
