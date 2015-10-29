@@ -68,7 +68,6 @@ import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.github.ivbaranov.mfb.MaterialFavoriteButton;
 import com.squareup.otto.Produce;
 import com.squareup.otto.Subscribe;
@@ -464,33 +463,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
             mPlayPauseButton.setStatus(PlayerStatusObservable.PAUSED);
         }
 
-        /*
-        mPlayPauseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mPlayPauseButton.toggle();
-            }
-        });
-
-        mBackButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (ps != null) {
-                    ps.getPlayer().rewind(item);
-                }
-            }
-        });
-
-        mForwardButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (ps != null) {
-                    ps.getPlayer().fastForward(item);
-                }
-            }
-        });
-        */
-
         mPlayerSeekbar.setEpisode(item);
         mPlayerSeekbar.setOverlay(mOverlay);
         mPlayerSeekbar.getProgressDrawable().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
@@ -552,7 +524,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         }
 
         String artworkUrl = item.getArtwork();
-        if (item != null && artworkUrl != null) {
+        if (artworkUrl != null) {
             Log.v("MissingImage", "Setting image");
             ImageLoaderUtils.loadImageInto(mPhoto, artworkUrl, null, false, false, false);
         }

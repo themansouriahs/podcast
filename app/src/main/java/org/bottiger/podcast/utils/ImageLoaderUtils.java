@@ -84,7 +84,7 @@ public class ImageLoaderUtils {
         if (argDoCrop)
             builder.centerCrop();
         else
-            builder.fitCenter();
+            builder.override(512, 512).fitCenter();
 
         if (argUsePlaceholder) {
             builder.placeholder(R.drawable.generic_podcast);
