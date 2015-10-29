@@ -369,7 +369,8 @@ public class Library {
                     }
                     argPlaylist.notifyPlaylistChanged();
                 } finally {
-                    cursor.close();
+                    if (cursor != null)
+                        cursor.close();
                 }
             }
         });

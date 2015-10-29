@@ -354,12 +354,22 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
 
         String where = "";
 
+        // Ignore (or include) podcasts which have been toggled manually
+        String filterSubscriptions = "";
+        filterSubscriptions += " AND CASE WHEN (" + SubscriptionColumns.TABLE_NAME + "." + SubscriptionColumns.SETTINGS + ">0 & ((" +
+                SubscriptionColumns.TABLE_NAME + "." + SubscriptionColumns.SETTINGS + " & " +
+                Subscription.ADD_NEW_TO_PLAYLIST_SET + ") <> 0)) THEN (";
+        filterSubscriptions += SubscriptionColumns.TABLE_NAME + "." + SubscriptionColumns.SETTINGS + " & " + Subscription.ADD_NEW_TO_PLAYLIST;
+        filterSubscriptions += ") ELSE 1 END";
+
+        //where += filterSubscriptions;
+
 
         // only find episodes from suscriptions which are not "unsubscribed"
         where += "(";
         where += ItemColumns.TABLE_NAME + "." + ItemColumns.SUBS_ID + " IN (SELECT " + SubscriptionColumns.TABLE_NAME + "." + SubscriptionColumns._ID + " FROM "  +
-                SubscriptionColumns.TABLE_NAME + " WHERE " + SubscriptionColumns.TABLE_NAME + "." + SubscriptionColumns.STATUS + "<>"
-                + Subscription.STATUS_UNSUBSCRIBED + " OR " + SubscriptionColumns.TABLE_NAME + "." + SubscriptionColumns.STATUS + " IS NULL)";
+                SubscriptionColumns.TABLE_NAME + " WHERE (" + SubscriptionColumns.TABLE_NAME + "." + SubscriptionColumns.STATUS + "<>"
+                + Subscription.STATUS_UNSUBSCRIBED + " OR " + SubscriptionColumns.TABLE_NAME + "." + SubscriptionColumns.STATUS + " IS NULL)" +  filterSubscriptions + " )";
         //where += ItemColumns.TABLE_NAME + "." + ItemColumns.SUBS_ID + " IN (4)";
         where += " )";
 
@@ -371,7 +381,7 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
         }
 
         // skip 'removed' episodes
-        where += " OR (" + ItemColumns.TABLE_NAME + "." + ItemColumns.PRIORITY + " >= 0)";
+        where += " AND (" + ItemColumns.TABLE_NAME + "." + ItemColumns.PRIORITY + " >= 0)";
 
 
 		return where;

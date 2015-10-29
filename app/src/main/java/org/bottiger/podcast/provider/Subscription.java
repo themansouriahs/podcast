@@ -32,10 +32,10 @@ public class Subscription implements ISubscription, PaletteListener {
 
 	private static SharedPreferences sSharedPreferences = null;
 
-	private static final int SHOW_EPISODE_DESCRIPTION_SET = 1;
-	private static final int SHOW_EPISODE_DESCRIPTION = (1 << 1);
-	private static final int ADD_NEW_TO_PLAYLIST_SET = (1 << 2);
-	private static final int ADD_NEW_TO_PLAYLIST = (1 << 3);
+	public static final int SHOW_EPISODE_DESCRIPTION_SET = 1;
+	public static final int SHOW_EPISODE_DESCRIPTION = (1 << 1);
+	public static final int ADD_NEW_TO_PLAYLIST_SET = (1 << 2);
+	public static final int ADD_NEW_TO_PLAYLIST = (1 << 3);
 	private static final int DOWNLOAD_NEW_EPISODES_SET = (1 << 4);
 	private static final int DOWNLOAD_NEW_EPISODES = (1 << 5);
 	private static final int DELETE_AFTER_PLAYBACK_SET = (1 << 6);

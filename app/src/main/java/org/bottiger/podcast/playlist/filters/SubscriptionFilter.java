@@ -137,7 +137,7 @@ public class SubscriptionFilter implements IPlaylistFilter, SharedPreferences.On
 
     public String toSQL() {
 
-        String listened = (mShowListened) ? " 1 " : " " + ItemColumns.LISTENED + "== 0 ";
+        String listened = (mShowListened) ? " 1 " : " " + ItemColumns.LISTENED + "<= 0 ";
 
         String sql = "";
 
