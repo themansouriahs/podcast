@@ -318,7 +318,7 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
 	public String getOrder() {
 
 		String inputOrder = sharedPreferences.getString(inputOrderKey,
-				defaultOrder);
+                defaultOrder);
 		int amount = sharedPreferences.getInt(amountKey, amountValue);
 
 		PlayerService playerService = SoundWaves.sBoundPlayerService;
@@ -331,8 +331,12 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
 		}
 		String prioritiesSecond = "case " + ItemColumns.TABLE_NAME + "." + ItemColumns.PRIORITY
 				+ " when 0 then 1 else 2 end DESC, " + ItemColumns.TABLE_NAME + "." + ItemColumns.PRIORITY + " DESC, ";
-		String order = playingFirst + prioritiesSecond + ItemColumns.TABLE_NAME + "." + ItemColumns.DATE + " "
-				+ inputOrder + " LIMIT " + amount; // before:
+
+        String deprecatedDateOrder = ItemColumns.TABLE_NAME + "." + ItemColumns.DATE + " " + inputOrder + " ";
+        String dateOrder = ItemColumns.TABLE_NAME + "." + ItemColumns.PUB_DATE + " " + inputOrder + ", ";
+
+		String order = playingFirst + prioritiesSecond + dateOrder + deprecatedDateOrder
+				+ " LIMIT " + amount; // before:
 		return order;
 	}
 

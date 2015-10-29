@@ -348,7 +348,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 	private static Long itemID(int position) {
         Log.v("PlaylistAdapter", "itemID");
 
-        PlayerService ps = SoundWaves.sBoundPlayerService;
+        PlayerService ps = PlayerService.getInstance();
         if (ps == null)
             return -1L;
 
@@ -358,7 +358,12 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         if (episode == null)
             return -1L;
 
-        String url = episode.getUrl().toString();
+        String url;
+        try {
+            url = episode.getUrl().toString();
+        } catch (NullPointerException npe) {
+            return -1L;
+        }
         //Long id = UUID.fromString(url).getLeastSignificantBits();
         return (long)url.hashCode();
 	}
