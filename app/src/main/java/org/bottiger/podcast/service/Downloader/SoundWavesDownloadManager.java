@@ -391,7 +391,7 @@ public class SoundWavesDownloadManager extends Observable {
 
 						if (deleteFile) {
 							item.setDownloaded(false);
-                            SoundWaves.getLibraryInstance().updateEpisode(item);
+                            //SoundWaves.getLibraryInstance().updateEpisode(item);
 						}
 						//cursor.moveToNext();
 					}

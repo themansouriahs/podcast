@@ -162,7 +162,7 @@ public class Library {
         updateEpisode(episode);
     }
 
-    public void addEpisode(IEpisode argEpisode) {
+    public void addEpisode(@Nullable IEpisode argEpisode) {
         mLock.lock();
         try {
         FeedItem item = null;
@@ -195,7 +195,7 @@ public class Library {
         }
     }
 
-    public void addSubscription(Subscription argSubscription) {
+    public void addSubscription(@Nullable Subscription argSubscription) {
         mLock.lock();
         try {
             if (argSubscription == null)
@@ -215,7 +215,7 @@ public class Library {
         }
     }
 
-    public void removeSubscription(Subscription argSubscription) {
+    public void removeSubscription(@Nullable Subscription argSubscription) {
         mLock.lock();
         try {
             if (argSubscription == null)
@@ -400,6 +400,9 @@ public class Library {
     }
 
     public void loadEpisodes(@NonNull final Subscription argSubscription) {
+        if (argSubscription.IsLoaded())
+            return;
+
         Observable<SqlBrite.Query> episodes = mDb.createQuery(ItemColumns.TABLE_NAME, getAllEpisodes(argSubscription));
         episodes
                 .observeOn(Schedulers.io())

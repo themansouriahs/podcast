@@ -19,6 +19,7 @@ import com.squareup.okhttp.Response;
 
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.parser.FeedParser;
 import org.bottiger.podcast.parser.FeedUpdater;
 import org.bottiger.podcast.provider.FeedItem;
@@ -217,6 +218,10 @@ public class SubscriptionRefreshManager {
                                     @Nullable final IDownloadCompleteCallback argCallback) {
         ISubscription parsedSubscription = null;
         try {
+            if (argSubscription instanceof Subscription) {
+                SoundWaves.getLibraryInstance().loadEpisodes((Subscription)argSubscription);
+            }
+
             if (response.body() != null && response.isSuccessful()) {
                 try {
                     parsedSubscription = mFeedParser.parse(argSubscription, response.body().byteStream());
