@@ -30,32 +30,12 @@ public class NotificationReceiver extends BroadcastReceiver {
     public static final String fastForwardAction = ApplicationConfiguration.packageName + ".FAST_FORWARD";
     public static final String rewindAction = ApplicationConfiguration.packageName + ".REWIND";
 
-	private RemoteViews layout;
 	private NotificationPlayer np;
 
-    private static String saction = "";
-
-    public ServiceConnection playerServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            Log.d(TAG, "PlayerService, onServiceConnected");
-            PlayerService service2 = ((PlayerService.PlayerBinder) service)
-                    .getService();
-
-            executeCommand(service2, saction);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName className) {
-            Log.d(TAG, "PlayerService, onServiceDisconnected");
-        }
-    };
-	
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		
 		String action = intent.getAction();
-		layout = new RemoteViews(context.getPackageName(), R.layout.notification);
 
         IBinder binder = peekService(context, new Intent(context, PlayerService.class));
         if (binder == null) {

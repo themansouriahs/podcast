@@ -157,6 +157,8 @@ public class NotificationPlayer {
         mBuilder.setContentTitle(title);
         mBuilder.setContentText(content);
 
+        mBuilder.setDeleteIntent(pendingClearIntent);
+
         // Should I use this? I'm not sure.
         mBuilder.setStyle(mediaStyle
                 .setMediaSession(mediaSessionToken));
@@ -165,7 +167,10 @@ public class NotificationPlayer {
         mBuilder.addAction(actionToggle);
         //mBuilder.setProgress(100,  50, false);
 
-        mBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
+        }
+
         mBuilder.setCategory("CATEGORY_TRANSPORT"); // Media transport control for playback
         mBuilder.setPriority(NotificationCompat.PRIORITY_MAX);
 
