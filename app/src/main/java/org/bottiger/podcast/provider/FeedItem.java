@@ -895,8 +895,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
     }
 
 	/**
-	 * @param title
-	 *            the title to set
+	 * @param title the title to set
 	 */
 	public void setTitle(String argTitle) {
 		if (title != null && title.equals(argTitle))

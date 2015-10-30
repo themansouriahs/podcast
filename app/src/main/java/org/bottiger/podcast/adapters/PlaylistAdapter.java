@@ -1,5 +1,6 @@
 package org.bottiger.podcast.adapters;
 
+import java.net.URL;
 import java.util.TreeSet;
 
 import org.bottiger.podcast.R;
@@ -360,13 +361,11 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         if (episode == null)
             return -1L;
 
-        String url;
-        try {
-            url = episode.getUrl().toString();
-        } catch (NullPointerException npe) {
+        URL url = episode.getUrl();
+
+        if (url == null)
             return -1L;
-        }
-        //Long id = UUID.fromString(url).getLeastSignificantBits();
+
         return (long)url.hashCode();
 	}
 
