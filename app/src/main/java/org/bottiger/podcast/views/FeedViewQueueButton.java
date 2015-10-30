@@ -136,8 +136,7 @@ public class FeedViewQueueButton extends PlayerButtonView implements View.OnClic
     }
 
     public synchronized void setEpisode(IEpisode argEpisode, @PlayPauseImageView.ButtonLocation int argLocation) {
-        mEpisode = argEpisode;
-        //super.setEpisode(argEpisode, argLocation);
+        super.setEpisode(argEpisode);
         PlayerService ps = PlayerService.getInstance();
         if (ps != null) {
             Playlist playlist = ps.getPlaylist();
