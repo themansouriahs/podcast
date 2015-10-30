@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.transition.TransitionManager;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
@@ -178,6 +179,7 @@ public class ExpandableViewHoldersUtil {
 
     @TargetApi(19)
     private static void initTransition(PlaylistViewHolder argPlaylistViewHolder) {
+        Log.v("TEst2", "initiTransition");
         if (android.os.Build.VERSION.SDK_INT < 19) {
             return;
         }

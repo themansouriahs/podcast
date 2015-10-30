@@ -38,6 +38,8 @@ public class CustomLinearLayoutManager extends LinearLayoutManager {
         } catch (IndexOutOfBoundsException e) {
             Log.e("RecyclerFail", "onLayoutChildren :" + e.toString());
             removeViewAt(0);
+        } catch (IllegalStateException ise) {
+            Log.e("RecyclerFail", "onLayoutChildren :" + ise.toString());
         }
     }
 
