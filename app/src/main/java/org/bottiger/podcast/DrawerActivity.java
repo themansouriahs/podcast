@@ -98,12 +98,14 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity impleme
     }
 
     public void goFullScreen(@NonNull View argFullScreenView, @ColorInt int argColor) {
+        mAppContent.bringToFront();
         mToolbar.bringToFront();
         UIUtils.tintStatusBar(argColor, this);
     }
 
     public void exitFullScreen(@NonNull View argFullScreenView) {
         UIUtils.resetStatusBar(this);
+        mSlidingTabLayout.bringToFront();
     }
 
     public int getFragmentTop() {

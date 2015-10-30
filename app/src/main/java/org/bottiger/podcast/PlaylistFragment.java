@@ -123,7 +123,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        int color = getResources().getColor(mSwipeBgColor);
+        int color = ContextCompat.getColor(getContext(),mSwipeBgColor);
         mSwipePaint.setColor(color);
         mSwipeIcon = BitmapFactory.decodeResource(getResources(), mSwipeIconID);
         super.onCreate(savedInstanceState);

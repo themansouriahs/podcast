@@ -197,9 +197,14 @@ public class FragmentContainerActivity extends DrawerActivity {
                         UIUtils.tintStatusBar(color, activity);
                         HasTinted = true;
                     }
+                } else {
+
                 }
 
-                if (!HasTinted) {
+                if (HasTinted) {
+                    mViewPager.bringToFront();
+                } else {
+                    mSlidingTabLayout.bringToFront();
                     UIUtils.resetStatusBar(activity);
                 }
             }
