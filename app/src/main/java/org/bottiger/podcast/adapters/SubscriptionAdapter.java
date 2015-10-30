@@ -67,9 +67,7 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<SubscriptionChanged>() {
                     @Override
-                    public void call(SubscriptionChanged event) {
-                        //if (event instanceof SubscriptionChanged) {
-                        SubscriptionChanged subscriptionChanged = (SubscriptionChanged) event;
+                    public void call(SubscriptionChanged subscriptionChanged) {
                         if (subscriptionChanged.getAction() == SubscriptionChanged.ADDED) {
                             notifyDataSetChanged();
                         }
@@ -77,7 +75,6 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
                         if (subscriptionChanged.getAction() == SubscriptionChanged.REMOVED) {
                             notifyDataSetChanged();
                         }
-                        //}
                     }
                 });
     }
@@ -176,7 +173,6 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
                     ColorExtractor extractor = new ColorExtractor(argChangedPalette);
                     if (holder.text_container != null)
                         holder.text_container.setBackgroundColor(extractor.getPrimary());
-                    //holder.title.setTextColor(extractor.getTextColor());
                 }
 
                 @Override

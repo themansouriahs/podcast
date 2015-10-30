@@ -245,12 +245,6 @@ public class FeedActivity extends TopActivity implements PaletteListener {
 
         if (mSubscription instanceof Subscription) {
             mSubscriptionSettingsUtils = new SubscriptionSettingsUtils(mRevealLayout, (Subscription)mSubscription);
-            mSubscriptionSettingsUtils.setShowDescriptionListener(new SubscriptionSettingsUtils.OnSettingsChangedListener() {
-                @Override
-                public void OnSettingsChanged(boolean isChecked) {
-                    mAdapter.setExpanded(isChecked);
-                }
-            });
             mAdapter.setExpanded(((Subscription) mSubscription).isShowDescription());
 
             mSubscriptionSettingsUtils.setListOldestFirstListener(new SubscriptionSettingsUtils.OnSettingsChangedListener() {
@@ -437,6 +431,11 @@ public class FeedActivity extends TopActivity implements PaletteListener {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mAdapter.unsubscribe();
+    }
 
     @Override
     protected void onStart() {

@@ -20,6 +20,7 @@ import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.model.Library;
+import org.bottiger.podcast.model.events.SubscriptionChanged;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
@@ -33,6 +34,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.Date;
+
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by apl on 02-09-2014.
@@ -60,12 +66,39 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
     private static final android.text.format.Formatter sFormatter = new android.text.format.Formatter();
     private StringBuilder mStringBuilder = new StringBuilder(100);
 
+    private Subscription mRxSubscription;
+
     public FeedViewAdapter(@NonNull Activity activity, @NonNull ISubscription argSubscription) {
         mActivity = activity;
         mSubscription = argSubscription;
 
         mInflater = (LayoutInflater) activity
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        mRxSubscription = SoundWaves.getRxBus().toObserverable()
+                .ofType(SubscriptionChanged.class)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<SubscriptionChanged>() {
+                    @Override
+                    public void call(SubscriptionChanged subscriptionChanged) {
+                        if (subscriptionChanged.getAction() == SubscriptionChanged.ADDED) {
+                            notifyDataSetChanged();
+                        }
+
+                        if (subscriptionChanged.getAction() == SubscriptionChanged.REMOVED) {
+                            notifyDataSetChanged();
+                        }
+                    }
+                });
+    }
+
+    public void unsubscribe() {
+        if (mRxSubscription == null)
+            return;
+
+        if (mRxSubscription.isUnsubscribed())
+            mRxSubscription.unsubscribe();
     }
 
     public void setDataset(@NonNull ISubscription argSubscription) {

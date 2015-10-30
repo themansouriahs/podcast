@@ -194,6 +194,7 @@ public class Subscription implements ISubscription, PaletteListener {
 
 	public void addEpisode(@NonNull IEpisode argEpisode) {
 		mEpisodes.add(argEpisode);
+		notifyEpisodeAdded();
 	}
 
 	/**
@@ -605,6 +606,11 @@ public class Subscription implements ISubscription, PaletteListener {
 	private boolean getApplicationValue(int argId, boolean argDefault) {
 		String key = SoundWaves.getAppContext().getResources().getString(argId);
 		return sSharedPreferences.getBoolean(key, argDefault);
+	}
+
+	private void notifyEpisodeAdded() {
+		if (!mIsRefreshing)
+			SoundWaves.getRxBus().send(new SubscriptionChanged(getId(), SubscriptionChanged.ADDED));
 	}
 
 	private void notifyPropertyChanged() {
