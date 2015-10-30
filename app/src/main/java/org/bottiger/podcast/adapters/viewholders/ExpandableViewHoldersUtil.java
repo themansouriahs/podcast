@@ -23,12 +23,9 @@ import org.bottiger.podcast.views.PlaylistViewHolder;
  */
 public class ExpandableViewHoldersUtil {
 
-    private static TransitionManager sTransitionManager = null;
-
     private static RelativeLayout.LayoutParams sPlayPauseParams;
     private static RelativeLayout.LayoutParams sTitleParams;
     private static RelativeLayout.LayoutParams sPodcastExpandedLayoutParams;
-    private static RelativeLayout.LayoutParams sDurationParams;
     private static ViewGroup.LayoutParams sImageParams;
 
 
@@ -40,7 +37,6 @@ public class ExpandableViewHoldersUtil {
                 sPodcastExpandedLayoutParams = (RelativeLayout.LayoutParams) holder.mExpandedLayoutControls.getLayoutParams();
                 sPlayPauseParams = (RelativeLayout.LayoutParams) holder.mPlayPauseButton.getLayoutParams();
                 sTitleParams = (RelativeLayout.LayoutParams) holder.mMainTitle.getLayoutParams();
-                sDurationParams = (RelativeLayout.LayoutParams) holder.mTimeDuration.getLayoutParams();
                 sImageParams = (ViewGroup.LayoutParams) holder.mPodcastImage.getLayoutParams();
             }
 
@@ -186,15 +182,11 @@ public class ExpandableViewHoldersUtil {
             return;
         }
 
-        if (sTransitionManager == null) {
-            sTransitionManager = new TransitionManager();
-        }
-
         ViewGroup viewGroup = (ViewGroup) argPlaylistViewHolder.mLayout.getParent();
         if (viewGroup == null)
             return;
 
-        sTransitionManager.beginDelayedTransition(viewGroup, UIUtils.getDefaultTransition(argPlaylistViewHolder.mLayout.getResources()));
+        TransitionManager.beginDelayedTransition(viewGroup, UIUtils.getDefaultTransition(argPlaylistViewHolder.mLayout.getResources()));
     }
 
 }

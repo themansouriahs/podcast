@@ -33,7 +33,8 @@ public interface IEpisode {
     String getAuthor();
     long getDuration();
     int getPriority();
-    ISubscription getSubscription(@NonNull Context argContext);
+    ISubscription getSubscription();
+    @Deprecated ISubscription getSubscription(@NonNull Context argContext);
     long getOffset();
     Date getDateTime();
     Date getCreatedAt();

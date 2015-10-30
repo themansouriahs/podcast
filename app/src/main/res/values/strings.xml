@@ -65,7 +65,8 @@
     <string name="crash_toast">Crash :( Please help by sending a crash report</string>
     <string name="pref_help_category_title">Help Build SoundWaves</string>
     <string name="pref_help_static_field_description">If you would like to help out, there are plenty of things to do. It could be programming or it could be something completely different. I need help with translations, UI, icons/graphics, building a website, and so forth. Head over to the project page on GitHub (github.com/bottiger/SoundWaves) or send me an email: bottiger@gmail.com</string>
-    <string name="podcast_title_unknown">No Title :(</string>
+    <string name="episode_title_unknown">No Title :(</string>
+    <string name="podcast_title_unknown">Unknown podcast title</string>
     <string name="subscription_instruction">Add new podcasts by using the discovery page to the right or import an OPML file.\n\nHowever, first please consider if you want to enabled/disable the options below.</string>
     <string name="filter_show_listened">Show Listened</string>
     <string name="auto_start_next">Auto Start Next</string>

@@ -148,6 +148,8 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         viewHolder.mMainTitle.setText(item.getTitle());
         viewHolder.mMainTitle.setTextColor(textColor);
 
+        viewHolder.mSecondaryTitle.setText(item.getSubscription().getTitle());
+
         viewHolder.description.setText(item.getDescription());
         bindDuration(viewHolder, item);
 
@@ -223,9 +225,9 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         holder.removeButton.setEpisode(feedItem);
         holder.downloadButton.setEpisode(feedItem);
 
-        PaletteHelper.generate(feedItem.getArtwork(mActivity), mActivity, holder.downloadButton);
+        PaletteHelper.generate(feedItem.getArtwork(), mActivity, holder.downloadButton);
         //PaletteHelper.generate(feedItem.getArtwork(mActivity), mActivity, holder.favoriteButton);
-        PaletteHelper.generate(feedItem.getArtwork(mActivity), mActivity, holder.removeButton);
+        PaletteHelper.generate(feedItem.getArtwork(), mActivity, holder.removeButton);
 
 
         holder.removeButton.setOnClickListener(new View.OnClickListener() {

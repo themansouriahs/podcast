@@ -86,6 +86,11 @@ public class SlimEpisode implements IEpisode, Parcelable {
     }
 
     @Override
+    public ISubscription getSubscription() {
+        return null;
+    }
+
+    @Override
     public ISubscription getSubscription(@NonNull Context argContext) {
         return null;
     }

@@ -36,7 +36,7 @@
     <!-- Play Pause Button Drawable - End -->
 
     <!-- Animation duration - Start -->
-    <integer name="animation_quick">150</integer>
+    <integer name="animation_quick">200</integer>
     <!-- Animation duration - End -->
 
     <dimen name="playlist_margin">1px</dimen>

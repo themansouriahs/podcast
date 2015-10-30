@@ -38,7 +38,7 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
 
     public ImageViewTinted mPodcastImage;
     public TextView mMainTitle;
-    public TextView mSubTitle;
+    public TextView mSecondaryTitle;
     public TextView mTimeDuration;
     //public ImageView mTimeDurationIcon;
     public TextView mCurrentPosition;
@@ -75,7 +75,8 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
         mMainContainer = (RelativeLayout) view.findViewById(R.id.main_player_container);
         mPlayPauseButton = (PlayPauseImageView) view.findViewById(R.id.list_image);
         mPodcastImage = (ImageViewTinted) view.findViewById(R.id.podcast_image);
-        mMainTitle = (TextView) view.findViewById(R.id.podcast_title);
+        mMainTitle = (TextView) view.findViewById(R.id.episode_title);
+        mSecondaryTitle = (TextView) view.findViewById(R.id.podcast_title);
         mTimeDuration = (TextView) view.findViewById(R.id.podcast_duration);
         //mTimeDurationIcon = (ImageView) view.findViewById(R.id.podcast_duration_ic);
         mCurrentPosition = (TextView) view.getTag(R.id.current_position);
