@@ -277,6 +277,9 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
             return;
         }
 
+        if (mEpisode == null)
+            return;
+
         float progress = 0;
         float duration = mEpisode.getDuration();
 
