@@ -123,7 +123,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        int color = ContextCompat.getColor(getContext(),mSwipeBgColor);
+        int color = ContextCompat.getColor(getContext(), mSwipeBgColor);
         mSwipePaint.setColor(color);
         mSwipeIcon = BitmapFactory.decodeResource(getResources(), mSwipeIconID);
         super.onCreate(savedInstanceState);
@@ -196,7 +196,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         setPlaylistViewState(mPlaylist);
 
         // use a linear layout manager
-        //mLayoutManager = new ExpandableLayoutManager(mContext, mSwipeRefreshView, mTopPlayer, mRecyclerView, mPhoto);
         mLayoutManager = new CustomLinearLayoutManager(mContext);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
@@ -323,9 +322,8 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                     item.markAsListened();
                 }
 
-                mPlaylist.removeItem(itemPosition);
+                mPlaylist.removeItem(itemPosition, true);
 
-                //String episodeRemoved = getResources().getString(R.string.playlist_episode_dismissed);
                 Snackbar snack = Snackbar.make(view, R.string.playlist_episode_dismissed, Snackbar.LENGTH_LONG)
                         .setAction(R.string.playlist_episode_dismissed_undo, new View.OnClickListener() {
                             @Override
@@ -342,7 +340,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                                 SoundWaves.getLibraryInstance().updateEpisode(episode);
                             }
                         })
-                        .setActionTextColor(getResources().getColor(R.color.white_opaque));
+                        .setActionTextColor(ContextCompat.getColor(getContext(), R.color.white_opaque));
 
                 View view = snack.getView();
                 FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)view.getLayoutParams();
@@ -350,8 +348,8 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                 view.setLayoutParams(params);
 
                 snack.show();
-
-                mAdapter.notifyItemRemoved(viewHolder.getAdapterPosition());
+                
+                mAdapter.notifyItemRemoved(itemPosition-1);
             }
         });
         swipeToDismissTouchHelper.attachToRecyclerView(mRecyclerView);

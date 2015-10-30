@@ -184,11 +184,12 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
 			mInternalPlaylist.add(item);
 		}
 	}
+
     /**
      *
      * @param position
      */
-    public void removeItem(int position) {
+    public void removeItem(int position, boolean argIsSilent) {
         if (position < 0) {
             VendorCrashReporter.report("Playlist remove", "Position must be greater or equal to zero"); // NoI18N
             return;
@@ -198,7 +199,17 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
         if (size > position) {
             mInternalPlaylist.remove(position);
         }
-        notifyPlaylistChanged();
+
+        if (!argIsSilent)
+            notifyPlaylistChanged();
+    }
+
+    /**
+     *
+     * @param position
+     */
+    public void removeItem(int position) {
+        removeItem(position, false);
     }
 
 	/**
