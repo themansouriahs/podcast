@@ -26,6 +26,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.concurrent.TimeUnit;
 
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
 
@@ -106,20 +107,19 @@ public class DialogPlaybackSpeed extends DialogFragment {
         mRxSubscriptions
                 .add(SoundWaves.getRxBus().toObserverable()
                         .ofType(RxBusSimpleEvents.PlaybackSpeedChanged.class)
+                        .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new Action1<RxBusSimpleEvents.PlaybackSpeedChanged>() {
                             @Override
-                            public void call(RxBusSimpleEvents.PlaybackSpeedChanged event) {
-                                //if (event instanceof RxBusSimpleEvents.PlaybackSpeedChanged) {
-                                    RxBusSimpleEvents.PlaybackSpeedChanged playbackSpeedChanged = (RxBusSimpleEvents.PlaybackSpeedChanged) event;
-                                    setSpeed(playbackSpeedChanged.speed);
+                            public void call(RxBusSimpleEvents.PlaybackSpeedChanged playbackSpeedChanged) {
+                                Log.d(TAG, "new playback: " + playbackSpeedChanged.speed);
+                                setSpeed(playbackSpeedChanged.speed);
 
-                                    if (mRadioGlobal.isChecked()) {
-                                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mActivity);
-                                        String key = getResources().getString(R.string.soundwaves_player_playback_speed_key);
-                                        int storedSpeed = Math.round(playbackSpeedChanged.speed * 10);
-                                        prefs.edit().putInt(key, storedSpeed).apply();
-                                    }
-                                //}
+                                if (mRadioGlobal.isChecked()) {
+                                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mActivity);
+                                    String key = getResources().getString(R.string.soundwaves_player_playback_speed_key);
+                                    int storedSpeed = Math.round(playbackSpeedChanged.speed * 10);
+                                    prefs.edit().putInt(key, storedSpeed).apply();
+                                }
                             }
                         }));
 
@@ -129,16 +129,24 @@ public class DialogPlaybackSpeed extends DialogFragment {
         mIncrementButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (player != null)
-                    player.setPlaybackSpeed(mOriginalPlaybackSpeed + sSpeedIncrements);
+                if (player != null) {
+                    float newPlaybackSpeed = mOriginalPlaybackSpeed + sSpeedIncrements;
+                    Log.d(TAG, "increment playback speed to: " + newPlaybackSpeed);
+                    setSpeed(newPlaybackSpeed);
+                    player.setPlaybackSpeed(newPlaybackSpeed);
+                }
             }
         });
 
         mDecrementButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (player != null)
-                    player.setPlaybackSpeed(mOriginalPlaybackSpeed - sSpeedIncrements);
+                if (player != null) {
+                    float newPlaybackSpeed = mOriginalPlaybackSpeed - sSpeedIncrements;
+                    Log.d(TAG, "dencrement playback speed to: " + newPlaybackSpeed);
+                    setSpeed(newPlaybackSpeed);
+                    player.setPlaybackSpeed(newPlaybackSpeed);
+                }
             }
         });
 
@@ -191,14 +199,14 @@ public class DialogPlaybackSpeed extends DialogFragment {
         argNewSpeed = Math.round(argNewSpeed*10)/10.0f;
 
         mOriginalPlaybackSpeed = argNewSpeed;
-        mCurrentSpeed.setText(getSpeed());
+        mCurrentSpeed.setText(getSpeedText(mOriginalPlaybackSpeed));
 
         mIncrementButton.setEnabled(argNewSpeed < sSpeedMaximum);
         mDecrementButton.setEnabled(argNewSpeed > sSpeedMinimum);
     }
 
-    private String getSpeed() {
-        return String.format("%.1f", mOriginalPlaybackSpeed) + "x"; // NoI18N
+    private String getSpeedText(float argSpeed) {
+        return String.format("%.1f", argSpeed) + "x"; // NoI18N
     }
 
     private void setPlaybackSpeed(float argSpeed) {
