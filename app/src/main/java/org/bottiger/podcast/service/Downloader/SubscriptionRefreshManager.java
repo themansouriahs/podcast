@@ -177,6 +177,7 @@ public class SubscriptionRefreshManager {
                 }
             }
 
+            /*
             if (startDownload) {
                 Runnable myRunnable = new Runnable() {
                     @Override
@@ -186,6 +187,7 @@ public class SubscriptionRefreshManager {
                 };
                 mainHandler.post(myRunnable);
             }
+            */
         }
     }
 
@@ -219,7 +221,7 @@ public class SubscriptionRefreshManager {
         ISubscription parsedSubscription = null;
         try {
             if (argSubscription instanceof Subscription) {
-                SoundWaves.getLibraryInstance().loadEpisodes((Subscription)argSubscription);
+                SoundWaves.getLibraryInstance().loadEpisodesSync((Subscription)argSubscription, null);
             }
 
             if (response.body() != null && response.isSuccessful()) {

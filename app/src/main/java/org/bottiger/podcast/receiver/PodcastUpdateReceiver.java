@@ -50,7 +50,7 @@ public class PodcastUpdateReceiver extends BroadcastReceiver {
                 analytics.trackEvent(IAnalytics.EVENT_TYPE.REFRESH_DURATION, timeDiff);
                 
                 SoundWavesDownloadManager.removeExpiredDownloadedPodcasts(context);
-                downloadManager.startDownload();
+                //downloadManager.startDownload();
 
                 wl.release();
                 return;

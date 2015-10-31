@@ -28,7 +28,7 @@ import org.bottiger.podcast.utils.PreferenceHelper;
  */
 public class PodcastUpdater implements SharedPreferences.OnSharedPreferenceChangeListener {
 
-    public static final float UPDATE_FREQUENCY_MIN = 60f;
+    public static final float UPDATE_FREQUENCY_MIN = 180f;
 
     private static final int PodcastUpdaterId = 36324;
 

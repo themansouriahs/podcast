@@ -165,7 +165,8 @@ public class TopActivity extends AppCompatActivity {
 
         switch (requestCode) {
             case PERMISSION_TO_DOWNLOAD: {
-                SoundWaves.getDownloadManager().startDownload();
+                // FIXME
+                //SoundWaves.getDownloadManager().startDownload();
                 return;
             }
             case PERMISSION_TO_IMPORT_EXPORT: {

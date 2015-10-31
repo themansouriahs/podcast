@@ -97,7 +97,7 @@ public class PodcastUpdateJobService extends JobService {
                 }
 
                 SoundWavesDownloadManager.removeExpiredDownloadedPodcasts(PodcastUpdateJobService.this);
-                downloadManager.startDownload();
+                //downloadManager.startDownload();
 
             }
         });

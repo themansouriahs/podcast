@@ -348,7 +348,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                 view.setLayoutParams(params);
 
                 snack.show();
-                
+
                 mAdapter.notifyItemRemoved(itemPosition-1);
             }
         });

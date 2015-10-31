@@ -139,8 +139,10 @@ public class DialogBulkDownload {
             }
         }
 
+        /*
         if (downloadManager != null)
         downloadManager.startDownload();
+        */
 
     }
 

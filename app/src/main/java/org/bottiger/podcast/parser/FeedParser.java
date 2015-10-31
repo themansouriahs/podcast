@@ -343,7 +343,7 @@ public class FeedParser {
                     if (enclosure.filesize > 0)
                         episode.setFilesize(enclosure.filesize);
 
-                    episode.setIsVideo(SoundWavesDownloadManager.isVideo(enclosure.mimeType));
+                    episode.setIsVideo(SoundWavesDownloadManager.getFileType(enclosure.mimeType) == SoundWavesDownloadManager.VIDEO);
                     break;
                 }
                 case EPISODE_CATEGORY_TAG:

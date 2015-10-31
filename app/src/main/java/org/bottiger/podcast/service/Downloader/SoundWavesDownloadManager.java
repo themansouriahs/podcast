@@ -41,14 +41,19 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.WorkerThread;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 import android.webkit.MimeTypeMap;
 
+import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 public class SoundWavesDownloadManager extends Observable {
@@ -103,6 +108,8 @@ public class SoundWavesDownloadManager extends Observable {
     private final ReentrantLock mQueueLock = new ReentrantLock();
     private LinkedList<QueueEpisode> mDownloadQueue = new LinkedList<>();
 
+    private rx.Subscription _subscription;
+
 	private IEpisode mDownloadingItem = null;
     private IDownloadEngine mEngine = null;
 
@@ -113,24 +120,6 @@ public class SoundWavesDownloadManager extends Observable {
         mContext = argContext;
         mDownloadCompleteCallback = new DownloadCompleteCallback(argContext);
         mProgressPublisher = new DownloadProgressPublisher((SoundWaves) SoundWaves.getAppContext(), this);
-
-        SoundWaves.getRxBus().toObserverable()
-                .ofType(DownloadManagerChanged.class)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<DownloadManagerChanged>() {
-                    @Override
-                    public void call(DownloadManagerChanged downloadManagerChanged) {
-                        Log.w(TAG, "DownloadManagerChanged, size: " + downloadManagerChanged.queueSize);
-                        startDownload();
-                        return;
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        Log.w(TAG, "Erorr");
-                    }
-                });
     }
 
     public static @SoundWavesDownloadManager.MimeType int getFileType(@Nullable String argMimeType) {
@@ -146,11 +135,6 @@ public class SoundWavesDownloadManager extends Observable {
             return VIDEO;
 
         return OTHER;
-    }
-
-    @Deprecated
-    public static boolean isVideo(String argMimeType) {
-        return getFileType(argMimeType) == VIDEO;
     }
 
     public static String getMimeType(String fileUrl) {
@@ -196,14 +180,11 @@ public class SoundWavesDownloadManager extends Observable {
 		return DownloadStatus.NOTHING;
 	}
 
-	/**
-	 * Download all the episodes in the queue
-	 */
-	public synchronized @Result int startDownload() {
-
+    @MainThread
+    private @Result int checkPermission() {
         if (Build.VERSION.SDK_INT >= 23 &&
                 (mContext.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
-                 mContext.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)  != PackageManager.PERMISSION_GRANTED)) {
+                        mContext.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)  != PackageManager.PERMISSION_GRANTED)) {
 
             if (!(mContext instanceof Activity))
                 return NEED_PERMISSION;
@@ -218,8 +199,8 @@ public class SoundWavesDownloadManager extends Observable {
             }*/
 
             activity.requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
-                                                     Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                                        TopActivity.PERMISSION_TO_DOWNLOAD);
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    TopActivity.PERMISSION_TO_DOWNLOAD);
 
             // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
             // app-defined int constant
@@ -227,57 +208,55 @@ public class SoundWavesDownloadManager extends Observable {
             return NEED_PERMISSION;
         }
 
+        return OK;
+    }
+
+	/**
+	 * Download all the episodes in the queue
+	 */
+    @WorkerThread
+	private void startDownload(QueueEpisode nextInQueue) {
+
 		// Make sure we have access to external storage
 		if (!SDCardManager.getSDCardStatusAndCreate()) {
-			return NO_STORAGE;
+			return; //return NO_STORAGE;
 		}
 
         @NetworkState int networkState = updateConnectStatus(mContext);
 
         mQueueLock.lock();
         try {
-            if (getDownloadingItem() == null && mDownloadQueue.size() > 0) {
+            FeedItem downloadingItem = SoundWaves.getLibraryInstance().getEpisode(nextInQueue.getId());
 
-                for (int i = 0; i < mDownloadQueue.size(); i++) {
-                    QueueEpisode nextInQueue = mDownloadQueue.pollFirst(); //getNextItem();
-                    FeedItem downloadingItem = SoundWaves.getLibraryInstance().getEpisode(nextInQueue.getId());
+            if (downloadingItem == null)
+                return;
 
-                    if (downloadingItem == null)
-                        continue;
+            if (!StrUtils.isValidUrl(downloadingItem.getURL()))
+                return;
 
-                    if (!StrUtils.isValidUrl(downloadingItem.getURL()))
-                        continue;
-
-                    if (!nextInQueue.IsStartedManually() && networkState != NETWORK_OK) {
-                        //return NO_CONNECTION;
-                        continue;
-                    }
-
-                    if (nextInQueue.IsStartedManually() && !(networkState == NETWORK_OK || networkState == NETWORK_RESTRICTED)) {
-                        continue;
-                    }
-
-                    mEngine = newEngine(downloadingItem);
-                    mEngine.addCallback(mDownloadCompleteCallback);
-
-                    mDownloadingItem = downloadingItem;
-
-                    Log.d(TAG, "Start downloading: " + downloadingItem);
-                    mEngine.startDownload();
-
-                    mProgressPublisher.addEpisode(downloadingItem);
-
-                    break;
-                }
-
-                postQueueChangedEvent();
+            if (!nextInQueue.IsStartedManually() && networkState != NETWORK_OK) {
+                //return NO_CONNECTION;
+                return;
             }
+
+            if (nextInQueue.IsStartedManually() && !(networkState == NETWORK_OK || networkState == NETWORK_RESTRICTED)) {
+                return;
+            }
+
+            mEngine = newEngine(downloadingItem);
+            mEngine.addCallback(mDownloadCompleteCallback);
+
+            mDownloadingItem = downloadingItem;
+
+            Log.d(TAG, "Start downloading: " + downloadingItem);
+            mEngine.startDownload();
+
+            mProgressPublisher.addEpisode(downloadingItem);
         } finally {
             mQueueLock.unlock();
         }
 
-
-        return OK;
+        return;
 	}
 
     @Deprecated
@@ -287,6 +266,7 @@ public class SoundWavesDownloadManager extends Observable {
             mEngine.abort();
     }
 
+    @WorkerThread
     public IDownloadEngine newEngine(@NonNull FeedItem argEpisode) {
         return new OkHttpDownloader(argEpisode);
     }
@@ -348,7 +328,7 @@ public class SoundWavesDownloadManager extends Observable {
 		protected Void doInBackground(Void... params) {
 			Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
 
-			if (SDCardManager.getSDCardStatus() == false) {
+			if (!SDCardManager.getSDCardStatus()) {
 				return null;
 			}
 
@@ -517,12 +497,7 @@ public class SoundWavesDownloadManager extends Observable {
             return null;
         }
 
-
-        if (mDownloadingItem != null) {
-            return mDownloadingItem;
-        }
-
-		return null;
+        return mDownloadingItem;
 	}
 
 	public void notifyDownloadComplete() {
@@ -535,7 +510,6 @@ public class SoundWavesDownloadManager extends Observable {
 	 */
 	public void addItemToQueue(IEpisode argEpisode, @QueuePosition int argPosition) {
         Log.d(TAG, "Adding item to queue: " + argEpisode);
-
         mQueueLock.lock();
         try {
 
@@ -543,30 +517,13 @@ public class SoundWavesDownloadManager extends Observable {
                 return;
             }
 
-		    QueueEpisode queueItem = new QueueEpisode((FeedItem)argEpisode);
+            QueueEpisode queueItem = new QueueEpisode((FeedItem)argEpisode);
+            mDownloadQueue.add(queueItem);
 
-            if (argPosition == STARTED_MANUALLY) {
-                queueItem.setStartedManually(true);
-                mDownloadQueue.addLast(queueItem);
-                return;
-            }
-
-            if (argPosition == ANYWHERE) {
-                if (!mDownloadQueue.contains(queueItem))
-                    mDownloadQueue.add(queueItem);
-
-                return;
-            }
-
-            if (mDownloadQueue.contains(queueItem)) {
-                mDownloadQueue.remove(queueItem);
-            }
-
-            if (argPosition == FIRST) {
-                mDownloadQueue.addFirst(queueItem);
-            } else if (argPosition == LAST) {
-                mDownloadQueue.addLast(queueItem);
-            }
+            _subscription = _getDownloadObservable(queueItem)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(_getObserver());                             // Observer
 
         } finally {
             postQueueChangedEvent();
@@ -629,7 +586,7 @@ public class SoundWavesDownloadManager extends Observable {
 	 */
 	public void addItemAndStartDownload(@NonNull IEpisode item, @QueuePosition int argPosition) {
         addItemToQueue(item, argPosition);
-		startDownload();
+		//startDownload();
 	}
 
     @Nullable
@@ -691,8 +648,6 @@ public class SoundWavesDownloadManager extends Observable {
             // clear the reference
             item = null;
             notifyDownloadComplete();
-
-            startDownload();
         }
 
         @Override
@@ -700,7 +655,6 @@ public class SoundWavesDownloadManager extends Observable {
             removeDownloadingEpisode(argEpisode);
             removeTmpFolderCruft();
             notifyDownloadComplete();
-            startDownload();
         }
     }
 
@@ -710,6 +664,53 @@ public class SoundWavesDownloadManager extends Observable {
         event.queueSize = mDownloadQueue.size()+extraFromCurrentDownload;
 
         return event;
+    }
+
+    private rx.Observable<QueueEpisode> _getDownloadObservable(final QueueEpisode argQueueItem) {
+        return rx.Observable.just(true).map(new Func1<Boolean, QueueEpisode>() {
+
+            @Override
+            public QueueEpisode call(Boolean argQueueItem2) {
+                //_log("Within Observable");
+                //_doSomeLongOperation_thatBlocksCurrentThread();
+                mDownloadQueue.remove(argQueueItem);
+                startDownload(argQueueItem);
+                return argQueueItem;
+            }
+        });
+    }
+
+    /**
+     * Observer that handles the result through the 3 important actions:
+     *
+     * 1. onCompleted
+     * 2. onError
+     * 3. onNext
+     */
+    private Observer<QueueEpisode> _getObserver() {
+        return new Observer<QueueEpisode>() {
+
+            @Override
+            public void onCompleted() {
+                Log.d(TAG, "On complete");
+                //_log("On complete");
+                //_progress.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Log.d(TAG, "Boo! Error " + e.getMessage());
+                //Timber.e(e, "Error in RxJava Demo concurrency");
+                //_log(String.format("Boo! Error %s", e.getMessage()));
+                //_progress.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onNext(QueueEpisode queueEpisode) {
+                Log.d(TAG, "onNext with return value " + queueEpisode);
+                //_log(String.format("onNext with return value \"%b\"", bool));
+            }
+        };
     }
 
     private void postQueueChangedEvent() {

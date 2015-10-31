@@ -1026,7 +1026,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	}
 
 	private void setHasBeenDownloadedOnce(boolean argHasBeenDownloaded) {
-		status = status < 0 ? 0 : status;
+		status = initStatus();
 		status |= HAS_BEEN_DOWNLOADED_ONCE;
 
 		if (argHasBeenDownloaded)
@@ -1038,7 +1038,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	}
 
     public void setIsVideo(boolean argIsVideo) {
-        status = status < 0 ? 0 : status;
+        status = initStatus();
         status |= IS_VIDEO;
 
         if (argIsVideo)
@@ -1048,6 +1048,14 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 
 		notifyPropertyChanged(EpisodeChanged.CHANGED);
     }
+
+	private int initStatus() {
+		if (status < 0) {
+			return 0;
+		} else {
+			return status;
+		}
+	}
 
     private boolean IsSettingEnabled(int setting) {
         return BitMaskUtils.IsBitSet(status, setting);

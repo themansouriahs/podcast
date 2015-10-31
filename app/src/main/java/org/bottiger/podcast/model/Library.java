@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.WorkerThread;
 import android.support.v4.util.ArrayMap;
 import android.support.v7.util.SortedList;
 import android.util.Log;
@@ -12,6 +13,7 @@ import com.squareup.sqlbrite.BriteDatabase;
 import com.squareup.sqlbrite.SqlBrite;
 
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.debug.SqliteCopy;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.events.EpisodeChanged;
 import org.bottiger.podcast.model.events.ItemChanged;
@@ -409,40 +411,53 @@ public class Library {
                 .subscribe(new Action1<SqlBrite.Query>() {
                     @Override
                     public void call(SqlBrite.Query query) {
-                        Cursor cursor = null;
-
-                        long start = 0;
-                        int counter = 0;
-                        try {
-                            cursor = query.run();
-
-                            start = System.currentTimeMillis();
-
-                            FeedItem[] emptyItems = new FeedItem[1];
-                            int count = cursor.getCount();
-                            if (count > 0) {
-                                emptyItems = new FeedItem[cursor.getCount()];
-
-                                for (int i = 0; i < emptyItems.length; i++) {
-                                    emptyItems[i] = new FeedItem();
-                                }
-                            }
-
-                            while (cursor.moveToNext()) {
-                                FeedItem item = LibraryPersistency.fetchEpisodeFromCursor(cursor, emptyItems[counter]);
-                                addEpisode(item);
-                                counter++;
-                            }
-
-                            argSubscription.setIsLoaded(true);
-                        } finally {
-                            if(cursor != null)
-                                cursor.close();
-                            long end = System.currentTimeMillis();
-                            Log.d("loadAllEpisodes", "1: " + (end - start) + " ms");
-                        }
+                        loadEpisodesSync(argSubscription, query);
                     }
                 });
+    }
+
+    @WorkerThread
+    public synchronized void loadEpisodesSync(@NonNull final Subscription argSubscription, @Nullable SqlBrite.Query argQuery) {
+        if (argSubscription.IsLoaded())
+            return;
+
+        Cursor cursor = null;
+
+        long start = 0;
+        int counter = 0;
+        try {
+
+            if (argQuery == null) {
+                cursor = PodcastOpenHelper.getInstance(mContext).getReadableDatabase().rawQuery(getAllEpisodes(argSubscription), new String[0]);
+            } else {
+                cursor = argQuery.run();
+            }
+
+            start = System.currentTimeMillis();
+
+            FeedItem[] emptyItems = new FeedItem[1];
+            int count = cursor.getCount();
+            if (count > 0) {
+                emptyItems = new FeedItem[cursor.getCount()];
+
+                for (int i = 0; i < emptyItems.length; i++) {
+                    emptyItems[i] = new FeedItem();
+                }
+            }
+
+            while (cursor.moveToNext()) {
+                FeedItem item = LibraryPersistency.fetchEpisodeFromCursor(cursor, emptyItems[counter]);
+                addEpisode(item);
+                counter++;
+            }
+
+            argSubscription.setIsLoaded(true);
+        } finally {
+            if (cursor != null)
+                cursor.close();
+            long end = System.currentTimeMillis();
+            Log.d("loadAllEpisodes", "1: " + (end - start) + " ms");
+        }
     }
 
     public boolean IsSubscribed(String argUrl) {
