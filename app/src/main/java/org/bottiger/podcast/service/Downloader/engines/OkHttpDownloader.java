@@ -82,6 +82,7 @@ public class OkHttpDownloader extends DownloadEngineBase {
 
                     outputStream.write(buffer, 0, bytesRead);
                     mProgress += bytesRead / contentLength;
+                    getEpisode().setProgress(mProgress*100);
                 }
 
                 outputStream.close();
@@ -89,12 +90,6 @@ public class OkHttpDownloader extends DownloadEngineBase {
 
                 File tmpFIle = new File(episode.getAbsoluteTmpPath());
                 File finalFIle = new File(episode.getAbsolutePath());
-
-                // This seems to be done in the sDownloadCompleteCallback
-                //
-                //Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                //intent.setData(Uri.fromFile(finalFIle));
-                //SoundWaves.getAppContext().sendBroadcast(intent);
 
                 // If download was succesfull
                 if (tmpFIle.exists() && tmpFIle.length() == contentLength) {

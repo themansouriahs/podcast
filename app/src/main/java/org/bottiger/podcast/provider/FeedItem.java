@@ -13,17 +13,17 @@ import java.util.Date;
 import java.util.Locale;
 
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.model.events.DownloadProgress;
 import org.bottiger.podcast.listeners.DownloadProgressPublisher;
 import org.bottiger.podcast.model.events.EpisodeChanged;
+import org.bottiger.podcast.provider.base.BaseEpisode;
+import org.bottiger.podcast.service.DownloadStatus;
 import org.bottiger.podcast.utils.BitMaskUtils;
 import org.bottiger.podcast.utils.SDCardManager;
 import org.jsoup.Jsoup;
 
-import android.app.DownloadManager;
-import android.app.DownloadManager.Query;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -31,7 +31,11 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
-public class FeedItem implements IEpisode, Comparable<FeedItem> {
+import rx.Observable;
+import rx.functions.Func1;
+import rx.subjects.PublishSubject;
+
+public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 
 	private static final String TAG = "FeedItem";
 
@@ -235,11 +239,10 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
     private static final SimpleDateFormat sFormat = new SimpleDateFormat(default_format, Locale.US);
 	public static SimpleDateFormat sFormatZ = new SimpleDateFormat(default_formatZ, Locale.US);
 
+	// Observables
+	public PublishSubject<DownloadProgress> _downloadProgressChangeObservable = PublishSubject.create();
+
 	private Date mDate = null;
-
-
-	private int iterWithoutChange = 0;
-	private int lastProgress = -1;
 
 	private boolean mIsParsing = false;
 
@@ -360,55 +363,6 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	}
 
 	/**
-	 * Get the current download progress as a int .
-	 * 
-	 * @return download status in percent
-	 */
-	public int getProgress(DownloadManager downloadManager) {
-		assert downloadManager != null;
-		long percent = 0;
-
-		// FIXME This is run one time for each textview. It should only be run
-		// once with all the reference ID's
-		Query query = new Query();
-		query.setFilterById(getDownloadReferenceID());
-		Cursor c = downloadManager.query(query);
-
-        if (c == null) {
-            return 100;
-        }
-
-		c.moveToFirst();
-		while (c.isAfterLast() == false) {
-			int cursorBytesSoFarIndex = c
-					.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR);
-			int cursorBytesTotalIndex = c
-					.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES);
-
-			long bytesSoFar = c.getInt(cursorBytesSoFarIndex);
-			long bytesTotal = c.getInt(cursorBytesTotalIndex);
-
-			percent = bytesSoFar * 100 / bytesTotal;
-
-			c.moveToNext();
-		}
-
-        int percentInt = (int)percent;
-
-        if (lastProgress > 0) {
-            if (percentInt == lastProgress) {
-                iterWithoutChange++;
-            } else {
-                Log.d("FeedItem", iterWithoutChange + " iterations without change in progress");
-                iterWithoutChange = 0;
-            }
-        }
-
-        lastProgress = percentInt;
-		return percentInt;
-	}
-
-	/**
 	 * Deletes the downloaded file and updates the data in the database
 	 * 
 	 * @param argContext
@@ -428,7 +382,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 					return true;
 				}
 			} catch (Exception e) {
-				Log.w(TAG, "del file failed : " + filename.toString() + "  " + e);
+				Log.w(TAG, "del file failed : " + filename + "  " + e);
 			}
 		}
 
@@ -438,13 +392,11 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 
 	public void downloadSuccess(ContentResolver contentResolver) {
 		filesize = getCurrentFileSize();
-		//update(contentResolver);
 		notifyPropertyChanged();
 	}
 
 	public void endDownload(ContentResolver context) {
-		lastUpdate = Long.valueOf(System.currentTimeMillis());
-		//update(context);
+		lastUpdate = System.currentTimeMillis();
 		notifyPropertyChanged();
 	}
 
@@ -473,8 +425,7 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 				m.update(this.getURL().getBytes());
 				byte[] digest = m.digest();
 				BigInteger bigInt = new BigInteger(1, digest);
-				String hashtext = bigInt.toString(16);
-				return hashtext;
+				return bigInt.toString(16);
 			} catch (NoSuchAlgorithmException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -746,7 +697,6 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 
     public void removeFromPlaylist(@NonNull ContentResolver argContentResolver) {
         setPriority(0);
-        //update(argContentResolver);
     }
 
 	@Nullable
@@ -788,14 +738,12 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	public void setPriority(IEpisode precedingItem, Context context) {
 		priority = precedingItem == null ? 1 : precedingItem.getPriority() + 1;
 		increateHigherPriorities(precedingItem, context);
-		//update(context.getContentResolver());
 		notifyPropertyChanged();
 	}
 
 	public void trackEnded(ContentResolver contentResolver) {
 		priority = 0;
 		markAsListened();
-		//update(contentResolver);
 	}
 
 	@Override
@@ -856,13 +804,6 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 	 */
 	public int getPriority() {
 		return this.priority;
-	}
-
-	/**
-	 * @return the downloadReferenceID
-	 */
-	public long getDownloadReferenceID() {
-		return downloadReferenceID;
 	}
 
 	/**
@@ -1068,9 +1009,22 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 			notifyPropertyChanged(EpisodeChanged.PARSED);
 	}
 
-	private void notifyPropertyChanged(@EpisodeChanged.Action int argAction) {
-		if (!mIsParsing) {
+	public boolean IsParsing() {
+		return mIsParsing;
+	}
+
+	DownloadProgress progressChanged;
+	long lastUpdate2 = System.currentTimeMillis();
+	protected void notifyPropertyChanged(@EpisodeChanged.Action int argAction) {
+		if (!mIsParsing && argAction != EpisodeChanged.PROGRESS) {
 			SoundWaves.getRxBus().send(new EpisodeChanged(getId(), getURL(), argAction));
+		}
+
+		if (argAction == EpisodeChanged.PROGRESS && (System.currentTimeMillis()-lastUpdate2)>16) {
+			lastUpdate2 = System.currentTimeMillis();
+			progressChanged = new DownloadProgress(this, DownloadStatus.DOWNLOADING, (int)getProgress());
+			Log.d(TAG, "Notify progress changed: FeedItemHash: " + hashCode() + " progress: " + (int)getProgress());
+			_downloadProgressChangeObservable.onNext(progressChanged);
 		}
 	}
 
@@ -1079,5 +1033,15 @@ public class FeedItem implements IEpisode, Comparable<FeedItem> {
 		if (!mIsParsing) {
 			SoundWaves.getRxBus().send(new EpisodeChanged(getId(), getURL(), EpisodeChanged.CHANGED));
 		}
+	}
+
+	private Observable<DownloadProgress> _getDownloadProgressObservable(DownloadProgress argDownloadProgress) {
+		return Observable.just(argDownloadProgress).map(new Func1<DownloadProgress, DownloadProgress>() {
+			@Override
+			public DownloadProgress call(DownloadProgress aBoolean) {
+				DownloadProgress progressChanged = new DownloadProgress(FeedItem.this, DownloadStatus.DOWNLOADING, (int)getProgress());
+				return progressChanged;
+			}
+		});
 	}
 }

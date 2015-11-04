@@ -8,8 +8,10 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.bottiger.podcast.model.events.EpisodeChanged;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.provider.base.BaseEpisode;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -18,7 +20,7 @@ import java.util.Date;
 /**
  * Created by apl on 21-04-2015.
  */
-public class SlimEpisode implements IEpisode, Parcelable {
+public class SlimEpisode extends BaseEpisode implements Parcelable {
 
     private String mTitle;
     private URL mUrl;
@@ -180,6 +182,11 @@ public class SlimEpisode implements IEpisode, Parcelable {
         mOffset = i;
     }
 
+    @Override
+    public String getURL() {
+        return null;
+    }
+
     @Nullable
     @Override
     public Uri getFileLocation(@Location int argLocation) {
@@ -251,5 +258,10 @@ public class SlimEpisode implements IEpisode, Parcelable {
         mDescription = in.readString();
         mFilesize = in.readLong();
         mDuration = in.readLong();
+    }
+
+    @Override
+    protected void notifyPropertyChanged(@EpisodeChanged.Action int argAction) {
+
     }
 }

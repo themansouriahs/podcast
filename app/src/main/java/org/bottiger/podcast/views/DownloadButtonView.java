@@ -19,11 +19,18 @@ import com.squareup.otto.Subscribe;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.listeners.DownloadProgress;
+import org.bottiger.podcast.model.events.DownloadProgress;
+import org.bottiger.podcast.model.events.ItemChanged;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.PlayerService;
+
+import java.util.concurrent.TimeUnit;
+
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 
 /**
  * Created by apl on 02-09-2014.
@@ -44,6 +51,8 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
 
     private RectF buttonRectangle;
     private int mLastProgress = 0;
+
+    private Subscription mRxSubscription = null;
 
     public DownloadButtonView(Context context) {
         super(context);
@@ -114,6 +123,8 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
             addState(PlayerButtonView.STATE_QUEUE, qeueed_icon);
         }
 
+
+
         addDownloadCompletedCallback(new PlayerButtonView.DownloadStatus() {
             @Override
             public void FileComplete() {
@@ -141,7 +152,7 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
         int left = width>height ? (width-rectSize)/2 : 0;
         int top = width<height ? (height-rectSize)/2 : 0;
 
-        buttonRectangle.set(left+BITMAP_OFFSET, top+BITMAP_OFFSET, left + rectSize-BITMAP_OFFSET, top + rectSize-BITMAP_OFFSET);
+        buttonRectangle.set(left + BITMAP_OFFSET, top + BITMAP_OFFSET, left + rectSize - BITMAP_OFFSET, top + rectSize - BITMAP_OFFSET);
 
         if(mProgress!=0 && mProgress < 100) {
             if (getState() != PlayerButtonView.STATE_DEFAULT) {
@@ -162,8 +173,38 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
     }
 
     @Override
+    public synchronized void unsetEpisodeId() {
+        if (mRxSubscription != null && !mRxSubscription.isUnsubscribed()) {
+            mRxSubscription.unsubscribe();
+        }
+        super.unsetEpisodeId();
+    }
+
+    @Override
     public void setEpisode(@NonNull IEpisode argItem) {
         super.setEpisode(argItem);
+
+        if (argItem instanceof FeedItem) {
+
+            FeedItem item = (FeedItem)argItem;
+            mRxSubscription = item._downloadProgressChangeObservable
+                    .sample(16, TimeUnit.MILLISECONDS)
+                    .ofType(DownloadProgress.class)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Action1<DownloadProgress>() {
+                        @Override
+                        public void call(DownloadProgress downloadProgress) {
+                            Log.v(TAG, "Recieved downloadProgress event. Progress: " + downloadProgress.getProgress());
+                            setProgressPercent(downloadProgress);
+                        }
+                    }, new Action1<Throwable>() {
+                        @Override
+                        public void call(Throwable throwable) {
+                            Log.d(TAG, "error: " + throwable.toString());
+                        }
+                    });
+
+        }
 
         setState(calcState());
 
@@ -189,19 +230,24 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
             return;
         }
 
-        mProgress = argProgress.getProgress();
-        if (mProgress == 100) {
+        int newProgress = argProgress.getProgress();
+
+        if (newProgress == 100) {
             if (mDownloadCompletedCallback != null) {
                 mDownloadCompletedCallback.FileComplete();
             }
             setState(PlayerButtonView.STATE_DELETE);
+        } else {
+            if (mProgress != newProgress) {
+                mProgress = newProgress;
+                invalidate();
+                return;
+            }
         }
 
         if (argProgress.getStatus() == org.bottiger.podcast.service.DownloadStatus.DELETED) {
             setState(PlayerButtonView.STATE_DEFAULT);
         }
-
-        this.invalidate();
     }
 
     @Override

@@ -18,9 +18,8 @@ import com.squareup.otto.Subscribe;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.activities.openopml.OpenOpmlAdapter;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.listeners.DownloadProgress;
+import org.bottiger.podcast.model.events.DownloadProgress;
 import org.bottiger.podcast.service.DownloadStatus;
 
 /**

@@ -170,6 +170,7 @@ public class FragmentContainerActivity extends DrawerActivity {
                     //fragment = new DummyFragment();
                 } else if (position == DISCOVER) {
                     fragment = new DiscoveryFragment();
+                    //fragment = new DummyFragment();
                 }
 
 
@@ -190,15 +191,16 @@ public class FragmentContainerActivity extends DrawerActivity {
             boolean HasTinted = false;
             if (activity != null) {
                 if (position == PLAYLIST) {
-                    PlaylistFragment playlistFragment = (PlaylistFragment) mFragments[PLAYLIST];
-                    TopPlayer topPlayer = playlistFragment.getTopPlayer();
-                    if (topPlayer != null && topPlayer.isFullscreen()) {
-                        int color = topPlayer.getBackGroundColor();
-                        UIUtils.tintStatusBar(color, activity);
-                        HasTinted = true;
+                    Fragment fragment = mFragments[PLAYLIST];
+                    if (fragment instanceof PlaylistFragment) {
+                        PlaylistFragment playlistFragment = (PlaylistFragment) fragment;
+                        TopPlayer topPlayer = playlistFragment.getTopPlayer();
+                        if (topPlayer != null && topPlayer.isFullscreen()) {
+                            int color = topPlayer.getBackGroundColor();
+                            UIUtils.tintStatusBar(color, activity);
+                            HasTinted = true;
+                        }
                     }
-                } else {
-
                 }
 
                 if (HasTinted) {

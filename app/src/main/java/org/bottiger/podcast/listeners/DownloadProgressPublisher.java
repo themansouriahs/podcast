@@ -2,13 +2,12 @@ package org.bottiger.podcast.listeners;
 
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.model.events.DownloadProgress;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.DownloadStatus;
@@ -18,7 +17,6 @@ import org.bottiger.podcast.service.Downloader.engines.IDownloadEngine;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 public class DownloadProgressPublisher {

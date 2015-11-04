@@ -47,6 +47,10 @@ public interface IEpisode {
     void setDuration(long argDurationMs);
     void setOffset(@Nullable ContentResolver contentResolver, long i);
 
+    double getProgress();
+    void setProgress(double argProgress);
+    String getURL();
+
     @Nullable
     Uri getFileLocation(@Location int argLocation);
 

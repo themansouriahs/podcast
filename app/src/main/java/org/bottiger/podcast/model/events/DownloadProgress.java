@@ -1,4 +1,4 @@
-package org.bottiger.podcast.listeners;
+package org.bottiger.podcast.model.events;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;

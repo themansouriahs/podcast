@@ -216,6 +216,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
         SoundWaves.getBus().unregister(holder.mPlayPauseButton);
         SoundWaves.getBus().unregister(holder.mDownloadButton);
         super.onViewDetachedFromWindow(holder);
+        holder.mDownloadButton.unsetEpisodeId();
     }
 
     @Override

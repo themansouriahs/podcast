@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.MediaRouteActionProvider;
 import android.support.v7.media.MediaRouteSelector;
-import android.support.v7.media.MediaRouter;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,7 +13,6 @@ import com.squareup.otto.Produce;
 import com.squareup.otto.Subscribe;
 
 import org.bottiger.podcast.flavors.MediaCast.VendorMediaRouteCast;
-import org.bottiger.podcast.listeners.DownloadProgress;
 import org.bottiger.podcast.service.PlayerService;
 
 /**

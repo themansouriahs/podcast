@@ -155,13 +155,18 @@ public class Library {
     }
 
     public void handleChangedEvent(EpisodeChanged argEpisodeChanged) {
-        if (argEpisodeChanged.getAction() == EpisodeChanged.PARSED) {
+        @EpisodeChanged.Action int action = argEpisodeChanged.getAction();
+        if (action == EpisodeChanged.PARSED) {
             if (mEpisodesUrlLUT.containsKey(argEpisodeChanged.getUrl()))
                 return;
         }
 
-        IEpisode episode = getEpisode(argEpisodeChanged.getId());
-        updateEpisode(episode);
+        if (action == EpisodeChanged.CHANGED ||
+            action == EpisodeChanged.ADDED ||
+            action == EpisodeChanged.REMOVED) {
+            IEpisode episode = getEpisode(argEpisodeChanged.getId());
+            updateEpisode(episode);
+        }
     }
 
     public void addEpisode(@Nullable IEpisode argEpisode) {
