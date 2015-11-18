@@ -3,6 +3,7 @@ package org.bottiger.podcast;
 import org.bottiger.podcast.adapters.PlaylistAdapter;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
+import org.bottiger.podcast.model.events.SubscriptionChanged;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.playlist.filters.SubscriptionFilter;
 import org.bottiger.podcast.provider.FeedItem;
@@ -72,6 +73,11 @@ import com.github.ivbaranov.mfb.MaterialFavoriteButton;
 import com.squareup.otto.Produce;
 import com.squareup.otto.Subscribe;
 
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
+
 public class PlaylistFragment extends AbstractEpisodeFragment implements OnSharedPreferenceChangeListener,
                                                                         DrawerActivity.TopFound {
 
@@ -97,10 +103,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
     private PlayPauseImageView mPlayPauseButton;
     private PlayerSeekbar mPlayerSeekbar;
     private DownloadButtonView mPlayerDownloadButton;
-    private PlayerButtonView mForwardButton;
-    private PlayerButtonView mBackButton;
-    private MaterialFavoriteButton mFavoriteButton;
-    private ImageButton mMoreButton;
 
     private RecyclerView mRecyclerView;
     private View mOverlay;
@@ -120,6 +122,8 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
     private Playlist mPlaylist;
     private Context mContext;
+
+    private Subscription mRxPlaylistSubscription;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -184,16 +188,9 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         mPlayPauseButton         =    (PlayPauseImageView) view.findViewById(R.id.playpause);
         mPlayerSeekbar          =    (PlayerSeekbar) view.findViewById(R.id.top_player_seekbar);
         mPlayerDownloadButton   =    (DownloadButtonView) view.findViewById(R.id.download);
-        mBackButton = (PlayerButtonView)view.findViewById(R.id.rewind_button);
-        mForwardButton = (PlayerButtonView)view.findViewById(R.id.fast_forward_button);
-        mFavoriteButton = (MaterialFavoriteButton)view.findViewById(R.id.favorite);
-
-        mMoreButton = (ImageButton) view.findViewById(R.id.player_more_button);
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.my_recycler_view);
         mOverlay = view.findViewById(R.id.playlist_overlay);
-
-        setPlaylistViewState(mPlaylist);
 
         // use a linear layout manager
         mLayoutManager = new CustomLinearLayoutManager(mContext);
@@ -203,17 +200,20 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         mAdapter = new PlaylistAdapter(getActivity(), mOverlay);
         mAdapter.setHasStableIds(true);
 
+
         SoundWaves.getBus().register(mAdapter);
         SoundWaves.getBus().register(mPlayPauseButton);
         SoundWaves.getBus().register(mPlayerSeekbar);
         SoundWaves.getBus().register(mCurrentTime);
 
+
+        setPlaylistViewState(mPlaylist);
+        producePlaylist();
+
+
         mRecyclerView.setAdapter(mAdapter);
 
-        if (mPlaylist != null && !mPlaylist.isEmpty()) {
-            IEpisode episode = mPlaylist.first();
-            bindHeader(episode);
-        }
+        bindHeaderWrapper(mPlaylist);
 
         mPopulateManually.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -372,18 +372,32 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
     public void onStart() {
         Log.d(TAG, "onStart");
         super.onStart();
+        mRxPlaylistSubscription = SoundWaves.getPlaylistObservabel()
+                .subscribe(new Action1<Playlist>() {
+                    @Override
+                    public void call(Playlist playlistChanged) {
+                        Log.d(TAG, "mRxPlaylistSubscription event recieved");
+                        playlistChanged(playlistChanged);
+                    }
+                });
+        Log.d(TAG, "mRxPlaylistSubscription isUnsubscribed: " + mRxPlaylistSubscription.isUnsubscribed());
     }
 
     @Override
     public void onStop() {
         Log.d(TAG, "onStop");
         super.onStop();
+        /*
+        if (mRxPlaylistSubscription != null && mRxPlaylistSubscription.isUnsubscribed()) {
+            mRxPlaylistSubscription.unsubscribe();
+        }
+        */
     }
 
     @Override
     public void onPause() {
         Log.d(TAG, "onPause");
-        SoundWaves.getBus().unregister(this);
+        //SoundWaves.getBus().unregister(this);
         super.onPause();
         //SoundWaves.getBus().unregister(this);
         if (mPlaylist != null && mPlaylist.getItem(0) != null){
@@ -398,21 +412,23 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
     @Override
     public void onResume() {
         Log.d(TAG, "onResume");
+
         SoundWaves.getBus().register(this);
-        //SoundWaves.getBus().register(this);
         if (mPlaylist != null) {
             IEpisode item = mPlaylist.getItem(0);
 
             if (item != null) {
-                mPlayPauseButton.setEpisode(item, PlayPauseImageView.PLAYLIST);
-                //mBackButton.setEpisode(item);
-                //mForwardButton.setEpisode(item);
-                mPlayerDownloadButton.setEpisode(item);
-                //mFavoriteButton.setEpisode(item);
-                SoundWaves.getBus().register(mPlayerDownloadButton);
+                if (mPlayPauseButton != null)
+                    mPlayPauseButton.setEpisode(item, PlayPauseImageView.PLAYLIST);
+
+                if (mPlayerDownloadButton != null) {
+                    mPlayerDownloadButton.setEpisode(item);
+                    SoundWaves.getBus().register(mPlayerDownloadButton);
+                }
             }
             playlistChanged(mPlaylist);
         }
+
         super.onResume();
     }
 
@@ -448,6 +464,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         mPlayPauseButton.setEpisode(item, PlayPauseImageView.PLAYLIST);
         //mBackButton.setEpisode(item);
         //mForwardButton.setEpisode(item);
+
         mPlayerDownloadButton.setEpisode(item);
         //mFavoriteButton.setEpisode(item);
 
@@ -624,12 +641,14 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
         switch (item.getItemId()) {
             case R.id.action_fullscreen_player: {
-                if (mTopPlayer.isFullscreen()) {
-                    item.setTitle(R.string.action_exit_fullscreen);
-                    item.setIcon(R.drawable.ic_fullscreen_exit_white_24px);
-                } else {
-                    item.setTitle(R.string.action_enter_fullscreen);
-                    item.setIcon(R.drawable.ic_fullscreen_white_24px);
+                if (mTopPlayer != null) {
+                    if (mTopPlayer.isFullscreen()) {
+                        item.setTitle(R.string.action_exit_fullscreen);
+                        item.setIcon(R.drawable.ic_fullscreen_exit_white_24px);
+                    } else {
+                        item.setTitle(R.string.action_enter_fullscreen);
+                        item.setIcon(R.drawable.ic_fullscreen_white_24px);
+                    }
                 }
                 break;
             }
@@ -644,8 +663,11 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 		}
 	}
 
-    @Produce
+
+    //@Produce
     public Playlist producePlaylist() {
+
+
         Playlist playlist = mPlaylist;
 
         if (playlist != null)
@@ -659,8 +681,10 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         return mPlaylist;
     }
 
-    @Subscribe
+
+    //@Subscribe
     public void playlistChanged(@NonNull Playlist argPlaylist) {
+
         mPlaylist = argPlaylist;
 
         if (mPlaylistContainer == null)
@@ -668,8 +692,13 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
         setPlaylistViewState(mPlaylist);
 
-        if (!mPlaylist.isEmpty()) {
-            IEpisode episode = mPlaylist.first();
+        bindHeaderWrapper(mPlaylist);
+    }
+
+    private void bindHeaderWrapper(@Nullable Playlist argPlyalist) {
+
+        if (argPlyalist != null && !argPlyalist.isEmpty()) {
+            IEpisode episode = argPlyalist.first();
             bindHeader(episode);
         }
     }

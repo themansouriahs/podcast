@@ -195,10 +195,15 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
     public void setEpisode(@NonNull IEpisode argEpisode) {
         mEpisode = argEpisode;
 
+        int progress = 0;
+
         if (mEpisode.getOffset() > 0 && mEpisode.getDuration() > 0) {
-            float progress = (float)mEpisode.getOffset() / mEpisode.getDuration();
-            setProgress((int)(progress*RANGE_MAX));
+            float progressf = (float)mEpisode.getOffset() / mEpisode.getDuration();
+            //setProgress();
+            progress = (int)(progressf*RANGE_MAX);
         }
+
+        setProgress(progress);
     }
 
     public void setOverlay(View argLayout) {
@@ -249,6 +254,7 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
                 Log.v(TAG, "Overlay: loc0 => " + loc[0] + " loc0 => " + loc[1]);
                 mOverlay.setLayoutParams(params);
                 mOverlay.setVisibility(VISIBLE);
+                mOverlay.bringToFront(); // FIXME it would be nice if we could remove this
             }
         } else {
             Log.d("PlayerSeekbar", "Remove seekinfo");

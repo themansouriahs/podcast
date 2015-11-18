@@ -186,10 +186,11 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
 
         if (argItem instanceof FeedItem) {
 
+
             FeedItem item = (FeedItem)argItem;
             mRxSubscription = item._downloadProgressChangeObservable
-                    .sample(16, TimeUnit.MILLISECONDS)
                     .ofType(DownloadProgress.class)
+                    .sample(500, TimeUnit.MILLISECONDS)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Action1<DownloadProgress>() {
                         @Override
@@ -203,6 +204,9 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
                             Log.d(TAG, "error: " + throwable.toString());
                         }
                     });
+
+            // .sample(16, TimeUnit.MILLISECONDS)
+
 
         }
 

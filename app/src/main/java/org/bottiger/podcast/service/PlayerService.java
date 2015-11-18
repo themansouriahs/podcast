@@ -45,6 +45,7 @@ import android.util.Log;
 
 import com.squareup.otto.Subscribe;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -340,10 +341,18 @@ public class PlayerService extends Service implements
 		String dataSource = null;
 		String dataSourceUrl = mItem.getUrl().toString();
 		try {
-			dataSource = mItem.isDownloaded() ? feedItem.getAbsolutePath()
-                    : dataSourceUrl;
-		} catch (IOException e) {
-			dataSource = dataSourceUrl;
+			if (mItem.isDownloaded() && feedItem != null) {
+				String path = feedItem.getAbsolutePath();
+				File file = new File(path);
+				if (file.exists()) {
+					dataSource = path;
+				}
+			}
+		} catch (IOException ignored) {
+		} finally {
+			if (dataSource == null) {
+				dataSource = dataSourceUrl;
+			}
 		}
 
 		int offset = mItem.getOffset() < 0 ? 0 : (int) mItem.getOffset();

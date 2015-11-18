@@ -43,6 +43,10 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.squareup.otto.Subscribe;
 
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
+
 public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> {
 
     private static final String TAG = "PlaylistAdapter";
@@ -66,7 +70,38 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         mInflater = (LayoutInflater) mActivity
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
+
+        SoundWaves.getPlaylistObservabel()
+                .subscribe(new Action1<Playlist>() {
+                    @Override
+                    public void call(Playlist playlistChanged) {
+                        Log.d(TAG, "mRxPlaylistSubscription event recieved");
+                        playlistChanged(playlistChanged);
+                    }
+                });
+
+
+        producePlaylist();
         notifyDataSetChanged();
+
+
+
+    }
+
+    public Playlist producePlaylist() {
+
+
+        Playlist playlist = mPlaylist;
+
+        if (playlist != null)
+            return playlist;
+
+        PlayerService service = PlayerService.getInstance();
+        if (service != null) {
+            mPlaylist = service.getPlaylist();
+        }
+
+        return mPlaylist;
     }
 
     @Override
@@ -369,7 +404,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         return (long)url.hashCode();
 	}
 
-    @Subscribe
+    //@Subscribe
     public void playlistChanged(@NonNull Playlist argPlaylist) {
         mPlaylist = argPlaylist;
         notifyDataSetChanged();

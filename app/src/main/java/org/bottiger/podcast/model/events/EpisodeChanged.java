@@ -12,13 +12,14 @@ import java.lang.annotation.RetentionPolicy;
 public class EpisodeChanged implements ItemChanged {
 
     @Retention(RetentionPolicy.SOURCE)
-    @IntDef({ADDED, REMOVED, CHANGED, PARSED, PROGRESS})
+    @IntDef({ADDED, REMOVED, CHANGED, PARSED, PROGRESS, DOWNLOADED})
     public @interface Action {}
     public static final int ADDED = 1;
     public static final int REMOVED = 2;
     public static final int CHANGED = 3;
     public static final int PARSED = 4;
     public static final int PROGRESS = 5;
+    public static final int DOWNLOADED = 6;
 
     private long id;
     private String url;

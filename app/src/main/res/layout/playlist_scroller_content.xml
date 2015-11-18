@@ -6,6 +6,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/tools">
 
+
     <org.bottiger.podcast.views.TopPlayer
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:visibility="visible"
@@ -21,6 +22,8 @@
         android:elevation="5dp"
         >
 
+
+
         <LinearLayout
             android:id="@+id/top_player_controls"
             android:layout_width="match_parent"
@@ -31,6 +34,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 >
+
 
                 <com.github.ivbaranov.mfb.MaterialFavoriteButton
                     xmlns:custom="http://schemas.android.com/apk/res/org.bottiger.podcast"
@@ -49,6 +53,7 @@
                     custom:mfb_rotation_duration="100"
                     custom:mfb_bounce_duration="150"
                     />
+
 
             <TextView
                 android:id="@+id/player_title"
@@ -134,7 +139,7 @@
                 android:layout_height="wrap_content"
                 >
 
-                <!-- buttons -->
+
                 <FrameLayout
                     android:id="@+id/play_button_container"
                     app:layout_widthPercent="25%"
@@ -176,6 +181,7 @@
 
                 </FrameLayout>
 
+
                 <net.steamcrafted.materialiconlib.MaterialIconView
                     android:id="@+id/top_player_rewind"
                     app:layout_widthPercent="20%"
@@ -205,6 +211,8 @@
                     android:layout_alignBottom="@id/play_button_container"
                     android:layout_toRightOf="@id/play_button_container"
                     android:layout_toEndOf="@id/play_button_container"/>
+
+
 
                 <ImageButton
                     android:id="@+id/player_more_button"
@@ -241,6 +249,8 @@
                 </RelativeLayout>
 
 
+
+
                 <FrameLayout
                     android:id="@+id/visual_triangle"
                     android:visibility="gone"
@@ -263,6 +273,7 @@
 
                 </FrameLayout>
 
+
             </android.support.percent.PercentRelativeLayout>
 
         </LinearLayout>
@@ -272,6 +283,7 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:layout_marginBottom="10dp">
+
 
             <LinearLayout
                 android:id="@+id/expanded_action_bar"
@@ -312,6 +324,7 @@
                     />
 
             </LinearLayout>
+
 
         <org.bottiger.podcast.views.ImageViewTinted
             android:id="@+id/session_photo"

@@ -25,7 +25,7 @@ public class RxBus {
     }
 
     public Observable<Object> toObserverable() {
-        return _bus.throttleLast(1, TimeUnit.SECONDS);
+        return _bus;
     }
 
     public boolean hasObservers() {

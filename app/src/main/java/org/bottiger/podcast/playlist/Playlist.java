@@ -43,6 +43,8 @@ import com.squareup.otto.Subscribe;
 
 public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListener {
 
+    private static final String TAG = "Playlist";
+
     public static final boolean SHOW_LISTENED_DEFAULT = true;
     public static final boolean SHOW_ONLY_DOWNLOADED  = false;
     public static final boolean PLAY_NEXT_DEFAULT     = false;
@@ -638,13 +640,15 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
     }
 
     public void notifyPlaylistChanged() {
+        Log.d(TAG, "notifyPlaylistChanged");
+        SoundWaves.getRxBus().send(this);
         SoundWaves.getBus().post(this);
     }
 
     @Subscribe
     public void onPlaylistChanged(@NonNull PlaylistData argPlaylistData) {
         if (argPlaylistData.showListened != null) {
-            setShowListened(argPlaylistData.showListened.booleanValue());
+            setShowListened(argPlaylistData.showListened);
         }
 
         if (argPlaylistData.sortOrder != NOT_SET) {

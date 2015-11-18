@@ -204,6 +204,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
     @SuppressWarnings("ResourceType")
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+
         if (sizeLarge > 0 && !mFullscreen){
             int hSize = MeasureSpec.getSize(heightMeasureSpec);
             int hMode = MeasureSpec.getMode(heightMeasureSpec);
@@ -221,6 +222,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
             }
         }
 
+
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         setMeasuredDimension(widthMeasureSpec, heightMeasureSpec);
     }
@@ -228,6 +230,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
+
 
         mLayout = (TopPlayer) findViewById(R.id.top_player);
         mControls = (LinearLayout) findViewById(R.id.top_player_controls);
@@ -294,6 +297,9 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
             }
         });
 
+
+
+
         mRewindButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -304,6 +310,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
             }
         });
 
+
         mFastForwardButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -313,6 +320,8 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
                 }
             }
         });
+
+
 
         mFullscreenButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -347,6 +356,8 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
                 dialogPlaybackSpeed.show(activity.getFragmentManager(), DialogPlaybackSpeed.class.getName());
             }
         });
+
+
     }
 
     @Override
@@ -364,6 +375,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
                         mSpeedpButton.setText(playbackSpeedChanged.speed + "X");
                     }
                 });
+
     }
 
     @Override

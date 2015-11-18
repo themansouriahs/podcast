@@ -587,7 +587,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 
 		isDownloaded = argIsDownloaded;
 		setHasBeenDownloadedOnce(true);
-		notifyPropertyChanged(EpisodeChanged.CHANGED);
+		notifyPropertyChanged(EpisodeChanged.DOWNLOADED);
 	}
 
 	/**
@@ -1020,7 +1020,16 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 			SoundWaves.getRxBus().send(new EpisodeChanged(getId(), getURL(), argAction));
 		}
 
-		if (argAction == EpisodeChanged.PROGRESS && (System.currentTimeMillis()-lastUpdate2)>16) {
+		if (argAction == EpisodeChanged.DOWNLOADED) {
+			boolean isDownloaded = isDownloaded();
+			DownloadStatus downloadStatus = isDownloaded ? DownloadStatus.DONE : DownloadStatus.DELETED;
+			int progress = isDownloaded ? 100 : 0;
+			progressChanged = new DownloadProgress(this, downloadStatus, progress);
+			Log.d(TAG, "Notify progress changed: FeedItemHash: " + hashCode() + " progress: DONE");
+			_downloadProgressChangeObservable.onNext(progressChanged);
+		}
+
+		if (argAction == EpisodeChanged.PROGRESS && !isDownloaded() && (System.currentTimeMillis()-lastUpdate2)>16) {
 			lastUpdate2 = System.currentTimeMillis();
 			progressChanged = new DownloadProgress(this, DownloadStatus.DOWNLOADING, (int)getProgress());
 			Log.d(TAG, "Notify progress changed: FeedItemHash: " + hashCode() + " progress: " + (int)getProgress());

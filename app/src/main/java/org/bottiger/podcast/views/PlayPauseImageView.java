@@ -188,7 +188,6 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
 
         long offset = mEpisode instanceof FeedItem && ((FeedItem)mEpisode).offset > 0 ? ((FeedItem)mEpisode).offset : 0;
         setProgressMs(new PlayerStatusProgressData(offset));
-        invalidate();
     }
 
     public synchronized void unsetEpisodeId() {

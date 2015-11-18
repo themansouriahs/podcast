@@ -18,10 +18,15 @@ import com.squareup.otto.ThreadEnforcer;
 import org.bottiger.podcast.flavors.Analytics.AnalyticsFactory;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.CrashReporterFactory;
+import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.rxbus.RxBus;
+
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class SoundWaves extends Application {
 
@@ -124,13 +129,6 @@ public class SoundWaves extends Application {
         startService(serviceIntent);
         Intent bindIntent = new Intent(this, PlayerService.class);
         bindService(bindIntent, playerServiceConnection, Context.BIND_AUTO_CREATE);
-
-        /*
-        Intent soundServiceIntent = new Intent(this, SoundService.class);
-        startService(soundServiceIntent);
-        Intent soundBindIntent = new Intent(this, SoundService.class);
-        bindService(soundBindIntent, soundEngineServiceConnection, Context.BIND_AUTO_CREATE);
-        */
     }
 
     private void firstRun(@NonNull Context argContext) {
@@ -140,7 +138,7 @@ public class SoundWaves extends Application {
         if (firstRun) {
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putBoolean(key, false);
-            editor.commit();
+            editor.apply();
         }
         mFirstRun = firstRun;
     }
@@ -150,7 +148,7 @@ public class SoundWaves extends Application {
             throw new IllegalStateException("First run can not be null!");
         }
 
-        return mFirstRun.booleanValue();
+        return mFirstRun;
     }
 
     public static Bus getBus() {
@@ -177,5 +175,21 @@ public class SoundWaves extends Application {
         }
 
         return sLibrary;
+    }
+
+
+    private static Observable<Playlist> sPlaylistObservabel;
+
+    @NonNull
+    public static Observable<Playlist> getPlaylistObservabel() {
+        if (sPlaylistObservabel == null) {
+            sPlaylistObservabel = SoundWaves.getRxBus()
+                    .toObserverable()
+                    .ofType(Playlist.class)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+        }
+
+        return sPlaylistObservabel;
     }
 }

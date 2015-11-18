@@ -61,7 +61,6 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
         mRecyclerView.setTranslationY(height);
 
         Log.v(TAG, "onLayoutChild, child: " + child.getClass().getName() + " layoutDirection: " + layoutDirection + " height: " + height);
-
         return false;
     }
 
