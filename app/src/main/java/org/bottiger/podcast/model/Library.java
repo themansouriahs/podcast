@@ -450,11 +450,13 @@ public class Library {
                 }
             }
 
+            argSubscription.setIsRefreshing(true);
             while (cursor.moveToNext()) {
                 FeedItem item = LibraryPersistency.fetchEpisodeFromCursor(cursor, emptyItems[counter]);
                 addEpisode(item);
                 counter++;
             }
+            argSubscription.setIsRefreshing(false);
 
             argSubscription.setIsLoaded(true);
         } finally {

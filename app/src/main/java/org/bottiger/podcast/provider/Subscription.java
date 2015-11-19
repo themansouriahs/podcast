@@ -494,7 +494,6 @@ public class Subscription implements ISubscription, PaletteListener {
 		notifyPropertyChanged();
 	}
 
-
 	/**
 	 * http://stackoverflow.com/questions/4549131/bitmask-question
 	 *
