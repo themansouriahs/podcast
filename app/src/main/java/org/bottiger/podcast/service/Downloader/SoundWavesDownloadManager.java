@@ -55,6 +55,9 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+import rx.subjects.PublishSubject;
+import rx.subjects.SerializedSubject;
+import rx.subjects.Subject;
 
 public class SoundWavesDownloadManager extends Observable {
 
@@ -109,6 +112,7 @@ public class SoundWavesDownloadManager extends Observable {
     private LinkedList<QueueEpisode> mDownloadQueue = new LinkedList<>();
 
     private rx.Subscription _subscription;
+    private Subject<QueueEpisode, QueueEpisode> _subject;
 
 	private IEpisode mDownloadingItem = null;
     private IDownloadEngine mEngine = null;
@@ -120,6 +124,15 @@ public class SoundWavesDownloadManager extends Observable {
         mContext = argContext;
         mDownloadCompleteCallback = new DownloadCompleteCallback(argContext);
         mProgressPublisher = new DownloadProgressPublisher((SoundWaves) SoundWaves.getAppContext(), this);
+
+        PublishSubject<QueueEpisode> publishSubject = PublishSubject.create();
+        _subject = new SerializedSubject<>(publishSubject);
+
+        _subscription = _subject
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(Schedulers.io())
+                        .subscribe(_getObserver());                             // Observer
+
     }
 
     public static @SoundWavesDownloadManager.MimeType int getFileType(@Nullable String argMimeType) {
@@ -224,9 +237,11 @@ public class SoundWavesDownloadManager extends Observable {
 
         @NetworkState int networkState = updateConnectStatus(mContext);
 
-        mQueueLock.lock();
+        FeedItem downloadingItem;
         try {
-            FeedItem downloadingItem = SoundWaves.getLibraryInstance().getEpisode(nextInQueue.getId());
+            mQueueLock.lock();
+
+            downloadingItem = SoundWaves.getLibraryInstance().getEpisode(nextInQueue.getId());
 
             if (downloadingItem == null)
                 return;
@@ -242,19 +257,19 @@ public class SoundWavesDownloadManager extends Observable {
             if (nextInQueue.IsStartedManually() && !(networkState == NETWORK_OK || networkState == NETWORK_RESTRICTED)) {
                 return;
             }
-
-            mEngine = newEngine(downloadingItem);
-            mEngine.addCallback(mDownloadCompleteCallback);
-
-            mDownloadingItem = downloadingItem;
-
-            Log.d(TAG, "Start downloading: " + downloadingItem);
-            mEngine.startDownload();
-
-            mProgressPublisher.addEpisode(downloadingItem);
         } finally {
             mQueueLock.unlock();
         }
+
+        mEngine = newEngine(downloadingItem);
+        mEngine.addCallback(mDownloadCompleteCallback);
+
+        mDownloadingItem = downloadingItem;
+
+        Log.d(TAG, "Start downloading: " + downloadingItem);
+        mEngine.startDownload();
+
+        mProgressPublisher.addEpisode(downloadingItem);
 
         return;
 	}
@@ -508,8 +523,8 @@ public class SoundWavesDownloadManager extends Observable {
 	 */
 	public void addItemToQueue(IEpisode argEpisode, @QueuePosition int argPosition) {
         Log.d(TAG, "Adding item to queue: " + argEpisode);
-        mQueueLock.lock();
         try {
+            mQueueLock.lock();
 
             if (!(argEpisode instanceof FeedItem)) {
                 return;
@@ -519,11 +534,7 @@ public class SoundWavesDownloadManager extends Observable {
             queueItem.setStartedManually(argPosition == STARTED_MANUALLY);
 
             mDownloadQueue.add(queueItem);
-
-            _subscription = _getDownloadObservable(queueItem)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(_getObserver());                             // Observer
+            _subject.onNext(queueItem);
 
         } finally {
             postQueueChangedEvent();
@@ -536,8 +547,9 @@ public class SoundWavesDownloadManager extends Observable {
      */
     public void removeFromQueue(IEpisode argEpisode) {
 
-        mQueueLock.lock();
         try {
+            mQueueLock.lock();
+
             IEpisode episode;
             QueueEpisode qEpisode;
             for (int i = 0; i < mDownloadQueue.size(); i++) {
@@ -570,8 +582,9 @@ public class SoundWavesDownloadManager extends Observable {
             return false;
         }
 
-        mQueueLock.lock();
         try {
+            mQueueLock.lock();
+
             QueueEpisode episode = mDownloadQueue.get(from);
             mDownloadQueue.remove(from);
             mDownloadQueue.add(to, episode);
@@ -680,6 +693,12 @@ public class SoundWavesDownloadManager extends Observable {
         });
     }
 
+    private boolean downloadEpisode(final QueueEpisode argQueueItem) {
+        mDownloadQueue.remove(argQueueItem);
+        startDownload(argQueueItem);
+        return true;
+    }
+
     /**
      * Observer that handles the result through the 3 important actions:
      *
@@ -693,22 +712,17 @@ public class SoundWavesDownloadManager extends Observable {
             @Override
             public void onCompleted() {
                 Log.d(TAG, "On complete");
-                //_log("On complete");
-                //_progress.setVisibility(View.INVISIBLE);
             }
 
             @Override
             public void onError(Throwable e) {
                 Log.d(TAG, "Boo! Error " + e.getMessage());
-                //Timber.e(e, "Error in RxJava Demo concurrency");
-                //_log(String.format("Boo! Error %s", e.getMessage()));
-                //_progress.setVisibility(View.INVISIBLE);
             }
 
             @Override
             public void onNext(QueueEpisode queueEpisode) {
                 Log.d(TAG, "onNext with return value " + queueEpisode);
-                //_log(String.format("onNext with return value \"%b\"", bool));
+                downloadEpisode(queueEpisode);
             }
         };
     }
@@ -719,20 +733,6 @@ public class SoundWavesDownloadManager extends Observable {
         Log.d(TAG, "posting DownloadManagerChanged event");
         SoundWaves.getRxBus().send(event);
         Log.d(TAG, "DownloadManagerChanged event posted");
-        /*
-        Handler handler = new Handler(Looper.getMainLooper());
-        if (Looper.myLooper() == Looper.getMainLooper()) {
-
-        } else {
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    SoundWaves.getBus().post(event);
-                    Log.d(TAG, "DownloadManagerChanged event posted");
-                }
-            });
-        }
-        */
     }
 
     public static class DownloadManagerChanged {

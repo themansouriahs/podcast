@@ -1,5 +1,6 @@
 package org.bottiger.podcast.provider;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 /**

@@ -31,6 +31,8 @@ import java.util.concurrent.TimeUnit;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by apl on 02-09-2014.
@@ -181,7 +183,7 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
     }
 
     @Override
-    public void setEpisode(@NonNull IEpisode argItem) {
+    public void setEpisode(@NonNull final IEpisode argItem) {
         super.setEpisode(argItem);
 
         if (argItem instanceof FeedItem) {
@@ -191,6 +193,13 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
             mRxSubscription = item._downloadProgressChangeObservable
                     .ofType(DownloadProgress.class)
                     .sample(500, TimeUnit.MILLISECONDS)
+                    .filter(new Func1<DownloadProgress, Boolean>() {
+                        @Override
+                        public Boolean call(DownloadProgress downloadProgress) {
+                            return argItem.equals(downloadProgress.getEpisode());
+                        }
+                    })
+                    .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Action1<DownloadProgress>() {
                         @Override

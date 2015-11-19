@@ -1029,7 +1029,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 			_downloadProgressChangeObservable.onNext(progressChanged);
 		}
 
-		if (argAction == EpisodeChanged.PROGRESS && !isDownloaded() && (System.currentTimeMillis()-lastUpdate2)>16) {
+		if (argAction == EpisodeChanged.PROGRESS && !isDownloaded() && (System.currentTimeMillis()-lastUpdate2)>160) {
 			lastUpdate2 = System.currentTimeMillis();
 			progressChanged = new DownloadProgress(this, DownloadStatus.DOWNLOADING, (int)getProgress());
 			Log.d(TAG, "Notify progress changed: FeedItemHash: " + hashCode() + " progress: " + (int)getProgress());
