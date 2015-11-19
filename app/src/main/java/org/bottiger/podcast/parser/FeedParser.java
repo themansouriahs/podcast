@@ -17,6 +17,7 @@ import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.utils.DateUtils;
+import org.bottiger.podcast.utils.StrUtils;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -133,9 +134,12 @@ public class FeedParser {
             parser.setInput(in, null);
             parser.nextTag();
             return readFeed(parser, argSubscription);
+        } catch (Exception parseException) {
+            Log.d(TAG, parseException.toString());
         } finally {
             in.close();
         }
+        return argSubscription;
     }
 
     private ISubscription readFeed(XmlPullParser parser, @NonNull ISubscription argSubscription) throws XmlPullParserException, IOException {
@@ -403,8 +407,10 @@ public class FeedParser {
             }
             case ITUNES_IMAGE_TAG: {
                 String image = parser.getAttributeValue(null, ITUNES_IMAGE_HREF);
-                URL url = new URL(image);
-                episode.setArtwork(url);
+                if (StrUtils.isValidUrl(image)) {
+                    URL url = new URL(image);
+                    episode.setArtwork(url);
+                }
                 parser.nextTag();
                 break;
             }

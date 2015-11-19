@@ -20,6 +20,7 @@ import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -219,6 +220,8 @@ public class FeedActivity extends TopActivity implements PaletteListener {
         if (mSubscription == null) {
             throw new IllegalStateException("Subscription can not be null");
         }
+
+        Log.d(TAG, "Showing: " + mSubscription);
 
         // Show QuickContact in front of soft input
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM,
