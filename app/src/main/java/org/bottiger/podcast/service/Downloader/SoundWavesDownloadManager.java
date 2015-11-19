@@ -371,9 +371,7 @@ public class SoundWavesDownloadManager extends Observable {
 
 						if (deleteFile) {
 							item.setDownloaded(false);
-                            //SoundWaves.getLibraryInstance().updateEpisode(item);
 						}
-						//cursor.moveToNext();
 					}
 				}
 
@@ -518,6 +516,8 @@ public class SoundWavesDownloadManager extends Observable {
             }
 
             QueueEpisode queueItem = new QueueEpisode((FeedItem)argEpisode);
+            queueItem.setStartedManually(argPosition == STARTED_MANUALLY);
+
             mDownloadQueue.add(queueItem);
 
             _subscription = _getDownloadObservable(queueItem)
