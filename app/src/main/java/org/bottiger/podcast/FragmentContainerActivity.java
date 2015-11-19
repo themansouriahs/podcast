@@ -208,6 +208,7 @@ public class FragmentContainerActivity extends DrawerActivity {
                 } else {
                     mSlidingTabLayout.bringToFront();
                     UIUtils.resetStatusBar(activity);
+                    mViewPager.bringToFront();
                 }
             }
             super.setPrimaryItem(container, position, object);

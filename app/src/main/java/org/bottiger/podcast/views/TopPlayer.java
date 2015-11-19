@@ -108,6 +108,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
     private ImageView mFastForwardButton;
     private ImageView mRewindButton;
     private ImageButton mMoreButton;
+    private PlayerSeekbar mPlayerSeekbar;
 
     private View mTriangle;
     private LinearLayout mExpandedActionsBar;
@@ -250,6 +251,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         mRewindButton = (ImageView) findViewById(R.id.top_player_rewind);
         mPhoto = (ImageViewTinted) findViewById(R.id.session_photo);
         mMoreButton = (ImageButton) findViewById(R.id.player_more_button);
+        mPlayerSeekbar = (PlayerSeekbar) findViewById(R.id.top_player_seekbar);
 
         mTriangle = findViewById(R.id.visual_triangle);
         mExpandedActionsBar = (LinearLayout) findViewById(R.id.expanded_action_bar);
@@ -622,6 +624,17 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
 
         setPlayerHeight(sizeLarge);
         ((MainActivity)getContext()).exitFullScreen(mLayout);
+
+        /*
+        mLayout.bringToFront();
+        ((MainActivity)getContext()).goFullScreen(mLayout, mBackgroundColor);
+
+        View view = mPlayerSeekbar.getViewOverlay();
+        if (view != null) {
+            view.bringToFront();
+        }
+        */
+
     }
 
     public boolean isFullscreen() {

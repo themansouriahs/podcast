@@ -11,6 +11,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.graphics.Palette;
 import android.util.AttributeSet;
@@ -213,6 +214,11 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
         mForwards =  (TextView) mOverlay.findViewById(R.id.seekbar_time_forward);
     }
 
+    @Nullable
+    public View getViewOverlay() {
+        return mOverlay;
+    }
+
     public IEpisode getEpisode() {
         validateState();
         return mEpisode;
@@ -254,7 +260,6 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
                 Log.v(TAG, "Overlay: loc0 => " + loc[0] + " loc0 => " + loc[1]);
                 mOverlay.setLayoutParams(params);
                 mOverlay.setVisibility(VISIBLE);
-                mOverlay.bringToFront(); // FIXME it would be nice if we could remove this
             }
         } else {
             Log.d("PlayerSeekbar", "Remove seekinfo");
