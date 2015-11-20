@@ -131,6 +131,11 @@ public class SlimSubscription implements ISubscription, Parcelable {
 
     }
 
+    @Override
+    public boolean isListOldestFirst() {
+        return false;
+    }
+
     public SortedList<SlimEpisode> getEpisodes() {
         return mEpisodes;
     }

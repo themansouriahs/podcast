@@ -72,6 +72,8 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
         mActivity = activity;
         mSubscription = argSubscription;
 
+        mSortOrder = mSubscription.isListOldestFirst() ? OLDEST_FIRST : RECENT_FIRST;
+
         mInflater = (LayoutInflater) activity
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -123,7 +125,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
 
     @Override
     public void onBindViewHolder(EpisodeViewHolder viewHolder, final int position) {
-        int dataPosition = getDatasetPosition(position);
+        int dataPosition = position; //getDatasetPosition(position);
         final IEpisode item = getItemForPosition(dataPosition);
         final EpisodeViewHolder episodeViewHolder = viewHolder;
 
@@ -237,6 +239,9 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
     }
 
     protected IEpisode getItemForPosition(int argPosition) {
+        if (mSubscription.isListOldestFirst()) {
+            argPosition = getDatasetPosition(argPosition);
+        }
         return mSubscription.getEpisodes().get(argPosition);
     }
 

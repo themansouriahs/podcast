@@ -57,6 +57,8 @@ public interface ISubscription {
     boolean IsRefreshing();
     void setIsRefreshing(boolean argIsRefreshing);
 
+    boolean isListOldestFirst();
+
     @Type int getType();
     @ColorInt int getPrimaryColor();
 }

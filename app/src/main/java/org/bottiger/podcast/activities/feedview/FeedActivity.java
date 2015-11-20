@@ -465,8 +465,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
         String url = b.getString(SUBSCRIPTION_URL_KEY);
 
         if (isSlim) {
-            SlimSubscription slimSubscription = b.getParcelable(SUBSCRIPTION_SLIM_KEY);
-            mSubscription = slimSubscription;
+            mSubscription = b.<SlimSubscription>getParcelable(SUBSCRIPTION_SLIM_KEY);
             mIsSlimSubscription = true;
         } else {
             mSubscription = SoundWaves.getLibraryInstance().getSubscription(url);
