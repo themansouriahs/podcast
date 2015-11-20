@@ -86,17 +86,9 @@ public class PodcastUpdateJobService extends JobService {
                     } else {
                         Log.w(TAG, "EpisodeDate not set");
                     }
-
-                    /*
-                    float buffer = 1.2f;
-                    long minutes = TimeUnit.MILLISECONDS.toMinutes(now - createdAt);
-                    if (minutes <= PodcastUpdater.UPDATE_FREQUENCY_MIN*buffer) {
-                        downloadManager.addItemToQueue(episode, SoundWavesDownloadManager.ANYWHERE);
-                    }
-                    */
                 }
 
-                SoundWavesDownloadManager.removeExpiredDownloadedPodcasts(PodcastUpdateJobService.this);
+                //SoundWavesDownloadManager.removeExpiredDownloadedPodcasts(PodcastUpdateJobService.this);
 
             }
         });

@@ -188,7 +188,6 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
 
         if (argItem instanceof FeedItem) {
 
-
             FeedItem item = (FeedItem)argItem;
             mRxSubscription = item._downloadProgressChangeObservable
                     .ofType(DownloadProgress.class)
@@ -213,8 +212,6 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
                             Log.d(TAG, "error: " + throwable.toString());
                         }
                     });
-
-            // .sample(16, TimeUnit.MILLISECONDS)
 
 
         }

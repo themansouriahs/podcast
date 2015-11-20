@@ -9,7 +9,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Handler;
 
+import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.TopActivity;
@@ -39,6 +41,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.support.annotation.MainThread;
@@ -303,8 +306,8 @@ public class SoundWavesDownloadManager extends Observable {
 	 * Removes all the expired downloads async
 	 */
 	public static void removeExpiredDownloadedPodcasts(Context context) {
-		new removeExpiredDownloadedPodcastsTask(context).execute();
-	}
+        removeExpiredDownloadedPodcastsTask(context);
+    }
 
     public static boolean removeTmpFolderCruft() {
         String tmpFolder;
@@ -329,26 +332,19 @@ public class SoundWavesDownloadManager extends Observable {
 	 *
 	 * @return Void
 	 */
-	private static class removeExpiredDownloadedPodcastsTask extends
-			AsyncTask<Void, Integer, Void> {
+    @WorkerThread
+    private static void removeExpiredDownloadedPodcastsTask(Context context) {
 
-		Context mContext = null;
-
-		public removeExpiredDownloadedPodcastsTask(Context context) {
-			mContext = context;
-		}
-
-		// Do the long-running work in here
-		@Override
-		protected Void doInBackground(Void... params) {
-			Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+            if (BuildConfig.DEBUG && Looper.myLooper() == Looper.getMainLooper()) {
+                throw new IllegalStateException("Should not be executed on main thread!");
+            }
 
 			if (!SDCardManager.getSDCardStatus()) {
-				return null;
+				return;
 			}
 
 			SharedPreferences sharedPreferences = PreferenceManager
-					.getDefaultSharedPreferences(mContext);
+					.getDefaultSharedPreferences(context);
 
             long bytesToKeep = bytesToKeep(sharedPreferences);
 
@@ -377,7 +373,7 @@ public class SoundWavesDownloadManager extends Observable {
 							// if we have exceeded our limit start deleting old
 							// items
 							if (bytesToKeep < 0) {
-								deleteExpireFile(mContext, item);
+								deleteExpireFile(context, item);
 							} else {
 								deleteFile = false;
 								filesToKeep.add(item.getFilename());
@@ -405,9 +401,6 @@ public class SoundWavesDownloadManager extends Observable {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			return null;
-
-		}
 	}
 
     public static boolean canPerform(@Action int argAction,
