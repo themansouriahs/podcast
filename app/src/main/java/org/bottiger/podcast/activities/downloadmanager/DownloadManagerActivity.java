@@ -97,16 +97,16 @@ public class DownloadManagerActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        SoundWaves.getBus().register(this);
+        //SoundWaves.getBus().register(this);
     }
 
     @Override
     public void onPause() {
-        SoundWaves.getBus().unregister(this);
+        //SoundWaves.getBus().unregister(this);
         super.onPause();
     }
 
-    @Subscribe
+    //@Subscribe
     public void setProgressPercent(@NonNull DownloadProgress argProgress) {
         if (mAdapter == null) {
             VendorCrashReporter.report("setProgress with null adapter", ""); // NoI18N

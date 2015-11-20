@@ -11,6 +11,7 @@ import android.widget.TextView;
 import org.bottiger.podcast.BR;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.QueueEpisode;
 import org.bottiger.podcast.provider.SlimImplementations.SlimEpisode;
@@ -91,18 +92,17 @@ public class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemVie
     public DownloadItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.activity_download_manager_item, parent, false);
-        DownloadItemViewHolder holder = new DownloadItemViewHolder(v);
-        return holder;
+        return new DownloadItemViewHolder(v);
     }
 
     @Override
     public void onBindViewHolder(DownloadItemViewHolder holder, int position) {
         final IEpisode episode = mDownloadingEpisodes.get(position);
-        DownloadViewModel viewModel = new DownloadViewModel(mContext, this, episode, position);
+        DownloadViewModel viewModel = new DownloadViewModel(mContext, this, (FeedItem)episode, position); // FIXME no type casting
         mViewModels.add(viewModel);
         holder.getBinding().setVariable(BR.viewModel, viewModel);
 
-        ImageLoaderUtils.loadImageInto(holder.mImageView, episode.getArtwork(mContext).toString(), false, true);
+        ImageLoaderUtils.loadImageInto(holder.mImageView, episode.getArtwork().toString(), false, true);
     }
 
     @Override

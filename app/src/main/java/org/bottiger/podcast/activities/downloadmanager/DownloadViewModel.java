@@ -7,15 +7,28 @@ import android.databinding.ObservableField;
 import android.databinding.ObservableInt;
 import android.support.annotation.NonNull;
 import android.text.format.Formatter;
+import android.util.Log;
 import android.view.View;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.model.events.DownloadProgress;
+import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
+
+import java.util.concurrent.TimeUnit;
+
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by aplb on 05-10-2015.
  */
 public class DownloadViewModel {
+
+    private static final String TAG = "DownloadViewModel";
 
     private static final int MAX_PROGRESS = 100;
 
@@ -27,15 +40,47 @@ public class DownloadViewModel {
     private IEpisode mEpisode;
     private int mPosition;
 
+    private Subscription mRxSubscription = null;
+
     public DownloadViewModel(@NonNull Context argContext,
                              @NonNull DownloadManagerAdapter argAdapter,
-                             @NonNull IEpisode argEpisode,
+                             @NonNull final FeedItem argEpisode,
                              int argPosition) {
         mContext = argContext;
         mAdapter = argAdapter;
         mEpisode = argEpisode;
         mPosition = argPosition;
         updateProgress(isFirst() ? 60 : 0);
+
+        mRxSubscription = argEpisode._downloadProgressChangeObservable
+                .ofType(DownloadProgress.class)
+                .sample(500, TimeUnit.MILLISECONDS)
+                .filter(new Func1<DownloadProgress, Boolean>() {
+                    @Override
+                    public Boolean call(DownloadProgress downloadProgress) {
+                        return argEpisode.equals(downloadProgress.getEpisode());
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<DownloadProgress>() {
+                    @Override
+                    public void call(DownloadProgress downloadProgress) {
+                        Log.v(TAG, "Recieved downloadProgress event. Progress: " + downloadProgress.getProgress());
+                        updateProgress(downloadProgress.getProgress());
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        Log.d(TAG, "error: " + throwable.toString());
+                    }
+                });
+    }
+
+    public void unsubscribe() {
+        if (mRxSubscription != null && !mRxSubscription.isUnsubscribed()) {
+            mRxSubscription.unsubscribe();
+        }
     }
 
     public IEpisode getEpisode() {
