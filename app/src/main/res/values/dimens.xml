@@ -54,7 +54,7 @@
     <dimen name="navigation_bar_height">0dp</dimen>
     <dimen name="header_bar_height">87dp</dimen>
 
-    <dimen name="top_player_size_minimum">120dp</dimen>
+    <dimen name="top_player_size_minimum">110dp</dimen>
     <dimen name="top_player_size_medium">150dp</dimen>
     <dimen name="top_player_size_maximum">280dp</dimen>
     <dimen name="top_player_size_maximum_bottom">160dp</dimen>

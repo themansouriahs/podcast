@@ -624,17 +624,6 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
 
         setPlayerHeight(sizeLarge);
         ((MainActivity)getContext()).exitFullScreen(mLayout);
-
-        /*
-        mLayout.bringToFront();
-        ((MainActivity)getContext()).goFullScreen(mLayout, mBackgroundColor);
-
-        View view = mPlayerSeekbar.getViewOverlay();
-        if (view != null) {
-            view.bringToFront();
-        }
-        */
-
     }
 
     public boolean isFullscreen() {
