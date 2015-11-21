@@ -141,7 +141,7 @@ public class DialogPlaylistFilters extends DialogFragment {
         mPlaylistOrderSpinner = (Spinner) view.findViewById(R.id.drawer_playlist_sort_order);
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapterSortOrder = ArrayAdapter.createFromResource(mContext,
-                R.array.playlist_sort_order, android.R.layout.simple_spinner_item);
+                R.array.playlist_sort_order, R.layout.simple_spinner_item_sw);
         // Specify the layout to use when the list of choices appears
         adapterSortOrder.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner

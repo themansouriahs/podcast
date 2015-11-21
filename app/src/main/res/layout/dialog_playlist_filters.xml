@@ -46,7 +46,7 @@
         android:paddingTop="5dip"
         android:paddingBottom="5dip">
 
-        <Spinner
+        <android.support.v7.widget.AppCompatSpinner
             android:id="@+id/drawer_playlist_sort_order"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -54,7 +54,13 @@
             android:layout_marginRight="10dp"
             android:spinnerMode="dropdown"
             android:layout_span="2"
-            android:textAppearance="?android:attr/textAppearanceMedium"/>
+            android:paddingLeft="10dp"
+            />
+        <!--
+
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:elevation="0dp"
+            -->
 
     </TableRow>
 
