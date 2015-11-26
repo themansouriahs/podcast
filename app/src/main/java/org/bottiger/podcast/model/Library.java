@@ -194,7 +194,7 @@ public class Library {
 
             Subscription subscription = item.getSubscription();
             if (subscription != null) {
-                subscription.addEpisode(item);
+                subscription.addEpisode(item, true);
             }
 
         } finally {

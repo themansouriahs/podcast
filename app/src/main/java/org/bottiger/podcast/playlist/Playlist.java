@@ -493,6 +493,12 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
                     return E1_FIRST;
 
                 return dt2.compareTo(dt1);
+                /*
+                if (mSortOrder == DATE_NEW_FIRST) {
+                    return dt2.compareTo(dt1);
+                } else {
+                    return dt1.compareTo(dt2);
+                }*/
             }
 
             @Override

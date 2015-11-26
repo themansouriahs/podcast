@@ -206,8 +206,9 @@ public class DialogPlaylistFilters extends DialogFragment {
             }
         }
 
-        mPlaylist.populatePlaylist(Playlist.MAX_SIZE, true);
-        mPlaylist.notifyPlaylistChanged();
+        SoundWaves.getLibraryInstance().loadPlaylist(mPlaylist);
+        //mPlaylist.populatePlaylist(Playlist.MAX_SIZE, true);
+        //mPlaylist.notifyPlaylistChanged();
     }
 
     private void initOnlyDownloaded() {
@@ -254,7 +255,7 @@ public class DialogPlaylistFilters extends DialogFragment {
         mAutoPlayNext.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mSharedPreferences.edit().putBoolean(playNextKey, isChecked).commit();
+                mSharedPreferences.edit().putBoolean(playNextKey, isChecked).apply();
             }
         });
         mSharedPreferences.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {

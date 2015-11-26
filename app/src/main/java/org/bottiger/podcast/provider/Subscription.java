@@ -192,9 +192,14 @@ public class Subscription implements ISubscription, PaletteListener {
 		return mEpisodes;
 	}
 
-	public void addEpisode(@NonNull IEpisode argEpisode) {
+	public void addEpisode(@NonNull IEpisode argEpisode, boolean argSilent) {
 		mEpisodes.add(argEpisode);
-		notifyEpisodeAdded();
+		if (!argSilent)
+			notifyEpisodeAdded();
+	}
+
+	public void addEpisode(@NonNull IEpisode argEpisode) {
+		addEpisode(argEpisode, false);
 	}
 
 	/**

@@ -166,8 +166,8 @@ public class LibraryPersistency {
     }
 
     public static FeedItem fetchEpisodeFromCursor(Cursor cursor,
-                                                  FeedItem item) {
-
+                                                  FeedItem item)
+    {
         if (item != null) {
             item.reset();
         } else
