@@ -188,6 +188,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
         getPalette(episodeViewHolder);
 
         episodeViewHolder.mDownloadButton.setEpisode(item);
+        episodeViewHolder.mDownloadButton.enabledProgressListener(true);
 
         if (mPalette != null) {
             episodeViewHolder.mPlayPauseButton.onPaletteFound(mPalette);

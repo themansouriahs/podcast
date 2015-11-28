@@ -48,6 +48,8 @@ public class ExpandableViewHoldersUtil {
             sImageParams.height = imageSize;
             holder.mPodcastImage.setLayoutParams(sImageParams);
 
+            holder.downloadButton.enabledProgressListener(true);
+
             /*
                 GenericDraweeHierarchy hierarchy = holder.mPodcastImage.getHierarchy();
                 RoundingParams roundingParams = hierarchy.getRoundingParams();
@@ -116,6 +118,8 @@ public class ExpandableViewHoldersUtil {
         //roundingParams.setRoundAsCircle(true);
         holder.mPodcastImage.getHierarchy().setRoundingParams(roundingParams);
         */
+
+        holder.downloadButton.enabledProgressListener(false);
 
         holder.mExpandedLayoutBottom.setVisibility(View.GONE);
         holder.buttonLayout.setVisibility(View.GONE);

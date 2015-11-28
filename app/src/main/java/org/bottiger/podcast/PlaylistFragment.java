@@ -397,16 +397,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
     @Override
     public void onPause() {
         Log.d(TAG, "onPause");
-        //SoundWaves.getBus().unregister(this);
         super.onPause();
-        //SoundWaves.getBus().unregister(this);
-        if (mPlaylist != null && mPlaylist.getItem(0) != null){
-            try {
-                SoundWaves.getBus().unregister(mPlayerDownloadButton);
-            } catch ( Exception e) {
-
-            }
-        }
     }
 
     @Override
@@ -423,7 +414,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
                 if (mPlayerDownloadButton != null) {
                     mPlayerDownloadButton.setEpisode(item);
-                    SoundWaves.getBus().register(mPlayerDownloadButton);
+                    mPlayerDownloadButton.enabledProgressListener(true);
                 }
             }
             playlistChanged(mPlaylist);

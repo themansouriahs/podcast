@@ -186,16 +186,22 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
     public void setEpisode(@NonNull final IEpisode argItem) {
         super.setEpisode(argItem);
 
-        if (argItem instanceof FeedItem) {
+        setState(calcState());
 
-            FeedItem item = (FeedItem)argItem;
+        setProgressPercent(new DownloadProgress());
+    }
+
+    public void enabledProgressListener(boolean argEnabled) {
+        if (argEnabled && getEpisode() instanceof FeedItem) {
+
+            FeedItem item = (FeedItem)getEpisode();
             mRxSubscription = item._downloadProgressChangeObservable
                     .ofType(DownloadProgress.class)
                     .sample(500, TimeUnit.MILLISECONDS)
                     .filter(new Func1<DownloadProgress, Boolean>() {
                         @Override
                         public Boolean call(DownloadProgress downloadProgress) {
-                            return argItem.equals(downloadProgress.getEpisode());
+                            return getEpisode().equals(downloadProgress.getEpisode());
                         }
                     })
                     .subscribeOn(Schedulers.io())
@@ -216,9 +222,9 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
 
         }
 
-        setState(calcState());
-
-        setProgressPercent(new DownloadProgress());
+        if (!argEnabled && mRxSubscription != null && !mRxSubscription.isUnsubscribed()) {
+            mRxSubscription.unsubscribe();
+        }
     }
 
     @Subscribe
