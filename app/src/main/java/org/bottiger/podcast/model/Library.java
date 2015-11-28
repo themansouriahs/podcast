@@ -15,6 +15,7 @@ import com.squareup.sqlbrite.SqlBrite;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.debug.SqliteCopy;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.model.events.DownloadProgress;
 import org.bottiger.podcast.model.events.EpisodeChanged;
 import org.bottiger.podcast.model.events.ItemChanged;
 import org.bottiger.podcast.model.events.SubscriptionChanged;
@@ -41,6 +42,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+import rx.subjects.PublishSubject;
 
 /**
  * Created by aplb on 11-10-2015.
@@ -62,6 +64,9 @@ public class Library {
     private ArrayMap<String, FeedItem> mEpisodesUrlLUT = new ArrayMap<>();
     @NonNull
     private ArrayMap<Long, FeedItem> mEpisodesIdLUT = new ArrayMap<>();
+
+    @NonNull
+    public PublishSubject<Subscription> mSubscriptionsChangeObservable = PublishSubject.create();
 
     @NonNull
     private SortedList<Subscription> mActiveSubscriptions;
@@ -179,6 +184,11 @@ public class Library {
         if (item == null)
             return;
 
+
+            // FIXME
+            if (item.sub_id < 0)
+                return;
+
             if (mEpisodesUrlLUT.containsKey(item.getURL())) {
                 // FIXME we should update the content of the model episode
                 return;
@@ -217,6 +227,9 @@ public class Library {
 
             mSubscriptionUrlLUT.put(argSubscription.getUrl(), argSubscription);
             mSubscriptionIdLUT.put(argSubscription.getId(), argSubscription);
+
+            mSubscriptionsChangeObservable.onNext(argSubscription);
+
         } finally {
             mLock.unlock();
         }
@@ -281,7 +294,7 @@ public class Library {
     }
 
     @Nullable
-    public FeedItem getEpisode(@NonNull long argId) {
+    public FeedItem getEpisode(long argId) {
         return mEpisodesIdLUT.get(argId);
     }
 
@@ -503,9 +516,9 @@ public class Library {
 
                         if (subscription == null) {
                             subscription = new Subscription(argUrl);
-                        } else {
-                            subscription.setStatus(Subscription.STATUS_SUBSCRIBED);
                         }
+
+                        subscription.setStatus(Subscription.STATUS_SUBSCRIBED);
 
                         try {
                             SoundWaves.sSubscriptionRefreshManager.refreshSync(mContext, subscription);

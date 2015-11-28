@@ -62,6 +62,5 @@ public class FeedViewDiscoveryAdapter extends FeedViewAdapter {
         episodeViewHolder.mPlayPauseButton.setStatus(PlayerStatusObservable.STOPPED);
 
         getPalette(episodeViewHolder);
-        return;
     }
 }

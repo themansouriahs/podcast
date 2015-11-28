@@ -3,6 +3,7 @@ package org.bottiger.podcast;
 import org.bottiger.podcast.adapters.SubscriptionAdapter;
 import org.bottiger.podcast.adapters.SubscriptionCursorAdapter;
 import org.bottiger.podcast.model.Library;
+import org.bottiger.podcast.model.events.DownloadProgress;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionLoader;
 import org.bottiger.podcast.utils.FragmentUtils;
@@ -37,6 +38,14 @@ import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
+import java.util.concurrent.TimeUnit;
+
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
+import rx.subscriptions.Subscriptions;
+
 public class SubscriptionsFragment extends Fragment implements View.OnClickListener,
                                                                 SharedPreferences.OnSharedPreferenceChangeListener,
                                                                 DrawerActivity.TopFound {
@@ -63,6 +72,8 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
 
     private Activity mActivity;
     private FrameLayout mContainerView;
+
+    private rx.Subscription mRxSubscription;
 
     private SharedPreferences shareprefs;
     private static String PREF_SUBSCRIPTION_COLUMNS;
@@ -132,9 +143,34 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
         mGridView.setLayoutManager(mGridLayoutmanager);
         mGridView.setAdapter(mAdapter);
 
+        mRxSubscription = mLibrary.mSubscriptionsChangeObservable
+                .ofType(Subscription.class)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<Subscription>() {
+                    @Override
+                    public void call(Subscription argSubscription) {
+                        Log.v(TAG, "Recieved Subscription event: " + argSubscription);
+                        mAdapter.notifyDataSetChanged();
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        Log.d(TAG, "error: " + throwable.toString());
+                    }
+                });
+
 		return mContainerView;
 
 	}
+
+    @Override
+    public void onDestroyView () {
+        onDestroyView();
+        if (mRxSubscription != null && !mRxSubscription.isUnsubscribed()) {
+            mRxSubscription.unsubscribe();
+        }
+    }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {

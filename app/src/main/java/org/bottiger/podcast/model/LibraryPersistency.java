@@ -38,6 +38,12 @@ public class LibraryPersistency {
     }
 
     public void persist(FeedItem argEpisode) {
+
+        if (argEpisode.sub_id < 0) {
+            Log.d("FeedItem", "Id less than 0");
+            return;
+        }
+
         ContentValues cv = getEpisodeContentValues(argEpisode, true);
 
         // BaseColumns._ID + "=" + id

@@ -6,6 +6,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -51,7 +52,7 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
         mActivity = argActivity;
         mInflater = (LayoutInflater) mActivity
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        mDefaultBackgroundColor = mActivity.getResources().getColor(R.color.colorPrimary);
+        mDefaultBackgroundColor = ContextCompat.getColor(mActivity, R.color.colorPrimary);
 
         populateSubscribedUrls();
     }
@@ -59,11 +60,8 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
     @Override
     public SearchResultViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Log.v(TAG, "onCreateViewHolder");
-
         View view = mInflater.inflate(R.layout.discovery_item, parent, false);
-        SearchResultViewHolder holder = new SearchResultViewHolder(view);
-
-        return holder;
+        return new SearchResultViewHolder(view);
     }
 
     @Override
