@@ -22,7 +22,7 @@ public class PodcastOpenHelper extends SQLiteOpenHelper {
 		super(context, DBNAME, null, DBVERSION);
 	}
 
-    public static PodcastOpenHelper getInstance(Context argContext) {
+    public static synchronized PodcastOpenHelper getInstance(Context argContext) {
 
         // Use the application context, which will ensure that you
         // don't accidentally leak an Activity's context.
