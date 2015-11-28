@@ -275,8 +275,12 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
 
         switch (menuItem.getItemId()) {
             case R.id.unsubscribe:
-                //Subscription subscription = SoundWaves.getLibraryInstance().getSubscription((long)position);
-                //SoundWaves.getLibraryInstance().unsubscribe(subscription.getURLString());
+                Subscription subscription = SoundWaves.getLibraryInstance().getSubscription((long)position);
+
+                if (subscription == null)
+                    return false;
+
+                subscription.setStatus(Subscription.STATUS_UNSUBSCRIBED);
                 return true;
             default:
                 return super.onContextItemSelected(menuItem);

@@ -104,7 +104,7 @@ public class LibraryPersistency {
         cv.put(SubscriptionColumns.DESCRIPTION, argSubscription.description);
 
         if (!silent) {
-            long lastUpdated = Long.valueOf(System.currentTimeMillis());
+            long lastUpdated = System.currentTimeMillis();
             cv.put(SubscriptionColumns.LAST_UPDATED, lastUpdated);
         }
 

@@ -95,7 +95,8 @@ public class Library {
 
         @Override
         public void onRemoved(int position, int count) {
-            notifySubscriptionChanged(mActiveSubscriptions.get(position).getId(), SubscriptionChanged.REMOVED);
+            long subscriptionId = mActiveSubscriptions.get(position).getId();
+            notifySubscriptionChanged(subscriptionId, SubscriptionChanged.REMOVED);
         }
 
         @Override
@@ -110,12 +111,18 @@ public class Library {
 
         @Override
         public boolean areContentsTheSame(Subscription oldItem, Subscription newItem) {
-            return false;
+            return areItemsTheSame(oldItem, newItem);
         }
 
         @Override
         public boolean areItemsTheSame(Subscription item1, Subscription item2) {
-            return false;
+            if (item1 == null && item2 == null)
+                return true;
+
+            if (item1 == null)
+                return false;
+
+            return item1.equals(item2);
         }
     };
 
@@ -156,6 +163,19 @@ public class Library {
 
     public void handleChangedEvent(SubscriptionChanged argSubscriptionChanged) {
         Subscription subscription = getSubscription(argSubscriptionChanged.getId());
+
+        try {
+            mLock.lock();
+            if (subscription != null &&
+                subscription.getStatus() == Subscription.STATUS_UNSUBSCRIBED &&
+                mActiveSubscriptions.indexOf(subscription) != SortedList.INVALID_POSITION) {
+                    mActiveSubscriptions.remove(subscription);
+                    mSubscriptionsChangeObservable.onNext(subscription);
+            }
+        } finally {
+                mLock.unlock();
+        }
+
         updateSubscription(subscription);
     }
 
@@ -218,7 +238,8 @@ public class Library {
             if (argSubscription == null)
                 return;
 
-            if (mActiveSubscriptions.indexOf(argSubscription) == -1 && argSubscription.IsSubscribed()) {
+            if (mActiveSubscriptions.indexOf(argSubscription) == SortedList.INVALID_POSITION &&
+                    argSubscription.IsSubscribed()) {
                 mActiveSubscriptions.add(argSubscription);
             }
 
@@ -357,6 +378,7 @@ public class Library {
         builder.append(ItemColumns.TABLE_NAME + "." + ItemColumns.PUB_DATE + ">" + thresholdTimestamp + ") ");
         builder.append("AS " + SubscriptionColumns.NEW_EPISODES + " ");
         builder.append("FROM " + SubscriptionColumns.TABLE_NAME + " ");
+        //builder.append("WHERE " + SubscriptionColumns.STATUS + "==" + Subscription.STATUS_SUBSCRIBED);
 
         return builder.toString();
     }
