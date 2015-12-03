@@ -202,7 +202,8 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
             }
         } else {
             if (!IsDisplayingPlayIcon()) { // we are not displaying the play icon, we should
-                setState(PlayPauseDrawable.IS_PLAYING);
+                //setState(PlayPauseDrawable.IS_PLAYING);
+                animateChangeFrom(PlayPauseDrawable.IS_PLAYING);
             }
         }
 
