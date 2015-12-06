@@ -118,7 +118,7 @@ public class NotificationPlayer {
         String title = item.getTitle();
         String content = "";
         try {
-            content = item.getSubscription(mPlayerService).getTitle();
+            content = item.getSubscription().getTitle();
         } catch (Exception e) {
             // Ignore
         }
@@ -207,6 +207,7 @@ public class NotificationPlayer {
         mBuilder.setContent(layout);
 
 
+        /*
         // The stack builder object will contain an artificial back stack for the
         // started Activity.
         // This ensures that navigating backward from the Activity leads out of
@@ -223,6 +224,10 @@ public class NotificationPlayer {
                         PendingIntent.FLAG_UPDATE_CURRENT
                 );
         mBuilder.setContentIntent(resultPendingIntent);
+        */
+        Intent intent = new Intent(mPlayerService.getApplicationContext(), MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(mPlayerService.getApplicationContext(), 0, intent, 0);
+        mBuilder.setContentIntent(pendingIntent);
 
         mNotificationManager =
                 (NotificationManager) mPlayerService.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -231,7 +236,7 @@ public class NotificationPlayer {
     }
 
     private void showNotification(final boolean isPlaying) {
-        String url = item.getArtwork(mPlayerService);
+        String url = item.getArtwork();
         if (TextUtils.isEmpty(url)) {
 
             // NOTIFICATION_PLAYER_ID allows you to update the notification later on.

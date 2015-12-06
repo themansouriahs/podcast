@@ -166,7 +166,7 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
 
     @Override
     public void onDestroyView () {
-        onDestroyView();
+        super.onDestroyView();
         if (mRxSubscription != null && !mRxSubscription.isUnsubscribed()) {
             mRxSubscription.unsubscribe();
         }

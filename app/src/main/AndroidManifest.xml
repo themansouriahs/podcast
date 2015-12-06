@@ -41,6 +41,7 @@
 
         <activity
             android:name="org.bottiger.podcast.MainActivity"
+            android:launchMode="singleTop"
             android:label="@string/title_activity_swipe" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

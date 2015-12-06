@@ -343,7 +343,7 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
 					+ " then 1 else 2 end, ";
 		}
 		String prioritiesSecond = "case " + ItemColumns.TABLE_NAME + "." + ItemColumns.PRIORITY
-				+ " when 0 then 1 else 2 end DESC, " + ItemColumns.TABLE_NAME + "." + ItemColumns.PRIORITY + " DESC, ";
+				+ " when 0 then 1 else 2 end DESC, " + ItemColumns.TABLE_NAME + "." + ItemColumns.PRIORITY + " ASC, ";
 
         String deprecatedDateOrder = ItemColumns.TABLE_NAME + "." + ItemColumns.DATE + " " + inputOrder + " ";
         String dateOrder = ItemColumns.TABLE_NAME + "." + ItemColumns.PUB_DATE + " " + inputOrder + ", ";
