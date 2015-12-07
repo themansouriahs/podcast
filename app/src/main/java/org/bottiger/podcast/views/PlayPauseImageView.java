@@ -17,6 +17,7 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IntDef;
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -194,6 +195,7 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
         this.mEpisode = null;
     }
 
+    @MainThread
     public void setStatus(@PlayerStatusObservable.PlayerStatus int argStatus) {
 
         if (argStatus == PlayerStatusObservable.PLAYING) {
@@ -202,7 +204,6 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
             }
         } else {
             if (!IsDisplayingPlayIcon()) { // we are not displaying the play icon, we should
-                //setState(PlayPauseDrawable.IS_PLAYING);
                 animateChangeFrom(PlayPauseDrawable.IS_PLAYING);
             }
         }
@@ -261,6 +262,9 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
         if (updateOutline) {
             onSizeChanged(0, 0, 0, 0);
         }
+
+
+        Log.d(TAG, "onDraw. Preparing => " + (mStatus == PlayerStatusObservable.PREPARING) + " status: " + mStatus);
 
         double elapsedTime = System.currentTimeMillis() - mStartTime;
         boolean showRotatingAnimation = mStatus == PlayerStatusObservable.PREPARING;// || animationStartedLessThanOneSecondAgo(mPreparingAnimationStarted);
@@ -406,6 +410,7 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
         invalidate();
     }
 
+    @MainThread
     @Override
     public void onClick(View view) {
 
@@ -422,8 +427,6 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
             animateChangeFrom(PlayPauseDrawable.IS_PAUSED);
             setStatus(PlayerStatusObservable.PREPARING);
         }
-
-        //setStatus(isPlaying ? PlayerStatusObservable.PAUSED : PlayerStatusObservable.PREPARING);
 
         // If the file is a video we offer to open it in another external player
         if (mEpisode.isVideo()) {

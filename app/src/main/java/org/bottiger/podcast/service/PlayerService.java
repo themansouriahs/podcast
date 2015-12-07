@@ -36,6 +36,7 @@ import android.os.PowerManager;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresPermission;
 import android.support.v4.media.session.MediaButtonReceiver;
@@ -382,6 +383,7 @@ public class PlayerService extends Service implements
      *
      * @return True of the songs start to play
      */
+	@MainThread
 	public boolean toggle(@NonNull IEpisode argEpisode) {
 
 

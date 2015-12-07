@@ -211,8 +211,8 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
         try {
             switch (mType) {
                 case ANDROID: {
-                    //mDefaultMediaPlayer.prepareAsync();
-                    mDefaultMediaPlayer.prepare();
+                    mDefaultMediaPlayer.prepareAsync();
+                    //mDefaultMediaPlayer.prepare();
                     break;
                 }
                 case SOUNDWAVES: {
