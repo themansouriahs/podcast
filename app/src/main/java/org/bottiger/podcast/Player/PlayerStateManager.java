@@ -78,7 +78,7 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
 
         int bitmapSize = 512;
 
-        String url = argEpisode.getArtwork(mPlayerService);
+        String url = argEpisode.getArtwork();
         if (url == null) {
             mSession.setMetadata(mMetaBuilder.build());
             return;

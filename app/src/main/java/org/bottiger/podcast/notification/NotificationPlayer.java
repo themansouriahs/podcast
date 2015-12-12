@@ -48,7 +48,8 @@ public class NotificationPlayer {
 
     @Nullable
 	public void show(@NonNull final IEpisode argItem) {
-		show(true, argItem);
+        boolean isPlaying = mPlayerService != null && mPlayerService.isPlaying();
+		show(isPlaying, argItem);
 	}
 
     @Nullable
