@@ -322,6 +322,7 @@ public class PlayerService extends Service implements
 			if (oldItem instanceof FeedItem) {
 				FeedItem oldFeedItem = (FeedItem)oldItem;
 				if (oldFeedItem.getPriority() > 0) {
+					oldFeedItem.setPriority(0);
 					int pos = mPlaylist.getPosition(oldItem);
 					if (pos >= 0) {
 						mPlaylist.removeItem(pos);
