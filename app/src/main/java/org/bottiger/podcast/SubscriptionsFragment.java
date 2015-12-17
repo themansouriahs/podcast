@@ -151,6 +151,7 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
                     @Override
                     public void call(Subscription argSubscription) {
                         Log.v(TAG, "Recieved Subscription event: " + argSubscription);
+                        setSubscriptionFragmentLayout(mLibrary.getSubscriptions().size());
                         mAdapter.notifyDataSetChanged();
                     }
                 }, new Action1<Throwable>() {
