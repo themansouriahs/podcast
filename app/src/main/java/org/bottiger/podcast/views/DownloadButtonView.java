@@ -1,5 +1,6 @@
 package org.bottiger.podcast.views;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -18,6 +19,7 @@ import com.squareup.otto.Subscribe;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.TopActivity;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.events.DownloadProgress;
 import org.bottiger.podcast.model.events.ItemChanged;
@@ -268,6 +270,14 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
 
     @Override
     public void onClick(View view) {
+
+        Context context = view.getContext();
+        if (context instanceof TopActivity) {
+            TopActivity topActivity = (TopActivity) context;
+            @SoundWavesDownloadManager.Result int result = SoundWavesDownloadManager.checkPermission(topActivity);
+        }
+
+
         String viewStr = view == null ? "null" : view.toString();
         Log.d(TAG, "onCLick: view => " + viewStr);
 

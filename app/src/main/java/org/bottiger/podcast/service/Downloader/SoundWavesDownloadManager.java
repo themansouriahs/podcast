@@ -197,15 +197,10 @@ public class SoundWavesDownloadManager extends Observable {
 	}
 
     @MainThread
-    private @Result int checkPermission() {
+    public static @Result int checkPermission(TopActivity argTopActivity) {
         if (Build.VERSION.SDK_INT >= 23 &&
-                (mContext.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
-                        mContext.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)  != PackageManager.PERMISSION_GRANTED)) {
-
-            if (!(mContext instanceof Activity))
-                return NEED_PERMISSION;
-
-            TopActivity activity = (TopActivity)mContext;
+                (argTopActivity.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
+                        argTopActivity.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)  != PackageManager.PERMISSION_GRANTED)) {
 
             // Should we show an explanation?
             /*
@@ -214,7 +209,7 @@ public class SoundWavesDownloadManager extends Observable {
                 // Explain to the user why we need to read the contacts
             }*/
 
-            activity.requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
+            argTopActivity.requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
                             Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     TopActivity.PERMISSION_TO_DOWNLOAD);
 
