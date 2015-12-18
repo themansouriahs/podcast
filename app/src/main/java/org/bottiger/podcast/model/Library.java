@@ -194,7 +194,10 @@ public class Library {
         }
     }
 
-    public void addEpisode(@Nullable IEpisode argEpisode) {
+    /*
+        Return true if the episode was added
+     */
+    public boolean addEpisode(@Nullable IEpisode argEpisode) {
         mLock.lock();
         try {
         FeedItem item = null;
@@ -202,16 +205,16 @@ public class Library {
             item = (FeedItem)argEpisode;
 
         if (item == null)
-            return;
+            return false;
 
 
             // FIXME
             if (item.sub_id < 0)
-                return;
+                return false;
 
             if (mEpisodesUrlLUT.containsKey(item.getURL())) {
                 // FIXME we should update the content of the model episode
-                return;
+                return false;
             }
 
             mEpisodes.add(argEpisode);
@@ -230,6 +233,8 @@ public class Library {
         } finally {
             mLock.unlock();
         }
+
+        return true;
     }
 
     public void addSubscription(@Nullable Subscription argSubscription) {
@@ -541,6 +546,11 @@ public class Library {
                         }
 
                         subscription.setStatus(Subscription.STATUS_SUBSCRIBED);
+                        updateSubscription(subscription);
+
+                        mSubscriptionUrlLUT.put(argUrl,subscription);
+                        mSubscriptionIdLUT.put(subscription.getId(), subscription);
+                        mActiveSubscriptions.add(subscription);
 
                         try {
                             SoundWaves.sSubscriptionRefreshManager.refreshSync(mContext, subscription);
@@ -549,7 +559,8 @@ public class Library {
                             e.printStackTrace();
                             return null;
                         }
-                        updateSubscription(subscription);
+
+                        mSubscriptionsChangeObservable.onNext(subscription);
 
                         return subscription;
                     }

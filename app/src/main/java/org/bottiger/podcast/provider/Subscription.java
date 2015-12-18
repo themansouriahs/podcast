@@ -391,6 +391,10 @@ public class Subscription implements ISubscription, PaletteListener {
 		return id;
 	}
 
+	public void setId(long argId) {
+		this.id = argId;
+	}
+
 	@Deprecated
 	public String getArtwork(Context context) {
 		return getImageURL();
@@ -612,7 +616,7 @@ public class Subscription implements ISubscription, PaletteListener {
 		return sSharedPreferences.getBoolean(key, argDefault);
 	}
 
-	private void notifyEpisodeAdded() {
+	public void notifyEpisodeAdded() {
 		if (!mIsRefreshing)
 			SoundWaves.getRxBus().send(new SubscriptionChanged(getId(), SubscriptionChanged.ADDED));
 	}

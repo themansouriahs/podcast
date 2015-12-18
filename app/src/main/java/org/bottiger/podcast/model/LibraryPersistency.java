@@ -133,6 +133,9 @@ public class LibraryPersistency {
                 if (uri == null) {
                     VendorCrashReporter.report("Insert Subscription Failed", "" + argSubscription.getURLString());
                 } else {
+                    long id = Long.parseLong(uri.toString().replaceAll("[^0-9]", ""));
+                    argSubscription.setId(id);
+                    argSubscription.notifyEpisodeAdded();
                     SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.SUBSCRIBE_TO_FEED);
                 }
             }

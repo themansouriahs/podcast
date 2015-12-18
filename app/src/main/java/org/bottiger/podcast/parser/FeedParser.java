@@ -143,7 +143,9 @@ public class FeedParser {
     }
 
     private ISubscription readFeed(XmlPullParser parser, @NonNull ISubscription argSubscription) throws XmlPullParserException, IOException {
-        //Subscription subscription = new Subscription();
+
+        boolean addedEpisodes = false;
+
         ISubscription subscription = argSubscription;
 
         parser.require(XmlPullParser.START_TAG, ns, topTag);
@@ -161,12 +163,20 @@ public class FeedParser {
                 if (isParsingSlimSubscription()) {
                     subscription.addEpisode(episode);
                 } else {
-                    SoundWaves.getLibraryInstance().addEpisode(episode);
+                    boolean didAdd = SoundWaves.getLibraryInstance().addEpisode(episode);
+                    if (didAdd) {
+                        addedEpisodes = true;
+                    }
                 }
             } else {
                 skip(parser);
             }
         }
+
+        if (addedEpisodes && !isParsingSlimSubscription()) {
+            ((Subscription)subscription).notifyEpisodeAdded();
+        }
+
         return subscription;
     }
 
