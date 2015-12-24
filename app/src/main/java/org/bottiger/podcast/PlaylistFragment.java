@@ -1,6 +1,7 @@
 package org.bottiger.podcast;
 
 import org.bottiger.podcast.adapters.PlaylistAdapter;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.model.events.SubscriptionChanged;
@@ -432,7 +433,17 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         mEpisodeTitle.setText(item.getTitle());
         mEpisodeInfo.setText(item.getDescription());
 
-        final int color = ContextCompat.getColor(getContext(), R.color.pitch_black);
+        Context context = getActivity();
+
+        if (context == null) {
+            String key = "context null";
+            String value = "the context shoul never be null!";
+            Log.wtf(key, value); // FIXME
+            VendorCrashReporter.report(key, value);
+            return;
+        }
+
+        final int color = ContextCompat.getColor(context, R.color.pitch_black);
         mEpisodeTitle.setTextColor(color);
         mEpisodeInfo.setTextColor(color);
 
@@ -672,8 +683,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         return mPlaylist;
     }
 
-
-    //@Subscribe
     public void playlistChanged(@NonNull Playlist argPlaylist) {
 
         mPlaylist = argPlaylist;
