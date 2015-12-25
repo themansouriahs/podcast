@@ -25,6 +25,7 @@ import org.bottiger.podcast.ToolbarActivity;
 import org.bottiger.podcast.activities.feedview.FeedActivity;
 import org.bottiger.podcast.adapters.viewholders.FooterViewHolder;
 import org.bottiger.podcast.adapters.viewholders.subscription.SubscriptionViewHolder;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.model.events.SubscriptionChanged;
@@ -77,6 +78,12 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
                         if (subscriptionChanged.getAction() == SubscriptionChanged.REMOVED) {
                             notifyDataSetChanged();
                         }
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        VendorCrashReporter.report("subscribeError" , throwable.toString());
+                        Log.d(TAG, "error: " + throwable.toString());
                     }
                 });
     }

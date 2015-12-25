@@ -217,6 +217,7 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
                     }, new Action1<Throwable>() {
                         @Override
                         public void call(Throwable throwable) {
+                            VendorCrashReporter.report("subscribeError" , throwable.toString());
                             Log.d(TAG, "error: " + throwable.toString());
                         }
                     });

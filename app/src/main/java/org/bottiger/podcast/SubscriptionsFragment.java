@@ -2,6 +2,7 @@ package org.bottiger.podcast;
 
 import org.bottiger.podcast.adapters.SubscriptionAdapter;
 import org.bottiger.podcast.adapters.SubscriptionCursorAdapter;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.model.events.DownloadProgress;
 import org.bottiger.podcast.provider.Subscription;
@@ -157,6 +158,7 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
+                        VendorCrashReporter.report("subscribeError" , throwable.toString());
                         Log.d(TAG, "error: " + throwable.toString());
                     }
                 });

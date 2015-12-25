@@ -6,6 +6,7 @@ import java.util.TreeSet;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.adapters.viewholders.ExpandableViewHoldersUtil;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.playlist.Playlist;
@@ -77,6 +78,12 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
                     public void call(Playlist playlistChanged) {
                         Log.d(TAG, "mRxPlaylistSubscription event recieved");
                         playlistChanged(playlistChanged);
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        VendorCrashReporter.report("subscribeError" , throwable.toString());
+                        Log.d(TAG, "error: " + throwable.toString());
                     }
                 });
 

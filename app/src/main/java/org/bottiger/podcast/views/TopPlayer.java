@@ -41,6 +41,7 @@ import android.widget.Toast;
 import com.github.ivbaranov.mfb.MaterialFavoriteButton;
 
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.player.SoundWavesPlayer;
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
@@ -375,6 +376,12 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
                     public void call(RxBusSimpleEvents.PlaybackSpeedChanged event) {
                         RxBusSimpleEvents.PlaybackSpeedChanged playbackSpeedChanged = event;
                         mSpeedpButton.setText(playbackSpeedChanged.speed + "X");
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        VendorCrashReporter.report("subscribeError" , throwable.toString());
+                        Log.d(TAG, "error: " + throwable.toString());
                     }
                 });
 

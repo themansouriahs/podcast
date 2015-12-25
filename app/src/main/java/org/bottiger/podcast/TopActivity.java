@@ -19,6 +19,7 @@ import android.view.WindowManager;
 import com.squareup.otto.Produce;
 import com.squareup.otto.Subscribe;
 
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.PlayerService;
@@ -87,6 +88,7 @@ public class TopActivity extends AppCompatActivity {
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
+                        VendorCrashReporter.report("subscribeError" , throwable.toString());
                         Log.w(TAG, "Erorr");
                     }
                 });

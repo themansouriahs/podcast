@@ -380,6 +380,12 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                         Log.d(TAG, "mRxPlaylistSubscription event recieved");
                         playlistChanged(playlistChanged);
                     }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        VendorCrashReporter.report("subscribeError" , throwable.toString());
+                        Log.d(TAG, "error: " + throwable.toString());
+                    }
                 });
         Log.d(TAG, "mRxPlaylistSubscription isUnsubscribed: " + mRxPlaylistSubscription.isUnsubscribed());
     }

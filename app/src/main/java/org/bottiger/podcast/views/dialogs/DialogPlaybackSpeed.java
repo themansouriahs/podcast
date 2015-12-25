@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.player.SoundWavesPlayer;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.rxbus.RxBusSimpleEvents;
@@ -120,6 +121,12 @@ public class DialogPlaybackSpeed extends DialogFragment {
                                     int storedSpeed = Math.round(playbackSpeedChanged.speed * 10);
                                     prefs.edit().putInt(key, storedSpeed).apply();
                                 }
+                            }
+                        }, new Action1<Throwable>() {
+                            @Override
+                            public void call(Throwable throwable) {
+                                VendorCrashReporter.report("subscribeError" , throwable.toString());
+                                Log.d(TAG, "error: " + throwable.toString());
                             }
                         }));
 

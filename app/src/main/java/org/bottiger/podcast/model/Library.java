@@ -420,6 +420,12 @@ public class Library {
                         cursor.close();
                 }
             }
+        }, new Action1<Throwable>() {
+            @Override
+            public void call(Throwable throwable) {
+                VendorCrashReporter.report("subscribeError" , throwable.toString());
+                Log.d(TAG, "error: " + throwable.toString());
+            }
         });
     }
 
@@ -443,6 +449,12 @@ public class Library {
                         cursor.close();
                 }
             }
+        }, new Action1<Throwable>() {
+            @Override
+            public void call(Throwable throwable) {
+                VendorCrashReporter.report("subscribeError" , throwable.toString());
+                Log.d(TAG, "error: " + throwable.toString());
+            }
         });
     }
 
@@ -457,6 +469,12 @@ public class Library {
                     @Override
                     public void call(SqlBrite.Query query) {
                         loadEpisodesSync(argSubscription, query);
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        VendorCrashReporter.report("subscribeError" , throwable.toString());
+                        Log.d(TAG, "error: " + throwable.toString());
                     }
                 });
     }
@@ -580,7 +598,8 @@ public class Library {
 
                     @Override
                     public void onError(Throwable e) {
-
+                        Log.e("OnError", e.getMessage());
+                        VendorCrashReporter.report("OnError", e.getStackTrace().toString());
                     }
 
                     @Override

@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.events.DownloadProgress;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
@@ -72,6 +73,7 @@ public class DownloadViewModel {
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
+                        VendorCrashReporter.report("subscribeError" , throwable.toString());
                         Log.d(TAG, "error: " + throwable.toString());
                     }
                 });
