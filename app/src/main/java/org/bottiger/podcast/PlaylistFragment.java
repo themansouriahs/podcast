@@ -229,7 +229,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    Playlist.changePlaylistFilter(getContext(), mPlaylist, SubscriptionFilter.SHOW_NONE);
+                    Playlist.changePlaylistFilter(getContext(), mPlaylist, SubscriptionFilter.SHOW_ALL);
                 }
             }
         });
@@ -239,6 +239,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         if (top < 0) {
             ((MainActivity) getActivity()).listeners.add(this);
         }
+
         top = ms.getFragmentTop();
         if (top > 0) {
             topfound(top);
@@ -394,11 +395,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
     public void onStop() {
         Log.d(TAG, "onStop");
         super.onStop();
-        /*
-        if (mRxPlaylistSubscription != null && mRxPlaylistSubscription.isUnsubscribed()) {
-            mRxPlaylistSubscription.unsubscribe();
-        }
-        */
     }
 
     @Override
@@ -495,6 +491,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         final Activity activity = getActivity();
 
         String artworkURL = item.getArtwork();
+
         if (!TextUtils.isEmpty(artworkURL)) {
 
             PaletteHelper.generate(artworkURL, activity, mTopPlayer);
@@ -518,6 +515,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
                     ColorExtractor extractor = new ColorExtractor(getActivity(), argChangedPalette);
 
+                    mPlayPauseButton.onPaletteFound(argChangedPalette);
                     mEpisodeTitle.setTextColor(color);
                     mEpisodeInfo.setTextColor(color);
 
@@ -544,12 +542,10 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                 }
             });
 
-        }
 
-        String artworkUrl = item.getArtwork();
-        if (artworkUrl != null) {
             Log.v("MissingImage", "Setting image");
-            ImageLoaderUtils.loadImageInto(mPhoto, artworkUrl, null, false, false, false);
+            ImageLoaderUtils.loadImageInto(mPhoto, artworkURL, null, false, false, false);
+
         }
 
         if (mTopPlayer.isFullscreen()) {

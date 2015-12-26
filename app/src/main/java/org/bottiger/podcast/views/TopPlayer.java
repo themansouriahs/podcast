@@ -449,6 +449,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         Log.v("TopPlayer", "controlTransY: " +  controlTransY);
         if (controlTransY >= 0)
             controlTransY = 0;
+
         mControls.setTranslationY(controlTransY);
 
         return minMaxScreenHeight;
@@ -567,8 +568,11 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
                 @Override
                 public void onGlobalLayout() {
                     UIUtils.removeOnGlobalLayoutListener(argView, this);
-                    mControlHeight = argView.getHeight();
-                    argView.getLayoutParams().height = mControlHeight;
+                    int controlHeight = argView.getHeight();
+                    if (controlHeight > 0) {
+                        mControlHeight = controlHeight;
+                        argView.getLayoutParams().height = mControlHeight;
+                    }
                 }
             });
         }
