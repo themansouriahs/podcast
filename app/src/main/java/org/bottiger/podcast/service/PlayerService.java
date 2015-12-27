@@ -86,7 +86,8 @@ public class PlayerService extends Service implements
 	
 	private Playlist mPlaylist;
 
-	private SoundWavesPlayer mPlayer = null;
+
+	@NonNull private SoundWavesPlayer mPlayer;
     private MediaControllerCompat mController;
     private PlayerStateManager mPlayerStateManager;
 
@@ -420,6 +421,8 @@ public class PlayerService extends Service implements
             takeWakelock(mPlayer.isSteaming());
 			mPlaylist.setAsFrist(mItem);
 			mPlayer.start();
+
+			notifyStatus(mItem);
 		}
 	}
 

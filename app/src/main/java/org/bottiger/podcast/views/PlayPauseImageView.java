@@ -227,11 +227,7 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
         int newColor = Color.argb(255, (int)red, (int)green, (int)blue);
 
         float darkPrimary = newColor;
-        /*
-        paint.setColor((int)darkPrimary);
-        paintBorder.setColor(argOuterColor);
-        this.invalidate();
-        */
+
         setBackgroundColor(newColor);
     }
 
