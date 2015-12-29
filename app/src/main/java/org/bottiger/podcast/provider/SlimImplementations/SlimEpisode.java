@@ -12,6 +12,7 @@ import org.bottiger.podcast.model.events.EpisodeChanged;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.base.BaseEpisode;
+import org.bottiger.podcast.utils.PlaybackSpeed;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -126,6 +127,10 @@ public class SlimEpisode extends BaseEpisode implements Parcelable {
     @Override
     public void setIsVideo(boolean argIsVideo) {
 
+    }
+
+    public float getPlaybackSpeed() {
+        return PlaybackSpeed.UNDEFINED;
     }
 
     @Override

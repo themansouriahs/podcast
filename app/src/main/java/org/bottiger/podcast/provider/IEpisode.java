@@ -47,6 +47,8 @@ public interface IEpisode {
     void setDuration(long argDurationMs);
     void setOffset(@Nullable ContentResolver contentResolver, long i);
 
+    float getPlaybackSpeed();
+
     double getProgress();
     void setProgress(double argProgress);
     String getURL();

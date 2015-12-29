@@ -13,9 +13,12 @@ import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.jobservice.PodcastUpdater;
+import org.bottiger.podcast.utils.PlaybackSpeed;
 
 import android.Manifest;
 import android.app.NotificationManager;
@@ -361,6 +364,21 @@ public class PlayerService extends Service implements
 		int offset = mItem.getOffset() < 0 ? 0 : (int) mItem.getOffset();
 
 		mPlaylist.setAsFrist(mItem);
+
+		ISubscription subscription = mItem.getSubscription();
+		float speed = PlaybackSpeed.DEFAULT;
+
+		float globalSpeed = PlaybackSpeed.globalPlaybackSpeed(this);
+		if (globalSpeed != PlaybackSpeed.UNDEFINED) {
+			speed = globalSpeed;
+		}
+
+		if (subscription != null && subscription instanceof Subscription) {
+			speed = ((Subscription) subscription).getPlaybackSpeed();
+		}
+
+		mPlayer.setPlaybackSpeed(speed);
+
 		mPlayer.setDataSourceAsync(dataSource, offset);
 
         IEpisode item = getCurrentItem();

@@ -19,6 +19,7 @@ import org.bottiger.podcast.model.events.EpisodeChanged;
 import org.bottiger.podcast.provider.base.BaseEpisode;
 import org.bottiger.podcast.service.DownloadStatus;
 import org.bottiger.podcast.utils.BitMaskUtils;
+import org.bottiger.podcast.utils.PlaybackSpeed;
 import org.bottiger.podcast.utils.SDCardManager;
 import org.jsoup.Jsoup;
 
@@ -866,6 +867,13 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 
     public String getAuthor() {
 		return author;
+	}
+
+	public float getPlaybackSpeed() {
+		if (getSubscription() == null)
+			return PlaybackSpeed.UNDEFINED;
+
+		return getSubscription().getPlaybackSpeed();
 	}
 
 	public void setAuthor(String argAuthor) {

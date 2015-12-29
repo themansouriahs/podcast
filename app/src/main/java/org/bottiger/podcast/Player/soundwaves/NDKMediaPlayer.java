@@ -1279,7 +1279,7 @@ public class NDKMediaPlayer {
                     R.string.soundwaves_player_playback_speed_key,
                     R.integer.soundwaves_player_speed_default);
             mSpeedMultiplier = playbackspeed/10.0f;
-            notifyAboutPlaybackSpeedChange(mSpeedMultiplier);
+            //notifyAboutPlaybackSpeedChange(mSpeedMultiplier);
         }
 
         return mSpeedMultiplier;

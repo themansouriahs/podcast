@@ -20,7 +20,13 @@ import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.player.SoundWavesPlayer;
+import org.bottiger.podcast.playlist.Playlist;
+import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.utils.PlaybackSpeed;
 import org.bottiger.podcast.utils.rxbus.RxBusSimpleEvents;
 
 import java.lang.annotation.Retention;
@@ -58,10 +64,7 @@ public class DialogPlaybackSpeed extends DialogFragment {
     private RadioButton mRadioSubscription;
     private RadioButton mRadioGlobal;
 
-    private static final float sSpeedMaximum = 2.0f;
-    private static final float sSpeedMinimum = 0.1f;
-    private static final float sSpeedIncrements = 0.1f;
-    private float mOriginalPlaybackSpeed = 1.0f;
+    private float mOriginalPlaybackSpeed = PlaybackSpeed.UNDEFINED;
 
     private CompositeSubscription mRxSubscriptions = new CompositeSubscription();
 
@@ -94,13 +97,33 @@ public class DialogPlaybackSpeed extends DialogFragment {
         mRadioSubscription = (RadioButton) view.findViewById(R.id.radio_playback_speed_subscription);
         mRadioGlobal = (RadioButton) view.findViewById(R.id.radio_playback_speed_global);
 
-        PlayerService ps = PlayerService.getInstance();
+        final PlayerService ps = PlayerService.getInstance();
         final SoundWavesPlayer player;
         if (ps != null) {
+
             player = ps.getPlayer();
-            mOriginalPlaybackSpeed = player.getCurrentSpeedMultiplier();
+
+            Playlist playlist = ps.getPlaylist();
+            if (playlist != null) {
+                IEpisode episode = playlist.first();
+
+                if (episode != null) {
+                    mOriginalPlaybackSpeed = episode.getPlaybackSpeed();
+                    scope = SUBSCRIPTION;
+                }
+            }
+
+
+            if (mOriginalPlaybackSpeed == PlaybackSpeed.UNDEFINED) {
+                mOriginalPlaybackSpeed = player.getCurrentSpeedMultiplier();
+                scope = GLOBAL;
+            }
         } else {
             player = null;
+        }
+
+        if (mOriginalPlaybackSpeed == PlaybackSpeed.UNDEFINED) {
+            mOriginalPlaybackSpeed = PlaybackSpeed.DEFAULT;
         }
 
         setPlaybackSpeed(mOriginalPlaybackSpeed);
@@ -114,13 +137,6 @@ public class DialogPlaybackSpeed extends DialogFragment {
                             public void call(RxBusSimpleEvents.PlaybackSpeedChanged playbackSpeedChanged) {
                                 Log.d(TAG, "new playback: " + playbackSpeedChanged.speed);
                                 setSpeed(playbackSpeedChanged.speed);
-
-                                if (mRadioGlobal.isChecked()) {
-                                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mActivity);
-                                    String key = getResources().getString(R.string.soundwaves_player_playback_speed_key);
-                                    int storedSpeed = Math.round(playbackSpeedChanged.speed * 10);
-                                    prefs.edit().putInt(key, storedSpeed).apply();
-                                }
                             }
                         }, new Action1<Throwable>() {
                             @Override
@@ -137,7 +153,7 @@ public class DialogPlaybackSpeed extends DialogFragment {
             @Override
             public void onClick(View v) {
                 if (player != null) {
-                    float newPlaybackSpeed = mOriginalPlaybackSpeed + sSpeedIncrements;
+                    float newPlaybackSpeed = mOriginalPlaybackSpeed + PlaybackSpeed.sSpeedIncrements;
                     Log.d(TAG, "increment playback speed to: " + newPlaybackSpeed);
                     setSpeed(newPlaybackSpeed);
                     player.setPlaybackSpeed(newPlaybackSpeed);
@@ -149,7 +165,7 @@ public class DialogPlaybackSpeed extends DialogFragment {
             @Override
             public void onClick(View v) {
                 if (player != null) {
-                    float newPlaybackSpeed = mOriginalPlaybackSpeed - sSpeedIncrements;
+                    float newPlaybackSpeed = mOriginalPlaybackSpeed - PlaybackSpeed.sSpeedIncrements;
                     Log.d(TAG, "dencrement playback speed to: " + newPlaybackSpeed);
                     setSpeed(newPlaybackSpeed);
                     player.setPlaybackSpeed(newPlaybackSpeed);
@@ -162,6 +178,28 @@ public class DialogPlaybackSpeed extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int id) {
                 setPlaybackSpeed(mOriginalPlaybackSpeed);
+
+                if (mRadioSubscription.isChecked() && ps != null) {
+                    IEpisode episode = ps.getPlaylist().first();
+                    if (episode instanceof FeedItem) {
+                        ISubscription subscription = episode.getSubscription();
+                        if (subscription instanceof Subscription) {
+                            Subscription subscription1 = (Subscription)subscription;
+                            int storedSpeed = Math.round(mOriginalPlaybackSpeed * 10);
+                            subscription1.setPlaybackSpeed(storedSpeed);
+                        }
+                    }
+                }
+
+                if (mRadioGlobal.isChecked()) {
+                    /*
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mActivity);
+                    String key = getResources().getString(R.string.soundwaves_player_playback_speed_key);
+                    int storedSpeed = Math.round(mOriginalPlaybackSpeed * 10);
+                    prefs.edit().putInt(key, storedSpeed).apply();
+                    */
+                    PlaybackSpeed.setGlobalPlaybackSpeed(mActivity, mOriginalPlaybackSpeed);
+                }
             }
         });
 
@@ -200,7 +238,7 @@ public class DialogPlaybackSpeed extends DialogFragment {
     }
 
     private void setSpeed(float argNewSpeed) {
-        if (argNewSpeed > sSpeedMaximum || argNewSpeed < sSpeedMinimum)
+        if (argNewSpeed > PlaybackSpeed.sSpeedMaximum || argNewSpeed < PlaybackSpeed.sSpeedMinimum)
             return;
 
         argNewSpeed = Math.round(argNewSpeed*10)/10.0f;
@@ -208,8 +246,8 @@ public class DialogPlaybackSpeed extends DialogFragment {
         mOriginalPlaybackSpeed = argNewSpeed;
         mCurrentSpeed.setText(getSpeedText(mOriginalPlaybackSpeed));
 
-        mIncrementButton.setEnabled(argNewSpeed < sSpeedMaximum);
-        mDecrementButton.setEnabled(argNewSpeed > sSpeedMinimum);
+        mIncrementButton.setEnabled(argNewSpeed < PlaybackSpeed.sSpeedMaximum);
+        mDecrementButton.setEnabled(argNewSpeed > PlaybackSpeed.sSpeedMinimum);
     }
 
     private String getSpeedText(float argSpeed) {

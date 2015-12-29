@@ -49,6 +49,7 @@ import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.ColorUtils;
+import org.bottiger.podcast.utils.PlaybackSpeed;
 import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.utils.rxbus.RxBusSimpleEvents;
 import org.bottiger.podcast.views.dialogs.DialogPlaybackSpeed;
@@ -348,7 +349,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         if (ps != null) {
             SoundWavesPlayer player = ps.getPlayer();
             float speedMultiplier = player.getCurrentSpeedMultiplier();
-            mSpeedpButton.setText(speedMultiplier + "X");
+            setPlaybackSpeed(speedMultiplier);
         }
 
         mSpeedpButton.setOnClickListener(new OnClickListener() {
@@ -412,6 +413,13 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
 
     public float getPlayerHeight() {
         return screenHeight;
+    }
+
+    public void setPlaybackSpeed(float argSpeed) {
+        if (mSpeedpButton == null)
+            return;
+
+        mSpeedpButton.setText(PlaybackSpeed.toString(argSpeed));
     }
 
     public synchronized float scrollBy(float argY) {

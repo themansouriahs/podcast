@@ -13,6 +13,7 @@ import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.model.events.SubscriptionChanged;
 import org.bottiger.podcast.utils.BitMaskUtils;
 import org.bottiger.podcast.utils.ColorExtractor;
+import org.bottiger.podcast.utils.PlaybackSpeed;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -42,6 +43,11 @@ public class Subscription implements ISubscription, PaletteListener {
 	private static final int DELETE_AFTER_PLAYBACK = (1 << 7);
 	private static final int LIST_OLDEST_FIRST_SET = (1 << 8);
 	private static final int LIST_OLDEST_FIRST = (1 << 9);
+	private static final int PLAYBACK_SPEED_SET = (1 << 10);
+	private static final int PLAYBACK_SPEED_1BIT = (1 << 11);
+	private static final int PLAYBACK_SPEED_2BIT = (1 << 12);
+	private static final int PLAYBACK_SPEED_3BIT = (1 << 13);
+	private static final int PLAYBACK_SPEED_4BIT = (1 << 14);
 
 	private final int mOldestFirstID = R.string.pref_list_oldest_first_key;
 	private final int mDeleteAfterPlaybackID = R.string.pref_delete_when_finished_key;
@@ -546,6 +552,77 @@ public class Subscription implements ISubscription, PaletteListener {
 			mSettings |= DELETE_AFTER_PLAYBACK;
 		else
 			mSettings &= ~DELETE_AFTER_PLAYBACK;
+
+		notifyPropertyChanged();
+	}
+
+	public float getPlaybackSpeed() {
+		if (!IsSettingEnabled(PLAYBACK_SPEED_SET))
+			return PlaybackSpeed.UNDEFINED;
+
+		int speedMap = 0;
+
+		if (IsSettingEnabled(PLAYBACK_SPEED_1BIT)) {
+			speedMap += 2<<2;
+		}
+
+		if (IsSettingEnabled(PLAYBACK_SPEED_2BIT)) {
+			speedMap += 2<<1;
+		}
+
+		if (IsSettingEnabled(PLAYBACK_SPEED_3BIT)) {
+			speedMap += 2<<0;
+		}
+
+		if (IsSettingEnabled(PLAYBACK_SPEED_4BIT)) {
+			speedMap += 2<<-1;
+		}
+
+		float speed = PlaybackSpeed.toSpeed(speedMap);
+
+		return speed;
+	}
+
+	public void setPlaybackSpeed(int argPlaybackSpeedTimesTen) {
+		mSettings = mSettings < 0 ? 0 : mSettings;
+
+		if (argPlaybackSpeedTimesTen > 0) {
+			mSettings |= PLAYBACK_SPEED_SET;
+		} else {
+			mSettings &= ~PLAYBACK_SPEED_SET;
+			notifyPropertyChanged();
+			return;
+		}
+
+		int playbackSpeedHash = PlaybackSpeed.toMap(argPlaybackSpeedTimesTen);
+
+		if (playbackSpeedHash >= 2<<2) {
+			mSettings |= PLAYBACK_SPEED_1BIT;
+			playbackSpeedHash -= 2<<2;
+		} else {
+			mSettings &= ~PLAYBACK_SPEED_1BIT;
+		}
+
+		if (playbackSpeedHash >= 2<<1) {
+			mSettings |= PLAYBACK_SPEED_2BIT;
+			playbackSpeedHash -= 2<<1;
+		} else {
+			mSettings &= ~PLAYBACK_SPEED_2BIT;
+		}
+
+		if (playbackSpeedHash >= 2<<0) {
+			mSettings |= PLAYBACK_SPEED_3BIT;
+			playbackSpeedHash -= 2<<0;
+		} else {
+			mSettings &= ~PLAYBACK_SPEED_3BIT;
+		}
+
+		if (playbackSpeedHash > 2<<-1) {
+			mSettings |= PLAYBACK_SPEED_4BIT;
+			playbackSpeedHash -= 2<<-1;
+		} else {
+			mSettings &= ~PLAYBACK_SPEED_4BIT;
+		}
 
 		notifyPropertyChanged();
 	}

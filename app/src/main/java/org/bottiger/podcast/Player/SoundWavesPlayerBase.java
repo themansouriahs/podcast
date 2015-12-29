@@ -11,6 +11,7 @@ import android.util.Log;
 import org.bottiger.podcast.player.soundwaves.NDKMediaPlayer;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.utils.PlaybackSpeed;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -108,7 +109,7 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
             }
         }
 
-        return 1.0f; // default speed is 1x
+        return PlaybackSpeed.DEFAULT; // default speed is 1x
     }
 
     @Override

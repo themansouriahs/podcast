@@ -9,6 +9,7 @@ import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.playlist.filters.SubscriptionFilter;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.ImageLoaderUtils;
@@ -480,6 +481,12 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
             mPlayPauseButton.setStatus(PlayerStatusObservable.PLAYING);
         } else {
             mPlayPauseButton.setStatus(PlayerStatusObservable.PAUSED);
+        }
+
+        ISubscription iSubscription = item.getSubscription();
+        if (iSubscription instanceof org.bottiger.podcast.provider.Subscription) {
+            org.bottiger.podcast.provider.Subscription subscription = (org.bottiger.podcast.provider.Subscription)iSubscription;
+            mTopPlayer.setPlaybackSpeed(subscription.getPlaybackSpeed());
         }
 
         mPlayerSeekbar.setEpisode(item);
