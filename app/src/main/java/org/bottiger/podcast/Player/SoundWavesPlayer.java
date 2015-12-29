@@ -193,6 +193,8 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         if (!isInitialized())
             return;
 
+        int currentPosition = getCurrentPosition();
+
         if (isCasting()) {
             mMediaCast.stop();
             return;
@@ -201,7 +203,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         }
 
         mStatus = PlayerStatusObservable.STOPPED;
-        mPlayerStateManager.updateState(PlaybackStateCompat.STATE_STOPPED, getCurrentPosition(), playbackSpeed);
+        mPlayerStateManager.updateState(PlaybackStateCompat.STATE_STOPPED, currentPosition, playbackSpeed);
         mIsInitialized = false;
         mPlayerService.stopForeground(true);
         PlayerStatusData psd = new PlayerStatusData(mPlayerService.getCurrentItem(), PlayerStatusObservable.STOPPED);

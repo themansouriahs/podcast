@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.provider.IEpisode;
@@ -16,6 +17,8 @@ import java.lang.ref.WeakReference;
  * Created by apl on 20-01-2015.
  */
 public class PlayerHandler {
+
+    private static final String TAG  = "PlayerHandler";
 
     private static final boolean CONTINUOUS_PLAYING_DEFAULT = false;
 
@@ -114,9 +117,11 @@ public class PlayerHandler {
                             mCurrentVolume = 0.0f;
                         }
                         playerService.getPlayer().setVolume(mCurrentVolume);
+                        Log.d(TAG, "Setting volume to: " + mCurrentVolume); // NoI18N
 
                         if (mCurrentVolume <= 0.0f) {
                             playerService.stop();
+                            Log.d(TAG, "Stopping playback"); // NoI18N
                         }
                     }
 

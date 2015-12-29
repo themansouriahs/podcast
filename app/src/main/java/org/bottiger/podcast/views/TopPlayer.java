@@ -394,16 +394,19 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
     }
 
     private void sleepButtonPressed() {
-        try {
-            PlayerService ps = PlayerService.getInstance();
-            int minutes = 30;
-            int onemin = 1000 * 60;
-            ps.FaceOutAndStop(onemin*minutes);
-            String toast = getResources().getQuantityString(R.plurals.player_sleep, minutes, minutes);
-            Toast.makeText(mContext, toast, Toast.LENGTH_LONG).show();
-        } catch (NullPointerException npe) {
-            Log.d(TAG, "Could not connect to the Player");
+        PlayerService ps = PlayerService.getInstance();
+        if (ps == null) {
+            String noPlayer = "Could not connect to the Player";
+            Toast.makeText(mContext, noPlayer, Toast.LENGTH_LONG).show();
+            Log.wtf(TAG, noPlayer);
+            return;
         }
+
+        int minutes = 30;
+        int onemin = 1000 * 60;
+        ps.FaceOutAndStop(onemin*minutes);
+        String toast = getResources().getQuantityString(R.plurals.player_sleep, minutes, minutes);
+        Toast.makeText(mContext, toast, Toast.LENGTH_LONG).show();
     }
 
     @Override
