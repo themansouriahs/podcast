@@ -1,5 +1,6 @@
 package org.bottiger.podcast.service;
 
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.player.LegacyRemoteController;
 import org.bottiger.podcast.player.PlayerHandler;
 import org.bottiger.podcast.player.PlayerPhoneListener;
@@ -53,6 +54,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.net.URL;
 
 import javax.annotation.Nullable;
 
@@ -414,6 +416,17 @@ public class PlayerService extends Service implements
                 return false;
             }
         }
+
+		URL url = argEpisode.getUrl();
+
+		if (url == null) {
+			ISubscription subscription = argEpisode.getSubscription();
+			if (subscription != null)
+				VendorCrashReporter.report("Malform episode", "subscription: " + subscription.toString());
+
+			Log.wtf(TAG, "Malform episode");
+			return false;
+		}
 
         play(argEpisode.getUrl().toString());
         return true;

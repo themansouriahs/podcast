@@ -21,6 +21,7 @@ import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionLoader;
 import org.bottiger.podcast.webservices.datastore.IWebservice;
 import org.bottiger.podcast.webservices.datastore.gpodder.GPodderAPI;
+import org.bottiger.podcast.webservices.datastore.gpodder.GPodderUtils;
 import org.bottiger.podcast.webservices.datastore.gpodder.IGPodderAPI;
 
 import java.io.IOException;
@@ -63,7 +64,9 @@ public class CloudSyncAdapter extends AbstractThreadedSyncAdapter {
         String username = sharedPreferences.getString(usernameKey, "");
         String password = sharedPreferences.getString(passwordKey, "");
 
-        GPodderAPI mGPodderAPI = new GPodderAPI(username, password);
+        String server = GPodderUtils.getServer(sharedPreferences);
+
+        GPodderAPI mGPodderAPI = new GPodderAPI(server, username, password);
 
         try {
             if (!mGPodderAPI.authenticateSync()) {

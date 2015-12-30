@@ -1,5 +1,6 @@
 package org.bottiger.podcast.webservices.datastore;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.LongSparseArray;
@@ -22,8 +23,8 @@ public interface IWebservice {
 
     Call<List<GSubscription>> getTopList(int amount, @Nullable String argTag, @Nullable ICallback<List<GSubscription>> argCallback);
 
-    void uploadSubscriptions(LongSparseArray<ISubscription> argSubscriptions);
-    void uploadSubscriptions(LongSparseArray<ISubscription> argSubscriptions, @Nullable ICallback argCallback);
+    void uploadSubscriptions(@NonNull final Context argContext, LongSparseArray<ISubscription> argSubscriptions);
+    void uploadSubscriptions(@NonNull final Context argContext, LongSparseArray<ISubscription> argSubscriptions, @Nullable ICallback argCallback);
 
     interface ICallback<T> {
         void onResponse(Response<T> response, Retrofit argRetrofit);

@@ -32,8 +32,6 @@ import retrofit.http.Query;
  */
 public interface IGPodderAPI {
 
-    public static final String baseUrl = "https://gpodder.net";
-
     /**
      * Auth string:
      * String basicAuth = "Basic " + Base64.encodeToString(String.format("%s:%s", "your_user_name", "your_password").getBytes(), Base64.NO_WRAP);

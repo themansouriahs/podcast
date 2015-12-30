@@ -50,6 +50,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
+import javax.annotation.Nonnegative;
+
 import retrofit.Call;
 import retrofit.Callback;
 import retrofit.GsonConverterFactory;
@@ -92,15 +94,15 @@ public class GPodderAPI implements IWebservice {
         }
     };
 
-    public GPodderAPI() {
-        this(null, null, null);
+    public GPodderAPI(@NonNull String argServer) {
+        this(argServer, null, null, null);
     }
 
-    public GPodderAPI(@Nullable String argUsername, @Nullable String argPassword) {
-        this(argUsername, argPassword, null);
+    public GPodderAPI(@NonNull String argServer, @Nullable String argUsername, @Nullable String argPassword) {
+        this(argServer, argUsername, argPassword, null);
     }
 
-    public GPodderAPI(@Nullable String argUsername, @Nullable String argPassword, @Nullable Callback argCallback) {
+    public GPodderAPI(@NonNull String argServer, @Nullable String argUsername, @Nullable String argPassword, @Nullable Callback argCallback) {
 
         mUsername = argUsername;
 
@@ -108,7 +110,7 @@ public class GPodderAPI implements IWebservice {
         client.interceptors().add(new ApiRequestInterceptor(argUsername, argPassword));
 
         api = new Retrofit.Builder()
-                .baseUrl(IGPodderAPI.baseUrl)
+                .baseUrl(argServer)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client) // The default client didn't handle well responses like 401
                 .build()
@@ -137,9 +139,9 @@ public class GPodderAPI implements IWebservice {
             return AUTHENTICATION_ERROR;
 
         GDevice device = new GDevice();
-        device.caption = GPodderUtils.getDeviceCaption();
-        device.type = GPodderUtils.getDeviceID();
-        Response responseDevice = api.updateDeviceData(mUsername, GPodderUtils.getDeviceID(), device).execute();
+        device.caption = GPodderUtils.getDeviceCaption(argContext);
+        device.type = GPodderUtils.getDeviceCaption(argContext);
+        Response responseDevice = api.updateDeviceData(mUsername, GPodderUtils.getDeviceCaption(argContext), device).execute();
         //if (!responseDevice.isSuccess())
         //    return SERVER_ERROR;
 
@@ -156,7 +158,7 @@ public class GPodderAPI implements IWebservice {
          */
         Set<String> subscribedUrls = getSubscribedUrls(argLocalSubscriptions);
 
-        Call<SubscriptionChanges> subscriptionsChanges = api.getDeviceSubscriptionsChanges(mUsername, GPodderUtils.getDeviceID(), lastSync); // lastCall
+        Call<SubscriptionChanges> subscriptionsChanges = api.getDeviceSubscriptionsChanges(mUsername, GPodderUtils.getDeviceCaption(argContext), lastSync); // lastCall
         Response<SubscriptionChanges> subscriptionsChangesResponse = subscriptionsChanges.execute();
 
         if (!subscriptionsChangesResponse.isSuccess())
@@ -185,7 +187,7 @@ public class GPodderAPI implements IWebservice {
         String[] gPodderDeviceSubscriptions;
         Set<String> gPodderSubscriptionsSet = getSet();
         try {
-            gPodderDeviceSubscriptions = getDeviceSubscriptionsAsStrings();
+            gPodderDeviceSubscriptions = getDeviceSubscriptionsAsStrings(argContext);
         } catch (IOException ioe) {
             return SERVER_ERROR;
         }
@@ -228,7 +230,7 @@ public class GPodderAPI implements IWebservice {
         // We are not subscribed to the URL's there are left
         localSubscriptionsChanges.remove.addAll(gPodderSubscriptionsSet);
 
-        Call<UpdatedUrls> updatedUrlsCall = api.uploadDeviceSubscriptionsChanges(localSubscriptionsChanges, mUsername, GPodderUtils.getDeviceID());
+        Call<UpdatedUrls> updatedUrlsCall = api.uploadDeviceSubscriptionsChanges(localSubscriptionsChanges, mUsername, GPodderUtils.getDeviceCaption(argContext));
         Response<UpdatedUrls> updatedUrlsResponse = updatedUrlsCall.execute();
 
         if (!updatedUrlsResponse.isSuccess())
@@ -285,7 +287,7 @@ public class GPodderAPI implements IWebservice {
 
                 action.podcast = getSubscriptionUrlForEpisode(argLocalSubscriptions, item);
                 action.episode = item.getURL();
-                action.device = GPodderUtils.getDeviceID();
+                action.device = GPodderUtils.getDeviceCaption(argContext);
 
                 if (TextUtils.isEmpty(action.podcast)) {
                     continue;
@@ -374,7 +376,7 @@ public class GPodderAPI implements IWebservice {
 
         String[] deviceSubscriptions;
         try {
-            deviceSubscriptions = getDeviceSubscriptionsAsStrings();
+            deviceSubscriptions = getDeviceSubscriptionsAsStrings(argContext);
         } catch (IOException ioe) {
             return SERVER_ERROR;
         }
@@ -440,7 +442,7 @@ public class GPodderAPI implements IWebservice {
             newLocalSubscription = argLocalSubscriptions.valueAt(i);
             localSubscriptionUrls.add(newLocalSubscription.getURLString());
         }
-        Response response = api.uploadDeviceSubscriptions(localSubscriptionUrls, mUsername, GPodderUtils.getDeviceID()).execute();
+        Response response = api.uploadDeviceSubscriptions(localSubscriptionUrls, mUsername, GPodderUtils.getDeviceCaption(argContext)).execute();
 
         if (!response.isSuccess()) {
             return SERVER_ERROR;
@@ -470,21 +472,24 @@ public class GPodderAPI implements IWebservice {
         return result;
     }
 
-    public void uploadSubscriptions(final LongSparseArray<ISubscription> argSubscriptions) {
-        uploadSubscriptions(argSubscriptions, null);
+    public void uploadSubscriptions(@NonNull final Context argContext,
+                                    final LongSparseArray<ISubscription> argSubscriptions) {
+        uploadSubscriptions(argContext, argSubscriptions, null);
     }
 
-    public void uploadSubscriptions(final LongSparseArray<ISubscription> argSubscriptions, @Nullable final ICallback argCallback) {
+    public void uploadSubscriptions(@NonNull final Context argContext,
+                                    final LongSparseArray<ISubscription> argSubscriptions,
+                                    @Nullable final ICallback argCallback) {
 
         if (mAuthenticated) {
-            uploadSubscriptionsInternal(argSubscriptions, argCallback);
+            uploadSubscriptionsInternal(argContext, argSubscriptions, argCallback);
             return;
         }
 
         authenticate(argCallback, new Callback() {
             @Override
             public void onResponse(Response response, Retrofit argRetrofit) {
-                uploadSubscriptionsInternal(argSubscriptions, argCallback);
+                uploadSubscriptionsInternal(argContext, argSubscriptions, argCallback);
             }
 
             @Override
@@ -494,7 +499,7 @@ public class GPodderAPI implements IWebservice {
         });
     }
 
-    private void uploadSubscriptionsInternal(final LongSparseArray<ISubscription> argSubscriptions, @Nullable ICallback argCalback) {
+    private void uploadSubscriptionsInternal(@NonNull Context argContext, final LongSparseArray<ISubscription> argSubscriptions, @Nullable ICallback argCalback) {
 
         //String test = "feeds.twit.tv/brickhouse.xml\nleoville.tv/podcasts/twit.xml";
         //String opml = OPMLImportExport.toOPML(argSubscriptions);
@@ -511,17 +516,17 @@ public class GPodderAPI implements IWebservice {
 
         CallbackWrapper<ResponseBody> callback = new CallbackWrapper(argCalback, mDummyCallback);
 
-        api.uploadDeviceSubscriptions(subscriptionList, mUsername, GPodderUtils.getDeviceID()).enqueue(callback);
+        api.uploadDeviceSubscriptions(subscriptionList, mUsername, GPodderUtils.getDeviceCaption(argContext)).enqueue(callback);
     }
 
-    public void getDeviceSubscriptions() {
+    public void getDeviceSubscriptions(@NonNull Context argContext) {
 
         if (mAuthenticated) {
-            getDeviceSubscriptions();
+            getDeviceSubscriptions(argContext);
             return;
         }
 
-        api.getDeviceSubscriptions(mUsername, GPodderUtils.getDeviceID()).enqueue(new Callback<String[]>() {
+        api.getDeviceSubscriptions(mUsername, GPodderUtils.getDeviceCaption(argContext)).enqueue(new Callback<String[]>() {
             @Override
             public void onResponse(Response<String[]> response, Retrofit argRetrofit) {
                 Log.d(TAG, response.toString());
@@ -554,14 +559,14 @@ public class GPodderAPI implements IWebservice {
         });
     }
 
-    public void getDeviceSubscriptionsChanges(long argSince) {
+    public void getDeviceSubscriptionsChanges(@NonNull Context argContext,  long argSince) {
 
         if (mAuthenticated) {
-            getDeviceSubscriptionsChanges(argSince);
+            getDeviceSubscriptionsChanges(argContext, argSince);
             return;
         }
 
-        api.getDeviceSubscriptionsChanges(mUsername, GPodderUtils.getDeviceID(), argSince).enqueue(new Callback<SubscriptionChanges>() {
+        api.getDeviceSubscriptionsChanges(mUsername, GPodderUtils.getDeviceCaption(argContext), argSince).enqueue(new Callback<SubscriptionChanges>() {
             @Override
             public void onResponse(Response<SubscriptionChanges> response, Retrofit argRetrofit) {
                 Log.d(TAG, response.toString());
@@ -574,7 +579,8 @@ public class GPodderAPI implements IWebservice {
         });
     }
 
-    private void uploadSubscriptionChangesInternal(LongSparseArray<ISubscription> argAdded,
+    private void uploadSubscriptionChangesInternal(@NonNull Context argContext,
+                                                   LongSparseArray<ISubscription> argAdded,
                                                    LongSparseArray<ISubscription> argRemoved) {
 
         SubscriptionChanges changes = new SubscriptionChanges();
@@ -591,7 +597,7 @@ public class GPodderAPI implements IWebservice {
             changes.remove.add(subscription.getURLString());
         }
 
-        api.uploadDeviceSubscriptionsChanges(changes, mUsername, GPodderUtils.getDeviceID()).enqueue(new Callback<UpdatedUrls>() {
+        api.uploadDeviceSubscriptionsChanges(changes, mUsername, GPodderUtils.getDeviceCaption(argContext)).enqueue(new Callback<UpdatedUrls>() {
             @Override
             public void onResponse(Response<UpdatedUrls> response, Retrofit argRetrofit) {
                 Log.d(TAG, response.toString());
@@ -720,8 +726,8 @@ public class GPodderAPI implements IWebservice {
         }
     }
 
-    private String[] getDeviceSubscriptionsAsStrings() throws IOException {
-        Call<String[]> deviceSubscriptions = api.getDeviceSubscriptions(mUsername, GPodderUtils.getDeviceID());
+    private String[] getDeviceSubscriptionsAsStrings(@NonNull Context argContext) throws IOException {
+        Call<String[]> deviceSubscriptions = api.getDeviceSubscriptions(mUsername, GPodderUtils.getDeviceCaption(argContext));
         Response<String[]> deviceSubscriptionsResponse = deviceSubscriptions.execute();
 
         if (!deviceSubscriptionsResponse.isSuccess())

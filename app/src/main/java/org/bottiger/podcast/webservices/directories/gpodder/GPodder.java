@@ -46,7 +46,7 @@ public class GPodder extends GenericDirectory {
 
     public GPodder() {
         super(NAME);
-        mGPodderAPI = new GPodderAPI();
+        mGPodderAPI = new GPodderAPI(null);
     }
 
     protected AsyncTask getAsyncTask() {
