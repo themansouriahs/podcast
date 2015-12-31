@@ -129,6 +129,7 @@ public class SubscriptionRefreshManager {
         mOkClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Request request, IOException e) {
+
                 wrappedCallback.complete(false, argSubscription);
             }
 
@@ -176,18 +177,6 @@ public class SubscriptionRefreshManager {
                     }
                 }
             }
-
-            /*
-            if (startDownload) {
-                Runnable myRunnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        SoundWaves.getDownloadManager().startDownload();
-                    }
-                };
-                mainHandler.post(myRunnable);
-            }
-            */
         }
     }
 
@@ -222,6 +211,14 @@ public class SubscriptionRefreshManager {
         try {
             if (argSubscription instanceof Subscription) {
                 SoundWaves.getLibraryInstance().loadEpisodesSync((Subscription)argSubscription, null);
+            }
+
+            if (response.code() == 401) { // 401 (Access Denied)
+                if (argSubscription instanceof Subscription) {
+                    Subscription subscription = (Subscription) argSubscription;
+                    subscription.setRequiringAuthentication(true);
+                }
+                return;
             }
 
             if (response.body() != null && response.isSuccessful()) {

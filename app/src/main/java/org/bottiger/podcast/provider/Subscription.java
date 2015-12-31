@@ -48,6 +48,8 @@ public class Subscription implements ISubscription, PaletteListener {
 	private static final int PLAYBACK_SPEED_2BIT = (1 << 12);
 	private static final int PLAYBACK_SPEED_3BIT = (1 << 13);
 	private static final int PLAYBACK_SPEED_4BIT = (1 << 14);
+	private static final int AUTHENTICATION_NEEDED_SET = (1 << 15);
+	private static final int AUTHENTICATION_NEEDED = (1 << 16);
 
 	private final int mOldestFirstID = R.string.pref_list_oldest_first_key;
 	private final int mDeleteAfterPlaybackID = R.string.pref_delete_when_finished_key;
@@ -517,6 +519,25 @@ public class Subscription implements ISubscription, PaletteListener {
 	 * bitmask ^= TRADEABLE; // Toggles the flag using bitwise XOR
 	 */
 	private boolean appDefault = true;
+
+	public boolean isRequiringAuthentication() {
+		if (!IsSettingEnabled(AUTHENTICATION_NEEDED_SET))
+			return false;
+
+		return IsSettingEnabled(AUTHENTICATION_NEEDED);
+	}
+
+	public void setRequiringAuthentication(boolean argIsRequiringAuthentication) {
+		mSettings = mSettings < 0 ? 0 : mSettings;
+		mSettings |= AUTHENTICATION_NEEDED_SET;
+
+		if (argIsRequiringAuthentication)
+			mSettings |= AUTHENTICATION_NEEDED;
+		else
+			mSettings &= ~AUTHENTICATION_NEEDED;
+
+		notifyPropertyChanged();
+	}
 
 	public boolean isListOldestFirst() {
 		if (!IsSettingEnabled(LIST_OLDEST_FIRST_SET))
