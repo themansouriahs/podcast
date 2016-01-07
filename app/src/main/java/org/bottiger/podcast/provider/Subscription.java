@@ -50,6 +50,7 @@ public class Subscription implements ISubscription, PaletteListener {
 	private static final int PLAYBACK_SPEED_4BIT = (1 << 14);
 	private static final int AUTHENTICATION_NEEDED_SET = (1 << 15);
 	private static final int AUTHENTICATION_NEEDED = (1 << 16);
+	private static final int AUTHENTICATION_WORKING = (1 << 17);
 
 	private final int mOldestFirstID = R.string.pref_list_oldest_first_key;
 	private final int mDeleteAfterPlaybackID = R.string.pref_delete_when_finished_key;
@@ -525,6 +526,25 @@ public class Subscription implements ISubscription, PaletteListener {
 			return false;
 
 		return IsSettingEnabled(AUTHENTICATION_NEEDED);
+	}
+
+	public boolean isAuthenticationWorking() {
+		if (!IsSettingEnabled(AUTHENTICATION_NEEDED_SET))
+			return true;
+
+		return IsSettingEnabled(AUTHENTICATION_WORKING);
+	}
+
+	public void setAuthenticationWorking(boolean argIsAuthenticationWorking) {
+		mSettings = mSettings < 0 ? 0 : mSettings;
+		mSettings |= AUTHENTICATION_NEEDED_SET;
+
+		if (argIsAuthenticationWorking)
+			mSettings |= AUTHENTICATION_WORKING;
+		else
+			mSettings &= ~AUTHENTICATION_WORKING;
+
+		notifyPropertyChanged();
 	}
 
 	public void setRequiringAuthentication(boolean argIsRequiringAuthentication) {

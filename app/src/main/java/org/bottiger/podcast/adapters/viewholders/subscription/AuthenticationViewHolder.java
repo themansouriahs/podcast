@@ -12,6 +12,8 @@ import org.bottiger.podcast.views.dialogs.DialogPlaybackSpeed;
  */
 public class AuthenticationViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
+    public String url = null;
+
     public AuthenticationViewHolder(View itemView) {
         super(itemView);
 
@@ -20,8 +22,11 @@ public class AuthenticationViewHolder extends RecyclerView.ViewHolder implements
 
     @Override
     public void onClick(View view) {
+        if (url == null)
+            return;
+
         Activity host = (Activity) view.getContext();
-        DialogFeedAuthentication dialogPlaybackSpeed = DialogFeedAuthentication.newInstance("sdfsdf");
+        DialogFeedAuthentication dialogPlaybackSpeed = DialogFeedAuthentication.newInstance(url);
         dialogPlaybackSpeed.show(host.getFragmentManager(), DialogFeedAuthentication.class.getName());
     }
 }

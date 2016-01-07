@@ -217,6 +217,7 @@ public class SubscriptionRefreshManager {
                 if (argSubscription instanceof Subscription) {
                     Subscription subscription = (Subscription) argSubscription;
                     subscription.setRequiringAuthentication(true);
+                    subscription.setAuthenticationWorking(false);
                 }
                 return;
             }
