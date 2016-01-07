@@ -134,14 +134,6 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
             return;
         }
 
-        if (getItemViewType(position) == AUTHENTICATE_TYPE) {
-            //holder.text_container.setVisibility(View.VISIBLE);
-            //holder.title.setText("authentication required");
-            return;
-        }
-
-        final SubscriptionViewHolder holder = (SubscriptionViewHolder)argHolder;
-
         Subscription sub = null;
         try {
             sub = mLibrary.getSubscriptions().get(position);
@@ -152,6 +144,16 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
         if (null == sub) {
             return;
         }
+
+        if (getItemViewType(position) == AUTHENTICATE_TYPE) {
+            //holder.text_container.setVisibility(View.VISIBLE);
+            //holder.title.setText("authentication required");
+            AuthenticationViewHolder holder = (AuthenticationViewHolder)argHolder;
+            holder.url = sub.getUrl();
+            return;
+        }
+
+        final SubscriptionViewHolder holder = (SubscriptionViewHolder)argHolder;
 
         final Subscription subscription = sub;
 
@@ -272,7 +274,7 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
             return FOOTER_TYPE;
         }
 
-        if (sub.isRequiringAuthentication()) {
+        if (!sub.isAuthenticationWorking()) {
             return AUTHENTICATE_TYPE;
         }
 

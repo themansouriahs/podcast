@@ -7,8 +7,11 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.widget.ContentLoadingProgressBar;
 import android.text.TextUtils;
 import android.util.Log;
@@ -25,8 +28,12 @@ import com.squareup.okhttp.Credentials;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
+import com.squareup.okhttp.internal.framed.FrameReader;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.model.Library;
+import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.AuthenticationUtils;
 import org.bottiger.podcast.utils.JSonUtils;
 import org.bottiger.podcast.utils.PreferenceHelper;
@@ -85,6 +92,8 @@ public class DialogFeedAuthentication extends DialogFragment {
 
         View view = inflater.inflate(R.layout.dialog_authenticate_feed, null);
 
+        final Subscription subscription = SoundWaves.getLibraryInstance().getSubscription(url);
+
         // bind things
         final ContentLoadingProgressBar contentLoadingProgressBar = (ContentLoadingProgressBar) view.findViewById(R.id.test_credentials_loading);
         final TextView usernameTextView = (TextView) view.findViewById(R.id.authenticate_feed_username);
@@ -109,34 +118,38 @@ public class DialogFeedAuthentication extends DialogFragment {
                 final String username = usernameTextView.getText().toString();
                 final String password = passwordTextView.getText().toString();
 
-                client.setAuthenticator(new Authenticator() {
+                ResponseCallback responseCallback = new ResponseCallback() {
                     @Override
-                    public Request authenticate(Proxy proxy, Response response) throws IOException {
-                        String credential = Credentials.basic(username, password);
-                        return response.request().newBuilder().header("Authorization", credential).build();
-                    }
+                    public void run() {
+                        Handler mainHandler = new Handler(mActivity.getMainLooper());
 
+                        Runnable myRunnable = new Runnable() {
+                            @Override
+                            public void run() {
+                                AuthenticationUtils.setState(response.isSuccessful(), mActivity, contentLoadingProgressBar, textResult);
+                            }
+                        };
+                        mainHandler.post(myRunnable);
+                    }
+                };
+
+                FailureCallback failureCallback = new FailureCallback() {
                     @Override
-                    public Request authenticateProxy(Proxy proxy, Response response) throws IOException {
-                        return null;
-                    }
-                });
+                    public void run() {
+                        Handler mainHandler = new Handler(mActivity.getMainLooper());
 
-                Request request = new Request.Builder()
-                        .url(url)
-                        .build();
-
-                client.newCall(request).enqueue(new Callback() {
-                    @Override
-                    public void onFailure(Request request, IOException e) {
-                        AuthenticationUtils.setState(false, mActivity, contentLoadingProgressBar, textResult);
+                        Runnable myRunnable = new Runnable() {
+                            @Override
+                            public void run() {
+                                AuthenticationUtils.setState(false, mActivity, contentLoadingProgressBar, textResult);
+                            }
+                        };
+                        mainHandler.post(myRunnable);
                     }
+                };
 
-                    @Override
-                    public void onResponse(Response response) throws IOException {
-                        AuthenticationUtils.setState(response.isSuccessful(), mActivity, contentLoadingProgressBar, textResult);
-                    }
-                });
+                if (subscription != null)
+                    testCredentials(client, subscription, username, password, responseCallback, failureCallback);
             }
         });
 
@@ -184,10 +197,11 @@ public class DialogFeedAuthentication extends DialogFragment {
 
                 if (prefCredentials != null) {
                     prefCredentials.put(url, credentials);
-
                     JSonUtils.setComplexObject(prefKey, prefs, prefCredentials);
                 }
 
+                if (subscription != null)
+                    testCredentials(client, subscription, username, password, null, null);
             }
         });
         builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -206,5 +220,67 @@ public class DialogFeedAuthentication extends DialogFragment {
             _subscription.unsubscribe();
         }
         super.onDestroyView();
+    }
+
+    private static void testCredentials(@NonNull OkHttpClient argClient,
+                                        final @NonNull Subscription argSubscription,
+                                        @Nullable final String argUsername,
+                                        final @Nullable String argPassword,
+                                        final @Nullable ResponseCallback argResponseCallback,
+                                        final @Nullable FailureCallback argFailureCallback) {
+        argClient.setAuthenticator(new Authenticator() {
+            @Override
+            public Request authenticate(Proxy proxy, Response response) throws IOException {
+                String credential = Credentials.basic(argUsername, argPassword);
+                return response.request().newBuilder().header("Authorization", credential).build();
+            }
+
+            @Override
+            public Request authenticateProxy(Proxy proxy, Response response) throws IOException {
+                return null;
+            }
+        });
+
+        Request request = new Request.Builder()
+                .url(argSubscription.getUrl())
+                .build();
+
+        argClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Request request, IOException e) {
+                if (argFailureCallback != null)
+                    argFailureCallback.run(request);
+                //AuthenticationUtils.setState(false, mActivity, contentLoadingProgressBar, textResult);
+                argSubscription.setAuthenticationWorking(false);
+            }
+
+            @Override
+            public void onResponse(Response response) throws IOException {
+                if (argResponseCallback != null)
+                    argResponseCallback.run(response);
+                //AuthenticationUtils.setState(response.isSuccessful(), mActivity, contentLoadingProgressBar, textResult);
+                argSubscription.setAuthenticationWorking(response.isSuccessful());
+            }
+        });
+    }
+
+    abstract class ResponseCallback implements Runnable {
+
+        Response response;
+
+        public void run(@NonNull Response argResponse) {
+            response = argResponse;
+            run();
+        }
+    }
+
+    abstract class FailureCallback implements Runnable {
+
+        Request request;
+
+        public void run(@NonNull Request argRequest) {
+            request = argRequest;
+            run();
+        }
     }
 }
