@@ -8,6 +8,7 @@ import android.content.res.Resources;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -334,16 +335,25 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
                 SoundWaves.getLibraryInstance().updateEpisode(feedItem);
             }
 
-            mPlayerService.getPlaylist().removeItem(0);
-            mPlayerService.stop();
-
-            boolean doPlayNext = PreferenceHelper.getBooleanPreferenceValue(mPlayerService,
+            final boolean doPlayNext = PreferenceHelper.getBooleanPreferenceValue(mPlayerService,
                     R.string.pref_continuously_playing_key,
                     R.bool.pref_delete_when_finished_default);
 
-            if (doPlayNext) {
-                mPlayerService.play();
-            }
+
+            Handler mainHandler = new Handler(mPlayerService.getMainLooper());
+
+            Runnable myRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    mPlayerService.getPlaylist().removeItem(0);
+                    mPlayerService.stop();
+
+                    if (doPlayNext) {
+                        mPlayerService.play();
+                    }
+                }
+            };
+            mainHandler.post(myRunnable);
         }
     };
 

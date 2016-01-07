@@ -32,6 +32,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.CursorAdapter;
@@ -645,6 +646,7 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
         notifyPlaylistChanged();
     }
 
+    @MainThread
     public void notifyPlaylistChanged() {
         Log.d(TAG, "notifyPlaylistChanged");
         SoundWaves.getRxBus().send(this);
