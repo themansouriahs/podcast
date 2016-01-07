@@ -578,6 +578,15 @@ public class Subscription implements ISubscription, PaletteListener {
 	}
 
 	public float getPlaybackSpeed() {
+		float parsedSpeed = parsePlaybackSpeed();
+
+		if (parsedSpeed == PlaybackSpeed.UNDEFINED)
+			return PlaybackSpeed.DEFAULT;
+
+		return parsedSpeed;
+	}
+
+	private float parsePlaybackSpeed() {
 		if (!IsSettingEnabled(PLAYBACK_SPEED_SET))
 			return PlaybackSpeed.UNDEFINED;
 
