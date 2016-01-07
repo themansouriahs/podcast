@@ -79,6 +79,9 @@
 
     </android.support.design.widget.TextInputLayout>
 
+
+    <include layout="@layout/include_test_credentials" />
+    <!--
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -106,5 +109,6 @@
             android:id="@+id/test_credentials_result" />
 
     </LinearLayout>
+    -->
 
 </LinearLayout>

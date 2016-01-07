@@ -184,6 +184,8 @@
 
     <!-- In the context: "4 new [episodes]" -->
     <string name="subscription_list_new">New</string>
+    <string name="authenticate_feed_username">Username</string>
+    <string name="authenticate_feed_password">Password</string>
 
 
     <plurals name="player_sleep">

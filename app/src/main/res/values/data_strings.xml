@@ -28,5 +28,6 @@
     <string name="pref_dark_theme_key" translatable="false" >pref_dark_theme</string>
     <string name="gpodder_last_sync_key" translatable="false">gpodder_last_sync</string>
     <string name="soundwaves_player_playback_speed_key" translatable="false">soundwaves_player_playback_speed</string>
+    <string name="feed_authentication_data_key" translatable="false">feed_authentication_data</string>
 </resources>
 

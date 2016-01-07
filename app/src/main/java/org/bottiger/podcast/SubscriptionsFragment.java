@@ -1,7 +1,6 @@
 package org.bottiger.podcast;
 
 import org.bottiger.podcast.adapters.SubscriptionAdapter;
-import org.bottiger.podcast.adapters.SubscriptionCursorAdapter;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.model.events.DownloadProgress;
@@ -80,13 +79,6 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
     private static String PREF_SUBSCRIPTION_COLUMNS;
     private static String PREF_SHARE_ANALYTICS_KEY;
     private static String PREF_CLOUD_SUPPORT_KEY;
-
-    private SubscriptionCursorAdapter.OnSubscriptionCountChanged mSubscriptionCountListener = new SubscriptionCursorAdapter.OnSubscriptionCountChanged() {
-        @Override
-        public void newSubscriptionCount(int argCount) {
-            setSubscriptionFragmentLayout(argCount);
-        }
-    };
 
     private void setSubscriptionFragmentLayout(int argSubscriptionCount) {
         boolean showEmpty = argSubscriptionCount == 0;

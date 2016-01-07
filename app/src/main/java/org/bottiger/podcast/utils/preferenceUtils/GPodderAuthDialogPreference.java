@@ -2,14 +2,10 @@ package org.bottiger.podcast.utils.preferenceUtils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.preference.DialogPreference;
 import android.support.annotation.ColorRes;
-import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.ContentLoadingProgressBar;
-import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -20,10 +16,8 @@ import android.widget.TextView;
 import com.jakewharton.rxbinding.widget.RxTextView;
 
 import org.bottiger.podcast.R;
-import org.bottiger.podcast.provider.Subscription;
-import org.bottiger.podcast.provider.SubscriptionLoader;
+import org.bottiger.podcast.utils.AuthenticationUtils;
 import org.bottiger.podcast.utils.StrUtils;
-import org.bottiger.podcast.utils.ThemeHelper;
 import org.bottiger.podcast.webservices.datastore.gpodder.GPodderAPI;
 import org.bottiger.podcast.webservices.datastore.gpodder.GPodderUtils;
 
@@ -32,12 +26,9 @@ import retrofit.Response;
 import retrofit.Retrofit;
 import rx.Observable;
 import rx.Observer;
-import rx.functions.Func2;
-import rx.functions.Func3;
 import rx.functions.Func4;
 
 import static android.text.TextUtils.isEmpty;
-import static android.util.Patterns.EMAIL_ADDRESS;
 
 /**
  * The OptionDialogPreference will display a dialog, and will persist the
@@ -111,42 +102,27 @@ public class GPodderAuthDialogPreference extends DialogPreference {
         mServerView.setText(GPodderUtils.getServer(sharedPreferences));
         mDeviceNameView.setText(GPodderUtils.getDeviceCaption(getContext()));
 
-        disableButton(validateCredentials(username, password));
+        AuthenticationUtils.disableButton(mTestCredentials, AuthenticationUtils.validateCredentials(username, password));
 
         mTestCredentials.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mTestResult.setVisibility(View.GONE);
-                mTestLoading.show();
+                //mTestResult.setVisibility(View.GONE);
+                //mTestLoading.show();
+                AuthenticationUtils.initCredentialTest(mTestLoading, mTestResult);
+
                 String username = mUsernameView.getText().toString();
                 String password = mPasswordView.getText().toString();
                 String server = mServerView.getText().toString();
                 GPodderAPI api = new GPodderAPI(server, username, password, new Callback() {
                     @Override
                     public void onResponse(Response response, Retrofit argRetrofit) {
-
-                        @ColorRes  int color = R.color.green;
-
-                        if (response.isSuccess()) {
-                            mTestLoading.hide();
-                            mTestResult.setVisibility(View.VISIBLE);
-                            mTestResult.setText(getContext().getResources().getString(R.string.generic_test_credentials_succes));
-                        } else {
-                            mTestLoading.hide();
-                            mTestResult.setVisibility(View.VISIBLE);
-                            mTestResult.setText(getContext().getResources().getString(R.string.generic_test_credentials_failed));
-                            color = R.color.red;
-                        }
-
-                        mTestResult.setTextColor(ContextCompat.getColor(getContext(), color));
+                        AuthenticationUtils.setState(response.isSuccess(), getContext(), mTestLoading, mTestResult);
                     }
 
                     @Override
                     public void onFailure(Throwable t) {
-                        mTestLoading.hide();
-                        mTestResult.setVisibility(View.VISIBLE);
-                        mTestResult.setText(getContext().getResources().getString(R.string.generic_test_credentials_failed));
-                        mTestResult.setTextColor(ContextCompat.getColor(getContext(), R.color.red));
+                        AuthenticationUtils.setState(false, getContext(), mTestLoading, mTestResult);
                     }
                 });
             }
@@ -168,7 +144,7 @@ public class GPodderAuthDialogPreference extends DialogPreference {
 
             SharedPreferences.Editor editor = getEditor();
 
-            boolean validates = validateCredentials(username, password);
+            boolean validates = AuthenticationUtils.validateCredentials(username, password);
             editor.putBoolean(mGPodderSupportKey, validates);
             if (validates) {
                 editor.putString(mUsernameKey, username);
@@ -192,23 +168,6 @@ public class GPodderAuthDialogPreference extends DialogPreference {
         if (_subscription != null && !_subscription.isUnsubscribed()) {
             _subscription.unsubscribe();
         }
-    }
-
-    private void disableButton(boolean argEnabled) {
-        if (mTestCredentials == null)
-            return;
-
-        mTestCredentials.setEnabled(argEnabled);
-
-        if (argEnabled) {
-            mTestCredentials.getBackground().setColorFilter(null);
-        } else {
-            mTestCredentials.getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
-        }
-    }
-
-    private boolean validateCredentials(@Nullable String argUsername, @Nullable String argPassword) {
-        return !TextUtils.isEmpty(argUsername) && !TextUtils.isEmpty(argPassword);
     }
 
     private void _combineLatestEvents() {
@@ -256,7 +215,7 @@ public class GPodderAuthDialogPreference extends DialogPreference {
                         }
                         */
 
-                        boolean credentialsValid = validateCredentials(newEmail.toString(), newPassword.toString());
+                        boolean credentialsValid = AuthenticationUtils.validateCredentials(newEmail.toString(), newPassword.toString());
 
                         return serverValid && deviceNameValid && credentialsValid;
 
@@ -275,7 +234,7 @@ public class GPodderAuthDialogPreference extends DialogPreference {
 
                     @Override
                     public void onNext(Boolean formValid) {
-                        disableButton(formValid);
+                        AuthenticationUtils.disableButton(mTestCredentials, formValid);
                         /*
                         if (formValid) {
                             _btnValidIndicator.setBackgroundColor(getResources().getColor(R.color.blue));

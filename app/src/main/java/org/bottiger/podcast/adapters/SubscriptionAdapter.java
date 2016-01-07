@@ -24,6 +24,7 @@ import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.ToolbarActivity;
 import org.bottiger.podcast.activities.feedview.FeedActivity;
 import org.bottiger.podcast.adapters.viewholders.FooterViewHolder;
+import org.bottiger.podcast.adapters.viewholders.subscription.AuthenticationViewHolder;
 import org.bottiger.podcast.adapters.viewholders.subscription.SubscriptionViewHolder;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PaletteListener;
@@ -49,6 +50,7 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
     private static final int GRID_TYPE = 1;
     private static final int LIST_TYPE = 2;
     private static final int FOOTER_TYPE = 3;
+    private static final int AUTHENTICATE_TYPE = 4;
 
     private final LayoutInflater mInflater;
     private Activity mActivity;
@@ -101,6 +103,11 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
                 holder = new FooterViewHolder(view);
                 break;
             }
+            case AUTHENTICATE_TYPE: {
+                View view = mInflater.inflate(R.layout.subscription_authenticate, parent, false);
+                holder = new AuthenticationViewHolder(view);
+                break;
+            }
             default: {
                 View view = mInflater.inflate(getGridItemLayout(), parent, false);
                 holder = new SubscriptionViewHolder(view);
@@ -124,6 +131,12 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
             footer.getFooter().setLayoutParams(params);
             footer.getFooter().requestLayout();
 
+            return;
+        }
+
+        if (getItemViewType(position) == AUTHENTICATE_TYPE) {
+            //holder.text_container.setVisibility(View.VISIBLE);
+            //holder.title.setText("authentication required");
             return;
         }
 
@@ -250,6 +263,18 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
     public int getItemViewType(int position) {
         if (isLastItem(position))
             return FOOTER_TYPE;
+
+        Subscription sub = null;
+        try {
+            sub = mLibrary.getSubscriptions().get(position);
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+            return FOOTER_TYPE;
+        }
+
+        if (sub.isRequiringAuthentication()) {
+            return AUTHENTICATE_TYPE;
+        }
 
         return numberOfColumns == 1 ? LIST_TYPE : GRID_TYPE;
     }
