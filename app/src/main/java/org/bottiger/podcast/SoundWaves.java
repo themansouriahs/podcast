@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.os.Debug;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -96,6 +97,7 @@ public class SoundWaves extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        //Debug.startMethodTracing("startup");
 
         // The following line triggers the initialization of ACRA
         //if (!BuildConfig.DEBUG) { //  || System.currentTimeMillis() > 0

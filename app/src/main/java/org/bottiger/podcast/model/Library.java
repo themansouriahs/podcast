@@ -237,6 +237,7 @@ public class Library {
         return true;
     }
 
+    @WorkerThread
     public void addSubscription(@Nullable Subscription argSubscription) {
         mLock.lock();
         try {
@@ -431,7 +432,10 @@ public class Library {
 
     public void loadSubscriptions() {
         Observable<SqlBrite.Query> subscriptions = mDb.createQuery(SubscriptionColumns.TABLE_NAME, getAllSubscriptions());
-        subscriptions.subscribe(new Action1<SqlBrite.Query>() {
+
+        subscriptions
+                .subscribeOn(Schedulers.newThread())
+                .subscribe(new Action1<SqlBrite.Query>() {
             @Override
             public void call(SqlBrite.Query query) {
                 Cursor cursor = null;

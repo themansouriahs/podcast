@@ -64,7 +64,7 @@ public class PodcastUpdateJobService extends JobService {
                     /**
                      * Currently we download an episode if:
                      *
-                     * 1) We should download automaticlly (checked abouve)
+                     * 1) We should download automatically (checked above)
                      * 2) It is less than 48 hours old
                      * 3) It has not been downloaded before
                      *

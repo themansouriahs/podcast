@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Build;
+import android.os.Debug;
 import android.preference.PreferenceManager;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IntDef;
@@ -360,6 +361,9 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
                 dialogPlaybackSpeed.show(activity.getFragmentManager(), DialogPlaybackSpeed.class.getName());
             }
         });
+
+
+        //Debug.stopMethodTracing();
 
 
     }
