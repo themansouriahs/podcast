@@ -26,10 +26,14 @@ import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.rxbus.RxBus;
 
 import rx.Observable;
+import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 public class SoundWaves extends Application {
+
+    private static final String TAG = "SoundWaves";
 
     /*
     static {
@@ -97,19 +101,27 @@ public class SoundWaves extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        //Debug.startMethodTracing("startup");
+        Debug.startMethodTracing("startup");
 
-        // The following line triggers the initialization of ACRA
-        //if (!BuildConfig.DEBUG) { //  || System.currentTimeMillis() > 0
-            // ACRA - crash reporter
-            CrashReporterFactory.startReporter(this);
+        CrashReporterFactory.startReporter(this);
 
-            // ANR
-            //new ANRWatchDog(10000 /*timeout*/).start();
-        //}
+        Observable.just(getAppContext()).subscribeOn(Schedulers.newThread()).subscribe(new Subscriber<Context>() {
+            @Override
+            public void onCompleted() {
+                Log.v(TAG, "Analytics started");
+            }
 
-        sAnalytics = AnalyticsFactory.getAnalytics(this);
-        sAnalytics.startTracking();
+            @Override
+            public void onError(Throwable e) {
+                Log.wtf(TAG, e.getMessage());
+            }
+
+            @Override
+            public void onNext(Context context) {
+                sAnalytics = AnalyticsFactory.getAnalytics(context);
+                sAnalytics.startTracking();
+            }
+        });
 
         context = getApplicationContext();
 
