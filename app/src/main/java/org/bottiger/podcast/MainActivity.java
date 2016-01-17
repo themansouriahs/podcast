@@ -60,7 +60,8 @@ public class MainActivity extends FragmentContainerActivity {
 			Debug.startMethodTracing("calc");
 
 		}
-		
+
+		/*
 		if (BuildConfig.DEBUG) {
 			try {
 				SqliteCopy.backupDatabase();
@@ -68,6 +69,7 @@ public class MainActivity extends FragmentContainerActivity {
 				e.printStackTrace();
 			}
 		}
+		*/
 
 		//setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         mPreferenceHelper.setOrientation(this, prefs);

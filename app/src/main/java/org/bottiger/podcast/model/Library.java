@@ -394,13 +394,17 @@ public class Library {
     }
 
     private String getPlaylistEpisodes(@NonNull Playlist argPlaylist) {
-        return "SELECT * FROM " + ItemColumns.TABLE_NAME + " WHERE " + argPlaylist.getWhere() + " ORDER BY " + argPlaylist.getOrder();
+        return "SELECT * FROM " + ItemColumns.TABLE_NAME + " WHERE " +
+                argPlaylist.getWhere() + " ORDER BY " +
+                argPlaylist.getOrder();
     }
 
     public void loadPlaylist(@NonNull final Playlist argPlaylist) {
         String query = getPlaylistEpisodes(argPlaylist);
         Observable<SqlBrite.Query> subscriptions = mDb.createQuery(SubscriptionColumns.TABLE_NAME, query);
-        subscriptions.subscribe(new Action1<SqlBrite.Query>() {
+        subscriptions
+                .subscribeOn(Schedulers.newThread())
+                .subscribe(new Action1<SqlBrite.Query>() {
             @Override
             public void call(SqlBrite.Query query) {
                 Cursor cursor = null;

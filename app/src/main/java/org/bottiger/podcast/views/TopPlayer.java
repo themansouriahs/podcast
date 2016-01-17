@@ -84,6 +84,8 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
     public static int sizeStartShrink           =   -1;
     public static int sizeShrinkBuffer           =   -1;
 
+    private static int sScreenHeight = -1;
+
     private int mControlHeight = -1;
 
     private float screenHeight;
@@ -117,6 +119,8 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
     private LinearLayout mExpandedActionsBar;
 
     private ImageViewTinted mPhoto;
+
+    private boolean mPlaylistEmpty = true;
 
     private PlayerLayoutParameter mLargeLayout = new PlayerLayoutParameter();
 
@@ -191,11 +195,11 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
 
 
         sizeShrinkBuffer = (int) UIUtils.convertDpToPixel(400, argContext);
-        screenHeight = UIUtils.getScreenHeight(argContext);
+        sScreenHeight = UIUtils.getScreenHeight(argContext);
 
         sizeSmall = argContext.getResources().getDimensionPixelSize(R.dimen.top_player_size_minimum);
         sizeMedium = argContext.getResources().getDimensionPixelSize(R.dimen.top_player_size_medium);
-        sizeLarge = screenHeight- argContext.getResources().getDimensionPixelSize(R.dimen.top_player_size_maximum_bottom);
+        sizeLarge = sScreenHeight- argContext.getResources().getDimensionPixelSize(R.dimen.top_player_size_maximum_bottom);
 
         sizeStartShrink = sizeSmall+sizeShrinkBuffer;
         sizeActionbar = argContext.getResources().getDimensionPixelSize(R.dimen.action_bar_height);
@@ -213,17 +217,25 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
             int hSize = MeasureSpec.getSize(heightMeasureSpec);
             int hMode = MeasureSpec.getMode(heightMeasureSpec);
 
+            int height = 0;
+            int mode = MeasureSpec.AT_MOST;
+
             switch (hMode){
                 case MeasureSpec.AT_MOST:
-                    heightMeasureSpec = MeasureSpec.makeMeasureSpec(Math.min(hSize, sizeLarge), MeasureSpec.AT_MOST);
+                    height = Math.min(hSize, sizeLarge);
                     break;
                 case MeasureSpec.UNSPECIFIED:
-                    heightMeasureSpec = MeasureSpec.makeMeasureSpec(sizeLarge, MeasureSpec.AT_MOST);
+                    height = sizeLarge;
                     break;
-                case MeasureSpec.EXACTLY:
-                    heightMeasureSpec = MeasureSpec.makeMeasureSpec(Math.min(hSize, sizeLarge), MeasureSpec.EXACTLY);
+                case MeasureSpec.EXACTLY: {
+                    height = mPlaylistEmpty ? hSize : Math.min(hSize, sizeLarge);
+                    mode = MeasureSpec.EXACTLY;
                     break;
+                }
             }
+
+            heightMeasureSpec = MeasureSpec.makeMeasureSpec(height, mode);
+            screenHeight = height;
         }
 
 
@@ -274,7 +286,15 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
             }
         });
 
-        setFullscreen(mFullscreen, false);
+        PlayerService ps = PlayerService.getInstance();
+
+        //setFullscreen(mFullscreen, false);
+        boolean isRecyclerViewEmpty = true;
+        if (ps != null && ps.getPlaylist() != null) {
+            isRecyclerViewEmpty = ps.getPlaylist().size()<2;
+        }
+
+        togglePlaylistEmpty(isRecyclerViewEmpty);
 
         if (mDoDisplayText) {
             showText();
@@ -346,7 +366,6 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         int visibility = useCustomEngine ? View.VISIBLE : View.GONE;
         mSpeedpButton.setVisibility(visibility);
 
-        PlayerService ps = PlayerService.getInstance();
         if (ps != null) {
             SoundWavesPlayer player = ps.getPlayer();
             float speedMultiplier = player.getCurrentSpeedMultiplier();
@@ -434,11 +453,27 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         return setPlayerHeight(oldHeight - argY);
     }
 
+    public void togglePlaylistEmpty(boolean argDoFill) {
+        Log.v(TAG, "Player height fill: " + argDoFill);
+
+        if (argDoFill == mPlaylistEmpty)
+            return;
+
+        mPlaylistEmpty = argDoFill;
+
+        //if (!argDoFill) {
+        //    setPlayerHeight(getPlayerHeight()-200); // FIXME not just 200
+        //}
+    }
+
     // returns the new height
     public float setPlayerHeight(float argScreenHeight) {
         Log.v(TAG, "Player height is set to: " + argScreenHeight);
 
         if (mFullscreen)
+            return getHeight();
+
+        if (mPlaylistEmpty)
             return getHeight();
 
         if (!validateState()) {
@@ -454,6 +489,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
 
         float minScreenHeight = screenHeight < sizeSmall ? sizeSmall : screenHeight;
         float minMaxScreenHeight = minScreenHeight > sizeLarge ? sizeLarge : minScreenHeight;
+
         screenHeight = minMaxScreenHeight;
 
         ViewGroup.LayoutParams lp = getLayoutParams();
@@ -649,6 +685,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         mLayout.setPadding(0, mCenterSquareMarginTop, 0, 0);
 
         setPlayerHeight(sizeLarge);
+        //togglePlaylistEmpty(true);
         ((MainActivity)getContext()).exitFullScreen(mLayout);
     }
 

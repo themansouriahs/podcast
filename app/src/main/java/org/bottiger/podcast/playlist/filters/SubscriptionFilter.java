@@ -37,7 +37,8 @@ public class SubscriptionFilter implements IPlaylistFilter, SharedPreferences.On
 
     private static final String SEPARATOR = ",";
 
-    private Long mFilterType = DisplayFilter.MANUAL;
+    private Long mDefaultFilterType = DisplayFilter.MANUAL;
+    private Long mFilterType = mDefaultFilterType;
     private boolean mShowListened = SHOW_LISTENED_DEFAULT;
 
     private final HashSet<Long> mSubscriptions = new HashSet<>();
@@ -128,7 +129,7 @@ public class SubscriptionFilter implements IPlaylistFilter, SharedPreferences.On
             editor.putString(SELECTED_SUBSCRIPTIONS_KEY, toPreferenceValue(mSubscriptions));
         }
 
-        editor.commit();
+        editor.apply();
     }
 
     public boolean showListened() {
@@ -167,7 +168,7 @@ public class SubscriptionFilter implements IPlaylistFilter, SharedPreferences.On
     }
 
     public void clear() {
-        mFilterType = DisplayFilter.ALL;
+        mFilterType = mDefaultFilterType;
         mSubscriptions.clear();
     }
 

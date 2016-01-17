@@ -49,7 +49,7 @@ public class ToolbarActivity extends TopActivity {
         setContentView(getLayout());
 
         mToolbar = (Toolbar) findViewById(R.id.my_awesome_toolbar);
-        mPagerTitleStrip = (View) findViewById(R.id.sliding_tabs);
+        mPagerTitleStrip = findViewById(R.id.sliding_tabs);
 
         mAppContent = findViewById(R.id.app_content);
 

@@ -4,7 +4,6 @@ import org.bottiger.podcast.adapters.PlaylistAdapter;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
-import org.bottiger.podcast.model.events.SubscriptionChanged;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.playlist.filters.SubscriptionFilter;
 import org.bottiger.podcast.provider.FeedItem;
@@ -20,7 +19,6 @@ import org.bottiger.podcast.views.CustomLinearLayoutManager;
 import org.bottiger.podcast.views.DownloadButtonView;
 import org.bottiger.podcast.views.ImageViewTinted;
 import org.bottiger.podcast.views.PlayPauseImageView;
-import org.bottiger.podcast.views.PlayerButtonView;
 import org.bottiger.podcast.views.PlayerSeekbar;
 import org.bottiger.podcast.views.PlaylistViewHolder;
 import org.bottiger.podcast.views.TextViewObserver;
@@ -42,9 +40,6 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
-import android.renderscript.Element;
-import android.renderscript.RenderScript;
-import android.renderscript.ScriptIntrinsicBlur;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
@@ -64,21 +59,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
-import com.github.ivbaranov.mfb.MaterialFavoriteButton;
-import com.squareup.otto.Produce;
-import com.squareup.otto.Subscribe;
-
 import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import rx.schedulers.Schedulers;
 
 public class PlaylistFragment extends AbstractEpisodeFragment implements OnSharedPreferenceChangeListener,
                                                                         DrawerActivity.TopFound {
@@ -108,8 +95,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
     private RecyclerView mRecyclerView;
     private View mOverlay;
-
-	private SharedPreferences.OnSharedPreferenceChangeListener spChanged;
 
 	/** ID of the current expanded episode */
 	private long mExpandedEpisodeId = -1;
@@ -154,9 +139,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-		TopActivity.getPreferences().registerOnSharedPreferenceChangeListener(
-                spChanged);
 
 		if (savedInstanceState != null) {
 			// Restore last state for checked position.
@@ -221,7 +203,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    Playlist.changePlaylistFilter(getContext(), mPlaylist, SubscriptionFilter.SHOW_ALL);
+                    Playlist.changePlaylistFilter(getContext(), mPlaylist, SubscriptionFilter.SHOW_NONE);
                 }
             }
         });
@@ -367,7 +349,9 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+        Log.v(TAG, "inflatetime: " + System.currentTimeMillis());
         View view = inflater.inflate(R.layout.playlist_fragment_main, container, false);
+        Log.v(TAG, "inflatetime2: " + System.currentTimeMillis());
         return view;
     }
 
@@ -381,6 +365,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                     public void call(Playlist playlistChanged) {
                         Log.d(TAG, "mRxPlaylistSubscription event recieved");
                         playlistChanged(playlistChanged);
+                        mTopPlayer.togglePlaylistEmpty(playlistChanged.size() == 1);
                     }
                 }, new Action1<Throwable>() {
                     @Override
@@ -557,6 +542,8 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
         if (mTopPlayer.isFullscreen()) {
             mTopPlayer.setFullscreen(true, false);
+        } else if (mPlaylist.size() == 1) {
+            mTopPlayer.togglePlaylistEmpty(true);
         }
     }
 

@@ -471,7 +471,8 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
 
         IAnalytics.EVENT_TYPE type = getEventType();
         if (type != null) {
-            SoundWaves.sAnalytics.trackEvent(type);
+            if (SoundWaves.sAnalytics != null)
+                SoundWaves.sAnalytics.trackEvent(type);
         }
     }
 

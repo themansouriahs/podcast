@@ -740,6 +740,10 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
             return;
 
         SubscriptionFilter filter = argPlaylist.getSubscriptionFilter();
+
+        if (filter.getMode() == argMode)
+            return;
+
         filter.setMode(argMode, argContext);
         argPlaylist.notifyDatabaseChanged();
     }

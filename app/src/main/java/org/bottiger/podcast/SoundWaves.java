@@ -8,7 +8,9 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Debug;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.bottiger.podcast.model.Library;
@@ -48,6 +50,7 @@ public class SoundWaves extends Application {
     // Global constants
     private Boolean mFirstRun = null;
 
+    @Nullable
     public static IAnalytics sAnalytics;
     public static SubscriptionRefreshManager sSubscriptionRefreshManager;
     private static SoundWavesDownloadManager sDownloadManager;
@@ -100,8 +103,13 @@ public class SoundWaves extends Application {
 
     @Override
     public void onCreate() {
+        Log.v(TAG, "time: " + System.currentTimeMillis());
         super.onCreate();
-        Debug.startMethodTracing("startup");
+        //Debug.startMethodTracing("startup");
+
+        context = getApplicationContext();
+
+        Log.v(TAG, "time: " + System.currentTimeMillis());
 
         CrashReporterFactory.startReporter(this);
 
@@ -123,14 +131,19 @@ public class SoundWaves extends Application {
             }
         });
 
-        context = getApplicationContext();
+        Log.v(TAG, "time: " + System.currentTimeMillis());
 
         sDownloadManager = new SoundWavesDownloadManager(this);
+
+        Log.v(TAG, "time: " + System.currentTimeMillis());
         sLibrary = new Library(this);
+        Log.v(TAG, "time: " + System.currentTimeMillis());
 
         sSubscriptionRefreshManager = new SubscriptionRefreshManager(context);
 
+        Log.v(TAG, "time: " + System.currentTimeMillis());
         firstRun(context);
+        Log.v(TAG, "time: " + System.currentTimeMillis());
     }
 
     public static Context getAppContext() {

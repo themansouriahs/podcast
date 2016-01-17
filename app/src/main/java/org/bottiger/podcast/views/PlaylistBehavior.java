@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ScrollerCompat;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -14,6 +15,8 @@ import android.view.ViewGroup;
 import android.view.animation.Interpolator;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.TopActivity;
+import org.bottiger.podcast.utils.UIUtils;
 
 /**
  * Created by aplb on 08-09-2015.
@@ -102,22 +105,28 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
     public void	onNestedPreScroll(CoordinatorLayout coordinatorLayout, View child, View target, int dx, int dy, int[] consumed) {
         Log.v(TAG, "onNestedPreScroll, child: " + child.getClass().getName() + " target: " + target.getClass().getName());
 
-        /*
-        if (target instanceof TopPlayer) {
+        int canScrollUp = canScrollUp(mRecyclerView);
 
-        }
-        */
         if (target instanceof FixedRecyclerView && dy > 0) {
 
-                if (!mTopPlayer.isMinimumSize()) {
-                    // scroll up (to smaller topplayer)
-                    //float oldHeight = mTopPlayer.getPlayerHeight();
-                    //float newHeight = mTopPlayer.setPlayerHeight(oldHeight - dy);
-                    float newHeight = mTopPlayer.scrollBy(dy);
-                    consumed[1] = (int) dy;//(oldHeight - newHeight);
-                }
-        }
+                if (!mTopPlayer.isMinimumSize() && canScrollUp > 0 ) {
 
+                    int logdy = dy;
+
+                    dy = dy > canScrollUp ? canScrollUp : dy;
+
+                    mTopPlayer.scrollBy(dy);
+                    consumed[1] = dy;//(oldHeight - newHeight);
+                }
+            }
+
+
+        /*
+        if (!(canScrollUp>0))
+        {
+            consumed[1] = dy;
+        }
+        */
     }
 
     @Override
@@ -147,8 +156,18 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
         }
 
         if (dyUnconsumed > 0) {
-            if (!mTopPlayer.isMinimumSize()) {
-                mTopPlayer.scrollBy(dyUnconsumed);
+            int canScrollUp = canScrollUp(mRecyclerView);
+            if (!mTopPlayer.isMinimumSize() && canScrollUp > 0) {
+
+                int left = canScrollUp;
+
+                if (left < 0 && left != -1) {
+                    dyUnconsumed = 0;
+                }
+
+                int scroll = dyUnconsumed > canScrollUp ? canScrollUp : dyUnconsumed;
+
+                mTopPlayer.scrollBy(scroll);
             }
         }
 
@@ -170,7 +189,6 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
         }
     };
 
-    private VelocityTracker mVelocityTracker;
     @Override
     public boolean onNestedPreFling(CoordinatorLayout coordinatorLayout, View child, View target, float velocityX, float velocityY) {
         Log.v(TAG, "onNestedPreFling, child: " + child.getClass().getName() + " target: " + target.getClass().getName() + "vy: " + velocityY);
@@ -253,8 +271,14 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
                             Log.v(TAG, "scroll.run, mRecyclerView2");
                             PlaylistBehavior.this.mRecyclerView.scrollBy(0, diffY);
                         } else {
-                            Log.v(TAG, "scroll.run, mTopPlayer1");
-                            PlaylistBehavior.this.mTopPlayer.scrollBy(diffY);
+
+                            int canscrollup = canScrollUp(PlaylistBehavior.this.mRecyclerView);
+                            if (canscrollup > 0) {
+                                Log.v(TAG, "scroll.run, mTopPlayer1 diffY: " + diffY + " canscroll: " + canscrollup);
+
+                                diffY = diffY < canscrollup ? diffY : canscrollup;
+                                PlaylistBehavior.this.mTopPlayer.scrollBy(diffY);
+                            }
                         }
                     }
                 }
@@ -264,6 +288,29 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
             }
 
         }
+    }
+
+    private static int canScrollUp(RecyclerView argRecyclerView) {
+        int lastItemPos = ((LinearLayoutManager)argRecyclerView.getLayoutManager()).findLastCompletelyVisibleItemPosition();
+
+
+        View v = (argRecyclerView.getLayoutManager()).findViewByPosition(lastItemPos);
+
+        if (v == null)
+            return -1;
+
+        int[] loc = new int[2];
+        v.getLocationOnScreen(loc);
+
+        Context context = argRecyclerView.getContext();
+
+        int screen = UIUtils.getScreenHeight(context);
+        int navBar = UIUtils.NavigationBarHeight(context);
+
+        int realloc = (int) (loc[1] + argRecyclerView.getTranslationY());
+        int realloc2 = loc[1] + v.getHeight();
+
+        return (realloc2+navBar)-screen; //
     }
 
 }

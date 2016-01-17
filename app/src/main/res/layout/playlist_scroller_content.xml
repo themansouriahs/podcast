@@ -17,7 +17,6 @@
         android:layout_height="match_parent"
         android:minHeight="@dimen/top_player_size_minimum"
         android:background="?attr/themeBackground"
-        android:paddingTop="20dp"
         android:orientation="vertical"
         android:elevation="5dp"
         >
@@ -28,6 +27,7 @@
             android:id="@+id/top_player_controls"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingTop="20dp"
             android:orientation="vertical">
 
             <RelativeLayout
@@ -342,7 +342,7 @@
         android:id="@+id/my_recycler_view"
         android:scrollbars="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:overScrollMode="never"
         app:layout_anchor="@id/session_photo_container"
         app:layout_anchorGravity="bottom"

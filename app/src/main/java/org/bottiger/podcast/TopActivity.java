@@ -104,14 +104,16 @@ public class TopActivity extends AppCompatActivity {
     protected void onPause() {
         SoundWaves.getBus().unregister(this);
         super.onPause();
-        SoundWaves.sAnalytics.activityPause();
+        if (SoundWaves.sAnalytics != null)
+            SoundWaves.sAnalytics.activityPause();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         SoundWaves.getBus().register(this);
-        SoundWaves.sAnalytics.activityResume();
+        if (SoundWaves.sAnalytics != null)
+            SoundWaves.sAnalytics.activityResume();
         initDownloadManagerOptionsMenu();
     }
 
