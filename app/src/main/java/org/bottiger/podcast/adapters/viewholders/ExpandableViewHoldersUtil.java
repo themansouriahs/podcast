@@ -38,10 +38,9 @@ public class ExpandableViewHoldersUtil {
                 sPodcastExpandedLayoutParams = (RelativeLayout.LayoutParams) holder.mExpandedLayoutControls.getLayoutParams();
                 sPlayPauseParams = (RelativeLayout.LayoutParams) holder.mPlayPauseButton.getLayoutParams();
                 sTitleParams = (RelativeLayout.LayoutParams) holder.mMainTitle.getLayoutParams();
-                sImageParams = (ViewGroup.LayoutParams) holder.mPodcastImage.getLayoutParams();
+                sImageParams = holder.mPodcastImage.getLayoutParams();
             }
 
-            int roundingRadius = (int) holder.mPodcastImage.getContext().getResources().getDimension(R.dimen.playlist_image_radius_large);
             int imageSize = (int) holder.mPodcastImage.getContext().getResources().getDimension(R.dimen.playlist_image_size_large);
 
             sImageParams.width = imageSize;
@@ -49,13 +48,6 @@ public class ExpandableViewHoldersUtil {
             holder.mPodcastImage.setLayoutParams(sImageParams);
 
             holder.downloadButton.enabledProgressListener(true);
-
-            /*
-                GenericDraweeHierarchy hierarchy = holder.mPodcastImage.getHierarchy();
-                RoundingParams roundingParams = hierarchy.getRoundingParams();
-                roundingParams.setCornersRadius(roundingRadius);
-                holder.mPodcastImage.getHierarchy().setRoundingParams(roundingParams);
-            */
 
             holder.mMainTitle.setLayoutParams(sTitleParams);
             holder.mMainTitle.setSingleLine(false);
@@ -68,27 +60,6 @@ public class ExpandableViewHoldersUtil {
             expandView.setVisibility(View.VISIBLE);
 
             holder.buttonLayout.setVisibility(View.VISIBLE);
-
-            PaletteHelper.generate(holder.getArtwork(), holder.getActivity(), new PaletteListener() {
-                @Override
-                public void onPaletteFound(Palette argChangedPalette) {
-                    int white = holder.getActivity().getResources().getColor(R.color.white_opaque);
-
-                    ColorExtractor colorExtractor = new ColorExtractor(holder.getActivity(), argChangedPalette);
-                    //holder.mLayout.setCardBackgroundColor(colorExtractor.getPrimary());
-                    //holder.mMainTitle.setTextColor(colorExtractor.getTextColor());
-                    ////viewHolder.buttonLayout.setBackgroundColor(colorExtractor.getPrimary());
-                    //holder.description.setTextColor(colorExtractor.getTextColor());
-                    //holder.currentTime.setTextColor(colorExtractor.getTextColor());
-                    //holder.mTimeDuration.setTextColor(colorExtractor.getTextColor());
-                }
-
-                @Override
-                public String getPaletteUrl() {
-                    return null;
-                }
-            });
-
     }
 
     @SuppressLint("NewApi")
@@ -111,14 +82,6 @@ public class ExpandableViewHoldersUtil {
             sImageParams.height = sizePixels;
             holder.mPodcastImage.setLayoutParams(sImageParams);
         }
-
-        /*
-        GenericDraweeHierarchy hierarchy = holder.mPodcastImage.getHierarchy();
-        RoundingParams roundingParams = hierarchy.getRoundingParams();
-        //roundingParams.setRoundAsCircle(true);
-        holder.mPodcastImage.getHierarchy().setRoundingParams(roundingParams);
-        */
-
         holder.downloadButton.enabledProgressListener(false);
 
         holder.mExpandedLayoutBottom.setVisibility(View.GONE);
@@ -128,13 +91,11 @@ public class ExpandableViewHoldersUtil {
         PaletteHelper.generate(holder.getArtwork(), holder.getActivity(), new PaletteListener() {
             @Override
             public void onPaletteFound(Palette argChangedPalette) {
-                int white = ColorUtils.getBackgroundColor(holder.getActivity()); //holder.getActivity().getResources().getColor(R.color.white_opaque);
-                int black = ColorUtils.getTextColor(holder.getActivity()); //holder.getActivity().getResources().getColor(R.color.black);
+                int white = ColorUtils.getBackgroundColor(holder.getActivity());
+                int black = ColorUtils.getTextColor(holder.getActivity());
 
-                ColorExtractor colorExtractor = new ColorExtractor(holder.getActivity(), argChangedPalette);
                 holder.mLayout.setCardBackgroundColor(white);
                 holder.mMainTitle.setTextColor(black);
-                ////viewHolder.buttonLayout.setBackgroundColor(colorExtractor.getPrimary());
                 holder.description.setTextColor(black);
                 holder.currentTime.setTextColor(black);
                 holder.mTimeDuration.setTextColor(black);
@@ -148,12 +109,11 @@ public class ExpandableViewHoldersUtil {
 
     }
 
-
-    public static interface Expandable {
-        public View getExpandView();
+    public interface Expandable {
+        View getExpandView();
     }
 
-    public static class KeepOneH<VH extends PlaylistViewHolder & Expandable> {
+    public static class KeepOneH<VH extends PlaylistViewHolder> {
         public int _opened = -1; //private
 
         public void bind(VH holder, int pos) {
@@ -165,13 +125,13 @@ public class ExpandableViewHoldersUtil {
 
         @SuppressWarnings("unchecked")
         public void toggle(VH holder) {
-            if (_opened == holder.getPosition()) {
+            if (_opened == holder.getAdapterPosition()) {
                 _opened = -1;
                 ExpandableViewHoldersUtil.closeH(holder, holder.getExpandView(), true);
             }
             else {
                 int previous = _opened;
-                _opened = holder.getPosition();
+                _opened = holder.getAdapterPosition();
                 ExpandableViewHoldersUtil.openH(holder, holder.getExpandView(), true);
 
                 final VH oldHolder = (VH) ((RecyclerView) holder.itemView.getParent()).findViewHolderForPosition(previous);

@@ -156,8 +156,6 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
             viewHolder.setArtwork(image);
         }
 
-        keepOne.bind(viewHolder, position);
-
         Log.d("ExpanderHelper", "pos: " + position + " episode: " + item.getTitle());
 
         viewHolder.mPlayPauseButton.setIconColor(Color.WHITE);
@@ -207,7 +205,9 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         viewHolder.mPlayPauseButton.setStatus(PlayerStatusObservable.PAUSED);
 
         viewHolder.downloadButton.setEpisode(item);
-        //mDownloadProgressObservable.registerObserver(viewHolder.downloadButton);
+
+        // needs the downloadButton to be bound in advance
+        keepOne.bind(viewHolder, position);
 
 
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {

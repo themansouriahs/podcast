@@ -97,6 +97,11 @@ public class Library {
 
         @Override
         public void onRemoved(int position, int count) {
+            if (mActiveSubscriptions.size() >= position) {
+                VendorCrashReporter.report("Library.onRemoved", "IndexOutOfBound");
+                return;
+            }
+
             long subscriptionId = mActiveSubscriptions.get(position).getId();
             notifySubscriptionChanged(subscriptionId, SubscriptionChanged.REMOVED);
         }
