@@ -38,6 +38,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import rx.Observable;
 import rx.Observer;
+import rx.Scheduler;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -50,6 +51,7 @@ import rx.subjects.PublishSubject;
 public class Library {
 
     private static final String TAG = "Library";
+    private static final int BACKPREASURE_BUFFER_SIZE = 10000;
 
     @NonNull private Context mContext;
     @NonNull private SqlBrite mSqlBrite = SqlBrite.create();
@@ -136,9 +138,10 @@ public class Library {
         loadSubscriptions();
 
         SoundWaves.getRxBus().toObserverable()
+                .onBackpressureBuffer(BACKPREASURE_BUFFER_SIZE)
                 .ofType(ItemChanged.class)
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.newThread())
                 .subscribe(new Action1<ItemChanged>() {
                     @Override
                     public void call(ItemChanged itemChangedEvent) {
@@ -156,9 +159,10 @@ public class Library {
                     @Override
                     public void call(Throwable throwable) {
                         VendorCrashReporter.handleException(throwable);
-                        Log.w(TAG, "Error");
+                        Log.wtf(TAG, "Missing back pressure. Should not happen anymore :(");
                     }
                 });
+
     }
 
     public void handleChangedEvent(SubscriptionChanged argSubscriptionChanged) {

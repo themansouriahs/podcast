@@ -47,6 +47,8 @@ import org.bottiger.podcast.player.SoundWavesPlayer;
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.PaletteListener;
+import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.ColorUtils;
@@ -286,7 +288,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
             }
         });
 
-        PlayerService ps = PlayerService.getInstance();
+        final PlayerService ps = PlayerService.getInstance();
 
         //setFullscreen(mFullscreen, false);
         boolean isRecyclerViewEmpty = true;
@@ -323,7 +325,18 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         });
 
 
-
+        mFavoriteButton.setOnFavoriteChangeListener(new MaterialFavoriteButton.OnFavoriteChangeListener() {
+            @Override
+            public void onFavoriteChanged(MaterialFavoriteButton buttonView, boolean favorite) {
+                if (ps != null) {
+                    IEpisode episode = ps.getPlaylist().first();
+                    if (episode instanceof FeedItem) {
+                        FeedItem feedItem = (FeedItem)episode;
+                        feedItem.setIsFavorite(favorite);
+                    }
+                }
+            }
+        });
 
         mRewindButton.setOnClickListener(new View.OnClickListener() {
             @Override

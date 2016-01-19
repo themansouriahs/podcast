@@ -43,6 +43,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
     // Se Subscription.java for details
     private static final int IS_VIDEO = 1;
 	private static final int HAS_BEEN_DOWNLOADED_ONCE = (1 << 2);
+	private static final int IS_FAVORITE = (1 << 3);
 
 	/*
 	 * Let's document these retared fields! They are totally impossible to guess
@@ -974,6 +975,13 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 		return IsSettingEnabled(HAS_BEEN_DOWNLOADED_ONCE);
 	}
 
+	public boolean isFavorite() {
+		if (!BitMaskUtils.IsBitmaskInitialized(status))
+			return false;
+
+		return IsSettingEnabled(IS_FAVORITE);
+	}
+
 	private void setHasBeenDownloadedOnce(boolean argHasBeenDownloaded) {
 		status = initStatus();
 		status |= HAS_BEEN_DOWNLOADED_ONCE;
@@ -997,6 +1005,17 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 
 		notifyPropertyChanged(EpisodeChanged.CHANGED);
     }
+
+	public void setIsFavorite(boolean argIsFavorite) {
+		status = initStatus();
+
+		if (argIsFavorite)
+			status |= IS_FAVORITE;
+		else
+			status &= ~IS_FAVORITE;
+
+		notifyPropertyChanged(EpisodeChanged.CHANGED);
+	}
 
 	private int initStatus() {
 		if (status < 0) {
@@ -1025,7 +1044,8 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 	long lastUpdate2 = System.currentTimeMillis();
 	protected void notifyPropertyChanged(@EpisodeChanged.Action int argAction) {
 		if (!mIsParsing && argAction != EpisodeChanged.PROGRESS) {
-			SoundWaves.getRxBus().send(new EpisodeChanged(getId(), getURL(), argAction));
+			EpisodeChanged ec = new EpisodeChanged(getId(), getURL(), argAction);
+			SoundWaves.getRxBus().send(ec);
 		}
 
 		if (argAction == EpisodeChanged.DOWNLOADED) {

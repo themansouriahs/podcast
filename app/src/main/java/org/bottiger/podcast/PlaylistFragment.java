@@ -64,6 +64,8 @@ import android.widget.FrameLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
+import com.github.ivbaranov.mfb.MaterialFavoriteButton;
+
 import rx.Subscription;
 import rx.functions.Action1;
 
@@ -92,6 +94,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
     private PlayPauseImageView mPlayPauseButton;
     private PlayerSeekbar mPlayerSeekbar;
     private DownloadButtonView mPlayerDownloadButton;
+    private MaterialFavoriteButton mFavoriteButton;
 
     private RecyclerView mRecyclerView;
     private View mOverlay;
@@ -165,6 +168,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
         mEpisodeTitle         =    (TextView) view.findViewById(R.id.player_title);
         mEpisodeInfo         =    (TextView) view.findViewById(R.id.player_podcast);
+        mFavoriteButton         = (MaterialFavoriteButton) view.findViewById(R.id.favorite);
 
         mCurrentTime       =    (TextViewObserver) view.findViewById(R.id.current_time);
         mTotalTime         =    (TextViewObserver) view.findViewById(R.id.total_time);
@@ -420,6 +424,10 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
         mEpisodeTitle.setText(item.getTitle());
         mEpisodeInfo.setText(item.getDescription());
+
+        if (item instanceof FeedItem) {
+            mFavoriteButton.setFavorite(((FeedItem) item).isFavorite());
+        }
 
         Context context = getActivity();
 
