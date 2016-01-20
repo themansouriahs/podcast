@@ -114,17 +114,28 @@ public class GPodderAuthDialogPreference extends DialogPreference {
                 String username = mUsernameView.getText().toString();
                 String password = mPasswordView.getText().toString();
                 String server = mServerView.getText().toString();
-                GPodderAPI api = new GPodderAPI(server, username, password, new Callback() {
-                    @Override
-                    public void onResponse(Response response, Retrofit argRetrofit) {
-                        AuthenticationUtils.setState(response.isSuccess(), getContext(), mTestLoading, mTestResult);
-                    }
 
-                    @Override
-                    public void onFailure(Throwable t) {
-                        AuthenticationUtils.setState(false, getContext(), mTestLoading, mTestResult);
-                    }
-                });
+                if (!StrUtils.isValidUrl(server)) {
+                    AuthenticationUtils.setState(false, getContext(), mTestLoading, mTestResult);
+                    return;
+                }
+
+                try {
+                    GPodderAPI api = new GPodderAPI(server, username, password, new Callback() {
+                        @Override
+                        public void onResponse(Response response, Retrofit argRetrofit) {
+                            AuthenticationUtils.setState(response.isSuccess(), getContext(), mTestLoading, mTestResult);
+                        }
+
+                        @Override
+                        public void onFailure(Throwable t) {
+                            AuthenticationUtils.setState(false, getContext(), mTestLoading, mTestResult);
+                        }
+                    });
+                } catch (IllegalArgumentException iae) {
+                    AuthenticationUtils.setState(false, getContext(), mTestLoading, mTestResult);
+                    return;
+                }
             }
         });
 
