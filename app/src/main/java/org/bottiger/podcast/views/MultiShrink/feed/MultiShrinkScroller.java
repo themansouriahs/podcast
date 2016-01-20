@@ -547,6 +547,23 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
         }
     }
 
+    /**
+     * Collapse to maximum size.
+     */
+    public void collapseHeader() {
+        int minHeaderHeight = mMinimumHeaderHeight;
+        if (getHeaderHeight() > minHeaderHeight) {
+            final ObjectAnimator animator = ObjectAnimator.ofInt(this, "headerHeight",
+                    minHeaderHeight);
+            animator.setDuration(ExpandingEntryCardView.DURATION_EXPAND_ANIMATION_CHANGE_BOUNDS);
+            animator.start();
+            // Scroll nested scroll view to its top
+            if (mRecyclerView.getScrollY() != 0) {
+                ObjectAnimator.ofInt(mRecyclerView, "scrollY", -mRecyclerView.getScrollY()).start();
+            }
+        }
+    }
+
     private void startDrag() {
         mIsBeingDragged = true;
         mScroller.abortAnimation();

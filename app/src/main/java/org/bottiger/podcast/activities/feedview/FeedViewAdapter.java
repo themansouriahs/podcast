@@ -21,6 +21,8 @@ import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.model.Library;
+import org.bottiger.podcast.model.datastructures.EpisodeFilter;
+import org.bottiger.podcast.model.datastructures.EpisodeList;
 import org.bottiger.podcast.model.events.SubscriptionChanged;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
@@ -35,6 +37,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -53,6 +56,8 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
     public static final int OLDEST_FIRST = 1;
 
     protected ISubscription mSubscription;
+    private EpisodeList<IEpisode> mEpisodeList;
+    private LinkedList<IEpisode> mFilteredEpisodeList = new LinkedList<>();
 
     protected Activity mActivity;
     protected LayoutInflater mInflater;
@@ -71,14 +76,15 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
 
     public FeedViewAdapter(@NonNull Activity activity, @NonNull ISubscription argSubscription) {
         mActivity = activity;
-        mSubscription = argSubscription;
+        setDataset(argSubscription);
 
         mSortOrder = mSubscription.isListOldestFirst() ? OLDEST_FIRST : RECENT_FIRST;
 
         mInflater = (LayoutInflater) activity
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        mRxSubscription = SoundWaves.getRxBus().toObserverable()
+        mRxSubscription = SoundWaves.getRxBus()
+                .toObserverable()
                 .ofType(SubscriptionChanged.class)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -112,6 +118,8 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
 
     public void setDataset(@NonNull ISubscription argSubscription) {
         mSubscription = argSubscription;
+        mEpisodeList = mSubscription.getEpisodes();
+        mFilteredEpisodeList = mEpisodeList.getFilteredList();
         notifyDataSetChanged();
     }
 
@@ -121,6 +129,15 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
 
     public void setOrder(@Order int argSortOrder) {
         mSortOrder = argSortOrder;
+        notifyDataSetChanged();
+    }
+
+    public void search(@Nullable String argSearchQuery) {
+        EpisodeFilter filter = mEpisodeList.getFilter();
+        filter.setSearchQuery(argSearchQuery);
+
+        mFilteredEpisodeList = mEpisodeList.getFilteredList();
+
         notifyDataSetChanged();
     }
 
@@ -238,7 +255,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
 
     @Override
     public int getItemCount() {
-        return mSubscription.getEpisodes().size();
+        return mFilteredEpisodeList.size();
     }
 
     public void setExpanded(boolean expanded) {
@@ -250,7 +267,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
         if (mSubscription.isListOldestFirst()) {
             argPosition = getDatasetPosition(argPosition);
         }
-        return mSubscription.getEpisodes().get(argPosition);
+        return mFilteredEpisodeList.get(argPosition);
     }
 
     protected int getDatasetPosition(int argPosition) {

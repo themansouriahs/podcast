@@ -6,6 +6,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.util.SortedList;
 
+import org.bottiger.podcast.model.datastructures.EpisodeList;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.net.URL;
@@ -36,7 +38,7 @@ public interface ISubscription {
     String getImageURL();
 
     @NonNull
-    SortedList<? extends IEpisode> getEpisodes();
+    EpisodeList<IEpisode> getEpisodes();
 
     void setImageURL(@Nullable String argUrl);
     void setTitle(@Nullable String argTitle);

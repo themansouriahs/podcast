@@ -100,6 +100,7 @@
     <string name="pref_advanced_category_experimental">Experimental settings</string>
     <string name="pref_screen_rotation_title">Enable screen rotation</string>
     <string name="pref_screen_rotation_description">Support for landscape orientation</string>
+    <string name="search_feed_hint">Search %s</string>
     <string name="search_query_hint">Search using %s</string>
     <string name="discovery_recommendations">Recommended by author</string>
     <string name="discovery_recommendations_trending">Trending</string>

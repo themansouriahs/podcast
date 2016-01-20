@@ -10,6 +10,7 @@ import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PaletteListener;
+import org.bottiger.podcast.model.datastructures.EpisodeList;
 import org.bottiger.podcast.model.events.SubscriptionChanged;
 import org.bottiger.podcast.utils.BitMaskUtils;
 import org.bottiger.podcast.utils.ColorExtractor;
@@ -92,7 +93,7 @@ public class Subscription implements ISubscription, PaletteListener {
 	 */
 	private int mSettings;
 
-    private SortedList<IEpisode> mEpisodes;
+    private EpisodeList mEpisodes;
 	private SortedList.Callback<IEpisode> mEpisodesListCallback = new SortedList.Callback<IEpisode>() {
 
 		@Override
@@ -194,10 +195,10 @@ public class Subscription implements ISubscription, PaletteListener {
 	}
 
 	private void init() {
-		mEpisodes = new SortedList(IEpisode.class, mEpisodesListCallback);
+		mEpisodes = new EpisodeList(IEpisode.class, mEpisodesListCallback);
 	}
 
-	public SortedList<IEpisode> getEpisodes() {
+	public EpisodeList getEpisodes() {
 		return mEpisodes;
 	}
 

@@ -19,6 +19,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -65,7 +66,6 @@ public class FeedActivity extends TopActivity implements PaletteListener {
     public static final int MODE_FULLY_EXPANDED = 4;
 
     private static final String TAG = "FeedActivity";
-
     private static final String KEY_THEME_COLOR = "theme_color";
 
     private Toolbar mToolbar;
@@ -147,6 +147,26 @@ public class FeedActivity extends TopActivity implements PaletteListener {
         }
     };
 
+    SearchView.OnQueryTextListener mOnQueryTextListener = new SearchView.OnQueryTextListener() {
+        @Override
+        public boolean onQueryTextSubmit(String query) {
+            //.collapseActionView();
+            return false;
+        }
+        @Override
+        public boolean onQueryTextChange(String argSearchQuery) {
+
+            mMultiShrinkScroller.collapseHeader();
+
+            FeedViewAdapter adapter = mAdapter;
+            if (adapter != null) {
+                adapter.search(argSearchQuery);
+            }
+
+            return false;
+        }
+    };
+
     IDownloadCompleteCallback mRefreshCompleteCallback = new IDownloadCompleteCallback() {
         @Override
         public void complete(boolean argSucces, ISubscription argSubscription) {
@@ -222,10 +242,6 @@ public class FeedActivity extends TopActivity implements PaletteListener {
         }
 
         Log.d(TAG, "Showing: " + mSubscription);
-
-        // Show QuickContact in front of soft input
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM,
-                WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
 
         setContentView(R.layout.feed_activity);
 
@@ -476,6 +492,11 @@ public class FeedActivity extends TopActivity implements PaletteListener {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.feedview, menu);
+
+        final MenuItem myActionMenuItem = menu.findItem( R.id.action_search);
+        final SearchView searchView = (SearchView) myActionMenuItem.getActionView();
+        searchView.setOnQueryTextListener(mOnQueryTextListener);
+
         return super.onCreateOptionsMenu(menu);
     }
 

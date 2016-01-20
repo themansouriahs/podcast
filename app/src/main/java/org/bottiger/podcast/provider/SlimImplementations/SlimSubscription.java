@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.util.SortedList;
 import android.view.View;
 
+import org.bottiger.podcast.model.datastructures.EpisodeList;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.converter.EpisodeConverter;
@@ -26,7 +27,7 @@ public class SlimSubscription implements ISubscription, Parcelable {
     private String mTitle;
     private URL mURL;
     private String mImageURL;
-    private SortedList<SlimEpisode> mEpisodes;
+    private EpisodeList<SlimEpisode> mEpisodes;
 
     private boolean mIsSubscribed = false;
     private boolean mIsDirty = false;
@@ -136,11 +137,11 @@ public class SlimSubscription implements ISubscription, Parcelable {
         return false;
     }
 
-    public SortedList<SlimEpisode> getEpisodes() {
+    public EpisodeList getEpisodes() {
         return mEpisodes;
     }
 
-    public void setEpisodes(SortedList<SlimEpisode> argEpisodes) {
+    public void setEpisodes(EpisodeList argEpisodes) {
         mEpisodes = argEpisodes;
     }
 
@@ -208,7 +209,7 @@ public class SlimSubscription implements ISubscription, Parcelable {
     }
 
     private void initEpisodes() {
-        mEpisodes = new SortedList<>(SlimEpisode.class, new SortedList.Callback<SlimEpisode>() {
+        mEpisodes = new EpisodeList(SlimEpisode.class, new SortedList.Callback<SlimEpisode>() {
             @Override
             public int compare(SlimEpisode o1, SlimEpisode o2) {
                 return 0;
