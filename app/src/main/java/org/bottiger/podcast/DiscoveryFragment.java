@@ -30,6 +30,7 @@ import android.widget.SearchView;
 import org.bottiger.podcast.activities.discovery.DiscoverySearchAdapter;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
+import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.views.dialogs.DialogSearchDirectory;
 import org.bottiger.podcast.webservices.directories.IDirectoryProvider;
 import org.bottiger.podcast.webservices.directories.ISearchParameters;
@@ -302,6 +303,12 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
             ISubscription sub4 = new SlimSubscription("The Moth Podcast", url4, "http://cdn.themoth.prx.org/wp-content/uploads/powerpress/moth_podcast_prx_480x480.jpeg");
             ISubscription sub5 = new SlimSubscription("Cooking Issues", url5, "http://s3.amazonaws.com/hrn/logos/51/original/Cooking-Issues.jpg?1380728747");
 
+            String locale = StrUtils.getUserCountry(getContext());//getContext().getResources().getConfiguration().locale.getCountry();
+            if ("dk".equals(locale)) {
+                URL url_hyggenord = new URL("http://hyggenord.dk/feed/podcast");
+                ISubscription sub_hyggenord = new SlimSubscription("Hyggenørderi", url_hyggenord, "http://hyggenord.dk/wp-content/uploads/2015/11/IMG_20151104_195039.jpg");
+                subscriptions.add(sub_hyggenord);
+            }
 
             subscriptions.add(sub1);
             subscriptions.add(sub2);

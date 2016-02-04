@@ -1,7 +1,9 @@
 package org.bottiger.podcast.utils;
 
 
+import android.content.Context;
 import android.support.annotation.Nullable;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.text.format.DateUtils;
@@ -11,6 +13,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import org.bottiger.podcast.provider.FeedItem;
@@ -150,5 +153,32 @@ public class StrUtils {
 		String str = "" + (length / 1000) + "," + s + " KB";
 
 		return str;
-	}    
+	}
+
+
+
+	/**
+	 * Get ISO 3166-1 alpha-2 country code for this device (or null if not available)
+	 * @param context Context reference to get the TelephonyManager instance from
+	 * @return country code or null
+	 */
+	public static String getUserCountry(Context context) {
+		try {
+			final TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+			final String simCountry = tm.getSimCountryIso();
+			if (simCountry != null && simCountry.length() == 2) { // SIM country code is available
+				return simCountry.toLowerCase(Locale.US);
+			}
+			else if (tm.getPhoneType() != TelephonyManager.PHONE_TYPE_CDMA) { // device is not 3G (would be unreliable)
+				String networkCountry = tm.getNetworkCountryIso();
+				if (networkCountry != null && networkCountry.length() == 2) { // network country code is available
+					return networkCountry.toLowerCase(Locale.US);
+				}
+			}
+		}
+		catch (Exception e) { }
+		return null;
+	}
+
+
 }
