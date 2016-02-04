@@ -72,7 +72,7 @@ public class FragmentContainerActivity extends DrawerActivity {
         mViewPager = mInflatedViewStub;
         mSectionsPagerAdapter = new SectionsPagerAdapter(mFragmentManager, mViewPager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-        mViewPager.setOffscreenPageLimit(1); // 3
+        mViewPager.setOffscreenPageLimit(3); // 3
 
 
         mPagerTaps.addTab(mPagerTaps.newTab().setText("Tab 1"));
