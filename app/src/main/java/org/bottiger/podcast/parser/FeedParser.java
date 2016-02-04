@@ -525,9 +525,18 @@ public class FeedParser {
 
         String url = "";
 
-        while (!(parser.next() == XmlPullParser.END_TAG && parser.getName().equals(SUBSCRIPTION_IMAGE_TAG))) {
-            if (SUBSCRIPTION_IMAGE_URL_TAG.equals(parser.getName())) {
-                url = readText(parser);
+        if (parser.getAttributeCount() > 0) {
+            if (parser.getAttributeName(0) == "href") {
+                String potentialUrl = parser.getAttributeValue(0);
+                if (StrUtils.isValidUrl(potentialUrl)) {
+                    url = potentialUrl;
+                }
+            }
+        } else {
+            while (!(parser.next() == XmlPullParser.END_TAG && parser.getName().equals(SUBSCRIPTION_IMAGE_TAG))) {
+                if (SUBSCRIPTION_IMAGE_URL_TAG.equals(parser.getName())) {
+                    url = readText(parser);
+                }
             }
         }
 
