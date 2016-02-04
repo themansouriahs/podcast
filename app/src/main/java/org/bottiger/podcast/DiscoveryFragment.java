@@ -303,7 +303,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
             ISubscription sub4 = new SlimSubscription("The Moth Podcast", url4, "http://cdn.themoth.prx.org/wp-content/uploads/powerpress/moth_podcast_prx_480x480.jpeg");
             ISubscription sub5 = new SlimSubscription("Cooking Issues", url5, "http://s3.amazonaws.com/hrn/logos/51/original/Cooking-Issues.jpg?1380728747");
 
-            String locale = StrUtils.getUserCountry(getContext());//getContext().getResources().getConfiguration().locale.getCountry();
+            String locale = StrUtils.getUserCountry(getContext());
             if ("dk".equals(locale)) {
                 URL url_hyggenord = new URL("http://hyggenord.dk/feed/podcast");
                 ISubscription sub_hyggenord = new SlimSubscription("Hyggenørderi", url_hyggenord, "http://hyggenord.dk/wp-content/uploads/2015/11/IMG_20151104_195039.jpg");
