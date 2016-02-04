@@ -67,6 +67,7 @@
                 android:id="@+id/fullscreen_button"
                 android:padding="0dip"
                 android:src="?attr/fullscreen"
+                android:visibility="gone"
                 android:elevation="@dimen/player_elevation"
                 style="@style/TopPlayerButton" />
 

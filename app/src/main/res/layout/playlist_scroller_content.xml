@@ -305,6 +305,7 @@
                     android:src="?attr/fullscreen_inv"
                     android:elevation="@dimen/player_elevation"
                     style="@style/TopPlayerButton"
+                    android:visibility="gone"
                     />
 
             </LinearLayout>

@@ -608,7 +608,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
      @Override
      public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
          inflater.inflate(R.menu.playlist_options_menu, menu);
-         setOptionMenuState(menu.findItem(R.id.action_fullscreen_player));
+         //setOptionMenuState(menu.findItem(R.id.action_fullscreen_player));
          super.onCreateOptionsMenu(menu, inflater);
          return;
      }
@@ -627,12 +627,14 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                  dialogPlaylistFilters.show(getFragmentManager(), getTag());
                  return true;
              }
+             /*
              case R.id.action_fullscreen_player: {
                  boolean isFullscreen = mTopPlayer.isFullscreen();
                  mTopPlayer.setFullscreen(!isFullscreen, true);
                  setOptionMenuState(item);
                  return true;
              }
+             */
          }
          return super.onOptionsItemSelected(item);
      }
@@ -641,6 +643,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         if (item == null)
             return;
 
+        /*
         switch (item.getItemId()) {
             case R.id.action_fullscreen_player: {
                 if (mTopPlayer != null) {
@@ -655,6 +658,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                 break;
             }
         }
+        */
     }
 
 	@Override
