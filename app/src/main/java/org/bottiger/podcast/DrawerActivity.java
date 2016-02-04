@@ -65,13 +65,13 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity impleme
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mNavigationView = (NavigationView) findViewById(R.id.navigation_drawer);
         mToolbar = (Toolbar) findViewById(R.id.my_awesome_toolbar);
-        mFragmentTop = (View) findViewById(R.id.fragment_top);
-        mHeaderContainerBackground = findViewById(R.id.header_container_background);
+        //mFragmentTop = (View) findViewById(R.id.fragment_top);
+        //mHeaderContainerBackground = findViewById(R.id.header_container_background);
         mAppContent = (ViewPager) findViewById(R.id.app_content);
-        mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
+        //mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
         mNavigationView.setNavigationItemSelectedListener(this);
 
-        observeToolbarHeight(mFragmentTop);
+        //observeToolbarHeight(mFragmentTop);
 
         // ActionBarDrawerToggle ties together the the proper interactions
         // between the sliding drawer and the action bar app icon
@@ -85,6 +85,8 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity impleme
         mDrawerToggle.syncState();
 
         // if we can use windowTranslucentNavigation=true
+
+        /*
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             //RelativeLayout.MarginLayoutParams params2 = (RelativeLayout.MarginLayoutParams) mDrawerMainContent.getLayoutParams();
             //params2.topMargin = getStatusBarHeight(getResources());
@@ -94,20 +96,25 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity impleme
 
             //mDrawerMainContent.setLayoutParams(params2);
         }
+        */
+
 
     }
 
     public void goFullScreen(@NonNull View argFullScreenView, @ColorInt int argColor) {
+        /*
         mAppContent.bringToFront();
         mToolbar.bringToFront();
         UIUtils.tintStatusBar(argColor, this);
+        */
     }
 
     public void exitFullScreen(@NonNull View argFullScreenView) {
+        /*
         UIUtils.resetStatusBar(this);
         mAppContent.bringToFront();
         mToolbar.bringToFront();
-        //mSlidingTabLayout.bringToFront();
+        */
     }
 
     public int getFragmentTop() {

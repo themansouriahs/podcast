@@ -30,7 +30,6 @@
         android:id="@+id/new_episodes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/subscription_list_new"
         android:layout_below="@id/new_episodes_counter"
         android:layout_alignLeft="@id/new_episodes_counter"
         android:layout_alignRight="@id/new_episodes_counter"

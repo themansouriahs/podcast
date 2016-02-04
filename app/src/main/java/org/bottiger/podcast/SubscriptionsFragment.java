@@ -47,8 +47,7 @@ import rx.schedulers.Schedulers;
 import rx.subscriptions.Subscriptions;
 
 public class SubscriptionsFragment extends Fragment implements View.OnClickListener,
-                                                                SharedPreferences.OnSharedPreferenceChangeListener,
-                                                                DrawerActivity.TopFound {
+                                                                SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG = "SubscriptionsFragment";
 
@@ -174,7 +173,6 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        ((MainActivity)getActivity()).listeners.add(this);
         super.onViewCreated(view, savedInstanceState);
 
         mEmptySubscrptionImportOPMLButton.setOnClickListener(new View.OnClickListener() {
@@ -344,17 +342,5 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
     @Override
     public void onClick(View v) {
         Log.d(TAG, "Onclikc");
-    }
-
-    @Override
-    public void topfound(int i) {
-        Log.d(TAG, "dfdsf");
-        //mContainerView.setPadding(0,i,0,0);
-        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) mGridView.getLayoutParams();
-        FrameLayout.LayoutParams params2 = (FrameLayout.LayoutParams) mEmptySubscrptionList.getLayoutParams();
-        params2.topMargin = i;
-        params.topMargin = i;
-        mGridView.setLayoutParams(params);
-        mEmptySubscrptionList.setLayoutParams(params);
     }
 }

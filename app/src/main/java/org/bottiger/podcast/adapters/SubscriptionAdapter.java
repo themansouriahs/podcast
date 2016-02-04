@@ -175,11 +175,15 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
 
         if (holder.new_episodes_counter != null && holder.new_episodes != null) {
 
-            boolean hasNewEpisodes = subscription.getNewEpisodes() > 0;
+            int newEpisodeCount = subscription.getNewEpisodes();
+            boolean hasNewEpisodes = newEpisodeCount > 0;
             int visibility = hasNewEpisodes ? View.VISIBLE : View.GONE;
 
             if (hasNewEpisodes) {
-                holder.new_episodes_counter.setText(subscription.getNewEpisodes());
+                CharSequence pluralNew = mActivity.getResources().getQuantityText(R.plurals.subscription_list_new, newEpisodeCount);
+
+                holder.new_episodes_counter.setText(newEpisodeCount);
+                holder.new_episodes.setText(pluralNew);
             }
 
             holder.new_episodes_counter.setVisibility(visibility);

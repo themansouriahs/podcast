@@ -135,7 +135,13 @@ public class Library {
 
     public Library(@NonNull Context argContext) {
         mContext = argContext;
-        mDb = mSqlBrite.wrapDatabaseHelper(PodcastOpenHelper.getInstance(argContext));
+
+        PodcastOpenHelper podcastOpenHelper = PodcastOpenHelper.getInstance(argContext);
+
+        //String sql = "update " + SubscriptionColumns.TABLE_NAME + " SET " + SubscriptionColumns.STATUS + "=" + Subscription.STATUS_SUBSCRIBED;
+        //podcastOpenHelper.getWritableDatabase().execSQL(sql);
+
+        mDb = mSqlBrite.wrapDatabaseHelper(podcastOpenHelper);
         mLibraryPersistency = new LibraryPersistency(argContext, this);
 
         mActiveSubscriptions = new SortedList<>(Subscription.class, mSubscriptionsListCallback);
@@ -145,8 +151,6 @@ public class Library {
         SoundWaves.getRxBus().toObserverable()
                 .onBackpressureBuffer(BACKPREASURE_BUFFER_SIZE)
                 .ofType(ItemChanged.class)
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.newThread())
                 .subscribe(new Action1<ItemChanged>() {
                     @Override
                     public void call(ItemChanged itemChangedEvent) {
@@ -253,13 +257,13 @@ public class Library {
             if (argSubscription == null)
                 return;
 
+            if (mSubscriptionIdLUT.containsKey(argSubscription.getId()))
+                return;
+
             if (mActiveSubscriptions.indexOf(argSubscription) == SortedList.INVALID_POSITION &&
                     argSubscription.IsSubscribed()) {
                 mActiveSubscriptions.add(argSubscription);
             }
-
-            if (mSubscriptionIdLUT.containsKey(argSubscription.getId()))
-                return;
 
             mSubscriptionUrlLUT.put(argSubscription.getUrl(), argSubscription);
             mSubscriptionIdLUT.put(argSubscription.getId(), argSubscription);
@@ -444,7 +448,7 @@ public class Library {
     }
 
     public void loadSubscriptions() {
-        Observable<SqlBrite.Query> subscriptions = mDb.createQuery(SubscriptionColumns.TABLE_NAME, getAllSubscriptions());
+        final Observable<SqlBrite.Query> subscriptions = mDb.createQuery(SubscriptionColumns.TABLE_NAME, getAllSubscriptions());
 
         subscriptions
                 .subscribeOn(Schedulers.newThread())
@@ -453,15 +457,17 @@ public class Library {
             public void call(SqlBrite.Query query) {
                 Cursor cursor = null;
                 clearSubscriptions();
+                Subscription subscription = null;
                 try {
                     cursor = query.run();
-                    Subscription subscription;
 
                     while (cursor.moveToNext()) {
                         subscription = getByCursor(cursor, null);
                         addSubscription(subscription);
                     }
                 } finally {
+                    if (subscription != null)
+                        mSubscriptionsChangeObservable.onNext(subscription);
                     if(cursor != null)
                         cursor.close();
                 }

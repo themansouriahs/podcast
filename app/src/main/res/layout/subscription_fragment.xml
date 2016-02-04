@@ -8,7 +8,7 @@
     We want to keep this abouve the "no subscriptions" layout because even if
     it's invisible it intercepts all clicks
     -->
-    <android.support.v7.widget.RecyclerView
+    <org.bottiger.podcast.views.SubscriptionRecycler
         android:id="@+id/gridview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

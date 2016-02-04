@@ -48,7 +48,8 @@
 
         <item name="android:actionBarStyle">@style/TransparentActionBar</item>
 
-        <item name="android:windowBackground">@null</item>
+        <item name="android:windowTranslucentStatus" tools:targetApi="kitkat">false</item>
+        <!--<item name="android:windowBackground">@null</item>-->
         <item name="themeBackground">@color/white_opaque</item>
         <item name="themeTextColorPrimary">@color/pitch_black</item>
         <item name="themeTextColorFaded">@color/grayDark</item>
@@ -135,7 +136,8 @@
         <!--<item name="seekbar_handle">@drawable/seekbar_handle2.9</item>-->
         <item name="android:actionBarStyle">@style/TranslucentActionBar</item>
 
-        <item name="android:windowBackground">@null</item>
+        <!--<item name="android:windowBackground">@null</item>-->
+        <item name="android:windowTranslucentStatus" tools:targetApi="kitkat">false</item>
         <item name="themeBackground">@color/pitch_black</item>
         <item name="themeTextColorPrimary">@color/white_opaque</item>
         <item name="themeTextColorFaded">@color/grayDark</item>

@@ -1,18 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<org.bottiger.podcast.views.PlaylistContainerBehavior
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main_content"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <!--
-    <android.support.v4.widget.NestedScrollView
-        android:id="@+id/overlay_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-        -->
+    android:layout_height="match_parent"
+    app:layout_behavior="org.bottiger.podcast.views.PlaylistContainerBehavior">
 
         <include layout="@layout/playlist_welcome" />
 
@@ -20,29 +13,4 @@
 
         <include layout="@layout/playlist_scroller_content"/>
 
-    <!--
-    </android.support.v4.widget.NestedScrollView>
-    -->
-
-
-    <!--
-    <FrameLayout
-        android:id="@+id/overlay_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <include layout="@layout/playlist_welcome" />
-
-        <include layout="@layout/playlist_empty" />
-
-        <include layout="@layout/playlist_scroller" />
-
-        <include
-            android:id="@+id/playlist_overlay"
-            android:animateLayoutChanges="true"
-            layout="@layout/seekbar_overlay" />
-
-    </FrameLayout>
-    -->
-
-</FrameLayout>
+</org.bottiger.podcast.views.PlaylistContainerBehavior>

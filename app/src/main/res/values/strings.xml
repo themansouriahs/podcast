@@ -184,7 +184,11 @@
     <string name="download_progress">%1$s of %2$s</string>
 
     <!-- In the context: "4 new [episodes]" -->
-    <string name="subscription_list_new">New</string>
+    <plurals name="subscription_list_new">
+        <item quantity="one">New</item>
+        <item quantity="other">New</item>
+    </plurals>
+
     <string name="authenticate_feed_username">Username</string>
     <string name="authenticate_feed_password">Password</string>
 

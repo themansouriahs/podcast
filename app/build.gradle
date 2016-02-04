@@ -1,6 +1,6 @@
 //apply plugin: 'idea'
 apply plugin: 'com.android.application'
-apply plugin: 'com.android.databinding'
+//apply plugin: 'com.android.databinding'
 
 android {
     compileSdkVersion 23
@@ -29,9 +29,9 @@ android {
 
     }
 
-    //dataBinding {
-    //    enabled = true
-    //}
+    dataBinding {
+        enabled = true
+    }
 
     // Point Gradle at the directory where you want to root all of your native code
     // There is a default directory but I prefer to control which directories to use

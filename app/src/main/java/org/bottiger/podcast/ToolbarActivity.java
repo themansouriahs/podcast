@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.view.PagerTitleStrip;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -22,6 +23,7 @@ import android.widget.RelativeLayout;
 import org.bottiger.podcast.DrawerActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.TopActivity;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 
 /**
  * Created by apl on 17-01-2015.
@@ -32,6 +34,7 @@ public class ToolbarActivity extends TopActivity {
 
     private View mPagerTitleStrip;
     private View mAppContent;
+    protected TabLayout mPagerTaps;
 
     private Drawable mToolBackground = null;
     private Drawable mPagerTitleStripBackground = null;
@@ -49,25 +52,24 @@ public class ToolbarActivity extends TopActivity {
         setContentView(getLayout());
 
         mToolbar = (Toolbar) findViewById(R.id.my_awesome_toolbar);
-        mPagerTitleStrip = findViewById(R.id.sliding_tabs);
+        mPagerTaps = (TabLayout) findViewById(R.id.tabs);
 
         mAppContent = findViewById(R.id.app_content);
-
-        // if we can use windowTranslucentNavigation=true
-        /*
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) mToolbar.getLayoutParams();
-            params.topMargin = getStatusBarHeight();
-            mToolbar.setLayoutParams(params);
-        }*/
 
         //Title and subtitle
         mToolbar.setTitle(getResources().getString(R.string.app_name));
 
         setSupportActionBar(mToolbar);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
+        ActionBar actionbar = getSupportActionBar();
+
+        if (actionbar == null) {
+            VendorCrashReporter.report("Actionbarnull", "yep, it's true");
+            return;
+        }
+
+        actionbar.setDisplayHomeAsUpEnabled(true);
+        actionbar.setHomeButtonEnabled(true);
     }
 
     /**
@@ -81,16 +83,18 @@ public class ToolbarActivity extends TopActivity {
             return;
 
         if (mToolBackground == null) {
+            /*
             mToolBackground = mToolbar.getBackground();
             mPagerTitleStripBackground = mPagerTitleStrip.getBackground();
 
             TypedArray array = getTheme().obtainStyledAttributes(new int[] {
-                    android.R.attr.colorPrimary,
                     android.R.attr.colorAccent,
+                    android.R.attr.colorPrimary,
             });
             mToolBackgroundColor = array.getColor(0, 0xFF00FF);
             mPagerTitleStripBackgroundColor = array.getColor(1, 0xFF00FF);
             array.recycle();
+            */
 
             //mToolbar.setBackgroundColor(mToolBackgroundColor);
             //mPagerTitleStrip.setBackgroundColor(mPagerTitleStripBackgroundColor);

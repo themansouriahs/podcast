@@ -1,6 +1,7 @@
 package org.bottiger.podcast;
 
 import org.bottiger.podcast.Animations.DepthPageTransformer;
+import org.bottiger.podcast.Animations.ZoomOutPageTransformer;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.utils.PodcastLog;
 import org.bottiger.podcast.utils.UIUtils;
@@ -11,6 +12,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -51,8 +53,6 @@ public class FragmentContainerActivity extends DrawerActivity {
 	private FragmentManager mFragmentManager;
 	private FragmentTransaction mFragmentTransaction;
 
-    private SlidingTabLayout mSlidingTabLayout;
-
     private ViewPager mInflatedViewStub;
 
     @Override
@@ -72,27 +72,19 @@ public class FragmentContainerActivity extends DrawerActivity {
         mViewPager = mInflatedViewStub;
         mSectionsPagerAdapter = new SectionsPagerAdapter(mFragmentManager, mViewPager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-        mViewPager.setOffscreenPageLimit(3);
+        mViewPager.setOffscreenPageLimit(1); // 3
 
 
-        //mViewPager.setOnPageChangeListener(mPageChangeListener);
-
-        // BEGIN_INCLUDE (setup_slidingtablayout)
-        // Give the SlidingTabLayout the ViewPager, this must be done AFTER the ViewPager has had
-        // it's PagerAdapter set.
-        mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
-        mSlidingTabLayout.setViewPager(mViewPager);
-        mSlidingTabLayout.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-                int lockMode = position == 0 ? DrawerLayout.LOCK_MODE_UNLOCKED : DrawerLayout.LOCK_MODE_LOCKED_CLOSED;
-                //mDrawerLayout.setDrawerLockMode(lockMode);
-            }
-        });
+        mPagerTaps.addTab(mPagerTaps.newTab().setText("Tab 1"));
+        mPagerTaps.addTab(mPagerTaps.newTab().setText("Tab 2"));
+        mPagerTaps.addTab(mPagerTaps.newTab().setText("Tab 3"));
+        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mPagerTaps));
+        mPagerTaps.setupWithViewPager(mViewPager);
 
         // BEGIN_INCLUDE (tab_colorizer)
         // Set a TabColorizer to customize the indicator and divider colors. Here we just retrieve
         // the tab at the position, and return it's set color
+        /*
         mSlidingTabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
 
             @Override
@@ -109,9 +101,11 @@ public class FragmentContainerActivity extends DrawerActivity {
             }
 
         });
+        */
 
 //         android:background="?attr/themeBackground"
         mViewPager.setPageTransformer(true, new DepthPageTransformer(mDrawerLayout));
+        //mViewPager.setPageTransformer(true, new ZoomOutPageTransformer());
 
         if (((SoundWaves)getApplication()).IsFirstRun())
             mViewPager.setCurrentItem(SUBSCRIPTION);
@@ -195,18 +189,20 @@ public class FragmentContainerActivity extends DrawerActivity {
                     if (fragment instanceof PlaylistFragment) {
                         PlaylistFragment playlistFragment = (PlaylistFragment) fragment;
                         TopPlayer topPlayer = playlistFragment.getTopPlayer();
+                        /*
                         if (topPlayer != null && topPlayer.isFullscreen()) {
                             int color = topPlayer.getBackGroundColor();
                             UIUtils.tintStatusBar(color, activity);
                             HasTinted = true;
                         }
+                        */
                     }
                 }
 
                 if (HasTinted) {
                     mViewPager.bringToFront();
                 } else {
-                    mSlidingTabLayout.bringToFront();
+                    //mSlidingTabLayout.bringToFront();
                     UIUtils.resetStatusBar(activity);
                     mViewPager.bringToFront();
                 }

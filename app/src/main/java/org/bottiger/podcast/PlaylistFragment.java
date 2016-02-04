@@ -46,6 +46,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
+import android.support.v4.view.NestedScrollingChildHelper;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -69,14 +70,14 @@ import com.github.ivbaranov.mfb.MaterialFavoriteButton;
 import rx.Subscription;
 import rx.functions.Action1;
 
-public class PlaylistFragment extends AbstractEpisodeFragment implements OnSharedPreferenceChangeListener,
-                                                                        DrawerActivity.TopFound {
+public class PlaylistFragment extends AbstractEpisodeFragment implements OnSharedPreferenceChangeListener {
 
     private static final String TAG = "PlaylistFragment";
 
     private static final String PLAYLIST_WELCOME_DISMISSED = "playlist_welcome_dismissed";
     private static final boolean PLAYLIST_WELCOME_DISMISSED_DEFAULT = false;
 
+    private View mPlaylistFragmentContainer;
     private View mPlaylistContainer;
     private View mPlaylistWelcomeContainer;
 
@@ -151,6 +152,8 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
 	}
 
+    NestedScrollingChildHelper scrollingChildHelper;
+
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         //((MainActivity)getActivity()).listeners.add(this);
@@ -159,7 +162,8 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         mTopPlayer =   (TopPlayer) view.findViewById(R.id.top_player);
         mPhoto =            (ImageViewTinted) view.findViewById(R.id.session_photo);
 
-        mPlaylistContainer = view.findViewById(R.id.playlist_container);
+        mPlaylistFragmentContainer = view.findViewById(R.id.top_coordinator_layout); //view.findViewById(R.id.main_content);
+        mPlaylistContainer = view.findViewById(R.id.top_player);
         mPlaylistWelcomeContainer = view.findViewById(R.id.playlist_welcome_screen);
 
         mPlaylistEmptyContainer = view.findViewById(R.id.playlist_empty);
@@ -187,6 +191,9 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         // specify an adapter (see also next example)
         mAdapter = new PlaylistAdapter(getActivity(), mOverlay);
         mAdapter.setHasStableIds(true);
+
+        scrollingChildHelper = new NestedScrollingChildHelper(mPlaylistFragmentContainer);
+        scrollingChildHelper.setNestedScrollingEnabled(true);
 
 
         SoundWaves.getBus().register(mAdapter);
@@ -220,17 +227,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                 }
             }
         });
-
-        MainActivity ms = ((MainActivity) getActivity());
-        int top = ms.getFragmentTop();
-        if (top < 0) {
-            ((MainActivity) getActivity()).listeners.add(this);
-        }
-
-        top = ms.getFragmentTop();
-        if (top > 0) {
-            topfound(top);
-        }
 
         // init swipe to dismiss logic
         ItemTouchHelper swipeToDismissTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(
@@ -709,26 +705,5 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
     public TopPlayer getTopPlayer() {
         return mTopPlayer;
-    }
-
-    @Override
-    public void topfound(int i) {
-        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) mTopPlayer.getLayoutParams();
-        FrameLayout.LayoutParams params2 = (FrameLayout.LayoutParams) mPlaylistEmptyContainer.getLayoutParams();
-        CoordinatorLayout.LayoutParams params3 = (CoordinatorLayout.LayoutParams) mRecyclerView.getLayoutParams();
-        FrameLayout.LayoutParams params4 = (FrameLayout.LayoutParams) mPlaylistWelcomeContainer.getLayoutParams();
-        params2.topMargin = i;
-        params3.topMargin = i;
-        params4.topMargin = i;
-        if (!mTopPlayer.isFullscreen()) {
-            params.topMargin = i;
-            mTopPlayer.setLayoutParams(params);
-        } else {
-            mTopPlayer.setFullscreen(true, false);
-            //mTopPlayer.setPadding(0, i ,0, 0);
-        }
-        mPlaylistEmptyContainer.setLayoutParams(params2);
-        mRecyclerView.setLayoutParams(params3);
-        mPlaylistWelcomeContainer.setLayoutParams(params4);
     }
 }

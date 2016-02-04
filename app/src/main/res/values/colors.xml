@@ -5,10 +5,10 @@
     <color name="pitch_black">#FF000000</color>
     <color name="transparent">#00000000</color>
 
-    <color name="colorPrimary">#660000</color>
-    <color name="colorSecondary">#cc0000</color>
+    <color name="colorPrimary">#cc0000</color>
+    <color name="colorSecondary">#ff3d00</color>
     <color name="colorPrimaryDark">#990000</color>
-    <color name="colorAccent">#ff3d00</color>
+    <color name="colorAccent">#660000</color>
 
     <color name="colorBgPrimary">#adadad</color>
     <color name="colorBgSecondary">#CCCCCC</color>

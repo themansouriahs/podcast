@@ -9,6 +9,8 @@ import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.webkit.CookieManager;
+import android.widget.FrameLayout;
 
 import org.bottiger.podcast.adapters.decoration.OnDragStateChangedListener;
 
@@ -37,12 +39,26 @@ public class FixedRecyclerView extends RecyclerView {
     }
 
     @Override
+    public boolean onInterceptTouchEvent(MotionEvent event) {
+        return super.onInterceptTouchEvent(event);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        return super.onTouchEvent(event);
+    }
+
+    @Override
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
 
         CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams)getLayoutParams();
         CoordinatorLayout.Behavior behavior = new PlaylistBehavior(mContext, null);
         lp.setBehavior(behavior);
+
+
+
+
         //setLayoutParams(lp);
 
     }

@@ -3,62 +3,51 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:clipToPadding="false">
 
-    <RelativeLayout
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/top_coordinator_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
+        android:layout_height="match_parent">
 
-            <!-- The height here is just an initial guess. It will be calculated in
-            the drawer activity
-            -->
-            <org.bottiger.podcast.views.ViewBackground
-                xmlns:custom="http://schemas.android.com/apk/res/org.bottiger.podcast"
-                android:id="@+id/header_container_background"
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/app_bar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/my_awesome_toolbar"
+                android:layout_height="wrap_content"
                 android:layout_width="match_parent"
-                android:layout_height="85dp"
-                android:background="?attr/colorAccent"
-                custom:dictatingView="@+id/my_awesome_toolbar">
-            </org.bottiger.podcast.views.ViewBackground>
+                app:layout_scrollFlags="scroll|enterAlways">
 
-            <!-- Sliding Tabs -->
-            <org.bottiger.podcast.views.SlidingTab.SlidingTabLayout
-                android:id="@+id/sliding_tabs"
+            </android.support.v7.widget.Toolbar>
+
+            <android.support.design.widget.TabLayout
+                android:id="@+id/tabs"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?attr/colorAccent"
-                android:layout_below="@+id/header_container_background"/>
+                app:tabMode="fixed"
+                app:tabGravity="fill"
+                app:layout_scrollFlags="scroll|enterAlways"/>
 
-        <View
-            android:id="@+id/fragment_top"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_below="@id/sliding_tabs"/>
+        </android.support.design.widget.AppBarLayout>
 
-     <!-- The Main layout -->
+        <!-- The Main layout -->
         <android.support.v4.view.ViewPager
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/app_content"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
             />
 
-    </RelativeLayout>
+    </android.support.design.widget.CoordinatorLayout>
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/my_awesome_toolbar"
-            android:layout_height="?attr/actionBarSize"
-            android:layout_width="match_parent"
-            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-
-        </android.support.v7.widget.Toolbar>
-
-    </FrameLayout>
 
     <!-- The Drawer -->
     <android.support.design.widget.NavigationView
