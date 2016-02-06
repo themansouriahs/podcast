@@ -260,13 +260,13 @@ public class Library {
             if (mSubscriptionIdLUT.containsKey(argSubscription.getId()))
                 return;
 
+            mSubscriptionUrlLUT.put(argSubscription.getUrl(), argSubscription);
+            mSubscriptionIdLUT.put(argSubscription.getId(), argSubscription);
+
             if (mActiveSubscriptions.indexOf(argSubscription) == SortedList.INVALID_POSITION &&
                     argSubscription.IsSubscribed()) {
                 mActiveSubscriptions.add(argSubscription);
             }
-
-            mSubscriptionUrlLUT.put(argSubscription.getUrl(), argSubscription);
-            mSubscriptionIdLUT.put(argSubscription.getId(), argSubscription);
 
             mSubscriptionsChangeObservable.onNext(argSubscription);
 
