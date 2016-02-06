@@ -77,6 +77,7 @@ public class FeedParser {
     private static final String SUBSCRIPTION_SKIP_DAYS_TAG = "skipDays";
 
     private static final String SUBSCRIPTION_IMAGE_URL_TAG = "url";
+    private static final String SUBSCRIPTION_IMAGE_URL_ATTRIBUTE = "href";
     private static final String SUBSCRIPTION_IMAGE_TITLE_TAG = "title";
     private static final String SUBSCRIPTION_IMAGE_LINK_TAG = "link";
 
@@ -526,17 +527,17 @@ public class FeedParser {
         String url = "";
 
         if (parser.getAttributeCount() > 0) {
-            if (parser.getAttributeName(0) == "href") {
+            if (SUBSCRIPTION_IMAGE_URL_ATTRIBUTE.equals(parser.getAttributeName(0))) {
                 String potentialUrl = parser.getAttributeValue(0);
                 if (StrUtils.isValidUrl(potentialUrl)) {
                     url = potentialUrl;
                 }
             }
-        } else {
-            while (!(parser.next() == XmlPullParser.END_TAG && parser.getName().equals(SUBSCRIPTION_IMAGE_TAG))) {
-                if (SUBSCRIPTION_IMAGE_URL_TAG.equals(parser.getName())) {
-                    url = readText(parser);
-                }
+        }
+
+        while (!(parser.next() == XmlPullParser.END_TAG && parser.getName().equals(SUBSCRIPTION_IMAGE_TAG))) {
+            if (SUBSCRIPTION_IMAGE_URL_TAG.equals(parser.getName())) {
+                url = readText(parser);
             }
         }
 

@@ -16,6 +16,7 @@ import android.os.Looper;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -379,8 +380,12 @@ public class FeedActivity extends TopActivity implements PaletteListener {
 
         mToolbar.setTitle(mSubscription.getTitle());
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
+
+        ActionBar actionbar = getSupportActionBar();
+        if (actionbar != null) {
+            actionbar.setDisplayHomeAsUpEnabled(true);
+            actionbar.setHomeButtonEnabled(true);
+        }
 
         mHasAlreadyBeenOpened = savedInstanceState != null;
         mIsEntranceAnimationFinished = mHasAlreadyBeenOpened;
