@@ -39,6 +39,7 @@ import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.UpdatedUrls;
 import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.net.MalformedURLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -204,11 +205,11 @@ public class GPodderAPI implements IWebservice {
         for (int i = 0; i < argLocalSubscriptions.size(); i++) {
             long arrayKey = argLocalSubscriptions.keyAt(i);
             Subscription subscription = argLocalSubscriptions.get(arrayKey);
+
             url = subscription.getURLString();
 
             if (removed.contains(url)) {
                 if (subscription.IsSubscribed()) {
-                    //subscription.unsubscribe(argContext);
                     SoundWaves.getLibraryInstance().unsubscribe(subscription.getURLString());
                 } else {
                     Log.w(TAG, "gPodder removed a subscription we are not subscribed to: " + url); // NoI18N

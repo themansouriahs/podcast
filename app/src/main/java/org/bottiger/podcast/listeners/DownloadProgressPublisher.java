@@ -71,8 +71,6 @@ public class DownloadProgressPublisher {
 
                         Log.d("Refresh UI:", "Run at: "+ (new Date().getTime()));
 
-                        //Iterator<FeedItem> iterator = mUpdateEpisodess.iterator();
-                        //while (iterator.hasNext()) {
                         for (int i = 0; i < mUpdateEpisodess.size(); i++) {
 
                             FeedItem episode = mUpdateEpisodess.get(i); //iterator.next();

@@ -149,7 +149,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
 
     @Override
     public void onBindViewHolder(EpisodeViewHolder viewHolder, final int position) {
-        int dataPosition = position; //getDatasetPosition(position);
+        int dataPosition = viewHolder.getAdapterPosition();
         final IEpisode item = getItemForPosition(dataPosition);
         final EpisodeViewHolder episodeViewHolder = viewHolder;
 

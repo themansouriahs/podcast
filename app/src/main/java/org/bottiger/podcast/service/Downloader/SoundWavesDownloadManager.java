@@ -522,6 +522,11 @@ public class SoundWavesDownloadManager extends Observable {
             queueItem.setStartedManually(argPosition == STARTED_MANUALLY);
 
             mDownloadQueue.add(queueItem);
+
+            if (mDownloadQueue.size()>10) {
+                _subject.onNext(queueItem);
+            }
+
             _subject.onNext(queueItem);
 
         } finally {
@@ -556,8 +561,12 @@ public class SoundWavesDownloadManager extends Observable {
         }
     }
 
-    public List<QueueEpisode> getQueue() {
-        return mDownloadQueue;
+    public int getQueueSize() {
+        return mDownloadQueue.size();
+    }
+
+    public QueueEpisode getQueueItem(int position) {
+        return mDownloadQueue.get(position);
     }
 
     public void cancelCurrentDownload() {

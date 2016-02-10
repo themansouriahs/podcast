@@ -46,46 +46,15 @@ public class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemVie
         mEmptyTextView = argEmptyTextView;
 
         mDownloadManager = SoundWaves.getDownloadManager();
-        List<QueueEpisode> queue = mDownloadManager.getQueue();
         IEpisode downloadingEpisode = mDownloadManager.getDownloadingItem();
         if (downloadingEpisode != null)
             mDownloadingEpisodes.add(downloadingEpisode);
 
-        for (int i = 0; i < queue.size(); i++) {
-            mDownloadingEpisodes.add(queue.get(i).getEpisode());
+        for (int i = 0; i < mDownloadManager.getQueueSize(); i++) {
+            mDownloadingEpisodes.add(mDownloadManager.getQueueItem(i).getEpisode());
         }
 
         setEmptyTextViewVisibility();
-
-        /*
-        URL url = null;
-        URL urlImage = null;
-        try {
-            url = new URL("http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/twit/twit0529/twit0529.mp3");
-            urlImage = new URL("http://twit.cachefly.net/coverart/twit/twit144audio.jpg");
-        } catch (MalformedURLException e) {
-            return;
-        }
-        SlimEpisode episode1 = new SlimEpisode("Episode 1", url, "Twit episode description");
-        SlimEpisode episode2 = new SlimEpisode("Episode 2", url, "Twit episode description");
-        SlimEpisode episode3 = new SlimEpisode("Episode 3", url, "Twit episode description");
-        SlimEpisode episode4 = new SlimEpisode("Episode 4", url, "Twit episode description");
-
-        episode1.setArtwork(urlImage);
-        episode2.setArtwork(urlImage);
-        episode3.setArtwork(urlImage);
-        episode4.setArtwork(urlImage);
-
-        episode1.setFilesize(fileSize);
-        episode2.setFilesize(fileSize);
-        episode3.setFilesize(fileSize);
-        episode4.setFilesize(fileSize);
-
-        mDownloadingEpisodes.add(episode1);
-        mDownloadingEpisodes.add(episode2);
-        mDownloadingEpisodes.add(episode3);
-        mDownloadingEpisodes.add(episode4);
-        */
     }
 
     @Override

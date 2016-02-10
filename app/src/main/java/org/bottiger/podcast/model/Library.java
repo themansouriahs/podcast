@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 import android.support.v4.util.ArrayMap;
 import android.support.v7.util.SortedList;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.squareup.sqlbrite.BriteDatabase;
@@ -176,6 +177,11 @@ public class Library {
 
     public void handleChangedEvent(SubscriptionChanged argSubscriptionChanged) {
         Subscription subscription = getSubscription(argSubscriptionChanged.getId());
+
+        if (subscription == null ||TextUtils.isEmpty(subscription.getURLString())) {
+            Log.wtf("Subscription empty!", "id: " + subscription.getId());
+            return;
+        }
 
         try {
             mLock.lock();
@@ -463,7 +469,12 @@ public class Library {
 
                     while (cursor.moveToNext()) {
                         subscription = getByCursor(cursor, null);
-                        addSubscription(subscription);
+
+                        if (!TextUtils.isEmpty(subscription.getImageURL())) {
+                            addSubscription(subscription);
+                        } else {
+                            subscription = null;
+                        }
                     }
                 } finally {
                     if (subscription != null)
