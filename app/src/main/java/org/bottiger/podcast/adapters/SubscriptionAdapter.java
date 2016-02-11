@@ -286,7 +286,7 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
     }
 
     private boolean isLastItem(int argPosition) {
-        return argPosition +1 == getItemCount();
+        return false; //argPosition +1 == getItemCount();
     }
 
     private boolean isListView() {
@@ -319,7 +319,7 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
         if (count == 0) // If there are 0 subscriptions we do not want to return 1
             return count;
 
-        return count +1; // one footer please
+        return count; // one footer please
     }
 
 }
