@@ -328,7 +328,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                         .setActionTextColor(ContextCompat.getColor(getContext(), R.color.white_opaque));
 
                 View view = snack.getView();
-                FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)view.getLayoutParams();
+                CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)view.getLayoutParams();
                 params.bottomMargin = DrawerActivity.getStatusBarHeight(getResources())*2;
                 view.setLayoutParams(params);
 

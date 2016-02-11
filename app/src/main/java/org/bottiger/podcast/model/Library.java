@@ -93,7 +93,7 @@ public class Library {
 
         @Override
         public void onInserted(int position, int count) {
-            notifySubscriptionChanged(mActiveSubscriptions.get(position).getId(), SubscriptionChanged.ADDED);
+            notifySubscriptionChanged(mActiveSubscriptions.get(position).getId(), SubscriptionChanged.ADDED, "SortedListInsert");
         }
 
         @Override
@@ -104,7 +104,7 @@ public class Library {
             }
 
             long subscriptionId = mActiveSubscriptions.get(position).getId();
-            notifySubscriptionChanged(subscriptionId, SubscriptionChanged.REMOVED);
+            notifySubscriptionChanged(subscriptionId, SubscriptionChanged.REMOVED, "SortedListRemoved");
         }
 
         @Override
@@ -114,7 +114,7 @@ public class Library {
 
         @Override
         public void onChanged(int position, int count) {
-            notifySubscriptionChanged(mActiveSubscriptions.get(position).getId(), SubscriptionChanged.CHANGED);
+            notifySubscriptionChanged(mActiveSubscriptions.get(position).getId(), SubscriptionChanged.CHANGED, "SortedListChanged");
         }
 
         @Override
@@ -178,16 +178,16 @@ public class Library {
     public void handleChangedEvent(SubscriptionChanged argSubscriptionChanged) {
         Subscription subscription = getSubscription(argSubscriptionChanged.getId());
 
-        if (subscription == null ||TextUtils.isEmpty(subscription.getURLString())) {
-            Log.wtf("Subscription empty!", "id: " + subscription.getId());
+        if (subscription == null || TextUtils.isEmpty(subscription.getURLString())) {
+            Log.wtf("Subscription empty!", "id: " + argSubscriptionChanged.getId());
             return;
         }
 
         try {
             mLock.lock();
-            if (subscription != null &&
-                subscription.getStatus() == Subscription.STATUS_UNSUBSCRIBED &&
+            if (subscription.getStatus() == Subscription.STATUS_UNSUBSCRIBED &&
                 mActiveSubscriptions.indexOf(subscription) != SortedList.INVALID_POSITION) {
+                    Log.e("Unsubscribing", "from: " + subscription.title + ", tag:" + argSubscriptionChanged.getTag());
                     mActiveSubscriptions.remove(subscription);
                     mSubscriptionsChangeObservable.onNext(subscription);
             }
@@ -568,7 +568,7 @@ public class Library {
         return subscription != null && subscription.IsSubscribed();
     }
 
-    public void unsubscribe(String argUrl) {
+    public void unsubscribe(String argUrl, String argTag) {
         if (!StrUtils.isValidUrl(argUrl))
             return;
 
@@ -577,7 +577,7 @@ public class Library {
         if (subscription == null)
             return;
 
-        subscription.setStatus(Subscription.STATUS_UNSUBSCRIBED);
+        subscription.setStatus(Subscription.STATUS_UNSUBSCRIBED, argTag);
         updateSubscription(subscription);
         removeSubscription(subscription);
     }
@@ -597,7 +597,7 @@ public class Library {
                             subscription = new Subscription(argUrl);
                         }
 
-                        subscription.setStatus(Subscription.STATUS_SUBSCRIBED);
+                        subscription.setStatus(Subscription.STATUS_SUBSCRIBED, "Subscribe:from:Library.subscribe");
                         updateSubscription(subscription);
 
                         mSubscriptionUrlLUT.put(argUrl,subscription);
@@ -668,15 +668,10 @@ public class Library {
         return s1.getTitle().compareTo(s2.getTitle());
     }
 
-    private void notifySubscriptionChanged(final long argId, @SubscriptionChanged.Action final int argAction) {
-        SoundWaves.getRxBus().send(new SubscriptionChanged(argId, argAction));
-        /*
-        SoundWaves.getRxBus().toObserverable().sample(1, TimeUnit.SECONDS).doOnNext(new Action1<Object>() {
-            @Override
-            public void call(Object o) {
-                new SubscriptionChanged(argId, argAction);
-            }
-        });
-        */
+    private void notifySubscriptionChanged(final long argId, @SubscriptionChanged.Action final int argAction, @Nullable String argTag) {
+        if (TextUtils.isEmpty(argTag))
+            argTag = "NoTag";
+
+        SoundWaves.getRxBus().send(new SubscriptionChanged(argId, argAction, argTag));
     }
 }

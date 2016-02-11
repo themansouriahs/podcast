@@ -179,6 +179,6 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
     }
 
     private void unsubscribe(@NonNull Subscription argSubscription) {
-        SoundWaves.getLibraryInstance().unsubscribe(argSubscription.getURLString());
+        SoundWaves.getLibraryInstance().unsubscribe(argSubscription.getURLString(), "DiscoveryAdapter:unsubscribe");
     }
 }

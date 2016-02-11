@@ -25,6 +25,7 @@ import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
 import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.utils.PodcastLog;
 import org.bottiger.podcast.utils.rxbus.RxBus;
 
 import rx.Observable;
@@ -106,6 +107,7 @@ public class SoundWaves extends Application {
         Log.v(TAG, "time: " + System.currentTimeMillis());
         super.onCreate();
         //Debug.startMethodTracing("startup");
+        PodcastLog.initFileLog(this);
 
         context = getApplicationContext();
 

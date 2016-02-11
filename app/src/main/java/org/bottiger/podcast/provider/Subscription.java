@@ -24,6 +24,7 @@ import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.v7.graphics.Palette;
 import android.support.v7.util.SortedList;
+import android.text.TextUtils;
 import android.util.Patterns;
 
 import javax.annotation.Nullable;
@@ -286,7 +287,7 @@ public class Subscription implements ISubscription, PaletteListener {
 			return;
 
         mPrimaryColor = argColor;
-		notifyPropertyChanged();
+		notifyPropertyChanged(null);
     }
 
     public void setPrimaryTintColor(int argColor) {
@@ -294,7 +295,7 @@ public class Subscription implements ISubscription, PaletteListener {
 			return;
 
         mPrimaryTintColor = argColor;
-		notifyPropertyChanged();
+		notifyPropertyChanged(null);
     }
 
     public void setSecondaryColor(int argColor) {
@@ -302,7 +303,7 @@ public class Subscription implements ISubscription, PaletteListener {
 			return;
 
         mSecondaryColor = argColor;
-		notifyPropertyChanged();
+		notifyPropertyChanged(null);
     }
 
     public int getPrimaryColor() {
@@ -336,7 +337,7 @@ public class Subscription implements ISubscription, PaletteListener {
         mPrimaryColor     = newPrimaryColor;
         mPrimaryTintColor = newPrimaryTintColor;
         mSecondaryColor   = newSecondaryColor;
-		notifyPropertyChanged();
+		notifyPropertyChanged(null);
     }
 
     public boolean IsDirty() {
@@ -369,7 +370,7 @@ public class Subscription implements ISubscription, PaletteListener {
 		mIsRefreshing = argIsRefreshing;
 
 		if (!mIsRefreshing)
-			notifyPropertyChanged();
+			notifyPropertyChanged(null);
 	}
 
 	@Override
@@ -425,7 +426,7 @@ public class Subscription implements ISubscription, PaletteListener {
 			return;
 
         imageURL = argUrl.trim();
-		notifyPropertyChanged();
+		notifyPropertyChanged(null);
     }
 
 	public String getUrl() {
@@ -437,7 +438,7 @@ public class Subscription implements ISubscription, PaletteListener {
 			return;
 
 		this.lastItemUpdated = argTimestamp;
-		notifyPropertyChanged();
+		notifyPropertyChanged(null);
 	}
 
 	public long getLastItemUpdated() {
@@ -459,12 +460,12 @@ public class Subscription implements ISubscription, PaletteListener {
 		return STATUS_SUBSCRIBED;
 	}
 
-	public void setStatus(@Subscribed int argStatus) {
+	public void setStatus(@Subscribed int argStatus, @NonNull String argTag) {
 		if (status == argStatus)
 			return;
 
 		status = argStatus;
-		notifyPropertyChanged();
+		notifyPropertyChanged(argTag);
 	}
 
 	public int getSettings() {
@@ -494,7 +495,7 @@ public class Subscription implements ISubscription, PaletteListener {
 			return;
 
 		title = argTitle.trim();
-		notifyPropertyChanged();
+		notifyPropertyChanged(null);
 	}
 
 	public void setURL(String argUrl) {
@@ -502,7 +503,7 @@ public class Subscription implements ISubscription, PaletteListener {
 			return;
 
 		url = argUrl.trim();
-		notifyPropertyChanged();
+		notifyPropertyChanged(null);
 	}
 
 	public void setDescription(String content) {
@@ -510,7 +511,7 @@ public class Subscription implements ISubscription, PaletteListener {
 			return;
 
 		description = content.trim();
-		notifyPropertyChanged();
+		notifyPropertyChanged(null);
 	}
 
 	/**
@@ -545,7 +546,7 @@ public class Subscription implements ISubscription, PaletteListener {
 		else
 			mSettings &= ~AUTHENTICATION_WORKING;
 
-		notifyPropertyChanged();
+		notifyPropertyChanged(null);
 	}
 
 	public void setRequiringAuthentication(boolean argIsRequiringAuthentication) {
@@ -557,7 +558,7 @@ public class Subscription implements ISubscription, PaletteListener {
 		else
 			mSettings &= ~AUTHENTICATION_NEEDED;
 
-		notifyPropertyChanged();
+		notifyPropertyChanged(null);
 	}
 
 	public boolean isListOldestFirst() {
@@ -576,7 +577,7 @@ public class Subscription implements ISubscription, PaletteListener {
 		else
 			mSettings &= ~LIST_OLDEST_FIRST;
 
-		notifyPropertyChanged();
+		notifyPropertyChanged(null);
 	}
 
 	public boolean isDeleteWhenListened() {
@@ -595,7 +596,7 @@ public class Subscription implements ISubscription, PaletteListener {
 		else
 			mSettings &= ~DELETE_AFTER_PLAYBACK;
 
-		notifyPropertyChanged();
+		notifyPropertyChanged(null);
 	}
 
 	public float getPlaybackSpeed() {
@@ -641,7 +642,7 @@ public class Subscription implements ISubscription, PaletteListener {
 			mSettings |= PLAYBACK_SPEED_SET;
 		} else {
 			mSettings &= ~PLAYBACK_SPEED_SET;
-			notifyPropertyChanged();
+			notifyPropertyChanged(null);
 			return;
 		}
 
@@ -675,7 +676,7 @@ public class Subscription implements ISubscription, PaletteListener {
 			mSettings &= ~PLAYBACK_SPEED_4BIT;
 		}
 
-		notifyPropertyChanged();
+		notifyPropertyChanged(null);
 	}
 
 	public boolean doDownloadNew(boolean argDefault) {
@@ -694,7 +695,7 @@ public class Subscription implements ISubscription, PaletteListener {
 		else
 			mSettings &= ~DOWNLOAD_NEW_EPISODES;
 
-		notifyPropertyChanged();
+		notifyPropertyChanged(null);
 	}
 
 	public boolean isAddNewToPlaylist() {
@@ -713,7 +714,7 @@ public class Subscription implements ISubscription, PaletteListener {
 		else
 			mSettings &= ~ADD_NEW_TO_PLAYLIST;
 
-		notifyPropertyChanged();
+		notifyPropertyChanged(null);
 	}
 
 	public boolean isShowDescription() {
@@ -732,7 +733,7 @@ public class Subscription implements ISubscription, PaletteListener {
 		else
 			mSettings &= ~SHOW_EPISODE_DESCRIPTION;
 
-		notifyPropertyChanged();
+		notifyPropertyChanged(null);
 	}
 
 	private boolean IsSettingEnabled(int setting) {
@@ -746,12 +747,15 @@ public class Subscription implements ISubscription, PaletteListener {
 
 	public void notifyEpisodeAdded() {
 		if (!mIsRefreshing)
-			SoundWaves.getRxBus().send(new SubscriptionChanged(getId(), SubscriptionChanged.ADDED));
+			SoundWaves.getRxBus().send(new SubscriptionChanged(getId(), SubscriptionChanged.ADDED, null));
 	}
 
-	private void notifyPropertyChanged() {
+	private void notifyPropertyChanged(@android.support.annotation.Nullable String argTag) {
+		if (TextUtils.isEmpty(argTag))
+			argTag = "NoTag";
+
 		if (!mIsRefreshing)
-			SoundWaves.getRxBus().send(new SubscriptionChanged(getId(), SubscriptionChanged.CHANGED));
+			SoundWaves.getRxBus().send(new SubscriptionChanged(getId(), SubscriptionChanged.CHANGED, argTag));
 	}
 
 }

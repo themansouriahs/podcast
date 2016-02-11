@@ -1,6 +1,7 @@
 package org.bottiger.podcast.model.events;
 
 import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -19,10 +20,12 @@ public class SubscriptionChanged implements ItemChanged {
 
     private long id;
     private @Action int action;
+    private String tag;
 
-    public SubscriptionChanged(long argId, @Action int argAction) {
+    public SubscriptionChanged(long argId, @Action int argAction, @NonNull String argTag) {
         id = argId;
         action = argAction;
+        tag = argTag;
     }
 
     public long getId() {
@@ -31,5 +34,10 @@ public class SubscriptionChanged implements ItemChanged {
 
     public @Action int getAction() {
         return action;
+    }
+
+    @NonNull
+    public String getTag() {
+        return tag;
     }
 }

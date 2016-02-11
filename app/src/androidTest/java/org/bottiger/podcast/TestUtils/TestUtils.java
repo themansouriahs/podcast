@@ -124,7 +124,7 @@ public class TestUtils {
             // get the object by the key.
             Subscription subscription = list.get(i);
             //subscription.unsubscribe(argActivity);
-            SoundWaves.getLibraryInstance().unsubscribe(subscription.getURLString());
+            SoundWaves.getLibraryInstance().unsubscribe(subscription.getURLString(), "TestUtil:UnsubscribeAll");
         }
     }
 }
