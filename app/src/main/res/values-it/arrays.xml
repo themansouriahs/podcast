@@ -1,26 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
-  <string-array name="drawer_menu">
-    <item>Filtri playlist</item>
-    <item>Elementi in download</item>
-  </string-array>
-  <string-array name="entries_update">
-    <item>30 minuti</item>
-    <item>1 ora</item>
-    <item>2 ore</item>
-    <item>4 ore </item>
-    <item>6 ore </item>
-    <item>10 ore </item>
-    <item>1 giorno</item>
-  </string-array>
-  <string-array name="entries_item_expire">
-    <item>1 giorno</item>
-    <item>3 giorni</item>
-    <item>5 giorni </item>
-    <item>1 settimana</item>
-    <item>2 settimane</item>
-    <item>1 mese</item>
-  </string-array>
   <string-array name="entries_download_file_expire">
     <item>100 MB</item>
     <item>1 GB</item>
@@ -28,41 +7,5 @@
     <item>3 GB</item>
     <item>5 GB</item>
     <item>Illimitato</item>
-  </string-array>
-  <string-array name="sort_select">
-    <item>Ordina per canale</item>
-    <item>Ordina per stato</item>
-    <item>Ordina per data</item>
-  </string-array>
-  <string-array name="select_select">
-    <item>Tutti</item>
-    <item>Nuovi soltanto</item>
-    <item>Non riprodotti soltanto</item>
-    <item>Riproducibili soltanto</item>
-  </string-array>
-  <string-array name="backup_select">
-    <item>Importa da OPML</item>
-    <item>Esporta in OPML</item>
-  </string-array>
-  <string-array name="repeat_select">
-    <item>Non ripetere</item>
-    <item>Ripeti tutti</item>
-    <item>Ripeti singolo</item>
-  </string-array>
-  <string-array name="entries_pref_rewind_interval">
-    <item>3 secondi</item>
-    <item>5 secondi</item>
-    <item>7 secondi</item>
-    <item>10 secondi</item>
-    <item>15 secondi</item>
-    <item>20 secondi</item>
-    <item>30 secondi</item>
-  </string-array>
-  <string-array name="entries_pref_fast_forward_interval">
-    <item>5 secondi</item>
-    <item>10 secondi</item>
-    <item>15 secondi</item>
-    <item>20 secondi</item>
-    <item>30 secondi</item>
   </string-array>
 </resources>

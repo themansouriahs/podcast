@@ -1,26 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
-  <string-array name="drawer_menu">
-    <item>Filtros da lista de reprodução</item>
-    <item>Transferindo itens</item>
-  </string-array>
-  <string-array name="entries_update">
-    <item>30 minutos</item>
-    <item>1 hora</item>
-    <item>2 horas</item>
-    <item>4 horas</item>
-    <item>6 horas</item>
-    <item>10 horas</item>
-    <item>1 dia</item>
-  </string-array>
-  <string-array name="entries_item_expire">
-    <item>1 dia</item>
-    <item>3 dias</item>
-    <item>5 dias</item>
-    <item>1 semana</item>
-    <item>2 semanas</item>
-    <item>1 mês</item>
-  </string-array>
   <string-array name="entries_download_file_expire">
     <item>100 MB</item>
     <item>1 GB</item>
@@ -28,71 +7,6 @@
     <item>3 GB</item>
     <item>5 GB</item>
     <item>Ilimitado</item>
-  </string-array>
-  <string-array name="entryvalues_spinner_number_of_episodes">
-    <item>10</item>
-    <item>20</item>
-    <item>30</item>
-    <item>40</item>
-    <item>50</item>
-    <item>100</item>
-  </string-array>
-  <string-array name="sort_select">
-    <item>Ordenar por canal</item>
-    <item>Ordenar por estado</item>
-    <item>Ordenar por data</item>
-  </string-array>
-  <string-array name="select_select">
-    <item>Tudo</item>
-    <item>Apenas novos</item>
-    <item>Apenas não reproduzidos</item>
-    <item>Apenas passíveis de reprodução</item>
-  </string-array>
-  <string-array name="backup_select">
-    <item>Importar de OPML</item>
-    <item>Exportar para OPML</item>
-  </string-array>
-  <string-array name="repeat_select">
-    <item>Não repetir</item>
-    <item>Repetir tudo</item>
-    <item>Repetir um</item>
-  </string-array>
-  <string-array name="entries_pref_rewind_interval">
-    <item>3 segundos</item>
-    <item>5 segundos</item>
-    <item>7 segundos</item>
-    <item>10 segundos</item>
-    <item>15 segundos</item>
-    <item>20 segundos</item>
-    <item>30 segundos</item>
-  </string-array>
-  <string-array name="entries_pref_fast_forward_interval">
-    <item>5 segundos</item>
-    <item>10 segundos</item>
-    <item>15 segundos</item>
-    <item>20 segundos</item>
-    <item>30 segundos</item>
-  </string-array>
-  <string-array name="entryvalues_pref_fast_forward_interval">
-    <item>5</item>
-    <item>10</item>
-    <item>15</item>
-    <item>20</item>
-    <item>30</item>
-  </string-array>
-  <string-array name="entries_pref_max_new_items">
-    <item>5</item>
-    <item>10</item>
-    <item>20</item>
-    <item>30</item>
-    <item>50</item>
-  </string-array>
-  <string-array name="entryvalues_pref_max_new_items">
-    <item>5</item>
-    <item>10</item>
-    <item>20</item>
-    <item>30</item>
-    <item>50</item>
   </string-array>
   <string-array name="pref_player_seek_entries">
     <item>5 segundos</item>

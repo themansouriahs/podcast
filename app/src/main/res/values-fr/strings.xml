@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
   <string name="app_name">SoundWaves</string>
   <string name="title_activity_swipe">SoundWaves</string>
   <string name="drawer_open">Ouvrier</string>
@@ -9,4 +9,5 @@
   <!--Search engine for searching for new podcasts-->
   <!--Used for displaying the download progress of a file. Example: "1.2 MB of 53 MB" (the unit, MB, is handled by the framework)
     When the progress is 0 (we have not started downloading) we should just show the total file size. Example "53 MB"-->
+  <!--In the context: "4 new [episodes]"-->
 </resources>

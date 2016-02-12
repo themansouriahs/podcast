@@ -1,10 +1,8 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
   <string name="app_name">SoundWaves</string>
   <string name="unsubscribe">Abmelden</string>
   <string name="pref_dark_theme">Dunklen Hintergrund für höheren Kontrast aktivieren</string>
-  <string name="pref_notification_control">Benachrichtigungssteuerungen</string>
-  <string name="pref_notification_control_description">Kleinen Player im Infobereich anzeigen</string>
   <string name="dialog_message_add_sub">Bitte geben Sie eine URL ein:</string>
   <string name="title_section3">Wiedergabeliste</string>
   <string name="title_section2">Entdecken</string>
@@ -12,8 +10,6 @@
   <string name="hello_world">Hallo Welt!</string>
   <string name="menu_settings">Einstellungen</string>
   <string name="title_activity_swipe">SoundWaves</string>
-  <string name="menu_order_by_date_desc">DIe neuesten zuerst anzeigen</string>
-  <string name="menu_order_by_date_asc">DIe ältesten zuerst anzeigen</string>
   <string name="pref_feedback_title">Anonyme Berichte senden</string>
   <string name="pref_feedback_description">Senden Sie anonyme Daten über die App wie Crash-Berichte, zu den Entwicklern</string>
   <string name="pref_cloud_support_title">Cloud-Unterstützung aktivieren</string>
@@ -27,7 +23,6 @@
   <string name="preferences_category_advanced">Fortgeschritten</string>
   <string name="pref_player_backward_amount_title">Rücklauf</string>
   <string name="pref_playback_category_title">Wiedergabe</string>
-  <string name="pref_notification_category_title">Benachrichtigung</string>
   <string name="preferences_category_about">Über</string>
   <string name="pref_current_version_title">Version</string>
   <string name="ok">OK</string>
@@ -38,14 +33,10 @@
   <string name="menu_feedback">Feedback</string>
   <string name="menu_refresh_feed">Aktualisieren</string>
   <string name="crash_toast">Absturz :( Bitte helfen Sie, indem Sie einen Absturzbericht an uns senden</string>
-  <string name="podcast_title_unknown">Kein Titel :(</string>
   <string name="subscription_instruction">Fügen Sie neue Podcasts mithilfe der Seite Entdeckung nach rechts hinzu oder importieren Sie eine OPML-Datei.\n\nBeachten, Sie bitte zunächst, ob Sie die Optionen unten aktiviert/deaktiviert haben.</string>
   <string name="filter_show_listened">Bisher gehört Anzeige</string>
   <string name="auto_start_next">Automatisch nächstes starten</string>
-  <string name="drawer_player_settings">Player Einstellungen</string>
   <string name="opml_not_found">OPML nicht gefunden. Benennen Sie die Datei um %1$s und legen Sie sie im Stammordner der Speicherkarte (SD-Karte)</string>
-  <string name="gpodder_searching">Suchen mit gPodder.net</string>
-  <string name="subscription_subscribing_to">Abonnieren von:</string>
   <string name="pref_subscriptions_category_title">Abonnements</string>
   <string name="pref_interface_other_category_title">Andere</string>
   <string name="opml_radio_import">OPML Datei importieren</string>
@@ -80,7 +71,6 @@
   <!--Search engine for searching for new podcasts-->
   <string name="discovery_select_backend">Suchmaschine auswählen</string>
   <string name="pref_webservices_discovery_description">Webdienste für die Suche nach Podcasts benutzen</string>
-  <string name="subscription_instruction_title">Vielen Dank für das Ausprobieren von SoundWaves</string>
   <string name="playlist_filter_introducion">Automatisch die letzten Episoden folgender Serie in die Wiedergabeliste einfügen</string>
   <string name="playlist_filter_none">Nichts einfügen</string>
   <string name="playlist_empty">Die Widergabeliste ist leer :(</string>
@@ -90,9 +80,9 @@
   <string name="playlist_empty_mode_two">Neueste Episoden</string>
   <string name="playlist_empty_mode_one_desc">Die Wiedergabeliste wird nur Episoden enthalten die manuell in die Warteschlange gestellt wurden </string>
   <string name="playlist_episode_dismissed">Episode entfernt</string>
-  <string name="drawer_playlist_content_source">Inhalt der Wiedergabeliste</string>
   <!--Used for displaying the download progress of a file. Example: "1.2 MB of 53 MB" (the unit, MB, is handled by the framework)
     When the progress is 0 (we have not started downloading) we should just show the total file size. Example "53 MB"-->
+  <!--In the context: "4 new [episodes]"-->
   <plurals name="bulk_download_playlist">
     <item quantity="one">Erste Episode in der Wiedergabeliste</item>
     <item quantity="other">Beste %d Episoden in der Wiedergabeliste</item>

@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
   <string name="app_name">SoundWaves</string>
   <string name="unsubscribe">Cancelar subscrição</string>
   <string name="pref_only_wifi_description">Apenas transferir ficheiros se estiver ligado a redes Wi-Fi</string>
@@ -10,8 +10,6 @@
   <string name="pref_download_on_update_description">Transferir novos episódios à medida que ficam disponíveis</string>
   <string name="pref_downloaded_expire_description">%s</string>
   <string name="pref_downloaded_expire_title">Limite de transferências</string>
-  <string name="pref_notification_control">Controlos na notificação</string>
-  <string name="pref_notification_control_description">Mostrar controlos do reprodutor na área de notificações</string>
   <string name="dialog_title_add_sub">Adicionar podcast</string>
   <string name="dialog_message_add_sub">Por favor digite um URL:</string>
   <string name="title_section3">Lista de reprodução</string>
@@ -25,8 +23,6 @@
   <string name="menu_clear_playlist">Repor lista de reprodução</string>
   <string name="menu_import">Importar/exportar OPML</string>
   <string name="menu_add_podcast">Adicionar podcast</string>
-  <string name="menu_order_by_date_desc">Mostrar mais recentes no inicio</string>
-  <string name="menu_order_by_date_asc">Mostrar mais antigos no inicio</string>
   <string name="pref_feedback_title">Enviar relatórios anónimos</string>
   <string name="pref_feedback_description">Envia ao programador algumas informações (anónimas) sobre a aplicação</string>
   <string name="pref_cloud_support_title">Ativar suporte na cloud</string>
@@ -52,7 +48,6 @@
   <string name="pref_player_forwards_amount_summary">Avançar %s no tempo</string>
   <string name="pref_player_backwards_amount_summary">Recuar %s no tempo</string>
   <string name="pref_playback_category_title">Reprodução</string>
-  <string name="pref_notification_category_title">Notificação</string>
   <string name="preferences_category_about">Sobre</string>
   <string name="pref_current_version_title">Versão</string>
   <string name="ok">OK</string>
@@ -66,15 +61,13 @@
   <string name="crash_toast">Erro (ajude-nos a corrigir o problema enviando um relatório de erros)</string>
   <string name="pref_help_category_title">Ajude no desenvolvimento</string>
   <string name="pref_help_static_field_description">Se você quiser ajudar, existem imensas coisas que pode fazer. Pode ajudar na programação ou algo completamente diferente. Pode ajudar na tradução, na criação de ícones e imagens, um sítio web e muito mais. Aceda à nossa página do GitHub (github.com/bottiger/SoundWaves) ou envie uma mensagem para: bottiger@gmail.com</string>
-  <string name="podcast_title_unknown">Sem título :(</string>
+  <string name="episode_title_unknown">Sem título :(</string>
+  <string name="podcast_title_unknown">Título desconhecido</string>
   <string name="subscription_instruction">Adicione novos podcasts utilizando o menu Descobrir ou importando um ficheiro OPML.\n\nContudo, tenha em consideração a ativação/desativação de uma das opções abaixo.</string>
   <string name="filter_show_listened">Mostrar reproduzidos</string>
   <string name="auto_start_next">Reprodução contínua</string>
   <string name="drawer_playlist_filters">Filtros da lista de reprodução</string>
-  <string name="drawer_player_settings">Definições do reprodutor</string>
   <string name="opml_not_found">OPML não encontrado. Renomeie o seu ficheiro para %1$s e coloque-o na pasta raíz do seu cartão SD</string>
-  <string name="gpodder_searching">Procurar no gPodder.net</string>
-  <string name="subscription_subscribing_to">Subscrevendo:  </string>
   <string name="pref_subscriptions_category_title">Subscrições</string>
   <string name="pref_subscriptions_columns_dialog_title">Colunas para subscrições</string>
   <string name="pref_subscriptions_columns_title">Colunas para subscrições</string>
@@ -101,6 +94,7 @@
   <string name="pref_advanced_category_experimental">Definições experimentais</string>
   <string name="pref_screen_rotation_title">Ativar rotação de ecrã</string>
   <string name="pref_screen_rotation_description">Suporte para modo horizontal</string>
+  <string name="search_feed_hint">Pesquisar %s</string>
   <string name="search_query_hint">Procurar através de %s</string>
   <string name="discovery_recommendations">Recomendado pelo autor</string>
   <string name="discovery_recommendations_trending">Tendências</string>
@@ -119,7 +113,6 @@
   <string name="pref_webservices_dialog_title">Mecanismo de procura de podcasts</string>
   <string name="pref_webservices_discovery_title">Mecanismo de procura de podcasts</string>
   <string name="pref_webservices_discovery_description">Os serviços web utilizados para procurar podcasts</string>
-  <string name="subscription_instruction_title">Obrigado por experimentar o SoundWaves</string>
   <string name="playlist_filter_introducion">Preencher lista de reprodução com os episódios mais recentes de</string>
   <string name="playlist_filter_none">Não preencher</string>
   <string name="playlist_empty">Lista de reprodução vazia :(</string>
@@ -132,16 +125,16 @@
   <string name="playlist_empty_mode_two_desc">A lista de reprodução será preenchida automaticamente com os episódios mais recentes. No entanto, também pode adicionar os episódios manualmente.</string>
   <string name="playlist_episode_dismissed">Episódio removido</string>
   <string name="playlist_episode_dismissed_undo">Anular</string>
-  <string name="drawer_playlist_content_source">Conteúdo da lista de reprodução</string>
   <string name="playlist_context_menu_playnext">Reproduzir seguinte</string>
   <string name="subscription_subtitle_updated_at">atualizada</string>
   <string name="filter_show_only_downloaded">Apenas transferidos</string>
   <string name="action_filter">Filtrar lista de reprodução</string>
   <string name="apply_filters">Aplicar filtros</string>
-  <string name="reset_filters">Repor</string>
   <string name="pref_gpodder_support_title">GPodder</string>
   <string name="gpodder_username">nome de utilizador</string>
   <string name="gpodder_password">palavra-passe</string>
+  <string name="gpodder_device">Nome do dispositivo</string>
+  <string name="gpodder_server">Servidor</string>
   <string name="generic_test_credentials">Testar credenciais</string>
   <string name="generic_test_credentials_succes">Credenciais válidas</string>
   <string name="generic_test_credentials_failed">Credenciais inválidas</string>
@@ -158,7 +151,6 @@
   <string name="feed_settings_delete_when_listened">Eliminar após a reprodução</string>
   <string name="feed_settings_intro">Estas definições irão substituir as predefinições do SoundWaves para este podcast.</string>
   <string name="feed_settings_oldest_first">Mostrar episódios antigos no inicio</string>
-  <string name="choose_player_for_open_video_externally">Escolher reprodutor para ver o episódio</string>
   <string name="open_video_externally_title">Abrir vídeo em outro reprodutor?</string>
   <string name="open_video_externally_body">Este é um episódio de vídeos e não é suportado por esta aplicação. Pode abrir o episódio no seu reprodutor de vídeos ou utilizar esta aplicação para ouvir o áudio.</string>
   <string name="open_video_externally_confirm">Abrir reprodutor de vídeo</string>
@@ -179,6 +171,9 @@
   <!--Used for displaying the download progress of a file. Example: "1.2 MB of 53 MB" (the unit, MB, is handled by the framework)
     When the progress is 0 (we have not started downloading) we should just show the total file size. Example "53 MB"-->
   <string name="download_progress">%1$s de %2$s</string>
+  <!--In the context: "4 new [episodes]"-->
+  <string name="authenticate_feed_username">Nome de utilizador</string>
+  <string name="authenticate_feed_password">Palavra-passe</string>
   <plurals name="player_sleep">
     <item quantity="one">O reprodutor parará em %d minuto</item>
     <item quantity="other">O reprodutor parará em %d minutos</item>
