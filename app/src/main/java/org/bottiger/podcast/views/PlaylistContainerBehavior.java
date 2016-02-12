@@ -178,6 +178,7 @@ public class PlaylistContainerBehavior extends CoordinatorLayout implements Nest
         return super.onNestedFling(target, velocityX, velocityY, consumed);
     }
 
+    /*
     public void onNestedScroll(View target, int dxConsumed, int dyConsumed,
                                int dxUnconsumed, int dyUnconsumed) {
 
@@ -187,6 +188,7 @@ public class PlaylistContainerBehavior extends CoordinatorLayout implements Nest
         stopNestedScroll();
         super.onNestedScroll(target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed);
     }
+    */
 
     @Override
     public boolean onTouchEvent(MotionEvent event){

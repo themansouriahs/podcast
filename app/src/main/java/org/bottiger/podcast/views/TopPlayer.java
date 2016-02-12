@@ -471,6 +471,25 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         //}
     }
 
+    public float canConsume(float argDiff) {
+        float currentHeight = getPlayerHeight();
+
+        if (currentHeight <= sizeSmall) {
+            return 0;
+        }
+        if (currentHeight > sizeLarge) {
+            return 0;
+        }
+
+        float newHeight = currentHeight+argDiff;
+
+        if (argDiff > 0) {
+            return newHeight-sizeLarge;
+        }
+
+        return newHeight-sizeSmall;
+    }
+
     // returns the new height
     public float setPlayerHeight(float argScreenHeight) {
         Log.v(TAG, "Player height is set to: " + argScreenHeight);
@@ -791,27 +810,40 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
             float oldHeight = TopPlayer.this.getPlayerHeight();
             float newHeight = 0;
 
+            scrollingChildHelper.startNestedScroll(ViewCompat.SCROLL_AXIS_VERTICAL);
+
+            int offsetY = (int)TopPlayer.this.getPlayerHeight();
+            int[] offsetInWindow = new int[] {0, 0}; // offsetY
+
+            int[] consumed = new int[] { 0, 0};
+            scrollingChildHelper.dispatchNestedPreScroll(0, dyUnconsumed, consumed, offsetInWindow);
+
+            dyConsumed = (int)canConsume(dyUnconsumed);
+
+            dyUnconsumed = (int)(diffY - dyConsumed);
+            scrollingChildHelper.dispatchNestedScroll(0, dyConsumed, 0, dyUnconsumed, offsetInWindow );
+
+            dyUnconsumed = (int)diffY;
+
+            int treshold = TopPlayer.this.mViewConfiguration.getScaledTouchSlop();
             if (diffYabs > 0) {//(diffYabs > ViewConfigurationCompat.getScaledPagingTouchSlop(TopPlayer.this.mViewConfiguration)) {
                 Log.d(DEBUG_TAG, "onScroll: dispatchScroll: dyUnconsumed: " + dyUnconsumed);
 
+                int consumedByActionbar = consumed[1];
+
                 // if we are pulling down, but do not consume all the pulls
                 if (dyUnconsumed < 0) {
-                    newHeight = TopPlayer.this.scrollBy(dyUnconsumed);
+                    newHeight = TopPlayer.this.scrollBy(dyUnconsumed-consumedByActionbar);
                 }
 
                 if (dyUnconsumed > 0 && !TopPlayer.this.isMinimumSize()) {
-                    newHeight = TopPlayer.this.scrollBy(dyUnconsumed);
+                    newHeight = TopPlayer.this.scrollBy(dyUnconsumed-consumedByActionbar);
                 }
 
                 dyConsumed = (int)(oldHeight-newHeight);
             }
 
-            int offsetY = (int)TopPlayer.this.getPlayerHeight();
-            int[] offsetInWindow = new int[] {0, offsetY};
 
-            int[] consumed = new int[] { 0, dyConsumed};
-            scrollingChildHelper.dispatchNestedPreScroll(0, (int) diffY, consumed, offsetInWindow);
-            scrollingChildHelper.dispatchNestedScroll(0, dyConsumed, 0, dyUnconsumed, offsetInWindow );
             Log.d(DEBUG_TAG, "onScroll: ignore: diffY: " + diffY);
             return true;
         }
