@@ -4,28 +4,22 @@ import android.content.Context;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.GestureDetectorCompat;
-import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.NestedScrollingChild;
 import android.support.v4.view.NestedScrollingChildHelper;
 import android.support.v4.view.NestedScrollingParent;
-import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
-import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewParent;
-import android.widget.FrameLayout;
 
 import org.bottiger.podcast.R;
-
-import java.util.List;
 
 /**
  * Created by aplb on 28-01-2016.
  */
-public class PlaylistContainerBehavior extends CoordinatorLayout implements NestedScrollingParent, NestedScrollingChild, GestureDetector.OnGestureListener {
+public class PlaylistContainerWrapper extends CoordinatorLayout implements NestedScrollingParent, NestedScrollingChild, GestureDetector.OnGestureListener {
 
     private static final String TAG = "PlaylistContainerBe";
 
@@ -37,15 +31,15 @@ public class PlaylistContainerBehavior extends CoordinatorLayout implements Nest
     private int mInitialTouchY;
     private int mLastTouchY;
 
-    public PlaylistContainerBehavior(Context context) {
+    public PlaylistContainerWrapper(Context context) {
         this(context, null);
     }
 
-    public PlaylistContainerBehavior(Context context, AttributeSet attrs) {
+    public PlaylistContainerWrapper(Context context, AttributeSet attrs) {
         this(context, null, 0);
     }
 
-    public PlaylistContainerBehavior(Context context, AttributeSet attrs, int defStyleAttr) {
+    public PlaylistContainerWrapper(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         mDetector = new GestureDetectorCompat(context, this);
         mNestedScrollingChildHelper = new NestedScrollingChildHelper(this);
