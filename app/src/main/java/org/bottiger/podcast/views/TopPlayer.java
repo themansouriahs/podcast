@@ -18,6 +18,7 @@ import android.support.v4.view.ScrollingView;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewConfigurationCompat;
 import android.support.v4.widget.NestedScrollView;
+import android.support.v4.widget.ScrollerCompat;
 import android.support.v7.graphics.Palette;
 import android.transition.ChangeBounds;
 import android.transition.Scene;
@@ -477,7 +478,8 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         if (currentHeight <= sizeSmall) {
             return 0;
         }
-        if (currentHeight > sizeLarge) {
+
+        if (currentHeight >= sizeLarge) {
             return 0;
         }
 
@@ -581,6 +583,10 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
             return false;
         }
         return true;
+    }
+
+    public boolean isMaximumSize() {
+        return getHeight() >= sizeLarge;
     }
 
     public boolean isMinimumSize() {
@@ -750,6 +756,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         return super.onInterceptTouchEvent(event);
     }
 
+    /*
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         Log.w(TAG, "touchdebug touch : " + event.getAction());
@@ -785,10 +792,73 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         }
 
         return true;
+    }*/
+
+
+    public boolean scrollExternal(float distanceY, boolean argDispatchScrollEvents) {
+
+        float diffY = distanceY;
+        int dyConsumed = 0;
+
+        float diffYabs = Math.abs(diffY);
+        int dyUnconsumed = (int)diffY;
+
+        if (argDispatchScrollEvents)
+            scrollingChildHelper.startNestedScroll(ViewCompat.SCROLL_AXIS_VERTICAL);
+
+
+        int[] offsetInWindow = new int[] {0, 0};
+
+        int[] consumed = new int[] { 0, 0};
+
+
+        if (argDispatchScrollEvents)
+            scrollingChildHelper.dispatchNestedPreScroll(0, dyUnconsumed, consumed, offsetInWindow);
+
+
+        //diffY = diffY + offsetInWindow[1];
+        dyUnconsumed += offsetInWindow[1];
+        offsetInWindow[1] = 0;
+
+
+        int dyCanConsume = (int)canConsume(dyUnconsumed);
+        dyConsumed = dyCanConsume > Math.abs(diffY) ? dyUnconsumed : dyCanConsume;
+
+        dyUnconsumed = Math.abs(diffY) > Math.abs(dyConsumed) ? (dyUnconsumed - dyConsumed) : 0;
+
+
+        if (argDispatchScrollEvents)
+            scrollingChildHelper.dispatchNestedScroll(0, dyConsumed, 0, dyUnconsumed, offsetInWindow );
+
+
+        int treshold = TopPlayer.this.mViewConfiguration.getScaledTouchSlop();
+        if (diffYabs > 0) {//(diffYabs > ViewConfigurationCompat.getScaledPagingTouchSlop(TopPlayer.this.mViewConfiguration)) {
+            Log.d(TAG, "onScroll: dispatchScroll: dyUnconsumed: " + dyConsumed);
+
+            int consumedByActionbar = consumed[1];
+
+            // if we are pulling down, but do not consume all the pulls
+            if (dyConsumed < 0) {
+                TopPlayer.this.scrollBy(dyConsumed-consumedByActionbar);
+            }
+
+            if (dyConsumed > 0 && !TopPlayer.this.isMinimumSize()) {
+                TopPlayer.this.scrollBy(dyConsumed-consumedByActionbar);
+            }
+        }
+
+
+        Log.d(TAG, "onScroll: ignore: diffY: " + diffY);
+        return true;
     }
 
+    public ScrollerCompat mScroller;
+
     class TopPLayerScrollGestureListener extends GestureDetector.SimpleOnGestureListener {
+
         private static final String DEBUG_TAG = "Gestures";
+
+        private Runnable mFlingRunnable;
 
         public TopPLayerScrollGestureListener() {
         }
@@ -796,66 +866,45 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         @Override
         public  boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
             Log.d(DEBUG_TAG, "onScroll: e1Y: " + e1.getY() + " e2Y: " + e2.getY());
-
-            float y1 = e1.getY();
-            float y2 = e2.getY();
-
-            //float diffY = y1 - y2;
-            float diffY = distanceY;
-            int dyConsumed = 0;
-
-            float diffYabs = Math.abs(diffY);
-            int dyUnconsumed = (int)diffY;
-
-            float oldHeight = TopPlayer.this.getPlayerHeight();
-            float newHeight = 0;
-
-            scrollingChildHelper.startNestedScroll(ViewCompat.SCROLL_AXIS_VERTICAL);
-
-            int offsetY = (int)TopPlayer.this.getPlayerHeight();
-            int[] offsetInWindow = new int[] {0, 0}; // offsetY
-
-            int[] consumed = new int[] { 0, 0};
-            scrollingChildHelper.dispatchNestedPreScroll(0, dyUnconsumed, consumed, offsetInWindow);
-
-            dyConsumed = (int)canConsume(dyUnconsumed);
-
-            dyUnconsumed = (int)(diffY - dyConsumed);
-            scrollingChildHelper.dispatchNestedScroll(0, dyConsumed, 0, dyUnconsumed, offsetInWindow );
-
-            dyUnconsumed = (int)diffY;
-
-            int treshold = TopPlayer.this.mViewConfiguration.getScaledTouchSlop();
-            if (diffYabs > 0) {//(diffYabs > ViewConfigurationCompat.getScaledPagingTouchSlop(TopPlayer.this.mViewConfiguration)) {
-                Log.d(DEBUG_TAG, "onScroll: dispatchScroll: dyUnconsumed: " + dyUnconsumed);
-
-                int consumedByActionbar = consumed[1];
-
-                // if we are pulling down, but do not consume all the pulls
-                if (dyUnconsumed < 0) {
-                    newHeight = TopPlayer.this.scrollBy(dyUnconsumed-consumedByActionbar);
-                }
-
-                if (dyUnconsumed > 0 && !TopPlayer.this.isMinimumSize()) {
-                    newHeight = TopPlayer.this.scrollBy(dyUnconsumed-consumedByActionbar);
-                }
-
-                dyConsumed = (int)(oldHeight-newHeight);
-            }
-
-
-            Log.d(DEBUG_TAG, "onScroll: ignore: diffY: " + diffY);
-            return true;
+            return scrollExternal(distanceY, true);
         }
 
         @Override
         public boolean onFling(MotionEvent event1, MotionEvent event2,
                                float velocityX, float velocityY) {
             Log.d(DEBUG_TAG, "onFling: " + event1.toString() + event2.toString());
+
+
+            if(this.mFlingRunnable != null) {
+                removeCallbacks(this.mFlingRunnable);
+            }
+
+            if(TopPlayer.this.mScroller == null) {
+                TopPlayer.this.mScroller = ScrollerCompat.create(getContext());
+            }
+
+            scrollingChildHelper.startNestedScroll(ViewCompat.SCROLL_AXIS_VERTICAL);
+
+            // FIXME
+            //scrollingChildHelper.dispatchNestedPreFling(0, velocityY);
+            //scrollingChildHelper.dispatchNestedFling(0, velocityY, true);
+
+            TopPlayer.this.mScroller.fling(0, PlaylistBehavior.MAX_VELOCITY_Y, 0, Math.round(velocityY), 0, 0, 0, 10000);
+            if(TopPlayer.this.mScroller.computeScrollOffset()) {
+                this.mFlingRunnable = new FlingRunnable(TopPlayer.this);
+                ViewCompat.postOnAnimation(TopPlayer.this, this.mFlingRunnable);
+                return true;
+            } else {
+                this.mFlingRunnable = null;
+                return false;
+            }
+
+            /*
             scrollingChildHelper.startNestedScroll(ViewCompat.SCROLL_AXIS_VERTICAL);
             scrollingChildHelper.dispatchNestedPreFling(velocityX, -velocityY);
             scrollingChildHelper.dispatchNestedFling(velocityX, -velocityY, true);
             return true;
+            */
         }
     }
 
@@ -930,6 +979,35 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
     // Compute the vertical range that the vertical scrollbar represents.
     public int computeVerticalScrollRange() {
         return 0;// this.Layout.canScrollVertically()?this.Layout.computeVerticalScrollRange(this.mState):0;
+    }
+
+
+    class FlingRunnable implements Runnable {
+        private final View mLayout;
+
+        private int lastY = 0;
+
+        FlingRunnable(View layout) {
+            this.mLayout = layout;
+        }
+
+        public void run() {
+            if(TopPlayer.this.mScroller != null && TopPlayer.this.mScroller.computeScrollOffset()) {
+
+                int currY = TopPlayer.this.mScroller.getCurrY();
+
+                if (lastY != 0) {
+                    int diffY = currY-lastY;
+
+                    Log.v(TAG, "scroll.run, diffY: " + diffY);
+                    TopPlayer.this.scrollExternal(-diffY, false);
+                }
+
+                lastY = currY;
+                ViewCompat.postOnAnimation(this.mLayout, this);
+            }
+
+        }
     }
 
 

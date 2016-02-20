@@ -1,7 +1,6 @@
 package org.bottiger.podcast.views;
 
 import android.content.Context;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ScrollerCompat;
@@ -10,13 +9,9 @@ import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.VelocityTracker;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.Interpolator;
 
 import org.bottiger.podcast.R;
-import org.bottiger.podcast.TopActivity;
 import org.bottiger.podcast.utils.UIUtils;
 
 /**
@@ -28,11 +23,11 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
 
     private TopPlayer mTopPlayer;
     private RecyclerView mRecyclerView;
-    private PlaylistContainerBehavior mPlaylistContainerBehavior;
+    private PlaylistContainerWrapper mPlaylistContainerWrapper;
 
     private int mRecyclerViewBottomPadding;
 
-    private static final int MAX_VELOCITY_Y = 5000;
+    public static final int MAX_VELOCITY_Y = 5000;
 
     private static final int DOWN = -1;
     private static final int UP = 1;
@@ -85,8 +80,8 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
             mRecyclerViewBottomPadding = mRecyclerView.getPaddingBottom();
         }
 
-        if (mPlaylistContainerBehavior == null) {
-            mPlaylistContainerBehavior = (PlaylistContainerBehavior) parent;
+        if (mPlaylistContainerWrapper == null) {
+            mPlaylistContainerWrapper = (PlaylistContainerWrapper) parent;
         }
 
         int height = (int)mTopPlayer.getPlayerHeight(); //mTopPlayer.getLayoutParams().height;
@@ -111,11 +106,15 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
     @Override
     public void	onNestedPreScroll(CoordinatorLayout coordinatorLayout, View child, View target, int dx, int dy, int[] consumed) {
         Log.v(TAG, "onNestedPreScroll, child: " + child.getClass().getName() + " target: " + target.getClass().getName());
+        //mPlaylistContainerWrapper.dispatchNestedPreScroll(dx, dy, consumed, null);
+        super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed);
     }
 
     @Override
     public void onNestedScroll(CoordinatorLayout coordinatorLayout, View child, View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed) {
         Log.v(TAG, "onNestedScroll, child: " + child.getClass().getName() + " target: " + target.getClass().getName() + " dyC: " + dyConsumed + " dyUC: " + dyUnconsumed);
+        //mPlaylistContainerWrapper.dispatchNestedScroll(dxConsumed, dyConsumed, dyUnconsumed, dxUnconsumed, null);
+        super.onNestedScroll(coordinatorLayout, child, target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed);
     }
 
     @Override
@@ -146,8 +145,9 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
             this.mScroller = ScrollerCompat.create(layout.getContext());
         }
 
-        mPlaylistContainerBehavior.startNestedScroll(ViewCompat.SCROLL_AXIS_VERTICAL);
-        mPlaylistContainerBehavior.dispatchNestedFling(0, velocityY, true);
+        mPlaylistContainerWrapper.startNestedScroll(ViewCompat.SCROLL_AXIS_VERTICAL);
+        mPlaylistContainerWrapper.dispatchNestedPreFling(0, velocityY);
+        mPlaylistContainerWrapper.dispatchNestedFling(0, velocityY, true);
 
         this.mScroller.fling(0, MAX_VELOCITY_Y, 0, Math.round(velocityY), 0, 0, minOffset, maxOffset);
         if(this.mScroller.computeScrollOffset()) {
@@ -181,16 +181,14 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
 
                     Log.v(TAG, "scroll.run, diffY: " + diffY);
 
-                    // diffY = Negative => larger topplayer
                     if (diffY < 0) {
-                        //if (mTopPlayer.isMaximumSize()) {
                         if (mRecyclerView.canScrollVertically(DOWN)) {
                             // it cannot be larger, scroll recyclerview
                             Log.v(TAG, "scroll.run, mRecyclerView1");
                             PlaylistBehavior.this.mRecyclerView.scrollBy(0, diffY);
                         } else {
                             Log.v(TAG, "scroll.run, mTopPlayer2");
-                            PlaylistBehavior.this.mTopPlayer.scrollBy(diffY);
+                            PlaylistBehavior.this.mTopPlayer.scrollExternal(diffY, false);
                         }
                     } else {
                         if (mTopPlayer.isMinimumSize()) {
@@ -203,7 +201,7 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
                                 Log.v(TAG, "scroll.run, mTopPlayer1 diffY: " + diffY + " canscroll: " + canscrollup);
 
                                 diffY = diffY < canscrollup ? diffY : canscrollup;
-                                PlaylistBehavior.this.mTopPlayer.scrollBy(diffY);
+                                PlaylistBehavior.this.mTopPlayer.scrollExternal(diffY, false);
                             }
                         }
                     }
