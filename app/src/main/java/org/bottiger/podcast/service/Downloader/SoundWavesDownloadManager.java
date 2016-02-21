@@ -55,6 +55,7 @@ import android.webkit.MimeTypeMap;
 
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
@@ -134,6 +135,13 @@ public class SoundWavesDownloadManager extends Observable {
         _subscription = _subject
                         .subscribeOn(Schedulers.io())
                         .observeOn(Schedulers.io())
+                        .onBackpressureBuffer(10000, new Action0() {
+                            @Override
+                            public void call() {
+                                VendorCrashReporter.report(TAG, "onBackpressureBuffer called");
+                                return;
+                            }
+                        })
                         .subscribe(_getObserver());                             // Observer
 
     }
@@ -714,6 +722,7 @@ public class SoundWavesDownloadManager extends Observable {
             @Override
             public void onError(Throwable e) {
                 Log.d(TAG, "Boo! Error " + e.getMessage());
+                VendorCrashReporter.report(TAG, e.getMessage());
             }
 
             @Override
