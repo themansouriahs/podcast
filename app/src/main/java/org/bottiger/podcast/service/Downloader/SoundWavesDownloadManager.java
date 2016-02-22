@@ -133,16 +133,26 @@ public class SoundWavesDownloadManager extends Observable {
         _subject = new SerializedSubject<>(publishSubject);
 
         _subscription = _subject
+                .onBackpressureBuffer(10000, new Action0() {
+                    @Override
+                    public void call() {
+                        VendorCrashReporter.report(TAG, "onBackpressureBuffer called");
+                        return;
+                    }
+                })
                         .subscribeOn(Schedulers.io())
                         .observeOn(Schedulers.io())
-                        .onBackpressureBuffer(10000, new Action0() {
-                            @Override
-                            public void call() {
-                                VendorCrashReporter.report(TAG, "onBackpressureBuffer called");
-                                return;
-                            }
-                        })
                         .subscribe(_getObserver());                             // Observer
+
+        /*
+        _subject.onBackpressureBuffer(10000, new Action0() {
+            @Override
+            public void call() {
+                VendorCrashReporter.report(TAG, "onBackpressureBuffer called");
+                return;
+            }
+        });
+        */
 
     }
 
@@ -531,9 +541,11 @@ public class SoundWavesDownloadManager extends Observable {
 
             mDownloadQueue.add(queueItem);
 
+            /*
             if (mDownloadQueue.size()>10) {
                 _subject.onNext(queueItem);
             }
+            */
 
             _subject.onNext(queueItem);
 
