@@ -756,45 +756,6 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         return super.onInterceptTouchEvent(event);
     }
 
-    /*
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        Log.w(TAG, "touchdebug touch : " + event.getAction());
-
-        final boolean handled = mGestureDetector.onTouchEvent(event);
-        if (!handled && event.getAction() == MotionEvent.ACTION_UP) {
-            stopNestedScroll();
-        }
-
-        int xvel;
-        int dx = 0; // no horizontal scrolling
-        boolean canScrollVertically = true;
-
-        MotionEvent vtev = MotionEvent.obtain(event);
-
-        switch (event.getAction()) {
-
-            case MotionEvent.ACTION_DOWN: {
-                mIsDragging = true;
-                mStartDragging = true;
-                //return true;
-                break;
-            }
-            case MotionEvent.ACTION_UP: {
-                this.scrollingChildHelper.stopNestedScroll();
-                mIsDragging = false;
-                mStartDragging = false;
-                break;
-            }
-
-            case MotionEvent.ACTION_MOVE: {
-            }
-        }
-
-        return true;
-    }*/
-
-
     public boolean scrollExternal(float distanceY, boolean argDispatchScrollEvents) {
 
         float diffY = distanceY;
@@ -885,10 +846,6 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
 
             scrollingChildHelper.startNestedScroll(ViewCompat.SCROLL_AXIS_VERTICAL);
 
-            // FIXME
-            //scrollingChildHelper.dispatchNestedPreFling(0, velocityY);
-            //scrollingChildHelper.dispatchNestedFling(0, velocityY, true);
-
             TopPlayer.this.mScroller.fling(0, PlaylistBehavior.MAX_VELOCITY_Y, 0, Math.round(velocityY), 0, 0, 0, 10000);
             if(TopPlayer.this.mScroller.computeScrollOffset()) {
                 this.mFlingRunnable = new FlingRunnable(TopPlayer.this);
@@ -898,13 +855,6 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
                 this.mFlingRunnable = null;
                 return false;
             }
-
-            /*
-            scrollingChildHelper.startNestedScroll(ViewCompat.SCROLL_AXIS_VERTICAL);
-            scrollingChildHelper.dispatchNestedPreFling(velocityX, -velocityY);
-            scrollingChildHelper.dispatchNestedFling(velocityX, -velocityY, true);
-            return true;
-            */
         }
     }
 

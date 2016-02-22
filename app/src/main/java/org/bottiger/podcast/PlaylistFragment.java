@@ -4,6 +4,10 @@ import org.bottiger.podcast.adapters.PlaylistAdapter;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
+import org.bottiger.podcast.model.Library;
+import org.bottiger.podcast.model.events.EpisodeChanged;
+import org.bottiger.podcast.model.events.ItemChanged;
+import org.bottiger.podcast.model.events.SubscriptionChanged;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.playlist.filters.SubscriptionFilter;
 import org.bottiger.podcast.provider.FeedItem;
@@ -68,6 +72,7 @@ import android.widget.TextView;
 import com.github.ivbaranov.mfb.MaterialFavoriteButton;
 
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 
 public class PlaylistFragment extends AbstractEpisodeFragment implements OnSharedPreferenceChangeListener {
@@ -115,6 +120,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
     private Context mContext;
 
     private Subscription mRxPlaylistSubscription;
+    private Subscription mRxTopEpisodeChanged;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -417,6 +423,33 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
         if (mEpisodeTitle == null)
             return;
+
+        if (mRxTopEpisodeChanged != null && !mRxTopEpisodeChanged.isUnsubscribed()) {
+            mRxTopEpisodeChanged.unsubscribe();
+        }
+
+        mRxTopEpisodeChanged = SoundWaves.getRxBus().toObserverable()
+                                                    .onBackpressureDrop()
+                                                    .ofType(EpisodeChanged.class)
+                                                    .observeOn(AndroidSchedulers.mainThread())
+                                                    .subscribe(new Action1<EpisodeChanged>() {
+                                                        @Override
+                                                        public void call(EpisodeChanged itemChangedEvent) {
+                                                            long episodeId = itemChangedEvent.getId();
+                                                            IEpisode episode = SoundWaves.getLibraryInstance().getEpisode(episodeId);
+                                                            if (episode != null) {
+                                                                if (episode.equals(mPlaylist.first())) {
+                                                                    PlaylistFragment.this.bindHeader(episode);
+                                                                }
+                                                            }
+                                                        }
+                                                    }, new Action1<Throwable>() {
+                                                        @Override
+                                                        public void call(Throwable throwable) {
+                                                            VendorCrashReporter.handleException(throwable);
+                                                            Log.wtf(TAG, "Missing back pressure. Should not happen anymore :(");
+                                                        }
+                                                    });
 
         mEpisodeTitle.setText(item.getTitle());
         mEpisodeInfo.setText(item.getDescription());
