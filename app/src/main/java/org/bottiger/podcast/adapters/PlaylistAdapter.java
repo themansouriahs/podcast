@@ -189,7 +189,8 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         viewHolder.mMainTitle.setText(item.getTitle());
         viewHolder.mMainTitle.setTextColor(textColor);
 
-        viewHolder.mSecondaryTitle.setText(item.getSubscription().getTitle());
+        if (item.getSubscription() != null)
+            viewHolder.mSecondaryTitle.setText(item.getSubscription().getTitle());
 
         viewHolder.description.setText(item.getDescription());
         bindDuration(viewHolder, item);
