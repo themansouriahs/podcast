@@ -14,6 +14,7 @@ import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.webservices.datastore.IWebservice;
 import org.bottiger.podcast.webservices.datastore.gpodder.GPodderAPI;
+import org.bottiger.podcast.webservices.datastore.gpodder.GPodderUtils;
 import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.GSubscription;
 import org.bottiger.podcast.webservices.directories.IDirectoryProvider;
 import org.bottiger.podcast.webservices.directories.ISearchParameters;
@@ -46,7 +47,7 @@ public class GPodder extends GenericDirectory {
 
     public GPodder() {
         super(NAME);
-        mGPodderAPI = new GPodderAPI(null);
+        mGPodderAPI = new GPodderAPI(GPodderUtils.getServer(null));
     }
 
     protected AsyncTask getAsyncTask() {
