@@ -157,13 +157,8 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
 
         final Subscription subscription = sub;
 
-        String title = sub.getTitle();
-        final String logo = sub.getImageURL();
 
-        if (!TextUtils.isEmpty(title))
-            holder.title.setText(title);
-        else
-            holder.title.setText(R.string.subscription_no_title);
+        final String logo = sub.getImageURL();
 
         if (subscription.getLastUpdate() > 0 && holder.subTitle != null) {
             String reportDate = DateUtils.getRelativeTimeSpanString(subscription.getLastItemUpdated()).toString(); //df.format(date);
@@ -173,21 +168,32 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
         }
 
 
+        int newEpisodeCount = subscription.getNewEpisodes();
+        boolean hasNewEpisodes = newEpisodeCount > 0;
+        CharSequence pluralNew = "";
+        if (hasNewEpisodes) {
+            pluralNew = mActivity.getResources().getQuantityText(R.plurals.subscription_list_new, newEpisodeCount);
+        }
+        int visibility = hasNewEpisodes ? View.VISIBLE : View.GONE;
+
         if (holder.new_episodes_counter != null && holder.new_episodes != null) {
 
-            int newEpisodeCount = subscription.getNewEpisodes();
-            boolean hasNewEpisodes = newEpisodeCount > 0;
-            int visibility = hasNewEpisodes ? View.VISIBLE : View.GONE;
-
             if (hasNewEpisodes) {
-                CharSequence pluralNew = mActivity.getResources().getQuantityText(R.plurals.subscription_list_new, newEpisodeCount);
-
                 holder.new_episodes_counter.setText(newEpisodeCount);
                 holder.new_episodes.setText(pluralNew);
             }
 
             holder.new_episodes_counter.setVisibility(visibility);
             holder.new_episodes.setVisibility(visibility);
+        } else {
+            String title = String.valueOf(newEpisodeCount) + " " + pluralNew;
+            if (hasNewEpisodes) {
+                holder.title.setText(title);
+            }
+        }
+
+        if (!hasNewEpisodes) {
+            holder.text_container.setVisibility(visibility);
         }
 
 
@@ -200,7 +206,7 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
                 public void onPaletteFound(Palette argChangedPalette) {
                     ColorExtractor extractor = new ColorExtractor(argChangedPalette);
                     if (holder.text_container != null)
-                        holder.text_container.setBackgroundColor(extractor.getPrimary());
+                        holder.text_container.setBackgroundColor(extractor.getPrimaryTint());
                 }
 
                 @Override

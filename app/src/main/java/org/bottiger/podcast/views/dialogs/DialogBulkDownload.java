@@ -133,7 +133,7 @@ public class DialogBulkDownload {
             if (date != null) {
                 boolean validDate = validDate(mAction, date);
 
-                if (validDate && downloadManager != null) {
+                if (validDate) {
                     downloadManager.addItemToQueue(episode, SoundWavesDownloadManager.LAST);
                 }
             }

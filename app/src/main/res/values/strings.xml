@@ -185,8 +185,8 @@
 
     <!-- In the context: "4 new [episodes]" -->
     <plurals name="subscription_list_new">
-        <item quantity="one">New</item>
-        <item quantity="other">New</item>
+        <item quantity="one">new</item>
+        <item quantity="other">new</item>
     </plurals>
 
     <string name="authenticate_feed_username">Username</string>
