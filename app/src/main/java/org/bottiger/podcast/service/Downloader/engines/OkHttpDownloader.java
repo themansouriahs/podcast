@@ -71,6 +71,7 @@ public class OkHttpDownloader extends DownloadEngineBase {
                 InputStream inputStream = mConnection.getInputStream();
                 FileOutputStream outputStream = new FileOutputStream(episode.getAbsoluteTmpPath());
 
+                mEpisode.setFilesize((long)contentLength);
 
                 int bytesRead = -1;
                 byte[] buffer = new byte[BUFFER_SIZE];

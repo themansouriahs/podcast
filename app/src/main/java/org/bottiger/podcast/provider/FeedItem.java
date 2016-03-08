@@ -540,7 +540,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 			return;
 
 		filesize = argFilesize;
-		notifyPropertyChanged();
+		notifyPropertyChanged(EpisodeChanged.PROGRESS);
 	}
 
 	/**

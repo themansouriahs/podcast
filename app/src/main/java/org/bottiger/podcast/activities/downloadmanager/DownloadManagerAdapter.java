@@ -3,6 +3,8 @@ package org.bottiger.podcast.activities.downloadmanager;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +13,7 @@ import android.widget.TextView;
 import org.bottiger.podcast.BR;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.QueueEpisode;
@@ -27,15 +30,20 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
+
 /**
  * Created by aplb on 04-10-2015.
  */
 public class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemViewHolder> {
 
+    private static final String TAG = "DownloadManagerAdapter";
+
     @NonNull
     private Context mContext;
     private SoundWavesDownloadManager mDownloadManager;
-    private List<IEpisode> mDownloadingEpisodes = new LinkedList<>();
     private List<DownloadViewModel> mViewModels = new LinkedList<>();
 
     private TextView mEmptyTextView;
@@ -46,13 +54,26 @@ public class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemVie
         mEmptyTextView = argEmptyTextView;
 
         mDownloadManager = SoundWaves.getDownloadManager();
-        IEpisode downloadingEpisode = mDownloadManager.getDownloadingItem();
-        if (downloadingEpisode != null)
-            mDownloadingEpisodes.add(downloadingEpisode);
 
-        for (int i = 0; i < mDownloadManager.getQueueSize(); i++) {
-            mDownloadingEpisodes.add(mDownloadManager.getQueueItem(i).getEpisode());
-        }
+        SoundWaves.getRxBus().toObserverable()
+                .onBackpressureDrop()
+                .ofType(SoundWavesDownloadManager.DownloadManagerChanged.class)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<SoundWavesDownloadManager.DownloadManagerChanged>() {
+                    @Override
+                    public void call(SoundWavesDownloadManager.DownloadManagerChanged downloadManagerChanged) {
+                        Log.d(TAG, "DownloadManagerChanged, size: " + downloadManagerChanged.queueSize);
+                        DownloadManagerAdapter.this.notifyDataSetChanged();
+                        return;
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        VendorCrashReporter.report("subscribeError" , throwable.toString());
+                        Log.w(TAG, "Erorr");
+                    }
+                });
 
         setEmptyTextViewVisibility();
     }
@@ -66,34 +87,42 @@ public class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemVie
 
     @Override
     public void onBindViewHolder(DownloadItemViewHolder holder, int position) {
-        final IEpisode episode = mDownloadingEpisodes.get(position);
+
+        QueueEpisode queueEpisode = mDownloadManager.getQueueItem(position);
+
+        if (queueEpisode == null)
+            return;
+
+        IEpisode episode = queueEpisode.getEpisode();
+
+        if (episode == null)
+            return;
+
         DownloadViewModel viewModel = new DownloadViewModel(mContext, this, (FeedItem)episode, position); // FIXME no type casting
         mViewModels.add(viewModel);
         holder.getBinding().setVariable(BR.viewModel, viewModel);
 
-        ImageLoaderUtils.loadImageInto(holder.mImageView, episode.getArtwork().toString(), false, true);
+        String artWork = episode.getArtwork();
+        if (!TextUtils.isEmpty(artWork)) {
+            ImageLoaderUtils.loadImageInto(holder.mImageView, artWork, null, true, false, true);
+        }
     }
 
     @Override
     public int getItemCount() {
-        return mDownloadingEpisodes.size();
+        return mDownloadManager.getQueueSize();
     }
 
     public void removed(int argPosition) {
-        super.notifyItemRemoved(argPosition);
-        IEpisode episode = mDownloadingEpisodes.get(argPosition);
-        if (argPosition == 0) {
-            mDownloadManager.cancelCurrentDownload();
-        } else {
-            mDownloadManager.removeFromQueue(episode);
-        }
-        mDownloadingEpisodes.remove(episode);
+        //super.notifyItemRemoved(argPosition);
+
+        mDownloadManager.removeFromQueue(argPosition);
         setEmptyTextViewVisibility();
-        super.notifyDataSetChanged();
+        super.notifyItemRemoved(argPosition);
     }
 
     public void downloadComplete(@NonNull IEpisode argEpisode) {
-
+        Log.d("here", "er go");
     }
 
     public void updateProgress(@NonNull IEpisode argEpisode, int argProgress) {
@@ -107,6 +136,7 @@ public class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemVie
     }
 
     boolean onItemMove(int fromPosition, int toPosition) {
+        /*
         if (fromPosition < toPosition) {
             for (int i = fromPosition; i < toPosition; i++) {
                 Collections.swap(mDownloadingEpisodes, i, i + 1);
@@ -116,12 +146,14 @@ public class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemVie
                 Collections.swap(mDownloadingEpisodes, i, i - 1);
             }
         }
+        */
+        mDownloadManager.move(fromPosition, toPosition);
         notifyItemMoved(fromPosition, toPosition);
         return true;
     }
 
     private void setEmptyTextViewVisibility() {
-        int visibility = mDownloadingEpisodes.size() > 0 ? View.GONE : View.VISIBLE;
+        int visibility = mDownloadManager.getDownloadingItem() != null ? View.GONE : View.VISIBLE;
         mEmptyTextView.setVisibility(visibility);
     }
 }

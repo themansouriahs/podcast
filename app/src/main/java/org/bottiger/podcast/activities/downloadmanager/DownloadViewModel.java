@@ -11,10 +11,12 @@ import android.util.Log;
 import android.view.View;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.events.DownloadProgress;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.service.DownloadStatus;
 
 import java.util.concurrent.TimeUnit;
 
@@ -51,11 +53,11 @@ public class DownloadViewModel {
         mAdapter = argAdapter;
         mEpisode = argEpisode;
         mPosition = argPosition;
-        updateProgress(isFirst() ? 60 : 0);
+        updateProgress(0); //updateProgress(isFirst() ? 60 : 0);
 
         mRxSubscription = argEpisode._downloadProgressChangeObservable
+                .onBackpressureDrop()
                 .ofType(DownloadProgress.class)
-                .sample(500, TimeUnit.MILLISECONDS)
                 .filter(new Func1<DownloadProgress, Boolean>() {
                     @Override
                     public Boolean call(DownloadProgress downloadProgress) {
@@ -68,7 +70,14 @@ public class DownloadViewModel {
                     @Override
                     public void call(DownloadProgress downloadProgress) {
                         Log.v(TAG, "Recieved downloadProgress event. Progress: " + downloadProgress.getProgress());
-                        updateProgress(downloadProgress.getProgress());
+
+                        if (downloadProgress.getStatus() == DownloadStatus.DOWNLOADING) {
+                            updateProgress(downloadProgress.getProgress());
+                        }
+
+                        if (downloadProgress.getStatus() == DownloadStatus.DONE || downloadProgress.getStatus() == DownloadStatus.ERROR) {
+                            mAdapter.notifyDataSetChanged();
+                        }
                     }
                 }, new Action1<Throwable>() {
                     @Override
@@ -104,7 +113,14 @@ public class DownloadViewModel {
         Resources res = mContext.getResources();
         String currentFilesizeFormatted = "";
 
-        String totalFilesizeFormatted = Formatter.formatFileSize(mContext, mEpisode.getFilesize());
+        long filesize = mEpisode.getFilesize();
+
+
+        if (filesize < 0) {
+            return mContext.getResources().getString(R.string.unknown_filesize);
+        }
+
+        String totalFilesizeFormatted = Formatter.formatFileSize(mContext, filesize);
 
         if (currentFilesize > 0) {
             currentFilesizeFormatted = Formatter.formatFileSize(mContext, (long)currentFilesize);

@@ -21,6 +21,7 @@ import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.events.DownloadProgress;
 import org.bottiger.podcast.service.DownloadStatus;
+import org.bottiger.podcast.views.NpaLinearLayoutManager;
 
 /**
  * Created by aplb on 04-10-2015.
@@ -51,13 +52,11 @@ public class DownloadManagerActivity extends AppCompatActivity {
 
         toolbarTitle.setVisibility(View.GONE);
         toolbarDescription.setVisibility(View.GONE);
-        //toolbarTitle.setText(R.string.download_manager_toolbar_title);
-        //toolbarDescription.setText(R.string.download_manager_toolbar_description);
 
         mAdapter = new DownloadManagerAdapter(this, emptyText);
         mRecyclerView = (RecyclerView) findViewById(R.id.download_queue_list);
         mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.setLayoutManager(new NpaLinearLayoutManager(this));
         mRecyclerView.setHasFixedSize(true);
 
         ItemTouchHelper.Callback callback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {
@@ -92,32 +91,6 @@ public class DownloadManagerActivity extends AppCompatActivity {
         };
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(mRecyclerView);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        //SoundWaves.getBus().register(this);
-    }
-
-    @Override
-    public void onPause() {
-        //SoundWaves.getBus().unregister(this);
-        super.onPause();
-    }
-
-    //@Subscribe
-    public void setProgressPercent(@NonNull DownloadProgress argProgress) {
-        if (mAdapter == null) {
-            VendorCrashReporter.report("setProgress with null adapter", ""); // NoI18N
-            return;
-        }
-
-        if (argProgress.getStatus() == DownloadStatus.DONE) {
-            return;
-        }
-
-        mAdapter.updateProgress(argProgress.getEpisode(), argProgress.getProgress());
     }
 
     @Override

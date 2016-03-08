@@ -176,6 +176,7 @@
     <string name="download_manager_empty_title">No download in progress</string>
     <string name="action_enter_fullscreen">Fullscreen player</string>
     <string name="action_exit_fullscreen">Exit fullscreen</string>
+    <string name="unknown_filesize">Filesize unknown</string>
 
     <!--
     Used for displaying the download progress of a file. Example: "1.2 MB of 53 MB" (the unit, MB, is handled by the framework)
@@ -191,7 +192,6 @@
 
     <string name="authenticate_feed_username">Username</string>
     <string name="authenticate_feed_password">Password</string>
-
 
     <plurals name="player_sleep">
         <item quantity="one">Player will sleep in %d minute</item>

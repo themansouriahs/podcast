@@ -17,6 +17,7 @@ import android.view.View;
 
 import com.squareup.otto.Subscribe;
 
+import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.TopActivity;
@@ -284,7 +285,11 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
 
         if (getEpisode() == null) {
             Log.e(TAG, "Episode is null");
-            throw new IllegalStateException("Episode can not be null");
+
+            if (BuildConfig.DEBUG)
+                throw new IllegalStateException("Episode can not be null");
+            else
+                return;
         }
 
         if (getState() == PlayerButtonView.STATE_DEFAULT) {

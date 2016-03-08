@@ -143,17 +143,6 @@ public class SoundWavesDownloadManager extends Observable {
                         .subscribeOn(Schedulers.io())
                         .observeOn(Schedulers.io())
                         .subscribe(_getObserver());                             // Observer
-
-        /*
-        _subject.onBackpressureBuffer(10000, new Action0() {
-            @Override
-            public void call() {
-                VendorCrashReporter.report(TAG, "onBackpressureBuffer called");
-                return;
-            }
-        });
-        */
-
     }
 
     public static @SoundWavesDownloadManager.MimeType int getFileType(@Nullable String argMimeType) {
@@ -540,13 +529,6 @@ public class SoundWavesDownloadManager extends Observable {
             queueItem.setStartedManually(argPosition == STARTED_MANUALLY);
 
             mDownloadQueue.add(queueItem);
-
-            /*
-            if (mDownloadQueue.size()>10) {
-                _subject.onNext(queueItem);
-            }
-            */
-
             _subject.onNext(queueItem);
 
         } finally {
@@ -554,6 +536,22 @@ public class SoundWavesDownloadManager extends Observable {
             mQueueLock.unlock();
         }
 	}
+
+    /**
+     * Remove item from queue by index
+     */
+    public void removeFromQueue(int argIndex) {
+
+        try {
+            mQueueLock.lock();
+
+            if (mDownloadQueue.size() > argIndex)
+                mDownloadQueue.remove(argIndex);
+        } finally {
+            postQueueChangedEvent();
+            mQueueLock.unlock();
+        }
+    }
 
     /**
      * Add feeditem to the download queue
@@ -585,8 +583,13 @@ public class SoundWavesDownloadManager extends Observable {
         return mDownloadQueue.size();
     }
 
+    @Nullable
     public QueueEpisode getQueueItem(int position) {
-        return mDownloadQueue.get(position);
+        try {
+            return mDownloadQueue.get(position);
+        } catch (IndexOutOfBoundsException ioobe) {
+            return null;
+        }
     }
 
     public void cancelCurrentDownload() {
@@ -616,7 +619,6 @@ public class SoundWavesDownloadManager extends Observable {
 	 */
 	public void addItemAndStartDownload(@NonNull IEpisode item, @QueuePosition int argPosition) {
         addItemToQueue(item, argPosition);
-		//startDownload();
 	}
 
     @Nullable
@@ -671,6 +673,7 @@ public class SoundWavesDownloadManager extends Observable {
 
             //Playlist.refresh(mContext);
 
+            removeTopQueueItem();
             removeDownloadingEpisode(argEpisode);
             removeExpiredDownloadedPodcasts(mContext);
             removeTmpFolderCruft();
@@ -682,16 +685,20 @@ public class SoundWavesDownloadManager extends Observable {
 
         @Override
         public void downloadInterrupted(IEpisode argEpisode) {
+            removeTopQueueItem();
             removeDownloadingEpisode(argEpisode);
             removeTmpFolderCruft();
             notifyDownloadComplete();
         }
     }
 
+    private void removeTopQueueItem() {
+        mDownloadQueue.removeFirst();
+    }
+
     public DownloadManagerChanged produceDownloadManagerState() {
         final DownloadManagerChanged event = new DownloadManagerChanged();
-        int extraFromCurrentDownload = getDownloadingItem() != null ? 1 : 0;
-        event.queueSize = mDownloadQueue.size()+extraFromCurrentDownload;
+        event.queueSize = mDownloadQueue.size();
 
         return event;
     }
@@ -703,7 +710,7 @@ public class SoundWavesDownloadManager extends Observable {
             public QueueEpisode call(Boolean argQueueItem2) {
                 //_log("Within Observable");
                 //_doSomeLongOperation_thatBlocksCurrentThread();
-                mDownloadQueue.remove(argQueueItem);
+                //mDownloadQueue.remove(argQueueItem);
                 startDownload(argQueueItem);
                 return argQueueItem;
             }
@@ -711,7 +718,6 @@ public class SoundWavesDownloadManager extends Observable {
     }
 
     private boolean downloadEpisode(final QueueEpisode argQueueItem) {
-        mDownloadQueue.remove(argQueueItem);
         startDownload(argQueueItem);
         return true;
     }
@@ -740,7 +746,24 @@ public class SoundWavesDownloadManager extends Observable {
             @Override
             public void onNext(QueueEpisode queueEpisode) {
                 Log.d(TAG, "onNext with return value " + queueEpisode);
-                downloadEpisode(queueEpisode);
+                //downloadEpisode(queueEpisode);
+
+                QueueEpisode episode = null;
+                try {
+                    mQueueLock.lock();
+
+                     if (mDownloadQueue.size() > 0) {
+                         episode = mDownloadQueue.getFirst();
+                     }
+                } finally {
+                    mQueueLock.unlock();
+                }
+
+                if (episode != null) {
+                    downloadEpisode(queueEpisode);
+                } else {
+                    notifyDownloadComplete();
+                }
             }
         };
     }
