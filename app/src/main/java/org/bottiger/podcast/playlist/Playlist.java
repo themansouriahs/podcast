@@ -25,6 +25,7 @@ import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionColumns;
 import org.bottiger.podcast.service.PlayerService;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -180,7 +181,9 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
 	 * @param item
 	 */
 	public void setItem(int position, IEpisode item) {
-		int size = mInternalPlaylist.size();
+		mInternalPlaylist.remove(item);
+
+        int size = mInternalPlaylist.size();
 		if (size > position) {
             mInternalPlaylist.add(position, item);
         } else if (size == position) {
@@ -494,12 +497,6 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
                     return E1_FIRST;
 
                 return dt2.compareTo(dt1);
-                /*
-                if (mSortOrder == DATE_NEW_FIRST) {
-                    return dt2.compareTo(dt1);
-                } else {
-                    return dt1.compareTo(dt2);
-                }*/
             }
 
             @Override
@@ -679,6 +676,7 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
         }
     }
 
+    @SuppressLint("CommitPrefEdits")
     public void showOnlyDownloaded(boolean argOnlyDownloaded) {
         boolean isChanged = showOnlyDownloadedVal != argOnlyDownloaded;
         showOnlyDownloadedVal = argOnlyDownloaded;
@@ -690,6 +688,7 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
         }
     }
 
+    @SuppressLint("CommitPrefEdits")
     public void setSortOrder(@SortOrder int argSortOrder) {
         boolean isChanged = mSortOrder != argSortOrder;
         mSortOrder = argSortOrder;
@@ -701,6 +700,7 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
         }
     }
 
+    @SuppressLint("CommitPrefEdits")
     public void setShowListened(boolean argShowListened) {
         boolean isChanged = showListenedVal != argShowListened;
         showListenedVal = argShowListened;
