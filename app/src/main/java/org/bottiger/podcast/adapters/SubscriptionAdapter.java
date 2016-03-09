@@ -124,7 +124,6 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
         // In case we are dealing with the footer
         if (isLastItem(position)) {
             FooterViewHolder footer = (FooterViewHolder)argHolder;
-            //footer.getFooter().getLayoutParams().height = ToolbarActivity.getNavigationBarHeight(mActivity.getResources());
 
             android.support.v7.widget.GridLayoutManager.LayoutParams params = (android.support.v7.widget.GridLayoutManager.LayoutParams)footer.getFooter().getLayoutParams();
             params.height = ToolbarActivity.getNavigationBarHeight(mActivity.getResources());
@@ -146,8 +145,6 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
         }
 
         if (getItemViewType(position) == AUTHENTICATE_TYPE) {
-            //holder.text_container.setVisibility(View.VISIBLE);
-            //holder.title.setText("authentication required");
             AuthenticationViewHolder holder = (AuthenticationViewHolder)argHolder;
             holder.url = sub.getUrl();
             return;
@@ -164,7 +161,7 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
             String reportDate = DateUtils.getRelativeTimeSpanString(subscription.getLastItemUpdated()).toString(); //df.format(date);
 
             String updatedAt = mActivity.getResources().getString(R.string.subscription_subtitle_updated_at);
-            holder.subTitle.setText(updatedAt + " " + reportDate);
+            holder.subTitle.setText(String.format("%s %s", updatedAt, reportDate));
         }
 
 
@@ -179,7 +176,7 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
         if (holder.new_episodes_counter != null && holder.new_episodes != null) {
 
             if (hasNewEpisodes) {
-                holder.new_episodes_counter.setText(newEpisodeCount);
+                holder.new_episodes_counter.setText(String.valueOf(newEpisodeCount));
                 holder.new_episodes.setText(pluralNew);
             }
 
