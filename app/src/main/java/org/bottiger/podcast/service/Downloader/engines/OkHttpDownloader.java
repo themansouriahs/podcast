@@ -19,6 +19,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
@@ -104,6 +105,9 @@ public class OkHttpDownloader extends DownloadEngineBase {
 
         } catch (IOException e){
             onFailure(e);
+            String[] keys = {"DownloadUrl"};
+            String[] values = {mURL.toString()};
+            VendorCrashReporter.handleException(e, keys, values);
         } finally{
             mConnection.disconnect();
         }
