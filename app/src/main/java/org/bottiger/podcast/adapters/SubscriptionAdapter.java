@@ -189,7 +189,7 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
             }
         }
 
-        if (!hasNewEpisodes) {
+        if (!hasNewEpisodes && holder.text_container != null) {
             holder.text_container.setVisibility(visibility);
         }
 
