@@ -12,7 +12,10 @@
         android:id="@+id/play_pause_button"
         android:layout_margin="10dp"
         android:layout_marginRight="5dp"
-        app:drawBackground="false" />
+         />
+    <!--
+    app:drawBackground="false"
+    -->
 
     <org.bottiger.podcast.views.DownloadButtonView
         android:layout_width="wrap_content"

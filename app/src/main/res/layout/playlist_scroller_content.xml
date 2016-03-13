@@ -127,54 +127,24 @@
                 android:id="@+id/controls"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:clipToPadding="false"
                 >
 
-
-                <FrameLayout
-                    android:id="@+id/play_button_container"
-                    app:layout_widthPercent="25%"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginTop="10dp"
-                    android:paddingBottom="10dp"
-                    android:clipChildren="false"
+                <org.bottiger.podcast.views.PlayPauseImageView
+                    android:id="@+id/playpause"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_centerHorizontal="true"
+                    android:foreground="?android:selectableItemBackground"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
                     android:clipToPadding="false"
-                    android:layout_weight="1"
-                    android:layout_centerHorizontal="true">
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center"
-                        android:clipChildren="false"
-                        android:clipToPadding="false"
-                        >
-
-                        <org.bottiger.podcast.views.PlayPauseImageView
-                            android:id="@+id/playpause"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_centerInParent="true"
-                            android:foreground="?android:selectableItemBackground"
-                            android:stateListAnimator="@anim/button_elevation"
-                            android:clipChildren="false"
-                            android:clipToPadding="false"
-                            android:elevation="10dp"
-                            />
-
-                    </RelativeLayout>
-
-                    <View
-                        android:id="@+id/playpausewrapper"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="?attr/selectableItemBackgroundBorderless"/>
-
-                </FrameLayout>
+                    android:elevation="2dp"
+                    />
 
                 <net.steamcrafted.materialiconlib.MaterialIconView
                     android:id="@+id/top_player_rewind"
-                    app:layout_widthPercent="20%"
+                    app:layout_widthPercent="30%"
+                    android:layout_width="wrap_content"
                     android:layout_height="42dp"
                     android:layout_weight="0.7"
                     android:background="?attr/selectableItemBackgroundBorderless"
@@ -182,14 +152,15 @@
                     app:materialIcon="undo"
                     app:materialIconColor="#000"
                     app:materialIconSize="30dp"
-                    android:layout_alignTop="@id/play_button_container"
-                    android:layout_alignBottom="@id/play_button_container"
-                    android:layout_toLeftOf="@id/play_button_container"
-                    android:layout_toStartOf="@id/play_button_container"/>
+                    android:layout_alignTop="@id/playpause"
+                    android:layout_alignBottom="@id/playpause"
+                    android:layout_toLeftOf="@id/playpause"
+                    android:layout_toStartOf="@id/playpause"/>
 
                 <net.steamcrafted.materialiconlib.MaterialIconView
                     android:id="@+id/top_player_fastforward"
-                    app:layout_widthPercent="20%"
+                    app:layout_widthPercent="30%"
+                    android:layout_width="wrap_content"
                     android:layout_height="42dp"
                     android:layout_weight="0.7"
                     android:background="?attr/selectableItemBackgroundBorderless"
@@ -197,10 +168,10 @@
                     app:materialIcon="redo"
                     app:materialIconColor="#000"
                     app:materialIconSize="30dp"
-                    android:layout_alignTop="@id/play_button_container"
-                    android:layout_alignBottom="@id/play_button_container"
-                    android:layout_toRightOf="@id/play_button_container"
-                    android:layout_toEndOf="@id/play_button_container"/>
+                    android:layout_alignTop="@id/playpause"
+                    android:layout_alignBottom="@id/playpause"
+                    android:layout_toRightOf="@id/playpause"
+                    android:layout_toEndOf="@id/playpause"/>
 
                 <ImageButton
                     android:id="@+id/player_more_button"
@@ -317,6 +288,7 @@
             android:layout_height="match_parent"
             android:scaleType="fitCenter"
             android:adjustViewBounds="true"
+            android:layout_marginTop="10dp"
             />
 
         </LinearLayout>

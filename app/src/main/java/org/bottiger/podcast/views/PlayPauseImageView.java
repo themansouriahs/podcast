@@ -12,6 +12,7 @@ import android.graphics.Outline;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
@@ -134,9 +135,11 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
 
     private void init(Context argContext) {
 
+        setWillNotDraw(false);
+
         mContext = argContext;
 
-        mPaintColor = ContextCompat.getColor(mContext, R.color.colorPrimaryDark);
+        mPaintColor = ContextCompat.getColor(mContext, R.color.colorPrimaryDark); // colorPrimaryDark
 
         paint = new Paint(Paint.LINEAR_TEXT_FLAG);
         paint.setColor(mPaintColor);
@@ -149,10 +152,10 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
         paintBorder.setStyle(Paint.Style.STROKE);
         paintBorder.setStrokeWidth(DRAW_WIDTH);
 
-        //setScaleType(ScaleType.CENTER);
+        //setPadding(DRAW_WIDTH, DRAW_WIDTH, DRAW_WIDTH, DRAW_WIDTH);
 
         if (Build.VERSION.SDK_INT >= 16) {
-            setBackground(null);
+            //setBackground(null);
         }
 
         if (isInEditMode()) {
@@ -228,7 +231,9 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
 
         float darkPrimary = newColor;
 
-        setBackgroundColor(newColor);
+        //setBackgroundColor(newColor);
+        setColor(newColor);
+        paintBorder.setColor(argOuterColor);
     }
 
 
@@ -242,22 +247,26 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
         int contentWidth = getWidth();
         int contentHeight = getHeight();
 
+        int minSize = Math.min(contentWidth, contentHeight);
+
         int centerX = contentWidth/2;
         int centerY = contentHeight/2;
 
         float radius = centerX-DRAW_WIDTH;
 
-        int drawOffset =  DRAW_WIDTH/2;
+        int drawOffset =  0;//DRAW_WIDTH/2;
         boolean updateOutline = bounds == null;
 
-        bounds.left =drawOffset;
+        bounds.left = contentWidth > minSize ? (contentWidth-minSize)/2f : 0;
         bounds.top = drawOffset;
-        bounds.right = contentWidth - drawOffset;
-        bounds.bottom = contentWidth - drawOffset;
+        bounds.right = bounds.left+minSize - drawOffset; //contentWidth - drawOffset;
+        bounds.bottom = minSize - drawOffset; //contentWidth - drawOffset;
 
+        /*
         if (updateOutline) {
             onSizeChanged(0, 0, 0, 0);
         }
+        */
 
 
         Log.d(TAG, "onDraw. Preparing => " + (mStatus == PlayerStatusObservable.PREPARING) + " status: " + mStatus);
@@ -496,8 +505,7 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
     @Override
     public void onPaletteFound(Palette argChangedPalette) {
         ColorExtractor extractor = new ColorExtractor(mContext, argChangedPalette);
-        setColor(extractor.getPrimary(), extractor.getSecondaryTint());
-        //setColor(extractor.getSecondary(), extractor.getSecondaryTint());
+        setColor(extractor.getPrimary(), extractor.getPrimaryTint());
     }
 
     @Override

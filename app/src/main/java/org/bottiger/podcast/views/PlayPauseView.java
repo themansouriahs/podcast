@@ -31,7 +31,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Created by aplb on 17-10-2015.
  */
-public class PlayPauseView extends FrameLayout {
+public class PlayPauseView extends View {
 
     private static final Property<PlayPauseView, Integer> COLOR =
             new Property<PlayPauseView, Integer>(Integer.class, "color") {
@@ -52,6 +52,7 @@ public class PlayPauseView extends FrameLayout {
 
     private final PlayPauseDrawable mDrawable;
     private final Paint mPaint = new Paint();
+    private final Paint mPaintBackground = new Paint();
     private int mPauseBackgroundColor;
     private int mPlayBackgroundColor;
 
@@ -60,8 +61,8 @@ public class PlayPauseView extends FrameLayout {
     private int mWidth;
     private int mHeight;
 
-    private @ColorRes int color1 = R.color.colorPrimary;
-    private @ColorRes int color2 = R.color.colorPrimary;
+    private @ColorRes int color1 = R.color.colorPrimaryDark;
+    private @ColorRes int color2 = R.color.colorPrimaryDark;
 
     public PlayPauseView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -69,51 +70,22 @@ public class PlayPauseView extends FrameLayout {
         mBackgroundColor = ContextCompat.getColor(context, color1);//getResources().getColor(R.color.purple);
         mPaint.setAntiAlias(true);
         mPaint.setStyle(Paint.Style.FILL);
-        mDrawable = new PlayPauseDrawable(context);
+
+        mPaintBackground.setAntiAlias(true);
+        mPaintBackground.setStyle(Paint.Style.FILL);
+
+        mDrawable = new PlayPauseDrawable(context); // context.getDrawable(R.drawable.action_search);
         //mDrawable.setTint(Color.WHITE);
         mDrawable.setCallback(this);
 
         mPauseBackgroundColor = ContextCompat.getColor(context, color1);
         mPlayBackgroundColor = ContextCompat.getColor(context, color2);
-
-        ViewTreeObserver viewTreeObserver = getViewTreeObserver();
-        if (viewTreeObserver.isAlive()) {
-            viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-                    UIUtils.removeOnGlobalLayoutListener(PlayPauseView.this, this);
-                    setViewSize(getWidth(), getHeight());
-                }
-            });
-        }
     }
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        final int size = Math.min(getMeasuredWidth(), getMeasuredHeight());
-        setMeasuredDimension(size, size);
-    }
-
-    @Override
-    protected void onSizeChanged(final int w, final int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-        setViewSize(w, h);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            setOutlineProvider(new ViewOutlineProvider() {
-                @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-                @Override
-                public void getOutline(View view, Outline outline) {
-                    outline.setOval(0, 0, view.getWidth(), view.getHeight());
-                }
-            });
-            setClipToOutline(true);
-        }
-    }
-
-    private void setColor(int color) {
+    public void setColor(int color) {
         mBackgroundColor = color;
+        mPlayBackgroundColor = color;
+        mPauseBackgroundColor = color;
         invalidate();
     }
 
@@ -126,26 +98,22 @@ public class PlayPauseView extends FrameLayout {
         return who == mDrawable || super.verifyDrawable(who);
     }
 
+
     @Override
     protected void onDraw(Canvas canvas) {
-        final float radius = Math.min(mWidth, mHeight) / 2f;
         super.onDraw(canvas);
         mPaint.setColor(mBackgroundColor);
-        canvas.drawCircle(mWidth / 2f, mHeight / 2f, radius, mPaint);
+        final float radius = Math.min(getWidth(), getHeight()) / 2f;
+        canvas.drawCircle(getWidth()/2f, radius, radius, mPaint);
         mDrawable.draw(canvas);
     }
+
 
     public void setIconColor(@ColorInt int argColor) {
         mDrawable.setTint(argColor);
         invalidate();
     }
 
-    public void setBackgroundColor(@ColorInt int argColor) {
-        mBackgroundColor = argColor;
-        mPauseBackgroundColor = argColor;
-        mPlayBackgroundColor = argColor;
-        invalidate();
-    }
 
     public void setState(@PlayPauseDrawable.IconState int argState) {
         mLock.lock();
@@ -156,7 +124,6 @@ public class PlayPauseView extends FrameLayout {
             if (mAnimatorSet != null && mAnimatorSet.isRunning())
                 return;
 
-            //mDrawable.setState(argState);
         } finally {
             mLock.unlock();
         }
@@ -185,11 +152,5 @@ public class PlayPauseView extends FrameLayout {
 
     public boolean IsDisplayingPlayIcon() {
         return !mDrawable.isPlaying();
-    }
-
-    private void setViewSize(final int w, final int h) {
-        mDrawable.setBounds(0, 0, w, h);
-        mWidth = w;
-        mHeight = h;
     }
 }
