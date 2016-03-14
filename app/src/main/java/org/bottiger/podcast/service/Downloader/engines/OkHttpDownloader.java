@@ -6,9 +6,6 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.webkit.MimeTypeMap;
 
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.OkUrlFactory;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -25,6 +22,8 @@ import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.utils.StrUtils;
 
+import okhttp3.OkUrlFactory;
+
 /**
  * Created by apl on 17-09-2014.
  */
@@ -32,7 +31,7 @@ public class OkHttpDownloader extends DownloadEngineBase {
 
     private static final int BUFFER_SIZE = 4096;
 
-    private final OkHttpClient mOkHttpClient = new OkHttpClient();
+    private final okhttp3.OkHttpClient mOkHttpClient = new okhttp3.OkHttpClient();
     private HttpURLConnection mConnection;
     private final SparseArray<Callback> mExternalCallback = new SparseArray<>();
 
