@@ -21,6 +21,7 @@ import android.widget.ImageButton;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
@@ -68,7 +69,7 @@ public class FeedViewQueueButton extends PlayerButtonView implements View.OnClic
     private float mArcLengthLeft;
     private float mArcLengthRight;
 
-    private final Paint sPaint = new Paint();
+    private Paint sPaint = new Paint();
     private int mColor = DEFAULT_COLOR;
     private RectF mRect;
     private PathMeasure mPathMeasure;
@@ -113,7 +114,7 @@ public class FeedViewQueueButton extends PlayerButtonView implements View.OnClic
 
     private void init(Context argContext) {
         mContext = argContext;
-        setOnClickListener(this);
+        setOnClickListener(this)    ;
     }
 
     @Override
@@ -334,6 +335,11 @@ public class FeedViewQueueButton extends PlayerButtonView implements View.OnClic
         mArcRight.addArc(mRect, ARC_RIGHT_START, ARC_RIGHT_ANGLE);
         mPathMeasure.setPath(mArcRight, false);
         mArcLengthRight = mPathMeasure.getLength();
+
+        if (sPaint == null) {
+            sPaint = new Paint();
+            VendorCrashReporter.report("sPain null", "This should never happen, but it does");
+        }
 
         sPaint.setAntiAlias(true);
         sPaint.setColor(mColor);

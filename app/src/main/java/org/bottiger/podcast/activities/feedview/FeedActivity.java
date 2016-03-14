@@ -198,11 +198,9 @@ public class FeedActivity extends TopActivity implements PaletteListener {
         Bundle b = new Bundle();
         b.putBoolean(FEED_ACTIVITY_IS_SLIM, false);
         b.putString(FeedActivity.SUBSCRIPTION_URL_KEY, argSubscription.getURLString());
-        mFuckItHack = null;
         startActivity(argActivity, b);
     }
 
-    private static Bundle mFuckItHack = null;
     public static void startSlim(@NonNull Activity argActivity, @NonNull String argURL, @Nullable SlimSubscription argSubscription) {
         Bundle b = new Bundle();
         Intent intent = new Intent(argActivity, DiscoveryFeedActivity.class);
@@ -210,7 +208,6 @@ public class FeedActivity extends TopActivity implements PaletteListener {
         b.putBoolean(FEED_ACTIVITY_IS_SLIM, true);
         b.putString(FeedActivity.SUBSCRIPTION_URL_KEY, argURL);
         b.putParcelable(SUBSCRIPTION_SLIM_KEY, argSubscription); // Not required, but nice to have if we already got it
-        mFuckItHack = b;
 
         intent.putExtras(b);
 
@@ -478,9 +475,6 @@ public class FeedActivity extends TopActivity implements PaletteListener {
 
     private void processIntent() {
         Bundle b = getIntent().getExtras();
-
-        if (mFuckItHack != null)
-            b = mFuckItHack;
 
         boolean isSlim = b.getBoolean(FEED_ACTIVITY_IS_SLIM);
         String url = b.getString(SUBSCRIPTION_URL_KEY);

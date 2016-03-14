@@ -63,8 +63,12 @@ public class SlimEpisode extends BaseEpisode implements Parcelable {
         return artwork;
     }
 
+    @Nullable
     @Override
     public String getArtwork() {
+        if (mArtworkUrl == null)
+            return null;
+
         return mArtworkUrl.toString();
     }
 
