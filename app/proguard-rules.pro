@@ -64,14 +64,16 @@ public static *** w(...);
 }
 
 # okhttp
--dontwarn com.squareup.okhttp.**
--keep class com.squareup.okhttp.** { *; }
+-dontwarn okhttp3.**
+-keep class okhttp3.** { *; }
 # Ignore warnings: https://github.com/square/okio/issues/60
 -dontwarn okio.**
 
 #retrofit
 -dontwarn retrofit.**
 -keep class retrofit.** { *; }
+-dontwarn retrofit2.**
+-keep class retrofit2.** { *; }
 -keepattributes Signature
 -keepattributes Exceptions
 
