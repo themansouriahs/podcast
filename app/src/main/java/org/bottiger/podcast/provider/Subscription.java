@@ -449,6 +449,14 @@ public class Subscription implements ISubscription, PaletteListener {
 		return lastUpdated;
 	}
 
+	public void setLastUpdated(long argTimestamp) {
+		if (lastUpdated >= argTimestamp)
+			return;
+
+		this.lastUpdated = argTimestamp;
+		notifyPropertyChanged(null);
+	}
+
 	public long getLastUpdate() {
 		return this.lastUpdated;
 	}

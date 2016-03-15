@@ -39,6 +39,21 @@ public class EpisodeList<T> extends SortedList<T> {
         return list;
     }
 
+    @Nullable
+    public IEpisode getNewest() {
+        long currentDate = -1;
+        IEpisode episode = null;
+        for (int i = 0; i < size(); i++) {
+            episode = (IEpisode) get(i);
+            long episodeDate = episode.getCreatedAt().getTime();
+            if (episodeDate > currentDate) {
+                currentDate = episodeDate;
+            }
+        }
+
+        return episode;
+    }
+
     public void setFilter(@Nullable EpisodeFilter argFilter) {
         mFilter = argFilter;
     }

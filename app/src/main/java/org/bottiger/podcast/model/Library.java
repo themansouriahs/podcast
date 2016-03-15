@@ -240,13 +240,22 @@ public class Library {
             mEpisodesUrlLUT.put(item.getURL(), item);
             mEpisodesIdLUT.put(item.getId(), item);
 
+            boolean updatedEpisode = false;
             if (!item.isPersisted()) {
                 updateEpisode(item);
+                updatedEpisode = true;
             }
 
             Subscription subscription = item.getSubscription();
+
             if (subscription != null) {
                 subscription.addEpisode(item, true);
+                if (updatedEpisode) {
+                    IEpisode episode = subscription.getEpisodes().getNewest();
+                    if (episode != null) {
+                        subscription.setLastUpdated(episode.getCreatedAt().getTime());
+                    }
+                }
             }
 
         } finally {
