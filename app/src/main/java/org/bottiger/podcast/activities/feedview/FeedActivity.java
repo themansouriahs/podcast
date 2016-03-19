@@ -39,6 +39,7 @@ import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.ToolbarActivity;
 import org.bottiger.podcast.TopActivity;
 import org.bottiger.podcast.activities.discovery.FeedViewDiscoveryAdapter;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
@@ -236,7 +237,8 @@ public class FeedActivity extends TopActivity implements PaletteListener {
         processIntent();
 
         if (mSubscription == null) {
-            throw new IllegalStateException("Subscription can not be null");
+            VendorCrashReporter.report("FeedActivity", "Subscription can not be null");
+            return;
         }
 
         Log.d(TAG, "Showing: " + mSubscription);
@@ -475,6 +477,9 @@ public class FeedActivity extends TopActivity implements PaletteListener {
 
     private void processIntent() {
         Bundle b = getIntent().getExtras();
+
+        if (b == null)
+            return;
 
         boolean isSlim = b.getBoolean(FEED_ACTIVITY_IS_SLIM);
         String url = b.getString(SUBSCRIPTION_URL_KEY);

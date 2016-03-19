@@ -4,7 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/group"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:clipToPadding="false">
 
     <org.bottiger.podcast.views.PlayPauseImageView
         android:layout_width="@dimen/playpause_button_size_normal"
@@ -12,6 +13,7 @@
         android:id="@+id/play_pause_button"
         android:layout_margin="10dp"
         android:layout_marginRight="5dp"
+        android:clipToPadding="false"
          />
     <!--
     app:drawBackground="false"
