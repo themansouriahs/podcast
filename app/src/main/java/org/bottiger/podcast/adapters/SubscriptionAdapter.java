@@ -157,8 +157,8 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
 
         final String logo = sub.getImageURL();
 
-        if (subscription.getLastUpdate() > 0 && holder.subTitle != null) {
-            String reportDate = DateUtils.getRelativeTimeSpanString(subscription.getLastUpdate()).toString(); //df.format(date);
+        if (subscription.getLastItemUpdated() > 0 && holder.subTitle != null) {
+            String reportDate = DateUtils.getRelativeTimeSpanString(subscription.getLastItemUpdated()).toString(); //df.format(date);
 
             String updatedAt = mActivity.getResources().getString(R.string.subscription_subtitle_updated_at);
             holder.subTitle.setText(String.format("%s %s", updatedAt, reportDate));
