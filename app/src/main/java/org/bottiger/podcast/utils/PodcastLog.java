@@ -25,14 +25,14 @@ public class PodcastLog {
 	private int  level;
 	private static final String TAG = "PODCAST";
 
-	public static void initFileLog(SoundWaves argSoundWavesApplication) {
+	public static void initFileLog() {
 		if (!BuildConfig.DEBUG) {
 			return;
 		}
 
 		if ( isExternalStorageWritable() ) {
 
-			File appDirectory = new File( Environment.getExternalStorageDirectory() + "/MyPersonalAppFolder" );
+			File appDirectory = new File( Environment.getExternalStorageDirectory() + "/SoundWavesDebug" );
 			File logDirectory = new File( appDirectory + "/log" );
 			File logFile = new File( logDirectory, "logcat_wlog.txt" );
 
@@ -50,7 +50,7 @@ public class PodcastLog {
 			try {
 				//Process process = Runtime.getRuntime().exec( "logcat -c");
 				//process = Runtime.getRuntime().exec( "logcat -f " + logFile + " *:S MyActivity:D MyActivity2:D");
-				Process process = Runtime.getRuntime().exec( "logcat -f " + logFile + " Unsubscribing:E *:S");
+				Process process = Runtime.getRuntime().exec( "logcat -f " + logFile + " OkHttpDownloaderLog:D *:S");
 			} catch ( IOException e ) {
 				e.printStackTrace();
 			}

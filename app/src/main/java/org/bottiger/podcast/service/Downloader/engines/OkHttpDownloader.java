@@ -29,6 +29,8 @@ import okhttp3.OkUrlFactory;
  */
 public class OkHttpDownloader extends DownloadEngineBase {
 
+    private static final String TAG = "OkHttpDownloaderLog";
+
     private static final int BUFFER_SIZE = 4096;
 
     private final okhttp3.OkHttpClient mOkHttpClient = new okhttp3.OkHttpClient();
@@ -52,7 +54,11 @@ public class OkHttpDownloader extends DownloadEngineBase {
     public void startDownload() {
         mProgress = 0;
         try {
+
+            Log.d(TAG, "startDownload");
+
             if (mURL == null || !StrUtils.isValidUrl(mURL.toString())) {
+                Log.d(TAG, "no URL, return");
                 onFailure(new MalformedURLException());
                 return;
             }
@@ -64,6 +70,8 @@ public class OkHttpDownloader extends DownloadEngineBase {
 
                 String extension = MimeTypeMap.getFileExtensionFromUrl(mURL.toString());
 
+                Log.d(TAG, "fileextension: " + extension);
+
                 String filename = Integer.toString(episode.getEpisodeNumber()) + episode.title.replace(' ', '_'); //Integer.toString(item.getEpisodeNumber()) + "_"
                 episode.setFilename(filename + "." + extension); // .replaceAll("[^a-zA-Z0-9_-]", "") +
 
@@ -73,10 +81,13 @@ public class OkHttpDownloader extends DownloadEngineBase {
 
                 mEpisode.setFilesize((long)contentLength);
 
+                Log.d(TAG, "starting file transfer");
+
                 int bytesRead = -1;
                 byte[] buffer = new byte[BUFFER_SIZE];
                 while ((bytesRead = inputStream.read(buffer)) != -1) {
                     if (mAborted) {
+                        Log.d(TAG, "Transfer abort");
                         onFailure(new InterruptedIOException());
                         return;
                     }
@@ -86,28 +97,41 @@ public class OkHttpDownloader extends DownloadEngineBase {
                     getEpisode().setProgress(mProgress*100);
                 }
 
+                Log.d(TAG, "filetransfer done");
+
                 outputStream.close();
                 inputStream.close();
 
                 File tmpFIle = new File(episode.getAbsoluteTmpPath());
                 File finalFIle = new File(episode.getAbsolutePath());
 
+                Log.d(TAG, "pre move file");
+
                 // If download was succesfull
                 if (tmpFIle.exists() && tmpFIle.length() == contentLength) {
+                    Log.d(TAG, "Renaming file");
                     tmpFIle.renameTo(finalFIle);
+                    Log.d(TAG, "File renamed");
                     onSucces(finalFIle);
+                    Log.d(TAG, "post onSucces");
                 } else {
+                    Log.d(TAG, "File already exists");
                     String msg = "Wrong file size. Expected: " + tmpFIle.length() + ", got: " + contentLength; // NoI18N
                     onFailure(new FileNotFoundException(msg));
+                    Log.d(TAG, "post onfailure");
                 }
+            } else {
+                Log.d(TAG, "Trying to download slim episode - abort");
             }
 
         } catch (IOException e){
+            Log.d(TAG, "IOException: " + e.toString());
             onFailure(e);
             String[] keys = {"DownloadUrl"};
             String[] values = {mURL.toString()};
             VendorCrashReporter.handleException(e, keys, values);
         } finally{
+            Log.d(TAG, "disconnecting");
             mConnection.disconnect();
         }
     }

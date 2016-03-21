@@ -107,7 +107,9 @@ public class SoundWaves extends Application {
         Log.v(TAG, "time: " + System.currentTimeMillis());
         super.onCreate();
         //Debug.startMethodTracing("startup");
-        PodcastLog.initFileLog(this);
+
+        if (BuildConfig.VERSION_CODE % 2 == 1)
+            PodcastLog.initFileLog();
 
         context = getApplicationContext();
 
