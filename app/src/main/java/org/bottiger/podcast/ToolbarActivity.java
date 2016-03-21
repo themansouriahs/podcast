@@ -70,6 +70,16 @@ public class ToolbarActivity extends TopActivity {
 
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeButtonEnabled(true);
+
+
+        int sdkInt = Build.VERSION.SDK_INT;
+        if (sdkInt == Build.VERSION_CODES.KITKAT) {
+            int paddingTop = mToolbar.getPaddingTop();
+            int paddingLeft = mToolbar.getPaddingLeft();
+            int paddingRight = mToolbar.getPaddingRight();
+            int paddingBottom = mToolbar.getPaddingBottom();
+            mToolbar.setPadding(paddingLeft, paddingTop + getStatusBarHeight(getResources()), paddingRight, paddingBottom);
+        }
     }
 
     /**
