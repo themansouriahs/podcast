@@ -76,6 +76,7 @@ public class EventLogger {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 Log.d(TAG, "succes");
+                response.body().close();
             }
         });
     }

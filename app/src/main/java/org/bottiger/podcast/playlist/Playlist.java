@@ -357,16 +357,6 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
 		return order;
 	}
 
-    class Condition {
-        boolean isDownloaded;
-        boolean isMarkedAsListened;
-        Set<ISubscription> subscriptions;
-    }
-
-    class Order {
-
-    }
-
 	/**
 	 * 
 	 * @return A SQL formatted string of the where clause
@@ -564,32 +554,6 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
             if (mInternalPlaylist.size() >= length)
                 break;
         }
-        /*
-        Cursor cursor = null;
-        try {
-            PodcastOpenHelper helper = PodcastOpenHelper.getInstance(mContext);//new PodcastOpenHelper(mActivity);
-            SQLiteDatabase database = helper.getReadableDatabase();
-
-            String where = getWhere();
-            String order = getOrder();
-            cursor = database.query(ItemColumns.TABLE_NAME,
-                    ItemColumns.ALL_COLUMNS, where, null, null, null,
-                    order);
-
-
-        mInternalPlaylist.clear();
-        cursor.moveToPosition(-1);
-
-        while (cursor.moveToNext()) {
-            setItem(cursor);
-        }
-        } catch (Exception lockedEx) { //FIXME
-            return;
-        } finally {
-            if (cursor != null)
-                cursor.close();
-        }
-        */
 
         int newSize = mInternalPlaylist.size();
 
@@ -633,11 +597,6 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
         return mInternalPlaylist.get(0);
     }
 
-    public interface PlaylistChangeListener {
-        void notifyPlaylistChanged();
-        void notifyPlaylistRangeChanged(int from, int to);
-    }
-
     public void notifyDatabaseChanged() {
         populatePlaylist(amountValue, true);
         notifyPlaylistChanged();
@@ -647,7 +606,6 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
     public void notifyPlaylistChanged() {
         Log.d(TAG, "notifyPlaylistChanged");
         SoundWaves.getRxBus().send(this);
-        SoundWaves.getBus().post(this);
     }
 
     @Subscribe

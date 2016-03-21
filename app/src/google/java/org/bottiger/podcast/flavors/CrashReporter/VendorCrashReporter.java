@@ -22,17 +22,6 @@ public class VendorCrashReporter {
 
     public static void init(@NonNull Application argApplication) {
         Bugsnag.init(argApplication);
-
-        /*
-        ACRAConfiguration config = ACRA.getNewDefaultConfig(argApplication);
-        try {
-            config.setMode(ReportingInteractionMode.SILENT);
-        } catch (ACRAConfigurationException e) {
-            e.printStackTrace();
-        } finally {
-            ACRA.init(argApplication, config);
-        }
-        */
     }
 	
 	public static void report(@NonNull String argKey, @NonNull String argValue) {
@@ -43,10 +32,6 @@ public class VendorCrashReporter {
 
     public static void handleException(@NonNull Throwable argException) {
         Bugsnag.notify(argException);
-        /*
-        if (!BuildConfig.DEBUG)
-            ACRA.getErrorReporter().handleException(argException);
-            */
     }
 
     public static void handleException(@NonNull Throwable argException, @NonNull String[] argKey, @NonNull String[] argValue) {
