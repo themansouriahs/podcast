@@ -14,6 +14,7 @@ import com.squareup.sqlbrite.BriteDatabase;
 import com.squareup.sqlbrite.SqlBrite;
 
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.cloud.EventLogger;
 import org.bottiger.podcast.debug.SqliteCopy;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.events.DownloadProgress;
@@ -589,6 +590,8 @@ public class Library {
         subscription.setStatus(Subscription.STATUS_UNSUBSCRIBED, argTag);
         updateSubscription(subscription);
         removeSubscription(subscription);
+
+        EventLogger.postEvent(mContext, EventLogger.UNSUBSCRIBE_PODCAST, null, argUrl, null);
     }
 
     public void subscribe(String argUrl) {
@@ -620,6 +623,8 @@ public class Library {
                             e.printStackTrace();
                             return null;
                         }
+
+                        EventLogger.postEvent(mContext, EventLogger.SUBSCRIBE_PODCAST, null, argUrl, null);
 
                         mSubscriptionsChangeObservable.onNext(subscription);
 

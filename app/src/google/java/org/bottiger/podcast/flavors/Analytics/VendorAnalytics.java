@@ -44,7 +44,7 @@ public class VendorAnalytics extends AbstractAnalytics implements IAnalytics {
         ECOMMERCE_TRACKER, // Tracker used by all ecommerce transactions from a company.
     }
 
-    private HashMap<TrackerName, Tracker> mTrackers = new HashMap<TrackerName, Tracker>();
+    private HashMap<TrackerName, Tracker> mTrackers = new HashMap<>();
 
     public void startTracking() {
         Tracker tracker = getTracker(TrackerName.APP_TRACKER);

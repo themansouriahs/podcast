@@ -41,7 +41,11 @@ public class MediaRouterPlaybackActivity extends ToolbarActivity {
 
     @Override
     protected void onResume() {
-        SoundWaves.getBus().register(mMediaRouterEventReciever);
+        try {
+            SoundWaves.getBus().register(mMediaRouterEventReciever);
+        } catch (Exception e) {
+            Log.wtf(TAG, "Could not register. I should investigate.");
+        }
         super.onResume();
     }
 

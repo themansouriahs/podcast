@@ -20,6 +20,8 @@ public interface IAnalytics {
                              REFRESH_DURATION
     };
 
+    boolean doShare();
+
     public void startTracking();
     public void stopTracking();
 

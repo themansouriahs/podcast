@@ -13,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import org.bottiger.podcast.cloud.EventLogger;
 import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.player.sonic.service.ISoundWavesEngine;
 import com.squareup.otto.Bus;
@@ -148,6 +149,8 @@ public class SoundWaves extends Application {
         Log.v(TAG, "time: " + System.currentTimeMillis());
         firstRun(context);
         Log.v(TAG, "time: " + System.currentTimeMillis());
+
+        incrementStartupCount(context);
     }
 
     public static Context getAppContext() {
@@ -172,6 +175,16 @@ public class SoundWaves extends Application {
             editor.apply();
         }
         mFirstRun = firstRun;
+    }
+
+    private void incrementStartupCount(@NonNull Context argContext) {
+        SharedPreferences sharedPref = argContext.getSharedPreferences(ApplicationConfiguration.packageName, Context.MODE_PRIVATE);
+        String times_started_key = getString(R.string.pref_times_started);
+        int times_started = sharedPref.getInt(times_started_key, 0) + 1;
+
+        EventLogger.postEvent(argContext, EventLogger.START_APP, times_started, null, null);
+
+        sharedPref.edit().putInt(times_started_key, times_started).apply();
     }
 
     public boolean IsFirstRun() {

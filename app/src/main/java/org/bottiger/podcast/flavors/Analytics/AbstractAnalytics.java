@@ -20,7 +20,7 @@ public abstract class AbstractAnalytics {
         mPrefs = PreferenceManager.getDefaultSharedPreferences(mContext.getApplicationContext());
     }
 
-    protected boolean doShare() {
+    public boolean doShare() {
         return mPrefs.getBoolean("pref_anonymous_feedback", shareAsDefault());
     }
 

@@ -17,13 +17,16 @@ import android.util.Log;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.cloud.EventLogger;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.flavors.MediaCast.IMediaCast;
 import org.bottiger.podcast.flavors.MediaCast.IMediaRouteStateListener;
 import org.bottiger.podcast.listeners.PlayerStatusData;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.PreferenceHelper;
@@ -186,7 +189,26 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
             super.start();
 
             SoundWaves.getBus().post(psd);
+
+            if (SoundWaves.sAnalytics == null) {
+                VendorCrashReporter.report("sAnalytics null", "In playerService");
+            }
+
             SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.PLAY);
+
+            ISubscription sub = mPlayerService.getCurrentItem().getSubscription();
+            String url = sub != null ? sub.getURLString() : "";
+            EventLogger.postEvent(mPlayerService,
+                    EventLogger.LISTEN_EPISODE,
+                    mPlayerService.getCurrentItem().isDownloaded() ? 1 : null,
+                    mPlayerService.getCurrentItem().getURL(),
+                    url);
+
+            EventLogger.postEvent(mPlayerService,
+                    EventLogger.LISTEN_PODCAST,
+                    null,
+                    null,
+                    url);
         }
     }
 
