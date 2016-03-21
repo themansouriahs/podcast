@@ -27,7 +27,7 @@ public class VendorCrashReporter {
 	public static void report(@NonNull String argKey, @NonNull String argValue) {
         MetaData metaData = new MetaData();
         metaData.addToTab("User", argKey, argValue);
-        Bugsnag.notify(new Exception("Non-fatal"), metaData);
+        Bugsnag.notify(new Exception("Non-fatal: " + argKey), metaData);
     }
 
     public static void handleException(@NonNull Throwable argException) {

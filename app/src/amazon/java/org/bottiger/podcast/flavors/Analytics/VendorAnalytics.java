@@ -58,6 +58,11 @@ public class VendorAnalytics implements IAnalytics {
     }
 
     @Override
+    public boolean doShare() {
+        return true;
+    }
+
+    @Override
     public void stopTracking() {
         return;
     }

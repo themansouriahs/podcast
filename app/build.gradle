@@ -9,7 +9,7 @@ android {
         applicationId "org.bottiger.podcast"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 242     // even - release. Odd - development
+        versionCode 244     // even - release. Odd - development
         versionName "0.128.12" // even - release. Odd - development
         //useJack = true
         multiDexEnabled = true
