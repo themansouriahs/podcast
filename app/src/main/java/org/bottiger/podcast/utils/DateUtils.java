@@ -141,6 +141,10 @@ public class DateUtils {
      * @see SimpleDateFormat
      */
     public static Date parse(String dateString, String dateFormat) throws ParseException {
+
+        // This is a hack to deal with date formats not known to Java
+        dateString = dateString.replace("BST", "GMT+1");
+
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat, Locale.US);
         simpleDateFormat.setLenient(false); // Don't automatically convert invalid date.
         return simpleDateFormat.parse(dateString);
