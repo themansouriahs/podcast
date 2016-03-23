@@ -49,7 +49,7 @@ import java.util.Arrays;
  * Created by apl on 13-04-2015.
  */
 public class DiscoveryFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener,
-        AdapterView.OnItemSelectedListener, DrawerActivity.TopFound {
+        AdapterView.OnItemSelectedListener {
 
     private static final String TAG = "DiscoveryFragment";
 
@@ -126,13 +126,6 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
         return mContainerView;
     }
 
-    @Override
-    public void topfound(int i) {
-        Log.d(TAG, "dfdsf");
-        //mContainerView.setPadding(0,i,0,0);
-        setTopMargin(i);
-    }
-
     private void setTopMargin(int i) {
         FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) mContainer.getLayoutParams();
         params.topMargin = i;
@@ -145,16 +138,6 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
 
 
         mContainer = (RelativeLayout) view.findViewById(R.id.discovery_container);
-
-        MainActivity ms = ((MainActivity) getActivity());
-        int top = ms.getFragmentTop();
-        if (top < 0) {
-            ((MainActivity) getActivity()).listeners.add(this);
-        }
-        top = ms.getFragmentTop();
-        if (top > 0) {
-            setTopMargin(top);
-        }
 
         Resources resource = getResources();
 

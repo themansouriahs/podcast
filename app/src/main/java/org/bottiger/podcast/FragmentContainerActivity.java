@@ -184,25 +184,9 @@ public class FragmentContainerActivity extends DrawerActivity {
             Activity activity = this.getItem(position).getActivity();
             boolean HasTinted = false;
             if (activity != null) {
-                if (position == PLAYLIST) {
-                    Fragment fragment = mFragments[PLAYLIST];
-                    if (fragment instanceof PlaylistFragment) {
-                        PlaylistFragment playlistFragment = (PlaylistFragment) fragment;
-                        TopPlayer topPlayer = playlistFragment.getTopPlayer();
-                        /*
-                        if (topPlayer != null && topPlayer.isFullscreen()) {
-                            int color = topPlayer.getBackGroundColor();
-                            UIUtils.tintStatusBar(color, activity);
-                            HasTinted = true;
-                        }
-                        */
-                    }
-                }
-
                 if (HasTinted) {
                     mViewPager.bringToFront();
                 } else {
-                    //mSlidingTabLayout.bringToFront();
                     UIUtils.resetStatusBar(activity);
                     mViewPager.bringToFront();
                 }
