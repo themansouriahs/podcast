@@ -50,6 +50,7 @@ public class SoundWavesPreferenceFragment extends PreferenceFragment {
         String version = "Unknown";
         try {
             version = getActivity().getPackageManager().getPackageInfo(packageName, 0).versionName;
+            version += "." + getActivity().getPackageManager().getPackageInfo(packageName, 0).versionCode;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
