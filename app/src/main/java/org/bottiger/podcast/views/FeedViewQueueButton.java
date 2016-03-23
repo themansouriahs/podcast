@@ -182,31 +182,8 @@ public class FeedViewQueueButton extends PlayerButtonView implements View.OnClic
     }
 
     @Override
-    protected Parcelable onSaveInstanceState() {
-        Parcelable parcelable = super.onSaveInstanceState();
-        if (parcelable == null) {
-            parcelable = new Bundle();
-        }
-
-        CrossViewState savedState = new CrossViewState(parcelable);
-        savedState.flagState = mState;
-        return savedState;
-    }
-
-    @Override
     protected void onRestoreInstanceState(Parcelable state) {
-        if(!(state instanceof CrossViewState)) {
-            super.onRestoreInstanceState(state);
-            return;
-        }
-
-        CrossViewState ss = (CrossViewState)state;
-        mState = ss.flagState;
-        if (mState != FLAG_STATE_PLUS && mState != FLAG_STATE_CROSS) {
-            mState = FLAG_STATE_PLUS;
-        }
-
-        super.onRestoreInstanceState(ss.getSuperState());
+        super.onRestoreInstanceState(state);
     }
 
     @Override
@@ -376,37 +353,5 @@ public class FeedViewQueueButton extends PlayerButtonView implements View.OnClic
 
         int width = getMeasuredWidth();
         setMeasuredDimension(width, width);
-    }
-
-    /**
-     * Internal saved state
-     */
-    static class CrossViewState extends BaseSavedState {
-        private int flagState;
-
-        CrossViewState(Parcelable superState) {
-            super(superState);
-        }
-
-        private CrossViewState(Parcel in) {
-            super(in);
-            this.flagState = in.readInt();
-        }
-
-        @Override
-        public void writeToParcel(Parcel out, int flags) {
-            super.writeToParcel(out, flags);
-            out.writeInt(this.flagState);
-        }
-
-        public static final Parcelable.Creator<CrossViewState> CREATOR =
-                new Parcelable.Creator<CrossViewState>() {
-                    public CrossViewState createFromParcel(Parcel in) {
-                        return new CrossViewState(in);
-                    }
-                    public CrossViewState[] newArray(int size) {
-                        return new CrossViewState[size];
-                    }
-                };
     }
 }
