@@ -10,13 +10,15 @@
     android:layout_height="match_parent"
     android:background="?attr/themeBackground">
 
+
     <RelativeLayout
         android:id="@+id/discovery_search_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary">
 
-            <SearchView
+
+            <android.support.v7.widget.SearchView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
@@ -25,7 +27,6 @@
                 android:id="@+id/discovery_searchView"
                 android:queryHint="@string/search_query_hint"
                 android:layout_alignParentTop="true"/>
-
             <ImageButton
                 android:id="@+id/discovery_searchIcon"
                 android:layout_width="30dp"
@@ -39,19 +40,6 @@
                 android:layout_alignParentRight="true"
                 />
 
-<!--
-    <TextView
-        android:id="@+id/search_label"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@color/white_opaque"
-        android:text="@string/discovery_recommendations"
-        android:paddingTop="5dp"
-        android:paddingBottom="10dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_below="@id/discovery_searchView" />-->
         <android.support.v7.widget.AppCompatSpinner
             android:id="@+id/search_spinner"
             android:layout_width="match_parent"
@@ -62,7 +50,8 @@
             android:paddingBottom="11dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:layout_below="@id/discovery_searchView" />
+            android:layout_below="@id/discovery_searchView"
+             />
 
     </RelativeLayout>
 

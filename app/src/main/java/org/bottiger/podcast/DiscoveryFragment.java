@@ -79,7 +79,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
     private String mSpinnerTrending;
 
     private RelativeLayout mContainer;
-    private SearchView mSearchView;
+    private android.support.v7.widget.SearchView mSearchView;
     private AppCompatSpinner mSpinner;
     private ImageButton mSearchEngineButton;
     private RecyclerView mResultsRecyclerView;
@@ -143,6 +143,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+
         mContainer = (RelativeLayout) view.findViewById(R.id.discovery_container);
 
         MainActivity ms = ((MainActivity) getActivity());
@@ -163,13 +164,8 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
         mSpinnerPopular  = resource.getString(SPINNER_POPULAR);
         mSpinnerTrending = resource.getString(SPINNER_TRENDING);
 
-        //String[] array = new String[] {mSpinnerByAuthor, mSpinnerPopular, mSpinnerTrending};
-        //ArrayList<String> lst = new ArrayList<>(Arrays.asList(array));
-        //mSpinnerAdapter = new ArrayAdapter<>(getContext(), R.layout.discovery_spinner_item, lst);
         updateSpinnerValues(mSpinnerByAuthor);
 
-        //mSpinnerAdapter = ArrayAdapter.createFromResource(getContext(),
-        //        R.array.discovery_spinner_array, R.layout.discovery_spinner_item);
         mSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpinner.setAdapter(mSpinnerAdapter);
         mSpinner.setOnItemSelectedListener(this);
@@ -186,8 +182,8 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
             }
         });
 
-        mSearchView = (SearchView) view.findViewById(R.id.discovery_searchView);
-        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        mSearchView = (android.support.v7.widget.SearchView) view.findViewById(R.id.discovery_searchView);
+        mSearchView.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 searchviewQueryChanged(query, false);
@@ -222,11 +218,8 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
         mResultsRecyclerView.setHasFixedSize(true);
         mResultsRecyclerView.setAdapter(mResultsAdapter);
 
-        // FIXME Add animation back when they are working
-        //mResultsRecyclerView.setItemAnimator(new SlideInUpAnimator(new OvershootInterpolator(1f)));
-        //mResultsRecyclerView.getItemAnimator().setAddDuration(ANIMATION_DURATION);
-
         populateRecommendations();
+
 
     }
 
