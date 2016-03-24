@@ -1,24 +1,32 @@
 package org.bottiger.podcast.notification;
 
+import org.bottiger.podcast.ApplicationConfiguration;
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.player.SoundWavesPlayer;
 import org.bottiger.podcast.provider.IEpisode;
-import org.bottiger.podcast.receiver.NotificationReceiver;
 import org.bottiger.podcast.service.PlayerService;
 
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -28,23 +36,115 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 
-public class NotificationPlayer {
+public class NotificationPlayer extends BroadcastReceiver {
 
     private static final String TAG = "NotificationPlayer";
+
+    public static final String toggleAction = ApplicationConfiguration.packageName + ".TOGGLE";
+    public static final String nextAction = ApplicationConfiguration.packageName + ".NEXT";
+    public static final String clearAction = ApplicationConfiguration.packageName + ".CLEAR";
+    public static final String playAction = ApplicationConfiguration.packageName + ".PLAY";
+    public static final String pauseAction = ApplicationConfiguration.packageName + ".PAUSE";
+    public static final String fastForwardAction = ApplicationConfiguration.packageName + ".FAST_FORWARD";
+    public static final String rewindAction = ApplicationConfiguration.packageName + ".REWIND";
+
+    private MediaSessionCompat.Token mSessionToken;
+    private MediaControllerCompat mController;
+    private MediaControllerCompat.TransportControls mTransportControls;
+
+    private boolean mStarted = false;
 
 	private PlayerService mPlayerService;
 	private IEpisode item;
 
     private Notification mNotification;
-	private NotificationManager mNotificationManager = null;
+    private NotificationManager mNotificationManager = null;
+	private NotificationManagerCompat mNotificationManagerCompat = null;
 
 	public static final int NOTIFICATION_PLAYER_ID = 4260;
-	
-	public NotificationPlayer(@NonNull PlayerService argPlayerService, @NonNull IEpisode item) {
-		super();
-		this.mPlayerService = argPlayerService;
-		this.item = item;
-	}
+    private static final int REQUEST_CODE = 413;
+
+    public NotificationPlayer(@NonNull PlayerService service , @NonNull IEpisode item) throws RemoteException {
+        this.mPlayerService = service;
+        this.item = item;
+        updateSessionToken();
+
+        mNotificationManagerCompat = NotificationManagerCompat.from(service);
+
+        // Cancel all notifications to handle the case where the Service was killed and
+        // restarted by the system.
+        mNotificationManagerCompat.cancelAll();
+    }
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        String action = intent.getAction();
+        executeCommand(mPlayerService, action);
+    }
+
+    private void executeCommand(@NonNull PlayerService playerService, @NonNull String action) {
+        if (action.equals(nextAction)) {
+            playerService.playNext();
+            return;
+        }
+
+        if (action.equals(clearAction)) {
+            playerService.halt();
+            return;
+        }
+
+        if (action.equals(playAction)) {
+            playerService.play();
+            return;
+        }
+
+        if (action.equals(pauseAction)) {
+            playerService.pause();
+            return;
+        }
+
+        if (action.equals(toggleAction)) {
+
+
+            SoundWavesPlayer player = playerService.getPlayer();
+            if (!player.isInitialized()) {
+                return;
+            }
+
+            Boolean isPlaying = false;
+            if (playerService.isPlaying()) {
+                playerService.pause();
+            } else {
+                playerService.play();
+                isPlaying = true;
+            }
+
+            IEpisode currentItem = playerService.getCurrentItem();
+            if (currentItem != null) {
+                setPlayerService(playerService);
+                show(isPlaying, currentItem);
+            }
+
+        }
+    }
+
+    /**
+     * Update the state based on a change on the session token. Called either when
+     * we are running for the first time or when the media session owner has destroyed the session
+     * (see {@link android.media.session.MediaController.Callback#onSessionDestroyed()})
+     */
+    private void updateSessionToken() throws RemoteException {
+        MediaSessionCompat.Token freshToken = mPlayerService.getSessionToken();
+        if (mSessionToken == null && freshToken != null ||
+                mSessionToken != null && !mSessionToken.equals(freshToken)) {
+
+            mSessionToken = freshToken;
+            if (mSessionToken != null) {
+                mController = new MediaControllerCompat(mPlayerService, mSessionToken);
+                mTransportControls = mController.getTransportControls();
+            }
+        }
+    }
 
     @Nullable
 	public void show(@NonNull final IEpisode argItem) {
@@ -62,8 +162,6 @@ public class NotificationPlayer {
         if (item == null)
             return;
 
-        //mPlayerService.startForeground(getNotificationId(), mNotification);
-
         showNotification(isPlaying);
 	}
 
@@ -77,11 +175,6 @@ public class NotificationPlayer {
             showNotification(ps.isPlaying());
         }
     }
-	
-	public void hide() {
-        if (mNotificationManager != null)
-		    mNotificationManager.cancel(NOTIFICATION_PLAYER_ID);
-	}
 
 	public IEpisode getItem() {
 		return item;
@@ -127,19 +220,22 @@ public class NotificationPlayer {
         int toggleIconId = pause;
         if (isPlaying) toggleIconId = play;
 
+        mNotificationManagerCompat = NotificationManagerCompat.from(mPlayerService);
+
         // Prepare intent which is triggered if the
         // notification is selected
-        Intent toggleIntent = new Intent(NotificationReceiver.toggleAction);
-        Intent nextIntent = new Intent(NotificationReceiver.nextAction);
-        Intent clearIntent = new Intent(NotificationReceiver.clearAction);
-        Intent playIntent = new Intent(NotificationReceiver.playAction);
-        Intent pauseIntent = new Intent(NotificationReceiver.pauseAction);
+        String pkg = mPlayerService.getPackageName();
+        Intent toggleIntent = new Intent(NotificationPlayer.toggleAction).setPackage(pkg);
+        Intent nextIntent = new Intent(NotificationPlayer.nextAction).setPackage(pkg);
+        Intent clearIntent = new Intent(NotificationPlayer.clearAction).setPackage(pkg);
+        Intent playIntent = new Intent(NotificationPlayer.playAction).setPackage(pkg);
+        Intent pauseIntent = new Intent(NotificationPlayer.pauseAction).setPackage(pkg);
 
-        PendingIntent pendingToggleIntent = PendingIntent.getBroadcast(mPlayerService, 0, toggleIntent, 0);
-        PendingIntent pendingNextIntent = PendingIntent.getBroadcast(mPlayerService, 0, nextIntent, 0);
-        PendingIntent pendingClearIntent = PendingIntent.getBroadcast(mPlayerService, 0, clearIntent, 0);
-        PendingIntent pendingPauseIntent = PendingIntent.getBroadcast(mPlayerService, 0, pauseIntent, 0);
-        PendingIntent pendingPlayIntent = PendingIntent.getBroadcast(mPlayerService, 0, playIntent, 0);
+        PendingIntent pendingToggleIntent = PendingIntent.getBroadcast(mPlayerService, REQUEST_CODE, toggleIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent pendingNextIntent = PendingIntent.getBroadcast(mPlayerService, REQUEST_CODE, nextIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent pendingClearIntent = PendingIntent.getBroadcast(mPlayerService, REQUEST_CODE, clearIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent pendingPauseIntent = PendingIntent.getBroadcast(mPlayerService, REQUEST_CODE, pauseIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent pendingPlayIntent = PendingIntent.getBroadcast(mPlayerService, REQUEST_CODE, playIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         // yes, the play/pause icons are inverted for now
         NotificationCompat.Action actionToggle = new NotificationCompat.Action(toggleIconId, "Toggle", pendingToggleIntent);
@@ -208,30 +304,12 @@ public class NotificationPlayer {
         mBuilder.setContent(layout);
 
 
-        /*
-        // The stack builder object will contain an artificial back stack for the
-        // started Activity.
-        // This ensures that navigating backward from the Activity leads out of
-        // your application to the Home screen.
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(mPlayerService);
-        // Adds the back stack for the Intent (but not the Intent itself)
-        //stackBuilder.addParentStack(MainActivity.class);
-        // Adds the Intent that starts the Activity to the top of the stack
-        stackBuilder.addNextIntent(resultIntent);
-
-        PendingIntent resultPendingIntent =
-                stackBuilder.getPendingIntent(
-                        0,
-                        PendingIntent.FLAG_UPDATE_CURRENT
-                );
-        mBuilder.setContentIntent(resultPendingIntent);
-        */
         Intent intent = new Intent(mPlayerService.getApplicationContext(), MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(mPlayerService.getApplicationContext(), 0, intent, 0);
         mBuilder.setContentIntent(pendingIntent);
 
         mNotificationManager =
-                (NotificationManager) mPlayerService.getSystemService(Context.NOTIFICATION_SERVICE);
+                (android.app.NotificationManager) mPlayerService.getSystemService(Context.NOTIFICATION_SERVICE);
 
         return mBuilder;
     }
@@ -260,11 +338,33 @@ public class NotificationPlayer {
         }
     }
 
+    public void hide() {
+        mStarted = false;
+        if (mNotificationManager != null)
+            mNotificationManager.cancel(NOTIFICATION_PLAYER_ID);
+
+        mPlayerService.unregisterReceiver(this);
+        mPlayerService.stopForeground(true);
+    }
+
     private void displayNotification(boolean isPlaying, @Nullable Bitmap argBitmap) {
         NotificationCompat.Builder builder = buildNotification(isPlaying, mPlayerService, argBitmap);
         mNotification = builder.build();
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(NotificationPlayer.toggleAction);
+        filter.addAction(NotificationPlayer.clearAction);
+        filter.addAction(NotificationPlayer.nextAction);
+        filter.addAction(NotificationPlayer.pauseAction);
+        filter.addAction(NotificationPlayer.playAction);
+        filter.addAction(NotificationPlayer.rewindAction);
+        filter.addAction(NotificationPlayer.fastForwardAction);
+        mPlayerService.registerReceiver(this, filter);
+
         mPlayerService.startForeground(getNotificationId(), mNotification);
         mNotificationManager.notify(NOTIFICATION_PLAYER_ID, mNotification);
+
+        mStarted = true;
     }
 
     /**

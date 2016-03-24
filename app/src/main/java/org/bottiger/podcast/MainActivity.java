@@ -16,6 +16,7 @@ import org.bottiger.podcast.utils.TransitionUtils;
 
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -24,8 +25,12 @@ import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Debug;
+import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.v4.media.MediaBrowserCompat;
+import android.support.v4.media.session.MediaControllerCompat;
+import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -45,12 +50,55 @@ public class MainActivity extends FragmentContainerActivity {
 
 	private int currentTheme;
 
+	MediaBrowserCompat mediaBrowser;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
         // Start the player service
-		((SoundWaves)getApplicationContext()).startService();
+		mediaBrowser = new MediaBrowserCompat(
+				this, // a Context
+				new ComponentName(this, PlayerService.class),
+				// Which MediaBrowserService
+				new MediaBrowserCompat.ConnectionCallback() {
+					@Override
+					public void onConnected() {
+						try {
+							// Ah, here’s our Token again
+							MediaSessionCompat.Token token =
+									mediaBrowser.getSessionToken();
+							// This is what gives us access to everything
+							MediaControllerCompat controller =
+									new MediaControllerCompat(MainActivity.this, token);
+
+							// Convenience method of FragmentActivity to allow you to use
+							// getSupportMediaController() anywhere
+							setSupportMediaController(controller);
+						} catch (RemoteException e) {
+							Log.e(MainActivity.class.getSimpleName(),
+									"Error creating controller", e);
+							VendorCrashReporter.handleException(e);
+						}
+
+						MainActivity.this.onServiceConnection();
+					}
+
+					@Override
+					public void onConnectionSuspended() {
+						// We were connected, but no longer :-(
+						VendorCrashReporter.report("onConnectionSuspended", "it happend");
+					}
+
+					@Override
+					public void onConnectionFailed() {
+						// The attempt to connect failed completely.
+						// Check the ComponentName!
+						VendorCrashReporter.report("onConnectionFailed", "it happend");
+					}
+				},
+				null); // optional Bundle
+		mediaBrowser.connect();
 
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -132,13 +180,8 @@ public class MainActivity extends FragmentContainerActivity {
 	@Override
 	protected void onDestroy() {
 		unregisterReceiver(receiver);
-
-        try {
-            unbindService(((SoundWaves)getApplicationContext()).playerServiceConnection);
-        } catch (Exception e) {
-            VendorCrashReporter.handleException(e);
-        }
         super.onDestroy();
+		mediaBrowser.disconnect();
 	}
 
 	@Override

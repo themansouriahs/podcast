@@ -18,9 +18,9 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 
+import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
-import org.bottiger.podcast.receiver.NotificationReceiver;
 import org.bottiger.podcast.service.PlayerService;
 
 /**
@@ -54,13 +54,43 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
         PendingIntent pendingMediaButtonIntent = PendingIntent.getBroadcast(mPlayerService, 0, mediaButtonIntent, 0);
         mSession.setMediaButtonReceiver(pendingMediaButtonIntent);
 
-        Intent toggleIntent = new Intent(NotificationReceiver.toggleAction);
+        Intent toggleIntent = new Intent(NotificationPlayer.toggleAction);
         PendingIntent pendingToggleIntent = PendingIntent.getBroadcast(mPlayerService, 0, toggleIntent, 0);
         mSession.setMediaButtonReceiver(pendingToggleIntent);
 
 
         mSession.setCallback(this);
         mSession.setActive(true);
+    }
+
+    /**
+     * Callback method called from PlaybackManager whenever the music is about to play.
+     */
+    public void onPlay() {
+        Log.d(TAG, "onPlay");
+        if (!mSession.isActive()) {
+            mSession.setActive(true);
+        }
+
+        //mDelayedStopHandler.removeCallbacksAndMessages(null);
+
+        // The service needs to continue running even after the bound client (usually a
+        // MediaController) disconnects, otherwise the music playback will stop.
+        // Calling startService(Intent) will keep the service running until it is explicitly killed.
+        mPlayerService.startService(new Intent(mPlayerService.getApplicationContext(), PlayerService.class));
+    }
+
+
+    /**
+     * Callback method called from PlaybackManager whenever the music stops playing.
+     */
+    public void onStop() {
+        Log.d(TAG, "onStop");
+        // Reset the delayed stop handler, so after STOP_DELAY it will be executed again,
+        // potentially stopping the service.
+        //mDelayedStopHandler.removeCallbacksAndMessages(null);
+        //mDelayedStopHandler.sendEmptyMessageDelayed(0, STOP_DELAY);
+        mPlayerService.stopForeground(true);
     }
 
     public void release() {
@@ -112,16 +142,6 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
 
     public MediaSessionCompat getSession() {
         return mSession;
-    }
-
-    @Override
-    public void onPlay() {
-        Log.d(TAG, "onPlay");
-    }
-
-    @Override
-    public void onPause() {
-        Log.d(TAG, "onPause");
     }
 
     @Override

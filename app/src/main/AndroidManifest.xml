@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="org.bottiger.podcast">
 
 
@@ -20,7 +21,7 @@
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.READ_SYNC_STATS" />
-    <uses-permission-sdk-m android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
+    <uses-permission-sdk-23 android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
 
     <uses-feature android:name="android.hardware.telephony" android:required="false" />
 
@@ -169,13 +170,19 @@
 
         <service
             android:name="org.bottiger.podcast.service.PlayerService"
-            android:enabled="true"
-            android:permission="android.permission.MEDIA_CONTENT_CONTROL">
+            android:exported="true"
+            tools:ignore="ExportedService">
             <intent-filter>
-                <action android:name="android.intent.action.MEDIA_BUTTON" />
+                <action android:name="android.media.browse.MediaBrowserService" />
             </intent-filter>
-
         </service>
+        <!--
+                    android:enabled="true
+
+            android:permission="android.permission.MEDIA_CONTENT_CONTROL"
+                        <action android:name="android.intent.action.MEDIA_BUTTON" />
+        -->
+
         <service
             android:name="org.bottiger.podcast.service.DownloadService"
             android:enabled="true" >
@@ -211,20 +218,7 @@
             android:name="PodcastUpdateManager"
             android:process=":remote" >
         </receiver>
-        <receiver android:name="org.bottiger.podcast.receiver.NotificationReceiver" >
-            <intent-filter>
-                <action android:name="org.bottiger.soundwaves.TOGGLE" >
-                </action>
-                <action android:name="org.bottiger.soundwaves.NEXT" >
-                </action>
-                <action android:name="org.bottiger.soundwaves.CLEAR" >
-                </action>
-                <action android:name="org.bottiger.soundwaves.PLAY" >
-                </action>
-                <action android:name="org.bottiger.soundwaves.PAUSE" >
-                </action>
-            </intent-filter>
-        </receiver>
+        
         <receiver android:name=".receiver.AutoStart" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" >
@@ -236,6 +230,7 @@
                 <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
             </intent-filter>
         </receiver>
+
         <receiver android:name="android.support.v4.media.session.MediaButtonReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />

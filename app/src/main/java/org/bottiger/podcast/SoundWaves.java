@@ -38,6 +38,7 @@ import rx.schedulers.Schedulers;
 public class SoundWaves extends Application {
 
     private static final String TAG = "SoundWaves";
+    public static PlayerService sBoundPlayerService;
 
     /*
     static {
@@ -62,32 +63,7 @@ public class SoundWaves extends Application {
 
     private static Library sLibrary = null;
 
-    public static class PlayerServiceBound {
-        public boolean isConnected;
-    }
-
-    @Deprecated
-    public static PlayerService sBoundPlayerService = null;
-
     public ISoundWavesEngine soundService;
-
-    public ServiceConnection playerServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            Log.d("PlayerService", "onServiceConnected");
-            sBoundPlayerService = ((PlayerService.PlayerBinder) service)
-                        .getService();
-            PlayerServiceBound playerServiceBound = new PlayerServiceBound();
-            playerServiceBound.isConnected = true;
-            sBus.post(playerServiceBound);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName className) {
-            Log.d("PlayerService", "onServiceDisconnected");
-            sBoundPlayerService = null;
-        }
-    };
 
     public ServiceConnection soundEngineServiceConnection = new ServiceConnection() {
         @Override
@@ -155,14 +131,6 @@ public class SoundWaves extends Application {
 
     public static Context getAppContext() {
         return context;
-    }
-
-    public void startService(){
-        // Start the player service
-        Intent serviceIntent = new Intent(this, PlayerService.class);
-        startService(serviceIntent);
-        Intent bindIntent = new Intent(this, PlayerService.class);
-        bindService(bindIntent, playerServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
     private void firstRun(@NonNull Context argContext) {

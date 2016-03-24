@@ -1,5 +1,6 @@
 package org.bottiger.podcast.service;
 
+import org.bottiger.podcast.R;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.player.LegacyRemoteController;
 import org.bottiger.podcast.player.PlayerHandler;
@@ -35,6 +36,7 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.RemoteException;
@@ -43,6 +45,8 @@ import android.support.annotation.IntDef;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresPermission;
+import android.support.v4.media.MediaBrowserCompat;
+import android.support.v4.media.MediaBrowserServiceCompat;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.telephony.PhoneStateListener;
@@ -55,6 +59,7 @@ import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.net.URL;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -64,7 +69,7 @@ import javax.annotation.Nullable;
  * 
  * @author Arvid Böttiger
  */
-public class PlayerService extends Service implements
+public class PlayerService extends MediaBrowserServiceCompat implements
 		AudioManager.OnAudioFocusChangeListener {
 
     private static final String TAG = "PlayerService";
@@ -90,7 +95,6 @@ public class PlayerService extends Service implements
 	private static @PlayerService.NextTrack int nextTrack = NEXT_IN_PLAYLIST;
 	
 	private Playlist mPlaylist;
-
 
 	@NonNull private SoundWavesPlayer mPlayer;
     private MediaControllerCompat mController;
@@ -154,7 +158,6 @@ public class PlayerService extends Service implements
                 .createWifiLock(WifiManager.WIFI_MODE_FULL, LOCK_NAME);
 
         mPlaylist = new Playlist(this);
-		//mPlaylist.populatePlaylistIfEmpty();
 		SoundWaves.getLibraryInstance().loadPlaylist(mPlaylist);
 		SoundWaves.getBus().register(mPlaylist);
 		SoundWaves.getBus().register(this);
@@ -169,6 +172,8 @@ public class PlayerService extends Service implements
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
+
+		setSessionToken(mPlayerStateManager.getToken());
 		
 		mPlayer = new SoundWavesPlayer(this);
 		mPlayer.setHandler(mPlayerHandler);
@@ -176,6 +181,7 @@ public class PlayerService extends Service implements
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             mMediaSessionManager = (MediaSessionManager) getSystemService(MEDIA_SESSION_SERVICE);
         }
+
 		mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
 		mPhoneStateListener = new PlayerPhoneListener(this);
@@ -229,9 +235,22 @@ public class PlayerService extends Service implements
 		super.onLowMemory();
 	}
 
+	/*
 	@Override
 	public IBinder onBind(Intent intent) {
 		return binder;
+	}
+	*/
+
+	@android.support.annotation.Nullable
+	@Override
+	public BrowserRoot onGetRoot(@NonNull String clientPackageName, int clientUid, @android.support.annotation.Nullable Bundle rootHints) {
+		return new BrowserRoot(getString(R.string.app_name), null);
+	}
+
+	@Override
+	public void onLoadChildren(@NonNull String parentId, @NonNull Result<List<MediaBrowserCompat.MediaItem>> result) {
+		result.sendResult(null);
 	}
 
 	/**
@@ -240,9 +259,9 @@ public class PlayerService extends Service implements
     public void dis_notifyStatus() {
 
         if (mNotificationManager == null)
-            mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+			mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
-        mNotificationManager.cancel(NotificationPlayer.NOTIFICATION_PLAYER_ID);
+		mNotificationManager.cancel(NotificationPlayer.NOTIFICATION_PLAYER_ID);
 
 		if (mNotificationPlayer != null)
 			mNotificationPlayer.hide();
@@ -254,7 +273,11 @@ public class PlayerService extends Service implements
     public void notifyStatus(@NonNull IEpisode argItem) {
 
 		if (mNotificationPlayer == null)
-			mNotificationPlayer = new NotificationPlayer(this, argItem);
+			try {
+				mNotificationPlayer = new NotificationPlayer(this, argItem);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
 
 		mItem = argItem;
         mNotificationPlayer.setPlayerService(this);
@@ -467,7 +490,8 @@ public class PlayerService extends Service implements
                 (mItem).setOffset(getContentResolver(), mPlayer.position());
             }
 		}
-		dis_notifyStatus();
+
+		//dis_notifyStatus();
 
 		mPlayer.pause();
         releaseWakelock();
@@ -585,6 +609,7 @@ public class PlayerService extends Service implements
             wifiLock.release();
     }
 
+	/*
 	private final IBinder binder = new PlayerBinder();
 
 	public class PlayerBinder extends Binder {
@@ -592,6 +617,7 @@ public class PlayerService extends Service implements
 			return PlayerService.this;
 		}
 	}
+	*/
 
     public Playlist getPlaylist() {
         return mPlaylist;
