@@ -3,6 +3,7 @@ package org.bottiger.podcast.activities.feedview;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -41,10 +42,12 @@ import org.bottiger.podcast.TopActivity;
 import org.bottiger.podcast.activities.discovery.FeedViewDiscoveryAdapter;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PaletteListener;
+import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
+import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.ColorUtils;
 import org.bottiger.podcast.utils.PaletteHelper;
@@ -55,6 +58,7 @@ import org.bottiger.podcast.views.FloatingActionButton;
 import org.bottiger.podcast.views.MultiShrink.feed.MultiShrinkScroller;
 import org.bottiger.podcast.views.MultiShrink.feed.FeedViewTopImage;
 import org.bottiger.podcast.views.MultiShrink.feed.SchedulingUtils;
+import org.bottiger.podcast.views.dialogs.DialogBulkDownload;
 import org.bottiger.podcast.views.utils.SubscriptionSettingsUtils;
 
 import io.codetail.animation.SupportAnimator;
@@ -519,6 +523,16 @@ public class FeedActivity extends TopActivity implements PaletteListener {
                         return;
                     }
                 });
+                return true;
+            case R.id.menu_bulk_download:
+                Playlist playlist = PlayerService.getInstance().getPlaylist();
+                if (mSubscription instanceof Subscription && playlist != null) {
+                    DialogBulkDownload dialogBulkDownload = new DialogBulkDownload();
+                    Dialog dialog = dialogBulkDownload.onCreateDialog(this, playlist, (Subscription)mSubscription);
+                    dialog.show();
+                } else {
+                    VendorCrashReporter.report("Bulk download", "Bulk download can not be started");
+                }
                 return true;
         }
         return super.onOptionsItemSelected(item);

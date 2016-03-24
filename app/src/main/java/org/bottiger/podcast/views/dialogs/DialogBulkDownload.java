@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CompoundButton;
@@ -18,11 +19,15 @@ import android.widget.TextView;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.playlist.Playlist;
+import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.PlayerService;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by apl on 24-03-2015.
@@ -36,12 +41,26 @@ public class DialogBulkDownload {
 
     private Context mContext;
     private Playlist mPlaylist;
+    @Nullable
+    private Subscription mSubscription = null;
 
 
     public Dialog onCreateDialog(@NonNull final Activity argActivity, @NonNull Playlist argPlaylist) {
+        return onCreateDialog(argActivity, argPlaylist, null);
+    }
 
+    public Dialog onCreateDialog(@NonNull final Activity argActivity,
+                                 @NonNull Playlist argPlaylist,
+                                 @Nullable Subscription argSubscription) {
+        return createDialog(argActivity, argPlaylist, argSubscription);
+    }
+
+    private Dialog createDialog(@NonNull final Activity argActivity,
+                                             @NonNull Playlist argPlaylist,
+                                             @Nullable Subscription argSubscription) {
         mContext = argActivity.getApplicationContext();
         mPlaylist = argPlaylist;
+        mSubscription = argSubscription;
 
         AlertDialog.Builder builder = new AlertDialog.Builder(argActivity);
         // Get the layout inflater
@@ -125,10 +144,12 @@ public class DialogBulkDownload {
         IEpisode episode;
         Date date;
 
-        int downloadCandidatesCount = Math.min(mPlaylist.size(), PLAYLIST_EPISODE_DOWNLOAD_COUNT);
+        List<FeedItem> episodes = mSubscription != null ? mSubscription.getEpisodes().getFilteredList() : mPlaylist.getPlaylist();
+
+        int downloadCandidatesCount = Math.min(episodes.size(), PLAYLIST_EPISODE_DOWNLOAD_COUNT);
 
         for (int i = 0; i < downloadCandidatesCount; i++) {
-            episode = mPlaylist.getItem(i);
+            episode = episodes.get(i);
             date = episode.getDateTime();
             if (date != null) {
                 boolean validDate = validDate(mAction, date);
@@ -138,11 +159,6 @@ public class DialogBulkDownload {
                 }
             }
         }
-
-        /*
-        if (downloadManager != null)
-        downloadManager.startDownload();
-        */
 
     }
 
@@ -170,8 +186,7 @@ public class DialogBulkDownload {
         long thresholdMs = nowMs-ageMs;
         Date thresholdDate =new Date(thresholdMs);
 
-        boolean newerThan = argDate.after(thresholdDate);
-        return newerThan;
+        return argDate.after(thresholdDate);
 
     }
 }
