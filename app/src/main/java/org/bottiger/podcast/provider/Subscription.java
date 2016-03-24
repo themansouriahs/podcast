@@ -5,6 +5,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
+import java.util.List;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
@@ -369,8 +370,10 @@ public class Subscription implements ISubscription, PaletteListener {
 
 		mIsRefreshing = argIsRefreshing;
 
-		if (!mIsRefreshing)
+		if (!mIsRefreshing) {
+			countNewEpisodes();
 			notifyPropertyChanged(null);
+		}
 	}
 
 	@Override
@@ -482,6 +485,18 @@ public class Subscription implements ISubscription, PaletteListener {
 
 	public void setSettings(int argSettings) {
 		mSettings = argSettings;
+	}
+
+	public int countNewEpisodes() {
+		int newCounter = 0;
+		List<IEpisode> list = getEpisodes().getUnfilteredList();
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).isNew())
+				newCounter++;
+		}
+
+		new_episodes = newCounter;
+		return getNewEpisodes();
 	}
 
 	public int getNewEpisodes() {

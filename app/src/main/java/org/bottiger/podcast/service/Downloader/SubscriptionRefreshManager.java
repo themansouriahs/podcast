@@ -158,20 +158,28 @@ public class SubscriptionRefreshManager {
         if (SoundWavesDownloadManager.canPerform(SoundWavesDownloadManager.ACTION_DOWNLOAD_AUTOMATICALLY,
                 argContext,
                 argSubscription)) {
-            boolean startDownload = false;
+
+            if (!(argSubscription instanceof Subscription)) {
+                return;
+            }
+
+            Subscription subscription = (Subscription)argSubscription;
+
             Date tenMinutesAgo = new Date(System.currentTimeMillis() - (10 * 60 * 1000));
 
             final PlayerService ps = SoundWaves.sBoundPlayerService;
 
             if (argSubscription instanceof Subscription) {
                 SortedList<? extends IEpisode> episodes = argSubscription.getEpisodes();
+                int newEpisodeCount = Math.min(subscription.countNewEpisodes(), episodes.size());
+
                 for (int i = 0; i < episodes.size(); i++) {
                     IEpisode episode = episodes.get(i);
                     if (episode instanceof FeedItem) {
                         Date lastUpdate = new Date(((FeedItem) episode).getLastUpdate());
-                        if (lastUpdate.after(tenMinutesAgo)) {
+                        if (lastUpdate.after(tenMinutesAgo) && newEpisodeCount > 0) {
                             SoundWaves.getDownloadManager().addItemToQueue(episode, SoundWavesDownloadManager.LAST);
-                            startDownload = true;
+                            newEpisodeCount--;
                         }
                     }
                 }
@@ -186,11 +194,6 @@ public class SubscriptionRefreshManager {
         if (argSubscription instanceof Subscription) {
             Subscription subscription = (Subscription)argSubscription;
             SoundWaves.getLibraryInstance().updateSubscription(subscription);
-            /*
-            FeedUpdater updater = new FeedUpdater(argContentResolver);
-            updater.updateDatabase(subscription);
-            ((Subscription)argSubscription).getEpisodes(argContentResolver);
-            */
             Log.d(SubscriptionRefreshManager.TAG, "Done updating database for: " + argSubscription);
             return;
         }

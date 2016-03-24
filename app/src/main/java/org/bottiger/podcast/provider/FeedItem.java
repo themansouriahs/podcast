@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.model.events.DownloadProgress;
 import org.bottiger.podcast.listeners.DownloadProgressPublisher;
 import org.bottiger.podcast.model.events.EpisodeChanged;
@@ -577,6 +578,10 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 	 */
 	public boolean isMarkedAsListened() {
 		return this.listened == 1;
+	}
+
+	public boolean isNew() {
+		return pub_date >= Library.episodeNewThreshold();
 	}
 
 	/**

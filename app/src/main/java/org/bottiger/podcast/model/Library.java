@@ -383,6 +383,20 @@ public class Library {
     }
 
     /**
+     * Return a timestamp which can be used to determine if an episode is new.
+     * @return
+     */
+    public static long episodeNewThreshold() {
+        int newThresholdInDays = 6;
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        cal.add(Calendar.DAY_OF_YEAR,-newThresholdInDays);
+        Date threshold= cal.getTime();
+        return threshold.getTime();
+    }
+
+    /**
      * Get all the subscriptions from the database.
      *
      * @return
@@ -391,13 +405,7 @@ public class Library {
         // SELECT *, (SELECT count(item._id) FROM item WHERE item.subs_id == subscriptions._id
         // AND item.pub_date>1445210057385) AS new_episodes FROM subscriptions
 
-        int newThresholdInDays = 6;
-
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(new Date());
-        cal.add(Calendar.DAY_OF_YEAR,-newThresholdInDays);
-        Date threshold= cal.getTime();
-        long thresholdTimestamp = threshold.getTime();
+        long thresholdTimestamp = episodeNewThreshold();
 
         StringBuilder builder = new StringBuilder(200);
         builder.append("SELECT ");

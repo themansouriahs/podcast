@@ -8,6 +8,7 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.model.events.EpisodeChanged;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
@@ -51,6 +52,10 @@ public class SlimEpisode extends BaseEpisode implements Parcelable {
     @Override
     public URL getUrl() {
         return mUrl;
+    }
+
+    public boolean isNew() {
+        return false;
     }
 
     @Nullable

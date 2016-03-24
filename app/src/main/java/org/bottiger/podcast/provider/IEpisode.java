@@ -70,6 +70,7 @@ public interface IEpisode {
 
     boolean isDownloaded();
     boolean isMarkedAsListened();
+    boolean isNew();
 
     boolean isVideo();
     void setIsVideo(boolean argIsVideo);

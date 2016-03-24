@@ -26,6 +26,18 @@ public class EpisodeList<T> extends SortedList<T> {
     }
 
     @NonNull
+    public LinkedList<IEpisode> getUnfilteredList() {
+        LinkedList<IEpisode> list =  new LinkedList<>();
+        IEpisode episode;
+        for (int i = 0; i < size(); i++) {
+            episode = (IEpisode) get(i);
+            list.add(episode);
+        }
+
+        return list;
+    }
+
+    @NonNull
     public LinkedList<IEpisode> getFilteredList() {
         LinkedList<IEpisode> list =  new LinkedList<>();
         IEpisode episode;
