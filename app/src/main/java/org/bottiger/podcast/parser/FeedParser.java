@@ -247,7 +247,7 @@ public class FeedParser {
                 case SUBSCRIPTION_IMAGE_TAG: {
                     String image = readSubscriptionImage(parser);
                     argSubscription.setImageURL(image);
-                    parser.nextTag();
+                    //parser.nextTag();
                     break;
                 }
                 case SUBSCRIPTION_PUB_DATE_TAG:
