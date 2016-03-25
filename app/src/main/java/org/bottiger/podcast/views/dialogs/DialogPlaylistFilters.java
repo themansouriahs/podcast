@@ -33,6 +33,7 @@ import org.bottiger.podcast.playlist.PlaylistData;
 import org.bottiger.podcast.playlist.filters.SubscriptionFilter;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionLoader;
+import org.bottiger.podcast.service.PlayerService;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -43,7 +44,7 @@ import java.util.List;
 public class DialogPlaylistFilters extends DialogFragment {
 
     private Activity mContext;
-    private Playlist mPlaylist;
+    @Nullable  private Playlist mPlaylist;
 
     protected SharedPreferences mSharedPreferences;
 
@@ -103,20 +104,22 @@ public class DialogPlaylistFilters extends DialogFragment {
 
     @Override
     public  void onResume() {
-        ((SoundWaves)getActivity().getApplicationContext()).getBus().register(this);
         super.onResume();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        ((SoundWaves)getActivity().getApplicationContext()).getBus().unregister(this);
     }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        //public Dialog onCreateDialog(@NonNull Playlist argPlaylist) {
-        mPlaylist = ((SoundWaves)getActivity().getApplicationContext()).sBoundPlayerService.getPlaylist();
+
+        PlayerService ps = PlayerService.getInstance();
+        if (ps != null) {
+            mPlaylist = ps.getPlaylist();
+        }
+
         mContext = getActivity();
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
@@ -207,8 +210,6 @@ public class DialogPlaylistFilters extends DialogFragment {
         }
 
         SoundWaves.getLibraryInstance().loadPlaylist(mPlaylist);
-        //mPlaylist.populatePlaylist(Playlist.MAX_SIZE, true);
-        //mPlaylist.notifyPlaylistChanged();
     }
 
     private void initOnlyDownloaded() {
@@ -274,8 +275,6 @@ public class DialogPlaylistFilters extends DialogFragment {
     }
 
     private void initSubscriptionFilter(@NonNull LayoutInflater argLayoutInflater, @NonNull View argView) {
-        //LinearLayout mPlaylistContentLayout = (LinearLayout) view.findViewById(R.id.playlist_content);
-        //bindPlaylistFilter(mPlaylistContentLayout);
         mSubscriptions.clear();
 
         SortedList<Subscription> list = SoundWaves.getLibraryInstance().getSubscriptions();
@@ -291,7 +290,6 @@ public class DialogPlaylistFilters extends DialogFragment {
         mRadioGroup.setOnCheckedChangeListener(RadioOnCheckedChangeListener);
 
         mCheckboxes.clear();
-        //for (Subscription subscription : mSubscriptions) {
         for (int i = 0, nsize = mSubscriptions.size(); i < nsize; i++) {
             Subscription subscription = mSubscriptions.valueAt(i);
 
@@ -327,10 +325,6 @@ public class DialogPlaylistFilters extends DialogFragment {
                 mDialogPlaylistContent.performClick();
             }
         });
-
-        //String title = mContext.getResources().getString(R.string.drawer_playlist_content_source);
-        //TextView tv = (TextView) argView.findViewById(R.id.drawer_item_title);
-        //tv.setText(title);
     }
 
     private void checkAll() {
@@ -384,10 +378,7 @@ public class DialogPlaylistFilters extends DialogFragment {
         }
     }
 
-    @Subscribe
-    public void setSubscriptions(@Nullable Playlist argPlaylist) {
-        mPlaylist = argPlaylist;
-
+    private void setSubscriptions(@Nullable Playlist argPlaylist) {
         if (argPlaylist != null)
             mSubscriptionFilter = argPlaylist.getSubscriptionFilter();
     }
