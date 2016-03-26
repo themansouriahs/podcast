@@ -36,6 +36,9 @@ import android.preference.PreferenceManager;
 import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.text.Html;
 import android.text.Spannable;
@@ -58,7 +61,10 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import org.bottiger.podcast.BuildConfig;
+import org.bottiger.podcast.DrawerActivity;
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.provider.FeedItem;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -159,6 +165,37 @@ public class UIUtils {
         }
 
         return builder;
+    }
+
+    public static void disPlayBottomSnackBar(View argView, @StringRes int stringRes, View.OnClickListener argAction) {
+        disPlayBottomSnackBarInternalInternal(argView, getSnack(argView, stringRes), argAction);
+    }
+
+    public static void disPlayBottomSnackBar(View argView, CharSequence stringRes, View.OnClickListener argAction) {
+        disPlayBottomSnackBarInternalInternal(argView, getSnack(argView, stringRes), argAction);
+    }
+
+    private static void disPlayBottomSnackBarInternalInternal(View argView, Snackbar argSnack, View.OnClickListener argAction) {
+        if (argAction != null) {
+            argSnack = argSnack.setAction(R.string.playlist_episode_dismissed_undo, argAction);
+        }
+
+        argSnack.setActionTextColor(ContextCompat.getColor(argView.getContext(), R.color.white_opaque));
+
+        //View view = argSnack.getView();
+        //CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)view.getLayoutParams();
+        //params.bottomMargin = DrawerActivity.getStatusBarHeight(view.getContext().getResources())*2;
+        //view.setLayoutParams(params);
+
+        argSnack.show();
+    }
+
+    private static Snackbar getSnack(View argView, Object stringRes) {
+        if (stringRes instanceof CharSequence) {
+            return Snackbar.make(argView, (CharSequence) stringRes, Snackbar.LENGTH_LONG);
+        }
+
+        return Snackbar.make(argView, (int)stringRes, Snackbar.LENGTH_LONG);
     }
 
     public static void preferPackageForIntent(Context context, Intent intent, String packageName) {

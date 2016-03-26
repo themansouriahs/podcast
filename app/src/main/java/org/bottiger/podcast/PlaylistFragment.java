@@ -315,6 +315,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
                 mPlaylist.removeItem(itemPosition, true);
 
+                /*
                 Snackbar snack = Snackbar.make(view, R.string.playlist_episode_dismissed, Snackbar.LENGTH_LONG)
                         .setAction(R.string.playlist_episode_dismissed_undo, new View.OnClickListener() {
                             @Override
@@ -339,6 +340,22 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                 view.setLayoutParams(params);
 
                 snack.show();
+                */
+                UIUtils.disPlayBottomSnackBar(view, R.string.playlist_episode_dismissed, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        episode.setPriority(currentPriority);
+                        mPlaylist.setItem(itemPosition, episode);
+                        mAdapter.notifyDataSetChanged();
+
+                        if (episode instanceof FeedItem) {
+                            FeedItem item = (FeedItem) episode;
+                            item.markAsListened(0);
+                        }
+
+                        SoundWaves.getLibraryInstance().updateEpisode(episode);
+                    }
+                });
 
                 mAdapter.notifyItemRemoved(itemPosition-1);
             }

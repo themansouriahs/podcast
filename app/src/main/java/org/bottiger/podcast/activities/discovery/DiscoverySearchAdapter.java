@@ -21,6 +21,7 @@ import org.bottiger.podcast.activities.feedview.FeedActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.adapters.viewholders.discovery.SearchResultViewHolder;
+import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
@@ -28,6 +29,7 @@ import org.bottiger.podcast.provider.SubscriptionLoader;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
 import org.bottiger.podcast.utils.ImageLoaderUtils;
 import org.bottiger.podcast.utils.SharedAdapterUtils;
+import org.bottiger.podcast.utils.UIUtils;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -99,7 +101,7 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
         holder.toggleSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                toggleSubscriptionStatus(subscription);
+                toggleSubscriptionStatus(holder.itemView, buttonView, subscription);
             }
         });
     }
@@ -150,10 +152,12 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
         }
     }
 
-    public synchronized void toggleSubscriptionStatus(@NonNull ISubscription argSubscription) {
-        URL url = argSubscription.getURL();
-        boolean isSubscribed = mSubscribedUrls.contains(url);
-        Subscription subscription = new Subscription(url.toString());
+    public synchronized void toggleSubscriptionStatus(@NonNull View argView,
+                                                      final @NonNull CompoundButton buttonView,
+                                                      @NonNull ISubscription argSubscription) {
+        final URL url = argSubscription.getURL();
+        final boolean isSubscribed = mSubscribedUrls.contains(url);
+        final Subscription subscription = new Subscription(url.toString());
         if (isSubscribed) {
             unsubscribe(subscription);
             mSubscribedUrls.remove(url);
@@ -162,16 +166,20 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
             mSubscribedUrls.add(url);
         }
 
-        // remember tjat isSubscribed is inverted now
+        // remember that isSubscribed is inverted now
         int stringId = !isSubscribed ? R.string.discovery_subscribe_toast : R.string.discovery_unsubscribe_toast;
         String text = mActivity.getResources().getString(stringId);
         String formattedText = String.format(text, argSubscription.getTitle());
+        /*
 
         Context context = mActivity.getApplicationContext();
         int duration = Toast.LENGTH_LONG;
 
         Toast toast = Toast.makeText(context, formattedText, duration);
         toast.show();
+        */
+
+        UIUtils.disPlayBottomSnackBar(argView, formattedText, null);
     }
 
     private void subscribe(@NonNull Subscription argSubscription) {

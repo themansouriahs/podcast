@@ -125,7 +125,7 @@ public class LibraryPersistency {
             int status = cv.getAsInteger(SubscriptionColumns.STATUS);
             if (status == Subscription.STATUS_UNSUBSCRIBED) {
                 String title = cv.getAsString(SubscriptionColumns.TITLE);
-                Log.e("Unsubscribing", "from: " + title + ", stack:" + Log.getStackTraceString(new Exception()));
+                //Log.e("Unsubscribing", "from: " + title + ", stack:" + Log.getStackTraceString(new Exception()));
             }
 
             int numUpdatedRows = mContentResolver.update(
