@@ -338,7 +338,7 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
                 defaultOrder);
 		int amount = sharedPreferences.getInt(amountKey, amountValue);
 
-		PlayerService playerService = SoundWaves.sBoundPlayerService;
+		PlayerService playerService = PlayerService.getInstance();
 
 		String playingFirst = "";
 		if (playerService != null && playerService.getCurrentItem() != null && playerService.getCurrentItem() instanceof FeedItem) {

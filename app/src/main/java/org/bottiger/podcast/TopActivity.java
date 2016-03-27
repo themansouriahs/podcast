@@ -132,7 +132,7 @@ public class TopActivity extends AppCompatActivity {
 
     @Nullable
     protected Playlist getPlaylist() {
-        PlayerService ps = SoundWaves.sBoundPlayerService;
+        PlayerService ps = PlayerService.getInstance();
 
         if (ps != null)
             return ps.getPlaylist();

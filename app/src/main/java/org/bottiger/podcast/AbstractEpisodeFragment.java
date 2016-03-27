@@ -108,7 +108,7 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 	public static String getOrder(String inputOrder, Integer amount) {
 		assert inputOrder != null;
 
-		PlayerService playerService = SoundWaves.sBoundPlayerService;
+		PlayerService playerService = PlayerService.getInstance();
 
 		String playingFirst = "";
 		if (playerService != null && playerService.getCurrentItem() != null && playerService.getCurrentItem() instanceof FeedItem) {

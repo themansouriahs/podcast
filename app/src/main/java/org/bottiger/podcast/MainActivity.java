@@ -146,8 +146,9 @@ public class MainActivity extends FragmentContainerActivity {
      * Return a reference to the playerservice if bound
      */
     @Nullable
+	@Deprecated
     public static PlayerService getPlayerService() {
-        return SoundWaves.sBoundPlayerService;
+        return PlayerService.getInstance();
     }
 
 	/**

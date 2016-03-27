@@ -167,7 +167,7 @@ public class SubscriptionRefreshManager {
 
             Date tenMinutesAgo = new Date(System.currentTimeMillis() - (10 * 60 * 1000));
 
-            final PlayerService ps = SoundWaves.sBoundPlayerService;
+            final PlayerService ps = PlayerService.getInstance();
 
             if (argSubscription instanceof Subscription) {
                 SortedList<? extends IEpisode> episodes = argSubscription.getEpisodes();

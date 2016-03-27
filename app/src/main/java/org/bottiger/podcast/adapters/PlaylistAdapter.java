@@ -241,12 +241,13 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         long playerPosition = 0;
         long playerDuration = 0;
 
-        if (SoundWaves.sBoundPlayerService != null) {
+        PlayerService ps = PlayerService.getInstance();
+        if (ps != null) {
             if (position == 0
-                    && SoundWaves.sBoundPlayerService.isPlaying()) {
-                playerPosition = SoundWaves.sBoundPlayerService
+                    && ps.isPlaying()) {
+                playerPosition = ps
                         .position();
-                playerDuration = SoundWaves.sBoundPlayerService
+                playerDuration = ps
                         .duration();
             } else {
                 if (feedItem instanceof FeedItem) {

@@ -13,6 +13,7 @@ import android.support.annotation.NonNull;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.views.PlayPauseImageView;
 
 /**
@@ -54,7 +55,9 @@ public class DialogOpenVideoExternally extends DialogFragment {
                     public void onClick(DialogInterface dialog, int id) {
                         // Play the episode
                         persistChoice(prefs, openExternallyKey, false);
-                        SoundWaves.sBoundPlayerService.toggle(sEpisode);
+                        if (PlayerService.getInstance() != null) {
+                            PlayerService.getInstance().toggle(sEpisode);
+                        }
                         sEpisode = null;
                     }
                 });

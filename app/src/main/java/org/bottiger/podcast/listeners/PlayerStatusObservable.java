@@ -81,7 +81,7 @@ public class PlayerStatusObservable {
             switch (inputMessage.what) {
                 // The decoding is done
                 case PLAYING:
-                    PlayerService ps = SoundWaves.sBoundPlayerService;
+                    PlayerService ps = PlayerService.getInstance();
 
                     if (ps != null) {
                         updateProgress(ps);
