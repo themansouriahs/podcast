@@ -99,9 +99,6 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
 
     private TopPlayer Layout;
     private LinearLayout mControls;
-    private View mGradient;
-    private View mEpisodeText;
-    private View mEpisodeInfo;
     private PlayPauseImageView mPlayPauseButton;
 
     private PlayerButtonView mFullscreenButton;
@@ -247,10 +244,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         getPlayerControlHeight(mControls);
 
         mPlayPauseButton = (PlayPauseImageView) findViewById(R.id.playpause);
-        mEpisodeText = findViewById(R.id.episode_title);
-        mEpisodeInfo = findViewById(R.id.episode_info);
         mFullscreenButton = (PlayerButtonView) findViewById(R.id.fullscreen_button);
-        mGradient = findViewById(R.id.top_gradient_inner);
         mSleepButton = (PlayerButtonView) findViewById(R.id.sleep_button);
         mSpeedpButton = (Button) findViewById(R.id.speed_button);
         mDownloadButton = (PlayerButtonView) findViewById(R.id.download);
@@ -633,17 +627,6 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         mTriangle.setVisibility(VISIBLE);
         mExpandedActionsBar.setVisibility(VISIBLE);
     }
-
-    private void fadeText(float argAlphaStart, float argAlphaEnd) {
-        mEpisodeText.setAlpha(argAlphaStart);
-        mEpisodeInfo.setAlpha(argAlphaStart);
-        mGradient.setAlpha(argAlphaStart);
-
-        mEpisodeText.animate().alpha(argAlphaEnd);
-        mEpisodeInfo.animate().alpha(argAlphaEnd);
-        mGradient.animate().alpha(argAlphaEnd);
-    }
-
 
     private void getPlayerControlHeight(@NonNull final View argView) {
         ViewTreeObserver viewTreeObserver = argView.getViewTreeObserver();

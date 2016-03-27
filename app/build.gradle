@@ -9,8 +9,8 @@ android {
         applicationId "org.bottiger.podcast"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 249        // even - release. Odd - development
-        versionName "0.128.15" // even - release. Odd - development
+        versionCode 251        // even - release. Odd - development
+        versionName "0.128.17" // even - release. Odd - development
         //useJack = true
         multiDexEnabled = true
         //renderscriptTargetApi 20
@@ -137,7 +137,7 @@ dependencies {
     // Because RxAndroid releases are few and far between, it is recommended you also
     // explicitly depend on RxJava's latest version for bug fixes and new features.
     compile 'io.reactivex:rxjava:1.1.1'
-    compile 'com.jakewharton.rxbinding:rxbinding:0.3.0'
+    compile 'com.jakewharton.rxbinding:rxbinding:0.4.0'
 
     // Glide
     compile 'com.github.bumptech.glide:glide:3.7.0'

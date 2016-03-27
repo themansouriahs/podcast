@@ -68,6 +68,7 @@ import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.ivbaranov.mfb.MaterialFavoriteButton;
 
@@ -468,8 +469,15 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                                                         }
                                                     });
 
-        mEpisodeTitle.setText(item.getTitle());
-        mEpisodeInfo.setText(item.getDescription());
+        final String title = item.getTitle();
+        final String description = item.getDescription();
+
+        mEpisodeTitle.setText(title);
+        mEpisodeInfo.setText(description);
+
+        View.OnClickListener onClickListener = getToast(title, description);
+        mEpisodeTitle.setOnClickListener(onClickListener);
+        mEpisodeInfo.setOnClickListener(onClickListener);
 
         if (item instanceof FeedItem) {
             mFavoriteButton.setFavorite(((FeedItem) item).isFavorite());
@@ -764,5 +772,20 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
     public TopPlayer getTopPlayer() {
         return mTopPlayer;
+    }
+
+    private View.OnClickListener getToast(@NonNull final String argTitle, @NonNull final String argDescription) {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View argView) {
+                String msg = argTitle + "\n\n" + argDescription;
+                // HACK: ugly, but it does actually work :)
+                // double the lifetime of a toast
+                for (int i = 0; i < 2; i++) {
+                    Toast toast = Toast.makeText(getContext(), msg, Toast.LENGTH_LONG);
+                    toast.show();
+                }
+            }
+        };
     }
 }
