@@ -8,6 +8,10 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Handler;
 
@@ -348,17 +352,24 @@ public class SoundWavesDownloadManager extends Observable {
 			SharedPreferences sharedPreferences = PreferenceManager
 					.getDefaultSharedPreferences(context);
 
-            long bytesToKeep = bytesToKeep(sharedPreferences);
+            final long initialBytesToKeep = bytesToKeep(sharedPreferences);
+            long bytesToKeep = initialBytesToKeep;
 
 			try {
                 ArrayList<IEpisode> episodes = SoundWaves.getLibraryInstance().getEpisodes();
                 LinkedList<String> filesToKeep = new LinkedList<>();
 
-				IEpisode episode;
+                if (episodes == null)
+                    return;
+
+                IEpisode episode;
                 FeedItem item;
+                File file;
+
+                // Build list of downloaded files
+                SortedMap<Long, FeedItem> sortedMap = new TreeMap<>();
                 for (int i = 0; i < episodes.size(); i++) {
-                    boolean deleteFile = true;
-					// Extract data.
+                    // Extract data.
                     episode = episodes.get(i);
                     try {
                         item = (FeedItem) episode;
@@ -366,25 +377,38 @@ public class SoundWavesDownloadManager extends Observable {
                         continue;
                     }
 
-					if (item != null) {
-						File file = new File(item.getAbsolutePath());
+                    if (item.isDownloaded()) {
+                        long key;
 
-						if (file.exists()) {
-							bytesToKeep = bytesToKeep - item.filesize;
+                        file = new File(item.getAbsolutePath());
+                        key = file.lastModified();
 
-							// if we have exceeded our limit start deleting old
-							// items
-							if (bytesToKeep < 0) {
-								deleteExpireFile(context, item);
-							} else {
-								deleteFile = false;
-								filesToKeep.add(item.getFilename());
-							}
+                        sortedMap.put(-key, item);
+                    }
+                }
+
+                SortedSet<Long> keys = new TreeSet<>(sortedMap.keySet());
+                for (Long key : keys) {
+                    boolean deleteFile = true;
+
+                    item = sortedMap.get(key);
+                    file = new File(item.getAbsolutePath());
+
+					if (file.exists()) {
+						bytesToKeep = bytesToKeep - item.filesize;
+
+                        // if we have exceeded our limit start deleting old
+						// items
+						if (bytesToKeep < 0) {
+							deleteExpireFile(context, item);
+						} else {
+							deleteFile = false;
+							filesToKeep.add(item.getFilename());
 						}
+					}
 
-						if (deleteFile) {
-							item.setDownloaded(false);
-						}
+					if (deleteFile) {
+						item.setDownloaded(false);
 					}
 				}
 
@@ -393,10 +417,10 @@ public class SoundWavesDownloadManager extends Observable {
 				// Duplicated code from DownloadManagerReceiver
 				File directory = new File(SDCardManager.getDownloadDir());
 				File[] files = directory.listFiles();
-				for (File file : files) {
-					if (!filesToKeep.contains(file.getName())) {
+				for (File keepFile : files) {
+					if (!filesToKeep.contains(keepFile.getName())) {
 						// Delete each file
-						file.delete();
+						keepFile.delete();
 					}
 				}
 
