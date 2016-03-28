@@ -80,7 +80,7 @@ public class PodcastUpdateJobService extends JobService {
                         long now = System.currentTimeMillis();
                         long hoursOld = TimeUnit.MILLISECONDS.toHours(now - createdAt);
 
-                        if (hoursOld <= HOURS && !episode.hasBeenDownloadedOnce()) {
+                        if (hoursOld <= HOURS && !episode.hasBeenDownloadedOnce() && episode.isNew()) {
                             downloadManager.addItemToQueue(episode, SoundWavesDownloadManager.ANYWHERE);
                         }
                     } else {
