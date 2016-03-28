@@ -16,7 +16,9 @@
     <string name="pref_gpodder_support_key" translatable="false" >pref_gpodder_support</string>
     <string name="pref_gpodder_username_key" translatable="false" >pref_gpodder_username</string>
     <string name="pref_gpodder_password_key" translatable="false" >pref_gpodder_password</string>
-    <string name="pref_playlist_subscriptions_key" translatable="false" >pref_playlist_subscriptions</string>
+    <string name="pref_playlist_show_listened_key" translatable="false" >pref_playlist_show_listened</string>
+    <string name="pref_playlist_subscriptions_key" translatable="false" >pref_playlist_selected_subscriptions</string>
+    <string name="pref_playlist_subscriptions_values_key" translatable="false" >pref_playlist_filter_value_key</string>
     <string name="pref_player_forward_amount_key" translatable="false" >pref_player_forward_amount</string>
     <string name="pref_player_backward_amount_key" translatable="false" >pref_player_backward_amount</string>
     <string name="pref_top_player_text_expanded_key" translatable="false" >pref_top_player_text_expanded</string>

@@ -373,15 +373,20 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
         filterSubscriptions += SubscriptionColumns.TABLE_NAME + "." + SubscriptionColumns.SETTINGS + " & " + Subscription.ADD_NEW_TO_PLAYLIST;
         filterSubscriptions += ") ELSE 1 END";
 
-        //where += filterSubscriptions;
-
-
-        // only find episodes from suscriptions which are not "unsubscribed"
         where += "(";
-        where += ItemColumns.TABLE_NAME + "." + ItemColumns.SUBS_ID + " IN (SELECT " + SubscriptionColumns.TABLE_NAME + "." + SubscriptionColumns._ID + " FROM "  +
-                SubscriptionColumns.TABLE_NAME + " WHERE (" + SubscriptionColumns.TABLE_NAME + "." + SubscriptionColumns.STATUS + "<>"
-                + Subscription.STATUS_UNSUBSCRIBED + " OR " + SubscriptionColumns.TABLE_NAME + "." + SubscriptionColumns.STATUS + " IS NULL)" +  filterSubscriptions + " )";
-        //where += ItemColumns.TABLE_NAME + "." + ItemColumns.SUBS_ID + " IN (4)";
+
+
+        String ids = "";
+        if (mSubscriptionFilter.getMode() == SubscriptionFilter.SHOW_SELECTED) {
+            where += mSubscriptionFilter.toSQL();
+        } else {
+            where += ItemColumns.TABLE_NAME + "." + ItemColumns.SUBS_ID+ " ";
+            // only find episodes from suscriptions which are not "unsubscribed"
+            where += "IN (SELECT " + SubscriptionColumns.TABLE_NAME + "." + SubscriptionColumns._ID + " FROM "  +
+                    SubscriptionColumns.TABLE_NAME + " WHERE (" + SubscriptionColumns.TABLE_NAME + "." + SubscriptionColumns.STATUS + "<>"
+                    + Subscription.STATUS_UNSUBSCRIBED + " OR " + SubscriptionColumns.TABLE_NAME + "." + SubscriptionColumns.STATUS + " IS NULL)" +  filterSubscriptions + " )";
+        }
+
         where += " )";
 
         where += " AND " + mSubscriptionFilter.toSQL();

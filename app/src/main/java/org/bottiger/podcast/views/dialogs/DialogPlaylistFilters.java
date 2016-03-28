@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -130,16 +131,14 @@ public class DialogPlaylistFilters extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         // Get the layout inflater
         LayoutInflater inflater = mContext.getLayoutInflater();
-
         View view = inflater.inflate(R.layout.dialog_playlist_filters, null);
 
-            mPlaylistOrderSpinner = (Spinner) view.findViewById(R.id.drawer_playlist_sort_order);
-            mPlaylistShowListened = (android.support.v7.widget.SwitchCompat) view.findViewById(R.id.slidebar_show_listened);
-            mOnlyDownloaded = (android.support.v7.widget.SwitchCompat) view.findViewById(R.id.slidebar_show_downloaded);
-            mAutoPlayNext = (android.support.v7.widget.SwitchCompat) view.findViewById(R.id.slidebar_show_continues);
+        mPlaylistOrderSpinner = (Spinner) view.findViewById(R.id.drawer_playlist_sort_order);
+        mPlaylistShowListened = (android.support.v7.widget.SwitchCompat) view.findViewById(R.id.slidebar_show_listened);
+        mOnlyDownloaded = (android.support.v7.widget.SwitchCompat) view.findViewById(R.id.slidebar_show_downloaded);
+        mAutoPlayNext = (android.support.v7.widget.SwitchCompat) view.findViewById(R.id.slidebar_show_continues);
 
         initSubscriptionFilter(inflater, view);
-
 
         mPlaylistOrderSpinner = (Spinner) view.findViewById(R.id.drawer_playlist_sort_order);
         // Create an ArrayAdapter using the string array and a default spinner layout
@@ -170,11 +169,9 @@ public class DialogPlaylistFilters extends DialogFragment {
             }
         });
 
-            initShowListened();
-
-            initOnlyDownloaded();
-
-            initAutoPlayNextSwitch();
+        initShowListened();
+        initOnlyDownloaded();
+        initAutoPlayNextSwitch();
 
         builder.setView(view);
         builder.setPositiveButton(R.string.apply_filters, new DialogInterface.OnClickListener() {
@@ -242,7 +239,10 @@ public class DialogPlaylistFilters extends DialogFragment {
             }
         });
 
-        boolean doShowListened = mSharedPreferences.getBoolean(ApplicationConfiguration.showListenedKey, Playlist.SHOW_LISTENED_DEFAULT);
+        Resources res = getResources();
+        boolean doShowListenedDefault = res.getBoolean(R.bool.pref_show_listened_default);
+        String  doShowListenedKey = res.getString(R.string.pref_playlist_show_listened_key);
+        boolean doShowListened = mSharedPreferences.getBoolean(doShowListenedKey, doShowListenedDefault);
         if (doShowListened != mPlaylistShowListened.isChecked()) {
             mPlaylistShowListened.setChecked(doShowListened);
         }
