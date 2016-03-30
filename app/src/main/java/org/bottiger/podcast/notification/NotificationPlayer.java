@@ -146,21 +146,16 @@ public class NotificationPlayer extends BroadcastReceiver {
         }
     }
 
-    @Nullable
-	public void show(@NonNull final IEpisode argItem) {
+    public void show(@NonNull final IEpisode argItem) {
         boolean isPlaying = mPlayerService != null && mPlayerService.isPlaying();
 		show(isPlaying, argItem);
 	}
 
-    @Nullable
 	public void show(final Boolean isPlaying, @NonNull final IEpisode argItem) {
 
         if (!argItem.equals(item)) {
             item = argItem;
         }
-
-        if (item == null)
-            return;
 
         showNotification(isPlaying);
 	}
@@ -343,7 +338,7 @@ public class NotificationPlayer extends BroadcastReceiver {
         if (mNotificationManager != null)
             mNotificationManager.cancel(NOTIFICATION_PLAYER_ID);
 
-        mPlayerService.unregisterReceiver(this);
+        //mPlayerService.unregisterReceiver(this);
         mPlayerService.stopForeground(true);
     }
 

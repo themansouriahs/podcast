@@ -163,6 +163,7 @@ public class SoundWaves extends Application {
         return mFirstRun;
     }
 
+    @Deprecated
     public static Bus getBus() {
         return sBus;
     }
