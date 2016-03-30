@@ -179,7 +179,7 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
         toast.show();
         */
 
-        UIUtils.disPlayBottomSnackBar(argView, formattedText, null);
+        UIUtils.disPlayBottomSnackBar(argView, formattedText, null, false);
     }
 
     private void subscribe(@NonNull Subscription argSubscription) {

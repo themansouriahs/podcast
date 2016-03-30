@@ -235,13 +235,15 @@ public class SoundWavesDownloadManager extends Observable {
 
 	/**
 	 * Download all the episodes in the queue
+     *
+     * @Return True if the download was started
 	 */
     @WorkerThread
-	private void startDownload(QueueEpisode nextInQueue) {
+	private boolean startDownload(QueueEpisode nextInQueue) {
 
 		// Make sure we have access to external storage
 		if (!SDCardManager.getSDCardStatusAndCreate()) {
-			return; //return NO_STORAGE;
+			return false;
 		}
 
         @NetworkState int networkState = updateConnectStatus(mContext);
@@ -253,18 +255,17 @@ public class SoundWavesDownloadManager extends Observable {
             downloadingItem = SoundWaves.getLibraryInstance().getEpisode(nextInQueue.getId());
 
             if (downloadingItem == null)
-                return;
+                return false;
 
             if (!StrUtils.isValidUrl(downloadingItem.getURL()))
-                return;
+                return false;
 
             if (!nextInQueue.IsStartedManually() && networkState != NETWORK_OK) {
-                //return NO_CONNECTION;
-                return;
+                return false;
             }
 
             if (nextInQueue.IsStartedManually() && !(networkState == NETWORK_OK || networkState == NETWORK_RESTRICTED)) {
-                return;
+                return false;
             }
         } finally {
             mQueueLock.unlock();
@@ -280,7 +281,7 @@ public class SoundWavesDownloadManager extends Observable {
 
         mProgressPublisher.addEpisode(downloadingItem);
 
-        return;
+        return true;
 	}
 
     @Deprecated
@@ -742,8 +743,7 @@ public class SoundWavesDownloadManager extends Observable {
     }
 
     private boolean downloadEpisode(final QueueEpisode argQueueItem) {
-        startDownload(argQueueItem);
-        return true;
+        return startDownload(argQueueItem);
     }
 
     /**
@@ -770,22 +770,35 @@ public class SoundWavesDownloadManager extends Observable {
             @Override
             public void onNext(QueueEpisode queueEpisode) {
                 Log.d(TAG, "onNext with return value " + queueEpisode);
-                //downloadEpisode(queueEpisode);
 
+                boolean downloadStarted = false;
                 QueueEpisode episode = null;
                 try {
                     mQueueLock.lock();
 
-                     if (mDownloadQueue.size() > 0) {
-                         episode = mDownloadQueue.getFirst();
-                     }
+                    for (int i = 0; i < mDownloadQueue.size() && !downloadStarted; i++) {
+                        episode = mDownloadQueue.getFirst();
+
+                        if (episode != null) {
+                            if (downloadEpisode(queueEpisode)) {
+                                downloadStarted = true;
+                                break;
+                            } else {
+                                // in case the download couldn't start
+                                mDownloadQueue.remove(episode);
+
+                                // This need to be more general and work for SlimEpisodes
+                                if (episode.getEpisode() instanceof FeedItem) {
+                                    ((FeedItem)episode.getEpisode()).downloadAborted();
+                                }
+                            }
+                        }
+                    }
                 } finally {
                     mQueueLock.unlock();
                 }
 
-                if (episode != null) {
-                    downloadEpisode(queueEpisode);
-                } else {
+                if (!downloadStarted)  {
                     notifyDownloadComplete();
                 }
             }

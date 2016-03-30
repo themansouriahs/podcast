@@ -134,6 +134,7 @@
     <string name="playlist_episode_dismissed">Episode removed</string>
     <string name="playlist_episode_dismissed_undo">Undo</string>
     <string name="playlist_context_menu_playnext">Play next</string>
+    <string name="download_aborted_snackbar">Could not download: %s</string>
     <string name="subscription_subtitle_updated_at">updated</string>
     <string name="filter_show_only_downloaded">Only downloaded</string>
     <string name="action_filter">Filter Playlist</string>

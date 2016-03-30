@@ -11,17 +11,12 @@ import android.graphics.Path;
 import android.graphics.PathMeasure;
 import android.graphics.RectF;
 import android.os.Build;
-import android.os.Bundle;
-import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.widget.ImageButton;
 
 import org.bottiger.podcast.R;
-import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
@@ -69,7 +64,7 @@ public class FeedViewQueueButton extends PlayerButtonView implements View.OnClic
     private float mArcLengthLeft;
     private float mArcLengthRight;
 
-    private Paint sPaint = new Paint();
+    private final Paint mPaint = new Paint();
     private int mColor = DEFAULT_COLOR;
     private RectF mRect;
     private PathMeasure mPathMeasure;
@@ -114,7 +109,13 @@ public class FeedViewQueueButton extends PlayerButtonView implements View.OnClic
 
     private void init(Context argContext) {
         mContext = argContext;
-        setOnClickListener(this)    ;
+        setOnClickListener(this);
+
+        mPaint.setAntiAlias(true);
+        mPaint.setColor(mColor);
+        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setStrokeCap(Paint.Cap.SQUARE);
+        mPaint.setStrokeWidth(DEFAULT_STROKE_WIDTH);
     }
 
     @Override
@@ -165,12 +166,12 @@ public class FeedViewQueueButton extends PlayerButtonView implements View.OnClic
         setPointFromPercent(mArcTop, mArcLengthTop, mPercent, mFromXY);
         setPointFromPercent(mArcBottom, mArcLengthBottom, mPercent, mToXY);
 
-        canvas.drawLine(mFromXY[0], mFromXY[1], mToXY[0], mToXY[1], sPaint);
+        canvas.drawLine(mFromXY[0], mFromXY[1], mToXY[0], mToXY[1], mPaint);
 
         setPointFromPercent(mArcLeft, mArcLengthLeft, mPercent, mFromXY);
         setPointFromPercent(mArcRight, mArcLengthRight, mPercent, mToXY);
 
-        canvas.drawLine(mFromXY[0], mFromXY[1], mToXY[0], mToXY[1], sPaint);
+        canvas.drawLine(mFromXY[0], mFromXY[1], mToXY[0], mToXY[1], mPaint);
     }
 
     @Override
@@ -201,7 +202,7 @@ public class FeedViewQueueButton extends PlayerButtonView implements View.OnClic
 
     public void setColor(int argb) {
         mColor = argb;
-        sPaint.setColor(argb);
+        mPaint.setColor(argb);
         invalidate();
     }
 
@@ -279,11 +280,6 @@ public class FeedViewQueueButton extends PlayerButtonView implements View.OnClic
         invalidate();
     }
 
-    /**
-     * Perform measurements and pre-calculations.  This should be called any time
-     * the view measurements or visuals are changed, such as with a call to {@link #setPadding(int, int, int, int)}
-     * or an operating system callback like {@link #onLayout(boolean, int, int, int, int)}.
-     */
     private void init() {
         mRect = new RectF();
         mRect.left = getPaddingLeft();
@@ -312,17 +308,6 @@ public class FeedViewQueueButton extends PlayerButtonView implements View.OnClic
         mArcRight.addArc(mRect, ARC_RIGHT_START, ARC_RIGHT_ANGLE);
         mPathMeasure.setPath(mArcRight, false);
         mArcLengthRight = mPathMeasure.getLength();
-
-        if (sPaint == null) {
-            sPaint = new Paint();
-            VendorCrashReporter.report("sPain null", "This should never happen, but it does");
-        }
-
-        sPaint.setAntiAlias(true);
-        sPaint.setColor(mColor);
-        sPaint.setStyle(Paint.Style.STROKE);
-        sPaint.setStrokeCap(Paint.Cap.SQUARE);
-        sPaint.setStrokeWidth(DEFAULT_STROKE_WIDTH);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             setBackground(null);

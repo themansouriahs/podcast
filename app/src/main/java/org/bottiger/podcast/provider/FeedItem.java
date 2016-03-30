@@ -1045,6 +1045,11 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 		return mIsParsing;
 	}
 
+	public void downloadAborted() {
+		progressChanged = new DownloadProgress(this, DownloadStatus.ERROR, 0);
+		_downloadProgressChangeObservable.onNext(progressChanged);
+	}
+
 	DownloadProgress progressChanged;
 	long lastUpdate2 = System.currentTimeMillis();
 	protected void notifyPropertyChanged(@EpisodeChanged.Action int argAction) {

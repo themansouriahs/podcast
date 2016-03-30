@@ -356,7 +356,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
                         SoundWaves.getLibraryInstance().updateEpisode(episode);
                     }
-                });
+                }, false);
 
                 mAdapter.notifyItemRemoved(itemPosition-1);
             }

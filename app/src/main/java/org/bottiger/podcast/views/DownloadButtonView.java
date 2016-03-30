@@ -26,8 +26,10 @@ import org.bottiger.podcast.model.events.DownloadProgress;
 import org.bottiger.podcast.model.events.ItemChanged;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.service.DownloadStatus;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.utils.UIUtils;
 
 import java.util.concurrent.TimeUnit;
 
@@ -197,7 +199,7 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
     public void enabledProgressListener(boolean argEnabled) {
         if (argEnabled && getEpisode() instanceof FeedItem) {
 
-            FeedItem item = (FeedItem)getEpisode();
+            final FeedItem item = (FeedItem)getEpisode();
             mRxSubscription = item._downloadProgressChangeObservable
                     .ofType(DownloadProgress.class)
                     .sample(500, TimeUnit.MILLISECONDS)
@@ -214,6 +216,12 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
                         public void call(DownloadProgress downloadProgress) {
                             Log.v(TAG, "Recieved downloadProgress event. Progress: " + downloadProgress.getProgress());
                             setProgressPercent(downloadProgress);
+
+                            if (downloadProgress.getStatus() == org.bottiger.podcast.service.DownloadStatus.ERROR) {
+                                String errorMsg = String.format(getResources().getString(R.string.download_aborted_snackbar), item.getTitle());
+                                UIUtils.disPlayBottomSnackBar(DownloadButtonView.this, errorMsg, null, true);
+                                setState(STATE_DEFAULT);
+                            }
                         }
                     }, new Action1<Throwable>() {
                         @Override
