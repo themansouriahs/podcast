@@ -168,7 +168,11 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
     public boolean isPlaying() {
         switch (mType) {
             case ANDROID: {
-                return mDefaultMediaPlayer.isPlaying();
+                try {
+                    return mDefaultMediaPlayer.isPlaying();
+                } catch (IllegalStateException ise) {
+                    return false;
+                }
             }
             case SOUNDWAVES: {
                 return mCustomMediaPlayer.isPlaying();

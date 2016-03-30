@@ -547,7 +547,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         String artworkURL = item.getArtwork();
 
         //
-        if (!TextUtils.isEmpty(iSubscription.getImageURL())) {
+        if (iSubscription != null && !TextUtils.isEmpty(iSubscription.getImageURL())) {
             artworkURL = iSubscription.getImageURL();
         }
 
