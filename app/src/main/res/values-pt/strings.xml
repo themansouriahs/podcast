@@ -2,14 +2,14 @@
 <resources>
   <string name="app_name">SoundWaves</string>
   <string name="unsubscribe">Cancelar subscrição</string>
-  <string name="pref_only_wifi_description">Apenas transferir ficheiros se estiver ligado a redes Wi-Fi</string>
+  <string name="pref_only_wifi_description">Apenas descarregar ficheiros por ligações Wi-Fi</string>
   <string name="pref_only_wifi_title">Apenas por Wi-Fi</string>
   <string name="pref_dark_theme">Ativar tema escuro para maior contraste</string>
   <string name="pref_dark_theme_title">Tema escuro</string>
-  <string name="pref_download_on_update_title">Transferência automática</string>
-  <string name="pref_download_on_update_description">Transferir novos episódios à medida que ficam disponíveis</string>
+  <string name="pref_download_on_update_title">Descarga automática</string>
+  <string name="pref_download_on_update_description">Descarregar novos episódios assim que fiquem disponíveis</string>
   <string name="pref_downloaded_expire_description">%s</string>
-  <string name="pref_downloaded_expire_title">Limite de transferências</string>
+  <string name="pref_downloaded_expire_title">Limite de descargas</string>
   <string name="dialog_title_add_sub">Adicionar podcast</string>
   <string name="dialog_message_add_sub">Por favor digite um URL:</string>
   <string name="title_section3">Lista de reprodução</string>
@@ -17,9 +17,9 @@
   <string name="title_section1">Subscrições</string>
   <string name="hello_world">Olá mundo!</string>
   <string name="menu_settings">Definições</string>
-  <string name="menu_downloading">Gestor de transferências</string>
+  <string name="menu_downloading">Gestor de descargas</string>
   <string name="title_activity_swipe">SoundWaves</string>
-  <string name="menu_download_all">Transferência em lote</string>
+  <string name="menu_download_all">Descargas em lote</string>
   <string name="menu_clear_playlist">Repor lista de reprodução</string>
   <string name="menu_import">Importar/exportar OPML</string>
   <string name="menu_add_podcast">Adicionar podcast</string>
@@ -29,7 +29,7 @@
   <string name="pref_cloud_support_description">O suporte Cloud possibilita o backup de dados e a sincronização entre vários dispositivos</string>
   <string name="drawer_open">Abrir</string>
   <string name="drawer_close">Fechar</string>
-  <string name="pref_stream_proxy_title">Transferir durante a emissão</string>
+  <string name="pref_stream_proxy_title">Descarregar durante a emissão</string>
   <string name="pref_stream_proxy">Se ativa, pode atrasar a reprodução</string>
   <string name="episode_title">Título do episódio</string>
   <string name="episode_description">Descrição do episódio</string>
@@ -85,7 +85,6 @@
   <string name="pref_delete_when_finished_description">Eliminar episódios após a sua reprodução</string>
   <!--For playing media on another device, like a chromecast-->
   <string name="media_route_menu_title">Cast</string>
-  <string name="bulk_download_instructions">Transferir todos os episódios coincidentes com:</string>
   <string name="bulk_download_day">Publicados nas últimas 24 horas</string>
   <string name="bulk_download_week">Publicados nesta semana</string>
   <string name="bulk_download_month">Publicados neste mês</string>
@@ -127,7 +126,7 @@
   <string name="playlist_episode_dismissed_undo">Anular</string>
   <string name="playlist_context_menu_playnext">Reproduzir seguinte</string>
   <string name="subscription_subtitle_updated_at">atualizada</string>
-  <string name="filter_show_only_downloaded">Apenas transferidos</string>
+  <string name="filter_show_only_downloaded">Apenas descarregados</string>
   <string name="action_filter">Filtrar lista de reprodução</string>
   <string name="apply_filters">Aplicar filtros</string>
   <string name="pref_gpodder_support_title">GPodder</string>
@@ -147,7 +146,7 @@
   <string name="dialog_playback_speed_scope">Aplicar alterações a</string>
   <string name="feed_settings_show_description">Mostrar descrição do episódio</string>
   <string name="feed_settings_in_playlist">Adicionar novos episódios à lista de reprodução</string>
-  <string name="feed_settings_download_new">Transferir novos episódios</string>
+  <string name="feed_settings_download_new">Descarregar novos episódios</string>
   <string name="feed_settings_delete_when_listened">Eliminar após a reprodução</string>
   <string name="feed_settings_intro">Estas definições irão substituir as predefinições do SoundWaves para este podcast.</string>
   <string name="feed_settings_oldest_first">Mostrar episódios antigos no inicio</string>
@@ -159,13 +158,13 @@
   <string name="pref_open_video_externally_description">O SoundWaves não consegue reproduzir vídeos. Pode abrir os ficheiros de vídeo com outra aplicação ou utilizar o SoundWaves para reproduzir o áudio.</string>
   <string name="pref_help_beta_title">Integrar a equipa BETA</string>
   <string name="pref_help_beta_description">Para experimentar as versões Beta e testar as alterações mais recentes, aceda a esta página: https://play.google.com/apps/testing/org.bottiger.podcast</string>
-  <string name="activity_download_name">Gestor de transferências</string>
+  <string name="activity_download_name">Gestor de descargas</string>
   <string name="opml_import_toolbar_title">Conteúdo OPML</string>
   <string name="opml_import_toolbar_description">Selecione os podcasts que deseja subscrever</string>
-  <string name="download_manager_toolbar_title">Fila de transferências</string>
-  <string name="download_manager_toolbar_description">Episódios agendados para transferência</string>
+  <string name="download_manager_toolbar_title">Fila de descargas</string>
+  <string name="download_manager_toolbar_description">Episódios agendados para descarga</string>
   <string name="menu_clear_download">Limpar</string>
-  <string name="download_manager_empty_title">Nenhuma transferência em curso</string>
+  <string name="download_manager_empty_title">Não existem descargas em curso</string>
   <string name="action_enter_fullscreen">Reprodutor em ecrã completo</string>
   <string name="action_exit_fullscreen">Sair de ecrã completo</string>
   <!--Used for displaying the download progress of a file. Example: "1.2 MB of 53 MB" (the unit, MB, is handled by the framework)
@@ -177,10 +176,6 @@
   <plurals name="player_sleep">
     <item quantity="one">O reprodutor parará em %d minuto</item>
     <item quantity="other">O reprodutor parará em %d minutos</item>
-  </plurals>
-  <plurals name="bulk_download_playlist">
-    <item quantity="one">Primeiro episódio da lista de reprodução</item>
-    <item quantity="other">Primeiros %d episódios da lista de reprodução</item>
   </plurals>
   <plurals name="subscriptions_imported">
     <item quantity="one">%d subscrição importada</item>

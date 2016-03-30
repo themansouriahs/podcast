@@ -80,7 +80,6 @@
   <string name="pref_delete_when_finished_description">Episoder er automatisk slettede efter de er afspillet</string>
   <!--For playing media on another device, like a chromecast-->
   <string name="media_route_menu_title">Cast</string>
-  <string name="bulk_download_instructions">Hent alle episoder i playlisten der passer på følgende</string>
   <string name="bulk_download_day">Udgivet inden for de sidste 24 timer</string>
   <string name="bulk_download_week">Udgivet denne uge</string>
   <string name="bulk_download_month">Udgivet denne måned</string>

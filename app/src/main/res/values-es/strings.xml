@@ -85,7 +85,6 @@
   <string name="pref_delete_when_finished_description">Los episodios se eliminarán automáticamente tras reproducirse.</string>
   <!--For playing media on another device, like a chromecast-->
   <string name="media_route_menu_title">Reproducir en dispositivos como ChromeCast</string>
-  <string name="bulk_download_instructions">Descargar todos los episodios de la lista relacionados</string>
   <string name="bulk_download_day">Publicados en las últimas 24 horas</string>
   <string name="bulk_download_week">Publicados esta semana</string>
   <string name="bulk_download_month">Publicados este mes</string>
@@ -169,14 +168,9 @@
     When the progress is 0 (we have not started downloading) we should just show the total file size. Example "53 MB"-->
   <string name="download_progress">%1$s de %2$s</string>
   <!--In the context: "4 new [episodes]"-->
-  <string name="subscription_list_new">nuevo</string>
   <plurals name="player_sleep">
     <item quantity="one">El reproductor se parará en %d minuto</item>
     <item quantity="other">El reproductor se parará en %d minutos</item>
-  </plurals>
-  <plurals name="bulk_download_playlist">
-    <item quantity="one">Primer episodio en la lista de reproducción</item>
-    <item quantity="other">Los %d episodios más populares en la lista de reproducción</item>
   </plurals>
   <plurals name="subscriptions_imported">
     <item quantity="one">Se ha importado %d suscripción.</item>

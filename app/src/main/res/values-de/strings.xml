@@ -50,7 +50,6 @@
   <string name="pref_delete_when_finished_description">Die Episoden nach der Wiedergabe automatisch löschen</string>
   <!--For playing media on another device, like a chromecast-->
   <string name="media_route_menu_title">Besetzung</string>
-  <string name="bulk_download_instructions">Alle Episoden nach Übereinstimmung in die Wiedergabeliste herunterladen</string>
   <string name="bulk_download_day">Veröffentlicht innerhalb der letzten 24 Stunden</string>
   <string name="bulk_download_week">Diese Woche veröffentlicht</string>
   <string name="bulk_download_month">Diesen Monat veröffentlicht</string>
@@ -83,10 +82,6 @@
   <!--Used for displaying the download progress of a file. Example: "1.2 MB of 53 MB" (the unit, MB, is handled by the framework)
     When the progress is 0 (we have not started downloading) we should just show the total file size. Example "53 MB"-->
   <!--In the context: "4 new [episodes]"-->
-  <plurals name="bulk_download_playlist">
-    <item quantity="one">Erste Episode in der Wiedergabeliste</item>
-    <item quantity="other">Beste %d Episoden in der Wiedergabeliste</item>
-  </plurals>
   <plurals name="subscriptions_imported">
     <item quantity="one">%d Abonnement wurde importiert.</item>
     <item quantity="other">%d Abonnements wurden importiert.</item>

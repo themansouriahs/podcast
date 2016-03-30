@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+  <string-array name="entries_download_file_expire">
+    <item>100 MB</item>
+    <item>1 GB</item>
+    <item>2 GB</item>
+    <item>3 GB</item>
+    <item>5 GB</item>
+    <item>無制限</item>
+  </string-array>
+  <string-array name="pref_player_seek_entries">
+    <item>5 秒</item>
+    <item>10 秒</item>
+    <item>20 秒</item>
+    <item>30 秒</item>
+    <item>1 分</item>
+  </string-array>
+  <string-array name="pref_player_seek_entries_values">
+    <item>5</item>
+    <item>10</item>
+    <item>20</item>
+    <item>30</item>
+    <item>60</item>
+  </string-array>
+  <string-array name="pref_subscriptions_columns_entries">
+    <item>1 列</item>
+    <item>2 列</item>
+    <item>3 列</item>
+    <item>4 列</item>
+  </string-array>
+  <string-array name="playlist_sort_order">
+    <item>並び順: 最新から</item>
+    <item>並び順: 古いものから</item>
+  </string-array>
+  <string-array name="entries_webservices_discovery_engine">
+    <item>gPodder</item>
+    <item>iTunes</item>
+  </string-array>
+</resources>
