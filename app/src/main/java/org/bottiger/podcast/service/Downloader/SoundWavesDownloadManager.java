@@ -19,6 +19,7 @@ import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.TopActivity;
+import org.bottiger.podcast.flavors.Analytics.AnalyticsFactory;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.DownloadProgressPublisher;
 import org.bottiger.podcast.provider.FeedItem;
@@ -58,6 +59,7 @@ import android.view.View;
 import android.webkit.MimeTypeMap;
 
 import rx.Observer;
+import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action0;
 import rx.functions.Action1;
@@ -233,18 +235,11 @@ public class SoundWavesDownloadManager extends Observable {
         return OK;
     }
 
-	/**
-	 * Download all the episodes in the queue
-     *
-     * @Return True if the download was started
-	 */
-    @WorkerThread
-	private boolean startDownload(QueueEpisode nextInQueue) {
-
-		// Make sure we have access to external storage
-		if (!SDCardManager.getSDCardStatusAndCreate()) {
-			return false;
-		}
+    private boolean canDownload(QueueEpisode nextInQueue) {
+        // Make sure we have access to external storage
+        if (!SDCardManager.getSDCardStatusAndCreate()) {
+            return false;
+        }
 
         @NetworkState int networkState = updateConnectStatus(mContext);
 
@@ -271,12 +266,45 @@ public class SoundWavesDownloadManager extends Observable {
             mQueueLock.unlock();
         }
 
+        return true;
+    }
+
+	/**
+	 * Download all the episodes in the queue
+     *
+     * @Return True if the download was started
+	 */
+    @WorkerThread
+	private boolean startDownload(QueueEpisode nextInQueue) {
+
+        FeedItem downloadingItem = downloadingItem = SoundWaves.getLibraryInstance().getEpisode(nextInQueue.getId());;
         mEngine = newEngine(downloadingItem);
         mEngine.addCallback(mDownloadCompleteCallback);
 
         mDownloadingItem = downloadingItem;
 
         Log.d(TAG, "Start downloading: " + downloadingItem);
+
+        /*
+        rx.Observable.just(mEngine)
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Subscriber<IDownloadEngine>() {
+            @Override
+            public void onCompleted() {
+                Log.v(TAG, "Analytics started");
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Log.wtf(TAG, e.getMessage());
+            }
+
+            @Override
+            public void onNext(IDownloadEngine engine) {
+                engine.startDownload();
+            }
+        });
+        */
         mEngine.startDownload();
 
         mProgressPublisher.addEpisode(downloadingItem);
@@ -543,12 +571,13 @@ public class SoundWavesDownloadManager extends Observable {
 	 */
 	public void addItemToQueue(IEpisode argEpisode, @QueuePosition int argPosition) {
         Log.d(TAG, "Adding item to queue: " + argEpisode);
+
+        if (!(argEpisode instanceof FeedItem)) {
+            return;
+        }
+
         try {
             mQueueLock.lock();
-
-            if (!(argEpisode instanceof FeedItem)) {
-                return;
-            }
 
             QueueEpisode queueItem = new QueueEpisode((FeedItem)argEpisode);
             queueItem.setStartedManually(argPosition == STARTED_MANUALLY);
@@ -742,6 +771,7 @@ public class SoundWavesDownloadManager extends Observable {
         });
     }
 
+    @WorkerThread
     private boolean downloadEpisode(final QueueEpisode argQueueItem) {
         return startDownload(argQueueItem);
     }
@@ -780,7 +810,7 @@ public class SoundWavesDownloadManager extends Observable {
                         episode = mDownloadQueue.getFirst();
 
                         if (episode != null) {
-                            if (downloadEpisode(queueEpisode)) {
+                            if (canDownload(queueEpisode)) {
                                 downloadStarted = true;
                                 break;
                             } else {
@@ -798,7 +828,9 @@ public class SoundWavesDownloadManager extends Observable {
                     mQueueLock.unlock();
                 }
 
-                if (!downloadStarted)  {
+                if (downloadStarted)  {
+                    startDownload(queueEpisode);
+                } else {
                     notifyDownloadComplete();
                 }
             }
