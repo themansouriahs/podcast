@@ -455,8 +455,12 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                                                         public void call(EpisodeChanged itemChangedEvent) {
                                                             long episodeId = itemChangedEvent.getId();
                                                             IEpisode episode = SoundWaves.getLibraryInstance().getEpisode(episodeId);
-                                                            if (episode != null) {
-                                                                if (episode.equals(mPlaylist.first())) {
+
+                                                            if (episode == null)
+                                                                return;
+
+                                                            if (episode.equals(mPlaylist.first())) {
+                                                                if (itemChangedEvent.getAction() != EpisodeChanged.PROGRESS) {
                                                                     PlaylistFragment.this.bindHeader(episode);
                                                                 }
                                                             }
