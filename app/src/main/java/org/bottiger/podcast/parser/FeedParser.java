@@ -146,6 +146,7 @@ public class FeedParser {
 
     private ISubscription readFeed(XmlPullParser parser, @NonNull ISubscription argSubscription) throws XmlPullParserException, IOException {
 
+
         boolean addedEpisodes = false;
 
         ISubscription subscription = argSubscription;

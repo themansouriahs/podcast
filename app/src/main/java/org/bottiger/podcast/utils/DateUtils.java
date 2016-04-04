@@ -103,9 +103,17 @@ public class DateUtils {
         put("^\\d{1,2}-\\d{1,2}-\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}$", "dd-MM-yyyy HH:mm:ss");
         put("^\\d{4}-\\d{1,2}-\\d{1,2}\\s\\d{1,2}:\\d{2}:\\d{2}$", "yyyy-MM-dd HH:mm:ss");
         put("^\\d{1,2}/\\d{1,2}/\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}$", "MM/dd/yyyy HH:mm:ss");
+        put("^\\d{1,2}/\\d{1,2}/\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2} [PMApma]{2}$", "MM/dd/yyyy HH:mm:ss a"); // am/pm
+        put("^\\d{1,2}/\\d{1,2}/\\d{4}\\s\\d{1,2}:\\d{2} [PMApma]{2}$", "MM/dd/yyyy HH:mm a"); // am/pm
         put("^\\d{4}/\\d{1,2}/\\d{1,2}\\s\\d{1,2}:\\d{2}:\\d{2}$", "yyyy/MM/dd HH:mm:ss");
-        put("^\\d{1,2}\\s[a-z]{3}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}$", "dd MMM yyyy HH:mm:ss");
-        put("^\\d{1,2}\\s[a-z]{4,}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}$", "dd MMMM yyyy HH:mm:ss");
+        put("^\\d{1,2}\\s[A-Za-z]{3}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}$", "dd MMM yyyy HH:mm:ss");
+        put("^\\d{1,2}\\s[A-Za-z]{4,}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}$", "dd MMMM yyyy HH:mm:ss");
+        put("^\\d{1,2}\\s[A-Za-z]{3}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}\\s[0-9+-]+$", "dd MMM yyyy HH:mm:ss Z");
+        put("^\\d{1,2}\\s[A-Za-z]{4,}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}\\s[A-Za-z0-9+-]+$", "dd MMMM yyyy HH:mm:ss z");
+        put("^[A-Za-z]{3}\\s\\d{1,2}\\s[A-Za-z]{3,9}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}\\s[0-9+-]+$", "EEE dd MMM yyyy HH:mm:ss Z"); // missing ,
+        put("^[A-Za-z]{3}\\s\\d{1,2}\\s[A-Za-z]{3,9}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}\\s[A-Za-z0-9+-]+$", "EEE dd MMM yyyy HH:mm:ss z"); // missing ,
+        put("^[A-Za-z]{3},\\s\\d{1,2}\\s[A-Za-z]{3,9}\\s\\d{4}\\s\\d{1,2}:\\d{2}\\s[0-9+-]+$", "EEE, dd MMM yyyy HH:mm Z"); // no seconds
+        put("^[A-Za-z]{3},\\s\\d{1,2}\\s[A-Za-z]{3,9}\\s\\d{4}\\s\\d{1,2}:\\d{2}\\s[A-Za-z0-9+-]+$", "EEE, dd MMM yyyy HH:mm z"); // no seconds
         put("^[A-Za-z]{3},\\s\\d{1,2}\\s[A-Za-z]{3,9}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}\\s[0-9+-]+$", "EEE, dd MMM yyyy HH:mm:ss Z");
         put("^[A-Za-z]{3},\\s\\d{1,2}\\s[A-Za-z]{3,9}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}\\s[A-Za-z0-9+-]+$", "EEE, dd MMM yyyy HH:mm:ss z");
     }};
@@ -125,7 +133,7 @@ public class DateUtils {
     public static Date parse(String dateString) throws ParseException {
         String dateFormat = determineDateFormat(dateString);
         if (dateFormat == null) {
-            throw new ParseException("Unknown date format.", 0);
+            throw new ParseException("Unknown date format: " + dateString, 0);
         }
         return parse(dateString, dateFormat);
     }
@@ -144,6 +152,7 @@ public class DateUtils {
 
         // This is a hack to deal with date formats not known to Java
         dateString = dateString.replace("BST", "GMT+1");
+        dateString = dateString.replace("PST", "-0800");
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat, Locale.US);
         simpleDateFormat.setLenient(false); // Don't automatically convert invalid date.
