@@ -67,7 +67,9 @@ public class MediaRouterPlaybackActivity extends ToolbarActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    protected void onServiceConnection() {
+    @Override
+    protected void onServiceConnected() {
+        super.onServiceConnected();
         PlayerService ps = PlayerService.getInstance();
         if (ps != null) {
             ps.setMediaCast(mMediaRouteCast);

@@ -1,12 +1,17 @@
 package org.bottiger.podcast;
 
+import android.content.ComponentName;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
+import android.support.v4.media.MediaBrowserCompat;
+import android.support.v4.media.session.MediaControllerCompat;
+import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.transition.Slide;
 import android.transition.Transition;
@@ -16,15 +21,11 @@ import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
 
-import com.squareup.otto.Produce;
-import com.squareup.otto.Subscribe;
-
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.TransitionUtils;
-import org.bottiger.podcast.views.dialogs.DialogAddPodcast;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -46,6 +47,8 @@ public class TopActivity extends AppCompatActivity {
 	
 	private static SharedPreferences prefs;
     private Menu mMenu;
+
+    protected MediaBrowserCompat mMediaBrowser;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -71,8 +74,49 @@ public class TopActivity extends AppCompatActivity {
             getWindow().setExitTransition(transition);
         }
 
-        if (ApplicationConfiguration.DEBUGGING)
-            ViewServer.get(this).addWindow(this);
+        // Start the player service
+        mMediaBrowser = new MediaBrowserCompat(
+                this, // a Context
+                new ComponentName(this, PlayerService.class),
+                // Which MediaBrowserService
+                new MediaBrowserCompat.ConnectionCallback() {
+                    @Override
+                    public void onConnected() {
+                        try {
+                            // Ah, here’s our Token again
+                            MediaSessionCompat.Token token =
+                                    mMediaBrowser.getSessionToken();
+                            // This is what gives us access to everything
+                            MediaControllerCompat controller =
+                                    new MediaControllerCompat(TopActivity.this, token);
+
+                            // Convenience method of FragmentActivity to allow you to use
+                            // getSupportMediaController() anywhere
+                            setSupportMediaController(controller);
+                        } catch (RemoteException e) {
+                            Log.e(MainActivity.class.getSimpleName(),
+                                    "Error creating controller", e);
+                            VendorCrashReporter.handleException(e);
+                        }
+
+                        TopActivity.this.onServiceConnected();
+                    }
+
+                    @Override
+                    public void onConnectionSuspended() {
+                        // We were connected, but no longer :-(
+                        VendorCrashReporter.report("onConnectionSuspended", "it happend");
+                    }
+
+                    @Override
+                    public void onConnectionFailed() {
+                        // The attempt to connect failed completely.
+                        // Check the ComponentName!
+                        VendorCrashReporter.report("onConnectionFailed", "it happend");
+                    }
+                },
+                null); // optional Bundle
+        mMediaBrowser.connect();
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -100,6 +144,7 @@ public class TopActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mMediaBrowser.disconnect();
     }
 
     @Override
@@ -180,6 +225,9 @@ public class TopActivity extends AppCompatActivity {
                 return;
             }
         }
+    }
+
+    protected void onServiceConnected() {
     }
 
     protected void importOPMLButtonCallback() {
