@@ -538,7 +538,7 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
         }
     }
 
-    private void fail() {
-        new AssertionError("This should never happen");
+    private void fail() throws AssertionError {
+        throw new AssertionError("This should never happen");
     }
 }

@@ -54,6 +54,7 @@ public class PodcastProvider extends ContentProvider {
 	@Override
 	public boolean onCreate() {
 		mHelper = PodcastOpenHelper.getInstance(getContext()); //new PodcastOpenHelper(getContext());
+		/*
 		if (sItemProjectionMap == null) {
 			sItemProjectionMap = new HashMap<>();
 			for (int i = 0; i < ItemColumns.ALL_COLUMNS.length; i++) {
@@ -78,6 +79,7 @@ public class PodcastProvider extends ContentProvider {
 						SubscriptionColumns.ALL_COLUMNS[i]);
 			}
 		}
+		*/
 		return true;
 	}
 

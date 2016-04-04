@@ -864,7 +864,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 
     @Override
     public void setArtwork(@NonNull URL argUrl) {
-		if (image != null && argUrl != null && image.equals(argUrl.toString()))
+		if (image != null && image.equals(argUrl.toString()))
 			return;
 
 		image = argUrl.toString();

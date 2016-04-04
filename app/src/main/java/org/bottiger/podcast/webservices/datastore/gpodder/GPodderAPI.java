@@ -218,7 +218,7 @@ public class GPodderAPI implements IWebservice {
             }
 
 
-            if (subscription.IsSubscribed() && !gPodderSubscriptionsSet.contains(subscription)) {
+            if (subscription.IsSubscribed() && !gPodderSubscriptionsSet.contains(url)) {
                 localSubscriptionsChanges.add.add(url);
             }
 
@@ -523,7 +523,7 @@ public class GPodderAPI implements IWebservice {
     public void getDeviceSubscriptions(@NonNull Context argContext) {
 
         if (mAuthenticated) {
-            getDeviceSubscriptions(argContext);
+            //getDeviceSubscriptions(argContext);
             return;
         }
 
@@ -543,7 +543,7 @@ public class GPodderAPI implements IWebservice {
     public void getAllSubscriptions() {
 
         if (mAuthenticated) {
-            getAllSubscriptions();
+            //getAllSubscriptions();
             return;
         }
 
@@ -563,7 +563,7 @@ public class GPodderAPI implements IWebservice {
     public void getDeviceSubscriptionsChanges(@NonNull Context argContext,  long argSince) {
 
         if (mAuthenticated) {
-            getDeviceSubscriptionsChanges(argContext, argSince);
+            //getDeviceSubscriptionsChanges(argContext, argSince);
             return;
         }
 

@@ -60,9 +60,9 @@ public class QueueEpisode implements Comparable {
 	@Override
 	public int compareTo(Object other) {
 		Integer otherPriority = ((QueueEpisode)other).getPriority();
-	    if(this.getPriority() == otherPriority)
-	        return 0;
-	    else if (this.getPriority() < otherPriority)
+	    if(this.getPriority().equals(otherPriority)) {
+			return 0;
+		} else if (this.getPriority() < otherPriority)
 	        return 1;
 	    else 
 	        return -1;

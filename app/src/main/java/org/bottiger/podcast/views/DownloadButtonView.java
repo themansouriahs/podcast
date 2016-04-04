@@ -281,6 +281,9 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
     @Override
     public void onClick(View view) {
 
+        if (view == null)
+            return;
+
         Context context = view.getContext();
         if (context instanceof TopActivity) {
             TopActivity topActivity = (TopActivity) context;
@@ -288,7 +291,7 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
         }
 
 
-        String viewStr = view == null ? "null" : view.toString();
+        String viewStr = view.toString();
         Log.d(TAG, "onCLick: view => " + viewStr);
 
         if (getEpisode() == null) {
