@@ -32,7 +32,6 @@
                 android:layout_height="wrap_content"
                 app:tabMode="fixed"
                 app:tabGravity="fill"
-                app:layout_scrollFlags="scroll|enterAlways"
                 />
 
         </android.support.design.widget.AppBarLayout>

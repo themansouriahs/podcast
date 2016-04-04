@@ -259,7 +259,7 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
 
         bounds.left = contentWidth > minSize ? (contentWidth-minSize)/2f + drawOffset : drawOffset;
         bounds.top = drawOffset;
-        bounds.right = bounds.left+minSize - drawOffset; //contentWidth - drawOffset;
+        bounds.right = minSize - drawOffset; //contentWidth - drawOffset;
         bounds.bottom = minSize - drawOffset; //contentWidth - drawOffset;
 
         Log.d(TAG, "onDraw. Preparing => " + (mStatus == PlayerStatusObservable.PREPARING) + " status: " + mStatus);
