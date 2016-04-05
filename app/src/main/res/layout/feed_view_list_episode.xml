@@ -15,9 +15,6 @@
         android:layout_marginRight="5dp"
         android:clipToPadding="false"
          />
-    <!--
-    app:drawBackground="false"
-    -->
 
     <org.bottiger.podcast.views.DownloadButtonView
         android:layout_width="wrap_content"
@@ -32,22 +29,19 @@
         android:layout_marginStart="5dp"
         android:layout_marginTop="10dp"/>
 
-        <org.bottiger.podcast.views.FeedViewQueueButton
-            android:id="@+id/queue_button"
-            android:visibility="gone"
-            android:src="@drawable/ic_add_white"
-            android:layout_below="@id/feedview_download_button"
-            android:layout_alignLeft="@id/feedview_download_button"
-            android:layout_alignRight="@id/feedview_download_button"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:animateLayoutChanges="true"/>
+    <org.bottiger.podcast.views.FeedViewQueueButton
+        android:id="@+id/queue_button"
+        android:visibility="gone"
+        android:src="@drawable/ic_add_white"
+        android:layout_below="@id/feedview_download_button"
+        android:layout_alignLeft="@id/feedview_download_button"
+        android:layout_alignRight="@id/feedview_download_button"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"/>
 
-    <!--
-            android:textColor="?attr/themeTextColorPrimary"
-            -->
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"

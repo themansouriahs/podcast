@@ -187,6 +187,11 @@ public class SlimEpisode extends BaseEpisode implements Parcelable {
     }
 
     @Override
+    public boolean canDownload() {
+        return false;
+    }
+
+    @Override
     public void setPriority(int argPriority) {
         mPriority = argPriority;
     }

@@ -83,7 +83,7 @@ public class EpisodeViewHolder extends RecyclerView.ViewHolder {
     }
 
 
-    public @DisplayState int toggleState() {
+    public @DisplayState int toggleState(boolean argCanDownload) {
 
         if (Build.VERSION.SDK_INT >= 19) {
             AutoTransition autoTransition = new AutoTransition();
@@ -102,59 +102,59 @@ public class EpisodeViewHolder extends RecyclerView.ViewHolder {
             newState = COLLAPSED;
         }
 
-        setState(newState);
+        setState(newState, argCanDownload);
         mState = newState;
 
         return mState;
     }
 
-    public void setState(@DisplayState int argState) {
+    public void setState(@DisplayState int argState, boolean argCanDownload) {
         Log.d(TAG, "Settings viewholder state to: " + argState);
         switch(argState) {
             case EXPANDED: {
-                setStateExpanded();
+                setStateExpanded(argCanDownload);
                 break;
             }
             case COLLAPSED: {
-                setStateCollapsed();
+                setStateCollapsed(argCanDownload);
                 break;
             }
             case COLLAPSED_WITH_DESCRIPTION: {
-                setStateCollapsedWithDescription();
+                setStateCollapsedWithDescription(argCanDownload);
                 break;
             }
             case COLLAPSED_LISTENED: {
-                setStateListenedCollapsed();
+                setStateListenedCollapsed(argCanDownload);
                 break;
             }
         }
         mState = argState;
     }
 
-    private void setStateExpanded() {
+    private void setStateExpanded(boolean argCanDownload) {
         setTextColor(false);
-        setButtonsVisibility(true, true);
+        setButtonsVisibility(argCanDownload, true);
         setDescriptionLength(LONG);
         setIsRecyclable(false);
     }
 
-    private void setStateCollapsed() {
+    private void setStateCollapsed(boolean argCanDownload) {
         setTextColor(false);
-        setButtonsVisibility(true, false);
+        setButtonsVisibility(argCanDownload, false);
         setDescriptionLength(GONE);
         setIsRecyclable(true);
     }
 
-    private void setStateCollapsedWithDescription() {
+    private void setStateCollapsedWithDescription(boolean argCanDownload) {
         setTextColor(false);
-        setButtonsVisibility(true, true);
+        setButtonsVisibility(argCanDownload, true);
         setDescriptionLength(SHORT);
         setIsRecyclable(true);
     }
 
-    private void setStateListenedCollapsed() {
+    private void setStateListenedCollapsed(boolean argCanDownload) {
         setTextColor(true);
-        setButtonsVisibility(true, false);
+        setButtonsVisibility(argCanDownload, false);
         setDescriptionLength(GONE);
         setIsRecyclable(true);
     }

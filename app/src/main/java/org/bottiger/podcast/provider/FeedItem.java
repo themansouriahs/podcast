@@ -769,6 +769,11 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 		notifyPropertyChanged(EpisodeChanged.CHANGED);
 	}
 
+	@Override
+	public boolean canDownload() {
+		return true;
+	}
+
 	/**
 	 * Increase the priority of all items in the playlist after the current item
 	 * 

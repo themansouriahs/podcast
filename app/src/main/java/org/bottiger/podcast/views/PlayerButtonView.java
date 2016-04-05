@@ -16,12 +16,15 @@ import android.util.SparseIntArray;
 import android.widget.ImageButton;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.ColorUtils;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.ref.WeakReference;
 
 /**
@@ -34,7 +37,6 @@ public class PlayerButtonView extends ImageButton implements PaletteListener  {
     public final static int STATE_DELETE = 2;
     public final static int STATE_QUEUE = 3;
 
-    private @PlayerStatusObservable.PlayerStatus int mStatus = PlayerStatusObservable.STOPPED;
     private IEpisode mEpisode;
 
     protected Paint mBaseColorPaint;
@@ -96,7 +98,7 @@ public class PlayerButtonView extends ImageButton implements PaletteListener  {
             }
 
             if (image > 0) {
-                s_Icon = new WeakReference<Bitmap>(BitmapFactory.decodeResource(getResources(), image));
+                s_Icon = new WeakReference<>(BitmapFactory.decodeResource(getResources(), image));
             }
         }
         defaultIcon = image;
@@ -110,11 +112,6 @@ public class PlayerButtonView extends ImageButton implements PaletteListener  {
 
     public synchronized void unsetEpisodeId() {
         this.mEpisode = null;
-    }
-
-    public void setStatus(@PlayerStatusObservable.PlayerStatus int argStatus) {
-        mStatus = argStatus;
-        this.invalidate();
     }
 
     public void setColor(int argColor) {
@@ -150,12 +147,6 @@ public class PlayerButtonView extends ImageButton implements PaletteListener  {
         setImage(mStateIcons.get(argState, defaultIcon));
     }
 
-    @Override
-    protected void onDraw(Canvas canvas) {
-        long startTime = System.currentTimeMillis();
-        super.onDraw(canvas);
-    }
-
     protected int getProgress() {
         return mProgress;
     }
@@ -179,7 +170,7 @@ public class PlayerButtonView extends ImageButton implements PaletteListener  {
 
     @Override
     public String getPaletteUrl() {
-        return mEpisode.getArtwork(mContext).toString();
+        return mEpisode.getArtwork().toString();
     }
 
     public interface DownloadStatus {
@@ -203,7 +194,11 @@ public class PlayerButtonView extends ImageButton implements PaletteListener  {
 
     private void ensureEpisode() {
         if (mEpisode == null) {
-            throw new IllegalStateException("Episode ID must be set before calling getEpisode");
+            try {
+                VendorCrashReporter.handleException(new IllegalStateException("Episode ID must be set before calling getEpisode"));
+            } catch (IllegalStateException ise) {
+
+            }
         }
     }
 }

@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.graphics.Palette;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -54,10 +55,8 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
     private @DrawableRes int delete_icon = R.drawable.ic_delete_white;
 
     private static final int BITMAP_OFFSET = 5;
-    private static final float RECTANGLE_SCALING = 1F;
 
     private RectF buttonRectangle;
-    private int mLastProgress = 0;
 
     private Subscription mRxSubscription = null;
 
@@ -93,7 +92,7 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
                 mStaticBackground = ta.getDrawable(0);
                 ta.recycle();
 
-                if (mStaticBackground != getResources().getDrawable(R.color.colorPrimaryDark)) {
+                if (mStaticBackground != ContextCompat.getDrawable(getContext(), R.color.colorPrimaryDark)) {
                     download_icon = R.drawable.ic_get_app_grey;
                     qeueed_icon = R.drawable.ic_schedule_grey;
                     delete_icon = R.drawable.ic_delete_grey;
@@ -110,7 +109,7 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
                 mStaticBackground = ta.getDrawable(0);
                 ta.recycle();
 
-                if (mStaticBackground != getResources().getDrawable(R.color.colorPrimaryDark)) {
+                if (mStaticBackground != ContextCompat.getDrawable(getContext(), R.color.colorPrimaryDark)) {
                     download_icon = R.drawable.ic_get_app_black;
                     qeueed_icon = R.drawable.ic_schedule_black;
                     delete_icon = R.drawable.ic_delete_black;
@@ -120,10 +119,6 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
 
 
         if (!isInEditMode()) {
-            //ThemeHelper themeHelper = new ThemeHelper(mActivity);
-            //int downloadIcon = themeHelper.getAttr(download_icon); //R.drawable.av_download; // FIXME
-            // http://stackoverflow.com/questions/7896615/android-how-to-get-value-of-an-attribute-in-code
-
             setImage(download_icon);
             addState(PlayerButtonView.STATE_DEFAULT, download_icon);
             addState(PlayerButtonView.STATE_DELETE, delete_icon);
@@ -167,8 +162,6 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
             }
             canvas.drawArc(buttonRectangle, -90, Math.round(360 * mProgress / 100F), false, mForegroundColorPaint);
         }
-
-        mLastProgress = mProgress;
     }
 
     @Override
@@ -202,7 +195,6 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
             final FeedItem item = (FeedItem)getEpisode();
             mRxSubscription = item._downloadProgressChangeObservable
                     .ofType(DownloadProgress.class)
-                    .sample(500, TimeUnit.MILLISECONDS)
                     .filter(new Func1<DownloadProgress, Boolean>() {
                         @Override
                         public Boolean call(DownloadProgress downloadProgress) {

@@ -75,7 +75,6 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
 
     private ArrayList<Integer> mExpanededItems = new ArrayList<>();
 
-    private static final android.text.format.Formatter sFormatter = new android.text.format.Formatter();
     private StringBuilder mStringBuilder = new StringBuilder(100);
 
     private Subscription mRxSubscription;
@@ -190,17 +189,13 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
             state = EpisodeViewHolder.COLLAPSED_WITH_DESCRIPTION;
         }
 
-        episodeViewHolder.setState(state);
+        final boolean canDownload = item.canDownload();
+        episodeViewHolder.setState(state, canDownload);
 
         episodeViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                @EpisodeViewHolder.DisplayState int newState = episodeViewHolder.toggleState();
-                if (newState == EpisodeViewHolder.EXPANDED) {
-                    mExpanededItems.add(dataPosition);
-                } else {
-                    mExpanededItems.remove(Integer.valueOf(dataPosition));
-                }
+                FeedViewAdapter.this.onClick(episodeViewHolder, dataPosition, canDownload);
             }
         });
 
@@ -228,6 +223,15 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
 
     }
 
+    public void onClick(EpisodeViewHolder episodeViewHolder, int dataPosition, boolean argCanDownload) {
+        @EpisodeViewHolder.DisplayState int newState = episodeViewHolder.toggleState(argCanDownload);
+        if (newState == EpisodeViewHolder.EXPANDED) {
+            mExpanededItems.add(dataPosition);
+        } else {
+            mExpanededItems.remove(Integer.valueOf(dataPosition));
+        }
+    }
+
     protected void getPalette(@NonNull final EpisodeViewHolder episodeViewHolder) {
         String url = mSubscription.getImageURL();
         if (!TextUtils.isEmpty(url)) {
@@ -240,14 +244,12 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
     @Override
     public void onViewAttachedToWindow (EpisodeViewHolder holder) {
         SoundWaves.getBus().register(holder.mPlayPauseButton);
-        SoundWaves.getBus().register(holder.mDownloadButton);
         super.onViewAttachedToWindow(holder);
     }
 
     @Override
     public void  onViewDetachedFromWindow(EpisodeViewHolder holder) {
         SoundWaves.getBus().unregister(holder.mPlayPauseButton);
-        SoundWaves.getBus().unregister(holder.mDownloadButton);
         super.onViewDetachedFromWindow(holder);
         holder.mDownloadButton.unsetEpisodeId();
     }
@@ -265,7 +267,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
     }
 
     public void setExpanded(boolean expanded) {
-        this.mIsExpanded = expanded;
+        mIsExpanded = expanded;
         notifyDataSetChanged();
     }
 
