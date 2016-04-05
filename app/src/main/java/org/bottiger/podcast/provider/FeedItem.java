@@ -520,6 +520,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 		notifyPropertyChanged();
 	}
 
+	@NonNull
 	public String getURL() {
 		String itemURL = "";
 		if (url != null && url.length() > 1)

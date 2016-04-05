@@ -65,7 +65,7 @@ public class Library {
     @NonNull
     private ArrayList<IEpisode> mEpisodes = new ArrayList<>();
     @NonNull
-    private ArrayMap<String, FeedItem> mEpisodesUrlLUT = new ArrayMap<>();
+    private ArrayMap<String, IEpisode> mEpisodesUrlLUT = new ArrayMap<>();
     @NonNull
     private ArrayMap<Long, FeedItem> mEpisodesIdLUT = new ArrayMap<>();
 
@@ -220,41 +220,43 @@ public class Library {
     public boolean addEpisode(@Nullable IEpisode argEpisode) {
         mLock.lock();
         try {
-        FeedItem item = null;
-        if (argEpisode instanceof FeedItem)
-            item = (FeedItem)argEpisode;
-
-        if (item == null)
-            return false;
-
-
-            // FIXME
-            if (item.sub_id < 0)
+            if (argEpisode == null)
                 return false;
 
-            if (mEpisodesUrlLUT.containsKey(item.getURL())) {
+            FeedItem item = argEpisode instanceof FeedItem ? (FeedItem)argEpisode : null;
+            boolean isFeedItem = item != null;
+
+            // FIXME
+            if (isFeedItem && item.sub_id < 0)
+                return false;
+
+            if (mEpisodesUrlLUT.containsKey(argEpisode.getURL())) {
                 // FIXME we should update the content of the model episode
                 return false;
             }
 
             mEpisodes.add(argEpisode);
-            mEpisodesUrlLUT.put(item.getURL(), item);
-            mEpisodesIdLUT.put(item.getId(), item);
+            mEpisodesUrlLUT.put(argEpisode.getURL(), argEpisode);
 
-            boolean updatedEpisode = false;
-            if (!item.isPersisted()) {
-                updateEpisode(item);
-                updatedEpisode = true;
-            }
+            if (isFeedItem)
+                mEpisodesIdLUT.put(item.getId(), item);
 
-            Subscription subscription = item.getSubscription();
+            if (isFeedItem) {
+                boolean updatedEpisode = false;
+                if (!item.isPersisted()) {
+                    updateEpisode(item);
+                    updatedEpisode = true;
+                }
 
-            if (subscription != null) {
-                subscription.addEpisode(item, true);
-                if (updatedEpisode) {
-                    IEpisode episode = subscription.getEpisodes().getNewest();
-                    if (episode != null) {
-                        subscription.setLastUpdated(episode.getCreatedAt().getTime());
+                Subscription subscription = item.getSubscription();
+
+                if (subscription != null) {
+                    subscription.addEpisode(item, true);
+                    if (updatedEpisode) {
+                        IEpisode episode = subscription.getEpisodes().getNewest();
+                        if (episode != null) {
+                            subscription.setLastUpdated(episode.getCreatedAt().getTime());
+                        }
                     }
                 }
             }
@@ -345,7 +347,7 @@ public class Library {
     }
 
     @Nullable
-    public FeedItem getEpisode(@NonNull String argUrl) {
+    public IEpisode getEpisode(@NonNull String argUrl) {
         return mEpisodesUrlLUT.get(argUrl);
     }
 
@@ -678,12 +680,16 @@ public class Library {
         }
     }
 
+    @Deprecated
     public void updateEpisode(IEpisode argEpisode) {
         if (argEpisode instanceof FeedItem) {
-            FeedItem item = (FeedItem) argEpisode;
-            addEpisode(item);
-            mLibraryPersistency.persist(item);
+            updateEpisode((FeedItem) argEpisode);
         }
+    }
+
+    public void updateEpisode(@NonNull FeedItem argEpisode) {
+        addEpisode(argEpisode);
+        mLibraryPersistency.persist(argEpisode);
     }
 
     private int compareSubscriptions(ISubscription s1, ISubscription s2) {

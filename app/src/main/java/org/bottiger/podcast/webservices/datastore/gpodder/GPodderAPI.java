@@ -354,7 +354,7 @@ public class GPodderAPI implements IWebservice {
 
         if (remoteActions != null) {
             GEpisodeAction action;
-            FeedItem item;
+            IEpisode item;
             ContentResolver resolver = argContext.getContentResolver();
             for (int i = 0; i < remoteActions.length; i++) {
                 action = remoteActions[i];

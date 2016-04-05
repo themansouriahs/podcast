@@ -165,12 +165,13 @@ public class FeedParser {
                 IEpisode episode = readEpisode(parser, subscription);
                 if (isParsingSlimSubscription()) {
                     subscription.addEpisode(episode);
-                } else {
-                    boolean didAdd = SoundWaves.getLibraryInstance().addEpisode(episode);
-                    if (didAdd) {
-                        addedEpisodes = true;
-                    }
                 }
+
+                boolean didAdd = SoundWaves.getLibraryInstance().addEpisode(episode);
+                if (didAdd) {
+                    addedEpisodes = true;
+                }
+
             } else {
                 skip(parser);
             }
@@ -240,9 +241,10 @@ public class FeedParser {
 
                     if (isParsingSlimSubscription()) {
                         argSubscription.addEpisode(episode);
-                    } else {
-                        SoundWaves.getLibraryInstance().addEpisode(episode);
                     }
+
+                    SoundWaves.getLibraryInstance().addEpisode(episode);
+
                     break;
                 }
                 case SUBSCRIPTION_IMAGE_TAG: {

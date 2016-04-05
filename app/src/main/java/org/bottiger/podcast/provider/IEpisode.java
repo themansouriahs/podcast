@@ -51,6 +51,8 @@ public interface IEpisode {
 
     double getProgress();
     void setProgress(double argProgress);
+
+    @NonNull
     String getURL();
 
     @Nullable

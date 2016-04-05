@@ -198,7 +198,7 @@ public class SlimEpisode extends BaseEpisode implements Parcelable {
 
     @Override
     public String getURL() {
-        return null;
+        return mUrl.toString();
     }
 
     @Nullable
@@ -225,7 +225,11 @@ public class SlimEpisode extends BaseEpisode implements Parcelable {
 
     @Override
     public void setURL(String argUrl) {
-
+        try {
+            setUrl(new URL(argUrl));
+        } catch (MalformedURLException e) {
+            return;
+        }
     }
 
     @Override

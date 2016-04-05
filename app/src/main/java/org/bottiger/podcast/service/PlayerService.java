@@ -325,7 +325,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 			mPlayer.pause();
 
 		if (mItem != null) {
-			if ((mItem.getUrl().toString().equals(argEpisodeURL)) && mPlayer.isInitialized()) {
+			if ((mItem.getURL().equals(argEpisodeURL)) && mPlayer.isInitialized()) {
 				if (!mPlayer.isPlaying()) {
 					start();
 				}
@@ -359,7 +359,6 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 				}
 
 				oldFeedItem.removePriority();
-				//SoundWaves.getLibraryInstance().updateEpisode(oldFeedItem);
 			}
 		}
 
@@ -367,6 +366,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
         if (mItem instanceof FeedItem) {
             isFeedItem = true;
         }
+
         final FeedItem feedItem = isFeedItem ? (FeedItem)mItem : null;
 
 		String dataSource = null;
@@ -411,7 +411,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 			updateMetadata(item);
         }
 
-        if (isFeedItem) {
+        if (feedItem != null) {
             if (feedItem.priority != 1)
                 feedItem.setPriority(null, getApplication());
 			SoundWaves.getLibraryInstance().updateEpisode(feedItem);
@@ -451,7 +451,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 			return false;
 		}
 
-        play(argEpisode.getUrl().toString());
+        play(url.toString());
         return true;
 	}
 
