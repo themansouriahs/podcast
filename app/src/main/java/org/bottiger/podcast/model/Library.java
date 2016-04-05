@@ -232,15 +232,14 @@ public class Library {
             mEpisodes.add(argEpisode);
             mEpisodesUrlLUT.put(argEpisode.getURL(), argEpisode);
 
-            if (isFeedItem)
-                mEpisodesIdLUT.put(item.getId(), item);
-
             if (isFeedItem) {
                 boolean updatedEpisode = false;
                 if (!item.isPersisted()) {
                     updateEpisode(item);
                     updatedEpisode = true;
                 }
+
+                mEpisodesIdLUT.put(item.getId(), item);
 
                 Subscription subscription = item.getSubscription();
 
@@ -537,6 +536,9 @@ public class Library {
         long start = 0;
         int counter = 0;
         try {
+
+            if (argQuery == null)
+                argQuery = getAllEpisodes(argSubscription);
 
             cursor = PodcastOpenHelper.runQuery(Library.this.mContext, argQuery);
 
