@@ -446,15 +446,6 @@ public class FeedActivity extends TopActivity implements PaletteListener {
                                 mMultiShrinkScroller.setVisibility(View.VISIBLE);
                                 mMultiShrinkScroller.setScroll(mMultiShrinkScroller.getScrollNeededToBeFullScreen());
                             }
-                            // Need to wait for pre draw for setting the theme color. Setting the
-                            // header tint before the MultiShrinkScroller has been measured will
-                            // cause incorrect tinting calculations.
-                            if (color != 0) {
-                                /*
-                                setThemeColor(mMaterialColorMapUtils
-                                        .calculatePrimaryAndSecondaryColor(color));
-                                        */
-                            }
                         }
                     });
         }

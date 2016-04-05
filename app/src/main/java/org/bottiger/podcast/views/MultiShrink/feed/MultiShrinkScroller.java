@@ -21,6 +21,7 @@ import android.os.Trace;
 import android.support.annotation.NonNull;
 import android.support.v4.view.MarginLayoutParamsCompat;
 import android.support.v7.widget.RecyclerView;
+import android.transition.TransitionManager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
@@ -280,10 +281,10 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
         mRecyclerView = (FeedRecyclerView) findViewById(R.id.feed_recycler_view);
         mScrollViewChild = findViewById(R.id.feed_scrollviewChild);
         mToolbar = findViewById(R.id.toolbar_parent);
-        mPhotoViewContainer = findViewById(R.id.toolbar_parent);
+        mPhotoViewContainer = mToolbar;
         mTransparentView = findViewById(R.id.transparent_view); // background_gradient
         mLargeTextView = (TextView) findViewById(R.id.feedview_title);
-        mInvisiblePlaceholderTextView = (TextView) findViewById(R.id.feedview_title);
+        mInvisiblePlaceholderTextView = (TextView) mLargeTextView;
         mStartColumn = findViewById(R.id.empty_start_column);
         mFloatingActionButton = (FloatingActionButton)findViewById(R.id.feedview_fap_button);
         // Touching the empty space should close the card
@@ -359,11 +360,6 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
                     // Permanently set photo width and height.
                     final TypedValue photoRatio = new TypedValue();
 
-
-                    // FIXME
-                    //getResources().getValue(R.vals.quickcontact_photo_ratio, photoRatio,
-                    //        /* resolveRefs = */ true);
-
                     final ViewGroup.LayoutParams photoLayoutParams
                             = mPhotoViewContainer.getLayoutParams();
                     photoLayoutParams.height = mMaximumHeaderHeight;
@@ -386,6 +382,7 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
 
                 calculateCollapsedLargeTitlePadding();
                 updateHeaderTextSizeAndMargin();
+                updateFloatingActionButton();
                 configureGradientViewHeights();
             }
         });
@@ -722,6 +719,7 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
         }
         updatePhotoTintAndDropShadow();
         updateHeaderTextSizeAndMargin();
+        updateFloatingActionButton();
         final boolean isFullscreen = getScrollNeededToBeFullScreen() <= 0;
         mHasEverTouchedTheTop |= isFullscreen;
         if (mListener != null) {
@@ -750,6 +748,7 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
 
         updatePhotoTintAndDropShadow();
         updateHeaderTextSizeAndMargin();
+        updateFloatingActionButton();
     }
 
     //@NeededForReflection
@@ -768,6 +767,7 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
         mToolbar.setLayoutParams(toolbarLayoutParams);
         updatePhotoTintAndDropShadow();
         updateHeaderTextSizeAndMargin();
+        updateFloatingActionButton();
     }
 
     //@NeededForReflection
@@ -1001,6 +1001,40 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
                 }
             });
         }
+    }
+
+    /**
+     * Removed the FAB when the header gets too small
+     */
+    private void updateFloatingActionButton() {
+        final int toolbarHeight = mToolbar.getLayoutParams().height;
+        float buffer = 30f;
+        float buffer2 = buffer*2f;
+
+        float alpha = 1f;
+
+        if (toolbarHeight < mMinimumHeaderHeight+buffer2) {
+            alpha = (toolbarHeight-mMinimumHeaderHeight)/(buffer2);
+        }
+
+        if (toolbarHeight <= mMinimumHeaderHeight) {
+            alpha = 0;
+        }
+
+        transitionFABTo(alpha);
+    }
+
+    private void transitionFABTo(float alpha) {
+        if (alpha <= 0) {
+            mFloatingActionButton.setVisibility(GONE);
+            return;
+        }
+
+        mFloatingActionButton.setVisibility(VISIBLE);
+        alpha = alpha > 1f ? 1f :alpha;
+        mFloatingActionButton.setAlpha(alpha);
+
+
     }
 
     /**
