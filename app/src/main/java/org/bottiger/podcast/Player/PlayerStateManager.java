@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.media.session.MediaSession;
+import android.os.Build;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v4.media.MediaMetadataCompat;
@@ -155,6 +156,7 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
     private void populateFastMediaMetadata(@NonNull MediaMetadataCompat.Builder mMetaBuilder, @NonNull IEpisode argEpisode) {
         //Subscription subscription = argEpisode.getSubscription(mPlayerService);
 
+        mMetaBuilder.putText(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, argEpisode.getURL());
         mMetaBuilder.putText(MediaMetadataCompat.METADATA_KEY_TITLE, argEpisode.getTitle());
         //mMetaBuilder.putText(MediaMetadataCompat.METADATA_KEY_ALBUM, "yo");
         mMetaBuilder.putText(MediaMetadataCompat.METADATA_KEY_ARTIST, argEpisode.getAuthor());
@@ -167,7 +169,11 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
     private PlaybackStateCompat.Builder getPlaybackState(@PlaybackStateCompat.State int argState, long argPosition, float argPlaybackSpeed) {
         PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder();
 
-        stateBuilder.setActiveQueueItemId(MediaSession.QueueItem.UNKNOWN_ID);
+        int queueId = -1;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            queueId = MediaSession.QueueItem.UNKNOWN_ID;
+        }
+        stateBuilder.setActiveQueueItemId(queueId);
 
         long actions =  PlaybackStateCompat.ACTION_PLAY_PAUSE |
                         PlaybackStateCompat.ACTION_REWIND |

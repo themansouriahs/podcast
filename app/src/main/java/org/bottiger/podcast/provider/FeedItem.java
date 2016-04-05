@@ -498,7 +498,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 			return;
 
 		this.offset = (int) pos;
-		notifyPropertyChanged();
+		notifyPropertyChanged(EpisodeChanged.PROGRESS);
 	}
 
 	@Override

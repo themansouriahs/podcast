@@ -75,6 +75,7 @@ import com.github.ivbaranov.mfb.MaterialFavoriteButton;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
+import rx.functions.Func1;
 
 public class PlaylistFragment extends AbstractEpisodeFragment implements OnSharedPreferenceChangeListener {
 
@@ -449,6 +450,12 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         mRxTopEpisodeChanged = SoundWaves.getRxBus().toObserverable()
                                                     .onBackpressureDrop()
                                                     .ofType(EpisodeChanged.class)
+                                                    .filter(new Func1<EpisodeChanged, Boolean>() {
+                                                        @Override
+                                                        public Boolean call(EpisodeChanged episodeChanged) {
+                                                            return episodeChanged.getAction() != EpisodeChanged.PROGRESS;
+                                                        }
+                                                    })
                                                     .observeOn(AndroidSchedulers.mainThread())
                                                     .subscribe(new Action1<EpisodeChanged>() {
                                                         @Override
@@ -460,9 +467,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                                                                 return;
 
                                                             if (episode.equals(mPlaylist.first())) {
-                                                                if (itemChangedEvent.getAction() != EpisodeChanged.PROGRESS) {
-                                                                    PlaylistFragment.this.bindHeader(episode);
-                                                                }
+                                                                PlaylistFragment.this.bindHeader(episode);
                                                             }
                                                         }
                                                     }, new Action1<Throwable>() {
@@ -508,14 +513,8 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
             mTotalTime.setText("");
         }
 
-        long offset = item.getOffset();
-        if (offset > 0) {
-            mCurrentTime.setText(StrUtils.formatTime(offset));
-        } else {
-            mCurrentTime.setText("00:00");
-        }
-        mCurrentTime.setEpisode(item);
         mTotalTime.setEpisode(item);
+        setPlayerProgress(item);
 
         mPlayPauseButton.setEpisode(item, PlayPauseImageView.PLAYLIST);
         //mBackButton.setEpisode(item);
@@ -547,10 +546,8 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         mPlayerDownloadButton.setEpisode(item);
 
         final Activity activity = getActivity();
-
         String artworkURL = item.getArtwork();
 
-        //
         if (iSubscription != null && !TextUtils.isEmpty(iSubscription.getImageURL())) {
             artworkURL = iSubscription.getImageURL();
         }
@@ -558,13 +555,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         if (!TextUtils.isEmpty(artworkURL)) {
 
             PaletteHelper.generate(artworkURL, activity, mTopPlayer);
-            /*
-            PaletteHelper.generate(artworkURL, activity, mPlayPauseButton);
-            PaletteHelper.generate(artworkURL, activity, mBackButton);
-            PaletteHelper.generate(artworkURL, activity, mForwardButton);
-            PaletteHelper.generate(artworkURL, activity, mPlayerDownloadButton);
-            //PaletteHelper.generate(artworkURL, activity, mFavoriteButton);
-*/
             PaletteHelper.generate(artworkURL, activity, new PaletteListener() {
                 @Override
                 public void onPaletteFound(Palette argChangedPalette) {
@@ -616,6 +606,16 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         } else if (mPlaylist.size() == 1) {
             mTopPlayer.togglePlaylistEmpty(true);
         }
+    }
+
+    private void setPlayerProgress(@NonNull IEpisode argEpisode) {
+        long offset = argEpisode.getOffset();
+        if (offset > 0) {
+            mCurrentTime.setText(StrUtils.formatTime(offset));
+        } else {
+            mCurrentTime.setText("00:00");
+        }
+        mCurrentTime.setEpisode(argEpisode);
     }
 
     private void setPlaylistViewState(@Nullable Playlist argPlaylist) {

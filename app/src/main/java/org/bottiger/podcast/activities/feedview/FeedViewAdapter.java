@@ -3,13 +3,17 @@ package org.bottiger.podcast.activities.feedview;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
+import android.os.RemoteException;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.media.session.MediaControllerCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +22,7 @@ import android.widget.RelativeLayout;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.TopActivity;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.model.Library;
@@ -30,6 +35,7 @@ import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorUtils;
 import org.bottiger.podcast.utils.PaletteHelper;
+import org.bottiger.podcast.utils.PlayerHelper;
 import org.bottiger.podcast.utils.SharedAdapterUtils;
 import org.bottiger.podcast.views.PlayPauseImageView;
 
@@ -59,7 +65,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
     private EpisodeList<IEpisode> mEpisodeList;
     private LinkedList<IEpisode> mFilteredEpisodeList = new LinkedList<>();
 
-    protected Activity mActivity;
+    protected TopActivity mActivity;
     protected LayoutInflater mInflater;
 
     protected Palette mPalette;
@@ -74,7 +80,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
 
     private Subscription mRxSubscription;
 
-    public FeedViewAdapter(@NonNull Activity activity, @NonNull ISubscription argSubscription) {
+    public FeedViewAdapter(@NonNull TopActivity activity, @NonNull ISubscription argSubscription) {
         mActivity = activity;
         setDataset(argSubscription);
 
@@ -148,12 +154,12 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(EpisodeViewHolder viewHolder, final int position) {
-        int dataPosition = viewHolder.getAdapterPosition();
+    public void onBindViewHolder(EpisodeViewHolder viewHolder, int position) {
+        final int dataPosition = viewHolder.getAdapterPosition();
         final IEpisode item = getItemForPosition(dataPosition);
         final EpisodeViewHolder episodeViewHolder = viewHolder;
 
-        SharedAdapterUtils.AddPaddingToLastElement((viewHolder).mContainer, 0, position == getItemCount()-1);
+        SharedAdapterUtils.AddPaddingToLastElement((viewHolder).mContainer, 0, dataPosition == getItemCount()-1);
 
         if (item == null) {
             VendorCrashReporter.report("FeedViewAdapter", "item is null for: " + mSubscription);
@@ -176,7 +182,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
         episodeViewHolder.mTextSecondary.setText(getSecondaryText(item));
 
         @EpisodeViewHolder.DisplayState int state = EpisodeViewHolder.COLLAPSED;
-        if (mExpanededItems.contains(position)) {
+        if (mExpanededItems.contains(dataPosition)) {
             state = EpisodeViewHolder.EXPANDED;
         } else if (item.isMarkedAsListened()) {
             state = EpisodeViewHolder.COLLAPSED_LISTENED;
@@ -191,23 +197,21 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
             public void onClick(View v) {
                 @EpisodeViewHolder.DisplayState int newState = episodeViewHolder.toggleState();
                 if (newState == EpisodeViewHolder.EXPANDED) {
-                    mExpanededItems.add(position);
+                    mExpanededItems.add(dataPosition);
                 } else {
-                    mExpanededItems.remove(Integer.valueOf(position));
+                    mExpanededItems.remove(Integer.valueOf(dataPosition));
                 }
             }
         });
 
         @PlayerStatusObservable.PlayerStatus int playerStatus = PlayerStatusObservable.STOPPED;
 
-        PlayerService ps = PlayerService.getInstance();
-        if (ps != null && ps.isInitialized() && item.equals(ps.getCurrentItem())) {
-            playerStatus = ps.getPlayer().getStatus();
+        if (mActivity.getPlayerHelper().isPlaying(item)) {
+            playerStatus = PlayerStatusObservable.PLAYING;
         }
 
         episodeViewHolder.mPlayPauseButton.setEpisode(item, PlayPauseImageView.FEEDVIEW);
         episodeViewHolder.mQueueButton.setEpisode(item, PlayPauseImageView.FEEDVIEW);
-        episodeViewHolder.mPlayPauseButton.setStatus(playerStatus);
 
         getPalette(episodeViewHolder);
 
@@ -219,6 +223,8 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
             episodeViewHolder.mQueueButton.onPaletteFound(mPalette);
             episodeViewHolder.mDownloadButton.onPaletteFound(mPalette);
         }
+
+        episodeViewHolder.mPlayPauseButton.setStatus(playerStatus);
 
     }
 
@@ -292,7 +298,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
 
         long filesize = argItem.getFilesize();
         if (filesize > 0) {
-            mStringBuilder.append(sFormatter.formatShortFileSize(mActivity, argItem.getFilesize()));
+            mStringBuilder.append(Formatter.formatShortFileSize(mActivity, argItem.getFilesize()));
             mStringBuilder.append(", ");
         }
 

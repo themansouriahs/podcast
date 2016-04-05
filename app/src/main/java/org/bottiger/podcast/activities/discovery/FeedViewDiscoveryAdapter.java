@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
+import org.bottiger.podcast.TopActivity;
 import org.bottiger.podcast.activities.feedview.EpisodeViewHolder;
 import org.bottiger.podcast.activities.feedview.FeedViewAdapter;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
@@ -25,7 +26,7 @@ import java.util.ArrayList;
  */
 public class FeedViewDiscoveryAdapter extends FeedViewAdapter {
 
-    public FeedViewDiscoveryAdapter(@NonNull Activity activity, @NonNull ISubscription argSubscription) {
+    public FeedViewDiscoveryAdapter(@NonNull TopActivity activity, @NonNull ISubscription argSubscription) {
         super(activity, argSubscription);
     }
 

@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -25,6 +26,7 @@ import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.utils.PlayerHelper;
 import org.bottiger.podcast.utils.TransitionUtils;
 
 import java.lang.annotation.Retention;
@@ -49,6 +51,8 @@ public class TopActivity extends AppCompatActivity {
     private Menu mMenu;
 
     protected MediaBrowserCompat mMediaBrowser;
+    protected static MediaControllerCompat mMediaControllerCompat; // FIXME: Should not be static.
+    protected static PlayerHelper mPlayerHelper = new PlayerHelper();
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -87,12 +91,13 @@ public class TopActivity extends AppCompatActivity {
                             MediaSessionCompat.Token token =
                                     mMediaBrowser.getSessionToken();
                             // This is what gives us access to everything
-                            MediaControllerCompat controller =
+                            mMediaControllerCompat =
                                     new MediaControllerCompat(TopActivity.this, token);
+                            mPlayerHelper.setMediaControllerCompat(mMediaControllerCompat);
 
                             // Convenience method of FragmentActivity to allow you to use
                             // getSupportMediaController() anywhere
-                            setSupportMediaController(controller);
+                            setSupportMediaController(mMediaControllerCompat);
                         } catch (RemoteException e) {
                             Log.e(MainActivity.class.getSimpleName(),
                                     "Error creating controller", e);
@@ -228,6 +233,16 @@ public class TopActivity extends AppCompatActivity {
     }
 
     protected void onServiceConnected() {
+    }
+
+    @Nullable
+    public MediaControllerCompat getMediaControllerCompat() {
+        return mMediaControllerCompat;
+    }
+
+    @NonNull
+    public PlayerHelper getPlayerHelper() {
+        return mPlayerHelper;
     }
 
     protected void importOPMLButtonCallback() {
