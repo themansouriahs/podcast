@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
@@ -27,7 +28,7 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
     public IEpisode episode = null;
     public PlaylistAdapter mAdapter = null;
 
-    public CardView mLayout;
+    public FrameLayout mLayout;
     public RelativeLayout mMainContainer;
 
     public PlayPauseImageView mPlayPauseButton;
@@ -71,7 +72,7 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
 
         mActivity = argActivity;
 
-        mLayout = (CardView) view.findViewById(R.id.item);
+        mLayout = (FrameLayout) view.findViewById(R.id.item);
         mMainContainer = (RelativeLayout) view.findViewById(R.id.main_player_container);
         mPlayPauseButton = (PlayPauseImageView) view.findViewById(R.id.list_image);
         mPodcastImage = (ImageViewTinted) view.findViewById(R.id.podcast_image);

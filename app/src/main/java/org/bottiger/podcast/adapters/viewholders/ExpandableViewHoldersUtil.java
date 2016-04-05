@@ -94,7 +94,7 @@ public class ExpandableViewHoldersUtil {
                 int white = ColorUtils.getBackgroundColor(holder.getActivity());
                 int black = ColorUtils.getTextColor(holder.getActivity());
 
-                holder.mLayout.setCardBackgroundColor(white);
+                //holder.mLayout.setCardBackgroundColor(white);
                 holder.mMainTitle.setTextColor(black);
                 holder.description.setTextColor(black);
                 holder.currentTime.setTextColor(black);

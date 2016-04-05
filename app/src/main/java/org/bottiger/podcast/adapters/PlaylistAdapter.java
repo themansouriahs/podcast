@@ -90,14 +90,9 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
         producePlaylist();
         notifyDataSetChanged();
-
-
-
     }
 
     public Playlist producePlaylist() {
-
-
         Playlist playlist = mPlaylist;
 
         if (playlist != null)
@@ -116,16 +111,16 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         Log.v(TAG, "onCreateViewHolder");
 
         View view = mInflater.inflate(R.layout.episode_list, viewGroup, false);
-        PlaylistViewHolder holder = new PlaylistViewHolder(view, mActivity);
 
-        return holder;
+        return new PlaylistViewHolder(view, mActivity);
     }
 
     @Override
-    public void onBindViewHolder(final PlaylistViewHolder viewHolder, final int position) {
+    public void onBindViewHolder(final PlaylistViewHolder viewHolder, int position) {
         Log.v(TAG, "onBindViewHolder(pos: " + position + ")");
 
-        final IEpisode item = mPlaylist.getItem(position+PLAYLIST_OFFSET);
+        final int dataPosition = viewHolder.getAdapterPosition();
+        final IEpisode item = mPlaylist.getItem(dataPosition+PLAYLIST_OFFSET);
         final Activity activity = mActivity;
 
         if (item == null) {
@@ -136,7 +131,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         Context context = SoundWaves.getAppContext();
         int textColor = item.isMarkedAsListened() ? ColorUtils.getTextColor(context) : ColorUtils.getFadedTextColor(context);
 
-        SharedAdapterUtils.AddPaddingToLastElement(viewHolder.mLayout, 0, position == getItemCount()-1);
+        SharedAdapterUtils.AddPaddingToLastElement(viewHolder.mLayout, 0, dataPosition == getItemCount()-1);
 
         viewHolder.setArtwork(null);
 
@@ -156,7 +151,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
             viewHolder.setArtwork(image);
         }
 
-        Log.d("ExpanderHelper", "pos: " + position + " episode: " + item.getTitle());
+        Log.d("ExpanderHelper", "pos: " + dataPosition + " episode: " + item.getTitle());
 
         viewHolder.mPlayPauseButton.setIconColor(Color.WHITE);
 
@@ -196,7 +191,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         bindDuration(viewHolder, item);
 
         if (item.getPriority() > 0) {
-            viewHolder.mPlaylistPosition.setText(Integer.toString(position));
+            viewHolder.mPlaylistPosition.setText(Integer.toString(dataPosition));
             viewHolder.mPlaylistPosition.setVisibility(View.VISIBLE);
         } else {
             viewHolder.mPlaylistPosition.setVisibility(View.GONE);
@@ -208,19 +203,19 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         viewHolder.downloadButton.setEpisode(item);
 
         // needs the downloadButton to be bound in advance
-        keepOne.bind(viewHolder, position);
+        keepOne.bind(viewHolder, dataPosition);
 
 
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                                                    @Override
                                                    public void onClick(View v) {
-                                                       PlaylistAdapter.toggle(viewHolder, position);
+                                                       PlaylistAdapter.toggle(viewHolder, dataPosition);
                                                    }
                                                });
 
 
 
-        bindExandedPlayer(mActivity, item, viewHolder, position);
+        bindExandedPlayer(mActivity, item, viewHolder, dataPosition);
     }
 
     /**
