@@ -7,7 +7,7 @@
         android:background="?attr/themeBackground">
 
     <include layout="@layout/helper_toolbar"
-        android:id="@id/helper_toolbar"/>
+        android:id="@+id/helper_toolbar"/>
 
     <Button
         android:id="@+id/opml_subscription_import_button"

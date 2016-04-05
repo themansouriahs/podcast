@@ -38,20 +38,20 @@ public class DownloadManagerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_download_manager);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.helper_toolbar);
-        toolbar.setTitleTextAppearance(this, R.style.ToolbarTitleTextApperance);
-        toolbar.setSubtitleTextAppearance(this, R.style.ToolbarSubtitleTextApperance);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.download_manager_toolbar);
+        //toolbar.setTitleTextAppearance(this, R.style.ToolbarTitleTextApperance);
+        //toolbar.setSubtitleTextAppearance(this, R.style.ToolbarSubtitleTextApperance);
         toolbar.setTitle(R.string.download_manager_toolbar_title);
-        toolbar.setSubtitle(R.string.download_manager_toolbar_description);
+        //toolbar.setSubtitle(R.string.download_manager_toolbar_description);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        TextView toolbarTitle = (TextView) findViewById(R.id.helper_toolbar_title);
-        TextView toolbarDescription = (TextView) findViewById(R.id.helper_toolbar_description);
+        //TextView toolbarTitle = (TextView) findViewById(R.id.helper_toolbar_title);
+        //TextView toolbarDescription = (TextView) findViewById(R.id.helper_toolbar_description);
         TextView emptyText = (TextView) findViewById(R.id.download_empty_text);
 
-        toolbarTitle.setVisibility(View.GONE);
-        toolbarDescription.setVisibility(View.GONE);
+        //toolbarTitle.setVisibility(View.GONE);
+        //toolbarDescription.setVisibility(View.GONE);
 
         mAdapter = new DownloadManagerAdapter(this, emptyText);
         mRecyclerView = (RecyclerView) findViewById(R.id.download_queue_list);
