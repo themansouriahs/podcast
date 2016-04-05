@@ -65,7 +65,8 @@ public class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemVie
                     public void call(SoundWavesDownloadManager.DownloadManagerChanged downloadManagerChanged) {
                         Log.d(TAG, "DownloadManagerChanged, size: " + downloadManagerChanged.queueSize);
                         DownloadManagerAdapter.this.notifyDataSetChanged();
-                        return;
+
+                        setEmptyTextViewVisibility();
                     }
                 }, new Action1<Throwable>() {
                     @Override
@@ -114,8 +115,6 @@ public class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemVie
     }
 
     public void removed(int argPosition) {
-        //super.notifyItemRemoved(argPosition);
-
         mDownloadManager.removeFromQueue(argPosition);
         setEmptyTextViewVisibility();
         super.notifyItemRemoved(argPosition);
@@ -136,24 +135,16 @@ public class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemVie
     }
 
     boolean onItemMove(int fromPosition, int toPosition) {
-        /*
-        if (fromPosition < toPosition) {
-            for (int i = fromPosition; i < toPosition; i++) {
-                Collections.swap(mDownloadingEpisodes, i, i + 1);
-            }
-        } else {
-            for (int i = fromPosition; i > toPosition; i--) {
-                Collections.swap(mDownloadingEpisodes, i, i - 1);
-            }
-        }
-        */
         mDownloadManager.move(fromPosition, toPosition);
+
+        // BUG: can couse "Inconsistency detected. Invalid item position 4(offset:4).state:5"
         notifyItemMoved(fromPosition, toPosition);
+        //notifyDataSetChanged();
         return true;
     }
 
     private void setEmptyTextViewVisibility() {
-        int visibility = mDownloadManager.getDownloadingItem() != null ? View.GONE : View.VISIBLE;
+        int visibility = mDownloadManager.getQueueSize() != 0 ? View.GONE : View.VISIBLE;
         mEmptyTextView.setVisibility(visibility);
     }
 }

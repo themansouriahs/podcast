@@ -3,25 +3,21 @@ package org.bottiger.podcast.activities.downloadmanager;
 import android.graphics.Canvas;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
-import android.view.View;
+import android.view.MenuItem;
 import android.widget.TextView;
-
-import com.squareup.otto.Subscribe;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.model.events.DownloadProgress;
-import org.bottiger.podcast.service.DownloadStatus;
+import org.bottiger.podcast.utils.TransitionUtils;
 import org.bottiger.podcast.views.NpaLinearLayoutManager;
+import org.bottiger.podcast.views.dialogs.DialogAddPodcast;
 
 /**
  * Created by aplb on 04-10-2015.
@@ -39,25 +35,23 @@ public class DownloadManagerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_download_manager);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.download_manager_toolbar);
-        //toolbar.setTitleTextAppearance(this, R.style.ToolbarTitleTextApperance);
-        //toolbar.setSubtitleTextAppearance(this, R.style.ToolbarSubtitleTextApperance);
-        toolbar.setTitle(R.string.download_manager_toolbar_title);
-        //toolbar.setSubtitle(R.string.download_manager_toolbar_description);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (toolbar != null) {
+            toolbar.setTitle(R.string.download_manager_toolbar_title);
+            setSupportActionBar(toolbar);
+        }
+        ActionBar actionbar = getSupportActionBar();
+        if (actionbar != null) actionbar.setDisplayHomeAsUpEnabled(true);
 
-        //TextView toolbarTitle = (TextView) findViewById(R.id.helper_toolbar_title);
-        //TextView toolbarDescription = (TextView) findViewById(R.id.helper_toolbar_description);
         TextView emptyText = (TextView) findViewById(R.id.download_empty_text);
 
-        //toolbarTitle.setVisibility(View.GONE);
-        //toolbarDescription.setVisibility(View.GONE);
+        if (emptyText != null) mAdapter = new DownloadManagerAdapter(this, emptyText);
 
-        mAdapter = new DownloadManagerAdapter(this, emptyText);
         mRecyclerView = (RecyclerView) findViewById(R.id.download_queue_list);
-        mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.setLayoutManager(new NpaLinearLayoutManager(this));
-        mRecyclerView.setHasFixedSize(true);
+        if (mRecyclerView != null) {
+            mRecyclerView.setAdapter(mAdapter);
+            mRecyclerView.setLayoutManager(new NpaLinearLayoutManager(this));
+            mRecyclerView.setHasFixedSize(true);
+        }
 
         ItemTouchHelper.Callback callback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {
             @Override
@@ -97,5 +91,20 @@ public class DownloadManagerActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_download_manager, menu);
         return true;
+    }
+
+    /**
+     * Right corner menu options
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.clear_download_queue: {
+                SoundWaves.getDownloadManager().clearQueue();
+                return true;
+            }
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }

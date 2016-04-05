@@ -174,7 +174,7 @@
     <string name="download_manager_toolbar_title">Download Queue</string>
     <string name="download_manager_toolbar_description">Episodes scheduled for download</string>
     <string name="menu_clear_download">Clear</string>
-    <string name="download_manager_empty_title">No download in progress</string>
+    <string name="download_manager_empty_title">No downloads in progress</string>
     <string name="action_enter_fullscreen">Fullscreen player</string>
     <string name="action_exit_fullscreen">Exit fullscreen</string>
     <string name="unknown_filesize">Filesize unknown</string>

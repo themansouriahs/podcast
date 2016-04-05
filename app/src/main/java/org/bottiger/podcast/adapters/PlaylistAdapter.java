@@ -319,14 +319,12 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
     public void onViewAttachedToWindow (PlaylistViewHolder holder) {
         super.onViewAttachedToWindow(holder);
         SoundWaves.getBus().register(holder.mPlayPauseButton);
-        SoundWaves.getBus().register(holder.downloadButton);
         SoundWaves.getBus().register(holder.seekbar);
     }
 
     @Override
     public void  onViewDetachedFromWindow(PlaylistViewHolder holder) {
         SoundWaves.getBus().unregister(holder.mPlayPauseButton);
-        SoundWaves.getBus().unregister(holder.downloadButton);
         SoundWaves.getBus().unregister(holder.seekbar);
         super.onViewDetachedFromWindow(holder);
     }

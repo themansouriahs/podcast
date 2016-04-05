@@ -284,27 +284,6 @@ public class SoundWavesDownloadManager extends Observable {
         mDownloadingItem = downloadingItem;
 
         Log.d(TAG, "Start downloading: " + downloadingItem);
-
-        /*
-        rx.Observable.just(mEngine)
-                .subscribeOn(Schedulers.io())
-                .subscribe(new Subscriber<IDownloadEngine>() {
-            @Override
-            public void onCompleted() {
-                Log.v(TAG, "Analytics started");
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                Log.wtf(TAG, e.getMessage());
-            }
-
-            @Override
-            public void onNext(IDownloadEngine engine) {
-                engine.startDownload();
-            }
-        });
-        */
         mEngine.startDownload();
 
         mProgressPublisher.addEpisode(downloadingItem);
@@ -561,7 +540,21 @@ public class SoundWavesDownloadManager extends Observable {
         return mDownloadingItem;
 	}
 
-	public void notifyDownloadComplete() {
+    public void clearQueue() {
+        try {
+            mQueueLock.lock();
+
+            // skip the first one which is currently downloading
+            for (int i = 1; i<mDownloadQueue.size(); i++) {
+                mDownloadQueue.remove(i);
+            }
+        } finally {
+            mQueueLock.unlock();
+        }
+        postQueueChangedEvent();
+    }
+
+    public void notifyDownloadComplete() {
 		mDownloadingItem = null;
         postQueueChangedEvent();
 	}
