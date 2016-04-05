@@ -389,11 +389,14 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
 
     GenericMediaPlayerInterface.OnPreparedListener preparedlistener = new GenericMediaPlayerInterface.OnPreparedListener() {
         @Override
-        public void onPrepared(GenericMediaPlayerInterface mp) {
+        public void onPrepared(@NonNull GenericMediaPlayerInterface mp) {
             mp.seekTo(startPos);
-            mPlayerService.getCurrentItem().setDuration(mp.getDuration());
-            start();
-            isPreparingMedia = false;
+            IEpisode episode = mPlayerService.getCurrentItem();
+            if (episode != null) {
+                episode.setDuration(mp.getDuration());
+                start();
+                isPreparingMedia = false;
+            }
         }
     };
 
