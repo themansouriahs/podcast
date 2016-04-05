@@ -46,19 +46,12 @@
         <item name="ic_close_inv">@drawable/ic_close_24dp</item>
         <item name="favorite_outline_inv">@drawable/ic_favorite_outline_black</item>
 
-        <item name="android:actionBarStyle">@style/TransparentActionBar</item>
+        <!--<item name="android:actionBarStyle">@style/TransparentActionBar</item>-->
 
         <item name="android:windowTranslucentStatus" tools:targetApi="kitkat">false</item>
-        <!--<item name="android:windowBackground">@null</item>-->
         <item name="themeBackground">@color/white_opaque</item>
         <item name="themeTextColorPrimary">@color/pitch_black</item>
         <item name="themeTextColorFaded">@color/grayDark</item>
-        <!--
-        <item name="android:background">@color/white_opaque</item>
-
-        <item name="android:windowBackground">@color/white_opaque</item>
-        -->
-        <!--<item name="android:colorBackground">@color/white_opaque</item>-->
 
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorSecondary</item>
