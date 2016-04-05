@@ -10,9 +10,6 @@ import android.support.v7.util.SortedList;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.squareup.sqlbrite.BriteDatabase;
-import com.squareup.sqlbrite.SqlBrite;
-
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.cloud.EventLogger;
 import org.bottiger.podcast.debug.SqliteCopy;
@@ -56,8 +53,6 @@ public class Library {
     private static final int BACKPREASURE_BUFFER_SIZE = 10000;
 
     @NonNull private Context mContext;
-    @NonNull private SqlBrite mSqlBrite = SqlBrite.create();
-    @NonNull private BriteDatabase mDb;
     @NonNull private LibraryPersistency mLibraryPersistency;
 
     private final ReentrantLock mLock = new ReentrantLock();
@@ -143,7 +138,6 @@ public class Library {
         //String sql = "update " + SubscriptionColumns.TABLE_NAME + " SET " + SubscriptionColumns.STATUS + "=" + Subscription.STATUS_SUBSCRIBED;
         //podcastOpenHelper.getWritableDatabase().execSQL(sql);
 
-        mDb = mSqlBrite.wrapDatabaseHelper(podcastOpenHelper);
         mLibraryPersistency = new LibraryPersistency(argContext, this);
 
         mActiveSubscriptions = new SortedList<>(Subscription.class, mSubscriptionsListCallback);
@@ -440,16 +434,16 @@ public class Library {
 
     public void loadPlaylist(@NonNull final Playlist argPlaylist) {
         String query = getPlaylistEpisodes(argPlaylist);
-        Observable<SqlBrite.Query> subscriptions = mDb.createQuery(SubscriptionColumns.TABLE_NAME, query);
-        subscriptions
+
+        Observable.just(query)
                 .subscribeOn(Schedulers.newThread())
-                .subscribe(new Action1<SqlBrite.Query>() {
+                .subscribe(new Action1<String>() {
             @Override
-            public void call(SqlBrite.Query query) {
+            public void call(String query) {
                 Cursor cursor = null;
                 int counter = 0;
                 try {
-                    cursor = query.run();
+                    cursor = PodcastOpenHelper.runQuery(Library.this.mContext, query);
                     FeedItem episode;
 
                     while (cursor.moveToNext()) {
@@ -474,18 +468,18 @@ public class Library {
     }
 
     public void loadSubscriptions() {
-        final Observable<SqlBrite.Query> subscriptions = mDb.createQuery(SubscriptionColumns.TABLE_NAME, getAllSubscriptions());
+        String query = getAllSubscriptions();
 
-        subscriptions
+        Observable.just(query)
                 .subscribeOn(Schedulers.newThread())
-                .subscribe(new Action1<SqlBrite.Query>() {
+                .subscribe(new Action1<String>() {
             @Override
-            public void call(SqlBrite.Query query) {
+            public void call(String query) {
                 Cursor cursor = null;
                 clearSubscriptions();
                 Subscription subscription = null;
                 try {
-                    cursor = query.run();
+                    cursor = PodcastOpenHelper.runQuery(Library.this.mContext, query);
 
                     while (cursor.moveToNext()) {
                         subscription = getByCursor(cursor, null);
@@ -516,12 +510,12 @@ public class Library {
         if (argSubscription.IsLoaded())
             return;
 
-        Observable<SqlBrite.Query> episodes = mDb.createQuery(ItemColumns.TABLE_NAME, getAllEpisodes(argSubscription));
-        episodes
+        String query = getAllEpisodes(argSubscription);
+        Observable.just(query)
                 .observeOn(Schedulers.io())
-                .subscribe(new Action1<SqlBrite.Query>() {
+                .subscribe(new Action1<String>() {
                     @Override
-                    public void call(SqlBrite.Query query) {
+                    public void call(String query) {
                         loadEpisodesSync(argSubscription, query);
                     }
                 }, new Action1<Throwable>() {
@@ -534,7 +528,7 @@ public class Library {
     }
 
     @WorkerThread
-    public synchronized void loadEpisodesSync(@NonNull final Subscription argSubscription, @Nullable SqlBrite.Query argQuery) {
+    public synchronized void loadEpisodesSync(@NonNull final Subscription argSubscription, @Nullable String argQuery) {
         if (argSubscription.IsLoaded())
             return;
 
@@ -544,11 +538,7 @@ public class Library {
         int counter = 0;
         try {
 
-            if (argQuery == null) {
-                cursor = PodcastOpenHelper.getInstance(mContext).getReadableDatabase().rawQuery(getAllEpisodes(argSubscription), new String[0]);
-            } else {
-                cursor = argQuery.run();
-            }
+            cursor = PodcastOpenHelper.runQuery(Library.this.mContext, argQuery);
 
             start = System.currentTimeMillis();
 

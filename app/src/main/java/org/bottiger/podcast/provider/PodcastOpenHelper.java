@@ -5,9 +5,10 @@ import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.utils.PodcastLog;
 
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
+import android.database.Cursor;
+import io.requery.android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.database.sqlite.SQLiteOpenHelper;
+import io.requery.android.database.sqlite.SQLiteOpenHelper;
 
 public class PodcastOpenHelper extends SQLiteOpenHelper {
 
@@ -32,6 +33,12 @@ public class PodcastOpenHelper extends SQLiteOpenHelper {
         }
         return mInstance;
     }
+
+	public static synchronized Cursor runQuery(Context argContext, String argQuery) {
+		SQLiteDatabase database = getInstance(argContext).getWritableDatabase();
+		Cursor cursor = database.rawQuery(argQuery, null);
+		return cursor;
+	}
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
