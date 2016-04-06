@@ -45,32 +45,14 @@ public class ApiRequestInterceptor implements Interceptor {
                 requestBuilder.addHeader("Cookie", cookie);
             } else {
                 final String authorizationValue = encodeCredentialsForBasicAuthorization();
-                //requestFacade.addHeader("Authorization", authorizationValue);
-                //request.headers().newBuilder().add("Authorization", authorizationValue).build();
                 requestBuilder.addHeader("Authorization", authorizationValue);
                 authenticating = true;
             }
         }
 
         request = requestBuilder.build();
-/*
-    private static String bodyToString(final Request request){
-
-        try {
-            final Request copy = request.newBuilder().build();
-            final Buffer buffer = new Buffer();
-            copy.body().writeTo(buffer);
-            return buffer.readUtf8();
-        } catch (final IOException e) {
-            return "did not work";
-        }
-    }
- */
-        //String body = bodyToString(request);
-        final Buffer buffer = new Buffer();
         Response response = chain.proceed(request);
 
-        //body = body + "1";
         if (authenticating) {
             Headers headers = response.headers();
             int numHeaders = headers.size();
@@ -85,23 +67,7 @@ public class ApiRequestInterceptor implements Interceptor {
             }
         }
 
-        /**
-         * FIXME: Remove when this have been fixed: https://github.com/square/retrofit/issues/1071
-         */
-        //if (response.body().contentLength() < 0) {
-        String r = response.body().string();
-
-        if (TextUtils.isEmpty(r)) {
-            r = "{}";
-        }
-
-            return response.newBuilder()
-                    .body(ResponseBody.create(response.body().contentType(), r))
-                    .build();
-        //}
-
-
-        //return response;
+        return response;
     }
 
     private String encodeCredentialsForBasicAuthorization() {

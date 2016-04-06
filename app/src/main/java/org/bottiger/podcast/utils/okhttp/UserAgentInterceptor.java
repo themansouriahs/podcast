@@ -21,7 +21,7 @@ public class UserAgentInterceptor implements Interceptor {
     private final String userAgent ;
 
     public UserAgentInterceptor(@NonNull Context argContext) {
-        this.userAgent = argContext.getResources().getString(R.string.app_name) + " " + BuildConfig.VERSION_NAME;
+        this.userAgent = argContext.getResources().getString(R.string.app_name) + "-" + BuildConfig.VERSION_NAME;
     }
 
     @Override

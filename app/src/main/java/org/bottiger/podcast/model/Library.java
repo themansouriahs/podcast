@@ -2,6 +2,7 @@ package org.bottiger.podcast.model;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteCantOpenDatabaseException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
@@ -499,7 +500,11 @@ public class Library {
         }, new Action1<Throwable>() {
             @Override
             public void call(Throwable throwable) {
-                VendorCrashReporter.report("subscribeError" , throwable.toString());
+                if (throwable instanceof SQLiteCantOpenDatabaseException) {
+                    VendorCrashReporter.report("subscribeError2", throwable.toString());
+                } else {
+                    VendorCrashReporter.report("subscribeError", throwable.toString());
+                }
                 Log.d(TAG, "error: " + throwable.toString());
             }
         });
