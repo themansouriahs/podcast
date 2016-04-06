@@ -10,9 +10,8 @@ import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.GSubscriptio
 
 import java.util.List;
 
-import retrofit.Call;
-import retrofit.Response;
-import retrofit.Retrofit;
+import retrofit2.Call;
+import retrofit2.Response;
 
 /**
  * Created by Arvid on 8/27/2015.
@@ -27,8 +26,8 @@ public interface IWebservice {
     void uploadSubscriptions(@NonNull final Context argContext, LongSparseArray<ISubscription> argSubscriptions, @Nullable ICallback argCallback);
 
     interface ICallback<T> {
-        void onResponse(Response<T> response, Retrofit argRetrofit);
-        void onFailure(Throwable throwable);
+        void onResponse(Call<T> call, Response<T> response);
+        void onFailure(Call<T> call, Throwable throwable);
     }
 
 }

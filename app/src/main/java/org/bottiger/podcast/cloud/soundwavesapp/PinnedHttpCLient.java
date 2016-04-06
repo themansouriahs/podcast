@@ -2,10 +2,10 @@ package org.bottiger.podcast.cloud.soundwavesapp;
 
 import android.support.annotation.NonNull;
 
-import com.squareup.okhttp.CertificatePinner;
-import com.squareup.okhttp.OkHttpClient;
-
 import org.bottiger.podcast.ApplicationConfiguration;
+
+import okhttp3.CertificatePinner;
+import okhttp3.OkHttpClient;
 
 /**
  * Created by apl on 22-04-2015.
@@ -22,8 +22,10 @@ public class PinnedHttpCLient {
             .build();
 
     @NonNull
+    @Deprecated
+    // FIXME this needs to be fixed
     public static OkHttpClient getHttpClient() {
-        sClient.setCertificatePinner(sCertificatePinner);
+        //sClient.setCertificatePinner(sCertificatePinner);
         return sClient;
     }
 

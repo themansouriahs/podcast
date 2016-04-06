@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.DialogPreference;
 import android.support.annotation.ColorRes;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.ContentLoadingProgressBar;
 import android.util.AttributeSet;
@@ -16,14 +17,20 @@ import android.widget.TextView;
 import com.jakewharton.rxbinding.widget.RxTextView;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.service.Downloader.engines.IDownloadEngine;
 import org.bottiger.podcast.utils.AuthenticationUtils;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.webservices.datastore.gpodder.GPodderAPI;
 import org.bottiger.podcast.webservices.datastore.gpodder.GPodderUtils;
+import org.bottiger.podcast.webservices.directories.IDirectoryProvider;
+import org.bottiger.podcast.webservices.directories.ISearchResult;
 
-import retrofit.Callback;
-import retrofit.Response;
-import retrofit.Retrofit;
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Response;
+import retrofit2.Callback;
+import retrofit2.Retrofit;
 import rx.Observable;
 import rx.Observer;
 import rx.functions.Func4;
@@ -123,12 +130,12 @@ public class GPodderAuthDialogPreference extends DialogPreference {
                 try {
                     GPodderAPI api = new GPodderAPI(server, username, password, new Callback() {
                         @Override
-                        public void onResponse(Response response, Retrofit argRetrofit) {
-                            AuthenticationUtils.setState(response.isSuccess(), getContext(), mTestLoading, mTestResult);
+                        public void onResponse(retrofit2.Call call, retrofit2.Response response) {
+                            AuthenticationUtils.setState(response.isSuccessful(), getContext(), mTestLoading, mTestResult);
                         }
 
                         @Override
-                        public void onFailure(Throwable t) {
+                        public void onFailure(retrofit2.Call call, Throwable t) {
                             AuthenticationUtils.setState(false, getContext(), mTestLoading, mTestResult);
                         }
                     });

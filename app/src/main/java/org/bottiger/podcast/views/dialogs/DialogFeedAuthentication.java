@@ -8,7 +8,6 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -21,30 +20,24 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.jakewharton.rxbinding.widget.RxTextView;
-import com.squareup.okhttp.Authenticator;
-import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.Challenge;
-import com.squareup.okhttp.Credentials;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
-import com.squareup.okhttp.internal.framed.FrameReader;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.AuthenticationUtils;
 import org.bottiger.podcast.utils.JSonUtils;
-import org.bottiger.podcast.utils.PreferenceHelper;
 
 import java.io.IOException;
-import java.net.Proxy;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import okhttp3.Authenticator;
+import okhttp3.Credentials;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.Route;
 import rx.Observable;
 import rx.Observer;
 import rx.functions.Func2;
@@ -59,7 +52,7 @@ public class DialogFeedAuthentication extends DialogFragment {
 
     private Activity mActivity;
 
-    OkHttpClient client = new OkHttpClient();
+    OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
 
     private rx.Subscription _subscription = null;
 
@@ -149,7 +142,7 @@ public class DialogFeedAuthentication extends DialogFragment {
                 };
 
                 if (subscription != null)
-                    testCredentials(client, subscription, username, password, responseCallback, failureCallback);
+                    testCredentials(clientBuilder, subscription, username, password, responseCallback, failureCallback);
             }
         });
 
@@ -201,7 +194,7 @@ public class DialogFeedAuthentication extends DialogFragment {
                 }
 
                 if (subscription != null)
-                    testCredentials(client, subscription, username, password, null, null);
+                    testCredentials(clientBuilder, subscription, username, password, null, null);
             }
         });
         builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -222,22 +215,17 @@ public class DialogFeedAuthentication extends DialogFragment {
         super.onDestroyView();
     }
 
-    private static void testCredentials(@NonNull OkHttpClient argClient,
+    private static void testCredentials(@NonNull OkHttpClient.Builder argClientBuilder,
                                         final @NonNull Subscription argSubscription,
                                         @Nullable final String argUsername,
                                         final @Nullable String argPassword,
                                         final @Nullable ResponseCallback argResponseCallback,
                                         final @Nullable FailureCallback argFailureCallback) {
-        argClient.setAuthenticator(new Authenticator() {
+        argClientBuilder.authenticator(new Authenticator() {
             @Override
-            public Request authenticate(Proxy proxy, Response response) throws IOException {
+            public Request authenticate(Route route, Response response) throws IOException {
                 String credential = Credentials.basic(argUsername, argPassword);
                 return response.request().newBuilder().header("Authorization", credential).build();
-            }
-
-            @Override
-            public Request authenticateProxy(Proxy proxy, Response response) throws IOException {
-                return null;
             }
         });
 
@@ -245,17 +233,17 @@ public class DialogFeedAuthentication extends DialogFragment {
                 .url(argSubscription.getUrl())
                 .build();
 
-        argClient.newCall(request).enqueue(new Callback() {
+        argClientBuilder.build().newCall(request).enqueue(new okhttp3.Callback() {
             @Override
-            public void onFailure(Request request, IOException e) {
+            public void onFailure(okhttp3.Call call, IOException e) {
                 if (argFailureCallback != null)
-                    argFailureCallback.run(request);
+                    argFailureCallback.run(call);
                 //AuthenticationUtils.setState(false, mActivity, contentLoadingProgressBar, textResult);
                 argSubscription.setAuthenticationWorking(false);
             }
 
             @Override
-            public void onResponse(Response response) throws IOException {
+            public void onResponse(okhttp3.Call call, Response response) throws IOException {
                 if (argResponseCallback != null)
                     argResponseCallback.run(response);
                 //AuthenticationUtils.setState(response.isSuccessful(), mActivity, contentLoadingProgressBar, textResult);
@@ -276,9 +264,9 @@ public class DialogFeedAuthentication extends DialogFragment {
 
     abstract class FailureCallback implements Runnable {
 
-        Request request;
+        okhttp3.Call request;
 
-        public void run(@NonNull Request argRequest) {
+        public void run(@NonNull okhttp3.Call argRequest) {
             request = argRequest;
             run();
         }

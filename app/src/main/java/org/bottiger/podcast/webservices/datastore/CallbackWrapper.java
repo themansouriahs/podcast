@@ -2,9 +2,10 @@ package org.bottiger.podcast.webservices.datastore;
 
 import android.support.annotation.Nullable;
 
-import retrofit.Callback;
-import retrofit.Response;
-import retrofit.Retrofit;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 /**
  * Created by Arvid on 8/27/2015.
@@ -20,20 +21,20 @@ public class CallbackWrapper<T> implements Callback<T>, IWebservice.ICallback {
     }
 
     @Override
-    public void onResponse(Response response, Retrofit argRetrofit) {
+    public void onResponse(Call call, Response response) {
         if (mCallback != null)
-            mCallback.onResponse(response, argRetrofit);
+            mCallback.onResponse(call, response);
 
         if (mICallback != null)
-            mICallback.onResponse(response, argRetrofit);
+            mICallback.onResponse(call, response);
     }
 
     @Override
-    public void onFailure(Throwable error) {
+    public void onFailure(Call call, Throwable error) {
         if (mCallback != null)
-            mCallback.onFailure(error);
+            mCallback.onFailure(call, error);
 
         if (mICallback != null)
-            mICallback.onFailure(error);
+            mICallback.onFailure(call, error);
     }
 }

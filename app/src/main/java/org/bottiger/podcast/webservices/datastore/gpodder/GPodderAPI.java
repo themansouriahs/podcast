@@ -16,9 +16,6 @@ import android.util.ArraySet;
 import android.util.Log;
 import android.util.Pair;
 
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.ResponseBody;
-
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
@@ -27,6 +24,7 @@ import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.utils.okhttp.UserAgentInterceptor;
 import org.bottiger.podcast.webservices.datastore.CallbackWrapper;
 import org.bottiger.podcast.webservices.datastore.IWebservice;
 import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.GActionsList;
@@ -53,11 +51,13 @@ import java.util.TimeZone;
 
 import javax.annotation.Nonnegative;
 
-import retrofit.Call;
-import retrofit.Callback;
-import retrofit.GsonConverterFactory;
-import retrofit.Response;
-import retrofit.Retrofit;
+import okhttp3.OkHttpClient;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 /**
  * Created by Arvid on 8/23/2015.
@@ -85,12 +85,12 @@ public class GPodderAPI implements IWebservice {
 
     private final Callback mDummyCallback = new Callback<String>() {
         @Override
-        public void onResponse(Response<String> response, Retrofit argRetrofit) {
+        public void onResponse(Call<String> call, Response<String> response) {
             Log.d(TAG, response.toString());
         }
 
         @Override
-        public void onFailure(Throwable error) {
+        public void onFailure(Call<String> call, Throwable error) {
             Log.d(TAG, error.toString());
         }
     };
@@ -107,13 +107,14 @@ public class GPodderAPI implements IWebservice {
 
         mUsername = argUsername;
 
-        OkHttpClient client = new OkHttpClient();
+        OkHttpClient.Builder client = new OkHttpClient.Builder();
+        client.interceptors().add(new UserAgentInterceptor(SoundWaves.getAppContext()));
         client.interceptors().add(new ApiRequestInterceptor(argUsername, argPassword));
 
         api = new Retrofit.Builder()
                 .baseUrl(argServer)
                 .addConverterFactory(GsonConverterFactory.create())
-                .client(client) // The default client didn't handle well responses like 401
+                .client(client.build()) // The default client didn't handle well responses like 401
                 .build()
                 .create(IGPodderAPI.class);
 
@@ -136,7 +137,7 @@ public class GPodderAPI implements IWebservice {
     int synchronize(@NonNull Context argContext, @NonNull LongSparseArray<Subscription> argLocalSubscriptions) throws IOException {
 
         Response response = api.login(mUsername).execute();
-        if (!response.isSuccess())
+        if (!response.isSuccessful())
             return AUTHENTICATION_ERROR;
 
         GDevice device = new GDevice();
@@ -162,7 +163,7 @@ public class GPodderAPI implements IWebservice {
         Call<SubscriptionChanges> subscriptionsChanges = api.getDeviceSubscriptionsChanges(mUsername, GPodderUtils.getDeviceCaption(argContext), lastSync); // lastCall
         Response<SubscriptionChanges> subscriptionsChangesResponse = subscriptionsChanges.execute();
 
-        if (!subscriptionsChangesResponse.isSuccess())
+        if (!subscriptionsChangesResponse.isSuccessful())
             return SERVER_ERROR;
 
         SubscriptionChanges subscriptionsChangesResult = subscriptionsChangesResponse.body();
@@ -234,7 +235,7 @@ public class GPodderAPI implements IWebservice {
         Call<UpdatedUrls> updatedUrlsCall = api.uploadDeviceSubscriptionsChanges(localSubscriptionsChanges, mUsername, GPodderUtils.getDeviceCaption(argContext));
         Response<UpdatedUrls> updatedUrlsResponse = updatedUrlsCall.execute();
 
-        if (!updatedUrlsResponse.isSuccess())
+        if (!updatedUrlsResponse.isSuccessful())
             return SERVER_ERROR;
 
         UpdatedUrls updatedUrls = updatedUrlsResponse.body();
@@ -274,7 +275,7 @@ public class GPodderAPI implements IWebservice {
         Call<GActionsList> actionList = api.getEpisodeActions(mUsername, null, null, lastSync, true);
         Response<GActionsList> actionListResponse = actionList.execute();
 
-        if (!actionListResponse.isSuccess())
+        if (!actionListResponse.isSuccessful())
             return SERVER_ERROR;
 
         GEpisodeAction[] remoteActions = actionListResponse.body().getActions();
@@ -347,7 +348,7 @@ public class GPodderAPI implements IWebservice {
             Call<UpdatedUrls> uploadEpisodesCall = api.uploadEpisodeActions(actions.toArray(new GEpisodeAction[actions.size()]), mUsername);
             Response<UpdatedUrls> uploadEpisodesResponse = uploadEpisodesCall.execute();
 
-            if (!uploadEpisodesResponse.isSuccess()) {
+            if (!uploadEpisodesResponse.isSuccessful()) {
                 return SERVER_ERROR;
             }
         }
@@ -445,7 +446,7 @@ public class GPodderAPI implements IWebservice {
         }
         Response response = api.uploadDeviceSubscriptions(localSubscriptionUrls, mUsername, GPodderUtils.getDeviceCaption(argContext)).execute();
 
-        if (!response.isSuccess()) {
+        if (!response.isSuccessful()) {
             return SERVER_ERROR;
         }
 
@@ -456,16 +457,16 @@ public class GPodderAPI implements IWebservice {
         Call<List<GSubscription>> result = api.search(argSearchTerm);
         result.enqueue(new Callback<List<GSubscription>>() {
             @Override
-            public void onResponse(Response<List<GSubscription>> response, Retrofit argRetrofit) {
+            public void onResponse(Call<List<GSubscription>> argCall, Response<List<GSubscription>> response) {
 
                 if (argICallback == null)
                     return;
 
-                argICallback.onResponse(response, argRetrofit);
+                argICallback.onResponse(argCall, response);
             }
 
             @Override
-            public void onFailure(Throwable t) {
+            public void onFailure(Call<List<GSubscription>> call, Throwable t) {
                 Log.d(TAG, t.toString());
             }
         });
@@ -489,12 +490,12 @@ public class GPodderAPI implements IWebservice {
 
         authenticate(argCallback, new Callback() {
             @Override
-            public void onResponse(Response response, Retrofit argRetrofit) {
+            public void onResponse(Call call, Response response) {
                 uploadSubscriptionsInternal(argContext, argSubscriptions, argCallback);
             }
 
             @Override
-            public void onFailure(Throwable error) {
+            public void onFailure(Call call, Throwable error) {
                 Log.d(TAG, error.toString());
             }
         });
@@ -529,12 +530,12 @@ public class GPodderAPI implements IWebservice {
 
         api.getDeviceSubscriptions(mUsername, GPodderUtils.getDeviceCaption(argContext)).enqueue(new Callback<String[]>() {
             @Override
-            public void onResponse(Response<String[]> response, Retrofit argRetrofit) {
-                Log.d(TAG, response.toString());
+            public void onResponse(Call<String[]> call, Response<String[]> response) {
+                Log.d(TAG, call.toString());
             }
 
             @Override
-            public void onFailure(Throwable error) {
+            public void onFailure(Call<String[]> call, Throwable error) {
                 Log.d(TAG, error.toString());
             }
         });
@@ -549,12 +550,12 @@ public class GPodderAPI implements IWebservice {
 
         api.getSubscriptions(mUsername).enqueue(new Callback<List<GSubscription>>() {
             @Override
-            public void onResponse(Response<List<GSubscription>> response, Retrofit argRetrofit) {
-                Log.d(TAG, response.toString());
+            public void onResponse(Call<List<GSubscription>> call, Response<List<GSubscription>> argRetrofit) {
+                Log.d(TAG, call.toString());
             }
 
             @Override
-            public void onFailure(Throwable error) {
+            public void onFailure(Call<List<GSubscription>> call, Throwable error) {
                 Log.d(TAG, error.toString());
             }
         });
@@ -569,12 +570,12 @@ public class GPodderAPI implements IWebservice {
 
         api.getDeviceSubscriptionsChanges(mUsername, GPodderUtils.getDeviceCaption(argContext), argSince).enqueue(new Callback<SubscriptionChanges>() {
             @Override
-            public void onResponse(Response<SubscriptionChanges> response, Retrofit argRetrofit) {
-                Log.d(TAG, response.toString());
+            public void onResponse(Call<SubscriptionChanges> call, Response<SubscriptionChanges> response) {
+                Log.d(TAG, call.toString());
             }
 
             @Override
-            public void onFailure(Throwable error) {
+            public void onFailure(Call<SubscriptionChanges> call, Throwable error) {
                 Log.d(TAG, error.toString());
             }
         });
@@ -600,13 +601,13 @@ public class GPodderAPI implements IWebservice {
 
         api.uploadDeviceSubscriptionsChanges(changes, mUsername, GPodderUtils.getDeviceCaption(argContext)).enqueue(new Callback<UpdatedUrls>() {
             @Override
-            public void onResponse(Response<UpdatedUrls> response, Retrofit argRetrofit) {
-                Log.d(TAG, response.toString());
+            public void onResponse(Call<UpdatedUrls> call, Response<UpdatedUrls> response) {
+                Log.d(TAG, call.toString());
                 //UpdatedUrls updatedUrls = new Gson
             }
 
             @Override
-            public void onFailure(Throwable error) {
+            public void onFailure(Call<UpdatedUrls> call, Throwable error) {
                 Log.d(TAG, error.toString());
             }
         });
@@ -638,11 +639,11 @@ public class GPodderAPI implements IWebservice {
         AuthenticationCallback callback = new AuthenticationCallback(null, null);
         Response response = api.login(mUsername).execute();
 
-        if (response.isSuccess()) {
+        if (response.isSuccessful()) {
             return true;
         }
 
-        return response.isSuccess();
+        return response.isSuccessful();
     }
 
     private void authenticate(@Nullable ICallback argICallback, @Nullable Callback argCallback) {
@@ -660,13 +661,13 @@ public class GPodderAPI implements IWebservice {
         }
 
         @Override
-        public void onResponse(Response response, Retrofit argRetrofit) {
+        public void onResponse(Call call, Response response) {
             mAuthenticated = true;
-            super.onResponse(response, argRetrofit);
+            super.onResponse(call, response);
         }
 
         @Override
-        public void onFailure(Throwable error) {
+        public void onFailure(Call call, Throwable error) {
             mAuthenticated = false;
             /*
             Response response = error.getResponse();
@@ -683,7 +684,7 @@ public class GPodderAPI implements IWebservice {
             }
             */
             Log.d(TAG, error.toString());
-            super.onFailure(error);
+            super.onFailure(call, error);
         }
 
     }
@@ -731,7 +732,7 @@ public class GPodderAPI implements IWebservice {
         Call<String[]> deviceSubscriptions = api.getDeviceSubscriptions(mUsername, GPodderUtils.getDeviceCaption(argContext));
         Response<String[]> deviceSubscriptionsResponse = deviceSubscriptions.execute();
 
-        if (!deviceSubscriptionsResponse.isSuccess())
+        if (!deviceSubscriptionsResponse.isSuccessful())
             throw new IOException("Could not contact server"); // NoI18N
 
         return deviceSubscriptionsResponse.body();

@@ -2,40 +2,33 @@ package org.bottiger.podcast.service.Downloader;
 
 import android.content.ContentResolver;
 import android.content.Context;
-import android.database.Cursor;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.util.SortedList;
 import android.text.TextUtils;
 import android.util.Log;
-import android.util.Patterns;
-import android.webkit.URLUtil;
-
-import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
 
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.parser.FeedParser;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
-import org.bottiger.podcast.provider.SubscriptionLoader;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
 import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.utils.okhttp.UserAgentInterceptor;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * Created by apl on 26-03-2015.
@@ -45,7 +38,8 @@ public class SubscriptionRefreshManager {
     private static final String ACRA_KEY = "SubscriptionRefreshManager";
     public static final String TAG = "SubscriptionRefresh";
 
-    final OkHttpClient mOkClient = new OkHttpClient();
+    @NonNull
+    final OkHttpClient mOkClient;
     final Handler mainHandler;
     final FeedParser mFeedParser = new FeedParser();
 
@@ -54,6 +48,10 @@ public class SubscriptionRefreshManager {
     public SubscriptionRefreshManager(@NonNull Context argContext) {
         mContext = argContext;
         mainHandler = new Handler(argContext.getMainLooper());
+
+        OkHttpClient.Builder okHttpBuilder = new OkHttpClient.Builder();
+        okHttpBuilder.interceptors().add(new UserAgentInterceptor(argContext));
+        mOkClient = okHttpBuilder.build();
     }
 
     public void refreshAll() {
@@ -127,13 +125,12 @@ public class SubscriptionRefreshManager {
 
         mOkClient.newCall(request).enqueue(new Callback() {
             @Override
-            public void onFailure(Request request, IOException e) {
-
+            public void onFailure(Call call, IOException e) {
                 wrappedCallback.complete(false, argSubscription);
             }
 
             @Override
-            public void onResponse(Response response) throws IOException {
+            public void onResponse(Call call, Response response) throws IOException {
                 handleHttpResponse(argContext, argSubscription, response, argCallback);
             }
         });

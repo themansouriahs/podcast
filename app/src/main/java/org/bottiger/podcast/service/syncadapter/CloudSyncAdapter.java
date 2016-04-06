@@ -26,8 +26,6 @@ import org.bottiger.podcast.webservices.datastore.gpodder.IGPodderAPI;
 
 import java.io.IOException;
 
-import retrofit.Response;
-
 /**
  * Created by aplb on 14-09-2015.
  */

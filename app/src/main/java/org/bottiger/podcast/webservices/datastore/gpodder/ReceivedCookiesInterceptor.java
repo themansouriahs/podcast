@@ -4,12 +4,12 @@ package org.bottiger.podcast.webservices.datastore.gpodder;
  * Created by apl on 23-05-2015.
  */
 
-import com.squareup.okhttp.Interceptor;
-import com.squareup.okhttp.Response;
-
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.prefs.Preferences;
+
+import okhttp3.Interceptor;
+import okhttp3.Response;
 
 
 /**

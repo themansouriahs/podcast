@@ -28,9 +28,10 @@ import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 
-import retrofit.Call;
-import retrofit.Response;
-import retrofit.Retrofit;
+import retrofit2.Call;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+
 
 /**
  * Created by apl on 13-04-2015.
@@ -60,8 +61,7 @@ public class GPodder extends GenericDirectory {
 
         mCall = mGPodderAPI.search(searchTerm, new IWebservice.ICallback<List<GSubscription>>() {
             @Override
-            public void onResponse(Response<List<GSubscription>> response, Retrofit argRetrofit) {
-
+            public void onResponse(Call<List<GSubscription>> call, Response<List<GSubscription>> response) {
                 if (!isSuccesfull(response))
                     return;
 
@@ -70,7 +70,7 @@ public class GPodder extends GenericDirectory {
             }
 
             @Override
-            public void onFailure(Throwable throwable) {
+            public void onFailure(Call<List<GSubscription>> call, Throwable throwable) {
 
             }
         });
@@ -106,7 +106,7 @@ public class GPodder extends GenericDirectory {
 
         mCall = mGPodderAPI.getTopList(amount, argTag, new IWebservice.ICallback<List<GSubscription>>() {
             @Override
-            public void onResponse(Response<List<GSubscription>> response, Retrofit argRetrofit) {
+            public void onResponse(Call<List<GSubscription>> call, Response<List<GSubscription>> response) {
                 if (!isSuccesfull(response))
                     return;
 
@@ -117,14 +117,14 @@ public class GPodder extends GenericDirectory {
             }
 
             @Override
-            public void onFailure(Throwable throwable) {
+            public void onFailure(Call<List<GSubscription>> call, Throwable throwable) {
 
             }
         });
     }
 
     private static boolean isSuccesfull(@Nullable Response argResponse) {
-        return argResponse != null && argResponse.isSuccess();
+        return argResponse != null && argResponse.isSuccessful();
     }
 
     private GenericSearchResult parseResponse(@NonNull String argSearchQuery, @Nullable Response<List<GSubscription>> argResponse) {

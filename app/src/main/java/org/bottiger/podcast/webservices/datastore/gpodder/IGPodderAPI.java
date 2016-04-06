@@ -16,16 +16,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import retrofit.Call;
-import retrofit.Callback;
-import retrofit.Retrofit;
-import retrofit.http.Body;
-import retrofit.http.GET;
-import retrofit.http.Header;
-import retrofit.http.POST;
-import retrofit.http.PUT;
-import retrofit.http.Path;
-import retrofit.http.Query;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.http.Body;
+import retrofit2.http.GET;
+import retrofit2.http.POST;
+import retrofit2.http.PUT;
+import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 /**
  * Created by apl on 23-05-2015.
@@ -40,7 +39,7 @@ public interface IGPodderAPI {
     */
     @POST("/api/2/auth/{username}/login.json")
     //void login(@Path("user") String user, @Header("Authorization") String authorization, Callback<String> callback);
-    Call<com.squareup.okhttp.ResponseBody> login(@Path("username") String user);
+    Call<ResponseBody> login(@Path("username") String user);
 
     @POST("/api/2/auth/{username}/logout.json")
     void logout(@Path("username") String user);
@@ -60,7 +59,7 @@ public interface IGPodderAPI {
 
     // Upload Subscriptions of Device
     @PUT("/subscriptions/{username}/{deviceid}.json")
-    Call<com.squareup.okhttp.ResponseBody> uploadDeviceSubscriptions(@Body List<String> subscriptions, @Path("username") String user, @Path("deviceid") String device);
+    Call<ResponseBody> uploadDeviceSubscriptions(@Body List<String> subscriptions, @Path("username") String user, @Path("deviceid") String device);
 
     // Upload Subscription Changes
     @POST("/api/2/subscriptions/{username}/{deviceid}.json")
@@ -131,7 +130,7 @@ public interface IGPodderAPI {
 
     // Update Device Data
     @POST("/api/2/devices/{username}/{deviceid}.json")
-    Call<com.squareup.okhttp.ResponseBody> updateDeviceData(@Path("username") String username, @Path("deviceid") String deviceid, @Body GDevice device);
+    Call<ResponseBody> updateDeviceData(@Path("username") String username, @Path("deviceid") String deviceid, @Body GDevice device);
 
     // List devices
     @POST("/api/2/devices/{username}.json")

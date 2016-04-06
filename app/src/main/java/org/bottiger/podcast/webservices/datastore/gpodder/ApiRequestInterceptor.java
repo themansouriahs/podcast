@@ -9,13 +9,13 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Base64;
 
-import com.squareup.okhttp.Interceptor;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
-import com.squareup.okhttp.ResponseBody;
-
 import java.io.IOException;
 
+import okhttp3.Headers;
+import okhttp3.Interceptor;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 import okio.Buffer;
 
 /**
@@ -37,22 +37,22 @@ public class ApiRequestInterceptor implements Interceptor {
     public Response intercept(Chain chain) throws IOException {
 
         Request request = chain.request();
-        Request.Builder requestBuidler = request.newBuilder();
+        Request.Builder requestBuilder = request.newBuilder();
 
         boolean authenticating = false;
         if (shouldAuthenticate()) {
             if (!TextUtils.isEmpty(cookie)) {
-                requestBuidler.addHeader("Cookie", cookie);
+                requestBuilder.addHeader("Cookie", cookie);
             } else {
                 final String authorizationValue = encodeCredentialsForBasicAuthorization();
                 //requestFacade.addHeader("Authorization", authorizationValue);
                 //request.headers().newBuilder().add("Authorization", authorizationValue).build();
-                requestBuidler.addHeader("Authorization", authorizationValue);
+                requestBuilder.addHeader("Authorization", authorizationValue);
                 authenticating = true;
             }
         }
 
-        request = requestBuidler.build();
+        request = requestBuilder.build();
 /*
     private static String bodyToString(final Request request){
 
@@ -72,7 +72,7 @@ public class ApiRequestInterceptor implements Interceptor {
 
         //body = body + "1";
         if (authenticating) {
-            com.squareup.okhttp.Headers headers = response.headers();
+            Headers headers = response.headers();
             int numHeaders = headers.size();
 
             String name, value;
