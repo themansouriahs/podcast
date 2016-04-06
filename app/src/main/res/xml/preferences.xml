@@ -275,6 +275,9 @@
             android:summary="@string/pref_use_soundengine_description"
             android:title="@string/pref_use_soundengine_title" />
 
+            <Preference android:key="@string/pref_submit_debug_logs_key"
+                android:title="@string/preferences__submit_debug_log"/>
+
     </PreferenceCategory>
 
     </PreferenceScreen>

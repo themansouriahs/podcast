@@ -9,8 +9,8 @@ android {
         applicationId "org.bottiger.podcast"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 267        // even - release. Odd - development
-        versionName "0.130.2" // even - release. Odd - development
+        versionCode 268        // even - release. Odd - development
+        versionName "0.130" // even - release. Odd - development
         //useJack = true
         multiDexEnabled = true
         //renderscriptTargetApi 20
@@ -144,6 +144,8 @@ dependencies {
     compile 'com.github.bumptech.glide:glide:3.7.0'
 
     compile 'net.steamcrafted:materialiconlib:1.0.9'
+
+    compile 'org.whispersystems:libpastelog:1.0.7'
 
     //compile 'com.google.api-client:google-api-client-android:+'
     compile 'com.google.http-client:google-http-client-gson:1.20.0'

@@ -2,6 +2,7 @@ package org.bottiger.podcast;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
@@ -10,17 +11,23 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.bottiger.podcast.activities.pastelog.LogSubmitActivity;
 import org.bottiger.podcast.utils.ThemeHelper;
 
 /**
  * Created by apl on 13-02-2015.
  */
 public class SoundWavesPreferenceFragment extends PreferenceFragment {
+
+    private static final String TAG = "SoundWavesPreferenceFragment";
 
     public static final String CURRENT_VERSION = "pref_current_version";
 
@@ -33,6 +40,10 @@ public class SoundWavesPreferenceFragment extends PreferenceFragment {
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.preferences);
 
+        String key = getResources().getString(R.string.pref_submit_debug_logs_key);
+        Preference submitDebugLog = this.findPreference(key);
+        submitDebugLog.setOnPreferenceClickListener(new SubmitDebugLogListener());
+        submitDebugLog.setSummary(getVersion(getActivity()));
     }
 
     @Override
@@ -107,5 +118,29 @@ public class SoundWavesPreferenceFragment extends PreferenceFragment {
         view.setBackgroundColor(Color.WHITE);
 
         return view;
+    }
+
+    private class SubmitDebugLogListener implements Preference.OnPreferenceClickListener {
+        @Override
+        public boolean onPreferenceClick(Preference preference) {
+            final Intent intent = new Intent(getActivity(), LogSubmitActivity.class);
+            startActivity(intent);
+            return true;
+        }
+    }
+
+    private @NonNull
+    String getVersion(@Nullable Context context) {
+        try {
+            if (context == null) return "";
+
+            String app     = context.getString(R.string.app_name);
+            String version = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
+
+            return String.format("%s %s", app, version);
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.w(TAG, e);
+            return context.getString(R.string.app_name);
+        }
     }
 }

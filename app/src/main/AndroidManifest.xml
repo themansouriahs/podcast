@@ -168,6 +168,11 @@
             android:label="Settings">
         </activity>
 
+        <activity android:name=".activities.pastelog.LogSubmitActivity"
+            android:label="Submit log"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize"/>
+
         <service
             android:name="org.bottiger.podcast.service.PlayerService"
             android:exported="true"
