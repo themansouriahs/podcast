@@ -139,7 +139,7 @@ public class DialogBulkDownload {
 
         SharedPreferences sharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(mContext);
-        long bytesToKeep = SoundWavesDownloadManager.bytesToKeep(sharedPreferences);
+        long bytesToKeep = SoundWavesDownloadManager.bytesToKeep(sharedPreferences, mContext.getResources());
 
         IEpisode episode;
         Date date;

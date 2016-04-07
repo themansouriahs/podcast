@@ -41,6 +41,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -360,8 +361,13 @@ public class SoundWavesDownloadManager extends Observable {
 			SharedPreferences sharedPreferences = PreferenceManager
 					.getDefaultSharedPreferences(context);
 
-            final long initialBytesToKeep = bytesToKeep(sharedPreferences);
+            final long initialBytesToKeep = bytesToKeep(sharedPreferences, context.getResources());
             long bytesToKeep = initialBytesToKeep;
+
+            // In case we do not have a limit
+            if (bytesToKeep < 0) {
+                return;
+            }
 
 			try {
                 ArrayList<IEpisode> episodes = SoundWaves.getLibraryInstance().getEpisodes();
@@ -673,11 +679,17 @@ public class SoundWavesDownloadManager extends Observable {
         return mEngine;
     }
 
-    public static long bytesToKeep(@NonNull SharedPreferences argSharedPreference) {
+    public static long bytesToKeep(@NonNull SharedPreferences argSharedPreference, @NonNull Resources argResources) {
+        String key = argResources.getString(R.string.pref_podcast_collection_size_key);
         String megabytesToKeepAsString = argSharedPreference.getString(
-                "pref_podcast_collection_size", "1000");
+                key, "1000");
 
         long megabytesToKeep = Long.parseLong(megabytesToKeepAsString);
+
+        if (megabytesToKeep < 0) {
+            return megabytesToKeep;
+        }
+
         long bytesToKeep = megabytesToKeep * 1024 * 1024;
 
         return bytesToKeep;
