@@ -37,6 +37,10 @@ SoundWaves takes privacy very seriously, and I try to do whatever I can do alway
 If you are getting SoundWaves from source or the F-droid it will never share any data with anyone without your explicit consent.
 However, if you are getting SoundWaves from a proprietary app store, like the Play store, it will collect some anonymous information - like crash reports - in order for me to improve the quality.
 
+# Special thanks to.
+
+[Bugsnag](https://bugsnag.com/) for providing free crash analytics for open source applications.
+
 # Permissions
 
 SoundWaves aims at not requesting any permissions it doesn't need. I am not quite there yet - but almost.
