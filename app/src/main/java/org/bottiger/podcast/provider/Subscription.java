@@ -13,6 +13,7 @@ import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.model.datastructures.EpisodeList;
 import org.bottiger.podcast.model.events.SubscriptionChanged;
+import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.utils.BitMaskUtils;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.PlaybackSpeed;
@@ -193,6 +194,14 @@ public class Subscription implements ISubscription, PaletteListener {
 		url = url_link;
 		title = url_link;
 		link = url_link;
+		init();
+	}
+
+	public Subscription(@NonNull  SlimSubscription argSlimSubscription) {
+		this();
+		url = argSlimSubscription.getURLString();
+		title = argSlimSubscription.getTitle();
+		imageURL = argSlimSubscription.getImageURL();
 		init();
 	}
 

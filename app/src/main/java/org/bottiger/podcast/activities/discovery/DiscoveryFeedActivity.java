@@ -9,6 +9,7 @@ import android.widget.Button;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.activities.feedview.FeedActivity;
+import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.PaletteHelper;
 
@@ -42,7 +43,11 @@ public class DiscoveryFeedActivity extends FeedActivity {
                 //URL url = mSubscription.getURL();
                 //Subscription subscription = new Subscription(url.toString());
                 //subscription.subscribe(DiscoveryFeedActivity.this);
-                SoundWaves.getLibraryInstance().subscribe(mSubscription.getURL().toString());
+                if (mSubscription instanceof SlimSubscription) {
+                    SoundWaves.getLibraryInstance().subscribe((SlimSubscription) mSubscription);
+                } else {
+                    SoundWaves.getLibraryInstance().subscribe(mSubscription.getURL().toString());
+                }
 
                 // if (Build.VERSION.SDK_INT >= 19) {
                 //TransitionManager.beginDelayedTransition(mSubscribeContainer);

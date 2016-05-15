@@ -25,12 +25,15 @@ import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.PodcastOpenHelper;
+import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionColumns;
 import org.bottiger.podcast.provider.SubscriptionLoader;
 import org.bottiger.podcast.utils.StrUtils;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -601,25 +604,36 @@ public class Library {
         EventLogger.postEvent(mContext, EventLogger.UNSUBSCRIBE_PODCAST, null, argUrl, null);
     }
 
+    @Deprecated
     public void subscribe(String argUrl) {
         if (!StrUtils.isValidUrl(argUrl))
             return;
 
-        Observable.just(argUrl).map(new Func1<String, Subscription>() {
+        try {
+            SlimSubscription slimSubscription = new SlimSubscription("", new URL(argUrl), "");
+            subscribe(slimSubscription);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void subscribe(@NonNull SlimSubscription argSubscription) {
+
+        Observable.just(argSubscription).map(new Func1<SlimSubscription, Subscription>() {
                     @Override
-                    public Subscription call(String argUrl) {
+                    public Subscription call(SlimSubscription argSubscription) {
 
                         Subscription subscription;
-                        subscription = mSubscriptionUrlLUT.get(argUrl);
+                        subscription = mSubscriptionUrlLUT.get(argSubscription.getURLString());
 
                         if (subscription == null) {
-                            subscription = new Subscription(argUrl);
+                            subscription = new Subscription(argSubscription);
                         }
 
                         subscription.setStatus(Subscription.STATUS_SUBSCRIBED, "Subscribe:from:Library.subscribe");
                         updateSubscription(subscription);
 
-                        mSubscriptionUrlLUT.put(argUrl,subscription);
+                        mSubscriptionUrlLUT.put(argSubscription.getURLString(),subscription);
                         mSubscriptionIdLUT.put(subscription.getId(), subscription);
                         mActiveSubscriptions.add(subscription);
 
@@ -631,7 +645,7 @@ public class Library {
                             return null;
                         }
 
-                        EventLogger.postEvent(mContext, EventLogger.SUBSCRIBE_PODCAST, null, argUrl, null);
+                        EventLogger.postEvent(mContext, EventLogger.SUBSCRIBE_PODCAST, null, argSubscription.getURLString(), null);
 
                         mSubscriptionsChangeObservable.onNext(subscription);
 
