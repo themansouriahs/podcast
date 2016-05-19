@@ -52,13 +52,13 @@ public class TestUtils {
 
     private static void clearEpisodes(@NonNull Context argContext) {
         PodcastOpenHelper helper = PodcastOpenHelper.getInstance(argContext);
-        SQLiteDatabase database = helper.getWritableDatabase();
+        io.requery.android.database.sqlite.SQLiteDatabase database = helper.getWritableDatabase();
         database.execSQL("DELETE FROM " + ItemColumns.TABLE_NAME);
     }
 
     private static void clearSubscriptions(@NonNull Context argContext) {
         PodcastOpenHelper helper = PodcastOpenHelper.getInstance(argContext);
-        SQLiteDatabase database = helper.getWritableDatabase();
+        io.requery.android.database.sqlite.SQLiteDatabase database = helper.getWritableDatabase();
         database.execSQL("DELETE FROM " + SubscriptionColumns.TABLE_NAME);
     }
 

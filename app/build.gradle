@@ -96,7 +96,7 @@ android {
         //preDexLibraries = false
         incremental true
         maxProcessCount 4
-        javaMaxHeapSize "4g"
+        javaMaxHeapSize "2g"
     }
 
     compileOptions {
