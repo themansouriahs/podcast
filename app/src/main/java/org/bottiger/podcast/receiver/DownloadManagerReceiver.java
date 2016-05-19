@@ -5,8 +5,8 @@ import java.io.File;
 import java.io.IOException;
 
 import org.bottiger.podcast.provider.FeedItem;
-import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.utils.SDCardManager;
+import org.bottiger.podcast.utils.StorageUtils;
 
 import android.app.DownloadManager;
 import android.app.DownloadManager.Query;
@@ -74,7 +74,7 @@ public class DownloadManagerReceiver extends BroadcastReceiver {
 				*/
 			}
 
-			SoundWavesDownloadManager.removeExpiredDownloadedPodcasts(context);
+			StorageUtils.removeExpiredDownloadedPodcasts(context);
 		}
 	}
 	

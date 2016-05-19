@@ -81,7 +81,7 @@ public class PodcastUpdateJobService extends JobService {
                         long hoursOld = TimeUnit.MILLISECONDS.toHours(now - createdAt);
 
                         if (hoursOld <= HOURS && !episode.hasBeenDownloadedOnce() && episode.isNew()) {
-                            downloadManager.addItemToQueue(episode, SoundWavesDownloadManager.ANYWHERE);
+                            downloadManager.addItemToQueue(episode, false, SoundWavesDownloadManager.ANYWHERE);
                         }
                     } else {
                         Log.w(TAG, "EpisodeDate not set");

@@ -7,7 +7,7 @@ import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
-import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.utils.StorageUtils;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -49,7 +49,7 @@ public class PodcastUpdateReceiver extends BroadcastReceiver {
                 IAnalytics analytics = AnalyticsFactory.getAnalytics(context);
                 analytics.trackEvent(IAnalytics.EVENT_TYPE.REFRESH_DURATION, timeDiff);
                 
-                SoundWavesDownloadManager.removeExpiredDownloadedPodcasts(context);
+                StorageUtils.removeExpiredDownloadedPodcasts(context);
                 //downloadManager.startDownload();
 
                 wl.release();

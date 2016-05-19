@@ -18,6 +18,7 @@ import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
 import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.utils.StorageUtils;
 import org.bottiger.podcast.utils.okhttp.UserAgentInterceptor;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -69,7 +70,7 @@ public class SubscriptionRefreshManager {
     public void refresh(@Nullable ISubscription argSubscription, @Nullable IDownloadCompleteCallback argCallback) {
         Log.d(TAG, "refresh subscription: " + argSubscription + " (null => all)");
 
-        if (!SoundWavesDownloadManager.canPerform(SoundWavesDownloadManager.ACTION_REFRESH_SUBSCRIPTION, mContext, argSubscription)) {
+        if (!StorageUtils.canPerform(SoundWavesDownloadManager.ACTION_REFRESH_SUBSCRIPTION, mContext, argSubscription)) {
             Log.d(TAG, "refresh aborted, not allowed"); // NoI18N
             return;
         }
@@ -152,7 +153,7 @@ public class SubscriptionRefreshManager {
     }
 
     private void downloadNewEpisodeskCallback(final @NonNull Context argContext, @NonNull ISubscription argSubscription) {
-        if (SoundWavesDownloadManager.canPerform(SoundWavesDownloadManager.ACTION_DOWNLOAD_AUTOMATICALLY,
+        if (StorageUtils.canPerform(SoundWavesDownloadManager.ACTION_DOWNLOAD_AUTOMATICALLY,
                 argContext,
                 argSubscription)) {
 
@@ -175,7 +176,7 @@ public class SubscriptionRefreshManager {
                     if (episode instanceof FeedItem) {
                         Date lastUpdate = new Date(((FeedItem) episode).getLastUpdate());
                         if (lastUpdate.after(tenMinutesAgo) && newEpisodeCount > 0) {
-                            SoundWaves.getDownloadManager().addItemToQueue(episode, SoundWavesDownloadManager.LAST);
+                            SoundWaves.getDownloadManager().addItemToQueue(episode, false, SoundWavesDownloadManager.LAST);
                             newEpisodeCount--;
                         }
                     }

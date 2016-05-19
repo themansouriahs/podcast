@@ -1,5 +1,7 @@
 package org.bottiger.podcast.provider;
 
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 import java.util.Comparator;
 
@@ -17,10 +19,15 @@ public class QueueEpisode implements Comparable {
 	private IEpisode mEpisode;
 	private boolean mStartedManually = false;
 
-	public QueueEpisode(FeedItem episode) {
+	public QueueEpisode(IEpisode episode) {
 		mEpisode = episode;
 		title = episode.getTitle();
-		episodeID = episode.getId();
+
+		if (episode instanceof FeedItem) {
+			episodeID = ((FeedItem)episode).getId();
+		} else {
+			episodeID = -1;
+		}
 		
 		int priority = episode.getPriority();
 		if (priority > 0)
@@ -29,6 +36,7 @@ public class QueueEpisode implements Comparable {
 			queuePriority = (int) episodeID; 
 	}
 
+	@NonNull
 	public IEpisode getEpisode() {
 		return mEpisode;
 	}

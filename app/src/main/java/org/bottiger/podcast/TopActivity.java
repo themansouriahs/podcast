@@ -24,6 +24,7 @@ import android.view.WindowManager;
 
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.playlist.Playlist;
+import org.bottiger.podcast.service.DownloadService;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.PlayerHelper;
@@ -273,7 +274,7 @@ public class TopActivity extends AppCompatActivity {
         if (ps == null)
             return;
 
-        item.setVisible(SoundWaves.getDownloadManager().getDownloadingItem() != null);
+        item.setVisible(DownloadService.isRunning());
     }
 
     public void showDownloadManager(SoundWavesDownloadManager.DownloadManagerChanged event)

@@ -18,6 +18,7 @@ import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.QueueEpisode;
 import org.bottiger.podcast.provider.SlimImplementations.SlimEpisode;
+import org.bottiger.podcast.service.DownloadService;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.Downloader.engines.IDownloadEngine;
 import org.bottiger.podcast.service.PlayerService;
@@ -115,7 +116,7 @@ public class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemVie
     }
 
     public void removed(int argPosition) {
-        mDownloadManager.removeFromQueue(argPosition);
+        DownloadService.removeFromQueue(argPosition);
         setEmptyTextViewVisibility();
         super.notifyItemRemoved(argPosition);
     }
@@ -135,7 +136,7 @@ public class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemVie
     }
 
     boolean onItemMove(int fromPosition, int toPosition) {
-        mDownloadManager.move(fromPosition, toPosition);
+        DownloadService.move(fromPosition, toPosition);
 
         // BUG: can couse "Inconsistency detected. Invalid item position 4(offset:4).state:5"
         notifyItemMoved(fromPosition, toPosition);

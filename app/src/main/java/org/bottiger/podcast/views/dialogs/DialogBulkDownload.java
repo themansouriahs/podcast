@@ -155,7 +155,7 @@ public class DialogBulkDownload {
                 boolean validDate = validDate(mAction, date);
 
                 if (validDate) {
-                    downloadManager.addItemToQueue(episode, SoundWavesDownloadManager.LAST);
+                    downloadManager.addItemToQueue(episode, true, SoundWavesDownloadManager.LAST);
                 }
             }
         }

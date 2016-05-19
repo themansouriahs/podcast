@@ -9,7 +9,6 @@ import android.util.Xml;
 
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.model.events.SubscriptionChanged;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
@@ -18,6 +17,7 @@ import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.utils.DateUtils;
+import org.bottiger.podcast.utils.StorageUtils;
 import org.bottiger.podcast.utils.StrUtils;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -30,6 +30,8 @@ import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import static org.bottiger.podcast.utils.StorageUtils.VIDEO;
 
 /**
  * Created by aplb on 19-09-2015.
@@ -363,7 +365,7 @@ public class FeedParser {
                     if (enclosure.filesize > 0)
                         episode.setFilesize(enclosure.filesize);
 
-                    episode.setIsVideo(SoundWavesDownloadManager.getFileType(enclosure.mimeType) == SoundWavesDownloadManager.VIDEO);
+                    episode.setIsVideo(StorageUtils.getFileType(enclosure.mimeType) == VIDEO);
                     break;
                 }
                 case EPISODE_CATEGORY_TAG:

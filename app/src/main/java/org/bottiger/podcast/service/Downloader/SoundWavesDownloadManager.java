@@ -6,20 +6,17 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Observable;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Handler;
 
 import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.TopActivity;
-import org.bottiger.podcast.flavors.Analytics.AnalyticsFactory;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.DownloadProgressPublisher;
 import org.bottiger.podcast.provider.FeedItem;
@@ -27,16 +24,17 @@ import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.QueueEpisode;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.service.DownloadService;
 import org.bottiger.podcast.service.DownloadStatus;
 import org.bottiger.podcast.service.Downloader.engines.IDownloadEngine;
 import org.bottiger.podcast.service.Downloader.engines.OkHttpDownloader;
 import org.bottiger.podcast.utils.FileUtils;
+import org.bottiger.podcast.utils.NetworkUtils;
 import org.bottiger.podcast.utils.PreferenceHelper;
 import org.bottiger.podcast.utils.SDCardManager;
-import org.bottiger.podcast.utils.StrUtils;
+import org.bottiger.podcast.utils.StorageUtils;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -45,7 +43,6 @@ import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Looper;
 import android.preference.PreferenceManager;
@@ -54,29 +51,21 @@ import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
-import android.text.TextUtils;
 import android.util.Log;
-import android.view.View;
-import android.webkit.MimeTypeMap;
 
 import rx.Observer;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action0;
-import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 import rx.subjects.SerializedSubject;
 import rx.subjects.Subject;
 
+import static org.bottiger.podcast.utils.StorageUtils.VIDEO;
+
 public class SoundWavesDownloadManager extends Observable {
 
     private static final String TAG = "SWDownloadManager";
-
-    private static final String MIME_AUDIO = "audio";
-    private static final String MIME_VIDEO = "video";
-    private static final String MIME_OTHER = "other";
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({OK, NO_STORAGE, OUT_OF_STORAGE, NO_CONNECTION, NEED_PERMISSION})
@@ -96,13 +85,6 @@ public class SoundWavesDownloadManager extends Observable {
     public static final int STARTED_MANUALLY = 4;
 
     @Retention(RetentionPolicy.SOURCE)
-    @IntDef({AUDIO, VIDEO, OTHER})
-    public @interface MimeType {}
-    public static final int AUDIO = 1;
-    public static final int VIDEO = 2;
-    public static final int OTHER = 3;
-
-    @Retention(RetentionPolicy.SOURCE)
     @IntDef({NETWORK_OK, NETWORK_RESTRICTED, NETWORK_DISCONNECTED})
     public @interface NetworkState {}
     public static final int NETWORK_OK = 1;
@@ -119,13 +101,6 @@ public class SoundWavesDownloadManager extends Observable {
 
 	private Context mContext = null;
 
-    private final ReentrantLock mQueueLock = new ReentrantLock();
-    private LinkedList<QueueEpisode> mDownloadQueue = new LinkedList<>();
-
-    private rx.Subscription _subscription;
-    private Subject<QueueEpisode, QueueEpisode> _subject;
-
-	private IEpisode mDownloadingItem = null;
     private IDownloadEngine mEngine = null;
 
     private DownloadProgressPublisher mProgressPublisher;
@@ -135,41 +110,6 @@ public class SoundWavesDownloadManager extends Observable {
         mContext = argContext;
         mDownloadCompleteCallback = new DownloadCompleteCallback(argContext);
         mProgressPublisher = new DownloadProgressPublisher((SoundWaves) SoundWaves.getAppContext(), this);
-
-        PublishSubject<QueueEpisode> publishSubject = PublishSubject.create();
-        _subject = new SerializedSubject<>(publishSubject);
-
-        _subscription = _subject
-                .onBackpressureBuffer(10000, new Action0() {
-                    @Override
-                    public void call() {
-                        VendorCrashReporter.report(TAG, "onBackpressureBuffer called");
-                        return;
-                    }
-                })
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(Schedulers.io())
-                        .subscribe(_getObserver());                             // Observer
-    }
-
-    public static @SoundWavesDownloadManager.MimeType int getFileType(@Nullable String argMimeType) {
-        if (TextUtils.isEmpty(argMimeType))
-            return OTHER;
-
-        String lowerCase = argMimeType.toLowerCase();
-
-        if (lowerCase.contains(MIME_AUDIO))
-            return AUDIO;
-
-        if (lowerCase.contains(MIME_VIDEO))
-            return VIDEO;
-
-        return OTHER;
-    }
-
-    public static String getMimeType(String fileUrl) {
-        String extension = MimeTypeMap.getFileExtensionFromUrl(fileUrl);
-        return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
     }
 
     /**
@@ -189,11 +129,11 @@ public class SoundWavesDownloadManager extends Observable {
         FeedItem item = (FeedItem)argEpisode;
 
         QueueEpisode qe = new QueueEpisode(item);
-		if (mDownloadQueue.contains(qe)) {
+		if (DownloadService.getQueue().contains(qe)) {
             return DownloadStatus.PENDING;
         }
 
-		IEpisode downloadingItem = getDownloadingItem();
+		IEpisode downloadingItem = DownloadService.getDownloadingItem();
 		if (downloadingItem != null) {
             if (item.equals(downloadingItem)) {
                 return DownloadStatus.DOWNLOADING;
@@ -236,61 +176,21 @@ public class SoundWavesDownloadManager extends Observable {
         return OK;
     }
 
-    private boolean canDownload(QueueEpisode nextInQueue) {
-        // Make sure we have access to external storage
-        if (!SDCardManager.getSDCardStatusAndCreate()) {
-            return false;
-        }
-
-        @NetworkState int networkState = updateConnectStatus(mContext);
-
-        FeedItem downloadingItem;
-        try {
-            mQueueLock.lock();
-
-            downloadingItem = SoundWaves.getLibraryInstance().getEpisode(nextInQueue.getId());
-
-            if (downloadingItem == null)
-                return false;
-
-            if (!StrUtils.isValidUrl(downloadingItem.getURL()))
-                return false;
-
-            if (!nextInQueue.IsStartedManually() && networkState != NETWORK_OK) {
-                return false;
-            }
-
-            if (nextInQueue.IsStartedManually() && !(networkState == NETWORK_OK || networkState == NETWORK_RESTRICTED)) {
-                return false;
-            }
-        } finally {
-            mQueueLock.unlock();
-        }
-
-        return true;
-    }
-
-	/**
+    /**
 	 * Download all the episodes in the queue
      *
      * @Return True if the download was started
 	 */
     @WorkerThread
+    @Deprecated
 	private boolean startDownload(QueueEpisode nextInQueue) {
-
-        FeedItem downloadingItem = downloadingItem = SoundWaves.getLibraryInstance().getEpisode(nextInQueue.getId());;
-        mEngine = newEngine(downloadingItem);
-        mEngine.addCallback(mDownloadCompleteCallback);
-
-        mDownloadingItem = downloadingItem;
-
-        Log.d(TAG, "Start downloading: " + downloadingItem);
-        mEngine.startDownload();
-
-        mProgressPublisher.addEpisode(downloadingItem);
-
+        DownloadService.download(nextInQueue.getEpisode(), nextInQueue.IsStartedManually(), mContext);
         return true;
 	}
+
+    public IDownloadEngine.Callback getIDownloadEngineCallback() {
+        return mDownloadCompleteCallback;
+    }
 
     @Deprecated
     public void removeDownloadingEpisode(IEpisode argEpisode) {
@@ -533,113 +433,26 @@ public class SoundWavesDownloadManager extends Observable {
 	}
 
 	/**
-	 * Return the FeedItem currently being downloaded
-	 * 
-	 * @return The downloading FeedItem
-	 */
-    @Nullable
-	public IEpisode getDownloadingItem() {
-		if (mDownloadingItem == null) {
-            return null;
-        }
-
-        return mDownloadingItem;
-	}
-
-    public void clearQueue() {
-        try {
-            mQueueLock.lock();
-
-            // skip the first one which is currently downloading
-            for (int i = 1; i<mDownloadQueue.size(); i++) {
-                mDownloadQueue.remove(i);
-            }
-        } finally {
-            mQueueLock.unlock();
-        }
-        postQueueChangedEvent();
-    }
-
-    public void notifyDownloadComplete() {
-		mDownloadingItem = null;
-        postQueueChangedEvent();
-	}
-
-	/**
 	 * Add feeditem to the download queue
 	 */
-	public void addItemToQueue(IEpisode argEpisode, @QueuePosition int argPosition) {
+	public void addItemToQueue(IEpisode argEpisode, boolean startedManually, @QueuePosition int argPosition) {
         Log.d(TAG, "Adding item to queue: " + argEpisode);
 
         if (!(argEpisode instanceof FeedItem)) {
             return;
         }
 
-        try {
-            mQueueLock.lock();
-
-            QueueEpisode queueItem = new QueueEpisode((FeedItem)argEpisode);
-            queueItem.setStartedManually(argPosition == STARTED_MANUALLY);
-
-            mDownloadQueue.add(queueItem);
-            _subject.onNext(queueItem);
-
-        } finally {
-            postQueueChangedEvent();
-            mQueueLock.unlock();
-        }
+        DownloadService.download(argEpisode, startedManually, mContext);
 	}
 
-    /**
-     * Remove item from queue by index
-     */
-    public void removeFromQueue(int argIndex) {
-
-        try {
-            mQueueLock.lock();
-
-            if (mDownloadQueue.size() > argIndex)
-                mDownloadQueue.remove(argIndex);
-        } finally {
-            postQueueChangedEvent();
-            mQueueLock.unlock();
-        }
-    }
-
-    /**
-     * Add feeditem to the download queue
-     */
-    public void removeFromQueue(IEpisode argEpisode) {
-
-        try {
-            mQueueLock.lock();
-
-            IEpisode episode;
-            QueueEpisode qEpisode;
-            for (int i = 0; i < mDownloadQueue.size(); i++) {
-                qEpisode = mDownloadQueue.get(i);
-                if (qEpisode != null) {
-                    episode = qEpisode.getEpisode();
-                    if (episode.equals(argEpisode)) {
-                        mDownloadQueue.remove(i);
-                        return;
-                    }
-                }
-            }
-        } finally {
-            postQueueChangedEvent();
-            mQueueLock.unlock();
-        }
-    }
-
     public int getQueueSize() {
-        return mDownloadQueue.size();
+        return DownloadService.getQueue().size();
     }
 
     @Nullable
     public QueueEpisode getQueueItem(int position) {
         try {
-            return mDownloadQueue.get(position);
+            return DownloadService.getQueue().get(position);
         } catch (IndexOutOfBoundsException ioobe) {
             return null;
         }
@@ -649,29 +462,11 @@ public class SoundWavesDownloadManager extends Observable {
         mEngine.abort();
     }
 
-    // True if succesfull
-    public boolean move(int from, int to) {
-        if (from < 0 || to >= mDownloadQueue.size()) {
-            return false;
-        }
-
-        try {
-            mQueueLock.lock();
-
-            QueueEpisode episode = mDownloadQueue.get(from);
-            mDownloadQueue.remove(from);
-            mDownloadQueue.add(to, episode);
-            return true;
-        } finally {
-            mQueueLock.unlock();
-        }
-    }
-
 	/**
 	 * Add feeditem to the download queue and start downloading at once
 	 */
 	public void addItemAndStartDownload(@NonNull IEpisode item, @QueuePosition int argPosition) {
-        addItemToQueue(item, argPosition);
+        addItemToQueue(item, true, argPosition);
 	}
 
     @Nullable
@@ -695,7 +490,7 @@ public class SoundWavesDownloadManager extends Observable {
         return bytesToKeep;
     }
 
-    private class DownloadCompleteCallback implements IDownloadEngine.Callback {
+    public class DownloadCompleteCallback implements IDownloadEngine.Callback {
 
         @NonNull private Context mContext;
 
@@ -710,12 +505,12 @@ public class SoundWavesDownloadManager extends Observable {
 
             String mimetype = null;
             try {
-                mimetype = getMimeType(item.getAbsolutePath());
+                mimetype = StorageUtils.getMimeType(item.getAbsolutePath());
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            item.setIsVideo(getFileType(mimetype) == VIDEO);
+            item.setIsVideo(StorageUtils.getFileType(mimetype) == VIDEO);
 
             SoundWaves.getLibraryInstance().updateEpisode(item);
 
@@ -732,10 +527,14 @@ public class SoundWavesDownloadManager extends Observable {
 
             //Playlist.refresh(mContext);
 
-            removeTopQueueItem();
+            //removeTopQueueItem();
+            DownloadService.removeFirst();
+
+
+
             removeDownloadingEpisode(argEpisode);
-            removeExpiredDownloadedPodcasts(mContext);
-            removeTmpFolderCruft();
+            StorageUtils.removeExpiredDownloadedPodcasts(mContext);
+            StorageUtils.removeTmpFolderCruft();
 
             // clear the reference
             item = null;
@@ -746,18 +545,24 @@ public class SoundWavesDownloadManager extends Observable {
         public void downloadInterrupted(IEpisode argEpisode) {
             removeTopQueueItem();
             removeDownloadingEpisode(argEpisode);
-            removeTmpFolderCruft();
+            StorageUtils.removeTmpFolderCruft();
             notifyDownloadComplete();
         }
     }
 
-    private void removeTopQueueItem() {
-        mDownloadQueue.removeFirst();
+    public void notifyDownloadComplete() {
+        postQueueChangedEvent();
     }
 
-    public DownloadManagerChanged produceDownloadManagerState() {
+    @Deprecated
+    private void removeTopQueueItem() {
+        DownloadService.removeFirst();
+    }
+
+    public static DownloadManagerChanged produceDownloadManagerState() {
         final DownloadManagerChanged event = new DownloadManagerChanged();
-        event.queueSize = mDownloadQueue.size();
+        //event.queueSize = mDownloadQueue.size();
+        event.queueSize = DownloadService.getSize();
 
         return event;
     }
@@ -781,68 +586,7 @@ public class SoundWavesDownloadManager extends Observable {
         return startDownload(argQueueItem);
     }
 
-    /**
-     * Observer that handles the result through the 3 important actions:
-     *
-     * 1. onCompleted
-     * 2. onError
-     * 3. onNext
-     */
-    private Observer<QueueEpisode> _getObserver() {
-        return new Observer<QueueEpisode>() {
-
-            @Override
-            public void onCompleted() {
-                Log.d(TAG, "On complete");
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                Log.d(TAG, "Boo! Error " + e.getMessage());
-                VendorCrashReporter.report(TAG, e.getMessage());
-            }
-
-            @Override
-            public void onNext(QueueEpisode queueEpisode) {
-                Log.d(TAG, "onNext with return value " + queueEpisode);
-
-                boolean downloadStarted = false;
-                QueueEpisode episode = null;
-                try {
-                    mQueueLock.lock();
-
-                    for (int i = 0; i < mDownloadQueue.size() && !downloadStarted; i++) {
-                        episode = mDownloadQueue.getFirst();
-
-                        if (episode != null) {
-                            if (canDownload(queueEpisode)) {
-                                downloadStarted = true;
-                                break;
-                            } else {
-                                // in case the download couldn't start
-                                mDownloadQueue.remove(episode);
-
-                                // This need to be more general and work for SlimEpisodes
-                                if (episode.getEpisode() instanceof FeedItem) {
-                                    ((FeedItem)episode.getEpisode()).downloadAborted();
-                                }
-                            }
-                        }
-                    }
-                } finally {
-                    mQueueLock.unlock();
-                }
-
-                if (downloadStarted)  {
-                    startDownload(queueEpisode);
-                } else {
-                    notifyDownloadComplete();
-                }
-            }
-        };
-    }
-
-    private void postQueueChangedEvent() {
+    public static void postQueueChangedEvent() {
         final DownloadManagerChanged event = produceDownloadManagerState();
 
         Log.d(TAG, "posting DownloadManagerChanged event");

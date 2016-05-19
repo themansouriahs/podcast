@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.service.DownloadService;
 import org.bottiger.podcast.utils.TransitionUtils;
 import org.bottiger.podcast.views.NpaLinearLayoutManager;
 import org.bottiger.podcast.views.dialogs.DialogAddPodcast;
@@ -100,7 +101,7 @@ public class DownloadManagerActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.clear_download_queue: {
-                SoundWaves.getDownloadManager().clearQueue();
+                DownloadService.clearQueue();
                 return true;
             }
         }

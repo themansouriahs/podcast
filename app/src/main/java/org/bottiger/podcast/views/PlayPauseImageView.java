@@ -12,7 +12,6 @@ import android.graphics.Outline;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
@@ -43,9 +42,9 @@ import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.listeners.PlayerStatusProgressData;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
-import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorExtractor;
+import org.bottiger.podcast.utils.StorageUtils;
 import org.bottiger.podcast.views.dialogs.DialogOpenVideoExternally;
 import org.bottiger.podcast.views.drawables.PlayPauseDrawable;
 
@@ -483,7 +482,7 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
 
         String mimetype;
         if (argEpisode.isDownloaded()) {
-            mimetype = SoundWavesDownloadManager.getMimeType(argEpisode.getFileLocation(IEpisode.REQUIRE_LOCAL).toString());
+            mimetype = StorageUtils.getMimeType(argEpisode.getFileLocation(IEpisode.REQUIRE_LOCAL).toString());
         } else {
             String extension = MimeTypeMap.getFileExtensionFromUrl(argEpisode.getFileLocation(IEpisode.REQUIRE_REMOTE).toString());
             mimetype = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
