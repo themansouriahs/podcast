@@ -18,10 +18,11 @@
         android:id="@+id/my_awesome_toolbar"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:background="@color/colorPrimary"
+        android:background="?attr/colorPrimary"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
         <!--
+android:background="@color/colorPrimary"
 
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"

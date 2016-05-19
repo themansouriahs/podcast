@@ -7,15 +7,15 @@
 <RelativeLayout
     android:id="@+id/discovery_container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="?attr/themeBackground">
+    android:layout_height="match_parent">
+    <!-- android:background="?attr/themeBackground" -->
 
 
     <RelativeLayout
         android:id="@+id/discovery_search_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary">
+        android:background="?attr/colorPrimary">
 
 
             <android.support.v7.widget.SearchView

@@ -317,32 +317,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
                 mPlaylist.removeItem(itemPosition, true);
 
-                /*
-                Snackbar snack = Snackbar.make(view, R.string.playlist_episode_dismissed, Snackbar.LENGTH_LONG)
-                        .setAction(R.string.playlist_episode_dismissed_undo, new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                episode.setPriority(currentPriority);
-                                mPlaylist.setItem(itemPosition, episode);
-                                mAdapter.notifyDataSetChanged();
-
-                                if (episode instanceof FeedItem) {
-                                    FeedItem item = (FeedItem) episode;
-                                    item.markAsListened(0);
-                                }
-
-                                SoundWaves.getLibraryInstance().updateEpisode(episode);
-                            }
-                        })
-                        .setActionTextColor(ContextCompat.getColor(getContext(), R.color.white_opaque));
-
-                View view = snack.getView();
-                CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)view.getLayoutParams();
-                params.bottomMargin = DrawerActivity.getStatusBarHeight(getResources())*2;
-                view.setLayoutParams(params);
-
-                snack.show();
-                */
                 UIUtils.disPlayBottomSnackBar(view, R.string.playlist_episode_dismissed, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -502,7 +476,8 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
             return;
         }
 
-        final int color = ContextCompat.getColor(context, R.color.pitch_black);
+        //final int color = ContextCompat.getColor(context, R.color.pitch_black);
+        final int color = UIUtils.attrColor(R.attr.themeTextColorPrimary, mContext);
         mEpisodeTitle.setTextColor(color);
         mEpisodeInfo.setTextColor(color);
 
@@ -569,8 +544,8 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                     ColorExtractor extractor = new ColorExtractor(getActivity(), argChangedPalette);
 
                     mPlayPauseButton.onPaletteFound(argChangedPalette);
-                    mEpisodeTitle.setTextColor(color);
-                    mEpisodeInfo.setTextColor(color);
+                    //mEpisodeTitle.setTextColor(color);
+                    //mEpisodeInfo.setTextColor(color);
 
                     int transparentgradientColor;
                     int gradientColor = extractor.getPrimary();
@@ -581,7 +556,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                     int blue = Color.blue(gradientColor);
                     transparentgradientColor = Color.argb(alpha, red, green, blue);
 
-                    //Drawable  normalDrawable = getResources().getDrawable(R.drawable.top_player_bottom_gradient_tinted);
                     GradientDrawable gd = new GradientDrawable(
                             GradientDrawable.Orientation.TOP_BOTTOM,
                             new int[]{transparentgradientColor, gradientColor});
@@ -694,14 +668,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                  dialogPlaylistFilters.show(getFragmentManager(), getTag());
                  return true;
              }
-             /*
-             case R.id.action_fullscreen_player: {
-                 boolean isFullscreen = mTopPlayer.isFullscreen();
-                 mTopPlayer.setFullscreen(!isFullscreen, true);
-                 setOptionMenuState(item);
-                 return true;
-             }
-             */
          }
          return super.onOptionsItemSelected(item);
      }
@@ -709,23 +675,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
     private void setOptionMenuState(MenuItem item) {
         if (item == null)
             return;
-
-        /*
-        switch (item.getItemId()) {
-            case R.id.action_fullscreen_player: {
-                if (mTopPlayer != null) {
-                    if (mTopPlayer.isFullscreen()) {
-                        item.setTitle(R.string.action_exit_fullscreen);
-                        item.setIcon(R.drawable.ic_fullscreen_exit_white_24px);
-                    } else {
-                        item.setTitle(R.string.action_enter_fullscreen);
-                        item.setIcon(R.drawable.ic_fullscreen_white_24px);
-                    }
-                }
-                break;
-            }
-        }
-        */
     }
 
 	@Override

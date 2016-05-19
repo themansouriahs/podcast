@@ -1,12 +1,16 @@
 package org.bottiger.podcast.utils;
 
 import android.content.Context;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Build;
 import android.support.annotation.AttrRes;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.graphics.Palette;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -14,6 +18,7 @@ import android.widget.ImageView;
 
 import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
 
 /**
  * Created by aplb on 30-09-2015.
@@ -42,6 +47,29 @@ public class ColorUtils {
         } else {
             tintButton(argButton, argColorExtractor.getPrimary());
         }
+    }
+
+    public static @ColorInt int adjustToTheme(@NonNull Resources argResources, @Nullable Palette argPalette, @ColorInt int color) {
+        int currentNightMode = argResources.getConfiguration().uiMode
+                & Configuration.UI_MODE_NIGHT_MASK;
+
+        if (argPalette == null)
+            return color;
+
+        if (UIUtils.isInNightMode()) {
+            return darken(argPalette.getDarkVibrantColor(color), 0.5f);
+        } else {
+            return argPalette.getLightVibrantColor(color);
+        }
+    }
+
+    public static @ColorInt int darken(@ColorInt int argColor, float scale) {
+        float[] hsv = new float[3];
+        Color.colorToHSV(argColor, hsv);
+        hsv[2] *= scale; // value component
+        argColor = Color.HSVToColor(hsv);
+
+        return argColor;
     }
 
     public static void tintButton(@NonNull Button argButton, @NonNull @ColorInt int argColor) {

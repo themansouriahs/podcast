@@ -18,6 +18,7 @@ import android.os.RemoteException;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.ActionBar;
@@ -556,12 +557,18 @@ public class FeedActivity extends TopActivity implements PaletteListener {
     @Override
     public void onPaletteFound(Palette argChangedPalette) {
         ColorExtractor extractor = new ColorExtractor(this, argChangedPalette);
-        mMultiShrinkScroller.setHeaderTintColor(extractor.getPrimary());
+
+        // ContextCompat.getColor(this, R.color.pitch_black)
+        //int tintColor = UIUtils.isInNightMode() ? extractor.getSecondary() : extractor.getPrimary();
+        int tintColor = ColorUtils.adjustToTheme(getResources(), argChangedPalette, extractor.getPrimary());
+
+        // extractor.getPrimary()
+        mMultiShrinkScroller.setHeaderTintColor(tintColor);
         mFloatingButton.onPaletteFound(argChangedPalette);
-        @ColorInt int feedColor = extractor.getPrimary();
+        @ColorInt int feedColor = tintColor;
         mRevealLayout.setBackgroundColor(feedColor);
         UIUtils.tintStatusBar(feedColor, this);
-        mStatusBarColor = extractor.getPrimary();
+        mStatusBarColor = tintColor;
         mAdapter.setPalette(argChangedPalette);
     }
 

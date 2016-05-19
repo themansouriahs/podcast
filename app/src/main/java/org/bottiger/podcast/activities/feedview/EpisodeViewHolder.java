@@ -161,8 +161,8 @@ public class EpisodeViewHolder extends RecyclerView.ViewHolder {
 
     private void setTextColor(boolean argFaded) {
         int textColor = argFaded ? mFadedColor : mPrimaryColor;
-        mTitle.setTextColor(textColor);
-        mDescription.setTextColor(textColor);
+        //mTitle.setTextColor(textColor);
+        //mDescription.setTextColor(textColor);
     }
 
     private void setButtonsVisibility(boolean argDownloadVisible, boolean argQueueVisible) {

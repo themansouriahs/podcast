@@ -17,29 +17,24 @@ package org.bottiger.podcast.utils;
  */
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.*;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
-import android.support.annotation.ColorRes;
+import android.support.annotation.AttrRes;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatDelegate;
 import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -51,13 +46,12 @@ import android.transition.AutoTransition;
 import android.transition.Transition;
 import android.transition.TransitionSet;
 import android.util.DisplayMetrics;
-import android.view.ContextThemeWrapper;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -65,14 +59,9 @@ import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.DrawerActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.provider.FeedItem;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Formatter;
-import java.util.TimeZone;
 import java.util.regex.Pattern;
 /**
  * An assortment of UI helpers.
@@ -428,7 +417,7 @@ public class UIUtils {
     }
 
     public static void resetStatusBar(@NonNull Activity argActivity) {
-        int color = ContextCompat.getColor(argActivity, R.color.colorPrimaryDark);
+        int color = attrColor(R.attr.colorPrimaryDark, argActivity); //ContextCompat.getColor(argActivity, R.attr.colorPrimaryDark);
         int r = Color.red(color);
         int g = Color.green(color);
         int b = Color.blue(color);
@@ -436,6 +425,46 @@ public class UIUtils {
         tintStatusBar(opaqueColor, argActivity);
     }
 
+    public static @ColorInt  int attrColor(@AttrRes int argRes, @NonNull Context argContext) {
+        TypedValue typedValue = new TypedValue();
+
+        // R.attr.colorAccent
+        TypedArray a = argContext.obtainStyledAttributes(typedValue.data, new int[] { argRes });
+        int color = a.getColor(0, 0);
+
+        a.recycle();
+
+        return color;
+    }
+
+    public static boolean isInNightMode() {
+
+        if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES)
+            return true;
+
+        if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_NO)
+            return false;
+
+        int currentNightMode = SoundWaves.getAppContext().getResources().getConfiguration().uiMode
+                & Configuration.UI_MODE_NIGHT_MASK;
+
+        switch (currentNightMode) {
+            case Configuration.UI_MODE_NIGHT_UNDEFINED:
+                // We don't know what mode we're in, assume notnight
+                return false;
+            case Configuration.UI_MODE_NIGHT_NO:
+                // Night mode is not active, we're in day time
+                return false;
+            case Configuration.UI_MODE_NIGHT_YES: {
+                // Night mode is active, we're at night!
+                //color = (int) (color * 0.2);
+                //color = darken(color, 1f);
+                return true;
+            }
+        }
+
+        return false;
+    }
 
 }
 

@@ -27,7 +27,7 @@ import org.bottiger.podcast.utils.ThemeHelper;
  */
 public class SoundWavesPreferenceFragment extends PreferenceFragment {
 
-    private static final String TAG = "SoundWavesPreferenceFragment";
+    private static final String TAG = "SWPreferenceFrag";
 
     public static final String CURRENT_VERSION = "pref_current_version";
 
@@ -115,7 +115,7 @@ public class SoundWavesPreferenceFragment extends PreferenceFragment {
         int color = a.getDimensionPixelSize(indexOfAttrTextSize, -1);
         a.recycle();*/
 
-        view.setBackgroundColor(Color.WHITE);
+        //view.setBackgroundColor(Color.WHITE);
 
         return view;
     }

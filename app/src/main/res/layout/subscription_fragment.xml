@@ -12,9 +12,11 @@
         android:id="@+id/gridview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="?attr/themeBackground"
         android:numColumns="2"
         android:stretchMode="columnWidth" />
+    <!--
+    android:background="?attr/themeBackground"
+    -->
 
     <RelativeLayout
         android:id="@+id/subscription_empty"

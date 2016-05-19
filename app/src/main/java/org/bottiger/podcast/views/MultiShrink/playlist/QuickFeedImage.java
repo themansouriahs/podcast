@@ -80,20 +80,6 @@ public class QuickFeedImage extends ImageView {
             bitmapDrawable = (BitmapDrawable) getResources().getDrawable(
                     R.drawable.generic_podcast);
         }
-        /*
-        if (drawable == null || drawable instanceof BitmapDrawable) {
-            bitmapDrawable = (BitmapDrawable) drawable;
-        } else if (drawable instanceof Drawable) {
-            if (!mIsBusiness) {
-                bitmapDrawable = (BitmapDrawable) getResources().getDrawable(
-                        R.drawable.generic_podcast);
-            } else {
-                bitmapDrawable = (BitmapDrawable) getResources().getDrawable(
-                        R.drawable.generic_podcast);
-            }
-        } else {
-            throw new IllegalArgumentException("Does not support this type of drawable");
-        }*/
 
         mOriginalDrawable = drawable;
         mBitmapDrawable = bitmapDrawable;

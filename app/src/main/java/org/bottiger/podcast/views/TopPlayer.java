@@ -596,9 +596,12 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         int textColor = ColorUtils.getTextColor(getContext());
         int color = ColorUtils.getBackgroundColor(getContext());
         mBackgroundColor = StaticButtonColor(mContext, argChangedPalette, color);
-        int bgcolor = ContextCompat.getColor(getContext(), R.color.playlist_background);
+        @ColorInt int bgcolor = ContextCompat.getColor(getContext(), R.color.playlist_background);
         int playcolor = ContextCompat.getColor(getContext(), R.color.colorPrimaryDark);
-        setBackgroundColor(argChangedPalette.getLightVibrantColor(bgcolor));
+
+
+        bgcolor = ColorUtils.adjustToTheme(getResources(), argChangedPalette, bgcolor);
+        setBackgroundColor(bgcolor);
 
         //mPlayPauseButton.setColor(argChangedPalette.getDarkVibrantColor(playcolor));
         mPlayPauseButton.onPaletteFound(argChangedPalette);

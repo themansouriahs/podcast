@@ -11,6 +11,7 @@ import android.util.AttributeSet;
 
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.utils.ColorExtractor;
+import org.bottiger.podcast.utils.ColorUtils;
 
 /**
  * Created by apl on 12-02-2015.
@@ -38,7 +39,8 @@ public class FloatingActionButton extends android.support.design.widget.Floating
     @Override
     public void onPaletteFound(Palette argChangedPalette) {
         ColorExtractor extractor = new ColorExtractor(mContext, argChangedPalette);
-        setBackgroundTintList(ColorStateList.valueOf(extractor.getPrimary()));
+        int color = ColorUtils.adjustToTheme(mContext.getResources(), argChangedPalette, extractor.getPrimary());
+        setBackgroundTintList(ColorStateList.valueOf(color));
         super.setRippleColor(extractor.getPrimaryTint());
 
         invalidate();

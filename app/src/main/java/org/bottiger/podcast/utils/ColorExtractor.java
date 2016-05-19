@@ -1,7 +1,9 @@
 package org.bottiger.podcast.utils;
 
+import android.app.UiModeManager;
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
@@ -10,6 +12,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.graphics.Palette;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
 
 /**
  * Created by apl on 15-03-2015.
@@ -27,6 +30,7 @@ public class ColorExtractor {
 
     private ColorStateList mColorStateList;
 
+    @Nullable
     private Context mContext;
 
     public ColorExtractor(@Nullable Palette argPalette) {
@@ -145,13 +149,41 @@ public class ColorExtractor {
     }
 
     private int getColor(@Nullable Palette.Swatch argSwatch, int defaultColorResource) {
-        if (argSwatch == null) {
-            if (mContext == null)
-                return mBaseColor;
 
-            return ContextCompat.getColor(mContext, defaultColorResource);
+        int color = -1;
+
+        if (argSwatch == null) {
+            if (mContext == null) {
+                color = mBaseColor;
+            } else {
+                color = ContextCompat.getColor(mContext, defaultColorResource);
+            }
+        } else {
+            color = argSwatch.getRgb();
         }
 
-        return argSwatch.getRgb();
+        /*
+            int currentNightMode = SoundWaves.getAppContext().getResources().getConfiguration().uiMode
+                    & Configuration.UI_MODE_NIGHT_MASK;
+
+            switch (currentNightMode) {
+                case Configuration.UI_MODE_NIGHT_UNDEFINED:
+                    // We don't know what mode we're in, assume notnight
+                case Configuration.UI_MODE_NIGHT_NO:
+                    // Night mode is not active, we're in day time
+                    return color;
+                case Configuration.UI_MODE_NIGHT_YES: {
+                    // Night mode is active, we're at night!
+                    //color = (int) (color * 0.2);
+
+                    float[] hsv = new float[3];
+                    Color.colorToHSV(color, hsv);
+                    hsv[2] *= 0.2f; // value component
+                    color = Color.HSVToColor(hsv);
+                }
+            }
+            */
+
+        return color;
     }
 }

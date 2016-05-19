@@ -38,7 +38,7 @@ public class SettingsActivity extends ToolbarActivity implements SharedPreferenc
         boolean lightTheme = prefs.getBoolean(DARK_THEME_KEY, false);
         int style = lightTheme ||System.currentTimeMillis() > 0 ? R.style.PreferenceTheme : R.style.PreferenceThemeDark;
 
-        setTheme(style);
+        //setTheme(style);
 
         super.onCreate(savedInstanceState);
 

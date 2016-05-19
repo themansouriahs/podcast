@@ -1,0 +1,438 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
+
+    <!--
+        Night
+    -->
+    <style name="SoundWavesTheme.Light" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="playpause_icon">@drawable/ic_play_arrow_white</item>
+        <item name="play_icon">@drawable/ic_play_arrow_white</item>
+        <item name="pause_icon">@drawable/ic_pause_white</item>
+        <item name="play_invert_icon">@drawable/ic_play_arrow_black</item>
+        <item name="pause_invert_icon">@drawable/ic_pause_black</item>
+        <item name="fast_forward_icon">@drawable/ic_action_fast_forward</item>
+        <item name="skip_to_next">@drawable/ic_skip_next_white</item>
+        <item name="rewind_icon">@drawable/ic_action_rewind</item>
+        <item name="ic_remove">@drawable/ic_highlight_remove_white</item>
+        <item name="previous_icon">@drawable/ic_action_previous</item>
+        <item name="ic_rewind">@drawable/ic_fast_rewind_white</item>
+        <item name="ic_forward">@drawable/ic_fast_forward_white</item>
+        <item name="ic_expand">@drawable/ic_expand_more_white</item>
+        <item name="ic_expand_less">@drawable/ic_expand_less_white</item>
+        <item name="stop_icon">@drawable/av_stop_dark</item>
+        <item name="download_icon">@drawable/ic_get_app_white</item>
+        <item name="delete_icon">@drawable/content_discard_dark</item>
+        <item name="backspace_icon">@drawable/content_backspace_dark</item>
+        <item name="queue_icon">@drawable/av_add_to_queue</item>
+        <item name="info_icon">@drawable/collections_view_as_list_dark</item>
+        <item name="new_icon">@drawable/content_new</item>
+        <item name="sync_icon">@drawable/refresh</item>
+        <item name="sync_invert_icon">@drawable/refresh</item>
+        <item name="search_invert_icon">@drawable/action_search</item>
+        <item name="search_icon">@drawable/action_search</item>
+        <item name="customBackground">@color/white_opaque</item>
+        <item name="favorite_outline">@drawable/ic_favorite_outline_white</item>
+        <item name="time_icon">@drawable/ic_access_time_white</item>
+        <item name="sleep">@drawable/ic_snooze_white</item>
+        <item name="fullscreen">@drawable/ic_fullscreen_white</item>
+        <item name="fullscreen_exit">@drawable/ic_fullscreen_exit_white</item>
+        <item name="delete_inv">@drawable/ic_delete_24dp</item>
+        <item name="download_inv">@drawable/ic_get_app_black</item>
+        <item name="sleep_inv">@drawable/ic_snooze_black</item>
+        <item name="fullscreen_inv">@drawable/ic_fullscreen_black</item>
+        <item name="fullscreen_exit_inv">@drawable/ic_fullscreen_exit_black</item>
+        <!--<item name="seekbar_handle">@drawable/seekbar_handle</item>-->
+        <item name="ic_remove_inv">@drawable/ic_highlight_remove_black</item>
+        <item name="ic_close_inv">@drawable/ic_close_24dp</item>
+        <item name="favorite_outline_inv">@drawable/ic_favorite_outline_black</item>
+
+        <!--<item name="android:actionBarStyle">@style/TransparentActionBar</item>-->
+
+        <item name="android:windowTranslucentStatus" tools:targetApi="kitkat">false</item>
+        <item name="themeBackground">@color/pitch_black</item>
+        <item name="themeTextColorPrimary">@color/white_opaque</item>
+        <item name="themeTextColorFaded">@color/grayDark</item>
+
+        <item name="colorPrimary">@color/night_primary</item>
+        <item name="colorPrimaryDark">@color/night_secondary</item>
+        <item name="colorAccent">@color/night_accent</item>
+
+        <item name="android:textColorPrimary">@color/white_opaque</item>
+
+        <!--
+        They are here because 4.1.2 will crash otherwise
+        http://stackoverflow.com/questions/21822523/java-lang-unsupportedoperationexception-cant-convert-to-dimension-type-0x12
+
+        Therefore I set it manually in TopActivity for now
+
+        <item name="android:windowTranslucentNavigation" tools:targetApi="19">true</item> <!- actionbar and  bottom navigation ->
+        <item name="android:windowTranslucentStatus" tools:targetApi="19">true</item> <!- top statusbar ->
+        -->
+
+        <item name="android:statusBarColor" tools:targetApi="21">@color/pitch_black</item>
+
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <!--<item name="android:windowActionBarOverlay">true</item>-->
+
+
+
+        <!-- Spinner: http://stackoverflow.com/questions/16693941/spinner-text-size-does-not-change -->
+        <item name="android:spinnerItemStyle">@style/spinnerItemStyle</item>
+
+
+        <!-- fonts -->
+        <item name="android:textViewStyle">@style/SoundWavesTextViewStyle</item>
+    </style>
+
+    <!--
+    Dark Theme
+    -->
+    <style name="SoundWavesTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="playpause_icon">@drawable/ic_play_arrow_black</item>
+        <item name="play_icon">@drawable/ic_play_arrow_black</item>
+        <item name="pause_icon">@drawable/ic_pause_black</item>
+        <item name="play_invert_icon">@drawable/ic_play_arrow_white</item>
+        <item name="pause_invert_icon">@drawable/ic_pause_white</item>
+        <item name="fast_forward_icon">@drawable/ic_action_fast_forward</item>
+        <item name="skip_to_next">@drawable/ic_skip_next_white</item>
+        <item name="rewind_icon">@drawable/ic_action_rewind</item>
+        <item name="ic_remove">@drawable/ic_highlight_remove_white</item>
+        <item name="ic_remove_inv">@drawable/ic_highlight_remove_black</item>
+        <item name="ic_close_inv">@drawable/ic_close_24dp</item>
+        <item name="favorite_outline_inv">@drawable/ic_favorite_outline_black</item>
+        <item name="previous_icon">@drawable/ic_action_previous</item>
+        <item name="ic_rewind">@drawable/ic_fast_rewind_white</item>
+        <item name="ic_forward">@drawable/ic_fast_forward_white</item>
+        <item name="ic_expand">@drawable/ic_expand_more_white</item>
+        <item name="ic_expand_less">@drawable/ic_expand_less_white</item>
+        <item name="stop_icon">@drawable/av_stop</item>
+        <item name="download_icon">@drawable/ic_get_app_white</item>
+        <item name="delete_icon">@drawable/ic_action_delete</item>
+        <item name="backspace_icon">@drawable/content_backspace</item>
+        <item name="queue_icon">@drawable/av_add_to_queue</item>
+        <item name="info_icon">@drawable/collections_view_as_list</item>
+        <item name="new_icon">@drawable/content_new</item>
+        <item name="sync_icon">@drawable/refresh</item>
+        <item name="sync_invert_icon">@drawable/action_search</item>
+        <item name="search_icon">@drawable/action_search</item>
+        <item name="search_invert_icon">@drawable/action_search</item>
+        <item name="customBackground">@color/pitch_black</item>
+        <item name="favorite_outline">@drawable/ic_favorite_outline_white</item>
+        <item name="time_icon">@drawable/ic_access_time_white</item>
+        <item name="sleep">@drawable/ic_snooze_white</item>
+        <item name="fullscreen">@drawable/ic_fullscreen_white</item>
+        <item name="fullscreen_exit">@drawable/ic_fullscreen_exit_white</item>
+        <item name="delete_inv">@drawable/ic_delete_24dp</item>
+        <item name="download_inv">@drawable/ic_get_app_black</item>
+        <item name="sleep_inv">@drawable/ic_snooze_black</item>
+        <item name="fullscreen_inv">@drawable/ic_fullscreen_black</item>
+        <item name="fullscreen_exit_inv">@drawable/ic_fullscreen_exit_black</item>
+        <!--<item name="seekbar_handle">@drawable/seekbar_handle2.9</item>-->
+        <item name="android:actionBarStyle">@style/TranslucentActionBar</item>
+
+        <!--<item name="android:windowBackground">@null</item>-->
+        <item name="android:windowTranslucentStatus" tools:targetApi="kitkat">false</item>
+        <!--<item name="themeBackground">@color/pitch_black</item>
+        <item name="themeTextColorPrimary">@color/white_opaque</item>
+        <item name="themeTextColorFaded">@color/grayDark</item>-->
+
+        <!--<item name="android:background">@color/pitch_black</item>
+        <item name="android:windowBackground">@color/pitch_black</item>-->
+        <!--<item name="android:colorBackground">@color/pitch_black</item>-->
+
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+
+        <!-- fonts -->
+        <item name="android:textViewStyle">@style/SoundWavesTextViewStyle</item>
+    </style>
+
+    <style name="PreferenceTheme" parent="SoundWavesTheme.Light">
+        <item name="android:windowBackground">@color/white_opaque</item>
+        <item name="android:textColor">@color/pitch_black</item>
+        <!--<item name="android:listViewStyle">@style/listViewPrefs</item>-->
+    </style>
+
+    <style name="PreferenceThemeDark" parent="SoundWavesTheme.Light">
+        <item name="android:windowBackground">@color/pitch_black</item>
+        <item name="android:textColor">@color/white_opaque</item>
+        <!--<item name="android:listViewStyle">@style/listViewPrefs</item>-->
+    </style>
+
+    <style name="ToolbarTitleTextApperance" parent="@android:style/TextAppearance.Medium">
+        <!--<item name="android:textColor">@color/pitch_black</item>-->
+        <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
+        <item name="android:textSize">28sp</item>
+    </style>
+
+    <style name="ToolbarSubtitleTextApperance" parent="@android:style/TextAppearance.Small">
+        <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
+    </style>
+
+    <style name="SoundWavesTextViewStyle" parent="android:Widget.TextView">
+        <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
+    </style>
+
+    <style name="SoundWavesListTextViewStyle" parent="SoundWavesTextViewStyle">
+        <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingBottom">20dp</item>
+    </style>
+
+    <style name="SoundWavesListTitleStyle" parent="SoundWavesTextViewStyle">
+        <item name="android:textSize">16sp</item>
+        <item name="android:layout_marginLeft">10dp</item>
+    </style>
+
+    <style name="FeedActivitySettingsTextStyle" parent="SoundWavesTextViewStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="FeedActivitySettingsSwitchStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">right</item>
+        <item name="android:checked">false</item>
+    </style>
+
+    <!--
+    <style name="NotificationText" parent="android:TextAppearance.StatusBar.EventContent" />
+    <style name="NotificationTitle" parent="android:TextAppearance.StatusBar.EventContent.Title" />
+    -->
+    <style name="NotificationTitle" parent="android:TextAppearance.Material.Notification.Title"></style>
+    <style name="NotificationText" parent="android:TextAppearance.Material.Notification"></style>
+
+    <!--
+    <style name="NotificationTitle">
+        <item name="textColor">@color/primary_text_default_material_light</item>
+        <item name="textSize">@dimen/notification_title_text_size</item>
+    </style>
+
+    <style name="NotificationContent">
+        <item name="textColor">@color/primary_text_default_material_light</item>
+        <item name="textSize">@dimen/notification_title_text_size</item>
+    </style>
+    -->
+
+
+    <style name="SoundWaves.PreferenceActivity.Light" parent="SoundWavesTheme.Light">
+        <item name="android:windowTranslucentNavigation" tools:targetApi="19">false</item> <!-- actionbar and  bottom navigation -->
+        <item name="android:windowTranslucentStatus" tools:targetApi="19">false</item> <!-- top statusbar -->
+    </style>
+
+    <style name="Theme.Transparent" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <!--<item name="android:windowIsFloating">true</item>-->
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+
+    <style name="FrameworkRoot.ActionBar" parent="android:Widget.Holo.ActionBar" />
+    <style name="FrameworkRoot.ActionBar.TitleText" parent="android:TextAppearance.Holo.Widget.ActionBar.Title" />
+    <style name="FrameworkRoot.ActionBar.TabBar" parent="android:Widget.Holo.ActionBar.TabBar" />
+
+    <!-- Action bar -->
+    <style name="ActionBar.Base" parent="FrameworkRoot.ActionBar">
+        <item name="android:background">@drawable/actionbar_background</item>
+        <!--<item name="android:icon">@drawable/actionbar_icon</item>-->
+        <item name="android:displayOptions">showHome|showTitle</item>
+        <item name="android:titleTextStyle">@style/ActionBar.TitleText</item>
+        <!--<item name="android:logo">@drawable/actionbar_logo</item>-->
+    </style>
+
+    <style name="ActionBar" parent="@android:style/Theme.Holo.Light.DarkActionBar" />
+
+    <style name="ActionBar.TitleText" parent="FrameworkRoot.ActionBar.TitleText">
+        <item name="android:textColor">#ccc</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <!-- Transparent Action Bar -->
+    <style name="TransparentActionBar" parent="ActionBar">
+        <!--<item name="android:background">@null</item>-->
+        <item name="android:height">@dimen/action_bar_height</item>
+        <item name="android:background">@color/colorPrimary</item> <!-- same as statusbar -->
+    </style>
+
+    <style name="TranslucentActionBar" parent="ActionBar">
+        <item name="android:background">@color/translucent_actionbar_background</item>
+    </style>
+
+    <style name="EpisodeHeaderFont" parent="@android:style/TextAppearance.Medium">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">19sp</item>
+    </style>
+
+    <style name="EpisodeMinorFont" parent="@style/EpisodeHeaderFont">
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="PodcastImageSIze">
+        <item name="android:layout_width">@dimen/playpause_button_size_normal</item>
+        <item name="android:layout_height">@dimen/playpause_button_size_normal</item>
+        <item name="android:width">@dimen/playpause_button_size_normal</item>
+        <item name="android:height">@dimen/playpause_button_size_normal</item>
+        <item name="android:padding">0dip</item>
+    </style>
+
+    <style name="FeedListImage" parent="@style/PodcastImageSIze">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:src">@drawable/generic_podcast</item>
+        <item name="android:scaleType">fitStart</item>
+    </style>
+
+    <style name="FeedViewRecyclerView">
+        <item name="android:scrollbarAlwaysDrawVerticalTrack">true</item>
+        <item name="android:scrollbarStyle">outsideOverlay</item>
+        <item name="android:scrollbars">vertical</item>
+        <item name="android:fadeScrollbars">false</item>
+        <item name="android:fastScrollEnabled">true</item>
+        <item name="android:scrollbarThumbVertical">@drawable/feed_view_scrollbar_thumb</item>
+    </style>
+
+    <!-- <style name="PlayerButton" parent="@style/PodcastImageSIze">-->
+    <!-- <item name="android:scaleType">fitStart</item> -->
+    <style name="PlayerButton" parent="@style/PodcastImageSIze">
+        <item name="android:layout_width">40dip</item>
+        <item name="android:layout_height">50dip</item>
+        <item name="android:layout_weight">1</item>
+        <item tools:targetApi="21" name="android:elevation">@dimen/player_elevation</item>
+    </style>
+
+    <style name="PlaylistButton" parent="@style/PlayerButton">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:padding">5dp</item>
+        <item name="android:background">@null</item>
+    </style>
+
+    <style name="RightPlaylistButton" parent="@style/PlaylistButton">
+        <item name="android:layout_width">40dip</item>
+        <item name="android:layout_alignParentRight">true</item>
+        <item name="android:layout_marginRight">40dp</item>
+    </style>
+
+    <style name="TopPlayerButton">
+        <item name="android:layout_width">60dp</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:layout_marginBottom">0dp</item>
+        <item name="android:layout_marginTop">5dp</item>
+        <item name="android:padding">0dp</item>
+        <item name="android:background">@null</item>
+    </style>
+
+    <style name="SeekPlayerButton" parent="@style/PlaylistButton">
+        <item name="android:layout_width">30dip</item>
+    </style>
+
+    <style name="RightTopPlayerButton" parent="@style/TopPlayerButton">
+        <item name="android:layout_alignParentRight">true</item>
+        <item name="android:layout_marginRight">140dp</item>
+    </style>
+
+    <style name="ForwardRewindButton" parent="@style/PodcastImage">
+        <item name="android:layout_width">40dip</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:scaleType">fitStart</item>
+        <item name="android:visibility">invisible</item>
+    </style>
+
+    <style name="PodcastImage" parent="@style/PodcastImageSIze">
+        <!--<item name="android:src">@drawable/generic_podcast</item>-->
+        <item name="android:scaleType">fitStart</item>
+    </style>
+
+    <style name="SubscriptionHeaderFont" parent="@android:style/TextAppearance.Large">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="CompactListItem" parent="@android:style/TextAppearance.Small">
+        <item name="android:padding">5dip</item>
+    </style>
+
+    <style name="PlayerControlButtons">
+        <item name="android:scaleType">fitStart</item>
+        <item name="android:layout_width">@dimen/playpause_button_size</item>
+        <item name="android:layout_height">@dimen/playpause_button_size</item>
+        <item name="android:layout_margin">10dip</item>
+        <item name="android:background">@drawable/button_flash</item>
+        <!-- 
+        <item name="android:scaleType">fitStart</item>
+        <item name="android:layout_width">37dip</item>
+        <item name="android:layout_height">37dip</item>
+        <item name="android:layout_margin">10dip</item>
+        <item name="android:paddingTop">20dip</item>
+        <item name="android:paddingBottom">20dip</item>
+        <item name="android:paddingLeft">20dip</item>
+        <item name="android:paddingRight">20dip</item>
+         -->
+    </style>
+    
+    <style  name="PlayerPlayPauseToggle"  parent="@style/PlayerControlButtons">
+        <item name="android:textOn"></item>
+        <item name="android:textOff"></item>
+        <item name="android:background">?attr/playpause_icon</item>
+    </style>
+
+    <style name="SeekbarOverlayText">
+        <item name="android:textColor">@color/white_opaque</item>
+        <item name="android:textSize">20dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_centerVertical">true</item>
+    </style>
+
+    <style name="AudioFileInfoOverlayText">
+        <item name="android:paddingLeft">4px</item>
+        <item name="android:paddingBottom">4px</item>
+        <item name="android:textColor">#ffffffff</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:shadowColor">#000000</item>
+        <item name="android:shadowDx">2</item>
+        <item name="android:shadowDy">2</item>
+        <item name="android:shadowRadius">2</item>
+    </style>
+
+    <style name="tallerBarStyle">
+        <item name="android:indeterminateOnly">false</item>
+
+
+        <!--
+        <item name="android:progressDrawable">@drawable/player_seekbar_progress</item>
+        <item name="android:indeterminateDrawable">@android:drawable/progress_indeterminate_horizontal</item>
+        -->
+
+        <!--
+        <item name="android:minHeight">10dip</item>
+        <item name="android:maxHeight">10dip</item>
+        -->
+    </style>
+
+    <!-- Navigation Drawer - Start -->
+    <!-- parent="Theme.AppCompat.Light.NoActionBar-->
+    <style name="DrawerSwitchTextAppearance">
+        <item name="android:textColor">@color/filter_text</item>
+        <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
+    </style>
+
+    <style name="spinnerItemStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/filter_text</item>
+        <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
+        <item name="android:background">@android:drawable/spinner_dropdown_background</item>
+    </style>
+    <!-- Navigation Drawer - End -->
+
+</resources>

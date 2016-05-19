@@ -11,6 +11,7 @@ import android.os.IBinder;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
 
 import org.bottiger.podcast.cloud.EventLogger;
@@ -39,6 +40,11 @@ public class SoundWaves extends Application {
 
     private static final String TAG = "SoundWaves";
     public static PlayerService sBoundPlayerService;
+
+    static {
+        //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO);
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+    }
 
     /*
     static {

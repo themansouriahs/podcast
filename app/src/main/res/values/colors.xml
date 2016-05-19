@@ -37,4 +37,8 @@
     <color name="default_background">#FFFFFF</color>
     <color name="playlist_background">#E6E6DC</color>
 
+    <color name="night_primary">#252525</color>
+    <color name="night_secondary">#252525</color>
+    <color name="night_accent">#AAAAAA</color>
+
 </resources>

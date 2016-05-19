@@ -170,14 +170,6 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
         int stringId = !isSubscribed ? R.string.discovery_subscribe_toast : R.string.discovery_unsubscribe_toast;
         String text = mActivity.getResources().getString(stringId);
         String formattedText = String.format(text, argSubscription.getTitle());
-        /*
-
-        Context context = mActivity.getApplicationContext();
-        int duration = Toast.LENGTH_LONG;
-
-        Toast toast = Toast.makeText(context, formattedText, duration);
-        toast.show();
-        */
 
         UIUtils.disPlayBottomSnackBar(argView, formattedText, null, false);
     }

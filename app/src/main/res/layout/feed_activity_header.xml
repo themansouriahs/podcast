@@ -23,8 +23,8 @@
         android:layout_height="match_parent"
         android:clickable="false"
         android:scaleType="centerCrop"
-        android:src="@color/white_opaque"
         />
+    <!-- android:background="?attr/themeBackground" -->
 
     <io.codetail.widget.RevealFrameLayout
         xmlns:android="http://schemas.android.com/apk/res/android"

@@ -192,7 +192,7 @@ public class DownloadService extends IntentService {
          try {
              if (sQueue.size() == 0)
                  return null;
-             
+
              QueueEpisode downloadingItem = sQueue.getFirst();
              if (downloadingItem == null) {
                  return null;

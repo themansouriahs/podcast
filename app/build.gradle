@@ -16,6 +16,8 @@ android {
         //renderscriptTargetApi 20
         //renderscriptSupportModeEnabled true
 
+        vectorDrawables.useSupportLibrary = true
+
         // Espresso
         //testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
