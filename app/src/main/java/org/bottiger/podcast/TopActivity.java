@@ -14,6 +14,7 @@ import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 import android.transition.Slide;
 import android.transition.Transition;
 import android.util.Log;
@@ -29,6 +30,7 @@ import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.PlayerHelper;
 import org.bottiger.podcast.utils.TransitionUtils;
+import org.bottiger.podcast.utils.UIUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -62,6 +64,11 @@ public class TopActivity extends AppCompatActivity {
         }
 
         super.onCreate(savedInstanceState);
+
+        if (savedInstanceState == null) {
+            // Set the local night mode to some value
+            UIUtils.setTheme(this);
+        }
 
         boolean transparentStatus = transparentNavigationBar();
         /*

@@ -34,6 +34,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.text.Html;
 import android.text.Spannable;
@@ -464,6 +465,45 @@ public class UIUtils {
         }
 
         return false;
+    }
+
+    /**
+     <string-array name="pref_theme_entries">
+     <item>Light (default)</item>
+     <item>Dark</item>
+     <item>Auto (Day/Night)</item>
+     </string-array>
+
+     <string-array name="pref_theme_entries_values" translatable="false">
+     <item>1</item>
+     <item>2</item>
+     <item>3</item>
+     </string-array>
+
+     *
+     *
+      * @param argAppCompatActivity
+     */
+    public static void setTheme(@NonNull AppCompatActivity argAppCompatActivity) {
+        String theme = PreferenceHelper.getStringPreferenceValue(argAppCompatActivity,
+                R.string.pref_dark_theme_key,
+                R.string.pref_theme_default);
+
+        int themeIntval = Integer.parseInt(theme);
+
+        if (themeIntval == 1) {
+            return;
+        }
+
+        if (themeIntval == 2) {
+            argAppCompatActivity.getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        }
+
+        if (themeIntval == 3) {
+            argAppCompatActivity.getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_AUTO);
+        }
+
+        argAppCompatActivity.recreate();
     }
 
 }

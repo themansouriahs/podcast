@@ -8,6 +8,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Debug;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -36,6 +37,8 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
+import static org.bottiger.podcast.SettingsActivity.DARK_THEME_KEY;
+
 public class SoundWaves extends Application {
 
     private static final String TAG = "SoundWaves";
@@ -43,7 +46,7 @@ public class SoundWaves extends Application {
 
     static {
         //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO);
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO);
     }
 
     /*
@@ -135,6 +138,7 @@ public class SoundWaves extends Application {
         incrementStartupCount(context);
     }
 
+    @Deprecated
     public static Context getAppContext() {
         return context;
     }

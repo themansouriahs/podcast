@@ -79,7 +79,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
     private String mSpinnerTrending;
 
     private RelativeLayout mContainer;
-    private android.support.v7.widget.SearchView mSearchView;
+    private SearchView mSearchView;
     private AppCompatSpinner mSpinner;
     private ImageButton mSearchEngineButton;
     private RecyclerView mResultsRecyclerView;
@@ -122,8 +122,8 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
                              Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         setHasOptionsMenu(true);
-        View mContainerView = inflater.inflate(R.layout.discovery_fragment, container, false);
-        return mContainerView;
+        View containerView = inflater.inflate(R.layout.discovery_fragment, container, false);
+        return containerView;
     }
 
     private void setTopMargin(int i) {
@@ -165,8 +165,8 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
             }
         });
 
-        mSearchView = (android.support.v7.widget.SearchView) view.findViewById(R.id.discovery_searchView);
-        mSearchView.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
+        mSearchView = (SearchView) view.findViewById(R.id.discovery_searchView);
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 searchviewQueryChanged(query, false);
@@ -383,7 +383,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-        String value = mSpinnerAdapter.getItem(position).toString();
+        String value = mSpinnerAdapter.getItem(position);
 
         // value.equals(mSpinnerByAuthor)
         if (position == 0) {
@@ -400,8 +400,6 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
             fetchTrending();
             return;
         }
-
-        return;
     }
 
     @Override

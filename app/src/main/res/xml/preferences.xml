@@ -81,9 +81,11 @@
             android:title="@string/pref_interface_other_category_title"
             android:key="@string/pref_interface_other_category_key">
 
-        <CheckBoxPreference
-            android:defaultValue="false"
+        <ListPreference
             android:key="@string/pref_dark_theme_key"
+            android:defaultValue="@string/pref_theme_default"
+            android:entries="@array/pref_theme_entries"
+            android:entryValues="@array/pref_theme_entries_values"
             android:summary="@string/pref_dark_theme"
             android:title="@string/pref_dark_theme_title" />
 

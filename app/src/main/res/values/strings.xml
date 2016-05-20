@@ -6,7 +6,7 @@
     <string name="pref_only_wifi_description">Wait until connected to Wi-Fi to download files</string>
     <string name="pref_only_wifi_title">Wi-Fi only downloading</string>
     <string name="pref_dark_theme">Enable dark theme for higher contrast</string>
-    <string name="pref_dark_theme_title">Dark theme</string>
+    <string name="pref_dark_theme_title">Theme</string>
     <string name="pref_download_on_update_title">Automatic download</string>
     <string name="pref_download_on_update_description">Download new episodes automatically when they are available</string>
 

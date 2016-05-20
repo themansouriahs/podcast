@@ -80,43 +80,6 @@ public class SoundWavesPreferenceFragment extends PreferenceFragment {
             mContext = getActivity();
         }
 
-        // The attributes you want retrieved
-        int[] attrs = {R.attr.themeBackground};
-        //ThemeHelper helper = new ThemeHelper(mContext);
-        //int color = helper.getAttr(R.attr.themeBackground);
-
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-        int theme = ThemeHelper.getTheme(prefs);
-
-        // Parse MyCustomStyle, using Context.obtainStyledAttributes()
-        TypedArray ta = mContext.obtainStyledAttributes(theme, attrs);
-
-        // Fetch the text from your style like this.
-        //String text = ta.getString(2);
-
-        // Fetching the colors defined in your style
-        //int textColor = ta.getColor(0, Color.BLACK);
-        int backgroundColor = ta.getColor(0, Color.BLACK);
-
-        // Do some logging to see if we have retrieved correct values
-        //Log.i("Retrieved text:", text);
-        //Log.i("Retrieved textColor as hex:", Integer.toHexString(textColor));
-        //Log.i("Retrieved background as hex:", Integer.toHexString(backgroundColor));
-
-        // OH, and don't forget to recycle the TypedArray
-        ta.recycle();
-
-
-        /*
-        TypedValue typedValue = new TypedValue();
-        int[] textSizeAttr = new int[] { R.attr.themeBackground };
-        int indexOfAttrTextSize = 0;
-        TypedArray a = mContext.obtainStyledAttributes(typedValue.data, textSizeAttr);
-        int color = a.getDimensionPixelSize(indexOfAttrTextSize, -1);
-        a.recycle();*/
-
-        //view.setBackgroundColor(Color.WHITE);
-
         return view;
     }
 

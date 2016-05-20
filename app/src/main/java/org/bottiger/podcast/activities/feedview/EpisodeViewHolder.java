@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.utils.ColorUtils;
+import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.views.DownloadButtonView;
 import org.bottiger.podcast.views.FeedViewQueueButton;
 import org.bottiger.podcast.views.PlayPauseImageView;
@@ -161,8 +162,11 @@ public class EpisodeViewHolder extends RecyclerView.ViewHolder {
 
     private void setTextColor(boolean argFaded) {
         int textColor = argFaded ? mFadedColor : mPrimaryColor;
-        //mTitle.setTextColor(textColor);
-        //mDescription.setTextColor(textColor);
+
+        if (!UIUtils.isInNightMode()) {
+            mTitle.setTextColor(textColor);
+            mDescription.setTextColor(textColor);
+        }
     }
 
     private void setButtonsVisibility(boolean argDownloadVisible, boolean argQueueVisible) {

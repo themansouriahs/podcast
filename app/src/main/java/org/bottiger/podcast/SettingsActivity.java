@@ -22,6 +22,8 @@ import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.View;
 
+import org.bottiger.podcast.utils.UIUtils;
+
 public class SettingsActivity extends ToolbarActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
 	public static String DARK_THEME_KEY = "";
@@ -35,8 +37,10 @@ public class SettingsActivity extends ToolbarActivity implements SharedPreferenc
 				.getDefaultSharedPreferences(this.getApplicationContext());
 
         DARK_THEME_KEY = getResources().getString(R.string.pref_dark_theme_key);
-        boolean lightTheme = prefs.getBoolean(DARK_THEME_KEY, false);
-        int style = lightTheme ||System.currentTimeMillis() > 0 ? R.style.PreferenceTheme : R.style.PreferenceThemeDark;
+        String defaultValue = getResources().getString(R.string.pref_theme_default);
+        String lightTheme = prefs.getString(DARK_THEME_KEY, defaultValue);
+        int lightThemeInt = Integer.parseInt(lightTheme);
+        //int style = lightTheme || System.currentTimeMillis() > 0 ? R.style.PreferenceTheme : R.style.PreferenceThemeDark;
 
         //setTheme(style);
 
@@ -75,7 +79,8 @@ public class SettingsActivity extends ToolbarActivity implements SharedPreferenc
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
 			String key) {
 		if (!TextUtils.isEmpty(DARK_THEME_KEY) && key.equals(DARK_THEME_KEY)) {
-			recreate();
+			//recreate();
+            UIUtils.setTheme(this);
 			return;
 		}
 	}
