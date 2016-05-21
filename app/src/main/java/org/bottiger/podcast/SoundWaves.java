@@ -42,10 +42,8 @@ import static org.bottiger.podcast.SettingsActivity.DARK_THEME_KEY;
 public class SoundWaves extends Application {
 
     private static final String TAG = "SoundWaves";
-    public static PlayerService sBoundPlayerService;
 
     static {
-        //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO);
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO);
     }
 
@@ -57,7 +55,6 @@ public class SoundWaves extends Application {
 
     public native String stringFromJNI();
 
-    //public static PlayerService sBoundPlayerService = null;
     private static Context context;
     // Global constants
     private Boolean mFirstRun = null;
@@ -103,7 +100,7 @@ public class SoundWaves extends Application {
 
         CrashReporterFactory.startReporter(this);
 
-        Observable.just(getAppContext()).subscribeOn(Schedulers.newThread()).subscribe(new Subscriber<Context>() {
+        Observable.just(this).subscribeOn(Schedulers.newThread()).subscribe(new Subscriber<Context>() {
             @Override
             public void onCompleted() {
                 Log.v(TAG, "Analytics started");
