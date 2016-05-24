@@ -69,9 +69,6 @@ public class MainActivity extends FragmentContainerActivity {
 		if (!isMyServiceRunning(PlayerService.class.getName()))
 			startService(new Intent(this, PlayerService.class));
 
-		currentTheme = ThemeHelper.getTheme(prefs);
-		setTheme(currentTheme);
-
 		/*
 		IntentFilter receiverFilter = new IntentFilter(
 				Intent.ACTION_HEADSET_PLUG); */
@@ -94,15 +91,6 @@ public class MainActivity extends FragmentContainerActivity {
     public static PlayerService getPlayerService() {
         return PlayerService.getInstance();
     }
-
-	/**
-	 * Set the current theme based on the preference
-	 */
-	private void refreshTheme() {
-		if (currentTheme != ThemeHelper.getTheme(prefs)) {
-			recreate();
-		}
-	}
 
 	/**
 	 * Test if a service is running
@@ -131,7 +119,6 @@ public class MainActivity extends FragmentContainerActivity {
 	@Override
 	public void onResume() {
         super.onResume();
-		refreshTheme();
 	}
 
     @Override

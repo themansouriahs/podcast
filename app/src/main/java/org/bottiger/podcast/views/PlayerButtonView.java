@@ -5,8 +5,10 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.annotation.ColorInt;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.graphics.Palette;
@@ -22,6 +24,7 @@ import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.ColorUtils;
+import org.bottiger.podcast.utils.UIUtils;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -120,13 +123,11 @@ public class PlayerButtonView extends ImageButton implements PaletteListener  {
     }
 
     public void setImage(int argImage) {
-        s_Icon = new WeakReference<>(BitmapFactory.decodeResource(getResources(), argImage));
-
-        this.setImageBitmap(s_Icon.get());
+        this.setImageResource(argImage);
         this.invalidate();
     }
 
-    public void addState(int argState, int argDrawable) {
+    public void addState(int argState, @DrawableRes int argDrawable) {
         if (mStateIcons.get(argState) != 0) {
             Log.w("PlayerButtonView", "Mapping already exists. Overwriting");
         }
@@ -138,13 +139,14 @@ public class PlayerButtonView extends ImageButton implements PaletteListener  {
         return mCurrentState;
     }
 
-    public void setState(int argState) {
+    public void setState(@DrawableRes int argState) {
         if (mStateIcons.get(argState) == 0) {
             throw new IllegalStateException("No such state exists");
         }
 
         mCurrentState = argState;
-        setImage(mStateIcons.get(argState, defaultIcon));
+        //setImage(mStateIcons.get(argState, defaultIcon));
+        setImageResource(mStateIcons.get(argState, defaultIcon));
     }
 
     protected int getProgress() {
@@ -162,8 +164,12 @@ public class PlayerButtonView extends ImageButton implements PaletteListener  {
         int color = ColorUtils.getTextColor(getContext());
         ColorExtractor extractor = new ColorExtractor(argChangedPalette, color);
 
-        mBaseColorPaint.setColor(extractor.getSecondary()); // -1761607680
-        mForegroundColorPaint.setColor(extractor.getSecondary());
+        int colorFinal = ColorUtils.adjustToTheme(this.mContext.getResources(), argChangedPalette, extractor.getSecondary());
+
+        //colorFinal = Color.BLACK;
+
+        mBaseColorPaint.setColor(colorFinal); // -1761607680
+        mForegroundColorPaint.setColor(colorFinal);
 
         invalidate();
     }

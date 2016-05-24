@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/menu_download_manager"
-        android:icon="@drawable/ic_file_download_white_24px"
+        android:icon="@drawable/ic_get_app_inv_24dp"
         android:orderInCategory="1"
         app:showAsAction="always"
         android:title="@string/download_manager_toolbar_title"

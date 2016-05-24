@@ -50,9 +50,9 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
     private Context mContext;
 
     private Drawable mStaticBackground = null;
-    private @DrawableRes int download_icon = R.drawable.ic_get_app_white;
-    private @DrawableRes int qeueed_icon = R.drawable.ic_schedule_white;
-    private @DrawableRes int delete_icon = R.drawable.ic_delete_white;
+    private static final @DrawableRes int download_icon = R.drawable.ic_get_app_24dp; //ic_get_app_24dp;
+    private static final @DrawableRes int qeueed_icon = R.drawable.ic_query_builder_24dp;
+    private static final @DrawableRes int delete_icon = R.drawable.ic_delete_24dp;
 
     private static final int BITMAP_OFFSET = 5;
 
@@ -77,46 +77,11 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
 
     private void init(Context argContext, @Nullable AttributeSet attrs) {
         mContext = argContext;
+        setImageResource(download_icon);
 
         buttonRectangle = new RectF();
 
         setOnClickListener(this);
-
-        // Detect of we have defined a background color for the view
-        if (getId() == R.id.feedview_download_button) {
-            if (attrs != null) {
-                int[] attrsArray = new int[]{
-                        android.R.attr.background, // 0
-                };
-                TypedArray ta = mContext.obtainStyledAttributes(attrs, attrsArray);
-                mStaticBackground = ta.getDrawable(0);
-                ta.recycle();
-
-                if (mStaticBackground != ContextCompat.getDrawable(getContext(), R.color.colorPrimaryDark)) {
-                    download_icon = R.drawable.ic_get_app_grey;
-                    qeueed_icon = R.drawable.ic_schedule_grey;
-                    delete_icon = R.drawable.ic_delete_grey;
-                }
-            }
-        }
-
-        if (getId() == R.id.expanded_download) {
-            if (attrs != null) {
-                int[] attrsArray = new int[]{
-                        android.R.attr.background, // 0
-                };
-                TypedArray ta = mContext.obtainStyledAttributes(attrs, attrsArray);
-                mStaticBackground = ta.getDrawable(0);
-                ta.recycle();
-
-                if (mStaticBackground != ContextCompat.getDrawable(getContext(), R.color.colorPrimaryDark)) {
-                    download_icon = R.drawable.ic_get_app_black;
-                    qeueed_icon = R.drawable.ic_schedule_black;
-                    delete_icon = R.drawable.ic_delete_black;
-                }
-            }
-        }
-
 
         if (!isInEditMode()) {
             setImage(download_icon);

@@ -165,9 +165,8 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
             return;
         }
 
-        Context context = SoundWaves.getAppContext();
-        episodeViewHolder.mPrimaryColor = ColorUtils.getTextColor(context);
-        episodeViewHolder.mFadedColor = ColorUtils.getFadedTextColor(context);
+        episodeViewHolder.mPrimaryColor = ColorUtils.getTextColor(mActivity);
+        episodeViewHolder.mFadedColor = ColorUtils.getFadedTextColor(mActivity);
 
         if (item.getTitle() != null)
             episodeViewHolder.mTitle.setText(item.getTitle());

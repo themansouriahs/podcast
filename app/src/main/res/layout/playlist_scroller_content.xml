@@ -39,8 +39,8 @@
                     android:layout_centerVertical="true"
                     android:layout_marginRight="@dimen/top_player_margin"
                     custom:mfb_animate_favorite="true"
-                    custom:mfb_favorite_image="@drawable/ic_favorite_white_24px"
-                    custom:mfb_not_favorite_image="@drawable/ic_favorite_border_white_24px"
+                    custom:mfb_favorite_image="@drawable/ic_favorite_24dp"
+                    custom:mfb_not_favorite_image="@drawable/ic_favorite_outline_24dp"
                     custom:mfb_rotation_duration="100"
                     custom:mfb_bounce_duration="150"
                     />
@@ -151,7 +151,7 @@
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:scaleType="center"
                     app:materialIcon="undo"
-                    app:materialIconColor="?attr/themeTextColorPrimary"
+                    app:materialIconColor="?attr/icon_fill_color"
                     app:materialIconSize="30dp"
                     android:layout_alignTop="@id/playpause"
                     android:layout_alignBottom="@id/playpause"
@@ -167,7 +167,7 @@
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:scaleType="center"
                     app:materialIcon="redo"
-                    app:materialIconColor="?attr/themeTextColorPrimary"
+                    app:materialIconColor="?attr/icon_fill_color"
                     app:materialIconSize="30dp"
                     android:layout_alignTop="@id/playpause"
                     android:layout_alignBottom="@id/playpause"
@@ -202,7 +202,6 @@
                         android:padding="0dip"
                         android:background="@null"
                         android:layout_centerHorizontal="true"
-                        android:src="@drawable/download"
                         android:elevation="@dimen/player_elevation"
                         />
 

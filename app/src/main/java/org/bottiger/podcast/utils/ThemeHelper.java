@@ -21,20 +21,10 @@ public class ThemeHelper {
 	// attr = R.attr.homeIcon
 	public int getAttr(int attr) {
 		
-		TypedArray a = mContext.getTheme().obtainStyledAttributes(getTheme(prefs), new int[] {attr});     
+		TypedArray a = mContext.getTheme().obtainStyledAttributes(R.style.SoundWavesTheme_Light, new int[] {attr});
 		int attributeResourceId = a.getResourceId(0, 0);
 		a.recycle();
 		return attributeResourceId;
-		//Drawable drawable = mActivity.getResources().getDrawable(attributeResourceId);
-		//return drawable;
-	}
-	
-	public static int getTheme(SharedPreferences prefs) {
-		if (prefs.getBoolean(SettingsActivity.DARK_THEME_KEY, false)) {
-			return R.style.SoundWavesTheme;
-		}
-		
-		return R.style.SoundWavesTheme_Light;
 	}
 
 }

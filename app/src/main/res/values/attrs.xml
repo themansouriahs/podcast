@@ -62,6 +62,8 @@
     <attr name="fullscreen_inv" format="reference" />
     <attr name="fullscreen_exit_inv" format="reference" />
 
+    <attr name="icon_fill_color" format="color" />
+
     <declare-styleable name="BezelImageView">
         <attr name="maskDrawable" format="reference" />
         <attr name="borderDrawable" format="reference" />

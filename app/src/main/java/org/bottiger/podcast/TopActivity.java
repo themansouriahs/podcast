@@ -3,6 +3,7 @@ package org.bottiger.podcast;
 import android.content.ComponentName;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.RemoteException;
@@ -10,6 +11,8 @@ import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
@@ -28,6 +31,7 @@ import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.service.DownloadService;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.utils.ColorUtils;
 import org.bottiger.podcast.utils.PlayerHelper;
 import org.bottiger.podcast.utils.TransitionUtils;
 import org.bottiger.podcast.utils.UIUtils;
@@ -63,12 +67,12 @@ public class TopActivity extends AppCompatActivity {
             getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
         }
 
-        super.onCreate(savedInstanceState);
-
         if (savedInstanceState == null) {
             // Set the local night mode to some value
-            UIUtils.setTheme(this);
+            //UIUtils.setTheme(this);
         }
+
+        super.onCreate(savedInstanceState);
 
         boolean transparentStatus = transparentNavigationBar();
         /*
@@ -174,7 +178,7 @@ public class TopActivity extends AppCompatActivity {
         SoundWaves.getBus().register(this);
         if (SoundWaves.sAnalytics != null)
             SoundWaves.sAnalytics.activityResume();
-        initDownloadManagerOptionsMenu();
+        initDownloadManagerOptionsMenu(mMenu);
     }
 
     public static SharedPreferences getPreferences() {
@@ -202,7 +206,7 @@ public class TopActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         mMenu = menu;
         getMenuInflater().inflate(R.menu.top_options_menu, menu);
-        initDownloadManagerOptionsMenu();
+        initDownloadManagerOptionsMenu(menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -271,12 +275,21 @@ public class TopActivity extends AppCompatActivity {
         return false;
     }
 
-    private void initDownloadManagerOptionsMenu() {
-        if (mMenu == null)
+    private void initDownloadManagerOptionsMenu(@Nullable Menu argMenu) {
+        if (argMenu == null)
             return;
 
-        MenuItem item = mMenu.findItem(R.id.menu_download_manager);
+        MenuItem item = argMenu.findItem(R.id.menu_download_manager);
         PlayerService ps = PlayerService.getInstance();
+
+        // Tint the icon
+        // http://stackoverflow.com/questions/26780046/menuitem-tinting-on-appcompat-toolbar
+        Drawable drawable = item.getIcon();
+        drawable = DrawableCompat.wrap(drawable);
+        drawable = drawable.getConstantState().newDrawable(); // clone it.
+        //DrawableCompat.setTint(drawable, ContextCompat.getColor(this, R.color.themeTextColorPrimary));
+        DrawableCompat.setTint(drawable, ColorUtils.getBackgroundColor(this));
+        argMenu.findItem(R.id.menu_download_manager).setIcon(drawable);
 
         if (ps == null)
             return;

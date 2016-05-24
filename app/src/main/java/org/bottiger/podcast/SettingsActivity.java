@@ -79,8 +79,8 @@ public class SettingsActivity extends ToolbarActivity implements SharedPreferenc
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
 			String key) {
 		if (!TextUtils.isEmpty(DARK_THEME_KEY) && key.equals(DARK_THEME_KEY)) {
-			//recreate();
             UIUtils.setTheme(this);
+            recreate();
 			return;
 		}
 	}

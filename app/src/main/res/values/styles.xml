@@ -53,6 +53,8 @@
         <item name="themeTextColorPrimary">@color/pitch_black</item>
         <item name="themeTextColorFaded">@color/grayDark</item>
 
+        <item name="icon_fill_color">@color/pitch_black</item>
+
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorSecondary</item>
@@ -81,6 +83,17 @@
 
         <!-- fonts -->
         <item name="android:textViewStyle">@style/SoundWavesTextViewStyle</item>
+    </style>
+
+    <style name="Theme.Transparent" parent="SoundWavesTheme.Light">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+
+        <item name="android:textColorPrimary">@color/white_opaque</item>
+
     </style>
 
     <!--
@@ -204,31 +217,9 @@
     <style name="NotificationTitle" parent="android:TextAppearance.Material.Notification.Title"></style>
     <style name="NotificationText" parent="android:TextAppearance.Material.Notification"></style>
 
-    <!--
-    <style name="NotificationTitle">
-        <item name="textColor">@color/primary_text_default_material_light</item>
-        <item name="textSize">@dimen/notification_title_text_size</item>
-    </style>
-
-    <style name="NotificationContent">
-        <item name="textColor">@color/primary_text_default_material_light</item>
-        <item name="textSize">@dimen/notification_title_text_size</item>
-    </style>
-    -->
-
-
     <style name="SoundWaves.PreferenceActivity.Light" parent="SoundWavesTheme.Light">
         <item name="android:windowTranslucentNavigation" tools:targetApi="19">false</item> <!-- actionbar and  bottom navigation -->
         <item name="android:windowTranslucentStatus" tools:targetApi="19">false</item> <!-- top statusbar -->
-    </style>
-
-    <style name="Theme.Transparent" parent="Theme.AppCompat.NoActionBar">
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowNoTitle">true</item>
-        <!--<item name="android:windowIsFloating">true</item>-->
-        <item name="android:backgroundDimEnabled">false</item>
     </style>
 
     <style name="FrameworkRoot.ActionBar" parent="android:Widget.Holo.ActionBar" />
