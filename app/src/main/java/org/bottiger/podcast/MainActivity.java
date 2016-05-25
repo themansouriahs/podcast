@@ -7,6 +7,7 @@ import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.service.syncadapter.CloudSyncUtils;
 import org.bottiger.podcast.utils.PreferenceHelper;
+import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.views.dialogs.DialogAddPodcast;
 import org.bottiger.podcast.utils.ThemeHelper;
 import org.bottiger.podcast.utils.TransitionUtils;
@@ -45,6 +46,7 @@ public class MainActivity extends FragmentContainerActivity {
 		super.onCreate(savedInstanceState);
 
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		currentTheme = UIUtils.getTheme(this);
 
 		if (ApplicationConfiguration.TRACE_STARTUP) {
 			//ViewServer.get(this).addWindow(this);
@@ -118,6 +120,10 @@ public class MainActivity extends FragmentContainerActivity {
 
 	@Override
 	public void onResume() {
+		if (currentTheme != UIUtils.getTheme(this)) {
+			recreate();
+		}
+
         super.onResume();
 	}
 

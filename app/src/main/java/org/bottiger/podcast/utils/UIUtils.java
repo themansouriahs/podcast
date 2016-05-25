@@ -485,11 +485,8 @@ public class UIUtils {
       * @param argAppCompatActivity
      */
     public static void setTheme(@NonNull Context argAppCompatActivity) {
-        String theme = PreferenceHelper.getStringPreferenceValue(argAppCompatActivity,
-                R.string.pref_dark_theme_key,
-                R.string.pref_theme_default);
 
-        int themeIntval = Integer.parseInt(theme);
+        int themeIntval = getTheme(argAppCompatActivity);
 
         if (themeIntval == 1) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
@@ -502,6 +499,14 @@ public class UIUtils {
         if (themeIntval == 3) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO);
         }
+    }
+
+    public static int getTheme(@NonNull Context argAppCompatActivity) {
+        String theme = PreferenceHelper.getStringPreferenceValue(argAppCompatActivity,
+                R.string.pref_dark_theme_key,
+                R.string.pref_theme_default);
+
+        return Integer.parseInt(theme);
     }
 
 }
