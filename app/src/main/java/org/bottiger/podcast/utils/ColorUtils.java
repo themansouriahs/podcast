@@ -37,6 +37,10 @@ public class ColorUtils {
         return getColor(argContext, R.attr.themeBackground);
     }
 
+    public static @ColorInt int getIconColor(@NonNull Context argContext) {
+        return getColor(argContext, android.R.attr.textColorPrimary);
+    }
+
     public static void tintButton(@NonNull Button argButton, @NonNull ColorExtractor argColorExtractor) {
         tintButton(argButton, argColorExtractor.getPrimary());
     }

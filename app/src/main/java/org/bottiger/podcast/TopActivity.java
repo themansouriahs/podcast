@@ -288,7 +288,7 @@ public class TopActivity extends AppCompatActivity {
         drawable = DrawableCompat.wrap(drawable);
         drawable = drawable.getConstantState().newDrawable(); // clone it.
         //DrawableCompat.setTint(drawable, ContextCompat.getColor(this, R.color.themeTextColorPrimary));
-        DrawableCompat.setTint(drawable, ColorUtils.getBackgroundColor(this));
+        DrawableCompat.setTint(drawable, ColorUtils.getIconColor(this));
         argMenu.findItem(R.id.menu_download_manager).setIcon(drawable);
 
         if (ps == null)
