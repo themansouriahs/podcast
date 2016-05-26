@@ -243,6 +243,22 @@
             </intent-filter>
         </receiver>
 
+        <receiver
+            android:name=".widgets.SoundWavesWidgetProvider" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/soundwaves_appwidget_info" />
+        </receiver>
+
+        <activity
+            android:name=".widgets.SoundWavesWidgetConfigure">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
+            </intent-filter>
+        </activity>
+
         <!--
         Don't be a dick :)
         -->

@@ -60,7 +60,8 @@ public class MediaRouterPlaybackActivity extends ToolbarActivity {
             MediaRouteActionProvider mediaRouteActionProvider =
                     (MediaRouteActionProvider) MenuItemCompat.getActionProvider(
                             mediaRouteMenuItem);
-            mediaRouteActionProvider.setRouteSelector(mediaRouteSelector);
+            if (mediaRouteActionProvider != null)
+                mediaRouteActionProvider.setRouteSelector(mediaRouteSelector);
         }
 
         // Return true to show the menu.

@@ -158,7 +158,7 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
 
         mMetaBuilder.putText(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, argEpisode.getURL());
         mMetaBuilder.putText(MediaMetadataCompat.METADATA_KEY_TITLE, argEpisode.getTitle());
-        //mMetaBuilder.putText(MediaMetadataCompat.METADATA_KEY_ALBUM, "yo");
+        mMetaBuilder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, argEpisode.getDuration());
         mMetaBuilder.putText(MediaMetadataCompat.METADATA_KEY_ARTIST, argEpisode.getAuthor());
         //mMetaBuilder.putText(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST, "ko");
         //mMetaBuilder.putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, 3);
