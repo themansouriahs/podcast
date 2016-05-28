@@ -135,12 +135,7 @@ public class Library {
     };
 
     public Library(@NonNull Context argContext) {
-        mContext = argContext;
-
-        PodcastOpenHelper podcastOpenHelper = PodcastOpenHelper.getInstance(argContext);
-
-        //String sql = "update " + SubscriptionColumns.TABLE_NAME + " SET " + SubscriptionColumns.STATUS + "=" + Subscription.STATUS_SUBSCRIBED;
-        //podcastOpenHelper.getWritableDatabase().execSQL(sql);
+        mContext = argContext.getApplicationContext();
 
         mLibraryPersistency = new LibraryPersistency(argContext, this);
 
@@ -338,7 +333,7 @@ public class Library {
         return mSubscriptionIdLUT.get(argId);
     }
 
-    @Nullable
+    @NonNull
     public ArrayList<IEpisode> getEpisodes() {
         return mEpisodes;
     }

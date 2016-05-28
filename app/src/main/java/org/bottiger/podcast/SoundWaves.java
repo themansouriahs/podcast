@@ -192,6 +192,7 @@ public class SoundWaves extends Application {
         return sDownloadManager;
     }
 
+    @NonNull
     public static Library getLibraryInstance() {
         if (sLibrary == null) {
             sLibrary = new Library(getAppContext());

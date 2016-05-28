@@ -186,6 +186,9 @@
     <string name="log_submit_activity__posting_logs">Posting logs to gist&#8230;</string>
     <string name="preferences__submit_debug_log">Submit debug log</string>
 
+    <!-- Widget -->
+    <string name="widget_playlist_empty">The playlist is empty.</string>
+
     <!--
     Used for displaying the download progress of a file. Example: "1.2 MB of 53 MB" (the unit, MB, is handled by the framework)
     When the progress is 0 (we have not started downloading) we should just show the total file size. Example "53 MB"

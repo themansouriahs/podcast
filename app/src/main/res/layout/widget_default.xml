@@ -4,117 +4,26 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:theme="@style/Theme.AppCompat"
-    android:background="@color/white_opaque">
-
-
-    <ImageView
-        android:src="@drawable/soundwaves"
-        android:layout_width="90dp"
-        android:layout_height="90dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:id="@+id/widget_logo" />
+    android:theme="@style/Theme.AppCompat.Light"
+    android:background="?android:attr/windowBackground">
 
     <TextView
-        android:text="Podcast Title"
+        android:id="@+id/widget_playlist_empty_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/widget_logo"
-        android:layout_toRightOf="@+id/widget_logo"
-        android:layout_toEndOf="@+id/widget_logo"
-        android:textColor="@color/black"
-        android:id="@+id/widget_title"
-        android:textAppearance="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large" />
+        android:layout_centerInParent="true"
+        android:text="@string/widget_playlist_empty"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
-    <Chronometer
-        android:text="Duration"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/widget_title"
-        android:layout_alignLeft="@id/widget_title"
-        android:textColor="@color/black"
-        android:id="@+id/widget_duration" />
-
-    <TextView
-        android:text=" / 1:12:34"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/widget_title"
-        android:layout_toRightOf="@+id/widget_duration"
-        android:layout_toEndOf="@+id/widget_duration"
-        android:textColor="@color/black"
-        android:id="@+id/widget_duration_total" />
-
-    <ProgressBar
-        style="?android:attr/progressBarStyleHorizontal"
+    <!-- Only supported from API 16
+    <ViewStub
+        android:id="@+id/stub_import"
+        android:inflatedId="@+id/widget_player_stub"
+        android:layout="@layout/widget_player"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/widget_logo"
-        android:layout_alignLeft="@+id/widget_logo"
-        android:layout_alignStart="@+id/widget_logo"
-        android:id="@+id/progressBar"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:max="1000" />
-
-    <ImageButton
-        android:src="@drawable/ic_volume_up_black"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/widget_mute"
-        android:layout_below="@+id/progressBar"
-        android:layout_alignLeft="@+id/progressBar"
-        android:layout_alignStart="@+id/progressBar"
-        android:background="@null"/>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/progressBar"
-        android:layout_centerHorizontal="true"
-        android:id="@+id/linearLayout">
-        <!--
-        android:gravity="center_horizontal"
+        android:layout_height="match_parent" />
         -->
 
-        <ImageButton
-            android:src="@drawable/ic_fast_rewind_black"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/widget_rewind"
-            android:background="@null"/>
-
-        <ImageButton
-            android:src="@drawable/ic_play_arrow_black"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/widget_play"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:background="@null"/>
-
-        <ImageButton
-            android:src="@drawable/ic_fast_forward_black"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/widget_fast_forward"
-            android:background="@null"/>
-
-    </LinearLayout>
-
-    <ImageButton
-        android:src="@drawable/ic_skip_next_black"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/imageButton3"
-        android:layout_below="@+id/progressBar"
-        android:background="@null"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+    <include layout="@layout/widget_player" />
 
 </RelativeLayout>
