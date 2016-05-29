@@ -71,13 +71,8 @@ public class DialogAddPodcast {
 					public void onClick(DialogInterface dialog, int whichButton) {
 
 						try {
-							/*
 							URL url = new URL(input.getText().toString());
-							Subscription sub = new Subscription(url.toString());
-							sub.subscribe(activity.getApplicationContext());
-							*/
-							URL url = new URL(input.getText().toString());
-							SoundWaves.getLibraryInstance().subscribe(url.toString());
+							SoundWaves.getAppContext(activity).getLibraryInstance().subscribe(url.toString());
 						} catch (MalformedURLException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();

@@ -176,7 +176,7 @@ public class PlayerButtonView extends ImageButton implements PaletteListener  {
 
     @Override
     public String getPaletteUrl() {
-        return mEpisode.getArtwork().toString();
+        return mEpisode.getArtwork(getContext()).toString();
     }
 
     public interface DownloadStatus {

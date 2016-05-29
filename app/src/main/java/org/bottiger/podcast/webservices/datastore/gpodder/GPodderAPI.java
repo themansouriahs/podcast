@@ -134,7 +134,8 @@ public class GPodderAPI implements IWebservice {
      */
     public
     @SynchronizationResult
-    int synchronize(@NonNull Context argContext, @NonNull LongSparseArray<Subscription> argLocalSubscriptions) throws IOException {
+    int synchronize(@NonNull Context argContext,
+                    @NonNull LongSparseArray<Subscription> argLocalSubscriptions) throws IOException {
 
         Response response = api.login(mUsername).execute();
         if (!response.isSuccessful())
@@ -180,7 +181,7 @@ public class GPodderAPI implements IWebservice {
             changedSubscription = new Subscription(newUrl);
             changedSubscription.subscribe(argContext);
             */
-            SoundWaves.getLibraryInstance().subscribe(newUrl);
+            SoundWaves.getAppContext(argContext).getLibraryInstance().subscribe(newUrl);
         }
 
         /**
@@ -211,7 +212,7 @@ public class GPodderAPI implements IWebservice {
 
             if (removed.contains(url)) {
                 if (subscription.IsSubscribed()) {
-                    SoundWaves.getLibraryInstance().unsubscribe(subscription.getURLString(), "GPodder:Unsubscribe");
+                    SoundWaves.getAppContext(argContext).getLibraryInstance().unsubscribe(subscription.getURLString(), "GPodder:Unsubscribe");
                 } else {
                     Log.w(TAG, "gPodder removed a subscription we are not subscribed to: " + url); // NoI18N
                     VendorCrashReporter.report("Removed unknown subscription", url); // NoI18N
@@ -256,7 +257,7 @@ public class GPodderAPI implements IWebservice {
          */
         //String where = String.format("%s>%d", ItemColumns.LAST_UPDATE, lastSync * 1000);
         //FeedItem[] items = FeedCursorLoader.asCursor(argContext.getContentResolver(), where);
-        ArrayList<IEpisode> allItems = SoundWaves.getLibraryInstance().getEpisodes();
+        ArrayList<IEpisode> allItems = SoundWaves.getAppContext(argContext).getLibraryInstance().getEpisodes();
         List<FeedItem> recentlySyncedItems = new LinkedList<>();
         IEpisode episode;
         FeedItem eitem;
@@ -361,7 +362,7 @@ public class GPodderAPI implements IWebservice {
                 action = remoteActions[i];
                 if (action != null && action.action == GEpisodeAction.PLAY) {
                     //item = FeedItem.getByURL(resolver, action.episode);
-                    item = SoundWaves.getLibraryInstance().getEpisode(action.episode);
+                    item = SoundWaves.getAppContext(argContext).getLibraryInstance().getEpisode(action.episode);
                     if (item != null) {
                         item.setOffset(resolver, action.position*1000);
                     }
@@ -432,7 +433,7 @@ public class GPodderAPI implements IWebservice {
             newLocalSubscription = new Subscription(gSubscription.getUrl());
             newLocalSubscription.subscribe(argContext);
             */
-            SoundWaves.getLibraryInstance().subscribe(gSubscription.getUrl());
+            SoundWaves.getAppContext(argContext).getLibraryInstance().subscribe(gSubscription.getUrl());
         }
 
 

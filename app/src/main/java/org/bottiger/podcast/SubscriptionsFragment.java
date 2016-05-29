@@ -97,7 +97,7 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
         mActivity = getActivity();
-        mLibrary = SoundWaves.getLibraryInstance();
+        mLibrary = SoundWaves.getAppContext(getContext()).getLibraryInstance();
         PREF_SUBSCRIPTION_COLUMNS = mActivity.getResources().getString(R.string.pref_subscriptions_columns_key);
         PREF_SHARE_ANALYTICS_KEY = mActivity.getResources().getString(R.string.pref_anonymous_feedback_key);
         PREF_CLOUD_SUPPORT_KEY = mActivity.getResources().getString(R.string.pref_cloud_support_key);
@@ -269,7 +269,7 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
 
         switch (menuItem.getItemId()) {
             case R.id.unsubscribe:
-                Subscription subscription = SoundWaves.getLibraryInstance().getSubscription((long)position);
+                Subscription subscription = SoundWaves.getAppContext(getContext()).getLibraryInstance().getSubscription((long)position);
 
                 if (subscription == null)
                     return false;

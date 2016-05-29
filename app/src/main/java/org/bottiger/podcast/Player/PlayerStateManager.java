@@ -77,8 +77,6 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
             mSession.setActive(true);
         }
 
-        //mDelayedStopHandler.removeCallbacksAndMessages(null);
-
         // The service needs to continue running even after the bound client (usually a
         // MediaController) disconnects, otherwise the music playback will stop.
         // Calling startService(Intent) will keep the service running until it is explicitly killed.
@@ -135,7 +133,7 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
 
         int bitmapSize = 512;
 
-        String url = argEpisode.getArtwork();
+        String url = argEpisode.getArtwork(mPlayerService);
         if (url == null) {
             mSession.setMetadata(mMetaBuilder.build());
             return;

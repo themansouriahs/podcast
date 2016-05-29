@@ -240,7 +240,7 @@ public class Library {
 
                 mEpisodesIdLUT.put(item.getId(), item);
 
-                Subscription subscription = item.getSubscription();
+                Subscription subscription = item.getSubscription(mContext);
 
                 if (subscription != null) {
                     subscription.addEpisode(item, true);

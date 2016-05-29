@@ -156,7 +156,7 @@ public class DownloadService extends IntentService {
 
         IEpisode episode = null;
         if (id > 0) {
-            episode = SoundWaves.getLibraryInstance().getEpisode(id);
+            episode = SoundWaves.getAppContext(this).getLibraryInstance().getEpisode(id);
         }
 
         QueueEpisode queueEpisode = new QueueEpisode(episode);

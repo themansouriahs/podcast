@@ -142,7 +142,7 @@ public class SubscriptionRefreshManager {
 
         int subscriptionsAdded = 0;
 
-        SortedList<Subscription> subscriptions = SoundWaves.getLibraryInstance().getSubscriptions();
+        SortedList<Subscription> subscriptions = SoundWaves.getAppContext(argContext).getLibraryInstance().getSubscriptions();
         for (int i = 0; i < subscriptions.size(); i++) {
            addSubscriptionToQueue(argContext, subscriptions.get(i), argCallback);
            subscriptionsAdded++;
@@ -186,12 +186,12 @@ public class SubscriptionRefreshManager {
     }
 
     @Deprecated
-    private void postProcess(@NonNull ContentResolver argContentResolver, @NonNull ISubscription argSubscription) {
+    private void postProcess(@NonNull Context argContext, @NonNull ISubscription argSubscription) {
         Log.d(SubscriptionRefreshManager.TAG, "Done Parsing: " + argSubscription);
 
         if (argSubscription instanceof Subscription) {
             Subscription subscription = (Subscription)argSubscription;
-            SoundWaves.getLibraryInstance().updateSubscription(subscription);
+            SoundWaves.getAppContext(argContext).getLibraryInstance().updateSubscription(subscription);
             Log.d(SubscriptionRefreshManager.TAG, "Done updating database for: " + argSubscription);
             return;
         }
@@ -210,7 +210,7 @@ public class SubscriptionRefreshManager {
         ISubscription parsedSubscription = null;
         try {
             if (argSubscription instanceof Subscription) {
-                SoundWaves.getLibraryInstance().loadEpisodesSync((Subscription)argSubscription, null);
+                SoundWaves.getAppContext(argContext).getLibraryInstance().loadEpisodesSync((Subscription)argSubscription, null);
             }
 
             if (response.code() == 401) { // 401 (Access Denied)
@@ -224,9 +224,9 @@ public class SubscriptionRefreshManager {
 
             if (response.body() != null && response.isSuccessful()) {
                 try {
-                    parsedSubscription = mFeedParser.parse(argSubscription, response.body().byteStream());
+                    parsedSubscription = mFeedParser.parse(argSubscription, response.body().byteStream(), argContext);
 
-                    postProcess(argContext.getContentResolver(), argSubscription);
+                    postProcess(argContext, argSubscription);
                     if (argSubscription instanceof Subscription) {
                         downloadNewEpisodeskCallback(argContext, argSubscription);
                     }

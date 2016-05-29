@@ -61,16 +61,6 @@ public class SlimEpisode extends BaseEpisode implements Parcelable {
     @Nullable
     @Override
     public String getArtwork(@NonNull Context argContext) {
-        String artwork = getArtwork();
-        if (artwork == null)
-            return null;
-
-        return artwork;
-    }
-
-    @Nullable
-    @Override
-    public String getArtwork() {
         if (mArtworkUrl == null)
             return null;
 
@@ -95,11 +85,6 @@ public class SlimEpisode extends BaseEpisode implements Parcelable {
     @Override
     public int getPriority() {
         return mPriority;
-    }
-
-    @Override
-    public ISubscription getSubscription() {
-        return null;
     }
 
     @Override
@@ -138,7 +123,7 @@ public class SlimEpisode extends BaseEpisode implements Parcelable {
 
     }
 
-    public float getPlaybackSpeed() {
+    public float getPlaybackSpeed(@NonNull Context argContext) {
         return PlaybackSpeed.UNDEFINED;
     }
 

@@ -85,7 +85,7 @@ public class DialogFeedAuthentication extends DialogFragment {
 
         View view = inflater.inflate(R.layout.dialog_authenticate_feed, null);
 
-        final Subscription subscription = SoundWaves.getLibraryInstance().getSubscription(url);
+        final Subscription subscription = SoundWaves.getAppContext(mActivity).getLibraryInstance().getSubscription(url);
 
         // bind things
         final ContentLoadingProgressBar contentLoadingProgressBar = (ContentLoadingProgressBar) view.findViewById(R.id.test_credentials_loading);

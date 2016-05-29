@@ -202,7 +202,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
 
     public static void start(@NonNull Activity argActivity, @NonNull Subscription argSubscription) {
         if (!argSubscription.IsLoaded()) {
-            SoundWaves.getLibraryInstance().loadEpisodes(argSubscription);
+            SoundWaves.getAppContext(argActivity).getLibraryInstance().loadEpisodes(argSubscription);
         }
         Bundle b = new Bundle();
         b.putBoolean(FEED_ACTIVITY_IS_SLIM, false);
@@ -486,7 +486,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
             mSubscription = b.<SlimSubscription>getParcelable(SUBSCRIPTION_SLIM_KEY);
             mIsSlimSubscription = true;
         } else {
-            mSubscription = SoundWaves.getLibraryInstance().getSubscription(url);
+            mSubscription = SoundWaves.getAppContext(this).getLibraryInstance().getSubscription(url);
             mIsSlimSubscription = false;
         }
     }

@@ -79,8 +79,8 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
 
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 
-        Library library = SoundWaves.getLibraryInstance();
-        library.loadPlaylistSync(SoundWaves.getPlaylist());
+        Library library = SoundWaves.getAppContext(context).getLibraryInstance();
+        library.loadPlaylistSync(SoundWaves.getAppContext(context).getPlaylist());
 
         // Construct the RemoteViews object.  It takes the package name (in our case, it's our
         // package, but it needs this because on the other side it's the widget host inflating
@@ -102,7 +102,7 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
 
             Log.wtf(TAG, episode.getTitle());
 
-            CharSequence podcast_title = episode.getSubscription().getTitle();
+            CharSequence podcast_title = episode.getSubscription(context).getTitle();
             CharSequence text = episode.getTitle();
             Long durationMs = episode.getDuration();
             Long elapsedTimeMs = episode.getOffset();
@@ -115,10 +115,6 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
 
             String chronometerFormat = "%s"; //episode.getOffset() + " / " + StrUtils.formatTime(durationMs);
 
-            if (isPlaying) {
-                //chronometerFormat = "%s / " + StrUtils.formatTime(durationMs);
-            }
-
             int playPauseIcon = !isPlaying ? R.drawable.ic_play_arrow_black : R.drawable.ic_pause_black;
             views.setImageViewResource(R.id.widget_play, playPauseIcon);
 
@@ -126,12 +122,11 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
             views.setTextViewText(R.id.widget_duration_total, " / " + StrUtils.formatTime(durationMs));
             views.setProgressBar(R.id.progressBar, 100, (int) progress, false);
 
-            String imageUrl = episode.getArtwork();
+            String imageUrl = episode.getArtwork(context);
             if (imageUrl != null) {
                 AppWidgetTarget appWidgetTarget = new AppWidgetTarget(context, views, R.id.widget_logo, appWidgetId);
 
-                Glide
-                        .with(context.getApplicationContext()) // safer!
+                Glide.with(context.getApplicationContext()) // safer!
                         .load(imageUrl)
                         .asBitmap()
                         .into(appWidgetTarget);

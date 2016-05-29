@@ -71,7 +71,7 @@ public class CloudSyncAdapter extends AbstractThreadedSyncAdapter {
                 return;
             }
 
-            SortedList<Subscription> iSubscriptionLongSparseArray = SoundWaves.getLibraryInstance().getSubscriptions();
+            SortedList<Subscription> iSubscriptionLongSparseArray = SoundWaves.getAppContext(getContext()).getLibraryInstance().getSubscriptions();
 
             // FIXME Hack to convet types
             LongSparseArray<Subscription> subscriptionLongSparseArray = new LongSparseArray<>(iSubscriptionLongSparseArray.size());

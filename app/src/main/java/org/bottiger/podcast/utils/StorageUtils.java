@@ -99,7 +99,7 @@ public class StorageUtils {
         long bytesToKeep = initialBytesToKeep;
 
         try {
-            ArrayList<IEpisode> episodes = SoundWaves.getLibraryInstance().getEpisodes();
+            ArrayList<IEpisode> episodes = SoundWaves.getAppContext(context).getLibraryInstance().getEpisodes();
             LinkedList<String> filesToKeep = new LinkedList<>();
 
             if (episodes == null)

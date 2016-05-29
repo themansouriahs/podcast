@@ -44,9 +44,9 @@ public class DiscoveryFeedActivity extends FeedActivity {
                 //Subscription subscription = new Subscription(url.toString());
                 //subscription.subscribe(DiscoveryFeedActivity.this);
                 if (mSubscription instanceof SlimSubscription) {
-                    SoundWaves.getLibraryInstance().subscribe((SlimSubscription) mSubscription);
+                    SoundWaves.getAppContext(DiscoveryFeedActivity.this).getLibraryInstance().subscribe((SlimSubscription) mSubscription);
                 } else {
-                    SoundWaves.getLibraryInstance().subscribe(mSubscription.getURL().toString());
+                    SoundWaves.getAppContext(DiscoveryFeedActivity.this).getLibraryInstance().subscribe(mSubscription.getURL().toString());
                 }
 
                 // if (Build.VERSION.SDK_INT >= 19) {

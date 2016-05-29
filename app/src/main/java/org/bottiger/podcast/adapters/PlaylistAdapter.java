@@ -135,7 +135,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
         viewHolder.setArtwork(null);
 
-        String image = item.getArtwork();
+        String image = item.getArtwork(mActivity);
         if (StrUtils.isValidUrl(image)) {
             Glide.with(mActivity).load(image).asBitmap().centerCrop().into(new BitmapImageViewTarget(viewHolder.mPodcastImage) {
                 @Override
@@ -155,7 +155,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
         viewHolder.mPlayPauseButton.setIconColor(Color.WHITE);
 
-        String artwork = item.getArtwork();
+        String artwork = item.getArtwork(mActivity);
         PaletteHelper.generate(artwork, activity, viewHolder.mPlayPauseButton);
         PaletteHelper.generate(artwork, activity, new PaletteListener() {
             @Override
@@ -184,8 +184,8 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         viewHolder.mMainTitle.setText(item.getTitle());
         viewHolder.mMainTitle.setTextColor(textColor);
 
-        if (item.getSubscription() != null)
-            viewHolder.mSecondaryTitle.setText(item.getSubscription().getTitle());
+        if (item.getSubscription(mActivity) != null)
+            viewHolder.mSecondaryTitle.setText(item.getSubscription(mActivity).getTitle());
 
         viewHolder.description.setText(item.getDescription());
         bindDuration(viewHolder, item);
@@ -265,9 +265,9 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         holder.removeButton.setEpisode(feedItem);
         holder.downloadButton.setEpisode(feedItem);
 
-        PaletteHelper.generate(feedItem.getArtwork(), mActivity, holder.downloadButton);
+        PaletteHelper.generate(feedItem.getArtwork(mActivity), mActivity, holder.downloadButton);
         //PaletteHelper.generate(feedItem.getArtwork(mActivity), mActivity, holder.favoriteButton);
-        PaletteHelper.generate(feedItem.getArtwork(), mActivity, holder.removeButton);
+        PaletteHelper.generate(feedItem.getArtwork(mActivity), mActivity, holder.removeButton);
 
 
         holder.removeButton.setOnClickListener(new View.OnClickListener() {

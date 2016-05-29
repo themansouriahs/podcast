@@ -270,7 +270,7 @@ public class SoundWavesDownloadManager extends Observable {
             }
 
 			try {
-                ArrayList<IEpisode> episodes = SoundWaves.getLibraryInstance().getEpisodes();
+                ArrayList<IEpisode> episodes = SoundWaves.getAppContext(context).getLibraryInstance().getEpisodes();
                 LinkedList<String> filesToKeep = new LinkedList<>();
 
                 if (episodes == null)
@@ -512,7 +512,7 @@ public class SoundWavesDownloadManager extends Observable {
 
             item.setIsVideo(StorageUtils.getFileType(mimetype) == VIDEO);
 
-            SoundWaves.getLibraryInstance().updateEpisode(item);
+            SoundWaves.getAppContext(mContext).getLibraryInstance().updateEpisode(item);
 
             Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
             try {

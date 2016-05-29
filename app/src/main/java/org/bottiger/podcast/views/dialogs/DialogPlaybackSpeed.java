@@ -108,7 +108,7 @@ public class DialogPlaybackSpeed extends DialogFragment {
                 IEpisode episode = playlist.first();
 
                 if (episode != null) {
-                    mOriginalPlaybackSpeed = episode.getPlaybackSpeed();
+                    mOriginalPlaybackSpeed = episode.getPlaybackSpeed(getContext());
                     scope = SUBSCRIPTION;
                 }
             }
@@ -182,7 +182,7 @@ public class DialogPlaybackSpeed extends DialogFragment {
                 if (mRadioSubscription.isChecked() && ps != null) {
                     IEpisode episode = ps.getPlaylist().first();
                     if (episode instanceof FeedItem) {
-                        ISubscription subscription = episode.getSubscription();
+                        ISubscription subscription = episode.getSubscription(mActivity);
                         if (subscription instanceof Subscription) {
                             Subscription subscription1 = (Subscription)subscription;
                             int storedSpeed = Math.round(mOriginalPlaybackSpeed * 10);

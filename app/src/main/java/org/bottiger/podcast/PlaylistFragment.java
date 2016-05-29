@@ -329,7 +329,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                             item.markAsListened(0);
                         }
 
-                        SoundWaves.getLibraryInstance().updateEpisode(episode);
+                        SoundWaves.getAppContext(getContext()).getLibraryInstance().updateEpisode(episode);
                     }
                 }, false);
 
@@ -435,7 +435,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
                                                         @Override
                                                         public void call(EpisodeChanged itemChangedEvent) {
                                                             long episodeId = itemChangedEvent.getId();
-                                                            IEpisode episode = SoundWaves.getLibraryInstance().getEpisode(episodeId);
+                                                            IEpisode episode = SoundWaves.getAppContext(getContext()).getLibraryInstance().getEpisode(episodeId);
 
                                                             if (episode == null)
                                                                 return;
@@ -508,7 +508,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
             mPlayPauseButton.setStatus(PlayerStatusObservable.PAUSED);
         }
 
-        ISubscription iSubscription = item.getSubscription();
+        ISubscription iSubscription = item.getSubscription(getContext());
         if (iSubscription instanceof org.bottiger.podcast.provider.Subscription) {
             org.bottiger.podcast.provider.Subscription subscription = (org.bottiger.podcast.provider.Subscription)iSubscription;
             mTopPlayer.setPlaybackSpeed(subscription.getPlaybackSpeed());
@@ -521,7 +521,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         mPlayerDownloadButton.setEpisode(item);
 
         final Activity activity = getActivity();
-        String artworkURL = item.getArtwork();
+        String artworkURL = item.getArtwork(getContext());
 
         if (iSubscription != null && !TextUtils.isEmpty(iSubscription.getImageURL())) {
             artworkURL = iSubscription.getImageURL();
@@ -565,7 +565,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
                 @Override
                 public String getPaletteUrl() {
-                    return item.getArtwork();
+                    return item.getArtwork(getContext());
                 }
             });
 

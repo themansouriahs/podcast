@@ -29,10 +29,12 @@ public class LibraryPersistency {
 
     private static final String TAG = "LibraryPersistency";
 
+    private Context mContext;
     private ContentResolver mContentResolver;
     private Library mLibrary;
 
     public LibraryPersistency(@NonNull Context argContext, @NonNull Library argLibrary) {
+        mContext = argContext;
         mContentResolver = argContext.getContentResolver();
         mLibrary = argLibrary;
     }
@@ -164,7 +166,7 @@ public class LibraryPersistency {
         cv.put(ItemColumns.STATUS, argItem.getStatus());
         cv.put(ItemColumns.LISTENED, argItem.getListenedValue());
         cv.put(ItemColumns.PRIORITY, argItem.getPriority());
-        cv.put(ItemColumns.IMAGE_URL, argItem.getArtwork());
+        cv.put(ItemColumns.IMAGE_URL, argItem.getArtwork(mContext));
         cv.put(ItemColumns.IS_DOWNLOADED, argItem.isDownloaded());
 
         // cv.put(ItemColumns.DATE, argItem.getDate());

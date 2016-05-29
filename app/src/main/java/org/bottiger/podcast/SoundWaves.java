@@ -3,14 +3,10 @@ package org.bottiger.podcast;
 import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.os.Debug;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.preference.PreferenceManager;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.media.MediaBrowserCompat;
@@ -41,7 +37,6 @@ import org.bottiger.podcast.utils.rxbus.RxBus;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 public class SoundWaves extends Application {
@@ -72,8 +67,8 @@ public class SoundWaves extends Application {
     private static Bus sBus = new Bus(ThreadEnforcer.MAIN);
     private static RxBus _rxBus = null;
 
-    private static Library sLibrary = null;
-    private static Playlist sPlaylist = null;
+    private Library mLibrary = null;
+    private Playlist mPlaylist = null;
 
     protected MediaBrowserCompat mMediaBrowser;
     public MediaControllerCompat mMediaControllerCompat; // FIXME: Should not be static.
@@ -130,24 +125,31 @@ public class SoundWaves extends Application {
             }
         });
 
-        Log.v(TAG, "time: " + System.currentTimeMillis());
+        Log.v(TAG, "time1: " + System.currentTimeMillis());
 
         sDownloadManager = new SoundWavesDownloadManager(this);
 
-        Log.v(TAG, "time: " + System.currentTimeMillis());
-        sLibrary = new Library(this);
-        Log.v(TAG, "time: " + System.currentTimeMillis());
+        Log.v(TAG, "time2: " + System.currentTimeMillis());
+        mLibrary = new Library(this);
+        Log.v(TAG, "time3: " + System.currentTimeMillis());
 
         sSubscriptionRefreshManager = new SubscriptionRefreshManager(context);
 
-        Log.v(TAG, "time: " + System.currentTimeMillis());
+        Log.v(TAG, "time4: " + System.currentTimeMillis());
         firstRun(context);
-        Log.v(TAG, "time: " + System.currentTimeMillis());
+        Log.v(TAG, "time5: " + System.currentTimeMillis());
 
         initMediaBrowser();
 
-        sPlaylist = new Playlist(this);
-        getLibraryInstance().loadPlaylist(sPlaylist);
+        Log.v(TAG, "time6: " + System.currentTimeMillis());
+
+        mPlaylist = new Playlist(this);
+
+        Log.v(TAG, "time7: " + System.currentTimeMillis());
+
+        getLibraryInstance().loadPlaylist(mPlaylist);
+
+        Log.v(TAG, "time8: " + System.currentTimeMillis());
 
         incrementStartupCount(context);
     }
@@ -207,21 +209,26 @@ public class SoundWaves extends Application {
     }
 
     @NonNull
-    public static Library getLibraryInstance() {
-        if (sLibrary == null) {
-            sLibrary = new Library(getAppContext());
+    public Library getLibraryInstance() {
+        if (mLibrary == null) {
+            mLibrary = new Library(this);
         }
 
-        return sLibrary;
+        return mLibrary;
     }
 
     @NonNull
-    public static Playlist getPlaylist() {
-        if (sPlaylist == null) {
-            sPlaylist = new Playlist(getAppContext());
+    public Playlist getPlaylist() {
+        if (mPlaylist == null) {
+            mPlaylist = new Playlist(this);
         }
 
-        return sPlaylist;
+        return mPlaylist;
+    }
+
+    @NonNull
+    public static SoundWaves getAppContext(@NonNull Context argContext) {
+        return (SoundWaves)argContext.getApplicationContext();
     }
 
     private static Observable<Playlist> sPlaylistObservabel;

@@ -27,14 +27,12 @@ public interface IEpisode {
 
     String getTitle();
     URL getUrl();
-    @Deprecated @Nullable String getArtwork(@NonNull Context argContext);
-    @Nullable String getArtwork();
+    @Nullable String getArtwork(@NonNull Context argContext);
     String getDescription();
     String getAuthor();
     long getDuration();
     int getPriority();
-    ISubscription getSubscription();
-    @Deprecated ISubscription getSubscription(@NonNull Context argContext);
+    ISubscription getSubscription(@NonNull Context argContext);
     long getOffset();
     Date getDateTime();
     Date getCreatedAt();
@@ -47,7 +45,7 @@ public interface IEpisode {
     void setDuration(long argDurationMs);
     void setOffset(@Nullable ContentResolver contentResolver, long i);
 
-    float getPlaybackSpeed();
+    float getPlaybackSpeed(@NonNull Context argContext);
 
     double getProgress();
     void setProgress(double argProgress);

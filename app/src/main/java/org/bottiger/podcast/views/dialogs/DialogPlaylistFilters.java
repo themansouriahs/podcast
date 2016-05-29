@@ -206,7 +206,7 @@ public class DialogPlaylistFilters extends DialogFragment {
             }
         }
 
-        SoundWaves.getLibraryInstance().loadPlaylist(mPlaylist);
+        SoundWaves.getAppContext(getContext()).getLibraryInstance().loadPlaylist(mPlaylist);
     }
 
     private void initOnlyDownloaded() {
@@ -277,7 +277,7 @@ public class DialogPlaylistFilters extends DialogFragment {
     private void initSubscriptionFilter(@NonNull LayoutInflater argLayoutInflater, @NonNull View argView) {
         mSubscriptions.clear();
 
-        SortedList<Subscription> list = SoundWaves.getLibraryInstance().getSubscriptions();
+        SortedList<Subscription> list = SoundWaves.getAppContext(getContext()).getLibraryInstance().getSubscriptions();
         for (int i = 0; i < list.size(); i++) {
             Subscription s = list.get(i);
             if (s.getStatus() == Subscription.STATUS_SUBSCRIBED)

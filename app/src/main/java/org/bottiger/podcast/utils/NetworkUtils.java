@@ -69,7 +69,9 @@ public class NetworkUtils {
         return SoundWavesDownloadManager.NETWORK_OK;
 	}
 
-    public static boolean canDownload(QueueEpisode nextInQueue, @NonNull Context argContext, @NonNull ReentrantLock argLock) {
+    public static boolean canDownload(QueueEpisode nextInQueue,
+                                      @NonNull Context argContext,
+                                      @NonNull ReentrantLock argLock) {
         // Make sure we have access to external storage
         if (!SDCardManager.getSDCardStatusAndCreate()) {
             return false;
@@ -81,7 +83,7 @@ public class NetworkUtils {
         try {
             argLock.lock();
 
-            downloadingItem = SoundWaves.getLibraryInstance().getEpisode(nextInQueue.getId());
+            downloadingItem = SoundWaves.getAppContext(argContext).getLibraryInstance().getEpisode(nextInQueue.getId());
 
             if (downloadingItem == null)
                 return false;

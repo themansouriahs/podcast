@@ -114,7 +114,7 @@ public class OPMLImportExport {
 			// Test we if already have the item in out database.
 			// If not we add it.
 			boolean isAlreadySubscribed = false;
-			Subscription subscription = SoundWaves.getLibraryInstance().getSubscription(url);
+			Subscription subscription = SoundWaves.getAppContext(mActivity).getLibraryInstance().getSubscription(url);
 			if (subscription != null && subscription.status == Subscription.STATUS_SUBSCRIBED) {
 				isAlreadySubscribed = true;
 			}
@@ -168,27 +168,17 @@ public class OPMLImportExport {
         List<Subscription> importedSubscriptions = new LinkedList<>();
 
 		Subscription subscription;
-		Library library = SoundWaves.getLibraryInstance();
+		Library library = SoundWaves.getAppContext(mActivity).getLibraryInstance();
 
 		for (OpmlElement element : elements) {
 			String url = element.getXmlUrl();
 
 			if (!library.IsSubscribed(url)) {
-				SoundWaves.getLibraryInstance().subscribe(url);
+				SoundWaves.getAppContext(mActivity).getLibraryInstance().subscribe(url);
 				numImported++;
-				importedSubscriptions.add(SoundWaves.getLibraryInstance().getSubscription(url));
+				importedSubscriptions.add(SoundWaves.getAppContext(mActivity).getLibraryInstance().getSubscription(url));
 			}
 		}
-
-		/*
-		if (numImported > 0) {
-            mUpdater.commit(contentResolver);
-
-            for (Subscription insertedSubscription : importedSubscriptions) {
-                insertedSubscription.refreshAsync(mActivity);
-            }
-        }
-        */
 
 		return numImported;
 	}
@@ -235,7 +225,7 @@ public class OPMLImportExport {
         }
 
         OpmlWriter opmlWriter = new OpmlWriter();
-        SortedList<Subscription> subscriptionList = SoundWaves.getLibraryInstance().getSubscriptions();
+        SortedList<Subscription> subscriptionList = SoundWaves.getAppContext(mActivity).getLibraryInstance().getSubscriptions();
 
         try {
             opmlWriter.writeDocument(subscriptionList, fileWriter);

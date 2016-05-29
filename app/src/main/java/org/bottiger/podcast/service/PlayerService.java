@@ -157,7 +157,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
         wifiLock = ((WifiManager) getSystemService(Context.WIFI_SERVICE))
                 .createWifiLock(WifiManager.WIFI_MODE_FULL, LOCK_NAME);
 
-		SoundWaves.getBus().register(SoundWaves.getPlaylist());
+		SoundWaves.getBus().register(SoundWaves.getAppContext(this).getPlaylist());
 		SoundWaves.getBus().register(this);
 
 		mPodcastUpdater = new PodcastUpdater(this);
@@ -220,7 +220,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 	@Override
 	public void onDestroy() {
 		sInstance = null;
-		SoundWaves.getBus().unregister(SoundWaves.getPlaylist());
+		SoundWaves.getBus().unregister(SoundWaves.getAppContext(this).getPlaylist());
 		SoundWaves.getBus().unregister(this);
         super.onDestroy();
 		if (mPlayer != null) {
@@ -279,7 +279,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 	public void playNext() {
         IEpisode item = getCurrentItem();
-        IEpisode nextItem = SoundWaves.getPlaylist().getNext();
+        IEpisode nextItem = SoundWaves.getAppContext(this).getPlaylist().getNext();
 
 		if (item != null && item instanceof FeedItem) {
             ((FeedItem)item).trackEnded(getContentResolver());
@@ -291,8 +291,8 @@ public class PlayerService extends MediaBrowserServiceCompat implements
         }
 
 		play(nextItem.getUrl().toString());
-		SoundWaves.getPlaylist().removeItem(0);
-		SoundWaves.getPlaylist().notifyPlaylistChanged();
+		SoundWaves.getAppContext(this).getPlaylist().removeItem(0);
+		SoundWaves.getAppContext(this).getPlaylist().notifyPlaylistChanged();
 	}
 
 	public void play() {
@@ -303,7 +303,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 			return;
 
         if (mItem == null)
-            mItem = SoundWaves.getPlaylist().getItem(0);
+            mItem = SoundWaves.getAppContext(this).getPlaylist().getItem(0);
 
         if (mItem == null)
             return;
@@ -333,7 +333,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 		IEpisode oldItem = mItem;
 
-		mItem = SoundWaves.getLibraryInstance().getEpisode(argEpisodeURL);
+		mItem = SoundWaves.getAppContext(this).getLibraryInstance().getEpisode(argEpisodeURL);
 
 		if (mItem == null)
 			return;
@@ -345,9 +345,9 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 				FeedItem oldFeedItem = (FeedItem)oldItem;
 				if (oldFeedItem.getPriority() > 0) {
 					oldFeedItem.setPriority(0);
-					int pos = SoundWaves.getPlaylist().getPosition(oldItem);
+					int pos = SoundWaves.getAppContext(this).getPlaylist().getPosition(oldItem);
 					if (pos >= 0) {
-						SoundWaves.getPlaylist().removeItem(pos);
+						SoundWaves.getAppContext(this).getPlaylist().removeItem(pos);
 					}
 				}
 
@@ -381,9 +381,9 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 		int offset = mItem.getOffset() < 0 ? 0 : (int) mItem.getOffset();
 
-		SoundWaves.getPlaylist().setAsFrist(mItem);
+		SoundWaves.getAppContext(this).getPlaylist().setAsFrist(mItem);
 
-		ISubscription subscription = mItem.getSubscription();
+		ISubscription subscription = mItem.getSubscription(this);
 		float speed = PlaybackSpeed.DEFAULT;
 
 		float globalSpeed = PlaybackSpeed.globalPlaybackSpeed(this);
@@ -407,7 +407,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
         if (feedItem != null) {
             if (feedItem.priority != 1)
                 feedItem.setPriority(null, getApplication());
-			SoundWaves.getLibraryInstance().updateEpisode(feedItem);
+			SoundWaves.getAppContext(this).getLibraryInstance().updateEpisode(feedItem);
         }
 	}
 
@@ -435,7 +435,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 		URL url = argEpisode.getUrl();
 
 		if (url == null) {
-			ISubscription subscription = argEpisode.getSubscription();
+			ISubscription subscription = argEpisode.getSubscription(this);
 			if (subscription != null)
 				VendorCrashReporter.report("Malform episode", "subscription: " + subscription.toString());
 
@@ -448,7 +448,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 	}
 
 	public void toggle() {
-		IEpisode episode = SoundWaves.getPlaylist().getItem(0);
+		IEpisode episode = SoundWaves.getAppContext(this).getPlaylist().getItem(0);
 
 		if (episode == null)
 			return;
@@ -459,13 +459,13 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 	private void start() {
 		if (!mPlayer.isPlaying()) {
 			if (mItem == null)
-				mItem = SoundWaves.getPlaylist().getItem(0);
+				mItem = SoundWaves.getAppContext(this).getPlaylist().getItem(0);
 
 			if (mItem == null)
 				return;
 
             takeWakelock(mPlayer.isSteaming());
-			SoundWaves.getPlaylist().setAsFrist(mItem);
+			SoundWaves.getAppContext(this).getPlaylist().setAsFrist(mItem);
 			mPlayer.start();
 
 			notifyStatus(mItem);
@@ -554,7 +554,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 	 */
     @Nullable
 	public IEpisode getNextId() {
-		IEpisode next = SoundWaves.getPlaylist().nextEpisode();
+		IEpisode next = SoundWaves.getAppContext(this).getPlaylist().nextEpisode();
 		if (next != null)
 			return next;
 		return null;
@@ -609,7 +609,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 	@Deprecated
     public Playlist getPlaylist() {
-        return SoundWaves.getPlaylist();
+        return SoundWaves.getAppContext(this).getPlaylist();
     }
 
 	public PlayerStateManager getPlayerStateManager() {

@@ -1,5 +1,6 @@
 package org.bottiger.podcast.parser;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringDef;
@@ -129,7 +130,9 @@ public class FeedParser {
 
     private boolean mParsingSlim = false;
 
-    public ISubscription parse(@NonNull ISubscription argSubscription, InputStream in) throws XmlPullParserException, IOException {
+    public ISubscription parse(@NonNull ISubscription argSubscription,
+                               @NonNull InputStream in,
+                               @NonNull Context argContext) throws XmlPullParserException, IOException {
         try {
             mParsingSlim = argSubscription instanceof SlimSubscription;
 
@@ -137,7 +140,7 @@ public class FeedParser {
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
             parser.setInput(in, null);
             parser.nextTag();
-            return readFeed(parser, argSubscription);
+            return readFeed(parser, argSubscription, argContext);
         } catch (Exception parseException) {
             Log.d(TAG, parseException.toString());
         } finally {
@@ -146,7 +149,9 @@ public class FeedParser {
         return argSubscription;
     }
 
-    private ISubscription readFeed(XmlPullParser parser, @NonNull ISubscription argSubscription) throws XmlPullParserException, IOException {
+    private ISubscription readFeed(@NonNull XmlPullParser parser,
+                                   @NonNull ISubscription argSubscription,
+                                   @NonNull Context argContext) throws XmlPullParserException, IOException {
 
 
         boolean addedEpisodes = false;
@@ -161,7 +166,7 @@ public class FeedParser {
             String name = parser.getName();
             // Starts by looking for the entry tag
             if (name.equals(startTag)) {
-                subscription = readChannel(parser, subscription);
+                subscription = readChannel(parser, subscription, argContext);
             }
             else if (name.equals(EPISODE_ITEM_TAG)) {
                 IEpisode episode = readEpisode(parser, subscription);
@@ -169,7 +174,7 @@ public class FeedParser {
                     subscription.addEpisode(episode);
                 }
 
-                boolean didAdd = SoundWaves.getLibraryInstance().addEpisode(episode);
+                boolean didAdd = SoundWaves.getAppContext(argContext).getLibraryInstance().addEpisode(episode);
                 if (didAdd) {
                     addedEpisodes = true;
                 }
@@ -209,7 +214,9 @@ public class FeedParser {
 
     // Parses the contents of an entry. If it encounters a title, summary, or link tag, hands them off
     // to their respective "read" methods for processing. Otherwise, skips the tag.
-    private ISubscription readChannel(XmlPullParser parser, @NonNull ISubscription argSubscription) throws XmlPullParserException, IOException {
+    private ISubscription readChannel(@NonNull  XmlPullParser parser,
+                                      @NonNull ISubscription argSubscription,
+                                      @NonNull Context argContext) throws XmlPullParserException, IOException {
         parser.require(XmlPullParser.START_TAG, ns, startTag);
 
         while (parser.next() != XmlPullParser.END_TAG) {
@@ -245,7 +252,7 @@ public class FeedParser {
                         argSubscription.addEpisode(episode);
                     }
 
-                    SoundWaves.getLibraryInstance().addEpisode(episode);
+                    SoundWaves.getAppContext(argContext).getLibraryInstance().addEpisode(episode);
 
                     break;
                 }

@@ -85,8 +85,8 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (SoundWaves.getLibraryInstance().containsSubscription(subscription)) {
-                    Subscription localsubscription = SoundWaves.getLibraryInstance().getSubscription(subscription.getURLString());
+                if (SoundWaves.getAppContext(mActivity).getLibraryInstance().containsSubscription(subscription)) {
+                    Subscription localsubscription = SoundWaves.getAppContext(mActivity).getLibraryInstance().getSubscription(subscription.getURLString());
                     FeedActivity.start(mActivity, localsubscription);
                 } else {
                     FeedActivity.startSlim(mActivity, subscription.getURLString(), (SlimSubscription)subscription);
@@ -141,7 +141,7 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
     }
 
     private void populateSubscribedUrls() {
-        SortedList<Subscription> subscriptionSortedList = SoundWaves.getLibraryInstance().getSubscriptions();
+        SortedList<Subscription> subscriptionSortedList = SoundWaves.getAppContext(mActivity).getLibraryInstance().getSubscriptions();
 
         Subscription subscription;
         for (int i = 0; i < subscriptionSortedList.size(); i++) {
@@ -175,10 +175,10 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
     }
 
     private void subscribe(@NonNull Subscription argSubscription) {
-        SoundWaves.getLibraryInstance().subscribe(argSubscription.getURLString());
+        SoundWaves.getAppContext(mActivity).getLibraryInstance().subscribe(argSubscription.getURLString());
     }
 
     private void unsubscribe(@NonNull Subscription argSubscription) {
-        SoundWaves.getLibraryInstance().unsubscribe(argSubscription.getURLString(), "DiscoveryAdapter:unsubscribe");
+        SoundWaves.getAppContext(mActivity).getLibraryInstance().unsubscribe(argSubscription.getURLString(), "DiscoveryAdapter:unsubscribe");
     }
 }

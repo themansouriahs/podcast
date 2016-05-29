@@ -83,7 +83,7 @@ public class OpenOpmlFromIntentActivity extends AppCompatActivity {
             if (subscription.IsDirty()) {
                 //newSubscription = new Subscription(subscription.getURLString());
                 //newSubscription.subscribe(this);
-                SoundWaves.getLibraryInstance().subscribe(subscription.getURLString());
+                SoundWaves.getAppContext(view.getContext()).getLibraryInstance().subscribe(subscription.getURLString());
                 didImport = true;
             }
         }

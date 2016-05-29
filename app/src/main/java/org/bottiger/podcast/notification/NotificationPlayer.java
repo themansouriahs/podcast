@@ -207,7 +207,7 @@ public class NotificationPlayer extends BroadcastReceiver {
         String title = item.getTitle();
         String content = "";
         try {
-            content = item.getSubscription().getTitle();
+            content = item.getSubscription(argPlayerService).getTitle();
         } catch (Exception e) {
             // Ignore
         }
@@ -310,7 +310,7 @@ public class NotificationPlayer extends BroadcastReceiver {
     }
 
     private void showNotification(final boolean isPlaying) {
-        String url = item.getArtwork();
+        String url = item.getArtwork(mPlayerService);
         if (TextUtils.isEmpty(url)) {
 
             // NOTIFICATION_PLAYER_ID allows you to update the notification later on.

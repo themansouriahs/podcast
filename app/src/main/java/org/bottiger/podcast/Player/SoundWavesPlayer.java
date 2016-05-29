@@ -196,7 +196,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
 
             SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.PLAY);
 
-            ISubscription sub = mPlayerService.getCurrentItem().getSubscription();
+            ISubscription sub = mPlayerService.getCurrentItem().getSubscription(mPlayerService);
             String url = sub != null ? sub.getURLString() : "";
             EventLogger.postEvent(mPlayerService,
                     EventLogger.LISTEN_EPISODE,
@@ -370,7 +370,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
                 // Mark current as listened
                 feedItem.markAsListened();
 
-                SoundWaves.getLibraryInstance().updateEpisode(feedItem);
+                SoundWaves.getAppContext(mPlayerService).getLibraryInstance().updateEpisode(feedItem);
             }
 
             final boolean doPlayNext = PreferenceHelper.getBooleanPreferenceValue(mPlayerService,
@@ -509,7 +509,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
             episode.markAsListened();
         }
 
-        SoundWaves.getLibraryInstance().updateEpisode(episode);
+        SoundWaves.getAppContext(mPlayerService).getLibraryInstance().updateEpisode(episode);
     }
 
     @Override

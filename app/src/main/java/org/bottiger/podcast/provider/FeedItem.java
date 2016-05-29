@@ -307,8 +307,8 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 	 * Update the FeedItem in the database
 	 */
 	@Deprecated
-	private void update(ContentResolver contentResolver) {
-		SoundWaves.getLibraryInstance().updateEpisode(this);
+	private void update(@NonNull Context argContext) {
+		SoundWaves.getAppContext(argContext).getLibraryInstance().updateEpisode(this);
 	}
 
 	/**
@@ -376,7 +376,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 		if (SDCardManager.getSDCardStatus()) {
 			try {
 				setDownloaded(false);
-				update(argContext.getContentResolver());
+				update(argContext);
 				File file = new File(getAbsolutePath());
 				if (file.exists() && file.delete()) {
                     DownloadProgressPublisher.deleteEpisode(this);
@@ -688,14 +688,8 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 	}
 
 	@Nullable
-	public Subscription getSubscription() {
-		return SoundWaves.getLibraryInstance().getSubscription(sub_id);
-	}
-
-	@Nullable
-	@Deprecated
     public Subscription getSubscription(@NonNull Context argContext) {
-		return SoundWaves.getLibraryInstance().getSubscription(sub_id);
+		return SoundWaves.getAppContext(argContext).getLibraryInstance().getSubscription(sub_id);
     }
 
     @Override
@@ -708,13 +702,13 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
     }
 
 	@Nullable
-	public String getArtwork() {
+	public String getArtwork(@NonNull Context argContext) {
 		String imageURL;
 
 		if (!TextUtils.isEmpty(image))
 			return image;
 
-		Subscription subscription = getSubscription();
+		Subscription subscription = getSubscription(argContext);
 
 		if (subscription == null)
 			return null;
@@ -725,13 +719,6 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 			return null;
 
 		return imageURL;
-	}
-
-	@Deprecated
-    @Nullable
-	@Override
-	public String getArtwork(@NonNull Context context) {
-		return getArtwork();
 	}
 
 	public long getId() {
@@ -881,11 +868,11 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 		return author;
 	}
 
-	public float getPlaybackSpeed() {
-		if (getSubscription() == null)
+	public float getPlaybackSpeed(@NonNull Context argContext) {
+		if (getSubscription(argContext) == null)
 			return PlaybackSpeed.UNDEFINED;
 
-		return getSubscription().getPlaybackSpeed();
+		return getSubscription(argContext).getPlaybackSpeed();
 	}
 
 	public void setAuthor(String argAuthor) {

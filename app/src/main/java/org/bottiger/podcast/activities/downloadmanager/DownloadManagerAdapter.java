@@ -104,7 +104,7 @@ public class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemVie
         mViewModels.add(viewModel);
         holder.getBinding().setVariable(BR.viewModel, viewModel);
 
-        String artWork = episode.getArtwork();
+        String artWork = episode.getArtwork(mContext);
         if (!TextUtils.isEmpty(artWork)) {
             ImageLoaderUtils.loadImageInto(holder.mImageView, artWork, null, true, false, true);
         }

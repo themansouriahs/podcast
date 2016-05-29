@@ -99,7 +99,7 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
 
     public void setContext(@NonNull Context argContext) {
 
-        mLibrary = SoundWaves.getLibraryInstance();
+        mLibrary = SoundWaves.getAppContext(argContext).getLibraryInstance();
 
         if (mContext == null) {
             sharedPreferences = PreferenceManager
@@ -294,7 +294,7 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
                 argEpisode.setPriority(preceedingItem.getPriority() + 1);
             }
 
-            SoundWaves.getLibraryInstance().updateEpisode(argEpisode);
+            SoundWaves.getAppContext(mContext).getLibraryInstance().updateEpisode(argEpisode);
 
             mInternalPlaylist.add(lastPlaylistPosition, argEpisode);
 
@@ -304,7 +304,7 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
                 int priority = episode.getPriority();
                 if (priority > 0) {
                     episode.setPriority(priority+1);
-                    SoundWaves.getLibraryInstance().updateEpisode(episode);
+                    SoundWaves.getAppContext(mContext).getLibraryInstance().updateEpisode(episode);
                 } else {
                     break;
                 }
