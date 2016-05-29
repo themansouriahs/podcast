@@ -8,14 +8,19 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Debug;
 import android.os.IBinder;
+import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.media.MediaBrowserCompat;
+import android.support.v4.media.session.MediaControllerCompat;
+import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
 
 import org.bottiger.podcast.cloud.EventLogger;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.player.sonic.service.ISoundWavesEngine;
 import com.squareup.otto.Bus;
@@ -28,6 +33,7 @@ import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
 import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.utils.PlayerHelper;
 import org.bottiger.podcast.utils.PodcastLog;
 import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.utils.rxbus.RxBus;
@@ -37,8 +43,6 @@ import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
-
-import static org.bottiger.podcast.SettingsActivity.DARK_THEME_KEY;
 
 public class SoundWaves extends Application {
 
@@ -69,6 +73,11 @@ public class SoundWaves extends Application {
     private static RxBus _rxBus = null;
 
     private static Library sLibrary = null;
+    private static Playlist sPlaylist = null;
+
+    protected MediaBrowserCompat mMediaBrowser;
+    public MediaControllerCompat mMediaControllerCompat; // FIXME: Should not be static.
+    public PlayerHelper mPlayerHelper = new PlayerHelper();
 
     public ISoundWavesEngine soundService;
 
@@ -134,6 +143,11 @@ public class SoundWaves extends Application {
         Log.v(TAG, "time: " + System.currentTimeMillis());
         firstRun(context);
         Log.v(TAG, "time: " + System.currentTimeMillis());
+
+        initMediaBrowser();
+
+        sPlaylist = new Playlist(this);
+        getLibraryInstance().loadPlaylist(sPlaylist);
 
         incrementStartupCount(context);
     }
@@ -201,6 +215,14 @@ public class SoundWaves extends Application {
         return sLibrary;
     }
 
+    @NonNull
+    public static Playlist getPlaylist() {
+        if (sPlaylist == null) {
+            sPlaylist = new Playlist(getAppContext());
+        }
+
+        return sPlaylist;
+    }
 
     private static Observable<Playlist> sPlaylistObservabel;
 
@@ -215,5 +237,52 @@ public class SoundWaves extends Application {
         }
 
         return sPlaylistObservabel;
+    }
+
+    private void initMediaBrowser() {
+        // Start the player service
+        mMediaBrowser = new MediaBrowserCompat(
+                this, // a Context
+                new ComponentName(this, PlayerService.class),
+                // Which MediaBrowserService
+                new MediaBrowserCompat.ConnectionCallback() {
+                    @Override
+                    public void onConnected() {
+                        try {
+                            // Ah, here’s our Token again
+                            MediaSessionCompat.Token token =
+                                    mMediaBrowser.getSessionToken();
+                            // This is what gives us access to everything
+                            mMediaControllerCompat =
+                                    new MediaControllerCompat(SoundWaves.this, token);
+                            mPlayerHelper.setMediaControllerCompat(mMediaControllerCompat);
+
+                            // Convenience method of FragmentActivity to allow you to use
+                            // getSupportMediaController() anywhere
+                            //setSupportMediaController(mMediaControllerCompat);
+                        } catch (RemoteException e) {
+                            Log.e(MainActivity.class.getSimpleName(),
+                                    "Error creating controller", e);
+                            VendorCrashReporter.handleException(e);
+                        }
+
+                        //SoundWaves.this.onServiceConnected();
+                    }
+
+                    @Override
+                    public void onConnectionSuspended() {
+                        // We were connected, but no longer :-(
+                        VendorCrashReporter.report("onConnectionSuspended", "it happend");
+                    }
+
+                    @Override
+                    public void onConnectionFailed() {
+                        // The attempt to connect failed completely.
+                        // Check the ComponentName!
+                        VendorCrashReporter.report("onConnectionFailed", "it happend");
+                    }
+                },
+                null); // optional Bundle
+        mMediaBrowser.connect();
     }
 }

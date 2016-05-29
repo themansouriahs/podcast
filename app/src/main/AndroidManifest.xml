@@ -252,12 +252,14 @@
                 android:resource="@xml/soundwaves_appwidget_info" />
         </receiver>
 
+        <!--
         <activity
             android:name=".widgets.SoundWavesWidgetConfigure">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
             </intent-filter>
         </activity>
+        -->
 
         <!--
         Don't be a dick :)

@@ -430,6 +430,11 @@ public class Library {
                 argPlaylist.getOrder();
     }
 
+    public void loadPlaylistSync(@NonNull final Playlist argPlaylist) {
+        String query = getPlaylistEpisodes(argPlaylist);
+        loadPlaylistInternal(query, argPlaylist);
+    }
+
     public void loadPlaylist(@NonNull final Playlist argPlaylist) {
         String query = getPlaylistEpisodes(argPlaylist);
 
@@ -438,23 +443,7 @@ public class Library {
                 .subscribe(new Action1<String>() {
             @Override
             public void call(String query) {
-                Cursor cursor = null;
-                int counter = 0;
-                try {
-                    cursor = PodcastOpenHelper.runQuery(Library.this.mContext, query);
-                    FeedItem episode;
-
-                    while (cursor.moveToNext()) {
-                        episode = LibraryPersistency.fetchEpisodeFromCursor(cursor, null);
-                        addEpisode(episode);
-                        argPlaylist.setItem(counter, episode);
-                        counter++;
-                    }
-                    argPlaylist.notifyPlaylistChanged();
-                } finally {
-                    if (cursor != null)
-                        cursor.close();
-                }
+                loadPlaylistInternal(query, argPlaylist);
             }
         }, new Action1<Throwable>() {
             @Override
@@ -463,6 +452,26 @@ public class Library {
                 Log.d(TAG, "error: " + throwable.toString());
             }
         });
+    }
+
+    private void loadPlaylistInternal(@NonNull String query, @NonNull  Playlist argPlaylist) {
+        Cursor cursor = null;
+        int counter = 0;
+        try {
+            cursor = PodcastOpenHelper.runQuery(Library.this.mContext, query);
+            FeedItem episode;
+
+            while (cursor.moveToNext()) {
+                episode = LibraryPersistency.fetchEpisodeFromCursor(cursor, null);
+                addEpisode(episode);
+                argPlaylist.setItem(counter, episode);
+                counter++;
+            }
+            argPlaylist.notifyPlaylistChanged();
+        } finally {
+            if (cursor != null)
+                cursor.close();
+        }
     }
 
     public void loadSubscriptions() {
@@ -493,6 +502,7 @@ public class Library {
                         mSubscriptionsChangeObservable.onNext(subscription);
                     if(cursor != null)
                         cursor.close();
+
                 }
             }
         }, new Action1<Throwable>() {

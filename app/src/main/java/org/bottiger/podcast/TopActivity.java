@@ -57,28 +57,15 @@ public class TopActivity extends AppCompatActivity {
 	private static SharedPreferences prefs;
     private Menu mMenu;
 
-    protected MediaBrowserCompat mMediaBrowser;
-    protected static MediaControllerCompat mMediaControllerCompat; // FIXME: Should not be static.
-    protected static PlayerHelper mPlayerHelper = new PlayerHelper();
-
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
         }
 
-        if (savedInstanceState == null) {
-            // Set the local night mode to some value
-            //UIUtils.setTheme(this);
-        }
-
         super.onCreate(savedInstanceState);
 
         boolean transparentStatus = transparentNavigationBar();
-        /*
-        if (transparentStatus && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        }*/
 
         if (transparentStatus && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
@@ -89,51 +76,6 @@ public class TopActivity extends AppCompatActivity {
             getWindow().setEnterTransition(transition);
             getWindow().setExitTransition(transition);
         }
-
-        // Start the player service
-        mMediaBrowser = new MediaBrowserCompat(
-                this, // a Context
-                new ComponentName(this, PlayerService.class),
-                // Which MediaBrowserService
-                new MediaBrowserCompat.ConnectionCallback() {
-                    @Override
-                    public void onConnected() {
-                        try {
-                            // Ah, here’s our Token again
-                            MediaSessionCompat.Token token =
-                                    mMediaBrowser.getSessionToken();
-                            // This is what gives us access to everything
-                            mMediaControllerCompat =
-                                    new MediaControllerCompat(TopActivity.this, token);
-                            mPlayerHelper.setMediaControllerCompat(mMediaControllerCompat);
-
-                            // Convenience method of FragmentActivity to allow you to use
-                            // getSupportMediaController() anywhere
-                            setSupportMediaController(mMediaControllerCompat);
-                        } catch (RemoteException e) {
-                            Log.e(MainActivity.class.getSimpleName(),
-                                    "Error creating controller", e);
-                            VendorCrashReporter.handleException(e);
-                        }
-
-                        TopActivity.this.onServiceConnected();
-                    }
-
-                    @Override
-                    public void onConnectionSuspended() {
-                        // We were connected, but no longer :-(
-                        VendorCrashReporter.report("onConnectionSuspended", "it happend");
-                    }
-
-                    @Override
-                    public void onConnectionFailed() {
-                        // The attempt to connect failed completely.
-                        // Check the ComponentName!
-                        VendorCrashReporter.report("onConnectionFailed", "it happend");
-                    }
-                },
-                null); // optional Bundle
-        mMediaBrowser.connect();
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -161,7 +103,6 @@ public class TopActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mMediaBrowser.disconnect();
     }
 
     @Override
@@ -249,12 +190,12 @@ public class TopActivity extends AppCompatActivity {
 
     @Nullable
     public MediaControllerCompat getMediaControllerCompat() {
-        return mMediaControllerCompat;
+        return ((SoundWaves)getApplicationContext()).mMediaControllerCompat;
     }
 
     @NonNull
     public PlayerHelper getPlayerHelper() {
-        return mPlayerHelper;
+        return ((SoundWaves)getApplicationContext()).mPlayerHelper;
     }
 
     protected void importOPMLButtonCallback() {
@@ -287,8 +228,8 @@ public class TopActivity extends AppCompatActivity {
         Drawable drawable = item.getIcon();
         drawable = DrawableCompat.wrap(drawable);
         drawable = drawable.getConstantState().newDrawable(); // clone it.
-        //DrawableCompat.setTint(drawable, ContextCompat.getColor(this, R.color.themeTextColorPrimary));
         DrawableCompat.setTint(drawable, ColorUtils.getIconColor(this));
+        //DrawableCompat.setTint(drawable, ColorUtils.getIconColor(this));
         argMenu.findItem(R.id.menu_download_manager).setIcon(drawable);
 
         if (ps == null)

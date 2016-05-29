@@ -5,8 +5,10 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.media.MediaMetadata;
 import android.media.session.MediaSession;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v4.media.MediaMetadataCompat;
@@ -35,6 +37,8 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
     private static final String TAG = "PlayerStateManager";
     private static final String SESSION_TAG = "SWMediaSession";
 
+    public static final String ACTION_TOGGLE = "playpause_action";
+
     private MediaSessionCompat mSession;
     private PlayerService mPlayerService;
 
@@ -59,9 +63,9 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
         PendingIntent pendingToggleIntent = PendingIntent.getBroadcast(mPlayerService, 0, toggleIntent, 0);
         mSession.setMediaButtonReceiver(pendingToggleIntent);
 
-
         mSession.setCallback(this);
         mSession.setActive(true);
+
     }
 
     /**
@@ -94,6 +98,27 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
         mPlayerService.stopForeground(true);
     }
 
+    public void onSkipToNext() {
+        mPlayerService.pause();
+    }
+
+    @Override
+    public void onFastForward() {
+        mPlayerService.getPlayer().fastForward();
+    }
+
+    @Override
+    public void onRewind() {
+        mPlayerService.getPlayer().rewind();
+    }
+
+    @Override
+    public void onCustomAction(String action, Bundle extras) {
+        if (ACTION_TOGGLE.equals(action)) {
+            mPlayerService.toggle();
+        }
+    }
+
     public void release() {
         mSession.release();
     }
@@ -104,6 +129,7 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
 
     public void updateMedia(@NonNull IEpisode argEpisode) {
         Log.d(TAG, "Update media: episode: " + argEpisode); // NoI18N
+
         final MediaMetadataCompat.Builder mMetaBuilder = new MediaMetadataCompat.Builder();
         populateFastMediaMetadata(mMetaBuilder, argEpisode);
 
@@ -160,10 +186,6 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
         mMetaBuilder.putText(MediaMetadataCompat.METADATA_KEY_TITLE, argEpisode.getTitle());
         mMetaBuilder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, argEpisode.getDuration());
         mMetaBuilder.putText(MediaMetadataCompat.METADATA_KEY_ARTIST, argEpisode.getAuthor());
-        //mMetaBuilder.putText(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST, "ko");
-        //mMetaBuilder.putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, 3);
-        //mMetaBuilder.putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, 15);
-        //mMetaBuilder.putLong(MediaMetadataCompat.METADATA_KEY_DISC_NUMBER, 1);
     }
 
     private PlaybackStateCompat.Builder getPlaybackState(@PlaybackStateCompat.State int argState, long argPosition, float argPlaybackSpeed) {

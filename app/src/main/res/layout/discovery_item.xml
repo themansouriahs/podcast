@@ -25,7 +25,11 @@
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
         android:checked="false"/>
+
+
     <!--
+
+
     android:layout_alignBottom="@id/result_image"
         android:layout_alignTop="@id/result_image"
         -->

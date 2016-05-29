@@ -257,9 +257,17 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         return mMediaCast != null && mMediaCast.isActive() ? mMediaCast.getCurrentPosition() : super.getCurrentPosition();
     }
 
+    public void rewind() {
+        rewind(null);
+    }
+
     public void rewind(@Nullable IEpisode argItem) {
         if (mPlayerService == null)
             return;
+
+        if (argItem == null) {
+            argItem = mPlayerService.getCurrentItem();
+        }
 
         if (argItem == null)
             return;
@@ -272,9 +280,17 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         }
     }
 
+    public void fastForward() {
+        fastForward(null);
+    }
+
     public void fastForward(@Nullable IEpisode argItem) {
         if (mPlayerService == null)
             return;
+
+        if (argItem == null) {
+            argItem = mPlayerService.getCurrentItem();
+        }
 
         if (argItem == null)
             return;

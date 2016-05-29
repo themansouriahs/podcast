@@ -3,9 +3,12 @@ package org.bottiger.podcast.widgets;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.SystemClock;
+import android.support.annotation.NonNull;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -21,6 +24,8 @@ import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.model.Library;
+import org.bottiger.podcast.notification.NotificationPlayer;
+import org.bottiger.podcast.player.PlayerStateManager;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.DateUtils;
@@ -31,6 +36,7 @@ import java.util.List;
 
 import static org.bottiger.podcast.R.id.chronometer;
 import static org.bottiger.podcast.R.id.widget_duration;
+import static org.bottiger.podcast.notification.NotificationPlayer.REQUEST_CODE;
 
 /**
  * Created by aplb on 26-05-2016.
@@ -48,17 +54,24 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
         for (int i=0; i<N; i++) {
             int appWidgetId = appWidgetIds[i];
 
-            // Create an Intent to launch ExampleActivity
-            Intent intent = new Intent(context, MainActivity.class);
-            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
-
             // Get the layout for the App Widget and attach an on-click listener
             // to the button
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_default);
-            views.setOnClickPendingIntent(R.id.widget_play, pendingIntent);
+
+            attachButtonListeners(context, views);
 
             // Tell the AppWidgetManager to perform an update on the current app widget
-            appWidgetManager.updateAppWidget(appWidgetId, views);
+            //appWidgetManager.updateAppWidget(appWidgetId, views);
+            updateAppWidget(context, appWidgetId);
+        }
+    }
+
+    public static void updateAllWidgets(@NonNull Context context) {
+        AppWidgetManager mgr= AppWidgetManager.getInstance(context);
+        ComponentName cn = new ComponentName(context, SoundWavesWidgetProvider.class);
+        int[] ids = mgr.getAppWidgetIds(cn);
+        for (int i = 0; i < ids.length; i++) {
+            updateAppWidget(context, ids[i]);
         }
     }
 
@@ -67,6 +80,7 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 
         Library library = SoundWaves.getLibraryInstance();
+        library.loadPlaylistSync(SoundWaves.getPlaylist());
 
         // Construct the RemoteViews object.  It takes the package name (in our case, it's our
         // package, but it needs this because on the other side it's the widget host inflating
@@ -91,7 +105,8 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
             CharSequence podcast_title = episode.getSubscription().getTitle();
             CharSequence text = episode.getTitle();
             Long durationMs = episode.getDuration();
-            boolean isPlaying = PlayerService.getInstance() != null && PlayerService.getInstance().isPlaying();
+            Long elapsedTimeMs = episode.getOffset();
+            boolean isPlaying = PlayerService.isPlaying();
 
             double progress = episode.getProgress();
 
@@ -107,7 +122,7 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
             int playPauseIcon = !isPlaying ? R.drawable.ic_play_arrow_black : R.drawable.ic_pause_black;
             views.setImageViewResource(R.id.widget_play, playPauseIcon);
 
-            views.setChronometer(R.id.widget_duration, SystemClock.elapsedRealtime() - durationMs, chronometerFormat, true);
+            views.setChronometer(R.id.widget_duration, SystemClock.elapsedRealtime() - elapsedTimeMs, chronometerFormat, isPlaying);
             views.setTextViewText(R.id.widget_duration_total, " / " + StrUtils.formatTime(durationMs));
             views.setProgressBar(R.id.progressBar, 100, (int) progress, false);
 
@@ -123,8 +138,72 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
             }
         }
 
+        attachButtonListeners(context, views);
+
         // Tell the widget manager
         appWidgetManager.updateAppWidget(appWidgetId, views);
+    }
+
+    private static void attachButtonListeners(Context context, RemoteViews views) {
+
+            Intent toggleIntent = new Intent(context, SoundWavesWidgetProvider.class);
+            toggleIntent.setAction(NotificationPlayer.toggleAction);
+
+            Intent nextIntent = new Intent(context, SoundWavesWidgetProvider.class);
+            nextIntent.setAction(NotificationPlayer.nextAction);
+
+            Intent fastForwardIntent = new Intent(context, SoundWavesWidgetProvider.class);
+            fastForwardIntent.setAction(NotificationPlayer.fastForwardAction);
+
+            Intent rewindIntent = new Intent(context, SoundWavesWidgetProvider.class);
+            rewindIntent.setAction(NotificationPlayer.rewindAction);
+
+            Intent muteIntent = new Intent(context, SoundWavesWidgetProvider.class);
+            muteIntent.setAction(NotificationPlayer.muteAction);
+
+            PendingIntent pendingToggleIntent = PendingIntent.getBroadcast(context, REQUEST_CODE, toggleIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+            PendingIntent pendingNextIntent = PendingIntent.getBroadcast(context, REQUEST_CODE, nextIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+            PendingIntent pendingFastForwardIntent = PendingIntent.getBroadcast(context, REQUEST_CODE, fastForwardIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+            PendingIntent pendingRewindIntent = PendingIntent.getBroadcast(context, REQUEST_CODE, rewindIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+            PendingIntent pendingMuteIntent = PendingIntent.getBroadcast(context, REQUEST_CODE, muteIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+            views.setOnClickPendingIntent(R.id.widget_play, pendingToggleIntent);
+            views.setOnClickPendingIntent(R.id.widget_skip_next, pendingNextIntent);
+            views.setOnClickPendingIntent(R.id.widget_rewind, pendingRewindIntent);
+            views.setOnClickPendingIntent(R.id.widget_fast_forward, pendingFastForwardIntent);
+            views.setOnClickPendingIntent(R.id.widget_mute, pendingMuteIntent);
+    }
+
+    @Override
+    public void onReceive(Context ctx, Intent intent) {
+        final String action = intent.getAction();
+
+        MediaControllerCompat mediaControllerCompat = ((SoundWaves)ctx.getApplicationContext()).
+                mMediaControllerCompat;
+
+        if (mediaControllerCompat != null) {
+
+            MediaControllerCompat.TransportControls transportControls = mediaControllerCompat.
+                    getTransportControls();
+
+            if (action.equals(NotificationPlayer.toggleAction)) {
+                transportControls.sendCustomAction(PlayerStateManager.ACTION_TOGGLE, new Bundle());
+            }
+            if (action.equals(NotificationPlayer.nextAction)) {
+                transportControls.skipToNext();
+            }
+            if (action.equals(NotificationPlayer.fastForwardAction)) {
+                transportControls.skipToNext();
+            }
+            if (action.equals(NotificationPlayer.rewindAction)) {
+                transportControls.skipToNext();
+            }
+            if (action.equals(NotificationPlayer.muteAction)) {
+
+            }
+
+        }
+        super.onReceive(ctx, intent);
     }
 
 }

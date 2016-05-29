@@ -47,6 +47,7 @@ public class NotificationPlayer extends BroadcastReceiver {
     public static final String pauseAction = ApplicationConfiguration.packageName + ".PAUSE";
     public static final String fastForwardAction = ApplicationConfiguration.packageName + ".FAST_FORWARD";
     public static final String rewindAction = ApplicationConfiguration.packageName + ".REWIND";
+    public static final String muteAction = ApplicationConfiguration.packageName + ".MUTE";
 
     private MediaSessionCompat.Token mSessionToken;
     private MediaControllerCompat mController;
@@ -62,7 +63,7 @@ public class NotificationPlayer extends BroadcastReceiver {
 	private NotificationManagerCompat mNotificationManagerCompat = null;
 
 	public static final int NOTIFICATION_PLAYER_ID = 4260;
-    private static final int REQUEST_CODE = 413;
+    public static final int REQUEST_CODE = 413;
 
     public NotificationPlayer(@NonNull PlayerService service , @NonNull IEpisode item) throws RemoteException {
         this.mPlayerService = service;
@@ -112,7 +113,7 @@ public class NotificationPlayer extends BroadcastReceiver {
             }
 
             Boolean isPlaying = false;
-            if (playerService.isPlaying()) {
+            if (PlayerService.isPlaying()) {
                 playerService.pause();
             } else {
                 playerService.play();
@@ -147,8 +148,7 @@ public class NotificationPlayer extends BroadcastReceiver {
     }
 
     public void show(@NonNull final IEpisode argItem) {
-        boolean isPlaying = mPlayerService != null && mPlayerService.isPlaying();
-		show(isPlaying, argItem);
+		show(PlayerService.isPlaying(), argItem);
 	}
 
 	public void show(final Boolean isPlaying, @NonNull final IEpisode argItem) {

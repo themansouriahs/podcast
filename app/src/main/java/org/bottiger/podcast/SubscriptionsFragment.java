@@ -136,6 +136,7 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
         mGridView.setAdapter(mAdapter);
 
         mRxSubscription = mLibrary.mSubscriptionsChangeObservable
+                .onBackpressureBuffer(10000)
                 .ofType(Subscription.class)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())

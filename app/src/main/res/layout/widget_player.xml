@@ -112,7 +112,7 @@
         android:src="@drawable/ic_skip_next_black"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/imageButton3"
+        android:id="@+id/widget_skip_next"
         android:layout_alignParentBottom="true"
         android:tint="?android:attr/textColorPrimary"
         android:background="@null"
