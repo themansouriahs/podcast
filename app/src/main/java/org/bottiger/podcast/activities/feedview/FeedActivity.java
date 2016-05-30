@@ -560,7 +560,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
 
         // ContextCompat.getColor(this, R.color.pitch_black)
         //int tintColor = UIUtils.isInNightMode() ? extractor.getSecondary() : extractor.getPrimary();
-        int tintColor = ColorUtils.adjustToTheme(getResources(), argChangedPalette, extractor.getPrimary());
+        int tintColor = ColorUtils.adjustToThemeDark(getResources(), argChangedPalette, extractor.getPrimary());
 
         // extractor.getPrimary()
         mMultiShrinkScroller.setHeaderTintColor(tintColor);

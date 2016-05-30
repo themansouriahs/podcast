@@ -39,7 +39,7 @@ public class FloatingActionButton extends android.support.design.widget.Floating
     @Override
     public void onPaletteFound(Palette argChangedPalette) {
         ColorExtractor extractor = new ColorExtractor(mContext, argChangedPalette);
-        int color = ColorUtils.adjustToTheme(mContext.getResources(), argChangedPalette, extractor.getPrimary());
+        int color = ColorUtils.adjustToThemeDark(mContext.getResources(), argChangedPalette, extractor.getPrimary());
         setBackgroundTintList(ColorStateList.valueOf(color));
         super.setRippleColor(extractor.getPrimaryTint());
 

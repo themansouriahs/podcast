@@ -67,6 +67,20 @@ public class ColorUtils {
         }
     }
 
+    public static @ColorInt int adjustToThemeDark(@NonNull Resources argResources, @Nullable Palette argPalette, @ColorInt int color) {
+        int currentNightMode = argResources.getConfiguration().uiMode
+                & Configuration.UI_MODE_NIGHT_MASK;
+
+        if (argPalette == null)
+            return color;
+
+        if (UIUtils.isInNightMode()) {
+            return darken(argPalette.getDarkVibrantColor(color), 0.5f);
+        } else {
+            return argPalette.getDarkVibrantColor(color);
+        }
+    }
+
     public static @ColorInt int darken(@ColorInt int argColor, float scale) {
         float[] hsv = new float[3];
         Color.colorToHSV(argColor, hsv);
