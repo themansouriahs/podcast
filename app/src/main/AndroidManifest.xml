@@ -247,6 +247,8 @@
             android:name=".widgets.SoundWavesWidgetProvider" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE_OPTIONS" />
+                <action android:name="android.appwidget.action.ACTION_APPWIDGET_OPTIONS_CHANGED" />
             </intent-filter>
             <meta-data android:name="android.appwidget.provider"
                 android:resource="@xml/soundwaves_appwidget_info" />

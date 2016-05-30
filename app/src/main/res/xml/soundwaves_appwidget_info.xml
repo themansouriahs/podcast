@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 600000 ms  = 10 minutes -->
 <appwidget-provider
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:minWidth="250dp"
     android:minHeight="120dp"
-    android:updatePeriodMillis="86400000"
+    android:previewImage="@drawable/widget_screenshot"
+    android:updatePeriodMillis="600000"
     android:initialLayout="@layout/widget_default"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen">
@@ -13,4 +15,4 @@ android:configure="org.bottiger.podcast.widgets.SoundWavesWidgetConfigure"
 
 android:minResizeWidth="180dp"
 android:minResizeHeight="40dp"
-android:previewImage="@drawable/preview" -->
+ -->

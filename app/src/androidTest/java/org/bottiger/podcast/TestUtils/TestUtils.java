@@ -119,12 +119,12 @@ public class TestUtils {
     }
 
     public static void unsubscribeAll(@NonNull Activity argActivity) {
-        SortedList<Subscription> list = SoundWaves.getLibraryInstance().getSubscriptions();
+        SortedList<Subscription> list = SoundWaves.getAppContext(argActivity).getLibraryInstance().getSubscriptions();
         for(int i = 0; i < list.size(); i++) {
             // get the object by the key.
             Subscription subscription = list.get(i);
             //subscription.unsubscribe(argActivity);
-            SoundWaves.getLibraryInstance().unsubscribe(subscription.getURLString(), "TestUtil:UnsubscribeAll");
+            SoundWaves.getAppContext(argActivity).getLibraryInstance().unsubscribe(subscription.getURLString(), "TestUtil:UnsubscribeAll");
         }
     }
 }

@@ -77,7 +77,7 @@ public class SoundWavesWidgetConfigure extends Activity {
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
             //SoundWavesWidgetProvider.updateAppWidget(context, appWidgetManager,
             //        mAppWidgetId, titlePrefix);
-            SoundWavesWidgetProvider.updateAppWidget(context, mAppWidgetId);
+            SoundWavesWidgetProvider.updateAppWidget(context, mAppWidgetId, false);
 
             // Make sure we pass back the original appWidgetId
             Intent resultValue = new Intent();

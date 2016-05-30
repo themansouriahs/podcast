@@ -21,6 +21,10 @@
     <integer name="feed_activity_description_lines_default">3</integer>
     <!-- Feed View - End -->
 
+    <!-- Widget start -->
+    <dimen name="widget_logo_size">90dp</dimen>
+    <!-- Widget end -->
+
     <!-- SoundWaves Player - Start -->
     <integer name="soundwaves_player_speed_default">10</integer>
     <!-- SoundWaves Player - End -->

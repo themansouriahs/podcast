@@ -1,5 +1,6 @@
 package org.bottiger.podcast.widgets;
 
+import android.annotation.TargetApi;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -47,6 +48,8 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
     // log tag
     private static final String TAG = "SWWidgetProvider";
 
+    int mHeight = -1;
+
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         final int N = appWidgetIds.length;
 
@@ -62,7 +65,7 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
 
             // Tell the AppWidgetManager to perform an update on the current app widget
             //appWidgetManager.updateAppWidget(appWidgetId, views);
-            updateAppWidget(context, appWidgetId);
+            updateAppWidget(context, appWidgetId, false);
         }
     }
 
@@ -71,11 +74,11 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
         ComponentName cn = new ComponentName(context, SoundWavesWidgetProvider.class);
         int[] ids = mgr.getAppWidgetIds(cn);
         for (int i = 0; i < ids.length; i++) {
-            updateAppWidget(context, ids[i]);
+            updateAppWidget(context, ids[i], false);
         }
     }
 
-    static void updateAppWidget(Context context, int appWidgetId) {
+    static void updateAppWidget(Context context, int appWidgetId, boolean showDescription) {
 
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 
@@ -102,13 +105,18 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
 
             Log.wtf(TAG, episode.getTitle());
 
-            CharSequence podcast_title = episode.getSubscription(context).getTitle();
+            CharSequence podcast_title = "No title";
+            if (episode.getSubscription(context) != null)
+                podcast_title = episode.getSubscription(context).getTitle();
+
             CharSequence text = episode.getTitle();
             Long durationMs = episode.getDuration();
             Long elapsedTimeMs = episode.getOffset();
             boolean isPlaying = PlayerService.isPlaying();
 
-            double progress = episode.getProgress();
+            double progress = 0;
+            if (durationMs > 0)
+                progress = elapsedTimeMs * 100 / durationMs;
 
             views.setTextViewText(R.id.widget_title, podcast_title);
             views.setTextViewText(R.id.widget_episode_title, text);
@@ -121,6 +129,10 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
             views.setChronometer(R.id.widget_duration, SystemClock.elapsedRealtime() - elapsedTimeMs, chronometerFormat, isPlaying);
             views.setTextViewText(R.id.widget_duration_total, " / " + StrUtils.formatTime(durationMs));
             views.setProgressBar(R.id.progressBar, 100, (int) progress, false);
+            views.setTextViewText(R.id.widget_description, episode.getDescription()); //
+
+            int descriptionVisibility = showDescription ? View.VISIBLE : View.GONE;
+            views.setViewVisibility(R.id.widget_description, descriptionVisibility);
 
             String imageUrl = episode.getArtwork(context);
             if (imageUrl != null) {
@@ -137,6 +149,30 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
 
         // Tell the widget manager
         appWidgetManager.updateAppWidget(appWidgetId, views);
+    }
+
+    @Override
+    @TargetApi(16)
+    public void onAppWidgetOptionsChanged(@NonNull Context context,
+                                          @NonNull AppWidgetManager appWidgetManager,
+                                          int appWidgetId,
+                                          @NonNull Bundle newOptions) {
+        int minWidth = newOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH); // portrait
+        int maxHeight = newOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT); // portrait
+
+        int maxWidth = newOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH); // landscape
+        int minHeight = newOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT); // landscape
+
+
+        mHeight = maxHeight;
+
+        //float widgetDefaultHeight = context.getResources().getDimension(R.dimen.widget_logo_size);
+        //int widgetDefaultHeightPx = (int)UIUtils.convertDpToPixel(widgetDefaultHeight, context);
+
+        // 180 dp = 3 blocks: https://developer.android.com/guide/practices/ui_guidelines/widget_design.html#anatomy
+        boolean showDescription = mHeight > 180;
+
+        updateAppWidget(context, appWidgetId, showDescription);
     }
 
     private static void attachButtonListeners(Context context, RemoteViews views) {
