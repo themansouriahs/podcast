@@ -29,6 +29,7 @@ import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
 import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.service.jobservice.PodcastUpdater;
 import org.bottiger.podcast.utils.PlayerHelper;
 import org.bottiger.podcast.utils.PodcastLog;
 import org.bottiger.podcast.utils.UIUtils;
@@ -61,8 +62,9 @@ public class SoundWaves extends Application {
 
     @Nullable
     public static IAnalytics sAnalytics;
-    public static SubscriptionRefreshManager sSubscriptionRefreshManager;
+    private SubscriptionRefreshManager mSubscriptionRefreshManager;
     private static SoundWavesDownloadManager sDownloadManager;
+    private PodcastUpdater mPodcastUpdater;
 
     private static Bus sBus = new Bus(ThreadEnforcer.MAIN);
     private static RxBus _rxBus = null;
@@ -133,9 +135,6 @@ public class SoundWaves extends Application {
         mLibrary = new Library(this);
         Log.v(TAG, "time3: " + System.currentTimeMillis());
 
-        sSubscriptionRefreshManager = new SubscriptionRefreshManager(context);
-
-        Log.v(TAG, "time4: " + System.currentTimeMillis());
         firstRun(context);
         Log.v(TAG, "time5: " + System.currentTimeMillis());
 
@@ -150,6 +149,10 @@ public class SoundWaves extends Application {
         getLibraryInstance().loadPlaylist(mPlaylist);
 
         Log.v(TAG, "time8: " + System.currentTimeMillis());
+
+        mPodcastUpdater = new PodcastUpdater(this);
+
+        Log.v(TAG, "time9: " + System.currentTimeMillis());
 
         incrementStartupCount(context);
     }
@@ -229,6 +232,14 @@ public class SoundWaves extends Application {
     @NonNull
     public static SoundWaves getAppContext(@NonNull Context argContext) {
         return (SoundWaves)argContext.getApplicationContext();
+    }
+
+    @NonNull
+    public SubscriptionRefreshManager getRefreshManager() {
+        if (mSubscriptionRefreshManager == null)
+            mSubscriptionRefreshManager = new SubscriptionRefreshManager(this);
+
+        return mSubscriptionRefreshManager;
     }
 
     private static Observable<Playlist> sPlaylistObservabel;

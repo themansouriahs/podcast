@@ -14,13 +14,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.RemoteException;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.media.session.MediaControllerCompat;
-import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
@@ -265,7 +261,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
             mProgress.setMessage(getString(R.string.discovery_progress_loading_podcast_content));
             mProgress.show();
             mAdapter = new FeedViewDiscoveryAdapter(this, mSubscription);
-            SoundWaves.sSubscriptionRefreshManager.refresh(mSubscription, mRefreshCompleteCallback);
+            SoundWaves.getAppContext(this).getRefreshManager().refresh(mSubscription, mRefreshCompleteCallback);
         } else {
             mAdapter = new FeedViewAdapter(this, mSubscription);
         }
@@ -517,7 +513,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
                 mMultiShrinkScroller.scrollOffBottom();
                 return true;
             case R.id.menu_refresh_feed:
-                SoundWaves.sSubscriptionRefreshManager.refresh(mSubscription, new IDownloadCompleteCallback() {
+                SoundWaves.getAppContext(this).getRefreshManager().refresh(mSubscription, new IDownloadCompleteCallback() {
                     @Override
                     public void complete(boolean succes, ISubscription argCallback) {
                         return;

@@ -3,10 +3,7 @@ package org.bottiger.podcast;
 import org.bottiger.podcast.adapters.SubscriptionAdapter;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.Library;
-import org.bottiger.podcast.model.events.DownloadProgress;
 import org.bottiger.podcast.provider.Subscription;
-import org.bottiger.podcast.provider.SubscriptionLoader;
-import org.bottiger.podcast.utils.FragmentUtils;
 import org.bottiger.podcast.views.dialogs.DialogOPML;
 
 import android.Manifest;
@@ -14,13 +11,11 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -38,13 +33,9 @@ import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
-import java.util.concurrent.TimeUnit;
-
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
-import rx.subscriptions.Subscriptions;
 
 public class SubscriptionsFragment extends Fragment implements View.OnClickListener,
                                                                 SharedPreferences.OnSharedPreferenceChangeListener {
@@ -243,7 +234,7 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
                 }
             }
             case R.id.menu_refresh_all_subscriptions: {
-                SoundWaves.sSubscriptionRefreshManager.refreshAll();
+                SoundWaves.mSubscriptionRefreshManager.refreshAll();
             }
         }
         return super.onOptionsItemSelected(item);

@@ -120,8 +120,6 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
     private PlayerHandler mPlayerHandler;
 
-	private PodcastUpdater mPodcastUpdater;
-
 	/**
 	 * Phone state listener. Will pause the playback when the phone is ringing
 	 * and continue it afterwards
@@ -159,8 +157,6 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 		SoundWaves.getBus().register(SoundWaves.getAppContext(this).getPlaylist());
 		SoundWaves.getBus().register(this);
-
-		mPodcastUpdater = new PodcastUpdater(this);
 
         mPlayerHandler = new PlayerHandler(this);
 

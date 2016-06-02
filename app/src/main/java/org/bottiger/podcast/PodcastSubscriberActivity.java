@@ -76,7 +76,7 @@ public class PodcastSubscriberActivity extends Activity {
         mProgress = new ProgressDialog(this);
         mProgress.setMessage(getString(R.string.discovery_progress_loading_podcast_content));
         mProgress.show();
-        SoundWaves.sSubscriptionRefreshManager.refresh(subscription, mRefreshCompleteCallback);
+        SoundWaves.getAppContext(this).getRefreshManager().refresh(subscription, mRefreshCompleteCallback);
     }
 
 

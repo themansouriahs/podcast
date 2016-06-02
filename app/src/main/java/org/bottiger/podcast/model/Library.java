@@ -13,9 +13,7 @@ import android.util.Log;
 
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.cloud.EventLogger;
-import org.bottiger.podcast.debug.SqliteCopy;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.model.events.DownloadProgress;
 import org.bottiger.podcast.model.events.EpisodeChanged;
 import org.bottiger.podcast.model.events.ItemChanged;
 import org.bottiger.podcast.model.events.SubscriptionChanged;
@@ -41,7 +39,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import rx.Observable;
 import rx.Observer;
-import rx.Scheduler;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -652,7 +649,7 @@ public class Library {
                         mActiveSubscriptions.add(subscription);
 
                         try {
-                            SoundWaves.sSubscriptionRefreshManager.refreshSync(mContext, subscription);
+                            SoundWaves.getAppContext(mContext).getRefreshManager().refreshSync(subscription);
                         } catch (IOException e) {
                             VendorCrashReporter.handleException(e);
                             e.printStackTrace();

@@ -40,10 +40,15 @@ public class SubscriptionRefreshManager {
     public static final String TAG = "SubscriptionRefresh";
 
     @NonNull
-    final OkHttpClient mOkClient;
-    final Handler mainHandler;
-    final FeedParser mFeedParser = new FeedParser();
+    private final OkHttpClient mOkClient;
 
+    @NonNull
+    private final Handler mainHandler;
+
+    @NonNull
+    private final FeedParser mFeedParser = new FeedParser();
+
+    @NonNull
     private Context mContext;
 
     public SubscriptionRefreshManager(@NonNull Context argContext) {
@@ -60,10 +65,10 @@ public class SubscriptionRefreshManager {
         refresh(null, null);
     }
 
-    public Subscription refreshSync(@NonNull Context argContext, @NonNull Subscription argSubscription) throws IOException {
+    public Subscription refreshSync(@NonNull Subscription argSubscription) throws IOException {
         final Request request = getRequest(argSubscription);
         Response response = mOkClient.newCall(request).execute();
-        handleHttpResponse(argContext, argSubscription, response, null);
+        handleHttpResponse(mContext, argSubscription, response, null);
         return argSubscription;
     }
 
