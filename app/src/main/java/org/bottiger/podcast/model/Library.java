@@ -712,9 +712,10 @@ public class Library {
         }
     }
 
-    public void updateEpisode(@NonNull FeedItem argEpisode) {
+    public @LibraryPersistency.PersistencyResult
+    int updateEpisode(@NonNull FeedItem argEpisode) {
         addEpisode(argEpisode);
-        mLibraryPersistency.persist(argEpisode);
+        return mLibraryPersistency.persist(argEpisode);
     }
 
     private int compareSubscriptions(ISubscription s1, ISubscription s2) {

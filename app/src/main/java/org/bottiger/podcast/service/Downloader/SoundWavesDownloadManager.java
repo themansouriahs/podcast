@@ -19,6 +19,7 @@ import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.TopActivity;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.DownloadProgressPublisher;
+import org.bottiger.podcast.model.LibraryPersistency;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
@@ -527,14 +528,10 @@ public class SoundWavesDownloadManager extends Observable {
 
             DownloadService.removeFirst();
 
-
-
             removeDownloadingEpisode(argEpisode);
             StorageUtils.removeExpiredDownloadedPodcasts(mContext);
             StorageUtils.removeTmpFolderCruft();
 
-            // clear the reference
-            item = null;
             notifyDownloadComplete();
         }
 

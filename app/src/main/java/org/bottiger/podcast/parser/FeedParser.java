@@ -166,7 +166,7 @@ public class FeedParser {
             String name = parser.getName();
             // Starts by looking for the entry tag
             if (name.equals(startTag)) {
-                subscription = readChannel(parser, subscription, argContext);
+                addedEpisodes = readChannel(parser, subscription, argContext);
             }
             else if (name.equals(EPISODE_ITEM_TAG)) {
                 IEpisode episode = readEpisode(parser, subscription);
@@ -185,8 +185,9 @@ public class FeedParser {
         }
 
         if (addedEpisodes && !isParsingSlimSubscription()) {
-            ((Subscription)subscription).setLastItemUpdated(System.currentTimeMillis());
-            ((Subscription)subscription).notifyEpisodeAdded();
+            Subscription sub = ((Subscription)subscription);
+            sub.setLastItemUpdated(System.currentTimeMillis());
+            sub.notifyEpisodeAdded(false);
         }
 
         return subscription;
@@ -214,10 +215,11 @@ public class FeedParser {
 
     // Parses the contents of an entry. If it encounters a title, summary, or link tag, hands them off
     // to their respective "read" methods for processing. Otherwise, skips the tag.
-    private ISubscription readChannel(@NonNull  XmlPullParser parser,
+    private boolean readChannel(@NonNull  XmlPullParser parser,
                                       @NonNull ISubscription argSubscription,
                                       @NonNull Context argContext) throws XmlPullParserException, IOException {
         parser.require(XmlPullParser.START_TAG, ns, startTag);
+        boolean addedEpisodes = false;
 
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -252,14 +254,13 @@ public class FeedParser {
                         argSubscription.addEpisode(episode);
                     }
 
-                    SoundWaves.getAppContext(argContext).getLibraryInstance().addEpisode(episode);
+                    addedEpisodes = addedEpisodes || SoundWaves.getAppContext(argContext).getLibraryInstance().addEpisode(episode);
 
                     break;
                 }
                 case SUBSCRIPTION_IMAGE_TAG: {
                     String image = readSubscriptionImage(parser);
                     argSubscription.setImageURL(image);
-                    //parser.nextTag();
                     break;
                 }
                 case SUBSCRIPTION_PUB_DATE_TAG:
@@ -282,7 +283,7 @@ public class FeedParser {
             }
         }
 
-        return argSubscription;
+        return addedEpisodes;
     }
 
     private void readSubscriptionItunesTag(XmlPullParser parser, String name, ISubscription argSubscription) throws XmlPullParserException, IOException {

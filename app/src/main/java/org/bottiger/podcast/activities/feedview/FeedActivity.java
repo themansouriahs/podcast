@@ -34,6 +34,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
@@ -46,6 +47,7 @@ import org.bottiger.podcast.TopActivity;
 import org.bottiger.podcast.activities.discovery.FeedViewDiscoveryAdapter;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PaletteListener;
+import org.bottiger.podcast.model.events.SubscriptionChanged;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
@@ -67,6 +69,9 @@ import org.bottiger.podcast.views.utils.SubscriptionSettingsUtils;
 
 import io.codetail.animation.SupportAnimator;
 import io.codetail.animation.ViewAnimationUtils;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by apl on 14-02-2015.
@@ -96,6 +101,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
 
     private FeedViewTopImage mPhotoView;
     private RecyclerView mRecyclerView;
+    private TextView mNoEpisodesTextView;
     private MultiShrinkScroller mMultiShrinkScroller;
     protected FloatingActionButton mFloatingButton;
     private FrameLayout mRevealLayout;
@@ -103,6 +109,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
     private String mUrl;
 
     private boolean mIsSlimSubscription = false;
+    private rx.Subscription mRxSubscription;
 
     /**
      *  This scrim's opacity is controlled in two different ways. 1) Before the initial entrance
@@ -257,17 +264,22 @@ public class FeedActivity extends TopActivity implements PaletteListener {
             mProgress = new ProgressDialog(this);
             mProgress.setMessage(getString(R.string.discovery_progress_loading_podcast_content));
             mProgress.show();
-            FeedViewDiscoveryAdapter adapter = new FeedViewDiscoveryAdapter(this, mSubscription);
-            mAdapter = adapter;
+            mAdapter = new FeedViewDiscoveryAdapter(this, mSubscription);
             SoundWaves.sSubscriptionRefreshManager.refresh(mSubscription, mRefreshCompleteCallback);
         } else {
             mAdapter = new FeedViewAdapter(this, mSubscription);
         }
 
+        mRxSubscription = subscribeToChanges(mSubscription, mAdapter);
+
         mPhotoView = (FeedViewTopImage) findViewById(R.id.photo);
+        mNoEpisodesTextView = (TextView) findViewById(R.id.feed_recycler_view_empty);
         mMultiShrinkScroller = (MultiShrinkScroller) findViewById(R.id.multiscroller);
         mFloatingButton = (FloatingActionButton) findViewById(R.id.feedview_fap_button);
         mRevealLayout = (FrameLayout) findViewById(R.id.feed_activity_settings_container);
+        mRecyclerView = (FeedRecyclerView) findViewById(R.id.feed_recycler_view);
+
+        setViewState(mSubscription);
 
         if (mSubscription instanceof Subscription) {
             mSubscriptionSettingsUtils = new SubscriptionSettingsUtils(mRevealLayout, (Subscription)mSubscription);
@@ -276,11 +288,11 @@ public class FeedActivity extends TopActivity implements PaletteListener {
             mSubscriptionSettingsUtils.setListOldestFirstListener(new SubscriptionSettingsUtils.OnSettingsChangedListener() {
                 @Override
                 public void OnSettingsChanged(boolean isChecked) {
-                    @FeedViewAdapter.Order int sortOrder = ((Subscription) mSubscription).isListOldestFirst() ?  FeedViewAdapter.OLDEST_FIRST : FeedViewAdapter.RECENT_FIRST;
+                    @FeedViewAdapter.Order int sortOrder = mSubscription.isListOldestFirst() ?  FeedViewAdapter.OLDEST_FIRST : FeedViewAdapter.RECENT_FIRST;
                     mAdapter.setOrder(sortOrder);
                 }
             });
-            @FeedViewAdapter.Order int sortOrder = ((Subscription) mSubscription).isListOldestFirst() ?  FeedViewAdapter.OLDEST_FIRST : FeedViewAdapter.RECENT_FIRST;
+            @FeedViewAdapter.Order int sortOrder = mSubscription.isListOldestFirst() ?  FeedViewAdapter.OLDEST_FIRST : FeedViewAdapter.RECENT_FIRST;
             mAdapter.setOrder(sortOrder);
         }
 
@@ -295,9 +307,6 @@ public class FeedActivity extends TopActivity implements PaletteListener {
         mFloatingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //mExpandedLayout = !mExpandedLayout;
-                //mAdapter.setExpanded(mExpandedLayout);
-
                 // get the center for the clipping circle
                 int cx = (mRevealLayout.getLeft() + mRevealLayout.getRight());
                 int cy = (mRevealLayout.getTop() + mRevealLayout.getBottom());
@@ -356,8 +365,6 @@ public class FeedActivity extends TopActivity implements PaletteListener {
         mPhotoView.setBackgroundColor(mSubscription.getPrimaryColor());
         ColorDrawable cd = new ColorDrawable(mSubscription.getPrimaryColor());
 
-        //analyzeWhitenessOfPhotoPostProcessor postProcessor = new analyzeWhitenessOfPhotoPostProcessor(this, mMultiShrinkScroller);
-        //FrescoHelper.loadImageInto(mPhotoView, mUrl, postProcessor);
         Glide.with(this)
                 .load(mUrl)
                 .asBitmap()
@@ -401,7 +408,6 @@ public class FeedActivity extends TopActivity implements PaletteListener {
 
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        mRecyclerView = (FeedRecyclerView) findViewById(R.id.feed_recycler_view);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setBackgroundColor(ColorUtils.getBackgroundColor(this));
@@ -410,10 +416,6 @@ public class FeedActivity extends TopActivity implements PaletteListener {
 
         mMultiShrinkScroller.initialize(mMultiShrinkScrollerListener, mExtraMode == MODE_FULLY_EXPANDED);
         mMultiShrinkScroller.setTitle(mSubscription.getTitle());
-
-        // mMultiShrinkScroller needs to perform asynchronous measurements after initalize(), therefore
-        // we can't mark this as GONE.
-        //mMultiShrinkScroller.setVisibility(View.INVISIBLE);
 
         SchedulingUtils.doOnPreDraw(mMultiShrinkScroller, /* drawNextFrame = */ true,
                 new Runnable() {
@@ -455,7 +457,11 @@ public class FeedActivity extends TopActivity implements PaletteListener {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mAdapter.unsubscribe();
+        if (mRxSubscription == null)
+            return;
+
+        if (mRxSubscription.isUnsubscribed())
+            mRxSubscription.unsubscribe();
     }
 
     @Override
@@ -558,8 +564,6 @@ public class FeedActivity extends TopActivity implements PaletteListener {
     public void onPaletteFound(Palette argChangedPalette) {
         ColorExtractor extractor = new ColorExtractor(this, argChangedPalette);
 
-        // ContextCompat.getColor(this, R.color.pitch_black)
-        //int tintColor = UIUtils.isInNightMode() ? extractor.getSecondary() : extractor.getPrimary();
         int tintColor = ColorUtils.adjustToThemeDark(getResources(), argChangedPalette, extractor.getPrimary());
 
         // extractor.getPrimary()
@@ -594,5 +598,38 @@ public class FeedActivity extends TopActivity implements PaletteListener {
                 mMultiShrinkScroller.setUseGradient(isWhite);
             }
         }.execute();
+    }
+
+    private void setViewState(@Nullable ISubscription argSubscription) {
+        boolean isEmpty = argSubscription == null || argSubscription.getEpisodes().size() == 0;
+        mNoEpisodesTextView.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
+        mRecyclerView.setVisibility(!isEmpty ? View.VISIBLE : View.GONE);
+    }
+
+    private rx.Subscription subscribeToChanges(@NonNull final ISubscription argSubscription,
+                                               @NonNull final FeedViewAdapter argAdapter) {
+        return SoundWaves.getRxBus()
+                .toObserverable()
+                .ofType(SubscriptionChanged.class)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<SubscriptionChanged>() {
+                    @Override
+                    public void call(SubscriptionChanged subscriptionChanged) {
+                        @SubscriptionChanged.Action int action = subscriptionChanged.getAction();
+                        boolean doNotify = action == SubscriptionChanged.ADDED || action == SubscriptionChanged.REMOVED;
+
+                        if (doNotify) {
+                            setViewState(argSubscription);
+                            argAdapter.notifyEpisodesChanged();
+                        }
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        VendorCrashReporter.report("subscribeError" , throwable.toString());
+                        Log.d("FeedViewAdapter", "error: " + throwable.toString());
+                    }
+                });
     }
 }

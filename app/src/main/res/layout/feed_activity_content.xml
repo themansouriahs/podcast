@@ -1,10 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/feed_scrollviewChild"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/default_background">
+
+    <TextView
+        android:id="@+id/feed_recycler_view_empty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/no_episodes_in_the_feed"
+        android:layout_gravity="center_horizontal"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:layout_marginTop="40dp"
+        android:visibility="gone" />
 
     <View
         android:id="@+id/empty_start_column"
@@ -21,8 +32,7 @@
         android:layout_height="wrap_content"
         android:overScrollMode="never"
         />
-<!--
--->
+
     <View
         android:id="@+id/empty_end_column"
         android:layout_width="0dp"

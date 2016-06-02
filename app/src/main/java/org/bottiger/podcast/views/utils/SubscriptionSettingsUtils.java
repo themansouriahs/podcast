@@ -58,6 +58,16 @@ public class SubscriptionSettingsUtils {
         final Context context = mLayout.getContext();
         final ContentResolver contentResolver = context.getContentResolver();
 
+        boolean defaultValue = PreferenceHelper.getBooleanPreferenceValue(context,
+                R.string.pref_download_on_update_key,
+                R.bool.pref_download_on_update_default);
+
+        mShowDescription.setChecked(mSubscription.isShowDescription());
+        mAddNewToPlaylist.setChecked(mSubscription.isAddNewToPlaylist());
+        mAutoDownload.setChecked(mSubscription.doDownloadNew(defaultValue));
+        mDeleteAfterPlayback.setChecked(mSubscription.isDeleteWhenListened());
+        mListOldestFirst.setChecked(mSubscription.isListOldestFirst());
+
         mShowDescription.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -97,16 +107,6 @@ public class SubscriptionSettingsUtils {
                 OnSwitchChangedHandler(isChecked, contentResolver, mListOldestFirstListener);
             }
         });
-
-        boolean defaultValue = PreferenceHelper.getBooleanPreferenceValue(context,
-                                R.string.pref_download_on_update_key,
-                                R.bool.pref_download_on_update_default);
-
-        mShowDescription.setChecked(mSubscription.isShowDescription());
-        mAddNewToPlaylist.setChecked(mSubscription.isAddNewToPlaylist());
-        mAutoDownload.setChecked(mSubscription.doDownloadNew(defaultValue));
-        mDeleteAfterPlayback.setChecked(mSubscription.isDeleteWhenListened());
-        mListOldestFirst.setChecked(mSubscription.isListOldestFirst());
     }
 
     private void OnSwitchChangedHandler(boolean isChecked,

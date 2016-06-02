@@ -201,6 +201,9 @@
         <item quantity="other">new</item>
     </plurals>
 
+    <!-- Feed Activity -->
+    <string name="no_episodes_in_the_feed">No episodes in the feed</string>
+
     <string name="authenticate_feed_username">Username</string>
     <string name="authenticate_feed_password">Password</string>
 

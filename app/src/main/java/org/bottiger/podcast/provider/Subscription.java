@@ -216,7 +216,7 @@ public class Subscription implements ISubscription, PaletteListener {
 	public void addEpisode(@NonNull IEpisode argEpisode, boolean argSilent) {
 		mEpisodes.add(argEpisode);
 		if (!argSilent)
-			notifyEpisodeAdded();
+			notifyEpisodeAdded(true);
 	}
 
 	public void addEpisode(@NonNull IEpisode argEpisode) {
@@ -777,8 +777,8 @@ public class Subscription implements ISubscription, PaletteListener {
 		return sSharedPreferences.getBoolean(key, argDefault);
 	}
 
-	public void notifyEpisodeAdded() {
-		if (!mIsRefreshing)
+	public void notifyEpisodeAdded(boolean argSilent) {
+		if (!mIsRefreshing || !argSilent)
 			SoundWaves.getRxBus().send(new SubscriptionChanged(getId(), SubscriptionChanged.ADDED, null));
 	}
 

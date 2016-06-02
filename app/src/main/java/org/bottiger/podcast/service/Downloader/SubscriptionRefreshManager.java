@@ -260,8 +260,9 @@ public class SubscriptionRefreshManager {
         } catch (NullPointerException npe) {
             npe.printStackTrace();
         } finally {
-            if (argSubscription != null)
+            if (argSubscription != null) {
                 argSubscription.setIsRefreshing(false);
+            }
         }
     }
 }

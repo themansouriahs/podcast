@@ -7,6 +7,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.BaseColumns;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -19,6 +20,8 @@ import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionColumns;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.Collection;
 import java.util.Date;
 
@@ -33,17 +36,25 @@ public class LibraryPersistency {
     private ContentResolver mContentResolver;
     private Library mLibrary;
 
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({UPDATED, INSERTED, IGNORED, ERROR})
+    public @interface PersistencyResult {}
+    public static final int ERROR = -1;
+    public static final int IGNORED = 0;
+    public static final int UPDATED = 1;
+    public static final int INSERTED = 2;
+
     public LibraryPersistency(@NonNull Context argContext, @NonNull Library argLibrary) {
         mContext = argContext;
         mContentResolver = argContext.getContentResolver();
         mLibrary = argLibrary;
     }
 
-    public void persist(FeedItem argEpisode) {
+    public @PersistencyResult int persist(FeedItem argEpisode) {
 
         if (argEpisode.sub_id < 0) {
             Log.d("FeedItem", "Id less than 0");
-            return;
+            return IGNORED;
         }
 
         ContentValues cv = getEpisodeContentValues(argEpisode, true);
@@ -58,6 +69,7 @@ public class LibraryPersistency {
                     condition, null);
             if (numUpdatedRows == 1) {
                 Log.d("FeedItem", "update OK");
+                return UPDATED;
             } else if (numUpdatedRows == 0) {
                 Log.d("FeedItem", "update NOT OK. Insert instead");
                 long createdAt = System.currentTimeMillis();
@@ -66,6 +78,7 @@ public class LibraryPersistency {
                 Uri result = mContentResolver.insert(ItemColumns.URI, cv);
                 long newId = getId(result.toString());
                 argEpisode.id = newId;
+                return INSERTED;
             } else {
                 throw new IllegalStateException("Never update more than one row here");
             }
@@ -143,7 +156,7 @@ public class LibraryPersistency {
                 } else {
                     long id = Long.parseLong(uri.toString().replaceAll("[^0-9]", ""));
                     argSubscription.setId(id);
-                    argSubscription.notifyEpisodeAdded();
+                    argSubscription.notifyEpisodeAdded(true);
                     SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.SUBSCRIBE_TO_FEED);
                 }
             }

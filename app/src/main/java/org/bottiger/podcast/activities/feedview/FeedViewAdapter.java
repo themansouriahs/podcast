@@ -77,8 +77,6 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
 
     private StringBuilder mStringBuilder = new StringBuilder(100);
 
-    private Subscription mRxSubscription;
-
     public FeedViewAdapter(@NonNull TopActivity activity, @NonNull ISubscription argSubscription) {
         mActivity = activity;
         setDataset(argSubscription);
@@ -87,42 +85,14 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
 
         mInflater = (LayoutInflater) activity
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-        mRxSubscription = SoundWaves.getRxBus()
-                .toObserverable()
-                .ofType(SubscriptionChanged.class)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<SubscriptionChanged>() {
-                    @Override
-                    public void call(SubscriptionChanged subscriptionChanged) {
-                        if (subscriptionChanged.getAction() == SubscriptionChanged.ADDED) {
-                            notifyDataSetChanged();
-                        }
-
-                        if (subscriptionChanged.getAction() == SubscriptionChanged.REMOVED) {
-                            notifyDataSetChanged();
-                        }
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        VendorCrashReporter.report("subscribeError" , throwable.toString());
-                        Log.d("FeedViewAdapter", "error: " + throwable.toString());
-                    }
-                });
-    }
-
-    public void unsubscribe() {
-        if (mRxSubscription == null)
-            return;
-
-        if (mRxSubscription.isUnsubscribed())
-            mRxSubscription.unsubscribe();
     }
 
     public void setDataset(@NonNull ISubscription argSubscription) {
         mSubscription = argSubscription;
+        notifyEpisodesChanged();
+    }
+
+    public void notifyEpisodesChanged() {
         mEpisodeList = mSubscription.getEpisodes();
         mFilteredEpisodeList = mEpisodeList.getFilteredList();
         notifyDataSetChanged();
