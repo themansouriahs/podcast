@@ -7,6 +7,8 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
@@ -94,7 +96,6 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
         int emptyTextVisibility = playlistEmpty ? View.VISIBLE : View.GONE;
         int playerVisibility = !playlistEmpty ? View.VISIBLE : View.GONE;
 
-        //views.setViewVisibility(R.id.widget_playlist_empty_text, emptyTextVisibility);
         views.setViewVisibility(R.id.widget_player, playerVisibility);
 
         Log.wtf(TAG, "pre");
@@ -134,7 +135,20 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
             int descriptionVisibility = showDescription ? View.VISIBLE : View.GONE;
             views.setViewVisibility(R.id.widget_description, descriptionVisibility);
 
-            String imageUrl = episode.getArtwork(context);
+
+            if (Build.VERSION.SDK_INT >= 23) {
+                views.setViewVisibility(R.id.widget_mute, View.VISIBLE);
+
+                AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+                boolean isMuted = audioManager.isStreamMute(PlayerStateManager.AUDIO_STREAM);
+                int volumeIcon = isMuted ? R.drawable.ic_volume_off_24dp : R.drawable.ic_volume_up_24dp;
+                views.setImageViewResource(R.id.widget_mute, volumeIcon);
+            } else {
+                views.setViewVisibility(R.id.widget_mute, View.GONE);
+            }
+
+
+                String imageUrl = episode.getArtwork(context);
             if (imageUrl != null) {
                 AppWidgetTarget appWidgetTarget = new AppWidgetTarget(context, views, R.id.widget_logo, appWidgetId);
 
@@ -219,6 +233,9 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
 
             if (action.equals(NotificationPlayer.toggleAction)) {
                 transportControls.sendCustomAction(PlayerStateManager.ACTION_TOGGLE, new Bundle());
+            }
+            if (action.equals(NotificationPlayer.muteAction)) {
+                transportControls.sendCustomAction(PlayerStateManager.ACTION_TOGGLE_MUTE, new Bundle());
             }
             if (action.equals(NotificationPlayer.nextAction)) {
                 transportControls.skipToNext();

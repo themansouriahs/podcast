@@ -2,9 +2,11 @@ package org.bottiger.podcast.player;
 
 import android.app.PendingIntent;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.media.AudioManager;
 import android.media.MediaMetadata;
 import android.media.session.MediaSession;
 import android.os.Build;
@@ -21,6 +23,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 
+import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
@@ -37,7 +40,10 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
     private static final String TAG = "PlayerStateManager";
     private static final String SESSION_TAG = "SWMediaSession";
 
+    public static int AUDIO_STREAM = AudioManager.STREAM_MUSIC;
+
     public static final String ACTION_TOGGLE = "playpause_action";
+    public static final String ACTION_TOGGLE_MUTE = "mute_toggle_action";
 
     private MediaSessionCompat mSession;
     private PlayerService mPlayerService;
@@ -114,6 +120,14 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
     public void onCustomAction(String action, Bundle extras) {
         if (ACTION_TOGGLE.equals(action)) {
             mPlayerService.toggle();
+        }
+
+        if (ACTION_TOGGLE_MUTE.equals(action)) {
+            if (Build.VERSION.SDK_INT >= 23) {
+                AudioManager audioManager = (AudioManager) mPlayerService.getSystemService(Context.AUDIO_SERVICE);
+                audioManager.adjustStreamVolume(AUDIO_STREAM, AudioManager.ADJUST_TOGGLE_MUTE, 0);
+                mPlayerService.notifyStatus(mPlayerService.getCurrentItem());
+            }
         }
     }
 

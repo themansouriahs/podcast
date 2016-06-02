@@ -62,24 +62,21 @@
         android:textColor="?android:attr/textColorPrimary"
         android:id="@+id/widget_duration_total" />
 
-    <ImageButton
-        android:src="@drawable/ic_volume_up_black"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/widget_mute"
-        android:layout_alignParentBottom="true"
-        android:layout_alignLeft="@+id/progressBar"
-        android:layout_alignStart="@+id/progressBar"
-        android:tint="?android:attr/textColorPrimary"
-        android:visibility="gone"
-        android:background="@null"/>
-
     <LinearLayout
         android:id="@+id/linearLayout"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true">
+
+        <ImageButton
+            android:id="@+id/widget_mute"
+            android:src="@drawable/ic_volume_up_24dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:tint="?android:attr/textColorPrimary"
+            android:background="@null"
+            android:visibility="gone" />
 
         <ImageButton
             android:src="@drawable/ic_fast_rewind_black"
@@ -87,6 +84,8 @@
             android:layout_height="wrap_content"
             android:id="@+id/widget_rewind"
             android:tint="?android:attr/textColorPrimary"
+            android:layout_marginLeft="35dp"
+            android:layout_weight="1"
             android:background="@null"/>
 
         <ImageButton
@@ -94,15 +93,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/widget_play"
-            android:layout_marginLeft="25dp"
-            android:layout_marginRight="25dp"
             android:tint="?android:attr/textColorPrimary"
             android:background="@null"/>
 
         <ImageButton
             android:src="@drawable/ic_fast_forward_black"
+            android:layout_weight="1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginRight="35dp"
             android:id="@+id/widget_fast_forward"
             android:tint="?android:attr/textColorPrimary"
             android:background="@null"/>

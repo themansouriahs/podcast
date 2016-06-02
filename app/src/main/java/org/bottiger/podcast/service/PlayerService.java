@@ -261,20 +261,22 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 	/**
 	 * Display a notification with the current podcast
 	 */
-    public void notifyStatus(@NonNull IEpisode argItem) {
+    public void notifyStatus(@android.support.annotation.Nullable IEpisode argItem) {
 
 		SoundWavesWidgetProvider.updateAllWidgets(this);
 
-		if (mNotificationPlayer == null)
-			try {
-				mNotificationPlayer = new NotificationPlayer(this, argItem);
-			} catch (RemoteException e) {
-				e.printStackTrace();
-			}
+		if (argItem != null) {
+			if (mNotificationPlayer == null)
+				try {
+					mNotificationPlayer = new NotificationPlayer(this, argItem);
+				} catch (RemoteException e) {
+					e.printStackTrace();
+				}
 
-		mItem = argItem;
-        mNotificationPlayer.setPlayerService(this);
-		mNotificationPlayer.show(argItem);
+			mItem = argItem;
+			mNotificationPlayer.setPlayerService(this);
+			mNotificationPlayer.show(argItem);
+		}
     }
 
 	public void playNext() {
