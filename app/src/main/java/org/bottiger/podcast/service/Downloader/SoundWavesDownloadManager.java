@@ -525,9 +525,6 @@ public class SoundWavesDownloadManager extends Observable {
 
             mContext.sendBroadcast(intent);
 
-            //Playlist.refresh(mContext);
-
-            //removeTopQueueItem();
             DownloadService.removeFirst();
 
 

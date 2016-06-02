@@ -175,7 +175,16 @@ public class DownloadService extends IntentService {
     }
 
     public static void removeFirst() {
-        sQueue.removeFirst();
+
+        // Queue have been cleared while downloading the current file
+        sLock.lock();
+        try {
+            if (getSize() > 0) {
+                sQueue.removeFirst();
+            }
+        } finally {
+            sLock.unlock();
+        }
     }
 
     public static boolean isRunning() {
