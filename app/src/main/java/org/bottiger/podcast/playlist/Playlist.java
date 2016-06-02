@@ -70,7 +70,7 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
 
     private SubscriptionFilter mSubscriptionFilter;
 
-	private static ArrayList<IEpisode> mInternalPlaylist = new ArrayList<>();
+	private ArrayList<IEpisode> mInternalPlaylist = new ArrayList<>();
 	private SharedPreferences sharedPreferences;
 
 	// Shared setting key/values

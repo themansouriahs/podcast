@@ -211,6 +211,10 @@ public class Library {
         Return true if the episode was added
      */
     public boolean addEpisode(@Nullable IEpisode argEpisode) {
+        return addEpisodeInternal(argEpisode, false);
+    }
+
+    private boolean addEpisodeInternal(@Nullable IEpisode argEpisode, boolean argSilent) {
         mLock.lock();
         try {
             if (argEpisode == null)
@@ -262,6 +266,11 @@ public class Library {
 
     @WorkerThread
     public void addSubscription(@Nullable Subscription argSubscription) {
+        addSubscriptionInternal(argSubscription, false);
+    }
+
+    @WorkerThread
+    private void addSubscriptionInternal(@Nullable Subscription argSubscription, boolean argSilent) {
         mLock.lock();
         try {
             if (argSubscription == null)
@@ -278,7 +287,8 @@ public class Library {
                 mActiveSubscriptions.add(argSubscription);
             }
 
-            mSubscriptionsChangeObservable.onNext(argSubscription);
+            if (!argSilent)
+                mSubscriptionsChangeObservable.onNext(argSubscription);
 
         } finally {
             mLock.unlock();
@@ -492,7 +502,7 @@ public class Library {
                         subscription = getByCursor(cursor, null);
 
                         if (!TextUtils.isEmpty(subscription.getImageURL())) {
-                            addSubscription(subscription);
+                            addSubscriptionInternal(subscription, true);
                         } else {
                             subscription = null;
                         }
@@ -574,7 +584,6 @@ public class Library {
                 counter++;
             }
             argSubscription.setIsRefreshing(false);
-
             argSubscription.setIsLoaded(true);
         } finally {
             if (cursor != null)

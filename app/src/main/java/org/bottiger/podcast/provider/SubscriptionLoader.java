@@ -3,6 +3,7 @@ package org.bottiger.podcast.provider;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.provider.BaseColumns;
+import android.support.annotation.NonNull;
 import android.support.v4.util.LongSparseArray;
 import android.support.v4.util.LruCache;
 import android.util.SparseArray;
@@ -14,18 +15,7 @@ import java.util.LinkedList;
  */
 public class SubscriptionLoader {
 
-    @Deprecated
-    public static Subscription getByCursor(Cursor cursor) {
-        // if (cursor.moveToFirst() == false)
-        // return null;
-        Subscription sub = new Subscription();
-        sub = fetchFromCursor(sub, cursor);
-        return sub;
-    }
-
-    public static Subscription fetchFromCursor(Subscription sub, Cursor cursor) {
-        // assert cursor.moveToFirst();
-        // cursor.moveToFirst();
+    public static Subscription fetchFromCursor(@NonNull  Subscription sub, @NonNull Cursor cursor) {
         sub.id = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
 
         int lastUpdatedIndex = cursor
@@ -54,8 +44,7 @@ public class SubscriptionLoader {
         sub.fail_count = cursor.getLong(cursor
                 .getColumnIndex(SubscriptionColumns.FAIL_COUNT));
 
-        sub.status = cursor.getLong(cursor
-                .getColumnIndex(SubscriptionColumns.STATUS));
+        sub.status = cursor.getLong(cursor.getColumnIndex(SubscriptionColumns.STATUS));
 
         sub.setSettings(cursor.getInt(cursor
                 .getColumnIndex(SubscriptionColumns.SETTINGS)));
