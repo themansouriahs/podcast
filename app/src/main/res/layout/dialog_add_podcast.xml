@@ -1,4 +1,3 @@
-
     <EditText xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/podcast_url"
         android:layout_width="234dp"
@@ -6,4 +5,4 @@
         android:layout_centerHorizontal="true"
         android:layout_weight="0.83"
         android:hint="@string/dialog_message_add_sub"
-        android:singleLine="true" />
+        android:maxLines="1" />

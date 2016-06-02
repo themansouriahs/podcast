@@ -32,6 +32,13 @@ public class SlimSubscription implements ISubscription, Parcelable {
     private boolean mIsSubscribed = false;
     private boolean mIsDirty = false;
 
+    public SlimSubscription(@NonNull URL argURL) {
+        mTitle = "";
+        mURL = argURL;
+        mImageURL = "";
+        initEpisodes();
+    }
+
     public SlimSubscription(@NonNull String argTitle, @NonNull URL argURL, @Nullable String argImageURL) {
         mTitle = argTitle;
         mURL = argURL;
@@ -165,15 +172,11 @@ public class SlimSubscription implements ISubscription, Parcelable {
         for (int i = 0; i < mEpisodes.size(); i++) {
             episodeArray.add(mEpisodes.get(i));
         }
-        //mEpisodes.toArray(new SlimEpisode[mEpisodes.size()]);
 
         // I think the order is important
         out.writeString(mTitle);
         out.writeString(mImageURL);
         out.writeString(mURL.toString());
-        //out.writeParcelableArray(episodeArray, PARCELABLE_WRITE_RETURN_VALUE);
-        //out.writeTypedList(mEpisodes);
-        //out.writeList(episodeArray);
     }
 
     public static final Parcelable.Creator<SlimSubscription> CREATOR
@@ -196,16 +199,6 @@ public class SlimSubscription implements ISubscription, Parcelable {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-
-        /*
-        ArrayList<SlimEpisode> episodeArray = in.readArrayList(SlimEpisode.class.getClassLoader());
-
-        mEpisodes.clear();
-        for (int i = 0; i < episodeArray.size(); i++) {
-            mEpisodes.add(episodeArray.get(i));
-        }
-        */
-
     }
 
     private void initEpisodes() {

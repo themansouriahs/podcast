@@ -6,14 +6,18 @@ import java.net.URL;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.utils.StrUtils;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -24,9 +28,8 @@ public class DialogAddPodcast {
 
 	private static final String TAG = "AddPodcastDialog";
 
-	@TargetApi(11)
 	@SuppressLint("NewApi")
-	public static void addPodcast(final Activity activity) {
+	public static void addPodcast(@NonNull  final Activity activity) {
 		AlertDialog.Builder alertBuilder = new AlertDialog.Builder(activity);
 
 		View alertView = activity.getLayoutInflater().inflate(
@@ -40,26 +43,13 @@ public class DialogAddPodcast {
 		final EditText input = (EditText) alertView
 				.findViewById((R.id.podcast_url));
 
-		// Only run if the API version if above 11
-		int currentapiVersion = android.os.Build.VERSION.SDK_INT;
-		if (currentapiVersion >= 11) {
-
-			ClipboardManager clipboard = (ClipboardManager) activity
-					.getApplicationContext().getSystemService(
-							activity.getApplicationContext().CLIPBOARD_SERVICE);
-			if (clipboard.hasPrimaryClip()) {
-				/*
-				CharSequence clipText = clipboard.getText();
-				if (clipText != null && clipText != "") {
-					input.setText(clipText);
-				}
-				*/
-				String clipText  = clipboard.getText().toString();
-				try {
-					URL url = new URL(clipText);
-					input.setText(clipText);
-				} catch (MalformedURLException e) {
-				}
+		ClipboardManager clipboard = (ClipboardManager) activity
+				.getApplicationContext().getSystemService(
+						Context.CLIPBOARD_SERVICE);
+		if (clipboard.hasPrimaryClip()) {
+			String clipText  = clipboard.getPrimaryClip().toString();
+			if (StrUtils.isValidUrl(clipText)) {
+				input.setText(clipText);
 			}
 		}
 
@@ -70,13 +60,18 @@ public class DialogAddPodcast {
 					@Override
 					public void onClick(DialogInterface dialog, int whichButton) {
 
-						try {
-							URL url = new URL(input.getText().toString());
-							SoundWaves.getAppContext(activity).getLibraryInstance().subscribe(url.toString());
-						} catch (MalformedURLException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+						String inputText = input.getText().toString();
+
+						if (StrUtils.isValidUrl(inputText)) {
+							SlimSubscription slimSubscription = null;
+							try {
+								slimSubscription = new SlimSubscription(new URL(inputText));
+								SoundWaves.getAppContext(activity).getLibraryInstance().subscribe(slimSubscription);
+							} catch (MalformedURLException e) {
+								e.printStackTrace();
+							}
 						}
+
 						return;
 					}
 				});
@@ -95,7 +90,7 @@ public class DialogAddPodcast {
 		dialog.show();
 
 		if (input.getText().toString().equals("")) {
-			Button b = dialog.getButton(DialogInterface.BUTTON1);
+			Button b = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
 			b.setEnabled(false);
 			input.setSelection(0);
 		}
@@ -120,14 +115,9 @@ public class DialogAddPodcast {
 
 			@Override
 			public void afterTextChanged(Editable s) {
-				// TODO Auto-generated method stub
 				String text = s.toString();
-				try {
-					URL url = new URL(text);
-					dialog.getButton(DialogInterface.BUTTON1).setEnabled(true);
-				} catch (MalformedURLException e) {
-					dialog.getButton(DialogInterface.BUTTON1).setEnabled(false);
-				}
+				boolean validUrl = StrUtils.isValidUrl(text);
+				dialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(validUrl);
 			}
 		};
 	}
