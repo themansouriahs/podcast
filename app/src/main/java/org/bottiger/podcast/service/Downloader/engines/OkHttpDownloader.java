@@ -132,7 +132,9 @@ public class OkHttpDownloader extends DownloadEngineBase {
             VendorCrashReporter.handleException(e, keys, values);
         } finally{
             Log.d(TAG, "disconnecting");
-            mConnection.disconnect();
+            HttpURLConnection connection = mConnection;
+            if (connection != null)
+                connection.disconnect();
         }
     }
 

@@ -234,7 +234,7 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
                 }
             }
             case R.id.menu_refresh_all_subscriptions: {
-                SoundWaves.mSubscriptionRefreshManager.refreshAll();
+                SoundWaves.getAppContext(getContext()).getRefreshManager().refreshAll();
             }
         }
         return super.onOptionsItemSelected(item);
@@ -246,7 +246,6 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
 		super.onCreateContextMenu(menu, v, menuInfo);
 		MenuInflater inflater = getActivity().getMenuInflater();
 		inflater.inflate(R.menu.subscription_context, menu);
-		//PlaylistFragment.setContextMenu(PlaylistFragment.SUBSCRIPTION_CONTEXT_MENU, this);
 	}
 
     public boolean onContextItemSelected(MenuItem menuItem) {
