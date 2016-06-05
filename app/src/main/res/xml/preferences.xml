@@ -20,8 +20,7 @@
 
     <PreferenceScreen
         android:key="help"
-        android:title="@string/preferences_category_help"
-        android:icon="@drawable/ic_help_24dp">
+        android:title="@string/preferences_category_help">
 
         <org.bottiger.podcast.ToolbarPreference
             android:key="help"
@@ -55,8 +54,7 @@
 
     <PreferenceScreen
         android:key="ui"
-        android:title="@string/preferences_category_ui"
-        android:icon="@drawable/ic_settings_24dp">
+        android:title="@string/preferences_category_ui">
 
         <org.bottiger.podcast.ToolbarPreference
             android:key="ui"
@@ -95,8 +93,7 @@
 
     <PreferenceScreen
         android:key="player"
-        android:title="@string/preferences_category_player"
-        android:icon="@drawable/ic_volume_up_24dp">
+        android:title="@string/preferences_category_player">
 
         <org.bottiger.podcast.ToolbarPreference
             android:key="player"
@@ -142,8 +139,7 @@
 
     <PreferenceScreen
         android:key="network"
-        android:title="@string/preferences_category_network"
-        android:icon="@drawable/ic_network_wifi_24dp">
+        android:title="@string/preferences_category_network">
 
         <org.bottiger.podcast.ToolbarPreference
             android:key="network"
@@ -204,8 +200,7 @@
 
     <PreferenceScreen
         android:key="cloud"
-        android:title="@string/preferences_category_cloud"
-        android:icon="@drawable/ic_cloud_queue_24dp">
+        android:title="@string/preferences_category_cloud">
 
         <org.bottiger.podcast.ToolbarPreference
             android:key="cloud"
@@ -249,8 +244,7 @@
 
     <PreferenceScreen
         android:key="advanced"
-        android:title="@string/preferences_category_advanced"
-        android:icon="@drawable/ic_build_24dp">
+        android:title="@string/preferences_category_advanced">
 
         <org.bottiger.podcast.ToolbarPreference
             android:key="advanced"
@@ -286,8 +280,7 @@
 
     <PreferenceScreen
         android:key="about"
-        android:title="@string/preferences_category_about"
-        android:icon="@drawable/ic_info_outline_24dp">
+        android:title="@string/preferences_category_about">
 
         <org.bottiger.podcast.ToolbarPreference
             android:key="about"

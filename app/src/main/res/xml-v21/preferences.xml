@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2008 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+<!-- This is a primitive example showing the different types of preferences available. -->
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceScreen
+        android:key="help"
+        android:title="@string/preferences_category_help"
+        android:icon="@drawable/ic_help_24dp">
+
+        <org.bottiger.podcast.ToolbarPreference
+            android:key="help"
+            android:title="@string/preferences_category_help" />
+
+        <PreferenceCategory
+            android:title="@string/pref_help_category_title"
+            android:key="pref_help_category">
+
+            <Preference
+                android:key="pref_help_static_field"
+                android:selectable="false"
+                android:persistent="false"
+                android:summary="@string/pref_help_static_field_description"/>
+
+        </PreferenceCategory>
+
+        <PreferenceCategory
+            android:title="@string/pref_help_beta_title"
+            android:key="pref_help_category">
+
+            <Preference
+                android:key="pref_help_static_field_2"
+                android:selectable="false"
+                android:persistent="false"
+                android:summary="@string/pref_help_beta_description"/>
+
+        </PreferenceCategory>
+
+    </PreferenceScreen>
+
+    <PreferenceScreen
+        android:key="ui"
+        android:title="@string/preferences_category_ui"
+        android:icon="@drawable/ic_settings_24dp">
+
+        <org.bottiger.podcast.ToolbarPreference
+            android:key="ui"
+            android:title="@string/preferences_category_ui" />
+
+        <PreferenceCategory
+            android:title="@string/pref_subscriptions_category_title"
+            android:key="pref_subscriptions_category">
+
+            <ListPreference
+                android:key="pref_subscriptions_columns"
+                android:defaultValue="2"
+                android:dialogTitle="@string/pref_subscriptions_columns_dialog_title"
+                android:entries="@array/pref_subscriptions_columns_entries"
+                android:entryValues="@array/pref_subscriptions_columns_entries_values"
+                android:title="@string/pref_subscriptions_columns_title"
+                android:summary="@string/pref_subscriptions_columns_summary" />
+
+        </PreferenceCategory>
+
+        <PreferenceCategory
+            android:title="@string/pref_interface_other_category_title"
+            android:key="@string/pref_interface_other_category_key">
+
+            <ListPreference
+                android:key="@string/pref_dark_theme_key"
+                android:defaultValue="@string/pref_theme_default"
+                android:entries="@array/pref_theme_entries"
+                android:entryValues="@array/pref_theme_entries_values"
+                android:summary="@string/pref_dark_theme"
+                android:title="@string/pref_dark_theme_title" />
+
+        </PreferenceCategory>
+
+    </PreferenceScreen>
+
+    <PreferenceScreen
+        android:key="player"
+        android:title="@string/preferences_category_player"
+        android:icon="@drawable/ic_volume_up_24dp">
+
+        <org.bottiger.podcast.ToolbarPreference
+            android:key="player"
+            android:title="@string/preferences_category_player" />
+
+        <PreferenceCategory
+            android:title="@string/pref_playback_category_title"
+            android:key="pref_playback_category">
+
+            <ListPreference
+                android:key="@string/pref_player_forward_amount_key"
+                android:defaultValue="30"
+                android:dialogTitle="@string/pref_player_forward_amount_dialog_title"
+                android:entries="@array/pref_player_seek_entries"
+                android:entryValues="@array/pref_player_seek_entries_values"
+                android:title="@string/pref_player_forward_amount_title"
+                android:summary="@string/pref_player_forwards_amount_summary" />
+
+            <ListPreference
+                android:key="@string/pref_player_backward_amount_key"
+                android:defaultValue="10"
+                android:dialogTitle="@string/pref_player_backward_amount_dialog_title"
+                android:entries="@array/pref_player_seek_entries"
+                android:entryValues="@array/pref_player_seek_entries_values"
+                android:title="@string/pref_player_backward_amount_title"
+                android:summary="@string/pref_player_backwards_amount_summary" />
+
+            <CheckBoxPreference
+                android:defaultValue="@bool/pref_continuously_playing_default"
+                android:key="@string/pref_continuously_playing_key"
+                android:summary="@string/pref_continuously_playing_description"
+                android:title="@string/pref_continuously_playing" />
+
+            <CheckBoxPreference
+                android:defaultValue="@bool/pref_open_video_externally_default"
+                android:key="@string/pref_open_video_externally_key"
+                android:summary="@string/pref_open_video_externally_description"
+                android:title="@string/pref_open_video_externally" />
+
+        </PreferenceCategory>
+
+    </PreferenceScreen>
+
+    <PreferenceScreen
+        android:key="network"
+        android:title="@string/preferences_category_network"
+        android:icon="@drawable/ic_network_wifi_24dp">
+
+        <org.bottiger.podcast.ToolbarPreference
+            android:key="network"
+            android:title="@string/preferences_category_network" />
+
+        <PreferenceCategory
+            android:title="@string/pref_network_category_network_title"
+            android:key="pref_network_category_network">
+
+            <CheckBoxPreference
+                android:defaultValue="@bool/pref_download_on_update_default"
+                android:key="@string/pref_download_on_update_key"
+                android:summary="@string/pref_download_on_update_description"
+                android:title="@string/pref_download_on_update_title" />
+
+            <CheckBoxPreference
+                android:defaultValue="@bool/pref_download_only_wifi_default"
+                android:key="@string/pref_download_only_wifi_key"
+                android:summary="@string/pref_only_wifi_description"
+                android:title="@string/pref_only_wifi_title" />
+
+        </PreferenceCategory>
+
+        <PreferenceCategory
+            android:title="@string/pref_network_category_storage_title"
+            android:key="pref_network_category_storage">
+
+            <CheckBoxPreference
+                android:defaultValue="@bool/pref_delete_when_finished_default"
+                android:key="@string/pref_delete_when_finished_key"
+                android:summary="@string/pref_delete_when_finished_description"
+                android:title="@string/pref_delete_when_finished_title" />
+
+            <ListPreference
+                android:defaultValue="1000"
+                android:dialogTitle="@string/pref_downloaded_expire_title"
+                android:entries="@array/entries_download_file_expire"
+                android:entryValues="@array/entryvalues_downlaod_file_expire"
+                android:key="@string/pref_podcast_collection_size_key"
+                android:summary="@string/pref_downloaded_expire_description"
+                android:title="@string/pref_downloaded_expire_title" />
+
+        </PreferenceCategory>
+
+        <PreferenceCategory
+            android:title="@string/pref_network_category_storage_experimental"
+            android:key="pref_network_category_experimental">
+
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="pref_stream_proxy"
+                android:summary="@string/pref_stream_proxy"
+                android:title="@string/pref_stream_proxy_title" />
+
+        </PreferenceCategory>
+
+    </PreferenceScreen>
+
+    <PreferenceScreen
+        android:key="cloud"
+        android:title="@string/preferences_category_cloud"
+        android:icon="@drawable/ic_cloud_queue_24dp">
+
+        <org.bottiger.podcast.ToolbarPreference
+            android:key="cloud"
+            android:title="@string/preferences_category_cloud" />
+
+        <PreferenceCategory
+            android:title="@string/pref_cloud_category_cloud_title"
+            android:key="pref_cloud_category_cloud">
+
+            <CheckBoxPreference
+                android:key="@string/pref_cloud_support_key"
+                android:summary="@string/pref_cloud_support_description"
+                android:title="@string/pref_cloud_support_title" />
+
+            <org.bottiger.podcast.utils.preferenceUtils.GPodderAuthDialogPreference
+                android:key="@string/pref_gpodder_support_key"
+                android:title="@string/pref_gpodder_support_title"
+                android:dialogIcon="@drawable/discovery_gpodder"
+                android:dialogLayout="@layout/dialog_gpodder_auth"
+                android:positiveButtonText="@android:string/ok"
+                android:negativeButtonText="@android:string/cancel"
+                />
+
+        </PreferenceCategory>
+
+        <PreferenceCategory
+            android:title="@string/pref_cloud_category_services_title"
+            android:key="@string/pref_cloud_category_cloud_services_key">
+
+            <ListPreference
+                android:dialogTitle="@string/pref_webservices_dialog_title"
+                android:entries="@array/entries_webservices_discovery_engine"
+                android:entryValues="@array/entryvalues_webservices_discovery_engine"
+                android:key="@string/pref_webservices_discovery_engine_key"
+                android:summary="@string/pref_webservices_discovery_description"
+                android:title="@string/pref_webservices_discovery_title" />
+
+        </PreferenceCategory>
+
+    </PreferenceScreen>
+
+    <PreferenceScreen
+        android:key="advanced"
+        android:title="@string/preferences_category_advanced"
+        android:icon="@drawable/ic_build_24dp">
+
+        <org.bottiger.podcast.ToolbarPreference
+            android:key="advanced"
+            android:title="@string/preferences_category_advanced" />
+
+        <PreferenceCategory
+            android:title="@string/pref_advanced_category_experimental"
+            android:key="@string/pref_advanced_category_experimental_key">
+
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="@string/pref_screen_rotation_key"
+                android:summary="@string/pref_screen_rotation_description"
+                android:title="@string/pref_screen_rotation_title" />
+
+            <CheckBoxPreference
+                android:key="@string/pref_anonymous_feedback_key"
+                android:summary="@string/pref_feedback_description"
+                android:title="@string/pref_feedback_title" />
+
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="@string/pref_use_soundengine_key"
+                android:summary="@string/pref_use_soundengine_description"
+                android:title="@string/pref_use_soundengine_title" />
+
+            <Preference android:key="@string/pref_submit_debug_logs_key"
+                android:title="@string/preferences__submit_debug_log"/>
+
+        </PreferenceCategory>
+
+    </PreferenceScreen>
+
+    <PreferenceScreen
+        android:key="about"
+        android:title="@string/preferences_category_about"
+        android:icon="@drawable/ic_info_outline_24dp">
+
+        <org.bottiger.podcast.ToolbarPreference
+            android:key="about"
+            android:title="@string/preferences_category_about" />
+
+        <Preference
+            android:defaultValue="true"
+            android:key="pref_current_version"
+            android:title="@string/pref_current_version_title" />
+
+    </PreferenceScreen>
+
+</PreferenceScreen>
