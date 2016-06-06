@@ -39,7 +39,7 @@ public class PlayerStatusObservable {
         IEpisode currentItem = argPlayerService.getCurrentItem();
         if (currentItem != null && currentItem instanceof FeedItem) {
             FeedItem feedItem = (FeedItem)currentItem;
-            int offset = argPlayerService.getPlayer().getCurrentPosition();
+            long offset = argPlayerService.getPlayer().getCurrentPosition();
             updateEpisodeOffset(argPlayerService.getContentResolver(),
                     feedItem,
                     offset);
@@ -50,7 +50,7 @@ public class PlayerStatusObservable {
 
     public static void updateEpisodeOffset(@NonNull ContentResolver argContentResolver,
                                            @NonNull FeedItem argEpisode,
-                                           int argOffset) {
+                                           long argOffset) {
         long now = System.currentTimeMillis();
 
         // more than a second ago

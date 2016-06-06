@@ -42,7 +42,7 @@ public interface IEpisode {
     void setUrl(@NonNull URL argUrl);
     void setArtwork(@NonNull URL argUrl);
     void setDescription(@NonNull String argDescription);
-    void setDuration(long argDurationMs);
+    boolean setDuration(long argDurationMs);
     void setOffset(@Nullable ContentResolver contentResolver, long i);
 
     float getPlaybackSpeed(@NonNull Context argContext);

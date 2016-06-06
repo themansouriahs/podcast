@@ -8,4 +8,7 @@
     <bool name="pref_show_listened_default">true</bool>
     <string name="pref_theme_default">1</string>
 
+    <string name="player_fast_forward_default">60</string>
+    <string name="player_rewind_default">60</string>
+
 </resources>

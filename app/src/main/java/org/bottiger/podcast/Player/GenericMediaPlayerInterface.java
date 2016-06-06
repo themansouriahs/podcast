@@ -13,9 +13,9 @@ public interface GenericMediaPlayerInterface {
     boolean canSetPitch();
     boolean canSetSpeed();
     float getCurrentPitchStepsAdjustment();
-    int getCurrentPosition();
+    long getCurrentPosition();
     float getCurrentSpeedMultiplier();
-    int getDuration();
+    long getDuration();
     float getMaxSpeedMultiplier();
     float getMinSpeedMultiplier();
     boolean isLooping();

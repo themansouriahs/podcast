@@ -635,21 +635,28 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
         return duration_ms;
 	}
 
-    public void setDuration(long argDurationMs) {
-        setDuration(argDurationMs, true);
+    /**
+     *
+     * @param argDurationMs
+     * @return true if the item was updated with a proper value
+     */
+    public boolean setDuration(long argDurationMs) {
+        return setDuration(argDurationMs, true);
     }
 
-    public void setDuration(long argDurationMs, boolean argOverride) {
+    public boolean setDuration(long argDurationMs, boolean argOverride) {
 		if (duration_ms == argDurationMs)
-			return;
+			return false;
 
         if (!argOverride) {
             if (duration_ms > 0)
-                return;
+                return false;
         }
 
         duration_ms = argDurationMs;
-		notifyPropertyChanged();
+		notifyPropertyChanged(EpisodeChanged.CHANGED);
+
+        return true;
     }
 
 	/**

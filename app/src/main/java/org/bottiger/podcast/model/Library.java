@@ -702,14 +702,16 @@ public class Library {
         }
     }
 
-    @Deprecated
-    public void updateEpisode(IEpisode argEpisode) {
+    public @LibraryPersistency.PersistencyResult
+    int updateEpisode(@NonNull IEpisode argEpisode) {
         if (argEpisode instanceof FeedItem) {
             updateEpisode((FeedItem) argEpisode);
         }
+
+        return LibraryPersistency.ERROR;
     }
 
-    public @LibraryPersistency.PersistencyResult
+    private @LibraryPersistency.PersistencyResult
     int updateEpisode(@NonNull FeedItem argEpisode) {
         addEpisode(argEpisode);
         return mLibraryPersistency.persist(argEpisode);

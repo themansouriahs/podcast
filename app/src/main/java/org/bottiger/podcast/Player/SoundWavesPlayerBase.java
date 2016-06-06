@@ -2,12 +2,27 @@ package org.bottiger.podcast.player;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.media.MediaCodec;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.google.android.exoplayer.ExoPlayer;
+import com.google.android.exoplayer.MediaCodecAudioTrackRenderer;
+import com.google.android.exoplayer.MediaCodecSelector;
+import com.google.android.exoplayer.MediaCodecVideoTrackRenderer;
+import com.google.android.exoplayer.extractor.ExtractorSampleSource;
+import com.google.android.exoplayer.upstream.Allocator;
+import com.google.android.exoplayer.upstream.DataSource;
+import com.google.android.exoplayer.upstream.DefaultAllocator;
+import com.google.android.exoplayer.upstream.DefaultBandwidthMeter;
+import com.google.android.exoplayer.upstream.DefaultUriDataSource;
+
+import org.bottiger.podcast.BuildConfig;
+import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
+import org.bottiger.podcast.player.exoplayer.ExtractorRendererBuilder;
 import org.bottiger.podcast.player.soundwaves.NDKMediaPlayer;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.service.PlayerService;
@@ -23,12 +38,13 @@ import java.lang.annotation.RetentionPolicy;
  */
 public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterface {
 
-    @IntDef({ANDROID, SOUNDWAVES})
+    @IntDef({ANDROID, SOUNDWAVES, EXOPLAYER})
     @Retention(RetentionPolicy.SOURCE)
     public @interface PlayerType {}
 
     public static final int ANDROID = 0;
     public static final int SOUNDWAVES = 1;
+    public static final int EXOPLAYER = 2;
 
     @PlayerType int mType;
 
@@ -36,6 +52,9 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
 
     private android.media.MediaPlayer mDefaultMediaPlayer;
     private NDKMediaPlayer mCustomMediaPlayer;
+
+    private ExoPlayerWrapper mExoplayer;
+    private static final int RENDERER_COUNT = 1;
 
     public SoundWavesPlayerBase(@NonNull PlayerService argPlayerService) {
         SharedPreferences prefs = PreferenceManager
@@ -48,6 +67,13 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
         } else {
             mDefaultMediaPlayer = new android.media.MediaPlayer();
             mDefaultMediaPlayer.reset();
+        }
+
+        if (BuildConfig.DEBUG) {
+            mExoplayer = new ExoPlayerWrapper();
+            mExoplayer.setRenderBuilder(new ExtractorRendererBuilder(argPlayerService, null));
+            mType = EXOPLAYER;
+            return;
         }
 
         mType = useCustomEngine ? SOUNDWAVES : ANDROID;
@@ -87,13 +113,16 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
     }
 
     @Override
-    public int getCurrentPosition() {
+    public long getCurrentPosition() {
         switch (mType) {
             case ANDROID: {
                 return mDefaultMediaPlayer.getCurrentPosition();
             }
             case SOUNDWAVES: {
                 return mCustomMediaPlayer.getCurrentPosition();
+            }
+            case EXOPLAYER: {
+                return mExoplayer.getCurrentPosition();
             }
         }
 
@@ -113,13 +142,16 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
     }
 
     @Override
-    public int getDuration() {
+    public long getDuration() {
         switch (mType) {
             case ANDROID: {
                 return mDefaultMediaPlayer.getDuration();
             }
             case SOUNDWAVES: {
                 return mCustomMediaPlayer.getDuration();
+            }
+            case EXOPLAYER: {
+                return mExoplayer.getDuration();
             }
         }
 
@@ -158,6 +190,9 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
             case SOUNDWAVES: {
                 return mCustomMediaPlayer.isLooping();
             }
+            case EXOPLAYER: {
+                return false;
+            }
         }
 
         fail();
@@ -177,6 +212,9 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
             case SOUNDWAVES: {
                 return mCustomMediaPlayer.isPlaying();
             }
+            case EXOPLAYER: {
+                return mExoplayer.getPlayWhenReady();
+            }
         }
 
         fail();
@@ -194,6 +232,10 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
                 mCustomMediaPlayer.pause();
                 break;
             }
+            case EXOPLAYER: {
+                mExoplayer.setPlayWhenReady(false);
+                break;
+            }
         }
     }
 
@@ -208,6 +250,10 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
                 mCustomMediaPlayer.prepare();
                 break;
             }
+            case EXOPLAYER: {
+                fail();
+                break;
+            }
         }
     }
 
@@ -217,11 +263,14 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
             switch (mType) {
                 case ANDROID: {
                     mDefaultMediaPlayer.prepareAsync();
-                    //mDefaultMediaPlayer.prepare();
                     break;
                 }
                 case SOUNDWAVES: {
                     mCustomMediaPlayer.prepareAsync();
+                    break;
+                }
+                case EXOPLAYER: {
+                    mExoplayer.prepare();
                     break;
                 }
             }
@@ -241,6 +290,10 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
                 mCustomMediaPlayer.release();
                 break;
             }
+            case EXOPLAYER: {
+                mExoplayer.release();
+                break;
+            }
         }
     }
 
@@ -255,6 +308,10 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
                 mCustomMediaPlayer.reset();
                 break;
             }
+            case EXOPLAYER: {
+                //fail();
+                break;
+            }
         }
     }
 
@@ -267,6 +324,12 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
             }
             case SOUNDWAVES: {
                 mCustomMediaPlayer.seekTo(msec);
+                break;
+            }
+            case EXOPLAYER: {
+                long seekPosition = mExoplayer.getDuration() == ExoPlayer.UNKNOWN_TIME ? 0
+                        : Math.min(Math.max(0, msec), getDuration());
+                mExoplayer.seekTo(seekPosition);
                 break;
             }
         }
@@ -295,6 +358,13 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
             }
             case SOUNDWAVES: {
                 mCustomMediaPlayer.setDataSource(context, uri);
+                break;
+            }
+            case EXOPLAYER: {
+                ExtractorRendererBuilder audioRenderer = new ExtractorRendererBuilder(context, uri);
+                audioRenderer.buildRenderers(mExoplayer);
+                //mExoplayer = new ExoPlayerWrapper(audioRenderer);
+                mExoplayer.setRenderBuilder(audioRenderer);
                 break;
             }
         }
@@ -423,6 +493,10 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
             }
             case SOUNDWAVES: {
                 mCustomMediaPlayer.start();
+                break;
+            }
+            case EXOPLAYER: {
+                mExoplayer.setPlayWhenReady(true);
                 break;
             }
         }

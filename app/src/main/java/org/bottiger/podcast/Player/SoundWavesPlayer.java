@@ -44,15 +44,6 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
     private static final float MARK_AS_LISTENED_RATIO_THRESHOLD = 0.9f;
     private static final float MARK_AS_LISTENED_MINUTES_LEFT_THRESHOLD = 5f;
 
-    private static final boolean DELETE_WHEN_FINISHED_DEFAULT = false;
-
-    private final String PLAYER_ACTION_FASTFORWARD_KEY;
-    private final String PLAYER_ACTION_REWIND_KEY;
-
-    // needs to be a string
-    private final String PLAYER_ACTION_FASTFORWARD_DEFAULT_VALUE = "60";
-    private final String PLAYER_ACTION_REWIND_DEFAULT_VALUE = "60";
-
     private @PlayerStatusObservable.PlayerStatus int mStatus;
 
     private PlayerService mPlayerService;
@@ -73,9 +64,6 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
 
     private boolean isPreparingMedia = false;
 
-    @NonNull
-    private SharedPreferences mSharedpreferences;
-
     int bufferProgress = 0;
     int startPos = 0;
     float playbackSpeed = 1.0f;
@@ -87,11 +75,6 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         this.mControllerComponentName = new ComponentName(mPlayerService,
                 HeadsetReceiver.class);
         this.mAudioManager = (AudioManager) mPlayerService.getSystemService(Context.AUDIO_SERVICE);
-        mSharedpreferences = PreferenceManager.getDefaultSharedPreferences(mPlayerService.getApplicationContext());
-
-        Resources resources = argPlayerService.getResources();
-        PLAYER_ACTION_FASTFORWARD_KEY = resources.getString(R.string.pref_player_forward_amount_key);
-        PLAYER_ACTION_REWIND_KEY = resources.getString(R.string.pref_player_backward_amount_key);
 
         mPlayerStatusObservable = new PlayerStatusObservable();
         SoundWaves.getBus().register(mPlayerStatusObservable); // FIXME is never unregistered!!!
@@ -123,12 +106,10 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
             Uri uri = Uri.parse(path);
             setDataSource(mPlayerService, uri);
 
-            setAudioStreamType(AudioManager.STREAM_MUSIC);
+            setAudioStreamType(PlayerStateManager.AUDIO_STREAM);
 
             this.startPos = startPos;
             this.isPreparingMedia = true;
-
-            setOnPreparedListener(preparedlistener);
         } catch (IOException ex) {
             // TODO: notify the user why the file couldn't be opened
             mIsInitialized = false;
@@ -138,11 +119,22 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
             mIsInitialized = false;
             return;
         }
+
         setOnCompletionListener(completionListener);
         setOnBufferingUpdateListener(bufferListener);
         setOnErrorListener(errorListener);
 
         prepareAsync();
+
+        seekTo(startPos);
+        IEpisode episode = mPlayerService.getCurrentItem();
+        if (episode != null) {
+            if (episode.setDuration(getDuration())) {
+                SoundWaves.getAppContext(mPlayerService).getLibraryInstance().updateEpisode(episode);
+            }
+            start();
+            isPreparingMedia = false;
+        }
 
         mIsInitialized = true;
     }
@@ -158,10 +150,11 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
     }
 
     public void toggle() {
-        if (isPlaying())
+        if (isPlaying()) {
             pause();
-        else
+        } else {
             start();
+        }
     }
 
     public void start() {
@@ -180,8 +173,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
 
         // Request audio focus for playback
         int result = mAudioManager.requestAudioFocus(mPlayerService,
-                // Use the music stream.
-                AudioManager.STREAM_MUSIC,
+                PlayerStateManager.AUDIO_STREAM,
                 // Request permanent focus.
                 AudioManager.AUDIOFOCUS_GAIN);
 
@@ -216,7 +208,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         if (!isInitialized())
             return;
 
-        int currentPosition = getCurrentPosition();
+        long currentPosition = getCurrentPosition();
 
         if (isCasting()) {
             mMediaCast.stop();
@@ -253,7 +245,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
     }
 
     @Override
-    public int getCurrentPosition() {
+    public long getCurrentPosition() {
         return mMediaCast != null && mMediaCast.isActive() ? mMediaCast.getCurrentPosition() : super.getCurrentPosition();
     }
 
@@ -272,7 +264,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         if (argItem == null)
             return;
 
-        String rewindAmount = mSharedpreferences.getString(PLAYER_ACTION_REWIND_KEY, PLAYER_ACTION_REWIND_DEFAULT_VALUE);
+        String rewindAmount = PreferenceHelper.getStringPreferenceValue(mPlayerService, R.string.pref_player_backward_amount_key, R.string.player_rewind_default);
         long seekTo = mPlayerService.position() - Integer.parseInt(rewindAmount)*1000; // to ms
 
         if (argItem.equals(mPlayerService.getCurrentItem())) {
@@ -295,7 +287,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         if (argItem == null)
             return;
 
-        String fastForwardAmount = mSharedpreferences.getString(PLAYER_ACTION_FASTFORWARD_KEY, PLAYER_ACTION_FASTFORWARD_DEFAULT_VALUE);
+        String fastForwardAmount = PreferenceHelper.getStringPreferenceValue(mPlayerService, R.string.pref_player_forward_amount_key, R.string.player_fast_forward_default);
         long seekTo = mPlayerService.position() + Integer.parseInt(fastForwardAmount)*1000; // to ms
 
         if (argItem.equals(mPlayerService.getCurrentItem())) {
@@ -402,19 +394,6 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         }
     };
 
-
-    GenericMediaPlayerInterface.OnPreparedListener preparedlistener = new GenericMediaPlayerInterface.OnPreparedListener() {
-        @Override
-        public void onPrepared(@NonNull GenericMediaPlayerInterface mp) {
-            mp.seekTo(startPos);
-            IEpisode episode = mPlayerService.getCurrentItem();
-            if (episode != null) {
-                episode.setDuration(mp.getDuration());
-                start();
-                isPreparingMedia = false;
-            }
-        }
-    };
 
     GenericMediaPlayerInterface.OnErrorListener errorListener = new GenericMediaPlayerInterface.OnErrorListener() {
         @Override
@@ -535,7 +514,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
             }
 
             if (super.isPlaying()) {
-                int offst = super.getCurrentPosition();
+                long offst = super.getCurrentPosition();
                 super.pause();
                 mMediaCast.play(offst);
             }

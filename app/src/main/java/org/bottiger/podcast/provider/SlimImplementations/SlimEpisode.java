@@ -152,8 +152,9 @@ public class SlimEpisode extends BaseEpisode implements Parcelable {
     }
 
     @Override
-    public void setDuration(long argDurationMs) {
+    public boolean setDuration(long argDurationMs) {
         mDuration = argDurationMs;
+        return true;
     }
 
     @Override

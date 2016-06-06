@@ -21,7 +21,7 @@ public class UserAgentInterceptor implements Interceptor {
     private final String userAgent ;
 
     public UserAgentInterceptor(@NonNull Context argContext) {
-        this.userAgent = argContext.getResources().getString(R.string.app_name) + "-" + BuildConfig.VERSION_NAME;
+        this.userAgent = getUserAgent(argContext);
     }
 
     @Override
@@ -31,5 +31,9 @@ public class UserAgentInterceptor implements Interceptor {
                 .header("User-Agent", userAgent)
                 .build();
         return chain.proceed(requestWithUserAgent);
+    }
+
+    public static String getUserAgent(@NonNull Context argContext) {
+        return argContext.getResources().getString(R.string.app_name) + "-" + BuildConfig.VERSION_NAME;
     }
 }
