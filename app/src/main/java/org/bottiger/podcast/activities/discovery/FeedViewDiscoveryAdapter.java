@@ -14,6 +14,7 @@ import org.bottiger.podcast.TopActivity;
 import org.bottiger.podcast.activities.feedview.EpisodeViewHolder;
 import org.bottiger.podcast.activities.feedview.FeedViewAdapter;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
+import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.SlimImplementations.SlimEpisode;
@@ -59,7 +60,7 @@ public class FeedViewDiscoveryAdapter extends FeedViewAdapter {
             params.addRule(RelativeLayout.BELOW, 0);
         }
 
-        episodeViewHolder.mPlayPauseButton.setStatus(PlayerStatusObservable.STOPPED);
+        episodeViewHolder.mPlayPauseButton.setStatus(ExoPlayerWrapper.STATE_IDLE);
 
         getPalette(episodeViewHolder);
     }

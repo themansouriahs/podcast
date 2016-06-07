@@ -131,6 +131,8 @@ public class Library {
         }
     };
 
+    private boolean mPlaylistLoaded = false;
+
     public Library(@NonNull Context argContext) {
         mContext = argContext.getApplicationContext();
 
@@ -462,22 +464,32 @@ public class Library {
     }
 
     private void loadPlaylistInternal(@NonNull String query, @NonNull  Playlist argPlaylist) {
-        Cursor cursor = null;
-        int counter = 0;
-        try {
-            cursor = PodcastOpenHelper.runQuery(Library.this.mContext, query);
-            FeedItem episode;
 
-            while (cursor.moveToNext()) {
-                episode = LibraryPersistency.fetchEpisodeFromCursor(cursor, null);
-                addEpisode(episode);
-                argPlaylist.setItem(counter, episode);
-                counter++;
+        mLock.lock();
+        try {
+            if (mPlaylistLoaded)
+                return;
+
+            Cursor cursor = null;
+            int counter = 0;
+            try {
+                cursor = PodcastOpenHelper.runQuery(Library.this.mContext, query);
+                FeedItem episode;
+
+                while (cursor.moveToNext()) {
+                    episode = LibraryPersistency.fetchEpisodeFromCursor(cursor, null);
+                    addEpisode(episode);
+                    argPlaylist.setItem(counter, episode);
+                    counter++;
+                }
+                argPlaylist.notifyPlaylistChanged();
+            } finally {
+                if (cursor != null)
+                    cursor.close();
+                mPlaylistLoaded = true;
             }
-            argPlaylist.notifyPlaylistChanged();
         } finally {
-            if (cursor != null)
-                cursor.close();
+            mLock.unlock();
         }
     }
 

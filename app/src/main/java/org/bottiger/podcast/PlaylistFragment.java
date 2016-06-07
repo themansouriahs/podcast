@@ -8,6 +8,7 @@ import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.model.events.EpisodeChanged;
 import org.bottiger.podcast.model.events.ItemChanged;
 import org.bottiger.podcast.model.events.SubscriptionChanged;
+import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.playlist.filters.SubscriptionFilter;
 import org.bottiger.podcast.provider.FeedItem;
@@ -140,9 +141,11 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
     @Override
     public void onDestroyView() {
         SoundWaves.getBus().unregister(mAdapter);
-        SoundWaves.getBus().unregister(mPlayPauseButton);
         SoundWaves.getBus().unregister(mPlayerSeekbar);
-        SoundWaves.getBus().unregister(mCurrentTime);
+        //SoundWaves.getBus().unregister(mCurrentTime);
+
+        SoundWaves.getAppContext(getContext()).getPlayer().removeListener(mCurrentTime);
+        SoundWaves.getAppContext(getContext()).getPlayer().removeListener(mPlayPauseButton);
         super.onDestroyView();
     }
 
@@ -205,9 +208,11 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
 
         SoundWaves.getBus().register(mAdapter);
-        SoundWaves.getBus().register(mPlayPauseButton);
         SoundWaves.getBus().register(mPlayerSeekbar);
-        SoundWaves.getBus().register(mCurrentTime);
+        //SoundWaves.getBus().register(mCurrentTime);
+
+        SoundWaves.getAppContext(getContext()).getPlayer().addListener(mCurrentTime);
+        SoundWaves.getAppContext(getContext()).getPlayer().addListener(mPlayPauseButton);
 
 
         setPlaylistViewState(mPlaylist);
@@ -476,7 +481,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
             return;
         }
 
-        //final int color = ContextCompat.getColor(context, R.color.pitch_black);
         final int color = UIUtils.attrColor(R.attr.themeTextColorPrimary, mContext);
         mEpisodeTitle.setTextColor(color);
         mEpisodeInfo.setTextColor(color);
@@ -492,21 +496,9 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         setPlayerProgress(item);
 
         mPlayPauseButton.setEpisode(item, PlayPauseImageView.PLAYLIST);
-        //mBackButton.setEpisode(item);
-        //mForwardButton.setEpisode(item);
-
         mPlayerDownloadButton.setEpisode(item);
-        //mFavoriteButton.setEpisode(item);
 
-        final PlayerService ps = PlayerService.getInstance();
-        if (ps != null &&
-                ps.getCurrentItem() != null &&
-                ps.getCurrentItem().equals(item) &&
-                ps.isPlaying()) {
-            mPlayPauseButton.setStatus(PlayerStatusObservable.PLAYING);
-        } else {
-            mPlayPauseButton.setStatus(PlayerStatusObservable.PAUSED);
-        }
+        mPlayPauseButton.setStatus(ExoPlayerWrapper.STATE_READY);
 
         ISubscription iSubscription = item.getSubscription(getContext());
         if (iSubscription instanceof org.bottiger.podcast.provider.Subscription) {

@@ -182,7 +182,6 @@ public class LibraryPersistency {
         cv.put(ItemColumns.IMAGE_URL, argItem.getArtwork(mContext));
         cv.put(ItemColumns.IS_DOWNLOADED, argItem.isDownloaded());
 
-        // cv.put(ItemColumns.DATE, argItem.getDate());
         Date date = argItem.getDateTime();
         if (date != null) {
             long time = date.getTime();

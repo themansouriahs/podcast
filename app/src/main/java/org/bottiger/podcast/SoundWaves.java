@@ -18,6 +18,8 @@ import android.util.Log;
 import org.bottiger.podcast.cloud.EventLogger;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.Library;
+import org.bottiger.podcast.player.SoundWavesPlayer;
+import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
 import org.bottiger.podcast.player.sonic.service.ISoundWavesEngine;
 import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
@@ -75,6 +77,8 @@ public class SoundWaves extends Application {
     protected MediaBrowserCompat mMediaBrowser;
     public MediaControllerCompat mMediaControllerCompat; // FIXME: Should not be static.
     public PlayerHelper mPlayerHelper = new PlayerHelper();
+
+    private SoundWavesPlayer mPlayer;
 
     public ISoundWavesEngine soundService;
 
@@ -230,6 +234,15 @@ public class SoundWaves extends Application {
     }
 
     @NonNull
+    public SoundWavesPlayer getPlayer() {
+        if (mPlayer == null) {
+            mPlayer = new SoundWavesPlayer(this);
+        }
+
+        return mPlayer;
+    }
+
+    @NonNull
     public static SoundWaves getAppContext(@NonNull Context argContext) {
         return (SoundWaves)argContext.getApplicationContext();
     }
@@ -271,6 +284,12 @@ public class SoundWaves extends Application {
                             MediaSessionCompat.Token token =
                                     mMediaBrowser.getSessionToken();
                             // This is what gives us access to everything
+                            PlayerService ps = PlayerService.getInstance();
+
+                            if (ps == null)
+                                return;
+
+                            SoundWaves.this.getPlayer().setPlayerService(ps);
                             mMediaControllerCompat =
                                     new MediaControllerCompat(SoundWaves.this, token);
                             mPlayerHelper.setMediaControllerCompat(mMediaControllerCompat);

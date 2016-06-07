@@ -30,7 +30,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 import static org.bottiger.podcast.utils.StorageUtils.VIDEO;
 
@@ -401,19 +403,21 @@ public class FeedParser {
                 if (unparsedDuration.contains(":")) {
 
                     Date date = null;
+                    SimpleDateFormat sdf = null;
                     for (String formatString : DURATION_FORMATS)
                     {
                         try
                         {
-                            date = new SimpleDateFormat(formatString).parse(unparsedDuration);
+                            sdf = new SimpleDateFormat(formatString);
+                            sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+                            date = sdf.parse(unparsedDuration);
+                            Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+                            cal.setTime(date);
+                            duration = cal.getTimeInMillis();
                             break;
                         }
                         catch (ParseException e) {
                         }
-                    }
-
-                    if (date != null) {
-                        duration = date.getTime();
                     }
                 } else {
                     // We assume it's the number of minutes

@@ -3,6 +3,7 @@ package org.bottiger.podcast.provider.base;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.model.events.EpisodeChanged;
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.service.PlayerService;
 
 /**
  * Created by aplb on 02-11-2015.
@@ -13,6 +14,11 @@ public abstract class BaseEpisode implements IEpisode {
 
     public double getProgress() {
         return mProgress;
+    }
+
+    @Override
+    public boolean isPlaying() {
+        return PlayerService.isPlaying() && this.equals(PlayerService.getCurrentItem());
     }
 
     public void setProgress(double argProgress) {

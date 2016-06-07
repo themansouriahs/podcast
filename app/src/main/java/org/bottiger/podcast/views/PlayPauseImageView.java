@@ -40,6 +40,7 @@ import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PlayerStatusData;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.listeners.PlayerStatusProgressData;
+import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
@@ -56,7 +57,8 @@ import java.lang.annotation.RetentionPolicy;
  */
 public class PlayPauseImageView extends PlayPauseView implements PaletteListener,
                                                              DownloadObserver,
-                                                             View.OnClickListener {
+                                                             View.OnClickListener,
+                                                            ExoPlayerWrapper.Listener {
 
     private static final String TAG = "PlayPauseImageView";
 
@@ -92,7 +94,7 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
     private double mLastProgressStart = -1;
     private double mLastProgressEnd = -1;
 
-    private @PlayerStatusObservable.PlayerStatus int mStatus = PlayerStatusObservable.STOPPED;
+    private @ExoPlayerWrapper.PlayerState int mStatus = ExoPlayerWrapper.STATE_IDLE;
 
     private IEpisode mEpisode;
 
@@ -151,8 +153,6 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
         paintBorder.setStyle(Paint.Style.STROKE);
         paintBorder.setStrokeWidth(DRAW_WIDTH);
 
-        //setPadding(DRAW_WIDTH, DRAW_WIDTH, DRAW_WIDTH, DRAW_WIDTH);
-
         if (Build.VERSION.SDK_INT >= 16) {
             //setBackground(null);
         }
@@ -198,9 +198,9 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
     }
 
     @MainThread
-    public void setStatus(@PlayerStatusObservable.PlayerStatus int argStatus) {
+    public void setStatus(@ExoPlayerWrapper.PlayerState int argPlayerStatus) {
 
-        if (argStatus == PlayerStatusObservable.PLAYING) {
+        if (getEpisode().isPlaying()) {
             if (IsDisplayingPlayIcon()) {
                 animateChangeFrom(PlayPauseDrawable.IS_PAUSED);
             }
@@ -210,9 +210,9 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
             }
         }
 
-        mStatus = argStatus;
+        mStatus = argPlayerStatus;
 
-        if (mStatus == PlayerStatusObservable.PREPARING) {
+        if (mStatus == ExoPlayerWrapper.STATE_PREPARING) {
             mStartTime = System.currentTimeMillis();
         }
 
@@ -261,10 +261,10 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
         bounds.right = minSize - drawOffset; //contentWidth - drawOffset;
         bounds.bottom = minSize - drawOffset; //contentWidth - drawOffset;
 
-        Log.d(TAG, "onDraw. Preparing => " + (mStatus == PlayerStatusObservable.PREPARING) + " status: " + mStatus);
+        Log.d(TAG, "onDraw. Preparing => " + (mStatus == ExoPlayerWrapper.STATE_PREPARING) + " status: " + mStatus);
 
         double elapsedTime = System.currentTimeMillis() - mStartTime;
-        boolean showRotatingAnimation = mStatus == PlayerStatusObservable.PREPARING;// || animationStartedLessThanOneSecondAgo(mPreparingAnimationStarted);
+        boolean showRotatingAnimation = mStatus == ExoPlayerWrapper.STATE_PREPARING;// || animationStartedLessThanOneSecondAgo(mPreparingAnimationStarted);
         boolean refreshButton = false;
 
         double defaultStartAngle = 0.0;
@@ -387,18 +387,29 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
         setProgressPercent((int) progress);
     }
 
-    @Subscribe
-    public void onPlayerStateChange(PlayerStatusData argPlayerStatus) {
-        if (argPlayerStatus == null)
-            return;
+    @Override
+    public void onStateChanged(boolean playWhenReady, @ExoPlayerWrapper.PlayerState int playbackState) {
+        onPlayerStateChange(playbackState);
+    }
 
-        if (!getEpisode().equals(argPlayerStatus.episode)) {
+    @Override
+    public void onError(Exception e) {
 
-            setStatus(PlayerStatusObservable.PAUSED);
+    }
+
+    @Override
+    public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
+
+    }
+
+    private void onPlayerStateChange(@ExoPlayerWrapper.PlayerState int argPlayerStatus) {
+        if (!getEpisode().equals(SoundWaves.getAppContext(getContext()).getPlaylist().first())) {
+
+            setStatus(ExoPlayerWrapper.STATE_READY);
             return;
         }
 
-        setStatus(argPlayerStatus.status);
+        setStatus(argPlayerStatus);
     }
 
     @Override
@@ -425,7 +436,7 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
             animateChangeFrom(PlayPauseDrawable.IS_PLAYING);
         } else {
             animateChangeFrom(PlayPauseDrawable.IS_PAUSED);
-            setStatus(PlayerStatusObservable.PREPARING);
+            setStatus(ExoPlayerWrapper.STATE_PREPARING);
         }
 
         // If the file is a video we offer to open it in another external player

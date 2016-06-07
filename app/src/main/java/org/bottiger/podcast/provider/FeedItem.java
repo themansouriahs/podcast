@@ -19,6 +19,7 @@ import org.bottiger.podcast.listeners.DownloadProgressPublisher;
 import org.bottiger.podcast.model.events.EpisodeChanged;
 import org.bottiger.podcast.provider.base.BaseEpisode;
 import org.bottiger.podcast.service.DownloadStatus;
+import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.BitMaskUtils;
 import org.bottiger.podcast.utils.PlaybackSpeed;
 import org.bottiger.podcast.utils.SDCardManager;

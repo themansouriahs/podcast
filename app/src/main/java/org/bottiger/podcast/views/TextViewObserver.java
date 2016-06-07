@@ -5,22 +5,27 @@ import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
+import android.widget.Chronometer;
 import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
 
 import org.bottiger.podcast.listeners.EpisodeStatus;
 import org.bottiger.podcast.listeners.PlayerStatusProgressData;
+import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.utils.StrUtils;
 
+import static android.os.SystemClock.elapsedRealtime;
+
 /**
  * Created by apl on 25-03-2015.
  */
-public class TextViewObserver extends TextView {
+public class TextViewObserver extends Chronometer implements ExoPlayerWrapper.Listener {
 
     protected IEpisode mEpisode = null;
+    private boolean mIsTicking = false;
 
     public TextViewObserver(Context context) {
         super(context);
@@ -47,16 +52,26 @@ public class TextViewObserver extends TextView {
         return mEpisode;
     }
 
-    @Subscribe
-    public void setProgressMs(PlayerStatusProgressData argPlayerProgress) {
-        if (argPlayerProgress.progressMs < 0)
-            return;
+    @Override
+    public void onStateChanged(boolean playWhenReady, @ExoPlayerWrapper.PlayerState int playbackState) {
 
-        setText(StrUtils.formatTime(argPlayerProgress.progressMs));
-        invalidate();
+        long base = elapsedRealtime() - mEpisode.getOffset();
+        setBase(base);
+        if (playWhenReady && !mIsTicking) {
+            start();
+        } else if (!playWhenReady && mIsTicking) {
+            stop();
+        }
+        mIsTicking = playWhenReady;
     }
 
-    public void onStateChange(EpisodeStatus argStatus) {
-        setProgressMs(new PlayerStatusProgressData(argStatus.getPlaybackPositionMs()));
+    @Override
+    public void onError(Exception e) {
+
+    }
+
+    @Override
+    public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
+
     }
 }

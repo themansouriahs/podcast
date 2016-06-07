@@ -31,7 +31,6 @@ public class TextViewTotalTime extends TextViewObserver {
         return;
     }
 
-    @Override
     public void onStateChange(EpisodeStatus argStatus) {
         long progressMs = mEpisode.getDuration();
 

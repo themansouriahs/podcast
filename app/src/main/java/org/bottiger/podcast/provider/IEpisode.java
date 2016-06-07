@@ -72,6 +72,7 @@ public interface IEpisode {
     boolean isDownloaded();
     boolean isMarkedAsListened();
     boolean isNew();
+    boolean isPlaying();
 
     boolean isVideo();
     void setIsVideo(boolean argIsVideo);

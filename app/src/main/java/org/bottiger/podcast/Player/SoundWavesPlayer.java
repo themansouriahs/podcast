@@ -15,6 +15,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 
+import com.google.android.exoplayer.ExoPlayer;
+
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.cloud.EventLogger;
@@ -46,6 +48,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
 
     private @PlayerStatusObservable.PlayerStatus int mStatus;
 
+    @Nullable
     private PlayerService mPlayerService;
     private org.bottiger.podcast.player.PlayerHandler mHandler;
     private org.bottiger.podcast.player.PlayerStateManager mPlayerStateManager;
@@ -68,16 +71,18 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
     int startPos = 0;
     float playbackSpeed = 1.0f;
 
-    public SoundWavesPlayer(@NonNull PlayerService argPlayerService) {
-        super(argPlayerService);
+    public SoundWavesPlayer(@NonNull Context argContext) {
+        super(argContext);
+        mPlayerStatusObservable = new PlayerStatusObservable();
+        SoundWaves.getBus().register(mPlayerStatusObservable); // FIXME is never unregistered!!!
+    }
+
+    public void setPlayerService(@NonNull PlayerService argPlayerService) {
         mPlayerService = argPlayerService;
         mPlayerStateManager = argPlayerService.getPlayerStateManager();
         this.mControllerComponentName = new ComponentName(mPlayerService,
                 HeadsetReceiver.class);
         this.mAudioManager = (AudioManager) mPlayerService.getSystemService(Context.AUDIO_SERVICE);
-
-        mPlayerStatusObservable = new PlayerStatusObservable();
-        SoundWaves.getBus().register(mPlayerStatusObservable); // FIXME is never unregistered!!!
     }
 
     public void setDataSourceAsync(String path, int startPos) {
@@ -86,7 +91,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         mPlayerStateManager.updateState(PlaybackStateCompat.STATE_CONNECTING, startPos, playbackSpeed);
 
         if (isCasting()) {
-            mMediaCast.loadEpisode(mPlayerService.getCurrentItem());
+            mMediaCast.loadEpisode(PlayerService.getCurrentItem());
             start();
             mPlayerStateManager.updateState(PlaybackStateCompat.STATE_PLAYING, startPos, playbackSpeed);
             return;
@@ -127,9 +132,10 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         prepareAsync();
 
         seekTo(startPos);
-        IEpisode episode = mPlayerService.getCurrentItem();
+        IEpisode episode = PlayerService.getCurrentItem();
         if (episode != null) {
-            if (episode.setDuration(getDuration())) {
+            long duration = getDuration();
+            if (duration != ExoPlayer.UNKNOWN_TIME && episode.setDuration(duration) ) {
                 SoundWaves.getAppContext(mPlayerService).getLibraryInstance().updateEpisode(episode);
             }
             start();

@@ -9,6 +9,7 @@ import org.bottiger.podcast.adapters.viewholders.ExpandableViewHoldersUtil;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
+import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
@@ -198,7 +199,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         }
 
         viewHolder.mPlayPauseButton.setEpisode(item, PlayPauseImageView.PLAYLIST);
-        viewHolder.mPlayPauseButton.setStatus(PlayerStatusObservable.PAUSED);
+        viewHolder.mPlayPauseButton.setStatus(ExoPlayerWrapper.STATE_IDLE);
 
         viewHolder.downloadButton.setEpisode(item);
 

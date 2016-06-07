@@ -169,7 +169,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 		setSessionToken(mPlayerStateManager.getToken());
 		
-		mPlayer = new SoundWavesPlayer(this);
+		mPlayer = SoundWaves.getAppContext(this).getPlayer();
 		mPlayer.setHandler(mPlayerHandler);
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -543,7 +543,18 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 		return mPlayer.duration();
 	}
 
-	public IEpisode getCurrentItem() {
+	@Nullable
+	public static IEpisode getCurrentItem() {
+		PlayerService ps = PlayerService.getInstance();
+
+		if (ps == null)
+			return null;
+
+		return ps.getCurrentItemInternal();
+	}
+
+	@Nullable
+	private IEpisode getCurrentItemInternal() {
 		return mItem;
 	}
 

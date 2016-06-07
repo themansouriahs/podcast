@@ -31,6 +31,7 @@ import org.bottiger.podcast.listeners.EpisodeStatus;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.listeners.PlayerStatusProgressData;
+import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.StrUtils;
@@ -42,7 +43,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by apl on 03-09-2014.
  */
-public class PlayerSeekbar extends SeekBar implements PaletteListener {
+public class PlayerSeekbar extends SeekBar implements PaletteListener, ExoPlayerWrapper.Listener {
 
     private static final String TAG = "PlayerSeekbar";
     private static final int RANGE_MAX = 1000;
@@ -86,15 +87,10 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
             long timeMs = mEpisode.getDuration() * seekBar.getProgress()
                     / RANGE_MAX;
 
-            PlayerService ps = PlayerService.getInstance();
-
-            if (ps == null)
-                return;
-
-            if (mEpisode.equals(ps.getCurrentItem())) {
-                ps.seek(timeMs);
+            if (mEpisode.equals(PlayerService.getCurrentItem())) {
+                PlayerService.getInstance().seek(timeMs);
             } else {
-                mEpisode.setOffset(ps.getContentResolver(), timeMs);
+                mEpisode.setOffset(getContext().getContentResolver(), timeMs);
                 setProgressMs(timeMs);
             }
 
@@ -189,8 +185,7 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
 
         setMax(RANGE_MAX);
         setOnSeekBarChangeListener(onSeekBarChangeListener);
-        PlayerService ps = PlayerService.getInstance();
-        mIsPlaying = ps != null && ps.isPlaying();
+        mIsPlaying = PlayerService.isPlaying();
     }
 
     public void setEpisode(@NonNull IEpisode argEpisode) {
@@ -200,7 +195,6 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
 
         if (mEpisode.getOffset() > 0 && mEpisode.getDuration() > 0) {
             float progressf = (float)mEpisode.getOffset() / mEpisode.getDuration();
-            //setProgress();
             progress = (int)(progressf*RANGE_MAX);
         }
 
@@ -277,7 +271,7 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
         setProgressMs(argPlayerProgress.progressMs);
     }
 
-    public void setProgressMs(long progressMs) {
+    private void setProgressMs(long progressMs) {
         if (isTouching()) {
             return;
         }
@@ -307,26 +301,6 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
         setProgress((int) progress);
     }
 
-    @Subscribe
-    public void onStateChange(EpisodeStatus argStatus) {
-        validateState();
-
-        mIsPlaying = argStatus.getStatus() == PlayerStatusObservable.PLAYING;
-
-        float currentPositionMs = argStatus.getPlaybackPositionMs() < 0 ? 0 : argStatus.getPlaybackPositionMs();
-        double episodeLenghtMS = (double)mEpisode.getDuration();
-
-        if (episodeLenghtMS < 0 || currentPositionMs > episodeLenghtMS) {
-            return;
-            //throw new IllegalStateException("Illegal Seekbar State: current position: " + currentPositionMs + ", episode length: " + episodeLenghtMS);
-        }
-
-        if (mIsPlaying) {
-            float progress = currentPositionMs / mEpisode.getDuration() * RANGE_MAX;
-            setProgress((int) progress);
-        }
-    }
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         Log.v(TAG, event.toString());
@@ -352,7 +326,6 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
                 Log.v(TAG, "pos => " + pos);
                 setProgress(pos);
                 onSeekBarChangeListener.onProgressChanged(this, pos, true);
-                //onSizeChanged(getWidth(), getHeight(), 0, 0);
                 invalidate();
                 break;
 
@@ -373,11 +346,9 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
         if (swatch==null)
             return;
 
-        int color = swatch.getRgb();// .getTitleTextColor();
+        int color = swatch.getRgb();
         ColorDrawable dc = new ColorDrawable(color);
         dc.setAlpha(100);
-        //setProgressDrawable(dc);
-        //setBackgroundColor(color);
         invalidate();
     }
 
@@ -386,7 +357,7 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
         return mEpisode.getArtwork(getContext());
     }
 
-    public void validateState() {
+    private void validateState() {
         if (mEpisode == null) {
             throw new IllegalStateException("Episode needs to be set");
         }
@@ -407,7 +378,58 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener {
         }
     }
 
-    public boolean isTouching() {
+    private boolean isTouching() {
         return mIsTouching;
+    }
+
+    @Subscribe
+    public void onStateChange(EpisodeStatus argStatus) {
+        validateState();
+
+        mIsPlaying = argStatus.getStatus() == PlayerStatusObservable.PLAYING;
+
+        float currentPositionMs = argStatus.getPlaybackPositionMs() < 0 ? 0 : argStatus.getPlaybackPositionMs();
+        double episodeLenghtMS = (double)mEpisode.getDuration();
+
+        if (episodeLenghtMS < 0 || currentPositionMs > episodeLenghtMS) {
+            return;
+            //throw new IllegalStateException("Illegal Seekbar State: current position: " + currentPositionMs + ", episode length: " + episodeLenghtMS);
+        }
+
+        if (mIsPlaying) {
+            float progress = currentPositionMs / mEpisode.getDuration() * RANGE_MAX;
+            setProgress((int) progress);
+        }
+    }
+
+    @Override
+    public void onStateChanged(boolean playWhenReady, @ExoPlayerWrapper.PlayerState int playbackState) {
+        validateState();
+
+        mIsPlaying = playWhenReady && playbackState == ExoPlayerWrapper.STATE_READY;
+
+        long playbackPosition = SoundWaves.getAppContext(getContext()).getPlayer().getCurrentPosition();
+
+        float currentPositionMs = Math.max(playbackPosition, 0);
+        double episodeLenghtMS = (double)mEpisode.getDuration();
+
+        if (episodeLenghtMS < 0 || currentPositionMs > episodeLenghtMS) {
+            return;
+        }
+
+        if (mIsPlaying) {
+            float progress = currentPositionMs / mEpisode.getDuration() * RANGE_MAX;
+            setProgress((int) progress);
+        }
+    }
+
+    @Override
+    public void onError(Exception e) {
+
+    }
+
+    @Override
+    public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
+
     }
 }

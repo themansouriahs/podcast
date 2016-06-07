@@ -29,6 +29,7 @@ import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.model.datastructures.EpisodeFilter;
 import org.bottiger.podcast.model.datastructures.EpisodeList;
 import org.bottiger.podcast.model.events.SubscriptionChanged;
+import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
@@ -168,10 +169,10 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
             }
         });
 
-        @PlayerStatusObservable.PlayerStatus int playerStatus = PlayerStatusObservable.STOPPED;
+        @ExoPlayerWrapper.PlayerState int playerStatus = ExoPlayerWrapper.STATE_IDLE;
 
         if (mActivity.getPlayerHelper().isPlaying(item)) {
-            playerStatus = PlayerStatusObservable.PLAYING;
+            playerStatus = ExoPlayerWrapper.STATE_READY;
         }
 
         episodeViewHolder.mPlayPauseButton.setEpisode(item, PlayPauseImageView.FEEDVIEW);

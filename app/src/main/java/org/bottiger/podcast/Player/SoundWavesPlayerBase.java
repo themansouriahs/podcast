@@ -56,27 +56,18 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
     private ExoPlayerWrapper mExoplayer;
     private static final int RENDERER_COUNT = 1;
 
-    public SoundWavesPlayerBase(@NonNull PlayerService argPlayerService) {
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(argPlayerService);
-        String key = argPlayerService.getResources().getString(R.string.pref_use_soundengine_key);
-        boolean useCustomEngine = prefs.getBoolean(key, !ANDROID_ENGINE_AS_DEFAULT);
+    public SoundWavesPlayerBase(@NonNull Context argContext) {
+        mExoplayer = new ExoPlayerWrapper();
+        mExoplayer.setRenderBuilder(new ExtractorRendererBuilder(argContext, null));
+        mType = EXOPLAYER;
+    }
 
-        if (useCustomEngine) {
-            mCustomMediaPlayer = new NDKMediaPlayer(argPlayerService, true);
-        } else {
-            mDefaultMediaPlayer = new android.media.MediaPlayer();
-            mDefaultMediaPlayer.reset();
-        }
+    public void addListener(ExoPlayerWrapper.Listener listener) {
+        mExoplayer.addListener(listener);
+    }
 
-        if (BuildConfig.DEBUG) {
-            mExoplayer = new ExoPlayerWrapper();
-            mExoplayer.setRenderBuilder(new ExtractorRendererBuilder(argPlayerService, null));
-            mType = EXOPLAYER;
-            return;
-        }
-
-        mType = useCustomEngine ? SOUNDWAVES : ANDROID;
+    public void removeListener(ExoPlayerWrapper.Listener listener) {
+        mExoplayer.removeListener(listener);
     }
 
     @Override
