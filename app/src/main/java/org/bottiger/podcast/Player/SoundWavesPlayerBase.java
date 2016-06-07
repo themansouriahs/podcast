@@ -1,9 +1,12 @@
 package org.bottiger.podcast.player;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.media.MediaCodec;
+import android.media.PlaybackParams;
 import android.net.Uri;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
@@ -13,6 +16,7 @@ import com.google.android.exoplayer.ExoPlayer;
 import com.google.android.exoplayer.MediaCodecAudioTrackRenderer;
 import com.google.android.exoplayer.MediaCodecSelector;
 import com.google.android.exoplayer.MediaCodecVideoTrackRenderer;
+import com.google.android.exoplayer.TrackRenderer;
 import com.google.android.exoplayer.extractor.ExtractorSampleSource;
 import com.google.android.exoplayer.upstream.Allocator;
 import com.google.android.exoplayer.upstream.DataSource;
@@ -23,6 +27,7 @@ import com.google.android.exoplayer.upstream.DefaultUriDataSource;
 import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
 import org.bottiger.podcast.player.exoplayer.ExtractorRendererBuilder;
+import org.bottiger.podcast.player.exoplayer.PodcastAudioRendererV21;
 import org.bottiger.podcast.player.soundwaves.NDKMediaPlayer;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.service.PlayerService;
@@ -56,6 +61,8 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
     private ExoPlayerWrapper mExoplayer;
     private static final int RENDERER_COUNT = 1;
 
+    private TrackRenderer[] mTrackRendere = new TrackRenderer[ExoPlayerWrapper.RENDERER_COUNT];
+
     public SoundWavesPlayerBase(@NonNull Context argContext) {
         mExoplayer = new ExoPlayerWrapper();
         mExoplayer.setRenderBuilder(new ExtractorRendererBuilder(argContext, null));
@@ -72,24 +79,12 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
 
     @Override
     public boolean canSetPitch() {
-        switch (mType) {
-            case SOUNDWAVES: {
-                return mCustomMediaPlayer.canSetPitch();
-            }
-        }
-
-        return false;
+        return true;
     }
 
     @Override
     public boolean canSetSpeed() {
-        switch (mType) {
-            case SOUNDWAVES: {
-                return mCustomMediaPlayer.canSetSpeed();
-            }
-        }
-
-        return false;
+        return true;
     }
 
     @Override
@@ -105,49 +100,24 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
 
     @Override
     public long getCurrentPosition() {
-        switch (mType) {
-            case ANDROID: {
-                return mDefaultMediaPlayer.getCurrentPosition();
-            }
-            case SOUNDWAVES: {
-                return mCustomMediaPlayer.getCurrentPosition();
-            }
-            case EXOPLAYER: {
-                return mExoplayer.getCurrentPosition();
-            }
-        }
-
-        fail();
-        return 0;
+        return mExoplayer.getCurrentPosition();
     }
 
     @Override
     public float getCurrentSpeedMultiplier() {
+        /*
         switch (mType) {
-            case SOUNDWAVES: {
-                return mCustomMediaPlayer.getCurrentSpeedMultiplier();
+            case EXOPLAYER: {
+                return mExoplayer.getPlaybackState();
             }
-        }
+        }*/
 
         return PlaybackSpeed.DEFAULT; // default speed is 1x
     }
 
     @Override
     public long getDuration() {
-        switch (mType) {
-            case ANDROID: {
-                return mDefaultMediaPlayer.getDuration();
-            }
-            case SOUNDWAVES: {
-                return mCustomMediaPlayer.getDuration();
-            }
-            case EXOPLAYER: {
-                return mExoplayer.getDuration();
-            }
-        }
-
-        fail();
-        return 0;
+        return mExoplayer.getDuration();
     }
 
     @Override
@@ -174,156 +144,49 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
 
     @Override
     public boolean isLooping() {
-        switch (mType) {
-            case ANDROID: {
-                return mDefaultMediaPlayer.isLooping();
-            }
-            case SOUNDWAVES: {
-                return mCustomMediaPlayer.isLooping();
-            }
-            case EXOPLAYER: {
-                return false;
-            }
-        }
-
-        fail();
         return false;
     }
 
     @Override
     public boolean isPlaying() {
-        switch (mType) {
-            case ANDROID: {
-                try {
-                    return mDefaultMediaPlayer.isPlaying();
-                } catch (IllegalStateException ise) {
-                    return false;
-                }
-            }
-            case SOUNDWAVES: {
-                return mCustomMediaPlayer.isPlaying();
-            }
-            case EXOPLAYER: {
-                return mExoplayer.getPlayWhenReady();
-            }
-        }
-
-        fail();
-        return false;
+        return mExoplayer.getPlayWhenReady();
     }
 
     @Override
     public void pause() {
-        switch (mType) {
-            case ANDROID: {
-                mDefaultMediaPlayer.pause();
-                break;
-            }
-            case SOUNDWAVES: {
-                mCustomMediaPlayer.pause();
-                break;
-            }
-            case EXOPLAYER: {
-                mExoplayer.setPlayWhenReady(false);
-                break;
-            }
-        }
+        mExoplayer.setPlayWhenReady(false);
     }
 
     @Override
-    public void prepare() throws IllegalStateException, IOException {
-        switch (mType) {
-            case ANDROID: {
-                mDefaultMediaPlayer.prepare();
-                break;
-            }
-            case SOUNDWAVES: {
-                mCustomMediaPlayer.prepare();
-                break;
-            }
-            case EXOPLAYER: {
-                fail();
-                break;
-            }
-        }
-    }
-
-    @Override
+    @Deprecated
     public void prepareAsync() {
-        try {
-            switch (mType) {
-                case ANDROID: {
-                    mDefaultMediaPlayer.prepareAsync();
-                    break;
-                }
-                case SOUNDWAVES: {
-                    mCustomMediaPlayer.prepareAsync();
-                    break;
-                }
-                case EXOPLAYER: {
-                    mExoplayer.prepare();
-                    break;
-                }
-            }
-        } catch (Exception ise) {
-            Log.e("bad", "very bad");
-        }
+        mExoplayer.prepare();
+    }
+
+    @Override
+    public void prepare() {
+        mExoplayer.prepare();
+    }
+
+    @Override
+    public void setDataSource(Context context, Uri uri) throws IllegalArgumentException, IllegalStateException, IOException {
+        ExtractorRendererBuilder audioRenderer = new ExtractorRendererBuilder(context, uri);
+        mExoplayer.setRenderBuilder(audioRenderer);
     }
 
     @Override
     public void release() {
-        switch (mType) {
-            case ANDROID: {
-                mDefaultMediaPlayer.release();
-                break;
-            }
-            case SOUNDWAVES: {
-                mCustomMediaPlayer.release();
-                break;
-            }
-            case EXOPLAYER: {
-                mExoplayer.release();
-                break;
-            }
-        }
+        mExoplayer.release();
     }
 
     @Override
     public void reset() {
-        switch (mType) {
-            case ANDROID: {
-                mDefaultMediaPlayer.reset();
-                break;
-            }
-            case SOUNDWAVES: {
-                mCustomMediaPlayer.reset();
-                break;
-            }
-            case EXOPLAYER: {
-                //fail();
-                break;
-            }
-        }
     }
 
     @Override
     public void seekTo(int msec) throws IllegalStateException {
-        switch (mType) {
-            case ANDROID: {
-                mDefaultMediaPlayer.seekTo(msec);
-                break;
-            }
-            case SOUNDWAVES: {
-                mCustomMediaPlayer.seekTo(msec);
-                break;
-            }
-            case EXOPLAYER: {
-                long seekPosition = mExoplayer.getDuration() == ExoPlayer.UNKNOWN_TIME ? 0
-                        : Math.min(Math.max(0, msec), getDuration());
-                mExoplayer.seekTo(seekPosition);
-                break;
-            }
-        }
+        long seekPosition = mExoplayer.getDuration() == ExoPlayer.UNKNOWN_TIME ? 0 : Math.min(Math.max(0, msec), getDuration());
+        mExoplayer.seekTo(seekPosition);
     }
 
     @Override
@@ -335,54 +198,6 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
             }
             case SOUNDWAVES: {
                 mCustomMediaPlayer.setAudioStreamType(streamtype);
-                break;
-            }
-        }
-    }
-
-    @Override
-    public void setDataSource(Context context, Uri uri) throws IllegalArgumentException, IllegalStateException, IOException {
-        switch (mType) {
-            case ANDROID: {
-                mDefaultMediaPlayer.setDataSource(context, uri);
-                break;
-            }
-            case SOUNDWAVES: {
-                mCustomMediaPlayer.setDataSource(context, uri);
-                break;
-            }
-            case EXOPLAYER: {
-                ExtractorRendererBuilder audioRenderer = new ExtractorRendererBuilder(context, uri);
-                audioRenderer.buildRenderers(mExoplayer);
-                //mExoplayer = new ExoPlayerWrapper(audioRenderer);
-                mExoplayer.setRenderBuilder(audioRenderer);
-                break;
-            }
-        }
-    }
-
-    public void setDataSource(FileDescriptor argfd) throws IllegalArgumentException, IllegalStateException, IOException {
-        switch (mType) {
-            case ANDROID: {
-                mDefaultMediaPlayer.setDataSource(argfd);
-                break;
-            }
-            case SOUNDWAVES: {
-                mCustomMediaPlayer.setDataSource(argfd.toString()); // FIXME
-                break;
-            }
-        }
-    }
-
-    @Override
-    public void setDataSource(String path) throws IllegalArgumentException, IllegalStateException, IOException {
-        switch (mType) {
-            case ANDROID: {
-                mDefaultMediaPlayer.setDataSource(path);
-                break;
-            }
-            case SOUNDWAVES: {
-                mCustomMediaPlayer.setDataSource(path);
                 break;
             }
         }
@@ -429,13 +244,10 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.M)
     @Override
-    public void setPlaybackSpeed(float f) {
-        switch (mType) {
-            case SOUNDWAVES: {
-                mCustomMediaPlayer.setPlaybackSpeed(f);
-            }
-        }
+    public void setPlaybackSpeed(float speed) {
+        mExoplayer.setPlaybackSpeed(speed);
     }
 
     @Override
@@ -477,34 +289,12 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
 
     @Override
     public void start() {
-        switch (mType) {
-            case ANDROID: {
-                mDefaultMediaPlayer.start();
-                break;
-            }
-            case SOUNDWAVES: {
-                mCustomMediaPlayer.start();
-                break;
-            }
-            case EXOPLAYER: {
-                mExoplayer.setPlayWhenReady(true);
-                break;
-            }
-        }
+        mExoplayer.setPlayWhenReady(true);
     }
 
     @Override
     public void stop() {
-        switch (mType) {
-            case ANDROID: {
-                mDefaultMediaPlayer.stop();
-                break;
-            }
-            case SOUNDWAVES: {
-                mCustomMediaPlayer.stop();
-                break;
-            }
-        }
+        mExoplayer.release();
     }
 
     @Override

@@ -271,12 +271,6 @@
                 android:summary="@string/pref_feedback_description"
                 android:title="@string/pref_feedback_title" />
 
-            <CheckBoxPreference
-                android:defaultValue="false"
-                android:key="@string/pref_use_soundengine_key"
-                android:summary="@string/pref_use_soundengine_description"
-                android:title="@string/pref_use_soundengine_title" />
-
             <Preference android:key="@string/pref_submit_debug_logs_key"
                 android:title="@string/preferences__submit_debug_log"/>
 

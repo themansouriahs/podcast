@@ -28,7 +28,6 @@ public interface GenericMediaPlayerInterface {
     void seekTo(int msec) throws IllegalStateException;
     void setAudioStreamType(int streamtype);
     void setDataSource(Context context, Uri uri) throws IllegalArgumentException, IllegalStateException, IOException;
-    void setDataSource(String path) throws IllegalArgumentException, IllegalStateException, IOException;
     void setEnableSpeedAdjustment(boolean enableSpeedAdjustment);
     void setLooping(boolean loop);
     void setPitchStepsAdjustment(float pitchSteps);

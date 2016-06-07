@@ -3,8 +3,7 @@ package org.bottiger.podcast.utils.okhttp;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import org.bottiger.podcast.BuildConfig;
-import org.bottiger.podcast.R;
+import org.bottiger.podcast.utils.HttpUtils;
 
 import java.io.IOException;
 
@@ -21,7 +20,7 @@ public class UserAgentInterceptor implements Interceptor {
     private final String userAgent ;
 
     public UserAgentInterceptor(@NonNull Context argContext) {
-        this.userAgent = getUserAgent(argContext);
+        this.userAgent = HttpUtils.getUserAgent(argContext);
     }
 
     @Override
@@ -33,7 +32,4 @@ public class UserAgentInterceptor implements Interceptor {
         return chain.proceed(requestWithUserAgent);
     }
 
-    public static String getUserAgent(@NonNull Context argContext) {
-        return argContext.getResources().getString(R.string.app_name) + "-" + BuildConfig.VERSION_NAME;
-    }
 }

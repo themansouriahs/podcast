@@ -43,7 +43,10 @@ import com.google.android.exoplayer.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer.util.DebugTextViewHelper;
 import com.google.android.exoplayer.util.PlayerControl;
 
+import android.annotation.TargetApi;
 import android.media.MediaCodec.CryptoException;
+import android.media.PlaybackParams;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.IntDef;
@@ -80,7 +83,7 @@ public class ExoPlayerWrapper implements ExoPlayer.Listener, ChunkSampleSource.E
          *     should be invoked once the renderers have been built. If building fails,
          *     {@link org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper#onRenderersError} should be invoked.
          */
-        void buildRenderers(org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper player);
+        TrackRenderer[] buildRenderers(org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper player);
         /**
          * Cancels the current build operation, if there is one. Else does nothing.
          * <p>
@@ -181,6 +184,7 @@ public class ExoPlayerWrapper implements ExoPlayer.Listener, ChunkSampleSource.E
     private final CopyOnWriteArrayList<Listener> listeners;
 
     private RendererBuilder rendererBuilder;
+    private TrackRenderer[] mTrackRendere = new TrackRenderer[ExoPlayerWrapper.RENDERER_COUNT];
 
     private int rendererBuildingState;
     private int lastReportedPlaybackState;
@@ -304,7 +308,25 @@ public class ExoPlayerWrapper implements ExoPlayer.Listener, ChunkSampleSource.E
         videoRenderer = null;
         rendererBuildingState = RENDERER_BUILDING_STATE_BUILDING;
         maybeReportPlayerState();
-        rendererBuilder.buildRenderers(this);
+        TrackRenderer[] trackRenderers = rendererBuilder.buildRenderers(this);
+
+        mTrackRendere[TYPE_VIDEO] = trackRenderers[TYPE_VIDEO];
+        mTrackRendere[TYPE_AUDIO] = trackRenderers[TYPE_AUDIO];
+        mTrackRendere[TYPE_TEXT] = trackRenderers[TYPE_TEXT];
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    public void setPlaybackSpeed(float speed) {
+        if (mTrackRendere[ExoPlayerWrapper.TYPE_AUDIO] != null) {
+
+            if (mTrackRendere[ExoPlayerWrapper.TYPE_AUDIO] instanceof PodcastAudioRendererV21) {
+                ((PodcastAudioRendererV21) mTrackRendere[ExoPlayerWrapper.TYPE_AUDIO]).setSpeed(speed);
+            } else {
+                player.sendMessage(mTrackRendere[ExoPlayerWrapper.TYPE_AUDIO],
+                        MediaCodecAudioTrackRenderer.MSG_SET_PLAYBACK_PARAMS,
+                        new PlaybackParams().setSpeed(speed));
+            }
+        }
     }
 
     /**
@@ -586,6 +608,10 @@ public class ExoPlayerWrapper implements ExoPlayer.Listener, ChunkSampleSource.E
     @Override
     public void onUpstreamDiscarded(int sourceId, long mediaStartTimeMs, long mediaEndTimeMs) {
         // Do nothing.
+    }
+
+    public ExoPlayer getPlayer() {
+        return player;
     }
 
     private void maybeReportPlayerState() {

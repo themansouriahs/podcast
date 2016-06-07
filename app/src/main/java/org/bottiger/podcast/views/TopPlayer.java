@@ -360,10 +360,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
             }
         });
 
-        // Need to be called after the ndk player is connected
-        String key = getResources().getString(R.string.pref_use_soundengine_key);
-        boolean useCustomEngine = prefs.getBoolean(key, false);
-        int visibility = useCustomEngine ? View.VISIBLE : View.GONE;
+        int visibility = SoundWaves.getAppContext(getContext()).getPlayer().canSetSpeed() ? View.VISIBLE : View.GONE;
         mSpeedpButton.setVisibility(visibility);
 
         if (ps != null) {
