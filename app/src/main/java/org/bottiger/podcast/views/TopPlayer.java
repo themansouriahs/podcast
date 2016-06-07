@@ -11,13 +11,10 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
-import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.NestedScrollingChild;
 import android.support.v4.view.NestedScrollingChildHelper;
 import android.support.v4.view.ScrollingView;
 import android.support.v4.view.ViewCompat;
-import android.support.v4.view.ViewConfigurationCompat;
-import android.support.v4.widget.NestedScrollView;
 import android.support.v4.widget.ScrollerCompat;
 import android.support.v7.graphics.Palette;
 import android.transition.ChangeBounds;
@@ -31,10 +28,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -103,7 +98,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
 
     private PlayerButtonView mFullscreenButton;
     private PlayerButtonView mSleepButton;
-    private Button mSpeedpButton;
+    private Button mSpeedButton;
     private PlayerButtonView mDownloadButton;
     private MaterialFavoriteButton mFavoriteButton;
     private ImageView mFastForwardButton;
@@ -246,7 +241,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         mPlayPauseButton = (PlayPauseImageView) findViewById(R.id.playpause);
         mFullscreenButton = (PlayerButtonView) findViewById(R.id.fullscreen_button);
         mSleepButton = (PlayerButtonView) findViewById(R.id.sleep_button);
-        mSpeedpButton = (Button) findViewById(R.id.speed_button);
+        mSpeedButton = (Button) findViewById(R.id.speed_button);
         mDownloadButton = (PlayerButtonView) findViewById(R.id.download);
         mFavoriteButton = (MaterialFavoriteButton) findViewById(R.id.favorite);
         mFastForwardButton = (ImageView) findViewById(R.id.top_player_fastforward);
@@ -361,15 +356,13 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         });
 
         int visibility = SoundWaves.getAppContext(getContext()).getPlayer().canSetSpeed() ? View.VISIBLE : View.GONE;
-        mSpeedpButton.setVisibility(visibility);
+        mSpeedButton.setVisibility(visibility);
 
-        if (ps != null) {
-            SoundWavesPlayer player = ps.getPlayer();
-            float speedMultiplier = player.getCurrentSpeedMultiplier();
-            setPlaybackSpeed(speedMultiplier);
-        }
+        SoundWavesPlayer player = SoundWaves.getAppContext(getContext()).getPlayer();
+        float speedMultiplier = player.getCurrentSpeedMultiplier();
+        setPlaybackSpeedView(speedMultiplier);
 
-        mSpeedpButton.setOnClickListener(new OnClickListener() {
+        mSpeedButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 MainActivity activity = ((MainActivity)getContext());
@@ -377,11 +370,6 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
                 dialogPlaybackSpeed.show(activity.getFragmentManager(), DialogPlaybackSpeed.class.getName());
             }
         });
-
-
-        //Debug.stopMethodTracing();
-
-
     }
 
     @Override
@@ -395,8 +383,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
                 .subscribe(new Action1<RxBusSimpleEvents.PlaybackSpeedChanged>() {
                     @Override
                     public void call(RxBusSimpleEvents.PlaybackSpeedChanged event) {
-                        RxBusSimpleEvents.PlaybackSpeedChanged playbackSpeedChanged = event;
-                        mSpeedpButton.setText(playbackSpeedChanged.speed + "X");
+                        mSpeedButton.setText(getContext().getString(R.string.speed_multiplier, event.speed));
                     }
                 }, new Action1<Throwable>() {
                     @Override
@@ -434,18 +421,18 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         super.onSizeChanged(w, h, oldw, oldh);
     }
 
-    public float getPlayerHeight() {
+    float getPlayerHeight() {
         return screenHeight;
     }
 
-    public void setPlaybackSpeed(float argSpeed) {
-        if (mSpeedpButton == null)
+    public void setPlaybackSpeedView(float argSpeed) {
+        if (mSpeedButton == null)
             return;
 
-        mSpeedpButton.setText(PlaybackSpeed.toString(argSpeed));
+        mSpeedButton.setText(PlaybackSpeed.toString(argSpeed));
     }
 
-    public synchronized float scrollBy(float argY) {
+    synchronized float scrollBy(float argY) {
         float oldHeight = getPlayerHeight();
         return setPlayerHeight(oldHeight - argY);
     }
@@ -457,13 +444,9 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
             return;
 
         mPlaylistEmpty = argDoFill;
-
-        //if (!argDoFill) {
-        //    setPlayerHeight(getPlayerHeight()-200); // FIXME not just 200
-        //}
     }
 
-    public float canConsume(float argDiff) {
+    private float canConsume(float argDiff) {
         float currentHeight = getPlayerHeight();
 
         if (currentHeight <= sizeSmall) {
@@ -484,13 +467,8 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
     }
 
     // returns the new height
-    public float setPlayerHeight(float argScreenHeight) {
+    private float setPlayerHeight(float argScreenHeight) {
         Log.v(TAG, "Player height is set to: " + argScreenHeight);
-
-        /* FIXME
-        if (mFullscreen)
-            return getHeight();
-            */
 
         if (mPlaylistEmpty)
             return getHeight();
@@ -605,7 +583,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
 
         ColorUtils.tintButton(mFavoriteButton,    textColor);
         ColorUtils.tintButton(mDownloadButton,    textColor);
-        ColorUtils.tintButton(mSpeedpButton,      textColor);
+        ColorUtils.tintButton(mSpeedButton,      textColor);
         ColorUtils.tintButton(mFullscreenButton,  textColor);
 
 

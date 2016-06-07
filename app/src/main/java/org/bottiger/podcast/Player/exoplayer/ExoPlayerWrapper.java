@@ -53,6 +53,10 @@ import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.view.Surface;
 
+import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.utils.rxbus.RxBus;
+import org.bottiger.podcast.utils.rxbus.RxBusSimpleEvents;
+
 import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -316,17 +320,20 @@ public class ExoPlayerWrapper implements ExoPlayer.Listener, ChunkSampleSource.E
     }
 
     @TargetApi(Build.VERSION_CODES.M)
-    public void setPlaybackSpeed(float speed) {
+    public void setPlaybackSpeed(float argNewSpeed) {
         if (mTrackRendere[ExoPlayerWrapper.TYPE_AUDIO] != null) {
 
             if (mTrackRendere[ExoPlayerWrapper.TYPE_AUDIO] instanceof PodcastAudioRendererV21) {
-                ((PodcastAudioRendererV21) mTrackRendere[ExoPlayerWrapper.TYPE_AUDIO]).setSpeed(speed);
+                ((PodcastAudioRendererV21) mTrackRendere[ExoPlayerWrapper.TYPE_AUDIO]).setSpeed(argNewSpeed);
             } else {
                 player.sendMessage(mTrackRendere[ExoPlayerWrapper.TYPE_AUDIO],
                         MediaCodecAudioTrackRenderer.MSG_SET_PLAYBACK_PARAMS,
-                        new PlaybackParams().setSpeed(speed));
+                        new PlaybackParams().setSpeed(argNewSpeed));
             }
         }
+
+        RxBus bus = SoundWaves.getRxBus();
+        bus.send(new RxBusSimpleEvents.PlaybackSpeedChanged(argNewSpeed));
     }
 
     /**

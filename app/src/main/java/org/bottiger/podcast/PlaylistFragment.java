@@ -3,11 +3,7 @@ package org.bottiger.podcast;
 import org.bottiger.podcast.adapters.PlaylistAdapter;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PaletteListener;
-import org.bottiger.podcast.listeners.PlayerStatusObservable;
-import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.model.events.EpisodeChanged;
-import org.bottiger.podcast.model.events.ItemChanged;
-import org.bottiger.podcast.model.events.SubscriptionChanged;
 import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.playlist.filters.SubscriptionFilter;
@@ -47,8 +43,6 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.NestedScrollingChildHelper;
@@ -66,7 +60,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
-import android.widget.FrameLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -503,7 +496,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
         ISubscription iSubscription = item.getSubscription(getContext());
         if (iSubscription instanceof org.bottiger.podcast.provider.Subscription) {
             org.bottiger.podcast.provider.Subscription subscription = (org.bottiger.podcast.provider.Subscription)iSubscription;
-            mTopPlayer.setPlaybackSpeed(subscription.getPlaybackSpeed());
+            mTopPlayer.setPlaybackSpeedView(subscription.getPlaybackSpeed());
         }
 
         mPlayerSeekbar.setEpisode(item);

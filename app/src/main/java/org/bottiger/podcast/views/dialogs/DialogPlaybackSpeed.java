@@ -5,10 +5,9 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,7 +30,6 @@ import org.bottiger.podcast.utils.rxbus.RxBusSimpleEvents;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.concurrent.TimeUnit;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -58,13 +56,14 @@ public class DialogPlaybackSpeed extends DialogFragment {
 
     private Button mIncrementButton;
     private Button mDecrementButton;
-    private TextView mCurrentSpeed;
+    private TextView mCurrentSpeedView;
 
     private RadioButton mRadioEpisode;
     private RadioButton mRadioSubscription;
     private RadioButton mRadioGlobal;
 
-    private float mOriginalPlaybackSpeed = PlaybackSpeed.UNDEFINED;
+    private float mInitialPlaybackSpeed = PlaybackSpeed.UNDEFINED;
+    private float mCurrentSpeed = mInitialPlaybackSpeed;
 
     private CompositeSubscription mRxSubscriptions = new CompositeSubscription();
 
@@ -91,42 +90,29 @@ public class DialogPlaybackSpeed extends DialogFragment {
         // bind stuff
         mIncrementButton = (Button) view.findViewById(R.id.playback_increment_button);
         mDecrementButton = (Button) view.findViewById(R.id.playback_decrement_button);
-        mCurrentSpeed = (TextView) view.findViewById(R.id.playback_speed_value);
+        mCurrentSpeedView = (TextView) view.findViewById(R.id.playback_speed_value);
 
         mRadioEpisode = (RadioButton) view.findViewById(R.id.radio_playback_speed_episode);
         mRadioSubscription = (RadioButton) view.findViewById(R.id.radio_playback_speed_subscription);
         mRadioGlobal = (RadioButton) view.findViewById(R.id.radio_playback_speed_global);
 
         final PlayerService ps = PlayerService.getInstance();
-        final SoundWavesPlayer player;
-        if (ps != null) {
+        final Playlist playlist = SoundWaves.getAppContext(getActivity()).getPlaylist();
+        final SoundWavesPlayer player = SoundWaves.getAppContext(getActivity()).getPlayer();
 
-            player = ps.getPlayer();
+        final IEpisode episode = playlist.first();
 
-            Playlist playlist = ps.getPlaylist();
-            if (playlist != null) {
-                IEpisode episode = playlist.first();
-
-                if (episode != null) {
-                    mOriginalPlaybackSpeed = episode.getPlaybackSpeed(getContext());
-                    scope = SUBSCRIPTION;
-                }
-            }
-
-
-            if (mOriginalPlaybackSpeed == PlaybackSpeed.UNDEFINED) {
-                mOriginalPlaybackSpeed = player.getCurrentSpeedMultiplier();
-                scope = GLOBAL;
-            }
-        } else {
-            player = null;
+        if (episode != null) {
+            mInitialPlaybackSpeed = episode.getPlaybackSpeed(getActivity());
+            scope = SUBSCRIPTION;
         }
 
-        if (mOriginalPlaybackSpeed == PlaybackSpeed.UNDEFINED) {
-            mOriginalPlaybackSpeed = PlaybackSpeed.DEFAULT;
+        if (mInitialPlaybackSpeed == PlaybackSpeed.UNDEFINED) {
+            mInitialPlaybackSpeed = player.getCurrentSpeedMultiplier();
+            scope = GLOBAL;
         }
 
-        setPlaybackSpeed(mOriginalPlaybackSpeed);
+        setSpeed(player, mInitialPlaybackSpeed);
 
         mRxSubscriptions
                 .add(SoundWaves.getRxBus().toObserverable()
@@ -136,7 +122,7 @@ public class DialogPlaybackSpeed extends DialogFragment {
                             @Override
                             public void call(RxBusSimpleEvents.PlaybackSpeedChanged playbackSpeedChanged) {
                                 Log.d(TAG, "new playback: " + playbackSpeedChanged.speed);
-                                setSpeed(playbackSpeedChanged.speed);
+                                setSpeed(player, playbackSpeedChanged.speed);
                             }
                         }, new Action1<Throwable>() {
                             @Override
@@ -146,30 +132,26 @@ public class DialogPlaybackSpeed extends DialogFragment {
                             }
                         }));
 
-        setSpeed(mOriginalPlaybackSpeed);
+        setSpeed(player, mInitialPlaybackSpeed);
         checkRadioButton(scope);
 
         mIncrementButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (player != null) {
-                    float newPlaybackSpeed = mOriginalPlaybackSpeed + PlaybackSpeed.sSpeedIncrements;
-                    Log.d(TAG, "increment playback speed to: " + newPlaybackSpeed);
-                    setSpeed(newPlaybackSpeed);
-                    player.setPlaybackSpeed(newPlaybackSpeed);
-                }
+                float newPlaybackSpeed = mInitialPlaybackSpeed + PlaybackSpeed.sSpeedIncrements;
+                Log.d(TAG, "increment playback speed to: " + newPlaybackSpeed);
+                setSpeed(player, newPlaybackSpeed);
+                player.setPlaybackSpeed(newPlaybackSpeed);
             }
         });
 
         mDecrementButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (player != null) {
-                    float newPlaybackSpeed = mOriginalPlaybackSpeed - PlaybackSpeed.sSpeedIncrements;
-                    Log.d(TAG, "dencrement playback speed to: " + newPlaybackSpeed);
-                    setSpeed(newPlaybackSpeed);
-                    player.setPlaybackSpeed(newPlaybackSpeed);
-                }
+                float newPlaybackSpeed = mInitialPlaybackSpeed - PlaybackSpeed.sSpeedIncrements;
+                Log.d(TAG, "dencrement playback speed to: " + newPlaybackSpeed);
+                setSpeed(player, newPlaybackSpeed);
+                player.setPlaybackSpeed(newPlaybackSpeed);
             }
         });
 
@@ -177,15 +159,14 @@ public class DialogPlaybackSpeed extends DialogFragment {
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
-                setPlaybackSpeed(mOriginalPlaybackSpeed);
+                setSpeed(player, mInitialPlaybackSpeed);
 
                 if (mRadioSubscription.isChecked() && ps != null) {
-                    IEpisode episode = ps.getPlaylist().first();
                     if (episode instanceof FeedItem) {
                         ISubscription subscription = episode.getSubscription(mActivity);
                         if (subscription instanceof Subscription) {
                             Subscription subscription1 = (Subscription)subscription;
-                            int storedSpeed = Math.round(mOriginalPlaybackSpeed * 10);
+                            int storedSpeed = Math.round(mInitialPlaybackSpeed * 10);
                             subscription1.setPlaybackSpeed(storedSpeed);
                         }
                     }
@@ -195,10 +176,10 @@ public class DialogPlaybackSpeed extends DialogFragment {
                     /*
                     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mActivity);
                     String key = getResources().getString(R.string.soundwaves_player_playback_speed_key);
-                    int storedSpeed = Math.round(mOriginalPlaybackSpeed * 10);
+                    int storedSpeed = Math.round(mInitialPlaybackSpeed * 10);
                     prefs.edit().putInt(key, storedSpeed).apply();
                     */
-                    PlaybackSpeed.setGlobalPlaybackSpeed(mActivity, mOriginalPlaybackSpeed);
+                    PlaybackSpeed.setGlobalPlaybackSpeed(mActivity, mInitialPlaybackSpeed);
                 }
             }
         });
@@ -237,28 +218,27 @@ public class DialogPlaybackSpeed extends DialogFragment {
         activeButton.setChecked(true);
     }
 
-    private void setSpeed(float argNewSpeed) {
+    private void setSpeed(@NonNull SoundWavesPlayer argPlayer, float argNewSpeed) {
+        if (Math.abs(mCurrentSpeed - argNewSpeed) < 0.01)
+            return;
+
         if (argNewSpeed > PlaybackSpeed.sSpeedMaximum || argNewSpeed < PlaybackSpeed.sSpeedMinimum)
             return;
 
         argNewSpeed = Math.round(argNewSpeed*10)/10.0f;
 
-        mOriginalPlaybackSpeed = argNewSpeed;
-        mCurrentSpeed.setText(getSpeedText(mOriginalPlaybackSpeed));
+        mInitialPlaybackSpeed = argNewSpeed;
+        mCurrentSpeedView.setText(getSpeedText(mInitialPlaybackSpeed));
 
         mIncrementButton.setEnabled(argNewSpeed < PlaybackSpeed.sSpeedMaximum);
         mDecrementButton.setEnabled(argNewSpeed > PlaybackSpeed.sSpeedMinimum);
+
+        mCurrentSpeed = argNewSpeed;
+        argPlayer.setPlaybackSpeed(argNewSpeed);
     }
 
     private String getSpeedText(float argSpeed) {
-        return String.format("%.1f", argSpeed) + "x"; // NoI18N
-    }
-
-    private void setPlaybackSpeed(float argSpeed) {
-        PlayerService ps = PlayerService.getInstance();
-        if (ps != null) {
-            ps.getPlayer().setPlaybackSpeed(argSpeed);
-        }
+        return getString(R.string.speed_multiplier, argSpeed);
     }
 
 }

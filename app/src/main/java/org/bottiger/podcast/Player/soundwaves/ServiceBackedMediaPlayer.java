@@ -298,7 +298,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 	}
 
 	/**
-	 * Get the maximum value that can be passed to setPlaybackSpeed
+	 * Get the maximum value that can be passed to setPlaybackSpeedView
 	 * @return The maximum speed multiplier
 	 */
 	@Override
@@ -323,7 +323,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 	}
 
 	/**
-	 * Get the minimum value that can be passed to setPlaybackSpeed
+	 * Get the minimum value that can be passed to setPlaybackSpeedView
 	 * @return The minimum speed multiplier
 	 */
 	@Override
@@ -759,7 +759,7 @@ public class ServiceBackedMediaPlayer extends MediaPlayerImpl {
 	 */
 	@Override
 	public void setPlaybackSpeed(float f) {
-		Log.d(SBMP_TAG, "setPlaybackSpeed(" + f + ")");
+		Log.d(SBMP_TAG, "setPlaybackSpeedView(" + f + ")");
 		if (pmInterface == null) {
 			if (!ConnectPlayMediaService()) {
 				ServiceBackedMediaPlayer.this.error(NDKMediaPlayer.MEDIA_ERROR_UNKNOWN, 0);

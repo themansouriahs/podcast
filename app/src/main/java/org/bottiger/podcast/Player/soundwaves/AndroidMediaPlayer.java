@@ -413,7 +413,7 @@ public class AndroidMediaPlayer extends MediaPlayerImpl {
 	@Override
 	public void setPlaybackSpeed(float f) {
 		// Can't!
-		Log.d(AMP_TAG, "setPlaybackSpeed(" + f + ")");
+		Log.d(AMP_TAG, "setPlaybackSpeedView(" + f + ")");
 	}
 
 	@Override

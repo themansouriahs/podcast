@@ -570,7 +570,7 @@ public class NDKMediaPlayer {
     }
 
     /**
-     * Get the maximum value that can be passed to setPlaybackSpeed
+     * Get the maximum value that can be passed to setPlaybackSpeedView
      *
      * @return The maximum speed multiplier
      */
@@ -584,7 +584,7 @@ public class NDKMediaPlayer {
     }
 
     /**
-     * Get the minimum value that can be passed to setPlaybackSpeed
+     * Get the minimum value that can be passed to setPlaybackSpeedView
      *
      * @return The minimum speed multiplier
      */

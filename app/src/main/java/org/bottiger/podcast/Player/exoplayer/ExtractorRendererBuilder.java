@@ -54,10 +54,6 @@ public class ExtractorRendererBuilder implements RendererBuilder {
     private static final int BUFFER_SEGMENT_SIZE = 64 * 1024;
     private static final int BUFFER_SEGMENT_COUNT = 256;
 
-    private MediaCodecAudioTrackRenderer mAudioRenderer;
-    private MediaCodecVideoTrackRenderer mVideoRenderer;
-    private TextTrackRenderer mTextRenderer;
-
     private final Context context;
     private final Uri uri;
 
@@ -99,14 +95,6 @@ public class ExtractorRendererBuilder implements RendererBuilder {
                                               @NonNull ExoPlayerWrapper player) {
         return new TextTrackRenderer(sampleSource, player,
                 mainHandler.getLooper());
-        /*
-        if (mTextRenderer == null) {
-            mTextRenderer = new TextTrackRenderer(sampleSource, player,
-                    mainHandler.getLooper());
-        }
-
-        return mTextRenderer;
-        */
     }
 
     @TargetApi(16)
@@ -116,34 +104,9 @@ public class ExtractorRendererBuilder implements RendererBuilder {
         return new MediaCodecVideoTrackRenderer(context,
                 sampleSource, MediaCodecSelector.DEFAULT, MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT, 5000,
                 mainHandler, player, 50);
-        /*
-        if (mVideoRenderer == null) {
-            mVideoRenderer = new MediaCodecVideoTrackRenderer(context,
-                    sampleSource, MediaCodecSelector.DEFAULT, MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT, 5000,
-                    mainHandler, player, 50);
-        }
-
-        return mVideoRenderer;
-        */
     }
 
     private MediaCodecAudioTrackRenderer getAudioRenderer(@NonNull ExtractorSampleSource sampleSource) {
-        /*
-        if (mAudioRenderer == null) {
-            if (Util.SDK_INT >= 21) {
-                mAudioRenderer = new PodcastAudioRendererV21(sampleSource);
-            } else {
-                mAudioRenderer = new PodcastAudioRenderer(sampleSource);
-            }
-
-        MediaCodecAudioTrackRenderer audioRenderer = new MediaCodecAudioTrackRenderer(sampleSource,
-            MediaCodecSelector.DEFAULT, null, true, mainHandler, player,
-            AudioCapabilities.getCapabilities(context), PlayerStateManager.AUDIO_STREAM);
-
-        }
-
-        return mAudioRenderer;
-        */
         return Util.SDK_INT >= 21 ? new PodcastAudioRendererV21(sampleSource) : new PodcastAudioRenderer(sampleSource);
     }
 

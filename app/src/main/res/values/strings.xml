@@ -207,6 +207,9 @@
     <string name="authenticate_feed_username">Username</string>
     <string name="authenticate_feed_password">Password</string>
 
+    <!-- Used for 1.1X speed-->
+    <string name="speed_multiplier">%1$.1f X</string>
+
     <plurals name="player_sleep">
         <item quantity="one">Player will sleep in %d minute</item>
         <item quantity="other">Player will sleep in %d minutes</item>
