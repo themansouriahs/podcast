@@ -23,7 +23,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:paddingTop="5dp"
+        android:layout_alignTop="@id/result_image"
+        android:layout_alignBottom="@id/result_image"
         android:checked="false"/>
 
 

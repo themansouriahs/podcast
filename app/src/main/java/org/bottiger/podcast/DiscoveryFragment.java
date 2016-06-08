@@ -96,6 +96,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
             ArrayList<ISubscription> subscriptions = new ArrayList<>();
             for (ISubscription subscription : argResult.getResults()) {
                 subscriptions.add(subscription);
+                subscription.fetchImage(getContext());
             }
             mResultsAdapter.setDataset(subscriptions);
         }

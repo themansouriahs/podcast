@@ -10,6 +10,7 @@ import android.view.View;
 import org.bottiger.podcast.model.datastructures.EpisodeList;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.provider.base.BaseSubscription;
 import org.bottiger.podcast.provider.converter.EpisodeConverter;
 
 import java.net.MalformedURLException;
@@ -22,7 +23,7 @@ import java.util.List;
 /**
  * Created by apl on 15-04-2015.
  */
-public class SlimSubscription implements ISubscription, Parcelable {
+public class SlimSubscription extends BaseSubscription implements Parcelable {
 
     private String mTitle;
     private URL mURL;

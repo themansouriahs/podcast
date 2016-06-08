@@ -1,5 +1,6 @@
 package org.bottiger.podcast.provider;
 
+import android.content.Context;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
@@ -36,6 +37,8 @@ public interface ISubscription {
 
     @Nullable
     String getImageURL();
+
+    void fetchImage(@NonNull Context argContext);
 
     @NonNull
     EpisodeList<IEpisode> getEpisodes();

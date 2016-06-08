@@ -14,6 +14,7 @@ import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.model.datastructures.EpisodeList;
 import org.bottiger.podcast.model.events.SubscriptionChanged;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
+import org.bottiger.podcast.provider.base.BaseSubscription;
 import org.bottiger.podcast.utils.BitMaskUtils;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.PlaybackSpeed;
@@ -31,7 +32,7 @@ import android.util.Patterns;
 
 import javax.annotation.Nullable;
 
-public class Subscription implements ISubscription, PaletteListener {
+public class Subscription extends BaseSubscription implements PaletteListener {
 
 	private static final String TAG = "Subscription";
 
