@@ -76,11 +76,8 @@ public class FragmentContainerActivity extends DrawerActivity {
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mPagerTaps));
         mPagerTaps.setupWithViewPager(mViewPager);
 
-        //mViewPager.setPageTransformer(true, new DepthPageTransformer(mDrawerLayout));
-
         if (((SoundWaves)getApplication()).IsFirstRun())
             mViewPager.setCurrentItem(DISCOVER);
-
 
         createScenes(mViewPager);
 	}

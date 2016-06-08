@@ -67,7 +67,7 @@
     <string name="pref_help_static_field_description">If you would like to help out, there are plenty of things to do. It could be programming or it could be something completely different. I need help with translations, UI, icons/graphics, building a website, and so forth. Head over to the project page on GitHub (github.com/bottiger/SoundWaves) or send me an email: bottiger@gmail.com</string>
     <string name="episode_title_unknown">No Title :(</string>
     <string name="podcast_title_unknown">Unknown podcast title</string>
-    <string name="subscription_instruction">Add new podcasts by using the discovery page to the right or import an OPML file.\n\nHowever, first please consider if you want to enabled/disable the options below.</string>
+    <string name="subscription_instruction">Add new podcasts by using the <D></D>iscovery page to the right or import an OPML file.\n\nHowever, first please consider if you want to enabled/disable the options below.</string>
     <string name="filter_show_listened">Show Listened</string>
     <string name="auto_start_next">Auto Start Next</string>
     <string name="drawer_playlist_filters">Playlist Filters</string>
@@ -102,7 +102,7 @@
     <string name="pref_screen_rotation_description">Support for landscape orientation</string>
     <string name="search_feed_hint">Search %s</string>
     <string name="search_query_hint">Search using %s</string>
-    <string name="discovery_recommendations">Recommended by author</string>
+    <string name="discovery_recommendations">Editors choice:</string>
     <string name="discovery_recommendations_trending">Trending</string>
     <string name="discovery_recommendations_popular">Popular</string>
     <string name="discovery_search_results">Results for: <i>%s</i></string>
