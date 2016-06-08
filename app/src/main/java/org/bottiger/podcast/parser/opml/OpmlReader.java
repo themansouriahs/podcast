@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 
+import org.bottiger.podcast.ApplicationConfiguration;
 import org.bottiger.podcast.MainActivity;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -38,17 +39,17 @@ public class OpmlReader {
 		while (eventType != XmlPullParser.END_DOCUMENT) {
 			switch (eventType) {
 			case XmlPullParser.START_DOCUMENT:
-				if (MainActivity.debugging)
+				if (ApplicationConfiguration.DEBUGGING)
 					Log.d(TAG, "Reached beginning of document");
 				break;
 			case XmlPullParser.START_TAG:
 				String elementName = xpp.getName();
 				if (elementName.equals(OpmlSymbols.OPML)) {
 					isInOpml = true;
-					if (MainActivity.debugging)
+					if (ApplicationConfiguration.DEBUGGING)
 						Log.d(TAG, "Reached beginning of OPML tree.");
 				} else if (isInOpml && elementName.equals(OpmlSymbols.OUTLINE)) {
-					if (MainActivity.debugging)
+					if (ApplicationConfiguration.DEBUGGING)
 						Log.d(TAG, "Found new Opml element");
 					OpmlElement element = new OpmlElement();
 					
@@ -74,7 +75,7 @@ public class OpmlReader {
 						}
 						elementList.add(element);
 					} else {
-						if (MainActivity.debugging)
+						if (ApplicationConfiguration.DEBUGGING)
 							Log.d(TAG,
 									"Skipping element because of missing xml url");
 					}
@@ -84,7 +85,7 @@ public class OpmlReader {
 			eventType = xpp.next();
 		}
 
-		if (MainActivity.debugging)
+		if (ApplicationConfiguration.DEBUGGING)
 			Log.d(TAG, "Parsing finished.");
 
 		return elementList;

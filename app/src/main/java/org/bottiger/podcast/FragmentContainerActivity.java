@@ -30,11 +30,6 @@ public class FragmentContainerActivity extends DrawerActivity {
     public static final int SUBSCRIPTION = 1;
     public static final int DISCOVER = 2;
 
-    @Deprecated
-	public static final boolean debugging = ApplicationConfiguration.DEBUGGING;
-
-	protected final PodcastLog log = PodcastLog.getDebugLog(getClass(), 0);
-
 	/**
 	 * The {@link ViewPager} that will host the section contents.
 	 */
@@ -81,34 +76,10 @@ public class FragmentContainerActivity extends DrawerActivity {
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mPagerTaps));
         mPagerTaps.setupWithViewPager(mViewPager);
 
-        // BEGIN_INCLUDE (tab_colorizer)
-        // Set a TabColorizer to customize the indicator and divider colors. Here we just retrieve
-        // the tab at the position, and return it's set color
-        /*
-        mSlidingTabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
-
-            @Override
-            public int getIndicatorColor(int position) {
-                //return getResources().getColor(R.color.colorSecondary);
-                return getResources().getColor(R.color.white_opaque);
-                //return mTabs.get(position).getIndicatorColor();
-            }
-
-            @Override
-            public int getDividerColor(int position) {
-                return getResources().getColor(R.color.colorSecondary);
-                //return mTabs.get(position).getDividerColor();
-            }
-
-        });
-        */
-
-//         android:background="?attr/themeBackground"
-        mViewPager.setPageTransformer(true, new DepthPageTransformer(mDrawerLayout));
-        //mViewPager.setPageTransformer(true, new ZoomOutPageTransformer());
+        //mViewPager.setPageTransformer(true, new DepthPageTransformer(mDrawerLayout));
 
         if (((SoundWaves)getApplication()).IsFirstRun())
-            mViewPager.setCurrentItem(SUBSCRIPTION);
+            mViewPager.setCurrentItem(DISCOVER);
 
 
         createScenes(mViewPager);

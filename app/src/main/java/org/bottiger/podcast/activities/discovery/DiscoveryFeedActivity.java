@@ -40,17 +40,12 @@ public class DiscoveryFeedActivity extends FeedActivity {
             @Override
             public void onClick(View v) {
 
-                //URL url = mSubscription.getURL();
-                //Subscription subscription = new Subscription(url.toString());
-                //subscription.subscribe(DiscoveryFeedActivity.this);
                 if (mSubscription instanceof SlimSubscription) {
                     SoundWaves.getAppContext(DiscoveryFeedActivity.this).getLibraryInstance().subscribe((SlimSubscription) mSubscription);
                 } else {
                     SoundWaves.getAppContext(DiscoveryFeedActivity.this).getLibraryInstance().subscribe(mSubscription.getURL().toString());
                 }
 
-                // if (Build.VERSION.SDK_INT >= 19) {
-                //TransitionManager.beginDelayedTransition(mSubscribeContainer);
                 mSubscribeContainer.setVisibility(View.GONE);
             }
         });

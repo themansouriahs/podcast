@@ -36,8 +36,7 @@ public class PodcastOpenHelper extends SQLiteOpenHelper {
 
 	public static synchronized Cursor runQuery(Context argContext, String argQuery) {
 		SQLiteDatabase database = getInstance(argContext).getWritableDatabase();
-		Cursor cursor = database.rawQuery(argQuery, null);
-		return cursor;
+		return database.rawQuery(argQuery, null);
 	}
 
 	@Override
