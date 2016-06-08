@@ -384,6 +384,7 @@ public class ExoPlayerWrapper implements ExoPlayer.Listener, ChunkSampleSource.E
 
     public void seekTo(long positionMs) {
         player.seekTo(positionMs);
+        onPlayerStateChanged(getPlayWhenReady(), getPlaybackState());
     }
 
     public void release() {
