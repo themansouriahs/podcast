@@ -109,20 +109,20 @@
     </style>
 
     <style name="ToolbarTitleTextApperance" parent="@android:style/TextAppearance.Medium">
-        <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
+        <item name="android:fontFamily" tools:targetApi="16">sans-serif</item>
         <item name="android:textSize">28sp</item>
     </style>
 
     <style name="ToolbarSubtitleTextApperance" parent="@android:style/TextAppearance.Small">
-        <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
+        <item name="android:fontFamily" tools:targetApi="16">sans-serif</item>
     </style>
 
     <style name="SoundWavesTextViewStyle" parent="android:Widget.TextView">
-        <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
+        <item name="android:fontFamily" tools:targetApi="16">sans-serif</item>
     </style>
 
     <style name="SoundWavesListTextViewStyle" parent="SoundWavesTextViewStyle">
-        <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
+        <item name="android:fontFamily" tools:targetApi="16">sans-serif</item>
         <item name="android:paddingTop">16dp</item>
         <item name="android:paddingBottom">20dp</item>
     </style>
@@ -135,7 +135,7 @@
     <style name="FeedActivitySettingsTextStyle" parent="SoundWavesTextViewStyle">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
+        <item name="android:fontFamily" tools:targetApi="16">sans-serif</item>
         <item name="android:textSize">18sp</item>
     </style>
 
@@ -324,7 +324,7 @@
     <!-- parent="Theme.AppCompat.Light.NoActionBar-->
     <style name="DrawerSwitchTextAppearance">
         <item name="android:textColor">@color/filter_text</item>
-        <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
+        <item name="android:fontFamily" tools:targetApi="16">sans-serif</item>
     </style>
 
     <style name="spinnerItemStyle">
@@ -332,7 +332,7 @@
         <item name="android:padding">10dp</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/filter_text</item>
-        <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
+        <item name="android:fontFamily" tools:targetApi="16">sans-serif</item>
         <item name="android:background">@android:drawable/spinner_dropdown_background</item>
     </style>
     <!-- Navigation Drawer - End -->

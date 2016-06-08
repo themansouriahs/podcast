@@ -229,7 +229,7 @@
                         android:id="@+id/radioNone"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-light"
+                        android:fontFamily="sans-serif"
                         android:text="@string/playlist_filter_none" />
 
                     <RadioButton
@@ -239,7 +239,7 @@
                         android:layout_alignStart="@id/radioNone"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-light"
+                        android:fontFamily="sans-serif"
                         android:text="@string/playlist_filter_all" />
 
                     <RadioButton
@@ -249,7 +249,7 @@
                         android:layout_alignStart="@id/radioNone"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-light"
+                        android:fontFamily="sans-serif"
                         android:text="@string/playlist_filter_some" />
 
                 </RadioGroup>
