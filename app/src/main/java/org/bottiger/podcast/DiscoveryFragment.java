@@ -78,8 +78,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
     private String mSpinnerPopular;
     private String mSpinnerTrending;
 
-    private RelativeLayout mContainer;
-    private SearchView mSearchView;
+    private android.support.v7.widget.SearchView mSearchView;
     private AppCompatSpinner mSpinner;
     private ImageButton mSearchEngineButton;
     private RecyclerView mResultsRecyclerView;
@@ -122,22 +121,12 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
                              Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         setHasOptionsMenu(true);
-        View containerView = inflater.inflate(R.layout.discovery_fragment, container, false);
-        return containerView;
-    }
-
-    private void setTopMargin(int i) {
-        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) mContainer.getLayoutParams();
-        params.topMargin = i;
-        mContainer.setLayoutParams(params);
+        return inflater.inflate(R.layout.discovery_fragment, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-
-        mContainer = (RelativeLayout) view.findViewById(R.id.discovery_container);
 
         Resources resource = getResources();
 
@@ -153,9 +142,6 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
         mSpinner.setAdapter(mSpinnerAdapter);
         mSpinner.setOnItemSelectedListener(this);
 
-
-
-
         mSearchEngineButton = (ImageButton) view.findViewById(R.id.discovery_searchIcon);
         mSearchEngineButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -165,8 +151,8 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
             }
         });
 
-        mSearchView = (SearchView) view.findViewById(R.id.discovery_searchView);
-        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        mSearchView = (android.support.v7.widget.SearchView) view.findViewById(R.id.discovery_searchView);
+        mSearchView.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 searchviewQueryChanged(query, false);
@@ -202,8 +188,6 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
         mResultsRecyclerView.setAdapter(mResultsAdapter);
 
         populateRecommendations();
-
-
     }
 
     protected void performSearch(@NonNull String argQuery) {
@@ -323,7 +307,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (mDiscoveryEngineKey == key) {
+        if (mDiscoveryEngineKey.equals(key)) {
             int searchEngine = Integer.valueOf(sharedPreferences.getString(mDiscoveryEngineKey, Integer.toString(getDefaultSearchEngine())));
 
             switch (searchEngine) {

@@ -209,6 +209,7 @@
 
     <!-- Used for 1.1X speed-->
     <string name="speed_multiplier">%1$.1f X</string>
+    <string name="discovery_directory_icon">Podcast directory (search engine)</string>
 
     <plurals name="player_sleep">
         <item quantity="one">Player will sleep in %d minute</item>

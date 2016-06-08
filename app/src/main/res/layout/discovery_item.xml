@@ -23,16 +23,9 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true"
+        android:paddingTop="5dp"
         android:checked="false"/>
 
-
-    <!--
-
-
-    android:layout_alignBottom="@id/result_image"
-        android:layout_alignTop="@id/result_image"
-        -->
 
         <FrameLayout
             android:id="@+id/result_container"

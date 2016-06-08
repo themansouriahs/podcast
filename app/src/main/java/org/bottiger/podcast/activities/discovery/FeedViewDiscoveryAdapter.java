@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
+import org.bottiger.podcast.R;
 import org.bottiger.podcast.TopActivity;
 import org.bottiger.podcast.activities.feedview.EpisodeViewHolder;
 import org.bottiger.podcast.activities.feedview.FeedViewAdapter;
@@ -33,7 +34,17 @@ public class FeedViewDiscoveryAdapter extends FeedViewAdapter {
 
     @Override
     public EpisodeViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        return super.onCreateViewHolder(viewGroup, i);
+        EpisodeViewHolder viewHolder = super.onCreateViewHolder(viewGroup, i);
+
+        //ViewGroup.LayoutParams params = viewHolder.mPlayPauseButton.getLayoutParams();
+        //params.width = (int)mActivity.getResources().getDimension(R.dimen.playpause_button_size_small);
+        //params.height = (int)mActivity.getResources().getDimension(R.dimen.playpause_button_size_small);
+
+        //viewHolder.mPlayPauseButton.setLayoutParams(params);
+        //viewHolder.itemView.invalidate();
+
+        return viewHolder;
+
     }
 
     @Override

@@ -85,6 +85,8 @@
 
         <!-- fonts -->
         <item name="android:textViewStyle">@style/SoundWavesTextViewStyle</item>
+
+        <item name="searchViewStyle">@style/DiscoverySearchViewStyle</item>
     </style>
 
 </resources>
