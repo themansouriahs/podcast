@@ -11,6 +11,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -24,6 +25,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.SearchView;
 
@@ -44,6 +46,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by apl on 13-04-2015.
@@ -82,6 +85,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
     private AppCompatSpinner mSpinner;
     private ImageButton mSearchEngineButton;
     private RecyclerView mResultsRecyclerView;
+    private ProgressBar mProgress;
 
     private ArrayAdapter<String> mSpinnerAdapter;
     private DiscoverySearchAdapter mResultsAdapter;
@@ -99,11 +103,15 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
                 subscription.fetchImage(getContext());
             }
             mResultsAdapter.setDataset(subscriptions);
+
+            if (argResult.getSearchQuery().equals(mSearchView.getQuery().toString()) )
+                mProgress.setVisibility(View.INVISIBLE);
         }
 
         @Override
         public void error(Exception argException) {
             Log.e(TAG, "Search failed", argException);
+            mProgress.setVisibility(View.INVISIBLE);
             return;
         }
     };
@@ -188,10 +196,12 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
         mResultsRecyclerView.setHasFixedSize(true);
         mResultsRecyclerView.setAdapter(mResultsAdapter);
 
+        mProgress = (ProgressBar) view.findViewById(R.id.discovery_progress);
+
         populateRecommendations();
     }
 
-    protected void performSearch(@NonNull String argQuery) {
+    private void performSearch(@NonNull String argQuery) {
         if (TextUtils.isEmpty(argQuery))
             return;
 
@@ -201,17 +211,19 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
         searchParameters.addSearchTerm(argQuery);
 
         mDirectoryProvider.search(searchParameters, mSearchResultCallback);
+        mProgress.setVisibility(View.VISIBLE);
     }
 
-    protected void abortSearch() {
+    private void abortSearch() {
         mDirectoryProvider.abortSearch();
+        mProgress.setVisibility(View.INVISIBLE);
     }
 
-    protected void fetchTrending() {
+    private void fetchTrending() {
         mDirectoryProvider.toplist(mSearchResultCallback);
     }
 
-    protected void fetchPopular() {
+    private void fetchPopular() {
         mDirectoryProvider.toplist(mSearchResultCallback);
     }
 
@@ -224,6 +236,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
         mSearchHandler.removeMessages(HANDLER_WHAT_SEARCH);
 
         if (TextUtils.isEmpty(argQuery)) {
+            mProgress.setVisibility(View.INVISIBLE);
             mSearchEngineButton.setVisibility(View.VISIBLE);
             populateRecommendations();
             return;
@@ -370,7 +383,6 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
 
         String value = mSpinnerAdapter.getItem(position);
 
-        // value.equals(mSpinnerByAuthor)
         if (position == 0) {
             searchviewQueryChanged(null, false);
             return;
@@ -398,7 +410,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
     private static class SearchHandler extends Handler {
         private final WeakReference<DiscoveryFragment> mFragment;
 
-        public SearchHandler(DiscoveryFragment fragment) {
+        SearchHandler(DiscoveryFragment fragment) {
             mFragment = new WeakReference<>(fragment);
         }
 
@@ -410,13 +422,14 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
                     case HANDLER_WHAT_SEARCH: {
                         String query = msg.getData().getString(HANDLER_QUERY);
                         Log.d(TAG, "Perform query: " + query);
-                        fragment.performSearch(query);
-                        return;
+                        if (query != null)
+                            fragment.performSearch(query);
+                        break;
                     }
                     case HANDLER_WHAT_CANCEL: {
                         Log.d(TAG, "abort query:");
                         fragment.abortSearch();
-                        return;
+                        break;
                     }
                 }
             }
