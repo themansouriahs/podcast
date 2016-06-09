@@ -44,6 +44,18 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
     private static final boolean SHARE_ANALYTICS_DEFAULT = !BuildConfig.LIBRE_MODE;
     private static final boolean SHARE_CLOUD_DEFAULT = false;
 
+     /**
+     1 = Auto
+     2 = list
+     3 = 2 columns
+     4 = 3 columns
+     */
+    private final int VIEW_TYPE_AUTO = 5;
+    private final int VIEW_TYPE_LIST = 6;
+    private final int VIEW_TYPE_2_COLUMNS = 7;
+    private final int VIEW_TYPE_3_COLUMNS = 8;
+
+
     private Boolean mShowEmptyView = null;
 
 	private RecyclerView mGridView;
@@ -63,8 +75,6 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
 
     private SharedPreferences shareprefs;
     private static String PREF_SUBSCRIPTION_COLUMNS;
-    private static String PREF_SHARE_ANALYTICS_KEY;
-    private static String PREF_CLOUD_SUPPORT_KEY;
 
     private void setSubscriptionFragmentLayout(int argSubscriptionCount) {
         boolean showEmpty = argSubscriptionCount == 0;
@@ -243,8 +253,31 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
     }
 
     private int numberOfColumns() {
-        String number = shareprefs.getString(PREF_SUBSCRIPTION_COLUMNS, "2");
-        return Integer.parseInt(number);
+        String number = shareprefs.getString(PREF_SUBSCRIPTION_COLUMNS, "5");
+        int intVal = Integer.parseInt(number);
+        int numColumns = -1;
+
+        if (intVal == VIEW_TYPE_LIST) {
+            numColumns = 1;
+        }
+
+        if (intVal == VIEW_TYPE_2_COLUMNS) {
+            numColumns = 2;
+        }
+
+        if (intVal == VIEW_TYPE_3_COLUMNS) {
+            numColumns = 3;
+        }
+
+        if (numColumns == -1) {
+            if (mLibrary.getSubscriptions().size() > 3) {
+                numColumns = 3;
+            } else {
+                numColumns = 2;
+            }
+        }
+
+        return numColumns;
     }
 
     static void openImportExportDialog(@NonNull TopActivity argActivity) {

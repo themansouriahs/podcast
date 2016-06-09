@@ -51,17 +51,17 @@
     </string-array>
 
     <string-array name="pref_subscriptions_columns_entries">
+        <item>Auto</item>
         <item>A list</item>
         <item>2 columns</item>
         <item>3 columns</item>
-        <item>4 columns</item>
     </string-array>
 
     <string-array name="pref_subscriptions_columns_entries_values" translatable="false">
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
     </string-array>
 
     <string-array name="pref_theme_entries">
