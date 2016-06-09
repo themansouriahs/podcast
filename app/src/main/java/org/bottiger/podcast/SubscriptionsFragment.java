@@ -37,8 +37,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
-public class SubscriptionsFragment extends Fragment implements View.OnClickListener,
-                                                                SharedPreferences.OnSharedPreferenceChangeListener {
+public class SubscriptionsFragment extends Fragment implements View.OnClickListener {
 
     private static final String TAG = "SubscriptionsFragment";
 
@@ -48,9 +47,6 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
     private Boolean mShowEmptyView = null;
 
 	private RecyclerView mGridView;
-
-    private CheckBox mShareAnalytics;
-    private CheckBox mCloudServices;
 
     private Library mLibrary;
 
@@ -90,10 +86,7 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
         mActivity = getActivity();
         mLibrary = SoundWaves.getAppContext(getContext()).getLibraryInstance();
         PREF_SUBSCRIPTION_COLUMNS = mActivity.getResources().getString(R.string.pref_subscriptions_columns_key);
-        PREF_SHARE_ANALYTICS_KEY = mActivity.getResources().getString(R.string.pref_anonymous_feedback_key);
-        PREF_CLOUD_SUPPORT_KEY = mActivity.getResources().getString(R.string.pref_cloud_support_key);
         shareprefs = PreferenceManager.getDefaultSharedPreferences(mActivity.getApplicationContext());
-        shareprefs.registerOnSharedPreferenceChangeListener(this);
 	}
 
 	@Override
@@ -110,9 +103,6 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
         mEmptySubscrptionImportOPMLButton = (Button) mContainerView.findViewById(R.id.import_opml_button);
 
         mGridContainerView = (FrameLayout) mContainerView.findViewById(R.id.subscription_grid_container);
-
-        mShareAnalytics = (CheckBox) mContainerView.findViewById(R.id.checkBox_usage);
-        mCloudServices =  (CheckBox) mContainerView.findViewById(R.id.checkBox_cloud);
 
         //RecycelrView
         mAdapter = new SubscriptionAdapter(getActivity(), mLibrary, numberOfColumns());
@@ -175,25 +165,6 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
                 } else {
                     Log.wtf(TAG, "getActivity() is not an instance of TopActivity. Please investigate"); // NoI18N
                 }
-            }
-        });
-
-        onSharedPreferenceChanged(shareprefs, PREF_SHARE_ANALYTICS_KEY);
-        onSharedPreferenceChanged(shareprefs, PREF_CLOUD_SUPPORT_KEY);
-
-        mShareAnalytics.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Log.d(TAG, "Setting " + PREF_SHARE_ANALYTICS_KEY + " to " + isChecked);
-                shareprefs.edit().putBoolean(PREF_SHARE_ANALYTICS_KEY, isChecked).commit();
-            }
-        });
-
-        mCloudServices.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Log.d(TAG, "Setting " + PREF_CLOUD_SUPPORT_KEY + " to " + isChecked);
-                shareprefs.edit().putBoolean(PREF_CLOUD_SUPPORT_KEY, isChecked).commit();
             }
         });
     }
@@ -276,26 +247,7 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
         return Integer.parseInt(number);
     }
 
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key == PREF_SHARE_ANALYTICS_KEY) {
-            boolean isEnabled = sharedPreferences.getBoolean(key, SHARE_ANALYTICS_DEFAULT);
-            if (mShareAnalytics != null) {
-                mShareAnalytics.setChecked(isEnabled);
-            }
-            return;
-        }
-
-        if (key == PREF_CLOUD_SUPPORT_KEY) {
-            boolean isEnabled = sharedPreferences.getBoolean(key, SHARE_CLOUD_DEFAULT);
-            if (mCloudServices != null) {
-                mCloudServices.setChecked(isEnabled);
-            }
-            return;
-        }
-    }
-
-    public static void openImportExportDialog(@NonNull TopActivity argActivity) {
+    static void openImportExportDialog(@NonNull TopActivity argActivity) {
 
         if (!checkPermission(argActivity))
             return;

@@ -43,7 +43,7 @@ public class FragmentContainerActivity extends DrawerActivity {
 	 * intensive, it may be best to switch to a
 	 * {@link android.support.v4.app.FragmentStatePagerAdapter}.
 	 */
-	protected SectionsPagerAdapter mSectionsPagerAdapter;
+	private SectionsPagerAdapter mSectionsPagerAdapter;
 
 	private FragmentManager mFragmentManager;
 	private FragmentTransaction mFragmentTransaction;
@@ -78,16 +78,7 @@ public class FragmentContainerActivity extends DrawerActivity {
 
         if (((SoundWaves)getApplication()).IsFirstRun())
             mViewPager.setCurrentItem(DISCOVER);
-
-        createScenes(mViewPager);
 	}
-
-    @TargetApi(Build.VERSION_CODES.KITKAT)
-    private void createScenes(ViewGroup viewGroup) {
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            //mSceneSubscriptions = Scene.getSceneForLayout(viewGroup, R.layout.subscription_list, this);
-        }
-    }
 
     /**
 	 * A {@link FragmentPagerAdapter} that returns a fragment corresponding to

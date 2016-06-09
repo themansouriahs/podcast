@@ -14,106 +14,42 @@
         android:layout_height="wrap_content"
         android:numColumns="2"
         android:stretchMode="columnWidth" />
-    <!--
-    android:background="?attr/themeBackground"
-    -->
 
     <RelativeLayout
         android:id="@+id/subscription_empty"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="?attr/themeBackground"
         android:paddingLeft="30dp"
         android:paddingRight="30dp">
 
         <TextView
-            android:id="@+id/subscription_empty_arrow_left"
+            android:id="@+id/subscription_empty_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="left"
-            android:layout_marginLeft="0dp"
-            android:layout_marginBottom="-20dp"
-            android:layout_marginTop="-40dp"
-            android:textSize="100sp"
-            android:text="←"/>
-
-        <TextView
-            android:id="@+id/subscription_empty_arrow_right"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="0dp"
-            android:layout_marginBottom="-20dp"
-            android:layout_marginTop="-40dp"
-            android:textSize="100sp"
-            android:text="→"/>
-
-        <TextView
-            android:id="@+id/subscription_empty_text_left"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textSize="22sp"
-            android:text="@string/title_section3"
-            android:gravity="left"
-            android:layout_below="@+id/subscription_empty_arrow_left"
-            android:paddingRight="10dp"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_toLeftOf="@+id/subscription_empty_arrow_right"
-            android:layout_toStartOf="@+id/subscription_empty_arrow_right" />
-
-        <TextView
-            android:id="@+id/subscription_empty_text_right"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textSize="22sp"
-            android:paddingLeft="10dp"
-            android:text="@string/title_section2"
-            android:layout_alignTop="@+id/subscription_empty_text_left"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_toRightOf="@+id/subscription_empty_arrow_left"
-            android:layout_toEndOf="@+id/subscription_empty_arrow_left"
-            android:gravity="right" />
+            android:text="@string/subscription_instruction_title"
+            android:layout_marginTop="20dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
 
         <TextView
             android:id="@+id/subscription_empty_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="16dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="20dp"
             android:text="@string/subscription_instruction"
-            android:layout_below="@+id/subscription_empty_text_left"
-            android:layout_centerHorizontal="true" />
-
-        <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/pref_feedback_title"
-            android:id="@+id/checkBox_usage"
-            android:layout_below="@+id/subscription_empty_text"
-            android:layout_centerHorizontal="true" />
-
-        <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/pref_cloud_support_title"
-            android:id="@+id/checkBox_cloud"
-            android:layout_below="@+id/checkBox_usage"
-            android:layout_alignLeft="@id/checkBox_usage"
+            android:layout_below="@+id/subscription_empty_title"
             android:layout_centerHorizontal="true" />
 
         <Button
             android:id="@+id/import_opml_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/checkBox_cloud"
+            android:layout_below="@id/subscription_empty_text"
             android:layout_marginTop="15dp"
             android:layout_centerHorizontal="true"
-            android:text="@string/opml_radio_import"/>
+            android:text="@string/opml_radio_import"
+            android:visibility="gone"/>
 
     </RelativeLayout>
 
