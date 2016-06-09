@@ -55,7 +55,7 @@ public class PodcastUpdateJobService extends JobService {
                 if (!downloadOnUpdate)
                     return;
 
-                SoundWavesDownloadManager downloadManager = SoundWaves.getDownloadManager();
+                SoundWavesDownloadManager downloadManager = SoundWaves.getAppContext(getApplicationContext()).getDownloadManager();
 
                 SortedList<? extends IEpisode> episodes = argSubscription.getEpisodes();
                 FeedItem episode;

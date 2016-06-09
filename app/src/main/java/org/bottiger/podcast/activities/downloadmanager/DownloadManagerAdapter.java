@@ -54,7 +54,7 @@ public class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemVie
         mContext = argContext;
         mEmptyTextView = argEmptyTextView;
 
-        mDownloadManager = SoundWaves.getDownloadManager();
+        mDownloadManager = SoundWaves.getAppContext(mContext).getDownloadManager();
 
         SoundWaves.getRxBus().toObserverable()
                 .onBackpressureDrop()

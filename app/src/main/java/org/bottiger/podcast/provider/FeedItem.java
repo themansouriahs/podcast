@@ -915,17 +915,12 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 		dbHelper.executeSQL(context, sqlQueue);
 	}
 
-	public void setFeed(Subscription feed) {
-		if (feed == null)
+	public void setFeed(@NonNull Subscription argSubscription) {
+		if (sub_id == argSubscription.getId())
 			return;
 
-		long id = feed.getId();
-
-		if (sub_id == id)
-			return;
-
-		this.sub_id = id;
-		notifyPropertyChanged();
+		this.sub_id = argSubscription.getId();
+		notifyPropertyChanged(EpisodeChanged.CHANGED);
 	}
 
 	public void setPubDate(@Nullable Date argPubDate) {

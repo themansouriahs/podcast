@@ -90,7 +90,8 @@ public class Library {
 
         @Override
         public void onInserted(int position, int count) {
-            notifySubscriptionChanged(mActiveSubscriptions.get(position).getId(), SubscriptionChanged.ADDED, "SortedListInsert");
+            Subscription subscription = mActiveSubscriptions.get(position);
+            notifySubscriptionChanged(subscription.getId(), SubscriptionChanged.ADDED, "SortedListInsert");
         }
 
         @Override
@@ -188,7 +189,15 @@ public class Library {
                 mLock.unlock();
         }
 
-        updateSubscription(subscription);
+        switch (argSubscriptionChanged.getAction()) {
+            case SubscriptionChanged.CHANGED: {
+                updateSubscription(subscription);
+                break;
+            }
+            case SubscriptionChanged.ADDED:
+            case SubscriptionChanged.REMOVED:
+            case SubscriptionChanged.SUBSCRIBED:
+        }
     }
 
     public void handleChangedEvent(EpisodeChanged argEpisodeChanged) {
@@ -213,16 +222,26 @@ public class Library {
         return addEpisodeInternal(argEpisode, false);
     }
 
+    /**
+     * Adds an episode to the Library. If the Episode already exists in the Library it will be updated.
+     *
+     * @param argEpisode The Episode
+     * @param argSilent Do not senda notification about the event
+     * @return True if the episode was added. False it was already there.
+     */
     private boolean addEpisodeInternal(@Nullable IEpisode argEpisode, boolean argSilent) {
+
+        if (argEpisode == null)
+            return false;
+
+        boolean isFeedItem = argEpisode instanceof FeedItem;
+        FeedItem item = isFeedItem ? (FeedItem)argEpisode : null;
+
         mLock.lock();
         try {
-            if (argEpisode == null)
-                return false;
-
-            FeedItem item = argEpisode instanceof FeedItem ? (FeedItem)argEpisode : null;
-            boolean isFeedItem = item != null;
-
-            // FIXME
+            // If the item is a feedItem it should belong to a subscription.
+            // If it does not belong to a subscription yet (i.e. we are parsing the subscription, maybe for the first time)
+            // We do not add it to the library yet.
             if (isFeedItem && item.sub_id < 0)
                 return false;
 
@@ -236,6 +255,7 @@ public class Library {
 
             if (isFeedItem) {
                 boolean updatedEpisode = false;
+
                 if (!item.isPersisted()) {
                     updateEpisode(item);
                     updatedEpisode = true;
@@ -465,30 +485,30 @@ public class Library {
 
     private void loadPlaylistInternal(@NonNull String query, @NonNull  Playlist argPlaylist) {
 
+        if (mPlaylistLoaded)
+            return;
+
+        Cursor cursor = null;
+
         mLock.lock();
         try {
-            if (mPlaylistLoaded)
-                return;
 
-            Cursor cursor = null;
             int counter = 0;
-            try {
-                cursor = PodcastOpenHelper.runQuery(Library.this.mContext, query);
-                FeedItem episode;
+            cursor = PodcastOpenHelper.runQuery(Library.this.mContext, query);
+            FeedItem episode;
 
-                while (cursor.moveToNext()) {
-                    episode = LibraryPersistency.fetchEpisodeFromCursor(cursor, null);
-                    addEpisode(episode);
-                    argPlaylist.setItem(counter, episode);
-                    counter++;
-                }
-                argPlaylist.notifyPlaylistChanged();
-            } finally {
-                if (cursor != null)
-                    cursor.close();
-                mPlaylistLoaded = true;
+            while (cursor.moveToNext()) {
+                episode = LibraryPersistency.fetchEpisodeFromCursor(cursor, null);
+                addEpisode(episode);
+                argPlaylist.setItem(counter, episode);
+                counter++;
             }
+            argPlaylist.notifyPlaylistChanged();
+
+            mPlaylistLoaded = true;
         } finally {
+            if (cursor != null)
+                cursor.close();
             mLock.unlock();
         }
     }
@@ -592,7 +612,10 @@ public class Library {
                 addEpisode(item);
                 counter++;
             }
-            argSubscription.setIsRefreshing(false);
+
+            if (counter > 0) {
+                argSubscription.setIsRefreshing(false);
+            }
             argSubscription.setIsLoaded(true);
         } finally {
             if (cursor != null)
@@ -640,25 +663,33 @@ public class Library {
         }
     }
 
-    public void subscribe(@NonNull SlimSubscription argSubscription) {
+    public void subscribe(@NonNull ISubscription argSubscription) {
 
-        Observable.just(argSubscription).map(new Func1<SlimSubscription, Subscription>() {
+        Observable
+                .just(argSubscription)
+                .map(new Func1<ISubscription, Subscription>() {
                     @Override
-                    public Subscription call(SlimSubscription argSubscription) {
+                    public Subscription call(ISubscription argSubscription) {
 
                         Subscription subscription;
-                        subscription = mSubscriptionUrlLUT.get(argSubscription.getURLString());
 
-                        if (subscription == null) {
-                            subscription = new Subscription(argSubscription);
+                        mLock.lock();
+                        try {
+                            String key = getKey(argSubscription);
+                            subscription = mSubscriptionUrlLUT.containsKey(key) ?
+                                    mSubscriptionUrlLUT.get(key) :
+                                    new Subscription(argSubscription);
+
+                            subscription.setStatus(Subscription.STATUS_SUBSCRIBED, "Subscribe:from:Library.subscribe");
+                            updateSubscription(subscription);
+
+                            mSubscriptionUrlLUT.put(key, subscription);
+                            mSubscriptionIdLUT.put(subscription.getId(), subscription);
+                            mActiveSubscriptions.add(subscription);
+
+                        } finally {
+                            mLock.unlock();
                         }
-
-                        subscription.setStatus(Subscription.STATUS_SUBSCRIBED, "Subscribe:from:Library.subscribe");
-                        updateSubscription(subscription);
-
-                        mSubscriptionUrlLUT.put(argSubscription.getURLString(),subscription);
-                        mSubscriptionIdLUT.put(subscription.getId(), subscription);
-                        mActiveSubscriptions.add(subscription);
 
                         try {
                             SoundWaves.getAppContext(mContext).getRefreshManager().refreshSync(subscription);
@@ -738,5 +769,9 @@ public class Library {
             argTag = "NoTag";
 
         SoundWaves.getRxBus().send(new SubscriptionChanged(argId, argAction, argTag));
+    }
+
+    private static String getKey(@NonNull ISubscription argSubscription) {
+        return argSubscription.getURLString();
     }
 }

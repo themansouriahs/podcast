@@ -12,11 +12,12 @@ import java.lang.annotation.RetentionPolicy;
 public class SubscriptionChanged implements ItemChanged {
 
     @Retention(RetentionPolicy.SOURCE)
-    @IntDef({ADDED, REMOVED, CHANGED})
+    @IntDef({ADDED, REMOVED, CHANGED, SUBSCRIBED})
     public @interface Action {}
     public static final int ADDED = 1;
     public static final int REMOVED = 2;
     public static final int CHANGED = 3;
+    public static final int SUBSCRIBED = 4;
 
     private long id;
     private @Action int action;

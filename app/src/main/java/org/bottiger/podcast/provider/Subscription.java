@@ -198,7 +198,7 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 		init();
 	}
 
-	public Subscription(@NonNull  SlimSubscription argSlimSubscription) {
+	public Subscription(@NonNull ISubscription argSlimSubscription) {
 		this();
 		url = argSlimSubscription.getURLString();
 		title = argSlimSubscription.getTitle();
@@ -486,7 +486,11 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 			return;
 
 		status = argStatus;
-		notifyPropertyChanged(argTag);
+
+		if (status == STATUS_SUBSCRIBED)
+			notifyPropertyChanged(SubscriptionChanged.SUBSCRIBED, argTag);
+		else
+			notifyPropertyChanged(argTag);
 	}
 
 	public int getSettings() {
@@ -784,11 +788,15 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 	}
 
 	private void notifyPropertyChanged(@android.support.annotation.Nullable String argTag) {
+		notifyPropertyChanged(SubscriptionChanged.CHANGED, argTag);
+	}
+
+	private void notifyPropertyChanged(@SubscriptionChanged.Action int event, @android.support.annotation.Nullable String argTag) {
 		if (TextUtils.isEmpty(argTag))
 			argTag = "NoTag";
 
 		if (!mIsRefreshing)
-			SoundWaves.getRxBus().send(new SubscriptionChanged(getId(), SubscriptionChanged.CHANGED, argTag));
+			SoundWaves.getRxBus().send(new SubscriptionChanged(getId(), event, argTag));
 	}
 
 }

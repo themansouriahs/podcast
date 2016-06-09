@@ -156,7 +156,7 @@ public class LibraryPersistency {
                 } else {
                     long id = Long.parseLong(uri.toString().replaceAll("[^0-9]", ""));
                     argSubscription.setId(id);
-                    argSubscription.notifyEpisodeAdded(true);
+                    //argSubscription.notifyEpisodeAdded(true);
                     SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.SUBSCRIBE_TO_FEED);
                 }
             }

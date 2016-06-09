@@ -21,12 +21,9 @@ import org.bottiger.podcast.activities.feedview.FeedActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.adapters.viewholders.discovery.SearchResultViewHolder;
-import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
-import org.bottiger.podcast.provider.SubscriptionLoader;
-import org.bottiger.podcast.service.IDownloadCompleteCallback;
 import org.bottiger.podcast.utils.ImageLoaderUtils;
 import org.bottiger.podcast.utils.SharedAdapterUtils;
 import org.bottiger.podcast.utils.UIUtils;
@@ -34,7 +31,6 @@ import org.bottiger.podcast.utils.UIUtils;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
 
 /**
  * Created by apl on 15-04-2015.
@@ -73,7 +69,7 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
         holder.title.setText(subscription.getTitle());
 
         try {
-            ImageLoaderUtils.loadImageInto(holder.image, subscription.getImageURL(), true, true);
+            ImageLoaderUtils.loadImageInto(holder.image, subscription.getImageURL(), null, false, true, true);
         } catch (NullPointerException npe) {
             holder.image.setBackgroundColor(mDefaultBackgroundColor);
         }
@@ -101,7 +97,7 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
         holder.toggleSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                toggleSubscriptionStatus(holder.itemView, buttonView, subscription);
+                toggleSubscriptionStatus(holder.itemView, subscription);
             }
         });
     }
@@ -152,8 +148,7 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
         }
     }
 
-    public synchronized void toggleSubscriptionStatus(@NonNull View argView,
-                                                      final @NonNull CompoundButton buttonView,
+    private synchronized void toggleSubscriptionStatus(@NonNull View argView,
                                                       @NonNull ISubscription argSubscription) {
         final URL url = argSubscription.getURL();
         final boolean isSubscribed = mSubscribedUrls.contains(url);
@@ -174,8 +169,8 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
         UIUtils.disPlayBottomSnackBar(argView, formattedText, null, false);
     }
 
-    private void subscribe(@NonNull Subscription argSubscription) {
-        SoundWaves.getAppContext(mActivity).getLibraryInstance().subscribe(argSubscription.getURLString());
+    private void subscribe(@NonNull ISubscription argSubscription) {
+        SoundWaves.getAppContext(mActivity).getLibraryInstance().subscribe(argSubscription);
     }
 
     private void unsubscribe(@NonNull Subscription argSubscription) {

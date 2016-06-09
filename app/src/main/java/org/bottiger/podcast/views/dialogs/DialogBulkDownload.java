@@ -135,7 +135,7 @@ public class DialogBulkDownload {
             return;
         }
 
-        SoundWavesDownloadManager downloadManager = SoundWaves.getDownloadManager();
+        SoundWavesDownloadManager downloadManager = SoundWaves.getAppContext(mContext).getDownloadManager();
 
         SharedPreferences sharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(mContext);

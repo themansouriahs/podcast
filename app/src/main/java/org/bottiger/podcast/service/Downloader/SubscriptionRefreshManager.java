@@ -5,12 +5,14 @@ import android.content.Context;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.WorkerThread;
 import android.support.v7.util.SortedList;
 import android.text.TextUtils;
 import android.util.Log;
 
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.model.datastructures.EpisodeList;
 import org.bottiger.podcast.parser.FeedParser;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
@@ -24,6 +26,8 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -65,6 +69,7 @@ public class SubscriptionRefreshManager {
         refresh(null, null);
     }
 
+    @WorkerThread
     public Subscription refreshSync(@NonNull Subscription argSubscription) throws IOException {
         final Request request = getRequest(argSubscription);
         Response response = mOkClient.newCall(request).execute();
@@ -157,48 +162,30 @@ public class SubscriptionRefreshManager {
         return subscriptionsAdded;
     }
 
-    private void downloadNewEpisodeskCallback(final @NonNull Context argContext, @NonNull ISubscription argSubscription) {
+    /**
+     * Download new episodes from a subscription.
+     *
+     * @param argContext A Context
+     * @param argSubscription The Subscription.
+     */
+    private void downloadNewEpisodeskCallback(final @NonNull Context argContext, @NonNull Subscription argSubscription) {
         if (StorageUtils.canPerform(SoundWavesDownloadManager.ACTION_DOWNLOAD_AUTOMATICALLY,
                 argContext,
                 argSubscription)) {
 
-            if (!(argSubscription instanceof Subscription)) {
-                return;
-            }
-
-            Subscription subscription = (Subscription)argSubscription;
-
             Date tenMinutesAgo = new Date(System.currentTimeMillis() - (10 * 60 * 1000));
 
-            final PlayerService ps = PlayerService.getInstance();
+            LinkedList<IEpisode> episodes = argSubscription.getEpisodes().getUnfilteredList();
+            int newEpisodeCount = Math.min(argSubscription.countNewEpisodes(), episodes.size());
 
-            if (argSubscription instanceof Subscription) {
-                SortedList<? extends IEpisode> episodes = argSubscription.getEpisodes();
-                int newEpisodeCount = Math.min(subscription.countNewEpisodes(), episodes.size());
-
-                for (int i = 0; i < episodes.size(); i++) {
-                    IEpisode episode = episodes.get(i);
-                    if (episode instanceof FeedItem) {
-                        Date lastUpdate = new Date(((FeedItem) episode).getLastUpdate());
-                        if (lastUpdate.after(tenMinutesAgo) && newEpisodeCount > 0) {
-                            SoundWaves.getDownloadManager().addItemToQueue(episode, false, SoundWavesDownloadManager.LAST);
-                            newEpisodeCount--;
-                        }
-                    }
+            for (int i = 0; i < episodes.size(); i++) {
+                FeedItem episode = (FeedItem)episodes.get(i);
+                Date lastUpdate = new Date(episode.getLastUpdate());
+                if (lastUpdate.after(tenMinutesAgo) && newEpisodeCount > 0) {
+                    SoundWaves.getAppContext(argContext).getDownloadManager().addItemToQueue(episode, false, SoundWavesDownloadManager.LAST);
+                    newEpisodeCount--;
                 }
             }
-        }
-    }
-
-    @Deprecated
-    private void postProcess(@NonNull Context argContext, @NonNull ISubscription argSubscription) {
-        Log.d(SubscriptionRefreshManager.TAG, "Done Parsing: " + argSubscription);
-
-        if (argSubscription instanceof Subscription) {
-            Subscription subscription = (Subscription)argSubscription;
-            SoundWaves.getAppContext(argContext).getLibraryInstance().updateSubscription(subscription);
-            Log.d(SubscriptionRefreshManager.TAG, "Done updating database for: " + argSubscription);
-            return;
         }
     }
 
@@ -212,63 +199,86 @@ public class SubscriptionRefreshManager {
                                     @NonNull ISubscription argSubscription,
                                     @NonNull Response response,
                                     @Nullable final IDownloadCompleteCallback argCallback) {
-        ISubscription parsedSubscription = null;
         try {
-            if (argSubscription instanceof Subscription) {
-                SoundWaves.getAppContext(argContext).getLibraryInstance().loadEpisodesSync((Subscription)argSubscription, null);
-            }
+            ensureLoadedSubscription(argContext, argSubscription);
 
-            if (response.code() == 401) { // 401 (Access Denied)
-                if (argSubscription instanceof Subscription) {
-                    Subscription subscription = (Subscription) argSubscription;
-                    subscription.setRequiringAuthentication(true);
-                    subscription.setAuthenticationWorking(false);
-                }
+            if (requiresAuthentication(response, argSubscription)) {
                 return;
             }
 
             if (response.body() != null && response.isSuccessful()) {
+                boolean success = true;
                 try {
-                    parsedSubscription = mFeedParser.parse(argSubscription, response.body().byteStream(), argContext);
+                    mFeedParser.parse(argSubscription, response.body().byteStream(), argContext);
 
-                    postProcess(argContext, argSubscription);
-                    if (argSubscription instanceof Subscription) {
-                        downloadNewEpisodeskCallback(argContext, argSubscription);
-                    }
-                } catch (XmlPullParserException e) {
-                    Log.d(TAG, "Parsing error " + e.toString());
-
-                    String[] keys = new String[1];
-                    String[] values = new String[1];
-
-                    keys[0] = "url";
-                    values[0] = TextUtils.isEmpty(argSubscription.getURLString()) ? "No url" : argSubscription.getURLString(); // NoI18N
-                    VendorCrashReporter.handleException(e, keys, values);
-                } catch (Exception e) {
-                    Log.d(TAG, "Parsing error " + e.toString());
-
-                    String[] keys = new String[1];
-                    String[] values = new String[1];
-
-                    keys[0] = "url";
-                    values[0] = TextUtils.isEmpty(argSubscription.getURLString()) ? "No url" : argSubscription.getURLString(); // NoI18N
-                    VendorCrashReporter.handleException(e, keys, values);
+                    downloadNewEpisodes(argContext, argSubscription);
+                } catch (Exception exception) {
+                    handleParingError(exception, argSubscription);
+                    success = false;
                 }
 
-                final ISubscription finalSubscription = parsedSubscription != null ? argSubscription : null;
-
                 Log.d(TAG, "Parsing callback for: " + argSubscription);
-                if (argCallback != null && finalSubscription != null)
-                    argCallback.complete(finalSubscription != null, finalSubscription);
+                if (argCallback != null)
+                    argCallback.complete(success, argSubscription);
 
             }
         } catch (NullPointerException npe) {
-            npe.printStackTrace();
-        } finally {
-            if (argSubscription != null) {
-                argSubscription.setIsRefreshing(false);
-            }
+            handleParingError(npe, argSubscription);
         }
+    }
+
+    private void downloadNewEpisodes(@NonNull Context argContext, @NonNull ISubscription argSubscription) {
+        if (argSubscription instanceof Subscription) {
+            downloadNewEpisodeskCallback(argContext, (Subscription)argSubscription);
+        }
+    }
+
+    /**
+     * Ensure the subscription and all of it's episodes are loaded before refreshing it.
+     *
+     * @param argContext A context
+     * @param argSubscription The subscription
+     */
+    private static void ensureLoadedSubscription(@NonNull Context argContext, @NonNull ISubscription argSubscription) {
+        if (argSubscription instanceof Subscription) {
+            SoundWaves.getAppContext(argContext).getLibraryInstance().loadEpisodesSync((Subscription)argSubscription, null);
+        }
+    }
+
+    /**
+     *
+     * @param response The HTTP Response
+     * @param argSubscription The subscription being refreshed
+     * @return true if the request was denied because of lacking authentication
+     */
+    private static boolean requiresAuthentication(@NonNull Response response, @NonNull ISubscription argSubscription) {
+        if (response.code() == 401) { // 401 (Access Denied)
+            if (argSubscription instanceof Subscription) {
+                Subscription subscription = (Subscription) argSubscription;
+                subscription.setRequiringAuthentication(true);
+                subscription.setAuthenticationWorking(false);
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Logs and reports Feed parsing errors
+     *
+     * @param argExceiption The Exception from the parser
+     * @param argSubscription The Subscription being parsed
+     */
+    private static void handleParingError(@NonNull Exception argExceiption, @NonNull ISubscription argSubscription) {
+        Log.d(TAG, "Parsing error " + argExceiption.toString());
+
+        String[] keys = new String[1];
+        String[] values = new String[1];
+
+        keys[0] = "url";
+        values[0] = TextUtils.isEmpty(argSubscription.getURLString()) ? "No url" : argSubscription.getURLString(); // NoI18N
+        VendorCrashReporter.handleException(argExceiption, keys, values);
     }
 }
 

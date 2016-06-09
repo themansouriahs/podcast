@@ -19,7 +19,6 @@ import org.bottiger.podcast.cloud.EventLogger;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.player.SoundWavesPlayer;
-import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
 import org.bottiger.podcast.player.sonic.service.ISoundWavesEngine;
 import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
@@ -65,7 +64,7 @@ public class SoundWaves extends Application {
     @Nullable
     public static IAnalytics sAnalytics;
     private SubscriptionRefreshManager mSubscriptionRefreshManager;
-    private static SoundWavesDownloadManager sDownloadManager;
+    private SoundWavesDownloadManager mDownloadManager;
     private PodcastUpdater mPodcastUpdater;
 
     private static Bus sBus = new Bus(ThreadEnforcer.MAIN);
@@ -133,7 +132,7 @@ public class SoundWaves extends Application {
 
         Log.v(TAG, "time1: " + System.currentTimeMillis());
 
-        sDownloadManager = new SoundWavesDownloadManager(this);
+        //mDownloadManager = new SoundWavesDownloadManager(this);
 
         Log.v(TAG, "time2: " + System.currentTimeMillis());
         mLibrary = new Library(this);
@@ -211,8 +210,12 @@ public class SoundWaves extends Application {
     }
 
     @NonNull
-    public static SoundWavesDownloadManager getDownloadManager() {
-        return sDownloadManager;
+    public SoundWavesDownloadManager getDownloadManager() {
+        if (mDownloadManager == null)  {
+            mDownloadManager = new SoundWavesDownloadManager(this);
+        }
+
+        return mDownloadManager;
     }
 
     @NonNull

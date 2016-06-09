@@ -37,9 +37,6 @@ public class PodcastUpdateReceiver extends BroadcastReceiver {
         final PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "");
         wl.acquire();
 
-        final SoundWavesDownloadManager downloadManager;
-        downloadManager = SoundWaves.getDownloadManager();
-
 		SubscriptionRefreshManager subscriptionRefreshManager = new SubscriptionRefreshManager(context);
         subscriptionRefreshManager.refresh(null, new IDownloadCompleteCallback() {
             @Override

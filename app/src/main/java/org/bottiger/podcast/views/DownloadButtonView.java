@@ -262,7 +262,7 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
 
         if (getState() == PlayerButtonView.STATE_DEFAULT) {
             Log.v(TAG, "Queue download");
-            SoundWaves.getDownloadManager().addItemAndStartDownload(getEpisode(), SoundWavesDownloadManager.STARTED_MANUALLY);
+            SoundWaves.getAppContext(getContext()).getDownloadManager().addItemAndStartDownload(getEpisode(), SoundWavesDownloadManager.STARTED_MANUALLY);
             setState(PlayerButtonView.STATE_QUEUE);
         } else if (getState() == PlayerButtonView.STATE_DELETE) {
             Log.v(TAG, "Delete file");
@@ -285,7 +285,7 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
             return PlayerButtonView.STATE_DELETE;
         }
 
-        org.bottiger.podcast.service.DownloadStatus status = SoundWaves.getDownloadManager().getStatus(getEpisode());
+        org.bottiger.podcast.service.DownloadStatus status = SoundWaves.getAppContext(getContext()).getDownloadManager().getStatus(getEpisode());
 
         if (status == org.bottiger.podcast.service.DownloadStatus.DOWNLOADING) {
             return PlayerButtonView.STATE_DEFAULT;
