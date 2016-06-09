@@ -13,11 +13,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <!--
+        Prevent the SearchView from popping up the Keyboard
+        http://stackoverflow.com/questions/21624282/searchview-gains-focus-and-opens-keyboard-when-returning-from-another-activity
+
+        android:focusableInTouchMode="true"
+        -->
         <android.support.v7.widget.CardView
             android:id="@+id/discovery_searchView_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
+            android:focusableInTouchMode="true"
             app:cardElevation="5dp"
             app:cardUseCompatPadding="true">
 
