@@ -263,13 +263,13 @@ public class FeedParser {
                     IEpisode episode = readEpisode(parser, argSubscription);
 
                     // Traditional approach
-                    if (isParsingSlimSubscription()) {
-                        argSubscription.addEpisode(episode);
-                    }
-                    addedEpisodes = addedEpisodes || !library.addEpisode(episode);
+                    //if (isParsingSlimSubscription()) {
+                    //    argSubscription.addEpisode(episode);
+                    //}
+                    //addedEpisodes = addedEpisodes || !library.addEpisode(episode);
 
                     // Bulk insert.
-                    //addedEpisodes = argSubscription.addEpisode(episode) || addedEpisodes;
+                    addedEpisodes = argSubscription.addEpisode(episode) || addedEpisodes;
 
                     break;
                 }
@@ -589,7 +589,7 @@ public class FeedParser {
             parser.nextTag();
             return result;
         }
-        
+
         return "";
     }
 
