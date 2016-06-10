@@ -1036,10 +1036,17 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
         return BitMaskUtils.IsBitSet(status, setting);
     }
 
-	public void setIsParsing(boolean argIsParsing) {
+	/**
+	 * This can be used to turn no notifications of changes on the episode without
+	 * emitting an event.
+	 *
+	 * @param argIsParsing
+	 * @param doNotify
+     */
+	public void setIsParsing(boolean argIsParsing, boolean doNotify) {
 		mIsParsing = argIsParsing;
 
-		if (!mIsParsing)
+		if (!mIsParsing && doNotify)
 			notifyPropertyChanged(EpisodeChanged.PARSED);
 	}
 

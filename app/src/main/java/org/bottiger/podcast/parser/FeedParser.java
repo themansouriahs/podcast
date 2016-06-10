@@ -401,7 +401,7 @@ public class FeedParser {
             }
         }
 
-        episode.setIsParsing(false);
+        episode.setIsParsing(false, false);
         return episode;
     }
 

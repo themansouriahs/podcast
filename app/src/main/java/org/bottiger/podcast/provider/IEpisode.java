@@ -78,6 +78,7 @@ public interface IEpisode {
     void setIsVideo(boolean argIsVideo);
 
     void setIsParsing(boolean argIsParsing);
+    void setIsParsing(boolean argIsParsing, boolean doNotify);
     void setFilesize(long argFilesize);
     void setURL(String argUrl);
     void setAuthor(String argAuthor);

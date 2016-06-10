@@ -129,7 +129,7 @@ public class SlimEpisode extends BaseEpisode implements Parcelable {
     }
 
     @Override
-    public void setIsParsing(boolean argIsParsing) {
+    public void setIsParsing(boolean argIsParsing, boolean argDoNotify) {
     }
 
     @Override

@@ -29,6 +29,10 @@ public abstract class BaseEpisode implements IEpisode {
         notifyPropertyChanged(EpisodeChanged.PROGRESS);
     }
 
+    public void setIsParsing(boolean argIsParsing) {
+        setIsParsing(argIsParsing, true);
+    }
+
     protected abstract void notifyPropertyChanged(@EpisodeChanged.Action int argAction);
 
 }
