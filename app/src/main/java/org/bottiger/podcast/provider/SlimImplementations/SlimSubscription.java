@@ -97,7 +97,7 @@ public class SlimSubscription extends BaseSubscription implements Parcelable {
     }
 
     @Override
-    public void addEpisode(@Nullable IEpisode episode) {
+    public boolean addEpisode(@Nullable IEpisode episode) {
         SlimEpisode slimEpisode;
         boolean isSlimEpisode = episode instanceof SlimEpisode;
         if (!isSlimEpisode) {
@@ -105,7 +105,13 @@ public class SlimSubscription extends BaseSubscription implements Parcelable {
         } else {
             slimEpisode = (SlimEpisode)episode;
         }
+
+        if (mEpisodes.indexOf(slimEpisode) > 0)
+            return false;
+
         mEpisodes.add(slimEpisode);
+
+        return true;
     }
 
     @Override

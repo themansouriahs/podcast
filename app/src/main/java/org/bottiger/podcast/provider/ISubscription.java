@@ -49,7 +49,7 @@ public interface ISubscription {
     void setURL(@Nullable String argUrl);
 
     void setLink(@Nullable String argLink);
-    void addEpisode(@Nullable IEpisode episode);
+    boolean addEpisode(@Nullable IEpisode episode);
 
     boolean IsDirty();
 

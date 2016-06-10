@@ -149,7 +149,7 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 
 		@Override
 		public boolean areItemsTheSame(IEpisode item1, IEpisode item2) {
-			return false;
+			return item1.equals(item2);
 		}
 	};
 
@@ -214,14 +214,20 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 		return mEpisodes;
 	}
 
-	public void addEpisode(@NonNull IEpisode argEpisode, boolean argSilent) {
+	public boolean addEpisode(@NonNull IEpisode argEpisode, boolean argSilent) {
+		if (mEpisodes.indexOf(argEpisode) > 0)
+			return false;
+
 		mEpisodes.add(argEpisode);
+		
 		if (!argSilent)
 			notifyEpisodeAdded(true);
+
+		return true;
 	}
 
-	public void addEpisode(@NonNull IEpisode argEpisode) {
-		addEpisode(argEpisode, false);
+	public boolean addEpisode(@NonNull IEpisode argEpisode) {
+		return addEpisode(argEpisode, false);
 	}
 
 	/**

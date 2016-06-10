@@ -34,7 +34,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.concurrent.locks.ReentrantLock;
 
 import rx.Observable;
@@ -215,6 +217,51 @@ public class Library {
         }
     }
 
+    /**
+     *
+     * @param argSubscription
+     * @return
+     */
+    public boolean addEpisodes(@NonNull Subscription argSubscription) {
+        mLock.lock();
+
+        LinkedList<IEpisode> episodes = argSubscription.getEpisodes().getFilteredList();
+        LinkedList<String> keys = new LinkedList<>();
+        LinkedList<FeedItem> unpersistedEpisodes = new LinkedList<>();
+
+        for (int i = 0; i < episodes.size(); i++) {
+            keys.add(i, getKey(episodes.get(i)));
+        }
+
+        try {
+            if (mEpisodesUrlLUT.containsAll(keys)) {
+                return false;
+            }
+
+            for (int i = 0; i < episodes.size(); i++) {
+                FeedItem episode = (FeedItem) episodes.get(i);
+                if (!mEpisodesUrlLUT.containsKey(keys.get(i))) {
+                    mEpisodes.add(episode);
+                    mEpisodesUrlLUT.put(keys.get(i), episode);
+
+                    if (!episode.isPersisted()) {
+                        unpersistedEpisodes.add(episode);
+                    }
+                }
+            }
+
+            //long start = System.currentTimeMillis();
+            mLibraryPersistency.insert(mContext, unpersistedEpisodes);
+            //long end = System.currentTimeMillis();
+            //Log.d(TAG, "insert time: " + (end-start) + " ms (#" + unpersistedEpisodes.size() + ")");
+
+        } finally {
+            mLock.unlock();
+        }
+
+        return true;
+    }
+
     /*
         Return true if the episode was added
      */
@@ -256,10 +303,13 @@ public class Library {
             if (isFeedItem) {
                 boolean updatedEpisode = false;
 
+                //long start = System.currentTimeMillis();
                 if (!item.isPersisted()) {
                     updateEpisode(item);
                     updatedEpisode = true;
                 }
+                //long end = System.currentTimeMillis();
+                //Log.d(TAG, "insert time: " + (end-start) + " ms");
 
                 mEpisodesIdLUT.put(item.getId(), item);
 
@@ -773,5 +823,9 @@ public class Library {
 
     private static String getKey(@NonNull ISubscription argSubscription) {
         return argSubscription.getURLString();
+    }
+
+    private static String getKey(@NonNull IEpisode argEpisode) {
+        return argEpisode.getURL();
     }
 }

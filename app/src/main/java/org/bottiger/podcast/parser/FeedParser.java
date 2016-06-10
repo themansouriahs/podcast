@@ -192,6 +192,8 @@ public class FeedParser {
 
         if (addedEpisodes && !isParsingSlimSubscription()) {
             Subscription sub = ((Subscription) argSubscription);
+            SoundWaves.getAppContext(argContext).getLibraryInstance().addEpisodes(sub);
+
             sub.setLastItemUpdated(System.currentTimeMillis());
             sub.notifyEpisodeAdded(false);
         }
@@ -256,12 +258,14 @@ public class FeedParser {
                 case EPISODE_ITEM_TAG: {
                     IEpisode episode = readEpisode(parser, argSubscription);
 
+                    // Traditional approach
                     if (isParsingSlimSubscription()) {
                         argSubscription.addEpisode(episode);
                     }
-
-                    //addedEpisodes = addedEpisodes || SoundWaves.getAppContext(argContext).getLibraryInstance().addEpisode(episode);
                     addedEpisodes = addedEpisodes || !library.addEpisode(episode);
+
+                    // Bulk insert.
+                    //addedEpisodes = argSubscription.addEpisode(episode) || addedEpisodes;
 
                     break;
                 }

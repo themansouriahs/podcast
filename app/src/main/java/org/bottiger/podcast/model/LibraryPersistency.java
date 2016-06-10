@@ -5,11 +5,15 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.v4.util.Pair;
 import android.util.Log;
+
+import com.google.common.collect.Iterables;
 
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
@@ -17,13 +21,21 @@ import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ItemColumns;
+import org.bottiger.podcast.provider.PodcastOpenHelper;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionColumns;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+
+import io.requery.android.database.sqlite.SQLiteDatabase;
+import io.requery.android.database.sqlite.SQLiteOpenHelper;
+import io.requery.android.database.sqlite.SQLiteStatement;
 
 /**
  * Created by aplb on 12-10-2015.
@@ -84,8 +96,87 @@ public class LibraryPersistency {
             }
     }
 
-    public void persist(Collection<IEpisode> argEpisodes) {
+    /**
+     * The idea is to develop a method for fast inserting episodes into a subscription.
+     * This is usefull for new very large feeds - like Planet Money or HPMor.
+     *
+     * The method will only insert new episodes, using prepared statments and bundle them all
+     * in a transaction.
+     *
+     * However, I'm am unsure if the added speed is worth the added complexity.
+     *
+     * @param argContext A context
+     * @param argEpisodes The episodes which should be inserted
+     * @return True if the items was inserted successfully
+     */
+    public boolean insert(@NonNull Context argContext, @NonNull List<FeedItem> argEpisodes) {
+        PodcastOpenHelper helper = PodcastOpenHelper.getInstance(argContext);
+        SQLiteDatabase db = helper.getWritableDatabase();
+        try {
+            db.beginTransaction();
+            FeedItem randomEpisode = argEpisodes.get(0);
+            List<Pair<String, Object>> keyValues = getEpisodeValues(randomEpisode, false);
 
+            Pair<String, Object> pair;
+            StringBuilder builder = new StringBuilder();
+            builder.append("INSERT INTO ");
+            builder.append(ItemColumns.TABLE_NAME);
+            builder.append(" (");
+            for (int i = 0; i < keyValues.size(); i++) {
+                pair = keyValues.get(i);
+                builder.append(pair.first);
+                if (i != keyValues.size()-1) {
+                    builder.append(", ");
+                }
+            }
+            builder.append(" ) VALUES (");
+            for (int i = 0; i < keyValues.size(); i++) {
+                builder.append("?");
+                if (i != keyValues.size()-1) {
+                    builder.append(", ");
+                }
+            }
+            builder.append(")");
+            String sql = builder.toString();
+
+
+            SQLiteStatement statement = db.compileStatement(sql);
+
+
+            for (FeedItem episode : argEpisodes) {
+
+                keyValues = getEpisodeValues(episode, false);
+                statement.clearBindings();
+
+                Object value;
+                for (int i = 0; i < keyValues.size(); i++) {
+                    pair = keyValues.get(i);
+                    value = pair.second;
+
+                    int index = i+1;
+                    if (value instanceof String) {
+                        statement.bindString(index, (String)value);
+                    } else if (value instanceof Boolean){
+                        long intVal = (Boolean)value ? 1 : 0;
+                        statement.bindLong(index, intVal);
+                    } else {
+                        statement.bindLong(index, Long.valueOf(value.toString()));
+                    }
+                }
+
+                statement.executeInsert();
+            }
+
+            db.setTransactionSuccessful(); // This commits the transaction if there were no exceptions
+
+            return true;
+
+        } catch (Exception e) {
+            Log.w("Exception:", e);
+            return false;
+        } finally {
+            db.endTransaction();
+        }
     }
 
     public ContentProviderOperation persist(@NonNull Subscription argSubscription) {
@@ -194,6 +285,33 @@ public class LibraryPersistency {
         return cv;
     }
 
+    private List<Pair<String, Object>> getEpisodeValues(@NonNull FeedItem argItem, Boolean silent) {
+        List<Pair<String, Object>> map = new LinkedList<>();
+        map.add(new Pair<String, Object>(ItemColumns.TITLE, argItem.getTitle()));
+        map.add(new Pair<String, Object>(ItemColumns.CONTENT, argItem.getDescription()));
+        map.add(new Pair<String, Object>(ItemColumns.PATHNAME, argItem.getFilename()));
+        map.add(new Pair<String, Object>(ItemColumns.SUBS_ID, argItem.getSubscriptionId()));
+        map.add(new Pair<String, Object>(ItemColumns.URL, argItem.getURL()));
+        map.add(new Pair<String, Object>(ItemColumns.FILESIZE, argItem.getFilesize()));
+        map.add(new Pair<String, Object>(ItemColumns.OFFSET, argItem.getOffset()));
+        map.add(new Pair<String, Object>(ItemColumns.STATUS, argItem.getStatus()));
+        map.add(new Pair<String, Object>(ItemColumns.LISTENED, argItem.getListenedValue()));
+        map.add(new Pair<String, Object>(ItemColumns.PRIORITY, argItem.getPriority()));
+        map.add(new Pair<String, Object>(ItemColumns.IMAGE_URL, argItem.getArtwork(mContext)));
+        map.add(new Pair<String, Object>(ItemColumns.IS_DOWNLOADED, argItem.isDownloaded()));
+
+        Date date = argItem.getDateTime();
+        if (date != null) {
+            long time = date.getTime();
+            map.add(new Pair<String, Object>(ItemColumns.PUB_DATE, time));
+        }
+
+        if (!silent)
+            map.add(new Pair<String, Object>(ItemColumns.LAST_UPDATE, System.currentTimeMillis()));
+
+        return map;
+    }
+
     public static FeedItem fetchEpisodeFromCursor(Cursor cursor,
                                                   FeedItem item)
     {
@@ -240,13 +358,12 @@ public class LibraryPersistency {
             return false;
     }
 
-    private long getId(String argUri) {
-        String s = argUri;
+    private long getId(@NonNull String argUri) {
         int res = 0;
         int p = 1;
-        int i = s.length()-1;
+        int i = argUri.length()-1;
         while(i >= 0){
-            int d = s.charAt(i) - '0';
+            int d = argUri.charAt(i) - '0';
             if (d>=0 && d<=9)
                 res += d * p;
             else
