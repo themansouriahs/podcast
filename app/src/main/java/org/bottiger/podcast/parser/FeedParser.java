@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringDef;
+import android.support.v4.util.Pair;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Xml;
@@ -45,6 +46,9 @@ public class FeedParser {
     private static final String TAG = "FeedParser";
 
     private String[] DURATION_FORMATS = {"HH:mm:ss", "mm:ss"};
+
+    @Nullable
+    private DateUtils.Hint mDateFormatHint = null;
 
     // We don't use namespaces
     private static final String ns = null;
@@ -361,7 +365,7 @@ public class FeedParser {
                             episode.setPubDate(DateUtils.preventDateInTheFutre(date));
                         }
                     } catch (Exception e) {
-                        Log.w(TAG, "Could not parse date from subscription: " + argSubscription);
+                        Log.w(TAG, "Could not parse date from subscription: " + argSubscription + " e: " + e.toString());
                         String[] keys = new String[1];
                         String[] values = new String[1];
 
@@ -494,8 +498,8 @@ public class FeedParser {
         parser.require(XmlPullParser.START_TAG, ns, EPISODE_PUB_DATE_TAG);
         String pubDate = readText(parser);
         parser.require(XmlPullParser.END_TAG, ns, EPISODE_PUB_DATE_TAG);
-        //return DateUtils.parseRFC3339Date(pubDate);
-        return DateUtils.parse(pubDate);
+
+        return cacheDateFormat(pubDate);
     }
 
     // Processes pubdate tag of an item in the feed.
@@ -503,25 +507,15 @@ public class FeedParser {
         parser.require(XmlPullParser.START_TAG, ns, SUBSCRIPTION_PUB_DATE_TAG);
         String pubDate = readText(parser);
         parser.require(XmlPullParser.END_TAG, ns, SUBSCRIPTION_PUB_DATE_TAG);
-        //return DateUtils.parseRFC3339Date(pubDate);
-        return DateUtils.parse(pubDate);
+
+        return cacheDateFormat(pubDate);
     }
 
-    // Processes link tags in the feed.
-/*    private String readLink(XmlPullParser parser) throws IOException, XmlPullParserException {
-        String link = "";
-        parser.require(XmlPullParser.START_TAG, ns, EPISODE_LINK_TAG);
-        String tag = parser.getName();
-        String relType = parser.getAttributeValue(null, "rel");
-        if (tag.equals(EPISODE_LINK_TAG)) {
-            //if (relType.equals("alternate")){
-            //    link = parser.getAttributeValue(null, "href");
-            //    parser.nextTag();
-            //}
-        }
-        parser.require(XmlPullParser.END_TAG, ns, EPISODE_LINK_TAG);
-        return link;
-    }*/
+    private Date cacheDateFormat(@NonNull String argDate) throws IOException, XmlPullParserException, ParseException {
+        Pair<Date, DateUtils.Hint> parsedDate = DateUtils.parse(argDate, mDateFormatHint);
+        mDateFormatHint = parsedDate.second;
+        return parsedDate.first;
+    }
 
     // Processes link tags in the feed.
     private EpisodeEnclosure readEnclosure(XmlPullParser parser) throws IOException, XmlPullParserException {
