@@ -30,7 +30,7 @@ public class SlimEpisode extends BaseEpisode implements Parcelable {
     private String mDescription;
     private long mDuration = -1;
     private int mPriority;
-    private URL mArtworkUrl;
+    private String mArtworkUrl;
     private long mOffset;
     private long mFilesize = 0;
 
@@ -65,7 +65,7 @@ public class SlimEpisode extends BaseEpisode implements Parcelable {
         if (mArtworkUrl == null)
             return null;
 
-        return mArtworkUrl.toString();
+        return mArtworkUrl;
     }
 
     @Override
@@ -143,7 +143,7 @@ public class SlimEpisode extends BaseEpisode implements Parcelable {
     }
 
     @Override
-    public void setArtwork(@NonNull URL argUrl) {
+    public void setArtwork(@NonNull String argUrl) {
         mArtworkUrl = argUrl;
     }
 

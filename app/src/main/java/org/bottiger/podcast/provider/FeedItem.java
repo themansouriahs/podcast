@@ -864,12 +864,12 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
     }
 
     @Override
-    public void setArtwork(@NonNull URL argUrl) {
-		if (image != null && image.equals(argUrl.toString()))
+    public void setArtwork(@NonNull String argUrl) {
+		if (image != null && image.equals(argUrl))
 			return;
 
-		image = argUrl.toString();
-		notifyPropertyChanged();
+		image = argUrl;
+		notifyPropertyChanged(EpisodeChanged.CHANGED);
     }
 
     public String getAuthor() {
@@ -945,9 +945,15 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
         notifyPropertyChanged(EpisodeChanged.CHANGED);
 	}
 
-	public void setDescription(String content2) {
-		this.content = Jsoup.parse(content2).text();
-		notifyPropertyChanged();
+	public void setDescription(@Nullable String argHTMLDescription) {
+		if (argHTMLDescription == null) {
+			return;
+		}
+
+		this.content = argHTMLDescription;
+		//this.content = Jsoup.parse(content2).text();
+
+		notifyPropertyChanged(EpisodeChanged.CHANGED);
 	}
 
 	public void setPageLink(String argLink) {

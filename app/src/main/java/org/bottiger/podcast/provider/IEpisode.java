@@ -40,7 +40,7 @@ public interface IEpisode {
 
     void setTitle(@NonNull String argTitle);
     void setUrl(@NonNull URL argUrl);
-    void setArtwork(@NonNull URL argUrl);
+    void setArtwork(@NonNull String argUrl);
     void setDescription(@NonNull String argDescription);
     boolean setDuration(long argDurationMs);
     void setOffset(@Nullable ContentResolver contentResolver, long i);

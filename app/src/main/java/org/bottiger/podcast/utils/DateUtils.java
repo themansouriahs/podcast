@@ -171,7 +171,7 @@ public class DateUtils {
             //simpleDateFormat = new SimpleDateFormat(dateFormat, Locale.US);
             simpleDateFormat = new SimpleDateFormat(dateFormat, Locale.getDefault());
             simpleDateFormat.setLenient(false); // Don't automatically convert invalid date.
-            
+
             sSimpleDateFormatFormat = dateFormat;
             sSimpleDateFormatCache = simpleDateFormat;
         }

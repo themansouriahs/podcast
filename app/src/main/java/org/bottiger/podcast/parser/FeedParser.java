@@ -451,8 +451,7 @@ public class FeedParser {
             case ITUNES_IMAGE_TAG: {
                 String image = parser.getAttributeValue(null, ITUNES_IMAGE_HREF);
                 if (StrUtils.isValidUrl(image)) {
-                    URL url = new URL(image);
-                    episode.setArtwork(url);
+                    episode.setArtwork(image);
                 }
                 parser.nextTag();
                 break;
@@ -585,12 +584,13 @@ public class FeedParser {
 
     // For the tags title and summary, extracts their text values.
     private String readText(XmlPullParser parser) throws IOException, XmlPullParserException {
-        String result = "";
         if (parser.next() == XmlPullParser.TEXT) {
-            result = parser.getText();
+            String result = parser.getText();
             parser.nextTag();
+            return result;
         }
-        return result;
+        
+        return "";
     }
 
     private boolean isParsingSlimSubscription() {
