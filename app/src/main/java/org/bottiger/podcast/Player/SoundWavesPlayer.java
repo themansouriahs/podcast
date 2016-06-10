@@ -129,9 +129,10 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         setOnBufferingUpdateListener(bufferListener);
         setOnErrorListener(errorListener);
 
+        seekTo(startPos);
+
         prepare();
 
-        seekTo(startPos);
         IEpisode episode = PlayerService.getCurrentItem();
         if (episode != null) {
             long duration = getDuration();

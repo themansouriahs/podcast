@@ -10,6 +10,9 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Message;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
@@ -69,6 +72,13 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener, ExoPlayer
 
     private CoordinatorLayout.LayoutParams params = new CoordinatorLayout.LayoutParams(0 ,0);
     private int[] loc = new int[2];
+
+    // For the Chronometer
+    private boolean mVisible;
+    private boolean mStarted;
+    private boolean mRunning;
+
+    private static final int TICK_WHAT = 2;
 
     private OnSeekBarChangeListener onSeekBarChangeListener = new OnSeekBarChangeListener() {
 
@@ -263,14 +273,6 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener, ExoPlayer
         }
     }
 
-    @Subscribe
-    public void setProgressMs(PlayerStatusProgressData argPlayerProgress) {
-        if (argPlayerProgress.progressMs < 0)
-            return;
-
-        setProgressMs(argPlayerProgress.progressMs);
-    }
-
     private void setProgressMs(long progressMs) {
         if (isTouching()) {
             return;
@@ -399,6 +401,7 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener, ExoPlayer
         if (mIsPlaying) {
             float progress = currentPositionMs / mEpisode.getDuration() * RANGE_MAX;
             setProgress((int) progress);
+            updateRunning();
         }
     }
 
@@ -432,4 +435,27 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener, ExoPlayer
     public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
 
     }
+
+    private void updateRunning() {
+        boolean running = mVisible && mStarted;
+        if (running != mIsPlaying) {
+            if (running) {
+                setProgressMs(SoundWaves.getAppContext(getContext()).getPlayer().getCurrentPosition());
+                mHandler.sendMessageDelayed(Message.obtain(mHandler, TICK_WHAT), 1000);
+            } else {
+                mHandler.removeMessages(TICK_WHAT);
+            }
+            mIsPlaying = running;
+        }
+    }
+
+    private Handler mHandler = new Handler() {
+        public void handleMessage(Message m) {
+            if (mIsPlaying) {
+                //updateText(SystemClock.elapsedRealtime());
+                setProgressMs(SoundWaves.getAppContext(getContext()).getPlayer().getCurrentPosition());
+                sendMessageDelayed(Message.obtain(this, TICK_WHAT), 1000);
+            }
+        }
+    };
 }

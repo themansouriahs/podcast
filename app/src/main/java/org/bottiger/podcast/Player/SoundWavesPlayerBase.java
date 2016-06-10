@@ -185,8 +185,9 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
 
     @Override
     public void seekTo(int msec) throws IllegalStateException {
-        long seekPosition = mExoplayer.getDuration() == ExoPlayer.UNKNOWN_TIME ? 0 : Math.min(Math.max(0, msec), getDuration());
-        mExoplayer.seekTo(seekPosition);
+        //long seekPosition = mExoplayer.getDuration() == ExoPlayer.UNKNOWN_TIME ? 0 : Math.min(Math.max(0, msec), getDuration());
+        //mExoplayer.seekTo(seekPosition);
+        mExoplayer.seekTo(msec);
     }
 
     @Override

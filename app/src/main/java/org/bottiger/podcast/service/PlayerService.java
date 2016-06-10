@@ -520,6 +520,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 	public long seek(long offset) {
 		offset = offset < 0 ? 0 : offset;
 
+		mItem.setOffset(getContentResolver(), offset);
 		return mPlayer.seek(offset);
 
 	}

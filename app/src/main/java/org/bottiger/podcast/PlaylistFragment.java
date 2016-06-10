@@ -134,9 +134,8 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
     @Override
     public void onDestroyView() {
         SoundWaves.getBus().unregister(mAdapter);
-        SoundWaves.getBus().unregister(mPlayerSeekbar);
-        //SoundWaves.getBus().unregister(mCurrentTime);
 
+        SoundWaves.getAppContext(getContext()).getPlayer().removeListener(mPlayerSeekbar);
         SoundWaves.getAppContext(getContext()).getPlayer().removeListener(mCurrentTime);
         SoundWaves.getAppContext(getContext()).getPlayer().removeListener(mPlayPauseButton);
         super.onDestroyView();
@@ -201,9 +200,8 @@ public class PlaylistFragment extends AbstractEpisodeFragment implements OnShare
 
 
         SoundWaves.getBus().register(mAdapter);
-        SoundWaves.getBus().register(mPlayerSeekbar);
-        //SoundWaves.getBus().register(mCurrentTime);
 
+        SoundWaves.getAppContext(getContext()).getPlayer().addListener(mPlayerSeekbar);
         SoundWaves.getAppContext(getContext()).getPlayer().addListener(mCurrentTime);
         SoundWaves.getAppContext(getContext()).getPlayer().addListener(mPlayPauseButton);
 
