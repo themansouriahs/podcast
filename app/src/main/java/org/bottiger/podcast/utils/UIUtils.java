@@ -438,7 +438,12 @@ public class UIUtils {
         return color;
     }
 
+    @Deprecated
     public static boolean isInNightMode() {
+        return isInNightMode(SoundWaves.getAppContext().getResources());
+    }
+
+    public static boolean isInNightMode(@NonNull Resources argResources) {
 
         if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES)
             return true;
@@ -446,7 +451,7 @@ public class UIUtils {
         if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_NO)
             return false;
 
-        int currentNightMode = SoundWaves.getAppContext().getResources().getConfiguration().uiMode
+        int currentNightMode = argResources.getConfiguration().uiMode
                 & Configuration.UI_MODE_NIGHT_MASK;
 
         switch (currentNightMode) {

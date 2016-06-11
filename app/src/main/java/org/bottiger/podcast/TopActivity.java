@@ -3,11 +3,14 @@ package org.bottiger.podcast;
 import android.content.ComponentName;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
+import android.support.annotation.ColorInt;
+import android.support.annotation.ColorRes;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -133,16 +136,6 @@ public class TopActivity extends AppCompatActivity {
         return true;
     }
 
-    @Nullable
-    protected Playlist getPlaylist() {
-        PlayerService ps = PlayerService.getInstance();
-
-        if (ps != null)
-            return ps.getPlaylist();
-
-        return null;
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         mMenu = menu;
@@ -221,19 +214,15 @@ public class TopActivity extends AppCompatActivity {
             return;
 
         MenuItem item = argMenu.findItem(R.id.menu_download_manager);
-        PlayerService ps = PlayerService.getInstance();
 
         // Tint the icon
         // http://stackoverflow.com/questions/26780046/menuitem-tinting-on-appcompat-toolbar
         Drawable drawable = item.getIcon();
         drawable = DrawableCompat.wrap(drawable);
         drawable = drawable.getConstantState().newDrawable(); // clone it.
-        DrawableCompat.setTint(drawable, ColorUtils.getIconColor(this));
-        //DrawableCompat.setTint(drawable, ColorUtils.getIconColor(this));
+        @ColorInt int color = UIUtils.isInNightMode(this.getResources()) ? ContextCompat.getColor(this, R.color.pitch_black) : ContextCompat.getColor(this, R.color.white_opaque);
+        DrawableCompat.setTint(drawable, color);
         argMenu.findItem(R.id.menu_download_manager).setIcon(drawable);
-
-        if (ps == null)
-            return;
 
         item.setVisible(DownloadService.isRunning());
     }
