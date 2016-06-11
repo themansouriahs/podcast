@@ -53,8 +53,6 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
 
     @PlayerType int mType;
 
-    private static final boolean ANDROID_ENGINE_AS_DEFAULT = true;
-
     private android.media.MediaPlayer mDefaultMediaPlayer;
     private NDKMediaPlayer mCustomMediaPlayer;
 
@@ -105,13 +103,6 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
 
     @Override
     public float getCurrentSpeedMultiplier() {
-        /*
-        switch (mType) {
-            case EXOPLAYER: {
-                return mExoplayer.getPlaybackState();
-            }
-        }*/
-
         return PlaybackSpeed.DEFAULT; // default speed is 1x
     }
 
@@ -192,57 +183,22 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
 
     @Override
     public void setAudioStreamType(int streamtype) {
-        switch (mType) {
-            case ANDROID: {
-                mDefaultMediaPlayer.setAudioStreamType(streamtype);
-                break;
-            }
-            case SOUNDWAVES: {
-                mCustomMediaPlayer.setAudioStreamType(streamtype);
-                break;
-            }
-        }
     }
 
     @Override
     public void setEnableSpeedAdjustment(boolean enableSpeedAdjustment) {
-        switch (mType) {
-            case SOUNDWAVES: {
-                mCustomMediaPlayer.setEnableSpeedAdjustment(enableSpeedAdjustment);
-            }
-        }
     }
 
     @Override
     public void setLooping(boolean loop) {
-        switch (mType) {
-            case ANDROID: {
-                mDefaultMediaPlayer.setLooping(loop);
-                break;
-            }
-            case SOUNDWAVES: {
-                mCustomMediaPlayer.setLooping(loop);
-                break;
-            }
-        }
     }
 
     @Override
     public void setPitchStepsAdjustment(float pitchSteps) {
-        switch (mType) {
-            case SOUNDWAVES: {
-                mCustomMediaPlayer.setPitchStepsAdjustment(pitchSteps);
-            }
-        }
     }
 
     @Override
     public void setPlaybackPitch(float f) {
-        switch (mType) {
-            case SOUNDWAVES: {
-                mCustomMediaPlayer.setPlaybackPitch(f);
-            }
-        }
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -253,39 +209,14 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
 
     @Override
     public void setSpeedAdjustmentAlgorithm(int algorithm) {
-        switch (mType) {
-            case SOUNDWAVES: {
-                mCustomMediaPlayer.setSpeedAdjustmentAlgorithm(algorithm);
-            }
-        }
     }
 
     @Override
     public void setVolume(float leftVolume, float rightVolume) {
-        switch (mType) {
-            case ANDROID: {
-                mDefaultMediaPlayer.setVolume(leftVolume, rightVolume);
-                break;
-            }
-            case SOUNDWAVES: {
-                mCustomMediaPlayer.setVolume(leftVolume, rightVolume);
-                break;
-            }
-        }
     }
 
     @Override
     public void setWakeMode(Context context, int mode) {
-        switch (mType) {
-            case ANDROID: {
-                mDefaultMediaPlayer.setWakeMode(context, mode);
-                break;
-            }
-            case SOUNDWAVES: {
-                mCustomMediaPlayer.setWakeMode(context, mode);
-                break;
-            }
-        }
     }
 
     @Override
