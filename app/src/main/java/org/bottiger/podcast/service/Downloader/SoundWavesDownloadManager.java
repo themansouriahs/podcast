@@ -110,7 +110,7 @@ public class SoundWavesDownloadManager extends Observable {
     public SoundWavesDownloadManager(@NonNull Context argContext) {
         mContext = argContext;
         mDownloadCompleteCallback = new DownloadCompleteCallback(argContext);
-        mProgressPublisher = new DownloadProgressPublisher((SoundWaves) SoundWaves.getAppContext(), this);
+        mProgressPublisher = new DownloadProgressPublisher(SoundWaves.getAppContext(argContext), this);
     }
 
     /**

@@ -64,7 +64,7 @@ public class PaletteHelper {
                         //mLock.lock();
                         final Palette palette = Palette.from(resource).generate();// .generate(resource, PALETTE_SIZE);
 
-                        sLock.lock();
+                        //sLock.lock();
                         try {
 
                             if (palette != null) {
@@ -82,7 +82,7 @@ public class PaletteHelper {
 
                             }
                         } finally {
-                            sLock.unlock();
+                            //sLock.unlock();
                         }
                     }
 

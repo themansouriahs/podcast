@@ -380,8 +380,8 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 				update(argContext);
 				File file = new File(getAbsolutePath());
 				if (file.exists() && file.delete()) {
-                    DownloadProgressPublisher.deleteEpisode(this);
-					//Playlist.refresh(argContext);
+					// FIXME Investigate this
+                    //DownloadProgressPublisher.deleteEpisode(this);
 					notifyPropertyChanged(EpisodeChanged.CHANGED);
 					return true;
 				}
@@ -1062,7 +1062,10 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 	DownloadProgress progressChanged;
 	long lastUpdate2 = System.currentTimeMillis();
 	protected void notifyPropertyChanged(@EpisodeChanged.Action int argAction) {
-		if (!mIsParsing && argAction != EpisodeChanged.PROGRESS) {
+        if (mIsParsing)
+            return;
+
+		if (argAction != EpisodeChanged.PROGRESS) {
 			EpisodeChanged ec = new EpisodeChanged(getId(), getURL(), argAction);
 			SoundWaves.getRxBus().send(ec);
 		}

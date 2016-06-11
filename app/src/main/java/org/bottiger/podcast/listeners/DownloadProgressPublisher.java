@@ -15,6 +15,7 @@ import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.Downloader.engines.IDownloadEngine;
 
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -25,16 +26,13 @@ public class DownloadProgressPublisher {
 	 * How often the UI should refresh
 	 */
 	private static final long REFRESH_INTERVAL = 50; // 16 ms => 60 fps
-	//TimeUnit.MILLISECONDS.convert(1,TimeUnit.SECONDS);
-
-    private static SoundWaves mApplicationContext;
 
     /**
      * Unregister an Observer from being updated on progress updates
      *
      * Returns true if the observer was found and removed
      */
-    public static Handler sHandler;
+    private Handler mHandler;
 
 	/**
 	 * Handler events types
@@ -44,16 +42,20 @@ public class DownloadProgressPublisher {
     private static final int DELETED = 3;
 
     public DownloadProgressPublisher(@NonNull SoundWaves context, @NonNull SoundWavesDownloadManager argDownloadManager) {
-        sHandler = new DownloadProgressHandler(argDownloadManager);
-        mApplicationContext = context;
+        // FIXME: Is this really enough?
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            mHandler = new DownloadProgressHandler(context, argDownloadManager);
+        }
     }
 
     private static class DownloadProgressHandler extends Handler {
 
+        private final SoundWaves mApplicationContext;
         private SoundWavesDownloadManager mDownloadManager;
 
-        public DownloadProgressHandler(@NonNull SoundWavesDownloadManager argDownloadManager) {
+        DownloadProgressHandler(@NonNull SoundWaves context, @NonNull SoundWavesDownloadManager argDownloadManager) {
             mDownloadManager = argDownloadManager;
+            mApplicationContext = context;
         }
 
         private List<FeedItem> mUpdateEpisodess = new LinkedList<>();
@@ -116,15 +118,15 @@ public class DownloadProgressPublisher {
                         }
 
                         if (!mUpdateEpisodess.isEmpty()) {
-                            msg = sHandler.obtainMessage(REFRESH_UI);
-                            sHandler.sendMessageDelayed(msg, REFRESH_INTERVAL);
+                            msg = DownloadProgressHandler.this.obtainMessage(REFRESH_UI);
+                            DownloadProgressHandler.this.sendMessageDelayed(msg, REFRESH_INTERVAL);
                         }
                         break;
                     }
                     case ADD_ID: {
                         FeedItem episode = (FeedItem) msg.obj;
                         mUpdateEpisodess.add(episode);
-                        refreshUI();
+                        refreshUI(DownloadProgressHandler.this);
                         break;
                     }
                     case DELETED: {
@@ -141,24 +143,24 @@ public class DownloadProgressPublisher {
 	}
 
     public void addEpisode(@NonNull FeedItem argEpisode) {
-        Message msg = sHandler.obtainMessage(ADD_ID);
+        Message msg = mHandler.obtainMessage(ADD_ID);
         msg.obj = argEpisode;
-        sHandler.sendMessage(msg);
+        mHandler.sendMessage(msg);
     }
 
-    public static void deleteEpisode(@NonNull FeedItem argEpisode) {
-        Message msg = sHandler.obtainMessage(DELETED);
+    public static void deleteEpisode(@NonNull DownloadProgressHandler argHandler, @NonNull FeedItem argEpisode) {
+        Message msg = argHandler.obtainMessage(DELETED);
         msg.obj = argEpisode;
-        sHandler.sendMessage(msg);
+        argHandler.sendMessage(msg);
     }
 
 	/**
 	 * Refrersh the UI handler
 	 */
-	private static void refreshUI() {
-		sHandler.removeMessages(REFRESH_UI);
-		Message msg = sHandler.obtainMessage(REFRESH_UI);
-		sHandler.sendMessage(msg);
+	private static void refreshUI(@NonNull DownloadProgressHandler argHandler) {
+        argHandler.removeMessages(REFRESH_UI);
+		Message msg = argHandler.obtainMessage(REFRESH_UI);
+        argHandler.sendMessage(msg);
 	}
 
 }

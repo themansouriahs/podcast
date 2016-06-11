@@ -327,6 +327,7 @@ public class FeedParser {
             episode = new SlimEpisode();
         } else {
             FeedItem item = new FeedItem(true);
+            item.setIsParsing(true);
             item.setFeed((Subscription)argSubscription);
             episode = item;
         }

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 
 import org.bottiger.podcast.SoundWaves;
@@ -47,8 +48,13 @@ public class DownloadService extends IntentService {
      */
     public DownloadService() {
         super(SERVICE_NAME);
-        mSoundWavesDownloadManager = new SoundWavesDownloadManager(this);
-        mProgressPublisher = new DownloadProgressPublisher((SoundWaves) SoundWaves.getAppContext(), mSoundWavesDownloadManager);
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        mSoundWavesDownloadManager = new SoundWavesDownloadManager(getApplicationContext());
+        mProgressPublisher = new DownloadProgressPublisher(SoundWaves.getAppContext(getApplicationContext()), mSoundWavesDownloadManager);
     }
 
     /**
@@ -155,8 +161,10 @@ public class DownloadService extends IntentService {
         boolean startedManually = argIntent.getBooleanExtra(PARAM_IN_MANUAL_START, false);
 
         IEpisode episode = null;
-        if (id > 0) {
-            episode = SoundWaves.getAppContext(this).getLibraryInstance().getEpisode(id);
+        if (!TextUtils.isEmpty(url)) {
+            episode = SoundWaves.getAppContext(this).getLibraryInstance().getEpisode(url);
+        } else {
+            Log.wtf(TAG, "wtf");
         }
 
         QueueEpisode queueEpisode = new QueueEpisode(episode);
