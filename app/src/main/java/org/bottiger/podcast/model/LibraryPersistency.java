@@ -164,7 +164,8 @@ public class LibraryPersistency {
                     }
                 }
 
-                statement.executeInsert();
+                long inserted_id = statement.executeInsert();
+                episode.setId(inserted_id);
             }
 
             db.setTransactionSuccessful(); // This commits the transaction if there were no exceptions

@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
@@ -38,7 +39,7 @@ import rx.schedulers.Schedulers;
 /**
  * Created by aplb on 04-10-2015.
  */
-public class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemViewHolder> {
+class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemViewHolder> {
 
     private static final String TAG = "DownloadManagerAdapter";
 
@@ -49,33 +50,14 @@ public class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemVie
 
     private TextView mEmptyTextView;
 
-    public DownloadManagerAdapter(@NonNull Context argContext, @NonNull TextView argEmptyTextView) {
+    private Subscription mRxSubscription = null;
+
+    DownloadManagerAdapter(@NonNull Context argContext, @NonNull TextView argEmptyTextView) {
         super();
         mContext = argContext;
         mEmptyTextView = argEmptyTextView;
 
         mDownloadManager = SoundWaves.getAppContext(mContext).getDownloadManager();
-
-        SoundWaves.getRxBus().toObserverable()
-                .onBackpressureDrop()
-                .ofType(SoundWavesDownloadManager.DownloadManagerChanged.class)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<SoundWavesDownloadManager.DownloadManagerChanged>() {
-                    @Override
-                    public void call(SoundWavesDownloadManager.DownloadManagerChanged downloadManagerChanged) {
-                        Log.d(TAG, "DownloadManagerChanged, size: " + downloadManagerChanged.queueSize);
-                        DownloadManagerAdapter.this.notifyDataSetChanged();
-
-                        setEmptyTextViewVisibility();
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        VendorCrashReporter.report("subscribeError" , throwable.toString());
-                        Log.w(TAG, "Erorr");
-                    }
-                });
 
         setEmptyTextViewVisibility();
     }
@@ -101,6 +83,7 @@ public class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemVie
             return;
 
         DownloadViewModel viewModel = new DownloadViewModel(mContext, this, (FeedItem)episode, position); // FIXME no type casting
+        viewModel.subscribe();
         mViewModels.add(viewModel);
         holder.getBinding().setVariable(BR.viewModel, viewModel);
 
@@ -108,6 +91,60 @@ public class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemVie
         if (!TextUtils.isEmpty(artWork)) {
             ImageLoaderUtils.loadImageInto(holder.mImageView, artWork, null, true, false, true);
         }
+    }
+
+    @Override
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+        mRxSubscription = SoundWaves.getRxBus().toObserverable()
+                .onBackpressureDrop()
+                .ofType(SoundWavesDownloadManager.DownloadManagerChanged.class)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<SoundWavesDownloadManager.DownloadManagerChanged>() {
+                    @Override
+                    public void call(SoundWavesDownloadManager.DownloadManagerChanged downloadManagerChanged) {
+                        Log.d(TAG, "DownloadManagerChanged, size: " + downloadManagerChanged.queueSize);
+
+                        switch (downloadManagerChanged.action) {
+                            case SoundWavesDownloadManager.ADDED: {
+                                break;
+                            }
+                            case SoundWavesDownloadManager.CLEARED: {
+                                break;
+                            }
+                            case SoundWavesDownloadManager.REMOVED: {
+                                break;
+                            }
+                        }
+
+                        clearViewModels();
+                        DownloadManagerAdapter.this.notifyDataSetChanged();
+
+                        setEmptyTextViewVisibility();
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        VendorCrashReporter.report("subscribeError" , throwable.toString());
+                        Log.w(TAG, "Erorr");
+                    }
+                });
+    }
+
+    @Override
+    public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
+        if (mRxSubscription != null && !mRxSubscription.isUnsubscribed()) {
+            mRxSubscription.unsubscribe();
+        }
+
+        clearViewModels();
+    }
+
+    private void clearViewModels() {
+        for (int i = 0; i < mViewModels.size(); i++) {
+            mViewModels.get(i).unsubscribe();
+        }
+        mViewModels.clear();
     }
 
     @Override
@@ -145,7 +182,7 @@ public class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemVie
     }
 
     private void setEmptyTextViewVisibility() {
-        int visibility = mDownloadManager.getQueueSize() != 0 ? View.GONE : View.VISIBLE;
+        int visibility = getItemCount() != 0 ? View.GONE : View.VISIBLE;
         mEmptyTextView.setVisibility(visibility);
     }
 }

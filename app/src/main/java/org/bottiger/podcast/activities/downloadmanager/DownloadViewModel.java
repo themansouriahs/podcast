@@ -40,7 +40,7 @@ public class DownloadViewModel {
 
     private Context mContext;
     private DownloadManagerAdapter mAdapter;
-    private IEpisode mEpisode;
+    private FeedItem mEpisode;
     private int mPosition;
 
     private Subscription mRxSubscription = null;
@@ -54,14 +54,16 @@ public class DownloadViewModel {
         mEpisode = argEpisode;
         mPosition = argPosition;
         updateProgress(0); //updateProgress(isFirst() ? 60 : 0);
+    }
 
-        mRxSubscription = argEpisode._downloadProgressChangeObservable
+    public void subscribe() {
+        mRxSubscription = getEpisode()._downloadProgressChangeObservable
                 .onBackpressureDrop()
                 .ofType(DownloadProgress.class)
                 .filter(new Func1<DownloadProgress, Boolean>() {
                     @Override
                     public Boolean call(DownloadProgress downloadProgress) {
-                        return argEpisode.equals(downloadProgress.getEpisode());
+                        return getEpisode().equals(downloadProgress.getEpisode());
                     }
                 })
                 .subscribeOn(Schedulers.io())
@@ -73,10 +75,6 @@ public class DownloadViewModel {
 
                         if (downloadProgress.getStatus() == DownloadStatus.DOWNLOADING) {
                             updateProgress(downloadProgress.getProgress());
-                        }
-
-                        if (downloadProgress.getStatus() == DownloadStatus.DONE || downloadProgress.getStatus() == DownloadStatus.ERROR) {
-                            mAdapter.notifyDataSetChanged();
                         }
                     }
                 }, new Action1<Throwable>() {
@@ -94,7 +92,8 @@ public class DownloadViewModel {
         }
     }
 
-    public IEpisode getEpisode() {
+    @NonNull
+    public FeedItem getEpisode() {
         return mEpisode;
     }
 

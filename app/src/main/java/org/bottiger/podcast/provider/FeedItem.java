@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.model.events.DownloadProgress;
 import org.bottiger.podcast.listeners.DownloadProgressPublisher;
@@ -729,6 +730,15 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 		return imageURL;
 	}
 
+	public void setId(long argId) {
+		if (id > 0 && argId != id) {
+			VendorCrashReporter.report("duplicate id", "Can not assign a new id"); // NoI18N
+			throw new IllegalStateException("Can not assign a new id"); // NoI18N
+		}
+
+		id = argId;
+	}
+
 	public long getId() {
 		return id;
 	}
@@ -1079,7 +1089,8 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 			_downloadProgressChangeObservable.onNext(progressChanged);
 		}
 
-		if (argAction == EpisodeChanged.PROGRESS && !isDownloaded() && (System.currentTimeMillis()-lastUpdate2)>160) {
+		// !isDownloaded() &&
+		if (argAction == EpisodeChanged.PROGRESS && (System.currentTimeMillis()-lastUpdate2)>160) {
 			lastUpdate2 = System.currentTimeMillis();
 			progressChanged = new DownloadProgress(this, DownloadStatus.DOWNLOADING, (int)getProgress());
 			Log.d(TAG, "Notify progress changed: FeedItemHash: " + hashCode() + " progress: " + (int)getProgress());

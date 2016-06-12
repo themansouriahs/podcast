@@ -45,7 +45,8 @@ public class DownloadManagerActivity extends AppCompatActivity {
 
         TextView emptyText = (TextView) findViewById(R.id.download_empty_text);
 
-        if (emptyText != null) mAdapter = new DownloadManagerAdapter(this, emptyText);
+        if (emptyText != null)
+            mAdapter = new DownloadManagerAdapter(this, emptyText);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.download_queue_list);
         if (mRecyclerView != null) {
@@ -86,6 +87,17 @@ public class DownloadManagerActivity extends AppCompatActivity {
         };
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(mRecyclerView);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mAdapter.onDetachedFromRecyclerView(mRecyclerView);
     }
 
     @Override

@@ -87,7 +87,7 @@ public class DownloadService extends IntentService {
             try {
                 sLock.lock();
                 sQueue.add(episode);
-                postQueueChangedEvent();
+                postQueueChangedEvent(episode.getEpisode(), SoundWavesDownloadManager.ADDED);
             } finally {
                 sLock.unlock();
             }
@@ -107,7 +107,7 @@ public class DownloadService extends IntentService {
         // Locate the next episode to be downloaded.
         try {
             sLock.lock();
-            boolean queueChanced = false;
+            int queueChanced = 0;
 
             for (int i = 0; i < sQueue.size() && !downloadStarted; i++) {
                 episode = sQueue.getFirst();
@@ -119,7 +119,7 @@ public class DownloadService extends IntentService {
                     } else {
                         // in case the download couldn't start
                         sQueue.remove(episode);
-                        queueChanced = true;
+                        queueChanced++;
 
                         // This need to be more general and work for SlimEpisodes
                         if (!(episode.getEpisode() instanceof FeedItem)) {
@@ -129,8 +129,8 @@ public class DownloadService extends IntentService {
                 }
             }
 
-            if (queueChanced) {
-                postQueueChangedEvent();
+            if (queueChanced > 0) {
+                postQueueChangedEvent(null, SoundWavesDownloadManager.UNDEFINED);
             }
 
         } finally {

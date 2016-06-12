@@ -68,6 +68,12 @@ public class SoundWavesDownloadManager extends Observable {
 
     private static final String TAG = "SWDownloadManager";
 
+    public static class DownloadManagerChanged {
+        public int queueSize;
+        public IEpisode episode;
+        public @DownloadManagerEvent int action;
+    }
+
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({OK, NO_STORAGE, OUT_OF_STORAGE, NO_CONNECTION, NEED_PERMISSION})
     public @interface Result {}
@@ -99,6 +105,14 @@ public class SoundWavesDownloadManager extends Observable {
     public static final int ACTION_STREAM_EPISODE = 2;
     public static final int ACTION_DOWNLOAD_MANUALLY = 3;
     public static final int ACTION_DOWNLOAD_AUTOMATICALLY = 4;
+
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({ADDED, REMOVED, CLEARED, UNDEFINED})
+    public @interface DownloadManagerEvent {}
+    public static final int ADDED = 1;
+    public static final int REMOVED = 2;
+    public static final int CLEARED = 3;
+    public static final int UNDEFINED = 4;
 
 	private Context mContext = null;
 
@@ -532,7 +546,7 @@ public class SoundWavesDownloadManager extends Observable {
             StorageUtils.removeExpiredDownloadedPodcasts(mContext);
             StorageUtils.removeTmpFolderCruft();
 
-            notifyDownloadComplete();
+            notifyDownloadComplete(argEpisode);
         }
 
         @Override
@@ -540,12 +554,12 @@ public class SoundWavesDownloadManager extends Observable {
             removeTopQueueItem();
             removeDownloadingEpisode(argEpisode);
             StorageUtils.removeTmpFolderCruft();
-            notifyDownloadComplete();
+            notifyDownloadComplete(argEpisode);
         }
     }
 
-    public void notifyDownloadComplete() {
-        postQueueChangedEvent();
+    public void notifyDownloadComplete(@Nullable IEpisode argFeedItem) {
+        postQueueChangedEvent(argFeedItem, REMOVED);
     }
 
     @Deprecated
@@ -553,9 +567,10 @@ public class SoundWavesDownloadManager extends Observable {
         DownloadService.removeFirst();
     }
 
-    public static DownloadManagerChanged produceDownloadManagerState() {
+    private static DownloadManagerChanged produceDownloadManagerState(@Nullable IEpisode argFeedItem, @DownloadManagerEvent int eventType) {
         final DownloadManagerChanged event = new DownloadManagerChanged();
-        //event.queueSize = mDownloadQueue.size();
+        event.episode = argFeedItem;
+        event.action = eventType;
         event.queueSize = DownloadService.getSize();
 
         return event;
@@ -566,9 +581,6 @@ public class SoundWavesDownloadManager extends Observable {
 
             @Override
             public QueueEpisode call(Boolean argQueueItem2) {
-                //_log("Within Observable");
-                //_doSomeLongOperation_thatBlocksCurrentThread();
-                //mDownloadQueue.remove(argQueueItem);
                 startDownload(argQueueItem);
                 return argQueueItem;
             }
@@ -580,15 +592,11 @@ public class SoundWavesDownloadManager extends Observable {
         return startDownload(argQueueItem);
     }
 
-    public static void postQueueChangedEvent() {
-        final DownloadManagerChanged event = produceDownloadManagerState();
+    public static void postQueueChangedEvent(@Nullable IEpisode argFeedItem, @DownloadManagerEvent int eventType) {
+        final DownloadManagerChanged event = produceDownloadManagerState(argFeedItem, eventType);
 
         Log.d(TAG, "posting DownloadManagerChanged event");
         SoundWaves.getRxBus().send(event);
         Log.d(TAG, "DownloadManagerChanged event posted");
-    }
-
-    public static class DownloadManagerChanged {
-        public int queueSize;
     }
 }
