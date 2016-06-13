@@ -689,9 +689,13 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
         }
 
         FeedItem other = (FeedItem) obj;
-		if (id != other.id) {
-            return false;
+		if (id > 0 && id == other.id) {
+            return true;
         }
+
+		if (!url.equals(other.url)) {
+			return false;
+		}
 
 		return true;
 	}

@@ -90,8 +90,6 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
             addState(PlayerButtonView.STATE_QUEUE, qeueed_icon);
         }
 
-
-
         addDownloadCompletedCallback(new PlayerButtonView.DownloadStatus() {
             @Override
             public void FileComplete() {
@@ -159,6 +157,7 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
 
             final FeedItem item = (FeedItem)getEpisode();
             mRxSubscription = item._downloadProgressChangeObservable
+                    .onBackpressureDrop()
                     .ofType(DownloadProgress.class)
                     .filter(new Func1<DownloadProgress, Boolean>() {
                         @Override

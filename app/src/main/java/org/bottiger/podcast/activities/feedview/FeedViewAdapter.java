@@ -181,6 +181,9 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
         getPalette(episodeViewHolder);
 
         episodeViewHolder.mDownloadButton.setEpisode(item);
+        //episodeViewHolder.mDownloadButton.enabledProgressListener(true);
+
+        SoundWaves.getAppContext(mActivity).getPlayer().addListener(episodeViewHolder.mPlayPauseButton);
         episodeViewHolder.mDownloadButton.enabledProgressListener(true);
 
         if (mPalette != null) {
@@ -213,13 +216,13 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
 
     @Override
     public void onViewAttachedToWindow (EpisodeViewHolder holder) {
-        SoundWaves.getBus().register(holder.mPlayPauseButton);
         super.onViewAttachedToWindow(holder);
     }
 
     @Override
     public void  onViewDetachedFromWindow(EpisodeViewHolder holder) {
-        SoundWaves.getBus().unregister(holder.mPlayPauseButton);
+        SoundWaves.getAppContext(mActivity).getPlayer().removeListener(holder.mPlayPauseButton);
+        holder.mDownloadButton.enabledProgressListener(false);
         super.onViewDetachedFromWindow(holder);
     }
 
