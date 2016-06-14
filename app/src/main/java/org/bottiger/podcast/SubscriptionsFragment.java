@@ -3,6 +3,7 @@ package org.bottiger.podcast;
 import org.bottiger.podcast.adapters.SubscriptionAdapter;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.Library;
+import org.bottiger.podcast.model.events.SubscriptionChanged;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.views.dialogs.DialogOPML;
 
@@ -16,6 +17,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.util.SortedList;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -32,6 +34,8 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
+
+import java.util.List;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -115,7 +119,7 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
         mGridContainerView = (FrameLayout) mContainerView.findViewById(R.id.subscription_grid_container);
 
         //RecycelrView
-        mAdapter = new SubscriptionAdapter(getActivity(), mLibrary, numberOfColumns());
+        mAdapter = new SubscriptionAdapter(getActivity(), numberOfColumns());
         setSubscriptionFragmentLayout(mLibrary.getSubscriptions().size());
 
 		mGridView = (RecyclerView) mContainerView.findViewById(R.id.gridview);
@@ -134,8 +138,11 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
                 .subscribe(new Action1<Subscription>() {
                     @Override
                     public void call(Subscription argSubscription) {
-                        Log.v(TAG, "Recieved Subscription event: " + argSubscription);
-                        setSubscriptionFragmentLayout(mLibrary.getSubscriptions().size());
+                        Log.v(TAG, "Recieved Subscription event: " + argSubscription.getId());
+                        SortedList<Subscription> subscriptions = mLibrary.getSubscriptions();
+                        setSubscriptionFragmentLayout(subscriptions.size());
+
+                        mAdapter.setDataset(subscriptions);
                         mAdapter.notifyDataSetChanged();
                     }
                 }, new Action1<Throwable>() {
@@ -145,6 +152,8 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
                         Log.d(TAG, "error: " + throwable.toString());
                     }
                 });
+
+        mAdapter.setDataset(mLibrary.getSubscriptions());
 
 		return mContainerView;
 

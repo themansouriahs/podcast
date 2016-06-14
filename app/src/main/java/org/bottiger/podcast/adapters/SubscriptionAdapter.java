@@ -4,9 +4,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.graphics.Palette;
+import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
@@ -31,10 +34,14 @@ import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.model.events.SubscriptionChanged;
 import org.bottiger.podcast.playlist.Playlist;
+import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.PaletteHelper;
+
+import java.util.LinkedList;
+import java.util.List;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -54,40 +61,18 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
 
     private final LayoutInflater mInflater;
     private Activity mActivity;
-    private Library mLibrary;
+
+    @Nullable
+    private SortedList<Subscription> mSubscriptions = null;
 
     private int numberOfColumns = 2;
     private int position = -1;
 
-    public SubscriptionAdapter(Activity argActivity, Library argLibrary, int argColumnsCount) {
+    public SubscriptionAdapter(Activity argActivity, int argColumnsCount) {
         mActivity = argActivity;
         mInflater = (LayoutInflater) argActivity
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         numberOfColumns = argColumnsCount;
-        mLibrary = argLibrary;
-
-        SoundWaves.getRxBus().toObserverable()
-                .ofType(SubscriptionChanged.class)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<SubscriptionChanged>() {
-                    @Override
-                    public void call(SubscriptionChanged subscriptionChanged) {
-                        if (subscriptionChanged.getAction() == SubscriptionChanged.ADDED) {
-                            notifyDataSetChanged();
-                        }
-
-                        if (subscriptionChanged.getAction() == SubscriptionChanged.REMOVED) {
-                            notifyDataSetChanged();
-                        }
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        VendorCrashReporter.report("subscribeError" , throwable.toString());
-                        Log.d(TAG, "error: " + throwable.toString());
-                    }
-                });
     }
 
     @Override
@@ -135,7 +120,7 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
 
         Subscription sub = null;
         try {
-            sub = mLibrary.getSubscriptions().get(position);
+            sub = mSubscriptions.get(position);
         } catch (IllegalStateException e) {
             e.printStackTrace();
         }
@@ -146,7 +131,7 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
 
         if (getItemViewType(position) == AUTHENTICATE_TYPE) {
             AuthenticationViewHolder holder = (AuthenticationViewHolder)argHolder;
-            holder.url = sub.getUrl();
+            holder.url = sub.getURLString();
             return;
         }
 
@@ -265,6 +250,9 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
         });
     }
 
+    public void setDataset(@NonNull SortedList<Subscription> argSubscriptions) {
+        mSubscriptions = argSubscriptions;
+    }
 
     @Override
     public void onViewRecycled(RecyclerView.ViewHolder holder) {
@@ -279,7 +267,7 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
 
         Subscription sub = null;
         try {
-            sub = mLibrary.getSubscriptions().get(position);
+            sub = mSubscriptions.get(position);
         } catch (IllegalStateException e) {
             e.printStackTrace();
             return FOOTER_TYPE;
@@ -321,12 +309,10 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
 
     @Override
     public int getItemCount() {
-        int count = mLibrary.getSubscriptions().size();
+        if (mSubscriptions == null)
+            return 0;
 
-        if (count == 0) // If there are 0 subscriptions we do not want to return 1
-            return count;
-
-        return count; // one footer please
+        return mSubscriptions.size();
     }
 
 }

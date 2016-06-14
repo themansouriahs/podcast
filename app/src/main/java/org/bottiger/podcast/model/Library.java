@@ -380,6 +380,8 @@ public class Library {
         } finally {
             mLock.unlock();
         }
+
+        mSubscriptionsChangeObservable.onNext(argSubscription);
     }
 
     private void clearSubscriptions() {
@@ -745,17 +747,10 @@ public class Library {
                             mLock.unlock();
                         }
 
-                        try {
-                            SoundWaves.getAppContext(mContext).getRefreshManager().refreshSync(subscription);
-                        } catch (IOException e) {
-                            VendorCrashReporter.handleException(e);
-                            e.printStackTrace();
-                            return null;
-                        }
-
                         EventLogger.postEvent(mContext, EventLogger.SUBSCRIBE_PODCAST, null, argSubscription.getURLString(), null);
-
                         mSubscriptionsChangeObservable.onNext(subscription);
+
+                        SoundWaves.getAppContext(mContext).getRefreshManager().refresh(subscription, null);
 
                         return subscription;
                     }
