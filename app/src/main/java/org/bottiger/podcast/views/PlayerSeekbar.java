@@ -28,6 +28,7 @@ import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
 
+import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.listeners.EpisodeStatus;
@@ -93,7 +94,10 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener, ExoPlayer
             Log.d("mPaintSeekInfo", "onStopTracking mPaintSeekInfo => " + mPaintSeekInfo);
             mThressholdCounter = -1;
 
-            validateState();
+            if (!validateState()) {
+                return;
+            }
+
             long timeMs = mEpisode.getDuration() * seekBar.getProgress()
                     / RANGE_MAX;
 
@@ -110,7 +114,9 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener, ExoPlayer
         @Override
         public void onStartTrackingTouch(SeekBar seekBar) {
             Log.d("PlayerSeekbar state", "onStartTrackingTouch");
-            validateState();
+            if (!validateState()) {
+                return;
+            }
 
             if (mDurationMs < 0) {
                 mDurationMs = mEpisode.getDuration();
@@ -223,8 +229,11 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener, ExoPlayer
         return mOverlay;
     }
 
+    @Nullable
     public IEpisode getEpisode() {
-        validateState();
+        if (!validateState()) {
+            return null;
+        }
         return mEpisode;
     }
 
@@ -359,14 +368,24 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener, ExoPlayer
         return mEpisode.getArtwork(getContext());
     }
 
-    private void validateState() {
+    private boolean validateState() {
         if (mEpisode == null) {
-            throw new IllegalStateException("Episode needs to be set");
+            if (BuildConfig.DEBUG) {
+                throw new IllegalStateException("Episode needs to be set");
+            } else {
+                return false;
+            }
         }
 
         if (mOverlay == null) {
-            throw new IllegalStateException("Overlay needs to be set");
+            if (BuildConfig.DEBUG) {
+                throw new IllegalStateException("Overlay needs to be set");
+            } else {
+                return false;
+            }
         }
+
+        return true;
     }
 
     private void requestParentTouchRecursive(@NonNull ViewParent argThisParent, boolean argDisallowTouch) {
@@ -386,7 +405,9 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener, ExoPlayer
 
     @Subscribe
     public void onStateChange(EpisodeStatus argStatus) {
-        validateState();
+        if (!validateState()) {
+            return;
+        }
 
         mIsPlaying = argStatus.getStatus() == PlayerStatusObservable.PLAYING;
 
@@ -407,7 +428,9 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener, ExoPlayer
 
     @Override
     public void onStateChanged(boolean playWhenReady, @ExoPlayerWrapper.PlayerState int playbackState) {
-        validateState();
+        if (!validateState()) {
+            return;
+        }
 
         mIsPlaying = playWhenReady && playbackState == ExoPlayerWrapper.STATE_READY;
 
