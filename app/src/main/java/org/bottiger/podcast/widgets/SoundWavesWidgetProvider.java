@@ -31,6 +31,7 @@ import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.player.PlayerStateManager;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.utils.AndroidUtil;
 import org.bottiger.podcast.utils.DateUtils;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.UIUtils;
@@ -83,6 +84,11 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
     static void updateAppWidget(Context context, int appWidgetId, boolean showDescription) {
 
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+
+        if (AndroidUtil.SDK_INT >= 16) {
+            Bundle options = appWidgetManager.getAppWidgetOptions(appWidgetId);
+            showDescription = doShowDescription(options);
+        }
 
         Library library = SoundWaves.getAppContext(context).getLibraryInstance();
         library.loadPlaylistSync(SoundWaves.getAppContext(context).getPlaylist());
@@ -171,22 +177,21 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
                                           @NonNull AppWidgetManager appWidgetManager,
                                           int appWidgetId,
                                           @NonNull Bundle newOptions) {
+
+        boolean showDescription = doShowDescription(newOptions);
+        updateAppWidget(context, appWidgetId, showDescription);
+    }
+
+    @TargetApi(16)
+    private static boolean doShowDescription(@NonNull Bundle newOptions) {
         int minWidth = newOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH); // portrait
         int maxHeight = newOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT); // portrait
 
         int maxWidth = newOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH); // landscape
         int minHeight = newOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT); // landscape
 
-
-        mHeight = maxHeight;
-
-        //float widgetDefaultHeight = context.getResources().getDimension(R.dimen.widget_logo_size);
-        //int widgetDefaultHeightPx = (int)UIUtils.convertDpToPixel(widgetDefaultHeight, context);
-
         // 180 dp = 3 blocks: https://developer.android.com/guide/practices/ui_guidelines/widget_design.html#anatomy
-        boolean showDescription = mHeight > 180;
-
-        updateAppWidget(context, appWidgetId, showDescription);
+        return maxHeight > 180;
     }
 
     private static void attachButtonListeners(Context context, RemoteViews views) {
@@ -245,9 +250,6 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
             }
             if (action.equals(NotificationPlayer.rewindAction)) {
                 transportControls.skipToNext();
-            }
-            if (action.equals(NotificationPlayer.muteAction)) {
-
             }
 
         }

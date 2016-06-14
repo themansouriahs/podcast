@@ -15,15 +15,6 @@
         android:text="@string/widget_playlist_empty"
         android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
-    <!-- Only supported from API 16
-    <ViewStub
-        android:id="@+id/stub_import"
-        android:inflatedId="@+id/widget_player_stub"
-        android:layout="@layout/widget_player"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-        -->
-
     <include layout="@layout/widget_player" />
 
 </RelativeLayout>

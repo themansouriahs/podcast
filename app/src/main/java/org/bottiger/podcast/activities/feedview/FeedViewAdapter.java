@@ -181,7 +181,6 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
         getPalette(episodeViewHolder);
 
         episodeViewHolder.mDownloadButton.setEpisode(item);
-        //episodeViewHolder.mDownloadButton.enabledProgressListener(true);
 
         SoundWaves.getAppContext(mActivity).getPlayer().addListener(episodeViewHolder.mPlayPauseButton);
         episodeViewHolder.mDownloadButton.enabledProgressListener(true);
@@ -254,8 +253,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
         if (mSortOrder == RECENT_FIRST)
             return argPosition;
 
-        int position = argPosition;
-        return getItemCount() - position -1;
+        return getItemCount() - argPosition -1;
     }
 
     public void setPalette(@NonNull Palette argPalette) {
@@ -263,7 +261,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
         this.notifyDataSetChanged();
     }
 
-    public String getSecondaryText(@NonNull IEpisode argItem) {
+    private String getSecondaryText(@NonNull IEpisode argItem) {
         mStringBuilder.setLength(0);
         if (argItem.getDuration() > 0) {
             mStringBuilder.append(DateUtils.formatElapsedTime(argItem.getDuration() / 1000));
