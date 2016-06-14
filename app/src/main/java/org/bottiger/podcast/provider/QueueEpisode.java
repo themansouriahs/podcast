@@ -19,7 +19,7 @@ public class QueueEpisode implements Comparable {
 	private IEpisode mEpisode;
 	private boolean mStartedManually = false;
 
-	public QueueEpisode(IEpisode episode) {
+	public QueueEpisode(@NonNull IEpisode episode) {
 		mEpisode = episode;
 		title = episode.getTitle();
 

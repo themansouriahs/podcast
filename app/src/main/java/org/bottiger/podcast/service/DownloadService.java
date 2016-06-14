@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.DownloadProgressPublisher;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
@@ -165,6 +166,8 @@ public class DownloadService extends IntentService {
             episode = SoundWaves.getAppContext(this).getLibraryInstance().getEpisode(url);
         } else {
             Log.wtf(TAG, "wtf");
+            VendorCrashReporter.report(TAG, "episode null");
+            return null;
         }
 
         QueueEpisode queueEpisode = new QueueEpisode(episode);
