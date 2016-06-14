@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.media.MediaControlIntent;
 import android.support.v7.media.MediaItemMetadata;
 import android.support.v7.media.MediaItemStatus;
@@ -93,6 +94,7 @@ public class VendorMediaRouteCast implements IMediaCast {
 
     private MediaInfo mCurrentTrack;
 
+    @Nullable
     private IMediaRouteStateListener mListener;
 
     @NonNull private Activity mActivity;
@@ -703,6 +705,13 @@ public class VendorMediaRouteCast implements IMediaCast {
         public void handleResult(Bundle bundle);
     }
 
+    private void notifyStateChanged() {
+        IMediaRouteStateListener listener = mListener;
+        if (listener != null) {
+            listener.onStateChanged(VendorMediaRouteCast.this);
+        }
+    }
+
     private class MyMediaRouterCallback extends MediaRouter.Callback {
         @Override
         public void onRouteSelected(MediaRouter router, MediaRouter.RouteInfo route) {
@@ -719,7 +728,9 @@ public class VendorMediaRouteCast implements IMediaCast {
             }
             mLastRouteId = routeId;
 
-            mListener.onStateChanged(VendorMediaRouteCast.this);
+
+            notifyStateChanged();
+            //mListener.onStateChanged(VendorMediaRouteCast.this);
         }
 
         @Override
@@ -732,7 +743,8 @@ public class VendorMediaRouteCast implements IMediaCast {
             mSessionId = null;
             //updateButtonStates();
 
-            mListener.onStateChanged(VendorMediaRouteCast.this);
+            notifyStateChanged();
+            //mListener.onStateChanged(VendorMediaRouteCast.this);
         }
 
         @Override
