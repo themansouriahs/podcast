@@ -292,6 +292,15 @@ public class Library {
             if (isFeedItem && item.sub_id < 0)
                 return false;
 
+            Subscription subscription = null;
+            if (item != null) {
+                subscription = item.getSubscription(mContext);
+
+                if (subscription != null) {
+                    subscription.addEpisode(item, true);
+                }
+            }
+
             if (mEpisodesUrlLUT.containsKey(argEpisode.getURL())) {
                 // FIXME we should update the content of the model episode
                 return false;
@@ -313,15 +322,10 @@ public class Library {
 
                 mEpisodesIdLUT.put(item.getId(), item);
 
-                Subscription subscription = item.getSubscription(mContext);
-
-                if (subscription != null) {
-                    subscription.addEpisode(item, true);
-                    if (updatedEpisode) {
-                        IEpisode episode = subscription.getEpisodes().getNewest();
-                        if (episode != null) {
-                            subscription.setLastUpdated(episode.getCreatedAt().getTime());
-                        }
+                if (subscription != null && updatedEpisode) {
+                    IEpisode episode = subscription.getEpisodes().getNewest();
+                    if (episode != null) {
+                        subscription.setLastUpdated(episode.getCreatedAt().getTime());
                     }
                 }
             }

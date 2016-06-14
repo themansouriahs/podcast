@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -30,6 +31,7 @@ import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.DownloadStatus;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.UIUtils;
 
 import java.util.concurrent.TimeUnit;
@@ -125,6 +127,12 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
             }
             canvas.drawArc(buttonRectangle, -90, Math.round(360 * mProgress / 100F), false, mForegroundColorPaint);
         }
+    }
+
+    @Override
+    public @ColorInt
+    int getForegroundColor(@NonNull ColorExtractor extractor) {
+        return extractor.getPrimaryTint();
     }
 
     @Override

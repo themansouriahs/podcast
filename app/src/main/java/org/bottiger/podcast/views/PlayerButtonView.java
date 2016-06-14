@@ -164,7 +164,7 @@ public class PlayerButtonView extends ImageButton implements PaletteListener  {
         int color = ColorUtils.getTextColor(getContext());
         ColorExtractor extractor = new ColorExtractor(argChangedPalette, color);
 
-        int colorFinal = ColorUtils.adjustToTheme(this.mContext.getResources(), argChangedPalette, extractor.getSecondary());
+        int colorFinal = ColorUtils.adjustToTheme(this.mContext.getResources(), argChangedPalette, getForegroundColor(extractor));
 
         //colorFinal = Color.BLACK;
 
@@ -172,6 +172,10 @@ public class PlayerButtonView extends ImageButton implements PaletteListener  {
         mForegroundColorPaint.setColor(colorFinal);
 
         invalidate();
+    }
+
+    public @ColorInt int getForegroundColor(@NonNull ColorExtractor extractor) {
+        return extractor.getSecondary();
     }
 
     @Override
