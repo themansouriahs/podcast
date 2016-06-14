@@ -29,6 +29,7 @@ import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.player.PlayerStateManager;
+import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.AndroidUtil;
@@ -91,6 +92,8 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
         }
 
         Library library = SoundWaves.getAppContext(context).getLibraryInstance();
+        Playlist playlist = SoundWaves.getAppContext(context).getPlaylist();
+
         library.loadPlaylistSync(SoundWaves.getAppContext(context).getPlaylist());
 
         // Construct the RemoteViews object.  It takes the package name (in our case, it's our
@@ -98,7 +101,7 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
         // the layout from our package).
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_default);
 
-        boolean playlistEmpty = library.getEpisodes().size() == 0;
+        boolean playlistEmpty = playlist.size() == 0;
         int emptyTextVisibility = playlistEmpty ? View.VISIBLE : View.GONE;
         int playerVisibility = !playlistEmpty ? View.VISIBLE : View.GONE;
 
@@ -108,7 +111,7 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
 
         if (!playlistEmpty) {
 
-            IEpisode episode = library.getEpisodes().get(0);
+            IEpisode episode = playlist.first();
 
             Log.wtf(TAG, episode.getTitle());
 
