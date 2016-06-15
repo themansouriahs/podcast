@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringDef;
 import android.support.v4.util.Pair;
+import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Xml;
@@ -49,6 +50,9 @@ public class FeedParser {
 
     @Nullable
     private DateUtils.Hint mDateFormatHint = null;
+
+    @Nullable
+    private Boolean mContainsHTML = null;
 
     // We don't use namespaces
     private static final String ns = null;
@@ -256,7 +260,7 @@ public class FeedParser {
                     break;
                 }
                 case SUBSCRIPTION_DESCRIPTION_TAG: {
-                    argSubscription.setDescription(readSummary(parser));
+                    argSubscription.setDescription(getAndParseDescription(parser));
                     break;
                 }
                 case EPISODE_ITEM_TAG: {
@@ -465,6 +469,30 @@ public class FeedParser {
                 skip(parser);
             }
         }
+    }
+
+    /**
+     * This is a parsing and caching layer. It detect if the feeds episode descriptions
+     * contain HTML, and if it does parses it.
+     *
+     * @param The XML parser
+     * @return The episode description as a String
+     * @throws IOException
+     * @throws XmlPullParserException
+     */
+    private String getAndParseDescription(@NonNull XmlPullParser parser) throws IOException, XmlPullParserException {
+        String description = readSummary(parser);
+        String parsedHTML = null;
+        if (mContainsHTML == null && description != null) {
+            parsedHTML = Html.fromHtml(description).toString();
+            mContainsHTML = description.equals(parsedHTML);
+        }
+
+        if (mContainsHTML != null && mContainsHTML) {
+            description = parsedHTML != null ? parsedHTML : Html.fromHtml(description).toString();
+        }
+
+        return description;
     }
 
     /**

@@ -32,6 +32,7 @@ import io.requery.android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -964,7 +965,8 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 			return;
 		}
 
-		this.content = argHTMLDescription;
+		//this.content = argHTMLDescription;
+		this.content = Html.fromHtml(argHTMLDescription).toString();
 		//this.content = Jsoup.parse(content2).text();
 
 		notifyPropertyChanged(EpisodeChanged.CHANGED);
