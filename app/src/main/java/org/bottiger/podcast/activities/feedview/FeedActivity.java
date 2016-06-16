@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.ColorInt;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
@@ -123,7 +124,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
     public static final String EPISODES_SLIM_KEY = "SlimEpisodes";
 
     protected ISubscription mSubscription = null;
-    private static ProgressDialog mProgress;
+    protected ProgressDialog mProgress;
 
     final MultiShrinkScroller.MultiShrinkScrollerListener mMultiShrinkScrollerListener
             = new MultiShrinkScroller.MultiShrinkScrollerListener() {
@@ -180,7 +181,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
         }
     };
 
-    IDownloadCompleteCallback mRefreshCompleteCallback = new IDownloadCompleteCallback() {
+    protected IDownloadCompleteCallback mRefreshCompleteCallback = new IDownloadCompleteCallback() {
         @Override
         public void complete(boolean argSucces, ISubscription argSubscription) {
             mProgress.dismiss();
@@ -197,6 +198,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
+                    setViewState(slimSubscription);
                     mAdapter.setDataset(slimSubscription);
                 }
             });
@@ -256,15 +258,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
 
         setContentView(R.layout.feed_activity);
 
-        if (mIsSlimSubscription) {
-            mProgress = new ProgressDialog(this);
-            mProgress.setMessage(getString(R.string.discovery_progress_loading_podcast_content));
-            mProgress.show();
-            mAdapter = new FeedViewDiscoveryAdapter(this, mSubscription);
-            SoundWaves.getAppContext(this).getRefreshManager().refresh(mSubscription, mRefreshCompleteCallback);
-        } else {
-            mAdapter = new FeedViewAdapter(this, mSubscription);
-        }
+        mAdapter = getAdapter();
 
         mRxSubscription = subscribeToChanges(mSubscription, mAdapter);
 
@@ -299,7 +293,6 @@ public class FeedActivity extends TopActivity implements PaletteListener {
             mMultiShrinkScroller.setLayoutParams(params);
         }
 
-
         mFloatingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -332,7 +325,8 @@ public class FeedActivity extends TopActivity implements PaletteListener {
                         @Override
                         public void onAnimationEnd() {
                             mRevealLayout.setVisibility(View.INVISIBLE);
-                            mFloatingButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_tune_white));
+                            //mFloatingButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_tune_white));
+                            setFABDrawable(R.drawable.ic_tune_white);
                             mToolbar.setTitle(mSubscription.getTitle());
                         }
                     });
@@ -347,14 +341,14 @@ public class FeedActivity extends TopActivity implements PaletteListener {
                     mRevealAnimator.setDuration(SETTINGS_REVEAL_DURATION);
 
                     mRevealLayout.setVisibility(View.VISIBLE);
-                    mFloatingButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_clear_white));
+                    //mFloatingButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_clear_white));
+                    setFABDrawable(R.drawable.ic_clear_white);
                     mToolbar.setTitle(R.string.menu_settings);
                     mRevealAnimator.start();
                 }
                 mSettingsRevealed = !mSettingsRevealed;
             }
         });
-
 
         mUrl = mSubscription.getImageURL();
 
@@ -448,6 +442,16 @@ public class FeedActivity extends TopActivity implements PaletteListener {
                         }
                     });
         }
+    }
+
+    @NonNull
+    protected FeedViewAdapter getAdapter() {
+
+        FeedViewAdapter adapter;
+
+        adapter = new FeedViewAdapter(this, mSubscription);
+
+        return adapter;
     }
 
     @Override
@@ -627,5 +631,12 @@ public class FeedActivity extends TopActivity implements PaletteListener {
                         Log.d("FeedViewAdapter", "error: " + throwable.toString());
                     }
                 });
+    }
+
+    protected void setFABDrawable(@DrawableRes int argRes) {
+        if (mFloatingButton.getVisibility() == View.GONE)
+            return;
+
+        mFloatingButton.setImageDrawable(getResources().getDrawable(argRes));
     }
 }
