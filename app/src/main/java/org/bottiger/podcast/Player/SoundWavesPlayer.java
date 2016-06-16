@@ -233,7 +233,13 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
     }
 
     public void release() {
-        mPlayerService.dis_notifyStatus();
+
+        // Called when the PlayerService is destroyed.
+        // Therefore mPlayerService will be null.
+        if (mPlayerService != null) {
+            mPlayerService.dis_notifyStatus();
+        }
+        
         super.stop();
         super.release();
         mAudioManager

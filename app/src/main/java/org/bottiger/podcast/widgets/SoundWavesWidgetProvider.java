@@ -144,7 +144,6 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
             int descriptionVisibility = showDescription ? View.VISIBLE : View.GONE;
             views.setViewVisibility(R.id.widget_description, descriptionVisibility);
 
-
             if (Build.VERSION.SDK_INT >= 23) {
                 views.setViewVisibility(R.id.widget_mute, View.VISIBLE);
 
@@ -156,8 +155,7 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
                 views.setViewVisibility(R.id.widget_mute, View.GONE);
             }
 
-
-                String imageUrl = episode.getArtwork(context);
+            String imageUrl = episode.getArtwork(context);
             if (imageUrl != null) {
                 AppWidgetTarget appWidgetTarget = new AppWidgetTarget(context, views, R.id.widget_logo, appWidgetId);
 
