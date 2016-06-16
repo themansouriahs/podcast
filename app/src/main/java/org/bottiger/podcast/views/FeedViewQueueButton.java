@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
@@ -121,12 +122,11 @@ public class FeedViewQueueButton extends PlayerButtonView implements View.OnClic
     @Override
     public void onClick(View view) {
         IEpisode item = getEpisode();
-        PlayerService ps = PlayerService.getInstance();
 
-        if (ps == null)
+        if (item == null)
             return;
 
-        Playlist playlist = ps.getPlaylist();
+        Playlist playlist = SoundWaves.getAppContext(getContext()).getPlaylist();
 
         if (playlist.contains(item)) {
             int position = playlist.getPosition(item);
@@ -134,6 +134,7 @@ public class FeedViewQueueButton extends PlayerButtonView implements View.OnClic
         } else {
             playlist.queue(item);
         }
+
         toggle();
     }
 

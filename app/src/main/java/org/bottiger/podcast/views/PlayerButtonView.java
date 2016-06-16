@@ -153,6 +153,7 @@ public class PlayerButtonView extends ImageButton implements PaletteListener  {
         return mProgress;
     }
 
+    @Nullable
     public IEpisode getEpisode() {
         ensureEpisode();
 

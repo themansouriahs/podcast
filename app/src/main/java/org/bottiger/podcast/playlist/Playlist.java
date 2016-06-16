@@ -430,9 +430,11 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
         // skip 'removed' episodes
         where += " AND (" + ItemColumns.TABLE_NAME + "." + ItemColumns.PRIORITY + " >= 0)";
 
+        // Manually queued episodes
+        where += " OR (" + ItemColumns.TABLE_NAME + "." + ItemColumns.PRIORITY + " >= 0)";
+
 
 		return where;
-        //return "1==1";
 	}
 
 	/**
@@ -495,34 +497,7 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
         SortedList<IEpisode> episodes = mLibrary.newEpisodeSortedList(new SortedList.Callback<IEpisode>() {
             @Override
             public int compare(IEpisode o1, IEpisode o2) {
-
-                int E1_FIRST = 1;
-                int E2_FIRST = -1;
-
-                if (o1 == null)
-                    return E2_FIRST;
-
-                if (o2 == null)
-                    return E1_FIRST;
-
-                int p1 = o1.getPriority();
-                int p2 = o2.getPriority();
-
-                if (p1 != p2) {
-                    return p1 > p2 ? E1_FIRST : E2_FIRST;
-                }
-
-                Date dt1 = o1.getDateTime();
-
-                if (dt1 == null)
-                    return E2_FIRST;
-
-                Date dt2 = o2.getDateTime();
-
-                if (dt2 == null)
-                    return E1_FIRST;
-
-                return dt2.compareTo(dt1);
+                return comparePlaylistOrder(o1, o2);
             }
 
             @Override
@@ -581,7 +556,9 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
                 downloadStateIsShown = true;
             }
 
-            boolean doAdd = subscriptionIsShown && downloadStateIsShown && listenedStateIsShown;
+            boolean highPriority = episode.getPriority() > 0;
+
+            boolean doAdd = highPriority || (subscriptionIsShown && downloadStateIsShown && listenedStateIsShown);
 
             if (doAdd) {
                 mInternalPlaylist.add(episode);
@@ -767,5 +744,36 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
 
         filter.setMode(argMode, argContext);
         argPlaylist.notifyDatabaseChanged();
+    }
+
+    private static int comparePlaylistOrder(@Nullable IEpisode argEpisode1,
+                                            @Nullable IEpisode argEpisode2) {
+        int E1_FIRST = 1;
+        int E2_FIRST = -1;
+
+        if (argEpisode1 == null)
+            return E2_FIRST;
+
+        if (argEpisode2 == null)
+            return E1_FIRST;
+
+        int p1 = argEpisode1.getPriority();
+        int p2 = argEpisode2.getPriority();
+
+        if (p1 != p2) {
+            return p1 > p2 ? E1_FIRST : E2_FIRST;
+        }
+
+        Date dt1 = argEpisode1.getDateTime();
+
+        if (dt1 == null)
+            return E2_FIRST;
+
+        Date dt2 = argEpisode2.getDateTime();
+
+        if (dt2 == null)
+            return E1_FIRST;
+
+        return dt2.compareTo(dt1);
     }
 }
