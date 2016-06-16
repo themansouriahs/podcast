@@ -353,8 +353,8 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 				try {
 					mDate = sFormatZ.parse(date);
 				} catch (ParseException e) {
-					e.printStackTrace();
-					throw new IllegalArgumentException("Datestring must be parsable");
+					VendorCrashReporter.report("Datestring must be parsable", date);
+					return null;
 				}
             } catch (Exception e) {
 				return null;
