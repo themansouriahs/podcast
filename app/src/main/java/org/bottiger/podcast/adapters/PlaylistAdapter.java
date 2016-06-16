@@ -407,7 +407,6 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         return (long)url.hashCode();
 	}
 
-    //@Subscribe
     public void playlistChanged(@NonNull Playlist argPlaylist) {
         mPlaylist = argPlaylist;
         notifyDataSetChanged();

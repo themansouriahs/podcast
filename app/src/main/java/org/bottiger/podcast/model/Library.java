@@ -797,7 +797,7 @@ public class Library {
     public @LibraryPersistency.PersistencyResult
     int updateEpisode(@NonNull IEpisode argEpisode) {
         if (argEpisode instanceof FeedItem) {
-            updateEpisode((FeedItem) argEpisode);
+            return updateEpisode((FeedItem) argEpisode);
         }
 
         return LibraryPersistency.ERROR;

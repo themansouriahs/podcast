@@ -61,7 +61,7 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 		case R.id.menu_clear_playlist: {
 
 			if (mPlaylist == null) {
-				mPlaylist = PlayerService.getInstance().getPlaylist();
+				mPlaylist = SoundWaves.getAppContext(getContext()).getPlaylist();
 				Log.wtf(TAG, "Playlist should not be null"); // NoI18N
 			}
 
@@ -80,15 +80,6 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 	@Override
 	public void onResume() {
 		super.onResume();
-	}
-
-	@Deprecated
-	protected Cursor createCursor(String condition, String order) {
-		// return new CursorLoader(getActivity(), ItemColumns.URI, PROJECTION,
-		// condition, null, getOrder()).loadInBackground();
-		return new CursorLoader(getActivity(), ItemColumns.URI,
-				ItemColumns.ALL_COLUMNS, condition, null, order)
-				.loadInBackground();
 	}
 
 	@Deprecated
