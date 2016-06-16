@@ -371,7 +371,7 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener, ExoPlayer
     private boolean validateState() {
         if (mEpisode == null) {
             if (BuildConfig.DEBUG) {
-                throw new IllegalStateException("Episode needs to be set");
+                return false; //throw new IllegalStateException("Episode needs to be set");
             } else {
                 return false;
             }

@@ -178,7 +178,11 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
 
     }
 
-    @NonNull
+    /*
+    This happens when the playlist is empty and an episode is about to be played.
+    The state change fires prior to the binding.
+     */
+    @Nullable
     @Override
     public IEpisode getEpisode() {
         return mEpisode;
@@ -199,6 +203,10 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
 
     @MainThread
     public void setStatus(@ExoPlayerWrapper.PlayerState int argPlayerStatus) {
+
+        if (getEpisode() == null) {
+            return;
+        }
 
         if (getEpisode().isPlaying()) {
             if (IsDisplayingPlayIcon()) {
@@ -403,6 +411,10 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
     }
 
     private void onPlayerStateChange(@ExoPlayerWrapper.PlayerState int argPlayerStatus) {
+
+        if (getEpisode() == null)
+            return;
+
         if (!getEpisode().equals(SoundWaves.getAppContext(getContext()).getPlaylist().first())) {
 
             setStatus(ExoPlayerWrapper.STATE_READY);

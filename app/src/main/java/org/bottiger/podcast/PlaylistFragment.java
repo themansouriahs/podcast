@@ -11,7 +11,6 @@ import org.bottiger.podcast.playlist.filters.SubscriptionFilter;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
-import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.ImageLoaderUtils;
 import org.bottiger.podcast.utils.PaletteHelper;
@@ -31,8 +30,6 @@ import org.bottiger.podcast.views.dialogs.DialogPlaylistFilters;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -52,8 +49,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -229,105 +224,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
         });
 
         // init swipe to dismiss logic
-        ItemTouchHelper swipeToDismissTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(
-                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT, ItemTouchHelper.RIGHT) {
-
-            @Override
-            public void onChildDraw(Canvas c,
-                                    RecyclerView recyclerView,
-                                    RecyclerView.ViewHolder viewHolder,
-                                    float dX,
-                                    float dY,
-                                    int actionState,
-                                    boolean isCurrentlyActive) {
-
-                if (actionState != ItemTouchHelper.ACTION_STATE_SWIPE)
-                    return;
-
-                PlaylistViewHolder playlistViewHolder = null;
-                if (viewHolder instanceof PlaylistViewHolder) {
-                    playlistViewHolder = (PlaylistViewHolder) viewHolder;
-                }
-
-                if (playlistViewHolder == null) {
-                    Log.wtf(TAG, "playlistViewHolder should never be null"); // NoI18N
-                    return;
-                }
-
-                // http://stackoverflow.com/questions/30820806/adding-a-colored-background-with-text-icon-under-swiped-row-when-using-androids
-                View itemView = viewHolder.itemView;
-
-                int color = playlistViewHolder.hasColor() ? playlistViewHolder.getEpisodePrimaryColor() : getResources().getColor(R.color.colorBgPrimary);
-                mSwipePaint.setColor(color);
-
-                c.drawRect((float) itemView.getLeft(), (float) itemView.getTop(), dX,
-                        (float) itemView.getBottom(), mSwipePaint);
-
-                int height2 = mSwipeIcon.getHeight()/2;
-                int heightView = itemView.getHeight();
-                int bitmapTopPos = heightView/2-height2+itemView.getTop();
-
-                int bitmapLeftPos = (int)UIUtils.convertDpToPixel(25, getContext());
-
-                c.drawBitmap(mSwipeIcon, bitmapLeftPos, bitmapTopPos, mSwipeIconPaint);
-
-                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-
-            }
-
-            @Override
-            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                // callback for drag-n-drop, false to skip this feature
-                return false;
-            }
-
-            @Override
-            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                // callback for swipe to dismiss, removing item from data and adapter
-                //items.remove(viewHolder.getAdapterPosition());
-
-                PlaylistViewHolder playlistViewHolder = null;
-                if (viewHolder instanceof PlaylistViewHolder) {
-                    playlistViewHolder = (PlaylistViewHolder) viewHolder;
-                }
-
-                if (playlistViewHolder == null) {
-                    Log.wtf(TAG, "playlistViewHolder should never be null"); // NoI18N
-                    return;
-                }
-
-                final int itemPosition = playlistViewHolder.getAdapterPosition()+1;
-                final IEpisode episode = mPlaylist.getItem(itemPosition);
-                final int currentPriority = episode.getPriority();
-
-                episode.setPriority(-1);
-
-                if (episode instanceof FeedItem) {
-                    FeedItem item = (FeedItem) episode;
-                    item.markAsListened();
-                }
-
-                mPlaylist.removeItem(itemPosition, true);
-
-                UIUtils.disPlayBottomSnackBar(view, R.string.playlist_episode_dismissed, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        episode.setPriority(currentPriority);
-                        mPlaylist.setItem(itemPosition, episode);
-                        mAdapter.notifyDataSetChanged();
-
-                        if (episode instanceof FeedItem) {
-                            FeedItem item = (FeedItem) episode;
-                            item.markAsListened(0);
-                        }
-
-                        SoundWaves.getAppContext(getContext()).getLibraryInstance().updateEpisode(episode);
-                    }
-                }, false);
-
-                mAdapter.notifyItemRemoved(itemPosition-1);
-            }
-        });
+        ItemTouchHelper swipeToDismissTouchHelper = getItemTouchHelper(view);
         swipeToDismissTouchHelper.attachToRecyclerView(mRecyclerView);
     }
 
@@ -350,25 +247,8 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
     public void onStart() {
         Log.d(TAG, "onStart");
         super.onStart();
-        mRxPlaylistSubscription = SoundWaves
-                .getRxBus()
-                .toObserverable()
-                .observeOn(AndroidSchedulers.mainThread())
-                .ofType(Playlist.class)
-                .subscribe(new Action1<Playlist>() {
-                    @Override
-                    public void call(Playlist playlistChanged) {
-                        Log.d(TAG, "mRxPlaylistSubscription event recieved");
-                        playlistChanged(playlistChanged);
-                        mTopPlayer.togglePlaylistEmpty(playlistChanged.size() == 1);
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        VendorCrashReporter.report("subscribeError" , throwable.toString());
-                        Log.d(TAG, "error: " + throwable.toString());
-                    }
-                });
+        mRxPlaylistSubscription = getPlaylistChangedSubscription();
+
         Log.d(TAG, "mRxPlaylistSubscription isUnsubscribed: " + mRxPlaylistSubscription.isUnsubscribed());
     }
 
@@ -407,7 +287,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
     }
 
 
-    public void bindHeader(final IEpisode item) {
+    private void bindHeader(final IEpisode item) {
 
         if (mEpisodeTitle == null)
             return;
@@ -416,37 +296,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
             mRxTopEpisodeChanged.unsubscribe();
         }
 
-        mRxTopEpisodeChanged = SoundWaves.getRxBus()
-                .toObserverable()
-                .onBackpressureDrop()
-                .ofType(EpisodeChanged.class)
-                .filter(new Func1<EpisodeChanged, Boolean>() {
-                    @Override
-                    public Boolean call(EpisodeChanged episodeChanged) {
-                        return episodeChanged.getAction() != EpisodeChanged.PROGRESS;
-                    }
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<EpisodeChanged>() {
-                    @Override
-                    public void call(EpisodeChanged itemChangedEvent) {
-                        long episodeId = itemChangedEvent.getId();
-                        IEpisode episode = SoundWaves.getAppContext(getContext()).getLibraryInstance().getEpisode(episodeId);
-
-                        if (episode == null)
-                            return;
-
-                        if (episode.equals(mPlaylist.first())) {
-                            PlaylistFragment.this.bindHeader(episode);
-                        }
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        VendorCrashReporter.handleException(throwable);
-                        Log.wtf(TAG, "Missing back pressure. Should not happen anymore :(");
-                    }
-                });
+        mRxTopEpisodeChanged = getEpisodeChangedSubscription();
 
         final String title = item.getTitle();
         final String description = item.getDescription();
@@ -546,8 +396,9 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
 
         if (mTopPlayer.isFullscreen()) {
             mTopPlayer.setFullscreen(true, false);
-        } else if (mPlaylist.size() == 1) {
-            mTopPlayer.togglePlaylistEmpty(true);
+        } else  {
+            /* If the player is not fullscreen, but the playlist is empty */
+            mTopPlayer.setPlaylistEmpty(mPlaylist.size() == 1);
         }
     }
 
@@ -597,8 +448,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-
-        // Handle item selection
         switch (item.getItemId()) {
             case R.id.menu_playlist_context_play_next:
                 return true;
@@ -606,14 +455,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
                 return super.onContextItemSelected(item);
         }
     }
-
-
-     @Override
-     public void onCreateContextMenu(ContextMenu menu, View v,
-                                     ContextMenuInfo menuInfo) {
-         super.onCreateContextMenu(menu, v, menuInfo);
-         MenuInflater inflater = getActivity().getMenuInflater();
-     }
 
      @Override
      public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
@@ -674,4 +515,170 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
             }
         };
     }
+
+    private Subscription getPlaylistChangedSubscription() {
+        return SoundWaves
+                .getRxBus()
+                .toObserverable()
+                .observeOn(AndroidSchedulers.mainThread())
+                .ofType(Playlist.class)
+                .subscribe(new Action1<Playlist>() {
+                    @Override
+                    public void call(Playlist playlistChanged) {
+                        Log.d(TAG, "mRxPlaylistSubscription event recieved");
+                        playlistChanged(playlistChanged);
+                        mTopPlayer.setPlaylistEmpty(playlistChanged.size() == 1);
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        VendorCrashReporter.report("subscribeError" , throwable.toString());
+                        Log.d(TAG, "error: " + throwable.toString());
+                    }
+                });
+    }
+
+    private Subscription getEpisodeChangedSubscription() {
+        return SoundWaves.getRxBus()
+                .toObserverable()
+                .onBackpressureDrop()
+                .ofType(EpisodeChanged.class)
+                .filter(new Func1<EpisodeChanged, Boolean>() {
+                    @Override
+                    public Boolean call(EpisodeChanged episodeChanged) {
+                        return episodeChanged.getAction() != EpisodeChanged.PROGRESS;
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<EpisodeChanged>() {
+                    @Override
+                    public void call(EpisodeChanged itemChangedEvent) {
+                        long episodeId = itemChangedEvent.getId();
+                        IEpisode episode = SoundWaves.getAppContext(getContext()).getLibraryInstance().getEpisode(episodeId);
+
+                        if (episode == null)
+                            return;
+
+                        if (episode.equals(mPlaylist.first())) {
+                            PlaylistFragment.this.bindHeader(episode);
+                        }
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        VendorCrashReporter.handleException(throwable);
+                        Log.wtf(TAG, "Missing back pressure. Should not happen anymore :(");
+                    }
+                });
+    }
+
+    @NonNull
+     private ItemTouchHelper getItemTouchHelper(@NonNull final View argView) {
+         return new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(
+                 ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT, ItemTouchHelper.RIGHT) {
+
+             @Override
+             public void onChildDraw(Canvas c,
+                                     RecyclerView recyclerView,
+                                     RecyclerView.ViewHolder viewHolder,
+                                     float dX,
+                                     float dY,
+                                     int actionState,
+                                     boolean isCurrentlyActive) {
+
+                 if (actionState != ItemTouchHelper.ACTION_STATE_SWIPE)
+                     return;
+
+                 PlaylistViewHolder playlistViewHolder = null;
+                 if (viewHolder instanceof PlaylistViewHolder) {
+                     playlistViewHolder = (PlaylistViewHolder) viewHolder;
+                 }
+
+                 if (playlistViewHolder == null) {
+                     Log.wtf(TAG, "playlistViewHolder should never be null"); // NoI18N
+                     return;
+                 }
+
+                 // http://stackoverflow.com/questions/30820806/adding-a-colored-background-with-text-icon-under-swiped-row-when-using-androids
+                 View itemView = viewHolder.itemView;
+
+                 int color = playlistViewHolder.hasColor() ? playlistViewHolder.getEpisodePrimaryColor() : getResources().getColor(R.color.colorBgPrimary);
+                 mSwipePaint.setColor(color);
+
+                 c.drawRect((float) itemView.getLeft(), (float) itemView.getTop(), dX,
+                         (float) itemView.getBottom(), mSwipePaint);
+
+                 int height2 = mSwipeIcon.getHeight()/2;
+                 int heightView = itemView.getHeight();
+                 int bitmapTopPos = heightView/2-height2+itemView.getTop();
+
+                 int bitmapLeftPos = (int)UIUtils.convertDpToPixel(25, getContext());
+
+                 c.drawBitmap(mSwipeIcon, bitmapLeftPos, bitmapTopPos, mSwipeIconPaint);
+
+                 super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+
+             }
+
+             @Override
+             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                 // callback for drag-n-drop, false to skip this feature
+                 return false;
+             }
+
+             @Override
+             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                 // callback for swipe to dismiss, removing item from data and adapter
+                 //items.remove(viewHolder.getAdapterPosition());
+
+                 PlaylistViewHolder playlistViewHolder = null;
+                 if (viewHolder instanceof PlaylistViewHolder) {
+                     playlistViewHolder = (PlaylistViewHolder) viewHolder;
+                 }
+
+                 if (playlistViewHolder == null) {
+                     Log.wtf(TAG, "playlistViewHolder should never be null"); // NoI18N
+                     return;
+                 }
+
+                 final int itemPosition = playlistViewHolder.getAdapterPosition()+1;
+                 final IEpisode episode = mPlaylist.getItem(itemPosition);
+                 final int currentPriority = episode.getPriority();
+
+                 episode.setPriority(-1);
+
+                 if (episode instanceof FeedItem) {
+                     FeedItem item = (FeedItem) episode;
+                     item.markAsListened();
+                 }
+
+                 mPlaylist.removeItem(itemPosition, true);
+
+                 UIUtils.disPlayBottomSnackBar(argView, R.string.playlist_episode_dismissed, new View.OnClickListener() {
+                     @Override
+                     public void onClick(View v) {
+                         episode.setPriority(currentPriority);
+                         mPlaylist.setItem(itemPosition, episode);
+                         mAdapter.notifyDataSetChanged();
+
+                         if (episode instanceof FeedItem) {
+                             FeedItem item = (FeedItem) episode;
+                             item.markAsListened(0);
+                         }
+
+                         SoundWaves.getAppContext(getContext()).getLibraryInstance().updateEpisode(episode);
+                     }
+                 }, false);
+
+                 mAdapter.notifyItemRemoved(itemPosition-1);
+
+                 // This doesn't work as intended
+                 if (mPlaylist.size() == 1) {
+                     mTopPlayer.setPlaylistEmpty(true);
+                     //mTopPlayer.invalidate();
+                     //mRecyclerView.invalidate();
+                 }
+             }
+         });
+     }
 }

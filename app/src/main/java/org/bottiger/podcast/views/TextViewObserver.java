@@ -55,6 +55,11 @@ public class TextViewObserver extends Chronometer implements ExoPlayerWrapper.Li
     @Override
     public void onStateChanged(boolean playWhenReady, @ExoPlayerWrapper.PlayerState int playbackState) {
 
+        // This happens when the playlist is empty and an episode is about to be played.
+        // The state change fires prior to the binding.
+        if (mEpisode == null)
+            return;
+
         long base = elapsedRealtime() - mEpisode.getOffset();
         setBase(base);
         if (playWhenReady && !mIsTicking) {

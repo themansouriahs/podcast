@@ -272,13 +272,12 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
 
         final PlayerService ps = PlayerService.getInstance();
 
-        //setFullscreen(mFullscreen, false);
         boolean isRecyclerViewEmpty = true;
         if (ps != null && ps.getPlaylist() != null) {
             isRecyclerViewEmpty = ps.getPlaylist().size()<2;
         }
 
-        togglePlaylistEmpty(isRecyclerViewEmpty);
+        setPlaylistEmpty(isRecyclerViewEmpty);
 
         if (mDoDisplayText) {
             showText();
@@ -340,8 +339,6 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
                 }
             }
         });
-
-
 
         mFullscreenButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -437,7 +434,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         return setPlayerHeight(oldHeight - argY);
     }
 
-    public void togglePlaylistEmpty(boolean argDoFill) {
+    public void setPlaylistEmpty(boolean argDoFill) {
         Log.v(TAG, "Player height fill: " + argDoFill);
 
         if (argDoFill == mPlaylistEmpty)
@@ -647,32 +644,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
     }
 
     private void goFullscreen() {
-
         exitFullscreen();
-        /*
-        Log.d(TAG, "Enter fullscreen mode");
-        mFullscreenButton.setImageResource(R.drawable.ic_fullscreen_exit_white);
-
-        MainActivity activity = ((MainActivity)getContext());
-        int topmargin = 0; //activity.getFragmentTop() - activity.getSlidingTabsHeight();
-
-
-        // Main player layout
-        //CoordinatorLayout.LayoutParams layoutParams = new CoordinatorLayout.LayoutParams(
-        //        LayoutParams.MATCH_PARENT,
-        //        LayoutParams.MATCH_PARENT);
-
-        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
-                        LayoutParams.MATCH_PARENT,
-                        LayoutParams.MATCH_PARENT);
-        Layout.setLayoutParams(layoutParams);
-        Layout.setPadding(0, topmargin, 0, 0);
-
-
-        Layout.bringToFront();
-        ((MainActivity)getContext()).goFullScreen(Layout, mBackgroundColor);
-        */
-
     }
 
     private void exitFullscreen() {
@@ -680,26 +652,14 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         Log.d(TAG, "Exit fullscreen mode");
         mFullscreenButton.setImageResource(R.drawable.ic_fullscreen_white);
 
-        // Main player layout
-/*        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
-                LayoutParams.MATCH_PARENT,
-                sizeLarge);
-*/
-
         if (Layout != null) {
             CoordinatorLayout.LayoutParams layoutParams = new CoordinatorLayout.LayoutParams(
                     LayoutParams.MATCH_PARENT,
                     sizeLarge);
 
             Layout.setLayoutParams(layoutParams);
-        /*
-        int topmargin = ((MainActivity)getContext()).getFragmentTop();
-        layoutParams.setMargins(0, topmargin, 0, 0);
-        Layout.setPadding(0, mCenterSquareMarginTop, 0, 0);
-        */
 
             setPlayerHeight(sizeLarge);
-            //togglePlaylistEmpty(true);
             ((MainActivity) getContext()).exitFullScreen(Layout);
         }
 
