@@ -147,7 +147,7 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity impleme
                 isHandled = true;
                 PlaylistData pld = new PlaylistData();
                 pld.reset = true;
-                SoundWaves.getBus().post(pld);
+                SoundWaves.getRxBus().send(pld);
                 break;
             }
             case R.id.navigation_feedback: {

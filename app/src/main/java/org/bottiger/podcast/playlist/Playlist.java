@@ -8,12 +8,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.bottiger.podcast.ApplicationConfiguration;
+import org.bottiger.podcast.PlaylistFragment;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.adapters.PlaylistAdapter;
 import org.bottiger.podcast.adapters.decoration.OnDragStateChangedListener;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.Library;
+import org.bottiger.podcast.model.events.EpisodeChanged;
 import org.bottiger.podcast.playlist.filters.SubscriptionFilter;
 import org.bottiger.podcast.provider.DatabaseHelper;
 import org.bottiger.podcast.provider.FeedItem;
@@ -31,6 +33,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.support.annotation.MainThread;
@@ -42,6 +45,10 @@ import android.util.Log;
 
 import com.google.api.client.util.DateTime;
 import com.squareup.otto.Subscribe;
+
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.functions.Func1;
 
 public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -65,6 +72,8 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
 
     private int mSortOrder = DATE_NEW_FIRST;
 
+    private boolean mIsLoaded = false;
+
     private Context mContext;
     private Library mLibrary;
 
@@ -82,6 +91,7 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
 	private String amountKey = "amountOfEpisodes";
 	private int amountValue = 20;
 
+    private rx.Subscription mRxSubscription;
 
 	// http://stackoverflow.com/questions/1036754/difference-between-wait-and-sleep
 
@@ -98,20 +108,41 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
 	}
 
     public void setContext(@NonNull Context argContext) {
-
         mLibrary = SoundWaves.getAppContext(argContext).getLibraryInstance();
 
-        if (mContext == null) {
-            sharedPreferences = PreferenceManager
-                    .getDefaultSharedPreferences(argContext);
-            showListenedVal = sharedPreferences.getBoolean(showListenedKey, showListenedVal);
+        sharedPreferences = PreferenceManager
+                   .getDefaultSharedPreferences(argContext);
+        showListenedVal = sharedPreferences.getBoolean(showListenedKey, showListenedVal);
 
-            String downloadKey = SoundWaves.getAppContext().getString(R.string.pref_only_downloaded_key);
-            showOnlyDownloadedVal = sharedPreferences.getBoolean(downloadKey, SHOW_ONLY_DOWNLOADED);
+        String downloadKey = SoundWaves.getAppContext().getString(R.string.pref_only_downloaded_key);
+        showOnlyDownloadedVal = sharedPreferences.getBoolean(downloadKey, SHOW_ONLY_DOWNLOADED);
 
-            mSubscriptionFilter = new SubscriptionFilter(argContext);
-        }
+        mSubscriptionFilter = new SubscriptionFilter(argContext);
         this.mContext = argContext;
+
+        mRxSubscription = SoundWaves.getRxBus()
+                .toObserverable()
+                .onBackpressureDrop()
+                .ofType(PlaylistData.class)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<PlaylistData>() {
+                    @Override
+                    public void call(PlaylistData argPlaylistData) {
+                        onPlaylistChanged(argPlaylistData);
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        VendorCrashReporter.handleException(throwable);
+                        Log.wtf(TAG, "Missing back pressure. Should not happen anymore :(");
+                    }
+                });
+    }
+
+    public void destroy() {
+        if (mRxSubscription != null && !mRxSubscription.isUnsubscribed()) {
+            mRxSubscription.unsubscribe();
+        }
     }
 
 	/**
@@ -566,7 +597,16 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
         if (previousSize == 0 && newSize == 0)
             return;
 
-        notifyPlaylistChanged();
+        Handler mainHandler = new Handler(mContext.getMainLooper());
+
+        Runnable myRunnable = new Runnable() {
+            @Override
+            public void run() {
+                notifyPlaylistChanged();
+            } // This is your code
+        };
+        mainHandler.post(myRunnable);
+
 	}
 
     /**
@@ -613,8 +653,7 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
         SoundWaves.getRxBus().send(this);
     }
 
-    @Subscribe
-    public void onPlaylistChanged(@NonNull PlaylistData argPlaylistData) {
+    void onPlaylistChanged(@NonNull PlaylistData argPlaylistData) {
         if (argPlaylistData.showListened != null) {
             setShowListened(argPlaylistData.showListened);
         }
@@ -637,6 +676,8 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
         if (argPlaylistData.onlyDownloaded != null) {
             showOnlyDownloaded(argPlaylistData.onlyDownloaded);
         }
+
+        SoundWaves.getRxBus().send(Playlist.this);
     }
 
     @SuppressLint("CommitPrefEdits")
@@ -678,6 +719,23 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
         return mSubscriptionFilter;
     }
 
+    public void setIsLoaded(boolean argIsLoaded) {
+        mIsLoaded = argIsLoaded;
+
+        if (mIsLoaded) {
+            notifyPlaylistChanged();
+        }
+    }
+
+    public boolean isLoaded() {
+        return mIsLoaded;
+    }
+
+    public void notifyFiltersChanged() {
+        setIsLoaded(false);
+        mLibrary.loadPlaylist(this);
+    }
+
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 
@@ -692,7 +750,7 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
             public void run() {
                 PlaylistData pd = new PlaylistData();
                 pd.playlistChanged = true;
-                SoundWaves.getBus().post(pd);
+                SoundWaves.getRxBus().send(pd);
             }
         };
         mainHandler.post(myRunnable);

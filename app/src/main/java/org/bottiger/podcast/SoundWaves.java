@@ -258,21 +258,6 @@ public class SoundWaves extends Application {
         return mSubscriptionRefreshManager;
     }
 
-    private static Observable<Playlist> sPlaylistObservabel;
-
-    @NonNull
-    public static Observable<Playlist> getPlaylistObservabel() {
-        if (sPlaylistObservabel == null) {
-            sPlaylistObservabel = SoundWaves.getRxBus()
-                    .toObserverable()
-                    .ofType(Playlist.class)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread());
-        }
-
-        return sPlaylistObservabel;
-    }
-
     private void initMediaBrowser() {
         // Start the player service
         mMediaBrowser = new MediaBrowserCompat(

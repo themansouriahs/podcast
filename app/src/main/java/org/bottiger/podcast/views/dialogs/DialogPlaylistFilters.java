@@ -24,17 +24,12 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.squareup.otto.Subscribe;
-
-import org.bottiger.podcast.ApplicationConfiguration;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.playlist.PlaylistData;
 import org.bottiger.podcast.playlist.filters.SubscriptionFilter;
 import org.bottiger.podcast.provider.Subscription;
-import org.bottiger.podcast.provider.SubscriptionLoader;
-import org.bottiger.podcast.service.PlayerService;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -47,7 +42,7 @@ public class DialogPlaylistFilters extends DialogFragment {
     private Activity mContext;
     @Nullable  private Playlist mPlaylist;
 
-    protected SharedPreferences mSharedPreferences;
+    private SharedPreferences mSharedPreferences;
 
     private static boolean modifyingState = false;
 
@@ -58,11 +53,12 @@ public class DialogPlaylistFilters extends DialogFragment {
 
     private RadioGroup mRadioGroup;
 
-    protected android.support.v7.widget.SwitchCompat mPlaylistShowListened;
-    protected android.support.v7.widget.SwitchCompat mAutoPlayNext;
-    protected android.support.v7.widget.SwitchCompat mOnlyDownloaded;
-    protected Spinner mPlaylistOrderSpinner;
+    private android.support.v7.widget.SwitchCompat mPlaylistShowListened;
+    private android.support.v7.widget.SwitchCompat mAutoPlayNext;
+    private android.support.v7.widget.SwitchCompat mOnlyDownloaded;
+    private Spinner mPlaylistOrderSpinner;
 
+    private PlaylistData mPlaylistData = new PlaylistData();;
 
     private CompoundButton.OnCheckedChangeListener onCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
         @Override
@@ -99,33 +95,19 @@ public class DialogPlaylistFilters extends DialogFragment {
     };
 
     public static DialogPlaylistFilters newInstance() {
-        DialogPlaylistFilters frag = new DialogPlaylistFilters();
-        return frag;
+        return new DialogPlaylistFilters();
     }
 
-    @Override
-    public  void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-    }
-
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-        PlayerService ps = PlayerService.getInstance();
-        if (ps != null) {
-            mPlaylist = ps.getPlaylist();
-        }
-
         mContext = getActivity();
+        mPlaylist = SoundWaves.getAppContext(mContext).getPlaylist();
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
 
-        setSubscriptions(mPlaylist);
+        initSubscriptionFilters(mPlaylist);
 
 
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
@@ -152,15 +134,14 @@ public class DialogPlaylistFilters extends DialogFragment {
         mPlaylistOrderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                PlaylistData pd = new PlaylistData();
                 if (position == 0) {
                     //playlist.setSortOrder(Playlist.SORT.DATE_NEW_FIRST); // new first
-                    pd.sortOrder = Playlist.DATE_NEW_FIRST; // new first
+                    mPlaylistData.sortOrder = Playlist.DATE_NEW_FIRST; // new first
                 } else {
                     //playlist.setSortOrder(Playlist.SORT.DATE_OLD_FIRST); // old first
-                    pd.sortOrder = Playlist.DATE_OLD_FIRST;  // old first
+                    mPlaylistData.sortOrder = Playlist.DATE_OLD_FIRST;  // old first
                 }
-                SoundWaves.getBus().post(pd);
+                SoundWaves.getRxBus().send(mPlaylistData);
             }
 
             @Override
@@ -177,14 +158,14 @@ public class DialogPlaylistFilters extends DialogFragment {
         builder.setPositiveButton(R.string.apply_filters, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
-                setPlaylistFilters();
+                applyPlaylistFilters();
             }
         });
 
         return builder.create();
     }
 
-    private void setPlaylistFilters() {
+    private void applyPlaylistFilters() {
         switch (mRadioGroup.getCheckedRadioButtonId()) {
             case R.id.radioNone:
                 mSubscriptionFilter.setMode(SubscriptionFilter.SHOW_NONE, getContext());
@@ -206,7 +187,7 @@ public class DialogPlaylistFilters extends DialogFragment {
             }
         }
 
-        SoundWaves.getAppContext(getContext()).getLibraryInstance().loadPlaylist(mPlaylist);
+        mPlaylist.notifyFiltersChanged();
     }
 
     private void initOnlyDownloaded() {
@@ -217,7 +198,7 @@ public class DialogPlaylistFilters extends DialogFragment {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 PlaylistData pd = new PlaylistData();
                 pd.onlyDownloaded = isChecked;
-                SoundWaves.getBus().post(pd);
+                SoundWaves.getRxBus().send(pd);
             }
         });
 
@@ -235,7 +216,7 @@ public class DialogPlaylistFilters extends DialogFragment {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 PlaylistData pd = new PlaylistData();
                 pd.showListened = isChecked;
-                SoundWaves.getBus().post(pd);
+                SoundWaves.getRxBus().send(pd);
             }
         });
 
@@ -262,7 +243,7 @@ public class DialogPlaylistFilters extends DialogFragment {
         mSharedPreferences.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                if (key == playNextKey) {
+                if (key != null && key.equals(playNextKey)) {
                     mAutoPlayNext.setChecked(sharedPreferences.getBoolean(playNextKey, Playlist.PLAY_NEXT_DEFAULT));
                 }
             }
@@ -378,8 +359,7 @@ public class DialogPlaylistFilters extends DialogFragment {
         }
     }
 
-    private void setSubscriptions(@Nullable Playlist argPlaylist) {
-        if (argPlaylist != null)
-            mSubscriptionFilter = argPlaylist.getSubscriptionFilter();
+    private void initSubscriptionFilters(@NonNull Playlist argPlaylist) {
+        mSubscriptionFilter = argPlaylist.getSubscriptionFilter();
     }
 }

@@ -72,8 +72,11 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         mInflater = (LayoutInflater) mActivity
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-
-        SoundWaves.getPlaylistObservabel()
+        /*
+        SoundWaves.getRxBus()
+                .toObserverable()
+                .ofType(Playlist.class)
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<Playlist>() {
                     @Override
                     public void call(Playlist playlistChanged) {
@@ -87,6 +90,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
                         Log.d(TAG, "error: " + throwable.toString());
                     }
                 });
+                */
 
 
         producePlaylist();
@@ -407,7 +411,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         return (long)url.hashCode();
 	}
 
-    public void playlistChanged(@NonNull Playlist argPlaylist) {
+    private void playlistChanged(@NonNull Playlist argPlaylist) {
         mPlaylist = argPlaylist;
         notifyDataSetChanged();
     }

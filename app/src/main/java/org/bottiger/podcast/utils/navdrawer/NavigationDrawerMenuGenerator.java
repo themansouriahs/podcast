@@ -40,7 +40,7 @@ public class NavigationDrawerMenuGenerator {
 
                 PlaylistData pld = new PlaylistData();
                 pld.reset = true;
-                SoundWaves.getBus().post(pld);
+                SoundWaves.getRxBus().send(pld);
 
             }
         }));

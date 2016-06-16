@@ -58,6 +58,8 @@ public class Library {
     @NonNull private Context mContext;
     @NonNull private LibraryPersistency mLibraryPersistency;
 
+    // private boolean mPlaylistLoaded = false;
+
     private final ReentrantLock mLock = new ReentrantLock();
 
     @NonNull
@@ -133,8 +135,6 @@ public class Library {
             return item1.equals(item2);
         }
     };
-
-    private boolean mPlaylistLoaded = false;
 
     public Library(@NonNull Context argContext) {
         mContext = argContext.getApplicationContext();
@@ -541,7 +541,7 @@ public class Library {
 
     private void loadPlaylistInternal(@NonNull String query, @NonNull  Playlist argPlaylist) {
 
-        if (mPlaylistLoaded)
+        if (argPlaylist.isLoaded())
             return;
 
         Cursor cursor = null;
@@ -556,12 +556,14 @@ public class Library {
             while (cursor.moveToNext()) {
                 episode = LibraryPersistency.fetchEpisodeFromCursor(cursor, null);
                 addEpisode(episode);
-                argPlaylist.setItem(counter, episode);
+                //argPlaylist.setItem(counter, episode);
                 counter++;
             }
-            argPlaylist.notifyPlaylistChanged();
 
-            mPlaylistLoaded = true;
+            // Populate the playlist from the library
+            argPlaylist.populatePlaylist();
+
+            argPlaylist.setIsLoaded(true);
         } finally {
             if (cursor != null)
                 cursor.close();

@@ -350,7 +350,11 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
     public void onStart() {
         Log.d(TAG, "onStart");
         super.onStart();
-        mRxPlaylistSubscription = SoundWaves.getPlaylistObservabel()
+        mRxPlaylistSubscription = SoundWaves
+                .getRxBus()
+                .toObserverable()
+                .observeOn(AndroidSchedulers.mainThread())
+                .ofType(Playlist.class)
                 .subscribe(new Action1<Playlist>() {
                     @Override
                     public void call(Playlist playlistChanged) {
@@ -643,8 +647,9 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
             return;
 
         setPlaylistViewState(mPlaylist);
-
         bindHeaderWrapper(mPlaylist);
+
+        mAdapter.notifyDataSetChanged();
     }
 
     private void bindHeaderWrapper(@Nullable Playlist argPlaylist) {
