@@ -239,7 +239,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         if (mPlayerService != null) {
             mPlayerService.dis_notifyStatus();
         }
-        
+
         super.stop();
         super.release();
         mAudioManager

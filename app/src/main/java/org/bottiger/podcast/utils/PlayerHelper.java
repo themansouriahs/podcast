@@ -7,6 +7,7 @@ import android.support.v4.media.session.PlaybackStateCompat;
 
 import org.bottiger.podcast.provider.IEpisode;
 
+import java.net.URL;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -55,6 +56,11 @@ public class PlayerHelper {
             MediaMetadataCompat metadataCompat = mMediaControllerCompat.getMetadata();
             if (metadataCompat.containsKey(MediaMetadataCompat.METADATA_KEY_MEDIA_ID)) {
                 String id = metadataCompat.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID);
+
+                String url = argEpisode.getURL();
+
+                if (url == null)
+                    return false;
 
                 return argEpisode.getURL().equals(id);
             }

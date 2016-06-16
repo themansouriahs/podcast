@@ -34,6 +34,8 @@ public class SlimEpisode extends BaseEpisode implements Parcelable {
     private long mOffset;
     private long mFilesize = 0;
 
+    // Find a better method
+    @Deprecated
     public SlimEpisode() {
     }
 
@@ -51,6 +53,7 @@ public class SlimEpisode extends BaseEpisode implements Parcelable {
     }
 
     @Override
+    @Nullable
     public URL getUrl() {
         return mUrl;
     }

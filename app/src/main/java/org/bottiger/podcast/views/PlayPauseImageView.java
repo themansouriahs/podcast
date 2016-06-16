@@ -32,6 +32,7 @@ import android.webkit.MimeTypeMap;
 
 import com.squareup.otto.Subscribe;
 
+import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
@@ -371,7 +372,10 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
         // copy from seekbar
 
         if (argPlayerProgress.progressMs < 0) {
-            throw new IllegalStateException("Progress must be positive");
+            if (BuildConfig.DEBUG) {
+                throw new IllegalStateException("Progress must be positive");
+            }
+            return;
         }
         float progress = 0;
 

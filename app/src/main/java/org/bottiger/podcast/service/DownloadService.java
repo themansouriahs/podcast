@@ -229,7 +229,13 @@ public class DownloadService extends IntentService {
     }
 
     public static void removeFromQueue(int argPosition) {
-        sQueue.remove(argPosition);
+        sLock.lock();
+        try {
+            if (sQueue.size() > argPosition)
+                sQueue.remove(argPosition);
+        } finally {
+            sLock.unlock();
+        }
     }
 
     public static void move(int fromPosition, int toPosition) {
