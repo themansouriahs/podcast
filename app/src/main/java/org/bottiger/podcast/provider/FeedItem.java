@@ -24,7 +24,6 @@ import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.BitMaskUtils;
 import org.bottiger.podcast.utils.PlaybackSpeed;
 import org.bottiger.podcast.utils.SDCardManager;
-import org.jsoup.Jsoup;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -965,9 +964,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 			return;
 		}
 
-		//this.content = argHTMLDescription;
 		this.content = Html.fromHtml(argHTMLDescription).toString();
-		//this.content = Jsoup.parse(content2).text();
 
 		notifyPropertyChanged(EpisodeChanged.CHANGED);
 	}
