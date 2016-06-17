@@ -63,21 +63,21 @@ public class Library {
     private final ReentrantLock mLock = new ReentrantLock();
 
     @NonNull
-    private ArrayList<IEpisode> mEpisodes = new ArrayList<>();
+    private final ArrayList<IEpisode> mEpisodes = new ArrayList<>();
     @NonNull
-    private ArrayMap<String, IEpisode> mEpisodesUrlLUT = new ArrayMap<>();
+    private final ArrayMap<String, IEpisode> mEpisodesUrlLUT = new ArrayMap<>();
     @NonNull
-    private ArrayMap<Long, FeedItem> mEpisodesIdLUT = new ArrayMap<>();
+    private final ArrayMap<Long, FeedItem> mEpisodesIdLUT = new ArrayMap<>();
 
     @NonNull
     public PublishSubject<Subscription> mSubscriptionsChangeObservable = PublishSubject.create();
 
     @NonNull
-    private SortedList<Subscription> mActiveSubscriptions;
+    private final SortedList<Subscription> mActiveSubscriptions;
     @NonNull
-    private ArrayMap<String, Subscription> mSubscriptionUrlLUT = new ArrayMap<>();
+    private final ArrayMap<String, Subscription> mSubscriptionUrlLUT = new ArrayMap<>();
     @NonNull
-    private ArrayMap<Long, Subscription> mSubscriptionIdLUT = new ArrayMap<>();
+    private final ArrayMap<Long, Subscription> mSubscriptionIdLUT = new ArrayMap<>();
     @NonNull
     private SortedList.Callback<Subscription> mSubscriptionsListCallback = new SortedList.Callback<Subscription>() {
 

@@ -678,26 +678,26 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
-            return true;
-        }
+			return true;
+		}
+
 		if (obj == null) {
-            return false;
-        }
-        boolean isInstanceof = obj instanceof FeedItem;
-		if (!isInstanceof) {
-            return false;
-        }
-
-        FeedItem other = (FeedItem) obj;
-		if (id > 0 && id == other.id) {
-            return true;
-        }
-
-		if (!url.equals(other.url)) {
 			return false;
 		}
 
-		return true;
+		boolean isInstanceof = obj instanceof FeedItem;
+		if (!isInstanceof) {
+			return false;
+		}
+
+		FeedItem other = (FeedItem) obj;
+
+		if (id > 0 && id == other.id) {
+			return true;
+		}
+
+		return url != null && url.equals(other.url);
+
 	}
 
 	@Nullable
