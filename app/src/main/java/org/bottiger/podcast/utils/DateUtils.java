@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -54,6 +55,13 @@ public class DateUtils {
         put("^[A-Za-z]{3},\\s\\d{1,2}\\s[A-Za-z]{3,9}\\s\\d{4}\\s\\d{1,2}:\\d{2}\\s[A-Za-z0-9+-]+$", "EEE, dd MMM yyyy HH:mm z"); // no seconds
         put("^[A-Za-z]{3},\\s\\d{1,2}\\s[A-Za-z]{3,9}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}\\s[0-9+-]+$", "EEE, dd MMM yyyy HH:mm:ss Z");
         put("^[A-Za-z]{3},\\s\\d{1,2}\\s[A-Za-z]{3,9}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}\\s[A-Za-z0-9+-]+$", "EEE, dd MMM yyyy HH:mm:ss z");
+    }};
+
+    private static final Map<String, String> UNSUPPORTED_TIME_ZONE = new HashMap<String, String>() {{
+        put("BST", "GMT+1");
+        put("PST", "-0800");
+        put("PDT", "GMT-7");
+        put("EST", "GMT-4");
     }};
 
     private static String[] sDateFormatKeys = null;
@@ -160,8 +168,12 @@ public class DateUtils {
     public static synchronized Date parse(@NonNull String dateString, @NonNull String dateFormat) throws ParseException {
 
         // This is a hack to deal with date formats not known to Java
-        dateString = dateString.replace("BST", "GMT+1");
-        dateString = dateString.replace("PST", "-0800");
+        Iterator it = UNSUPPORTED_TIME_ZONE.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            dateString = dateString.replace(pair.getKey().toString(), pair.getValue().toString());
+            it.remove(); // avoids a ConcurrentModificationException
+        }
 
         SimpleDateFormat simpleDateFormat;
         if (sSimpleDateFormatCache != null && dateFormat.equals(sSimpleDateFormatFormat)) {
