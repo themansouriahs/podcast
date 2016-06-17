@@ -1,6 +1,7 @@
 package org.bottiger.podcast.adapters;
 
 import java.net.URL;
+import java.util.Locale;
 import java.util.TreeSet;
 
 import org.bottiger.podcast.R;
@@ -72,27 +73,6 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         mInflater = (LayoutInflater) mActivity
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        /*
-        SoundWaves.getRxBus()
-                .toObserverable()
-                .ofType(Playlist.class)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<Playlist>() {
-                    @Override
-                    public void call(Playlist playlistChanged) {
-                        Log.d(TAG, "mRxPlaylistSubscription event recieved");
-                        playlistChanged(playlistChanged);
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        VendorCrashReporter.report("subscribeError" , throwable.toString());
-                        Log.d(TAG, "error: " + throwable.toString());
-                    }
-                });
-                */
-
-
         producePlaylist();
         notifyDataSetChanged();
     }
@@ -133,7 +113,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
             return;
         }
 
-        Context context = SoundWaves.getAppContext();
+        Context context = SoundWaves.getAppContext(mActivity);
         int textColor = item.isMarkedAsListened() ? ColorUtils.getTextColor(context) : ColorUtils.getFadedTextColor(context);
 
         SharedAdapterUtils.AddPaddingToLastElement(viewHolder.mLayout, 0, dataPosition == getItemCount()-1);
@@ -196,7 +176,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         bindDuration(viewHolder, item);
 
         if (item.getPriority() > 0) {
-            viewHolder.mPlaylistPosition.setText(Integer.toString(dataPosition));
+            viewHolder.mPlaylistPosition.setText(String.format(Locale.getDefault(), "%d", dataPosition+1));
             viewHolder.mPlaylistPosition.setVisibility(View.VISIBLE);
         } else {
             viewHolder.mPlaylistPosition.setVisibility(View.GONE);

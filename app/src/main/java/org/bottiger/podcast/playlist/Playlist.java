@@ -761,7 +761,7 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
         int p2 = argEpisode2.getPriority();
 
         if (p1 != p2) {
-            return p1 > p2 ? E1_FIRST : E2_FIRST;
+            return p1 < p2 ? E1_FIRST : E2_FIRST;
         }
 
         Date dt1 = argEpisode1.getDateTime();
