@@ -34,4 +34,8 @@ public abstract class BaseEpisode implements IEpisode {
 
     protected abstract void notifyPropertyChanged(@EpisodeChanged.Action int argAction);
 
+    public boolean hasBeenDownloadedOnce() {
+        return false;
+    }
+
 }

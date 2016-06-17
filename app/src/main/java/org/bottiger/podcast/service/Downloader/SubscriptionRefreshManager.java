@@ -2,6 +2,7 @@ package org.bottiger.podcast.service.Downloader;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.os.Debug;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -182,7 +183,8 @@ public class SubscriptionRefreshManager {
                 FeedItem episode = (FeedItem)episodes.get(i);
                 Date lastUpdate = new Date(episode.getLastUpdate());
                 if (lastUpdate.after(tenMinutesAgo) && newEpisodeCount > 0) {
-                    SoundWaves.getAppContext(argContext).getDownloadManager().addItemToQueue(episode, false, SoundWavesDownloadManager.LAST);
+                    SoundWavesDownloadManager.downloadNewEpisodeAutomatically(argContext, episode);
+                    //SoundWaves.getAppContext(argContext).getDownloadManager().addItemToQueue(episode, false, SoundWavesDownloadManager.LAST);
                     newEpisodeCount--;
                 }
             }

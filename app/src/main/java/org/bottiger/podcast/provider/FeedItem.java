@@ -590,7 +590,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 	 *            the isDownloaded to set
 	 */
 	public void setDownloaded(boolean argIsDownloaded) {
-		if (isDownloaded == argIsDownloaded)
+		if (isDownloaded == argIsDownloaded && !hasBeenDownloadedOnce())
 			return;
 
 		isDownloaded = argIsDownloaded;

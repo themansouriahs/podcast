@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.util.SortedList;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -13,13 +14,17 @@ import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.DownloadProgressPublisher;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.QueueEpisode;
+import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.Downloader.engines.IDownloadEngine;
 import org.bottiger.podcast.utils.NetworkUtils;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager.postQueueChangedEvent;
@@ -170,6 +175,10 @@ public class DownloadService extends IntentService {
             return null;
         }
 
+        if (episode == null) {
+            return null;
+        }
+
         QueueEpisode queueEpisode = new QueueEpisode(episode);
         queueEpisode.setStartedManually(startedManually);
 
@@ -247,4 +256,5 @@ public class DownloadService extends IntentService {
             sLock.unlock();
         }
     }
+
 }

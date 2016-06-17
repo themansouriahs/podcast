@@ -5,12 +5,15 @@ import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Observable;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.bottiger.podcast.BuildConfig;
@@ -52,6 +55,7 @@ import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
+import android.support.v7.util.SortedList;
 import android.util.Log;
 
 import rx.Observer;
@@ -66,6 +70,7 @@ import static org.bottiger.podcast.utils.StorageUtils.VIDEO;
 
 public class SoundWavesDownloadManager extends Observable {
 
+    public static final int HOURS = 48;
     private static final String TAG = "SWDownloadManager";
 
     public static class DownloadManagerChanged {
@@ -447,10 +452,14 @@ public class SoundWavesDownloadManager extends Observable {
         return NETWORK_OK;
 	}
 
+    public void addItemToQueue(IEpisode argEpisode, @QueuePosition int argPosition) {
+        addItemToQueue(argEpisode, true, argPosition);
+    }
+
 	/**
 	 * Add feeditem to the download queue
 	 */
-	public void addItemToQueue(IEpisode argEpisode, boolean startedManually, @QueuePosition int argPosition) {
+	private void addItemToQueue(IEpisode argEpisode, boolean startedManually, @QueuePosition int argPosition) {
         Log.d(TAG, "Adding item to queue: " + argEpisode);
 
         if (!(argEpisode instanceof FeedItem)) {
@@ -576,27 +585,85 @@ public class SoundWavesDownloadManager extends Observable {
         return event;
     }
 
-    private rx.Observable<QueueEpisode> _getDownloadObservable(final QueueEpisode argQueueItem) {
-        return rx.Observable.just(true).map(new Func1<Boolean, QueueEpisode>() {
-
-            @Override
-            public QueueEpisode call(Boolean argQueueItem2) {
-                startDownload(argQueueItem);
-                return argQueueItem;
-            }
-        });
-    }
-
-    @WorkerThread
-    private boolean downloadEpisode(final QueueEpisode argQueueItem) {
-        return startDownload(argQueueItem);
-    }
-
     public static void postQueueChangedEvent(@Nullable IEpisode argFeedItem, @DownloadManagerEvent int eventType) {
         final DownloadManagerChanged event = produceDownloadManagerState(argFeedItem, eventType);
 
         Log.d(TAG, "posting DownloadManagerChanged event");
         SoundWaves.getRxBus().send(event);
         Log.d(TAG, "DownloadManagerChanged event posted");
+    }
+
+    public static int downloadNewEpisodes(@NonNull Context argContext, @NonNull ISubscription argSubscription) {
+        int amountQueued = 0;
+
+        SoundWavesDownloadManager downloadManager = SoundWaves.getAppContext(argContext.getApplicationContext()).getDownloadManager();
+
+        List<IEpisode> episodesToDownload = episodesToDownloadAutomatically(argSubscription);
+        for (int i = 0; i < episodesToDownload.size(); i++) {
+            IEpisode episode = episodesToDownload.get(i);
+            if (downloadNewEpisodeAutomatically(argContext, episode)) {
+                amountQueued++;
+            }
+        }
+
+        return amountQueued;
+    }
+
+    public static boolean downloadNewEpisodeAutomatically(@NonNull Context argContext, @NonNull IEpisode argEpisode) {
+        if (shouldDownloadAutomaticlly(argEpisode)) {
+            SoundWavesDownloadManager downloadManager = SoundWaves.getAppContext(argContext.getApplicationContext()).getDownloadManager();
+            downloadManager.addItemToQueue(argEpisode, false, ANYWHERE);
+            return true;
+        }
+
+        return false;
+    }
+
+    public static List<IEpisode> episodesToDownloadAutomatically(@NonNull ISubscription argSubscription) {
+
+        List<IEpisode> episodesToDownload = new LinkedList<>();
+
+        SortedList<? extends IEpisode> episodes = argSubscription.getEpisodes();
+        FeedItem episode;
+
+        for (int i = 0; i < episodes.size(); i++) {
+
+            episode = (FeedItem)episodes.get(i);
+
+            if (shouldDownloadAutomaticlly(episode)) {
+                episodesToDownload.add(episode);
+            }
+        }
+
+        return episodesToDownload;
+    }
+
+    public static boolean shouldDownloadAutomaticlly(@NonNull IEpisode argEpisode) {
+        /**
+         * Currently we download an episode if:
+         *
+         * 1) We should download automatically (checked above)
+         * 2) It is less than 48 hours old
+         * 3) It has not been downloaded before
+         *
+         */
+        Date episodeDate = argEpisode.getDateTime();
+        if (episodeDate != null && argEpisode.getCreatedAt().getTime() > 0) {
+            episodeDate = argEpisode.getCreatedAt();
+        }
+
+        if (episodeDate != null) {
+            long createdAt = episodeDate.getTime();
+            long now = System.currentTimeMillis();
+            long hoursOld = TimeUnit.MILLISECONDS.toHours(now - createdAt);
+
+            if (hoursOld <= HOURS && !argEpisode.hasBeenDownloadedOnce() && argEpisode.isNew()) {
+                return true;
+            }
+        } else {
+            Log.w(TAG, "EpisodeDate not set");
+        }
+
+        return false;
     }
 }
