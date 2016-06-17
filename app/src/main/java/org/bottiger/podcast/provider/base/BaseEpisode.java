@@ -1,6 +1,5 @@
 package org.bottiger.podcast.provider.base;
 
-import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.model.events.EpisodeChanged;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
@@ -26,7 +25,7 @@ public abstract class BaseEpisode implements IEpisode {
             return;
 
         mProgress = argProgress;
-        notifyPropertyChanged(EpisodeChanged.PROGRESS);
+        notifyPropertyChanged(EpisodeChanged.DOWNLOAD_PROGRESS);
     }
 
     public void setIsParsing(boolean argIsParsing) {

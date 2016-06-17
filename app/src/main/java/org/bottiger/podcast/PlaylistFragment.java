@@ -546,7 +546,8 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
                 .filter(new Func1<EpisodeChanged, Boolean>() {
                     @Override
                     public Boolean call(EpisodeChanged episodeChanged) {
-                        return episodeChanged.getAction() != EpisodeChanged.PROGRESS;
+                        return episodeChanged.getAction() != EpisodeChanged.PLAYING_PROGRESS &&
+                                episodeChanged.getAction() != EpisodeChanged.DOWNLOAD_PROGRESS;
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())

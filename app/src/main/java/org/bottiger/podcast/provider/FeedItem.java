@@ -16,11 +16,9 @@ import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.model.events.DownloadProgress;
-import org.bottiger.podcast.listeners.DownloadProgressPublisher;
 import org.bottiger.podcast.model.events.EpisodeChanged;
 import org.bottiger.podcast.provider.base.BaseEpisode;
 import org.bottiger.podcast.service.DownloadStatus;
-import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.BitMaskUtils;
 import org.bottiger.podcast.utils.PlaybackSpeed;
 import org.bottiger.podcast.utils.SDCardManager;
@@ -500,7 +498,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 			return;
 
 		this.offset = (int) pos;
-		notifyPropertyChanged(EpisodeChanged.PROGRESS);
+		notifyPropertyChanged(EpisodeChanged.PLAYING_PROGRESS);
 	}
 
 	@Override
@@ -544,7 +542,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 			return;
 
 		filesize = argFilesize;
-		notifyPropertyChanged(EpisodeChanged.PROGRESS);
+		notifyPropertyChanged(EpisodeChanged.PLAYING_PROGRESS);
 	}
 
 	/**
@@ -1078,7 +1076,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
         if (mIsParsing)
             return;
 
-		if (argAction != EpisodeChanged.PROGRESS) {
+		if (argAction != EpisodeChanged.PLAYING_PROGRESS) {
 			EpisodeChanged ec = new EpisodeChanged(getId(), getURL(), argAction);
 			SoundWaves.getRxBus().send(ec);
 		}
@@ -1093,7 +1091,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 		}
 
 		// !isDownloaded() &&
-		if (argAction == EpisodeChanged.PROGRESS && (System.currentTimeMillis()-lastUpdate2)>160) {
+		if (argAction == EpisodeChanged.DOWNLOAD_PROGRESS && (System.currentTimeMillis()-lastUpdate2)>160) {
 			lastUpdate2 = System.currentTimeMillis();
 			progressChanged = new DownloadProgress(this, DownloadStatus.DOWNLOADING, (int)getProgress());
 			Log.d(TAG, "Notify progress changed: FeedItemHash: " + hashCode() + " progress: " + (int)getProgress());

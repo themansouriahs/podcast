@@ -1,8 +1,6 @@
 package org.bottiger.podcast.views;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.RectF;
@@ -11,7 +9,6 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.graphics.Palette;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -25,16 +22,12 @@ import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.TopActivity;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.events.DownloadProgress;
-import org.bottiger.podcast.model.events.ItemChanged;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
-import org.bottiger.podcast.service.DownloadStatus;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.UIUtils;
-
-import java.util.concurrent.TimeUnit;
 
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -53,7 +46,7 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
 
     private Drawable mStaticBackground = null;
     private static final @DrawableRes int download_icon = R.drawable.ic_get_app_24dp; //ic_get_app_24dp;
-    private static final @DrawableRes int qeueed_icon = R.drawable.ic_query_builder_24dp;
+    private static final @DrawableRes int queued_icon = R.drawable.ic_query_builder_24dp;
     private static final @DrawableRes int delete_icon = R.drawable.ic_delete_24dp;
 
     private static final int BITMAP_OFFSET = 5;
@@ -89,7 +82,7 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
             setImage(download_icon);
             addState(PlayerButtonView.STATE_DEFAULT, download_icon);
             addState(PlayerButtonView.STATE_DELETE, delete_icon);
-            addState(PlayerButtonView.STATE_QUEUE, qeueed_icon);
+            addState(PlayerButtonView.STATE_QUEUE, queued_icon);
         }
 
         addDownloadCompletedCallback(new PlayerButtonView.DownloadStatus() {
