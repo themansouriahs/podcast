@@ -62,6 +62,8 @@ public interface ISubscription {
     boolean IsRefreshing();
     void setIsRefreshing(boolean argIsRefreshing);
 
+    boolean IsLoaded();
+
     boolean isListOldestFirst();
 
     @Type int getType();

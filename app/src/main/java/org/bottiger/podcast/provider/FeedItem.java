@@ -66,7 +66,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 	 * URL of the episode:
 	 * http://podcast.dr.dk/P1/p1debat/2013/p1debat_1301171220.mp3
 	 */
-	public String url;
+	private String url;
 
 	/**
 	 * Currently not persisted.
@@ -517,7 +517,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 			return;
 
 		url = argUrl;
-		notifyPropertyChanged();
+		notifyPropertyChanged(EpisodeChanged.CHANGED);
 	}
 
 	@NonNull
