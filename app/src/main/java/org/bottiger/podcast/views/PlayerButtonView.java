@@ -105,6 +105,12 @@ public class PlayerButtonView extends ImageButton implements PaletteListener  {
             }
         }
         defaultIcon = image;
+
+        if (defaultIcon == 0) {
+            VendorCrashReporter.report("Default icon 0", "Should not happen");
+            defaultIcon = R.drawable.generic_podcast;
+        }
+
         mStateIcons.put(PlayerButtonView.STATE_DEFAULT, defaultIcon);
     }
 
@@ -141,11 +147,11 @@ public class PlayerButtonView extends ImageButton implements PaletteListener  {
 
     public void setState(@DrawableRes int argState) {
         if (mStateIcons.get(argState) == 0) {
-            throw new IllegalStateException("No such state exists");
+            VendorCrashReporter.report("No such state exists", "No such state exists: " + argState);
+            return;
         }
 
         mCurrentState = argState;
-        //setImage(mStateIcons.get(argState, defaultIcon));
         setImageResource(mStateIcons.get(argState, defaultIcon));
     }
 

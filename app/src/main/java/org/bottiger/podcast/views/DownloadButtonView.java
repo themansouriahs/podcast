@@ -276,12 +276,12 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
 
     private int calcState() {
 
-        PlayerService ps = PlayerService.getInstance();
+        IEpisode episode = getEpisode();
 
-        if (ps == null)
+        if (episode == null)
             return PlayerButtonView.STATE_DOWNLOAD;
 
-        if (getEpisode().isDownloaded()) {
+        if (episode.isDownloaded()) {
             return PlayerButtonView.STATE_DELETE;
         }
 
