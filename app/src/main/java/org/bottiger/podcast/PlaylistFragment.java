@@ -14,6 +14,7 @@ import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.ImageLoaderUtils;
 import org.bottiger.podcast.utils.PaletteHelper;
+import org.bottiger.podcast.utils.PlayerHelper;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.views.CustomLinearLayoutManager;
@@ -322,7 +323,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
         if (duration > 0) {
             mTotalTime.setText(StrUtils.formatTime(duration));
         } else {
-            mTotalTime.setText("");
+            PlayerHelper.setDuration(item, mTotalTime);
         }
 
         setPlayerProgress(item);
