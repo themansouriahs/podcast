@@ -9,8 +9,8 @@ android {
         applicationId "org.bottiger.podcast"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 285        // even - release. Odd - development
-        versionName "0.136.5" // even - release. Odd - development
+        versionCode 286        // even - release. Odd - development
+        versionName "0.136.6" // even - release. Odd - development
         multiDexEnabled = true
         //renderscriptTargetApi 20
         //renderscriptSupportModeEnabled true
@@ -130,7 +130,7 @@ dependencies {
 
     compile 'io.requery:sqlite-android:3.13.0-2'
 
-    compile 'com.google.android.exoplayer:exoplayer:r1.5.8'
+    compile 'com.google.android.exoplayer:exoplayer:r1.5.9'
 
     // Glide
     compile 'com.github.bumptech.glide:glide:3.7.0'
