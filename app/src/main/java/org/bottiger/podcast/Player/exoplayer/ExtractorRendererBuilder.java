@@ -29,9 +29,11 @@ import com.google.android.exoplayer.MediaCodecVideoTrackRenderer;
 import com.google.android.exoplayer.TrackRenderer;
 import com.google.android.exoplayer.audio.AudioCapabilities;
 
+import org.bottiger.podcast.R;
 import org.bottiger.podcast.player.PlayerStateManager;
 import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper.RendererBuilder;
 import org.bottiger.podcast.utils.HttpUtils;
+import org.bottiger.podcast.utils.PreferenceHelper;
 
 import com.google.android.exoplayer.extractor.Extractor;
 import com.google.android.exoplayer.extractor.ExtractorSampleSource;
@@ -80,11 +82,15 @@ public class ExtractorRendererBuilder implements RendererBuilder {
       ExtractorSampleSource sampleSource = new ExtractorSampleSource(uri, dataSource, allocator,
         BUFFER_SEGMENT_COUNT * BUFFER_SEGMENT_SIZE, mainHandler, player, 0);
 
+      PodcastAudioRenderer podcastAudioRenderer = getAudioRenderer(sampleSource);
+      podcastAudioRenderer.setRemoveSilence(player.doRemoveSilence());
+
       // Invoke the callback.
       TrackRenderer[] renderers = new TrackRenderer[ExoPlayerWrapper.RENDERER_COUNT];
       renderers[ExoPlayerWrapper.TYPE_VIDEO] = getVideoRenderer(sampleSource, mainHandler, player);
-      renderers[ExoPlayerWrapper.TYPE_AUDIO] = getAudioRenderer(sampleSource);
+      renderers[ExoPlayerWrapper.TYPE_AUDIO] = podcastAudioRenderer;
       renderers[ExoPlayerWrapper.TYPE_TEXT] = getTextRenderer(sampleSource, mainHandler, player);
+
       player.onRenderers(renderers, bandwidthMeter);
 
       return renderers;
@@ -106,7 +112,7 @@ public class ExtractorRendererBuilder implements RendererBuilder {
                 mainHandler, player, 50);
     }
 
-    private MediaCodecAudioTrackRenderer getAudioRenderer(@NonNull ExtractorSampleSource sampleSource) {
+    private PodcastAudioRenderer getAudioRenderer(@NonNull ExtractorSampleSource sampleSource) {
         return Util.SDK_INT >= 21 ? new PodcastAudioRendererV21(sampleSource) : new PodcastAudioRenderer(sampleSource);
     }
 

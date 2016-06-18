@@ -374,12 +374,12 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         super.onAttachedToWindow();
 
         SoundWaves.getRxBus().toObserverable()
-                .ofType(RxBusSimpleEvents.PlaybackSpeedChanged.class)
+                .ofType(RxBusSimpleEvents.PlaybackEngineChanged.class)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<RxBusSimpleEvents.PlaybackSpeedChanged>() {
+                .subscribe(new Action1<RxBusSimpleEvents.PlaybackEngineChanged>() {
                     @Override
-                    public void call(RxBusSimpleEvents.PlaybackSpeedChanged event) {
+                    public void call(RxBusSimpleEvents.PlaybackEngineChanged event) {
                         mSpeedButton.setText(getContext().getString(R.string.speed_multiplier, event.speed));
                     }
                 }, new Action1<Throwable>() {

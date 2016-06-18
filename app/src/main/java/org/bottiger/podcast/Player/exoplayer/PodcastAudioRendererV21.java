@@ -31,7 +31,6 @@ public class PodcastAudioRendererV21 extends PodcastAudioRenderer {
     private SilenceRemover mSilenceRemover;
 
     private float mSpeed = PlaybackSpeed.DEFAULT;
-    private boolean mRemoveSilence = false;
 
     private int mLastSeenBufferIndex = -1;
     private ByteBuffer mLastInternalBuffer;
@@ -47,8 +46,8 @@ public class PodcastAudioRendererV21 extends PodcastAudioRenderer {
         this.mSonic.setSpeed(speed);
     }
 
-    public synchronized void setRemoveSilence(boolean argRemoveSilence) {
-        this.mRemoveSilence = argRemoveSilence;
+    public float getSpeed() {
+        return mSpeed;
     }
 
     @Override
@@ -77,7 +76,7 @@ public class PodcastAudioRendererV21 extends PodcastAudioRenderer {
         int bytesOld = bytesToRead;
 
         // Remove Silence
-        if (mRemoveSilence) {
+        if (doRemoveSilence()) {
             mSilenceOutputBuffer = mSilenceRemover.removeSilence(mSonicInputBuffer, mSilenceOutputBuffer, bytesToRead);
             bytesToRead = mSilenceRemover.getOutputLength();
         } else {
@@ -91,7 +90,11 @@ public class PodcastAudioRendererV21 extends PodcastAudioRenderer {
                 us_skipped = us_pr_frame * (bytesOld - bytesToRead);
             }
         }
-        Log.w(TAG, "bytediff: " + (bytesOld-bytesToRead) + "time skipped: " + us_skipped);
+
+        if (us_skipped > 0) {
+            Log.w(TAG, "bytediff: " + (bytesOld - bytesToRead) + "time skipped: " + us_skipped);
+        }
+
         positionUs += us_skipped;
 
         mSonic.writeBytesToStream(mSilenceOutputBuffer, bytesToRead);

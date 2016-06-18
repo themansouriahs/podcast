@@ -16,6 +16,8 @@ public class PodcastAudioRenderer extends MediaCodecAudioTrackRenderer {
 
     private static final long US_IN_MS = 1_000;
 
+    private boolean mRemoveSilence = false;
+
     private ProgressUpdateListener mProgressUpdateListener;
     private long mProgress;
 
@@ -25,6 +27,14 @@ public class PodcastAudioRenderer extends MediaCodecAudioTrackRenderer {
 
     public void setProgressUpdateListener(ProgressUpdateListener progressUpdateListener) {
         mProgressUpdateListener = progressUpdateListener;
+    }
+
+    public boolean doRemoveSilence() {
+        return mRemoveSilence;
+    }
+
+    public synchronized void setRemoveSilence(boolean argRemoveSilence) {
+        this.mRemoveSilence = argRemoveSilence;
     }
 
     @Override

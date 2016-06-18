@@ -48,6 +48,38 @@
     </LinearLayout>
 
     <View
+        android:id="@+id/filter_subscription_line_2"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:background="@color/grayStart"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/remove_silence_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Body1"
+            android:text="Removile silence"
+            android:layout_centerVertical="true"/>
+
+        <android.support.v7.widget.SwitchCompat
+            android:id="@+id/remove_silence_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            />
+
+    </RelativeLayout>
+
+    <View
         android:id="@+id/filter_subscription_line"
         android:layout_width="fill_parent"
         android:layout_height="1dp"
@@ -90,5 +122,6 @@
             android:text="@string/dialog_playback_speed_global" />
 
     </RadioGroup>
+
 
 </LinearLayout>

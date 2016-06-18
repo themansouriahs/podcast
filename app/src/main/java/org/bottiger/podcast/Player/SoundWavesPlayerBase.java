@@ -32,6 +32,7 @@ import org.bottiger.podcast.player.soundwaves.NDKMediaPlayer;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.PlaybackSpeed;
+import org.bottiger.podcast.utils.PreferenceHelper;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -62,7 +63,12 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
     private TrackRenderer[] mTrackRendere = new TrackRenderer[ExoPlayerWrapper.RENDERER_COUNT];
 
     public SoundWavesPlayerBase(@NonNull Context argContext) {
+        boolean remove_silence = PreferenceHelper.getBooleanPreferenceValue(argContext,
+                R.string.pref_audioengine_remove_silence_key,
+                R.bool.pref_audioengine_remove_silence_default);
+
         mExoplayer = new ExoPlayerWrapper();
+        mExoplayer.setRemoveSilence(remove_silence);
         mExoplayer.setRenderBuilder(new ExtractorRendererBuilder(argContext, null));
         mType = EXOPLAYER;
     }
@@ -94,6 +100,14 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
         }
 
         return 0;
+    }
+
+    public boolean doRemoveSilence() {
+        return mExoplayer.doRemoveSilence();
+    }
+
+    public void setRemoveSilence(boolean argDoRemoveSilence) {
+        mExoplayer.setRemoveSilence(argDoRemoveSilence);
     }
 
     @Override
@@ -176,8 +190,6 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
 
     @Override
     public void seekTo(int msec) throws IllegalStateException {
-        //long seekPosition = mExoplayer.getDuration() == ExoPlayer.UNKNOWN_TIME ? 0 : Math.min(Math.max(0, msec), getDuration());
-        //mExoplayer.seekTo(seekPosition);
         mExoplayer.seekTo(msec);
     }
 

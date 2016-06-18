@@ -333,7 +333,9 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
         mPlayPauseButton.setStatus(ExoPlayerWrapper.STATE_READY);
 
         ISubscription iSubscription = item.getSubscription(getContext());
-        if (iSubscription instanceof org.bottiger.podcast.provider.Subscription) {
+        if (mPlayer.isPlaying()) {
+            mTopPlayer.setPlaybackSpeedView(mPlayer.getCurrentSpeedMultiplier());
+        } else if (iSubscription instanceof org.bottiger.podcast.provider.Subscription) {
             org.bottiger.podcast.provider.Subscription subscription = (org.bottiger.podcast.provider.Subscription)iSubscription;
             mTopPlayer.setPlaybackSpeedView(subscription.getPlaybackSpeed());
         }

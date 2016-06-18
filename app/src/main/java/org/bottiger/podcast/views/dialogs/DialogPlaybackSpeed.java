@@ -8,10 +8,12 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
@@ -58,6 +60,8 @@ public class DialogPlaybackSpeed extends DialogFragment {
     private Button mDecrementButton;
     private TextView mCurrentSpeedView;
 
+    private SwitchCompat mRemoveSilenceSwitch;
+
     private RadioButton mRadioEpisode;
     private RadioButton mRadioSubscription;
     private RadioButton mRadioGlobal;
@@ -92,6 +96,8 @@ public class DialogPlaybackSpeed extends DialogFragment {
         mDecrementButton = (Button) view.findViewById(R.id.playback_decrement_button);
         mCurrentSpeedView = (TextView) view.findViewById(R.id.playback_speed_value);
 
+        mRemoveSilenceSwitch = (SwitchCompat) view.findViewById(R.id.remove_silence_switch);
+
         mRadioEpisode = (RadioButton) view.findViewById(R.id.radio_playback_speed_episode);
         mRadioSubscription = (RadioButton) view.findViewById(R.id.radio_playback_speed_subscription);
         mRadioGlobal = (RadioButton) view.findViewById(R.id.radio_playback_speed_global);
@@ -116,13 +122,13 @@ public class DialogPlaybackSpeed extends DialogFragment {
 
         mRxSubscriptions
                 .add(SoundWaves.getRxBus().toObserverable()
-                        .ofType(RxBusSimpleEvents.PlaybackSpeedChanged.class)
+                        .ofType(RxBusSimpleEvents.PlaybackEngineChanged.class)
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Action1<RxBusSimpleEvents.PlaybackSpeedChanged>() {
+                        .subscribe(new Action1<RxBusSimpleEvents.PlaybackEngineChanged>() {
                             @Override
-                            public void call(RxBusSimpleEvents.PlaybackSpeedChanged playbackSpeedChanged) {
-                                Log.d(TAG, "new playback: " + playbackSpeedChanged.speed);
-                                setSpeed(player, playbackSpeedChanged.speed);
+                            public void call(RxBusSimpleEvents.PlaybackEngineChanged playbackEngineChanged) {
+                                Log.d(TAG, "new playback: " + playbackEngineChanged.speed);
+                                setSpeed(player, playbackEngineChanged.speed);
                             }
                         }, new Action1<Throwable>() {
                             @Override
@@ -134,6 +140,7 @@ public class DialogPlaybackSpeed extends DialogFragment {
 
         setSpeed(player, mInitialPlaybackSpeed);
         checkRadioButton(scope);
+        mRemoveSilenceSwitch.setChecked(player.doRemoveSilence());
 
         mIncrementButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -141,7 +148,7 @@ public class DialogPlaybackSpeed extends DialogFragment {
                 float newPlaybackSpeed = mInitialPlaybackSpeed + PlaybackSpeed.sSpeedIncrements;
                 Log.d(TAG, "increment playback speed to: " + newPlaybackSpeed);
                 setSpeed(player, newPlaybackSpeed);
-                player.setPlaybackSpeed(newPlaybackSpeed);
+                //player.setPlaybackSpeed(newPlaybackSpeed);
             }
         });
 
@@ -151,9 +158,19 @@ public class DialogPlaybackSpeed extends DialogFragment {
                 float newPlaybackSpeed = mInitialPlaybackSpeed - PlaybackSpeed.sSpeedIncrements;
                 Log.d(TAG, "dencrement playback speed to: " + newPlaybackSpeed);
                 setSpeed(player, newPlaybackSpeed);
-                player.setPlaybackSpeed(newPlaybackSpeed);
+                //player.setPlaybackSpeed(newPlaybackSpeed);
             }
         });
+
+        mRemoveSilenceSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Log.d(TAG, "remove silence: " + isChecked);
+                player.setRemoveSilence(isChecked);
+            }
+        });
+
+
 
         builder.setView(view);
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {

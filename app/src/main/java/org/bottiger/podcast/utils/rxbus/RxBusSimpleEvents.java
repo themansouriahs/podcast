@@ -5,12 +5,18 @@ package org.bottiger.podcast.utils.rxbus;
  */
 public class RxBusSimpleEvents {
 
-    public static class PlaybackSpeedChanged {
+    public static class PlaybackEngineChanged {
 
+        private boolean mDoRemoveSilence = false;
         public float speed = 1.0f;
 
-        public PlaybackSpeedChanged(float argSpeed) {
+        public PlaybackEngineChanged(float argSpeed, boolean doRemoveSilence) {
             speed = argSpeed;
+            mDoRemoveSilence = doRemoveSilence;
+        }
+
+        public boolean doRemoveSilence() {
+            return mDoRemoveSilence;
         }
     }
 

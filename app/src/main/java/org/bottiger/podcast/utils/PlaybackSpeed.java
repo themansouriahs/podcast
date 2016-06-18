@@ -21,7 +21,7 @@ public class PlaybackSpeed {
 
     public static int toMap(float argSpeed) {
         int playbackSpeedHash = 0;
-        for (float i = sSpeedMinimum*10; i < argSpeed+sSpeedIncrements/2; i = (i + sSpeedIncrements*10)) {
+        for (float i = sSpeedMinimum*10; i < Math.floor(argSpeed+sSpeedIncrements/2); i = (i + sSpeedIncrements*10)) {
             playbackSpeedHash++;
         }
 
@@ -29,13 +29,11 @@ public class PlaybackSpeed {
     }
 
     public static float toSpeed(int argMap) {
-        float speed = sSpeedMinimum + argMap*sSpeedIncrements;
-
-        return speed;
+        return sSpeedMinimum + argMap*sSpeedIncrements;
     }
 
     public static String toString(float argSpeed) {
-        return argSpeed + "X";
+        return argSpeed + " X";
     }
 
     public static float globalPlaybackSpeed(@NonNull Context argContext) {

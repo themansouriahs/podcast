@@ -208,6 +208,8 @@ public class ExoPlayerWrapper implements ExoPlayer.Listener, ChunkSampleSource.E
     private InternalErrorListener internalErrorListener;
     private InfoListener infoListener;
 
+    boolean mDoRemoveSilence = false;
+
     public ExoPlayerWrapper() {
         player = ExoPlayer.Factory.newInstance(RENDERER_COUNT, 1000, 5000);
         player.addListener(this);
@@ -319,6 +321,33 @@ public class ExoPlayerWrapper implements ExoPlayer.Listener, ChunkSampleSource.E
         mTrackRendere[TYPE_TEXT] = trackRenderers[TYPE_TEXT];
     }
 
+    public boolean doRemoveSilence() {
+        return mDoRemoveSilence;
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    public void setRemoveSilence(boolean argDoRemoveSilence) {
+        mDoRemoveSilence = argDoRemoveSilence;
+        float speed = 1.0f;
+
+        if (mTrackRendere[ExoPlayerWrapper.TYPE_AUDIO] != null) {
+
+            TrackRenderer audioTrackRenderer = mTrackRendere[ExoPlayerWrapper.TYPE_AUDIO];
+
+            if (mTrackRendere[ExoPlayerWrapper.TYPE_AUDIO] instanceof PodcastAudioRenderer) {
+                ((PodcastAudioRenderer) audioTrackRenderer).setRemoveSilence(argDoRemoveSilence);
+            }
+
+            // FIXME: not robust
+            if (mTrackRendere[ExoPlayerWrapper.TYPE_AUDIO] instanceof PodcastAudioRendererV21) {
+                speed = ((PodcastAudioRendererV21) audioTrackRenderer).getSpeed();
+            }
+        }
+
+        RxBus bus = SoundWaves.getRxBus();
+        bus.send(new RxBusSimpleEvents.PlaybackEngineChanged(speed, doRemoveSilence()));
+    }
+
     @TargetApi(Build.VERSION_CODES.M)
     public void setPlaybackSpeed(float argNewSpeed) {
         if (mTrackRendere[ExoPlayerWrapper.TYPE_AUDIO] != null) {
@@ -333,7 +362,7 @@ public class ExoPlayerWrapper implements ExoPlayer.Listener, ChunkSampleSource.E
         }
 
         RxBus bus = SoundWaves.getRxBus();
-        bus.send(new RxBusSimpleEvents.PlaybackSpeedChanged(argNewSpeed));
+        bus.send(new RxBusSimpleEvents.PlaybackEngineChanged(argNewSpeed, doRemoveSilence()));
     }
 
     /**

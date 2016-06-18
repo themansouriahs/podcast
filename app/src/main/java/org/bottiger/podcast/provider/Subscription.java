@@ -683,7 +683,7 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 		}
 
 		if (IsSettingEnabled(PLAYBACK_SPEED_4BIT)) {
-			speedMap += 2<<-1;
+			speedMap += 1;
 		}
 
 		float speed = PlaybackSpeed.toSpeed(speedMap);

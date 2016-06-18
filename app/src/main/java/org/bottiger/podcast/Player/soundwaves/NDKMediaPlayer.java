@@ -18,7 +18,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.media.AudioManager;
@@ -1279,7 +1278,6 @@ public class NDKMediaPlayer {
                     R.string.soundwaves_player_playback_speed_key,
                     R.integer.soundwaves_player_speed_default);
             mSpeedMultiplier = playbackspeed/10.0f;
-            //notifyAboutPlaybackSpeedChange(mSpeedMultiplier);
         }
 
         return mSpeedMultiplier;
@@ -1287,6 +1285,6 @@ public class NDKMediaPlayer {
 
     private void notifyAboutPlaybackSpeedChange(float argNewSpeed) {
         RxBus bus = SoundWaves.getRxBus();
-        bus.send(new RxBusSimpleEvents.PlaybackSpeedChanged(argNewSpeed));
+        bus.send(new RxBusSimpleEvents.PlaybackEngineChanged(argNewSpeed, false));
     }
 }

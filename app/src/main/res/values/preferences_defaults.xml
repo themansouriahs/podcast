@@ -11,4 +11,6 @@
     <string name="player_fast_forward_default">60</string>
     <string name="player_rewind_default">60</string>
 
+    <bool name="pref_audioengine_remove_silence_default">false</bool>
+
 </resources>
