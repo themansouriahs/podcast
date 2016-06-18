@@ -302,7 +302,9 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
         final String description = item.getDescription();
 
         mEpisodeTitle.setText(title);
-        mEpisodeInfo.setText(description);
+
+        // FIXME: Trim can be remove from here very soon.
+        mEpisodeInfo.setText(description.trim());
 
         View.OnClickListener onClickListener = getToast(title, description);
         mEpisodeTitle.setOnClickListener(onClickListener);

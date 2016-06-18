@@ -147,6 +147,11 @@ public class SlimSubscription extends BaseSubscription implements Parcelable {
     }
 
     @Override
+    public boolean IsLoaded() {
+        return false;
+    }
+
+    @Override
     public boolean isListOldestFirst() {
         return false;
     }

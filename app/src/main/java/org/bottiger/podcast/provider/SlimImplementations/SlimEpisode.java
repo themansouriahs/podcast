@@ -72,7 +72,11 @@ public class SlimEpisode extends BaseEpisode implements Parcelable {
     }
 
     @Override
+    @NonNull
     public String getDescription() {
+        if (mDescription == null)
+            return "";
+
         return mDescription;
     }
 

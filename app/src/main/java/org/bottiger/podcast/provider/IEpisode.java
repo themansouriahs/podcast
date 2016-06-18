@@ -28,7 +28,7 @@ public interface IEpisode {
     String getTitle();
     URL getUrl();
     @Nullable String getArtwork(@NonNull Context argContext);
-    String getDescription();
+    @NonNull String getDescription();
     String getAuthor();
     long getDuration();
     int getPriority();

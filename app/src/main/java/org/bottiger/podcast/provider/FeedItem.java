@@ -851,7 +851,11 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
     }
 
     @Override
+	@NonNull
     public String getDescription() {
+		if (content == null)
+			return "";
+
         return content;
     }
 
@@ -962,7 +966,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 			return;
 		}
 
-		this.content = Html.fromHtml(argHTMLDescription).toString();
+		this.content = Html.fromHtml(argHTMLDescription).toString().trim();
 
 		notifyPropertyChanged(EpisodeChanged.CHANGED);
 	}
