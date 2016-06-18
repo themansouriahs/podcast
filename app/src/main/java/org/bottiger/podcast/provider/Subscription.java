@@ -215,7 +215,16 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 	}
 
 	public boolean contains(@NonNull IEpisode argEpisode) {
-		return mEpisodes.indexOf(argEpisode) >= 0;
+
+		// For some reason thi doen't work
+		//return mEpisodes.indexOf(argEpisode) >= 0;
+
+		for (int i = 0; i < mEpisodes.size(); i++) {
+			if (mEpisodes.get(i).equals(argEpisode))
+				return true;
+		}
+
+		return false;
 	}
 
 	public boolean addEpisode(@NonNull IEpisode argEpisode, boolean argSilent) {
