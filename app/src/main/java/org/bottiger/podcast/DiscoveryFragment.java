@@ -112,7 +112,12 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
         @Override
         public void error(Exception argException) {
             Log.e(TAG, "Search failed", argException);
-            mProgress.setVisibility(View.INVISIBLE);
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mProgress.setVisibility(View.INVISIBLE);
+                }
+            });
             return;
         }
     };
