@@ -85,7 +85,13 @@ public class PlayerHelper {
             return -1;
         }
 
-        metaRetriever.setDataSource(location.getPath());
+        try {
+            metaRetriever.setDataSource(location.getPath());
+        } catch (Exception e) {
+            argTextView.setText("");
+            VendorCrashReporter.report("Invalid location", "location:" + location.getPath());
+            return -1;
+        }
 
         String durationStr = metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
         long durationMs = Long.parseLong(durationStr);
