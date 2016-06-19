@@ -59,6 +59,8 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorSecondary</item>
 
+        <item name="colorButtonNormal">@color/white_opaque</item>
+
         <!--
         They are here because 4.1.2 will crash otherwise
         http://stackoverflow.com/questions/21822523/java-lang-unsupportedoperationexception-cant-convert-to-dimension-type-0x12

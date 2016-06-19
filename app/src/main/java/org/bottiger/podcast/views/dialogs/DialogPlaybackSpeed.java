@@ -61,6 +61,7 @@ public class DialogPlaybackSpeed extends DialogFragment {
     private TextView mCurrentSpeedView;
 
     private SwitchCompat mRemoveSilenceSwitch;
+    private SwitchCompat mAutomaticGainSwitch;
 
     private RadioButton mRadioEpisode;
     private RadioButton mRadioSubscription;
@@ -97,6 +98,7 @@ public class DialogPlaybackSpeed extends DialogFragment {
         mCurrentSpeedView = (TextView) view.findViewById(R.id.playback_speed_value);
 
         mRemoveSilenceSwitch = (SwitchCompat) view.findViewById(R.id.remove_silence_switch);
+        mAutomaticGainSwitch = (SwitchCompat) view.findViewById(R.id.automatic_gain_control_switch);
 
         mRadioEpisode = (RadioButton) view.findViewById(R.id.radio_playback_speed_episode);
         mRadioSubscription = (RadioButton) view.findViewById(R.id.radio_playback_speed_subscription);
@@ -141,6 +143,7 @@ public class DialogPlaybackSpeed extends DialogFragment {
         setSpeed(player, mInitialPlaybackSpeed);
         checkRadioButton(scope);
         mRemoveSilenceSwitch.setChecked(player.doRemoveSilence());
+        mAutomaticGainSwitch.setChecked(player.doAutomaticGainControl());
 
         mIncrementButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -167,6 +170,14 @@ public class DialogPlaybackSpeed extends DialogFragment {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 Log.d(TAG, "remove silence: " + isChecked);
                 player.setRemoveSilence(isChecked);
+            }
+        });
+
+        mAutomaticGainSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Log.d(TAG, "automatic gain: " + isChecked);
+                player.setAutomaticGainControl(isChecked);
             }
         });
 

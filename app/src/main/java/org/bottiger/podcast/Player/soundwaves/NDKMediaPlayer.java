@@ -1285,6 +1285,6 @@ public class NDKMediaPlayer {
 
     private void notifyAboutPlaybackSpeedChange(float argNewSpeed) {
         RxBus bus = SoundWaves.getRxBus();
-        bus.send(new RxBusSimpleEvents.PlaybackEngineChanged(argNewSpeed, false));
+        bus.send(new RxBusSimpleEvents.PlaybackEngineChanged(argNewSpeed, false, false));
     }
 }

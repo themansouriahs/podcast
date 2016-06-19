@@ -12,5 +12,6 @@
     <string name="player_rewind_default">60</string>
 
     <bool name="pref_audioengine_remove_silence_default">false</bool>
+    <bool name="pref_audioengine_automatic_gain_control_default">false</bool>
 
 </resources>

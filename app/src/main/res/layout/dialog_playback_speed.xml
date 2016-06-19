@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -8,12 +8,16 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="@string/dialog_playback_engine_title"
+        android:padding="10dp"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Headline"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:text="@string/dialog_playback_speed_title"
         android:padding="10dp"
-        android:textSize="18sp"
-        android:textColor="@color/white_opaque"
-        android:background="@color/colorPrimary"
-        style="@style/SoundWavesTextViewStyle" />
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Body1"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -22,26 +26,26 @@
         android:padding="10dp">
 
         <Button
-            style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="-"
+            style="@style/Base.Widget.AppCompat.Button.Small"
             android:id="@+id/playback_decrement_button" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="1.0x"
+            android:text="1.0 X"
             android:gravity="center"
             android:textSize="20sp"
             android:textColor="@color/black"
             android:id="@+id/playback_speed_value"/>
 
         <Button
-            style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            style="@style/Base.Widget.AppCompat.Button.Small"
             android:text="+"
             android:id="@+id/playback_increment_button" />
 
@@ -66,11 +70,35 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Body1"
-            android:text="Removile silence"
+            android:text="@string/dialog_playback_removile_silence"
             android:layout_centerVertical="true"/>
 
         <android.support.v7.widget.SwitchCompat
             android:id="@+id/remove_silence_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/automatic_gain_control_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Body1"
+            android:text="@string/dialog_playback_boost_volume"
+            android:layout_centerVertical="true"/>
+
+        <android.support.v7.widget.SwitchCompat
+            android:id="@+id/automatic_gain_control_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
@@ -92,9 +120,7 @@
         android:layout_height="wrap_content"
         android:text="@string/dialog_playback_speed_scope"
         android:padding="10dp"
-        android:textSize="18sp"
-        android:textColor="@color/black"
-        style="@style/SoundWavesTextViewStyle"/>
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Body1"/>
 
     <RadioGroup
         android:layout_width="match_parent"

@@ -152,6 +152,7 @@
     <string name="dialog_playback_speed_episode">This episode only</string>
     <string name="dialog_playback_speed_subscription">All episodes in from this podcast</string>
     <string name="dialog_playback_speed_global">All episodes</string>
+    <string name="dialog_playback_engine_title">Sound Engine Settings</string>
     <string name="dialog_playback_speed_title">Playback speed</string>
     <string name="dialog_playback_speed_scope">Apply change to</string>
     <string name="feed_settings_show_description">Show episode description</string>
@@ -211,6 +212,8 @@
     <string name="speed_multiplier">%1$.1f X</string>
     <string name="discovery_directory_icon">Podcast directory (search engine)</string>
     <string name="subscription_instruction_title">You are not subscribed to any podcasts</string>
+    <string name="dialog_playback_boost_volume">Boost volume</string>
+    <string name="dialog_playback_removile_silence">Removile silence</string>
 
     <plurals name="player_sleep">
         <item quantity="one">Player will sleep in %d minute</item>

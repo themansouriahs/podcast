@@ -1,10 +1,15 @@
 package org.bottiger.podcast.player.exoplayer;
 
+import android.media.audiofx.AutomaticGainControl;
+import android.support.annotation.Nullable;
+
 import com.google.android.exoplayer.ExoPlaybackException;
 import com.google.android.exoplayer.MediaCodecAudioTrackRenderer;
 import com.google.android.exoplayer.MediaCodecSelector;
 import com.google.android.exoplayer.SampleSource;
 import com.google.android.exoplayer.TrackRenderer;
+
+import org.bottiger.podcast.utils.AndroidUtil;
 
 /**
  * Custom renderer used for PremoFM
@@ -17,6 +22,10 @@ public class PodcastAudioRenderer extends MediaCodecAudioTrackRenderer {
     private static final long US_IN_MS = 1_000;
 
     private boolean mRemoveSilence = false;
+    private boolean mAutomaticGainControl = false;
+
+    @Nullable
+    private Integer mAudioSessionId = null;
 
     private ProgressUpdateListener mProgressUpdateListener;
     private long mProgress;
@@ -33,8 +42,16 @@ public class PodcastAudioRenderer extends MediaCodecAudioTrackRenderer {
         return mRemoveSilence;
     }
 
-    public synchronized void setRemoveSilence(boolean argRemoveSilence) {
+    public void setRemoveSilence(boolean argRemoveSilence) {
         this.mRemoveSilence = argRemoveSilence;
+    }
+
+    public void setAutomaticGainControl(boolean argAutomaticGainControl) {
+        this.mAutomaticGainControl = argAutomaticGainControl;
+    }
+
+    public boolean getAutomaticGainControl() {
+        return mAutomaticGainControl;
     }
 
     @Override
@@ -57,6 +74,27 @@ public class PodcastAudioRenderer extends MediaCodecAudioTrackRenderer {
             if (mProgressUpdateListener != null) {
                 mProgressUpdateListener.onProgressUpdate(progress, bufferedProgress, duration);
             }
+        }
+    }
+
+    /**
+     * Invoked when the audio session id becomes known. Once the id is known it will not change
+     * (and hence this method will not be invoked again) unless the renderer is disabled and then
+     * subsequently re-enabled.
+     * <p>
+     * The default implementation is a no-op. One reason for overriding this method would be to
+     * instantiate and enable a {@link Virtualizer} in order to spatialize the audio channels. For
+     * this use case, any {@link Virtualizer} instances should be released in {@link #onDisabled()}
+     * (if not before).
+     *
+     * @param audioSessionId The audio session id.
+     */
+    @Override
+    protected void onAudioSessionId(int audioSessionId) {
+        mAudioSessionId = audioSessionId;
+
+        if (mAutomaticGainControl && AndroidUtil.SDK_INT >= 16) {
+            AutomaticGainControl.create(audioSessionId);
         }
     }
 }

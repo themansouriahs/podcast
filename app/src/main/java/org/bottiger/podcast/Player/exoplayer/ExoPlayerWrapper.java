@@ -209,6 +209,7 @@ public class ExoPlayerWrapper implements ExoPlayer.Listener, ChunkSampleSource.E
     private InfoListener infoListener;
 
     boolean mDoRemoveSilence = false;
+    boolean mAutomaticGainControl = false;
 
     public ExoPlayerWrapper() {
         player = ExoPlayer.Factory.newInstance(RENDERER_COUNT, 1000, 5000);
@@ -325,6 +326,32 @@ public class ExoPlayerWrapper implements ExoPlayer.Listener, ChunkSampleSource.E
         return mDoRemoveSilence;
     }
 
+    public boolean doAutomaticGainControl() {
+        return mAutomaticGainControl;
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    public void setAutomaticGainControl(boolean argAutomaticGainControl) {
+        mAutomaticGainControl = argAutomaticGainControl;
+        float speed = 1.0f;
+
+        if (mTrackRendere[ExoPlayerWrapper.TYPE_AUDIO] != null) {
+
+            TrackRenderer audioTrackRenderer = mTrackRendere[ExoPlayerWrapper.TYPE_AUDIO];
+
+            if (mTrackRendere[ExoPlayerWrapper.TYPE_AUDIO] instanceof PodcastAudioRenderer) {
+                ((PodcastAudioRenderer) audioTrackRenderer).setAutomaticGainControl(argAutomaticGainControl);
+            }
+
+            // FIXME: not robust
+            if (mTrackRendere[ExoPlayerWrapper.TYPE_AUDIO] instanceof PodcastAudioRendererV21) {
+                speed = ((PodcastAudioRendererV21) audioTrackRenderer).getSpeed();
+            }
+        }
+
+        notifyAudioEngineChange(speed);
+    }
+
     @TargetApi(Build.VERSION_CODES.M)
     public void setRemoveSilence(boolean argDoRemoveSilence) {
         mDoRemoveSilence = argDoRemoveSilence;
@@ -344,8 +371,7 @@ public class ExoPlayerWrapper implements ExoPlayer.Listener, ChunkSampleSource.E
             }
         }
 
-        RxBus bus = SoundWaves.getRxBus();
-        bus.send(new RxBusSimpleEvents.PlaybackEngineChanged(speed, doRemoveSilence()));
+        notifyAudioEngineChange(speed);
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -361,8 +387,11 @@ public class ExoPlayerWrapper implements ExoPlayer.Listener, ChunkSampleSource.E
             }
         }
 
-        RxBus bus = SoundWaves.getRxBus();
-        bus.send(new RxBusSimpleEvents.PlaybackEngineChanged(argNewSpeed, doRemoveSilence()));
+        notifyAudioEngineChange(argNewSpeed);
+    }
+
+    private void notifyAudioEngineChange(float argSpeed) {
+        SoundWaves.getRxBus().send(new RxBusSimpleEvents.PlaybackEngineChanged(argSpeed, doRemoveSilence(), doAutomaticGainControl()));
     }
 
     /**

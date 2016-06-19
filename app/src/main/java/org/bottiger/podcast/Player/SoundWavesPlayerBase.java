@@ -67,8 +67,13 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
                 R.string.pref_audioengine_remove_silence_key,
                 R.bool.pref_audioengine_remove_silence_default);
 
+        boolean gain_control = PreferenceHelper.getBooleanPreferenceValue(argContext,
+                R.string.pref_audioengine_automatic_gain_control_key,
+                R.bool.pref_audioengine_automatic_gain_control_default);
+
         mExoplayer = new ExoPlayerWrapper();
         mExoplayer.setRemoveSilence(remove_silence);
+        mExoplayer.setAutomaticGainControl(gain_control);
         mExoplayer.setRenderBuilder(new ExtractorRendererBuilder(argContext, null));
         mType = EXOPLAYER;
     }
@@ -100,6 +105,14 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
         }
 
         return 0;
+    }
+
+    public boolean doAutomaticGainControl() {
+        return mExoplayer.doAutomaticGainControl();
+    }
+
+    public void setAutomaticGainControl(boolean argSetAutomaticGainControl) {
+        mExoplayer.setAutomaticGainControl(argSetAutomaticGainControl);
     }
 
     public boolean doRemoveSilence() {
