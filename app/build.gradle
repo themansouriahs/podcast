@@ -9,8 +9,8 @@ android {
         applicationId "org.bottiger.podcast"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 286        // even - release. Odd - development
-        versionName "0.136.6" // even - release. Odd - development
+        versionCode 289        // even - release. Odd - development
+        versionName "0.136.9" // even - release. Odd - development
         multiDexEnabled = true
         //renderscriptTargetApi 20
         //renderscriptSupportModeEnabled true
@@ -111,6 +111,8 @@ repositories {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
+
+    compile 'com.android.support:multidex:1.0.1'
 
     compile 'com.squareup.okhttp3:okhttp:3.3.1'
     compile 'com.squareup.okhttp3:okhttp-urlconnection:3.3.1'
