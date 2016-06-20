@@ -29,29 +29,20 @@ public class PaletteHelper {
     private static final int CACHE_SIZE = 40;
     private static final int PALETTE_SIZE = 24; /* 24 is default size. You can decrease this value to speed up palette generation */
 
-    private static final ReentrantLock sLock = new ReentrantLock();
-
     private static LruCache<String, Palette> mPaletteCache = new LruCache<>(CACHE_SIZE);
 
     public static void generate(@NonNull final String argUrl, @NonNull final Activity argActivity, @Nullable final PaletteListener ... argCallbacks) {
 
-        if (TextUtils.isEmpty(argUrl) || !Patterns.WEB_URL.matcher(argUrl).matches())
+        if (!StrUtils.isValidUrl(argUrl))
             return;
 
-        try {
-            sLock.lock();
+        Palette palette = mPaletteCache.get(argUrl);
 
-            Palette palette = mPaletteCache.get(argUrl);
-            if (palette != null) {
-                for (PaletteListener callback : argCallbacks)
-                    callback.onPaletteFound(palette);
-                return;
-            }
-
-        } finally {
-            sLock.unlock();
+        if (palette != null && argCallbacks != null) {
+            for (PaletteListener callback : argCallbacks)
+                callback.onPaletteFound(palette);
+            return;
         }
-
 
         Glide.with(argActivity)
                 .load(argUrl)
@@ -59,31 +50,28 @@ public class PaletteHelper {
                 .into(new SimpleTarget<Bitmap>(200, 200) {
                     @Override
                     public void onResourceReady(Bitmap resource, GlideAnimation glideAnimation) {
-                        // You can use the bitmap in only limited ways
-                        // No need to do any cleanup.
-                        //mLock.lock();
-                        final Palette palette = Palette.from(resource).generate();// .generate(resource, PALETTE_SIZE);
 
-                        //sLock.lock();
-                        try {
+                        Palette.from(resource).generate(new Palette.PaletteAsyncListener() {
+                            @Override
+                            public void onGenerated(final Palette palette) {
 
-                            if (palette != null) {
-                                mPaletteCache.put(argUrl, palette);
-                            }
+                                if (palette != null) {
+                                    mPaletteCache.put(argUrl, palette);
+                                }
 
-                            for (final PaletteListener listener : argCallbacks) {
-
-                                argActivity.runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
+                                if (argCallbacks != null) {
+                                    for (final PaletteListener listener : argCallbacks) {
+                                    argActivity.runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
                                         listener.onPaletteFound(palette);
-                                    }
-                                });
+                                        }
+                                        });
 
+                                    }
+                                }
                             }
-                        } finally {
-                            //sLock.unlock();
-                        }
+                        });
                     }
 
                     @Override
