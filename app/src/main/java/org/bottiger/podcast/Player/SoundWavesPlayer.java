@@ -242,8 +242,6 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
 
         super.stop();
         super.release();
-        mAudioManager
-                .unregisterMediaButtonEventReceiver(mControllerComponentName);
         mIsInitialized = false;
         mStatus = PlayerStatusObservable.STOPPED;
     }
