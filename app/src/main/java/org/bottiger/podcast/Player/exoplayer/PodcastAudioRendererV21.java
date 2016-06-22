@@ -21,6 +21,7 @@ import java.nio.ByteBuffer;
 public class PodcastAudioRendererV21 extends PodcastAudioRenderer {
 
     private static final String TAG = "PodcastAudioRendererV21";
+    private static final boolean DEBUG = true;
 
     private static final int SAMPLES_PER_CODEC_FRAME = 1_024;
 
@@ -54,6 +55,9 @@ public class PodcastAudioRendererV21 extends PodcastAudioRenderer {
     protected boolean processOutputBuffer(long positionUs, long elapsedRealtimeUs, MediaCodec codec,
                                           ByteBuffer buffer, MediaCodec.BufferInfo bufferInfo, int bufferIndex,
                                           boolean shouldSkip) throws ExoPlaybackException {
+
+        if (DEBUG)
+            Log.d(TAG, "processOutputBuffer");
 
         if (bufferIndex == mLastSeenBufferIndex) {
             return super.processOutputBuffer(positionUs, elapsedRealtimeUs, codec,
@@ -114,6 +118,9 @@ public class PodcastAudioRendererV21 extends PodcastAudioRenderer {
     @Override
     protected void onOutputFormatChanged(final MediaCodec codec, final MediaFormat format) {
         super.onOutputFormatChanged(codec, format);
+
+        if (DEBUG)
+            Log.d(TAG, "onOutputFormatChanged");
 
         final int sampleRate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE);
         final int channelCount = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT);
