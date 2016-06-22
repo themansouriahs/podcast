@@ -26,6 +26,7 @@ import java.lang.annotation.RetentionPolicy;
 public class PlayPauseDrawable extends Drawable {
 
     private static final String TAG = "PlayPauseDrawable";
+    private static final boolean DEBUG = false;
 
     @IntDef({IS_PLAYING, IS_PAUSED})
     @Retention(RetentionPolicy.SOURCE)
@@ -138,7 +139,8 @@ public class PlayPauseDrawable extends Drawable {
         canvas.drawPath(mRightPauseBar, mPaint);
 
         // Draw the circle around the button
-        Log.v(TAG, "id: " + hashCode() + " progress:" + mTransformationProgress + " playing:" + mIsPlaying);
+        if (DEBUG)
+            Log.v(TAG, "id: " + hashCode() + " progress:" + mTransformationProgress + " playing:" + mIsPlaying);
 
         canvas.restore();
     }

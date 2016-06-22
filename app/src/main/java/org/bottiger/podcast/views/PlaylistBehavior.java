@@ -20,6 +20,7 @@ import org.bottiger.podcast.utils.UIUtils;
 public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
 
     private final String TAG = "PlaylistBehavior";
+    private static final boolean DEBUG = false;
 
     private TopPlayer mTopPlayer;
     private RecyclerView mRecyclerView;
@@ -48,7 +49,8 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
 
     @Override
     public boolean layoutDependsOn(CoordinatorLayout parent, View child, View dependency) {
-        Log.v(TAG, "layoutDependsOn, child: " + child.getClass().getName() + " dependency: " + dependency.getClass().getName());
+        if (DEBUG)
+            Log.v(TAG, "layoutDependsOn, child: " + child.getClass().getName() + " dependency: " + dependency.getClass().getName());
         boolean corectChild = (child.getId() == R.id.my_recycler_view);
         boolean correctDependency = (dependency.getId() == R.id.top_player);
         return corectChild && correctDependency && super.layoutDependsOn(parent, child, dependency);
@@ -56,7 +58,8 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
 
     @Override
     public boolean onDependentViewChanged(CoordinatorLayout parent, View child, View dependency) {
-        Log.v(TAG, "onDependentViewChanged, child: " + child.getClass().getName() + " dependency: " + dependency.getClass().getName());
+        if (DEBUG)
+            Log.v(TAG, "onDependentViewChanged, child: " + child.getClass().getName() + " dependency: " + dependency.getClass().getName());
         int height = mTopPlayer.getLayoutParams().height;
         mRecyclerView.setTranslationY(height);
 
@@ -87,13 +90,15 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
         int height = (int)mTopPlayer.getPlayerHeight(); //mTopPlayer.getLayoutParams().height;
         mRecyclerView.setTranslationY(height);
 
-        Log.v(TAG, "onLayoutChild, child: " + child.getClass().getName() + " layoutDirection: " + layoutDirection + " height: " + height);
+        if (DEBUG)
+            Log.v(TAG, "onLayoutChild, child: " + child.getClass().getName() + " layoutDirection: " + layoutDirection + " height: " + height);
         return super.onLayoutChild(parent, child, layoutDirection);
     }
 
     @Override
     public boolean onStartNestedScroll(CoordinatorLayout coordinatorLayout, View child, View directTargetChild, View target, int nestedScrollAxes) {
-        Log.v(TAG, "onStartNestedScroll, child: " + child.getClass().getName() + " target: " + target.getClass().getName());
+        if (DEBUG)
+            Log.v(TAG, "onStartNestedScroll, child: " + child.getClass().getName() + " target: " + target.getClass().getName());
 
         if (mScroller != null && !mScroller.isFinished()) {
             mScroller.abortAnimation();
@@ -105,21 +110,24 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
 
     @Override
     public void	onNestedPreScroll(CoordinatorLayout coordinatorLayout, View child, View target, int dx, int dy, int[] consumed) {
-        Log.v(TAG, "onNestedPreScroll, child: " + child.getClass().getName() + " target: " + target.getClass().getName());
-        //mPlaylistContainerWrapper.dispatchNestedPreScroll(dx, dy, consumed, null);
+        if (DEBUG)
+            Log.v(TAG, "onNestedPreScroll, child: " + child.getClass().getName() + " target: " + target.getClass().getName());
+
         super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed);
     }
 
     @Override
     public void onNestedScroll(CoordinatorLayout coordinatorLayout, View child, View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed) {
-        Log.v(TAG, "onNestedScroll, child: " + child.getClass().getName() + " target: " + target.getClass().getName() + " dyC: " + dyConsumed + " dyUC: " + dyUnconsumed);
-        //mPlaylistContainerWrapper.dispatchNestedScroll(dxConsumed, dyConsumed, dyUnconsumed, dxUnconsumed, null);
+        if (DEBUG)
+            Log.v(TAG, "onNestedScroll, child: " + child.getClass().getName() + " target: " + target.getClass().getName() + " dyC: " + dyConsumed + " dyUC: " + dyUnconsumed);
+
         super.onNestedScroll(coordinatorLayout, child, target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed);
     }
 
     @Override
     public boolean onNestedPreFling(CoordinatorLayout coordinatorLayout, View child, View target, float velocityX, float velocityY) {
-        Log.v(TAG, "onNestedPreFling, child: " + child.getClass().getName() + " target: " + target.getClass().getName() + "vy: " + velocityY);
+        if (DEBUG)
+            Log.v(TAG, "onNestedPreFling, child: " + child.getClass().getName() + " target: " + target.getClass().getName() + "vy: " + velocityY);
 
         int ymin = 0;
         int ymax = 100000;
@@ -129,7 +137,8 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
 
     @Override
     public boolean onNestedFling (CoordinatorLayout coordinatorLayout, View child, View target, float velocityX, float velocityY, boolean consumed) {
-        Log.v(TAG, "onNestedFling, child: " + child.getClass().getName() + " target: " + target.getClass().getName() + "vy: " + velocityY + " consumed:" + consumed);
+        if (DEBUG)
+            Log.v(TAG, "onNestedFling, child: " + child.getClass().getName() + " target: " + target.getClass().getName() + "vy: " + velocityY + " consumed:" + consumed);
         int ymin = 0;
         int ymax = 100000;
         fling(coordinatorLayout, child, ymin, ymax, velocityY);
@@ -179,20 +188,24 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
                 if (lastY != 0) {
                     int diffY = currY-lastY;
 
-                    Log.v(TAG, "scroll.run, diffY: " + diffY);
+                    if (DEBUG)
+                        Log.v(TAG, "scroll.run, diffY: " + diffY);
 
                     if (diffY < 0) {
                         if (mRecyclerView.canScrollVertically(DOWN)) {
                             // it cannot be larger, scroll recyclerview
-                            Log.v(TAG, "scroll.run, mRecyclerView1");
+                            if (DEBUG)
+                                Log.v(TAG, "scroll.run, mRecyclerView1");
                             PlaylistBehavior.this.mRecyclerView.scrollBy(0, diffY);
                         } else {
-                            Log.v(TAG, "scroll.run, mTopPlayer2");
+                            if (DEBUG)
+                                Log.v(TAG, "scroll.run, mTopPlayer2");
                             PlaylistBehavior.this.mTopPlayer.scrollExternal(diffY, false);
                         }
                     } else {
                         if (mTopPlayer.isMinimumSize()) {
-                            Log.v(TAG, "scroll.run, mRecyclerView2");
+                            if (DEBUG)
+                                Log.v(TAG, "scroll.run, mRecyclerView2");
                             PlaylistBehavior.this.mRecyclerView.scrollBy(0, diffY);
                         } else {
 

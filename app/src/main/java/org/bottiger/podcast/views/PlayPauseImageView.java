@@ -63,6 +63,8 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
 
     private static final String TAG = "PlayPauseImageView";
 
+    private static final boolean DEBUG = false;
+
     private static final boolean DRAW_PROGRESS          = true;
     private static final boolean DRAW_PROGRESS_MARKER   = true;
 
@@ -270,7 +272,8 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
         bounds.right = minSize - drawOffset; //contentWidth - drawOffset;
         bounds.bottom = minSize - drawOffset; //contentWidth - drawOffset;
 
-        Log.d(TAG, "onDraw. Preparing => " + (mStatus == ExoPlayerWrapper.STATE_PREPARING) + " status: " + mStatus);
+        if (DEBUG)
+            Log.d(TAG, "onDraw. Preparing => " + (mStatus == ExoPlayerWrapper.STATE_PREPARING) + " status: " + mStatus);
 
         double elapsedTime = System.currentTimeMillis() - mStartTime;
         boolean showRotatingAnimation = mStatus == ExoPlayerWrapper.STATE_PREPARING;// || animationStartedLessThanOneSecondAgo(mPreparingAnimationStarted);
@@ -337,7 +340,9 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
         defaultStartAngle = defaultStartAngle + DRAW_ANGLE_OFFSET;
         defaultEndAngle = defaultEndAngle + DRAW_ANGLE_OFFSET;
 
-        Log.v(TAG, "startAngle: " + defaultStartAngle + " endAngle: " + defaultEndAngle + " elapsed:" + elapsedTime + " lastStart: " + mLastProgressStart + " lastEnd: " + mLastProgressEnd);
+        if (DEBUG)
+            Log.v(TAG, "startAngle: " + defaultStartAngle + " endAngle: " + defaultEndAngle + " elapsed:" + elapsedTime + " lastStart: " + mLastProgressStart + " lastEnd: " + mLastProgressEnd);
+
         canvas.drawArc(bounds, (float)defaultStartAngle, (float)(defaultEndAngle - defaultStartAngle), false, paintBorder);
 
         if (refreshButton) {
