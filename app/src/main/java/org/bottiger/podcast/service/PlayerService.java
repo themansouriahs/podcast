@@ -12,6 +12,7 @@ import org.bottiger.podcast.flavors.MediaCast.IMediaCast;
 import org.bottiger.podcast.listeners.PlayerStatusData;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.notification.NotificationPlayer;
+import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
@@ -54,6 +55,7 @@ import android.support.v4.media.session.MediaControllerCompat;
 import android.telephony.PhoneStateListener;
 import android.util.Log;
 
+import com.google.android.exoplayer.ExoPlayer;
 import com.squareup.otto.Subscribe;
 
 import java.io.File;
@@ -171,6 +173,30 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 		
 		mPlayer = SoundWaves.getAppContext(this).getPlayer();
 		mPlayer.setHandler(mPlayerHandler);
+		mPlayer.addListener(new ExoPlayerWrapper.Listener() {
+			@Override
+			public void onStateChanged(boolean playWhenReady, @ExoPlayerWrapper.PlayerState int playbackState) {
+				if (playbackState == ExoPlayerWrapper.STATE_READY) {
+					IEpisode episode = getCurrentItem();
+					if (episode != null) {
+						long duration = mPlayer.getDuration();
+						if (duration != ExoPlayer.UNKNOWN_TIME && episode.setDuration(duration)) {
+							SoundWaves.getAppContext(PlayerService.this).getLibraryInstance().updateEpisode(episode);
+						}
+					}
+				}
+			}
+
+			@Override
+			public void onError(Exception e) {
+
+			}
+
+			@Override
+			public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
+
+			}
+		});
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             mMediaSessionManager = (MediaSessionManager) getSystemService(MEDIA_SESSION_SERVICE);

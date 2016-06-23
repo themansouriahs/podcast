@@ -135,10 +135,6 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
 
         IEpisode episode = PlayerService.getCurrentItem();
         if (episode != null) {
-            long duration = getDuration();
-            if (duration != ExoPlayer.UNKNOWN_TIME && episode.setDuration(duration) ) {
-                SoundWaves.getAppContext(mPlayerService).getLibraryInstance().updateEpisode(episode);
-            }
             start();
             isPreparingMedia = false;
         }
