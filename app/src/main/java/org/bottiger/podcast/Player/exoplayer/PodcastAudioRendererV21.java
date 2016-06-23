@@ -21,7 +21,7 @@ import java.nio.ByteBuffer;
 public class PodcastAudioRendererV21 extends PodcastAudioRenderer {
 
     private static final String TAG = "PodcastAudioRendererV21";
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     private static final int SAMPLES_PER_CODEC_FRAME = 1_024;
 
