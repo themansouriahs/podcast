@@ -500,7 +500,16 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 		return STATUS_SUBSCRIBED;
 	}
 
-	public void setStatus(@Subscribed int argStatus, @NonNull String argTag) {
+    public void subscribe(@NonNull String argTag) {
+        setStatus(STATUS_SUBSCRIBED, argTag);
+    }
+
+    public void unsubscribe(@NonNull String argTag) {
+		VendorCrashReporter.report("Unsubscribe" , argTag);
+        setStatus(STATUS_UNSUBSCRIBED, argTag);
+    }
+
+	private void setStatus(@Subscribed int argStatus, @NonNull String argTag) {
 		if (status == argStatus)
 			return;
 

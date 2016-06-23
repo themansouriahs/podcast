@@ -181,7 +181,7 @@ public class Library {
 
         try {
             mLock.lock();
-            if (subscription.getStatus() == Subscription.STATUS_UNSUBSCRIBED &&
+            if (!subscription.IsSubscribed() &&
                 mActiveSubscriptions.indexOf(subscription) != SortedList.INVALID_POSITION) {
                     Log.e("Unsubscribing", "from: " + subscription.title + ", tag:" + argSubscriptionChanged.getTag());
                     mActiveSubscriptions.remove(subscription);
@@ -701,7 +701,7 @@ public class Library {
         if (subscription == null)
             return;
 
-        subscription.setStatus(Subscription.STATUS_UNSUBSCRIBED, argTag);
+        subscription.unsubscribe(argTag);
         updateSubscription(subscription);
         removeSubscription(subscription);
 
@@ -738,7 +738,7 @@ public class Library {
                                     mSubscriptionUrlLUT.get(key) :
                                     new Subscription(argSubscription);
 
-                            subscription.setStatus(Subscription.STATUS_SUBSCRIBED, "Subscribe:from:Library.subscribe");
+                            subscription.subscribe("Subscribe:from:Library.subscribe");
                             updateSubscription(subscription);
 
                             mSubscriptionUrlLUT.put(key, subscription);

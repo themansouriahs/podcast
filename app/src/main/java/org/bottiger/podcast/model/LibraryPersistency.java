@@ -13,8 +13,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
 import android.util.Log;
 
-import com.google.common.collect.Iterables;
-
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;

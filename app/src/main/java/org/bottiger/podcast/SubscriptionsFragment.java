@@ -254,7 +254,7 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
                 if (subscription == null)
                     return false;
 
-                subscription.setStatus(Subscription.STATUS_UNSUBSCRIBED, "Unsubscribe:context");
+                subscription.unsubscribe("Unsubscribe:context");
                 return true;
             default:
                 return super.onContextItemSelected(menuItem);
