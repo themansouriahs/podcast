@@ -236,7 +236,6 @@ public class FeedParser {
                                 @NonNull Context argContext) throws XmlPullParserException, IOException {
         parser.require(XmlPullParser.START_TAG, ns, startTag);
         boolean addedEpisodes = false;
-        Library library = SoundWaves.getAppContext(argContext).getLibraryInstance();
 
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {

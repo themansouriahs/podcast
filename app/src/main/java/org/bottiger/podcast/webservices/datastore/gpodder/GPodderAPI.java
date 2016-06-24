@@ -23,7 +23,9 @@ import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.ItemColumns;
+import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.utils.PreferenceHelper;
 import org.bottiger.podcast.utils.okhttp.UserAgentInterceptor;
 import org.bottiger.podcast.webservices.datastore.CallbackWrapper;
 import org.bottiger.podcast.webservices.datastore.IWebservice;
@@ -38,6 +40,7 @@ import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -144,17 +147,13 @@ public class GPodderAPI implements IWebservice {
         GDevice device = new GDevice();
         device.caption = GPodderUtils.getDeviceCaption(argContext);
         device.type = GPodderUtils.getDeviceCaption(argContext);
-        Response responseDevice = api.updateDeviceData(mUsername, GPodderUtils.getDeviceCaption(argContext), device).execute();
-        //if (!responseDevice.isSuccess())
-        //    return SERVER_ERROR;
 
-        String key = argContext.getResources().getString(R.string.gpodder_last_sync_key);
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(argContext);
-        long lastSync = prefs.getLong(key, 0);
+        int keyRes = R.string.gpodder_last_sync_key;
+        String key = argContext.getResources().getString(keyRes);
+        long lastSync = PreferenceHelper.getLongPreferenceValue(argContext, keyRes, R.integer.gpodder_last_sync_default);
 
         long timestamp;
         @SynchronizationResult int returnValue = SYNCHRONIZATION_OK;
-
 
         /**
          * Fetch changes from the server
@@ -164,8 +163,9 @@ public class GPodderAPI implements IWebservice {
         Call<SubscriptionChanges> subscriptionsChanges = api.getDeviceSubscriptionsChanges(mUsername, GPodderUtils.getDeviceCaption(argContext), lastSync); // lastCall
         Response<SubscriptionChanges> subscriptionsChangesResponse = subscriptionsChanges.execute();
 
-        if (!subscriptionsChangesResponse.isSuccessful())
+        if (!subscriptionsChangesResponse.isSuccessful()) {
             return SERVER_ERROR;
+        }
 
         SubscriptionChanges subscriptionsChangesResult = subscriptionsChangesResponse.body();
         List<String> added = subscriptionsChangesResult.add;
@@ -173,15 +173,10 @@ public class GPodderAPI implements IWebservice {
 
         added.removeAll(subscribedUrls);
 
-        String newUrl;
-        Subscription changedSubscription;
         for (int i = 0; i < added.size(); i++) {
-            newUrl = added.get(i);
-            /*
-            changedSubscription = new Subscription(newUrl);
-            changedSubscription.subscribe(argContext);
-            */
-            SoundWaves.getAppContext(argContext).getLibraryInstance().subscribe(newUrl);
+            URL url = new URL(added.get(i));
+            SlimSubscription slimSubscription = new SlimSubscription(url);
+            SoundWaves.getAppContext(argContext).getLibraryInstance().subscribe(slimSubscription);
         }
 
         /**
@@ -192,13 +187,13 @@ public class GPodderAPI implements IWebservice {
         try {
             gPodderDeviceSubscriptions = getDeviceSubscriptionsAsStrings(argContext);
         } catch (IOException ioe) {
+            VendorCrashReporter.handleException(ioe);
             return SERVER_ERROR;
         }
 
         for (int i = 0; i < gPodderDeviceSubscriptions.length; i++) {
             gPodderSubscriptionsSet.add(gPodderDeviceSubscriptions[i]);
         }
-        gPodderDeviceSubscriptions = null;
 
         // FIXME: Fuck, at the moment we do not have a "subscribed_at" timesstamp on Subscriptions.
         // We just upload all of them
@@ -225,7 +220,6 @@ public class GPodderAPI implements IWebservice {
             }
 
             if (subscription.IsSubscribed()) {
-                //localSubscriptionsChanges.remove.add(url);
                 gPodderSubscriptionsSet.remove(url);
             }
         }
@@ -248,6 +242,7 @@ public class GPodderAPI implements IWebservice {
         timestamp = updatedUrls.getTimestamp();
 
         if (timestamp > 0) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(argContext);
             prefs.edit().putLong(key, timestamp).commit();
         }
 

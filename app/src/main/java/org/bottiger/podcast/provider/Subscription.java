@@ -494,7 +494,7 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 	}
 
 	public int getStatus() {
-		if (status == STATUS_UNSUBSCRIBED)
+		if (!IsSubscribed())
 			return STATUS_UNSUBSCRIBED;
 
 		return STATUS_SUBSCRIBED;

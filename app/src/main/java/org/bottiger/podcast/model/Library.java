@@ -139,7 +139,7 @@ public class Library {
     public Library(@NonNull Context argContext) {
         mContext = argContext.getApplicationContext();
 
-        mLibraryPersistency = new LibraryPersistency(argContext, this);
+        mLibraryPersistency = new LibraryPersistency(argContext);
 
         mActiveSubscriptions = new SortedList<>(Subscription.class, mSubscriptionsListCallback);
 
@@ -588,7 +588,7 @@ public class Library {
                     while (cursor.moveToNext()) {
                         subscription = getByCursor(cursor, null);
 
-                        if (!TextUtils.isEmpty(subscription.getImageURL())) {
+                        if (!TextUtils.isEmpty(subscription.getUrl())) {
                             addSubscriptionInternal(subscription, true);
                         } else {
                             subscription = null;
@@ -650,6 +650,8 @@ public class Library {
             if (argQuery == null)
                 argQuery = getAllEpisodes(argSubscription);
 
+            //argQuery = "update " + SubscriptionColumns.TABLE_NAME + " set " + SubscriptionColumns.STATUS + "=" + Subscription.STATUS_SUBSCRIBED;
+
             cursor = PodcastOpenHelper.runQuery(Library.this.mContext, argQuery);
 
             start = System.currentTimeMillis();
@@ -671,9 +673,7 @@ public class Library {
                 counter++;
             }
 
-            if (counter > 0) {
-                argSubscription.setIsRefreshing(false);
-            }
+            argSubscription.setIsRefreshing(false);
             argSubscription.setIsLoaded(true);
         } finally {
             if (cursor != null)

@@ -58,13 +58,23 @@ public class PreferenceHelper implements SharedPreferences.OnSharedPreferenceCha
     }
 
     public static int getIntegerPreferenceValue(@NonNull Context argContext,
-                                                    @StringRes int argKeyId,
-                                                    @IntegerRes int argDefaultId) {
+                                                     @StringRes int argKeyId,
+                                                     @IntegerRes int argDefaultId) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(argContext);
         String key = argContext.getResources().getString(argKeyId);
         Integer defaultValue = argContext.getResources().getInteger(argDefaultId);
 
         return prefs.getInt(key, defaultValue);
+    }
+
+    public static long getLongPreferenceValue(@NonNull Context argContext,
+                                                @StringRes int argKeyId,
+                                                @IntegerRes int argDefaultId) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(argContext);
+        String key = argContext.getResources().getString(argKeyId);
+        Integer defaultValue = argContext.getResources().getInteger(argDefaultId);
+
+        return prefs.getLong(key, defaultValue);
     }
 
     public static String getStringPreferenceValue(@NonNull Context argContext,

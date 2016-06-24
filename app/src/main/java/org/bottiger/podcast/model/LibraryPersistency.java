@@ -44,7 +44,6 @@ public class LibraryPersistency {
 
     private Context mContext;
     private ContentResolver mContentResolver;
-    private Library mLibrary;
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({UPDATED, INSERTED, IGNORED, ERROR})
@@ -54,10 +53,9 @@ public class LibraryPersistency {
     public static final int UPDATED = 1;
     public static final int INSERTED = 2;
 
-    public LibraryPersistency(@NonNull Context argContext, @NonNull Library argLibrary) {
+    public LibraryPersistency(@NonNull Context argContext) {
         mContext = argContext;
         mContentResolver = argContext.getContentResolver();
-        mLibrary = argLibrary;
     }
 
     public @PersistencyResult int persist(FeedItem argEpisode) {
@@ -157,8 +155,10 @@ public class LibraryPersistency {
                     } else if (value instanceof Boolean){
                         long intVal = (Boolean)value ? 1 : 0;
                         statement.bindLong(index, intVal);
-                    } else {
+                    } else if (value != null){
                         statement.bindLong(index, Long.valueOf(value.toString()));
+                    } else {
+                        statement.bindNull(index);
                     }
                 }
 
@@ -172,6 +172,7 @@ public class LibraryPersistency {
 
         } catch (Exception e) {
             Log.w("Exception:", e);
+            VendorCrashReporter.report("Persistency insert error!", "no idea why, find ouy");
             return false;
         } finally {
             db.endTransaction();
@@ -230,7 +231,7 @@ public class LibraryPersistency {
             int status = cv.getAsInteger(SubscriptionColumns.STATUS);
             if (status == Subscription.STATUS_UNSUBSCRIBED) {
                 String title = cv.getAsString(SubscriptionColumns.TITLE);
-                //Log.e("Unsubscribing", "from: " + title + ", stack:" + Log.getStackTraceString(new Exception()));
+                Log.e("Unsubscribing", "from: " + title + ", stack:" + Log.getStackTraceString(new Exception()));
             }
 
             int numUpdatedRows = mContentResolver.update(

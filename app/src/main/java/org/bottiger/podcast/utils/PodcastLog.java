@@ -50,7 +50,7 @@ public class PodcastLog {
 			try {
 				//Process process = Runtime.getRuntime().exec( "logcat -c");
 				//process = Runtime.getRuntime().exec( "logcat -f " + logFile + " *:S MyActivity:D MyActivity2:D");
-				Process process = Runtime.getRuntime().exec( "logcat -f " + logFile + " OkHttpDownloaderLog:D *:S");
+				Process process = Runtime.getRuntime().exec( "logcat -f " + logFile + " Unsubscribing *:S");
 			} catch ( IOException e ) {
 				e.printStackTrace();
 			}
