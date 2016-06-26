@@ -35,6 +35,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.TimeZone;
 
 import static org.bottiger.podcast.utils.StorageUtils.VIDEO;
@@ -179,7 +181,7 @@ public class FeedParser {
                                    @NonNull Context argContext) throws XmlPullParserException, IOException {
 
 
-        boolean addedEpisodes = false;
+        List<IEpisode> addedEpisodes = new LinkedList<>();
 
         parser.require(XmlPullParser.START_TAG, ns, topTag);
         while (parser.next() != XmlPullParser.END_TAG) {
@@ -198,7 +200,7 @@ public class FeedParser {
             }
         }
 
-        if (addedEpisodes && !isParsingSlimSubscription()) {
+        if (addedEpisodes.size() > 0 && !isParsingSlimSubscription()) {
             Subscription sub = ((Subscription) argSubscription);
             SoundWaves.getAppContext(argContext).getLibraryInstance().addEpisodes(sub);
 
@@ -231,11 +233,12 @@ public class FeedParser {
 
     // Parses the contents of an entry. If it encounters a title, summary, or link tag, hands them off
     // to their respective "read" methods for processing. Otherwise, skips the tag.
-    private boolean readChannel(@NonNull XmlPullParser parser,
+    @NonNull
+    private List<IEpisode> readChannel(@NonNull XmlPullParser parser,
                                 @NonNull ISubscription argSubscription,
                                 @NonNull Context argContext) throws XmlPullParserException, IOException {
         parser.require(XmlPullParser.START_TAG, ns, startTag);
-        boolean addedEpisodes = false;
+        List<IEpisode> addedEpisodes = new LinkedList<>();
 
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -272,7 +275,11 @@ public class FeedParser {
                     //addedEpisodes = addedEpisodes || !library.addEpisode(episode);
 
                     // Bulk insert.
-                    addedEpisodes = argSubscription.addEpisode(episode) || addedEpisodes;
+                    if (StrUtils.isValidUrl(episode.getURL())) {
+                        if (argSubscription.addEpisode(episode)) {
+                            addedEpisodes.add(episode);
+                        }
+                    }
 
                     break;
                 }

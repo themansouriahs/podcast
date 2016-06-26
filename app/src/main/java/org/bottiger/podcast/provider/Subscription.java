@@ -32,6 +32,8 @@ import android.util.Patterns;
 
 import javax.annotation.Nullable;
 
+import static org.bottiger.podcast.model.events.SubscriptionChanged.LOADED;
+
 public class Subscription extends BaseSubscription implements PaletteListener {
 
 	private static final String TAG = "Subscription";
@@ -401,7 +403,7 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 
 		if (!mIsRefreshing) {
 			countNewEpisodes();
-			notifyPropertyChanged(null);
+			notifyPropertyChanged(SubscriptionChanged.LOADED, "loaded");
 		}
 	}
 

@@ -617,7 +617,10 @@ public class FeedActivity extends TopActivity implements PaletteListener {
                     @Override
                     public void call(SubscriptionChanged subscriptionChanged) {
                         @SubscriptionChanged.Action int action = subscriptionChanged.getAction();
-                        boolean doNotify = action == SubscriptionChanged.ADDED || action == SubscriptionChanged.REMOVED;
+                        boolean doNotify = action ==
+                                SubscriptionChanged.ADDED ||
+                                action == SubscriptionChanged.REMOVED ||
+                                action == SubscriptionChanged.LOADED;
 
                         if (doNotify) {
                             setViewState(argSubscription);
