@@ -104,7 +104,7 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder argHolder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder argHolder, final int position) {
 
         // In case we are dealing with the footer
         if (isLastItem(position)) {
@@ -244,6 +244,8 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
+                // This saves the position in the adapter.
+                // The unsubscribing is done in the fragment
                 setPosition((int)subscription.getId());
                 return false;
             }

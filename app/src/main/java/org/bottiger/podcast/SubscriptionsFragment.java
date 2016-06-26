@@ -255,6 +255,7 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
                     return false;
 
                 subscription.unsubscribe("Unsubscribe:context");
+                mAdapter.notifyItemRemoved(position);
                 return true;
             default:
                 return super.onContextItemSelected(menuItem);
