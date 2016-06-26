@@ -74,27 +74,11 @@ public class SoundWaves extends MultiDexApplication {
     private Library mLibrary = null;
     private Playlist mPlaylist = null;
 
-    protected MediaBrowserCompat mMediaBrowser;
-    public MediaControllerCompat mMediaControllerCompat; // FIXME: Should not be static.
-    public PlayerHelper mPlayerHelper = new PlayerHelper();
+    private MediaBrowserCompat mMediaBrowser;
+    public MediaControllerCompat mMediaControllerCompat;
+    PlayerHelper mPlayerHelper = new PlayerHelper();
 
     private SoundWavesPlayer mPlayer;
-
-    public ISoundWavesEngine soundService;
-
-    public ServiceConnection soundEngineServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            Log.d("SoundEngine", "onServiceConnected");
-            soundService = ISoundWavesEngine.Stub.asInterface(service);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName className) {
-            Log.d("SoundEngine", "onServiceDisconnected");
-            soundService = null;
-        }
-    };
 
     @Override
     public void onCreate() {
@@ -132,8 +116,6 @@ public class SoundWaves extends MultiDexApplication {
         });
 
         Log.v(TAG, "time1: " + System.currentTimeMillis());
-
-        //mDownloadManager = new SoundWavesDownloadManager(this);
 
         Log.v(TAG, "time2: " + System.currentTimeMillis());
         mLibrary = new Library(this);
@@ -291,8 +273,6 @@ public class SoundWaves extends MultiDexApplication {
                                     "Error creating controller", e);
                             VendorCrashReporter.handleException(e);
                         }
-
-                        //SoundWaves.this.onServiceConnected();
                     }
 
                     @Override

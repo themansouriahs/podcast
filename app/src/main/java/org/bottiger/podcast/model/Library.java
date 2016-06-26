@@ -58,8 +58,6 @@ public class Library {
     @NonNull private Context mContext;
     @NonNull private LibraryPersistency mLibraryPersistency;
 
-    // private boolean mPlaylistLoaded = false;
-
     private final ReentrantLock mLock = new ReentrantLock();
 
     @NonNull
@@ -571,7 +569,7 @@ public class Library {
         }
     }
 
-    public void loadSubscriptions() {
+    private void loadSubscriptions() {
         String query = getAllSubscriptions();
 
         Observable.just(query)
