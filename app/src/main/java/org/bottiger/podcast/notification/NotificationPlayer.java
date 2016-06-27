@@ -3,6 +3,7 @@ package org.bottiger.podcast.notification;
 import org.bottiger.podcast.ApplicationConfiguration;
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.player.PlayerStateManager;
 import org.bottiger.podcast.player.SoundWavesPlayer;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
@@ -17,6 +18,7 @@ import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
@@ -62,8 +64,59 @@ public class NotificationPlayer extends BroadcastReceiver {
     private NotificationManager mNotificationManager = null;
 	private NotificationManagerCompat mNotificationManagerCompat = null;
 
+    private PlaybackStateCompat mPlaybackState;
+    private MediaMetadataCompat mMetadata;
+
 	public static final int NOTIFICATION_PLAYER_ID = 4260;
     public static final int REQUEST_CODE = 413;
+
+    private final MediaControllerCompat.Callback mCb = new MediaControllerCompat.Callback() {
+        @Override
+        public void onPlaybackStateChanged(@NonNull PlaybackStateCompat state) {
+            mPlaybackState = state;
+            Log.d(TAG, "Received new playback state:" + state);
+
+            if (state.getState() == PlaybackStateCompat.STATE_STOPPED ||
+                    state.getState() == PlaybackStateCompat.STATE_NONE) {
+                mPlayerService.dis_notifyStatus();
+            }
+            /*
+            if (state.getState() == PlaybackStateCompat.STATE_STOPPED ||
+                    state.getState() == PlaybackStateCompat.STATE_NONE) {
+                stopNotification();
+            } else {
+                Notification notification = createNotification();
+                if (notification != null) {
+                    mNotificationManager.notify(NOTIFICATION_ID, notification);
+                }
+            }
+            */
+        }
+
+        @Override
+        public void onMetadataChanged(MediaMetadataCompat metadata) {
+            mMetadata = metadata;
+            Log.d(TAG, "Received new metadata: " + metadata);
+
+            /*
+            Notification notification = createNotification();
+            if (notification != null) {
+                mNotificationManager.notify(NOTIFICATION_ID, notification);
+            }
+            */
+        }
+
+        @Override
+        public void onSessionDestroyed() {
+            super.onSessionDestroyed();
+            Log.d(TAG, "Session was destroyed, resetting to the new session token");
+            try {
+                updateSessionToken();
+            } catch (RemoteException e) {
+                Log.e(TAG, "could not connect media controller");
+            }
+        }
+    };
 
     public NotificationPlayer(@NonNull PlayerService service , @NonNull IEpisode item) throws RemoteException {
         this.mPlayerService = service;
@@ -80,52 +133,31 @@ public class NotificationPlayer extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
-        executeCommand(mPlayerService, action);
-    }
 
-    private void executeCommand(@NonNull PlayerService playerService, @NonNull String action) {
+        if (action.equals(toggleAction)) {
+            mTransportControls.sendCustomAction(PlayerStateManager.ACTION_TOGGLE, new Bundle());
+        }
+
         if (action.equals(nextAction)) {
-            playerService.playNext();
+            mTransportControls.skipToNext();
             return;
         }
 
         if (action.equals(clearAction)) {
-            playerService.halt();
+            if (mPlayerService != null) {
+                mPlayerService.halt();
+            }
             return;
         }
 
         if (action.equals(playAction)) {
-            playerService.play();
+            mTransportControls.play();
             return;
         }
 
         if (action.equals(pauseAction)) {
-            playerService.pause();
+            mTransportControls.pause();
             return;
-        }
-
-        if (action.equals(toggleAction)) {
-
-
-            SoundWavesPlayer player = playerService.getPlayer();
-            if (!player.isInitialized()) {
-                return;
-            }
-
-            Boolean isPlaying = false;
-            if (PlayerService.isPlaying()) {
-                playerService.pause();
-            } else {
-                playerService.play();
-                isPlaying = true;
-            }
-
-            IEpisode currentItem = playerService.getCurrentItem();
-            if (currentItem != null) {
-                setPlayerService(playerService);
-                show(isPlaying, currentItem);
-            }
-
         }
     }
 
@@ -143,6 +175,9 @@ public class NotificationPlayer extends BroadcastReceiver {
             if (mSessionToken != null) {
                 mController = new MediaControllerCompat(mPlayerService, mSessionToken);
                 mTransportControls = mController.getTransportControls();
+                if (mStarted) {
+                    mController.registerCallback(mCb);
+                }
             }
         }
     }
@@ -165,10 +200,7 @@ public class NotificationPlayer extends BroadcastReceiver {
     }
 
     public void refresh() {
-        PlayerService ps = mPlayerService;
-        if (ps != null) {
-            showNotification(ps.isPlaying());
-        }
+        showNotification(PlayerService.isPlaying());
     }
 
 	public IEpisode getItem() {
@@ -335,10 +367,11 @@ public class NotificationPlayer extends BroadcastReceiver {
 
     public void hide() {
         mStarted = false;
+        mController.unregisterCallback(mCb);
+
         if (mNotificationManager != null)
             mNotificationManager.cancel(NOTIFICATION_PLAYER_ID);
 
-        //mPlayerService.unregisterReceiver(this);
         mPlayerService.stopForeground(true);
     }
 
@@ -380,5 +413,4 @@ public class NotificationPlayer extends BroadcastReceiver {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
     }
 
-	
 }

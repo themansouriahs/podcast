@@ -172,7 +172,7 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
                 });
     }
 
-    public void updateState(@PlaybackStateCompat.State int argState, long argPosition, float argPlaybackSpeed) {
+    void updateState(@PlaybackStateCompat.State int argState, long argPosition, float argPlaybackSpeed) {
         Log.d(TAG, "Update State:"); // NoI18N
 
         PlaybackStateCompat.Builder stateBuilder = getPlaybackState(argState, argPosition, argPlaybackSpeed);
@@ -184,7 +184,7 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
     }
 
     @Override
-    public boolean	onMediaButtonEvent(Intent mediaButtonEvent) {
+    public boolean onMediaButtonEvent(Intent mediaButtonEvent) {
         Log.d(TAG, "onMediaButtonEvent");
         KeyEvent event = mediaButtonEvent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
         boolean wasHandled = HeadsetReceiver.handleMediaButtonEvent(event, mPlayerService);
