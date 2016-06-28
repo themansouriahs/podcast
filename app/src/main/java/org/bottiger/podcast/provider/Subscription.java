@@ -99,6 +99,7 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 	 */
 	private int mSettings;
 
+	@NonNull
     private EpisodeList mEpisodes;
 	private SortedList.Callback<IEpisode> mEpisodesListCallback = new SortedList.Callback<IEpisode>() {
 
@@ -212,6 +213,7 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 		mEpisodes = new EpisodeList(IEpisode.class, mEpisodesListCallback);
 	}
 
+	@NonNull
 	public EpisodeList getEpisodes() {
 		return mEpisodes;
 	}

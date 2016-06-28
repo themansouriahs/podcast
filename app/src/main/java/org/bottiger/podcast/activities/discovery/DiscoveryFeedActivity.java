@@ -1,9 +1,14 @@
 package org.bottiger.podcast.activities.discovery;
 
 import android.app.ProgressDialog;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -14,9 +19,11 @@ import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.activities.feedview.FeedActivity;
 import org.bottiger.podcast.activities.feedview.FeedViewAdapter;
+import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.PaletteHelper;
+import org.bottiger.podcast.utils.UIUtils;
 
 import java.net.URL;
 
@@ -29,8 +36,7 @@ public class DiscoveryFeedActivity extends FeedActivity {
 
     private static final String TAG = "DiscoveryFeedActivity";
 
-    private Button mSubscribeButton;
-    private View mSubscribeContainer;
+    private boolean mIsSubscribed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,24 +44,28 @@ public class DiscoveryFeedActivity extends FeedActivity {
         super.onCreate(savedInstanceState);
         PaletteHelper.generate(mSubscription.getImageURL(), this, mFloatingButton);
 
-        mSubscribeContainer = findViewById(R.id.feed_subscribe_layout);
-        mSubscribeButton = (Button) findViewById(R.id.feed_subscribe_button);
+        mIsSubscribed = mSubscription instanceof Subscription;
 
-        mSubscribeContainer.setVisibility(View.VISIBLE);
-
-        mSubscribeButton.setOnClickListener(new View.OnClickListener() {
+        mFloatingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                if (mSubscription instanceof SlimSubscription) {
-                    SoundWaves.getAppContext(DiscoveryFeedActivity.this).getLibraryInstance().subscribe(mSubscription);
+                Library library = SoundWaves.getAppContext(DiscoveryFeedActivity.this).getLibraryInstance();
+                if (!mIsSubscribed) {
+                    library.subscribe(mSubscription);
                 } else {
-                    SoundWaves.getAppContext(DiscoveryFeedActivity.this).getLibraryInstance().subscribe(mSubscription.getURL().toString());
+                    library.unsubscribe(mSubscription.getURLString(), "DiscoveryFeedActivity");
                 }
 
-                mSubscribeContainer.setVisibility(GONE);
+                mIsSubscribed = !mIsSubscribed;
+                tintButton();
+
+                UIUtils.displaySubscribedSnackbar(!mIsSubscribed, mSubscription, mMultiShrinkScroller, DiscoveryFeedActivity.this);
+
             }
         });
+
+        tintButton();
     }
 
     @NonNull
@@ -75,5 +85,23 @@ public class DiscoveryFeedActivity extends FeedActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         return true;
+    }
+
+    private void tintButton() {
+        Drawable drawable = ContextCompat.getDrawable(this, R.drawable.ic_rss_feed_24dp);
+
+        // Wrap the drawable so that future tinting calls work
+        // on pre-v21 devices. Always use the returned drawable.
+        drawable = DrawableCompat.wrap(drawable);
+
+        // We can now set a tint
+        int colorRes = mIsSubscribed ? R.color.orange : R.color.white_opaque;
+        int tintColor = ContextCompat.getColor(this, colorRes);
+        DrawableCompat.setTint(drawable, tintColor);
+        // ...and a different tint mode
+        //DrawableCompat.setTintMode(drawable, PorterDuff.Mode.SRC_OVER);
+
+        //setFABDrawable(R.drawable.ic_rss_feed_24dp);
+        mFloatingButton.setImageDrawable(drawable);
     }
 }

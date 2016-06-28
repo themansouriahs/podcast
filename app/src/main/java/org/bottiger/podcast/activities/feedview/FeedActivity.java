@@ -99,7 +99,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
     private FeedViewTopImage mPhotoView;
     private RecyclerView mRecyclerView;
     private TextView mNoEpisodesTextView;
-    private MultiShrinkScroller mMultiShrinkScroller;
+    protected MultiShrinkScroller mMultiShrinkScroller;
     protected FloatingActionButton mFloatingButton;
     private FrameLayout mRevealLayout;
     private FeedViewAdapter mAdapter;
@@ -325,7 +325,6 @@ public class FeedActivity extends TopActivity implements PaletteListener {
                         @Override
                         public void onAnimationEnd() {
                             mRevealLayout.setVisibility(View.INVISIBLE);
-                            //mFloatingButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_tune_white));
                             setFABDrawable(R.drawable.ic_tune_white);
                             mToolbar.setTitle(mSubscription.getTitle());
                         }
@@ -341,7 +340,6 @@ public class FeedActivity extends TopActivity implements PaletteListener {
                     mRevealAnimator.setDuration(SETTINGS_REVEAL_DURATION);
 
                     mRevealLayout.setVisibility(View.VISIBLE);
-                    //mFloatingButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_clear_white));
                     setFABDrawable(R.drawable.ic_clear_white);
                     mToolbar.setTitle(R.string.menu_settings);
                     mRevealAnimator.start();

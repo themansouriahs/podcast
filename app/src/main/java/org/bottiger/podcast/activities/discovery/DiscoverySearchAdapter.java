@@ -161,12 +161,7 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
             mSubscribedUrls.add(url);
         }
 
-        // remember that isSubscribed is inverted now
-        int stringId = !isSubscribed ? R.string.discovery_subscribe_toast : R.string.discovery_unsubscribe_toast;
-        String text = mActivity.getResources().getString(stringId);
-        String formattedText = String.format(text, argSubscription.getTitle());
-
-        UIUtils.disPlayBottomSnackBar(argView, formattedText, null, false);
+        UIUtils.displaySubscribedSnackbar(isSubscribed, argSubscription, argView, mActivity);
     }
 
     private void subscribe(@NonNull ISubscription argSubscription) {

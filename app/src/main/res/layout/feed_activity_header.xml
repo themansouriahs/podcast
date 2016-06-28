@@ -71,21 +71,4 @@
 
     </android.support.v7.widget.Toolbar>
 
-    <FrameLayout
-        android:id="@+id/feed_subscribe_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/blackWithAlpha"
-        android:layout_gravity="bottom"
-        android:visibility="gone"
-        android:layout_alignParentBottom="true">
-
-        <Button
-            android:id="@+id/feed_subscribe_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/discovery_subscribe"  />
-
-    </FrameLayout>
-
 </merge>

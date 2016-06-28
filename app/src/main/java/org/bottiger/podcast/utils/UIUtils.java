@@ -60,6 +60,7 @@ import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.DrawerActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.provider.ISubscription;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -512,6 +513,18 @@ public class UIUtils {
                 R.string.pref_theme_default);
 
         return Integer.parseInt(theme);
+    }
+
+    public static void displaySubscribedSnackbar(boolean isSubscribed,
+                                          @NonNull ISubscription argSubscription,
+                                          @NonNull View argView,
+                                          @NonNull Context argContext) {
+        // remember that isSubscribed is inverted now
+        int stringId = !isSubscribed ? R.string.discovery_subscribe_toast : R.string.discovery_unsubscribe_toast;
+        String text = argContext.getResources().getString(stringId);
+        String formattedText = String.format(text, argSubscription.getTitle());
+
+        UIUtils.disPlayBottomSnackBar(argView, formattedText, null, false);
     }
 
 }
