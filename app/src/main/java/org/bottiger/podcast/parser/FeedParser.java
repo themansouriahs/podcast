@@ -533,7 +533,7 @@ public class FeedParser {
         String pubDate = readText(parser);
         parser.require(XmlPullParser.END_TAG, ns, EPISODE_PUB_DATE_TAG);
 
-        return cacheDateFormat(pubDate);
+        return cacheDateFormat(pubDate.trim());
     }
 
     // Processes pubdate tag of an item in the feed.
