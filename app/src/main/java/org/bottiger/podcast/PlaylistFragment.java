@@ -4,6 +4,7 @@ import org.bottiger.podcast.adapters.PlaylistAdapter;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.model.events.EpisodeChanged;
+import org.bottiger.podcast.player.GenericMediaPlayerInterface;
 import org.bottiger.podcast.player.SoundWavesPlayer;
 import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
 import org.bottiger.podcast.playlist.Playlist;
@@ -94,7 +95,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
     private DownloadButtonView mPlayerDownloadButton;
     private MaterialFavoriteButton mFavoriteButton;
 
-    private SoundWavesPlayer mPlayer;
+    private GenericMediaPlayerInterface mPlayer;
 
     private RecyclerView mRecyclerView;
     private View mOverlay;

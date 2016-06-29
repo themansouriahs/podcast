@@ -108,12 +108,12 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
 
     @Override
     public void onFastForward() {
-        mPlayerService.getPlayer().fastForward();
+        mPlayerService.getPlayer().fastForward(null);
     }
 
     @Override
     public void onRewind() {
-        mPlayerService.getPlayer().rewind();
+        mPlayerService.getPlayer().rewind(null);
     }
 
     @Override
@@ -172,7 +172,7 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
                 });
     }
 
-    void updateState(@PlaybackStateCompat.State int argState, long argPosition, float argPlaybackSpeed) {
+    public void updateState(@PlaybackStateCompat.State int argState, long argPosition, float argPlaybackSpeed) {
         Log.d(TAG, "Update State:"); // NoI18N
 
         PlaybackStateCompat.Builder stateBuilder = getPlaybackState(argState, argPosition, argPlaybackSpeed);

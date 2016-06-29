@@ -20,6 +20,7 @@ import android.widget.TextView;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.player.GenericMediaPlayerInterface;
 import org.bottiger.podcast.player.SoundWavesPlayer;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
@@ -106,7 +107,7 @@ public class DialogPlaybackSpeed extends DialogFragment {
 
         final PlayerService ps = PlayerService.getInstance();
         final Playlist playlist = SoundWaves.getAppContext(getActivity()).getPlaylist();
-        final SoundWavesPlayer player = SoundWaves.getAppContext(getActivity()).getPlayer();
+        final GenericMediaPlayerInterface player = SoundWaves.getAppContext(getActivity()).getPlayer();
 
         final IEpisode episode = playlist.first();
 
@@ -246,7 +247,7 @@ public class DialogPlaybackSpeed extends DialogFragment {
         activeButton.setChecked(true);
     }
 
-    private void setSpeed(@NonNull SoundWavesPlayer argPlayer, float argNewSpeed) {
+    private void setSpeed(@NonNull GenericMediaPlayerInterface argPlayer, float argNewSpeed) {
         if (Math.abs(mCurrentSpeed - argNewSpeed) < 0.01)
             return;
 

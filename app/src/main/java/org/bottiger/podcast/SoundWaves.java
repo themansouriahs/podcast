@@ -19,6 +19,7 @@ import android.util.Log;
 import org.bottiger.podcast.cloud.EventLogger;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.Library;
+import org.bottiger.podcast.player.GenericMediaPlayerInterface;
 import org.bottiger.podcast.player.SoundWavesPlayer;
 import org.bottiger.podcast.player.sonic.service.ISoundWavesEngine;
 import com.squareup.otto.Bus;
@@ -78,7 +79,7 @@ public class SoundWaves extends MultiDexApplication {
     public MediaControllerCompat mMediaControllerCompat;
     PlayerHelper mPlayerHelper = new PlayerHelper();
 
-    private SoundWavesPlayer mPlayer;
+    private GenericMediaPlayerInterface mPlayer;
 
     @Override
     public void onCreate() {
@@ -220,12 +221,16 @@ public class SoundWaves extends MultiDexApplication {
     }
 
     @NonNull
-    public SoundWavesPlayer getPlayer() {
+    public GenericMediaPlayerInterface getPlayer() {
         if (mPlayer == null) {
             mPlayer = new SoundWavesPlayer(this);
         }
 
         return mPlayer;
+    }
+
+    public void setPlayer(@NonNull GenericMediaPlayerInterface argPlayer) {
+        mPlayer = argPlayer;
     }
 
     @NonNull

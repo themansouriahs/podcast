@@ -13,6 +13,7 @@ import com.squareup.otto.Produce;
 import com.squareup.otto.Subscribe;
 
 import org.bottiger.podcast.flavors.MediaCast.VendorMediaRouteCast;
+import org.bottiger.podcast.player.googlecast.GoogleCastPlayer;
 import org.bottiger.podcast.service.PlayerService;
 
 /**
@@ -71,10 +72,14 @@ public class MediaRouterPlaybackActivity extends ToolbarActivity {
     @Override
     protected void onServiceConnected() {
         super.onServiceConnected();
+        SoundWaves.getAppContext(this).setPlayer(new GoogleCastPlayer(mMediaRouteCast, this));
+
+        /*
         PlayerService ps = PlayerService.getInstance();
         if (ps != null) {
             ps.setMediaCast(mMediaRouteCast);
         }
+        */
     }
 
 }

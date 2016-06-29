@@ -2,6 +2,7 @@ package org.bottiger.podcast.service;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.player.GenericMediaPlayerInterface;
 import org.bottiger.podcast.player.LegacyRemoteController;
 import org.bottiger.podcast.player.PlayerHandler;
 import org.bottiger.podcast.player.PlayerPhoneListener;
@@ -98,7 +99,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 	private static @PlayerService.NextTrack int nextTrack = NEXT_IN_PLAYLIST;
 
-	@NonNull private SoundWavesPlayer mPlayer;
+	@NonNull private GenericMediaPlayerInterface mPlayer;
     private MediaControllerCompat mController;
     private PlayerStateManager mPlayerStateManager;
 
@@ -136,7 +137,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 		mPlayerHandler.sendEmptyMessageDelayed(PlayerHandler.FADEOUT, argDelayMs);
 	}
 
-    public SoundWavesPlayer getPlayer() {
+    public GenericMediaPlayerInterface getPlayer() {
         return mPlayer;
     }
 	private static PlayerService sInstance = null;
@@ -535,7 +536,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 		if (sInstance == null)
 			return false;
 
-		SoundWavesPlayer player = sInstance.getPlayer();
+		GenericMediaPlayerInterface player = sInstance.getPlayer();
 
         if (!player.isInitialized())
             return false;
@@ -620,16 +621,9 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 			mNotificationPlayer.show(isPlaying(), mItem);
         }
 
-        mPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
-
         if (isSteaming && mWifi.isConnected()) {
             wifiLock.acquire();
         }
-    }
-
-    public void setMediaCast(IMediaCast mMediaCast) {
-        this.mMediaCast = mMediaCast;
-        mMediaCast.registerStateChangedListener(getPlayer());
     }
 
     /**

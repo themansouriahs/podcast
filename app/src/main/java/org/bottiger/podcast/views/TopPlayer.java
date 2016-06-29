@@ -39,6 +39,7 @@ import com.github.ivbaranov.mfb.MaterialFavoriteButton;
 
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.player.GenericMediaPlayerInterface;
 import org.bottiger.podcast.player.SoundWavesPlayer;
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
@@ -355,7 +356,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         int visibility = SoundWaves.getAppContext(getContext()).getPlayer().canSetSpeed() ? View.VISIBLE : View.GONE;
         mSpeedButton.setVisibility(visibility);
 
-        SoundWavesPlayer player = SoundWaves.getAppContext(getContext()).getPlayer();
+        GenericMediaPlayerInterface player = SoundWaves.getAppContext(getContext()).getPlayer();
         float speedMultiplier = player.getCurrentSpeedMultiplier();
         setPlaybackSpeedView(speedMultiplier);
 

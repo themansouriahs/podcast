@@ -2,6 +2,13 @@ package org.bottiger.podcast.player;
 
 import android.content.Context;
 import android.net.Uri;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import org.bottiger.podcast.listeners.PlayerStatusObservable;
+import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
+import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.service.PlayerService;
 
 import java.io.IOException;
 
@@ -10,35 +17,57 @@ import java.io.IOException;
  */
 public interface GenericMediaPlayerInterface {
 
+    void setDataSourceAsync(@NonNull String path, int startPos);
+    @PlayerStatusObservable.PlayerStatus int getStatus();
+    boolean isSteaming();
+    boolean isInitialized();
+
+    void toggle();
+    void start();
+    void stop();
+    void release();
+    boolean isPlaying();
+
+    long getCurrentPosition();
+
+    void rewind(@Nullable IEpisode argItem);
+    void fastForward(@Nullable IEpisode argItem);
+
+    void pause();
+
+    long duration();
+    long position();
+
+    long seek(long whereto);
+    void setVolume(float vol);
+
+    boolean isCasting();
+    void setPlayerService(@NonNull PlayerService argPlayerService);
+
+    void addListener(ExoPlayerWrapper.Listener listener);
+    void removeListener(ExoPlayerWrapper.Listener listener);
+    void setHandler(PlayerHandler handler);
+
+
+    boolean doAutomaticGainControl();
+    void setAutomaticGainControl(boolean argSetAutomaticGainControl);
+    boolean doRemoveSilence();
+    void setRemoveSilence(boolean argDoRemoveSilence);
+
     boolean canSetPitch();
     boolean canSetSpeed();
     float getCurrentPitchStepsAdjustment();
-    long getCurrentPosition();
     float getCurrentSpeedMultiplier();
     long getDuration();
     float getMaxSpeedMultiplier();
     float getMinSpeedMultiplier();
-    boolean isLooping();
-    boolean isPlaying();
-    void pause();
     void prepare() throws IllegalStateException, IOException;
-    void prepareAsync();
-    void release();
     void reset();
     void seekTo(int msec) throws IllegalStateException;
     void setAudioStreamType(int streamtype);
     void setDataSource(Context context, Uri uri) throws IllegalArgumentException, IllegalStateException, IOException;
-    void setEnableSpeedAdjustment(boolean enableSpeedAdjustment);
-    void setLooping(boolean loop);
-    void setPitchStepsAdjustment(float pitchSteps);
-    void setPlaybackPitch(float f);
     void setPlaybackSpeed(float f);
-    void setSpeedAdjustmentAlgorithm(int algorithm);
     void setVolume(float leftVolume, float rightVolume);
-    void setWakeMode(Context context, int mode);
-    void start();
-    void stop();
-
 
     // For registering listeners
     interface OnBufferingUpdateListener {
@@ -50,40 +79,9 @@ public interface GenericMediaPlayerInterface {
     }
 
     interface OnErrorListener {
-        public abstract boolean onError(GenericMediaPlayerInterface arg0, int what, int extra);
+        boolean onError(GenericMediaPlayerInterface arg0, int what, int extra);
     }
 
-    interface OnInfoListener {
-        public abstract boolean onInfo(GenericMediaPlayerInterface arg0, int what, int extra);
-    }
-
-    interface OnPitchAdjustmentAvailableChangedListener {
-        /**
-         * @param arg0                     The owning media player
-         * @param pitchAdjustmentAvailable True if pitch adjustment is available, false if not
-         */
-        public abstract void onPitchAdjustmentAvailableChanged(
-                GenericMediaPlayerInterface arg0, boolean pitchAdjustmentAvailable);
-    }
-
-    interface OnPreparedListener {
-        public abstract void onPrepared(GenericMediaPlayerInterface arg0);
-    }
-
-    interface OnSeekCompleteListener {
-        public abstract void onSeekComplete(GenericMediaPlayerInterface arg0);
-    }
-
-    interface OnSpeedAdjustmentAvailableChangedListener {
-        /**
-         * @param arg0                     The owning media player
-         * @param speedAdjustmentAvailable True if speed adjustment is available, false if not
-         */
-        public abstract void onSpeedAdjustmentAvailableChanged(
-                GenericMediaPlayerInterface arg0, boolean speedAdjustmentAvailable);
-    }
-
-    void setOnPreparedListener(OnPreparedListener listener);
     void setOnErrorListener(OnErrorListener listener);
     void setOnCompletionListener(OnCompletionListener listener);
     void setOnBufferingUpdateListener(OnBufferingUpdateListener listener);
