@@ -9,7 +9,7 @@ android {
         applicationId "org.bottiger.podcast"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 292        // even - release. Odd - development
+        versionCode 293        // even - release. Odd - development
         versionName "0.136.10" // even - release. Odd - development
         multiDexEnabled = true
         //renderscriptTargetApi 20
@@ -185,12 +185,15 @@ dependencies {
 
     // Amazon version
     amazonCompile fileTree(dir: 'src/amazon/libs', include: ['*.jar'])
-    amazonCompile 'com.google.android.gms:play-services-cast:9.0.0'
+    amazonCompile 'com.google.android.gms:play-services-cast:9.2.0'
     // google cast
 
     // Play Store
-    googleCompile 'com.google.android.gms:play-services-analytics:9.0.0'
+    googleCompile 'com.google.android.gms:play-services-analytics:9.2.0'
     // analytics
-    googleCompile 'com.google.android.gms:play-services-cast:9.0.0'
+    googleCompile 'com.google.android.gms:play-services-cast:9.2.0'
+    googleCompile 'com.google.android.gms:play-services-cast-framework:9.2.0'
+
     // google cast
+
 }

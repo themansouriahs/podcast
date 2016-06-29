@@ -50,6 +50,8 @@ public class MediaRouterPlaybackActivity extends ToolbarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        mMediaRouteCast.setupMediaButton(this, menu, R.id.media_route_menu_item);
+        /*
         MediaRouteSelector mediaRouteSelector = mMediaRouteCast.getRouteSelector();
 
         if (mediaRouteSelector != null) {
@@ -64,6 +66,7 @@ public class MediaRouterPlaybackActivity extends ToolbarActivity {
             if (mediaRouteActionProvider != null)
                 mediaRouteActionProvider.setRouteSelector(mediaRouteSelector);
         }
+        */
 
         // Return true to show the menu.
         return super.onCreateOptionsMenu(menu);
@@ -73,13 +76,6 @@ public class MediaRouterPlaybackActivity extends ToolbarActivity {
     protected void onServiceConnected() {
         super.onServiceConnected();
         SoundWaves.getAppContext(this).setPlayer(new GoogleCastPlayer(mMediaRouteCast, this));
-
-        /*
-        PlayerService ps = PlayerService.getInstance();
-        if (ps != null) {
-            ps.setMediaCast(mMediaRouteCast);
-        }
-        */
     }
 
 }

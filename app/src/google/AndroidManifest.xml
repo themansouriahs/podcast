@@ -10,6 +10,11 @@
         <meta-data android:name="com.google.android.backup.api_key"
             android:value="AEdPqrEAAAAIbL9pyk7PhnT_qw7sZY1zFYRc-w8CKQ-3VFm_Ng" />
 
+        <meta-data
+            android:name=
+                "com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
+            android:value="org.bottiger.podcast.flavors.MediaCast.GoogleCastOptionProvider" />
+
     </application>
 
 </manifest>

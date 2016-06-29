@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.support.annotation.MenuRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.media.MediaControlIntent;
@@ -19,10 +20,13 @@ import android.support.v7.media.MediaRouter;
 import android.support.v7.media.MediaSessionStatus;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
 
 import com.google.android.gms.cast.CastMediaControlIntent;
 import com.google.android.gms.cast.MediaInfo;
 import com.google.android.gms.cast.MediaMetadata;
+import com.google.android.gms.cast.framework.CastButtonFactory;
+import com.google.android.gms.cast.framework.CastContext;
 import com.google.android.gms.common.images.WebImage;
 
 import org.bottiger.podcast.R;
@@ -94,6 +98,9 @@ public class VendorMediaRouteCast implements IMediaCast {
 
     private MediaInfo mCurrentTrack;
 
+    // New
+    CastContext mCastContext;
+
     @Nullable
     private IMediaRouteStateListener mListener;
 
@@ -102,6 +109,10 @@ public class VendorMediaRouteCast implements IMediaCast {
 
     public VendorMediaRouteCast(Activity argActivity) {
         mActivity = argActivity;
+
+
+        // New
+        mCastContext = CastContext.getSharedInstance(argActivity);
 
         mMediaRouter = MediaRouter.getInstance(mActivity.getApplicationContext());
         mMediaRouterCallback = new MyMediaRouterCallback();
@@ -151,6 +162,10 @@ public class VendorMediaRouteCast implements IMediaCast {
 
         clearStreamState();
         buildRouteSelector();
+    }
+
+    public void setupMediaButton(@NonNull Context argContext, @NonNull Menu menu, @MenuRes int argMenuResource) {
+        CastButtonFactory.setUpMediaRouteButton(argContext, menu, argMenuResource);
     }
 
     @Override

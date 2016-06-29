@@ -6,6 +6,4 @@
         app:actionProviderClass="android.support.v7.app.MediaRouteActionProvider"
         app:showAsAction="always"
         />
-
-
 </menu>
