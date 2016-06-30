@@ -3,6 +3,7 @@ package org.bottiger.podcast.model;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteCantOpenDatabaseException;
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
@@ -141,9 +142,15 @@ public class Library {
 
         mActiveSubscriptions = new SortedList<>(Subscription.class, mSubscriptionsListCallback);
 
+        long start = System.currentTimeMillis();
+        Log.v(TAG, "pretimer: " + start);
         loadSubscriptions();
+        long end = System.currentTimeMillis();
+        long diff = (end-start);
+        Log.v(TAG, "posttimer: " + end + " diff:" + diff);
 
-        SoundWaves.getRxBus().toObserverable()
+        SoundWaves.getRxBus()
+                .toObserverable()
                 .onBackpressureBuffer(BACKPREASURE_BUFFER_SIZE)
                 .ofType(ItemChanged.class)
                 .subscribe(new Action1<ItemChanged>() {
@@ -569,36 +576,17 @@ public class Library {
         }
     }
 
+    @MainThread
     private void loadSubscriptions() {
         String query = getAllSubscriptions();
 
         Observable.just(query)
-                .subscribeOn(Schedulers.newThread())
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.io())
                 .subscribe(new Action1<String>() {
             @Override
             public void call(String query) {
-                Cursor cursor = null;
-                clearSubscriptions();
-                Subscription subscription = null;
-                try {
-                    cursor = PodcastOpenHelper.runQuery(Library.this.mContext, query);
-
-                    while (cursor.moveToNext()) {
-                        subscription = getByCursor(cursor, null);
-
-                        if (!TextUtils.isEmpty(subscription.getUrl())) {
-                            addSubscriptionInternal(subscription, true);
-                        } else {
-                            subscription = null;
-                        }
-                    }
-                } finally {
-                    if (subscription != null)
-                        mSubscriptionsChangeObservable.onNext(subscription);
-                    if(cursor != null)
-                        cursor.close();
-
-                }
+                loadSubscriptionsInternal(query);
             }
         }, new Action1<Throwable>() {
             @Override
@@ -611,6 +599,32 @@ public class Library {
                 Log.d(TAG, "error: " + throwable.toString());
             }
         });
+    }
+
+    @WorkerThread
+    private void loadSubscriptionsInternal(@NonNull String argQuery) {
+        Cursor cursor = null;
+        clearSubscriptions();
+        Subscription subscription = null;
+        try {
+            cursor = PodcastOpenHelper.runQuery(Library.this.mContext, argQuery);
+
+            while (cursor.moveToNext()) {
+                subscription = getByCursor(cursor, null);
+
+                if (!TextUtils.isEmpty(subscription.getUrl())) {
+                    addSubscriptionInternal(subscription, true);
+                } else {
+                    subscription = null;
+                }
+            }
+        } finally {
+            if (subscription != null)
+                mSubscriptionsChangeObservable.onNext(subscription);
+            if(cursor != null)
+                cursor.close();
+
+        }
     }
 
     public void loadEpisodes(@NonNull final Subscription argSubscription) {

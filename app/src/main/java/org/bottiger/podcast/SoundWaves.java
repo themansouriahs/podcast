@@ -5,10 +5,13 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.os.Debug;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.WorkerThread;
 import android.support.multidex.MultiDexApplication;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -82,9 +85,9 @@ public class SoundWaves extends MultiDexApplication {
 
     @Override
     public void onCreate() {
-        Log.v(TAG, "time: " + System.currentTimeMillis());
+        Log.v(TAG, "App start time: " + System.currentTimeMillis());
         super.onCreate();
-        //Debug.startMethodTracing("startup");
+        Debug.startMethodTracing("startup5");
 
         UIUtils.setTheme(getApplicationContext());
 
@@ -96,24 +99,6 @@ public class SoundWaves extends MultiDexApplication {
         Log.v(TAG, "time: " + System.currentTimeMillis());
 
         CrashReporterFactory.startReporter(this);
-
-        Observable.just(this).subscribeOn(Schedulers.newThread()).subscribe(new Subscriber<Context>() {
-            @Override
-            public void onCompleted() {
-                Log.v(TAG, "Analytics started");
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                Log.wtf(TAG, e.getMessage());
-            }
-
-            @Override
-            public void onNext(Context context) {
-                sAnalytics = AnalyticsFactory.getAnalytics(context);
-                sAnalytics.startTracking();
-            }
-        });
 
         Log.v(TAG, "time1: " + System.currentTimeMillis());
 
@@ -141,6 +126,28 @@ public class SoundWaves extends MultiDexApplication {
         Log.v(TAG, "time9: " + System.currentTimeMillis());
 
         incrementStartupCount(context);
+
+        Observable.just(this)
+                .observeOn(Schedulers.io())
+                .subscribe(new Subscriber<Context>() {
+            @Override
+            public void onCompleted() {
+                Log.v(TAG, "Analytics started");
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Log.wtf(TAG, e.getMessage());
+            }
+
+            @Override
+            public void onNext(Context context) {
+                sAnalytics = AnalyticsFactory.getAnalytics(context);
+                sAnalytics.startTracking();
+
+                incrementStartupCount(context);
+            }
+        });
     }
 
     @Deprecated
@@ -160,13 +167,14 @@ public class SoundWaves extends MultiDexApplication {
         mFirstRun = firstRun;
     }
 
+    @WorkerThread
     private void incrementStartupCount(@NonNull Context argContext) {
+
         SharedPreferences sharedPref = argContext.getSharedPreferences(ApplicationConfiguration.packageName, Context.MODE_PRIVATE);
         String times_started_key = getString(R.string.pref_times_started);
         int times_started = sharedPref.getInt(times_started_key, 0) + 1;
 
         EventLogger.postEvent(argContext, EventLogger.START_APP, times_started, null, null);
-
         sharedPref.edit().putInt(times_started_key, times_started).apply();
     }
 

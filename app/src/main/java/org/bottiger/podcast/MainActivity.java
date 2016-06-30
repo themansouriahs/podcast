@@ -25,6 +25,7 @@ import android.os.Bundle;
 import android.os.Debug;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -43,6 +44,7 @@ public class MainActivity extends FragmentContainerActivity {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		Log.v(TAG, "App start time: " + System.currentTimeMillis());
 		super.onCreate(savedInstanceState);
 
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -56,7 +58,7 @@ public class MainActivity extends FragmentContainerActivity {
 		}
 
 
-		if (BuildConfig.DEBUG) {
+		if (BuildConfig.DEBUG && false) {
 			try {
 				SqliteCopy.backupDatabase();
 			} catch (IOException e) { // TODO Auto-generated catch block
