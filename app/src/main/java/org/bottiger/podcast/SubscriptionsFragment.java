@@ -30,6 +30,7 @@ import org.bottiger.podcast.adapters.SubscriptionAdapter;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.views.ContextMenuRecyclerView;
 import org.bottiger.podcast.views.dialogs.DialogOPML;
 
 import rx.android.schedulers.AndroidSchedulers;
@@ -249,8 +250,10 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
                 if (subscription == null)
                     return false;
 
+                ContextMenuRecyclerView.RecyclerContextMenuInfo info = (ContextMenuRecyclerView.RecyclerContextMenuInfo) menuItem.getMenuInfo();
                 subscription.unsubscribe("Unsubscribe:context");
-                mAdapter.notifyItemRemoved(position);
+
+                mAdapter.notifyItemRemoved(info.position);
                 return true;
             default:
                 return super.onContextItemSelected(menuItem);
