@@ -1,7 +1,6 @@
 package org.bottiger.podcast.webservices.datastore.gpodder.datatypes;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 /**
  * Created by Arvid on 8/25/2015.

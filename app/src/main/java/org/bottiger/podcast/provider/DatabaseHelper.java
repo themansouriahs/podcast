@@ -1,16 +1,16 @@
 package org.bottiger.podcast.provider;
 
-import java.util.ArrayList;
-
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.OperationApplicationException;
-import io.requery.android.database.sqlite.SQLiteDatabase;
-import io.requery.android.database.sqlite.SQLiteStatement;
-import android.os.AsyncTask;
 import android.os.RemoteException;
 import android.support.v4.widget.CursorAdapter;
+
+import java.util.ArrayList;
+
+import io.requery.android.database.sqlite.SQLiteDatabase;
+import io.requery.android.database.sqlite.SQLiteStatement;
 
 public class DatabaseHelper {
 

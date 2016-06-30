@@ -1,18 +1,10 @@
 package org.bottiger.podcast.views;
 
 import android.content.Context;
-import android.graphics.Canvas;
-import android.os.Debug;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.widget.ScrollerCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
-import android.webkit.CookieManager;
-import android.widget.FrameLayout;
-
-import org.bottiger.podcast.adapters.decoration.OnDragStateChangedListener;
 
 /**
  * Created by apl on 22-08-2014.

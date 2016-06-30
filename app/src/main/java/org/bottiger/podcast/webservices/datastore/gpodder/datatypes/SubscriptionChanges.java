@@ -1,7 +1,6 @@
 package org.bottiger.podcast.webservices.datastore.gpodder.datatypes;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 

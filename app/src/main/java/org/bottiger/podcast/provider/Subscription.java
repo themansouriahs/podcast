@@ -1,27 +1,7 @@
 package org.bottiger.podcast.provider;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Date;
-import java.util.List;
-
-import org.bottiger.podcast.R;
-import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.listeners.PaletteListener;
-import org.bottiger.podcast.model.datastructures.EpisodeList;
-import org.bottiger.podcast.model.events.SubscriptionChanged;
-import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
-import org.bottiger.podcast.provider.base.BaseSubscription;
-import org.bottiger.podcast.utils.BitMaskUtils;
-import org.bottiger.podcast.utils.ColorExtractor;
-import org.bottiger.podcast.utils.PlaybackSpeed;
-
 import android.content.Context;
 import android.content.SharedPreferences;
-import io.requery.android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
@@ -30,9 +10,27 @@ import android.support.v7.util.SortedList;
 import android.text.TextUtils;
 import android.util.Patterns;
 
+import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.listeners.PaletteListener;
+import org.bottiger.podcast.model.datastructures.EpisodeList;
+import org.bottiger.podcast.model.events.SubscriptionChanged;
+import org.bottiger.podcast.provider.base.BaseSubscription;
+import org.bottiger.podcast.utils.BitMaskUtils;
+import org.bottiger.podcast.utils.ColorExtractor;
+import org.bottiger.podcast.utils.PlaybackSpeed;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Date;
+import java.util.List;
+
 import javax.annotation.Nullable;
 
-import static org.bottiger.podcast.model.events.SubscriptionChanged.LOADED;
+import io.requery.android.database.sqlite.SQLiteDatabase;
 
 public class Subscription extends BaseSubscription implements PaletteListener {
 

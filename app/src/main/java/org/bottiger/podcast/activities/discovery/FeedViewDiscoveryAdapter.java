@@ -1,27 +1,18 @@
 package org.bottiger.podcast.activities.discovery;
 
-import android.app.Activity;
-import android.database.Cursor;
 import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.util.SortedList;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
-import org.bottiger.podcast.R;
 import org.bottiger.podcast.TopActivity;
 import org.bottiger.podcast.activities.feedview.EpisodeViewHolder;
 import org.bottiger.podcast.activities.feedview.FeedViewAdapter;
-import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
-import org.bottiger.podcast.provider.SlimImplementations.SlimEpisode;
 import org.bottiger.podcast.views.PlayPauseImageView;
-
-import java.util.ArrayList;
 
 /**
  * Created by apl on 21-04-2015.

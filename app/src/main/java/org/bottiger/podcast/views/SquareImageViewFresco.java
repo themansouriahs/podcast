@@ -3,7 +3,6 @@ package org.bottiger.podcast.views;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-import android.widget.ImageView;
 
 public class SquareImageViewFresco extends ImageViewTinted {
     public SquareImageViewFresco(Context context) {

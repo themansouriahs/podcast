@@ -5,7 +5,6 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.util.SortedList;
-import android.view.View;
 
 import org.bottiger.podcast.model.datastructures.EpisodeList;
 import org.bottiger.podcast.provider.IEpisode;
@@ -16,9 +15,6 @@ import org.bottiger.podcast.provider.converter.EpisodeConverter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Created by apl on 15-04-2015.

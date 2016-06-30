@@ -2,7 +2,6 @@ package org.bottiger.podcast.cloud;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
@@ -10,7 +9,6 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.flavors.Analytics.VendorAnalytics;
 
 import java.io.IOException;
 import java.lang.annotation.Retention;

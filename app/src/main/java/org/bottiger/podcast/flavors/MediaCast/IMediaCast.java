@@ -1,6 +1,5 @@
 package org.bottiger.podcast.flavors.MediaCast;
 
-import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 
 /**

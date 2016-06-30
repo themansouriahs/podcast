@@ -18,8 +18,6 @@ package org.bottiger.podcast;
 
 import junit.framework.TestCase;
 
-import org.bottiger.podcast.utils.SDCardManager;
-
 
 public class SDCardTest extends TestCase {
 

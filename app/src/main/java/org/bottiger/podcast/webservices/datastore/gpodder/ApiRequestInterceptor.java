@@ -4,7 +4,6 @@ package org.bottiger.podcast.webservices.datastore.gpodder;
  * Created by apl on 23-05-2015.
  */
 
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Base64;
@@ -15,8 +14,6 @@ import okhttp3.Headers;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.ResponseBody;
-import okio.Buffer;
 
 /**
  * Interceptor used to authorize requests.

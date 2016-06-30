@@ -1,12 +1,5 @@
 package org.bottiger.podcast;
 
-import org.bottiger.podcast.adapters.SubscriptionAdapter;
-import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.model.Library;
-import org.bottiger.podcast.model.events.SubscriptionChanged;
-import org.bottiger.podcast.provider.Subscription;
-import org.bottiger.podcast.views.dialogs.DialogOPML;
-
 import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
@@ -22,20 +15,23 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
-import java.util.List;
+import org.bottiger.podcast.adapters.SubscriptionAdapter;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.model.Library;
+import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.views.ContextMenuRecyclerView;
+import org.bottiger.podcast.views.dialogs.DialogOPML;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -254,8 +250,10 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
                 if (subscription == null)
                     return false;
 
+                ContextMenuRecyclerView.RecyclerContextMenuInfo info = (ContextMenuRecyclerView.RecyclerContextMenuInfo) menuItem.getMenuInfo();
                 subscription.unsubscribe("Unsubscribe:context");
-                mAdapter.notifyItemRemoved(position);
+
+                mAdapter.notifyItemRemoved(info.position);
                 return true;
             default:
                 return super.onContextItemSelected(menuItem);

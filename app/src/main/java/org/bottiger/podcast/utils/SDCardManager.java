@@ -1,22 +1,18 @@
 package org.bottiger.podcast.utils;
 
 
-import java.io.File;
-import java.io.IOException;
+import android.Manifest;
+import android.os.Build;
+import android.os.Environment;
+import android.os.StatFs;
+import android.support.annotation.RequiresPermission;
+import android.support.v4.content.ContextCompat;
 
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.provider.FeedItem;
 
-import android.Manifest;
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.os.Build;
-import android.os.Environment;
-import android.os.StatFs;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresPermission;
-import android.support.v4.content.ContextCompat;
+import java.io.File;
+import java.io.IOException;
 
 public class SDCardManager {
 

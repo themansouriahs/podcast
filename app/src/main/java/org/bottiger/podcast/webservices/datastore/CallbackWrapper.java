@@ -5,7 +5,6 @@ import android.support.annotation.Nullable;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
 
 /**
  * Created by Arvid on 8/27/2015.

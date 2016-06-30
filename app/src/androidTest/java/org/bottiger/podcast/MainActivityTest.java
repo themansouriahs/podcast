@@ -3,8 +3,6 @@ package org.bottiger.podcast;
 import android.content.Intent;
 import android.test.ActivityUnitTestCase;
 
-import org.bottiger.podcast.MainActivity;
-
 /**
  * Created by apl on 20-03-2015.
  */

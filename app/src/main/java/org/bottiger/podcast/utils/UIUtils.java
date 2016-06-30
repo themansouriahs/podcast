@@ -15,6 +15,7 @@ package org.bottiger.podcast.utils;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
@@ -25,7 +26,9 @@ import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.graphics.*;
+import android.graphics.Color;
+import android.graphics.Point;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.AttrRes;
@@ -34,14 +37,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
-import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
-import android.text.TextUtils;
 import android.text.format.DateUtils;
-import android.text.method.LinkMovementMethod;
 import android.text.style.StyleSpan;
 import android.transition.AutoTransition;
 import android.transition.Transition;
@@ -54,17 +53,12 @@ import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
-import android.widget.TextView;
 
 import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.DrawerActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.provider.ISubscription;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.regex.Pattern;
 /**
  * An assortment of UI helpers.
  */

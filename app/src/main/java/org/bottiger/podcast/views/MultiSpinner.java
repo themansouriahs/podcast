@@ -1,7 +1,5 @@
 package org.bottiger.podcast.views;
 
-import java.util.List;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,6 +10,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import org.bottiger.podcast.R;
+
+import java.util.List;
 
 /**
  * Created by apl on 19-02-2015.

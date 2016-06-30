@@ -1,6 +1,5 @@
 package org.bottiger.podcast.player;
 
-import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;

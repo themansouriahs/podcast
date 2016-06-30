@@ -1,11 +1,11 @@
 package org.bottiger.podcast.fetcher;
 
 
+import org.bottiger.podcast.utils.PodcastLog;
+
 import java.io.UnsupportedEncodingException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.bottiger.podcast.utils.PodcastLog;
 
 public class Response {
 	private final PodcastLog log = PodcastLog.getLog(getClass());

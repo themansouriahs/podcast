@@ -1,14 +1,5 @@
 package org.bottiger.podcast.receiver;
 
-import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.flavors.Analytics.AnalyticsFactory;
-import org.bottiger.podcast.flavors.Analytics.IAnalytics;
-import org.bottiger.podcast.provider.ISubscription;
-import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
-import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
-import org.bottiger.podcast.service.IDownloadCompleteCallback;
-import org.bottiger.podcast.utils.StorageUtils;
-
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -17,6 +8,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
+
+import org.bottiger.podcast.flavors.Analytics.AnalyticsFactory;
+import org.bottiger.podcast.flavors.Analytics.IAnalytics;
+import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
+import org.bottiger.podcast.service.IDownloadCompleteCallback;
+import org.bottiger.podcast.utils.StorageUtils;
 
 public class PodcastUpdateReceiver extends BroadcastReceiver {
 	

@@ -1,12 +1,12 @@
 package org.bottiger.podcast.receiver;
 
-import org.bottiger.podcast.service.PlayerService;
-import org.bottiger.podcast.service.jobservice.PodcastUpdater;
-
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+
+import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.service.jobservice.PodcastUpdater;
 
 public class PowerReceiver extends BroadcastReceiver {
 

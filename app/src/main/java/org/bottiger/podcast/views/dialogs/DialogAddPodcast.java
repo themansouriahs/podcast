@@ -1,17 +1,7 @@
 package org.bottiger.podcast.views.dialogs;
 
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import org.bottiger.podcast.R;
-import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
-import org.bottiger.podcast.provider.Subscription;
-import org.bottiger.podcast.utils.StrUtils;
-
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ClipboardManager;
@@ -23,6 +13,14 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+
+import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
+import org.bottiger.podcast.utils.StrUtils;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class DialogAddPodcast {
 

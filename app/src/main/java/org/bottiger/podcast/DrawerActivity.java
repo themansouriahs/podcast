@@ -1,11 +1,5 @@
 package org.bottiger.podcast;
 
-import org.bottiger.podcast.activities.downloadmanager.DownloadManagerActivity;
-import org.bottiger.podcast.playlist.PlaylistData;
-import org.bottiger.podcast.utils.TransitionUtils;
-import org.bottiger.podcast.utils.UIUtils;
-import org.bottiger.podcast.views.SlidingTab.SlidingTabLayout;
-
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
@@ -18,14 +12,18 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+
+import org.bottiger.podcast.playlist.PlaylistData;
+import org.bottiger.podcast.utils.TransitionUtils;
+import org.bottiger.podcast.views.SlidingTab.SlidingTabLayout;
 
 import java.util.LinkedList;
 import java.util.List;

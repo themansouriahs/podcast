@@ -1,8 +1,6 @@
 package org.bottiger.podcast.adapters;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.widget.ArrayAdapter;
 
 import java.util.List;

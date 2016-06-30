@@ -2,12 +2,8 @@ package org.bottiger.podcast;
 
 import android.support.test.InstrumentationRegistry;
 import android.test.ActivityInstrumentationTestCase2;
-import android.text.TextUtils;
 
-import org.bottiger.podcast.TestUtils.RecyclerTestUtils;
 import org.bottiger.podcast.TestUtils.TestUtils;
-import org.bottiger.podcast.playlist.Playlist;
-import org.bottiger.podcast.service.PlayerService;
 import org.junit.Before;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -20,8 +16,6 @@ import static android.support.test.espresso.matcher.ViewMatchers.isChecked;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isNotChecked;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static org.hamcrest.Matchers.anyOf;
 
 
 /**

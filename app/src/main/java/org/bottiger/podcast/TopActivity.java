@@ -1,26 +1,19 @@
 package org.bottiger.podcast;
 
-import android.content.ComponentName;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.support.annotation.ColorInt;
-import android.support.annotation.ColorRes;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
-import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.session.MediaControllerCompat;
-import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.AppCompatDelegate;
 import android.transition.Slide;
 import android.transition.Transition;
 import android.util.Log;
@@ -30,11 +23,8 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.service.DownloadService;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
-import org.bottiger.podcast.service.PlayerService;
-import org.bottiger.podcast.utils.ColorUtils;
 import org.bottiger.podcast.utils.PlayerHelper;
 import org.bottiger.podcast.utils.TransitionUtils;
 import org.bottiger.podcast.utils.UIUtils;

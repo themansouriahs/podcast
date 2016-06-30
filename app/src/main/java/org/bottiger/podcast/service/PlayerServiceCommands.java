@@ -1,16 +1,5 @@
 package org.bottiger.podcast.service;
 
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.IBinder;
-import android.support.annotation.NonNull;
-import android.util.Log;
-
-import java.lang.ref.WeakReference;
-
 /**
  * Created by apl on 27-05-2015.
  */

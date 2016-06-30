@@ -1,39 +1,9 @@
 package org.bottiger.podcast.playlist;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.bottiger.podcast.ApplicationConfiguration;
-import org.bottiger.podcast.PlaylistFragment;
-import org.bottiger.podcast.R;
-import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.adapters.PlaylistAdapter;
-import org.bottiger.podcast.adapters.decoration.OnDragStateChangedListener;
-import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.model.Library;
-import org.bottiger.podcast.model.events.EpisodeChanged;
-import org.bottiger.podcast.playlist.filters.SubscriptionFilter;
-import org.bottiger.podcast.provider.DatabaseHelper;
-import org.bottiger.podcast.provider.FeedItem;
-import org.bottiger.podcast.provider.IEpisode;
-import org.bottiger.podcast.provider.ISubscription;
-import org.bottiger.podcast.provider.ItemColumns;
-import org.bottiger.podcast.provider.PodcastOpenHelper;
-import org.bottiger.podcast.provider.Subscription;
-import org.bottiger.podcast.provider.SubscriptionColumns;
-import org.bottiger.podcast.service.PlayerService;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
-import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.support.annotation.MainThread;
@@ -43,12 +13,26 @@ import android.support.v4.widget.CursorAdapter;
 import android.support.v7.util.SortedList;
 import android.util.Log;
 
-import com.google.api.client.util.DateTime;
-import com.squareup.otto.Subscribe;
+import org.bottiger.podcast.ApplicationConfiguration;
+import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.model.Library;
+import org.bottiger.podcast.playlist.filters.SubscriptionFilter;
+import org.bottiger.podcast.provider.DatabaseHelper;
+import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.provider.ItemColumns;
+import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.provider.SubscriptionColumns;
+import org.bottiger.podcast.service.PlayerService;
 
-import rx.android.schedulers.AndroidSchedulers;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.util.ArrayList;
+import java.util.Date;
+
 import rx.functions.Action1;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListener {

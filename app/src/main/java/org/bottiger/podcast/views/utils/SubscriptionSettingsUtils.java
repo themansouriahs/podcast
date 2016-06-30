@@ -2,8 +2,6 @@ package org.bottiger.podcast.views.utils;
 
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.SwitchCompat;
@@ -11,7 +9,6 @@ import android.view.View;
 import android.widget.CompoundButton;
 
 import org.bottiger.podcast.R;
-import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.PreferenceHelper;
 

@@ -19,22 +19,12 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.media.MediaCodec;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
-import com.google.android.exoplayer.MediaCodecAudioTrackRenderer;
 import com.google.android.exoplayer.MediaCodecSelector;
 import com.google.android.exoplayer.MediaCodecVideoTrackRenderer;
 import com.google.android.exoplayer.TrackRenderer;
-import com.google.android.exoplayer.audio.AudioCapabilities;
-
-import org.bottiger.podcast.R;
-import org.bottiger.podcast.player.PlayerStateManager;
-import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper.RendererBuilder;
-import org.bottiger.podcast.utils.HttpUtils;
-import org.bottiger.podcast.utils.PreferenceHelper;
-
 import com.google.android.exoplayer.extractor.Extractor;
 import com.google.android.exoplayer.extractor.ExtractorSampleSource;
 import com.google.android.exoplayer.text.TextTrackRenderer;
@@ -45,6 +35,9 @@ import com.google.android.exoplayer.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer.upstream.DefaultUriDataSource;
 import com.google.android.exoplayer.upstream.UriDataSource;
 import com.google.android.exoplayer.util.Util;
+
+import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper.RendererBuilder;
+import org.bottiger.podcast.utils.HttpUtils;
 
 import okhttp3.OkHttpClient;
 

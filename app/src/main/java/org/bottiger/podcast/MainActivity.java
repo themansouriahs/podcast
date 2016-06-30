@@ -1,18 +1,5 @@
 package org.bottiger.podcast;
 
-import java.io.IOException;
-
-import org.bottiger.podcast.debug.SqliteCopy;
-import org.bottiger.podcast.receiver.HeadsetReceiver;
-import org.bottiger.podcast.service.PlayerService;
-import org.bottiger.podcast.service.syncadapter.CloudSyncUtils;
-import org.bottiger.podcast.utils.PreferenceHelper;
-import org.bottiger.podcast.utils.UIUtils;
-import org.bottiger.podcast.views.dialogs.DialogAddPodcast;
-import org.bottiger.podcast.utils.ThemeHelper;
-import org.bottiger.podcast.utils.TransitionUtils;
-
-
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.content.Context;
@@ -28,6 +15,17 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import org.bottiger.podcast.debug.SqliteCopy;
+import org.bottiger.podcast.receiver.HeadsetReceiver;
+import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.service.syncadapter.CloudSyncUtils;
+import org.bottiger.podcast.utils.PreferenceHelper;
+import org.bottiger.podcast.utils.TransitionUtils;
+import org.bottiger.podcast.utils.UIUtils;
+import org.bottiger.podcast.views.dialogs.DialogAddPodcast;
+
+import java.io.IOException;
 
 // Sliding
 public class MainActivity extends FragmentContainerActivity {

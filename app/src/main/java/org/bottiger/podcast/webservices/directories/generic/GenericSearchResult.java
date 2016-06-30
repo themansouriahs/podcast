@@ -3,7 +3,6 @@ package org.bottiger.podcast.webservices.directories.generic;
 import android.support.annotation.NonNull;
 
 import org.bottiger.podcast.provider.ISubscription;
-import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.webservices.directories.ISearchResult;
 
 import java.util.LinkedList;

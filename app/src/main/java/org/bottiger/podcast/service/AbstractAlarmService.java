@@ -1,13 +1,10 @@
 package org.bottiger.podcast.service;
 
-import org.bottiger.podcast.utils.PodcastLog;
-
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.os.Binder;
 import android.os.Bundle;
@@ -15,7 +12,8 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.os.SystemClock;
-import android.preference.PreferenceManager;
+
+import org.bottiger.podcast.utils.PodcastLog;
 
 public abstract class AbstractAlarmService extends IntentService {
 

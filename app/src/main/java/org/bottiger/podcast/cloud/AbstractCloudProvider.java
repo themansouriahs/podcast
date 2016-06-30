@@ -1,14 +1,14 @@
 package org.bottiger.podcast.cloud;
 
 
-import java.net.URL;
-import java.util.List;
-
-import org.bottiger.podcast.provider.Subscription;
-
 import android.accounts.Account;
 import android.content.Context;
 import android.os.AsyncTask;
+
+import org.bottiger.podcast.provider.Subscription;
+
+import java.net.URL;
+import java.util.List;
 
 public abstract class AbstractCloudProvider implements CloudProvider {
 	

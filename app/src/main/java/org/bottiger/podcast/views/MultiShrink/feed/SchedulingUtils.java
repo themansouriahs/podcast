@@ -3,8 +3,8 @@ package org.bottiger.podcast.views.MultiShrink.feed;
 /**
  * Created by apl on 14-02-2015.
  */
+
 import android.view.View;
-import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.ViewTreeObserver.OnPreDrawListener;
 
 /** Static methods that are useful for scheduling actions to occur at a later time. */
