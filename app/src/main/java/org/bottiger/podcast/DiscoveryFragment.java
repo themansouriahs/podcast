@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.ContentLoadingProgressBar;
+import android.support.v7.util.SortedList;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -31,6 +32,7 @@ import android.widget.RelativeLayout;
 import android.widget.SearchView;
 
 import org.bottiger.podcast.activities.discovery.DiscoverySearchAdapter;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.utils.StrUtils;
@@ -48,6 +50,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by apl on 13-04-2015.
@@ -92,6 +99,8 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
     private DiscoverySearchAdapter mResultsAdapter;
 
     private String mDiscoveryEngineKey;
+
+    private Subscription mRxSubscription = null;
 
     private IDirectoryProvider mDirectoryProvider = null;
     private IDirectoryProvider.Callback mSearchResultCallback = new IDirectoryProvider.Callback() {
@@ -205,6 +214,36 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
         mProgress = (ProgressBar) view.findViewById(R.id.discovery_progress);
 
         populateRecommendations();
+
+        mRxSubscription = SoundWaves
+                .getAppContext(getContext())
+                .getLibraryInstance()
+                .mSubscriptionsChangeObservable
+                .onBackpressureLatest()
+                .ofType(org.bottiger.podcast.provider.Subscription.class)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<org.bottiger.podcast.provider.Subscription>() {
+                    @Override
+                    public void call(org.bottiger.podcast.provider.Subscription argSubscription) {
+                        mResultsAdapter.populateSubscribedUrls();
+                        mResultsAdapter.notifyDataSetChanged();
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        VendorCrashReporter.report("subscribeError" , throwable.toString());
+                        Log.d(TAG, "error: " + throwable.toString());
+                    }
+                });
+    }
+
+    @Override
+    public void onDestroyView () {
+        super.onDestroyView();
+        if (mRxSubscription != null && !mRxSubscription.isUnsubscribed()) {
+            mRxSubscription.unsubscribe();
+        }
     }
 
     private void performSearch(@NonNull String argQuery) {

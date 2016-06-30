@@ -142,12 +142,7 @@ public class Library {
 
         mActiveSubscriptions = new SortedList<>(Subscription.class, mSubscriptionsListCallback);
 
-        long start = System.currentTimeMillis();
-        Log.v(TAG, "pretimer: " + start);
         loadSubscriptions();
-        long end = System.currentTimeMillis();
-        long diff = (end-start);
-        Log.v(TAG, "posttimer: " + end + " diff:" + diff);
 
         SoundWaves.getRxBus()
                 .toObserverable()
