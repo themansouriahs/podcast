@@ -30,12 +30,8 @@ public class PlayerHandler {
     private PlayerService mPlayerService;
     private final InnerPlayerHandler mHandler;
 
-    @NonNull
-    private static SharedPreferences mSharedpreferences;
-
     public PlayerHandler(@NonNull PlayerService argPlayerService) {
         mPlayerService = argPlayerService;
-        mSharedpreferences = PreferenceManager.getDefaultSharedPreferences(mPlayerService.getApplicationContext());
         mHandler  = new InnerPlayerHandler(mPlayerService);
     }
 
@@ -87,7 +83,9 @@ public class PlayerHandler {
                     break;
                 case TRACK_ENDED:
                     String key = playerService.getResources().getString(R.string.pref_continuously_playing_key);
-                    boolean doPlayNext = mSharedpreferences.getBoolean(key, CONTINUOUS_PLAYING_DEFAULT);
+                    boolean doPlayNext = PreferenceManager
+                            .getDefaultSharedPreferences(playerService.getApplicationContext())
+                            .getBoolean(key, CONTINUOUS_PLAYING_DEFAULT);
 
                     if (playerService.getCurrentItem() != null) {
 

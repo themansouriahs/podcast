@@ -58,6 +58,10 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 	private static final int AUTHENTICATION_NEEDED_SET = (1 << 15);
 	private static final int AUTHENTICATION_NEEDED = (1 << 16);
 	private static final int AUTHENTICATION_WORKING = (1 << 17);
+	private static final int SKIP_INTRO_SET = (1 << 18);
+	private static final int SKIP_INTRO = (1 << 19);
+	private static final int NOTIFY_ON_NEW_SET = (1 << 20);
+	private static final int NOTIFY_ON_NEW = (1 << 21);
 
 	private final int mOldestFirstID = R.string.pref_list_oldest_first_key;
 	private final int mDeleteAfterPlaybackID = R.string.pref_delete_when_finished_key;
@@ -626,6 +630,44 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 			mSettings |= AUTHENTICATION_NEEDED;
 		else
 			mSettings &= ~AUTHENTICATION_NEEDED;
+
+		notifyPropertyChanged(null);
+	}
+
+	public boolean doSkipIntro() {
+		if (!IsSettingEnabled(SKIP_INTRO_SET))
+			return false;
+
+		return IsSettingEnabled(SKIP_INTRO_SET);
+	}
+
+	public void setDoSkipIntro(boolean argSkipIntro) {
+		mSettings = mSettings < 0 ? 0 : mSettings;
+		mSettings |= SKIP_INTRO_SET;
+
+		if (argSkipIntro)
+			mSettings |= SKIP_INTRO;
+		else
+			mSettings &= ~SKIP_INTRO;
+
+		notifyPropertyChanged(null);
+	}
+
+	public boolean doNotifyOnNew() {
+		if (!IsSettingEnabled(NOTIFY_ON_NEW_SET))
+			return false;
+
+		return IsSettingEnabled(NOTIFY_ON_NEW_SET);
+	}
+
+	public void setDoNotifyOnNew(boolean argDoNotifyOnNew) {
+		mSettings = mSettings < 0 ? 0 : mSettings;
+		mSettings |= NOTIFY_ON_NEW_SET;
+
+		if (argDoNotifyOnNew)
+			mSettings |= NOTIFY_ON_NEW;
+		else
+			mSettings &= ~NOTIFY_ON_NEW;
 
 		notifyPropertyChanged(null);
 	}

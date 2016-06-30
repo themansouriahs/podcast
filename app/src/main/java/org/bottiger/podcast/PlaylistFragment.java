@@ -41,6 +41,7 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.os.Debug;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -125,7 +126,13 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
         mSwipePaint.setColor(color);
         mSwipeIcon = BitmapFactory.decodeResource(getResources(), mSwipeIconID);
 
-        mPlayer = SoundWaves.getAppContext(getContext()).getPlayer();
+        SoundWaves soundwaves = SoundWaves.getAppContext(getContext());
+
+        mRxPlaylistSubscription = getPlaylistChangedSubscription();
+
+        mPlayer = soundwaves.getPlayer();
+        mPlaylist = soundwaves.getPlaylist();
+        //soundwaves.getLibraryInstance().loadPlaylist(mPlaylist);
 
         super.onCreate(savedInstanceState);
     }
@@ -249,7 +256,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
     public void onStart() {
         Log.d(TAG, "onStart");
         super.onStart();
-        mRxPlaylistSubscription = getPlaylistChangedSubscription();
 
         Log.d(TAG, "mRxPlaylistSubscription isUnsubscribed: " + mRxPlaylistSubscription.isUnsubscribed());
     }

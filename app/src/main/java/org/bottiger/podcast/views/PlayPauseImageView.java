@@ -38,7 +38,6 @@ import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.listeners.DownloadObserver;
 import org.bottiger.podcast.listeners.PaletteListener;
-import org.bottiger.podcast.listeners.PlayerStatusData;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.listeners.PlayerStatusProgressData;
 import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
@@ -207,11 +206,13 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
     @MainThread
     public void setStatus(@ExoPlayerWrapper.PlayerState int argPlayerStatus) {
 
-        if (getEpisode() == null) {
+        IEpisode episode = getEpisode();
+
+        if (episode == null) {
             return;
         }
 
-        if (getEpisode().isPlaying()) {
+        if (episode.isPlaying()) {
             if (IsDisplayingPlayIcon()) {
                 animateChangeFrom(PlayPauseDrawable.IS_PAUSED);
             }

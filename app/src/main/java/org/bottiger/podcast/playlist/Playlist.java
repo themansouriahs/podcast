@@ -49,6 +49,7 @@ import com.squareup.otto.Subscribe;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -124,7 +125,7 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
                 .toObserverable()
                 .onBackpressureDrop()
                 .ofType(PlaylistData.class)
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.computation())
                 .subscribe(new Action1<PlaylistData>() {
                     @Override
                     public void call(PlaylistData argPlaylistData) {

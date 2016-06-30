@@ -136,7 +136,7 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
         notifyDataSetChanged();
     }
 
-    private void populateSubscribedUrls() {
+    public void populateSubscribedUrls() {
         SortedList<Subscription> subscriptionSortedList = SoundWaves.getAppContext(mActivity).getLibraryInstance().getSubscriptions();
 
         Subscription subscription;

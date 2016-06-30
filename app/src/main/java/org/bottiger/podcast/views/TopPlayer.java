@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
+import android.os.Debug;
 import android.preference.PreferenceManager;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
@@ -155,6 +156,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
 
 
     private void init(@NonNull Context argContext) {
+        Log.v(TAG, "App start time: " + System.currentTimeMillis());
 
         mTopPLayerScrollGestureListener = new TopPLayerScrollGestureListener();
         scrollingChildHelper.setNestedScrollingEnabled(true);

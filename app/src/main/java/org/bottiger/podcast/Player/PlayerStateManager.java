@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
-import android.media.MediaMetadata;
 import android.media.session.MediaSession;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,7 +22,6 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 
-import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
@@ -99,6 +97,8 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
         // potentially stopping the service.
         //mDelayedStopHandler.removeCallbacksAndMessages(null);
         //mDelayedStopHandler.sendEmptyMessageDelayed(0, STOP_DELAY);
+
+        mPlayerService.dis_notifyStatus();
         mPlayerService.stopForeground(true);
     }
 
@@ -109,11 +109,13 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
     @Override
     public void onFastForward() {
         mPlayerService.getPlayer().fastForward(null);
+        mPlayerService.notifyStatusChanged();
     }
 
     @Override
     public void onRewind() {
         mPlayerService.getPlayer().rewind(null);
+        mPlayerService.notifyStatusChanged();
     }
 
     @Override
@@ -126,7 +128,7 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
             if (Build.VERSION.SDK_INT >= 23) {
                 AudioManager audioManager = (AudioManager) mPlayerService.getSystemService(Context.AUDIO_SERVICE);
                 audioManager.adjustStreamVolume(AUDIO_STREAM, AudioManager.ADJUST_TOGGLE_MUTE, 0);
-                mPlayerService.notifyStatus(mPlayerService.getCurrentItem());
+                mPlayerService.notifyStatusChanged();
             }
         }
     }
