@@ -1,42 +1,29 @@
 package org.bottiger.podcast.activities.feedview;
 
-import android.app.Activity;
 import android.content.Context;
-import android.database.Cursor;
-import android.os.RemoteException;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.media.session.MediaControllerCompat;
-import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.text.format.Formatter;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.TopActivity;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.listeners.PlayerStatusObservable;
-import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.model.datastructures.EpisodeFilter;
 import org.bottiger.podcast.model.datastructures.EpisodeList;
-import org.bottiger.podcast.model.events.SubscriptionChanged;
 import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
-import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
-import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorUtils;
 import org.bottiger.podcast.utils.PaletteHelper;
-import org.bottiger.podcast.utils.PlayerHelper;
 import org.bottiger.podcast.utils.SharedAdapterUtils;
 import org.bottiger.podcast.views.PlayPauseImageView;
 
@@ -45,11 +32,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
-
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.schedulers.Schedulers;
 
 /**
  * Created by apl on 02-09-2014.

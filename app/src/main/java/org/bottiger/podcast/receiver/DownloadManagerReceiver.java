@@ -1,13 +1,6 @@
 package org.bottiger.podcast.receiver;
 
 
-import java.io.File;
-import java.io.IOException;
-
-import org.bottiger.podcast.provider.FeedItem;
-import org.bottiger.podcast.utils.SDCardManager;
-import org.bottiger.podcast.utils.StorageUtils;
-
 import android.app.DownloadManager;
 import android.app.DownloadManager.Query;
 import android.content.BroadcastReceiver;
@@ -16,6 +9,13 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
+
+import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.utils.SDCardManager;
+import org.bottiger.podcast.utils.StorageUtils;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Receives event when a download is complete. If the file is succesfully

@@ -1,16 +1,15 @@
 package org.bottiger.podcast.parser.opml;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.util.ArrayList;
+import android.util.Log;
 
 import org.bottiger.podcast.ApplicationConfiguration;
-import org.bottiger.podcast.MainActivity;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
-import android.util.Log;
+import java.io.IOException;
+import java.io.Reader;
+import java.util.ArrayList;
 
 /** Reads OPML documents. */
 public class OpmlReader {

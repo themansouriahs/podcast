@@ -6,16 +6,9 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.widget.Chronometer;
-import android.widget.TextView;
 
-import com.squareup.otto.Subscribe;
-
-import org.bottiger.podcast.listeners.EpisodeStatus;
-import org.bottiger.podcast.listeners.PlayerStatusProgressData;
 import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
-import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
-import org.bottiger.podcast.utils.StrUtils;
 
 import static android.os.SystemClock.elapsedRealtime;
 

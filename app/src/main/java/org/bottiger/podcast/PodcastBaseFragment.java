@@ -1,18 +1,11 @@
 package org.bottiger.podcast;
 
-import org.bottiger.podcast.playlist.Playlist;
-import org.bottiger.podcast.provider.FeedItem;
-import org.bottiger.podcast.service.PlayerService;
-import org.bottiger.podcast.utils.PodcastLog;
-
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.CursorAdapter;
 import android.support.v7.widget.RecyclerView;
 import android.widget.SeekBar;
-import android.widget.TextView;
 
 public abstract class PodcastBaseFragment extends Fragment {
 

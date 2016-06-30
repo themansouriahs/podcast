@@ -1,11 +1,11 @@
 package org.bottiger.podcast.receiver;
 
-import org.bottiger.podcast.service.jobservice.PodcastUpdater;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+
+import org.bottiger.podcast.service.jobservice.PodcastUpdater;
 
 public class AutoStart extends BroadcastReceiver
 {   

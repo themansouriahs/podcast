@@ -2,7 +2,6 @@ package org.bottiger.podcast.service.Downloader.engines;
 
 import android.support.annotation.NonNull;
 
-import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 
 /**

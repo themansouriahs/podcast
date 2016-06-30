@@ -3,21 +3,17 @@ package org.bottiger.podcast.TestUtils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
-import android.support.v4.util.LongSparseArray;
 import android.support.v7.util.SortedList;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.PodcastOpenHelper;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionColumns;
-import org.bottiger.podcast.provider.SubscriptionLoader;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

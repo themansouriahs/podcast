@@ -1,18 +1,16 @@
 package org.bottiger.podcast.listeners;
 
 
-import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.provider.FeedItem;
-import org.bottiger.podcast.provider.IEpisode;
-import org.bottiger.podcast.service.PlayerService;
-
 import android.content.ContentResolver;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 
-import com.squareup.otto.Subscribe;
+import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.service.PlayerService;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

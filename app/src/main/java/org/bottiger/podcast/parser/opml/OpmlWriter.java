@@ -1,19 +1,16 @@
 package org.bottiger.podcast.parser.opml;
 
-import java.io.IOException;
-import java.io.Writer;
-import java.util.List;
+import android.support.v4.util.LongSparseArray;
+import android.support.v7.util.SortedList;
+import android.util.Log;
+import android.util.Xml;
 
-import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.xmlpull.v1.XmlSerializer;
 
-import android.support.v4.util.LongSparseArray;
-import android.support.v7.util.SortedList;
-import android.util.Log;
-import android.util.SparseArray;
-import android.util.Xml;
+import java.io.IOException;
+import java.io.Writer;
 
 /** Writes OPML documents. */
 public class OpmlWriter {

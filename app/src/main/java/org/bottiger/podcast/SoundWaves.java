@@ -1,14 +1,9 @@
 package org.bottiger.podcast;
 
-import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.os.Debug;
-import android.os.IBinder;
 import android.os.RemoteException;
-import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
@@ -19,17 +14,16 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
 
-import org.bottiger.podcast.cloud.EventLogger;
-import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.model.Library;
-import org.bottiger.podcast.player.SoundWavesPlayer;
-import org.bottiger.podcast.player.sonic.service.ISoundWavesEngine;
 import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
 
+import org.bottiger.podcast.cloud.EventLogger;
 import org.bottiger.podcast.flavors.Analytics.AnalyticsFactory;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.CrashReporterFactory;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.model.Library;
+import org.bottiger.podcast.player.SoundWavesPlayer;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
@@ -42,7 +36,6 @@ import org.bottiger.podcast.utils.rxbus.RxBus;
 
 import rx.Observable;
 import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class SoundWaves extends MultiDexApplication {

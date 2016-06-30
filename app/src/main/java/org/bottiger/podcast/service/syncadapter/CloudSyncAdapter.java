@@ -16,13 +16,9 @@ import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
-import org.bottiger.podcast.provider.SubscriptionLoader;
-import org.bottiger.podcast.webservices.datastore.IWebservice;
 import org.bottiger.podcast.webservices.datastore.gpodder.GPodderAPI;
 import org.bottiger.podcast.webservices.datastore.gpodder.GPodderUtils;
-import org.bottiger.podcast.webservices.datastore.gpodder.IGPodderAPI;
 
 import java.io.IOException;
 

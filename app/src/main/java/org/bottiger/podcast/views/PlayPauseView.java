@@ -4,26 +4,19 @@ import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Outline;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.Property;
 import android.view.View;
-import android.view.ViewOutlineProvider;
-import android.view.ViewTreeObserver;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.FrameLayout;
 
 import org.bottiger.podcast.R;
-import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.views.drawables.PlayPauseDrawable;
 
 import java.util.concurrent.locks.ReentrantLock;

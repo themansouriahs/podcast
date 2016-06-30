@@ -1,12 +1,12 @@
 package org.bottiger.podcast.provider;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import android.content.ContentValues;
 import android.database.SQLException;
 import android.net.Uri;
 import android.provider.BaseColumns;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class ItemColumns implements BaseColumns {
 

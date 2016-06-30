@@ -1,22 +1,12 @@
 package org.bottiger.podcast.utils;
 
-import org.bottiger.podcast.PodcastBaseFragment.OnItemSelectedListener;
-import org.bottiger.podcast.provider.FeedItem;
-
 import android.app.Activity;
-import android.content.Context;
 import android.database.Cursor;
-import android.database.CursorWrapper;
-import android.net.Uri;
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
-import android.util.SparseIntArray;
 import android.view.View;
+
+import org.bottiger.podcast.PodcastBaseFragment.OnItemSelectedListener;
 
 public class FragmentUtils {
 	

@@ -2,7 +2,6 @@ package org.bottiger.podcast.activities.downloadmanager;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.databinding.BaseObservable;
 import android.databinding.ObservableField;
 import android.databinding.ObservableInt;
 import android.support.annotation.NonNull;
@@ -11,14 +10,10 @@ import android.util.Log;
 import android.view.View;
 
 import org.bottiger.podcast.R;
-import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.events.DownloadProgress;
 import org.bottiger.podcast.provider.FeedItem;
-import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.DownloadStatus;
-
-import java.util.concurrent.TimeUnit;
 
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;

@@ -14,12 +14,12 @@
 
 package org.bottiger.podcast.player.soundwaves;
 
-import java.io.IOException;
-import java.util.concurrent.locks.ReentrantLock;
-
 import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
+
+import java.io.IOException;
+import java.util.concurrent.locks.ReentrantLock;
 
 public abstract class MediaPlayerImpl {
 	private static final String MPI_TAG = "MediaPlayerImpl";

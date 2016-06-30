@@ -20,8 +20,6 @@
 
 package org.bottiger.podcast.player.soundwaves;
 
-import java.io.IOException;
-
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -30,12 +28,11 @@ import android.media.AudioManager;
 import android.net.Uri;
 import android.os.IBinder;
 import android.os.PowerManager;
-import android.os.RemoteException;
 import android.os.PowerManager.WakeLock;
+import android.os.RemoteException;
 import android.util.Log;
 
 import org.bottiger.podcast.BuildConfig;
-import org.bottiger.podcast.player.soundwaves.NDKMediaPlayer.State;
 import org.bottiger.podcast.player.sonic.service.IDeathCallback;
 import org.bottiger.podcast.player.sonic.service.IOnBufferingUpdateListenerCallback;
 import org.bottiger.podcast.player.sonic.service.IOnCompletionListenerCallback;
@@ -46,6 +43,9 @@ import org.bottiger.podcast.player.sonic.service.IOnPreparedListenerCallback;
 import org.bottiger.podcast.player.sonic.service.IOnSeekCompleteListenerCallback;
 import org.bottiger.podcast.player.sonic.service.IOnSpeedAdjustmentAvailableChangedListenerCallback;
 import org.bottiger.podcast.player.sonic.service.ISoundWavesEngine;
+import org.bottiger.podcast.player.soundwaves.NDKMediaPlayer.State;
+
+import java.io.IOException;
 
 /**
  * Class for connecting to remote speed-altering, media playing Service

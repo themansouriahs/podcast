@@ -1,13 +1,13 @@
 package org.bottiger.podcast.parser.syndication.util;
 
+import android.util.Log;
+
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-
-import android.util.Log;
-
-import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 
 
 /** Parses several date formats. */

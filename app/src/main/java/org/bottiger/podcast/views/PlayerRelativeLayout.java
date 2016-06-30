@@ -1,21 +1,7 @@
 package org.bottiger.podcast.views;
 
 import android.content.Context;
-import android.content.res.TypedArray;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.drawable.Drawable;
-import android.text.TextPaint;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.SeekBar;
-
-import org.bottiger.podcast.R;
 
 public class PlayerRelativeLayout extends android.support.percent.PercentRelativeLayout {
 

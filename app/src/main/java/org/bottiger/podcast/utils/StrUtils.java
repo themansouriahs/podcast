@@ -5,9 +5,10 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
-import android.text.format.DateFormat;
 import android.text.format.DateUtils;
 import android.util.Patterns;
+
+import org.bottiger.podcast.provider.IEpisode;
 
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -15,9 +16,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
-
-import org.bottiger.podcast.provider.FeedItem;
-import org.bottiger.podcast.provider.IEpisode;
 
 public class StrUtils {
 

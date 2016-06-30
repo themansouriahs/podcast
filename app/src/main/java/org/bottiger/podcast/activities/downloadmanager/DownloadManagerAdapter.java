@@ -17,17 +17,10 @@ import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.QueueEpisode;
-import org.bottiger.podcast.provider.SlimImplementations.SlimEpisode;
 import org.bottiger.podcast.service.DownloadService;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
-import org.bottiger.podcast.service.Downloader.engines.IDownloadEngine;
-import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ImageLoaderUtils;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 

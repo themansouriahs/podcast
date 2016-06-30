@@ -4,7 +4,6 @@ import android.content.Context;
 import android.util.AttributeSet;
 
 import org.bottiger.podcast.listeners.EpisodeStatus;
-import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.utils.StrUtils;
 
 /**

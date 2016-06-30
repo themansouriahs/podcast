@@ -5,7 +5,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import org.bottiger.podcast.views.dialogs.DialogFeedAuthentication;
-import org.bottiger.podcast.views.dialogs.DialogPlaybackSpeed;
 
 /**
  * Created by aplb on 31-12-2015.

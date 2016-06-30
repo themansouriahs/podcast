@@ -2,7 +2,6 @@ package org.bottiger.podcast.views;
 
 import android.app.Activity;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.FrameLayout;

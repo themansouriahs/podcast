@@ -1,13 +1,14 @@
 package org.bottiger.podcast.provider;
 
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteException;
+
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.utils.PodcastLog;
 
-import android.content.Context;
-import android.database.Cursor;
 import io.requery.android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
 import io.requery.android.database.sqlite.SQLiteOpenHelper;
 
 public class PodcastOpenHelper extends SQLiteOpenHelper {

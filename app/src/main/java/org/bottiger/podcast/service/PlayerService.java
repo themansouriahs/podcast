@@ -1,25 +1,5 @@
 package org.bottiger.podcast.service;
 
-import org.bottiger.podcast.R;
-import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.player.PlayerHandler;
-import org.bottiger.podcast.player.PlayerPhoneListener;
-import org.bottiger.podcast.player.PlayerStateManager;
-import org.bottiger.podcast.player.SoundWavesPlayer;
-import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.flavors.MediaCast.IMediaCast;
-import org.bottiger.podcast.listeners.PlayerStatusObservable;
-import org.bottiger.podcast.notification.NotificationPlayer;
-import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
-import org.bottiger.podcast.playlist.Playlist;
-import org.bottiger.podcast.provider.FeedItem;
-import org.bottiger.podcast.provider.IEpisode;
-import org.bottiger.podcast.provider.ISubscription;
-import org.bottiger.podcast.provider.Subscription;
-import org.bottiger.podcast.receiver.HeadsetReceiver;
-import org.bottiger.podcast.utils.PlaybackSpeed;
-import org.bottiger.podcast.widgets.SoundWavesWidgetProvider;
-
 import android.Manifest;
 import android.app.NotificationManager;
 import android.content.ComponentName;
@@ -46,6 +26,26 @@ import android.telephony.PhoneStateListener;
 import android.util.Log;
 
 import com.google.android.exoplayer.ExoPlayer;
+
+import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.flavors.MediaCast.IMediaCast;
+import org.bottiger.podcast.listeners.PlayerStatusObservable;
+import org.bottiger.podcast.notification.NotificationPlayer;
+import org.bottiger.podcast.player.PlayerHandler;
+import org.bottiger.podcast.player.PlayerPhoneListener;
+import org.bottiger.podcast.player.PlayerStateManager;
+import org.bottiger.podcast.player.SoundWavesPlayer;
+import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
+import org.bottiger.podcast.playlist.Playlist;
+import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.receiver.HeadsetReceiver;
+import org.bottiger.podcast.utils.PlaybackSpeed;
+import org.bottiger.podcast.widgets.SoundWavesWidgetProvider;
 
 import java.io.File;
 import java.io.IOException;

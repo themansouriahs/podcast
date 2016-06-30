@@ -3,9 +3,7 @@ package org.bottiger.podcast.adapters.viewholders.discovery;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.Switch;
 import android.widget.TextView;
-
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.views.ImageViewTinted;

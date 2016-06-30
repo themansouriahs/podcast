@@ -4,11 +4,7 @@ import android.support.annotation.NonNull;
 import android.util.ArraySet;
 import android.util.Pair;
 
-import org.bottiger.podcast.webservices.datastore.gpodder.GPodderAPI;
-
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 /**

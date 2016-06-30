@@ -1,10 +1,8 @@
 package org.bottiger.podcast.utils;
 
 import android.os.Environment;
-import android.support.design.widget.CoordinatorLayout;
 
 import org.bottiger.podcast.BuildConfig;
-import org.bottiger.podcast.SoundWaves;
 
 import java.io.File;
 import java.io.IOException;

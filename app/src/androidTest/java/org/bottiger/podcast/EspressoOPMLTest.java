@@ -1,22 +1,17 @@
 package org.bottiger.podcast;
 
 import android.support.test.InstrumentationRegistry;
-import android.support.v4.util.LongSparseArray;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.suitebuilder.annotation.LargeTest;
 import android.util.Log;
 
 import org.bottiger.podcast.TestUtils.RecyclerTestUtils;
 import org.bottiger.podcast.TestUtils.TestUtils;
-import org.bottiger.podcast.provider.ISubscription;
-import org.bottiger.podcast.provider.Subscription;
-import org.bottiger.podcast.provider.SubscriptionLoader;
 import org.bottiger.podcast.utils.OPMLImportExport;
 import org.bottiger.podcast.views.dialogs.DialogOPML;
 import org.junit.Before;
 
 import java.io.File;
-import java.util.List;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;

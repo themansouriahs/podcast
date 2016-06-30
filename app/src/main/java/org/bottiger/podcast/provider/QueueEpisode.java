@@ -2,9 +2,6 @@ package org.bottiger.podcast.provider;
 
 import android.support.annotation.NonNull;
 
-import java.io.Serializable;
-import java.util.Comparator;
-
 /**
  * A Thin wrapper for episodes in the download queue.
  * 

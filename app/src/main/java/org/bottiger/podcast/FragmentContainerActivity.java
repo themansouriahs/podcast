@@ -1,16 +1,6 @@
 package org.bottiger.podcast;
 
-import org.bottiger.podcast.Animations.DepthPageTransformer;
-import org.bottiger.podcast.Animations.ZoomOutPageTransformer;
-import org.bottiger.podcast.playlist.Playlist;
-import org.bottiger.podcast.utils.PodcastLog;
-import org.bottiger.podcast.utils.UIUtils;
-import org.bottiger.podcast.views.SlidingTab.SlidingTabLayout;
-import org.bottiger.podcast.views.TopPlayer;
-
-import android.annotation.TargetApi;
 import android.app.Activity;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -19,9 +9,10 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.ViewGroup;
+
+import org.bottiger.podcast.utils.UIUtils;
 
 
 public class FragmentContainerActivity extends DrawerActivity {

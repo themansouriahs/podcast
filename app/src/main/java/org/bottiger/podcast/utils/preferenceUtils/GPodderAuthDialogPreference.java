@@ -3,9 +3,6 @@ package org.bottiger.podcast.utils.preferenceUtils;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.DialogPreference;
-import android.support.annotation.ColorRes;
-import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.ContentLoadingProgressBar;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -17,20 +14,12 @@ import android.widget.TextView;
 import com.jakewharton.rxbinding.widget.RxTextView;
 
 import org.bottiger.podcast.R;
-import org.bottiger.podcast.service.Downloader.engines.IDownloadEngine;
 import org.bottiger.podcast.utils.AuthenticationUtils;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.webservices.datastore.gpodder.GPodderAPI;
 import org.bottiger.podcast.webservices.datastore.gpodder.GPodderUtils;
-import org.bottiger.podcast.webservices.directories.IDirectoryProvider;
-import org.bottiger.podcast.webservices.directories.ISearchResult;
 
-import java.io.IOException;
-
-import okhttp3.Call;
-import okhttp3.Response;
 import retrofit2.Callback;
-import retrofit2.Retrofit;
 import rx.Observable;
 import rx.Observer;
 import rx.functions.Func4;
