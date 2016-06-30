@@ -56,18 +56,14 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
     // GoogleCast
     private IMediaCast mMediaCast;
 
-    private PlayerStatusObservable mPlayerStatusObservable;
-
     private boolean isPreparingMedia = false;
 
     int bufferProgress = 0;
     int startPos = 0;
     float playbackSpeed = 1.0f;
 
-    public SoundWavesPlayer(@NonNull Context argContext) {
+    public SoundWavesPlayer(@NonNull PlayerService argContext) {
         super(argContext);
-        mPlayerStatusObservable = new PlayerStatusObservable();
-        SoundWaves.getBus().register(mPlayerStatusObservable); // FIXME is never unregistered!!!
     }
 
     public void setPlayerService(@NonNull PlayerService argPlayerService) {
@@ -158,12 +154,6 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         mStatus = PlayerStatusObservable.PLAYING;
         mPlayerStateManager.updateState(PlaybackStateCompat.STATE_PLAYING, getCurrentPosition(), playbackSpeed);
 
-        // If we are using a Chromecats we send the file to it
-        if (isCasting()) {
-            mMediaCast.play(0);
-            return;
-        }
-
         // Request audio focus for playback
         int result = mAudioManager.requestAudioFocus(mPlayerService,
                 PlayerStateManager.AUDIO_STREAM,
@@ -173,25 +163,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             super.start();
 
-            if (SoundWaves.sAnalytics == null) {
-                VendorCrashReporter.report("sAnalytics null", "In playerService");
-            }
-
-            SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.PLAY);
-
-            ISubscription sub = mPlayerService.getCurrentItem().getSubscription(mPlayerService);
-            String url = sub != null ? sub.getURLString() : "";
-            EventLogger.postEvent(mPlayerService,
-                    EventLogger.LISTEN_EPISODE,
-                    mPlayerService.getCurrentItem().isDownloaded() ? 1 : null,
-                    mPlayerService.getCurrentItem().getURL(),
-                    url);
-
-            EventLogger.postEvent(mPlayerService,
-                    EventLogger.LISTEN_PODCAST,
-                    null,
-                    null,
-                    url);
+            trackEventPlay();
         }
     }
 

@@ -161,6 +161,8 @@
     <string name="feed_settings_delete_when_listened">Delete when listened</string>
     <string name="feed_settings_intro">These settings will override the SoundWaves defaults for this specific podcast.</string>
     <string name="feed_settings_oldest_first">List oldest episodes first</string>
+    <string name="feed_settings_notify_on_new">Notify on new episodes</string>
+    <string name="feed_settings_skip_intro">Skip intro</string>
     <string name="open_video_externally_title">Open video in another player?</string>
     <string name="open_video_externally_body">This episode is a video, which is not supported by this app. You can open it in another video player, or choose to stay here for audio only.</string>
     <string name="open_video_externally_confirm">Open video player</string>

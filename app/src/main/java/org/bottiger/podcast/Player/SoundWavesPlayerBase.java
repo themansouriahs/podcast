@@ -25,11 +25,16 @@ import com.google.android.exoplayer.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer.upstream.DefaultUriDataSource;
 
 import org.bottiger.podcast.BuildConfig;
+import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.cloud.EventLogger;
+import org.bottiger.podcast.flavors.Analytics.IAnalytics;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
 import org.bottiger.podcast.player.exoplayer.ExtractorRendererBuilder;
 import org.bottiger.podcast.player.exoplayer.PodcastAudioRendererV21;
 import org.bottiger.podcast.player.soundwaves.NDKMediaPlayer;
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.PlaybackSpeed;
 import org.bottiger.podcast.utils.PreferenceHelper;
@@ -60,9 +65,12 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
     private ExoPlayerWrapper mExoplayer;
     private static final int RENDERER_COUNT = 1;
 
+    @NonNull
+    private PlayerService mPlayerService;
+
     private TrackRenderer[] mTrackRendere = new TrackRenderer[ExoPlayerWrapper.RENDERER_COUNT];
 
-    public SoundWavesPlayerBase(@NonNull Context argContext) {
+    public SoundWavesPlayerBase(@NonNull PlayerService argContext) {
         boolean remove_silence = PreferenceHelper.getBooleanPreferenceValue(argContext,
                 R.string.pref_audioengine_remove_silence_key,
                 R.bool.pref_audioengine_remove_silence_default);
@@ -76,6 +84,8 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
         mExoplayer.setAutomaticGainControl(gain_control);
         mExoplayer.setRenderBuilder(new ExtractorRendererBuilder(argContext, null));
         mType = EXOPLAYER;
+
+        mPlayerService = argContext;
     }
 
     public void addListener(ExoPlayerWrapper.Listener listener) {
@@ -352,5 +362,27 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
 
     private void fail() throws AssertionError {
         throw new AssertionError("This should never happen");
+    }
+
+    protected void trackEventPlay() {
+        if (SoundWaves.sAnalytics == null) {
+            VendorCrashReporter.report("sAnalytics null", "In playerService");
+        }
+
+        SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.PLAY);
+
+        ISubscription sub = mPlayerService.getCurrentItem().getSubscription(mPlayerService);
+        String url = sub != null ? sub.getURLString() : "";
+        EventLogger.postEvent(mPlayerService,
+                EventLogger.LISTEN_EPISODE,
+                mPlayerService.getCurrentItem().isDownloaded() ? 1 : null,
+                mPlayerService.getCurrentItem().getURL(),
+                url);
+
+        EventLogger.postEvent(mPlayerService,
+                EventLogger.LISTEN_PODCAST,
+                null,
+                null,
+                url);
     }
 }
