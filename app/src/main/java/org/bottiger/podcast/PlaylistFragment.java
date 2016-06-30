@@ -125,7 +125,11 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
         mSwipePaint.setColor(color);
         mSwipeIcon = BitmapFactory.decodeResource(getResources(), mSwipeIconID);
 
-        mPlayer = SoundWaves.getAppContext(getContext()).getPlayer();
+        SoundWaves soundwaves = SoundWaves.getAppContext(getContext());
+
+        mPlayer = soundwaves.getPlayer();
+        mPlaylist = soundwaves.getPlaylist();
+        //soundwaves.getLibraryInstance().loadPlaylist(mPlaylist);
 
         super.onCreate(savedInstanceState);
     }

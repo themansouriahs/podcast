@@ -69,21 +69,13 @@ import java.util.regex.Pattern;
  * An assortment of UI helpers.
  */
 public class UIUtils {
-    private static final String TAG = "Google UIUtils";
+    private static final String TAG = "UIUtils";
 
     /**
      * Factor applied to session color to derive the background color on panels and when
      * a session photo could not be downloaded (or while it is being downloaded)
      */
     public static final float SESSION_BG_COLOR_SCALE_FACTOR = 0.65f;
-    public static final float SESSION_PHOTO_SCRIM_ALPHA = 0.75f;
-
-
-    public static final String TARGET_FORM_FACTOR_ACTIVITY_METADATA =
-            "com.google.samples.apps.iosched.meta.TARGET_FORM_FACTOR";
-
-    public static final String TARGET_FORM_FACTOR_HANDSET = "handset";
-    public static final String TARGET_FORM_FACTOR_TABLET = "tablet";
 
     /**
      * Flags used with {@link android.text.format.DateUtils#formatDateRange}.
@@ -91,45 +83,6 @@ public class UIUtils {
     private static final int TIME_FLAGS = DateUtils.FORMAT_SHOW_TIME
             | DateUtils.FORMAT_SHOW_WEEKDAY | DateUtils.FORMAT_ABBREV_WEEKDAY;
 
-    /**
-     * Regex to search for HTML escape sequences.
-     *
-     * <p></p>Searches for any continuous string of characters starting with an ampersand and ending with a
-     * semicolon. (Example: &amp;amp;)
-     */
-    private static final Pattern REGEX_HTML_ESCAPE = Pattern.compile(".*&\\S;.*");
-
-    private static CharSequence sNowPlayingText;
-    private static CharSequence sLivestreamNowText;
-    private static CharSequence sLivestreamAvailableText;
-
-    public static final String GOOGLE_PLUS_PACKAGE_NAME = "com.google.android.apps.plus";
-    public static final String YOUTUBE_PACKAGE_NAME = "com.google.android.youtube";
-
-    public static final int ANIMATION_FADE_IN_TIME = 250;
-    public static final String TRACK_ICONS_TAG = "tracks";
-
-    private static SimpleDateFormat sDayOfWeekFormat = new SimpleDateFormat("E");
-    private static DateFormat sShortTimeFormat = DateFormat.getTimeInstance(DateFormat.SHORT);
-
-
-    /**
-     * Populate the given {@link android.widget.TextView} with the requested text, formatting
-     * through {@link android.text.Html#fromHtml(String)} when applicable. Also sets
-     * {@link android.widget.TextView#setMovementMethod} so inline links are handled.
-     */
-    public static void setTextMaybeHtml(TextView view, String text) {
-        if (TextUtils.isEmpty(text)) {
-            view.setText("");
-            return;
-        }
-        if ((text.contains("<") && text.contains(">")) || REGEX_HTML_ESCAPE.matcher(text).find()) {
-            view.setText(Html.fromHtml(text));
-            view.setMovementMethod(LinkMovementMethod.getInstance());
-        } else {
-            view.setText(text);
-        }
-    }
 
     /**
      * Given a snippet string with matching segments surrounded by curly

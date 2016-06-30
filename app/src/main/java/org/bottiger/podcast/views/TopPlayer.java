@@ -156,7 +156,6 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
 
     private void init(@NonNull Context argContext) {
         Log.v(TAG, "App start time: " + System.currentTimeMillis());
-        Debug.stopMethodTracing();
 
         mTopPLayerScrollGestureListener = new TopPLayerScrollGestureListener();
         scrollingChildHelper.setNestedScrollingEnabled(true);

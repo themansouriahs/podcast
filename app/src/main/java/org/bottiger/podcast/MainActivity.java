@@ -131,6 +131,7 @@ public class MainActivity extends FragmentContainerActivity {
 
     @Override
     protected void onPause() {
+		//Debug.stopMethodTracing();
         super.onPause();
         if (ApplicationConfiguration.TRACE_STARTUP)
             Debug.stopMethodTracing();

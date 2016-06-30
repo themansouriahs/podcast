@@ -1,21 +1,15 @@
 package org.bottiger.podcast.player;
 
 import android.content.ComponentName;
-import android.content.ContentResolver;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
-
-import com.google.android.exoplayer.ExoPlayer;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
@@ -24,7 +18,6 @@ import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.flavors.MediaCast.IMediaCast;
 import org.bottiger.podcast.flavors.MediaCast.IMediaRouteStateListener;
-import org.bottiger.podcast.listeners.PlayerStatusData;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
@@ -165,12 +158,9 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         mStatus = PlayerStatusObservable.PLAYING;
         mPlayerStateManager.updateState(PlaybackStateCompat.STATE_PLAYING, getCurrentPosition(), playbackSpeed);
 
-        PlayerStatusData psd = new PlayerStatusData(mPlayerService.getCurrentItem(), PlayerStatusObservable.PLAYING);
-
         // If we are using a Chromecats we send the file to it
         if (isCasting()) {
             mMediaCast.play(0);
-            SoundWaves.getBus().post(psd);
             return;
         }
 
@@ -182,8 +172,6 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
 
         if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             super.start();
-
-            SoundWaves.getBus().post(psd);
 
             if (SoundWaves.sAnalytics == null) {
                 VendorCrashReporter.report("sAnalytics null", "In playerService");
@@ -224,8 +212,6 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         mPlayerStateManager.updateState(PlaybackStateCompat.STATE_STOPPED, currentPosition, playbackSpeed);
         mIsInitialized = false;
         mPlayerService.stopForeground(true);
-        PlayerStatusData psd = new PlayerStatusData(mPlayerService.getCurrentItem(), PlayerStatusObservable.STOPPED);
-        SoundWaves.getBus().post(psd);
     }
 
     public void release() {
@@ -318,8 +304,6 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         mPlayerStateManager.updateState(PlaybackStateCompat.STATE_PAUSED, getCurrentPosition(), playbackSpeed);
 
         MarkAsListenedIfNeeded();
-        PlayerStatusData psd = new PlayerStatusData(mPlayerService.getCurrentItem(), PlayerStatusObservable.PAUSED);
-        SoundWaves.getBus().post(psd);
         SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.PAUSE);
     }
 
@@ -525,10 +509,6 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
                 super.pause();
                 mMediaCast.play(offst);
             }
-
-            mStatus = PlayerStatusObservable.PLAYING;
-            PlayerStatusData psd = new PlayerStatusData(mPlayerService.getCurrentItem(), PlayerStatusObservable.PLAYING);
-            SoundWaves.getBus().post(psd);
         }
     }
 

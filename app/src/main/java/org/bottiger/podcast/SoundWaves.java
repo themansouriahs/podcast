@@ -87,7 +87,7 @@ public class SoundWaves extends MultiDexApplication {
     public void onCreate() {
         Log.v(TAG, "App start time: " + System.currentTimeMillis());
         super.onCreate();
-        Debug.startMethodTracing("startup5");
+        //Debug.startMethodTracing("startup6");
 
         UIUtils.setTheme(getApplicationContext());
 
@@ -103,7 +103,7 @@ public class SoundWaves extends MultiDexApplication {
         Log.v(TAG, "time1: " + System.currentTimeMillis());
 
         Log.v(TAG, "time2: " + System.currentTimeMillis());
-        mLibrary = new Library(this);
+        //mLibrary = new Library(this);
         Log.v(TAG, "time3: " + System.currentTimeMillis());
 
         firstRun(context);
@@ -113,19 +113,15 @@ public class SoundWaves extends MultiDexApplication {
 
         Log.v(TAG, "time6: " + System.currentTimeMillis());
 
-        mPlaylist = new Playlist(this);
+        //mPlaylist = new Playlist(this);
 
         Log.v(TAG, "time7: " + System.currentTimeMillis());
-
-        getLibraryInstance().loadPlaylist(mPlaylist);
 
         Log.v(TAG, "time8: " + System.currentTimeMillis());
 
         mPodcastUpdater = new PodcastUpdater(this);
 
         Log.v(TAG, "time9: " + System.currentTimeMillis());
-
-        incrementStartupCount(context);
 
         Observable.just(this)
                 .observeOn(Schedulers.io())
@@ -222,6 +218,7 @@ public class SoundWaves extends MultiDexApplication {
     public Playlist getPlaylist() {
         if (mPlaylist == null) {
             mPlaylist = new Playlist(this);
+            getLibraryInstance().loadPlaylist(mPlaylist);
         }
 
         return mPlaylist;

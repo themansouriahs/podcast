@@ -91,10 +91,10 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
             showDescription = doShowDescription(options);
         }
 
-        Library library = SoundWaves.getAppContext(context).getLibraryInstance();
         Playlist playlist = SoundWaves.getAppContext(context).getPlaylist();
 
-        library.loadPlaylistSync(SoundWaves.getAppContext(context).getPlaylist());
+        //Library library = SoundWaves.getAppContext(context).getLibraryInstance();
+        //library.loadPlaylistSync(SoundWaves.getAppContext(context).getPlaylist());
 
         // Construct the RemoteViews object.  It takes the package name (in our case, it's our
         // package, but it needs this because on the other side it's the widget host inflating

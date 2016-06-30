@@ -60,11 +60,10 @@ public class PlayerStatusObservable {
         }
     }
 
-    @Subscribe
-    public void startProgressUpdate(PlayerStatusData argPlayerStatus) {
+    public static void startProgressUpdate(boolean argIsPlaying) {
         sHandler.removeMessages(PLAYING);
 
-        if (argPlayerStatus.status == PLAYING) {
+        if (argIsPlaying) {
             Message msg = sHandler.obtainMessage(PLAYING);
             sHandler.sendMessage(msg);
         }
