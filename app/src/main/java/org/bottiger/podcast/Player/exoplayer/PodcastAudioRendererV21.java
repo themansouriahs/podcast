@@ -44,7 +44,8 @@ public class PodcastAudioRendererV21 extends PodcastAudioRenderer {
 
     public synchronized void setSpeed(float speed) {
         this.mSpeed = speed;
-        this.mSonic.setSpeed(speed);
+        if (this.mSonic != null)
+            this.mSonic.setSpeed(speed);
     }
 
     public float getSpeed() {
