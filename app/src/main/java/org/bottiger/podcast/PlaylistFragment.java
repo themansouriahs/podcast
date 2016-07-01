@@ -564,13 +564,14 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
                 .subscribe(new Action1<Playlist>() {
                     @Override
                     public void call(Playlist playlistChanged) {
-                        Log.d(TAG, "mRxPlaylistSubscription event recieved");
+                        Log.d(TAG, "notifyPlaylistChanged: mRxPlaylistSubscription event recieved");
                         playlistChanged(playlistChanged);
                         mTopPlayer.setPlaylistEmpty(playlistChanged.size() == 1);
                     }
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
+                        Log.d(TAG, "ERROR: notifyPlaylistChanged: mRxPlaylistSubscription event recieved");
                         VendorCrashReporter.report("subscribeError" , throwable.toString());
                         Log.d(TAG, "error: " + throwable.toString());
                     }

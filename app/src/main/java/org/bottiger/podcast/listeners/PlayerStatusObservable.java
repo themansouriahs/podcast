@@ -33,14 +33,15 @@ public class PlayerStatusObservable {
     private static Handler sHandler = new ProgressHandler();
     private static long lastUpdate = System.currentTimeMillis();
 
-    public static void updateProgress(@NonNull PlayerService argPlayerService) {
-        IEpisode currentItem = argPlayerService.getCurrentItem();
+    private static void updateProgress(@NonNull PlayerService argPlayerService) {
+        IEpisode currentItem = PlayerService.getCurrentItem();
         if (currentItem != null && currentItem instanceof FeedItem) {
             FeedItem feedItem = (FeedItem)currentItem;
             long offset = argPlayerService.getPlayer().getCurrentPosition();
-            updateEpisodeOffset(argPlayerService.getContentResolver(),
-                    feedItem,
-                    offset);
+            //updateEpisodeOffset(argPlayerService.getContentResolver(),
+            //        feedItem,
+            //        offset);
+            feedItem.setPosition(offset);
 
             SoundWaves.getBus().post(new PlayerStatusProgressData(feedItem.getOffset()));
         }

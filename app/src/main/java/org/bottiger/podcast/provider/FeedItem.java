@@ -493,12 +493,28 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 	}
 
     // in ms
-	public void setPosition(long pos) {
-		if (offset == pos)
-			return;
+	public long setPosition(long pos) {
+		return setPosition(pos, false);
+	}
 
-		this.offset = (int) pos;
-		notifyPropertyChanged(EpisodeChanged.PLAYING_PROGRESS);
+	// in ms
+	private static long lastPositionUpdate = System.currentTimeMillis();
+	public long setPosition(long pos, boolean forceWrite) {
+
+		if (offset == pos) {
+			return this.offset;
+		}
+
+		long now = System.currentTimeMillis();
+
+		// more than a second ago
+		if (forceWrite || (offset == -1 && pos > offset) || (now - lastPositionUpdate > 1000)) {
+			this.offset = (int) pos;
+			notifyPropertyChanged(EpisodeChanged.PLAYING_PROGRESS);
+			lastPositionUpdate = now;
+		}
+
+		return this.offset;
 	}
 
 	@Override

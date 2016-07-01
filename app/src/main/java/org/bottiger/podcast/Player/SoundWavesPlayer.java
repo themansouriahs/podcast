@@ -428,7 +428,8 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
 
     @Override
     public long getCurrentPosition() {
-        return mExoplayer.getCurrentPosition();
+        long currentPosition = mExoplayer.getCurrentPosition();
+        return currentPosition;
     }
 
     @Override
