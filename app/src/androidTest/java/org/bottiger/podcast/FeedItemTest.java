@@ -17,12 +17,12 @@
 package org.bottiger.podcast;
 
 
+import android.content.ContentResolver;
+import android.test.mock.MockContentResolver;
+
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.PodcastProvider;
-
-import android.content.ContentResolver;
-import android.test.mock.MockContentResolver;
 
 
 public class FeedItemTest extends android.test.ProviderTestCase<PodcastProvider> {

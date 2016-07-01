@@ -1,24 +1,21 @@
 package org.bottiger.podcast;
 
-import org.bottiger.podcast.playlist.Playlist;
-import org.bottiger.podcast.provider.FeedItem;
-import org.bottiger.podcast.provider.ItemColumns;
-import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
-import org.bottiger.podcast.service.PlayerService;
-
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.v4.content.CursorLoader;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.squareup.otto.Subscribe;
+
+import org.bottiger.podcast.playlist.Playlist;
+import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.ItemColumns;
+import org.bottiger.podcast.service.PlayerService;
 
 public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 

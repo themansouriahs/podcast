@@ -12,10 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
-import android.support.v4.media.MediaBrowserCompat;
-import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
-import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
@@ -23,24 +20,16 @@ import android.widget.RemoteViews;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.AppWidgetTarget;
 
-import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.player.PlayerStateManager;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.AndroidUtil;
-import org.bottiger.podcast.utils.DateUtils;
 import org.bottiger.podcast.utils.StrUtils;
-import org.bottiger.podcast.utils.UIUtils;
 
-import java.util.List;
-
-import static org.bottiger.podcast.R.id.chronometer;
-import static org.bottiger.podcast.R.id.widget_duration;
 import static org.bottiger.podcast.notification.NotificationPlayer.REQUEST_CODE;
 
 /**
@@ -91,10 +80,10 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
             showDescription = doShowDescription(options);
         }
 
-        Library library = SoundWaves.getAppContext(context).getLibraryInstance();
         Playlist playlist = SoundWaves.getAppContext(context).getPlaylist();
 
-        library.loadPlaylistSync(SoundWaves.getAppContext(context).getPlaylist());
+        //Library library = SoundWaves.getAppContext(context).getLibraryInstance();
+        //library.loadPlaylistSync(SoundWaves.getAppContext(context).getPlaylist());
 
         // Construct the RemoteViews object.  It takes the package name (in our case, it's our
         // package, but it needs this because on the other side it's the widget host inflating

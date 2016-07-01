@@ -1,9 +1,6 @@
 package org.bottiger.podcast.receiver;
 
 
-import org.bottiger.podcast.MainActivity;
-import org.bottiger.podcast.service.PlayerService;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +9,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.KeyEvent;
+
+import org.bottiger.podcast.MainActivity;
+import org.bottiger.podcast.service.PlayerService;
 
 public class HeadsetReceiver extends BroadcastReceiver {
 

@@ -15,6 +15,7 @@ package org.bottiger.podcast.utils;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
@@ -25,7 +26,9 @@ import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.graphics.*;
+import android.graphics.Color;
+import android.graphics.Point;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.AttrRes;
@@ -34,14 +37,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
-import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
-import android.text.TextUtils;
 import android.text.format.DateUtils;
-import android.text.method.LinkMovementMethod;
 import android.text.style.StyleSpan;
 import android.transition.AutoTransition;
 import android.transition.Transition;
@@ -54,36 +53,23 @@ import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
-import android.widget.TextView;
 
 import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.DrawerActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.provider.ISubscription;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.regex.Pattern;
 /**
  * An assortment of UI helpers.
  */
 public class UIUtils {
-    private static final String TAG = "Google UIUtils";
+    private static final String TAG = "UIUtils";
 
     /**
      * Factor applied to session color to derive the background color on panels and when
      * a session photo could not be downloaded (or while it is being downloaded)
      */
     public static final float SESSION_BG_COLOR_SCALE_FACTOR = 0.65f;
-    public static final float SESSION_PHOTO_SCRIM_ALPHA = 0.75f;
-
-
-    public static final String TARGET_FORM_FACTOR_ACTIVITY_METADATA =
-            "com.google.samples.apps.iosched.meta.TARGET_FORM_FACTOR";
-
-    public static final String TARGET_FORM_FACTOR_HANDSET = "handset";
-    public static final String TARGET_FORM_FACTOR_TABLET = "tablet";
 
     /**
      * Flags used with {@link android.text.format.DateUtils#formatDateRange}.
@@ -91,45 +77,6 @@ public class UIUtils {
     private static final int TIME_FLAGS = DateUtils.FORMAT_SHOW_TIME
             | DateUtils.FORMAT_SHOW_WEEKDAY | DateUtils.FORMAT_ABBREV_WEEKDAY;
 
-    /**
-     * Regex to search for HTML escape sequences.
-     *
-     * <p></p>Searches for any continuous string of characters starting with an ampersand and ending with a
-     * semicolon. (Example: &amp;amp;)
-     */
-    private static final Pattern REGEX_HTML_ESCAPE = Pattern.compile(".*&\\S;.*");
-
-    private static CharSequence sNowPlayingText;
-    private static CharSequence sLivestreamNowText;
-    private static CharSequence sLivestreamAvailableText;
-
-    public static final String GOOGLE_PLUS_PACKAGE_NAME = "com.google.android.apps.plus";
-    public static final String YOUTUBE_PACKAGE_NAME = "com.google.android.youtube";
-
-    public static final int ANIMATION_FADE_IN_TIME = 250;
-    public static final String TRACK_ICONS_TAG = "tracks";
-
-    private static SimpleDateFormat sDayOfWeekFormat = new SimpleDateFormat("E");
-    private static DateFormat sShortTimeFormat = DateFormat.getTimeInstance(DateFormat.SHORT);
-
-
-    /**
-     * Populate the given {@link android.widget.TextView} with the requested text, formatting
-     * through {@link android.text.Html#fromHtml(String)} when applicable. Also sets
-     * {@link android.widget.TextView#setMovementMethod} so inline links are handled.
-     */
-    public static void setTextMaybeHtml(TextView view, String text) {
-        if (TextUtils.isEmpty(text)) {
-            view.setText("");
-            return;
-        }
-        if ((text.contains("<") && text.contains(">")) || REGEX_HTML_ESCAPE.matcher(text).find()) {
-            view.setText(Html.fromHtml(text));
-            view.setMovementMethod(LinkMovementMethod.getInstance());
-        } else {
-            view.setText(text);
-        }
-    }
 
     /**
      * Given a snippet string with matching segments surrounded by curly

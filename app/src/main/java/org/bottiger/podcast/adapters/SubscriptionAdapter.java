@@ -15,6 +15,7 @@ import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.util.Patterns;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,29 +24,15 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 
 import org.bottiger.podcast.R;
-import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.ToolbarActivity;
 import org.bottiger.podcast.activities.feedview.FeedActivity;
 import org.bottiger.podcast.adapters.viewholders.FooterViewHolder;
 import org.bottiger.podcast.adapters.viewholders.subscription.AuthenticationViewHolder;
 import org.bottiger.podcast.adapters.viewholders.subscription.SubscriptionViewHolder;
-import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PaletteListener;
-import org.bottiger.podcast.model.Library;
-import org.bottiger.podcast.model.events.SubscriptionChanged;
-import org.bottiger.podcast.playlist.Playlist;
-import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
-import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.PaletteHelper;
-
-import java.util.LinkedList;
-import java.util.List;
-
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.schedulers.Schedulers;
 
 /**
  * Created by aplb on 11-10-2015.

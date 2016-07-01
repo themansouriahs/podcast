@@ -1,16 +1,13 @@
 package org.bottiger.podcast.provider;
 
-import java.io.File;
-import java.io.IOException;
-import java.math.BigInteger;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import android.content.ContentResolver;
+import android.content.Context;
+import android.net.Uri;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.text.Html;
+import android.text.TextUtils;
+import android.util.Log;
 
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
@@ -23,16 +20,19 @@ import org.bottiger.podcast.utils.BitMaskUtils;
 import org.bottiger.podcast.utils.PlaybackSpeed;
 import org.bottiger.podcast.utils.SDCardManager;
 
-import android.content.ContentResolver;
-import android.content.Context;
-import io.requery.android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.text.Html;
-import android.text.TextUtils;
-import android.util.Log;
+import java.io.File;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
+import io.requery.android.database.sqlite.SQLiteDatabase;
 import rx.Observable;
 import rx.functions.Func1;
 import rx.subjects.PublishSubject;
@@ -493,12 +493,28 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 	}
 
     // in ms
-	public void setPosition(long pos) {
-		if (offset == pos)
-			return;
+	public long setPosition(long pos) {
+		return setPosition(pos, false);
+	}
 
-		this.offset = (int) pos;
-		notifyPropertyChanged(EpisodeChanged.PLAYING_PROGRESS);
+	// in ms
+	private static long lastPositionUpdate = System.currentTimeMillis();
+	public long setPosition(long pos, boolean forceWrite) {
+
+		if (offset == pos) {
+			return this.offset;
+		}
+
+		long now = System.currentTimeMillis();
+
+		// more than a second ago
+		if (forceWrite || (offset == -1 && pos > offset) || (now - lastPositionUpdate > 1000)) {
+			this.offset = (int) pos;
+			notifyPropertyChanged(EpisodeChanged.PLAYING_PROGRESS);
+			lastPositionUpdate = now;
+		}
+
+		return this.offset;
 	}
 
 	@Override

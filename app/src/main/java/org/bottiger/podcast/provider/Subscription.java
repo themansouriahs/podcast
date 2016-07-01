@@ -1,27 +1,7 @@
 package org.bottiger.podcast.provider;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Date;
-import java.util.List;
-
-import org.bottiger.podcast.R;
-import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.listeners.PaletteListener;
-import org.bottiger.podcast.model.datastructures.EpisodeList;
-import org.bottiger.podcast.model.events.SubscriptionChanged;
-import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
-import org.bottiger.podcast.provider.base.BaseSubscription;
-import org.bottiger.podcast.utils.BitMaskUtils;
-import org.bottiger.podcast.utils.ColorExtractor;
-import org.bottiger.podcast.utils.PlaybackSpeed;
-
 import android.content.Context;
 import android.content.SharedPreferences;
-import io.requery.android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
@@ -30,9 +10,27 @@ import android.support.v7.util.SortedList;
 import android.text.TextUtils;
 import android.util.Patterns;
 
+import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.listeners.PaletteListener;
+import org.bottiger.podcast.model.datastructures.EpisodeList;
+import org.bottiger.podcast.model.events.SubscriptionChanged;
+import org.bottiger.podcast.provider.base.BaseSubscription;
+import org.bottiger.podcast.utils.BitMaskUtils;
+import org.bottiger.podcast.utils.ColorExtractor;
+import org.bottiger.podcast.utils.PlaybackSpeed;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Date;
+import java.util.List;
+
 import javax.annotation.Nullable;
 
-import static org.bottiger.podcast.model.events.SubscriptionChanged.LOADED;
+import io.requery.android.database.sqlite.SQLiteDatabase;
 
 public class Subscription extends BaseSubscription implements PaletteListener {
 
@@ -58,6 +56,10 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 	private static final int AUTHENTICATION_NEEDED_SET = (1 << 15);
 	private static final int AUTHENTICATION_NEEDED = (1 << 16);
 	private static final int AUTHENTICATION_WORKING = (1 << 17);
+	private static final int SKIP_INTRO_SET = (1 << 18);
+	private static final int SKIP_INTRO = (1 << 19);
+	private static final int NOTIFY_ON_NEW_SET = (1 << 20);
+	private static final int NOTIFY_ON_NEW = (1 << 21);
 
 	private final int mOldestFirstID = R.string.pref_list_oldest_first_key;
 	private final int mDeleteAfterPlaybackID = R.string.pref_delete_when_finished_key;
@@ -626,6 +628,44 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 			mSettings |= AUTHENTICATION_NEEDED;
 		else
 			mSettings &= ~AUTHENTICATION_NEEDED;
+
+		notifyPropertyChanged(null);
+	}
+
+	public boolean doSkipIntro() {
+		if (!IsSettingEnabled(SKIP_INTRO_SET))
+			return false;
+
+		return IsSettingEnabled(SKIP_INTRO_SET);
+	}
+
+	public void setDoSkipIntro(boolean argSkipIntro) {
+		mSettings = mSettings < 0 ? 0 : mSettings;
+		mSettings |= SKIP_INTRO_SET;
+
+		if (argSkipIntro)
+			mSettings |= SKIP_INTRO;
+		else
+			mSettings &= ~SKIP_INTRO;
+
+		notifyPropertyChanged(null);
+	}
+
+	public boolean doNotifyOnNew() {
+		if (!IsSettingEnabled(NOTIFY_ON_NEW_SET))
+			return false;
+
+		return IsSettingEnabled(NOTIFY_ON_NEW_SET);
+	}
+
+	public void setDoNotifyOnNew(boolean argDoNotifyOnNew) {
+		mSettings = mSettings < 0 ? 0 : mSettings;
+		mSettings |= NOTIFY_ON_NEW_SET;
+
+		if (argDoNotifyOnNew)
+			mSettings |= NOTIFY_ON_NEW;
+		else
+			mSettings &= ~NOTIFY_ON_NEW;
 
 		notifyPropertyChanged(null);
 	}

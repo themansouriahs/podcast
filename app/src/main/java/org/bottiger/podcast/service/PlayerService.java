@@ -10,7 +10,6 @@ import org.bottiger.podcast.player.PlayerStateManager;
 import org.bottiger.podcast.player.SoundWavesPlayer;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.MediaCast.IMediaCast;
-import org.bottiger.podcast.listeners.PlayerStatusData;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
@@ -20,31 +19,25 @@ import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
-import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
-import org.bottiger.podcast.service.jobservice.PodcastUpdater;
 import org.bottiger.podcast.utils.PlaybackSpeed;
+import org.bottiger.podcast.utils.PreferenceHelper;
 import org.bottiger.podcast.widgets.SoundWavesWidgetProvider;
+
 
 import android.Manifest;
 import android.app.NotificationManager;
-import android.app.Service;
-import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.session.MediaSessionManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
-import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.RemoteException;
-import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
@@ -57,7 +50,26 @@ import android.telephony.PhoneStateListener;
 import android.util.Log;
 
 import com.google.android.exoplayer.ExoPlayer;
-import com.squareup.otto.Subscribe;
+
+import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.flavors.MediaCast.IMediaCast;
+import org.bottiger.podcast.listeners.PlayerStatusObservable;
+import org.bottiger.podcast.notification.NotificationPlayer;
+import org.bottiger.podcast.player.PlayerHandler;
+import org.bottiger.podcast.player.PlayerPhoneListener;
+import org.bottiger.podcast.player.PlayerStateManager;
+import org.bottiger.podcast.player.SoundWavesPlayer;
+import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
+import org.bottiger.podcast.playlist.Playlist;
+import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.receiver.HeadsetReceiver;
+import org.bottiger.podcast.utils.PlaybackSpeed;
+import org.bottiger.podcast.widgets.SoundWavesWidgetProvider;
 
 import java.io.File;
 import java.io.IOException;
@@ -158,9 +170,6 @@ public class PlayerService extends MediaBrowserServiceCompat implements
         wifiLock = ((WifiManager) getSystemService(Context.WIFI_SERVICE))
                 .createWifiLock(WifiManager.WIFI_MODE_FULL, LOCK_NAME);
 
-		SoundWaves.getBus().register(SoundWaves.getAppContext(this).getPlaylist());
-		SoundWaves.getBus().register(this);
-
         mPlayerHandler = new PlayerHandler(this);
 
 		mPlayerStateManager = new PlayerStateManager(this);
@@ -243,8 +252,6 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 	@Override
 	public void onDestroy() {
 		sInstance = null;
-		SoundWaves.getBus().unregister(SoundWaves.getAppContext(this).getPlaylist());
-		SoundWaves.getBus().unregister(this);
         super.onDestroy();
 		if (mPlayer != null) {
 			mPlayer.release();
@@ -284,9 +291,13 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 	/**
 	 * Display a notification with the current podcast
 	 */
-    public void notifyStatus(@android.support.annotation.Nullable IEpisode argItem) {
+    public void notifyStatusChanged() {
 
 		SoundWavesWidgetProvider.updateAllWidgets(this);
+
+		IEpisode argItem = getCurrentItem();
+
+        PlayerStatusObservable.startProgressUpdate(isPlaying());
 
 		if (argItem != null) {
 			if (mNotificationPlayer == null)
@@ -315,7 +326,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
             return;
         }
 
-		play(nextItem.getUrl().toString());
+		play(nextItem);
 		SoundWaves.getAppContext(this).getPlaylist().removeItem(0);
 		SoundWaves.getAppContext(this).getPlaylist().notifyPlaylistChanged();
 	}
@@ -333,39 +344,41 @@ public class PlayerService extends MediaBrowserServiceCompat implements
         if (mItem == null)
             return;
 
-		play(mItem.getUrl().toString());
+		play(mItem);
 	}
 
-	public void play(String argEpisodeURL) {
+	/**
+	 *
+	 * @param argEpisode The episode to be played
+	 * @return True if the episode is being played
+     */
+	public boolean play(@NonNull IEpisode argEpisode) {
 
 		// Pause the current episode in order to save the current state
 		if (mPlayer.isPlaying())
 			mPlayer.pause();
 
-		if (mItem != null) {
-			if ((mItem.getURL().equals(argEpisodeURL)) && mPlayer.isInitialized()) {
+		IEpisode currentItem = getCurrentItem();
+
+		if (currentItem != null) {
+			if (argEpisode.equals(currentItem) && mPlayer.isInitialized()) {
 				if (!mPlayer.isPlaying()) {
 					start();
 				}
-				return;
+				return true;
 			}
 
 			if (mPlayer.isPlaying()) {
-                mItem.setOffset(getContentResolver(), mPlayer.position());
+				currentItem.setOffset(getContentResolver(), mPlayer.position());
 				stop();
 			}
 		}
 
-		IEpisode oldItem = mItem;
-
-		mItem = SoundWaves.getAppContext(this).getLibraryInstance().getEpisode(argEpisodeURL);
-
-		if (mItem == null)
-			return;
-
+		IEpisode oldItem = currentItem;
+		currentItem = setCurrentItem(argEpisode);
 
 		// Removed the current top episode from the playlist if it has been started
-		if (oldItem != null && !oldItem.equals(mItem)) {
+		if (oldItem != null && !oldItem.equals(currentItem)) {
 			if (oldItem instanceof FeedItem) {
 				FeedItem oldFeedItem = (FeedItem)oldItem;
 				if (oldFeedItem.getPriority() > 0) {
@@ -380,64 +393,31 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 			}
 		}
 
-        boolean isFeedItem = false;
-        if (mItem instanceof FeedItem) {
-            isFeedItem = true;
-        }
+        boolean isFeedItem = currentItem instanceof FeedItem;
+        final FeedItem feedItem = isFeedItem ? (FeedItem)currentItem : null;
 
-        final FeedItem feedItem = isFeedItem ? (FeedItem)mItem : null;
+		String dataSource = getDataSourceUrl(currentItem);
+		long offset = getStartPosition(this, currentItem);
+		float speed = getPlaybackSpeed(this, currentItem);
 
-		String dataSource = null;
-		String dataSourceUrl = mItem.getUrl().toString();
-		try {
-			if (mItem.isDownloaded() && feedItem != null) {
-				String path = feedItem.getAbsolutePath();
-				File file = new File(path);
-				if (file.exists()) {
-					dataSource = path;
-				}
-			}
-		} catch (IOException ignored) {
-		} finally {
-			if (dataSource == null) {
-				dataSource = dataSourceUrl;
-			}
-		}
-
-		int offset = mItem.getOffset() < 0 ? 0 : (int) mItem.getOffset();
-
-		SoundWaves.getAppContext(this).getPlaylist().setAsFrist(mItem);
-
-		ISubscription subscription = mItem.getSubscription(this);
-		float speed = PlaybackSpeed.DEFAULT;
-
-		float globalSpeed = PlaybackSpeed.globalPlaybackSpeed(this);
-		if (globalSpeed != PlaybackSpeed.UNDEFINED) {
-			speed = globalSpeed;
-		}
-
-		if (subscription != null && subscription instanceof Subscription) {
-			speed = ((Subscription) subscription).getPlaybackSpeed();
-		}
+		SoundWaves.getAppContext(this).getPlaylist().setAsFrist(currentItem);
 
 		mPlayer.setPlaybackSpeed(speed);
+		mPlayer.setDataSourceAsync(dataSource, (int)offset);
 
-		mPlayer.setDataSourceAsync(dataSource, offset);
-
-        IEpisode item = getCurrentItem();
-        if (item != null) {
-			updateMetadata(item);
-        }
+		updateMetadata(currentItem);
 
         if (feedItem != null) {
             if (feedItem.priority != 1)
                 feedItem.setPriority(null, getApplication());
 			SoundWaves.getAppContext(this).getLibraryInstance().updateEpisode(feedItem);
         }
+
+		return true;
 	}
 
 	private void updateMetadata(IEpisode item) {
-		notifyStatus(item);
+		notifyStatusChanged();
 		mPlayerStateManager.updateMedia(item);
 	}
 
@@ -468,7 +448,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 			return false;
 		}
 
-        play(url.toString());
+        play(argEpisode);
         return true;
 	}
 
@@ -493,7 +473,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 			SoundWaves.getAppContext(this).getPlaylist().setAsFrist(mItem);
 			mPlayer.start();
 
-			notifyStatus(mItem);
+			notifyStatusChanged();
 		}
 	}
 
@@ -512,6 +492,8 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 		mPlayer.pause();
         releaseWakelock();
+
+		notifyStatusChanged();
 	}
 
 	public void stop() {
@@ -552,23 +534,17 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 	}
 
-	@Subscribe
-	public void onPlayerStateChange(PlayerStatusData argPlayerStatus) {
-		if (argPlayerStatus == null)
-			return;
-        if (argPlayerStatus.status == PlayerStatusObservable.STOPPED) {
-            dis_notifyStatus();
-        } else {
-            notifyStatus(mItem);
-        }
-	}
-
 	public long position() {
 		return mPlayer.position();
 	}
 
 	public long duration() {
 		return mPlayer.duration();
+	}
+
+	public IEpisode setCurrentItem(@Nullable IEpisode argEpisode) {
+		mItem = argEpisode;
+		return mItem;
 	}
 
 	@Nullable
@@ -644,6 +620,54 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 	public PlayerStateManager getPlayerStateManager() {
 		return mPlayerStateManager;
+	}
+
+	private static String getDataSourceUrl(@NonNull IEpisode argEpisode) {
+		String dataSource = argEpisode.getURL();
+		boolean isFeedItem = argEpisode instanceof FeedItem;
+
+		try {
+			if (argEpisode.isDownloaded() && isFeedItem) {
+				FeedItem feedItem = (FeedItem) argEpisode;
+				String path = feedItem.getAbsolutePath();
+				File file = new File(path);
+				if (file.exists()) {
+					dataSource = path;
+				}
+			}
+		} catch (IOException ignored) {
+		}
+
+		return dataSource;
+	}
+
+	private static float getPlaybackSpeed(@NonNull Context argContext, @NonNull IEpisode argEpisode) {
+		ISubscription subscription = argEpisode.getSubscription(argContext);
+		float speed = PlaybackSpeed.DEFAULT;
+
+		float globalSpeed = PlaybackSpeed.globalPlaybackSpeed(argContext);
+		if (globalSpeed != PlaybackSpeed.UNDEFINED) {
+			speed = globalSpeed;
+		}
+
+		if (subscription != null && subscription instanceof Subscription) {
+			speed = ((Subscription) subscription).getPlaybackSpeed();
+		}
+
+		return speed;
+	}
+
+	private static long getStartPosition(@NonNull Context argContext, @NonNull IEpisode argEpisode) {
+		long episodeOffset = argEpisode.getOffset();
+		long offset = Math.max(episodeOffset, 0);
+
+		ISubscription subscription = argEpisode.getSubscription(argContext);
+		if (subscription.doSkipIntro()) {
+			long startSkipAmount = PreferenceHelper.getLongPreferenceValue(argContext, R.string.pref_skip_intro_key, R.integer.skip_into_default);
+			offset = Math.max(offset, startSkipAmount);
+		}
+
+		return offset;
 	}
 
 }

@@ -7,7 +7,6 @@ import android.view.View;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.provider.IEpisode;
-import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.views.ImageViewTinted;
 
 /**

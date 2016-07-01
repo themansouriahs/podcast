@@ -1,9 +1,5 @@
 package org.bottiger.podcast.utils.rxbus;
 
-import android.util.Log;
-
-import java.util.concurrent.TimeUnit;
-
 import rx.Observable;
 import rx.subjects.PublishSubject;
 import rx.subjects.SerializedSubject;

@@ -5,17 +5,12 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Bundle;
-import android.support.annotation.IdRes;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresPermission;
 import android.support.annotation.StringRes;
-import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CompoundButton;
@@ -23,7 +18,6 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 
 import org.bottiger.podcast.R;
-import org.bottiger.podcast.TopActivity;
 import org.bottiger.podcast.utils.OPMLImportExport;
 
 import java.lang.annotation.Retention;

@@ -7,8 +7,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.LongSparseArray;
 import android.support.v7.util.SortedList;
-import android.util.AttributeSet;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -25,7 +23,6 @@ import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.playlist.filters.SubscriptionFilter;
 import org.bottiger.podcast.provider.Subscription;
-import org.bottiger.podcast.provider.SubscriptionLoader;
 
 import java.util.LinkedList;
 import java.util.List;

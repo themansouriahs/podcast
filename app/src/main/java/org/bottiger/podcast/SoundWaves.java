@@ -1,14 +1,12 @@
 package org.bottiger.podcast;
 
-import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.WorkerThread;
 import android.support.multidex.MultiDexApplication;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -21,13 +19,17 @@ import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.player.GenericMediaPlayerInterface;
 import org.bottiger.podcast.player.SoundWavesPlayer;
-import org.bottiger.podcast.player.sonic.service.ISoundWavesEngine;
+
 import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
 
+import org.bottiger.podcast.cloud.EventLogger;
 import org.bottiger.podcast.flavors.Analytics.AnalyticsFactory;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.CrashReporterFactory;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.model.Library;
+import org.bottiger.podcast.player.SoundWavesPlayer;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
@@ -40,7 +42,6 @@ import org.bottiger.podcast.utils.rxbus.RxBus;
 
 import rx.Observable;
 import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class SoundWaves extends MultiDexApplication {
@@ -83,9 +84,9 @@ public class SoundWaves extends MultiDexApplication {
 
     @Override
     public void onCreate() {
-        Log.v(TAG, "time: " + System.currentTimeMillis());
+        Log.v(TAG, "App start time: " + System.currentTimeMillis());
         super.onCreate();
-        //Debug.startMethodTracing("startup");
+        //Debug.startMethodTracing("startup6");
 
         UIUtils.setTheme(getApplicationContext());
 
@@ -98,7 +99,32 @@ public class SoundWaves extends MultiDexApplication {
 
         CrashReporterFactory.startReporter(this);
 
-        Observable.just(this).subscribeOn(Schedulers.newThread()).subscribe(new Subscriber<Context>() {
+        Log.v(TAG, "time1: " + System.currentTimeMillis());
+
+        Log.v(TAG, "time2: " + System.currentTimeMillis());
+        //mLibrary = new Library(this);
+        Log.v(TAG, "time3: " + System.currentTimeMillis());
+
+        firstRun(context);
+        Log.v(TAG, "time5: " + System.currentTimeMillis());
+
+        initMediaBrowser();
+
+        Log.v(TAG, "time6: " + System.currentTimeMillis());
+
+        //mPlaylist = new Playlist(this);
+
+        Log.v(TAG, "time7: " + System.currentTimeMillis());
+
+        Log.v(TAG, "time8: " + System.currentTimeMillis());
+
+        mPodcastUpdater = new PodcastUpdater(this);
+
+        Log.v(TAG, "time9: " + System.currentTimeMillis());
+
+        Observable.just(this)
+                .observeOn(Schedulers.io())
+                .subscribe(new Subscriber<Context>() {
             @Override
             public void onCompleted() {
                 Log.v(TAG, "Analytics started");
@@ -113,35 +139,10 @@ public class SoundWaves extends MultiDexApplication {
             public void onNext(Context context) {
                 sAnalytics = AnalyticsFactory.getAnalytics(context);
                 sAnalytics.startTracking();
+
+                incrementStartupCount(context);
             }
         });
-
-        Log.v(TAG, "time1: " + System.currentTimeMillis());
-
-        Log.v(TAG, "time2: " + System.currentTimeMillis());
-        mLibrary = new Library(this);
-        Log.v(TAG, "time3: " + System.currentTimeMillis());
-
-        firstRun(context);
-        Log.v(TAG, "time5: " + System.currentTimeMillis());
-
-        initMediaBrowser();
-
-        Log.v(TAG, "time6: " + System.currentTimeMillis());
-
-        mPlaylist = new Playlist(this);
-
-        Log.v(TAG, "time7: " + System.currentTimeMillis());
-
-        getLibraryInstance().loadPlaylist(mPlaylist);
-
-        Log.v(TAG, "time8: " + System.currentTimeMillis());
-
-        mPodcastUpdater = new PodcastUpdater(this);
-
-        Log.v(TAG, "time9: " + System.currentTimeMillis());
-
-        incrementStartupCount(context);
     }
 
     @Deprecated
@@ -161,13 +162,14 @@ public class SoundWaves extends MultiDexApplication {
         mFirstRun = firstRun;
     }
 
+    @WorkerThread
     private void incrementStartupCount(@NonNull Context argContext) {
+
         SharedPreferences sharedPref = argContext.getSharedPreferences(ApplicationConfiguration.packageName, Context.MODE_PRIVATE);
         String times_started_key = getString(R.string.pref_times_started);
         int times_started = sharedPref.getInt(times_started_key, 0) + 1;
 
         EventLogger.postEvent(argContext, EventLogger.START_APP, times_started, null, null);
-
         sharedPref.edit().putInt(times_started_key, times_started).apply();
     }
 
@@ -215,6 +217,7 @@ public class SoundWaves extends MultiDexApplication {
     public Playlist getPlaylist() {
         if (mPlaylist == null) {
             mPlaylist = new Playlist(this);
+            getLibraryInstance().loadPlaylist(mPlaylist);
         }
 
         return mPlaylist;

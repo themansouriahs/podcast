@@ -38,10 +38,9 @@ import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.listeners.DownloadObserver;
 import org.bottiger.podcast.listeners.PaletteListener;
-import org.bottiger.podcast.listeners.PlayerStatusData;
-import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.listeners.PlayerStatusProgressData;
 import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
+import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
@@ -207,11 +206,13 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
     @MainThread
     public void setStatus(@ExoPlayerWrapper.PlayerState int argPlayerStatus) {
 
-        if (getEpisode() == null) {
+        IEpisode episode = getEpisode();
+
+        if (episode == null) {
             return;
         }
 
-        if (getEpisode().isPlaying()) {
+        if (episode.isPlaying()) {
             if (IsDisplayingPlayIcon()) {
                 animateChangeFrom(PlayPauseDrawable.IS_PAUSED);
             }
@@ -421,10 +422,13 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
 
     private void onPlayerStateChange(@ExoPlayerWrapper.PlayerState int argPlayerStatus) {
 
-        if (getEpisode() == null)
+        IEpisode episode = getEpisode();
+
+        if (episode == null)
             return;
 
-        if (!getEpisode().equals(SoundWaves.getAppContext(getContext()).getPlaylist().first())) {
+        Playlist playlist = SoundWaves.getAppContext(getContext()).getPlaylist();
+        if (!episode.equals(playlist.first())) {
 
             setStatus(ExoPlayerWrapper.STATE_READY);
             return;

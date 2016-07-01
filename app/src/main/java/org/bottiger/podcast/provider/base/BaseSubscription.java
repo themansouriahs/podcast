@@ -5,9 +5,7 @@ import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.PreloadTarget;
-import com.bumptech.glide.request.target.SimpleTarget;
 
 import org.bottiger.podcast.provider.ISubscription;
 
@@ -23,5 +21,9 @@ public abstract class BaseSubscription implements ISubscription {
         .load(getImageURL())
                 .asBitmap()
                 .into(preloadTarget);
+    }
+
+    public boolean doSkipIntro() {
+        return false;
     }
 }

@@ -1,12 +1,8 @@
 package org.bottiger.podcast.views;
 
 import android.content.Context;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.view.NestedScrollingParent;
-import android.support.v4.view.NestedScrollingParentHelper;
 import android.util.AttributeSet;
-import android.view.View;
 import android.widget.LinearLayout;
 
 /**

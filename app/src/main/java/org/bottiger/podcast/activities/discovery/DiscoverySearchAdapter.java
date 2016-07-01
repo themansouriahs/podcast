@@ -1,25 +1,20 @@
 package org.bottiger.podcast.activities.discovery;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
-import android.content.ContentResolver;
 import android.content.Context;
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
-import android.widget.Toast;
 
-import org.bottiger.podcast.activities.feedview.FeedActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.activities.feedview.FeedActivity;
 import org.bottiger.podcast.adapters.viewholders.discovery.SearchResultViewHolder;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
@@ -136,7 +131,7 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
         notifyDataSetChanged();
     }
 
-    private void populateSubscribedUrls() {
+    public void populateSubscribedUrls() {
         SortedList<Subscription> subscriptionSortedList = SoundWaves.getAppContext(mActivity).getLibraryInstance().getSubscriptions();
 
         Subscription subscription;

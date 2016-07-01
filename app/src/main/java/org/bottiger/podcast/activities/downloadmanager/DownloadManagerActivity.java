@@ -14,11 +14,8 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import org.bottiger.podcast.R;
-import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.service.DownloadService;
-import org.bottiger.podcast.utils.TransitionUtils;
 import org.bottiger.podcast.views.NpaLinearLayoutManager;
-import org.bottiger.podcast.views.dialogs.DialogAddPodcast;
 
 /**
  * Created by aplb on 04-10-2015.

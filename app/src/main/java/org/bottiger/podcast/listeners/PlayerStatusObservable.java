@@ -1,18 +1,16 @@
 package org.bottiger.podcast.listeners;
 
 
-import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.provider.FeedItem;
-import org.bottiger.podcast.provider.IEpisode;
-import org.bottiger.podcast.service.PlayerService;
-
 import android.content.ContentResolver;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 
-import com.squareup.otto.Subscribe;
+import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.service.PlayerService;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -35,14 +33,15 @@ public class PlayerStatusObservable {
     private static Handler sHandler = new ProgressHandler();
     private static long lastUpdate = System.currentTimeMillis();
 
-    public static void updateProgress(@NonNull PlayerService argPlayerService) {
-        IEpisode currentItem = argPlayerService.getCurrentItem();
+    private static void updateProgress(@NonNull PlayerService argPlayerService) {
+        IEpisode currentItem = PlayerService.getCurrentItem();
         if (currentItem != null && currentItem instanceof FeedItem) {
             FeedItem feedItem = (FeedItem)currentItem;
             long offset = argPlayerService.getPlayer().getCurrentPosition();
-            updateEpisodeOffset(argPlayerService.getContentResolver(),
-                    feedItem,
-                    offset);
+            //updateEpisodeOffset(argPlayerService.getContentResolver(),
+            //        feedItem,
+            //        offset);
+            feedItem.setPosition(offset);
 
             SoundWaves.getBus().post(new PlayerStatusProgressData(feedItem.getOffset()));
         }
@@ -60,11 +59,10 @@ public class PlayerStatusObservable {
         }
     }
 
-    @Subscribe
-    public void startProgressUpdate(PlayerStatusData argPlayerStatus) {
+    public static void startProgressUpdate(boolean argIsPlaying) {
         sHandler.removeMessages(PLAYING);
 
-        if (argPlayerStatus.status == PLAYING) {
+        if (argIsPlaying) {
             Message msg = sHandler.obtainMessage(PLAYING);
             sHandler.sendMessage(msg);
         }

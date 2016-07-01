@@ -21,7 +21,6 @@ import junit.framework.TestCase;
 import org.bottiger.podcast.provider.Subscription;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 /**

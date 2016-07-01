@@ -7,7 +7,6 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
-import org.bottiger.podcast.R;
 import org.bottiger.podcast.views.ImageViewTinted;
 
 /**

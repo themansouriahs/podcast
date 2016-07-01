@@ -1,14 +1,8 @@
 package org.bottiger.podcast.provider;
 
-import android.content.ContentResolver;
 import android.database.Cursor;
 import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
-import android.support.v4.util.LongSparseArray;
-import android.support.v4.util.LruCache;
-import android.util.SparseArray;
-
-import java.util.LinkedList;
 
 /**
  * Created by apl on 22-05-2015.

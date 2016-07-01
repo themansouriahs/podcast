@@ -1,15 +1,11 @@
 package org.bottiger.podcast.provider.converter;
 
-import android.content.ContentResolver;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.SlimImplementations.SlimEpisode;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 
 import java.net.URL;
 

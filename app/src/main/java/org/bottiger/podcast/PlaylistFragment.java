@@ -64,6 +64,34 @@ import android.widget.Toast;
 
 import com.github.ivbaranov.mfb.MaterialFavoriteButton;
 
+import org.bottiger.podcast.adapters.PlaylistAdapter;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.listeners.PaletteListener;
+import org.bottiger.podcast.model.events.EpisodeChanged;
+import org.bottiger.podcast.player.SoundWavesPlayer;
+import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
+import org.bottiger.podcast.playlist.Playlist;
+import org.bottiger.podcast.playlist.filters.SubscriptionFilter;
+import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.utils.ColorExtractor;
+import org.bottiger.podcast.utils.ImageLoaderUtils;
+import org.bottiger.podcast.utils.PaletteHelper;
+import org.bottiger.podcast.utils.PlayerHelper;
+import org.bottiger.podcast.utils.StrUtils;
+import org.bottiger.podcast.utils.UIUtils;
+import org.bottiger.podcast.views.CustomLinearLayoutManager;
+import org.bottiger.podcast.views.DownloadButtonView;
+import org.bottiger.podcast.views.ImageViewTinted;
+import org.bottiger.podcast.views.PlayPauseImageView;
+import org.bottiger.podcast.views.PlayerSeekbar;
+import org.bottiger.podcast.views.PlaylistViewHolder;
+import org.bottiger.podcast.views.TextViewObserver;
+import org.bottiger.podcast.views.TopPlayer;
+import org.bottiger.podcast.views.dialogs.DialogBulkDownload;
+import org.bottiger.podcast.views.dialogs.DialogPlaylistFilters;
+
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -125,7 +153,13 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
         mSwipePaint.setColor(color);
         mSwipeIcon = BitmapFactory.decodeResource(getResources(), mSwipeIconID);
 
-        mPlayer = SoundWaves.getAppContext(getContext()).getPlayer();
+        SoundWaves soundwaves = SoundWaves.getAppContext(getContext());
+
+        mRxPlaylistSubscription = getPlaylistChangedSubscription();
+
+        mPlayer = soundwaves.getPlayer();
+        mPlaylist = soundwaves.getPlaylist();
+        //soundwaves.getLibraryInstance().loadPlaylist(mPlaylist);
 
         super.onCreate(savedInstanceState);
     }
@@ -249,7 +283,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
     public void onStart() {
         Log.d(TAG, "onStart");
         super.onStart();
-        mRxPlaylistSubscription = getPlaylistChangedSubscription();
 
         Log.d(TAG, "mRxPlaylistSubscription isUnsubscribed: " + mRxPlaylistSubscription.isUnsubscribed());
     }
@@ -531,13 +564,14 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
                 .subscribe(new Action1<Playlist>() {
                     @Override
                     public void call(Playlist playlistChanged) {
-                        Log.d(TAG, "mRxPlaylistSubscription event recieved");
+                        Log.d(TAG, "notifyPlaylistChanged: mRxPlaylistSubscription event recieved");
                         playlistChanged(playlistChanged);
                         mTopPlayer.setPlaylistEmpty(playlistChanged.size() == 1);
                     }
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
+                        Log.d(TAG, "ERROR: notifyPlaylistChanged: mRxPlaylistSubscription event recieved");
                         VendorCrashReporter.report("subscribeError" , throwable.toString());
                         Log.d(TAG, "error: " + throwable.toString());
                     }

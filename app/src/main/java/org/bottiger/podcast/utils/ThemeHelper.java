@@ -1,12 +1,11 @@
 package org.bottiger.podcast.utils;
 
-import org.bottiger.podcast.R;
-import org.bottiger.podcast.SettingsActivity;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.preference.PreferenceManager;
+
+import org.bottiger.podcast.R;
 
 public class ThemeHelper {
 	

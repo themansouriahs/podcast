@@ -11,7 +11,6 @@ import android.widget.TextView;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.provider.IEpisode;
 
-import java.net.URL;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**

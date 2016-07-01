@@ -3,17 +3,14 @@ package org.bottiger.podcast;
 import android.support.test.InstrumentationRegistry;
 import android.test.ActivityInstrumentationTestCase2;
 
-import org.bottiger.podcast.TestUtils.RecyclerTestUtils;
 import org.bottiger.podcast.TestUtils.TestUtils;
 import org.junit.Before;
 
 import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isChecked;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static org.hamcrest.Matchers.not;
 
 /**
  * Created by aplb on 17-09-2015.

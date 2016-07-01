@@ -9,40 +9,30 @@ import android.media.MediaCodec;
 import android.media.PlaybackParams;
 import android.net.Uri;
 import android.os.Build;
-import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 
-import com.google.android.exoplayer.ExoPlayer;
-import com.google.android.exoplayer.MediaCodecAudioTrackRenderer;
-import com.google.android.exoplayer.MediaCodecSelector;
-import com.google.android.exoplayer.MediaCodecVideoTrackRenderer;
-import com.google.android.exoplayer.TrackRenderer;
-import com.google.android.exoplayer.extractor.ExtractorSampleSource;
-import com.google.android.exoplayer.upstream.Allocator;
-import com.google.android.exoplayer.upstream.DataSource;
-import com.google.android.exoplayer.upstream.DefaultAllocator;
-import com.google.android.exoplayer.upstream.DefaultBandwidthMeter;
-import com.google.android.exoplayer.upstream.DefaultUriDataSource;
-
 import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.MediaCast.IMediaCast;
-import org.bottiger.podcast.listeners.PlayerStatusData;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
+import org.bottiger.podcast.cloud.EventLogger;
+import org.bottiger.podcast.flavors.Analytics.IAnalytics;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
 import org.bottiger.podcast.player.exoplayer.ExtractorRendererBuilder;
 import org.bottiger.podcast.player.exoplayer.PodcastAudioRendererV21;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
+import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.service.PlayerService;
+
 import org.bottiger.podcast.utils.PlaybackSpeed;
 import org.bottiger.podcast.utils.PreferenceHelper;
 
-import java.io.FileDescriptor;
 import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -56,17 +46,16 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
 
     @Nullable
     protected PlayerService mPlayerService;
-    protected org.bottiger.podcast.player.PlayerHandler mHandler;
-    protected org.bottiger.podcast.player.PlayerStateManager mPlayerStateManager;
+    protected PlayerHandler mHandler;
+    protected PlayerStateManager mPlayerStateManager;
 
     // AudioManager
     protected AudioManager mAudioManager;
     protected ComponentName mControllerComponentName;
 
-    private boolean mIsInitialized = false;
+    protected boolean mIsInitialized = false;
 
     public SoundWavesPlayerBase(@NonNull Context argContext) {
-
     }
 
     public void setPlayerService(@NonNull PlayerService argPlayerService) {
@@ -85,9 +74,7 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
     public void start() {
         mStatus = PlayerStatusObservable.PLAYING;
         mPlayerStateManager.updateState(PlaybackStateCompat.STATE_PLAYING, getCurrentPosition(), getCurrentSpeedMultiplier());
-
-        PlayerStatusData psd = new PlayerStatusData(mPlayerService.getCurrentItem(), PlayerStatusObservable.PLAYING);
-        SoundWaves.getBus().post(psd);
+        mPlayerService.notifyStatusChanged();
     }
 
     public void stop() {
@@ -95,8 +82,7 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
         mPlayerStateManager.updateState(PlaybackStateCompat.STATE_STOPPED, getCurrentPosition(), getCurrentSpeedMultiplier());
         mIsInitialized = false;
         mPlayerService.stopForeground(true);
-        PlayerStatusData psd = new PlayerStatusData(mPlayerService.getCurrentItem(), PlayerStatusObservable.STOPPED);
-        SoundWaves.getBus().post(psd);
+        mPlayerService.notifyStatusChanged();
     }
 
     public @PlayerStatusObservable.PlayerStatus int getStatus() {
@@ -154,9 +140,6 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
     public void setOnBufferingUpdateListener(final OnBufferingUpdateListener listener) {
     }
 
-    private void fail() throws AssertionError {
-        throw new AssertionError("This should never happen");
-    }
 
     public boolean doAutomaticGainControl() {
         return false;
@@ -172,4 +155,29 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
     public void setRemoveSilence(boolean argDoRemoveSilence) {
     }
 
+    private void fail() throws AssertionError {
+        throw new AssertionError("This should never happen");
+    }
+
+    protected void trackEventPlay() {
+        if (SoundWaves.sAnalytics == null) {
+            VendorCrashReporter.report("sAnalytics null", "In playerService");
+        }
+
+        SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.PLAY);
+
+        ISubscription sub = mPlayerService.getCurrentItem().getSubscription(mPlayerService);
+        String url = sub != null ? sub.getURLString() : "";
+        EventLogger.postEvent(mPlayerService,
+                EventLogger.LISTEN_EPISODE,
+                mPlayerService.getCurrentItem().isDownloaded() ? 1 : null,
+                mPlayerService.getCurrentItem().getURL(),
+                url);
+
+        EventLogger.postEvent(mPlayerService,
+                EventLogger.LISTEN_PODCAST,
+                null,
+                null,
+                url);
+    }
 }

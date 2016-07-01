@@ -2,8 +2,6 @@ package org.bottiger.podcast.views.utils;
 
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.SwitchCompat;
@@ -11,7 +9,6 @@ import android.view.View;
 import android.widget.CompoundButton;
 
 import org.bottiger.podcast.R;
-import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.PreferenceHelper;
 
@@ -33,12 +30,18 @@ public class SubscriptionSettingsUtils {
     SwitchCompat mDeleteAfterPlayback;
     @NonNull
     SwitchCompat mListOldestFirst;
+    @NonNull
+    SwitchCompat mNotifyOnNew;
+    @NonNull
+    SwitchCompat mSkipIntro;
 
     @Nullable OnSettingsChangedListener mShowDescriptionListener;
     @Nullable OnSettingsChangedListener mAddNewToPlaylistListener;
     @Nullable OnSettingsChangedListener mAutoDownloadListener;
     @Nullable OnSettingsChangedListener mDeleteAfterPlaybackListener;
     @Nullable OnSettingsChangedListener mListOldestFirstListener;
+    @Nullable OnSettingsChangedListener mNotifyOnNewListener;
+    @Nullable OnSettingsChangedListener mSkipIntroListener;
 
 
     public interface OnSettingsChangedListener {
@@ -54,6 +57,8 @@ public class SubscriptionSettingsUtils {
         mAutoDownload = (SwitchCompat)mLayout.findViewById(R.id.feed_auto_download_switch);
         mDeleteAfterPlayback = (SwitchCompat) mLayout.findViewById(R.id.feed_auto_delete_switch);
         mListOldestFirst = (SwitchCompat) mLayout.findViewById(R.id.feed_oldest_first_switch);
+        mNotifyOnNew = (SwitchCompat) mLayout.findViewById(R.id.feed_notify_on_new_switch);
+        mSkipIntro = (SwitchCompat) mLayout.findViewById(R.id.feed_skip_intro_switch);
 
         final Context context = mLayout.getContext();
         final ContentResolver contentResolver = context.getContentResolver();
@@ -67,6 +72,8 @@ public class SubscriptionSettingsUtils {
         mAutoDownload.setChecked(mSubscription.doDownloadNew(defaultValue));
         mDeleteAfterPlayback.setChecked(mSubscription.isDeleteWhenListened());
         mListOldestFirst.setChecked(mSubscription.isListOldestFirst());
+        mSkipIntro.setChecked(mSubscription.doSkipIntro());
+        mNotifyOnNew.setChecked(mSubscription.doNotifyOnNew());
 
         mShowDescription.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -104,6 +111,22 @@ public class SubscriptionSettingsUtils {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mSubscription.setListOldestFirst(isChecked);
+                OnSwitchChangedHandler(isChecked, contentResolver, mListOldestFirstListener);
+            }
+        });
+
+        mSkipIntro.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mSubscription.setDoSkipIntro(isChecked);
+                OnSwitchChangedHandler(isChecked, contentResolver, mListOldestFirstListener);
+            }
+        });
+
+        mNotifyOnNew.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mSubscription.setDoNotifyOnNew(isChecked);
                 OnSwitchChangedHandler(isChecked, contentResolver, mListOldestFirstListener);
             }
         });

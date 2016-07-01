@@ -6,6 +6,11 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.webkit.MimeTypeMap;
 
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.utils.StrUtils;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -15,12 +20,6 @@ import java.io.InterruptedIOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.provider.FeedItem;
-import org.bottiger.podcast.provider.IEpisode;
-import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
-import org.bottiger.podcast.utils.StrUtils;
 
 import okhttp3.OkUrlFactory;
 

@@ -40,10 +40,13 @@ import com.github.ivbaranov.mfb.MaterialFavoriteButton;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.player.GenericMediaPlayerInterface;
-import org.bottiger.podcast.player.SoundWavesPlayer;
+
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PaletteListener;
+import org.bottiger.podcast.player.SoundWavesPlayer;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
@@ -155,6 +158,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
 
 
     private void init(@NonNull Context argContext) {
+        Log.v(TAG, "App start time: " + System.currentTimeMillis());
 
         mTopPLayerScrollGestureListener = new TopPLayerScrollGestureListener();
         scrollingChildHelper.setNestedScrollingEnabled(true);

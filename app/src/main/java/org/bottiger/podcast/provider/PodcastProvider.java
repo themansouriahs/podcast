@@ -1,23 +1,21 @@
 package org.bottiger.podcast.provider;
 
-import java.util.HashMap;
-
-import org.bottiger.podcast.BuildConfig;
-import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.utils.PodcastLog;
-
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.SQLException;
-import io.requery.android.database.sqlite.SQLiteDatabase;
-import io.requery.android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.text.TextUtils;
+
+import org.bottiger.podcast.utils.PodcastLog;
+
+import java.util.HashMap;
+
+import io.requery.android.database.sqlite.SQLiteDatabase;
+import io.requery.android.database.sqlite.SQLiteQueryBuilder;
 
 public class PodcastProvider extends ContentProvider {
 

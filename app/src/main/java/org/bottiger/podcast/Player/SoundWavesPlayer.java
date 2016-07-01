@@ -2,16 +2,12 @@ package org.bottiger.podcast.player;
 
 import android.annotation.TargetApi;
 import android.content.ComponentName;
-import android.content.ContentResolver;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -27,7 +23,6 @@ import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.flavors.MediaCast.IMediaCast;
 import org.bottiger.podcast.flavors.MediaCast.IMediaRouteStateListener;
-import org.bottiger.podcast.listeners.PlayerStatusData;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
 import org.bottiger.podcast.player.exoplayer.ExtractorRendererBuilder;
@@ -52,11 +47,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
     private static final float MARK_AS_LISTENED_RATIO_THRESHOLD = 0.9f;
     private static final float MARK_AS_LISTENED_MINUTES_LEFT_THRESHOLD = 5f;
 
-
-    private boolean mIsInitialized = false;
     private boolean mIsStreaming = false;
-
-    private PlayerStatusObservable mPlayerStatusObservable;
 
     private boolean isPreparingMedia = false;
 
@@ -84,9 +75,6 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         mExoplayer.setRemoveSilence(remove_silence);
         mExoplayer.setAutomaticGainControl(gain_control);
         mExoplayer.setRenderBuilder(new ExtractorRendererBuilder(argContext, null));
-
-        mPlayerStatusObservable = new PlayerStatusObservable();
-        SoundWaves.getBus().register(mPlayerStatusObservable); // FIXME is never unregistered!!!
     }
 
     public void addListener(ExoPlayerWrapper.Listener listener) {
@@ -142,6 +130,8 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         setOnBufferingUpdateListener(bufferListener);
         setOnErrorListener(errorListener);
 
+        mIsInitialized = true;
+
         seekTo(startPos);
 
         prepare();
@@ -151,13 +141,14 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
             start();
             isPreparingMedia = false;
         }
-
-        mIsInitialized = true;
     }
 
     public boolean isSteaming() { return  mIsStreaming; }
 
     public void start() {
+        mStatus = PlayerStatusObservable.PLAYING;
+        mPlayerStateManager.updateState(PlaybackStateCompat.STATE_PLAYING, getCurrentPosition(), playbackSpeed);
+
         // Request audio focus for playback
         int result = mAudioManager.requestAudioFocus(mPlayerService,
                 PlayerStateManager.AUDIO_STREAM,
@@ -167,27 +158,9 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             mExoplayer.setPlayWhenReady(true);
 
-            super.start();
+            mPlayerService.notifyStatusChanged();
 
-            if (SoundWaves.sAnalytics == null) {
-                VendorCrashReporter.report("sAnalytics null", "In playerService");
-            }
-
-            SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.PLAY);
-
-            ISubscription sub = mPlayerService.getCurrentItem().getSubscription(mPlayerService);
-            String url = sub != null ? sub.getURLString() : "";
-            EventLogger.postEvent(mPlayerService,
-                    EventLogger.LISTEN_EPISODE,
-                    mPlayerService.getCurrentItem().isDownloaded() ? 1 : null,
-                    mPlayerService.getCurrentItem().getURL(),
-                    url);
-
-            EventLogger.postEvent(mPlayerService,
-                    EventLogger.LISTEN_PODCAST,
-                    null,
-                    null,
-                    url);
+            trackEventPlay();
         }
     }
 
@@ -196,7 +169,6 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
             return;
 
         mExoplayer.release();
-
         super.stop();
     }
 
@@ -268,8 +240,6 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         mPlayerStateManager.updateState(PlaybackStateCompat.STATE_PAUSED, getCurrentPosition(), playbackSpeed);
 
         MarkAsListenedIfNeeded();
-        PlayerStatusData psd = new PlayerStatusData(mPlayerService.getCurrentItem(), PlayerStatusObservable.PAUSED);
-        SoundWaves.getBus().post(psd);
         SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.PAUSE);
     }
 
@@ -458,7 +428,8 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
 
     @Override
     public long getCurrentPosition() {
-        return mExoplayer.getCurrentPosition();
+        long currentPosition = mExoplayer.getCurrentPosition();
+        return currentPosition;
     }
 
     @Override

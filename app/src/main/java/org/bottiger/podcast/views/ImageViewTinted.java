@@ -1,10 +1,6 @@
 package org.bottiger.podcast.views;
 
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.graphics.Palette;
 import android.util.AttributeSet;

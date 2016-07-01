@@ -1,8 +1,6 @@
 package org.bottiger.podcast.service.Downloader;
 
-import android.content.ContentResolver;
 import android.content.Context;
-import android.os.Debug;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -13,22 +11,18 @@ import android.util.Log;
 
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.model.datastructures.EpisodeList;
 import org.bottiger.podcast.parser.FeedParser;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
-import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.StorageUtils;
 import org.bottiger.podcast.utils.okhttp.UserAgentInterceptor;
-import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.util.Date;
 import java.util.LinkedList;
-import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;

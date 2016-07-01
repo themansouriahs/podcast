@@ -3,7 +3,6 @@ package org.bottiger.podcast.service.syncadapter;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;

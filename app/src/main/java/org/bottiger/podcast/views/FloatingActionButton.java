@@ -2,9 +2,6 @@ package org.bottiger.podcast.views;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.ColorDrawable;
 import android.support.v7.graphics.Palette;
 import android.text.TextUtils;
 import android.util.AttributeSet;

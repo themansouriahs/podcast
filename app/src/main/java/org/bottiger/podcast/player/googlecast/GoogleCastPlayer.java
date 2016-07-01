@@ -9,7 +9,6 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.MediaCast.IMediaCast;
 import org.bottiger.podcast.flavors.MediaCast.IMediaRouteStateListener;
-import org.bottiger.podcast.listeners.PlayerStatusData;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.player.Player;
 import org.bottiger.podcast.player.SoundWavesPlayerBase;
@@ -133,8 +132,7 @@ public class GoogleCastPlayer extends SoundWavesPlayerBase implements IMediaRout
             }
 
             mStatus = PlayerStatusObservable.PLAYING;
-            PlayerStatusData psd = new PlayerStatusData(mPlayerService.getCurrentItem(), PlayerStatusObservable.PLAYING);
-            SoundWaves.getBus().post(psd);
+            mPlayerService.notifyStatusChanged();
         }
     }
 

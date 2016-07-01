@@ -15,6 +15,16 @@
  */
 package org.bottiger.podcast.player.exoplayer;
 
+import android.annotation.TargetApi;
+import android.media.MediaCodec.CryptoException;
+import android.media.PlaybackParams;
+import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
+import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
+import android.view.Surface;
+
 import com.google.android.exoplayer.CodecCounters;
 import com.google.android.exoplayer.DummyTrackRenderer;
 import com.google.android.exoplayer.ExoPlaybackException;
@@ -43,18 +53,7 @@ import com.google.android.exoplayer.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer.util.DebugTextViewHelper;
 import com.google.android.exoplayer.util.PlayerControl;
 
-import android.annotation.TargetApi;
-import android.media.MediaCodec.CryptoException;
-import android.media.PlaybackParams;
-import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
-import android.support.annotation.IntDef;
-import android.support.annotation.NonNull;
-import android.view.Surface;
-
 import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.utils.rxbus.RxBus;
 import org.bottiger.podcast.utils.rxbus.RxBusSimpleEvents;
 
 import java.io.IOException;

@@ -2,10 +2,8 @@ package org.bottiger.podcast.adapters.viewholders.subscription;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.ContextMenu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import org.bottiger.podcast.R;

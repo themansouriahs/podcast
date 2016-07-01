@@ -1,33 +1,23 @@
 package org.bottiger.podcast.activities.discovery;
 
 import android.app.ProgressDialog;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
-import android.widget.Button;
-import android.widget.FrameLayout;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.activities.feedview.FeedActivity;
 import org.bottiger.podcast.activities.feedview.FeedViewAdapter;
 import org.bottiger.podcast.model.Library;
-import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.UIUtils;
-
-import java.net.URL;
-
-import static android.view.View.GONE;
 
 /**
  * Created by apl on 23-04-2015.

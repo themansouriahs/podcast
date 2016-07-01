@@ -1,13 +1,5 @@
 package org.bottiger.podcast.notification;
 
-import org.bottiger.podcast.ApplicationConfiguration;
-import org.bottiger.podcast.MainActivity;
-import org.bottiger.podcast.R;
-import org.bottiger.podcast.player.PlayerStateManager;
-import org.bottiger.podcast.player.SoundWavesPlayer;
-import org.bottiger.podcast.provider.IEpisode;
-import org.bottiger.podcast.service.PlayerService;
-
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -19,7 +11,6 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -37,6 +28,13 @@ import android.widget.RemoteViews;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+
+import org.bottiger.podcast.ApplicationConfiguration;
+import org.bottiger.podcast.MainActivity;
+import org.bottiger.podcast.R;
+import org.bottiger.podcast.player.PlayerStateManager;
+import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.service.PlayerService;
 
 public class NotificationPlayer extends BroadcastReceiver {
 

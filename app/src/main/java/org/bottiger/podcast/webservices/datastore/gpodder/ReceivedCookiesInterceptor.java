@@ -6,7 +6,6 @@ package org.bottiger.podcast.webservices.datastore.gpodder;
 
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.prefs.Preferences;
 
 import okhttp3.Interceptor;
 import okhttp3.Response;

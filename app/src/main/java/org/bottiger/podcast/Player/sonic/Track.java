@@ -14,10 +14,6 @@
 
 package org.bottiger.podcast.player.sonic;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.concurrent.locks.ReentrantLock;
-
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.media.AudioFormat;
@@ -42,6 +38,10 @@ import org.bottiger.podcast.player.sonic.service.IOnPitchAdjustmentAvailableChan
 import org.bottiger.podcast.player.sonic.service.IOnPreparedListenerCallback;
 import org.bottiger.podcast.player.sonic.service.IOnSeekCompleteListenerCallback;
 import org.bottiger.podcast.player.sonic.service.IOnSpeedAdjustmentAvailableChangedListenerCallback;
+
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.concurrent.locks.ReentrantLock;
 
 @TargetApi(16)
 public class Track {

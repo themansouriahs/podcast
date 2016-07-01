@@ -5,7 +5,6 @@ import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.GDevice;
 import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.GDeviceUpdates;
 import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.GEpisode;
 import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.GEpisodeAction;
-import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.GNull;
 import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.GSetting;
 import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.GSubscription;
 import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.GTag;
@@ -14,7 +13,6 @@ import org.bottiger.podcast.webservices.datastore.gpodder.datatypes.UpdatedUrls;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
