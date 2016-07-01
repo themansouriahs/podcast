@@ -50,6 +50,8 @@ public interface ISubscription {
 
     boolean IsDirty();
 
+    boolean doSkipIntro();
+
     /**
      * Determines if we are subscribed to a Subscription with the same URL
      * @return

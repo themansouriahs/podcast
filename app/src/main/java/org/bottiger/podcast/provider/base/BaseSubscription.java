@@ -22,4 +22,8 @@ public abstract class BaseSubscription implements ISubscription {
                 .asBitmap()
                 .into(preloadTarget);
     }
+
+    public boolean doSkipIntro() {
+        return false;
+    }
 }
