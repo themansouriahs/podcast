@@ -234,6 +234,7 @@ public class SoundWaves extends MultiDexApplication {
 
     public void setPlayer(@NonNull GenericMediaPlayerInterface argPlayer) {
         mPlayer = argPlayer;
+        mPlayer.setPlayerService(PlayerService.getInstance());
     }
 
     @NonNull

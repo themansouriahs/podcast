@@ -29,53 +29,31 @@ public class MediaRouterPlaybackActivity extends ToolbarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mMediaRouteCast = new VendorMediaRouteCast(this);
-        mMediaRouteCast.startDiscovery();
-    }
-
-    @Override
-    protected void onDestroy() {
-        mMediaRouteCast.stopDiscovery();
-        super.onDestroy();
+        mMediaRouteCast.onCreate();
     }
 
     @Override
     protected void onResume() {
+        mMediaRouteCast.onResume();
         super.onResume();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        mMediaRouteCast.onPause();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         mMediaRouteCast.setupMediaButton(this, menu, R.id.media_route_menu_item);
-        /*
-        MediaRouteSelector mediaRouteSelector = mMediaRouteCast.getRouteSelector();
-
-        if (mediaRouteSelector != null) {
-            // Inflate the menu and configure the media router action provider.
-            getMenuInflater().inflate(R.menu.media_router, menu);
-
-            // Attach the MediaRouteSelector to the menu item
-            MenuItem mediaRouteMenuItem = menu.findItem(R.id.media_route_menu_item);
-            MediaRouteActionProvider mediaRouteActionProvider =
-                    (MediaRouteActionProvider) MenuItemCompat.getActionProvider(
-                            mediaRouteMenuItem);
-            if (mediaRouteActionProvider != null)
-                mediaRouteActionProvider.setRouteSelector(mediaRouteSelector);
-        }
-        */
-
-        // Return true to show the menu.
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     protected void onServiceConnected() {
         super.onServiceConnected();
-        SoundWaves.getAppContext(this).setPlayer(new GoogleCastPlayer(mMediaRouteCast, this));
+        SoundWaves.getAppContext(this).setPlayer(mMediaRouteCast);
     }
 
 }

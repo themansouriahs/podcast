@@ -1,5 +1,6 @@
 package org.bottiger.podcast.player;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
@@ -26,12 +27,12 @@ public class PlayerHandler {
     public static final int SERVER_DIED = 2;
     public static final int FADEOUT = 3;
 
-    private PlayerService mPlayerService;
+    private Context mContext;
     private final InnerPlayerHandler mHandler;
 
-    public PlayerHandler(@NonNull PlayerService argPlayerService) {
-        mPlayerService = argPlayerService;
-        mHandler  = new InnerPlayerHandler(mPlayerService);
+    public PlayerHandler(@NonNull Context argContext) {
+        mContext = argContext;
+        mHandler  = new InnerPlayerHandler(mContext);
     }
 
     public void sendEmptyMessage(int msg) {
@@ -48,17 +49,17 @@ public class PlayerHandler {
     }
 
     private static class InnerPlayerHandler extends Handler {
-        private final WeakReference<PlayerService> mService;
+        private final WeakReference<Context> mService;
         private float mCurrentVolume = 1.0f;
 
-        public InnerPlayerHandler(PlayerService service) {
+        public InnerPlayerHandler(Context service) {
             mService = new WeakReference<>(service);
         }
 
         @Override
         public void handleMessage(Message msg) {
 
-            PlayerService playerService = mService.get();
+            PlayerService playerService = PlayerService.getInstance();
 
             if (playerService == null)
                 return;
@@ -89,7 +90,7 @@ public class PlayerHandler {
                     if (playerService.getCurrentItem() != null) {
 
                         if (playerService.getNextTrack() == PlayerService.NEXT_IN_PLAYLIST) {
-                            IEpisode nextItemId = playerService.getNextId();
+                            IEpisode nextItemId = playerService.getNext();
 
                             if (nextItemId == null) {
                                 playerService.dis_notifyStatus();

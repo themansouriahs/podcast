@@ -2,6 +2,7 @@ package org.bottiger.podcast.flavors.MediaCast;
 
 import android.content.Context;
 
+import com.google.android.gms.cast.CastMediaControlIntent;
 import com.google.android.gms.cast.framework.CastOptions;
 import com.google.android.gms.cast.framework.OptionsProvider;
 import com.google.android.gms.cast.framework.SessionProvider;
@@ -19,7 +20,7 @@ public class GoogleCastOptionProvider implements OptionsProvider {
     @Override
     public CastOptions getCastOptions(Context argContext) {
         CastOptions castOptions = new CastOptions.Builder()
-                .setReceiverApplicationId(argContext.getString(R.string.app_name)) // FIXME should be a proper ID
+                .setReceiverApplicationId(CastMediaControlIntent.DEFAULT_MEDIA_RECEIVER_APPLICATION_ID) // FIXME should be a proper ID
                 .build();
         return castOptions;
     }

@@ -6,6 +6,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.media.session.PlaybackStateCompat;
 
+import com.google.android.gms.cast.MediaInfo;
+import com.google.android.gms.cast.MediaMetadata;
+import com.google.android.gms.cast.framework.media.RemoteMediaClient;
+import com.google.android.gms.common.images.WebImage;
+
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.MediaCast.IMediaCast;
 import org.bottiger.podcast.flavors.MediaCast.IMediaRouteStateListener;
@@ -15,6 +20,7 @@ import org.bottiger.podcast.player.SoundWavesPlayerBase;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.utils.PlaybackSpeed;
 
 import java.io.IOException;
 
@@ -22,123 +28,43 @@ import java.io.IOException;
  * Created by aplb on 28-06-2016.
  */
 
-public class GoogleCastPlayer extends SoundWavesPlayerBase implements IMediaRouteStateListener {
+public abstract class GoogleCastPlayer extends SoundWavesPlayerBase {
 
-    // GoogleCast
-    private IMediaCast mMediaCast;
-
-    public GoogleCastPlayer(@NonNull IMediaCast argMediaCast, @NonNull Context argContext) {
+    public GoogleCastPlayer(@NonNull Context argContext) {
         super(argContext);
-        mMediaCast = argMediaCast;
     }
 
-    public void setDataSourceAsync(String path, int startPos) {
-        super.setDataSourceAsync(path, startPos);
-
-        mMediaCast.loadEpisode(PlayerService.getCurrentItem());
-        start();
-        mPlayerStateManager.updateState(PlaybackStateCompat.STATE_PLAYING, startPos, getCurrentSpeedMultiplier());
-    }
+    @Nullable
+    public abstract RemoteMediaClient getRemoteMediaClient();
 
     @Override
-    public boolean isSteaming() {
-        return true;
-    }
-
-    public void start() {
-        super.start();
-        mMediaCast.play(0);
-    }
-
-    public void stop() {
-        if (!isInitialized())
+    public void pause() {
+        if (!isCasting())
             return;
 
-        mMediaCast.stop();
-
-        super.stop();
-    }
-
-    @Override
-    public boolean isPlaying() {
-        return mMediaCast != null && mMediaCast.isPlaying();
-    }
-
-    public void pause() {
-        mMediaCast.stop();
-    }
-
-    @Override
-    public long duration() {
-        return 0;
-    }
-
-    @Override
-    public long position() {
-        return mMediaCast.getCurrentPosition();
+        // Handle pending result
+        getRemoteMediaClient().pause();
     }
 
     @Override
     public long getCurrentPosition() {
-        return mMediaCast != null && mMediaCast.isActive() ? mMediaCast.getCurrentPosition() : 0;
-    }
+        if (!isCasting())
+            return 0;
 
-    @Override
-    public void rewind(@Nullable IEpisode argItem) {
-    }
-
-    @Override
-    public void fastForward(@Nullable IEpisode argItem) {
-
-    }
-
-    public long seek(long whereto) {
-        mMediaCast.seekTo(whereto);
-
-        return whereto;
+        return getRemoteMediaClient().getApproximateStreamPosition();
     }
 
     @Override
     public void setVolume(float vol) {
-
-    }
-
-    @Override
-    public void onStateChanged(IMediaCast castProvider) {
-        if (castProvider == null)
+        if (!isCasting())
             return;
 
-        mMediaCast = castProvider;
-
-        if (mPlayerService == null)
-            return;
-
-        IEpisode episode = mPlayerService.getCurrentItem();
-
-        if (episode == null)
-            return;
-
-        if (mMediaCast.isConnected()) {
-            mMediaCast.loadEpisode(episode);
-
-            if (episode instanceof FeedItem) {
-                mMediaCast.seekTo(((FeedItem)episode).offset);
-            }
-
-            if (isPlaying()) {
-                long offst = getCurrentPosition();
-                pause();
-                mMediaCast.play(offst);
-            }
-
-            mStatus = PlayerStatusObservable.PLAYING;
-            mPlayerService.notifyStatusChanged();
-        }
+        getRemoteMediaClient().setStreamVolume(vol);
     }
 
     @Override
     public boolean isCasting() {
-        return mMediaCast != null && mMediaCast.isConnected();
+        return getRemoteMediaClient() != null && getRemoteMediaClient().hasMediaSession();
     }
 
     @Override
@@ -158,22 +84,25 @@ public class GoogleCastPlayer extends SoundWavesPlayerBase implements IMediaRout
 
     @Override
     public float getCurrentSpeedMultiplier() {
-        return 0;
+        return PlaybackSpeed.DEFAULT;
     }
 
     @Override
     public long getDuration() {
-        return 0;
+        if (!isCasting())
+            return -1;
+
+        return getRemoteMediaClient().getStreamDuration();
     }
 
     @Override
     public float getMaxSpeedMultiplier() {
-        return 0;
+        return getCurrentSpeedMultiplier();
     }
 
     @Override
     public float getMinSpeedMultiplier() {
-        return 0;
+        return getCurrentSpeedMultiplier();
     }
 
     @Override
@@ -187,8 +116,14 @@ public class GoogleCastPlayer extends SoundWavesPlayerBase implements IMediaRout
     }
 
     @Override
-    public void seekTo(int msec) throws IllegalStateException {
+    public long seekTo(long msec) throws IllegalStateException {
+        if (!isCasting())
+            return getCurrentPosition();
 
+        // handle pending result
+        getRemoteMediaClient().seek(msec);
+
+        return msec;
     }
 
     @Override
@@ -203,17 +138,90 @@ public class GoogleCastPlayer extends SoundWavesPlayerBase implements IMediaRout
 
     @Override
     public void setPlaybackSpeed(float f) {
+        return;
+    }
 
+
+    @Override
+    public void setDataSourceAsync(@NonNull IEpisode argEpisode) {
+        super.setDataSourceAsync(argEpisode);
+
+        String url = argEpisode.getURL();
+        MediaMetadata mediaMetadata = new MediaMetadata(MediaMetadata.MEDIA_TYPE_MOVIE);
+
+        mediaMetadata.putString(MediaMetadata.KEY_TITLE, argEpisode.getTitle());
+        mediaMetadata.putString(MediaMetadata.KEY_SUBTITLE, argEpisode.getSubscription(mContext).getTitle());
+        mediaMetadata.addImage(new WebImage(Uri.parse(argEpisode.getArtwork(mContext))));
+
+        Uri uri = Uri.parse(url);
+        String type = mContext.getContentResolver().getType(uri);
+        if (type == null) {
+            type = "audio/mpeg";
+        }
+
+        // Load media
+        MediaInfo mediaInfo = new MediaInfo.Builder(argEpisode.getURL())
+                .setStreamType(MediaInfo.STREAM_TYPE_BUFFERED)
+                .setContentType(type)
+                .setMetadata(mediaMetadata)
+                .setStreamDuration(argEpisode.getDuration() * 1000)
+                .build();
+
+
+        RemoteMediaClient remoteMediaClient = getRemoteMediaClient();
+        remoteMediaClient.load(mediaInfo, true, startPos);
     }
 
     @Override
-    public void setVolume(float leftVolume, float rightVolume) {
+    public int getStatus() {
+        if (!isCasting())
+            return PlayerStatusObservable.STOPPED;
 
+        return isPlaying() ? PlayerStatusObservable.PLAYING : PlayerStatusObservable.PAUSED;
     }
 
-    public void setMediaCast(IMediaCast mMediaCast) {
-        this.mMediaCast = mMediaCast;
-        mMediaCast.registerStateChangedListener(this);
+    @Override
+    public boolean isSteaming() {
+        return isCasting() && getRemoteMediaClient().isLiveStream();
+    }
+
+    @Override
+    public boolean isInitialized() {
+        return isCasting();
+    }
+
+    @Override
+    public void toggle() {
+        if (!isCasting())
+            return;
+
+        getRemoteMediaClient().togglePlayback();
+    }
+
+    @Override
+    public void start() {
+        if (!isCasting())
+            return;
+
+        getRemoteMediaClient().play();
+    }
+
+    @Override
+    public void stop() {
+        pause();
+    }
+
+    @Override
+    public void release() {
+        if (!isCasting())
+            return;
+
+        getRemoteMediaClient().stop();
+    }
+
+    @Override
+    public boolean isPlaying() {
+        return false;
     }
 
 }

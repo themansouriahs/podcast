@@ -26,6 +26,8 @@ import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
 import org.bottiger.podcast.player.exoplayer.ExtractorRendererBuilder;
 import org.bottiger.podcast.player.exoplayer.PodcastAudioRendererV21;
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.service.PlayerService;
@@ -33,6 +35,7 @@ import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.PlaybackSpeed;
 import org.bottiger.podcast.utils.PreferenceHelper;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -46,8 +49,9 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
 
     @Nullable
     protected PlayerService mPlayerService;
-    protected PlayerHandler mHandler;
     protected PlayerStateManager mPlayerStateManager;
+
+    @NonNull protected Context mContext;
 
     // AudioManager
     protected AudioManager mAudioManager;
@@ -55,7 +59,10 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
 
     protected boolean mIsInitialized = false;
 
+    protected long startPos = 0;
+
     public SoundWavesPlayerBase(@NonNull Context argContext) {
+        mContext = argContext;
     }
 
     public void setPlayerService(@NonNull PlayerService argPlayerService) {
@@ -66,7 +73,8 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
         this.mAudioManager = (AudioManager) mPlayerService.getSystemService(Context.AUDIO_SERVICE);
     }
 
-    public void setDataSourceAsync(String path, int startPos) {
+    public void setDataSourceAsync(@NonNull IEpisode argEpisode) {
+        startPos = getStartPosition(mContext, argEpisode);
         mStatus = PlayerStatusObservable.PREPARING;
         mPlayerStateManager.updateState(PlaybackStateCompat.STATE_CONNECTING, startPos, getCurrentSpeedMultiplier());
     }
@@ -110,6 +118,33 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
         mStatus = PlayerStatusObservable.STOPPED;
     }
 
+    public void fastForward(@Nullable IEpisode argItem) {
+        if (mPlayerService == null)
+            return;
+
+        if (argItem == null)
+            return;
+
+        String fastForwardAmount = PreferenceHelper.getStringPreferenceValue(mPlayerService, R.string.pref_player_forward_amount_key, R.string.player_fast_forward_default);
+        long seekTo = mPlayerService.position() + Integer.parseInt(fastForwardAmount)*1000; // to ms
+
+        seekTo(seekTo);
+    }
+
+    public void rewind(@Nullable IEpisode argItem) {
+        if (mPlayerService == null)
+            return;
+
+        if (argItem == null)
+            return;
+
+        String rewindAmount = PreferenceHelper.getStringPreferenceValue(mPlayerService, R.string.pref_player_backward_amount_key, R.string.player_rewind_default);
+        long seekTo = mPlayerService.position() - Integer.parseInt(rewindAmount)*1000; // to ms
+
+
+        seekTo(seekTo);
+    }
+
     public boolean isInitialized() {
         return mIsInitialized;
     }
@@ -122,10 +157,6 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
     }
 
     public void removeListener(ExoPlayerWrapper.Listener listener) {
-    }
-
-    public void setHandler(PlayerHandler handler) {
-        mHandler = handler;
     }
 
     @Override
@@ -179,5 +210,37 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
                 null,
                 null,
                 url);
+    }
+
+    protected static long getStartPosition(@NonNull Context argContext, @NonNull IEpisode argEpisode) {
+        long episodeOffset = argEpisode.getOffset();
+        long offset = Math.max(episodeOffset, 0);
+
+        ISubscription subscription = argEpisode.getSubscription(argContext);
+        if (subscription.doSkipIntro()) {
+            long startSkipAmount = PreferenceHelper.getLongPreferenceValue(argContext, R.string.pref_skip_intro_key, R.integer.skip_into_default);
+            offset = Math.max(offset, startSkipAmount);
+        }
+
+        return offset;
+    }
+
+    protected static String getDataSourceUrl(@NonNull IEpisode argEpisode) {
+        String dataSource = argEpisode.getURL();
+        boolean isFeedItem = argEpisode instanceof FeedItem;
+
+        try {
+            if (argEpisode.isDownloaded() && isFeedItem) {
+                FeedItem feedItem = (FeedItem) argEpisode;
+                String path = feedItem.getAbsolutePath();
+                File file = new File(path);
+                if (file.exists()) {
+                    dataSource = path;
+                }
+            }
+        } catch (IOException ignored) {
+        }
+
+        return dataSource;
     }
 }
