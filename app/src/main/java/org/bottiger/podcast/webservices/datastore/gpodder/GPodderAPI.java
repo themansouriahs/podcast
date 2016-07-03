@@ -201,8 +201,14 @@ public class GPodderAPI implements IWebservice {
             url = subscription.getURLString();
 
             if (removed.contains(url)) {
+
+                VendorCrashReporter.report("removedUrls", removed.toString());
+
                 if (subscription.IsSubscribed()) {
                     SoundWaves.getAppContext(argContext).getLibraryInstance().unsubscribe(subscription.getURLString(), "GPodder:Unsubscribe");
+                    String raw = subscriptionsChangesResponse.raw().toString();
+                    Log.w(TAG, "gPodder removed a subscription we are not subscribed to: " + url + " raw: " + raw); // NoI18N
+                    VendorCrashReporter.report("Removed unknown subscription", raw); // NoI18N
                 } else {
                     String raw = subscriptionsChangesResponse.raw().toString();
                     Log.w(TAG, "gPodder removed a subscription we are not subscribed to: " + url + " raw: " + raw); // NoI18N
