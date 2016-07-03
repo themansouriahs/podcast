@@ -72,7 +72,7 @@ public class PlayerPhoneListener extends PhoneStateListener {
 
         long msDiff = now.getTime()-mStoppedAt.getTime();
         if (msDiff < RESTART_THRESHOLD_SECONDS*1000) {
-            mPlayerService.startAndFadeIn();
+            mPlayerService.getPlayer().startAndFadeIn();
         }
 
         mStoppedAt = null;

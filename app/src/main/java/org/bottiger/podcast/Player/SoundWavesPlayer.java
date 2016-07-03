@@ -37,6 +37,8 @@ import org.bottiger.podcast.utils.PreferenceHelper;
 import java.io.File;
 import java.io.IOException;
 
+import static org.bottiger.podcast.service.PlayerService.getCurrentItem;
+
 /**
  * Created by apl on 20-01-2015.
  */
@@ -52,7 +54,6 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
     private boolean isPreparingMedia = false;
 
     int bufferProgress = 0;
-    int startPos = 0;
     float playbackSpeed = 1.0f;
 
     private ExoPlayerWrapper mExoplayer;
@@ -60,7 +61,9 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
 
     private TrackRenderer[] mTrackRendere = new TrackRenderer[ExoPlayerWrapper.RENDERER_COUNT];
 
-    public SoundWavesPlayer(@NonNull Context argContext) {
+    private PlayerHandler mPlayerHandler;
+
+    public SoundWavesPlayer(@NonNull final Context argContext) {
         super(argContext);
 
         boolean remove_silence = PreferenceHelper.getBooleanPreferenceValue(argContext,
@@ -75,6 +78,33 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         mExoplayer.setRemoveSilence(remove_silence);
         mExoplayer.setAutomaticGainControl(gain_control);
         mExoplayer.setRenderBuilder(new ExtractorRendererBuilder(argContext, null));
+
+        mPlayerHandler = new PlayerHandler(argContext);
+
+        addListener(new ExoPlayerWrapper.Listener() {
+            @Override
+            public void onStateChanged(boolean playWhenReady, @ExoPlayerWrapper.PlayerState int playbackState) {
+                if (playbackState == ExoPlayerWrapper.STATE_READY) {
+                    IEpisode episode = getCurrentItem();
+                    if (episode != null) {
+                        long duration = getDuration();
+                        if (duration != ExoPlayer.UNKNOWN_TIME && episode.setDuration(duration)) {
+                            SoundWaves.getAppContext(argContext).getLibraryInstance().updateEpisode(episode);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onError(Exception e) {
+
+            }
+
+            @Override
+            public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
+
+            }
+        });
     }
 
     public void addListener(ExoPlayerWrapper.Listener listener) {
@@ -95,11 +125,12 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         return true;
     }
 
-    public void setDataSourceAsync(String path, int startPos) {
-        super.setDataSourceAsync(path, startPos);
+    public void setDataSourceAsync(@NonNull IEpisode argEpisode) {
+        super.setDataSourceAsync(argEpisode);
 
         try {
 
+            String path = getDataSourceUrl(argEpisode);
             File f = new File(path);
             mIsStreaming = !f.exists();
 
@@ -114,7 +145,6 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
 
             setAudioStreamType(PlayerStateManager.AUDIO_STREAM);
 
-            this.startPos = startPos;
             this.isPreparingMedia = true;
         } catch (IOException ex) {
             // TODO: notify the user why the file couldn't be opened
@@ -136,7 +166,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
 
         prepare();
 
-        IEpisode episode = PlayerService.getCurrentItem();
+        IEpisode episode = getCurrentItem();
         if (episode != null) {
             start();
             isPreparingMedia = false;
@@ -183,50 +213,12 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         return mExoplayer.getPlayWhenReady();
     }
 
-    void rewind() {
-        rewind(null);
+    public void rewind() {
+        rewind(getCurrentItem());
     }
 
-    public void rewind(@Nullable IEpisode argItem) {
-        if (mPlayerService == null)
-            return;
-
-        if (argItem == null) {
-            argItem = mPlayerService.getCurrentItem();
-        }
-
-        if (argItem == null)
-            return;
-
-        String rewindAmount = PreferenceHelper.getStringPreferenceValue(mPlayerService, R.string.pref_player_backward_amount_key, R.string.player_rewind_default);
-        long seekTo = mPlayerService.position() - Integer.parseInt(rewindAmount)*1000; // to ms
-
-        if (argItem.equals(mPlayerService.getCurrentItem())) {
-            mPlayerService.seek(seekTo);
-        }
-    }
-
-    void fastForward() {
-        fastForward(null);
-    }
-
-    public void fastForward(@Nullable IEpisode argItem) {
-        if (mPlayerService == null)
-            return;
-
-        if (argItem == null) {
-            argItem = mPlayerService.getCurrentItem();
-        }
-
-        if (argItem == null)
-            return;
-
-        String fastForwardAmount = PreferenceHelper.getStringPreferenceValue(mPlayerService, R.string.pref_player_forward_amount_key, R.string.player_fast_forward_default);
-        long seekTo = mPlayerService.position() + Integer.parseInt(fastForwardAmount)*1000; // to ms
-
-        if (argItem.equals(mPlayerService.getCurrentItem())) {
-            mPlayerService.seek(seekTo);
-        }
+    public void fastForward() {
+        fastForward(getCurrentItem());
     }
 
     /**
@@ -253,13 +245,13 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
             mPlayerStateManager.updateState(PlaybackStateCompat.STATE_STOPPED, 0, playbackSpeed);
 
             if (!isPreparingMedia)
-                mHandler.sendEmptyMessage(PlayerHandler.TRACK_ENDED);
+                mPlayerHandler.sendEmptyMessage(PlayerHandler.TRACK_ENDED);
 
             if (mPlayerService == null) {
                 return;
             }
 
-            IEpisode item = mPlayerService.getCurrentItem();
+            IEpisode item = getCurrentItem();
 
             if (item == null)
                 return;
@@ -325,7 +317,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
                     mIsInitialized = false;
                     release();
 
-                    mHandler.sendMessageDelayed(PlayerHandler.SERVER_DIED, 2000);
+                    mPlayerHandler.sendMessageDelayed(PlayerHandler.SERVER_DIED, 2000);
                     return true;
                 default:
                     break;
@@ -343,7 +335,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
                 mIsInitialized = false;
                 release();
 
-                mHandler.sendMessageDelayed(PlayerHandler.SERVER_DIED, 2000);
+                mPlayerHandler.sendMessageDelayed(PlayerHandler.SERVER_DIED, 2000);
                 return true;
             default:
                 break;
@@ -351,28 +343,15 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         return false;
     }
 
-    public long duration() {
-        return getDuration();
-    }
-
-    public long position() {
-        return getCurrentPosition();
-    }
-
-    public long seek(long whereto) {
-        seekTo((int) whereto);
-        return whereto;
-    }
-
     public void setVolume(float vol) {
-        setVolume(vol, vol);
+        return;
     }
 
     private void MarkAsListenedIfNeeded() {
         if (mPlayerService == null)
             return;
 
-        IEpisode iepisode = mPlayerService.getCurrentItem();
+        IEpisode iepisode = getCurrentItem();
 
         FeedItem episode = null;
         if (iepisode instanceof FeedItem) {
@@ -468,8 +447,9 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
     }
 
     @Override
-    public void seekTo(int msec) throws IllegalStateException {
+    public long seekTo(long msec) throws IllegalStateException {
         mExoplayer.seekTo(msec);
+        return msec;
     }
 
     @Override
@@ -483,7 +463,11 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         mExoplayer.setPlaybackSpeed(speed);
     }
 
-    @Override
-    public void setVolume(float leftVolume, float rightVolume) {
+    public void startAndFadeIn() {
+        mPlayerHandler.sendEmptyMessageDelayed(PlayerHandler.FADEIN, 10);
+    }
+
+    public void FaceOutAndStop(int argDelayMs) {
+        mPlayerHandler.sendEmptyMessageDelayed(PlayerHandler.FADEOUT, argDelayMs);
     }
 }

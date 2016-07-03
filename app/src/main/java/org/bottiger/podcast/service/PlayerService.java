@@ -111,12 +111,8 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 	private static @PlayerService.NextTrack int nextTrack = NEXT_IN_PLAYLIST;
 
-	@NonNull private GenericMediaPlayerInterface mPlayer;
     private MediaControllerCompat mController;
     private PlayerStateManager mPlayerStateManager;
-
-    // Google Cast
-    private IMediaCast mMediaCast;
 
 
     private NotificationManager mNotificationManager;
@@ -133,7 +129,6 @@ public class PlayerService extends MediaBrowserServiceCompat implements
     private final String LOCK_NAME = "SoundWavesWifiLock";
     WifiManager.WifiLock wifiLock;
 
-    private PlayerHandler mPlayerHandler;
 
 	/**
 	 * Phone state listener. Will pause the playback when the phone is ringing
@@ -141,17 +136,10 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 	 */
 	private PhoneStateListener mPhoneStateListener;
 
-	public void startAndFadeIn() {
-        mPlayerHandler.sendEmptyMessageDelayed(PlayerHandler.FADEIN, 10);
-	}
-
-	public void FaceOutAndStop(int argDelayMs) {
-		mPlayerHandler.sendEmptyMessageDelayed(PlayerHandler.FADEOUT, argDelayMs);
-	}
-
     public GenericMediaPlayerInterface getPlayer() {
-        return mPlayer;
+        return SoundWaves.getAppContext(this).getPlayer();
     }
+
 	private static PlayerService sInstance = null;
 
 	@Nullable
@@ -170,8 +158,6 @@ public class PlayerService extends MediaBrowserServiceCompat implements
         wifiLock = ((WifiManager) getSystemService(Context.WIFI_SERVICE))
                 .createWifiLock(WifiManager.WIFI_MODE_FULL, LOCK_NAME);
 
-        mPlayerHandler = new PlayerHandler(this);
-
 		mPlayerStateManager = new PlayerStateManager(this);
 		try {
 			mController = new MediaControllerCompat(getApplicationContext(), mPlayerStateManager.getToken()); // .fromToken( mSession.getSessionToken() );
@@ -180,33 +166,6 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 		}
 
 		setSessionToken(mPlayerStateManager.getToken());
-		
-		mPlayer = SoundWaves.getAppContext(this).getPlayer();
-		mPlayer.setHandler(mPlayerHandler);
-		mPlayer.addListener(new ExoPlayerWrapper.Listener() {
-			@Override
-			public void onStateChanged(boolean playWhenReady, @ExoPlayerWrapper.PlayerState int playbackState) {
-				if (playbackState == ExoPlayerWrapper.STATE_READY) {
-					IEpisode episode = getCurrentItem();
-					if (episode != null) {
-						long duration = mPlayer.getDuration();
-						if (duration != ExoPlayer.UNKNOWN_TIME && episode.setDuration(duration)) {
-							SoundWaves.getAppContext(PlayerService.this).getLibraryInstance().updateEpisode(episode);
-						}
-					}
-				}
-			}
-
-			@Override
-			public void onError(Exception e) {
-
-			}
-
-			@Override
-			public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
-
-			}
-		});
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             mMediaSessionManager = (MediaSessionManager) getSystemService(MEDIA_SESSION_SERVICE);
@@ -253,8 +212,9 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 	public void onDestroy() {
 		sInstance = null;
         super.onDestroy();
-		if (mPlayer != null) {
-			mPlayer.release();
+		GenericMediaPlayerInterface player = getPlayer();
+		if (player != null) {
+			player.release();
 		}
 	}
 
@@ -332,10 +292,12 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 	}
 
 	public void play() {
-		if (mPlayer == null)
+		GenericMediaPlayerInterface player = getPlayer();
+
+		if (player == null)
 			return;
 
-		if (mPlayer.isPlaying())
+		if (player.isPlaying())
 			return;
 
         if (mItem == null)
@@ -354,22 +316,24 @@ public class PlayerService extends MediaBrowserServiceCompat implements
      */
 	public boolean play(@NonNull IEpisode argEpisode) {
 
+		GenericMediaPlayerInterface player = getPlayer();
+
 		// Pause the current episode in order to save the current state
-		if (mPlayer.isPlaying())
-			mPlayer.pause();
+		if (player.isPlaying())
+			player.pause();
 
 		IEpisode currentItem = getCurrentItem();
 
 		if (currentItem != null) {
-			if (argEpisode.equals(currentItem) && mPlayer.isInitialized()) {
-				if (!mPlayer.isPlaying()) {
+			if (argEpisode.equals(currentItem) && player.isInitialized()) {
+				if (!player.isPlaying()) {
 					start();
 				}
 				return true;
 			}
 
-			if (mPlayer.isPlaying()) {
-				currentItem.setOffset(getContentResolver(), mPlayer.position());
+			if (player.isPlaying()) {
+				currentItem.setOffset(getContentResolver(), player.getCurrentPosition());
 				stop();
 			}
 		}
@@ -396,14 +360,13 @@ public class PlayerService extends MediaBrowserServiceCompat implements
         boolean isFeedItem = currentItem instanceof FeedItem;
         final FeedItem feedItem = isFeedItem ? (FeedItem)currentItem : null;
 
-		String dataSource = getDataSourceUrl(currentItem);
-		long offset = getStartPosition(this, currentItem);
 		float speed = getPlaybackSpeed(this, currentItem);
 
 		SoundWaves.getAppContext(this).getPlaylist().setAsFrist(currentItem);
 
-		mPlayer.setPlaybackSpeed(speed);
-		mPlayer.setDataSourceAsync(dataSource, (int)offset);
+
+		getPlayer().setPlaybackSpeed(speed);
+		getPlayer().setDataSourceAsync(currentItem);
 
 		updateMetadata(currentItem);
 
@@ -429,7 +392,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 	public boolean toggle(@NonNull IEpisode argEpisode) {
 
 
-        if (mPlayer.isPlaying()) {
+        if (getPlayer().isPlaying()) {
             IEpisode item = getCurrentItem();
             if (argEpisode.equals(item)) {
                 pause();
@@ -462,35 +425,38 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 	}
 
 	private void start() {
-		if (!mPlayer.isPlaying()) {
+		if (!getPlayer().isPlaying()) {
 			if (mItem == null)
 				mItem = SoundWaves.getAppContext(this).getPlaylist().getItem(0);
 
 			if (mItem == null)
 				return;
 
-            takeWakelock(mPlayer.isSteaming());
+            takeWakelock(getPlayer().isSteaming());
 			SoundWaves.getAppContext(this).getPlaylist().setAsFrist(mItem);
-			mPlayer.start();
+			getPlayer().start();
 
 			notifyStatusChanged();
 		}
 	}
 
 	public void pause() {
-		if (!mPlayer.isPlaying()) {
+
+		GenericMediaPlayerInterface player = getPlayer();
+
+		if (!player.isPlaying()) {
 			return;
 		}
 
 		if ((mItem != null)) {
             if (mItem instanceof FeedItem) {
-                (mItem).setOffset(getContentResolver(), mPlayer.position());
+                (mItem).setOffset(getContentResolver(), player.getCurrentPosition());
             }
 		}
 
 		//dis_notifyStatus();
 
-		mPlayer.pause();
+		player.pause();
         releaseWakelock();
 
 		notifyStatusChanged();
@@ -498,7 +464,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 	public void stop() {
 		pause();
-		mPlayer.stop();
+		getPlayer().stop();
 		mItem = null;
 		dis_notifyStatus();
 	}
@@ -506,11 +472,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 	public void halt() {
         stopForeground(true);
         dis_notifyStatus();
-		mPlayer.stop();
-	}
-
-	public boolean isInitialized() {
-		return mPlayer.isInitialized();
+		getPlayer().stop();
 	}
 
 	public static boolean isPlaying() {
@@ -530,16 +492,15 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 		offset = offset < 0 ? 0 : offset;
 
 		mItem.setOffset(getContentResolver(), offset);
-		return mPlayer.seek(offset);
-
+		return getPlayer().seekTo(offset);
 	}
 
 	public long position() {
-		return mPlayer.position();
+		return getPlayer().getCurrentPosition();
 	}
 
 	public long duration() {
-		return mPlayer.duration();
+		return getPlayer().getCurrentPosition();
 	}
 
 	public IEpisode setCurrentItem(@Nullable IEpisode argEpisode) {
@@ -566,7 +527,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 	 * @return The ID of the next episode in the playlist
 	 */
     @Nullable
-	public IEpisode getNextId() {
+	public IEpisode getNext() {
 		IEpisode next = SoundWaves.getAppContext(this).getPlaylist().nextEpisode();
 		if (next != null)
 			return next;
@@ -606,8 +567,6 @@ public class PlayerService extends MediaBrowserServiceCompat implements
      * Remove wakelocks
      */
     public void releaseWakelock() {
-        //stopForeground(true);
-        //mPlayer.release();
 
         if (wifiLock.isHeld())
             wifiLock.release();
@@ -620,25 +579,6 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 	public PlayerStateManager getPlayerStateManager() {
 		return mPlayerStateManager;
-	}
-
-	private static String getDataSourceUrl(@NonNull IEpisode argEpisode) {
-		String dataSource = argEpisode.getURL();
-		boolean isFeedItem = argEpisode instanceof FeedItem;
-
-		try {
-			if (argEpisode.isDownloaded() && isFeedItem) {
-				FeedItem feedItem = (FeedItem) argEpisode;
-				String path = feedItem.getAbsolutePath();
-				File file = new File(path);
-				if (file.exists()) {
-					dataSource = path;
-				}
-			}
-		} catch (IOException ignored) {
-		}
-
-		return dataSource;
 	}
 
 	private static float getPlaybackSpeed(@NonNull Context argContext, @NonNull IEpisode argEpisode) {
@@ -656,18 +596,4 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 		return speed;
 	}
-
-	private static long getStartPosition(@NonNull Context argContext, @NonNull IEpisode argEpisode) {
-		long episodeOffset = argEpisode.getOffset();
-		long offset = Math.max(episodeOffset, 0);
-
-		ISubscription subscription = argEpisode.getSubscription(argContext);
-		if (subscription.doSkipIntro()) {
-			long startSkipAmount = PreferenceHelper.getLongPreferenceValue(argContext, R.string.pref_skip_intro_key, R.integer.skip_into_default);
-			offset = Math.max(offset, startSkipAmount);
-		}
-
-		return offset;
-	}
-
 }

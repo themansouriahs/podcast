@@ -17,7 +17,7 @@ import java.io.IOException;
  */
 public interface GenericMediaPlayerInterface {
 
-    void setDataSourceAsync(@NonNull String path, int startPos);
+    void setDataSourceAsync(@NonNull IEpisode argEpisode);
     @PlayerStatusObservable.PlayerStatus int getStatus();
     boolean isSteaming();
     boolean isInitialized();
@@ -35,10 +35,6 @@ public interface GenericMediaPlayerInterface {
 
     void pause();
 
-    long duration();
-    long position();
-
-    long seek(long whereto);
     void setVolume(float vol);
 
     boolean isCasting();
@@ -46,7 +42,9 @@ public interface GenericMediaPlayerInterface {
 
     void addListener(ExoPlayerWrapper.Listener listener);
     void removeListener(ExoPlayerWrapper.Listener listener);
-    void setHandler(PlayerHandler handler);
+
+    void startAndFadeIn();
+    void FaceOutAndStop(int argDelayMs);
 
 
     boolean doAutomaticGainControl();
@@ -63,11 +61,10 @@ public interface GenericMediaPlayerInterface {
     float getMinSpeedMultiplier();
     void prepare() throws IllegalStateException, IOException;
     void reset();
-    void seekTo(int msec) throws IllegalStateException;
+    long seekTo(long msec) throws IllegalStateException;
     void setAudioStreamType(int streamtype);
     void setDataSource(Context context, Uri uri) throws IllegalArgumentException, IllegalStateException, IOException;
     void setPlaybackSpeed(float f);
-    void setVolume(float leftVolume, float rightVolume);
 
     // For registering listeners
     interface OnBufferingUpdateListener {

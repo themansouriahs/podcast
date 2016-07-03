@@ -413,7 +413,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
 
         int minutes = 30;
         int onemin = 1000 * 60;
-        ps.FaceOutAndStop(onemin*minutes);
+        ps.getPlayer().FaceOutAndStop(onemin*minutes);
         String toast = getResources().getQuantityString(R.plurals.player_sleep, minutes, minutes);
         Toast.makeText(mContext, toast, Toast.LENGTH_LONG).show();
     }

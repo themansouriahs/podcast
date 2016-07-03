@@ -1,11 +1,22 @@
 package org.bottiger.podcast.flavors.MediaCast;
 
+import android.content.Context;
+import android.support.annotation.MenuRes;
+import android.support.annotation.NonNull;
+import android.view.Menu;
+
+import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 
 /**
  * Created by apl on 11-04-2015.
  */
 public interface IMediaCast {
+
+    //New
+    void setupMediaButton(@NonNull Context argContext, Menu menu, @MenuRes int argMenuResource);
+
+    // Old
 
     public void connect();
     public void disconnect();
