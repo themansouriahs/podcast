@@ -54,6 +54,7 @@ import com.google.android.exoplayer.util.DebugTextViewHelper;
 import com.google.android.exoplayer.util.PlayerControl;
 
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.player.SoundWavesPlayerBase;
 import org.bottiger.podcast.utils.rxbus.RxBusSimpleEvents;
 
 import java.io.IOException;
@@ -62,6 +63,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import static org.bottiger.podcast.player.SoundWavesPlayerBase.STATE_IDLE;
+import static org.bottiger.podcast.player.SoundWavesPlayerBase.STATE_PREPARING;
+import static org.bottiger.podcast.player.SoundWavesPlayerBase.TRACK_DISABLED;
 
 /**
  * A wrapper around {@link ExoPlayer} that provides a higher level interface. It can be prepared
@@ -100,7 +105,7 @@ public class ExoPlayerWrapper implements ExoPlayer.Listener, ChunkSampleSource.E
      * A listener for core events.
      */
     public interface Listener {
-        void onStateChanged(boolean playWhenReady, @PlayerState int playbackState);
+        void onStateChanged(boolean playWhenReady, @SoundWavesPlayerBase.PlayerState int playbackState);
         void onError(Exception e);
         void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees,
                                 float pixelWidthHeightRatio);
@@ -155,18 +160,6 @@ public class ExoPlayerWrapper implements ExoPlayer.Listener, ChunkSampleSource.E
     public interface Id3MetadataListener {
         void onId3Metadata(List<Id3Frame> id3Frames);
     }
-
-    // Constants pulled into this class for convenience.
-    @Retention(RetentionPolicy.SOURCE)
-    @IntDef({STATE_IDLE, STATE_PREPARING, STATE_BUFFERING, STATE_READY, STATE_ENDED, TRACK_DISABLED, TRACK_DEFAULT})
-    public @interface PlayerState {}
-    public static final int STATE_IDLE = ExoPlayer.STATE_IDLE;
-    public static final int STATE_PREPARING = ExoPlayer.STATE_PREPARING;
-    public static final int STATE_BUFFERING = ExoPlayer.STATE_BUFFERING;
-    public static final int STATE_READY = ExoPlayer.STATE_READY;
-    public static final int STATE_ENDED = ExoPlayer.STATE_ENDED;
-    public static final int TRACK_DISABLED = ExoPlayer.TRACK_DISABLED;
-    public static final int TRACK_DEFAULT = ExoPlayer.TRACK_DEFAULT;
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({RENDERER_COUNT, TYPE_VIDEO, TYPE_AUDIO, TYPE_TEXT, TYPE_METADATA})
@@ -452,7 +445,8 @@ public class ExoPlayerWrapper implements ExoPlayer.Listener, ChunkSampleSource.E
     }
 
     @SuppressWarnings("ResourceType")
-    public @PlayerState int getPlaybackState() {
+    public @SoundWavesPlayerBase.PlayerState
+    int getPlaybackState() {
         if (rendererBuildingState == RENDERER_BUILDING_STATE_BUILDING) {
             return STATE_PREPARING;
         }
@@ -681,7 +675,7 @@ public class ExoPlayerWrapper implements ExoPlayer.Listener, ChunkSampleSource.E
 
     private void maybeReportPlayerState() {
         boolean playWhenReady = player.getPlayWhenReady();
-        @PlayerState int playbackState = getPlaybackState();
+        @SoundWavesPlayerBase.PlayerState int playbackState = getPlaybackState();
         if (lastReportedPlayWhenReady != playWhenReady || lastReportedPlaybackState != playbackState) {
             for (Listener listener : listeners) {
                 listener.onStateChanged(playWhenReady, playbackState);

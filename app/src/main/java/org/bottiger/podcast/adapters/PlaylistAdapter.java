@@ -39,6 +39,8 @@ import java.net.URL;
 import java.util.Locale;
 import java.util.TreeSet;
 
+import static org.bottiger.podcast.player.SoundWavesPlayerBase.STATE_IDLE;
+
 public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> {
 
     private static final String TAG = "PlaylistAdapter";
@@ -172,7 +174,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         }
 
         viewHolder.mPlayPauseButton.setEpisode(item, PlayPauseImageView.PLAYLIST);
-        viewHolder.mPlayPauseButton.setStatus(ExoPlayerWrapper.STATE_IDLE);
+        viewHolder.mPlayPauseButton.setStatus(STATE_IDLE);
 
         viewHolder.downloadButton.setEpisode(item);
 

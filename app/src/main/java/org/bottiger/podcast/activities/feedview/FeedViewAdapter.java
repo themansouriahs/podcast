@@ -19,6 +19,7 @@ import org.bottiger.podcast.TopActivity;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.datastructures.EpisodeFilter;
 import org.bottiger.podcast.model.datastructures.EpisodeList;
+import org.bottiger.podcast.player.SoundWavesPlayerBase;
 import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
@@ -32,6 +33,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
+
+import static org.bottiger.podcast.player.SoundWavesPlayerBase.STATE_IDLE;
+import static org.bottiger.podcast.player.SoundWavesPlayerBase.STATE_READY;
 
 /**
  * Created by apl on 02-09-2014.
@@ -151,10 +155,10 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
             }
         });
 
-        @ExoPlayerWrapper.PlayerState int playerStatus = ExoPlayerWrapper.STATE_IDLE;
+        @SoundWavesPlayerBase.PlayerState int playerStatus = STATE_IDLE;
 
         if (mActivity.getPlayerHelper().isPlaying(item)) {
-            playerStatus = ExoPlayerWrapper.STATE_READY;
+            playerStatus = STATE_READY;
         }
 
         episodeViewHolder.mPlayPauseButton.setEpisode(item, PlayPauseImageView.FEEDVIEW);

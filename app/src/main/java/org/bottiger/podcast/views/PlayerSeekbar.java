@@ -26,11 +26,14 @@ import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.listeners.EpisodeStatus;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
+import org.bottiger.podcast.player.SoundWavesPlayerBase;
 import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.UIUtils;
+
+import static org.bottiger.podcast.player.SoundWavesPlayerBase.STATE_READY;
 
 /**
  * Created by apl on 03-09-2014.
@@ -415,12 +418,12 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener, ExoPlayer
     }
 
     @Override
-    public void onStateChanged(boolean playWhenReady, @ExoPlayerWrapper.PlayerState int playbackState) {
+    public void onStateChanged(boolean playWhenReady, @SoundWavesPlayerBase.PlayerState int playbackState) {
         if (!validateState()) {
             return;
         }
 
-        mIsPlaying = playWhenReady && playbackState == ExoPlayerWrapper.STATE_READY;
+        mIsPlaying = playWhenReady && playbackState == STATE_READY;
 
         long playbackPosition = SoundWaves.getAppContext(getContext()).getPlayer().getCurrentPosition();
 

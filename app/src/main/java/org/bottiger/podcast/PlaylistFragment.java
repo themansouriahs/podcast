@@ -97,6 +97,8 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
+import static org.bottiger.podcast.player.SoundWavesPlayerBase.STATE_READY;
+
 public class PlaylistFragment extends AbstractEpisodeFragment {
 
     private static final String TAG = "PlaylistFragment";
@@ -365,7 +367,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
         mPlayPauseButton.setEpisode(item, PlayPauseImageView.PLAYLIST);
         mPlayerDownloadButton.setEpisode(item);
 
-        mPlayPauseButton.setStatus(ExoPlayerWrapper.STATE_READY);
+        mPlayPauseButton.setStatus(STATE_READY);
 
         ISubscription iSubscription = item.getSubscription(getContext());
         if (mPlayer.isPlaying()) {

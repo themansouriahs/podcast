@@ -14,6 +14,8 @@ import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.views.PlayPauseImageView;
 
+import static org.bottiger.podcast.player.SoundWavesPlayerBase.STATE_IDLE;
+
 /**
  * Created by apl on 21-04-2015.
  */
@@ -62,7 +64,7 @@ public class FeedViewDiscoveryAdapter extends FeedViewAdapter {
             params.addRule(RelativeLayout.BELOW, 0);
         }
 
-        episodeViewHolder.mPlayPauseButton.setStatus(ExoPlayerWrapper.STATE_IDLE);
+        episodeViewHolder.mPlayPauseButton.setStatus(STATE_IDLE);
 
         getPalette(episodeViewHolder);
     }

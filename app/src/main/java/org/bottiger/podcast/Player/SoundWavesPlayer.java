@@ -83,8 +83,8 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
 
         addListener(new ExoPlayerWrapper.Listener() {
             @Override
-            public void onStateChanged(boolean playWhenReady, @ExoPlayerWrapper.PlayerState int playbackState) {
-                if (playbackState == ExoPlayerWrapper.STATE_READY) {
+            public void onStateChanged(boolean playWhenReady, @PlayerState int playbackState) {
+                if (playbackState == STATE_READY) {
                     IEpisode episode = getCurrentItem();
                     if (episode != null) {
                         long duration = getDuration();
