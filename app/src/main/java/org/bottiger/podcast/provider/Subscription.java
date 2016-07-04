@@ -511,7 +511,7 @@ public class Subscription extends BaseSubscription implements PaletteListener {
     }
 
     public void unsubscribe(@NonNull String argTag) {
-		VendorCrashReporter.report("Unsubscribe" , argTag);
+		VendorCrashReporter.report("Unsubscribe" , argTag + "title: " + title + " url: " + url);
         setStatus(STATUS_UNSUBSCRIBED, argTag);
     }
 

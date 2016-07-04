@@ -372,8 +372,10 @@ public class Library {
             if (argSubscription == null)
                 return;
 
-            mSubscriptionIdLUT.remove(argSubscription);
-            mSubscriptionUrlLUT.remove(argSubscription);
+            VendorCrashReporter.report("remove", argSubscription.getUrl());
+
+            mSubscriptionIdLUT.remove(argSubscription.getId());
+            mSubscriptionUrlLUT.remove(argSubscription.getUrl());
             mActiveSubscriptions.remove(argSubscription);
         } finally {
             mLock.unlock();
