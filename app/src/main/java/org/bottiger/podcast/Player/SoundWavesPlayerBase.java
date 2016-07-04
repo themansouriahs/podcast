@@ -89,21 +89,45 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
 
     public void setDataSourceAsync(@NonNull IEpisode argEpisode) {
         startPos = getStartPosition(mContext, argEpisode);
-        mStatus = PlayerStatusObservable.PREPARING;
-        mPlayerStateManager.updateState(PlaybackStateCompat.STATE_CONNECTING, startPos, getCurrentSpeedMultiplier());
+        //mStatus = PlayerStatusObservable.PREPARING;
+        //mPlayerStateManager.updateState(PlaybackStateCompat.STATE_CONNECTING, startPos, getCurrentSpeedMultiplier());
+        setState(PlayerStatusObservable.PREPARING);
     }
 
     public void start() {
-        mStatus = PlayerStatusObservable.PLAYING;
-        mPlayerStateManager.updateState(PlaybackStateCompat.STATE_PLAYING, getCurrentPosition(), getCurrentSpeedMultiplier());
-        mPlayerService.notifyStatusChanged();
+        //mStatus = PlayerStatusObservable.PLAYING;
+        //mPlayerStateManager.updateState(PlaybackStateCompat.STATE_PLAYING, getCurrentPosition(), getCurrentSpeedMultiplier());
+        //mPlayerService.notifyStatusChanged();
+        setState(PlayerStatusObservable.PLAYING);
     }
 
     public void stop() {
-        mStatus = PlayerStatusObservable.STOPPED;
-        mPlayerStateManager.updateState(PlaybackStateCompat.STATE_STOPPED, getCurrentPosition(), getCurrentSpeedMultiplier());
+        //mStatus = PlayerStatusObservable.STOPPED;
+        //mPlayerStateManager.updateState(PlaybackStateCompat.STATE_STOPPED, getCurrentPosition(), getCurrentSpeedMultiplier());
         mIsInitialized = false;
         mPlayerService.stopForeground(true);
+        //mPlayerService.notifyStatusChanged();
+        setState(PlayerStatusObservable.STOPPED);
+    }
+
+    protected void setState(@PlayerStatusObservable.PlayerStatus int argState) {
+
+        mStatus = argState;
+        switch (argState) {
+            case PlayerStatusObservable.PAUSED:
+                mPlayerStateManager.updateState(PlaybackStateCompat.STATE_PAUSED, getCurrentPosition(), getCurrentSpeedMultiplier());
+                break;
+            case PlayerStatusObservable.PLAYING:
+                mPlayerStateManager.updateState(PlaybackStateCompat.STATE_PLAYING, getCurrentPosition(), getCurrentSpeedMultiplier());
+                break;
+            case PlayerStatusObservable.PREPARING:
+                mPlayerStateManager.updateState(PlaybackStateCompat.STATE_CONNECTING, startPos, getCurrentSpeedMultiplier());
+                break;
+            case PlayerStatusObservable.STOPPED:
+                mPlayerStateManager.updateState(PlaybackStateCompat.STATE_STOPPED, getCurrentPosition(), getCurrentSpeedMultiplier());
+                break;
+        }
+
         mPlayerService.notifyStatusChanged();
     }
 

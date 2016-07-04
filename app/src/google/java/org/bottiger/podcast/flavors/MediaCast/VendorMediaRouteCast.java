@@ -148,7 +148,13 @@ public class VendorMediaRouteCast extends GoogleCastPlayer {
 
     private void setClient() {
         mRemoteMediaClient = mCastSession.getRemoteMediaClient();
+        mRemoteMediaClient.addListener(getRemoteMediaClientListener());
         SoundWaves.getAppContext(mActivity).setPlayer(this);
+
+        IEpisode episode = SoundWaves.getAppContext(mActivity).getPlaylist().first();
+        if (episode != null) {
+            setDataSourceAsync(episode);
+        }
     }
 
     private void unsetClient() {

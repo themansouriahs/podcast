@@ -24,14 +24,29 @@ import org.bottiger.podcast.utils.PlaybackSpeed;
 
 import java.io.IOException;
 
+import static com.google.android.gms.cast.MediaStatus.PLAYER_STATE_BUFFERING;
+import static com.google.android.gms.cast.MediaStatus.PLAYER_STATE_IDLE;
+import static com.google.android.gms.cast.MediaStatus.PLAYER_STATE_PAUSED;
+import static com.google.android.gms.cast.MediaStatus.PLAYER_STATE_PLAYING;
+import static com.google.android.gms.cast.MediaStatus.PLAYER_STATE_UNKNOWN;
+
 /**
  * Created by aplb on 28-06-2016.
  */
 
 public abstract class GoogleCastPlayer extends SoundWavesPlayerBase {
 
+    @NonNull
+    private RemoteMediaClient.Listener mClientListener;
+
     public GoogleCastPlayer(@NonNull Context argContext) {
         super(argContext);
+        mClientListener = getRemoteClientListener();
+    }
+
+    @NonNull
+    protected RemoteMediaClient.Listener getRemoteMediaClientListener() {
+        return mClientListener;
     }
 
     @Nullable
@@ -222,6 +237,59 @@ public abstract class GoogleCastPlayer extends SoundWavesPlayerBase {
     @Override
     public boolean isPlaying() {
         return false;
+    }
+
+    private RemoteMediaClient.Listener getRemoteClientListener() {
+        return new RemoteMediaClient.Listener() {
+            @Override
+            public void onStatusUpdated() {
+                RemoteMediaClient client = getRemoteMediaClient();
+                int state = client.getPlayerState();
+
+                switch (state) {
+                    case PLAYER_STATE_UNKNOWN: {
+                        setState(PlayerStatusObservable.STOPPED);
+                        break;
+                    }
+                    case PLAYER_STATE_IDLE: {
+                        setState(PlayerStatusObservable.PAUSED);
+                        break;
+                    }
+                    case PLAYER_STATE_BUFFERING: {
+                        setState(PlayerStatusObservable.PREPARING);
+                        break;
+                    }
+                    case PLAYER_STATE_PAUSED: {
+                        setState(PlayerStatusObservable.PAUSED);
+                        break;
+                    }
+                    case PLAYER_STATE_PLAYING: {
+                        setState(PlayerStatusObservable.PLAYING);
+                        break;
+                    }
+                }
+            }
+
+            @Override
+            public void onMetadataUpdated() {
+
+            }
+
+            @Override
+            public void onQueueStatusUpdated() {
+
+            }
+
+            @Override
+            public void onPreloadStatusUpdated() {
+
+            }
+
+            @Override
+            public void onSendingRemoteMediaRequest() {
+
+            }
+        };
     }
 
 }
