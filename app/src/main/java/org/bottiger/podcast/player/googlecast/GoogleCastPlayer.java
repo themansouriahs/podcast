@@ -5,10 +5,15 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.util.Log;
 
 import com.google.android.gms.cast.MediaInfo;
 import com.google.android.gms.cast.MediaMetadata;
 import com.google.android.gms.cast.framework.media.RemoteMediaClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResolvingResultCallbacks;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.common.images.WebImage;
 
 import org.bottiger.podcast.SoundWaves;
@@ -17,12 +22,14 @@ import org.bottiger.podcast.flavors.MediaCast.IMediaRouteStateListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.player.Player;
 import org.bottiger.podcast.player.SoundWavesPlayerBase;
+import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.PlaybackSpeed;
 
 import java.io.IOException;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.google.android.gms.cast.MediaStatus.PLAYER_STATE_BUFFERING;
 import static com.google.android.gms.cast.MediaStatus.PLAYER_STATE_IDLE;
@@ -36,17 +43,32 @@ import static com.google.android.gms.cast.MediaStatus.PLAYER_STATE_UNKNOWN;
 
 public abstract class GoogleCastPlayer extends SoundWavesPlayerBase {
 
+    private static final String TAG = GoogleCastPlayer.class.getSimpleName();
+
     @NonNull
     private RemoteMediaClient.Listener mClientListener;
+
+    private final CopyOnWriteArrayList<ExoPlayerWrapper.Listener> listeners;
 
     public GoogleCastPlayer(@NonNull Context argContext) {
         super(argContext);
         mClientListener = getRemoteClientListener();
+        listeners = new CopyOnWriteArrayList<>();
     }
 
     @NonNull
     protected RemoteMediaClient.Listener getRemoteMediaClientListener() {
         return mClientListener;
+    }
+
+    @Override
+    public void addListener(ExoPlayerWrapper.Listener listener) {
+        listeners.add(listener);
+    }
+
+    @Override
+    public void removeListener(ExoPlayerWrapper.Listener listener) {
+        listeners.remove(listener);
     }
 
     @Nullable
@@ -218,7 +240,15 @@ public abstract class GoogleCastPlayer extends SoundWavesPlayerBase {
         if (!isCasting())
             return;
 
-        getRemoteMediaClient().play();
+        PendingResult<RemoteMediaClient.MediaChannelResult> result = getRemoteMediaClient().play();
+
+        result.setResultCallback(new ResultCallback<RemoteMediaClient.MediaChannelResult>() {
+            @Override
+            public void onResult(@NonNull RemoteMediaClient.MediaChannelResult mediaChannelResult) {
+                Log.w(TAG, "" + mediaChannelResult);
+                notifyListeners(STATE_READY);
+            }
+        });
     }
 
     @Override
@@ -236,7 +266,16 @@ public abstract class GoogleCastPlayer extends SoundWavesPlayerBase {
 
     @Override
     public boolean isPlaying() {
-        return false;
+        if (!isCasting())
+            return false;
+
+        return getRemoteMediaClient().isPlaying();
+    }
+
+    private void notifyListeners(@SoundWavesPlayerBase.PlayerState int playbackState) {
+        for (int i = 0; i < listeners.size(); i++) {
+            listeners.get(i).onStateChanged(true, playbackState);
+        }
     }
 
     private RemoteMediaClient.Listener getRemoteClientListener() {
@@ -246,6 +285,8 @@ public abstract class GoogleCastPlayer extends SoundWavesPlayerBase {
                 RemoteMediaClient client = getRemoteMediaClient();
                 int state = client.getPlayerState();
 
+                @SoundWavesPlayerBase.PlayerState int playbackState = PLAYER_STATE_UNKNOWN;
+
                 switch (state) {
                     case PLAYER_STATE_UNKNOWN: {
                         setState(PlayerStatusObservable.STOPPED);
@@ -253,21 +294,27 @@ public abstract class GoogleCastPlayer extends SoundWavesPlayerBase {
                     }
                     case PLAYER_STATE_IDLE: {
                         setState(PlayerStatusObservable.PAUSED);
+                        playbackState = STATE_IDLE;
                         break;
                     }
                     case PLAYER_STATE_BUFFERING: {
                         setState(PlayerStatusObservable.PREPARING);
+                        playbackState = STATE_BUFFERING;
                         break;
                     }
                     case PLAYER_STATE_PAUSED: {
                         setState(PlayerStatusObservable.PAUSED);
+                        playbackState = STATE_ENDED;
                         break;
                     }
                     case PLAYER_STATE_PLAYING: {
                         setState(PlayerStatusObservable.PLAYING);
+                        playbackState = STATE_READY;
                         break;
                     }
                 }
+
+                notifyListeners(playbackState);
             }
 
             @Override

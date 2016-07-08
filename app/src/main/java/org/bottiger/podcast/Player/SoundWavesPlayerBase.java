@@ -89,24 +89,16 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
 
     public void setDataSourceAsync(@NonNull IEpisode argEpisode) {
         startPos = getStartPosition(mContext, argEpisode);
-        //mStatus = PlayerStatusObservable.PREPARING;
-        //mPlayerStateManager.updateState(PlaybackStateCompat.STATE_CONNECTING, startPos, getCurrentSpeedMultiplier());
         setState(PlayerStatusObservable.PREPARING);
     }
 
     public void start() {
-        //mStatus = PlayerStatusObservable.PLAYING;
-        //mPlayerStateManager.updateState(PlaybackStateCompat.STATE_PLAYING, getCurrentPosition(), getCurrentSpeedMultiplier());
-        //mPlayerService.notifyStatusChanged();
         setState(PlayerStatusObservable.PLAYING);
     }
 
     public void stop() {
-        //mStatus = PlayerStatusObservable.STOPPED;
-        //mPlayerStateManager.updateState(PlaybackStateCompat.STATE_STOPPED, getCurrentPosition(), getCurrentSpeedMultiplier());
         mIsInitialized = false;
         mPlayerService.stopForeground(true);
-        //mPlayerService.notifyStatusChanged();
         setState(PlayerStatusObservable.STOPPED);
     }
 
@@ -191,11 +183,8 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
         return false;
     }
 
-    public void addListener(ExoPlayerWrapper.Listener listener) {
-    }
-
-    public void removeListener(ExoPlayerWrapper.Listener listener) {
-    }
+    public abstract void addListener(ExoPlayerWrapper.Listener listener);
+    public abstract void removeListener(ExoPlayerWrapper.Listener listener);
 
     @Override
     public void setOnErrorListener(final OnErrorListener listener) {

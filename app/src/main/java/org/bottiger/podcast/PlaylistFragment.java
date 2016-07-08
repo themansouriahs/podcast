@@ -2,6 +2,7 @@ package org.bottiger.podcast;
 
 import org.bottiger.podcast.adapters.PlaylistAdapter;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.listeners.NewPlayerEvent;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.model.events.EpisodeChanged;
 import org.bottiger.podcast.player.GenericMediaPlayerInterface;
@@ -146,6 +147,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
 
     private Subscription mRxPlaylistSubscription;
     private Subscription mRxTopEpisodeChanged;
+    private Subscription mRxPlayerChanged;
 
     private NestedScrollingChildHelper scrollingChildHelper;
 
@@ -158,8 +160,8 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
         SoundWaves soundwaves = SoundWaves.getAppContext(getContext());
 
         mRxPlaylistSubscription = getPlaylistChangedSubscription();
+        mRxPlayerChanged = getPlayerSubscription();
 
-        mPlayer = soundwaves.getPlayer();
         mPlaylist = soundwaves.getPlaylist();
         //soundwaves.getLibraryInstance().loadPlaylist(mPlaylist);
 
@@ -169,15 +171,22 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        if (mRxPlayerChanged != null && !mRxPlayerChanged.isUnsubscribed()) {
+            mRxPlayerChanged.unsubscribe();
+        }
+
+        if (mRxPlaylistSubscription != null && !mRxPlaylistSubscription.isUnsubscribed()) {
+            mRxPlaylistSubscription.unsubscribe();
+        }
+
+        if (mRxTopEpisodeChanged != null && !mRxTopEpisodeChanged.isUnsubscribed()) {
+            mRxTopEpisodeChanged.unsubscribe();
+        }
     }
 
     @Override
     public void onDestroyView() {
-        if (mPlayer != null) {
-            mPlayer.removeListener(mPlayerSeekbar);
-            mPlayer.removeListener(mCurrentTime);
-            mPlayer.removeListener(mPlayPauseButton);
-        }
+        unsetPlayer();
         super.onDestroyView();
     }
 
@@ -222,6 +231,8 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
         mRecyclerView = (RecyclerView) view.findViewById(R.id.my_recycler_view);
         mOverlay = view.findViewById(R.id.playlist_overlay);
 
+        setPlayer();
+
         // use a linear layout manager
         mLayoutManager = new CustomLinearLayoutManager(mContext);
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -232,10 +243,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
 
         scrollingChildHelper = new NestedScrollingChildHelper(mPlaylistFragmentContainer);
         scrollingChildHelper.setNestedScrollingEnabled(true);
-
-        mPlayer.addListener(mPlayerSeekbar);
-        mPlayer.addListener(mCurrentTime);
-        mPlayer.addListener(mPlayPauseButton);
 
         mPlaylist = SoundWaves.getAppContext(getContext()).getPlaylist();
         setPlaylistViewState(mPlaylist);
@@ -534,6 +541,24 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
         mAdapter.notifyDataSetChanged();
     }
 
+    private void setPlayer() {
+        unsetPlayer();
+
+        mPlayer = SoundWaves.getAppContext(getContext()).getPlayer();
+
+        mPlayer.addListener(mPlayerSeekbar);
+        mPlayer.addListener(mCurrentTime);
+        mPlayer.addListener(mPlayPauseButton);
+    }
+
+    private void unsetPlayer() {
+        if (mPlayer != null) {
+            mPlayer.removeListener(mPlayerSeekbar);
+            mPlayer.removeListener(mCurrentTime);
+            mPlayer.removeListener(mPlayPauseButton);
+        }
+    }
+
     private void bindHeaderWrapper(@Nullable Playlist argPlaylist) {
 
         if (argPlaylist != null && !argPlaylist.isEmpty()) {
@@ -561,6 +586,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
         return SoundWaves
                 .getRxBus()
                 .toObserverable()
+                .onBackpressureLatest()
                 .observeOn(AndroidSchedulers.mainThread())
                 .ofType(Playlist.class)
                 .subscribe(new Action1<Playlist>() {
@@ -574,6 +600,29 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
                     @Override
                     public void call(Throwable throwable) {
                         Log.d(TAG, "ERROR: notifyPlaylistChanged: mRxPlaylistSubscription event recieved");
+                        VendorCrashReporter.report("subscribeError" , throwable.toString());
+                        Log.d(TAG, "error: " + throwable.toString());
+                    }
+                });
+    }
+
+    private Subscription getPlayerSubscription() {
+        return SoundWaves
+                .getRxBus()
+                .toObserverable()
+                .onBackpressureLatest()
+                .observeOn(AndroidSchedulers.mainThread())
+                .ofType(NewPlayerEvent.class)
+                .subscribe(new Action1<NewPlayerEvent>() {
+                    @Override
+                    public void call(NewPlayerEvent playlistChanged) {
+                        Log.d(TAG, "NewPlayerEvent: NewPlayerEvent event recieved");
+                        setPlayer();
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        Log.d(TAG, "ERROR: NewPlayerEvent: mRxPlaylistSubscription event recieved");
                         VendorCrashReporter.report("subscribeError" , throwable.toString());
                         Log.d(TAG, "error: " + throwable.toString());
                     }

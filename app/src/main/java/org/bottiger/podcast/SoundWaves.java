@@ -16,6 +16,7 @@ import android.util.Log;
 
 import org.bottiger.podcast.cloud.EventLogger;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.listeners.NewPlayerEvent;
 import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.player.GenericMediaPlayerInterface;
 import org.bottiger.podcast.player.SoundWavesPlayer;
@@ -235,6 +236,9 @@ public class SoundWaves extends MultiDexApplication {
     public void setPlayer(@NonNull GenericMediaPlayerInterface argPlayer) {
         mPlayer = argPlayer;
         mPlayer.setPlayerService(PlayerService.getInstance());
+
+        NewPlayerEvent event = new NewPlayerEvent();
+        getRxBus().send(event);
     }
 
     @NonNull
