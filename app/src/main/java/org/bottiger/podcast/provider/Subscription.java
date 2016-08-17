@@ -523,8 +523,10 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 
 		if (status == STATUS_SUBSCRIBED)
 			notifyPropertyChanged(SubscriptionChanged.SUBSCRIBED, argTag);
-		else
+		else {
+			VendorCrashReporter.report("setstatus", argTag);
 			notifyPropertyChanged(argTag);
+		}
 	}
 
 	public int getSettings() {

@@ -47,6 +47,8 @@ import java.lang.annotation.RetentionPolicy;
  */
 public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterface {
 
+    private static final String TAG = SoundWavesPlayerBase.class.getSimpleName();
+
     // Constants pulled into this class for convenience.
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({STATE_IDLE, STATE_PREPARING, STATE_BUFFERING, STATE_READY, STATE_ENDED, TRACK_DISABLED, TRACK_DEFAULT})
@@ -188,14 +190,17 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
 
     @Override
     public void setOnErrorListener(final OnErrorListener listener) {
+        Log.d(TAG, "setOnErrorListener");
     }
 
     @Override
     public void setOnCompletionListener(final OnCompletionListener listener) {
+        Log.d(TAG, "setOnCompletionListener");
     }
 
     @Override
     public void setOnBufferingUpdateListener(final OnBufferingUpdateListener listener) {
+        Log.d(TAG, "setOnBufferingUpdateListener");
     }
 
 
@@ -211,10 +216,6 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
     }
 
     public void setRemoveSilence(boolean argDoRemoveSilence) {
-    }
-
-    private void fail() throws AssertionError {
-        throw new AssertionError("This should never happen");
     }
 
     protected void trackEventPlay() {

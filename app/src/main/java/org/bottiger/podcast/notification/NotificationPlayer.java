@@ -201,6 +201,10 @@ public class NotificationPlayer extends BroadcastReceiver {
         showNotification(PlayerService.isPlaying());
     }
 
+    public boolean isShowing() {
+        return mStarted;
+    }
+
 	public IEpisode getItem() {
 		return item;
 	}
@@ -341,8 +345,8 @@ public class NotificationPlayer extends BroadcastReceiver {
 
     private void showNotification(final boolean isPlaying) {
         String url = item.getArtwork(mPlayerService);
-        if (TextUtils.isEmpty(url)) {
 
+        if (TextUtils.isEmpty(url)) {
             // NOTIFICATION_PLAYER_ID allows you to update the notification later on.
             displayNotification(isPlaying, null);
         } else {
@@ -387,7 +391,9 @@ public class NotificationPlayer extends BroadcastReceiver {
         filter.addAction(NotificationPlayer.fastForwardAction);
         mPlayerService.registerReceiver(this, filter);
 
-        mPlayerService.startForeground(getNotificationId(), mNotification);
+        if (isPlaying) {
+            mPlayerService.startForeground(getNotificationId(), mNotification);
+        }
         mNotificationManager.notify(NOTIFICATION_PLAYER_ID, mNotification);
 
         mStarted = true;

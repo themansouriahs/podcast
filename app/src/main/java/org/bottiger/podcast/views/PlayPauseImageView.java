@@ -460,7 +460,7 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
         if (mEpisode.getUrl() == null)
             return;
 
-        boolean isPlaying = ps.isPlaying() && mEpisode.equals(ps.getCurrentItem());
+        boolean isPlaying = PlayerService.isPlaying() && mEpisode.equals(ps.getCurrentItem());
 
         if (isPlaying) {
             animateChangeFrom(PlayPauseDrawable.IS_PLAYING);

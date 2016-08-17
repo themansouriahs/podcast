@@ -56,7 +56,7 @@ public class TextViewObserver extends Chronometer implements ExoPlayerWrapper.Li
 
         long base = elapsedRealtime() - mEpisode.getOffset();
         setBase(base);
-        boolean isPlaying = playbackState == SoundWavesPlayerBase.STATE_READY;
+        boolean isPlaying = playbackState == SoundWavesPlayerBase.STATE_READY && playWhenReady;
         if (isPlaying && !mIsTicking) {
             start();
         } else if (!isPlaying && mIsTicking) {

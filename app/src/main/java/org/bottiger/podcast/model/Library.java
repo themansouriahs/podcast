@@ -481,9 +481,6 @@ public class Library {
      * @return
      */
     private String getAllSubscriptions() {
-        // SELECT *, (SELECT count(item._id) FROM item WHERE item.subs_id == subscriptions._id
-        // AND item.pub_date>1445210057385) AS new_episodes FROM subscriptions
-
         long thresholdTimestamp = episodeNewThreshold();
 
         StringBuilder builder = new StringBuilder(200);

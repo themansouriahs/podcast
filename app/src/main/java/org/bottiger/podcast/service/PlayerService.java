@@ -197,7 +197,8 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 		} else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
 			mAudioManager.abandonAudioFocus(this);
 			// Stop playback
-			stop();
+			//stop();
+			pause();
 		}
 	}
 
@@ -268,8 +269,10 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 				}
 
 			mItem = argItem;
-			mNotificationPlayer.setPlayerService(this);
-			mNotificationPlayer.show(argItem);
+			if (mNotificationPlayer.isShowing() || isPlaying()) {
+				mNotificationPlayer.setPlayerService(this);
+				mNotificationPlayer.show(argItem);
+			}
 		}
     }
 
@@ -364,7 +367,6 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 		SoundWaves.getAppContext(this).getPlaylist().setAsFrist(currentItem);
 
-
 		getPlayer().setPlaybackSpeed(speed);
 		getPlayer().setDataSourceAsync(currentItem);
 
@@ -442,6 +444,8 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 	public void pause() {
 
+		stopForeground(false);
+
 		GenericMediaPlayerInterface player = getPlayer();
 
 		if (!player.isPlaying()) {
@@ -470,9 +474,8 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 	}
 
 	public void halt() {
-        stopForeground(true);
         dis_notifyStatus();
-		getPlayer().stop();
+		getPlayer().pause();
 	}
 
 	public static boolean isPlaying() {

@@ -160,11 +160,11 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         setOnBufferingUpdateListener(bufferListener);
         setOnErrorListener(errorListener);
 
-        mIsInitialized = true;
-
         seekTo(startPos);
 
         prepare();
+
+        mIsInitialized = true;
 
         IEpisode episode = getCurrentItem();
         if (episode != null) {
@@ -206,6 +206,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
     public void release() {
         super.release();
         mExoplayer.release();
+        mIsInitialized = false;
     }
 
     @Override
