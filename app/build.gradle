@@ -196,4 +196,6 @@ dependencies {
 
     // google cast
 
+    compile project(path: ':WebPlayer', configuration: 'android-endpoints')
+
 }
