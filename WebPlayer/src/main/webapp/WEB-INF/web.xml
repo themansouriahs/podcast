@@ -23,7 +23,16 @@
         <url-pattern>/_ah/spi/*</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>auth</servlet-name>
+        <servlet-class>org.bottiger.podcast.web.AuthServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>auth</servlet-name>
+        <url-pattern>/auth</url-pattern>
+    </servlet-mapping>
+
     <welcome-file-list>
-        <welcome-file>index.html</welcome-file>
+        <welcome-file>qr.html</welcome-file>
     </welcome-file-list>
 </web-app>
