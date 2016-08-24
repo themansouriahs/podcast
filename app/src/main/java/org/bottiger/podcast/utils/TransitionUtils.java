@@ -1,8 +1,11 @@
 package org.bottiger.podcast.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+
+import com.google.zxing.integration.android.IntentIntegrator;
 
 import org.bottiger.podcast.SettingsActivity;
 import org.bottiger.podcast.activities.downloadmanager.DownloadManagerActivity;
@@ -23,6 +26,10 @@ public class TransitionUtils {
     private static void startActivityWrapper(Context argContext, Class<?> cls) {
         Intent intent = new Intent(argContext, cls);
         argContext.startActivity(intent);
+    }
+
+    public static void openWebPlayerAuthenticator(@NonNull Activity argActivity) {
+        new IntentIntegrator(argActivity).initiateScan(); // `this` is the current Activity
     }
 
 }

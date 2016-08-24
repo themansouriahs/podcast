@@ -216,6 +216,7 @@
     <string name="subscription_instruction_title">You are not subscribed to any podcasts</string>
     <string name="dialog_playback_boost_volume">Boost volume</string>
     <string name="dialog_playback_removile_silence">Remove silence</string>
+    <string name="menu_web_player">Web Player</string>
 
     <plurals name="player_sleep">
         <item quantity="one">Player will sleep in %d minute</item>

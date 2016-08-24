@@ -13,7 +13,12 @@ function checkForChange() {					// before probing for any page change,
 		if ( syncQuery.readyState == 4 ) {
 			if ( syncQuery.status == 200 ) {
 				newSync = syncQuery.responseText;
-				document.location.href = "/player.jsp"
+				var docLoc = ""
+				if (newSync > 0) {
+				    docLoc = "#t=" + newSync
+				}
+
+				document.location.href = "/player" + docLoc
 				//if (typeof lastSync !== 'undefined' && lastSync != newSync)
 				//	document.location.href = document.location.pathname.substring(location.pathname.lastIndexOf("/") + 1);
 				//else

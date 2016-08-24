@@ -15,8 +15,13 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
+
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 
 import org.bottiger.podcast.debug.SqliteCopy;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.service.syncadapter.CloudSyncUtils;
@@ -24,6 +29,7 @@ import org.bottiger.podcast.utils.PreferenceHelper;
 import org.bottiger.podcast.utils.TransitionUtils;
 import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.views.dialogs.DialogAddPodcast;
+import org.bottiger.podcast.webservices.datastore.webplayer.WebPlayerAuthenticator;
 
 import java.io.IOException;
 
@@ -172,8 +178,29 @@ public class MainActivity extends FragmentContainerActivity {
 				TransitionUtils.openSettings(this);
 				return true;
 			}
+			case R.id.menu_web_player: {
+				TransitionUtils.openWebPlayerAuthenticator(this);
+				return true;
+			}
 		}
 
 		return super.onOptionsItemSelected(item);
+	}
+
+	// Get the results:
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+		if(result != null) {
+			if(result.getContents() == null) {
+				Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show();
+			} else {
+				Toast.makeText(this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
+				IEpisode episode = SoundWaves.getAppContext(this).getPlaylist().getItem(0);
+				WebPlayerAuthenticator.authenticate(result.getContents(), this, episode);
+			}
+		} else {
+			super.onActivityResult(requestCode, resultCode, data);
+		}
 	}
 }
