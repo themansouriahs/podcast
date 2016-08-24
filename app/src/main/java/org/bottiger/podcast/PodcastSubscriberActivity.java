@@ -5,6 +5,8 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.bottiger.podcast.activities.feedview.FeedActivity;
@@ -35,7 +37,7 @@ public class PodcastSubscriberActivity extends Activity {
                 url = new URL(urlstr);
             } else {
                 Uri data = intent.getData();
-                url = new URL(data.toString());
+                url = parseUri(data);
             }
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -77,6 +79,32 @@ public class PodcastSubscriberActivity extends Activity {
         mProgress.setMessage(getString(R.string.discovery_progress_loading_podcast_content));
         mProgress.show();
         SoundWaves.getAppContext(this).getRefreshManager().refresh(subscription, mRefreshCompleteCallback);
+    }
+
+    private static URL parseUri(@NonNull Uri argUri) throws MalformedURLException {
+        String scheme = argUri.getScheme();
+
+        String url = argUri.toString();
+
+        switch (scheme) {
+            case "http":
+            case "https": {
+                break;
+            }
+            case "pcast": {
+                // We support http only
+                url = argUri.toString().replace("pcast:", "http://");
+                break;
+            }
+            case "soundwaves": {
+                // We support http only
+                url = argUri.toString().replace("soundwaves://subscribe/", "http://");
+                url = url.replace("soundwaves://", "http://");
+                break;
+            }
+        }
+
+        return new URL(url);
     }
 
 
