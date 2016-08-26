@@ -35,8 +35,8 @@ import static org.bottiger.podcast.web.OfyService.ofy;
         name = "messaging",
         version = "v1",
         namespace = @ApiNamespace(
-                ownerDomain = "web.podcast.bottiger.org",
-                ownerName = "web.podcast.bottiger.org",
+                ownerDomain = "web.soundwavesapp.com",
+                ownerName = "web.soundwavesapp.com",
                 packagePath = ""
         )
 )

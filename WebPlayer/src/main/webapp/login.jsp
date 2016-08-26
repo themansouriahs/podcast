@@ -2,12 +2,22 @@
 <%@ page import="org.bottiger.podcast.web.QRModel" %>
 <html>
 <head>
+<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 <script type="text/javascript" src="/js/auth_checker.js"></script>
+    <style>
+      body {
+        font-family: 'Roboto', sans-serif;
+        font-size: 28px;
+      }
+    </style>
+
 </head>
-<body>
+<body style="margin: 0px;">
 <center>
-<h1>Use SoundWaves to scan the QR code</h1>
-<img src="<%= QRModel.getQRUrl(session) %>" />
+<h1 style="margin-top: 20px;">Use SoundWaves to scan the QR code</h1>
+<div style="background: #cc0000; padding: 40px;">
+<img src="<%= QRModel.getQRUrl(session) %>" style="border-radius: 25px;" />
+</div>
 </center>
 <%
 String cookieName = "username";
