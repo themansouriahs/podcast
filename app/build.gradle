@@ -195,6 +195,7 @@ dependencies {
     // analytics
     googleCompile 'com.google.android.gms:play-services-cast:9.4.0'
     googleCompile 'com.google.android.gms:play-services-cast-framework:9.4.0'
+    googleCompile 'com.google.firebase:firebase-messaging:9.4.0'
 
     // google cast
 

@@ -5,7 +5,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.common.WebPlayerShared;
+import org.bottiger.podcast.flavors.MessagingService.InstanceIDService;
 import org.bottiger.podcast.provider.IEpisode;
 
 import java.io.IOException;
@@ -19,19 +20,21 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static org.bottiger.podcast.common.WebPlayerShared.EPISODE_DESCRIPTION;
+import static org.bottiger.podcast.common.WebPlayerShared.EPISODE_POSITION;
+import static org.bottiger.podcast.common.WebPlayerShared.EPISODE_SUBTITLE;
+import static org.bottiger.podcast.common.WebPlayerShared.EPISODE_TITLE;
+import static org.bottiger.podcast.common.WebPlayerShared.EPISODE_URL;
+import static org.bottiger.podcast.common.WebPlayerShared.EPISODE_WEBSITE;
+import static org.bottiger.podcast.common.WebPlayerShared.EPISODE_cover;
+import static org.bottiger.podcast.common.WebPlayerShared.PHONE_ID;
+import static org.bottiger.podcast.common.WebPlayerShared.WEB_URL;
+
 /**
  * Created by aplb on 20-08-2016.
  */
 
 public class WebPlayerAuthenticator {
-
-    public static final String EPISODE_URL = "episode_url";
-    public static final String EPISODE_cover = "episode_cover";
-    public static final String EPISODE_TITLE = "episode_title";
-    public static final String EPISODE_SUBTITLE = "episode_subtitle";
-    public static final String EPISODE_WEBSITE = "episode_website";
-    public static final String EPISODE_DESCRIPTION = "episode_description";
-    public static final String EPISODE_POSITION = "episode_position";
 
     public static void authenticate(@Nullable String argScannedQRValue, @NonNull Context argContext, @Nullable IEpisode argEpisode) {
         if (argScannedQRValue == null)
@@ -41,7 +44,9 @@ public class WebPlayerAuthenticator {
         final String cookie = values[1];
         String nonce = values[0];
 
-        String url = "https://soundwaves-bottiger.appspot.com/auth?4350967=" + nonce + "&jsessionid=" + cookie;
+        String post_key = WebPlayerShared.POST_KEY;
+
+        String url = WEB_URL + "/auth? " + post_key + "=" + nonce + "&jsessionid=" + cookie;
         Log.d("dsfdsfsd", url);
         Log.d("dsfdsfsd---", argScannedQRValue);
         Log.d("dsfdsfsd---", cookie);
@@ -75,6 +80,7 @@ public class WebPlayerAuthenticator {
                     .add(EPISODE_SUBTITLE, argEpisode.getTitle())
                     .add(EPISODE_WEBSITE, argEpisode.getSubscription(argContext).getURLString())
                     .add(EPISODE_DESCRIPTION, argEpisode.getDescription())
+                    .add(PHONE_ID, InstanceIDService.getToken())
                     .add(EPISODE_POSITION, offset_seconds);
         }
 

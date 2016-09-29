@@ -67,5 +67,17 @@
       <p id="player_state">
       Nothing
       </p>
+
+      <script src="https://www.gstatic.com/firebasejs/3.3.0/firebase.js"></script>
+      <script>
+        // Initialize Firebase
+        var config = {
+          apiKey: "AIzaSyDZvX6mPV2Bpa4-W-AJILKi_bmPPmIwGEA",
+          authDomain: "soundwaves-bottiger.firebaseapp.com",
+          databaseURL: "https://soundwaves-bottiger.firebaseio.com",
+          storageBucket: "soundwaves-bottiger.appspot.com",
+        };
+        firebase.initializeApp(config);
+      </script>
   </body>
 </html>

@@ -5,6 +5,8 @@ import java.security.SecureRandom;
 
 import javax.servlet.http.HttpSession;
 
+import static org.bottiger.podcast.common.WebPlayerShared.AUTH_TOKEN;
+
 /**
  * Created by aplb on 19-08-2016.
  */
@@ -20,7 +22,7 @@ public class QRModel {
 
     public static String getAndSaveQRValue(HttpSession argSession) {
         String id = nextSessionId();
-        argSession.setAttribute(AuthServlet.AUTH_TOKEN, id);
+        argSession.setAttribute(AUTH_TOKEN, id);
         return  id + sSeparator + getSessionID(argSession);
     }
 

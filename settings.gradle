@@ -1,1 +1,1 @@
-include ':app', ':WebPlayer'
+include ':app', ':WebPlayer', ':soundwavescommon'

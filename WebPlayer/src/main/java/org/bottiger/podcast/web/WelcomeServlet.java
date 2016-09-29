@@ -16,10 +16,6 @@ import static org.bottiger.podcast.web.AuthServlet.isAuthenticated;
 
 public class WelcomeServlet extends HttpServlet {
 
-    public static final String POST_KEY = "4350967";
-    public static final String AUTH_TOKEN = "token";
-    public static final String AUTHENTICATED = "logged_in";
-
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         HttpSession session = req.getSession();

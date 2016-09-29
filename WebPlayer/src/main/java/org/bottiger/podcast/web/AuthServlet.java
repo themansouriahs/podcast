@@ -13,22 +13,23 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import static org.bottiger.podcast.common.WebPlayerShared.AUTH_TOKEN;
+import static org.bottiger.podcast.common.WebPlayerShared.EPISODE_DESCRIPTION;
+import static org.bottiger.podcast.common.WebPlayerShared.EPISODE_POSITION;
+import static org.bottiger.podcast.common.WebPlayerShared.EPISODE_SUBTITLE;
+import static org.bottiger.podcast.common.WebPlayerShared.EPISODE_TITLE;
+import static org.bottiger.podcast.common.WebPlayerShared.EPISODE_URL;
+import static org.bottiger.podcast.common.WebPlayerShared.EPISODE_WEBSITE;
+import static org.bottiger.podcast.common.WebPlayerShared.EPISODE_cover;
+import static org.bottiger.podcast.common.WebPlayerShared.PHONE_ID;
+import static org.bottiger.podcast.common.WebPlayerShared.POST_KEY;
+
 
 // [START example]
 @SuppressWarnings("serial")
 public class AuthServlet extends HttpServlet {
 
-    public static final String POST_KEY = "4350967";
-    public static final String AUTH_TOKEN = "token";
     public static final String AUTHENTICATED = "logged_in";
-
-    public static final String EPISODE_URL = "episode_url";
-    public static final String EPISODE_cover = "episode_cover";
-    public static final String EPISODE_TITLE = "episode_title";
-    public static final String EPISODE_SUBTITLE = "episode_subtitle";
-    public static final String EPISODE_WEBSITE = "episode_website";
-    public static final String EPISODE_DESCRIPTION = "episode_description";
-    public static final String EPISODE_POSITION = "episode_position";
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -36,9 +37,7 @@ public class AuthServlet extends HttpServlet {
 
         if (isAuthenticated(session)) {
             PrintWriter out = resp.getWriter();
-            //out.println("OK");
             long position = EpisodeModel.getPosition(session);
-            //out.print("--" + session.getAttribute(EPISODE_POSITION) + "--");
             out.print(position);
             return;
         }
@@ -51,7 +50,6 @@ public class AuthServlet extends HttpServlet {
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
         String postValue = req.getParameter(POST_KEY);
-        //String parsedPostValue = QRModel.parseQRValue(postValue);
 
         HttpSession session = req.getSession();
         String token = (String)session.getAttribute(AUTH_TOKEN);
@@ -63,6 +61,7 @@ public class AuthServlet extends HttpServlet {
         String website = req.getParameter(EPISODE_WEBSITE);
         String description = req.getParameter(EPISODE_DESCRIPTION);
         String position = req.getParameter(EPISODE_POSITION);
+        String phone_id = req.getParameter(PHONE_ID);
 
         session.setAttribute(EPISODE_URL, url);
         session.setAttribute(EPISODE_cover, cover);
@@ -71,6 +70,7 @@ public class AuthServlet extends HttpServlet {
         session.setAttribute(EPISODE_WEBSITE, website);
         session.setAttribute(EPISODE_DESCRIPTION, description);
         session.setAttribute(EPISODE_POSITION, position);
+        session.setAttribute(PHONE_ID, phone_id);
 
         if (token == null) {
             resp.sendError(501, "sessionid: " + session.getId() );
