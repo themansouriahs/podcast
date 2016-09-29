@@ -406,6 +406,12 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 		mIsRefreshing = argIsRefreshing;
 
 		if (!mIsRefreshing) {
+
+			if (mIsDirty) {
+				mIsDirty = false;
+				notifyPropertyChanged(SubscriptionChanged.CHANGED, "updatedDuringRefresh");
+			}
+
 			countNewEpisodes();
 			notifyPropertyChanged(SubscriptionChanged.LOADED, "loaded");
 		}
@@ -463,7 +469,7 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 		if (imageURL != null && imageURL.equals(argUrl))
 			return;
 
-        imageURL = argUrl.trim();
+        imageURL = argUrl;
 		notifyPropertyChanged(null);
     }
 
@@ -869,8 +875,11 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 		if (TextUtils.isEmpty(argTag))
 			argTag = "NoTag";
 
-		if (!mIsRefreshing)
+		if (!mIsRefreshing) {
 			SoundWaves.getRxBus().send(new SubscriptionChanged(getId(), event, argTag));
+		} else {
+			mIsDirty = true;
+		}
 	}
 
 }
