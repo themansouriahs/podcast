@@ -185,18 +185,6 @@ public class SoundWavesDownloadManager extends Observable {
         return OK;
     }
 
-    /**
-	 * Download all the episodes in the queue
-     *
-     * @Return True if the download was started
-	 */
-    @WorkerThread
-    @Deprecated
-	private boolean startDownload(QueueEpisode nextInQueue) {
-        DownloadService.download(nextInQueue.getEpisode(), nextInQueue.IsStartedManually(), mContext);
-        return true;
-	}
-
     public IDownloadEngine.Callback getIDownloadEngineCallback() {
         return mDownloadCompleteCallback;
     }

@@ -15,62 +15,66 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * Created by aplb on 19-09-2015.
  */
 public class DateUtils {
 
-    private static final Map<String, String> DATE_FORMAT_REGEXPS = new HashMap<String, String>() {{
-        put("^\\d{8}$", "yyyyMMdd");
-        put("^\\d{1,2}-\\d{1,2}-\\d{4}$", "dd-MM-yyyy");
-        put("^\\d{4}-\\d{1,2}-\\d{1,2}$", "yyyy-MM-dd");
-        put("^\\d{1,2}/\\d{1,2}/\\d{4}$", "MM/dd/yyyy");
-        put("^\\d{4}/\\d{1,2}/\\d{1,2}$", "yyyy/MM/dd");
-        put("^\\d{1,2}\\s[a-z]{3}\\s\\d{4}$", "dd MMM yyyy");
-        put("^\\d{1,2}\\s[a-z]{4,}\\s\\d{4}$", "dd MMMM yyyy");
-        put("^\\d{12}$", "yyyyMMddHHmm");
-        put("^\\d{8}\\s\\d{4}$", "yyyyMMdd HHmm");
-        put("^\\d{1,2}-\\d{1,2}-\\d{4}\\s\\d{1,2}:\\d{2}$", "dd-MM-yyyy HH:mm");
-        put("^\\d{4}-\\d{1,2}-\\d{1,2}\\s\\d{1,2}:\\d{2}$", "yyyy-MM-dd HH:mm");
-        put("^\\d{1,2}/\\d{1,2}/\\d{4}\\s\\d{1,2}:\\d{2}$", "MM/dd/yyyy HH:mm");
-        put("^\\d{4}/\\d{1,2}/\\d{1,2}\\s\\d{1,2}:\\d{2}$", "yyyy/MM/dd HH:mm");
-        put("^\\d{1,2}\\s[a-z]{3}\\s\\d{4}\\s\\d{1,2}:\\d{2}$", "dd MMM yyyy HH:mm");
-        put("^\\d{1,2}\\s[a-z]{4,}\\s\\d{4}\\s\\d{1,2}:\\d{2}$", "dd MMMM yyyy HH:mm");
-        put("^\\d{14}$", "yyyyMMddHHmmss");
-        put("^\\d{8}\\s\\d{6}$", "yyyyMMdd HHmmss");
-        put("^\\d{1,2}-\\d{1,2}-\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}$", "dd-MM-yyyy HH:mm:ss");
-        put("^\\d{4}-\\d{1,2}-\\d{1,2}\\s\\d{1,2}:\\d{2}:\\d{2}$", "yyyy-MM-dd HH:mm:ss");
-        put("^\\d{1,2}/\\d{1,2}/\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}$", "MM/dd/yyyy HH:mm:ss");
-        put("^\\d{1,2}/\\d{1,2}/\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2} [PMApma]{2}$", "MM/dd/yyyy HH:mm:ss a"); // am/pm
-        put("^\\d{1,2}/\\d{1,2}/\\d{4}\\s\\d{1,2}:\\d{2} [PMApma]{2}$", "MM/dd/yyyy HH:mm a"); // am/pm
-        put("^\\d{4}/\\d{1,2}/\\d{1,2}\\s\\d{1,2}:\\d{2}:\\d{2}$", "yyyy/MM/dd HH:mm:ss");
-        put("^\\d{1,2}\\s[A-Za-z]{3}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}$", "dd MMM yyyy HH:mm:ss");
-        put("^\\d{1,2}\\s[A-Za-z]{4,}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}$", "dd MMMM yyyy HH:mm:ss");
-        put("^\\d{1,2}\\s[A-Za-z]{3}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}\\s[0-9+-]+$", "dd MMM yyyy HH:mm:ss Z");
-        put("^\\d{1,2}\\s[A-Za-z]{4,}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}\\s[A-Za-z0-9+-]+$", "dd MMMM yyyy HH:mm:ss z");
-        put("^[A-Za-z]{3}\\s\\d{1,2}\\s[A-Za-z]{3,9}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}\\s[0-9+-]+$", "EEE dd MMM yyyy HH:mm:ss Z"); // missing ,
-        put("^[A-Za-z]{3}\\s\\d{1,2}\\s[A-Za-z]{3,9}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}\\s[A-Za-z0-9+-]+$", "EEE dd MMM yyyy HH:mm:ss z"); // missing ,
-        put("^[A-Za-z]{3},\\s\\d{1,2}\\s[A-Za-z]{3,9}\\s\\d{4}\\s\\d{1,2}:\\d{2}\\s[0-9+-]+$", "EEE, dd MMM yyyy HH:mm Z"); // no seconds
-        put("^[A-Za-z]{3},\\s\\d{1,2}\\s[A-Za-z]{3,9}\\s\\d{4}\\s\\d{1,2}:\\d{2}\\s[A-Za-z0-9+-]+$", "EEE, dd MMM yyyy HH:mm z"); // no seconds
-        put("^[A-Za-z]{3},\\s\\d{1,2}\\s[A-Za-z]{3,9}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}\\s[0-9+-]+$", "EEE, dd MMM yyyy HH:mm:ss Z");
-        put("^[A-Za-z]{3},\\s\\d{1,2}\\s[A-Za-z]{3,9}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}\\s[A-Za-z0-9+-]+$", "EEE, dd MMM yyyy HH:mm:ss z");
+    private static final Map<Pattern, String> DATE_FORMAT_REGEXPS = new HashMap<Pattern, String>() {{
+        put(Pattern.compile("^\\d{8}$"), "yyyyMMdd");
+        put(Pattern.compile("^\\d{1,2}-\\d{1,2}-\\d{4}$"), "dd-MM-yyyy");
+        put(Pattern.compile("^\\d{4}-\\d{1,2}-\\d{1,2}$"), "yyyy-MM-dd");
+        put(Pattern.compile("^\\d{1,2}/\\d{1,2}/\\d{4}$"), "MM/dd/yyyy");
+        put(Pattern.compile("^\\d{4}/\\d{1,2}/\\d{1,2}$"), "yyyy/MM/dd");
+        put(Pattern.compile("^\\d{1,2}\\s[a-z]{3}\\s\\d{4}$"), "dd MMM yyyy");
+        put(Pattern.compile("^\\d{1,2}\\s[a-z]{4,}\\s\\d{4}$"), "dd MMMM yyyy");
+        put(Pattern.compile("^\\d{12}$"), "yyyyMMddHHmm");
+        put(Pattern.compile("^\\d{8}\\s\\d{4}$"), "yyyyMMdd HHmm");
+        put(Pattern.compile("^\\d{1,2}-\\d{1,2}-\\d{4}\\s\\d{1,2}:\\d{2}$"), "dd-MM-yyyy HH:mm");
+        put(Pattern.compile("^\\d{4}-\\d{1,2}-\\d{1,2}\\s\\d{1,2}:\\d{2}$"), "yyyy-MM-dd HH:mm");
+        put(Pattern.compile("^\\d{1,2}/\\d{1,2}/\\d{4}\\s\\d{1,2}:\\d{2}$"), "MM/dd/yyyy HH:mm");
+        put(Pattern.compile("^\\d{4}/\\d{1,2}/\\d{1,2}\\s\\d{1,2}:\\d{2}$"), "yyyy/MM/dd HH:mm");
+        put(Pattern.compile("^\\d{1,2}\\s[a-z]{3}\\s\\d{4}\\s\\d{1,2}:\\d{2}$"), "dd MMM yyyy HH:mm");
+        put(Pattern.compile("^\\d{1,2}\\s[a-z]{4,}\\s\\d{4}\\s\\d{1,2}:\\d{2}$"), "dd MMMM yyyy HH:mm");
+        put(Pattern.compile("^\\d{14}$"), "yyyyMMddHHmmss");
+        put(Pattern.compile("^\\d{8}\\s\\d{6}$"), "yyyyMMdd HHmmss");
+        put(Pattern.compile("^\\d{1,2}-\\d{1,2}-\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}$"), "dd-MM-yyyy HH:mm:ss");
+        put(Pattern.compile("^\\d{4}-\\d{1,2}-\\d{1,2}\\s\\d{1,2}:\\d{2}:\\d{2}$"), "yyyy-MM-dd HH:mm:ss");
+        put(Pattern.compile("^\\d{1,2}/\\d{1,2}/\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}$"), "MM/dd/yyyy HH:mm:ss");
+        put(Pattern.compile("^\\d{1,2}/\\d{1,2}/\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2} [PMApma]{2}$"), "MM/dd/yyyy HH:mm:ss a"); // am/pm
+        put(Pattern.compile("^\\d{1,2}/\\d{1,2}/\\d{4}\\s\\d{1,2}:\\d{2} [PMApma]{2}$"), "MM/dd/yyyy HH:mm a"); // am/pm
+        put(Pattern.compile("^\\d{4}/\\d{1,2}/\\d{1,2}\\s\\d{1,2}:\\d{2}:\\d{2}$"), "yyyy/MM/dd HH:mm:ss");
+        put(Pattern.compile("^\\d{1,2}\\s[A-Za-z]{3}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}$"), "dd MMM yyyy HH:mm:ss");
+        put(Pattern.compile("^\\d{1,2}\\s[A-Za-z]{4,}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}$"), "dd MMMM yyyy HH:mm:ss");
+        put(Pattern.compile("^\\d{1,2}\\s[A-Za-z]{3}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}\\s[0-9+-]+$"), "dd MMM yyyy HH:mm:ss Z");
+        put(Pattern.compile("^\\d{1,2}\\s[A-Za-z]{4,}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}\\s[A-Za-z0-9+-]+$"), "dd MMMM yyyy HH:mm:ss z");
+        put(Pattern.compile("^[A-Za-z]{3}\\s\\d{1,2}\\s[A-Za-z]{3,9}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}\\s[0-9+-]+$"), "EEE dd MMM yyyy HH:mm:ss Z"); // missing ,
+        put(Pattern.compile("^[A-Za-z]{3}\\s\\d{1,2}\\s[A-Za-z]{3,9}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}\\s[A-Za-z]+[0-9+-]{0,5}$"), "EEE dd MMM yyyy HH:mm:ss z"); // missing ,
+        put(Pattern.compile("^[A-Za-z]{3},\\s\\d{1,2}\\s[A-Za-z]{3,9}\\s\\d{4}\\s\\d{1,2}:\\d{2}\\s[0-9+-]+$"), "EEE, dd MMM yyyy HH:mm Z"); // no seconds
+        put(Pattern.compile("^[A-Za-z]{3},\\s\\d{1,2}\\s[A-Za-z]{3,9}\\s\\d{4}\\s\\d{1,2}:\\d{2}\\s[A-Za-z]+[0-9+-]{0,5}$"), "EEE, dd MMM yyyy HH:mm z"); // no seconds
+        put(Pattern.compile("^[A-Za-z]{3},\\s\\d{1,2}\\s[A-Za-z]{3,9}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}\\s[0-9+-]+$"), "EEE, dd MMM yyyy HH:mm:ss Z");
+        put(Pattern.compile("^[A-Za-z]{3},\\s\\d{1,2}\\s[A-Za-z]{3,9}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}\\s[A-Za-z]+[0-9+-]{0,5}$"), "EEE, dd MMM yyyy HH:mm:ss z");
     }};
 
     private static final Map<String, String> UNSUPPORTED_TIME_ZONE = new HashMap<String, String>() {{
-        put("BST", "GMT+1");
-        put("PST", "-0800");
-        put("PDT", "GMT-7");
-        put("EST", "GMT-4");
+        put("BST", "GMT+0100");
+        put("PST", "GMT-0800");
+        put("PDT", "GMT-0700");
+        put("EST", "GMT-0500");
+        put("EDT", "GMT-0400");
     }};
 
-    private static String[] sDateFormatKeys = null;
+    private static final Map<String, SimpleDateFormat> SIMPLE_DATE_FORMATS_LUT = new HashMap<>(DATE_FORMAT_REGEXPS.size());
+
+    private static Pattern[] sDateFormatKeys = null;
 
     private static String sSimpleDateFormatFormat = null;
     private static SimpleDateFormat sSimpleDateFormatCache = null;
 
     public interface Hint {
-        String get();
+        Pattern get();
     }
 
     @Nullable
@@ -167,28 +171,35 @@ public class DateUtils {
      */
     public static synchronized Date parse(@NonNull String dateString, @NonNull String dateFormat) throws ParseException {
 
-        // This is a hack to deal with date formats not known to Java
-        Iterator it = UNSUPPORTED_TIME_ZONE.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
-            dateString = dateString.replace(pair.getKey().toString(), pair.getValue().toString());
-            it.remove(); // avoids a ConcurrentModificationException
+        SimpleDateFormat simpleDateFormat = sSimpleDateFormatCache;
+        String dateOrg = dateString;
+
+        try {
+            // This is a hack to deal with time zones not known to Java
+            Iterator it = UNSUPPORTED_TIME_ZONE.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                dateString = dateString.replace(pair.getKey().toString(), pair.getValue().toString());
+                //it.remove(); // avoids a ConcurrentModificationException
+            }
+
+            simpleDateFormat = getSimpleDateFormat(dateFormat);
+            /*
+            if (simpleDateFormat == null || !dateFormat.equals(sSimpleDateFormatFormat)) {
+                // http://blog.andromo.com/2011/simpledateformat-can-be-slow/
+                //simpleDateFormat = new SimpleDateFormat(dateFormat, Locale.getDefault());
+                //simpleDateFormat.setLenient(false); // Don't automatically convert invalid date.
+
+                sSimpleDateFormatFormat = dateFormat;
+                sSimpleDateFormatCache = simpleDateFormat;
+            }
+            */
+
+            return simpleDateFormat.parse(dateString);
+        } catch (ParseException pe) {
+            ParseException pe2 = pe;
+            return simpleDateFormat.parse(dateString);
         }
-
-        SimpleDateFormat simpleDateFormat;
-        if (sSimpleDateFormatCache != null && dateFormat.equals(sSimpleDateFormatFormat)) {
-            simpleDateFormat = sSimpleDateFormatCache;
-        } else {
-            // http://blog.andromo.com/2011/simpledateformat-can-be-slow/
-            //simpleDateFormat = new SimpleDateFormat(dateFormat, Locale.US);
-            simpleDateFormat = new SimpleDateFormat(dateFormat, Locale.getDefault());
-            simpleDateFormat.setLenient(false); // Don't automatically convert invalid date.
-
-            sSimpleDateFormatFormat = dateFormat;
-            sSimpleDateFormatCache = simpleDateFormat;
-        }
-
-        return simpleDateFormat.parse(dateString);
     }
 
     // Validators ---------------------------------------------------------------------------------
@@ -247,17 +258,17 @@ public class DateUtils {
 
         // Test the hint first
         if (argKeyHint != null) {
-            if (dateStringLowerCase.matches(argKeyHint.get())) {
+            if (argKeyHint.get().matcher(dateStringLowerCase).matches()) { // dateStringLowerCase.matches(argKeyHint.get())
                 return new Pair<>(DATE_FORMAT_REGEXPS.get(argKeyHint.get()), argKeyHint);
             }
         }
 
-        for (final String regexp : getDateFormatKeys()) {
+        for (final Pattern regexp : getDateFormatKeys()) {
 
             if (argKeyHint != null && regexp.equals(argKeyHint.get()))
                 continue;
 
-            if (dateStringLowerCase.matches(regexp)) {
+            if (regexp.matcher(dateStringLowerCase).matches()) { // dateStringLowerCase.matches(regexp)
                 return new Pair<>(DATE_FORMAT_REGEXPS.get(regexp), getHint(regexp));
             }
         }
@@ -265,13 +276,13 @@ public class DateUtils {
     }
 
     @Nullable
-    private static Hint getHint(@Nullable final String argKey) {
+    private static Hint getHint(@Nullable final Pattern argKey) {
         if (argKey == null)
             return null;
 
         return new Hint() {
             @Override
-            public String get() {
+            public Pattern get() {
                 return argKey;
             }
         };
@@ -284,13 +295,28 @@ public class DateUtils {
         return newDate;
     }
 
-    private static synchronized String[] getDateFormatKeys() {
+    private static synchronized Pattern[] getDateFormatKeys() {
         if (sDateFormatKeys == null) {
-            Set<String> keySet = DATE_FORMAT_REGEXPS.keySet();
-            sDateFormatKeys = keySet.toArray(new String[keySet.size()]);
+            Set<Pattern> keySet = DATE_FORMAT_REGEXPS.keySet();
+            sDateFormatKeys = keySet.toArray(new Pattern[keySet.size()]);
             Collections.reverse(Arrays.asList(sDateFormatKeys));
         }
 
         return sDateFormatKeys;
+    }
+
+    private static SimpleDateFormat getSimpleDateFormat(@NonNull String argDateFormat) {
+        SimpleDateFormat simpleDateFormat = SIMPLE_DATE_FORMATS_LUT.get(argDateFormat);
+
+        if (simpleDateFormat == null) {
+            synchronized (SIMPLE_DATE_FORMATS_LUT) {
+                simpleDateFormat = new SimpleDateFormat(argDateFormat, Locale.getDefault());
+                simpleDateFormat.setLenient(false); // Don't automatically convert invalid date.
+
+                SIMPLE_DATE_FORMATS_LUT.put(argDateFormat, simpleDateFormat);
+            }
+        }
+
+        return simpleDateFormat;
     }
 }

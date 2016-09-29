@@ -546,16 +546,9 @@ public class Library {
         mLock.lock();
         try {
 
-            int counter = 0;
             cursor = PodcastOpenHelper.runQuery(Library.this.mContext, query);
-            FeedItem episode;
 
-            while (cursor.moveToNext()) {
-                episode = LibraryPersistency.fetchEpisodeFromCursor(cursor, null);
-                addEpisode(episode);
-                //argPlaylist.setItem(counter, episode);
-                counter++;
-            }
+            addEpisodes(cursor, null);
 
             // Populate the playlist from the library
             argPlaylist.populatePlaylist();
@@ -566,6 +559,22 @@ public class Library {
                 cursor.close();
             mLock.unlock();
         }
+    }
+
+    private int addEpisodes(@NonNull Cursor argCursor, @Nullable FeedItem[] emptyItems) {
+        int counter = 0;
+        while (argCursor.moveToNext()) {
+            final FeedItem item;
+            if (emptyItems != null) {
+                item = LibraryPersistency.fetchEpisodeFromCursor(argCursor, emptyItems[counter]);
+            } else {
+                item = LibraryPersistency.fetchEpisodeFromCursor(argCursor, null);
+            }
+            addEpisode(item);
+            counter++;
+        }
+
+        return counter;
     }
 
     @MainThread
@@ -641,49 +650,49 @@ public class Library {
     }
 
     @WorkerThread
-    public synchronized void loadEpisodesSync(@NonNull final Subscription argSubscription, @Nullable String argQuery) {
-        if (argSubscription.IsLoaded())
-            return;
+    public void loadEpisodesSync(@NonNull final Subscription argSubscription, @Nullable String argQuery) {
 
-        Cursor cursor = null;
+        synchronized (argSubscription) {
 
-        long start = 0;
-        int counter = 0;
-        try {
+            if (argSubscription.IsLoaded())
+                return;
 
-            if (argQuery == null)
-                argQuery = getAllEpisodes(argSubscription);
+            Cursor cursor = null;
 
-            //argQuery = "update " + SubscriptionColumns.TABLE_NAME + " set " + SubscriptionColumns.STATUS + "=" + Subscription.STATUS_SUBSCRIBED;
+            long start = System.currentTimeMillis();
+            try {
 
-            cursor = PodcastOpenHelper.runQuery(Library.this.mContext, argQuery);
+                if (argQuery == null)
+                    argQuery = getAllEpisodes(argSubscription);
 
-            start = System.currentTimeMillis();
+                //argQuery = "update " + SubscriptionColumns.TABLE_NAME + " set " + SubscriptionColumns.STATUS + "=" + Subscription.STATUS_SUBSCRIBED;
 
-            FeedItem[] emptyItems = new FeedItem[1];
-            int count = cursor.getCount();
-            if (count > 0) {
-                emptyItems = new FeedItem[cursor.getCount()];
+                cursor = PodcastOpenHelper.runQuery(Library.this.mContext, argQuery);
 
-                for (int i = 0; i < emptyItems.length; i++) {
-                    emptyItems[i] = new FeedItem();
+                start = System.currentTimeMillis();
+
+                FeedItem[] emptyItems = new FeedItem[1];
+                int count = cursor.getCount();
+                if (count > 0) {
+                    emptyItems = new FeedItem[cursor.getCount()];
+
+                    for (int i = 0; i < emptyItems.length; i++) {
+                        emptyItems[i] = new FeedItem();
+                    }
                 }
-            }
 
-            argSubscription.setIsRefreshing(true);
-            while (cursor.moveToNext()) {
-                FeedItem item = LibraryPersistency.fetchEpisodeFromCursor(cursor, emptyItems[counter]);
-                addEpisode(item);
-                counter++;
-            }
+                argSubscription.setIsRefreshing(true);
 
-            argSubscription.setIsRefreshing(false);
-            argSubscription.setIsLoaded(true);
-        } finally {
-            if (cursor != null)
-                cursor.close();
-            long end = System.currentTimeMillis();
-            Log.d("loadAllEpisodes", "1: " + (end - start) + " ms");
+                addEpisodes(cursor, emptyItems);
+
+                argSubscription.setIsRefreshing(false);
+                argSubscription.setIsLoaded(true);
+            } finally {
+                if (cursor != null)
+                    cursor.close();
+                long end = System.currentTimeMillis();
+                Log.d("loadAllEpisodes", "1: " + (end - start) + " ms");
+            }
         }
     }
 

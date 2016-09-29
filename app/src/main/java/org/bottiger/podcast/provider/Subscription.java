@@ -220,22 +220,22 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 		return mEpisodes;
 	}
 
-	public boolean contains(@NonNull IEpisode argEpisode) {
+	private boolean updateEpisodeData(@NonNull IEpisode argCurrnetEpisode, @NonNull IEpisode argNewEpisode) {
+		argCurrnetEpisode.setPubDate(argNewEpisode.getDateTime());
+		if (argNewEpisode.getFilesize() > 0)
+			argCurrnetEpisode.setFilesize(argNewEpisode.getFilesize());
 
-		// For some reason thi doen't work
-		//return mEpisodes.indexOf(argEpisode) >= 0;
-
-		for (int i = 0; i < mEpisodes.size(); i++) {
-			if (mEpisodes.get(i).equals(argEpisode))
-				return true;
-		}
-
-		return false;
+		return true;
 	}
 
 	public boolean addEpisode(@NonNull IEpisode argEpisode, boolean argSilent) {
-		if (contains(argEpisode))
+		if (contains(argEpisode)) {
+
+			IEpisode modelEpisode = getMatchingEpisode(argEpisode);
+			updateEpisodeData(modelEpisode, argEpisode);
+
 			return false;
+		}
 
 		mEpisodes.add(argEpisode);
 		

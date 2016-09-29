@@ -261,8 +261,10 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
         }
 
         Date date = argItem.getDateTime();
-        if (date != null)
-            mStringBuilder.append(DateUtils.formatDateTime(mActivity, argItem.getDateTime().getTime(), 0));
+        if (date != null) {
+            int flags = DateUtils.FORMAT_SHOW_YEAR | DateUtils.FORMAT_NO_MIDNIGHT;
+            mStringBuilder.append(DateUtils.formatDateTime(mActivity, argItem.getDateTime().getTime(), flags));
+        }
 
         return mStringBuilder.toString();
     }

@@ -315,6 +315,8 @@ public class LibraryPersistency {
         } else
             item = new FeedItem();
 
+        item.setIsParsing(true, false);
+
         item.id = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
         item.filename = cursor.getString(cursor.getColumnIndex(ItemColumns.PATHNAME));
         item.offset = cursor.getInt(cursor.getColumnIndex(ItemColumns.OFFSET));
@@ -338,6 +340,8 @@ public class LibraryPersistency {
         item.listened = cursor.getInt(cursor.getColumnIndex(ItemColumns.LISTENED));
         item.priority = cursor.getInt(cursor.getColumnIndex(ItemColumns.PRIORITY));
         item.created_at = cursor.getLong(cursor.getColumnIndex(ItemColumns.CREATED));
+
+        item.setIsParsing(false, false);
 
         return item;
     }

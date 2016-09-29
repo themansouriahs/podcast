@@ -281,11 +281,10 @@ public class PodcastProvider extends ContentProvider {
 	public int update(Uri uri, ContentValues values, String where,
 			String[] whereArgs) {
 		SQLiteDatabase db = mHelper.getWritableDatabase();
-		int count;
+		int count = 0;
 		switch (matcher.match(uri)) {
 		case TYPE_ALL_SUBSCRIPTIONS:
-			count = db.update(SubscriptionColumns.TABLE_NAME, values, where,
-					whereArgs);
+			count = db.update(SubscriptionColumns.TABLE_NAME, values, where, whereArgs);
 			break;
 
 		case TYPE_ALL_ITEMS:

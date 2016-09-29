@@ -48,6 +48,8 @@ public interface ISubscription {
     void setLink(@Nullable String argLink);
     boolean addEpisode(@Nullable IEpisode episode);
 
+    boolean contains(@NonNull IEpisode argEpisode);
+
     boolean IsDirty();
 
     boolean doSkipIntro();
