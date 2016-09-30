@@ -135,6 +135,9 @@ public class GPodderAPI implements IWebservice {
     int synchronize(@NonNull Context argContext,
                     @NonNull LongSparseArray<Subscription> argLocalSubscriptions) throws IOException {
 
+        if (System.currentTimeMillis() > 0)
+            return SERVER_ERROR;
+
         Response response = api.login(mUsername).execute();
         if (!response.isSuccessful())
             return AUTHENTICATION_ERROR;
@@ -205,10 +208,11 @@ public class GPodderAPI implements IWebservice {
                 VendorCrashReporter.report("removedUrls", removed.toString());
 
                 if (subscription.IsSubscribed()) {
-                    SoundWaves.getAppContext(argContext).getLibraryInstance().unsubscribe(subscription.getURLString(), "GPodder:Unsubscribe");
+                    SoundWaves.getAppContext(argContext).getLibraryInstance().unsubscribe(subscription.getURLString(), "GPodder:Unsubscribe:" + url
+                    );
                     String raw = subscriptionsChangesResponse.raw().toString();
                     Log.w(TAG, "gPodder removed a subscription we are not subscribed to: " + url + " raw: " + raw); // NoI18N
-                    VendorCrashReporter.report("Removed unknown subscription", raw); // NoI18N
+                    VendorCrashReporter.report("Removed unknown subscription2: " + url, raw); // NoI18N
                 } else {
                     String raw = subscriptionsChangesResponse.raw().toString();
                     Log.w(TAG, "gPodder removed a subscription we are not subscribed to: " + url + " raw: " + raw); // NoI18N
