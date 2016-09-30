@@ -29,12 +29,16 @@ import android.widget.RelativeLayout;
 import org.bottiger.podcast.adapters.SubscriptionAdapter;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.Library;
+import org.bottiger.podcast.model.events.EpisodeChanged;
+import org.bottiger.podcast.model.events.ItemChanged;
+import org.bottiger.podcast.model.events.SubscriptionChanged;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.views.ContextMenuRecyclerView;
 import org.bottiger.podcast.views.dialogs.DialogOPML;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 public class SubscriptionsFragment extends Fragment implements View.OnClickListener {
@@ -72,6 +76,7 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
     private FrameLayout mContainerView;
 
     private rx.Subscription mRxSubscription;
+    private rx.Subscription mRxSubscriptionChanged;
 
     private SharedPreferences shareprefs;
     private static String PREF_SUBSCRIPTION_COLUMNS;
@@ -149,6 +154,36 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
                     }
                 });
 
+
+        mRxSubscriptionChanged = SoundWaves.getRxBus()
+                .toObserverable()
+                .onBackpressureBuffer(10000)
+                .ofType(SubscriptionChanged.class)
+                .filter(new Func1<SubscriptionChanged, Boolean>() {
+                    @Override
+                    public Boolean call(SubscriptionChanged subscriptionChanged) {
+                        return subscriptionChanged.getAction()==SubscriptionChanged.CHANGED;
+                    }
+                })
+                .subscribe(new Action1<SubscriptionChanged>() {
+                    @Override
+                    public void call(SubscriptionChanged itemChangedEvent) {
+                        Log.v(TAG, "Refreshing Subscription: " + itemChangedEvent.getId());
+                        // Update the subscription fragment when a image is updated in an subscription
+                        SortedList<Subscription> subscriptions = mLibrary.getSubscriptions();
+                        Subscription subscription = mLibrary.getSubscription(itemChangedEvent.getId());
+                        int index = subscriptions.indexOf(subscription);
+                        mAdapter.notifyItemChanged(index);
+                        //mAdapter.notifyDataSetChanged();
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        VendorCrashReporter.handleException(throwable);
+                        Log.wtf(TAG, "Missing back pressure. Should not happen anymore :(");
+                    }
+                });
+
         mAdapter.setDataset(mLibrary.getSubscriptions());
 
 		return mContainerView;
@@ -160,6 +195,9 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
         super.onDestroyView();
         if (mRxSubscription != null && !mRxSubscription.isUnsubscribed()) {
             mRxSubscription.unsubscribe();
+        }
+        if (mRxSubscriptionChanged != null && !mRxSubscriptionChanged.isUnsubscribed()) {
+            mRxSubscriptionChanged.unsubscribe();
         }
     }
 

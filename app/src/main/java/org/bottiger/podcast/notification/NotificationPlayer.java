@@ -78,30 +78,12 @@ public class NotificationPlayer extends BroadcastReceiver {
                     state.getState() == PlaybackStateCompat.STATE_NONE) {
                 mPlayerService.dis_notifyStatus();
             }
-            /*
-            if (state.getState() == PlaybackStateCompat.STATE_STOPPED ||
-                    state.getState() == PlaybackStateCompat.STATE_NONE) {
-                stopNotification();
-            } else {
-                Notification notification = createNotification();
-                if (notification != null) {
-                    mNotificationManager.notify(NOTIFICATION_ID, notification);
-                }
-            }
-            */
         }
 
         @Override
         public void onMetadataChanged(MediaMetadataCompat metadata) {
             mMetadata = metadata;
             Log.d(TAG, "Received new metadata: " + metadata);
-
-            /*
-            Notification notification = createNotification();
-            if (notification != null) {
-                mNotificationManager.notify(NOTIFICATION_ID, notification);
-            }
-            */
         }
 
         @Override

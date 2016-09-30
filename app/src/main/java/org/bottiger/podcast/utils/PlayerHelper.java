@@ -11,6 +11,7 @@ import android.widget.TextView;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.provider.IEpisode;
 
+import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -85,7 +86,7 @@ public class PlayerHelper {
         }
 
         try {
-            metaRetriever.setDataSource(location.getPath());
+            metaRetriever.setDataSource(location.toString(), new HashMap<String, String>());
         } catch (Exception e) {
             argTextView.setText("");
             VendorCrashReporter.report("Invalid location", "location:" + location.getPath());
