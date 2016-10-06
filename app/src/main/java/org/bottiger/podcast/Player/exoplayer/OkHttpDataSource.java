@@ -15,12 +15,14 @@
  */
 package org.bottiger.podcast.player.exoplayer;
 
-import com.google.android.exoplayer.C;
-import com.google.android.exoplayer.upstream.DataSpec;
-import com.google.android.exoplayer.upstream.HttpDataSource;
-import com.google.android.exoplayer.upstream.TransferListener;
-import com.google.android.exoplayer.util.Assertions;
-import com.google.android.exoplayer.util.Predicate;
+import android.net.Uri;
+
+import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.upstream.DataSpec;
+import com.google.android.exoplayer2.upstream.HttpDataSource;
+import com.google.android.exoplayer2.upstream.TransferListener;
+import com.google.android.exoplayer2.util.Assertions;
+import com.google.android.exoplayer2.util.Predicate;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -115,8 +117,8 @@ public class OkHttpDataSource implements HttpDataSource {
   }
 
   @Override
-  public String getUri() {
-    return response == null ? null : response.request().url().toString();
+  public Uri getUri() {
+    return response == null ? null : Uri.parse(response.request().url().toString());
   }
 
   @Override
@@ -186,13 +188,13 @@ public class OkHttpDataSource implements HttpDataSource {
 
     // Determine the length of the data to be read, after skipping.
     long contentLength = response.body().contentLength();
-    bytesToRead = dataSpec.length != C.LENGTH_UNBOUNDED ? dataSpec.length
+    bytesToRead = dataSpec.length != C.LENGTH_UNSET ? dataSpec.length
         : contentLength != -1 ? contentLength - bytesToSkip
-        : C.LENGTH_UNBOUNDED;
+        : C.LENGTH_UNSET;
 
     opened = true;
     if (listener != null) {
-      listener.onTransferStart();
+      listener.onTransferStart(this, dataSpec);
     }
 
     return bytesToRead;
@@ -213,7 +215,7 @@ public class OkHttpDataSource implements HttpDataSource {
     if (opened) {
       opened = false;
       if (listener != null) {
-        listener.onTransferEnd();
+        listener.onTransferEnd(this);
       }
       closeConnectionQuietly();
     }
@@ -243,12 +245,12 @@ public class OkHttpDataSource implements HttpDataSource {
    * Returns the number of bytes that are still to be read for the current {@link DataSpec}.
    * <p>
    * If the total length of the data being read is known, then this length minus {@code bytesRead()}
-   * is returned. If the total length is unknown, {@link C#LENGTH_UNBOUNDED} is returned.
+   * is returned. If the total length is unknown, {@link C#LENGTH_UNSET} is returned.
    *
-   * @return The remaining length, or {@link C#LENGTH_UNBOUNDED}.
+   * @return The remaining length, or {@link C#LENGTH_UNSET}.
    */
   protected final long bytesRemaining() {
-    return bytesToRead == C.LENGTH_UNBOUNDED ? bytesToRead : bytesToRead - bytesRead;
+    return bytesToRead == C.LENGTH_UNSET ? bytesToRead : bytesToRead - bytesRead;
   }
 
   /**
@@ -269,9 +271,9 @@ public class OkHttpDataSource implements HttpDataSource {
         builder.addHeader(property.getKey(), property.getValue());
       }
     }
-    if (!(position == 0 && length == C.LENGTH_UNBOUNDED)) {
+    if (!(position == 0 && length == C.LENGTH_UNSET)) {
       String rangeRequest = "bytes=" + position + "-";
-      if (length != C.LENGTH_UNBOUNDED) {
+      if (length != C.LENGTH_UNSET) {
         rangeRequest += (position + length - 1);
       }
       builder.addHeader("Range", rangeRequest);
@@ -316,7 +318,7 @@ public class OkHttpDataSource implements HttpDataSource {
       }
       bytesSkipped += read;
       if (listener != null) {
-        listener.onBytesTransferred(read);
+        listener.onBytesTransferred(read, readLength);
       }
     }
 
@@ -339,7 +341,7 @@ public class OkHttpDataSource implements HttpDataSource {
    * @throws IOException If an error occurs reading from the source.
    */
   private int readInternal(byte[] buffer, int offset, int readLength) throws IOException {
-    readLength = bytesToRead == C.LENGTH_UNBOUNDED ? readLength
+    readLength = bytesToRead == C.LENGTH_UNSET ? readLength
         : (int) Math.min(readLength, bytesToRead - bytesRead);
     if (readLength == 0) {
       // We've read all of the requested data.
@@ -348,7 +350,7 @@ public class OkHttpDataSource implements HttpDataSource {
 
     int read = responseByteStream.read(buffer, offset, readLength);
     if (read == -1) {
-      if (bytesToRead != C.LENGTH_UNBOUNDED && bytesToRead != bytesRead) {
+      if (bytesToRead != C.LENGTH_UNSET && bytesToRead != bytesRead) {
         // The server closed the connection having not sent sufficient data.
         throw new EOFException();
       }
@@ -357,7 +359,7 @@ public class OkHttpDataSource implements HttpDataSource {
 
     bytesRead += read;
     if (listener != null) {
-      listener.onBytesTransferred(read);
+      listener.onBytesTransferred(read, (int)bytesRead);
     }
     return read;
   }

@@ -22,29 +22,33 @@ import android.net.Uri;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
-import com.google.android.exoplayer.MediaCodecSelector;
-import com.google.android.exoplayer.MediaCodecVideoTrackRenderer;
-import com.google.android.exoplayer.TrackRenderer;
-import com.google.android.exoplayer.extractor.Extractor;
-import com.google.android.exoplayer.extractor.ExtractorSampleSource;
-import com.google.android.exoplayer.text.TextTrackRenderer;
-import com.google.android.exoplayer.upstream.Allocator;
-import com.google.android.exoplayer.upstream.DataSource;
-import com.google.android.exoplayer.upstream.DefaultAllocator;
-import com.google.android.exoplayer.upstream.DefaultBandwidthMeter;
-import com.google.android.exoplayer.upstream.DefaultUriDataSource;
-import com.google.android.exoplayer.upstream.UriDataSource;
-import com.google.android.exoplayer.util.Util;
+import com.google.android.exoplayer2.Renderer;
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
+import com.google.android.exoplayer2.extractor.Extractor;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.text.TextRenderer;
+import com.google.android.exoplayer2.upstream.Allocator;
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DataSpec;
+import com.google.android.exoplayer2.upstream.DefaultAllocator;
+import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
+import com.google.android.exoplayer2.upstream.HttpDataSource;
+import com.google.android.exoplayer2.upstream.TransferListener;
+import com.google.android.exoplayer2.util.Predicate;
+import com.google.android.exoplayer2.util.Util;
+import com.google.android.exoplayer2.video.MediaCodecVideoRenderer;
 
-import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper.RendererBuilder;
 import org.bottiger.podcast.utils.HttpUtils;
+
+import java.io.IOException;
 
 import okhttp3.OkHttpClient;
 
 /**
  * A {@link RendererBuilder} for streams that can be read using an {@link Extractor}.
  */
-public class ExtractorRendererBuilder implements RendererBuilder {
+public class ExtractorRendererBuilder implements ExoPlayerWrapper.RendererBuilder {
 
     private static final int BUFFER_SEGMENT_SIZE = 64 * 1024;
     private static final int BUFFER_SEGMENT_COUNT = 256;
@@ -59,7 +63,7 @@ public class ExtractorRendererBuilder implements RendererBuilder {
 
   @TargetApi(16)
   @Override
-  public TrackRenderer[] buildRenderers(ExoPlayerWrapper player) {
+  public Renderer[] buildRenderers(ExoPlayerWrapper player) {
       Allocator allocator = new DefaultAllocator(BUFFER_SEGMENT_SIZE);
       Handler mainHandler = player.getMainHandler();
 
@@ -68,46 +72,72 @@ public class ExtractorRendererBuilder implements RendererBuilder {
             new DefaultBandwidthMeter(mainHandler, null);
 
       OkHttpClient client = new OkHttpClient();
-      UriDataSource source = new OkHttpDataSource(client, HttpUtils.getUserAgent(context), null, bandwidthMeter);
+      Predicate<String> predicate = null; // FIXME: Optional, can this be done better?
 
-      DataSource dataSource =
-            new DefaultUriDataSource(context, bandwidthMeter, source);
-      ExtractorSampleSource sampleSource = new ExtractorSampleSource(uri, dataSource, allocator,
-        BUFFER_SEGMENT_COUNT * BUFFER_SEGMENT_SIZE, mainHandler, player, 0);
+      String useragent = HttpUtils.getUserAgent(context);
+      OkHttpDataSource okHttpDataSource = new OkHttpDataSource(client, useragent, predicate);
+      final HttpDataSource source = new OkHttpDataSource(client, useragent, predicate, bandwidthMeter);
 
-      PodcastAudioRenderer podcastAudioRenderer = getAudioRenderer(sampleSource);
+      DataSource.Factory datasourceFactory = new DataSource.Factory() {
+          @Override
+          public DataSource createDataSource() {
+              return source;
+          }
+      };
+
+      ExtractorMediaSource.EventListener eventListener = new ExtractorMediaSource.EventListener() {
+          @Override
+          public void onLoadError(IOException error) {
+
+          }
+      };
+
+      DefaultExtractorsFactory defaultExtractorsFactory = new DefaultExtractorsFactory();
+
+      MediaSource dataSource = new ExtractorMediaSource(uri, datasourceFactory, defaultExtractorsFactory, mainHandler, eventListener);
+
+      //DataSource dataSource =
+      //      new DefaultUriDataSource(context, bandwidthMeter, source);
+      //ExtractorSampleSource sampleSource = new ExtractorSampleSource(uri, dataSource, allocator,
+      //  BUFFER_SEGMENT_COUNT * BUFFER_SEGMENT_SIZE, mainHandler, player, 0);
+
+      /*
+      PodcastAudioRenderer podcastAudioRenderer = getAudioRenderer(dataSource);
       podcastAudioRenderer.setRemoveSilence(player.doRemoveSilence());
 
       // Invoke the callback.
-      TrackRenderer[] renderers = new TrackRenderer[ExoPlayerWrapper.RENDERER_COUNT];
-      renderers[ExoPlayerWrapper.TYPE_VIDEO] = getVideoRenderer(sampleSource, mainHandler, player);
+      Renderer[] renderers = new Renderer[ExoPlayerWrapper.RENDERER_COUNT];
+      renderers[ExoPlayerWrapper.TYPE_VIDEO] = getVideoRenderer(dataSource, mainHandler, player);
       renderers[ExoPlayerWrapper.TYPE_AUDIO] = podcastAudioRenderer;
-      renderers[ExoPlayerWrapper.TYPE_TEXT] = getTextRenderer(sampleSource, mainHandler, player);
+      renderers[ExoPlayerWrapper.TYPE_TEXT] = getTextRenderer(dataSource, mainHandler, player);
+      */
 
-      player.onRenderers(renderers, bandwidthMeter);
+      //player.onRenderers(renderers, bandwidthMeter);
 
-      return renderers;
+      return null; //renderers;
   }
 
-    private TextTrackRenderer getTextRenderer(@NonNull ExtractorSampleSource sampleSource,
+    /*
+    private TextRenderer getTextRenderer(@NonNull MediaSource sampleSource,
                                               @NonNull Handler mainHandler,
                                               @NonNull ExoPlayerWrapper player) {
-        return new TextTrackRenderer(sampleSource, player,
+        return new TextRenderer(sampleSource, player,
                 mainHandler.getLooper());
     }
 
     @TargetApi(16)
-    private MediaCodecVideoTrackRenderer getVideoRenderer(@NonNull ExtractorSampleSource sampleSource,
-                                                          @NonNull Handler mainHandler,
-                                                          @NonNull ExoPlayerWrapper player) {
-        return new MediaCodecVideoTrackRenderer(context,
+    private MediaCodecVideoRenderer getVideoRenderer(@NonNull MediaSource sampleSource,
+                                                     @NonNull Handler mainHandler,
+                                                     @NonNull ExoPlayerWrapper player) {
+        return new MediaCodecVideoRenderer(context,
                 sampleSource, MediaCodecSelector.DEFAULT, MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT, 5000,
                 mainHandler, player, 50);
     }
 
-    private PodcastAudioRenderer getAudioRenderer(@NonNull ExtractorSampleSource sampleSource) {
+    private PodcastAudioRenderer getAudioRenderer(@NonNull MediaSource sampleSource) {
         return Util.SDK_INT >= 21 ? new PodcastAudioRendererV21(sampleSource) : new PodcastAudioRenderer(sampleSource);
     }
+    */
 
     @Override
   public void cancel() {

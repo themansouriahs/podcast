@@ -7,6 +7,10 @@ import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.widget.Chronometer;
 
+import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.Timeline;
+
 import org.bottiger.podcast.player.SoundWavesPlayerBase;
 import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
 import org.bottiger.podcast.provider.IEpisode;
@@ -16,7 +20,7 @@ import static android.os.SystemClock.elapsedRealtime;
 /**
  * Created by apl on 25-03-2015.
  */
-public class TextViewObserver extends Chronometer implements ExoPlayerWrapper.Listener {
+public class TextViewObserver extends Chronometer implements ExoPlayer.EventListener {
 
     protected IEpisode mEpisode = null;
     private boolean mIsTicking = false;
@@ -47,7 +51,12 @@ public class TextViewObserver extends Chronometer implements ExoPlayerWrapper.Li
     }
 
     @Override
-    public void onStateChanged(boolean playWhenReady, @SoundWavesPlayerBase.PlayerState int playbackState) {
+    public void onLoadingChanged(boolean isLoading) {
+
+    }
+
+    @Override
+    public void onPlayerStateChanged(boolean playWhenReady, @SoundWavesPlayerBase.PlayerState int playbackState) {
 
         // This happens when the playlist is empty and an episode is about to be played.
         // The state change fires prior to the binding.
@@ -66,12 +75,17 @@ public class TextViewObserver extends Chronometer implements ExoPlayerWrapper.Li
     }
 
     @Override
-    public void onError(Exception e) {
+    public void onTimelineChanged(Timeline timeline, Object manifest) {
 
     }
 
     @Override
-    public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
+    public void onPlayerError(ExoPlaybackException error) {
+
+    }
+
+    @Override
+    public void onPositionDiscontinuity() {
 
     }
 }

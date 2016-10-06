@@ -4,19 +4,28 @@ import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.os.Build;
+import android.os.Handler;
 import android.util.Log;
 
-import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.audio.AudioCapabilities;
+import com.google.android.exoplayer2.audio.AudioRendererEventListener;
+import com.google.android.exoplayer2.audio.MediaCodecAudioRenderer;
+import com.google.android.exoplayer2.drm.DrmSessionManager;
+import com.google.android.exoplayer2.drm.FrameworkMediaCrypto;
+import com.google.android.exoplayer2.mediacodec.MediaCodecSelector;
+import com.google.android.exoplayer2.util.Util;
 
 import org.bottiger.podcast.utils.PlaybackSpeed;
 
 import java.nio.ByteBuffer;
 
 /**
- * Custom renderer used for PremoFM
- * Created by evanhalley on 12/4/15.
+ * Created by aplb on 05-10-2016.
  */
-public class PodcastAudioRendererV21 extends PodcastAudioRenderer {
+
+public class PodcastMediaCodecAudioRenderer extends MediaCodecAudioRenderer {
+
 
     private static final String TAG = "PodcastAudioRendererV21";
     private static final boolean DEBUG = false;
@@ -36,15 +45,25 @@ public class PodcastAudioRendererV21 extends PodcastAudioRenderer {
     private byte[] mSilenceInputBuffer;
     private byte[] mSilenceOutputBuffer;
 
-    public PodcastAudioRendererV21(MediaSource source) {
-        super(source);
+    public PodcastMediaCodecAudioRenderer(MediaCodecSelector mediaCodecSelector) {
+        super(mediaCodecSelector);
     }
 
-    /*
-    public PodcastAudioRendererV21(SampleSource source) {
-        super(source);
+    public PodcastMediaCodecAudioRenderer(MediaCodecSelector mediaCodecSelector, DrmSessionManager drmSessionManager, boolean playClearSamplesWithoutKeys) {
+        super(mediaCodecSelector, drmSessionManager, playClearSamplesWithoutKeys);
     }
-    */
+
+    public PodcastMediaCodecAudioRenderer(MediaCodecSelector mediaCodecSelector, Handler eventHandler, AudioRendererEventListener eventListener) {
+        super(mediaCodecSelector, eventHandler, eventListener);
+    }
+
+    public PodcastMediaCodecAudioRenderer(MediaCodecSelector mediaCodecSelector, DrmSessionManager<FrameworkMediaCrypto> drmSessionManager, boolean playClearSamplesWithoutKeys, Handler eventHandler, AudioRendererEventListener eventListener) {
+        super(mediaCodecSelector, drmSessionManager, playClearSamplesWithoutKeys, eventHandler, eventListener);
+    }
+
+    public PodcastMediaCodecAudioRenderer(MediaCodecSelector mediaCodecSelector, DrmSessionManager<FrameworkMediaCrypto> drmSessionManager, boolean playClearSamplesWithoutKeys, Handler eventHandler, AudioRendererEventListener eventListener, AudioCapabilities audioCapabilities, int streamType) {
+        super(mediaCodecSelector, drmSessionManager, playClearSamplesWithoutKeys, eventHandler, eventListener, audioCapabilities, streamType);
+    }
 
     public synchronized void setSpeed(float speed) {
         this.mSpeed = speed;
@@ -56,10 +75,9 @@ public class PodcastAudioRendererV21 extends PodcastAudioRenderer {
         return mSpeed;
     }
 
-    /*
     @Override
     protected boolean processOutputBuffer(long positionUs, long elapsedRealtimeUs, MediaCodec codec,
-                                          ByteBuffer buffer, MediaCodec.BufferInfo bufferInfo, int bufferIndex,
+                                          ByteBuffer buffer, int bufferIndex, int bufferFlags, long bufferPresentationTimeUs,
                                           boolean shouldSkip) throws ExoPlaybackException {
 
         if (DEBUG)
@@ -67,26 +85,30 @@ public class PodcastAudioRendererV21 extends PodcastAudioRenderer {
 
         if (bufferIndex == mLastSeenBufferIndex) {
             return super.processOutputBuffer(positionUs, elapsedRealtimeUs, codec,
-                    mLastInternalBuffer, bufferInfo, bufferIndex, shouldSkip);
+                    mLastInternalBuffer, bufferIndex, bufferFlags, bufferPresentationTimeUs, shouldSkip);
         } else {
             mLastSeenBufferIndex = bufferIndex;
         }
 
         int bytesToRead;
 
+        /*
         if (Util.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             buffer.position(0);
             bytesToRead = bufferInfo.size;
         } else {
             bytesToRead = buffer.remaining();
         }
+        */
+        bytesToRead = buffer.remaining();
 
         buffer.get(mSonicInputBuffer, 0, bytesToRead);
 
         int bytesOld = bytesToRead;
 
         // Remove Silence
-        if (doRemoveSilence()) {
+        //if (doRemoveSilence()) {
+        if (false) {
             mSilenceOutputBuffer = mSilenceRemover.removeSilence(mSonicInputBuffer, mSilenceOutputBuffer, bytesToRead);
             bytesToRead = mSilenceRemover.getOutputLength();
         } else {
@@ -95,8 +117,8 @@ public class PodcastAudioRendererV21 extends PodcastAudioRenderer {
 
         long us_skipped = 0;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
-            if (bufferInfo.size != 0) {
-                long us_pr_frame = (bufferInfo.presentationTimeUs / bufferInfo.size);
+            if (bytesToRead != 0) {
+                long us_pr_frame = (bufferPresentationTimeUs / bytesToRead);
                 us_skipped = us_pr_frame * (bytesOld - bytesToRead);
             }
         }
@@ -110,14 +132,15 @@ public class PodcastAudioRendererV21 extends PodcastAudioRenderer {
         mSonic.writeBytesToStream(mSilenceOutputBuffer, bytesToRead);
         final int readThisTime = mSonic.readBytesFromStream(mSonicOutputBuffer, mSonicOutputBuffer.length);
 
-        bufferInfo.offset = 0;
+        //bufferInfo.offset = 0;
         mLastInternalBuffer.position(0);
 
-        bufferInfo.size = readThisTime;
+        //bufferInfo.size = readThisTime;
         mLastInternalBuffer.limit(readThisTime);
 
         return super.processOutputBuffer(positionUs, elapsedRealtimeUs, codec, mLastInternalBuffer,
-                bufferInfo, bufferIndex, shouldSkip);
+                bufferIndex, bufferFlags, bufferPresentationTimeUs, shouldSkip);
+
     }
 
     @TargetApi(16)
@@ -144,5 +167,4 @@ public class PodcastAudioRendererV21 extends PodcastAudioRenderer {
         this.mLastInternalBuffer = ByteBuffer.wrap(mSonicOutputBuffer, 0, 0);
         setSpeed(mSpeed);
     }
-    */
 }

@@ -18,6 +18,9 @@ import android.view.ViewParent;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.Timeline;
 import com.squareup.otto.Subscribe;
 
 import org.bottiger.podcast.BuildConfig;
@@ -38,7 +41,7 @@ import static org.bottiger.podcast.player.SoundWavesPlayerBase.STATE_READY;
 /**
  * Created by apl on 03-09-2014.
  */
-public class PlayerSeekbar extends SeekBar implements PaletteListener, ExoPlayerWrapper.Listener {
+public class PlayerSeekbar extends SeekBar implements PaletteListener, ExoPlayer.EventListener {
 
     private static final String TAG = "PlayerSeekbar";
     private static final int RANGE_MAX = 1000;
@@ -418,7 +421,7 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener, ExoPlayer
     }
 
     @Override
-    public void onStateChanged(boolean playWhenReady, @SoundWavesPlayerBase.PlayerState int playbackState) {
+    public void onPlayerStateChanged(boolean playWhenReady, @SoundWavesPlayerBase.PlayerState int playbackState) {
         if (!validateState()) {
             return;
         }
@@ -440,15 +443,6 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener, ExoPlayer
         }
     }
 
-    @Override
-    public void onError(Exception e) {
-
-    }
-
-    @Override
-    public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
-
-    }
 
     private void updateRunning() {
         boolean running = mVisible && mStarted;
@@ -472,4 +466,24 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener, ExoPlayer
             }
         }
     };
+
+    @Override
+    public void onLoadingChanged(boolean isLoading) {
+
+    }
+
+    @Override
+    public void onTimelineChanged(Timeline timeline, Object manifest) {
+
+    }
+
+    @Override
+    public void onPlayerError(ExoPlaybackException error) {
+
+    }
+
+    @Override
+    public void onPositionDiscontinuity() {
+
+    }
 }

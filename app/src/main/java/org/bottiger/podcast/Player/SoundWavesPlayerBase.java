@@ -15,7 +15,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 
-import com.google.android.exoplayer.ExoPlayer;
+import com.google.android.exoplayer2.ExoPlayer;
 
 import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.SoundWaves;
@@ -51,15 +51,12 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
 
     // Constants pulled into this class for convenience.
     @Retention(RetentionPolicy.SOURCE)
-    @IntDef({STATE_IDLE, STATE_PREPARING, STATE_BUFFERING, STATE_READY, STATE_ENDED, TRACK_DISABLED, TRACK_DEFAULT})
+    @IntDef({STATE_IDLE, STATE_BUFFERING, STATE_READY, STATE_ENDED})
     public @interface PlayerState {}
     public static final int STATE_IDLE = ExoPlayer.STATE_IDLE;
-    public static final int STATE_PREPARING = ExoPlayer.STATE_PREPARING;
     public static final int STATE_BUFFERING = ExoPlayer.STATE_BUFFERING;
     public static final int STATE_READY = ExoPlayer.STATE_READY;
     public static final int STATE_ENDED = ExoPlayer.STATE_ENDED;
-    public static final int TRACK_DISABLED = ExoPlayer.TRACK_DISABLED;
-    public static final int TRACK_DEFAULT = ExoPlayer.TRACK_DEFAULT;
 
     protected  @PlayerStatusObservable.PlayerStatus int mStatus;
 
@@ -185,8 +182,8 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
         return false;
     }
 
-    public abstract void addListener(ExoPlayerWrapper.Listener listener);
-    public abstract void removeListener(ExoPlayerWrapper.Listener listener);
+    public abstract void addListener(ExoPlayer.EventListener listener);
+    public abstract void removeListener(ExoPlayer.EventListener listener);
 
     @Override
     public void setOnErrorListener(final OnErrorListener listener) {

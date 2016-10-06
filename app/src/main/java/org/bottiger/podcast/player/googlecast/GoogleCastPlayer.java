@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 
+import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.gms.cast.MediaInfo;
 import com.google.android.gms.cast.MediaMetadata;
 import com.google.android.gms.cast.framework.media.RemoteMediaClient;
@@ -48,7 +49,7 @@ public abstract class GoogleCastPlayer extends SoundWavesPlayerBase {
     @NonNull
     private RemoteMediaClient.Listener mClientListener;
 
-    private final CopyOnWriteArrayList<ExoPlayerWrapper.Listener> listeners;
+    private final CopyOnWriteArrayList<ExoPlayer.EventListener> listeners;
 
     public GoogleCastPlayer(@NonNull Context argContext) {
         super(argContext);
@@ -62,12 +63,12 @@ public abstract class GoogleCastPlayer extends SoundWavesPlayerBase {
     }
 
     @Override
-    public void addListener(ExoPlayerWrapper.Listener listener) {
+    public void addListener(ExoPlayer.EventListener listener) {
         listeners.add(listener);
     }
 
     @Override
-    public void removeListener(ExoPlayerWrapper.Listener listener) {
+    public void removeListener(ExoPlayer.EventListener listener) {
         listeners.remove(listener);
     }
 
@@ -274,7 +275,7 @@ public abstract class GoogleCastPlayer extends SoundWavesPlayerBase {
 
     private void notifyListeners(@SoundWavesPlayerBase.PlayerState int playbackState) {
         for (int i = 0; i < listeners.size(); i++) {
-            listeners.get(i).onStateChanged(true, playbackState);
+            listeners.get(i).onPlayerStateChanged(true, playbackState);
         }
     }
 

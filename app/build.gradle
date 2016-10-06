@@ -132,7 +132,7 @@ dependencies {
 
     compile 'io.requery:sqlite-android:3.14.0'
 
-    compile 'com.google.android.exoplayer:exoplayer:r1.5.11'
+    compile 'com.google.android.exoplayer:exoplayer:r2.0.1'
 
     // Glide
     compile 'com.github.bumptech.glide:glide:3.7.0'

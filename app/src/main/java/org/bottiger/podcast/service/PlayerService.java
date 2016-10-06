@@ -49,7 +49,7 @@ import android.support.v4.media.session.MediaControllerCompat;
 import android.telephony.PhoneStateListener;
 import android.util.Log;
 
-import com.google.android.exoplayer.ExoPlayer;
+import com.google.android.exoplayer2.ExoPlayer;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
@@ -457,8 +457,6 @@ public class PlayerService extends MediaBrowserServiceCompat implements
                 (mItem).setOffset(getContentResolver(), player.getCurrentPosition());
             }
 		}
-
-		//dis_notifyStatus();
 
 		player.pause();
         releaseWakelock();

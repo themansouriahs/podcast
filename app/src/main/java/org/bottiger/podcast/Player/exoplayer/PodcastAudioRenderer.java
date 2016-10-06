@@ -3,11 +3,10 @@ package org.bottiger.podcast.player.exoplayer;
 import android.media.audiofx.AutomaticGainControl;
 import android.support.annotation.Nullable;
 
-import com.google.android.exoplayer.ExoPlaybackException;
-import com.google.android.exoplayer.MediaCodecAudioTrackRenderer;
-import com.google.android.exoplayer.MediaCodecSelector;
-import com.google.android.exoplayer.SampleSource;
-import com.google.android.exoplayer.TrackRenderer;
+import com.google.android.exoplayer2.Renderer;
+import com.google.android.exoplayer2.audio.MediaCodecAudioRenderer;
+import com.google.android.exoplayer2.mediacodec.MediaCodecSelector;
+import com.google.android.exoplayer2.source.MediaSource;
 
 import org.bottiger.podcast.utils.AndroidUtil;
 
@@ -17,7 +16,7 @@ import org.bottiger.podcast.utils.AndroidUtil;
  *
  * https://github.com/emuneee/premofm/blob/master/LICENSE
  */
-public class PodcastAudioRenderer extends MediaCodecAudioTrackRenderer {
+public class PodcastAudioRenderer extends MediaCodecAudioRenderer {
 
     private static final long US_IN_MS = 1_000;
 
@@ -30,9 +29,12 @@ public class PodcastAudioRenderer extends MediaCodecAudioTrackRenderer {
     private ProgressUpdateListener mProgressUpdateListener;
     private long mProgress;
 
-    public PodcastAudioRenderer(SampleSource source) {
-        super(source, MediaCodecSelector.DEFAULT);
+
+    public PodcastAudioRenderer(MediaSource source) {
+        super((MediaCodecSelector) source);
+        //super(source, MediaCodecSelector.DEFAULT);
     }
+
 
     public void setProgressUpdateListener(ProgressUpdateListener progressUpdateListener) {
         mProgressUpdateListener = progressUpdateListener;
@@ -54,6 +56,7 @@ public class PodcastAudioRenderer extends MediaCodecAudioTrackRenderer {
         return mAutomaticGainControl;
     }
 
+    /*
     @Override
     protected void doSomeWork(long positionUs, long elapsedRealtimeUs, boolean sourceIsReady) throws ExoPlaybackException {
         super.doSomeWork(positionUs, elapsedRealtimeUs, sourceIsReady);
@@ -62,7 +65,7 @@ public class PodcastAudioRenderer extends MediaCodecAudioTrackRenderer {
         long bufferedProgress = getBufferedPositionUs();
 
         // if the end of the track has been buffered, set progress to duration
-        if (bufferedProgress == TrackRenderer.END_OF_TRACK_US) {
+        if (bufferedProgress == Renderer.END_OF_TRACK_US) {
             bufferedProgress = duration;
         } else {
             bufferedProgress = bufferedProgress / US_IN_MS;
@@ -76,6 +79,7 @@ public class PodcastAudioRenderer extends MediaCodecAudioTrackRenderer {
             }
         }
     }
+    */
 
     /**
      * Invoked when the audio session id becomes known. Once the id is known it will not change

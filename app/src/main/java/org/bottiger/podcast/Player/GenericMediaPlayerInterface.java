@@ -5,6 +5,8 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.google.android.exoplayer2.ExoPlayer;
+
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
 import org.bottiger.podcast.provider.IEpisode;
@@ -40,8 +42,8 @@ public interface GenericMediaPlayerInterface {
     boolean isCasting();
     void setPlayerService(@NonNull PlayerService argPlayerService);
 
-    void addListener(ExoPlayerWrapper.Listener listener);
-    void removeListener(ExoPlayerWrapper.Listener listener);
+    void addListener(ExoPlayer.EventListener listener);
+    void removeListener(ExoPlayer.EventListener listener);
 
     void startAndFadeIn();
     void FaceOutAndStop(int argDelayMs);

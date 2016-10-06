@@ -13,8 +13,13 @@ import android.support.annotation.Nullable;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 
-import com.google.android.exoplayer.ExoPlayer;
-import com.google.android.exoplayer.TrackRenderer;
+import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.source.MediaSource;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
@@ -24,8 +29,10 @@ import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.flavors.MediaCast.IMediaCast;
 import org.bottiger.podcast.flavors.MediaCast.IMediaRouteStateListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
+import org.bottiger.podcast.player.exoplayer.ExoPlayerMediaSourceHelper;
 import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
 import org.bottiger.podcast.player.exoplayer.ExtractorRendererBuilder;
+import org.bottiger.podcast.player.exoplayer.NewExoPlayer;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
@@ -56,10 +63,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
     int bufferProgress = 0;
     float playbackSpeed = 1.0f;
 
-    private ExoPlayerWrapper mExoplayer;
-    private static final int RENDERER_COUNT = 1;
-
-    private TrackRenderer[] mTrackRendere = new TrackRenderer[ExoPlayerWrapper.RENDERER_COUNT];
+    private NewExoPlayer mExoplayer;
 
     private PlayerHandler mPlayerHandler;
 
@@ -74,21 +78,28 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
                 R.string.pref_audioengine_automatic_gain_control_key,
                 R.bool.pref_audioengine_automatic_gain_control_default);
 
-        mExoplayer = new ExoPlayerWrapper();
-        mExoplayer.setRemoveSilence(remove_silence);
-        mExoplayer.setAutomaticGainControl(gain_control);
-        mExoplayer.setRenderBuilder(new ExtractorRendererBuilder(argContext, null));
+
+        mExoplayer = NewExoPlayer.newInstance(argContext);
+        //mExoplayer = new ExoPlayerWrapper();
+        //mExoplayer.setRemoveSilence(remove_silence);
+        //mExoplayer.setAutomaticGainControl(gain_control);
+        //mExoplayer.setRenderBuilder(new ExtractorRendererBuilder(argContext, null));
 
         mPlayerHandler = new PlayerHandler(argContext);
 
-        addListener(new ExoPlayerWrapper.Listener() {
+        addListener(new ExoPlayer.EventListener() {
             @Override
-            public void onStateChanged(boolean playWhenReady, @PlayerState int playbackState) {
+            public void onLoadingChanged(boolean isLoading) {
+                Log.d(TAG, "loading chanced: " + isLoading);
+            }
+
+            @Override
+            public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
                 if (playbackState == STATE_READY) {
                     IEpisode episode = getCurrentItem();
                     if (episode != null) {
                         long duration = getDuration();
-                        if (duration != ExoPlayer.UNKNOWN_TIME && episode.setDuration(duration)) {
+                        if (duration != C.TIME_UNSET && episode.setDuration(duration)) {
                             SoundWaves.getAppContext(argContext).getLibraryInstance().updateEpisode(episode);
                         }
                     }
@@ -96,22 +107,25 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
             }
 
             @Override
-            public void onError(Exception e) {
-
+            public void onTimelineChanged(Timeline timeline, Object manifest) {
             }
 
             @Override
-            public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
+            public void onPlayerError(ExoPlaybackException error) {
+                Log.e(TAG, error.toString());
+            }
 
+            @Override
+            public void onPositionDiscontinuity() {
             }
         });
     }
 
-    public void addListener(ExoPlayerWrapper.Listener listener) {
+    public void addListener(ExoPlayer.EventListener listener) {
         mExoplayer.addListener(listener);
     }
 
-    public void removeListener(ExoPlayerWrapper.Listener listener) {
+    public void removeListener(ExoPlayer.EventListener listener) {
         mExoplayer.removeListener(listener);
     }
 
@@ -390,20 +404,21 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         return 0;
     }
 
+
     public boolean doAutomaticGainControl() {
-        return mExoplayer.doAutomaticGainControl();
+        return false; //mExoplayer.doAutomaticGainControl();
     }
 
     public void setAutomaticGainControl(boolean argSetAutomaticGainControl) {
-        mExoplayer.setAutomaticGainControl(argSetAutomaticGainControl);
+        //mExoplayer.setAutomaticGainControl(argSetAutomaticGainControl);
     }
 
     public boolean doRemoveSilence() {
-        return mExoplayer.doRemoveSilence();
+        return false; //mExoplayer.doRemoveSilence();
     }
 
     public void setRemoveSilence(boolean argDoRemoveSilence) {
-        mExoplayer.setRemoveSilence(argDoRemoveSilence);
+        //mExoplayer.setRemoveSilence(argDoRemoveSilence);
     }
 
     @Override
@@ -434,13 +449,17 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
 
     @Override
     public void prepare() {
-        mExoplayer.prepare();
+        //mExoplayer.prepare();
     }
 
     @Override
     public void setDataSource(Context context, Uri uri) throws IllegalArgumentException, IllegalStateException, IOException {
-        ExtractorRendererBuilder audioRenderer = new ExtractorRendererBuilder(context, uri);
-        mExoplayer.setRenderBuilder(audioRenderer);
+        //ExtractorRendererBuilder audioRenderer = new ExtractorRendererBuilder(context, uri);
+        //mExoplayer.setRenderBuilder(audioRenderer);
+
+        ExoPlayerMediaSourceHelper mediaSourceHelper = new ExoPlayerMediaSourceHelper(context);
+        MediaSource source = mediaSourceHelper.buildMediaSource(uri);
+        mExoplayer.prepare(source);
     }
 
     @Override
@@ -461,7 +480,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
     @TargetApi(Build.VERSION_CODES.M)
     @Override
     public void setPlaybackSpeed(float speed) {
-        mExoplayer.setPlaybackSpeed(speed);
+        //mExoplayer.setPlaybackSpeed(speed);
     }
 
     public void startAndFadeIn() {
