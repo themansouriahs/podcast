@@ -767,8 +767,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
                  // This doesn't work as intended
                  if (mPlaylist.size() == 1) {
                      mTopPlayer.setPlaylistEmpty(true);
-                     //mTopPlayer.invalidate();
-                     //mRecyclerView.invalidate();
                  }
              }
          });

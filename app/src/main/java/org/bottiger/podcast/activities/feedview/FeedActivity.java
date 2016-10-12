@@ -465,9 +465,18 @@ public class FeedActivity extends TopActivity implements PaletteListener {
     protected void onStart() {
         super.onStart();
 
+        if (mSubscription == null) {
+            Log.w(TAG, "FeedActivitySubscription is null");
+            VendorCrashReporter.report(TAG, "FeedActivitySubscription is null");
+            finish();
+            return;
+        }
+
         if (mSubscription.getType() == ISubscription.DEFAULT) {
-            Subscription subscription = (Subscription) mSubscription;
-            PaletteHelper.generate(subscription.getImageURL(), this, this);
+            String url = mSubscription.getImageURL();
+            if (url != null) {
+                PaletteHelper.generate(url, this, this);
+            }
         }
     }
 

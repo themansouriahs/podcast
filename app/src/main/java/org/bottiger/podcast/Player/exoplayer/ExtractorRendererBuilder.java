@@ -64,7 +64,7 @@ public class ExtractorRendererBuilder implements ExoPlayerWrapper.RendererBuilde
   @TargetApi(16)
   @Override
   public Renderer[] buildRenderers(ExoPlayerWrapper player) {
-      Allocator allocator = new DefaultAllocator(BUFFER_SEGMENT_SIZE);
+      //Allocator allocator = new DefaultAllocator(BUFFER_SEGMENT_SIZE);
       Handler mainHandler = player.getMainHandler();
 
       // Build the video and audio renderers.

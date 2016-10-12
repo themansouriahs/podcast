@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.PlaybackParams;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
@@ -19,6 +20,7 @@ import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.audio.MediaCodecAudioRenderer;
 import com.google.android.exoplayer2.source.MediaSource;
 
 import org.bottiger.podcast.R;
@@ -33,6 +35,7 @@ import org.bottiger.podcast.player.exoplayer.ExoPlayerMediaSourceHelper;
 import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
 import org.bottiger.podcast.player.exoplayer.ExtractorRendererBuilder;
 import org.bottiger.podcast.player.exoplayer.NewExoPlayer;
+import org.bottiger.podcast.player.exoplayer.PodcastAudioRendererV21;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
@@ -40,6 +43,7 @@ import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.PlaybackSpeed;
 import org.bottiger.podcast.utils.PreferenceHelper;
+import org.bottiger.podcast.utils.rxbus.RxBusSimpleEvents;
 
 import java.io.File;
 import java.io.IOException;
@@ -454,9 +458,6 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
 
     @Override
     public void setDataSource(Context context, Uri uri) throws IllegalArgumentException, IllegalStateException, IOException {
-        //ExtractorRendererBuilder audioRenderer = new ExtractorRendererBuilder(context, uri);
-        //mExoplayer.setRenderBuilder(audioRenderer);
-
         ExoPlayerMediaSourceHelper mediaSourceHelper = new ExoPlayerMediaSourceHelper(context);
         MediaSource source = mediaSourceHelper.buildMediaSource(uri);
         mExoplayer.prepare(source);
@@ -480,7 +481,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
     @TargetApi(Build.VERSION_CODES.M)
     @Override
     public void setPlaybackSpeed(float speed) {
-        //mExoplayer.setPlaybackSpeed(speed);
+        mExoplayer.setPlaybackSpeed(speed);
     }
 
     public void startAndFadeIn() {

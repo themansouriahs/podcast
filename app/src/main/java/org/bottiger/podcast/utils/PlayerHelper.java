@@ -58,6 +58,11 @@ public class PlayerHelper {
             }
 
             MediaMetadataCompat metadataCompat = mMediaControllerCompat.getMetadata();
+
+            if (metadataCompat == null) {
+                return false;
+            }
+
             if (metadataCompat.containsKey(MediaMetadataCompat.METADATA_KEY_MEDIA_ID)) {
                 String id = metadataCompat.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID);
 

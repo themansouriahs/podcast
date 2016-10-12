@@ -21,6 +21,7 @@ import android.graphics.SurfaceTexture;
 import android.media.AudioManager;
 import android.media.MediaCodec;
 import android.media.PlaybackParams;
+import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -59,6 +60,10 @@ import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.video.MediaCodecVideoRenderer;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
+
+import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.utils.rxbus.RxBusSimpleEvents;
+
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
@@ -142,6 +147,11 @@ public final class NewExoPlayer implements ExoPlayer {
     private int audioSessionId;
     private float volume;
     private PlaybackParamsHolder playbackParamsHolder;
+
+    private int audioRendererIndex = -1;
+
+    boolean mDoRemoveSilence = false;
+    boolean mAutomaticGainControl = false;
 
     /* package */ NewExoPlayer(Context context, TrackSelector trackSelector,
                                   LoadControl loadControl, DrmSessionManager drmSessionManager,
@@ -570,6 +580,7 @@ public final class NewExoPlayer implements ExoPlayer {
                 drmSessionManager, true, mainHandler, componentListener,
                 AudioCapabilities.getCapabilities(context), AudioManager.STREAM_MUSIC);
         renderersList.add(audioRenderer);
+        audioRendererIndex = renderersList.size()-1;
 
         Renderer textRenderer = new TextRenderer(componentListener, mainHandler.getLooper());
         renderersList.add(textRenderer);
@@ -860,6 +871,39 @@ public final class NewExoPlayer implements ExoPlayer {
             this.params = params;
         }
 
+    }
+
+    public boolean doRemoveSilence() {
+        return mDoRemoveSilence;
+    }
+
+    public boolean doAutomaticGainControl() {
+        return mAutomaticGainControl;
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    public void setPlaybackSpeed(float argNewSpeed) {
+        if (renderers[audioRendererIndex] != null) {
+            ((PodcastMediaCodecAudioRenderer) renderers[audioRendererIndex]).setSpeed(argNewSpeed);
+        }
+        /*
+        if (renderers[ExoPlayerWrapper.TYPE_AUDIO] != null) {
+
+            if (renderers[ExoPlayerWrapper.TYPE_AUDIO] instanceof PodcastAudioRendererV21) {
+                ((PodcastAudioRendererV21) renderers[ExoPlayerWrapper.TYPE_AUDIO]).setSpeed(argNewSpeed);
+            } else {
+                player.sendMessage(renderers[ExoPlayerWrapper.TYPE_AUDIO],
+                        MediaCodecAudioRenderer.MSG_SET_PLAYBACK_PARAMS,
+                        new PlaybackParams().setSpeed(argNewSpeed));
+            }
+        }
+        */
+
+        notifyAudioEngineChange(argNewSpeed);
+    }
+
+    private void notifyAudioEngineChange(float argSpeed) {
+        SoundWaves.getRxBus().send(new RxBusSimpleEvents.PlaybackEngineChanged(argSpeed, doRemoveSilence(), doAutomaticGainControl()));
     }
 
 }
