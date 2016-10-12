@@ -178,10 +178,13 @@ public class MainActivity extends FragmentContainerActivity {
 				TransitionUtils.openSettings(this);
 				return true;
 			}
+
+			/*
 			case R.id.menu_web_player: {
 				TransitionUtils.openWebPlayerAuthenticator(this);
 				return true;
 			}
+			*/
 		}
 
 		return super.onOptionsItemSelected(item);
