@@ -228,6 +228,13 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
 
     /**
      *
+     */
+    public void removeFirst() {
+        removeItem(0);
+    }
+
+    /**
+     *
      * @param position
      */
     public void removeItem(int position) {

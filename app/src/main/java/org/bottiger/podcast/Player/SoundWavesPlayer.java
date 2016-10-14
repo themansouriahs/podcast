@@ -300,7 +300,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
             Runnable myRunnable = new Runnable() {
                 @Override
                 public void run() {
-                    mPlayerService.getPlaylist().removeItem(0);
+                    SoundWaves.getAppContext(mContext).getPlaylist().removeFirst();
                     mPlayerService.stop();
 
                     if (doPlayNext) {

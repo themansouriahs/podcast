@@ -290,7 +290,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
         }
 
 		play(nextItem);
-		SoundWaves.getAppContext(this).getPlaylist().removeItem(0);
+		SoundWaves.getAppContext(this).getPlaylist().removeFirst();
 		SoundWaves.getAppContext(this).getPlaylist().notifyPlaylistChanged();
 	}
 
