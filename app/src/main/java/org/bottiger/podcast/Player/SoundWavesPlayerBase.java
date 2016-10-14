@@ -181,8 +181,6 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
     public boolean isCasting() {
         return false;
     }
-
-    public abstract void addListener(ExoPlayer.EventListener listener);
     public abstract void removeListener(ExoPlayer.EventListener listener);
 
     @Override

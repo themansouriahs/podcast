@@ -67,6 +67,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
     int bufferProgress = 0;
     float playbackSpeed = 1.0f;
 
+    @NonNull
     private NewExoPlayer mExoplayer;
 
     private PlayerHandler mPlayerHandler;
@@ -84,11 +85,6 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
 
 
         mExoplayer = NewExoPlayer.newInstance(argContext);
-        //mExoplayer = new ExoPlayerWrapper();
-        //mExoplayer.setRemoveSilence(remove_silence);
-        //mExoplayer.setAutomaticGainControl(gain_control);
-        //mExoplayer.setRenderBuilder(new ExtractorRendererBuilder(argContext, null));
-
         mPlayerHandler = new PlayerHandler(argContext);
 
         addListener(new ExoPlayer.EventListener() {
@@ -363,7 +359,11 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
     }
 
     public void setVolume(float vol) {
-        return;
+        mExoplayer.setVolume(vol);;
+    }
+
+    public float getVolume() {
+        return mExoplayer.getVolume();
     }
 
     private void MarkAsListenedIfNeeded() {

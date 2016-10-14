@@ -51,6 +51,7 @@ public class PlayerHandler {
 
     private static class InnerPlayerHandler extends Handler {
         private float mCurrentVolume = 1.0f;
+        private static float sInitialVolume = 1.0f;
 
         @Override
         public void handleMessage(Message msg) {
@@ -60,12 +61,14 @@ public class PlayerHandler {
             if (playerService == null)
                 return;
 
+            GenericMediaPlayerInterface player = playerService.getPlayer();
+
             switch (msg.what) {
                 case FADEIN:
-                    if (!playerService.isPlaying()) {
+                    if (!PlayerService.isPlaying()) {
                         mCurrentVolume = 0f;
-                        playerService.getPlayer().setVolume(mCurrentVolume);
-                        playerService.getPlayer().start();
+                        player.setVolume(mCurrentVolume);
+                        player.start();
                         this.sendEmptyMessageDelayed(FADEIN, 10);
                     } else {
                         mCurrentVolume += 0.01f;
@@ -74,7 +77,7 @@ public class PlayerHandler {
                         } else {
                             mCurrentVolume = 1.0f;
                         }
-                        playerService.getPlayer().setVolume(mCurrentVolume);
+                        player.setVolume(mCurrentVolume);
                     }
                     break;
                 case TRACK_ENDED:
@@ -83,14 +86,14 @@ public class PlayerHandler {
                             .getDefaultSharedPreferences(playerService.getApplicationContext())
                             .getBoolean(key, CONTINUOUS_PLAYING_DEFAULT);
 
-                    if (playerService.getCurrentItem() != null) {
+                    if (PlayerService.getCurrentItem() != null) {
 
-                        if (playerService.getNextTrack() == PlayerService.NEXT_IN_PLAYLIST) {
+                        if (PlayerService.getNextTrack() == PlayerService.NEXT_IN_PLAYLIST) {
                             IEpisode nextItemId = playerService.getNext();
 
                             if (nextItemId == null) {
                                 playerService.dis_notifyStatus();
-                                playerService.getPlayer().stop();
+                                player.stop();
                             } else if (doPlayNext) {
                                 playerService.playNext();
                             }
@@ -103,19 +106,24 @@ public class PlayerHandler {
                     break;
 
                 case FADEOUT: {
-                    if (playerService.isPlaying()) {
+                    sInitialVolume = mCurrentVolume;
+
+                    if (PlayerService.isPlaying()) {
                         mCurrentVolume -= 0.01f;
                         if (mCurrentVolume > 0.0f) {
                             this.sendEmptyMessageDelayed(FADEOUT, 10);
                         } else {
                             mCurrentVolume = 0.0f;
                         }
-                        playerService.getPlayer().setVolume(mCurrentVolume);
+
+                        player.setVolume(mCurrentVolume);
                         Log.d(TAG, "Setting volume to: " + mCurrentVolume); // NoI18N
 
                         if (mCurrentVolume <= 0.0f) {
-                            playerService.stop();
+                            playerService.pause();
                             Log.d(TAG, "Stopping playback"); // NoI18N
+                            player.setVolume(sInitialVolume);
+                            mCurrentVolume = sInitialVolume;
                         }
                     }
 

@@ -37,6 +37,7 @@ public interface GenericMediaPlayerInterface {
 
     void pause();
 
+    float getVolume();
     void setVolume(float vol);
 
     boolean isCasting();

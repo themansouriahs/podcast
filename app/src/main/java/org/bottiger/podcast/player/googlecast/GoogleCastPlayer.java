@@ -100,6 +100,10 @@ public abstract class GoogleCastPlayer extends SoundWavesPlayerBase {
         getRemoteMediaClient().setStreamVolume(vol);
     }
 
+    public float getVolume() {
+        return getVolume();
+    }
+
     @Override
     public boolean isCasting() {
         return getRemoteMediaClient() != null && getRemoteMediaClient().hasMediaSession();

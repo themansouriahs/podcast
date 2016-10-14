@@ -415,7 +415,12 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         int onemin = 1000 * 60;
         ps.getPlayer().FaceOutAndStop(onemin*minutes);
         String toast = getResources().getQuantityString(R.plurals.player_sleep, minutes, minutes);
-        Toast.makeText(mContext, toast, Toast.LENGTH_LONG).show();
+        UIUtils.disPlayBottomSnackBar(this.getRootView(), toast, new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                return;
+            }
+        }, true);
     }
 
     @Override

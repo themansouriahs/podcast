@@ -434,6 +434,8 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 			if (mItem == null)
 				return;
 
+			getPlayer().setVolume(1.0f);
+
             takeWakelock(getPlayer().isSteaming());
 			SoundWaves.getAppContext(this).getPlaylist().setAsFrist(mItem);
 			getPlayer().start();
