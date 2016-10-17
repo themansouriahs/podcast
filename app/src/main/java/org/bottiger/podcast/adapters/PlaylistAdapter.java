@@ -136,16 +136,8 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         PaletteHelper.generate(artwork, activity, new PaletteListener() {
             @Override
             public void onPaletteFound(Palette argChangedPalette) {
-                int white = mActivity.getResources().getColor(R.color.white_opaque);
-
                 ColorExtractor colorExtractor = new ColorExtractor(mActivity, argChangedPalette);
                 viewHolder.setEpisodePrimaryColor(colorExtractor.getPrimary());
-                //viewHolder.mLayout.setCardBackgroundColor(colorExtractor.getPrimary());
-                //viewHolder.mMainTitle.setTextColor(colorExtractor.getTextColor());
-                ////viewHolder.buttonLayout.setBackgroundColor(colorExtractor.getPrimary());
-                //viewHolder.description.setTextColor(colorExtractor.getTextColor());
-                //viewHolder.currentTime.setTextColor(colorExtractor.getTextColor());
-                //viewHolder.mTimeDuration.setTextColor(colorExtractor.getTextColor());
             }
 
             @Override
@@ -230,19 +222,15 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
         holder.currentTime.setText(StrUtils.formatTime(playerPosition));
 
-        //holder.downloadButton.registerListener(paletteObservable);
-
         holder.seekbar.setEpisode(feedItem);
         holder.seekbar.setOverlay(mOverlay);
 
         holder.mPlayPauseButton.setEpisode(feedItem, PlayPauseImageView.PLAYLIST);
         holder.downloadButton.setEpisode(feedItem);
-        //holder.favoriteButton.setEpisode(feedItem);
         holder.removeButton.setEpisode(feedItem);
         holder.downloadButton.setEpisode(feedItem);
 
         PaletteHelper.generate(feedItem.getArtwork(mActivity), mActivity, holder.downloadButton);
-        //PaletteHelper.generate(feedItem.getArtwork(mActivity), mActivity, holder.favoriteButton);
         PaletteHelper.generate(feedItem.getArtwork(mActivity), mActivity, holder.removeButton);
 
 
@@ -254,7 +242,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
                 if (feedItem instanceof FeedItem) { // FIXME
                     ((FeedItem) feedItem).removeFromPlaylist(context.getContentResolver());
                 }
-                //PlaylistAdapter.this.notifyItemRemoved(position);
+
                 notifyDataSetChanged();
                 mPlaylist.removeItem(position + PLAYLIST_OFFSET);
             }
@@ -264,11 +252,8 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
     @Override
     public int getItemCount() {
         Log.v("PlaylistAdapter", "getItemCount");
-        //int cursorCount = mCursor == null ? 0 : mCursor.getCount();
         int playlistCount = mPlaylist == null ? 0 : mPlaylist.size();
-        //int minCount = Math.min(cursorCount, playlistCount);
 
-        //return minCount-PLAYLIST_OFFSET;
         return playlistCount-PLAYLIST_OFFSET;
     }
 
@@ -286,7 +271,6 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         }
 
         holder.mPlayPauseButton.unsetEpisodeId();
-        //holder.favoriteButton.unsetEpisodeId();
         holder.removeButton.unsetEpisodeId();
         holder.downloadButton.unsetEpisodeId();
     }
