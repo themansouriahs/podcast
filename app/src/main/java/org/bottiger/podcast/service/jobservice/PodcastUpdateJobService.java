@@ -31,7 +31,8 @@ public class PodcastUpdateJobService extends JobService {
             @Override
             public void complete(boolean argSucces, @NonNull ISubscription argSubscription) {
 
-                boolean downloadOnUpdate = PreferenceHelper.getBooleanPreferenceValue(getApplicationContext(),
+                boolean downloadOnUpdate = PreferenceHelper.getBooleanPreferenceValue(
+                        getApplicationContext(),
                         R.string.pref_download_on_update_key,
                         R.bool.pref_download_on_update_default);
 

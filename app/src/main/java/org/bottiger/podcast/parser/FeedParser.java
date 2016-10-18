@@ -441,13 +441,11 @@ public class FeedParser {
                         }
                     }
                 } else {
-                    // We assume it's the number of minutes
+                    // We assume it's the number of seconds
+                    // http://lists.apple.com/archives/syndication-dev/2005/Nov/msg00002.html#_Toc526931683
                     try {
-                        duration = Long.parseLong(unparsedDuration) * 60 * 1000; // to ms
-                    } catch (NumberFormatException nfe) {
-                        // I have observed feeds with malform duration
-                        duration = -1;
-                    } catch (NullPointerException npe) {
+                        duration = Long.parseLong(unparsedDuration) * 1000; // to ms
+                    } catch (NumberFormatException | NullPointerException nfe) {
                         // I have observed feeds with malform duration
                         duration = -1;
                     }
