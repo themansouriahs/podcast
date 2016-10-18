@@ -443,11 +443,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
 
     @NonNull
     protected FeedViewAdapter getAdapter() {
-
-        FeedViewAdapter adapter;
-
-        adapter = new FeedViewAdapter(this, mSubscription);
-
+        FeedViewAdapter adapter = new FeedViewAdapter(this, mSubscription);
         return adapter;
     }
 

@@ -9,8 +9,8 @@ android {
         applicationId "org.bottiger.podcast"
         minSdkVersion 15
         targetSdkVersion 24
-        versionCode 302        // even - release. Odd - development
-        versionName "0.140" // even - release. Odd - development
+        versionCode 305        // even - release. Odd - development
+        versionName "0.141" // even - release. Odd - development
         multiDexEnabled = true
         //renderscriptTargetApi 20
         //renderscriptSupportModeEnabled true
@@ -84,17 +84,10 @@ android {
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-        debug {
-            //minifyEnabled true
-            //shrinkResources true
-            //proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
     }
 
     // http://stackoverflow.com/questions/22851103/android-studio-gradle-error-multiple-dex-files-define
     dexOptions {
-        //preDexLibraries = false
-        incremental true
         maxProcessCount 4
         javaMaxHeapSize "2g"
     }
@@ -204,4 +197,14 @@ dependencies {
 
 }
 
-apply plugin: 'com.google.gms.google-services'
+task nonfreeReleaseTask << {
+    apply plugin: 'com.google.gms.google-services'
+}
+
+tasks.whenTaskAdded { task ->
+    if (task.name != 'free') {
+        task.dependsOn nonfreeReleaseTask
+    }
+}
+
+//apply plugin: 'com.google.gms.google-services'
