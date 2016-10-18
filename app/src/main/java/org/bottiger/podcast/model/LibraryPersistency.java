@@ -322,7 +322,7 @@ public class LibraryPersistency {
         item.offset = cursor.getInt(cursor.getColumnIndex(ItemColumns.OFFSET));
         item.setURL(cursor.getString(cursor.getColumnIndex(ItemColumns.URL)));
         item.image = cursor.getString(cursor.getColumnIndex(ItemColumns.IMAGE_URL));
-        item.title = cursor.getString(cursor.getColumnIndex(ItemColumns.TITLE));
+        item.setTitle(cursor.getString(cursor.getColumnIndex(ItemColumns.TITLE)));
         item.author = cursor.getString(cursor.getColumnIndex(ItemColumns.AUTHOR));
         item.date = cursor.getString(cursor.getColumnIndex(ItemColumns.DATE));
         item.pub_date = cursor.getLong(cursor.getColumnIndex(ItemColumns.PUB_DATE));

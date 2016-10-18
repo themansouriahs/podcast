@@ -531,8 +531,8 @@ public class FeedActivity extends TopActivity implements PaletteListener {
                 });
                 return true;
             case R.id.menu_bulk_download:
-                Playlist playlist = PlayerService.getInstance().getPlaylist();
-                if (mSubscription instanceof Subscription && playlist != null) {
+                Playlist playlist = SoundWaves.getAppContext(this).getPlaylist();
+                if (mSubscription instanceof Subscription) {
                     DialogBulkDownload dialogBulkDownload = new DialogBulkDownload();
                     Dialog dialog = dialogBulkDownload.onCreateDialog(this, playlist, (Subscription)mSubscription);
                     dialog.show();

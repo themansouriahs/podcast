@@ -128,9 +128,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
         if (item.getTitle() != null)
             episodeViewHolder.mTitle.setText(item.getTitle());
 
-        if (item.getDescription() != null)
-            episodeViewHolder.mDescription.setText(item.getDescription());
-
+        episodeViewHolder.mDescription.setText(item.getDescription());
         episodeViewHolder.IsMarkedAsListened = item.isMarkedAsListened();
         episodeViewHolder.DisplayDescription = mIsExpanded;
 

@@ -96,15 +96,15 @@ public class DownloadProgressPublisher {
 
                                         downloadProgress = new DownloadProgress(episode, status, progress);
                                     }
-                                    Log.d("Refresh UI:", "Downloading: " + episode.title + " (progress: " + progress + ")");
+                                    Log.d("Refresh UI:", "Downloading: " + episode.getTitle() + " (progress: " + progress + ")");
                                     break;
                                 case PENDING:
-                                    Log.d("Refresh UI:", "Pending: "+ episode.title);
+                                    Log.d("Refresh UI:", "Pending: "+ episode.getTitle());
                                     break;
                                 case DONE:
                                 case NOTHING:
                                 case ERROR:
-                                    Log.d("Refresh UI:", "End: "+ episode.title);
+                                    Log.d("Refresh UI:", "End: "+ episode.getTitle());
                                     downloadProgress = new DownloadProgress(episode, status, 100);
                                     mUpdateEpisodess.remove(i);
                                     break;

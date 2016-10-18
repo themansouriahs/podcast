@@ -290,16 +290,20 @@ public class Library {
             if (isFeedItem && item.sub_id < 0)
                 return false;
 
+            String episodeUrl = argEpisode.getURL();
+            boolean libraryContainsEpisode = mEpisodesUrlLUT.containsKey(episodeUrl);
+            IEpisode libraryEpisode = libraryContainsEpisode ? mEpisodesUrlLUT.get(episodeUrl) : item;
+
             Subscription subscription = null;
             if (item != null) {
                 subscription = item.getSubscription(mContext);
 
                 if (subscription != null) {
-                    subscription.addEpisode(item, true);
+                    subscription.addEpisode(libraryEpisode, true);
                 }
             }
 
-            if (mEpisodesUrlLUT.containsKey(argEpisode.getURL())) {
+            if (libraryContainsEpisode) {
                 // FIXME we should update the content of the model episode
                 return false;
             }

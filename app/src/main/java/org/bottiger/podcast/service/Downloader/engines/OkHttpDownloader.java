@@ -71,7 +71,7 @@ public class OkHttpDownloader extends DownloadEngineBase {
 
                 Log.d(TAG, "fileextension: " + extension);
 
-                String filename = Integer.toString(episode.getEpisodeNumber()) + episode.title.replace(' ', '_'); //Integer.toString(item.getEpisodeNumber()) + "_"
+                String filename = Integer.toString(episode.getEpisodeNumber()) + episode.getTitle().replace(' ', '_'); //Integer.toString(item.getEpisodeNumber()) + "_"
                 episode.setFilename(filename + "." + extension); // .replaceAll("[^a-zA-Z0-9_-]", "") +
 
                 double contentLength = mConnection.getContentLength();

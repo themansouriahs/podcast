@@ -96,7 +96,7 @@ public class DownloadManagerReceiver extends BroadcastReceiver {
 		item.filesize = c.getInt(c
 				.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
 
-		String filename =  Integer.toString(item.getEpisodeNumber()) + item.title.replace(' ', '_'); //Integer.toString(item.getEpisodeNumber()) + "_"
+		String filename =  Integer.toString(item.getEpisodeNumber()) + item.getTitle().replace(' ', '_'); //Integer.toString(item.getEpisodeNumber()) + "_"
 		item.setFilename(filename + ".mp3"); // .replaceAll("[^a-zA-Z0-9_-]", "") +
 
 		/* Calculate the imagePath */

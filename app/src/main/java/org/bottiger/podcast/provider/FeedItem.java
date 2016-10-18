@@ -77,7 +77,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 	/**
 	 * Title of the episode
 	 */
-	public String title;
+	private String title;
 
 	/**
 	 * Name of Publisher
