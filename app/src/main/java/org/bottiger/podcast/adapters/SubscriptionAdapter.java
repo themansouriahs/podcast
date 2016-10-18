@@ -303,5 +303,4 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
 
         return mSubscriptions.size();
     }
-
 }

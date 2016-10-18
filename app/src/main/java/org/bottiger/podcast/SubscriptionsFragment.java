@@ -143,6 +143,7 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
                         SortedList<Subscription> subscriptions = mLibrary.getSubscriptions();
                         setSubscriptionFragmentLayout(subscriptions.size());
 
+                        mGridLayoutmanager.setSpanCount(numberOfColumns());
                         mAdapter.setDataset(subscriptions);
                         mAdapter.notifyDataSetChanged();
                     }
