@@ -24,6 +24,8 @@ import com.bumptech.glide.request.target.SimpleTarget;
 
 import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.service.PlayerService;
 
@@ -194,12 +196,15 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
     }
 
     private void populateFastMediaMetadata(@NonNull MediaMetadataCompat.Builder mMetaBuilder, @NonNull IEpisode argEpisode) {
-        //Subscription subscription = argEpisode.getSubscription(mPlayerService);
+        ISubscription subscription = argEpisode.getSubscription(mPlayerService);
 
         mMetaBuilder.putText(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, argEpisode.getURL());
         mMetaBuilder.putText(MediaMetadataCompat.METADATA_KEY_TITLE, argEpisode.getTitle());
         mMetaBuilder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, argEpisode.getDuration());
         mMetaBuilder.putText(MediaMetadataCompat.METADATA_KEY_ARTIST, argEpisode.getAuthor());
+
+        if (subscription != null)
+            mMetaBuilder.putText(MediaMetadataCompat.METADATA_KEY_ALBUM, subscription.getTitle());
     }
 
     private PlaybackStateCompat.Builder getPlaybackState(@PlaybackStateCompat.State int argState, long argPosition, float argPlaybackSpeed) {
