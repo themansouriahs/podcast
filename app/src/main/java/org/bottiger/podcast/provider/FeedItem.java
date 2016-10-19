@@ -191,8 +191,15 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 	public int listened;
 
 	/**
-	 * Priority in the playlist. Higher priority value is higher up in the playlist.
-	 * Default is 1
+	 * Priority in the playlist.
+	 * * Default is 0.
+	 * * Higher priority value is further down in the playlist.
+	 * * The Priority 1 will always be the current playing episode.
+	 * * The current playing episode doesn't need to have the priority 1. It could be a higher number or 0.
+	 * * The priority 1 is assigned to episodes which are played "on demand".
+	 * * Priorities above 1 are episode which are queued manually
+	 * * If an episode is being played on demand it will replace other episodes with the priority one.
+	 * * Other episodes, with priorities above 1, will just be pushed down the playlist.
 	 */
 	public int priority;
 

@@ -69,7 +69,7 @@ public class HeadsetReceiver extends BroadcastReceiver {
                 break;
             case KeyEvent.KEYCODE_MEDIA_NEXT:
                 // FIXME implement this
-                argPlayerService.play(argPlayerService.getNext());
+                argPlayerService.play(argPlayerService.getNext(), true);
                 break;
             case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
                 // TODO: ensure that doing this in rapid succession actually plays the

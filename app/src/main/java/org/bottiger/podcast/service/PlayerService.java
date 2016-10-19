@@ -278,7 +278,9 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 	public void playNext() {
         IEpisode item = getCurrentItem();
-        IEpisode nextItem = SoundWaves.getAppContext(this).getPlaylist().getNext();
+        Playlist playlist = SoundWaves.getAppContext(this).getPlaylist();
+
+        IEpisode nextItem = playlist.getNext();
 
 		if (item != null && item instanceof FeedItem) {
             ((FeedItem)item).trackEnded(getContentResolver());
@@ -289,9 +291,10 @@ public class PlayerService extends MediaBrowserServiceCompat implements
             return;
         }
 
-		play(nextItem);
-		SoundWaves.getAppContext(this).getPlaylist().removeFirst();
-		SoundWaves.getAppContext(this).getPlaylist().notifyPlaylistChanged();
+        playlist.removeFirst();
+        playlist.notifyPlaylistChanged();
+
+		play(nextItem, false);
 	}
 
 	public void play() {
@@ -309,7 +312,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
         if (mItem == null)
             return;
 
-		play(mItem);
+		play(mItem, true);
 	}
 
 	/**
@@ -317,7 +320,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 	 * @param argEpisode The episode to be played
 	 * @return True if the episode is being played
      */
-	public boolean play(@NonNull IEpisode argEpisode) {
+	public boolean play(@NonNull IEpisode argEpisode, boolean triggeredManually) {
 
 		GenericMediaPlayerInterface player = getPlayer();
 
@@ -334,49 +337,20 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 				}
 				return true;
 			}
-
-			if (player.isPlaying()) {
-				currentItem.setOffset(getContentResolver(), player.getCurrentPosition());
-				stop();
-			}
 		}
 
-		IEpisode oldItem = currentItem;
 		currentItem = setCurrentItem(argEpisode);
+        Playlist playlist = SoundWaves.getAppContext(this).getPlaylist();
 
-		// Removed the current top episode from the playlist if it has been started
-		if (oldItem != null && !oldItem.equals(currentItem)) {
-			if (oldItem instanceof FeedItem) {
-				FeedItem oldFeedItem = (FeedItem)oldItem;
-				if (oldFeedItem.getPriority() > 0) {
-					oldFeedItem.setPriority(0);
-					int pos = SoundWaves.getAppContext(this).getPlaylist().getPosition(oldItem);
-					if (pos >= 0) {
-						SoundWaves.getAppContext(this).getPlaylist().removeItem(pos);
-					}
-				}
+        if (triggeredManually)
+            playlist.setAsFrist(currentItem);
 
-				oldFeedItem.removePriority();
-			}
-		}
+        float speed = getPlaybackSpeed(this, currentItem);
 
-        boolean isFeedItem = currentItem instanceof FeedItem;
-        final FeedItem feedItem = isFeedItem ? (FeedItem)currentItem : null;
-
-		float speed = getPlaybackSpeed(this, currentItem);
-
-		SoundWaves.getAppContext(this).getPlaylist().setAsFrist(currentItem);
-
-		getPlayer().setPlaybackSpeed(speed);
-		getPlayer().setDataSourceAsync(currentItem);
+        player.setPlaybackSpeed(speed);
+        player.setDataSourceAsync(currentItem);
 
 		updateMetadata(currentItem);
-
-        if (feedItem != null) {
-            if (feedItem.priority != 1)
-                feedItem.setPriority(null, getApplication());
-			SoundWaves.getAppContext(this).getLibraryInstance().updateEpisode(feedItem);
-        }
 
 		return true;
 	}
@@ -413,7 +387,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 			return false;
 		}
 
-        play(argEpisode);
+        play(argEpisode, true);
         return true;
 	}
 

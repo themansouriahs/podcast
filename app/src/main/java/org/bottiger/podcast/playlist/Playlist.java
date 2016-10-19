@@ -175,20 +175,44 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
 		return mInternalPlaylist.indexOf(episode);
 	}
 
+    /**
+     * Called when the user activly wants to play an episode.
+     * Should not be called when an episode arrives at the top of the playlist because it was second in line in the queue
+     *
+     * Referer to the "priority" description for the inner workings.
+     * @param item
+     */
     public void setAsFrist(@NonNull IEpisode item) {
+
+        // Persist the episode as the first episode
+        FeedItem feedItem = item instanceof FeedItem ? (FeedItem)item : null;
+        IEpisode oldFirst = null;
+
+        boolean isChanged = false;
 
         if (mInternalPlaylist.isEmpty()) {
             mInternalPlaylist.add(0, item);
-            notifyPlaylistChanged();
-            return;
+            isChanged = true;
+        } else if (!item.equals(mInternalPlaylist.get(0))) {
+            oldFirst = mInternalPlaylist.get(0);
+            mInternalPlaylist.remove(item);
+            mInternalPlaylist.add(0, item);
+            isChanged = true;
         }
 
-        if (item.equals(mInternalPlaylist.get(0)))
-            return;
+        if (isChanged) {
+            if (oldFirst != null && oldFirst.getPriority() == 1) {
+                oldFirst.setPriority(0);
+                mLibrary.updateEpisode(oldFirst);
+            }
 
-        mInternalPlaylist.remove(item);
-        mInternalPlaylist.add(0, item);
-        notifyPlaylistChanged();
+            mInternalPlaylist.get(0).setPriority(1);
+            if (feedItem != null) {
+                mLibrary.updateEpisode(feedItem);
+            }
+
+            notifyPlaylistChanged();
+        }
     }
 
 	/**
@@ -740,8 +764,8 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
 
     private static int comparePlaylistOrder(@Nullable IEpisode argEpisode1,
                                             @Nullable IEpisode argEpisode2) {
-        int E1_FIRST = 1;
-        int E2_FIRST = -1;
+        int E1_FIRST = -1;
+        int E2_FIRST = 1;
 
         if (argEpisode1 == null)
             return E2_FIRST;
@@ -752,8 +776,12 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
         int p1 = argEpisode1.getPriority();
         int p2 = argEpisode2.getPriority();
 
+        if ((p1 > 0 && p2 > 0) && p1 != p2) {
+            return p1 < p2 ? E1_FIRST : E2_FIRST; // Returns lowest first
+        }
+
         if (p1 != p2) {
-            return p1 < p2 ? E1_FIRST : E2_FIRST;
+            return p1 > p2 ? E1_FIRST : E2_FIRST; // Returns highest first
         }
 
         Date dt1 = argEpisode1.getDateTime();
