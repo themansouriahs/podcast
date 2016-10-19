@@ -138,6 +138,7 @@
     <string name="subscription_subtitle_updated_at">updated</string>
     <string name="filter_show_only_downloaded">Only downloaded</string>
     <string name="action_filter">Filter Playlist</string>
+    <string name="snackbar_change">Change</string>
     <string name="apply_filters">Apply filters</string>
     <string name="pref_gpodder_support_title">GPodder</string>
     <string name="gpodder_username">username</string>

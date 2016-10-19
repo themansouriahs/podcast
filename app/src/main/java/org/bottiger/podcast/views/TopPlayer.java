@@ -1,6 +1,7 @@
 package org.bottiger.podcast.views;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -36,6 +37,8 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.github.ivbaranov.mfb.MaterialFavoriteButton;
+import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
+import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
@@ -55,6 +58,8 @@ import org.bottiger.podcast.utils.PlaybackSpeed;
 import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.utils.rxbus.RxBusSimpleEvents;
 import org.bottiger.podcast.views.dialogs.DialogPlaybackSpeed;
+
+import java.util.Calendar;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -338,9 +343,10 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         mFastForwardButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                IEpisode episode = PlayerService.getCurrentItem();
                 PlayerService ps = PlayerService.getInstance();
                 if (ps != null) {
-                    ps.getPlayer().fastForward(ps.getCurrentItem());
+                    ps.getPlayer().fastForward(episode);
                 }
             }
         });
@@ -403,6 +409,24 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
     }
 
     private void sleepButtonPressed() {
+        int defaultminutes = mContext.getResources().getInteger(R.integer.player_sleep_default);
+        sleepButtonPressed(defaultminutes);
+    }
+
+    private void sleepButtonPressed(int argMinutes) {
+        String toast = getResources().getQuantityString(R.plurals.player_sleep, argMinutes, argMinutes);
+
+        setSleepTimer(argMinutes);
+
+        UIUtils.disPlayBottomSnackBar(this.getRootView(), toast, new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openTimePicker(view);
+            }
+        }, R.string.snackbar_change, true);
+    }
+
+    private void setSleepTimer(int minutes) {
         PlayerService ps = PlayerService.getInstance();
         if (ps == null) {
             String noPlayer = "Could not connect to the Player";
@@ -411,16 +435,42 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
             return;
         }
 
-        int minutes = 30;
         int onemin = 1000 * 60;
         ps.getPlayer().FaceOutAndStop(onemin*minutes);
-        String toast = getResources().getQuantityString(R.plurals.player_sleep, minutes, minutes);
-        UIUtils.disPlayBottomSnackBar(this.getRootView(), toast, new OnClickListener() {
+    }
+
+    private void openTimePicker(View argView) {
+
+        Calendar rightNow = Calendar.getInstance();
+
+        final int hour = rightNow.get(Calendar.HOUR_OF_DAY);
+        final int minute = rightNow.get(Calendar.MINUTE);
+
+        int minute_sleep = (minute + 30) % 60;
+
+        int setHour = hour;
+        if ((minute + 30) > 60) {
+            setHour = hour+1;
+        }
+
+        TimePickerDialog tpd = TimePickerDialog.newInstance(new TimePickerDialog.OnTimeSetListener() {
             @Override
-            public void onClick(View view) {
-                return;
+            public void onTimeSet(RadialPickerLayout view, int setHourOfDay, int setMinute, int setSecond) {
+                int hourDiff = setHourOfDay - hour;
+                int minuteDiff = setMinute-minute;
+
+                int setMinutes = hourDiff*60 + minuteDiff;
+
+                if (setMinutes > 0) {
+                    sleepButtonPressed(setMinutes);
+                }
             }
-        }, true);
+        }, setHour, minute_sleep, true);
+
+        if (getContext() instanceof Activity) {
+            Activity activity = (Activity) getContext();
+            tpd.show(activity.getFragmentManager(), "TimePickerDialog");
+        }
     }
 
     @Override

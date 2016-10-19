@@ -65,6 +65,8 @@ import org.bottiger.podcast.provider.ISubscription;
 public class UIUtils {
     private static final String TAG = "UIUtils";
 
+    public static final int INVALID_RES_ID = 0;
+
     /**
      * Factor applied to session color to derive the background color on panels and when
      * a session photo could not be downloaded (or while it is being downloaded)
@@ -107,16 +109,21 @@ public class UIUtils {
     }
 
     public static void disPlayBottomSnackBar(View argView, @StringRes int stringRes, View.OnClickListener argAction, boolean addBototmPadding) {
-        disPlayBottomSnackBarInternalInternal(argView, getSnack(argView, stringRes), argAction, addBototmPadding);
+        disPlayBottomSnackBarInternalInternal(argView, getSnack(argView, stringRes), argAction, INVALID_RES_ID, addBototmPadding);
     }
 
     public static void disPlayBottomSnackBar(View argView, CharSequence stringRes, View.OnClickListener argAction, boolean addBototmPadding) {
-        disPlayBottomSnackBarInternalInternal(argView, getSnack(argView, stringRes), argAction, addBototmPadding);
+        disPlayBottomSnackBarInternalInternal(argView, getSnack(argView, stringRes), argAction, INVALID_RES_ID, addBototmPadding);
     }
 
-    private static void disPlayBottomSnackBarInternalInternal(View argView, Snackbar argSnack, View.OnClickListener argAction, boolean addBototmPadding) {
+    public static void disPlayBottomSnackBar(View argView, CharSequence stringRes, View.OnClickListener argAction, @StringRes int argActionStringRed, boolean addBototmPadding) {
+        disPlayBottomSnackBarInternalInternal(argView, getSnack(argView, stringRes), argAction, argActionStringRed, addBototmPadding);
+    }
+
+    private static void disPlayBottomSnackBarInternalInternal(View argView, Snackbar argSnack, View.OnClickListener argAction, @StringRes int argActionStringRed, boolean addBototmPadding) {
         if (argAction != null) {
-            argSnack = argSnack.setAction(R.string.playlist_episode_dismissed_undo, argAction);
+            int res = argActionStringRed != INVALID_RES_ID ? argActionStringRed : R.string.playlist_episode_dismissed_undo;
+            argSnack = argSnack.setAction(res, argAction);
         }
 
         argSnack.setActionTextColor(ContextCompat.getColor(argView.getContext(), R.color.white_opaque));

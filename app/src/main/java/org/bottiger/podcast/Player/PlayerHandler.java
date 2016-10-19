@@ -49,6 +49,10 @@ public class PlayerHandler {
                 mHandler.obtainMessage(msg), delay);
     }
 
+    public void removeCallbacks(int what) {
+        mHandler.removeMessages(what);
+    }
+
     private static class InnerPlayerHandler extends Handler {
         private float mCurrentVolume = 1.0f;
         private static float sInitialVolume = 1.0f;

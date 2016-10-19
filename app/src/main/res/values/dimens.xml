@@ -15,6 +15,8 @@
 -->
 <resources>
 
+    <integer name="player_sleep_default">30</integer>
+
     <!-- Feed View - Start -->
     <dimen name="feed_activity_setting_caption_width">70dp</dimen>
     <dimen name="feed_activity_setting_control_width">30dp</dimen>
