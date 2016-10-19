@@ -275,20 +275,6 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         holder.downloadButton.unsetEpisodeId();
     }
 
-    @Override
-    public void onViewAttachedToWindow (PlaylistViewHolder holder) {
-        super.onViewAttachedToWindow(holder);
-        SoundWaves.getBus().register(holder.mPlayPauseButton);
-        SoundWaves.getBus().register(holder.seekbar);
-    }
-
-    @Override
-    public void  onViewDetachedFromWindow(PlaylistViewHolder holder) {
-        SoundWaves.getBus().unregister(holder.mPlayPauseButton);
-        SoundWaves.getBus().unregister(holder.seekbar);
-        super.onViewDetachedFromWindow(holder);
-    }
-
     /**
      1.) Observable is a Class and Observer is an Interface
      2.) Observable class maintain a list of observers

@@ -21,9 +21,6 @@ import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.player.GenericMediaPlayerInterface;
 import org.bottiger.podcast.player.SoundWavesPlayer;
 
-import com.squareup.otto.Bus;
-import com.squareup.otto.ThreadEnforcer;
-
 import org.bottiger.podcast.cloud.EventLogger;
 import org.bottiger.podcast.flavors.Analytics.AnalyticsFactory;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
@@ -72,7 +69,6 @@ public class SoundWaves extends MultiDexApplication {
     private SoundWavesDownloadManager mDownloadManager;
     private PodcastUpdater mPodcastUpdater;
 
-    private static Bus sBus = new Bus(ThreadEnforcer.MAIN);
     private static RxBus _rxBus = null;
     private static RxBus2 _rxBus2 = null;
 
@@ -182,11 +178,6 @@ public class SoundWaves extends MultiDexApplication {
         }
 
         return mFirstRun;
-    }
-
-    @Deprecated
-    public static Bus getBus() {
-        return sBus;
     }
 
     // This is better done with a DI Library like Dagger

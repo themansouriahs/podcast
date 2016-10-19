@@ -33,7 +33,6 @@ import android.webkit.MimeTypeMap;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.Timeline;
-import com.squareup.otto.Subscribe;
 
 import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.R;
@@ -59,6 +58,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.NoSuchElementException;
 
+import io.reactivex.BackpressureStrategy;
 import io.reactivex.CompletableObserver;
 import io.reactivex.Observer;
 import io.reactivex.Scheduler;
@@ -192,6 +192,7 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
 
         mRxDisposable = SoundWaves.getRxBus2()
                 .toObservable()
+                .toFlowable(BackpressureStrategy.LATEST)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .ofType(PlayerStatusProgressData.class)
