@@ -372,7 +372,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
 
         IEpisode iepisode = getCurrentItem();
 
-        FeedItem episode = null;
+        FeedItem episode;
         if (iepisode instanceof FeedItem) {
             episode = (FeedItem)iepisode;
         } else {
@@ -380,9 +380,6 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         }
 
         float playerPosition = (float) getCurrentPosition();
-
-        if (episode == null)
-            return;
 
         long episodeDuration = episode.getDuration();
 

@@ -43,7 +43,10 @@ public class PlayerStatusObservable {
             //        offset);
             feedItem.setPosition(offset);
 
-            SoundWaves.getBus().post(new PlayerStatusProgressData(feedItem.getOffset()));
+            //SoundWaves.getBus().post(new PlayerStatusProgressData(feedItem.getOffset()));
+
+            PlayerStatusProgressData pspd = new PlayerStatusProgressData(feedItem.getOffset());
+            SoundWaves.getRxBus2().send(pspd);
         }
     }
 

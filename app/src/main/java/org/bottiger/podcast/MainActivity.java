@@ -41,7 +41,6 @@ public class MainActivity extends FragmentContainerActivity {
     static PreferenceHelper mPreferenceHelper = new PreferenceHelper();
 
     private HeadsetReceiver receiver;
-
 	private SharedPreferences prefs;
 
 	private int currentTheme;
@@ -92,15 +91,6 @@ public class MainActivity extends FragmentContainerActivity {
 	}
 
 	/**
-     * Return a reference to the playerservice if bound
-     */
-    @Nullable
-	@Deprecated
-    public static PlayerService getPlayerService() {
-        return PlayerService.getInstance();
-    }
-
-	/**
 	 * Test if a service is running
 	 * 
 	 * @param serviceName
@@ -135,24 +125,10 @@ public class MainActivity extends FragmentContainerActivity {
 
     @Override
     protected void onPause() {
-		//Debug.stopMethodTracing();
-        super.onPause();
+	    super.onPause();
         if (ApplicationConfiguration.TRACE_STARTUP)
             Debug.stopMethodTracing();
     }
-
-	@Override
-	public void onLowMemory() {
-        super.onLowMemory();
-	}
-
-	@Override
-	public void onTrimMemory(int level) {
-        super.onTrimMemory(level);
-		if (level >= TRIM_MEMORY_MODERATE ) {
-			// Clear fresco cache
-		}
-	}
 
 	/**
 	 * Creates the actionbar from the XML menu file. In addition it makes sure

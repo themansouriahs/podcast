@@ -18,7 +18,7 @@ public class HeadsetReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d("HeadsetReceiver", "Action: " + intent.getAction().toString() + "");
-        PlayerService playerService = MainActivity.getPlayerService();
+        PlayerService playerService = PlayerService.getInstance();
 
         if (playerService == null) {
             Log.e("HeadsetReciever", "Warning, PlayerService is null");

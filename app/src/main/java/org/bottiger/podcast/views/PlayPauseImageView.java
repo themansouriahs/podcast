@@ -52,9 +52,24 @@ import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.StorageUtils;
 import org.bottiger.podcast.views.dialogs.DialogOpenVideoExternally;
 import org.bottiger.podcast.views.drawables.PlayPauseDrawable;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.NoSuchElementException;
+
+import io.reactivex.CompletableObserver;
+import io.reactivex.Observer;
+import io.reactivex.Scheduler;
+import io.reactivex.SingleEmitter;
+import io.reactivex.SingleObserver;
+import io.reactivex.SingleOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subscribers.ResourceSubscriber;
 
 import static org.bottiger.podcast.player.SoundWavesPlayerBase.STATE_BUFFERING;
 import static org.bottiger.podcast.player.SoundWavesPlayerBase.STATE_IDLE;
@@ -127,6 +142,8 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
     private int mPaintColor;
     private int mPaintBorderColor = Color.WHITE;
 
+    private Disposable mRxDisposable;
+
     public PlayPauseImageView(Context context) {
         super(context, null);
         init(context);
@@ -172,6 +189,17 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
         }
 
         setOnClickListener(this);
+
+        mRxDisposable = SoundWaves.getRxBus2()
+                .toObservable()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .ofType(PlayerStatusProgressData.class)
+                .subscribe(new Consumer<PlayerStatusProgressData>() {
+                    public void accept(PlayerStatusProgressData playerStatusProgressData){
+                        setProgressMs(playerStatusProgressData);
+                    }
+                });
     }
 
     private void initAttr(AttributeSet attrs) {
@@ -209,6 +237,7 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
 
     public synchronized void unsetEpisodeId() {
         this.mEpisode = null;
+        mRxDisposable.dispose();
     }
 
     @MainThread
@@ -380,8 +409,7 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
         return System.currentTimeMillis()-argFirstDisplayed < 1000 && argFirstDisplayed != -1;
     }
 
-    @Subscribe
-    public void setProgressMs(PlayerStatusProgressData argPlayerProgress) {
+    private void setProgressMs(PlayerStatusProgressData argPlayerProgress) {
 
         // copy from seekbar
 
