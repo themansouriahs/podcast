@@ -63,6 +63,7 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 			}
 
             mPlaylist.resetPlaylist(null);
+
             int size = mPlaylist.defaultSize();
             if (!mPlaylist.isEmpty()) {
 				mPlaylist.populatePlaylist(size, true);

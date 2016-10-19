@@ -163,7 +163,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
         mRxPlayerChanged = getPlayerSubscription();
 
         mPlaylist = soundwaves.getPlaylist();
-        //soundwaves.getLibraryInstance().loadPlaylist(mPlaylist);
 
         super.onCreate(savedInstanceState);
     }

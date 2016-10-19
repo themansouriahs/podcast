@@ -457,6 +457,18 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
 	 * 
 	 */
 	public void resetPlaylist(CursorAdapter adapter) {
+
+        // Clear the model.
+        IEpisode episode;
+        for (int i = 0; i < mInternalPlaylist.size(); i++) {
+            episode = mInternalPlaylist.get(i);
+            if (episode.getPriority() > 0) {
+                episode.setPriority(0);
+            } else {
+                break;
+            }
+        }
+
 		// Update the database
 		String currentTime = String.valueOf(System.currentTimeMillis());
 		String updateLastUpdate = ", " + ItemColumns.LAST_UPDATE + "="
