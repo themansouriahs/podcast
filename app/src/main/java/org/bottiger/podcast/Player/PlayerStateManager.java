@@ -15,6 +15,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 
@@ -197,11 +198,13 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
 
     private void populateFastMediaMetadata(@NonNull MediaMetadataCompat.Builder mMetaBuilder, @NonNull IEpisode argEpisode) {
         ISubscription subscription = argEpisode.getSubscription(mPlayerService);
+        String author = !TextUtils.isEmpty(argEpisode.getAuthor()) ? argEpisode.getAuthor() : subscription.getTitle();
 
         mMetaBuilder.putText(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, argEpisode.getURL());
         mMetaBuilder.putText(MediaMetadataCompat.METADATA_KEY_TITLE, argEpisode.getTitle());
         mMetaBuilder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, argEpisode.getDuration());
-        mMetaBuilder.putText(MediaMetadataCompat.METADATA_KEY_ARTIST, argEpisode.getAuthor());
+        mMetaBuilder.putText(MediaMetadataCompat.METADATA_KEY_ARTIST, author);
+        mMetaBuilder.putText(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, argEpisode.getArtwork(mPlayerService));
 
         if (subscription != null)
             mMetaBuilder.putText(MediaMetadataCompat.METADATA_KEY_ALBUM, subscription.getTitle());
