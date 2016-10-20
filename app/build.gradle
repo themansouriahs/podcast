@@ -199,6 +199,7 @@ dependencies {
 
 }
 
+/*
 task nonfreeReleaseTask << {
     apply plugin: 'com.google.gms.google-services'
 }
@@ -208,5 +209,6 @@ tasks.whenTaskAdded { task ->
         task.dependsOn nonfreeReleaseTask
     }
 }
+*/
 
 //apply plugin: 'com.google.gms.google-services'
