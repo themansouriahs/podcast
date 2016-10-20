@@ -54,6 +54,10 @@ public interface ISubscription {
 
     boolean doSkipIntro();
 
+    Integer countNewEpisodes();
+
+    long getLastUpdate();
+
     /**
      * Determines if we are subscribed to a Subscription with the same URL
      * @return

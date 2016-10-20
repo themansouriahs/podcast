@@ -3,6 +3,7 @@ package org.bottiger.podcast.model;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteCantOpenDatabaseException;
+import android.support.annotation.IntDef;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,6 +13,7 @@ import android.support.v7.util.SortedList;
 import android.text.TextUtils;
 import android.util.Log;
 
+import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.cloud.EventLogger;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
@@ -28,8 +30,11 @@ import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionColumns;
 import org.bottiger.podcast.provider.SubscriptionLoader;
+import org.bottiger.podcast.utils.PreferenceHelper;
 import org.bottiger.podcast.utils.StrUtils;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -54,8 +59,22 @@ public class Library {
     private static final String TAG = "Library";
     private static final int BACKPREASURE_BUFFER_SIZE = 10000;
 
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({DATE_NEW_FIRST, DATE_OLD_FIRST, NOT_SET, ALPHABETICALLY, ALPHABETICALLY_REVERSE, LAST_UPDATE, NEW_EPISODES})
+    public @interface SortOrder {}
+    public static final int DATE_NEW_FIRST         = 0;
+    public static final int DATE_OLD_FIRST         = 1;
+    public static final int NOT_SET                = 2;
+    public static final int ALPHABETICALLY         = 3;
+    public static final int ALPHABETICALLY_REVERSE = 4;
+    public static final int LAST_UPDATE            = 5;
+    public static final int NEW_EPISODES           = 6;
+
     @NonNull private Context mContext;
     @NonNull private LibraryPersistency mLibraryPersistency;
+
+    @Library.SortOrder
+    private int mSubscriptionSortOrder = Library.ALPHABETICALLY;
 
     private final ReentrantLock mLock = new ReentrantLock();
 
@@ -92,6 +111,10 @@ public class Library {
         @Override
         public void onInserted(int position, int count) {
             Subscription subscription = mActiveSubscriptions.get(position);
+
+            if (subscription == null)
+                return;
+
             notifySubscriptionChanged(subscription.getId(), SubscriptionChanged.ADDED, "SortedListInsert");
         }
 
@@ -139,6 +162,11 @@ public class Library {
         mLibraryPersistency = new LibraryPersistency(argContext);
 
         mActiveSubscriptions = new SortedList<>(Subscription.class, mSubscriptionsListCallback);
+
+        mSubscriptionSortOrder = PreferenceHelper.getIntegerPreferenceValue(
+                mContext,
+                R.string.pref_subscription_sort_order_key,
+                Integer.valueOf(mSubscriptionSortOrder));
 
         loadSubscriptions();
 
@@ -829,7 +857,45 @@ public class Library {
     }
 
     private int compareSubscriptions(ISubscription s1, ISubscription s2) {
-        return s1.getTitle().compareTo(s2.getTitle());
+        switch (mSubscriptionSortOrder) {
+
+            case Library.ALPHABETICALLY_REVERSE:
+                return compareTitle(s2, s1);
+            case Library.LAST_UPDATE:
+                return compareDates(s2, s1); // largest first
+            case Library.NEW_EPISODES:
+                return compareNewEpisodes(s2, s1); // largest first
+            case Library.ALPHABETICALLY:
+            case Library.NOT_SET:
+            case Library.DATE_OLD_FIRST:
+            case Library.DATE_NEW_FIRST:
+                break;
+        }
+
+        // Default
+        //return s1.getTitle().compareTo(s2.getTitle());
+        return compareTitle(s1, s2);
+    }
+
+    private static int compareDates(@Nullable ISubscription s1, @Nullable ISubscription s2) {
+        Long episode1 = s1 != null ? s1.getLastUpdate() : 0;
+        Long episode2 = s2 != null ? s2.getLastUpdate() : 0;
+
+        return episode1.compareTo(episode2);
+    }
+
+    private static int compareNewEpisodes(@Nullable ISubscription s1, @Nullable ISubscription s2) {
+        Integer episode1 = s1 != null ? s1.countNewEpisodes() : 0;
+        Integer episode2 = s2 != null ? s2.countNewEpisodes() : 0;
+
+        return episode1.compareTo(episode2);
+    }
+
+    private static int compareTitle(@Nullable ISubscription s1, @Nullable ISubscription s2) {
+        String title1 = s1 != null ? s1.getTitle() : "";
+        String title2 = s2 != null ? s2.getTitle() : "";
+
+        return title1.compareTo(title2);
     }
 
     private void notifySubscriptionChanged(final long argId, @SubscriptionChanged.Action final int argAction, @Nullable String argTag) {
@@ -845,5 +911,33 @@ public class Library {
 
     private static String getKey(@NonNull IEpisode argEpisode) {
         return argEpisode.getURL();
+    }
+
+    public void setSubscriptionOrder(@SortOrder int argSortOrder) {
+        PreferenceHelper.setIntegerPreferenceValue(mContext, R.string.pref_subscription_sort_order_key, argSortOrder);
+        mSubscriptionSortOrder = argSortOrder;
+
+        mActiveSubscriptions.beginBatchedUpdates();
+        Subscription[] subscriptionsTmp = new Subscription[mActiveSubscriptions.size()];
+        Subscription subTmp;
+
+        for (int i = 0; i < subscriptionsTmp.length; i++) {
+            subscriptionsTmp[i] = mActiveSubscriptions.get(i);
+        }
+
+        mActiveSubscriptions.clear();
+
+        for (int i = 0; i < subscriptionsTmp.length; i++) {
+            subTmp = subscriptionsTmp[i];
+            mActiveSubscriptions.add(subTmp);
+        }
+
+        mActiveSubscriptions.endBatchedUpdates();
+
+
+    }
+
+    public @SortOrder int getSubscriptionOrder() {
+        return mSubscriptionSortOrder;
     }
 }

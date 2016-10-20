@@ -115,6 +115,16 @@ public class SlimSubscription extends BaseSubscription implements Parcelable {
         return mIsDirty;
     }
 
+    @Override
+    public Integer countNewEpisodes() {
+        return 0;
+    }
+
+    @Override
+    public long getLastUpdate() {
+        return 0;
+    }
+
     public void markForSubscription(boolean argDoSubscribe) {
         setIsSubscribed(argDoSubscribe);
         mIsDirty = argDoSubscribe;

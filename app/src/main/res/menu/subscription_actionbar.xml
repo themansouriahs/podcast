@@ -15,4 +15,27 @@
         appcompat:showAsAction="never" >
     </item>
 
+    <!-- "sort" submenu -->
+    <item android:id="@+id/file"
+        android:title="@string/menu_subscriptions_order"
+        android:orderInCategory="600">
+    <menu>
+        <group
+            android:id="@+id/group"
+            android:checkableBehavior="single">
+
+        <item android:id="@+id/menu_order_alphabetically"
+            android:title="@string/menu_subscriptions_order_alphabetically" />
+        <item android:id="@+id/menu_order_alphabetically_reverse"
+            android:title="@string/menu_subscriptions_order_alphabetically_reverse" />
+        <item android:id="@+id/menu_order_last_updated"
+            android:title="@string/menu_subscriptions_order_updated" />
+        <item android:id="@+id/menu_order_new_count"
+            android:title="@string/menu_subscriptions_order_new_count" />
+
+        </group>
+    </menu>
+
+    </item>
+
 </menu>

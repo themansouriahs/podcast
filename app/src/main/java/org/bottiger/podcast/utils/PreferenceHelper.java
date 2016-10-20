@@ -57,6 +57,24 @@ public class PreferenceHelper implements SharedPreferences.OnSharedPreferenceCha
         return prefs.getBoolean(key, defaultValue);
     }
 
+    public static void setIntegerPreferenceValue(@NonNull Context argContext,
+                                                @StringRes int argKeyId,
+                                                Integer argValue) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(argContext);
+        String key = argContext.getResources().getString(argKeyId);
+
+        prefs.edit().putInt(key, argValue).apply();
+    }
+
+    public static int getIntegerPreferenceValue(@NonNull Context argContext,
+                                                @StringRes int argKeyId,
+                                                Integer argDefaultValue) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(argContext);
+        String key = argContext.getResources().getString(argKeyId);
+
+        return prefs.getInt(key, argDefaultValue);
+    }
+
     public static int getIntegerPreferenceValue(@NonNull Context argContext,
                                                      @StringRes int argKeyId,
                                                      @IntegerRes int argDefaultId) {

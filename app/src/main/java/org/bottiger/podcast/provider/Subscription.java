@@ -543,7 +543,7 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 		mSettings = argSettings;
 	}
 
-	public int countNewEpisodes() {
+	public Integer countNewEpisodes() {
 		int newCounter = 0;
 		List<IEpisode> list = getEpisodes().getUnfilteredList();
 		for (int i = 0; i < list.size(); i++) {

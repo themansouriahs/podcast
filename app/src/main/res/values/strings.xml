@@ -219,6 +219,12 @@
     <string name="dialog_playback_removile_silence">Remove silence</string>
     <string name="menu_web_player">Web Player</string>
 
+    <string name="menu_subscriptions_order">Sort by</string>
+    <string name="menu_subscriptions_order_alphabetically">name (A-Z)</string>
+    <string name="menu_subscriptions_order_alphabetically_reverse">name reversed (Z-A)</string>
+    <string name="menu_subscriptions_order_updated">last updated</string>
+    <string name="menu_subscriptions_order_new_count">new episodes</string>
+
     <plurals name="player_sleep">
         <item quantity="one">Player will sleep in %d minute</item>
         <item quantity="other">Player will sleep in %d minutes</item>

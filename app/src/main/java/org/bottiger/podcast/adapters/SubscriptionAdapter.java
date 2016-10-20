@@ -30,6 +30,7 @@ import org.bottiger.podcast.adapters.viewholders.FooterViewHolder;
 import org.bottiger.podcast.adapters.viewholders.subscription.AuthenticationViewHolder;
 import org.bottiger.podcast.adapters.viewholders.subscription.SubscriptionViewHolder;
 import org.bottiger.podcast.listeners.PaletteListener;
+import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.PaletteHelper;
@@ -262,7 +263,7 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
             return FOOTER_TYPE;
         }
 
-        if (!sub.isAuthenticationWorking()) {
+        if (sub != null && !sub.isAuthenticationWorking()) {
             return AUTHENTICATE_TYPE;
         }
 

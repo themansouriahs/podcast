@@ -26,6 +26,7 @@ import android.widget.TextView;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.playlist.PlaylistData;
 import org.bottiger.podcast.playlist.filters.SubscriptionFilter;
@@ -136,10 +137,10 @@ public class DialogPlaylistFilters extends DialogFragment {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (position == 0) {
                     //playlist.setSortOrder(Playlist.SORT.DATE_NEW_FIRST); // new first
-                    mPlaylistData.sortOrder = Playlist.DATE_NEW_FIRST; // new first
+                    mPlaylistData.sortOrder = Library.DATE_NEW_FIRST; // new first
                 } else {
                     //playlist.setSortOrder(Playlist.SORT.DATE_OLD_FIRST); // old first
-                    mPlaylistData.sortOrder = Playlist.DATE_OLD_FIRST;  // old first
+                    mPlaylistData.sortOrder = Library.DATE_OLD_FIRST;  // old first
                 }
                 SoundWaves.getRxBus().send(mPlaylistData);
             }

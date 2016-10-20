@@ -37,6 +37,7 @@
     <string name="pref_audioengine_remove_silence_key" translatable="false">pref_audioengine_remove_silence</string>
     <string name="pref_audioengine_automatic_gain_control_key" translatable="false">pref_audioengine_automatic_gain_control</string>
     <string name="pref_skip_intro_key" translatable="false">pref_skip_intro</string>
+    <string name="pref_subscription_sort_order_key" translatable="false">pref_subscription_sort_order</string>
 
 
 </resources>

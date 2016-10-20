@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.util.SortedList;
@@ -29,10 +30,9 @@ import android.widget.RelativeLayout;
 import org.bottiger.podcast.adapters.SubscriptionAdapter;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.Library;
-import org.bottiger.podcast.model.events.EpisodeChanged;
-import org.bottiger.podcast.model.events.ItemChanged;
 import org.bottiger.podcast.model.events.SubscriptionChanged;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.utils.PreferenceHelper;
 import org.bottiger.podcast.views.ContextMenuRecyclerView;
 import org.bottiger.podcast.views.dialogs.DialogOPML;
 
@@ -58,7 +58,6 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
     private final int VIEW_TYPE_LIST = 6;
     private final int VIEW_TYPE_2_COLUMNS = 7;
     private final int VIEW_TYPE_3_COLUMNS = 8;
-
 
     private Boolean mShowEmptyView = null;
 
@@ -120,7 +119,7 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
         mGridContainerView = (FrameLayout) mContainerView.findViewById(R.id.subscription_grid_container);
 
         //RecycelrView
-        mAdapter = new SubscriptionAdapter(getActivity(), numberOfColumns());
+        mAdapter = createAdapter();
         setSubscriptionFragmentLayout(mLibrary.getSubscriptions().size());
 
 		mGridView = (RecyclerView) mContainerView.findViewById(R.id.gridview);
@@ -242,6 +241,34 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
 	public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.subscription_actionbar, menu);
 		super.onCreateOptionsMenu(menu, inflater);
+
+        @IdRes int idres = 0;
+
+        switch (mLibrary.getSubscriptionOrder()) {
+            case Library.ALPHABETICALLY: {
+                idres = R.id.menu_order_alphabetically;
+                break;
+            }
+            case Library.ALPHABETICALLY_REVERSE: {
+                idres = R.id.menu_order_alphabetically_reverse;
+                break;
+            }
+            case Library.LAST_UPDATE: {
+                idres = R.id.menu_order_last_updated;
+                break;
+            }
+            case Library.NEW_EPISODES: {
+                idres = R.id.menu_order_new_count;
+                break;
+            }
+            default: {
+                idres = R.id.menu_order_alphabetically;
+            }
+        }
+
+        MenuItem item = menu.findItem(idres);
+        item.setChecked(true);
+
         return;
 	}
 
@@ -257,12 +284,43 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
                     Log.wtf(TAG, "Activity (" + getActivity().getClass().getName() + ") could not be cast to TopActivity." +
                             "This is needed in order to requets filesystem permission. Exception: " + cce.toString()); // NoI18N
                 }
+                break;
             }
             case R.id.menu_refresh_all_subscriptions: {
                 SoundWaves.getAppContext(getContext()).getRefreshManager().refreshAll();
+                break;
             }
+            case R.id.menu_order_alphabetically: {
+                setSortOrder(item, Library.ALPHABETICALLY);
+                break;
+            }
+            case R.id.menu_order_alphabetically_reverse: {
+                setSortOrder(item, Library.ALPHABETICALLY_REVERSE);
+                break;
+            }
+            case R.id.menu_order_last_updated: {
+                setSortOrder(item, Library.LAST_UPDATE);
+                break;
+            }
+            case R.id.menu_order_new_count: {
+                setSortOrder(item, Library.NEW_EPISODES);
+                break;
+            }
+
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void setSortOrder(MenuItem item, @Library.SortOrder int argSortOrder) {
+        mLibrary.setSubscriptionOrder(argSortOrder);
+        item.setChecked(true);
+
+        mAdapter.setDataset(mLibrary.getSubscriptions());
+        mAdapter.notifyDataSetChanged();
+    }
+
+    private SubscriptionAdapter createAdapter() {
+        return new SubscriptionAdapter(getActivity(), numberOfColumns());
     }
 	
 	@Override

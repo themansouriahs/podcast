@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.annotation.IntDef;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -27,8 +26,6 @@ import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionColumns;
 import org.bottiger.podcast.service.PlayerService;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -48,14 +45,7 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
     private static final String mSortNew = "DESC";
     private static final String mSortOld = "ASC";
 
-    @Retention(RetentionPolicy.SOURCE)
-    @IntDef({DATE_NEW_FIRST, DATE_OLD_FIRST, NOT_SET})
-    public @interface SortOrder {}
-    public static final int DATE_NEW_FIRST = 0;
-    public static final int DATE_OLD_FIRST = 1;
-    public static final int NOT_SET = 2;
-
-    private int mSortOrder = DATE_NEW_FIRST;
+    private int mSortOrder = Library.DATE_NEW_FIRST;
 
     private boolean mIsLoaded = false;
 
@@ -663,7 +653,7 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
             setShowListened(argPlaylistData.showListened);
         }
 
-        if (argPlaylistData.sortOrder != NOT_SET) {
+        if (argPlaylistData.sortOrder != Library.NOT_SET) {
             setSortOrder(argPlaylistData.sortOrder);
         }
 
@@ -698,12 +688,12 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
     }
 
     @SuppressLint("CommitPrefEdits")
-    public void setSortOrder(@SortOrder int argSortOrder) {
+    public void setSortOrder(@Library.SortOrder int argSortOrder) {
         boolean isChanged = mSortOrder != argSortOrder;
         mSortOrder = argSortOrder;
 
         if (isChanged) {
-            String order = mSortOrder == DATE_NEW_FIRST ? mSortNew : mSortOld;
+            String order = mSortOrder == Library.DATE_NEW_FIRST ? mSortNew : mSortOld;
             sharedPreferences.edit().putString(inputOrderKey, order).commit();
             notifyDatabaseChanged();
         }
