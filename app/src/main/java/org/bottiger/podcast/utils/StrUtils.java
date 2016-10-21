@@ -32,6 +32,13 @@ public class StrUtils {
 		return DateUtils.formatElapsedTime(item.getDuration());
     }
 
+	public static String formatUrl(@Nullable String argUrl) {
+		if (TextUtils.isEmpty(argUrl))
+			return "";
+
+		return argUrl.replace("http://", "").replace("https://", "");
+	}
+
 	public static boolean isValidUrl(@Nullable String argUrl) {
 		if (TextUtils.isEmpty(argUrl))
 			return false;

@@ -20,6 +20,7 @@ import org.bottiger.podcast.provider.base.BaseSubscription;
 import org.bottiger.podcast.utils.BitMaskUtils;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.PlaybackSpeed;
+import org.bottiger.podcast.utils.StrUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -595,7 +596,7 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 
 	@Override
 	public String getTitle() {
-		return title;
+		return StrUtils.formatUrl(title);
 	}
 
 	@Override

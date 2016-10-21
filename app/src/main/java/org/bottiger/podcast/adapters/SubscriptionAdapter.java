@@ -35,6 +35,7 @@ import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.StrUtils;
+import org.bottiger.podcast.utils.UIUtils;
 
 /**
  * Created by aplb on 11-10-2015.
@@ -145,7 +146,12 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
         if (hasNewEpisodes) {
             pluralNew = mActivity.getResources().getQuantityText(R.plurals.subscription_list_new, newEpisodeCount);
         }
-        int visibility = hasNewEpisodes ? View.VISIBLE : View.GONE;
+
+        boolean hasImage = !TextUtils.isEmpty(logo);
+        Uri uri = hasImage ? Uri.parse(logo) : null;
+        int generic_image_margin = 100;
+
+        int visibility = hasNewEpisodes || !hasImage ? View.VISIBLE : View.GONE;
 
         if (holder.new_episodes_counter != null && holder.new_episodes != null) {
 
@@ -158,41 +164,34 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
             holder.new_episodes.setVisibility(visibility);
         } else {
             String title = String.valueOf(newEpisodeCount) + " " + pluralNew;
-            if (hasNewEpisodes && !isListView()) {
+            if (hasNewEpisodes && !isListView() && hasImage) {
                 holder.title.setText(title);
             }
         }
 
-        if (isListView()) {
-            holder.title.setText(subscription.getTitle());
-        }
-
         if (holder.text_container != null) {
-            holder.text_container.setVisibility(visibility);
-        }
+            if (holder.image != null && hasImage) {
 
-
-        Uri uri = null;
-        if (holder.image != null && !TextUtils.isEmpty(logo)) {
-            uri = Uri.parse(logo);
-
-            PaletteHelper.generate(logo, mActivity, new PaletteListener() {
-                @Override
-                public void onPaletteFound(Palette argChangedPalette) {
-                    ColorExtractor extractor = new ColorExtractor(argChangedPalette);
-                    if (holder.text_container != null)
+                PaletteHelper.generate(logo, mActivity, new PaletteListener() {
+                    @Override
+                    public void onPaletteFound(Palette argChangedPalette) {
+                        ColorExtractor extractor = new ColorExtractor(argChangedPalette);
                         holder.text_container.setBackgroundColor(extractor.getPrimaryTint());
-                }
+                    }
 
-                @Override
-                public String getPaletteUrl() {
-                    return logo;
-                }
-            });
+                    @Override
+                    public String getPaletteUrl() {
+                        return logo;
+                    }
+                });
 
+            } else {
+                holder.text_container.setBackgroundColor(0x00000000);
+            }
         }
 
-        if (uri != null) {
+        if (hasImage) {
+            holder.image.setPadding(0, 0, 0, 0);
             String image = uri.toString();
             if (!TextUtils.isEmpty(image) && StrUtils.isValidUrl(image)) {
 
@@ -220,7 +219,16 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
 
             }
         } else {
+            holder.image.setPadding(generic_image_margin, generic_image_margin, generic_image_margin, generic_image_margin);
             Glide.with(mActivity).load(R.drawable.generic_podcast).centerCrop().into(holder.image);
+        }
+
+        if (holder.text_container != null) {
+            holder.text_container.setVisibility(visibility);
+        }
+
+        if (isListView() || !hasImage) {
+            holder.title.setText(subscription.getTitle());
         }
 
         argHolder.itemView.setOnClickListener(new View.OnClickListener() {
