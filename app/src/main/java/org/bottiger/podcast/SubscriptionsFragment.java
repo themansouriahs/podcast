@@ -144,7 +144,10 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
 
                         mGridLayoutmanager.setSpanCount(numberOfColumns());
                         mAdapter.setDataset(subscriptions);
-                        mAdapter.notifyDataSetChanged();
+
+                        if (!mGridView.isComputingLayout()) {
+                            mAdapter.notifyDataSetChanged();
+                        }
                     }
                 }, new Action1<Throwable>() {
                     @Override
@@ -173,8 +176,10 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
                         SortedList<Subscription> subscriptions = mLibrary.getSubscriptions();
                         Subscription subscription = mLibrary.getSubscription(itemChangedEvent.getId());
                         int index = subscriptions.indexOf(subscription);
-                        mAdapter.notifyItemChanged(index);
-                        //mAdapter.notifyDataSetChanged();
+
+                        if (!mGridView.isComputingLayout()) {
+                            mAdapter.notifyItemChanged(index);
+                        }
                     }
                 }, new Action1<Throwable>() {
                     @Override
