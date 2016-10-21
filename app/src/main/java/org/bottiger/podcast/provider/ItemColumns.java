@@ -102,7 +102,7 @@ public class ItemColumns implements BaseColumns {
             + LAST_UPDATE + " INTEGER, "
             + CONTENT + " TEXT, "
             + STATUS + " INTEGER, "
-            + URL + " VARCHAR(1024) NOT NULL UNIQUE, "
+            + URL + " VARCHAR(1024) NOT NULL, "
 			+ RESOURCE + " VARCHAR(1024), "
             + FILESIZE + " INTEGER, "
 			+ CHUNK_FILESIZE + " INTEGER, "
@@ -122,7 +122,8 @@ public class ItemColumns implements BaseColumns {
             + CREATED + " INTEGER, "
             + LISTENED + " INTEGER NOT NULL DEFAULT 0, "
 			+ PRIORITY + " INTEGER NOT NULL DEFAULT 0, "
-			+ PUB_DATE + " INTEGER NOT NULL DEFAULT -1 "
+			+ PUB_DATE + " INTEGER NOT NULL DEFAULT -1, "
+	        + "UNIQUE(" + SUBS_ID + ", " + URL + ") ON CONFLICT ABORT"
 			+ ");";
 
 	// To upgrade from database version 12 to version 13
