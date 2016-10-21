@@ -56,6 +56,11 @@ public class SubscriptionLoader {
             sub.setNewEpisodes(cursor.getInt(newEpisodesIndex));
         }
 
+        int episodeCountIndex = cursor.getColumnIndex(SubscriptionColumns.EPISODE_COUNT);
+        if (episodeCountIndex > 0) {
+            sub.setEpisodeCount(cursor.getInt(episodeCountIndex));
+        }
+
         return sub;
     }
 

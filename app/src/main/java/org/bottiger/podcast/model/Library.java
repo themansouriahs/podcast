@@ -859,16 +859,24 @@ public class Library {
     private int compareSubscriptions(ISubscription s1, ISubscription s2) {
         switch (mSubscriptionSortOrder) {
 
-            case Library.ALPHABETICALLY_REVERSE:
+            case ALPHABETICALLY_REVERSE: {
                 return compareTitle(s2, s1);
-            case Library.LAST_UPDATE:
+            }
+            case LAST_UPDATE: {
                 return compareDates(s2, s1); // largest first
-            case Library.NEW_EPISODES:
-                return compareNewEpisodes(s2, s1); // largest first
-            case Library.ALPHABETICALLY:
-            case Library.NOT_SET:
-            case Library.DATE_OLD_FIRST:
-            case Library.DATE_NEW_FIRST:
+            }
+            case NEW_EPISODES: {
+                int order = compareNewEpisodes(s2, s1); // largest first
+                if (order == 0) {
+                    return compareTitle(s1, s2);
+                }
+
+                return order;
+            }
+            case ALPHABETICALLY:
+            case NOT_SET:
+            case DATE_OLD_FIRST:
+            case DATE_NEW_FIRST:
                 break;
         }
 
@@ -885,8 +893,8 @@ public class Library {
     }
 
     private static int compareNewEpisodes(@Nullable ISubscription s1, @Nullable ISubscription s2) {
-        Integer episode1 = s1 != null ? s1.countNewEpisodes() : 0;
-        Integer episode2 = s2 != null ? s2.countNewEpisodes() : 0;
+        Integer episode1 = s1 != null ? s1.getNewEpisodes() : 0;
+        Integer episode2 = s2 != null ? s2.getNewEpisodes() : 0;
 
         return episode1.compareTo(episode2);
     }

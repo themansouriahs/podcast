@@ -34,6 +34,7 @@ import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.PaletteHelper;
+import org.bottiger.podcast.utils.StrUtils;
 
 /**
  * Created by aplb on 11-10-2015.
@@ -166,7 +167,7 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
             holder.title.setText(subscription.getTitle());
         }
 
-        if (!hasNewEpisodes && holder.text_container != null) {
+        if (holder.text_container != null) {
             holder.text_container.setVisibility(visibility);
         }
 
@@ -193,7 +194,7 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
 
         if (uri != null) {
             String image = uri.toString();
-            if (!TextUtils.isEmpty(image) && Patterns.WEB_URL.matcher(image).matches()) {
+            if (!TextUtils.isEmpty(image) && StrUtils.isValidUrl(image)) {
 
                 if (getItemViewType(position) == GRID_TYPE) {
                     Glide.with(mActivity).load(image).centerCrop().placeholder(R.drawable.generic_podcast).into(holder.image);

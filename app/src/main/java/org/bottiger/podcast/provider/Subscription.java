@@ -90,11 +90,13 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 	public long lastUpdated;
 	public long lastItemUpdated;
 	public long fail_count;
-	public int new_episodes;
 	@Deprecated public long auto_download;
     private int mPrimaryColor;
     private int mPrimaryTintColor;
     private int mSecondaryColor;
+
+	public int new_episodes_cache;
+	private int episode_count_cache;
 
 	/**
 	 * Settings is a bitmasked int with various settings
@@ -184,7 +186,8 @@ public class Subscription extends BaseSubscription implements PaletteListener {
         mPrimaryTintColor = -1;
         mSecondaryColor = -1;
 		mSettings = -1;
-		new_episodes = -1;
+		new_episodes_cache = -1;
+		episode_count_cache = -1;
 	}
 
 	public Subscription() {
@@ -386,6 +389,7 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 
 	public void setIsLoaded(boolean argIsLoaded) {
 		mIsLoaded = argIsLoaded;
+		countEpisodes();
 	}
 
 	@Override
@@ -412,7 +416,7 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 				notifyPropertyChanged(SubscriptionChanged.CHANGED, "updatedDuringRefresh");
 			}
 
-			countNewEpisodes();
+			countEpisodes();
 			notifyPropertyChanged(SubscriptionChanged.LOADED, "loaded");
 		}
 	}
@@ -543,7 +547,12 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 		mSettings = argSettings;
 	}
 
-	public Integer countNewEpisodes() {
+	/**
+	 * Should be run when the Subscription is loaded or refreshed.
+	 *
+	 * @return
+     */
+	private boolean countEpisodes() {
 		int newCounter = 0;
 		List<IEpisode> list = getEpisodes().getUnfilteredList();
 		for (int i = 0; i < list.size(); i++) {
@@ -551,16 +560,37 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 				newCounter++;
 		}
 
-		new_episodes = newCounter;
-		return getNewEpisodes();
+		setEpisodeCount(list.size());
+		setNewEpisodes(newCounter);
+		return true;
 	}
 
-	public int getNewEpisodes() {
-		return new_episodes <= 0 ? 0 : new_episodes;
+	@NonNull
+	public Integer getNewEpisodes() {
+		return new_episodes_cache <= 0 ? 0 : new_episodes_cache;
 	}
 
-	public void setNewEpisodes(int argNewEpisodes) {
-		new_episodes = argNewEpisodes;
+	void setNewEpisodes(int argNewEpisodes) {
+		if (new_episodes_cache == argNewEpisodes)
+			return;
+
+		new_episodes_cache = argNewEpisodes;
+		notifyPropertyChanged(null);
+	}
+
+	void setEpisodeCount(int argEpisodeCount) {
+		if (episode_count_cache == argEpisodeCount)
+			return;
+
+		episode_count_cache = argEpisodeCount;
+		notifyPropertyChanged(null);
+	}
+
+	public int getEpisodeCount() {
+		if (mIsLoaded)
+			return mEpisodes.size();
+
+		return episode_count_cache;
 	}
 
 	@Override

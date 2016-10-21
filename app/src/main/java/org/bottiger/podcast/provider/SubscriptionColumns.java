@@ -43,15 +43,10 @@ public class SubscriptionColumns implements BaseColumns {
     public static final String PRIMARY_TINT_COLOR = "primary_tint_color";
     public static final String SECONDARY_COLOR = "secondary_color";
 
-	// virtual column
 	public static final String NEW_EPISODES = "new_episodes";
+	public static final String EPISODE_COUNT = "episodes_count";
 
 	public static final String SETTINGS = "settings";
-
-	public static final String[] ALL_COLUMNS = { _ID, URL, LINK, TITLE,
-			DESCRIPTION, LAST_UPDATED, LAST_ITEM_UPDATED, FAIL_COUNT, STATUS,
-			COMMENT, RATING, USERNAME, PASSWORD, SERVER_ID, REMOTE_ID, AUTO_DOWNLOAD,
-			PLAYLIST_POSITION, IMAGE_URL, PRIMARY_COLOR, PRIMARY_TINT_COLOR, SECONDARY_COLOR, SETTINGS};
 
 	public static final String DEFAULT_SORT_ORDER = _ID + " ASC";
 	public static final String sql_create_table = "CREATE TABLE " 
@@ -77,7 +72,9 @@ public class SubscriptionColumns implements BaseColumns {
         + PRIMARY_COLOR + " INTEGER DEFAULT 0 , "
         + PRIMARY_TINT_COLOR + " INTEGER DEFAULT 0 , "
 		+ SECONDARY_COLOR + " INTEGER DEFAULT 0 , "
-        + SETTINGS + " INTEGER DEFAULT -1 "
+        + SETTINGS + " INTEGER DEFAULT -1 , "
+		+ NEW_EPISODES + " INTEGER DEFAULT 0 , "
+		+ EPISODE_COUNT + " INTEGER DEFAULT 0 "
 		+ ");";
 
 	public static final String sql_index_subs_url = "CREATE UNIQUE INDEX IDX_"
@@ -88,57 +85,64 @@ public class SubscriptionColumns implements BaseColumns {
 			+ LAST_UPDATED + ");";
 	
 	public static ContentValues checkValues(ContentValues values, Uri uri) {
-		if (values.containsKey(URL) == false) {
+		if (!values.containsKey(URL)) {
 			throw new SQLException("Fail to insert row because URL is needed "
 					+ uri);
 		}
 
-		if (values.containsKey(LINK) == false) {
+		if (!values.containsKey(LINK)) {
 			values.put(LINK, "");
 		}
 
-		if (values.containsKey(TITLE) == false) {
+		if (!values.containsKey(TITLE)) {
 			values.put(TITLE, "unknow");
 		}
 
-		if (values.containsKey(DESCRIPTION) == false) {
+		if (!values.containsKey(DESCRIPTION)) {
 			values.put(DESCRIPTION, "");
 		}
 		
-		if (values.containsKey(IMAGE_URL) == false) {
+		if (!values.containsKey(IMAGE_URL)) {
 			values.put(IMAGE_URL, "");
 		}
 
-		if (values.containsKey(LAST_UPDATED) == false) {
+		if (!values.containsKey(LAST_UPDATED)) {
 			values.put(LAST_UPDATED, 0);
 		}
 
-		if (values.containsKey(LAST_ITEM_UPDATED) == false) {
+		if (!values.containsKey(LAST_ITEM_UPDATED)) {
 			values.put(LAST_ITEM_UPDATED, 0);
 		}
 
-		if (values.containsKey(FAIL_COUNT) == false) {
+		if (!values.containsKey(FAIL_COUNT)) {
 			values.put(FAIL_COUNT, 0);
 		}
 		
-		if (values.containsKey(AUTO_DOWNLOAD) == false) {
+		if (!values.containsKey(AUTO_DOWNLOAD)) {
 			values.put(AUTO_DOWNLOAD, 0);
 		}		
-		if (values.containsKey(PLAYLIST_POSITION) == false) {
+		if (!values.containsKey(PLAYLIST_POSITION)) {
 			values.put(PLAYLIST_POSITION, -1);
 		}
 
-        if (values.containsKey(PRIMARY_COLOR) == false) {
+        if (!values.containsKey(PRIMARY_COLOR)) {
             values.put(PRIMARY_COLOR, -1);
         }
-        if (values.containsKey(PRIMARY_TINT_COLOR) == false) {
+        if (!values.containsKey(PRIMARY_TINT_COLOR)) {
             values.put(PRIMARY_TINT_COLOR, -1);
         }
-        if (values.containsKey(SECONDARY_COLOR) == false) {
+        if (!values.containsKey(SECONDARY_COLOR)) {
             values.put(SECONDARY_COLOR, -1);
         }
-		if (values.containsKey(SETTINGS) == false) {
+		if (!values.containsKey(SETTINGS)) {
 			values.put(SETTINGS, -1);
+		}
+
+		if (!values.containsKey(NEW_EPISODES)) {
+			values.put(NEW_EPISODES, 0);
+		}
+		if (!values.containsKey(EPISODE_COUNT)) {
+			values.put(EPISODE_COUNT, 0);
 		}
 
 		return values;

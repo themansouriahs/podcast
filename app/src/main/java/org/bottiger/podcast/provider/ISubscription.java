@@ -54,7 +54,8 @@ public interface ISubscription {
 
     boolean doSkipIntro();
 
-    Integer countNewEpisodes();
+    @NonNull
+    Integer getNewEpisodes();
 
     long getLastUpdate();
 

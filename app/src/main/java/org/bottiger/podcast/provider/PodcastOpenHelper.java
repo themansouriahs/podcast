@@ -15,7 +15,7 @@ public class PodcastOpenHelper extends SQLiteOpenHelper {
 
 	private final PodcastLog log = PodcastLog.getLog(getClass());
 
-	private final static int DBVERSION = 20;
+	private final static int DBVERSION = 21;
 	private final static String DBNAME = "podcast.db";
 
     private static PodcastOpenHelper mInstance = null;
@@ -207,15 +207,6 @@ public class PodcastOpenHelper extends SQLiteOpenHelper {
 			log.debug("Done upgrading database");
 		}
 
-        /*
-        else if (oldVersion != newVersion) {
-			// drop db
-			db.execSQL("DROP TABLE " + ItemColumns.TABLE_NAME);
-			db.execSQL("DROP TABLE " + SubscriptionColumns.TABLE_NAME);
-			onCreate(db);
-		}*/
-
-
 		if (oldVersion < 19) {
 			String new_settings_column = "ALTER TABLE " + SubscriptionColumns.TABLE_NAME
 					+ " ADD COLUMN " + SubscriptionColumns.SETTINGS + " INTEGER DEFAULT -1;";
@@ -232,6 +223,17 @@ public class PodcastOpenHelper extends SQLiteOpenHelper {
 			db.execSQL(new_settings_column);
 			db.execSQL(ItemColumns.sql_index_item_subid);
 			db.execSQL(ItemColumns.sql_index_item_status);
+		}
+
+		if (oldVersion < 21) {
+			String new_episodes_column = "ALTER TABLE " + SubscriptionColumns.TABLE_NAME
+					+ " ADD COLUMN " + SubscriptionColumns.NEW_EPISODES + " INTEGER DEFAULT 0;";
+			String new_episode_count_column = "ALTER TABLE " + SubscriptionColumns.TABLE_NAME
+					+ " ADD COLUMN " + SubscriptionColumns.EPISODE_COUNT + " INTEGER DEFAULT 0;";
+
+			log.debug("Upgrading database to version 21");
+			db.execSQL(new_episodes_column);
+			db.execSQL(new_episode_count_column);
 		}
 	}
 }

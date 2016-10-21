@@ -171,7 +171,7 @@ public class SubscriptionRefreshManager {
             Date tenMinutesAgo = new Date(System.currentTimeMillis() - (10 * 60 * 1000));
 
             LinkedList<IEpisode> episodes = argSubscription.getEpisodes().getUnfilteredList();
-            int newEpisodeCount = Math.min(argSubscription.countNewEpisodes(), episodes.size());
+            int newEpisodeCount = Math.min(argSubscription.getNewEpisodes(), episodes.size());
 
             for (int i = 0; i < episodes.size(); i++) {
                 FeedItem episode = (FeedItem)episodes.get(i);

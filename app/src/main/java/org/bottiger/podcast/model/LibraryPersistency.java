@@ -216,6 +216,14 @@ public class LibraryPersistency {
         cv.put(SubscriptionColumns.PRIMARY_TINT_COLOR, argSubscription.getPrimaryTintColor());
         cv.put(SubscriptionColumns.SECONDARY_COLOR, argSubscription.getSecondaryColor());
 
+        cv.put(SubscriptionColumns.NEW_EPISODES, argSubscription.getNewEpisodes());
+        cv.put(SubscriptionColumns.EPISODE_COUNT, argSubscription.getEpisodeCount());
+
+        int episode_count = argSubscription.getEpisodes().size();
+        if (episode_count > 0) {
+            cv.put(SubscriptionColumns.EPISODE_COUNT, episode_count);
+        }
+
         String condition = SubscriptionColumns.URL + "='" + argSubscription.getURLString() + "'";
         if (batchUpdate) {
             contentUpdate = ContentProviderOperation
@@ -242,7 +250,6 @@ public class LibraryPersistency {
                 } else {
                     long id = Long.parseLong(uri.toString().replaceAll("[^0-9]", ""));
                     argSubscription.setId(id);
-                    //argSubscription.notifyEpisodeAdded(true);
                     SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.SUBSCRIBE_TO_FEED);
                 }
             }

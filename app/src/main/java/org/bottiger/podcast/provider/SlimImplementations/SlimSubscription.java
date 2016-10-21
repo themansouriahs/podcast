@@ -115,8 +115,9 @@ public class SlimSubscription extends BaseSubscription implements Parcelable {
         return mIsDirty;
     }
 
+    @NonNull
     @Override
-    public Integer countNewEpisodes() {
+    public Integer getNewEpisodes() {
         return 0;
     }
 
