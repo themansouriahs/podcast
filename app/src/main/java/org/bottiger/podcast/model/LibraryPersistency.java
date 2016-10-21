@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteConstraintException;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.support.annotation.IntDef;
@@ -103,65 +104,45 @@ public class LibraryPersistency {
     public boolean insert(@NonNull Context argContext, @NonNull List<FeedItem> argEpisodes) {
         PodcastOpenHelper helper = PodcastOpenHelper.getInstance(argContext);
         SQLiteDatabase db = helper.getWritableDatabase();
+
+        FeedItem randomEpisode = argEpisodes.get(0);
+
+        List<Pair<String, Object>> keyValues = getEpisodeValues(randomEpisode, argContext, false);
+        String sql = getEpisodeInsertSQL(keyValues);
+
+        SQLiteStatement statement = db.compileStatement(sql);
+
         try {
             db.beginTransaction();
-            FeedItem randomEpisode = argEpisodes.get(0);
-            List<Pair<String, Object>> keyValues = getEpisodeValues(randomEpisode, false);
-
-            Pair<String, Object> pair;
-            StringBuilder builder = new StringBuilder();
-            builder.append("INSERT INTO ");
-            builder.append(ItemColumns.TABLE_NAME);
-            builder.append(" (");
-            for (int i = 0; i < keyValues.size(); i++) {
-                pair = keyValues.get(i);
-                builder.append(pair.first);
-                if (i != keyValues.size()-1) {
-                    builder.append(", ");
-                }
-            }
-            builder.append(" ) VALUES (");
-            for (int i = 0; i < keyValues.size(); i++) {
-                builder.append("?");
-                if (i != keyValues.size()-1) {
-                    builder.append(", ");
-                }
-            }
-            builder.append(")");
-            String sql = builder.toString();
-
-
-            SQLiteStatement statement = db.compileStatement(sql);
-
 
             for (FeedItem episode : argEpisodes) {
-
-                keyValues = getEpisodeValues(episode, false);
-                statement.clearBindings();
-
-                Object value;
-                for (int i = 0; i < keyValues.size(); i++) {
-                    pair = keyValues.get(i);
-                    value = pair.second;
-
-                    int index = i+1;
-                    if (value instanceof String) {
-                        statement.bindString(index, (String)value);
-                    } else if (value instanceof Boolean){
-                        long intVal = (Boolean)value ? 1 : 0;
-                        statement.bindLong(index, intVal);
-                    } else if (value != null){
-                        statement.bindLong(index, Long.valueOf(value.toString()));
-                    } else {
-                        statement.bindNull(index);
-                    }
-                }
-
-                long inserted_id = statement.executeInsert();
+                long inserted_id = insertEpisode(argContext, statement, episode);
                 episode.setId(inserted_id);
             }
 
             db.setTransactionSuccessful(); // This commits the transaction if there were no exceptions
+
+            return true;
+
+        } catch (SQLiteConstraintException sqlce ){
+
+            // End the previous transaction
+            db.endTransaction();
+
+            // Failed to insert all episodes.
+            // Insert them one at the time, to find the problem
+            for (FeedItem episode : argEpisodes) {
+                try {
+                    long inserted_id = insertEpisode(argContext, statement, episode);
+                    episode.setId(inserted_id);
+                } catch (Exception e) {
+                    // This still happens when the user is subscribed to multiple podcasts (different URL's) which hosts the
+                    // same episode.
+                    VendorCrashReporter.report("Persistency insert error!", "Failed to insert: " + episode.getURL());
+                }
+            }
+
+            db.beginTransaction();
 
             return true;
 
@@ -287,7 +268,7 @@ public class LibraryPersistency {
         return cv;
     }
 
-    private List<Pair<String, Object>> getEpisodeValues(@NonNull FeedItem argItem, Boolean silent) {
+    private static List<Pair<String, Object>> getEpisodeValues(@NonNull FeedItem argItem, @NonNull Context argContext,  Boolean silent) {
         List<Pair<String, Object>> map = new LinkedList<>();
         map.add(new Pair<String, Object>(ItemColumns.TITLE, argItem.getTitle()));
         map.add(new Pair<String, Object>(ItemColumns.CONTENT, argItem.getDescription()));
@@ -299,7 +280,7 @@ public class LibraryPersistency {
         map.add(new Pair<String, Object>(ItemColumns.STATUS, argItem.getStatus()));
         map.add(new Pair<String, Object>(ItemColumns.LISTENED, argItem.getListenedValue()));
         map.add(new Pair<String, Object>(ItemColumns.PRIORITY, argItem.getPriority()));
-        map.add(new Pair<String, Object>(ItemColumns.IMAGE_URL, argItem.getArtwork(mContext)));
+        map.add(new Pair<String, Object>(ItemColumns.IMAGE_URL, argItem.getArtwork(argContext)));
         map.add(new Pair<String, Object>(ItemColumns.IS_DOWNLOADED, argItem.isDownloaded()));
 
         Date date = argItem.getDateTime();
@@ -351,6 +332,59 @@ public class LibraryPersistency {
         item.setIsParsing(false, false);
 
         return item;
+    }
+
+    private static String getEpisodeInsertSQL(@NonNull List<Pair<String, Object>> keyValues) {
+        Pair<String, Object> pair;
+        StringBuilder builder = new StringBuilder();
+        builder.append("INSERT INTO ");
+        builder.append(ItemColumns.TABLE_NAME);
+        builder.append(" (");
+        for (int i = 0; i < keyValues.size(); i++) {
+            pair = keyValues.get(i);
+            builder.append(pair.first);
+            if (i != keyValues.size()-1) {
+                builder.append(", ");
+            }
+        }
+        builder.append(" ) VALUES (");
+        for (int i = 0; i < keyValues.size(); i++) {
+            builder.append("?");
+            if (i != keyValues.size()-1) {
+                builder.append(", ");
+            }
+        }
+        builder.append(")");
+        return builder.toString();
+    }
+
+    private static long insertEpisode(@NonNull Context argContext,
+                                      @NonNull SQLiteStatement argStatement,
+                                      @NonNull FeedItem argEpisode) {
+
+        Pair<String, Object> pair;
+        List<Pair<String, Object>> keyValues = getEpisodeValues(argEpisode, argContext, false);
+        argStatement.clearBindings();
+
+        Object value;
+        for (int i = 0; i < keyValues.size(); i++) {
+            pair = keyValues.get(i);
+            value = pair.second;
+
+            int index = i+1;
+            if (value instanceof String) {
+                argStatement.bindString(index, (String)value);
+            } else if (value instanceof Boolean){
+                long intVal = (Boolean)value ? 1 : 0;
+                argStatement.bindLong(index, intVal);
+            } else if (value != null){
+                argStatement.bindLong(index, Long.valueOf(value.toString()));
+            } else {
+                argStatement.bindNull(index);
+            }
+        }
+
+        return argStatement.executeInsert();
     }
 
     private boolean deleteEpisodes(@NonNull Subscription argSubscription) {
