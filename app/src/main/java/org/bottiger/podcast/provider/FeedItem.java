@@ -319,16 +319,6 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 	}
 
 	/**
-	 * http://docs.oracle.com/javase/6/docs/api/java/lang/String.html#compareTo
-	 *      %28java.lang.String%29
-	 * @return True of the current FeedItem is newer than the supplied argument
-	 */
-	public boolean newerThan(FeedItem item) {
-		int comparator = this.getDate().compareTo(item.getDate());
-		return comparator > 0;
-	}
-
-	/**
 	 * @return the PublishingDate as default_format = "yyyy-MM-dd HH:mm:ss Z"
 	 */
 	public String getDate() {

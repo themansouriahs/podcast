@@ -49,6 +49,8 @@ public interface IEpisode {
     double getProgress();
     void setProgress(double argProgress);
 
+    boolean newerThan(IEpisode item);
+
     @NonNull
     String getURL();
 

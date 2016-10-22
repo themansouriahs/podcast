@@ -17,6 +17,7 @@ import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.Library;
+import org.bottiger.podcast.model.events.EpisodeChanged;
 import org.bottiger.podcast.playlist.filters.SubscriptionFilter;
 import org.bottiger.podcast.provider.DatabaseHelper;
 import org.bottiger.podcast.provider.FeedItem;
@@ -30,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import rx.functions.Action1;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -67,6 +69,7 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
 	private int amountValue = 20;
 
     private rx.Subscription mRxSubscription;
+    private rx.Subscription mRxSubscription_episodes;
 
 	// http://stackoverflow.com/questions/1036754/difference-between-wait-and-sleep
 
@@ -112,11 +115,40 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
                         Log.wtf(TAG, "Missing back pressure. Should not happen anymore :(");
                     }
                 });
+
+        mRxSubscription_episodes = SoundWaves.getRxBus()
+                .toObserverable()
+                .onBackpressureBuffer(10000)
+                .ofType(EpisodeChanged.class)
+                .filter(new Func1<EpisodeChanged, Boolean>() {
+                    @Override
+                    public Boolean call(EpisodeChanged episodeChanged) {
+                        return episodeChanged.getAction()==EpisodeChanged.ADDED;
+                    }
+                })
+                .observeOn(Schedulers.computation())
+                .subscribe(new Action1<EpisodeChanged>() {
+                    @Override
+                    public void call(EpisodeChanged episodeChanged) {
+                        IEpisode episode = mLibrary.getEpisode(episodeChanged.getId());
+                        maybeInsert(episode);
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        VendorCrashReporter.handleException(throwable);
+                        Log.wtf(TAG, "Missing back pressure. Buffer size too small");
+                    }
+                });
     }
 
     public void destroy() {
         if (mRxSubscription != null && !mRxSubscription.isUnsubscribed()) {
             mRxSubscription.unsubscribe();
+        }
+
+        if (mRxSubscription_episodes != null && !mRxSubscription_episodes.isUnsubscribed()) {
+            mRxSubscription_episodes.unsubscribe();
         }
     }
 
@@ -220,6 +252,37 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
 			mInternalPlaylist.add(item);
 		}
 	}
+
+    /**
+     * Insert a new episode into the playlist if it belongs there
+     *
+     * @param argEpisode
+     * @return if the episode was inserted into the playlist
+     */
+    public boolean maybeInsert(@Nullable IEpisode argEpisode) {
+        if (argEpisode == null)
+            return false;
+
+        IEpisode lastItem = mInternalPlaylist.get(mInternalPlaylist.size()-1);
+
+        if (lastItem.getPriority() > argEpisode.getPriority())
+            return false;
+
+        if (lastItem.newerThan(argEpisode))
+            return false;
+
+        IEpisode currentItem;
+        for (int i = 0; i < mInternalPlaylist.size(); i++) {
+            currentItem = mInternalPlaylist.get(i);
+            if (comparePlaylistOrder(argEpisode, currentItem) < 0) {
+                setItem(i, argEpisode);
+                removeItem(mInternalPlaylist.size()-1);
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     /**
      *

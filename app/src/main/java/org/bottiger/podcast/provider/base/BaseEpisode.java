@@ -1,6 +1,7 @@
 package org.bottiger.podcast.provider.base;
 
 import org.bottiger.podcast.model.events.EpisodeChanged;
+import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
 
@@ -26,6 +27,16 @@ public abstract class BaseEpisode implements IEpisode {
 
         mProgress = argProgress;
         notifyPropertyChanged(EpisodeChanged.DOWNLOAD_PROGRESS);
+    }
+
+    /**
+     * http://docs.oracle.com/javase/6/docs/api/java/lang/String.html#compareTo
+     *      %28java.lang.String%29
+     * @return True of the current FeedItem is newer than the supplied argument
+     */
+    public boolean newerThan(IEpisode item) {
+        int comparator = this.getDateTime().compareTo(item.getDateTime());
+        return comparator > 0;
     }
 
     public void setIsParsing(boolean argIsParsing) {

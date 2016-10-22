@@ -16,6 +16,7 @@ import android.util.Log;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.model.events.EpisodeChanged;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.PodcastOpenHelper;
@@ -40,6 +41,7 @@ public class LibraryPersistency {
 
     private Context mContext;
     private ContentResolver mContentResolver;
+    private Library mLibrary;
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({UPDATED, INSERTED, IGNORED, ERROR})
@@ -49,8 +51,9 @@ public class LibraryPersistency {
     public static final int UPDATED = 1;
     public static final int INSERTED = 2;
 
-    public LibraryPersistency(@NonNull Context argContext) {
+    public LibraryPersistency(@NonNull Context argContext, @NonNull Library argLibrary) {
         mContext = argContext;
+        mLibrary = argLibrary;
         mContentResolver = argContext.getContentResolver();
     }
 
@@ -116,7 +119,7 @@ public class LibraryPersistency {
             db.beginTransaction();
 
             for (FeedItem episode : argEpisodes) {
-                long inserted_id = insertEpisode(argContext, statement, episode);
+                long inserted_id = insertEpisode(argContext, mLibrary, statement, episode);
                 episode.setId(inserted_id);
             }
 
@@ -133,7 +136,7 @@ public class LibraryPersistency {
             // Insert them one at the time, to find the problem
             for (FeedItem episode : argEpisodes) {
                 try {
-                    long inserted_id = insertEpisode(argContext, statement, episode);
+                    long inserted_id = insertEpisode(argContext, mLibrary, statement, episode);
                     episode.setId(inserted_id);
                 } catch (Exception e) {
                     // This still happens when the user is subscribed to multiple podcasts (different URL's) which hosts the
@@ -359,6 +362,7 @@ public class LibraryPersistency {
     }
 
     private static long insertEpisode(@NonNull Context argContext,
+                                      @NonNull Library argLibrary,
                                       @NonNull SQLiteStatement argStatement,
                                       @NonNull FeedItem argEpisode) {
 
@@ -384,7 +388,13 @@ public class LibraryPersistency {
             }
         }
 
-        return argStatement.executeInsert();
+        long inserted_id = argStatement.executeInsert();
+
+        argLibrary.setEpisodeId(inserted_id, argEpisode);
+        EpisodeChanged event = new EpisodeChanged(inserted_id, argEpisode.getURL(), EpisodeChanged.ADDED);
+        SoundWaves.getRxBus().send(event);
+
+        return inserted_id;
     }
 
     private boolean deleteEpisodes(@NonNull Subscription argSubscription) {

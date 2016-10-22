@@ -159,7 +159,7 @@ public class Library {
     public Library(@NonNull Context argContext) {
         mContext = argContext.getApplicationContext();
 
-        mLibraryPersistency = new LibraryPersistency(argContext);
+        mLibraryPersistency = new LibraryPersistency(argContext, this);
 
         mActiveSubscriptions = new SortedList<>(Subscription.class, mSubscriptionsListCallback);
 
@@ -947,5 +947,15 @@ public class Library {
 
     public @SortOrder int getSubscriptionOrder() {
         return mSubscriptionSortOrder;
+    }
+
+    /**
+     *
+     *
+     * @param argID
+     * @param argEpisode
+     */
+    protected void setEpisodeId(@NonNull Long argID, @NonNull FeedItem argEpisode) {
+        mEpisodesIdLUT.put(argID, argEpisode);
     }
 }
