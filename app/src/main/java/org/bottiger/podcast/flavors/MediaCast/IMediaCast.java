@@ -31,9 +31,10 @@ public interface IMediaCast {
     public void pause();
     public void stop();
 
-    public int getCurrentPosition();
-    public void seekTo(long argPositionMs);
-
     public void registerStateChangedListener(IMediaRouteStateListener argListener);
     public void unregisterStateChangedListener(IMediaRouteStateListener argListener);
+
+    void onCreate();
+    void onResume();
+    void onPause();
 }

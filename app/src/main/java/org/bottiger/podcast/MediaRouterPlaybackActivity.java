@@ -1,15 +1,9 @@
 package org.bottiger.podcast;
 
 import android.os.Bundle;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.MediaRouteActionProvider;
-import android.support.v7.media.MediaRouteSelector;
 import android.view.Menu;
-import android.view.MenuItem;
 
 import org.bottiger.podcast.flavors.MediaCast.VendorMediaRouteCast;
-import org.bottiger.podcast.player.googlecast.GoogleCastPlayer;
-import org.bottiger.podcast.service.PlayerService;
 
 /**
  * Created by apl on 28-03-2015.
