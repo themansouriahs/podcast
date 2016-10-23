@@ -136,6 +136,8 @@ dependencies {
 
     compile 'org.whispersystems:libpastelog:1.0.7'
 
+    //compile 'com.bignerdranch.android:recyclerview-multiselect:0.2'
+
     //compile 'com.google.api-client:google-api-client-android:+'
     compile 'com.google.http-client:google-http-client-gson:1.22.0'
     compile 'com.android.support:support-v4:24.2.1'
@@ -183,6 +185,9 @@ dependencies {
     // Amazon version
     amazonCompile fileTree(dir: 'src/amazon/libs', include: ['*.jar'])
     amazonCompile 'com.google.android.gms:play-services-cast:9.6.1'
+    amazonCompile 'com.google.android.gms:play-services-cast-framework:9.6.1'
+    amazonCompile 'com.google.android.gms:play-services-auth:9.6.1'
+    amazonCompile 'com.google.firebase:firebase-messaging:9.6.1'
     // google cast
 
     // Play Store

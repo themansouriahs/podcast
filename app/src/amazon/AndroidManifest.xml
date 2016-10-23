@@ -8,6 +8,28 @@
             android:name="io.fabric.ApiKey"
             android:value="50c5c1ca71f12ac3ffdcc0fe338318a6ca9ac616" />
 
+        <meta-data
+            android:name=
+                "com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
+            android:value="org.bottiger.podcast.flavors.MediaCast.GoogleCastOptionProvider" />
+
+        <!-- [START firebase_service] -->
+        <service
+            android:name=".flavors.MessagingService.MessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+        <!-- [END firebase_service] -->
+        <!-- [START firebase_iid_service] -->
+        <service
+            android:name=".flavors.MessagingService.InstanceIDService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
+        <!-- [END firebase_iid_service] -->
+
     </application>
 
 </manifest>
