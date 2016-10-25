@@ -75,6 +75,8 @@
 
         <item name="android:windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
+        <item name="windowActionModeOverlay">true</item>
+        <item name="actionModeStyle">@style/Widget.ActionMode</item>
         <!--<item name="android:windowActionBarOverlay">true</item>-->
 
 
@@ -87,6 +89,12 @@
         <item name="android:textViewStyle">@style/SoundWavesTextViewStyle</item>
 
         <item name="searchViewStyle">@style/DiscoverySearchViewStyle</item>
+    </style>
+
+    <style name="Widget.ActionMode" parent="@style/Widget.AppCompat.ActionMode">
+        <item name="background">@color/colorPrimary</item>
+        <!--<item name="titleTextStyle">@style/TextAppearance.AppCompat</item>-->
+        <item name="android:textColor">@android:color/white</item>
     </style>
 
     <style name="Theme.Transparent" parent="SoundWavesTheme.Light">

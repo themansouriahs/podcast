@@ -118,12 +118,12 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
 
         mGridContainerView = (FrameLayout) mContainerView.findViewById(R.id.subscription_grid_container);
 
-        //RecycelrView
+        //RecyclerView
         mAdapter = createAdapter();
         setSubscriptionFragmentLayout(mLibrary.getSubscriptions().size());
 
 		mGridView = (RecyclerView) mContainerView.findViewById(R.id.gridview);
-		registerForContextMenu(mGridView);
+
 
         mGridLayoutmanager = new GridLayoutManager(getActivity(), numberOfColumns());
         mGridView.setHasFixedSize(true);
@@ -326,40 +326,6 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
 
     private SubscriptionAdapter createAdapter() {
         return new SubscriptionAdapter(getActivity(), numberOfColumns());
-    }
-	
-	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v,
-			ContextMenuInfo menuInfo) {
-		super.onCreateContextMenu(menu, v, menuInfo);
-		MenuInflater inflater = getActivity().getMenuInflater();
-		inflater.inflate(R.menu.subscription_context, menu);
-	}
-
-    public boolean onContextItemSelected(MenuItem menuItem) {
-        int position = -1;
-        try {
-            position = mAdapter.getPosition();
-        } catch (Exception e) {
-            Log.d(TAG, e.getLocalizedMessage(), e);
-            return super.onContextItemSelected(menuItem);
-        }
-
-        switch (menuItem.getItemId()) {
-            case R.id.unsubscribe:
-                Subscription subscription = SoundWaves.getAppContext(getContext()).getLibraryInstance().getSubscription((long)position);
-
-                if (subscription == null)
-                    return false;
-
-                ContextMenuRecyclerView.RecyclerContextMenuInfo info = (ContextMenuRecyclerView.RecyclerContextMenuInfo) menuItem.getMenuInfo();
-                subscription.unsubscribe("Unsubscribe:context");
-
-                mAdapter.notifyItemRemoved(info.position);
-                return true;
-            default:
-                return super.onContextItemSelected(menuItem);
-        }
     }
 
     private int numberOfColumns() {

@@ -8,8 +8,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.util.SortedList;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
@@ -17,13 +19,18 @@ import android.util.Log;
 import android.util.Patterns;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bignerdranch.android.multiselector.ModalMultiSelectorCallback;
+import com.bignerdranch.android.multiselector.MultiSelector;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.ToolbarActivity;
 import org.bottiger.podcast.activities.feedview.FeedActivity;
 import org.bottiger.podcast.adapters.viewholders.FooterViewHolder;
@@ -36,6 +43,8 @@ import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.UIUtils;
+
+import java.util.List;
 
 /**
  * Created by aplb on 11-10-2015.
@@ -57,6 +66,62 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
 
     private int numberOfColumns = 2;
     private int position = -1;
+
+    private ActionMode mActionMode = null;
+    private MultiSelector mMultiSelector = new MultiSelector();
+    private ModalMultiSelectorCallback mActionModeCallback
+            = new ModalMultiSelectorCallback(mMultiSelector) {
+        @Override
+        public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+
+            List<Integer> positions = mMultiSelector.getSelectedPositions();
+
+            if (mSubscriptions == null)
+                return false;
+
+            switch (menuItem.getItemId()) {
+                case R.id.unsubscribe:
+                    actionMode.finish();
+
+                    for (int i = 0; i < positions.size(); i++) {
+                        int position = positions.get(i);
+                        Subscription subscription = mSubscriptions.get(position);
+
+                        if (subscription == null)
+                            return false;
+
+                        subscription.unsubscribe("Unsubscribe:context");
+                        notifyItemRemoved(position);
+                    }
+
+                    mMultiSelector.clearSelections();
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        @Override
+        public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+            super.onCreateActionMode(actionMode, menu);
+            mActivity.getMenuInflater().inflate(R.menu.subscription_context, menu);
+
+            return true;
+        }
+
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            boolean onPrepared = super.onPrepareActionMode(mode, menu);
+
+            String title = String.valueOf(mMultiSelector.getSelectedPositions().size() + 1 );
+            mode.setTitle(title);
+
+            return onPrepared;
+        }
+
+        public void onDestroyActionMode(ActionMode mode) {
+            super.onDestroyActionMode(mode);
+        }
+    };
 
     public SubscriptionAdapter(Activity argActivity, int argColumnsCount) {
         mActivity = argActivity;
@@ -85,7 +150,7 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
             }
             default: {
                 View view = mInflater.inflate(getGridItemLayout(), parent, false);
-                holder = new SubscriptionViewHolder(view);
+                holder = new SubscriptionViewHolder(view, mMultiSelector);
                 break;
             }
         }
@@ -231,22 +296,37 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
             holder.title.setText(subscription.getTitle());
         }
 
+
         argHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FeedActivity.start(mActivity, subscription);
+                if (!mMultiSelector.tapSelection(holder)){
+                    // do whatever we want to do when not in selection mode
+                    // perhaps navigate to a detail screen
+                    FeedActivity.start(mActivity, subscription);
+                } else {
+                    setActionModeTitle(mMultiSelector.getSelectedPositions().size());
+                }
             }
         });
 
         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                // This saves the position in the adapter.
-                // The unsubscribing is done in the fragment
-                setPosition((int)subscription.getId());
+
+                AppCompatActivity appCompatActivity = ((AppCompatActivity) holder.itemView.getContext());
+                mActionMode = appCompatActivity.startSupportActionMode(mActionModeCallback); // (2)
+
+                if (!mMultiSelector.isSelectable()) { // (3)
+                    mMultiSelector.setSelectable(true); // (4)
+                    mMultiSelector.setSelected(holder, true); // (5)
+                    return true;
+                }
                 return false;
+
             }
         });
+
     }
 
     public void setDataset(@NonNull SortedList<Subscription> argSubscriptions) {
@@ -312,5 +392,21 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
             return 0;
 
         return mSubscriptions.size();
+    }
+
+    private boolean setActionModeTitle(int argNumSelectedItems) {
+        ActionMode actionMode = mActionMode;
+
+        if (actionMode == null) {
+            return false;
+        }
+
+        if (argNumSelectedItems > 0) {
+            String title = argNumSelectedItems + " selected";
+            actionMode.setTitle(title);
+            return true;
+        }
+
+        return false;
     }
 }
