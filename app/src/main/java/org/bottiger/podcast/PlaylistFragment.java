@@ -598,9 +598,9 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        Log.d(TAG, "ERROR: notifyPlaylistChanged: mRxPlaylistSubscription event recieved");
+                        Log.wtf(TAG, "ERROR: notifyPlaylistChanged: mRxPlaylistSubscription event recieved");
                         VendorCrashReporter.report("subscribeError" , throwable.toString());
-                        Log.d(TAG, "error: " + throwable.toString());
+                        Log.wtf(TAG, "error: " + throwable.toString());
                     }
                 });
     }
@@ -615,15 +615,15 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
                 .subscribe(new Action1<NewPlayerEvent>() {
                     @Override
                     public void call(NewPlayerEvent playlistChanged) {
-                        Log.d(TAG, "NewPlayerEvent: NewPlayerEvent event recieved");
+                        Log.wtf(TAG, "NewPlayerEvent: NewPlayerEvent event recieved");
                         setPlayer();
                     }
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        Log.d(TAG, "ERROR: NewPlayerEvent: mRxPlaylistSubscription event recieved");
+                        Log.wtf(TAG, "ERROR: NewPlayerEvent: mRxPlaylistSubscription event recieved");
                         VendorCrashReporter.report("subscribeError" , throwable.toString());
-                        Log.d(TAG, "error: " + throwable.toString());
+                        Log.wtf(TAG, "error: " + throwable.toString());
                     }
                 });
     }
