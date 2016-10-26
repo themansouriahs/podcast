@@ -18,14 +18,14 @@ import okhttp3.Response;
 /**
  * Interceptor used to authorize requests.
  */
-public class ApiRequestInterceptor implements Interceptor {
+class ApiRequestInterceptor implements Interceptor {
 
     @Nullable private String mUsername;
     @Nullable private String mPassword;
 
-    public static String cookie;
+    static String cookie;
 
-    public ApiRequestInterceptor(@Nullable  String argUsername, @Nullable String argPassword) {
+    ApiRequestInterceptor(@Nullable  String argUsername, @Nullable String argPassword) {
         mUsername = argUsername;
         mPassword = argPassword;
     }

@@ -21,6 +21,7 @@ import org.bottiger.podcast.webservices.datastore.gpodder.GPodderAPI;
 import org.bottiger.podcast.webservices.datastore.gpodder.GPodderUtils;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 
 /**
  * Created by aplb on 14-09-2015.
@@ -89,6 +90,8 @@ public class CloudSyncAdapter extends AbstractThreadedSyncAdapter {
             } else {
                 Log.d(TAG, "gPodder synchronization failed");
             }
+        } catch (SocketTimeoutException ste) {
+            Log.e(TAG, "Socket timeout");
         } catch (IOException e) {
             VendorCrashReporter.handleException(e);
         }
