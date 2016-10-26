@@ -330,7 +330,10 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
     }
 
 
-    private void bindHeader(final IEpisode item) {
+    private void bindHeader(@Nullable final IEpisode item) {
+
+        if (item == null)
+            return;
 
         if (mEpisodeTitle == null)
             return;
@@ -559,8 +562,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
     }
 
     private void bindHeaderWrapper(@Nullable Playlist argPlaylist) {
-
-        if (argPlaylist != null && !argPlaylist.isEmpty()) {
+        if (argPlaylist != null) {
             IEpisode episode = argPlaylist.first();
             bindHeader(episode);
         }

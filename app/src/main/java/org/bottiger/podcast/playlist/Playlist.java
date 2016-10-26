@@ -693,9 +693,10 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
         return mInternalPlaylist.isEmpty();
     }
 
+    @Nullable
     public IEpisode first() {
         if (mInternalPlaylist.size() <= 0) {
-            throw new IllegalStateException("Playlist is empty"); // NoI18N
+            return null;
         }
         return mInternalPlaylist.get(0);
     }

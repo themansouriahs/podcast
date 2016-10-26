@@ -82,8 +82,11 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
 
         Playlist playlist = SoundWaves.getAppContext(context).getPlaylist();
 
-        //Library library = SoundWaves.getAppContext(context).getLibraryInstance();
-        //library.loadPlaylistSync(SoundWaves.getAppContext(context).getPlaylist());
+        boolean wasEmpty = false;
+        if (playlist.isEmpty()) {
+            playlist.populatePlaylistIfEmpty();
+            wasEmpty = true;
+        }
 
         // Construct the RemoteViews object.  It takes the package name (in our case, it's our
         // package, but it needs this because on the other side it's the widget host inflating
@@ -98,15 +101,17 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
 
         Log.wtf(TAG, "pre");
 
-        if (!playlistEmpty) {
+        IEpisode episode = playlist.first();
 
-            IEpisode episode = playlist.first();
+        if (episode != null) {
 
             Log.wtf(TAG, episode.getTitle());
 
             CharSequence podcast_title = "No title";
             if (episode.getSubscription(context) != null)
                 podcast_title = episode.getSubscription(context).getTitle();
+
+            podcast_title =   (wasEmpty ? "Loaded" : "Memory") + podcast_title;
 
             CharSequence text = episode.getTitle();
             Long durationMs = episode.getDuration();

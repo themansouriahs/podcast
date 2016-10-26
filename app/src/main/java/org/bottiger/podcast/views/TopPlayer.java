@@ -320,7 +320,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
             @Override
             public void onFavoriteChanged(MaterialFavoriteButton buttonView, boolean favorite) {
                 if (ps != null) {
-                    IEpisode episode = ps.getPlaylist().first();
+                    IEpisode episode = SoundWaves.getAppContext(getContext()).getPlaylist().first();
                     if (episode instanceof FeedItem) {
                         FeedItem feedItem = (FeedItem)episode;
                         feedItem.setIsFavorite(favorite);
