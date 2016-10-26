@@ -240,7 +240,7 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
         long offset = Math.max(episodeOffset, 0);
 
         ISubscription subscription = argEpisode.getSubscription(argContext);
-        if (subscription.doSkipIntro()) {
+        if (subscription != null && subscription.doSkipIntro()) {
             long startSkipAmount = PreferenceHelper.getLongPreferenceValue(argContext, R.string.pref_skip_intro_key, R.integer.skip_into_default);
             offset = Math.max(offset, startSkipAmount);
         }
