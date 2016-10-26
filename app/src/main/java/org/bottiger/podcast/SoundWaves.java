@@ -21,9 +21,6 @@ import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.player.GenericMediaPlayerInterface;
 import org.bottiger.podcast.player.SoundWavesPlayer;
 
-import com.squareup.otto.Bus;
-import com.squareup.otto.ThreadEnforcer;
-
 import org.bottiger.podcast.cloud.EventLogger;
 import org.bottiger.podcast.flavors.Analytics.AnalyticsFactory;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
@@ -40,6 +37,7 @@ import org.bottiger.podcast.utils.PlayerHelper;
 import org.bottiger.podcast.utils.PodcastLog;
 import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.utils.rxbus.RxBus;
+import org.bottiger.podcast.utils.rxbus.RxBus2;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -70,8 +68,8 @@ public class SoundWaves extends MultiDexApplication {
     private SoundWavesDownloadManager mDownloadManager;
     private PodcastUpdater mPodcastUpdater;
 
-    private static Bus sBus = new Bus(ThreadEnforcer.MAIN);
     private static RxBus _rxBus = null;
+    private static RxBus2 _rxBus2 = null;
 
     private Library mLibrary = null;
     private Playlist mPlaylist = null;
@@ -174,11 +172,6 @@ public class SoundWaves extends MultiDexApplication {
         return mFirstRun;
     }
 
-    @Deprecated
-    public static Bus getBus() {
-        return sBus;
-    }
-
     // This is better done with a DI Library like Dagger
     public static RxBus getRxBus() {
         if (_rxBus == null) {
@@ -186,6 +179,14 @@ public class SoundWaves extends MultiDexApplication {
         }
 
         return _rxBus;
+    }
+
+    public static RxBus2 getRxBus2() {
+        if (_rxBus2 == null) {
+            _rxBus2 = new RxBus2();
+        }
+
+        return _rxBus2;
     }
 
     @NonNull

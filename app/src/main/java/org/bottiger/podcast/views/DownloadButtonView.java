@@ -14,13 +14,12 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
-import com.squareup.otto.Subscribe;
-
 import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.TopActivity;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.listeners.PlayerStatusProgressData;
 import org.bottiger.podcast.model.events.DownloadProgress;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
@@ -28,6 +27,9 @@ import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.UIUtils;
 
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -53,6 +55,7 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
     private RectF buttonRectangle;
 
     private Subscription mRxSubscription = null;
+    private Disposable mRxDisposable = null;
 
     public DownloadButtonView(Context context) {
         super(context);
@@ -97,6 +100,23 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
                 setProgressPercent(new DownloadProgress());
             }
         });
+
+        mRxDisposable = SoundWaves.getRxBus2()
+                .toObservable()
+                .toFlowable(BackpressureStrategy.LATEST)
+                .subscribeOn(io.reactivex.schedulers.Schedulers.io())
+                .observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
+                .ofType(DownloadProgress.class)
+                .subscribe(new Consumer<DownloadProgress>() {
+                    public void accept(DownloadProgress downloadProgress) {
+                        setProgressPercent(downloadProgress);
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Log.d(TAG, throwable.toString());
+                    }
+                });
     }
 
     @Override
@@ -139,6 +159,10 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
     public synchronized void unsetEpisodeId() {
         if (mRxSubscription != null && !mRxSubscription.isUnsubscribed()) {
             mRxSubscription.unsubscribe();
+        }
+
+        if (mRxDisposable != null && !mRxDisposable.isDisposed()) {
+            mRxDisposable.dispose();
         }
         super.unsetEpisodeId();
     }
@@ -195,7 +219,6 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
         }
     }
 
-    @Subscribe
     public void setProgressPercent(@NonNull DownloadProgress argProgress) {
 
         /*

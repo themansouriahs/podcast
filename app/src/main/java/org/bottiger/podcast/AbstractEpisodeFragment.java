@@ -10,8 +10,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import com.squareup.otto.Subscribe;
-
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.ItemColumns;
@@ -40,7 +38,6 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 		prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 	}
 
-	@Subscribe
 	public void playlistChanged(@NonNull Playlist argPlaylist) {
 		mPlaylist = argPlaylist;
 	}

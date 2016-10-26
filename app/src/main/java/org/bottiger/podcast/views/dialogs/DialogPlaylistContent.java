@@ -16,8 +16,6 @@ import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import com.squareup.otto.Subscribe;
-
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.playlist.Playlist;
@@ -84,7 +82,6 @@ public class DialogPlaylistContent implements DialogInterface.OnMultiChoiceClick
     };
 
     public DialogPlaylistContent(@NonNull Context context, @Nullable Playlist argPlaylist) {
-        SoundWaves.getBus().register(this);
         init(context, argPlaylist);
     }
 
@@ -209,7 +206,6 @@ public class DialogPlaylistContent implements DialogInterface.OnMultiChoiceClick
     public void onCancel(DialogInterface dialog) {
     }
 
-    @Subscribe
     public void setSubscriptions(@Nullable Playlist argPlaylist) {
         mPlaylist = argPlaylist;
 

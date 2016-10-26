@@ -21,16 +21,12 @@ import android.widget.TextView;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.Timeline;
-import com.squareup.otto.Subscribe;
 
 import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.listeners.EpisodeStatus;
 import org.bottiger.podcast.listeners.PaletteListener;
-import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.player.SoundWavesPlayerBase;
-import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.StrUtils;
@@ -395,29 +391,6 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener, ExoPlayer
 
     private boolean isTouching() {
         return mIsTouching;
-    }
-
-    @Subscribe
-    public void onStateChange(EpisodeStatus argStatus) {
-        if (!validateState()) {
-            return;
-        }
-
-        mIsPlaying = argStatus.getStatus() == PlayerStatusObservable.PLAYING;
-
-        float currentPositionMs = argStatus.getPlaybackPositionMs() < 0 ? 0 : argStatus.getPlaybackPositionMs();
-        double episodeLenghtMS = (double)mEpisode.getDuration();
-
-        if (episodeLenghtMS < 0 || currentPositionMs > episodeLenghtMS) {
-            return;
-            //throw new IllegalStateException("Illegal Seekbar State: current position: " + currentPositionMs + ", episode length: " + episodeLenghtMS);
-        }
-
-        if (mIsPlaying) {
-            float progress = currentPositionMs / mEpisode.getDuration() * RANGE_MAX;
-            setProgress((int) progress);
-            updateRunning();
-        }
     }
 
     @Override

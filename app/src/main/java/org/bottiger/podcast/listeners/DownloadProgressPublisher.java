@@ -113,7 +113,7 @@ public class DownloadProgressPublisher {
                             }
 
                             if (downloadProgress != null) {
-                                mApplicationContext.getBus().post(downloadProgress);
+                                SoundWaves.getRxBus2().send(downloadProgress);
                             }
                         }
 
@@ -132,7 +132,7 @@ public class DownloadProgressPublisher {
                     case DELETED: {
                         IEpisode episode = (FeedItem) msg.obj;
                         DownloadProgress downloadProgress = new DownloadProgress(episode, DownloadStatus.DELETED, 0);
-                        mApplicationContext.getBus().post(downloadProgress);
+                        SoundWaves.getRxBus2().send(downloadProgress);
                         break;
                     }
                 }
