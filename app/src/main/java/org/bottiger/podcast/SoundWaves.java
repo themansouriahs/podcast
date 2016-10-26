@@ -61,7 +61,6 @@ public class SoundWaves extends MultiDexApplication {
 
     public native String stringFromJNI();
 
-    private static Context context;
     // Global constants
     private Boolean mFirstRun = null;
 
@@ -94,8 +93,6 @@ public class SoundWaves extends MultiDexApplication {
         if (BuildConfig.VERSION_CODE % 2 == 1)
             PodcastLog.initFileLog();
 
-        context = getApplicationContext();
-
         Log.v(TAG, "time: " + System.currentTimeMillis());
 
         CrashReporterFactory.startReporter(this);
@@ -106,7 +103,7 @@ public class SoundWaves extends MultiDexApplication {
         //mLibrary = new Library(this);
         Log.v(TAG, "time3: " + System.currentTimeMillis());
 
-        firstRun(context);
+        firstRun(this);
         Log.v(TAG, "time5: " + System.currentTimeMillis());
 
         initMediaBrowser();
@@ -144,11 +141,6 @@ public class SoundWaves extends MultiDexApplication {
                 incrementStartupCount(context);
             }
         });
-    }
-
-    @Deprecated
-    public static Context getAppContext() {
-        return context;
     }
 
     private void firstRun(@NonNull Context argContext) {

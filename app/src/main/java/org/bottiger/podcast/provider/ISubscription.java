@@ -1,6 +1,7 @@
 package org.bottiger.podcast.provider;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
@@ -70,7 +71,7 @@ public interface ISubscription {
 
     boolean IsLoaded();
 
-    boolean isListOldestFirst();
+    boolean isListOldestFirst(@NonNull Resources argResources);
 
     @Type int getType();
     @ColorInt int getPrimaryColor();

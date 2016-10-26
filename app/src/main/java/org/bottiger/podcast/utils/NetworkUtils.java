@@ -106,7 +106,7 @@ public class NetworkUtils {
     }
 
     @WorkerThread
-    public static IDownloadEngine newEngine(@NonNull FeedItem argEpisode) {
-        return new OkHttpDownloader(argEpisode);
+    public static IDownloadEngine newEngine(@NonNull Context argContext, @NonNull FeedItem argEpisode) {
+        return new OkHttpDownloader(argContext, argEpisode);
     }
 }

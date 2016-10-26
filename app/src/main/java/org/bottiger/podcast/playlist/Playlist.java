@@ -92,7 +92,7 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
                    .getDefaultSharedPreferences(argContext);
         showListenedVal = sharedPreferences.getBoolean(showListenedKey, showListenedVal);
 
-        String downloadKey = SoundWaves.getAppContext().getString(R.string.pref_only_downloaded_key);
+        String downloadKey = SoundWaves.getAppContext(argContext).getString(R.string.pref_only_downloaded_key);
         showOnlyDownloadedVal = sharedPreferences.getBoolean(downloadKey, SHOW_ONLY_DOWNLOADED);
 
         mSubscriptionFilter = new SubscriptionFilter(argContext);
@@ -745,7 +745,7 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
         showOnlyDownloadedVal = argOnlyDownloaded;
 
         if (isChanged) {
-            String key = SoundWaves.getAppContext().getString(R.string.pref_only_downloaded_key);
+            String key = SoundWaves.getAppContext(mContext).getString(R.string.pref_only_downloaded_key);
             sharedPreferences.edit().putBoolean(key, argOnlyDownloaded).commit();
             notifyDatabaseChanged();
         }

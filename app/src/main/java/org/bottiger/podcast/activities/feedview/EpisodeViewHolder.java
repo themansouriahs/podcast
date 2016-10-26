@@ -158,7 +158,7 @@ public class EpisodeViewHolder extends RecyclerView.ViewHolder {
     private void setTextColor(boolean argFaded) {
         int textColor = argFaded ? mFadedColor : mPrimaryColor;
 
-        if (!UIUtils.isInNightMode()) {
+        if (!UIUtils.isInNightMode(mContainer.getResources())) {
             mTitle.setTextColor(textColor);
             mDescription.setTextColor(textColor);
         }

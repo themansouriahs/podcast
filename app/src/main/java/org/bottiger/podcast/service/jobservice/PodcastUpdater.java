@@ -29,8 +29,11 @@ public class PodcastUpdater implements SharedPreferences.OnSharedPreferenceChang
 
     private static final int PodcastUpdaterId = 36324;
 
+    private Context mContext;
+
     public PodcastUpdater(@NonNull Context argContext) {
 
+        mContext = argContext;
         PreferenceManager.getDefaultSharedPreferences(argContext).registerOnSharedPreferenceChangeListener(this);
 
         if (Build.VERSION.SDK_INT >= 21) {
@@ -141,10 +144,10 @@ public class PodcastUpdater implements SharedPreferences.OnSharedPreferenceChang
             return;
         }
 
-        String wifiKey = SoundWaves.getAppContext().getResources().getString(R.string.pref_download_only_wifi_key);
+        String wifiKey = SoundWaves.getAppContext(mContext).getResources().getString(R.string.pref_download_only_wifi_key);
 
         if (wifiKey.equals(key)) {
-            scheduleUpdateUsingJobScheduler(SoundWaves.getAppContext());
+            scheduleUpdateUsingJobScheduler(SoundWaves.getAppContext(mContext));
         }
     }
 }

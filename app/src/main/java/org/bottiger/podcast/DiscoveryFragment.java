@@ -364,7 +364,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
 
             switch (searchEngine) {
                 case GPODDER_INDEX: {
-                    mDirectoryProvider = new GPodder();
+                    mDirectoryProvider = new GPodder(getContext());
                     mSearchEngineButton.setImageResource(R.drawable.discovery_gpodder);
                     break;
                 }

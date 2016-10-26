@@ -1,5 +1,6 @@
 package org.bottiger.podcast.webservices.directories.gpodder;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -39,9 +40,9 @@ public class GPodder extends GenericDirectory {
     private GPodderAPI mGPodderAPI;
     private Call mCall;
 
-    public GPodder() {
+    public GPodder(@NonNull Context argContext) {
         super(NAME);
-        mGPodderAPI = new GPodderAPI(GPodderUtils.getServer(null));
+        mGPodderAPI = new GPodderAPI(argContext, GPodderUtils.getServer(null));
     }
 
     protected AsyncTask getAsyncTask() {

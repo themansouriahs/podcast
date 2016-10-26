@@ -29,12 +29,16 @@ public class CloudSyncAdapter extends AbstractThreadedSyncAdapter {
 
     private static final String TAG = "CloudSyncAdapter";
 
+    private Context mContext;
+
     public CloudSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
+        mContext = context;
     }
 
     public CloudSyncAdapter(Context context, boolean autoInitialize, boolean allowParallelSyncs) {
         super(context, autoInitialize, allowParallelSyncs);
+        mContext = context;
     }
 
     @Override
@@ -60,7 +64,7 @@ public class CloudSyncAdapter extends AbstractThreadedSyncAdapter {
 
         String server = GPodderUtils.getServer(sharedPreferences);
 
-        GPodderAPI mGPodderAPI = new GPodderAPI(server, username, password);
+        GPodderAPI mGPodderAPI = new GPodderAPI(mContext, server, username, password);
 
         try {
             if (!mGPodderAPI.authenticateSync()) {

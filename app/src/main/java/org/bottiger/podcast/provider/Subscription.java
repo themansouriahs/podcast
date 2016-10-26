@@ -2,7 +2,7 @@ package org.bottiger.podcast.provider;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
+import android.content.res.Resources;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.v7.graphics.Palette;
@@ -37,7 +37,7 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 
 	private static final String TAG = "Subscription";
 
-	private static SharedPreferences sSharedPreferences = null;
+	private SharedPreferences mSharedPreferences = null;
 
 	public static final int SHOW_EPISODE_DESCRIPTION_SET = 1;
 	public static final int SHOW_EPISODE_DESCRIPTION = (1 << 1);
@@ -64,7 +64,6 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 
 	private final int mOldestFirstID = R.string.pref_list_oldest_first_key;
 	private final int mDeleteAfterPlaybackID = R.string.pref_delete_when_finished_key;
-
 
 	@Retention(RetentionPolicy.SOURCE)
 	@IntDef({STATUS_SUBSCRIBED, STATUS_UNSUBSCRIBED})
@@ -191,24 +190,22 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 		episode_count_cache = -1;
 	}
 
-	public Subscription() {
+	public Subscription(@NonNull SharedPreferences argSharedPreferences) {
 		reset();
-		if (sSharedPreferences == null) {
-			sSharedPreferences = PreferenceManager.getDefaultSharedPreferences(SoundWaves.getAppContext());
-		}
+		mSharedPreferences = argSharedPreferences;
 		init();
 	}
 
-	public Subscription(String url_link) {
-		this();
+	public Subscription(@NonNull SharedPreferences argSharedPreferences, String url_link) {
+		this(argSharedPreferences);
 		url = url_link;
 		title = url_link;
 		link = url_link;
 		init();
 	}
 
-	public Subscription(@NonNull ISubscription argSlimSubscription) {
-		this();
+	public Subscription(@NonNull SharedPreferences argSharedPreferences, @NonNull ISubscription argSlimSubscription) {
+		this(argSharedPreferences);
 		url = argSlimSubscription.getURLString();
 		title = argSlimSubscription.getTitle();
 		imageURL = argSlimSubscription.getImageURL();
@@ -709,9 +706,9 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 		notifyPropertyChanged(null);
 	}
 
-	public boolean isListOldestFirst() {
+	public boolean isListOldestFirst(@NonNull Resources argResources) {
 		if (!IsSettingEnabled(LIST_OLDEST_FIRST_SET))
-			return getApplicationValue(mOldestFirstID, false);
+			return getApplicationValue(argResources, mOldestFirstID, false);
 
 		return IsSettingEnabled(LIST_OLDEST_FIRST);
 	}
@@ -728,9 +725,9 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 		notifyPropertyChanged(null);
 	}
 
-	public boolean isDeleteWhenListened() {
+	public boolean isDeleteWhenListened(@NonNull Resources argResources) {
 		if (!IsSettingEnabled(DELETE_AFTER_PLAYBACK_SET))
-			return getApplicationValue(mDeleteAfterPlaybackID, false);
+			return getApplicationValue(argResources, mDeleteAfterPlaybackID, false);
 
 		return IsSettingEnabled(DELETE_AFTER_PLAYBACK);
 	}
@@ -888,9 +885,9 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 		return BitMaskUtils.IsBitSet(mSettings, setting);
 	}
 
-	private boolean getApplicationValue(int argId, boolean argDefault) {
-		String key = SoundWaves.getAppContext().getResources().getString(argId);
-		return sSharedPreferences.getBoolean(key, argDefault);
+	private boolean getApplicationValue(@NonNull Resources argResources, int argId, boolean argDefault) {
+		String key = argResources.getString(argId);
+		return mSharedPreferences.getBoolean(key, argDefault);
 	}
 
 	public void notifyEpisodeAdded(boolean argSilent) {

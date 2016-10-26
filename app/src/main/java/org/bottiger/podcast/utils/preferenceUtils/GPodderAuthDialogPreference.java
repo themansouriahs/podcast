@@ -117,7 +117,7 @@ public class GPodderAuthDialogPreference extends DialogPreference {
                 }
 
                 try {
-                    GPodderAPI api = new GPodderAPI(server, username, password, new Callback() {
+                    GPodderAPI api = new GPodderAPI(getContext(), server, username, password, new Callback() {
                         @Override
                         public void onResponse(retrofit2.Call call, retrofit2.Response response) {
                             AuthenticationUtils.setState(response.isSuccessful(), getContext(), mTestLoading, mTestResult);

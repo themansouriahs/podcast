@@ -393,11 +393,6 @@ public class UIUtils {
         return color;
     }
 
-    @Deprecated
-    public static boolean isInNightMode() {
-        return isInNightMode(SoundWaves.getAppContext().getResources());
-    }
-
     public static boolean isInNightMode(@NonNull Resources argResources) {
 
         if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES)

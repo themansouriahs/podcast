@@ -70,8 +70,8 @@ public class SubscriptionSettingsUtils {
         mShowDescription.setChecked(mSubscription.isShowDescription());
         mAddNewToPlaylist.setChecked(mSubscription.isAddNewToPlaylist());
         mAutoDownload.setChecked(mSubscription.doDownloadNew(defaultValue));
-        mDeleteAfterPlayback.setChecked(mSubscription.isDeleteWhenListened());
-        mListOldestFirst.setChecked(mSubscription.isListOldestFirst());
+        mDeleteAfterPlayback.setChecked(mSubscription.isDeleteWhenListened(context.getResources()));
+        mListOldestFirst.setChecked(mSubscription.isListOldestFirst(context.getResources()));
         mSkipIntro.setChecked(mSubscription.doSkipIntro());
         mNotifyOnNew.setChecked(mSubscription.doNotifyOnNew());
 

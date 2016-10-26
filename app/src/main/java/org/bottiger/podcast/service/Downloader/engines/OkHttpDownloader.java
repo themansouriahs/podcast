@@ -1,6 +1,9 @@
 package org.bottiger.podcast.service.Downloader.engines;
 
+import android.Manifest;
+import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresPermission;
 import android.support.annotation.WorkerThread;
 import android.util.Log;
 import android.util.SparseArray;
@@ -38,19 +41,22 @@ public class OkHttpDownloader extends DownloadEngineBase {
 
     private volatile boolean mAborted = false;
 
+    private Context mContext;
     private final URL mURL;
 
     private double mProgress = 0;
 
     @WorkerThread
-    public OkHttpDownloader(@NonNull IEpisode argEpisode) {
+    public OkHttpDownloader(@NonNull Context argContext, @NonNull IEpisode argEpisode) {
         super(argEpisode);
+        mContext = argContext;
         mURL = argEpisode.getUrl();
     }
 
     @WorkerThread
     @Override
-    public void startDownload() {
+    @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    public void startDownload() throws SecurityException{
         mProgress = 0;
         try {
 
@@ -76,7 +82,7 @@ public class OkHttpDownloader extends DownloadEngineBase {
 
                 double contentLength = mConnection.getContentLength();
                 InputStream inputStream = mConnection.getInputStream();
-                FileOutputStream outputStream = new FileOutputStream(episode.getAbsoluteTmpPath());
+                FileOutputStream outputStream = new FileOutputStream(episode.getAbsoluteTmpPath(mContext));
 
                 mEpisode.setFilesize((long)contentLength);
 
@@ -101,7 +107,7 @@ public class OkHttpDownloader extends DownloadEngineBase {
                 outputStream.close();
                 inputStream.close();
 
-                File tmpFIle = new File(episode.getAbsoluteTmpPath());
+                File tmpFIle = new File(episode.getAbsoluteTmpPath(mContext));
                 File finalFIle = new File(episode.getAbsolutePath());
 
                 Log.d(TAG, "pre move file");

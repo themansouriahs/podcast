@@ -1,5 +1,6 @@
 package org.bottiger.podcast.utils;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Looper;
@@ -7,6 +8,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresPermission;
 import android.support.annotation.WorkerThread;
 import android.text.TextUtils;
 import android.util.Log;
@@ -58,10 +60,12 @@ public class StorageUtils {
         removeExpiredDownloadedPodcastsTask(context);
     }
 
-    public static boolean removeTmpFolderCruft() {
+
+    @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    public static boolean removeTmpFolderCruft(@NonNull Context argContext) throws SecurityException {
         String tmpFolder;
         try {
-            tmpFolder = SDCardManager.getTmpDir();
+            tmpFolder = SDCardManager.getTmpDir(argContext);
         } catch (IOException e) {
             Log.w(TAG, "Could not access tmp storage. removeTmpFolderCruft() returns without success"); // NoI18N
             return false;

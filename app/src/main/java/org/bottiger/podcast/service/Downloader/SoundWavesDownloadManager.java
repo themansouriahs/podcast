@@ -16,6 +16,7 @@ import android.support.annotation.IntDef;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresPermission;
 import android.support.annotation.WorkerThread;
 import android.support.v7.util.SortedList;
 import android.util.Log;
@@ -198,7 +199,7 @@ public class SoundWavesDownloadManager extends Observable {
 
     @WorkerThread
     public IDownloadEngine newEngine(@NonNull FeedItem argEpisode) {
-        return new OkHttpDownloader(argEpisode);
+        return new OkHttpDownloader(mContext, argEpisode);
     }
 
 	/**
@@ -206,7 +207,8 @@ public class SoundWavesDownloadManager extends Observable {
 	 * 
 	 * @param context
 	 */
-	private static void deleteExpireFile(@NonNull Context context, FeedItem item) {
+    @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+	private static void deleteExpireFile(@NonNull Context context, FeedItem item) throws SecurityException{
 
 		if (item == null)
 			return;
@@ -221,10 +223,11 @@ public class SoundWavesDownloadManager extends Observable {
         removeExpiredDownloadedPodcastsTask(context);
     }
 
-    public static boolean removeTmpFolderCruft() {
+    @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    public static boolean removeTmpFolderCruft(@NonNull Context argContext) throws SecurityException {
         String tmpFolder;
         try {
-            tmpFolder = SDCardManager.getTmpDir();
+            tmpFolder = SDCardManager.getTmpDir(argContext);
         } catch (IOException e) {
             Log.w(TAG, "Could not access tmp storage. removeTmpFolderCruft() returns without success"); // NoI18N
             return false;
@@ -530,7 +533,7 @@ public class SoundWavesDownloadManager extends Observable {
 
             removeDownloadingEpisode(argEpisode);
             StorageUtils.removeExpiredDownloadedPodcasts(mContext);
-            StorageUtils.removeTmpFolderCruft();
+            StorageUtils.removeTmpFolderCruft(mContext);
 
             notifyDownloadComplete(argEpisode);
         }
@@ -539,7 +542,7 @@ public class SoundWavesDownloadManager extends Observable {
         public void downloadInterrupted(IEpisode argEpisode) {
             removeTopQueueItem();
             removeDownloadingEpisode(argEpisode);
-            StorageUtils.removeTmpFolderCruft();
+            StorageUtils.removeTmpFolderCruft(mContext);
             notifyDownloadComplete(argEpisode);
         }
     }

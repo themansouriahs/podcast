@@ -2,6 +2,8 @@ package org.bottiger.podcast.activities.discovery;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.util.SortedList;
@@ -147,7 +149,8 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
                                                       @NonNull ISubscription argSubscription) {
         final URL url = argSubscription.getURL();
         final boolean isSubscribed = mSubscribedUrls.contains(url);
-        final Subscription subscription = new Subscription(url.toString());
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
+        final Subscription subscription = new Subscription(sharedPreferences, url.toString());
         if (isSubscribed) {
             unsubscribe(subscription);
             mSubscribedUrls.remove(url);

@@ -2,9 +2,11 @@ package org.bottiger.podcast.utils;
 
 
 import android.Manifest;
+import android.content.Context;
 import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
+import android.support.annotation.NonNull;
 import android.support.annotation.RequiresPermission;
 import android.support.v4.content.ContextCompat;
 
@@ -55,18 +57,18 @@ public class SDCardManager {
 	}
 
     @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-	public static String getTmpDir() throws IOException, SecurityException {
-		return getSDCardDir() + APP_DIR + TMP_DIR;
+	public static String getTmpDir(@NonNull Context argContext) throws IOException, SecurityException {
+		return getSDCardDir(argContext) + APP_DIR + TMP_DIR;
 	}
 
     @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-	public static File getCacheDir() throws IOException, SecurityException {
-		return  returnDir(getSDCardDir() + APP_DIR + CACHE_DIR);
+	public static File getCacheDir(@NonNull Context argContext) throws IOException, SecurityException {
+		return  returnDir(getSDCardDir(argContext) + APP_DIR + CACHE_DIR);
 	}
 
     @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-	public static File getThumbnailCacheDir() throws IOException, SecurityException {
-		return  returnDir(getSDCardDir() + APP_DIR + CACHE_DIR + THUMBNAIL_CACHE);
+	public static File getThumbnailCacheDir(@NonNull Context argContext) throws IOException, SecurityException {
+		return  returnDir(getSDCardDir(argContext) + APP_DIR + CACHE_DIR + THUMBNAIL_CACHE);
 	}
 
     @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -79,13 +81,13 @@ public class SDCardManager {
 	}
 
     @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-    public static String getSDCardDir() throws IOException {
+    public static String getSDCardDir(@NonNull Context argContext) throws IOException {
 
         if (sSDCardDirCache != null) {
             return sSDCardDirCache;
         }
 
-        File[] dirs = ContextCompat.getExternalFilesDirs(SoundWaves.getAppContext(), null);
+        File[] dirs = ContextCompat.getExternalFilesDirs(argContext, null);
 
         File externalDir = null;
 
@@ -121,7 +123,7 @@ public class SDCardManager {
          * I should probably investigate it at some point
          */
         if (externalDir == null) {
-            externalDir = SoundWaves.getAppContext().getFilesDir();
+            externalDir = SoundWaves.getAppContext(argContext).getFilesDir();
         }
 
 
@@ -159,17 +161,17 @@ public class SDCardManager {
 		}
 	}
 	
-	public static String pathTmpFromFilename(FeedItem item) throws IOException, SecurityException {
+	public static String pathTmpFromFilename(@NonNull Context argContext, FeedItem item) throws IOException, SecurityException {
 		if (item.getFilename() == null || item.getFilename().equals("")) {
 			return "";
 		} else {
-			return pathTmpFromFilename(item.getFilename());
+			return pathTmpFromFilename(argContext, item.getFilename());
 		}
 	}
 
     @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-	public static String pathTmpFromFilename(String item) throws IOException, SecurityException {
-		String folder = SDCardManager.getTmpDir();
+	public static String pathTmpFromFilename(@NonNull Context argContext, String item) throws IOException, SecurityException {
+		String folder = SDCardManager.getTmpDir(argContext);
 		returnDir(folder);
 		return folder + "/" + item;
 	}

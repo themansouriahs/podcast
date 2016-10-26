@@ -144,7 +144,7 @@ public class DownloadService extends IntentService {
 
         FeedItem feedItem = (FeedItem) episode.getEpisode();
 
-        IDownloadEngine mEngine = NetworkUtils.newEngine(feedItem);
+        IDownloadEngine mEngine = NetworkUtils.newEngine(this, feedItem);
         mEngine.addCallback(mSoundWavesDownloadManager.getIDownloadEngineCallback());
 
         Log.d(TAG, "Start downloading: " + feedItem);

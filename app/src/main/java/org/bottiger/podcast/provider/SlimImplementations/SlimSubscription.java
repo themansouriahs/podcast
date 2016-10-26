@@ -1,5 +1,6 @@
 package org.bottiger.podcast.provider.SlimImplementations;
 
+import android.content.res.Resources;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -159,7 +160,7 @@ public class SlimSubscription extends BaseSubscription implements Parcelable {
     }
 
     @Override
-    public boolean isListOldestFirst() {
+    public boolean isListOldestFirst(@NonNull Resources argResources) {
         return false;
     }
 

@@ -1,10 +1,12 @@
 package org.bottiger.podcast.provider;
 
+import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresPermission;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
@@ -368,7 +370,8 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 	 * @param argContext
 	 * @return True of the file was deleted succesfully
 	 */
-	public boolean delFile(@NonNull Context argContext) {
+    @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+	public boolean delFile(@NonNull Context argContext) throws SecurityException {
 
 		if (SDCardManager.getSDCardStatus()) {
 			try {
@@ -390,7 +393,8 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 
 	}
 
-	public void downloadSuccess(ContentResolver contentResolver) {
+    @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+	public void downloadSuccess(ContentResolver contentResolver) throws SecurityException {
 		filesize = getCurrentFileSize();
 		notifyPropertyChanged();
 	}
@@ -404,7 +408,8 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
         return id > 0;
     }
 
-	public long getCurrentFileSize() {
+    @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+	public long getCurrentFileSize() throws SecurityException {
 		String file = null;
 		try {
 			file = getAbsolutePath();
@@ -445,16 +450,18 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 		notifyPropertyChanged(EpisodeChanged.CHANGED);
 	}
 
-	public String getAbsolutePath() throws IOException {
+	@RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+	public String getAbsolutePath() throws IOException, SecurityException {
 		return SDCardManager.pathFromFilename(this);
 	}
 
-	public String getAbsoluteTmpPath() throws IOException {
-		return SDCardManager.pathTmpFromFilename(this);
+	public String getAbsoluteTmpPath(@NonNull Context argContext) throws IOException {
+		return SDCardManager.pathTmpFromFilename(argContext, this);
 	}
 
 	@Nullable
-	public Uri getFileLocation(@Location int argLocation) {
+    @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+	public Uri getFileLocation(@Location int argLocation) throws SecurityException {
 		boolean isDownloaded = isDownloaded();
 
 		if (!isDownloaded && argLocation == REQUIRE_LOCAL)
@@ -562,7 +569,8 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 	 * 
 	 * @return whether the item is downloaded to the phone
 	 */
-	public boolean isDownloaded() {
+    @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+	public boolean isDownloaded() throws SecurityException {
         try {
             if (this.isDownloaded!=null)
                 return this.isDownloaded;
@@ -599,8 +607,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 	}
 
 	/**
-	 * @param isDownloaded
-	 *            the isDownloaded to set
+	 * @param argIsDownloaded the isDownloaded to set
 	 */
 	public void setDownloaded(boolean argIsDownloaded) {
 		if (isDownloaded == argIsDownloaded && !hasBeenDownloadedOnce())
@@ -873,7 +880,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
     }
 
 	/**
-	 * @param title the title to set
+	 * @param argTitle the title to set
 	 */
 	public void setTitle(String argTitle) {
 		if (title != null && title.equals(argTitle))
@@ -1089,6 +1096,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 
 	DownloadProgress progressChanged;
 	long lastUpdate2 = System.currentTimeMillis();
+
 	protected void notifyPropertyChanged(@EpisodeChanged.Action int argAction) {
         if (mIsParsing)
             return;
@@ -1099,7 +1107,12 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 		}
 
 		if (argAction == EpisodeChanged.DOWNLOADED) {
-			boolean isDownloaded = isDownloaded();
+			boolean isDownloaded = false;
+            try {
+                isDownloaded = isDownloaded();
+            } catch (SecurityException se) {
+                VendorCrashReporter.report("IsDownloaded", "SecurityException");
+            }
 			DownloadStatus downloadStatus = isDownloaded ? DownloadStatus.DONE : DownloadStatus.DELETED;
 			int progress = isDownloaded ? 100 : 0;
 			progressChanged = new DownloadProgress(this, downloadStatus, progress);

@@ -277,11 +277,11 @@ public class FeedActivity extends TopActivity implements PaletteListener {
             mSubscriptionSettingsUtils.setListOldestFirstListener(new SubscriptionSettingsUtils.OnSettingsChangedListener() {
                 @Override
                 public void OnSettingsChanged(boolean isChecked) {
-                    @FeedViewAdapter.Order int sortOrder = mSubscription.isListOldestFirst() ?  FeedViewAdapter.OLDEST_FIRST : FeedViewAdapter.RECENT_FIRST;
+                    @FeedViewAdapter.Order int sortOrder = mSubscription.isListOldestFirst(getResources()) ?  FeedViewAdapter.OLDEST_FIRST : FeedViewAdapter.RECENT_FIRST;
                     mAdapter.setOrder(sortOrder);
                 }
             });
-            @FeedViewAdapter.Order int sortOrder = mSubscription.isListOldestFirst() ?  FeedViewAdapter.OLDEST_FIRST : FeedViewAdapter.RECENT_FIRST;
+            @FeedViewAdapter.Order int sortOrder = mSubscription.isListOldestFirst(getResources()) ?  FeedViewAdapter.OLDEST_FIRST : FeedViewAdapter.RECENT_FIRST;
             mAdapter.setOrder(sortOrder);
         }
 

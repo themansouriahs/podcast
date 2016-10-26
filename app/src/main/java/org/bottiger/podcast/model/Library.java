@@ -1,8 +1,12 @@
 package org.bottiger.podcast.model;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteCantOpenDatabaseException;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
@@ -427,13 +431,11 @@ public class Library {
         }
     }
 
-    public static Subscription getByCursor(Cursor cursor, Subscription argSubscription) {
-        if (argSubscription == null) {
-            argSubscription = new Subscription();
-        }
+    public static Subscription getByCursor(@NonNull Cursor cursor, @NonNull SharedPreferences argSharedPreferences) {
+        Subscription subscription = new Subscription(argSharedPreferences);
 
-        argSubscription = SubscriptionLoader.fetchFromCursor(argSubscription, cursor);
-        return argSubscription;
+        subscription = SubscriptionLoader.fetchFromCursor(subscription, cursor);
+        return subscription;
     }
 
     public SortedList<Subscription> getSubscriptions() {
@@ -643,7 +645,7 @@ public class Library {
             cursor = PodcastOpenHelper.runQuery(Library.this.mContext, argQuery);
 
             while (cursor.moveToNext()) {
-                subscription = getByCursor(cursor, null);
+                subscription = getByCursor(cursor, PreferenceManager.getDefaultSharedPreferences(mContext));
 
                 if (!TextUtils.isEmpty(subscription.getUrl())) {
                     addSubscriptionInternal(subscription, true);
@@ -781,7 +783,8 @@ public class Library {
                             String key = getKey(argSubscription);
                             subscription = mSubscriptionUrlLUT.containsKey(key) ?
                                     mSubscriptionUrlLUT.get(key) :
-                                    new Subscription(argSubscription);
+                                    new Subscription(PreferenceManager.getDefaultSharedPreferences(mContext),
+                                            argSubscription);
 
                             subscription.subscribe("Subscribe:from:Library.subscribe");
                             updateSubscription(subscription);

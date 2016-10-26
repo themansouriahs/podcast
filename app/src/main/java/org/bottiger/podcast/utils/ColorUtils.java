@@ -56,7 +56,7 @@ public class ColorUtils {
         if (argPalette == null)
             return color;
 
-        if (UIUtils.isInNightMode()) {
+        if (UIUtils.isInNightMode(argResources)) {
             return darken(argPalette.getDarkVibrantColor(color), 0.5f);
         } else {
             return argPalette.getLightVibrantColor(color);
@@ -70,7 +70,7 @@ public class ColorUtils {
         if (argPalette == null)
             return color;
 
-        if (UIUtils.isInNightMode()) {
+        if (UIUtils.isInNightMode(argResources)) {
             return darken(argPalette.getDarkVibrantColor(color), 0.5f);
         } else {
             return argPalette.getDarkVibrantColor(color);

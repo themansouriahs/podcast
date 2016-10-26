@@ -93,20 +93,20 @@ public class GPodderAPI implements IWebservice {
         }
     };
 
-    public GPodderAPI(@NonNull String argServer) {
-        this(argServer, null, null, null);
+    public GPodderAPI(@NonNull Context argContext, @NonNull String argServer) {
+        this(argContext, argServer, null, null, null);
     }
 
-    public GPodderAPI(@NonNull String argServer, @Nullable String argUsername, @Nullable String argPassword) {
-        this(argServer, argUsername, argPassword, null);
+    public GPodderAPI(@NonNull Context argContext, @NonNull String argServer, @Nullable String argUsername, @Nullable String argPassword) {
+        this(argContext, argServer, argUsername, argPassword, null);
     }
 
-    public GPodderAPI(@NonNull String argServer, @Nullable String argUsername, @Nullable String argPassword, @Nullable Callback argCallback) {
+    public GPodderAPI(@NonNull Context argContext, @NonNull String argServer, @Nullable String argUsername, @Nullable String argPassword, @Nullable Callback argCallback) {
 
         mUsername = argUsername;
 
         OkHttpClient.Builder client = new OkHttpClient.Builder();
-        client.interceptors().add(new UserAgentInterceptor(SoundWaves.getAppContext()));
+        client.interceptors().add(new UserAgentInterceptor(SoundWaves.getAppContext(argContext)));
         client.interceptors().add(new ApiRequestInterceptor(argUsername, argPassword));
 
         api = new Retrofit.Builder()
