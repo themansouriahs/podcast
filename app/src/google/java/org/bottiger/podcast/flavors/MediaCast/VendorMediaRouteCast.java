@@ -1,56 +1,23 @@
 package org.bottiger.podcast.flavors.MediaCast;
 
 import android.app.Activity;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.net.Uri;
-import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.annotation.IdRes;
-import android.support.annotation.MenuRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.media.MediaControlIntent;
-import android.support.v7.media.MediaItemMetadata;
-import android.support.v7.media.MediaItemStatus;
-import android.support.v7.media.MediaRouteSelector;
-import android.support.v7.media.MediaRouter;
-import android.support.v7.media.MediaSessionStatus;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 
-import com.google.android.gms.cast.CastMediaControlIntent;
-import com.google.android.gms.cast.MediaInfo;
-import com.google.android.gms.cast.MediaMetadata;
 import com.google.android.gms.cast.framework.CastButtonFactory;
 import com.google.android.gms.cast.framework.CastContext;
 import com.google.android.gms.cast.framework.CastSession;
-import com.google.android.gms.cast.framework.Session;
 import com.google.android.gms.cast.framework.SessionManager;
 import com.google.android.gms.cast.framework.SessionManagerListener;
 import com.google.android.gms.cast.framework.media.RemoteMediaClient;
-import com.google.android.gms.common.images.WebImage;
 
-import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.flavors.Analytics.IAnalytics;
-import org.bottiger.podcast.listeners.PlayerStatusObservable;
-import org.bottiger.podcast.player.Player;
+import org.bottiger.podcast.flavors.player.googlecast.GoogleCastPlayer;
 import org.bottiger.podcast.player.SoundWavesPlayer;
-import org.bottiger.podcast.player.SoundWavesPlayerBase;
-import org.bottiger.podcast.player.googlecast.GoogleCastPlayer;
-import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
-import org.bottiger.podcast.utils.PlaybackSpeed;
-
-import java.io.IOException;
-import java.net.URLConnection;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by apl on 11-04-2015.
