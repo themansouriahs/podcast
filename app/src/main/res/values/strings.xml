@@ -238,6 +238,11 @@
     <plurals name="subscriptions_imported">
         <item quantity="one">%d subscription was imported.</item>
         <item quantity="other">%d subscriptions were imported.</item>
-    </plurals>  
+    </plurals>
+
+    <plurals name="subscriptions_selected">
+        <item quantity="one">%d Selected</item>
+        <item quantity="other">%d Selected</item>
+    </plurals>
 
 </resources>

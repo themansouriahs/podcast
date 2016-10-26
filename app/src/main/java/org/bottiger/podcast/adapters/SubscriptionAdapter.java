@@ -2,6 +2,7 @@ package org.bottiger.podcast.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -315,11 +316,11 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
             public boolean onLongClick(View v) {
 
                 AppCompatActivity appCompatActivity = ((AppCompatActivity) holder.itemView.getContext());
-                mActionMode = appCompatActivity.startSupportActionMode(mActionModeCallback); // (2)
+                mActionMode = appCompatActivity.startSupportActionMode(mActionModeCallback);
 
-                if (!mMultiSelector.isSelectable()) { // (3)
-                    mMultiSelector.setSelectable(true); // (4)
-                    mMultiSelector.setSelected(holder, true); // (5)
+                if (!mMultiSelector.isSelectable()) {
+                    mMultiSelector.setSelectable(true);
+                    mMultiSelector.setSelected(holder, true);
                     return true;
                 }
                 return false;
@@ -402,8 +403,9 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
         }
 
         if (argNumSelectedItems > 0) {
-            String title = argNumSelectedItems + " selected";
-            actionMode.setTitle(title);
+            Resources res = mActivity.getResources();
+            String formattedString = res.getQuantityString(R.plurals.subscriptions_selected, argNumSelectedItems, argNumSelectedItems);
+            actionMode.setTitle(formattedString);
             return true;
         }
 

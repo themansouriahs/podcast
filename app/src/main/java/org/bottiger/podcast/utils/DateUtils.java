@@ -140,7 +140,7 @@ public class DateUtils {
 
     /**
      * Parse the given date string to date object and return a date instance based on the given
-     * date string. This makes use of the {@link DateUtil#determineDateFormat(String)} to determine
+     * date string. This makes use of the {@link DateUtils#determineDateFormat(String, Hint)} to determine
      * the SimpleDateFormat pattern to be used for parsing.
      *
      * @param dateString The date string to be parsed to date object.
@@ -172,7 +172,6 @@ public class DateUtils {
     public static synchronized Date parse(@NonNull String dateString, @NonNull String dateFormat) throws ParseException {
 
         SimpleDateFormat simpleDateFormat = sSimpleDateFormatCache;
-        String dateOrg = dateString;
 
         try {
             // This is a hack to deal with time zones not known to Java
@@ -180,21 +179,9 @@ public class DateUtils {
             while (it.hasNext()) {
                 Map.Entry pair = (Map.Entry) it.next();
                 dateString = dateString.replace(pair.getKey().toString(), pair.getValue().toString());
-                //it.remove(); // avoids a ConcurrentModificationException
             }
 
             simpleDateFormat = getSimpleDateFormat(dateFormat);
-            /*
-            if (simpleDateFormat == null || !dateFormat.equals(sSimpleDateFormatFormat)) {
-                // http://blog.andromo.com/2011/simpledateformat-can-be-slow/
-                //simpleDateFormat = new SimpleDateFormat(dateFormat, Locale.getDefault());
-                //simpleDateFormat.setLenient(false); // Don't automatically convert invalid date.
-
-                sSimpleDateFormatFormat = dateFormat;
-                sSimpleDateFormatCache = simpleDateFormat;
-            }
-            */
-
             return simpleDateFormat.parse(dateString);
         } catch (ParseException pe) {
             ParseException pe2 = pe;
@@ -206,7 +193,7 @@ public class DateUtils {
 
     /**
      * Checks whether the actual date of the given date string is valid. This makes use of the
-     * {@link DateUtil#determineDateFormat(String)} to determine the SimpleDateFormat pattern to be
+     * {@link DateUtils#determineDateFormat(String, Hint)} to determine the SimpleDateFormat pattern to be
      * used for parsing.
      * @param dateString The date string.
      * @return True if the actual date of the given date string is valid.
