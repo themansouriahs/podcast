@@ -22,6 +22,7 @@ import com.bumptech.glide.request.target.AppWidgetTarget;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.player.PlayerStateManager;
 import org.bottiger.podcast.playlist.Playlist;
@@ -81,9 +82,11 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
         }
 
         Playlist playlist = SoundWaves.getAppContext(context).getPlaylist();
+        Library library = SoundWaves.getAppContext(context).getLibraryInstance();
 
         boolean wasEmpty = false;
         if (playlist.isEmpty()) {
+            library.loadPlaylistSync(playlist);
             playlist.populatePlaylistIfEmpty();
             wasEmpty = true;
         }
@@ -111,7 +114,7 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
             if (episode.getSubscription(context) != null)
                 podcast_title = episode.getSubscription(context).getTitle();
 
-            podcast_title =   (wasEmpty ? "Loaded" : "Memory") + podcast_title;
+            //podcast_title =   (wasEmpty ? "Loaded" : "Memory") + podcast_title;
 
             CharSequence text = episode.getTitle();
             Long durationMs = episode.getDuration();
