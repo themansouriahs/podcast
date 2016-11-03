@@ -189,8 +189,14 @@ public class SlimEpisode extends BaseEpisode implements Parcelable {
     }
 
     @Override
-    public void setOffset(@Nullable ContentResolver contentResolver, long i) {
+    public boolean setOffset(long i) {
         mOffset = i;
+        return true;
+    }
+
+    @Override
+    public void setOffset(@Nullable ContentResolver contentResolver, long i) {
+        setOffset(i);
     }
 
     @Override

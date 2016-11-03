@@ -32,13 +32,14 @@ import org.bottiger.podcast.views.dialogs.DialogAddPodcast;
 import org.bottiger.podcast.webservices.datastore.webplayer.WebPlayerAuthenticator;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 // Sliding
 public class MainActivity extends FragmentContainerActivity {
 
 	private static final String TAG = "MainActivity";
 
-    static PreferenceHelper mPreferenceHelper = new PreferenceHelper();
+    private PreferenceHelper mPreferenceHelper = new PreferenceHelper();
 
     private HeadsetReceiver receiver;
 	private SharedPreferences prefs;
@@ -59,7 +60,6 @@ public class MainActivity extends FragmentContainerActivity {
 			Debug.startMethodTracing("calc");
 
 		}
-
 
 		if (BuildConfig.DEBUG && false) {
 			try {
@@ -176,7 +176,12 @@ public class MainActivity extends FragmentContainerActivity {
 			} else {
 				Toast.makeText(this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
 				IEpisode episode = SoundWaves.getAppContext(this).getPlaylist().getItem(0);
-				WebPlayerAuthenticator.authenticate(result.getContents(), this, episode);
+				try {
+					WebPlayerAuthenticator.authenticate(result.getContents(), this, episode);
+				} catch (ParseException e) {
+					e.printStackTrace();
+					Toast.makeText(this, "ParseError: " + e.getMessage(), Toast.LENGTH_LONG).show();
+				}
 			}
 		} else {
 			super.onActivityResult(requestCode, resultCode, data);

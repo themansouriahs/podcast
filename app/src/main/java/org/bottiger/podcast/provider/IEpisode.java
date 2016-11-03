@@ -42,6 +42,10 @@ public interface IEpisode {
     void setArtwork(@NonNull String argUrl);
     void setDescription(@NonNull String argDescription);
     boolean setDuration(long argDurationMs);
+
+    boolean setOffset(long i);
+
+    @Deprecated
     void setOffset(@Nullable ContentResolver contentResolver, long i);
 
     float getPlaybackSpeed(@NonNull Context argContext);

@@ -170,7 +170,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 	 * http://developer
 	 * .android.com/reference/android/media/NDKMediaPlayer.html#seekTo(int)
 	 */
-	public int offset;
+	public long offset;
 
 	/**
 	 * This was a deprecated status from before I forked the project.
@@ -302,14 +302,22 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 
 	}
 
-	public void setOffset(ContentResolver contentResolver, long i) {
-		offset = (int) i;
-        if (contentResolver != null) {
-            lastUpdate = -1;
-			//update(contentResolver);
-        }
+	public boolean setOffset(long argOffset) {
+		if (offset == argOffset || argOffset < 0) {
+			return false;
+		}
 
-		notifyPropertyChanged();
+
+		offset = argOffset;
+		notifyPropertyChanged(EpisodeChanged.CHANGED);
+		notifyPropertyChanged(EpisodeChanged.PLAYING_PROGRESS);
+
+		return true;
+	}
+
+	@Deprecated
+	public void setOffset(ContentResolver contentResolver, long i) {
+		setOffset(i);
 	}
 
 	/**

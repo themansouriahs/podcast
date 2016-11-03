@@ -458,8 +458,24 @@ public class Library {
     }
 
     @Nullable
+    public IEpisode getEpisode(@NonNull String argUrl, boolean doLookup) {
+
+        IEpisode episode = mEpisodesUrlLUT.get(argUrl);
+
+        if (episode != null || !doLookup) {
+            return episode;
+        }
+
+        String query = getSingleEpisodes(argUrl);
+        Cursor cursor = PodcastOpenHelper.runQuery(mContext, query);
+        episode = LibraryPersistency.fetchEpisodeFromCursor(cursor, null);
+
+        return episode;
+    }
+
+    @Nullable
     public IEpisode getEpisode(@NonNull String argUrl) {
-        return mEpisodesUrlLUT.get(argUrl);
+        return getEpisode(argUrl, false);
     }
 
     @Nullable
@@ -534,6 +550,10 @@ public class Library {
         //builder.append("WHERE " + SubscriptionColumns.STATUS + "==" + Subscription.STATUS_SUBSCRIBED);
 
         return builder.toString();
+    }
+
+    private String getSingleEpisodes(@NonNull String argUrl) {
+        return "SELECT * FROM " + ItemColumns.TABLE_NAME + " WHERE " + ItemColumns.URL + "==" + argUrl;
     }
 
     private String getAllEpisodes(@NonNull Subscription argSubscription) {
