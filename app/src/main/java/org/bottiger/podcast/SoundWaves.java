@@ -21,13 +21,9 @@ import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.player.GenericMediaPlayerInterface;
 import org.bottiger.podcast.player.SoundWavesPlayer;
 
-import org.bottiger.podcast.cloud.EventLogger;
 import org.bottiger.podcast.flavors.Analytics.AnalyticsFactory;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
-import org.bottiger.podcast.flavors.CrashReporter.CrashReporterFactory;
-import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.model.Library;
-import org.bottiger.podcast.player.SoundWavesPlayer;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCodeFactory;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;
@@ -93,7 +89,9 @@ public class SoundWaves extends MultiDexApplication {
 
         Log.v(TAG, "time: " + System.currentTimeMillis());
 
-        CrashReporterFactory.startReporter(this);
+        VendorCodeFactory.startReporter(this);
+
+        VendorCodeFactory.startFirebase(this);
 
         Log.v(TAG, "time1: " + System.currentTimeMillis());
 

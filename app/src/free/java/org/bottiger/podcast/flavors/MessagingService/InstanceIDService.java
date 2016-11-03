@@ -34,4 +34,7 @@ public class InstanceIDService {
     public static String getToken() {
         return "";
     }
+
+    public static void init(@NonNull Context argContext) {
+    }
 }

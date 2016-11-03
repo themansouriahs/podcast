@@ -22,6 +22,11 @@ import org.bottiger.podcast.R;
 public class MessagingService extends FirebaseMessagingService {
     private static final String TAG = "MyFirebaseMsgService";
 
+    public MessagingService() {
+        super();
+        Log.d(TAG, "Started");
+    }
+
     /**
      * Called when message is received.
      *
@@ -47,6 +52,7 @@ public class MessagingService extends FirebaseMessagingService {
         // Check if message contains a data payload.
         if (remoteMessage.getData().size() > 0) {
             Log.d(TAG, "Message data payload: " + remoteMessage.getData());
+            MessagingServiceShared.updateEpisode(this, remoteMessage.getData());
         }
 
         // Check if message contains a notification payload.

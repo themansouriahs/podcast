@@ -46,4 +46,7 @@ public class InstanceIDService extends FirebaseInstanceIdService {
     public static String getToken() {
         return FirebaseInstanceId.getInstance().getToken();
     }
+
+    public static void init(@NonNull Context argContext) {
+    }
 }

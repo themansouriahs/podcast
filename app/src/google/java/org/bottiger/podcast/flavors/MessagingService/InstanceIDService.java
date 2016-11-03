@@ -1,7 +1,10 @@
 package org.bottiger.podcast.flavors.MessagingService;
 
+import android.content.Context;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
 
@@ -45,5 +48,9 @@ public class InstanceIDService extends FirebaseInstanceIdService {
 
     public static String getToken() {
         return FirebaseInstanceId.getInstance().getToken();
+    }
+
+    public static void init(@NonNull Context argContext) {
+        FirebaseApp.initializeApp(argContext);
     }
 }
