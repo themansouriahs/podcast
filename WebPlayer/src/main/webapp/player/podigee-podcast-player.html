@@ -68,6 +68,13 @@
     <script>
       a_src = ""
       console.log('Initial test');
+
+      function notify_phone(arg_event, arg_offset) {
+        $.get("/message", { offset:arg_offset, event:arg_event });
+        //alert(arg_event);
+        return;
+      }
+
       $("body").on('DOMNodeInserted', function(e) {
 
         aud_elms = document.getElementsByTagName('audio')
@@ -79,9 +86,9 @@
 
           console.log(aud_elm, ' Listener added');
 
-          aud_elm.addEventListener('play', function() { alert('play') });
-          aud_elm.addEventListener('pause', function() { alert('pause') });
-          aud_elm.addEventListener('ended', function() { alert('ended') });
+          aud_elm.addEventListener('play', function(){ notify_phone('play' , aud_elm.currentTime) } );
+          aud_elm.addEventListener('pause', function(){ notify_phone('pause' , aud_elm.currentTime) } );
+          aud_elm.addEventListener('ended', function(){ notify_phone('ended' , aud_elm.currentTime) } );
         }
       });
     </script>

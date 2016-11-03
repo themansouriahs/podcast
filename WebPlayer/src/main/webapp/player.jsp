@@ -19,7 +19,7 @@
         </style>
 
     <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
-    <!--
+
     <script>
     window.playerConfiguration = {
       "options": {
@@ -38,7 +38,8 @@
       }
     }
     </script>
-    -->
+
+    <!--
         <script>
         window.playerConfiguration = {
           "options": {
@@ -57,6 +58,7 @@
           }
         }
         </script>
+        -->
   </head>
   <body>
       <p style="margin: 30px">

@@ -1,5 +1,7 @@
 package org.bottiger.podcast.web;
 
+import org.bottiger.podcast.common.WebPlayerShared;
+
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
@@ -13,28 +15,23 @@ import static org.bottiger.podcast.common.WebPlayerShared.AUTH_TOKEN;
 
 public class QRModel {
 
-    private static final String sSeparator = "-";
-    static SecureRandom randomizer = new SecureRandom();
+    private static SecureRandom randomizer = new SecureRandom();
 
     public static String getQRUrl(HttpSession argSession) {
         return "https://zxing.org/w/chart?cht=qr&chs=400x400&chld=L&choe=UTF-8&chl=" + getAndSaveQRValue(argSession);
     }
 
-    public static String getAndSaveQRValue(HttpSession argSession) {
-        String id = nextSessionId();
-        argSession.setAttribute(AUTH_TOKEN, id);
-        return  id + sSeparator + getSessionID(argSession);
+    private static String getAndSaveQRValue(HttpSession argSession) {
+        String authToken = nextAuthToken();
+        argSession.setAttribute(AUTH_TOKEN, authToken);
+        return  authToken + WebPlayerShared.SEPARATOR + getSessionID(argSession);
     }
 
-    public static String parseQRValue(String argQRValue) {
-        return argQRValue.split(sSeparator)[1];
-    }
-
-    public static String getSessionID(HttpSession argSession) {
+    private static String getSessionID(HttpSession argSession) {
         return argSession.getId();
     }
 
-    public static String nextSessionId() {
+    private static String nextAuthToken() {
         return new BigInteger(130, randomizer).toString(32);
     }
 }

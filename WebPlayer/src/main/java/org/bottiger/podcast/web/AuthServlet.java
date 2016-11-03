@@ -29,7 +29,7 @@ import static org.bottiger.podcast.common.WebPlayerShared.POST_KEY;
 @SuppressWarnings("serial")
 public class AuthServlet extends HttpServlet {
 
-    public static final String AUTHENTICATED = "logged_in";
+    private static final String AUTHENTICATED = "logged_in";
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -42,7 +42,14 @@ public class AuthServlet extends HttpServlet {
             return;
         }
 
-        resp.sendError(401, "Not Authenticated: " + isAuthenticated(session) + " sessionatuh: " + session.getAttribute(AUTHENTICATED) + " sessionid: " + session.getId());
+        String token = (String)session.getAttribute(AUTH_TOKEN);
+
+        String debugOut = "IsAuthenticated: " + isAuthenticated(session) +
+                          " SessionAuth: " + session.getAttribute(AUTHENTICATED) +
+                          " SessionId: " + session.getId() +
+                          " AuthToken: " + token;
+
+        resp.sendError(401, debugOut);
     }
 
     // Process the http POST of the form
@@ -78,18 +85,13 @@ public class AuthServlet extends HttpServlet {
         }
 
         boolean isAuthenticated = token.equals(postValue);
-        if (isAuthenticated) {
-            session.setAttribute(AUTHENTICATED, Boolean.TRUE);
-        }
+        session.setAttribute(AUTHENTICATED, isAuthenticated);
 
-        if (isAuthenticated) {
-            resp.sendError(502, "postValue: " + postValue + " token: " + token + " isAuth:" + isAuthenticated);
-        } else {
-            resp.sendError(503, "postValue: " + postValue + " token: " + token + " isAuth:" + isAuthenticated);
-        }
+        int errorCode = isAuthenticated ? 502 : 503;
+        resp.sendError(errorCode, "postValue: " + postValue + " token: " + token + " isAuth:" + isAuthenticated);
     }
 
-    public static boolean isAuthenticated(@Nonnull  HttpSession argSession) {
+    static boolean isAuthenticated(@Nonnull HttpSession argSession) {
         Object obj = argSession.getAttribute(AUTHENTICATED);
         return Boolean.TRUE.equals(obj);
     }

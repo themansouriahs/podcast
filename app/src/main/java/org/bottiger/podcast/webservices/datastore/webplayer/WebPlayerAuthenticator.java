@@ -10,6 +10,8 @@ import org.bottiger.podcast.flavors.MessagingService.InstanceIDService;
 import org.bottiger.podcast.provider.IEpisode;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.util.regex.Pattern;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -36,17 +38,20 @@ import static org.bottiger.podcast.common.WebPlayerShared.WEB_URL;
 
 public class WebPlayerAuthenticator {
 
-    public static void authenticate(@Nullable String argScannedQRValue, @NonNull Context argContext, @Nullable IEpisode argEpisode) {
+    private static final String TAG = WebPlayerAuthenticator.class.getSimpleName();
+
+    public static void authenticate(@Nullable String argScannedQRValue, @NonNull Context argContext, @Nullable IEpisode argEpisode) throws ParseException {
         if (argScannedQRValue == null)
             return;
 
-        String[] values = argScannedQRValue.split("-");
+        String[] values = WebPlayerShared.parseQRValue(argScannedQRValue);
+
         final String cookie = values[1];
         String nonce = values[0];
 
         String post_key = WebPlayerShared.POST_KEY;
 
-        String url = WEB_URL + "/auth? " + post_key + "=" + nonce + "&jsessionid=" + cookie;
+        String url = WEB_URL + "/auth?" + post_key + "=" + nonce + "&jsessionid=" + cookie;
         Log.d("dsfdsfsd", url);
         Log.d("dsfdsfsd---", argScannedQRValue);
         Log.d("dsfdsfsd---", cookie);
@@ -84,7 +89,7 @@ public class WebPlayerAuthenticator {
                     .add(EPISODE_POSITION, offset_seconds);
         }
 
-        formBody.add("4350967", nonce)
+        formBody.add(post_key, nonce)
                 .build();
 
         RequestBody requestBody = formBody.build();
@@ -102,7 +107,7 @@ public class WebPlayerAuthenticator {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-
+                Log.d(TAG, "Succes");
             }
         });
     }

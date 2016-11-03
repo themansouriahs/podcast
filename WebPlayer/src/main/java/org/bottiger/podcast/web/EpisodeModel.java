@@ -8,20 +8,20 @@ import javax.servlet.http.HttpSession;
 
 public class EpisodeModel {
 
-    public static final String EPISODE_URL = "episode_url";
-    public static final String EPISODE_cover = "episode_cover";
-    public static final String EPISODE_TITLE = "episode_title";
-    public static final String EPISODE_SUBTITLE = "episode_subtitle";
-    public static final String EPISODE_WEBSITE = "episode_website";
-    public static final String EPISODE_DESCRIPTION = "episode_description";
-    public static final String EPISODE_POSITION = "episode_position";
+    private static final String EPISODE_URL = "episode_url";
+    private static final String EPISODE_COVER = "episode_cover";
+    private static final String EPISODE_TITLE = "episode_title";
+    private static final String EPISODE_SUBTITLE = "episode_subtitle";
+    private static final String EPISODE_WEBSITE = "episode_website";
+    private static final String EPISODE_DESCRIPTION = "episode_description";
+    private static final String EPISODE_POSITION = "episode_position";
 
     public static String getUrl(HttpSession argSession) {
         return getAttr(argSession, EPISODE_URL);
     }
 
     public static String getCover(HttpSession argSession) {
-        return getAttr(argSession, EPISODE_cover);
+        return getAttr(argSession, EPISODE_COVER);
     }
 
     public static String getTitle(HttpSession argSession) {
@@ -37,10 +37,10 @@ public class EpisodeModel {
     }
 
     public static String getDescription(HttpSession argSession) {
-        return getAttr(argSession, EPISODE_DESCRIPTION);
+        return getAttr(argSession, EPISODE_DESCRIPTION).replaceAll("\\p{Cntrl}", "");
     }
 
-    public static long getPosition(HttpSession argSession) {
+    static long getPosition(HttpSession argSession) {
         String pos = getAttr(argSession, EPISODE_POSITION);
 
         if (pos == null || pos == "")
