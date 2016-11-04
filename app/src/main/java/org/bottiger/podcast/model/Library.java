@@ -2,10 +2,8 @@ package org.bottiger.podcast.model;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteCantOpenDatabaseException;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.support.annotation.MainThread;
@@ -448,8 +446,21 @@ public class Library {
     }
 
     @Nullable
-    public Subscription getSubscription(@NonNull Long argId) {
+    public Subscription getSubscription(@NonNull Long argId, boolean doLookup) {
+        if (mSubscriptionIdLUT.containsKey(argId)) {
+            return mSubscriptionIdLUT.get(argId);
+        }
+
+        if (doLookup) {
+            loadSubscriptionsInternalSync(false);
+        }
+
         return mSubscriptionIdLUT.get(argId);
+    }
+
+    @Nullable
+    public Subscription getSubscription(@NonNull Long argId) {
+        return getSubscription(argId, false);
     }
 
     @NonNull
@@ -633,15 +644,13 @@ public class Library {
 
     @MainThread
     private void loadSubscriptions() {
-        String query = getAllSubscriptions();
-
-        Observable.just(query)
+        Observable.just(1)
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(Schedulers.io())
-                .subscribe(new Action1<String>() {
+                .subscribe(new Action1<Integer>() {
             @Override
-            public void call(String query) {
-                loadSubscriptionsInternal(query);
+            public void call(Integer query) {
+                loadSubscriptionsInternalSync(true);
             }
         }, new Action1<Throwable>() {
             @Override
@@ -657,12 +666,16 @@ public class Library {
     }
 
     @WorkerThread
-    private void loadSubscriptionsInternal(@NonNull String argQuery) {
+    private void loadSubscriptionsInternalSync(boolean doReload) {
         Cursor cursor = null;
-        clearSubscriptions();
+
+        if (doReload) {
+            clearSubscriptions();
+        }
+
         Subscription subscription = null;
         try {
-            cursor = PodcastOpenHelper.runQuery(Library.this.mContext, argQuery);
+            cursor = PodcastOpenHelper.runQuery(Library.this.mContext, getAllSubscriptions());
 
             while (cursor.moveToNext()) {
                 subscription = getByCursor(cursor, PreferenceManager.getDefaultSharedPreferences(mContext));

@@ -728,7 +728,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 
 	@Nullable
     public Subscription getSubscription(@NonNull Context argContext) {
-		return SoundWaves.getAppContext(argContext).getLibraryInstance().getSubscription(sub_id);
+		return SoundWaves.getAppContext(argContext).getLibraryInstance().getSubscription(sub_id, true);
     }
 
     @Override
