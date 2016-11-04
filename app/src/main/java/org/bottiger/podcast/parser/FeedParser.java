@@ -265,14 +265,8 @@ public class FeedParser {
                 case EPISODE_ITEM_TAG: {
                     IEpisode episode = readEpisode(parser, argSubscription);
 
-                    // Traditional approach
-                    //if (isParsingSlimSubscription()) {
-                    //    argSubscription.addEpisode(episode);
-                    //}
-                    //addedEpisodes = addedEpisodes || !library.addEpisode(episode);
-
                     // Bulk insert.
-                    if (StrUtils.isValidUrl(episode.getURL())) {
+                    if (episode != null) {
                         if (argSubscription.addEpisode(episode)) {
                             addedEpisodes.add(episode);
                         }
@@ -324,11 +318,13 @@ public class FeedParser {
 
     // Parses the contents of an entry. If it encounters a title, summary, or link tag, hands them off
     // to their respective "read" methods for processing. Otherwise, skips the tag.
+    @Nullable
     private IEpisode readEpisode(@NonNull XmlPullParser parser,
                                  @NonNull ISubscription argSubscription) throws XmlPullParserException, IOException {
         parser.require(XmlPullParser.START_TAG, ns, EPISODE_ITEM_TAG);
 
         IEpisode episode;
+        boolean parsedURL = false;
 
         if (isParsingSlimSubscription()) {
             episode = new SlimEpisode();
@@ -390,7 +386,11 @@ public class FeedParser {
                 }
                 case EPISODE_ENCLOSURE_TAG: {
                     EpisodeEnclosure enclosure = readEnclosure(parser);
-                    episode.setURL(enclosure.url);
+
+                    if (StrUtils.isValidUrl(enclosure.url)) {
+                        episode.setURL(enclosure.url);
+                        parsedURL = true;
+                    }
 
                     // Planet money seems to tag all files with filesize 0
                     if (enclosure.filesize > 0)
@@ -410,7 +410,8 @@ public class FeedParser {
         }
 
         episode.setIsParsing(false, false);
-        return episode;
+
+        return parsedURL ? episode : null;
     }
 
     private void readEpisodeItunesTag(@NonNull XmlPullParser parser, @NonNull String name, @NonNull IEpisode episode) throws IOException, XmlPullParserException {

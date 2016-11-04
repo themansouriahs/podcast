@@ -503,9 +503,15 @@ public class FeedActivity extends TopActivity implements PaletteListener {
     }
 
     private void setViewState(@Nullable ISubscription argSubscription) {
-        boolean isEmpty = argSubscription == null || argSubscription.getEpisodes().size() == 0;
-        mNoEpisodesTextView.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
-        mRecyclerView.setVisibility(!isEmpty ? View.VISIBLE : View.GONE);
+        mRecyclerView.setVisibility(!isEmpty(argSubscription) ? View.VISIBLE : View.GONE);
+    }
+
+    private void setNoEpisodesTextViewViewState(@Nullable ISubscription argSubscription) {
+        mNoEpisodesTextView.setVisibility(isEmpty(argSubscription) ? View.VISIBLE : View.GONE);
+    }
+
+    private static boolean isEmpty(@Nullable ISubscription argSubscription) {
+        return argSubscription == null || argSubscription.getEpisodes().size() == 0;
     }
 
     private rx.Subscription subscribeToChanges(@NonNull final ISubscription argSubscription,
@@ -625,6 +631,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
                     @Override
                     public void run() {
                         setViewState(slimSubscription);
+                        setNoEpisodesTextViewViewState(slimSubscription);
                         mAdapter.setDataset(slimSubscription);
                         setBackgroundImage(slimSubscription);
                     }
