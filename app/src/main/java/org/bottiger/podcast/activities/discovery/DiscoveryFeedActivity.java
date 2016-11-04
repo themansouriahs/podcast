@@ -1,9 +1,12 @@
 package org.bottiger.podcast.activities.discovery;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.Log;
@@ -14,10 +17,16 @@ import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.activities.feedview.FeedActivity;
 import org.bottiger.podcast.activities.feedview.FeedViewAdapter;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.Library;
+import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.UIUtils;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * Created by apl on 23-04-2015.
@@ -32,7 +41,13 @@ public class DiscoveryFeedActivity extends FeedActivity {
     protected void onCreate(Bundle savedInstanceState) {
         Log.v(TAG, "Starting DiscoveryFeedActivity"); // NoI18N
         super.onCreate(savedInstanceState);
-        PaletteHelper.generate(mSubscription.getImageURL(), this, mFloatingButton);
+
+        mNoEpisodesTextView.setVisibility(View.INVISIBLE);
+
+        ISubscription subscription = getmSubscription();
+        if (subscription != null && subscription.getImageURL() != null) {
+            PaletteHelper.generate(subscription.getImageURL(), this, mFloatingButton);
+        }
 
         mIsSubscribed = mSubscription instanceof Subscription;
 
@@ -58,6 +73,25 @@ public class DiscoveryFeedActivity extends FeedActivity {
         tintButton();
     }
 
+    @Override
+    @Nullable
+    protected ISubscription processIntent() {
+        ISubscription subscription = super.processIntent();
+
+        if (subscription != null)
+            return subscription;
+
+        URL url = parseIntent(getIntent());
+        SlimSubscription slimSubscription = null;
+
+        if (url != null) {
+            slimSubscription = new SlimSubscription(url);
+            setSubscription(slimSubscription);
+        }
+
+        return slimSubscription;
+    }
+
     @NonNull
     @Override
     protected FeedViewAdapter getAdapter() {
@@ -67,7 +101,7 @@ public class DiscoveryFeedActivity extends FeedActivity {
         mProgress.setMessage(getString(R.string.discovery_progress_loading_podcast_content));
         mProgress.show();
         adapter = new FeedViewDiscoveryAdapter(this, mSubscription);
-        SoundWaves.getAppContext(this).getRefreshManager().refresh(mSubscription, mRefreshCompleteCallback);
+        SoundWaves.getAppContext(this).getRefreshManager().refresh(mSubscription, getIDownloadCompleteCallback());
 
         return adapter;
     }
@@ -93,5 +127,65 @@ public class DiscoveryFeedActivity extends FeedActivity {
 
         //setFABDrawable(R.drawable.ic_rss_feed_24dp);
         mFloatingButton.setImageDrawable(drawable);
+    }
+
+    @Nullable
+    private static URL parseIntent(@Nullable Intent argIntent) {
+
+        if (argIntent == null) {
+            return null;
+        }
+
+        URL url = null;
+
+        try {
+            if (Intent.ACTION_SEND.equals(argIntent.getAction())) {
+                String urlstr = argIntent.getStringExtra(Intent.EXTRA_TEXT);
+                url = new URL(urlstr);
+            } else {
+                Uri data = argIntent.getData();
+                url = parseUri(data);
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            VendorCrashReporter.handleException(e);
+        }
+
+        return url;
+    }
+
+    private static URL parseUri(@NonNull Uri argUri) throws MalformedURLException {
+        String scheme = argUri.getScheme();
+
+        String url = argUri.toString();
+
+        switch (scheme) {
+            case "http":
+            case "https": {
+                break;
+            }
+            case "pcast":
+            case "soundwaves": {
+                url = replaceScheme(url);
+                break;
+            }
+        }
+
+        return new URL(url);
+    }
+
+    private static String replaceScheme(@NonNull String url) {
+        // pcast
+        url = url.replace("pcast://", "");
+        url = url.replace("pcast:", "");
+
+        // soundwaves
+        url = url.replace("soundwaves://subscribe/", "");
+        url = url.replace("soundwaves://", "");
+        url = url.replace("soundwaves:", "");
+
+        url = "http://" + url;
+
+        return url;
     }
 }

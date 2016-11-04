@@ -62,7 +62,7 @@
             android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.bottiger.podcast.MainActivity" />
+                android:value=".MainActivity" />
         </activity>
 
         <activity android:name=".activities.discovery.DiscoveryFeedActivity"
@@ -71,30 +71,8 @@
             android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.bottiger.podcast.MainActivity" />
-        </activity>
+                android:value=".MainActivity" />
 
-        <activity android:name=".activities.downloadmanager.DownloadManagerActivity"
-            android:label="@string/activity_download_name"
-            android:parentActivityName=".MainActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.bottiger.podcast.MainActivity" />
-        </activity>
-
-        <provider
-            android:name="org.bottiger.podcast.provider.PodcastProvider"
-            android:authorities="org.bottiger.podcast.provider.PodcastProvider"
-            android:syncable="true">
-        </provider>
-
-        <service android:name=".service.jobservice.PodcastUpdateJobService"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-
-        <activity
-            android:name=".PodcastSubscriberActivity"
-            android:label="@string/app_name"
-            android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.SEND" />
@@ -154,7 +132,25 @@
 
                 <data android:mimeType="text/plain"/>
             </intent-filter>
+
         </activity>
+
+        <activity android:name=".activities.downloadmanager.DownloadManagerActivity"
+            android:label="@string/activity_download_name"
+            android:parentActivityName=".MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.bottiger.podcast.MainActivity" />
+        </activity>
+
+        <provider
+            android:name="org.bottiger.podcast.provider.PodcastProvider"
+            android:authorities="org.bottiger.podcast.provider.PodcastProvider"
+            android:syncable="true">
+        </provider>
+
+        <service android:name=".service.jobservice.PodcastUpdateJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <activity
             android:name=".activities.openopml.OpenOpmlFromIntentActivity"
@@ -189,7 +185,7 @@
             android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize"/>
 
         <service
-            android:name="org.bottiger.podcast.service.PlayerService"
+            android:name=".service.PlayerService"
             android:exported="true"
             tools:ignore="ExportedService">
             <intent-filter>
@@ -204,7 +200,7 @@
         -->
 
         <service
-            android:name="org.bottiger.podcast.service.DownloadService"
+            android:name=".service.DownloadService"
             android:enabled="true" >
         </service>
         <service
@@ -213,7 +209,7 @@
         </service>
 
         <service
-            android:name="org.bottiger.podcast.service.syncadapter.AuthenticatorService">
+            android:name=".service.syncadapter.AuthenticatorService">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator"/>
             </intent-filter>
@@ -224,7 +220,7 @@
 
         <!-- android:process=":sync" -->
         <service
-            android:name="org.bottiger.podcast.service.syncadapter.CloudSyncService"
+            android:name=".service.syncadapter.CloudSyncService"
             android:exported="true"
             android:process=":sync">
             <intent-filter>

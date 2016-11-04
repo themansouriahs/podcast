@@ -63,6 +63,8 @@ import org.bottiger.podcast.views.MultiShrink.feed.SchedulingUtils;
 import org.bottiger.podcast.views.dialogs.DialogBulkDownload;
 import org.bottiger.podcast.views.utils.SubscriptionSettingsUtils;
 
+import java.util.Objects;
+
 import io.codetail.animation.SupportAnimator;
 import io.codetail.animation.ViewAnimationUtils;
 import rx.android.schedulers.AndroidSchedulers;
@@ -97,7 +99,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
 
     private FeedViewTopImage mPhotoView;
     private RecyclerView mRecyclerView;
-    private TextView mNoEpisodesTextView;
+    protected TextView mNoEpisodesTextView;
     protected MultiShrinkScroller mMultiShrinkScroller;
     protected FloatingActionButton mFloatingButton;
     private FrameLayout mRevealLayout;
@@ -125,84 +127,8 @@ public class FeedActivity extends TopActivity implements PaletteListener {
     protected ISubscription mSubscription = null;
     protected ProgressDialog mProgress;
 
-    final MultiShrinkScroller.MultiShrinkScrollerListener mMultiShrinkScrollerListener
-            = new MultiShrinkScroller.MultiShrinkScrollerListener() {
-        @Override
-        public void onScrolledOffBottom() {
-            finish();
-        }
-
-        @Override
-        public void onEnterFullscreen() {
-            updateStatusBarColor();
-        }
-
-        @Override
-        public void onExitFullscreen() {
-            updateStatusBarColor();
-        }
-
-        @Override
-        public void onStartScrollOffBottom() {
-
-        }
-
-        @Override
-        public void onEntranceAnimationDone() {
-            mIsEntranceAnimationFinished = true;
-        }
-
-        @Override
-        public void onTransparentViewHeightChange(float ratio) {
-            if (mIsEntranceAnimationFinished) {
-                mWindowScrim.setAlpha((int) (0xFF * ratio));
-            }
-        }
-    };
-
-    SearchView.OnQueryTextListener mOnQueryTextListener = new SearchView.OnQueryTextListener() {
-        @Override
-        public boolean onQueryTextSubmit(String query) {
-            //.collapseActionView();
-            return false;
-        }
-        @Override
-        public boolean onQueryTextChange(String argSearchQuery) {
-
-            mMultiShrinkScroller.collapseHeader();
-
-            FeedViewAdapter adapter = mAdapter;
-            if (adapter != null) {
-                adapter.search(argSearchQuery);
-            }
-
-            return false;
-        }
-    };
-
-    protected IDownloadCompleteCallback mRefreshCompleteCallback = new IDownloadCompleteCallback() {
-        @Override
-        public void complete(boolean argSucces, ISubscription argSubscription) {
-            mProgress.dismiss();
-
-            if (!argSucces)
-                return;
-
-            // FIXME why do I get Subscriptions here?
-            if (argSubscription instanceof Subscription)
-                return;
-
-            final SlimSubscription slimSubscription = (SlimSubscription)argSubscription;
-            Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    setViewState(slimSubscription);
-                    mAdapter.setDataset(slimSubscription);
-                }
-            });
-        }
-    };
+    final MultiShrinkScroller.MultiShrinkScrollerListener mMultiShrinkScrollerListener = getMultiShrinkScrollerListener();
+    SearchView.OnQueryTextListener mOnQueryTextListener = getOnQueryTextListener();
 
     public static void start(@NonNull Activity argActivity, @NonNull Subscription argSubscription) {
         if (!argSubscription.IsLoaded()) {
@@ -292,79 +218,9 @@ public class FeedActivity extends TopActivity implements PaletteListener {
             mMultiShrinkScroller.setLayoutParams(params);
         }
 
-        mFloatingButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // get the center for the clipping circle
-                int cx = (mRevealLayout.getLeft() + mRevealLayout.getRight());
-                int cy = (mRevealLayout.getTop() + mRevealLayout.getBottom());
+        mFloatingButton.setOnClickListener(getFloatingOnClickListener());
 
-                // get the final radius for the clipping circle
-                int revealRadius = Math.max(mRevealLayout.getWidth(), mRevealLayout.getHeight());
-
-
-                if (mSettingsRevealed) {
-                    mRevealAnimator =
-                            ViewAnimationUtils.createCircularReveal(mRevealLayout, cx, cy, revealRadius, 0);
-                    mRevealAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-                    mRevealAnimator.setDuration(SETTINGS_REVEAL_DURATION);
-                    mRevealAnimator.addListener(new SupportAnimator.AnimatorListener() {
-                        @Override
-                        public void onAnimationStart() {
-                        }
-
-                        @Override
-                        public void onAnimationCancel() {
-                        }
-
-                        @Override
-                        public void onAnimationRepeat() {
-                        }
-
-                        @Override
-                        public void onAnimationEnd() {
-                            mRevealLayout.setVisibility(View.INVISIBLE);
-                            setFABDrawable(R.drawable.ic_tune_white);
-                            mToolbar.setTitle(mSubscription.getTitle());
-                        }
-                    });
-                    mRevealAnimator.start();
-                } else {
-
-                    // Open Settings
-                    mMultiShrinkScroller.expandHeader();
-                    mRevealAnimator =
-                            ViewAnimationUtils.createCircularReveal(mRevealLayout, cx, cy, 0, revealRadius);
-                    mRevealAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-                    mRevealAnimator.setDuration(SETTINGS_REVEAL_DURATION);
-
-                    mRevealLayout.setVisibility(View.VISIBLE);
-                    setFABDrawable(R.drawable.ic_clear_white);
-                    mToolbar.setTitle(R.string.menu_settings);
-                    mRevealAnimator.start();
-                }
-                mSettingsRevealed = !mSettingsRevealed;
-            }
-        });
-
-        mUrl = mSubscription.getImageURL();
-
-        mPhotoView.setBackgroundColor(mSubscription.getPrimaryColor());
-        ColorDrawable cd = new ColorDrawable(mSubscription.getPrimaryColor());
-
-        Glide.with(this)
-                .load(mUrl)
-                .asBitmap()
-                .placeholder(cd)
-                .fitCenter()
-                .into(new BitmapImageViewTarget(mPhotoView) {
-                    @Override
-                    protected void setResource(Bitmap resource) {
-                        boolean isWhite = WhitenessUtils.isBitmapWhiteAtTopOrBottom(resource);
-                        mMultiShrinkScroller.setUseGradient(isWhite);
-                        mPhotoView.setImageBitmap(resource);
-                    }
-                });
+        setBackgroundImage(mSubscription);
 
         final View transparentView = findViewById(R.id.transparent_view);
         if (mMultiShrinkScroller != null) {
@@ -441,6 +297,27 @@ public class FeedActivity extends TopActivity implements PaletteListener {
         }
     }
 
+    private void bindSubscriptionImage() {
+        mPhotoView.setBackgroundColor(mSubscription.getPrimaryColor());
+
+        if (mPhotoView.getDrawable() == null) {
+            ColorDrawable cd = new ColorDrawable(mSubscription.getPrimaryColor());
+            Glide.with(this)
+                    .load(mUrl)
+                    .asBitmap()
+                    .placeholder(cd)
+                    .fitCenter()
+                    .into(new BitmapImageViewTarget(mPhotoView) {
+                        @Override
+                        protected void setResource(Bitmap resource) {
+                            boolean isWhite = WhitenessUtils.isBitmapWhiteAtTopOrBottom(resource);
+                            mMultiShrinkScroller.setUseGradient(isWhite);
+                            mPhotoView.setImageBitmap(resource);
+                        }
+                    });
+        }
+    }
+
     @NonNull
     protected FeedViewAdapter getAdapter() {
         FeedViewAdapter adapter = new FeedViewAdapter(this, mSubscription);
@@ -481,22 +358,45 @@ public class FeedActivity extends TopActivity implements PaletteListener {
         super.onStop();
     }
 
-    private void processIntent() {
+    @Nullable
+    protected ISubscription processIntent() {
         Bundle b = getIntent().getExtras();
 
         if (b == null)
-            return;
+            return null;
 
-        boolean isSlim = b.getBoolean(FEED_ACTIVITY_IS_SLIM);
         String url = b.getString(SUBSCRIPTION_URL_KEY);
+        boolean isSlim = b.getBoolean(FEED_ACTIVITY_IS_SLIM);
+
+        ISubscription subscription;
 
         if (isSlim) {
-            mSubscription = b.<SlimSubscription>getParcelable(SUBSCRIPTION_SLIM_KEY);
-            mIsSlimSubscription = true;
+            subscription = b.<SlimSubscription>getParcelable(SUBSCRIPTION_SLIM_KEY);
         } else {
-            mSubscription = SoundWaves.getAppContext(this).getLibraryInstance().getSubscription(url);
-            mIsSlimSubscription = false;
+            subscription = SoundWaves.getAppContext(this).getLibraryInstance().getSubscription(url);
         }
+
+        setSubscription(subscription);
+
+        return subscription;
+    }
+
+    protected void setSubscription(@NonNull ISubscription argSubscription) {
+        mSubscription = argSubscription;
+        mIsSlimSubscription = argSubscription instanceof SlimSubscription;
+    }
+
+    private void setBackgroundImage(@NonNull ISubscription argSubscription) {
+        String url = argSubscription.getImageURL();
+        if (mUrl == null && url != null) {
+            mUrl = url;
+            bindSubscriptionImage();
+        }
+    }
+
+    @Nullable
+    public ISubscription getmSubscription() {
+        return mSubscription;
     }
 
     @Override
@@ -643,5 +543,150 @@ public class FeedActivity extends TopActivity implements PaletteListener {
             return;
 
         mFloatingButton.setImageDrawable(getResources().getDrawable(argRes));
+    }
+
+    private MultiShrinkScroller.MultiShrinkScrollerListener getMultiShrinkScrollerListener() {
+        return new MultiShrinkScroller.MultiShrinkScrollerListener() {
+            @Override
+            public void onScrolledOffBottom() {
+                finish();
+            }
+
+            @Override
+            public void onEnterFullscreen() {
+                updateStatusBarColor();
+            }
+
+            @Override
+            public void onExitFullscreen() {
+                updateStatusBarColor();
+            }
+
+            @Override
+            public void onStartScrollOffBottom() {
+
+            }
+
+            @Override
+            public void onEntranceAnimationDone() {
+                mIsEntranceAnimationFinished = true;
+            }
+
+            @Override
+            public void onTransparentViewHeightChange(float ratio) {
+                if (mIsEntranceAnimationFinished) {
+                    mWindowScrim.setAlpha((int) (0xFF * ratio));
+                }
+            }
+        };
+    }
+
+    private SearchView.OnQueryTextListener getOnQueryTextListener() {
+        return new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+            @Override
+            public boolean onQueryTextChange(String argSearchQuery) {
+
+                mMultiShrinkScroller.collapseHeader();
+
+                FeedViewAdapter adapter = mAdapter;
+                if (adapter != null) {
+                    adapter.search(argSearchQuery);
+                }
+
+                return false;
+            }
+        };
+    }
+
+    protected IDownloadCompleteCallback getIDownloadCompleteCallback() {
+        return new IDownloadCompleteCallback() {
+            @Override
+            public void complete(boolean argSucces, ISubscription argSubscription) {
+                mProgress.dismiss();
+
+                if (!argSucces)
+                    return;
+
+                if (argSubscription instanceof Subscription) {
+                    VendorCrashReporter.report(TAG, "Proper subscription recieved");
+                    return;
+                }
+
+                final SlimSubscription slimSubscription = (SlimSubscription)argSubscription;
+
+                setSubscription(argSubscription);
+
+                Handler handler = new Handler(Looper.getMainLooper());
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        setViewState(slimSubscription);
+                        mAdapter.setDataset(slimSubscription);
+                        setBackgroundImage(slimSubscription);
+                    }
+                });
+            }
+        };
+    }
+
+    private View.OnClickListener getFloatingOnClickListener() {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // get the center for the clipping circle
+                int cx = (mRevealLayout.getLeft() + mRevealLayout.getRight());
+                int cy = (mRevealLayout.getTop() + mRevealLayout.getBottom());
+
+                // get the final radius for the clipping circle
+                int revealRadius = Math.max(mRevealLayout.getWidth(), mRevealLayout.getHeight());
+
+
+                if (mSettingsRevealed) {
+                    mRevealAnimator =
+                            ViewAnimationUtils.createCircularReveal(mRevealLayout, cx, cy, revealRadius, 0);
+                    mRevealAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+                    mRevealAnimator.setDuration(SETTINGS_REVEAL_DURATION);
+                    mRevealAnimator.addListener(new SupportAnimator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart() {
+                        }
+
+                        @Override
+                        public void onAnimationCancel() {
+                        }
+
+                        @Override
+                        public void onAnimationRepeat() {
+                        }
+
+                        @Override
+                        public void onAnimationEnd() {
+                            mRevealLayout.setVisibility(View.INVISIBLE);
+                            setFABDrawable(R.drawable.ic_tune_white);
+                            mToolbar.setTitle(mSubscription.getTitle());
+                        }
+                    });
+                    mRevealAnimator.start();
+                } else {
+
+                    // Open Settings
+                    mMultiShrinkScroller.expandHeader();
+                    mRevealAnimator =
+                            ViewAnimationUtils.createCircularReveal(mRevealLayout, cx, cy, 0, revealRadius);
+                    mRevealAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+                    mRevealAnimator.setDuration(SETTINGS_REVEAL_DURATION);
+
+                    mRevealLayout.setVisibility(View.VISIBLE);
+                    setFABDrawable(R.drawable.ic_clear_white);
+                    mToolbar.setTitle(R.string.menu_settings);
+                    mRevealAnimator.start();
+                }
+                mSettingsRevealed = !mSettingsRevealed;
+            }
+        };
     }
 }

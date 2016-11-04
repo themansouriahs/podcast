@@ -214,6 +214,7 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 
 	private void init() {
 		mEpisodes = new EpisodeList(IEpisode.class, mEpisodesListCallback);
+		setIsRefreshing(true);
 	}
 
 	@NonNull

@@ -61,6 +61,8 @@ public class SubscriptionLoader {
             sub.setEpisodeCount(cursor.getInt(episodeCountIndex));
         }
 
+        sub.setIsRefreshing(false);
+
         return sub;
     }
 
