@@ -95,10 +95,6 @@ public class SoundWaves extends MultiDexApplication {
 
         Log.v(TAG, "time1: " + System.currentTimeMillis());
 
-        Log.v(TAG, "time2: " + System.currentTimeMillis());
-        //mLibrary = new Library(this);
-        Log.v(TAG, "time3: " + System.currentTimeMillis());
-
         firstRun(this);
         Log.v(TAG, "time5: " + System.currentTimeMillis());
 
@@ -209,7 +205,6 @@ public class SoundWaves extends MultiDexApplication {
     public Playlist getPlaylist() {
         if (mPlaylist == null) {
             mPlaylist = new Playlist(this);
-            getLibraryInstance().loadPlaylist(mPlaylist);
         }
 
         return mPlaylist;

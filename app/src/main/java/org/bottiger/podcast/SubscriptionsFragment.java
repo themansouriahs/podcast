@@ -41,7 +41,7 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
-public class SubscriptionsFragment extends Fragment implements View.OnClickListener {
+public class SubscriptionsFragment extends Fragment {
 
     private static final String TAG = "SubscriptionsFragment";
 
@@ -79,20 +79,6 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
 
     private SharedPreferences shareprefs;
     private static String PREF_SUBSCRIPTION_COLUMNS;
-
-    private void setSubscriptionFragmentLayout(int argSubscriptionCount) {
-        boolean showEmpty = argSubscriptionCount == 0;
-
-        if (mShowEmptyView == null || mShowEmptyView != showEmpty) {
-            if (showEmpty) {
-                mEmptySubscrptionList.setVisibility(View.VISIBLE);
-            } else {
-                mEmptySubscrptionList.setVisibility(View.GONE);
-            }
-            mShowEmptyView = showEmpty;
-        }
-    }
-
 
     @Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -189,8 +175,6 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
                     }
                 });
 
-        mAdapter.setDataset(mLibrary.getSubscriptions());
-
 		return mContainerView;
 
 	}
@@ -225,6 +209,8 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
                 }
             }
         });
+
+        mAdapter.setDataset(mLibrary.getSubscriptions());
     }
 
     @Override
@@ -391,8 +377,16 @@ public class SubscriptionsFragment extends Fragment implements View.OnClickListe
         return true;
     }
 
-    @Override
-    public void onClick(View v) {
-        Log.d(TAG, "Onclikc");
+    private void setSubscriptionFragmentLayout(int argSubscriptionCount) {
+        boolean showEmpty = argSubscriptionCount == 0;
+
+        if (mShowEmptyView == null || mShowEmptyView != showEmpty) {
+            if (showEmpty) {
+                mEmptySubscrptionList.setVisibility(View.VISIBLE);
+            } else {
+                mEmptySubscrptionList.setVisibility(View.GONE);
+            }
+            mShowEmptyView = showEmpty;
+        }
     }
 }

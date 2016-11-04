@@ -85,7 +85,7 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
 		this(argContext, MAX_SIZE);
 	}
 
-    public void setContext(@NonNull Context argContext) {
+    private void setContext(@NonNull Context argContext) {
         mLibrary = SoundWaves.getAppContext(argContext).getLibraryInstance();
 
         sharedPreferences = PreferenceManager
@@ -140,6 +140,8 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
                         Log.wtf(TAG, "Missing back pressure. Buffer size too small");
                     }
                 });
+
+        mLibrary.loadPlaylist(this);
     }
 
     public void destroy() {

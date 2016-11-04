@@ -64,22 +64,8 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         mInflater = (LayoutInflater) mActivity
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        producePlaylist();
-        notifyDataSetChanged();
-    }
-
-    public Playlist producePlaylist() {
-        Playlist playlist = mPlaylist;
-
-        if (playlist != null)
-            return playlist;
-
-        PlayerService service = PlayerService.getInstance();
-        if (service != null) {
-            mPlaylist = service.getPlaylist();
-        }
-
-        return mPlaylist;
+        mPlaylist = SoundWaves.getAppContext(argActivity).getPlaylist();
+        //notifyDataSetChanged();
     }
 
     @Override
