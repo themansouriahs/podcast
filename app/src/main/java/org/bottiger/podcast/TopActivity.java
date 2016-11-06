@@ -121,7 +121,7 @@ public class TopActivity extends AppCompatActivity {
      * Override this if the navigation bar should remain opaque
      */
     protected boolean transparentNavigationBar() {
-        return true;
+        return false;
     }
 
     @Override

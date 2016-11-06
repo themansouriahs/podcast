@@ -47,11 +47,5 @@ public class FixedRecyclerView extends RecyclerView {
         CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams)getLayoutParams();
         CoordinatorLayout.Behavior behavior = new PlaylistBehavior(mContext, null);
         lp.setBehavior(behavior);
-
-
-
-
-        //setLayoutParams(lp);
-
     }
 }

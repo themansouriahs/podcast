@@ -231,6 +231,8 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
         // use a linear layout manager
         mLayoutManager = new CustomLinearLayoutManager(mContext);
         mRecyclerView.setLayoutManager(mLayoutManager);
+        
+        mRecyclerView.setPadding(0, 0, 0, UIUtils.NavigationBarHeight(getContext()));
 
         // specify an adapter (see also next example)
         mAdapter = new PlaylistAdapter(getActivity(), mOverlay);
