@@ -71,6 +71,7 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 	public static final int STATUS_SUBSCRIBED = 1;
 	public static final int STATUS_UNSUBSCRIBED = 2;
 
+	// If the Subscription contains unpersisted changes.
     private boolean mIsDirty = false;
 	private boolean mIsLoaded = false;
 	private boolean mIsRefreshing = false;
@@ -406,16 +407,21 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 		if (mIsRefreshing == argIsRefreshing)
 			return;
 
+		if (!argIsRefreshing) {
+			// This calls a lot of notifyPropertyChanged().
+			// We should call it before setting mIsRefreshing to false.
+			countEpisodes();
+		}
+
 		mIsRefreshing = argIsRefreshing;
 
-		if (!mIsRefreshing) {
+		if (!argIsRefreshing) {
 
 			if (mIsDirty) {
 				mIsDirty = false;
 				notifyPropertyChanged(SubscriptionChanged.CHANGED, "updatedDuringRefresh");
 			}
 
-			countEpisodes();
 			notifyPropertyChanged(SubscriptionChanged.LOADED, "loaded");
 		}
 	}
@@ -906,7 +912,7 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 
 		if (!mIsRefreshing) {
 			SoundWaves.getRxBus().send(new SubscriptionChanged(getId(), event, argTag));
-		} else {
+		} else if (mIsLoaded) {
 			mIsDirty = true;
 		}
 	}

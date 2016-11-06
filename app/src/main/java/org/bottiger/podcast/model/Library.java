@@ -123,7 +123,8 @@ public class Library {
         @Override
         public void onRemoved(int position, int count) {
             if (mActiveSubscriptions.size() >= position) {
-                VendorCrashReporter.report("Library.onRemoved", "IndexOutOfBound");
+                // This is provoked by .clear()
+                //VendorCrashReporter.report("Library.onRemoved", "IndexOutOfBound");
                 return;
             }
 
@@ -199,10 +200,14 @@ public class Library {
 
     }
 
-    public void handleChangedEvent(SubscriptionChanged argSubscriptionChanged) {
+    private void handleChangedEvent(SubscriptionChanged argSubscriptionChanged) {
         Subscription subscription = getSubscription(argSubscriptionChanged.getId());
 
         if (subscription == null || TextUtils.isEmpty(subscription.getURLString())) {
+            if (argSubscriptionChanged.getAction() == SubscriptionChanged.LOADED) {
+                return; // it's ok. The Subscription is marked as loaded befor eadded to the model.
+            }
+
             Log.wtf("Subscription empty!", "id: " + argSubscriptionChanged.getId());
             return;
         }
