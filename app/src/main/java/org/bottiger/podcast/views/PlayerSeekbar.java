@@ -91,7 +91,8 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener, ExoPlayer
             long timeMs = mEpisode.getDuration() * seekBar.getProgress()
                     / RANGE_MAX;
 
-            if (mEpisode.equals(PlayerService.getCurrentItem())) {
+            IEpisode currentTopEpisode = PlayerService.getCurrentItem(getContext());
+            if (mEpisode.equals(currentTopEpisode)) {
                 PlayerService.getInstance().seek(timeMs);
             } else {
                 mEpisode.setOffset(getContext().getContentResolver(), timeMs);

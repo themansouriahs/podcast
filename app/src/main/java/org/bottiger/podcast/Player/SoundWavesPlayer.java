@@ -467,7 +467,6 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
     @Override
     public long seekTo(long msec) throws IllegalStateException {
         mExoplayer.seekTo(msec);
-        updateNotificationPlayer();
         return msec;
     }
 

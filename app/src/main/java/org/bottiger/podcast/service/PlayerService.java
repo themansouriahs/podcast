@@ -291,7 +291,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 			return;
 
         if (mItem == null)
-            mItem = SoundWaves.getAppContext(this).getPlaylist().getItem(0);
+			setCurrentItem(SoundWaves.getAppContext(this).getPlaylist().first());
 
         if (mItem == null)
             return;
@@ -387,7 +387,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 	private void start() {
 		if (!getPlayer().isPlaying()) {
 			if (mItem == null)
-				mItem = SoundWaves.getAppContext(this).getPlaylist().getItem(0);
+				setCurrentItem(SoundWaves.getAppContext(this).getPlaylist().first());
 
 			if (mItem == null)
 				return;
@@ -412,10 +412,8 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 			return;
 		}
 
-		if ((mItem != null)) {
-            if (mItem instanceof FeedItem) {
-                (mItem).setOffset(getContentResolver(), player.getCurrentPosition());
-            }
+		if (mItem != null) {
+            mItem.setOffset(player.getCurrentPosition());
 		}
 
 		player.pause();
@@ -453,6 +451,9 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 		offset = offset < 0 ? 0 : offset;
 
 		mItem.setOffset(offset);
+
+		notifyStatusChanged();
+
 		return getPlayer().seekTo(offset);
 	}
 
@@ -470,13 +471,29 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 	}
 
 	@Nullable
-	public static IEpisode getCurrentItem() {
+	public static IEpisode getCurrentItem(@android.support.annotation.Nullable Context argContext) {
 		PlayerService ps = PlayerService.getInstance();
 
 		if (ps == null)
 			return null;
 
-		return ps.getCurrentItemInternal();
+		IEpisode currentItem = ps.getCurrentItemInternal();
+
+		if (currentItem != null) {
+			return currentItem;
+		}
+
+		if (argContext == null) {
+			return null;
+		}
+
+		currentItem = ps.setCurrentItem(SoundWaves.getAppContext(argContext).getPlaylist().first());
+		return currentItem;
+	}
+
+	@Nullable
+	public static IEpisode getCurrentItem() {
+		return getCurrentItem(null);
 	}
 
 	@Nullable
