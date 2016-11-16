@@ -116,7 +116,6 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 
     private NotificationManager mNotificationManager;
-    @Nullable private NotificationPlayer mNotificationPlayer;
     @Nullable private MediaSessionManager mMediaSessionManager;
 
 	// AudioManager
@@ -245,8 +244,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 		mNotificationManager.cancel(NotificationPlayer.NOTIFICATION_PLAYER_ID);
 
-		if (mNotificationPlayer != null)
-			mNotificationPlayer.hide();
+		getPlayer().removeNotificationPlayer();
 	}
 
 	/**
@@ -256,24 +254,10 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 		SoundWavesWidgetProvider.updateAllWidgets(this);
 
-		IEpisode argItem = getCurrentItem();
+		//IEpisode argItem = getCurrentItem();
+		getPlayer().updateNotificationPlayer();
 
         PlayerStatusObservable.startProgressUpdate(isPlaying());
-
-		if (argItem != null) {
-			if (mNotificationPlayer == null)
-				try {
-					mNotificationPlayer = new NotificationPlayer(this, argItem);
-				} catch (RemoteException e) {
-					e.printStackTrace();
-				}
-
-			mItem = argItem;
-			if (mNotificationPlayer.isShowing() || isPlaying()) {
-				mNotificationPlayer.setPlayerService(this);
-				mNotificationPlayer.show(argItem);
-			}
-		}
     }
 
 	public void playNext() {
@@ -468,7 +452,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 	public long seek(long offset) {
 		offset = offset < 0 ? 0 : offset;
 
-		mItem.setOffset(getContentResolver(), offset);
+		mItem.setOffset(offset);
 		return getPlayer().seekTo(offset);
 	}
 
@@ -531,9 +515,8 @@ public class PlayerService extends MediaBrowserServiceCompat implements
         ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
-        if (mNotificationPlayer != null) {
-			mNotificationPlayer.show(isPlaying(), mItem);
-        }
+
+		getPlayer().updateNotificationPlayer();
 
         if (isSteaming && mWifi.isConnected()) {
             wifiLock.acquire();

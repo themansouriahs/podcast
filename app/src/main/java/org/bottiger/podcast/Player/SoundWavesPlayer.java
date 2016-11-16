@@ -139,7 +139,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         return true;
     }
 
-    public void setDataSourceAsync(@NonNull IEpisode argEpisode) {
+    public void setDataSourceAsync(@NonNull IEpisode argEpisode) throws SecurityException {
         super.setDataSourceAsync(argEpisode);
 
         try {
@@ -467,6 +467,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
     @Override
     public long seekTo(long msec) throws IllegalStateException {
         mExoplayer.seekTo(msec);
+        updateNotificationPlayer();
         return msec;
     }
 

@@ -9,6 +9,7 @@ import android.media.MediaCodec;
 import android.media.PlaybackParams;
 import android.net.Uri;
 import android.os.Build;
+import android.os.RemoteException;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -24,6 +25,7 @@ import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.cloud.EventLogger;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
 import org.bottiger.podcast.player.exoplayer.ExtractorRendererBuilder;
 import org.bottiger.podcast.player.exoplayer.PodcastAudioRendererV21;
@@ -58,19 +60,22 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
     public static final int STATE_READY = ExoPlayer.STATE_READY;
     public static final int STATE_ENDED = ExoPlayer.STATE_ENDED;
 
-    protected  @PlayerStatusObservable.PlayerStatus int mStatus;
+    @PlayerStatusObservable.PlayerStatus int mStatus;
 
     @Nullable
-    protected PlayerService mPlayerService;
-    protected PlayerStateManager mPlayerStateManager;
+    PlayerService mPlayerService;
+    PlayerStateManager mPlayerStateManager;
+
+    @javax.annotation.Nullable
+    private NotificationPlayer mNotificationPlayer;
 
     @NonNull protected Context mContext;
 
     // AudioManager
-    protected AudioManager mAudioManager;
-    protected ComponentName mControllerComponentName;
+    AudioManager mAudioManager;
+    private ComponentName mControllerComponentName;
 
-    protected boolean mIsInitialized = false;
+    boolean mIsInitialized = false;
 
     protected long startPos = 0;
 
@@ -147,6 +152,29 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
         mStatus = PlayerStatusObservable.STOPPED;
     }
 
+    public void updateNotificationPlayer() {
+        IEpisode episode = PlayerService.getCurrentItem();
+        if (episode != null) {
+            if (mNotificationPlayer == null && mPlayerService != null) {
+                try {
+                    mNotificationPlayer = new NotificationPlayer(mPlayerService, episode);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (mNotificationPlayer.isShowing() || isPlaying()) {
+                mNotificationPlayer.setPlayerService(mPlayerService);
+                mNotificationPlayer.show(episode);
+            }
+        }
+    }
+
+    public void removeNotificationPlayer() {
+        if (mNotificationPlayer != null)
+            mNotificationPlayer.hide();
+    }
+
     public void fastForward(@Nullable IEpisode argItem) {
         if (mPlayerService == null)
             return;
@@ -213,7 +241,7 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
     public void setRemoveSilence(boolean argDoRemoveSilence) {
     }
 
-    protected void trackEventPlay() {
+    void trackEventPlay() {
         if (SoundWaves.sAnalytics == null) {
             VendorCrashReporter.report("sAnalytics null", "In playerService");
         }
@@ -235,7 +263,7 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
                 url);
     }
 
-    protected static long getStartPosition(@NonNull Context argContext, @NonNull IEpisode argEpisode) {
+    static long getStartPosition(@NonNull Context argContext, @NonNull IEpisode argEpisode) {
         long episodeOffset = argEpisode.getOffset();
         long offset = Math.max(episodeOffset, 0);
 
@@ -248,7 +276,7 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
         return offset;
     }
 
-    protected static String getDataSourceUrl(@NonNull IEpisode argEpisode) {
+    static String getDataSourceUrl(@NonNull IEpisode argEpisode) throws SecurityException {
         String dataSource = argEpisode.getURL();
         boolean isFeedItem = argEpisode instanceof FeedItem;
 

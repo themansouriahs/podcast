@@ -35,6 +35,9 @@ public interface GenericMediaPlayerInterface {
     void rewind(@Nullable IEpisode argItem);
     void fastForward(@Nullable IEpisode argItem);
 
+    void updateNotificationPlayer();
+    void removeNotificationPlayer();
+
     void pause();
 
     float getVolume();
