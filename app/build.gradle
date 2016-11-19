@@ -9,8 +9,8 @@ android {
         applicationId "org.bottiger.podcast"
         minSdkVersion 15
         targetSdkVersion 25
-        versionCode 314        // even - release. Odd - development
-        versionName "0.146" // even - release. Odd - development
+        versionCode 316        // even - release. Odd - development
+        versionName "0.146.2" // even - release. Odd - development
         multiDexEnabled = true
         //renderscriptTargetApi 20
         //renderscriptSupportModeEnabled true
@@ -195,7 +195,7 @@ dependencies {
 
 
 task nonfreeReleaseTask << {
-    apply plugin: 'com.google.gms.google-services'
+    //apply plugin: 'com.google.gms.google-services'
 }
 
 tasks.whenTaskAdded { task ->
