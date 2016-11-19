@@ -7,6 +7,8 @@ import java.security.SecureRandom;
 
 import javax.servlet.http.HttpSession;
 
+import java.util.logging.Logger;
+
 import static org.bottiger.podcast.common.WebPlayerShared.AUTH_TOKEN;
 
 /**
@@ -15,15 +17,25 @@ import static org.bottiger.podcast.common.WebPlayerShared.AUTH_TOKEN;
 
 public class QRModel {
 
+    private static final Logger log = Logger.getLogger(QRModel.class.getName());
     private static SecureRandom randomizer = new SecureRandom();
+
+    private static final boolean mStaticToken = false;
 
     public static String getQRUrl(HttpSession argSession) {
         return "https://zxing.org/w/chart?cht=qr&chs=400x400&chld=L&choe=UTF-8&chl=" + getAndSaveQRValue(argSession);
     }
 
     private static String getAndSaveQRValue(HttpSession argSession) {
-        String authToken = nextAuthToken();
-        argSession.setAttribute(AUTH_TOKEN, authToken);
+        String authToken = (String)argSession.getAttribute(AUTH_TOKEN);
+
+        log.info("id:" + argSession.getId() + "token: " + authToken);
+
+        if (!mStaticToken || authToken == null) {
+            authToken = nextAuthToken();
+            argSession.setAttribute(AUTH_TOKEN, authToken);
+        }
+
         return  authToken + WebPlayerShared.SEPARATOR + getSessionID(argSession);
     }
 
