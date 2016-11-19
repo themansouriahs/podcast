@@ -155,36 +155,13 @@ public class MainActivity extends FragmentContainerActivity {
 				return true;
 			}
 
-			/*
 			case R.id.menu_web_player: {
-				TransitionUtils.openWebPlayerAuthenticator(this);
+				TransitionUtils.startWebScannerActivity(this);
 				return true;
 			}
-			*/
+
 		}
 
 		return super.onOptionsItemSelected(item);
-	}
-
-	// Get the results:
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-		if(result != null) {
-			if(result.getContents() == null) {
-				Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show();
-			} else {
-				Toast.makeText(this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
-				IEpisode episode = SoundWaves.getAppContext(this).getPlaylist().getItem(0);
-				try {
-					WebPlayerAuthenticator.authenticate(result.getContents(), this, episode);
-				} catch (ParseException e) {
-					e.printStackTrace();
-					Toast.makeText(this, "ParseError: " + e.getMessage(), Toast.LENGTH_LONG).show();
-				}
-			}
-		} else {
-			super.onActivityResult(requestCode, resultCode, data);
-		}
 	}
 }

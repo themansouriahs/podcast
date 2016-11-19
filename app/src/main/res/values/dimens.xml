@@ -51,7 +51,7 @@
     <dimen name="playlist_image_size_large">90dp</dimen>
     <dimen name="playlist_image_radius_large">9dp</dimen>
 
-    <dimen name="activity_horizontal_margin">64dp</dimen>
+    <dimen name="activity_horizontal_margin">16dp</dimen>
 
     <dimen name="seekbar_thumb_size">30dp</dimen>
 
@@ -107,5 +107,7 @@
     <dimen name="quickcontact_title_initial_margin">16dp</dimen>
 
     <dimen name="quick_contact_toolbar_elevation">16dp</dimen>
-    
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+
 </resources>

@@ -80,7 +80,6 @@
         <!--<item name="android:windowActionBarOverlay">true</item>-->
 
 
-
         <!-- Spinner: http://stackoverflow.com/questions/16693941/spinner-text-size-does-not-change -->
         <item name="android:spinnerItemStyle">@style/spinnerItemStyle</item>
 
@@ -162,15 +161,20 @@
     <style name="NotificationTitle" parent="android:TextAppearance.StatusBar.EventContent.Title" />
     -->
     <style name="NotificationTitle" parent="android:TextAppearance.Material.Notification.Title"></style>
+
     <style name="NotificationText" parent="android:TextAppearance.Material.Notification"></style>
 
     <style name="SoundWaves.PreferenceActivity.Light" parent="SoundWavesTheme.Light">
-        <item name="android:windowTranslucentNavigation" tools:targetApi="19">false</item> <!-- actionbar and  bottom navigation -->
-        <item name="android:windowTranslucentStatus" tools:targetApi="19">false</item> <!-- top statusbar -->
+        <item name="android:windowTranslucentNavigation" tools:targetApi="19">false
+        </item> <!-- actionbar and  bottom navigation -->
+        <item name="android:windowTranslucentStatus" tools:targetApi="19">false
+        </item> <!-- top statusbar -->
     </style>
 
     <style name="FrameworkRoot.ActionBar" parent="android:Widget.Holo.ActionBar" />
+
     <style name="FrameworkRoot.ActionBar.TitleText" parent="android:TextAppearance.Holo.Widget.ActionBar.Title" />
+
     <style name="FrameworkRoot.ActionBar.TabBar" parent="android:Widget.Holo.ActionBar.TabBar" />
 
     <!-- Action bar -->
@@ -240,7 +244,7 @@
         <item name="android:layout_width">40dip</item>
         <item name="android:layout_height">50dip</item>
         <item name="android:layout_weight">1</item>
-        <item tools:targetApi="21" name="android:elevation">@dimen/player_elevation</item>
+        <item name="android:elevation" tools:targetApi="21">@dimen/player_elevation</item>
     </style>
 
     <style name="PlaylistButton" parent="@style/PlayerButton">
@@ -303,8 +307,8 @@
         <item name="android:layout_margin">10dip</item>
         <item name="android:background">@drawable/button_flash</item>
     </style>
-    
-    <style  name="PlayerPlayPauseToggle"  parent="@style/PlayerControlButtons">
+
+    <style name="PlayerPlayPauseToggle" parent="@style/PlayerControlButtons">
         <item name="android:background">?attr/playpause_icon</item>
     </style>
 
@@ -351,5 +355,9 @@
     <style name="DiscoverySearchViewStyle" parent="Widget.AppCompat.Light.SearchView">
         <item name="queryBackground">@null</item>
     </style>
+
+    <style name="SoundWavesTheme.Light.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="SoundWavesTheme.Light.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 </resources>

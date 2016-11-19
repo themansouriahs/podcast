@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import com.google.zxing.integration.android.IntentIntegrator;
 
 import org.bottiger.podcast.SettingsActivity;
+import org.bottiger.podcast.WebScannerActivity;
 import org.bottiger.podcast.activities.downloadmanager.DownloadManagerActivity;
 
 /**
@@ -30,6 +31,11 @@ public class TransitionUtils {
 
     public static void openWebPlayerAuthenticator(@NonNull Activity argActivity) {
         new IntentIntegrator(argActivity).initiateScan(); // `this` is the current Activity
+    }
+
+    public static void startWebScannerActivity(@NonNull Activity argActivity) {
+        Intent intent = new Intent(argActivity, WebScannerActivity.class);
+        argActivity.startActivity(intent);
     }
 
 }

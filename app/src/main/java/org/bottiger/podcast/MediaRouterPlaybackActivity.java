@@ -35,6 +35,7 @@ public class MediaRouterPlaybackActivity extends ToolbarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_media_router, menu);
         mMediaRouteCast.setupMediaButton(this, menu, R.id.media_route_menu_item);
         return super.onCreateOptionsMenu(menu);
     }
