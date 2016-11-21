@@ -72,13 +72,7 @@ public class MainActivity extends FragmentContainerActivity {
 
         mPreferenceHelper.setOrientation(this, prefs);
 
-		// Start Application services
-		if (!isMyServiceRunning(PlayerService.class.getName()))
-			startService(new Intent(this, PlayerService.class));
 
-		/*
-		IntentFilter receiverFilter = new IntentFilter(
-				Intent.ACTION_HEADSET_PLUG); */
 		IntentFilter receiverFilter = new IntentFilter(
 				AudioManager.ACTION_AUDIO_BECOMING_NOISY);
 		receiver = new HeadsetReceiver();
@@ -88,24 +82,6 @@ public class MainActivity extends FragmentContainerActivity {
 			CloudSyncUtils.startCloudSync(this);
 		}
 
-	}
-
-	/**
-	 * Test if a service is running
-	 * 
-	 * @param serviceName
-	 *            MyService.class.getName()
-	 * @return
-	 */
-	private boolean isMyServiceRunning(String serviceName) {
-		ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-		for (RunningServiceInfo service : manager
-				.getRunningServices(Integer.MAX_VALUE)) {
-			if (serviceName.equals(service.service.getClassName())) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	@Override

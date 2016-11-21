@@ -3,16 +3,11 @@ package org.bottiger.podcast.service;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.player.GenericMediaPlayerInterface;
-import org.bottiger.podcast.player.LegacyRemoteController;
-import org.bottiger.podcast.player.PlayerHandler;
 import org.bottiger.podcast.player.PlayerPhoneListener;
 import org.bottiger.podcast.player.PlayerStateManager;
-import org.bottiger.podcast.player.SoundWavesPlayer;
 import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.flavors.MediaCast.IMediaCast;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.notification.NotificationPlayer;
-import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
@@ -20,7 +15,6 @@ import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.utils.PlaybackSpeed;
-import org.bottiger.podcast.utils.PreferenceHelper;
 import org.bottiger.podcast.widgets.SoundWavesWidgetProvider;
 
 
@@ -49,30 +43,6 @@ import android.support.v4.media.session.MediaControllerCompat;
 import android.telephony.PhoneStateListener;
 import android.util.Log;
 
-import com.google.android.exoplayer2.ExoPlayer;
-
-import org.bottiger.podcast.R;
-import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.flavors.MediaCast.IMediaCast;
-import org.bottiger.podcast.listeners.PlayerStatusObservable;
-import org.bottiger.podcast.notification.NotificationPlayer;
-import org.bottiger.podcast.player.PlayerHandler;
-import org.bottiger.podcast.player.PlayerPhoneListener;
-import org.bottiger.podcast.player.PlayerStateManager;
-import org.bottiger.podcast.player.SoundWavesPlayer;
-import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
-import org.bottiger.podcast.playlist.Playlist;
-import org.bottiger.podcast.provider.FeedItem;
-import org.bottiger.podcast.provider.IEpisode;
-import org.bottiger.podcast.provider.ISubscription;
-import org.bottiger.podcast.provider.Subscription;
-import org.bottiger.podcast.receiver.HeadsetReceiver;
-import org.bottiger.podcast.utils.PlaybackSpeed;
-import org.bottiger.podcast.widgets.SoundWavesWidgetProvider;
-
-import java.io.File;
-import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.net.URL;
@@ -112,8 +82,6 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 	private static @PlayerService.NextTrack int nextTrack = NEXT_IN_PLAYLIST;
 
     private MediaControllerCompat mController;
-    private PlayerStateManager mPlayerStateManager;
-
 
     private NotificationManager mNotificationManager;
     @Nullable private MediaSessionManager mMediaSessionManager;
@@ -127,6 +95,9 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
     private final String LOCK_NAME = "SoundWavesWifiLock";
     WifiManager.WifiLock wifiLock;
+
+	@NonNull
+	private PlayerStateManager mPlayerStateManager;
 
 
 	/**
@@ -157,7 +128,11 @@ public class PlayerService extends MediaBrowserServiceCompat implements
         wifiLock = ((WifiManager) getSystemService(Context.WIFI_SERVICE))
                 .createWifiLock(WifiManager.WIFI_MODE_FULL, LOCK_NAME);
 
-		mPlayerStateManager = new PlayerStateManager(this);
+		mPlayerStateManager = SoundWaves.getAppContext(this).getPlayerStateManager();
+		mPlayerStateManager.setService(this);
+
+		SoundWaves.getAppContext(this).getPlayer().setPlayerService(this);
+
 		try {
 			mController = new MediaControllerCompat(getApplicationContext(), mPlayerStateManager.getToken()); // .fromToken( mSession.getSessionToken() );
 		} catch (RemoteException e) {

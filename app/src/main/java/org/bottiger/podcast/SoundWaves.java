@@ -1,7 +1,9 @@
 package org.bottiger.podcast;
 
+import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
@@ -19,6 +21,7 @@ import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.NewPlayerEvent;
 import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.player.GenericMediaPlayerInterface;
+import org.bottiger.podcast.player.PlayerStateManager;
 import org.bottiger.podcast.player.SoundWavesPlayer;
 
 import org.bottiger.podcast.flavors.Analytics.AnalyticsFactory;
@@ -75,6 +78,9 @@ public class SoundWaves extends MultiDexApplication {
     PlayerHelper mPlayerHelper = new PlayerHelper();
 
     private GenericMediaPlayerInterface mPlayer;
+
+    @NonNull
+    private PlayerStateManager mPlayerStateManager;
 
     @Override
     public void onCreate() {
@@ -133,6 +139,8 @@ public class SoundWaves extends MultiDexApplication {
                 incrementStartupCount(context);
             }
         });
+
+        mPlayerStateManager = new PlayerStateManager();
     }
 
     private void firstRun(@NonNull Context argContext) {
@@ -193,6 +201,11 @@ public class SoundWaves extends MultiDexApplication {
     }
 
     @NonNull
+    public PlayerStateManager getPlayerStateManager() {
+        return mPlayerStateManager;
+    }
+
+    @NonNull
     public Library getLibraryInstance() {
         if (mLibrary == null) {
             mLibrary = new Library(this);
@@ -246,48 +259,46 @@ public class SoundWaves extends MultiDexApplication {
                 this, // a Context
                 new ComponentName(this, PlayerService.class),
                 // Which MediaBrowserService
-                new MediaBrowserCompat.ConnectionCallback() {
-                    @Override
-                    public void onConnected() {
-                        try {
-                            // Ah, here’s our Token again
-                            MediaSessionCompat.Token token =
-                                    mMediaBrowser.getSessionToken();
-                            // This is what gives us access to everything
-                            PlayerService ps = PlayerService.getInstance();
-
-                            if (ps == null)
-                                return;
-
-                            SoundWaves.this.getPlayer().setPlayerService(ps);
-                            mMediaControllerCompat =
-                                    new MediaControllerCompat(SoundWaves.this, token);
-                            mPlayerHelper.setMediaControllerCompat(mMediaControllerCompat);
-
-                            // Convenience method of FragmentActivity to allow you to use
-                            // getSupportMediaController() anywhere
-                            //setSupportMediaController(mMediaControllerCompat);
-                        } catch (RemoteException e) {
-                            Log.e(MainActivity.class.getSimpleName(),
-                                    "Error creating controller", e);
-                            VendorCrashReporter.handleException(e);
-                        }
-                    }
-
-                    @Override
-                    public void onConnectionSuspended() {
-                        // We were connected, but no longer :-(
-                        VendorCrashReporter.report("onConnectionSuspended", "it happend");
-                    }
-
-                    @Override
-                    public void onConnectionFailed() {
-                        // The attempt to connect failed completely.
-                        // Check the ComponentName!
-                        VendorCrashReporter.report("onConnectionFailed", "it happend");
-                    }
-                },
+                getMediaBrowserCallback(),
                 null); // optional Bundle
         mMediaBrowser.connect();
+    }
+
+    @NonNull
+    private MediaBrowserCompat.ConnectionCallback getMediaBrowserCallback() {
+        return new MediaBrowserCompat.ConnectionCallback() {
+            @Override
+            public void onConnected() {
+                try {
+                    // Ah, here’s our Token again
+                    MediaSessionCompat.Token token =
+                            mMediaBrowser.getSessionToken();
+
+                    mMediaControllerCompat = new MediaControllerCompat(SoundWaves.this, token);
+                    mPlayerHelper.setMediaControllerCompat(mMediaControllerCompat);
+
+                    // Convenience method of FragmentActivity to allow you to use
+                    // getSupportMediaController() anywhere
+                    //setSupportMediaController(mMediaControllerCompat);
+                } catch (RemoteException e) {
+                    Log.e(MainActivity.class.getSimpleName(),
+                            "Error creating controller", e);
+                    VendorCrashReporter.handleException(e);
+                }
+            }
+
+            @Override
+            public void onConnectionSuspended() {
+                // We were connected, but no longer :-(
+                VendorCrashReporter.report("onConnectionSuspended", "it happend");
+            }
+
+            @Override
+            public void onConnectionFailed() {
+                // The attempt to connect failed completely.
+                // Check the ComponentName!
+                VendorCrashReporter.report("onConnectionFailed", "it happend");
+            }
+        };
     }
 }

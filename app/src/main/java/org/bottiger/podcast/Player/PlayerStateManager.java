@@ -53,12 +53,15 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
      * Started when the PlayerService is started
      * @param argService
      */
-    public PlayerStateManager(@NonNull PlayerService argService) {
+    public PlayerStateManager() {
         Log.d(TAG, "Constructor");
+    }
 
+    public void setService(@NonNull PlayerService argService) {
         mPlayerService = argService;
-        ComponentName mediaButtonReceiver = new ComponentName(argService, HeadsetReceiver.class);
-        mSession = new MediaSessionCompat(argService, SESSION_TAG, mediaButtonReceiver, null);
+
+        ComponentName mediaButtonReceiver = new ComponentName(mPlayerService, HeadsetReceiver.class);
+        mSession = new MediaSessionCompat(mPlayerService, SESSION_TAG, mediaButtonReceiver, null);
         mSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
                 MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
 
