@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v4.media.session.MediaControllerCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
@@ -42,6 +43,8 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
     // log tag
     private static final String TAG = "SWWidgetProvider";
 
+    @PlaybackStateCompat.State static int sState;
+
     int mHeight = -1;
 
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -55,15 +58,17 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
             // to the button
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_default);
 
-            attachButtonListeners(context, views);
+            attachButtonListeners(context.getApplicationContext(), views);
 
             // Tell the AppWidgetManager to perform an update on the current app widget
             //appWidgetManager.updateAppWidget(appWidgetId, views);
-            updateAppWidget(context, appWidgetId, false);
+            updateAppWidget(context.getApplicationContext(), appWidgetId, false);
         }
     }
 
-    public static void updateAllWidgets(@NonNull Context context) {
+    public static void updateAllWidgets(@NonNull Context context, @PlaybackStateCompat.State int argState) {
+        sState = argState;
+
         AppWidgetManager mgr= AppWidgetManager.getInstance(context);
         ComponentName cn = new ComponentName(context, SoundWavesWidgetProvider.class);
         int[] ids = mgr.getAppWidgetIds(cn);
@@ -119,7 +124,8 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
             CharSequence text = episode.getTitle();
             Long durationMs = episode.getDuration();
             Long elapsedTimeMs = episode.getOffset();
-            boolean isPlaying = PlayerService.isPlaying();
+            boolean isPlaying = isPlaying();
+            boolean isBuffering = isBuffering();
 
             double progress = 0;
             if (durationMs > 0)
@@ -130,12 +136,12 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
 
             String chronometerFormat = "%s"; //episode.getOffset() + " / " + StrUtils.formatTime(durationMs);
 
-            int playPauseIcon = !isPlaying ? R.drawable.ic_play_arrow_black : R.drawable.ic_pause_black;
+            int playPauseIcon = !(isPlaying || isBuffering) ? R.drawable.ic_play_arrow_black : R.drawable.ic_pause_black;
             views.setImageViewResource(R.id.widget_play, playPauseIcon);
 
             views.setChronometer(R.id.widget_duration, SystemClock.elapsedRealtime() - elapsedTimeMs, chronometerFormat, isPlaying);
             views.setTextViewText(R.id.widget_duration_total, " / " + StrUtils.formatTime(durationMs));
-            views.setProgressBar(R.id.progressBar, 100, (int) progress, false);
+            views.setProgressBar(R.id.progressBar, 100, (int) progress, isBuffering);
             views.setTextViewText(R.id.widget_description, episode.getDescription()); //
 
             int descriptionVisibility = showDescription ? View.VISIBLE : View.GONE;
@@ -252,6 +258,14 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
 
         }
         super.onReceive(ctx, intent);
+    }
+
+    private static boolean isPlaying() {
+        return sState == PlaybackStateCompat.STATE_PLAYING;
+    }
+
+    private static boolean isBuffering() {
+        return sState == PlaybackStateCompat.STATE_BUFFERING;
     }
 
 }

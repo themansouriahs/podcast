@@ -49,6 +49,8 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
     private MediaSessionCompat mSession;
     private PlayerService mPlayerService;
 
+    @PlaybackStateCompat.State private int mCurrentState = PlaybackStateCompat.STATE_NONE;
+
     /**
      * Started when the PlayerService is started
      * @param argService
@@ -83,6 +85,7 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
      */
     public void onPlay() {
         Log.d(TAG, "onPlay");
+
         if (!mSession.isActive()) {
             mSession.setActive(true);
         }
@@ -126,6 +129,8 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
 
     @Override
     public void onCustomAction(String action, Bundle extras) {
+        Log.d(TAG, "received action: " + action); // NoI18N
+
         if (ACTION_TOGGLE.equals(action)) {
             mPlayerService.toggle();
         }
@@ -180,11 +185,16 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
                 });
     }
 
-    public void updateState(@PlaybackStateCompat.State int argState, long argPosition, float argPlaybackSpeed) {
-        Log.d(TAG, "Update State:"); // NoI18N
+    void updateState(@PlaybackStateCompat.State int argState, long argPosition, float argPlaybackSpeed) {
+        Log.d(TAG, "Update State:" + argState); // NoI18N
 
         PlaybackStateCompat.Builder stateBuilder = getPlaybackState(argState, argPosition, argPlaybackSpeed);
         mSession.setPlaybackState(stateBuilder.build());
+
+        if (mCurrentState != argState) {
+            mCurrentState = argState;
+            mPlayerService.notifyStatusChanged();
+        }
     }
 
     public MediaSessionCompat getSession() {
@@ -230,7 +240,7 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
                         PlaybackStateCompat.ACTION_SKIP_TO_NEXT |
                         PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS;
 
-        if (argState == PlaybackStateCompat.ACTION_PLAY) {
+        if (argState == PlaybackStateCompat.STATE_PLAYING) {
             actions |= PlaybackStateCompat.ACTION_PAUSE;
         } else {
             actions |= PlaybackStateCompat.ACTION_PLAY;
@@ -241,5 +251,10 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
         stateBuilder.setState(argState, argPosition, argPlaybackSpeed, SystemClock.elapsedRealtime());
 
         return stateBuilder;
+    }
+
+    @PlaybackStateCompat.State
+    public int getState() {
+        return mCurrentState;
     }
 }

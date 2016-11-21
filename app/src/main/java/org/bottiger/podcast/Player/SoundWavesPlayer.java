@@ -94,7 +94,27 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
             }
 
             @Override
-            public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+            public void onPlayerStateChanged(boolean playWhenReady, @PlayerState int playbackState) {
+                Log.d(TAG, "player state changed: " + playbackState + " playWhenReady: " + playWhenReady);
+
+                int state = PlaybackStateCompat.STATE_NONE;
+                switch (playbackState) {
+                    case SoundWavesPlayerBase.STATE_BUFFERING:
+                        state = PlaybackStateCompat.STATE_BUFFERING;
+                        break;
+                    case SoundWavesPlayerBase.STATE_ENDED:
+                        state = PlaybackStateCompat.STATE_NONE;
+                        break;
+                    case SoundWavesPlayerBase.STATE_IDLE:
+                        state = PlaybackStateCompat.STATE_STOPPED;
+                        break;
+                    case SoundWavesPlayerBase.STATE_READY:
+                        state = playWhenReady ? PlaybackStateCompat.STATE_PLAYING : PlaybackStateCompat.STATE_PAUSED;
+                        break;
+                }
+
+                mPlayerStateManager.updateState(state, getCurrentPosition(), playbackSpeed);
+
                 if (playbackState == STATE_READY) {
                     IEpisode episode = getCurrentItem();
                     if (episode != null) {
@@ -191,7 +211,6 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
 
     public void start() {
         mStatus = PlayerStatusObservable.PLAYING;
-        mPlayerStateManager.updateState(PlaybackStateCompat.STATE_PLAYING, getCurrentPosition(), playbackSpeed);
 
         // Request audio focus for playback
         int result = mAudioManager.requestAudioFocus(mPlayerService,
@@ -202,7 +221,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             mExoplayer.setPlayWhenReady(true);
 
-            mPlayerService.notifyStatusChanged();
+            //mPlayerService.notifyStatusChanged();
 
             trackEventPlay();
         }
@@ -244,7 +263,6 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         mExoplayer.setPlayWhenReady(false);
 
         mStatus = PlayerStatusObservable.PAUSED;
-        mPlayerStateManager.updateState(PlaybackStateCompat.STATE_PAUSED, getCurrentPosition(), playbackSpeed);
 
         MarkAsListenedIfNeeded();
         SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.PAUSE);

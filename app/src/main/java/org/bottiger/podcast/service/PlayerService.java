@@ -227,9 +227,8 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 	 */
     public void notifyStatusChanged() {
 
-		SoundWavesWidgetProvider.updateAllWidgets(this);
+		SoundWavesWidgetProvider.updateAllWidgets(this, mPlayerStateManager.getState());
 
-		//IEpisode argItem = getCurrentItem();
 		getPlayer().updateNotificationPlayer();
 
         PlayerStatusObservable.startProgressUpdate(isPlaying());
@@ -284,8 +283,9 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 		GenericMediaPlayerInterface player = getPlayer();
 
 		// Pause the current episode in order to save the current state
-		if (player.isPlaying())
+		if (player.isPlaying()) {
 			player.pause();
+		}
 
 		IEpisode currentItem = getCurrentItem();
 
@@ -326,7 +326,6 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 	@MainThread
 	public boolean toggle(@NonNull IEpisode argEpisode) {
 
-
         if (getPlayer().isPlaying()) {
             IEpisode item = getCurrentItem();
             if (argEpisode.equals(item)) {
@@ -346,17 +345,22 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 			return false;
 		}
 
-        play(argEpisode, true);
-        return true;
+        return play(argEpisode, true);
 	}
 
-	public void toggle() {
-		IEpisode episode = SoundWaves.getAppContext(this).getPlaylist().getItem(0);
+	public boolean toggle() {
 
-		if (episode == null)
-			return;
+		Playlist playlist = SoundWaves.getAppContext(this).getPlaylist(true);
+		IEpisode episode = playlist.first();
+
+		if (episode == null) {
+			Log.wtf(TAG, "episode null");
+			return false;
+		}
 
 		toggle(episode);
+
+		return true;
 	}
 
 	private void start() {

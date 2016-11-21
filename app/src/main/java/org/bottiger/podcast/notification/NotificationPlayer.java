@@ -114,6 +114,8 @@ public class NotificationPlayer extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
 
+        Log.d(TAG, "received action: " + action);
+
         if (action.equals(toggleAction)) {
             mTransportControls.sendCustomAction(PlayerStateManager.ACTION_TOGGLE, new Bundle());
         }

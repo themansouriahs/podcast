@@ -117,7 +117,7 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
                 mPlayerStateManager.updateState(PlaybackStateCompat.STATE_PLAYING, getCurrentPosition(), getCurrentSpeedMultiplier());
                 break;
             case PlayerStatusObservable.PREPARING:
-                mPlayerStateManager.updateState(PlaybackStateCompat.STATE_CONNECTING, startPos, getCurrentSpeedMultiplier());
+                mPlayerStateManager.updateState(PlaybackStateCompat.STATE_BUFFERING, startPos, getCurrentSpeedMultiplier());
                 break;
             case PlayerStatusObservable.STOPPED:
                 mPlayerStateManager.updateState(PlaybackStateCompat.STATE_STOPPED, getCurrentPosition(), getCurrentSpeedMultiplier());

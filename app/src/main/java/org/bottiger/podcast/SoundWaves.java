@@ -215,12 +215,22 @@ public class SoundWaves extends MultiDexApplication {
     }
 
     @NonNull
-    public Playlist getPlaylist() {
+    public Playlist getPlaylist(boolean argPopulated) {
         if (mPlaylist == null) {
             mPlaylist = new Playlist(this);
         }
 
+        if (argPopulated) {
+            getLibraryInstance().loadPlaylistSync(mPlaylist);
+            mPlaylist.populatePlaylistIfEmpty();
+        }
+
         return mPlaylist;
+    }
+
+    @NonNull
+    public Playlist getPlaylist() {
+        return getPlaylist(false);
     }
 
     @NonNull
