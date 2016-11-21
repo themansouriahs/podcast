@@ -185,5 +185,19 @@ public class StrUtils {
 		return null;
 	}
 
+	/**
+	 *
+	 * @param argTitle The title of the episode
+	 * @return
+     */
+	public static String formatTitle(@Nullable String argTitle) {
+		if (argTitle == null)
+			return "";
+
+		String[] parts = argTitle.split("-"); // NoI18N
+		String episodeTitle = parts[parts.length-1];
+
+		return episodeTitle.trim();
+	}
 
 }

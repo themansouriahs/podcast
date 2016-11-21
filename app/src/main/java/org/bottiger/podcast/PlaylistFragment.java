@@ -342,7 +342,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
 
         mRxTopEpisodeChanged = getEpisodeChangedSubscription();
 
-        final String title = item.getTitle();
+        final String title = StrUtils.formatTitle(item.getTitle());
         final String description = item.getDescription();
 
         mEpisodeTitle.setText(title);
