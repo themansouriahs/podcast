@@ -504,11 +504,6 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 		return Uri.parse(getURL());
 	}
 
-    // in ms
-	public long setPosition(long pos) {
-		return setPosition(pos, false);
-	}
-
 	// in ms
 	private static long lastPositionUpdate = System.currentTimeMillis();
 	public long setPosition(long pos, boolean forceWrite) {
@@ -517,11 +512,11 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 			return this.offset;
 		}
 
-		long now = System.currentTimeMillis();
+		this.offset = (int) pos;
 
+		long now = System.currentTimeMillis();
 		// more than a second ago
-		if (forceWrite || (offset == -1 && pos > offset) || (now - lastPositionUpdate > 1000)) {
-			this.offset = (int) pos;
+		if (forceWrite || (offset == -1 && pos > offset) || (now - lastPositionUpdate) > 5000) {
 			notifyPropertyChanged(EpisodeChanged.PLAYING_PROGRESS);
 			lastPositionUpdate = now;
 		}
@@ -1109,10 +1104,8 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
         if (mIsParsing)
             return;
 
-		if (argAction != EpisodeChanged.PLAYING_PROGRESS) {
-			EpisodeChanged ec = new EpisodeChanged(getId(), getURL(), argAction);
-			SoundWaves.getRxBus().send(ec);
-		}
+		EpisodeChanged ec = new EpisodeChanged(getId(), getURL(), argAction);
+		SoundWaves.getRxBus().send(ec);
 
 		if (argAction == EpisodeChanged.DOWNLOADED) {
 			boolean isDownloaded = false;

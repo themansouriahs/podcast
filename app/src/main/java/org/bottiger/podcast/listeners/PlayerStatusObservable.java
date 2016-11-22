@@ -14,6 +14,7 @@ import org.bottiger.podcast.service.PlayerService;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.ref.WeakReference;
 
 public class PlayerStatusObservable {
 
@@ -30,39 +31,28 @@ public class PlayerStatusObservable {
     public static final int STOPPED = 3;
     public static final int PREPARING = 4;
 
-    private static Handler sHandler = new ProgressHandler();
-    private static long lastUpdate = System.currentTimeMillis();
+    private static Handler sHandler;
+
+    public PlayerStatusObservable(@NonNull PlayerService argPlayerService) {
+        sHandler = new ProgressHandler(argPlayerService);
+    }
 
     private static void updateProgress(@NonNull PlayerService argPlayerService) {
+
         IEpisode currentItem = PlayerService.getCurrentItem();
-        if (currentItem != null && currentItem instanceof FeedItem) {
+
+        if (currentItem instanceof FeedItem) {
             FeedItem feedItem = (FeedItem)currentItem;
             long offset = argPlayerService.getPlayer().getCurrentPosition();
-            //updateEpisodeOffset(argPlayerService.getContentResolver(),
-            //        feedItem,
-            //        offset);
-            feedItem.setPosition(offset);
 
-            //SoundWaves.getBus().post(new PlayerStatusProgressData(feedItem.getOffset()));
+            feedItem.setPosition(offset, false);
 
             PlayerStatusProgressData pspd = new PlayerStatusProgressData(feedItem.getOffset());
             SoundWaves.getRxBus2().send(pspd);
         }
     }
 
-    public static void updateEpisodeOffset(@NonNull ContentResolver argContentResolver,
-                                           @NonNull FeedItem argEpisode,
-                                           long argOffset) {
-        long now = System.currentTimeMillis();
-
-        // more than a second ago
-        if (now - lastUpdate > 1000) {
-            argEpisode.setPosition(argOffset);
-            lastUpdate = now;
-        }
-    }
-
-    public static void startProgressUpdate(boolean argIsPlaying) {
+    public void startProgressUpdate(boolean argIsPlaying) {
         sHandler.removeMessages(PLAYING);
 
         if (argIsPlaying) {
@@ -73,28 +63,31 @@ public class PlayerStatusObservable {
 
     private static class ProgressHandler extends Handler {
 
+        // http://stackoverflow.com/questions/11407943/this-handler-class-should-be-static-or-leaks-might-occur-incominghandler
+        private final WeakReference<PlayerService> mService;
+
+        ProgressHandler(PlayerService service) {
+            mService = new WeakReference<>(service);
+        }
+
         @Override
         public void handleMessage(Message inputMessage) {
-            // Gets the task from the incoming Message object.
-            //PhotoTask photoTask = (PhotoTask) inputMessage.obj;
 
-            // Gets the ImageView for this task
-            switch (inputMessage.what) {
-                // The decoding is done
-                case PLAYING:
-                    PlayerService ps = PlayerService.getInstance();
+            PlayerService service = mService.get();
 
-                    if (ps != null) {
-                        updateProgress(ps);
+            if (service != null) {
+                switch (inputMessage.what) {
+                    case PLAYING: {
+                        updateProgress(service);
 
-                        int currentStatus = ps.isPlaying() || ps.getPlayer().isCasting() ? PLAYING : STOPPED;
+                        int currentStatus = PlayerService.isPlaying() || service.getPlayer().isCasting() ? PLAYING : STOPPED;
                         inputMessage = sHandler.obtainMessage(currentStatus);
                         sHandler.sendMessageDelayed(inputMessage, REFRESH_INTERVAL);
+                        break;
                     }
-                    break;
-                default:
-
-                    //super.handleMessage(inputMessage);
+                    default:
+                        //super.handleMessage(inputMessage);
+                }
             }
         }
 

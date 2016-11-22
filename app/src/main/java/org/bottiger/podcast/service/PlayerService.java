@@ -61,16 +61,6 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
     private static final String TAG = "PlayerService";
 
-    public static final String ACTION_PLAY = "action_play";
-    public static final String ACTION_PAUSE = "action_pause";
-    public static final String ACTION_REWIND = "action_rewind";
-    public static final String ACTION_FAST_FORWARD = "action_fast_foward";
-    public static final String ACTION_NEXT = "action_next";
-    public static final String ACTION_PREVIOUS = "action_previous";
-    public static final String ACTION_STOP = "action_stop";
-
-	public static final String ACTION_REFRESH_FEEDS = "action_refresh_feeds";
-
 	/** Which action to perform when a track ends */
 	@Retention(RetentionPolicy.SOURCE)
 	@IntDef({NONE, NEW_TRACK, NEXT_IN_PLAYLIST})
@@ -99,6 +89,9 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 	@NonNull
 	private PlayerStateManager mPlayerStateManager;
 
+	@NonNull
+	private PlayerStatusObservable mPlayerStatusObservable;
+
 
 	/**
 	 * Phone state listener. Will pause the playback when the phone is ringing
@@ -113,6 +106,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 	private static PlayerService sInstance = null;
 
 	@Nullable
+	@Deprecated
 	public static PlayerService getInstance() {
 		return sInstance;
 	}
@@ -130,6 +124,8 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 		mPlayerStateManager = SoundWaves.getAppContext(this).getPlayerStateManager();
 		mPlayerStateManager.setService(this);
+
+		mPlayerStatusObservable = new PlayerStatusObservable(this);
 
 		SoundWaves.getAppContext(this).getPlayer().setPlayerService(this);
 
@@ -231,7 +227,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 		getPlayer().updateNotificationPlayer();
 
-        PlayerStatusObservable.startProgressUpdate(isPlaying());
+        mPlayerStatusObservable.startProgressUpdate(isPlaying());
     }
 
 	public void playNext() {
