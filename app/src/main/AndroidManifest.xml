@@ -42,7 +42,9 @@
         android:name=".SoundWaves"
         android:icon="@drawable/ic_launcher_sw"
         android:label="@string/app_name"
-        android:theme="@style/SoundWavesTheme.Light">
+        android:theme="@style/SoundWavesTheme.Light"
+        android:allowBackup="true">
+
         <uses-library android:name="android.test.runner" />
 
         <activity
@@ -70,6 +72,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+
         <activity
             android:name=".activities.discovery.DiscoveryFeedActivity"
             android:label="@string/app_name"
@@ -137,6 +140,7 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".activities.downloadmanager.DownloadManagerActivity"
             android:label="@string/activity_download_name"
@@ -176,9 +180,12 @@
                     android:scheme="content" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".SettingsActivity"
-            android:label="Settings"></activity>
+            android:label="Settings">
+        </activity>
+
         <activity
             android:name=".activities.pastelog.LogSubmitActivity"
             android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize"
@@ -193,19 +200,18 @@
                 <action android:name="android.media.browse.MediaBrowserService" />
             </intent-filter>
         </service>
-        <!--
-                    android:enabled="true
-
-            android:permission="android.permission.MEDIA_CONTENT_CONTROL"
-                        <action android:name="android.intent.action.MEDIA_BUTTON" />
-        -->
 
         <service
             android:name=".service.DownloadService"
-            android:enabled="true"></service>
+            android:enabled="true">
+
+        </service>
+
         <service
             android:name=".player.sonic.SoundService"
-            android:enabled="true"></service>
+            android:enabled="true">
+        </service>
+
         <service android:name=".service.syncadapter.AuthenticatorService">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />

@@ -205,7 +205,7 @@ public class Library {
 
         if (subscription == null || TextUtils.isEmpty(subscription.getURLString())) {
             if (argSubscriptionChanged.getAction() == SubscriptionChanged.LOADED) {
-                return; // it's ok. The Subscription is marked as loaded befor eadded to the model.
+                return; // it's ok. The Subscription is marked as loaded before added to the model.
             }
 
             Log.wtf("Subscription empty!", "id: " + argSubscriptionChanged.getId());

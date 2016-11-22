@@ -40,7 +40,6 @@ public class WebScannerActivity extends MediaRouterPlaybackActivity {
 
     private static final boolean DO_BEEP = true;
 
-    private CaptureManager mCapture;
     private DecoratedBarcodeView mDecoratedBarcodeView;
     private BeepManager mBeepManager;
 
@@ -78,38 +77,28 @@ public class WebScannerActivity extends MediaRouterPlaybackActivity {
                                               mDecoratedBarcodeView.setLayoutParams(params);
                                           }
                                       });
-        //scanBarcode(mDecoratedBarcodeView);
-
-
-        //mCapture = new CaptureManager(this, mDecoratedBarcodeView);
-        //mCapture.initializeFromIntent(getIntent(), savedInstanceState);
-        //mCapture.decode();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        //mCapture.onResume();
         mDecoratedBarcodeView.resume();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        //mCapture.onPause();
         mDecoratedBarcodeView.pause();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //mCapture.onDestroy();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        mCapture.onSaveInstanceState(outState);
     }
 
     @Override
@@ -120,13 +109,6 @@ public class WebScannerActivity extends MediaRouterPlaybackActivity {
 
     protected int getLayout() {
         return R.layout.activity_web_scanner;
-    }
-
-    public void scanBarcode(View view) {
-        IntentIntegrator integrator = new IntentIntegrator(this);
-        integrator.setOrientationLocked(false);
-        //integrator.setCaptureActivity(SmallCaptureActivity.class);
-        integrator.initiateScan();
     }
 
     @SuppressWarnings("deprecation")
