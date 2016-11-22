@@ -21,6 +21,9 @@
 -keep class org.bottiger.podcast.** {*;}
 -keep class com.dragontek.mygpoclient.** {*;}
 
+-keep class com.google.** { *; }
+-dontwarn com.google.**
+
 -keep        class android.support.v13.** { *; }
 -keep        class android.support.v7.** { *; }
 -keep        class android.support.v4.** { *; }
