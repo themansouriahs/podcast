@@ -39,6 +39,7 @@
         <item name="delete_inv">@drawable/ic_delete_24dp</item>
         <item name="download_inv">@drawable/ic_get_app_black</item>
         <item name="sleep_inv">@drawable/ic_snooze_black</item>
+        <item name="bookmark_inv">@drawable/ic_bookmark_black</item>
         <item name="fullscreen_inv">@drawable/ic_fullscreen_black</item>
         <item name="fullscreen_exit_inv">@drawable/ic_fullscreen_exit_black</item>
         <!--<item name="seekbar_handle">@drawable/seekbar_handle</item>-->

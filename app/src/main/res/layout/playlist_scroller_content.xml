@@ -282,6 +282,13 @@
                     style="@style/TopPlayerButton" />
 
                 <org.bottiger.podcast.views.PlayerButtonView
+                    android:id="@+id/chapter_button"
+                    android:padding="0dip"
+                    android:src="?attr/bookmark_inv"
+                    android:elevation="@dimen/player_elevation"
+                    style="@style/TopPlayerButton" />
+
+                <org.bottiger.podcast.views.PlayerButtonView
                     android:id="@+id/fullscreen_button"
                     android:padding="0dip"
                     android:src="?attr/fullscreen_inv"

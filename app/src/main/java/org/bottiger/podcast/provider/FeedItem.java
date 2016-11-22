@@ -574,9 +574,9 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 	 */
     @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
 	public boolean isDownloaded() throws SecurityException {
-        try {
-            if (this.isDownloaded!=null)
-                return this.isDownloaded;
+		try {
+            if (isDownloaded != null)
+                return isDownloaded;
         } catch (NullPointerException e) {
             e.printStackTrace();
         }

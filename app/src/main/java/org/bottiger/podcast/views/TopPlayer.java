@@ -107,6 +107,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
 
     private PlayerButtonView mFullscreenButton;
     private PlayerButtonView mSleepButton;
+    private PlayerButtonView mChapterButton;
     private Button mSpeedButton;
     private PlayerButtonView mDownloadButton;
     private MaterialFavoriteButton mFavoriteButton;
@@ -251,6 +252,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         mPlayPauseButton = (PlayPauseImageView) findViewById(R.id.playpause);
         mFullscreenButton = (PlayerButtonView) findViewById(R.id.fullscreen_button);
         mSleepButton = (PlayerButtonView) findViewById(R.id.sleep_button);
+        mChapterButton = (PlayerButtonView) findViewById(R.id.chapter_button);
         mSpeedButton = (Button) findViewById(R.id.speed_button);
         mDownloadButton = (PlayerButtonView) findViewById(R.id.download);
         mFavoriteButton = (MaterialFavoriteButton) findViewById(R.id.favorite);
@@ -279,6 +281,8 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
                 sleepButtonPressed();
             }
         });
+
+        mChapterButton.setVisibility(GONE);
 
         final PlayerService ps = PlayerService.getInstance();
 

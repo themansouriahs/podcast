@@ -1,19 +1,36 @@
 package org.bottiger.podcast.utils.chapter;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.WorkerThread;
 import android.util.Log;
 
 import org.bottiger.podcast.BuildConfig;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.utils.id3reader.ID3Chapter;
 import org.bottiger.podcast.utils.id3reader.ID3Reader;
 import org.bottiger.podcast.utils.id3reader.ID3ReaderException;
 import org.bottiger.podcast.utils.id3reader.model.FrameHeader;
 import org.bottiger.podcast.utils.id3reader.model.TagHeader;
+import org.reactivestreams.Subscriber;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+
+import io.reactivex.Flowable;
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.Single;
+import io.reactivex.SingleObserver;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
 
 public class ChapterReader extends ID3Reader {
     private static final String TAG = "ID3ChapterReader";
@@ -24,6 +41,30 @@ public class ChapterReader extends ID3Reader {
 
 	private List<Chapter> chapters;
 	private ID3Chapter currentChapter;
+
+	@WorkerThread
+	public static Flowable<List<Chapter>> getChapters(@NonNull final IEpisode argEpisode) {
+
+		return Flowable.just(argEpisode).map(new Function<IEpisode, List<Chapter>>() {
+			@Override
+			public List<Chapter> apply(IEpisode argEpisode) throws Exception {
+
+				List<Chapter> chapters = new LinkedList<>();
+				ChapterReader reader = new ChapterReader();
+
+				try {
+					InputStream is = argEpisode.getUrl().openStream();
+					reader.readInputStream(is);
+					chapters = reader.getChapters();
+				} catch (ID3ReaderException | IOException e) {
+					VendorCrashReporter.handleException(e);
+					e.printStackTrace();
+				}
+
+				return chapters;
+			}
+		});
+	}
 
 	@Override
 	public int onStartTagHeader(TagHeader header) {

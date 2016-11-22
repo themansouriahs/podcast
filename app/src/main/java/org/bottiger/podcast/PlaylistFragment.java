@@ -19,6 +19,9 @@ import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.PlayerHelper;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.UIUtils;
+import org.bottiger.podcast.utils.chapter.Chapter;
+import org.bottiger.podcast.utils.chapter.ChapterReader;
+import org.bottiger.podcast.utils.id3reader.ID3ReaderException;
 import org.bottiger.podcast.views.CustomLinearLayoutManager;
 import org.bottiger.podcast.views.DownloadButtonView;
 import org.bottiger.podcast.views.ImageViewTinted;
@@ -92,6 +95,14 @@ import org.bottiger.podcast.views.TextViewObserver;
 import org.bottiger.podcast.views.TopPlayer;
 import org.bottiger.podcast.views.dialogs.DialogBulkDownload;
 import org.bottiger.podcast.views.dialogs.DialogPlaylistFilters;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.List;
 
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
