@@ -14,6 +14,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 import android.transition.Slide;
 import android.transition.Transition;
 import android.util.Log;
@@ -49,6 +50,10 @@ public class TopActivity extends AppCompatActivity {
 	
 	private static SharedPreferences prefs;
     private Menu mMenu;
+
+    static {
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+    }
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
