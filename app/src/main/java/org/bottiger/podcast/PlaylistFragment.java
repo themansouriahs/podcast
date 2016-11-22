@@ -44,6 +44,7 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -108,6 +109,7 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import wseemann.media.FFmpegMediaMetadataRetriever;
 
 import static org.bottiger.podcast.player.SoundWavesPlayerBase.STATE_READY;
 
@@ -357,6 +359,26 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
         final String description = item.getDescription();
 
         mEpisodeTitle.setText(title);
+
+        //
+        if (item.isDownloaded()) {
+            Uri test = null;
+            try {
+                test = Uri.parse(((FeedItem)item).getAbsolutePath());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            FFmpegMediaMetadataRetriever mmr = new FFmpegMediaMetadataRetriever();
+            mmr.setDataSource(mContext, test);
+            int chapterCount = Integer.parseInt(mmr.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_CHAPTER_COUNT));
+
+            for (int i = 0; i < chapterCount; i++) {
+                String title2 = mmr.extractMetadataFromChapter(FFmpegMediaMetadataRetriever.METADATA_KEY_TITLE, i);
+                if (title2 != null) {
+                    Log.d("MY_APP", title2);
+                }
+            }
+        }
 
         // FIXME: Trim can be remove from here very soon.
         mEpisodeInfo.setText(description.trim());

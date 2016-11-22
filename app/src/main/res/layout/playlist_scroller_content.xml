@@ -301,14 +301,29 @@
             </LinearLayout>
 
 
-        <org.bottiger.podcast.views.ImageViewTinted
-            android:id="@+id/session_photo"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="fitCenter"
-            android:adjustViewBounds="true"
-            android:layout_marginTop="10dp"
-            />
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp">
+
+                <org.bottiger.podcast.views.ImageViewTinted
+                    android:id="@+id/session_photo"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitCenter"
+                    android:adjustViewBounds="true"
+                />
+
+                <!--
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Test"
+                    android:visibility="gone"
+                    />
+                    -->
+
+            </FrameLayout>
 
         </LinearLayout>
 
