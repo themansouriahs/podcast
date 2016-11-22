@@ -176,19 +176,19 @@ dependencies {
 
     // Amazon version
     amazonCompile fileTree(dir: 'src/amazon/libs', include: ['*.jar'])
-    amazonCompile 'com.google.android.gms:play-services-cast:9.8.0'
-    amazonCompile 'com.google.android.gms:play-services-cast-framework:9.8.0'
-    amazonCompile 'com.google.android.gms:play-services-auth:9.8.0'
-    amazonCompile 'com.google.firebase:firebase-messaging:9.8.0'
+    amazonCompile 'com.google.android.gms:play-services-cast:10.0.0'
+    amazonCompile 'com.google.android.gms:play-services-cast-framework:10.0.0'
+    amazonCompile 'com.google.android.gms:play-services-auth:10.0.0'
+    amazonCompile 'com.google.firebase:firebase-messaging:10.0.0'
     // google cast
 
     // Play Store
-    googleCompile 'com.google.android.gms:play-services-analytics:9.8.0'
+    googleCompile 'com.google.android.gms:play-services-analytics:10.0.0'
     // analytics
-    googleCompile 'com.google.android.gms:play-services-cast:9.8.0'
-    googleCompile 'com.google.android.gms:play-services-cast-framework:9.8.0'
-    googleCompile 'com.google.android.gms:play-services-auth:9.8.0'
-    googleCompile 'com.google.firebase:firebase-messaging:9.8.0'
+    googleCompile 'com.google.android.gms:play-services-cast:10.0.0'
+    googleCompile 'com.google.android.gms:play-services-cast-framework:10.0.0'
+    googleCompile 'com.google.android.gms:play-services-auth:10.0.0'
+    googleCompile 'com.google.firebase:firebase-messaging:10.0.0'
     // google cast
     compile project(':soundwavescommon')
 }
