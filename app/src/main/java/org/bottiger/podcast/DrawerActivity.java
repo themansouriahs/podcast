@@ -195,42 +195,4 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity impleme
         return super.onOptionsItemSelected(item);
 	}
 
-    private void observeToolbarHeight(@NonNull final View argToolbarContainer) {
-
-        mVto = argToolbarContainer.getViewTreeObserver();
-
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            mVto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                @TargetApi(16)
-                public void onGlobalLayout() {
-                    argToolbarContainer.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                    setViewPagerTopPadding(argToolbarContainer);
-
-                }
-            });
-        } else {
-            mVto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-                    argToolbarContainer.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                    setViewPagerTopPadding(argToolbarContainer);
-
-                }
-            });
-        }
-    }
-
-    private void setViewPagerTopPadding(@NonNull final View argToolbar) {
-        mFragmentTopPosition = mToolbar.getHeight() + mSlidingTabLayout.getHeight(); //argToolbar.getTop();
-
-        if (mFragmentTopPosition > 0) {
-            for (TopFound topfound: listeners) {
-                // FIXME: ensure this is correct
-                topfound.topfound(mFragmentTopPosition);
-            }
-            listeners = new LinkedList<>();
-        }
-    }
-
 }

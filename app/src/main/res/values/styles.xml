@@ -49,7 +49,9 @@
 
         <!--<item name="android:actionBarStyle">@style/TransparentActionBar</item>-->
 
+        <!--
         <item name="android:windowTranslucentStatus" tools:targetApi="kitkat">false</item>
+        -->
         <item name="themeBackground">@color/white_opaque</item>
         <item name="themeTextColorPrimary">@color/pitch_black</item>
         <item name="themeTextColorFaded">@color/grayDark</item>
