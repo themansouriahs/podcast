@@ -42,30 +42,6 @@ public class ChapterReader extends ID3Reader {
 	private List<Chapter> chapters;
 	private ID3Chapter currentChapter;
 
-	@WorkerThread
-	public static Flowable<List<Chapter>> getChapters(@NonNull final IEpisode argEpisode) {
-
-		return Flowable.just(argEpisode).map(new Function<IEpisode, List<Chapter>>() {
-			@Override
-			public List<Chapter> apply(IEpisode argEpisode) throws Exception {
-
-				List<Chapter> chapters = new LinkedList<>();
-				ChapterReader reader = new ChapterReader();
-
-				try {
-					InputStream is = argEpisode.getUrl().openStream();
-					reader.readInputStream(is);
-					chapters = reader.getChapters();
-				} catch (ID3ReaderException | IOException e) {
-					VendorCrashReporter.handleException(e);
-					e.printStackTrace();
-				}
-
-				return chapters;
-			}
-		});
-	}
-
 	@Override
 	public int onStartTagHeader(TagHeader header) {
 		chapters = new ArrayList<Chapter>();

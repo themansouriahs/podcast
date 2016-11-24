@@ -343,6 +343,8 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
 
     private void bindHeader(@Nullable final IEpisode item) {
 
+        mTopPlayer.bind(item);
+
         if (item == null)
             return;
 
@@ -359,26 +361,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
         final String description = item.getDescription();
 
         mEpisodeTitle.setText(title);
-
-        //
-        if (item.isDownloaded()) {
-            Uri test = null;
-            try {
-                test = Uri.parse(((FeedItem)item).getAbsolutePath());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            FFmpegMediaMetadataRetriever mmr = new FFmpegMediaMetadataRetriever();
-            mmr.setDataSource(mContext, test);
-            int chapterCount = Integer.parseInt(mmr.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_CHAPTER_COUNT));
-
-            for (int i = 0; i < chapterCount; i++) {
-                String title2 = mmr.extractMetadataFromChapter(FFmpegMediaMetadataRetriever.METADATA_KEY_TITLE, i);
-                if (title2 != null) {
-                    Log.d("MY_APP", title2);
-                }
-            }
-        }
 
         // FIXME: Trim can be remove from here very soon.
         mEpisodeInfo.setText(description.trim());

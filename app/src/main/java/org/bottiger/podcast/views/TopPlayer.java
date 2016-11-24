@@ -9,6 +9,7 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
@@ -29,6 +30,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -54,15 +56,26 @@ import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorUtils;
+import org.bottiger.podcast.utils.ErrorUtils;
 import org.bottiger.podcast.utils.PlaybackSpeed;
 import org.bottiger.podcast.utils.UIUtils;
+import org.bottiger.podcast.utils.chapter.Chapter;
+import org.bottiger.podcast.utils.chapter.ChapterUtil;
+import org.bottiger.podcast.utils.rxbus.RxBasicSubscriber;
 import org.bottiger.podcast.utils.rxbus.RxBusSimpleEvents;
 import org.bottiger.podcast.views.dialogs.DialogPlaybackSpeed;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 
 import java.util.Calendar;
+import java.util.List;
 
+import io.reactivex.Scheduler;
+import io.reactivex.SingleObserver;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
+import rx.functions.Func0;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 import static org.bottiger.podcast.views.PlayerButtonView.StaticButtonColor;
@@ -99,16 +112,21 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
     private String mDoDisplayTextKey;
     private boolean mDoDisplayText = false;
 
-    private int mCenterSquareMarginTop = -1;
+    @ColorInt private int mTextColor = Color.BLACK;
 
     private TopPlayer Layout;
     private LinearLayout mControls;
     private PlayPauseImageView mPlayPauseButton;
 
-    private PlayerButtonView mFullscreenButton;
-    private PlayerButtonView mSleepButton;
-    private PlayerButtonView mChapterButton;
-    private Button mSpeedButton;
+    @Nullable private ViewStub mMoreButtonsStub;
+    @Nullable private LinearLayout mExpandedActionsBar;
+    @Nullable private PlayerButtonView mFullscreenButton;
+    @Nullable private PlayerButtonView mSleepButton;
+    @Nullable private PlayerButtonView mChapterButton;
+    @Nullable private Button mSpeedButton;
+
+    @Nullable private ViewStub mStubChaptersList;
+
     private PlayerButtonView mDownloadButton;
     private MaterialFavoriteButton mFavoriteButton;
     private ImageView mFastForwardButton;
@@ -117,7 +135,6 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
     private PlayerSeekbar mPlayerSeekbar;
 
     private View mTriangle;
-    private LinearLayout mExpandedActionsBar;
 
     private ImageViewTinted mPhoto;
 
@@ -131,6 +148,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
     private @ColorInt int mBackgroundColor = -1;
 
     private SharedPreferences prefs;
+    public ScrollerCompat mScroller;
 
     private class PlayerLayoutParameter {
         public int SeekBarLeftMargin;
@@ -250,10 +268,6 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         getPlayerControlHeight(mControls);
 
         mPlayPauseButton = (PlayPauseImageView) findViewById(R.id.playpause);
-        mFullscreenButton = (PlayerButtonView) findViewById(R.id.fullscreen_button);
-        mSleepButton = (PlayerButtonView) findViewById(R.id.sleep_button);
-        mChapterButton = (PlayerButtonView) findViewById(R.id.chapter_button);
-        mSpeedButton = (Button) findViewById(R.id.speed_button);
         mDownloadButton = (PlayerButtonView) findViewById(R.id.download);
         mFavoriteButton = (MaterialFavoriteButton) findViewById(R.id.favorite);
         mFastForwardButton = (ImageView) findViewById(R.id.top_player_fastforward);
@@ -262,27 +276,15 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         mMoreButton = (ImageButton) findViewById(R.id.player_more_button);
         mPlayerSeekbar = (PlayerSeekbar) findViewById(R.id.top_player_seekbar);
 
+        mMoreButtonsStub = (ViewStub) findViewById(R.id.stub_expanded_action_bar);
+
         mTriangle = findViewById(R.id.visual_triangle);
-        mExpandedActionsBar = (LinearLayout) findViewById(R.id.expanded_action_bar);
-
-
 
         int mPlayPauseLargeSize = mPlayPauseButton.getLayoutParams().height;
         mPlayPauseButton.setIconColor(Color.WHITE);
 
-        mCenterSquareMarginTop = (int)getResources().getDimension(R.dimen.top_player_center_square_margin_top);
-
         mLargeLayout.SeekBarLeftMargin = 0;
         mLargeLayout.PlayPauseSize = mPlayPauseLargeSize;
-
-        mSleepButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sleepButtonPressed();
-            }
-        });
-
-        mChapterButton.setVisibility(GONE);
 
         final PlayerService ps = PlayerService.getInstance();
 
@@ -294,28 +296,14 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         setPlaylistEmpty(isRecyclerViewEmpty);
 
         if (mDoDisplayText) {
-            showText();
+            //showText();
+            onClickMoreButton(mMoreButton);
         }
 
         mMoreButton.setOnClickListener(new OnClickListener() {
             @Override
-            public void onClick(View v) {
-                try {
-                    mDoDisplayText = !mDoDisplayText;
-                    if (Build.VERSION.SDK_INT >= 19) {
-                        TransitionManager.beginDelayedTransition(Layout, UIUtils.getDefaultTransition(getResources()));
-                    }
-
-                    if (mDoDisplayText) {
-                        Log.d(TAG, "ShowText");
-                        showText();
-                    } else {
-                        Log.d(TAG, "HideText");
-                        hideText();
-                    }
-                } finally {
-                    prefs.edit().putBoolean(mDoDisplayTextKey, mDoDisplayText).apply();
-                }
+            public void onClick(View argView) {
+                onClickMoreButton(argView);
             }
         });
 
@@ -354,34 +342,6 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
                 }
             }
         });
-
-        mFullscreenButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    mFullscreen = !mFullscreen;
-                    setFullscreen(mFullscreen, true);
-                } finally {
-                    prefs.edit().putBoolean(mDoFullscreentKey, mFullscreen).apply();
-                }
-            }
-        });
-
-        int visibility = SoundWaves.getAppContext(getContext()).getPlayer().canSetSpeed() ? View.VISIBLE : View.GONE;
-        mSpeedButton.setVisibility(visibility);
-
-        GenericMediaPlayerInterface player = SoundWaves.getAppContext(getContext()).getPlayer();
-        float speedMultiplier = player.getCurrentSpeedMultiplier();
-        setPlaybackSpeedView(speedMultiplier);
-
-        mSpeedButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MainActivity activity = ((MainActivity)getContext());
-                DialogPlaybackSpeed dialogPlaybackSpeed = DialogPlaybackSpeed.newInstance(DialogPlaybackSpeed.EPISODE);
-                dialogPlaybackSpeed.show(activity.getFragmentManager(), DialogPlaybackSpeed.class.getName());
-            }
-        });
     }
 
     @Override
@@ -392,9 +352,17 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
                 .ofType(RxBusSimpleEvents.PlaybackEngineChanged.class)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .filter(new Func1<RxBusSimpleEvents.PlaybackEngineChanged, Boolean>() {
+                    @Override
+                    public Boolean call(RxBusSimpleEvents.PlaybackEngineChanged playbackEngineChanged) {
+                        return mSpeedButton != null;
+                    }
+                })
                 .subscribe(new Action1<RxBusSimpleEvents.PlaybackEngineChanged>() {
                     @Override
                     public void call(RxBusSimpleEvents.PlaybackEngineChanged event) {
+                        assert  mSpeedButton != null;
+
                         mSpeedButton.setText(getContext().getString(R.string.speed_multiplier, event.speed));
                     }
                 }, new Action1<Throwable>() {
@@ -441,6 +409,39 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
 
         int onemin = 1000 * 60;
         ps.getPlayer().FaceOutAndStop(onemin*minutes);
+    }
+
+    public void bind(@Nullable IEpisode argEpisode) {
+
+        if (argEpisode == null)
+            return;
+
+        ChapterUtil.getChapters(mContext, argEpisode)
+                .subscribeOn(io.reactivex.schedulers.Schedulers.io())
+                .observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
+                .subscribe(new RxBasicSubscriber<List<Chapter>>() {
+                    @Override
+                    public void onNext(List<Chapter> chapters) {
+
+                        int chapterVisibility = chapters.isEmpty() ? GONE : VISIBLE;
+
+                        if (mChapterButton != null) {
+                            mChapterButton.setVisibility(chapterVisibility);
+                        }
+
+                        if (chapters.isEmpty()) {
+                            return;
+                        }
+
+                        Log.d(TAG, "chapters: " + chapters.size());
+                        bindChapters(chapters);
+                    }
+                });
+
+    }
+
+    private void bindChapters(List<Chapter> argChapters) {
+
     }
 
     private void openTimePicker(View argView) {
@@ -629,7 +630,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
 
     @Override
     public void onPaletteFound(Palette argChangedPalette) {
-        int textColor = ColorUtils.getTextColor(getContext());
+        mTextColor = ColorUtils.getTextColor(getContext());
         int color = ColorUtils.getBackgroundColor(getContext());
         mBackgroundColor = StaticButtonColor(mContext, argChangedPalette, color);
         @ColorInt int bgcolor = ContextCompat.getColor(getContext(), R.color.playlist_background);
@@ -642,11 +643,9 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         //mPlayPauseButton.setColor(argChangedPalette.getDarkVibrantColor(playcolor));
         mPlayPauseButton.onPaletteFound(argChangedPalette);
 
-        ColorUtils.tintButton(mFavoriteButton,    textColor);
-        ColorUtils.tintButton(mDownloadButton,    textColor);
-        ColorUtils.tintButton(mSpeedButton,      textColor);
-        ColorUtils.tintButton(mFullscreenButton,  textColor);
-
+        ColorUtils.tintButton(mFavoriteButton,    mTextColor);
+        ColorUtils.tintButton(mDownloadButton,    mTextColor);
+        tintInflatedButtons();
 
         invalidate();
     }
@@ -733,8 +732,94 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         return mFullscreen;
     }
 
-    private boolean mIsDragging = false;
-    private boolean mStartDragging = false;
+    private synchronized void onClickMoreButton(@NonNull View argView) {
+
+        if (mMoreButtonsStub != null) {
+            View inflated = mMoreButtonsStub.inflate();
+            mMoreButtonsStub = null;
+
+            mFullscreenButton = (PlayerButtonView) inflated.findViewById(R.id.fullscreen_button);
+            mSleepButton = (PlayerButtonView) inflated.findViewById(R.id.sleep_button);
+            mChapterButton = (PlayerButtonView) inflated.findViewById(R.id.chapter_button);
+            mSpeedButton = (Button) inflated.findViewById(R.id.speed_button);
+            mExpandedActionsBar = (LinearLayout) inflated.findViewById(R.id.expanded_action_bar);
+
+            initExpandedButtons();
+        }
+
+        try {
+            mDoDisplayText = !mDoDisplayText;
+            if (Build.VERSION.SDK_INT >= 19) {
+                TransitionManager.beginDelayedTransition(Layout, UIUtils.getDefaultTransition(getResources()));
+            }
+
+            if (mDoDisplayText) {
+                Log.d(TAG, "ShowText");
+                showText();
+            } else {
+                Log.d(TAG, "HideText");
+                hideText();
+            }
+        } finally {
+            prefs.edit().putBoolean(mDoDisplayTextKey, mDoDisplayText).apply();
+        }
+    }
+
+    private void tintInflatedButtons() {
+        if (mSpeedButton != null) {
+            ColorUtils.tintButton(mSpeedButton, mTextColor);
+        }
+
+        if (mFullscreenButton != null) {
+            ColorUtils.tintButton(mFullscreenButton, mTextColor);
+        }
+    }
+
+    private void initExpandedButtons() {
+        assert mSleepButton != null;
+        assert mChapterButton != null;
+        assert mSpeedButton != null;
+        assert mFullscreenButton != null;
+
+        tintInflatedButtons();
+
+        mSleepButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sleepButtonPressed();
+            }
+        });
+
+        mChapterButton.setVisibility(GONE);
+
+        int visibility = SoundWaves.getAppContext(getContext()).getPlayer().canSetSpeed() ? View.VISIBLE : View.GONE;
+        mSpeedButton.setVisibility(visibility);
+
+        GenericMediaPlayerInterface player = SoundWaves.getAppContext(getContext()).getPlayer();
+        float speedMultiplier = player.getCurrentSpeedMultiplier();
+        setPlaybackSpeedView(speedMultiplier);
+
+        mSpeedButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MainActivity activity = ((MainActivity)getContext());
+                DialogPlaybackSpeed dialogPlaybackSpeed = DialogPlaybackSpeed.newInstance(DialogPlaybackSpeed.EPISODE);
+                dialogPlaybackSpeed.show(activity.getFragmentManager(), DialogPlaybackSpeed.class.getName());
+            }
+        });
+
+        mFullscreenButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    mFullscreen = !mFullscreen;
+                    setFullscreen(mFullscreen, true);
+                } finally {
+                    prefs.edit().putBoolean(mDoFullscreentKey, mFullscreen).apply();
+                }
+            }
+        });
+    }
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
@@ -798,8 +883,6 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         Log.d(TAG, "onScroll: ignore: diffY: " + diffY);
         return true;
     }
-
-    public ScrollerCompat mScroller;
 
     class TopPLayerScrollGestureListener extends GestureDetector.SimpleOnGestureListener {
 
