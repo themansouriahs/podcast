@@ -230,6 +230,7 @@
     <string name="web_scanner_instrcution_title">Listen using your desktop computer</string>
     <string name="web_scanner_instructions"><![CDATA[1) Go to web.soundwavesapp.com<br />2) Scan the QR code]]></string>
     <string name="web_scanner_qr_scanned">Scanned. Logging in.</string>
+    <string name="player_chapters_title">Chapters</string>
 
     <plurals name="player_sleep">
         <item quantity="one">Player will sleep in %d minute</item>

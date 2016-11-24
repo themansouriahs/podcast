@@ -5,7 +5,7 @@
     android:id="@+id/expanded_action_bar"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:elevation="5dp"
+    android:elevation="@dimen/player_elevation"
     android:background="@color/white_opaque"
     android:layout_below="@+id/visual_triangle"
     android:layout_marginBottom="10dp"
@@ -42,12 +42,18 @@
         android:elevation="@dimen/player_elevation"
         style="@style/TopPlayerButton" />
 
-    <org.bottiger.podcast.views.PlayerButtonView
+    <ImageView
+        android:layout_width="wrap_content"
         android:id="@+id/chapter_button"
-        android:padding="0dip"
+        android:paddingLeft="0dip"
+        android:paddingRight="10dp"
+        android:padding="5dip"
+        android:gravity="left|center_vertical"
         app:srcCompat="?attr/bookmark_inv"
         android:elevation="@dimen/player_elevation"
         style="@style/TopPlayerButton" />
+    <!--
+        app:srcCompat="?attr/bookmark_inv" -->
 
 
     <org.bottiger.podcast.views.PlayerButtonView

@@ -7,10 +7,13 @@ import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.bottiger.podcast.utils.chapter.Chapter;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.net.URL;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by apl on 21-04-2015.
@@ -36,6 +39,10 @@ public interface IEpisode {
     Date getDateTime();
     Date getCreatedAt();
     long getFilesize();
+
+    void setChapters(@NonNull List<Chapter> argChapters);
+    @NonNull List<Chapter> getChapters();
+    boolean hasChapters();
 
     void setTitle(@NonNull String argTitle);
     void setUrl(@NonNull URL argUrl);

@@ -19,6 +19,8 @@ import android.support.v4.view.ScrollingView;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ScrollerCompat;
 import android.support.v7.graphics.Palette;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.transition.ChangeBounds;
 import android.transition.Scene;
 import android.transition.Transition;
@@ -43,20 +45,17 @@ import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.adapters.PlayerChapterAdapter;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.player.GenericMediaPlayerInterface;
 
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
-import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PaletteListener;
-import org.bottiger.podcast.player.SoundWavesPlayer;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorUtils;
-import org.bottiger.podcast.utils.ErrorUtils;
 import org.bottiger.podcast.utils.PlaybackSpeed;
 import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.utils.chapter.Chapter;
@@ -64,17 +63,12 @@ import org.bottiger.podcast.utils.chapter.ChapterUtil;
 import org.bottiger.podcast.utils.rxbus.RxBasicSubscriber;
 import org.bottiger.podcast.utils.rxbus.RxBusSimpleEvents;
 import org.bottiger.podcast.views.dialogs.DialogPlaybackSpeed;
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
 
 import java.util.Calendar;
 import java.util.List;
 
-import io.reactivex.Scheduler;
-import io.reactivex.SingleObserver;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import rx.functions.Func0;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
@@ -112,7 +106,12 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
     private String mDoDisplayTextKey;
     private boolean mDoDisplayText = false;
 
+    private String mDoDisplayChaptersKey;
+    private boolean mDoDisplayChapters = false;
+
     @ColorInt private int mTextColor = Color.BLACK;
+
+    @Nullable IEpisode mCurrentEpisode;
 
     private TopPlayer Layout;
     private LinearLayout mControls;
@@ -122,10 +121,14 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
     @Nullable private LinearLayout mExpandedActionsBar;
     @Nullable private PlayerButtonView mFullscreenButton;
     @Nullable private PlayerButtonView mSleepButton;
-    @Nullable private PlayerButtonView mChapterButton;
+    @Nullable private ImageView mChapterButton;
     @Nullable private Button mSpeedButton;
 
     @Nullable private ViewStub mStubChaptersList;
+    @Nullable private View mChapterList;
+    @Nullable private RecyclerView mChapterRecyclerView;
+    @Nullable private RecyclerView.Adapter mAdapter;
+    @Nullable private RecyclerView.LayoutManager mLayoutManager;
 
     private PlayerButtonView mDownloadButton;
     private MaterialFavoriteButton mFavoriteButton;
@@ -204,6 +207,9 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         mDoFullscreentKey = argContext.getResources().getString(R.string.pref_top_player_fullscreen_key);
         mFullscreen = prefs.getBoolean(mDoFullscreentKey, mFullscreen);
 
+        mDoDisplayChaptersKey = argContext.getResources().getString(R.string.pref_top_player_display_chapters_key);
+        mDoDisplayChapters = prefs.getBoolean(mDoDisplayChaptersKey, mDoDisplayChapters);
+
         sizeShrinkBuffer = (int) UIUtils.convertDpToPixel(400, argContext);
         sScreenHeight = UIUtils.getScreenHeight(argContext);
 
@@ -277,6 +283,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         mPlayerSeekbar = (PlayerSeekbar) findViewById(R.id.top_player_seekbar);
 
         mMoreButtonsStub = (ViewStub) findViewById(R.id.stub_expanded_action_bar);
+        mStubChaptersList = (ViewStub) findViewById(R.id.stub_chapters_list);
 
         mTriangle = findViewById(R.id.visual_triangle);
 
@@ -393,7 +400,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         UIUtils.disPlayBottomSnackBar(this.getRootView(), toast, new OnClickListener() {
             @Override
             public void onClick(View view) {
-                openTimePicker(view);
+                openTimePicker();
             }
         }, R.string.snackbar_change, true);
     }
@@ -411,7 +418,9 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         ps.getPlayer().FaceOutAndStop(onemin*minutes);
     }
 
-    public void bind(@Nullable IEpisode argEpisode) {
+    public void bind(@Nullable final IEpisode argEpisode) {
+
+        mCurrentEpisode = argEpisode;
 
         if (argEpisode == null)
             return;
@@ -423,28 +432,20 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
                     @Override
                     public void onNext(List<Chapter> chapters) {
 
-                        int chapterVisibility = chapters.isEmpty() ? GONE : VISIBLE;
+                        argEpisode.setChapters(chapters);
 
                         if (mChapterButton != null) {
-                            mChapterButton.setVisibility(chapterVisibility);
-                        }
-
-                        if (chapters.isEmpty()) {
-                            return;
+                            bindChapterButton(mChapterButton, argEpisode);
                         }
 
                         Log.d(TAG, "chapters: " + chapters.size());
-                        bindChapters(chapters);
+                        bindChapters();
                     }
                 });
 
     }
 
-    private void bindChapters(List<Chapter> argChapters) {
-
-    }
-
-    private void openTimePicker(View argView) {
+    private void openTimePicker() {
 
         Calendar rightNow = Calendar.getInstance();
 
@@ -740,7 +741,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
 
             mFullscreenButton = (PlayerButtonView) inflated.findViewById(R.id.fullscreen_button);
             mSleepButton = (PlayerButtonView) inflated.findViewById(R.id.sleep_button);
-            mChapterButton = (PlayerButtonView) inflated.findViewById(R.id.chapter_button);
+            mChapterButton = (ImageView) inflated.findViewById(R.id.chapter_button);
             mSpeedButton = (Button) inflated.findViewById(R.id.speed_button);
             mExpandedActionsBar = (LinearLayout) inflated.findViewById(R.id.expanded_action_bar);
 
@@ -765,6 +766,52 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         }
     }
 
+    private void toggleChapters() {
+        View view = inflatedChapterView();
+
+        try {
+            mDoDisplayChapters = !mDoDisplayChapters;
+            int Chaptersvisibility = mDoDisplayChapters ? VISIBLE : GONE;
+            int photoVisibility = !mDoDisplayChapters ? VISIBLE : GONE;
+            view.setVisibility(Chaptersvisibility);
+            mPhoto.setVisibility(photoVisibility);
+        } finally {
+            prefs.edit().putBoolean(mDoDisplayChaptersKey, mDoDisplayChapters).apply();
+        }
+    }
+
+    private void bindChapters() {
+        assert mCurrentEpisode != null;
+        assert mChapterRecyclerView != null;
+
+        if (mChapterList == null) {
+            return;
+        }
+
+        mAdapter = new PlayerChapterAdapter(mCurrentEpisode.getChapters());
+        mLayoutManager = new LinearLayoutManager(mContext);
+
+        mChapterRecyclerView.setHasFixedSize(true);
+        mChapterRecyclerView.setLayoutManager(mLayoutManager);
+        mChapterRecyclerView.setAdapter(mAdapter);
+    }
+
+    @NonNull
+    private View inflatedChapterView() {
+        if (mChapterList != null)
+            return mChapterList;
+
+        assert mStubChaptersList != null;
+
+        mChapterList = mStubChaptersList.inflate();
+        mChapterRecyclerView = (RecyclerView) mChapterList.findViewById(R.id.chapter_recycler_view);
+        mStubChaptersList = null;
+
+        bindChapters();
+
+        return mChapterList;
+    }
+
     private void tintInflatedButtons() {
         if (mSpeedButton != null) {
             ColorUtils.tintButton(mSpeedButton, mTextColor);
@@ -775,6 +822,11 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         }
     }
 
+    private void bindChapterButton(@NonNull View argChapterButton, @Nullable IEpisode argEpisode) {
+        int chapterVisibility = argEpisode != null && argEpisode.hasChapters() ? VISIBLE : GONE;
+        argChapterButton.setVisibility(chapterVisibility);
+    }
+
     private void initExpandedButtons() {
         assert mSleepButton != null;
         assert mChapterButton != null;
@@ -783,6 +835,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
 
         tintInflatedButtons();
 
+        // Sleep buttons
         mSleepButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -790,7 +843,14 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
             }
         });
 
-        mChapterButton.setVisibility(GONE);
+        // Chapter button
+        bindChapterButton(mChapterButton, mCurrentEpisode);
+        mChapterButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toggleChapters();
+            }
+        });
 
         int visibility = SoundWaves.getAppContext(getContext()).getPlayer().canSetSpeed() ? View.VISIBLE : View.GONE;
         mSpeedButton.setVisibility(visibility);
