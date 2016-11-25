@@ -1,5 +1,6 @@
 package org.bottiger.podcast.utils.rxbus;
 
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.processors.PublishProcessor;
 import io.reactivex.processors.ReplayProcessor;
@@ -16,6 +17,10 @@ public final class RxBus2 {
 
     public Observable<Object> toObservable() {
         return this.mBus.toObservable();
+    }
+
+    public Flowable<Object> toFlowable() {
+        return this.mBus;
     }
 
     public boolean hasSubscribers() {

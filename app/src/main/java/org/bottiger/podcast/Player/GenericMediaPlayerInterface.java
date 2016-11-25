@@ -72,6 +72,8 @@ public interface GenericMediaPlayerInterface {
     void setDataSource(Context context, Uri uri) throws IllegalArgumentException, IllegalStateException, IOException;
     void setPlaybackSpeed(float f);
 
+    IEpisode getEpisode();
+
     // For registering listeners
     interface OnBufferingUpdateListener {
         void onBufferingUpdate(GenericMediaPlayerInterface arg0, int percent);

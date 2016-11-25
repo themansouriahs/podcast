@@ -294,4 +294,8 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
 
         return dataSource;
     }
+
+    public IEpisode getEpisode() {
+        return PlayerService.getCurrentItem();
+    }
 }

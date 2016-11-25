@@ -26,6 +26,7 @@ import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.listeners.PaletteListener;
+import org.bottiger.podcast.player.GenericMediaPlayerInterface;
 import org.bottiger.podcast.player.SoundWavesPlayerBase;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
@@ -39,7 +40,7 @@ import static org.bottiger.podcast.player.SoundWavesPlayerBase.STATE_READY;
  */
 public class PlayerSeekbar extends SeekBar implements PaletteListener, ExoPlayer.EventListener {
 
-    private static final String TAG = "PlayerSeekbar";
+    private static final String TAG = PlayerSeekbar.class.getSimpleName();
     private static final int RANGE_MAX = 1000;
 
     private boolean mPaintSeekInfo = false;
@@ -64,13 +65,6 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener, ExoPlayer
     private CoordinatorLayout.LayoutParams params = new CoordinatorLayout.LayoutParams(0 ,0);
     private int[] loc = new int[2];
 
-    // For the Chronometer
-    private boolean mVisible;
-    private boolean mStarted;
-    private boolean mRunning;
-
-    private static final int TICK_WHAT = 2;
-
     private OnSeekBarChangeListener onSeekBarChangeListener = new OnSeekBarChangeListener() {
 
         private final int cDrawThresshold = 10;
@@ -88,14 +82,13 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener, ExoPlayer
                 return;
             }
 
-            long timeMs = mEpisode.getDuration() * seekBar.getProgress()
-                    / RANGE_MAX;
+            long timeMs = mEpisode.getDuration() * seekBar.getProgress() / RANGE_MAX;
 
             IEpisode currentTopEpisode = PlayerService.getCurrentItem(getContext());
             if (mEpisode.equals(currentTopEpisode)) {
-                PlayerService.getInstance().seek(timeMs);
+                SoundWaves.getAppContext(getContext()).getPlayer().seekTo(timeMs);
             } else {
-                mEpisode.setOffset(getContext().getContentResolver(), timeMs);
+                mEpisode.setOffset(timeMs);
                 setProgressMs(timeMs);
             }
 
@@ -118,9 +111,8 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener, ExoPlayer
             mThressholdCounter = cDrawThresshold;
             mStartSeekPosition = seekBar.getProgress();
 
-            long timeMs = mEpisode.getDuration() * seekBar.getProgress()
-                    / RANGE_MAX;
-            mEpisode.setOffset(null, timeMs);
+            long timeMs = mEpisode.getDuration() * seekBar.getProgress() / RANGE_MAX;
+            mEpisode.setOffset(timeMs);
         }
 
         @Override
@@ -394,6 +386,42 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener, ExoPlayer
         return mIsTouching;
     }
 
+
+    // For the Chronometer
+    private boolean mVisible;
+    private boolean mStarted;
+    private boolean mRunning;
+    private static final int TICK_WHAT = 2;
+
+    private void updateRunning() {
+        if (shouldUpdate(getContext(), getEpisode())) {
+            setProgressMs(SoundWaves.getAppContext(getContext()).getPlayer().getCurrentPosition());
+            //mHandler.sendMessageDelayed(Message.obtain(mHandler, TICK_WHAT), 1000);
+            postDelayed(mTickRunnable, 1000);
+        } else {
+            removeCallbacks(mTickRunnable);
+        }
+    }
+
+    private final Runnable mTickRunnable = new Runnable() {
+        @Override
+        public void run() {
+            GenericMediaPlayerInterface player = SoundWaves.getAppContext(getContext()).getPlayer();
+            if (shouldUpdate(getContext(), getEpisode())) {
+                setProgressMs(player.getCurrentPosition());
+                //dispatchChronometerTick();
+                postDelayed(mTickRunnable, 1000);
+            }
+        }
+    };
+
+    private static boolean shouldUpdate(@NonNull Context argContext, @Nullable IEpisode argEpisode) {
+        GenericMediaPlayerInterface player = SoundWaves.getAppContext(argContext).getPlayer();
+        boolean playingThis = (argEpisode != null && argEpisode.equals(player.getEpisode()));
+
+        return PlayerService.isPlaying() && playingThis;
+    }
+
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, @SoundWavesPlayerBase.PlayerState int playbackState) {
         if (!validateState()) {
@@ -414,32 +442,9 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener, ExoPlayer
         if (mIsPlaying) {
             float progress = currentPositionMs / mEpisode.getDuration() * RANGE_MAX;
             setProgress((int) progress);
+            updateRunning();
         }
     }
-
-
-    private void updateRunning() {
-        boolean running = mVisible && mStarted;
-        if (running != mIsPlaying) {
-            if (running) {
-                setProgressMs(SoundWaves.getAppContext(getContext()).getPlayer().getCurrentPosition());
-                mHandler.sendMessageDelayed(Message.obtain(mHandler, TICK_WHAT), 1000);
-            } else {
-                mHandler.removeMessages(TICK_WHAT);
-            }
-            mIsPlaying = running;
-        }
-    }
-
-    private Handler mHandler = new Handler() {
-        public void handleMessage(Message m) {
-            if (mIsPlaying) {
-                //updateText(SystemClock.elapsedRealtime());
-                setProgressMs(SoundWaves.getAppContext(getContext()).getPlayer().getCurrentPosition());
-                sendMessageDelayed(Message.obtain(this, TICK_WHAT), 1000);
-            }
-        }
-    };
 
     @Override
     public void onLoadingChanged(boolean isLoading) {

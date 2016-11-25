@@ -40,7 +40,7 @@ public class PlayerStatusObservable {
     }
 
     private static void updateProgress(@NonNull PlayerService argPlayerService) {
-
+        
         IEpisode currentItem = PlayerService.getCurrentItem();
 
         if (currentItem instanceof FeedItem) {
@@ -49,7 +49,7 @@ public class PlayerStatusObservable {
 
             feedItem.setPosition(offset, false);
 
-            PlayerStatusProgressData pspd = new PlayerStatusProgressData(feedItem.getOffset());
+            PlayerStatusProgressData pspd = new PlayerStatusProgressData(feedItem);
             SoundWaves.getRxBus2().send(pspd);
         }
     }

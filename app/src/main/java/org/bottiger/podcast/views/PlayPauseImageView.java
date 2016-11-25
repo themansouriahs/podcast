@@ -68,6 +68,7 @@ import io.reactivex.SingleOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subscribers.ResourceSubscriber;
 
@@ -79,9 +80,9 @@ import static org.bottiger.podcast.player.SoundWavesPlayerBase.STATE_READY;
  * TODO: document your custom view class.
  */
 public class PlayPauseImageView extends PlayPauseView implements PaletteListener,
-                                                             DownloadObserver,
-                                                             View.OnClickListener,
-                                                            ExoPlayer.EventListener {
+                                                                DownloadObserver,
+                                                                View.OnClickListener,
+                                                                ExoPlayer.EventListener {
 
     private static final String TAG = "PlayPauseImageView";
 
@@ -191,11 +192,16 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
         setOnClickListener(this);
 
         mRxDisposable = SoundWaves.getRxBus2()
-                .toObservable()
-                .toFlowable(BackpressureStrategy.LATEST)
+                .toFlowable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .ofType(PlayerStatusProgressData.class)
+                .filter(new Predicate<PlayerStatusProgressData>() {
+                    @Override
+                    public boolean test(PlayerStatusProgressData playerStatusProgressData) throws Exception {
+                        return playerStatusProgressData.getEpisode().equals(getEpisode());
+                    }
+                })
                 .subscribe(new Consumer<PlayerStatusProgressData>() {
                     public void accept(PlayerStatusProgressData playerStatusProgressData){
                         setProgressMs(playerStatusProgressData);
@@ -231,9 +237,7 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
         this.mLocation = argLocation;
         this.mEpisode = argEpisode;
 
-
-        long offset = mEpisode instanceof FeedItem && ((FeedItem)mEpisode).offset > 0 ? ((FeedItem)mEpisode).offset : 0;
-        setProgressMs(new PlayerStatusProgressData(offset));
+        setProgressMs(new PlayerStatusProgressData(mEpisode));
     }
 
     public synchronized void unsetEpisodeId() {
@@ -414,7 +418,9 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
 
         // copy from seekbar
 
-        if (argPlayerProgress.progressMs < 0) {
+        long progressMs = argPlayerProgress.getProgress();
+
+        if (progressMs < 0) {
             if (BuildConfig.DEBUG) {
                 throw new IllegalStateException("Progress must be positive");
             }
@@ -435,7 +441,7 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
         }
 
         try {
-            progress = argPlayerProgress.progressMs / duration * 100;
+            progress = progressMs / duration * 100;
         } catch (Exception e) {
             e.printStackTrace();
         }
