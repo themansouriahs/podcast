@@ -16,6 +16,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.WeakReference;
 
+import io.reactivex.processors.PublishProcessor;
+
 public class PlayerStatusObservable {
 
     /**
@@ -65,6 +67,7 @@ public class PlayerStatusObservable {
 
         // http://stackoverflow.com/questions/11407943/this-handler-class-should-be-static-or-leaks-might-occur-incominghandler
         private final WeakReference<PlayerService> mService;
+        private long lastPosition = -1;
 
         ProgressHandler(PlayerService service) {
             mService = new WeakReference<>(service);
@@ -79,6 +82,8 @@ public class PlayerStatusObservable {
                 switch (inputMessage.what) {
                     case PLAYING: {
                         updateProgress(service);
+                        service.updateChapter(lastPosition);
+                        lastPosition = service.position();
 
                         int currentStatus = PlayerService.isPlaying() || service.getPlayer().isCasting() ? PLAYING : STOPPED;
                         inputMessage = sHandler.obtainMessage(currentStatus);

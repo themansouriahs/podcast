@@ -15,6 +15,8 @@ import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.utils.PlaybackSpeed;
+import org.bottiger.podcast.utils.chapter.Chapter;
+import org.bottiger.podcast.utils.chapter.ChapterUtil;
 import org.bottiger.podcast.widgets.SoundWavesWidgetProvider;
 
 
@@ -49,6 +51,13 @@ import java.net.URL;
 import java.util.List;
 
 import javax.annotation.Nullable;
+
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.processors.BehaviorProcessor;
+import io.reactivex.processors.FlowableProcessor;
+import io.reactivex.processors.PublishProcessor;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * The service which handles the audio extended_player. This is responsible for playing
@@ -531,6 +540,22 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 	public PlayerStateManager getPlayerStateManager() {
 		return mPlayerStateManager;
+	}
+
+	public void updateChapter(long lastPosition) {
+
+		FlowableProcessor<Integer> chapterProcessor = SoundWaves.getAppContext(this).getChapterProcessor();
+		if (!chapterProcessor.hasSubscribers())
+			return;
+
+		IEpisode episode = SoundWaves.getAppContext(this).getPlaylist().first();
+		long currentPosition = position();
+		Integer lastChapterIndex = ChapterUtil.getCurrentChapterIndex(episode, lastPosition);
+		Integer currentChapterIndex = ChapterUtil.getCurrentChapterIndex(episode, currentPosition);
+
+		if (currentChapterIndex != null && !currentChapterIndex.equals(lastChapterIndex)) {
+			chapterProcessor.onNext(currentChapterIndex);
+		}
 	}
 
 	private static float getPlaybackSpeed(@NonNull Context argContext, @NonNull IEpisode argEpisode) {

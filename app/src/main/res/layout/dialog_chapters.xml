@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:animateLayoutChanges="true"
+    android:padding="32dp">
+
+    <TextView
+        android:id="@+id/dialog_chapter_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/player_chapters_title"
+        style="@style/TextAppearance.AppCompat.Title"
+        android:layout_marginBottom="24dp"
+        />
+
+    <android.support.v4.widget.ContentLoadingProgressBar
+        android:id="@+id/chapter_progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:layout_below="@id/dialog_chapter_title"
+        android:layout_centerInParent="true"
+        android:visibility="visible" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/chapter_recycler_view"
+        android:scrollbars="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/dialog_chapter_title"
+        android:overScrollMode="ifContentScrolls"
+        />
+
+    <TextView
+        android:id="@+id/dialog_chapter_missing"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/dialog_chapter_title"
+        android:text="@string/player_chapters_missing"
+        style="@style/TextAppearance.AppCompat.Medium"
+        android:visibility="gone"
+        />
+
+</RelativeLayout>

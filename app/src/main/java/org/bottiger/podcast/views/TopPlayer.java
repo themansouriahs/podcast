@@ -62,11 +62,13 @@ import org.bottiger.podcast.utils.chapter.Chapter;
 import org.bottiger.podcast.utils.chapter.ChapterUtil;
 import org.bottiger.podcast.utils.rxbus.RxBasicSubscriber;
 import org.bottiger.podcast.utils.rxbus.RxBusSimpleEvents;
+import org.bottiger.podcast.views.dialogs.DialogChapters;
 import org.bottiger.podcast.views.dialogs.DialogPlaybackSpeed;
 
 import java.util.Calendar;
 import java.util.List;
 
+import io.reactivex.functions.Predicate;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -106,9 +108,6 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
     private String mDoDisplayTextKey;
     private boolean mDoDisplayText = false;
 
-    private String mDoDisplayChaptersKey;
-    private boolean mDoDisplayChapters = false;
-
     @ColorInt private int mTextColor = Color.BLACK;
 
     @Nullable IEpisode mCurrentEpisode;
@@ -127,7 +126,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
     @Nullable private ViewStub mStubChaptersList;
     @Nullable private View mChapterList;
     @Nullable private RecyclerView mChapterRecyclerView;
-    @Nullable private RecyclerView.Adapter mAdapter;
+    @Nullable private PlayerChapterAdapter mAdapter;
     @Nullable private RecyclerView.LayoutManager mLayoutManager;
 
     private PlayerButtonView mDownloadButton;
@@ -206,9 +205,6 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
 
         mDoFullscreentKey = argContext.getResources().getString(R.string.pref_top_player_fullscreen_key);
         mFullscreen = prefs.getBoolean(mDoFullscreentKey, mFullscreen);
-
-        mDoDisplayChaptersKey = argContext.getResources().getString(R.string.pref_top_player_display_chapters_key);
-        mDoDisplayChapters = prefs.getBoolean(mDoDisplayChaptersKey, mDoDisplayChapters);
 
         sizeShrinkBuffer = (int) UIUtils.convertDpToPixel(400, argContext);
         sScreenHeight = UIUtils.getScreenHeight(argContext);
@@ -420,29 +416,14 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
 
     public void bind(@Nullable final IEpisode argEpisode) {
 
+        // FIXME remove
+        if (mCurrentEpisode == argEpisode)
+            return;
+
         mCurrentEpisode = argEpisode;
 
         if (argEpisode == null)
             return;
-
-        ChapterUtil.getChapters(mContext, argEpisode)
-                .subscribeOn(io.reactivex.schedulers.Schedulers.io())
-                .observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
-                .subscribe(new RxBasicSubscriber<List<Chapter>>() {
-                    @Override
-                    public void onNext(List<Chapter> chapters) {
-
-                        argEpisode.setChapters(chapters);
-
-                        if (mChapterButton != null) {
-                            bindChapterButton(mChapterButton, argEpisode);
-                        }
-
-                        Log.d(TAG, "chapters: " + chapters.size());
-                        bindChapters();
-                    }
-                });
-
     }
 
     private void openTimePicker() {
@@ -766,52 +747,6 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         }
     }
 
-    private void toggleChapters() {
-        View view = inflatedChapterView();
-
-        try {
-            mDoDisplayChapters = !mDoDisplayChapters;
-            int Chaptersvisibility = mDoDisplayChapters ? VISIBLE : GONE;
-            int photoVisibility = !mDoDisplayChapters ? VISIBLE : GONE;
-            view.setVisibility(Chaptersvisibility);
-            mPhoto.setVisibility(photoVisibility);
-        } finally {
-            prefs.edit().putBoolean(mDoDisplayChaptersKey, mDoDisplayChapters).apply();
-        }
-    }
-
-    private void bindChapters() {
-        assert mCurrentEpisode != null;
-        assert mChapterRecyclerView != null;
-
-        if (mChapterList == null) {
-            return;
-        }
-
-        mAdapter = new PlayerChapterAdapter(mCurrentEpisode.getChapters());
-        mLayoutManager = new LinearLayoutManager(mContext);
-
-        mChapterRecyclerView.setHasFixedSize(true);
-        mChapterRecyclerView.setLayoutManager(mLayoutManager);
-        mChapterRecyclerView.setAdapter(mAdapter);
-    }
-
-    @NonNull
-    private View inflatedChapterView() {
-        if (mChapterList != null)
-            return mChapterList;
-
-        assert mStubChaptersList != null;
-
-        mChapterList = mStubChaptersList.inflate();
-        mChapterRecyclerView = (RecyclerView) mChapterList.findViewById(R.id.chapter_recycler_view);
-        mStubChaptersList = null;
-
-        bindChapters();
-
-        return mChapterList;
-    }
-
     private void tintInflatedButtons() {
         if (mSpeedButton != null) {
             ColorUtils.tintButton(mSpeedButton, mTextColor);
@@ -820,11 +755,6 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         if (mFullscreenButton != null) {
             ColorUtils.tintButton(mFullscreenButton, mTextColor);
         }
-    }
-
-    private void bindChapterButton(@NonNull View argChapterButton, @Nullable IEpisode argEpisode) {
-        int chapterVisibility = argEpisode != null && argEpisode.hasChapters() ? VISIBLE : GONE;
-        argChapterButton.setVisibility(chapterVisibility);
     }
 
     private void initExpandedButtons() {
@@ -844,11 +774,13 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         });
 
         // Chapter button
-        bindChapterButton(mChapterButton, mCurrentEpisode);
         mChapterButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                toggleChapters();
+                //toggleChapters();
+                MainActivity activity = ((MainActivity)getContext());
+                DialogChapters dialogChapters = DialogChapters.newInstance(mCurrentEpisode);
+                dialogChapters.show(activity.getFragmentManager(), DialogPlaybackSpeed.class.getName());
             }
         });
 

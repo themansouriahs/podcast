@@ -38,6 +38,10 @@ import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.utils.rxbus.RxBus;
 import org.bottiger.podcast.utils.rxbus.RxBus2;
 
+import io.reactivex.Flowable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.processors.BehaviorProcessor;
+import io.reactivex.processors.FlowableProcessor;
 import rx.Observable;
 import rx.Subscriber;
 import rx.schedulers.Schedulers;
@@ -76,6 +80,8 @@ public class SoundWaves extends MultiDexApplication {
     private MediaBrowserCompat mMediaBrowser;
     public MediaControllerCompat mMediaControllerCompat;
     PlayerHelper mPlayerHelper = new PlayerHelper();
+
+    FlowableProcessor<Integer> mChapterProcessor = BehaviorProcessor.create();
 
     private GenericMediaPlayerInterface mPlayer;
 
@@ -261,6 +267,17 @@ public class SoundWaves extends MultiDexApplication {
             mSubscriptionRefreshManager = new SubscriptionRefreshManager(this);
 
         return mSubscriptionRefreshManager;
+    }
+
+    @NonNull
+    public FlowableProcessor<Integer> getChapterProcessor() {
+        return mChapterProcessor;
+    }
+
+    public Flowable<Integer> getChapterObservable() {
+        return mChapterProcessor
+                .subscribeOn(io.reactivex.schedulers.Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     private void initMediaBrowser() {

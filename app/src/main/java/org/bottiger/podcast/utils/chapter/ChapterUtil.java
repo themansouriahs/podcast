@@ -36,7 +36,7 @@ public class ChapterUtil {
 
         String arch = System.getProperty("os.arch");
 
-        if (arch.contains("arm")) {
+        if (arch.contains("a")) { // https://developer.android.com/ndk/guides/abis.html
             chapters = getM4aChapters(argContext, argEpisode);
         } else {
             chapters = getMp3Chapters(argEpisode);
@@ -51,7 +51,7 @@ public class ChapterUtil {
             @Override
             public List<Chapter> apply(IEpisode argEpisode) throws Exception {
 
-                List<Chapter> chapters = new LinkedList<>();
+                List<Chapter> chapters = null;
                 ChapterReader reader = new ChapterReader();
 
                 try {
@@ -61,6 +61,11 @@ public class ChapterUtil {
                 } catch (ID3ReaderException | IOException e) {
                     VendorCrashReporter.handleException(e);
                     e.printStackTrace();
+                }
+
+                // reader.getChapters() can return null
+                if (chapters == null) {
+                    chapters = new LinkedList<>();
                 }
 
                 return chapters;
@@ -109,5 +114,37 @@ public class ChapterUtil {
                 return chapters;
             }
         });
+    }
+
+    @Nullable
+    public static Integer getCurrentChapterIndex(@Nullable IEpisode argEpisode, long argCurrentPosition) {
+
+        if (argEpisode == null || !argEpisode.hasChapters()) {
+            return null;
+        }
+
+        List<Chapter> chapters = argEpisode.getChapters();
+        Chapter chapter;
+        int chapterIndex = -1;
+
+        for (int i = 0; i < chapters.size(); i++) {
+            boolean isLast = i == chapters.size()-1;
+
+            // If last
+            if (isLast) {
+                chapterIndex = i;
+                break;
+            }
+
+            chapter = chapters.get(i);
+            if (argCurrentPosition >= chapter.getStart()) {
+                continue;
+            }
+
+            chapterIndex = i > 0 ? i-1 : i;
+            break;
+        }
+
+        return chapterIndex;
     }
 }
