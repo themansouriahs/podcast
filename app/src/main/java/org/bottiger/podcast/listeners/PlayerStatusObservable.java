@@ -40,7 +40,7 @@ public class PlayerStatusObservable {
     }
 
     private static void updateProgress(@NonNull PlayerService argPlayerService) {
-        
+
         IEpisode currentItem = PlayerService.getCurrentItem();
 
         if (currentItem instanceof FeedItem) {

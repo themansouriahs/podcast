@@ -91,15 +91,6 @@ public class PodcastMediaCodecAudioRenderer extends MediaCodecAudioRenderer {
         }
 
         int bytesToRead;
-
-        /*
-        if (Util.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            buffer.position(0);
-            bytesToRead = bufferInfo.size;
-        } else {
-            bytesToRead = buffer.remaining();
-        }
-        */
         bytesToRead = buffer.remaining();
 
         buffer.get(mSonicInputBuffer, 0, bytesToRead);
