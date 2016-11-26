@@ -21,6 +21,9 @@ android {
         //testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         ndk {
+            abiFilters "armeabi-v7a"
+
+
             //moduleName "hello-jni"
             moduleName "sonic"
             //moduleName "swutils"
@@ -122,7 +125,7 @@ dependencies {
     compile 'com.jakewharton.rxbinding:rxbinding:0.4.0'
     compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
     compile 'io.reactivex.rxjava2:rxjava:2.0.0'
-    compile 'io.requery:sqlite-android:3.14.2'
+    compile 'io.requery:sqlite-android:3.15.1'
     compile 'com.google.android.exoplayer:exoplayer:r2.0.4'
     compile 'com.wdullaer:materialdatetimepicker:2.5.0'
     // Glide
@@ -146,7 +149,7 @@ dependencies {
     compile 'com.journeyapps:zxing-android-embedded:3.4.0'
 
     //compile 'com.github.wseemann:FFmpegMediaMetadataRetriever:1.0.13'
-    compile project(":arm-fmmr")
+    compile project(":armv7-fmmr")
 
     // For testing only
     testCompile 'junit:junit:4.12'

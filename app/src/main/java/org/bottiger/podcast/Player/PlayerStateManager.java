@@ -53,7 +53,6 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
 
     /**
      * Started when the PlayerService is started
-     * @param argService
      */
     public PlayerStateManager() {
         Log.d(TAG, "Constructor");

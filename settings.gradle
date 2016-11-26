@@ -1,1 +1,1 @@
-include ':app', ':WebPlayer', ':soundwavescommon', ':arm-fmmr'
+include ':app', ':WebPlayer', ':soundwavescommon', ':armv7-fmmr'
