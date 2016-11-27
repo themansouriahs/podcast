@@ -311,4 +311,8 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
     public IEpisode getEpisode() {
         return PlayerService.getCurrentItem();
     }
+
+    public void cancelFadeOut() {
+
+    }
 }

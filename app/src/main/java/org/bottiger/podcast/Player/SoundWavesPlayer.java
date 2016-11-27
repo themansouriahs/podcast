@@ -511,7 +511,11 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
     }
 
     public void FaceOutAndStop(int argDelayMs) {
-        mPlayerHandler.removeCallbacks(PlayerHandler.FADEOUT);
+        cancelFadeOut();
         mPlayerHandler.sendEmptyMessageDelayed(PlayerHandler.FADEOUT, argDelayMs);
+    }
+
+    public void cancelFadeOut() {
+        mPlayerHandler.removeCallbacks(PlayerHandler.FADEOUT);
     }
 }

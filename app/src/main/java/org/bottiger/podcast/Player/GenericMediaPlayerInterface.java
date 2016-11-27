@@ -51,6 +51,7 @@ public interface GenericMediaPlayerInterface {
 
     void startAndFadeIn();
     void FaceOutAndStop(int argDelayMs);
+    void cancelFadeOut();
 
 
     boolean doAutomaticGainControl();

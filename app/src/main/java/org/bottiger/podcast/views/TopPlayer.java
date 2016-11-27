@@ -3,6 +3,7 @@ package org.bottiger.podcast.views;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
@@ -390,28 +391,41 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
 
     private void sleepButtonPressed(int argMinutes) {
         String toast = getResources().getQuantityString(R.plurals.player_sleep, argMinutes, argMinutes);
+        String toast_cancel = getResources().getString(R.string.player_sleep_cancel);
 
         setSleepTimer(argMinutes);
 
-        UIUtils.disPlayBottomSnackBar(this.getRootView(), toast, new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                openTimePicker();
-            }
-        }, R.string.snackbar_change, true);
+        if (argMinutes < 0) {
+            UIUtils.disPlayBottomSnackBar(this.getRootView(), toast_cancel, null, true);
+        } else {
+            UIUtils.disPlayBottomSnackBar(this.getRootView(), toast, new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    openTimePicker();
+                }
+            }, R.string.snackbar_change, true);
+        }
     }
 
-    private void setSleepTimer(int minutes) {
+    private boolean setSleepTimer(int minutes) {
         PlayerService ps = PlayerService.getInstance();
         if (ps == null) {
             String noPlayer = "Could not connect to the Player";
             Toast.makeText(mContext, noPlayer, Toast.LENGTH_LONG).show();
             Log.wtf(TAG, noPlayer);
-            return;
+            return false;
+        }
+
+        GenericMediaPlayerInterface player = ps.getPlayer();
+
+        if (minutes < 0) {
+            player.cancelFadeOut();
+            return true;
         }
 
         int onemin = 1000 * 60;
-        ps.getPlayer().FaceOutAndStop(onemin*minutes);
+        player.FaceOutAndStop(onemin*minutes);
+        return true;
     }
 
     public void bind(@Nullable final IEpisode argEpisode) {
@@ -453,6 +467,16 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
                 }
             }
         }, setHour, minute_sleep, true);
+
+        tpd.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialogInterface) {
+                sleepButtonPressed(-1);
+            }
+        });
+
+        tpd.setCancelText(R.string.player_sleep_dialog_cancel_button);
+        tpd.setOkText(R.string.player_sleep_dialog_ok_button);
 
         if (getContext() instanceof Activity) {
             Activity activity = (Activity) getContext();

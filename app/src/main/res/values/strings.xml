@@ -232,6 +232,9 @@
     <string name="web_scanner_qr_scanned">Scanned. Logging in.</string>
     <string name="player_chapters_title">Chapters</string>
     <string name="player_chapters_missing">This episode does not contain any chapters.</string>
+    <string name="player_sleep_cancel">Sleep timer removed</string>
+    <string name="player_sleep_dialog_cancel_button">Remove timer</string>
+    <string name="player_sleep_dialog_ok_button">Set timer</string>
 
     <plurals name="player_sleep">
         <item quantity="one">Player will sleep in %d minute</item>
