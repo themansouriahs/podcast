@@ -72,6 +72,7 @@ public interface ISubscription {
     boolean IsLoaded();
 
     boolean isListOldestFirst(@NonNull Resources argResources);
+    void setListOldestFirst(boolean listOldestFirst);
 
     @Type int getType();
     @ColorInt int getPrimaryColor();

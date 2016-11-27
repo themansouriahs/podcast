@@ -19,4 +19,9 @@
         android:orderInCategory="3"
         android:title="@string/menu_download_all" />
 
+    <item
+        android:id="@+id/menu_feed_sort_order"
+        android:orderInCategory="10"
+        android:title="@string/menu_feed_sort_order" />
+
 </menu>

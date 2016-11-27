@@ -235,6 +235,7 @@
     <string name="player_sleep_cancel">Sleep timer removed</string>
     <string name="player_sleep_dialog_cancel_button">Remove timer</string>
     <string name="player_sleep_dialog_ok_button">Set timer</string>
+    <string name="menu_feed_sort_order">Reverse order</string>
 
     <plurals name="player_sleep">
         <item quantity="one">Player will sleep in %d minute</item>

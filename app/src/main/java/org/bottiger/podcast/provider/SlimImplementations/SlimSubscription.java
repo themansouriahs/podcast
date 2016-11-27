@@ -30,6 +30,8 @@ public class SlimSubscription extends BaseSubscription implements Parcelable {
     private boolean mIsSubscribed = false;
     private boolean mIsDirty = false;
 
+    private boolean mListOldestFirst = false;
+
     public SlimSubscription(@NonNull URL argURL) {
         mTitle = "";
         mURL = argURL;
@@ -161,7 +163,11 @@ public class SlimSubscription extends BaseSubscription implements Parcelable {
 
     @Override
     public boolean isListOldestFirst(@NonNull Resources argResources) {
-        return false;
+        return mListOldestFirst;
+    }
+
+    public void setListOldestFirst(boolean listOldestFirst) {
+        mListOldestFirst = listOldestFirst;
     }
 
     public EpisodeList getEpisodes() {

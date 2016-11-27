@@ -1,6 +1,7 @@
 package org.bottiger.podcast.activities.feedview;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -68,7 +69,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
         mActivity = activity;
         setDataset(argSubscription);
 
-        mSortOrder = mSubscription.isListOldestFirst(activity.getResources()) ? OLDEST_FIRST : RECENT_FIRST;
+        mSortOrder = calcOrder();
 
         mInflater = (LayoutInflater) activity
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -265,5 +266,9 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
         }
 
         return mStringBuilder.toString();
+    }
+
+    public @Order int calcOrder() {
+        return mSubscription.isListOldestFirst(mActivity.getResources()) ? OLDEST_FIRST : RECENT_FIRST;
     }
 }

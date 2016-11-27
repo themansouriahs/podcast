@@ -203,8 +203,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
             mSubscriptionSettingsUtils.setListOldestFirstListener(new SubscriptionSettingsUtils.OnSettingsChangedListener() {
                 @Override
                 public void OnSettingsChanged(boolean isChecked) {
-                    @FeedViewAdapter.Order int sortOrder = mSubscription.isListOldestFirst(getResources()) ?  FeedViewAdapter.OLDEST_FIRST : FeedViewAdapter.RECENT_FIRST;
-                    mAdapter.setOrder(sortOrder);
+                    mAdapter.setOrder(mAdapter.calcOrder());
                 }
             });
             @FeedViewAdapter.Order int sortOrder = mSubscription.isListOldestFirst(getResources()) ?  FeedViewAdapter.OLDEST_FIRST : FeedViewAdapter.RECENT_FIRST;
@@ -320,8 +319,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
 
     @NonNull
     protected FeedViewAdapter getAdapter() {
-        FeedViewAdapter adapter = new FeedViewAdapter(this, mSubscription);
-        return adapter;
+        return new FeedViewAdapter(this, mSubscription);
     }
 
     @Override
@@ -436,6 +434,12 @@ public class FeedActivity extends TopActivity implements PaletteListener {
                     VendorCrashReporter.report("Bulk download", "Bulk download can not be started");
                 }
                 return true;
+            case R.id.menu_feed_sort_order: {
+                boolean listOldestFirst = mSubscription.isListOldestFirst(getResources());
+                mSubscription.setListOldestFirst(!listOldestFirst);
+                mAdapter.setOrder(mAdapter.calcOrder());
+                return true;
+            }
         }
         return super.onOptionsItemSelected(item);
     }
