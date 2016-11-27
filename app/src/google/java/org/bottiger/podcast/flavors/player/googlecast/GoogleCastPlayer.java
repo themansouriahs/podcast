@@ -341,6 +341,10 @@ public abstract class GoogleCastPlayer extends SoundWavesPlayerBase {
             public void onSendingRemoteMediaRequest() {
 
             }
+
+            @Override
+            public void onAdBreakStatusUpdated() {
+            }
         };
     }
 
