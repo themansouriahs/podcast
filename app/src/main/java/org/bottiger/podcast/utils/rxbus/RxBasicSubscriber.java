@@ -27,7 +27,7 @@ public abstract class RxBasicSubscriber<T> implements Subscriber<T> {
     }
 
     public void onSubscribe(Subscription s) {
-        Log.d(mTag, "onSubscribe");
+        //Log.d(mTag, "onSubscribe");
         s.request(Long.MAX_VALUE);
     }
 
@@ -36,6 +36,6 @@ public abstract class RxBasicSubscriber<T> implements Subscriber<T> {
     }
 
     public void onComplete() {
-        Log.d(mTag, "complete");
+        //Log.d(mTag, "complete");
     }
 }

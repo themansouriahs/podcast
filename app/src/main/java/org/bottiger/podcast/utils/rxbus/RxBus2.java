@@ -27,8 +27,8 @@ public final class RxBus2 {
 
     public Flowable<Object> toFlowableCommon() {
         return this.mBus
-                .observeOn(Schedulers.io())
-                .subscribeOn(AndroidSchedulers.mainThread());
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     public boolean hasSubscribers() {

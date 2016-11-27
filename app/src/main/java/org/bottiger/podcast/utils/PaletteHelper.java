@@ -13,6 +13,15 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 
 import org.bottiger.podcast.listeners.PaletteListener;
+import org.bottiger.podcast.utils.rxbus.RxBasicSubscriber;
+
+import io.reactivex.Flowable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.processors.PublishProcessor;
+import io.reactivex.processors.ReplayProcessor;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by apl on 10-11-2014.
@@ -44,23 +53,26 @@ public class PaletteHelper {
                     @Override
                     public void onResourceReady(Bitmap resource, GlideAnimation glideAnimation) {
 
-                        Palette.from(resource).generate(new Palette.PaletteAsyncListener() {
+                        Flowable.just(resource)
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribeOn(Schedulers.computation())
+                                .map(new Function<Bitmap, Palette>( ) {
+                                    @Override
+                                    public Palette apply(Bitmap bitmap) throws Exception {
+                                        Palette palette = Palette.from(bitmap).generate();
+
+                                        if (palette != null) {
+                                            mPaletteCache.put(argUrl, palette);
+                                        }
+
+                                        return palette;
+                                    }
+                                }).subscribe(new RxBasicSubscriber<Palette>() {
                             @Override
-                            public void onGenerated(final Palette palette) {
-
-                                if (palette != null) {
-                                    mPaletteCache.put(argUrl, palette);
-                                }
-
+                            public void onNext(Palette palette) {
                                 if (argCallbacks != null) {
                                     for (final PaletteListener listener : argCallbacks) {
-                                    argActivity.runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
                                         listener.onPaletteFound(palette);
-                                        }
-                                        });
-
                                     }
                                 }
                             }
