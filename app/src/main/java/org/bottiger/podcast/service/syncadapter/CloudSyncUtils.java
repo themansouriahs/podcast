@@ -176,13 +176,11 @@ public class CloudSyncUtils {
     public static boolean startCloudSync(@NonNull Context argContext) {
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(argContext);
-
         String key = argContext.getResources().getString(R.string.pref_cloud_support_key);
-        boolean defaultValue = !BuildConfig.PRIVATE_MODE;
 
-        boolean enableClouldSupport = prefs.getBoolean(key, defaultValue);
+        boolean enableCloudSupport = prefs.getBoolean(key, !BuildConfig.PRIVATE_MODE);
 
-        if (!enableClouldSupport) {
+        if (!enableCloudSupport) {
             return false;
         }
 
