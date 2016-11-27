@@ -10,6 +10,7 @@ import android.media.PlaybackParams;
 import android.net.Uri;
 import android.os.Build;
 import android.os.RemoteException;
+import android.os.SystemClock;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -72,6 +73,8 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
     private NotificationPlayer mNotificationPlayer;
 
     @NonNull protected Context mContext;
+
+    long mSleepTimer = -1;
 
     // AudioManager
     AudioManager mAudioManager;
@@ -312,7 +315,19 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
         return PlayerService.getCurrentItem();
     }
 
-    public void cancelFadeOut() {
 
+    public void startAndFadeIn() {
+    }
+
+    public void FadeOutAndStop(int argDelayMs) {
+        mSleepTimer = System.currentTimeMillis() + argDelayMs;
+    }
+
+    public void cancelFadeOut() {
+        mSleepTimer = -1;
+    }
+
+    public long timeUntilFadeout() {
+        return mSleepTimer - System.currentTimeMillis();
     }
 }

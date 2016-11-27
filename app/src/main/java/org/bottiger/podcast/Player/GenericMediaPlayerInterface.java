@@ -50,8 +50,9 @@ public interface GenericMediaPlayerInterface {
     void removeListener(ExoPlayer.EventListener listener);
 
     void startAndFadeIn();
-    void FaceOutAndStop(int argDelayMs);
+    void FadeOutAndStop(int argDelayMs);
     void cancelFadeOut();
+    long timeUntilFadeout();
 
 
     boolean doAutomaticGainControl();

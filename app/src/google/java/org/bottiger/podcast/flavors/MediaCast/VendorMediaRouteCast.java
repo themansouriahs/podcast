@@ -46,7 +46,7 @@ public class VendorMediaRouteCast extends GoogleCastPlayer {
     }
 
     @Override
-    public void FaceOutAndStop(int argDelayMs) {
+    public void FadeOutAndStop(int argDelayMs) {
         stop();
     }
 

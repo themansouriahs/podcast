@@ -1,49 +1,33 @@
 package org.bottiger.podcast.player;
 
 import android.annotation.TargetApi;
-import android.content.ComponentName;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.PlaybackParams;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
-import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
-import com.google.android.exoplayer2.audio.MediaCodecAudioRenderer;
 import com.google.android.exoplayer2.source.MediaSource;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.cloud.EventLogger;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
-import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.flavors.MediaCast.IMediaCast;
-import org.bottiger.podcast.flavors.MediaCast.IMediaRouteStateListener;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.player.exoplayer.ExoPlayerMediaSourceHelper;
-import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
-import org.bottiger.podcast.player.exoplayer.ExtractorRendererBuilder;
 import org.bottiger.podcast.player.exoplayer.NewExoPlayer;
-import org.bottiger.podcast.player.exoplayer.PodcastAudioRendererV21;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
-import org.bottiger.podcast.provider.ISubscription;
-import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.PlaybackSpeed;
 import org.bottiger.podcast.utils.PreferenceHelper;
-import org.bottiger.podcast.utils.rxbus.RxBusSimpleEvents;
 
 import java.io.File;
 import java.io.IOException;
@@ -507,10 +491,12 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
     }
 
     public void startAndFadeIn() {
+        super.startAndFadeIn();
         mPlayerHandler.sendEmptyMessageDelayed(PlayerHandler.FADEIN, 10);
     }
 
-    public void FaceOutAndStop(int argDelayMs) {
+    public void FadeOutAndStop(int argDelayMs) {
+        super.FadeOutAndStop(argDelayMs);
         cancelFadeOut();
         mPlayerHandler.sendEmptyMessageDelayed(PlayerHandler.FADEOUT, argDelayMs);
     }

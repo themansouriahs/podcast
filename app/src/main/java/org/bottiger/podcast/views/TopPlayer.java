@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
+import android.os.CountDownTimer;
 import android.preference.PreferenceManager;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
@@ -20,7 +21,6 @@ import android.support.v4.view.ScrollingView;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ScrollerCompat;
 import android.support.v7.graphics.Palette;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.transition.ChangeBounds;
 import android.transition.Scene;
@@ -36,9 +36,11 @@ import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
+import android.widget.Chronometer;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.ivbaranov.mfb.MaterialFavoriteButton;
@@ -58,18 +60,14 @@ import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorUtils;
 import org.bottiger.podcast.utils.PlaybackSpeed;
+import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.UIUtils;
-import org.bottiger.podcast.utils.chapter.Chapter;
-import org.bottiger.podcast.utils.chapter.ChapterUtil;
-import org.bottiger.podcast.utils.rxbus.RxBasicSubscriber;
 import org.bottiger.podcast.utils.rxbus.RxBusSimpleEvents;
 import org.bottiger.podcast.views.dialogs.DialogChapters;
 import org.bottiger.podcast.views.dialogs.DialogPlaybackSpeed;
 
 import java.util.Calendar;
-import java.util.List;
 
-import io.reactivex.functions.Predicate;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -120,7 +118,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
     @Nullable private ViewStub mMoreButtonsStub;
     @Nullable private LinearLayout mExpandedActionsBar;
     @Nullable private PlayerButtonView mFullscreenButton;
-    @Nullable private PlayerButtonView mSleepButton;
+    @Nullable private Button mSleepButton;
     @Nullable private ImageView mChapterButton;
     @Nullable private Button mSpeedButton;
 
@@ -136,6 +134,8 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
     private ImageView mRewindButton;
     private ImageButton mMoreButton;
     private PlayerSeekbar mPlayerSeekbar;
+
+    @Nullable private CountDownTimer mCountDownTimer;
 
     private View mTriangle;
 
@@ -393,11 +393,19 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         String toast = getResources().getQuantityString(R.plurals.player_sleep, argMinutes, argMinutes);
         String toast_cancel = getResources().getString(R.string.player_sleep_cancel);
 
+        long millis = argMinutes * 60 * 1000;
+
         setSleepTimer(argMinutes);
+
+        if (mCountDownTimer != null) {
+            mCountDownTimer.cancel();
+            mCountDownTimer.onFinish();
+        }
 
         if (argMinutes < 0) {
             UIUtils.disPlayBottomSnackBar(this.getRootView(), toast_cancel, null, true);
         } else {
+            setCountDownText(millis);
             UIUtils.disPlayBottomSnackBar(this.getRootView(), toast, new OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -424,7 +432,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         }
 
         int onemin = 1000 * 60;
-        player.FaceOutAndStop(onemin*minutes);
+        player.FadeOutAndStop(onemin*minutes);
         return true;
     }
 
@@ -745,7 +753,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
             mMoreButtonsStub = null;
 
             mFullscreenButton = (PlayerButtonView) inflated.findViewById(R.id.fullscreen_button);
-            mSleepButton = (PlayerButtonView) inflated.findViewById(R.id.sleep_button);
+            mSleepButton = (Button) inflated.findViewById(R.id.sleep_button);
             mChapterButton = (ImageView) inflated.findViewById(R.id.chapter_button);
             mSpeedButton = (Button) inflated.findViewById(R.id.speed_button);
             mExpandedActionsBar = (LinearLayout) inflated.findViewById(R.id.expanded_action_bar);
@@ -786,6 +794,7 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         assert mChapterButton != null;
         assert mSpeedButton != null;
         assert mFullscreenButton != null;
+        //assert mSleepButtonTime != null;
 
         tintInflatedButtons();
 
@@ -796,6 +805,10 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
                 sleepButtonPressed();
             }
         });
+
+        GenericMediaPlayerInterface player = SoundWaves.getAppContext(mContext).getPlayer();
+        final long countDownMs = player.timeUntilFadeout();
+        setCountDownText(countDownMs);
 
         // Chapter button
         mChapterButton.setOnClickListener(new OnClickListener() {
@@ -811,7 +824,6 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
         int visibility = SoundWaves.getAppContext(getContext()).getPlayer().canSetSpeed() ? View.VISIBLE : View.GONE;
         mSpeedButton.setVisibility(visibility);
 
-        GenericMediaPlayerInterface player = SoundWaves.getAppContext(getContext()).getPlayer();
         float speedMultiplier = player.getCurrentSpeedMultiplier();
         setPlaybackSpeedView(speedMultiplier);
 
@@ -835,6 +847,25 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
                 }
             }
         });
+    }
+
+    private void setCountDownText(final long argDuration) {
+        if (argDuration > 0) {
+            mCountDownTimer = new CountDownTimer(argDuration, 1000) {
+
+                public void onTick(long millisUntilFinished) {
+                    if (mSleepButton != null) {
+                        GenericMediaPlayerInterface player = SoundWaves.getAppContext(mContext).getPlayer();
+                        mSleepButton.setText(StrUtils.formatTime(player.timeUntilFadeout()));
+                    }
+                }
+
+                public void onFinish() {
+                    if (mSleepButton != null)
+                        mSleepButton.setText("");
+                }
+            }.start();
+        }
     }
 
     @Override
