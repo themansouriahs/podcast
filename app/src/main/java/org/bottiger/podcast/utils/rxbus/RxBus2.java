@@ -2,8 +2,10 @@ package org.bottiger.podcast.utils.rxbus;
 
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.processors.PublishProcessor;
 import io.reactivex.processors.ReplayProcessor;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by aplb on 18-10-2016.
@@ -21,6 +23,12 @@ public final class RxBus2 {
 
     public Flowable<Object> toFlowable() {
         return this.mBus;
+    }
+
+    public Flowable<Object> toFlowableCommon() {
+        return this.mBus
+                .observeOn(Schedulers.io())
+                .subscribeOn(AndroidSchedulers.mainThread());
     }
 
     public boolean hasSubscribers() {

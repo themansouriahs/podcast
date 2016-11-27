@@ -32,12 +32,14 @@ import org.bottiger.podcast.player.exoplayer.PodcastAudioRendererV21;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.provider.base.BaseEpisode;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.service.PlayerService;
 
 import org.bottiger.podcast.utils.PlaybackSpeed;
 import org.bottiger.podcast.utils.PreferenceHelper;
+import org.bottiger.podcast.utils.rxbus.RxBasicSubscriber;
 
 import java.io.File;
 import java.io.IOException;
@@ -81,6 +83,16 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
 
     public SoundWavesPlayerBase(@NonNull Context argContext) {
         mContext = argContext;
+
+        SoundWaves.getRxBus2()
+                .toFlowableCommon()
+                .ofType(BaseEpisode.SeekEvent.class)
+                .subscribe(new RxBasicSubscriber<BaseEpisode.SeekEvent>() {
+                    @Override
+                    public void onNext(BaseEpisode.SeekEvent seekEvent) {
+                        seekTo(seekEvent.getMs());
+                    }
+                });
     }
 
     public void setPlayerService(@NonNull PlayerService argPlayerService) {
@@ -295,6 +307,7 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
         return dataSource;
     }
 
+    @Nullable
     public IEpisode getEpisode() {
         return PlayerService.getCurrentItem();
     }

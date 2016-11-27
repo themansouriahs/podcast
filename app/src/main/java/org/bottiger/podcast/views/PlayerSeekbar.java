@@ -29,9 +29,14 @@ import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.player.GenericMediaPlayerInterface;
 import org.bottiger.podcast.player.SoundWavesPlayerBase;
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.provider.base.BaseEpisode;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.UIUtils;
+import org.bottiger.podcast.utils.rxbus.RxBasicSubscriber;
+
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Predicate;
 
 import static org.bottiger.podcast.player.SoundWavesPlayerBase.STATE_READY;
 
@@ -190,14 +195,45 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener, ExoPlayer
     public void setEpisode(@NonNull IEpisode argEpisode) {
         mEpisode = argEpisode;
 
+        int progress = getProgress(mEpisode, mEpisode.getOffset());
+
+        setProgress(progress);
+
+        SoundWaves.getRxBus2()
+                .toFlowableCommon()
+                .ofType(BaseEpisode.SeekEvent.class)
+                .filter(new Predicate<BaseEpisode.SeekEvent>() {
+                    @Override
+                    public boolean test(BaseEpisode.SeekEvent seekEvent) throws Exception {
+                        return seekEvent.getEpisode().equals(getEpisode());
+                    }
+                })
+                .subscribe(new RxBasicSubscriber<BaseEpisode.SeekEvent>() {
+                    @Override
+                    public void onNext(BaseEpisode.SeekEvent seekEvent) {
+                        setProgress(getProgress(mEpisode, seekEvent.getMs()));
+                        PlayerSeekbar.this.postInvalidate();
+                        //postInvalidate();
+                    }
+                });
+    }
+
+    private int getProgress(@Nullable IEpisode argEpisode, long argPosition) {
+
         int progress = 0;
 
-        if (mEpisode.getOffset() > 0 && mEpisode.getDuration() > 0) {
-            float progressf = (float)mEpisode.getOffset() / mEpisode.getDuration();
+        if (argEpisode == null) {
+            return progress;
+        }
+
+        double position = (double) argPosition;
+
+        if (argEpisode.getOffset() > 0 && argEpisode.getDuration() > 0) {
+            double progressf = position / mEpisode.getDuration();
             progress = (int)(progressf*RANGE_MAX);
         }
 
-        setProgress(progress);
+        return progress;
     }
 
     public void setOverlay(View argLayout) {

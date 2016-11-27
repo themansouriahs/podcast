@@ -2,7 +2,9 @@ package org.bottiger.podcast.provider.base;
 
 import android.support.annotation.NonNull;
 
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.model.events.EpisodeChanged;
+import org.bottiger.podcast.player.SoundWavesPlayerBase;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
@@ -58,6 +60,17 @@ public abstract class BaseEpisode implements IEpisode {
         notifyPropertyChanged(EpisodeChanged.DOWNLOAD_PROGRESS);
     }
 
+    public boolean seekTo(long msec)  {
+        boolean canSet = setOffset(msec);
+
+        if (canSet) {
+            SeekEvent event = new SeekEvent(this, msec);
+            SoundWaves.getRxBus2().send(event);
+        }
+
+        return canSet;
+    }
+
     /**
      * http://docs.oracle.com/javase/6/docs/api/java/lang/String.html#compareTo
      *      %28java.lang.String%29
@@ -76,6 +89,26 @@ public abstract class BaseEpisode implements IEpisode {
 
     public boolean hasBeenDownloadedOnce() {
         return false;
+    }
+
+    public class SeekEvent {
+
+        @NonNull IEpisode mEpisode;
+        long mMs;
+
+        public SeekEvent(@NonNull IEpisode argEpisode, long ms) {
+            mEpisode = argEpisode;
+            mMs = ms;
+        }
+
+        @NonNull
+        public IEpisode getEpisode() {
+            return mEpisode;
+        }
+
+        public long getMs() {
+            return mMs;
+        }
     }
 
 }

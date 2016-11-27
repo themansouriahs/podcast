@@ -91,7 +91,7 @@ public class DialogChapters extends DialogFragment {
                 SoundWaves.getAppContext(mActivity).getLibraryInstance().getEpisode(episodeID) :
                 null;
 
-        List<Chapter> chapters = hasEpisode ? episode.getChapters() : new LinkedList<Chapter>();
+        final List<Chapter> chapters = hasEpisode ? episode.getChapters() : new LinkedList<Chapter>();
         final long offset = hasEpisode ? episode.getOffset() : 0;
 
         AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
@@ -127,7 +127,17 @@ public class DialogChapters extends DialogFragment {
                 .subscribe(new RxBasicSubscriber<Integer>("ChapterChanged") {
                     @Override
                     public void onNext(Integer integer) {
+
+                        if (episode == null)
+                            return;
+
+                        Chapter chapter = episode.getChapters().get(integer);
                         mAdapter.setActive(integer);
+
+                        if (chapter != null && chapter.getStart() >= 0) {
+                            //SoundWaves.getAppContext(mActivity).getPlayer().seekTo(chapter.getStart());
+                            episode.seekTo(chapter.getStart());
+                        }
                     }
                 });
 

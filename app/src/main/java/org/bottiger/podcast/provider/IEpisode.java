@@ -51,6 +51,7 @@ public interface IEpisode {
     boolean setDuration(long argDurationMs);
 
     boolean setOffset(long i);
+    boolean seekTo(long msec);
 
     @Deprecated
     void setOffset(@Nullable ContentResolver contentResolver, long i);
