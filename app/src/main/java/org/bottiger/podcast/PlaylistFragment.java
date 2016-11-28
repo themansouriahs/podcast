@@ -475,16 +475,18 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
         mCurrentTime.setEpisode(argEpisode);
     }
 
-    private void setPlaylistViewState(@Nullable Playlist argPlaylist) {
+    private void setPlaylistViewState(@NonNull Playlist argPlaylist) {
 
         boolean dismissedWelcomePage = sharedPreferences.getBoolean(PLAYLIST_WELCOME_DISMISSED, PLAYLIST_WELCOME_DISMISSED_DEFAULT);
 
-        if (argPlaylist == null || argPlaylist.isEmpty()) {
+        if (argPlaylist.isEmpty()) {
             mTopPlayer.setVisibility(View.GONE);
 
             if (dismissedWelcomePage) {
-                mPlaylistEmptyContainer.setVisibility(View.VISIBLE);
-                mPlaylistWelcomeContainer.setVisibility(View.GONE);
+                if (argPlaylist.isLoaded()) {
+                    mPlaylistEmptyContainer.setVisibility(View.VISIBLE);
+                    mPlaylistWelcomeContainer.setVisibility(View.GONE);
+                }
             } else {
                 mPlaylistWelcomeContainer.setVisibility(View.VISIBLE);
                 mPlaylistEmptyContainer.setVisibility(View.GONE);

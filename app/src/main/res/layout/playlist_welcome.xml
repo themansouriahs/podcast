@@ -7,7 +7,8 @@
         android:layout_height="match_parent"
         android:paddingTop="10dp"
         android:paddingLeft="30dp"
-        android:paddingRight="30dp">
+        android:paddingRight="30dp"
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/playlist_empty_header"
