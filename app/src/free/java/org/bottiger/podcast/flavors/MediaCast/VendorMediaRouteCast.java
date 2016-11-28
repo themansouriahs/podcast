@@ -112,7 +112,7 @@ public class VendorMediaRouteCast extends GoogleCastPlayer implements IMediaCast
     }
 
     @Override
-    public void FaceOutAndStop(int argDelayMs) {
+    public void FadeOutAndStop(int argDelayMs) {
 
     }
 
