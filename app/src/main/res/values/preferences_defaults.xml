@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <bool name="pref_download_on_update_default">false</bool>
+    <bool name="pref_download_on_update_default">true</bool>
     <bool name="pref_download_only_wifi_default">true</bool>
     <bool name="pref_open_video_externally_default">false</bool>
     <bool name="pref_delete_when_finished_default">false</bool>
