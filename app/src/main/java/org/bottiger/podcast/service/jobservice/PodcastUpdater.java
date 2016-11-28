@@ -20,6 +20,8 @@ import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.service.PodcastService;
 import org.bottiger.podcast.utils.PreferenceHelper;
 
+import java.util.List;
+
 /**
  * Created by apl on 11-09-2014.
  */
@@ -52,6 +54,9 @@ public class PodcastUpdater implements SharedPreferences.OnSharedPreferenceChang
             return false;
         }
 
+        JobScheduler jobScheduler =
+                (JobScheduler) argContext.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+
         ComponentName receiver = new ComponentName(argContext, PodcastUpdateJobService.class);
         boolean wifiOnly = PreferenceHelper.getBooleanPreferenceValue(argContext,
                 R.string.pref_download_only_wifi_key,
@@ -59,10 +64,18 @@ public class PodcastUpdater implements SharedPreferences.OnSharedPreferenceChang
         int networkType = wifiOnly ? JobInfo.NETWORK_TYPE_UNMETERED : JobInfo.NETWORK_TYPE_ANY;
         long updateFrequencyMs = alarmInterval(UPDATE_FREQUENCY_MIN); // to ms
 
-        JobInfo refreshFeedsTask = getJobInfo(receiver, networkType, updateFrequencyMs);
+        List<JobInfo> jobs = jobScheduler.getAllPendingJobs();
+        for (int i = 0; i < jobs.size(); i++) {
+            JobInfo job = jobs.get(i);
 
-        JobScheduler jobScheduler =
-                (JobScheduler) argContext.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+            if (job.getId() == PodcastUpdaterId) {
+                boolean sameNetworkType = job.getNetworkType() == networkType;
+                boolean sameFrequency = job.getIntervalMillis() == updateFrequencyMs;
+                return sameNetworkType && sameFrequency;
+            }
+        }
+
+        JobInfo refreshFeedsTask = getJobInfo(receiver, networkType, updateFrequencyMs);
 
         jobScheduler.cancel(PodcastUpdaterId);
         return jobScheduler.schedule(refreshFeedsTask) == JobScheduler.RESULT_SUCCESS;

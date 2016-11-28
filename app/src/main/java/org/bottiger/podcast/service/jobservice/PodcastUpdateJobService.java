@@ -23,7 +23,7 @@ public class PodcastUpdateJobService extends JobService {
     private static final String TAG = "PodcastUpdateJobService";
 
     @Override
-    public boolean onStartJob(JobParameters params) {
+    public boolean onStartJob(final JobParameters params) {
         Log.d(TAG, "Job started");
 
         SubscriptionRefreshManager subscriptionRefreshManager = new SubscriptionRefreshManager(this);
@@ -47,12 +47,14 @@ public class PodcastUpdateJobService extends JobService {
 
                 SoundWavesDownloadManager.downloadNewEpisodes(getApplicationContext(), argSubscription);
 
+
+                jobFinished(params, true);
                 //SoundWavesDownloadManager.removeExpiredDownloadedPodcasts(PodcastUpdateJobService.this);
 
             }
         });
 
-        return false;
+        return true;
     }
 
     /**
