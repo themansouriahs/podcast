@@ -16,6 +16,7 @@ import org.bottiger.podcast.R;
 import org.bottiger.podcast.adapters.PlaylistAdapter;
 import org.bottiger.podcast.adapters.viewholders.ExpandableViewHoldersUtil;
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.provider.ISubscription;
 
 /**
  * Created by apl on 30-07-2014.
@@ -60,7 +61,7 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
     public DownloadButtonView downloadButton;
 
     private Activity mActivity;
-    public String mArtwork;
+    public ISubscription mSubscription;
 
     private boolean mHasColor;
     private int mEpisodePrimaryColor;
@@ -102,12 +103,12 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
         return mExpandedLayoutControls;
     }
 
-    public void setArtwork(@Nullable String argArtwork) {
-        mArtwork = argArtwork;
+    public void setArtwork(@Nullable ISubscription argArtwork) {
+        mSubscription = argArtwork;
     }
 
-    public String getArtwork() {
-        return mArtwork;
+    public ISubscription getArtwork() {
+        return mSubscription;
     }
 
     public Activity getActivity() {

@@ -238,7 +238,7 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
         if (holder.text_container != null) {
             if (holder.image != null && hasImage) {
 
-                PaletteHelper.generate(logo, mActivity, new PaletteListener() {
+                PaletteHelper.generate(sub, mActivity, new PaletteListener() {
                     @Override
                     public void onPaletteFound(Palette argChangedPalette) {
                         ColorExtractor extractor = new ColorExtractor(argChangedPalette);

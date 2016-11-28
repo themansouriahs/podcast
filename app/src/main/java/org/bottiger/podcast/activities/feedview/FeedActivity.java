@@ -344,10 +344,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
         }
 
         if (mSubscription.getType() == ISubscription.DEFAULT) {
-            String url = mSubscription.getImageURL();
-            if (url != null) {
-                PaletteHelper.generate(url, this, this);
-            }
+            PaletteHelper.generate(mSubscription, this, this);
         }
     }
 

@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.provider.ISubscription;
 
 /**
  * Created by aplb on 30-09-2015.
@@ -49,10 +50,15 @@ public class ColorUtils {
         }
     }
 
-    public static @ColorInt int adjustToTheme(@NonNull Resources argResources, @Nullable Palette argPalette, @ColorInt int color) {
-        int currentNightMode = argResources.getConfiguration().uiMode
-                & Configuration.UI_MODE_NIGHT_MASK;
+    public static @ColorInt int adjustToTheme(@NonNull Resources argResources, @NonNull ISubscription argSubscription) {
+        if (UIUtils.isInNightMode(argResources)) {
+            return darken(argSubscription.getPrimaryColor(), 0.5f);
+        } else {
+            return argSubscription.getPrimaryColor();
+        }
+    }
 
+    public static @ColorInt int adjustToTheme(@NonNull Resources argResources, @Nullable Palette argPalette, @ColorInt int color) {
         if (argPalette == null)
             return color;
 

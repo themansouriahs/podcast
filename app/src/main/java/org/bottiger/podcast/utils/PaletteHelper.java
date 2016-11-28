@@ -14,6 +14,14 @@ import com.bumptech.glide.request.target.SimpleTarget;
 
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.utils.rxbus.RxBasicSubscriber;
+import org.reactivestreams.Subscription;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -33,12 +41,20 @@ public class PaletteHelper {
 
     private static LruCache<String, Palette> mPaletteCache = new LruCache<>(CACHE_SIZE);
 
-    public static void generate(@NonNull final String argUrl, @NonNull final Activity argActivity, @Nullable final PaletteListener ... argCallbacks) {
+    private static ReentrantLock sLock = new ReentrantLock();
+    private static HashMap<String, List<PaletteListener>> listeners = new HashMap<>();
 
-        if (!StrUtils.isValidUrl(argUrl))
+    public static void generate(@NonNull final org.bottiger.podcast.provider.ISubscription argSubscription, @NonNull final Activity argActivity, @Nullable final PaletteListener ... argCallbacks) {
+
+        final String url = argSubscription.getImageURL();
+
+        if (!StrUtils.isValidUrl(url))
             return;
 
-        Palette palette = mPaletteCache.get(argUrl);
+        if (argCallbacks == null)
+            return;
+
+        Palette palette = mPaletteCache.get(url);
 
         if (palette != null && argCallbacks != null) {
             for (PaletteListener callback : argCallbacks)
@@ -46,8 +62,24 @@ public class PaletteHelper {
             return;
         }
 
+        final String key = url;
+        try {
+            sLock.lock();
+            boolean hasKey = listeners.containsKey(key);
+            List<PaletteListener> list = hasKey ? listeners.get(key) : new LinkedList<PaletteListener>();
+            Collections.addAll(list, argCallbacks);
+            listeners.put(key, list);
+
+            if (hasKey) {
+                return;
+            }
+
+        } finally {
+            sLock.unlock();
+        }
+
         Glide.with(argActivity)
-                .load(argUrl)
+                .load(url)
                 .asBitmap()
                 .into(new SimpleTarget<Bitmap>(200, 200) {
                     @Override
@@ -62,18 +94,20 @@ public class PaletteHelper {
                                         Palette palette = Palette.from(bitmap).generate();
 
                                         if (palette != null) {
-                                            mPaletteCache.put(argUrl, palette);
+                                            mPaletteCache.put(url, palette);
                                         }
+
+                                        argSubscription.onPaletteFound(palette);
 
                                         return palette;
                                     }
                                 }).subscribe(new RxBasicSubscriber<Palette>() {
                             @Override
                             public void onNext(Palette palette) {
-                                if (argCallbacks != null) {
-                                    for (final PaletteListener listener : argCallbacks) {
-                                        listener.onPaletteFound(palette);
-                                    }
+
+                                List<PaletteListener> list = listeners.get(key);
+                                for (final PaletteListener listener : list) {
+                                    listener.onPaletteFound(palette);
                                 }
                             }
                         });

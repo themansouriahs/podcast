@@ -25,6 +25,7 @@ import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.ColorUtils;
@@ -96,6 +97,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         SharedAdapterUtils.AddPaddingToLastElement(viewHolder.mLayout, 0, dataPosition == getItemCount()-1);
 
         viewHolder.setArtwork(null);
+        ISubscription subscription = item.getSubscription(context);
 
         String image = item.getArtwork(mActivity);
         if (StrUtils.isValidUrl(image)) {
@@ -110,7 +112,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
                 }
             });
 
-            viewHolder.setArtwork(image);
+            viewHolder.setArtwork(subscription);
         }
 
         Log.d("ExpanderHelper", "pos: " + dataPosition + " episode: " + item.getTitle());
@@ -118,8 +120,8 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         viewHolder.mPlayPauseButton.setIconColor(Color.WHITE);
 
         String artwork = item.getArtwork(mActivity);
-        PaletteHelper.generate(artwork, activity, viewHolder.mPlayPauseButton);
-        PaletteHelper.generate(artwork, activity, new PaletteListener() {
+        PaletteHelper.generate(subscription, activity, viewHolder.mPlayPauseButton);
+        PaletteHelper.generate(subscription, activity, new PaletteListener() {
             @Override
             public void onPaletteFound(Palette argChangedPalette) {
                 ColorExtractor colorExtractor = new ColorExtractor(mActivity, argChangedPalette);
@@ -216,8 +218,9 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         holder.removeButton.setEpisode(feedItem);
         holder.downloadButton.setEpisode(feedItem);
 
-        PaletteHelper.generate(feedItem.getArtwork(mActivity), mActivity, holder.downloadButton);
-        PaletteHelper.generate(feedItem.getArtwork(mActivity), mActivity, holder.removeButton);
+        ISubscription subscription = feedItem.getSubscription(context);
+        PaletteHelper.generate(subscription, mActivity, holder.downloadButton);
+        PaletteHelper.generate(subscription, mActivity, holder.removeButton);
 
 
         holder.removeButton.setOnClickListener(new View.OnClickListener() {

@@ -7,6 +7,7 @@ import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.model.datastructures.EpisodeList;
 
 import java.lang.annotation.Retention;
@@ -16,7 +17,7 @@ import java.net.URL;
 /**
  * Created by apl on 15-04-2015.
  */
-public interface ISubscription {
+public interface ISubscription extends PaletteListener {
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({DEFAULT, SLIM})
@@ -76,4 +77,6 @@ public interface ISubscription {
 
     @Type int getType();
     @ColorInt int getPrimaryColor();
+    @ColorInt int getPrimaryTintColor();
+    @ColorInt int getSecondaryColor();
 }

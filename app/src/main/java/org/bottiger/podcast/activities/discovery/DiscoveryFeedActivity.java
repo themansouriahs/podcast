@@ -45,8 +45,8 @@ public class DiscoveryFeedActivity extends FeedActivity {
         mNoEpisodesTextView.setVisibility(View.INVISIBLE);
 
         ISubscription subscription = getmSubscription();
-        if (subscription != null && subscription.getImageURL() != null) {
-            PaletteHelper.generate(subscription.getImageURL(), this, mFloatingButton);
+        if (subscription != null) {
+            PaletteHelper.generate(subscription, this, mFloatingButton);
         }
 
         mIsSubscribed = mSubscription instanceof Subscription;

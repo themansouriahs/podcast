@@ -170,10 +170,12 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
         SoundWaves.getAppContext(mActivity).getPlayer().addListener(episodeViewHolder.mPlayPauseButton);
         episodeViewHolder.mDownloadButton.enabledProgressListener(true);
 
+        ISubscription subscription = item.getSubscription(mActivity);
+
         if (mPalette != null) {
-            episodeViewHolder.mPlayPauseButton.onPaletteFound(mPalette);
             episodeViewHolder.mQueueButton.onPaletteFound(mPalette);
             episodeViewHolder.mDownloadButton.onPaletteFound(mPalette);
+            episodeViewHolder.mPlayPauseButton.onPaletteFound(mPalette);
         }
 
         episodeViewHolder.mPlayPauseButton.setStatus(playerStatus);
@@ -192,9 +194,9 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
     protected void getPalette(@NonNull final EpisodeViewHolder episodeViewHolder) {
         String url = mSubscription.getImageURL();
         if (!TextUtils.isEmpty(url)) {
-            PaletteHelper.generate(mSubscription.getImageURL(), mActivity, episodeViewHolder.mDownloadButton);
-            PaletteHelper.generate(mSubscription.getImageURL(), mActivity, episodeViewHolder.mQueueButton);
-            PaletteHelper.generate(mSubscription.getImageURL(), mActivity, episodeViewHolder.mPlayPauseButton);
+            PaletteHelper.generate(mSubscription, mActivity, episodeViewHolder.mDownloadButton);
+            PaletteHelper.generate(mSubscription, mActivity, episodeViewHolder.mQueueButton);
+            PaletteHelper.generate(mSubscription, mActivity, episodeViewHolder.mPlayPauseButton);
         }
     }
 

@@ -188,6 +188,16 @@ public class SlimSubscription extends BaseSubscription implements Parcelable {
         return -1;
     }
 
+    @Override
+    public int getPrimaryTintColor() {
+        return -1;
+    }
+
+    @Override
+    public int getSecondaryColor() {
+        return -1;
+    }
+
     public int describeContents() {
         return 0;
     }
@@ -264,5 +274,10 @@ public class SlimSubscription extends BaseSubscription implements Parcelable {
                 return false;
             }
         });
+    }
+
+    @Override
+    public String getPaletteUrl() {
+        return getImageURL();
     }
 }

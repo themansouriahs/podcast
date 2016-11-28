@@ -412,10 +412,10 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
             artworkURL = iSubscription.getImageURL();
         }
 
-        if (!TextUtils.isEmpty(artworkURL)) {
+        if (iSubscription != null) {
 
-            PaletteHelper.generate(artworkURL, activity, mTopPlayer);
-            PaletteHelper.generate(artworkURL, activity, new PaletteListener() {
+            PaletteHelper.generate(iSubscription, activity, mTopPlayer);
+            PaletteHelper.generate(iSubscription, activity, new PaletteListener() {
                 @Override
                 public void onPaletteFound(Palette argChangedPalette) {
                     Palette.Swatch swatch = argChangedPalette.getMutedSwatch();

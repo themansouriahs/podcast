@@ -33,7 +33,7 @@ import javax.annotation.Nullable;
 
 import io.requery.android.database.sqlite.SQLiteDatabase;
 
-public class Subscription extends BaseSubscription implements PaletteListener {
+public class Subscription extends BaseSubscription {
 
 	private static final String TAG = "Subscription";
 
@@ -71,11 +71,6 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 	public static final int STATUS_SUBSCRIBED = 1;
 	public static final int STATUS_UNSUBSCRIBED = 2;
 
-	// If the Subscription contains unpersisted changes.
-    private boolean mIsDirty = false;
-	private boolean mIsLoaded = false;
-	private boolean mIsRefreshing = false;
-
     /**
      * See SubscriptionColumns for documentation
      */
@@ -92,9 +87,6 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 	public long lastItemUpdated;
 	public long fail_count;
 	@Deprecated public long auto_download;
-    private int mPrimaryColor;
-    private int mPrimaryTintColor;
-    private int mSecondaryColor;
 
 	public int new_episodes_cache;
 	private int episode_count_cache;
@@ -361,23 +353,6 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 	public String toString() {
 		return "Subscription: " + this.title + " (" + this.url + ")";
 	}
-
-    @Override
-    public void onPaletteFound(@Nullable Palette argChangedPalette) {
-        ColorExtractor extractor = new ColorExtractor(argChangedPalette);
-        int newPrimaryColor = extractor.getPrimary();
-        int newPrimaryTintColor = extractor.getPrimaryTint();
-        int newSecondaryColor = extractor.getSecondary();
-
-        if (newPrimaryColor != mPrimaryColor || newPrimaryTintColor != mPrimaryTintColor ||newSecondaryColor != mSecondaryColor) {
-            mIsDirty = true;
-        }
-
-        mPrimaryColor     = newPrimaryColor;
-        mPrimaryTintColor = newPrimaryTintColor;
-        mSecondaryColor   = newSecondaryColor;
-		notifyPropertyChanged(null);
-    }
 
     public boolean IsDirty() {
         return mIsDirty;
@@ -902,11 +877,7 @@ public class Subscription extends BaseSubscription implements PaletteListener {
 			SoundWaves.getRxBus().send(new SubscriptionChanged(getId(), SubscriptionChanged.ADDED, null));
 	}
 
-	private void notifyPropertyChanged(@android.support.annotation.Nullable String argTag) {
-		notifyPropertyChanged(SubscriptionChanged.CHANGED, argTag);
-	}
-
-	private void notifyPropertyChanged(@SubscriptionChanged.Action int event, @android.support.annotation.Nullable String argTag) {
+	protected void notifyPropertyChanged(@SubscriptionChanged.Action int event, @android.support.annotation.Nullable String argTag) {
 		if (TextUtils.isEmpty(argTag))
 			argTag = "NoTag";
 
