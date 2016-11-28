@@ -13,6 +13,8 @@ import com.google.android.gms.cast.framework.CastSession;
 import com.google.android.gms.cast.framework.SessionManager;
 import com.google.android.gms.cast.framework.SessionManagerListener;
 import com.google.android.gms.cast.framework.media.RemoteMediaClient;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.player.googlecast.GoogleCastPlayer;
@@ -29,7 +31,7 @@ public class VendorMediaRouteCast extends GoogleCastPlayer {
     @NonNull
     private final Activity mActivity;
 
-    @NonNull
+    @Nullable
     private final CastContext mCastContext;
 
     @Nullable
@@ -109,11 +111,20 @@ public class VendorMediaRouteCast extends GoogleCastPlayer {
         mActivity = argActivity;
 
         // New
-        mCastContext = CastContext.getSharedInstance(argActivity);
-
+        GoogleApiAvailability api = GoogleApiAvailability.getInstance();
+        int code = api.isGooglePlayServicesAvailable(mActivity);
+        if (code == ConnectionResult.SUCCESS) {
+            // Do Your Stuff Here
+            mCastContext = CastContext.getSharedInstance(argActivity);
+        }else {
+            mCastContext = null;
+        }
     }
 
     private void setClient() {
+        if (isMissingPlayServices())
+            return;
+
         mRemoteMediaClient = mCastSession.getRemoteMediaClient();
         mRemoteMediaClient.addListener(getRemoteMediaClientListener());
         SoundWaves.getAppContext(mActivity).setPlayer(this);
@@ -130,19 +141,31 @@ public class VendorMediaRouteCast extends GoogleCastPlayer {
     }
 
     public void setupMediaButton(@NonNull Context argContext, @NonNull Menu menu, @IdRes int argMenuResource) {
+        if (isMissingPlayServices())
+            return;
+
         CastButtonFactory.setUpMediaRouteButton(argContext, menu, argMenuResource);
     }
 
     public void onCreate() {
+        if (isMissingPlayServices())
+            return;
+
         mSessionManager = CastContext.getSharedInstance(mActivity).getSessionManager();
     }
 
     public void onResume() {
+        if (isMissingPlayServices())
+            return;
+
         mCastSession = mSessionManager.getCurrentCastSession();
         mSessionManager.addSessionManagerListener(mSessionManagerListener);
     }
 
     public void onPause() {
+        if (isMissingPlayServices())
+            return;
+
         mSessionManager.removeSessionManagerListener(mSessionManagerListener);
         mCastSession = null;
     }
@@ -151,6 +174,10 @@ public class VendorMediaRouteCast extends GoogleCastPlayer {
     @Override
     public RemoteMediaClient getRemoteMediaClient() {
         return mRemoteMediaClient;
+    }
+
+    public boolean isMissingPlayServices() {
+        return mCastContext == null;
     }
 
 
