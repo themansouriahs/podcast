@@ -216,6 +216,8 @@
     <string name="discovery_directory_icon">Podcast directory (search engine)</string>
     <string name="subscription_instruction_title">You are not subscribed to any podcasts</string>
     <string name="dialog_playback_boost_volume">Boost volume</string>
+
+    <!-- The audio engine has an option to remove periods of silence in an audio file. -->
     <string name="dialog_playback_removile_silence">Remove silence</string>
     <string name="menu_web_player">Web Player (beta)</string>
 
