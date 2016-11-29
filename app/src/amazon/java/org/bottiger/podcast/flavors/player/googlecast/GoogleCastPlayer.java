@@ -1,4 +1,4 @@
-package org.bottiger.podcast.player.googlecast;
+package org.bottiger.podcast.flavors.player.googlecast;
 
 import android.content.Context;
 import android.net.Uri;
@@ -339,6 +339,11 @@ public abstract class GoogleCastPlayer extends SoundWavesPlayerBase {
 
             @Override
             public void onSendingRemoteMediaRequest() {
+
+            }
+
+            @Override
+            public void onAdBreakStatusUpdated() {
 
             }
         };

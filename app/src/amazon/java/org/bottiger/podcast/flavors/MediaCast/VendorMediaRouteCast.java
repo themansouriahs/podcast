@@ -38,11 +38,11 @@ import com.google.android.gms.common.images.WebImage;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
+import org.bottiger.podcast.flavors.player.googlecast.GoogleCastPlayer;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.player.Player;
 import org.bottiger.podcast.player.SoundWavesPlayer;
 import org.bottiger.podcast.player.SoundWavesPlayerBase;
-import org.bottiger.podcast.player.googlecast.GoogleCastPlayer;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.utils.PlaybackSpeed;
@@ -79,7 +79,7 @@ public class VendorMediaRouteCast extends GoogleCastPlayer {
     }
 
     @Override
-    public void FaceOutAndStop(int argDelayMs) {
+    public void FadeOutAndStop(int argDelayMs) {
         stop();
     }
 
