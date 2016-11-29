@@ -47,6 +47,8 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
+import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -702,7 +704,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
                  // http://stackoverflow.com/questions/30820806/adding-a-colored-background-with-text-icon-under-swiped-row-when-using-androids
                  View itemView = viewHolder.itemView;
 
-                 int color = playlistViewHolder.hasColor() ? playlistViewHolder.getEpisodePrimaryColor() : getResources().getColor(R.color.colorBgPrimary);
+                 @ColorInt int color = playlistViewHolder.hasColor() ? playlistViewHolder.getEpisodePrimaryColor() : ContextCompat.getColor(mContext, R.color.colorBgPrimary);
                  mSwipePaint.setColor(color);
 
                  c.drawRect((float) itemView.getLeft(), (float) itemView.getTop(), dX,
