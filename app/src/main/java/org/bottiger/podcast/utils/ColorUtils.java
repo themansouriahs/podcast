@@ -52,9 +52,9 @@ public class ColorUtils {
 
     public static @ColorInt int adjustToTheme(@NonNull Resources argResources, @NonNull ISubscription argSubscription) {
         if (UIUtils.isInNightMode(argResources)) {
-            return darken(argSubscription.getPrimaryColor(), 0.5f);
+            return darken(argSubscription.getPrimaryTintColor(), 0.5f);
         } else {
-            return argSubscription.getPrimaryColor();
+            return argSubscription.getPrimaryTintColor();
         }
     }
 

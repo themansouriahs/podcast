@@ -87,24 +87,14 @@ public class ExpandableViewHoldersUtil {
         holder.buttonLayout.setVisibility(View.GONE);
         expandView.setVisibility(View.GONE);
 
-        PaletteHelper.generate(holder.getArtwork(), holder.getActivity(), new PaletteListener() {
-            @Override
-            public void onPaletteFound(Palette argChangedPalette) {
-                int white = ColorUtils.getBackgroundColor(holder.getActivity());
-                int black = ColorUtils.getTextColor(holder.getActivity());
 
-                //holder.mLayout.setCardBackgroundColor(white);
-                holder.mMainTitle.setTextColor(black);
-                holder.description.setTextColor(black);
-                holder.currentTime.setTextColor(black);
-                holder.mTimeDuration.setTextColor(black);
-            }
+        int white = ColorUtils.getBackgroundColor(holder.getActivity());
+        int black = ColorUtils.getTextColor(holder.getActivity());
 
-            @Override
-            public String getPaletteUrl() {
-                return null;
-            }
-        });
+        holder.mMainTitle.setTextColor(black);
+        holder.description.setTextColor(black);
+        holder.currentTime.setTextColor(black);
+        holder.mTimeDuration.setTextColor(black);
 
     }
 

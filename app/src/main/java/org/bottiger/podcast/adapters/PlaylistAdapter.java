@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.graphics.Palette;
@@ -26,6 +28,7 @@ import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.provider.base.BaseSubscription;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.ColorUtils;
@@ -119,20 +122,17 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
         viewHolder.mPlayPauseButton.setIconColor(Color.WHITE);
 
-        String artwork = item.getArtwork(mActivity);
-        PaletteHelper.generate(subscription, activity, viewHolder.mPlayPauseButton);
-        PaletteHelper.generate(subscription, activity, new PaletteListener() {
-            @Override
-            public void onPaletteFound(Palette argChangedPalette) {
-                ColorExtractor colorExtractor = new ColorExtractor(mActivity, argChangedPalette);
-                viewHolder.setEpisodePrimaryColor(colorExtractor.getPrimary());
-            }
+        subscription.getColors(mActivity)
+                .subscribeOn(io.reactivex.schedulers.Schedulers.io())
+                .observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
+                .subscribe(new BaseSubscription.BasicColorExtractorObserver<ColorExtractor>() {
 
-            @Override
-            public String getPaletteUrl() {
-                return null;
-            }
-        });
+                    @Override
+                    public void onSuccess(ColorExtractor value) {
+                        viewHolder.mPlayPauseButton.setColor(value);
+                        viewHolder.setEpisodePrimaryColor(value.getPrimary());
+                    }
+                });
 
         viewHolder.episode = item;
         viewHolder.mAdapter = this;
@@ -219,8 +219,17 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         holder.downloadButton.setEpisode(feedItem);
 
         ISubscription subscription = feedItem.getSubscription(context);
-        PaletteHelper.generate(subscription, mActivity, holder.downloadButton);
-        PaletteHelper.generate(subscription, mActivity, holder.removeButton);
+        subscription.getColors(context)
+                .subscribeOn(io.reactivex.schedulers.Schedulers.io())
+                .observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
+                .subscribe(new BaseSubscription.BasicColorExtractorObserver<ColorExtractor>() {
+
+                    @Override
+                    public void onSuccess(ColorExtractor value) {
+                        holder.downloadButton.onPaletteFound(value);
+                        holder.removeButton.onPaletteFound(value);
+                    }
+                });
 
 
         holder.removeButton.setOnClickListener(new View.OnClickListener() {

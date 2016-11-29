@@ -13,6 +13,7 @@ import org.bottiger.podcast.playlist.filters.SubscriptionFilter;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.provider.base.BaseSubscription;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.ImageLoaderUtils;
 import org.bottiger.podcast.utils.PaletteHelper;
@@ -414,42 +415,33 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
 
         if (iSubscription != null) {
 
-            PaletteHelper.generate(iSubscription, activity, mTopPlayer);
-            PaletteHelper.generate(iSubscription, activity, new PaletteListener() {
-                @Override
-                public void onPaletteFound(Palette argChangedPalette) {
-                    Palette.Swatch swatch = argChangedPalette.getMutedSwatch();
+            //PaletteHelper.generate(iSubscription, activity, mTopPlayer);
 
-                    if (swatch == null)
-                        return;
+            iSubscription.getColors(mContext)
+                    .subscribeOn(io.reactivex.schedulers.Schedulers.io())
+                    .observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
+                    .subscribe(new BaseSubscription.BasicColorExtractorObserver<ColorExtractor>() {
 
-                    int colorBackground = swatch.getRgb();
+                        @Override
+                        public void onSuccess(ColorExtractor value) {
+                            mPlayPauseButton.setColor(value);
 
-                    ColorExtractor extractor = new ColorExtractor(getActivity(), argChangedPalette);
+                            int transparentgradientColor;
+                            int gradientColor = value.getPrimary();
 
-                    mPlayPauseButton.onPaletteFound(argChangedPalette);
+                            int alpha = 0;
+                            int red = Color.red(gradientColor);
+                            int green = Color.green(gradientColor);
+                            int blue = Color.blue(gradientColor);
+                            transparentgradientColor = Color.argb(alpha, red, green, blue);
 
-                    int transparentgradientColor;
-                    int gradientColor = extractor.getPrimary();
-
-                    int alpha = 0;
-                    int red = Color.red(gradientColor);
-                    int green = Color.green(gradientColor);
-                    int blue = Color.blue(gradientColor);
-                    transparentgradientColor = Color.argb(alpha, red, green, blue);
-
-                    GradientDrawable gd = new GradientDrawable(
-                            GradientDrawable.Orientation.TOP_BOTTOM,
-                            new int[]{transparentgradientColor, gradientColor});
-                    Drawable wrapDrawable = DrawableCompat.wrap(gd);
-                    DrawableCompat.setTint(wrapDrawable, colorBackground);
-                }
-
-                @Override
-                public String getPaletteUrl() {
-                    return item.getArtwork(getContext());
-                }
-            });
+                            GradientDrawable gd = new GradientDrawable(
+                                    GradientDrawable.Orientation.TOP_BOTTOM,
+                                    new int[]{transparentgradientColor, gradientColor});
+                            Drawable wrapDrawable = DrawableCompat.wrap(gd);
+                            DrawableCompat.setTint(wrapDrawable, value.getPrimary());
+                        }
+                    });
 
 
             Log.v("MissingImage", "Setting image");

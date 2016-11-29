@@ -2,9 +2,11 @@ package org.bottiger.podcast.activities.feedview;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.support.annotation.ColorInt;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -24,6 +26,8 @@ import org.bottiger.podcast.player.SoundWavesPlayerBase;
 import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.provider.base.BaseSubscription;
+import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.ColorUtils;
 import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.SharedAdapterUtils;
@@ -171,12 +175,18 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
         episodeViewHolder.mDownloadButton.enabledProgressListener(true);
 
         ISubscription subscription = item.getSubscription(mActivity);
+        subscription.getColors(mActivity)
+                .subscribeOn(io.reactivex.schedulers.Schedulers.io())
+                .observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
+                .subscribe(new BaseSubscription.BasicColorExtractorObserver<ColorExtractor>() {
 
-        if (mPalette != null) {
-            episodeViewHolder.mQueueButton.onPaletteFound(mPalette);
-            episodeViewHolder.mDownloadButton.onPaletteFound(mPalette);
-            episodeViewHolder.mPlayPauseButton.onPaletteFound(mPalette);
-        }
+                    @Override
+                    public void onSuccess(ColorExtractor value) {
+                        episodeViewHolder.mPlayPauseButton.setColor(value);
+                        episodeViewHolder.mQueueButton.onPaletteFound(value);
+                        episodeViewHolder.mDownloadButton.onPaletteFound(value);
+                    }
+                });
 
         episodeViewHolder.mPlayPauseButton.setStatus(playerStatus);
 
@@ -192,12 +202,18 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
     }
 
     protected void getPalette(@NonNull final EpisodeViewHolder episodeViewHolder) {
-        String url = mSubscription.getImageURL();
-        if (!TextUtils.isEmpty(url)) {
-            PaletteHelper.generate(mSubscription, mActivity, episodeViewHolder.mDownloadButton);
-            PaletteHelper.generate(mSubscription, mActivity, episodeViewHolder.mQueueButton);
-            PaletteHelper.generate(mSubscription, mActivity, episodeViewHolder.mPlayPauseButton);
-        }
+        mSubscription.getColors(mActivity)
+                .subscribeOn(io.reactivex.schedulers.Schedulers.io())
+                .observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
+                .subscribe(new BaseSubscription.BasicColorExtractorObserver<ColorExtractor>() {
+
+                    @Override
+                    public void onSuccess(ColorExtractor value) {
+                        episodeViewHolder.mPlayPauseButton.setColor(value);
+                        episodeViewHolder.mQueueButton.onPaletteFound(value);
+                        episodeViewHolder.mDownloadButton.onPaletteFound(value);
+                    }
+                });
     }
 
     @Override

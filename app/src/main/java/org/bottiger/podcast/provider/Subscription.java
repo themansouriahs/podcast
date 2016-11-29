@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
-import android.support.v7.graphics.Palette;
 import android.support.v7.util.SortedList;
 import android.text.TextUtils;
 import android.util.Patterns;
@@ -13,7 +12,6 @@ import android.util.Patterns;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.model.datastructures.EpisodeList;
 import org.bottiger.podcast.model.events.SubscriptionChanged;
 import org.bottiger.podcast.provider.base.BaseSubscription;
@@ -31,6 +29,10 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Single;
 import io.requery.android.database.sqlite.SQLiteDatabase;
 
 public class Subscription extends BaseSubscription {
@@ -205,7 +207,9 @@ public class Subscription extends BaseSubscription {
 		init();
 	}
 
-	private void init() {
+	@Override
+	protected void init() {
+		super.init();
 		mEpisodes = new EpisodeList(IEpisode.class, mEpisodesListCallback);
 		setIsRefreshing(true);
 	}

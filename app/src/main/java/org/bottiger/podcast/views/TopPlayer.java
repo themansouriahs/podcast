@@ -57,7 +57,10 @@ import org.bottiger.podcast.R;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.provider.base.BaseSubscription;
 import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.ColorUtils;
 import org.bottiger.podcast.utils.PlaybackSpeed;
 import org.bottiger.podcast.utils.StrUtils;
@@ -68,6 +71,8 @@ import org.bottiger.podcast.views.dialogs.DialogPlaybackSpeed;
 
 import java.util.Calendar;
 
+import io.reactivex.SingleObserver;
+import io.reactivex.disposables.Disposable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -78,7 +83,7 @@ import static org.bottiger.podcast.views.PlayerButtonView.StaticButtonColor;
 /**
  * Created by apl on 30-09-2014.
  */
-public class TopPlayer extends LinearLayout implements PaletteListener, ScrollingView, NestedScrollingChild {
+public class TopPlayer extends LinearLayout implements ScrollingView, NestedScrollingChild {
 
     private static final String TAG = "TopPlayer";
 
@@ -446,6 +451,32 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
 
         if (argEpisode == null)
             return;
+
+        // Set colors
+        mTextColor = ColorUtils.getTextColor(getContext());
+        int color = ColorUtils.getBackgroundColor(getContext());
+
+        argEpisode.getSubscription(mContext).getColors(mContext)
+                .subscribeOn(io.reactivex.schedulers.Schedulers.io())
+                .observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
+                .subscribe(new BaseSubscription.BasicColorExtractorObserver<ColorExtractor>() {
+
+                    @Override
+                    public void onSuccess(ColorExtractor value) {
+                        mPlayPauseButton.setColor(value);
+                        mBackgroundColor = value.getPrimary();
+
+                        @ColorInt int bgcolor = ContextCompat.getColor(getContext(), R.color.playlist_background);
+                        bgcolor = ColorUtils.adjustToTheme(getResources(), argEpisode.getSubscription(mContext));
+                        setBackgroundColor(bgcolor);
+
+                        ColorUtils.tintButton(mFavoriteButton,    mTextColor);
+                        ColorUtils.tintButton(mDownloadButton,    mTextColor);
+                        tintInflatedButtons();
+
+                        invalidate();
+                    }
+                });
     }
 
     private void openTimePicker() {
@@ -640,33 +671,6 @@ public class TopPlayer extends LinearLayout implements PaletteListener, Scrollin
 
     public int getMaximumSize() {
         return sizeLarge;
-    }
-
-    @Override
-    public void onPaletteFound(Palette argChangedPalette) {
-        mTextColor = ColorUtils.getTextColor(getContext());
-        int color = ColorUtils.getBackgroundColor(getContext());
-        mBackgroundColor = StaticButtonColor(mContext, argChangedPalette, color);
-        @ColorInt int bgcolor = ContextCompat.getColor(getContext(), R.color.playlist_background);
-        int playcolor = ContextCompat.getColor(getContext(), R.color.colorPrimaryDark);
-
-
-        bgcolor = ColorUtils.adjustToTheme(getResources(), argChangedPalette, bgcolor);
-        setBackgroundColor(bgcolor);
-
-        //mPlayPauseButton.setColor(argChangedPalette.getDarkVibrantColor(playcolor));
-        mPlayPauseButton.onPaletteFound(argChangedPalette);
-
-        ColorUtils.tintButton(mFavoriteButton,    mTextColor);
-        ColorUtils.tintButton(mDownloadButton,    mTextColor);
-        tintInflatedButtons();
-
-        invalidate();
-    }
-
-    @Override
-    public String getPaletteUrl() {
-        return mPlayPauseButton.getPaletteUrl();
     }
 
     private void hideText() {

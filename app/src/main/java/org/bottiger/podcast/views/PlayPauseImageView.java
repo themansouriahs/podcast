@@ -79,8 +79,7 @@ import static org.bottiger.podcast.player.SoundWavesPlayerBase.STATE_READY;
 /**
  * TODO: document your custom view class.
  */
-public class PlayPauseImageView extends PlayPauseView implements PaletteListener,
-                                                                DownloadObserver,
+public class PlayPauseImageView extends PlayPauseView implements DownloadObserver,
                                                                 View.OnClickListener,
                                                                 ExoPlayer.EventListener {
 
@@ -583,16 +582,10 @@ public class PlayPauseImageView extends PlayPauseView implements PaletteListener
         argContext.startActivity(intent);
     }
 
-    @Override
-    public void onPaletteFound(Palette argChangedPalette) {
-        ColorExtractor extractor = new ColorExtractor(mContext, argChangedPalette);
-        setColor(extractor.getPrimary(), extractor.getPrimaryTint());
+    public void setColor(ColorExtractor value) {
+        setColor(value.getPrimary(), value.getPrimaryTint());
     }
 
-    @Override
-    public String getPaletteUrl() {
-        return mEpisode.getUrl().toString();
-    }
 
     private static int smallSize = -1;
     private static int largeSize = -1;

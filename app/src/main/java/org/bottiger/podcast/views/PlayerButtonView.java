@@ -27,7 +27,7 @@ import java.lang.ref.WeakReference;
 /**
  * TODO: document your custom view class.
  */
-public class PlayerButtonView extends ImageButton implements PaletteListener  {
+public class PlayerButtonView extends ImageButton  {
 
     public final static int STATE_DEFAULT = 0;
     public final static int STATE_DOWNLOAD = 1;
@@ -160,12 +160,10 @@ public class PlayerButtonView extends ImageButton implements PaletteListener  {
         return mEpisode;
     }
 
-    @Override
-    public void onPaletteFound(Palette argChangedPalette) {
+    public void onPaletteFound(ColorExtractor extractor) {
         int color = ColorUtils.getTextColor(getContext());
-        ColorExtractor extractor = new ColorExtractor(argChangedPalette, color);
 
-        int colorFinal = ColorUtils.adjustToTheme(this.mContext.getResources(), argChangedPalette, getForegroundColor(extractor));
+        int colorFinal = ColorUtils.adjustToTheme(this.mContext.getResources(), mEpisode.getSubscription(mContext));
 
         //colorFinal = Color.BLACK;
 
@@ -177,11 +175,6 @@ public class PlayerButtonView extends ImageButton implements PaletteListener  {
 
     public @ColorInt int getForegroundColor(@NonNull ColorExtractor extractor) {
         return extractor.getSecondary();
-    }
-
-    @Override
-    public String getPaletteUrl() {
-        return mEpisode.getArtwork(getContext()).toString();
     }
 
     public interface DownloadStatus {

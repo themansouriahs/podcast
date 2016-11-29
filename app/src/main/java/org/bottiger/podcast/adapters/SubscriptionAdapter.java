@@ -40,6 +40,7 @@ import org.bottiger.podcast.adapters.viewholders.subscription.SubscriptionViewHo
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.provider.base.BaseSubscription;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.StrUtils;
@@ -238,19 +239,16 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
         if (holder.text_container != null) {
             if (holder.image != null && hasImage) {
 
-                PaletteHelper.generate(sub, mActivity, new PaletteListener() {
-                    @Override
-                    public void onPaletteFound(Palette argChangedPalette) {
-                        ColorExtractor extractor = new ColorExtractor(argChangedPalette);
-                        holder.text_container.setBackgroundColor(extractor.getPrimaryTint());
-                    }
+                subscription.getColors(mActivity)
+                        .subscribeOn(io.reactivex.schedulers.Schedulers.io())
+                        .observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
+                        .subscribe(new BaseSubscription.BasicColorExtractorObserver<ColorExtractor>() {
 
-                    @Override
-                    public String getPaletteUrl() {
-                        return logo;
-                    }
-                });
-
+                            @Override
+                            public void onSuccess(ColorExtractor value) {
+                                holder.text_container.setBackgroundColor(value.getPrimaryTint());
+                            }
+                        });
             } else {
                 holder.text_container.setBackgroundColor(0x00000000);
             }
