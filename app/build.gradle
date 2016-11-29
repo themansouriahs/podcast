@@ -9,7 +9,7 @@ android {
         applicationId "org.bottiger.podcast"
         minSdkVersion 15
         targetSdkVersion 25
-        versionCode 316        // even - release. Odd - development
+        versionCode 320        // even - release. Odd - development
         versionName "0.146.2" // even - release. Odd - development
         multiDexEnabled = true
         //renderscriptTargetApi 20
@@ -21,7 +21,7 @@ android {
         //testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         ndk {
-            abiFilters "armeabi-v7a"
+            abiFilters "armeabi-v7a", "x86"
 
 
             //moduleName "hello-jni"
