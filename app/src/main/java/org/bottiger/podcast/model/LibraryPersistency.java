@@ -188,7 +188,7 @@ public class LibraryPersistency {
         cv.put(SubscriptionColumns.TITLE, argSubscription.getTitle());
         cv.put(SubscriptionColumns.URL, argSubscription.getURLString());
         cv.put(SubscriptionColumns.IMAGE_URL, argSubscription.getImageURL());
-        cv.put(SubscriptionColumns.DESCRIPTION, argSubscription.description);
+        cv.put(SubscriptionColumns.DESCRIPTION, argSubscription.getDescription());
 
         if (!silent) {
             long lastUpdated = System.currentTimeMillis();

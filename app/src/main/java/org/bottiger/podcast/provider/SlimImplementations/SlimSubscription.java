@@ -10,6 +10,7 @@ import android.support.v7.util.SortedList;
 import org.bottiger.podcast.model.datastructures.EpisodeList;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.provider.base.BasePodcastSubscription;
 import org.bottiger.podcast.provider.base.BaseSubscription;
 import org.bottiger.podcast.provider.converter.EpisodeConverter;
 
@@ -20,7 +21,7 @@ import java.util.ArrayList;
 /**
  * Created by apl on 15-04-2015.
  */
-public class SlimSubscription extends BaseSubscription implements Parcelable {
+public class SlimSubscription extends BasePodcastSubscription implements Parcelable {
 
     private String mTitle;
     private URL mURL;

@@ -72,7 +72,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 
 	/**
 	 * Currently not persisted.
-	 * A link to the show notes
+	 * A mLink to the show notes
 	 */
 	public String link_show_notes;
 
@@ -98,7 +98,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
     public long pub_date;
 
 	/**
-	 * Episode description in text
+	 * Episode mDescription in text
 	 */
 	public String content;
 
@@ -747,7 +747,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 		if (subscription == null)
 			return null;
 
-		imageURL = subscription.imageURL;
+		imageURL = subscription.getImageURL();
 
 		if (TextUtils.isEmpty(imageURL))
 			return null;
@@ -857,7 +857,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 	}
 
 	/**
-	 * @return the title
+	 * @return the mTitle
 	 */
 	public String getTitle() {
         return title != null ? title : "";
@@ -883,7 +883,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
     }
 
 	/**
-	 * @param argTitle the title to set
+	 * @param argTitle the mTitle to set
 	 */
 	public void setTitle(String argTitle) {
 		if (title != null && title.equals(argTitle))

@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
 import android.support.v7.graphics.Palette;
+import android.support.v7.util.SortedList;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -14,11 +15,13 @@ import com.bumptech.glide.request.target.PreloadTarget;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PaletteListener;
+import org.bottiger.podcast.model.datastructures.EpisodeList;
 import org.bottiger.podcast.model.events.SubscriptionChanged;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.utils.ColorExtractor;
 
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -51,9 +54,129 @@ public abstract class BaseSubscription implements ISubscription {
     protected int mPrimaryTintColor;
     protected int mSecondaryColor;
 
+    /**
+     * See SubscriptionColumns for documentation
+     */
+    protected String mTitle;
+    protected String mImageURL;
+    protected String mDescription;
+    protected String mUrlString;
+    protected String mLink;
+
     private Single<ColorExtractor> mColorObservable;
 
+    @NonNull
+    protected EpisodeList mEpisodes;
+    protected SortedList.Callback<IEpisode> mEpisodesListCallback = new SortedList.Callback<IEpisode>() {
+
+        @Override
+        public int compare(IEpisode o1, IEpisode o2) {
+
+            if (o1 == null)
+                return 1;
+
+            if (o2 == null)
+                return -1;
+
+            Date dt1 = o1.getDateTime();
+
+            if (dt1 == null)
+                return 1;
+
+            Date dt2 = o2.getDateTime();
+
+            if (dt2 == null)
+                return -1;
+
+            return o2.getDateTime().compareTo(o1.getDateTime());
+        }
+
+        @Override
+        public void onInserted(int position, int count) {
+
+        }
+
+        @Override
+        public void onRemoved(int position, int count) {
+
+        }
+
+        @Override
+        public void onMoved(int fromPosition, int toPosition) {
+
+        }
+
+        @Override
+        public void onChanged(int position, int count) {
+
+        }
+
+        @Override
+        public boolean areContentsTheSame(IEpisode oldItem, IEpisode newItem) {
+            return false;
+        }
+
+        @Override
+        public boolean areItemsTheSame(IEpisode item1, IEpisode item2) {
+            return item1.equals(item2);
+        }
+    };
+
     protected void init() {
+    }
+
+    @NonNull
+    @Override
+    public EpisodeList<IEpisode> getEpisodes() {
+        return mEpisodes;
+    }
+
+    @Override
+    public void setTitle(String argTitle) {
+        if (mTitle != null && mTitle.equals(argTitle))
+            return;
+
+        mTitle = argTitle.trim();
+        notifyPropertyChanged(null);
+    }
+
+    public void setImageURL(String argUrl) {
+
+        if (argUrl == null)
+            return;
+
+        argUrl = argUrl.trim();
+
+        if (mImageURL != null && mImageURL.equals(argUrl))
+            return;
+
+        mImageURL = argUrl;
+        notifyPropertyChanged(null);
+    }
+
+    public void setURL(String argUrl) {
+        if (mUrlString != null && mUrlString.equals(argUrl))
+            return;
+
+        mUrlString = argUrl.trim();
+        notifyPropertyChanged(null);
+    }
+
+    public void setLink(@NonNull String argLink) {
+        mLink = argLink;
+    }
+
+    public void setDescription(String content) {
+        if (mDescription != null && mDescription.equals(content))
+            return;
+
+        mDescription = content.trim();
+        notifyPropertyChanged(null);
+    }
+
+    @android.support.annotation.Nullable
+    public String getDescription() {
+        return mDescription;
     }
 
     public Single<ColorExtractor> getColors(@NonNull final Context argContext) {
@@ -100,14 +223,6 @@ public abstract class BaseSubscription implements ISubscription {
         return new ColorExtractor(palette);
     }
 
-    public void fetchImage(@NonNull Context argContext) {
-        PreloadTarget<Bitmap> preloadTarget = PreloadTarget.obtain(500, 500);
-        Glide.with(argContext.getApplicationContext())
-        .load(getImageURL())
-                .asBitmap()
-                .into(preloadTarget);
-    }
-
     public boolean doSkipIntro() {
         return false;
     }
@@ -124,9 +239,8 @@ public abstract class BaseSubscription implements ISubscription {
 
     public boolean contains(@NonNull IEpisode argEpisode) {
 
-        // For some reason thi doen't work
+        // For some reason this doesn't work
         //return mEpisodes.indexOf(argEpisode) >= 0;
-
         IEpisode matchingEpisode = getMatchingEpisode(argEpisode);
 
         return matchingEpisode != null;

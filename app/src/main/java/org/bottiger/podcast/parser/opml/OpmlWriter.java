@@ -108,10 +108,8 @@ public class OpmlWriter {
 			if (feed.getType() != null) {
 				xs.attribute(null, OpmlSymbols.TYPE, feed.getType());
 			}*/
-			xs.attribute(null, OpmlSymbols.XMLURL, feed.url);
-			if (feed.url != null) {
-				xs.attribute(null, OpmlSymbols.HTMLURL, feed.url);
-			}
+			xs.attribute(null, OpmlSymbols.XMLURL, feed.getURLString());
+			xs.attribute(null, OpmlSymbols.HTMLURL, feed.getURLString());
 			xs.endTag(null, OpmlSymbols.OUTLINE);
 		}
 		xs.endTag(null, OpmlSymbols.BODY);

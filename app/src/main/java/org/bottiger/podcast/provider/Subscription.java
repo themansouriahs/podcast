@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
-import android.support.v7.util.SortedList;
 import android.text.TextUtils;
 import android.util.Patterns;
 
@@ -14,9 +13,8 @@ import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.datastructures.EpisodeList;
 import org.bottiger.podcast.model.events.SubscriptionChanged;
-import org.bottiger.podcast.provider.base.BaseSubscription;
+import org.bottiger.podcast.provider.base.BasePodcastSubscription;
 import org.bottiger.podcast.utils.BitMaskUtils;
-import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.PlaybackSpeed;
 import org.bottiger.podcast.utils.StrUtils;
 
@@ -24,20 +22,15 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.Single;
 import io.requery.android.database.sqlite.SQLiteDatabase;
 
-public class Subscription extends BaseSubscription {
+public class Subscription extends BasePodcastSubscription {
 
-	private static final String TAG = "Subscription";
+	private static final String TAG = Subscription.class.getSimpleName();
 
 	private SharedPreferences mSharedPreferences = null;
 
@@ -77,12 +70,7 @@ public class Subscription extends BaseSubscription {
      * See SubscriptionColumns for documentation
      */
 	public long id;
-	public String title;
-	public String link;
 	public String comment;
-	public String url;
-	public String description;
-	public String imageURL;
 	public String sync_id;
 	public long status;
 	public long lastUpdated;
@@ -98,79 +86,18 @@ public class Subscription extends BaseSubscription {
 	 */
 	private int mSettings;
 
-	@NonNull
-    private EpisodeList mEpisodes;
-	private SortedList.Callback<IEpisode> mEpisodesListCallback = new SortedList.Callback<IEpisode>() {
-
-		@Override
-		public int compare(IEpisode o1, IEpisode o2) {
-
-			if (o1 == null)
-				return 1;
-
-			if (o2 == null)
-				return -1;
-
-			Date dt1 = o1.getDateTime();
-
-			if (dt1 == null)
-				return 1;
-
-			Date dt2 = o2.getDateTime();
-
-			if (dt2 == null)
-				return -1;
-
-			return o2.getDateTime().compareTo(o1.getDateTime());
-		}
-
-		@Override
-		public void onInserted(int position, int count) {
-
-		}
-
-		@Override
-		public void onRemoved(int position, int count) {
-
-		}
-
-		@Override
-		public void onMoved(int fromPosition, int toPosition) {
-
-		}
-
-		@Override
-		public void onChanged(int position, int count) {
-
-		}
-
-		@Override
-		public boolean areContentsTheSame(IEpisode oldItem, IEpisode newItem) {
-			return false;
-		}
-
-		@Override
-		public boolean areItemsTheSame(IEpisode item1, IEpisode item2) {
-			return item1.equals(item2);
-		}
-	};
-
-	public void setLink(@NonNull String argLink) {
-		this.link = argLink;
-	}
-
 	public String getLink() {
-		return link;
+		return mLink;
 	}
 
 	public void reset() {
 		id = -1;
-		title = null;
-		url = null;
-		link = null;
+		mTitle = null;
+		mUrlString = null;
+		mLink = null;
 		comment = "";
-		description = null;
-		imageURL = null;
+		mDescription = null;
+		mImageURL = null;
 		lastUpdated = -1;
 		fail_count = -1;
 		lastItemUpdated = -1;
@@ -193,17 +120,17 @@ public class Subscription extends BaseSubscription {
 
 	public Subscription(@NonNull SharedPreferences argSharedPreferences, String url_link) {
 		this(argSharedPreferences);
-		url = url_link;
-		title = url_link;
-		link = url_link;
+		mUrlString = url_link;
+		mTitle = url_link;
+		mLink = url_link;
 		init();
 	}
 
 	public Subscription(@NonNull SharedPreferences argSharedPreferences, @NonNull ISubscription argSlimSubscription) {
 		this(argSharedPreferences);
-		url = argSlimSubscription.getURLString();
-		title = argSlimSubscription.getTitle();
-		imageURL = argSlimSubscription.getImageURL();
+		mUrlString = argSlimSubscription.getURLString();
+		mTitle = argSlimSubscription.getTitle();
+		mImageURL = argSlimSubscription.getImageURL();
 		init();
 	}
 
@@ -212,11 +139,6 @@ public class Subscription extends BaseSubscription {
 		super.init();
 		mEpisodes = new EpisodeList(IEpisode.class, mEpisodesListCallback);
 		setIsRefreshing(true);
-	}
-
-	@NonNull
-	public EpisodeList getEpisodes() {
-		return mEpisodes;
 	}
 
 	private boolean updateEpisodeData(@NonNull IEpisode argCurrnetEpisode, @NonNull IEpisode argNewEpisode) {
@@ -273,23 +195,23 @@ public class Subscription extends BaseSubscription {
 			return;
 		}
 
-		// I currently doesn't test that the new url can be parsed and contains content
+		// I currently doesn't test that the new mUrlString can be parsed and contains content
 
-		// Ok, the url should be valid
+		// Ok, the mUrlString should be valid
 		// generate the SQL
 		String sqlUpdateSubscription = String.format("UPDATE %s SET %s=%s WHERE %s=%s LIMIT 1",
 								SubscriptionColumns.TABLE_NAME,
 								SubscriptionColumns.URL,
 								url.toString(),
 								SubscriptionColumns.URL,
-								this.url);
+								this.mUrlString);
 		/*
 		String sqlUpdateItems = String.format("UPDATE %s SET %s=%s WHERE %s=%s LIMIT 1",
 								ItemColumns.TABLE_NAME,
 								ItemColumns.URL,
-								url.toString(),
+								mUrlString.toString(),
 								ItemColumns.URL,
-								this.url);;
+								this.mUrlString);;
 		*/
 		PodcastOpenHelper helper = PodcastOpenHelper.getInstance(argContext);
 		SQLiteDatabase db = helper.getWritableDatabase();
@@ -299,7 +221,7 @@ public class Subscription extends BaseSubscription {
 			db.execSQL(sqlUpdateSubscription);
 			//db.execSQL(sqlUpdateItems);
 			/*
-			this.url = url.toString();
+			this.mUrlString = mUrlString.toString();
 			for (int i = 0; i < getEpisodes().size(); i++) {
 				IEpisode episode = getEpisodes().get(0);
 				if (episode instanceof FeedItem) {
@@ -314,7 +236,7 @@ public class Subscription extends BaseSubscription {
 	}
 
 	private void failUpdateUrl(@Nullable String argNewUrl) {
-		VendorCrashReporter.report("updateURL failed", "Unable to change subscription url to: " + argNewUrl); // NoI18N
+		VendorCrashReporter.report("updateURL failed", "Unable to change subscription mUrlString to: " + argNewUrl); // NoI18N
 	}
 
     public void setPrimaryColor(int argColor) {
@@ -355,7 +277,7 @@ public class Subscription extends BaseSubscription {
 
 	@Override
 	public String toString() {
-		return "Subscription: " + this.title + " (" + this.url + ")";
+		return "Subscription: " + this.mTitle + " (" + this.mUrlString + ")";
 	}
 
     public boolean IsDirty() {
@@ -417,7 +339,7 @@ public class Subscription extends BaseSubscription {
 
     public URL getURL() {
 		try {
-			return new URL(url);
+			return new URL(mUrlString);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
@@ -444,25 +366,11 @@ public class Subscription extends BaseSubscription {
 	}
 
 	public String getImageURL() {
-		return imageURL;
+		return mImageURL;
 	}
 
-    public void setImageURL(String argUrl) {
-
-		// FIXME tmp repair code. Remove in a future version
-		if (argUrl == null)
-			return;
-		argUrl = argUrl.trim();
-
-		if (imageURL != null && imageURL.equals(argUrl))
-			return;
-
-        imageURL = argUrl;
-		notifyPropertyChanged(null);
-    }
-
 	public String getUrl() {
-		return url;
+		return mUrlString;
 	}
 
 	public void setLastItemUpdated(long argTimestamp) {
@@ -505,7 +413,7 @@ public class Subscription extends BaseSubscription {
     }
 
     public void unsubscribe(@NonNull String argTag) {
-		VendorCrashReporter.report("Unsubscribe" , argTag + "title: " + title + " url: " + url);
+		VendorCrashReporter.report("Unsubscribe" , argTag + "mTitle: " + mTitle + " mUrlString: " + mUrlString);
         setStatus(STATUS_UNSUBSCRIBED, argTag);
     }
 
@@ -579,32 +487,7 @@ public class Subscription extends BaseSubscription {
 
 	@Override
 	public String getTitle() {
-		return StrUtils.formatUrl(title);
-	}
-
-	@Override
-	public void setTitle(String argTitle) {
-		if (title != null && title.equals(argTitle))
-			return;
-
-		title = argTitle.trim();
-		notifyPropertyChanged(null);
-	}
-
-	public void setURL(String argUrl) {
-		if (url != null && url.equals(argUrl))
-			return;
-
-		url = argUrl.trim();
-		notifyPropertyChanged(null);
-	}
-
-	public void setDescription(String content) {
-		if (description != null && description.equals(content))
-			return;
-
-		description = content.trim();
-		notifyPropertyChanged(null);
+		return StrUtils.formatUrl(mTitle);
 	}
 
 	/**

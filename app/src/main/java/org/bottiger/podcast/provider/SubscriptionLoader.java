@@ -19,15 +19,15 @@ public class SubscriptionLoader {
         String lastUpdatedString = cursor.getString(lastUpdatedIndex);
         sub.lastUpdated = Long.parseLong(lastUpdatedString);
 
-        sub.title = cursor.getString(cursor
-                .getColumnIndex(SubscriptionColumns.TITLE));
-        sub.url = cursor.getString(urlIndex);
-        sub.imageURL = cursor.getString(cursor
-                .getColumnIndex(SubscriptionColumns.IMAGE_URL));
+        sub.setTitle(cursor.getString(cursor
+                .getColumnIndex(SubscriptionColumns.TITLE)));
+        sub.setURL(cursor.getString(urlIndex));
+        sub.setImageURL(cursor.getString(cursor
+                .getColumnIndex(SubscriptionColumns.IMAGE_URL)));
         sub.comment = cursor.getString(cursor
                 .getColumnIndex(SubscriptionColumns.COMMENT));
-        sub.description = cursor.getString(cursor
-                .getColumnIndex(SubscriptionColumns.DESCRIPTION));
+        sub.setDescription(cursor.getString(cursor
+                .getColumnIndex(SubscriptionColumns.DESCRIPTION)));
         sub.sync_id = cursor.getString(cursor
                 .getColumnIndex(SubscriptionColumns.REMOTE_ID));
 

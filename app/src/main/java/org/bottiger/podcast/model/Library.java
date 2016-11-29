@@ -216,7 +216,7 @@ public class Library {
             mLock.lock();
             if (!subscription.IsSubscribed() &&
                 mActiveSubscriptions.indexOf(subscription) != SortedList.INVALID_POSITION) {
-                    Log.e("Unsubscribing", "from: " + subscription.title + ", tag:" + argSubscriptionChanged.getTag());
+                    Log.e("Unsubscribing", "from: " + subscription.getTitle() + ", tag:" + argSubscriptionChanged.getTag());
                     mActiveSubscriptions.remove(subscription);
                     mSubscriptionsChangeObservable.onNext(subscription);
             }

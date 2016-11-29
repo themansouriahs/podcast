@@ -142,7 +142,7 @@ public class DialogBulkDownload {
         IEpisode episode;
         Date date;
 
-        List<FeedItem> episodes = mSubscription != null ? mSubscription.getEpisodes().getFilteredList() : mPlaylist.getPlaylist();
+        List<IEpisode> episodes = mSubscription != null ? mSubscription.getEpisodes().getFilteredList() : mPlaylist.getPlaylist();
 
         int downloadCandidatesCount = Math.min(episodes.size(), PLAYLIST_EPISODE_DOWNLOAD_COUNT);
 

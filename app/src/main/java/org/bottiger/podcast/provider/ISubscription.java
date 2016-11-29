@@ -24,10 +24,11 @@ import io.reactivex.SingleObserver;
 public interface ISubscription extends PaletteListener {
 
     @Retention(RetentionPolicy.SOURCE)
-    @IntDef({DEFAULT, SLIM})
+    @IntDef({DEFAULT, SLIM, AUDIOBOOK})
     @interface Type {}
     int DEFAULT = 0;
     int SLIM = 1;
+    int AUDIOBOOK = 2;
 
     @NonNull
     String getTitle();
@@ -40,6 +41,9 @@ public interface ISubscription extends PaletteListener {
 
     @Nullable
     String getImageURL();
+
+    @Nullable
+    String getDescription();
 
     void fetchImage(@NonNull Context argContext);
 
