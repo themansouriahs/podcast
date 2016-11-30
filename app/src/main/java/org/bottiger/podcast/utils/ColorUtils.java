@@ -50,12 +50,16 @@ public class ColorUtils {
         }
     }
 
-    public static @ColorInt int adjustToTheme(@NonNull Resources argResources, @NonNull ISubscription argSubscription) {
+    public static @ColorInt int adjustToTheme(@NonNull Resources argResources, @ColorInt int argColor) {
         if (UIUtils.isInNightMode(argResources)) {
-            return darken(argSubscription.getPrimaryTintColor(), 0.5f);
+            return darken(argColor, 0.5f);
         } else {
-            return argSubscription.getPrimaryTintColor();
+            return argColor;
         }
+    }
+
+    public static @ColorInt int adjustToTheme(@NonNull Resources argResources, @NonNull ISubscription argSubscription) {
+        return adjustToTheme(argResources, argSubscription.getPrimaryTintColor());
     }
 
     public static @ColorInt int adjustToTheme(@NonNull Resources argResources, @Nullable Palette argPalette, @ColorInt int color) {

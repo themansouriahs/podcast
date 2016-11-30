@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,6 +20,7 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
@@ -48,6 +51,7 @@ import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.provider.base.BaseSubscription;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorExtractor;
@@ -74,7 +78,7 @@ import rx.schedulers.Schedulers;
 /**
  * Created by apl on 14-02-2015.
  */
-public class FeedActivity extends TopActivity implements PaletteListener {
+public class FeedActivity extends TopActivity {
 
     public static final int MODE_FULLY_EXPANDED = 4;
 
@@ -343,9 +347,15 @@ public class FeedActivity extends TopActivity implements PaletteListener {
             return;
         }
 
-        if (mSubscription.getType() == ISubscription.DEFAULT) {
-            PaletteHelper.generate(mSubscription, this, this);
-        }
+        mSubscription.getColors(this)
+                .subscribeOn(io.reactivex.schedulers.Schedulers.io())
+                .observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
+                .subscribe(new BaseSubscription.BasicColorExtractorObserver<ColorExtractor>() {
+                    @Override
+                    public void onSuccess(ColorExtractor value) {
+                        FeedActivity.this.onColorExtractorFound(value);
+                    }
+                });
     }
 
     @Override
@@ -390,7 +400,7 @@ public class FeedActivity extends TopActivity implements PaletteListener {
     }
 
     @Nullable
-    public ISubscription getmSubscription() {
+    public ISubscription getSubscription() {
         return mSubscription;
     }
 
@@ -463,25 +473,16 @@ public class FeedActivity extends TopActivity implements PaletteListener {
         }
     }
 
-    @Override
-    public void onPaletteFound(Palette argChangedPalette) {
-        ColorExtractor extractor = new ColorExtractor(this, argChangedPalette);
+    public void onColorExtractorFound(ColorExtractor argExtractor) {
+        int tintColor = ColorUtils.adjustToTheme(getResources(), mSubscription);
 
-        int tintColor = ColorUtils.adjustToThemeDark(getResources(), argChangedPalette, extractor.getPrimary());
-
-        // extractor.getPrimary()
         mMultiShrinkScroller.setHeaderTintColor(tintColor);
-        mFloatingButton.onPaletteFound(argChangedPalette);
+        mFloatingButton.onPaletteFound(argExtractor);
         @ColorInt int feedColor = tintColor;
         mRevealLayout.setBackgroundColor(feedColor);
         UIUtils.tintStatusBar(feedColor, this);
         mStatusBarColor = tintColor;
-        mAdapter.setPalette(argChangedPalette);
-    }
-
-    @Override
-    public String getPaletteUrl() {
-        return mSubscription.getImageURL();
+        mAdapter.setPalette(argExtractor);
     }
 
     /**

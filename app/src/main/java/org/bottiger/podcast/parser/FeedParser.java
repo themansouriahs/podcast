@@ -276,7 +276,9 @@ public class FeedParser {
                 }
                 case SUBSCRIPTION_IMAGE_TAG: {
                     String image = readSubscriptionImage(parser);
-                    argSubscription.setImageURL(image);
+                    if (!TextUtils.isEmpty(image)) {
+                        argSubscription.setImageURL(image);
+                    }
                     break;
                 }
                 case SUBSCRIPTION_PUB_DATE_TAG:
@@ -590,6 +592,7 @@ public class FeedParser {
         while (!(parser.next() == XmlPullParser.END_TAG && parser.getName().equals(SUBSCRIPTION_IMAGE_TAG))) {
             if (SUBSCRIPTION_IMAGE_URL_TAG.equals(parser.getName())) {
                 url = readText(parser);
+                break;
             }
         }
 

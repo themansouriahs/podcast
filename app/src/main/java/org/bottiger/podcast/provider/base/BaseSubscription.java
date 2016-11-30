@@ -188,9 +188,7 @@ public abstract class BaseSubscription implements ISubscription {
                     e.onNext(colorExtractor);
                     e.onComplete();
                 }
-            }).replay(1)
-                    .autoConnect()
-                    .firstOrError();
+            }).replay(1).autoConnect().firstOrError();
         }
 
         return mColorObservable;
@@ -281,5 +279,10 @@ public abstract class BaseSubscription implements ISubscription {
             Log.d(TAG, "onError");
             VendorCrashReporter.handleException(e);
         }
+    }
+
+    @DbItemType
+    public int getDbItemType() {
+        return SUBSCRIPTION;
     }
 }

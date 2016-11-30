@@ -26,10 +26,15 @@ import org.bottiger.podcast.provider.ItemColumns;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionColumns;
 import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.utils.ColorExtractor;
 
 import java.util.ArrayList;
 import java.util.Date;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Single;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
@@ -790,6 +795,22 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
 
     public boolean isLoaded() {
         return mIsLoaded;
+    }
+
+    private Single<Playlist> mColorObservable;
+    public Single<Playlist> getLoadedPlaylist() {
+        if (mColorObservable == null) {
+            mColorObservable = Observable.create(new ObservableOnSubscribe<Playlist>() {
+                @Override
+                public void subscribe(final ObservableEmitter<Playlist> e) throws Exception {
+                    mLibrary.loadPlaylistSync(Playlist.this);
+                    e.onNext(Playlist.this);
+                    e.onComplete();
+                }
+            }).replay(1).autoConnect().firstOrError();
+        }
+
+        return mColorObservable;
     }
 
     public void notifyFiltersChanged() {

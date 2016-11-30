@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * Created by apl on 21-04-2015.
  */
-public interface IEpisode {
+public interface IEpisode extends IDbItem {
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({PREFER_LOCAL, REQUIRE_LOCAL, REQUIRE_REMOTE})

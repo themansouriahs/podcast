@@ -111,4 +111,9 @@ public abstract class BaseEpisode implements IEpisode {
         }
     }
 
+    @DbItemType
+    public int getType() {
+        return EPISODE;
+    }
+
 }

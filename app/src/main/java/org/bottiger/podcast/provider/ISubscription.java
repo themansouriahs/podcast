@@ -21,7 +21,7 @@ import io.reactivex.SingleObserver;
 /**
  * Created by apl on 15-04-2015.
  */
-public interface ISubscription extends PaletteListener {
+public interface ISubscription extends PaletteListener, IDbItem {
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({DEFAULT, SLIM, AUDIOBOOK})

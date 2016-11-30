@@ -43,8 +43,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Single;
 import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
@@ -582,6 +586,7 @@ public class Library {
                 argPlaylist.getOrder();
     }
 
+    @WorkerThread
     public void loadPlaylistSync(@NonNull final Playlist argPlaylist) {
         String query = getPlaylistEpisodes(argPlaylist);
         loadPlaylistInternal(query, argPlaylist);
@@ -606,15 +611,15 @@ public class Library {
         });
     }
 
+    @WorkerThread
     private void loadPlaylistInternal(@NonNull String query, @NonNull  Playlist argPlaylist) {
-
-        if (argPlaylist.isLoaded())
-            return;
 
         Cursor cursor = null;
 
         mLock.lock();
         try {
+            if (argPlaylist.isLoaded())
+                return;
 
             cursor = PodcastOpenHelper.runQuery(Library.this.mContext, query);
 
@@ -645,6 +650,22 @@ public class Library {
         }
 
         return counter;
+    }
+
+    private Single<SortedList<Subscription>> mLoadedSubscriptionsObservable;
+    public Single<SortedList<Subscription>> getLoadedSubscriptions() {
+        if (mLoadedSubscriptionsObservable == null) {
+            mLoadedSubscriptionsObservable = io.reactivex.Observable.create(new ObservableOnSubscribe<SortedList<Subscription>>() {
+                @Override
+                public void subscribe(final ObservableEmitter<SortedList<Subscription>> e) throws Exception {
+                    loadSubscriptionsInternalSync(true);
+                    e.onNext(mActiveSubscriptions);
+                    e.onComplete();
+                }
+            }).replay(1).autoConnect().firstOrError();
+        }
+
+        return mLoadedSubscriptionsObservable;
     }
 
     @MainThread

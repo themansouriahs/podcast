@@ -60,7 +60,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
     protected TopActivity mActivity;
     protected LayoutInflater mInflater;
 
-    protected Palette mPalette;
+    protected ColorExtractor mPalette;
 
     public static boolean mIsExpanded = false;
     protected @Order int mSortOrder = RECENT_FIRST;
@@ -259,8 +259,8 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
         return getItemCount() - argPosition -1;
     }
 
-    public void setPalette(@NonNull Palette argPalette) {
-        mPalette = argPalette;
+    public void setPalette(@NonNull ColorExtractor argExtractor) {
+        mPalette = argExtractor;
         this.notifyDataSetChanged();
     }
 

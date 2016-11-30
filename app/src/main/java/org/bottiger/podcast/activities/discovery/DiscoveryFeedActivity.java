@@ -22,6 +22,8 @@ import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.provider.base.BaseSubscription;
+import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.UIUtils;
 
@@ -44,9 +46,17 @@ public class DiscoveryFeedActivity extends FeedActivity {
 
         mNoEpisodesTextView.setVisibility(View.INVISIBLE);
 
-        ISubscription subscription = getmSubscription();
+        ISubscription subscription = getSubscription();
         if (subscription != null) {
-            PaletteHelper.generate(subscription, this, mFloatingButton);
+            subscription.getColors(this)
+                    .subscribeOn(io.reactivex.schedulers.Schedulers.io())
+                    .observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
+                    .subscribe(new BaseSubscription.BasicColorExtractorObserver<ColorExtractor>() {
+                        @Override
+                        public void onSuccess(ColorExtractor value) {
+                            DiscoveryFeedActivity.this.onColorExtractorFound(value);
+                        }
+                    });
         }
 
         mIsSubscribed = mSubscription instanceof Subscription;

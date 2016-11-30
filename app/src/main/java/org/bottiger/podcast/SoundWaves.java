@@ -37,6 +37,7 @@ import org.bottiger.podcast.utils.PodcastLog;
 import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.utils.rxbus.RxBus;
 import org.bottiger.podcast.utils.rxbus.RxBus2;
+import org.bottiger.podcast.utils.shortcuts.ShortcutManagerUtil;
 
 import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -147,6 +148,8 @@ public class SoundWaves extends MultiDexApplication {
         });
 
         mPlayerStateManager = new PlayerStateManager();
+
+        ShortcutManagerUtil.updateAppShortcuts(this, getPlaylist());
     }
 
     private void firstRun(@NonNull Context argContext) {

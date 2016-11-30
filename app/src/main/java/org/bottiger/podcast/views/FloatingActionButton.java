@@ -13,7 +13,7 @@ import org.bottiger.podcast.utils.ColorUtils;
 /**
  * Created by apl on 12-02-2015.
  */
-public class FloatingActionButton extends android.support.design.widget.FloatingActionButton implements PaletteListener {
+public class FloatingActionButton extends android.support.design.widget.FloatingActionButton {
 
     private String mURL;
     private Context mContext;
@@ -33,22 +33,11 @@ public class FloatingActionButton extends android.support.design.widget.Floating
         mContext = context;
     }
 
-    @Override
-    public void onPaletteFound(Palette argChangedPalette) {
-        ColorExtractor extractor = new ColorExtractor(mContext, argChangedPalette);
-        int color = ColorUtils.adjustToThemeDark(mContext.getResources(), argChangedPalette, extractor.getPrimary());
+    public void onPaletteFound(ColorExtractor extractor) {
+        int color = ColorUtils.adjustToTheme(mContext.getResources(), extractor.getPrimary());
         setBackgroundTintList(ColorStateList.valueOf(color));
         super.setRippleColor(extractor.getPrimaryTint());
 
         invalidate();
-    }
-
-    @Override
-    public String getPaletteUrl() {
-        if (!TextUtils.isEmpty(mURL)) {
-            throw new IllegalStateException("URL must not be null");
-        }
-
-        return mURL;
     }
 }
