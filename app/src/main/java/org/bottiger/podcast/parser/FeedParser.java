@@ -592,7 +592,7 @@ public class FeedParser {
         while (!(parser.next() == XmlPullParser.END_TAG && parser.getName().equals(SUBSCRIPTION_IMAGE_TAG))) {
             if (SUBSCRIPTION_IMAGE_URL_TAG.equals(parser.getName())) {
                 url = readText(parser);
-                break;
+                parser.require(XmlPullParser.END_TAG, ns, SUBSCRIPTION_IMAGE_URL_TAG);
             }
         }
 
