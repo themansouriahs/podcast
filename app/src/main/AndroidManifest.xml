@@ -57,11 +57,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <intent-filter>
-                <action android:name="org.bottiger.podcast.OPEN" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-
             <meta-data
                 android:name="com.google.android.apps.drive.APP_ID"
                 android:value="FILL_ME_IN" />
@@ -77,6 +72,11 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
+
+            <intent-filter>
+                <action android:name="org.bottiger.podcast.OPEN" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
 
         <receiver android:name=".receiver.StartFeedActivityReceiver"

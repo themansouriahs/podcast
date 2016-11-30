@@ -14,6 +14,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
@@ -26,6 +27,7 @@ import com.bumptech.glide.Glide;
 import org.bottiger.podcast.ApplicationConfiguration;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.activities.feedview.FeedActivity;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.IDbItem;
 import org.bottiger.podcast.provider.IEpisode;
@@ -59,12 +61,12 @@ import io.reactivex.schedulers.Schedulers;
 public class ShortcutManagerUtil {
 
     private static final String TAG = ShortcutManagerUtil.class.getSimpleName();
-    private static boolean done = false;
 
+    private static final boolean SHOW_DOWNLOAD_OPTION = false;
     private static final int NUM_EPISODES = 5;
 
     public static void updateAppShortcuts(@NonNull Context argContext, @NonNull Playlist argPlaylist) {
-        if (Build.VERSION.SDK_INT < 25 || !done) {
+        if (Build.VERSION.SDK_INT < 25) {
             return;
         }
 
@@ -76,7 +78,16 @@ public class ShortcutManagerUtil {
         final ShortcutManager shortcutManager = argContext.getSystemService(ShortcutManager.class);
         final List<ShortcutInfo> shortcuts = new LinkedList<>();
 
-        shortcuts.add(getDownloadRecent(argContext));
+        final int otherShortcuts;
+        shortcutManager.removeAllDynamicShortcuts();
+
+
+        if (SHOW_DOWNLOAD_OPTION) {
+            shortcuts.add(getDownloadRecent(argContext));
+            otherShortcuts = 1;
+        } else {
+            otherShortcuts = 0;
+        }
 
         //argPlaylist.getLoadedPlaylist()
         SoundWaves.getAppContext(argContext).getLibraryInstance().getLoadedSubscriptions()
@@ -87,7 +98,7 @@ public class ShortcutManagerUtil {
                     public List<ShortcutInfo> apply(SortedList<Subscription> itemsList) throws Exception {
                         List<ShortcutInfo> list = new LinkedList<>();
                         List<IDbItem> items = new LinkedList<>();
-                        int numDynamicIcons = numDynamicShortcuts(shortcutManager) - 1; //minus the download icon
+                        int numDynamicIcons = numDynamicShortcuts(shortcutManager) - otherShortcuts; //minus the download icon
                         int numItems = itemsList.size() >= numDynamicShortcuts(shortcutManager) ? numDynamicIcons : itemsList.size();
 
                         for (int i = 0; i < numItems; i++) {
@@ -146,14 +157,14 @@ public class ShortcutManagerUtil {
     @WorkerThread
     private static ShortcutInfo getSubscriptionShortCut(@NonNull Context argContext, @NonNull ISubscription argSubscription) {
 
+        Bundle bundle = FeedActivity.getBundle(argSubscription);
 
         String pkg = argContext.getPackageName();
         String action = pkg + ".OPEN";
-        //Intent intent = new Intent(argContext, StartFeedActivityReceiver.class);
-        Intent intent = new Intent(action);
+        Intent intent = new Intent(argContext, FeedActivity.class);
         intent.setAction(action);
-        //Intent intent = new Intent(action); //.setPackage(pkg);
         intent.setData(Uri.parse(argSubscription.getURLString()));
+        intent.putExtras(bundle);
 
         return getShortCut(argContext,
                 intent,

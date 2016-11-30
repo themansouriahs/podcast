@@ -5,6 +5,7 @@ import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -134,13 +135,16 @@ public class FeedActivity extends TopActivity {
     final MultiShrinkScroller.MultiShrinkScrollerListener mMultiShrinkScrollerListener = getMultiShrinkScrollerListener();
     SearchView.OnQueryTextListener mOnQueryTextListener = getOnQueryTextListener();
 
-    public static void start(@NonNull Activity argActivity, @NonNull Subscription argSubscription) {
-        if (!argSubscription.IsLoaded()) {
-            SoundWaves.getAppContext(argActivity).getLibraryInstance().loadEpisodes(argSubscription);
-        }
+    public static Bundle getBundle(@NonNull ISubscription argSubscription) {
         Bundle b = new Bundle();
-        b.putBoolean(FEED_ACTIVITY_IS_SLIM, false);
+        b.putBoolean(FEED_ACTIVITY_IS_SLIM, !(argSubscription instanceof Subscription));
         b.putString(FeedActivity.SUBSCRIPTION_URL_KEY, argSubscription.getURLString());
+        return b;
+    }
+
+    public static void start(@NonNull Activity argActivity, @NonNull Subscription argSubscription) {
+        SoundWaves.getAppContext(argActivity).getLibraryInstance().loadEpisodes(argSubscription);
+        Bundle b = getBundle(argSubscription);
         startActivity(argActivity, b);
     }
 
@@ -379,6 +383,10 @@ public class FeedActivity extends TopActivity {
             subscription = b.<SlimSubscription>getParcelable(SUBSCRIPTION_SLIM_KEY);
         } else {
             subscription = SoundWaves.getAppContext(this).getLibraryInstance().getSubscription(url);
+
+            if (subscription instanceof Subscription) {
+                SoundWaves.getAppContext(this).getLibraryInstance().loadEpisodes((Subscription) subscription);
+            }
         }
 
         setSubscription(subscription);
