@@ -85,8 +85,10 @@ public class DownloadService extends IntentService {
         if (episode != null) {
             try {
                 sLock.lock();
-                sQueue.add(episode);
-                postQueueChangedEvent(episode.getEpisode(), SoundWavesDownloadManager.ADDED);
+                if (!sQueue.contains(episode)) {
+                    sQueue.add(episode);
+                    postQueueChangedEvent(episode.getEpisode(), SoundWavesDownloadManager.ADDED);
+                }
             } finally {
                 sLock.unlock();
             }

@@ -100,6 +100,7 @@ public class QueueEpisode implements Comparable {
 		QueueEpisode other = (QueueEpisode) obj;
 		if (episodeID != other.episodeID)
 			return false;
+
 		return true;
 	}
 
