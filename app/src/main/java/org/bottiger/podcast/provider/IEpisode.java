@@ -34,7 +34,7 @@ public interface IEpisode extends IDbItem {
     String getAuthor();
     long getDuration();
     int getPriority();
-    ISubscription getSubscription(@NonNull Context argContext);
+    @NonNull ISubscription getSubscription(@NonNull Context argContext);
     long getOffset();
     Date getDateTime();
     Date getCreatedAt();

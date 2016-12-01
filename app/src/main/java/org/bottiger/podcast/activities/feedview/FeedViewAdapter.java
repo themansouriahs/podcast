@@ -175,18 +175,20 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
         episodeViewHolder.mDownloadButton.enabledProgressListener(true);
 
         ISubscription subscription = item.getSubscription(mActivity);
-        subscription.getColors(mActivity)
-                .subscribeOn(io.reactivex.schedulers.Schedulers.io())
-                .observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
-                .subscribe(new BaseSubscription.BasicColorExtractorObserver<ColorExtractor>() {
+        if (subscription != null) {
+            subscription.getColors(mActivity)
+                    .subscribeOn(io.reactivex.schedulers.Schedulers.io())
+                    .observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
+                    .subscribe(new BaseSubscription.BasicColorExtractorObserver<ColorExtractor>() {
 
-                    @Override
-                    public void onSuccess(ColorExtractor value) {
-                        episodeViewHolder.mPlayPauseButton.setColor(value);
-                        episodeViewHolder.mQueueButton.onPaletteFound(value);
-                        episodeViewHolder.mDownloadButton.onPaletteFound(value);
-                    }
-                });
+                        @Override
+                        public void onSuccess(ColorExtractor value) {
+                            episodeViewHolder.mPlayPauseButton.setColor(value);
+                            episodeViewHolder.mQueueButton.onPaletteFound(value);
+                            episodeViewHolder.mDownloadButton.onPaletteFound(value);
+                        }
+                    });
+        }
 
         episodeViewHolder.mPlayPauseButton.setStatus(playerStatus);
 
