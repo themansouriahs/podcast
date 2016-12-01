@@ -452,6 +452,9 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
         if (argEpisode == null)
             return;
 
+        float speed = PlayerService.getPlaybackSpeed(getContext(), mCurrentEpisode);
+        setPlaybackSpeedView(speed);
+
         // Set colors
         mTextColor = ColorUtils.getTextColor(getContext());
         int color = ColorUtils.getBackgroundColor(getContext());

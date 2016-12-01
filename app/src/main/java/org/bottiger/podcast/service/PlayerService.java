@@ -558,7 +558,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 		}
 	}
 
-	private static float getPlaybackSpeed(@NonNull Context argContext, @NonNull IEpisode argEpisode) {
+	public static float getPlaybackSpeed(@NonNull Context argContext, @NonNull IEpisode argEpisode) {
 		ISubscription subscription = argEpisode.getSubscription(argContext);
 		float speed = PlaybackSpeed.DEFAULT;
 

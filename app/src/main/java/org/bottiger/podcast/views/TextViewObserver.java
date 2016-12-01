@@ -11,9 +11,12 @@ import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.Timeline;
 
+import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.player.GenericMediaPlayerInterface;
 import org.bottiger.podcast.player.SoundWavesPlayerBase;
 import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.utils.StrUtils;
 
 import static android.os.SystemClock.elapsedRealtime;
 
@@ -24,6 +27,8 @@ public class TextViewObserver extends Chronometer implements ExoPlayer.EventList
 
     protected IEpisode mEpisode = null;
     private boolean mIsTicking = false;
+
+    private GenericMediaPlayerInterface mPlayer;
 
     public TextViewObserver(Context context) {
         super(context);
@@ -44,6 +49,15 @@ public class TextViewObserver extends Chronometer implements ExoPlayer.EventList
 
     public void setEpisode(@NonNull IEpisode argEpisode) {
         mEpisode = argEpisode;
+        mPlayer = SoundWaves.getAppContext(getContext()).getPlayer();
+
+        setOnChronometerTickListener(new OnChronometerTickListener() {
+            @Override
+            public void onChronometerTick(Chronometer chronometer) {
+                long position = mPlayer.getCurrentPosition();
+                setText(StrUtils.formatTime(position));
+            }
+        });
     }
 
     public IEpisode getEpisode() {
