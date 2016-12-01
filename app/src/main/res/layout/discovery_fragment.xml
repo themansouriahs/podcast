@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-
 <RelativeLayout android:id="@+id/discovery_container"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <RelativeLayout
         android:id="@+id/discovery_search_container"
@@ -29,13 +26,14 @@
             app:cardUseCompatPadding="true">
 
             <RelativeLayout
+                android:id="@+id/discovery_searchView_container_relative"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
 
             <android.support.v7.widget.SearchView
                 android:id="@+id/discovery_searchView"
                 android:layout_width="match_parent"
-                android:layout_height="45dp"
+                android:layout_height="wrap_content"
                 android:queryHint="@string/search_query_hint"
                 app:defaultQueryHint="testing"
                 app:iconifiedByDefault="false"
@@ -60,11 +58,10 @@
                 android:id="@+id/discovery_progress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:visibility="invisible"
+                android:layout_below="@id/discovery_searchView"
+                android:visibility="gone"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
-                android:layout_alignParentBottom="true"
                 android:indeterminate="true"
                 style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                 />
@@ -91,11 +88,9 @@
         android:id="@+id/search_result_view"
         android:scrollbars="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:overScrollMode="never"
+        android:layout_height="match_parent"
+        android:overScrollMode="ifContentScrolls"
         android:layout_below="@+id/discovery_search_container"
         />
 
 </RelativeLayout>
-
-</ScrollView>

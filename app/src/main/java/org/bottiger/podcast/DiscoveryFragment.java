@@ -98,7 +98,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
     private IDirectoryProvider mDirectoryProvider = null;
     private IDirectoryProvider.Callback mSearchResultCallback = new IDirectoryProvider.Callback() {
         @Override
-        public void result(ISearchResult argResult) {
+        public void result(@NonNull ISearchResult argResult) {
             Log.d(TAG, "Search results for: " + argResult.getSearchQuery());
             ArrayList<ISubscription> subscriptions = new ArrayList<>();
             for (ISubscription subscription : argResult.getResults()) {
@@ -108,19 +108,18 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
             mResultsAdapter.setDataset(subscriptions);
 
             if (argResult.getSearchQuery().equals(mSearchView.getQuery().toString()) )
-                mProgress.setVisibility(View.INVISIBLE);
+                mProgress.setVisibility(View.GONE);
         }
 
         @Override
-        public void error(Exception argException) {
+        public void error(@NonNull Exception argException) {
             Log.e(TAG, "Search failed", argException);
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mProgress.setVisibility(View.INVISIBLE);
+                    mProgress.setVisibility(View.GONE);
                 }
             });
-            return;
         }
     };
 
@@ -254,7 +253,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
 
     private void abortSearch() {
         mDirectoryProvider.abortSearch();
-        mProgress.setVisibility(View.INVISIBLE);
+        mProgress.setVisibility(View.GONE);
     }
 
     private void fetchTrending() {
@@ -274,7 +273,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
         mSearchHandler.removeMessages(HANDLER_WHAT_SEARCH);
 
         if (TextUtils.isEmpty(argQuery)) {
-            mProgress.setVisibility(View.INVISIBLE);
+            mProgress.setVisibility(View.GONE);
             mSearchEngineButton.setVisibility(View.VISIBLE);
             populateRecommendations();
             return;
