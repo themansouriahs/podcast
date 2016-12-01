@@ -51,7 +51,7 @@ public class ColorUtils {
     }
 
     public static @ColorInt int adjustToTheme(@NonNull Resources argResources, @ColorInt int argColor) {
-        if (UIUtils.isInNightMode(argResources)) {
+        if (UIUtils.isInNightMode(argResources) || isLight(argColor)) {
             return darken(argColor, 0.5f);
         } else {
             return argColor;
@@ -59,7 +59,7 @@ public class ColorUtils {
     }
 
     public static @ColorInt int adjustToTheme(@NonNull Resources argResources, @NonNull ISubscription argSubscription) {
-        return adjustToTheme(argResources, argSubscription.getPrimaryTintColor());
+        return adjustToTheme(argResources, argSubscription.getPrimaryColor());
     }
 
     public static @ColorInt int adjustToTheme(@NonNull Resources argResources, @Nullable Palette argPalette, @ColorInt int color) {
@@ -87,6 +87,14 @@ public class ColorUtils {
         }
     }
 
+    public static void tintButton(@NonNull Button argButton, @NonNull @ColorInt int argColor) {
+        argButton.setTextColor(argColor);
+    }
+
+    public static void tintButton(@NonNull ImageView argButton, @NonNull @ColorInt int argColor) {
+        argButton.setColorFilter(argColor);
+    }
+
     public static @ColorInt int darken(@ColorInt int argColor, float scale) {
         float[] hsv = new float[3];
         Color.colorToHSV(argColor, hsv);
@@ -96,12 +104,14 @@ public class ColorUtils {
         return argColor;
     }
 
-    public static void tintButton(@NonNull Button argButton, @NonNull @ColorInt int argColor) {
-        argButton.setTextColor(argColor);
-    }
+    // https://en.wikipedia.org/wiki/HSL_and_HSV#/media/File:Hsl-hsv_models.svg
+    public static boolean isLight(@ColorInt int argColor) {
+        float threshold = 0.8f;
 
-    public static void tintButton(@NonNull ImageView argButton, @NonNull @ColorInt int argColor) {
-        argButton.setColorFilter(argColor);
+        float[] hsl = new float[3];
+        android.support.v4.graphics.ColorUtils.colorToHSL(argColor, hsl);
+
+        return hsl[2] > threshold;
     }
 
     private static @ColorInt int getColor(@NonNull Context argContext, @AttrRes int argResource) {

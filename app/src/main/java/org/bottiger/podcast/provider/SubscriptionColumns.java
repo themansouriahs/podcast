@@ -61,7 +61,7 @@ public class SubscriptionColumns implements BaseColumns {
 		+ FAIL_COUNT + " INTEGER, " 
 		+ STATUS + " INTEGER, " 
 		+ COMMENT + " TEXT, " 
-		+ RATING + " INTEGER, " 
+		+ RATING + " INTEGER DEFAULT 0, "
 		+ USERNAME	+ " VARCHAR(32) , " 
 		+ PASSWORD + " VARCHAR(32) , " 
 		+ SERVER_ID + " INTEGER , " 

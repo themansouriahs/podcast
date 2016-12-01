@@ -135,36 +135,31 @@ public class FeedActivity extends TopActivity {
     final MultiShrinkScroller.MultiShrinkScrollerListener mMultiShrinkScrollerListener = getMultiShrinkScrollerListener();
     SearchView.OnQueryTextListener mOnQueryTextListener = getOnQueryTextListener();
 
-    public static Bundle getBundle(@NonNull ISubscription argSubscription) {
-        Bundle b = new Bundle();
-        b.putBoolean(FEED_ACTIVITY_IS_SLIM, !(argSubscription instanceof Subscription));
-        b.putString(FeedActivity.SUBSCRIPTION_URL_KEY, argSubscription.getURLString());
-        return b;
+    public static Intent getIntent(@NonNull Context argContext, @NonNull ISubscription argSubscription) {
+        Class activityClass;
+        boolean isSlim = false;
+        Bundle bundle = new Bundle();
+
+        if (argSubscription instanceof SlimSubscription) {
+            isSlim = true;
+            activityClass = DiscoveryFeedActivity.class;
+            bundle.putParcelable(SUBSCRIPTION_SLIM_KEY, (SlimSubscription)argSubscription); // Not required, but nice to have if we already got it
+        } else {
+            SoundWaves.getAppContext(argContext).getLibraryInstance().loadEpisodes((Subscription) argSubscription);
+            activityClass = FeedActivity.class;
+        }
+
+        bundle.putBoolean(FEED_ACTIVITY_IS_SLIM, isSlim);
+        bundle.putString(FeedActivity.SUBSCRIPTION_URL_KEY, argSubscription.getURLString());
+
+        Intent intent = new Intent(argContext, activityClass);
+        intent.putExtras(bundle);
+
+        return intent;
     }
 
-    public static void start(@NonNull Activity argActivity, @NonNull Subscription argSubscription) {
-        SoundWaves.getAppContext(argActivity).getLibraryInstance().loadEpisodes(argSubscription);
-        Bundle b = getBundle(argSubscription);
-        startActivity(argActivity, b);
-    }
-
-    public static void startSlim(@NonNull Activity argActivity, @NonNull String argURL, @Nullable SlimSubscription argSubscription) {
-        Bundle b = new Bundle();
-        Intent intent = new Intent(argActivity, DiscoveryFeedActivity.class);
-
-        b.putBoolean(FEED_ACTIVITY_IS_SLIM, true);
-        b.putString(FeedActivity.SUBSCRIPTION_URL_KEY, argURL);
-        b.putParcelable(SUBSCRIPTION_SLIM_KEY, argSubscription); // Not required, but nice to have if we already got it
-
-        intent.putExtras(b);
-
-        argActivity.startActivity(intent);
-        argActivity.overridePendingTransition(R.anim.slide_in_bottom, R.anim.slide_out_bottom);
-    }
-
-    private static void startActivity(@NonNull Activity argActivity, @NonNull Bundle argBundle) {
-        Intent intent = new Intent(argActivity, FeedActivity.class);
-        intent.putExtras(argBundle);
+    public static void start(@NonNull Activity argActivity, @NonNull ISubscription argSubscription) {
+        Intent intent = getIntent(argActivity, argSubscription);
         argActivity.startActivity(intent);
         argActivity.overridePendingTransition(R.anim.slide_in_bottom, R.anim.slide_out_bottom);
     }
@@ -386,6 +381,7 @@ public class FeedActivity extends TopActivity {
 
             if (subscription instanceof Subscription) {
                 SoundWaves.getAppContext(this).getLibraryInstance().loadEpisodes((Subscription) subscription);
+                ((Subscription) subscription).incrementClicks();
             }
         }
 

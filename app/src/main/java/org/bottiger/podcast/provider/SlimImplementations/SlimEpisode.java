@@ -32,17 +32,23 @@ public class SlimEpisode extends BaseEpisode implements Parcelable {
     private long mOffset;
     private long mFilesize = 0;
 
+    @NonNull SlimSubscription mSlimSubscription;
+
     // Find a better method
     @Deprecated
-    public SlimEpisode() {
+    public SlimEpisode(@NonNull SlimSubscription argSubscription) {
+        mSlimSubscription = argSubscription;
     }
 
     public SlimEpisode(@NonNull String argTitle,
                        @NonNull URL argUrl,
-                       @NonNull String argDescription) {
+                       @NonNull String argDescription,
+                       @NonNull SlimSubscription argSubscription) {
         mTitle = argTitle;
         mUrl = argUrl;
         mDescription = argDescription;
+
+        mSlimSubscription = argSubscription;
     }
 
     @Override
@@ -95,7 +101,7 @@ public class SlimEpisode extends BaseEpisode implements Parcelable {
 
     @Override
     public ISubscription getSubscription(@NonNull Context argContext) {
-        return null;
+        return mSlimSubscription;
     }
 
     @Override

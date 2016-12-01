@@ -101,7 +101,7 @@ public class SlimSubscription extends BasePodcastSubscription implements Parcela
         SlimEpisode slimEpisode;
         boolean isSlimEpisode = episode instanceof SlimEpisode;
         if (!isSlimEpisode) {
-            slimEpisode = EpisodeConverter.toSlim(episode);
+            slimEpisode = EpisodeConverter.toSlim(episode, this);
         } else {
             slimEpisode = (SlimEpisode)episode;
         }

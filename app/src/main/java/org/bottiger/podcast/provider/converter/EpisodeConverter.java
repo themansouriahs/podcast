@@ -6,6 +6,7 @@ import android.text.TextUtils;
 
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.SlimImplementations.SlimEpisode;
+import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 
 import java.net.URL;
 
@@ -15,7 +16,7 @@ import java.net.URL;
 public class EpisodeConverter {
 
     @Nullable
-    public static SlimEpisode toSlim(@NonNull IEpisode argEpisode) {
+    public static SlimEpisode toSlim(@NonNull IEpisode argEpisode, @NonNull SlimSubscription argSubscription) {
 
         String title = argEpisode.getTitle();
         String description = argEpisode.getDescription();
@@ -24,7 +25,7 @@ public class EpisodeConverter {
         if (title == null || description == null || url == null)
             return null;
 
-        SlimEpisode slimEpisode = new SlimEpisode(title, url, description);
+        SlimEpisode slimEpisode = new SlimEpisode(title, url, description, argSubscription);
 
         if (argEpisode.getFilesize() > 0)
             slimEpisode.setFilesize(argEpisode.getFilesize());

@@ -15,6 +15,7 @@ import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.IntegerRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
@@ -31,6 +32,7 @@ import org.bottiger.podcast.activities.feedview.FeedActivity;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.IDbItem;
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.provider.IPersistedSub;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.base.BaseSubscription;
@@ -43,6 +45,8 @@ import org.bottiger.podcast.utils.NetworkUtils;
 
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -101,9 +105,7 @@ public class ShortcutManagerUtil {
                         int numDynamicIcons = numDynamicShortcuts(shortcutManager) - otherShortcuts; //minus the download icon
                         int numItems = itemsList.size() >= numDynamicShortcuts(shortcutManager) ? numDynamicIcons : itemsList.size();
 
-                        for (int i = 0; i < numItems; i++) {
-                            items.add(getSubscription(itemsList, i));
-                        }
+                        items.addAll(getSubscriptions(itemsList, numItems));
 
                         ShortcutInfo shortCut;
                         for (int i = 0; i < numItems; i++) {
@@ -156,15 +158,11 @@ public class ShortcutManagerUtil {
     @TargetApi(25)
     @WorkerThread
     private static ShortcutInfo getSubscriptionShortCut(@NonNull Context argContext, @NonNull ISubscription argSubscription) {
-
-        Bundle bundle = FeedActivity.getBundle(argSubscription);
-
         String pkg = argContext.getPackageName();
         String action = pkg + ".OPEN";
-        Intent intent = new Intent(argContext, FeedActivity.class);
+        Intent intent = FeedActivity.getIntent(argContext, argSubscription);
         intent.setAction(action);
         intent.setData(Uri.parse(argSubscription.getURLString()));
-        intent.putExtras(bundle);
 
         return getShortCut(argContext,
                 intent,
@@ -234,8 +232,27 @@ public class ShortcutManagerUtil {
         return argPlaylist.getItem(argNumItem);
     }
 
-    private static ISubscription getSubscription(@NonNull SortedList<Subscription> argSubscriptions, int argNumItem) {
-        return argSubscriptions.get(argNumItem);
+    private static List<IPersistedSub> getSubscriptions(@NonNull SortedList<? extends IPersistedSub> argSubscriptions, int argNumItem) {
+        int numSubscription = argSubscriptions.size();
+        List<IPersistedSub> subscriptionsList = new LinkedList<>();
+        IPersistedSub subscription;
+
+        for (int i = 0; i < numSubscription; i++) {
+            subscription = argSubscriptions.get(i);
+            subscriptionsList.add(subscription);
+        }
+
+        Collections.sort(subscriptionsList, new Comparator<IPersistedSub>() {
+            @Override
+            public int compare(IPersistedSub iPersistedSub, IPersistedSub t1) {
+                // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
+                int score1 = iPersistedSub.getScore();
+                int score2 = t1.getScore();
+                return score1 > score2 ? -1 : (score1 < score2) ? 1 : 0;
+            }
+        });
+
+        return subscriptionsList.subList(0, argNumItem);
     }
 
     // From: http://stackoverflow.com/questions/11932805/cropping-circular-area-from-bitmap-in-android

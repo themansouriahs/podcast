@@ -205,6 +205,8 @@ public class LibraryPersistency {
         cv.put(SubscriptionColumns.NEW_EPISODES, argSubscription.getNewEpisodes());
         cv.put(SubscriptionColumns.EPISODE_COUNT, argSubscription.getEpisodeCount());
 
+        cv.put(SubscriptionColumns.RATING, argSubscription.getClicks());
+
         int episode_count = argSubscription.getEpisodes().size();
         if (episode_count > 0) {
             cv.put(SubscriptionColumns.EPISODE_COUNT, episode_count);

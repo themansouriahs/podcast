@@ -82,7 +82,7 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
                     Subscription localsubscription = SoundWaves.getAppContext(mActivity).getLibraryInstance().getSubscription(subscription.getURLString());
                     FeedActivity.start(mActivity, localsubscription);
                 } else {
-                    FeedActivity.startSlim(mActivity, subscription.getURLString(), (SlimSubscription)subscription);
+                    FeedActivity.start(mActivity, subscription);
                 }
             }
         });

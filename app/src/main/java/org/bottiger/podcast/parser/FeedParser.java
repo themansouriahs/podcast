@@ -329,7 +329,7 @@ public class FeedParser {
         boolean parsedURL = false;
 
         if (isParsingSlimSubscription()) {
-            episode = new SlimEpisode();
+            episode = new SlimEpisode((SlimSubscription) argSubscription);
         } else {
             FeedItem item = new FeedItem(true);
             item.setIsParsing(true);
