@@ -495,10 +495,10 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
         if ((minute + 30) > 60) {
             setHour = hour+1;
         }
-
+        
         TimePickerDialog tpd = TimePickerDialog.newInstance(new TimePickerDialog.OnTimeSetListener() {
             @Override
-            public void onTimeSet(RadialPickerLayout view, int setHourOfDay, int setMinute, int setSecond) {
+            public void onTimeSet(TimePickerDialog view, int setHourOfDay, int setMinute, int setSecond) {
                 int hourDiff = setHourOfDay - hour;
                 int minuteDiff = setMinute-minute;
 
