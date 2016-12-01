@@ -70,6 +70,7 @@ import org.bottiger.podcast.views.dialogs.DialogChapters;
 import org.bottiger.podcast.views.dialogs.DialogPlaybackSpeed;
 
 import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.SingleObserver;
 import io.reactivex.disposables.Disposable;
@@ -86,6 +87,9 @@ import static org.bottiger.podcast.views.PlayerButtonView.StaticButtonColor;
 public class TopPlayer extends LinearLayout implements ScrollingView, NestedScrollingChild {
 
     private static final String TAG = "TopPlayer";
+
+    private static final long TIMER_NOT_SET = -1;
+    private static final int DEFAULT_SLEEP_TIME_MIN = 30;
 
     public NestedScrollingChildHelper scrollingChildHelper;
     private ViewConfiguration mViewConfiguration;
@@ -141,6 +145,7 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
     private PlayerSeekbar mPlayerSeekbar;
 
     @Nullable private CountDownTimer mCountDownTimer;
+    private long mCountDownTimeLeft = TIMER_NOT_SET;
 
     private View mTriangle;
 
@@ -484,21 +489,23 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
 
         Calendar rightNow = Calendar.getInstance();
 
-        final int hour = rightNow.get(Calendar.HOUR_OF_DAY);
-        final int minute = rightNow.get(Calendar.MINUTE);
+        final int hourStart = rightNow.get(Calendar.HOUR_OF_DAY);
+        final int minuteStart = rightNow.get(Calendar.MINUTE);
 
-        int minute_sleep = (minute + 30) % 60;
-
-        int setHour = hour;
-        if ((minute + 30) > 60) {
-            setHour = hour+1;
+        if (mCountDownTimeLeft > TIMER_NOT_SET) {
+            rightNow.add(Calendar.MILLISECOND, (int)mCountDownTimeLeft);
+        } else {
+            rightNow.add(Calendar.MINUTE, DEFAULT_SLEEP_TIME_MIN);
         }
+
+        int hour_sleep = rightNow.get(Calendar.HOUR);
+        int minute_sleep = rightNow.get(Calendar.MINUTE);
 
         TimePickerDialog tpd = TimePickerDialog.newInstance(new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePickerDialog view, int setHourOfDay, int setMinute, int setSecond) {
-                int hourDiff = setHourOfDay - hour;
-                int minuteDiff = setMinute-minute;
+                int hourDiff = setHourOfDay >= hourStart ? setHourOfDay - hourStart : setHourOfDay+24 - hourStart;
+                int minuteDiff = setMinute - minuteStart;
 
                 int setMinutes = hourDiff*60 + minuteDiff;
 
@@ -506,7 +513,7 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
                     sleepButtonPressed(setMinutes);
                 }
             }
-        }, setHour, minute_sleep, true);
+        }, hour_sleep, minute_sleep, false);
 
         tpd.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
@@ -807,7 +814,11 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
         mSleepButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                sleepButtonPressed();
+                if (mCountDownTimeLeft > TIMER_NOT_SET) {
+                    openTimePicker();
+                } else {
+                    sleepButtonPressed();
+                }
             }
         });
 
@@ -859,6 +870,7 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
             mCountDownTimer = new CountDownTimer(argDuration, 1000) {
 
                 public void onTick(long millisUntilFinished) {
+                    mCountDownTimeLeft = millisUntilFinished;
                     if (mSleepButton != null) {
                         GenericMediaPlayerInterface player = SoundWaves.getAppContext(mContext).getPlayer();
                         mSleepButton.setText(StrUtils.formatTime(player.timeUntilFadeout()));
@@ -866,6 +878,7 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
                 }
 
                 public void onFinish() {
+                    mCountDownTimeLeft = TIMER_NOT_SET;
                     if (mSleepButton != null)
                         mSleepButton.setText("");
                 }

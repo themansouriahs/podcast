@@ -2,10 +2,12 @@ package org.bottiger.podcast.player;
 
 import android.content.Context;
 
+import android.icu.util.TimeUnit;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.v4.util.TimeUtils;
 import android.util.Log;
 
 import org.bottiger.podcast.R;
@@ -22,6 +24,8 @@ public class PlayerHandler {
     private static final String TAG  = "PlayerHandler";
 
     private static final boolean CONTINUOUS_PLAYING_DEFAULT = false;
+    private static final int FADE_OUT_DURATION_SECONDS = 30;
+    private static final float FADE_OUT_VOLUME_STEP = 0.01f;
 
     public static final int FADEIN = 0;
     public static final int TRACK_ENDED = 1;
@@ -75,7 +79,7 @@ public class PlayerHandler {
                         player.start();
                         this.sendEmptyMessageDelayed(FADEIN, 10);
                     } else {
-                        mCurrentVolume += 0.01f;
+                        mCurrentVolume += FADE_OUT_VOLUME_STEP;
                         if (mCurrentVolume < 1.0f) {
                             this.sendEmptyMessageDelayed(FADEIN, 10);
                         } else {
@@ -113,9 +117,9 @@ public class PlayerHandler {
                     sInitialVolume = mCurrentVolume;
 
                     if (PlayerService.isPlaying()) {
-                        mCurrentVolume -= 0.01f;
+                        mCurrentVolume -= FADE_OUT_VOLUME_STEP;
                         if (mCurrentVolume > 0.0f) {
-                            this.sendEmptyMessageDelayed(FADEOUT, 10);
+                            this.sendEmptyMessageDelayed(FADEOUT, fadeOutMessageDelay());
                         } else {
                             mCurrentVolume = 0.0f;
                         }
@@ -136,6 +140,10 @@ public class PlayerHandler {
 
             }
         }
+    }
+
+    private static int fadeOutMessageDelay() {
+        return Math.round(FADE_OUT_DURATION_SECONDS*1000 * FADE_OUT_VOLUME_STEP);
     }
 
 }
