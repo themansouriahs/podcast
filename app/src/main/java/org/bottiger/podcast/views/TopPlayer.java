@@ -461,23 +461,21 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
 
         argEpisode.getSubscription(mContext).getColors(mContext)
                 .subscribeOn(io.reactivex.schedulers.Schedulers.io())
-                .observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
+                .observeOn(io.reactivex.schedulers.Schedulers.computation())
                 .subscribe(new BaseSubscription.BasicColorExtractorObserver<ColorExtractor>() {
 
                     @Override
                     public void onSuccess(ColorExtractor value) {
                         mPlayPauseButton.setColor(value);
-                        mBackgroundColor = value.getPrimary();
+                        mBackgroundColor = value.getPrimaryTint();
 
-                        @ColorInt int bgcolor = ContextCompat.getColor(getContext(), R.color.playlist_background);
-                        bgcolor = ColorUtils.adjustToTheme(getResources(), argEpisode.getSubscription(mContext));
-                        setBackgroundColor(bgcolor);
+                        setBackgroundColor(mBackgroundColor);
 
                         ColorUtils.tintButton(mFavoriteButton,    mTextColor);
                         ColorUtils.tintButton(mDownloadButton,    mTextColor);
                         tintInflatedButtons();
 
-                        invalidate();
+                        postInvalidate();
                     }
                 });
     }
@@ -495,7 +493,7 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
         if ((minute + 30) > 60) {
             setHour = hour+1;
         }
-        
+
         TimePickerDialog tpd = TimePickerDialog.newInstance(new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePickerDialog view, int setHourOfDay, int setMinute, int setSecond) {
