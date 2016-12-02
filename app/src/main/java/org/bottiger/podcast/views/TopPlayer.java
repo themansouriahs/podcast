@@ -144,6 +144,8 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
     private ImageButton mMoreButton;
     private PlayerSeekbar mPlayerSeekbar;
 
+    @Nullable private Overlay mOverlay;
+
     @Nullable private CountDownTimer mCountDownTimer;
     private long mCountDownTimeLeft = TIMER_NOT_SET;
 
@@ -367,6 +369,10 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
 
     }
 
+    public void setOverlay(@Nullable Overlay argOverlay) {
+        mOverlay = argOverlay;
+    }
+
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
@@ -439,10 +445,12 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
 
         mRewindButton.setOnTouchListener(OnTouchSeekListener.getSeekListener(soundwaves,
                 argEpisode,
-                OnTouchSeekListener.BACKWARDS));
+                OnTouchSeekListener.BACKWARDS,
+                mOverlay));
         mFastForwardButton.setOnTouchListener(OnTouchSeekListener.getSeekListener(soundwaves,
                 argEpisode,
-                OnTouchSeekListener.FORWARD));
+                OnTouchSeekListener.FORWARD,
+                mOverlay));
 
         float speed = PlayerService.getPlaybackSpeed(getContext(), mCurrentEpisode);
         setPlaybackSpeedView(speed);

@@ -26,6 +26,7 @@ import org.bottiger.podcast.utils.id3reader.ID3ReaderException;
 import org.bottiger.podcast.views.CustomLinearLayoutManager;
 import org.bottiger.podcast.views.DownloadButtonView;
 import org.bottiger.podcast.views.ImageViewTinted;
+import org.bottiger.podcast.views.Overlay;
 import org.bottiger.podcast.views.PlayPauseImageView;
 import org.bottiger.podcast.views.PlayerSeekbar;
 import org.bottiger.podcast.views.PlaylistViewHolder;
@@ -145,7 +146,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
     private GenericMediaPlayerInterface mPlayer;
 
     private RecyclerView mRecyclerView;
-    private View mOverlay;
+    private Overlay mOverlay;
 
 	/** ID of the current expanded episode */
 	private long mExpandedEpisodeId = -1;
@@ -240,7 +241,9 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
         mPlayerDownloadButton   =    (DownloadButtonView) view.findViewById(R.id.download);
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.my_recycler_view);
-        mOverlay = view.findViewById(R.id.playlist_overlay);
+        mOverlay = (Overlay) view.findViewById(R.id.playlist_overlay);
+
+        mTopPlayer.setOverlay(mOverlay);
 
         setPlayer();
 

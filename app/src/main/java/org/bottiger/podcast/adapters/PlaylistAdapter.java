@@ -36,6 +36,7 @@ import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.SharedAdapterUtils;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.ThemeHelper;
+import org.bottiger.podcast.views.Overlay;
 import org.bottiger.podcast.views.PlayPauseImageView;
 import org.bottiger.podcast.views.PlaylistViewHolder;
 
@@ -57,11 +58,11 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
     public static ExpandableViewHoldersUtil.KeepOneH<PlaylistViewHolder> keepOne = new ExpandableViewHoldersUtil.KeepOneH<>();
 
     private Activity mActivity;
-    private View mOverlay;
+    private Overlay mOverlay;
 
 	public static TreeSet<Number> mExpandedItemID = new TreeSet<>();
 
-    public PlaylistAdapter(@NonNull Activity argActivity, View argOverlay) {
+    public PlaylistAdapter(@NonNull Activity argActivity, Overlay argOverlay) {
         super(argActivity);
         mActivity = argActivity;
         mOverlay = argOverlay;

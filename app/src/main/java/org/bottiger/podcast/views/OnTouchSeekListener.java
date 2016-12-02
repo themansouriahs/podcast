@@ -7,6 +7,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -38,14 +39,15 @@ public class OnTouchSeekListener {
     @IntDef({FORWARD, BACKWARDS})
     public @interface Direction {}
     public static final int FORWARD = 1;
-    public static final int BACKWARDS = 2;
+    public static final int BACKWARDS = -1;
 
     private static SeekHandler sSeekHandler;
 
     static View.OnTouchListener getSeekListener(@NonNull final SoundWaves argApp,
                                                 @NonNull final IEpisode argEpisode,
-                                                @Direction final int argDirection) {
-        iniSeekHandler(argApp);
+                                                @Direction final int argDirection,
+                                                @Nullable final Overlay argOverlay) {
+        iniSeekHandler(argApp, argOverlay);
 
         return new View.OnTouchListener() {
             @Override
@@ -103,9 +105,11 @@ public class OnTouchSeekListener {
 
     private static class SeekHandler extends Handler {
         private final WeakReference<SoundWaves> mApp;
+        private final WeakReference<Overlay> mOverlay;
 
-        SeekHandler(@NonNull final SoundWaves argApp) {
+        SeekHandler(@NonNull final SoundWaves argApp, @Nullable Overlay argOverlay) {
             mApp = new WeakReference<>(argApp);
+            mOverlay = new WeakReference<>(argOverlay);
         }
 
         @Override
@@ -113,7 +117,9 @@ public class OnTouchSeekListener {
         {
             Log.v(TAG, "Handle message");
 
-            if (msg.what != MotionEvent.ACTION_DOWN && msg.what != EVENT_BUTTON_HOLD && msg.what != MotionEvent.ACTION_UP)
+            if (msg.what != MotionEvent.ACTION_DOWN &&
+                    msg.what != EVENT_BUTTON_HOLD &&
+                    msg.what != MotionEvent.ACTION_UP)
                 return;
 
             SoundWaves soundwaves = mApp.get();
@@ -143,13 +149,16 @@ public class OnTouchSeekListener {
                 GenericMediaPlayerInterface player = soundwaves.getPlayer();
 
                 boolean isFastSeeking = msg.what == EVENT_BUTTON_HOLD;
-                //noinspection WrongConstant
-                seekPlayer(player, episode, msg.arg1, isFastSeeking);
                 Message newMsg = new Message();
                 newMsg.copyFrom(msg);
+
                 newMsg.what = EVENT_BUTTON_HOLD;
+                newMsg.arg1 = tickerIsPointingForward(msg.arg1) ? msg.arg1+1 : msg.arg1-1;
 
                 if (msg.what != MotionEvent.ACTION_UP) {
+                    //noinspection WrongConstant
+                    seekPlayer(player, episode, mOverlay.get(), msg.arg1, isFastSeeking);
+
                     this.sendMessageDelayed(newMsg, MSG_DELAY_MS);
                 }
             }
@@ -158,21 +167,39 @@ public class OnTouchSeekListener {
 
     private static void seekPlayer(GenericMediaPlayerInterface argPlayer,
                                    @NonNull final IEpisode argEpisode,
-                                   @Direction final int argDirection,
+                                   @Nullable Overlay argOverlay,
+                                   final int argTicker,
                                    boolean isFastSeeking) {
-        if (argDirection == FORWARD) {
-            argPlayer.fastForward(argEpisode, isFastSeeking);
+        long seekAmount;
+        int tickCounter = Math.abs(argTicker);
+
+        if (tickerIsPointingForward(argTicker)) {
+            seekAmount = argPlayer.fastForward(argEpisode, isFastSeeking);
         } else {
-            argPlayer.rewind(argEpisode, isFastSeeking);
+            seekAmount = argPlayer.rewind(argEpisode, isFastSeeking);
         }
 
-        Log.v(TAG, "Do seek! isFast:" + isFastSeeking);
+        // FIXME: This will cause problems if the seekAmoutn changes during seeking.
+        long totalSeekAmount = seekAmount * tickCounter;
+        long currentPosition = argEpisode.getOffset()+totalSeekAmount;
+
+        if (argOverlay != null) {
+            argOverlay.setText(currentPosition, totalSeekAmount);
+            argOverlay.show();
+        }
+
+        Log.v(TAG, "Do seek! isFast:" + isFastSeeking + " totalSeek:" + totalSeekAmount + " currenPos:" + currentPosition + " ticker:" + tickCounter);
     }
 
-    private static SeekHandler iniSeekHandler(@NonNull final SoundWaves argApp) {
-        sSeekHandler = new SeekHandler(argApp);
+    private static SeekHandler iniSeekHandler(@NonNull final SoundWaves argApp,
+                                              @Nullable final Overlay argOverlay) {
+        sSeekHandler = new SeekHandler(argApp, argOverlay);
 
         return sSeekHandler;
+    }
+
+    private static boolean tickerIsPointingForward(int argTicker) {
+        return Math.signum(argTicker) == Math.signum(FORWARD);
     }
 
 }

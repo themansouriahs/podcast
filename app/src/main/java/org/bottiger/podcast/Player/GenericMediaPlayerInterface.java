@@ -32,11 +32,11 @@ public interface GenericMediaPlayerInterface {
 
     long getCurrentPosition();
 
-    void rewind(@Nullable IEpisode argItem);
-    void fastForward(@Nullable IEpisode argItem);
+    long rewind(@Nullable IEpisode argItem);
+    long fastForward(@Nullable IEpisode argItem);
 
-    void rewind(@Nullable IEpisode argItem, boolean isFastSeeking);
-    void fastForward(@Nullable IEpisode argItem, boolean isFastSeeking);
+    long rewind(@Nullable IEpisode argItem, boolean isFastSeeking);
+    long fastForward(@Nullable IEpisode argItem, boolean isFastSeeking);
 
     void updateNotificationPlayer();
     void removeNotificationPlayer();

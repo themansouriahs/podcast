@@ -99,26 +99,33 @@ public class StrUtils {
 	Fast but not so readable.
 	From here: http://stackoverflow.com/questions/9027317/how-to-convert-milliseconds-to-hhmmss-format
  	*/
-	public static String formatTime(final long millis) {
+	public static String formatTime(final long argMillis) {
+
+		long millis = Math.abs(argMillis);
+
 		long seconds = TimeUnit.MILLISECONDS.toSeconds(millis)
 				- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis));
 		long minutes = TimeUnit.MILLISECONDS.toMinutes(millis)
 				- TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis));
 		long hours = TimeUnit.MILLISECONDS.toHours(millis);
 
-		StringBuilder b = new StringBuilder();
+		StringBuilder stringBuilder = new StringBuilder();
 
-		if (hours > 0) {
-			b.append(hours < 10 ? String.valueOf("" + hours) : String.valueOf(hours));
-			b.append(":");
+		if (argMillis < 0) {
+			stringBuilder.append("-");
 		}
 
-		b.append(minutes == 0 ? "00" : minutes < 10 ? String.valueOf("0" + minutes) :
+		if (hours > 0) {
+			stringBuilder.append(hours < 10 ? String.valueOf("" + hours) : String.valueOf(hours));
+			stringBuilder.append(":");
+		}
+
+		stringBuilder.append(minutes == 0 ? "00" : minutes < 10 ? String.valueOf("0" + minutes) :
 				String.valueOf(minutes));
-		b.append(":");
-		b.append(seconds == 0 ? "00" : seconds < 10 ? String.valueOf("0" + seconds) :
+		stringBuilder.append(":");
+		stringBuilder.append(seconds == 0 ? "00" : seconds < 10 ? String.valueOf("0" + seconds) :
 				String.valueOf(seconds));
-		return b.toString();
+		return stringBuilder.toString();
 	}
     
 	public static String formatDownloadString(int offset, long length) {

@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<org.bottiger.podcast.views.Overlay
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/playlist_overlay_frame"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:elevation="13dp"
     android:visibility="gone"
-    android:gravity="center_horizontal">
+    android:gravity="center_horizontal"
+    android:animateLayoutChanges="true">
 
     <RelativeLayout
         android:id="@+id/playlist_overlay_layout"
@@ -38,4 +39,4 @@
 
     </RelativeLayout>
 
-</FrameLayout>
+</org.bottiger.podcast.views.Overlay>

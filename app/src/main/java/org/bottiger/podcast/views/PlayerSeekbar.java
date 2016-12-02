@@ -50,12 +50,8 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener, ExoPlayer
 
     private boolean mPaintSeekInfo = false;
 
-    private View mOverlay = null;
+    private Overlay mOverlay = null;
     private IEpisode mEpisode = null;
-
-    private TextView mBackwards;
-    private TextView mCurrent;
-    private TextView mForwards;
 
     private String mBackwardsText = "";
     private String mCurrentText = "";
@@ -236,11 +232,8 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener, ExoPlayer
         return progress;
     }
 
-    public void setOverlay(View argLayout) {
+    public void setOverlay(Overlay argLayout) {
         mOverlay = argLayout;
-        mBackwards = (TextView) mOverlay.findViewById(R.id.seekbar_time_backwards);
-        mCurrent =   (TextView) mOverlay.findViewById(R.id.seekbar_time_current);
-        mForwards =  (TextView) mOverlay.findViewById(R.id.seekbar_time_forward);
     }
 
     @Nullable
@@ -275,9 +268,9 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener, ExoPlayer
                 mOverlay.bringToFront();
             }
 
-            mBackwards.setText(mBackwardsText);
-            mCurrent.setText(mCurrentText);
-            mForwards.setText(mForwardText);
+            mOverlay.getBackwards().setText(mBackwardsText);
+            mOverlay.getCurrent().setText(mCurrentText);
+            mOverlay.getForward().setText(mForwardText);
 
             this.getLocationInWindow(loc);
 
@@ -422,17 +415,9 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener, ExoPlayer
         return mIsTouching;
     }
 
-
-    // For the Chronometer
-    private boolean mVisible;
-    private boolean mStarted;
-    private boolean mRunning;
-    private static final int TICK_WHAT = 2;
-
     private void updateRunning() {
         if (shouldUpdate(getContext(), getEpisode())) {
             setProgressMs(SoundWaves.getAppContext(getContext()).getPlayer().getCurrentPosition());
-            //mHandler.sendMessageDelayed(Message.obtain(mHandler, TICK_WHAT), 1000);
             postDelayed(mTickRunnable, 1000);
         } else {
             removeCallbacks(mTickRunnable);

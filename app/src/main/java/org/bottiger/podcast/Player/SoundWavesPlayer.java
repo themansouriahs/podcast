@@ -231,12 +231,12 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         return mExoplayer.getPlayWhenReady();
     }
 
-    public void rewind() {
-        rewind(getCurrentItem());
+    public long rewind() {
+        return rewind(getCurrentItem());
     }
 
-    public void fastForward() {
-        fastForward(getCurrentItem());
+    public long fastForward() {
+        return fastForward(getCurrentItem());
     }
 
     /**

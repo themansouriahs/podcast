@@ -196,34 +196,34 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
         return seekTo(msec, false);
     }
 
-    public void fastForward(@Nullable IEpisode argItem, boolean isFastSeeking) {
-        seekDirection(argItem, isFastSeeking, OnTouchSeekListener.FORWARD);
+    public long fastForward(@Nullable IEpisode argItem, boolean isFastSeeking) {
+        return seekDirection(argItem, isFastSeeking, OnTouchSeekListener.FORWARD);
     }
 
-    public void fastForward(@Nullable IEpisode argItem) {
-        fastForward(argItem, false);
+    public long fastForward(@Nullable IEpisode argItem) {
+        return fastForward(argItem, false);
     }
 
-    public void rewind(@Nullable IEpisode argItem) {
-        rewind(argItem, false);
+    public long rewind(@Nullable IEpisode argItem) {
+        return rewind(argItem, false);
     }
 
-    public void rewind(@Nullable IEpisode argItem, boolean isFastSeeking) {
-        seekDirection(argItem, isFastSeeking, OnTouchSeekListener.BACKWARDS);
+    public long rewind(@Nullable IEpisode argItem, boolean isFastSeeking) {
+        return seekDirection(argItem, isFastSeeking, OnTouchSeekListener.BACKWARDS);
     }
 
-    private void seekDirection(@Nullable IEpisode argItem, boolean isFastSeeking, @OnTouchSeekListener.Direction int argDirection) {
+    private long seekDirection(@Nullable IEpisode argItem, boolean isFastSeeking, @OnTouchSeekListener.Direction int argDirection) {
 
         String amount = PreferenceHelper.getStringPreferenceValue(mContext, R.string.pref_player_backward_amount_key, R.string.player_rewind_default);
         long seekAmountMs = Integer.parseInt(amount)*1000; // to ms
 
         if (argItem == null)
-            return;
+            return 0;
 
         boolean hasService = mPlayerService != null;
         long currentOffset = hasService && PlayerService.getCurrentItem() != null ? mPlayerService.position() : argItem.getOffset();
 
-        if (argDirection==OnTouchSeekListener.BACKWARDS) {
+        if (argDirection == OnTouchSeekListener.BACKWARDS) {
             seekAmountMs = -seekAmountMs;
         }
 
@@ -231,10 +231,12 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
 
         if (!hasService) {
             argItem.setOffset(seekTo);
-            return;
+            return seekAmountMs;
         }
 
         seekTo(seekTo, isFastSeeking);
+
+        return seekAmountMs;
     }
 
     public boolean isInitialized() {
