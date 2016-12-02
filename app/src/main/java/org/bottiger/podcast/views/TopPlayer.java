@@ -334,28 +334,6 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
                 }
             }
         });
-
-        mRewindButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PlayerService ps = PlayerService.getInstance();
-                if (ps != null) {
-                    ps.getPlayer().rewind(ps.getCurrentItem());
-                }
-            }
-        });
-
-
-        mFastForwardButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                IEpisode episode = PlayerService.getCurrentItem();
-                PlayerService ps = PlayerService.getInstance();
-                if (ps != null) {
-                    ps.getPlayer().fastForward(episode);
-                }
-            }
-        });
     }
 
     @Override
@@ -456,6 +434,15 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
 
         if (argEpisode == null)
             return;
+
+        SoundWaves soundwaves = SoundWaves.getAppContext(getContext());
+
+        mRewindButton.setOnTouchListener(OnTouchSeekListener.getSeekListener(soundwaves,
+                argEpisode,
+                OnTouchSeekListener.BACKWARDS));
+        mFastForwardButton.setOnTouchListener(OnTouchSeekListener.getSeekListener(soundwaves,
+                argEpisode,
+                OnTouchSeekListener.FORWARD));
 
         float speed = PlayerService.getPlaybackSpeed(getContext(), mCurrentEpisode);
         setPlaybackSpeedView(speed);

@@ -35,6 +35,9 @@ public interface GenericMediaPlayerInterface {
     void rewind(@Nullable IEpisode argItem);
     void fastForward(@Nullable IEpisode argItem);
 
+    void rewind(@Nullable IEpisode argItem, boolean isFastSeeking);
+    void fastForward(@Nullable IEpisode argItem, boolean isFastSeeking);
+
     void updateNotificationPlayer();
     void removeNotificationPlayer();
 
@@ -70,6 +73,7 @@ public interface GenericMediaPlayerInterface {
     void prepare() throws IllegalStateException, IOException;
     void reset();
     long seekTo(long msec) throws IllegalStateException;
+    long seekTo(long msec, boolean argFastSeeking) throws IllegalStateException;
     void setAudioStreamType(int streamtype);
     void setDataSource(Context context, Uri uri) throws IllegalArgumentException, IllegalStateException, IOException;
     void setPlaybackSpeed(float f);

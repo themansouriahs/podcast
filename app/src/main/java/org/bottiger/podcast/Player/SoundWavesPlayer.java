@@ -467,13 +467,15 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
     }
 
     @Override
-    public long seekTo(long msec) throws IllegalStateException {
+    public long seekTo(long msec, boolean argFastSeeking) throws IllegalStateException {
         long position = mExoplayer.getCurrentPosition();;
         mExoplayer.seekTo(msec);
 
-        PlayerService ps = mPlayerService;
-        if (ps != null) {
-            mPlayerService.updateChapter(position);
+        if (!argFastSeeking) {
+            PlayerService ps = mPlayerService;
+            if (ps != null) {
+                mPlayerService.updateChapter(position);
+            }
         }
 
         return msec;

@@ -41,6 +41,7 @@ import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.PlaybackSpeed;
 import org.bottiger.podcast.utils.PreferenceHelper;
 import org.bottiger.podcast.utils.rxbus.RxBasicSubscriber;
+import org.bottiger.podcast.views.OnTouchSeekListener;
 
 import java.io.File;
 import java.io.IOException;
@@ -190,31 +191,50 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
             mNotificationPlayer.hide();
     }
 
+    @Override
+    public long seekTo(long msec) throws IllegalStateException {
+        return seekTo(msec, false);
+    }
+
+    public void fastForward(@Nullable IEpisode argItem, boolean isFastSeeking) {
+        seekDirection(argItem, isFastSeeking, OnTouchSeekListener.FORWARD);
+    }
+
     public void fastForward(@Nullable IEpisode argItem) {
-        if (mPlayerService == null)
-            return;
-
-        if (argItem == null)
-            return;
-
-        String fastForwardAmount = PreferenceHelper.getStringPreferenceValue(mPlayerService, R.string.pref_player_forward_amount_key, R.string.player_fast_forward_default);
-        long seekTo = mPlayerService.position() + Integer.parseInt(fastForwardAmount)*1000; // to ms
-
-        seekTo(seekTo);
+        fastForward(argItem, false);
     }
 
     public void rewind(@Nullable IEpisode argItem) {
-        if (mPlayerService == null)
-            return;
+        rewind(argItem, false);
+    }
+
+    public void rewind(@Nullable IEpisode argItem, boolean isFastSeeking) {
+        seekDirection(argItem, isFastSeeking, OnTouchSeekListener.BACKWARDS);
+    }
+
+    private void seekDirection(@Nullable IEpisode argItem, boolean isFastSeeking, @OnTouchSeekListener.Direction int argDirection) {
+
+        String amount = PreferenceHelper.getStringPreferenceValue(mContext, R.string.pref_player_backward_amount_key, R.string.player_rewind_default);
+        long seekAmountMs = Integer.parseInt(amount)*1000; // to ms
 
         if (argItem == null)
             return;
 
-        String rewindAmount = PreferenceHelper.getStringPreferenceValue(mPlayerService, R.string.pref_player_backward_amount_key, R.string.player_rewind_default);
-        long seekTo = mPlayerService.position() - Integer.parseInt(rewindAmount)*1000; // to ms
+        boolean hasService = mPlayerService != null;
+        long currentOffset = hasService && PlayerService.getCurrentItem() != null ? mPlayerService.position() : argItem.getOffset();
 
+        if (argDirection==OnTouchSeekListener.BACKWARDS) {
+            seekAmountMs = -seekAmountMs;
+        }
 
-        seekTo(seekTo);
+        long seekTo = currentOffset + seekAmountMs;
+
+        if (!hasService) {
+            argItem.setOffset(seekTo);
+            return;
+        }
+
+        seekTo(seekTo, isFastSeeking);
     }
 
     public boolean isInitialized() {
