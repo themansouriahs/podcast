@@ -43,7 +43,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 import io.reactivex.ObservableEmitter;
@@ -82,7 +81,8 @@ public class Library {
     @Library.SortOrder
     private int mSubscriptionSortOrder = Library.ALPHABETICALLY;
 
-    private final ReentrantLock mLock = new ReentrantLock();
+    private final ReentrantLock mEpisodeLock = new ReentrantLock();
+    private final ReentrantLock mSubscriptionLock = new ReentrantLock();
 
     @NonNull
     private final ArrayList<IEpisode> mEpisodes = new ArrayList<>();
@@ -217,7 +217,7 @@ public class Library {
         }
 
         try {
-            mLock.lock();
+            mSubscriptionLock.lock();
             if (!subscription.IsSubscribed() &&
                 mActiveSubscriptions.indexOf(subscription) != SortedList.INVALID_POSITION) {
                     Log.e("Unsubscribing", "from: " + subscription.getTitle() + ", tag:" + argSubscriptionChanged.getTag());
@@ -225,7 +225,7 @@ public class Library {
                     mSubscriptionsChangeObservable.onNext(subscription);
             }
         } finally {
-                mLock.unlock();
+            mSubscriptionLock.unlock();
         }
 
         switch (argSubscriptionChanged.getAction()) {
@@ -260,7 +260,7 @@ public class Library {
      * @return
      */
     public boolean addEpisodes(@NonNull Subscription argSubscription) {
-        mLock.lock();
+        mEpisodeLock.lock();
 
         LinkedList<IEpisode> episodes = argSubscription.getEpisodes().getFilteredList();
         LinkedList<String> keys = new LinkedList<>();
@@ -293,7 +293,7 @@ public class Library {
             //Log.d(TAG, "insert time: " + (end-start) + " ms (#" + unpersistedEpisodes.size() + ")");
 
         } finally {
-            mLock.unlock();
+            mEpisodeLock.unlock();
         }
 
         return true;
@@ -321,7 +321,7 @@ public class Library {
         boolean isFeedItem = argEpisode instanceof FeedItem;
         FeedItem item = isFeedItem ? (FeedItem)argEpisode : null;
 
-        mLock.lock();
+        mEpisodeLock.lock();
         try {
             // If the item is a feedItem it should belong to a subscription.
             // If it does not belong to a subscription yet (i.e. we are parsing the subscription, maybe for the first time)
@@ -372,7 +372,7 @@ public class Library {
             }
 
         } finally {
-            mLock.unlock();
+            mEpisodeLock.unlock();
         }
 
         return true;
@@ -385,7 +385,7 @@ public class Library {
 
     @WorkerThread
     private void addSubscriptionInternal(@Nullable Subscription argSubscription, boolean argSilent) {
-        mLock.lock();
+        mSubscriptionLock.lock();
         try {
             if (argSubscription == null)
                 return;
@@ -405,12 +405,12 @@ public class Library {
                 mSubscriptionsChangeObservable.onNext(argSubscription);
 
         } finally {
-            mLock.unlock();
+            mSubscriptionLock.unlock();
         }
     }
 
     public void removeSubscription(@Nullable Subscription argSubscription) {
-        mLock.lock();
+        mSubscriptionLock.lock();
         try {
             if (argSubscription == null)
                 return;
@@ -421,20 +421,20 @@ public class Library {
             mSubscriptionUrlLUT.remove(argSubscription.getUrl());
             mActiveSubscriptions.remove(argSubscription);
         } finally {
-            mLock.unlock();
+            mSubscriptionLock.unlock();
         }
 
         mSubscriptionsChangeObservable.onNext(argSubscription);
     }
 
     private void clearSubscriptions() {
-        mLock.lock();
+        mSubscriptionLock.lock();
         try {
             mActiveSubscriptions.clear();
             mSubscriptionUrlLUT.clear();
             mSubscriptionIdLUT.clear();
         } finally {
-            mLock.unlock();
+            mSubscriptionLock.unlock();
         }
     }
 
@@ -505,7 +505,17 @@ public class Library {
 
     public SortedList<IEpisode> newEpisodeSortedList(SortedList.Callback<IEpisode> argCallback) {
         SortedList<IEpisode> sortedList = new SortedList<>(IEpisode.class, argCallback);
-        sortedList.addAll(mEpisodes);
+
+        try {
+            mEpisodeLock.lock();
+            for (int i = 0; i < mEpisodes.size(); i++) {
+                sortedList.add(mEpisodes.get(i));
+            }
+        } finally {
+            mEpisodeLock.unlock();
+        }
+
+        //sortedList.addAll(mEpisodes);
         return sortedList;
     }
 
@@ -616,7 +626,7 @@ public class Library {
 
         Cursor cursor = null;
 
-        mLock.lock();
+        mEpisodeLock.lock();
         try {
             if (argPlaylist.isLoaded())
                 return;
@@ -632,7 +642,7 @@ public class Library {
         } finally {
             if (cursor != null)
                 cursor.close();
-            mLock.unlock();
+            mEpisodeLock.unlock();
         }
     }
 
@@ -837,7 +847,7 @@ public class Library {
 
                         Subscription subscription;
 
-                        mLock.lock();
+                        mSubscriptionLock.lock();
                         try {
                             String key = getKey(argSubscription);
                             subscription = mSubscriptionUrlLUT.containsKey(key) ?
@@ -853,7 +863,7 @@ public class Library {
                             mActiveSubscriptions.add(subscription);
 
                         } finally {
-                            mLock.unlock();
+                            mSubscriptionLock.unlock();
                         }
 
                         EventLogger.postEvent(mContext, EventLogger.SUBSCRIBE_PODCAST, null, argSubscription.getURLString(), null);
