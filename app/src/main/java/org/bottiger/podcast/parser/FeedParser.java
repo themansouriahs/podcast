@@ -411,6 +411,12 @@ public class FeedParser {
             }
         }
 
+        // Ensure that pubDate is always present
+        if (episode.getDateTime() == null) {
+            Date now = Calendar.getInstance().getTime();
+            episode.setPubDate(now);
+        }
+
         episode.setIsParsing(false, false);
 
         return parsedURL ? episode : null;
@@ -479,8 +485,8 @@ public class FeedParser {
      * This is a parsing and caching layer. It detect if the feeds episode descriptions
      * contain HTML, and if it does parses it.
      *
-     * @param The XML parser
-     * @return The episode description as a String
+     * @param parser The XML parser
+     * @return description The episode description as a String
      * @throws IOException
      * @throws XmlPullParserException
      */
@@ -488,7 +494,7 @@ public class FeedParser {
         String description = readSummary(parser);
         String parsedHTML = null;
         if (mContainsHTML == null && description != null) {
-            parsedHTML = Html.fromHtml(description).toString();
+            parsedHTML = StrUtils.fromHtmlCompat(description).toString();
             mContainsHTML = description.equals(parsedHTML);
         }
 

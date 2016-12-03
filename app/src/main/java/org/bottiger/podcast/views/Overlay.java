@@ -10,6 +10,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.utils.StrUtils;
 
 /**
@@ -17,6 +18,8 @@ import org.bottiger.podcast.utils.StrUtils;
  */
 
 public class Overlay extends FrameLayout {
+
+    private static final String TAG = Overlay.class.getSimpleName();
 
     private static final int DEFAULT_DISPLAY_LENGTH_MS = 1_000;
 
@@ -82,9 +85,18 @@ public class Overlay extends FrameLayout {
         mStringBuilder.append(positiveOffset ? "+" : "-");
         mStringBuilder.append(StrUtils.formatTime(argOffsetMs));
 
-        mCurrent.setText(StrUtils.formatTime(argCurrentTimeMs));
-        mForwards.setText(positiveOffset ? mStringBuilder.toString() : "");
-        mBackwards.setText(positiveOffset ? "" : mStringBuilder.toString());
+        TextView current = mCurrent;
+        TextView forward = mForwards;
+        TextView backward = mBackwards;
+
+        if (current == null || forward == null || backward == null) {
+            VendorCrashReporter.report(TAG, "View is null");
+            return;
+        }
+
+        current.setText(StrUtils.formatTime(argCurrentTimeMs));
+        forward.setText(positiveOffset ? mStringBuilder.toString() : "");
+        backward.setText(positiveOffset ? "" : mStringBuilder.toString());
     }
 
     @NonNull

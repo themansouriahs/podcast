@@ -291,10 +291,8 @@ public class LibraryPersistency {
         map.add(new Pair<String, Object>(ItemColumns.IS_DOWNLOADED, argItem.isDownloaded()));
 
         Date date = argItem.getDateTime();
-        if (date != null) {
-            long time = date.getTime();
-            map.add(new Pair<String, Object>(ItemColumns.PUB_DATE, time));
-        }
+        long time = date != null ? date.getTime() : System.currentTimeMillis();
+        map.add(new Pair<String, Object>(ItemColumns.PUB_DATE, time));
 
         if (!silent)
             map.add(new Pair<String, Object>(ItemColumns.LAST_UPDATE, System.currentTimeMillis()));

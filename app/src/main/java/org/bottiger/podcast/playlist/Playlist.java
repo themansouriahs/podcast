@@ -485,7 +485,8 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
 
         String ids = "";
         if (mSubscriptionFilter.getMode() == SubscriptionFilter.SHOW_SELECTED) {
-            where += mSubscriptionFilter.toSQL();
+            //where += mSubscriptionFilter.toSQL();
+            where += "1";
         } else {
             where += ItemColumns.TABLE_NAME + "." + ItemColumns.SUBS_ID+ " ";
             // only find episodes from suscriptions which are not "unsubscribed"

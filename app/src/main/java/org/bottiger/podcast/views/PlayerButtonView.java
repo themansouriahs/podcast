@@ -1,6 +1,7 @@
 package org.bottiger.podcast.views;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -19,6 +20,7 @@ import org.bottiger.podcast.R;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.ColorUtils;
 
@@ -28,6 +30,8 @@ import java.lang.ref.WeakReference;
  * TODO: document your custom view class.
  */
 public class PlayerButtonView extends ImageButton  {
+
+    private static final String TAG = PlayerButtonView.class.getSimpleName();
 
     public final static int STATE_DEFAULT = 0;
     public final static int STATE_DOWNLOAD = 1;
@@ -161,11 +165,26 @@ public class PlayerButtonView extends ImageButton  {
     }
 
     public void onPaletteFound(ColorExtractor extractor) {
-        int color = ColorUtils.getTextColor(getContext());
 
-        int colorFinal = ColorUtils.adjustToTheme(this.mContext.getResources(), mEpisode.getSubscription(mContext));
+        if (mEpisode == null) {
+            VendorCrashReporter.report(TAG, "EpisodeNull");
+            return;
+        }
 
-        //colorFinal = Color.BLACK;
+        if (mContext == null) {
+            VendorCrashReporter.report(TAG, "ContextNull");
+            return;
+        }
+
+        Resources resources = mContext.getResources();
+        ISubscription subscription = mEpisode.getSubscription(mContext);
+
+        if (subscription == null) {
+            VendorCrashReporter.report(TAG, "subscriptionNull");
+            return;
+        }
+
+        int colorFinal = ColorUtils.adjustToTheme(resources, subscription);
 
         mBaseColorPaint.setColor(colorFinal); // -1761607680
         mForegroundColorPaint.setColor(colorFinal);

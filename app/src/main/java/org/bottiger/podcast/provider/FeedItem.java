@@ -973,14 +973,6 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 
         pub_date = pubDate;
 
-        /*
-        try {
-            this.date = sFormat.format(parseRFC822Date);
-        } catch (NullPointerException npe) {
-            //Log.e("Date parsing error:" , "Could not parse: " + parseRFC822Date.toString());
-            this.date = sFormat.format(new Date());
-        }
-        */
         notifyPropertyChanged(EpisodeChanged.CHANGED);
 	}
 

@@ -200,7 +200,7 @@ public class ShortcutManagerUtil {
                     with(argContext)
                     .load(argArtwork)
                     .asBitmap()
-                    .into(40, 40) // Width and height
+                    .into(200, 200) // Width and height
                     .get();
 
             bitmap = getCroppedBitmap(bitmap);

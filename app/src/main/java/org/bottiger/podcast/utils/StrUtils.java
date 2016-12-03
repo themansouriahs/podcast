@@ -2,8 +2,13 @@ package org.bottiger.podcast.utils;
 
 
 import android.content.Context;
+import android.os.Build;
 import android.support.annotation.Nullable;
 import android.telephony.TelephonyManager;
+import android.text.Html;
+import android.text.Spannable;
+import android.text.Spanned;
+import android.text.SpannedString;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.Patterns;
@@ -126,6 +131,20 @@ public class StrUtils {
 		stringBuilder.append(seconds == 0 ? "00" : seconds < 10 ? String.valueOf("0" + seconds) :
 				String.valueOf(seconds));
 		return stringBuilder.toString();
+	}
+
+	public static Spanned fromHtmlCompat(@Nullable String argString) {
+
+		if (TextUtils.isEmpty(argString)) {
+			new SpannedString("");
+		}
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+			return Html.fromHtml(argString, Html.FROM_HTML_MODE_LEGACY);
+		} else {
+			//noinspection deprecation
+			return Html.fromHtml(argString);
+		}
 	}
     
 	public static String formatDownloadString(int offset, long length) {
