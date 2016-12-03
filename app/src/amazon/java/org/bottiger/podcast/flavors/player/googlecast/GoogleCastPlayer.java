@@ -158,7 +158,7 @@ public abstract class GoogleCastPlayer extends SoundWavesPlayerBase {
     }
 
     @Override
-    public long seekTo(long msec) throws IllegalStateException {
+    public long seekTo(long msec, boolean argFastSeeking) throws IllegalStateException {
         if (!isCasting())
             return getCurrentPosition();
 
@@ -166,6 +166,11 @@ public abstract class GoogleCastPlayer extends SoundWavesPlayerBase {
         getRemoteMediaClient().seek(msec);
 
         return msec;
+    }
+
+    @Override
+    public long seekTo(long msec) throws IllegalStateException {
+        return seekTo(msec, false);
     }
 
     @Override
