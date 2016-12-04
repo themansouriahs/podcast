@@ -167,6 +167,11 @@ public class VendorMediaRouteCast extends GoogleCastPlayer implements IMediaCast
     }
 
     @Override
+    public long seekTo(long msec, boolean argFastSeeking) throws IllegalStateException {
+        return 0;
+    }
+
+    @Override
     public void setAudioStreamType(int streamtype) {
 
     }
