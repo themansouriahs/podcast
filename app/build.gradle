@@ -9,8 +9,8 @@ android {
         applicationId "org.bottiger.podcast"
         minSdkVersion 15
         targetSdkVersion 25
-        versionCode 330        // even - release. Odd - development
-        versionName "0.148.8" // even - release. Odd - development
+        versionCode 332        // even - release. Odd - development
+        versionName "0.148.10" // even - release. Odd - development
         multiDexEnabled = true
         //renderscriptTargetApi 20
         //renderscriptSupportModeEnabled true
@@ -104,6 +104,7 @@ android {
 
 repositories {
     mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -147,6 +148,7 @@ dependencies {
     compile 'com.nineoldandroids:library:2.4.0'
     compile 'com.bugsnag:bugsnag-android:3.7.0'
     compile 'com.journeyapps:zxing-android-embedded:3.4.0'
+    compile 'com.heinrichreimersoftware:material-intro:1.6'
 
     //compile 'com.github.wseemann:FFmpegMediaMetadataRetriever:1.0.13'
     compile project(":armv7-fmmr")
