@@ -41,6 +41,7 @@
     <application
         android:name=".SoundWaves"
         android:icon="@drawable/ic_launcher_sw"
+        android:roundIcon="@drawable/ic_launcher_sw_round"
         android:label="@string/app_name"
         android:theme="@style/SoundWavesTheme.Light"
         android:allowBackup="true">
