@@ -469,7 +469,9 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
                         mPlayPauseButton.setColor(value);
                         mBackgroundColor = value.getPrimaryTint();
 
-                        setBackgroundColor(mBackgroundColor);
+                        if (mBackgroundColor != -1) {
+                            setBackgroundColor(mBackgroundColor);
+                        }
 
                         ColorUtils.tintButton(mFavoriteButton,    mTextColor);
                         ColorUtils.tintButton(mDownloadButton,    mTextColor);
