@@ -7,10 +7,6 @@
         android:icon="@drawable/ic_clear_all_24dp"
         android:title="@string/menu_clear_playlist"/>
     <item
-        android:id="@+id/navigation_feedback"
-        android:icon="@drawable/ic_messenger_black"
-        android:title="@string/menu_feedback"/>
-    <item
         android:id="@+id/navigation_downloading"
         android:icon="@drawable/ic_file_download_24dp"
         android:title="@string/menu_downloading"/>

@@ -64,14 +64,27 @@ android:background="@color/colorPrimary"
 
     </LinearLayout>
 
+    <!--
+    android:background="?attr/themeBackground" -->
     <!-- The Drawer -->
     <android.support.design.widget.NavigationView
         android:id="@+id/navigation_drawer"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="?attr/themeBackground"
         app:headerLayout="@layout/drawer_header"
-        app:menu="@menu/drawer"/>
+        app:menu="@menu/drawer">
+
+        <android.support.design.widget.NavigationView
+            android:id="@+id/navigation_drawer_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:menu="@menu/drawer_bottom"
+            android:layout_gravity="bottom">
+
+
+        </android.support.design.widget.NavigationView>
+
+        </android.support.design.widget.NavigationView>
 
 </android.support.v4.widget.DrawerLayout>

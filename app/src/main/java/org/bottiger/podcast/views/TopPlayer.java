@@ -746,7 +746,6 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
             Layout.setLayoutParams(layoutParams);
 
             setPlayerHeight(sizeLarge);
-            ((MainActivity) getContext()).exitFullScreen(Layout);
         }
 
     }

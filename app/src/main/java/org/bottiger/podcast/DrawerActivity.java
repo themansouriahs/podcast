@@ -40,6 +40,7 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity impleme
 
     protected ViewGroup mDrawerMainContent;
     private NavigationView mNavigationView;
+    private NavigationView mNavigationViewBottom;
     private Toolbar mToolbar;
     private View mFragmentTop;
     private View mHeaderContainerBackground;
@@ -62,12 +63,14 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity impleme
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mNavigationView = (NavigationView) findViewById(R.id.navigation_drawer);
+        mNavigationViewBottom = (NavigationView) findViewById(R.id.navigation_drawer_bottom);
         mToolbar = (Toolbar) findViewById(R.id.my_awesome_toolbar);
         //mFragmentTop = (View) findViewById(R.id.fragment_top);
         //mHeaderContainerBackground = findViewById(R.id.header_container_background);
         mAppContent = (ViewPager) findViewById(R.id.app_content);
         //mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
         mNavigationView.setNavigationItemSelectedListener(this);
+        mNavigationViewBottom.setNavigationItemSelectedListener(this);
 
         //observeToolbarHeight(mFragmentTop);
 
@@ -79,59 +82,11 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity impleme
                 R.string.drawer_open, /* "open drawer" description for accessibility */
                 R.string.drawer_close /* "close drawer" description for accessibility */
         );
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
+        mDrawerLayout.addDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
 
-        // if we can use windowTranslucentNavigation=true
-
-        /*
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            //RelativeLayout.MarginLayoutParams params2 = (RelativeLayout.MarginLayoutParams) mDrawerMainContent.getLayoutParams();
-            //params2.topMargin = getStatusBarHeight(getResources());
-            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) mDrawerLayout.getLayoutParams();
-            params.topMargin = getStatusBarHeight(getResources());
-            mDrawerLayout.setLayoutParams(params);
-
-            //mDrawerMainContent.setLayoutParams(params2);
-        }
-        */
 
 
-    }
-
-    public void goFullScreen(@NonNull View argFullScreenView, @ColorInt int argColor) {
-        /*
-        mAppContent.bringToFront();
-        mToolbar.bringToFront();
-        UIUtils.tintStatusBar(argColor, this);
-        */
-    }
-
-    public void exitFullScreen(@NonNull View argFullScreenView) {
-        /*
-        UIUtils.resetStatusBar(this);
-        mAppContent.bringToFront();
-        mToolbar.bringToFront();
-        */
-    }
-
-    public int getFragmentTop() {
-        return mFragmentTopPosition;
-    }
-
-    public int getSlidingTabsHeight() {
-        return mSlidingTabLayout.getHeight();
-    }
-
-    private int getToolbarBottomPosition() {
-        if (mFragmentTopPosition > 0) {
-            return mFragmentTopPosition;
-        }
-
-        int[] location = new int[2];
-        mFragmentTop.getLocationOnScreen(location);
-        //return location[1];// - mFragmentTop.getHeight();// + mSlidingTabLayout.getHeight();
-        return mToolbar.getHeight() + mSlidingTabLayout.getHeight();
     }
 
 
@@ -159,6 +114,11 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity impleme
             case R.id.navigation_downloading: {
                 isHandled = true;
                 TransitionUtils.openDownloadManager(this);
+                break;
+            }
+            case R.id.navigation_settings: {
+                isHandled = true;
+                TransitionUtils.openSettings(this);
                 break;
             }
         }
