@@ -15,11 +15,13 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+import org.bottiger.podcast.activities.intro.Intro;
 import org.bottiger.podcast.debug.SqliteCopy;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
@@ -50,6 +52,11 @@ public class MainActivity extends FragmentContainerActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		Log.v(TAG, "App start time: " + System.currentTimeMillis());
 		super.onCreate(savedInstanceState);
+
+		if (SoundWaves.getAppContext(this).IsFirstRun()) {
+			Intent intent = new Intent(MainActivity.this, Intro.class);
+			startActivity(intent);
+		}
 
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		currentTheme = UIUtils.getTheme(this);

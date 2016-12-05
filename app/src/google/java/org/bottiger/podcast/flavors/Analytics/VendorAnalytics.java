@@ -187,6 +187,13 @@ public class VendorAnalytics extends AbstractAnalytics implements IAnalytics {
             eventData.LabelID = "Background feed refresh duration";
         }
 
+        if (argType == EVENT_TYPE.INTRO_DURATION) {
+            eventData = new EventData();
+            eventData.Category = CATEGORY_INFRASTRUCTURE;
+            eventData.Action = "IntroDuration";
+            eventData.LabelID = "Time spendt in the Intro";
+        }
+
         if (eventData != null)
             return eventData;
 

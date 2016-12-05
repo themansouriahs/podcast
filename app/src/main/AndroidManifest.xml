@@ -62,6 +62,11 @@
                 android:value="FILL_ME_IN" />
         </activity>
 
+        <activity
+            android:name="org.bottiger.podcast.activities.intro.Intro"
+            android:theme="@style/Theme.Intro"
+            android:label="@string/app_intro_activity" />
+
         <!-- android:theme="@style/Theme.Transparent" -->
         <activity
             android:name=".activities.feedview.FeedActivity"

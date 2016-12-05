@@ -26,8 +26,12 @@
 
     <color name="orange">#ff6600</color>
     <color name="green">#558855</color>
+    <color name="greenDark">#3b5e3b</color>
     <color name="blue">#33b5e5</color>
     <color name="darkblue">#0099cc</color>
+    <color name="yellow">#FFA500</color>
+    <color name="purple">#a14576</color>
+    <color name="purpleDark">#853962</color>
     <color name="red">#ff4444</color>
     <color name="grayDark">#777777</color>
     <color name="grayStart">#adadad</color>

@@ -175,6 +175,11 @@ public class SoundWaves extends MultiDexApplication {
         sharedPref.edit().putInt(times_started_key, times_started).apply();
     }
 
+    @NonNull
+    public IAnalytics getAnalystics() {
+        return sAnalytics;
+    }
+
     public boolean IsFirstRun() {
         if (mFirstRun == null) {
             throw new IllegalStateException("First run can not be null!");

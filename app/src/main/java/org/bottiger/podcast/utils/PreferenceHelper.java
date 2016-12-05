@@ -66,6 +66,15 @@ public class PreferenceHelper implements SharedPreferences.OnSharedPreferenceCha
         prefs.edit().putInt(key, argValue).apply();
     }
 
+    public static void setBooleanPreferenceValue(@NonNull Context argContext,
+                                                 @StringRes int argKeyId,
+                                                 boolean argValue) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(argContext);
+        String key = argContext.getResources().getString(argKeyId);
+
+        prefs.edit().putBoolean(key, argValue).apply();
+    }
+
     public static int getIntegerPreferenceValue(@NonNull Context argContext,
                                                 @StringRes int argKeyId,
                                                 Integer argDefaultValue) {

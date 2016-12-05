@@ -17,7 +17,8 @@ public interface IAnalytics {
                              OPML_EXPORT,
                              DATABASE_UPGRADE,
                              MEDIA_ROUTING,
-                             REFRESH_DURATION
+                             REFRESH_DURATION,
+                             INTRO_DURATION
     };
 
     boolean doShare();

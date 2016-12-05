@@ -240,6 +240,19 @@
     <string name="menu_feed_sort_order">Reverse order</string>
     <string name="shortcut_short_download">Download new</string>
     <string name="shortcut_long_download">Download new episodes</string>
+    <string name="app_intro_activity">SoundWaves Intro</string>
+    <string name="appintro_playlist_title">There is a playlist located under the main player</string>
+    <string name="appintro_playlist_description">By default the playlist populates itself with the most recent episodes from your subscriptions.</string>
+    <string name="appintro_filters_title">Fine tune the playlist</string>
+    <string name="appintro_filters_description">Example: The playlist should only be populated with episodes which are downloaded, and ignoring podcasts you don\'t listen to on a regular basis</string>
+    <string name="appintro_settings_title">Settings</string>
+    <string name="intro_settings_auto_download">Automatically download new episodes</string>
+    <string name="intro_settings_wifi_download">Download automatically using WiFi only</string>
+    <string name="intro_settings_title">Network settings</string>
+    <string name="intro_settings_done">That\'s it! Happy podcasting</string>
+    <string name="app_intro_welcome_title">Welcome to SoundWaves</string>
+    <string name="app_intro_welcome_description">Please spend 10 seconds reading these intro pages</string>
+    <string name="appintro_settings_description">SoundWaves Podcast is completely free, and do not charge for advanced features such as \'Download new episodes when available\'. However, you should review your datasettings before start using it in order to avoid unwanted data consumption</string>
 
     <plurals name="player_sleep">
         <item quantity="one">Player will sleep in %d minute</item>
