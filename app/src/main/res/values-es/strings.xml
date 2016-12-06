@@ -5,7 +5,6 @@
   <string name="pref_only_wifi_description">Esperar a estar conectado a una red wifi para descargar los archivos</string>
   <string name="pref_only_wifi_title">Sólo wifi para descargar</string>
   <string name="pref_dark_theme">Activar tema oscuro para un mayor contraste.</string>
-  <string name="pref_dark_theme_title">Tema oscuro</string>
   <string name="pref_download_on_update_title">Descarga automática</string>
   <string name="pref_download_on_update_description">Descargar nuevos episodios en cuanto sea posible</string>
   <string name="pref_downloaded_expire_description">%s</string>
@@ -63,7 +62,6 @@
   <string name="pref_help_static_field_description">Si quieres ayudar, hay muchas cosas que hacer; programar, traducir, mejorar la experiencia de usuario, mejorar iconos y gráficos, crear una página web y más cosas. Si te decides, entra en la página del proyecto en GitHub (github.com/bottiger/SoundWaves) o envíame un correo electrónico a esta dirección: bottiger@gmail.com.</string>
   <string name="episode_title_unknown">Sin nombre :(</string>
   <string name="podcast_title_unknown">Nombre del podcast desconocido</string>
-  <string name="subscription_instruction">Añade nuevos podcast mediante la página Descubrir, a la derecha, o importa un archivo OPML.\n\nNo obstante, antes de hacerlo, dedica unos segundos a pensar si quieres activar o no las siguientes opciones:</string>
   <string name="filter_show_listened">Mostrar escuchados</string>
   <string name="auto_start_next">Empezar siguiente automáticamente</string>
   <string name="drawer_playlist_filters">Filtros de la lista de reproducción</string>
@@ -94,7 +92,6 @@
   <string name="pref_screen_rotation_title">Habilitar rotación de pantalla</string>
   <string name="pref_screen_rotation_description">Soporte para la orientación horizontal</string>
   <string name="search_query_hint">Buscar usando %s</string>
-  <string name="discovery_recommendations">Recomendado por el autor</string>
   <string name="discovery_recommendations_trending">De actualidad</string>
   <string name="discovery_recommendations_popular">Popular</string>
   <string name="discovery_search_results">Resultados para: <i>%s</i></string>
@@ -161,13 +158,17 @@
   <string name="download_manager_toolbar_title">Cola de descarga</string>
   <string name="download_manager_toolbar_description">Episodios programados para descargar</string>
   <string name="menu_clear_download">Limpiar</string>
-  <string name="download_manager_empty_title">No hay descargas activas</string>
   <string name="action_enter_fullscreen">Reproductor a pantalla completa</string>
   <string name="action_exit_fullscreen">Salir de pantalla completa</string>
+  <!--log_submit_activity-->
+  <!--Widget-->
   <!--Used for displaying the download progress of a file. Example: "1.2 MB of 53 MB" (the unit, MB, is handled by the framework)
     When the progress is 0 (we have not started downloading) we should just show the total file size. Example "53 MB"-->
   <string name="download_progress">%1$s de %2$s</string>
   <!--In the context: "4 new [episodes]"-->
+  <!--Feed Activity-->
+  <!--Used for 1.1X speed-->
+  <!--The audio engine has an option to remove periods of silence in an audio file.-->
   <plurals name="player_sleep">
     <item quantity="one">El reproductor se parará en %d minuto</item>
     <item quantity="other">El reproductor se parará en %d minutos</item>

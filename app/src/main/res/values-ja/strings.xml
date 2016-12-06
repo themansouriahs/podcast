@@ -5,7 +5,7 @@
   <string name="pref_only_wifi_description">ファイルをダウンロードするため Wi-Fi に接続されるまで待ちます</string>
   <string name="pref_only_wifi_title">Wi-Fi のみダウンロード</string>
   <string name="pref_dark_theme">より高いコントラストのダークテーマを有効にします</string>
-  <string name="pref_dark_theme_title">ダークテーマ</string>
+  <string name="pref_dark_theme_title">テーマ</string>
   <string name="pref_download_on_update_title">自動ダウンロード</string>
   <string name="pref_download_on_update_description">新しいエピソードが利用可能なときに自動的にダウンロードします</string>
   <string name="pref_downloaded_expire_description">%s</string>
@@ -63,7 +63,7 @@
   <string name="pref_help_static_field_description">あなたが支援していただけるのであれば、行うことはたくさんあります。これは、プログラミングであったり、完全に異なるものである可能性があります。翻訳、UI、アイコン/グラフィックス、ウェブサイトの構築などの支援が必要です。 GitHub (github.com/bottiger/SoundWaves) のプロジェクトページを参照するか、私にメールをお送りください: bottiger@gmail.com</string>
   <string name="episode_title_unknown">タイトルなし :(</string>
   <string name="podcast_title_unknown">不明なポッドキャスト タイトル</string>
-  <string name="subscription_instruction">右の探索ページを使用するか、OPML ファイルをインポートして、新しいポッドキャストを追加します。\n\nしかし、まず以下のオプションを有効/無効にするかどうかをご検討ください。</string>
+  <string name="subscription_instruction">右の探索ページを使用して、新しいポッドキャストを追加してください。\n\n設定に移動して、OPML ファイルをインポート、または gPodder と同期することもできます</string>
   <string name="filter_show_listened">視聴済を表示</string>
   <string name="auto_start_next">次を自動開始</string>
   <string name="drawer_playlist_filters">プレイリスト フィルター</string>
@@ -96,7 +96,7 @@
   <string name="pref_screen_rotation_description">横向きのサポート</string>
   <string name="search_feed_hint">%s を検索</string>
   <string name="search_query_hint">%s を使用して検索</string>
-  <string name="discovery_recommendations">作者が推奨</string>
+  <string name="discovery_recommendations">エディターズチョイス:</string>
   <string name="discovery_recommendations_trending">トレンド</string>
   <string name="discovery_recommendations_popular">人気</string>
   <string name="discovery_search_results">次の結果: <i>%s</i></string>
@@ -126,9 +126,11 @@
   <string name="playlist_episode_dismissed">エピソードを削除しました</string>
   <string name="playlist_episode_dismissed_undo">元に戻す</string>
   <string name="playlist_context_menu_playnext">次を再生</string>
+  <string name="download_aborted_snackbar">ダウンロードできません: %s</string>
   <string name="subscription_subtitle_updated_at">更新しました</string>
   <string name="filter_show_only_downloaded">ダウンロード済のみ</string>
   <string name="action_filter">プレイリストをフィルター</string>
+  <string name="snackbar_change">変更</string>
   <string name="apply_filters">フィルターを適用</string>
   <string name="pref_gpodder_support_title">GPodder</string>
   <string name="gpodder_username">ユーザー名</string>
@@ -143,6 +145,7 @@
   <string name="dialog_playback_speed_episode">このエピソードのみ</string>
   <string name="dialog_playback_speed_subscription">このポッドキャストからすべてのエピソード</string>
   <string name="dialog_playback_speed_global">すべてのエピソード</string>
+  <string name="dialog_playback_engine_title">サウンドエンジン設定</string>
   <string name="dialog_playback_speed_title">再生速度</string>
   <string name="dialog_playback_speed_scope">変更を適用</string>
   <string name="feed_settings_show_description">エピソードの説明を表示</string>
@@ -151,6 +154,8 @@
   <string name="feed_settings_delete_when_listened">視聴済のとき削除</string>
   <string name="feed_settings_intro">これらの設定は、この特定のポッドキャストに対して SoundWaves のデフォルトを上書きします。</string>
   <string name="feed_settings_oldest_first">最も古いエピソードをリストの最初に表示します</string>
+  <string name="feed_settings_notify_on_new">新しいエピソードで通知</string>
+  <string name="feed_settings_skip_intro">イントロをスキップ</string>
   <string name="open_video_externally_title">別のプレーヤーでビデオを開きますか?</string>
   <string name="open_video_externally_body">このエピソードは、このアプリでサポートされていないビデオです。別のビデオプレーヤーで開くか、またはこのまま音声のみを選択できます。</string>
   <string name="open_video_externally_confirm">ビデオ プレーヤーを開く</string>
@@ -165,10 +170,18 @@
   <string name="download_manager_toolbar_title">ダウンロード キュー</string>
   <string name="download_manager_toolbar_description">エピソードのダウンロードをスケジュールしました</string>
   <string name="menu_clear_download">クリア</string>
-  <string name="download_manager_empty_title">ダウンロード中はありません</string>
+  <string name="download_manager_empty_title">実行中のダウンロードはありません</string>
   <string name="action_enter_fullscreen">全画面プレーヤー</string>
   <string name="action_exit_fullscreen">全画面を終了</string>
   <string name="unknown_filesize">ファイルサイズが不明</string>
+  <!--log_submit_activity-->
+  <string name="log_submit_activity__log_fetch_failed">お使いのデバイスのログを読み取りできません。代わりに ADB を使用してデバッグログを取得することができます。</string>
+  <string name="log_submit_activity__thanks">ご支援ありがとうございます!</string>
+  <string name="log_submit_activity__submitting">送信中</string>
+  <string name="log_submit_activity__posting_logs">gist にログを投稿中…</string>
+  <string name="preferences__submit_debug_log">デバッグログを送信</string>
+  <!--Widget-->
+  <string name="widget_playlist_empty">プレイリストは空です。</string>
   <!--Used for displaying the download progress of a file. Example: "1.2 MB of 53 MB" (the unit, MB, is handled by the framework)
     When the progress is 0 (we have not started downloading) we should just show the total file size. Example "53 MB"-->
   <string name="download_progress">%1$s / %2$s</string>
@@ -176,8 +189,35 @@
   <plurals name="subscription_list_new">
     <item quantity="other">新規</item>
   </plurals>
+  <!--Feed Activity-->
+  <string name="no_episodes_in_the_feed">フィードにエピソードはありません</string>
   <string name="authenticate_feed_username">ユーザー名</string>
   <string name="authenticate_feed_password">パスワード</string>
+  <!--Used for 1.1X speed-->
+  <string name="speed_multiplier">%1$.1f X</string>
+  <string name="discovery_directory_icon">ポッドキャスト ディレクトリー (検索エンジン)</string>
+  <string name="subscription_instruction_title">ポッドキャストを購読していません</string>
+  <string name="dialog_playback_boost_volume">音量ブースト</string>
+  <!--The audio engine has an option to remove periods of silence in an audio file.-->
+  <string name="dialog_playback_removile_silence">無音の削除</string>
+  <string name="menu_web_player">Web プレーヤー (ベータ)</string>
+  <string name="menu_subscriptions_order">並び順</string>
+  <string name="menu_subscriptions_order_alphabetically">名前 (A-Z)</string>
+  <string name="menu_subscriptions_order_alphabetically_reverse">名前の降順 (Z-A)</string>
+  <string name="menu_subscriptions_order_updated">最終更新</string>
+  <string name="menu_subscriptions_order_new_count">新しいエピソード</string>
+  <string name="title_activity_web_scanner">WebScannerActivity</string>
+  <string name="web_scanner_instrcution_title">お使いのデスクトップコンピュータを使用してお聞きください</string>
+  <string name="web_scanner_instructions"><![CDATA[1) web.soundwavesapp.com に移動します<br />2) QR コードをスキャンします]]></string>
+  <string name="web_scanner_qr_scanned">スキャンしました。ログインします。</string>
+  <string name="player_chapters_title">チャプター</string>
+  <string name="player_chapters_missing">このエピソードはチャプターが含まれていません。</string>
+  <string name="player_sleep_cancel">スリープタイマーを削除しました</string>
+  <string name="player_sleep_dialog_cancel_button">タイマーを削除</string>
+  <string name="player_sleep_dialog_ok_button">タイマーを設定</string>
+  <string name="menu_feed_sort_order">逆順</string>
+  <string name="shortcut_short_download">新しいものをダウンロード</string>
+  <string name="shortcut_long_download">新しいエピソードをダウンロード</string>
   <plurals name="player_sleep">
     <item quantity="other">プレーヤーは %d 分でスリープします</item>
   </plurals>
@@ -186,5 +226,8 @@
   </plurals>
   <plurals name="subscriptions_imported">
     <item quantity="other">%d の購読をインポートしました。</item>
+  </plurals>
+  <plurals name="subscriptions_selected">
+    <item quantity="other">%d 選択済</item>
   </plurals>
 </resources>

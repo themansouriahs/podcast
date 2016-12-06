@@ -5,7 +5,6 @@
   <string name="pref_only_wifi_description">Vent med til hente filer ind til der er Wi-Fi tilgængeligt</string>
   <string name="pref_only_wifi_title">hent kun via Wi-Fi</string>
   <string name="pref_dark_theme">Benyt mørkt tema for højere kontrast</string>
-  <string name="pref_dark_theme_title">Mørkt tema</string>
   <string name="pref_download_on_update_title">Download automatisk</string>
   <string name="pref_download_on_update_description">Hent automatisk nye episoder når de er tilgængelige</string>
   <string name="pref_downloaded_expire_description">%s</string>
@@ -87,7 +86,6 @@
   <string name="mrp_request_failed">\"MediaRouter\" forespørgelsen fejlede</string>
   <string name="pref_advanced_category_experimental">Experimenterende indstillinger</string>
   <string name="search_query_hint">Søg via %s</string>
-  <string name="discovery_recommendations">Anbefalet af udvikleren</string>
   <string name="discovery_recommendations_trending">Trending</string>
   <string name="discovery_recommendations_popular">Populære</string>
   <string name="discovery_search_results">Resultater for <i>%s</i></string>
@@ -115,8 +113,13 @@
   <string name="menu_clear_download">Ryd</string>
   <string name="action_enter_fullscreen">Fuldskærm</string>
   <string name="action_exit_fullscreen">Forlad fuldskærm</string>
+  <!--log_submit_activity-->
+  <!--Widget-->
   <!--Used for displaying the download progress of a file. Example: "1.2 MB of 53 MB" (the unit, MB, is handled by the framework)
     When the progress is 0 (we have not started downloading) we should just show the total file size. Example "53 MB"-->
   <string name="download_progress">%1$s af %2$s</string>
   <!--In the context: "4 new [episodes]"-->
+  <!--Feed Activity-->
+  <!--Used for 1.1X speed-->
+  <!--The audio engine has an option to remove periods of silence in an audio file.-->
 </resources>

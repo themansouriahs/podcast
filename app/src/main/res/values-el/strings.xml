@@ -33,7 +33,6 @@
   <string name="menu_feedback">Ανατροφοδότηση</string>
   <string name="menu_refresh_feed">Ανανέωση</string>
   <string name="crash_toast">Συντριβή :( Παρακαλούμε βοηθήστε μας αποστέλλοντας σε εμας μια έκθεση συντριβής</string>
-  <string name="subscription_instruction">Προσθέστε νέα podcast χρησιμοποιώντας την σελίδα ανακάλυψης προς τα δεξιά ή εισαγάγετε ένα αρχείο OPML.\N\nΠαρακαλούμε να εξετάσετε αν θέλετε να ενεργοποιήσετε/απενεργοποιήσετε τις παρακάτω επιλογές.</string>
   <string name="filter_show_listened">Εμφάνιση ακρόασης</string>
   <string name="auto_start_next">Αυτοματη εναρξη επομενου</string>
   <string name="opml_not_found">OPML δεν βρέθηκε. Μετονομάστε το αρχείο σας ως %1$s και τοποθετήστε το στον ριζικό φάκελο της αποθήκευσης (κάρτα SD)</string>
@@ -59,7 +58,6 @@
   <string name="pref_screen_rotation_title">Ενεργοποίηση περιστροφής της οθόνης</string>
   <string name="pref_screen_rotation_description">Υποστήριξη για οριζόντιο προσανατολισμό</string>
   <string name="search_query_hint">Αναζήτηση χρησιμοποιώντας το %s</string>
-  <string name="discovery_recommendations">Συνιστάται από τον δημιουργο</string>
   <string name="discovery_search_results">Αποτελέσματα για:<i>%s</i></string>
   <string name="discovery_subscribe">Εγγραφή </string>
   <string name="discovery_subscribe_toast">Εγγραφή σε %s</string>
@@ -79,9 +77,14 @@
   <string name="playlist_empty_mode_two">Πρόσφατα επεισόδια</string>
   <string name="playlist_empty_mode_one_desc">Η λίστας αναπαραγωγής θα περιλαμβάνει μόνο τα επεισόδια που έχετε στην σειρά αναμονής με μη αυτόματο τρόπο</string>
   <string name="playlist_episode_dismissed">Το επεισόδιο αφαιρεθηκε</string>
+  <!--log_submit_activity-->
+  <!--Widget-->
   <!--Used for displaying the download progress of a file. Example: "1.2 MB of 53 MB" (the unit, MB, is handled by the framework)
     When the progress is 0 (we have not started downloading) we should just show the total file size. Example "53 MB"-->
   <!--In the context: "4 new [episodes]"-->
+  <!--Feed Activity-->
+  <!--Used for 1.1X speed-->
+  <!--The audio engine has an option to remove periods of silence in an audio file.-->
   <plurals name="subscriptions_imported">
     <item quantity="one">%d συνδρομή εισήχθη.</item>
     <item quantity="other">%d συνδρομές εισήχθησαν.</item>

@@ -8,6 +8,24 @@
     <item>5 GB</item>
     <item>Unbegrenzt</item>
   </string-array>
+  <string-array name="pref_player_seek_entries_values">
+    <item>5</item>
+    <item>10</item>
+    <item>20</item>
+    <item>30</item>
+    <item>60</item>
+  </string-array>
+  <string-array name="pref_subscriptions_columns_entries">
+    <item>Automatisch</item>
+    <item>Eine Liste</item>
+    <item>2 Spalten</item>
+    <item>3 Spalten</item>
+  </string-array>
+  <string-array name="pref_theme_entries">
+    <item>Hell (Standard)</item>
+    <item>Dunkel</item>
+    <item>Automatisch (Tag/Nacht)</item>
+  </string-array>
   <string-array name="entries_webservices_discovery_engine">
     <item>gPodder</item>
     <item>iTunes</item>

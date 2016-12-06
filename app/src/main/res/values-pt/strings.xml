@@ -5,7 +5,7 @@
   <string name="pref_only_wifi_description">Apenas descarregar ficheiros por ligações Wi-Fi</string>
   <string name="pref_only_wifi_title">Apenas por Wi-Fi</string>
   <string name="pref_dark_theme">Ativar tema escuro para maior contraste</string>
-  <string name="pref_dark_theme_title">Tema escuro</string>
+  <string name="pref_dark_theme_title">Tema</string>
   <string name="pref_download_on_update_title">Descarga automática</string>
   <string name="pref_download_on_update_description">Descarregar novos episódios assim que fiquem disponíveis</string>
   <string name="pref_downloaded_expire_description">%s</string>
@@ -63,7 +63,7 @@
   <string name="pref_help_static_field_description">Se você quiser ajudar, existem imensas coisas que pode fazer. Pode ajudar na programação ou algo completamente diferente. Pode ajudar na tradução, na criação de ícones e imagens, um sítio web e muito mais. Aceda à nossa página do GitHub (github.com/bottiger/SoundWaves) ou envie uma mensagem para: bottiger@gmail.com</string>
   <string name="episode_title_unknown">Sem título :(</string>
   <string name="podcast_title_unknown">Título desconhecido</string>
-  <string name="subscription_instruction">Adicione novos podcasts utilizando o menu Descobrir ou importando um ficheiro OPML.\n\nContudo, tenha em consideração a ativação/desativação de uma das opções abaixo.</string>
+  <string name="subscription_instruction">Adicione podcstas utilizando a página Descobrir à direita.\n\nTambém pode importar um ficheiro OPML ou sincronizar os seus podcasts do gPodder.</string>
   <string name="filter_show_listened">Mostrar reproduzidos</string>
   <string name="auto_start_next">Reprodução contínua</string>
   <string name="drawer_playlist_filters">Filtros da lista de reprodução</string>
@@ -85,6 +85,7 @@
   <string name="pref_delete_when_finished_description">Eliminar episódios após a sua reprodução</string>
   <!--For playing media on another device, like a chromecast-->
   <string name="media_route_menu_title">Cast</string>
+  <string name="bulk_download_instructions">Descarregar episódios coincidentes com</string>
   <string name="bulk_download_day">Publicados nas últimas 24 horas</string>
   <string name="bulk_download_week">Publicados nesta semana</string>
   <string name="bulk_download_month">Publicados neste mês</string>
@@ -95,7 +96,7 @@
   <string name="pref_screen_rotation_description">Suporte para modo horizontal</string>
   <string name="search_feed_hint">Pesquisar %s</string>
   <string name="search_query_hint">Procurar através de %s</string>
-  <string name="discovery_recommendations">Recomendado pelo autor</string>
+  <string name="discovery_recommendations">Escolha dos editores:</string>
   <string name="discovery_recommendations_trending">Tendências</string>
   <string name="discovery_recommendations_popular">Popular</string>
   <string name="discovery_search_results">Resultados para: <i>%s</i></string>
@@ -125,9 +126,11 @@
   <string name="playlist_episode_dismissed">Episódio removido</string>
   <string name="playlist_episode_dismissed_undo">Anular</string>
   <string name="playlist_context_menu_playnext">Reproduzir seguinte</string>
+  <string name="download_aborted_snackbar">Não foi possível descarregar: %s</string>
   <string name="subscription_subtitle_updated_at">atualizada</string>
   <string name="filter_show_only_downloaded">Apenas descarregados</string>
   <string name="action_filter">Filtrar lista de reprodução</string>
+  <string name="snackbar_change">Alterar</string>
   <string name="apply_filters">Aplicar filtros</string>
   <string name="pref_gpodder_support_title">GPodder</string>
   <string name="gpodder_username">nome de utilizador</string>
@@ -142,6 +145,7 @@
   <string name="dialog_playback_speed_episode">Este episódio</string>
   <string name="dialog_playback_speed_subscription">Todos os episódios deste podcast</string>
   <string name="dialog_playback_speed_global">Todos os episódios</string>
+  <string name="dialog_playback_engine_title">Definições do mecanismo de som</string>
   <string name="dialog_playback_speed_title">Velocidade de reprodução</string>
   <string name="dialog_playback_speed_scope">Aplicar alterações a</string>
   <string name="feed_settings_show_description">Mostrar descrição do episódio</string>
@@ -150,6 +154,8 @@
   <string name="feed_settings_delete_when_listened">Eliminar após a reprodução</string>
   <string name="feed_settings_intro">Estas definições irão substituir as predefinições do SoundWaves para este podcast.</string>
   <string name="feed_settings_oldest_first">Mostrar episódios antigos no inicio</string>
+  <string name="feed_settings_notify_on_new">Notificar sobre novos episódios</string>
+  <string name="feed_settings_skip_intro">Ignorar introdução</string>
   <string name="open_video_externally_title">Abrir vídeo em outro reprodutor?</string>
   <string name="open_video_externally_body">Este é um episódio de vídeos e não é suportado por esta aplicação. Pode abrir o episódio no seu reprodutor de vídeos ou utilizar esta aplicação para ouvir o áudio.</string>
   <string name="open_video_externally_confirm">Abrir reprodutor de vídeo</string>
@@ -164,21 +170,69 @@
   <string name="download_manager_toolbar_title">Fila de descargas</string>
   <string name="download_manager_toolbar_description">Episódios agendados para descarga</string>
   <string name="menu_clear_download">Limpar</string>
-  <string name="download_manager_empty_title">Não existem descargas em curso</string>
+  <string name="download_manager_empty_title">Não há descargas em curso</string>
   <string name="action_enter_fullscreen">Reprodutor em ecrã completo</string>
   <string name="action_exit_fullscreen">Sair de ecrã completo</string>
+  <string name="unknown_filesize">Tamanho desconhecido</string>
+  <!--log_submit_activity-->
+  <string name="log_submit_activity__log_fetch_failed">Não foi possível ler os registos. Pode utilizar o ADB para obter o registo de depuração.</string>
+  <string name="log_submit_activity__thanks">Obrigado pela sua ajuda!</string>
+  <string name="log_submit_activity__submitting">A enviar</string>
+  <string name="log_submit_activity__posting_logs">A publicar registos...</string>
+  <string name="preferences__submit_debug_log">Enviar registo de depuração</string>
+  <!--Widget-->
+  <string name="widget_playlist_empty">A lista de reprodução está vazia.</string>
   <!--Used for displaying the download progress of a file. Example: "1.2 MB of 53 MB" (the unit, MB, is handled by the framework)
     When the progress is 0 (we have not started downloading) we should just show the total file size. Example "53 MB"-->
   <string name="download_progress">%1$s de %2$s</string>
   <!--In the context: "4 new [episodes]"-->
+  <plurals name="subscription_list_new">
+    <item quantity="one">novo</item>
+    <item quantity="other">novos</item>
+  </plurals>
+  <!--Feed Activity-->
+  <string name="no_episodes_in_the_feed">Esta fonte não tem episódios</string>
   <string name="authenticate_feed_username">Nome de utilizador</string>
   <string name="authenticate_feed_password">Palavra-passe</string>
+  <!--Used for 1.1X speed-->
+  <string name="speed_multiplier">%1$.1f X</string>
+  <string name="discovery_directory_icon">Diretório de podcstas (mecanismo de pesquisa)</string>
+  <string name="subscription_instruction_title">Ainda não subscreveu a quaisquer podcasts</string>
+  <string name="dialog_playback_boost_volume">Aumentar volume</string>
+  <!--The audio engine has an option to remove periods of silence in an audio file.-->
+  <string name="dialog_playback_removile_silence">Remover períodos de silêncio</string>
+  <string name="menu_web_player">Reprodutor web (beta)</string>
+  <string name="menu_subscriptions_order">Ordenar por</string>
+  <string name="menu_subscriptions_order_alphabetically">nome (A-Z)</string>
+  <string name="menu_subscriptions_order_alphabetically_reverse">nome (Z-A)</string>
+  <string name="menu_subscriptions_order_updated">última atualização</string>
+  <string name="menu_subscriptions_order_new_count">novos episódios</string>
+  <string name="title_activity_web_scanner">WebScannerActivity</string>
+  <string name="web_scanner_instrcution_title">Receção através do seu computador</string>
+  <string name="web_scanner_instructions"><![CDATA[1) Aceda a web.soundwavesapp.com<br />2) Digitalize o código QR]]></string>
+  <string name="web_scanner_qr_scanned">Digitalizado. A iniciar sessão.</string>
+  <string name="player_chapters_title">Capítulos</string>
+  <string name="player_chapters_missing">Este episódio não contém capítulos.</string>
+  <string name="player_sleep_cancel">Temporizador removido</string>
+  <string name="player_sleep_dialog_cancel_button">Remover temporizador</string>
+  <string name="player_sleep_dialog_ok_button">Definir temporizador</string>
+  <string name="menu_feed_sort_order">Ordem inversa</string>
+  <string name="shortcut_short_download">Descarregar novos</string>
+  <string name="shortcut_long_download">Descarregar novos episódios</string>
   <plurals name="player_sleep">
     <item quantity="one">O reprodutor parará em %d minuto</item>
     <item quantity="other">O reprodutor parará em %d minutos</item>
   </plurals>
+  <plurals name="bulk_download_playlist">
+    <item quantity="one">Primeiro episódio</item>
+    <item quantity="other">Primeiros %d episódios</item>
+  </plurals>
   <plurals name="subscriptions_imported">
     <item quantity="one">%d subscrição importada</item>
     <item quantity="other">%d subscrições importadas</item>
+  </plurals>
+  <plurals name="subscriptions_selected">
+    <item quantity="one">%d selecionada</item>
+    <item quantity="other">%d selecionadas</item>
   </plurals>
 </resources>
