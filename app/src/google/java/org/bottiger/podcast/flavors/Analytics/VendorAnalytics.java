@@ -1,11 +1,13 @@
 package org.bottiger.podcast.flavors.Analytics;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.bottiger.podcast.ApplicationConfiguration;
 
@@ -26,9 +28,12 @@ public class VendorAnalytics extends AbstractAnalytics implements IAnalytics {
 
     private Context mContext;
 
+    private FirebaseAnalytics mFirebaseAnalytics;
+
     public VendorAnalytics(@NonNull Context argContext) {
         super(argContext);
         mContext = argContext;
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(mContext);
     }
 
     /**
@@ -89,6 +94,21 @@ public class VendorAnalytics extends AbstractAnalytics implements IAnalytics {
 
         // Build and send an Event.
         getTracker(TrackerName.APP_TRACKER).send(event);
+
+        TrackEventFirebase(argEvent, argValue, eventData);
+    }
+
+    private void TrackEventFirebase(@NonNull EVENT_TYPE argEvent, @Nullable Integer argValue, @Nullable EventData argEventData) {
+
+        if (argEventData == null)
+            return;
+
+        Bundle bundle = new Bundle();
+        if (argValue != null) {
+            bundle.putString(FirebaseAnalytics.Param.VALUE, argValue.toString());
+        }
+
+        mFirebaseAnalytics.logEvent(argEventData.LabelID, bundle);
     }
 
     private synchronized Tracker getTracker(TrackerName trackerId) {

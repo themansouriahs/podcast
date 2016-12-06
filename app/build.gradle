@@ -21,7 +21,7 @@ android {
         //testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         ndk {
-            abiFilters "armeabi-v7a", "x86", "arm64-v8a"
+            abiFilters "armeabi-v7a", "x86"
 
 
             //moduleName "hello-jni"
@@ -190,6 +190,7 @@ dependencies {
     googleCompile 'com.google.android.gms:play-services-cast:10.0.1'
     googleCompile 'com.google.android.gms:play-services-cast-framework:10.0.1'
     googleCompile 'com.google.android.gms:play-services-auth:10.0.1'
+    googleCompile 'com.google.firebase:firebase-core:10.0.1'
     googleCompile 'com.google.firebase:firebase-messaging:10.0.1'
     // google cast
     compile project(':soundwavescommon')
