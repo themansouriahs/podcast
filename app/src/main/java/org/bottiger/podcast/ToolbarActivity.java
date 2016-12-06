@@ -1,14 +1,10 @@
 package org.bottiger.podcast;
 
-import android.animation.ValueAnimator;
 import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 
@@ -26,7 +22,7 @@ public class ToolbarActivity extends TopActivity {
 
         setContentView(getLayout());
 
-        mToolbar = (Toolbar) findViewById(R.id.my_awesome_toolbar);
+        mToolbar = (Toolbar) findViewById(R.id.soundwaves_toolbar);
         mPagerTaps = (TabLayout) findViewById(R.id.tabs);
 
         //Title and subtitle

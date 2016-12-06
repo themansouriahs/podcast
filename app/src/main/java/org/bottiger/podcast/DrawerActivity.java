@@ -1,15 +1,11 @@
 package org.bottiger.podcast;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.ColorInt;
-import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -64,7 +60,7 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity impleme
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mNavigationView = (NavigationView) findViewById(R.id.navigation_drawer);
         mNavigationViewBottom = (NavigationView) findViewById(R.id.navigation_drawer_bottom);
-        mToolbar = (Toolbar) findViewById(R.id.my_awesome_toolbar);
+        mToolbar = (Toolbar) findViewById(R.id.soundwaves_toolbar);
         //mFragmentTop = (View) findViewById(R.id.fragment_top);
         //mHeaderContainerBackground = findViewById(R.id.header_container_background);
         mAppContent = (ViewPager) findViewById(R.id.app_content);

@@ -28,7 +28,7 @@ public class ToolbarPreference extends Preference {
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View layout = inflater.inflate(R.layout.preference_screen_toolbar, parent, false);
 
-        Toolbar toolbar = (Toolbar) layout.findViewById(R.id.my_awesome_toolbar);
+        Toolbar toolbar = (Toolbar) layout.findViewById(R.id.soundwaves_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white);
         toolbar.setTitle(getTitle());
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {

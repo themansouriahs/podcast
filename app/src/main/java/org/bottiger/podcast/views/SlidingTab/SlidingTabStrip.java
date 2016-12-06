@@ -21,6 +21,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
@@ -63,13 +64,7 @@ class SlidingTabStrip extends LinearLayout {
         setWillNotDraw(false);
 
         final float density = getResources().getDisplayMetrics().density;
-
-        TypedValue outValue = new TypedValue();
-
-        /*
-        context.getTheme().resolveAttribute(R.attr.colorForeground, outValue, true);
-        final int themeForegroundColor =  outValue.data;*/
-        final int themeForegroundColor =  context.getResources().getColor(R.color.white);
+        final int themeForegroundColor = ContextCompat.getColor(context, R.color.white);
 
         mDefaultBottomBorderColor = setColorAlpha(themeForegroundColor,
                 DEFAULT_BOTTOM_BORDER_COLOR_ALPHA);

@@ -17,7 +17,7 @@
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" -->
 
     <android.support.v7.widget.Toolbar
-        android:id="@+id/my_awesome_toolbar"
+        android:id="@+id/soundwaves_toolbar"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:background="?attr/colorPrimary"
@@ -47,6 +47,7 @@ android:background="@color/colorPrimary"
                 android:layout_height="wrap_content"
                 app:tabMode="fixed"
                 app:tabGravity="fill"
+                android:theme="@style/TabLayoutSingleLineTheme"
                 app:layout_scrollFlags="scroll|enterAlways" />
 
         </android.support.design.widget.AppBarLayout>
