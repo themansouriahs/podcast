@@ -5,10 +5,10 @@ import android.graphics.Color;
 import android.os.Build;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IntDef;
+import android.support.transition.AutoTransition;
+import android.support.transition.TransitionManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.transition.AutoTransition;
-import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,11 +81,9 @@ public class EpisodeViewHolder extends RecyclerView.ViewHolder {
 
     public @DisplayState int toggleState(boolean argCanDownload) {
 
-        if (Build.VERSION.SDK_INT >= 19) {
-            AutoTransition autoTransition = new AutoTransition();
-            autoTransition.setDuration(100);
-            TransitionManager.beginDelayedTransition((ViewGroup)mContainer.getParent(), autoTransition);
-        }
+        AutoTransition autoTransition = new AutoTransition();
+        autoTransition.setDuration(100);
+        TransitionManager.beginDelayedTransition((ViewGroup)mContainer.getParent(), autoTransition);
 
         @DisplayState int newState;
         if (mState != EXPANDED) {

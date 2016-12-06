@@ -13,6 +13,10 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.transition.ChangeBounds;
+import android.support.transition.Scene;
+import android.support.transition.Transition;
+import android.support.transition.TransitionManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.NestedScrollingChild;
@@ -22,10 +26,6 @@ import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ScrollerCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
-import android.transition.ChangeBounds;
-import android.transition.Scene;
-import android.transition.Transition;
-import android.transition.TransitionManager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -771,9 +771,7 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
 
         try {
             mDoDisplayText = !mDoDisplayText;
-            if (Build.VERSION.SDK_INT >= 19) {
-                TransitionManager.beginDelayedTransition(Layout, UIUtils.getDefaultTransition(getResources()));
-            }
+            TransitionManager.beginDelayedTransition(Layout, UIUtils.getDefaultTransition(getResources()));
 
             if (mDoDisplayText) {
                 Log.d(TAG, "ShowText");

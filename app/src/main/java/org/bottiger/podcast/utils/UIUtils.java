@@ -36,6 +36,8 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
+import android.support.transition.Transition;
+import android.support.transition.TransitionSet;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatDelegate;
 import android.text.Spannable;
@@ -43,8 +45,6 @@ import android.text.SpannableStringBuilder;
 import android.text.format.DateUtils;
 import android.text.style.StyleSpan;
 import android.transition.AutoTransition;
-import android.transition.Transition;
-import android.transition.TransitionSet;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -169,7 +169,7 @@ public class UIUtils {
 
     @TargetApi(19)
     public static Transition getDefaultTransition(@NonNull Resources argResources) {
-        AutoTransition autoTransition = new AutoTransition();
+        android.support.transition.AutoTransition autoTransition = new android.support.transition.AutoTransition();
         autoTransition.setDuration(argResources.getInteger(R.integer.animation_quick));
         autoTransition.setOrdering(TransitionSet.ORDERING_TOGETHER);
         return autoTransition;
