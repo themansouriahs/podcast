@@ -37,6 +37,7 @@ import org.bottiger.podcast.webservices.directories.ISearchResult;
 import org.bottiger.podcast.webservices.directories.generic.GenericSearchParameters;
 import org.bottiger.podcast.webservices.directories.gpodder.GPodder;
 import org.bottiger.podcast.webservices.directories.itunes.ITunes;
+import org.bottiger.podcast.webservices.directories.podcastaddict.PodcastAddict;
 
 import java.lang.ref.WeakReference;
 import java.net.MalformedURLException;
@@ -55,7 +56,7 @@ import rx.schedulers.Schedulers;
 public class DiscoveryFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener,
         AdapterView.OnItemSelectedListener {
 
-    private static final String TAG = "DiscoveryFragment";
+    private static final String TAG = DiscoveryFragment.class.getSimpleName();
 
     // Animations
     private static final int ANIMATION_DURATION = 400;
