@@ -105,6 +105,9 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
             for (ISubscription subscription : argResult.getResults()) {
                 subscriptions.add(subscription);
                 subscription.fetchImage(getContext());
+
+                // Log the subscription
+                SoundWaves.getAppContext(getActivity()).getAnalystics().logFeed(subscription.getURLString(), false);
             }
             mResultsAdapter.setDataset(subscriptions);
 

@@ -43,4 +43,7 @@ public class VendorAnalytics implements IAnalytics {
     public void trackEvent(EVENT_TYPE argEvent, @Nullable Integer argValue) {
         return;
     }
+
+    @Override
+    public void logFeed(@NonNull String url, boolean argDidSubscribe) {}
 }
