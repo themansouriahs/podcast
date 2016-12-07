@@ -432,7 +432,13 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
 
     @Override
     public float getCurrentSpeedMultiplier() {
-        return PlaybackSpeed.DEFAULT; // default speed is 1x
+        IEpisode episode = getEpisode();
+
+        if (episode == null) {
+            return PlaybackSpeed.DEFAULT; // default speed is 1x
+        }
+
+        return PlayerService.getPlaybackSpeed(mContext, episode);
     }
 
     @Override
