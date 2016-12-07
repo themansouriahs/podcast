@@ -90,4 +90,7 @@ public class VendorAnalytics implements IAnalytics {
         return;
     }
 
+    @Override
+    public void logFeed(@NonNull String url, boolean argDidSubscribe) {}
+
 }

@@ -10,9 +10,12 @@ import com.google.android.gms.analytics.Tracker;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.bottiger.podcast.ApplicationConfiguration;
+import org.bottiger.podcast.flavors.Analytics.database.FirebaseDatabaseLog;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.bottiger.podcast.flavors.Analytics.IAnalytics.EVENT_TYPE.SUBSCRIBE_TO_FEED;
 
 /**
  * Created by apl on 11-02-2015.
@@ -126,6 +129,11 @@ public class VendorAnalytics extends AbstractAnalytics implements IAnalytics {
         return mTrackers.get(trackerId);
     }
 
+    @Override
+    public void logFeed(@NonNull String url, boolean argDidSubscribe) {
+        FirebaseDatabaseLog.logFeed(url, argDidSubscribe);
+    }
+
     @NonNull
     private EventData getEventData(EVENT_TYPE argType) {
         EventData eventData = null;
@@ -165,7 +173,7 @@ public class VendorAnalytics extends AbstractAnalytics implements IAnalytics {
             eventData.LabelID = "Discovery";
         }
 
-        if (argType == EVENT_TYPE.SUBSCRIBE_TO_FEED) {
+        if (argType == SUBSCRIBE_TO_FEED) {
             eventData = new EventData();
             eventData.Category = CATEGORY_USAGE;
             eventData.Action = "Subscribe to feed";

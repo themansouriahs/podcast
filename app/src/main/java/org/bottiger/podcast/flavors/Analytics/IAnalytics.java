@@ -1,5 +1,6 @@
 package org.bottiger.podcast.flavors.Analytics;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 /**
@@ -23,12 +24,14 @@ public interface IAnalytics {
 
     boolean doShare();
 
-    public void startTracking();
-    public void stopTracking();
+    void startTracking();
+    void stopTracking();
 
-    public void activityPause();
-    public void activityResume();
+    void activityPause();
+    void activityResume();
 
-    public void trackEvent(EVENT_TYPE argEvent);
-    public void trackEvent(EVENT_TYPE argEvent, @Nullable Integer argValue);
+    void trackEvent(EVENT_TYPE argEvent);
+    void trackEvent(EVENT_TYPE argEvent, @Nullable Integer argValue);
+
+    void logFeed(@NonNull String url, boolean argDidSubscribe);
 }

@@ -192,6 +192,7 @@ dependencies {
     googleCompile 'com.google.android.gms:play-services-auth:10.0.1'
     googleCompile 'com.google.firebase:firebase-core:10.0.1'
     googleCompile 'com.google.firebase:firebase-messaging:10.0.1'
+    googleCompile 'com.google.firebase:firebase-database:10.0.1'
     // google cast
     compile project(':soundwavescommon')
 }

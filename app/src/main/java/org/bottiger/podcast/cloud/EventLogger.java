@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 
 import java.io.IOException;
 import java.lang.annotation.Retention;
@@ -38,14 +39,15 @@ public class EventLogger {
     public static final int START_APP = 4;
 
     private static final OkHttpClient client = new OkHttpClient();
-    private static SharedPreferences mPrefs;
 
     public static void postEvent(@NonNull Context argContent, @EventType int argType,
                                  @Nullable Integer value1,
                                  @Nullable String value2,
                                  @Nullable String value3) {
 
-        if (SoundWaves.sAnalytics == null || !SoundWaves.sAnalytics.doShare()) {
+        IAnalytics analytics = SoundWaves.getAppContext(argContent).getAnalystics();
+
+        if (analytics == null || !analytics.doShare()) {
             return;
         }
 
@@ -63,6 +65,10 @@ public class EventLogger {
                 .addQueryParameter("value2", value2)
                 .addQueryParameter("value3", value3)
                 .build();
+
+        if (argType == SUBSCRIBE_PODCAST) {
+            analytics.logFeed(value2, true);
+        }
 
         Request request = new Request.Builder().url(url).build();
         client.newCall(request).enqueue(new Callback() {

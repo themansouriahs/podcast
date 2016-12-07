@@ -1,8 +1,8 @@
 package org.bottiger.podcast.utils;
 
-
 import android.content.Context;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.telephony.TelephonyManager;
 import android.text.Html;
@@ -11,16 +11,20 @@ import android.text.Spanned;
 import android.text.SpannedString;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
+import android.util.Base64;
 import android.util.Patterns;
 
 import org.bottiger.podcast.provider.IEpisode;
 
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+import java.util.zip.Adler32;
 
 public class StrUtils {
 
@@ -224,6 +228,26 @@ public class StrUtils {
 		String episodeTitle = parts[parts.length-1];
 
 		return episodeTitle.trim();
+	}
+
+	public static String toBase64(@NonNull String argString) {
+		return Base64.encodeToString(argString.getBytes(), Base64.DEFAULT);
+	}
+
+	public static String fromBase64(@NonNull String argString) throws UnsupportedEncodingException {
+		return new String(Base64.decode(argString, Base64.DEFAULT), "UTF-8"); // NoI18N
+	}
+
+	public static String toBase32(@NonNull String argString) {
+		BigInteger bigInt = new BigInteger(argString.getBytes());
+		return bigInt.toString(32);
+	}
+
+	public static long Adler32(@NonNull String argString) {
+		byte[] bytes = argString.getBytes();
+		Adler32 adler32 = new Adler32();
+		adler32.update(bytes, 0, bytes.length);
+		return adler32.getValue();
 	}
 
 }
