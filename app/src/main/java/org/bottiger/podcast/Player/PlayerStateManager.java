@@ -111,7 +111,8 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
     }
 
     public void onSkipToNext() {
-        mPlayerService.pause();
+        Log.d(TAG, "skipToNext");
+        mPlayerService.playNext();
     }
 
     @Override
