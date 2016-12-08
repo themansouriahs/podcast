@@ -27,13 +27,10 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 
-import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.SingleObserver;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -53,7 +50,7 @@ public class SubscriptionRefreshManager {
     private final Handler mainHandler;
 
     @NonNull
-    private final FeedParser mFeedParser = new FeedParser();
+    private static final FeedParser sFeedParser = new FeedParser();
 
     @NonNull
     private Context mContext;
@@ -228,7 +225,7 @@ public class SubscriptionRefreshManager {
             if (response.body() != null && response.isSuccessful()) {
                 boolean success = true;
                 try {
-                    mFeedParser.parse(argSubscription, response.body().byteStream(), argContext);
+                    sFeedParser.parse(argSubscription, response.body().byteStream(), argContext, true);
 
                     //downloadNewEpisodes(argContext, argSubscription);
                 } catch (XmlPullParserException xppe) {
