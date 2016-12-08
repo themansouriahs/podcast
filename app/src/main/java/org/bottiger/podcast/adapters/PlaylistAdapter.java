@@ -243,10 +243,18 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
     @Override
     public int getItemCount() {
-        Log.v("PlaylistAdapter", "getItemCount");
-        int playlistCount = mPlaylist == null ? 0 : mPlaylist.size();
 
-        return playlistCount-PLAYLIST_OFFSET;
+        if (!mPlaylist.isLoaded()) {
+            Log.v(TAG, "playlistCount: 0. Not loaded");
+            return 0;
+        }
+
+        int playlistCount = mPlaylist == null ? 0 : mPlaylist.size();
+        int countAdjusted = playlistCount-PLAYLIST_OFFSET;
+
+        Log.v(TAG, "playlistCount: " + countAdjusted);
+
+        return countAdjusted;
     }
 
     @Override
