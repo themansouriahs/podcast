@@ -17,13 +17,21 @@ import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
+import org.bottiger.podcast.utils.ErrorUtils;
 import org.bottiger.podcast.utils.StorageUtils;
 import org.bottiger.podcast.utils.okhttp.UserAgentInterceptor;
+import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Observable;
+import io.reactivex.Single;
+import io.reactivex.SingleObserver;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -56,6 +64,9 @@ public class SubscriptionRefreshManager {
 
         OkHttpClient.Builder okHttpBuilder = new OkHttpClient.Builder();
         okHttpBuilder.interceptors().add(new UserAgentInterceptor(argContext));
+        okHttpBuilder.connectTimeout(20, TimeUnit.SECONDS)
+                     .writeTimeout(20, TimeUnit.SECONDS)
+                     .readTimeout(30, TimeUnit.SECONDS);
         mOkClient = okHttpBuilder.build();
     }
 
@@ -103,9 +114,7 @@ public class SubscriptionRefreshManager {
             return;
         }
 
-        String subscriptionUrl = argSubscription.getURL().toString();
-
-        if (TextUtils.isEmpty(subscriptionUrl)) {
+        if (TextUtils.isEmpty(argSubscription.getURLString())) {
             VendorCrashReporter.report(ACRA_KEY, "subscription.url=empty");
             return;
         }
@@ -129,15 +138,29 @@ public class SubscriptionRefreshManager {
 
         final Request request = getRequest(argSubscription);
 
-        mOkClient.newCall(request).enqueue(new Callback() {
+        Single.just(request)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(new SingleObserver<Request>() {
             @Override
-            public void onFailure(Call call, IOException e) {
-                wrappedCallback.complete(false, argSubscription);
+            public void onSubscribe(Disposable d) {
+
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                handleHttpResponse(argContext, argSubscription, response, argCallback);
+            public void onSuccess(Request value) {
+                try {
+                    Response response = mOkClient.newCall(value).execute();
+                    handleHttpResponse(argContext, argSubscription, response, argCallback);
+                } catch (IOException e) {
+                    ErrorUtils.handleException(e);
+                    wrappedCallback.complete(false, argSubscription);
+                }
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                ErrorUtils.handleException(e);
             }
         });
     }
@@ -207,15 +230,24 @@ public class SubscriptionRefreshManager {
                 try {
                     mFeedParser.parse(argSubscription, response.body().byteStream(), argContext);
 
-                    downloadNewEpisodes(argContext, argSubscription);
-                } catch (Exception exception) {
+                    //downloadNewEpisodes(argContext, argSubscription);
+                } catch (XmlPullParserException xppe) {
+                    // Not foolproof, but good enough
+                    // The idea is that if the feed is not a valid XML feed it will fail in the first few lines.
+                    // If the feed is valid, and fails anyway we want to know about it.
+                    if (xppe.getLineNumber() > 10) {
+                        handleParingError(xppe, argSubscription);
+                    }
+                    success = false;
+                } catch(Exception exception) {
                     handleParingError(exception, argSubscription);
                     success = false;
                 }
 
                 Log.d(TAG, "Parsing callback for: " + argSubscription);
-                if (argCallback != null)
-                    argCallback.complete(success, argSubscription);
+
+                //if (argCallback != null)
+                //    argCallback.complete(success, argSubscription);
 
             }
         } catch (NullPointerException npe) {
