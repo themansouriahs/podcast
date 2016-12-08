@@ -43,9 +43,9 @@ import static org.bottiger.podcast.utils.StorageUtils.VIDEO;
  */
 public class FeedParser {
 
-    private static final String TAG = "FeedParser";
+    private static final String TAG = FeedParser.class.getSimpleName();
 
-    private String[] DURATION_FORMATS = {"HH:mm:ss", "mm:ss"};
+    private static final SimpleDateFormat[] DURATION_FORMATS = {new SimpleDateFormat("HH:mm:ss"), new SimpleDateFormat("mm:ss")};
 
     @Nullable
     private DateUtils.Hint mDateFormatHint = null;
@@ -102,7 +102,7 @@ public class FeedParser {
             EPISODE_AUTHOR_TAG, EPISODE_CATEGORY_TAG, EPISODE_COMMENTS_TAG, EPISODE_ENCLOSURE_TAG, EPISODE_GUID_TAG,
             EPISODE_PUB_DATE_TAG, EPISODE_SOURCE_TAG
     })
-    public @interface RssItemTag {}
+    @interface RssItemTag {}
 
     private static final String EPISODE_TITLE_TAG = "title";
     private static final String EPISODE_LINK_TAG = "link";
@@ -115,10 +115,10 @@ public class FeedParser {
     private static final String EPISODE_PUB_DATE_TAG = "pubDate";
     private static final String EPISODE_SOURCE_TAG = "source";
 
-    final String EPISODE_ENCLOSURE_URL = "url"; // in bytes
-    final String EPISODE_ENCLOSURE_FILESISZE = "length"; // in bytes
-    final String EPISODE_ENCLOSURE_MIMETYPE = "type";
-    final String ITUNES_IMAGE_HREF = "href";
+    private static final String EPISODE_ENCLOSURE_URL = "url"; // in bytes
+    private static final String EPISODE_ENCLOSURE_FILESISZE = "length"; // in bytes
+    private static final String EPISODE_ENCLOSURE_MIMETYPE = "type";
+    private static final String ITUNES_IMAGE_HREF = "href";
 
     /**
      * Not complete
@@ -337,11 +337,12 @@ public class FeedParser {
             episode = item;
         }
 
+        String name;
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
                 continue;
             }
-            String name = parser.getName();
+            name = parser.getName();
 
             if (name.startsWith(FEED_TYPE_ITUNES)) { // FIXME FEED_TYPE_ITUNES.equals(prefix)
                 readEpisodeItunesTag(parser, name, episode);
@@ -430,25 +431,9 @@ public class FeedParser {
                 String unparsedDuration = readSimpleTag(ITUNES_DURATION_TAG, parser);
                 long duration = -1;
 
-                if (unparsedDuration.contains(":")) {
-
-                    Date date = null;
-                    SimpleDateFormat sdf = null;
-                    for (String formatString : DURATION_FORMATS)
-                    {
-                        try
-                        {
-                            sdf = new SimpleDateFormat(formatString);
-                            sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-                            date = sdf.parse(unparsedDuration);
-                            Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-                            cal.setTime(date);
-                            duration = cal.getTimeInMillis();
-                            break;
-                        }
-                        catch (ParseException e) {
-                        }
-                    }
+                //if (unparsedDuration.contains(":")) {
+                if (unparsedDuration.indexOf(':') > -1) {
+                    duration = parseDuration(unparsedDuration);
                 } else {
                     // We assume it's the number of seconds
                     // http://lists.apple.com/archives/syndication-dev/2005/Nov/msg00002.html#_Toc526931683
@@ -635,6 +620,29 @@ public class FeedParser {
 
     private boolean isParsingSlimSubscription() {
         return mParsingSlim;
+    }
+
+    private long parseDuration(@NonNull String argUnparsedDuration) {
+        Date date;
+        SimpleDateFormat sdf;
+        Calendar cal;
+
+        long duration = -1;
+
+        for (int i = 0; i < DURATION_FORMATS.length; i++) {
+            try {
+                sdf = DURATION_FORMATS[i];
+                sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+                date = sdf.parse(argUnparsedDuration);
+                cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+                cal.setTime(date);
+                duration = cal.getTimeInMillis();
+                break;
+            } catch (ParseException ignored) {
+            }
+        }
+
+        return duration;
     }
 
 }

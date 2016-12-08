@@ -349,7 +349,7 @@ public class Subscription extends BasePodcastSubscription {
     @NonNull
     @Override
     public String getURLString() {
-        return getURL() == null ? "" : getURL().toString();
+        return mUrlString;
     }
 
 	public long getId() {

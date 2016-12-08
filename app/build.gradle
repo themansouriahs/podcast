@@ -150,6 +150,8 @@ dependencies {
     compile 'com.journeyapps:zxing-android-embedded:3.4.0'
     compile 'com.heinrichreimersoftware:material-intro:1.6'
 
+    compile 'org.unbescape:unbescape:1.1.4.RELEASE'
+
     //compile 'com.github.wseemann:FFmpegMediaMetadataRetriever:1.0.13'
     compile project(":armv7-fmmr")
 
