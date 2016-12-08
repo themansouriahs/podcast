@@ -137,6 +137,7 @@
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:clipToPadding="false"
                     android:elevation="2dp"
+                    android:layout_marginBottom="7dp"
                     />
 
                 <net.steamcrafted.materialiconlib.MaterialIconView
