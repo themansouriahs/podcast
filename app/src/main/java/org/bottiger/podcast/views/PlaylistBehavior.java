@@ -1,6 +1,7 @@
 package org.bottiger.podcast.views;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ScrollerCompat;
@@ -22,8 +23,8 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
     private final String TAG = "PlaylistBehavior";
     private static final boolean DEBUG = false;
 
-    private TopPlayer mTopPlayer;
-    private RecyclerView mRecyclerView;
+    @Nullable private TopPlayer mTopPlayer;
+    @Nullable private RecyclerView mRecyclerView;
     private PlaylistContainerWrapper mPlaylistContainerWrapper;
 
     private int mRecyclerViewBottomPadding;
@@ -58,16 +59,20 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
 
     @Override
     public boolean onDependentViewChanged(CoordinatorLayout parent, View child, View dependency) {
-        if (DEBUG)
+        if (DEBUG) {
             Log.v(TAG, "onDependentViewChanged, child: " + child.getClass().getName() + " dependency: " + dependency.getClass().getName());
-        int height = mTopPlayer.getLayoutParams().height;
-        mRecyclerView.setTranslationY(height);
+        }
 
-        int left = mRecyclerView.getPaddingLeft();
-        int right = mRecyclerView.getPaddingRight();
-        int top = mRecyclerView.getPaddingTop();
+        if (mTopPlayer != null && mRecyclerView != null) {
+            int height = mTopPlayer.getLayoutParams().height;
+            mRecyclerView.setTranslationY(height);
 
-        mRecyclerView.setPadding(left, top, right, mRecyclerViewBottomPadding+height);
+            int left = mRecyclerView.getPaddingLeft();
+            int right = mRecyclerView.getPaddingRight();
+            int top = mRecyclerView.getPaddingTop();
+
+            mRecyclerView.setPadding(left, top, right, mRecyclerViewBottomPadding + height);
+        }
         return true;
     }
 
@@ -80,31 +85,40 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
 
         if (mRecyclerView == null) {
             mRecyclerView = (RecyclerView) parent.findViewById(R.id.my_recycler_view);
-            mRecyclerViewBottomPadding = mRecyclerView.getPaddingBottom();
+            if (mRecyclerView != null) {
+                mRecyclerViewBottomPadding = mRecyclerView.getPaddingBottom();
+            }
         }
 
         if (mPlaylistContainerWrapper == null) {
             mPlaylistContainerWrapper = (PlaylistContainerWrapper) parent;
         }
 
-        int height = (int)mTopPlayer.getPlayerHeight(); //mTopPlayer.getLayoutParams().height;
-        mRecyclerView.setTranslationY(height);
+        if (mTopPlayer != null && mRecyclerView != null) {
+            int height = (int) mTopPlayer.getPlayerHeight();
+            mRecyclerView.setTranslationY(height);
 
-        if (DEBUG)
-            Log.v(TAG, "onLayoutChild, child: " + child.getClass().getName() + " layoutDirection: " + layoutDirection + " height: " + height);
+            if (DEBUG) {
+                Log.v(TAG, "onLayoutChild, child: " + child.getClass().getName() + " layoutDirection: " + layoutDirection + " height: " + height);
+            }
+        }
+
         return super.onLayoutChild(parent, child, layoutDirection);
     }
 
     @Override
     public boolean onStartNestedScroll(CoordinatorLayout coordinatorLayout, View child, View directTargetChild, View target, int nestedScrollAxes) {
-        if (DEBUG)
+        if (DEBUG) {
             Log.v(TAG, "onStartNestedScroll, child: " + child.getClass().getName() + " target: " + target.getClass().getName());
+        }
 
         if (mScroller != null && !mScroller.isFinished()) {
             mScroller.abortAnimation();
         }
 
-        mRecyclerView.canScrollVertically(-1);
+        if (mRecyclerView != null) {
+            mRecyclerView.canScrollVertically(-1);
+        }
         return true;
     }
 
@@ -181,7 +195,11 @@ public class PlaylistBehavior extends CoordinatorLayout.Behavior<View> {
         }
 
         public void run() {
-            if(this.mLayout != null && PlaylistBehavior.this.mScroller != null && PlaylistBehavior.this.mScroller.computeScrollOffset()) {
+            if(this.mLayout != null &&
+                    mTopPlayer != null &&
+                    mRecyclerView != null &&
+                    PlaylistBehavior.this.mScroller != null &&
+                    PlaylistBehavior.this.mScroller.computeScrollOffset()) {
 
                 int currY = PlaylistBehavior.this.mScroller.getCurrY();
 
