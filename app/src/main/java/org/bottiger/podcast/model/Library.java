@@ -602,10 +602,10 @@ public class Library {
         loadPlaylistInternal(query, argPlaylist);
     }
 
-    public void loadPlaylist(@NonNull final Playlist argPlaylist) {
+    public rx.Subscription loadPlaylist(@NonNull final Playlist argPlaylist) {
         String query = getPlaylistEpisodes(argPlaylist);
 
-        Observable.just(query)
+        return Observable.just(query)
                 .subscribeOn(Schedulers.newThread())
                 .subscribe(new Action1<String>() {
             @Override
@@ -648,6 +648,7 @@ public class Library {
 
     private int addEpisodes(@NonNull Cursor argCursor, @Nullable FeedItem[] emptyItems) {
         int counter = 0;
+        boolean wasAdded = false;
         while (argCursor.moveToNext()) {
             final FeedItem item;
             if (emptyItems != null) {
@@ -655,8 +656,11 @@ public class Library {
             } else {
                 item = LibraryPersistency.fetchEpisodeFromCursor(argCursor, null);
             }
-            addEpisode(item);
-            counter++;
+            wasAdded = addEpisode(item);
+
+            if (wasAdded) {
+                counter++;
+            }
         }
 
         return counter;

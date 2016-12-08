@@ -119,7 +119,7 @@ import static org.bottiger.podcast.player.SoundWavesPlayerBase.STATE_READY;
 
 public class PlaylistFragment extends AbstractEpisodeFragment {
 
-    private static final String TAG = "PlaylistFragment";
+    private static final String TAG = PlaylistFragment.class.getSimpleName();
 
     private static final String PLAYLIST_WELCOME_DISMISSED = "playlist_welcome_dismissed";
     private static final boolean PLAYLIST_WELCOME_DISMISSED_DEFAULT = false;
