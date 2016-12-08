@@ -88,7 +88,6 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
         final int dataPosition = viewHolder.getAdapterPosition();
         final IEpisode item = mPlaylist.getItem(dataPosition+PLAYLIST_OFFSET);
-        final Activity activity = mActivity;
 
         if (item == null) {
             // This should only happen if the playlist only contain 1 item
@@ -188,10 +187,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         Log.v("PlaylistAdapter", "bindExandedPlayer");
 
 
-        ThemeHelper themeHelper = new ThemeHelper(context);
-
         long playerPosition = 0;
-        long playerDuration = 0;
 
         PlayerService ps = PlayerService.getInstance();
         if (ps != null) {
@@ -199,13 +195,10 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
                     && ps.isPlaying()) {
                 playerPosition = ps
                         .position();
-                playerDuration = ps
-                        .duration();
             } else {
                 if (feedItem instanceof FeedItem) {
                     playerPosition = ((FeedItem)feedItem).offset;
                 }
-                playerDuration = 0;//feedItem.getDuration();
             }
         }
 
