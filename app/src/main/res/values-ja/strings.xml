@@ -155,7 +155,7 @@
   <string name="feed_settings_intro">これらの設定は、この特定のポッドキャストに対して SoundWaves のデフォルトを上書きします。</string>
   <string name="feed_settings_oldest_first">最も古いエピソードをリストの最初に表示します</string>
   <string name="feed_settings_notify_on_new">新しいエピソードで通知</string>
-  <string name="feed_settings_skip_intro">イントロをスキップ</string>
+  <string name="feed_settings_skip_intro">紹介をスキップ</string>
   <string name="open_video_externally_title">別のプレーヤーでビデオを開きますか?</string>
   <string name="open_video_externally_body">このエピソードは、このアプリでサポートされていないビデオです。別のビデオプレーヤーで開くか、またはこのまま音声のみを選択できます。</string>
   <string name="open_video_externally_confirm">ビデオ プレーヤーを開く</string>
@@ -218,6 +218,19 @@
   <string name="menu_feed_sort_order">逆順</string>
   <string name="shortcut_short_download">新しいものをダウンロード</string>
   <string name="shortcut_long_download">新しいエピソードをダウンロード</string>
+  <string name="app_intro_activity">SoundWaves 紹介</string>
+  <string name="appintro_playlist_title">プレイリストは、メインプレーヤーの下にあります</string>
+  <string name="appintro_playlist_description">デフォルトでは、プレイリストは購読から最新のエピソードを表示します。</string>
+  <string name="appintro_filters_title">プレイリストを微調整</string>
+  <string name="appintro_filters_description">例: プレイリストはダウンロードされたエピソードだけが入力され、定期的に聴いていないポッドキャストは無視します</string>
+  <string name="appintro_settings_title">設定</string>
+  <string name="intro_settings_auto_download">自動的に新しいエピソードをダウンロード</string>
+  <string name="intro_settings_wifi_download">WiFi を使用時のみ自動的にダウンロード</string>
+  <string name="intro_settings_title">ネットワーク設定</string>
+  <string name="intro_settings_done">これでおしまいです! ポッドキャスティングをお楽しみください</string>
+  <string name="app_intro_welcome_title">SoundWaves へようこそ</string>
+  <string name="app_intro_welcome_description">この紹介ページを読むために 10 秒時間をください</string>
+  <string name="appintro_settings_description">SoundWaves ポッドキャストは完全無料で、「新しいエピソードが利用可能なときにダウンロードする」などの高度な機能も無料です。 ただし、不要なデータ通信を防止するために、使用する前にデータの設定を確認する必要があります</string>
   <plurals name="player_sleep">
     <item quantity="other">プレーヤーは %d 分でスリープします</item>
   </plurals>
