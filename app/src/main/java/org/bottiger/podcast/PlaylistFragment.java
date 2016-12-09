@@ -457,6 +457,12 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
      @Override
      public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
          inflater.inflate(R.menu.playlist_options_menu, menu);
+
+         if (mTopPlayer != null && mTopPlayer.isFullscreen()) {
+             MenuItem menuItem = menu.findItem(R.id.action_fullscreen_player);
+             menuItem.setIcon(R.drawable.ic_fullscreen_exit_white_24px);
+         }
+
          super.onCreateOptionsMenu(menu, inflater);
      }
 
@@ -474,6 +480,19 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
                  dialogPlaylistFilters.show(getFragmentManager(), getTag());
                  return true;
              }
+             case R.id.action_fullscreen_player: {
+                 boolean shouldBeFullscreen = false;
+                 if (mTopPlayer != null) {
+                     shouldBeFullscreen = !mTopPlayer.isFullscreen();
+                     mTopPlayer.setFullscreen(shouldBeFullscreen, true);
+                 }
+
+                 if (!shouldBeFullscreen) {
+                     inflatePlaylist(mPlaylistFragmentContainer);
+                 }
+                 getActivity().invalidateOptionsMenu();
+                 return true;
+             }
          }
          return super.onOptionsItemSelected(item);
      }
@@ -486,9 +505,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
 
         if (showTopPlayer(mPlaylist)) {
             if (mTopPlayerStub != null) {
-                mTopPlayer = (TopPlayer) mTopPlayerStub.inflate();
-                inflateTopPlayer(mTopPlayer);
-                mTopPlayerStub = null;
+                inflateTopPlayer(getView());
             }
 
             bindHeaderWrapper(mPlaylist);
@@ -496,9 +513,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
 
         if (showPlaylist(mPlaylist)) {
             if (mRecyclerStub != null) {
-                mRecyclerView = (RecyclerView) mRecyclerStub.inflate();
-                inflatePlaylist(mPlaylistFragmentContainer);
-                mRecyclerStub = null;
+                inflatePlaylist(getView());
             }
 
             mAdapter.notifyDataSetChanged();
@@ -510,7 +525,9 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
     }
 
     private boolean showPlaylist(@NonNull Playlist argPlaylist) {
-        return argPlaylist.size() > 1;
+        boolean hasContent = argPlaylist.size() > 1;
+        boolean inFullscreenMode = mTopPlayer != null && mTopPlayer.isFullscreen();
+        return hasContent && !inFullscreenMode;
     }
 
     private void setPlayer() {
@@ -538,7 +555,13 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
         }
     }
 
-    private void inflateTopPlayer(@NonNull TopPlayer view) {
+    private synchronized void inflateTopPlayer(@NonNull View view) {
+
+        if (mTopPlayerStub == null)
+            return;
+
+        mTopPlayer = (TopPlayer) mTopPlayerStub.inflate();
+
         //mTopPlayer =   (TopPlayer) view.findViewById(R.id.top_player);
         mPhoto =            (ImageViewTinted) view.findViewById(R.id.session_photo);
 
@@ -553,14 +576,26 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
         mPlayerSeekbar          =    (PlayerSeekbar) view.findViewById(R.id.top_player_seekbar);
         mPlayerDownloadButton   =    (DownloadButtonView) view.findViewById(R.id.download);
 
-        view.setOverlay(mOverlay);
+        assert mTopPlayer != null;
+        mTopPlayer.setOverlay(mOverlay);
 
         setPlayer();
 
         bindHeaderWrapper(mPlaylist);
+
+        mTopPlayerStub = null;
+
+        if (mTopPlayer.isFullscreen()) {
+            getActivity().invalidateOptionsMenu();
+        }
     }
 
-    private void inflatePlaylist(@NonNull View view) {
+    private synchronized void inflatePlaylist(@NonNull View view) {
+
+        if (mRecyclerStub == null)
+            return;
+
+        mRecyclerView = (RecyclerView) mRecyclerStub.inflate();
         //mRecyclerView = (RecyclerView) view.findViewById(R.id.my_recycler_view);
 
         // use a linear layout manager
@@ -578,6 +613,8 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
         // init swipe to dismiss logic
         ItemTouchHelper swipeToDismissTouchHelper = getItemTouchHelper(view);
         swipeToDismissTouchHelper.attachToRecyclerView(mRecyclerView);
+
+        mRecyclerStub = null;
     }
 
     private View.OnClickListener getToast(@NonNull final String argTitle, @NonNull final String argDescription) {

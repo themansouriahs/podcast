@@ -17,14 +17,12 @@ import android.support.transition.ChangeBounds;
 import android.support.transition.Scene;
 import android.support.transition.Transition;
 import android.support.transition.TransitionManager;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.NestedScrollingChild;
 import android.support.v4.view.NestedScrollingChildHelper;
 import android.support.v4.view.ScrollingView;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ScrollerCompat;
-import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -36,15 +34,12 @@ import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
-import android.widget.Chronometer;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.ivbaranov.mfb.MaterialFavoriteButton;
-import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import org.bottiger.podcast.SoundWaves;
@@ -54,10 +49,8 @@ import org.bottiger.podcast.player.GenericMediaPlayerInterface;
 
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
-import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
-import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.base.BaseSubscription;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorExtractor;
@@ -70,16 +63,11 @@ import org.bottiger.podcast.views.dialogs.DialogChapters;
 import org.bottiger.podcast.views.dialogs.DialogPlaybackSpeed;
 
 import java.util.Calendar;
-import java.util.concurrent.TimeUnit;
 
-import io.reactivex.SingleObserver;
-import io.reactivex.disposables.Disposable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
-
-import static org.bottiger.podcast.views.PlayerButtonView.StaticButtonColor;
 
 /**
  * Created by apl on 30-09-2014.
@@ -120,7 +108,7 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
 
     @Nullable IEpisode mCurrentEpisode;
 
-    private TopPlayer Layout;
+    private TopPlayer mMainLayout;
     private LinearLayout mControls;
     private PlayPauseImageView mPlayPauseButton;
 
@@ -239,8 +227,7 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 
-        // FIXME  && !mFullscreen
-        if (sizeLarge > 0){
+        if (sizeLarge > 0 && !mFullscreen){
             int hSize = MeasureSpec.getSize(heightMeasureSpec);
             int hMode = MeasureSpec.getMode(heightMeasureSpec);
 
@@ -277,7 +264,7 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
         super.onFinishInflate();
 
 
-        Layout = (TopPlayer) findViewById(R.id.top_player);
+        mMainLayout = this;
         mControls = (LinearLayout) findViewById(R.id.top_player_controls);
 
         getPlayerControlHeight(mControls);
@@ -310,6 +297,8 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
         }
 
         setPlaylistEmpty(isRecyclerViewEmpty);
+
+        setFullscreenImagePadding(getContext());
 
         if (mDoDisplayText) {
             //showText();
@@ -662,7 +651,7 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
 
     private boolean validateState() {
         if (sizeSmall < 0 || sizeMedium < 0 || sizeLarge < 0) {
-            Log.d("TopPlayer", "Layout sizes needs to be defined");
+            Log.d("TopPlayer", "mMainLayout sizes needs to be defined");
             return false;
         }
         return true;
@@ -715,7 +704,7 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
     public synchronized void setFullscreen(boolean argNewState, boolean doAnimate) {
         mFullscreen = argNewState;
         try {
-            if (doAnimate && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            if (doAnimate) {
                 Transition trans = new ChangeBounds();
                 trans.setDuration(getResources().getInteger(R.integer.animation_quick));
                 TransitionManager.go(new Scene(this), trans);
@@ -726,30 +715,42 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
             } else {
                 exitFullscreen();
             }
+
+            setFullscreenImagePadding(getContext());
         } finally {
             prefs.edit().putBoolean(mDoFullscreentKey, argNewState).apply();
         }
     }
 
     private void goFullscreen() {
-        exitFullscreen();
+        Log.d(TAG, "Enter fullscreen mode");
+
+        if (mMainLayout != null) {
+
+            setPlayerHeight(sizeLarge);
+
+            CoordinatorLayout.LayoutParams layoutParams = new CoordinatorLayout.LayoutParams(
+                    LayoutParams.MATCH_PARENT,
+                    LayoutParams.MATCH_PARENT);
+
+            mMainLayout.setLayoutParams(layoutParams);
+        }
     }
 
     private void exitFullscreen() {
 
         Log.d(TAG, "Exit fullscreen mode");
-        mFullscreenButton.setImageResource(R.drawable.ic_fullscreen_white);
+        //mFullscreenButton.setImageResource(R.drawable.ic_fullscreen_white);
 
-        if (Layout != null) {
+        if (mMainLayout != null) {
             CoordinatorLayout.LayoutParams layoutParams = new CoordinatorLayout.LayoutParams(
                     LayoutParams.MATCH_PARENT,
                     sizeLarge);
 
-            Layout.setLayoutParams(layoutParams);
+            mMainLayout.setLayoutParams(layoutParams);
 
             setPlayerHeight(sizeLarge);
         }
-
     }
 
     public boolean isFullscreen() {
@@ -773,7 +774,7 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
 
         try {
             mDoDisplayText = !mDoDisplayText;
-            TransitionManager.beginDelayedTransition(Layout, UIUtils.getDefaultTransition(getResources()));
+            TransitionManager.beginDelayedTransition(mMainLayout, UIUtils.getDefaultTransition(getResources()));
 
             if (mDoDisplayText) {
                 Log.d(TAG, "ShowText");
@@ -880,6 +881,11 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
                 }
             }.start();
         }
+    }
+
+    private void setFullscreenImagePadding(@NonNull Context argContext) {
+        int padding = (int)argContext.getResources().getDimension(R.dimen.player_fullscreen_image_padding);
+        mPhoto.setPadding(padding, 0 ,padding, padding);
     }
 
     @Override
@@ -1033,32 +1039,32 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
 
     // Compute the horizontal extent of the horizontal scrollbar's thumb within the horizontal range.
     public int computeHorizontalScrollOffset() {
-        return 0;// this.Layout.canScrollHorizontally()?this.Layout.computeHorizontalScrollOffset(this.mState):0;
+        return 0;// this.mMainLayout.canScrollHorizontally()?this.mMainLayout.computeHorizontalScrollOffset(this.mState):0;
     }
 
     // Compute the horizontal offset of the horizontal scrollbar's thumb within the horizontal range.
     public int computeHorizontalScrollExtent() {
-        return 0;// this.Layout.canScrollHorizontally()?this.Layout.computeHorizontalScrollExtent(this.mState):0;
+        return 0;// this.mMainLayout.canScrollHorizontally()?this.mMainLayout.computeHorizontalScrollExtent(this.mState):0;
     }
 
     // Compute the horizontal range that the horizontal scrollbar represents.
     public int computeHorizontalScrollRange() {
-        return 0;// this.Layout.canScrollHorizontally()?this.Layout.computeHorizontalScrollRange(this.mState):0;
+        return 0;// this.mMainLayout.canScrollHorizontally()?this.mMainLayout.computeHorizontalScrollRange(this.mState):0;
     }
 
     // Compute the vertical extent of the vertical scrollbar's thumb within the vertical range.
     public int computeVerticalScrollOffset() {
-        return 0;// this.Layout.canScrollVertically()?this.Layout.computeVerticalScrollOffset(this.mState):0;
+        return 0;// this.mMainLayout.canScrollVertically()?this.mMainLayout.computeVerticalScrollOffset(this.mState):0;
     }
 
     // Compute the vertical offset of the vertical scrollbar's thumb within the horizontal range.
     public int computeVerticalScrollExtent() {
-        return 0;// this.Layout.canScrollVertically()?this.Layout.computeVerticalScrollExtent(this.mState):0;
+        return 0;// this.mMainLayout.canScrollVertically()?this.mMainLayout.computeVerticalScrollExtent(this.mState):0;
     }
 
     // Compute the vertical range that the vertical scrollbar represents.
     public int computeVerticalScrollRange() {
-        return 0;// this.Layout.canScrollVertically()?this.Layout.computeVerticalScrollRange(this.mState):0;
+        return 0;// this.mMainLayout.canScrollVertically()?this.mMainLayout.computeVerticalScrollRange(this.mState):0;
     }
 
 
