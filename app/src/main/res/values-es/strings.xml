@@ -5,6 +5,7 @@
   <string name="pref_only_wifi_description">Esperar a estar conectado a una red wifi para descargar los archivos</string>
   <string name="pref_only_wifi_title">Sólo wifi para descargar</string>
   <string name="pref_dark_theme">Activar tema oscuro para un mayor contraste.</string>
+  <string name="pref_dark_theme_title">Tema</string>
   <string name="pref_download_on_update_title">Descarga automática</string>
   <string name="pref_download_on_update_description">Descargar nuevos episodios en cuanto sea posible</string>
   <string name="pref_downloaded_expire_description">%s</string>
@@ -62,6 +63,7 @@
   <string name="pref_help_static_field_description">Si quieres ayudar, hay muchas cosas que hacer; programar, traducir, mejorar la experiencia de usuario, mejorar iconos y gráficos, crear una página web y más cosas. Si te decides, entra en la página del proyecto en GitHub (github.com/bottiger/SoundWaves) o envíame un correo electrónico a esta dirección: bottiger@gmail.com.</string>
   <string name="episode_title_unknown">Sin nombre :(</string>
   <string name="podcast_title_unknown">Nombre del podcast desconocido</string>
+  <string name="subscription_instruction">Añade tus podcasts usando la página Descubrir situada a la derecha.\n\nTambién puedes importar un fichero OPML o sincronizar tu lista con gPodder desde el menú de configuración</string>
   <string name="filter_show_listened">Mostrar escuchados</string>
   <string name="auto_start_next">Empezar siguiente automáticamente</string>
   <string name="drawer_playlist_filters">Filtros de la lista de reproducción</string>
@@ -83,6 +85,7 @@
   <string name="pref_delete_when_finished_description">Los episodios se eliminarán automáticamente tras reproducirse.</string>
   <!--For playing media on another device, like a chromecast-->
   <string name="media_route_menu_title">Reproducir en dispositivos como ChromeCast</string>
+  <string name="bulk_download_instructions">Descarga todos los episodios similares</string>
   <string name="bulk_download_day">Publicados en las últimas 24 horas</string>
   <string name="bulk_download_week">Publicados esta semana</string>
   <string name="bulk_download_month">Publicados este mes</string>
@@ -91,7 +94,9 @@
   <string name="pref_advanced_category_experimental">Configuración experimental</string>
   <string name="pref_screen_rotation_title">Habilitar rotación de pantalla</string>
   <string name="pref_screen_rotation_description">Soporte para la orientación horizontal</string>
+  <string name="search_feed_hint">Búsqueda %s</string>
   <string name="search_query_hint">Buscar usando %s</string>
+  <string name="discovery_recommendations">Selección de editores:</string>
   <string name="discovery_recommendations_trending">De actualidad</string>
   <string name="discovery_recommendations_popular">Popular</string>
   <string name="discovery_search_results">Resultados para: <i>%s</i></string>
@@ -121,13 +126,17 @@
   <string name="playlist_episode_dismissed">Episodio eliminado</string>
   <string name="playlist_episode_dismissed_undo">Deshacer</string>
   <string name="playlist_context_menu_playnext">Reproducir siguiente</string>
+  <string name="download_aborted_snackbar">No se pudo descargar: %s</string>
   <string name="subscription_subtitle_updated_at">actualizado</string>
   <string name="filter_show_only_downloaded">Sólo descargados</string>
   <string name="action_filter">Filtrar lista de reproducción</string>
+  <string name="snackbar_change">Cambiar</string>
   <string name="apply_filters">Aplicar filtros</string>
   <string name="pref_gpodder_support_title">GPodder</string>
   <string name="gpodder_username">nombre de usuario</string>
   <string name="gpodder_password">contraseña</string>
+  <string name="gpodder_device">Nombre de dispositivo</string>
+  <string name="gpodder_server">Servidor</string>
   <string name="generic_test_credentials">Prueba de credenciales</string>
   <string name="generic_test_credentials_succes">Prueba realizada con éxcito</string>
   <string name="generic_test_credentials_failed">Prueba fallida</string>
@@ -136,6 +145,7 @@
   <string name="dialog_playback_speed_episode">Solo este episodio</string>
   <string name="dialog_playback_speed_subscription">Todos los episodios de este podcast</string>
   <string name="dialog_playback_speed_global">Todos los episodios</string>
+  <string name="dialog_playback_engine_title">Ajustes del motor de audio</string>
   <string name="dialog_playback_speed_title">Velocidad de reproducción</string>
   <string name="dialog_playback_speed_scope">Aplicar cambio a</string>
   <string name="feed_settings_show_description">Mostrar descripción del episodio</string>
@@ -144,6 +154,8 @@
   <string name="feed_settings_delete_when_listened">Eliminar tras escuchar</string>
   <string name="feed_settings_intro">Esta configuración ignorará la configuración por defecto de SoundWaves para este podcast en concreto.</string>
   <string name="feed_settings_oldest_first">Mostrar episodios más antiguos primero</string>
+  <string name="feed_settings_notify_on_new">Notifícame los nuevos episodios</string>
+  <string name="feed_settings_skip_intro">Saltar intro</string>
   <string name="open_video_externally_title">¿Abrir vídeo en otro reproductor?</string>
   <string name="open_video_externally_body">Este episodio es un vídeo y esta aplicación no puede reproducirlo. Puedes abrirlo en otro reproductor o escuchar unicamente el audio aquí.</string>
   <string name="open_video_externally_confirm">Abrir reproductor de vídeos</string>
@@ -158,23 +170,82 @@
   <string name="download_manager_toolbar_title">Cola de descarga</string>
   <string name="download_manager_toolbar_description">Episodios programados para descargar</string>
   <string name="menu_clear_download">Limpiar</string>
+  <string name="download_manager_empty_title">No hay descargas activas</string>
   <string name="action_enter_fullscreen">Reproductor a pantalla completa</string>
   <string name="action_exit_fullscreen">Salir de pantalla completa</string>
+  <string name="unknown_filesize">Tamaño desconocido</string>
   <!--log_submit_activity-->
+  <string name="log_submit_activity__log_fetch_failed">No se ha podido leer el log de su dispositivo. Alternativamente puede usar la conexión ADB para descargar un log de errores.</string>
+  <string name="log_submit_activity__thanks">Gracias por su ayuda!</string>
+  <string name="log_submit_activity__submitting">Enviando</string>
+  <string name="log_submit_activity__posting_logs">Subiendo los logs a gist...</string>
+  <string name="preferences__submit_debug_log">Enviar log de errores</string>
   <!--Widget-->
+  <string name="widget_playlist_empty">La lista de reproducción está vacía</string>
   <!--Used for displaying the download progress of a file. Example: "1.2 MB of 53 MB" (the unit, MB, is handled by the framework)
     When the progress is 0 (we have not started downloading) we should just show the total file size. Example "53 MB"-->
   <string name="download_progress">%1$s de %2$s</string>
   <!--In the context: "4 new [episodes]"-->
+  <plurals name="subscription_list_new">
+    <item quantity="one">nuevo</item>
+    <item quantity="other">nuevo</item>
+  </plurals>
   <!--Feed Activity-->
+  <string name="no_episodes_in_the_feed">No hay episodios nuevos</string>
+  <string name="authenticate_feed_username">Nombre de usuario</string>
+  <string name="authenticate_feed_password">Contraseña</string>
   <!--Used for 1.1X speed-->
+  <string name="speed_multiplier">%1$.1f X</string>
+  <string name="discovery_directory_icon">Directorio de podcasts (motor de búsqueda)q</string>
+  <string name="subscription_instruction_title">No estás suscrito a ningún podcast</string>
+  <string name="dialog_playback_boost_volume">Mejorar volumen</string>
   <!--The audio engine has an option to remove periods of silence in an audio file.-->
+  <string name="dialog_playback_removile_silence">Eliminar silencios</string>
+  <string name="menu_web_player">Reproductor web (beta)</string>
+  <string name="menu_subscriptions_order">Ordenar</string>
+  <string name="menu_subscriptions_order_alphabetically">Nombre (A-Z)</string>
+  <string name="menu_subscriptions_order_alphabetically_reverse">Nombre inverso (Z-A)</string>
+  <string name="menu_subscriptions_order_updated">Último actualizado</string>
+  <string name="menu_subscriptions_order_new_count">Nuevos episodios</string>
+  <string name="title_activity_web_scanner">WebScannerActivity</string>
+  <string name="web_scanner_instrcution_title">Escucha usando tu ordenador</string>
+  <string name="web_scanner_instructions"><![CDATA[1) Go to web.soundwavesapp.com<br />2) Escanea el código QR]]></string>
+  <string name="web_scanner_qr_scanned">Escaneado. Iniciando sesión.</string>
+  <string name="player_chapters_title">Capítulos</string>
+  <string name="player_chapters_missing">El episodio no tiene ningún capítulo</string>
+  <string name="player_sleep_cancel">Temporizador apagado</string>
+  <string name="player_sleep_dialog_cancel_button">Apagar temporizador</string>
+  <string name="player_sleep_dialog_ok_button">Establecer temporizador</string>
+  <string name="menu_feed_sort_order">Orden inverso</string>
+  <string name="shortcut_short_download">Descargar nuevo</string>
+  <string name="shortcut_long_download">Descargar episodios nuevos</string>
+  <string name="app_intro_activity">Introducción</string>
+  <string name="appintro_playlist_title">La lista de reproducción está debajo del reproductor</string>
+  <string name="appintro_playlist_description">Por defecto, la lista de reproducción se actualiza con los episodios más recientes de tus subscripciones</string>
+  <string name="appintro_filters_title">Afinar la playlist</string>
+  <string name="appintro_filters_description">Por ejemplo: La lista de reproducción solo contiene episodios descargados, ignorando los podcasts que no escuchas normalmente</string>
+  <string name="appintro_settings_title">Ajustes</string>
+  <string name="intro_settings_auto_download">Descargar nuevos episodios automáticamente</string>
+  <string name="intro_settings_wifi_download">Descargar solo por wifi</string>
+  <string name="intro_settings_title">Ajustes de red</string>
+  <string name="intro_settings_done">Ya está! Feliz podcasting</string>
+  <string name="app_intro_welcome_title">Bienvenido a SoundWaves</string>
+  <string name="app_intro_welcome_description">Por favor, dedica 10 segundos a leer la introducción, puede serte útil</string>
+  <string name="appintro_settings_description">La aplicación SoundWaves es completamente gratuita, no cobramos por funcionalidades avanzadas como \"Descargar episodios nuevos automaticamente\". Debes tener precaución con tu consumo de datos, puedes llevarte un susto.</string>
   <plurals name="player_sleep">
     <item quantity="one">El reproductor se parará en %d minuto</item>
     <item quantity="other">El reproductor se parará en %d minutos</item>
   </plurals>
+  <plurals name="bulk_download_playlist">
+    <item quantity="one">Primer episodio</item>
+    <item quantity="other">Top %d episodios</item>
+  </plurals>
   <plurals name="subscriptions_imported">
     <item quantity="one">Se ha importado %d suscripción.</item>
     <item quantity="other">Se han importado %d suscripciones.</item>
+  </plurals>
+  <plurals name="subscriptions_selected">
+    <item quantity="one">%d Seleccionados</item>
+    <item quantity="other">%d Seleccionados</item>
   </plurals>
 </resources>
