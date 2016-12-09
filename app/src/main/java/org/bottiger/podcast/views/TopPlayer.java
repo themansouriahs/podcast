@@ -232,7 +232,7 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
             int hMode = MeasureSpec.getMode(heightMeasureSpec);
 
             int height = -1;
-            int mode = MeasureSpec.AT_MOST;
+            int mode = MeasureSpec.EXACTLY;
 
             switch (hMode){
                 case MeasureSpec.AT_MOST:
