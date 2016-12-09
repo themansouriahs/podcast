@@ -9,7 +9,7 @@
   <string name="pref_download_on_update_title">Descarga automática</string>
   <string name="pref_download_on_update_description">Descarregar novos episódios assim que fiquem disponíveis</string>
   <string name="pref_downloaded_expire_description">%s</string>
-  <string name="pref_downloaded_expire_title">Limite de descargas</string>
+  <string name="pref_downloaded_expire_title">Limite para descargas</string>
   <string name="dialog_title_add_sub">Adicionar podcast</string>
   <string name="dialog_message_add_sub">Por favor digite um URL:</string>
   <string name="title_section3">Lista de reprodução</string>
@@ -41,14 +41,14 @@
   <string name="preferences_category_network">Rede e armazenamento</string>
   <string name="preferences_category_cloud">Suporte Cloud</string>
   <string name="preferences_category_advanced">Avançado</string>
-  <string name="pref_player_forward_amount_dialog_title">O tempo a avançar ao clicar no botão Avançar</string>
-  <string name="pref_player_backward_amount_dialog_title">O tempo a recuar ao clicar no botão Recuar</string>
+  <string name="pref_player_forward_amount_dialog_title">Tempo a avançar ao tocar no botão Avançar</string>
+  <string name="pref_player_backward_amount_dialog_title">Tempo a recuar ao tocar no botão Recuar</string>
   <string name="pref_player_forward_amount_title">Avanço</string>
   <string name="pref_player_backward_amount_title">Recuo</string>
-  <string name="pref_player_forwards_amount_summary">Avançar %s no tempo</string>
-  <string name="pref_player_backwards_amount_summary">Recuar %s no tempo</string>
+  <string name="pref_player_forwards_amount_summary">Avançar %s</string>
+  <string name="pref_player_backwards_amount_summary">Recuar %s</string>
   <string name="pref_playback_category_title">Reprodução</string>
-  <string name="preferences_category_about">Sobre</string>
+  <string name="preferences_category_about">Acerca</string>
   <string name="pref_current_version_title">Versão</string>
   <string name="ok">OK</string>
   <string name="playlist_filter_all">Todas as subscrições</string>
@@ -60,14 +60,14 @@
   <string name="menu_refresh_feed_all">Atualizar</string>
   <string name="crash_toast">Erro (ajude-nos a corrigir o problema enviando um relatório de erros)</string>
   <string name="pref_help_category_title">Ajude no desenvolvimento</string>
-  <string name="pref_help_static_field_description">Se você quiser ajudar, existem imensas coisas que pode fazer. Pode ajudar na programação ou algo completamente diferente. Pode ajudar na tradução, na criação de ícones e imagens, um sítio web e muito mais. Aceda à nossa página do GitHub (github.com/bottiger/SoundWaves) ou envie uma mensagem para: bottiger@gmail.com</string>
+  <string name="pref_help_static_field_description">Se você quiser ajudar, existem imensas coisas que pode fazer. Pode ajudar na programação ou em algo completamente diferente. Pode ajudar na tradução, na criação de ícones e imagens, um sítio web e muito mais. Aceda à nossa página no GitHub (github.com/bottiger/SoundWaves) ou envie uma mensagem para: bottiger@gmail.com</string>
   <string name="episode_title_unknown">Sem título :(</string>
   <string name="podcast_title_unknown">Título desconhecido</string>
-  <string name="subscription_instruction">Adicione podcstas utilizando a página Descobrir à direita.\n\nTambém pode importar um ficheiro OPML ou sincronizar os seus podcasts do gPodder.</string>
+  <string name="subscription_instruction">Adicione podcasts utilizando a página Descobrir à direita.\n\nTambém pode importar um ficheiro OPML ou sincronizar os seus podcasts do gPodder.</string>
   <string name="filter_show_listened">Mostrar reproduzidos</string>
   <string name="auto_start_next">Reprodução contínua</string>
   <string name="drawer_playlist_filters">Filtros da lista de reprodução</string>
-  <string name="opml_not_found">OPML não encontrado. Renomeie o seu ficheiro para %1$s e coloque-o na pasta raíz do seu cartão SD</string>
+  <string name="opml_not_found">OPML não encontrado. Renomeie o seu ficheiro para %1$s e coloque-o na pasta raiz do seu cartão SD</string>
   <string name="pref_subscriptions_category_title">Subscrições</string>
   <string name="pref_subscriptions_columns_dialog_title">Colunas para subscrições</string>
   <string name="pref_subscriptions_columns_title">Colunas para subscrições</string>
@@ -85,7 +85,7 @@
   <string name="pref_delete_when_finished_description">Eliminar episódios após a sua reprodução</string>
   <!--For playing media on another device, like a chromecast-->
   <string name="media_route_menu_title">Cast</string>
-  <string name="bulk_download_instructions">Descarregar episódios coincidentes com</string>
+  <string name="bulk_download_instructions">Descarregar episódios</string>
   <string name="bulk_download_day">Publicados nas últimas 24 horas</string>
   <string name="bulk_download_week">Publicados nesta semana</string>
   <string name="bulk_download_month">Publicados neste mês</string>
@@ -95,7 +95,7 @@
   <string name="pref_screen_rotation_title">Ativar rotação de ecrã</string>
   <string name="pref_screen_rotation_description">Suporte para modo horizontal</string>
   <string name="search_feed_hint">Pesquisar %s</string>
-  <string name="search_query_hint">Procurar através de %s</string>
+  <string name="search_query_hint">Pesquisa através de %s</string>
   <string name="discovery_recommendations">Escolha dos editores:</string>
   <string name="discovery_recommendations_trending">Tendências</string>
   <string name="discovery_recommendations_popular">Popular</string>
@@ -121,7 +121,7 @@
   <string name="playlist_empty_text_bottom">Pode alterar o modo de funcionamento da lista de reprodução através do ícone na margem superior do ecrã</string>
   <string name="playlist_empty_mode_one">Colocar episódios manualmente</string>
   <string name="playlist_empty_mode_two">Episódios recentes</string>
-  <string name="playlist_empty_mode_one_desc">A lista de reprodução será preenchida pelos episódios colocados manualmente</string>
+  <string name="playlist_empty_mode_one_desc">A lista de reprodução será preenchida pelos episódios colocados manualmente.</string>
   <string name="playlist_empty_mode_two_desc">A lista de reprodução será preenchida automaticamente com os episódios mais recentes. No entanto, também pode adicionar os episódios manualmente.</string>
   <string name="playlist_episode_dismissed">Episódio removido</string>
   <string name="playlist_episode_dismissed_undo">Anular</string>
@@ -153,7 +153,7 @@
   <string name="feed_settings_download_new">Descarregar novos episódios</string>
   <string name="feed_settings_delete_when_listened">Eliminar após a reprodução</string>
   <string name="feed_settings_intro">Estas definições irão substituir as predefinições do SoundWaves para este podcast.</string>
-  <string name="feed_settings_oldest_first">Mostrar episódios antigos no inicio</string>
+  <string name="feed_settings_oldest_first">Mostrar episódios antigos no início</string>
   <string name="feed_settings_notify_on_new">Notificar sobre novos episódios</string>
   <string name="feed_settings_skip_intro">Ignorar introdução</string>
   <string name="open_video_externally_title">Abrir vídeo em outro reprodutor?</string>
@@ -196,7 +196,7 @@
   <string name="authenticate_feed_password">Palavra-passe</string>
   <!--Used for 1.1X speed-->
   <string name="speed_multiplier">%1$.1f X</string>
-  <string name="discovery_directory_icon">Diretório de podcstas (mecanismo de pesquisa)</string>
+  <string name="discovery_directory_icon">Diretório de podcasts (mecanismo de pesquisa)</string>
   <string name="subscription_instruction_title">Ainda não subscreveu a quaisquer podcasts</string>
   <string name="dialog_playback_boost_volume">Aumentar volume</string>
   <!--The audio engine has an option to remove periods of silence in an audio file.-->
@@ -219,6 +219,19 @@
   <string name="menu_feed_sort_order">Ordem inversa</string>
   <string name="shortcut_short_download">Descarregar novos</string>
   <string name="shortcut_long_download">Descarregar novos episódios</string>
+  <string name="app_intro_activity">Introdução ao SoundWaves</string>
+  <string name="appintro_playlist_title">Existe uma lista de reprodução por baixo do reprodutor</string>
+  <string name="appintro_playlist_description">Por definição, a lista de reprodução será preenchida com os episódios mais recentes</string>
+  <string name="appintro_filters_title">Controlar a lista de reprodução</string>
+  <string name="appintro_filters_description">Exemplo: a lista de reprodução apenas deve ser preenchida com os episódios descarregados ou ignorar as subscrições que não utiliza regularmente</string>
+  <string name="appintro_settings_title">Definições</string>
+  <string name="intro_settings_auto_download">Descarregar novos episódios automaticamente</string>
+  <string name="intro_settings_wifi_download">Descargas automáticas apenas em redes Wi-Fi</string>
+  <string name="intro_settings_title">Definições de rede</string>
+  <string name="intro_settings_done">E é isto. Desfrute!</string>
+  <string name="app_intro_welcome_title">Bem-vindo ao SoundWaves</string>
+  <string name="app_intro_welcome_description">Por favor dispense alguns segundos para ler esta introdução</string>
+  <string name="appintro_settings_description">O SoundWaves é totalmente gratuito e não cobra por funcionalidades avançadas, tais como \'Descarregar novos episódios assim que fiquem disponíveis\'. No entanto, deve rever as definições antes de iniciar a sua utilização para evitar o consumo de dados móveis.</string>
   <plurals name="player_sleep">
     <item quantity="one">O reprodutor parará em %d minuto</item>
     <item quantity="other">O reprodutor parará em %d minutos</item>
