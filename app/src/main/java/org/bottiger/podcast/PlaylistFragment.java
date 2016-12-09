@@ -101,15 +101,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
     @Nullable private TopPlayer mTopPlayer;
     @Nullable private ImageViewTinted mPhoto;
 
-    @Nullable private TextView mEpisodeTitle;
-    @Nullable private TextView mEpisodeInfo;
-    @Nullable private TextViewObserver mCurrentTime;
-    @Nullable private TextView mTotalTime;
-    @Nullable private PlayPauseImageView mPlayPauseButton;
-    @Nullable private PlayerSeekbar mPlayerSeekbar;
-    @Nullable private DownloadButtonView mPlayerDownloadButton;
-    @Nullable private MaterialFavoriteButton mFavoriteButton;
-
     private GenericMediaPlayerInterface mPlayer;
 
     private RecyclerView mRecyclerView;
@@ -130,8 +121,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
     private Context mContext;
 
     private Subscription mRxPlaylistSubscription;
-    private Subscription mRxTopEpisodeChanged;
-    private Subscription mRxPlayerChanged;
 
     private NestedScrollingChildHelper scrollingChildHelper;
 
@@ -142,7 +131,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
         mSwipeIcon = BitmapFactory.decodeResource(getResources(), mSwipeIconID);
 
         mRxPlaylistSubscription = getPlaylistChangedSubscription();
-        mRxPlayerChanged = getPlayerSubscription();
 
         super.onCreate(savedInstanceState);
     }
@@ -150,22 +138,18 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (mRxPlayerChanged != null && !mRxPlayerChanged.isUnsubscribed()) {
-            mRxPlayerChanged.unsubscribe();
+
+        if (mTopPlayer != null) {
+            mTopPlayer.onDestroyView();
         }
 
         if (mRxPlaylistSubscription != null && !mRxPlaylistSubscription.isUnsubscribed()) {
             mRxPlaylistSubscription.unsubscribe();
         }
-
-        if (mRxTopEpisodeChanged != null && !mRxTopEpisodeChanged.isUnsubscribed()) {
-            mRxTopEpisodeChanged.unsubscribe();
-        }
     }
 
     @Override
     public void onDestroyView() {
-        unsetPlayer();
         super.onDestroyView();
     }
 
@@ -266,6 +250,10 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
         if (mPlaylist != null) {
             IEpisode item = mPlaylist.getItem(0);
 
+            if (mTopPlayer != null) {
+                mTopPlayer.bind(item);
+            }
+            /*
             if (item != null) {
                 if (mPlayPauseButton != null)
                     mPlayPauseButton.setEpisode(item, PlayPauseImageView.PLAYLIST);
@@ -275,6 +263,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
                     mPlayerDownloadButton.enabledProgressListener(true);
                 }
             }
+            */
             playlistChanged(mPlaylist);
         }
 
@@ -289,122 +278,12 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
         if (item == null)
             return;
 
-        if (mEpisodeTitle == null)
-            return;
-
-        if (mRxTopEpisodeChanged != null && !mRxTopEpisodeChanged.isUnsubscribed()) {
-            mRxTopEpisodeChanged.unsubscribe();
-        }
-
-        mRxTopEpisodeChanged = getEpisodeChangedSubscription();
-
-        final String title = StrUtils.formatTitle(item.getTitle());
-        final String description = item.getDescription();
-
-        mEpisodeTitle.setText(title);
-
-        // FIXME: Trim can be remove from here very soon.
-        mEpisodeInfo.setText(description.trim());
-
-        View.OnClickListener onClickListener = getToast(title, description);
-        mEpisodeTitle.setOnClickListener(onClickListener);
-        mEpisodeInfo.setOnClickListener(onClickListener);
-
-        if (item instanceof FeedItem) {
-            mFavoriteButton.setFavorite(((FeedItem) item).isFavorite());
-        }
-
-        final int color = UIUtils.attrColor(R.attr.themeTextColorPrimary, mContext);
-        mEpisodeTitle.setTextColor(color);
-        mEpisodeInfo.setTextColor(color);
-
-        long duration = item.getDuration();
-        if (duration > 0) {
-            mTotalTime.setText(StrUtils.formatTime(duration));
-        } else {
-            PlayerHelper.setDuration(item, mTotalTime);
-        }
-
-        setPlayerProgress(item);
-
-        mPlayPauseButton.setEpisode(item, PlayPauseImageView.PLAYLIST);
-        mPlayerDownloadButton.setEpisode(item);
-
-        mPlayPauseButton.setStatus(STATE_READY);
-
-        ISubscription iSubscription = item.getSubscription(getContext());
-        if (mPlayer.isPlaying()) {
-            argTopPlayer.setPlaybackSpeedView(mPlayer.getCurrentSpeedMultiplier());
-        } else if (iSubscription instanceof org.bottiger.podcast.provider.Subscription) {
-            org.bottiger.podcast.provider.Subscription subscription = (org.bottiger.podcast.provider.Subscription)iSubscription;
-            argTopPlayer.setPlaybackSpeedView(subscription.getPlaybackSpeed());
-        }
-
-        mPlayerSeekbar.setEpisode(item);
-        mPlayerSeekbar.setOverlay(mOverlay);
-        mPlayerSeekbar.getProgressDrawable().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
-
-        mPlayerDownloadButton.setEpisode(item);
-
-        final Activity activity = getActivity();
-        String artworkURL = item.getArtwork(getContext());
-
-        if (iSubscription != null && !TextUtils.isEmpty(iSubscription.getImageURL())) {
-            artworkURL = iSubscription.getImageURL();
-        }
-
-        if (iSubscription != null) {
-
-            //PaletteHelper.generate(iSubscription, activity, mTopPlayer);
-
-            iSubscription.getColors(mContext)
-                    .subscribeOn(io.reactivex.schedulers.Schedulers.io())
-                    .observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
-                    .subscribe(new BaseSubscription.BasicColorExtractorObserver<ColorExtractor>() {
-
-                        @Override
-                        public void onSuccess(ColorExtractor value) {
-                            mPlayPauseButton.setColor(value);
-
-                            int transparentgradientColor;
-                            int gradientColor = value.getPrimary();
-
-                            int alpha = 0;
-                            int red = Color.red(gradientColor);
-                            int green = Color.green(gradientColor);
-                            int blue = Color.blue(gradientColor);
-                            transparentgradientColor = Color.argb(alpha, red, green, blue);
-
-                            GradientDrawable gd = new GradientDrawable(
-                                    GradientDrawable.Orientation.TOP_BOTTOM,
-                                    new int[]{transparentgradientColor, gradientColor});
-                            Drawable wrapDrawable = DrawableCompat.wrap(gd);
-                            DrawableCompat.setTint(wrapDrawable, value.getPrimary());
-                        }
-                    });
-
-
-            Log.v("MissingImage", "Setting image");
-            ImageLoaderUtils.loadImageInto(mPhoto, artworkURL, null, false, false, false);
-
-        }
-
         if (argTopPlayer.isFullscreen()) {
             argTopPlayer.setFullscreen(true, false);
         } else  {
             /* If the player is not fullscreen, but the playlist is empty */
             argTopPlayer.setPlaylistEmpty(mPlaylist.size() == 1);
         }
-    }
-
-    private void setPlayerProgress(@NonNull IEpisode argEpisode) {
-        long offset = argEpisode.getOffset();
-        if (offset > 0) {
-            mCurrentTime.setText(StrUtils.formatTime(offset));
-        } else {
-            mCurrentTime.setText("00:00");
-        }
-        mCurrentTime.setEpisode(argEpisode);
     }
 
     private void setPlaylistViewState(@NonNull Playlist argPlaylist) {
@@ -531,24 +410,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
         return hasContent && !inFullscreenMode;
     }
 
-    private void setPlayer() {
-        unsetPlayer();
-
-        mPlayer = SoundWaves.getAppContext(getContext()).getPlayer();
-
-        mPlayer.addListener(mPlayerSeekbar);
-        mPlayer.addListener(mCurrentTime);
-        mPlayer.addListener(mPlayPauseButton);
-    }
-
-    private void unsetPlayer() {
-        if (mPlayer != null) {
-            mPlayer.removeListener(mPlayerSeekbar);
-            mPlayer.removeListener(mCurrentTime);
-            mPlayer.removeListener(mPlayPauseButton);
-        }
-    }
-
     private void bindHeaderWrapper(@Nullable Playlist argPlaylist) {
         if (argPlaylist != null && mTopPlayer != null) {
             IEpisode episode = argPlaylist.first();
@@ -566,21 +427,8 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
         //mTopPlayer =   (TopPlayer) view.findViewById(R.id.top_player);
         mPhoto =            (ImageViewTinted) view.findViewById(R.id.session_photo);
 
-        mEpisodeTitle         =    (TextView) view.findViewById(R.id.player_title);
-        mEpisodeInfo         =    (TextView) view.findViewById(R.id.player_podcast);
-        mFavoriteButton         = (MaterialFavoriteButton) view.findViewById(R.id.favorite);
-
-        mCurrentTime       =    (TextViewObserver) view.findViewById(R.id.current_time);
-        mTotalTime         =    (TextView) view.findViewById(R.id.total_time);
-
-        mPlayPauseButton         =    (PlayPauseImageView) view.findViewById(R.id.playpause);
-        mPlayerSeekbar          =    (PlayerSeekbar) view.findViewById(R.id.top_player_seekbar);
-        mPlayerDownloadButton   =    (DownloadButtonView) view.findViewById(R.id.download);
-
         assert mTopPlayer != null;
         mTopPlayer.setOverlay(mOverlay);
-
-        setPlayer();
 
         bindHeaderWrapper(mPlaylist);
 
@@ -618,21 +466,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
         mRecyclerStub = null;
     }
 
-    private View.OnClickListener getToast(@NonNull final String argTitle, @NonNull final String argDescription) {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View argView) {
-                String msg = argTitle + "\n\n" + argDescription;
-                // HACK: ugly, but it does actually work :)
-                // double the lifetime of a toast
-                for (int i = 0; i < 2; i++) {
-                    Toast toast = Toast.makeText(getContext(), msg, Toast.LENGTH_LONG);
-                    toast.show();
-                }
-            }
-        };
-    }
-
     private Subscription getPlaylistChangedSubscription() {
         return SoundWaves
                 .getRxBus()
@@ -653,64 +486,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
                         Log.wtf(TAG, "ERROR: notifyPlaylistChanged: mRxPlaylistSubscription event recieved");
                         VendorCrashReporter.report("subscribeError" , throwable.toString());
                         Log.wtf(TAG, "error: " + throwable.toString());
-                    }
-                });
-    }
-
-    private Subscription getPlayerSubscription() {
-        return SoundWaves
-                .getRxBus()
-                .toObserverable()
-                .onBackpressureLatest()
-                .observeOn(AndroidSchedulers.mainThread())
-                .ofType(NewPlayerEvent.class)
-                .subscribe(new Action1<NewPlayerEvent>() {
-                    @Override
-                    public void call(NewPlayerEvent playlistChanged) {
-                        Log.wtf(TAG, "NewPlayerEvent: NewPlayerEvent event recieved");
-                        setPlayer();
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        Log.wtf(TAG, "ERROR: NewPlayerEvent: mRxPlaylistSubscription event recieved");
-                        VendorCrashReporter.report("subscribeError" , throwable.toString());
-                        Log.wtf(TAG, "error: " + throwable.toString());
-                    }
-                });
-    }
-
-    private Subscription getEpisodeChangedSubscription() {
-        return SoundWaves.getRxBus()
-                .toObserverable()
-                .onBackpressureDrop()
-                .ofType(EpisodeChanged.class)
-                .filter(new Func1<EpisodeChanged, Boolean>() {
-                    @Override
-                    public Boolean call(EpisodeChanged episodeChanged) {
-                        return episodeChanged.getAction() != EpisodeChanged.PLAYING_PROGRESS &&
-                                episodeChanged.getAction() != EpisodeChanged.DOWNLOAD_PROGRESS;
-                    }
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<EpisodeChanged>() {
-                    @Override
-                    public void call(EpisodeChanged itemChangedEvent) {
-                        long episodeId = itemChangedEvent.getId();
-                        IEpisode episode = SoundWaves.getAppContext(getContext()).getLibraryInstance().getEpisode(episodeId);
-
-                        if (episode == null)
-                            return;
-
-                        if (episode.equals(mPlaylist.first()) && mTopPlayer != null) {
-                            PlaylistFragment.this.bindHeader(mTopPlayer, episode);
-                        }
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        VendorCrashReporter.handleException(throwable);
-                        Log.wtf(TAG, "Missing back pressure. Should not happen anymore :(");
                     }
                 });
     }
